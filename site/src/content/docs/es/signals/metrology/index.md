@@ -32,7 +32,7 @@ incluyendo dónde divergen y por qué.
 
 [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/) guarda la
 puerta delante de ambas: todo promedio - un Leq, una PSD de Welch, toda
-entrada promediada de un presupuesto de incertidumbre - supone que el
+entrada promediada de un balance de incertidumbre - supone que el
 registro es estacionario, y los
 tests de inversiones de orden y de rachas de Bendat y Piersol lo deciden
 objetivamente a partir de medias cuadráticas por segmento, con las regiones
@@ -48,10 +48,10 @@ espectrales de Welch, de modo que cada PSD lleva su número efectivo de
 promedios, su error aleatorio normalizado y un intervalo de confianza
 chi-cuadrado.
 
-Las páginas se encuentran en la práctica: un presupuesto de incertidumbre
+Las páginas se encuentran en la práctica: un balance de incertidumbre
 de una medición acústica casi siempre contiene un término de calibración, y
 varias normas implementadas en otras partes de la biblioteca (ISO 9612,
-ISO 12999-1) traen presupuestos de incertidumbre que son especializaciones de
+ISO 12999-1) traen balances de incertidumbre que son especializaciones de
 la maquinaria GUM descrita aquí.
 
 ## Páginas de esta sección
@@ -80,7 +80,7 @@ marco de referencia, no una medición. La cualificación de datos implementa sol
 el núcleo cuantitativo del apartado 10.3 de Bendat y Piersol: clasificar el
 tipo de un registro, validarlo frente a límites físicos y editar transitorios
 espurios siguen siendo pasos manuales, tal como los describe el libro. Y un
-presupuesto de incertidumbre es un modelo de *tu* medición: la biblioteca
+balance de incertidumbre es un modelo de *tu* medición: la biblioteca
 propaga lo que declares y nunca inventa los términos. Donde una norma publica
 su propio presupuesto, las guías lo dicen, como hace ISO 9612 para la
 [exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) e

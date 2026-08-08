@@ -27,7 +27,7 @@ ancha de una máquina en marcha es el **análisis de envolvente**, y son tres
 pasos en tres sitios. Se filtra en banda el registro alrededor de la resonancia
 de alta frecuencia del soporte que los impactos hacen sonar, se toma el espectro
 de envolvente para que la frecuencia de repetición de los impactos se convierta
-en una línea discreta — ese paso es [Cepstro, ecos y espectro de la
+en una línea discreta — ese paso es [Cepstrum, ecos y espectro de la
 envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/), a una sección de
 distancia — y se superponen las familias cinemáticas, coloreadas por origen,
 para que un armónico del eje no pueda leerse nunca como prueba de rodamiento.
@@ -51,9 +51,9 @@ calcula las familias y las dibuja sobre un espectro de envolvente medido.
 
 Páginas de otras áreas del sitio en las que se apoya esta sección:
 
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
   el espectro de envolvente del que depende el flujo de trabajo de esta
-  sección, y el cepstro que lee el rizado periódico del propio espectro.
+  sección, y el cepstrum que lee el rizado periódico del propio espectro.
 - [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):
   extraer la contribución de un eje antes de leer sus bandas laterales.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):

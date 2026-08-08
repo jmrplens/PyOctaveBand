@@ -48,7 +48,7 @@ Piersol con la coherencia ordinaria $\gamma^2$. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
-los valores son verificables y no ajustados. Las hojas de datos de
+los valores son verificables y no ajustados. Las hojas de características de
 transductor que estas mediciones alimentan tienen sus propias guías:
 [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/),
 con las convenciones de sensibilidad y el modelo de radiación del pistón en
@@ -176,7 +176,7 @@ print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.
 Las dos cifras de catálogo de cualquier conversor comparten la ponderación
 AES17 **CCIR-RMS** (5.2.7): la curva ITU-R BS.468-4 desplazada un valor plano de
 -5,63 dB para que sea unidad a 2 kHz. El **rango dinámico** (6.4.1) excita el
-dispositivo con una senoide de 997 Hz 60 dB por debajo de plena escala, elimina la
+dispositivo con una sinusoide de 997 Hz 60 dB por debajo de plena escala, elimina la
 fundamental con la muesca normalizada (5.2.8) y pondera el residuo de
 ruido-más-distorsión, y luego informa de la razón del seno de plena escala a ese
 residuo ponderado (también conocida como relación señal-ruido). El **ruido de
@@ -222,7 +222,7 @@ con su definición por órdenes:
   normalizados de 8 kHz y 11,95 kHz son los valores por defecto) donde solo
   cuentan los dos productos en banda en $f_0 \mp \delta$:
   $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
-- **Intermodulación dinámica** (DIM, 14.12.9): una senoide de 15 kHz más una onda
+- **Intermodulación dinámica** (DIM, 14.12.9): una sinusoide de 15 kHz más una onda
   cuadrada de 3,15 kHz filtrada en paso bajo (1:4 pico a pico). La DIM es el
   RMS de los productos de intermodulación
   $|k\,f_\text{square} \pm f_\text{sine}|$ que caen por
@@ -329,11 +329,11 @@ plt.show()
 
 </details>
 
-Lo que estas mediciones alimentan, al final, es una hoja de datos de
+Lo que estas mediciones alimentan, al final, es una hoja de características de
 transductor. Las convenciones de sensibilidad de IEC 60268-5 (donde fallan
-la mayoría de las comparaciones entre hojas de datos), el modelo de
+la mayoría de las comparaciones entre hojas de características), el modelo de
 radiación del pistón en pantalla detrás de la directividad de un cono y el
-informe de características nominales que compone la hoja de datos de la
+informe de características nominales que compone la hoja de características de la
 norma viven en
 [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/);
 el lado de micrófono, sus referencias de sensibilidad, patrones

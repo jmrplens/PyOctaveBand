@@ -29,7 +29,7 @@ de periodo.
 aporta el LAeq, los percentiles y los niveles de suceso de cada periodo de
 referencia; lo que convierte esos niveles de periodo en Lden, Ldn y el nivel de
 evaluación, con la corrección por tonalidad, la corrección por ruido residual y
-el presupuesto de incertidumbre encima, es
+el balance de incertidumbre encima, es
 [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/),
 en esta misma sección. La
 absorción atmosférica que consume todo modelo de propagación se comparte con

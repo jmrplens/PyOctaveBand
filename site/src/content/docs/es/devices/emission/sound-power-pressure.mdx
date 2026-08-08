@@ -462,7 +462,7 @@ de ensayo** (`test_room`), el **cliente**, la **instrumentación**, la
 **temperatura**, la **humedad relativa** y la **presión ambiente**, la **fecha
 del ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área de la superficie de medición $S$ procede del
-propio resultado y se imprime en el recuadro y en la tira de base, junto con las
+propio resultado y se imprime en el recuadro y en la franja de base, junto con las
 correcciones aplicadas (el ruido de fondo $K_1$ y el entorno $K_2$ para el
 método de superficie ISO 3744/3746, o las meteorológicas $C_1$/$C_2$/$C_3$ para
 el método de precisión ISO 3745). Indicar `requirement` añade un veredicto
@@ -472,7 +472,7 @@ que la fuente cumple igual o por debajo del límite). `verbose=True` añade el
 nivel promedio energético $L_p'$ a la tabla, y para el resultado de superficie
 ISO 3744/3746 añade además las columnas de corrección $K_1$/$K_2$ (el resultado
 de precisión ISO 3745 no lleva $K_1$/$K_2$; sus $C_1$/$C_2$/$C_3$ aparecen en la
-tira de base). `language="es"` genera la ficha en español con decimales de coma.
+franja de base). `language="es"` genera la ficha en español con decimales de coma.
 
 ```python
 import numpy as np
@@ -512,12 +512,12 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso3744_sound_power_example"
 	title="Informe de ejemplo de determinación de potencia acústica ISO 3744 (PDF)"
-	description="Ficha de una página de determinación de potencia acústica ISO 3744: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo semianecoico y la instrumentación y el clima, la tabla en bandas de octava (63 Hz a 8 kHz) de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 103,7 dB(A) re 1 pW con el LW total = 105,8 dB, la incertidumbre expandida U = 3,0 dB y la superficie de medición S = 100,53 m2, y un veredicto CUMPLE frente al límite declarado de 105 dB(A), cerrada por una tira de base que indica las correcciones aplicadas K1 = 0,5 dB y K2 = 1,0 dB."
+	description="Ficha de una página de determinación de potencia acústica ISO 3744: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo semianecoico y la instrumentación y el clima, la tabla en bandas de octava (63 Hz a 8 kHz) de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 103,7 dB(A) re 1 pW con el LW total = 105,8 dB, la incertidumbre expandida U = 3,0 dB y la superficie de medición S = 100,53 m2, y un veredicto CUMPLE frente al límite declarado de 105 dB(A), cerrada por una franja de base que indica las correcciones aplicadas K1 = 0,5 dB y K2 = 1,0 dB."
 	caption="Ficha de determinación de potencia acústica (SoundPowerResult.report), una medición ISO 3744 en hemisferio de grado de ingeniería con las correcciones K1/K2 y el LWA en recuadro."
 />
 
 El resultado de precisión escribe la misma hoja desde el lado de ISO 3745, con
-las correcciones meteorológicas en su tira de base en lugar del par
+las correcciones meteorológicas en su franja de base en lugar del par
 $K_1$/$K_2$. Es la medición de la sección 2 sobre las 40 posiciones del
 hemisferio, la del espectro representado más arriba:
 
@@ -539,7 +539,7 @@ result.report(
 <ReportPreview
 	name="iso3745_precision_power_example"
 	title="Informe de ejemplo de determinación de potencia acústica de precisión ISO 3745 (PDF)"
-	description="Ficha de una página de potencia acústica de precisión ISO 3745: un encabezado con el cliente, la fuente de ruido y la sala anecoica cualificada con su red de 40 posiciones en hemisferio, la tabla en bandas de octava de 125 Hz a 8 kHz de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW (78,0, 79,0, 82,6, 85,8, 82,6, 78,7 y 78,0 dB), el espectro LW con su máximo en 1 kHz, y el recuadro con el nivel de potencia acústica ponderado A LWA = 89,3 dB(A) re 1 pW junto al LW total = 90,1 dB, la incertidumbre expandida U = 4,1 dB y la superficie de medición S = 6,28 m2, sobre una tira de base que indica las correcciones meteorológicas aplicadas C1 = -0,13 dB, C2 = 0,00 dB y C3 = 0,0 dB."
+	description="Ficha de una página de potencia acústica de precisión ISO 3745: un encabezado con el cliente, la fuente de ruido y la sala anecoica cualificada con su red de 40 posiciones en hemisferio, la tabla en bandas de octava de 125 Hz a 8 kHz de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW (78,0, 79,0, 82,6, 85,8, 82,6, 78,7 y 78,0 dB), el espectro LW con su máximo en 1 kHz, y el recuadro con el nivel de potencia acústica ponderado A LWA = 89,3 dB(A) re 1 pW junto al LW total = 90,1 dB, la incertidumbre expandida U = 4,1 dB y la superficie de medición S = 6,28 m2, sobre una franja de base que indica las correcciones meteorológicas aplicadas C1 = -0,13 dB, C2 = 0,00 dB y C3 = 0,0 dB."
 	caption="Ficha de potencia acústica de precisión (PrecisionSoundPowerResult.report), la determinación anecoica de ISO 3745 con sus correcciones meteorológicas."
 />
 

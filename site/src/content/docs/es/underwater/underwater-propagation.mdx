@@ -283,9 +283,9 @@ print(underwater.reflection_loss_gradient("sand"))   # 0.278 Np/rad
 ```
 
 Al ser un resultado *incoherente*, el flujo describe el campo promediado en
-distancia, y eso es justo lo que lo convierte en referencia para los solucionadores
+distancia, y eso es justo lo que lo convierte en referencia para los métodos numéricos
 numéricos de
-[Solucionadores de propagación
+[Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/).
 Con el ángulo crítico a 90° y el gradiente de pérdida a cero, la rama cilíndrica
 se reduce a $F = \pi/(rH)$, el límite exacto de muchos modos de una guía ideal;
@@ -655,11 +655,11 @@ Todas las formas cerradas anteriores dejan de bastar cuando la refracción y
 los contornos deciden la respuesta: un mínimo de velocidad del sonido que
 atrapa energía, reflexiones en la superficie y el fondo en aguas someras, o
 una distancia de detección que oscila con la elección de la ley de
-divergencia. En ese punto el campo hay que calcularlo, y los solucionadores de
+divergencia. En ese punto el campo hay que calcularlo, y los métodos numéricos de
 modos normales, trazado de rayos y ecuación parabólica del módulo, junto
 con la guía para elegir entre ellos y estas formas cerradas, tienen su
 propia guía:
-[Solucionadores numéricos de propagación
+[Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/).
 
 ## Qué cubre esta guía
@@ -691,15 +691,15 @@ de alcance. `active_sonar_equation` es solo monostática: no hay geometría
 biestática. `ocean_ambient_noise` deja fuera la banda de turbulencia de baja
 frecuencia y cualquier modelo integrado de tráfico marítimo lejano; hay que
 aportar un espectro de tráfico propio, por ejemplo con
-`ship_source_spectrum` de arriba. Los solucionadores numéricos del campo
+`ship_source_spectrum` de arriba. Los métodos numéricos del campo
 (`normal_modes`, `ray_trace`, `parabolic_equation`) se cubren en
-[Solucionadores numéricos de propagación
+[Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/).
 
 ## Véase también
 
-- [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los solucionadores de modos normales, trazado de rayos y ecuación parabólica para
+- [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
+  los métodos de modos normales, trazado de rayos y ecuación parabólica para
   los casos en que estas formas cerradas no bastan, y la guía de selección
   de modelo.
 - Referencia de la API: [`underwater.propagation.closed_form`](/phonometry/es/reference/api/underwater/closed-form/) y [`underwater.propagation.sound_speed`](/phonometry/es/reference/api/underwater/sound-speed/).

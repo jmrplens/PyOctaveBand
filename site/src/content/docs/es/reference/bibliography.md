@@ -255,7 +255,7 @@ síncrono, Golay por los pares complementarios.
   la Fig. 2. ISBN 978-0-387-77698-9. Citado por
   [Medición de sistemas: Golay, barridos, inversión](/phonometry/es/signals/spectra/system-measurement/)
   y
-  [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/).
+  [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/).
 
 ## Audición y percepción
 
@@ -400,7 +400,7 @@ las guías y no un tratamiento general de la audición.
 - International Organization for Standardization. (2009). *Acoustics —
   Determination of occupational noise exposure — Engineering method*
   (ISO 9612:2009). [Catálogo iso.org](https://www.iso.org/standard/41718.html).
-  Las tres estrategias de medición y el presupuesto de incertidumbre del
+  Las tres estrategias de medición y el balance de incertidumbre del
   anexo C.
   Citado por [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
 - European Parliament and Council. (2003). *Directive 2003/10/EC on the
@@ -470,7 +470,7 @@ se reparte la absorción, que es justo donde discrepan los cinco.
 - Schroeder, M. R. (1965). New method of measuring reverberation time.
   *The Journal of the Acoustical Society of America*, 37(3), 409-412.
   [doi:10.1121/1.1909343](https://doi.org/10.1121/1.1909343).
-  La integración hacia atrás de la respuesta al impulso al cuadrado en una
+  La integración inversa de la respuesta al impulso al cuadrado en una
   curva de decaimiento.
   Citado por [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/).
 - Hak, C. C. J. M., Wenmaekers, R. H. C., & van Luxemburg, L. C. J. (2012).
@@ -1138,7 +1138,7 @@ vuelo.
 
 Urick para el vocabulario y la ecuación del sonar, Ainslie para el sistema
 moderno de magnitudes que codificó ISO 18405 y para números resueltos, y Jensen
-et al. solo cuando llegues a los solucionadores numéricos, donde es la referencia
+et al. solo cuando llegues a los métodos numéricos, donde es la referencia
 habitual. François y Garrison, Ainslie y McColm, y Thorp son tres modelos de
 absorción de alcance decreciente y no tres alternativas.
 
@@ -1171,14 +1171,14 @@ absorción de alcance decreciente y no tres alternativas.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   La monografía de referencia de la propagación numérica: modos normales,
   trazado de rayos y ecuación parabólica.
-  Citado por [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+  Citado por [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
 - Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
   with application to SOFAR. *The Journal of the Acoustical Society of
   America*, 55(2), 220-226.
   [doi:10.1121/1.1914492](https://doi.org/10.1121/1.1914492).
   El perfil canónico de velocidad del sonido en aguas profundas que usan los
-  ejemplos de los solucionadores.
-  Citado por [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+  ejemplos de esos métodos.
+  Citado por [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
 - Francois, R. E., & Garrison, G. R. (1982). Sound absorption based on ocean
   measurements: Part I: Pure water and magnesium sulfate contributions.
   *The Journal of the Acoustical Society of America*, 72(3), 896-907.
@@ -1380,7 +1380,7 @@ Esta área no tiene norma aplicable, así que su literatura es su evidencia.
 Bilbao es la puerta de entrada a los esquemas en diferencias finitas en
 acústica, Virieux la formulación elástica original en malla escalonada, y Moczo
 et al. la revisión que reúne el análisis de estabilidad y de dispersión contra
-el que se comprueban los solucionadores.
+el que se comprueban los esquemas de la biblioteca.
 
 - Williams, E. G. (1999). *Fourier acoustics: Sound radiation and nearfield
   acoustical holography*. Academic Press.

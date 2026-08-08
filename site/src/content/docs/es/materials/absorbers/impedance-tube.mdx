@@ -51,7 +51,7 @@ de transferencia** con dos micrófonos de ISO 10534-2 y el método de la
 **matriz de transferencia** con cuatro micrófonos de ASTM E2611, que añade la
 pérdida por transmisión. La sección final ejecuta el instrumento completo,
 muestra incluida, dentro del
-[solucionador FDTD](/phonometry/es/simulation/fdtd-simulation/) y recupera la respuesta
+[simulación FDTD](/phonometry/es/simulation/fdtd-simulation/) y recupera la respuesta
 analítica con las mismas cadenas de reducción.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_es.svg" alt="Tubo de impedancia de dos micrófonos de ISO 10534-2: un altavoz radiando una onda plana por el tubo, dos micrófonos enrasados en la pared a la separación s y a la distancia x1 de la cara de la probeta, la probeta de ensayo contra un respaldo rígido, y las ondas incidente y reflejada" width="92%" />
@@ -135,14 +135,14 @@ circular sin redondear ($f\,d < 0{,}586\,c$, 6.2.4.1), el mismo
 $f\,d < 0{,}500\,c$ rectangular (6.2.5), una cota de separación algo más
 estricta $f\,s < 0{,}40\,c$ (6.5.4) y un extremo bajo más laxo en el 1 % de
 la longitud de onda (6.2.3). Pasar `diameter=` (y `shape=`) a
-`two_microphone_impedance`, `wave_decomposition` o los solucionadores
+`two_microphone_impedance`, `wave_decomposition` o las funciones
 `transfer_matrix_*` convierte la comprobación correspondiente en un aviso, y
 para la estimación de atenuación del anexo A en tubo rectangular
 `hydraulic_diameter(width, height)` proporciona el diámetro $4A/P$ que espera
 `tube_attenuation_constant`.
 
 El tubo completo, muestra incluida, también se puede simular: la sección 5
-ejecuta esta misma medición de forma virtual dentro del solucionador FDTD y
+ejecuta esta misma medición de forma virtual dentro de la simulación FDTD y
 recupera la absorción analítica de la muestra modelada a través de la misma
 cadena de reducción.
 
@@ -456,7 +456,7 @@ $$
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_es.svg" alt="Tubo de pérdida por transmisión de cuatro micrófonos de ASTM E2611: una fuente sonora, dos micrófonos aguas arriba y dos aguas abajo de la probeta de ensayo a las separaciones s1 y s2 y los desplazamientos l1 y l2, una terminación ajustable para el método de dos cargas, las ondas viajeras A y B aguas arriba y C y D aguas abajo, y las relaciones de matriz de transferencia y pérdida por transmisión" width="92%" />
 
 A escala tiene este aspecto. Una `TransferMatrix` recuperada por los
-solucionadores de dos cargas o de una carga retiene `l1`, `s1`, `l2`, `s2` y
+métodos de dos cargas o de una carga retiene `l1`, `s1`, `l2`, `s2` y
 el espesor de la probeta, así que `tm.plot_geometry()` redibuja el tubo en
 el que se midió.
 
@@ -506,11 +506,11 @@ micrófonos `(H1, H2, H3, H4)` medidas en cada carga; sus métodos
 `absorption_hard_backed`, `characteristic_impedance_material`,
 `material_wavenumber`) leen entonces las magnitudes de ASTM E2611, y su
 `.plot()` dibuja la pérdida de transmisión con la absorción con respaldo
-rígido superpuesta (una matriz construida por los solucionadores retiene
+rígido superpuesta (una matriz construida por esas reducciones retiene
 $\rho c$ y, si se aporta, el vector de frecuencias, de modo que solo una
 matriz construida a mano los necesita como argumentos). La matriz no tiene por qué venir de una
 medición: el
-[solucionador multicapa](/phonometry/es/materials/absorbers/porous-absorbers/) expone la
+[modelo multicapa](/phonometry/es/materials/absorbers/porous-absorbers/) expone la
 matriz de cadena de cualquier apilado modelado en el mismo convenio, de modo
 que una probeta predicha se lee exactamente igual que una medida.
 
@@ -602,10 +602,10 @@ el portamuestras, mucho antes del procesado de señal. Los fallos recurrentes:
   no ruido de medida que esconder.
 
 
-## 5. El tubo virtual: el solucionador medido por las normas
+## 5. El tubo virtual: la simulación medida por las normas
 
 Un dominio de tres filas con paredes rígidas del
-[solucionador FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) es un tubo de onda
+[simulación FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) es un tubo de onda
 plana, y con el mapa de `damping` por celda una muestra porosa se convierte
 en un fluido equivalente (mapas de densidad, velocidad y pérdidas). Eso cierra un
 círculo notable: las historias de las sondas FDTD pueden reducirse con las
@@ -708,9 +708,9 @@ de la cámara reverberante es otra magnitud con su propia guía:
   la resistividad al flujo de ISO 9053 que ancla los modelos contra los que
   se ajusta una medida de tubo.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
-  los modelos de fluido equivalente y el solucionador multicapa cuya matriz de
+  los modelos de fluido equivalente y el modelo multicapa cuya matriz de
   cadena se lee con la misma maquinaria ASTM E2611 que una probeta medida.
-- [Simulación FDTD](/phonometry/es/simulation/fdtd-simulation/): el solucionador 2D
+- [Simulación FDTD](/phonometry/es/simulation/fdtd-simulation/): el esquema 2D
   detrás de los tubos virtuales de la sección 5.
 - [Calibración](/phonometry/es/signals/metrology/calibration/): la calibración de
   micrófonos previa a la función de transferencia con dos micrófonos.

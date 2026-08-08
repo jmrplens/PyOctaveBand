@@ -9,7 +9,7 @@ references:
     edition: "6.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781315372150"
-    note: "La teoría estadística del decaimiento que sustenta la integración hacia atrás y las relaciones de Sabine usadas a lo largo de esta página."
+    note: "La teoría estadística del decaimiento que sustenta la integración inversa y las relaciones de Sabine usadas a lo largo de esta página."
   - type: article
     authors: ["Schroeder, M. R."]
     year: 1965
@@ -19,7 +19,7 @@ references:
     issue: 3
     pages: "409-412"
     doi: "10.1121/1.1909343"
-    note: "El método de integración hacia atrás de la sección de curvas de decaimiento."
+    note: "El método de integración inversa de la sección de curvas de decaimiento."
   - type: article
     authors: ["Hak, C. C. J. M.", "Wenmaekers, R. H. C.", "van Luxemburg, L. C. J."]
     year: 2012
@@ -84,7 +84,7 @@ references:
     title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
     designation: "ISO 3382-1:2009"
     url: "https://www.iso.org/standard/40979.html"
-    note: "La integración hacia atrás, las definiciones de parámetros y la familia de claridad del Anexo A."
+    note: "La integración inversa, las definiciones de parámetros y la familia de claridad del Anexo A."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2008
@@ -162,17 +162,17 @@ $$
 
 Un tiempo por octava constante hace que el espectro del ESS sea rosa (−3 dB/octava). La deconvolución se realiza mediante división espectral **lineal** (no circular, con relleno de ceros) $H = Y\ \overline{X} / (|X|^2 + \varepsilon)$, donde el término de Tikhonov $\varepsilon$ (una fracción de $\max |X|^2$) evita la amplificación del ruido en los extremos de banda. Como un barrido de grave a agudo sitúa los productos de distorsión armónica en tiempos de llegada negativos, caen en la cola envuelta y se eliminan conservando la parte causal (Farina). El método MLS (Anexo A) explota en cambio que la autocorrelación circular de una secuencia de longitud máxima de longitud $2^N-1$ es una delta periódica, de modo que $h = \operatorname{xcorr}_{\text{circ}}(\text{recorded}, \text{mls}) / 2^N$; el promediado síncrono de $n$ periodos añade $10 \log_{10} n$ dB.
 
-### Integración hacia atrás de Schroeder (ISO 3382-1, 5.3.3)
+### Integración inversa de Schroeder (ISO 3382-1, 5.3.3)
 
-La curva de decaimiento por banda es la respuesta al impulso al cuadrado **integrada hacia atrás** (Schroeder):
+La curva de decaimiento por banda es la respuesta al impulso al cuadrado con **integración inversa** (Schroeder):
 
 $$
 E(t) = \int_t^{\infty} p^2(\tau)\ d\tau = \int_0^{\infty} p^2\ d\tau - \int_0^t p^2\ d\tau , \qquad L(t) = 10 \log_{10} \frac{E(t)}{E(0)}\ \text{dB},
 $$
 
-es decir, una suma acumulada invertida en tiempo discreto. La integración hacia atrás cancela la fluctuación aleatoria de una única respuesta al impulso al cuadrado: para un decaimiento de energía puramente exponencial $p^2(t) = e^{-a t}$ da $E(t) = e^{-a t}/a$, una recta exactamente $L(t) = -(10 a / \ln 10)\ t$. El ruido de fondo aplana $E(t)$, así que la integración se trunca en el cruce $t_1$ de la recta de decaimiento ajustada con el nivel de ruido y la cola que falta se compensa con una exponencial de la pendiente ajustada; sin ese término la integral finita **subestima** sistemáticamente $T$.
+es decir, una suma acumulada invertida en tiempo discreto. La integración inversa cancela la fluctuación aleatoria de una única respuesta al impulso al cuadrado: para un decaimiento de energía puramente exponencial $p^2(t) = e^{-a t}$ da $E(t) = e^{-a t}/a$, una recta exactamente $L(t) = -(10 a / \ln 10)\ t$. El ruido de fondo aplana $E(t)$, así que la integración se trunca en el cruce $t_1$ de la recta de decaimiento ajustada con el nivel de ruido y la cola que falta se compensa con una exponencial de la pendiente ajustada; sin ese término la integral finita **subestima** sistemáticamente $T$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento integrada hacia atrás de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
 
 *Una respuesta al impulso al cuadrado, su integral inversa de Schroeder y las ventanas de regresión EDT/T20/T30 del siguiente apartado.*
 

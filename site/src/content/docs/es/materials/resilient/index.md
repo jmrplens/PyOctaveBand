@@ -12,7 +12,7 @@ dinámica por unidad de superficie dividida por la variación de espesor que pro
 Una solera de 120 kg/m² sobre una capa de 10 MN/m³ resuena cerca de 46 Hz;
 reducir la rigidez a la mitad baja esa cifra en un factor raíz de dos, y todo
 lo que el suelo consigue en las bandas de valoración se sigue de dónde quede la
-resonancia. Por eso s' es el único número que una hoja de datos de capa
+resonancia. Por eso s' es el único número que una hoja de características de capa
 elástica tiene que llevar, y por eso es una rigidez *dinámica*: un ensayo de
 compresión estático no describe ni el rango de frecuencias de audio ni la
 precarga de servicio.

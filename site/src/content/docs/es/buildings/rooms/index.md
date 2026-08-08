@@ -111,14 +111,14 @@ habla](/phonometry/es/perception/speech/speech-transmission/).
 
 ## Qué no cubre esta sección
 
-**Aquí no hay ningún solucionador de ondas.** El modelo de fuentes imagen es
+**Aquí no hay ninguna simulación de ondas.** El modelo de fuentes imagen es
 solo especular: no lleva difracción, ni dispersión en un difusor, ni contornos
 de impedancia finita, y se detiene cuando se agota el orden de reflexión, no
 cuando se agota el sonido. Por debajo de la frecuencia de Schroeder, donde los
 modelos estadísticos dejan de servir, lo que ofrece esta sección son las
 *posiciones* de los modos de una caja rectangular rígida, no el campo de una
 sala real a baja frecuencia. Para eso, la sección de
-[simulación de ondas](/phonometry/es/simulation/) ejecuta un solucionador FDTD
+[simulación de ondas](/phonometry/es/simulation/) ejecuta un esquema FDTD
 sobre la geometría real.
 
 **Ni auralización, ni trazador de rayos, ni modelo de sala.** No hay importador

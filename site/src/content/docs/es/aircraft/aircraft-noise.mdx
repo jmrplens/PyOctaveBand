@@ -1,6 +1,6 @@
 ---
 title: "Ruido de aeronaves: nivel efectivo de ruido percibido"
-description: "El nivel efectivo de ruido percibido (EPNL) del Anexo 16 de la OACI, Vol. I, Apéndice 2: la molestia percibida y el PNL, la corrección tonal por el método de pendientes, la corrección por duración de 10 dB por debajo, y el verificador de sistema de medida IEC 61265."
+description: "El nivel efectivo de ruido percibido (EPNL) del Anexo 16 de la OACI, Vol. I, Apéndice 2: la ruidosidad percibida y el PNL, la corrección tonal por el método de pendientes, la corrección por duración de 10 dB por debajo, y el verificador de sistema de medida IEC 61265."
 references:
   - type: standard
     organization: "International Civil Aviation Organization"
@@ -8,7 +8,7 @@ references:
     title: "Annex 16 to the Convention on International Civil Aviation: Environmental protection — Volume I: Aircraft noise"
     designation: "ICAO Annex 16, Vol. I, 8.ª ed."
     url: "https://store.icao.int/en/annex-16-environmental-protection-volume-i-aircraft-noise"
-    note: "El procedimiento normativo EPNL del Apéndice 2 implementado en las secciones de molestia percibida, corrección tonal y EPNL."
+    note: "El procedimiento normativo EPNL del Apéndice 2 implementado en las secciones de ruidosidad percibida, corrección tonal y EPNL."
   - type: standard
     organization: "International Civil Aviation Organization"
     year: 2018
@@ -161,7 +161,7 @@ aircraft.effective_perceived_noise_level(spectra, dt).plot(language="es")
 ### Informe EPNL de la OACI (`.report()`)
 
 `EPNLResult.report(path)` renderiza una ficha PDF de una página con el formato de
-una hoja de datos de certificación de ruido de aeronaves: la línea de base
+una hoja de características de certificación de ruido de aeronaves: la línea de base
 normativa (Anexo 16 de la OACI, Vol. I, Apéndice 2), un bloque opcional de metadatos de
 cabecera al estilo TCDSN (aeronave, fabricante / titular del certificado de tipo,
 solicitante, punto de medida), una tabla de métricas de las magnitudes

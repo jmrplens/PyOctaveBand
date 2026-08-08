@@ -1,5 +1,5 @@
 ---
-title: "Solucionadores numéricos de propagación submarina"
+title: "Métodos numéricos de propagación submarina"
 description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
 references:
   - type: book
@@ -35,18 +35,18 @@ La pérdida por transmisión en forma cerrada de la
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
 no sabe nada del perfil de velocidad del sonido, del fondo ni de la
 superficie. Cuando la refracción y los contornos deciden la respuesta, el
-campo hay que **calcularlo**: esta guía cubre los tres solucionadores numéricos del
+campo hay que **calcularlo**: esta guía cubre los tres métodos numéricos del
 módulo `underwater`, la física que cada uno discretiza, y cómo elegir entre
 ellos y las formas cerradas. Los tres suponen un océano independiente de la
 distancia (estratificado horizontalmente) con superficie de
 presión nula, toman como entrada el mismo perfil $c(z)$ y siguen a
 Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
 
-## 1. Los tres solucionadores de un vistazo
+## 1. Los tres métodos de un vistazo
 
 Para entornos independientes de la distancia (estratificados
 horizontalmente) el campo puede calcularse numéricamente. Se proporcionan
-tres solucionadores (Jensen et al., *Computational Ocean Acoustics*):
+tres métodos (Jensen et al., *Computational Ocean Acoustics*):
 
 - **`normal_modes`** resuelve el problema de autovalores de Sturm-Liouville
   separado en profundidad por diferencias finitas y suma los modos
@@ -172,7 +172,7 @@ print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exacto
 ```
 
 Esa guía de ondas ideal cumple dos papeles, y no conviene confundirlos. Es el
-oráculo exacto contra el que se comprueba el solucionador, que es para lo que se
+oráculo exacto contra el que se comprueba el cálculo, que es para lo que se
 usa aquí, y es además un fondo físicamente *extremo*: un lecho de presión nula
 refleja con módulo unidad e inversión de fase, así que no transmite nada al
 sedimento y no absorbe nada. Una pérdida por transmisión modal o PE calculada
@@ -206,7 +206,7 @@ velocidad del sonido más baja, se aplana según crece $c$ y gira donde
 $c(z_t) = c(z_s)/\cos\theta_0$. En un gradiente lineal $c(z) = c_0 + gz$
 los arcos son exactamente circulares con radio
 $R = c_0/(g \cos\theta_0)$, la forma cerrada contra la que se valida el
-solucionador; en un perfil de aguas profundas la familia de rayos se reenfoca
+trazado de rayos; en un perfil de aguas profundas la familia de rayos se reenfoca
 periódicamente en las **zonas de convergencia** de la figura de la
 sección 1. `ray_trace` integra todos los ángulos de lanzamiento a la vez
 con un esquema Runge-Kutta de cuarto orden y paso fijo, reflejando en la
@@ -337,18 +337,18 @@ que la ley práctica con $R_0 = 1000$ m la estira hasta unos 15,8 km. Cuando
 la ley de divergencia es la mayor incertidumbre del presupuesto, esa es
 la señal de dejar la forma cerrada y calcular el campo.
 
-**¿Forma cerrada o solucionador?** La pérdida por transmisión en forma cerrada no
+**¿Forma cerrada o cálculo numérico?** La pérdida por transmisión en forma cerrada no
 sabe nada del perfil de velocidad del sonido, del fondo ni de la superficie;
 es honesta para caminos cortos, directos y sin contornos, y para presupuestos
 de sonar de primera pasada. Cuando la refracción y los contornos deciden la
-respuesta, elíjase el solucionador por frecuencia y geometría (Jensen et al. 2011,
+respuesta, elíjase el método por frecuencia y geometría (Jensen et al. 2011,
 cap. 1):
 
-| Solucionador | Régimen natural | Qué aporta |
+| Método | Régimen natural | Qué aporta |
 |---|---|---|
 | `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($m < kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres solucionadores |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
@@ -377,7 +377,7 @@ que todos vivan en un mismo módulo.
 ## Qué cubre esta guía
 
 **Cubierto.** `normal_modes`, `ray_trace` y `parabolic_equation` implementan
-los solucionadores numéricos de Jensen et al. (2011) para un océano estratificado
+los métodos numéricos de Jensen et al. (2011) para un océano estratificado
 independiente de la distancia: la suma modal de Sturm-Liouville por
 diferencias finitas (cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de
 las trayectorias de rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar
@@ -387,29 +387,29 @@ modos de la guía de ondas ideal de presión nula, los rayos en arco de
 círculo de un gradiente lineal y la divergencia esférica en campo libre,
 más la coincidencia mutua de la pérdida por transmisión modal y de la PE.
 
-**No cubierto.** Los tres solucionadores suponen una columna de agua independiente
+**No cubierto.** Los tres métodos suponen una columna de agua independiente
 de la distancia con un contorno de presión nula (o, para los modos,
 opcionalmente rígido): no hay fondo absorbente ni elástico, ni atenuación
 del sedimento, ni batimetría real, así que los problemas dependientes de la
-distancia quedan fuera de alcance. El solucionador de rayos devuelve caminos y
+distancia quedan fuera de alcance. El trazado de rayos devuelve caminos y
 tiempos de propagación, no amplitudes: la intensidad de tubo de rayos con
 correcciones de cáusticas no se calcula. La PE es la forma estándar de
 ángulos pequeños (Tappert), no una variante de gran angular de Padé. Para la
-física del lecho elástico que estos solucionadores fluidos dejan fuera, véase
+física del lecho elástico que estos métodos fluidos dejan fuera, véase
 [Ondas elásticas y acoplamiento
 fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
 ## Véase también
 
 - [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
-  las formas cerradas que estos solucionadores sustituyen cuando la refracción y
+  las formas cerradas que estos métodos sustituyen cuando la refracción y
   los contornos importan, y los perfiles de velocidad del sonido que
   consumen.
 - [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/):
   los niveles de referencia de ISO 18405 en los que se expresa toda pérdida
   por transmisión de esta página.
 - [Refracción atmosférica: rayos y la GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
-  los hermanos aéreos de estos solucionadores, con la misma curvatura de rayos y
+  los hermanos aéreos de estos métodos, con la misma curvatura de rayos y
   una PE de función de Green marchada sobre impedancia de suelo en lugar de
   un lecho marino.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): la
@@ -419,7 +419,7 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
 ## Respuestas rápidas
 
-### ¿Qué solucionador de propagación submarina debo usar?
+### ¿Qué método de propagación submarina debo usar?
 
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
 alta frecuencia y océano profundo (geometría de eigenrayos y tiempos de
@@ -427,7 +427,7 @@ propagación a un coste independiente de la frecuencia), modos normales para
 baja frecuencia en aguas someras (pocos modos propagantes, $m < kD/\pi$, la
 solución de referencia en su régimen) y la ecuación parabólica para caminos
 largos de un solo sentido a baja frecuencia (el campo completo TL($z$,$r$)
-con refracción). Cuando dos solucionadores coinciden en un caso, esa coincidencia
+con refracción). Cuando dos métodos coinciden en un caso, esa coincidencia
 es la prueba práctica de convergencia.
 
 ### ¿Cuándo deja de bastar la pérdida por transmisión en forma cerrada?

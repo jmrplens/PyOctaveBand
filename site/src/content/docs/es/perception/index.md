@@ -119,7 +119,7 @@ El umbral de audición, lo que el ruido le hace y cómo se mide la exposición.
   con la edad en el HTLAN.
 - [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
   las estrategias por tareas, basadas en la función y de jornada completa para LEX,8h
-  con el presupuesto de incertidumbre del Anexo C.
+  con el balance de incertidumbre del Anexo C.
 
 ## Qué no cubre esta sección
 

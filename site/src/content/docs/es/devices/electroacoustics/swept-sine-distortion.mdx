@@ -1,6 +1,6 @@
 ---
 title: "Distorsión con barridos y utilidades de fase"
-description: "Separación de la distorsión armónica con un solo barrido exponencial (el método de Farina con el barrido sincronizado de Novak et al. para fases armónicas coherentes), THD en función de la frecuencia de excitación, y las utilidades de fase: fase mínima desde la magnitud vía cepstro real, retardo de grupo y exceso de fase."
+description: "Separación de la distorsión armónica con un solo barrido exponencial (el método de Farina con el barrido sincronizado de Novak et al. para fases armónicas coherentes), THD en función de la frecuencia de excitación, y las utilidades de fase: fase mínima desde la magnitud vía cepstrum real, retardo de grupo y exceso de fase."
 references:
   - type: report
     authors: ["Farina, A."]
@@ -83,7 +83,7 @@ La cadena es exactamente el esquema siguiente: reproducir el barrido, grabar,
 convolucionar con el filtro inverso, y los armónicos caen por delante de la
 respuesta lineal con sus adelantos fijos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido senoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido sinusoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
 
 ```python
 import numpy as np
@@ -224,7 +224,7 @@ En un sistema causal, estable y de fase mínima, la log-magnitud y la fase
 de la respuesta en frecuencia forman un par de transformadas de Hilbert
 (Bendat y Piersol, Sec. 13.1.4): la fase queda totalmente determinada por
 `|H(f)|`. Las utilidades de `phonometry.signals` calculan esa
-reconstrucción con el cepstro real y descomponen cualquier respuesta
+reconstrucción con el cepstrum real y descomponen cualquier respuesta
 medida en su parte invertible y su parte paso todo:
 
 ```python
@@ -296,7 +296,7 @@ inclusive (la disposición `rfft`) y con densidad suficiente para que la
 respuesta al impulso subyacente quepa en el registro implícito; los ceros
 de magnitud (bordes de un paso banda, fondos de notch) se acotan y no son
 representables por un sistema de fase mínima; el factor `oversample`
-(interpolación trigonométrica de la magnitud antes del cepstro) mitiga el
+(interpolación trigonométrica de la magnitud antes del cepstrum) mitiga el
 aliasing cepstral que los ceros casi sobre el círculo causan en mallas
 gruesas.
 
@@ -325,7 +325,7 @@ cerrada del filtro inverso y la corrección de sesgo sub-muestra,
 implementadas por `swept_sine_distortion` y `synchronized_sweep_signal`.
 Las utilidades de fase `minimum_phase`, `group_delay`, `excess_phase` y
 `phase_decomposition` implementan la relación de transformada de Hilbert
-de la sección 13.1.4 de Bendat y Piersol mediante el cepstro real.
+de la sección 13.1.4 de Bendat y Piersol mediante el cepstrum real.
 
 **No cubierto.** La distorsión de intermodulación y la intermodulación
 dinámica (IEC 60268-3, apartados 14.12.7-10) se miden a partir de tonos

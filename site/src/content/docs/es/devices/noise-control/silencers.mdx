@@ -471,12 +471,12 @@ desde primeros principios, los modelos de fluido equivalente alimentados por
 la resistividad al flujo de aire, es la misma teoría de materiales que
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
 
-## Contraste con el solucionador FDTD
+## Contraste con la simulación FDTD
 
 Ese contraste es el clip incrustado en el apartado 1, y vale la pena volver a
 él ahora con el álgebra en la mano. La cámara de expansión de cuatro polos se
 contrasta con el
-[solucionador de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
+[simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
 independiente, que no comparte con el producto de matrices de transferencia
 ninguna fórmula ni ninguna hipótesis más allá de la propia ecuación de ondas:
 un conducto de onda plana que se ensancha en la misma cámara de 0,30 m y
@@ -488,7 +488,7 @@ la pérdida de transmisión anotada en el clip, 6,5 dB a 286 Hz y 0,0 dB a
 tan estrecho descarta un error de álgebra en cualquiera de los dos lados. Los
 dos tienen que separarse tarde o temprano por encima de la primera frecuencia
 de corte del conducto, donde se propagan modos de orden superior: el
-solucionador bidimensional sigue funcionando ahí y el álgebra de onda plana
+esquema bidimensional sigue funcionando ahí y el álgebra de onda plana
 no.
 
 ## Qué cubre esta guía
@@ -499,7 +499,7 @@ cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
 `quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
 los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
 `insertion_loss` para encadenar elementos arbitrarios, cada uno con su
-dibujo a escala `.plot_geometry()`, contrastados contra el solucionador FDTD
+dibujo a escala `.plot_geometry()`, contrastados contra la simulación FDTD
 independiente.
 
 **No cubierto.** Solo se calculan elementos reactivos: los silenciadores
@@ -522,7 +522,7 @@ sin flujo que se usan aquí.
   resto de la instalación: atenuación y ruido de flujo en conductos HVAC,
   plenums, reflexión de extremo y cerramientos de máquina.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el
-  solucionador independiente que respalda el contraste de la cámara de
+  esquema independiente que respalda el contraste de la cámara de
   expansión.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
   la teoría de materiales de fluido equivalente detrás de los revestimientos

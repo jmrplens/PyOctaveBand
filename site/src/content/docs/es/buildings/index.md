@@ -129,7 +129,7 @@ globales de los elementos, los índices de unión y las mejoras de los
 revestimientos son entradas que aportas tú desde una medición o desde el propio
 anexo de una norma; ninguna se deriva de un plano.
 
-**Aquí no hay ningún solucionador de ondas ni ningún modelo de sala.** No hay
+**Aquí no hay ninguna simulación de ondas ni ningún modelo de sala.** No hay
 importador de geometría, ni base de datos de materiales, ni trazador de rayos,
 ni auralización: las páginas de sala toman dimensiones, coeficientes de
 absorción y respuestas al impulso y devuelven parámetros, y el modelo de

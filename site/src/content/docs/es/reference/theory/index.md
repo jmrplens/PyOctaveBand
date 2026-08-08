@@ -27,7 +27,7 @@ porque si no la deducción y el único método al que sirve quedarían separados
 para nada. Es el caso de los módulos submarinos
 ([Acústica submarina](/phonometry/es/underwater/underwater-acoustics/),
 [Propagación submarina](/phonometry/es/underwater/underwater-propagation/),
-[Solucionadores numéricos de propagación
+[Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/) y
 [Exposición a ruido de mamíferos
 marinos](/phonometry/es/underwater/marine-mammal-exposure/));
@@ -39,7 +39,7 @@ electroacústicas de IEC 60268 y la cadena de radiodifusión de BS.1770 en
 [Electroacústica](/phonometry/es/devices/electroacoustics/) y
 [Radiodifusión](/phonometry/es/devices/broadcast/); de los modelos de
 silenciador, de conductos y de recinto a recinto de [Control de
-ruido](/phonometry/es/devices/noise-control/); y de los solucionadores FDTD y elástico,
+ruido](/phonometry/es/devices/noise-control/); y de los esquemas FDTD y elástico,
 cuyo método numérico, cota de estabilidad y regla de dispersión se desarrollan
 en las propias páginas de [simulación de ondas](/phonometry/es/simulation/).
 Todo lo de abajo va listado con las secciones que aloja cada página de dominio.

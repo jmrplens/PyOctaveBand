@@ -30,9 +30,9 @@ con la altura, porque la temperatura y el viento cambian con la altura, y esto
 **refracta** el sonido: los rayos se curvan y, en unos cientos de metros, el
 nivel recibido puede variar en decenas de decibelios. Esta página cubre
 `phonometry.environment.propagation.refraction`, el homólogo para atmósfera
-refractante de los solucionadores oceánicos de
+refractante de los métodos numéricos oceánicos de
 [`phonometry.underwater.propagation.numerical`](/phonometry/es/underwater/underwater-solvers/):
-un **modelo de rayos** y un solucionador de **ecuación parabólica (PE)**.
+un **modelo de rayos** y una **ecuación parabólica (PE)** marchada en distancia.
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
 representativo de la capa superficial de ±0,1 s⁻¹ curva los rayos con un radio
@@ -384,7 +384,7 @@ sombra.
 del sonido que varía solo con la altura, no con la distancia: una atmósfera
 horizontalmente no homogénea (un gradiente que cambia a lo largo de la
 trayectoria) queda fuera de esta formulación independiente de la distancia,
-descrita en el módulo como la contrapartida de los «solucionadores oceánicos
+descrita en el módulo como la contrapartida de los «métodos oceánicos
 independientes del alcance» a los que refleja. Ambos suponen además un suelo
 plano en $z = 0$; ninguno admite un perfil de elevación del terreno.
 

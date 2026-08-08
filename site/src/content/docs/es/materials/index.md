@@ -16,7 +16,7 @@ campo, un instrumento o una familia de modelos por guía.
 sonora](/phonometry/es/materials/absorbers/absorption-measurement/)
 es la cámara reverberante: los coeficientes de incidencia aleatoria de
 ISO 354 y la valoración ponderada ISO 11654 α_w con su clase por letra, la
-cifra que citan las hojas de datos de los absorbentes, con la incertidumbre
+cifra que citan las hojas de características de los absorbentes, con la incertidumbre
 de medida de ISO 12999-2.
 [Resistencia al flujo de
 aire](/phonometry/es/materials/absorbers/airflow-resistance/) es
@@ -28,7 +28,7 @@ instrumento
 de banco: la impedancia superficial compleja, el factor de reflexión y la
 absorción de una muestra pequeña a incidencia normal (ISO 10534-1/-2) y, con
 cuatro micrófonos, su pérdida por transmisión (ASTM E2611), más el tubo FDTD
-virtual que contrasta el solucionador de ondas con las mismas normas.
+virtual que contrasta la simulación de ondas con las mismas normas.
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/)
 convierte la resistividad al flujo medida en *predicciones*: los modelos de
 fluido equivalente de Delany-Bazley, Miki y Johnson-Champoux-Allard dan la
@@ -107,13 +107,13 @@ modelos por guía.
   la impedancia y la pérdida por transmisión ASTM E2611 a incidencia normal,
   más el tubo FDTD virtual.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
-  los modelos porosos de Delany-Bazley, Miki y JCA, el solucionador
+  los modelos porosos de Delany-Bazley, Miki y JCA, el modelo
   multicapa por matrices de transferencia con capas perforadas,
   microperforadas y de membrana, y la integral de Paris de incidencia
   aleatoria.
 - [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/): el
   acoplamiento crítico y el panel ranurado de sonido lento con su
-  solucionador de diseño.
+  cálculo de diseño.
 
 ## [Difusores y superficies](/phonometry/es/materials/diffusers/)
 
@@ -164,7 +164,7 @@ no está implementado, y una resistividad al flujo de aire suministrada como
 entrada en lugar de medida allí mismo. Nada de esta sección predice un
 material a partir de su química o de su fabricación: los modelos van hacia
 delante desde parámetros macroscópicos medidos — resistividad al flujo,
-porosidad, tortuosidad — hasta una impedancia, y no hay ningún solucionador inverso
+porosidad, tortuosidad — hasta una impedancia, y no hay ninguna inversión
 que recupere esos parámetros de una curva de impedancia medida.
 
 ## Antes y después de estas páginas

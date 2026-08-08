@@ -1,6 +1,6 @@
 ---
 title: "Exposición al ruido en el trabajo (ISO 9612)"
-description: "Las estrategias de medición basada en tareas, basada en la función y de jornada completa de la ISO 9612 para el nivel de exposición diario LEX,8h, con el presupuesto de incertidumbre del anexo C y el límite superior unilateral al 95 %."
+description: "Las estrategias de medición basada en tareas, basada en la función y de jornada completa de la ISO 9612 para el nivel de exposición diario LEX,8h, con el balance de incertidumbre del anexo C y el límite superior unilateral al 95 %."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -8,7 +8,7 @@ references:
     title: "Acoustics — Determination of occupational noise exposure — Engineering method"
     designation: "ISO 9612:2009"
     url: "https://www.iso.org/standard/41718.html"
-    note: "El método implementado: las estrategias basadas en tareas (apartado 9), basadas en la función (apartado 10) y de jornada completa (apartado 11), la colocación del micrófono del apartado 12.3, el presupuesto de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12, Tablas C.4/C.5) y el factor de cobertura unilateral k = 1,65 (apartado 14), validado frente a los ejemplos resueltos de los anexos D, E y F; el informe de medición del apartado 15 lo escribe ExposureResult.report()."
+    note: "El método implementado: las estrategias basadas en tareas (apartado 9), basadas en la función (apartado 10) y de jornada completa (apartado 11), la colocación del micrófono del apartado 12.3, el balance de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12, Tablas C.4/C.5) y el factor de cobertura unilateral k = 1,65 (apartado 14), validado frente a los ejemplos resueltos de los anexos D, E y F; el informe de medición del apartado 15 lo escribe ExposureResult.report()."
   - type: report
     organization: "European Parliament and Council"
     year: 2003
@@ -40,7 +40,7 @@ diseño de la medición *en torno* a esa primitiva: cómo muestrear una jornada
 laboral real, cómo combinar las partes y cómo adjuntar la incertidumbre
 normativa que necesita todo informe de higiene industrial. El módulo
 `occupational_exposure` añade las tres **estrategias de medición** y el
-presupuesto de incertidumbre del **anexo C** sobre la maquinaria del promediado
+balance de incertidumbre del **anexo C** sobre la maquinaria del promediado
 en energía.
 
 <ThemeImage
@@ -173,7 +173,7 @@ plt.show()
 
 </details>
 
-## 2. El presupuesto de incertidumbre del anexo C
+## 2. El balance de incertidumbre del anexo C
 
 Conviene detallar dos sutilezas. Primero, el factor de cobertura es $k = 1{,}65$
 para un intervalo **unilateral** al 95 % (apartado 14), porque al higienista solo

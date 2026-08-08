@@ -103,7 +103,7 @@ valoración.
   (IEC 61252), y espectrogramas de octava.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   Lden, Ldn y los niveles de evaluación compuestos, el ajuste tonal, la
-  corrección de ruido residual y el presupuesto de incertidumbre.
+  corrección de ruido residual y el balance de incertidumbre.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
   de evaluación y las fases de ruido, y las tablas de valores límite.
@@ -127,8 +127,8 @@ calibrada y acompañada de su calidad estadística.
   espectrograma STFT calibrado en unidades absolutas (dB SPL para pascales)
   y la FFT con zoom que resuelve tonos más próximos que un bin práctico de
   FFT.
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
-  el cepstro de potencia, real y complejo con análisis de quefrencia,
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+  el cepstrum de potencia, real y complejo con análisis de quefrencia,
   detección de ecos con el coeficiente de reflexión leído en el pico
   cepstral, liftering paso bajo/paso alto de un espectro logarítmico, y el
   espectro de la envolvente que convierte las modulaciones de amplitud en
@@ -189,9 +189,9 @@ veredicto de clase de aquí describe el algoritmo y no un aparato construido.
 ni ningún otro contenedor: toda función toma un array que ya has leído, que es
 la razón de que `fs` sea siempre un argumento. **Aquí no hay procesado de
 arrays.** La correlación y el retardo modelan un único camino común entre
-exactamente dos sensores e informan solo del mayor pico; no hay un solucionador
-TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
-rasgos perceptuales.** El cepstro de aquí es el de frecuencia lineal, sin
+exactamente dos sensores e informan solo del mayor pico; no hay ninguna resolución
+de TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
+rasgos perceptuales.** El cepstrum de aquí es el de frecuencia lineal, sin
 escala mel ni variante MFCC, y la sonoridad como sensación pertenece a
 [Psicoacústica](/phonometry/es/perception/psychoacoustics/), no a las métricas
 energéticas de esta sección.

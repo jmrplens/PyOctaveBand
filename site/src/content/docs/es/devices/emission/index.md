@@ -5,7 +5,7 @@ description: "La emisión acústica total de una fuente: determinación de la po
 
 La magnitud central de esta sección es la **potencia acústica**: la energía
 acústica total por segundo que radia una fuente. Expresada en decibelios como
-el nivel de potencia acústica, es la cifra que va en una hoja de datos,
+el nivel de potencia acústica, es la cifra que va en una hoja de características,
 alimenta una predicción de sala o de exteriores y se compara con los límites
 de emisión de ruido.
 

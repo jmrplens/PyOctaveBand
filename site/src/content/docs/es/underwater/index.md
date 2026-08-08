@@ -1,6 +1,6 @@
 ---
 title: "Acústica submarina"
-description: "El sonido en el mar: los niveles de referencia de ISO 18405, el ruido radiado por buques (ISO 17208) y la exposición por hincado de pilotes (ISO 18406), la propagación desde la pérdida de transmisión en forma cerrada y la ecuación del sonar hasta el ruido ambiente y los solucionadores numéricos, y los criterios auditivos de mamíferos marinos que convierten un nivel en una evaluación."
+description: "El sonido en el mar: los niveles de referencia de ISO 18405, el ruido radiado por buques (ISO 17208) y la exposición por hincado de pilotes (ISO 18406), la propagación desde la pérdida de transmisión en forma cerrada y la ecuación del sonar hasta el ruido ambiente y los métodos numéricos, y los criterios auditivos de mamíferos marinos que convierten un nivel en una evaluación."
 ---
 
 La acústica submarina funciona con la misma física que la acústica aérea pero
@@ -43,7 +43,7 @@ detección, la pérdida por reflexión en el lecho marino de Rayleigh, y el
 espectro de ruido ambiente de Wenz con el tráfico marítimo JOMOPANS-ECHO.
 Cuando la refracción y los contornos deciden la
 respuesta,
-[Solucionadores numéricos de propagación
+[Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/)
 calcula el campo en su lugar: la expansión en modos normales, el trazado de
 rayos y la ecuación parabólica split-step de Fourier, con la guía para
@@ -71,8 +71,8 @@ de teoría.
 - [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
   pérdida de transmisión, velocidad del sonido, ecuación del sonar, reflexión
   en el lecho y ruido ambiente oceánico, en forma cerrada.
-- [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los solucionadores de modos normales, trazado de rayos y ecuación parabólica de
+- [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
+  los métodos de modos normales, trazado de rayos y ecuación parabólica de
   la guía de ondas estratificada, cada uno validado contra una forma cerrada
   exacta, y cómo elegir modelo de propagación.
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
@@ -93,14 +93,14 @@ continuo no tiene forma cerrada aquí ni en ningún otro lugar de la biblioteca.
 
 **El lecho marino es delgado.** La página de formas cerradas lo modela como una
 reflexión de Rayleigh fluido-fluido sin pérdidas, así que la atenuación del
-sedimento queda fuera de alcance, y los tres solucionadores suponen una columna de agua
+sedimento queda fuera de alcance, y los tres métodos suponen una columna de agua
 **independiente de la distancia**, sin fondo absorbente ni elástico y sin
 batimetría real — lo que deja fuera por completo los problemas dependientes de
-la distancia. El solucionador de rayos devuelve caminos y tiempos de propagación pero
+la distancia. El trazado de rayos devuelve caminos y tiempos de propagación pero
 no amplitudes (sin intensidad de tubo de rayos, sin corrección de cáusticas), y
 la ecuación parabólica es la forma estándar de ángulos pequeños de Tappert y no
 una variante de gran angular de Padé. Para la física del lecho elástico que
-estos solucionadores fluidos dejan fuera, el [solucionador de ondas
+estos métodos fluidos dejan fuera, el [esquema de ondas
 elásticas](/phonometry/es/simulation/elastic-waves/) es lo más parecido que
 tiene la biblioteca.
 

@@ -919,7 +919,7 @@ export const glossary = [
         id: "cepstrum",
         name: {
           en: "Cepstrum and quefrency",
-          es: "Cepstro y quefrencia",
+          es: "Cepstrum y quefrencia",
         },
         unit: {
           en: "quefrency in s",
@@ -936,7 +936,7 @@ export const glossary = [
         guide: "signals/spectra/cepstrum-echoes",
         definition: {
           en: "Cepstrum: the inverse transform of the logarithmic spectrum, in which the periodic ripple an echo or a harmonic family leaves across the spectrum collapses onto a single peak. Quefrency is its independent variable, a time in seconds, at which that peak stands at the echo's own delay — which is why a bearing report quotes a quefrency and not a frequency.",
-          es: "Cepstro: la transformada inversa del espectro logarítmico, en la que el rizado periódico que un eco o una familia de armónicos deja en el espectro se concentra en un único pico. La quefrencia es su variable independiente, un tiempo en segundos, en la que ese pico aparece al retardo propio del eco, y por eso un informe de rodamientos cita una quefrencia y no una frecuencia.",
+          es: "Cepstrum: la transformada inversa del espectro logarítmico, en la que el rizado periódico que un eco o una familia de armónicos deja en el espectro se concentra en un único pico. La quefrencia es su variable independiente, un tiempo en segundos, en la que ese pico aparece al retardo propio del eco, y por eso un informe de rodamientos cita una quefrencia y no una frecuencia.",
         },
       },
       {

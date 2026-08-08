@@ -23,7 +23,7 @@ convierte una hoja así en un informe de ensayo y no en un estudio de diseño so
 los datos de entrada medidos y la norma declarada, y las dos cosas las aportas
 tú. La página de altavoces vuelve luego a poner el dispositivo caracterizado en
 una sala con un micrófono abierto, donde la pregunta deja de ser un número de
-hoja de datos y pasa a ser si el lazo es estable: el criterio de Long de
+hoja de características y pasa a ser si el lazo es estable: el criterio de Long de
 ganancia antes de la realimentación, la corrección por número de micrófonos
 abiertos y el margen de 10 dB para el que se diseña un sistema ecualizado se
 calculan ahí. Si estás diseñando o diagnosticando un sistema de refuerzo sonoro

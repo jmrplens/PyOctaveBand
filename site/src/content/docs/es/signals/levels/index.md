@@ -46,7 +46,7 @@ Convertir esos niveles en un veredicto regulatorio es
 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
 el nivel día-tarde-noche Lden y los niveles de evaluación de **ISO 1996-1**
 con sus ajustes, y la cadena de determinación de ISO 1996-2 con el ajuste
-tonal, la corrección de ruido residual y el presupuesto de incertidumbre de
+tonal, la corrección de ruido residual y el balance de incertidumbre de
 la medición.
 
 Las normativas nacionales construyen su propio índice sobre esa cadena, y

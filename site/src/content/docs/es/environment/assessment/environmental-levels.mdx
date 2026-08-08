@@ -1,6 +1,6 @@
 ---
 title: "Niveles ambientales (ISO 1996-1/-2)"
-description: "Lden, Ldn y los niveles de evaluación compuestos de ISO 1996-1, con el ajuste tonal, la corrección de ruido residual y el presupuesto de incertidumbre de medida de ISO 1996-2."
+description: "Lden, Ldn y los niveles de evaluación compuestos de ISO 1996-1, con el ajuste tonal, la corrección de ruido residual y el balance de incertidumbre de medida de ISO 1996-2."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -21,7 +21,7 @@ references:
     title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
     designation: "ISO 1996-2:2017"
     url: "https://www.iso.org/standard/59766.html"
-    note: "La corrección de ruido residual del apartado 10.4, el presupuesto de incertidumbre de medida del apartado 4 / Anexo F, el mapeo de audibilidad media de la Tabla J.1 del Anexo J y el método de cribado del Anexo K."
+    note: "La corrección de ruido residual del apartado 10.4, el balance de incertidumbre de medida del apartado 4 / Anexo F, el mapeo de audibilidad media de la Tabla J.1 del Anexo J y el método de cribado del Anexo K."
   - type: standard
     organization: "British Standards Institution"
     year: 2003
@@ -40,7 +40,7 @@ página es la cadena de evaluación regulatoria construida sobre los niveles
 por periodo medidos: los descriptores de día completo $L_{den}$/$L_{dn}$ y
 los niveles de evaluación compuestos de ISO 1996-1, y los procedimientos de
 determinación de ISO 1996-2 que hacen defendible el número declarado: el
-ajuste tonal, la corrección de ruido residual y el presupuesto de incertidumbre
+ajuste tonal, la corrección de ruido residual y el balance de incertidumbre
 de medida.
 
 El cálculo de niveles en sí, las integrales de
@@ -135,7 +135,7 @@ ISO 1996-2:2017 es la parte de **determinación**: cómo el nivel medido se
 convierte en nivel de evaluación y se declara con su incertidumbre. La *suma* del
 nivel de evaluación y las penalizaciones por periodo están en ISO 1996-1 (arriba);
 ISO 1996-2 aporta el ajuste tonal, la corrección de ruido residual y el
-presupuesto de incertidumbre.
+balance de incertidumbre.
 
 **Ajuste tonal (método de ingeniería, Anexo C de ISO 1996-2:2007).** La edición
 de 2017 abandonó el algoritmo autocontenido y remite en su lugar a ISO/PAS 20065
@@ -209,7 +209,7 @@ environment.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
 1996-1:2016 (apartado 6.5,
 `environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal del
 anexo C de la ISO 1996-2:2007 junto con la corrección de ruido residual
-(apartado 10.4), el presupuesto de incertidumbre de medida (apartado 4, anexo F),
+(apartado 10.4), el balance de incertidumbre de medida (apartado 4, anexo F),
 el mapeo de audibilidad media del anexo J y el método de cribado del anexo K
 de la ISO 1996-2:2017.
 
@@ -224,7 +224,7 @@ aplicados.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): los niveles $L_{eq}$/$L_{Aeq}$, percentiles y de suceso con los que se componen los indicadores de esta página.
 - [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste $K_t$ (Tabla J.1).
 - [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/): los veredictos de relación tono-ruido y de prominencia de ECMA-418-1, cribado de emisión complementario para la cuestión tonal.
-- [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su presupuesto de incertidumbre.
+- [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su balance de incertidumbre.
 - Referencia de la API: [`environment.assessment.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environment.assessment.rating`](/phonometry/es/reference/api/environment/rating/).
 - Teoría: [Descriptores ambientales (ISO 1996-1)](/phonometry/es/reference/theory/environment-transport/#descriptores-ambientales-iso-1996-1): las definiciones de ISO 1996-1 del nivel de evaluación y de los indicadores día-tarde-noche, y qué les hacen las correcciones.
 

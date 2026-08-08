@@ -1,6 +1,6 @@
 ---
 title: "Simulación de ondas FDTD 2D"
-description: "Un solucionador acústico 2D determinista por diferencias finitas en el dominio del tiempo sobre una malla escalonada presión-velocidad: fuentes gaussianas, tonales y de señal arbitraria, sondas de presión, obstáculos rasterizados, contornos rígidos, de impedancia y absorbentes, la cadena de campo cercano a lejano de Kirchhoff-Helmholtz, y un resultado congelado con historias de sonda, instantáneas del campo y un método plot, siguiendo el capítulo 4 de Attenborough y Van Renterghem (2021)."
+description: "Un método acústico 2D determinista por diferencias finitas en el dominio del tiempo sobre una malla escalonada presión-velocidad: fuentes gaussianas, tonales y de señal arbitraria, sondas de presión, obstáculos rasterizados, contornos rígidos, de impedancia y absorbentes, la cadena de campo cercano a lejano de Kirchhoff-Helmholtz, y un resultado congelado con historias de sonda, instantáneas del campo y un método plot, siguiendo el capítulo 4 de Attenborough y Van Renterghem (2021)."
 references:
   - type: book
     authors: ["Attenborough, K.", "Van Renterghem, T."]
@@ -33,7 +33,7 @@ references:
     volume: "7"
     pages: "5389"
     doi: "10.1038/s41598-017-05710-5"
-    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este solucionador, el contraste TMM frente a onda completa que documenta el artículo."
+    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este esquema, el contraste TMM frente a onda completa que documenta el artículo."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -54,7 +54,7 @@ tiempo (Ecs. 4.11-4.12), la condición de estabilidad de Courant
 (Ec. 4.32) y el contorno de impedancia real independiente de la frecuencia
 (Ecs. 4.33-4.35).
 
-El solucionador es **determinista por diseño**: aritmética float64, sin
+El esquema es **determinista por diseño**: aritmética float64, sin
 números aleatorios y avance numpy monohilo, de modo que las mismas entradas
 producen salidas idénticas bit a bit en la misma plataforma. Es el motor de
 las animaciones FDTD de esta documentación, promocionado a API pública con
@@ -154,7 +154,7 @@ convierte con ``ix = round(x / dx - 0.5)``.
 Tres tipos de fuente inyectan una **fuente blanda** (una contribución de
 presión aditiva que no dispersa las ondas que pasan) en una celda de la
 malla: `GaussianPulse` (un pulso de banda ancha con semianchura temporal
-`width`), `CWSource` (un tono senoidal con rampa de coseno alzado para que su
+`width`), `CWSource` (un tono sinusoidal con rampa de coseno alzado para que su
 arranque no salpique el campo con un transitorio de banda ancha) y
 `SignalSource` (una forma de onda muestreada arbitraria, interpolada
 linealmente sobre los pasos temporales de la simulación). Las sondas
@@ -166,7 +166,7 @@ mejor con un frente plano. Dos herramientas lo cubren, cada una
 unidireccional por su propio mecanismo:
 
 - `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`
-  superpone un paquete gaussiano (opcionalmente con portadora senoidal)
+  superpone un paquete gaussiano (opcionalmente con portadora sinusoidal)
   como condición inicial viajando hacia `"down"`, `"up"`, `"left"` o
   `"right"`; la velocidad consistente con el leapfrog escrita medio paso
   atrás es lo que la hace unidireccional, y tras el frente la energía
@@ -273,7 +273,7 @@ plt.show()
 
 Un dominio de tres filas con paredes rígidas es un tubo de onda plana, y con
 el mapa de `damping` por celda una muestra porosa se convierte en un fluido
-equivalente, lo que convierte al propio solucionador en una probeta medible: la
+equivalente, lo que convierte a la propia simulación en una probeta medible: la
 [guía del tubo de
 impedancia](/phonometry/es/materials/absorbers/impedance-tube/) ejecuta
 las mediciones ISO 10534-2 y ASTM E2611 de forma virtual sobre exactamente
@@ -293,13 +293,13 @@ rectángulo cerrado de caras de celda, en acumuladores complejos (una DFT al
 vuelo por punto y frecuencia, así que un régimen de onda continua no
 almacena historias temporales), y la integral propaga esos fasores hasta el
 infinito con la función de Green de espacio libre $-(j/4)\,H_0^{(2)}(kR)$, la
-misma construcción con la que los solucionadores FEM de onda completa
+misma construcción con la que los códigos FEM de onda completa
 publican patrones de dispersión desde el campo cercano. Dos propiedades
 sostienen el esquema: la malla escalonada ya guarda $v_n$ exactamente en
 las caras del contorno, y todo campo cuyas fuentes queden *fuera* del
 contorno integra a nada (extinción), de modo que los fasores del campo
 total de una dispersión con onda plana se transforman directamente en el
-campo lejano *dispersado*. En el solucionador discreto esa cancelación deja
+campo lejano *dispersado*. En el esquema discreto esa cancelación deja
 un residuo de dispersión numérica de malla (por debajo de 0,01 dB en las
 escenas validadas aquí); `ContourPhasors.subtract()` lo elimina con una
 pasada de referencia sin dispersor cuando esa última fracción importa.
@@ -352,8 +352,8 @@ nulos se desplazan unos grados.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la biblioteca, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
 
-*Dos rutas independientes al mismo campo lejano: el panel mallado en un
-solucionador de onda completa en el dominio del tiempo (continuo) frente a
+*Dos rutas independientes al mismo campo lejano: el panel mallado por
+onda completa en el dominio del tiempo (continuo) frente a
 la cadena de matrices de transferencia homogeneizada (discontinuo). Los
 lóbulos coinciden; los nulos, sensibles a las correcciones de extremo
 milimétricas que el TMM modela analíticamente, se desplazan unos grados.*
@@ -476,8 +476,8 @@ plt.show()
 
 A la inversa, cuando existe una forma cerrada validada (reverberación
 estadística, atenuación en exteriores de ISO 9613-2, fuentes imagen en una
-sala rectangular), la forma cerrada es miles de veces más barata: este
-solucionador es el contraste y el demostrador, no el sustituto. El oráculo
+sala rectangular), la forma cerrada es miles de veces más barata: esta
+simulación es el contraste y el demostrador, no el sustituto. El oráculo
 funciona en ambos sentidos; una ejecución en caja rígida reproduce los modos
 analíticos de la sala:
 
@@ -555,7 +555,7 @@ frente en vez de pasar limpiamente. Los *patrones* de interferencia y
 difracción son fieles; los niveles absolutos y las tasas de caída no son los
 de una sala 3D. Trata las ejecuciones 2D como secciones y demostraciones, y
 valida cualquier afirmación cuantitativa 3D contra una forma cerrada o un
-solucionador 3D.
+cálculo 3D.
 
 <span id="dispersion-numerica-y-precision"></span>
 
@@ -593,7 +593,7 @@ resuelta o fuera de eje es más precisa. Con
 $\Delta x = 1$ cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
 reducir $\Delta x$ a la mitad divide el error entre cuatro (el esquema es de
 segundo orden, y la batería de validación mide ese orden observado bajo
-refinamiento de malla). Los tests anclan el solucionador a oráculos
+refinamiento de malla). Los tests anclan el esquema a oráculos
 analíticos: autofrecuencias de caja y de conducto, tiempos de llegada en
 campo libre y caída cilíndrica, el eco de la fuente imagen de una pared
 rígida, el coeficiente de reflexión de impedancia anterior y la propia
@@ -611,7 +611,7 @@ compañero `elastic_fdtd_simulation` integra sobre ella el sistema
 velocidad-esfuerzo P-SV de Virieux (1986), añadiendo ondas de cizalla,
 superficies libres por imagen de esfuerzos con ondas de Rayleigh, y el
 acoplamiento fluido-sólido con conversión de modo, ondas de interfase de
-Scholte y transmisión de placas sumergidas. Ese solucionador tiene su
+Scholte y transmisión de placas sumergidas. Ese esquema tiene su
 propia guía,
 [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
@@ -637,7 +637,7 @@ dipolo, la propiedad de extinción, y los paneles QRD y metadifusor
 mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
 la biblioteca.
 
-**No cubierto.** El solucionador es solo bidimensional: modela una fuente
+**No cubierto.** El esquema es solo bidimensional: modela una fuente
 lineal en sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la
 propagación esférica $1/r$ de una fuente puntual 3D, así que los niveles
 absolutos y las tasas de decaimiento no son los de una sala 3D. El contorno
@@ -646,14 +646,14 @@ sencillo» de una verdadera capa perfectamente adaptada, no una PML en sí. Las
 ecuaciones de gobierno suponen un medio en reposo, así que no se modela la
 advección por viento o flujo, y el único contorno de impedancia es el real
 independiente de la frecuencia de las Ecs. 4.33-4.35. Los medios elásticos no
-se cubren aquí: el solucionador compañero P-SV, sus superficies libres y su
+se cubren aquí: el esquema compañero P-SV, sus superficies libres y su
 física fluido-sólido tienen su propia guía, [Ondas elásticas y acoplamiento
 fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
 ## Véase también
 
 - [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/):
-  el solucionador compañero P-SV sobre la misma malla escalonada, con ondas
+  el esquema compañero P-SV sobre la misma malla escalonada, con ondas
   de Rayleigh y de Scholte, conversión de modo y placas sumergidas.
 - [Informe de conformidad](/phonometry/es/reference/conformance/): dos de los anclajes
   de validación en forma cerrada del §4 se ejecutan ahí.
@@ -695,4 +695,4 @@ duplicación de distancia, en lugar del $1/r$ esférico (6,0 dB por
 duplicación) de una fuente puntual 3D. Los patrones de interferencia y
 difracción son fieles, pero los niveles absolutos y las tasas de caída no
 son los de una sala 3D; valida cualquier afirmación cuantitativa 3D contra
-una forma cerrada o un solucionador 3D.
+una forma cerrada o un cálculo 3D.

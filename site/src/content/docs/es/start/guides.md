@@ -83,7 +83,7 @@ head:
             "@type": "ListItem",
             "position": 10,
             "name": "Simulación de ondas",
-            "description": "Solucionadores FDTD 2D deterministas, acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a una norma.",
+            "description": "Simulación FDTD 2D determinista, acústica y elástica P-SV, validada frente a oráculos analíticos y no frente a una norma.",
             "url": "https://jmrplens.github.io/phonometry/es/simulation/"
           }
         ]
@@ -177,7 +177,7 @@ ISO 1996-1, IEC 60942 y la GUM.
   SEL, y la dosis de ruido.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ y los niveles de evaluación compuestos, el ajuste tonal, la
-  corrección de ruido residual y el presupuesto de incertidumbre. Vive en Medio
+  corrección de ruido residual y el balance de incertidumbre. Vive en Medio
   ambiente y transporte, y se repite aquí porque son las definiciones de nivel
   de arriba agregadas a lo largo de un día.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
@@ -198,7 +198,7 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): el
   espectrograma STFT calibrado en dB SPL absolutos y la FFT con zoom que
   resuelve tonos más próximos que un bin práctico de FFT.
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
   el análisis de quefrencia, la detección de ecos con el coeficiente de
   reflexión leído en el pico cepstral, el liftering y el espectro de la
   envolvente.
@@ -291,7 +291,7 @@ ISO 389-7, ISO 1999 e ISO 9612.
   frecuencia, combinado con la componente de la edad.
 - [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
   las estrategias por tareas, basadas en la función y de jornada completa para
-  $L_{EX,8h}$, con el presupuesto de incertidumbre y el límite superior.
+  $L_{EX,8h}$, con el balance de incertidumbre y el límite superior.
 
 ## [Salas y edificación](/phonometry/es/buildings/)
 
@@ -413,13 +413,13 @@ ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
   superficial, la absorción y la pérdida por transmisión a incidencia normal,
   más el tubo FDTD virtual.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/): los
-  modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el solucionador multicapa
+  modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el modelo multicapa
   por matriz de transferencia con capas perforadas, microperforadas y de
   membrana, y la integral de incidencia aleatoria.
 - [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/): la
   condición de acoplamiento crítico para la absorción perfecta y el panel
   ranurado de sonido lento cargado con resonadores de Helmholtz, con su
-  solucionador de diseño.
+  cálculo de diseño.
 **[Difusores y superficies](/phonometry/es/materials/diffusers/)**
 
 - [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/): el
@@ -551,7 +551,7 @@ para la cartografía reglamentaria.
 
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ y los niveles de evaluación compuestos, el ajuste tonal, la
-  corrección de ruido residual y el presupuesto de incertidumbre. Listada también
+  corrección de ruido residual y el balance de incertidumbre. Listada también
   en Análisis de señal, junto a las definiciones de nivel sobre las que se
   construye.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
@@ -597,8 +597,8 @@ ISO 17208-1/-2, ISO 18406 y JOMOPANS-ECHO.
   la divergencia geométrica más la absorción de volumen, la velocidad del sonido
   en agua de mar, la ecuación del sonar, las pérdidas por reflexión en el fondo y
   el espectro de ruido ambiente.
-- [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los solucionadores de modos normales, trazado de rayos y ecuación parabólica de la
+- [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
+  los métodos de modos normales, trazado de rayos y ecuación parabólica de la
   guía de ondas estratificada, y cómo elegir modelo de propagación.
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
   la cara auditiva de ese ruido: los audiogramas de grupo, las funciones de
@@ -673,7 +673,7 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 
 ## [Simulación de ondas](/phonometry/es/simulation/)
 
-Solucionadores deterministas de diferencias finitas en el dominio del tiempo en 2D,
+Esquemas deterministas de diferencias finitas en el dominio del tiempo en 2D,
 acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a
 una norma. Es la única área sin documento aplicable, así que su evidencia es la
 solución en forma cerrada que reproduce.
@@ -684,6 +684,6 @@ solución en forma cerrada que reproduce.
   absorbentes, y un resultado inmutable con los historiales de sonda y las
   instantáneas del campo.
 - [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/):
-  el solucionador compañero P-SV sobre la misma malla, con ondas de Rayleigh
+  el esquema compañero P-SV sobre la misma malla, con ondas de Rayleigh
   en superficies libres, conversión de modo, ondas de interfase de Scholte y
   transmisión de placas sumergidas.

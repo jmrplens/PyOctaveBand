@@ -131,7 +131,7 @@ filtros](/phonometry/es/signals/filters/filter-banks/) para la rejilla.
 
 **Lee el espectro antes de fiarte de él.** Dos de las 33 bandas contienen la
 señal: 90,71 dB a 100 Hz y 90,95 dB a 1 kHz, ambas a menos de 0,3 dB de
-90,97 dB, el nivel de una senoide de amplitud unidad leída como pascales
+90,97 dB, el nivel de una sinusoide de amplitud unidad leída como pascales
 ($20\log_{10}(0{,}7071/20\,\mu\mathrm{Pa})$). Esa coincidencia es la comprobación
 de que el banco hace una aritmética defendible; el pequeño déficit en 100 Hz es
 la respuesta del filtro de banda diezmado en su propio centro, no energía
@@ -149,7 +149,7 @@ máscara que fija cuánto tienen que caer esas faldas.
 **Todavía no son niveles físicos.** `octave_filter` devuelve siempre
 $20\log_{10}(p_\mathrm{rms} / 20\,\mu\mathrm{Pa})$ y, con la calibración por
 defecto, toma el valor numérico de cada muestra *como si fuera* la presión en
-pascales. Una senoide de amplitud unidad se lee, por tanto, como 0,7071 Pa
+pascales. Una sinusoide de amplitud unidad se lee, por tanto, como 0,7071 Pa
 eficaces, es decir 90,97 dB: exactamente correcto para una señal sintética
 definida en pascales, y exactamente incorrecto para una grabación, cuyas
 muestras valen lo que hayan dado el convertidor y la cadena de ganancia. Hay dos
@@ -386,8 +386,8 @@ cada uno con su propia sensibilidad.
 internamente a float64, pero una muestra int16 de +32767 entra en el banco como
 32767.0 y no como 1.0. Todos los niveles salen, por tanto,
 $20\log_{10}(32768) = 90{,}3$ dB por encima de los de la misma señal leída como
-float: medido, una senoide de 1 kHz de amplitud unidad tiene su máximo en
-90,95 dB y esa misma senoide escrita en int16 lo tiene en 181,26 dB. Divide por
+float: medido, una sinusoide de 1 kHz de amplitud unidad tiene su máximo en
+90,95 dB y esa misma sinusoide escrita en int16 lo tiene en 181,26 dB. Divide por
 el valor de fondo de escala (`signal / 32768.0` para int16) antes de analizar, o
 deja que lo absorba el paso de calibración: una sensibilidad determinada a
 partir de una grabación de calibrador *en el mismo formato entero* ya lleva el

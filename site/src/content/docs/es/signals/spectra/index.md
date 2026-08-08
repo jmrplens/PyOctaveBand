@@ -20,7 +20,7 @@ múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/)), el
 terreno intermedio tiempo-frecuencia
 ([espectrogramas](/phonometry/es/signals/spectra/time-frequency/)), los métodos
 sobre la forma del espectro
-([cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/)), los métodos del
+([cepstrum](/phonometry/es/signals/spectra/cepstrum-echoes/)), los métodos del
 dominio del periodo ([promediado
 síncrono](/phonometry/es/signals/spectra/synchronous-averaging/)), los
 estimadores del dominio del tiempo ([correlación y
@@ -68,9 +68,9 @@ leyendo un nivel absoluto en el mismo escalado que los estimadores de
 Welch, y la FFT con zoom calcula el espectro de una banda estrecha en una
 malla arbitrariamente fina para separar tonos más próximos que un bin
 práctico de FFT.
-[Cepstro, ecos y espectro de la
+[Cepstrum, ecos y espectro de la
 envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/)
-trabaja sobre la *forma* del espectro. El cepstro de potencia, real y
+trabaja sobre la *forma* del espectro. El cepstrum de potencia, real y
 complejo colapsa el rizado espectral periódico en picos de quefrencia, la
 detección de ecos lee el retardo y el coeficiente de una reflexión en el
 pico cepstral, el liftering separa un espectro logarítmico en envolvente
@@ -142,8 +142,8 @@ estimaciones.
   espectrograma STFT calibrado en unidades absolutas (dB SPL para pascales)
   con el compromiso de resolución tiempo-frecuencia, y la FFT con zoom que
   resuelve tonos más próximos que un bin práctico de FFT.
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
-  el cepstro de potencia/real/complejo con análisis de quefrencia, detección
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+  el cepstrum de potencia/real/complejo con análisis de quefrencia, detección
   de ecos con el coeficiente de reflexión leído en el pico, liftering paso
   bajo/paso alto, la ida y vuelta homomórfica y el espectro de la envolvente
   de las modulaciones de amplitud.
@@ -189,9 +189,9 @@ separan.** `time_delay` y `echo_detection` informan solo del mayor pico, así
 que un registro con un camino directo más varias reflexiones necesita
 localización manual de picos o llamadas repetidas sobre bandas más estrechas.
 **No hay geometría multisensor.** La estimación de retardo es por pares; no hay
-un solucionador TDOA incorporado, ni beamformer, ni localización de fuentes, y
+ninguna resolución de TDOA incorporada, ni beamformer, ni localización de fuentes, y
 un sistema de varias salidas necesita una llamada a `miso_coherence` por
-salida. **No hay rasgos perceptuales.** El cepstro es el de frecuencia lineal,
+salida. **No hay rasgos perceptuales.** El cepstrum es el de frecuencia lineal,
 sin escala mel ni variante MFCC. Dos estimadores que comparten el núcleo de
 Welch de esta sección se documentan allí donde se usan: la función de
 transferencia y la coherencia ordinaria en

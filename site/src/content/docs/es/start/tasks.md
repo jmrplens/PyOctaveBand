@@ -39,7 +39,7 @@ calcula.
 | El trabajo | Dónde se responde |
 |---|---|
 | La potencia acústica de una máquina | [Potencia acústica](/phonometry/es/devices/emission/sound-power/) — empieza aquí sean cuales sean tus instalaciones: su apartado «Elegir un método» encamina hacia el método por presión (ISO 3744/3745/3746), en cámara reverberante (ISO 3741), por intensidad (ISO 9614) o por vibración superficial (ISO/TS 7849) |
-| Un valor de emisión declarado para una hoja de datos o un expediente CE | [Declarar la emisión sonora](/phonometry/es/devices/emission/sound-power/#declarar-la-emisión-sonora-iso-4871) — ISO 4871, el nivel declarado ponderado A $L_{WAd}$ y su incertidumbre $K_{WA}$ |
+| Un valor de emisión declarado para una hoja de características o un expediente CE | [Declarar la emisión sonora](/phonometry/es/devices/emission/sound-power/#declarar-la-emisión-sonora-iso-4871) — ISO 4871, el nivel declarado ponderado A $L_{WAd}$ y su incertidumbre $K_{WA}$ |
 | Cuánto van a atenuar un silenciador, un cerramiento o un tramo de conducto | [Silenciadores](/phonometry/es/devices/noise-control/silencers/), [Control de ruido industrial](/phonometry/es/devices/noise-control/noise-control/) para cerramientos y climatización, [Ruido por conductos](/phonometry/es/devices/noise-control/duct-path/) |
 | Un altavoz, un micrófono o un amplificador medidos según su norma | [Medidas electroacústicas](/phonometry/es/devices/electroacoustics/electroacoustics/) — IEC 60268-3/-4/-5 |
 | La sonoridad de un programa en LUFS | [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/) — ITU-R BS.1770-5 y EBU R 128 |
@@ -72,7 +72,7 @@ calcula.
 | La resistividad al flujo de aire o la rigidez dinámica de una capa | [Resistencia al flujo de aire](/phonometry/es/materials/absorbers/airflow-resistance/) (ISO 9053-1/-2), [Rigidez dinámica](/phonometry/es/materials/resilient/dynamic-stiffness/) (EN 29052-1) |
 | Cuánto dispersa un difusor | [Difusores y dispersión](/phonometry/es/materials/diffusers/diffusers/) — ISO 17497-1/-2, y la diferencia entre los dos coeficientes |
 | El ruido radiado por un buque, o la exposición de una campaña de hincado de pilotes | [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/) (ISO 17208, ISO 18406) y después [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/) |
-| Hasta dónde llega un sonido en el mar | [Propagación submarina](/phonometry/es/underwater/underwater-propagation/), y [Solucionadores de propagación submarina](/phonometry/es/underwater/underwater-solvers/) cuando hace falta un campo dependiente de la distancia |
+| Hasta dónde llega un sonido en el mar | [Propagación submarina](/phonometry/es/underwater/underwater-propagation/), y [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/) cuando hace falta un campo dependiente de la distancia |
 
 ## Cuando hay más de un método válido
 

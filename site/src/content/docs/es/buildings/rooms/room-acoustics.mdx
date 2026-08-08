@@ -19,7 +19,7 @@ references:
     issue: 3
     pages: "409-412"
     doi: "10.1121/1.1909343"
-    note: "El método de integración hacia atrás que convierte la respuesta al impulso al cuadrado en la curva suave de decaimiento de esta página."
+    note: "El método de integración inversa que convierte la respuesta al impulso al cuadrado en la curva suave de decaimiento de esta página."
   - type: article
     authors: ["Hak, C. C. J. M.", "Wenmaekers, R. H. C.", "van Luxemburg, L. C. J."]
     year: 2012
@@ -71,7 +71,7 @@ lados de un cerramiento) consulta la guía complementaria
 ## Análisis del decaimiento y parámetros de sala (ISO 3382-1/2)
 
 La RI se filtra en bandas de octava (o de tercio de octava) y cada banda se
-convierte en una **curva de decaimiento** mediante la integración hacia atrás de
+convierte en una **curva de decaimiento** mediante la integración inversa de
 Schroeder de la RI al cuadrado:
 
 $$
@@ -79,7 +79,7 @@ E(t) = \int_t^{\infty} p^2(\tau)\ d\tau, \qquad
 L(t) = 10 \log_{10} \frac{E(t)}{E(0)}\ \text{dB}.
 $$
 
-Integrar *hacia atrás* elimina la fluctuación que afecta a la RI al cuadrado
+La integración *inversa* elimina la fluctuación que afecta a la RI al cuadrado
 en bruto y produce una curva suave cuya pendiente es la tasa de decaimiento.
 El ruido de fondo haría que $E(t)$ se estabilizara, así que la integración se
 trunca donde la recta de decaimiento ajustada cruza el suelo de ruido y la
@@ -107,11 +107,11 @@ informarlo.
   name="anim_schroeder"
   width={2400}
   height={1350}
-  title="Integración hacia atrás de Schroeder de la respuesta al impulso al cuadrado"
-  description="La energía de la cola de la respuesta al impulso al cuadrado se rellena desde el final mientras la integral hacia atrás avanza hacia t = 0, y la curva de decaimiento de Schroeder emerge en un eje inferior, terminando con las rectas de regresión T20 y T30."
+  title="Integración inversa de Schroeder de la respuesta al impulso al cuadrado"
+  description="La energía de la cola de la respuesta al impulso al cuadrado se rellena desde el final mientras la integral inversa avanza hacia t = 0, y la curva de decaimiento de Schroeder emerge en un eje inferior, terminando con las rectas de regresión T20 y T30."
 />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento integrada hacia atrás de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
 
 *La RI al cuadrado dentada (gris) se integra hasta la curva suave de
 Schroeder (azul); las ventanas EDT, T20 y T30 se ajustan sobre esa curva y
@@ -305,7 +305,7 @@ se organiza en ese patrón nodal (2,1).
 | `fs` | int | Hz | > 0 | Frecuencia de muestreo |
 | `limits` | (float, float) o `None` | Hz | por defecto `(125.0, 4000.0)` | Límites de centros de banda; `None` = banda única de banda ancha |
 | `fraction` | int | — | `1` (octava, por defecto) / `3` (tercio) | Fracción de ancho de banda |
-| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $BT > 16$ a $BT > 4$); elimina el retardo de grupo del filtro antes de la integración hacia atrás y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
+| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $BT > 16$ a $BT > 4$); elimina el retardo de grupo del filtro antes de la integración inversa y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
 
 Devuelve un `RoomAcousticsResult`: `frequency` (centros de banda, o `None` en
 banda ancha), `edt`/`t20`/`t30` (s), `c50`/`c80` (dB), `d50`, `ts` (s),
@@ -395,7 +395,7 @@ son [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-a
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración hacia atrás y
+**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración inversa y
 las fórmulas de parámetros del anexo A) y la ISO 3382-2:2008 (apartado 6 y
 el criterio de rango dinámico del apartado 5.3.3), calculados por
 `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
@@ -449,7 +449,7 @@ $T_1$/$T_2$ medido vive en
 
 ### ¿Cómo se definen EDT, T20 y T30?
 
-Cada banda de la respuesta al impulso se convierte en una curva de decaimiento mediante la integración hacia atrás de Schroeder de la RI al cuadrado, y una recta ajustada por mínimos cuadrados sobre un rango de evaluación se extrapola a una caída completa de 60 dB, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT de 0 a −10 dB (reverberación percibida), T20 de −5 a −25 dB y T30 de −5 a −35 dB.
+Cada banda de la respuesta al impulso se convierte en una curva de decaimiento mediante la integración inversa de Schroeder de la RI al cuadrado, y una recta ajustada por mínimos cuadrados sobre un rango de evaluación se extrapola a una caída completa de 60 dB, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT de 0 a −10 dB (reverberación percibida), T20 de −5 a −25 dB y T30 de −5 a −35 dB.
 
 ### ¿Cuánto rango de decaimiento necesito para un T20 o T30 válido?
 

@@ -1,6 +1,6 @@
 ---
 title: "Caracterización de altavoces (IEC 60268-5)"
-description: "La cadena de altavoz de IEC 60268-5: la sensibilidad característica y sus convenciones de 1 W / 1 m, el pistón radiante en pantalla infinita con su impedancia de radiación y su directividad, y el informe de características nominales que compone la hoja de datos de la norma con los paneles de respuesta en eje, impedancia, THD y polar según las convenciones de escala de IEC 60263, además del criterio de Long de ganancia antes de la realimentación para un lazo de refuerzo sonoro."
+description: "La cadena de altavoz de IEC 60268-5: la sensibilidad característica y sus convenciones de 1 W / 1 m, el pistón radiante en pantalla infinita con su impedancia de radiación y su directividad, y el informe de características nominales que compone la hoja de características de la norma con los paneles de respuesta en eje, impedancia, THD y polar según las convenciones de escala de IEC 60263, además del criterio de Long de ganancia antes de la realimentación para un lazo de refuerzo sonoro."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -36,13 +36,13 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-La hoja de datos de un altavoz es un paquete de convenciones, e IEC 60268-5
+La hoja de características de un altavoz es un paquete de convenciones, e IEC 60268-5
 es la norma que las fija: a qué se refiere la «sensibilidad», sobre qué
 banda se lee un rango de frecuencias, cómo se dibuja la directividad y con
 qué excitación se mide la distorsión. Esta guía cubre la cadena que
 phonometry implementa alrededor de una respuesta en eje medida: las
 **convenciones de sensibilidad** donde suelen fallar las comparaciones
-entre hojas de datos, el **pistón radiante** en pantalla que es el modelo
+entre hojas de características, el **pistón radiante** en pantalla que es el modelo
 físico canónico detrás de la impedancia de radiación y la directividad de
 un cono, y el **informe de características nominales** que compone la hoja
 de datos de la norma, con cada panel dibujado según las convenciones de
@@ -68,7 +68,7 @@ nivel re 20 µPa (apartado 20.4) es el familiar «dB @ 1 W/1 m». En esa frase s
 esconden dos normalizaciones:
 
 - *La eléctrica.* La tensión de ensayo es $U_p = \sqrt{R \cdot 1\,\text{W}}$,
-  numéricamente $\sqrt{R}$: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de datos que anuncia
+  numéricamente $\sqrt{R}$: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de características que anuncia
   «dB @ 2,83 V/1 m» para un altavoz de 4 Ω le está entregando 2 W, lo que
   infla la cifra en 3 dB frente a una especificación real de 1 W/1 m;
   comprueba la impedancia nominal antes de comparar.

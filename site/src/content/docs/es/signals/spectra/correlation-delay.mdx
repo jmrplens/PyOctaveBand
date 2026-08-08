@@ -433,9 +433,9 @@ camino común entre exactamente dos sensores (el modelo
 $y(t) = \alpha\,x(t-\tau_0) + n(t)$ de la ecuación 5.21). Un registro con varias
 llegadas (multitrayecto, un camino directo más reflexiones) no se separa
 automáticamente: `time_delay` y el correlador directo solo informan el
-mayor pico, la misma limitación que `echo_detection` señala en el cepstro
-dentro de [Cepstro, ecos y espectro de la
+mayor pico, la misma limitación que `echo_detection` señala en el cepstrum
+dentro de [Cepstrum, ecos y espectro de la
 envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/). Estimar retardos entre
 más de dos sensores, como haría una matriz o un beamformer, implica llamar
-tú mismo a estas funciones por pares: no hay un solucionador TDOA
-multisensor incorporado.
+tú mismo a estas funciones por pares: no hay ninguna resolución de TDOA
+multisensor incorporada.

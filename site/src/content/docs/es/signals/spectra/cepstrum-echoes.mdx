@@ -1,6 +1,6 @@
 ---
-title: "Cepstro, ecos y espectro de la envolvente"
-description: "El cepstro de potencia, real y complejo con análisis de quefrencia, detección de ecos con el coeficiente de reflexión leído en el pico cepstral, liftering paso bajo y paso alto de un espectro logarítmico, la ida y vuelta homomórfica del cepstro complejo y el espectro de la envolvente que convierte las modulaciones de amplitud en líneas discretas."
+title: "Cepstrum, ecos y espectro de la envolvente"
+description: "El cepstrum de potencia, real y complejo con análisis de quefrencia, detección de ecos con el coeficiente de reflexión leído en el pico cepstral, liftering paso bajo y paso alto de un espectro logarítmico, la ida y vuelta homomórfica del cepstrum complejo y el espectro de la envolvente que convierte las modulaciones de amplitud en líneas discretas."
 references:
   - type: book
     authors: ["Havelock, D.", "Kuwano, S.", "Vorländer, M. (Eds.)"]
@@ -8,7 +8,7 @@ references:
     title: "Handbook of signal processing in acoustics"
     publisher: "Springer"
     doi: "10.1007/978-0-387-30441-0"
-    note: "Capítulo 27 (Milner: la transformada cepstral como DFT inversa del espectro logarítmico de potencia, la quefrencia, liftering paso bajo/paso alto), capítulo 87 (Neelamani: el cepstro complejo, deconvolución homomórfica, trenes de picos periódicos por reverberación) y capítulo 75 (Tohyama: manipulación fase mínima/paso todo en el dominio cepstral). ISBN 978-0-387-77698-9."
+    note: "Capítulo 27 (Milner: la transformada cepstral como DFT inversa del espectro logarítmico de potencia, la quefrencia, liftering paso bajo/paso alto), capítulo 87 (Neelamani: el cepstrum complejo, deconvolución homomórfica, trenes de picos periódicos por reverberación) y capítulo 75 (Tohyama: manipulación fase mínima/paso todo en el dominio cepstral). ISBN 978-0-387-77698-9."
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
@@ -24,7 +24,7 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 Los [estimadores
 espectrales](/phonometry/es/signals/spectra/spectral-analysis/) describen
 *qué frecuencias* contiene una señal; esta página cubre lo que se esconde en
-la *forma* de ese espectro. El **cepstro** - la transformada de Fourier
+la *forma* de ese espectro. El **cepstrum** - la transformada de Fourier
 inversa del espectro logarítmico - vive en `phonometry.signals` y convierte
 dos problemas espectrales difíciles en simple localización de picos: el
 rizado espectral periódico (un eco, una familia de armónicos) colapsa en un
@@ -39,9 +39,9 @@ Todo el truco es una cadena de cuatro pasos: el logaritmo convierte un eco
 multiplicativo en ondulación espectral aditiva, y la FFT inversa colapsa esa
 ondulación en un único pico de quefrencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_es.svg" alt="Diagrama de bloques de la cadena del cepstro: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_es.svg" alt="Diagrama de bloques de la cadena del cepstrum: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
 
-## 1. El cepstro y sus tres variantes
+## 1. El cepstrum y sus tres variantes
 
 Como el logaritmo convierte la convolución $x = h \ast u$ en la suma
 $\ln X = \ln H + \ln U$, componentes que se solapan en el espectro se suman - y
@@ -50,12 +50,12 @@ se separan - en el dominio cepstral (Havelock cap. 27, Ecs. (22)-(23)).
 
 - `'power'` (por defecto): la DFT inversa de $\ln|X|^2$ (Fig. 21 de Milner).
   Real, par y ciega a la fase - el caballo de batalla para detectar ecos y
-  familias de armónicos. Es el cepstro *con signo* del espectro logarítmico
-  de potencia según Milner; el «cepstro de potencia» original de Bogert
+  familias de armónicos. Es el cepstrum *con signo* del espectro logarítmico
+  de potencia según Milner; el «cepstrum de potencia» original de Bogert
   (1963) eleva al cuadrado una vez más y es no negativo - la biblioteca
   sigue a Milner en todo, así que los rahmónicos negativos conservan su
   signo;
-- `'real'`: la DFT inversa de $\ln|X|$ - exactamente la mitad del cepstro de
+- `'real'`: la DFT inversa de $\ln|X|$ - exactamente la mitad del cepstrum de
   potencia, y la cantidad cuyo plegado causal es la reconstrucción de fase
   mínima (más abajo);
 - `'complex'`: la DFT inversa de $\ln|X| + j\arg X$ con la fase desenrollada
@@ -76,12 +76,12 @@ print(res.quefrencies[:3], res.cepstrum.shape)   # eje de quefrencia, en s
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_es.svg" alt="Los cepstros de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstro real llega exactamente a la mitad" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_es.svg" alt="Los cepstra de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstrum real llega exactamente a la mitad" width="86%" />
 
 *Las tres variantes de un mismo registro con eco (una ondícula de banda
 limitada más una reflexión en 8 ms, $a = 0{,}5$). Las tres llevan los
 rahmónicos en 8 y 16 ms con alturas $a$ y $-a^2/2$ (convención con signo de
-Milner); el recuadro muestra el cepstro real exactamente a la mitad del de
+Milner); el recuadro muestra el cepstrum real exactamente a la mitad del de
 potencia, y la ondícula fuente se concentra por debajo de 2 ms.*
 
 <details>
@@ -110,8 +110,8 @@ for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
     res = cepstrum(x, fs, kind=kind)
     q_ms = 1e3 * res.quefrencies
     mask = (q_ms > 0.5) & (q_ms <= 20.0)
-    ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"cepstro {kind}")
-ax.set(xlabel="Quefrencia [ms]", ylabel="Cepstro")
+    ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"cepstrum {kind}")
+ax.set(xlabel="Quefrencia [ms]", ylabel="Cepstrum")
 ax.legend()
 plt.show()
 ```
@@ -120,8 +120,8 @@ plt.show()
 
 El resultado lleva el eje de quefrencia periódico completo
 (`0 .. (nfft-1)/fs`); las quefrencias por encima de `nfft/(2·fs)` son las
-quefrencias negativas especulares, donde los cepstros de potencia y real (que
-son pares) se repiten y el cepstro complejo guarda su contenido anticausal
+quefrencias negativas especulares, donde los cepstra de potencia y real (que
+son pares) se repiten y el cepstrum complejo guarda su contenido anticausal
 (de fase no mínima). El relleno de ceros vía `nfft` reduce el aliasing
 temporal cepstral cuando el espectro logarítmico tiene rasgos abruptos,
 exactamente igual que el relleno `oversample` de
@@ -138,14 +138,14 @@ $$
 = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n}\, e^{-jn\theta},
 $$
 
-así que el cepstro lleva un tren de picos en los **rahmónicos** $n t_0$ con
+así que el cepstrum lleva un tren de picos en los **rahmónicos** $n t_0$ con
 amplitudes $a, -a^2/2, a^3/3, \dots$ (su suma es $\ln(1+a)$),
 independientemente del espectro de la propia $s$, que se concentra en las
 quefrencias bajas. En
-el cepstro con signo del espectro logarítmico de potencia (`kind='power'`,
+el cepstrum con signo del espectro logarítmico de potencia (`kind='power'`,
 la convención de Milner) la altura del primer pico es el coeficiente de
-reflexión $a$ - con su signo - más lo que el cepstro de la fuente aporte en
-esa quefrencia (despreciable para fuentes de banda ancha, cuyo cepstro se
+reflexión $a$ - con su signo - más lo que el cepstrum de la fuente aporte en
+esa quefrencia (despreciable para fuentes de banda ancha, cuyo cepstrum se
 concentra en las quefrencias bajas); sobre un impulso ideal con eco la
 identidad es una forma cerrada que los tests y la batería de conformidad
 fijan a 1e-10. `echo_detection`
@@ -173,7 +173,7 @@ print(res.delay, res.reflection_coefficient)  # 0.008 s, ~0.5
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo_es.svg" alt="Cepstro de potencia de una respuesta al impulso con una reflexión frente a la quefrencia en milisegundos: un pico positivo afilado exactamente a 8 milisegundos marcado como eco detectado, un segundo rahmónico negativo menor a 16 milisegundos, la envolvente de la fuente en las quefrencias bajas fuera de la banda de búsqueda sombreada y una línea discontinua en el retardo verdadero" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo_es.svg" alt="Cepstrum de potencia de una respuesta al impulso con una reflexión frente a la quefrencia en milisegundos: un pico positivo afilado exactamente a 8 milisegundos marcado como eco detectado, un segundo rahmónico negativo menor a 16 milisegundos, la envolvente de la fuente en las quefrencias bajas fuera de la banda de búsqueda sombreada y una línea discontinua en el retardo verdadero" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -203,7 +203,7 @@ ax.plot([1e3 * res.delay], [res.reflection_coefficient], "v", ms=10,
         label="Pico detectado (altura = reflexión a)")
 ax.set_xlim(0.0, 30.0)
 ax.set_xlabel("Quefrencia [ms]")
-ax.set_ylabel("Cepstro")
+ax.set_ylabel("Cepstrum")
 ax.legend()
 plt.show()
 ```
@@ -270,7 +270,7 @@ x = s + 0.5 * np.roll(s, 384)
 low = lifter(x, fs, cutoff=0.004, mode="lowpass")
 high = lifter(x, fs, cutoff=0.004, mode="highpass")
 
-# Una línea: el cepstro con el corte y los dos espectros logarítmicos:
+# Una línea: el cepstrum con el corte y los dos espectros logarítmicos:
 low.plot(language="es")
 plt.show()
 
@@ -301,9 +301,9 @@ vocal (formantes) de los armónicos de la excitación; aquí es la herramienta
 general para separar «lo suave de lo periódico» en cualquier respuesta en
 magnitud medida.
 
-## 4. El cepstro complejo y la conexión con la fase mínima
+## 4. El cepstrum complejo y la conexión con la fase mínima
 
-El cepstro complejo conserva la fase desenrollada, así que la transformada
+El cepstrum complejo conserva la fase desenrollada, así que la transformada
 es de ida y vuelta: `CepstrumResult.invert()` restaura el registro con
 precisión de máquina, incluida la componente de fase lineal (retardo puro)
 que la transformada directa elimina y guarda en `linear_phase_samples`:
@@ -321,14 +321,14 @@ x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 res = cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negativo: retardo eliminado
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
-res.plot(language="es")   # el cepstro complejo frente a la quefrencia
+res.plot(language="es")   # el cepstrum complejo frente a la quefrencia
 ```
 
 Entre el logaritmo y la transformada inversa se puede editar lo que se
 quiera - eso es la deconvolución homomórfica (Havelock cap. 87, sec. 3.3):
 anular los rahmónicos elimina un eco, conservar solo las quefrencias bajas
-extrae la ondícula de la fuente. Una señal de fase mínima tiene un cepstro
-complejo causal, y por eso plegar el cepstro real sobre las quefrencias
+extrae la ondícula de la fuente. Una señal de fase mínima tiene un cepstrum
+complejo causal, y por eso plegar el cepstrum real sobre las quefrencias
 positivas reconstruye la fase mínima a partir de $|H|$ únicamente:
 [`minimum_phase`](/phonometry/es/devices/electroacoustics/swept-sine-distortion/) y
 `phase_decomposition` corren sobre ese mismo núcleo de plegado (Bendat y
@@ -337,7 +337,7 @@ manipulando exactamente estas partes causal y anticausal).
 
 ## 5. El espectro de la envolvente: modulaciones como líneas
 
-Donde el cepstro encuentra periodicidades *del espectro*, el **espectro de
+Donde el cepstrum encuentra periodicidades *del espectro*, el **espectro de
 la envolvente** encuentra periodicidades *de la amplitud*. La sección 13.3
 de Bendat y Piersol (Fig. 13.11) formaliza la estructura: un detector de
 envolvente, un eliminador de continua y una vista espectral de lo que queda.
@@ -423,10 +423,10 @@ importa la línea de continua absoluta.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las tres variantes del cepstro y el liftering del *Handbook of
+**Cubierto.** Las tres variantes del cepstrum y el liftering del *Handbook of
 Signal Processing in Acoustics* de Havelock, Kuwano y Vorländer (`cepstrum`,
 `lifter`, capítulos 27 y 87), el retardo de un único eco y el coeficiente de
-reflexión leídos en el cepstro de potencia (`echo_detection`), el cepstro
+reflexión leídos en el cepstrum de potencia (`echo_detection`), el cepstrum
 complejo invertible y su ida y vuelta homomórfica (`CepstrumResult.invert`),
 y el espectro de la envolvente del capítulo 13 de Bendat y Piersol
 (`envelope_spectrum`) con sus líneas de forma cerrada para un tono AM.
@@ -434,13 +434,13 @@ y el espectro de la envolvente del capítulo 13 de Bendat y Piersol
 **No cubierto.** `echo_detection` solo elige el mayor pico cepstral de la
 banda de búsqueda, así que una respuesta con varios ecos solapados necesita
 localización manual de picos o llamadas repetidas sobre bandas más
-estrechas: no es un separador multi-eco. El módulo tampoco tiene un cepstro
+estrechas: no es un separador multi-eco. El módulo tampoco tiene un cepstrum
 en escala mel ni de tipo MFCC para rasgos de audio perceptual: `lifter` y
 `cepstrum` trabajan solo sobre el espectro logarítmico en frecuencia lineal.
 
 ## Relación con los demás estimadores
 
-El cepstro parte de las mismas convenciones FFT de registro único que los
+El cepstrum parte de las mismas convenciones FFT de registro único que los
 [estimadores espectrales calibrados](/phonometry/es/signals/spectra/spectral-analysis/),
 y su núcleo de plegado es literalmente el que hay dentro de
 [`minimum_phase`](/phonometry/es/devices/electroacoustics/swept-sine-distortion/) - la

@@ -10,7 +10,7 @@ la distancia desde la que se escucha.
 
 Las páginas de **potencia acústica e intensidad** determinan la magnitud
 central de la emisión, el nivel de potencia acústica: la cifra que va en una
-hoja de datos, alimenta una predicción de sala o de exteriores y se compara
+hoja de características, alimenta una predicción de sala o de exteriores y se compara
 con los límites de emisión de ruido, incluida la vía que lo lee de la propia
 vibración de la carcasa cuando no se puede colocar ningún micrófono. Las
 páginas de **electroacústica** se

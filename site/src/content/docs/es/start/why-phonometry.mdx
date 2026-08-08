@@ -68,17 +68,17 @@ ráfaga llene un bloque por casualidad.
 ## Verificación frente a IEC 61672-1 (ráfagas de tono)
 
 La prueba rigurosa para la ponderación temporal es la **respuesta a ráfaga de
-tono** (IEC 61672-1, Tabla 4), usando una ráfaga senoidal de 4 kHz referida al
+tono** (IEC 61672-1, Tabla 4), usando una ráfaga sinusoidal de 4 kHz referida al
 nivel de régimen estacionario.
 
 ### Cómo se ejecuta la comprobación
 
 La Tabla 4 fija la excitación pero no el montaje, así que aquí va el montaje. Se
-genera una senoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
-Fast estacionario de esa senoide continua, promediado sobre su último medio
+genera una sinusoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
+Fast estacionario de esa sinusoide continua, promediado sobre su último medio
 segundo: una vez asentado el integrador, este es el $L_A$ en la notación de la
 norma. La ráfaga de la duración indicada se recorta después de *esa misma*
-senoide, de modo que su fase y su amplitud son idénticas a las del tono de
+sinusoide, de modo que su fase y su amplitud son idénticas a las del tono de
 referencia, y se rodea de ceros. La **respuesta** es el máximo de la envolvente
 Fast de esa ráfaga, expresado respecto de la referencia:
 $10\log_{10}(\max \text{env} / \text{ref})$, que es el $L_{AFmax} - L_A$ de la
@@ -185,7 +185,7 @@ batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en
 habla, la acústica de salas, edificación y materiales, la vibración humana y de
 máquinas, el ruido ambiental, el de aeronaves y helicópteros y el submarino, la
 electroacústica, la sonoridad de programa, el control de ruido industrial, el
-análisis espectral calibrado y el solucionador FDTD de ondas. El informe numérico
+análisis espectral calibrado y la simulación FDTD de ondas. El informe numérico
 completo (el valor esperado y el valor que calcula la biblioteca para cada
 comprobación, regenerado en cada pull request) está publicado como
 [informe de conformidad](/phonometry/es/reference/conformance/).
@@ -257,7 +257,7 @@ desde otra implementación hereda lo que la errata le hiciera hacer, y nada en
   conformación de haz, estimación de la dirección de llegada), y también llega
   al lado de la medición, con adquisición de la respuesta al impulso por barrido
   y un estimador de RT60. Lo que no lleva es el juego de parámetros de
-  ISO 3382. Los solucionadores de fuentes imagen y FDTD de phonometry están fijados a
+  ISO 3382. Los modelos de fuentes imagen y FDTD de phonometry están fijados a
   formas cerradas publicadas, y la respuesta al impulso de fuentes imagen pasa
   por el mismo análisis de `room_parameters` (EDT, T20, T30, C50, C80, D50, Ts,
   por bandas, con los indicadores de validez del rango de decaimiento de

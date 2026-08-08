@@ -289,7 +289,7 @@ N_a = N_0\, e^{-a^2/2\sigma_x^2},
 $$
 
 donde $N_a$ es la tasa de cruces del nivel $a$ (Ec. (5.196)). $N_0/2$ es la
-**frecuencia aparente** del registro: una senoide de 60 Hz cruza el cero 120
+**frecuencia aparente** del registro: una sinusoide de 60 Hz cruza el cero 120
 veces por segundo, el ruido paso bajo de ancho de banda $B$ da
 $N_0 = 2B/\sqrt{3}$ (una frecuencia aparente de $0{,}58B$, Ejemplo 5.12) y
 una banda centrada en $f_c$ da $N_0 = 2\sqrt{f_c^2 + B^2/12}$
@@ -303,7 +303,7 @@ from phonometry import level_crossing_rate
 
 fs = 8192.0
 t = np.arange(1 << 16) / fs
-x = np.sin(2 * np.pi * 60.0 * t)          # una senoide de 60 Hz...
+x = np.sin(2 * np.pi * 60.0 * t)          # una sinusoide de 60 Hz...
 
 res = level_crossing_rate(x, fs)
 print(round(res.zero_crossing_rate, 1))   # ...tiene 120 ceros por segundo
