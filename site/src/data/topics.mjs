@@ -254,7 +254,7 @@ export const topics = [
       },
       {
         label: 'Resilient layers',
-        translations: { es: 'Capas resilientes' },
+        translations: { es: 'Capas elásticas' },
         collapsed: true,
         items: [
           { slug: 'materials/resilient', label: 'Overview', translations: { es: 'Resumen' } },

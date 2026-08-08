@@ -1,6 +1,6 @@
 ---
 title: "Rigidez dinámica de materiales resilientes"
-description: "La determinación según EN 29052-1:1992 de la rigidez dinámica por unidad de área de materiales resilientes bajo suelos flotantes a partir de la resonancia de la placa de carga: la rigidez aparente de la Fórmula 4, el término del gas encerrado de la Fórmula 7, los regímenes por resistividad al flujo de la cláusula 8.2 y la frecuencia natural del suelo flotante de la Fórmula 2."
+description: "La determinación según EN 29052-1:1992 de la rigidez dinámica por unidad de superficie de materiales resilientes bajo suelos flotantes a partir de la resonancia de la placa de carga: la rigidez aparente de la Fórmula 4, el término del gas encerrado de la Fórmula 7, los regímenes por resistividad al flujo del apartado 8.2 y la frecuencia natural del suelo flotante de la Fórmula 2."
 references:
   - type: book
     authors: ["Vigran, T. E."]
@@ -8,31 +8,31 @@ references:
     title: "Building acoustics"
     publisher: "CRC Press"
     doi: "10.1201/9781482266016"
-    note: "El diseño de suelos flotantes y el papel de la rigidez dinámica de la capa resiliente en la mejora a ruido de impactos. ISBN 978-0-415-42853-8."
+    note: "El diseño de suelos flotantes y el papel de la rigidez dinámica de la capa elástica en la mejora a ruido de impactos. ISBN 978-0-415-42853-8."
   - type: standard
     organization: "International Organization for Standardization"
     year: 1989
     title: "Acoustics — Determination of dynamic stiffness — Part 1: Materials used under floating floors in dwellings"
     designation: "ISO 9052-1:1989"
     url: "https://www.iso.org/standard/16620.html"
-    note: "El original internacional de EN 29052-1:1992, el método que implementa esta página: la rigidez dinámica por unidad de área (Fórmula 1), las relaciones de resonancia (Fórmulas 2-4), el término del gas encerrado (Fórmula 7, NOTA de la cláusula 8.2 s'a = 111/d MN/m³) y los regímenes por resistividad al flujo (Fórmulas 5-6). La conformidad se ancla en la NOTA numérica de la propia norma más valores en forma cerrada calculados a mano de las relaciones de resonancia."
+    note: "El original internacional de EN 29052-1:1992, el método que implementa esta página: la rigidez dinámica por unidad de superficie (Fórmula 1), las relaciones de resonancia (Fórmulas 2-4), el término del gas encerrado (Fórmula 7, NOTA del apartado 8.2 s'a = 111/d MN/m³) y los regímenes por resistividad al flujo (Fórmulas 5-6). La conformidad se ancla en la NOTA numérica de la propia norma más valores en forma cerrada calculados a mano de las relaciones de resonancia."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-Un **suelo flotante** es una losa pesada que descansa sobre una capa resiliente;
+Un **suelo flotante** es una losa pesada que descansa sobre una capa elástica;
 ambos forman un sistema masa-resorte cuya **frecuencia natural** determina cuánto
 mejora el suelo el aislamiento a impacto y aéreo. **EN 29052-1:1992** (idéntica a
-ISO 9052-1:1989) mide la **rigidez dinámica por unidad de área** $s'$ de la capa
-resiliente a partir de la resonancia de una placa de carga normalizada sobre una
+ISO 9052-1:1989) mide la **rigidez dinámica por unidad de superficie** $s'$ de la capa
+elástica a partir de la resonancia de una placa de carga normalizada sobre una
 probeta de 200 mm × 200 mm. $s'$ es la entrada al término de suelo flotante del
 modelo de impacto de EN 12354-2 tratado en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/). (La
 ISO 16251-1 no aplica aquí: su alcance se limita a revestimientos blandos de
 reacción local y excluye expresamente los suelos flotantes.)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_es.svg" alt="Frecuencia natural del suelo flotante frente a la rigidez dinámica por unidad de área de la capa resiliente para un suelo flotante ligero y uno pesado, con un punto de diseño" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_es.svg" alt="Frecuencia natural del suelo flotante frente a la rigidez dinámica por unidad de superficie de la capa elástica para un suelo flotante ligero y uno pesado, con un punto de diseño" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -65,7 +65,7 @@ plt.legend(); plt.show()
 
 ## 1. Rigidez dinámica y resonancia
 
-La rigidez dinámica por unidad de área es una fuerza dinámica por área dividida
+La rigidez dinámica por unidad de superficie es una fuerza dinámica por área dividida
 entre el cambio de espesor resultante (Fórmula 1): $s' = (F/S)/\Delta d$. El suelo
 soportado resilientemente es un resonador cuya frecuencia natural (Fórmula 2) y,
 en la disposición de laboratorio, la frecuencia de resonancia medida (Fórmula 3)
@@ -86,7 +86,7 @@ $$
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_es.svg" alt="Banco de resonancia ISO 9052-1: un excitador vertical y un acelerómetro sobre la placa de carga encima de la probeta resiliente de 200 mm por 200 mm, leído como un sistema masa-resorte cuyo pico de respuesta da la frecuencia de resonancia y la rigidez dinámica aparente" width="92%" />
 
 En la disposición de ensayo la probeta queda entre la base rígida y una placa
-de carga cuya masa total por unidad de área, placa más carga añadida, es de
+de carga cuya masa total por unidad de superficie, placa más carga añadida, es de
 200 kg/m² (8 kg sobre la probeta de 0,04 m²). Esa carga reproduce la precarga
 estática de un suelo flotante típico, unos 2 kPa. Un excitador vertical mueve
 la placa, un acelerómetro recoge su respuesta y la resonancia vertical
@@ -105,14 +105,14 @@ print(round(s_t / 1e6, 3))                              # 4.935  MN/m3
 print(round(materials.natural_frequency(10e6, 120.0), 1))      # 45.9  Hz
 ```
 
-Ese pequeño oscilador es lo bastante pequeño para dibujarlo a escala real.
+Ese oscilador es lo bastante pequeño para dibujarlo a escala real.
 `plot_dynamic_stiffness_rig` coloca la probeta estándar de 200 mm bajo la
 placa de carga de 8 kg con el excitador y el acelerómetro en su sitio.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_es.svg" alt="Sección a escala del banco de rigidez dinámica: la probeta resiliente punteada de 200 mm y 20 mm de espesor sobre la base rígida rayada, la placa de carga gris de 8 kg encima con el acelerómetro en su borde, y el bloque del excitador arriba atacando la placa con una flecha vertical roja, con el lado y el espesor de la probeta acotados" width="92%" />
 
 *El sistema masa-muelle detrás de $s'$ a escala real: 20 mm de capa
-resiliente bajo la placa de 8 kg bastan para reproducir la precarga de 2 kPa
+elástica bajo la placa de 8 kg bastan para reproducir la precarga de 2 kPa
 de un suelo flotante.*
 
 <details>
@@ -146,13 +146,13 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 La rigidez dinámica del material *instalado* la fija entonces la resistividad
-lateral al flujo $r$ (cláusula 8.2): $s' = s'_t$ para
+lateral al flujo $r$ (apartado 8.2): $s' = s'_t$ para
 $r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ para
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, y para
 $r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_t$
 cuando el término del gas es despreciable.
 
-**Ojo al prefijo.** $r$ es la magnitud que la ISO 9053 llama $\sigma$ y reporta
+**Ojo al prefijo.** $r$ es la magnitud que la ISO 9053 llama $\sigma$ y da
 en Pa·s/m², mientras que la EN 29052-1 la escribe $r$ y pone sus umbrales en
 **kPa·s/m²**. La biblioteca sigue a la norma, así que `airflow_resistivity` va
 en kPa·s/m²: el único argumento de esta página que no está en SI puro. Una lana
@@ -190,14 +190,15 @@ y su `.plot()` dibuja la curva de diseño $f_0(s')$.
 `DynamicStiffnessResult.report(path)` genera un informe de ensayo de rigidez
 dinámica acreditado de una página (EN 29052-1:1992 = ISO 9052-1:1989): una
 cabecera de metadatos (probeta, la masa total por unidad de superficie $m'_t$
-empleada durante el ensayo, el espesor bajo carga $d$ (en metros, mostrado en mm), instalación de ensayo,
+empleada durante el ensayo, el espesor bajo carga $d$ (en metros, mostrado en
+mm), instalación de ensayo,
 clima), una tabla compacta de resultados (la frecuencia de resonancia $f_r$, la
 rigidez aparente $s'_t$ de la Fórmula 4, el término del gas encerrado $s'_a$
-cuando procede, la rigidez instalada $s'$ de la cláusula 8.2 y la frecuencia
+cuando procede, la rigidez instalada $s'$ del apartado 8.2 y la frecuencia
 natural $f_0$ de la Fórmula 2) junto a la curva de diseño $f_0(s')$, y una
 rigidez dinámica aparente $s'_t$ enmarcada con la instalada $s'$ y la resonancia
-$f_r$ al lado. La cláusula 9 redondea cada rigidez al MN/m³ más próximo. Es una
-caracterización, por lo que no hay veredicto de apto/no apto; `language="es"`
+$f_r$ al lado. El apartado 9 redondea cada rigidez al MN/m³ más próximo. Es una
+caracterización, por lo que no hay veredicto de cumple/no cumple; `language="es"`
 genera la ficha en español. La ficha siempre incrusta la curva de diseño
 $f_0(s')$, por lo que requiere los extras de informes y de gráficos
 (`pip install "phonometry[report,plot]"`).
@@ -214,7 +215,7 @@ res = materials.floating_floor_resonance(
 res.report(
     "dynamic_stiffness.pdf",
     metadata=ReportMetadata(
-        specimen="Capa resiliente de lana mineral de 20 mm",
+        specimen="Capa elástica de lana mineral de 20 mm",
         mass_per_area=200.0, thickness=0.020,   # espesor d en metros (20 mm)
         measurement_standard="EN 29052-1",
     ),
@@ -229,7 +230,7 @@ res.report(
 	caption="Ficha de rigidez dinámica (DynamicStiffnessResult.report): las métricas de resonancia y la curva de diseño f0(s')."
 />
 
-## 3. Qué asume el método de resonancia, y dónde muerde
+## 3. Qué supone el método de resonancia, y dónde muerde
 
 La evaluación trata el banco como un sistema de un grado de libertad: la
 placa de carga se mueve como un pistón rígido sobre un resorte sin masa. Eso
@@ -238,12 +239,12 @@ resonancia interna quede bastante por encima de $f_r$; una capa pesada o muy
 gruesa empieza a comportarse como un sistema distribuido y la lectura simple
 de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
 
-* **$s'$ es una rigidez *a la precarga normalizada*.** Las capas resilientes
+* **$s'$ es una rigidez *a la precarga normalizada*.** Las capas elásticas
   son visiblemente no lineales con la carga estática: la lana mineral se
   rigidiza al comprimirse, algunas espumas se ablandan. La placa de carga de
   200 kg/m² fija el punto de trabajo, así que la $s'$ tabulada describe en
-  rigor suelos próximos a esa masa superficial. Diseñar un recrecido mucho
-  más pesado con la misma $s'$ extrapola más allá de la medición.
+  rigor suelos próximos a esa masa superficial. Diseñar una solera mucho
+  más pesada con la misma $s'$ extrapola más allá de la medición.
 * **Excitar poco.** La rigidez tangente se define para deformaciones
   dinámicas pequeñas; excitar fuerte la placa lleva la capa a su rango no
   lineal y desplaza la resonancia aparente hacia abajo. Mantén la excitación
@@ -261,25 +262,25 @@ capa blanda bajo una losa pesada) es el objetivo de diseño.
 ## Qué cubre esta guía
 
 **Cubierto.** La EN 29052-1:1992 (idéntica a la ISO 9052-1:1989) para
-materiales bajo suelos flotantes: la rigidez dinámica por unidad de área de
+materiales bajo suelos flotantes: la rigidez dinámica por unidad de superficie de
 la Fórmula 1, las relaciones de resonancia de las Fórmulas 2-4
 (`apparent_dynamic_stiffness`, `natural_frequency`), el término del gas
 encerrado de la Fórmula 7 (`enclosed_gas_stiffness`) y los regímenes por
-resistividad al flujo de la cláusula 8.2, Fórmulas 5-6
+resistividad al flujo del apartado 8.2, Fórmulas 5-6
 (`installed_dynamic_stiffness`), encadenados de principio a fin por
 `floating_floor_resonance`. `DynamicStiffnessResult.report` genera la ficha
-de informe de ensayo de la cláusula 9.
+de informe de ensayo del apartado 9.
 
-**No cubierto.** El procedimiento de medición de la cláusula 7, que extrae
+**No cubierto.** El procedimiento de medición del apartado 7, que extrae
 la frecuencia de resonancia $f_r$ de la señal bruta de excitación-respuesta
 por métodos sinusoidal, de ruido blanco o de impulso y la extrapola a
 amplitud de fuerza nula, no está implementado: pasa una $f_r$ ya extrapolada.
-La resistividad al flujo lateral $r$ de la cláusula 8.2 también se toma como
+La resistividad al flujo lateral $r$ del apartado 8.2 también se toma como
 entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
 están implementados aparte, en `materials.absorbers.airflow_resistance`, y
-reportan $\sigma$ en Pa·s/m² mientras que el argumento `airflow_resistivity` de
+dan $\sigma$ en Pa·s/m² mientras que el argumento `airflow_resistivity` de
 esta página va en kPa·s/m². El requisito
-de selección de probetas de la cláusula 6 (al menos tres probetas de
+de selección de probetas del apartado 6 (al menos tres probetas de
 200 mm × 200 mm) no se aplica.
 
 ## Véase también

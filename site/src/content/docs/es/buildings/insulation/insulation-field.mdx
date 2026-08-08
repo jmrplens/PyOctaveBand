@@ -36,21 +36,21 @@ references:
     title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
     designation: "ISO 717-1:2020"
     url: "https://www.iso.org/standard/77435.html"
-    note: "La calificación por curva de referencia y los términos de adaptación espectral C y Ctr interpretados arriba; también el motor de un solo número para la magnitud de fachada (Anexo F)."
+    note: "La valoración por curva de referencia y los términos de adaptación espectral C y Ctr interpretados arriba; también el motor de un solo número para la magnitud de fachada (Anexo F)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
     title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
     designation: "ISO 717-2:2020"
     url: "https://www.iso.org/standard/69867.html"
-    note: "La calificación de impactos por curva de referencia y el término de adaptación espectral CI, con el término de rango ampliado CI,50-2500."
+    note: "La valoración de impactos por curva de referencia y el término de adaptación espectral CI, con el término de rango ampliado CI,50-2500."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
     title: "Acoustics — Determination and application of measurement uncertainties in building acoustics — Part 1: Sound insulation"
     designation: "ISO 12999-1:2020"
     url: "https://www.iso.org/standard/73930.html"
-    note: "Las incertidumbres típicas por situación de medición (Cláusula 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
+    note: "Las incertidumbres típicas por situación de medición (Apartado 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -93,7 +93,7 @@ de los dos espectros se valora con `building.weighted_rating` /
 
 ## Aislamiento a ruido aéreo en campo (ISO 16283-1)
 
-Para calificar una pared o un forjado, mide el nivel promediado en energía en
+Para valorar una pared o un forjado, mide el nivel promediado en energía en
 el recinto **emisor** ($L_1$) y en el recinto **receptor** ($L_2$) por banda de
 tercio de octava y forma la diferencia de niveles $D = L_1 - L_2$. Dos
 normalizaciones la hacen comparable entre recintos. La **diferencia de niveles
@@ -114,10 +114,11 @@ $L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
 
 La prima de $R'$ es una convención, no un adorno: las magnitudes con prima
 ($R'$, $L'_n$, $L'_{nT}$) se miden **en el edificio** e incluyen todas las
-vías de flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
+trayectorias por flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
 laboratorio del elemento solo, medidas con los flancos suprimidos. El mapa
 completo laboratorio-campo vive en
-[Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/);
+[Medición del aislamiento en
+laboratorio](/phonometry/es/buildings/insulation/insulation-lab/);
 la predicción que tiende el puente entre ambos es
 [EN 12354](/phonometry/es/buildings/design/insulation-prediction/).
 
@@ -272,7 +273,7 @@ print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)
 
 ## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
-El ruido de pisadas se califica al revés. En lugar de cuánto *bloquea* un
+El ruido de pisadas se valora al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
 una **máquina de impactos normalizada** situada en el forjado superior, así que
 un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_i$
@@ -312,7 +313,7 @@ print(round(float(imp.l_n[0]), 1))            # 64.1  normalizado a A0 = 10 m^2
 res_imp = building.weighted_impact_rating(imp.l_n_t)
 print(res_imp.rating, res_imp.ci, res_imp.unfavourable_sum)   # 79 -11 28.0  ->  L'nT,w(CI)=79(-11)
 
-# Los datos en banda de octava llevan la reducción extra de -5 dB (Cláusula 4.3.2)
+# Los datos en banda de octava llevan la reducción extra de -5 dB (Apartado 4.3.2)
 octave = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
 print(building.weighted_impact_rating(octave).rating)  # 54
 ```
@@ -383,7 +384,7 @@ metadata = ReportMetadata(
     area=12.5, source_volume=32.1, receiving_volume=30.4,
     test_room="Salón de la vivienda A hacia el salón de la vivienda B",
     test_date="2026-07-20",
-    laboratory="Laboratorio de Referencia phonometry",
+    laboratory="Laboratorio de referencia Phonometry",
     report_id="PHN-2026-0143",
     requirement=50.0,               # DnT,w >= 50 dB -> fila CUMPLE/NO CUMPLE
 )
@@ -474,7 +475,7 @@ Un índice sin incertidumbre es solo medio resultado. ISO 12999-1 no vuelve a
 medir nada; tabula la **incertidumbre típica** $u$ de cada magnitud de
 aislamiento acústico, derivada de ensayos interlaboratorio, y prescribe cómo
 expandirla y combinarla. Qué desviación típica es $u$ depende de la **situación
-de medición** (Cláusula 5.2):
+de medición** (Apartado 5.2):
 
 | Situación | Significado | Incertidumbre típica $u$ |
 | :--- | :--- | :--- |
@@ -484,7 +485,7 @@ de medición** (Cláusula 5.2):
 
 La incertidumbre expandida es $U = k\ u$ (Fórmula 2) con el factor de cobertura
 $k$ de la Tabla 8. Un intervalo bilateral $Y = y \pm U$ (Fórmula 3, $k = 1{,}96$ al
-95 %) *informa* un valor; el factor **unilateral** ($k = 1{,}65$ al 95 %) *declara
+95 %) *informa de* un valor; el factor **unilateral** ($k = 1{,}65$ al 95 %) *declara
 conformidad* con un requisito (Fórmulas 4/5).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso12999_es.svg" alt="Flujo de incertidumbre ISO 12999-1: incertidumbre típica de las tablas, reducida por mediciones repetidas y combinada en cuadratura, y luego expandida por el factor de cobertura de la Tabla 8 en un informe bilateral o una decisión de conformidad unilateral" width="82%" />
@@ -501,7 +502,7 @@ i = list(u.frequencies).index(500.0)
 print(len(u.frequencies), u.uncertainties[i])      # 21 1.1  (la banda de 500 Hz)
 u.plot()   # el espectro por banda u(f) de la Tabla 2 (requiere matplotlib)
 
-# Informa R'w = 52 dB con un intervalo bilateral al 95 % (k = 1.96, Tabla 8):
+# Informa de R'w = 52 dB con un intervalo bilateral al 95 % (k = 1.96, Tabla 8):
 uv = building.uncertain_value(52.0, "rprime_w", "B")        # los alias resuelven a r_w
 print(uv.coverage_factor, round(uv.expanded_uncertainty, 1))    # 1.96 1.8
 print(round(uv.lower, 1), round(uv.upper, 1))      # 50.2 53.8  ->  52 ± 1.8 dB
@@ -553,7 +554,7 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `measurand` | str | — | `'airborne'` / `'impact'` / `'impact_reduction'` | Selecciona la Tabla 2 / 4 / 6 |
 | `quantity` | str | — | `'r_w'`, `'ln_w'`, `'delta_lw'` (+ alias, variantes `+c`/`+ctr`) | Descriptor de un solo número |
-| `situation` | str | — | `'A'` / `'B'` / `'C'` | Situación de medición (Cláusula 5.2) |
+| `situation` | str | — | `'A'` / `'B'` / `'C'` | Situación de medición (Apartado 5.2) |
 | `value` | float | dB | — | Mejor estimación $y$ a la que adjuntar $U$ |
 | `coverage` | float | — | por defecto `0.95` | Nivel de confianza (Tabla 8) |
 | `one_sided` | bool | — | por defecto `False` | Factor unilateral para verificaciones de conformidad |
@@ -601,7 +602,7 @@ ISO 717-1/ISO 717-2.
 usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1). La
 *medición* del nivel de fondo — fuente apagada, mismas posiciones, mismo
 promediado — es cosa del operador, y aquí nada verifica que se haya cumplido el
-suelo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
+mínimo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
 [Corrección por ruido de fondo](#correccion-por-ruido-de-fondo)
 más arriba. (`building.background_correction` es la variante de *laboratorio*
 de ISO 10140-4 y no coincide con los umbrales de campo.) Los
@@ -611,13 +612,17 @@ frecuencia con altavoz móvil o barrido de micrófono) no se comprueban: el
 promediado en energía ocurre una vez que se proporcionan las posiciones, pero
 nada aquí verifica cuántas se tomaron ni dónde. Los demás miembros de la
 familia están cubiertos por sus propias guías: la parte de fachada ISO 16283-3
-([Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/)),
+([Aislamiento acústico de
+fachadas](/phonometry/es/buildings/insulation/facade-insulation/)),
 el método de control ISO 10052
-([Método de control del aislamiento](/phonometry/es/buildings/insulation/insulation-survey/)),
-los motores de calificación ISO 717-1/-2
-([Índices globales de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/)) y
+([Método de control del
+aislamiento](/phonometry/es/buildings/insulation/insulation-survey/)),
+los motores de valoración ISO 717-1/-2
+([Índices globales de
+aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/)) y
 la vía de intensidad acústica ISO 15186-1/-2
-([Aislamiento acústico por intensidad](/phonometry/es/buildings/insulation/insulation-intensity/)).
+([Aislamiento acústico por
+intensidad](/phonometry/es/buildings/insulation/insulation-intensity/)).
 
 ## Véase también
 
@@ -640,8 +645,8 @@ la vía de intensidad acústica ISO 15186-1/-2
   aislamiento de esta guía.
 - [Niveles](/phonometry/es/signals/levels/levels/): el promediado en energía y las métricas de
   nivel que sustentan los niveles de los recintos emisor/receptor.
-- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): los filtros de octava
-  fraccionaria IEC 61260 usados para los espectros de aislamiento.
+- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): los filtros de fracción
+  de octava IEC 61260 usados para los espectros de aislamiento.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación de la curva de referencia que sustenta
   los índices ponderados de un solo número.
 - Referencia de la API: [`building.measurement.insulation`](/phonometry/es/reference/api/building/insulation/) y [`building.measurement.uncertainty`](/phonometry/es/reference/api/building/uncertainty/).
@@ -661,8 +666,8 @@ reduce después las 16 bandas de 100 Hz a 3150 Hz al número único leído a
 ### ¿Cuál es la diferencia entre R y R' en el aislamiento acústico?
 
 La prima indica dónde se hizo la medición: las magnitudes con prima ($R'$,
-$L'_n$, $L'_{nT}$) se miden en el edificio e incluyen todas las vías de
-flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
+$L'_n$, $L'_{nT}$) se miden en el edificio e incluyen todas las trayectorias
+por flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
 laboratorio del elemento solo, medidas con los flancos suprimidos. En campo
 (ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ con la superficie del
 cerramiento $S$ y el área de absorción de Sabine $A = 0{,}16\ V/T$.

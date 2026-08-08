@@ -11,7 +11,7 @@ tiempo de reverberación y la claridad que la acústica de salas mide
 el ruido de fondo en que se asienta la sala se valora contra curvas de
 criterio (ANSI/ASA S12.2). Entre salas, la magnitud que gobierna es el
 aislamiento: cuánto
-sonido aéreo y de impacto transmiten una partición y sus caminos de flancos,
+sonido aéreo y de impacto transmiten una partición y sus trayectorias por flancos,
 medido en campo (ISO 16283) o en laboratorio (ISO 10140) y predicho a partir
 de datos de elemento (EN 12354).
 
@@ -21,16 +21,18 @@ caracteriza los datos de absorción, impedancia y dispersión en los que se
 apoyan las predicciones de sala y de aislamiento de esta sección.
 
 Empieza por
-[Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/)
+[Medición de la respuesta al
+impulso](/phonometry/es/buildings/rooms/room-impulse-response/)
 y [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): la respuesta al
 impulso que adquiere la primera y los parámetros que deriva la segunda son el
 vocabulario que habla el resto de la sección. Si tu interés es el
 aislamiento, sigue con
 [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
 y ten en cuenta que las fuentes de impacto distintas de la máquina de impactos
-tienen página propia, porque ISO 16283-2 es el apartado con el que suele llegar
+tienen página propia, porque ISO 16283-2 es la parte con la que suele llegar
 un técnico de campo; si es la predicción en fase de diseño, ve a
-[Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/buildings/rooms/reverberation-prediction/)
+[Predicción del tiempo de reverberación (Sabine,
+Arau)](/phonometry/es/buildings/rooms/reverberation-prediction/)
 y [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/).
 
 ## [Acústica de salas](/phonometry/es/buildings/rooms/)
@@ -45,7 +47,7 @@ absorción.
   de sala de ISO 3382-1/2 derivados de esa respuesta al impulso.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/):
   las magnitudes de privacidad del habla de una planta diáfana.
-- [Fuentes imagen y el campo estacionario de la sala](/phonometry/es/buildings/rooms/room-image-sources/):
+- [Fuentes imagen y campo estacionario de sala](/phonometry/es/buildings/rooms/room-image-sources/):
   la respuesta al impulso determinista por fuentes imagen y el nivel
   estacionario estadístico.
 - [Criterios de ruido de salas (NC / RC Mark II)](/phonometry/es/buildings/rooms/room-noise/):
@@ -69,7 +71,7 @@ laboratorio y predicho a partir de datos de elemento.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   la caracterización en laboratorio de un elemento según ISO 10140.
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/):
-  la vía de potencia directa hacia los mismos índices cuando hay muchos flancos.
+  la trayectoria de potencia directa hacia los mismos índices cuando hay muchos flancos.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   el método de control en bandas de octava y su índice de reverberación.
 - [Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/):
@@ -77,7 +79,7 @@ laboratorio y predicho a partir de datos de elemento.
   fuerza de impacto que las especifica y el número único del anexo D de
   ISO 717-2.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
-  el índice de reducción de vibraciones de unión medido y los descriptores de
+  el índice de reducción vibratoria de unión medido y los descriptores de
   flanco.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia tras Rw, DnT,w, Ln,w y sus términos de
@@ -96,10 +98,10 @@ datos de elemento y a partir de la física del propio elemento.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   la transmisión por flancos aérea y de impacto entre salas (EN 12354-1/2).
 - [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
-  la misma predicción banda a banda, con las contribuciones por camino tras
+  la misma predicción banda a banda, con las contribuciones por trayectoria tras
   R'w y L'n,w.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masa, la coincidencia, las dobles hojas y las aberturas.
+  la ley de masas, la coincidencia, las dobles hojas y las aberturas.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
   la mejora ponderada de un revestimiento blando en una maqueta pesada pequeña.
 - [Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/):
@@ -117,7 +119,7 @@ datos de elemento y a partir de la física del propio elemento.
 ## Qué no cubre esta sección
 
 **La biblioteca empieza después del micrófono y se detiene antes de la
-geometría.** Del lado de la medición, cada función toma niveles por bandas ya
+geometría.** Del lado de la medición, cada función toma niveles de banda ya
 promediados sobre las posiciones y ya corregidos por el ruido de fondo: el
 número de posiciones, los procedimientos de baja frecuencia, los mínimos de
 señal frente al ruido de fondo y las cualificaciones de la instalación de
@@ -127,7 +129,7 @@ globales de los elementos, los índices de unión y las mejoras de los
 revestimientos son entradas que aportas tú desde una medición o desde el propio
 anexo de una norma; ninguna se deriva de un plano.
 
-**Aquí no hay ningún solucionador de ondas ni ningún modelo de sala.** No hay
+**Aquí no hay ninguna simulación de ondas ni ningún modelo de sala.** No hay
 importador de geometría, ni base de datos de materiales, ni trazador de rayos,
 ni auralización: las páginas de sala toman dimensiones, coeficientes de
 absorción y respuestas al impulso y devuelven parámetros, y el modelo de
@@ -142,9 +144,9 @@ siempre de tu reglamentación.
 
 ## Antes y después de estas páginas
 
-Toda magnitud de estas páginas parte de niveles por bandas o de una respuesta
+Toda magnitud de estas páginas parte de niveles de banda o de una respuesta
 al impulso filtrada, así que la calibración, la ponderación y el filtrado en
-octavas fraccionales que hay detrás están en [Análisis de
+fracción de octava que hay detrás están en [Análisis de
 señal](/phonometry/es/signals/), y [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
 principio a fin en una sola página ejecutable. Las derivaciones están en la

@@ -58,11 +58,11 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Un difusor se juzga por adónde envía el sonido que refleja, y dos
-coeficientes normalizados califican ese trabajo desde dos ángulos distintos.
+coeficientes normalizados valoran ese trabajo desde dos ángulos distintos.
 El **coeficiente de dispersión** $s$ (ISO 17497-1) se mide en cámara
 reverberante y hace contabilidad de energía: qué fracción de la energía
 reflejada abandona la dirección especular. El **coeficiente de difusión** $d$
-(ISO 17497-2) se mide en un goniómetro de campo libre y califica la calidad
+(ISO 17497-2) se mide en un goniómetro de campo libre y valora la calidad
 espacial: cuán uniformemente cubre la energía reflejada un arco polar de
 receptores. Esta guía cubre ambas mediciones, la predicción del coeficiente
 de difusión a partir del diseño de un difusor de Schroeder antes de fabricar
@@ -108,7 +108,7 @@ absorción negativo significa que los miembros de una pareja entraron al revés.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_es.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria y su placa base a al menos 1 m de las paredes, dos posiciones fijas de altavoz y tres posiciones fijas de micrófono, siendo la plataforma lo único que se mueve, y el mapeo de la Tabla 2 de T1 a T4 sobre los coeficientes de absorción de incidencia aleatoria y especular a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
 
-**Absorción a partir del tiempo de reverberación (cláusula 6).** Cada situación se
+**Absorción a partir del tiempo de reverberación (apartado 6).** Cada situación se
 convierte en un coeficiente de absorción de Sabine con el propio término de
 atenuación del aire de la norma:
 
@@ -214,10 +214,10 @@ plt.show()
 
 </details>
 
-**Comprobación de la placa base (cláusula 6.4, Tabla 1).** La placa base vacía
+**Comprobación de la placa base (apartado 6.4, Tabla 1).** La placa base vacía
 debe dispersar por sí sola de forma despreciable, o sesgaría el resultado.
 ISO 17497-1 limita el coeficiente de dispersión de la placa base por banda de
-tercio de octava; la librería expone esos límites y un comprobador.
+tercio de octava; la biblioteca expone esos límites y un comprobador.
 
 ```python
 from phonometry import materials
@@ -239,7 +239,7 @@ de muestra $S$, volumen de sala $V$, sala de ensayo, clima), la tabla por tercio
 de octava de la absorción de incidencia aleatoria $\alpha_s$ y el coeficiente de
 dispersión $s$ junto a la curva $s(f)$ sobre un eje de bandas categórico, y un
 titular de caracterización enmarcado. Es una caracterización, por lo que no hay
-veredicto de apto/no apto. `verbose=True` añade la columna de absorción especular
+veredicto de cumple/no cumple. `verbose=True` añade la columna de absorción especular
 $\alpha_{spec}$ y `language="es"` genera la ficha en español. Requiere el extra de
 informes (`pip install phonometry[report]`).
 
@@ -289,7 +289,7 @@ menor, así que $A_\text{min}$) y 0,0436 en el polo, de modo que los pesos van
 comprobar los propios con `materials.area_factors(elevations, delta_theta=5.0)`
 antes de meter un vector de pesos construido a mano en la fórmula (6).
 
-El montaje que asumen esas fórmulas merece dibujarse a escala.
+El montaje que suponen esas fórmulas merece dibujarse a escala.
 `plot_goniometer_geometry` traza la disposición estándar en planta: el
 semicírculo de 37 micrófonos cada 5 grados a 5 m alrededor de la muestra, con
 la fuente a 10 m sobre la normal.
@@ -340,7 +340,7 @@ misma distancia, que es justo lo que fija la ISO 17497-2 con los tres.
 La respuesta de un solo plano de abajo es la predicción en campo lejano de una
 geometría de difusor publicada: un difusor de residuos cuadráticos $N = 7$ de
 6 periodos, 3,6 m de anchura total y 0,2 m de profundidad máxima de pozo (la
-fila "N = 7 QRD, 6 periods, 0.2 m deep" de Cox & D'Antonio, *Acoustic
+fila «N = 7 QRD, 6 periods, 0.2 m deep» de Cox & D'Antonio, *Acoustic
 Absorbers and Diffusers*, 3.ª ed., Apéndice B; el QRD comercial $N = 7$ medido
 por Hargreaves, Cox, Lam & D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720,
 2000, Tabla I) y su panel de referencia plano de igual huella, a 1000 Hz,
@@ -438,13 +438,13 @@ result.plot()   # respuesta polar reflejada, d en el título (requiere matplotli
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión acústica reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
 
-*La matriz periódica de QRD divide la energía reflejada en un abanico de
+*El array periódico de QRD divide la energía reflejada en un abanico de
 lóbulos de red discretos en lugar de un único pico especular, pero seis
 repeticiones del mismo periodo concentran la energía en esas pocas
 direcciones, así que el coeficiente de difusión por autocorrelación se queda
 en un valor modesto ($d \approx 0{,}11$). El panel de referencia plano colapsa
 solo en la dirección especular y baja a $d \approx 0{,}005$; esta penalización
-por lóbulos de las matrices periódicas es justo el motivo por el que
+por lóbulos de los arrays periódicos es justo el motivo por el que
 Cox & D'Antonio recomiendan disposiciones moduladas.*
 
 <details>
@@ -487,9 +487,9 @@ plt.show()
 
 Reunido a lo largo de las bandas de tercio de octava, el coeficiente de difusión
 $d(f)$ forma un `DiffusionSpectrum`, cuyo `report(path)` genera un informe de
-ensayo de difusión de una página (ISO 17497-2, Cláusula 8.5): la tabla por banda
+ensayo de difusión de una página (ISO 17497-2, Apartado 8.5): la tabla por banda
 de $d$ junto a la curva $d(f)$ con eje de bandas, con un titular de
-caracterización enmarcado. Según la Cláusula 8.4, el coeficiente de incidencia
+caracterización enmarcado. Según el Apartado 8.4, el coeficiente de incidencia
 aleatoria es a su vez una magnitud por banda, la media de los coeficientes
 direccionales sobre las posiciones de fuente banda a banda (**no** una media a
 través de las frecuencias), de modo que aquí $d$ es un coeficiente por banda.
@@ -504,7 +504,7 @@ from phonometry import materials
 # práctica, la d de incidencia aleatoria de cada banda es la media, sobre las
 # posiciones de fuente, de los coeficientes direccionales: para la banda k, se
 # promedia directional_diffusion_coefficient sobre las fuentes con
-# random_incidence_diffusion (Cláusula 8.4).
+# random_incidence_diffusion (Apartado 8.4).
 freqs = np.array([250, 500, 1000, 2000, 4000], float)
 d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
 spectrum = materials.diffusion_spectrum(freqs, d)
@@ -533,7 +533,7 @@ esa banda.
 
 ## 3. Diseño de un difusor de Schroeder
 
-Las mediciones anteriores califican una superficie que ya existe. La manera
+Las mediciones anteriores valoran una superficie que ya existe. La manera
 clásica de *diseñar* una es la rejilla de fase de Schroeder: dividir la
 superficie en pozos de igual anchura y distinta profundidad, de modo que cada
 pozo devuelva la onda incidente con una fase diferente. Un pozo de fondo
@@ -591,7 +591,7 @@ Del propio dibujo se deducen unas cuantas reglas de diseño:
   lóbulo especular a la frecuencia de diseño.
 
 `qrd_well_depths` evalúa la secuencia de profundidades y
-`predict_diffuser_polar_response` califica el diseño antes de construir nada,
+`predict_diffuser_polar_response` valora el diseño antes de construir nada,
 que es el tema de la sección siguiente.
 
 ### Predicción de la difusión a partir del diseño de un difusor
@@ -618,13 +618,13 @@ que una medición.
 import numpy as np
 from phonometry import materials
 
-# Un difusor de residuo cuadratico N = 7, frecuencia de diseno 500 Hz.
+# Un difusor de residuo cuadrático N = 7, frecuencia de diseño 500 Hz.
 depths = materials.qrd_well_depths(7, 500.0)   # Ecs. (10.2)/(10.3)
 print(np.round(depths * 100, 1))               # profundidades de pozo en cm:
                                                # [ 0.   4.9 19.6  9.8  9.8 19.6  4.9]
 
 # Respuesta polar de campo lejano predicha a una frecuencia (5 periodos
-# repetidos, pozos de 10 cm), reducida al coeficiente de difusion direccional
+# repetidos, pozos de 10 cm), reducida al coeficiente de difusión direccional
 # ISO 17497-2.
 surface = materials.predict_diffuser_polar_response(0.10, 2000.0, depths=depths,
                                                     periods=5)
@@ -643,7 +643,7 @@ flat = materials.predicted_diffusion_spectrum(0.10, freqs,
 print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_es.svg" alt="Coeficiente de difusion predicho sobre las bandas de tercio de octava de 250 a 5000 Hz para un diseno de difusor de residuo cuadratico N = 7 comparado con un panel plano de la misma huella: la curva del QRD queda muy por encima de la curva casi nula del panel plano en toda la banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_es.svg" alt="Coeficiente de difusión predicho sobre las bandas de tercio de octava de 250 a 5000 Hz para un diseño de difusor de residuo cuadrático N = 7 comparado con un panel plano de la misma huella: la curva del QRD queda muy por encima de la curva casi nula del panel plano en toda la banda" width="88%" />
 
 *Predicho solo a partir del diseño: el QRD $N = 7$ reparte la energía reflejada
 mucho más uniformemente que el panel plano de la misma huella, de modo que su
@@ -664,7 +664,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# QRD N = 7 (frecuencia de diseno 500 Hz, pozos de 10 cm, cinco periodos) frente
+# QRD N = 7 (frecuencia de diseño 500 Hz, pozos de 10 cm, cinco periodos) frente
 # al panel plano de la misma huella, sobre las bandas de tercio de octava.
 freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
                   2000, 2500, 3150, 4000, 5000], float)
@@ -680,11 +680,11 @@ flat = materials.predicted_diffusion_spectrum(0.10, freqs,
                                 depths=np.zeros_like(depths), periods=5,
                                 normalize=False)
 fig, ax = plt.subplots()
-ax.semilogx(freqs, qrd.diffusion, "o-", color="#1f77b4", label="Diseno QRD N = 7")
+ax.semilogx(freqs, qrd.diffusion, "o-", color="#1f77b4", label="Diseño QRD N = 7")
 ax.semilogx(freqs, flat.diffusion, "s--", color="#d62728", label="Panel plano")
 ax.set_ylim(0.0, 1.0)
 ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Coeficiente de difusion predicho d")
+ax.set_ylabel("Coeficiente de difusión predicho d")
 ax.legend()
 plt.show()
 ```
@@ -700,7 +700,7 @@ intercambiables, en fichas de producto y a veces en manuales de simulación. No
 lo son, y ninguno puede calcularse a partir del otro. El coeficiente de
 dispersión $s$ (ISO 17497-1) hace **contabilidad de energía**: qué fracción de
 la energía reflejada abandona la dirección especular. No dice nada sobre a
-dónde va esa energía. El coeficiente de difusión $d$ (ISO 17497-2) califica la
+dónde va esa energía. El coeficiente de difusión $d$ (ISO 17497-2) valora la
 **calidad espacial**: cuán uniformemente cubre la energía reflejada el arco de
 receptores, para una dirección de fuente cada vez. No dice nada sobre cómo se
 reparte la energía entre el lóbulo especular y el resto.
@@ -725,7 +725,7 @@ decente no significa que se dispersara mucha energía.
   reparto, que es lo que ISO 17497-1 se redactó para suministrar. Equivocarlo
   se traduce en predicciones erróneas de tiempo de reverberación y claridad
   en salas no mezcladoras.
-- **El coeficiente de difusión califica difusores.** Cuando la tarea es
+- **El coeficiente de difusión valora difusores.** Cuando la tarea es
   deshacer un eco, un flutter o una reflexión focalizada, lo que importa es
   que la energía reflejada se reparta en ángulo, y $d$ mide exactamente eso.
   El $d_n$ normalizado (fórmula (7)) resta además la difracción de borde que
@@ -734,12 +734,12 @@ decente no significa que se dispersara mucha energía.
 
 Intercambiarlos falla en ambos sentidos: un coeficiente de difusión metido en
 la casilla de dispersión de un simulador sesga el reparto de energía, y un
-coeficiente de dispersión citado como prueba de "difusión" puede describir una
+coeficiente de dispersión citado como prueba de «difusión» puede describir una
 superficie que simplemente redirige la reflexión problemática a otro sitio.
 Ambos coeficientes son funciones por banda de tercio de octava que en general
 crecen cuando el relieve de la superficie deja de ser pequeño frente a la
-longitud de onda; un número único ciego a la frecuencia ("dispersa el 90 % del
-sonido") no es ninguno de los dos.
+longitud de onda; un número único ciego a la frecuencia («dispersa el 90 % del
+sonido») no es ninguno de los dos.
 
 ## Qué cubre esta guía
 
@@ -774,9 +774,9 @@ con resonadores son el tema de la
 
 - [Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/): la versión en
   sublongitud de onda profunda de los diseños de Schroeder de la sección 3,
-  rendijas cargadas con resonadores de Helmholtz que alcanzan las mismas
+  ranuras cargadas con resonadores de Helmholtz que alcanzan las mismas
   fases de reflexión desde un panel de pocos centímetros.
-- [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
+- [Absorción in situ de pavimentos de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la otra familia de medidas de superficie realizada en campo y no en
   laboratorio, con los métodos de sustracción y puntual de ISO 13472.
 - [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):

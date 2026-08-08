@@ -7,7 +7,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 import { totalChecks } from '../../../../data/conformance-stats.mjs';
 
 phonometry es una biblioteca de Python para la medida acústica, desde los
-bancos de filtros de octava fraccional y la ponderación frecuencial hasta los
+bancos de filtros de fracción de octava y la ponderación frecuencial hasta los
 niveles sonoros y las métricas normalizadas. Cada métrica se verifica frente a
 la norma que la rige: {totalChecks} comprobaciones numéricas en total.
 Instálala con `pip install phonometry`; el primer ejemplo de abajo filtra una
@@ -65,7 +65,7 @@ pip install -e ./phonometry
 ## La cadena de procesado de un vistazo
 
 Todo análisis con phonometry es un subconjunto de una misma cadena: tomar la
-señal cruda, convertirla a unidades físicas, ponderarla en frecuencia, dividirla
+señal en bruto, convertirla a unidades físicas, ponderarla en frecuencia, dividirla
 en bandas normalizadas, suavizarla en el tiempo y reducirla a métricas:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_es.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
@@ -113,7 +113,7 @@ spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 print(f"Bandas: {freq}")
 # Bandas: [12.589254117941678, 15.848931924611138, ..., 19952.623149688785]  (33 bandas)
 print(f"SPL [dB]: {spl}")
-# SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — 90,71 dB en 100 Hz y 90,95 dB en 1 kHz
+# SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — 90,71 dB a 100 Hz y 90,95 dB a 1 kHz
 ```
 
 **Las frecuencias de banda salen como números, no como las etiquetas de un
@@ -130,16 +130,16 @@ consulta [Bancos de
 filtros](/phonometry/es/signals/filters/filter-banks/) para la rejilla.
 
 **Lee el espectro antes de fiarte de él.** Dos de las 33 bandas contienen la
-señal: 90,71 dB en 100 Hz y 90,95 dB en 1 kHz, ambas a menos de 0,3 dB de
-90,97 dB, el nivel de una senoide de amplitud unidad leída como pascales
+señal: 90,71 dB a 100 Hz y 90,95 dB a 1 kHz, ambas a menos de 0,3 dB de
+90,97 dB, el nivel de una sinusoide de amplitud unidad leída como pascales
 ($20\log_{10}(0{,}7071/20\,\mu\mathrm{Pa})$). Esa coincidencia es la comprobación
 de que el banco hace una aritmética defendible; el pequeño déficit en 100 Hz es
 la respuesta del filtro de banda diezmado en su propio centro, no energía
 perdida. Todo lo demás de la gráfica es el banco de filtros mirándose a sí
-mismo: los 63,79 dB en 80 Hz y los 65,13 dB en 125 Hz, y los 53,18 dB en 800 Hz
-y los 62,10 dB en 1,25 kHz, son los dos tonos colándose por las faldas de los
-filtros contiguos, de 27 a 29 dB por debajo; la subida lenta de 46,88 dB en
-12,5 Hz a 54,71 dB en 50 Hz es la banda atenuada lejana de esos filtros más el
+mismo: los 63,79 dB a 80 Hz y los 65,13 dB a 125 Hz, y los 53,18 dB a 800 Hz
+y los 62,10 dB a 1,25 kHz, son los dos tonos colándose por las faldas de los
+filtros contiguos, de 27 a 29 dB por debajo; la subida lenta de 46,88 dB a
+12,5 Hz a 54,71 dB a 50 Hz es la banda atenuada lejana de esos filtros más el
 suelo numérico. La regla práctica que se deduce: en un espectro de bandas, trata
 como artefacto del análisis todo lo que quede más de unos 40 dB por debajo de la
 banda más alta, hasta que una medida de fondo diga lo contrario. [Verificación
@@ -149,7 +149,7 @@ máscara que fija cuánto tienen que caer esas faldas.
 **Todavía no son niveles físicos.** `octave_filter` devuelve siempre
 $20\log_{10}(p_\mathrm{rms} / 20\,\mu\mathrm{Pa})$ y, con la calibración por
 defecto, toma el valor numérico de cada muestra *como si fuera* la presión en
-pascales. Una senoide de amplitud unidad se lee, por tanto, como 0,7071 Pa
+pascales. Una sinusoide de amplitud unidad se lee, por tanto, como 0,7071 Pa
 eficaces, es decir 90,97 dB: exactamente correcto para una señal sintética
 definida en pascales, y exactamente incorrecto para una grabación, cuyas
 muestras valen lo que hayan dado el convertidor y la cadena de ganancia. Hay dos
@@ -161,11 +161,11 @@ la señal nunca tuvo escala física, pide `LevelCalibration(dbfs=True)` y lee
 niveles referidos a fondo de escala digital, que salen negativos y no se pueden
 confundir con un SPL.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD cruda de fondo" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
 
 *Un ejemplo más rico que el fragmento de arriba: seis tonos (20, 100, 500, 2000,
 4000 y 15000 Hz) de amplitud 100, así que los niveles de banda llegan a unos
-131 dB. La curva gris es la PSD de la señal cruda, desplazada hacia abajo para
+131 dB. La curva gris es la PSD de la señal en bruto, desplazada hacia abajo para
 compartir el eje.*
 
 <details>
@@ -185,14 +185,14 @@ y = 100 * np.sum([np.sin(2 * np.pi * f * t) for f in tones], axis=0)
 # Aplicar el banco de filtros de 1/3 de octava
 spl, freq = filters.octave_filter(y, fs=fs, fraction=3, limits=[12.0, 20000.0])
 
-# Fondo gris: la PSD de la señal cruda (Welch), desplazada justo por debajo
+# Fondo gris: la PSD de la señal en bruto (Welch), desplazada justo por debajo
 # de los SPL de banda para comparar ambas formas espectrales en un mismo eje.
 f_psd, psd = scipy.signal.welch(y, fs, nperseg=8192)
 psd_db = 10 * np.log10(psd + 1e-12)
 psd_db += np.max(spl) - np.max(psd_db) - 5
 
 fig, ax = plt.subplots()
-ax.semilogx(f_psd, psd_db, color="gray", alpha=0.6, label="PSD de la señal cruda")
+ax.semilogx(f_psd, psd_db, color="gray", alpha=0.6, label="PSD de la señal en bruto")
 ax.semilogx(freq, spl, marker="o", markerfacecolor="white",
             label="Bandas de 1/3 de octava")
 ax.set_xlabel("Frecuencia [Hz]")
@@ -306,9 +306,9 @@ El nivel sin ponderar de ese mismo segundo es 93,98 dB: la ponderación A quita
 casi 3 dB, prácticamente todos del tono de 100 Hz, al que la curva atenúa unos
 19 dB. `signals.laeq(recording, fs, calibration_factor=cal)` es la forma de una
 línea de las dos anteriores y aplica la ponderación internamente, así que no
-ponderes nunca A la señal antes de pasarla a una función de nivel: eso la
-pondera dos veces. Las envolventes Fast y Slow, $L_{AE}$, $L_{Cpeak}$ y los
-niveles percentiles son llamadas de la misma clase: [Ponderación
+apliques nunca la ponderación A a la señal antes de pasarla a una función de
+nivel: eso la pondera dos veces. Las envolventes Fast y Slow, $L_{AE}$,
+$L_{Cpeak}$ y los niveles percentiles son llamadas de la misma clase: [Ponderación
 temporal](/phonometry/es/signals/levels/time-weighting/) y [Niveles integrados y
 estadísticos](/phonometry/es/signals/levels/levels/) las tienen, y [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorre la cadena entera,
@@ -381,13 +381,13 @@ sentido. Consulta
 convenio, y para el caso en que se analizan varios canales calibrados a la vez,
 cada uno con su propia sensibilidad.
 
-**El audio entero se convierte de tipo, no se reescala.** La salida de
+**El audio en enteros se convierte de tipo, no se reescala.** La salida de
 `wavfile.read` se ejecuta sin error porque los enteros se convierten
 internamente a float64, pero una muestra int16 de +32767 entra en el banco como
 32767.0 y no como 1.0. Todos los niveles salen, por tanto,
 $20\log_{10}(32768) = 90{,}3$ dB por encima de los de la misma señal leída como
-float: medido, una senoide de 1 kHz de amplitud unidad tiene su máximo en
-90,95 dB y esa misma senoide escrita en int16 lo tiene en 181,26 dB. Divide por
+float: medido, una sinusoide de 1 kHz de amplitud unidad tiene su máximo en
+90,95 dB y esa misma sinusoide escrita en int16 lo tiene en 181,26 dB. Divide por
 el valor de fondo de escala (`signal / 32768.0` para int16) antes de analizar, o
 deja que lo absorba el paso de calibración: una sensibilidad determinada a
 partir de una grabación de calibrador *en el mismo formato entero* ya lleva el
@@ -423,7 +423,7 @@ ficha PDF normativa.
 
 - [Construir un sonómetro](/phonometry/es/signals/sound-level-meter/): la misma cadena de principio a fin, del tono de calibrador a $L_{AF}(t)$, $L_{Aeq}$, $L_{AE}$, $L_{Cpeak}$, los niveles percentiles y la comprobación de clase de cada etapa
 - [Todas las guías](/phonometry/es/start/guides/): el mapa, todas las guías agrupadas por tema con una línea sobre cada una
-- [Glosario](/phonometry/es/reference/glossary/): un símbolo, su unidad, la cláusula que lo define y la guía que lo calcula
+- [Glosario](/phonometry/es/reference/glossary/): un símbolo, su unidad, el apartado que lo define y la guía que lo calcula
 - [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/): elige una arquitectura e inspecciona sus respuestas
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): obtén valores SPL reales
 - [Por qué phonometry](/phonometry/es/start/why-phonometry/): la filosofía de diseño basada en conformidad

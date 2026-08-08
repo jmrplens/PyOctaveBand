@@ -20,12 +20,13 @@ de medición — la ISO 7235 para un silenciador de conducto sobre un banco de
 laboratorio con y sin flujo de aire, que da además el ruido de flujo regenerado
 y la pérdida de carga, la ISO 11691 para el método de control sin flujo, la
 ISO 11820 para un silenciador in situ, y la ISO 11546-1 y -2 para un
-encapsulamiento en laboratorio y in situ. Una pérdida por transmisión calculada
+cerramiento en laboratorio y in situ. Una pérdida por transmisión calculada
 y una pérdida de inserción de catálogo no son la misma magnitud. Ninguna de las
 dos está mal; responden a preguntas distintas, y un diseño que las mezcla sin
 decirlo no es defendible.
 
-[Ruido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/)
+[Ruido por conductos: del ventilador a la
+sala](/phonometry/es/devices/noise-control/duct-path/)
 sigue un camino aéreo desde el ventilador, por el tramo de conductos, hasta la
 sala: la atenuación en conducto recto, en codos y en derivaciones, la reflexión
 del extremo en la unidad terminal, el ruido de flujo regenerado que se vuelve a
@@ -33,12 +34,13 @@ sumar, el efecto de sala en el receptor y el resultado contrastado con el
 criterio de la sala. Enuncia además el límite que comparte todo modelo de
 elemento de esta sección: la frecuencia por encima de la cual entran los modos
 de orden superior y deja de valer la hipótesis de onda plana.
-[Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/)
+[Entre recintos: partición, receptor y
+criterio](/phonometry/es/devices/noise-control/room-to-room/)
 sigue en cambio el camino aéreo entre recintos: un nivel de recinto emisor
 construido a partir de una potencia acústica y de la constante de sala, una
 partición con su pérdida por transmisión, un recinto receptor con su absorción,
 el espectro recibido y su veredicto — y el problema inverso, la pérdida por
-transmisión que necesita una partición o un encapsulamiento revestido para que
+transmisión que necesita una partición o un cerramiento revestido para que
 el recinto receptor cumpla su criterio, resuelto hacia atrás.
 
 Las dos páginas de elemento aportan aquello a lo que esas cadenas llaman.
@@ -76,7 +78,7 @@ límite laboral que corresponda, en [Exposición al ruido en el trabajo
   fondo, y el corte de modos superiores que limita todo método de onda plana.
 - [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/):
   la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
-  transmisión que necesita una partición o un encapsulado para cumplir un
+  transmisión que necesita una partición o un cerramiento para cumplir un
   criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de

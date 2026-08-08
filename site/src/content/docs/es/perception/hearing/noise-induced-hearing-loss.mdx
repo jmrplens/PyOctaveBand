@@ -8,7 +8,7 @@ references:
     title: "Acoustics — Estimation of noise-induced hearing loss"
     designation: "ISO 1999:2013"
     url: "https://www.iso.org/standard/45103.html"
-    note: "El modelo implementado: la combinación HTLAN (cláusula 6.1, Fórmula 1), el NIPTS mediano (cláusula 6.3.1, Fórmulas 2-3, Tabla 1) y su distribución estadística (cláusula 6.3.2, Fórmulas 4-7, Tablas 2-3), validado frente a los ejemplos resueltos del Anexo D. La componente de edad (base de datos A) es ISO 7029:2017."
+    note: "El modelo implementado: la combinación HTLAN (apartado 6.1, Fórmula 1), el NIPTS mediano (apartado 6.3.1, Fórmulas 2-3, Tabla 1) y su distribución estadística (apartado 6.3.2, Fórmulas 4-7, Tablas 2-3), validado frente a los ejemplos resueltos del Anexo D. La componente de edad (base de datos A) es ISO 7029:2017."
   - type: article
     authors: ["Passchier-Vermeer, W."]
     year: 1974
@@ -50,11 +50,11 @@ muesca característica a 4 kHz).
   loading="eager"
 />
 
-## 1. Desplazamiento permanente del umbral por ruido (cláusula 6.3)
+## 1. Desplazamiento permanente del umbral por ruido (apartado 6.3)
 
 El NIPTS mediano para duraciones de exposición de 10 a 40 años crece con el
 cuadrado del exceso del nivel de exposición sobre un umbral de corte $L_0$
-dependiente de la frecuencia (ISO 1999, cláusula 6.3.1, Fórmula 2, Tabla 1):
+dependiente de la frecuencia (ISO 1999, apartado 6.3.1, Fórmula 2, Tabla 1):
 
 $$
 N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
@@ -64,7 +64,7 @@ con $t$ la exposición en años y $t_0 = 1$ año; por debajo de $L_0$ el efecto 
 nulo. Un **fractil** poblacional se obtiene de dos semi-gaussianas cuyas
 dispersiones $d_u$ (peor que la mediana) y $d_l$ (mejor) se dan en las Fórmulas
 6/7 y la Tabla 3: $N_Q = N_{50} + z\,d$ con $z$ el cuantil normal estándar,
-recortado a cero (cláusula 6.3.2).
+recortado a cero (apartado 6.3.2).
 
 El argumento `fractile` es la fracción de la población que queda *por debajo*
 del valor devuelto, así que `fractile=0.9` es el décimo más susceptible. Ojo a
@@ -132,8 +132,8 @@ vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
 
 `NiptsResult.report(path)` genera una ficha PDF de una página con la
 presentación de la predicción de pérdida auditiva inducida por ruido que emite
-un servicio de higiene laboral para un grupo de exposición, según la
-**ISO 1999:2013** (cláusula 6.3): la línea de base de la predicción, un bloque
+un servicio de higiene industrial para un grupo de exposición, según la
+**ISO 1999:2013** (apartado 6.3): la línea de base de la predicción, un bloque
 de metadatos opcional (empresa, trabajador(es)/grupo, lugar de trabajo y fecha
 de la evaluación), una tabla con el NIPTS mediano $N_{50}$ y el del fractil
 pedido en las seis frecuencias audiométricas junto al gráfico del espectro con
@@ -144,8 +144,8 @@ honesta la ficha: los valores son una predicción estadística para la població
 expuesta, no el audiograma de nadie, y la ISO 1999 deja al usuario la elección
 de las frecuencias de discapacidad. `verbose=True` añade las columnas de
 dispersión $d_u$/$d_l$; un `requirement` en los metadatos se interpreta como el
-NIPTS representativo máximo admisible y añade una fila APTO/NO APTO (un
-desplazamiento menor es apto). El renderizado necesita reportlab y matplotlib
+NIPTS representativo máximo admisible y añade una fila CUMPLE/NO CUMPLE (un
+desplazamiento menor cumple). El renderizado necesita reportlab y matplotlib
 (`pip install "phonometry[report,plot]"`); solo se admite
 `engine="reportlab"`, y `language="es"` genera la ficha en español.
 
@@ -166,7 +166,7 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; pulse la vista previa para abrir el PDF.
+el repositorio; Pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso1999_nipts_example"
@@ -175,7 +175,7 @@ el repositorio; pulse la vista previa para abrir el PDF.
 	caption="Ficha de predicción de NIPTS (NiptsResult.report), el desplazamiento promediado en el conjunto de 2/3/4 kHz."
 />
 
-## 2. Edad y ruido combinados: HTLAN (cláusula 6.1)
+## 2. Edad y ruido combinados: HTLAN (apartado 6.1)
 
 La componente de ruido no se suma sin más a la de edad: la Fórmula (1) de
 ISO 1999 las combina con un término de compresión que importa cuando el total
@@ -287,7 +287,7 @@ sola es el tema de la guía de
 ### Informe de HTLAN (`.report()`)
 
 `HtlanResult.report(path)` genera la ficha hermana para el umbral combinado,
-según la cláusula 6.1 de la **ISO 1999:2013**: la misma línea de base de la
+según el apartado 6.1 de la **ISO 1999:2013**: la misma línea de base de la
 predicción y el mismo encabezado de metadatos que la ficha de NIPTS, pero con
 una tabla que lleva la componente de edad $H$, la de ruido $N$ y la combinada
 $H'$ en cada frecuencia audiométrica, junto al gráfico de las tres curvas, con
@@ -317,7 +317,7 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; pulse la vista previa para abrir el PDF.
+el repositorio; Pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso1999_htlan_example"
@@ -329,15 +329,15 @@ el repositorio; pulse la vista previa para abrir el PDF.
 ## Qué cubre esta guía
 
 **Cubierto.** La ISO 1999:2013 tal como la implementan `nipts` y `htlan`: el
-NIPTS mediano de la cláusula 6.3.1 (Fórmula 2, extrapolada por debajo de 10
-años con la Fórmula 3, Tabla 1) y su fractil poblacional de la cláusula 6.3.2
-(Fórmulas 4-7, Tablas 2-3), junto con la combinación HTLAN de la cláusula 6.1
+NIPTS mediano del apartado 6.3.1 (Fórmula 2, extrapolada por debajo de 10
+años con la Fórmula 3, Tabla 1) y su fractil poblacional del apartado 6.3.2
+(Fórmulas 4-7, Tablas 2-3), junto con la combinación HTLAN del apartado 6.1
 (Fórmula 1) que ejecuta `combine_age_and_noise`, todo ello validado frente a
 los ejemplos resueltos del Anexo D. La componente de edad es la base de datos
-A, evaluada a partir de ISO 7029:2017, la edición que la cláusula 6.2.2 cita
+A, evaluada a partir de ISO 7029:2017, la edición que el apartado 6.2.2 cita
 sin fecha.
 
-**No cubierto.** Las cláusulas 6.2.3 y 6.2.4 permiten sustituir la base de
+**No cubierto.** Los apartados 6.2.3 y 6.2.4 permiten sustituir la base de
 datos A por una base de datos B: un umbral por edad medido en una población de
 control del país correspondiente. Solo está implementada la base de datos A,
 así que `htlan` toma siempre su componente de edad de ISO 7029:2017.

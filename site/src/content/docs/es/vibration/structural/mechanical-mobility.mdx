@@ -85,7 +85,7 @@ mismo punto ($i = j$); una FRF de **transferencia** las tiene en puntos
 distintos. Los tipos fuerza-por-movimiento son recíprocas elemento a elemento,
 es decir, las magnitudes *libres* de la ISO 7626-1, 3.1.4; las magnitudes
 matriciales *bloqueadas* de la Tabla 1 no se invierten elemento a elemento en
-sistemas de varias coordenadas (la Tabla 1 llama además "masa efectiva" a
+sistemas de varias coordenadas (la Tabla 1 llama además «masa efectiva» a
 $F/a$, la magnitud aquí denominada masa aparente).
 
 ```python
@@ -147,7 +147,7 @@ print(round(complex(vibration.sdof_receptance(1e-6, m, k, c)).real, 7))  # 0.000
 En la disposición habitual de ISO 7626-2 la estructura cuelga de una
 suspensión lo bastante blanda para que sus modos de sólido rígido queden muy
 por debajo de la primera resonancia elástica (la norma admite estructuras
-suspendidas libremente o ancladas; la cláusula 5 pide un apoyo
+suspendidas libremente o ancladas; el apartado 5 pide un apoyo
 representativo de la aplicación prevista), un excitador ataca un punto a
 través de una
 **cabeza de impedancia** (una pila de transductores que mide fuerza y
@@ -199,7 +199,7 @@ magnitud de la FRF medida frente a la recta de masa rígida con su banda de
 tolerancia de ±5 % (panel superior) y la desviación relativa frente a la misma
 banda (panel inferior, donde una tolerancia de pocos por ciento es realmente
 legible). Una calibración que se sale de la banda hacia unos pocos kHz señala
-un error del transductor o de la conformidad del acoplamiento, justo lo que la
+un error del transductor o de la flexibilidad del acoplamiento, justo lo que la
 verificación pretende detectar:
 
 ```python

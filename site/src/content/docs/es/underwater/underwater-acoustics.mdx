@@ -1,6 +1,6 @@
 ---
 title: "Acústica submarina: ruido radiado e hincado de pilotes"
-description: "Niveles de referencia ISO 18405 (SPL, SEL, pico) re 1 µPa, el nivel de ruido radiado de buques y el nivel de fuente monopolar equivalente de la ISO 17208 mediante la corrección de Lloyd's mirror, y la exposición sonora por golpe, de pico y acumulada del hincado de pilotes de la ISO 18406."
+description: "Niveles de referencia ISO 18405 (SPL, SEL, pico) re 1 µPa, el nivel de ruido radiado de buques y el nivel de fuente monopolar equivalente de la ISO 17208 mediante la corrección de Espejo de Lloyd, y la exposición sonora por golpe, de pico y acumulada del hincado de pilotes de la ISO 18406."
 references:
   - type: book
     authors: ["Urick, R. J."]
@@ -36,7 +36,7 @@ references:
     title: "Underwater acoustics — Quantities and procedures for description and measurement of underwater sound from ships — Part 2: Determination of source levels from deep water measurements"
     designation: "ISO 17208-2:2019"
     url: "https://www.iso.org/standard/62409.html"
-    note: "El nivel de fuente monopolar equivalente mediante la corrección de superficie de Lloyd's mirror (Fórmula 3) para una profundidad de fuente de 0,7·calado."
+    note: "El nivel de fuente monopolar equivalente mediante la corrección de superficie de Espejo de Lloyd (Fórmula 3) para una profundidad de fuente de 0,7·calado."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
@@ -100,7 +100,7 @@ L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{
 L_s = L_{\mathrm{RN}} + \Delta L,
 $$
 
-donde la corrección de superficie de Lloyd's mirror (ISO 17208-2 Fórmula 3) para
+donde la corrección de superficie de Espejo de Lloyd (ISO 17208-2 Fórmula 3) para
 una profundidad de fuente nominal $d_s = 0{,}7\,D$ ($D$ = calado medio) y $u = k\,d_s$,
 $k = 2\pi f/c$, es
 
@@ -110,10 +110,10 @@ $$
 
 $\Delta L$ diverge a $u$ bajo (rasante / baja frecuencia) y tiende a
 $-10\log_{10}(2) = -3{,}01$ dB cuando $u \to \infty$. El nivel de fuente
-reportado es un valor *monopolar
+declarado es un valor *monopolar
 equivalente de través* y debe indicarse junto con su profundidad de fuente.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de Lloyd's mirror en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de Espejo de Lloyd en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -155,7 +155,7 @@ Lee los órdenes de magnitud antes de seguir. Un buque mercante vive en un nivel
 de ruido radiado de aproximadamente 160-180 dB re 1 µPa·m, frente a niveles
 espectrales de ruido ambiente oceánico de 60-100 dB, así que un resultado muy
 fuera de ese rango es un error de unidades y no un buque silencioso. Por encima
-del primer cero del Lloyd's mirror la corrección se asienta hacia $-3$ dB y el
+del primer cero del Espejo de Lloyd la corrección se asienta hacia $-3$ dB y el
 nivel monopolar equivalente queda justo *por debajo* del nivel de ruido radiado;
 solo en las bandas más bajas, donde $u$ es pequeño, va al revés.
 
@@ -173,10 +173,11 @@ escena (apartados 5.2, 5.4). Solo puntúa la **ventana de datos** de ±30°
 alrededor del CPA: el promediado corre mientras el buque cruza una ventana de
 longitud $2\,d_{CPA}\tan 30°$ (aproximadamente 1,15 distancias de CPA),
 centrada en el aspecto de través para el que se define el nivel de ruido
-radiado (apartado 3, figura 3). Se exigen cuatro pasadas, dos por banda; los
+radiado (apartado 3, figura 3). Se exigen cuatro pasadas, dos por cada costado
+del buque; los
 tres niveles de hidrófono de cada pasada se promedian en potencia (fórmula 8),
 las pasadas se promedian después aritméticamente (fórmula 9), y babor y
-estribor se reportan también por separado, porque un buque real no radia de
+estribor se declaran también por separado, porque un buque real no radia de
 forma simétrica (apartado 6.5). El ruido de fondo se mide al principio y al
 final de cada periodo de ensayo y se aplica por banda la corrección al estilo
 de la ISO 3744; el límite de viento recomendado es de 20 kn para buques de más
@@ -240,14 +241,14 @@ ambiental que exigen monitorizar el sonido radiado, y su alcance se dibuja en
 consecuencia: hincado percusivo en aguas de 4 a 100 m, con el vibrohincado y
 las tablestacas excluidos (apartado 1). La campaña mínima es una posición de
 medida **lo más cerca posible de 750 m** del pilote, registrando la secuencia
-de hincado completa y reportando la distancia real; el estándar es explícito
+de hincado completa y declarando la distancia real; la norma es explícita
 en que los 750 m se eligen por comparabilidad con el gran cuerpo de medidas
 existente, no porque el límite de ningún regulador viva ahí, y en que un nivel
 a una sola distancia no tiene valor predictivo para otros emplazamientos
 (apartado 6.1.2, notas 1-2). Los criterios de impacto sobre la fauna marina se
 formulan exactamente en las magnitudes de esta sección, un tope al SEL por
 golpe o acumulado y al nivel de pico a una distancia declarada, y por eso
-`pile_strike_metrics` los reporta juntos y `cumulative_sel` sigue la suma
+`pile_strike_metrics` los da juntos y `cumulative_sel` sigue la suma
 energética golpe a golpe de las fórmulas 8-9.
 
 ## Qué cubre esta guía
@@ -257,7 +258,7 @@ energética golpe a golpe de las fórmulas 8-9.
 `peak_sound_pressure_level`. Las ISO 17208-1:2016 e ISO 17208-2:2019 para el
 nivel de ruido radiado del buque y el nivel de fuente monopolar equivalente:
 `radiated_noise_level` y `monopole_source_level`, con la corrección de
-superficie de Lloyd's mirror (fórmula 3) y la profundidad de fuente de
+superficie de Espejo de Lloyd (fórmula 3) y la profundidad de fuente de
 0,7·calado (fórmula 1), la geometría de tres hidrófonos
 (`hydrophone_depths`) y la incertidumbre tabulada del nivel de fuente
 (`source_level_uncertainty`). La ISO 18406:2017 para las métricas de hincado
@@ -269,7 +270,7 @@ SPL cuadrático medio (fórmula 7) y la exposición sonora acumulada (fórmulas
 **No cubierto.** La disciplina de medida de la ISO 17208-1 en sí no está
 implementada: el promediado en potencia y aritmético de cuatro pasadas y tres
 hidrófonos (fórmulas 8-9), las comprobaciones de geometría de CPA y
-profundidad de agua, el puntuado de la ventana de datos de ±30° y la
+profundidad de agua, la puntuación de la ventana de datos de ±30° y la
 corrección de ruido de fondo al estilo ISO 3744 descrita en la sección 2
 anterior quedan a cargo del lector; la biblioteca solo aporta las fórmulas
 cerradas `radiated_noise_level` y `monopole_source_level`. La propia ISO
@@ -280,4 +281,4 @@ ningún otro lugar de phonometry.
 ## Véase también
 
 - Referencia de la API: [`underwater.acoustics`](/phonometry/es/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](/phonometry/es/reference/api/underwater/pile-driving-noise/) y [`underwater.sources.ship_radiated_noise`](/phonometry/es/reference/api/underwater/ship-radiated-noise/).
-- El modelado general de propagación submarina (rayos, modos normales, ecuación parabólica) se cubre en [Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+- El modelado general de propagación submarina (rayos, modos normales, ecuación parabólica) se cubre en [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).

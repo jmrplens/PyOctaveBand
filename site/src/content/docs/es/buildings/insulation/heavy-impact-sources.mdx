@@ -55,10 +55,11 @@ Esta guía cubre su especificación normativa, la verificación en laboratorio d
 una fuente frente a ella, la estandarización del nivel máximo en el recinto
 receptor y el número único ponderado A. La cadena de la máquina de impactos
 está en
-[Medición del aislamiento en obra (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)
-y [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/).
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)
+y [Medición del aislamiento en
+laboratorio](/phonometry/es/buildings/insulation/insulation-lab/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources_es.svg" alt="Dos paneles: los niveles de exposición a la fuerza de impacto por bandas de octava de la pelota de caucho y de la máquina de neumático con sus bandas de tolerancia impresas de 31,5 Hz a 500 Hz, y la valoración del Anexo D de ISO 717-2 de una medición en obra con los niveles de octava medidos, sus contribuciones ponderadas A y el número único resultante" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources_es.svg" alt="Dos paneles: los niveles de exposición a la fuerza de impacto por bandas de octava de la pelota de caucho y de la máquina de neumático con sus bandas de tolerancia impresas de 31,5 Hz a 500 Hz, y la valoración del Anexo D de ISO 717-2 de una medición in situ con los niveles de octava medidos, sus contribuciones ponderadas A y el número único resultante" width="92%" />
 
 *Izquierda: las dos especificaciones son espectros puros de fuerza, no de
 geometría. Derecha: la valoración suma en energía las contribuciones
@@ -233,7 +234,7 @@ resultado intermedio sin redondear que imprime la norma:
 ```python
 from phonometry import a_weighted_maximum_impact_level
 
-# ISO 717-2:2020 Tabla D.4: una medición en obra en bandas de octava.
+# ISO 717-2:2020 Tabla D.4: una medición in situ en bandas de octava.
 res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
 print(list(res.corrected))   # 39.1, 48.3, 49.3, 52.6 dB
 print(res.unrounded)         # 55.350667... dB
@@ -266,7 +267,7 @@ octavas de la Fórmula (20), con `building.standardized_maximum_impact_level`,
 del Anexo D de ISO 717-2:2020 con las correcciones de la Tabla D.3, con
 `building.a_weighted_maximum_impact_level`.
 
-**No cubierto.** El procedimiento de medición en obra en sí (las cuatro o más
+**No cubierto.** El procedimiento de medición in situ en sí (las cuatro o más
 posiciones de caída del Anexo A de ISO 10140-3, las posiciones de micrófono y
 el procedimiento de esquina en baja frecuencia) no está automatizado: las
 funciones consumen niveles ya promediados en energía sobre las posiciones. No
@@ -281,11 +282,11 @@ una reproducción publicada de 25 bandas de la Fórmula (4).
 
 ## Véase también
 
-- [Medición del aislamiento en obra (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   la cadena de la máquina de impactos de la misma norma.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   la serie ISO 10140 que amplían las fuentes pesadas.
-- [Valoración del aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   el motor de curva de referencia que valora las magnitudes de la máquina de
   impactos.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):

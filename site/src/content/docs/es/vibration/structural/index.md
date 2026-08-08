@@ -25,17 +25,18 @@ acopla realmente a través de una interfaz, y por eso importa este
 vocabulario.
 
 Tres páginas caracterizan después los elementos del camino.
-[Transmisión de onda de flexión en uniones de placas (Cremer/Craik/Hopkins)](/phonometry/es/vibration/structural/junction-transmission/)
+[Transmisión de onda de flexión en uniones de placas
+(Cremer/Craik/Hopkins)](/phonometry/es/vibration/structural/junction-transmission/)
 sigue la potencia a través de la propia estructura, con los coeficientes de
 transmisión del enfoque ondulatorio para uniones rígidas en X, T, L y en
 línea, su media angular de campo difuso, y el factor de pérdidas por
-acoplamiento y el índice de reducción vibracional Kij que se derivan de
+acoplamiento y el índice de reducción vibratoria Kij que se derivan de
 ellos.
 [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/)
 mide la rigidez de transferencia dinámica de los aisladores, soportes y
-mangueras que se insertan precisamente para romper el camino de transmisión,
+mangueras que se insertan precisamente para romper la trayectoria de transmisión,
 por los métodos directo e indirecto (transmisibilidad).
-[Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
+[Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
 se ocupa de la radiación directa: la potencia aérea estimada desde la
 velocidad superficial y un factor de radiación, sin medición acústica
 alguna.
@@ -67,7 +68,7 @@ receptor, que es donde esta sección se encuentra con los modelos de
 
 Páginas de otras áreas del sitio en las que se apoya esta sección:
 
-- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+- [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   potencia aérea radiada desde la velocidad superficial y un factor de
   radiación.
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
@@ -80,7 +81,7 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 Los coeficientes de unión son una **idealización en forma cerrada** para una
 unión rígida y simplemente apoyada entre placas homogéneas, no una medición: el
-índice de reducción vibracional empírico obtenido de una diferencia de niveles
+índice de reducción vibratoria empírico obtenido de una diferencia de niveles
 de velocidad promediada en dirección es la ISO 10848, en [Transmisión por
 flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/). El
 coeficiente

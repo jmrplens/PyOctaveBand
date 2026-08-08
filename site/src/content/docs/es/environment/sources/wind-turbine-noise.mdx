@@ -55,15 +55,15 @@ r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
 lwa = environment.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
 ```
 
-### Por qué "aparente"
+### Por qué «aparente»
 
 $L_{WA}$ se escribe como un nivel de potencia acústica, pero no lo es en el
 sentido de la ISO 3744 de muestrear el campo de presión sobre una
 superficie envolvente. La norma reduce toda la máquina a una fuente puntual
 equivalente en el centro del rotor y pregunta qué potencia necesitaría esa
 fuente, radiando esféricamente, para reproducir el nivel medido en una única
-posición sobre placa a sotavento: por definición es la potencia "que produce
-la misma emisión sonora en la dirección de sotavento que el aerogenerador".
+posición sobre placa a sotavento: por definición es la potencia «que produce
+la misma emisión sonora en la dirección de sotavento que el aerogenerador».
 Todo lo que un rotor de 150 m hace y una fuente puntual no, la directividad
 vertical y lateral y el silbido al paso de pala, queda englobado en el valor
 y evaluado en una sola dirección; las posiciones opcionales 2 a 4
@@ -77,13 +77,14 @@ suelo, a su vez, es la razón de los 6 dB restados: una cápsula tumbada sobre
 una placa dura recibe una reflexión perfectamente coherente (duplicación de
 presión, $+6$ dB) en lugar del patrón de interferencia dependiente de la
 altura que muestrearía un micrófono en trípode (véase
-[la fuente imagen que explica el efecto del suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
+[la fuente imagen que explica el efecto del
+suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
 
 ### Clases de viento y condiciones estandarizadas
 
 La emisión de ruido de un aerogenerador crece con la velocidad del viento
 hacia la potencia nominal, así que un número único no significaría nada sin
-su punto de operación: la IEC 61400-11 reporta $L_{WA}$ *en función de la
+su punto de operación: la IEC 61400-11 declara $L_{WA}$ *en función de la
 velocidad del viento*. Sonido y viento se registran en promedios
 sincronizados de 10 s, y cada periodo se clasifica en una **clase de
 velocidad de viento de 0,5 m/s de ancho centrada en velocidades enteras y
@@ -124,7 +125,7 @@ energética de la banda excluyendo el máximo y sus líneas adyacentes. El nivel
 de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
 $\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
 $\Delta L_a = \Delta L_{tn} - L_a$ con
-$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, reportada cuando
+$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, declarada cuando
 $\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />
@@ -150,7 +151,7 @@ import numpy as np
 from phonometry import environment
 
 # Un espectro de banda estrecha uniformemente espaciado (resolución de 2 Hz):
-# un suelo plano de 30 dB con un tono discreto de 60 dB en 500 Hz.
+# un suelo plano de 30 dB con un tono discreto de 60 dB a 500 Hz.
 frequencies = np.arange(440.0, 562.0, 2.0)
 levels = np.full(frequencies.size, 30.0)
 levels[np.argmin(np.abs(frequencies - 500.0))] = 60.0
@@ -201,13 +202,13 @@ $\Delta L_{tn}$, criterio de audibilidad $L_a$ y audibilidad tonal
 $\Delta L_a$) junto al gráfico del espectro de banda estrecha con la banda
 crítica, el nivel de enmascaramiento y el tono marcados, la audibilidad tonal
 $\Delta L_a$ enmarcada junto con la frecuencia del tono y la decisión de
-audibilidad, una fila opcional de veredicto APTO/NO APTO y una nota sobre cómo
+audibilidad, una fila opcional de veredicto CUMPLE/NO CUMPLE y una nota sobre cómo
 se construye $\Delta L_a$, y un pie con el descargo fijo.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de sonoridad ISO 532-1](/phonometry/es/perception/psychoacoustics/loudness/#informe-de-iso-532-1-report);
 un `requirement` indicado se interpreta como la audibilidad tonal $\Delta L_a$
-máxima admisible en dB (un tono menos audible es apto). El renderizado necesita
+máxima admisible en dB (un tono menos audible cumple). El renderizado necesita
 reportlab y, para la figura que incrusta la ficha, matplotlib (`pip install
 "phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
 genera en inglés por defecto; pasa `language="es"` para una ficha en español
@@ -237,7 +238,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iec61400_wind_turbine_tonality_example"
 	title="Informe de ejemplo de audibilidad tonal de aerogenerador IEC 61400-11 (PDF)"
-	description="Ficha de audibilidad tonal de aerogenerador de una página: un encabezado de metadatos, una tabla de análisis en la banda crítica (frecuencia del tono 500,0 Hz, ancho de banda crítica 117,3 Hz, nivel del tono Lpt = 60,0 dB, nivel de ruido de enmascaramiento Lpn = 45,9 dB, tonalidad ΔL_tn = 14,1 dB, criterio de audibilidad La = -2,3 dB) junto al gráfico del espectro de banda estrecha con la banda crítica sombreada y el nivel de enmascaramiento trazado, la audibilidad tonal ΔL_a = 16,4 dB enmarcada en el tono de 500,0 Hz con la decisión de que el tono es audible, y un veredicto NO APTO frente a una audibilidad máxima admisible de 6,0 dB."
+	description="Ficha de audibilidad tonal de aerogenerador de una página: un encabezado de metadatos, una tabla de análisis en la banda crítica (frecuencia del tono 500,0 Hz, ancho de banda crítica 117,3 Hz, nivel del tono Lpt = 60,0 dB, nivel de ruido de enmascaramiento Lpn = 45,9 dB, tonalidad ΔL_tn = 14,1 dB, criterio de audibilidad La = -2,3 dB) junto al gráfico del espectro de banda estrecha con la banda crítica sombreada y el nivel de enmascaramiento trazado, la audibilidad tonal ΔL_a = 16,4 dB enmarcada en el tono de 500,0 Hz con la decisión de que el tono es audible, y un veredicto NO CUMPLE frente a una audibilidad máxima admisible de 6,0 dB."
 	caption="Ficha de audibilidad tonal de aerogenerador (WindTurbineTonalityResult.report), audibilidad tonal ΔL_a en dB con la decisión de audibilidad."
 />
 

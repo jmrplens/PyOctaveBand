@@ -8,7 +8,7 @@ references:
     title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
     designation: "IEC 61260-1:2014"
     url: "https://webstore.iec.ch/en/publication/5063"
-    note: "Los límites de aceptación de clase 1 y clase 2 de la Tabla 1 verificados aquí, con el mapeo de breakpoints a fraccionales y la interpolación logarítmica de la norma."
+    note: "Los límites de aceptación de clase 1 y clase 2 de la Tabla 1 verificados aquí, con el mapeo de los puntos de quiebre a cada fracción de octava y la interpolación logarítmica de la norma."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 1995
@@ -42,7 +42,7 @@ Esta página es la mitad de verificación del tema del filtrado en octavas: la
 máscara de 2014 y el veredicto por banda, la **clase 0** más estricta que
 mantienen vivas las máscaras retiradas de IEC 61260:1995 y ANSI S1.11-2004,
 una lectura de lo que aporta de verdad una clase en una medición (error en la
-banda de paso, fuga en la banda atenuada, presupuesto de incertidumbre) y la ficha
+banda de paso, fuga en la banda atenuada, balance de incertidumbre) y la ficha
 acreditada de una página que convierte el veredicto en documento. La mitad
 de diseño, las matemáticas de banda y la referencia de parámetros, es
 [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/), y las cinco
@@ -54,9 +54,9 @@ sección 6 de [Ponderación frecuencial](/phonometry/es/signals/levels/weighting
 ## 1. Verificar la clase frente a IEC 61260-1:2014
 
 `verify_filter_class` comprueba cada banda de un banco contra los límites de
-aceptación de **IEC 61260-1:2014** (Tabla 1, con el mapeo de breakpoints a
-fraccionales y la interpolación logarítmica de la norma) e informa de la clase
-por banda con su margen en dB:
+aceptación de **IEC 61260-1:2014** (Tabla 1, con el mapeo de los puntos de
+quiebre a cada fracción de octava y la interpolación logarítmica de la norma)
+e informa de la clase por banda con su margen en dB:
 
 ```python
 from phonometry import filters
@@ -138,7 +138,7 @@ plt.show()
 Con parámetros por defecto (orden 6), **Butterworth cumple clase 1**, y también
 lo hace **Chebyshev II**: su valor por defecto de `attenuation` es ahora `72` dB,
 superando el límite de clase 1 de 70 dB en la banda atenuada lejana (scipy fija el
-suelo equirizado de cheby2 en exactamente `attenuation`, así que cualquier valor
+suelo equirrizado de cheby2 en exactamente `attenuation`, así que cualquier valor
 $\ge 70\ \text{dB}$ cumple; el valor por defecto de 72 dB mantiene el mismo
 margen de banda de paso de +0,400 dB que Butterworth). Chebyshev I, elíptico y
 Bessel no cumplen
@@ -214,7 +214,7 @@ plt.show()
 ## 3. Qué significa físicamente una clase
 
 Las máscaras son cotas de error en el peor caso de una *medición*, no
-calificaciones abstractas:
+valoraciones abstractas:
 
 - **En la banda de paso** el corredor acota cuánto puede desviarse la lectura
   del contenido dentro de banda: un banco de clase 1 lee un tono de centro de
@@ -233,7 +233,7 @@ calificaciones abstractas:
   por debajo de un tono dominante, la lectura toca fondo en la falda de fuga
   unos 70 dB por debajo, y una arquitectura más abrupta (o mayor orden) es la
   única forma de empujar ese suelo más abajo.
-- **Para el presupuesto de incertidumbre**, la clase es la contribución del filtro a la
+- **Para el balance de incertidumbre**, la clase es la contribución del filtro a la
   incertidumbre de la medición: un banco de clase 1 añade hasta unas décimas
   de dB a un nivel de banda, comparable a los demás términos de tolerancia de
   un sonómetro de clase 1, y por eso las cadenas con calidad de instrumento
@@ -244,11 +244,11 @@ clases son la 1 y la 2, el banco Butterworth de orden 6 por defecto de la
 biblioteca **cumple la clase 1** con un margen vinculante de +0,400 dB: ese es
 el techo, y el apartado 1 explica por qué. Frente a la máscara más estricta de
 1995 / ANSI S1.11-2004 (`edition="1995"`) ese mismo valor por defecto alcanza la
-**clase 0**; la configuración que verifica el conjunto de conformidad a esa
+**clase 0**; la configuración que verifica la batería de conformidad a esa
 clase es el banco de *bandas de octava* a 48 kHz, así que vuelve a ejecutar
 `verify_filter_class(bank, edition="1995")` por tu cuenta antes de escribir
 clase 0 en un documento para cualquier otra fracción o frecuencia de muestreo.
-Escribir "clase 0 según IEC 61260-1:2014" es una afirmación contra una clase que
+Escribir «clase 0 según IEC 61260-1:2014» es una afirmación contra una clase que
 esa edición no define.
 
 La tabla indica la mejor clase que alcanza cada arquitectura con orden 6 y
@@ -282,8 +282,8 @@ ensayo de tipo puede renderizarse como una ficha acreditada de una página. La
 ficha lista la clase alcanzada por cada banda y su margen vinculante, superpone
 la atenuación relativa medida de la banda de peor margen sobre el corredor de la
 clase y encuadra el resultado global de conformidad. Pasa un `required_class` en
-el `ReportMetadata` para añadir una fila de veredicto PASS/FAIL (un banco
-"cumple la clase N" cuando su clase alcanzada es al menos igual de estricta, es
+el `ReportMetadata` para añadir una fila de veredicto CUMPLE/NO CUMPLE (un banco
+«cumple la clase N» cuando su clase alcanzada es al menos igual de estricta, es
 decir, un índice de clase N o inferior). La ficha se genera en inglés por
 defecto; pasa `language="es"` para una ficha en español (cadenas fijas
 traducidas y coma como separador decimal), p. ej.
@@ -311,12 +311,12 @@ result.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iec61260_filter_example"
 	title="Informe de ejemplo de conformidad de clase de filtro IEC 61260-1 (PDF)"
-	description="Ficha de conformidad de clase de filtro de una página: una cabecera de metadatos, una tabla de clasificación por bandas con la clase alcanzada y el margen vinculante de cada banda de octava, la atenuación relativa medida de la banda de peor margen superpuesta sobre el corredor de aceptación verde de clase 1, el resultado encuadrado Class 1 - COMPLIES (margin +0.40 dB) y un veredicto PASS frente a la clase 1 exigida."
+	description="Ficha de conformidad de clase de filtro de una página: una cabecera de metadatos, una tabla de clasificación por bandas con la clase alcanzada y el margen vinculante de cada banda de octava, la atenuación relativa medida de la banda de peor margen superpuesta sobre el corredor de aceptación verde de clase 1, el resultado encuadrado Class 1 - COMPLIES (margin +0.40 dB) y un veredicto CUMPLE frente a la clase 1 exigida."
 	caption="Ficha de conformidad de clase de filtro (FilterComplianceResult.report), clase alcanzada con el margen vinculante en dB y la atenuación relativa medida sobre el corredor de la Tabla 1."
 />
 
@@ -336,19 +336,19 @@ result.report("iec61260_1995.pdf",
 <ReportPreview
 	name="iec61260_filter_1995_example"
 	title="Informe de ejemplo de conformidad de clase 0 IEC 61260:1995 (PDF)"
-	description="Ficha de conformidad de clase de filtro de una página bajo la edición de 1995: una tabla de clasificación por bandas con cada banda de octava alcanzando la clase 0, la atenuación relativa medida superpuesta sobre el corredor de aceptación verde de clase 0, el resultado encuadrado Class 0 - COMPLIES (margin +0.15 dB) y un veredicto PASS frente a la clase 0 exigida."
+	description="Ficha de conformidad de clase de filtro de una página bajo la edición de 1995: una tabla de clasificación por bandas con cada banda de octava alcanzando la clase 0, la atenuación relativa medida superpuesta sobre el corredor de aceptación verde de clase 0, el resultado encuadrado Class 0 - COMPLIES (margin +0.15 dB) y un veredicto CUMPLE frente a la clase 0 exigida."
 	caption="La clase 0 la conserva la edición IEC 61260:1995 / ANSI S1.11-2004 (edition='1995'); la edición de 2014 solo mantiene las clases 1 y 2."
 />
 
 ## Qué cubre esta guía
 
 **Cubierto.** Los límites de aceptación de clase 1 y clase 2 de la Tabla 1
-de IEC 61260-1:2014 (con el mapeo de breakpoints a fraccionales y la
-interpolación logarítmica de la norma), comprobados banda a banda por
-`verify_filter_class` y publicados como máscara por `class_limits`; la
+de IEC 61260-1:2014 (con el mapeo de los puntos de quiebre a cada fracción de
+octava y la interpolación logarítmica de la norma), comprobados banda a banda
+por `verify_filter_class` y publicados como máscara por `class_limits`; la
 máscara de clase 0 de la edición retirada IEC 61260:1995 / ANSI S1.11-2004,
 accesible con `edition="1995"`; y la ficha acreditada de una página de
-`filter_class_compliance().report()`, con su veredicto opcional PASS/FAIL
+`filter_class_compliance().report()`, con su veredicto opcional CUMPLE/NO CUMPLE
 frente a `required_class`, en inglés y en español.
 
 **No cubierto.** Los ensayos de conformidad de IEC 61260-1 sobre el filtro

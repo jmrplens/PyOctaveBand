@@ -1,6 +1,6 @@
 ---
 title: "Vibración y ruido estructural"
-description: "La vibración como fuente de ruido en edificios, como exposición humana y como diagnóstico de la propia máquina: el vocabulario de FRF (ISO 7626), la transmisión de onda de flexión en uniones, la rigidez de transferencia de aisladores (ISO 10846), la potencia acústica desde vibración (ISO/TS 7849), la cadena de equipos EN 15657 y EN 12354-5, las métricas de vibración en humanos de ISO 2631 e ISO 5349, y las frecuencias cinemáticas de fallo de la maquinaria rotativa."
+description: "La vibración como fuente de ruido en edificios, como exposición humana y como diagnóstico de la propia máquina: el vocabulario de FRF (ISO 7626), la transmisión de onda de flexión en uniones, la rigidez de transferencia de aisladores (ISO 10846), la Potencia acústica a partir de la vibración (ISO/TS 7849), la cadena de equipos EN 15657 y EN 12354-5, las métricas de vibración en humanos de ISO 2631 e ISO 5349, y las frecuencias cinemáticas de fallo de la maquinaria rotativa."
 ---
 
 La vibración importa a la acústica tres veces. Primero como **fuente de
@@ -58,7 +58,7 @@ Del vocabulario de FRF al nivel predicho en el recinto receptor.
 - [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/):
   la rigidez de transferencia dinámica de aisladores de vibración por los
   métodos directo e indirecto.
-- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+- [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   potencia aérea radiada a partir de la velocidad superficial y un factor de
   radiación.
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
@@ -74,7 +74,7 @@ La vibración transmitida al cuerpo humano, de la exposición diaria al riesgo
 de lesión lumbar.
 
 - [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/):
-  ponderaciones de cuerpo completo y mano-brazo (ISO 8041-1), medidas r.m.s.
+  ponderaciones de cuerpo entero y mano-brazo (ISO 8041-1), medidas r.m.s.
   y de dosis (ISO 2631-1), exposición diaria A(8) (ISO 5349) y los valores de
   la Directiva 2002/44/CE.
 - [Vibración con choques múltiples (ISO 2631-5)](/phonometry/es/vibration/human/multiple-shock-vibration/):
@@ -114,7 +114,7 @@ el código nacional.
 
 Dos predicciones estructurales son idealizaciones y no mediciones. Los
 coeficientes de transmisión de unión son un resultado en forma cerrada para una
-unión rígida y simplemente apoyada — el índice de reducción vibracional *medido*
+unión rígida y simplemente apoyada — el índice de reducción vibratoria *medido*
 de la ISO 10848 es [Transmisión por flancos en
 laboratorio](/phonometry/es/buildings/insulation/flanking-lab/) — y la página de
 FRF devuelve recíprocas libres elemento a elemento, correctas para el punto de

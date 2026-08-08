@@ -1,10 +1,10 @@
 ---
 title: "Filtrado en octavas"
-description: "El análisis en bandas de octava fraccional en phonometry: los bancos de filtros ANSI S1.11 / IEC 61260-1 y sus arquitecturas, la verificación de clase de IEC 61260-1, el procesado por bloques con estado para señales en streaming, y el análisis multicanal vectorizado."
+description: "El análisis en bandas de fracción de octava en phonometry: los bancos de filtros ANSI S1.11 / IEC 61260-1 y sus arquitecturas, la verificación de clase de IEC 61260-1, el procesado por bloques con estado para señales en streaming, y el análisis multicanal vectorizado."
 ---
 
 El análisis acústico rara vez quiere una FFT en bruto: las normas, los
-índices y el propio oído trabajan en **bandas de octava fraccional**,
+índices y el propio oído trabajan en **bandas de fracción de octava**,
 intervalos de frecuencia cuya anchura crece proporcionalmente con la
 frecuencia. phonometry las implementa como bancos de filtros recursivos cuyos
 diseños se verifican contra las tolerancias de clase de
@@ -13,8 +13,8 @@ Chebyshev II y Bessel, sitúan sus **puntos de -3 dB exactamente en los bordes
 de banda de ANSI S1.11**, así que sus niveles de banda son directamente
 comparables; las dos arquitecturas de rizado constante (Chebyshev I,
 elíptica) colocan ahí su borde de rizado y en consecuencia leen unas décimas
-de decibelio altas en todas las bandas, y por eso una campaña debe fijar una
-arquitectura y mantenerla.
+de decibelio de más en todas las bandas, y por eso conviene que una campaña
+fije una arquitectura y la mantenga.
 
 La página fundacional es
 [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). Cubre la matemática

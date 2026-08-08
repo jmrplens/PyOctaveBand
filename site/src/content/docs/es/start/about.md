@@ -3,7 +3,7 @@ title: "Acerca de"
 description: "Quién mantiene phonometry, cómo se construye cada métrica a partir del texto de la norma que la rige y se comprueba en CI, cómo informar de un error y cómo citar el software."
 ---
 
-Esta página existe porque una librería que te pide que confíes en sus números
+Esta página existe porque una biblioteca que te pide que confíes en sus números
 te debe el nombre de quien está detrás, el método del que salen esos números y
 una forma de avisarme cuando alguno esté mal.
 
@@ -40,12 +40,12 @@ acústicos; los artículos están listados en los perfiles de Google Scholar y
 ORCID de arriba. Hoy trabajo en I+D industrial como ingeniero de firmware y
 software.
 
-La librería nació de la parte de medición de ese trabajo: necesitaba una y
-otra vez niveles por bandas de octava y magnitudes de sonómetro que pudiera
+La biblioteca nació de la parte de medición de ese trabajo: necesitaba una y
+otra vez niveles de bandas de octava y magnitudes de sonómetro que pudiera
 defender frente a una tabla de tolerancias, así que los construí bien una sola
 vez en lugar de volver a deducirlos en cada proyecto.
 
-## Cómo construyo la librería
+## Cómo construyo la biblioteca
 
 El método es la razón de ser del proyecto, y es deliberadamente estrecho:
 
@@ -82,8 +82,8 @@ erratas](/phonometry/es/reference/errata/).
 
 Los números son públicos: ese informe recoge, para
 cada comprobación, la norma y el apartado, el valor esperado normativo, el
-valor que calcula realmente la librería, la diferencia y un veredicto de apto o
-no apto; CI lo regenera en cada pull request, así que no puede desviarse del
+valor que calcula realmente la biblioteca, la diferencia y un veredicto de cumple o
+no cumple; CI lo regenera en cada pull request, así que no puede desviarse del
 código. [Por qué phonometry](/phonometry/es/start/why-phonometry/) recorre
 el método sobre un caso resuelto concreto (la ponderación temporal según
 IEC 61672-1:2013) si quieres verlo aplicado de principio a fin antes de
@@ -113,7 +113,7 @@ erratas de imprenta, ejemplos resueltos que contradicen su propio texto
 normativo, redacciones ambiguas. No los sorteo en silencio. Cada caso
 confirmado queda registrado en el
 [registro de erratas](/phonometry/es/reference/errata/) con la localización, la
-evidencia, la lectura que implementa la librería y si se ha comunicado al
+evidencia, la lectura que implementa la biblioteca y si se ha comunicado al
 organismo emisor. Se mantiene como
 [`docs/ERRATA.md`](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
 en el repositorio y se trasplanta al sitio al compilar, así que los dos no
@@ -173,7 +173,7 @@ instrumento calibrado y no tiene ninguna acreditación. Decidir si un resultado
 es adecuado para tu propósito sigue siendo cosa tuya.
 
 En concreto, para los laboratorios y las consultoras para los que está escrita
-sobre todo: la librería calcula y documenta, no mide, así que **la trazabilidad
+sobre todo: la biblioteca calcula y documenta, no mide, así que **la trazabilidad
 se queda en la cadena de instrumentación** — un calibrador y un micrófono con
 certificados en vigor, e instrumentación con aprobación de modelo allí donde la
 medición tenga efectos legales. Las entidades de acreditación esperan que **el
@@ -193,7 +193,7 @@ implementaciones; no sustituye a la compra de los documentos.
 ## Adónde ir a partir de aquí
 
 Si has llegado hasta aquí y quieres empezar a usarla, [Primeros
-pasos](/phonometry/es/start/getting-started/) instala la librería y ejecuta un
+pasos](/phonometry/es/start/getting-started/) instala la biblioteca y ejecuta un
 primer análisis calibrado, [¿Qué necesitas
 medir?](/phonometry/es/start/tasks/) encuentra la página de un trabajo
 concreto, y [Todas las guías](/phonometry/es/start/guides/) es el mapa de la

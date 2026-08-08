@@ -15,14 +15,14 @@ references:
     title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
     designation: "IEC 61260-1:2014"
     url: "https://webstore.iec.ch/en/publication/5063"
-    note: "Los filtros de bandas de octava fraccional de la etapa de espectro, y los límites de aceptación de clase de la Tabla 1 que comprueba verify_filter_class."
+    note: "Los filtros de bandas de fracción de octava de la etapa de espectro, y los límites de aceptación de clase de la Tabla 1 que comprueba verify_filter_class."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2017
     title: "Electroacoustics — Sound calibrators"
     designation: "IEC 60942:2017"
     url: "https://webstore.iec.ch/en/publication/30045"
-    note: "El calibrador acústico que asume la etapa de sensibilidad: el nivel principal de 94 dB y la comprobación de estabilidad a corto plazo aplicada a la grabación de referencia."
+    note: "El calibrador acústico que supone la etapa de sensibilidad: el nivel principal de 94 dB y la comprobación de estabilidad a corto plazo aplicada a la grabación de referencia."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -94,7 +94,7 @@ calcularse a partir de la sensibilidad nominal de la cadena en vez de medirse
 — un micrófono de sensibilidad nominal $M$ mV/Pa a través de un preamplificador
 de ganancia lineal $G$ hacia un convertidor cuyo fondo de escala es $V_{FS}$
 voltios da $S = V_{FS} / (M G / 1000)$ pascales por unidad digital —, pero un
-factor nominal arrastra la tolerancia de la hoja de datos y no los ±0,4 dB de un
+factor nominal arrastra la tolerancia de la hoja de características y no los ±0,4 dB de un
 calibrador de clase 1, así que no puede informarse como una medición calibrada.
 
 ## 3. Pondera: frecuencia y tiempo (IEC 61672-1)
@@ -138,7 +138,7 @@ Guías de fondo:
 desmonta este mismo clip frente a la tabla de ráfagas de tono de
 IEC 61672-1.
 
-## 4. Integra: los números que reporta un sonómetro
+## 4. Integra: los números que da un sonómetro
 
 Una sola pasada sobre la grabación calibrada produce las lecturas estándar:
 el **$L_{Aeq}$** equivalente en energía, los **niveles percentiles** que
@@ -175,13 +175,13 @@ deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
 Guía de fondo:
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que añade
 dosis de ruido y espectrogramas de octava; el $L_{den}$ y los niveles de
-valoración continúan en
+evaluación continúan en
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
 ## 5. Filtra en bandas: la vista de espectro (IEC 61260-1)
 
-Un sonómetro de clase 1 con juego de filtros reporta niveles por banda.
-`octave_filter` descompone la señal calibrada en bandas de octava fraccional
+Un sonómetro de clase 1 con juego de filtros da niveles de banda.
+`octave_filter` descompone la señal calibrada en bandas de fracción de octava
 cuyo diseño está anclado a los bordes de banda de IEC 61260-1;
 `nominal=True` las etiqueta con las frecuencias preferentes que leerías en un
 instrumento.
@@ -204,7 +204,7 @@ para arrays.
 
 ## 6. Verifica: ¿es este sonómetro de clase 1?
 
-Un instrumento real solo es un "sonómetro de clase 1" cuando sus
+Un instrumento real solo es un «sonómetro de clase 1» cuando sus
 ponderaciones y filtros superan los límites de aceptación de las normas. La
 biblioteca incluye los mismos verificadores que se aplica a sí misma en CI:
 `verify_weighting_class` barre un `WeightingFilter` contra los límites de la

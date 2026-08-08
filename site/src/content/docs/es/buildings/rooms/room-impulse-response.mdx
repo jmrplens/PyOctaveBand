@@ -59,7 +59,7 @@ f(t) = f_1 \left( \frac{f_2}{f_1} \right)^{t/T},
 $$
 
 de modo que el tiempo invertido por octava es constante y la excitación
-imita al ruido rosa (energía constante por banda de octava fraccionaria).
+imita al ruido rosa (energía constante por banda de fracción de octava).
 La RI se recupera mediante división espectral lineal (con relleno de ceros,
 no circular),
 
@@ -225,7 +225,7 @@ plt.xlabel("Tiempo [s]"); plt.ylabel("Nivel re pico [dB]")
 | `f2` | float | Hz | `f1 < f2 <= fs/2` | Frecuencia final del barrido |
 | `seconds` | float | s | cualquiera; mayor ⇒ más SNR | Duración del barrido |
 | `amplitude` | float | — | por defecto `1.0` | Amplitud de pico |
-| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido medio Hann (elimina transitorios de inicio/fin) |
+| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido (medio Hann; elimina transitorios de inicio/fin) |
 
 ### Parámetros de `impulse_response()`
 
@@ -247,8 +247,8 @@ necesita que `recorded` abarque un número entero de periodos de MLS.
 ## Dónde medir
 
 Una RI caracteriza un único par fuente–receptor; un parámetro
-de sala se obtiene promediando sobre varios. ISO 3382-1 (espacios para
-interpretación) pide al menos dos posiciones de fuente y micrófonos separados
+de sala se obtiene promediando sobre varios. ISO 3382-1 (salas de
+espectáculos) pide al menos dos posiciones de fuente y micrófonos separados
 $\geq 2$ m entre sí, $\geq 1$ m de cualquier superficie, a $1{,}2$ m
 (altura de oído sentado); ISO 3382-2 fija el número mínimo de posiciones de
 fuente, de micrófono y de combinaciones fuente–micrófono según el grado de
@@ -300,8 +300,8 @@ media:
 
 ## De la respuesta al impulso en adelante
 
-La RI sale de esta página en varias direcciones. Filtrada en bandas e
-integrada hacia atrás se convierte en la curva de decaimiento cuya pendiente
+La RI sale de esta página en varias direcciones. Filtrada en bandas y
+sometida a integración inversa de Schroeder se convierte en la curva de decaimiento cuya pendiente
 es el tiempo de reverberación: la
 [guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) arranca
 exactamente ahí, y su hermana de oficinas diáfanas recorre la
@@ -332,8 +332,9 @@ grados de exactitud) se citan para la planificación.
 de sonido, la calibración de nivel de la cadena) quedan fuera de la
 biblioteca. Los diagnósticos de varianza temporal y de distorsión de
 ISO 18233 no están implementados: la guía explica cómo el barrido separa la
-distorsión, pero ningún ayudante la cuantifica (esa lectura vive en la
-[guía de distorsión por barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
+distorsión, pero ninguna función auxiliar la cuantifica (esa lectura vive en la
+[guía de distorsión por barrido
+sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
 Las reglas de posiciones son prosa de orientación: nada comprueba cuántas
 posiciones se midieron ni dónde.
 

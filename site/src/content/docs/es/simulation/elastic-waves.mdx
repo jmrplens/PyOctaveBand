@@ -1,6 +1,6 @@
 ---
 title: "Ondas elásticas y acoplamiento fluido-sólido"
-description: "El compañero elástico P-SV del solucionador FDTD acústico: el esquema velocidad-esfuerzo de Virieux (1986) sobre la misma malla escalonada, superficies libres por imagen de esfuerzos con ondas de Rayleigh, los fluidos como límite sin cizalla, y el acoplamiento fluido-sólido validado contra Brekhovskikh y Godin (1990): reflexión oblicua con conversión de modo, ondas de interfase de Scholte y transmisión de placas sumergidas con sus resonancias de espesor."
+description: "El compañero elástico P-SV del método FDTD acústico: el esquema velocidad-esfuerzo de Virieux (1986) sobre la misma malla escalonada, superficies libres por imagen de esfuerzos con ondas de Rayleigh, los fluidos como límite sin cizalla, y el acoplamiento fluido-sólido validado contra Brekhovskikh y Godin (1990): reflexión oblicua con conversión de modo, ondas de interfase de Scholte y transmisión de placas sumergidas con sus resonancias de espesor."
 references:
   - type: article
     authors: ["Virieux, J."]
@@ -11,7 +11,7 @@ references:
     issue: "4"
     pages: "889-901"
     doi: "10.1190/1.1442147"
-    note: "El solucionador elástico de la sección 1: el sistema velocidad-esfuerzo (Ec. 2), la celda totalmente escalonada y su actualización (Fig. 1, Ec. 5), la cota de Courant solo con P (Ecs. 6-7), las relaciones de dispersión (Ecs. 13-14) y el líquido como límite sin cizalla."
+    note: "El esquema elástico de la sección 1: el sistema velocidad-esfuerzo (Ec. 2), la celda totalmente escalonada y su actualización (Fig. 1, Ec. 5), la cota de Courant solo con P (Ecs. 6-7), las relaciones de dispersión (Ecs. 13-14) y el líquido como límite sin cizalla."
   - type: article
     authors: ["Moczo, P.", "Kristek, J.", "Galis, M.", "Pazak, P.", "Balazovjech, M."]
     year: 2007
@@ -28,7 +28,7 @@ references:
     edition: "3.ª ed."
     publisher: "Springer"
     doi: "10.1007/b137728"
-    note: "Los oráculos analíticos del solucionador elástico: la ecuación característica exacta de Rayleigh (Ec. 3.149) y la dispersión de flexión de Kirchhoff con su corrección de espesor (Ecs. 3.83-3.89, 3.196b)."
+    note: "Los oráculos analíticos del esquema elástico: la ecuación característica exacta de Rayleigh (Ec. 3.149) y la dispersión de flexión de Kirchhoff con su corrección de espesor (Ecs. 3.83-3.89, 3.196b)."
   - type: book
     authors: ["Brekhovskikh, L. M.", "Godin, O. A."]
     year: 1990
@@ -56,7 +56,7 @@ cubre el compañero elástico de la
 [simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/):
 `elastic_fdtd_simulation` integra el sistema velocidad-esfuerzo en
 deformación plana de Virieux (1986) sobre la misma malla escalonada que el
-solucionador acústico, y con él la **onda P** de compresión, la **onda S**
+esquema acústico, y con él la **onda P** de compresión, la **onda S**
 de cizalla, la **onda de Rayleigh** de una superficie libre y la **onda de
 Scholte** de un contacto fluido-sólido emergen de la misma actualización.
 Como un fluido es simplemente el límite sin cizalla de las ecuaciones
@@ -66,15 +66,17 @@ ondas de interfase del lecho marino y la transmisión de placas sumergidas
 salen de los mapas sin más, cada una anclada a su forma cerrada exacta por
 la batería de validación.
 
-La guía asume el vocabulario del solucionador acústico (fuentes, sondas,
-máscaras de obstáculos, esponjas y la cota de Courant); lea primero la
+La guía supone el vocabulario del esquema acústico (fuentes, sondas,
+máscaras de obstáculos, esponjas y la cota de Courant); lee primero la
 [simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) si
-todo ello le resulta nuevo. Las formas cerradas que este solucionador
+todo ello te resulta nuevo. Las formas cerradas que este esquema
 contrasta viven en las guías de edificación, de vibración y de acústica
 submarina: la ley de masas de la
-[predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
+[predicción del aislamiento de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
 las ondas de flexión de la
-[transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/),
+[transmisión de onda de flexión en uniones de
+placas](/phonometry/es/vibration/structural/junction-transmission/),
 y el lecho marino con cizalla que el modelo de reflexión de fondo fluido de
 la [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
 no puede representar.
@@ -97,7 +99,7 @@ $$
   + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
 $$
 
-sobre la misma disposición escalonada que el solucionador acústico: los
+sobre la misma disposición escalonada que el esquema acústico: los
 esfuerzos normales ``txx``/``tyy`` comparten los centros de celda donde
 vive la presión acústica, las velocidades ocupan las caras y el esfuerzo
 de cizalla ``txy`` las esquinas (la celda totalmente escalonada de
@@ -139,11 +141,11 @@ t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
 print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
 ```
 
-## 2. Fluidos dentro del solucionador elástico
+## 2. Fluidos dentro del esquema elástico
 
 Poner ``c_s = 0`` marca una celda de **fluido**: el módulo de cizalla se
 anula, el sistema degenera en las ecuaciones acústicas y, con un mapa
-uniforme de ``c_s = 0``, el solucionador elástico reproduce el acústico
+uniforme de ``c_s = 0``, el esquema elástico reproduce el acústico
 **bit a bit** (la batería de regresión afirma la igualdad exacta). Una
 columna de agua sobre un semiespacio de acero son, por tanto, solo dos
 bandas de los mapas de material: con la densidad promediada
@@ -163,7 +165,7 @@ Un lado declarado ``"free"`` se convierte en superficie libre de tracción
 mediante la **imagen de esfuerzos** (Moczo et al., Ec. 9.9): el esfuerzo
 normal se fija a cero en el plano de la superficie y el esfuerzo de
 cizalla por encima es su imagen antisimétrica. Esa única condición de
-contorno es la que hace a las superficies portadoras de ondas: golpee
+contorno es la que hace a las superficies portadoras de ondas: golpea
 verticalmente la superficie libre de un bloque de aluminio (el problema de
 Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
 rueda por la superficie a $c_R \approx 0{,}93\,c_S$, la raíz de la ecuación
@@ -172,7 +174,7 @@ Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
 y la onda de flexión de una franja delgada libre-libre a la dispersión de
 placa de Kirchhoff $c_B \propto \sqrt{\omega}$ en su dominio de placa
 delgada. Las superficies libres siguen la regla de muestreo de Rayleigh:
-reserve 15-20 celdas por longitud de onda ahí, pues la superficie de
+reserva 15-20 celdas por longitud de onda ahí, pues la superficie de
 imagen de segundo orden es la parte más dispersiva del esquema.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_es.webp" alt="Instantánea de la velocidad de partícula vertical en un bloque de aluminio de 0,6 por 0,3 metros unas centésimas de milisegundo después de un golpe vertical sobre su superficie libre superior: el frente P de compresión es el arco exterior, el frente S de cizalla el arco interior a aproximadamente la mitad de su radio, y los lóbulos más intensos se pegan a la superficie justo detrás del frente S, etiquetados como la onda de Rayleigh; arcos punteados marcan los radios exactos de P y S" width="96%" loading="eager" />
@@ -210,7 +212,7 @@ plt.show()
 </details>
 
 Esa onda de flexión merece verse en movimiento. El clip de abajo es este mismo
-solucionador lanzando un paquete de flexión de 4 kHz por una placa de acero de
+esquema lanzando un paquete de flexión de 4 kHz por una placa de acero de
 10 mm: en el panel de control la placa sigue recta y el paquete simplemente se
 marcha, y en el panel de la unión una placa perpendicular del mismo espesor
 convierte la esquina en un dispersor. Allí el paquete se parte en las ondas de
@@ -218,9 +220,10 @@ flexión reflejada y transmitida que la forma cerrada tasa en
 $\tau_{12}(0°) = 0{,}5$, más el rápido precursor de onda en el plano que corre
 por delante por la placa receptora: la conversión de modo que el modelo de unión
 articulada deja fuera a propósito, y la razón por la que esta página necesita un
-solucionador elástico y no uno de flexión. La
-[guía de transmisión de onda de flexión](/phonometry/es/vibration/structural/junction-transmission/)
-desmonta esa misma ejecución frente al índice de reducción vibracional de
+modelo elástico y no uno de flexión. La
+[guía de transmisión de onda de
+flexión](/phonometry/es/vibration/structural/junction-transmission/)
+desmonta esa misma ejecución frente al índice de reducción vibratoria de
 EN 12354.
 
 <Video
@@ -228,17 +231,17 @@ EN 12354.
   width={2400}
   height={1350}
   title="Ondas de flexión en una unión en L en una simulación FDTD elástica 2D"
-  description="Una fuerza en ráfaga tonal de 4 kHz lanza un paquete de onda de flexión por una placa de acero de 10 mm. En la placa de control recta el paquete sigue de largo y no vuelve nada. En una unión en L con una placa perpendicular idéntica se parte: una parte se refleja, otra dobla la esquina como onda de flexión que baja por la placa vertical, y un precursor de onda en el plano más rápido corre por delante, con el coeficiente de transmisión en forma cerrada de 0,50 a incidencia normal y el índice de reducción vibracional difuso de 5,2 dB anotados."
+  description="Una fuerza en ráfaga tonal de 4 kHz lanza un paquete de onda de flexión por una placa de acero de 10 mm. En la placa de control recta el paquete sigue de largo y no vuelve nada. En una unión en L con una placa perpendicular idéntica se parte: una parte se refleja, otra dobla la esquina como onda de flexión que baja por la placa vertical, y un precursor de onda en el plano más rápido corre por delante, con el coeficiente de transmisión en forma cerrada de 0,50 a incidencia normal y el índice de reducción vibratoria difuso de 5,2 dB anotados."
 />
 
 ## 4. Acoplamiento fluido-sólido a incidencia normal
 
-Como el fluido es simplemente el límite ``c_s = 0`` del esquema elástico,
-un contacto agua-acero es **un solo solver con dos bandas en los mapas de
-material**, y toda la física del acoplamiento fluido-sólido emerge de la
-misma actualización. Las constantes `Material` y
-`ElasticFDTD2D.from_regions` construyen esos mapas por capas sin cirugía
-manual de arrays: un material de fondo y una lista de regiones pintadas.
+Como el fluido es simplemente el límite ``c_s = 0`` del esquema elástico, un
+contacto agua-acero es **una sola simulación con dos bandas en los mapas de
+material**, y toda la física del acoplamiento fluido-sólido emerge de la misma
+actualización. Las constantes `Material` y `ElasticFDTD2D.from_regions`
+construyen esos mapas por capas sin cirugía manual de arrays: un material de
+fondo y una lista de regiones pintadas.
 
 ```python
 import numpy as np
@@ -382,11 +385,11 @@ impedancias ~$10^5$:1): estable durante 10 000 pasos con la amplitud
 reflejada conservada al 0,5 %.
 
 A incidencia oblicua la física de la placa se enriquece, y el clip de abajo es
-este solucionador excitando la misma placa de acero de 10 mm, ahora tendida en
+este mismo esquema excitando la misma placa de acero de 10 mm, ahora tendida en
 aire, con una onda plana sostenida que llega a 45°. Los dos paneles se
 diferencian en **un solo número**: la frecuencia de excitación, $f_c/2 = 603$ Hz
 a la izquierda y $2 f_c = 2413$ Hz a la derecha, a un lado y otro de la
-frecuencia de coincidencia de 1206 Hz que la librería calcula con los mismos
+frecuencia de coincidencia de 1206 Hz que la biblioteca calcula con los mismos
 $m''$ y $B'$ usados más arriba. Todo lo demás (la placa, el ángulo, la malla y
 la escala de color) se mantiene fijo. Por debajo de $f_c$ la placa refleja casi
 todo y el nivel transmitido cae sobre la ley de masas oblicua; por encima, la
@@ -394,11 +397,12 @@ longitud de onda de traza acústica coincide con la longitud de onda de flexión
 libre, la placa re-radia un haz a 45° que crece a lo largo del tramo iluminado y
 el nivel transmitido se mantiene en la cifra de baja frecuencia, justo donde la
 ley de masas exigía 12 dB más de bloqueo. El aire bajo la placa se dibuja en los
-dos paneles con la ganancia de visualización que `_weak_field_gain` mide sobre
+dos paneles con la ganancia de representación que `_weak_field_gain` mide sobre
 el campo asentado de las dos ejecuciones juntas (×150, es decir, +44 dB) y que
 se imprime en el lienzo: lee las *anotaciones* para los niveles, no el brillo.
 La
-[guía de predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
+[guía de predicción del aislamiento de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 desmonta esa misma ejecución frente al método de la meseta y a la ley de masas.
 
 <Video
@@ -406,12 +410,12 @@ desmonta esa misma ejecución frente al método de la meseta y a la ley de masas
   width={2400}
   height={1350}
   title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
-  description="Dos campos FDTD elásticos en paralelo de la misma placa de acero de 10 mm tendida en aire mientras una onda plana sostenida llega a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi totalmente y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica coincide con la longitud de onda de flexión libre y bajo la placa crece un haz transmitido a 45 grados que mantiene el mismo nivel que el panel de baja frecuencia, allí donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de visualización anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medido y de ley de masas anotados."
+  description="Dos campos FDTD elásticos en paralelo de la misma placa de acero de 10 mm tendida en aire mientras una onda plana sostenida llega a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi totalmente y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica coincide con la longitud de onda de flexión libre y bajo la placa crece un haz transmitido a 45 grados que mantiene el mismo nivel que el panel de baja frecuencia, allí donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la biblioteca y los niveles medido y de ley de masas anotados."
 />
 
 ## Qué cubre esta guía
 
-**Cubierto.** El compañero elástico P-SV del solucionador FDTD acústico: el
+**Cubierto.** El compañero elástico P-SV del método FDTD acústico: el
 esquema velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y
 la superficie libre por imagen de esfuerzos de Moczo et al. (2007),
 expuesto a través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con
@@ -428,7 +432,7 @@ placa sumergida con su primera resonancia de espesor contra la forma
 cerrada de tres medios (Ecs. 2.4.14-2.4.19), la ley de masas del panel
 sumergido y el test de esfuerzo de contraste extremo aire-acero.
 
-**No cubierto.** Todo lo que el solucionador acústico 2D no puede hacer,
+**No cubierto.** Todo lo que el esquema acústico 2D no puede hacer,
 este tampoco: el dominio es una sección transversal (propagación cilíndrica
 $1/\sqrt{r}$, no $1/r$), así que los niveles absolutos y las tasas de
 decaimiento no son los de un problema 3D. El sólido es isótropo y puramente
@@ -443,7 +447,7 @@ pero no tiene aquí oráculo dedicado en forma cerrada.
 ## Véase también
 
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el
-  solucionador acústico que esta guía extiende, con la malla escalonada, la
+  esquema acústico que esta guía extiende, con la malla escalonada, la
   cota de Courant y la maquinaria de fuentes, sondas y contornos que ambos
   comparten.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
@@ -459,22 +463,22 @@ pero no tiene aquí oráculo dedicado en forma cerrada.
 
 ## Respuestas rápidas
 
-### ¿Cuándo necesito el solucionador elástico en lugar del acústico?
+### ¿Cuándo necesito el esquema elástico en lugar del acústico?
 
 Siempre que alguna parte del dominio soporte cizalla: la conversión de modo
 a incidencia oblicua, las ondas de Rayleigh en superficies libres, las
 ondas de Scholte en contactos fluido-sólido y la transmisión de placas
-necesitan las ecuaciones elásticas. Si todas las celdas son fluidas, use el
-solucionador acústico: con un mapa uniforme de ``c_s = 0`` el elástico lo
+necesitan las ecuaciones elásticas. Si todas las celdas son fluidas, usa el
+esquema acústico: con un mapa uniforme de ``c_s = 0`` el elástico lo
 reproduce bit a bit, a aproximadamente el doble de coste en memoria y en
 avance temporal.
 
 ### ¿Qué resolución de malla necesita una simulación elástica?
 
-Resuelva al menos 10 celdas por longitud de onda más corta con la
+Resuelve al menos 10 celdas por longitud de onda más corta con la
 velocidad de onda más lenta del dominio, la de cizalla no nula más lenta o
 una velocidad del sonido de fluido aún más lenta si la hay:
-$\Delta x \le c_\text{min} / (10 f)$. Reserve 15-20 celdas por
+$\Delta x \le c_\text{min} / (10 f)$. Reserva 15-20 celdas por
 longitud de onda a lo largo de superficies libres (el contorno de imagen de
 esfuerzos es la parte más dispersiva del esquema), y al menos 15 puntos por
 longitud de onda cuando haya que cronometrar una onda de interfase

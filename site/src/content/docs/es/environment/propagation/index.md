@@ -93,7 +93,7 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 Son modelos punto a punto, no un motor de mapas. Cada llamada toma una fuente,
 un receptor y el suelo entre ambos; no hay perfil de elevación del terreno, ni
-geometría de edificios, ni capa GIS, los dos modelos de refracción asumen un
+geometría de edificios, ni capa GIS, los dos modelos de refracción suponen un
 suelo plano a altura cero y un perfil que varía solo con la altura y no a lo
 largo del camino, y cómo se descompone una línea fuente en fuentes puntuales lo
 declara fuera de alcance el propio CNOSSOS. El **método de propagación de
@@ -105,6 +105,6 @@ reflexión calculado sobre la geometría global, así que es coherente y recípr
 pero no es una solución por elementos de contorno, y ningún modelo de aquí
 calcula la dispersión por turbulencia: la ISO 9613-2 la absorbe en los topes
 fijos de su término de apantallamiento, y las páginas de acústica ondulatoria y
-de refracción asumen sin más una atmósfera no turbulenta. Nada de estas páginas
+de refracción suponen sin más una atmósfera no turbulenta. Nada de estas páginas
 produce una evaluación: ni Lden, ni valor límite, ni veredicto — eso es
 [Evaluación y normativa](/phonometry/es/environment/assessment/).

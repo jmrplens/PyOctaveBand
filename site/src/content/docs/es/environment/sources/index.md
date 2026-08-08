@@ -41,7 +41,8 @@ juntas y desvíos, el chirrido en curva, la tracción, el ruido aerodinámico po
 encima de 200 km/h y un término de puente se asignan cada uno a la altura desde
 la que radian.
 
-[Ruido de aerogeneradores: potencia acústica y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/)
+[Ruido de aerogeneradores: potencia y audibilidad
+tonal](/phonometry/es/environment/sources/wind-turbine-noise/)
 es la IEC 61400-11, donde el descriptor se **mide** en vez de tabularse. Con el
 micrófono sobre una placa en el suelo a la distancia horizontal R0 = H + D/2, la
 potencia acústica aparente por banda se sigue del nivel de presión medido y de
@@ -66,7 +67,7 @@ ferrocarril reutiliza. La de aerogeneradores es independiente de ambas.
   de la rugosidad y las funciones de transferencia a las dos líneas fuente
   equivalentes a 0,5 m y 4,0 m, con los términos de impacto, chirrido,
   tracción, aerodinámico y de puente.
-- [Ruido de aerogeneradores: potencia acústica y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
+- [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
   la potencia acústica aparente de IEC 61400-11 referida al centro del rotor,
   su clasificación por velocidad de viento y la cadena de audibilidad tonal,
   con la ficha de evaluación.
@@ -85,7 +86,7 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 Faltan dos de las cuatro fuentes de CNOSSOS, por omisión y no por descuido: la
 **fuente industrial** del apartado 2.4 y el Apéndice H no está implementada, y
 tampoco la **fuente de aeronaves** de los apartados 2.6 y 2.7 — el ruido de
-aeronaves lo cubren los métodos de la ICAO y de la ECAC en [Ruido de
+aeronaves lo cubren los métodos de la OACI y de la ECAC en [Ruido de
 aeronaves](/phonometry/es/aircraft/), que es una familia de modelos
 completamente distinta. Tampoco lo está el **método de propagación de CNOSSOS**
 del apartado 2.5: difiere del modelo ISO 9613-2 que implementa esta biblioteca,
@@ -96,6 +97,6 @@ vienen de los propios documentos fuente: la categoría abierta de vehículos 5 n
 tiene coeficientes en el Apéndice F y no se modeliza, las clases de rugosidad
 ferroviaria N y B no llevan espectro en el Apéndice G y las tiene que aportar
 el Estado miembro, y cómo se descompone una línea fuente en fuentes puntuales
-lo declara fuera de alcance el propio método. Las cocheras, las estaciones y la
+lo declara fuera de alcance el propio método. Los depósitos, las estaciones y la
 megafonía son fuentes ferroviarias según el 2.3.3 pero se tratan por el método
 industrial, así que tampoco están aquí.

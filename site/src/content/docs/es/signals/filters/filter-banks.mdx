@@ -1,6 +1,6 @@
 ---
 title: "Bancos de filtros"
-description: "Las matemáticas de bandas de octava fraccionaria, los parámetros de octave_filter, el EQ paramétrico, la descomposición por bandas y el filtrado de fase cero, con la galería de arquitecturas y la verificación de clase IEC 61260-1 en sus propias guías."
+description: "Las matemáticas de bandas de fracción de octava, los parámetros de octave_filter, el EQ paramétrico, la descomposición por bandas y el filtrado de fase cero, con la galería de arquitecturas y la verificación de clase IEC 61260-1 en sus propias guías."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -59,10 +59,10 @@ lo que ensancha la banda y sesga todos los niveles por banda en unas décimas de
 decibelio fijas — ver el apartado 1, porque el sesgo es sistemático y no se
 promedia a cero.
 
-## 1. Bandas de octava fraccionaria: las matemáticas
+## 1. Bandas de fracción de octava: las matemáticas
 
 IEC 61260-1:2014 construye cada banda a partir de la razón de octava en base 10
-$G = 10^{3/10} \approx 1{,}99526$ (es decir, "una octava" *no* es exactamente 2).
+$G = 10^{3/10} \approx 1{,}99526$ (es decir, «una octava» *no* es exactamente 2).
 Para la fracción de banda $1/b$, las frecuencias centrales y los bordes de
 banda siguen (5.2-5.5):
 
@@ -117,9 +117,9 @@ caída más lenta.
 
 ### Polos, ceros y estabilidad
 
-Un paso-banda digital es una constelación de polos y ceros en el plano z: los
+Un paso banda digital es una constelación de polos y ceros en el plano z: los
 ceros en DC y Nyquist, o cerca de ellos, sujetan la respuesta lejos de la
-banda (hasta el suelo de la banda atenuada, en los diseños equirizados), y
+banda (hasta el suelo de la banda atenuada, en los diseños equirrizados), y
 los polos se agrupan justo dentro del círculo unidad en los ángulos
 $\omega = 2\pi f / f_s$ que abarca la banda de paso. De ahí salen dos
 intuiciones. Primera, la selectividad es proximidad: cuanto más cerca del
@@ -144,13 +144,13 @@ Una banda de tercio de octava de 25 Hz a 48 kHz abarca unos 5,8 Hz, el
 numéricamente inestables. El banco lo evita filtrando las bandas bajas a una
 frecuencia diezmada:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate_es.svg" alt="Diezmado multitasa: las bandas altas se filtran a la frecuencia de entrada y las bajas tras un paso-bajo antialiasing y diezmado, para que las secciones SOS se mantengan numéricamente sanas" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate_es.svg" alt="Diezmado multitasa: las bandas altas se filtran a la frecuencia de entrada y las bajas tras un paso bajo antialiasing y diezmado, para que las secciones SOS se mantengan numéricamente sanas" width="92%" loading="eager" />
 
 Diezmar por $M$ reescala el problema: el mismo ancho de banda de 5,8 Hz se
 vuelve $M$ veces mayor respecto al nuevo Nyquist, el radio de los polos se
 separa del círculo unidad y los coeficientes SOS regresan a un rango bien
 condicionado. El precio es una contabilidad que el banco paga internamente:
-antes de cada etapa de diezmado debe ejecutarse un paso-bajo antialiasing,
+antes de cada etapa de diezmado debe ejecutarse un paso bajo antialiasing,
 porque una componente por encima del nuevo Nyquist que se pliegue hacia abajo
 cae *dentro* de las bandas bajas que se están midiendo, y ningún filtro
 posterior puede eliminarla.
@@ -203,7 +203,7 @@ constructor y `bank.filter()` es el método por llamada.
 | `order` | función, constructor | int | — | por defecto `6` | Orden SOS por banda |
 | `limits` | función, constructor | lista `[lo, hi]` | Hz | por defecto `[12, 20000]` | Rango de análisis |
 | `design.filter_type` | función, constructor | str | — | `'butter'` (por defecto), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | Consulta la [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/) |
-| `design.ripple` / `design.attenuation` | función, constructor | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirizado en exactamente este valor |
+| `design.ripple` / `design.attenuation` | función, constructor | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirrizado en exactamente este valor |
 | `design.resample` | función, constructor | bool | — | por defecto `True` | Filtra cada banda a una frecuencia diezmada (multitasa) |
 | `response_plot.show` | función, constructor | bool | — | por defecto `False` | Dibuja la respuesta del banco (requiere matplotlib) |
 | `response_plot.file` | función, constructor | str o `None` | — | por defecto `None` | Guarda la gráfica de respuesta del banco en esta ruta |
@@ -225,13 +225,13 @@ y lo usa una vez, así que solo lleva las opciones de tiempo de diseño.
 banco.
 
 `mode` tiene exactamente dos valores. `'rms'` da el nivel medio energético de la
-banda sobre todo el registro, que es lo que toda norma entiende por "nivel de
-banda". `'peak'` da $20\log_{10}$ de la mayor muestra en valor absoluto dentro
+banda sobre todo el registro, que es lo que toda norma entiende por «nivel de
+banda». `'peak'` da $20\log_{10}$ de la mayor muestra en valor absoluto dentro
 de la banda, contra la misma referencia de 20 µPa; es un pico instantáneo de
 banda, no una lectura de retención de pico, está limitado en banda y sin
 ponderar, así que *no* es el pico ponderado C $L_{C\text{peak}}$ de la guía de
 [Niveles](/phonometry/es/signals/levels/levels/), y en señales impulsivas lo
-domina el propio timbrado del filtro: pertenece al diagnóstico de transitorios,
+domina la propia resonancia del filtro: pertenece al diagnóstico de transitorios,
 no a la comunicación de niveles. No hay modo `'sum'`: un total entre bandas es
 una suma energética que hace quien llama,
 `10*np.log10(np.sum(10**(spl/10)))`, nunca una media aritmética de decibelios.
@@ -245,12 +245,12 @@ márgenes por banda.
 Secciones biquad de ecualización según el **RBJ Audio EQ Cookbook**
 (Bristow-Johnson): campana (peaking), shelving grave/agudo, paso bajo/alto,
 paso banda (pico a 0 dB constante o faldas constantes), rechazo de banda
-(notch) y pasa-todo, cada una parametrizada por `fs`, `f0`, `gain_db` y uno
+(notch) y paso todo, cada una parametrizada por `fs`, `f0`, `gain_db` y uno
 de `q`, `bw` (ancho de banda en octavas) o `slope`, exactamente como los
 define el cookbook. Las secciones se encadenan en una cascada SOS
 numéricamente robusta, y el diseño es exacto en forma cerrada: una campana
 pasa exactamente `gain_db` en `f0` y exactamente 0 dB en DC y Nyquist, los
-shelving caen exactamente en `gain_db` en su extremo, y el pasa-todo tiene
+shelving caen exactamente en `gain_db` en su extremo, y el paso todo tiene
 magnitud unidad en todas las frecuencias (solo gira la fase).
 
 ```python
@@ -526,7 +526,7 @@ margen cómodo respecto a Nyquist, o sube `fs`, y confirma el margen con
 
 ## Respuestas rápidas
 
-### ¿Cómo se definen las frecuencias centrales y los bordes de banda de octava fraccionaria?
+### ¿Cómo se definen las frecuencias centrales y los bordes de banda de fracción de octava?
 
 IEC 61260-1:2014 (apartados 5.2-5.5) construye cada banda a partir de la
 razón de octava en base 10 $G = 10^{3/10} \approx 1{,}99526$, de modo que

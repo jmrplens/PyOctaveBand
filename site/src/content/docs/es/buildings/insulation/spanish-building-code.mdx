@@ -1,6 +1,6 @@
 ---
 title: "Código Técnico de la Edificación (CTE DB-HR)"
-description: "El índice global del DB HR: la fórmula directa del anexo A sobre dieciocho tercios de octava, los cuatro espectros normalizados, el redondeo del apartado 3.1.3.1, las exigencias del apartado 2 y la corrección por tamaño de ventana."
+description: "El índice global del DB HR: la fórmula directa del anejo A sobre dieciocho tercios de octava, los cuatro espectros normalizados, el redondeo del apartado 3.1.3.1, las exigencias del apartado 2 y la corrección por tamaño de ventana."
 references:
   - type: standard
     organization: "Ministerio de Fomento (España)"
@@ -9,7 +9,7 @@ references:
     designation: "CTE DB-HR"
     url: "https://www.codigotecnico.org/pdf/Documentos/HR/DBHR.pdf"
     primary: true
-    note: "El índice global del anexo A (fórmulas A.5 a A.7) y sus espectros normalizados (tablas A.2 a A.5), el redondeo del apartado 3.1.3.1 punto 4 y las exigencias del apartado 2 (Tabla 2.1 de fachadas, 2.1.1 de ruido aéreo, 2.1.2 de impactos y 2.2 de reverberación)."
+    note: "El índice global del anejo A (fórmulas A.5 a A.7) y sus espectros normalizados (tablas A.2 a A.5), el redondeo del apartado 3.1.3.1 punto 4 y las exigencias del apartado 2 (Tabla 2.1 de fachadas, 2.1.1 de ruido aéreo, 2.1.2 de impactos y 2.2 de reverberación)."
   - type: standard
     organization: "Ministerio de la Presidencia (España)"
     year: 2007
@@ -27,11 +27,11 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-El Documento Básico HR "Protección frente al ruido" del Código Técnico de la
+El Documento Básico HR «Protección frente al ruido» del Código Técnico de la
 Edificación enuncia sus exigencias en magnitudes globales ponderadas A que son
 parientes cercanas, pero no idénticas, de las magnitudes globales de ISO 717-1:
 $R_A$, $R_{A,tr}$, $D_{nT,A}$ y $D_{2m,nT,Atr}$. Esta página implementa la vía
-directa del anexo A, que es la normativa para el DB HR, las tablas de
+directa del anejo A, que es la normativa para el DB HR, las tablas de
 exigencias del apartado 2 y los dos cálculos de proyecto que más se usan con
 ellas: la corrección por tamaño de ventana y el aislamiento de una fachada
 mixta.
@@ -41,7 +41,7 @@ predicción; el motor de curva de referencia de ISO 717, con el que conviene no
 confundirlo, está en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
 
-## El índice global del anexo A
+## El índice global del anejo A
 
 En lugar de desplazar una curva de referencia, el DB HR pondera el aislamiento
 medido por bandas con un espectro normalizado de la fuente y lo suma
@@ -59,7 +59,7 @@ ISO 717-1 (100 Hz a 3150 Hz): las bandas de 4 kHz y 5 kHz, que son la primera
 razón por la que las dos vías no dan siempre lo mismo. Los centros de banda
 están en `DB_HR_FREQUENCIES`.
 
-| Espectro normalizado | Tabla del anexo A | Magnitud que define | Expresión |
+| Espectro normalizado | Tabla del anejo A | Magnitud que define | Expresión |
 | :--- | :--- | :--- | :--- |
 | Ruido rosa ponderado A, $L_{Ar,i}$ | Tabla A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
 | Ruido de automóviles, $L_{Atr,i}$ | Tabla A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
@@ -139,7 +139,7 @@ donde la (H.2) cubre el caso de ferrocarril dominante del apartado anterior.
 En los dos espectros publicados que reproduce esta página, la coincidencia es
 exacta al entero:
 
-| Caso | Vía directa (anexo A) | Vía ISO 717-1 | ¿Publicado? |
+| Caso | Vía directa (anejo A) | Vía ISO 717-1 | ¿Publicado? |
 | :--- | :--- | :--- | :--- |
 | Elemento de separación del ejemplo 7.2 | $R'_A = 51{,}4$ dBA, redondeado 51 | $R'_w = 52$ con $C_{100-5000} = -1$, o sea 51 | sí, el ejemplo 7.1 imprime $R'_w = 52$, $C = -1$ y los 51 dBA |
 | Fachada del ejercicio 7.1 | $D_{2m,nT,Atr} = 32{,}8$ dBA, redondeado 33 | $D_{2m,nT,w} = 38$ con $C_{tr,100-5000} = -5$, o sea 33 | no, el libro no imprime ni el 38 ni el $-5$ |
@@ -160,8 +160,8 @@ los términos que hacen salir bien las expresiones (H.1) a (H.3) son los de
 el anejo H, sino en el *Manual*, en la nota a las expresiones [7.15] y [7.16].
 Y tiene consecuencias: en la fachada del ejercicio 7.1 el $C$ del rango básico
 vale $-2$ y el $C_{100-5000}$ vale $-1$, de modo que tomar el que no es da
-36 dBA en lugar de 37 para el $D_{2m,nT,A}$ de esa fachada. En esa misma
-probeta $C_{tr}$ y $C_{tr,100-5000}$ valen los dos $-5$, así que el
+36 dBA en lugar de 37 para el $D_{2m,nT,A}$ de esa fachada. En ese mismo
+elemento de ensayo $C_{tr}$ y $C_{tr,100-5000}$ valen los dos $-5$, así que el
 $D_{2m,nT,Atr}$ que el DB HR exige de verdad no llega a distinguir entre las
 dos lecturas.
 
@@ -247,7 +247,7 @@ building.db_hr_reverberation_requirement("classroom").limit           # 0,7 s
 
 # La exigencia entre recintos está declarada en DnT,A, así que el R' de la
 # medianería del informe de campo no se puede contrastar con ella tal cual. Hay
-# que rereferenciarlo antes: un recinto receptor de V = 50 m3 con T = 0,5 s
+# que re-referenciarlo antes: un recinto receptor de V = 50 m3 con T = 0,5 s
 # detrás de una partición de S = 12 m2 tiene A = 0,16 V / T = 16 m2, y
 # DnT = R' + 10 lg(A/S) + 10 lg(T/T0).
 d_nt = np.asarray(r_prime) + 10 * np.log10(16.0 / 12.0) + 10 * np.log10(0.5 / 0.5)
@@ -278,7 +278,7 @@ sobre una lista de pares valor-exigencia.
 ## Ventanas y fachadas mixtas
 
 Los ensayos que determinan el índice de reducción acústica de una ventana se
-hacen sobre probetas de unos 1,8 m², y al aumentar el tamaño de la ventana
+hacen sobre elementos de ensayo de unos 1,8 m², y al aumentar el tamaño de la ventana
 disminuye su capacidad de aislamiento. El Catálogo de Elementos Constructivos
 del CTE corrige el valor de catálogo de $R_A$ y $R_{A,tr}$ por el área total de
 la ventana: 0 dB hasta 2,7 m², $-1$ dB entre 2,7 y 3,6 m², $-2$ dB entre 3,6 y
@@ -321,7 +321,7 @@ alcanzados contra sus límites, uno por exigencia comprobada.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El índice global del anexo A del DB HR (fórmulas A.5 a A.7) sobre
+**Cubierto.** El índice global del anejo A del DB HR (fórmulas A.5 a A.7) sobre
 las dieciocho bandas de 100 Hz a 5 kHz con los cuatro espectros normalizados de
 las tablas A.2 a A.5, el redondeo del apartado 3.1.3.1 punto 4, las exigencias
 del apartado 2 (Tabla 2.1 de fachadas, 2.1.1 de ruido aéreo y medianerías,

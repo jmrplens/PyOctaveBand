@@ -29,7 +29,7 @@ de periodo.
 aporta el LAeq, los percentiles y los niveles de suceso de cada periodo de
 referencia; lo que convierte esos niveles de periodo en Lden, Ldn y el nivel de
 evaluación, con la corrección por tonalidad, la corrección por ruido residual y
-el presupuesto de incertidumbre encima, es
+el balance de incertidumbre encima, es
 [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/),
 en esta misma sección. La
 absorción atmosférica que consume todo modelo de propagación se comparte con
@@ -103,7 +103,7 @@ internacionalmente, y tienen un área propia:
 Del Anexo II de CNOSSOS-EU solo está implementado el lado de la fuente, y solo
 dos de sus cuatro fuentes. La **fuente industrial** del apartado 2.4 y el
 Apéndice H, y la **fuente de aeronaves** de los apartados 2.6 y 2.7, no están
-implementadas; el ruido de aeronaves lo cubren los métodos de la ICAO y de la
+implementadas; el ruido de aeronaves lo cubren los métodos de la OACI y de la
 ECAC en [Ruido de aeronaves](/phonometry/es/aircraft/), que es una familia de
 modelos distinta, y una máquina que no es un vehículo se caracteriza como una
 potencia acústica en [Fuentes y
@@ -111,11 +111,11 @@ dispositivos](/phonometry/es/devices/emission/). Tampoco está implementado el
 **método de propagación de CNOSSOS** del apartado 2.5: el camino de aquí es la
 ISO 9613-2, un modelo distinto, así que una cadena construida con fuentes
 CNOSSOS y la propagación de esta biblioteca no es un cálculo CNOSSOS y no debe
-reportarse como tal.
+declararse como tal.
 
 Nada de aquí es un motor de mapas. No hay modelo de terreno, ni geometría de
 ciudad, ni capa GIS: las funciones de propagación toman una fuente, un receptor
-y el suelo entre ambos, los dos modelos de refracción asumen un suelo plano en
+y el suelo entre ambos, los dos modelos de refracción suponen un suelo plano en
 z = 0, y cómo se descompone una línea fuente en fuentes puntuales lo declara
 fuera de alcance el propio CNOSSOS. Del lado de la evaluación, la biblioteca
 empieza donde termina el sonómetro — las posiciones del receptor y las

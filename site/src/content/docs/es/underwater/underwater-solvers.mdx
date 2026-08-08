@@ -1,5 +1,5 @@
 ---
-title: "Solvers numéricos de propagación submarina"
+title: "Métodos numéricos de propagación submarina"
 description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
 references:
   - type: book
@@ -35,29 +35,29 @@ La pérdida por transmisión en forma cerrada de la
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
 no sabe nada del perfil de velocidad del sonido, del fondo ni de la
 superficie. Cuando la refracción y los contornos deciden la respuesta, el
-campo hay que **calcularlo**: esta guía cubre los tres solvers numéricos del
+campo hay que **calcularlo**: esta guía cubre los tres métodos numéricos del
 módulo `underwater`, la física que cada uno discretiza, y cómo elegir entre
-ellos y las formas cerradas. Los tres asumen un océano independiente de la
+ellos y las formas cerradas. Los tres suponen un océano independiente de la
 distancia (estratificado horizontalmente) con superficie de
-presión-liberada, toman como entrada el mismo perfil $c(z)$ y siguen a
+presión nula, toman como entrada el mismo perfil $c(z)$ y siguen a
 Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
 
-## 1. Los tres solvers de un vistazo
+## 1. Los tres métodos de un vistazo
 
 Para entornos independientes de la distancia (estratificados
 horizontalmente) el campo puede calcularse numéricamente. Se proporcionan
-tres solvers (Jensen et al., *Computational Ocean Acoustics*):
+tres métodos (Jensen et al., *Computational Ocean Acoustics*):
 
 - **`normal_modes`** resuelve el problema de autovalores de Sturm-Liouville
   separado en profundidad por diferencias finitas y suma los modos
   propagantes en la pérdida por transmisión. Validado contra los modos
-  exactos de la guía de ondas ideal (de presión-liberada).
+  exactos de la guía de ondas ideal (de presión nula).
 - **`ray_trace`** integra las ecuaciones de trayectoria de rayos
   (Runge-Kutta, vectorizadas sobre todos los rayos a la vez) a través de un
   perfil de velocidad del sonido, reflejando en la superficie y el fondo.
   Validado contra los arcos de círculo de un gradiente lineal.
 - **`parabolic_equation`** marcha la PE estándar (Tappert) con el algoritmo
-  split-step de Fourier. Validado contra el ensanchamiento esférico en campo
+  split-step de Fourier. Validado contra la divergencia esférica en campo
   libre; coincide en tendencia con la pérdida por transmisión de los modos
   normales.
 
@@ -111,9 +111,9 @@ field.plot()  # campo TL sobre distancia x profundidad
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `transmission_loss`); `ray_trace` un `RayTraceResult`
 (`ranges`, `depths` por rayo); `parabolic_equation` un
-`ParabolicEquationResult` (el campo `transmission_loss`). Los tres asumen
+`ParabolicEquationResult` (el campo `transmission_loss`). Los tres suponen
 una columna de agua independiente de la distancia con superficie de
-presión-liberada.
+presión nula.
 
 ## 2. Modos normales: la guía de ondas como suma de ondas estacionarias
 
@@ -128,8 +128,8 @@ $$
 \qquad \Psi_m(0) = 0,
 $$
 
-con superficie de presión-liberada en $z = 0$ y, en el fondo $z = D$,
-$\Psi(D) = 0$ para un lecho de presión-liberada o $d\Psi/dz|_{D} = 0$
+con superficie de presión nula en $z = 0$ y, en el fondo $z = D$,
+$\Psi(D) = 0$ para un lecho de presión nula o $d\Psi/dz|_{D} = 0$
 para uno rígido. Cada autofunción $\Psi_m(z)$ es una onda estacionaria en
 profundidad que viaja en distancia como $e^{\,i k_{rm} r}$ con su propio
 número de onda horizontal $k_{rm}$; solo **propagan** los modos con
@@ -154,7 +154,7 @@ queda demasiado cerca de su banda de error de discretización.
 El número de modos es la física: un canal isovelocidad de profundidad $D$
 transporta $M \approx kD/\pi$ modos propagantes, así que baja frecuencia y
 aguas someras significan pocos modos y una descripción compacta y
-esencialmente exacta. La guía de ondas ideal de presión-liberada es el
+esencialmente exacta. La guía de ondas ideal de presión nula es el
 oráculo de validación, con $k_{rm} = \sqrt{k^2 - (m\pi/D)^2}$ en forma
 cerrada:
 
@@ -172,7 +172,7 @@ print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exacto
 ```
 
 Esa guía de ondas ideal cumple dos papeles, y no conviene confundirlos. Es el
-oráculo exacto contra el que se comprueba el solucionador, que es para lo que se
+oráculo exacto contra el que se comprueba el cálculo, que es para lo que se
 usa aquí, y es además un fondo físicamente *extremo*: un lecho de presión nula
 refleja con módulo unidad e inversión de fase, así que no transmite nada al
 sedimento y no absorbe nada. Una pérdida por transmisión modal o PE calculada
@@ -206,7 +206,7 @@ velocidad del sonido más baja, se aplana según crece $c$ y gira donde
 $c(z_t) = c(z_s)/\cos\theta_0$. En un gradiente lineal $c(z) = c_0 + gz$
 los arcos son exactamente circulares con radio
 $R = c_0/(g \cos\theta_0)$, la forma cerrada contra la que se valida el
-solver; en un perfil de aguas profundas la familia de rayos se reenfoca
+trazado de rayos; en un perfil de aguas profundas la familia de rayos se reenfoca
 periódicamente en las **zonas de convergencia** de la figura de la
 sección 1. `ray_trace` integra todos los ángulos de lanzamiento a la vez
 con un esquema Runge-Kutta de cuarto orden y paso fijo, reflejando en la
@@ -238,7 +238,7 @@ resultado devuelve los caminos y deja el nivel al campo modal o de la PE.
 ## 4. La ecuación parabólica: un campo de un solo sentido, marchado en distancia
 
 La ecuación parabólica cambia el problema de contorno de Helmholtz por un
-problema de valores iniciales en distancia. Factorice la oscilación
+problema de valores iniciales en distancia. Factoriza la oscilación
 saliente rápida, $p(r, z) \simeq \psi(r, z)\,e^{\,i k_0 r}/\sqrt{k_0 r}$
 con un número de onda de referencia $k_0 = \omega/c_0$, y para la energía
 que viaja dentro de un ángulo pequeño respecto a la horizontal la
@@ -252,27 +252,26 @@ $$
 $$
 
 El algoritmo **split-step de Fourier** la marcha por descomposición de
-operadores, alternando dos
-semipasos físicos alternados: la difracción es una multiplicación por
-$e^{-i k_z^2 \Delta r / 2 k_0}$ en el dominio del número de onda vertical,
-y la refracción una pantalla de fase $e^{\,i k_0 (n^2 - 1) \Delta r / 2}$
-de vuelta en profundidad, con un par de transformadas por paso de
-distancia. `parabolic_equation` arranca de un campo gaussiano adaptado a la
-fuente puntual y usa una transformada discreta de senos en profundidad, que
-impone por construcción la superficie y el fondo de presión-liberada. El
-precio es la aproximación **paraxial**: la PE estándar es precisa dentro de
-±15-20° de la horizontal, aproximadamente, y la energía más empinada
-arrastra un error de fase que se nota a corta distancia en guías de ondas
-someras (Jensen §6.2). La calibración en campo libre es el oráculo: sin
-gradiente alguno, el campo marchado debe reproducir el ensanchamiento
-esférico,
+operadores, alternando dos semipasos físicos, exacto cada uno por separado: la
+difracción es una multiplicación por $e^{-i k_z^2 \Delta r / 2 k_0}$ en el
+dominio del número de onda vertical, y la refracción una pantalla de fase
+$e^{\,i k_0 (n^2 - 1) \Delta r / 2}$ de vuelta en profundidad, con un par de
+transformadas por paso de distancia. `parabolic_equation` arranca de un campo
+gaussiano adaptado a la fuente puntual y usa una transformada discreta de
+senos en profundidad, que impone por construcción la superficie y el fondo de
+presión nula. El precio es la aproximación **paraxial**: la PE estándar es
+precisa dentro de ±15-20° de la horizontal, aproximadamente, y la energía más
+empinada arrastra un error de fase que se nota a corta distancia en guías de
+ondas someras (Jensen §6.2). La calibración en campo libre es el oráculo: sin
+gradiente alguno, el campo marchado debe reproducir la divergencia
+esférica,
 
 ```python
 import numpy as np
 from phonometry import underwater
 
 # Campo libre: en una columna isovelocidad de 5000 m, antes de sentir
-# ningún contorno, la PE debe reproducir el ensanchamiento esférico,
+# ningún contorno, la PE debe reproducir la divergencia esférica,
 # TL = 20 lg R.
 field = underwater.parabolic_equation(50.0, [0.0, 5000.0], [1500.0, 1500.0],
                                       source_depth=2500.0, max_range=2000.0,
@@ -287,7 +286,7 @@ y lo hace hasta unos $10^{-4}$ dB con el paso de distancia por defecto.
 ## 5. Elegir modelo
 
 Todas las funciones de propagación del módulo `underwater` responden a la
-misma pregunta, "cuánto nivel sobrevive al camino", a distinto precio en
+misma pregunta, «cuánto nivel sobrevive al camino», a distinto precio en
 física. La terminología sigue en toda la página la ISO 18405:2017 (pérdida
 por propagación, nivel de fuente, niveles re 1 µPa). Los modelos de
 velocidad del sonido y de absorción nombrados abajo están implementados y
@@ -323,7 +322,7 @@ la frecuencia (lleva incorporada agua a 4 °C cerca de 1000 m) y es anterior a
 ambas; resérvese para estimaciones rápidas de baja frecuencia por debajo de
 unas decenas de kHz y para comparar con literatura antigua que la usó.
 
-**Ley de ensanchamiento.** El ensanchamiento esférico ($20\log_{10} R$) describe un
+**Ley de divergencia.** La divergencia esférica ($20\log_{10} R$) describe un
 frente de onda que se expande libremente en tres dimensiones, antes de que
 ningún contorno lo confine; el cilíndrico ($10\log_{10} R$) describe energía
 atrapada entre la superficie y el fondo (o en el canal SOFAR) que solo puede
@@ -332,24 +331,24 @@ de transición $R_0$, físicamente del orden de la profundidad del agua (o del
 canal): esférico mientras el frente no ha llenado el conducto, cilíndrico
 cuando ya lo ha hecho. En el ejemplo de 10 kHz de la
 [sección de pérdida por transmisión](/phonometry/es/underwater/underwater-propagation/)
-la elección no es cosmética: frente a la misma figura de mérito de 87 dB, el
-ensanchamiento solo esférico predice detección hasta unos 8,7 km, mientras
+la elección no es cosmética: frente a la misma figura de mérito de 87 dB, la
+divergencia solo esférica predice detección hasta unos 8,7 km, mientras
 que la ley práctica con $R_0 = 1000$ m la estira hasta unos 15,8 km. Cuando
-la ley de ensanchamiento es la mayor incertidumbre del presupuesto, esa es
+la ley de divergencia es la mayor incertidumbre del presupuesto, esa es
 la señal de dejar la forma cerrada y calcular el campo.
 
-**¿Forma cerrada o solver?** La pérdida por transmisión en forma cerrada no
+**¿Forma cerrada o cálculo numérico?** La pérdida por transmisión en forma cerrada no
 sabe nada del perfil de velocidad del sonido, del fondo ni de la superficie;
 es honesta para caminos cortos, directos y sin contornos, y para presupuestos
 de sonar de primera pasada. Cuando la refracción y los contornos deciden la
-respuesta, elíjase el solver por frecuencia y geometría (Jensen et al. 2011,
+respuesta, elíjase el método por frecuencia y geometría (Jensen et al. 2011,
 cap. 1):
 
-| Solver | Régimen natural | Qué aporta |
+| Método | Régimen natural | Qué aporta |
 |---|---|---|
 | `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($m < kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que asumen los tres solvers |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
@@ -372,44 +371,45 @@ detección predicha, y cada término del presupuesto lo mueve. Recórtese el
 la distancia baja a donde la curva de TL cruce ese valor; dóblese la
 frecuencia a 20 kHz y $\alpha$ más que se triplica hasta 3,3 dB/km, tirando
 del cruce bruscamente hacia dentro. Este acoplamiento entre el modelo de
-absorción, la ley de ensanchamiento y la ecuación del sonar es la razón de
+absorción, la ley de divergencia y la ecuación del sonar es la razón de
 que todos vivan en un mismo módulo.
 
 ## Qué cubre esta guía
 
 **Cubierto.** `normal_modes`, `ray_trace` y `parabolic_equation` implementan
-los solvers numéricos de Jensen et al. (2011) para un océano estratificado
+los métodos numéricos de Jensen et al. (2011) para un océano estratificado
 independiente de la distancia: la suma modal de Sturm-Liouville por
 diferencias finitas (cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de
 las trayectorias de rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar
 split-step de Fourier (cap. 6), con la terminología de la ISO 18405:2017 en
 toda la página. Cada uno está validado contra una forma cerrada exacta: los
-modos de la guía de ondas ideal de presión-liberada, los rayos en arco de
-círculo de un gradiente lineal y el ensanchamiento esférico en campo libre,
+modos de la guía de ondas ideal de presión nula, los rayos en arco de
+círculo de un gradiente lineal y la divergencia esférica en campo libre,
 más la coincidencia mutua de la pérdida por transmisión modal y de la PE.
 
-**No cubierto.** Los tres solvers asumen una columna de agua independiente
-de la distancia con un contorno de presión-liberada (o, para los modos,
+**No cubierto.** Los tres métodos suponen una columna de agua independiente
+de la distancia con un contorno de presión nula (o, para los modos,
 opcionalmente rígido): no hay fondo absorbente ni elástico, ni atenuación
 del sedimento, ni batimetría real, así que los problemas dependientes de la
-distancia quedan fuera de alcance. El solver de rayos devuelve caminos y
+distancia quedan fuera de alcance. El trazado de rayos devuelve caminos y
 tiempos de propagación, no amplitudes: la intensidad de tubo de rayos con
 correcciones de cáusticas no se calcula. La PE es la forma estándar de
 ángulos pequeños (Tappert), no una variante de gran angular de Padé. Para la
-física del lecho elástico que estos solvers fluidos dejan fuera, véase
-[Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/).
+física del lecho elástico que estos métodos fluidos dejan fuera, véase
+[Ondas elásticas y acoplamiento
+fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
 ## Véase también
 
 - [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
-  las formas cerradas que estos solvers sustituyen cuando la refracción y
+  las formas cerradas que estos métodos sustituyen cuando la refracción y
   los contornos importan, y los perfiles de velocidad del sonido que
   consumen.
 - [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/):
   los niveles de referencia de ISO 18405 en los que se expresa toda pérdida
   por transmisión de esta página.
 - [Refracción atmosférica: rayos y la GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
-  los hermanos aéreos de estos solvers, con la misma curvatura de rayos y
+  los hermanos aéreos de estos métodos, con la misma curvatura de rayos y
   una PE de función de Green marchada sobre impedancia de suelo en lugar de
   un lecho marino.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): la
@@ -419,15 +419,15 @@ física del lecho elástico que estos solvers fluidos dejan fuera, véase
 
 ## Respuestas rápidas
 
-### ¿Qué solver de propagación submarina debo usar?
+### ¿Qué método de propagación submarina debo usar?
 
-Elija por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
+Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
 alta frecuencia y océano profundo (geometría de eigenrayos y tiempos de
 propagación a un coste independiente de la frecuencia), modos normales para
 baja frecuencia en aguas someras (pocos modos propagantes, $m < kD/\pi$, la
 solución de referencia en su régimen) y la ecuación parabólica para caminos
 largos de un solo sentido a baja frecuencia (el campo completo TL($z$,$r$)
-con refracción). Cuando dos solvers coinciden en un caso, esa coincidencia
+con refracción). Cuando dos métodos coinciden en un caso, esa coincidencia
 es la prueba práctica de convergencia.
 
 ### ¿Cuándo deja de bastar la pérdida por transmisión en forma cerrada?
@@ -435,7 +435,7 @@ es la prueba práctica de convergencia.
 Cuando la refracción o los contornos deciden la respuesta: un mínimo de
 velocidad del sonido que atrapa energía (el canal SOFAR), reflexiones en la
 superficie y el fondo en aguas someras, o una distancia de detección que
-oscila con la elección de la ley de ensanchamiento. La forma cerrada
-$TL = \text{ensanchamiento} + \alpha R$ es honesta para caminos cortos,
+oscila con la elección de la ley de divergencia. La forma cerrada
+$TL = \text{divergencia} + \alpha R$ es honesta para caminos cortos,
 directos y sin contornos, y para presupuestos de sonar de primera pasada;
-más allá, calcule el campo.
+más allá, calcula el campo.

@@ -8,7 +8,7 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "El detector exponencial de ponderación temporal (cláusula 3.8) con las constantes de tiempo F y S (cláusula 5.7), y las respuestas de referencia a ráfagas de tono de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
+    note: "El detector exponencial de ponderación temporal (apartado 3.8) con las constantes de tiempo F y S (apartado 5.7), y las respuestas de referencia a ráfagas de tono de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
   - type: standard
     organization: "American National Standards Institute"
     year: 1983
@@ -20,7 +20,7 @@ references:
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "Las secciones 3.2 y 3.6 (sonómetros y medición de sonido variable en el tiempo: qué significan las lecturas F/S/I en la práctica instrumental). ISBN 978-1-4987-2405-0."
@@ -34,7 +34,7 @@ temporal*: antes de llegar a la lectura, la presión cuadrática ponderada en
 frecuencia pasa por un detector exponencial cuya constante de tiempo fija
 la rapidez con la que el nivel sigue a la señal. Esta página es ese
 detector, implementado como un filtro recursivo exacto por muestra: las
-características Fast y Slow de IEC 61672-1:2013 (cláusula 5.7), la
+características Fast y Slow de IEC 61672-1:2013 (apartado 5.7), la
 balística asimétrica heredada Impulse, estado en streaming para el
 procesado por bloques y la verificación con ráfagas de tono contra la
 Tabla 4 de la norma.
@@ -69,7 +69,7 @@ $$
 y(t) = \frac{1}{\tau} \int_{-\infty}^{t} x^2(\xi)\ e^{-(t-\xi)/\tau}\ d\xi
 $$
 
-un paso-bajo de primer orden sobre la señal al cuadrado. La constante de tiempo
+un paso bajo de primer orden sobre la señal al cuadrado. La constante de tiempo
 $\tau$ fija el compromiso: **Fast** (125 ms) sigue fluctuaciones del tipo del
 habla y **Slow** (1 s) estabiliza la lectura para ruido cuasi estacionario.
 Tras un escalón, la envolvente alcanza el 63 % de su valor final en un $\tau$
@@ -151,28 +151,28 @@ $$
 
 - **Fast** es el valor por defecto de casi todos los métodos modernos:
   niveles percentiles, detección de eventos impulsivos, ruido comunitario,
-  la gráfica general de "nivel frente a tiempo". Su constante de 125 ms es
+  la gráfica general de «nivel frente a tiempo». Su constante de 125 ms es
   del mismo orden que el tiempo de integración de sonoridad del propio oído,
   así que una traza $L_{AF}$ sigue a grandes rasgos lo que un oyente percibe.
 - **Slow** conviene a fuentes cuasi estacionarias y a cualquier
   procedimiento que necesite una lectura estable: promedia el parpadeo de
   una fuente fluctuante al precio de perder los eventos cortos (una ráfaga
   de 100 ms alcanza un pico unos 7,5 dB más bajo en S que en F). Algunos
-  métodos heredados la prescriben directamente, el más famoso, los niveles de
-  certificación de aeronaves, construidos sobre muestras con ponderación
-  Slow.
-- **Impulse** es herencia histórica, y está desaconsejada para calificar.
+  métodos heredados la prescriben directamente; el caso más famoso son los
+  niveles de certificación de aeronaves, construidos sobre muestras con
+  ponderación Slow.
+- **Impulse** es herencia histórica, y está desaconsejada para valorar.
   Fue un intento de los años 60 de que la aguja del medidor siguiera la
   sonoridad percibida de los impactos; no lo consigue (el ataque de 35 ms
   sigue perdiendo los impulsos muy cortos y la retención de 1,5 s exagera la
   duración). Entró en las normas internacionales con IEC 60651 y quedó fuera
   de los requisitos de su sucesora IEC 61672-1, cuya primera edición (2002)
   explica el porqué: los niveles ponderados I no son adecuados para
-  calificar sonidos impulsivos. Sobrevive en los medidores solo por
+  valorar sonidos impulsivos. Sobrevive en los medidores solo por
   continuidad con requisitos nacionales antiguos. La práctica moderna
-  califica la impulsividad
+  valora la impulsividad
   con $L_{Aeq}$ más un ajuste (Tabla A.1 de ISO 1996-1, o el análisis de
-  ataques de
+  inicio de
   [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/))
   y evalúa el riesgo de daño auditivo con $L_{Cpeak}$, nunca con niveles
   ponderados I.
@@ -248,8 +248,8 @@ de dárselo.
   idéntico bit a bit a `'zero'`.
 - **Un float** reanuda un estado que hayas guardado tú, que es lo que hace el
   procesado por bloques del apartado 6.
-- **Un array** difundible a la forma de la entrada sin el eje temporal hace lo
-  mismo por canal.
+- **Un array** compatible por broadcasting con la forma de la entrada sin el
+  eje temporal hace lo mismo por canal.
 
 Si el registro es la continuación de una señal que ya venía sonando, siembra el
 integrador con algo robusto: el cuadrado medio del primer medio segundo,
@@ -283,7 +283,7 @@ from phonometry import filters
 
 state = None
 
-# audio_blocks: fotogramas consecutivos de tu grabación calibrada (Pa),
+# audio_blocks: tramas consecutivas de tu grabación calibrada (Pa),
 #   transmitidos desde tu tarjeta de sonido o leídos de un WAV por bloques.
 for block in audio_blocks:
     energy_envelope = filters.time_weighting(block, fs, mode='fast', initial_state=state)
@@ -292,8 +292,9 @@ for block in audio_blocks:
 
 Para bloques multicanal con el tiempo en el último eje, lleva un estado por
 canal: usa `state = energy_envelope[..., -1]`. Un `initial_state` escalar se
-aplica a todos los canales, mientras que un array debe coincidir (o difundirse)
-con la forma sin el eje temporal, p. ej. `(n_channels,)` para una entrada de
+aplica a todos los canales, mientras que un array debe coincidir con la forma
+sin el eje temporal o ser compatible con ella por broadcasting, p. ej.
+`(n_channels,)` para una entrada de
 forma `(n_channels, n_samples)`.
 
 O deja que la clase `TimeWeighting` lleve el estado por ti:
@@ -302,7 +303,7 @@ O deja que la clase `TimeWeighting` lleve el estado por ti:
 from phonometry import filters
 
 tw = filters.TimeWeighting(fs, mode='fast')
-# audio_blocks: fotogramas consecutivos de tu grabación calibrada (Pa),
+# audio_blocks: tramas consecutivas de tu grabación calibrada (Pa),
 #   transmitidos desde tu tarjeta de sonido o leídos de un WAV por bloques.
 for block in audio_blocks:
     energy_envelope = tw.process(block)
@@ -327,23 +328,24 @@ verificación con ráfagas de tono de IEC 61672-1.
 ## Qué cubre esta guía
 
 **Cubierto.** El detector exponencial de ponderación temporal de la
-IEC 61672-1:2013 (cláusula 3.8) con las constantes de tiempo Fast y Slow
-(cláusula 5.7), implementado como el filtro recursivo de `time_weighting`
+IEC 61672-1:2013 (apartado 3.8) con las constantes de tiempo Fast y Slow
+(apartado 5.7), implementado como el filtro recursivo de `time_weighting`
 y la clase `TimeWeighting` para streaming, verificado en CI contra las
-referencias de ráfaga de tono de clase 1 de la tabla 4. La balística
+referencias de ráfaga de tono de clase 1 de la Tabla 4. La balística
 asimétrica heredada Impulse (35 ms de ataque, 1,5 s de caída), trasladada
 a las normas internacionales desde las características FAST/SLOW/IMPULSE
 de ANSI S1.4-1983.
 
 **No cubierto.** La cadena de instrumento más amplia de la IEC 61672-1
-(ponderación en frecuencia, rangos de nivel, verificaciones periódicas) no
+(ponderación frecuencial, rangos de nivel, verificaciones periódicas) no
 está en esta página; es el asunto de
 [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/). La
 ANSI S1.4-1983 se cita solo por el origen histórico de las constantes F y
 S, no se implementa como especificación de instrumento propia. La
 valoración moderna de impulsividad ($L_{Aeq}$ más un ajuste, o el análisis
 de inicio) está en la página de
-[Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/),
+[Prominencia de sonidos
+impulsivos](/phonometry/es/environment/assessment/impulsive-sound/),
 no construida sobre la ponderación Impulse de aquí.
 
 ## Véase también

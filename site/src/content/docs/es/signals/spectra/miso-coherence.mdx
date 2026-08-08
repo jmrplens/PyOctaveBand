@@ -1,12 +1,12 @@
 ---
 title: "Coherencia múltiple y parcial"
-description: "Las funciones de coherencia de sistemas de entradas múltiples y salida única de Bendat y Piersol: coherencia ordinaria, múltiple y parcial de varias fuentes correladas que excitan una respuesta, el condicionamiento por eliminación de Gauss que separa una causa real de una fuente que solo correla con ella, y los espectros de salida coherente parciales que indican qué fuente domina cada banda."
+description: "Las funciones de coherencia de sistemas de entradas múltiples y salida única de Bendat y Piersol: coherencia ordinaria, múltiple y parcial de varias fuentes correlacionadas que excitan una respuesta, el condicionamiento por eliminación de Gauss que separa una causa real de una fuente que solo se correlaciona con ella, y los espectros de salida coherente parciales que indican qué fuente domina cada banda."
 references:
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
     title: "Random data: Analysis and measurement procedures"
-    edition: "4th ed."
+    edition: "4.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
     note: "Capítulo 7 (relaciones de entradas y salidas múltiples: coherencia ordinaria Ec. 7.109, coherencia múltiple Ec. 7.35, coherencia parcial Ec. 7.87, la recursión de eliminación de Gauss de los espectros condicionados Ec. 7.94, la descomposición de la salida coherente Ecs. 7.86/7.116/7.121) y sección 9.3 (errores estadísticos de las estimaciones múltiples y condicionadas, Ecs. 9.98-9.101). ISBN 978-0-470-24877-5."
@@ -14,18 +14,18 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Cuando varias fuentes parcialmente correladas excitan una misma respuesta, la
+Cuando varias fuentes parcialmente correlacionadas excitan una misma respuesta, la
 coherencia ordinaria de cada fuente con la salida engaña: una fuente que solo
-*correla* con la causa real hereda una coherencia espuria a través de ella, de
+*se correlaciona* con la causa real hereda una coherencia espuria a través de ella, de
 modo que leer solo las coherencias ordinarias puede atribuir el mérito a la
 fuente equivocada. Bendat y Piersol, *Random Data* (4.a ed., 2010,
 capítulo 7), lo resuelven para un sistema de entradas múltiples y salida única
 (MISO) con las funciones de coherencia **múltiple** y **parcial**.
 `miso_coherence` las calcula desde el mismo núcleo de espectros cruzados de
-Welch que el resto de `phonometry.signals`, para varias entradas correladas
+Welch que el resto de `phonometry.signals`, para varias entradas correlacionadas
 y una salida.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_es.svg" alt="Figura de dos paneles. Arriba: el autoespectro de salida medido en dB con la contribución de salida coherente de dos entradas sombreada debajo; la entrada 1 llena la banda baja hasta unos 400 Hz y la entrada 2 la banda alta por encima de unos 1,5 kHz, con el ruido residual muy por debajo. Abajo: para la segunda entrada correlada, su coherencia ordinaria ronda 0,3 en toda la banda baja aunque no excita ningún camino de baja frecuencia, mientras que su coherencia parcial se desploma a cero ahí una vez que se condiciona fuera la primera entrada; la coherencia múltiple se mantiene cerca de uno salvo en el nulo del cruce." width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_es.svg" alt="Figura de dos paneles. Arriba: el autoespectro de salida medido en dB con la contribución de salida coherente de dos entradas sombreada debajo; la entrada 1 llena la banda baja hasta unos 400 Hz y la entrada 2 la banda alta por encima de unos 1,5 kHz, con el ruido residual muy por debajo. Abajo: para la segunda entrada correlacionada, su coherencia ordinaria ronda 0,3 en toda la banda baja aunque no excita ningún camino de baja frecuencia, mientras que su coherencia parcial se desploma a cero ahí una vez que se condiciona fuera la primera entrada; la coherencia múltiple se mantiene cerca de uno salvo en el nulo del cruce." width="88%" loading="eager" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -39,7 +39,7 @@ from phonometry import miso_coherence, noise_signal
 fs = 8192.0
 # La entrada 1 excita un camino de baja frecuencia; la entrada 2 =
 # 0.7*x1 + ruido independiente excita un camino de alta frecuencia, de modo
-# que la entrada 2 esta correlada con la entrada 1.
+# que la entrada 2 esta correlacionada con la entrada 1.
 x1 = noise_signal(fs, 32.0, color="white", seed=1)
 x2 = 0.7 * x1 + noise_signal(fs, 32.0, color="white", seed=2)
 low = signal.butter(4, 400.0, fs=fs, output="sos")
@@ -88,10 +88,10 @@ res.plot()          # etiquetas en inglés; res.plot(language="es") en español
 
 Para un sistema con $q$ entradas $x_1..x_q$ y salida $y$, `miso_coherence`
 estima todos los autoespectros y espectros cruzados por el método de Welch y
-reporta tres funciones de coherencia.
+da tres funciones de coherencia.
 
 La historia del condicionamiento cabe en un diagrama de bloques: dos
-entradas correladas excitan sus propios caminos hacia una única salida
+entradas correlacionadas excitan sus propios caminos hacia una única salida
 medida, y la matriz de espectros cruzados de Welch es la que convierte la
 maraña en números por fuente.
 
@@ -114,8 +114,8 @@ $$
                   = 1 - \frac{G_{nn}}{G_{yy}} ,
 $$
 
-donde $G_{nn}$ es el espectro de salida residual no correlado con ninguna
-entrada. Si la salida lleva ruido aditivo no correlado de relación
+donde $G_{nn}$ es el espectro de salida residual no correlacionado con ninguna
+entrada. Si la salida lleva ruido aditivo no correlacionado de relación
 señal-ruido $\mathrm{SNR}$ por banda, esto vale exactamente
 $\mathrm{SNR}/(1+\mathrm{SNR})$, el oráculo de forma cerrada con que se
 verifica la implementación.
@@ -134,7 +134,7 @@ denominador (no la salida condicionada). Esa elección hace que las
 coherencias parciales de las entradas ordenadas sumen la coherencia múltiple,
 $\gamma^2_{y:x} = \sum_i \gamma^2_{iy\cdot(i-1)!}$ (Ec. 7.116), y se reduzcan
 exactamente a las coherencias ordinarias cuando las entradas son mutuamente
-no correladas (Ec. 7.117).
+no correlacionadas (Ec. 7.117).
 
 ```python
 res = miso_coherence([x1, x2], y, fs)
@@ -159,7 +159,7 @@ aplicado a cada entrada en el orden de condicionamiento hasta que solo queda
 el espectro de salida residual $G_{yy\cdot q!}$. Este es el sentido del
 método: en la figura anterior la entrada 2 es
 $0{,}7\,x_1 + \text{ruido independiente}$, así que
-*correla* con la entrada 1 pero no excita ningún camino de baja frecuencia. Su
+*se correlaciona* con la entrada 1 pero no excita ningún camino de baja frecuencia. Su
 coherencia ordinaria con la salida marca por ello unos 0,3 en la banda baja,
 prestada por completo a través de la entrada 1, mientras que su coherencia
 parcial se desploma a cero ahí una vez condicionada fuera la entrada 1.
@@ -182,7 +182,7 @@ G_{v_i} = \gamma^2_{iy\cdot(i-1)!}\,G_{yy}, \qquad
 \sum_i G_{v_i} + G_{nn} = G_{yy} .
 $$
 
-Comparar las porciones banda por banda responde a "¿qué fuente domina aquí?".
+Comparar las porciones banda por banda responde a «¿qué fuente domina aquí?».
 `dominant_input()` devuelve, para cada frecuencia, el índice de la entrada con
 la mayor porción:
 
@@ -251,7 +251,7 @@ internamente para construir los espectros de salida coherente pero no se
 devuelven: `MISOCoherenceResult` solo expone el lado de la coherencia y la
 descomposición espectral, no una función de transferencia multientrada
 ajustada. El método también es de salida única (MISO); un sistema con
-varias salidas correladas necesita una llamada a `miso_coherence` por cada
+varias salidas correlacionadas necesita una llamada a `miso_coherence` por cada
 salida.
 
 ## Véase también

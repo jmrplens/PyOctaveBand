@@ -1,6 +1,6 @@
 ---
 title: "Sonoridad"
-description: "Sonoridad en sonos por el método de Zwicker (ISO 532-1) más las curvas isofónicas de ISO 226:2023, con los modelos de ISO 532-2/-3 y ECMA-418-2 en su propia guía."
+description: "Sonoridad en sonios por el método de Zwicker (ISO 532-1) más las líneas isofónicas de ISO 226:2023, con los modelos de ISO 532-2/-3 y ECMA-418-2 en su propia guía."
 references:
   - type: book
     authors: ["Fastl, H.", "Zwicker, E."]
@@ -26,14 +26,14 @@ references:
     title: "Acoustics — Normal equal-loudness-level contours"
     designation: "ISO 226:2023"
     url: "https://www.iso.org/standard/83117.html"
-    note: "El modelo de isófonas y los parámetros de la Tabla 1 que sustentan los niveles de sonoridad de tonos puros: las curvas isofónicas (Fórmula 1), el nivel de sonoridad de tonos puros (Fórmula 2) y el umbral de audición."
+    note: "El modelo de líneas isofónicas y los parámetros de la Tabla 1 que sustentan los niveles de sonoridad de tonos puros: las líneas isofónicas (Fórmula 1), el nivel de sonoridad de tonos puros (Fórmula 2) y el umbral de audición."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
     title: "Acoustics — Methods for calculating loudness — Part 1: Zwicker method"
     designation: "ISO 532-1:2017"
     url: "https://www.iso.org/standard/63077.html"
-    note: "Sonoridad estacionaria y variable en el tiempo en sonos a partir del programa de referencia normativo del Anexo A.4, con la sonoridad percentil N5/N10, validada frente al conjunto del Anexo B."
+    note: "Sonoridad estacionaria y variable en el tiempo en sonios a partir del programa de referencia normativo del Anexo A.4, con la sonoridad percentil N5/N10, validada frente al conjunto del Anexo B."
 ---
 
 import Video from '../../../../../components/Video.astro';
@@ -42,16 +42,19 @@ import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Las métricas de nivel dicen cuánta *presión acústica* hay; la sonoridad dice
 cuán fuerte la *percibe* realmente quien escucha. Esta página cubre el
-método de referencia, la sonoridad en sonos de Zwicker (ISO 532-1), además
-de las curvas isofónicas de tonos puros (ISO 226); las familias de modelos
+método de referencia, la sonoridad en sonios de Zwicker (ISO 532-1), además
+de las líneas isofónicas de tonos puros (ISO 226); las familias de modelos
 más nuevas, Moore-Glasberg (ISO 532-2/-3) y la sonoridad del modelo de
 Sottek (ECMA-418-2), están en
 [Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/).
 La agudeza, la tonalidad y la aspereza están en
-[Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/); las
+[Métricas de calidad
+sonora](/phonometry/es/perception/psychoacoustics/sound-quality/); las
 métricas de habla en el
-[índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) y
-el [índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/).
+[índice de transmisión del
+habla](/phonometry/es/perception/speech/speech-transmission/) y
+el [índice de inteligibilidad del
+habla](/phonometry/es/perception/speech/speech-intelligibility/).
 
 ## ¿Cómo calculo la sonoridad de Zwicker de ISO 532-1 con Python?
 
@@ -59,10 +62,10 @@ Llama a `psychoacoustics.loudness_zwicker(x, fs, calibration_factor=sens)`
 sobre una grabación calibrada. Si solo tienes el espectro, usa
 `loudness_zwicker_from_spectrum(levels_28)` con los 28 niveles de banda de
 tercio de octava de 25 Hz a 12,5 kHz. Cualquiera de los dos resultados lleva
-`loudness` en sonos, `loudness_level` en fonios y, para señales variables en el
+`loudness` en sonios, `loudness_level` en fonios y, para señales variables en el
 tiempo, los percentiles `n5` y `n10`.
 
-## Sonoridad en sonos (ISO 532-1, Zwicker)
+## Sonoridad en sonios (ISO 532-1, Zwicker)
 
 Los decibelios comprimen la percepción: 10 dB más se leen como *el doble de
 sonoro*, y dos sonidos con el mismo dB(A) pueden diferir audiblemente según
@@ -70,16 +73,16 @@ cómo se reparta su energía entre las **bandas críticas** del oído. El métod
 Zwicker modela explícitamente la cadena auditiva (transmisión del oído
 externo/medio, análisis en bandas críticas sobre la escala de 24 Bark,
 pendientes de enmascaramiento dependientes del nivel) y produce la
-**sonoridad $N$ en sonos**, una escala de razón: 4 sonos es el doble de sonoro
-que 2 sonos. Por definición, un tono de 1 kHz a 40 dB SPL es 1 sono, y cada
-+10 fonios duplica el valor en sonos.
+**sonoridad $N$ en sonios**, una escala de razón: 4 sonios es el doble de sonoro
+que 2 sonios. Por definición, un tono de 1 kHz a 40 dB SPL es 1 sonio, y cada
++10 fonios duplica el valor en sonios.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker_es.svg" alt="Cadena de sonoridad de Zwicker ISO 532-1: 28 niveles de banda de tercio de octava, transmisión y agrupación de bandas críticas inferiores, sonoridad de núcleo de las 20 bandas críticas, sonoridad específica sobre Bark, integrada en la sonoridad total N en sonos y el nivel de sonoridad en fonios" width="78%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker_es.svg" alt="Cadena de sonoridad de Zwicker ISO 532-1: 28 niveles de banda de tercio de octava, transmisión y agrupación de bandas críticas inferiores, sonoridad de núcleo de las 20 bandas críticas, sonoridad específica sobre Bark, integrada en la sonoridad total N en sonios y el nivel de sonoridad en fonios" width="78%" loading="eager" />
 
 La animación de abajo muestra esa integración en acción: al subir el nivel
 de banda de un sonido de banda estrecha de 1 kHz, el patrón de sonoridad
 específica $N'(z)$ crece a lo largo del eje de Bark y el área bajo él es la
-sonoridad total en sonos.
+sonoridad total en sonios.
 
 <Video
   name="anim_specific_loudness"
@@ -93,7 +96,7 @@ sonoridad total en sonos.
 import numpy as np
 from phonometry import psychoacoustics
 
-# Una grabación cruda y su calibración para que la guía funcione por sí sola
+# Una grabación en bruto y su calibración para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)   # cualquier grabación (unidades digitales)
 sens = 1.0                                                # calibration_factor a pascales
@@ -117,7 +120,7 @@ res.plot()   # N'(z) sobre la escala Bark — el patrón de sonoridad específic
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
 
 *Mismo nivel de banda, sonoridad muy distinta: la energía repartida entre
-muchas bandas críticas (rojo) suma muchos más sonos que el mismo nivel
+muchas bandas críticas (rojo) suma muchos más sonios que el mismo nivel
 concentrado en una sola banda (azul). El área bajo $N'(z)$ es la sonoridad
 total.*
 
@@ -174,7 +177,7 @@ dentro de la banda de tolerancia del 5 % por muestra que fija la norma.
 | `stationary` | bool | — | por defecto `False` | `True`: un único $N$ a partir del espectro promediado |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
 
-Devuelve un dataclass `ZwickerLoudness`: `loudness` ($N$, sonos),
+Devuelve un dataclass `ZwickerLoudness`: `loudness` ($N$, sonios),
 `loudness_level` (fonios), `specific` ($N'(z)$, 240 bins de 0,1 Bark) y, para los
 análisis variables en el tiempo, `n5`, `n10`, `time`, `loudness_vs_time`
 (traza a 500 Hz).
@@ -187,12 +190,13 @@ bloque opcional de metadatos de cabecera, una tabla compacta de métricas
 (sonoridad total $N$, nivel de sonoridad $L_N$ y los percentiles
 $N_5$/$N_{10}$ para un resultado variable en el tiempo) junto
 al patrón de sonoridad específica $N'(z)$ (el propio `.plot()` del resultado),
-el número único $N = X\ \text{sono}$ ($L_N = Y\ \text{fonio}$) en caja, una
+el número único $N = X\ \text{sonio}$ ($L_N = Y\ \text{fonio}$) en caja, una
 fila opcional de
 veredicto y un pie con el descargo fijo. Usa el mismo contenedor
 `ReportMetadata` y el mismo motor de renderizado que la
-[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
-un `requirement` aportado se lee como la sonoridad máxima admisible en sonos
+[ficha de aislamiento de ISO
+717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
+un `requirement` aportado se lee como la sonoridad máxima admisible en sonios
 (una sonoridad menor cumple). El renderizado necesita reportlab y, para la
 figura que incrusta la ficha, matplotlib (`pip install
 "phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
@@ -210,9 +214,9 @@ res.report(
         specimen="Electrodoméstico, ruido de funcionamiento estable",
         measurement_standard="ISO 532-1 método 1",
         laboratory="Laboratorio de referencia Phonometry",
-        requirement=12.0,             # sonoridad máxima admisible (sonos)
+        requirement=12.0,             # sonoridad máxima admisible (sonios)
     ),
-)                                     # N (sonos) y LN (fonios)
+)                                     # N (sonios) y LN (fonios)
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
@@ -221,14 +225,14 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso532_loudness_example"
 	title="Informe de ejemplo de sonoridad ISO 532-1 (PDF)"
-	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la tasa de banda crítica, el resultado de un solo número N = 8,2 sonos (LN = 70,4 fonios) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonos."
-	caption="Ficha de sonoridad de Zwicker (ZwickerLoudness.report), N en sonos con LN en fonios."
+	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la tasa de banda crítica, el resultado de un solo número N = 8,2 sonios (LN = 70,4 fonios) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonios."
+	caption="Ficha de sonoridad de Zwicker (ZwickerLoudness.report), N en sonios con LN en fonios."
 />
 
 ## Nivel de sonoridad de tonos puros (ISO 226:2023)
 
-Las curvas isofónicas normales relacionan el SPL de un tono puro con su *nivel
-de sonoridad* percibido en fonios (el SPL de un tono de 1 kHz igual de fuerte).
+Las líneas isofónicas normales relacionan el SPL de un tono puro con su *nivel
+de sonoridad* percibido en fonios (el SPL de un tono de 1 kHz igual de sonoro).
 `equal_loudness_contour(phon)` evalúa la Fórmula (1) de ISO 226:2023 en las 29
 frecuencias preferentes de tercio de octava de la Tabla 1,
 `loudness_level(spl, frequency)` es la inversa exacta (Fórmula 2) y
@@ -247,7 +251,7 @@ res = psychoacoustics.equal_loudness_contours()
 res.plot()   # el clásico gráfico de ISO 226 (necesita matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Curvas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
 
 ISO 226:2023 define las curvas de 20 a 90 fonios; por encima de 80 fonios la fórmula solo es válida hasta 4 kHz, por lo que la curva de 90 fonios se detiene ahí y no se define ninguna curva superior.
 
@@ -282,7 +286,7 @@ plt.show()
 
 Validez según el apartado 4.1: 20–90 fonios (80 fonios por encima de 4 kHz); la
 implementación se verifica en CI contra las tablas del Anexo B. Ojo: esto es la
-sonoridad de *tonos puros*; la sonoridad de señales arbitrarias en sonos es lo
+sonoridad de *tonos puros*; la sonoridad de señales arbitrarias en sonios es lo
 que calculan los modelos ISO 532, el método de Zwicker de arriba y las
 familias más nuevas de
 [Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/).
@@ -327,10 +331,14 @@ espera una de las frecuencias de la Tabla 1.
 
 ## Respuestas rápidas
 
-### ¿Cuál es la diferencia entre la sonoridad en sonos y el nivel de sonoridad en fonios?
+### ¿Cuál es la diferencia entre la sonoridad en sonios y el nivel de sonoridad en fonios?
 
-La sonoridad $N$ en sonos (ISO 532-1) es una escala de razón de la sonoridad percibida: 4 sonos es el doble de sonoro que 2 sonos y, por definición, un tono de 1 kHz a 40 dB SPL es 1 sono. El nivel de sonoridad en fonios (ISO 226) es el SPL de un tono puro de 1 kHz igual de fuerte, y cada +10 fonios duplica el valor en sonos.
+La sonoridad $N$ en sonios (ISO 532-1) es una escala de razón de la sonoridad percibida: 4 sonios es el doble de sonoro que 2 sonios y, por definición, un tono de 1 kHz a 40 dB SPL es 1 sonio. El nivel de sonoridad en fonios (ISO 226) es el SPL de un tono puro de 1 kHz igual de sonoro, y cada +10 fonios duplica el valor en sonios.
 
-### ¿En qué rango son válidas las curvas isofónicas de ISO 226:2023?
+### ¿En qué rango son válidas las líneas isofónicas de ISO 226:2023?
 
-El apartado 4.1 de ISO 226:2023 define las curvas isofónicas normales de 20 a 90 fonios, evaluadas en las 29 frecuencias preferentes de tercio de octava de la Tabla 1; por encima de 80 fonios la fórmula solo es válida hasta 4 kHz, por lo que la curva de 90 fonios se detiene ahí y no se define ninguna curva superior. Las curvas describen tonos puros, no señales arbitrarias.
+El apartado 4.1 de ISO 226:2023 define las líneas isofónicas normales de 20 a
+90 fonios, evaluadas en las 29 frecuencias preferentes de tercio de octava de
+la Tabla 1; por encima de 80 fonios la fórmula solo es válida hasta 4 kHz, por
+lo que la curva de 90 fonios se detiene ahí y no se define ninguna curva
+superior. Las curvas describen tonos puros, no señales arbitrarias.

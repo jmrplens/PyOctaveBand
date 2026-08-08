@@ -74,7 +74,13 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Esta página reúne la teoría de la propia cadena de medición: las bandas fraccionales de octava normalizadas y los bancos de filtros en el dominio temporal que las implementan, las curvas de ponderación frecuencial, la integración temporal, las métricas de nivel, de evento y de exposición, la intensidad acústica y el marco de incertidumbre del GUM que sustenta cada magnitud medida. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+Esta página reúne la teoría de la propia cadena de medición: las bandas de
+fracción de octava normalizadas y los bancos de filtros en el dominio temporal
+que las implementan, las curvas de ponderación frecuencial, la integración
+temporal, las métricas de nivel, de evento y de exposición, la intensidad
+acústica y el marco de incertidumbre del GUM que sustenta cada magnitud
+medida. Forma parte de la [referencia de
+teoría](/phonometry/es/reference/theory/).
 
 ## Frecuencias de banda de octava (ANSI S1.11 / IEC 61260)
 
@@ -100,14 +106,14 @@ $$
 
 ## Resolución frecuencial vs separación de bins FFT
 
-`octave_filter` es un **banco de filtros de octava fraccional en el dominio del
+`octave_filter` es un **banco de filtros de fracción de octava en el dominio del
 tiempo**, no un estimador espectral FFT/Welch. Por tanto, su resultado no tiene
 una resolución frecuencial en el sentido `fs / nfft`.
 
 Para `fraction=3`, la salida contiene un nivel escalar por banda de tercio de
 octava. La granularidad relevante es la definición normalizada de la banda:
-frecuencia central, borde inferior y borde superior. Como las bandas de octava
-fraccional están espaciadas logarítmicamente, su ancho absoluto en Hz crece con
+frecuencia central, borde inferior y borde superior. Como las bandas de fracción
+de octava están espaciadas logarítmicamente, su ancho absoluto en Hz crece con
 la frecuencia mientras su ancho relativo se mantiene aproximadamente constante.
 
 Por ejemplo, con `fraction=3` y `limits=[12, 20000]`, la banda de tercio de
@@ -173,7 +179,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
     print(f, pxx)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD cruda de fondo" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
 
 *Los dos objetos sobre un mismo eje, para una señal de seis tonos a 20, 100,
 500, 2000, 4000 y 15 000 Hz. La traza gris es una PSD de Welch ($f_s$ = 48 kHz,
@@ -186,8 +192,8 @@ que las bajas caben dentro de uno solo, y por eso las dos respuestas no se
 pueden convertir la una en la otra. (La traza de PSD lleva un desplazamiento
 vertical por legibilidad, así que hay que leer su forma y no su nivel.)*
 
-Esto mantiene separados los dos conceptos: phonometry da niveles de octava
-fraccional normalizados, mientras Welch da bins FFT de banda estrecha. Con
+Esto mantiene separados los dos conceptos: phonometry da niveles de fracción
+de octava normalizados, mientras Welch da bins FFT de banda estrecha. Con
 `fs=100000` y `nperseg=2**15`, la separación de bins Welch es de unos 3,05 Hz.
 La ventana y el solape afectan al leakage y a la varianza del promediado, pero
 no cambian la separación de bins de cada segmento FFT.
@@ -199,7 +205,7 @@ FFT a partir de los niveles escalares por banda.
 
 ## Respuestas en magnitud |H(jw)|
 
-La librería implementa los prototipos clásicos estándar:
+La biblioteca implementa los prototipos clásicos estándar:
 
 **1. Butterworth:** banda de paso máximamente plana.
 
@@ -239,16 +245,17 @@ $$
 Todas las arquitecturas se diseñan sobre los propios bordes de banda, con la
 ganancia que cada una define en su frecuencia de borde: **−3 dB** en
 Butterworth, Chebyshev II y Bessel, y el **borde de rizado de la banda de paso**
-(`ripple` dB, 0,1 dB por defecto) en Chebyshev I y elíptico, que son
-equirrizados en la banda de paso y no tienen ahí ningún punto de −3 dB. Dos
-casos requieren tratamiento especial:
+(`ripple` dB, 0,1 dB por defecto) en Chebyshev I y elíptico, que tienen rizado
+uniforme en la banda de paso y no tienen ahí ningún punto de −3 dB. Dos casos
+requieren tratamiento especial:
 
 - **Chebyshev II**: en scipy, `Wn` es el borde de la banda *atenuada*.
   phonometry mapea analíticamente los bordes de −3 dB deseados a bordes de
   banda atenuada (la razón de transición del prototipo es
   $\cosh(\operatorname{acosh}(\sqrt{10^{A/10}-1})/N)$), aplicando la
-  transformación paso-bajo→paso-banda en el dominio bilineal pre-warpeado, de
-  modo que el mapeo es exacto incluso para bandas diezmadas cercanas a Nyquist.
+  transformación paso bajo→paso banda en el dominio bilineal con
+  precompensación de frecuencia, de modo que el mapeo es exacto incluso para
+  bandas diezmadas cercanas a Nyquist.
 - **Bessel**: se diseña con `norm="mag"`, que define el punto de −3 dB
   exactamente en `Wn` (la norma `phase` desplazaría los bordes a unos −10 dB).
 
@@ -294,7 +301,7 @@ modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" />
 
 *Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).*
 
@@ -351,7 +358,8 @@ z_{1..4} = 0, \qquad
 p = 2\pi \left\lbrace -0{,}707 \pm j0{,}707,\  -19{,}27 \pm j5{,}16,\  -14{,}11 \pm j14{,}11,\  -5{,}16 \pm j19{,}27 \right\rbrace \ \text{Hz}
 $$
 
-La ganancia $k$ se elige para que la respuesta sea exactamente **0 dB a 10 Hz** (cláusula 4):
+La ganancia $k$ se elige para que la respuesta sea exactamente **0 dB a 10
+Hz** (apartado 4):
 
 $$
 k = \left| \frac{\prod_i (j\omega_{10} - p_i)}{\prod_i (j\omega_{10} - z_i)} \right|, \qquad \omega_{10} = 2\pi \cdot 10 \ \text{rad/s}
@@ -403,7 +411,7 @@ $$
 
 Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**.
 
-**$L_{Cpeak}$** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
+**$L_{Cpeak}$** (IEC 61672-1:2013, apartado 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
 Consulta la [guía de niveles](/phonometry/es/signals/levels/levels/) para su uso y la [guía de calibración](/phonometry/es/signals/metrology/calibration/) para configurar la escala absoluta.
 
@@ -433,7 +441,7 @@ $$
 \frac{\sin(k \Delta r)}{k \Delta r}, \qquad k = \frac{2 \pi f}{c}
 $$
 
-La cláusula 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda con exactamente este argumento y la Tabla 3 la tabula (p. ej. −10,5 dB a 6,3 kHz para un separador de 25 mm). Por debajo de $f = 0{,}1 c / \Delta r$ (es decir, $k \Delta r$ por debajo de 0,63) el sesgo se mantiene dentro de unos 0,3 dB; `bias_correction` proporciona el factor recíproco por banda y `max_valid_frequency` la cota.
+El apartado 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda con exactamente este argumento y la Tabla 3 la tabula (p. ej. −10,5 dB a 6,3 kHz para un separador de 25 mm). Por debajo de $f = 0{,}1 c / \Delta r$ (es decir, $k \Delta r$ por debajo de 0,63) el sesgo se mantiene dentro de unos 0,3 dB; `bias_correction` proporciona el factor recíproco por banda y `max_valid_frequency` la cota.
 
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
@@ -448,7 +456,7 @@ Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/inte
 Los presupuestos de dominio como ISO 12999-1 y el Anexo C de ISO 9612 son
 instancias del marco general de la GUM (ISO/IEC Guide 98-3:2008). Dado un
 modelo de medición $y = f(x_1, \ldots, x_N)$, la ley de propagación de la
-incertidumbre (cláusula 5) combina las incertidumbres típicas de entrada a
+incertidumbre (apartado 5) combina las incertidumbres típicas de entrada a
 través de coeficientes de sensibilidad:
 
 $$
@@ -459,7 +467,7 @@ generalizada a $(c \odot u)^{\top} r\ (c \odot u)$ para entradas
 correlacionadas. Las sensibilidades se obtienen por diferencias centradas
 sobre el modelo del usuario (paso escalado a $10^{-3}$ de cada incertidumbre
 de entrada), así que no hacen falta derivadas parciales a mano. Las entradas
-de Tipo B entran por las reglas de semiancho de la cláusula 4.3: rectangular
+de Tipo B entran por las reglas de semiancho del apartado 4.3: rectangular
 $a/\sqrt{3}$ (4.3.7), triangular $a/\sqrt{6}$ (4.3.9), en U $a/\sqrt{2}$. La
 incertidumbre expandida $U = k\,u_c$ toma $k$ de la distribución t con los
 grados de libertad efectivos de Welch–Satterthwaite (Anexo G.4):
@@ -469,19 +477,19 @@ $$
 $$
 
 El **Suplemento 1** (ISO/IEC Guide 98-3-1:2008) propaga en cambio las
-distribuciones completas: $10^6$ extracciones de Monte Carlo (cláusula 6.4) a
+distribuciones completas: $10^6$ extracciones de Monte Carlo (apartado 6.4) a
 través del mismo modelo dan $u(y)$ y el intervalo de cobertura
 probabilísticamente simétrico a partir de los fractiles
-$\frac{1}{2}(1 \mp p)$ (cláusula 7.7): la vía cuando el modelo es no lineal o
+$\frac{1}{2}(1 \mp p)$ (apartado 7.7): la vía cuando el modelo es no lineal o
 la salida visiblemente no gaussiana. Los ejemplos de las propias Guías se
 reproducen: el modelo aditivo de cuatro términos da $u_c = 2{,}0$ y el
-intervalo Monte Carlo al 95 % $\pm 3{,}88$ de la cláusula 9.2/Tabla 3 del
+intervalo Monte Carlo al 95 % $\pm 3{,}88$ del apartado 9.2/Tabla 3 del
 Suplemento 1 (cuatro entradas rectangulares; la salida es casi trapezoidal,
 no gaussiana, así que el intervalo es más estrecho que $\pm 1{,}96\,u$), y el
 ejemplo del bloque patrón del Anexo H.1 de la GUM da
 $k = t_{0{,}99}(\nu_{\mathrm{eff}} = 16) = 2{,}92$ y $U_{99} = 93$ nm.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el presupuesto de incertidumbre GUM, un diagrama de barras horizontales con la contribución de cada entrada a la incertidumbre combinada y una línea discontinua en uc igual a 0,407 dB. Derecha: el histograma de salida de Monte Carlo con la gaussiana GUM superpuesta y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre GUM, un diagrama de barras horizontales con la contribución de cada entrada a la incertidumbre combinada y una línea discontinua en uc igual a 0,407 dB. Derecha: el histograma de salida de Monte Carlo con la gaussiana GUM superpuesta y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
 
 *Las dos vías sobre un mismo problema, un nivel ponderado A y no el ejemplo de
 cuatro términos del Suplemento 1 citado más arriba. A la izquierda, la ley de
@@ -489,7 +497,7 @@ propagación como presupuesto: una barra por entrada, de modo que se ve cuál es
 el término que merece la pena reducir. A la derecha, la vía del Suplemento 1: la
 distribución de salida de Monte Carlo con la gaussiana GUM dibujada encima y el
 intervalo de cobertura del 95 % sombreado. Aquí las dos coinciden, que es lo que
-la cláusula 8 llama validación; cuando el modelo es no lineal o la salida
+el apartado 8 llama validación; cuando el modelo es no lineal o la salida
 visiblemente no gaussiana, el histograma se separa de la curva y el intervalo se
 lee de los fractiles en su lugar.*
 

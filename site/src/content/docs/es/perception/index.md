@@ -12,7 +12,7 @@ las palabras al viaje del hablante al oyente, a través de una sala, un
 sistema de megafonía o el ruido de fondo. Y **audición y exposición** cubre
 el propio oído: dónde se sitúa el umbral de audición según la edad y la
 población, cómo el ruido lo desplaza de forma permanente, y cómo se mide y
-reporta la exposición de una jornada laboral.
+declara la exposición de una jornada laboral.
 
 Las tres se apoyan mutuamente en una dirección: los modelos psicoacústicos
 consumen señales calibradas o espectros de banda del
@@ -51,8 +51,9 @@ que aprender de cada una es su ancla: el sonido que vale exactamente 1.
 La sonoridad, la agudeza, la aspereza y la intensidad de fluctuación son
 **escalas de razón sin línea de aprobado**: el doble de número significa el
 doble de sensación, así que un electrodoméstico de 20 sonios se oye
-aproximadamente el doble de fuerte que uno de 10, y por eso las declaraciones de
-electrodomésticos fijan sus límites en sonios y no en decibelios. Las métricas tonales y los
+aproximadamente el doble de sonoro que uno de 10, y por eso las declaraciones de
+electrodomésticos fijan sus límites en sonios y no en decibelios. Las métricas
+tonales y los
 índices de habla sí llevan criterios, y por eso las páginas de tonos terminan
 en un veredicto y las de sonoridad no.
 
@@ -73,7 +74,7 @@ Las sensaciones perceptivas del sonido: la sonoridad y las métricas
 construidas sobre ella.
 
 - [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/): la sonoridad Zwicker de
-  ISO 532-1 en sonios, más las curvas isofónicas de ISO 226:2023.
+  ISO 532-1 en sonios, más las líneas isofónicas de ISO 226:2023.
 - [Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)](/phonometry/es/perception/psychoacoustics/advanced-loudness/):
   los métodos Moore-Glasberg estacionario y variable en el tiempo y la
   sonoridad del Sottek Hearing Model, con la tabla de elección de modelo.
@@ -81,7 +82,7 @@ construidas sobre ella.
   (DIN 45692) y la tonalidad, aspereza e intensidad de fluctuación del
   modelo auditivo de Sottek (ECMA-418-2).
 - [Tonos discretos prominentes (ECMA-418-1)](/phonometry/es/perception/psychoacoustics/tone-prominence/):
-  las razones tono-ruido y de prominencia que deciden si un tono discreto es
+  las relaciones tono-ruido y de prominencia que deciden si un tono discreto es
   prominente.
 - [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/):
   el método de ingeniería para la audibilidad de un tono sobre el umbral de
@@ -117,8 +118,8 @@ El umbral de audición, lo que el ruido le hace y cómo se mide la exposición.
   el desplazamiento permanente del umbral inducido por ruido y su combinación
   con la edad en el HTLAN.
 - [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
-  las estrategias por tareas, por puesto y de jornada completa para LEX,8h
-  con el presupuesto de incertidumbre del Anexo C.
+  las estrategias por tareas, basadas en la función y de jornada completa para LEX,8h
+  con el balance de incertidumbre del Anexo C.
 
 ## Qué no cubre esta sección
 
@@ -126,7 +127,7 @@ El umbral de audición, lo que el ruido le hace y cómo se mide la exposición.
 persona.** Todos los modelos de estas páginas predicen lo que percibiría una
 población, o un oyente normalizado, a partir de una señal calibrada: ninguno
 realiza una sesión audiométrica, ninguno diagnostica una pérdida auditiva, e
-ISO 1999 declina explícitamente definir un hándicap auditivo o un umbral
+ISO 1999 renuncia explícitamente a definir un hándicap auditivo o un umbral
 indemnizable, esa línea es regulación nacional y aquí no se aplica ninguna.
 Todo veredicto de prominencia y de audibilidad es igualmente el criterio
 numérico y nada más: ECMA-418-1 exige además la confirmación auditiva de un
@@ -147,7 +148,7 @@ transporte](/phonometry/es/environment/).
 
 Por último, estos modelos parten de una señal o un espectro **calibrados** en
 pascales, porque todos ellos dependen del nivel. Alimentarlos con muestras
-crudas de una tarjeta de sonido produce una cifra con una referencia
+en bruto de una tarjeta de sonido produce una cifra con una referencia
 arbitraria, que es un fallo distinto de una respuesta equivocada: parece
 plausible.
 
@@ -159,7 +160,7 @@ de modo que la calibración y las ponderaciones que los producen están en
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
 principio a fin en una única página ejecutable. Las derivaciones están en
 [Percepción y audición](/phonometry/es/reference/theory/perception/), desde las
-curvas isofónicas hasta la función de transferencia de modulación.
+líneas isofónicas hasta la función de transferencia de modulación.
 
 Si has llegado aquí desde una búsqueda y quieres la forma del conjunto de la
 biblioteca, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por

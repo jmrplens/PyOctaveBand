@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for anechoic rooms and hemi-anechoic rooms"
     designation: "ISO 3745:2012"
     url: "https://www.iso.org/standard/45362.html"
-    note: "El método de precisión en cámara anecoica de la sección 2: el nivel de potencia de la Cláusula 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
+    note: "El método de precisión en cámara anecoica de la sección 2: el nivel de potencia de el Apartado 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -241,7 +241,7 @@ Devuelve un `SoundPowerResult`: `sound_power_level` ($L_W$ por banda),
 `surface_pressure_level` ($L_p$ tras $K_1$/$K_2$), `mean_pressure_level`,
 `background_correction`/`environmental_correction` ($K_1$/$K_2$),
 `directivity_index` (índice de directividad aparente $DI_i^*$ por posición de
-micrófono **y** banda de frecuencia, forma `(NM, NB)`; ISO 3744 cláusula 8.6),
+micrófono **y** banda de frecuencia, forma `(NM, NB)`; ISO 3744 apartado 8.6),
 `surface_area`, `sound_power_level_a` ($L_{WA}$), `uncertainty`
 (expandida, 95 %) y `grade`. `measurement_positions('hemisphere', radius=…,
 reflecting_planes=…, tones=…, grade=…)` devuelve las coordenadas normativas
@@ -283,7 +283,7 @@ posición y una corrección meteorológica explícita.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_es.svg" alt="Potencia acústica de precisión de ISO 3745 en una cámara anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
 
-**Nivel de potencia acústica (Cláusula 8).** El nivel de potencia acústica por banda es
+**Nivel de potencia acústica (Apartado 8).** El nivel de potencia acústica por banda es
 el nivel de presión promediado en la superficie más el término de superficie y las
 correcciones:
 
@@ -298,7 +298,7 @@ absorción del aire sobre el radio de medición. Las posiciones de micrófono so
 conjuntos normalizados de vectores unitarios de las Tablas D.1 (esfera), E.1
 (semiesfera) y E.2 (semiesfera, banda ancha).
 
-**El radio no es libre** (cláusulas 8.1/8.2). Debe cumplir $r \ge 2 d_0$, con
+**El radio no es libre** (apartados 8.1/8.2). Debe cumplir $r \ge 2 d_0$, con
 $d_0$ la distancia del centro acústico al punto más alejado de la fuente (en
 cámara semianecoica, $r \ge 2 d_0$ o $r \ge 3 h_0$, el que sea mayor, siendo
 $h_0$ la altura del centro acústico sobre el suelo), $r \ge \lambda/4$ a la
@@ -307,7 +307,7 @@ pequeña y poco ruidosa en una banda limitada — con toda la superficie dentro
 de la región cualificada según el Anexo A o el B. Con números: una fuente de
 sobremesa de 0,6 × 0,5 × 0,7 m tiene
 $d_0 = \sqrt{0{,}3^2 + 0{,}25^2 + 0{,}7^2} = 0{,}80$ m, así que $r \ge 1{,}6$ m;
-con una banda más baja de 100 Hz, $\lambda/4 = 0{,}86$ m no manda, y el suelo
+con una banda más baja de 100 Hz, $\lambda/4 = 0{,}86$ m no manda, y el mínimo
 de 1 m tampoco. El `radius=1.0` de los ejemplos de abajo solo vale, por tanto,
 para una fuente de menos de unos 0,5 m de dimensión característica.
 
@@ -354,7 +354,7 @@ print(round(float(k1[0, 0]), 4))      # 1.2563
 mc = emission.meteorological_corrections(23.0, 101.325)
 print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 
-# Incertidumbre expandida (EJEMPLO de la Cláusula 10.5): sigma_R0 = 0.5, sigma_omc = 2.0,
+# Incertidumbre expandida (EJEMPLO de el Apartado 10.5): sigma_R0 = 0.5, sigma_omc = 2.0,
 # k = 2 -> U = 4.1 dB.
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
@@ -362,7 +362,7 @@ print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 La `MeteorologicalCorrection` es un par de escalares (más el $C_3$ por banda
 cuando el coeficiente de atenuación se aporta por banda), no un espectro
 dibujable: las correcciones se pliegan en el `PrecisionSoundPowerResult` como
-sus campos `c1`/`c2`/`c3`, y la ficha `.report()` las imprime en su franja de
+sus campos `c1`/`c2`/`c3`, y la ficha `.report()` las imprime en su tira de
 base de medición.
 
 Sobre varias bandas `sound_power_anechoic` devuelve un `PrecisionSoundPowerResult`
@@ -381,7 +381,7 @@ rng = np.random.default_rng(7)
 levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
 
 # sigma_omc es la desviación típica de funcionamiento y montaje de la
-# Cláusula 10.5; con el valor de EJEMPLO 2.0 dB y el factor de cobertura por
+# Apartado 10.5; con el valor de EJEMPLO 2.0 dB y el factor de cobertura por
 # defecto k = 2, la incertidumbre expandida U = k*sqrt(sigma_R0^2 + sigma_omc^2)
 # son los 4.1 dB que imprime la ficha de abajo. Con su valor por defecto 0
 # informa 1.0 dB.
@@ -462,7 +462,7 @@ de ensayo** (`test_room`), el **cliente**, la **instrumentación**, la
 **temperatura**, la **humedad relativa** y la **presión ambiente**, la **fecha
 del ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área de la superficie de medición $S$ procede del
-propio resultado y se imprime en el recuadro y en la tira de base, junto con las
+propio resultado y se imprime en el recuadro y en la franja de base, junto con las
 correcciones aplicadas (el ruido de fondo $K_1$ y el entorno $K_2$ para el
 método de superficie ISO 3744/3746, o las meteorológicas $C_1$/$C_2$/$C_3$ para
 el método de precisión ISO 3745). Indicar `requirement` añade un veredicto
@@ -472,7 +472,7 @@ que la fuente cumple igual o por debajo del límite). `verbose=True` añade el
 nivel promedio energético $L_p'$ a la tabla, y para el resultado de superficie
 ISO 3744/3746 añade además las columnas de corrección $K_1$/$K_2$ (el resultado
 de precisión ISO 3745 no lleva $K_1$/$K_2$; sus $C_1$/$C_2$/$C_3$ aparecen en la
-tira de base). `language="es"` genera la ficha en español con decimales de coma.
+franja de base). `language="es"` genera la ficha en español con decimales de coma.
 
 ```python
 import numpy as np
@@ -498,7 +498,7 @@ res.report(
         specimen="Grupo hidráulico (de suelo)",
         test_room="Cámara semianecoica sobre suelo reflectante",
         instrumentation="Sonómetro clase 1 (IEC 61672-1), n/s 0042",
-        laboratory="Ejemplo de referencia de phonometry",
+        laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-3744",
         requirement=105.0,
     ),
@@ -507,17 +507,17 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso3744_sound_power_example"
 	title="Informe de ejemplo de determinación de potencia acústica ISO 3744 (PDF)"
-	description="Ficha de una página de determinación de potencia acústica ISO 3744: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo semianecoico y la instrumentación y el clima, la tabla en bandas de octava (63 Hz a 8 kHz) de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 103,7 dB(A) re 1 pW con el LW total = 105,8 dB, la incertidumbre expandida U = 3,0 dB y la superficie de medición S = 100,53 m2, y un veredicto CUMPLE frente al límite declarado de 105 dB(A), cerrada por una tira de base que indica las correcciones aplicadas K1 = 0,5 dB y K2 = 1,0 dB."
+	description="Ficha de una página de determinación de potencia acústica ISO 3744: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo semianecoico y la instrumentación y el clima, la tabla en bandas de octava (63 Hz a 8 kHz) de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 103,7 dB(A) re 1 pW con el LW total = 105,8 dB, la incertidumbre expandida U = 3,0 dB y la superficie de medición S = 100,53 m2, y un veredicto CUMPLE frente al límite declarado de 105 dB(A), cerrada por una franja de base que indica las correcciones aplicadas K1 = 0,5 dB y K2 = 1,0 dB."
 	caption="Ficha de determinación de potencia acústica (SoundPowerResult.report), una medición ISO 3744 en hemisferio de grado de ingeniería con las correcciones K1/K2 y el LWA en recuadro."
 />
 
 El resultado de precisión escribe la misma hoja desde el lado de ISO 3745, con
-las correcciones meteorológicas en su tira de base en lugar del par
+las correcciones meteorológicas en su franja de base en lugar del par
 $K_1$/$K_2$. Es la medición de la sección 2 sobre las 40 posiciones del
 hemisferio, la del espectro representado más arriba:
 
@@ -539,7 +539,7 @@ result.report(
 <ReportPreview
 	name="iso3745_precision_power_example"
 	title="Informe de ejemplo de determinación de potencia acústica de precisión ISO 3745 (PDF)"
-	description="Ficha de una página de potencia acústica de precisión ISO 3745: un encabezado con el cliente, la fuente de ruido y la sala anecoica cualificada con su red de 40 posiciones en hemisferio, la tabla en bandas de octava de 125 Hz a 8 kHz de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW (78,0, 79,0, 82,6, 85,8, 82,6, 78,7 y 78,0 dB), el espectro LW con su máximo en 1 kHz, y el recuadro con el nivel de potencia acústica ponderado A LWA = 89,3 dB(A) re 1 pW junto al LW total = 90,1 dB, la incertidumbre expandida U = 4,1 dB y la superficie de medición S = 6,28 m2, sobre una tira de base que indica las correcciones meteorológicas aplicadas C1 = -0,13 dB, C2 = 0,00 dB y C3 = 0,0 dB."
+	description="Ficha de una página de potencia acústica de precisión ISO 3745: un encabezado con el cliente, la fuente de ruido y la sala anecoica cualificada con su red de 40 posiciones en hemisferio, la tabla en bandas de octava de 125 Hz a 8 kHz de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW (78,0, 79,0, 82,6, 85,8, 82,6, 78,7 y 78,0 dB), el espectro LW con su máximo en 1 kHz, y el recuadro con el nivel de potencia acústica ponderado A LWA = 89,3 dB(A) re 1 pW junto al LW total = 90,1 dB, la incertidumbre expandida U = 4,1 dB y la superficie de medición S = 6,28 m2, sobre una franja de base que indica las correcciones meteorológicas aplicadas C1 = -0,13 dB, C2 = 0,00 dB y C3 = 0,0 dB."
 	caption="Ficha de potencia acústica de precisión (PrecisionSoundPowerResult.report), la determinación anecoica de ISO 3745 con sus correcciones meteorológicas."
 />
 
@@ -554,12 +554,12 @@ las posiciones de micrófono del Anexo B (`measurement_positions`,
 determinación de precisión de ISO 3745 (`sound_power_anechoic`): las mallas
 fijas de los Anexos D/E (`precision_positions`), la corrección de fondo por
 posición (`precision_background_correction`, Ec. 11), las correcciones
-meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida de la
-Cláusula 10.5 (`precision_uncertainty`). Ambos resultados presentan la
+meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida de el
+Apartado 10.5 (`precision_uncertainty`). Ambos resultados presentan la
 ficha de potencia acústica de estilo acreditado mediante `.report()`.
 
 **No cubierto.** Ninguno de los dos métodos ejecuta el ensayo de
-calificación del recinto: la calificación de campo libre de la sala
+cualificación del recinto: la cualificación de campo libre de la sala
 anecoica o semianecoica de ISO 3745 se da por supuesta, no se realiza, y la
 validez de $K_2$ en ISO 3744 solo emite avisos. La corrección meteorológica
 $C_3$ de ISO 3745 necesita un coeficiente de absorción del aire que aporta

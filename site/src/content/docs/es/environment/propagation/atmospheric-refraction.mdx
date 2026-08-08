@@ -23,15 +23,16 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 El [método ISO 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/) y el
-[efecto suelo de onda esférica](/phonometry/es/environment/propagation/ground-barriers/) suponen
+[efecto suelo de onda
+esférica](/phonometry/es/environment/propagation/ground-barriers/) suponen
 ambos una atmósfera **homogénea**. En realidad la velocidad del sonido cambia
 con la altura, porque la temperatura y el viento cambian con la altura, y esto
 **refracta** el sonido: los rayos se curvan y, en unos cientos de metros, el
 nivel recibido puede variar en decenas de decibelios. Esta página cubre
 `phonometry.environment.propagation.refraction`, el homólogo para atmósfera
-refractante de los solvers oceánicos de
+refractante de los métodos numéricos oceánicos de
 [`phonometry.underwater.propagation.numerical`](/phonometry/es/underwater/underwater-solvers/):
-un **modelo de rayos** y un solver de **ecuación parabólica (PE)**.
+un **modelo de rayos** y una **ecuación parabólica (PE)** marchada en distancia.
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
 representativo de la capa superficial de ±0,1 s⁻¹ curva los rayos con un radio
@@ -46,7 +47,7 @@ perfil abre una sombra acústica en la que el nivel se derrumba 20 dB o más
 viento a favor / viento en contra de cualquier fuente exterior estacionaria:
 la misma máquina a la misma distancia, con decenas de decibelios de
 diferencia según el lado en que uno se sitúe. Es también la razón por la que
-la ISO 9613-2 fija por decreto su atmósfera "favorable", y lo que comprime su
+la ISO 9613-2 fija por decreto su atmósfera «favorable», y lo que comprime su
 $C_{met}$ escalar; los modelos de esta página calculan la física que decide
 ambas cosas.
 
@@ -56,7 +57,7 @@ dos oye algo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_es.svg" alt="Escena de refracción atmosférica: una fuente a 2 m del suelo con un receptor a 350 m por cada lado, flechas de viento que crecen con la altura y un recuadro con los perfiles de velocidad efectiva c_eff(z) = c(z) + u(z); a favor del viento los rayos se curvan de vuelta al suelo y el receptor recibe la llegada directa más una rebotada en el suelo, y contra el viento todos los rayos se curvan hacia arriba y se abre una sombra acústica en el suelo a partir de unos 220 m que engulle al receptor situado dentro" width="92%" />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction_es.webp" alt="Dos paneles apilados para una atmósfera con refracción hacia arriba sobre pasto. Arriba: un abanico de rayos sonoros que sale de una fuente a 2 m del suelo se curva hacia arriba, de modo que más allá de un límite de zona de sombra a punteado cerca de 110 m ningún rayo permanece próximo al suelo. Abajo: el campo de nivel relativo GFPE sobre distancia y altura muestra lóbulos de interferencia rojos cerca de la fuente y una sombra acústica azul profunda que se extiende hacia arriba y a la derecha, con su borde siguiendo el mismo límite." width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction_es.webp" alt="Dos paneles apilados para una atmósfera con refracción hacia arriba sobre pradera. Arriba: un abanico de rayos sonoros que sale de una fuente a 2 m del suelo se curva hacia arriba, de modo que más allá de un límite de zona de sombra a punteado cerca de 110 m ningún rayo permanece próximo al suelo. Abajo: el campo de nivel relativo GFPE sobre distancia y altura muestra lóbulos de interferencia rojos cerca de la fuente y una sombra acústica azul profunda que se extiende hacia arriba y a la derecha, con su borde siguiendo el mismo límite." width="88%" loading="eager" />
 
 ## 1. Perfil de velocidad efectiva del sonido
 
@@ -75,7 +76,7 @@ capa superficial:
   Salomons Ec. 4.5), con $b \approx +1\ \text{m/s}$ para una atmósfera típica
   con refracción hacia abajo, $b \approx -1\ \text{m/s}$ para una con
   refracción hacia arriba, y $z_0$ la longitud
-  de rugosidad (unos 0,1 m para pasto).
+  de rugosidad (unos 0,1 m para pradera).
 
 Un gradiente positivo (velocidad del sonido creciente con la altura) curva los
 rayos **hacia abajo**, hacia el receptor (propagación favorable); un gradiente
@@ -99,7 +100,7 @@ perfil.plot()           # c_eff(z) con la altura en el eje vertical
 import matplotlib.pyplot as plt
 from phonometry import log_linear_sound_speed_profile
 
-# Las dos capas superficiales canónicas de la Ec. 4.5 de Salomons sobre pasto.
+# Las dos capas superficiales canónicas de la Ec. 4.5 de Salomons sobre pradera.
 bajada = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
 subida = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
 ax = bajada.plot(color="#1f77b4", language="es")
@@ -208,7 +209,7 @@ from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_pr
 
 perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # hacia arriba
 pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
-                                    flow_resistivity=200e3,  # pasto
+                                    flow_resistivity=200e3,  # pradera
                                     max_range=600.0, max_height=40.0)
 pe.level_at_height(2.0)   # nivel relativo frente a distancia a 2 m
 pe.plot()                 # el campo de nivel relativo distancia-altura (necesita matplotlib)
@@ -218,7 +219,7 @@ Basta cortar el campo a la altura del receptor para que toda la historia de
 esta página quepa en una figura: con todo lo demás idéntico, solo el signo del
 gradiente mueve el nivel de 400 Hz a 600 m en más de 30 dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range_es.svg" alt="Nivel sonoro relativo GFPE frente a la distancia a un receptor a 2 m de altura sobre pasto a 400 Hz para tres atmósferas. La curva con refracción hacia abajo se recupera del valle del efecto suelo y vuelve hacia 0 dB respecto al campo libre, la curva homogénea a trazos decae suavemente hasta unos -27 dB a 600 m, y la curva con refracción hacia arriba se hunde por debajo de -40 dB más allá del límite punteado de la zona de sombra en forma cerrada cerca de 110 m" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range_es.svg" alt="Nivel sonoro relativo GFPE frente a la distancia a un receptor a 2 m de altura sobre pradera a 400 Hz para tres atmósferas. La curva con refracción hacia abajo se recupera del valle del efecto suelo y vuelve hacia 0 dB respecto al campo libre, la curva homogénea a trazos decae suavemente hasta unos -27 dB a 600 m, y la curva con refracción hacia arriba se hunde por debajo de -40 dB más allá del límite punteado de la zona de sombra en forma cerrada cerca de 110 m" width="88%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -350,12 +351,12 @@ silencio más allá de la frontera de sombra del modelo de rayos.
 
 Los modelos están anclados por oráculos independientes, fijados numéricamente en
 el [informe de conformidad](/phonometry/es/reference/conformance/) (sección
-"Atmospheric refraction"):
+«Atmospheric refraction»):
 
 - **Límite homogéneo → efecto suelo esférico.** Con gradiente nulo el campo
   GFPE reproduce el [`ground_effect`](/phonometry/es/environment/propagation/ground-barriers/)
   exacto de Weyl-Van der Pol a cualquier distancia, con unas décimas de dB
-  sobre pasto en la malla por defecto, y el refuerzo coherente de **+6 dB** de
+  sobre pradera en la malla por defecto, y el refuerzo coherente de **+6 dB** de
   los dos rayos sobre un suelo rígido.
 - **Geometría de rayos exacta.** Para un perfil lineal el rayo trazado es un
   arco de círculo cuyo radio ajustado coincide con `ray_curvature_radius` con
@@ -383,8 +384,8 @@ sombra.
 del sonido que varía solo con la altura, no con la distancia: una atmósfera
 horizontalmente no homogénea (un gradiente que cambia a lo largo de la
 trayectoria) queda fuera de esta formulación independiente de la distancia,
-descrita en el módulo como la contrapartida de los "solvers oceánicos
-independientes del alcance" a los que refleja. Ambos asumen además un suelo
+descrita en el módulo como la contrapartida de los «métodos oceánicos
+independientes del alcance» a los que refleja. Ambos suponen además un suelo
 plano en $z = 0$; ninguno admite un perfil de elevación del terreno.
 
 ## Véase también

@@ -1,6 +1,6 @@
 ---
 title: "Exposición al ruido en el trabajo (ISO 9612)"
-description: "Las estrategias de medición basada en tareas, basada en la función y de jornada completa de la ISO 9612 para el nivel de exposición diario LEX,8h, con el presupuesto de incertidumbre del anexo C y el límite superior unilateral al 95 %."
+description: "Las estrategias de medición basada en tareas, basada en la función y de jornada completa de la ISO 9612 para el nivel de exposición diario LEX,8h, con el balance de incertidumbre del anexo C y el límite superior unilateral al 95 %."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -8,7 +8,7 @@ references:
     title: "Acoustics — Determination of occupational noise exposure — Engineering method"
     designation: "ISO 9612:2009"
     url: "https://www.iso.org/standard/41718.html"
-    note: "El método implementado: las estrategias basadas en tareas (apartado 9), basadas en la función (apartado 10) y de jornada completa (apartado 11), la colocación del micrófono del apartado 12.3, el presupuesto de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12, Tablas C.4/C.5) y el factor de cobertura unilateral k = 1,65 (apartado 14), validado frente a los ejemplos resueltos de los anexos D, E y F; el informe de medición del apartado 15 lo escribe ExposureResult.report()."
+    note: "El método implementado: las estrategias basadas en tareas (apartado 9), basadas en la función (apartado 10) y de jornada completa (apartado 11), la colocación del micrófono del apartado 12.3, el balance de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12, Tablas C.4/C.5) y el factor de cobertura unilateral k = 1,65 (apartado 14), validado frente a los ejemplos resueltos de los anexos D, E y F; el informe de medición del apartado 15 lo escribe ExposureResult.report()."
   - type: report
     organization: "European Parliament and Council"
     year: 2003
@@ -38,14 +38,14 @@ higienista pueda defender. `lex_8h` (en
 diario. La ISO 9612:2009, el método de ingeniería (clase de exactitud 2), es el
 diseño de la medición *en torno* a esa primitiva: cómo muestrear una jornada
 laboral real, cómo combinar las partes y cómo adjuntar la incertidumbre
-normativa que necesita todo informe de higiene laboral. El módulo
+normativa que necesita todo informe de higiene industrial. El módulo
 `occupational_exposure` añade las tres **estrategias de medición** y el
-presupuesto de incertidumbre del **anexo C** sobre la maquinaria del promediado
+balance de incertidumbre del **anexo C** sobre la maquinaria del promediado
 en energía.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dosimeter_iso9612_es.svg"
-  alt="Izquierda: un trabajador con un exposímetro sonoro personal (IEC 61252), con el micrófono montado unos 0,04 m por encima del hombro y a al menos 0,1 m de la entrada del canal auditivo del oído más expuesto, según el apartado 12.3 de la ISO 9612. Derecha: las tres estrategias de medición dibujadas como líneas de tiempo sobre una jornada de ocho horas: basada en tareas (la jornada dividida en tareas etiquetadas, al menos tres muestras y una duración por tarea), basada en la función (cinco o más muestras aleatorias repartidas sobre el grupo de exposición homogéneo) y jornada completa (todo el turno medido al menos tres veces), que desembocan todas en el LEX,8h y su incertidumbre del anexo C, eligiendo por patrón de trabajo según la Tabla B.1"
+  alt="Izquierda: un trabajador con un exposímetro sonoro personal (IEC 61252), con el micrófono montado unos 0,04 m por encima del hombro y a al menos 0,1 m de la entrada del conducto auditivo del oído más expuesto, según el apartado 12.3 de la ISO 9612. Derecha: las tres estrategias de medición dibujadas como líneas de tiempo sobre una jornada de ocho horas: basada en tareas (la jornada dividida en tareas etiquetadas, al menos tres muestras y una duración por tarea), basada en la función (cinco o más muestras aleatorias repartidas sobre el grupo de exposición homogéneo) y jornada completa (todo el turno medido al menos tres veces), que desembocan todas en el LEX,8h y su incertidumbre del anexo C, eligiendo por patrón de trabajo según la Tabla B.1"
   width="94%"
   loading="eager"
 />
@@ -173,7 +173,7 @@ plt.show()
 
 </details>
 
-## 2. El presupuesto de incertidumbre del anexo C
+## 2. El balance de incertidumbre del anexo C
 
 Conviene detallar dos sutilezas. Primero, el factor de cobertura es $k = 1{,}65$
 para un intervalo **unilateral** al 95 % (apartado 14), porque al higienista solo
@@ -187,9 +187,9 @@ que la incertidumbre de muestreo por función/jornada completa $u_1$ (Ec. C.12) 
 la desviación típica muestral simple con denominador $N-1$, cuya contribución
 $c_1 u_1$ se lee luego de la **Tabla C.4** en función de $(N, u_1)$. La misma
 dispersión bruta infla, por tanto, más la estimación por función, que es la
-penalización que el estándar impone a un muestreo más grueso y con menos
+penalización que la norma impone a un muestreo más grueso y con menos
 muestras. (El $L_{EX,8h}$ por función impreso es $88{,}2$ dB donde el anexo E
-declara $88{,}1$: el estándar redondea el nivel de jornada efectiva a $88{,}4$ antes
+declara $88{,}1$: la norma redondea el nivel de jornada efectiva a $88{,}4$ antes
 de la normalización de la duración; la biblioteca lo mantiene sin redondear.)
 
 **Qué domina el presupuesto.** El anexo C combina cuatro fuentes en cuadratura
@@ -256,7 +256,7 @@ trabajo, y la instrumentación y la trazabilidad de calibración del
 apartado 15 c), el análisis del trabajo (la tabla por tareas con duraciones,
 niveles $L_{p,A,eqT,m}$ y contribuciones $L_{EX,8h,m}$ para un resultado por
 tareas (con su gráfica de contribuciones), o el resumen del muestreo con el
-presupuesto de la fórmula C.9 para los resultados por puesto o de jornada
+presupuesto de la fórmula C.9 para los resultados por función o de jornada
 completa) y el $L_{EX,8h}$ en caja con $U$, $k$ y el límite superior
 unilateral al 95 %.
 
@@ -290,14 +290,14 @@ res.report(
         instrumentation="Dosímetro personal (IEC 61252), n/s 0042",
         calibration="Calibrador IEC 60942 clase 1; verificaciones de campo dentro de 0,3 dB",
         test_date="2026-07-20",
-        laboratory="Ejemplo de referencia de phonometry",
+        laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-9612",
     ),
 )   # LEX,8h = 84,3 dB, U = 3,2 dB -> valor inferior de acción superado, límite CUMPLE
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
-el repositorio; pulsa en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso9612_exposure_example"

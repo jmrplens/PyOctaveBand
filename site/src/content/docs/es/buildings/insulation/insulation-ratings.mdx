@@ -15,14 +15,14 @@ references:
     title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
     designation: "ISO 717-1:2020"
     url: "https://www.iso.org/standard/77435.html"
-    note: "La calificación por curva de referencia y los términos de adaptación espectral C y Ctr interpretados arriba; también el motor de un solo número para la magnitud de fachada (Anexo F)."
+    note: "La valoración por curva de referencia y los términos de adaptación espectral C y Ctr interpretados arriba; también el motor de un solo número para la magnitud de fachada (Anexo F)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
     title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
     designation: "ISO 717-2:2020"
     url: "https://www.iso.org/standard/69867.html"
-    note: "La calificación de impactos por curva de referencia y el término de adaptación espectral CI, con el término de rango ampliado CI,50-2500."
+    note: "La valoración de impactos por curva de referencia y el término de adaptación espectral CI, con el término de rango ampliado CI,50-2500."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -55,7 +55,7 @@ Pasa los 16 valores en tercios de octava de 100 Hz a 3150 Hz a
 devuelve el índice leído a 500 Hz, junto con los términos de adaptación
 espectral $C$ y $C_{tr}$. Para el espectro medido que se usa abajo,
 `w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w\ (C\ ;\ C_{tr}) = 30\ (-2\ ;\ -3)$. La
-misma llamada califica $R'$, $D_n$ y $D_{nT}$.
+misma llamada valora $R'$, $D_n$ y $D_{nT}$.
 
 ## Índices de ruido aéreo (ISO 717-1)
 
@@ -69,7 +69,7 @@ referencia desplazada leída a 500 Hz. Los **términos de adaptación
 espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico urbano) añaden la
 penalización en baja frecuencia de una fuente real.
 
-Los dos términos recalifican la misma curva medida frente a los dos espectros
+Los dos términos vuelven a valorar la misma curva medida frente a los dos espectros
 de fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A,
 representativo de las actividades domésticas (habla, música, radio,
 televisión), y $C_{tr}$ frente a tráfico rodado urbano ponderado A, cuya
@@ -86,9 +86,9 @@ fuente. Para leerlos:
   ligera con su resonancia masa-aire-masa cerca de 100 Hz puede llevar un
   $C_{tr}$ de −5 a −10 dB, mientras que una pared monolítica pesada con el
   mismo $R_w$ pierde mucho menos: dos construcciones con la misma
-  calificación pueden diferir de forma audible frente al tráfico.
+  valoración pueden diferir de forma audible frente al tráfico.
 * Diseña con el descriptor que corresponda al ruido, sobre la magnitud de
-  campo que el requisito califica: $R'_w + C_{tr}$ para una fachada a una
+  campo que el requisito valora: $R'_w + C_{tr}$ para una fachada a una
   calle con tráfico, $D_{nT,w} + C$ (o el índice a secas, donde la
   reglamentación lo diga) entre viviendas, los dos requisitos de ejemplo de
   ISO 717-1, 5.3.
@@ -181,7 +181,7 @@ l_nt = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
 res_imp = building.weighted_impact_rating(l_nt)
 print(res_imp.rating, res_imp.ci, res_imp.unfavourable_sum)   # 79 -11 28.0  ->  L'nT,w(CI)=79(-11)
 
-# Los datos en banda de octava llevan la reducción extra de -5 dB (Cláusula 4.3.2)
+# Los datos en banda de octava llevan la reducción extra de -5 dB (Apartado 4.3.2)
 octave = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
 print(building.weighted_impact_rating(octave).rating)  # 54
 
@@ -323,10 +323,10 @@ plt.show()
 
 ## Informe de ISO 717 (`.report()`)
 
-Ambos resultados de calificación generan en PDF una ficha de una sola página con
+Ambos resultados de valoración generan en PDF una ficha de una sola página con
 el formato de un informe de ensayo de laboratorio acreditado mediante el método
-`report(path)`: la línea de norma base (norma de medición más la parte de
-calificación de ISO 717), un bloque de encabezado de metadatos opcional, la
+`report(path)`: la línea de base normativa (norma de medición más la parte de
+valoración de ISO 717), un bloque de encabezado de metadatos opcional, la
 tabla de tercios de octava junto a la gráfica de la curva medida frente a la
 referencia desplazada (el propio `.plot()` del resultado), el número único en
 un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
@@ -334,14 +334,14 @@ un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 ($R_w\ (C\ ;\ C_{tr})$, desviaciones donde la referencia supera a la medida);
 `ImpactRatingResult.report()` etiqueta la ficha de impactos de ISO 717-2
 ($L_{n,w}(C_I)$, con el signo contrario). `SoundReductionResult.report()` es
-una utilidad que califica el $R(f)$ predicho y escribe su ficha en una sola
+una utilidad que valora el $R(f)$ predicho y escribe su ficha en una sola
 llamada.
 
 Los metadatos del informe se pasan como una dataclase congelada `ReportMetadata`
 (todos los campos opcionales; solo se representan los suministrados y los campos
 numéricos deben ser finitos y positivos). Pasar `metadata=None` genera una ficha
 de predicción ligera (solo el cuerpo, el resultado y el descargo). Cuando se
-define `metadata.requirement` se añade una fila de veredicto: una calificación
+define `metadata.requirement` se añade una fila de veredicto: una valoración
 aérea aprueba cuando iguala o supera el requisito y una de impactos cuando lo
 iguala o queda por debajo (un nivel de impactos menor es mejor). Con
 `verbose=True` la tabla de dos columnas `f | valor` se cambia por las columnas
@@ -361,7 +361,7 @@ separador decimal), p. ej.
 ```python
 from phonometry import building, ReportMetadata
 
-# Calificación aérea a partir de un espectro R de 16 bandas (ISO 717-1)
+# Valoración aérea a partir de un espectro R de 16 bandas (ISO 717-1)
 R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
      28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
 metadata = ReportMetadata(
@@ -373,7 +373,7 @@ metadata = ReportMetadata(
     test_room="Sala de transmisión T1",
     measurement_standard="ISO 10140-2",
     test_date="2026-07-18",
-    laboratory="Laboratorio de Referencia phonometry",
+    laboratory="Laboratorio de referencia Phonometry",
     operator="José Manuel Requena Plens",
     report_id="PHN-2026-0042",
     requirement=42.0,          # añade la fila de veredicto CUMPLE/NO CUMPLE
@@ -382,7 +382,7 @@ building.weighted_rating(R).report(
     "Rw_ficha.pdf", metadata=metadata
 )                                                           # Rw (C; Ctr)
 
-# Calificación de impactos a partir de un espectro L'nT de 16 bandas (ISO 717-2)
+# Valoración de impactos a partir de un espectro L'nT de 16 bandas (ISO 717-2)
 l_nt = [45.0, 47.0, 48.0, 49.0, 51.0, 52.0, 53.0, 54.0,
         55.0, 56.0, 57.0, 58.0, 55.0, 52.0, 49.0, 46.0]
 building.weighted_impact_rating(l_nt).report("Lnw_ficha.pdf")  # Ln,w (CI)
@@ -394,7 +394,7 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 <ReportPreview
 	name="iso717_airborne_example"
 	title="Informe de ejemplo aéreo ISO 717-1 (PDF)"
-	description="Ficha de aislamiento a ruido aéreo de una página: una cabecera de metadatos (cliente, muestra, superficie de la probeta, volúmenes de las salas, temperatura y humedad por sala, presión ambiente y montaje), la tabla de R en tercios de octava junto a la curva medida frente a la referencia desplazada, el resultado de un solo número Rw (C; Ctr) en caja y una fila de veredicto CUMPLE frente al requisito de 30 dB."
+	description="Ficha de aislamiento a ruido aéreo de una página: una cabecera de metadatos (cliente, muestra, superficie del elemento de ensayo, volúmenes de las salas, temperatura y humedad por sala, presión ambiente y montaje), la tabla de R en tercios de octava junto a la curva medida frente a la referencia desplazada, el resultado de un solo número Rw (C; Ctr) en caja y una fila de veredicto CUMPLE frente al requisito de 30 dB."
 	caption="Ficha de índice aéreo (WeightedRatingResult.report), Rw (C; Ctr)."
 />
 
@@ -415,7 +415,7 @@ rango físico.
 | Campo | Tipo | Se renderiza como |
 | --- | --- | --- |
 | `specimen`, `client`, `mounted_by`, `manufacturer` | `str` | Identidad de cabecera del elemento ensayado y para quién / quién lo montó |
-| `area`, `mass_per_area` | `float > 0` | Superficie de la probeta $S$ (m²) y masa por unidad de superficie medida (kg/m²) |
+| `area`, `mass_per_area` | `float > 0` | Superficie del elemento de ensayo $S$ (m²) y masa por unidad de superficie medida (kg/m²) |
 | `source_volume`, `receiving_volume` | `float > 0` | Volúmenes de las salas (m³) |
 | `temperature`, `relative_humidity`, `pressure` | `float` | Clima representativo único: temperatura del aire (°C, cualquier signo), humedad relativa (0–100 %), presión ambiente (kPa, > 0) |
 | `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Clima por recinto cuando el recinto emisor y el receptor se informan por separado (mismos rangos que arriba) |
@@ -474,7 +474,7 @@ motores desde sus propias guías en lugar de duplicarlos.
 
 ### ¿Cuál es la diferencia entre los términos de adaptación espectral C y Ctr?
 
-Ambos recalifican la misma curva medida frente a los dos espectros de
+Ambos vuelven a valorar la misma curva medida frente a los dos espectros de
 fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A
 (actividades domésticas: habla, música, radio, televisión) y $C_{tr}$
 frente a tráfico rodado urbano ponderado A, cuya energía se concentra en

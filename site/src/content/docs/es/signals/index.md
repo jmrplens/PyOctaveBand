@@ -1,11 +1,11 @@
 ---
 title: "Análisis de señal"
-description: "El núcleo de medición de phonometry: bancos de filtros de octava fraccional, ponderación frecuencial y temporal, niveles integrados y estadísticos, análisis espectral y de correlación calibrado, calibración física e incertidumbre de medida, y cómo esas piezas se encadenan en un sonómetro en código."
+description: "El núcleo de medición de phonometry: bancos de filtros de fracción de octava, ponderación frecuencial y temporal, niveles integrados y estadísticos, análisis espectral y de correlación calibrado, calibración física e incertidumbre de medida, y cómo esas piezas se encadenan en un sonómetro en código."
 ---
 
 Todo en phonometry empieza aquí. Esta sección cubre la cadena que convierte
 una señal digital en bruto en números acústicos conformes con las normas:
-dividirla en **bandas de octava fraccional** (ANSI S1.11 / IEC 61260-1),
+dividirla en **bandas de fracción de octava** (ANSI S1.11 / IEC 61260-1),
 moldearla con las **ponderaciones frecuenciales** de IEC 61672-1, suavizarla
 con las **balísticas temporales Fast/Slow/Impulse** e integrarla en **Leq y
 niveles estadísticos**. Es, en la práctica, un sonómetro descompuesto en
@@ -33,7 +33,7 @@ varios canales en paralelo son `(canales, muestras)`. La frecuencia de
 muestreo viaja siempre como argumento `fs` explícito: no se lee nada de la
 cabecera de un archivo, porque la biblioteca nunca abre el archivo. Y se
 espera que el array contenga **pascales**, que es la razón de que una función
-de nivel aplicada a muestras crudas de tarjeta de sonido devuelva un número
+de nivel aplicada a muestras en bruto de tarjeta de sonido devuelva un número
 con una referencia arbitraria, y de que toda función de nivel acepte también
 un `calibration_factor` en pascales por unidad digital o la salida de
 emergencia `dbfs=True`. Las métricas simples vuelven como floats y arrays; las
@@ -65,11 +65,11 @@ pascales.
 
 ## [Filtrado en octavas](/phonometry/es/signals/filters/)
 
-La descomposición en bandas de octava fraccional y las dos maneras de
+La descomposición en bandas de fracción de octava y las dos maneras de
 escalarla: bloques en streaming y arrays multicanal.
 
 - [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): la matemática de
-  las bandas de octava fraccional, los parámetros del banco, el ecualizador
+  las bandas de fracción de octava, los parámetros del banco, el ecualizador
   paramétrico, la descomposición en bandas y el filtrado de fase cero fuera
   de línea.
 - [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/):
@@ -86,7 +86,7 @@ escalarla: bloques en streaming y arrays multicanal.
 
 ## [Niveles y ponderación](/phonometry/es/signals/levels/)
 
-De la señal ponderada al nivel reportado: las ponderaciones frecuenciales,
+De la señal ponderada al nivel declarado: las ponderaciones frecuenciales,
 las balísticas temporales y los niveles integrados, estadísticos y de
 valoración.
 
@@ -102,8 +102,8 @@ valoración.
   LAeq, niveles percentiles L10/L50/L90, LCpeak y SEL, dosis de ruido
   (IEC 61252), y espectrogramas de octava.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
-  Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
-  corrección de ruido residual y el presupuesto de incertidumbre.
+  Lden, Ldn y los niveles de evaluación compuestos, el ajuste tonal, la
+  corrección de ruido residual y el balance de incertidumbre.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
   de evaluación y las fases de ruido, y las tablas de valores límite.
@@ -120,21 +120,21 @@ calibrada y acompañada de su calidad estadística.
   octava y generadores de ruido de colores con pendiente exacta.
 - [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/): las
   funciones de coherencia de entradas múltiples para varias fuentes
-  correladas y una salida, con el condicionamiento que distingue una causa
-  real de una fuente que solo correla con ella, y los espectros de salida
+  correlacionadas y una salida, con el condicionamiento que distingue una causa
+  real de una fuente que solo se correlaciona con ella, y los espectros de salida
   coherente parciales que indican qué fuente domina cada banda.
 - [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): el
   espectrograma STFT calibrado en unidades absolutas (dB SPL para pascales)
   y la FFT con zoom que resuelve tonos más próximos que un bin práctico de
   FFT.
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
-  el cepstro de potencia, real y complejo con análisis de quefrencia,
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+  el cepstrum de potencia, real y complejo con análisis de quefrencia,
   detección de ecos con el coeficiente de reflexión leído en el pico
   cepstral, liftering paso bajo/paso alto de un espectro logarítmico, y el
   espectro de la envolvente que convierte las modulaciones de amplitud en
   líneas discretas.
 - [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):
-  extracción de una forma de onda periódica de período conocido por promediado
+  extracción de una forma de onda periódica de periodo conocido por promediado
   en el dominio del tiempo, el filtro peine que lo describe en el dominio de la
   frecuencia, la ley de reducción de ruido en raíz cuadrada, y la elección del
   número de promedios que sitúa un nodo del peine sobre un orden interferente
@@ -153,7 +153,7 @@ calibrada y acompañada de su calidad estadística.
   submuestral y alineación de respuestas al impulso, y la envolvente de
   Hilbert.
 - [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
-  salvas de tono IEC 60268-1 con conmutación exacta, remuestreo con
+  ráfagas de tono IEC 60268-1 con conmutación exacta, remuestreo con
   especificación antialias declarada y retardo fraccionario de banda limitada.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/):
   pares complementarios de Golay, barridos con un espectro de magnitud
@@ -170,7 +170,7 @@ Qué significan los números y cuánto fiarse de ellos.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo de
   ISO/IEC Guide 98-3, con incertidumbre expandida e intervalos de cobertura.
-- [Calificación de datos](/phonometry/es/signals/metrology/data-qualification/): los tests
+- [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/): los tests
   de estacionariedad por inversiones de orden y por rachas sobre estadísticas
   de segmento, y las estadísticas de Rice de cruces por nivel y de picos con el
   factor de irregularidad.
@@ -189,9 +189,9 @@ veredicto de clase de aquí describe el algoritmo y no un aparato construido.
 ni ningún otro contenedor: toda función toma un array que ya has leído, que es
 la razón de que `fs` sea siempre un argumento. **Aquí no hay procesado de
 arrays.** La correlación y el retardo modelan un único camino común entre
-exactamente dos sensores e informan solo del mayor pico; no hay un solucionador
-TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
-rasgos perceptuales.** El cepstro de aquí es el de frecuencia lineal, sin
+exactamente dos sensores e informan solo del mayor pico; no hay ninguna resolución
+de TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
+rasgos perceptuales.** El cepstrum de aquí es el de frecuencia lineal, sin
 escala mel ni variante MFCC, y la sonoridad como sensación pertenece a
 [Psicoacústica](/phonometry/es/perception/psychoacoustics/), no a las métricas
 energéticas de esta sección.

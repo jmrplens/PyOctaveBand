@@ -121,7 +121,7 @@ res.plot()   # R(f) previsto con la frecuencia crítica marcada (requiere matplo
 ```
 
 El espectro predicho entra directamente en el índice ISO 717-1 mediante
-`res.rating()`, y en EN 12354 como el $R$ de elemento "predicho" allí donde la
+`res.rating()`, y en EN 12354 como el $R$ de elemento «predicho» allí donde la
 norma exigiría una medida de laboratorio.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con el valle de coincidencia hacia 2100 Hz marcado, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
@@ -179,7 +179,7 @@ El clip de abajo mira la coincidencia mientras ocurre en un
 [campo FDTD elástico 2D](/phonometry/es/simulation/elastic-waves/): una placa de
 acero de 10 mm inmersa en aire, excitada por una onda plana sostenida a 45
 grados, con las dos frecuencias elegidas con la
-`coincidence_frequency` de la librería. A `fc/2` = 603 Hz la transmisión
+`coincidence_frequency` de la biblioteca. A `fc/2` = 603 Hz la transmisión
 medida cae sobre la ley de masas oblicua; a `2 fc` = 2413 Hz la traza a 45
 grados iguala exactamente la longitud de onda de flexión y la placa en
 coincidencia reirradia un haz a 45 grados que crece a lo largo de la placa,
@@ -201,7 +201,7 @@ siendo comparables, y los niveles anotados son los medidos, los físicos.
   width={2400}
   height={1350}
   title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
-  description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medidos y de la ley de masas anotados."
+  description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la biblioteca y los niveles medidos y de la ley de masas anotados."
 />
 
 ### Estimaciones rápidas: el método de la meseta (Norton 3.9.1)
@@ -881,7 +881,7 @@ funciones de rendija y orificio devuelven un `ApertureTransmissionResult`
 `radiation_index`, `.plot()`). Las predicciones arrastran las salvedades de sus
 fuentes (el método de Sharp por encima de $1{,}5\times$ la primera resonancia del
 panel; la rendija sin viscosidad de Gomperts válida para $w < 0{,}3\lambda$;
-"método n.º 1" de Leppington).
+«método n.º 1» de Leppington).
 
 ## Qué cubre esta guía
 
@@ -922,7 +922,7 @@ debajo de aproximadamente $1{,}5\times$ la primera resonancia del panel,
 donde manda el propio comportamiento modal de baja frecuencia del panel,
 no la ley de masas; el modelo de rendija de Gomperts solo es válido para
 una rendija estrecha, $w < 0{,}3\lambda$, así que una abertura ancha queda
-fuera de él; y solo está implementado el "método n.º 1" de Leppington
+fuera de él; y solo está implementado el «método n.º 1» de Leppington
 para la eficiencia de radiación, no sus otras formulaciones publicadas.
 Los modelos ortótropos son modelos de panel infinito en las mismas
 condiciones: por debajo de unos $0{,}7f_{c1}$ la rama de Heckl infravalora $R$
@@ -950,5 +950,5 @@ exigiría toda la cadena sala-placa-cámara-placa-sala.
   la contraparte medida de las movilidades puntuales teóricas.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/): los
   modelos de relleno de cámara que consume una pared doble.
-- Referencia de API: [`building.prediction.panel_transmission`](/phonometry/es/reference/api/building/panel-transmission/), [`building.prediction.masonry_cavity_wall`](/phonometry/es/reference/api/building/masonry-cavity-wall/), [`building.prediction.aperture_transmission`](/phonometry/es/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](/phonometry/es/reference/api/vibration/radiation-efficiency/) y [`vibration.structural.point_mobility`](/phonometry/es/reference/api/vibration/point-mobility/).
+- Referencia de la API: [`building.prediction.panel_transmission`](/phonometry/es/reference/api/building/panel-transmission/), [`building.prediction.masonry_cavity_wall`](/phonometry/es/reference/api/building/masonry-cavity-wall/), [`building.prediction.aperture_transmission`](/phonometry/es/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](/phonometry/es/reference/api/vibration/radiation-efficiency/) y [`vibration.structural.point_mobility`](/phonometry/es/reference/api/vibration/point-mobility/).
 - Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la ley de masas, el valle de coincidencia y el coeficiente de transmisión que devuelven los modelos de panel.

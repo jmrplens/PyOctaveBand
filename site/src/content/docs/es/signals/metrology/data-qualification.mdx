@@ -1,15 +1,15 @@
 ---
-title: "Calificación de datos: estacionariedad y picos"
-description: "Califica un registro aleatorio antes de analizarlo: los tests de inversiones de orden y de rachas de Bendat y Piersol para la estacionariedad sobre medias cuadráticas por segmento con las regiones de aceptación de la Tabla A.6, y las estadísticas de Rice de cruces por nivel, frecuencia aparente, tasas de picos y el factor de irregularidad que fija la distribución de alturas de pico entre Rayleigh y gaussiana."
+title: "Cualificación de datos: estacionariedad y picos"
+description: "Cualifica un registro aleatorio antes de analizarlo: los tests de inversiones de orden y de rachas de Bendat y Piersol para la estacionariedad sobre medias cuadráticas por segmento con las regiones de aceptación de la Tabla A.6, y las estadísticas de Rice de cruces por nivel, frecuencia aparente, tasas de picos y el factor de irregularidad que fija la distribución de alturas de pico entre Rayleigh y gaussiana."
 references:
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
     title: "Random data: Analysis and measurement procedures"
-    edition: "4th ed."
+    edition: "4.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
-    note: "Sección 4.5.2 con la Tabla A.6 (el test no paramétrico de tendencia por inversiones de orden, su media y varianza, los puntos porcentuales tabulados y el Ejemplo 4.4), Sección 10.3 (calificación de datos: clasificación, validación, edición; el procedimiento de estacionariedad por medias cuadráticas de segmento de 10.3.1.1 y el Ejemplo 10.3) y Sección 5.5 (cruces por nivel y valores de pico: Ecs. (5.195)-(5.196), (5.206), (5.211), (5.217)-(5.223) y Ejemplos 5.12-5.15). ISBN 978-0-470-24877-5. El test de rachas complementario aparecía en los puntos porcentuales de la distribución de rachas de la tercera edición."
+    note: "Sección 4.5.2 con la Tabla A.6 (el test no paramétrico de tendencia por inversiones de orden, su media y varianza, los puntos porcentuales tabulados y el Ejemplo 4.4), Sección 10.3 (cualificación de datos: clasificación, validación, edición; el procedimiento de estacionariedad por medias cuadráticas de segmento de 10.3.1.1 y el Ejemplo 10.3) y Sección 5.5 (cruces por nivel y valores de pico: Ecs. (5.195)-(5.196), (5.206), (5.211), (5.217)-(5.223) y Ejemplos 5.12-5.15). ISBN 978-0-470-24877-5. El test de rachas complementario aparecía en los puntos porcentuales de la distribución de rachas de la tercera edición."
   - type: article
     authors: ["Wald, A.", "Wolfowitz, J."]
     year: 1940
@@ -38,24 +38,24 @@ Todo promedio de esta documentación - una [PSD](/phonometry/es/signals/spectra/
 [Leq](/phonometry/es/signals/levels/levels/), un
 [balance GUM](/phonometry/es/signals/metrology/gum-uncertainty/) - supone que el registro es
 **estacionario**: que el proceso que lo genera no derivó mientras se medía.
-Bendat y Piersol dedican la Sección 10.3 de *Random Data* a calificar los
+Bendat y Piersol dedican la Sección 10.3 de *Random Data* a cualificar los
 registros antes del análisis, y `phonometry.metrology` implementa su núcleo
 cuantitativo: **tests de tendencia y de estacionariedad** libres de
 distribución con las regiones de aceptación del propio libro, y las
 **estadísticas de Rice** - cruces por nivel, frecuencia aparente, tasas y
-alturas de pico - que resumen el aspecto de un registro gaussiano calificado
+alturas de pico - que resumen el aspecto de un registro gaussiano cualificado
 y delatan al que no lo es.
 
-La calificación es una decisión, no un estadístico, así que se lee mejor
+La cualificación es una decisión, no un estadístico, así que se lee mejor
 como un flujo: segmentar el registro, contar inversiones, y dejar que la
 región de la Tabla A.6 diga si se puede promediar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_es.svg" alt="Diagrama de flujo de decisión de la calificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_es.svg" alt="Diagrama de flujo de decisión de la cualificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
 
 ## 1. El test de inversiones de orden
 
 Dada una secuencia de $N$ observaciones $x_1, \dots, x_N$ - estimaciones de
-parámetros, niveles por segmento, lo que sea - cuéntense los pares $i < j$
+parámetros, niveles por segmento, lo que sea - cuenta los pares $i < j$
 con $x_i > x_j$. Cada par es una **inversión de orden** (*reverse
 arrangement*), y para observaciones independientes de una misma variable
 aleatoria su total $A$ tiene (B&P Ecs. (4.54)-(4.55))
@@ -70,7 +70,7 @@ monótona empuja $A$ a un extremo (0 si la secuencia sube, $N(N-1)/2$ si
 baja), así que la hipótesis de *ausencia de tendencia* se acepta al nivel de
 significación $\alpha$ cuando $A$ cae dentro de una región bilateral - la
 Tabla A.6 de B&P, cuyas filas de $\alpha = 0{,}05$ reproduce exactamente
-`trend_test` y fija la suite de conformidad. El Ejemplo 4.4 del libro
+`trend_test` y fija la batería de conformidad. El Ejemplo 4.4 del libro
 (veinte observaciones, $A = 86$, aceptado entre 64 y 125) corre tal cual:
 
 ```python
@@ -116,7 +116,7 @@ plt.show()
 
 </details>
 
-El p-valor sale de la distribución nula exacta de $A$ (los conteos de
+El valor p sale de la distribución nula exacta de $A$ (los conteos de
 inversiones de una permutación aleatoria), calculada hasta $N = 100$ - el
 alcance de la Tabla A.6 - y de la aproximación normal del libro más allá;
 el veredicto sigue la región tabulada del libro. `.plot()` dibuja la
@@ -127,9 +127,9 @@ además la mediana de la secuencia que clasifica cada valor).
 ## 2. Estacionariedad de un registro
 
 El procedimiento de la Sec. 10.3.1.1 de B&P convierte el test de tendencia
-en un test de estacionariedad para una única historia temporal: divídase el
+en un test de estacionariedad para una única historia temporal: divide el
 registro en $N$ intervalos iguales lo bastante largos para ser
-independientes, calcúlese una **media cuadrática por intervalo** y pruébese
+independientes, calcula una **media cuadrática por intervalo** y prueba
 esa secuencia. No hace falta saber nada del ancho de banda del registro, de
 su distribución ni de sus unidades, y el test funciona igual de bien sobre
 medias, valores eficaces o varianzas (`statistic=`). Una deriva de ganancia
@@ -196,7 +196,7 @@ independientes.
 
 Merece la pena repetir dos salvedades del libro. Un registro puede ser no
 estacionario con media cuadrática estacionaria (un barrido de frecuencia,
-por ejemplo), así que pásese `statistic="mean"` o pruébense versiones
+por ejemplo), así que pasa `statistic="mean"` o prueba versiones
 filtradas por bandas cuando importe; y el test necesita que la *tendencia*
 sea lenta frente a la longitud del segmento, o se disuelve en la
 fluctuación aleatoria de los valores de segmento.
@@ -289,7 +289,7 @@ N_a = N_0\, e^{-a^2/2\sigma_x^2},
 $$
 
 donde $N_a$ es la tasa de cruces del nivel $a$ (Ec. (5.196)). $N_0/2$ es la
-**frecuencia aparente** del registro: un seno de 60 Hz cruza el cero 120
+**frecuencia aparente** del registro: una sinusoide de 60 Hz cruza el cero 120
 veces por segundo, el ruido paso bajo de ancho de banda $B$ da
 $N_0 = 2B/\sqrt{3}$ (una frecuencia aparente de $0{,}58B$, Ejemplo 5.12) y
 una banda centrada en $f_c$ da $N_0 = 2\sqrt{f_c^2 + B^2/12}$
@@ -303,7 +303,7 @@ from phonometry import level_crossing_rate
 
 fs = 8192.0
 t = np.arange(1 << 16) / fs
-x = np.sin(2 * np.pi * 60.0 * t)          # un seno de 60 Hz...
+x = np.sin(2 * np.pi * 60.0 * t)          # una sinusoide de 60 Hz...
 
 res = level_crossing_rate(x, fs)
 print(round(res.zero_crossing_rate, 1))   # ...tiene 120 ceros por segundo
@@ -311,7 +311,7 @@ print(round(res.apparent_frequency, 1))   # 60.0
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings_es.svg" alt="Tasas de cruce por nivel medidas de un registro de ruido gaussiano limitado en banda entre ochocientos y mil doscientos hercios, dibujadas como puntos frente al nivel de cruce desde menos tres coma cinco hasta más tres coma cinco unidades de la señal en un eje de tasas logarítmico, cayendo desde unos dos mil cruces por segundo en el nivel cero hasta unos pocos por segundo a tres sigmas, con la curva exponencial de Rice pasando por todos los puntos medidos" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings_es.svg" alt="Tasas de cruce por nivel medidas de un registro de ruido gaussiano de banda limitada entre ochocientos y mil doscientos hercios, dibujadas como puntos frente al nivel de cruce desde menos tres coma cinco hasta más tres coma cinco unidades de la señal en un eje de tasas logarítmico, cayendo desde unos dos mil cruces por segundo en el nivel cero hasta unos pocos por segundo a tres sigmas, con la curva exponencial de Rice pasando por todos los puntos medidos" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -324,7 +324,7 @@ from phonometry import level_crossing_rate
 fs = 20480.0
 n = 1 << 19
 rng = np.random.default_rng(0)
-freqs = np.fft.rfftfreq(n, 1 / fs)        # ruido gaussiano limitado en banda:
+freqs = np.fft.rfftfreq(n, 1 / fs)        # ruido gaussiano de banda limitada:
 spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
 spec[(freqs < 800.0) | (freqs > 1200.0)] = 0.0
 x = np.fft.irfft(spec, n)
@@ -433,23 +433,27 @@ vibroacústico, donde selecciona la corrección de conteo de ciclos entre la
 hipótesis de Rayleigh de banda estrecha y las correcciones rainflow de
 banda ancha. Un aviso práctico: $m_4$ pondera el espectro por $f^4$, así
 que el ruido de instrumentación de banda ancha muy por encima de la banda
-física infla $M$ y deprime $r$ sin avisar - limítese antes el registro a la
+física infla $M$ y deprime $r$ sin avisar - limita antes el registro a la
 banda físicamente significativa.
 
 ## Dónde encaja esto
 
-La calificación va *antes* de las estadísticas que calculan las demás
+La cualificación va *antes* de las estadísticas que calculan las demás
 páginas de esta sección: el intervalo de confianza chi-cuadrado de una
-[PSD de Welch](/phonometry/es/signals/spectra/spectral-analysis/) y las fórmulas de error
-aleatorio de los [estimadores de correlación](/phonometry/es/signals/spectra/correlation-delay/)
+[PSD de Welch](/phonometry/es/signals/spectra/spectral-analysis/) y las
+fórmulas de error
+aleatorio de los [estimadores de
+correlación](/phonometry/es/signals/spectra/correlation-delay/)
 suponen que el registro es estacionario, igual que la idea misma de *el*
 $L_{eq}$ de una medición en [Niveles](/phonometry/es/signals/levels/levels/). Cuando un
-registro no pasa el test, divídase en el cambio (la secuencia
-`segment_values` muestra dónde), analícense los trozos, o pásese a las
+registro no pasa el test, divídelo en el cambio (la secuencia
+`segment_values` muestra dónde), analiza los trozos, o pasa a las
 vistas de tiempo corto - el
-[espectrograma calibrado](/phonometry/es/signals/spectra/time-frequency/) - que no suponen
+[espectrograma calibrado](/phonometry/es/signals/spectra/time-frequency/) -
+que no suponen
 estacionariedad. Y cuando pasa, la
-[maquinaria GUM](/phonometry/es/signals/metrology/gum-uncertainty/) puede propagar el error
+[maquinaria GUM](/phonometry/es/signals/metrology/gum-uncertainty/) puede
+propagar el error
 aleatorio *restante* de cada estimación promediada con la conciencia
 tranquila.
 
@@ -465,8 +469,8 @@ nivel y de picos de Rice (1945) de la sección 5.5 (`level_crossing_rate`,
 `peak_statistics`, el factor de irregularidad y sus límites Rayleigh y
 gaussiano para la altura de pico).
 
-**No cubierto.** La sección 10.3 del libro se titula "calificación de
-datos" en un sentido más amplio y también cubre la clasificación, la
+**No cubierto.** La sección 10.3 del libro se titula «cualificación de
+datos» en un sentido más amplio y también cubre la clasificación, la
 validación y la edición de registros; `phonometry.metrology` implementa
 solo su núcleo cuantitativo, el test de estacionariedad por medias
 cuadráticas. Clasificar el tipo de un registro, validarlo frente a límites
@@ -476,4 +480,4 @@ como los describe el libro, fuera de este módulo.
 ## Véase también
 
 - Referencia de la API: [`metrology.data_qualification`](/phonometry/es/reference/api/metrology/data-qualification/).
-- Teoría: [Incertidumbre de medida (GUM)](/phonometry/es/reference/theory/signal-analysis/#incertidumbre-de-medida-isoiec-guide-98-3-gum-y-suplemento-1): el marco de incertidumbre que alimentan los criterios de calificación de esta página.
+- Teoría: [Incertidumbre de medida (GUM)](/phonometry/es/reference/theory/signal-analysis/#incertidumbre-de-medida-isoiec-guide-98-3-gum-y-suplemento-1): el marco de incertidumbre que alimentan los criterios de cualificación de esta página.

@@ -14,13 +14,13 @@ sobre el ruido de los motores es un problema de SII.
 
 El rango [0, 1] compartido es una coincidencia de la normalización, no una
 escala común, y 0,6 significa tres cosas distintas en los tres. Un **STI** de
-0,6 cae en la banda D de la escala de calificación del Anexo F de
+0,6 cae en la banda D de la escala de valoración del Anexo F de
 IEC 60268-16, cuyas once letras van de la U por debajo de 0,36 a la A+ a partir
 de 0,76; eso es una buena sala de conferencias, y una especificación de alarma
 por voz suele fijar su mínimo un par de bandas más abajo. Un **SII** de 0,6
 significa que en torno al 60 % del espectro del habla ponderado por importancia
 es audible para ese oyente en ese ruido; el índice es una fracción por
-construcción y no lleva escala de calificación normalizada alguna. Un **STOI**
+construcción y no lleva escala de valoración normalizada alguna. Un **STOI**
 de 0,6 no tiene significado absoluto: la correspondencia entre el índice y un
 porcentaje de palabras entendidas se ajusta para cada corpus de pruebas de
 escucha y está deliberadamente sin implementar, de modo que el STOI solo se lee
@@ -36,17 +36,18 @@ modulación sobrevive al canal, mediante la función de transferencia de
 modulación. Puede calcularse indirectamente desde una respuesta al impulso
 medida o medirse directamente con la señal de ensayo STIPA.
 [Índice de transmisión del habla (STI)](/phonometry/es/perception/speech/speech-transmission/)
-cubre la física de la modulación, ambos métodos y las bandas de calificación
+cubre la física de la modulación, ambos métodos y las bandas de valoración
 del Anexo F.
 
 El SII (**ANSI S3.5-1997**) trabaja sobre la *audibilidad*: la
 inteligibilidad se predice a partir de cuánta parte del espectro portador de
 habla supera el umbral efectivo del oyente, banda a banda, ponderada por la
 importancia de cada banda para el habla. El ruido, el autoenmascaramiento, la
-extensión ascendente del enmascaramiento y el umbral de audición del propio
+propagación ascendente del enmascaramiento y el umbral de audición del propio
 oyente entran explícitamente, y por eso el SII se extiende con naturalidad a
 la pérdida auditiva.
-[Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/)
+[Índice de inteligibilidad del
+habla](/phonometry/es/perception/speech/speech-intelligibility/)
 cubre los cuatro procedimientos por bandas de la norma (bandas críticas,
 bandas críticas de contribución equitativa, tercio de octava y octava),
 incluidos los espectros normalizados de habla desde el esfuerzo vocal normal
@@ -96,7 +97,7 @@ del apartado 6.3 no está implementada, así que una cadena con distorsión seve
 necesita equipo de medida y no esta biblioteca.
 
 Dentro del SII hay dos límites de cobertura que conviene comprobar antes de
-usarlo: los espectros de habla de esfuerzo vocal elevado, alto y de grito solo
+usarlo: los espectros de habla de esfuerzo vocal elevado, fuerte y de grito solo
 se incluyen para el procedimiento por tercios de octava, y las funciones de
 importancia de banda tabuladas son el compromiso de habla promedio de cada
 tabla, con las alternativas por material del Anexo B en tus manos a través del

@@ -1,6 +1,6 @@
 ---
 title: "Ruido de aeronaves"
-description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la ICAO, la maquinaria de contornos de aeropuerto de ECAC Doc 29, el método del hemisferio para rotorcraft de ECAC Doc 32 y la base de datos ANP de EASA que los alimenta."
+description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la OACI, la maquinaria de contornos de aeropuerto de ECAC Doc 29, el método del hemisferio para helicópteros de ECAC Doc 32 y la base de datos ANP de EASA que los alimenta."
 ---
 
 El ruido de aeronaves se calcula con métodos negociados internacionalmente de
@@ -14,10 +14,11 @@ temporal espectral, una tabla nivel-potencia-distancia o un hemisferio de
 ruido), más **ajustes de propagación** normalizados que colocan la fuente en
 un receptor.
 
-[Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/)
-cubre la certificación de ala fija. El **EPNL** del Anexo 16 de la ICAO
+[Ruido de aeronaves: nivel efectivo de ruido
+percibido](/phonometry/es/aircraft/aircraft-noise/)
+cubre la certificación de ala fija. El **EPNL** del Anexo 16 de la OACI
 condensa una historia temporal en tercios de octava de un sobrevuelo en un
-único valor en EPNdB a través de la molestia percibida, una corrección tonal
+único valor en EPNdB a través de la ruidosidad percibida, una corrección tonal
 y una corrección de duración; la página añade el verificador de sistemas de
 medida IEC 61265 y la absorción atmosférica SAE ARP 5534 usada en la cadena
 de certificación.
@@ -25,9 +26,10 @@ de certificación.
 recoge el avión desde ahí: las tablas nivel-potencia-distancia, las
 correcciones por segmento de una trayectoria (impedancia, atenuación lateral,
 instalación del motor, duración, fracción de ruido y directividad de inicio
-de rodaje) y el contorno de evento único sobre una malla de tierra.
+del recorrido de despegue) y el contorno de evento único sobre una malla de tierra.
 
-[Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/)
+[Ruido de helicópteros: el método del
+hemisferio](/phonometry/es/aircraft/rotorcraft-noise/)
 cubre los helicópteros, cuya fuerte directividad derrota a un nivel de fuente
 de un solo número. ECAC Doc 32 describe en cambio la fuente como un
 **hemisferio de ruido** (niveles de banda sobre una malla de ángulos de
@@ -57,13 +59,13 @@ tonalidad es a su vez primo de los métodos de
 Empieza por la pregunta. Para contrastar un avión con un límite de
 certificación, o para entender de dónde salen los números publicados de un
 tipo, empieza por la página del EPNL. Para predecir lo que hace un movimiento
-en una dirección concreta de la calle, usa la página de Doc 29, con la página
+en un domicilio concreto, usa la página de Doc 29, con la página
 de ANP aportando los datos de la aeronave. Para helicópteros, la página del
 hemisferio sustituye a las dos. Lee las páginas de ala fija en ese orden: la
 del EPNL define la métrica certificada, la de Doc 29 convierte aviones
 certificados en contornos sobre el terreno a partir de tablas escritas a mano,
 y la de ANP sustituye esas tablas escritas a mano por los datos de flota
-publicados. La página de rotorcraft se sostiene sola (otra norma y otro modelo
+publicados. La página de helicópteros se sostiene sola (otra norma y otro modelo
 de fuente) y puede leerse la primera si vienes por los helicópteros.
 
 Las tres métricas no son intercambiables. El EPNL es una métrica de
@@ -75,12 +77,12 @@ suelo.
 ## Páginas de esta sección
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/):
-  la cadena EPNL del Anexo 16 de la ICAO, el verificador IEC 61265 y la
+  la cadena EPNL del Anexo 16 de la OACI, el verificador IEC 61265 y la
   absorción SAE ARP 5534.
 - [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/aircraft/airport-noise/):
   el motor NPD, la cadena de segmentos de evento único y el contorno de SEL
   en malla de tierra.
-- [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
+- [Ruido de helicópteros: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32, sus ajustes de
   propagación y las métricas y contornos de evento único.
 - [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las
@@ -102,16 +104,16 @@ base de datos ANP se lee y nunca se escribe (la versión 2.3 se distribuye tal
 cual). De las entradas de ANP, solo las que tienen perfiles de punto fijo traen
 una trayectoria lista para usar, porque convertir una salida por pasos de
 procedimiento en una trayectoria de vuelo exige el modelo de prestaciones de
-mecánica del vuelo del Doc 9911 de la ICAO, que no está implementado.
+mecánica del vuelo del Doc 9911 de la OACI, que no está implementado.
 
-**Tres huecos concretos.** Las operaciones de rotorcraft en estacionario,
+**Tres huecos concretos.** Las operaciones de helicóptero en estacionario,
 ralentí y rodaje quedan fuera del modelo de fuente de hemisferio, que supone un
 sobrevuelo. El verificador de sistemas de medida comprueba la IEC 61265:1995 y
 no la edición de 2018 que la sustituye. Y el estampido sónico no se toca en
 ningún punto de la biblioteca.
 
 Por último, la fuente de aeronaves de CNOSSOS-EU de los apartados 2.6 y 2.7
-**no** está implementada: el ruido de aeronaves aquí es la familia de la ICAO y
+**no** está implementada: el ruido de aeronaves aquí es la familia de la OACI y
 la ECAC, que es un conjunto de modelos distinto del de las fuentes de carretera
 y ferrocarril de [Fuentes ambientales](/phonometry/es/environment/sources/), y
 los dos no deben mezclarse dentro de un mismo mapa estratégico sin advertirlo.

@@ -28,7 +28,7 @@ references:
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "La sección 2.5 (las medidas de ruido: Leq, L10/L90 y sus usos previstos) y la sección 2.15 (campañas de ruido ambiental). ISBN 978-1-4987-2405-0."
@@ -52,7 +52,7 @@ ISO 1996-1 (BS 7445-1 es la guía de práctica de medición sobre esa misma
 elección, y Bies, Hansen y Howard 2017, §2.5 las repasa en paralelo):
 
 - **Exposición acumulada en un intervalo**: $L_{eq}$/$L_{Aeq}$, la media
-  energética. Responde a "cuánto sonido llegó en total", sin importar cómo
+  energética. Responde a «cuánto sonido llegó en total», sin importar cómo
   se repartió en el tiempo.
 - **Cómo se distribuyó el nivel fluctuante**: los percentiles $L_N$:
   $L_{90}$ como nivel de fondo, $L_{10}$ como indicador de intrusión de
@@ -74,7 +74,7 @@ exponencial: $L_{eq}$ y SEL no tienen constante de tiempo, y las balísticas
 Fast/Slow solo entran por los niveles percentiles, definidos sobre la traza
 de nivel con ponderación temporal (ver
 [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/)). Y todo lo
-de esta página asume la señal ya en pascales: el factor de sensibilidad que
+de esta página supone la señal ya en pascales: el factor de sensibilidad que
 la lleva ahí es el asunto de
 [Calibración](/phonometry/es/signals/metrology/calibration/).
 
@@ -109,7 +109,7 @@ la = signals.laeq(recording, fs, calibration_factor=sensitivity)
 
 Ambas aceptan señales 1D (devuelven un escalar) o arrays 2D
 `[channels, samples]` (devuelven un nivel por canal), y admiten `dbfs=True` para
-análisis digital a fondo de escala (la calibración no aplica en modo dBFS).
+análisis digital a fondo de escala (la calibración no se aplica en modo dBFS).
 
 ¿Por qué la media *energética* y no la media aritmética de los valores en dB?
 Porque las dosis sonoras se suman como energía: dos periodos a 60 dB y 80 dB no
@@ -237,7 +237,7 @@ robustos frente a eventos raros por construcción. En la práctica:
   intermitente, que es como lo usa el Anexo I de ISO 1996-2.
 - **$L_{10}$** sigue los picos de los eventos; la separación
   $L_{10} - L_{90}$ es un indicador rápido de intermitencia.
-- **$L_{eq} - L_{50}$** mide lo "picudo" que es el historial: en ruido
+- **$L_{eq} - L_{50}$** mide lo «picudo» que es el historial: en ruido
   estacionario casi coinciden, y cuanto más fluctúa el nivel más sube
   $L_{eq}$ por encima de la mediana (para una distribución gaussiana de
   niveles con desviación típica $\sigma$ dB,
@@ -261,7 +261,7 @@ lo que hace el `composite_rating_level` de
 | `weighting` | str o None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente |
 | `calibration_factor` / `dbfs` | float / bool | — | como `leq` | Misma semántica que en `leq()` |
 
-## Métricas de pico, evento y ocupacionales
+## Métricas de pico, evento y laborales
 
 ```python
 import numpy as np
@@ -290,8 +290,8 @@ lex = signals.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sens
 `lc_peak` está verificado contra las respuestas de referencia de ciclo
 único/semiciclo de la Tabla 5 de IEC 61672-1:2013, `sel` contra la columna
 $L_{AE}$ de la Tabla 4, y las funciones de dosis contra las anclas de IEC 61252
-(3,2 Pa²h ↔ exactamente 90 dB). `lc_peak` sobremuestrea (polifásico) la señal
-ponderada C por `oversample` (por defecto `8`) antes de tomar el máximo,
+(3,2 Pa²h ↔ exactamente 90 dB). `lc_peak` sobremuestrea de forma polifásica la
+señal ponderada C por `oversample` (por defecto `8`) antes de tomar el máximo,
 recuperando el verdadero pico inter-muestra: un máximo en rejilla subestima los
 tonos de HF sostenidos hasta ~1,15 dB (un tono de 8 kHz a 48 kHz tiene solo
 6 muestras/ciclo). Usa `oversample=1` para detectar el pico en la rejilla
@@ -383,23 +383,23 @@ mitad de dosis son −3 dB; el doble de duración al mismo nivel son +3 dB.
 | `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
 | `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
 
-`lex_8h` califica *una* grabación; componer una jornada laboral completa a
+`lex_8h` valora *una* grabación; componer una jornada laboral completa a
 partir de muestras por tarea o por función, con el presupuesto normativo de
 incertidumbre de la ISO 9612, continúa en
 [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
 
 Convertir estos niveles en los indicadores regulatorios día-tarde-noche y
-reportarlos con garantías es
+declararlos con garantías es
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): los
 descriptores $L_{den}$ y $L_{dn}$, los niveles de evaluación compuestos de
 ISO 1996-1
 con sus ajustes por carácter, y la cadena de determinación de ISO 1996-2 con
-el ajuste tonal, la corrección de ruido residual y el balance de
+el ajuste tonal, la corrección de ruido residual y el presupuesto de
 incertidumbre de medida.
 
 ## Espectrograma de octavas (niveles vs tiempo)
 
-Análisis de octava fraccional en tiempo corto: un nivel por banda y ventana,
+Análisis de fracción de octava en tiempo corto: un nivel por banda y ventana,
 alineado en el tiempo entre bandas.
 
 ```python
@@ -471,16 +471,20 @@ plt.show()
 Consulta [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) para
 convertir unidades digitales a SPL físico, y
 [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) para los
-detalles de la envolvente. Las estrategias ocupacionales de la ISO 9612
+detalles de la envolvente. Las estrategias laborales de la ISO 9612
 continúan en
-[Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/),
+[Exposición al ruido en el
+trabajo](/phonometry/es/perception/hearing/occupational-exposure/),
 los veredictos de prominencia tonal de ECMA-418-1 en
-[Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/), y las
-curvas isofónicas de ISO 226 viven con las métricas de percepción en
-[Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/). Que un único $L_{eq}$ sea un
+[Tonos discretos
+prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/), y
+las
+líneas isofónicas de ISO 226 viven con las métricas de percepción en
+[Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/). Que un único
+$L_{eq}$ sea un
 resumen justo de una medición es, de entrada, una cuestión de
 estacionariedad: los tests de
-[calificación de datos](/phonometry/es/signals/metrology/data-qualification/) la
+[cualificación de datos](/phonometry/es/signals/metrology/data-qualification/) la
 responden objetivamente a partir de medias cuadráticas por segmento.
 
 ## Qué cubre esta guía
@@ -490,8 +494,8 @@ responden objetivamente a partir de medias cuadráticas por segmento.
 apartado 5.13 (`lc_peak`, verificado frente a la Tabla 5) y el nivel de
 exposición sonora (`sel`, verificado frente a la columna $L_{AE}$ de la Tabla
 4); la exposición sonora y el LEX,8h de la IEC 61252:1993
-(`sound_exposure`, `lex_8h`); y el espectrograma en bandas de octava
-fraccional de `OctaveFilterBank.spectrogram`.
+(`sound_exposure`, `lex_8h`); y el espectrograma en bandas de fracción
+de octava de `OctaveFilterBank.spectrogram`.
 
 **No cubierto.** Los indicadores de jornada completa de la ISO 1996-1
 ($L_{den}$, $L_{dn}$, niveles de evaluación) y los procedimientos de
@@ -505,7 +509,7 @@ implementada (1993), no las de la más reciente.
 
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/): los indicadores $L_{den}$/$L_{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
 - [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.
-- [Calibración](/phonometry/es/signals/metrology/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página asume.
+- [Calibración](/phonometry/es/signals/metrology/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página supone.
 - [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.
 - [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): niveles por canal y cómo combinarlos energéticamente.
 - Referencia de la API: [`signals.levels`](/phonometry/es/reference/api/signals/levels/).

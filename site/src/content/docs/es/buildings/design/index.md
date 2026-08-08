@@ -1,6 +1,6 @@
 ---
 title: "Diseño del aislamiento"
-description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN/ISO 12354 entre recintos en sus formas simplificada y por bandas, el aislamiento teórico de un panel a partir de sus propiedades físicas, las capas elásticas de las que depende el diseño de un suelo o de un trasdosado, y el sonido estructural de los equipos de instalaciones desde la placa de recepción de EN 15657 hasta el nivel en el recinto receptor de EN 12354-5."
+description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN/ISO 12354 entre recintos en sus formas simplificada y por bandas, el aislamiento teórico de un panel a partir de sus propiedades físicas, las capas elásticas de las que depende el diseño de un suelo o de un trasdosado, y el ruido estructural de los equipamientos desde la placa de recepción de EN 15657 hasta el nivel en el recinto receptor de EN 12354-5."
 ---
 
 Las páginas de la sección de
@@ -14,8 +14,8 @@ sus márgenes son un asunto propio.
 
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)
 es el modelo normativo: la transmisión por flancos aérea y de impacto entre dos
-salas, camino a camino, a partir del elemento directo y de los índices de
-reducción de vibraciones de unión $K_{ij}$. Consume datos de elemento de
+salas, trayectoria a trayectoria, a partir del elemento directo y de los índices de
+reducción vibratoria de unión $K_{ij}$. Consume datos de elemento de
 laboratorio medidos según ISO 10140 y datos de unión medidos según ISO 10848,
 que viven ambos en
 [Aislamiento acústico](/phonometry/es/buildings/insulation/) junto
@@ -26,7 +26,7 @@ edificio.
 [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/)
 ejecuta la misma norma banda a banda en lugar de sobre números únicos: los
 datos de laboratorio de elemento y de unión se convierten a sus valores in
-situ, cada camino se forma por banda y el resultado muestra qué camino domina
+situ, cada trayectoria se forma por banda y el resultado muestra qué trayectoria domina
 cada banda, no solo si el recinto cumple.
 
 **¿Cuál de los dos ejecutas?** Ejecuta el modelo simplificado cuando lo que
@@ -34,16 +34,17 @@ tienes son magnitudes globales ponderadas de catálogo — $R_w$, $\Delta L_w$, 
 masa por unidad de superficie — y la pregunta es si la partición cumple un
 límite. Ejecuta el detallado cuando tienes espectros de elemento y de unión por
 bandas, o las propiedades de material a partir de las cuales la norma puede
-calcularlos, y la pregunta es *qué camino corregir en qué banda*. La elección no
+calcularlos, y la pregunta es *qué trayectoria corregir en qué banda*. La elección no
 va de exactitud sobre la valoración: sobre el propio edificio resuelto de la
 norma, los dos coinciden holgadamente dentro de la dispersión que declaran, y el
 modelo aéreo detallado no tiene error sistemático y su desviación típica es de
-1,5 dB a 2,5 dB (cláusula 5) frente a unos 2 dB del simplificado. Lo que compra
+1,5 dB a 2,5 dB (apartado 5) frente a unos 2 dB del simplificado. Lo que compra
 el modelo detallado es el espectro que hay detrás del número único.
 
-[Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
-baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masa y
-la caída de coincidencia de un panel simple, el comportamiento masa-muelle-masa
+[Predicción del aislamiento de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
+baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masas y
+el valle de coincidencia de un panel simple, el comportamiento masa-muelle-masa
 de una doble hoja, la transmisión por rendijas y aberturas, la eficiencia de
 radiación de placas y las movilidades puntuales. Es la física que un valor de
 catálogo resume en un número.
@@ -65,23 +66,25 @@ medida según EN 29052-1 en
 en la sección de materiales, que fija la resonancia de la que depende toda la
 mejora.
 
-Los equipos de instalaciones del edificio son una cadena aparte, y sus dos
+Los equipamientos del edificio son una cadena aparte, y sus dos
 páginas solo se leen bien en orden.
 [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/)
 caracteriza una bomba, un ventilador o una cisterna por la potencia que inyecta
 en la estructura, medida sobre una placa de recepción de disipación conocida y
 convertida después en independiente de la placa.
-[Sonido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/)
+[Ruido estructural instalado (EN
+12354-5)](/phonometry/es/buildings/design/installed-structure-borne/)
 toma esa descripción de fuente, pierde parte de ella en el término de
 acoplamiento que fijan las movilidades de fuente y de receptor, y lleva el resto
 a un recinto que puede estar a varias uniones de distancia.
 
 Una nota de contabilidad recorre toda la sección: la familia existe como
-EN 12354:2000 y como ISO 12354:2017, y las dos no son intercambiables en todas
-las cláusulas. Los modelos simplificados de
-[Predicción del aislamiento acústico](/phonometry/es/buildings/design/insulation-prediction/)
+EN 12354:2000 y como ISO 12354:2017, y las dos no son intercambiables en todos
+los apartados. Los modelos simplificados de
+[Predicción del aislamiento
+acústico](/phonometry/es/buildings/design/insulation-prediction/)
 siguen el texto de 2000 — incluida la corrección tabulada por flancos $K$ que la
-parte de impactos de 2017 sustituyó por fórmulas explícitas camino a camino —
+parte de impactos de 2017 sustituyó por fórmulas explícitas trayectoria a trayectoria —
 mientras que
 [Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
 sigue el texto de 2017. Comprueba qué edición invoca tu reglamento antes de
@@ -95,7 +98,7 @@ necesita. Los índices de unión $K_{ij}$ salen de una medición según ISO 1084
 del catálogo de tipos de unión del anexo E de EN 12354-1. La mejora del
 revestimiento de suelo $\Delta L_w$ sale de ISO 16251-1 o de un ensayo
 ISO 10140-3 a tamaño real. La $s'$ de la capa elástica sale de EN 29052-1. Y
-para los equipos de instalaciones, la potencia estructural característica sale
+para los equipamientos, la potencia estructural característica sale
 de la placa de recepción de EN 15657. Dos de las páginas de esta sección son
 ellas mismas mediciones de ese tipo, que alimentan a las demás; el resultado
 construido se contrasta al final con la medición en campo de ISO 16283 en
@@ -105,13 +108,13 @@ construido se contrasta al final con la medición en campo de ISO 16283 en
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   los modelos de flancos aéreo y de impacto entre recintos (EN 12354-1/2) con sus
-  índices de reducción de vibraciones de unión y sus fichas de predicción.
+  índices de reducción vibratoria de unión y sus fichas de predicción.
 - [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
   el modelo detallado por bandas de ISO 12354-1/-2 con la conversión in situ de
   los datos de elemento y de unión, los índices por flancos banda a banda y las
-  contribuciones por camino que hay detrás de la valoración.
+  contribuciones por trayectoria que hay detrás de la valoración.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masa y la coincidencia (Sharp), las dobles hojas (Bies), las
+  la ley de masas y la coincidencia (Sharp), las dobles hojas (Bies), las
   rendijas y aberturas (Gomperts, Wilson-Soroka), la eficiencia de radiación
   (Leppington/Maidanik) y las movilidades puntuales (Cremer).
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
@@ -124,7 +127,7 @@ construido se contrasta al final con la medición en campo de ISO 16283 en
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   la potencia característica que una máquina inyecta en un elemento del
   edificio, medida sobre una placa de recepción.
-- [Sonido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
+- [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
   en qué se convierte esa potencia con la máquina montada sobre un elemento
   real, y el nivel que produce en el recinto receptor.
 
@@ -152,7 +155,7 @@ señalan uno a uno: el método de panel simple de Sharp no es válido por debajo
 aproximadamente 1,5 veces la primera resonancia del panel, el modelo de rendija
 de Gomperts solo se sostiene mientras la rendija sea estrecha frente a la
 longitud de onda, de la eficiencia de radiación solo está implementado el método
-n.º 1 de Leppington, y las vías ortótropas son modelos de panel infinito que se
+n.º 1 de Leppington, y las trayectorias ortótropas son modelos de panel infinito que se
 pierden el valle entre 2 kHz y 4 kHz que muestra la chapa grecada real. Del lado
 de las capas elásticas, el modelo de fuerza de la máquina de impactos supone una
 impedancia de punto de excitación independiente de la frecuencia, así que un
@@ -161,7 +164,8 @@ se tratan como resortes lineales; no hay predicción por bandas de la mejora de
 un trasdosado, porque el anexo D es un método de magnitud global; y las fuentes
 de impacto pesadas, como la pelota de caucho, no las cubre ninguno de estos
 modelos — su valoración está en
-[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+[Fuentes de impacto pesadas y
+blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
 
 Dos fronteras de edición: solo está implementada la edición de 2009 de
 EN 12354-5, no la revisión de 2023, y las páginas simplificada y detallada

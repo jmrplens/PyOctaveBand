@@ -11,7 +11,7 @@ references:
     issue: 2
     pages: "82-108"
     doi: "10.1121/1.1915637"
-    note: "Las mediciones originales de igual sonoridad; la curva A invierte su isófona de 40 fonios (sección 1)."
+    note: "Las mediciones originales de igual sonoridad; la curva A invierte su línea isofónica de 40 fonios (sección 1)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2023
@@ -25,7 +25,7 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB en 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
+    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB a 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -37,7 +37,7 @@ Esta guía cubre **A**, **C** y **Z**, las curvas especificadas en
 la familia, la curva G de infrasonido, las históricas B y D y la curva AU, es
 [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" loading="eager" />
 
 *Las tres curvas de IEC 61672-1, medidas con los filtros de la propia
 biblioteca a 48 kHz: A, que descarta los graves; C, que los conserva; y Z,
@@ -107,22 +107,22 @@ f_1 = 20{,}599\ \text{Hz}, \quad f_2 = 107{,}653\ \text{Hz}, \quad
 f_3 = 737{,}862\ \text{Hz}, \quad f_4 = 12194{,}217\ \text{Hz}
 $$
 
-C es un paso-banda con polos dobles en $f_1$ y $f_4$ (2 ceros en el origen);
+C es un paso banda con polos dobles en $f_1$ y $f_4$ (2 ceros en el origen);
 A añade los polos $f_2$ y $f_3$ (4 ceros), y por eso sigue cayendo en los
-medios-graves. Ambas se normalizan a exactamente 0 dB en 1 kHz. Z es la
+medios-graves. Ambas se normalizan a exactamente 0 dB a 1 kHz. Z es la
 ausencia de ponderación. La derivación completa de polos y ceros está en la
 página de [Teoría](/phonometry/es/reference/theory/signal-analysis/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_es.svg" alt="Líneas isofónicas según ISO 226 a la izquierda, con la isófona de 40 fonios resaltada; a la derecha la curva de ponderación A superpuesta a la isófona de 40 fonios invertida, mostrando que A es la isófona volteada congelada en un filtro realizable" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_es.svg" alt="Líneas isofónicas según ISO 226 a la izquierda, con la línea isofónica de 40 fonios resaltada; a la derecha la curva de ponderación A superpuesta a la línea isofónica de 40 fonios invertida, mostrando que A es la línea isofónica volteada congelada en un filtro realizable" width="92%" />
 
 ### Una breve historia: A, B, C y Z
 
 La cadena va de las mediciones de igual sonoridad de Fletcher y Munson en
 1933 a la primera norma estadounidense de sonómetros (1936), que dio a los
 medidores respuestas conmutables para que la lectura aproximara la
-sonoridad a distintos niveles: **A** de la isófona de 40 fonios para sonidos
+sonoridad a distintos niveles: **A** de la línea isofónica de 40 fonios para sonidos
 débiles, **B** de la de ~70 fonios para los moderados y una respuesta plana
-para los fuertes (la curva **C** propiamente dicha, reflejo de la isófona
+para los fuertes (la curva **C** propiamente dicha, reflejo de la línea isofónica
 más plana de ~100 fonios, llegó con la revisión de 1944). Conmutar curvas
 según el nivel murió en la práctica (las
 lecturas saltaban en los puntos de cambio y las mediciones de campo dejaban
@@ -131,7 +131,7 @@ auditivo y de molestia comunitaria se habían recogido con ella, y
 correlaciona con ambos casi tan bien como métricas mucho más elaboradas.
 IEC 61672-1 (primera edición, 2002) remató la limpieza: B se eliminó, A y C
 se conservaron con tolerancias más estrictas y **Z** se introdujo para
-sustituir el "lineal" mal especificado de los sonómetros antiguos, que
+sustituir el «lineal» mal especificado de los sonómetros antiguos, que
 variaba según el fabricante. La curva B (y la curva D de ruido de aeronaves,
 que corrió la misma suerte) sigue disponible para datos históricos; véase
 [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
@@ -143,7 +143,7 @@ $L_{Ceq} - L_{Aeq}$ es un indicador de un solo número del contenido en
 baja frecuencia:
 
 - **Por debajo de unos 10 dB**: espectro de banda ancha ordinario; el nivel
-  ponderado A lo califica con justicia.
+  ponderado A lo valora con justicia.
 - **En torno a 15 a 20 dB o más**: la energía se concentra en las bajas
   frecuencias (retumbo de climatización, compresores, graves de música a
   través de una pared). El nivel ponderado A entonces subestima el problema;
@@ -180,7 +180,7 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-# Aplicar ponderación A a la señal cruda
+# Aplicar ponderación A a la señal en bruto
 weighted_signal = filters.weighting_filter(recording, fs, curve='A')
 
 # Aplicar ponderación C para análisis de picos
@@ -254,7 +254,7 @@ impulse[fs // 2] = 1.0
 freqs = np.fft.rfftfreq(fs, 1 / fs)[1:]
 
 # ...frente a la curva A analítica de IEC 61672-1 construida con las
-# cuatro frecuencias de esquina de la sección 1, normalizada a 0 dB en 1 kHz.
+# cuatro frecuencias de esquina de la sección 1, normalizada a 0 dB a 1 kHz.
 f1, f2, f3, f4 = 20.599, 107.653, 737.862, 12194.217
 gain = (f4**2 * freqs**4) / ((freqs**2 + f1**2)
         * np.sqrt((freqs**2 + f2**2) * (freqs**2 + f3**2))
@@ -403,13 +403,13 @@ propia guía:
   la curva G de infrasonido, las históricas B y D, y la AU para sonido
   audible en presencia de ultrasonidos.
 - Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).
-- Teoría: [Curvas de ponderación (IEC 61672-1)](/phonometry/es/reference/theory/signal-analysis/#curvas-de-ponderación-iec-61672-1): la definición en polos y ceros de las curvas A, C y Z, y el diseño bilineal que repara el sobremuestreo.
+- Teoría: [Curvas de ponderación (IEC 61672-1)](/phonometry/es/reference/theory/signal-analysis/#curvas-de-ponderación-iec-61672-1): la definición en polos y ceros de las curvas A, C y Z, y el diseño bilineal que el sobremuestreo repara.
 
 ## Respuestas rápidas
 
 ### ¿Cuándo debo usar la ponderación C en lugar de la ponderación A?
 
-Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A califica el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
+Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A valora el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
 
 ### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
 

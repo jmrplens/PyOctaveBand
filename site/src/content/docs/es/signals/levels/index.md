@@ -1,6 +1,6 @@
 ---
 title: "Niveles y ponderación"
-description: "De la señal ponderada al número reportado: las ponderaciones frecuenciales de IEC 61672-1 y las curvas especiales, las balísticas Fast/Slow/Impulse, los niveles integrados, estadísticos y de dosis, y los indicadores ambientales de ISO 1996 construidos sobre ellos."
+description: "De la señal ponderada al número declarado: las ponderaciones frecuenciales de IEC 61672-1 y las curvas especiales, las balísticas Fast/Slow/Impulse, los niveles integrados, estadísticos y de dosis, y los indicadores ambientales de ISO 1996 construidos sobre ellos."
 ---
 
 Un sonómetro hace tres cosas a una señal calibrada, en orden: la **pondera en
@@ -42,10 +42,11 @@ la mayoría de las mediciones prácticas, y donde arrancan las secciones
 ambiental y laboral.
 
 Convertir esos niveles en un veredicto regulatorio es
-[Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
-el nivel día-tarde-noche Lden y los niveles de valoración de **ISO 1996-1**
+[Niveles ambientales (ISO
+1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
+el nivel día-tarde-noche Lden y los niveles de evaluación de **ISO 1996-1**
 con sus ajustes, y la cadena de determinación de ISO 1996-2 con el ajuste
-tonal, la corrección de ruido residual y el presupuesto de incertidumbre de
+tonal, la corrección de ruido residual y el balance de incertidumbre de
 la medición.
 
 Las normativas nacionales construyen su propio índice sobre esa cadena, y
@@ -75,7 +76,7 @@ las que se juzga una actividad.
 Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
-  Lden, Ldn y niveles de valoración, ajuste tonal, ruido residual e
+  Lden, Ldn y niveles de evaluación, ajuste tonal, ruido residual e
   incertidumbre.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
@@ -93,7 +94,7 @@ exactamente qué significa y qué no significa un veredicto de clase de la
 biblioteca. Dos curvas llegan sin veredicto de ningún tipo: ISO 7196 define
 una única tolerancia de ±1 dB sin estructura de clases, y la retirada IEC 537
 no dejó tabla de tolerancias para la D, así que ambas curvas filtran una señal
-pero ninguna llega a `verify_weighting_class`, y en su lugar se fijan frente a
+pero ninguna llega a `verify_weighting_class`, y en su lugar se anclan a
 sus tablas publicadas en el informe de conformidad. La dosis de ruido es solo
 la primera edición (1993) de IEC 61252, no la revisión de 2025. Y una dosis es
 una magnitud, no un veredicto: las estrategias de exposición, el plan de

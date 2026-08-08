@@ -8,7 +8,7 @@ references:
     title: "Acoustics — Statistical distribution of hearing thresholds related to age and gender"
     designation: "ISO 7029:2017"
     url: "https://www.iso.org/standard/42916.html"
-    note: "El modelo por edad de la sección 1: la ley de potencias de la mediana (cláusula 4.2, Tabla 1), la dispersión asimétrica en torno a la mediana (cláusula 4.3, Tablas 2–5) y la maquinaria de fractiles y su aplicación (cláusula 4.4)."
+    note: "El modelo por edad de la sección 1: la ley de potencias de la mediana (apartado 4.2, Tabla 1), la dispersión asimétrica en torno a la mediana (apartado 4.3, Tablas 2–5) y la maquinaria de fractiles y su aplicación (apartado 4.4)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2005
@@ -39,7 +39,7 @@ sobre las frecuencias audiométricas de 125 Hz a 8000 Hz.
 
 Para una persona mayor de 18 años, la desviación **mediana** del umbral de
 audición respecto al valor a los 18 años crece como una ley de potencias de la
-edad (ISO 7029, cláusula 4.2, Tabla 1):
+edad (ISO 7029, apartado 4.2, Tabla 1):
 
 $$
 \Delta H_{md} = a\,(Y - 18)^{b},
@@ -48,8 +48,8 @@ $$
 con coeficientes $a$, $b$ por frecuencia y sexo. La dispersión en torno a la
 mediana se modela con dos semi-gaussianas cuyas desviaciones típicas $s_u$ (peor
 que la mediana) y $s_l$ (mejor) son polinomios de grado cinco en $(Y - 18)$
-(cláusula 4.3, Tablas 2–5). Cualquier **fractil poblacional** $Q$ se obtiene del
-cuantil normal estándar $z(Q)$ (cláusula 4.4): $\Delta H_Q = \Delta H_{md} +
+(apartado 4.3, Tablas 2–5). Cualquier **fractil poblacional** $Q$ se obtiene del
+cuantil normal estándar $z(Q)$ (apartado 4.4): $\Delta H_Q = \Delta H_{md} +
 z(Q)\,s$, usando $s_u$ cuando $z \ge 0$ y $s_l$ en caso contrario.
 
 ```python
@@ -84,9 +84,9 @@ para los estudios cuyo objetivo es compararse con una población real en lugar
 de aislar el efecto del ruido.
 
 **Cómo leer los percentiles.** Un fractil es un enunciado poblacional, no una
-predicción para una persona: `fractile=0.9` devuelve el umbral que el 90 % de
-las personas otológicamente normales de esa edad y sexo *oyen mejor que* (solo
-lo supera el décimo que peor oye), y `fractile=0.5` la mediana: mitad por
+predicción para una persona: `fractile=0.9` devuelve el umbral *por debajo del
+cual* oye el 90 % de las personas otológicamente normales de esa edad y sexo
+(solo lo supera el décimo que peor oye), y `fractile=0.5` la mediana: mitad por
 encima, mitad por debajo. La dispersión es deliberadamente asimétrica (dos
 semi-gaussianas, $s_u > s_l$): el envejecimiento arrastra a una minoría muy
 abajo mientras la mitad que mejor oye se mantiene agrupada cerca de la
@@ -161,8 +161,8 @@ print(hearing.reference_threshold("diffuse-field")[4])   # 0.8 dB a 1000 Hz
 ```
 
 Ambos campos coinciden en baja frecuencia y divergen por encima de 1 kHz
-aproximadamente, donde la resonancia del canal auditivo y la difracción de la
-cabeza hacen del campo libre frontal la condición más sensible (un umbral más
+aproximadamente, donde la resonancia del conducto auditivo y la difracción
+de la cabeza hacen del campo libre frontal la condición más sensible (un umbral más
 bajo) en torno a 3–4 kHz.
 
 <ThemeImage
@@ -208,9 +208,9 @@ componente de edad, es el tema de la guía de
 ## Qué cubre esta guía
 
 **Cubierto.** El modelo de edad de ISO 7029:2017: la desviación mediana en
-ley de potencias desde los 18 años (cláusula 4.2, Tabla 1), las dispersiones
-asimétricas semi-gaussianas $s_u$ y $s_l$ (cláusula 4.3, Tablas 2–5), y el
-cálculo del fractil poblacional de la cláusula 4.4, todo implementado por
+ley de potencias desde los 18 años (apartado 4.2, Tabla 1), las dispersiones
+asimétricas semi-gaussianas $s_u$ y $s_l$ (apartado 4.3, Tablas 2–5), y el
+cálculo del fractil poblacional del apartado 4.4, todo implementado por
 `age_threshold(age, sex, fractile)`. El umbral de referencia de la audición
 en campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005, devuelto por
 `reference_threshold(field)`.

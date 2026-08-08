@@ -66,7 +66,7 @@ para esa cadena: las curvas de audición, las funciones de ponderación y los
 criterios de la guía vigente, y la evaluación de extremo a extremo de una
 campaña de hincado.
 
-Los niveles van en dB re 1 µPa (presión sonora), dB re 1 µPa²·s (exposición
+Los niveles van en dB re 1 µPa (presión acústica), dB re 1 µPa²·s (exposición
 sonora) o, para los dos grupos de carnívoros en aire, dB re 20 µPa y
 dB re (20 µPa)²·s. Las convenciones de referencia submarinas están en
 [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/).
@@ -152,7 +152,7 @@ print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 
 Ese valor es el umbral de audición del ejemplo de orca frente a salmón de
 Ainslie: con un nivel de fuente de 198,2 dB re 1 µPa²·m² y una fuerza de blanco
-del salmón de −29,0 dB re m², la cifra de mérito limitada por audición es
+del salmón de −29,0 dB re m², la figura de mérito limitada por audición es
 $(SL + TS - HT)/2 = 59{,}0$ dB re m².
 
 ## Ponderación auditiva y funciones de exposición
@@ -176,7 +176,7 @@ argumento explícito y viaja con el resultado:
 - **`"nmfs-2024"`** (por defecto): NOAA Fisheries *Updated Technical Guidance*
   v3.0, octubre de 2024. Sustituye a la revisión de 2018, fija $b = 5$ para
   todos los grupos, adopta los nombres de grupo de Southall y reemplaza el
-  "inicio de PTS" por el "inicio de lesión auditiva (AUD INJ)".
+  «inicio de PTS» por el «inicio de lesión auditiva (AUD INJ)».
 - **`"nmfs-2018"`**: la revisión de 2018 v2.0, todavía citada por evaluaciones
   en curso.
 - **`"southall-2019"`**: los criterios revisados por pares; numéricamente
@@ -234,7 +234,7 @@ los valores corregidos son los implementados. Ambas quedan registradas en
 
 `exposure_criteria` devuelve los criterios publicados de inicio de TTS y de
 lesión de un grupo. El ruido impulsivo lleva una **métrica dual**: un nivel de
-exposición sonora ponderado *y* un nivel de pico sin ponderar ("plano"), y
+exposición sonora ponderado *y* un nivel de pico sin ponderar («plano»), y
 gobierna el criterio que produzca la isopleta mayor.
 
 ```python
@@ -258,7 +258,7 @@ El hincado percusivo de pilotes es el caso impulsivo canónico. La cadena va del
 golpe registrado al veredicto:
 
 1. `strike_sel_spectrum` reparte la exposición sonora de un golpe del registro
-   en bandas de octava fraccionaria (las energías por banda vuelven a sumar el
+   en bandas de fracción de octava (las energías por banda vuelven a sumar el
    `single_strike_sel` de banda ancha de
    [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/), por
    Parseval);
@@ -279,12 +279,12 @@ resueltas hasta unos 20 kHz) sirve para LF, va justo para OW y trunca gravemente
 HF, VHF y PW. Una evaluación de marsopa necesita unos cuantos cientos de
 kilohercios.
 
-`weighted_exposure` no puede detectar un espectro truncado: pondera lo que se le
-da, así que un registro corto simplemente informa de un SEL acumulado menor y de
-ningún aviso. La mitad de pico sin ponderar de la métrica dual tiene que salir
-de ese mismo registro sin recorte y con margen de sobra, que es la razón por la
-que la ISO 18406 hace del margen dinámico un requisito de campaña: una captura
-saturada se lee como un pico conforme.
+`weighted_exposure` no puede detectar un espectro truncado: pondera lo que se
+le da, así que un registro corto simplemente informa de un SEL acumulado
+menor, sin dar ningún aviso. La mitad de pico sin ponderar de la métrica dual
+tiene que salir de ese mismo registro sin recorte y con margen de sobra, que
+es la razón por la que la ISO 18406 hace del margen dinámico un requisito de
+campaña: una captura saturada se lee como un pico conforme.
 
 ```python
 import numpy as np
@@ -342,14 +342,14 @@ fuente, de modo que el SEL acumulado que informa es el caso peor de receptor
 estático. Tampoco comprueba que el espectro aportado abarque la banda de paso
 del grupo: un registro que se queda corto respecto de $f_2$ se pondera tal cual
 y subestima la exposición. La propagación de la fuente al receptor pertenece a
-[Propagación del sonido submarino](/phonometry/es/underwater/underwater-propagation/).
+[Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/).
 
 ## Véase también
 
 - [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/):
   los niveles de referencia de la ISO 18405 y la exposición por hincado de la
   ISO 18406 que alimentan esta página.
-- [Propagación del sonido submarino](/phonometry/es/underwater/underwater-propagation/):
-  la pérdida por transmisión y la maquinaria de cifra de mérito que convierte un
+- [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
+  la pérdida por transmisión y la maquinaria de figura de mérito que convierte un
   criterio en una distancia.
-- Referencia de API: [`underwater.bioacoustics.weighting`](/phonometry/es/reference/api/underwater/weighting/) y [`underwater.bioacoustics.audiograms`](/phonometry/es/reference/api/underwater/audiograms/).
+- Referencia de la API: [`underwater.bioacoustics.weighting`](/phonometry/es/reference/api/underwater/weighting/) y [`underwater.bioacoustics.audiograms`](/phonometry/es/reference/api/underwater/audiograms/).

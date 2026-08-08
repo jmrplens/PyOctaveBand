@@ -8,14 +8,14 @@ references:
     title: "Sound system equipment – Part 3: Amplifiers"
     designation: "IEC 60268-3:2013"
     url: "https://webstore.iec.ch/en/publication/1220"
-    note: "Cláusulas 14.12.2-14.12.11: distorsión armónica total THD_F/THD_R (la fórmula de 14.12.3.2 define la forma R), distorsión armónica de orden n d_n, la intermodulación por órdenes de modulación (d_m,n) y por frecuencia diferencia (d_d,n), distorsión total por frecuencia diferencia, intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4 / IEC 60268-1."
+    note: "Apartados 14.12.2-14.12.11: distorsión armónica total THD_F/THD_R (la fórmula de 14.12.3.2 define la forma R), distorsión armónica de orden n d_n, la intermodulación por órdenes de modulación (d_m,n) y por frecuencia diferencia (d_d,n), distorsión total por frecuencia diferencia, intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4 / IEC 60268-1."
   - type: standard
     organization: "Audio Engineering Society"
     year: 2015
     title: "AES standard method for digital audio engineering — Measurement of digital audio equipment"
     designation: "AES17-2015"
     url: "https://www.aes.org/publications/standards/search.cfm?docID=21"
-    note: "Cláusulas 5.2.5, 5.2.8 y 6.3.1: la razón THD+N mediante el filtro de muesca normalizado y el ancho de banda de medición normalizado; el SINAD se deriva de ella. Revisada después como AES17-2020 (misma página de catálogo); la edición de 2015 es la implementada."
+    note: "Apartados 5.2.5, 5.2.8 y 6.3.1: la razón THD+N mediante el filtro de muesca normalizado y el ancho de banda de medición normalizado; el SINAD se deriva de ella. Revisada después como AES17-2020 (misma página de catálogo); la edición de 2015 es la implementada."
   - type: standard
     organization: "International Telecommunication Union"
     year: 1986
@@ -48,7 +48,7 @@ Piersol con la coherencia ordinaria $\gamma^2$. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
-los valores son verificables y no ajustados. Las hojas de datos de
+los valores son verificables y no ajustados. Las hojas de características de
 transductor que estas mediciones alimentan tienen sus propias guías:
 [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/),
 con las convenciones de sensibilidad y el modelo de radiación del pistón en
@@ -124,7 +124,7 @@ plt.show()
 Mientras que la THD cuenta solo los armónicos, la **THD+N** compara *todo salvo
 el fundamental* (armónicos **y** ruido) con la señal total. AES17 elimina el
 fundamental con un filtro de muesca normalizado ($1{,}2 \le Q \le 3$, validado sobre
-la respuesta *aplicada* de fase cero según la cláusula 5.2.8) y toma la razón
+la respuesta *aplicada* de fase cero según el apartado 5.2.8) y toma la razón
 entre el residuo y el RMS total; el **SINAD** es su recíproco en dB:
 
 $$
@@ -133,9 +133,9 @@ $$
 $$
 
 Ambas tensiones se miden a través del ancho de banda de medición AES17 (un paso
-alto de 20 Hz más el paso bajo normalizado en 20 kHz, cláusulas 5.2.5 y 6.3.1)
+alto de 20 Hz más el paso bajo normalizado en 20 kHz, apartados 5.2.5 y 6.3.1)
 de modo que un offset de continua o el ruido ultrasónico a frecuencias de
-muestreo altas no cuentan como "ruido". El borde de banda es configurable, y
+muestreo altas no cuentan como «ruido». El borde de banda es configurable, y
 `bandwidth=None` desactiva la cadena y mide toda la banda de Nyquist.
 
 ```python
@@ -157,10 +157,10 @@ que la medición requiere una captura estacionaria y suficientemente larga.
 
 `weighted_thd` pondera en frecuencia el residuo tras la muesca antes de tomar la
 razón, de modo que se tiene en cuenta el énfasis perceptual de los productos de
-distorsión. La ponderación por defecto es la red que exige la cláusula: la
+distorsión. La ponderación por defecto es la red que exige el apartado: la
 curva del Apéndice A de la IEC 60268-1, es decir la ITU-R BS.468-4, con su pico
 de +12,2 dB cerca de 6,3 kHz (expuesta como `itu_r_468_weighting`); `'A'` y
-`'C'` se mantienen como opciones etiquetadas. Según la cláusula, la medición
+`'C'` se mantienen como opciones etiquetadas. Según el apartado, la medición
 ponderada solo es válida para frecuencias fundamentales entre 31,5 Hz y 400 Hz:
 
 ```python
@@ -176,7 +176,7 @@ print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.
 Las dos cifras de catálogo de cualquier conversor comparten la ponderación
 AES17 **CCIR-RMS** (5.2.7): la curva ITU-R BS.468-4 desplazada un valor plano de
 -5,63 dB para que sea unidad a 2 kHz. El **rango dinámico** (6.4.1) excita el
-dispositivo con un seno de 997 Hz 60 dB por debajo de plena escala, elimina la
+dispositivo con una sinusoide de 997 Hz 60 dB por debajo de plena escala, elimina la
 fundamental con la muesca normalizada (5.2.8) y pondera el residuo de
 ruido-más-distorsión, y luego informa de la razón del seno de plena escala a ese
 residuo ponderado (también conocida como relación señal-ruido). El **ruido de
@@ -211,7 +211,7 @@ con su definición por órdenes:
   respecto a la salida en $f_\text{high}$:
   $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ y
   $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. El resultado también lleva el
-  valor `smpte` de RMS combinado que reportan los analizadores tipo SMPTE (no
+  valor `smpte` de RMS combinado que dan los analizadores tipo SMPTE (no
   es una magnitud IEC).
 - **Distorsión por frecuencia diferencia** (14.12.8): dos tonos agudos iguales
   $f_1 < f_2$, referida a $U_{2,\text{ref}} = 2U_{2,f_2}$ (la suma de las
@@ -222,7 +222,7 @@ con su definición por órdenes:
   normalizados de 8 kHz y 11,95 kHz son los valores por defecto) donde solo
   cuentan los dos productos en banda en $f_0 \mp \delta$:
   $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
-- **Intermodulación dinámica** (DIM, 14.12.9): un seno de 15 kHz más una onda
+- **Intermodulación dinámica** (DIM, 14.12.9): una sinusoide de 15 kHz más una onda
   cuadrada de 3,15 kHz filtrada en paso bajo (1:4 pico a pico). La DIM es el
   RMS de los productos de intermodulación
   $|k\,f_\text{square} \pm f_\text{sine}|$ que caen por
@@ -329,11 +329,11 @@ plt.show()
 
 </details>
 
-Lo que estas mediciones alimentan, al final, es una hoja de datos de
+Lo que estas mediciones alimentan, al final, es una hoja de características de
 transductor. Las convenciones de sensibilidad de IEC 60268-5 (donde fallan
-la mayoría de las comparaciones entre hojas de datos), el modelo de
+la mayoría de las comparaciones entre hojas de características), el modelo de
 radiación del pistón en pantalla detrás de la directividad de un cono y el
-informe de características nominales que compone la hoja de datos de la
+informe de características nominales que compone la hoja de características de la
 norma viven en
 [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/);
 el lado de micrófono, sus referencias de sensibilidad, patrones
@@ -343,10 +343,10 @@ características nominales, vive en
 
 ## Qué cubre esta guía
 
-**Cubierto.** El conjunto de distorsión de IEC 60268-3 (cláusulas
+**Cubierto.** El conjunto de distorsión de IEC 60268-3 (apartados
 14.12.2-14.12.11): $\mathrm{THD}_F$ y $\mathrm{THD}_R$ (`thd`), la distorsión armónica de orden n
 (`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de
-medición de AES17-2015 (`harmonic_analysis`, cláusulas 5.2.5/5.2.8/6.3.1 de
+medición de AES17-2015 (`harmonic_analysis`, apartados 5.2.5/5.2.8/6.3.1 de
 AES17), la intermodulación por modulación y por frecuencia diferencia, la
 intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
 margen dinámico y el ruido de canal en reposo de AES17-2015. Los

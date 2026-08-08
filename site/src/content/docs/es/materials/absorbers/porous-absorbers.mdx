@@ -1,6 +1,6 @@
 ---
 title: "Absorbentes porosos y multicapa"
-description: "Predicción de la absorción a partir de los parámetros del material: los modelos porosos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el solucionador multicapa por matrices de transferencia con capas perforadas, microperforadas (Maa) y de membrana, y la integral de Paris de incidencia aleatoria."
+description: "Predicción de la absorción a partir de los parámetros del material: los modelos porosos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el modelo multicapa por matrices de transferencia con capas perforadas, microperforadas (Maa) y de membrana, y la integral de Paris de incidencia aleatoria."
 references:
   - type: book
     authors: ["Mechel, F. P. (Ed.)"]
@@ -84,10 +84,10 @@ references:
     authors: ["Allard, J. F.", "Atalla, N."]
     year: 2009
     title: "Propagation of Sound in Porous Media: Modelling Sound Absorbing Materials"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9780470747339"
-    note: "Capítulo 6: la teoría de Biot de un material poroso de esqueleto elástico, sus coeficientes elásticos, sus dos ondas de compresión y su onda de cortante, y la impedancia de superficie y la resonancia de cuarto de onda del esqueleto de una capa con fondo rígido (ecs. 6.107-6.111). Capítulo 11: el método de matrices de transferencia, la matriz de capa poroelástica de seis variables (tabla 11.1), las matrices de acoplamiento (apdo. 11.4) y el ensamblado global (apdo. 11.5). Apartado 11.3.4: los límites de esqueleto rígido y blando de la teoría de Biot, la frecuencia de desacoplamiento y la densidad efectiva blanda (ecs. 11.53-11.55, según Panneton 2007). ISBN 978-0-470-74661-5."
+    note: "Capítulo 6: la teoría de Biot de un material poroso de esqueleto elástico, sus coeficientes elásticos, sus dos ondas de compresión y su onda de cizalla, y la impedancia de superficie y la resonancia de cuarto de onda del esqueleto de una capa con fondo rígido (ecs. 6.107-6.111). Capítulo 11: el método de matrices de transferencia, la matriz de capa poroelástica de seis variables (tabla 11.1), las matrices de acoplamiento (apdo. 11.4) y el ensamblado global (apdo. 11.5). Apartado 11.3.4: los límites de esqueleto rígido y blando de la teoría de Biot, la frecuencia de desacoplo y la densidad efectiva blanda (ecs. 11.53-11.55, según Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -99,7 +99,7 @@ número de onda complejos, y una pila de capas por **matrices de
 transferencia** (mantas porosas, cámaras de aire, paneles perforados y
 microperforados, membranas) predice el coeficiente de absorción de toda la
 construcción antes de construir nada. Esta página cubre los tres modelos
-porosos (Delany–Bazley, Miki, Johnson–Champoux–Allard), el solucionador
+porosos (Delany–Bazley, Miki, Johnson–Champoux–Allard), el modelo
 multicapa, las capas resonantes de Maa y la integral de incidencia aleatoria
 (Paris). Las contrapartes de medida están en las guías del
 [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) y de la
@@ -213,7 +213,7 @@ comparación); JCA extiende la predicción con base física fuera de él. Un
 `PorousMediumResult` construido con datos medidos (por ejemplo los $Z_c$,
 $k$ recuperados por la
 [reducción de matriz de transferencia ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/))
-se conecta al solucionador de capas exactamente igual que uno modelado.
+se conecta al modelo de capas exactamente igual que uno modelado.
 
 ### Esqueletos flexibles: cuando el armazón se mueve (Allard & Atalla 11.3.4)
 
@@ -532,7 +532,7 @@ calculados que el libro sí imprime en prosa para la lana de vidrio de la tabla
 6.1, los tres reproducidos: la onda del aire cambia de raíz en 495 Hz,
 $|\mu_a| > 40$ por encima de 50 Hz y $\mu_b$ cae de 1,0 en 50 Hz a 0,82 en
 1500 Hz. Este último lo reproduce $\mathrm{Re}(\mu_b)$, no $|\mu_b|$, aunque
-la frase impresa diga "el módulo del cociente": el modelo da
+la frase impresa diga «el módulo del cociente»: el modelo da
 $\mu_b(1500) = 0,811 + 0,473j$, cuya parte real queda a un 1,1 % del valor
 impreso mientras su módulo, 0,939, se aparta un 14,5 %. Queda registrado en
 [Erratas](/phonometry/es/reference/errata/), junto con el barrido de parámetros
@@ -589,9 +589,9 @@ print(round(res.absorption[i], 3))               # 0.937 a 1 kHz
 res.plot()   # alpha(f) con |R| superpuesto
 ```
 
-El solucionador evalúa las magnitudes físicas mediante una recursión de
+El modelo multicapa evalúa las magnitudes físicas mediante una recursión de
 admitancias numéricamente robusta (inmune al desbordamiento
-$e^{|\mathrm{Im}(k_x)| d}$ de las entradas matriciales crudas en capas
+$e^{|\mathrm{Im}(k_x)| d}$ de las entradas matriciales en bruto en capas
 extremadamente atenuantes) y aun así expone la matriz de cadena completa
 (recíproca por construcción, $\det T = 1$) en `transfer_matrix`, lista para
 la [maquinaria ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/)
@@ -876,8 +876,8 @@ ralentizan el sonido y alcanzan la absorción perfecta ($\alpha = 1$) en el
 acoplamiento crítico con paneles de solo $\lambda/38$ de profundidad, se
 mudaron a su propia guía:
 [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/) cubre el
-modelo de matrices de transferencia, el solucionador de diseño con
-acoplamiento crítico y la validación cruzada FDTD de la celda mallada.
+modelo de matrices de transferencia, el diseño por
+acoplamiento crítico y la comprobación cruzada FDTD de la celda mallada.
 
 
 ## Notas prácticas
@@ -901,23 +901,25 @@ material adherido a una estructura vibrante. Cuando el esqueleto es lo bastante
 rígido y pesado como para resonar en la banda de interés no vale ningún fluido
 equivalente: usa una `PoroelasticLayer` y la teoría de Biot completa.
 
-**Reacción local frente a volumétrica.** El solucionador de capas es de
+**Reacción local frente a volumétrica.** El modelo de capas es de
 reacción volumétrica (el sonido refracta y viaja dentro de las capas).
 `statistical_absorption` supone reacción local, una buena aproximación para
 resistividades altas, cámaras compartimentadas o revestimientos resonantes
-delgados; para capas porosas gruesas y ligeras integre el modelo volumétrico
+delgados; para capas porosas gruesas y ligeras integra el modelo volumétrico
 con `diffuse_field_absorption` (Mechel secc. D.6).
 
 **Dónde se comprobaron los números.** Ningún estándar rige estos modelos
 de predicción; son métodos de libro y de revista implementados en sala
-limpia desde las fuentes de las referencias de más abajo. Los modelos están fijados dígito a
+limpia desde las fuentes de las referencias de más abajo. Los modelos están
+fijados dígito a
 dígito a las tablas de coeficientes impresas (Bies tabla D.1, Miki
-ecs. 30–34), el solucionador a las formas cerradas anteriores y a la
+ecs. 30–34), el modelo multicapa a las formas cerradas anteriores y a la
 recuperación por `TransferMatrix` de la
-[página del tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/), el MPP a
+[página del tubo de
+impedancia](/phonometry/es/materials/absorbers/impedance-tube/), el MPP a
 la propia aproximación de Maa (acuerdo declarado de ~6 % con la ec. 2
 exacta), a su ejemplo de diseño y a su tabla I, y la integral de Paris a su
-forma cerrada de reacción local. Tres erratas encontradas en las fuentes
+forma cerrada de reacción local. Las erratas encontradas en las fuentes
 durante este trabajo están registradas en el
 [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
 
@@ -930,7 +932,7 @@ Biot de los capítulos 6 y 11 de Allard y Atalla. Esto cubre los
 modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
 `johnson_champoux_allard`, `limp_frame`), la capa poroelástica
 (`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), el
-solucionador multicapa por matrices de
+modelo multicapa por matrices de
 transferencia (`layered_absorber` con `AirLayer`, `PorousLayer`,
 `PoroelasticLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer` y
 `MembraneLayer`) y los

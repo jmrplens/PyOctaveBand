@@ -35,7 +35,7 @@ dB SPL para una señal en pascales) y la **FFT con zoom** (sección 11.5.4),
 que calcula el espectro de una banda estrecha en una malla arbitrariamente
 fina para separar tonos más próximos que un bin práctico de FFT de banda
 completa. Donde la [página de niveles](/phonometry/es/signals/levels/levels/)
-ofrece el espectrograma en bandas fraccionales de octava de un sonómetro,
+ofrece el espectrograma en bandas de fracción de octava de un sonómetro,
 esta es su equivalente de banda fina y ancho de banda constante.
 
 Un solo número gobierna todo en esta página: la longitud del segmento, que
@@ -142,7 +142,7 @@ plt.show()
 
 `res.plot()` dibuja la misma representación directamente desde el
 resultado (una única imagen ráster, 80 dB por debajo de la celda más
-fuerte por defecto; pase `vmin`/`vmax` para cambiar el rango, o `ax` para
+fuerte por defecto; pasa `vmin`/`vmax` para cambiar el rango, o `ax` para
 dibujar en un panel existente).
 
 ## 2. FFT con zoom
@@ -153,17 +153,17 @@ una FFT de 1024 puntos a 8192 Hz: sus bins miden 8 Hz. La solución clásica
 de los analizadores es la **transformada con zoom** de Bendat y Piersol,
 sección 11.5.4: filtrar la banda, bajarla a frecuencia cero por
 demodulación compleja con $\exp(-j 2\pi f_1 t)$ (ecs. 11.123-11.126),
-decimar por
-la razón de anchos de banda y transformar el registro decimado
+diezmar por
+la razón de anchos de banda y transformar el registro diezmado
 (ecs. 11.128-11.130), obteniendo un espaciado fino de bins sobre la banda
 sin un bloque de FFT gigante (ec. 11.127).
 
 `zoom_fft` calcula el equivalente digital exacto en una sola pasada - la
 evaluación chirp-Z de la DFT del registro con ventana sobre la malla del
 zoom - que da las mismas muestras de la DFT que la cadena
-demodular-decimar; la batería de tests fija ambas entre sí a precisión de
+demodular-diezmar; la batería de tests fija ambas entre sí a precisión de
 máquina. Las amplitudes se calibran con la ganancia coherente de la
-ventana, así que un seno de amplitud de pico $A$ sobre una frecuencia de
+ventana, así que una sinusoide de amplitud de pico $A$ sobre una frecuencia de
 análisis lee `amplitude` $= A$ y `power` $= A^2/2$ exactamente:
 
 ```python
@@ -227,11 +227,11 @@ plt.show()
 
 </details>
 
-## Relación con el resto de la librería
+## Relación con el resto de la biblioteca
 
 El espectrograma comparte ventana, segmentación y escalado con
 [`power_spectral_density`](/phonometry/es/signals/spectra/spectral-analysis/), así
-que ambos son mutuamente consistentes bin a bin; el
+que ambos son mutuamente congruentes bin a bin; el
 [espectrograma en bandas de octava](/phonometry/es/signals/levels/levels/) de
 `OctaveFilterBank.spectrogram` es el equivalente de ancho de banda
 porcentual constante con balística de sonómetro; y para seguir en el
@@ -265,7 +265,7 @@ estimadores de Bendat y Piersol, no una norma de certificación.
 ## Véase también
 
 - [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la estimación de Welch promediada para el fondo estacionario, y las figuras de mérito de las ventanas tras el enventanado del segmento.
-- [Niveles](/phonometry/es/signals/levels/levels/): el espectrograma en bandas de octava fraccional con balística de sonómetro.
+- [Niveles](/phonometry/es/signals/levels/levels/): el espectrograma en bandas de fracción de octava con balística de sonómetro.
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): la frecuencia instantánea de Hilbert para seguir una componente.
 - Referencia de la API: [`signals.time_frequency`](/phonometry/es/reference/api/signals/time-frequency/).
 - Teoría: [Resolución frecuencial vs separación de bins FFT](/phonometry/es/reference/theory/signal-analysis/#resolución-frecuencial-vs-separación-de-bins-fft): la separación de bins frente a la resolución efectiva, el compromiso al que esta página dedica toda su extensión.

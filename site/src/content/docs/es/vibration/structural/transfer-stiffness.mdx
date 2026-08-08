@@ -16,14 +16,14 @@ references:
     title: "Acoustics and vibration — Laboratory measurement of vibro-acoustic transfer properties of resilient elements — Part 1: Principles and guidelines"
     designation: "ISO 10846-1:2008"
     url: "https://www.iso.org/standard/38936.html"
-    note: "La parte de principios de la serie: la idealización de fuerza de bloqueo y las relaciones FRF que implementa esta página: la rigidez dinámica de transferencia k₂₁ = F₂,b/u₁ y sus relaciones FRF (cláusula 5 y Anexo A / Tabla A.2) y la aproximación de la fuerza de bloqueo (Ecs. 6/7). Las partes 4 y 5 de la serie extienden las mismas magnitudes a elementos distintos de los soportes y al método de punto de excitación en baja frecuencia. La conformidad se ancla en la identidad en forma cerrada de la Tabla A.2 k = jω·Z y el cociente de fuerzas de la Ec. (6) 1/1,1."
+    note: "La parte de principios de la serie: la idealización de fuerza de bloqueo y las relaciones FRF que implementa esta página: la rigidez dinámica de transferencia k₂₁ = F₂,b/u₁ y sus relaciones FRF (apartado 5 y Anexo A / Tabla A.2) y la aproximación de la fuerza de bloqueo (Ecs. 6/7). Las partes 4 y 5 de la serie extienden las mismas magnitudes a elementos distintos de los soportes y al método de punto de excitación en baja frecuencia. La conformidad se ancla en la identidad en forma cerrada de la Tabla A.2 k = jω·Z y el cociente de fuerzas de la Ec. (6) 1/1,1."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2008
     title: "Acoustics and vibration — Laboratory measurement of vibro-acoustic transfer properties of resilient elements — Part 2: Direct method for determination of the dynamic stiffness of resilient supports for translatory motion"
     designation: "ISO 10846-2:2008"
     url: "https://www.iso.org/standard/38937.html"
-    note: "El método directo y, con la Parte 3, el nivel L_k re 1 N/m y el factor de pérdidas (cláusulas 3.8/3.17). La conformidad se ancla en el nivel en forma cerrada de una década de rigidez."
+    note: "El método directo y, con la Parte 3, el nivel L_k re 1 N/m y el factor de pérdidas (apartados 3.8/3.17). La conformidad se ancla en el nivel en forma cerrada de una década de rigidez."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2002
@@ -37,10 +37,10 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 La propiedad de transferencia vibroacústica de un elemento resiliente (un
-aislador de vibraciones, montura, fuelle o manguera) es su **rigidez dinámica de
-transferencia** $k_{2,1}$, el cociente dependiente de la frecuencia entre la
-*fuerza de bloqueo* en el lado de salida (receptor) y el desplazamiento en el
-lado de entrada (fuente) (ISO 10846-1, 3.7):
+aislador de vibraciones, soporte, fuelle o manguera) es su **rigidez dinámica
+de transferencia** $k_{2,1}$, el cociente dependiente de la frecuencia entre
+la *fuerza de bloqueo* en el lado de salida (receptor) y el desplazamiento en
+el lado de entrada (fuente) (ISO 10846-1, 3.7):
 
 $$
 k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
@@ -107,7 +107,7 @@ $$
 ```python
 from phonometry import vibration
 
-# Una montura resiliente con |k2,1| = 1 MN/m y un factor de pérdidas del 5 %:
+# Un soporte resiliente con |k2,1| = 1 MN/m y un factor de pérdidas del 5 %:
 k = 1e6 * (1.0 + 0.05j)
 print(round(float(vibration.transfer_stiffness_level(k)), 2))   # 120.00  dB re 1 N/m
 print(round(float(vibration.loss_factor(k)), 3))                # 0.05
@@ -156,7 +156,7 @@ from phonometry import vibration
 k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0,
                                           flange_mass=1.2)
 print(f"{abs(complex(k)):.3e}")            # 1.105e+06  N/m
-# flange_mass vale 0 por defecto, lo que declara 9.870e+05 N/m: aquí un 12 % baja.
+# flange_mass vale 0 por defecto: declara 9.870e+05 N/m, un 12 % por debajo.
 
 # Agrupa una medición en barrido en un resultado con su nivel y factor de pérdidas:
 f = np.logspace(1.5, 3.3, 200)

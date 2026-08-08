@@ -6,7 +6,7 @@ references:
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "El método de cuatro polos de silenciadores, la TL de la cámara de expansión y las fórmulas de sintonía de los resonadores (§8.8-8.9) de esta guía."
@@ -14,7 +14,7 @@ references:
     authors: ["Munjal, M. L."]
     year: 2014
     title: "Acoustics of ducts and mufflers"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9781118443767"
     note: "La formulación por matrices de transferencia, las matrices de los elementos y la pérdida de transmisión de la matriz compuesta (Ec. (3.27)), y el tratamiento de referencia de los silenciadores disipativos y combinados."
@@ -22,7 +22,7 @@ references:
     authors: ["Vér, I. L.", "Beranek, L. L."]
     year: 2006
     title: "Noise and vibration control engineering: Principles and applications"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9780470172568"
     note: "El tratamiento complementario de silenciadores reactivos y disipativos."
@@ -394,7 +394,7 @@ media sobre las bandas de análisis en su recuadro con el valor de pico y el
 tipo de dispositivo, y un veredicto opcional frente a una pérdida de
 transmisión media mínima declarada. El renderizado necesita reportlab y, para
 la figura que incrusta la ficha, matplotlib (`pip install
-"phonometry[report,plot]"`); pase `language="es"` para una ficha en español.
+"phonometry[report,plot]"`); pasa `language="es"` para una ficha en español.
 
 ```python
 import numpy as np
@@ -416,12 +416,12 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; pulse la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="reactive_silencer_example"
 	title="Informe de ejemplo de pérdida de transmisión de un silenciador reactivo (PDF)"
-	description="Ficha de silenciador reactivo de una página: una cabecera de metadatos con el cliente, el silenciador de cámara de expansión con relación de áreas m = 8 como fuente de ruido, el estudio de diseño del sistema de conductos y la fecha de ensayo, la tabla de pérdida de transmisión por bandas de octava con 7,5, 11,4, 9,9, 12,1, 3,2, 7,0 y 11,1 dB de 63 Hz a 4 kHz junto a esa misma curva frente a la frecuencia, la pérdida de transmisión media TL = 8,9 dB enmarcada con el valor de pico de 12,1 dB y el dispositivo identificado como cámara de expansión, un veredicto APTO frente al mínimo exigido de 6,0 dB, y la nota de que el resultado es una predicción de onda plana a partir de la geometría declarada y no una medida."
+	description="Ficha de silenciador reactivo de una página: una cabecera de metadatos con el cliente, el silenciador de cámara de expansión con relación de áreas m = 8 como fuente de ruido, el estudio de diseño del sistema de conductos y la fecha de ensayo, la tabla de pérdida de transmisión por bandas de octava con 7,5, 11,4, 9,9, 12,1, 3,2, 7,0 y 11,1 dB de 63 Hz a 4 kHz junto a esa misma curva frente a la frecuencia, la pérdida de transmisión media TL = 8,9 dB enmarcada con el valor de pico de 12,1 dB y el dispositivo identificado como cámara de expansión, un veredicto CUMPLE frente al mínimo exigido de 6,0 dB, y la nota de que el resultado es una predicción de onda plana a partir de la geometría declarada y no una medida."
 	caption="Ficha de silenciador reactivo (ReactiveSilencerResult.report), la pérdida de transmisión media sobre las bandas de análisis con su valor de pico."
 />
 
@@ -445,7 +445,7 @@ para elegir:
   sonido se colima por el conducto libre y pasa de largo sobre el
   revestimiento, así que la atenuación de las dos familias se desploma y solo
   las geometrías de bafles (pasos estrechos, más perímetro revestido por
-  unidad de área) siguen funcionando.
+  unidad de superficie) siguen funcionando.
 - **Tipo de espectro.** Una fuente tonal, un orden de encendido de un motor o
   una frecuencia de paso de álabes, es la presa natural de un resonador; el
   ruido de ventilador o de flujo, de banda ancha, pide la banda disipativa.
@@ -471,12 +471,12 @@ desde primeros principios, los modelos de fluido equivalente alimentados por
 la resistividad al flujo de aire, es la misma teoría de materiales que
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
 
-## Contraste con el solucionador FDTD
+## Contraste con la simulación FDTD
 
 Ese contraste es el clip incrustado en el apartado 1, y vale la pena volver a
 él ahora con el álgebra en la mano. La cámara de expansión de cuatro polos se
 contrasta con el
-[solucionador de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
+[simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
 independiente, que no comparte con el producto de matrices de transferencia
 ninguna fórmula ni ninguna hipótesis más allá de la propia ecuación de ondas:
 un conducto de onda plana que se ensancha en la misma cámara de 0,30 m y
@@ -488,7 +488,7 @@ la pérdida de transmisión anotada en el clip, 6,5 dB a 286 Hz y 0,0 dB a
 tan estrecho descarta un error de álgebra en cualquiera de los dos lados. Los
 dos tienen que separarse tarde o temprano por encima de la primera frecuencia
 de corte del conducto, donde se propagan modos de orden superior: el
-solucionador bidimensional sigue funcionando ahí y el álgebra de onda plana
+esquema bidimensional sigue funcionando ahí y el álgebra de onda plana
 no.
 
 ## Qué cubre esta guía
@@ -499,7 +499,7 @@ cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
 `quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
 los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
 `insertion_loss` para encadenar elementos arbitrarios, cada uno con su
-dibujo a escala `.plot_geometry()`, contrastados contra el solucionador FDTD
+dibujo a escala `.plot_geometry()`, contrastados contra la simulación FDTD
 independiente.
 
 **No cubierto.** Solo se calculan elementos reactivos: los silenciadores
@@ -522,7 +522,7 @@ sin flujo que se usan aquí.
   resto de la instalación: atenuación y ruido de flujo en conductos HVAC,
   plenums, reflexión de extremo y cerramientos de máquina.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el
-  solucionador independiente que respalda el contraste de la cámara de
+  esquema independiente que respalda el contraste de la cámara de
   expansión.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
   la teoría de materiales de fluido equivalente detrás de los revestimientos

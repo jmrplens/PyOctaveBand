@@ -20,7 +20,7 @@ references:
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "Las secciones 3.1.5 y 3.4 (efectos de campo del micrófono y calibración del sonómetro: la práctica de calibración eléctrica y acústica que sigue el flujo de esta página). ISBN 978-1-4987-2405-0."
@@ -28,7 +28,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Cada nivel que devuelve esta librería es tan fiable como el número que
+Cada nivel que devuelve esta biblioteca es tan fiable como el número que
 produce esta página: el factor de sensibilidad que convierte unidades
 digitales en pascales. La página cubre los dos marcos de referencia en los
 que se puede analizar una grabación: el **dB SPL** físico, obtenido
@@ -40,8 +40,8 @@ preferencia. Trabaja en dB SPL siempre que el resultado se enfrente a un
 criterio físico (un límite de ruido, un umbral de exposición, cualquier
 norma de acústica); eso exige una grabación del calibrador hecha con la
 *misma cadena, sin tocar*, que la medición. Trabaja en dBFS cuando la señal
-nunca tuvo un frontal analógico calibrado (normalización de sonoridad,
-pruebas de códecs e interfaces, análisis de solo archivo) o cuando no
+nunca tuvo un front-end analógico calibrado (normalización de sonoridad,
+pruebas de códecs e interfaces, análisis solo a partir de archivos) o cuando no
 existe tono de calibración, en cuyo caso las afirmaciones absolutas de SPL
 quedan sencillamente fuera de alcance.
 
@@ -57,7 +57,7 @@ exactamente en este paso antes de calcular ningún nivel.
 
 ## ¿Por qué calibrar? La teoría
 
-Una grabación digital solo conoce *números*: una senoide a fondo de escala es
+Una grabación digital solo conoce *números*: una sinusoide a fondo de escala es
 ±1,0 tanto si era un susurro como un motor a reacción. Para expresar niveles
 de presión acústica físicos, la cadena micrófono → preamplificador → ADC debe
 caracterizarse con un único número, el **factor de sensibilidad** $S$, que
@@ -80,7 +80,7 @@ nada cambie en la cadena: si tocas la ganancia, recalibra.
 Los tres pasos de abajo son todo el flujo de trabajo de SPL físico: una toma del
 calibrador, una llamada a `sensitivity()` y el factor entregado a una función de
 nivel. Las dos grabaciones tienen que venir de la misma cadena sin tocar nada
-entre medias. El mismo factor funciona en toda la librería: `octave_filter` y
+entre medias. El mismo factor funciona en toda la biblioteca: `octave_filter` y
 `OctaveFilterBank` lo reciben dentro de `LevelCalibration(factor=...)`, y `leq`,
 `laeq` y `ln_levels` como `calibration_factor=`.
 
@@ -111,7 +111,7 @@ spl, freq = filters.octave_filter(
 
 ## Supuestos del calibrador (IEC 60942)
 
-`sensitivity` asume que la grabación de referencia procede de un
+`sensitivity` supone que la grabación de referencia procede de un
 calibrador acústico según **IEC 60942** (clases LS, 1 y 2):
 
 - El `target_spl=94.0` por defecto corresponde a la salida habitual de 94 dB
@@ -211,13 +211,13 @@ funciones de dosis, y como `calibration=LevelCalibration(factor=...)` a
 
 La calibración vive en tres escalas de tiempo:
 
-- **En cada sesión: la comprobación de campo.** Acopla el calibrador y deriva
+- **En cada sesión: la comprobación de campo.** Acopla el calibrador y obtén
   la sensibilidad antes de cada serie de mediciones, y compruébala de nuevo
   al terminar. Los métodos normativos hacen obligatoria la segunda
   comprobación y usan la diferencia antes/después como criterio de validez
   (uno habitual invalida la serie cuando ambas difieren en más de 0,5 dB).
   Sea cual sea el umbral, esa diferencia es tu cota de deriva para todo lo
-  capturado entre medias; llévala al presupuesto de incertidumbre en lugar
+  capturado entre medias; llévala al balance de incertidumbre en lugar
   de suponerla cero.
 - **Periódicamente: verificación de laboratorio.** Una comprobación de campo
   solo compara la cadena con el calibrador; no puede ver un error que
@@ -231,7 +231,7 @@ La calibración vive en tres escalas de tiempo:
   electrónica, con la tensión de la batería. Una cadena de clase 1 sana
   deriva unas centésimas de dB en una sesión, y por eso una diferencia
   antes/después de medio decibelio señala un daño y no el clima. La mayor
-  "deriva" de todas es un mando de ganancia tocado: el factor $S$ solo vale
+  «deriva» de todas es un mando de ganancia tocado: el factor $S$ solo vale
   mientras la cadena permanece exactamente como se calibró.
 
 Una sutileza más sobre clases: las tolerancias se encadenan. Una medición de
@@ -249,7 +249,7 @@ parámetro `dbfs=True`.
 En este modo:
 
 * **0 dBFS** corresponde a un nivel numérico de señal de 1,0 (RMS o pico).
-* El factor de calibración no aplica (dBFS es relativo al fondo de escala digital).
+* El factor de calibración no se aplica (dBFS es relativo al fondo de escala digital).
 * Útil para analizar headroom, mastering digital o señales normalizadas.
 
 ```python
@@ -320,7 +320,7 @@ de nada.
 ## Qué cubre esta guía
 
 **Cubierto.** La IEC 60942:2017 en lo que condiciona el *factor de
-sensibilidad*: el nivel principal del calibrador que asume `target_spl`, las
+sensibilidad*: el nivel principal del calibrador que supone `target_spl`, las
 tolerancias de clase de la Tabla 1 citadas arriba en la discusión de
 incertidumbre y la comprobación de fluctuación de nivel a corto plazo del
 apartado 5.3.3 frente a los límites de clase 1 de la Tabla 2, que
@@ -346,11 +346,16 @@ queda fuera de cualquier norma y no hace ninguna afirmación física.
 
 ### ¿Qué nivel de calibrador debo usar para calibrar mi cadena de medición?
 
-La elección habitual es 94 dB SPL a 1 kHz (1 Pa RMS), que es lo que `sensitivity()` asume con su `target_spl=94.0` por defecto; para un calibrador de 114 dB pasa `114.0`. IEC 60942 exige que el nivel principal sea al menos 90 dB re 20 µPa. Graba unos segundos de tono estable, porque la norma especifica el nivel generado como promedio de 20 s.
+La elección habitual es 94 dB SPL a 1 kHz (1 Pa RMS), que es lo que `sensitivity()` supone con su `target_spl=94.0` por defecto; para un calibrador de 114 dB pasa `114.0`. IEC 60942 exige que el nivel principal sea al menos 90 dB re 20 µPa. Graba unos segundos de tono estable, porque la norma especifica el nivel generado como promedio de 20 s.
 
 ### ¿Cuánta deriva entre las comprobaciones de calibración previa y posterior es aceptable?
 
-Deriva la sensibilidad antes de cada serie de mediciones y compruébala de nuevo al terminar: un criterio habitual invalida la serie cuando ambas difieren en más de 0,5 dB. Una cadena de clase 1 sana deriva unas centésimas de dB en una sesión, así que una diferencia antes/después de medio decibelio señala un daño y no el clima. Sea cual sea el umbral, lleva la diferencia al presupuesto de incertidumbre en lugar de suponerla cero.
+Obtén la sensibilidad antes de cada serie de mediciones y compruébala de nuevo
+al terminar: un criterio habitual invalida la serie cuando ambas difieren en
+más de 0,5 dB. Una cadena de clase 1 sana deriva unas centésimas de dB en una
+sesión, así que una diferencia antes/después de medio decibelio señala un daño
+y no el clima. Sea cual sea el umbral, lleva la diferencia al presupuesto de
+incertidumbre en lugar de suponerla cero.
 
 ### ¿Puedo calibrar una cadena de clase 1 con un calibrador de clase 2?
 

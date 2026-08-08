@@ -20,7 +20,7 @@ references:
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
     title: "Random data: Analysis and measurement procedures"
-    edition: "4th ed."
+    edition: "4.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
     note: "La sección 10.4.2 (el procedimiento para analizar múltiples registros de datos: primero el análisis individual por registro y, como paso aparte y deliberado, el análisis cruzado conjunto) y el capítulo 7 (los modelos de múltiples entradas/salidas a los que conduce ese paso conjunto). ISBN 978-0-470-24877-5."
@@ -59,7 +59,7 @@ entradas de Bendat y Piersol.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_es.svg" alt="Análisis estéreo: ruido rosa y barrido logarítmico resueltos por canal en tercios de octava" width="80%" loading="eager" />
 
 *Análisis simultáneo de una señal estéreo: canal izquierdo (ruido rosa) vs canal
-derecho (barrido senoidal logarítmico).*
+derecho (barrido sinusoidal logarítmico).*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -94,7 +94,7 @@ plt.show()
 
 </details>
 
-La convención es consistente en toda la librería: el tiempo siempre es el
+La convención es uniforme en toda la biblioteca: el tiempo siempre es el
 **último eje**. Aplica a `octave_filter`, `OctaveFilterBank`, `weighting_filter`,
 `time_weighting`, `leq`, `laeq`, `ln_levels` y `spectrogram`.
 
@@ -218,7 +218,7 @@ cruzada y los modelos de entrada múltiple de Bendat y Piersol.
 ## Véase también
 
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): las preguntas cruzadas en el dominio del tiempo (retardo, alineación) que la ruta por canal deja deliberadamente en tus manos.
-- [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/): cuál de varios canales correlados excita realmente una respuesta (Bendat y Piersol, cap. 7).
+- [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/): cuál de varios canales correlacionados excita realmente una respuesta (Bendat y Piersol, cap. 7).
 - [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): la contrapartida en streaming, con un estado de filtro por canal.
 - [Niveles](/phonometry/es/signals/levels/levels/): las métricas de nivel por canal, y por qué los dB se combinan energéticamente.
 - Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).

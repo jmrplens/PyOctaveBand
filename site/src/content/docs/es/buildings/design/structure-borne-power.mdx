@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica estructural de equipos (EN 15657)"
-description: "El método de placa receptora de EN 15657:2018 para equipos de servicio del edificio: la potencia inyectada en la placa L_Ws = 10 lg(2πfηmS) + L_v − 60 dB (Fórmula 14) y las magnitudes de fuente independientes de la placa: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17), velocidad libre y movilidad de la fuente (Fórmulas 18/19)."
+description: "El método de placa receptora de EN 15657:2018 para equipamientos del edificio: la potencia inyectada en la placa L_Ws = 10 lg(2πfηmS) + L_v − 60 dB (Fórmula 14) y las magnitudes de fuente independientes de la placa: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17), velocidad libre y movilidad de la fuente (Fórmulas 18/19)."
 references:
   - type: book
     authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
@@ -16,7 +16,7 @@ references:
     title: "Acoustic properties of building elements and of buildings — Laboratory measurement of structure-borne sound from building service equipment for all installation conditions"
     designation: "EN 15657:2018"
     url: "https://www.une.org/encuentra-tu-norma/busca-tu-norma/norma?c=N0059781"
-    note: "El método de la placa receptora (cláusula 7): el nivel de velocidad medio espacial (Fórmula 12), el factor de pérdida de la placa η = 2,2/(f·Ts) (Fórmula 13), el nivel de potencia inyectada en la placa L_Ws (Fórmula 14, niveles de velocidad de la placa referidos a v₀ = 10⁻⁹ m/s) y la cadena de magnitudes de fuente: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17, Y_R,∞,baja = 5·10⁻⁶ m/(N·s)), velocidad libre equivalente (Fórmula 18) y movilidad de la fuente (Fórmula 19). La conformidad se ancla en el balance de potencia de la placa resonante P = ω·η·(m·S)·⟨v²⟩ (del cual la Fórmula 14 es el nivel), en la identidad del factor de pérdida y en la conversión de la fuente de la cisterna de la Tabla I.8 del Anexo I.3 de EN 12354-5. La ficha de catálogo enlazada es la página de UNE de UNE-EN 15657:2018."
+    note: "El método de la placa receptora (apartado 7): el nivel de velocidad medio espacial (Fórmula 12), el factor de pérdida de la placa η = 2,2/(f·Ts) (Fórmula 13), el nivel de potencia inyectada en la placa L_Ws (Fórmula 14, niveles de velocidad de la placa referidos a v₀ = 10⁻⁹ m/s) y la cadena de magnitudes de fuente: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17, Y_R,∞,baja = 5·10⁻⁶ m/(N·s)), velocidad libre equivalente (Fórmula 18) y movilidad de la fuente (Fórmula 19). La conformidad se ancla en el balance de potencia de la placa resonante P = ω·η·(m·S)·⟨v²⟩ (del cual la Fórmula 14 es el nivel), en la identidad del factor de pérdida y en la conversión de la fuente de la cisterna de la Tabla I.8 del Anexo I.3 de EN 12354-5. La ficha de catálogo enlazada es la página de UNE de UNE-EN 15657:2018."
   - type: standard
     organization: "International Organization for Standardization"
     year: 1996
@@ -29,7 +29,7 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-Los equipos de servicio del edificio (bombas, ventiladores, calderas, aparatos
+Los equipamientos del edificio (bombas, ventiladores, calderas, aparatos
 sanitarios) inyectan **potencia acústica estructural** en la estructura del
 edificio a la que están fijados, que luego se radia como ruido aéreo en los
 recintos contiguos. La **EN 15657:2018** la mide con el **método de la placa
@@ -191,7 +191,8 @@ equivalente** (Fórmula 18, re $10^{-9}\ \text{m/s}$) y la **movilidad de la
 fuente**
 $|Y_{S,\text{eq}}|$ (Fórmula 19). La corrección de movilidad del Anexo I de EN 12354-5
 (`installed_power_from_reception_plate`, véase el
-[sonido estructural instalado](/phonometry/es/buildings/design/installed-structure-borne/))
+[ruido estructural
+instalado](/phonometry/es/buildings/design/installed-structure-borne/))
 refiere después $L_{Wsn}$ al elemento receptor real.
 
 ```python
@@ -259,7 +260,7 @@ fuente, entorno de ensayo, instrumentación, clima, fecha), una tabla por bandas
 espacial de la placa $L_v$ y el nivel de potencia acústica estructural inyectado
 $L_{Ws}$), el espectro $L_{Ws}(f)$ con un eje de bandas nominal, y el total
 sumado en bandas $L_{Ws}$ (dB re 1 pW) recuadrado, con la masa por unidad de
-área de la placa $m$ y el área $S$.
+superficie de la placa $m$ y el área $S$.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
 aquí son el **equipo fuente** (`specimen`), el **entorno de ensayo**
@@ -267,12 +268,13 @@ aquí son el **equipo fuente** (`specimen`), el **entorno de ensayo**
 **humedad relativa** y la **presión ambiente**, la **fecha del ensayo**
 (`test_date`) y la identidad del pie (`laboratory`, `operator`, `report_id`,
 `notes`); la masa y el área de la placa provienen del propio resultado. Aportar
-`requirement` añade un veredicto PASS/FAIL frente a un límite superior declarado
+`requirement` añade un veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado
 sobre el total $L_{Ws}$ (una emisión de potencia es una magnitud donde menos es
 mejor, así que la fuente cumple en el límite o por debajo). `verbose=True` añade
 la columna del factor de pérdidas de la placa $\eta$ a la tabla.
-`language="es"` genera la ficha en español con comas decimales. La franja de
-base enuncia la Fórmula 14 y recuerda que el nivel inyectado en la placa debe convertirse a las
+`language="es"` genera la ficha en español con comas decimales. La tira de
+base enuncia la Fórmula 14 y recuerda que el nivel inyectado en la placa debe
+convertirse a las
 magnitudes de fuente independientes de la placa (Fórmulas 15/17) antes de
 alimentar la EN 12354-5.
 
@@ -289,10 +291,10 @@ res = reception_plate_power(
 res.report(
     "structure_borne_power.pdf",
     metadata=ReportMetadata(
-        client="Example building services contractor",
-        specimen="Circulation pump (wall-mounted)",
-        test_room="Reception-plate test rig (heavy concrete plate)",
-        laboratory="Phonometry reference example",
+        client="Instalador de servicios del edificio de ejemplo",
+        specimen="Bomba circuladora (montada en pared)",
+        test_room="Banco de placa de recepción (placa pesada de hormigón)",
+        laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-15657",
     ),
     language="es",
@@ -305,7 +307,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="en15657_structure_borne_power_example"
 	title="Informe de ejemplo de potencia acústica estructural EN 15657 (PDF)"
-	description="Ficha de una página de potencia acústica estructural por el método de la placa de recepción de la EN 15657:2018: una cabecera con el cliente, el equipo fuente, el banco de placa de recepción y el acelerómetro y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de los niveles de velocidad medios de la placa Lv y los niveles de potencia acústica estructural inyectados L_Ws, el espectro L_Ws(f) con un eje de bandas nominal, y el total sumado en bandas L_Ws (dB re 1 pW) recuadrado con la masa por unidad de área de la placa m = 25 kg/m2 y el área S = 1,20 m2, cerrada por una franja de base con la relación de la Fórmula 14 y la conversión a las magnitudes de fuente independientes de la placa requerida antes de la EN 12354-5."
+	description="Ficha de una página de potencia acústica estructural por el método de la placa de recepción de la EN 15657:2018: una cabecera con el cliente, el equipo fuente, el banco de placa de recepción y el acelerómetro y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de los niveles de velocidad medios de la placa Lv y los niveles de potencia acústica estructural inyectados L_Ws, el espectro L_Ws(f) con un eje de bandas nominal, y el total sumado en bandas L_Ws (dB re 1 pW) recuadrado con la masa por unidad de superficie de la placa m = 25 kg/m2 y el área S = 1,20 m2, cerrada por una franja de base con la relación de la Fórmula 14 y la conversión a las magnitudes de fuente independientes de la placa requerida antes de la EN 12354-5."
 	caption="Ficha de potencia acústica estructural (StructureBornePowerResult.report), una caracterización por placa de recepción EN 15657 con el total L_Ws recuadrado."
 />
 

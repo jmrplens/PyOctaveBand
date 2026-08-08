@@ -1,27 +1,27 @@
 ---
 title: "Simulación de ondas"
-description: "Calcular el propio campo sonoro: un solucionador FDTD 2D determinista sobre una malla escalonada presión-velocidad, con fuentes, sondas, obstáculos rasterizados y contornos por lado, más su compañero elástico P-SV con ondas de Rayleigh, acoplamiento fluido-sólido y ondas de interfase de Scholte."
+description: "Calcular el propio campo sonoro: un método FDTD 2D determinista sobre una malla escalonada presión-velocidad, con fuentes, sondas, obstáculos rasterizados y contornos por lado, más su compañero elástico P-SV con ondas de Rayleigh, acoplamiento fluido-sólido y ondas de interfase de Scholte."
 ---
 
 La mayor parte de esta biblioteca predice un número; esta sección calcula el
-**propio campo de ondas**. Un solucionador de diferencias finitas en el
+**propio campo de ondas**. Un esquema de diferencias finitas en el
 dominio del tiempo (FDTD) integra las ecuaciones acústicas lineales sobre una
 malla 2D, de modo que la reflexión, la difracción, la interferencia, el
 comportamiento modal y la refracción en medios inhomogéneos emergen de
 primeros principios, y su compañero elástico lleva el mismo esquema a los
-sólidos. Ambos solucionadores son deterministas (entradas idénticas dan
+sólidos. Ambos esquemas son deterministas (entradas idénticas dan
 salidas idénticas bit a bit en la misma plataforma), están validados contra
 oráculos analíticos y sirven además como motor de contraste para los modelos
 en forma cerrada de las demás secciones.
 
 El dominio 2D es una **sección**, y eso tiene una consecuencia que conviene
-zanjar antes de que salga ningún número del solucionador: un punto del plano es
+zanjar antes de que salga ningún número de la simulación: un punto del plano es
 físicamente una fuente lineal infinita, así que las amplitudes caen como la
 raíz cuadrada inversa de la distancia, unos 3 dB por duplicación en lugar de 6.
 Los patrones de interferencia y difracción, los tiempos de llegada y las
 frecuencias modales son fieles; los niveles absolutos y las tasas de caída
 pertenecen a esa geometría y no a una sala 3D. Una afirmación cuantitativa 3D
-necesita detrás una forma cerrada o un solucionador 3D.
+necesita detrás una forma cerrada o un cálculo 3D.
 
 La sección se divide según los medios que simula. La página acústica
 explica el método numérico (el esquema leapfrog escalonado y su límite de
@@ -47,21 +47,24 @@ emerge de un perfil de velocidad del sonido dependiente de la altura. Cuando
 una geometría es demasiado irregular para esos modelos (salas de forma
 extraña, barreras múltiples, suelo de impedancia mixta), la simulación es el
 recurso que aún da una respuesta cuantitativa; cuando existe una forma
-cerrada, prefiérela, y usa el solucionador para verificar las hipótesis en
+cerrada, prefiérela, y usa la simulación para verificar las hipótesis en
 las que se apoya.
 
 Esos contrastes no son solo argumentos: quince de las animaciones de esta
-documentación son salida de estos dos solucionadores, y están archivadas en las
+documentación son salida de estos dos esquemas, y están archivadas en las
 guías cuya física zanjan y no aquí. Los modos de sala creciendo en resonancia y
 fuera de ella aparecen en
 [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y en
-[predicción de la reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/),
+[predicción de la
+reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/),
 que además lleva la sala de columnas que convierte un solo frente de onda en un
 campo mezclado; la difracción por barrera a dos longitudes de onda, en
 [propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/)
-y en [efecto del suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/);
+y en [efecto del suelo y
+barreras](/phonometry/es/environment/propagation/ground-barriers/);
 la refracción a favor y en contra del viento, en
-[refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/);
+[refracción
+atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/);
 el patrón de lóbulos del efecto del suelo, en propagación en exteriores y en
 [ruido de aeropuerto](/phonometry/es/aircraft/airport-noise/); los tubos de onda
 estacionaria y de transmisión, en
@@ -69,17 +72,20 @@ estacionaria y de transmisión, en
 paneles QRD y de metadifusor, en
 [difusores](/phonometry/es/materials/diffusers/diffusers/) y
 [metadifusores](/phonometry/es/materials/diffusers/metadiffusers/); el absorbente
-de rendija, en [absorbentes metamateriales](/phonometry/es/materials/absorbers/metamaterial-absorbers/);
-la cámara de expansión, en [silenciadores](/phonometry/es/devices/noise-control/silencers/);
+de ranura, en [absorbentes
+metamateriales](/phonometry/es/materials/absorbers/metamaterial-absorbers/);
+la cámara de expansión, en
+[silenciadores](/phonometry/es/devices/noise-control/silencers/);
 la abertura en la pared, en
-[aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/);
+[aislamiento acústico de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/);
 y el canal SOFAR, en
 [propagación submarina](/phonometry/es/underwater/underwater-propagation/). El
-solucionador elástico aporta dos más: el paquete de flexión que entra en una
+esquema elástico aporta dos más: el paquete de flexión que entra en una
 unión en L, en
 [transmisión en uniones](/phonometry/es/vibration/structural/junction-transmission/),
 y la placa en coincidencia, en aislamiento acústico de paneles. Las dos aparecen
-también en la página elástica de más abajo, donde se explica el solucionador que
+también en la página elástica de más abajo, donde se explica el esquema que
 las produjo.
 
 Varias de esas guías hacen algo más que ilustrar: ejecutan una **medición
@@ -90,7 +96,7 @@ las guías de difusores y metadifusores excitan paneles mallados con una onda
 plana y transforman el campo cercano en una respuesta polar; las guías de
 aislamiento de paneles y de unión entre placas lanzan ondas de flexión en una
 placa y observan cómo suceden la coincidencia y el reparto en la unión. En cada
-caso el solucionador hace las veces de laboratorio, que es lo que convierte la
+caso la simulación hace las veces de laboratorio, que es lo que convierte la
 comparación con la forma cerrada en un ensayo de verdad y no en una
 demostración.
 
@@ -121,7 +127,7 @@ dice en su propia apertura.
   condiciones de contorno, la cadena de campo cercano a lejano, los límites
   del 2D y la regla de dispersión numérica.
 - [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/):
-  el solucionador compañero velocidad-esfuerzo P-SV (Virieux 1986) sobre la
+  el esquema compañero velocidad-esfuerzo P-SV (Virieux 1986) sobre la
   misma malla, con superficies libres por imagen de esfuerzos, ondas de
   Rayleigh, conversión de modo, ondas de interfase de Scholte y transmisión
   de placas sumergidas, cada una validada contra su forma cerrada exacta.
@@ -129,11 +135,11 @@ dice en su propia apertura.
 ## Qué no cubre esta sección
 
 **Dos dimensiones, y no hay forma de esquivarlo.** Todo lo que una sección 2D
-no puede decir de una sala 3D, no lo dice ninguno de los dos solucionadores, y
+no puede decir de una sala 3D, no lo dice ninguno de los dos esquemas, y
 la divergencia cilíndrica de más arriba es solo la consecuencia más visible. El
 contorno abierto es una capa absorbente de rampa cuadrática — el precursor
 sencillo de una capa perfectamente adaptada, no una PML —, así que la incidencia
-rasante se absorbe menos limpiamente que la normal, y el solucionador elástico
+rasante se absorbe menos limpiamente que la normal, y el esquema elástico
 no tiene ninguna PML elástica, lo que más se nota en las ondas de Rayleigh
 rasantes. El medio no se mueve: **el viento y la advección por flujo no se
 modelan**, así que un estudio de refracción aquí sale de un perfil de velocidad
@@ -141,22 +147,22 @@ del sonido dependiente de la altura y no de un campo de flujo. El único contorn
 de impedancia es uno real independiente de la frecuencia, así que un absorbente
 poroso hay que mallarlo en vez de declararlo. Del lado elástico el sólido es
 isótropo y puramente elástico: sin anisotropía y sin amortiguamiento
-viscoelástico más allá de la tasa de caída volumétrica, así que no se puede
+viscoelástico más allá de la tasa de decaimiento volumétrica, así que no se puede
 introducir un factor de pérdidas del material.
 
 Y aquí no hay ningún paquete de acústica de salas. No hay importador de
 geometría, ni biblioteca de materiales, ni trazador de rayos, ni auralización,
-ni solucionador 3D: los obstáculos se rasterizan sobre la malla a partir de
+ni cálculo 3D: los obstáculos se rasterizan sobre la malla a partir de
 formas que defines tú, y la salida es un campo que analizas tú.
 
 ## Antes y después de estas páginas
 
-Los campos que producen estos solucionadores se leen con las mismas
+Los campos que producen estos esquemas se leen con las mismas
 herramientas que una medición: el filtrado, la ponderación y las funciones de
 nivel de [Análisis de señal](/phonometry/es/signals/), con [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorriendo esa cadena de
 principio a fin en una sola página ejecutable. No hay página de referencia de
-teoría para los solucionadores; las derivaciones, las condiciones de
+teoría para los dos esquemas; las derivaciones, las condiciones de
 estabilidad y los oráculos analíticos se quedan dentro de las dos guías de
 arriba.
 

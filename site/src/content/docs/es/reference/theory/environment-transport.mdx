@@ -41,7 +41,7 @@ references:
     title: "Acoustics — Description, measurement and assessment of environmental noise — Part 1: Basic quantities and assessment procedures"
     designation: "ISO 1996-1:2016"
     url: "https://www.iso.org/standard/59765.html"
-    note: "El nivel de calificación compuesto y los ajustes de la Tabla A.1 de la sección de descriptores."
+    note: "El nivel de evaluación compuesto y los ajustes de la Tabla A.1 de la sección de descriptores."
   - type: standard
     organization: "Nordtest"
     year: 2002
@@ -76,7 +76,7 @@ references:
     title: "Acoustics — Determination of occupational noise exposure — Engineering method"
     designation: "ISO 9612:2009"
     url: "https://www.iso.org/standard/41718.html"
-    note: "Las tres estrategias de medición y el presupuesto de incertidumbre del Anexo C de la sección laboral."
+    note: "Las tres estrategias de medición y el balance de incertidumbre del Anexo C de la sección laboral."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -109,7 +109,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Esta página reúne la teoría del ruido ambiental y en exteriores: los descriptores de evaluación de jornada completa y el ajuste por sonidos impulsivos, la absorción atmosférica, el método general de propagación en exteriores, la exposición al ruido en el trabajo con su presupuesto de incertidumbre, y los métodos de determinación de la potencia acústica. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+Esta página reúne la teoría del ruido ambiental y en exteriores: los descriptores de evaluación de jornada completa y el ajuste por sonidos impulsivos, la absorción atmosférica, el método general de propagación en exteriores, la exposición al ruido en el trabajo con su balance de incertidumbre, y los métodos de determinación de la potencia acústica. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Descriptores ambientales (ISO 1996-1)
 
@@ -141,7 +141,13 @@ Consulta la [guía de niveles ambientales](/phonometry/es/environment/assessment
 
 ## Prominencia de sonidos impulsivos (NT ACOU 112)
 
-Un impulso molesta más allá de su energía, por lo que las evaluaciones ambientales según ISO 1996-2 penalizan los periodos con sonidos impulsivos prominentes; NT ACOU 112:2002 hace objetiva esa penalización. A partir del historial de nivel ponderado A con ponderación temporal F de un único evento, la tasa de crecimiento (dB/s) y la diferencia de nivel (dB) del arranque (que cualifica cuando supera los 10 dB/s, cláusulas 4.5–4.7) predicen la prominencia percibida (cláusula 7, Fórmula 1):
+Un impulso molesta más allá de su energía, por lo que las evaluaciones
+ambientales según ISO 1996-2 penalizan los periodos con sonidos impulsivos
+prominentes; NT ACOU 112:2002 hace objetiva esa penalización. A partir del
+historial de nivel ponderado A con ponderación temporal F de un único evento,
+la tasa de crecimiento (dB/s) y la diferencia de nivel (dB) del arranque (que
+cualifica cuando supera los 10 dB/s, apartados 4.5–4.7) predicen la
+prominencia percibida (apartado 7, Fórmula 1):
 
 $$
 P = 3 \log_{10}(\text{tasa de crecimiento}) + 2 \log_{10}(\text{diferencia de nivel}),
@@ -156,13 +162,16 @@ cualificación de 10 dB/s es una inclinación sobre este eje; la diferencia de
 nivel es la altura de ese mismo arranque. Aquí se detectan tres golpes y solo
 el más empinado y alto determina el ajuste.*
 
-diseñada para alcanzar en torno a 15 en impulsos muy súbitos e intensos. El ajuste al nivel del periodo de medición toma el impulso determinante (el de mayor $P$) (cláusula 8, Fórmula 2):
+diseñada para alcanzar en torno a 15 en impulsos muy súbitos e intensos. El
+ajuste al nivel del periodo de medición toma el impulso determinante (el de
+mayor $P$) (apartado 8, Fórmula 2):
 
 $$
 K_I = 1{,}8\ (P - 5)\ \text{dB} \quad (P > 5;\ \text{si no, } K_I = 0),
 $$
 
-y el nivel de evaluación de la jornada completa combina energéticamente los periodos ajustados (cláusula 8, Nota 1):
+y el nivel de evaluación de la jornada completa combina energéticamente los
+periodos ajustados (apartado 8, Nota 1):
 
 $$
 L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
@@ -192,13 +201,13 @@ $$
 
 con las frecuencias de relajación del oxígeno y el nitrógeno $f_{rO}$, $f_{rN}$
 de la Ec. (3)/(4), las condiciones de referencia $T_0 = 293{,}15$ K,
-$p_r = 101{,}325$ kPa (cláusula 4.2) y la concentración molar de vapor de agua $h$
+$p_r = 101{,}325$ kPa (apartado 4.2) y la concentración molar de vapor de agua $h$
 a partir de la humedad relativa (anexo B). A baja frecuencia
 $\alpha \propto f^2$; cerca de cada frecuencia de relajación el término
 correspondiente alcanza un máximo y decae, razón por la que $\alpha$ sube dos
 décadas de 50 Hz a 10 kHz y por la que subir la humedad barre un pico por la
 banda. La biblioteca reproduce la Tabla 1 con menos del 0,4 % (la propia
-precisión impresa del estándar), muy dentro de su $\pm 10$ % declarado; pasar
+precisión impresa de la norma), muy dentro de su $\pm 10$ % declarado; pasar
 `exact_midband=True` ajusta cada frecuencia a los centros exactos
 $f_m = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mismo
 $\alpha$ es la única vía hacia el coeficiente de atenuación de potencia de la
@@ -234,7 +243,7 @@ que renuncia el recorrido apantallado, $A_{bar} = D_z - A_{gr} \geq 0$, y
 250 Hz es justo donde $A_{gr}$ alcanza su máximo. Qué término merece la pena
 afinar depende por completo de la banda y de la geometría.*
 
-La biblioteca implementa los cuatro términos generales de la cláusula 7; el
+La biblioteca implementa los cuatro términos generales del apartado 7; el
 $A_{misc}$ informativo (vegetación, zonas industriales, edificación) y las
 reflexiones se dejan a criterio del usuario. La **divergencia geométrica** es la
 expansión esférica desde una fuente puntual,
@@ -274,20 +283,20 @@ ruido de banda ancha hasta 1000 m (Tabla 5).
 La ISO 9612:2009 es el método de ingeniería (clase de exactitud 2) para el nivel
 diario de exposición al ruido de un trabajador $L_{EX,8h}$, normalizado a una
 jornada nominal de 8 h. Tres **estrategias de medición** cambian esfuerzo por
-representatividad. El método *basado en tareas* (cláusula 9) divide la jornada en
+representatividad. El método *basado en tareas* (apartado 9) divide la jornada en
 tareas, promedia en energía $I \ge 3$ muestras por tarea (Ec. 7) y suma en
 energía las contribuciones de cada tarea
 $L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0)$ (Ec. 9/10). El método
-*basado en la función* (cláusula 10) promedia en energía $N \ge 5$ muestras
+*basado en la función* (apartado 10) promedia en energía $N \ge 5$ muestras
 aleatorias sobre un grupo de exposición homogéneo (Ec. 11) y normaliza la
 duración efectiva de la jornada (Ec. 12); el método *de jornada completa*
-(cláusula 11) hace la misma aritmética sobre mediciones de jornada completa
+(apartado 11) hace la misma aritmética sobre mediciones de jornada completa
 (Ec. 13).
 
-El presupuesto de incertidumbre del **anexo C** es normativo. La incertidumbre
+El balance de incertidumbre del **anexo C** es normativo. La incertidumbre
 típica combinada es $u^2 = \sum c_i^2 u_i^2$ (C.1) y la incertidumbre expandida es
 $U = k\ u$ con $k = 1{,}65$ para un intervalo **unilateral** al 95 %
-(cláusula 14), de modo que el límite superior declarado es $L_{EX,8h} + U$. Los
+(apartado 14), de modo que el límite superior declarado es $L_{EX,8h} + U$. Los
 métodos por tareas y por función difieren de forma instructiva: la incertidumbre
 de muestreo del ruido de la tarea $u_{1a}$ divide la suma de desviaciones al
 cuadrado entre $I(I-1)$ (el error típico de la media, Ec. C.6), mientras que la
@@ -306,7 +315,8 @@ $L_{EX,8h} = 84{,}3$ dB, $U = 2{,}7$ dB), E (función, $88{,}1$ dB, $3{,}8$ dB) 
 (jornada completa, $90{,}1$ dB, $3{,}4$ dB) se reproducen con la precisión impresa
 de la norma: todos los intermedios del anexo E son exactos dígito a dígito, y su
 nivel final difiere solo por el redondeo previo que la propia norma aplica al
-nivel efectivo de la jornada (véase la [guía de exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/)).
+nivel efectivo de la jornada (véase la [guía de exposición al ruido en el
+trabajo](/phonometry/es/perception/hearing/occupational-exposure/)).
 
 Consulta la [guía de Propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/)
 y la [guía de exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/) para su uso.
@@ -352,7 +362,7 @@ corrección por ruido de fondo $K_{1i} = -10 \log_{10}(1 - 10^{-0{,}1 \Delta L_{
 aplicada por posición de micrófono *antes* del promedio energético (Ec. 11);
 no hace falta corrección por encima de un margen de 15 dB, y por debajo de
 10 dB (250 Hz – 5 kHz) o 6 dB (bandas extremas) la corrección se satura y el
-resultado se marca como cota superior (cláusula 9.4.2). Los términos
+resultado se marca como cota superior (apartado 9.4.2). Los términos
 meteorológicos son
 $C_1 = -10 \log_{10}(p_s/p_{s0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ y
 $C_2 = -10 \log_{10}(p_s/p_{s0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ con
@@ -360,12 +370,13 @@ $\theta_0 = 314$ K, $\theta_1 = 296$ K: en la referencia de 23 °C /
 101,325 kPa, $C_2 = 0$ exactamente y $C_1 = -0{,}128$ dB; y
 $C_3 = A_0 (1{,}0053 - 0{,}0012 A_0)^{1{,}6}$ con $A_0 = a(f)\ r$ restituye la
 absorción del aire de ISO 9613-1 sobre el radio de medición. Las
-disposiciones de micrófonos de los Anexos D/E están incorporadas como tablas de coordenadas
+disposiciones de micrófonos de los Anexos D/E están incorporadas como tablas
+de coordenadas
 exactas dígito a dígito (40 posiciones de igual área; el juego espejo 21–40 se
-añade cuando la dispersión del SPL por banda supera $N_M/2$, cláusula 9.3.2),
+añade cuando la dispersión del SPL por banda supera $N_M/2$, apartado 9.3.2),
 y las mismas posiciones dan el índice de directividad
-$DI_i = L_{pi} - \bar{L}_p$ (Ec. 21). El ejemplo de incertidumbre de la
-cláusula 10.5, $U = 2\sqrt{0{,}5^2 + 2{,}0^2} = 4{,}12$ dB, se reproduce, junto
+$DI_i = L_{pi} - \bar{L}_p$ (Ec. 21). El ejemplo de incertidumbre del
+apartado 10.5, $U = 2\sqrt{0{,}5^2 + 2{,}0^2} = 4{,}12$ dB, se reproduce, junto
 con los valores de $\sigma_{R0}$ por banda de las Tablas 2/3.
 
 ### Cámara reverberante (ISO 3741)
@@ -420,7 +431,7 @@ $F_S \le 2$ (C.4) y la convergencia de densidad de barrido
 $0{,}83 \le F_S(1)/F_S(2) \le 1{,}2$ (C.5). La Ec. 10 normaliza el resultado a
 las condiciones meteorológicas de referencia,
 $L_{W0} = L_W - 15 \log_{10}[(B/101325) \cdot 296{,}15/(273{,}15 + \theta)]$. Las
-bandas con potencia neta negativa son no determinables (cláusula 9.2) y se
+bandas con potencia neta negativa son no determinables (apartado 9.2) y se
 marcan. Una intensidad normal uniforme recupera la potencia exactamente
 (100 µW sobre 3,75 m² → 80,0 dB re 1 pW), con independencia de cómo se
 segmente la superficie.

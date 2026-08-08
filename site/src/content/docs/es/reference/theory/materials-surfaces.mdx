@@ -86,7 +86,13 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Esta página reúne la teoría de materiales y superficies: la dispersión y difusión superficial, la absorción in situ de pavimentos y la caracterización de materiales acústicos, del índice ponderado de absorción a la resistencia al flujo de aire y el tubo de impedancia. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/). La medición en cámara reverberante de ISO 354 que alimenta el índice de ISO 11654 se cubre en [Salas y edificación](/phonometry/es/reference/theory/rooms-buildings/).
+Esta página reúne la teoría de materiales y superficies: la dispersión y
+difusión superficial, la absorción in situ de pavimentos y la caracterización
+de materiales acústicos, de la valoración ponderada de la absorción a la
+resistencia al flujo de aire y el tubo de impedancia. Forma parte de la
+[referencia de teoría](/phonometry/es/reference/theory/). La medición en
+cámara reverberante de ISO 354 que alimenta el índice de ISO 11654 se cubre en
+[Salas y edificación](/phonometry/es/reference/theory/rooms-buildings/).
 
 ## Dispersión superficial y difusión (ISO 17497-1, ISO 17497-2)
 
@@ -97,11 +103,11 @@ otra dispersa; el coeficiente de dispersión $s$ es la fracción de energía no
 especular. ISO 17497-1:2004+A1:2014 lo mide en una cámara reverberante con la
 muestra sobre una mesa giratoria: cuatro tiempos de reverberación, con la
 mesa parada y girando, cada uno sin y con la muestra (Tabla 2), dan la
-absorción a incidencia aleatoria $\alpha_s$ (cláusula 8.1.1, Fórmula 1) y la
-absorción *especular* $\alpha_{spec}$ (cláusula 8.1.2, Fórmula 4). La
+absorción a incidencia aleatoria $\alpha_s$ (apartado 8.1.1, Fórmula 1) y la
+absorción *especular* $\alpha_{spec}$ (apartado 8.1.2, Fórmula 4). La
 rotación decorrelaciona las reflexiones dispersas entre decaimientos, de modo
-que se promedian y se registran como "absorción" extra, y el coeficiente de
-dispersión se sigue (cláusula 8.1.3, Fórmula 5):
+que se promedian y se registran como «absorción» extra, y el coeficiente de
+dispersión se sigue (apartado 8.1.3, Fórmula 5):
 
 $$
 s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s},
@@ -112,9 +118,9 @@ $55{,}3 (V/S) [1/(c_b T_b) - 1/(c_a T_a)] - 4 (V/S)(m_b - m_a)$, con
 $c = 343{,}2 \sqrt{(273{,}15 + t)/293{,}15}$ (Fórmula 2) y $m$ de ISO 9613-1
 mediante $m = \alpha_{dB}/(10 \log_{10} e)$ (Fórmula 3). La propia placa base debe
 dispersar poco: la Tabla 1 acota su coeficiente (Fórmula 6) a 0,05–0,25 entre
-100 Hz y 5 kHz (cláusula 6.2). El $s$ negativo se trunca a cero para su
-presentación (cláusula 8.3), pero los valores por encima de 1 en bandas
-cercanas al rasante se conservan (cláusula 6.3.2). La cadena de incertidumbre
+100 Hz y 5 kHz (apartado 6.2). El $s$ negativo se trunca a cero para su
+presentación (apartado 8.3), pero los valores por encima de 1 en bandas
+cercanas al rasante se conservan (apartado 6.3.2). La cadena de incertidumbre
 del Anexo A ($u_\alpha$, Fórmulas A.3/A.4; $u_s$, Fórmula A.5; $U = 2 u_s$)
 está implementada. Como la norma no imprime ningún ejemplo resuelto, el
 oráculo es una cadena sintética de extremo a extremo ($V = 200$ m³,
@@ -129,7 +135,7 @@ mano de la Fórmula A.5, $u_s = 0{,}0297$.
 
 ISO 17497-2:2012 mide, en campo libre, cuán uniformemente reparte una
 superficie su respuesta polar reflejada sobre $n$ micrófonos. El coeficiente
-basado en autocorrelación (cláusula 8.1, Fórmula 5) es
+basado en autocorrelación (apartado 8.1, Fórmula 5) es
 
 $$
 d_\theta = \frac{\left( \sum_i p_i \right)^2 - \sum_i p_i^2}{(n - 1) \sum_i p_i^2},
@@ -141,10 +147,10 @@ lóbulo especular; la Fórmula 6 es la forma ponderada por área con
 $N_i = A_i / A_{min}$ a partir de los factores de ángulo sólido de la
 Fórmula 8 ($A_i = (4\pi/\Delta\phi) \sin^2(\Delta\theta/4)$ en el cénit).
 Normalizar frente a un reflector plano de referencia del mismo tamaño elimina
-la difracción de borde (cláusula 8.2, Fórmula 7):
+la difracción de borde (apartado 8.2, Fórmula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. El valor a
 incidencia aleatoria promedia los ángulos de fuente con pesos 1:3:3:3:3 para
-0°, ±30°, ±60° (cláusula 8.4). Anclajes: el arco de 37 receptores predicho
+0°, ±30°, ±60° (apartado 8.4). Anclajes: el arco de 37 receptores predicho
 por el modelo para el QRD $N = 7$ publicado de seis periodos (Cox & D'Antonio
 3.ª ed., Apéndice B; Hargreaves et al. 2000, Tabla I) a 1000 Hz da
 $d_\theta = 0{,}1099$, su referencia plana $0{,}0049$ y
@@ -156,12 +162,12 @@ desviación absoluta media en banda ancha 100-5000 Hz ronda 0,09); factor de
 
 Consulta la [guía de difusores](/phonometry/es/materials/diffusers/diffusers/) para su uso.
 
-## Absorción in situ de superficies de carretera (ISO 13472-1, ISO 13472-2)
+## Absorción in situ de pavimentos de carretera (ISO 13472-1, ISO 13472-2)
 
 ISO 13472-1:2002 (método de superficie extendida) recupera la absorción a
 incidencia normal de un pavimento en su emplazamiento, con un micrófono sobre
 él: las componentes directa y reflejada de una respuesta al impulso se separan
-con la **técnica de sustracción** y la **ventana de Adrienne** (cláusula 6.4:
+con la **técnica de sustracción** y la **ventana de Adrienne** (apartado 6.4:
 un flanco de subida abrupto, una meseta obligatoria de 5 ms y un flanco de
 bajada Blackman-Harris), y
 
@@ -171,7 +177,7 @@ $$
 $$
 
 para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m
-(cláusula 4.2, Anexo C); $K_r$ es el cociente de expansión esférica entre el
+(apartado 4.2, Anexo C); $K_r$ es el cociente de expansión esférica entre el
 camino directo y el de la imagen. Referenciar la medición del pavimento a otra
 sobre una superficie muy reflectante cancela toda la cadena electroacústica
 junto con $K_r$ (Anexo B). La ventana de 5 ms acota el área muestreada (forma
@@ -179,13 +185,14 @@ cerrada del Anexo A: radio ≈ 1,34 m para la geometría normalizada) y el rango
 válido es de 250 Hz a 4 kHz en tercios de octava. ISO 13472-2:2010 (método
 puntual, 250–1600 Hz) acopla en cambio un pequeño tubo de impedancia a la
 superficie y remite las matemáticas al método de función de transferencia de
-ISO 10534-2 de más abajo (sus cláusulas 4/5.7/6.6); la implementación
+ISO 10534-2 de más abajo (sus apartados 4/5.7/6.6); la implementación
 reutiliza ese módulo, añadiendo la geometría y los límites de validez de la
 Parte 2 ($f_u = 0{,}58\ c_0/d$; cotas de separación de micrófonos
-$0{,}45\ c_0/f_{max}$ y $0{,}05\ c_0/f_{min}$, cláusula 5.4) y la corrección
+$0{,}45\ c_0/f_{max}$ y $0{,}05\ c_0/f_{min}$, apartado 5.4) y la corrección
 sustractiva del Anexo A por pérdidas internas del sistema.
 
-Consulta la [guía de absorción in situ de firmes](/phonometry/es/materials/surfaces/road-absorption/) para su uso.
+Consulta la [guía de absorción in situ de
+pavimentos](/phonometry/es/materials/surfaces/road-absorption/) para su uso.
 
 ## Caracterización de materiales acústicos (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 
@@ -194,20 +201,20 @@ Consulta la [guía de absorción in situ de firmes](/phonometry/es/materials/sur
 ISO 11654:1997 condensa una curva de absorción en tercios de octava de ISO 354
 en un solo número. El coeficiente práctico $\alpha_p$ promedia los tres
 tercios de cada octava de 250 Hz a 4 kHz y redondea a pasos de 0,05
-(cláusula 4.1). La curva de referencia (0,80, 1,00, 1,00, 1,00, 0,90 en
+(apartado 4.1). La curva de referencia (0,80, 1,00, 1,00, 1,00, 0,90 en
 250–4000 Hz) se desplaza después hacia abajo en pasos de 0,05 hasta que la
 suma de desviaciones desfavorables, contadas solo donde la medición queda
 *por debajo* de la curva desplazada, es $\le 0{,}10$; $\alpha_w$ es la curva
-desplazada a 500 Hz (cláusula 4.2). Un indicador de forma señala el exceso de
+desplazada a 500 Hz (apartado 4.2). Un indicador de forma señala el exceso de
 absorción $\ge 0{,}25$ sobre la curva desplazada: L a 250 Hz, M a
-500/1000 Hz, H a 2000/4000 Hz (cláusula 4.3), y el Anexo B informativo asigna
+500/1000 Hz, H a 2000/4000 Hz (apartado 4.3), y el Anexo B informativo asigna
 $\alpha_w$ a las clases de absorción A–E. Como toda magnitud es múltiplo de
 0,05, la implementación hace toda la aritmética de la malla en veinteavos
 enteros, dejando la búsqueda del desplazamiento y las fronteras de clase
 exactas y a salvo del punto flotante. Los dos ejemplos resueltos del Anexo A
 se reproducen: $\alpha_p = (0{,}35, 0{,}70, 0{,}65, 0{,}60, 0{,}55)$ →
 $\alpha_w = 0{,}60$, clase C; y subir 500 Hz a 1,00 mantiene
-$\alpha_w = 0{,}60$ pero añade el indicador, "0,60(M)".
+$\alpha_w = 0{,}60$ pero añade el indicador, «0,60(M)».
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
@@ -220,11 +227,11 @@ Consulta la [guía de medida y clasificación de la absorción sonora](/phonomet
 La resistividad al flujo $\sigma = R\,A/d$ es el parámetro de transporte clave
 de un absorbente poroso. ISO 9053-1:2018 (método estático) hace pasar un flujo
 estacionario por la muestra y ajusta $\Delta p = a\,u + b\,u^2$ por el origen
-(cláusula 7.5); como $R_s = \Delta p / u = a + b\,u$, el coeficiente lineal es
+(apartado 7.5); como $R_s = \Delta p / u = a + b\,u$, el coeficiente lineal es
 la resistencia específica a velocidad nula, informada a la velocidad de
 referencia $u = 0{,}5$ mm/s. ISO 9053-2:2020 (método alternante) sustituye el
 caudalímetro por un pistón a ~2 Hz y un micrófono en una cavidad cerrada
-(cláusula 8.7, Fórmula 2):
+(apartado 8.7, Fórmula 2):
 
 $$
 R = \kappa'\ \frac{p_s}{2 \pi f V}\ \frac{h_t}{h_s}\ 10^{(L_{ps} - L_{pt})/20}
@@ -245,12 +252,12 @@ Consulta la [guía de resistencia al flujo de aire](/phonometry/es/materials/abs
 
 Un tubo por debajo de su frecuencia de corte ($f d < 0{,}58\ c_0$ circular,
 $< 0{,}50\ c_0$ rectangular; límites de separación de micrófonos
-$f s < 0{,}45\ c_0$ y $f > c_0/(20 s)$; cláusulas 4.2–4.5) solo propaga ondas
+$f s < 0{,}45\ c_0$ y $f > c_0/(20 s)$; apartados 4.2–4.5) solo propaga ondas
 planas, así que el factor de reflexión superficial de una muestra es
 plenamente observable. ISO 10534-2 (método de función de transferencia)
 compara la función de transferencia medida entre dos micrófonos $H_{12}$ con
 las analíticas incidente y reflejada $H_I = e^{-j k_0 s}$,
-$H_R = e^{+j k_0 s}$ (Anexo D) para dar (cláusula 7, Ec. 17):
+$H_R = e^{+j k_0 s}$ (Anexo D) para dar (apartado 7, Ec. 17):
 
 $$
 r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad

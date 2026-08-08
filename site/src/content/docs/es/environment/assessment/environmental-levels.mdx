@@ -39,7 +39,7 @@ una medición tomada sobre un fondo residual con una confianza finita. Esta
 página es la cadena de evaluación regulatoria construida sobre los niveles
 por periodo medidos: los descriptores de día completo $L_{den}$/$L_{dn}$ y
 los niveles de evaluación compuestos de ISO 1996-1, y los procedimientos de
-determinación de ISO 1996-2 que hacen defendible el número reportado: el
+determinación de ISO 1996-2 que hacen defendible el número declarado: el
 ajuste tonal, la corrección de ruido residual y el balance de incertidumbre
 de medida.
 
@@ -47,7 +47,7 @@ El cálculo de niveles en sí, las integrales de
 $L_{eq}$/$L_{Aeq}$, los niveles percentiles $L_N$, el SEL y la dosis de
 ruido que producen los niveles por periodo que esta página consume, es
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/); todo lo
-de aquí asume que esos valores por periodo ya están calculados.
+de aquí supone que esos valores por periodo ya están calculados.
 
 ## Ruido ambiental: Lden, Ldn y niveles de evaluación (ISO 1996-1)
 
@@ -132,10 +132,10 @@ cribado de emisión complementario, no la base del $K_t$.
 ## Determinación de niveles: ajuste tonal, ruido residual e incertidumbre (ISO 1996-2)
 
 ISO 1996-2:2017 es la parte de **determinación**: cómo el nivel medido se
-convierte en nivel de valoración y se reporta con su incertidumbre. La *suma* del
-nivel de valoración y las penalizaciones por periodo están en ISO 1996-1 (arriba);
+convierte en nivel de evaluación y se declara con su incertidumbre. La *suma* del
+nivel de evaluación y las penalizaciones por periodo están en ISO 1996-1 (arriba);
 ISO 1996-2 aporta el ajuste tonal, la corrección de ruido residual y el
-presupuesto de incertidumbre.
+balance de incertidumbre.
 
 **Ajuste tonal (método de ingeniería, Anexo C de ISO 1996-2:2007).** La edición
 de 2017 abandonó el algoritmo autocontenido y remite en su lugar a ISO/PAS 20065
@@ -172,23 +172,23 @@ plt.show()
 ```
 </details>
 
-**Corrección de ruido residual (Cláusula 10.4).** `residual_sound_correction()`
+**Corrección de ruido residual (Apartado 10.4).** `residual_sound_correction()`
 aplica $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
 residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
-valor reportable es entonces el nivel medido *sin corregir* $L'$, como cota
+valor declarable es entonces el nivel medido *sin corregir* $L'$, como cota
 superior del sonido específico (expuesto como `reportable_upper_bound`, con
 `reliable=False`). `gaussian_residual_level()` estima el residual a partir de
 niveles percentiles (Anexo I) y rechaza ordenaciones de percentiles
 invertidas.
 
-**Incertidumbre de medición (Cláusula 4, Anexo F).**
+**Incertidumbre de medición (Apartado 4, Anexo F).**
 `combined_standard_uncertainty()` forma $u = \sqrt{\sum (c_j u_j)^2}$ (Fórmula (2))
 y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1{,}3$ (80 %);
 `residual_correction_uncertainty()` lleva la sensibilidad de la corrección residual
 (Fórmulas (F.7)/(F.8)) y `uncertainty_from_repeated_measurements()` la
 incertidumbre típica de mediciones repetidas: la vía primaria en el dominio
 de energía (Fórmulas (17)+(19)), con el sustituto en niveles de la Nota 2
-(Fórmula (20)) reportado al lado como `approximate_uncertainty` y un aviso
+(Fórmula (20)) declarado al lado como `approximate_uncertainty` y un aviso
 cuando los niveles se dispersan más de 3 dB, donde el sustituto se infla
 groseramente.
 
@@ -205,7 +205,7 @@ environment.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
 
 ## Qué cubre esta guía
 
-**Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de valoración compuesto de la ISO
+**Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de evaluación compuesto de la ISO
 1996-1:2016 (apartado 6.5,
 `environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal del
 anexo C de la ISO 1996-2:2007 junto con la corrección de ruido residual

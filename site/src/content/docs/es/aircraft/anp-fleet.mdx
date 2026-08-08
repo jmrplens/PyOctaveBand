@@ -64,7 +64,7 @@ instalación de motores que la
 mano. La elección no es cosmética: a ángulos de depresión pequeños el montaje
 en ala y en fuselaje difieren en más de un decibelio, las hélices no reciben
 esa corrección, y la flota distribuida se reparte 70 / 55 / 30 entre los tres.
-Un identificador que la base no reconoce cae a `"wing"`.
+Un identificador que la base no reconoce recae en `"wing"`.
 
 ## 2. Las curvas nivel-potencia-distancia
 
@@ -163,7 +163,7 @@ misma aeronave tiene un perfil por tramo.
 
 Solo se leen como trayectorias listas para usar los perfiles de **punto fijo**.
 La mayoría de las entradas ANP describen sus despegues como pasos
-procedimentales (sube a este régimen hasta tal altitud, acelera, repliega
+de procedimiento (sube a este régimen hasta tal altitud, acelera, repliega
 flaps), que hay que volar a través de un modelo de mecánica del vuelo antes de
 que sean una trayectoria. Ese modelo queda fuera de este puente, así que de las
 155 aeronaves de la base distribuida 13 tienen perfil de despegue de punto fijo.
@@ -199,7 +199,7 @@ print(round(float(flyover.level), 1))     # SEL en dB en ese receptor
 
 El observador es `(x, y, z)` en metros en el **sistema de la pista**, y el
 origen de ese sistema no es el límite del aeropuerto: $x$ corre a lo largo del
-eje de pista con $x = 0$ en el inicio de carrera para una salida y en el umbral
+eje de pista con $x = 0$ en el inicio del recorrido de despegue para una salida y en el umbral
 de aterrizaje para una llegada, así que los perfiles de llegada llevan $x$
 negativa en aproximación final. Los datos que se distribuyen lo dicen sin
 rodeos: `db.profile("747100", "D", 1).path[0]` empieza en $x = 0$ (suelta de
@@ -244,12 +244,12 @@ defecto y sus tramos de etapa; y ejecutar el nivel de evento único y el contorn
 en malla de Doc 29 desde un identificador de aeronave con `event_level` y
 `noise_contour`.
 
-**No cubierto.** Los perfiles de pasos procedimentales, que es como describen su
-despegue la mayoría de las entradas ANP: convertirlos en una trayectoria exige
-el modelo de mecánica del vuelo de ICAO Doc 9911, que este puente no implementa,
-así que solo las 13 aeronaves con perfil de punto fijo tienen trayectoria lista
-para usar. La base además solo se lee, nunca se escribe: phonometry distribuye
-la versión 2.3 y no la actualiza.
+**No cubierto.** Los perfiles de pasos de procedimiento, que es como describen
+su despegue la mayoría de las entradas ANP: convertirlos en una trayectoria
+exige el modelo de mecánica del vuelo de Doc 9911 de la OACI, que este puente no
+implementa, así que solo las 13 aeronaves con perfil de punto fijo tienen
+trayectoria lista para usar. La base además solo se lee, nunca se escribe:
+phonometry distribuye la versión 2.3 y no la actualiza.
 
 ## Véase también
 

@@ -1,6 +1,6 @@
 ---
 title: "Índice de inteligibilidad del habla"
-description: "El índice de inteligibilidad del habla (SII) de ANSI S3.5-1997 en sus cuatro procedimientos por bandas (bandas críticas, contribución equitativa, tercio de octava, octava): niveles espectrales equivalentes de habla/ruido/umbral, las funciones de importancia de banda, la automáscara del habla y la propagación ascendente de la máscara, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
+description: "El índice de inteligibilidad del habla (SII) de ANSI S3.5-1997 en sus cuatro procedimientos por bandas (bandas críticas, contribución equitativa, tercio de octava, octava): niveles espectrales equivalentes de habla/ruido/umbral, las funciones de importancia de banda, la autoenmascaramiento del habla y la propagación ascendente del enmascaramiento, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
 references:
   - type: standard
     organization: "American National Standards Institute"
@@ -9,7 +9,7 @@ references:
     designation: "ANSI S3.5-1997 (R2017)"
     publisher: "Acoustical Society of America"
     url: "https://webstore.ansi.org/standards/asa/ansiasas31997r2017"
-    note: "Los cuatro procedimientos por bandas: bandas críticas (21 bandas, Tabla 1), bandas críticas de contribución equitativa (17 bandas, Tabla 2), tercio de octava (18 bandas, Tabla 3) y octava (6 bandas, Tabla 4), cada uno con su función de importancia de banda, nivel espectral del habla estándar y ruido interno de referencia; el procedimiento de enmascaramiento, perturbación y audibilidad de banda (cláusula 5) y el índice (cláusula 6)."
+    note: "Los cuatro procedimientos por bandas: bandas críticas (21 bandas, Tabla 1), bandas críticas de contribución equitativa (17 bandas, Tabla 2), tercio de octava (18 bandas, Tabla 3) y octava (6 bandas, Tabla 4), cada uno con su función de importancia de banda, nivel espectral del habla estándar y ruido interno de referencia; el procedimiento de enmascaramiento, perturbación y audibilidad de banda (apartado 5) y el índice (apartado 6)."
   - type: article
     authors: ["French, N. R.", "Steinberg, J. C."]
     year: 1947
@@ -47,7 +47,7 @@ un sistema de sonido. Para esto último, consulta la
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_speech_intelligibility_es.svg"
-  alt="El flujo de cálculo del SII: tres entradas de nivel espectral equivalente (habla Ei', ruido Ni', umbral de audición Ti') alimentan la etapa de automáscara del habla y propagación de la máscara (nivel espectral de enmascaramiento equivalente Zi), después la perturbación equivalente Di, después la función de audibilidad de banda Ai acotada a [0, 1], y por último la suma ponderada por importancia de banda SII sobre las 18 bandas de tercio de octava"
+  alt="El flujo de cálculo del SII: tres entradas de nivel espectral equivalente (habla Ei', ruido Ni', umbral de audición Ti') alimentan la etapa de autoenmascaramiento del habla y propagación del enmascaramiento (nivel espectral de enmascaramiento equivalente Zi), después la perturbación equivalente Di, después la función de audibilidad de banda Ai acotada a [0, 1], y por último la suma ponderada por importancia de banda SII sobre las 18 bandas de tercio de octava"
   width="94%"
   loading="eager"
 />
@@ -55,7 +55,7 @@ un sistema de sonido. Para esto último, consulta la
 ## 1. Entradas y la función de importancia de banda
 
 Las tres entradas son **niveles espectrales equivalentes** (ANSI S3.5-1997,
-cláusulas 3.11 y 3.55) muestreados en los 18 centros de banda de tercio de
+apartados 3.11 y 3.55) muestreados en los 18 centros de banda de tercio de
 octava: el nivel espectral del habla $E_i'$, el nivel espectral del ruido $N_i'$
 (ambos en dB SPL) y el umbral de audición $T_i'$ (en dB HL). Cada banda $i$
 contribuye a la inteligibilidad en proporción a su **función de importancia de
@@ -75,7 +75,7 @@ result.plot()   # audibilidad por banda y su contribución ponderada (necesita m
 
 Sin ruido y con un umbral de audición normal, el espectro de habla estándar es casi
 totalmente audible, por lo que el índice se acerca a uno; el pequeño déficit es
-la propia **automáscara del habla** del oyente.
+la propia **autoenmascaramiento del habla** del oyente.
 
 La función de importancia es donde vive el conocimiento perceptivo de la
 norma. Desciende de los experimentos de articulación que sustentan el índice de
@@ -95,11 +95,11 @@ material.
 
 ## 2. Enmascaramiento y la función de audibilidad de banda
 
-El procedimiento (ANSI S3.5-1997, cláusula 5) convierte las entradas en una
+El procedimiento (ANSI S3.5-1997, apartado 5) convierte las entradas en una
 audibilidad por banda. El habla se enmascara a sí misma hacia abajo desde cada
 banda ($V_i = E_i' - 24$); el mayor entre eso y el ruido externo, $B_i$, se
 propaga **hacia arriba** en frecuencia con una pendiente dependiente del nivel
-para dar el nivel espectral de enmascaramiento equivalente $Z_i$ (cláusula 5.4):
+para dar el nivel espectral de enmascaramiento equivalente $Z_i$ (apartado 5.4):
 
 $$
 Z_i = 10\log_{10}\!\left(10^{0{,}1 N_i'} + \sum_{k<i}
@@ -108,22 +108,22 @@ $$
 
 El enmascaramiento se combina con el ruido interno equivalente
 ($X_i' = X_i + T_i'$, el ruido interno de referencia desplazado por la pérdida
-auditiva) en la **perturbación equivalente** $D_i$ (cláusula 5.6), y la
+auditiva) en la **perturbación equivalente** $D_i$ (apartado 5.6), y la
 **función de audibilidad de banda** es la razón habla-perturbación escalada a
-$[0, 1]$ (cláusula 5.8):
+$[0, 1]$ (apartado 5.8):
 
 $$
 A_i = \operatorname{clip}\!\left(\frac{E_i' - D_i + 15}{30},\; 0,\; 1\right).
 $$
 
 A niveles de habla muy por encima del esfuerzo normal, un **factor de distorsión
-de nivel** de la cláusula 5.7 (la unidad para los espectros estándar usados en
+de nivel** del apartado 5.7 (la unidad para los espectros estándar usados en
 esta página) reduce aún más $A_i$; phonometry lo aplica automáticamente.
 
 ## 3. El índice en ruido
 
 El índice de inteligibilidad del habla es la suma de las audibilidades de banda
-ponderada por la importancia de banda (ANSI S3.5-1997, cláusula 6):
+ponderada por la importancia de banda (ANSI S3.5-1997, apartado 6):
 
 $$
 \text{SII} = \sum_{i} I_i\, A_i .
@@ -238,7 +238,7 @@ poblacional cómoda, véase la
 ## 4. Esfuerzo vocal
 
 Los hablantes elevan la voz en ruido, y la norma da cuatro **espectros de voz
-estándar** para los esfuerzos vocales *normal*, *elevada*, *fuerte* y *grito*
+estándar** para los esfuerzos vocales *normal*, *elevado*, *fuerte* y *grito*
 (ANSI S3.5-1997, Tabla 3). Al pasar el nombre del esfuerzo se selecciona el
 espectro correspondiente; hablar más fuerte sube todo el espectro y, en un ruido
 fijo, aumenta el índice.
@@ -265,7 +265,7 @@ bandas de tercio de octava.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum_es.svg"
-  alt="Los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevada, fuerte, grito) como una familia etiquetada: el nivel espectral de voz en dB SPL sobre las 18 bandas de tercio de octava de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro"
+  alt="Los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevado, fuerte, grito) como una familia etiquetada: el nivel espectral de voz en dB SPL sobre las 18 bandas de tercio de octava de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro"
   width="90%"
 />
 
@@ -302,7 +302,7 @@ fijo, cada esfuerzo vocal mayor sube el espectro de voz y aumenta el SII.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_vocal_efforts_es.svg"
-  alt="Izquierda: los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevada, fuerte, grito) de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro. Derecha: el SII resultante en un ruido de banda ancha fijo, subiendo de 0,12 (normal) a 0,79 (grito)"
+  alt="Izquierda: los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevado, fuerte, grito) de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro. Derecha: el SII resultante en un ruido de banda ancha fijo, subiendo de 0,12 (normal) a 0,79 (grito)"
   width="96%"
 />
 
@@ -373,7 +373,7 @@ Las dos columnas son `sii_procedure(method).frequencies` y `.band_edges`; solo
 los límites de tercio de octava se calculan a partir de los centros en vez de
 estar tabulados.
 
-Todos los procedimientos recorren la misma cadena del apartado 2: la automáscara
+Todos los procedimientos recorren la misma cadena del apartado 2: la autoenmascaramiento
 del habla, la propagación ascendente del enmascaramiento, el ruido interno
 equivalente y la perturbación, el factor de distorsión de nivel y la función de
 audibilidad de banda, ponderada por la función de importancia de banda propia de
@@ -526,7 +526,7 @@ mediciones distintas, y cada una es ciega a lo que la otra captura:
 | Maquinaria de bandas | Ponderación por importancia de banda $I_i$ aplicada a la audibilidad de banda $A_i$ | Función de transferencia de modulación $m(F)$ por banda de octava, convertida en una SNR efectiva |
 | Captura | Ruido estacionario, propagación ascendente del enmascaramiento, pérdida auditiva, esfuerzo vocal, distorsión de nivel | Reverberación, ecos, ruido y (medido en directo) procesado no lineal |
 | Ciega a | La reverberación y cualquier emborronamiento temporal: un canal totalmente audible pero irremediablemente reverberante sigue puntuando alto | El estado auditivo individual: los oyentes con pérdida auditiva requieren correcciones específicas |
-| Uso típico | Audiología, audífonos y protectores, objetivos de control de ruido en una posición de escucha | Sistemas de megafonía, interfonos y salas: calificar un canal de transmisión de extremo a extremo |
+| Uso típico | Audiología, audífonos y protectores, objetivos de control de ruido en una posición de escucha | Sistemas de megafonía, interfonos y salas: valorar un canal de transmisión de extremo a extremo |
 
 El mismo espacio puede aprobar una y suspender la otra. Un atrio silencioso y
 muy reverberante es un SII cercano a 1 con un STI pobre; una oficina seca
@@ -541,14 +541,15 @@ para el lado del STI.
 ## 7. Informe ANSI S3.5-1997 (`.report()`)
 
 `SIIResult.report(path)` genera una ficha PDF de una página dispuesta como un
-informe de audibilidad del habla: una línea de norma base, un bloque de
+informe de audibilidad del habla: una línea de base normativa, un bloque de
 metadatos opcional, una tabla por bandas de tercio de octava del espectro del
 habla equivalente $E_i'$, la función de importancia de banda $I_i$ de la Tabla 3
 y la función de audibilidad de banda $A_i$ junto a las barras de audibilidad y
 de aportación ponderada por importancia (el `.plot()` del propio resultado), el
 número único enmarcado `SII = X`, una fila de veredicto opcional y un pie con el
 descargo fijo. Usa el mismo contenedor `ReportMetadata` y el mismo motor que la
-[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
+[ficha de aislamiento de ISO
+717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` indicado se interpreta como el SII mínimo exigido (un SII mayor
 cumple). `verbose=True` añade la columna del nivel de espectro de perturbación
 equivalente $D_i$. La generación necesita reportlab y, para la figura que
@@ -589,17 +590,18 @@ contribución equitativa (17 bandas, Tabla 2), el de bandas de tercio de octava
 (18 bandas, Tabla 3, el valor por omisión) y el de bandas de octava (6 bandas,
 Tabla 4). Para cada uno: los niveles espectrales equivalentes de habla, ruido y
 umbral de audición, la función de importancia de banda y el nivel espectral de
-voz estándar, la automáscara del habla, la propagación ascendente de la máscara,
-el factor de distorsión de nivel y la función de audibilidad de banda de la
-cláusula 5, y el índice de la cláusula 6. `speech_intelligibility_index` (con
+voz estándar, la autoenmascaramiento del habla, la propagación ascendente del
+enmascaramiento,
+el factor de distorsión de nivel y la función de audibilidad de banda del
+apartado 5, y el índice del apartado 6. `speech_intelligibility_index` (con
 `method=` y `band_importance=`), `sii_procedure`, `standard_speech_spectrum` y
 `standard_speech_spectra` implementan esto, y `SIIResult.report(path)` genera la
 ficha de ANSI S3.5-1997 para el procedimiento que se haya usado.
 
-**No cubierto.** Los espectros de voz estándar de esfuerzo vocal elevado, alto y
-de grito solo se incluyen para el procedimiento por tercios de octava; las
+**No cubierto.** Los espectros de voz estándar de esfuerzo vocal elevado, fuerte
+y de grito solo se incluyen para el procedimiento por tercios de octava; las
 Tablas 1, 2 y 4 se implementan con su columna de esfuerzo normal, que es la que
-necesita el factor de distorsión de nivel de la cláusula 5.7. Las funciones de
+necesita el factor de distorsión de nivel del apartado 5.7. Las funciones de
 importancia de banda tabuladas son el compromiso de habla promedio de cada
 tabla; las funciones de importancia alternativas del Anexo B para materiales de
 ensayo concretos (sílabas sin sentido, listas de palabras monosílabas, pasajes
@@ -608,7 +610,8 @@ puede aplicarse con `band_importance=`. No se ofrece remuestreo entre los cuatro
 conjuntos de bandas: cada procedimiento se alimenta con espectros en sus propias
 bandas. El índice de transmisión del habla, una métrica distinta para un canal de
 transmisión en vez de la audibilidad de quien escucha, se cubre aparte en la
-[guía del índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
+[guía del índice de transmisión del
+habla](/phonometry/es/perception/speech/speech-transmission/).
 
 ## Véase también
 
@@ -632,12 +635,12 @@ En el método por bandas de tercio de octava de ANSI S3.5-1997, la función de i
 
 ### ¿Cómo se calcula el índice de inteligibilidad del habla?
 
-El SII de la cláusula 6 de ANSI S3.5-1997 es la suma de las audibilidades de
+El SII del apartado 6 de ANSI S3.5-1997 es la suma de las audibilidades de
 banda ponderada por la importancia de banda,
 $\text{SII} = \sum_i I_i A_i$, sobre las 18 bandas de tercio de octava. Cada
 audibilidad de banda es
 $A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
-(cláusula 5.8), donde $E_i'$ es el nivel espectral del habla equivalente y
+(apartado 5.8), donde $E_i'$ es el nivel espectral del habla equivalente y
 $D_i$ la perturbación equivalente, que combina el ruido externo, la
 propagación ascendente del enmascaramiento y el ruido interno equivalente. El
 índice queda en $[0, 1]$.
@@ -663,6 +666,6 @@ alto con ruido fuerte en baja frecuencia.
 Usa el SII (ANSI S3.5) cuando la pregunta es si suficiente espectro del habla
 es audible en el oído de quien escucha: captura el ruido estacionario, la
 propagación ascendente del enmascaramiento, la pérdida auditiva y el esfuerzo
-vocal, pero es ciego a la reverberación. El STI (IEC 60268-16) califica un
+vocal, pero es ciego a la reverberación. El STI (IEC 60268-16) valora un
 canal de transmisión, cuánta de la modulación del habla conserva una sala o
 un sistema de sonido. Cuando ambos mecanismos están en juego, calcula ambos.

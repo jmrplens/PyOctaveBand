@@ -215,7 +215,7 @@ que tiende a 5 dB en el límite de sombra $N \to 0$ y aproxima la curva de
 fuente puntual de Maekawa dentro de unos 1,5 dB.
 
 El clip de abajo es esa fórmula convertida en campo. Es el
-[solver FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) ejecutado dos veces
+[esquema FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) ejecutado dos veces
 sobre un mismo semiespacio de 12 × 7 m sobre suelo rígido con una pantalla
 rígida delgada de 2,5 m de alto, una vez a 100 Hz y otra a 500 Hz, cada una con
 una simulación de referencia sin barrera sobre el mismo suelo para que la
@@ -364,11 +364,13 @@ plt.show()
 ## Relación con ISO 9613-2
 
 Los términos tabulados $A_{gr}$ y $D_z$ del
-[método ISO 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/) son ajustes de
+[método ISO
+9613-2](/phonometry/es/environment/propagation/outdoor-propagation/) son
+ajustes de
 ingeniería por banda de octava basados en energía; `ground_effect` y
 `barrier_insertion_loss` son sus contrapartes de banda estrecha por acústica
 ondulatoria. Sobre suelo rígido ambos coinciden en el realce de +6 dB y en el
-suelo de barrera rasante de 5 dB, pero solo los modelos ondulatorios resuelven
+límite de barrera rasante de 5 dB, pero solo los modelos ondulatorios resuelven
 las caídas de interferencia que se mueven con la geometría, la frecuencia y la
 impedancia del suelo, lo que los hace la infraestructura natural de los esquemas
 meteorológicos de Nord2000 y CNOSSOS.
@@ -383,14 +385,15 @@ reciprocidad anclados como tests. La difracción de barrera por teoría
 ondulatoria (`barrier_insertion_loss`): la forma cerrada de Kurze-Anderson
 (`kurze_anderson_attenuation`, Bies Ec. 5.138), el semiplano rígido exacto
 (MacDonald / Hadden y Pierce, Attenborough Ecs. 9.19-9.20), las barreras
-gruesas mediante el número de Fresnel de doble arista (Bies Ec. 5.157), y el
+gruesas mediante el número de Fresnel de doble borde (Bies Ec. 5.157), y el
 modelo coherente de barrera sobre suelo de cuatro caminos ponderado por el
 coeficiente de reflexión de `ground_effect`.
 
-**No cubierto.** Ambos modelos asumen una atmósfera homogénea, sin
+**No cubierto.** Ambos modelos suponen una atmósfera homogénea, sin
 refracción ni turbulencia; un gradiente vertical de velocidad del sonido es
 el objeto de la guía separada de
-[refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/).
+[refracción
+atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/).
 El modelo coherente de barrera sobre suelo pondera los cuatro caminos
 difractados con un único coeficiente de reflexión $Q$ calculado sobre la
 geometría global fuente-receptor, en lugar de un coeficiente distinto por
