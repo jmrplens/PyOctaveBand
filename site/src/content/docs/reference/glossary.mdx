@@ -1,6 +1,6 @@
 ---
 title: "Glossary"
-description: "Every acoustic quantity the guides compute, with its symbol, a one-sentence definition, its unit, the standard and clause that defines it, and the guide that implements it."
+description: "The acoustic quantities the guides compute most often, each with its symbol, a one-sentence definition, its unit, the standard and clause that defines it, and the guide that implements it."
 ---
 
 import Glossary from '../../../components/Glossary.astro';
@@ -9,10 +9,11 @@ The guides each open with the standard they implement, so a quantity is always
 defined where it is used. This page is the other direction: you have a symbol,
 from a report, a specification or a colleague's email, and you want to know
 what it is, what it is measured in, which document defines it and where in this
-documentation it is computed.
+documentation it is computed. A quantity that is not here is still defined
+where it is computed: every guide states its quantities before its code.
 
-Two conventions govern the line that says where a quantity is defined, and they
-matter more than they look.
+Two conventions govern the line that says where a quantity is defined, and both
+matter more than they seem to.
 Where a clause, formula or table number appears, it is the one the
 implementation cites, taken from the standard the guide implements. Where only
 a designation appears, the standard is established but the defining clause is
@@ -21,14 +22,50 @@ be worse than leaving it out. A handful of quantities have no governing
 standard at all; their source is the paper or book the model comes from, named
 as such.
 
-Symbols collide across domains, and the glossary does not pretend otherwise. *R*
-is the sound reduction index in building acoustics, the airflow resistance in
-materials, the roughness in psychoacoustics and the cumulative stress variable
-in ISO 2631-5. Sigma is the airflow resistivity of a porous material and the
-radiation efficiency of a plate. *A* is an equivalent absorption area and an
-accelerance. *L*<sub>N</sub> is a percentile level here and a loudness level in
-phon there. Read the symbol together with its domain, which is what the
-grouping below is for.
+A third convention governs the unit, and it is the one most often lost between
+a measurement and a report. A decibel is always a ratio, so an entry whose unit
+reads *re* something — dB re 20 µPa in air, dB re 1 µPa in water, dB re 1 pW
+for power, dB re 1 pW/m² for intensity, dB re 50 nm/s for a velocity level — is
+an **absolute level**, and the reference quantity is part of the unit. An entry
+whose unit is a bare dB is a **level difference or a rating**: $D$, $R$, $R_w$,
+$C$, $C_{tr}$, $\Delta L_w$, $K_{ij}$, where the reference cancels and no
+reference applies. Two numbers can only be added or subtracted when they are of
+the same kind, and the commonest error in a report is subtracting two levels
+referred to different quantities, or adding a rating to a level.
+
+## Symbols that collide
+
+Symbols collide across domains, and the glossary does not pretend otherwise.
+Some collisions are harmless because the two quantities never meet in one
+calculation; others change a number by tens of decibels, or by a whole rating
+step, and those are the ones below. Where two entries share a symbol, the
+qualifier in brackets after the notation says which one you are reading, and on
+the site a symbol index above the cards lists every meaning of a letter side by
+side — the answer for a reader who has the symbol and not the domain, which is
+the one case the grouping by domain cannot serve.
+
+| Symbol | Meanings that are not the same quantity |
+| :--- | :--- |
+| $C$ | The **decay curvature** $100\,(T_{30}/T_{20} - 1)$ in per cent, and the ISO 717-1 **spectrum adaptation term** in decibels. Both are defined on one page, [Rooms and buildings](/phonometry/reference/theory/rooms-buildings/), a couple of sections apart. |
+| TL | A partition's **transmission loss**, a duct element's **transmission loss** (a different measurement, with an anechoic termination in the definition) and the underwater **propagation loss** of the sonar equation. Three domains, three unrelated calculations. |
+| NR | The **noise rating** curve family of a room criterion, and the **noise reduction** $L_{p1} - L_{p2}$ between two rooms in noise control. |
+| $\alpha$ | The **absorption coefficient** of a surface, the **atmospheric attenuation coefficient** per unit length (dB/m here, dB/km in ISO 9613-2), the **volume absorption coefficient** of sea water (dB/km), and the **tortuosity** $\alpha_\infty$ of a porous model, which is not an absorption at all. |
+| $A$ | An **equivalent absorption area** in m², an **accelerance** in 1/kg, and the **total attenuation** of ISO 9613-2 in dB. |
+| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_c$ and barrier screening $D_z$ of ISO 9613-2, the spatial decay rate $D_{2,S}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
+| $H$ | The **receptance** of ISO 7626-1, the **frequency response estimators** $H_1$ and $H_2$, and the **harmonic transfer functions** $H_n$ of a swept-sine measurement — where $H_2$ is the second harmonic, not the noise-on-input estimator. |
+| $\eta$ | The **loss factor** of a resilient element, the **coupling loss factor** $\eta_{ij}$ of a junction, and the **internal** and **total** loss factors of a building element. |
+| $\tau$ | The **transmission factor** of a partition, the **time constant** of a detector, the **lag** of a correlation, and the **air temperature** in CNOSSOS-EU. |
+| $T_s$ | The ISO 3382-1 **centre time** of a room impulse response, typically tens of milliseconds; the **structural reverberation time** of a plate, which is seconds; and the number of **months per year that studded tyres are fitted** in CNOSSOS-EU. |
+| $R$ | The **sound reduction index** in building acoustics, the **airflow resistance** in materials, the **roughness** in psychoacoustics, and the **cumulative stress variable** of ISO 2631-5. |
+| $\sigma$ | The **airflow resistivity** of a porous material, the **radiation efficiency** of a plate, and the **standard deviation** $\sigma_R$ of a building-acoustics measurement situation. |
+| $L_N$, $L_n$ | $L_N$ is a **percentile level** in environmental noise, a **loudness level** in phon, and the level equivalent to a microphone's **inherent noise**; $L_n$, with a lower-case subscript, is the **normalized impact sound pressure level** of ISO 10140-3. In building acoustics the case of the subscript is the whole difference. |
+| $v_0$ | A **reference velocity** of 1 nm/s in EN 15657 and EN 12354-5, and of 50 nm/s in ISO/TS 7849 and ISO 9611 — 34 dB apart, in one section of one area. |
+| $F_0$ | A **reference force** of 1 N in ISO 16283-2, and of 1 µN in EN 15657 — 120 dB apart. |
+| $K_1$ | The ISO 3744 **background noise correction** in dB, and a CNOSSOS-EU **temperature coefficient** in dB/°C. |
+| $F$ | **Fluctuation strength** in vacil, the **Fast** time weighting, and the **modulation frequency** in $m(F)$ — all three on this page. |
+
+Where two meanings meet inside one navigation section, the guide says so at
+first use; this table is the site-wide list.
 
 For the source of each definition rather than the definition itself, the
 [bibliography](/phonometry/reference/bibliography/) lists every cited work with

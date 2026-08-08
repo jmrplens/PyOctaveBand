@@ -2,63 +2,58 @@
 
 # Outdoor sound
 
-Outdoor sound assessment has two halves: predicting the level a source
-delivers to a distant receiver, and judging the character of the sound that
-actually arrives. The pages of this section split along that line, with the
-prediction half starting one step earlier, at the source itself.
+This section is the **path**: what happens to a sound between a source of known
+power and a receiver hundreds of metres away. Its three pages go from the
+engineering method down to the physics it approximates, and then to the one
+thing both of them assume does not happen.
 
 [Outdoor Sound Propagation](outdoor-propagation.md) is the
-prediction half. Starting from a source's **sound power**, the ISO 9613-2
-general method subtracts, octave band by octave band, every mechanism that
-attenuates sound on its way: geometrical divergence, atmospheric absorption
-(supplied by the pure-tone coefficient of **ISO 9613-1**), the ground effect
-and barrier screening, with a meteorological correction for long-term
-averages. The page keeps the per-term breakdown visible, so a prediction is
-never a black box: you can see exactly which mechanism buys how many decibels
-at which frequency.
-
-[CNOSSOS-EU railway source emission](../sources/cnossos-rail-emission.md)
-is the source half for the railway. Section 2.3 of Annex II to Directive
-2002/49/EC turns a roughness spectrum, a set of transfer functions and a train
-flow into the two equivalent source lines every strategic noise map in the
-European Union starts from, at 0,5 m and at 4,0 m above the rail head, with
-impact noise, curve squeal, traction, aerodynamic noise above 200 km/h and the
-bridge term each allocated to the height it radiates from.
+engineering method. Starting from a source's **sound power**, ISO 9613-2
+subtracts, octave band by octave band, every mechanism that attenuates sound on
+its way: geometrical divergence, atmospheric absorption (supplied by the
+pure-tone coefficient of **ISO 9613-1**), the ground effect and barrier
+screening, with a meteorological correction for long-term averages. The page
+keeps the per-term breakdown visible, so a prediction is never a black box: you
+can see exactly which mechanism buys how many decibels at which frequency.
+Start here — the other two pages exist to say when its terms can be trusted.
 
 [Spherical ground effect and advanced barriers](ground-barriers.md)
-goes underneath the ISO 9613-2 fits to the wave acoustics they approximate: the
+goes underneath two of those terms to the wave acoustics they fit: the
 Weyl-Van der Pol spherical-wave reflection coefficient of a finite-impedance
 ground, and barrier diffraction by the Kurze-Anderson Fresnel number, the exact
 rigid half-plane, thick barriers and the coherent four-path barrier on the
-ground, all resolving the frequency-dependent interference the octave-band terms
-smooth away.
+ground. What it resolves is the frequency-dependent interference the
+octave-band terms smooth away: a ground dip is a cancellation between a direct
+and a reflected path, at a frequency that depends on the geometry and the
+ground impedance, and a tabulated correction cannot know where it falls. Open
+this page when the answer is dominated by the ground or by a screen, or when
+the octave-band result has to be defended against a measurement.
 
-[CNOSSOS-EU road traffic source emission](../sources/cnossos-road-emission.md)
-supplies the source power that a prediction starts from, for the one source
-that dominates almost every noise map: road traffic. The common EU method of
-Annex II to Directive 2002/49/EC builds a rolling and a propulsion sound power
-for each vehicle category, corrects the rolling term for pavement, air
-temperature and studded tyres and the propulsion term for pavement and road
-gradient, applies the junction correction to both, and delivers a directional
-sound power per metre of source line.
+[Atmospheric refraction: rays and the GFPE](atmospheric-refraction.md)
+removes the assumption both pages above are built on. Sound speed changes with
+height, so rays are curved rather than straight, and whether that matters is
+mostly a question of range: a representative surface-layer gradient bends rays
+on a radius of about 3.4 km, so over the first hundred metres the homogeneous
+models are accurate, and beyond a few hundred the geometry takes over. Downwind
+or under a nocturnal inversion the rays close over the ground and hold the
+level up; upwind the same profile opens an acoustic shadow into which the level
+collapses by 20 dB or more. That asymmetry — the same machine at the same
+distance, tens of decibels apart depending on which side you stand — is what
+ISO 9613-2 fixes by decree in its favourable-propagation convention and
+compresses into the scalar meteorological correction. This page computes it,
+with curved rays and closed-form shadow-zone distances, and with the Green's
+function parabolic equation as the reference field.
 
-[Impulsive-sound prominence (NT ACOU 112)](../assessment/impulsive-sound.md)
-is the assessment half. Noise containing distinct impulses (hammering,
-riveting, pile driving) annoys more than a steady sound of the same LAeq, and
-the Nordtest method quantifies that: from the onset rate and level difference
-of each impulse it computes a predicted **prominence**, and converts it into
-the graduated adjustment KI that is added to the measured LAeq in a rating
-level.
-
-The surrounding machinery lives nearby: the rating levels and Lden that
-assessments end in are covered in
-[Integrated and Statistical Levels](../../signals/levels/levels.md), the tonal
-counterpart of the impulsive adjustment in
-[Objective audibility of tones in noise](../../perception/psychoacoustics/tone-audibility.md),
-and the sources that feed a propagation calculation in the
-[Sound power and intensity](../../devices/emission/index.md) and
-[Aircraft and wind energy](../../aircraft/index.md)
-sections.
+Read them in that order. The rating that a predicted level ends in is not here:
+the period levels come from [Integrated and Statistical
+Levels](../../signals/levels/levels.md), and Lden, Ldn and the rating level
+from [Environmental Levels (ISO
+1996-1/-2)](../assessment/environmental-levels.md) in the
+[assessment](../assessment/index.md) subsection. The source
+strengths a prediction starts from are in
+[Environmental sources](../sources/index.md) for road, rail and
+wind turbines, in [Sound power and intensity](../../devices/emission/index.md)
+for a machine, and in [Aircraft noise](../../aircraft/index.md) for aircraft.
 
 ## Pages in this section
 
@@ -77,13 +72,31 @@ sections.
 
 Pages elsewhere on the site that this section leans on:
 
-- [CNOSSOS-EU railway source emission](../sources/cnossos-rail-emission.md):
-  the common EU railway emission method, from rail and wheel roughness to the
-  directional sound power per metre of the two equivalent source lines.
-- [CNOSSOS-EU road traffic source emission](../sources/cnossos-road-emission.md):
-  the road source of Annex II to Directive 2002/49/EC: rolling and propulsion
-  sound power per vehicle category with the Appendix F database, and the
-  directional sound power per metre of source line.
-- [Impulsive-sound prominence (NT ACOU 112)](../assessment/impulsive-sound.md):
-  the predicted prominence of impulsive sounds and the graduated LAeq
-  adjustment KI.
+- [CNOSSOS-EU road traffic source emission](../sources/cnossos-road-emission.md)
+  and [CNOSSOS-EU railway source emission](../sources/cnossos-rail-emission.md),
+  both in [Environmental sources](../sources/index.md): the
+  directional sound power per metre of source line that a prediction starts
+  from.
+- [Impulsive-sound prominence (NT ACOU 112)](../assessment/impulsive-sound.md),
+  in [Assessment and regulation](../assessment/index.md): the
+  character adjustment applied to the level once it has arrived.
+
+## What this section does not cover
+
+These are point-to-point models, not a mapping engine. Each call takes one
+source, one receiver and the ground between them; there is no terrain
+elevation profile, no building geometry and no GIS layer, both refraction
+models assume flat ground at height zero and a profile that varies with height
+alone rather than along the path, and how a source line is broken into point
+sources is declared out of scope by CNOSSOS itself. The **CNOSSOS-EU
+propagation method of section 2.5 is not implemented**: it is a different model
+from ISO 9613-2, so a calculation that pairs CNOSSOS source powers with the
+path here is not a CNOSSOS calculation. The coherent barrier-on-ground model
+weights its four diffracted paths with a single reflection coefficient computed
+over the overall geometry, so it is coherent and reciprocal but is not a
+boundary-element solution, and no model here computes turbulent scattering:
+ISO 9613-2 absorbs it into the fixed caps on its screening term, and the
+wave-acoustic and refraction pages assume a non-turbulent atmosphere
+outright. Nothing on these pages produces a rating: no Lden,
+no limit value and no verdict — those are
+[Assessment and regulation](../assessment/index.md).

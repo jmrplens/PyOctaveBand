@@ -80,3 +80,23 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
   de evaluación y las fases de ruido, y las tablas de valores límite.
+
+## Qué no cubre esta sección
+
+Estas páginas implementan el procesado de señal de un sonómetro, no el
+sonómetro. El resto de IEC 61672-1 (los rangos de nivel, la indicación de
+sobrecarga, el ruido autogenerado, la respuesta direccional y los ensayos
+periódicos de IEC 61672-3) no está implementado en ninguna parte de la
+biblioteca, así que aquí nada asigna una clase a un instrumento físico;
+[Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) dice
+exactamente qué significa y qué no significa un veredicto de clase de la
+biblioteca. Dos curvas llegan sin veredicto de ningún tipo: ISO 7196 define
+una única tolerancia de ±1 dB sin estructura de clases, y la retirada IEC 537
+no dejó tabla de tolerancias para la D, así que ambas curvas filtran una señal
+pero ninguna llega a `verify_weighting_class`, y en su lugar se fijan frente a
+sus tablas publicadas en el informe de conformidad. La dosis de ruido es solo
+la primera edición (1993) de IEC 61252, no la revisión de 2025. Y una dosis es
+una magnitud, no un veredicto: las estrategias de exposición, el plan de
+muestreo y los límites que deciden si un trabajador está sobreexpuesto son
+[Exposición al ruido en el trabajo
+(ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/).

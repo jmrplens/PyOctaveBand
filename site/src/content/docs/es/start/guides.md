@@ -83,7 +83,7 @@ head:
             "@type": "ListItem",
             "position": 10,
             "name": "Simulación de ondas",
-            "description": "Un solver FDTD 2D determinista, validado frente a oráculos analíticos y no frente a una norma.",
+            "description": "Solvers FDTD 2D deterministas, acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a una norma.",
             "url": "https://jmrplens.github.io/phonometry/es/simulation/"
           }
         ]
@@ -112,6 +112,20 @@ los docstrings y no se repite aquí. Las deducciones, las decisiones de diseño 
 la evidencia numérica están en [Referencia](/phonometry/es/reference/): las
 páginas de teoría explican por qué la fórmula es esa, y el informe de
 conformidad pone el valor esperado de la propia norma junto al calculado.
+
+Un tercer apunte, para quien llegue con una medición que hacer y no con un
+número que calcular. Cuando un método necesita un montaje físico, su guía lleva
+un diagrama de montaje de ingeniería con la geometría que prescribe la norma:
+posiciones de fuente y micrófono, separaciones, montaje y la probeta o la
+superficie envolvente. [Medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/)
+dibuja así el par de recintos de ISO 16283-1, y el
+[Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) dibuja
+el tubo de ISO 10534-2 con sus dos separaciones de micrófono. Las guías de
+predicción y de clasificación toman en cambio datos de elemento o de material
+como entrada y no necesitan instalaciones, que suele ser la forma más rápida de
+distinguir las dos clases de página. [¿Qué necesitas
+medir?](/phonometry/es/start/tasks/) ordena esas mismas guías por el trabajo en
+lugar de por el tema.
 
 ## [Análisis de señal](/phonometry/es/signals/)
 
@@ -163,11 +177,14 @@ ISO 1996-1, IEC 60942 y la GUM.
   SEL, y la dosis de ruido.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ y los niveles de valoración compuestos, el ajuste tonal, la
-  corrección de ruido residual y el presupuesto de incertidumbre.
+  corrección de ruido residual y el presupuesto de incertidumbre. Vive en Medio
+  ambiente y transporte, y se repite aquí porque son las definiciones de nivel
+  de arriba agregadas a lo largo de un día.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido $L_{Keq}$ con sus correcciones $K_t$, $K_f$ y $K_i$, los
   periodos temporales de evaluación y las fases de ruido, las tablas de valores
-  límite y la comprobación del artículo 25.
+  límite y la comprobación del artículo 25. También vive en Medio ambiente y
+  transporte.
 
 **[Señales y espectros](/phonometry/es/signals/spectra/)**
 
@@ -193,7 +210,9 @@ ISO 1996-1, IEC 60942 y la GUM.
   (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
   medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
   laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
-  los motores de inducción, y tonos de paso de pala.
+  los motores de inducción, y tonos de paso de pala. Vive en Vibración y ruido
+  estructural, y se repite aquí porque es el espectro de envolvente de arriba
+  puesto a trabajar.
 - [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
   la correlación con sus errores aleatorios, la estimación de retardo por
   correlación directa y las ponderaciones GCC, y la envolvente de Hilbert.
@@ -361,7 +380,18 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
   global de un trasdosado según el anexo D de ISO 12354-1.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la rigidez por unidad de superficie bajo un suelo flotante a partir de la
-  resonancia con placa de carga, con el término del gas encerrado.
+  resonancia con placa de carga, con el término del gas encerrado. Vive en
+  Materiales y superficies, y se repite aquí porque es el dato de entrada que
+  piden los modelos de capas de arriba.
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
+  el método de la placa de recepción y las magnitudes de fuente independientes de
+  la placa: fuerza bloqueada equivalente, velocidad libre y movilidad de la
+  fuente. Listada también en Vibración, junto a las movilidades con las que está
+  construida.
+- [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
+  el término de acoplamiento a partir de las movilidades de fuente y receptor, la
+  potencia instalada y el nivel de presión acústica por vía en el recinto
+  receptor. Listada también en Vibración.
 
 ## [Materiales y superficies](/phonometry/es/materials/)
 
@@ -401,12 +431,17 @@ ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
   resonadores, sonido lento y secuencias ternarias.
 - [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la absorción in situ de pavimentos por la técnica de sustracción y el
-  método puntual.
+  método puntual. Es la única guía del índice [superficies medidas in
+  situ](/phonometry/es/materials/surfaces/), que la barra lateral archiva en
+  este mismo grupo.
 
-El tercer grupo de esta área, Capas elásticas, tiene una sola guía,
-[Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/),
-listada más arriba dentro de Diseño del aislamiento, junto a la predicción de
-suelo flotante que la consume.
+**[Capas elásticas](/phonometry/es/materials/resilient/)**
+
+- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
+  la rigidez por unidad de superficie bajo un suelo flotante a partir de la
+  resonancia con placa de carga, con el término del gas encerrado. Listada
+  también en Salas y edificación, junto a la predicción de suelo flotante que la
+  consume.
 
 ## [Vibración y ruido estructural](/phonometry/es/vibration/)
 
@@ -432,14 +467,17 @@ EN 12354-5, ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 e ISO 8041-1.
 - [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   la potencia radiada a partir del nivel de velocidad promediado en la superficie
   y el factor de radiación, con el límite superior de la Parte 1 y el valor de
-  ingeniería de la Parte 2.
+  ingeniería de la Parte 2. Vive en Fuentes y dispositivos, y se repite aquí
+  porque su entrada es una velocidad superficial medida.
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   el método de la placa de recepción y las magnitudes de fuente independientes de
   la placa, fuerza bloqueada equivalente, velocidad libre y movilidad de la
-  fuente.
+  fuente. Vive en Salas y edificación, y se repite aquí porque las magnitudes de
+  fuente son movilidades.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
   el término de acoplamiento a partir de las movilidades de fuente y receptor, la
-  potencia instalada y el nivel de presión acústica por vía en el recinto receptor.
+  potencia instalada y el nivel de presión acústica por vía en el recinto
+  receptor. Vive en Salas y edificación, por el mismo motivo.
 
 **[Vibración en humanos](/phonometry/es/vibration/human/)**
 
@@ -451,6 +489,14 @@ EN 12354-5, ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 e ISO 8041-1.
   variable de tensión acumulada que hay detrás de la probabilidad de lesión
   lumbar.
 
+**[Maquinaria](/phonometry/es/vibration/machinery/)**
+
+- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
+  las frecuencias características de rodamientos, engranajes y ejes y el análisis
+  de envolvente que las encuentra bajo el ruido de banda ancha de una máquina en
+  marcha. Listada también en Análisis de señal, junto a los estimadores
+  espectrales que utiliza.
+
 ## [Medio ambiente y transporte](/phonometry/es/environment/)
 
 Propagación en exteriores, barreras, refracción, fuentes viarias,
@@ -460,6 +506,16 @@ valorarse, así que la atmósfera, el suelo y el propio movimiento de la fuente
 entran en la respuesta. Implementa ISO 9613-1/-2, ISO 1996-1/-2,
 ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (Directiva 2002/49/CE, anexo II) e
 IEC 61400-11.
+
+Hay un límite de alcance que vale la pena decir aquí y no a un clic de
+distancia. De CNOSSOS-EU, lo implementado es el lado de la **fuente** del anexo
+II: la emisión viaria del apartado 2.2 con los coeficientes del apéndice F, y la
+emisión ferroviaria del apartado 2.3 con el apéndice G, que dan la potencia
+acústica direccional por metro de línea fuente. El cálculo de propagación del
+apartado 2.5, con su propia maquinaria de suelo, difracción y condiciones
+favorables, **no** está implementado; la atenuación en exteriores pasa aquí por
+la cadena de ISO 9613-2, que es un modelo distinto y no intercambiable con aquel
+para la cartografía reglamentaria.
 
 **[Sonido en exteriores](/phonometry/es/environment/propagation/)**
 
@@ -493,10 +549,16 @@ IEC 61400-11.
   la prominencia prevista de cada impulso a partir de su tasa de ataque y su
   diferencia de nivel, y el ajuste que se suma al $L_{Aeq}$.
 
-Las otras dos guías de este grupo, [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/)
-y [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/),
-están listadas más arriba dentro de Análisis de señal, junto a las definiciones
-de nivel sobre las que se construyen.
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
+  $L_{den}$, $L_{dn}$ y los niveles de valoración compuestos, el ajuste tonal, la
+  corrección de ruido residual y el presupuesto de incertidumbre. Listada también
+  en Análisis de señal, junto a las definiciones de nivel sobre las que se
+  construye.
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
+  el nivel corregido $L_{Keq}$ con sus correcciones $K_t$, $K_f$ y $K_i$, los
+  periodos temporales de evaluación y las fases de ruido, las tablas de valores
+  límite y la comprobación del artículo 25. Listada también en Análisis de señal,
+  por el mismo motivo.
 
 ## [Ruido de aeronaves](/phonometry/es/aircraft/)
 
@@ -538,7 +600,6 @@ ISO 17208-1/-2, ISO 18406 y JOMOPANS-ECHO.
 - [Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
   los solvers de modos normales, trazado de rayos y ecuación parabólica de la
   guía de ondas estratificada, y cómo elegir modelo de propagación.
-
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
   la cara auditiva de ese ruido: los audiogramas de grupo, las funciones de
   ponderación reglamentarias con su versión de guía, y la exposición de una
@@ -565,6 +626,12 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   los métodos directo y de comparación de ISO 3741.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+  la cuarta ruta de determinación, para la máquina que no se puede llevar a un
+  recinto cualificado: la potencia radiada a partir del nivel de velocidad
+  promediado en la superficie y el factor de radiación, con el límite superior de
+  la Parte 1 y el valor de ingeniería de la Parte 2. Listada también en
+  Vibración.
 
 **[Electroacústica](/phonometry/es/devices/electroacoustics/)**
 
@@ -580,10 +647,13 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   la separación de armónicos a partir de un solo barrido exponencial, la THD
   frente a la frecuencia de excitación, y la fase mínima, el retardo de grupo y
   la fase en exceso.
+**[Radiodifusión](/phonometry/es/devices/broadcast/)**
+
 - [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/):
   la ponderación K y la sonoridad integrada con puerta en LUFS, los medidores
   momentáneo y de corto plazo, el rango de sonoridad y el nivel de pico
-  verdadero.
+  verdadero. La barra lateral la archiva dentro de Electroacústica; tiene su
+  propio índice de sección.
 
 **[Control de ruido](/phonometry/es/devices/noise-control/)**
 

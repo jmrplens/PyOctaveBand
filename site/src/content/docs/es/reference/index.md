@@ -1,21 +1,24 @@
 ---
 title: "Referencia"
-description: "La parte del sitio que no enseña: la teoría que hay detrás de cada módulo, el informe numérico de conformidad que fija cada métrica al apartado de su norma y la bibliografía de todas las fuentes que citan las guías."
+description: "Teoría, evidencia y vocabulario: las deducciones que hay detrás de los módulos, el informe de conformidad que fija cada métrica a su apartado, el registro de defectos encontrados en las fuentes publicadas, la bibliografía y el glosario."
 ---
 
-Las guías muestran cómo medir algo. Esta sección responde a las tres preguntas
-que vienen después: **por qué la fórmula es esta**, **si la implementación es
-realmente correcta** y **de dónde procede**. Aquí no hay ningún tutorial, así
-que nada tiene que leerse en orden: son páginas a las que se llega desde una
-guía, desde un informe que se está redactando o desde la pregunta de un
-revisor.
+Las guías muestran cómo medir algo. Esta sección responde a las preguntas que
+vienen después: **por qué la fórmula es esta**, **si la implementación es
+realmente correcta**, **si la fuente impresa es correcta**, **qué es este
+símbolo** y **de dónde procede**. Aquí no hay ningún tutorial, así que nada
+tiene que leerse en orden: son páginas a las que se llega desde una guía, desde
+un informe que se está redactando o desde la pregunta de un revisor.
 
 Úsala cuando estés defendiendo un resultado y no produciéndolo. Si un colega
 pregunta qué apartado de la norma ISO 3382-1 sigue el tiempo de
 reverberación, las páginas de teoría lo dicen; si un cliente pide pruebas de
 que la librería lo calcula correctamente, el informe de conformidad muestra el
-valor esperado de la propia norma junto al calculado; si una revista pide la
-fuente de un modelo, la bibliografía tiene el DOI.
+valor esperado de la propia norma junto al calculado; si un valor esperado
+impreso no concuerda con la librería, el registro de erratas dice cuál de los
+dos está mal y por qué; si un símbolo de un informe necesita nombre, el glosario
+tiene su unidad y la cláusula que lo define; y si una revista pide la fuente de
+un modelo, la bibliografía tiene el DOI.
 
 Si solo buscas la firma de una función, lo que quieres es la
 [referencia de la API](/phonometry/es/reference/api/): se genera a partir de
@@ -23,15 +26,45 @@ los docstrings del código y ocupa su propia sección de la barra lateral. Esa
 sección está en inglés en los dos idiomas, porque su texto es el del propio
 código; todo lo demás del sitio está traducido.
 
+## Qué llevarte a tu informe
+
+La evidencia existe; esto es cuál de ella tiene sitio en el documento que
+entregas. **Anota la versión exacta de phonometry que produjo los números**, y
+su DOI de versión, porque el informe de conformidad se regenera en cada pull
+request y solo el informe de la versión fijada es evidencia sobre tu ejecución.
+**Nombra la norma y el apartado que implementa cada magnitud reportada**; las
+páginas de teoría y el glosario dan las dos cosas. **Adjunta o enlaza las filas
+de conformidad de esas magnitudes**, ya que llevan el valor esperado normativo
+junto al calculado. **Consulta el registro de erratas para las normas que
+cites**: cuando un defecto impreso cambió la lectura que implementa la
+librería, esa entrada es lo que explica una diferencia frente al número de otra
+implementación. Y lee el bloque «Qué cubre esta guía» de cada guía que hayas
+usado para saber qué cláusulas *no* están implementadas, que es la parte por la
+que pregunta primero quien revisa.
+
 ## [Teoría](/phonometry/es/reference/theory/)
 
-Las normas, las matemáticas y las decisiones de diseño detrás de cada módulo,
-en seis páginas por dominio: análisis de señal, percepción y audición, salas y
+Las normas, las matemáticas y las decisiones de diseño detrás de los módulos
+cuyas deducciones son lo bastante largas como para sacarlas de la guía, en seis
+páginas por dominio: análisis de señal, percepción y audición, salas y
 edificación, materiales y superficies, medio ambiente y transporte, y
 vibración. Empieza aquí cuando una guía enuncia un resultado y quieres la
 deducción, el apartado que implementa o el motivo por el que se eligió una
-formulación y no otra. La teoría de los módulos submarinos es la excepción:
-está junto a [sus guías](/phonometry/es/underwater/).
+formulación y no otra.
+
+Esas seis están repartidas por física y no por las diez áreas de las guías, así
+que algunos asuntos quedan donde el lector puede no esperarlos: la
+[determinación de la potencia
+acústica](/phonometry/es/reference/theory/environment-transport/#determinación-de-la-potencia-acústica-iso-374437453746-iso-3741-iso-9614-23)
+y la [exposición al ruido en el
+trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-e-incertidumbre-iso-9612)
+están en Medio ambiente y transporte, y la [intensidad
+acústica](/phonometry/es/reference/theory/signal-analysis/#intensidad-acústica-iec-61043)
+en Análisis de señal, porque cada una es la misma matemática de propagación y
+de espectro que desarrollan las páginas que las rodean. La teoría submarina vive
+junto a [sus guías](/phonometry/es/underwater/), y las deducciones de
+aeronaves, de simulación de ondas, de electroacústica y de control de ruido se
+quedan dentro de las propias guías, donde ya está la geometría que las motiva.
 
 ## [Informe de conformidad](/phonometry/es/reference/conformance/)
 
@@ -42,6 +75,19 @@ pull request, así que describe el código tal como está ahora y no como se
 documentó una vez. Léelo cuando necesites demostrar que un número es
 defendible, o para ver exactamente qué partes de una norma están implementadas
 y cuáles no.
+
+Hay dos cosas que conviene saber antes de abrirlo. No todas las filas son una
+comparación contra un número impreso en una norma: algunas normas no publican
+ningún ejemplo resuelto, y esas comprobaciones se anclan a la forma cerrada del
+texto normativo y se fijan con un caso sintetizado a un resultado conocido, lo
+que es una evidencia más débil y así se describe en la fila. Y no toda marca
+distinta de «apto» es un defecto: la galería de filtros incluye a propósito
+arquitecturas que por construcción no pueden cumplir la máscara de
+IEC 61260-1, Chebyshev I y el elíptico porque la cambian por rizado de banda de
+paso y Bessel por retardo de grupo, y esas filas llevan el veredicto «Por
+diseño». Juzga una fila por su margen frente al límite aplicable y no por el
+tamaño de la desviación, porque los límites se ensanchan allí donde la norma
+sabe que tienen que hacerlo.
 
 ## [Erratas de las fuentes publicadas](/phonometry/es/reference/errata/)
 
@@ -54,13 +100,6 @@ evidencia, la lectura que implementa la librería y el test que la fija. Léelo
 cuando un valor esperado impreso y la librería no coincidan, antes de dar por
 hecho que el error es de la librería.
 
-## [Glosario de magnitudes](/phonometry/es/reference/glossary/)
-
-Cada magnitud acústica que calculan las guías, con su símbolo, una definición
-de una frase, su unidad, la norma y cláusula que la define y la guía que la
-implementa. Léelo cuando un símbolo de una fórmula necesite nombre, o un
-nombre necesite la cláusula de la que viene.
-
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
 Una selección curada de los libros y artículos en los que se apoyan las guías,
@@ -69,3 +108,34 @@ enlace oficial del editor, media frase sobre qué sustenta y las páginas de gu�
 que la citan. Es una lista de lectura del campo más que el índice completo de
 citas: la lista con autoridad para una página concreta es la sección de
 Referencias de esa misma página, generada a partir de su frontmatter.
+
+## [Glosario](/phonometry/es/reference/glossary/)
+
+Las magnitudes acústicas que más a menudo calculan las guías, cada una con su
+símbolo, una definición de una frase, su unidad, la norma y cláusula que la
+define y la guía que la implementa. Léelo cuando un símbolo de una fórmula
+necesite nombre, o un nombre necesite la cláusula de la que viene. Una magnitud
+que no esté listada sigue estando definida allí donde se calcula: toda guía
+enuncia sus magnitudes antes de su código.
+
+## Qué no cubre esta sección
+
+**No es evidencia sobre tu medición, solo sobre la librería.** El informe de
+conformidad dice que la implementación reproduce el valor esperado de cada
+norma; no dice nada de tu micrófono, de tu sala ni de tu operador, y una
+medición acreditada necesita una cadena de calibración trazable y un
+instrumento con aprobación de modelo que ningún software puede aportar.
+
+**No sustituye a las normas.** Aquí no se reproduce ningún texto normativo: las
+páginas de teoría citan números de apartado, de tabla y de ecuación para que
+puedas leer el documento en sí, que es lo que te va a pedir quien revise.
+
+**No es la API.** Las firmas, los tipos de los argumentos y los valores de
+retorno se generan a partir de los docstrings hacia la [referencia de la
+API](/phonometry/es/reference/api/), que es otra sección de la barra lateral.
+
+**Y no es exhaustiva.** Las páginas de teoría cubren las áreas cuya matemática
+comparten varias guías, y dicen sin rodeos qué áreas se quedan con su teoría
+dentro; el registro de erratas lista solo los defectos que este proyecto ha
+confirmado contra una página impresa; y la bibliografía lista las fuentes que
+implementa la librería, no la literatura del campo.

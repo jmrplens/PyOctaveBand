@@ -26,6 +26,17 @@ laboratory element and junction data are converted to their in-situ values,
 every path is formed per band, and the result shows which path dominates each
 band rather than only whether the room passes.
 
+**Which of the two do you run?** Run the simplified model when what you have is
+catalogue weighted ratings — $R_w$, $\Delta L_w$, a mass per unit area — and the
+question is whether the partition meets a limit. Run the detailed one when you
+have per-band element and junction spectra, or the material properties the
+standard can calculate them from, and the question is *which path to fix in
+which band*. The choice is not about accuracy on the rating: on the standard's
+own worked building the two agree well inside their stated spread, and the
+detailed airborne model carries no bias error and a standard deviation of 1,5 dB
+to 2,5 dB (Clause 5) against about 2 dB for the simplified one. What the
+detailed model buys is the spectrum behind the single number.
+
 [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/)
 goes one level deeper, to where the element $R$ itself comes from: the mass law
 and the coincidence dip of a single panel, the mass-spring-mass behaviour of a
@@ -70,6 +81,19 @@ follow the 2000 text — including the tabulated flanking correction $K$ that th
 follows the 2017 text. Check which edition your regulation calls up before
 quoting a correction from either.
 
+Every prediction here starts from measured data that came from somewhere else,
+and the design report has to say where. The element $R$ and $L_n$ come from
+ISO 10140-2 and -3, together with the laboratory structural reverberation time
+printed in the same report, because the in-situ conversion needs it. The
+junction indices $K_{ij}$ come from an ISO 10848 measurement or from the
+EN 12354-1 Annex E catalogue of junction types. The floor-covering improvement
+$\Delta L_w$ comes from ISO 16251-1 or from a full-size ISO 10140-3 test. The
+resilient layer's $s'$ comes from EN 29052-1. And for service equipment, the
+characteristic structure-borne power comes from the EN 15657 reception plate.
+Two of the pages in this section are themselves such measurements, feeding the
+others; the built result is finally checked against the ISO 16283 field
+measurement in [Sound insulation](/phonometry/buildings/insulation/).
+
 ## Pages in this section
 
 - [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/):
@@ -104,3 +128,31 @@ Pages elsewhere on the site that this section leans on:
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
   the load-plate resonance measurement, the enclosed-gas term and the
   floating-floor natural frequency.
+
+## What this section does not cover
+
+**A prediction is only as good as the element data you feed it, and the library
+takes that data as given.** The element ratings, the junction indices, the
+covering improvement and the structure-to-airborne adjustment terms of
+EN 12354-5 Annexes D and F are inputs you supply from measurement or from the
+standards' own annexes; none of them is derived here. The simplified prediction
+page stops at the weighted single numbers by design, and the detailed page is
+where the per-band models live.
+
+Every panel model carries a validity range it does not extend past, and the
+guides flag each: Sharp's single-panel method is not valid below about 1.5
+times the panel's first resonance, Gomperts' slit model holds only while the
+slit is narrow against the wavelength, only Leppington's method no. 1 is
+implemented for radiation efficiency, and the orthotropic routes are
+infinite-panel models that miss the dip real ribbed cladding shows between 2 and
+4 kHz. On the resilient-layer side, the tapping-machine force model assumes a
+frequency-independent driving-point impedance, so a joisted or battened
+lightweight floor is outside it; soft coverings are treated as linear springs;
+there is no per-band prediction of a lining's improvement, because Annex D is a
+single-number method; and heavy impact sources such as the rubber ball are not
+covered by any of these models at all — their rating is
+[Heavy and Soft Impact Sources](/phonometry/buildings/insulation/heavy-impact-sources/).
+
+Two edition boundaries: only the 2009 edition of EN 12354-5 is implemented, not
+the 2023 revision, and the simplified and detailed pages follow different
+editions of the 12354 family, as the note above says.

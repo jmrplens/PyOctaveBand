@@ -7,10 +7,14 @@ El análisis acústico rara vez quiere una FFT en bruto: las normas, los
 índices y el propio oído trabajan en **bandas de octava fraccional**,
 intervalos de frecuencia cuya anchura crece proporcionalmente con la
 frecuencia. phonometry las implementa como bancos de filtros recursivos cuyos
-**puntos de -3 dB caen exactamente en los bordes de banda de ANSI S1.11**, de
-modo que los niveles de banda son comparables sea cual sea la arquitectura de
-filtro que los calcule, y cuyos diseños se verifican contra las tolerancias
-de clase de **IEC 61260-1:2014**.
+diseños se verifican contra las tolerancias de clase de
+**IEC 61260-1:2014**. El banco Butterworth por defecto, y las alternativas
+Chebyshev II y Bessel, sitúan sus **puntos de -3 dB exactamente en los bordes
+de banda de ANSI S1.11**, así que sus niveles de banda son directamente
+comparables; las dos arquitecturas de rizado constante (Chebyshev I,
+elíptica) colocan ahí su borde de rizado y en consecuencia leen unas décimas
+de decibelio altas en todas las bandas, y por eso una campaña debe fijar una
+arquitectura y mantenerla.
 
 La página fundacional es
 [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). Cubre la matemática
@@ -61,3 +65,23 @@ páginas producen.
   streaming con estado de filtro arrastrado.
 - [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): análisis
   multicanal vectorizado y notas de rendimiento.
+
+## Qué no cubre esta sección
+
+`verify_filter_class` comprueba una respuesta digital diseñada frente a la
+Tabla 1 de IEC 61260-1. Los ensayos de conformidad de la norma sobre el filtro
+físico (recuperación de sobrecarga, linealidad, las magnitudes de influencia
+ambientales) se aplican a un instrumento y no están implementados, así que un
+veredicto de clase de aquí es una afirmación sobre el diseño y no sobre un
+aparato. Cerca de Nyquist la transformada bilineal deforma el eje de
+frecuencia y el banco no lleva ninguna corrección para ello, a diferencia de
+la opción `high_accuracy` de los filtros de ponderación: la banda atenuada más
+allá del Nyquist de procesado se informa como `range_limited` en lugar de
+verificarse, así que mantén el borde de banda superior holgadamente por debajo
+de Nyquist o sube `fs`. Dos operaciones no admiten streaming: el filtrado de
+fase cero hacia delante y hacia atrás necesita la señal entera, y los
+estadísticos de rango como L90 hay que calcularlos una sola vez sobre la
+envolvente conjunta. Y el camino por canal nunca mezcla canales: el retardo
+entre dos micrófonos, o cuánto de un canal explica un segundo, son
+[Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/) y
+[Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/).

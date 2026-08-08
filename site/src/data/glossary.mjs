@@ -55,7 +55,7 @@ export const glossary = [
       {
         id: "l-eq",
         symbol: "$L_{eq}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "IEC 61672-1:2013",
         guide: "signals/levels/levels",
         definition: {
@@ -66,7 +66,7 @@ export const glossary = [
       {
         id: "l-aeq",
         symbol: "$L_{Aeq}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "IEC 61672-1:2013",
         guide: "signals/levels/levels",
         definition: {
@@ -77,7 +77,7 @@ export const glossary = [
       {
         id: "l-ae-sel",
         symbol: "$L_{AE}$, SEL",
-        unit: "dB",
+        unit: "dB re (20 µPa)²·s",
         standard: "IEC 61672-1:2013",
         clause: {
           en: "Equation 8 (Table 4)",
@@ -92,7 +92,7 @@ export const glossary = [
       {
         id: "l-cpeak",
         symbol: "$L_{Cpeak}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "IEC 61672-1:2013",
         clause: {
           en: "subclause 5.13",
@@ -107,7 +107,7 @@ export const glossary = [
       {
         id: "l-n-l-10-l-50-l-90",
         symbol: "$L_N$ ($L_{10}$, $L_{50}$, $L_{90}$)",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: {
           en: "ISO 1996-2:2017 (Annex I uses $L_{90}$ as the residual level)",
           es: "ISO 1996-2:2017 (el Anexo I usa $L_{90}$ como nivel residual)",
@@ -159,6 +159,73 @@ export const glossary = [
           es: "Índice presión-intensidad: la diferencia entre el nivel de presión y el de intensidad en una posición, el indicador de campo que cualifica una medida de intensidad.",
         },
       },
+      {
+        id: "k-1",
+        symbol: "$K_1$",
+        unit: "dB",
+        standard: "ISO 3744:2010",
+        clause: {
+          en: "3.16 and Equation (16)",
+          es: "3.16 y ecuación (16)",
+        },
+        guide: "devices/emission/sound-power-pressure",
+        definition: {
+          en: "Background noise correction: what is subtracted from the surface level to remove the background's own contribution, $-10\\log_{10}(1 - 10^{-0,1\\Delta L_p})$ from the source-on minus source-off margin. It is a cliff rather than a slope: above a 15 dB margin it is taken as zero, between 6 and 15 dB it is computed, and below 6 dB the standard caps it at 1,3 dB and warns that the result has lost accuracy.",
+          es: "Corrección por ruido de fondo: lo que se resta al nivel de la superficie de medida para eliminar la contribución del propio fondo, $-10\\log_{10}(1 - 10^{-0,1\\Delta L_p})$ a partir del margen entre fuente en marcha y fuente parada. Es un escalón y no una pendiente: por encima de 15 dB de margen se toma como cero, entre 6 y 15 dB se calcula, y por debajo de 6 dB la norma la limita a 1,3 dB y advierte de que el resultado ha perdido exactitud.",
+        },
+      },
+      {
+        id: "k-2",
+        symbol: "$K_2$",
+        unit: "dB",
+        standard: "ISO 3744:2010",
+        clause: {
+          en: "3.17 and Formula (A.2)",
+          es: "3.17 y fórmula (A.2)",
+        },
+        guide: "devices/emission/sound-power-pressure",
+        definition: {
+          en: "Environmental correction: what is subtracted to remove the energy the test room reflects back onto the measurement surface, $10\\log_{10}(1 + 4S/A)$ from the surface area and the room's equivalent absorption area. Its ceiling is the grade of accuracy rather than a preference: an engineering-grade result is only valid where $K_{2A} \\le 4$ dB, the survey method allows 7 dB, and a qualified hemi-anechoic room gives zero.",
+          es: "Corrección ambiental: lo que se resta para eliminar la energía que la sala de ensayo refleja de vuelta sobre la superficie de medida, $10\\log_{10}(1 + 4S/A)$ a partir del área de la superficie y del área de absorción equivalente de la sala. Su techo lo fija el grado de exactitud y no una preferencia: un resultado de grado de ingeniería solo es válido si $K_{2A} \\le 4$ dB, el método de control admite 7 dB y una sala semianecoica cualificada da cero.",
+        },
+      },
+      {
+        id: "l-wad-k-wa",
+        symbol: "$L_{WAd}$, $K_{WA}$",
+        unit: "dB re 1 pW",
+        standard: "ISO 4871:1996",
+        clause: {
+          en: "3.15 and 3.16",
+          es: "3.15 y 3.16",
+        },
+        guide: "devices/emission/sound-power",
+        definition: {
+          en: "The declared noise emission of a machine: either the dual-number form, the measured $L_{WA}$ and its uncertainty $K_{WA}$ stated separately, or the single-number form $L_{WAd} = L_{WA} + K_{WA}$, both rounded to the nearest whole decibel. The declared value is an upper limit a verification measurement is unlikely to exceed, not a best estimate, so it is never the number to feed into a propagation calculation.",
+          es: "La emisión sonora declarada de una máquina: o bien la forma de dos números, el $L_{WA}$ medido y su incertidumbre $K_{WA}$ indicados por separado, o bien la forma de un número $L_{WAd} = L_{WA} + K_{WA}$, ambas redondeadas al decibelio entero más próximo. El valor declarado es un límite superior que una medida de verificación difícilmente superará, no una mejor estimación, así que nunca es el número que debe entrar en un cálculo de propagación.",
+        },
+      },
+      {
+        id: "l-wa",
+        symbol: "$L_{WA}$",
+        qualifier: {
+          en: "apparent, wind turbine",
+          es: "aparente, aerogenerador",
+        },
+        unit: "dB re 1 pW",
+        standard: {
+          en: "IEC 61400-11:2012+AMD1:2018",
+          es: "IEC 61400-11:2012+AMD1:2018",
+        },
+        clause: {
+          en: "3.1 and Formula (26)",
+          es: "3.1 y fórmula (26)",
+        },
+        guide: "environment/sources/wind-turbine-noise",
+        definition: {
+          en: "Apparent sound power level of a wind turbine: the A-weighted level of a point source at the rotor centre that would radiate the same downwind emission as the machine measured. It is written like a sound power level but is not one in the usual sense: the ground-board measurement builds a downwind reflection into it, so feeding it to a propagation model that adds a ground effect counts that reflection twice.",
+          es: "Nivel de potencia acústica aparente de un aerogenerador: el nivel ponderado A de una fuente puntual situada en el centro del rotor que radiaría a sotavento la misma emisión que la máquina medida. Se escribe como un nivel de potencia acústica pero no lo es en el sentido habitual: la medida sobre placa reflectante incorpora una reflexión a sotavento, de modo que introducirlo en un modelo de propagación que añade efecto del terreno cuenta esa reflexión dos veces.",
+        },
+      },
     ],
   },
   {
@@ -171,7 +238,7 @@ export const glossary = [
       {
         id: "l-den",
         symbol: "$L_{den}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 1996-1:2016",
         clause: "3.6.4",
         guide: "environment/assessment/environmental-levels",
@@ -183,7 +250,7 @@ export const glossary = [
       {
         id: "l-dn",
         symbol: "$L_{dn}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 1996-1:2016",
         clause: "3.6.5",
         guide: "environment/assessment/environmental-levels",
@@ -195,7 +262,7 @@ export const glossary = [
       {
         id: "l-r",
         symbol: "$L_r$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 1996-1:2016",
         clause: {
           en: "clause 6.5 (Formulae 5 and 6)",
@@ -210,7 +277,7 @@ export const glossary = [
       {
         id: "l-ar-t",
         symbol: "$L_{Ar,T}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "NT ACOU 112:2002",
         clause: {
           en: "clause 8",
@@ -252,7 +319,7 @@ export const glossary = [
       {
         id: "l-ex-8h-l-ep-d",
         symbol: "$L_{EX,8h}$, $L_{EP,d}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "IEC 61252:1993",
         clause: "3.3",
         guide: "perception/hearing/occupational-exposure",
@@ -264,7 +331,7 @@ export const glossary = [
       {
         id: "l-p-a-eqt",
         symbol: "$L_{p,A,eqT}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 9612:2009",
         clause: {
           en: "clauses 9 to 11",
@@ -296,6 +363,207 @@ export const glossary = [
         definition: {
           en: "Hearing threshold level associated with age and noise: the NIPTS combined with the age component.",
           es: "Nivel de umbral auditivo asociado a la edad y al ruido: el NIPTS combinado con la componente de la edad.",
+        },
+      },
+      {
+        id: "l-keq",
+        symbol: "$L_{Keq,T}$",
+        unit: "dB re 20 µPa",
+        standard: {
+          en: "RD 1367/2007 (Spain)",
+          es: "RD 1367/2007",
+        },
+        clause: {
+          en: "Annex I A.2 c",
+          es: "Anexo I A.2 c",
+        },
+        guide: "environment/assessment/spanish-noise-regulation",
+        definition: {
+          en: "Corrected equivalent level: the A-weighted equivalent level of the interval plus the three penalties for tonal, low-frequency and impulsive character, $L_{Aeq,T} + K_t + K_f + K_i$. It is the quantity the Spanish immission limits are written against, so an activity is judged on it and not on the bare $L_{Aeq}$.",
+          es: "Nivel corregido equivalente: el nivel equivalente ponderado A del intervalo más las tres penalizaciones por componentes tonales, de baja frecuencia e impulsivas, $L_{Aeq,T} + K_t + K_f + K_i$. Es la magnitud en la que están escritos los límites de inmisión españoles, de modo que una actividad se juzga por él y no por el $L_{Aeq}$ desnudo.",
+        },
+      },
+      {
+        id: "k-t-k-f-k-i",
+        symbol: "$K_t$, $K_f$, $K_i$",
+        unit: "dB",
+        standard: {
+          en: "RD 1367/2007 (Spain)",
+          es: "RD 1367/2007",
+        },
+        clause: {
+          en: "Annex IV A.3.3",
+          es: "Anexo IV A.3.3",
+        },
+        guide: "environment/assessment/spanish-noise-regulation",
+        definition: {
+          en: "The three character penalties added to $L_{Aeq,T}$: $K_t$ for emergent tonal components, read from an unweighted one-third-octave spectrum against the arithmetic mean of the two adjacent bands; $K_f$ for low-frequency content, from $L_{Ceq} - L_{Aeq}$; and $K_i$ for impulsive content, from $L_{AIeq} - L_{Aeq}$. They are stepped, not continuous, so a spectrum just short of a threshold scores nothing.",
+          es: "Las tres penalizaciones por carácter que se suman al $L_{Aeq,T}$: $K_t$ por componentes tonales emergentes, leída en un espectro de tercio de octava sin ponderar frente a la media aritmética de las dos bandas contiguas; $K_f$ por contenido de baja frecuencia, a partir de $L_{Ceq} - L_{Aeq}$; y $K_i$ por contenido impulsivo, a partir de $L_{AIeq} - L_{Aeq}$. Son escalonadas y no continuas, así que un espectro que se queda algo por debajo de un umbral no puntúa nada.",
+        },
+      },
+    ],
+  },
+  {
+    id: "outdoor-propagation",
+    label: {
+      en: "Outdoor propagation",
+      es: "Propagación en exteriores",
+    },
+    terms: [
+      {
+        id: "a-3",
+        symbol: "$A$",
+        qualifier: {
+          en: "octave-band attenuation",
+          es: "atenuación por banda de octava",
+        },
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equations (3) and (4)",
+          es: "Ecuaciones (3) y (4)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Total octave-band attenuation between an outdoor point source and a downwind receiver: the sum $A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}$ subtracted from the sound power level and the directivity correction. Everything the method knows about the path between source and receiver is in this one term.",
+          es: "Atenuación total por banda de octava entre una fuente puntual exterior y un receptor a sotavento: la suma $A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}$ que se resta al nivel de potencia acústica y a la corrección por directividad. Todo lo que el método sabe del camino entre fuente y receptor está en este único término.",
+        },
+      },
+      {
+        id: "a-div",
+        symbol: "$A_{div}$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equation (7)",
+          es: "Ecuación (7)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Geometrical divergence: $20\\log_{10}(d/d_0) + 11$ dB, the spreading of a point source radiating into free space with $d_0 = 1$ m. The 11 dB constant is what refers the level to a sound power level rather than to a level measured at one metre.",
+          es: "Divergencia geométrica: $20\\log_{10}(d/d_0) + 11$ dB, la propagación de una fuente puntual que radia en campo libre con $d_0 = 1$ m. La constante de 11 dB es lo que refiere el nivel a un nivel de potencia acústica y no a un nivel medido a un metro.",
+        },
+      },
+      {
+        id: "a-atm",
+        symbol: "$A_{atm}$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equation (8)",
+          es: "Ecuación (8)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Atmospheric absorption: the attenuation coefficient of the air times the path length. It is the term that removes the high bands over long distances, and it depends strongly on frequency, temperature and humidity — which is why a long-range prediction has to state the weather it assumed.",
+          es: "Absorción atmosférica: el coeficiente de atenuación del aire por la longitud del camino. Es el término que elimina las bandas altas a grandes distancias y depende mucho de la frecuencia, la temperatura y la humedad, y por eso una predicción a larga distancia debe indicar las condiciones meteorológicas supuestas.",
+        },
+      },
+      {
+        id: "alpha-atm",
+        symbol: "$\\alpha$",
+        qualifier: {
+          en: "atmospheric",
+          es: "atmosférico",
+        },
+        unit: {
+          en: "dB/m (ISO 9613-2 tabulates dB/km)",
+          es: "dB/m (la ISO 9613-2 la tabula en dB/km)",
+        },
+        standard: "ISO 9613-1:1993",
+        clause: {
+          en: "Equation (5)",
+          es: "Ecuación (5)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Atmospheric attenuation coefficient: the excess loss per unit path length from classical absorption and the nitrogen and oxygen relaxation processes, a function of frequency, temperature, humidity and pressure. Watch the length unit: the library returns decibels per metre while ISO 9613-2 Table 2 tabulates decibels per kilometre, a factor of a thousand.",
+          es: "Coeficiente de atenuación atmosférica: la pérdida en exceso por unidad de longitud debida a la absorción clásica y a los procesos de relajación del nitrógeno y del oxígeno, función de la frecuencia, la temperatura, la humedad y la presión. Cuidado con la unidad de longitud: la biblioteca devuelve decibelios por metro mientras que la tabla 2 de la ISO 9613-2 los tabula por kilómetro, un factor de mil.",
+        },
+      },
+      {
+        id: "a-gr",
+        symbol: "$A_{gr}$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equation (9)",
+          es: "Ecuación (9)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Ground effect: the interference between the direct path and the path reflected off the ground, split into a source region, a receiver region and the middle between them. Over hard ground it comes out negative — a net gain, not a loss — which is why it cannot be treated as an attenuation that is merely optional.",
+          es: "Efecto del terreno: la interferencia entre el camino directo y el reflejado en el suelo, dividida en una región de fuente, una de receptor y la zona intermedia. Sobre terreno duro resulta negativa —una ganancia neta, no una pérdida—, y por eso no puede tratarse como una atenuación simplemente opcional.",
+        },
+      },
+      {
+        id: "a-bar",
+        symbol: "$A_{bar}$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equation (12)",
+          es: "Ecuación (12)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Barrier attenuation: the screening $D_z$ of the diffracting edge minus the ground effect the barrier removes, floored at zero. The subtraction is the point: a barrier over soft ground buys much less than its raw screening, because the ground was already doing part of the work.",
+          es: "Atenuación por pantalla: el apantallamiento $D_z$ del borde difractante menos el efecto del terreno que la pantalla suprime, con cero como valor mínimo. La resta es lo esencial: una pantalla sobre terreno blando aporta bastante menos que su apantallamiento bruto, porque el terreno ya hacía parte del trabajo.",
+        },
+      },
+      {
+        id: "c-met",
+        symbol: "$C_{met}$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equations (21) and (22)",
+          es: "Ecuaciones (21) y (22)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Meteorological correction: what is subtracted from the downwind level to obtain a long-term average over many wind directions, driven by the local factor $C_0$ and by the source and receiver heights against the distance. It is zero close to the source and grows only where the path is long compared with the heights.",
+          es: "Corrección meteorológica: lo que se resta al nivel a sotavento para obtener un promedio a largo plazo sobre muchas direcciones de viento, gobernada por el factor local $C_0$ y por las alturas de fuente y receptor frente a la distancia. Es nula cerca de la fuente y solo crece cuando el camino es largo comparado con las alturas.",
+        },
+      },
+      {
+        id: "d-c",
+        symbol: "$D_c$",
+        unit: "dB",
+        standard: "ISO 9613-2:1996",
+        clause: {
+          en: "Equation (3)",
+          es: "Ecuación (3)",
+        },
+        guide: "environment/propagation/outdoor-propagation",
+        definition: {
+          en: "Directivity correction: how far the level from the point source in the chosen direction departs from that of an omnidirectional source of the same sound power. It is the directivity index of the source plus an index for radiation into less than the full sphere, and it is 0 dB for an omnidirectional source in free space.",
+          es: "Corrección por directividad: cuánto se aparta el nivel de la fuente puntual en la dirección elegida del de una fuente omnidireccional de la misma potencia acústica. Es el índice de directividad de la fuente más un índice por radiación en menos de la esfera completa, y vale 0 dB para una fuente omnidireccional en campo libre.",
+        },
+      },
+      {
+        id: "fresnel-n",
+        symbol: "$N$",
+        qualifier: {
+          en: "Fresnel number",
+          es: "número de Fresnel",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Bies, Hansen and Howard (2017)",
+          es: "Bies, Hansen y Howard (2017)",
+        },
+        clause: {
+          en: "Equation 5.134; no governing standard",
+          es: "Ecuación 5.134; sin norma aplicable",
+        },
+        guide: "environment/propagation/ground-barriers",
+        definition: {
+          en: "Fresnel number of a screen: twice the extra path length the sound has to travel over the edge, divided by the wavelength. It is the single geometric parameter of the Kurze-Anderson insertion loss, which is why a barrier that works at 1 kHz can be worth almost nothing two octaves lower for the same geometry.",
+          es: "Número de Fresnel de una pantalla: el doble de la longitud de camino adicional que el sonido debe recorrer por encima del borde, dividido por la longitud de onda. Es el único parámetro geométrico de la pérdida por inserción de Kurze-Anderson, y por eso una pantalla que funciona a 1 kHz puede no valer casi nada dos octavas por debajo con la misma geometría.",
         },
       },
     ],
@@ -393,6 +661,300 @@ export const glossary = [
         definition: {
           en: "Fast, Slow and Impulse exponential time weightings: the detector ballistics that produce a displayed level.",
           es: "Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado.",
+        },
+      },
+      {
+        id: "filter-class",
+        name: {
+          en: "Performance class (0, 1, 2)",
+          es: "Clase de prestaciones (0, 1, 2)",
+        },
+        unit: {
+          en: "dB (tolerance)",
+          es: "dB (tolerancia)",
+        },
+        standard: "IEC 61260-1:2014",
+        clause: {
+          en: "1.2 and Table 1",
+          es: "1.2 y tabla 1",
+        },
+        guide: "signals/filters/filter-compliance",
+        definition: {
+          en: "Performance class of a filter or an instrument: the width of the tolerance corridor its response has to stay inside, band by band. Class 1 and class 2 share the same design goals and differ in the acceptance limits and in the operating temperature range, class 2 being the looser; class 0, the laboratory reference grade, comes from the withdrawn IEC 61260:1995 and ANSI S1.11-2004 and the current edition no longer defines it. A class is a property of the response, not of the result: a class 2 bank does not make a measurement wrong, it makes its band levels less certain.",
+          es: "Clase de prestaciones de un filtro o de un instrumento: la anchura del corredor de tolerancia dentro del cual debe mantenerse su respuesta, banda a banda. Las clases 1 y 2 comparten los mismos objetivos de diseño y se diferencian en los límites de aceptación y en el intervalo de temperatura de funcionamiento, siendo la clase 2 la más holgada; la clase 0, de referencia de laboratorio, procede de las retiradas IEC 61260:1995 y ANSI S1.11-2004 y la edición vigente ya no la define. La clase es una propiedad de la respuesta, no del resultado: un banco de clase 2 no hace que una medida sea errónea, hace que sus niveles de banda sean menos ciertos.",
+        },
+      },
+      {
+        id: "k-weighting",
+        symbol: "K",
+        unit: "dB",
+        standard: "ITU-R BS.1770-5",
+        clause: {
+          en: "Annex 1",
+          es: "Anexo 1",
+        },
+        guide: "devices/broadcast/program-loudness",
+        definition: {
+          en: "K-weighting: the programme-loudness curve, a two-stage pre-filter that models the high-frequency boost a spherical head gives and then applies the revised low-frequency B-curve high-pass. It is applied per channel before the channel mean squares are summed and gated, and the LKFS designation records it.",
+          es: "Ponderación K: la curva de sonoridad de programa, un prefiltro de dos etapas que modela el realce en alta frecuencia que produce una cabeza esférica y aplica después el paso alto de la curva B revisada en baja frecuencia. Se aplica canal a canal antes de sumar y aplicar la puerta a los valores cuadráticos medios, y la designación LKFS lo recoge.",
+        },
+      },
+      {
+        id: "itu-r-468",
+        name: {
+          en: "ITU-R 468 weighting",
+          es: "Ponderación ITU-R 468",
+        },
+        unit: "dB",
+        standard: {
+          en: "Recommendation ITU-R BS.468-4",
+          es: "Recomendación UIT-R BS.468-4",
+        },
+        clause: {
+          en: "Table 1",
+          es: "Tabla 1",
+        },
+        guide: "devices/electroacoustics/electroacoustics",
+        definition: {
+          en: "The broadcast noise weighting: zero at 1 kHz, peaking at $+12{,}2$ dB at 6,3 kHz and falling to $-29{,}9$ dB at 31,5 Hz, shaped to how audible a noise is rather than how loud a tone is. The Recommendation pairs it with a quasi-peak detector and quotes results as dB(468); AES17 reuses the same curve with an r.m.s. detector, which is a different number from the same filter.",
+          es: "La ponderación de ruido para radiodifusión: cero en 1 kHz, con máximo de $+12{,}2$ dB en 6,3 kHz y caída hasta $-29{,}9$ dB en 31,5 Hz, con la forma de lo audible que resulta un ruido y no de lo sonoro que resulta un tono. La Recomendación la combina con un detector de cuasipico y expresa el resultado en dB(468); la AES17 reutiliza la misma curva con un detector eficaz, lo que da otro número con el mismo filtro.",
+        },
+      },
+      {
+        id: "w-wholebody",
+        symbol: "$W_b$, $W_c$, $W_d$, $W_e$, $W_f$, $W_j$, $W_k$, $W_m$",
+        qualifier: {
+          en: "whole-body",
+          es: "cuerpo completo",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 8041-1:2017",
+        clause: {
+          en: "5.6.1, Formulae (1) to (5) and Table 3",
+          es: "5.6.1, fórmulas (1) a (5) y tabla 3",
+        },
+        guide: "vibration/human/human-vibration",
+        definition: {
+          en: "The whole-body frequency weightings, one parameter row each of the same four-stage filter: $W_k$ for the vertical axis and $W_d$ for the two horizontal ones in health and comfort, with $W_b$, $W_c$, $W_e$, $W_f$, $W_j$ and $W_m$ for ride comfort, the seat back, rotational axes, motion sickness and the head. The weighted acceleration $a_w$ is what comes out of them; the standard that names the curve is not the one that says where to apply it.",
+          es: "Las ponderaciones en frecuencia para cuerpo completo, cada una una fila de parámetros del mismo filtro de cuatro etapas: $W_k$ para el eje vertical y $W_d$ para los dos horizontales en salud y confort, con $W_b$, $W_c$, $W_e$, $W_f$, $W_j$ y $W_m$ para el confort de marcha, el respaldo, los ejes de rotación, el mareo por movimiento y la cabeza. De ellas sale la aceleración ponderada $a_w$; la norma que define la curva no es la que dice dónde aplicarla.",
+        },
+      },
+      {
+        id: "w-h",
+        symbol: "$W_h$",
+        qualifier: {
+          en: "hand-arm",
+          es: "mano-brazo",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 8041-1:2017",
+        clause: {
+          en: "5.6.1, Formulae (1) to (5) and Table 3",
+          es: "5.6.1, fórmulas (1) a (5) y tabla 3",
+        },
+        guide: "vibration/human/human-vibration",
+        definition: {
+          en: "The hand-arm frequency weighting: one curve, band-limited from 8 Hz to 1 kHz, applied to each of the three axes before they are combined into the vibration total value. Unlike the whole-body case there is no axis multiplier, so the three weighted values enter the total on equal terms.",
+          es: "La ponderación en frecuencia para vibración mano-brazo: una sola curva, limitada en banda de 8 Hz a 1 kHz, aplicada a cada uno de los tres ejes antes de combinarlos en el valor total de vibración. A diferencia del caso de cuerpo completo no hay multiplicador por eje, así que los tres valores ponderados entran en el total en igualdad de condiciones.",
+        },
+      },
+    ],
+  },
+  {
+    id: "spectral-and-system-analysis",
+    label: {
+      en: "Spectral and system analysis",
+      es: "Análisis espectral y de sistemas",
+    },
+    terms: [
+      {
+        id: "g-xx",
+        symbol: "$G_{xx}$, $G_{xy}$",
+        unit: {
+          en: "(unit of $x$)²/Hz",
+          es: "(unidad de $x$)²/Hz",
+        },
+        standard: {
+          en: "Bendat and Piersol (2010)",
+          es: "Bendat y Piersol (2010)",
+        },
+        clause: {
+          en: "Sections 5.2 and 9.1; no governing standard",
+          es: "Secciones 5.2 y 9.1; sin norma aplicable",
+        },
+        guide: "signals/spectra/spectral-analysis",
+        definition: {
+          en: "One-sided auto- and cross-spectral density: mean-square content per hertz, so the power in a band is the integral over it and not the height of a line. Everything else in this group is a ratio of these: the coherences, the two frequency-response estimators and the coherent output spectrum.",
+          es: "Densidad espectral unilateral, propia y cruzada: contenido cuadrático medio por hercio, de modo que la potencia de una banda es la integral sobre ella y no la altura de una línea. Todo lo demás de este grupo es un cociente de estas magnitudes: las coherencias, los dos estimadores de respuesta en frecuencia y el espectro de salida coherente.",
+        },
+      },
+      {
+        id: "gamma2",
+        symbol: "$\\gamma^2_{iy}$",
+        qualifier: {
+          en: "ordinary coherence",
+          es: "coherencia ordinaria",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Bendat and Piersol (2010)",
+          es: "Bendat y Piersol (2010)",
+        },
+        clause: {
+          en: "Equation (7.109); no governing standard",
+          es: "Ecuación (7.109); sin norma aplicable",
+        },
+        guide: "signals/spectra/miso-coherence",
+        definition: {
+          en: "Ordinary coherence: the fraction of the output autospectrum, at each frequency, that a linear time-invariant path from one input accounts for, $|G_{xy}|^2/(G_{xx}G_{yy})$. It is one where the pair is noiselessly linearly related, and with additive output noise it settles at $\\mathrm{SNR}/(1+\\mathrm{SNR})$ — so it reads as a quality figure, not as a cause.",
+          es: "Coherencia ordinaria: la fracción del autoespectro de salida que, a cada frecuencia, explica un camino lineal e invariante desde una entrada, $|G_{xy}|^2/(G_{xx}G_{yy})$. Vale uno cuando el par está relacionado linealmente y sin ruido, y con ruido aditivo en la salida se estabiliza en $\\mathrm{SNR}/(1+\\mathrm{SNR})$: se lee como una cifra de calidad, no como una causa.",
+        },
+      },
+      {
+        id: "gamma2-multiple",
+        symbol: "$\\gamma^2_{y:x}$",
+        qualifier: {
+          en: "multiple coherence",
+          es: "coherencia múltiple",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Bendat and Piersol (2010)",
+          es: "Bendat y Piersol (2010)",
+        },
+        clause: {
+          en: "Equation (7.35); no governing standard",
+          es: "Ecuación (7.35); sin norma aplicable",
+        },
+        guide: "signals/spectra/miso-coherence",
+        definition: {
+          en: "Multiple coherence: the fraction of the output that all the measured inputs together account for, one minus the residual spectrum over the total. It is the ceiling the partial coherences are apportioned under, and what is left of it is the part of the output no measured input explains.",
+          es: "Coherencia múltiple: la fracción de la salida que explican conjuntamente todas las entradas medidas, uno menos el espectro residual dividido por el total. Es el techo bajo el que se reparten las coherencias parciales, y lo que le falta es la parte de la salida que ninguna entrada medida explica.",
+        },
+      },
+      {
+        id: "gamma2-partial",
+        symbol: "$\\gamma^2_{iy\\cdot(i-1)!}$",
+        qualifier: {
+          en: "partial coherence",
+          es: "coherencia parcial",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Bendat and Piersol (2010)",
+          es: "Bendat y Piersol (2010)",
+        },
+        clause: {
+          en: "Equation (7.87); no governing standard",
+          es: "Ecuación (7.87); sin norma aplicable",
+        },
+        guide: "signals/spectra/miso-coherence",
+        definition: {
+          en: "Partial coherence: the coherence of one input with the output after the inputs ranked before it have been conditioned out. It is what separates a genuine source from one that merely correlates with a genuine source, and it depends on the conditioning order, so the order has to be reported with the number.",
+          es: "Coherencia parcial: la coherencia de una entrada con la salida después de condicionar y retirar las entradas situadas antes que ella. Es lo que separa una fuente real de otra que solo está correlacionada con una fuente real, y depende del orden de condicionado, así que el orden debe indicarse junto con el número.",
+        },
+      },
+      {
+        id: "h-2",
+        symbol: "$H_1$, $H_2$",
+        qualifier: {
+          en: "FRF estimators",
+          es: "estimadores de FRF",
+        },
+        unit: {
+          en: "output per input",
+          es: "salida por unidad de entrada",
+        },
+        standard: {
+          en: "Bendat and Piersol (2010)",
+          es: "Bendat y Piersol (2010)",
+        },
+        clause: {
+          en: "Section 6.1; no governing standard",
+          es: "Sección 6.1; sin norma aplicable",
+        },
+        guide: "devices/electroacoustics/electroacoustics",
+        definition: {
+          en: "The two averaged estimates of a frequency response function: $H_1 = G_{xy}/G_{xx}$, unbiased when the noise is on the output, and $H_2 = G_{yy}/G_{yx}$, unbiased when it is on the input. Their ratio is exactly the ordinary coherence, so they agree only where the measurement is clean, and the gap between them is a measure of how far it is not.",
+          es: "Las dos estimaciones promediadas de una función de respuesta en frecuencia: $H_1 = G_{xy}/G_{xx}$, insesgada cuando el ruido está en la salida, y $H_2 = G_{yy}/G_{yx}$, insesgada cuando está en la entrada. Su cociente es exactamente la coherencia ordinaria, así que coinciden solo donde la medida está limpia, y la distancia entre ambas mide cuánto no lo está.",
+        },
+      },
+      {
+        id: "enbw",
+        symbol: "ENBW",
+        unit: {
+          en: "bins (or Hz)",
+          es: "líneas (o Hz)",
+        },
+        standard: {
+          en: "Harris (1978)",
+          es: "Harris (1978)",
+        },
+        clause: {
+          en: "Table 1; no governing standard",
+          es: "Tabla 1; sin norma aplicable",
+        },
+        guide: "signals/spectra/spectral-analysis",
+        definition: {
+          en: "Equivalent noise bandwidth of an analysis window: the width of the ideal rectangular filter that would pass the same broadband noise power. It is exactly 1 bin for a rectangular window and 1,5 for a Hann, and it is the factor that turns a windowed line spectrum into a density — a broadband level read off the lines sits $10\\log_{10}(\\mathrm{ENBW})$ dB high without it.",
+          es: "Ancho de banda equivalente de ruido de una ventana de análisis: el ancho del filtro rectangular ideal que dejaría pasar la misma potencia de ruido de banda ancha. Vale exactamente 1 línea para la ventana rectangular y 1,5 para la de Hann, y es el factor que convierte un espectro de líneas enventanado en una densidad: sin él, un nivel de banda ancha leído sobre las líneas queda $10\\log_{10}(\\mathrm{ENBW})$ dB alto.",
+        },
+      },
+      {
+        id: "cepstrum",
+        name: {
+          en: "Cepstrum and quefrency",
+          es: "Cepstrum y quefrencia",
+        },
+        unit: {
+          en: "quefrency in s",
+          es: "quefrencia en s",
+        },
+        standard: {
+          en: "Havelock, Kuwano and Vorländer (2008)",
+          es: "Havelock, Kuwano y Vorländer (2008)",
+        },
+        clause: {
+          en: "Chapter 27; no governing standard",
+          es: "Capítulo 27; sin norma aplicable",
+        },
+        guide: "signals/spectra/cepstrum-echoes",
+        definition: {
+          en: "Cepstrum: the inverse transform of the logarithmic spectrum, in which the periodic ripple an echo or a harmonic family leaves across the spectrum collapses onto a single peak. Quefrency is its independent variable, a time in seconds, at which that peak stands at the echo's own delay — which is why a bearing report quotes a quefrency and not a frequency.",
+          es: "Cepstrum: la transformada inversa del espectro logarítmico, en la que el rizado periódico que un eco o una familia de armónicos deja en el espectro se concentra en un único pico. La quefrencia es su variable independiente, un tiempo en segundos, en la que ese pico aparece al retardo propio del eco, y por eso un informe de rodamientos cita una quefrencia y no una frecuencia.",
+        },
+      },
+      {
+        id: "crest-factor",
+        name: {
+          en: "Crest factor",
+          es: "Factor de cresta",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 2631-1:1997",
+        clause: "6.2.1",
+        guide: "vibration/human/human-vibration",
+        definition: {
+          en: "Crest factor: the modulus of the ratio of the peak to the r.m.s. value over the measurement period. It decides whether an r.m.s. description is honest — above 9 the standard says the basic evaluation method is not sufficient and dose measures have to be reported beside it — and for a test signal it decides whether a device clips before the signal has delivered its energy.",
+          es: "Factor de cresta: el módulo del cociente entre el valor de pico y el valor eficaz en el periodo de medida. Decide si una descripción en valor eficaz es honesta —por encima de 9 la norma considera insuficiente el método básico de evaluación y obliga a informar además de medidas de dosis— y, en una señal de ensayo, decide si un equipo recorta antes de que la señal entregue su energía.",
         },
       },
     ],
@@ -504,6 +1066,10 @@ export const glossary = [
       {
         id: "t-s",
         symbol: "$T_s$",
+        qualifier: {
+          en: "centre time",
+          es: "tiempo central",
+        },
         unit: "s",
         standard: "ISO 3382-1:2009",
         clause: {
@@ -512,8 +1078,8 @@ export const glossary = [
         },
         guide: "buildings/rooms/room-acoustics",
         definition: {
-          en: "Centre time: the centre of gravity of the squared impulse response in time, a boundary-free alternative to the clarity indices.",
-          es: "Tiempo central: el centro de gravedad temporal de la respuesta al impulso al cuadrado, una alternativa a los índices de claridad sin frontera arbitraria.",
+          en: "Centre time: the centre of gravity of the squared impulse response in time, a boundary-free alternative to the clarity indices. It runs to tens of milliseconds in a room; the building-prediction guides write $T_s$ for something else entirely, the structural reverberation time of a plate, which is seconds.",
+          es: "Tiempo central: el centro de gravedad temporal de la respuesta al impulso al cuadrado, una alternativa a los índices de claridad sin frontera arbitraria. En una sala llega a decenas de milisegundos; las guías de predicción en edificación escriben $T_s$ para algo muy distinto, el tiempo de reverberación estructural de una placa, que se mide en segundos.",
         },
       },
       {
@@ -601,6 +1167,54 @@ export const glossary = [
         definition: {
           en: "Noise rating, the European counterpart curve family of NC. Discussed for comparison and deliberately not implemented. Not the NR of the noise-control guides, which is a level drop.",
           es: "Noise Rating, la familia de curvas europea equivalente a NC. Se comenta a efectos de comparación y no se implementa deliberadamente. No es el NR de las guías de control de ruido, que es una caída de nivel.",
+        },
+      },
+      {
+        id: "d-2-s",
+        symbol: "$D_{2,S}$",
+        unit: "dB",
+        standard: "ISO 3382-3:2012",
+        clause: "3.2",
+        guide: "buildings/rooms/open-plan-acoustics",
+        definition: {
+          en: "Spatial decay rate of speech: the drop in A-weighted speech level per doubling of distance along a line of workstations, taken from the regression of level against the logarithm of distance over positions between 2 m and 16 m. It is a slope only — it says how fast speech dies away, not how loud it starts.",
+          es: "Tasa de decaimiento espacial del habla: la caída del nivel de habla ponderado A por cada duplicación de la distancia a lo largo de una fila de puestos de trabajo, obtenida por regresión del nivel frente al logaritmo de la distancia con posiciones entre 2 m y 16 m. Es solo una pendiente: indica con qué rapidez se extingue el habla, no con qué intensidad empieza.",
+        },
+      },
+      {
+        id: "l-p-a-s-4m",
+        symbol: "$L_{p,A,S,4m}$",
+        unit: "dB",
+        standard: "ISO 3382-3:2012",
+        clause: "3.3",
+        guide: "buildings/rooms/open-plan-acoustics",
+        definition: {
+          en: "A-weighted speech level at 4 m: the nominal level of normal speech four metres from the talker, read off the same regression line rather than measured at that distance. It fixes the absolute height of the decay curve that $D_{2,S}$ only gives the slope of, which is why the two are always reported together.",
+          es: "Nivel de habla ponderado A a 4 m: el nivel nominal del habla normal a cuatro metros del hablante, leído sobre la misma recta de regresión y no medido a esa distancia. Fija la altura absoluta de la curva de decaimiento de la que $D_{2,S}$ solo da la pendiente, y por eso ambos se informan siempre juntos.",
+        },
+      },
+      {
+        id: "r-d",
+        symbol: "$r_D$",
+        unit: "m",
+        standard: "ISO 3382-3:2012",
+        clause: "3.6",
+        guide: "buildings/rooms/open-plan-acoustics",
+        definition: {
+          en: "Distraction distance: the distance from the talker at which the speech transmission index falls below 0,50, beyond which concentration and privacy start to improve rapidly. It is the single number an open-plan office is usually specified on, and the only rating in the corpus that is a distance rather than a level.",
+          es: "Distancia de distracción: la distancia al hablante a la que el índice de transmisión del habla cae por debajo de 0,50 y a partir de la cual la concentración y la privacidad mejoran rápidamente. Es el número con el que suele especificarse una oficina diáfana y la única calificación de todo el corpus que es una distancia y no un nivel.",
+        },
+      },
+      {
+        id: "r-p",
+        symbol: "$r_P$",
+        unit: "m",
+        standard: "ISO 3382-3:2012",
+        clause: "3.7",
+        guide: "buildings/rooms/open-plan-acoustics",
+        definition: {
+          en: "Privacy distance: the distance at which the speech transmission index falls below 0,20, beyond which speech is as private as it would be between separate rooms. In offices with small volume or poor privacy it can be out of reach entirely.",
+          es: "Distancia de privacidad: la distancia a la que el índice de transmisión del habla cae por debajo de 0,20 y más allá de la cual el habla es tan privada como lo sería entre recintos separados. En oficinas de volumen reducido o con mala privacidad puede resultar inalcanzable.",
         },
       },
     ],
@@ -826,6 +1440,10 @@ export const glossary = [
       {
         id: "tl",
         symbol: "TL",
+        qualifier: {
+          en: "panel",
+          es: "panel",
+        },
         unit: "dB",
         standard: {
           en: "Bies, Hansen and Howard (2017)",
@@ -837,8 +1455,66 @@ export const glossary = [
         },
         guide: "buildings/design/panel-sound-insulation",
         definition: {
-          en: "Transmission loss: the airborne insulation of a panel predicted from its physical properties, the same quantity as $R$ in a prediction context.",
-          es: "Pérdidas por transmisión: el aislamiento a ruido aéreo de un panel predicho a partir de sus propiedades físicas, la misma magnitud que $R$ en un contexto de predicción.",
+          en: "Transmission loss: the airborne insulation of a partition predicted from its physical properties, ten times the base-10 logarithm of the reciprocal transmission factor, the same quantity as $R$ in a prediction context.",
+          es: "Pérdidas por transmisión: el aislamiento a ruido aéreo de un elemento separador predicho a partir de sus propiedades físicas, diez veces el logaritmo decimal del inverso del factor de transmisión, la misma magnitud que $R$ en un contexto de predicción.",
+        },
+      },
+      {
+        id: "tl-2",
+        symbol: "TL",
+        qualifier: {
+          en: "duct element",
+          es: "elemento de conducto",
+        },
+        unit: "dB",
+        standard: {
+          en: "Bies, Hansen and Howard (2017)",
+          es: "Bies, Hansen y Howard (2017)",
+        },
+        clause: {
+          en: "Sections 8.8-8.9; no governing standard",
+          es: "Secciones 8.8-8.9; sin norma aplicable",
+        },
+        guide: "devices/noise-control/silencers",
+        definition: {
+          en: "Transmission loss of a duct element: ten times the base-10 logarithm of the incident plane-wave power over the power transmitted into an anechoic termination, computed from the four-pole transfer matrix and the two port impedances. The anechoic termination is part of the definition, which is why this transmission loss describes the element alone and is not the noise reduction the same silencer delivers once it is installed between a real source and a real outlet.",
+          es: "Pérdidas por transmisión de un elemento de conducto: diez veces el logaritmo decimal de la potencia de onda plana incidente dividida por la potencia transmitida a una terminación anecoica, calculada con la matriz de transferencia de cuatro polos y las impedancias de los dos puertos. La terminación anecoica forma parte de la definición, y por eso estas pérdidas por transmisión describen solo al elemento y no son la reducción de ruido que ese mismo silenciador logra una vez instalado entre una fuente y una salida reales.",
+        },
+      },
+      {
+        id: "il",
+        symbol: "IL",
+        unit: "dB",
+        standard: {
+          en: "Bies, Hansen and Howard (2017)",
+          es: "Bies, Hansen y Howard (2017)",
+        },
+        clause: {
+          en: "Section 8.2, Equation (8.1); no governing standard",
+          es: "Sección 8.2, ecuación (8.1); sin norma aplicable",
+        },
+        guide: "devices/noise-control/silencers",
+        definition: {
+          en: "Insertion loss: the level at a receiver before an element is inserted minus the level after, for a silencer the drop in radiated sound power level when a length of duct is replaced by it. Unlike a transmission loss it depends on the source and the termination as well as on the element, which is what makes it the number a client can hear and the transmission loss the number a catalogue can print.",
+          es: "Pérdida por inserción: el nivel en un receptor antes de insertar un elemento menos el nivel después; para un silenciador, la caída del nivel de potencia acústica radiada al sustituir por él un tramo de conducto. A diferencia de las pérdidas por transmisión, depende de la fuente y de la terminación además del elemento, y eso la convierte en el número que un cliente oye y a las pérdidas por transmisión en el número que un catálogo puede imprimir.",
+        },
+      },
+      {
+        id: "tau",
+        symbol: "$\\tau$",
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 12354-1:2017",
+        clause: {
+          en: "Formula (1)",
+          es: "Fórmula (1)",
+        },
+        guide: "buildings/design/detailed-prediction",
+        definition: {
+          en: "Transmission factor, or transmission coefficient: the fraction of the incident sound power a partition passes on. It is the quantity the whole group is a logarithm of, since $R = -10\\log_{10}\\tau$ and the transmission loss is the same logarithm; a $\\tau$ of $10^{-5}$ is a 50 dB partition. Transmission factors of parallel paths add, which is why a prediction sums the direct, flanking and indirect airborne factors and only then takes the logarithm.",
+          es: "Factor de transmisión, o coeficiente de transmisión: la fracción de la potencia acústica incidente que deja pasar un elemento separador. Es la magnitud de la que es logaritmo todo el grupo, ya que $R = -10\\log_{10}\\tau$ y las pérdidas por transmisión son ese mismo logaritmo; un $\\tau$ de $10^{-5}$ es un separador de 50 dB. Los factores de transmisión de caminos en paralelo se suman, y por eso una predicción suma los factores directo, por flancos e indirecto por vía aérea y solo después toma el logaritmo.",
         },
       },
       {
@@ -881,7 +1557,7 @@ export const glossary = [
       {
         id: "l-n",
         symbol: "$L_n$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 10140-3:2010",
         guide: "buildings/insulation/insulation-lab",
         definition: {
@@ -892,7 +1568,7 @@ export const glossary = [
       {
         id: "l-nt",
         symbol: "$L'_{nT}$",
-        unit: "dB",
+        unit: "dB re 20 µPa",
         standard: "ISO 16283-2:2015",
         guide: "buildings/insulation/insulation-field",
         definition: {
@@ -1003,6 +1679,107 @@ export const glossary = [
         definition: {
           en: "Radiation efficiency of a plate: the airborne power radiated per unit mean-square surface velocity, normalised by the plane-wave value.",
           es: "Eficiencia de radiación de una placa: la potencia aérea radiada por unidad de velocidad cuadrática media de la superficie, normalizada por el valor de onda plana.",
+        },
+      },
+      {
+        id: "d-2m-nt",
+        symbol: "$D_{2m,nT}$",
+        unit: "dB",
+        standard: "ISO 16283-3:2016",
+        clause: "3.15",
+        guide: "buildings/insulation/facade-insulation",
+        definition: {
+          en: "Standardized facade level difference: the level 2 m in front of the facade minus the indoor level, standardized to a reference reverberation time of 0,5 s for dwellings. The 2 m position sits in the field the facade itself reflects, so it is not a free-field level, and the notation records the source — $D_{tr,2m,nT}$ for road traffic, $D_{ls,2m,nT}$ for a loudspeaker.",
+          es: "Diferencia de niveles estandarizada en fachada: el nivel a 2 m por delante de la fachada menos el nivel interior, estandarizado a un tiempo de reverberación de referencia de 0,5 s en viviendas. La posición a 2 m está en el campo que la propia fachada refleja, así que no es un nivel de campo libre, y la notación indica la fuente: $D_{tr,2m,nT}$ para tráfico rodado y $D_{ls,2m,nT}$ para altavoz.",
+        },
+      },
+      {
+        id: "d-ls-2m-nt-w",
+        symbol: "$D_{ls,2m,nT,w}$",
+        unit: "dB",
+        standard: "ISO 717-1:2020",
+        guide: "buildings/insulation/facade-insulation",
+        definition: {
+          en: "The weighted facade rating: $D_{2m,nT}$ measured with a loudspeaker put through the ISO 717-1 reference-curve procedure. The `ls` subscript is not decoration — it records that the source was a loudspeaker at 45 degrees rather than real road traffic, and a facade rated with one source is not interchangeable with the same facade rated with the other.",
+          es: "El índice global de fachada: el $D_{2m,nT}$ medido con altavoz pasado por el procedimiento de curva de referencia de la ISO 717-1. El subíndice `ls` no es decorativo: indica que la fuente fue un altavoz a 45 grados y no tráfico rodado real, y una fachada calificada con una fuente no es intercambiable con esa misma fachada calificada con la otra.",
+        },
+      },
+      {
+        id: "r-45",
+        symbol: "$R'_{45°}$",
+        unit: "dB",
+        standard: "ISO 16283-3:2016",
+        clause: "3.12",
+        guide: "buildings/insulation/facade-insulation",
+        definition: {
+          en: "Apparent sound reduction index of a facade element under loudspeaker sound at 45 degrees: the level difference corrected by the specimen area over the receiving-room absorption area, with a further $-1{,}5$ dB that carries the single-angle geometry. It is apparent, so flanking and any other component of the facade are inside the number.",
+          es: "Índice de reducción acústica aparente de un elemento de fachada con altavoz a 45 grados: la diferencia de niveles corregida por el área del elemento frente al área de absorción del recinto receptor, con un término adicional de $-1{,}5$ dB que recoge la geometría de ángulo único. Es aparente, así que las transmisiones por flancos y cualquier otro componente de la fachada quedan dentro del número.",
+        },
+      },
+      {
+        id: "r-a",
+        symbol: "$R_A$, $R_{A,tr}$",
+        unit: "dBA",
+        standard: {
+          en: "CTE DB-HR",
+          es: "CTE DB-HR",
+        },
+        clause: {
+          en: "Annex A, Formulae (A.5) and (A.6)",
+          es: "Anejo A, fórmulas (A.5) y (A.6)",
+        },
+        guide: "buildings/insulation/spanish-building-code",
+        definition: {
+          en: "Global airborne index: the A-weighted level a partition transmits when it is excited by a normalised spectrum — pink noise for $R_A$, road traffic for $R_{A,tr}$ — summed energetically over eighteen one-third-octave bands from 100 Hz to 5 kHz. It is a close relative of $R_w + C$ and $R_w + C_{tr}$ but is computed directly, not by shifting a reference curve, and it uses two bands the ISO 717-1 range does not.",
+          es: "Índice global de reducción acústica: el nivel ponderado A que transmite un elemento cuando se excita con un espectro normalizado —ruido rosa para $R_A$ y tráfico rodado para $R_{A,tr}$— sumado energéticamente en dieciocho bandas de tercio de octava de 100 Hz a 5 kHz. Es pariente cercano de $R_w + C$ y $R_w + C_{tr}$, pero se calcula directamente y no desplazando una curva de referencia, y utiliza dos bandas que el intervalo de la ISO 717-1 no incluye.",
+        },
+      },
+      {
+        id: "d-nt-a",
+        symbol: "$D_{nT,A}$, $D_{2m,nT,Atr}$",
+        unit: "dBA",
+        standard: {
+          en: "CTE DB-HR",
+          es: "CTE DB-HR",
+        },
+        clause: {
+          en: "Annex A, Formulae (A.5) and (A.6); requirements in clause 2",
+          es: "Anejo A, fórmulas (A.5) y (A.6); exigencias del capítulo 2",
+        },
+        guide: "buildings/insulation/spanish-building-code",
+        definition: {
+          en: "The same global index applied to a standardized level difference: between two rooms ($D_{nT,A}$, pink noise) and between the outside and a protected room ($D_{2m,nT,Atr}$, road traffic or aircraft). These are the quantities the DB-HR requirement tables are written against, so a project is checked in them and not in the ISO 717-1 ratings.",
+          es: "El mismo índice global aplicado a una diferencia de niveles estandarizada: entre dos recintos ($D_{nT,A}$, ruido rosa) y entre el exterior y un recinto protegido ($D_{2m,nT,Atr}$, tráfico rodado o aeronaves). Son las magnitudes en las que están escritas las tablas de exigencias del DB-HR, de modo que un proyecto se comprueba en ellas y no en los índices de la ISO 717-1.",
+        },
+      },
+      {
+        id: "r-i",
+        symbol: "$R_I$",
+        unit: "dB",
+        standard: "ISO 15186-1:2000",
+        clause: {
+          en: "3.8, Equation (7)",
+          es: "3.8, ecuación (7)",
+        },
+        guide: "buildings/insulation/insulation-intensity",
+        definition: {
+          en: "Intensity sound reduction index: the source-room level minus the intensity level scanned over the radiating face, so the transmitted power is measured directly instead of inferred from the receiving room. It is the method of choice where flanking is strong; add the $K_c$ adaptation to get $R_{I,M}$, the value the ISO 10140 pressure method would have produced.",
+          es: "Índice de reducción acústica por intensidad: el nivel del recinto emisor menos el nivel de intensidad barrido sobre la cara radiante, de modo que la potencia transmitida se mide directamente en vez de deducirse del recinto receptor. Es el método preferente cuando la transmisión por flancos es fuerte; con la adaptación $K_c$ se obtiene $R_{I,M}$, el valor que habría dado el método de presión de la ISO 10140.",
+        },
+      },
+      {
+        id: "d-i-n-e",
+        symbol: "$D_{I,n,e}$",
+        unit: "dB",
+        standard: "ISO 15186-2:2003",
+        clause: {
+          en: "Formula (12)",
+          es: "Fórmula (12)",
+        },
+        guide: "buildings/insulation/insulation-intensity",
+        definition: {
+          en: "Intensity element-normalized level difference: the small-element counterpart of $D_{n,e}$, measured by scanning the element and normalised to a reference absorption area of 10 m². It is rated through the same ISO 717-1 procedure, as $D_{I,n,e,w}$, so a ventilator or a transit sealing system can be compared with a wall on one scale.",
+          es: "Diferencia de niveles normalizada de elemento por intensidad: la contrapartida para elementos pequeños de $D_{n,e}$, medida barriendo el elemento y normalizada a un área de absorción de referencia de 10 m². Se califica con el mismo procedimiento de la ISO 717-1, como $D_{I,n,e,w}$, de modo que un aireador o un sistema de sellado de pasos puede compararse con un muro en una única escala.",
         },
       },
     ],
@@ -1218,6 +1995,95 @@ export const glossary = [
           es: "Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca.",
         },
       },
+      {
+        id: "phi",
+        symbol: "$\\phi$",
+        qualifier: {
+          en: "porosity",
+          es: "porosidad",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Allard and Atalla (2009)",
+          es: "Allard y Atalla (2009)",
+        },
+        clause: {
+          en: "Equation (2.25); no governing standard",
+          es: "Ecuación (2.25); sin norma aplicable",
+        },
+        guide: "materials/absorbers/porous-absorbers",
+        definition: {
+          en: "Open porosity: the fraction of the material's volume that is air connected to the outside, $\\phi = V_a/V_T$. A closed bubble counts as frame, not as pore, because sound cannot enter it; for most fibrous materials and foams $\\phi$ lies very close to one, which is why a one-parameter model that assumes so can still work.",
+          es: "Porosidad abierta: la fracción del volumen del material que es aire conectado con el exterior, $\\phi = V_a/V_T$. Una burbuja cerrada cuenta como esqueleto y no como poro, porque el sonido no puede entrar en ella; en la mayoría de los materiales fibrosos y de las espumas $\\phi$ es muy próxima a uno, y por eso un modelo de un solo parámetro que lo dé por supuesto puede seguir funcionando.",
+        },
+      },
+      {
+        id: "alpha-infty",
+        symbol: "$\\alpha_\\infty$",
+        qualifier: {
+          en: "tortuosity",
+          es: "tortuosidad",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Allard and Atalla (2009)",
+          es: "Allard y Atalla (2009)",
+        },
+        clause: {
+          en: "Equation (4.143); no governing standard",
+          es: "Ecuación (4.143); sin norma aplicable",
+        },
+        guide: "materials/absorbers/porous-absorbers",
+        definition: {
+          en: "Tortuosity: how much longer the winding path through the pores is than the straight line, squared — exactly $1/\\cos^2\\varphi$ for pores inclined at an angle $\\varphi$, and one for straight cylindrical pores. It sets the high-frequency limit of the effective density, and despite the $\\alpha$ it is not an absorption coefficient of any kind.",
+          es: "Tortuosidad: cuánto más largo es el camino sinuoso a través de los poros que la línea recta, al cuadrado; exactamente $1/\\cos^2\\varphi$ para poros inclinados un ángulo $\\varphi$, y uno para poros cilíndricos rectos. Fija el límite en alta frecuencia de la densidad efectiva y, pese a la $\\alpha$, no es un coeficiente de absorción de ninguna clase.",
+        },
+      },
+      {
+        id: "lambda-visc-therm",
+        symbol: "$\\Lambda$, $\\Lambda'$",
+        unit: "m",
+        standard: {
+          en: "Allard and Atalla (2009)",
+          es: "Allard y Atalla (2009)",
+        },
+        clause: {
+          en: "Equations (5.24) and (5.27); no governing standard",
+          es: "Ecuaciones (5.24) y (5.27); sin norma aplicable",
+        },
+        guide: "materials/absorbers/porous-absorbers",
+        definition: {
+          en: "The two pore sizes the Johnson-Champoux-Allard model needs: $\\Lambda$ weights the pore surface by the squared flow velocity, so it is set by the narrow constrictions where the viscous losses happen, and $\\Lambda'$ is the plain surface-to-volume length that governs the thermal exchange with the frame. $\\Lambda'$ is normally the larger, and the two are equal only for identical straight cylindrical pores.",
+          es: "Los dos tamaños de poro que necesita el modelo de Johnson-Champoux-Allard: $\\Lambda$ pondera la superficie del poro por el cuadrado de la velocidad del flujo, así que lo fijan los estrechamientos donde se producen las pérdidas viscosas, y $\\Lambda'$ es la longitud superficie-volumen sin ponderar que gobierna el intercambio térmico con el esqueleto. $\\Lambda'$ suele ser la mayor, y ambas coinciden solo con poros cilíndricos rectos idénticos.",
+        },
+      },
+      {
+        id: "z-c-k",
+        symbol: "$Z_c$, $k$",
+        unit: {
+          en: "Pa·s/m and 1/m",
+          es: "Pa·s/m y 1/m",
+        },
+        standard: {
+          en: "Allard and Atalla (2009)",
+          es: "Allard y Atalla (2009)",
+        },
+        clause: {
+          en: "Chapter 5; no governing standard",
+          es: "Capítulo 5; sin norma aplicable",
+        },
+        guide: "materials/absorbers/porous-absorbers",
+        definition: {
+          en: "Characteristic impedance and complex wavenumber: the pair that describes a porous medium as an equivalent fluid — the ratio of pressure to particle velocity in a travelling wave inside it, and the wavenumber whose imaginary part is the attenuation per metre. Every empirical or semi-phenomenological model produces this pair, and it is what the transfer-matrix method stacks layer by layer.",
+          es: "Impedancia característica y número de onda complejo: el par que describe un medio poroso como fluido equivalente, es decir, la relación entre presión y velocidad de partícula en una onda progresiva dentro de él y el número de onda cuya parte imaginaria es la atenuación por metro. Todo modelo empírico o semifenomenológico produce este par, y es lo que el método de matrices de transferencia apila capa a capa.",
+        },
+      },
     ],
   },
   {
@@ -1260,6 +2126,10 @@ export const glossary = [
       {
         id: "h",
         symbol: "$H$",
+        qualifier: {
+          en: "receptance",
+          es: "receptancia",
+        },
         unit: "m/N",
         standard: "ISO 7626-1:2011",
         clause: {
@@ -1317,6 +2187,10 @@ export const glossary = [
       {
         id: "eta",
         symbol: "$\\eta$",
+        qualifier: {
+          en: "resilient element",
+          es: "elemento resiliente",
+        },
         unit: {
           en: "dimensionless",
           es: "adimensional",
@@ -1327,6 +2201,50 @@ export const glossary = [
         definition: {
           en: "Loss factor of a resilient element: the tangent of the phase angle of its dynamic transfer stiffness.",
           es: "Factor de pérdidas de un elemento resiliente: la tangente del ángulo de fase de su rigidez dinámica de transferencia.",
+        },
+      },
+      {
+        id: "eta-int",
+        symbol: "$\\eta_{int}$",
+        qualifier: {
+          en: "internal",
+          es: "interno",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 12354-1:2017",
+        clause: {
+          en: "Annex C, Formula (C.1)",
+          es: "Anexo C, fórmula (C.1)",
+        },
+        guide: "buildings/design/detailed-prediction",
+        definition: {
+          en: "Internal loss factor of a building element: the fraction of its vibrational energy dissipated per radian inside the material itself, before anything is radiated or leaves through the junctions. It is an input to the prediction, not a measured output: Table B.3 of the same standard gives 0,005 for concrete and about 0,01 for most masonry.",
+          es: "Factor de pérdidas interno de un elemento constructivo: la fracción de su energía vibratoria que se disipa por radián dentro del propio material, antes de radiarse o de escapar por las uniones. Es un dato de entrada de la predicción, no un resultado medido: la tabla B.3 de la misma norma da 0,005 para el hormigón y en torno a 0,01 para la mayoría de las fábricas.",
+        },
+      },
+      {
+        id: "eta-tot",
+        symbol: "$\\eta_{tot}$",
+        qualifier: {
+          en: "total, in situ",
+          es: "total, in situ",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "ISO 12354-1:2017",
+        clause: {
+          en: "Annex C, Formula (C.1)",
+          es: "Anexo C, fórmula (C.1)",
+        },
+        guide: "buildings/design/detailed-prediction",
+        definition: {
+          en: "Total loss factor of an element as built in: the internal loss factor plus the losses radiated into the air and absorbed at the perimeter junctions. It is what damps the resonant transmission above the critical frequency, and it fixes the structural reverberation time through $T_s = 2{,}2/(f\\,\\eta_{tot})$ — so a laboratory value measured in a heavy test frame does not transfer to the building unchanged.",
+          es: "Factor de pérdidas total de un elemento ya construido: el factor de pérdidas interno más las pérdidas radiadas al aire y absorbidas en las uniones del perímetro. Es lo que amortigua la transmisión resonante por encima de la frecuencia crítica y fija el tiempo de reverberación estructural mediante $T_s = 2{,}2/(f\\,\\eta_{tot})$, de modo que un valor de laboratorio medido en un marco de ensayo pesado no se traslada al edificio sin más.",
         },
       },
       {
@@ -1413,7 +2331,7 @@ export const glossary = [
       {
         id: "l-v",
         symbol: "$L_v$",
-        unit: "dB",
+        unit: "dB re 50 nm/s",
         standard: "ISO/TS 7849-1:2009",
         clause: {
           en: "Formula 3",
@@ -1473,6 +2391,28 @@ export const glossary = [
         definition: {
           en: "Coupling loss factor: the fraction of energy per radian that a statistical energy analysis subsystem loses into a neighbouring one across a junction.",
           es: "Factor de pérdidas por acoplamiento: la fracción de energía por radián que un subsistema de análisis estadístico de energía cede al vecino a través de una unión.",
+        },
+      },
+      {
+        id: "tau-ij",
+        symbol: "$\\tau_{ij}$",
+        qualifier: {
+          en: "junction",
+          es: "unión",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: "Hopkins (2007)",
+        clause: {
+          en: "Equations 5.12 and 5.13; no governing standard",
+          es: "Ecuaciones 5.12 y 5.13; sin norma aplicable",
+        },
+        guide: "vibration/structural/junction-transmission",
+        definition: {
+          en: "Junction transmission coefficient: the fraction of the bending-wave power arriving at a junction from plate $i$ that continues into plate $j$, angle by angle and then averaged over a diffuse field. Both the coupling loss factor $\\eta_{ij}$ and the vibration reduction index $K_{ij}$ are derived from it, so it is the wave-approach quantity the junction family bottoms out in.",
+          es: "Coeficiente de transmisión en la unión: la fracción de la potencia de ondas de flexión que llega a una unión desde la placa $i$ y continúa hacia la placa $j$, ángulo a ángulo y después promediada en campo difuso. De él se derivan tanto el factor de pérdidas por acoplamiento $\\eta_{ij}$ como el índice de reducción vibracional $K_{ij}$, así que es la magnitud del enfoque ondulatorio en la que se apoya toda la familia de uniones.",
         },
       },
     ],
@@ -1663,6 +2603,113 @@ export const glossary = [
           es: "Molestia psicoacústica: la sonoridad percentil escalada por la agudeza y por un término que combina fluctuación y aspereza.",
         },
       },
+      {
+        id: "critical-band",
+        name: {
+          en: "Critical band",
+          es: "Banda crítica",
+        },
+        unit: "Hz",
+        standard: {
+          en: "Fastl and Zwicker (2007)",
+          es: "Fastl y Zwicker (2007)",
+        },
+        clause: {
+          en: "Sections 6.1 and 6.2; no governing standard",
+          es: "Secciones 6.1 y 6.2; sin norma aplicable",
+        },
+        guide: "perception/psychoacoustics/loudness",
+        definition: {
+          en: "Critical band: the frequency span within which the ear sums energy as one event, about 100 Hz wide below 500 Hz and roughly a fifth of the centre frequency above it. Masking, sharpness and the two tone-prominence ratios are all computed band by band on this scale, which is why none of them can be read off a fixed fractional-octave spectrum.",
+          es: "Banda crítica: el intervalo de frecuencias dentro del cual el oído suma la energía como un único suceso, de unos 100 Hz de ancho por debajo de 500 Hz y de aproximadamente una quinta parte de la frecuencia central por encima. El enmascaramiento, la agudeza y las dos razones de prominencia tonal se calculan banda a banda en esta escala, y por eso ninguno de ellos puede leerse en un espectro de fracción de octava fija.",
+        },
+      },
+      {
+        id: "z-bark",
+        symbol: "$z$",
+        qualifier: {
+          en: "critical-band rate",
+          es: "tasa de banda crítica",
+        },
+        unit: "Bark",
+        standard: {
+          en: "Fastl and Zwicker (2007)",
+          es: "Fastl y Zwicker (2007)",
+        },
+        clause: {
+          en: "Section 6.2, Table 6.1; no governing standard",
+          es: "Sección 6.2, tabla 6.1; sin norma aplicable",
+        },
+        guide: "perception/psychoacoustics/loudness",
+        definition: {
+          en: "Critical-band rate: the auditory frequency scale on which one unit is one critical band, running 0 to 24 Bark over the audible range. Specific loudness is a density along it, which is why its unit is sone/Bark and why a loudness pattern is plotted against $z$ rather than against frequency.",
+          es: "Tasa de banda crítica: la escala auditiva de frecuencia en la que una unidad es una banda crítica, de 0 a 24 Bark en todo el margen audible. La sonoridad específica es una densidad a lo largo de ella, y por eso su unidad es sone/Bark y por eso un patrón de sonoridad se representa frente a $z$ y no frente a la frecuencia.",
+        },
+      },
+      {
+        id: "erb-cam",
+        symbol: "$ERB_N$",
+        qualifier: {
+          en: "Cam scale",
+          es: "escala Cam",
+        },
+        unit: {
+          en: "Hz (scale in Cam)",
+          es: "Hz (escala en Cam)",
+        },
+        standard: "ISO 532-2:2017",
+        clause: {
+          en: "3.13 and 3.14",
+          es: "3.13 y 3.14",
+        },
+        guide: "perception/psychoacoustics/advanced-loudness",
+        definition: {
+          en: "Equivalent rectangular bandwidth of the auditory filter, and the Cam scale built from it by counting one unit per $ERB_N$: about 132 Hz at 1 kHz, so the step from 934 Hz to 1066 Hz is one Cam. It is narrower than the Bark band at low frequencies, and it is the scale ISO 532-2 and ISO 532-3 compute specific loudness on, so a sone/Cam density is not numerically a sone/Bark one.",
+          es: "Ancho de banda rectangular equivalente del filtro auditivo, y la escala Cam construida a partir de él contando una unidad por cada $ERB_N$: unos 132 Hz en 1 kHz, de modo que el paso de 934 Hz a 1066 Hz es un Cam. Es más estrecha que la banda de Bark en baja frecuencia y es la escala sobre la que la ISO 532-2 y la ISO 532-3 calculan la sonoridad específica, así que una densidad en sone/Cam no equivale numéricamente a una en sone/Bark.",
+        },
+      },
+      {
+        id: "n-5",
+        symbol: "$N_5$",
+        unit: {
+          en: "sone",
+          es: "sone",
+        },
+        standard: {
+          en: "Fastl and Zwicker (2007)",
+          es: "Fastl y Zwicker (2007)",
+        },
+        clause: {
+          en: "Equation 16.2; no governing standard",
+          es: "Ecuación 16.2; sin norma aplicable",
+        },
+        guide: "perception/psychoacoustics/psychoacoustic-annoyance",
+        definition: {
+          en: "Percentile loudness: the loudness exceeded 5 % of the time, read off the time-varying loudness of the ISO 532-1 model. It is the stationary stand-in for a fluctuating sound that psychoacoustic annoyance is built on, and it is a loudness in sone, not a loudness level in phon.",
+          es: "Sonoridad percentil: la sonoridad superada el 5 % del tiempo, leída sobre la sonoridad variable en el tiempo del modelo de la ISO 532-1. Es el sustituto estacionario de un sonido fluctuante sobre el que se construye la molestia psicoacústica, y es una sonoridad en sone, no un nivel de sonoridad en fon.",
+        },
+      },
+      {
+        id: "short-long-term-loudness",
+        name: {
+          en: "Short-term and long-term loudness",
+          es: "Sonoridad a corto y a largo plazo",
+        },
+        unit: {
+          en: "sone",
+          es: "sone",
+        },
+        standard: "ISO 532-3:2023",
+        clause: {
+          en: "3.10 and 3.11",
+          es: "3.10 y 3.11",
+        },
+        guide: "perception/psychoacoustics/advanced-loudness",
+        definition: {
+          en: "The two smoothed loudness time series of the Moore-Glasberg-Schlittenlacher model: short-term loudness is the loudness of a brief segment — a syllable, a single note, typically up to 500 ms — and long-term loudness that of a longer one, a whole sentence or musical phrase, typically up to 5 s. The loudness of a sound lasting two or three seconds is predicted by the maximum of the long-term series, not by its average.",
+          es: "Las dos series temporales suavizadas de sonoridad del modelo de Moore-Glasberg-Schlittenlacher: la sonoridad a corto plazo es la de un segmento breve —una sílaba, una nota, típicamente hasta 500 ms— y la de largo plazo la de uno más extenso, una frase completa o un fraseo musical, típicamente hasta 5 s. La sonoridad de un sonido de dos o tres segundos se predice con el máximo de la serie a largo plazo, no con su promedio.",
+        },
+      },
     ],
   },
   {
@@ -1724,14 +2771,71 @@ export const glossary = [
       },
       {
         id: "imd",
-        symbol: "IMD",
+        symbol: "IMD, $d_{m,n}$",
+        qualifier: {
+          en: "modulation",
+          es: "por modulación",
+        },
         unit: "%",
         standard: "IEC 60268-3:2013",
         clause: "14.12.7",
         guide: "devices/electroacoustics/electroacoustics",
         definition: {
-          en: "Modulation intermodulation distortion: the sidebands a low-frequency tone produces around a high-frequency one.",
-          es: "Distorsión de intermodulación por modulación: las bandas laterales que un tono de baja frecuencia genera alrededor de uno de alta.",
+          en: "Modulation intermodulation distortion: the sidebands a strong low-frequency tone produces around a weak high-frequency one. IEC 60268-3 defines several intermodulation families with different test signals, so a bare \"IMD\" has to say which one it is, and the single number an SMPTE-type analyzer prints combines the modulation sidebands in r.m.s. and is none of them.",
+          es: "Distorsión de intermodulación por modulación: las bandas laterales que un tono intenso de baja frecuencia genera alrededor de uno débil de alta. La IEC 60268-3 define varias familias de intermodulación con señales de ensayo distintas, así que un «IMD» a secas debe indicar cuál es, y el número único que da un analizador tipo SMPTE combina en valor eficaz las bandas laterales de modulación y no es ninguna de ellas.",
+        },
+      },
+      {
+        id: "imd-2",
+        symbol: "$d_{d,n}$",
+        qualifier: {
+          en: "difference frequency",
+          es: "por frecuencia diferencia",
+        },
+        unit: "%",
+        standard: "IEC 60268-3:2013",
+        clause: "14.12.8",
+        guide: "devices/electroacoustics/electroacoustics",
+        definition: {
+          en: "Difference-frequency intermodulation distortion: the products two closely spaced high-frequency tones of equal amplitude create at their difference and its multiples, referred to the fundamentals. Its test signal and its products are both different from the modulation form, so the two numbers are not comparable.",
+          es: "Distorsión de intermodulación por frecuencia diferencia: los productos que dos tonos de alta frecuencia próximos y de igual amplitud generan en su diferencia y en los múltiplos de esta, referidos a los fundamentales. Tanto su señal de ensayo como sus productos difieren de la forma por modulación, así que ambos números no son comparables.",
+        },
+      },
+      {
+        id: "tdfd",
+        symbol: "TDFD",
+        unit: "%",
+        standard: "IEC 60268-3:2013",
+        clause: "14.12.10",
+        guide: "devices/electroacoustics/electroacoustics",
+        definition: {
+          en: "Total difference-frequency distortion: the second- and third-order difference products of the two-tone test combined into one figure and referred to the sum of the two fundamentals, the single number the difference-frequency family reports.",
+          es: "Distorsión total por frecuencia diferencia: los productos diferencia de segundo y tercer orden del ensayo de dos tonos combinados en una sola cifra y referidos a la suma de los dos fundamentales, el número único con el que informa la familia de frecuencia diferencia.",
+        },
+      },
+      {
+        id: "h-3",
+        symbol: "$H_n$",
+        qualifier: {
+          en: "harmonic order $n$",
+          es: "armónico de orden $n$",
+        },
+        unit: {
+          en: "output per input",
+          es: "salida por unidad de entrada",
+        },
+        standard: {
+          en: "Farina (2000)",
+          es: "Farina (2000)",
+        },
+        clause: {
+          en: "no governing standard",
+          es: "sin norma aplicable",
+        },
+        guide: "devices/electroacoustics/swept-sine-distortion",
+        definition: {
+          en: "Harmonic transfer function of order $n$: the impulse response that an exponential-sweep deconvolution places $L\\ln n$ seconds *before* the linear one, so a single sweep separates the linear response and every harmonic order into its own window. The distortion of order $n$ at excitation frequency $f$ is then read as $|H_n(nf)|/|H_1(f)|$.",
+          es: "Función de transferencia armónica de orden $n$: la respuesta al impulso que la deconvolución de un barrido exponencial sitúa $L\\ln n$ segundos *antes* de la lineal, de modo que un único barrido separa la respuesta lineal y cada orden armónico en su propia ventana. La distorsión de orden $n$ a la frecuencia de excitación $f$ se lee entonces como $|H_n(nf)|/|H_1(f)|$.",
         },
       },
       {
@@ -1790,10 +2894,10 @@ export const glossary = [
     ],
   },
   {
-    id: "aircraft-and-underwater",
+    id: "aircraft-noise",
     label: {
-      en: "Aircraft and underwater",
-      es: "Aeronaves y acústica submarina",
+      en: "Aircraft and airport noise",
+      es: "Ruido de aeronaves y aeroportuario",
     },
     terms: [
       {
@@ -1850,6 +2954,107 @@ export const glossary = [
           es: "Nivel efectivo de ruido percibido: el PNLT máximo más la corrección por duración en la ventana de 10 dB, la métrica de certificación acústica.",
         },
       },
+      {
+        id: "pnltm",
+        symbol: "PNLTM",
+        unit: "PNdB",
+        standard: {
+          en: "ICAO Annex 16, Vol. I",
+          es: "Anexo 16 OACI, Vol. I",
+        },
+        clause: {
+          en: "Appendix 2, 4.4",
+          es: "Apéndice 2, 4.4",
+        },
+        guide: "aircraft/aircraft-noise",
+        definition: {
+          en: "Maximum tone-corrected perceived noise level: the largest PNLT of the half-second time history, after the bandsharing adjustment. It is the peak the certification metric is built on, since $\\mathrm{EPNL} = \\mathrm{PNLTM} + D$ and the 10 dB-down integration window is measured down from it.",
+          es: "Nivel máximo de ruido percibido corregido por tonos: el mayor PNLT del historial temporal de medio segundo, tras el ajuste por reparto entre bandas. Es el pico sobre el que se construye la métrica de certificación, ya que $\\mathrm{EPNL} = \\mathrm{PNLTM} + D$ y la ventana de integración de 10 dB se mide hacia abajo desde él.",
+        },
+      },
+      {
+        id: "npd",
+        symbol: "NPD",
+        unit: "dB",
+        standard: {
+          en: "ECAC Doc 29, 4th ed., Volume 2",
+          es: "ECAC Doc 29, 4.ª ed., Volumen 2",
+        },
+        clause: {
+          en: "section 4.2",
+          es: "apartado 4.2",
+        },
+        guide: "aircraft/airport-noise",
+        definition: {
+          en: "Noise-power-distance table: the event level of one aircraft — $L_{Amax}$ or SEL — tabulated against distance for a handful of engine power settings, measured in steady flight along a notionally infinite straight path at a reference speed. A calculation interpolates it linearly in power and logarithmically in distance, then corrects that baseline segment by segment.",
+          es: "Tabla ruido-potencia-distancia: el nivel del suceso de una aeronave — $L_{Amax}$ o SEL — tabulado frente a la distancia para unos pocos regímenes de motor, medido en vuelo estacionario a lo largo de una trayectoria recta nominalmente infinita y a una velocidad de referencia. El cálculo interpola linealmente en potencia y logarítmicamente en distancia, y después corrige esa base segmento a segmento.",
+        },
+      },
+      {
+        id: "anp",
+        name: {
+          en: "ANP database",
+          es: "Base de datos ANP",
+        },
+        standard: {
+          en: "ECAC Doc 29, 4th ed., Volume 2",
+          es: "ECAC Doc 29, 4.ª ed., Volumen 2",
+        },
+        clause: {
+          en: "Appendix G",
+          es: "Apéndice G",
+        },
+        guide: "aircraft/anp-fleet",
+        definition: {
+          en: "Aircraft Noise and Performance database: the international collection of NPD tables, aircraft and engine performance coefficients and default departure and approach profiles, supplied mostly by the manufacturers, that an airport-noise calculation is normally run from.",
+          es: "Base de datos de ruido y prestaciones de aeronaves (ANP): la colección internacional de tablas NPD, coeficientes de prestaciones de aeronave y motor y perfiles por defecto de despegue y aproximación, aportada en su mayor parte por los fabricantes, desde la que se ejecuta normalmente un cálculo de ruido aeroportuario.",
+        },
+      },
+      {
+        id: "slant-distance",
+        symbol: "$d_p$",
+        unit: "m",
+        standard: {
+          en: "ECAC Doc 29, 4th ed., Volume 2",
+          es: "ECAC Doc 29, 4.ª ed., Volumen 2",
+        },
+        clause: {
+          en: "section 4.5.2",
+          es: "apartado 4.5.2",
+        },
+        guide: "aircraft/airport-noise",
+        definition: {
+          en: "Slant distance: the perpendicular distance from the receiver to the flight-path segment, which is the abscissa of every NPD table. It is not the distance along the ground and not the aircraft's altitude, and to the side of the track it is the minimum distance to the segment rather than to the whole path.",
+          es: "Distancia oblicua: la distancia perpendicular del receptor al segmento de trayectoria, que es la abscisa de toda tabla NPD. No es la distancia sobre el terreno ni la altitud de la aeronave y, a un lado de la traza, es la distancia mínima al segmento y no a toda la trayectoria.",
+        },
+      },
+      {
+        id: "l-amax",
+        symbol: "$L_{Amax}$",
+        unit: "dB re 20 µPa",
+        standard: {
+          en: "ECAC Doc 29, 4th ed., Volume 2",
+          es: "ECAC Doc 29, 4.ª ed., Volumen 2",
+        },
+        clause: {
+          en: "section 4.1",
+          es: "apartado 4.1",
+        },
+        guide: "aircraft/airport-noise",
+        definition: {
+          en: "Maximum A-weighted level of a single event: the largest instantaneous value $L_A(t)$ reaches while the aircraft passes, the simpler of the two event metrics an NPD table carries. Doc 29 reads $L_A$ on the Slow sound-level-meter scale, so the time weighting is part of the quantity; it is not the peak level, which has no time weighting at all.",
+          es: "Nivel máximo ponderado A de un suceso: el mayor valor instantáneo que alcanza $L_A(t)$ durante el paso de la aeronave, la más sencilla de las dos métricas de suceso que recoge una tabla NPD. El Doc 29 lee $L_A$ en la escala Slow del sonómetro, así que la ponderación temporal forma parte de la magnitud; no es el nivel de pico, que no lleva ponderación temporal alguna.",
+        },
+      },
+    ],
+  },
+  {
+    id: "underwater-acoustics",
+    label: {
+      en: "Underwater acoustics",
+      es: "Acústica submarina",
+    },
+    terms: [
       {
         id: "l-p-2",
         symbol: "$L_p$",
@@ -1909,6 +3114,281 @@ export const glossary = [
           es: "Nivel de fuente monopolar equivalente: el nivel de ruido radiado tras la corrección de superficie de Lloyd, de modo que un solo número describa la fuente en sí.",
         },
       },
+      {
+        id: "tl-3",
+        symbol: "TL",
+        qualifier: {
+          en: "underwater",
+          es: "submarino",
+        },
+        unit: "dB",
+        standard: "ISO 18405:2017",
+        clause: {
+          en: "3.4.1.3 and 3.4.1.4",
+          es: "3.4.1.3 y 3.4.1.4",
+        },
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Transmission loss as the sonar equation uses it: the drop between the source level and the level at the receiver, a geometrical spreading law plus the volume absorption $\\alpha R$. Strictly, ISO 18405 calls that quantity propagation loss, $N_{PL} = L_S - L_p(x)$, keeps the name transmission loss for the reduction in level between two stated points, and deprecates using one as a synonym of the other.",
+          es: "Pérdidas por transmisión tal como las usa la ecuación del sonar: la caída entre el nivel de fuente y el nivel en el receptor, una ley de divergencia geométrica más la absorción de volumen $\\alpha R$. En rigor, la ISO 18405 llama a esa magnitud pérdidas por propagación, $N_{PL} = L_S - L_p(x)$, reserva el nombre de pérdidas por transmisión para la reducción de nivel entre dos puntos indicados y desaconseja usar una como sinónimo de la otra.",
+        },
+      },
+      {
+        id: "sl",
+        symbol: "SL, $L_S$",
+        unit: "dB re 1 µPa²m²",
+        standard: "ISO 18405:2017",
+        clause: "3.3.2.1",
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Source level: the level of the source factor, equal to the level 1 m from a hypothetical point source radiating into an infinite lossless medium, so it is back-projected from a measurement made much further away and never measured at 1 m. The reference value carries a squared metre, which is why the widespread \"dB re 1 µPa at 1 m\" is the same number written loosely.",
+          es: "Nivel de fuente: el nivel del factor de fuente, igual al nivel a 1 m de una fuente puntual hipotética que radia en un medio infinito sin pérdidas, de modo que se retroproyecta desde una medida hecha mucho más lejos y nunca se mide a 1 m. El valor de referencia lleva un metro cuadrado, y por eso el habitual «dB re 1 µPa a 1 m» es ese mismo número escrito de forma laxa.",
+        },
+      },
+      {
+        id: "nl",
+        symbol: "NL, $L_N$",
+        unit: "dB re 1 µPa",
+        standard: "ISO 18405:2017",
+        clause: "3.6.2.5",
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Sonar noise level: the background the signal has to be detected against, in the band of interest, from wind, thermal agitation, distant shipping and the platform's own self-noise. It has to be quoted over the same bandwidth as the source level, since an ambient spectrum level and a broadband level differ by $10\\log_{10}B$.",
+          es: "Nivel de ruido del sonar: el fondo frente al que hay que detectar la señal en la banda de interés, procedente del viento, la agitación térmica, el tráfico marítimo lejano y el ruido propio de la plataforma. Debe darse en el mismo ancho de banda que el nivel de fuente, ya que un nivel espectral de ruido ambiente y un nivel de banda ancha difieren en $10\\log_{10}B$.",
+        },
+      },
+      {
+        id: "di",
+        symbol: "DI",
+        qualifier: {
+          en: "receiving array",
+          es: "agrupación receptora",
+        },
+        unit: "dB",
+        standard: "ISO 18405:2017",
+        clause: {
+          en: "3.6.2.4 (Note 4)",
+          es: "3.6.2.4 (nota 4)",
+        },
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Directivity index of a receiving array: the array gain in the special case the sonar equation assumes, a plane-wave signal in isotropic background noise. It is the signal-to-noise ratio the beam buys over a single omnidirectional hydrophone, and it enters the equation as a credit against the noise level.",
+          es: "Índice de directividad de una agrupación receptora: la ganancia de agrupación en el caso particular que supone la ecuación del sonar, señal de onda plana en ruido de fondo isótropo. Es la relación señal-ruido que aporta el haz frente a un único hidrófono omnidireccional, y entra en la ecuación como un crédito frente al nivel de ruido.",
+        },
+      },
+      {
+        id: "dt",
+        symbol: "DT",
+        unit: "dB",
+        standard: "ISO 18405:2017",
+        clause: "3.6.2.1",
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Detection threshold: ten times the base-10 logarithm of the signal-to-noise ratio at which a signal counts as just detectable, for a stated probability of detection — often 0,5 — and probability of false alarm. It is where the processing gain and the operator's tolerance for false alarms enter the sonar equation.",
+          es: "Umbral de detección: diez veces el logaritmo decimal de la relación señal-ruido a la que una señal se considera apenas detectable, para una probabilidad de detección indicada —a menudo 0,5— y una probabilidad de falsa alarma. Es el punto por el que entran en la ecuación del sonar la ganancia de proceso y la tolerancia del operador a las falsas alarmas.",
+        },
+      },
+      {
+        id: "ts",
+        symbol: "TS, $N_{TS}$",
+        unit: "dB re 1 m²/sr",
+        standard: "ISO 18405:2017",
+        clause: "3.6.2.8",
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Target strength: the level of the target's differential scattering cross section, the free-field ratio of what it scatters back to what is incident on it. It is the one term that separates the active sonar equation from the passive one, and it depends on both the incidence and the scattering direction, so a backscattering value is the monostatic special case.",
+          es: "Índice de blanco: el nivel de la sección eficaz diferencial de dispersión del blanco, la relación en campo libre entre lo que devuelve y lo que incide sobre él. Es el único término que separa la ecuación del sonar activo de la del pasivo y depende tanto de la dirección de incidencia como de la de dispersión, de modo que un valor de retrodispersión es el caso particular monoestático.",
+        },
+      },
+      {
+        id: "se",
+        symbol: "SE, $\\Delta L_{SE}$",
+        unit: "dB",
+        standard: "ISO 18405:2017",
+        clause: "3.6.2.2",
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Signal excess: the amount by which the signal-to-noise ratio at the processor output exceeds the detection threshold. It is what the sonar equation returns; the target is detectable where it is positive, and the range at which it crosses zero is the detection range.",
+          es: "Exceso de señal: la cantidad en que la relación señal-ruido a la salida del procesador supera el umbral de detección. Es lo que devuelve la ecuación del sonar: el blanco es detectable donde es positivo, y el alcance al que cruza el cero es el alcance de detección.",
+        },
+      },
+      {
+        id: "fom",
+        symbol: "FOM",
+        unit: {
+          en: "dB (re 1 m² as a propagation factor)",
+          es: "dB (re 1 m² como factor de propagación)",
+        },
+        standard: {
+          en: "Ainslie (2010)",
+          es: "Ainslie (2010)",
+        },
+        clause: {
+          en: "Equations (3.48) and (3.111); no governing standard",
+          es: "Ecuaciones (3.48) y (3.111); sin norma aplicable",
+        },
+        guide: "underwater/underwater-propagation",
+        definition: {
+          en: "Figure of merit: the propagation loss at which the probability of detection falls to 50 %, that is, the loss a passive system can afford before the signal excess reaches zero. Inverting any loss law at $TL = \\mathrm{FOM}$ gives the detection range directly, which is why it is quoted instead of the whole curve.",
+          es: "Figura de mérito: las pérdidas por propagación a las que la probabilidad de detección baja al 50 %, es decir, las pérdidas que un sistema pasivo puede permitirse antes de que el exceso de señal llegue a cero. Invertir cualquier ley de pérdidas en $TL = \\mathrm{FOM}$ da directamente el alcance de detección, y por eso se cita en lugar de toda la curva.",
+        },
+      },
+      {
+        id: "w-f",
+        symbol: "$W(f)$",
+        unit: "dB",
+        standard: {
+          en: "NMFS (2024) v3.0",
+          es: "NMFS (2024) v3.0",
+        },
+        clause: {
+          en: "Equation 1 (parameters in Table 5); no governing standard",
+          es: "Ecuación 1 (parámetros en la tabla 5); sin norma aplicable",
+        },
+        guide: "underwater/marine-mammal-exposure",
+        definition: {
+          en: "Auditory weighting function: a generic band-pass filter shaped to one hearing group's susceptibility to noise-induced hearing loss, with its gain chosen so the flat central part sits at 0 dB. It is applied to the spectrum before an exposure is summed, so the same physical sound weighs differently for a porpoise and for a baleen whale.",
+          es: "Función de ponderación auditiva: un filtro paso banda genérico con la forma de la susceptibilidad de un grupo auditivo a la pérdida de audición inducida por ruido, con la ganancia elegida para que su parte central plana quede en 0 dB. Se aplica al espectro antes de sumar la exposición, de modo que un mismo sonido físico pesa distinto para una marsopa y para una ballena barbada.",
+        },
+      },
+      {
+        id: "tts-onset",
+        name: {
+          en: "TTS onset",
+          es: "Umbral de TTS",
+        },
+        unit: "dB",
+        standard: {
+          en: "NMFS (2024) v3.0",
+          es: "NMFS (2024) v3.0",
+        },
+        clause: {
+          en: "Table 8; no governing standard",
+          es: "Tabla 8; sin norma aplicable",
+        },
+        guide: "underwater/marine-mammal-exposure",
+        definition: {
+          en: "Onset of temporary threshold shift: the exposure at which a recoverable loss of hearing sensitivity begins, published per hearing group as a weighted sound exposure level and, for impulsive sound, together with an unweighted peak level. Both metrics have to be tested; whichever is reached first decides.",
+          es: "Umbral de desplazamiento temporal del umbral auditivo: la exposición a la que empieza una pérdida recuperable de sensibilidad auditiva, publicada por grupo auditivo como nivel de exposición sonora ponderado y, para sonidos impulsivos, junto con un nivel de pico sin ponderar. Hay que comprobar ambas métricas: decide la que se alcanza primero.",
+        },
+      },
+      {
+        id: "aud-inj-onset",
+        name: {
+          en: "AUD INJ onset (PTS onset)",
+          es: "Umbral de AUD INJ (umbral de PTS)",
+        },
+        unit: "dB",
+        standard: {
+          en: "NMFS (2024) v3.0",
+          es: "NMFS (2024) v3.0",
+        },
+        clause: {
+          en: "Table ES3; no governing standard",
+          es: "Tabla ES3; sin norma aplicable",
+        },
+        guide: "underwater/marine-mammal-exposure",
+        definition: {
+          en: "Onset of auditory injury, the 2024 guidance's name for what earlier versions called permanent threshold shift onset: the exposure above which the shift no longer recovers. For non-impulsive sound it is the TTS onset plus 20 dB for every group; for impulsive sound the guidance sets it 15 dB above in exposure and 6 dB above in peak level.",
+          es: "Umbral de lesión auditiva, el nombre que la guía de 2024 da a lo que las versiones anteriores llamaban umbral de desplazamiento permanente: la exposición por encima de la cual el desplazamiento ya no se recupera. Para sonidos no impulsivos son 20 dB por encima del umbral de TTS en todos los grupos; para sonidos impulsivos la guía lo sitúa 15 dB por encima en exposición y 6 dB por encima en nivel de pico.",
+        },
+      },
+      {
+        id: "sel-cum",
+        symbol: "$SEL_{cum}$",
+        unit: "dB re 1 µPa²·s",
+        standard: {
+          en: "NMFS (2024) v3.0",
+          es: "NMFS (2024) v3.0",
+        },
+        clause: {
+          en: "Table ES3; no governing standard",
+          es: "Tabla ES3; sin norma aplicable",
+        },
+        guide: "underwater/marine-mammal-exposure",
+        definition: {
+          en: "Cumulative sound exposure level: the weighted sound exposure of every event of an activity — every strike of a piling campaign, say — summed over its whole duration. The onset criteria are written against this accumulated quantity, not against a single event, so halving the strike energy and doubling the strike count changes nothing.",
+          es: "Nivel de exposición sonora acumulada: la exposición sonora ponderada de todos los sucesos de una actividad —por ejemplo, cada golpe de una campaña de hincado— sumada a lo largo de toda su duración. Los criterios de umbral se escriben frente a esta magnitud acumulada y no frente a un suceso aislado, de modo que reducir a la mitad la energía por golpe y duplicar el número de golpes no cambia nada.",
+        },
+      },
+    ],
+  },
+  {
+    id: "numerical-simulation",
+    label: {
+      en: "Numerical simulation",
+      es: "Simulación numérica",
+    },
+    terms: [
+      {
+        id: "courant-number",
+        symbol: "$C_N$",
+        qualifier: {
+          en: "the cfl argument",
+          es: "el argumento cfl",
+        },
+        unit: {
+          en: "dimensionless",
+          es: "adimensional",
+        },
+        standard: {
+          en: "Attenborough and Van Renterghem (2021)",
+          es: "Attenborough y Van Renterghem (2021)",
+        },
+        clause: {
+          en: "Equations (4.13) and (4.14); no governing standard",
+          es: "Ecuaciones (4.13) y (4.14); sin norma aplicable",
+        },
+        guide: "simulation/fdtd-simulation",
+        definition: {
+          en: "Courant number: how far a wavefront travels in one time step, measured in grid cells, $c\\,\\Delta t\\sqrt{1/\\Delta x^2 + 1/\\Delta y^2}$. An explicit scheme is stable only up to one and meaningless above it, so it is the number the time step is chosen from rather than the other way round; the library defaults to 0,6.",
+          es: "Número de Courant: la distancia que recorre un frente de onda en un paso temporal, medida en celdas de la malla, $c\\,\\Delta t\\sqrt{1/\\Delta x^2 + 1/\\Delta y^2}$. Un esquema explícito solo es estable hasta uno y carece de sentido por encima, así que es el número a partir del cual se elige el paso temporal y no al revés; la biblioteca usa 0,6 por defecto.",
+        },
+      },
+      {
+        id: "numerical-dispersion",
+        name: {
+          en: "Numerical dispersion",
+          es: "Dispersión numérica",
+        },
+        unit: {
+          en: "% (speed error)",
+          es: "% (error de velocidad)",
+        },
+        standard: {
+          en: "Attenborough and Van Renterghem (2021)",
+          es: "Attenborough y Van Renterghem (2021)",
+        },
+        clause: {
+          en: "Equation (4.15); no governing standard",
+          es: "Ecuación (4.15); sin norma aplicable",
+        },
+        guide: "simulation/fdtd-simulation",
+        definition: {
+          en: "Numerical dispersion: the error the discrete scheme makes in the propagation speed, which grows with frequency and depends on the direction of travel — largest along a coordinate axis, and zero along the diagonal of square cells at a Courant number of one. It is why ten cells per shortest wavelength is the working rule, and why an FDTD arrival time drifts if the grid is too coarse.",
+          es: "Dispersión numérica: el error que comete el esquema discreto en la velocidad de propagación, que crece con la frecuencia y depende de la dirección de avance: máximo a lo largo de un eje coordenado y nulo en la diagonal de celdas cuadradas con número de Courant igual a uno. Por eso la regla práctica es de diez celdas por longitud de onda más corta, y por eso el tiempo de llegada de una simulación FDTD se desvía si la malla es demasiado gruesa.",
+        },
+      },
+      {
+        id: "pml",
+        name: {
+          en: "PML (perfectly matched layer)",
+          es: "PML (capa perfectamente acoplada)",
+        },
+        standard: {
+          en: "Attenborough and Van Renterghem (2021)",
+          es: "Attenborough y Van Renterghem (2021)",
+        },
+        clause: {
+          en: "Section 4.2.3; no governing standard",
+          es: "Sección 4.2.3; sin norma aplicable",
+        },
+        guide: "simulation/fdtd-simulation",
+        definition: {
+          en: "Perfectly matched layer: a boundary region whose absorption is graded so that, in principle, it reflects nothing at any angle or frequency, which is what lets a finite grid stand in for open space. What this library ships is the graded sponge layer, its simple precursor, so a grazing-incidence residue at the edge is expected rather than a bug.",
+          es: "Capa perfectamente acoplada: una región de contorno con absorción gradual que, en principio, no refleja nada a ningún ángulo ni frecuencia, y que es lo que permite a una malla finita hacer las veces de espacio abierto. Lo que incluye esta biblioteca es la capa esponja gradual, su precursora sencilla, así que un residuo a incidencia rasante en el borde es esperable y no un fallo.",
+        },
+      },
     ],
   },
   {
@@ -1965,8 +3445,8 @@ export const glossary = [
         },
         guide: "buildings/insulation/insulation-field",
         definition: {
-          en: "Standard uncertainty of a building-acoustics measurement situation, tabulated per quantity and situation.",
-          es: "Incertidumbre típica de una situación de medida en acústica de la edificación, tabulada por magnitud y por situación.",
+          en: "Reproducibility standard deviation of a sound-insulation quantity: the standard uncertainty ISO 12999-1 assigns to situation A, the widest of the three. The same clause assigns $\\sigma_{situ}$ to situation B and the repeatability $\\sigma_r$ to situation C — for $R'_w$, 1,2 dB against 0,9 and 0,4 — so the situation has to be stated with the number.",
+          es: "Desviación típica de reproducibilidad de una magnitud de aislamiento acústico: la incertidumbre típica que la ISO 12999-1 asigna a la situación A, la más amplia de las tres. El mismo apartado asigna $\\sigma_{situ}$ a la situación B y la repetibilidad $\\sigma_r$ a la situación C —para $R'_w$, 1,2 dB frente a 0,9 y 0,4—, así que hay que indicar la situación junto con el número.",
         },
       },
     ],

@@ -39,14 +39,51 @@ ISO 7029. Las consecuencias perceptivas de un
 umbral desplazado, como la pérdida de inteligibilidad, las recoge el SII en
 la [sección de habla](/phonometry/es/perception/speech/).
 
+**Tres páginas, tres decibelios distintos**, y mantenerlos separados es casi
+todo el trabajo. Un **nivel de umbral de audición** va en dB HL, medido
+respecto al cero audiométrico, de modo que 0 dB HL es una presión acústica
+*distinta* en cada frecuencia: exactamente lo que tabula ISO 389-7. Un **nivel
+de exposición diario** va en decibelios ponderados A normalizados a ocho horas,
+una dosis energética del sonido fuera del oído, sin oyente dentro. Un
+**desplazamiento del umbral** es una diferencia entre dos valores en dB HL, así
+que puede sumarse a un nivel de audición y nunca a un nivel de presión
+acústica. La cadena entre ellos discurre en un solo sentido: ISO 9612 entrega
+un único LEX,8h ponderado A a las fórmulas de ISO 1999, que devuelven dB HL. El
+único puente de vuelta del nivel de audición a la presión acústica física es el
+umbral de referencia de ISO 389-7 de la página del umbral, que es además lo que
+necesita el SII cuando se usa un umbral elevado como entrada.
+
 ## Páginas de esta sección
 
-- [Umbral de audición (edad y cero de referencia)](/phonometry/es/perception/hearing/hearing-threshold/):
+En el orden en que discurre la cadena.
+
+- **Línea base**: [Umbral de audición (edad y cero de referencia)](/phonometry/es/perception/hearing/hearing-threshold/):
   la distribución del umbral con la edad de ISO 7029:2017 y el umbral de
   referencia de ISO 389-7:2005.
-- [Pérdida auditiva inducida por ruido (ISO 1999)](/phonometry/es/perception/hearing/noise-induced-hearing-loss/):
-  el NIPTS y su distribución poblacional, y la combinación con la edad en el
-  HTLAN.
-- [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
+- **Exposición**: [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
   las tres estrategias de medición para LEX,8h con el presupuesto de
   incertidumbre del Anexo C.
+- **Daño**: [Pérdida auditiva inducida por ruido (ISO 1999)](/phonometry/es/perception/hearing/noise-induced-hearing-loss/):
+  el NIPTS y su distribución poblacional, y la combinación con la edad en el
+  HTLAN.
+
+## Qué no cubre esta sección
+
+**Nada de lo que hay aquí es un veredicto sobre una persona.** ISO 1999 no
+define un hándicap auditivo ni un umbral indemnizable: esa línea la fija la
+regulación nacional, y la biblioteca no aplica ninguna, así que el criterio lo
+aportas y lo compruebas tú. Lo mismo vale para los valores de acción de la
+exposición: el LEX,8h y su límite superior unilateral al 95 % salen de
+ISO 9612, y las cifras con las que se comparan están en la directiva de tu
+jurisdicción, no aquí.
+
+Dos límites de implementación siguen a las normas. De ISO 1999 solo está
+implementada la **base de datos A**: `htlan` toma siempre su componente de edad
+de ISO 7029:2017, y sustituirla por una población de control medida
+nacionalmente (apartados 6.2.3 y 6.2.4) obliga a calcular esa base de datos
+fuera y pasarla. De ISO 389-7 solo están implementados los valores de
+referencia de la Tabla 1, no los procedimientos con los que se establecieron.
+
+Y aquí no se hace audiometría. Nada genera un tono de prueba, gobierna un
+audiómetro ni corrige por el acoplador de un auricular: las páginas consumen y
+producen niveles de umbral como datos.

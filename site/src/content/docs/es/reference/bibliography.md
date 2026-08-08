@@ -1,23 +1,41 @@
 ---
 title: "Bibliografía"
-description: "Una selección curada de los libros y artículos que sustentan las guías, agrupados por dominio: cada entrada con un DOI verificado o un enlace oficial del editor y una nota sobre qué sustenta."
+description: "Todas las fuentes que hay detrás de las guías en una sola lista, agrupadas por área: las normas con su ficha de catálogo, los libros y artículos con un DOI verificado o un enlace del editor, cada uno con una nota y las guías que lo citan."
 ---
 
-Cada guía de este sitio se cierra con dos secciones de citas: una sección
-**Referencias** que lista los libros y artículos que sustentan la física de la
-página (estilo APA, un punto por fuente, cada uno con un DOI o un enlace
-oficial del editor, y media frase sobre qué sustenta la entrada), seguida de
-una sección **Normas** que nombra los documentos normativos que la página
-implementa, apartado por apartado. Esta página reúne las obras en las que más
-se apoyan las guías, agrupadas por dominio, y cada entrada lista las páginas de
-guía que la citan. Es una **selección curada, no la lista completa de citas**:
-en el momento de escribir esto, dos docenas de obras con DOI citadas en el
-frontmatter de las propias guías no aparecen aquí, entre ellas Welch (1967),
-Harris (1978), Knapp y Carter (1976), Allen y Berkley (1979) y Maa (1998). La
-sección de Referencias de cada guía, generada a partir de su frontmatter, es la
-autoridad para esa página.
+Cada guía de este sitio nombra sus fuentes dos veces. Bajo el título va una
+fila de chips con los documentos normativos que la página implementa, por
+designación, de modo que la norma aplicable se ve antes del primer párrafo; y
+al pie va una única sección **Referencias**, generada a partir de la
+bibliografía tipada del frontmatter de la página, que compone todas las fuentes
+en estilo APA, normas, libros y artículos por igual, cada una con un DOI o un
+enlace oficial del editor y media frase sobre qué sustenta.
+
+Un documento normativo aparece en una lista de Referencias siempre que una guía
+lo cite como *fuente* de algo que usa y no como el método que implementa:
+ISO 3740 como la guía de selección que decide qué método de potencia acústica
+aplica, ISO 1996-2 por el criterio de audibilidad tonal que reutiliza
+IEC 61400-11. Lo que una página implementa apartado por apartado está en su
+fila de chips, y reunido para toda la biblioteca en el
+[informe de conformidad](/phonometry/es/reference/conformance/), no aquí.
+
+Esta página reúne esas fuentes en una sola lista, agrupadas por las mismas diez
+áreas en las que se agrupan las guías, con Acústica general y Metrología como
+los dos cajones transversales de los extremos. Cada entrada lista las páginas
+de guía que la citan. La sección de Referencias de cada guía, generada a partir
+de su frontmatter, sigue siendo la autoridad para esa página.
 
 ## Acústica general
+
+Las obras de aquí son a las que acudir cuando la pregunta no pertenece a
+ninguna área concreta. Kinsler et al. es el primer curso, Rossing el panorama
+en un solo volumen de todos los dominios que toca esta biblioteca, y Beranek y
+Mellow el tratamiento que hay que abrir cuando la pregunta es de radiación o de
+transducción. Bies, Hansen y Howard y Norton y Karczub son los dos manuales de
+ingeniería en los que más se apoyan las guías de un área a otra: el primero por
+las relaciones de recinto y los cerramientos, el segundo por sus problemas
+resueltos por bandas de octava, alrededor de los cuales están construidas
+varias guías.
 
 - Kinsler, L. E., Frey, A. R., Coppens, A. B., & Sanders, J. V. (2000).
   *Fundamentals of acoustics* (4.ª ed.). Wiley. ISBN 978-0-471-84789-2.
@@ -40,8 +58,57 @@ autoridad para esa página.
   Citado por [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
   [Caracterización de altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/) y
   [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5.ª ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152). Las
+  relaciones de recinto en régimen estacionario (apartado 6.4, Ecs. 6.43-6.44)
+  que hay detrás de `steady_state_spl` y `room_constant`, y la pérdida por
+  inserción de cerramientos del apartado 7.4.2 (Ecs. 7.103, 7.111), que es el
+  modelo de cerramiento por defecto de la biblioteca. Citado por
+  [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/),
+  [Ruido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/),
+  [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/),
+  [Silenciadores](/phonometry/es/devices/noise-control/silencers/),
+  [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
+  [Fuentes imagen y campo estacionario de sala](/phonometry/es/buildings/rooms/room-image-sources/),
+  [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/),
+  [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/),
+  [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/) y
+  [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
+- Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
+  analysis for engineers* (2.ª ed.). Cambridge University Press.
+  [doi:10.1017/CBO9781139163927](https://doi.org/10.1017/CBO9781139163927).
+  Los modelos de potencia acústica del apartado 4.6 (Tabla 4.5,
+  Ecs. 4.53-4.56), el balance de potencia entre recintos del apartado 4.9
+  (Ecs. 4.92-4.101), la ecuación de diseño de cerramientos del apartado 4.10
+  (Ecs. 4.102-4.115) y los problemas resueltos 4.16, 4.18 y 4.21 con sus
+  respuestas impresas por bandas de octava, alrededor de los cuales está
+  construida esta guía. Citado por
+  [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/),
+  [Ruido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/),
+  [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/)
+  y
+  [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/).
+- Vér, I. L., & Beranek, L. L. (2006). *Noise and vibration control
+  engineering: Principles and applications* (2.ª ed.). Wiley.
+  [doi:10.1002/9780470172568](https://doi.org/10.1002/9780470172568). El
+  tratamiento complementario de los conductos y los cerramientos de esta
+  página. Citado por
+  [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/)
+  y [Silenciadores](/phonometry/es/devices/noise-control/silencers/).
 
-## Procesado de señal
+## Análisis de señal
+
+Oppenheim y Schafer es la columna vertebral de la teoría de filtros, y Smith el
+acompañante gratuito cuando la pregunta es de diseño y no de análisis. Abre
+Bendat y Piersol siempre que una estimación espectral necesite barra de error:
+es la referencia que hay detrás de todas las cifras de error aleatorio de esta
+área, y su capítulo de coherencia múltiple no tiene equivalente en ningún otro
+sitio. Los artículos están aquí como fuentes y no como lectura, cada uno
+fijando un estimador: Welch por la varianza con segmentos solapados, Harris por
+las figuras de mérito de las ventanas, Thomson y Percival y Walden por el
+método multitaper, Knapp y Carter por el retardo, McFadden por el promediado
+síncrono, Golay por los pares complementarios.
 
 - Oppenheim, A. V., & Schafer, R. W. (2010). *Discrete-time signal processing*
   (3.ª ed.). Pearson. ISBN 978-0-13-198842-2.
@@ -81,9 +148,6 @@ autoridad para esa página.
   El desarrollo multitaper (capítulo 7) tras `multitaper_psd` y las tablas
   de autovalores de las secuencias de Slepian que anclan su oráculo de test.
   Citado por [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/).
-
-## Instrumentación de medida
-
 - International Electrotechnical Commission. (2014). *Electroacoustics —
   Octave-band and fractional-octave-band filters — Part 1: Specifications*
   (IEC 61260-1:2014).
@@ -141,68 +205,221 @@ autoridad para esa página.
   de círculo de referencia de 25 dB.
   Citado por [Caracterización de altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/) y
   [Caracterización de micrófonos](/phonometry/es/devices/electroacoustics/microphones/).
+- Harris, F. J. (1978). On the use of windows for harmonic analysis with the
+  discrete Fourier transform. *Proceedings of the IEEE*, 66(1), 51-83.
+  [doi:10.1109/PROC.1978.10837](https://doi.org/10.1109/PROC.1978.10837). Las
+  figuras de mérito de las ventanas (Tabla 1): ancho de banda de ruido
+  equivalente, ganancia coherente, pérdida por festoneado, pérdida de proceso
+  en el peor caso, nivel del lóbulo lateral más alto y anchura del lóbulo
+  principal, calculadas por `window_metrics` para cualquier ventana de scipy.
+  Citado por [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/)
+  y [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/).
+- Welch, P. D. (1967). The use of fast Fourier transform for the estimation of
+  power spectra: A method based on time averaging over short, modified
+  periodograms. *IEEE Transactions on Audio and Electroacoustics*, 15(2),
+  70-73.
+  [doi:10.1109/TAU.1967.1161901](https://doi.org/10.1109/TAU.1967.1161901).
+  La fórmula de la varianza con segmentos solapados que hay detrás del número
+  efectivo de promedios (Bendat y Piersol, apartado 11.5.2.2, Ref. 11). Citado
+  por
+  [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/).
+- Knapp, C. H., & Carter, G. C. (1976). The generalized correlation method for
+  estimation of time delay. *IEEE Transactions on Acoustics, Speech, and
+  Signal Processing*, 24(4), 320-327.
+  [doi:10.1109/TASSP.1976.1162830](https://doi.org/10.1109/TASSP.1976.1162830).
+  El marco GCC, las ponderaciones de su Tabla I y las condiciones de cada una,
+  y el procesador de máxima verosimilitud (Hannan-Thomson). Citado por
+  [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/).
+- McFadden, P. D. (1987). A revised model for the extraction of periodic
+  waveforms by time domain averaging. *Mechanical Systems and Signal
+  Processing*, 1(1), 83-95.
+  [doi:10.1016/0888-3270(87)90085-9](https://doi.org/10.1016/0888-3270%2887%2990085-9). El modelo de filtro peine del promediado síncrono (Ec. 8, magnitud
+  Ec. 9), el modelo revisado de registro finito que da un resultado
+  exactamente periódico, y la observación de que un orden interferente no
+  armónico se rechaza mejor eligiendo el número de promedios para que un nodo
+  del peine caiga sobre él, y no con la potencia de dos de costumbre. Citado
+  por
+  [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
+- Golay, M. J. E. (1961). Complementary series. *IRE Transactions on
+  Information Theory*, 7(2), 82-87.
+  [doi:10.1109/TIT.1961.1057620](https://doi.org/10.1109/TIT.1961.1057620).
+  La construcción original de los pares complementarios del apartado 1. Citado
+  por
+  [Medición de sistemas: Golay, barridos, inversión](/phonometry/es/signals/spectra/system-measurement/).
+- Havelock, D., Kuwano, S., & Vorländer, M. (Eds.) (2008). *Handbook of signal
+  processing in acoustics*. Springer.
+  [doi:10.1007/978-0-387-30441-0](https://doi.org/10.1007/978-0-387-30441-0).
+  Parte I, capítulo 6 (Xiang, *Digital Sequences*): la recursión de Golay del
+  apartado 1, la identidad de autocorrelación complementaria de la Ec. (2) y el
+  procedimiento de recuperación en el dominio de la frecuencia de la Ec. (4) y
+  la Fig. 2. ISBN 978-0-387-77698-9. Citado por
+  [Medición de sistemas: Golay, barridos, inversión](/phonometry/es/signals/spectra/system-measurement/)
+  y
+  [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/).
 
-## Potencia acústica e intensidad
+## Audición y percepción
 
-- Fahy, F. J. (1995). *Sound intensity* (2.ª ed.). E&FN Spon.
-  ISBN 978-0-419-19810-9.
-  [doi:10.4324/9780203475386](https://doi.org/10.4324/9780203475386).
-  La monografía sobre el flujo de energía sonora: intensidad activa y
-  reactiva, el estimador p-p y su presupuesto de error por desfase.
-  Citado por [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
-  e [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
-- International Organization for Standardization. (2019). *Acoustics —
-  Determination of sound power levels of noise sources — Guidelines for the
-  use of basic standards* (ISO 3740:2019).
-  [Catálogo iso.org](https://www.iso.org/standard/45107.html).
-  La guía de selección de la familia de potencia acústica: grados, entornos y
-  criterios de tamaño de fuente y de ruido de fondo.
-  Citado por [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
-- International Organization for Standardization. (2010). *Acoustics —
-  Determination of sound power levels and sound energy levels of noise
-  sources using sound pressure — Precision methods for reverberation test
-  rooms* (ISO 3741:2010).
-  [Catálogo iso.org](https://www.iso.org/standard/52053.html).
-  El método de precisión en cámara reverberante.
-  Citado por [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/).
-- International Organization for Standardization. (2010). *Acoustics —
-  Determination of sound power levels and sound energy levels of noise
-  sources using sound pressure — Engineering methods for an essentially free
-  field over a reflecting plane* (ISO 3744:2010).
-  [Catálogo iso.org](https://www.iso.org/standard/52055.html).
-  El método de ingeniería por superficie envolvente.
-  Citado por [Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/).
-- International Organization for Standardization. (2012). *Acoustics —
-  Determination of sound power levels and sound energy levels of noise
-  sources using sound pressure — Precision methods for anechoic rooms and
-  hemi-anechoic rooms* (ISO 3745:2012).
-  [Catálogo iso.org](https://www.iso.org/standard/45362.html).
-  El método de precisión en cámara anecoica.
-  Citado por [Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/).
-- International Organization for Standardization. (1996). *Acoustics —
-  Declaration and verification of noise emission values of machinery and
-  equipment* (ISO 4871:1996).
-  [Catálogo iso.org](https://www.iso.org/standard/10868.html).
-  La declaración de emisión sonora: las formas de doble/único número,
-  $L_{WAd} = L_{WA} + K_{WA}$ y la verificación de la cláusula 6.2.
-  Citado por [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
-- International Organization for Standardization. (1993). *Acoustics —
-  Determination of sound power levels of noise sources using sound
-  intensity — Part 1: Measurement at discrete points* (ISO 9614-1:1993).
-  [Catálogo iso.org](https://www.iso.org/standard/17427.html).
-  Los indicadores de campo y el criterio de capacidad dinámica de la medida
-  de intensidad.
-  Citado por [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
-- International Electrotechnical Commission. (1993). *Electroacoustics —
-  Instruments for the measurement of sound intensity — Measurements with
-  pairs of pressure sensing microphones* (IEC 61043:1993; adoptada en Europa
-  como EN 61043:1994).
-  [Tienda IEC](https://webstore.iec.ch/en/publication/4353).
-  La norma de instrumentación p-p: el estimador por espectro cruzado y el
-  índice presión-intensidad residual.
-  Citado por [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
+Fastl y Zwicker es la puerta de entrada y sigue siendo útil mucho después;
+Moore es el mejor primer libro si la pregunta es sobre el sistema auditivo y no
+sobre la métrica. Las obras del lado normativo y los artículos de modelo que
+hay aquí son la fuente de un algoritmo cada uno, así que lee la nota antes que
+el artículo: varios son el enunciado definitivo de un modelo que implementan
+las guías y no un tratamiento general de la audición.
 
-## Acústica de salas
+- Houtgast, T., & Steeneken, H. J. M. (1985). A review of the MTF concept in
+  room acoustics and its use for estimating speech intelligibility in
+  auditoria. *The Journal of the Acoustical Society of America*, 77(3),
+  1069-1077. [doi:10.1121/1.392224](https://doi.org/10.1121/1.392224).
+  El marco de transferencia de modulación sobre el que se construye el índice
+  de transmisión del habla.
+  Citado por [Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
+- French, N. R., & Steinberg, J. C. (1947). Factors governing the
+  intelligibility of speech sounds. *The Journal of the Acoustical Society of
+  America*, 19(1), 90-119.
+  [doi:10.1121/1.1916407](https://doi.org/10.1121/1.1916407).
+  Los experimentos por bandas de articulación que sustentan la función de importancia
+  de banda del índice de inteligibilidad del habla.
+  Citado por [Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An
+  algorithm for intelligibility prediction of time-frequency weighted noisy
+  speech. *IEEE Transactions on Audio, Speech, and Language Processing*,
+  19(7), 2125-2136.
+  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
+  STOI: el frontal común de tercios de octava, la normalización y el recorte
+  señal-distorsión, y la correlación de envolventes por banda que promedia el
+  índice.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A
+  short-time objective intelligibility measure for time-frequency weighted
+  noisy speech. *2010 IEEE International Conference on Acoustics, Speech and
+  Signal Processing (ICASSP)*, 4214-4217.
+  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
+  La versión corta de congreso del STOI.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
+- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
+  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
+  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
+  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
+  ESTOI: el espectrograma de tiempo corto normalizado por filas y columnas y
+  su índice intermedio de correlación espectral.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
+- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
+  (6.ª ed.). Brill.
+  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
+  El libro de texto de referencia sobre percepción auditiva; sus páginas
+  76-77 dan el ancho de banda del filtro auditivo ERB_N de Glasberg y Moore
+  (1990) y la escala de frecuencia Cam (número ERB_N) sobre la que se
+  escriben los modelos de sonoridad.
+  Citado por [Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/).
+- Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
+  and calculation. *The Journal of the Acoustical Society of America*, 5(2),
+  82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
+  Las mediciones originales de igual sonoridad cuya isófona de 40 fonios se
+  convirtió en la curva de ponderación A.
+  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/)
+  y [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/).
+- International Organization for Standardization. (2023). *Acoustics —
+  Normal equal-loudness-level contours* (ISO 226:2023).
+  [Catálogo iso.org](https://www.iso.org/standard/83117.html).
+  Las líneas isofónicas modernas, sucesoras de las curvas de Fletcher y
+  Munson.
+  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/)
+  y [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/).
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3.ª ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  El modelo de molestia psicoacústica y la forma cerrada de la intensidad de
+  fluctuación para ruido de banda ancha modulado en amplitud.
+  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/),
+  [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) y
+  [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
+- Osses Vecchi, A., García León, R., & Kohlrausch, A. (2016). Modelling the
+  sensation of fluctuation strength. *Proceedings of Meetings on Acoustics*,
+  28, 050005. [doi:10.1121/2.0000410](https://doi.org/10.1121/2.0000410).
+  El modelo de señal de la intensidad de fluctuación y sus valores de la
+  Tabla 1 de la literatura.
+  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
+- Felix Greco, G., Merino-Martínez, R., Osses, A., & Lotinga, M. J. B. (2025).
+  *SQAT: a sound quality analysis toolbox for MATLAB* (software de código
+  abierto). [github.com/ggrecow/SQAT](https://github.com/ggrecow/SQAT),
+  [doi:10.5281/zenodo.7934709](https://doi.org/10.5281/zenodo.7934709).
+  La referencia abierta en MATLAB usada como oráculo numérico de las
+  comprobaciones de la intensidad de fluctuación.
+  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
+- Ecma International. (2024). *ECMA-418-1: Psychoacoustic metrics for ITT
+  equipment — Part 1: Prominent discrete tones* (3.ª ed.).
+  [PDF gratuito](https://ecma-international.org/wp-content/uploads/ECMA-418-1_3rd_edition_december_2024.pdf).
+  Los métodos de relación tono-ruido y relación de prominencia, de descarga
+  gratuita.
+  Citado por [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/).
+- Ecma International. (2025). *ECMA-74: Measurement of airborne noise emitted
+  by information technology and telecommunications equipment* (22.ª ed.).
+  [PDF gratuito](https://ecma-international.org/wp-content/uploads/ECMA-74_22nd_edition_december_2025.pdf).
+  La norma de emisión matriz, de descarga gratuita, cuyo anexo D delega la
+  evaluación de tonos en ECMA-418-1.
+  Citado por [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/).
+- International Organization for Standardization. (2016). *Acoustics —
+  Objective method for assessing the audibility of tones in noise —
+  Engineering method* (ISO/PAS 20065:2016).
+  [Catálogo iso.org](https://www.iso.org/standard/66941.html).
+  El método de ingeniería para la audibilidad objetiva de tonos.
+  Citado por [Audibilidad objetiva de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/).
+- International Organization for Standardization. (2017). *Acoustics —
+  Statistical distribution of hearing thresholds related to age and gender*
+  (ISO 7029:2017). [Catálogo iso.org](https://www.iso.org/standard/42916.html).
+  El modelo por edad del umbral de audición y su dispersión poblacional.
+  Citado por [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
+- International Organization for Standardization. (2005). *Acoustics —
+  Reference zero for the calibration of audiometric equipment — Part 7:
+  Reference threshold of hearing under free-field and diffuse-field listening
+  conditions* (ISO 389-7:2005).
+  [Catálogo iso.org](https://www.iso.org/standard/38976.html).
+  El cero audiométrico como nivel de presión acústica.
+  Citado por [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
+- International Organization for Standardization. (2013). *Acoustics —
+  Estimation of noise-induced hearing loss* (ISO 1999:2013).
+  [Catálogo iso.org](https://www.iso.org/standard/45103.html).
+  El modelo de NIPTS, su distribución y la combinación HTLAN.
+  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/).
+- Passchier-Vermeer, W. (1974). Hearing loss due to continuous exposure to
+  steady-state broad-band noise. *The Journal of the Acoustical Society of
+  America*, 56(5), 1585–1593.
+  [doi:10.1121/1.1903482](https://doi.org/10.1121/1.1903482).
+  Un estudio de campo de las relaciones exposición-respuesta del ruido
+  codificadas después en la ISO 1999.
+  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/).
+- National Institute for Occupational Safety and Health. (1998). *Criteria for
+  a recommended standard: Occupational noise exposure — Revised criteria 1998*
+  (DHHS/NIOSH Publication No. 98-126).
+  [doi:10.26616/NIOSHPUB98126](https://doi.org/10.26616/NIOSHPUB98126),
+  [PDF gratuito](https://www.cdc.gov/niosh/docs/98-126/pdfs/98-126.pdf).
+  El documento de criterios de libre acceso que sustenta el límite de exposición
+  recomendado de 85 dB(A) y la discusión de conservación auditiva y umbral.
+  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) y
+  [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
+- International Organization for Standardization. (2009). *Acoustics —
+  Determination of occupational noise exposure — Engineering method*
+  (ISO 9612:2009). [Catálogo iso.org](https://www.iso.org/standard/41718.html).
+  Las tres estrategias de medición y el presupuesto de incertidumbre del
+  anexo C.
+  Citado por [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
+- European Parliament and Council. (2003). *Directive 2003/10/EC on the
+  minimum health and safety requirements regarding the exposure of workers to
+  the risks arising from physical agents (noise)*. Diario Oficial de la Unión
+  Europea. [eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2003/10/oj/eng).
+  Los valores de exposición que dan lugar a una acción y el valor límite de la
+  UE para el ruido laboral.
+  Citado por [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
+
+## Salas y edificación
+
+Kuttruff es la monografía de referencia y la que conviene tener; Long es el
+acompañante del lado del diseño cuando la pregunta es arquitectónica y no
+metrológica, y Hopkins es el que hay que abrir para cualquier cosa de ruido
+estructural o de flancos. Los artículos de Sabine, Eyring, Millington, Fitzroy
+y Arau están aquí como fuentes de las cinco fórmulas de predicción y no como
+lectura, y vale la pena abrir cada uno para ver qué supuso su autor sobre cómo
+se reparte la absorción, que es justo donde discrepan los cinco.
 
 - Long, M. (2014). *Architectural acoustics* (2.ª ed.). Academic Press.
   [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
@@ -340,8 +557,73 @@ autoridad para esa página.
   El método de tangencia NC normativo y la calificación RC Mark II de su
   Anexo D informativo, con su etiqueta espectral.
   Citado por [Criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/).
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
+  El tratamiento exhaustivo del aislamiento a ruido aéreo y de impactos: las
+  cadenas de medición, la transmisión por flancos y el marco de predicción
+  EN 12354.
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
+  [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) y
+  [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/).
+- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Un manual compacto sobre la transmisión del sonido en edificios, de las
+  construcciones simples y dobles a los suelos flotantes.
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
+  [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/),
+  [Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/) y
+  [Predicción del aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
+- International Organization for Standardization. (2020). *Acoustics —
+  Rating of sound insulation in buildings and of building elements — Part 1:
+  Airborne sound insulation* (ISO 717-1:2020).
+  [Catálogo iso.org](https://www.iso.org/standard/77435.html).
+  La calificación por curva de referencia y los términos de adaptación
+  espectral C y Ctr.
+  Citado por [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
+- International Organization for Standardization. (2014). *Acoustics — Field
+  measurement of sound insulation in buildings and of building elements —
+  Part 1: Airborne sound insulation* (ISO 16283-1:2014).
+  [Catálogo iso.org](https://www.iso.org/standard/55997.html).
+  El método de medición aérea en campo.
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
+- International Organization for Standardization. (1989). *Acoustics —
+  Determination of dynamic stiffness — Part 1: Materials used under floating
+  floors in dwellings* (ISO 9052-1:1989).
+  [Catálogo iso.org](https://www.iso.org/standard/16620.html).
+  El método de resonancia para la rigidez dinámica por unidad de área,
+  idéntico a EN 29052-1.
+  Citado por [Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/).
+- Hopkins, C., Wilson, R., & Craik, R. J. M. (1999). Dynamic stiffness as an
+  acoustic specification parameter for wall ties used in masonry cavity walls.
+  *Applied Acoustics 58, 51-68*.
+  [doi:10.1016/S0003-682X(98)00068-1](https://doi.org/10.1016/S0003-682X%2898%2900068-1). La medida que hay detrás de las filas de 50 mm de la Tabla A4 de
+  Hopkins: mariposa 1,7 MN/m, doble triángulo 16,1 MN/m y torsión vertical
+  94,0 MN/m. Citado por
+  [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
+- Vorländer, M. (2020). *Auralization: Fundamentals of acoustics, modelling,
+  simulation, algorithms and acoustic virtual reality* (2.ª ed.). Springer.
+  [doi:10.1007/978-3-030-51202-6](https://doi.org/10.1007/978-3-030-51202-6).
+  El modelo de fuentes imagen del apartado 1 (capítulo 11), con las
+  expresiones del factor de reflexión y del retardo. Citado por
+  [Fuentes imagen y campo estacionario de sala](/phonometry/es/buildings/rooms/room-image-sources/).
+- Allen, J. B., & Berkley, D. A. (1979). Image method for efficiently
+  simulating small-room acoustics. *The Journal of the Acoustical Society of
+  America*, 65(4), 943-950.
+  [doi:10.1121/1.382599](https://doi.org/10.1121/1.382599). La descomposición
+  por número de reflexiones de la retícula de fuentes imagen de una sala
+  rectangular que se usa en el apartado 1. Citado por
+  [Fuentes imagen y campo estacionario de sala](/phonometry/es/buildings/rooms/room-image-sources/).
 
 ## Materiales y superficies
+
+Allard y Atalla es la referencia para los medios porosos y el método de la
+matriz de transferencia, y Cox y D'Antonio para todo lo que una superficie
+dispersa en lugar de absorber. Los artículos son los modelos en sí, más o menos
+por orden de alcance: Delany y Bazley y su regresión de Miki son empíricos,
+Johnson-Koplik-Dashen y la familia JCA son fenomenológicos con parámetros
+medibles, y Maa es el panel microperforado en forma cerrada.
 
 - Allard, J. F., & Atalla, N. (2009). *Propagation of sound in porous media:
   Modelling sound absorbing materials* (2.ª ed.). Wiley.
@@ -513,49 +795,49 @@ autoridad para esa página.
   [Catálogo iso.org](https://www.iso.org/standard/32304.html).
   El método de tubo puntual y sus límites de onda plana y de espaciado.
   Citado por [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/).
+- Maa, D.-Y. (1998). Potential of microperforated panel absorber. *The Journal
+  of the Acoustical Society of America*, 104(5), 2861-2866.
+  [doi:10.1121/1.423870](https://doi.org/10.1121/1.423870). La impedancia
+  exacta del panel microperforado (Ec. 2), las correcciones de extremo, las
+  fórmulas de diseño y el ejemplo de la Fig. 5 fijado en los tests. Citado por
+  [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/)
+  y
+  [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/).
+- Jiménez, N., Romero-García, V. y Groby, J.-P. (2018). Perfect absorption of
+  sound by rigidly-backed high-porous materials. *Acta Acustica united with
+  Acustica*, 104(3), 396-409.
+  [doi:10.3813/AAA.919183](https://doi.org/10.3813/AAA.919183). La condición
+  de acoplamiento crítico aplicada a una capa de absorbente corriente de alta
+  porosidad con fondo rígido, que conecta los modelos de material poroso del
+  apartado de caracterización con la absorción perfecta a una sola frecuencia.
+  Citado por
+  [Materiales y superficies](/phonometry/es/reference/theory/materials-surfaces/).
+- Mechel, F. P. (Ed.) (2008). *Formulas of acoustics* (2.ª ed.). Springer.
+  [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
+  Apartados D.3-D.6 (reflexión en una capa, esquema multicapa, integrales de
+  campo difuso) y G.11 (relaciones porosas empíricas). Citado por
+  [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
+- Miki, Y. (1990). Acoustical properties of porous materials — Modifications
+  of Delany-Bazley models. *Journal of the Acoustical Society of Japan (E)*,
+  11(1), 19-24. [doi:10.1250/ast.11.19](https://doi.org/10.1250/ast.11.19).
+  La regresión de parte real positiva que implementa miki. Citado por
+  [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
+- Johnson, D. L., Koplik, J., & Dashen, R. (1987). Theory of dynamic
+  permeability and tortuosity in fluid-saturated porous media. *Journal of
+  Fluid Mechanics*, 176, 379-402.
+  [doi:10.1017/S0022112087000727](https://doi.org/10.1017/S0022112087000727).
+  El modelo de tortuosidad dinámica que hay detrás de la densidad efectiva
+  JCA. Citado por
+  [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
 
-## Acústica de edificios
+## Vibración y ruido estructural
 
-- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
-  ISBN 978-0-7506-6526-1.
-  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
-  El tratamiento exhaustivo del aislamiento a ruido aéreo y de impactos: las
-  cadenas de medición, la transmisión por flancos y el marco de predicción
-  EN 12354.
-  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
-  [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) y
-  [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/).
-- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
-  ISBN 978-0-415-42853-8.
-  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
-  Un manual compacto sobre la transmisión del sonido en edificios, de las
-  construcciones simples y dobles a los suelos flotantes.
-  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
-  [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/),
-  [Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/) y
-  [Predicción del aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
-- International Organization for Standardization. (2020). *Acoustics —
-  Rating of sound insulation in buildings and of building elements — Part 1:
-  Airborne sound insulation* (ISO 717-1:2020).
-  [Catálogo iso.org](https://www.iso.org/standard/77435.html).
-  La calificación por curva de referencia y los términos de adaptación
-  espectral C y Ctr.
-  Citado por [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
-- International Organization for Standardization. (2014). *Acoustics — Field
-  measurement of sound insulation in buildings and of building elements —
-  Part 1: Airborne sound insulation* (ISO 16283-1:2014).
-  [Catálogo iso.org](https://www.iso.org/standard/55997.html).
-  El método de medición aérea en campo.
-  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
-- International Organization for Standardization. (1989). *Acoustics —
-  Determination of dynamic stiffness — Part 1: Materials used under floating
-  floors in dwellings* (ISO 9052-1:1989).
-  [Catálogo iso.org](https://www.iso.org/standard/16620.html).
-  El método de resonancia para la rigidez dinámica por unidad de área,
-  idéntico a EN 29052-1.
-  Citado por [Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/).
-
-## Sonido estructural
+Cremer, Heckl y Petersson es la referencia de ruido estructural, Hopkins el
+acompañante de acústica de la edificación que lleva los datos medidos de
+uniones, y Ewins el que hay que abrir para el ensayo modal y la familia de las
+FRF. Las obras de vibración en humanos son de otra clase: sustentan las
+ponderaciones y las medidas de dosis, no la física de transmisión que tienen
+por encima.
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
   sound: Structural vibrations and sound radiation at audio frequencies*
@@ -578,7 +860,8 @@ autoridad para esa página.
   de transmisión de onda de flexión para uniones de placas.
   Citado por [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/).
 - Craik, R. J. M. (1996). *Sound transmission through buildings using
-  statistical energy analysis*. Gower. ISBN 978-0-566-07572-5.
+  statistical energy analysis*. Gower. ISBN 978-0-566-07572-8.
+  [Ficha de Open Library](https://openlibrary.org/isbn/9780566075728).
   El tratamiento SEA de la transmisión aérea y estructural en edificios, con los
   coeficientes de transmisión de onda de flexión tabulados para uniones en X, T,
   L y en línea.
@@ -627,8 +910,31 @@ autoridad para esa página.
   La caracterización por velocidad libre de fuentes montadas
   resilientemente.
   Citado por [Potencia acústica estructural de equipos](/phonometry/es/buildings/design/structure-borne-power/).
+- Griffin, M. J. (1996). *Handbook of human vibration*. Academic Press.
+  ISBN 978-0-12-303041-2.
+  [Página del editor](https://shop.elsevier.com/books/handbook-of-human-vibration/griffin/978-0-12-303041-2).
+  La monografía de referencia sobre vibración de cuerpo completo y transmitida
+  a la mano: la biodinámica, la incomodidad y la evidencia de efectos sobre
+  la salud que sustentan las ponderaciones, las medidas de dosis y la
+  orientación exposición-respuesta de las guías de vibración.
+  Citado por [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) y
+  [Vibración con choques múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/).
+- Mansfield, N. J. (2004). *Human response to vibration*. CRC Press.
+  ISBN 978-0-415-28239-0.
+  [Página del editor](https://www.routledge.com/Human-Response-to-Vibration/Mansfield/p/book/9780415282390).
+  Un manual moderno y compacto sobre las cadenas de evaluación de ISO 2631-1 e
+  ISO 5349, de la percepción y el confort a los límites de exposición
+  laborales.
+  Citado por [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/).
 
-## Sonido en exteriores y ruido ambiental
+## Medio ambiente y transporte
+
+Attenborough y Van Renterghem es la referencia moderna del sonido en exteriores
+y la fuente del material de refracción; la revisión de Embleton es el camino más
+corto hacia el efecto suelo. Los artículos de barreras son los dos extremos de
+un mismo asunto: Kurze y Anderson como el ajuste en forma cerrada que usa la
+ingeniería, y Hadden y Pierce como la solución exacta de la cuña que aquel
+aproxima.
 
 - Salomons, E. M. (2001). *Computational atmospheric acoustics*. Kluwer
   Academic Publishers. ISBN 978-1-4020-0390-5.
@@ -714,8 +1020,34 @@ autoridad para esa página.
   [Tienda IEC](https://webstore.iec.ch/en/publication/5432).
   Los valores declarados y su incertidumbre para un lote de aerogeneradores.
   Citado por [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/).
+- Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
+  (2.ª ed.). CRC Press.
+  [doi:10.1201/9780429470141](https://doi.org/10.1201/9780429470141).
+  Capítulo 11 (refracción por gradientes de viento y de temperatura, modelos
+  de rayos y zonas de sombra). ISBN 978-1-138-30655-2. Citado por
+  [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/)
+  y
+  [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/).
+- Kurze, U. J., & Anderson, G. S. (1971). Sound attenuation by barriers.
+  *Applied Acoustics*, 4(1), 35-53.
+  [doi:10.1016/0003-682X(71)90024-7](https://doi.org/10.1016/0003-682X%2871%2990024-7). El ajuste en forma cerrada al ábaco de Maekawa en función del número
+  de Fresnel. Citado por
+  [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/).
+- Hadden, W. J., & Pierce, A. D. (1981). Sound diffraction around screens and
+  wedges for arbitrary point source locations. *The Journal of the Acoustical
+  Society of America*, 69(5), 1266-1276.
+  [doi:10.1121/1.385809](https://doi.org/10.1121/1.385809). La solución exacta
+  de difracción en cuña cuyo límite de cuña plana (pantalla delgada) usa la
+  pérdida por inserción de la barrera. Citado por
+  [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/).
 
 ## Ruido de aeronaves
+
+Aquí van primero los documentos de certificación, porque la magnitud la definen
+ellos y no un libro de texto; las prácticas SAE son la maquinaria atmosférica y
+espectral a la que llaman. Lee el ECAC Doc 29 cuando la pregunta sea una curva
+de ruido alrededor de un aeropuerto y no un nivel bajo una trayectoria de
+vuelo.
 
 - International Civil Aviation Organization. (2017). *Annex 16 to the
   Convention on International Civil Aviation: Environmental protection —
@@ -802,7 +1134,13 @@ autoridad para esa página.
   El modelo de impedancia del suelo de un parámetro (resistividad de flujo).
   Citado por [Ruido de rotorcraft](/phonometry/es/aircraft/rotorcraft-noise/).
 
-## Sonido submarino
+## Acústica submarina
+
+Urick para el vocabulario y la ecuación del sonar, Ainslie para el sistema
+moderno de magnitudes que codificó ISO 18405 y para números resueltos, y Jensen
+et al. solo cuando llegues a los solvers numéricos, donde es la referencia
+habitual. François y Garrison, Ainslie y McColm, y Thorp son tres modelos de
+absorción de alcance decreciente y no tres alternativas.
 
 - Urick, R. J. (1983). *Principles of underwater sound* (3.ª ed.).
   McGraw-Hill; reimpreso en 1996 por Peninsula Publishing.
@@ -955,7 +1293,94 @@ autoridad para esa página.
   que adoptan tanto los criterios NMFS como los de Southall.
   Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/).
 
+## Fuentes y dispositivos
+
+Estas son las obras que hay detrás de la emisión, no de la inmisión. Munjal es
+la referencia de conductos y silenciadores y la fuente de la formulación por
+matrices de transferencia; Fahy es el que hay que abrir para la intensidad,
+donde la aproximación por diferencias finitas y sus errores se deducen en lugar
+de afirmarse.
+
+- Fahy, F. J. (1995). *Sound intensity* (2.ª ed.). E&FN Spon.
+  ISBN 978-0-419-19810-9.
+  [doi:10.4324/9780203475386](https://doi.org/10.4324/9780203475386).
+  La monografía sobre el flujo de energía sonora: intensidad activa y
+  reactiva, el estimador p-p y su presupuesto de error por desfase.
+  Citado por [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
+  e [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
+- International Organization for Standardization. (2019). *Acoustics —
+  Determination of sound power levels of noise sources — Guidelines for the
+  use of basic standards* (ISO 3740:2019).
+  [Catálogo iso.org](https://www.iso.org/standard/45107.html).
+  La guía de selección de la familia de potencia acústica: grados, entornos y
+  criterios de tamaño de fuente y de ruido de fondo.
+  Citado por [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Precision methods for reverberation test
+  rooms* (ISO 3741:2010).
+  [Catálogo iso.org](https://www.iso.org/standard/52053.html).
+  El método de precisión en cámara reverberante.
+  Citado por [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/).
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Engineering methods for an essentially free
+  field over a reflecting plane* (ISO 3744:2010).
+  [Catálogo iso.org](https://www.iso.org/standard/52055.html).
+  El método de ingeniería por superficie envolvente.
+  Citado por [Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/).
+- International Organization for Standardization. (2012). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Precision methods for anechoic rooms and
+  hemi-anechoic rooms* (ISO 3745:2012).
+  [Catálogo iso.org](https://www.iso.org/standard/45362.html).
+  El método de precisión en cámara anecoica.
+  Citado por [Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/).
+- International Organization for Standardization. (1996). *Acoustics —
+  Declaration and verification of noise emission values of machinery and
+  equipment* (ISO 4871:1996).
+  [Catálogo iso.org](https://www.iso.org/standard/10868.html).
+  La declaración de emisión sonora: las formas de doble/único número,
+  $L_{WAd} = L_{WA} + K_{WA}$ y la verificación de la cláusula 6.2.
+  Citado por [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+- International Organization for Standardization. (1993). *Acoustics —
+  Determination of sound power levels of noise sources using sound
+  intensity — Part 1: Measurement at discrete points* (ISO 9614-1:1993).
+  [Catálogo iso.org](https://www.iso.org/standard/17427.html).
+  Los indicadores de campo y el criterio de capacidad dinámica de la medida
+  de intensidad.
+  Citado por [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
+- International Electrotechnical Commission. (1993). *Electroacoustics —
+  Instruments for the measurement of sound intensity — Measurements with
+  pairs of pressure sensing microphones* (IEC 61043:1993; adoptada en Europa
+  como EN 61043:1994).
+  [Tienda IEC](https://webstore.iec.ch/en/publication/4353).
+  La norma de instrumentación p-p: el estimador por espectro cruzado y el
+  índice presión-intensidad residual.
+  Citado por [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
+- Munjal, M. L. (2014). *Acoustics of ducts and mufflers* (2.ª ed.). Wiley.
+  [doi:10.1002/9781118443767](https://doi.org/10.1002/9781118443767). La
+  formulación por matrices de transferencia, las matrices de cada elemento y
+  la pérdida por transmisión a partir de la matriz compuesta (Ec. (3.27)), y
+  el tratamiento de referencia de los silenciadores disipativos y combinados.
+  Citado por [Silenciadores](/phonometry/es/devices/noise-control/silencers/).
+- Novak, A., Lotton, P., & Simon, L. (2015). Synchronized swept-sine: Theory,
+  application and implementation. *Journal of the Audio Engineering Society*,
+  63(10), 786-798.
+  [doi:10.17743/jaes.2015.0071](https://doi.org/10.17743/jaes.2015.0071). La
+  condición de sincronización que convierte las fases de los armónicos en
+  propiedades del sistema, el espectro del filtro inverso en forma cerrada que
+  se usa para la deconvolución y la separación con resolución de muestra
+  fraccionaria. Citado por
+  [Distorsión con barridos y utilidades de fase](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+
 ## Simulación de ondas
+
+Esta área no tiene norma aplicable, así que su literatura es su evidencia.
+Bilbao es la puerta de entrada a los esquemas en diferencias finitas en
+acústica, Virieux la formulación elástica original en malla escalonada, y Moczo
+et al. la revisión que reúne el análisis de estabilidad y de dispersión contra
+el que se comprueban los solvers.
 
 - Williams, E. G. (1999). *Fourier acoustics: Sound radiation and nearfield
   acoustical holography*. Academic Press.
@@ -974,6 +1399,7 @@ autoridad para esa página.
 - Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
   The finite-difference and finite-element modeling of seismic wave
   propagation and earthquake motion. *Acta Physica Slovaca*, 57(2), 177-406.
+  [doi:10.2478/v10155-010-0084-x](https://doi.org/10.2478/v10155-010-0084-x).
   Los parámetros efectivos de malla en medio heterogéneo (módulo de cizalla
   armónico, densidad aritmética) y la superficie libre por imagen de
   esfuerzos.
@@ -994,179 +1420,12 @@ autoridad para esa página.
   regla de puntos por longitud de onda para las ondas de interfase.
   Citado por [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
-## Habla
-
-- Houtgast, T., & Steeneken, H. J. M. (1985). A review of the MTF concept in
-  room acoustics and its use for estimating speech intelligibility in
-  auditoria. *The Journal of the Acoustical Society of America*, 77(3),
-  1069-1077. [doi:10.1121/1.392224](https://doi.org/10.1121/1.392224).
-  El marco de transferencia de modulación sobre el que se construye el índice
-  de transmisión del habla.
-  Citado por [Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
-- French, N. R., & Steinberg, J. C. (1947). Factors governing the
-  intelligibility of speech sounds. *The Journal of the Acoustical Society of
-  America*, 19(1), 90-119.
-  [doi:10.1121/1.1916407](https://doi.org/10.1121/1.1916407).
-  Los experimentos por bandas de articulación que sustentan la función de importancia
-  de banda del índice de inteligibilidad del habla.
-  Citado por [Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/).
-- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An
-  algorithm for intelligibility prediction of time-frequency weighted noisy
-  speech. *IEEE Transactions on Audio, Speech, and Language Processing*,
-  19(7), 2125-2136.
-  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
-  STOI: el frontal común de tercios de octava, la normalización y el recorte
-  señal-distorsión, y la correlación de envolventes por banda que promedia el
-  índice.
-  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
-- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A
-  short-time objective intelligibility measure for time-frequency weighted
-  noisy speech. *2010 IEEE International Conference on Acoustics, Speech and
-  Signal Processing (ICASSP)*, 4214-4217.
-  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
-  La versión corta de congreso del STOI.
-  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
-- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
-  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
-  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
-  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
-  ESTOI: el espectrograma de tiempo corto normalizado por filas y columnas y
-  su índice intermedio de correlación espectral.
-  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
-
-## Psicoacústica
-
-- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
-  (6.ª ed.). Brill.
-  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
-  El libro de texto de referencia sobre percepción auditiva; sus páginas
-  76-77 dan el ancho de banda del filtro auditivo ERB_N de Glasberg y Moore
-  (1990) y la escala de frecuencia Cam (número ERB_N) sobre la que se
-  escriben los modelos de sonoridad.
-  Citado por [Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/).
-- Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
-  and calculation. *The Journal of the Acoustical Society of America*, 5(2),
-  82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
-  Las mediciones originales de igual sonoridad cuya isófona de 40 fonios se
-  convirtió en la curva de ponderación A.
-  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/)
-  y [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/).
-- International Organization for Standardization. (2023). *Acoustics —
-  Normal equal-loudness-level contours* (ISO 226:2023).
-  [Catálogo iso.org](https://www.iso.org/standard/83117.html).
-  Las líneas isofónicas modernas, sucesoras de las curvas de Fletcher y
-  Munson.
-  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/)
-  y [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/).
-- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
-  (3.ª ed.). Springer.
-  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
-  El modelo de molestia psicoacústica y la forma cerrada de la intensidad de
-  fluctuación para ruido de banda ancha modulado en amplitud.
-  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/),
-  [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) y
-  [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
-- Osses Vecchi, A., García León, R., & Kohlrausch, A. (2016). Modelling the
-  sensation of fluctuation strength. *Proceedings of Meetings on Acoustics*,
-  28, 050005. [doi:10.1121/2.0000410](https://doi.org/10.1121/2.0000410).
-  El modelo de señal de la intensidad de fluctuación y sus valores de la
-  Tabla 1 de la literatura.
-  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
-- Felix Greco, G., Merino-Martínez, R., Osses, A., & Lotinga, M. J. B. (2025).
-  *SQAT: a sound quality analysis toolbox for MATLAB* (software de código
-  abierto). [github.com/ggrecow/SQAT](https://github.com/ggrecow/SQAT),
-  [doi:10.5281/zenodo.7934709](https://doi.org/10.5281/zenodo.7934709).
-  La referencia abierta en MATLAB usada como oráculo numérico de las
-  comprobaciones de la intensidad de fluctuación.
-  Citado por [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
-- Ecma International. (2024). *ECMA-418-1: Psychoacoustic metrics for ITT
-  equipment — Part 1: Prominent discrete tones* (3.ª ed.).
-  [PDF gratuito](https://ecma-international.org/wp-content/uploads/ECMA-418-1_3rd_edition_december_2024.pdf).
-  Los métodos de relación tono-ruido y relación de prominencia, de descarga
-  gratuita.
-  Citado por [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/).
-- Ecma International. (2025). *ECMA-74: Measurement of airborne noise emitted
-  by information technology and telecommunications equipment* (22.ª ed.).
-  [PDF gratuito](https://ecma-international.org/wp-content/uploads/ECMA-74_22nd_edition_december_2025.pdf).
-  La norma de emisión matriz, de descarga gratuita, cuyo anexo D delega la
-  evaluación de tonos en ECMA-418-1.
-  Citado por [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/).
-- International Organization for Standardization. (2016). *Acoustics —
-  Objective method for assessing the audibility of tones in noise —
-  Engineering method* (ISO/PAS 20065:2016).
-  [Catálogo iso.org](https://www.iso.org/standard/66941.html).
-  El método de ingeniería para la audibilidad objetiva de tonos.
-  Citado por [Audibilidad objetiva de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/).
-
-## Audición y conservación auditiva
-
-- International Organization for Standardization. (2017). *Acoustics —
-  Statistical distribution of hearing thresholds related to age and gender*
-  (ISO 7029:2017). [Catálogo iso.org](https://www.iso.org/standard/42916.html).
-  El modelo por edad del umbral de audición y su dispersión poblacional.
-  Citado por [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
-- International Organization for Standardization. (2005). *Acoustics —
-  Reference zero for the calibration of audiometric equipment — Part 7:
-  Reference threshold of hearing under free-field and diffuse-field listening
-  conditions* (ISO 389-7:2005).
-  [Catálogo iso.org](https://www.iso.org/standard/38976.html).
-  El cero audiométrico como nivel de presión acústica.
-  Citado por [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
-- International Organization for Standardization. (2013). *Acoustics —
-  Estimation of noise-induced hearing loss* (ISO 1999:2013).
-  [Catálogo iso.org](https://www.iso.org/standard/45103.html).
-  El modelo de NIPTS, su distribución y la combinación HTLAN.
-  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/).
-- Passchier-Vermeer, W. (1974). Hearing loss due to continuous exposure to
-  steady-state broad-band noise. *The Journal of the Acoustical Society of
-  America*, 56(5), 1585–1593.
-  [doi:10.1121/1.1903482](https://doi.org/10.1121/1.1903482).
-  Un estudio de campo de las relaciones exposición-respuesta del ruido
-  codificadas después en la ISO 1999.
-  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/).
-- National Institute for Occupational Safety and Health. (1998). *Criteria for
-  a recommended standard: Occupational noise exposure — Revised criteria 1998*
-  (DHHS/NIOSH Publication No. 98-126).
-  [doi:10.26616/NIOSHPUB98126](https://doi.org/10.26616/NIOSHPUB98126),
-  [PDF gratuito](https://www.cdc.gov/niosh/docs/98-126/pdfs/98-126.pdf).
-  El documento de criterios de libre acceso que sustenta el límite de exposición
-  recomendado de 85 dB(A) y la discusión de conservación auditiva y umbral.
-  Citado por [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) y
-  [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
-- International Organization for Standardization. (2009). *Acoustics —
-  Determination of occupational noise exposure — Engineering method*
-  (ISO 9612:2009). [Catálogo iso.org](https://www.iso.org/standard/41718.html).
-  Las tres estrategias de medición y el presupuesto de incertidumbre del
-  anexo C.
-  Citado por [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
-- European Parliament and Council. (2003). *Directive 2003/10/EC on the
-  minimum health and safety requirements regarding the exposure of workers to
-  the risks arising from physical agents (noise)*. Diario Oficial de la Unión
-  Europea. [eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2003/10/oj/eng).
-  Los valores de exposición que dan lugar a una acción y el valor límite de la
-  UE para el ruido laboral.
-  Citado por [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
-
-## Vibración en humanos
-
-- Griffin, M. J. (1996). *Handbook of human vibration*. Academic Press.
-  ISBN 978-0-12-303041-2.
-  [Página del editor](https://shop.elsevier.com/books/handbook-of-human-vibration/griffin/978-0-12-303041-2).
-  La monografía de referencia sobre vibración de cuerpo completo y transmitida
-  a la mano: la biodinámica, la incomodidad y la evidencia de efectos sobre
-  la salud que sustentan las ponderaciones, las medidas de dosis y la
-  orientación exposición-respuesta de las guías de vibración.
-  Citado por [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) y
-  [Vibración con choques múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/).
-- Mansfield, N. J. (2004). *Human response to vibration*. CRC Press.
-  ISBN 978-0-415-28239-0.
-  [Página del editor](https://www.routledge.com/Human-Response-to-Vibration/Mansfield/p/book/9780415282390).
-  Un manual moderno y compacto sobre las cadenas de evaluación de ISO 2631-1 e
-  ISO 5349, de la percepción y el confort a los límites de exposición
-  laborales.
-  Citado por [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/).
-
 ## Metrología
+
+La GUM y sus suplementos son el marco normativo; todo lo demás de aquí sustenta
+un criterio de cualificación. Lee la GUM primero aunque la pregunta sea de
+Monte Carlo, porque el Suplemento 1 está escrito como una desviación respecto a
+ella.
 
 - Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement
   data — Guide to the expression of uncertainty in measurement* (JCGM
@@ -1193,3 +1452,17 @@ autoridad para esa página.
   para magnitudes de número único, complemento de la maquinaria general de la
   GUM.
   Citado por [Incertidumbre de medida](/phonometry/es/signals/metrology/gum-uncertainty/).
+- Wald, A., & Wolfowitz, J. (1940). On a test whether two samples are from the
+  same population. *The Annals of Mathematical Statistics*, 11(2), 147-162.
+  [doi:10.1214/aoms/1177731909](https://doi.org/10.1214/aoms/1177731909). La
+  distribución condicional exacta del número de rachas, de la que se calculan
+  las regiones de aceptación de las rachas en torno a la mediana. Citado por
+  [Calificación de datos: estacionariedad y picos](/phonometry/es/signals/metrology/data-qualification/).
+- Rice, S. O. (1945). Mathematical analysis of random noise. *The Bell System
+  Technical Journal*, 24(1), 46-156.
+  [doi:10.1002/j.1538-7305.1945.tb00453.x](https://doi.org/10.1002/j.1538-7305.1945.tb00453.x).
+  Las deducciones originales de las tasas esperadas de cruces por nivel y de
+  máximos y de la distribución de picos del ruido gaussiano que presentan
+  Bendat y Piersol en su apartado 5.5 (su Ref. 6; las partes I-II están en el
+  volumen 23, de 1944). Citado por
+  [Calificación de datos: estacionariedad y picos](/phonometry/es/signals/metrology/data-qualification/).

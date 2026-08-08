@@ -1,6 +1,6 @@
 ---
 title: "Getting Started"
-description: "Install phonometry and run your first fractional octave analysis."
+description: "Install phonometry, run your first one-third-octave analysis and calibrate it."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
@@ -8,20 +8,21 @@ import { totalChecks } from '../../../data/conformance-stats.mjs';
 
 phonometry is a Python toolkit for acoustic measurement, from fractional
 octave filter banks and frequency weighting to sound levels and standardized
-metrics. Every metric is verified against its governing standard, {totalChecks}
+metrics. Every metric is verified against its governing standard: {totalChecks}
 numerical checks in all. Install it with `pip install phonometry`; the first
-example below filters a signal into one-third octave bands and returns the
-sound pressure level of each band.
+example below filters a signal into one-third-octave bands and returns the
+sound pressure level of each band, and the section after it anchors those
+levels to a calibrator tone, which is what turns them into a measurement.
 
 ## Installation
 
-**Option 1: From PyPI (Recommended)**
+### From PyPI (recommended)
 
 ```bash
 pip install phonometry
 ```
 
-Optional extras:
+### Optional extras
 
 ```bash
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
@@ -43,7 +44,7 @@ the newest release. numba only makes the `impulse` time weighting faster, so if
 you would rather keep NumPy current, install `phonometry[plot,report]` and
 leave `[perf]` out.
 
-**Option 2: Cloning and Installing**
+### From a clone
 
 ```bash
 git clone https://github.com/jmrplens/phonometry.git
@@ -51,7 +52,7 @@ cd phonometry
 pip install .
 ```
 
-**Option 3: Git Submodule**
+### As a git submodule
 
 ```bash
 git submodule add https://github.com/jmrplens/phonometry.git
@@ -67,8 +68,24 @@ standardized bands, smooth it in time and reduce it to metrics:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="phonometry processing chain: signal, calibration, frequency weighting, octave filter bank, time weighting and metrics, with the standard verified at each stage" width="92%" loading="eager" />
 
-Each stage is an independent function or class you can use on its own; the
-guides cover them left to right ([Calibration](/phonometry/signals/metrology/calibration/) →
+Read it as a sequence of decisions rather than a fixed recipe. **Calibration
+comes first** because everything downstream is a ratio to 20 µPa, so a wrong
+scale factor shifts every later number by the same amount and nothing further
+along can detect it. **Frequency weighting** is defined by IEC 61672-1 as one
+filter applied to the broadband signal; applying band-by-band weighting
+corrections after the bank instead is a shortcut that only holds for a
+stationary signal. **The bank** decides the frequency resolution, and **the
+ballistics and the metrics** decide the time behaviour — both acting on the
+weighted signal, in that order, because exponential time weighting squares the
+signal and so does not commute with anything before it.
+
+The example in the next section runs **Signal → Octave** and nothing else: no
+calibration, so its levels are pascals by assumption rather than by measurement;
+no weighting, so they are Z (unweighted); no ballistics, so each band is one
+r.m.s. value over the whole record. "Give the samples physical meaning" below
+puts the first stage back, and each stage is an independent function or class
+you can use on its own — the guides cover them left to right
+([Calibration](/phonometry/signals/metrology/calibration/) →
 [Frequency Weighting](/phonometry/signals/levels/weighting/) → [Filter Banks](/phonometry/signals/filters/filter-banks/) →
 [Time Weighting](/phonometry/signals/levels/time-weighting/) → [Levels](/phonometry/signals/levels/levels/)).
 
@@ -93,6 +110,34 @@ print(f"Bands: {freq}")
 print(f"SPL [dB]: {spl}")
 # SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — 90.71 dB at 100 Hz and 90.95 dB at 1 kHz
 ```
+
+**The band frequencies come out as numbers, not as the labels on an analyser.**
+IEC 61260-1 places the midband frequencies on a base-10 grid,
+$f_m = 1000\cdot 10^{\,x/10b}$ with $b = 3$ for one-third octaves, which is why
+the lowest is 12.589 Hz and the highest 19952.6 Hz. The round numbers a
+hand-held meter prints are the same standard's *nominal* designations for the
+same bands: pass `nominal=True` and `freq` comes back as `['12.5', '16', …,
+'20k']`, which is what you want on an axis or in a report, while the exact
+values are what you want when computing with them. There are 33 bands because
+the default range is 12 Hz to 20 kHz; `limits=[f_min, f_max]` narrows it, and
+narrowing it is usually worth doing — see [Filter
+Banks](/phonometry/signals/filters/filter-banks/) for the grid.
+
+**Read the spectrum before trusting it.** Two of the 33 bands hold the signal:
+90.71 dB at 100 Hz and 90.95 dB at 1 kHz, both within 0.3 dB of 90.97 dB, the
+level of a unit-amplitude sine read as pascals ($20\log_{10}(0.7071/20\,\mu
+\mathrm{Pa})$). That agreement is the check that the bank is doing arithmetic
+you can defend; the small deficit at 100 Hz is the decimated band filter's
+response at its own centre, not lost energy. Everything else on the plot is the
+filter bank looking at itself: 63.79 dB at 80 Hz and 65.13 dB at 125 Hz, and
+53.18 dB at 800 Hz and 62.10 dB at 1.25 kHz, are the two tones leaking through
+the skirts of the adjacent filters, 27 to 29 dB down; the slow climb from
+46.88 dB at 12.5 Hz to 54.71 dB at 50 Hz is the far stopband of those filters
+plus the numerical floor. The rule of thumb that follows: in a band spectrum,
+treat anything more than about 40 dB below the loudest band as an artefact of
+the analysis until a background measurement says otherwise. [Filter Class
+Verification](/phonometry/signals/filters/filter-compliance/) is the mask that
+fixes how far down those skirts must be.
 
 **These are not yet physical levels.** `octave_filter` always returns
 $20\log_{10}(p_\mathrm{rms} / 20\,\mu\mathrm{Pa})$, and with the default
@@ -150,23 +195,166 @@ plt.show()
 
 </details>
 
-## Analyzing an audio file
+The same call can also draw the bank it just designed, which is what the
+`[plot]` extra is for: pass `response_plot=filters.ResponsePlot(show=True)` and
+the 33 band filters appear on one axis before the levels come back.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response, 33 bands from 12.5 Hz to 20 kHz at order 6" width="80%" />
+
+*The default bank: Butterworth, order 6, one-third octave. Each curve crosses
+−3 dB at its own band edges, which is where the skirts of the previous
+paragraph come from, and the IEC 61260-1 class 1 mask is what fixes how fast
+they fall away.*
+
+<details>
+<summary>Show the code for this figure</summary>
 
 ```python
+spl, freq = filters.octave_filter(
+    signal, fs=fs, fraction=3, response_plot=filters.ResponsePlot(show=True)
+)
+```
+
+</details>
+
+[Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/) has
+the same plate for the other four architectures.
+
+## Give the samples physical meaning
+
+The levels above are not a measurement, because nothing connected the numbers in
+the array to a pressure. That connection is a single factor $S$, the
+**sensitivity** in pascals per digital unit, and you obtain it by recording a
+calibrator of known level through the same microphone, preamplifier, interface
+and gain setting you are about to measure with. A class 1 acoustic calibrator
+produces 94 dB re 20 µPa at 1 kHz, which is $2\times10^{-5}\cdot10^{94/20} =
+1.0024$ Pa r.m.s. — not 1 Pa, a 0.02 dB difference that is worth getting right
+because it propagates into every level afterwards.
+
+```python
+# What the acquisition chain does to the pressure. This microphone, preamplifier
+# and interface together deliver 0.005 digital units per pascal; in a real
+# measurement you never know this number, which is exactly what the calibrator
+# is for.
+chain = 0.005
+
+# What the calibrator writes to disk: 3 s of 1 kHz at 94 dB re 20 uPa.
+p94 = 2e-5 * 10 ** (94.0 / 20)                       # 1.0024 Pa RMS
+calibrator = chain * np.sqrt(2) * p94 * np.sin(
+    2 * np.pi * 1000 * np.arange(3 * fs) / fs
+)
+
+# ...and the measurement: the same two tones through the same chain.
+recording = chain * signal
+
+# The sensitivity is the known pressure over the RMS of the recorded tone.
+cal = p94 / np.sqrt(np.mean(calibrator ** 2))
+print(f"{cal:.1f} Pa per digital unit")
+# 200.0 Pa per digital unit
+
+spl, bands = filters.octave_filter(
+    recording, fs=fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
+)
+print(f"{bands[9]} Hz: {spl[9]:.2f} dB SPL, {bands[19]}: {spl[19]:.2f} dB SPL")
+# 100 Hz: 90.71 dB SPL, 1k: 90.95 dB SPL
+```
+
+Two things are worth noticing. The calibrated levels are **the same numbers as
+in the first analysis**, because the synthetic signal there was defined in
+pascals and this recording is that same field seen through a chain the
+calibrator has now undone — but this time they are decibels re 20 µPa because a
+measurement put them there, not because we assumed it. And the same recording
+read without the factor gives 44.93 dB in the 1 kHz band, 46.0 dB low: an
+uncalibrated level is not approximately right, it is off by whatever the gain
+staging happened to be.
+
+In practice you do not divide by hand. `metrology.sensitivity(calibrator,
+target_spl=94.0, fs=fs)` returns the same factor and, on the way, checks the
+recorded tone's short-term stability the way IEC 60942 qualifies the calibrator
+itself, so a badly coupled microphone is caught here instead of silently
+corrupting every level downstream. [Calibration and
+dBFS](/phonometry/signals/metrology/calibration/) carries that call, the
+pre/post drift rule and the digital dBFS alternative for signals that never had
+a physical scale.
+
+## One number instead of thirty-three
+
+A meter shows one level, not a spectrum. On a calibrated signal that level is
+one line, because the A weighting and the energy average are both defined on
+the broadband pressure:
+
+```python
+weighted = filters.weighting_filter(cal * recording, fs, curve="A")
+laeq = 10 * np.log10(np.mean(weighted ** 2) / (2e-5) ** 2)
+print(f"LAeq = {laeq:.2f} dB(A)")
+# LAeq = 91.03 dB(A)
+```
+
+The unweighted level of the same second is 93.98 dB: A weighting takes almost
+3 dB off, essentially all of it from the 100 Hz tone, which the curve attenuates
+by about 19 dB. `signals.laeq(recording, fs, calibration_factor=cal)` is the
+one-line form of the two lines above and applies the weighting internally, so
+never A-weight the signal first and then pass it to a level function — that
+weights it twice. The Fast and Slow envelopes, $L_{AE}$, $L_{Cpeak}$ and the
+percentile levels are the same kind of call: [Time
+Weighting](/phonometry/signals/levels/time-weighting/) and [Integrated and
+Statistical Levels](/phonometry/signals/levels/levels/) have them, and [Build a
+sound level meter](/phonometry/signals/sound-level-meter/) runs the whole chain
+from a calibrator tone to all of them on one page.
+
+## Analyzing an audio file
+
+A real measurement is **two** recordings, not one, and the conditions under
+which they are made decide what the levels are worth:
+
+- **Same chain, nothing touched in between.** Record the calibrator tone first,
+  then the measurement, through the same microphone, preamplifier, interface and
+  gain. Lock the gain before the calibrator tone and never move it again: the
+  factor is only valid while the chain stays as it was calibrated, and a touched
+  gain knob is a larger error than any drift.
+- **Keep peaks 10–12 dB below full scale, and switch off everything automatic.**
+  Automatic gain control, noise suppression, limiting and interface EQ all
+  change the level as a function of the level, so a processed sample can no
+  longer be turned into a sound pressure level. A clipped one cannot either.
+- **Record at 48 kHz or more.** At 44.1 kHz the bands above $f_s/2$ are dropped:
+  the bank returns 32 bands ending at 15848.9 Hz instead of the 33 ending at
+  19952.6 Hz shown above, and says so with a `PhonometryWarning`.
+- **Repeat the calibrator check at the end.** The pre/post difference is the
+  drift bound for everything captured in between, and a common criterion
+  invalidates the series when it exceeds 0.5 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup.svg" alt="Calibration chain: sound calibrator coupled on the microphone at 94.0 dB and 1 kHz, preamplifier, audio interface and the sensitivity that converts digital units into pascals" width="92%" />
+
+*The first of the two recordings: the calibrator coupled onto the capsule at
+94.0 dB / 1 kHz, through the same preamplifier and interface as the measurement
+that follows, producing the pascals-per-digital-unit factor everything
+downstream depends on.*
+
+```python
+import numpy as np
 from scipy.io import wavfile
 from phonometry import filters
 
-# Load standard WAV file
+# Both files come from the same chain, in this order, with nothing touched.
+fs, calibrator = wavfile.read("calibrator.wav")
 fs, signal = wavfile.read("measurement.wav")
 
 # wavfile.read returns (samples, channels); the bank expects (channels, samples)
+if calibrator.ndim > 1:
+    calibrator = calibrator[:, 0]
 if signal.ndim > 1:
     signal = signal[:, 0]        # measurement microphone on channel 1
 
-# Analyze
-# Note: To obtain real-world SPL values, you must calibrate the input.
-# See the Calibration guide.
-spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+# Sensitivity in pascals per digital unit, from the 94 dB calibrator tone.
+# metrology.sensitivity(calibrator, target_spl=94.0, fs=fs) is the library call,
+# and it validates the tone's stability as well.
+cal = 2e-5 * 10 ** (94.0 / 20) / np.sqrt(np.mean(calibrator.astype(float) ** 2))
+
+spl, freq = filters.octave_filter(
+    signal, fs=fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
+)
 ```
 
 **Reduce a multichannel file to the channel you measured with, or transpose it.**
@@ -191,6 +379,20 @@ integer format* already carries the factor. Mixing the two — a float-read
 calibrator and an integer-read measurement, or the reverse — is wrong by 90 dB
 with no symptom. The rules are in
 [Calibration and dBFS](/phonometry/signals/metrology/calibration/).
+
+**One number per band, over the whole file.** `octave_filter` returns a single
+r.m.s. level per band for the entire array, with the mean removed first
+(`detrend=True`); it answers "how much energy was in each band during this
+recording", which is the right question for a steady source and the wrong one
+for anything that changes. A pass-by, a machine that cycles or a room that
+someone walks through comes back as an energy average nobody asked for. If the
+level moves during the record, slice the signal and call the bank per slice, or
+take the standard route and use the exponential Fast/Slow ballistics that a
+sound level meter shows; `mode="peak"` gives the band peak instead of the
+average, and a band peak is not $L_{Cpeak}$. There is a floor on the other side
+too: a band filter needs several cycles of its own centre frequency to settle,
+so a one-second record says very little about the 12.5 or 16 Hz bands however
+many digits come back.
 
 ## Where to go next
 

@@ -62,10 +62,7 @@ be read first if helicopters are what you came for.
 The three metrics are not interchangeable. EPNL is a *certification* metric of
 one aeroplane at one prescribed point; SEL and LASmax are *single-event*
 assessment metrics at an arbitrary receiver; neither is the long-term index a
-land-use study is finally judged on. And the boundary: this section does not
-compute cumulative multi-event indices, does not synthesise NPD tables from
-engine data, does not model hover, idle or taxi rotorcraft operations, and does
-not touch sonic boom.
+land-use study is finally judged on.
 
 ## Pages in this section
 
@@ -80,3 +77,44 @@ not touch sonic boom.
 - [The ANP fleet database](/phonometry/aircraft/anp-fleet/): the EASA tables of
   noise-power-distance curves and default trajectories that run the Doc 29
   chain for a real aircraft type.
+
+## What this section does not cover
+
+**Single events only.** The Doc 29 chain builds single-event contours; it does
+not assemble the cumulative multi-event indices — an Lden-style sum over a full
+flight schedule — that a complete noise-contour study needs on top of them. That
+last step is where a land-use decision is actually made, and it is not here.
+
+**No aircraft is modelled from first principles.** NPD tables and noise
+hemispheres are *inputs*: the library interpolates the tables published for a
+type and does not synthesise them from engine data, and the ANP database is read
+and never written (version 2.3 ships as-is). Of the ANP entries, only those with
+fixed-point profiles have a ready-to-use trajectory, because turning a
+procedural-step departure into a flight path needs the ICAO Doc 9911
+flight-mechanics performance model, which is not implemented.
+
+**Three specific gaps.** Rotorcraft hover, idle and taxi operations are outside
+the hemisphere source model, which assumes a flyover. The measurement-system
+verifier checks IEC 61265:1995 and not the superseding 2018 edition. And sonic
+boom is not touched anywhere in the library.
+
+Finally, the CNOSSOS-EU aircraft source of sections 2.6 and 2.7 is **not**
+implemented: aircraft noise here is the ICAO and ECAC family, which is a
+different set of models from the road and rail sources of [Environmental
+sources](/phonometry/environment/sources/), and the two must not be mixed inside
+one strategic map without saying so.
+
+## Before and after these pages
+
+Every level on these pages is built from band levels, so the filtering,
+weighting and calibration that produce them are in [Signal
+analysis](/phonometry/signals/), and [Build a sound level
+meter](/phonometry/signals/sound-level-meter/) runs that chain end to end on
+one runnable page. The derivations for aircraft noise are not in the theory
+reference: they stay inside the guides above, beside the flight geometry that
+motivates them.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](/phonometry/start/tasks/) indexes it by the job
+and [All guides](/phonometry/start/guides/) lists every page with a line on
+each.

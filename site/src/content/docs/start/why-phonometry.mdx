@@ -1,10 +1,10 @@
 ---
 title: "Why phonometry"
-description: "The conformance-first design philosophy: an IEC 61672-1 time-weighting case study, the numerical conformance suite, and comparison with other libraries."
+description: "The conformance-first design philosophy: an IEC 61672-1 time-weighting case study, the numerical conformance suite, the registry of defects found in the published standards themselves, and how phonometry compares with other Python libraries."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
-import { totalChecks, domains, standards } from '../../../data/conformance-stats.mjs';
+import { totalChecks, domains, standards, errataEntries } from '../../../data/conformance-stats.mjs';
 
 phonometry is a standards-based acoustic measurement toolkit. Its
 differentiator is not the list of features but how they are built: every
@@ -40,6 +40,29 @@ weighting" means: past events are forgotten exponentially. A pole on the
 positive real axis grows without bound; block-resetting hides this but changes
 the measurement's nature.
 
+That equation is also where the reference numbers of the next section come
+from, which is worth doing once rather than taking Table 4 on faith. Integrate
+it from rest over a burst of duration $T_b$ and the envelope reaches
+$(1-e^{-T_b/\tau})$ of the steady value the same tone would eventually produce,
+so the maximum time-weighted level relative to steady state is
+
+$$
+\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_b/\tau}\right)
+$$
+
+which is IEC 61672-1:2013 Equation (7). With $\tau_F = 0.125$ s that gives
+−0.98 dB at 200 ms, −4.82 dB at 50 ms, −11.14 dB at 10 ms and −20.99 dB at
+1 ms: the whole "IEC target" column of Table 4, to the standard's own rounding.
+CI asserts the identity for every Fast and Slow row
+(`test_delta_ref_equation7_consistency`, to within 0.15 dB), so the
+transcription of the table is itself checked rather than trusted.
+
+The consequence carries the rest of this page. Because the response is a smooth
+function of $T_b/\tau$, a detector that really solves the equation tracks the
+whole column at once; a detector that averages over fixed 125 ms blocks has no
+$T_b$ in it at all, and can only be right where the burst happens to fill a
+block.
+
 ## Verification against IEC 61672-1 (tone bursts)
 
 The rigorous test for time weighting is the **Tone Burst Response**
@@ -63,7 +86,7 @@ numbers below verify the *ballistics*, not a complete instrument. The same
 reference values are transcribed in `tests/filters/test_iec_compliance.py` for F
 and S and for the $L_{AE}$ column.
 
-**phonometry results (FAST):**
+**phonometry results (Fast weighting):**
 
 | Burst duration | IEC target (dB) | Class 1 limit (dB) | phonometry (dB) | Error (dB) | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -72,8 +95,8 @@ and S and for the $L_{AE}$ column.
 | 10 ms | −11.1 | ±1.0 | −11.14 | −0.04 | ✅ PASS |
 | 1 ms | −21.0 | +1.0 / −2.0 | −20.99 | +0.01 | ✅ PASS |
 
-**python-acoustics results (FAST, squared signal passed as required by that
-library):**
+**python-acoustics results (Fast weighting, squared signal passed as that
+library requires):**
 
 | Burst duration | IEC target (dB) | Class 1 limit (dB) | python-acoustics (dB) | Error (dB) | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -118,6 +141,17 @@ phonometry rows can be reproduced directly.
 
 ## Conformance testing across the library
 
+A word on what a **performance class** is, since every verdict on this page is
+one. In IEC 61672-1 and IEC 61260-1 a class is not a grade of accuracy but a
+named tolerance corridor around a nominal response: class 1 is the narrow
+corridor intended for precision work, class 2 the wider one for general survey
+use, and both widen at the extremes of the frequency range, where they are
+hardest to meet. Class 0 was a narrower corridor still, in the withdrawn 1995
+edition of IEC 61260, and is kept here as a voluntary extra target for the
+default Butterworth bank. So a PASS on this page means the computed response
+never leaves the corridor the standard draws; it does not mean the error is
+zero, and the size of the margin is the interesting number.
+
 The tone-burst case above is not an isolated check. For each standard the
 library implements, the reference values and acceptance limits are transcribed
 from the official text into the test suite, so any regression fails CI. A
@@ -134,6 +168,7 @@ sample from the metrology core:
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
+| IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()` | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite
 runs {totalChecks} numerical conformance checks across {domains} domains and {standards} standards,
@@ -145,15 +180,19 @@ The full numerical report (the expected value and the value the
 library computes for every check, regenerated on every pull request) is
 published as [the conformance report](/phonometry/reference/conformance/).
 
-Beyond IEC 61252-style noise dose (`sound_exposure()`, `lex_8h()`), the same
-standards-first mindset shows up in the numerics: filter banks place their
-−3 dB points on the **ANSI S1.11 / IEC 61260-1** band edges for every
-architecture (including Chebyshev II and Bessel, where scipy's raw
-parametrization would not), the default Butterworth bank is checked against
-the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
-as well as the current class 1, and A/C weighting stays within class 1
-tolerances up to 16 kHz at common audio rates via internal oversampling (see
-[Frequency Weighting](/phonometry/signals/levels/weighting/)).
+The same standards-first habit shows up below the level of whole metrics, in
+the numerics. Filter banks place their −3 dB points on the **ANSI S1.11 /
+IEC 61260-1** band edges for the three architectures whose parametrization
+allows it, Butterworth, Chebyshev II and Bessel, the last two through
+corrections scipy's raw parametrization would not apply; Chebyshev I and
+elliptic read the same edges as their equiripple passband edge instead, which
+is stated with its measured cost on [Filter
+Banks](/phonometry/signals/filters/filter-banks/). The default Butterworth bank
+is checked against the stricter class 0 of the withdrawn IEC 61260:1995 /
+ANSI S1.11-2004 edition as well as the current class 1. And A/C weighting stays
+inside class 1 tolerances up to 16 kHz at common audio rates through internal
+oversampling (see [Frequency
+Weighting](/phonometry/signals/levels/weighting/)).
 
 ## When the source is what is wrong
 
@@ -170,9 +209,9 @@ the exact location, what the document says, why it cannot be right, the
 independent evidence and the reading the library implements. Where that reading
 changes a number the library reports, the entry names the check or test that
 pins it; where it does not, because the defect is a label, a cross-reference or
-a table the library never reads, the entry says so instead. There are dozens of them now, across standards,
-guidance documents, textbooks and journal papers, each marked as reported to
-the issuing body or not. A defect listed there is never a defect of the
+a table the library never reads, the entry says so instead. There are
+{errataEntries} of them now, across standards, guidance documents, textbooks
+and journal papers, each marked as reported to the issuing body or not. A defect listed there is never a defect of the
 method: in every case the intended reading could be established from the
 document itself or from physics.
 
@@ -183,7 +222,7 @@ nothing in the port ever notices.
 ## Where phonometry fits in the Python ecosystem
 
 - **python-acoustics** was archived in February 2024 and is no longer
-  maintained. Its comparison above reflects the last released code.
+  maintained; the comparison above was run against its last released version.
 - **acoustic-toolbox**, the community successor to python-acoustics, builds
   its IEC 61672-1 time and frequency weighting on `pyoctaveband`, the former
   name of this library, which since 2.1.0 is a shim over phonometry. It is only

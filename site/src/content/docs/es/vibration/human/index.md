@@ -15,8 +15,10 @@ especial que la rompe.
 general. Cubre las ponderaciones frecuenciales de cuerpo completo y
 mano-brazo de **ISO 8041-1**, la aceleración r.m.s. ponderada y las medidas
 móviles y de dosis de **ISO 2631-1** (MTVV, VDV, MSDV, factor de cresta) que
-delatan los choques que un r.m.s. simple esconde, la vibración en edificios
-según ISO 2631-2, el valor total de vibración mano-brazo y la exposición
+delatan los choques que un r.m.s. simple esconde, la ponderación `Wm`
+independiente de la dirección que la **ISO 2631-2** prescribe para los ocupantes
+de edificios en todos los ejes, el valor total de vibración mano-brazo y la
+exposición
 diaria A(8) de **ISO 5349-1/-2**, y los valores de acción y límite de la
 **Directiva 2002/44/CE** que dan sentido legal a A(8).
 
@@ -30,14 +32,18 @@ partir de los picos de respuesta y la convierte en tensión de compresión
 sobre los platillos vertebrales y en una probabilidad de lesión lumbar a lo
 largo de una vida laboral.
 
-Usa primero las métricas de ISO 2631-1; cuando el factor de cresta o el VDV
-avisen de que dominan los choques, ISO 2631-5 es la continuación dedicada: su
-modelo de la cláusula 5, implementado aquí, cubre los choques severos con
-posible pérdida de contacto con el asiento, mientras que las exposiciones
-menos severas en las que el ocupante permanece sentado corresponden a su
-modelo de elementos finitos del Anexo A. El frontal de medida (filtros de ponderación, análisis en bandas)
-se comparte con la sección de
-[análisis de señal](/phonometry/es/signals/).
+Usa primero las métricas de la ISO 2631-1, y deja que dos números decidan
+cuándo pasar a otra cosa. Un **factor de cresta por encima de 9** dice que el
+método básico del valor eficaz ponderado ya no es adecuado para ese registro,
+que es el disparador de la ISO 2631-1 para echar mano de las medidas móviles y
+de dosis. Una **aceleración de pico vertical limitada en banda por encima de
+9,81 m/s²** — 1 g, el umbral de caída libre — sitúa la exposición en el régimen
+de la cláusula 5 de la ISO 2631-5, los choques severos con posible pérdida de
+contacto con el asiento que esta biblioteca implementa, y no en su modelo de
+elementos finitos del Anexo A para exposiciones en las que el ocupante
+permanece sentado. El frontal de medida (filtros de ponderación, análisis en
+bandas) se comparte con la sección de [análisis de
+señal](/phonometry/es/signals/).
 
 ## Páginas de esta sección
 
@@ -47,3 +53,29 @@ se comparte con la sección de
 - [Vibración con choques múltiples (ISO 2631-5)](/phonometry/es/vibration/human/multiple-shock-vibration/):
   el modelo de respuesta espinal, la dosis de aceleración y la probabilidad
   de lesión lumbar.
+
+## Qué no cubre esta sección
+
+**Aquí no se somete a ensayo de tipo ningún vibrómetro.** El objeto propio de la
+ISO 8041-1 — el diseño y el ensayo de tipo de los vibrómetros de uso general
+para vibración en humanos — no está implementado; de ella solo se toman las
+definiciones de las ponderaciones frecuenciales, así que aquí nada asigna una
+clase a un instrumento.
+
+**La vibración en edificios se queda en la ponderación.** De la ISO 2631-2 la
+biblioteca implementa la curva `Wm` independiente de la dirección y nada más, y
+eso está más cerca de la norma de lo que parece: la edición de 2003 suprimió a
+propósito los valores orientativos de su predecesora, así que no hay magnitudes
+admisibles de vibración en edificios con las que comparar. Quien busque un
+límite no lo encontrará aquí, y tampoco lo encontrará en la norma.
+
+**De la ISO 2631-5, solo el modelo de la cláusula 5.** El modelo de elementos
+finitos del Anexo A para exposiciones sentadas menos severas lo distribuye ISO
+por separado y no está implementado, que es lo que convierte la delimitación de
+1 g de más arriba en una decisión de encaminamiento y no en una preferencia.
+
+Y no se emite ningún veredicto de exposición. Los valores de acción y límite de
+la Directiva 2002/44/CE se enuncian para poder contrastar un A(8) con ellos,
+pero la biblioteca no aplica ninguna transposición nacional de la directiva, y
+una conclusión de evaluación de riesgos no es un número que produzca esta
+sección.

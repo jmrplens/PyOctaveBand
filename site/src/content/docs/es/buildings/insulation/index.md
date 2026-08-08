@@ -95,3 +95,36 @@ emparentada EN 12354-5, vive en
 - [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/buildings/insulation/spanish-building-code/):
   las magnitudes globales RA, RA,tr, DnT,A y D2m,nT,Atr del DB HR, las
   exigencias del apartado 2 y la corrección por tamaño de ventana.
+
+## Qué no cubre esta sección
+
+**La biblioteca empieza después del micrófono.** Cada función de aquí toma
+niveles por bandas que ya se han promediado en energía sobre las posiciones y ya
+se han corregido por ruido de fondo, y nada verifica cómo se hizo la medición:
+ni el número y la colocación de las posiciones de fuente y de micrófono, ni los
+procedimientos de baja frecuencia de ISO 16283-1/-2, ni el suelo de 6 dB de
+señal frente al ruido de fondo, ni los requisitos de instalación de ensayo y de
+montaje de ISO 10140-1. Eso es cosa del operador y del informe, y es lo que hace
+que los números de aquí signifiquen algo. Dos consecuencias que conviene
+nombrar: las correcciones por ruido de fondo de campo y de laboratorio son
+reglas *distintas*, así que una función auxiliar de laboratorio no debe
+aplicarse a datos de campo; y la vía de intensidad toma como entradas tanto el
+nivel de presión como el de intensidad, con la sonda de barrido y su calibración
+del desajuste de fase fuera de la biblioteca.
+
+**La cobertura dentro de las normas es parcial en dos sitios.** De ISO 10848
+solo están implementadas de forma genérica las fórmulas de la parte 1, más la
+comprobación de validez por solape modal de la parte 4, no los montajes
+específicos de instalación de las partes 2, 3 y 4. Del código español solo están
+implementadas las magnitudes de verificación: las tablas de soluciones de la
+opción simplificada del apartado 3, las condiciones de ejecución del apartado 5
+y las condiciones de mantenimiento del apartado 6 quedan fuera de alcance, y la
+vía de cálculo de la opción general es
+[Predicción del aislamiento acústico](/phonometry/es/buildings/design/insulation-prediction/).
+
+**Y no hay ninguna predicción de impacto pesado.** Una solución constructiva de
+forjado se puede llevar hasta un nivel de máquina de impactos con los modelos de
+[Diseño del aislamiento](/phonometry/es/buildings/design/); nada hace lo mismo
+para la pelota de caucho, porque la complejidad de la fuerza de entrada y el uso
+de un máximo con ponderación temporal no dejan ningún equivalente sencillo. La
+página de impacto pesado valora una medición, y solo una medición.

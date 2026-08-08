@@ -83,7 +83,7 @@ head:
             "@type": "ListItem",
             "position": 10,
             "name": "Wave simulation",
-            "description": "A deterministic 2D FDTD solver, validated against analytic oracles rather than a standard.",
+            "description": "Deterministic 2D FDTD solvers, acoustic and elastic P-SV, validated against analytic oracles rather than a standard.",
             "url": "https://jmrplens.github.io/phonometry/simulation/"
           }
         ]
@@ -111,6 +111,19 @@ docstrings and is not repeated here. Derivations, design decisions and the
 numerical evidence live in [Reference](/phonometry/reference/): the theory
 pages explain why a formula is the one it is, and the conformance report shows
 the standard's own expected value next to the computed one.
+
+A third pointer, for anyone arriving with a measurement to make rather than a
+number to compute. Where a method needs a physical arrangement, its guide
+carries an engineering setup diagram with the geometry the standard prescribes:
+source and microphone positions, separations, mounting, and the specimen or the
+enclosing surface. [Field Insulation Measurement](/phonometry/buildings/insulation/insulation-field/)
+draws the ISO 16283-1 room pair that way, and
+[Impedance Tube](/phonometry/materials/absorbers/impedance-tube/) draws the
+ISO 10534-2 tube with both microphone spacings. The prediction and rating
+guides take element or material data as their input instead and need no
+facility, which is usually the fastest way to tell the two kinds of page apart.
+[What do you need to measure?](/phonometry/start/tasks/) sorts the same guides
+by the job rather than by the topic.
 
 ## [Signal analysis](/phonometry/signals/)
 
@@ -158,11 +171,13 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
   SEL, and the noise dose.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
-  residual-noise correction and the uncertainty budget.
+  residual-noise correction and the uncertainty budget. It lives under
+  Environment and transport, and is repeated here because it is the level
+  definitions above aggregated over a day.
 - [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/):
   the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
   evaluation periods and noise phases, the limit tables and the Article 25
-  compliance check.
+  compliance check. It lives under Environment and transport too.
 
 **[Signals and spectra](/phonometry/signals/spectra/)**
 
@@ -185,7 +200,9 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
   the kinematic fault-frequency families of rotating machinery (Norton &
   Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
   BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
-  slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
+  slip, pole-pass and rotor-slot harmonics, and blade-passing tones. It lives
+  under Vibration and structure-borne sound, and is repeated here because it is
+  the envelope spectrum above put to work.
 - [Correlation, time delay and envelope](/phonometry/signals/spectra/correlation-delay/):
   correlation with its random errors, time-delay estimation by direct
   correlation and the GCC weightings, and the Hilbert envelope.
@@ -346,7 +363,16 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
   wall lining.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
   the stiffness per unit area under a floating floor from the load-plate
-  resonance, with the enclosed-gas term.
+  resonance, with the enclosed-gas term. It lives under Materials and surfaces,
+  and is repeated here because it is the input the layer models above ask for.
+- [Structure-borne sound power of equipment (EN 15657)](/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities:
+  equivalent blocked force, free velocity and source mobility. Also listed under
+  Vibration, beside the mobilities it is built from.
+- [Installed structure-borne sound (EN 12354-5)](/phonometry/buildings/design/installed-structure-borne/):
+  the coupling term from source and receiver mobilities, the installed power and
+  the per-path sound pressure level in the receiving room. Also listed under
+  Vibration.
 
 ## [Materials and surfaces](/phonometry/materials/)
 
@@ -383,12 +409,16 @@ ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 and ISO 12999-2.
   sequences.
 - [In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/):
   in-situ road-surface absorption by the subtraction technique and the spot
-  method.
+  method. It is the only guide of the [surfaces measured in
+  place](/phonometry/materials/surfaces/) overview, which the sidebar files in
+  this same group.
 
-The third group of this area, Resilient layers, has one guide,
-[Dynamic stiffness of resilient materials](/phonometry/materials/resilient/dynamic-stiffness/),
-listed above under Insulation design beside the floating-floor prediction that
-consumes it.
+**[Resilient layers](/phonometry/materials/resilient/)**
+
+- [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
+  the stiffness per unit area under a floating floor from the load-plate
+  resonance, with the enclosed-gas term. Also listed under Rooms and buildings,
+  beside the floating-floor prediction that consumes it.
 
 ## [Vibration and structure-borne sound](/phonometry/vibration/)
 
@@ -413,13 +443,18 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
   and indirect methods.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
   the radiated power from the surface-averaged velocity level and the radiation
-  factor, with the Part 1 upper limit and the Part 2 engineering value.
+  factor, with the Part 1 upper limit and the Part 2 engineering value. It lives
+  under Sources and devices, and is repeated here because its input is a
+  measured surface velocity.
 - [Structure-borne sound power of equipment (EN 15657)](/phonometry/buildings/design/structure-borne-power/):
   the reception-plate method and the plate-independent source quantities,
-  equivalent blocked force, free velocity and source mobility.
+  equivalent blocked force, free velocity and source mobility. It lives under
+  Rooms and buildings, and is repeated here because the source quantities are
+  mobilities.
 - [Installed structure-borne sound (EN 12354-5)](/phonometry/buildings/design/installed-structure-borne/):
   the coupling term from source and receiver mobilities, the installed power
-  and the per-path sound pressure level in the receiving room.
+  and the per-path sound pressure level in the receiving room. It lives under
+  Rooms and buildings, for the same reason.
 
 **[Human vibration](/phonometry/vibration/human/)**
 
@@ -430,6 +465,13 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
   the seat-to-spine transfer function, the acceleration dose, and the
   cumulative stress variable behind the lumbar injury probability.
 
+**[Machinery](/phonometry/vibration/machinery/)**
+
+- [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
+  the characteristic bearing, gear and shaft frequencies and the envelope
+  analysis that finds them under the broadband noise of a running machine.
+  Also listed under Signal analysis, beside the spectral estimators it uses.
+
 ## [Environment and transport](/phonometry/environment/)
 
 Outdoor propagation, barriers, refraction, road, rail and wind-turbine
@@ -438,6 +480,16 @@ has to travel a long way before it is assessed, so the atmosphere, the ground
 and the source's own motion all enter the answer. Implements ISO 9613-1/-2,
 ISO 1996-1/-2, ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (2002/49/EC Annex II)
 and IEC 61400-11.
+
+One scope boundary is worth stating here rather than one click away. Of
+CNOSSOS-EU, what is implemented is the **source** side of Annex II: the road
+emission of section 2.2 with the Appendix F coefficients, and the railway
+emission of section 2.3 with Appendix G, which give the directional sound power
+per metre of source line. The propagation calculation of section 2.5, with its
+own ground, diffraction and favourable-conditions machinery, is **not**
+implemented; outdoor attenuation here goes through the ISO 9613-2 chain
+instead, which is a different model and not interchangeable with it for
+regulatory mapping.
 
 **[Outdoor sound](/phonometry/environment/propagation/)**
 
@@ -470,9 +522,14 @@ and IEC 61400-11.
   the predicted prominence of each impulse from its onset rate and level
   difference, and the adjustment added to $L_{Aeq}$.
 
-The two remaining guides of this group, [Environmental Levels](/phonometry/environment/assessment/environmental-levels/)
-and [Spanish Noise Regulation](/phonometry/environment/assessment/spanish-noise-regulation/),
-are listed above under Signal analysis, beside the level definitions they build on.
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/assessment/environmental-levels/):
+  $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
+  residual-noise correction and the uncertainty budget. Also listed under
+  Signal analysis, beside the level definitions it builds on.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/):
+  the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
+  evaluation periods and noise phases, the limit tables and the Article 25
+  compliance check. Also listed under Signal analysis, for the same reason.
 
 ## [Aircraft noise](/phonometry/aircraft/)
 
@@ -512,7 +569,6 @@ JOMOPANS-ECHO.
 - [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/):
   the normal-mode, ray-tracing and parabolic-equation solvers of the
   stratified waveguide, and how to choose a propagation model.
-
 - [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/):
   the hearing side of that noise: the group audiograms, the regulatory weighting
   functions with their guidance version, and the exposure of a pile-driving
@@ -539,6 +595,11 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
   the direct and comparison methods of ISO 3741.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+- [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
+  the fourth determination route, for the machine that cannot be moved into a
+  qualified room: the radiated power from the surface-averaged velocity level
+  and the radiation factor, with the Part 1 upper limit and the Part 2
+  engineering value. Also listed under Vibration.
 
 **[Electroacoustics](/phonometry/devices/electroacoustics/)**
 
@@ -553,9 +614,12 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Swept-sine distortion and phase utilities](/phonometry/devices/electroacoustics/swept-sine-distortion/):
   harmonic separation from one exponential sweep, THD against excitation
   frequency, and minimum phase, group delay and excess phase.
+**[Broadcast](/phonometry/devices/broadcast/)**
+
 - [Programme loudness and true peak](/phonometry/devices/broadcast/program-loudness/):
   K-weighting and gated integrated loudness in LUFS, the momentary and
-  short-term meters, the loudness range and the true-peak level.
+  short-term meters, the loudness range and the true-peak level. The sidebar
+  files it inside Electroacoustics; it has its own section overview.
 
 **[Noise control](/phonometry/devices/noise-control/)**
 

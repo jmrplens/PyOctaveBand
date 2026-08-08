@@ -6,9 +6,10 @@ description: "Calificar y diseñar superficies por lo que reflejan: los coeficie
 Donde la subsección de
 [Absorbentes](/phonometry/es/materials/absorbers/) pregunta cuánta
 energía retira un material del campo, esta pregunta qué hace una *superficie*
-con el sonido que devuelve: cuánto lanza fuera de la dirección especular, con
-qué uniformidad lo reparte y, sobre un pavimento, cuánto absorbe allí donde
-ningún laboratorio puede llegar. Tres guías recorren ese terreno.
+con el sonido que devuelve: cuánto lanza fuera de la dirección especular y con
+qué uniformidad lo reparte. Dos guías recorren ese terreno, y una tercera
+familia de medidas de superficie — los pavimentos caracterizados allí donde
+están — tiene su propia subsección anidada dentro de este grupo.
 
 [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/) es el núcleo
 de medida y diseño: el **coeficiente de dispersión** de incidencia aleatoria
@@ -27,12 +28,10 @@ estado `0` perfectamente absorbente que necesitan las secuencias ternarias.
 El diseño de residuo cuadrático publicado se evalúa de principio a fin, de la
 cadena de matrices de transferencia a la validación cruzada FDTD.
 
-[Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/)
-saca la pregunta de la absorción al exterior: la técnica de sustracción de
-ISO 13472-1 separa las componentes incidente y reflejada por el firme de un
-impulso con la ventana de Adrienne, y el tubo puntual de ISO 13472-2 apoya un
-tubo de impedancia portátil sobre el pavimento para superficies reflectantes,
-con la elección entre ambos métodos explicada.
+[Superficies medidas in situ](/phonometry/es/materials/surfaces/) saca la
+pregunta de la absorción al exterior, a las superficies que no tienen probeta:
+cubre la técnica de sustracción de ISO 13472-1 y el tubo puntual de
+ISO 13472-2, y la decisión entre ambos.
 
 Los vecinos están cerca: los paneles difusores son parientes de superficie de
 los [metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/)
@@ -55,6 +54,26 @@ métodos de firmes sirven al interés por el ruido exterior de
 
 Páginas de otras áreas del sitio en las que se apoya esta sección:
 
-- [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
+- [Superficies medidas in situ](/phonometry/es/materials/surfaces/) y su guía
+  [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la técnica de sustracción de ISO 13472-1 y el método puntual de
   ISO 13472-2.
+
+## Qué no cubre esta sección
+
+Los dos modelos de predicción de aquí son **estimaciones de diseño, no
+mediciones**. El campo lejano de Fraunhofer que comparten las páginas de
+difusores y metadifusores pierde exactitud en baja frecuencia, a incidencias
+rasantes y sobre superficies muy absorbentes, e ignora la difracción de bordes,
+así que califica una secuencia de profundidades antes de construirla pero no
+sustituye a una medición ISO 17497-2; el modelo de metadifusor es además de
+reacción local, sin acoplamiento entre pozos. Solo la secuencia de
+profundidades de residuo cuadrático tiene una función dedicada — las
+disposiciones de raíz primitiva y moduladas se comentan como guía de diseño y
+entran por los argumentos explícitos de profundidad o de reflexión. El problema
+inverso, resolver las geometrías de los resonadores para un perfil de fase
+objetivo, no está automatizado: el flujo de trabajo ajusta las fases por
+evaluación. Del lado de la medida, la biblioteca reduce los datos pero no
+maneja el banco: la plataforma giratoria de ISO 17497-1 y el goniómetro de
+ISO 17497-2 aportan los tiempos de reverberación y la respuesta polar, y lo que
+está implementado es la aritmética que los convierte en un coeficiente.

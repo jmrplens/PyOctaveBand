@@ -1,6 +1,6 @@
 ---
 title: "Materials and surfaces"
-description: "Characterising acoustic materials and surfaces: reverberation-room absorption and its rating (ISO 354, ISO 11654), airflow resistance (ISO 9053), the impedance tube (ISO 10534, ASTM E2611), porous, multilayer and metamaterial absorber prediction, diffusers with their scattering and diffusion coefficients (ISO 17497), metadiffusers, and in-situ road-surface absorption (ISO 13472)."
+description: "Characterising acoustic materials and surfaces: reverberation-room absorption and its rating (ISO 354, ISO 11654), airflow resistance (ISO 9053), the impedance tube (ISO 10534, ASTM E2611), porous, multilayer and metamaterial absorber prediction, diffusers with their scattering and diffusion coefficients (ISO 17497), metadiffusers, in-situ road-surface absorption (ISO 13472) and the dynamic stiffness of resilient layers (EN 29052-1)."
 ---
 
 Every room prediction and many an insulation model end up consuming a
@@ -43,20 +43,41 @@ coefficient** (ISO 17497-1) and the **diffusion coefficient** (ISO 17497-2),
 together with Schroeder diffuser design and its far-field prediction.
 [Metadiffusers](/phonometry/materials/diffusers/metadiffusers/) rebuilds the Schroeder
 diffuser from resonator-loaded slits, one to two orders of magnitude thinner.
-And [In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/)
-measures the absorption of a pavement where it lies, by the ISO 13472-1
-subtraction technique over an extended surface or the ISO 13472-2 spot tube.
+
+Nested inside that group is **Surfaces measured in place**, for the surfaces
+that have no sample. A pavement cannot be cut out and carried indoors without
+destroying the connected pore structure that governs its absorption, so the
+laboratory geometry is replaced by a time window over an extended surface, or
+by a tube pressed onto the road.
+[In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/)
+measures it where it lies, by the ISO 13472-1 subtraction technique or the
+ISO 13472-2 spot tube, and says which of the two a given pavement allows.
+
+The **Resilient layers** subsection covers the one material property here that
+is mechanical rather than acoustic: a resilient layer is characterised not by
+what it does to airborne sound but by how softly it supports a mass, so its
+measurement is a resonance and not an absorption. A floating floor is a
+mass-spring system, the screed is the mass and the layer is the spring, and the
+dynamic stiffness per unit area s' of the layer sets the resonance above which
+the floor starts working.
+[Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/)
+is the load-plate resonance measurement that produces s', with the enclosed-gas
+term that makes an air-permeable layer stiffer than its frame alone.
 
 The consumers of these numbers are spread across the site: absorption
 coefficients feed the reverberation predictions in
-[Room acoustics](/phonometry/buildings/rooms/), dynamic
-stiffness (measured by a related load-plate method) feeds the floating-floor
-model in [Sound insulation](/phonometry/buildings/insulation/),
+[Room acoustics](/phonometry/buildings/rooms/); the dynamic stiffness measured
+here feeds the floating-floor model of
+[Sound insulation](/phonometry/buildings/insulation/) through
+[Predicting resilient-layer performance](/phonometry/buildings/design/resilient-layers/);
 and the road-surface methods connect to the outdoor-noise interest of the
 [Environment and transport](/phonometry/environment/)
 section.
 
-## Pages in this section
+## [Absorbers](/phonometry/materials/absorbers/)
+
+How much energy a material takes out of the field, one instrument or model
+family per guide.
 
 - [Absorbers overview](/phonometry/materials/absorbers/): the
   measurement chain from reverberation room to flow rig to impedance tube,
@@ -75,9 +96,15 @@ section.
   and the random-incidence Paris integral.
 - [Metamaterial Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/):
   critical coupling and the slow-sound slit panel with its design solver.
+
+## [Diffusers and surfaces](/phonometry/materials/diffusers/)
+
+Where a surface sends what it reflects, and the surfaces that can only be
+measured in place.
+
 - [Diffusers and surfaces overview](/phonometry/materials/diffusers/):
   what a surface does with the sound it returns, from coefficients to
-  metamaterial panels to pavements.
+  metamaterial panels.
 - [Diffusers and Their Coefficients](/phonometry/materials/diffusers/diffusers/):
   ISO 17497-1/2 scattering and diffusion coefficients, Schroeder design and
   the far-field prediction.
@@ -87,6 +114,11 @@ section.
   surfaces that cannot be taken to a laboratory, characterised where they lie.
 - [In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/):
   ISO 13472-1/-2 in-situ road-surface absorption.
+
+## [Resilient layers](/phonometry/materials/resilient/)
+
+The mechanical property a floating floor is designed around.
+
 - [Resilient layers overview](/phonometry/materials/resilient/):
   what a resilient layer does under a floating floor, and the dynamic
   stiffness that sets it.
@@ -94,3 +126,38 @@ section.
   the resonance method that measures what a resilient layer does under a
   floating floor, and the apparent stiffness the insulation design chapter
   asks it for.
+
+## What this section does not cover
+
+Everything here characterises a **material or a surface**, never a
+construction. The transmission loss of a wall, the impact improvement of a
+floor and the flanking paths of a junction are
+[Sound insulation](/phonometry/buildings/insulation/) and
+[Insulation design](/phonometry/buildings/design/); this section supplies the
+coefficients they consume. Two boundaries inside the measurements themselves
+are worth knowing before you start. The in-situ road methods implement
+ISO 13472-1:2002 and ISO 13472-2:2010; **their 2022 and 2025 revisions are not
+implemented**. And the resilient-layer measurement expects a resonant frequency
+that has already been extrapolated to zero force amplitude by clause 7 of
+EN 29052-1, a procedure that is not implemented, and an airflow resistivity
+supplied as an input rather than measured in place. Nothing in this section
+predicts a material from its chemistry or its manufacture: the models run
+forwards from measured macroscopic parameters — flow resistivity, porosity,
+tortuosity — to an impedance, and there is no inverse solver that recovers
+those parameters from a measured impedance curve.
+
+## Before and after these pages
+
+Every coefficient on these pages is derived from band levels or from a
+transfer function between microphones, so the filtering, weighting and
+calibration that produce them are in [Signal analysis](/phonometry/signals/),
+and [Build a sound level meter](/phonometry/signals/sound-level-meter/) runs
+that chain end to end on one runnable page. The derivations are in [Materials
+and surfaces theory](/phonometry/reference/theory/materials-surfaces/): the characterisation
+quantities, the in-situ subtraction and the scattering and diffusion
+coefficients.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](/phonometry/start/tasks/) indexes it by the job
+and [All guides](/phonometry/start/guides/) lists every page with a line on
+each.

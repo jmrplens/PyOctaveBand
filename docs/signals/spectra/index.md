@@ -11,8 +11,37 @@ same dB SPL / dBFS reference frames as the rest of the library) and carries
 its **statistical quality**, so a spectrum is not just a curve but a curve
 with a confidence interval.
 
-[Calibrated spectral analysis](spectral-analysis.md) is the
-frequency-domain half. The Welch power and cross-spectral density estimators
+Eight pages sit under that discipline, in six families: the frequency-domain
+estimators ([spectral
+analysis](spectral-analysis.md), [multiple and
+partial coherence](miso-coherence.md)), the
+time-frequency middle ground
+([spectrograms](time-frequency.md)), the
+spectrum-shape methods
+([cepstrum](cepstrum-echoes.md)), the period-domain
+methods ([synchronous
+averaging](synchronous-averaging.md)), the
+time-domain estimators ([correlation and
+delay](correlation-delay.md)), and the stimulus and
+system toolbox ([test
+signals](test-signals.md), [system
+measurement](system-measurement.md)).
+
+They differ in what they estimate and share two decisions. The first is the
+**segment length**. It fixes the resolution bandwidth of a PSD, the cell shape
+of a spectrogram, the number of averages behind every confidence interval, the
+longest delay a generalized cross-correlation can see and the degrees of
+freedom a conditioned MISO estimate has left, so choosing it once and keeping
+it is what makes a PSD, a coherence and a delay computed from the same record
+mutually consistent. The second is **stationarity**. Every average on these
+pages, and every error formula quoted beside it, assumes the process did not
+drift while it was being recorded, which is exactly what the [data
+qualification](../metrology/data-qualification.md) tests decide;
+when a record fails them, the honest tools are the short-time views rather than
+the averaged ones.
+
+[Calibrated spectral analysis](spectral-analysis.md) is where
+the frequency-domain family starts. The Welch power and cross-spectral density estimators
 report their effective number of averages, normalized random errors and
 chi-square confidence intervals; the coherent output spectrum splits a
 measured output into the part explained by an input and the part that is
@@ -45,7 +74,7 @@ root of the number of averages, and choosing that number to place a comb node
 on an interfering order rejects it far better than the habitual power of two.
 
 [Correlation, time delay and envelope](correlation-delay.md)
-is the time-domain half. Auto- and cross-correlation come with the
+is where its time-domain counterpart starts. Auto- and cross-correlation come with the
 Bendat & Piersol normalizations and random errors; time-delay estimation
 offers the direct correlator, the cross-spectrum phase slope and the
 Knapp & Carter generalized cross-correlation weightings (Roth, SCOT, PHAT,
@@ -54,12 +83,16 @@ sub-sample precision; and the Hilbert transform yields the envelope with
 instantaneous phase and frequency.
 
 [Test signals and sample-rate tools](test-signals.md) is
-the toolbox the other two lean on: tone bursts with the exact gating of
-IEC 60268-1 (zero-crossing start, integral full periods, repetitive trains),
-polyphase resampling behind an explicit anti-alias specification whose
-designed filter travels with the result, and band-limited fractional delay
-with a linear or circular boundary, sharing its kernel with the sub-sample
-alignment of impulse responses.
+the toolbox underneath the rest: tone bursts with the exact gating of
+IEC 60268-1 (zero-crossing start, integral full periods, repetitive trains)
+that exercise detector ballistics, polyphase resampling behind an explicit
+anti-alias specification whose designed filter travels with the result and
+which every cross-rate comparison needs, and band-limited fractional delay
+with a linear or circular boundary, whose kernel is shared by the
+impulse-response alignment of
+[Correlation, time delay and envelope](correlation-delay.md)
+and the non-integer period alignment of
+[Time synchronous averaging](synchronous-averaging.md).
 
 [System measurement](system-measurement.md) turns the
 toolbox toward measuring systems themselves: complementary Golay pairs
@@ -123,3 +156,22 @@ Pages elsewhere on the site that this section leans on:
   Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
   BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
   slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
+
+## What this section does not cover
+
+These are Bendat & Piersol's textbook estimators, not a certification method:
+no page here carries clause numbers or acceptance limits, and no result is a
+compliance verdict. Three capabilities a reader looks for are genuinely absent.
+**Multiple arrivals are not separated.** `time_delay` and `echo_detection`
+report the single largest peak, so a record with a direct path plus several
+reflections needs manual peak-picking or repeated calls on narrowed bands.
+**There is no multi-sensor geometry.** Delay estimation is pairwise; there is
+no built-in TDOA solver, no beamformer and no source localisation, and a
+multiple-output system needs one `miso_coherence` call per output.
+**There are no perceptual features.** The cepstrum is the plain
+linear-frequency one, with no mel warping and no MFCC variant. Two estimators
+that share this section's Welch core are documented where they are used
+instead: the transfer function and ordinary coherence on
+[Electroacoustics](../../devices/electroacoustics/electroacoustics.md), and
+the two-microphone intensity probe on [Sound
+intensity](../../devices/emission/intensity.md).

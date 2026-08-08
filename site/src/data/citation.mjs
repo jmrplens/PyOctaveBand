@@ -313,9 +313,11 @@ for (const page of ['start/about.md', 'es/start/about.md']) {
   }
   if (!apa.includes(doiUrl)) fail(`the APA reference should end at ${doiUrl}: ${apa}`);
 
-  // The italicised title, which APA gives without the parenthetical former
-  // name that `CITATION.cff` carries, so it has to open the full title rather
-  // than equal it.
+  // The italicised title. The English page gives the full title, parenthetical
+  // former name included, so that a reader who copies the reference cites the
+  // same string as the Zenodo record; the Spanish page still gives the short
+  // form. Both are accepted here by requiring the quoted title to *open* the
+  // one in `CITATION.cff` rather than equal it.
   const italic = apa.match(/\*([^*]+)\*/);
   if (!italic) fail(`the APA reference should italicise the title: ${apa}`);
   if (!cff.title.startsWith(italic[1])) {

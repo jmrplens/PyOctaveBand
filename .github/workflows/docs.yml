@@ -95,9 +95,10 @@ jobs:
           path: ${{ env.PNPM_STORE }}
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('site/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
-      - name: Check the overview mirrors, then regenerate llms.txt
+      - name: Check the overview and glossary mirrors, then regenerate llms.txt
         run: |
           python3 scripts/mirror_overviews.py --check
+          python3 scripts/mirror_glossary.py --check
           python3 scripts/generate_llms.py
       - name: Check the icon sheet is not stale
         # The sheet is the index of the site's own icons and the only place a

@@ -12,9 +12,6 @@ in effect, a sound level meter decomposed into composable functions, and every
 other section of the documentation builds on it: a loudness model consumes
 calibrated band levels, a room parameter starts from a filtered impulse
 response, an environmental rating is an adjusted Leq.
-[Build a sound level meter](/phonometry/signals/sound-level-meter/) assembles
-that chain end to end on a single runnable page; it is the best starting point
-if you want to see the whole area at work before opening the deep guides.
 
 Around the level chain sit the general signal-analysis tools:
 **calibrated spectral estimates** (Welch PSD and cross-spectral density with
@@ -26,13 +23,40 @@ calibrator tone (dB SPL), or stay in digital full scale (dBFS). **Measurement un
 supplement) qualifies any result computed from uncertain inputs, which is
 what makes a number defensible in a report.
 
-If you are new to the library, read
-[Filter Banks](/phonometry/signals/filters/filter-banks/) first: it introduces the band
-decomposition every other page assumes. Then
-[Integrated and Statistical Levels](/phonometry/signals/levels/levels/) shows the
-metrics most measurements end in, and
-[Calibration and dBFS](/phonometry/signals/metrology/calibration/) anchors them to
-physical units.
+Three conventions run through every page below, and every snippet on the site
+assumes them. A signal is a NumPy array of sound pressure with **time on the
+last axis**, so one channel is `(n,)` and several parallel channels are
+`(channels, samples)`. The sample rate always travels as an explicit `fs`
+argument: nothing is read from a file header, because the library never opens
+the file. And the array is expected to hold **pascals**, which is why a level
+function applied to raw soundcard samples returns a number whose reference is
+arbitrary, and why every level function also accepts a `calibration_factor` in
+pascals per digital unit or the `dbfs=True` escape hatch. Simple metrics come
+back as floats and arrays; the richer ones come back as frozen result objects
+that expose `.plot()`. [Calibration and
+dBFS](/phonometry/signals/metrology/calibration/) resolves the third convention
+in full, and [Multichannel and
+Performance](/phonometry/signals/filters/multichannel/) the first.
+
+Two ways in. To see the whole chain working at once, run [Build a sound level
+meter](/phonometry/signals/sound-level-meter/): it calibrates against a
+calibrator tone, applies the frequency and time weightings, integrates into
+Leq, SEL and percentile levels, splits the signal into octave bands and checks
+the class of every stage, on one runnable page. To learn the pieces in
+dependency order, start at [Filter
+Banks](/phonometry/signals/filters/filter-banks/), which introduces the band
+decomposition every other page assumes, then [Integrated and Statistical
+Levels](/phonometry/signals/levels/levels/) for the metrics most measurements
+end in, and [Calibration and dBFS](/phonometry/signals/metrology/calibration/)
+to anchor them to pascals.
+
+## [Build a sound level meter](/phonometry/signals/sound-level-meter/)
+
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the whole
+  chain assembled on one runnable page — calibration, frequency and time
+  weighting, the integrated and statistical levels, the band decomposition and
+  the class verdict of each stage — as the worked introduction to the four
+  subsections below.
 
 ## [Octave filtering](/phonometry/signals/filters/)
 
@@ -105,8 +129,9 @@ and carrying its statistical quality.
   the comb filter that describes it in the frequency domain, the square-root
   noise-reduction law, and the choice of the number of averages that places a
   comb node on an interfering order (McFadden 1987).
-- [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
-  the kinematic fault-frequency families of rotating machinery (Norton &
+- [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/)
+  (in the vibration section): the kinematic fault-frequency families of
+  rotating machinery (Norton &
   Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
   BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
   slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
@@ -136,3 +161,36 @@ What the numbers mean and how much to trust them.
 - [Data qualification](/phonometry/signals/metrology/data-qualification/): the reverse
   arrangement and runs stationarity tests on segment statistics, and the Rice
   level-crossing and peak statistics with the irregularity factor.
+
+## What this section does not cover
+
+Four things a reader reasonably expects here are absent, and each guide says so
+in its own "Not covered" block. **No instrument is verified.**
+`verify_filter_class` and `verify_weighting_class` check a designed digital
+response against the tolerance tables of IEC 61260-1 and IEC 61672-1; the
+IEC 61672-3 pattern-evaluation tests a physical meter needs for type approval,
+and the IEC 60942 conformance tests of the calibrator itself, are not run, so a
+class verdict here describes the algorithm and not a built device. **No file is
+opened.** Nothing in the library decodes WAV, FLAC or any other container:
+every function takes an array you have already read, which is why `fs` is
+always an argument. **No array processing.** Correlation and time delay model
+one common path between exactly two sensors and report the single largest peak;
+there is no multi-sensor TDOA solver, no beamformer and no source localisation.
+**No perceptual features.** The cepstrum here is the plain linear-frequency
+one, with no mel warping or MFCC variant, and loudness as a sensation belongs
+to [Psychoacoustics](/phonometry/perception/psychoacoustics/), not to the
+energy metrics of this section.
+
+## Before and after these pages
+
+The derivations behind these pages are in [Signal analysis
+theory](/phonometry/reference/theory/signal-analysis/): the band grid, the weighting curves,
+the time integration, the intensity approximation and the uncertainty
+framework. If you have not run anything yet, [Getting
+Started](/phonometry/start/getting-started/) installs the library and
+calibrates a first analysis.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](/phonometry/start/tasks/) indexes it by the job
+and [All guides](/phonometry/start/guides/) lists every page with a line on
+each.

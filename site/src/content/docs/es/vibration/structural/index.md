@@ -6,9 +6,10 @@ description: "La cadena desde una máquina vibrante hasta el ruido oído varias 
 Una máquina fijada a un edificio radia sonido dos veces: directamente desde
 su propia superficie vibrante, e indirectamente inyectando **potencia
 estructural** en la estructura, que la transporta y la vuelve a radiar en
-salas lejanas. Las seis páginas de esta sección cubren ambos caminos: una
-estima la radiación directa desde la propia vibración superficial, y las
-otras cinco caracterizan de extremo a extremo ese segundo camino
+salas lejanas. Seis páginas cubren ambos caminos, tres aquí y tres en otras
+partes del sitio: una estima la radiación directa desde la propia vibración
+superficial, y las otras cinco caracterizan de extremo a extremo ese segundo
+camino
 estructural, el más escurridizo, desde describir la vibración y caracterizar
 los aisladores hasta cuantificar la potencia y predecir el nivel que
 finalmente oye un oyente.
@@ -74,3 +75,30 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
   independientes de la placa.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
   el nivel predicho en el recinto receptor desde el equipo instalado.
+
+## Qué no cubre esta sección
+
+Los coeficientes de unión son una **idealización en forma cerrada** para una
+unión rígida y simplemente apoyada entre placas homogéneas, no una medición: el
+índice de reducción vibracional empírico obtenido de una diferencia de niveles
+de velocidad promediada en dirección es la ISO 10848, en [Transmisión por
+flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/). El
+coeficiente
+de tramo recto no está definido para las geometrías T y L, que no tienen una
+tercera placa colineal, así que ahí solo se aplica el camino de esquina.
+
+La página de FRF implementa la ISO 7626-1 y los criterios de aceptación de la
+ISO 7626-2 para un excitador acoplado; **la excitación por martillo de impacto
+(ISO 7626-5) se nombra solo como contexto**, sin nada que sintetice ni procese
+un espectro de impacto, y las conversiones devuelven recíprocas *libres*
+elemento a elemento, correctas para el punto de excitación o para una sola vía,
+no para una matriz de FRF completa, cuyas magnitudes matriciales bloqueadas no
+se construyen.
+
+En la página de aisladores, las Partes 4 y 5 de la ISO 10846 no están
+implementadas, y dos de las comprobaciones de validez de la propia norma se
+describen en vez de calcularse: la desigualdad de masa de bloqueo rígida y el
+criterio de linealidad del apartado 7.6 (dos espectros de entrada separados
+10 dB que coincidan dentro de 1,5 dB). Por último, aquí no se diseña ningún
+aislador ni ninguna bancada flotante: las páginas caracterizan elementos y
+predicen la transmisión, y la decisión de dimensionado se queda contigo.

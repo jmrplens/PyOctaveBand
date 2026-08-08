@@ -47,6 +47,10 @@ export const topics = [
     items: [
       { slug: 'start', label: 'Overview', translations: { es: 'Resumen' } },
       'start/getting-started',
+      // The task-shaped door. The rest of the site is a subject tree, which
+      // only helps a reader who already knows which subject owns their job;
+      // this row is the same library indexed by the job instead.
+      { slug: 'start/tasks', label: 'What do you need to measure?', translations: { es: '¿Qué necesitas medir?' } },
       // The map of the ten topics. A sibling entry point rather than a parent:
       // the area overviews stay the breadcrumb ancestors of their own guides.
       { slug: 'start/guides', label: 'All guides', translations: { es: 'Todas las guías' } },

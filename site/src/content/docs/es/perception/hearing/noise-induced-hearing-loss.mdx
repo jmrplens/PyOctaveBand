@@ -66,6 +66,13 @@ dispersiones $d_u$ (peor que la mediana) y $d_l$ (mejor) se dan en las Fórmulas
 6/7 y la Tabla 3: $N_Q = N_{50} + z\,d$ con $z$ el cuantil normal estándar,
 recortado a cero (cláusula 6.3.2).
 
+El argumento `fractile` es la fracción de la población que queda *por debajo*
+del valor devuelto, así que `fractile=0.9` es el décimo más susceptible. Ojo a
+que la ISO 1999 escribe su propio porcentaje $Q$ al revés: en las Fórmulas
+(4)/(5) $Q$ es el porcentaje con *peor* audición, así que ese mismo décimo es
+$Q = 10\;\%$, que es como lo imprime la ficha de `.report()` y como se encabezan
+las columnas del anexo D.
+
 ```python
 from phonometry import hearing
 
@@ -343,3 +350,4 @@ aportarla y comprobarla uno mismo.
 ## Véase también
 
 - Referencia de la API: [`hearing.noise_induced_hearing_loss`](/phonometry/es/reference/api/hearing/noise-induced-hearing-loss/).
+- Teoría: [Pérdida auditiva inducida por ruido (ISO 1999)](/phonometry/es/reference/theory/perception/#pérdida-auditiva-inducida-por-ruido-iso-1999): el modelo de desplazamiento del umbral de ISO 1999, su mediana y su dispersión por fractiles.

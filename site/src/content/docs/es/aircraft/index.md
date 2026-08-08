@@ -70,10 +70,7 @@ Las tres métricas no son intercambiables. El EPNL es una métrica de
 *certificación* de un avión en un punto prescrito; el SEL y el LASmax son
 métricas de evaluación de *evento único* en un receptor cualquiera; ninguna es
 el índice de largo plazo con el que finalmente se juzga un estudio de usos del
-suelo. Y el límite: esta sección no calcula índices acumulados de múltiples
-eventos, no sintetiza tablas NPD a partir de datos de motor, no modela
-operaciones de rotorcraft en estacionario, ralentí o rodaje, y no toca el
-estampido sónico.
+suelo.
 
 ## Páginas de esta sección
 
@@ -89,3 +86,47 @@ estampido sónico.
 - [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las
   tablas de EASA con curvas nivel-potencia-distancia y trayectorias por defecto
   que ejecutan la cadena de Doc 29 con una aeronave real.
+
+## Qué no cubre esta sección
+
+**Solo eventos únicos.** La cadena de Doc 29 construye contornos de evento
+único; no ensambla los índices acumulados de múltiples eventos — una suma tipo
+Lden sobre un programa completo de vuelos — que un estudio de contornos de
+ruido necesita por encima de ellos. Ese último paso es donde de verdad se toma
+una decisión de usos del suelo, y no está aquí.
+
+**Ninguna aeronave se modela desde primeros principios.** Las tablas NPD y los
+hemisferios de ruido son *datos de entrada*: la biblioteca interpola las tablas
+publicadas para un tipo y no las sintetiza a partir de datos de motor, y la
+base de datos ANP se lee y nunca se escribe (la versión 2.3 se distribuye tal
+cual). De las entradas de ANP, solo las que tienen perfiles de punto fijo traen
+una trayectoria lista para usar, porque convertir una salida por pasos de
+procedimiento en una trayectoria de vuelo exige el modelo de prestaciones de
+mecánica del vuelo del Doc 9911 de la ICAO, que no está implementado.
+
+**Tres huecos concretos.** Las operaciones de rotorcraft en estacionario,
+ralentí y rodaje quedan fuera del modelo de fuente de hemisferio, que supone un
+sobrevuelo. El verificador de sistemas de medida comprueba la IEC 61265:1995 y
+no la edición de 2018 que la sustituye. Y el estampido sónico no se toca en
+ningún punto de la biblioteca.
+
+Por último, la fuente de aeronaves de CNOSSOS-EU de los apartados 2.6 y 2.7
+**no** está implementada: el ruido de aeronaves aquí es la familia de la ICAO y
+la ECAC, que es un conjunto de modelos distinto del de las fuentes de carretera
+y ferrocarril de [Fuentes ambientales](/phonometry/es/environment/sources/), y
+los dos no deben mezclarse dentro de un mismo mapa estratégico sin advertirlo.
+
+## Antes y después de estas páginas
+
+Todos los niveles de estas páginas se construyen a partir de niveles de banda,
+así que el filtrado, la ponderación y la calibración que los producen están en
+[Análisis de señal](/phonometry/es/signals/), y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una sola página ejecutable. Las derivaciones del ruido de
+aeronaves no están en la referencia de teoría: se quedan dentro de las guías de
+arriba, junto a la geometría de vuelo que las motiva.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.
