@@ -49,25 +49,43 @@ from .buildings import (
 )
 from .canvas import _write
 from .devices import (
+    _d_box_array,
+    _d_distortion_bench,
+    _d_duct_path,
     _d_intensity_scan,
     _d_loudspeaker_freefield,
+    _d_loudspeaker_polar,
+    _d_machine_enclosure,
     _d_methods,
+    _d_microphone_references,
     _d_noise_control,
     _d_pp_probe,
     _d_precision_anechoic,
     _d_program_loudness,
+    _d_radiation_factor,
+    _d_residual_intensity_check,
+    _d_reverberation_power,
+    _d_room_to_room,
+    _d_silencer_iso7235,
     _d_surfaces,
+    _d_sweep_bench,
     _d_swept_sine,
     _d_vibration_sound_power,
 )
 from .environment import (
     _d_atmospheric_refraction,
+    _d_barrier_four_paths,
+    _d_cnossos_rail,
+    _d_cnossos_road,
     _d_env_positions,
     _d_ground_barrier,
     _d_ground_reflection,
+    _d_ground_regions,
     _d_impulse_prominence,
     _d_outdoor,
+    _d_rd1367_chain,
     _d_wind_turbine,
+    _d_wind_turbine_board,
 )
 from .materials import (
     _d_airflow,
@@ -155,7 +173,7 @@ DIAGRAMS = {
         _d_survey_sweep, "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)",
         560),
     "sound_power_methods": (
-        _d_methods, "Sound power methods compared", 620),
+        _d_methods, "Sound power methods compared", 700),
     "diagram_flanking_paths": (
         _d_flanking, "Direct and flanking transmission paths (EN 12354)", 640),
     "diagram_outdoor_geometry": (
@@ -190,6 +208,18 @@ DIAGRAMS = {
     "diagram_intensity_scan": (
         _d_intensity_scan,
         "Precision sound intensity scanning (ISO 9614-3)", 600),
+    "diagram_reverberation_power": (
+        _d_reverberation_power,
+        "ISO 3741 reverberation test room", 600),
+    "diagram_box_array": (
+        _d_box_array,
+        "ISO 3744 parallelepiped measurement surface", 580),
+    "diagram_radiation_factor": (
+        _d_radiation_factor,
+        "Determining the radiation factor (ISO/TS 7849-2)", 540),
+    "diagram_residual_intensity_check": (
+        _d_residual_intensity_check,
+        "Residual-intensity test and the before-use probe check", 570),
     "diagram_human_vibration": (
         _d_human_vibration,
         "Whole-body vibration measurement chain (ISO 2631-1 / ISO 8041-1)", 580),
@@ -270,6 +300,16 @@ DIAGRAMS = {
     "diagram_loudspeaker_freefield": (
         _d_loudspeaker_freefield,
         "Loudspeaker free-field sensitivity measurement (IEC 60268-5)", 600),
+    "diagram_loudspeaker_polar": (
+        _d_loudspeaker_polar,
+        "Polar directional response measurement (IEC 60268-5 clause 23)", 600),
+    "diagram_microphone_references": (
+        _d_microphone_references,
+        ("The three fields a microphone sensitivity is defined in "
+         "(IEC 60268-4)"), 590),
+    "diagram_distortion_bench": (
+        _d_distortion_bench,
+        "The IEC 60268-3 distortion bench and its operating point", 590),
     "diagram_dosimeter_iso9612": (
         _d_dosimeter,
         "Occupational noise exposure measurement (ISO 9612)", 640),
@@ -347,6 +387,10 @@ DIAGRAMS = {
         _d_swept_sine,
         "Swept-sine distortion: deconvolution and harmonic pre-arrivals",
         620),
+    "diagram_sweep_bench": (
+        _d_sweep_bench,
+        "Playing and recording a sweep: the two benches and the time budget",
+        620),
     "diagram_system_measurement": (
         _d_system_measurement,
         "Two-channel FRF measurement: the H1 estimator and coherence", 560),
@@ -405,6 +449,26 @@ DIAGRAMS = {
     "diagram_ground_barrier": (
         _d_ground_barrier,
         "Barrier diffraction over ground: the Fresnel number at work", 510),
+    "diagram_ground_regions": (
+        _d_ground_regions,
+        "ISO 9613-2 ground regions and the ground factor G", 640),
+    "diagram_barrier_four_paths": (
+        _d_barrier_four_paths,
+        "The four diffracted paths of a barrier on finite-impedance ground",
+        596),
+    "diagram_cnossos_road": (
+        _d_cnossos_road,
+        "CNOSSOS-EU road source line geometry", 580),
+    "diagram_cnossos_rail": (
+        _d_cnossos_rail,
+        "CNOSSOS-EU railway source lines and directivity angles", 700),
+    "diagram_wind_turbine_board": (
+        _d_wind_turbine_board,
+        "IEC 61400-11 ground-board microphone mounting", 600),
+    "diagram_rd1367_chain": (
+        _d_rd1367_chain,
+        "RD 1367/2007: from a noise phase to the three acceptance criteria",
+        580),
     "diagram_room_image_sources": (
         _d_room_image_sources,
         "Image-source lattice in plan: first reflections of a 7 × 5 m room",
@@ -413,6 +477,22 @@ DIAGRAMS = {
         _d_noise_control,
         "Noise control at the source, along the path and at the receiver",
         625),
+    "diagram_machine_enclosure": (
+        _d_machine_enclosure,
+        "Machine enclosure in section: what IL = R − C really depends on",
+        660),
+    "diagram_room_to_room": (
+        _d_room_to_room,
+        "Plant room to operator room: every symbol of the balance, in section",
+        586),
+    "diagram_silencer_iso7235": (
+        _d_silencer_iso7235,
+        "How a silencer is measured: the ISO 7235 substitution method",
+        710),
+    "diagram_duct_path": (
+        _d_duct_path,
+        "Long's Table 14.9 installation: every row of the sheet as a place",
+        566),
     "diagram_slm_pipeline": (
         _d_slm_pipeline,
         "The sound level meter pipeline: one function per stage", 672),

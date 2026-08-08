@@ -1,6 +1,6 @@
 ---
 title: "Sound Power"
-description: "The sound power level LW as the device-independent emission descriptor: choosing among the five standardised determination routes (ISO 3744/3746, ISO 3741, ISO 9614-2, ISO 3745, ISO 9614-3), what the accuracy grades promise, and the ISO 4871 noise-emission declaration with its dual- and single-number forms and verification."
+description: "The sound power level LW as the device-independent emission descriptor: choosing among the six standardised determination routes (ISO 3744/3746, ISO 3745, ISO 3741, ISO 9614-2, ISO 9614-3, ISO/TS 7849), what the accuracy grades promise, and the ISO 4871 noise-emission declaration with its dual- and single-number forms and verification."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -34,16 +34,19 @@ sound **power** does not. The sound power level $L_W$ is the total acoustic
 energy per second a source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is
 the device-independent **emission** descriptor that goes on a datasheet,
 feeds a room prediction (EN 12354) or is checked against a noise-emission
-limit. phonometry implements five standardised routes to it, split across
-three method guides: an enveloping *pressure* surface in the field
+limit. phonometry implements six standardised routes to it, split across
+four method guides: an enveloping *pressure* surface in the field
 (ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
 covered in
 [Sound Power by Pressure Methods](/phonometry/devices/emission/sound-power-pressure/);
 the diffuse field of a *reverberation room* (ISO 3741), covered in
 [Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/);
-and *intensity* scanning over a surface (ISO 9614-2), with its precision
+*intensity* scanning over a surface (ISO 9614-2), with its precision
 counterpart (ISO 9614-3), covered in
-[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
+[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/);
+and the *surface velocity* of the machine's own casing (ISO/TS 7849-1 and -2),
+the one route that needs no acoustic measurement at all, covered in
+[Sound power from surface vibration](/phonometry/devices/emission/vibration-sound-power/).
 This page is the front door: how to choose among them, what the accuracy
 grades actually promise, and how a measured $L_W$ becomes the ISO 4871
 noise-emission declaration a datasheet prints.
@@ -69,17 +72,36 @@ constraints.
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
 | Precision intensity scanning | **ISO 9614-3** | Scanned normal intensity, tighter criteria | Almost any, tolerant of steady extraneous noise | Grade 1 (precision) | Precision on-site, with the ISO 9614-3 field-indicator checks |
+| Surface vibration | **ISO/TS 7849-1** (survey) / **-2** (engineering) | Surface-averaged velocity level and a radiation factor | Any; no acoustic measurement | Upper limit ($\varepsilon = 1$) / engineering | The machine cannot be quietened, enclosed or approached with a microphone |
 
 The pressure methods correct the surface level for the room ($K_2$) and for
 background noise ($K_1$); the reverberation method needs a *qualified* room
 but reaches precision grade; intensity rejects steady background energy at
-the cost of a two-microphone probe and a per-band validity check. Each
-method guide walks its routes in turn.
+the cost of a two-microphone probe and a per-band validity check; the
+surface-velocity route abandons the microphone altogether and pays for it with
+a radiation factor. Each method guide walks its routes in turn.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%" loading="eager" />
+**Two members of the ISO 3740 family are missing from that table on purpose.**
+ISO 3743-1 and ISO 3743-2 reach engineering grade on *small movable* sources in
+a hard-walled or a specially reverberant test room — the route most appliance
+noise test codes call for — and ISO 3747 determines the sound power of a large
+fixed machine in situ by comparison against a calibrated reference sound source
+in a reverberant field. Neither is implemented here. In practice: for a small
+appliance, ISO 3744 over a hemisphere in the same room is usually available at
+the same grade; for the in-situ comparison case, the comparison formula on the
+[ISO 3741 page](/phonometry/devices/emission/sound-power-reverberation/#2-the-comparison-method-eq-21)
+is the same algebra, applied to a qualified room instead of an arbitrary one.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The six sound power routes in two rows of three, each cell carrying the same five attributes. Top row: the ISO 3744/3746 enveloping pressure surface over a reflecting plane, the ISO 3745 fixed array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. Bottom row: the ISO 9614-2 serpentine intensity scan, the tighter ISO 9614-3 precision scan, and the ISO/TS 7849 accelerometer grid on a radiating casing with no microphone at all" width="92%" loading="eager" />
+
+All six deliver the same quantity, and the last one gets there without a
+microphone. The claim that they *agree* is checkable, and worth checking once:
+the block below drives one synthetic source through three of the routes and
+compares their spectra. It is not a reproduction of the diagram above — a setup
+diagram has no matplotlib equivalent — but a cross-check you can run.
 
 <details>
-<summary>Show the code for this figure</summary>
+<summary>Show three routes computed on one source</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -114,6 +136,34 @@ plt.show()
 ```
 
 </details>
+
+### Before the method: the operating and mounting conditions
+
+Choosing a route is the second decision. The first is what, exactly, is being
+measured — and for most machine families it has already been made for you. A
+**noise test code** is the type C standard for one family of machines: it fixes
+the basic determination standard, the microphone array, the mounting and the
+operating mode, and it overrides the general specifications of ISO 3744 or
+ISO 3741 wherever the two disagree. The same installation, mounting and
+operating conditions must then be used for the sound power level *and* for the
+emission sound pressure level that stands beside it in a declaration, or the two
+numbers describe two different machines.
+
+Two rules from ISO 3744 clause 6 decide whether a determination is repeatable at
+all. **Auxiliary equipment** shall be outside the test environment if it can be;
+what cannot be removed or adequately quietened is counted as *part of the source*
+and the reference box grows to enclose it. And the **mounting** shall be the
+typical one, used or simulated — resilient mounts only if the machine is
+resiliently mounted in the field, because a small machine that is a poor
+low-frequency radiator on its own becomes a good one through a large panel it is
+bolted to.
+
+That is also where $\sigma_\text{omc}$ comes from. It is not a table lookup: it
+is estimated from repeated determinations on the same source at the same
+location, by the same operators, with the same instruments and positions,
+**readjusting the mounting and re-establishing the operating conditions before
+each one**. ISO 3744 Annex H notes 0,5 dB for a well-defined installation, and
+much larger values where material flow or process variability dominates.
 
 ### A decision path
 
@@ -150,6 +200,19 @@ order; the first match names the standard.
    tolerates steady extraneous noise even some 10 dB *above* the source,
    because only the net energy flux through the surface counts; the
    per-band field indicators then decide the grade actually achieved.
+5. **Can you put a microphone there at all?** A machine that cannot be stopped,
+   an environment that destroys a capsule, an enclosure with no room for a
+   surface: when no acoustic measurement is possible, the surface-velocity route
+   estimates the same quantity from accelerometers on the casing
+   (ISO/TS 7849-1 and -2). It answers a subtly different question — it
+   characterises what the *structure* radiates, and stays blind to sound
+   escaping through openings, intakes and gaps — and it costs a radiation factor
+   you must either assume (Part 1, an upper limit) or measure once (Part 2).
+6. **How repeatable is the machine itself?** None of the above bounds
+   $\sigma_\text{omc}$, and on a process machine it can outrank the whole grade
+   choice: a grade-1 facility around a source whose own operating conditions
+   scatter by 2 dB buys a $\sigma_\text{tot}$ no better than grade 2. Estimate it
+   before paying for the room.
 
 ### What the accuracy grades mean
 
@@ -171,7 +234,56 @@ In practice: a grade-2 $L_{WA}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so 
 results 2 dB apart are statistically indistinguishable, and checking that
 same source against a 93 dB limit is a coin flip. Choose the grade from the
 decision the number has to support, not from the facility that happens to
-be free.
+be free. And do not leave $\sigma_\text{omc}$ at its default of zero while doing
+so: `emission.sound_power_pressure(..., omc_uncertainty=2.0)` on a machine whose
+installation really does scatter by 2 dB turns a $U$ of 3.0 dB into 5.0 dB, and
+the honest number is the one the declaration has to absorb.
+
+**All these routes describe a steady source.** Each formula energy-averages over
+an interval and reports a *rate* of energy flow, so it characterises the machine
+only if the machine is time-invariant over that interval. A cyclic machine is
+admissible when the averaging time spans a whole number of cycles, and the cycle
+then becomes part of the declared operating condition. For a single event — one
+press stroke, one door slam — the descriptor is not $L_W$ at all but the **sound
+energy level $L_J$**, the same surface integral taken over the event rather than
+per second, defined in the same clauses of ISO 3741, ISO 3744, ISO 3745 and
+ISO 3746 and *not implemented here*. The practical test: if the A-weighted level
+at a fixed microphone moves by more than a few decibels over the averaging time,
+the source is not steady for these methods.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_grades_declaration.svg" alt="Two panels. Left, one measured A-weighted sound power level of 92.4 dB drawn three times with the expanded uncertainty of each accuracy grade, 1.0 dB at grade 1, 3.0 dB at grade 2 and 6.0 dB at grade 3, against a dashed declared limit of 93 dB(A) that only the grade-1 interval clears. Right, the ISO 4871 Annex B example as two stacked bars: operating mode 1 at 88 dB plus a 2 dB uncertainty giving a declared 90 dB, verified by a level of 89 dB, and operating mode 2 at 95 plus 2 giving 97 dB, not verified by a level of 98 dB" width="92%" />
+
+*What the grade buys, and what the declaration has to absorb. The left bar is
+the width the method contributes; the right panel is the same width turned into
+$K_{WA}$ and added to the measured value, which is why a wide grade produces a
+high declared limit and a machine that is easy to declare.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# The interval each grade puts around one measured LWA, through the library's
+# own uncertainty combination; then the ISO 4871 Annex B declaration.
+fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5.2))
+for k, (name, sigma_r0) in enumerate([("Grade 1", 0.5), ("Grade 2", 1.5),
+                                      ("Grade 3", 3.0)]):
+    u = float(emission.precision_uncertainty(sigma_r0, 0.0, 2.0))
+    axl.errorbar([k], [92.4], yerr=[[u], [u]], fmt="o", capsize=10)
+axl.axhline(93.0, linestyle="--")
+axl.set(ylabel="LWA [dB re 1 pW]", ylim=(84.0, 101.0))
+
+for k, (level, k_wa, l1) in enumerate([(88.0, 2.0, 89.0), (95.0, 2.0, 98.0)]):
+    axr.bar([k], [level], width=0.5)
+    axr.bar([k], [k_wa], width=0.5, bottom=level)
+    axr.plot([k], [l1], "D", markersize=10)
+axr.set(ylabel="A-weighted sound power level [dB]", ylim=(80.0, 106.0))
+plt.show()
+```
+
+</details>
 
 ## Declaring the noise emission (ISO 4871)
 
@@ -191,7 +303,9 @@ A declaration takes one of two alternative forms (clause 4):
   to exceed at the stated confidence level.
 
 $K_{WA}$ combines the measurement (reproducibility) and, for a batch, the
-production spread; for a single machine $K = 1.645\,\sigma_R$ (Annex A.2.2). A
+production spread; for a single machine $K = 1.645\,\sigma_R$ (Annex A.2.2),
+where 1.645 is the 95 % one-sided quantile of the normal distribution — the
+declared value is an upper limit, so only one tail is being covered. A
 [`NoiseEmissionDeclaration`](/phonometry/reference/api/power/sound-power/)
 holds one or more per-operating-mode declarations and renders the ISO 4871
 fiche through `.report()`. The quickest route is to `declare()` straight from a
@@ -240,6 +354,45 @@ ph.NoiseEmissionDeclaration(
 ).report("iso4871.pdf")
 ```
 
+### Verifying a declared value
+
+Verification is a separate measurement, made by somebody else. One machine of
+the declared type is measured, giving a single level $L_1$, and the declaration
+holds when $L_1$ does not exceed the declared value (clause 6.2). That is the
+`verification_level` argument — a number the manufacturer does not supply.
+
+What makes such a measurement admissible is clause 6.1, and it is the part most
+often skipped: the verification shall follow the **same noise test code** as the
+declaration or, where none exists, a basic determination standard of accuracy
+grade at least equal to the one behind the declared value, under **identical
+operating and mounting conditions**. A lower grade may be used only by agreement
+between manufacturer and user, and the difference in accuracy accounted for.
+Without that, the comparison is measuring the procedure and not the machine.
+
+The rounding is a trap of its own. A **single-number** declaration is verified
+against $L_{WAd}$, the unrounded sum $L_{WA} + K_{WA}$ rounded once; a
+**dual-number** declaration is verified against
+$\mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})$, which can differ by a whole
+decibel. The library exposes both verdicts separately — `verified` for the
+single-number rule and `verified_dual` for the dual-number one — so a
+dual-number declaration must be read from the second, not from the first.
+
+One caveat on the first snippet above: it passes
+`verification_level=result.sound_power_level_a`, which verifies the declaration
+against the very value it was built from. That always passes and is an
+illustration of the plumbing, not of a verification.
+
+The other two arguments deserve their provenance. `emission_pressure_level` is
+the A-weighted **emission sound pressure level** $L_{pA}$ at the work station,
+determined by ISO 11201 (essentially free field), ISO 11202 (survey, with an
+environmental correction) or ISO 11204 (with local corrections) — none of which
+is implemented here, so it arrives as a measured value from elsewhere, taken
+under the same installation and operating conditions as the sound power.
+`basic_standards` names the determination standards behind those two numbers,
+and the **noise test code** in the fiche footnote is the type C standard for the
+machine family that fixed the operating and mounting conditions and the
+work-station positions in the first place.
+
 The example fiche is regenerated with `make reports` and kept rendered in the
 repository; click the preview to open the PDF.
 
@@ -254,23 +407,33 @@ repository; click the preview to open the PDF.
 ## What this guide covers
 
 **Covered.** The ISO 3740 decision guidance condensed into the method table
-and the decision path, what the accuracy grades claim about
+and the decision path, the operating and mounting conditions that precede it,
+what the accuracy grades claim about
 reproducibility, and the ISO 4871 noise-emission declaration
 (`NoiseEmissionDeclaration`, `OperatingModeDeclaration`, `declare()`): the
 dual- and single-number forms, $L_{WAd} = L_{WA} + K_{WA}$ and the clause 6.2
-verification, rendered as the declaration fiche through `.report()`.
+verification with both rounding rules (`verified`, `verified_dual`), rendered as
+the declaration fiche through `.report()`.
 
-**Not covered.** The five determinations themselves live in their method
+**Not covered.** The six determinations themselves live in their method
 guides: the enveloping surface and the anechoic array in
 [Sound Power by Pressure Methods](/phonometry/devices/emission/sound-power-pressure/),
 the diffuse-field method in
-[Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/)
-and both scanning methods in
-[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
+[Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/),
+both scanning methods in
+[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/)
+and the surface-velocity route in
+[Sound power from surface vibration](/phonometry/devices/emission/vibration-sound-power/).
 ISO 9614-1's own discrete-point power summation is not implemented at all;
 only its field indicators are, in
 [Sound Intensity](/phonometry/devices/emission/intensity/).
-ISO 4871's batch statistics beyond the single-machine
+ISO 3743-1, ISO 3743-2 and ISO 3747, the remaining members of the ISO 3740
+family, are not implemented either, and neither is the sound *energy* level
+$L_J$ for single events. The emission sound pressure level $L_{pA}$ that stands
+beside $L_{WA}$ in a declaration is consumed, not determined: ISO 11201,
+ISO 11202 and ISO 11204 are outside the library. ISO 4871's batch criteria of
+clause 6.3 are not evaluated — only the clause 6.2 single-machine verification —
+and its batch statistics beyond the single-machine
 $K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
 
 ## See also
@@ -284,6 +447,8 @@ $K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](/phonometry/devices/emission/sound-power-intensity/):
   the routes that tolerate steady background noise, qualified by their field
   indicators.
+- [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
+  the sixth route, for a machine no microphone can approach.
 - [Sound Intensity (p-p)](/phonometry/devices/emission/intensity/): the two-microphone
   probe behind the scanning methods.
 - [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the reverberation

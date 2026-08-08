@@ -119,6 +119,49 @@ Rectangular ducts use the equivalent diameter $D = \sqrt{4S/\pi}$. Bies 5th
 ed. gives the duct end reflection only as the ASHRAE table (no closed form in
 that edition); this module reproduces and interpolates it.
 
+Two conditions travel with those models. The lined-elbow values assume the
+lining extends **at least three duct diameters up- and downstream of the bend**,
+so `lined=True` describes a lined run that contains a bend rather than a lined
+bend in a bare duct; a bend in bare duct takes the unlined column. And the
+flow-noise model is for a straight, undisturbed run: the sound power carries
+$50\log_{10}U$, so the velocity term alone costs 15.1 dB per doubling, and
+because the spectrum shape also shifts upward the band levels of a 0.04 m² duct
+rise by 15.6 dB at 63 Hz and 21.6 dB at 4 kHz between 10 and 20 m/s. Hence the
+customary design velocities: roughly 7 to 10 m/s in plant-room mains, 4 to 5 m/s
+in branches and 2 to 3 m/s in the last run before an occupied room.
+
+**Test-report fiche.** `HvacSpectrumResult.report(path)` renders a one-page
+duct-noise fiche: the octave-band table of the spectrum beside the same curve
+plotted against frequency, the boxed single-number result — the A-weighted sound
+power level when the spectrum is regenerated noise, the mean attenuation when it
+is a loss — and, when a `requirement` is declared, the verdict against it.
+Rendering needs reportlab and, for the embedded figure, matplotlib
+(`pip install "phonometry[report,plot]"`).
+
+```python
+from phonometry import ReportMetadata
+from phonometry.noise_control import hvac
+
+octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+
+# The flow noise of a straight supply duct carrying air at 12 m/s.
+duct = hvac.flow_noise_straight_duct(octaves, flow_velocity=12.0, area=0.04)
+duct.report(
+    "hvac-duct-noise.pdf",
+    metadata=ReportMetadata(
+        specimen="Straight supply duct, 0.04 m2 cross-section (design case)",
+        test_room="Air-handling plant room (design case)",
+        measurement_standard="VDI 2081-1 prediction model",
+        requirement=45.0,               # maximum acceptable L_WA, dB(A)
+    ),
+)
+```
+
+[![One-page HVAC duct-noise fiche: a metadata header naming the straight supply duct and the air-handling plant room, an octave-band table of the flow-generated sound power level falling from 42.5 dB at 63 Hz to 21.8 dB at 4 kHz, the same spectrum plotted beside it, the boxed A-weighted sound power level LWA = 38.8 dB(A) re 1 pW with the overall unweighted LW = 47.0 dB re 1 pW, and a PASS verdict against a declared maximum of 45.0 dB(A).](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/hvac_duct_noise_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/hvac_duct_noise_example.pdf)
+
+That PASS has very little margin: the same duct at 17 m/s returns 48.1 dB(A) and
+fails, with nothing else changed.
+
 ## 2. Machine enclosures
 
 A sealed enclosure reduces the radiated noise by its panel transmission loss
@@ -192,6 +235,59 @@ plt.show()
 `enclosure_insertion_loss` returns an `EnclosureResult` with the panel
 `panel_transmission_loss`, the interior `correction`, the net `insertion_loss`,
 the interior `room_constant` and `.plot()`.
+
+**What the enclosure actually delivers.** An enclosure is a composite, so the
+elements combine on an energy basis before $\mathrm{IL} = R - C$ is applied, and
+the result is set by the worst of them. A bare opening of relative area
+$S_a/S_E$ caps the composite at $10\log_{10}(S_E/S_a)$ whatever the panels are:
+one per cent of open area caps it at 20 dB. For the sheet-steel case below
+(mean panel $R$ = 32.3 dB, $S_E$ = 24 m²), a 1.28 m² door at $R$ = 15 dB takes
+the mean insertion loss from 28.9 dB to 21.4 dB, and adding a 0.24 m² gap at the
+door foot takes it to 15.1 dB. `composite_transmission_loss(areas,
+reduction_indices)` builds that composite and `enclosure_insertion_loss` takes
+its result directly as the panel $R$. Cooling openings become short lined ducts
+rather than holes, and the machine must not touch the shell or share its slab,
+because a rigid contact bypasses the panels entirely.
+
+**Test-report fiche.** `EnclosureResult.report(path)` renders a one-page
+enclosure fiche: the octave-band table of the supplied panel $R$, the interior
+correction $C$ and the net $\mathrm{IL}$, the three curves plotted beside it,
+and the boxed mean insertion loss with the mean panel $R$ and the external and
+internal surface areas, plus the verdict against a declared minimum mean
+insertion loss.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, enclosure_insertion_loss
+
+octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+sheet_steel_R = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
+
+case = enclosure_insertion_loss(sheet_steel_R, external_area=24.0,
+                                internal_area=30.0, internal_absorption=0.30,
+                                frequencies=octaves)
+case.report(
+    "enclosure.pdf",
+    metadata=ReportMetadata(
+        specimen="Sheet-steel close-fitting machine enclosure (design case)",
+        test_room="Machine hall, line 3 (design case)",
+        measurement_standard="Bies & Hansen 7.4.2 prediction model",
+        requirement=20.0,               # minimum acceptable mean IL, dB
+    ),
+)
+```
+
+[![One-page machine-enclosure fiche: a metadata header naming the sheet-steel close-fitting enclosure and the machine hall, an octave-band table of the supplied panel transmission loss R, the interior correction C and the net insertion loss IL (18.0, 3.4 and 14.6 dB at 63 Hz up to 45.0, 3.4 and 41.6 dB at 4 kHz), the R, C and IL curves plotted beside it, the boxed mean insertion loss IL = 28.9 dB with the mean panel R = 32.3 dB and the external and internal surface areas SE = 24.00 m2 and Si = 30.00 m2, and a PASS verdict against a declared minimum of 20.0 dB.](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosure_insertion_loss_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosure_insertion_loss_example.pdf)
+
+**And how it would be measured.** ISO 11546-1:1995 determines the same quantity
+under laboratory conditions for declaration, ISO 11546-2:1995 in situ for
+acceptance: the sound power level (or the level at a specified position) is
+determined with the enclosure and again without it, at identical microphone
+positions and with the machine at the same operating point, and the difference
+is reported band by band over at least 100 Hz to 5 kHz in third octaves.
+What has to be recorded includes the **leak ratio** (open area over interior
+surface area, with the openings described) and the **fill ratio** (source volume
+over interior volume) — the two numbers a prediction never captures.
 
 ## References
 

@@ -12,6 +12,7 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import Normalize
 from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
@@ -20,12 +21,14 @@ from .i18n import _LANG
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
+    COLOR_MUTED,
     COLOR_PANEL,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
     apply_axis_styling,
+    measure_weighting_response,
     save_figure,
 )
 
@@ -181,7 +184,14 @@ def generate_distortion(output_dir: str) -> None:
 
 
 def generate_frequency_response(output_dir: str) -> None:
-    """Bode magnitude and coherence of an estimated frequency response (H1)."""
+    """H1 against H2 with the noise on each channel in turn, and coherence.
+
+    Bendat & Piersol's rule is that the unbiased estimator is the one whose
+    noisy channel sits in the denominator, and that the coherence floor of an
+    output-noise measurement is SNR/(1 + SNR). Both are statements a single
+    H1 curve cannot make: the same record has to be analysed twice, and the
+    noise has to be moved from one channel to the other.
+    """
     print("Generating frequency_response...")
     from scipy import signal as sp_signal
 
@@ -190,44 +200,80 @@ def generate_frequency_response(output_dir: str) -> None:
     fs = _FS_ELECTRO
     n = 400000
     rng = np.random.default_rng(7)
-    x = rng.standard_normal(n)
+    clean_x = rng.standard_normal(n)
     # A resonant second-order band-pass "device under test".
     b, a = sp_signal.butter(2, [400.0, 4000.0], btype="band", fs=fs)
-    y = sp_signal.lfilter(b, a, x)
-    # Additive output noise pulls the coherence down where the signal is weak.
-    y = y + rng.standard_normal(n) * np.sqrt(np.mean(y**2)) * 0.05
+    clean_y = sp_signal.lfilter(b, a, clean_x)
+    noise_frac = 0.05
 
-    res = transfer_function(x, y, fs, estimator="H1")
-    _, h_true = sp_signal.freqz(b, a, worN=res.frequencies, fs=fs)
-    pos = res.frequencies > 0.0
-    freqs = res.frequencies[pos]
-    true_db = 20.0 * np.log10(np.maximum(np.abs(h_true[pos]), 1e-12))
+    # Case 1: the noise is on the output, which is the usual acoustic case.
+    y_out = clean_y + rng.standard_normal(n) * np.sqrt(
+        np.mean(clean_y**2)) * noise_frac
+    # Case 2: the same path with the noise on the reference channel instead.
+    # A larger fraction, because an input-noise bias is uniform across the
+    # band and a 5 % one would be invisible at this scale.
+    noise_frac_in = 0.5
+    x_in = clean_x + rng.standard_normal(n) * np.sqrt(
+        np.mean(clean_x**2)) * noise_frac_in
 
-    _fig, (ax_mag, ax_coh) = plt.subplots(
-        2, 1, figsize=(10, 7.2), sharex=True,
+    cases = (
+        ("Noise on the output — H1 is unbiased", clean_x, y_out),
+        ("Noise on the input — H2 is unbiased", x_in, clean_y),
+    )
+
+    _fig, axes = plt.subplots(
+        2, 2, figsize=(11.4, 7.6), sharex=True,
         gridspec_kw={"height_ratios": [2.0, 1.0]})
-    ax_mag.semilogx(freqs, true_db, color=COLOR_FG, linestyle="--",
-                    linewidth=1.6, alpha=0.7, label="True |H|")
-    ax_mag.semilogx(freqs, res.magnitude_db[pos], color=COLOR_PRIMARY,
-                    linewidth=1.8, label="Estimated |H| (H1)")
-    ax_mag.set_ylabel("Magnitude [dB]")
-    ax_mag.set_ylim(-80.0, 5.0)
-    ax_mag.set_title("Frequency Response and Coherence (Bendat & Piersol)",
-                     fontweight="bold", pad=12)
-    ax_mag.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
-    ax_mag.set_axisbelow(True)
-    ax_mag.legend(loc="lower center", fontsize=9)
+    for col, (title, xx, yy) in enumerate(cases):
+        h1 = transfer_function(xx, yy, fs, estimator="H1")
+        h2 = transfer_function(xx, yy, fs, estimator="H2")
+        _, h_true = sp_signal.freqz(b, a, worN=h1.frequencies, fs=fs)
+        pos = h1.frequencies > 0.0
+        freqs = h1.frequencies[pos]
+        true_db = 20.0 * np.log10(np.maximum(np.abs(h_true[pos]), 1e-12))
 
-    ax_coh.semilogx(freqs, res.coherence[pos], color=COLOR_TERTIARY,
-                    linewidth=1.8)
-    ax_coh.set_ylabel(r"Coherence $\gamma^2$")
-    ax_coh.set_xlabel("Frequency [Hz]")
-    ax_coh.set_ylim(0.0, 1.05)
-    ax_coh.set_xlim(20.0, fs / 2.0)
-    ax_coh.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
-    ax_coh.set_axisbelow(True)
-    for _axf in (ax_mag, ax_coh):
-        format_frequency_axis(_axf, 20.0, fs / 2.0)
+        ax_mag, ax_coh = axes[0][col], axes[1][col]
+        ax_mag.semilogx(freqs, true_db, color=COLOR_FG, linestyle="--",
+                        linewidth=1.6, alpha=0.7, label="True |H|")
+        ax_mag.semilogx(freqs, h1.magnitude_db[pos], color=COLOR_PRIMARY,
+                        linewidth=1.8, label="H1 = Gxy / Gxx")
+        ax_mag.semilogx(freqs, h2.magnitude_db[pos], color=COLOR_SECONDARY,
+                        linewidth=1.5, linestyle="-.", label="H2 = Gyy / Gyx")
+        ax_mag.set_ylim(-80.0, 12.0)
+        ax_mag.set_title(title, fontweight="bold", fontsize=11, pad=10)
+        ax_mag.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax_mag.set_axisbelow(True)
+        ax_mag.legend(loc="lower center", fontsize=8.5)
+
+        ax_coh.semilogx(freqs, h1.coherence[pos], color=COLOR_TERTIARY,
+                        linewidth=1.8, label="measured")
+        # The closed-form floor the section states, from the local SNR.
+        if col == 0:
+            # Output noise: the SNR follows |H|, so the coherence collapses
+            # wherever the filter has thrown the output into the noise.
+            snr = (np.abs(h_true[pos]) ** 2 * np.mean(clean_x**2)
+                   / (np.mean(clean_y**2) * noise_frac**2))
+        else:
+            # Input noise: the ratio is the same in every band, so the
+            # coherence is depressed uniformly and never at the band edges.
+            snr = np.full_like(freqs, 1.0 / noise_frac_in**2)
+        snr = np.maximum(snr, 1e-9)
+        ax_coh.semilogx(freqs, snr / (1.0 + snr), color=COLOR_FG,
+                        linestyle=":", linewidth=1.4, label="SNR / (1 + SNR)")
+        ax_coh.axhline(0.9, color=COLOR_SECONDARY, linestyle="--",
+                       linewidth=1.2, alpha=0.8)
+        ax_coh.set_ylabel("Coherence" if col == 0 else "")
+        ax_coh.set_xlabel(LABEL_FREQ_HZ)
+        ax_coh.set_ylim(0.0, 1.05)
+        ax_coh.set_xlim(20.0, fs / 2.0)
+        ax_coh.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax_coh.set_axisbelow(True)
+        ax_coh.legend(loc="lower center", fontsize=8)
+        for _axf in (ax_mag, ax_coh):
+            format_frequency_axis(_axf, 20.0, fs / 2.0)
+    axes[0][0].set_ylabel("Magnitude [dB]")
+    _fig.suptitle("Choosing Between H1 and H2 (Bendat & Piersol)",
+                  fontweight="bold", fontsize=13)
     plt.tight_layout()
     save_figure(output_dir, "frequency_response.svg")
     plt.close()
@@ -976,6 +1022,196 @@ def generate_silencer_expansion_chamber(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "silencer_expansion_chamber.svg")
     plt.close()
+
+
+def generate_silencer_insertion_loss(output_dir: str) -> None:
+    """The same chamber: one transmission loss, two insertion losses."""
+    print("Generating silencer_insertion_loss.svg...")
+    import warnings as _warnings
+
+    from phonometry import expansion_chamber, radiating_piston
+
+    pipe_area, rho, c = 0.01, 1.206, 343.0
+    radius = float(np.sqrt(pipe_area / np.pi))
+    z0 = rho * c / pipe_area                       # 41.4 kPa.s/m3
+    freqs = np.linspace(20.0, 880.0, 1600)         # up to the cut-on, 890.8 Hz
+    piston = radiating_piston(radius, freqs, speed_of_sound=c, density=rho)
+    # Acoustic (not mechanical) radiation impedance of the open end:
+    # Z_r = (rho c / S) (R_1 + j X_1), with the normalised R_1 / X_1 the
+    # result carries as .resistance / .reactance.
+    z_r = z0 * (np.asarray(piston.resistance) + 1j * np.asarray(piston.reactance))
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        plain = expansion_chamber(freqs, 0.3, 0.04, pipe_area)
+        matched = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                                    source_impedance=z0, radiation_impedance=z_r)
+        stiff = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                                  source_impedance=20.0 * z0,
+                                  radiation_impedance=z_r)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.axhline(0.0, color=COLOR_GRID, lw=1.0)
+    ax.plot(freqs, plain.transmission_loss, color=COLOR_FG, lw=2.6,
+            label="Transmission loss (anechoic ports)")
+    ax.plot(freqs, np.asarray(stiff.insertion_loss), color=COLOR_SECONDARY,
+            lw=1.7, ls="--",
+            label="Insertion loss, stiff source ($Z_s = 20\\,\\rho c/S$)")
+    ax.plot(freqs, np.asarray(matched.insertion_loss), color=COLOR_PRIMARY,
+            lw=1.7, label="Insertion loss, matched source ($Z_s = \\rho c/S$)")
+    ax.set_xlim(20.0, 880.0)
+    ax.set_ylim(-30.0, 24.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Attenuation [dB]")
+    ax.set_title("One chamber, one TL, and as many insertion losses as "
+                 "installations", fontweight="bold", pad=10)
+    ax.annotate("near 180 Hz the chamber and the open end it\ndischarges "
+                "through resonate together: the\ninstallation is LOUDER with "
+                "the silencer in it",
+                xy=(182.0, -22.6), xytext=(250.0, -25.0), fontsize="small",
+                color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
+                            "lw": 1.0})
+    ax.annotate("near 645 Hz, just past the half-wave trough\nof the TL, both "
+                "insertion losses dip again",
+                xy=(645.0, -8.5), xytext=(560.0, -17.5),
+                fontsize="small", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small")
+    plt.tight_layout()
+    save_figure(output_dir, "silencer_insertion_loss.svg")
+    plt.close()
+
+
+def generate_silencer_selection(output_dir: str) -> None:
+    """Reactive against dissipative, on one axis, with the validity ceiling."""
+    print("Generating silencer_selection.svg...")
+    import warnings as _warnings
+
+    from phonometry import expansion_chamber, helmholtz_resonator
+    from phonometry.noise_control import hvac
+
+    inch, foot = 0.0254, 0.3048
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    freqs = np.linspace(30.0, 8000.0, 4000)
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        chamber = expansion_chamber(freqs, 0.3, 0.04, 0.01)
+        branch = helmholtz_resonator(freqs, duct_area=0.01, neck_area=1e-4,
+                                     neck_length=0.0296, cavity_volume=1e-3)
+    limit = float(chamber.plane_wave_limit or 8000.0)
+    inside = freqs <= limit
+
+    _fig, ax = plt.subplots(figsize=(10, 6.4))
+    ax.semilogx(freqs[inside], np.asarray(chamber.transmission_loss)[inside],
+                color=COLOR_PRIMARY, lw=1.9,
+                label="Reactive: 0.3 m expansion chamber, m = 4")
+    ax.semilogx(freqs[inside], np.asarray(branch.transmission_loss)[inside],
+                color=COLOR_PRIMARY, lw=1.7, ls="--",
+                label="Reactive: Helmholtz branch tuned to 100 Hz")
+    for thickness, style in ((0.025, ":"), (0.050, "-.")):
+        lined = hvac.lined_rectangular_duct_attenuation(
+            bands, 36 * inch, 24 * inch, 1.5, thickness, include_unlined=True)
+        ax.semilogx(bands, np.asarray(lined.values), style, color=COLOR_TERTIARY,
+                    lw=1.8, marker="o", ms=4,
+                    label=f"Dissipative: 1.5 m of {thickness * 1000:.0f} mm "
+                          f"lined 36 × 24 in duct")
+    splitter = hvac.splitter_silencer_insertion_loss(
+        bands, 24 * inch, 5 * foot, [4 * inch] * 5, 8 * inch)
+    ax.semilogx(bands, np.asarray(splitter.values), "-", color=COLOR_SECONDARY,
+                lw=2.0, marker="s", ms=5,
+                label="Dissipative: five-airway splitter unit, 5 ft")
+    ax.axvline(limit, color=COLOR_PRIMARY, lw=1.6, ls=":")
+    ax.text(limit * 1.10, 45.0, f"first duct cut-on, {limit:.0f} Hz: the blue "
+                                "four-pole\ncurves stop applying beyond it; the "
+                                "dissipative\nregressions carry on",
+            fontsize="small", color=COLOR_FG, va="top")
+    ax.set_xlim(40.0, 8000.0)
+    ax.set_ylim(0.0, 48.0)
+    format_frequency_axis(ax, 40.0, 8000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Attenuation [dB]")
+    ax.set_title("Choosing the family: where each one is worth having",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small")
+    plt.tight_layout()
+    save_figure(output_dir, "silencer_selection.svg")
+    plt.close()
+
+
+def generate_silencer_extended_tube(output_dir: str) -> None:
+    """The internal extensions that fill the plain chamber's 0 dB troughs."""
+    print("Generating silencer_extended_tube.svg...")
+    import warnings as _warnings
+
+    from phonometry import expansion_chamber, extended_tube_chamber
+
+    freqs = np.linspace(20.0, 880.0, 2400)
+    kwargs = {"length": 0.4, "chamber_area": 0.04, "pipe_area": 0.01}
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        plain = expansion_chamber(freqs, kwargs["length"], kwargs["chamber_area"],
+                                  kwargs["pipe_area"])
+        inlet = extended_tube_chamber(freqs, inlet_extension=0.1, **kwargs)
+        both = extended_tube_chamber(freqs, inlet_extension=0.1,
+                                     outlet_extension=0.2, **kwargs)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.plot(freqs, plain.transmission_loss, color=COLOR_FG, lw=1.6, ls="--",
+            label="Plain chamber, 0.4 m")
+    ax.plot(freqs, inlet.transmission_loss, color=COLOR_PRIMARY, lw=1.9,
+            label="Inlet extension L/4 = 0.10 m")
+    ax.plot(freqs, both.transmission_loss, color=COLOR_SECONDARY, lw=1.7,
+            ls="-.", label="Inlet L/4 and outlet L/2 = 0.20 m")
+    trough = 343.0 / (2.0 * kwargs["length"])
+    ax.axvline(trough, color=COLOR_GRID, lw=1.2, ls=":")
+    ax.annotate(f"c/2L = {trough:.0f} Hz: the plain chamber is transparent "
+                "(0.0 dB),\nthe L/4 inlet gives 5.1 dB and the L/4 + L/2 pair "
+                "74 dB", xy=(trough, 5.1), xytext=(trough * 1.06, 26.0),
+                fontsize="small", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    for fx, label in ((355.0, "0.1 dB"), (261.0, "0.4 dB")):
+        ax.annotate(f"new trough,\n{label}", xy=(fx, 0.4),
+                    xytext=(fx - 78.0, 16.0), fontsize="small",
+                    color=COLOR_SECONDARY,
+                    arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
+                                "lw": 1.0})
+    ax.set_xlim(20.0, 880.0)
+    ax.set_ylim(0.0, 46.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Transmission loss [dB]")
+    ax.set_title("Extended-tube chamber: quarter-wave branches buried inside",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper right", fontsize="small")
+    plt.tight_layout()
+    save_figure(output_dir, "silencer_extended_tube.svg")
+    plt.close()
+
+
+def generate_extended_tube_geometry(output_dir: str) -> None:
+    """The dimensioned cross-section of the extended-tube chamber."""
+    print("Generating extended_tube_geometry.svg...")
+    import warnings as _warnings
+
+    from phonometry import extended_tube_chamber
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        result = extended_tube_chamber(
+            np.linspace(20.0, 880.0, 800), length=0.4, chamber_area=0.04,
+            pipe_area=0.01, inlet_extension=0.1, outlet_extension=0.2,
+        )
+    result.plot_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "extended_tube_geometry.svg")
+    plt.close()
+
+
 def generate_modulation_distortion(output_dir: str) -> None:
     """IEC 60268-3 14.12.7 modulation sidebands via ModulationDistortionResult.plot()."""
     print("Generating modulation_distortion.svg...")
@@ -1016,6 +1252,551 @@ def generate_piston_radiation_impedance(output_dir: str) -> None:
     res.plot(ax=ax)
     plt.tight_layout()
     save_figure(output_dir, "piston_radiation_impedance.svg")
+    plt.close()
+
+
+def generate_reverberation_correction_terms(output_dir: str) -> None:
+    """The five terms of ISO 3741 Eq. 20, on the guide's own room.
+
+    Every value is read off the ``ReverberationSoundPowerResult`` the page's
+    own call returns, so the stack adds up to the LW - Lp the guide prints.
+    """
+    print("Generating reverberation_correction_terms.svg...")
+    from phonometry import emission
+
+    freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                      1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                      10000], dtype=float)
+    lp = np.linspace(80.0, 70.0, freqs.size)
+    surface_area = 220.0
+    res = emission.sound_power_reverberation(
+        lp, np.full(freqs.size, 2.0), volume=200.0, surface_area=surface_area,
+        frequencies=freqs, temperature=20.0, static_pressure=101.0)
+
+    absorption = 10.0 * np.log10(res.absorption_area)
+    eyring = 4.34 * res.absorption_area / surface_area
+    meteo = np.full(freqs.size, res.c1 + res.c2)
+    minus_six = np.full(freqs.size, -6.0)
+    terms = (
+        ("10 lg(A/A₀)", absorption, COLOR_PRIMARY),
+        ("4.34 A/S", eyring, COLOR_TERTIARY),
+        ("Waterhouse", res.waterhouse_correction, COLOR_SECONDARY),
+        ("C₁ + C₂", meteo, COLOR_MUTED),
+        ("−6 dB", minus_six, theme_fill(COLOR_MUTED, None)),
+    )
+
+    _fig, ax = plt.subplots(figsize=(11, 5.6))
+    x = np.arange(freqs.size)
+    up = np.zeros(freqs.size)
+    down = np.zeros(freqs.size)
+    for label, values, colour in terms:
+        base = np.where(values >= 0.0, up, down)
+        ax.bar(x, values, bottom=base, width=0.72, color=colour,
+               edgecolor=COLOR_FG, linewidth=0.4, label=label)
+        up = up + np.clip(values, 0.0, None)
+        down = down + np.clip(values, None, 0.0)
+    ax.plot(x, res.sound_power_level - lp, "o-", color=COLOR_FG, markersize=4,
+            linewidth=1.6, label="LW − L̄p")
+    ax.axhline(0.0, color=COLOR_FG, linewidth=1.0)
+    ax.annotate("the Waterhouse term rules the low bands\n"
+                "(1.68 dB at 100 Hz, 0.02 dB at 10 kHz)", (0.6, 14.4),
+                fontsize=10, color=COLOR_SECONDARY)
+    ax.annotate("4.34 A/S is 0.32 dB in this hard room, and 0.79 dB with the "
+                "same room damped to T₆₀ = 0.8 s",
+                (0.6, -7.4), fontsize=10, color=COLOR_TERTIARY)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=60, ha="right",
+                       fontsize=8)
+    ax.set(xlabel=LABEL_FREQ_HZ, ylabel="Contribution to LW − L̄p [dB]",
+           ylim=(-8.0, 17.5))
+    ax.set_title("The five terms of ISO 3741 Eq. 20", fontweight="bold",
+                 pad=12)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="-")
+    ax.legend(loc="upper right", fontsize=9, ncol=3)
+    plt.tight_layout()
+    save_figure(output_dir, "reverberation_correction_terms.svg")
+    plt.close()
+
+
+def generate_precision_positions_arrays(output_dir: str) -> None:
+    """The two ISO 3745 arrays: the 40-position hemisphere and the sphere.
+
+    The hemisphere panel splits the array at position 20, which is where the
+    standard's escalation cuts: positions 1 to 20 are used first and 21 to 40
+    are added only when the band level range demands it.
+    """
+    print("Generating precision_positions_arrays.svg...")
+    from phonometry import emission, plot_microphone_positions
+
+    hemi = emission.precision_positions("hemisphere", radius=1.0, count=40)
+    sphere = emission.precision_positions("sphere", radius=1.0, count=20)
+
+    from matplotlib.lines import Line2D
+
+    fig, (axl, axr) = plt.subplots(
+        1, 2, figsize=(12, 5.4), subplot_kw={"projection": "3d"})
+    # Two colours through the scatter kwargs, so the escalation the standard
+    # makes at position 20 reads straight off the array.
+    plot_microphone_positions(
+        hemi, ax=axl, radius=1.0, language=_LANG,
+        color=[COLOR_SECONDARY] * 20 + [COLOR_PRIMARY] * 20, s=36)
+    axl.set_title("Hemisphere, 40 positions (Table E.1)", fontweight="bold")
+    axl.legend(handles=[
+        Line2D([], [], marker="o", linestyle="none", color=COLOR_SECONDARY,
+               label="positions 1-20: always"),
+        Line2D([], [], marker="o", linestyle="none", color=COLOR_PRIMARY,
+               label="positions 21-40: on escalation"),
+    ], loc="upper left", fontsize=8)
+
+    plot_microphone_positions(sphere, ax=axr, radius=1.0, language=_LANG)
+    axr.set_title("Sphere, 20 positions (Table D.1)", fontweight="bold")
+
+    fig.suptitle("ISO 3745 precision microphone arrays", fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "precision_positions_arrays.svg")
+    plt.close()
+
+
+def generate_k1_k2_corrections(output_dir: str) -> None:
+    """The shape of the two ISO 3744 corrections, and where they are capped.
+
+    Left: K1 against the source-to-background margin, swept through
+    ``sound_power_pressure`` itself so the curve is the library's. Right: K2
+    against 4S/A, with the two validity limits and what a 20 % error in A
+    costs at the engineering limit.
+    """
+    print("Generating k1_k2_corrections.svg...")
+    from phonometry import emission
+
+    # --- left: K1(delta Lp) --------------------------------------------------
+    freqs = np.array([1000.0])
+    margins = np.linspace(0.5, 20.0, 400)
+    surface = 80.0
+    k1 = np.array([
+        float(emission.sound_power_pressure(
+            np.full((10, 1), surface), "hemisphere", radius=2.0,
+            background_levels=np.full((10, 1), surface - m),
+            frequencies=freqs).background_correction[0])
+        for m in margins
+    ])
+
+    # --- right: K2(4S/A) -----------------------------------------------------
+    ratio = np.geomspace(0.05, 10.0, 400)
+    k2 = 10.0 * np.log10(1.0 + ratio)
+
+    _fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5))
+
+    axl.plot(margins, k1, color=COLOR_PRIMARY, linewidth=2.0)
+    axl.axvspan(0.0, 6.0, color=theme_fill(COLOR_SECONDARY, axl), zorder=0)
+    axl.axvline(6.0, color=COLOR_SECONDARY, linestyle="--", linewidth=1.4)
+    axl.axvline(3.0, color=COLOR_TERTIARY, linestyle=":", linewidth=1.4)
+    axl.text(6.2, 2.4, "ISO 3744 criterion\n6 dB", fontsize=9,
+             color=COLOR_SECONDARY)
+    axl.text(0.4, 3.4, "capped:\nupper bound", fontsize=9, color=COLOR_SECONDARY)
+    axl.text(3.15, 0.9, "ISO 3746\n3 dB", fontsize=9, color=COLOR_TERTIARY)
+    for m, label in ((15.0, "0.14 dB"), (10.0, "0.46 dB"), (6.0, "1.26 dB")):
+        value = float(np.interp(m, margins, k1))
+        axl.plot([m], [value], "o", color=COLOR_FG, markersize=5)
+        axl.annotate(f"{m:g} dB → {label}", (m, value),
+                     textcoords="offset points", xytext=(8, 8), fontsize=9)
+    axl.set(xlabel="Source-to-background margin ΔLp [dB]",
+            ylabel="Background correction K1 [dB]", xlim=(0, 20), ylim=(0, 4.2))
+    axl.set_title("K1 is a cliff, not a slope", fontweight="bold", pad=12)
+    axl.grid(color=COLOR_GRID, linestyle="-")
+
+    axr.semilogx(ratio, k2, color=COLOR_PRIMARY, linewidth=2.0)
+    # A +/- 20 % error in A moves 4S/A the other way by the same factor.
+    axr.fill_between(ratio, 10.0 * np.log10(1.0 + ratio / 1.2),
+                     10.0 * np.log10(1.0 + ratio / 0.8),
+                     color=theme_fill(COLOR_PRIMARY, axr), zorder=0,
+                     label="A known to ±20 %")
+    for limit, colour, name in ((4.0, COLOR_SECONDARY, "ISO 3744 limit"),
+                                (7.0, COLOR_TERTIARY, "ISO 3746 limit")):
+        r_limit = 10.0 ** (limit / 10.0) - 1.0
+        share = 100.0 * r_limit / (1.0 + r_limit)
+        axr.axhline(limit, color=colour, linestyle="--", linewidth=1.4)
+        axr.annotate(f"{name}: K2 = {limit:g} dB\n{share:.0f} % of the measured "
+                     f"energy is room", (0.055, limit + 0.18), fontsize=9,
+                     color=colour)
+    axr.set(xlabel="4S/A", ylabel="Environmental correction K2 [dB]",
+            ylim=(0, 11))
+    axr.set_title("K2 saturates, and inherits every error in A",
+                  fontweight="bold", pad=12)
+    axr.grid(which="both", color=COLOR_GRID, linestyle="-")
+    axr.legend(loc="lower right", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "k1_k2_corrections.svg")
+    plt.close()
+
+
+def generate_radiation_efficiency(output_dir: str) -> None:
+    """sigma(f) for the page's own plate, against the Part 1 assumption eps = 1."""
+    print("Generating radiation_efficiency_sigma.svg...")
+    from phonometry import vibration
+
+    # A 3 mm steel casing panel: m'' = 23.4 kg/m2, B' from the plate stiffness,
+    # so the coincidence frequency lands near 4 kHz.
+    freqs = np.geomspace(50.0, 5000.0, 400)
+    stiffness = vibration.plate_bending_stiffness(2.0e11, 0.003, 0.30)
+    fc = vibration.coincidence_frequency(7800.0 * 0.003, stiffness)
+    sigma = vibration.radiation_efficiency(freqs, 1.5, 1.25, fc)
+
+    _fig, ax = plt.subplots(figsize=(10, 5.6))
+    # The result's own .plot() draws sigma(f) on a log axis with the sigma = 1
+    # line and the critical frequency already marked.
+    sigma.plot(ax=ax, language=_LANG)
+    values = sigma.radiation_efficiency
+    ax.fill_between(freqs, values, 1.0, where=values < 1.0,
+                    color=theme_fill(COLOR_SECONDARY, ax), zorder=0)
+    ax.annotate("ISO/TS 7849-1 assumes ε = 1 here", (60.0, 1.35), fontsize=10,
+                color=COLOR_SECONDARY)
+    for band in (125.0, 1000.0):
+        index = float(np.interp(band, freqs, sigma.radiation_index))
+        ax.annotate(f"{index:.1f} dB", (band, float(np.interp(band, freqs, values))),
+                    textcoords="offset points", xytext=(6, -16), fontsize=10,
+                    color=COLOR_SECONDARY)
+    ax.annotate("the gap Part 1 pays for: 25 dB at 63 Hz,\n"
+                "14 dB at 2 kHz, gone only above coincidence",
+                (55.0, 0.02), fontsize=10, color=COLOR_SECONDARY)
+    plt.tight_layout()
+    save_figure(output_dir, "radiation_efficiency_sigma.svg")
+    plt.close()
+
+
+def generate_partial_power_map(output_dir: str) -> None:
+    """The per-segment partial powers of an ISO 9614-2 scan, over the unfolded box.
+
+    Five faces of a measurement box laid flat, each tiled by its segments and
+    coloured by its partial power level, with the one net-negative segment
+    hatched: the diagnostic a band-summed LW spectrum cannot show.
+    """
+    print("Generating partial_power_map.svg...")
+    import matplotlib.patches as mpatches
+
+    from phonometry import emission
+
+    # A 1,2 x 0,8 x 1,0 m machine boxed at d = 0,25 m: five faces, each cut
+    # into four segments. The front face dominates; one segment on the shadow
+    # side takes net inflow from a louder neighbour.
+    faces = ("front", "right", "back", "left", "top")
+    areas_face = np.array([1.7 * 1.5, 1.3 * 1.5, 1.7 * 1.5, 1.3 * 1.5, 1.7 * 1.3])
+    seg_area = np.repeat(areas_face / 4.0, 4)
+    share = np.array([
+        2.6, 2.2, 2.0, 1.8,      # front
+        0.9, 0.8, 0.7, 0.7,      # right
+        0.5, 0.4, -0.35, 0.3,    # back, one segment net inward
+        0.8, 0.7, 0.6, 0.6,      # left
+        1.1, 1.0, 0.9, 0.8,      # top
+    ])
+    freqs = np.array([500.0])
+    i_n = (share * 1.0e-5 / seg_area)[:, None]
+    res = emission.sound_power_intensity(i_n, seg_area, frequencies=freqs)
+    level = res.partial_power_level[:, 0]
+    signed = res.partial_power[:, 0]
+
+    # Unfolded net: the four side faces in a row with the top above the front.
+    origins = {"front": (0.0, 0.0), "right": (1.7, 0.0), "back": (3.0, 0.0),
+               "left": (4.7, 0.0), "top": (0.0, 1.5)}
+    sizes = {"front": (1.7, 1.5), "right": (1.3, 1.5), "back": (1.7, 1.5),
+             "left": (1.3, 1.5), "top": (1.7, 1.3)}
+
+    fig, (ax, axb) = plt.subplots(
+        2, 1, figsize=(11, 7.4), gridspec_kw={"height_ratios": [3.0, 1.0]})
+    vmin, vmax = float(level.min()), float(level.max())
+    cmap = plt.get_cmap("viridis")
+    for f_index, face in enumerate(faces):
+        ox, oy = origins[face]
+        w, h = sizes[face]
+        for k in range(4):
+            cx = ox + (k % 2) * w / 2.0
+            cy = oy + (1 - k // 2) * h / 2.0
+            value = level[4 * f_index + k]
+            shade = cmap((value - vmin) / max(vmax - vmin, 1e-9))
+            ax.add_patch(mpatches.Rectangle(
+                (cx, cy), w / 2.0, h / 2.0, facecolor=shade,
+                edgecolor=COLOR_FG, linewidth=1.0,
+                hatch="//" if signed[4 * f_index + k] < 0 else None))
+            sign = "−" if signed[4 * f_index + k] < 0 else ""
+            ax.text(cx + w / 4.0, cy + h / 4.0, f"{sign}{value:.0f}",
+                    ha="center", va="center", fontsize=9, color="white")
+        ax.add_patch(mpatches.Rectangle((ox, oy), w, h, fill=False,
+                                        edgecolor=COLOR_FG, linewidth=2.0))
+        if face == "top":
+            ax.text(ox + w / 2.0, oy + h + 0.10, face, ha="center",
+                    va="bottom", fontsize=10, fontweight="bold")
+        else:
+            ax.text(ox + w / 2.0, oy - 0.12, face, ha="center", va="top",
+                    fontsize=10, fontweight="bold")
+    ax.set_xlim(-0.2, 6.2)
+    ax.set_ylim(-0.4, 3.0)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_title("Partial power level per segment [dB re 1 pW], "
+                 "the box unfolded", fontweight="bold")
+    fig.colorbar(plt.cm.ScalarMappable(
+        norm=Normalize(vmin, vmax), cmap=cmap), ax=ax, shrink=0.8,
+        label="LWi [dB]")
+
+    per_face = np.add.reduceat(signed, np.arange(0, 20, 4))
+    axb.bar(range(5), 10.0 * np.log10(np.abs(per_face) / 1e-12),
+            color=[COLOR_PRIMARY] * 5, width=0.6)
+    axb.axhline(float(res.sound_power_level[0]), color=COLOR_SECONDARY,
+                linestyle="--", linewidth=1.6,
+                label=f"LW = {float(res.sound_power_level[0]):.1f} dB")
+    axb.set_xticks(range(5))
+    axb.set_xticklabels(faces)
+    axb.set_ylabel("Face total [dB]")
+    axb.set_ylim(60, float(res.sound_power_level[0]) + 4.0)
+    axb.legend(loc="upper right", fontsize=9)
+    axb.grid(axis="y", color=COLOR_GRID, linestyle="-")
+
+    plt.tight_layout()
+    save_figure(output_dir, "partial_power_map.svg")
+    plt.close()
+
+
+def generate_spacer_bandwidth(output_dir: str) -> None:
+    """What each p-p spacer costs at both ends of the band.
+
+    Upper panel: the finite-difference bias against frequency for 6, 12 and
+    50 mm, taken from ``sound_intensity`` itself. Lower panel: the residual
+    index requirement each spacer inherits, which scales as 10 lg(dr/25 mm),
+    so the two limits close in from opposite sides and no single spacer covers
+    the audio range.
+    """
+    print("Generating spacer_bandwidth.svg...")
+    from phonometry import sound_intensity
+
+    fs, c = 48000, 343.0
+    n = fs  # one second of white noise: enough bands to read the bias off
+    rng = np.random.default_rng(61043)
+    noise = rng.standard_normal(n)
+    spectrum = np.fft.rfft(noise)
+    freqs = np.fft.rfftfreq(n, 1 / fs)
+
+    _fig, (axt, axb) = plt.subplots(
+        2, 1, figsize=(10, 7.2), sharex=True,
+        gridspec_kw={"height_ratios": [2.0, 1.0]})
+    colours = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY)
+    for (dr, colour) in zip((0.006, 0.012, 0.050), colours, strict=True):
+        p2 = np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n)
+        res = sound_intensity(noise, p2, fs, dr, fraction=3,
+                              limits=[20.0, 12500.0])
+        # bias_correction is the compensating factor (k dr)/sin(k dr); the bias
+        # itself is its reciprocal in decibels. Drop the bands the library
+        # clamps at k dr = pi/2 so the curve stays the physics.
+        assert res.frequency is not None, "band analysis returns its frequencies"
+        assert res.bias_correction is not None, "the result must carry the bias"
+        usable = res.frequency < c / (4.0 * dr)
+        axt.semilogx(res.frequency[usable],
+                     -10.0 * np.log10(res.bias_correction[usable]),
+                     color=colour, linewidth=2.0,
+                     label=f"Δr = {dr * 1000:.0f} mm")
+        f_max = res.max_valid_frequency
+        axt.axvline(f_max, color=colour, linestyle=":", linewidth=1.3)
+        axt.annotate(f"{f_max / 1000:.2f} kHz", (f_max, -1.9), fontsize=9,
+                     color=colour, rotation=90, ha="right", va="bottom")
+        # The IEC 61043 Table 2 requirement moves with the spacer, by the
+        # 10 lg(x/25) of its own Note 1.
+        margin = 10.0 * np.log10(dr / 0.025)
+        axb.semilogx(res.frequency, np.full(res.frequency.shape, margin),
+                     color=colour, linewidth=2.2)
+        axb.annotate(f"{margin:+.1f} dB", (11000.0, margin + 0.3), fontsize=10,
+                     color=colour, ha="right")
+    axt.axhline(-0.3, color=COLOR_FG, linestyle="--", linewidth=1.3)
+    axt.annotate("−0.3 dB: the bound f_max is quoted against",
+                 (24.0, -0.24), fontsize=9)
+    axt.set(ylabel="Finite-difference bias [dB]", ylim=(-2.4, 0.35))
+    axt.set_title("High end: the finite-difference bias, and f_max = 0.1 c/Δr",
+                  fontweight="bold", pad=12)
+    axt.grid(which="both", color=COLOR_GRID, linestyle="-")
+    axt.legend(loc="lower left", fontsize=9)
+
+    axb.axhline(0.0, color=COLOR_FG, linewidth=1.0)
+    axb.annotate("25 mm: the separation Table 2 is written for", (24.0, 0.3),
+                 fontsize=9)
+    axb.set(xlabel=LABEL_FREQ_HZ,
+            ylabel="δpI0 margin,\nre 25 mm [dB]", ylim=(-8.0, 4.6))
+    axb.set_title("Low end: doubling the spacer is worth 3 dB of margin",
+                  fontweight="bold", pad=10)
+    axb.grid(which="both", color=COLOR_GRID, linestyle="-")
+    format_frequency_axis(axb)
+
+    plt.tight_layout()
+    save_figure(output_dir, "spacer_bandwidth.svg")
+    plt.close()
+
+
+def generate_true_peak_intersample(output_dir: str) -> None:
+    """What a sample-peak meter misses, and what oversampling recovers."""
+    print("Generating true_peak_intersample.svg...")
+    from phonometry import broadcast
+
+    fs = 48000
+    f0 = fs / 4.0                      # the worst case of the closed form
+    phase = np.pi / 4.0                # badly phased: every sample at 1/sqrt(2)
+    # The page's own signal: one second of it is metered, twelve samples drawn.
+    t_full = np.arange(fs) / fs
+    x_full = np.sin(2.0 * np.pi * f0 * t_full + phase)
+    sample_peak = float(broadcast.true_peak_level(x_full, fs, oversample=1))
+    true_peak = float(broadcast.true_peak_level(x_full, fs))
+
+    n = 12
+    t = np.arange(n) / fs
+    x = x_full[:n]
+    t_fine = np.linspace(0.0, (n - 1) / fs, 2000)
+    fine = np.sin(2.0 * np.pi * f0 * t_fine + phase)
+
+    _fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5))
+    axl.plot(t_fine * 1000.0, fine, color=COLOR_PRIMARY, linewidth=1.8,
+             label="band-limited reconstruction")
+    axl.plot(t * 1000.0, x, "o", color=COLOR_SECONDARY, markersize=7,
+             label="samples at 48 kHz")
+    axl.axhline(np.abs(x).max(), color=COLOR_SECONDARY, linestyle="--",
+                linewidth=1.3)
+    axl.axhline(1.0, color=COLOR_FG, linestyle="--", linewidth=1.3)
+    axl.annotate(f"sample peak {sample_peak:.2f} dBFS",
+                 (0.012, np.abs(x).max() + 0.04), fontsize=9,
+                 color=COLOR_SECONDARY)
+    axl.annotate(f"true peak {true_peak:.2f} dBTP", (0.012, 1.04), fontsize=9)
+    for tick in np.arange(0, (n - 1) / fs, 1.0 / (4 * fs)):
+        axl.plot([tick * 1000.0], [-1.28], "|", color=COLOR_MUTED,
+                 markersize=6)
+    axl.annotate("4× oversampled grid", (0.02, -1.24), fontsize=9,
+                 color=COLOR_MUTED)
+    axl.set(xlabel="Time [ms]", ylabel="Amplitude [FS]", ylim=(-1.35, 1.25))
+    axl.set_title("A 12 kHz tone at π/4: every sample misses the peak",
+                  fontweight="bold", pad=12)
+    axl.grid(color=COLOR_GRID, linestyle="-")
+    axl.legend(loc="lower right", fontsize=9)
+
+    f_norm = np.linspace(0.0, 0.5, 400)
+    for ratio, colour in zip((1, 2, 4, 8), (COLOR_SECONDARY, COLOR_TERTIARY,
+                                            COLOR_PRIMARY, COLOR_MUTED),
+                             strict=True):
+        bound = 20.0 * np.log10(np.cos(np.pi * f_norm / ratio))
+        axr.plot(f_norm, bound, color=colour, linewidth=2.0,
+                 label=f"n = {ratio}")
+    worst = 20.0 * np.log10(np.cos(np.pi * 0.25 / 4))
+    axr.plot([0.25], [worst], "o", color=COLOR_FG, markersize=6)
+    axr.annotate(f"BS.1770 asks for n ≥ 4 at 48 kHz:\n{worst:.2f} dB left at "
+                 "f_norm = 1/4", (0.25, worst), textcoords="offset points",
+                 xytext=(-150, -46), fontsize=9)
+    axr.axvline(0.25, color=COLOR_FG, linestyle=":", linewidth=1.2)
+    axr.set(xlabel="Tone frequency / sampling rate", ylabel="Under-read [dB]",
+            xlim=(0.0, 0.5), ylim=(-7.0, 0.4))
+    axr.set_title("Worst-case under-read, 20 lg cos(π f_norm / n)",
+                  fontweight="bold", pad=12)
+    axr.grid(color=COLOR_GRID, linestyle="-")
+    axr.legend(loc="lower left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "true_peak_intersample.svg")
+    plt.close()
+
+
+def generate_channel_weight_map(output_dir: str) -> None:
+    """The BS.1770 Annex 3 channel weight as a map of the reproduction layout."""
+    print("Generating channel_weight_map.svg...")
+    from phonometry import broadcast
+
+    az = np.linspace(-180.0, 180.0, 361)
+    el = np.linspace(-90.0, 90.0, 181)
+    grid_az, grid_el = np.meshgrid(az, el)
+    weight = broadcast.channel_weight(grid_az, grid_el)
+    high = float(np.max(weight))
+
+    _fig, ax = plt.subplots(figsize=(11, 5.6))
+    # contourf, not pcolormesh: the map is two-valued with straight
+    # boundaries, so a filled contour keeps the SVG to a handful of paths.
+    ax.contourf(grid_az, grid_el, weight, levels=[0.5 * (1.0 + high), 2.0],
+                colors=[theme_fill(COLOR_PRIMARY, ax)], zorder=0)
+    ax.contour(grid_az, grid_el, weight, levels=[0.5 * (1.0 + high)],
+               colors=[COLOR_FG], linewidths=1.4)
+    for sign in (-1.0, 1.0):
+        ax.text(sign * 90.0, 20.0, f"{high:.2f}\n(+1.5 dB)", ha="center",
+                va="center", fontsize=11, fontweight="bold")
+    ax.text(0.0, 62.0, "1.0 everywhere else", ha="center", fontsize=11)
+    ax.annotate("60° ≤ |azimuth| ≤ 120°,  |elevation| < 30°", (0.0, -50.0),
+                ha="center", fontsize=10)
+
+    speakers = (("L", -30.0, 0.0), ("R", 30.0, 0.0), ("C", 0.0, 0.0),
+                ("Ls", -110.0, 0.0), ("Rs", 110.0, 0.0),
+                ("U+110", 110.0, 45.0))
+    for name, a, e in speakers:
+        ax.plot([a], [e], "o", color=COLOR_SECONDARY, markersize=8)
+        ax.annotate(f"{name}  ({broadcast.channel_weight(a, e):.2f})", (a, e),
+                    textcoords="offset points", xytext=(9, -16), fontsize=9,
+                    color=COLOR_SECONDARY)
+    ax.set(xlabel="Azimuth [°]", ylabel="Elevation [°]",
+           xlim=(-180, 180), ylim=(-90, 90))
+    ax.set_xticks([-180, -120, -60, 0, 60, 120, 180])
+    ax.set_yticks([-90, -30, 0, 30, 90])
+    ax.set_title("BS.1770 Annex 3: the weight is a property of the "
+                 "loudspeaker position", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle=":", alpha=0.6)
+    plt.tight_layout()
+    save_figure(output_dir, "channel_weight_map.svg")
+    plt.close()
+
+
+def generate_sound_power_grades_declaration(output_dir: str) -> None:
+    """What the grade buys, and what the declaration has to absorb.
+
+    Left: one measured LWA = 92.4 dB carried by the three accuracy grades,
+    each interval computed through ``precision_uncertainty``. Right: the
+    ISO 4871 Annex B example, declared value against verification level.
+    """
+    print("Generating sound_power_grades_declaration.svg...")
+    from phonometry import emission
+
+    lwa = 92.4
+    grades = (("Grade 1\nISO 3741 / 3745", 0.5), ("Grade 2\nISO 3744 / 9614-2", 1.5),
+              ("Grade 3\nISO 3746", 3.0))
+    sigma_omc = 0.0
+
+    _fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5.2))
+    for k, (name, sigma_r0) in enumerate(grades):
+        u = float(emission.precision_uncertainty(sigma_r0, sigma_omc, 2.0))
+        axl.errorbar([k], [lwa], yerr=[[u], [u]], fmt="o", markersize=8,
+                     capsize=10, elinewidth=2.4, color=COLOR_PRIMARY)
+        axl.annotate(f"U = {u:.1f} dB", (k, lwa - u), textcoords="offset points",
+                     xytext=(0, -16), ha="center", va="top", fontsize=10)
+    axl.axhline(93.0, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6,
+                label="declared limit 93 dB(A)")
+    axl.set_xticks(range(len(grades)))
+    axl.set_xticklabels([name for name, _ in grades], fontsize=9)
+    axl.set_ylabel("LWA [dB re 1 pW]")
+    axl.set_ylim(84.0, 101.0)
+    axl.set_title("One measurement, three grades: 92.4 dB(A) against a 93 dB "
+                  "limit", fontweight="bold", pad=12)
+    axl.grid(axis="y", color=COLOR_GRID, linestyle="-")
+    axl.legend(loc="upper left", fontsize=9)
+
+    modes = (("Operating mode 1", 88.0, 2.0, 89.0),
+             ("Operating mode 2", 95.0, 2.0, 98.0))
+    for k, (name, level, k_wa, l1) in enumerate(modes):
+        axr.bar([k], [level], width=0.5, color=COLOR_PRIMARY, label="LWA"
+                if k == 0 else None)
+        axr.bar([k], [k_wa], width=0.5, bottom=level, color=COLOR_MUTED,
+                label="K_WA" if k == 0 else None)
+        axr.plot([k], [l1], "D", color=COLOR_SECONDARY, markersize=10,
+                 label="verification level L1" if k == 0 else None)
+        verdict = "verified" if l1 <= level + k_wa else "not verified"
+        axr.annotate(f"LWAd = {level + k_wa:.0f} dB\nL1 = {l1:.0f} dB\n{verdict}",
+                     (k, max(l1, level + k_wa) + 1.4), ha="center", fontsize=9)
+    axr.set_xticks(range(len(modes)))
+    axr.set_xticklabels([name for name, *_ in modes], fontsize=9)
+    axr.set_ylabel("A-weighted sound power level [dB]")
+    axr.set_ylim(80.0, 106.0)
+    axr.set_title("ISO 4871 Annex B: LWAd = LWA + K_WA, verified when L1 ≤ LWAd",
+                  fontweight="bold", pad=12)
+    axr.grid(axis="y", color=COLOR_GRID, linestyle="-")
+    axr.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sound_power_grades_declaration.svg")
     plt.close()
 
 
@@ -1146,6 +1927,342 @@ def generate_hvac_end_reflection(output_dir: str) -> None:
     plt.close()
 
 
+def generate_duct_attenuation_elements(output_dir: str) -> None:
+    """The eight element models of section 3, drawn instead of printed."""
+    print("Generating duct_attenuation_elements.svg...")
+    from phonometry.noise_control import hvac
+
+    inch, foot = 0.0254, 0.3048
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    _fig, axes = plt.subplots(2, 2, figsize=(12.4, 8.6))
+
+    ax = axes[0][0]
+    runs = (
+        ("Bare", hvac.unlined_rectangular_duct_attenuation(
+            bands, 36 * inch, 24 * inch, 5 * foot), COLOR_FG, ":"),
+        ("Externally wrapped", hvac.unlined_rectangular_duct_attenuation(
+            bands, 36 * inch, 24 * inch, 5 * foot, wrapped=True),
+         COLOR_TERTIARY, "-."),
+        ("25 mm lining, insertion loss", hvac.lined_rectangular_duct_attenuation(
+            bands, 36 * inch, 24 * inch, 5 * foot, 1 * inch), COLOR_SECONDARY,
+         "--"),
+        ("25 mm lining + side walls", hvac.lined_rectangular_duct_attenuation(
+            bands, 36 * inch, 24 * inch, 5 * foot, 1 * inch,
+            include_unlined=True), COLOR_PRIMARY, "-"),
+    )
+    for label, res, color, style in runs:
+        ax.semilogx(bands, np.asarray(res.values), style, color=color, lw=1.8,
+                    marker="o", ms=4, label=label)
+    ax.set_title("(a) 36 × 24 in run, 5 ft", fontweight="bold", pad=8)
+    ax.set_ylabel("Attenuation [dB]")
+
+    ax = axes[0][1]
+    for label, kwargs, color, style in (
+        ("Square, lined", {"bend_type": "square", "lined": True},
+         COLOR_PRIMARY, "-"),
+        ("Square, bare", {"bend_type": "square"}, COLOR_SECONDARY, "--"),
+        ("Square, vanes", {"bend_type": "square", "vanes": True},
+         COLOR_TERTIARY, "-."),
+        ("Round, bare", {"bend_type": "round"}, COLOR_FG, ":"),
+    ):
+        el = hvac.elbow_insertion_loss(bands, width=24 * inch, **kwargs)
+        ax.semilogx(bands, np.asarray(el.values), style, color=color, lw=1.8,
+                    marker="o", ms=4, label=label)
+    ax.axvline(343.0 / (24 * inch), color=COLOR_FG, lw=1.2, ls=":", alpha=0.7)
+    ax.annotate("W/λ = 1", xy=(343.0 / (24 * inch), 1.0),
+                xytext=(700.0, 1.4), fontsize="small", color=COLOR_FG)
+    ax.set_title("(b) One bend, W = 24 in", fontweight="bold", pad=8)
+
+    ax = axes[1][0]
+    for method, color, style in (("bies", COLOR_PRIMARY, "-"),
+                                 ("long", COLOR_SECONDARY, "--")):
+        er = hvac.end_reflection_loss(bands[:6], diameter=0.30, method=method)
+        ax.semilogx(bands[:6], np.asarray(er.values), style, color=color,
+                    lw=1.8, marker="o", ms=4, label=f'method="{method}"')
+    ax.set_title("(c) Open end, 300 mm flush", fontweight="bold", pad=8)
+    ax.set_ylabel("Attenuation [dB]")
+    ax.set_xlabel(LABEL_FREQ_HZ)
+
+    ax = axes[1][1]
+    sil = hvac.splitter_silencer_insertion_loss(
+        bands, height=24 * inch, length=5 * foot, airway_widths=[0.10] * 5,
+        splitter_thickness=0.10)
+    ax.semilogx(bands, np.asarray(sil.values), "-", color=COLOR_PRIMARY, lw=1.9,
+                marker="o", ms=4, label="Geometry-only model, 5 ft, 5 airways")
+    ax.plot([63.0, 125.0], [16.0, 21.0], "D", color=COLOR_SECONDARY, ms=9,
+            mfc="none", mew=2.0, label="The unit Long's sheet specifies")
+    ax.annotate("10.2 dB and 12.4 dB of low-frequency\nperformance the "
+                "model cannot see", xy=(66.0, 11.0), xytext=(150.0, 5.0),
+                fontsize="small", color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
+                            "lw": 1.0})
+    ax.set_title("(d) Splitter silencer", fontweight="bold", pad=8)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+
+    for row in axes:
+        for ax in row:
+            ax.set_xlim(50.0, 10000.0)
+            ax.set_ylim(bottom=0.0)
+            format_frequency_axis(ax, 50.0, 10000.0)
+            ax.grid(True, which="both", alpha=0.4)
+            ax.legend(loc="upper left", fontsize="x-small")
+    plt.tight_layout()
+    save_figure(output_dir, "duct_attenuation_elements.svg")
+    plt.close()
+
+
+def generate_duct_sheet_verification(output_dir: str) -> None:
+    """Which rows of Long's Table 14.9 the printed equations reproduce."""
+    print("Generating duct_sheet_verification.svg...")
+    from phonometry import fan_sound_power, nc_curve
+    from phonometry.noise_control import hvac
+
+    inch, foot = 0.0254, 0.3048
+    cfm, in_wg = 0.0004719474432, 249.0
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+
+    fan = fan_sound_power(volume_flow=5000 * cfm, static_pressure=2 * in_wg,
+                          fan_type="forward_curved", relative_efficiency=80.0)
+    flex = hvac.flexible_duct_insertion_loss(bands[:7], diameter=12 * inch,
+                                             length=6 * foot)
+    lined_small = hvac.lined_rectangular_duct_attenuation(
+        bands, 18 * inch, 12 * inch, 6 * foot, 1 * inch, include_unlined=True)
+    lined_large = hvac.lined_rectangular_duct_attenuation(
+        bands, 36 * inch, 24 * inch, 5 * foot, 1 * inch, include_unlined=True)
+    diffuser = hvac.diffuser_sound_power(bands, (24 * inch) ** 2,
+                                         volume_flow=312 * cfm,
+                                         pressure_drop=0.05 * in_wg)
+    nc30 = np.asarray(nc_curve(30), dtype=float)[2:]   # OCTAVE_BANDS is 16 Hz up
+
+    panels = (
+        ("Fan, Eq. 13.1", [90, 86, 82, 79, 77, 75, 71, 61],
+         np.asarray(fan.values)),
+        ("Flexible duct, 12 in × 6 ft", [14, 14, 16, 15, 17, 22, 16],
+         np.asarray(flex.values)),
+        ("Lined duct, 18 × 12 in, 6 ft", [3, 3, 5, 11, 25, 22, 16, 13],
+         np.asarray(lined_small.values)),
+        ("Lined duct, 36 × 24 in, 5 ft", [2, 2, 3, 7, 15, 12, 11, 9],
+         np.asarray(lined_large.values)),
+        ("Supply diffuser, 312 cfm", [33, 32, 29, 23, 15, 4, 0, 0],
+         np.asarray(diffuser.values)),
+        ("NC 30 curve", [57, 48, 41, 35, 31, 29, 28, 27], nc30),
+    )
+
+    _fig, axes = plt.subplots(2, 3, figsize=(13.0, 7.6))
+    for ax, (title, sheet_row, model_row) in zip(axes.ravel(), panels):
+        printed = np.asarray(sheet_row, dtype=float)
+        computed = np.asarray(model_row, dtype=float)
+        n = min(printed.size, computed.size)
+        printed, computed, axis = printed[:n], computed[:n], bands[:n]
+        ax.fill_between(axis, printed, computed,
+                        color=theme_fill(COLOR_SECONDARY, ax), zorder=0)
+        ax.semilogx(axis, printed, "o", color=COLOR_FG, ms=6,
+                    label="Long's printed row")
+        ax.semilogx(axis, computed, "-", color=COLOR_PRIMARY, lw=1.9,
+                    label="the library")
+        # Long floors an absent row at 0 dB, so a band the sheet prints as
+        # zero carries no level to disagree about.
+        carries = printed > 0.0
+        worst = float(np.max(np.abs(printed - computed)[carries]))
+        ax.set_title(f"{title}  (worst Δ {worst:.0f} dB)", fontweight="bold",
+                     fontsize="medium", pad=7)
+        ax.set_xlim(50.0, 10000.0)
+        format_frequency_axis(ax, 50.0, 10000.0)
+        ax.grid(True, which="both", alpha=0.4)
+        ax.legend(loc="best", fontsize="x-small")
+    for ax in axes[1]:
+        ax.set_xlabel(LABEL_FREQ_HZ)
+    for ax in axes[:, 0]:
+        ax.set_ylabel("Level [dB]")
+    plt.tight_layout()
+    save_figure(output_dir, "duct_sheet_verification.svg")
+    plt.close()
+
+
+def generate_duct_regenerated_noise(output_dir: str) -> None:
+    """The two velocity laws of section 4, as slopes rather than as numbers."""
+    print("Generating duct_regenerated_noise.svg...")
+    from phonometry import air_terminal_velocity_limit
+    from phonometry.noise_control import hvac
+
+    inch, cfm, in_wg = 0.0254, 0.0004719474432, 249.0
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    _fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.6))
+
+    ax = axes[0]
+    for velocity, color in ((5.0, COLOR_TERTIARY), (10.0, COLOR_PRIMARY),
+                            (20.0, COLOR_SECONDARY), (40.0, COLOR_FG)):
+        res = hvac.silencer_self_noise(bands, airway_velocity=velocity,
+                                       passages=5, height=24 * inch)
+        ax.semilogx(bands, np.asarray(res.values), "o-", color=color, lw=1.8,
+                    ms=4, label=f"{velocity:.0f} m/s")
+    ax.annotate("55 lg(V/V₀): 16.6 dB per\ndoubling, every band",
+                xy=(250.0, 55.0), xytext=(400.0, 26.0), fontsize="small",
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_title("Silencer self-noise (Long Eq. 14.31)", fontweight="bold",
+                 pad=10)
+    ax.set_ylabel("Regenerated $L_W$ [dB re 1 pW]")
+    ax.legend(loc="upper right", fontsize="small", title="Airway velocity")
+
+    ax = axes[1]
+    for flow, color in ((312.0, COLOR_TERTIARY), (624.0, COLOR_PRIMARY),
+                        (1248.0, COLOR_SECONDARY)):
+        res = hvac.diffuser_sound_power(bands, (24 * inch) ** 2,
+                                        volume_flow=flow * cfm,
+                                        pressure_drop=0.05 * in_wg)
+        velocity = flow * cfm / (24 * inch) ** 2
+        peak = 48.8 * velocity / 0.3048
+        ax.semilogx(bands, np.asarray(res.values), "o-", color=color, lw=1.8,
+                    ms=4, label=f"{flow:.0f} cfm ({velocity:.1f} m/s)")
+        ax.axvline(peak, color=color, lw=1.0, ls=":")
+    limit = air_terminal_velocity_limit(30, opening="supply")
+    ax.annotate(f"peak band f_P = 48.8 U_G moves up one octave per\ndoubling "
+                f"of the face velocity; ASHRAE Table 9 caps\nthe neck of an "
+                f"RC 30 supply outlet at {limit:.1f} m/s",
+                xy=(250.0, 33.0), xytext=(340.0, 12.0), fontsize="small",
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_title("Diffuser sound power (Long Eqs. 13.27-13.33)",
+                 fontweight="bold", pad=10)
+    ax.legend(loc="upper right", fontsize="small",
+              title="24 × 24 in device")
+
+    for ax in axes:
+        ax.set_xlim(50.0, 10000.0)
+        format_frequency_axis(ax, 50.0, 10000.0)
+        ax.set_xlabel(LABEL_FREQ_HZ)
+        ax.grid(True, which="both", alpha=0.4)
+    plt.tight_layout()
+    save_figure(output_dir, "duct_regenerated_noise.svg")
+    plt.close()
+
+
+def generate_fan_sound_power(output_dir: str) -> None:
+    """The source row: the efficiency staircase and the blade-tone increment."""
+    print("Generating fan_sound_power.svg...")
+    from phonometry import (
+        fan_casing_attenuation,
+        fan_efficiency_correction,
+        fan_sound_power,
+    )
+
+    cfm, in_wg = 0.0004719474432, 249.0
+    volume_flow, static_pressure = 5000 * cfm, 2 * in_wg
+    fan_type = "forward_curved"
+    _fig, ax = plt.subplots(figsize=(10, 6.4))
+    for efficiency, color, style in ((90.0, COLOR_TERTIARY, ":"),
+                                     (80.0, COLOR_PRIMARY, "-"),
+                                     (55.0, COLOR_SECONDARY, "--")):
+        fan = fan_sound_power(volume_flow, static_pressure,
+                              fan_type=fan_type,
+                              relative_efficiency=efficiency)
+        ax.semilogx(np.asarray(fan.frequencies), np.asarray(fan.values), style,
+                    color=color, lw=1.9, marker="o", ms=4,
+                    label=f"{efficiency:.0f} % of peak static efficiency "
+                          f"(+{fan_efficiency_correction(efficiency):.0f} dB)")
+    tone = fan_sound_power(volume_flow, static_pressure, fan_type=fan_type,
+                           relative_efficiency=80.0, blade_frequency=2000.0)
+    ax.semilogx(np.asarray(tone.frequencies), np.asarray(tone.values), "-",
+                color=COLOR_PRIMARY, lw=1.0, alpha=0.55, marker="^", ms=4,
+                label="the same fan with its blade tone at 2 kHz")
+    casing = fan_casing_attenuation()
+    ax.semilogx(np.asarray(casing.frequencies), np.asarray(casing.values), "-.",
+                color=COLOR_FG, lw=1.6, marker="s", ms=4,
+                label="Casing attenuation (Table 13.8)")
+    ax.annotate("the C_BFI increment is 2 dB and lands whole in the\noctave "
+                "containing the blade tone: 500 Hz at 1200 rev/min\n× 24 "
+                "blades, 2 kHz if the fan is selected faster",
+                xy=(2000.0, 79.0), xytext=(220.0, 44.0), fontsize="small",
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_xlim(50.0, 10000.0)
+    ax.set_ylim(-4.0, 116.0)
+    format_frequency_axis(ax, 50.0, 10000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Level [dB]")
+    ax.set_title("The fan row: 5000 cfm at 2 in w.g., forward curved "
+                 "(Long Eq. 13.1)", fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper right", fontsize="small")
+
+    inset = ax.inset_axes((0.07, 0.22, 0.33, 0.26))
+    grid = np.linspace(40.0, 100.0, 400)
+    inset.plot(grid, [fan_efficiency_correction(v) for v in grid],
+               color=COLOR_PRIMARY, lw=1.8)
+    inset.set_xlabel("static efficiency [% of peak]", fontsize="x-small")
+    inset.set_ylabel("$C_{EFF}$ [dB]", fontsize="x-small")
+    inset.tick_params(labelsize="x-small")
+    inset.grid(True, alpha=0.4)
+    plt.tight_layout()
+    save_figure(output_dir, "fan_sound_power.svg")
+    plt.close()
+
+
+def generate_hvac_elbow_flow_noise(output_dir: str) -> None:
+    """The bend a designer chooses, and the noise the same bend regenerates."""
+    print("Generating hvac_elbow_flow_noise.svg...")
+    from phonometry.noise_control import hvac
+
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    width = 0.3
+    _fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.4))
+
+    ax = axes[0]
+    families = (
+        ("Square, lined", {"bend_type": "square", "lined": True}, COLOR_PRIMARY, "-"),
+        ("Square, bare", {"bend_type": "square"}, COLOR_SECONDARY, "--"),
+        ("Square, vanes", {"bend_type": "square", "vanes": True}, COLOR_TERTIARY, "-."),
+        ("Round, bare", {"bend_type": "round"}, COLOR_FG, ":"),
+    )
+    for label, kwargs, color, style in families:
+        el = hvac.elbow_insertion_loss(bands, width=width, **kwargs)
+        ax.semilogx(np.asarray(el.frequencies), np.asarray(el.values), style,
+                    color=color, lw=1.8, marker="o", ms=4, label=label)
+    f_unity = 343.0 / width
+    ax.axvline(f_unity, color=COLOR_FG, lw=1.2, ls=":", alpha=0.7)
+    ax.annotate("W / lambda = 1\n(W = 0.30 m, 1143 Hz)", xy=(f_unity, 1.6),
+                xytext=(1.35 * f_unity, 1.2), fontsize="small", color=COLOR_FG)
+    ax.set_xlim(50.0, 10000.0)
+    ax.set_ylim(bottom=0.0)
+    format_frequency_axis(ax, 50.0, 10000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Insertion loss [dB per bend]")
+    ax.set_title("Elbow insertion loss (ASHRAE Table 8.11)",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small")
+
+    ax = axes[1]
+    for velocity, color in ((5.0, COLOR_TERTIARY), (10.0, COLOR_PRIMARY),
+                            (20.0, COLOR_SECONDARY)):
+        fn = hvac.flow_noise_straight_duct(bands, flow_velocity=velocity,
+                                           area=0.04)
+        ax.semilogx(np.asarray(fn.frequencies), np.asarray(fn.values), "o-",
+                    color=color, lw=1.8, ms=4,
+                    label=f"Straight duct, U = {velocity:.0f} m/s")
+    bend = hvac.flow_noise_bend(bands, flow_velocity=10.0, area=0.04, height=0.2)
+    ax.semilogx(np.asarray(bend.frequencies), np.asarray(bend.values), "s--",
+                color=COLOR_FG, lw=1.8, ms=4, label="Mitred bend, U = 10 m/s")
+    ax.annotate("one bend at 10 m/s beats\na straight run at 20 m/s\nbelow 500 Hz",
+                xy=(125.0, 57.8), xytext=(320.0, 30.0),
+                fontsize="small", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_xlim(50.0, 10000.0)
+    ax.set_ylim(-16.0, 66.0)
+    format_frequency_axis(ax, 50.0, 10000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Regenerated $L_W$ [dB re 1 pW]")
+    ax.set_title("Flow-generated sound power (VDI 2081, Bies Eq. 8.252)",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper right", fontsize="small")
+
+    plt.tight_layout()
+    save_figure(output_dir, "hvac_elbow_flow_noise.svg")
+    plt.close()
+
+
 def _long_duct_paths() -> tuple[Any, Any]:
     """The supply and return paths of Long's worked HVAC sheet (Table 14.9).
 
@@ -1220,6 +2337,139 @@ def generate_duct_path_cascade(output_dir: str) -> None:
                  fontweight="bold", pad=10)
     plt.tight_layout()
     save_figure(output_dir, "duct_path_cascade.svg")
+    plt.close()
+
+
+def generate_enclosure_required_tl(output_dir: str) -> None:
+    """Norton problem 4.16: the panel TL an enclosure needs, band by band."""
+    print("Generating enclosure_required_tl.svg...")
+    from phonometry import enclosure_required_transmission_loss, mean_absorption
+
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    wool = [0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80]
+    concrete = [0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.03, 0.03]
+    lp1 = np.array([72.0, 79.0, 81.0, 84.0, 83.0, 81.0, 80.0, 75.0])
+    nc45 = np.array([67.0, 60.0, 54.0, 49.0, 46.0, 44.0, 43.0, 41.0])
+    radiating = 2 * (2.5 * 2.5) + 2 * (3.5 * 2.5) + 2.5 * 3.5
+    machine = 2 * (1.5 * 1.5) + 2 * (2.5 * 1.5) + 1.5 * 2.5
+    bare_floor = 2.5 * 3.5 - 1.5 * 2.5
+    alpha = mean_absorption([(radiating, wool), (bare_floor + machine, concrete)])
+
+    def _required(model: str) -> Any:
+        return enclosure_required_transmission_loss(
+            lp1 - nc45, radiating, radiating + bare_floor + machine, alpha,
+            frequencies=bands, model=model,
+        )
+
+    norton, bies = _required("norton"), _required("bies")
+    printed = np.array([14.4, 25.2, 28.9, 34.4, 35.2, 34.7, 34.7, 31.6])
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(np.arange(bands.size) - 0.16, lp1 - nc45, width=0.32,
+           color=theme_fill(COLOR_TERTIARY, ax), edgecolor=COLOR_TERTIARY,
+           label="Target IL = $L_{p1}$ − NC 45")
+    ax.bar(np.arange(bands.size) + 0.16,
+           np.asarray(norton.correction, dtype=float), width=0.32,
+           color=theme_fill(COLOR_SECONDARY, ax), edgecolor=COLOR_SECONDARY,
+           label="Interior correction $10\\,\\lg(S_E/R_i)$")
+    ax.plot(np.arange(bands.size),
+            np.asarray(norton.panel_transmission_loss, dtype=float), "o-",
+            color=COLOR_PRIMARY, lw=2.0, ms=6, label="Required panel R (Norton)")
+    ax.plot(np.arange(bands.size),
+            np.asarray(bies.panel_transmission_loss, dtype=float), "--",
+            color=COLOR_FG, lw=1.6, label="Required panel R (Bies default)")
+    ax.plot(np.arange(bands.size), printed, "D", color=COLOR_PRIMARY, ms=7,
+            mfc="none", label="Norton's printed answer")
+    ax.axhline(0.0, color=COLOR_GRID, lw=1.0)
+    ax.annotate("the peak: the lining works and\nthe compressor is still loud",
+                xy=(4.0, 35.2), xytext=(4.4, 18.0), fontsize="small",
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_xticks(np.arange(bands.size))
+    ax.set_xticklabels(["63", "125", "250", "500", "1k", "2k", "4k", "8k"])
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Level [dB]")
+    ax.set_title("What the enclosure panels have to be: Norton problem 4.16",
+                 fontweight="bold", pad=10)
+    ax.set_ylim(-5.0, 45.0)
+    ax.grid(True, axis="y", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small", ncol=2)
+    plt.tight_layout()
+    save_figure(output_dir, "enclosure_required_tl.svg")
+    plt.close()
+
+
+def generate_room_to_room_partitions(output_dir: str) -> None:
+    """Norton problem 4.21: three partitions, one room, one gap curve."""
+    print("Generating room_to_room_partitions.svg...")
+    from phonometry import (
+        SourceRoom,
+        equivalent_absorption_area,
+        room_to_room_transmission,
+    )
+
+    bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    receiving = np.asarray(equivalent_absorption_area([
+        (102.0, [0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),   # walls
+        (72.0, [0.02, 0.06, 0.14, 0.37, 0.60, 0.66]),    # floor
+        (72.0, [0.30, 0.20, 0.15, 0.05, 0.05, 0.05]),    # ceiling
+    ]), dtype=float)
+    wall_area = 8.0 * 3.0
+    partitions = (
+        ("Two 13 mm wallboards, 64 mm gap", [18.0, 27.0, 37.0, 45.0, 43.0, 39.0],
+         COLOR_PRIMARY, "o-"),
+        ("125 mm plastered brick", [36.0, 36.0, 40.0, 46.0, 54.0, 57.0],
+         COLOR_SECONDARY, "s--"),
+        ("Double brick, 50 mm cavity", [37.0, 41.0, 48.0, 60.0, 61.0, 61.0],
+         COLOR_TERTIARY, "^-."),
+    )
+
+    _fig, axes = plt.subplots(2, 1, figsize=(10, 8.4), sharex=True)
+
+    ax = axes[0]
+    for label, tl, color, style in partitions:
+        res = room_to_room_transmission(
+            bands, tl, wall_area, receiving,
+            source=SourceRoom(level=90.0), label=label,
+        )
+        gap = np.asarray(res.noise_reduction, dtype=float) - np.asarray(tl)
+        ax.semilogx(bands, gap, style, color=color, lw=1.8, ms=7,
+                    mfc="none", label=label)
+    ax.axhline(0.0, color=COLOR_FG, lw=1.2)
+    ax.annotate("the three curves are one curve:\nthe gap belongs to the room, "
+                "not to the wall", xy=(250.0, -0.22), xytext=(300.0, -2.6),
+                fontsize="small", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_ylim(-4.0, 6.5)
+    ax.set_ylabel("NR − TL [dB]")
+    ax.set_title("What the receiving room adds to (or takes from) the wall",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small")
+
+    ax = axes[1]
+    ax.semilogx(bands, receiving, "o-", color=COLOR_PRIMARY, lw=1.8, ms=6,
+                label="Receiving-room absorption $S_2\\alpha_2$")
+    ax.axhline(wall_area, color=COLOR_SECONDARY, lw=1.8, ls="--",
+               label=f"Partition area $S_w$ = {wall_area:.0f} m²")
+    ax.fill_between(bands, wall_area, receiving, where=receiving > wall_area,
+                    color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
+    ax.annotate("crossing: below it the wall delivers less than its TL,\n"
+                "above it, more", xy=(430.0, 27.0), xytext=(520.0, 8.0),
+                fontsize="small", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_ylim(0.0, 82.0)
+    format_frequency_axis(ax, 110.0, 4600.0)
+    ax.set_xlim(110.0, 4600.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Area [m²]")
+    ax.set_title("Why: the same room, band by band",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper left", fontsize="small")
+
+    plt.tight_layout()
+    save_figure(output_dir, "room_to_room_partitions.svg")
     plt.close()
 
 
@@ -1437,3 +2687,421 @@ def generate_loudness_range(output_dir: str) -> None:
     res.plot(ax=ax)
     plt.tight_layout()
     save_figure(output_dir, "loudness_range.svg")
+
+
+def generate_itu_r_468_weighting(output_dir: str) -> None:
+    """The ITU-R BS.468-4 network and its CCIR-RMS renormalisation."""
+    print("Generating itu_r_468_weighting...")
+    from phonometry import electroacoustics
+
+    freqs = np.geomspace(20.0, 20000.0, 600)
+    w468 = np.asarray(electroacoustics.itu_r_468_weighting(freqs), dtype=float)
+    ccir = w468 - 5.63
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    fa, wa = measure_weighting_response(48000, "A")
+    sel = (fa >= 20.0) & (fa <= 20000.0)
+    ax.semilogx(fa[sel], wa[sel], color=COLOR_FG, linewidth=4.0, alpha=0.18,
+                label="A-weighting (reference)")
+    ax.semilogx(freqs, w468, color=COLOR_PRIMARY, linewidth=2.2,
+                label="ITU-R BS.468-4 (0 dB at 1 kHz)")
+    ax.semilogx(freqs, ccir, color=COLOR_SECONDARY, linewidth=1.8,
+                linestyle="--", label="AES17 CCIR-RMS (0 dB at 2 kHz)")
+
+    for f0, level, col, txt in (
+        (6300.0, float(electroacoustics.itu_r_468_weighting([6300.0])[0]),
+         COLOR_PRIMARY, "+12.2 dB at 6.3 kHz"),
+        (1000.0, 0.0, COLOR_PRIMARY, "0 dB at 1 kHz"),
+        (1000.0, -5.63, COLOR_SECONDARY, "-5.63 dB at 1 kHz"),
+    ):
+        ax.plot([f0], [level], "o", color=col, markersize=7, zorder=6)
+        ax.annotate(txt, xy=(f0, level), xytext=(-10, 10),
+                    textcoords="offset points", ha="right", fontsize=9,
+                    color=col)
+
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Weighting [dB]")
+    ax.set_title("The ITU-R BS.468-4 Network and Its CCIR-RMS Form",
+                 fontweight="bold", pad=12)
+    ax.set_xlim(20.0, 20000.0)
+    ax.set_ylim(-45.0, 20.0)
+    format_frequency_axis(ax, 20.0, 20000.0)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9)
+    ax.text(0.015, 0.96,
+            "for a 100 Hz fundamental the network cuts d2 by 13.8 dB\n"
+            "and d3 by 10.3 dB, and lifts the 10th order and above",
+            transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
+            color=COLOR_FG)
+    plt.tight_layout()
+    save_figure(output_dir, "itu_r_468_weighting.svg")
+    plt.close()
+
+
+def generate_intermodulation_tests(output_dir: str) -> None:
+    """Which products the three scalar intermodulation tests count."""
+    print("Generating intermodulation_tests...")
+    from phonometry import electroacoustics
+
+    fs = 96000
+    n = fs                              # 1 s -> 1 Hz bins, every tone on a bin
+    t = np.arange(n) / fs
+    a2, a3 = 0.05, 0.02                 # one weak non-linearity for all three
+
+    def through(x: Any) -> Any:
+        return x + a2 * x**2 + a3 * x**3
+
+    def spectrum(sig: Any) -> tuple[Any, Any]:
+        win = np.hanning(len(sig))
+        mag = np.abs(np.fft.rfft(sig * win)) * 2.0 / np.sum(win)
+        f = np.fft.rfftfreq(len(sig), d=1.0 / fs)
+        return f, 20.0 * np.log10(np.maximum(mag, 1e-12) / np.max(mag))
+
+    # (a) difference-frequency test, 13 and 14 kHz (IEC 60268-3 14.12.8).
+    x_dfd = 0.5 * (np.sin(2 * np.pi * 13000.0 * t)
+                   + np.sin(2 * np.pi * 14000.0 * t))
+    y_dfd = through(x_dfd)
+    # (b) total difference-frequency test at the default 8 / 11.95 kHz.
+    x_tdfd = 0.5 * (np.sin(2 * np.pi * 8000.0 * t)
+                    + np.sin(2 * np.pi * 11950.0 * t))
+    y_tdfd = through(x_tdfd)
+    # (c) DIM: a 15 kHz sine plus a low-passed 3.15 kHz square, 1:4 peak
+    # (14.12.9). The square is built from its own band-limited Fourier series
+    # so that nothing aliases before the device sees it, then taken through
+    # the first-order 30 kHz low-pass the clause specifies.
+    square = np.zeros_like(t)
+    for k in range(1, 200, 2):
+        if k * 3150.0 >= fs / 2.0:
+            break
+        square += np.sin(2 * np.pi * k * 3150.0 * t) / k
+    square *= 4.0 / np.pi
+    b_lp, a_lp = scipy_signal.butter(1, 30000.0, fs=fs)
+    x_dim = 0.8 * scipy_signal.lfilter(b_lp, a_lp, square) + 0.2 * np.sin(
+        2 * np.pi * 15000.0 * t)
+    y_dim = through(x_dim)
+
+    dfd2 = electroacoustics.difference_frequency_distortion(
+        y_dfd, fs, 13e3, 14e3, order=2)
+    tdfd = electroacoustics.total_difference_frequency_distortion(y_tdfd, fs)
+    dim = electroacoustics.dynamic_intermodulation_distortion(y_dim, fs)
+
+    panels = (
+        (y_dfd, (0.0, 16000.0),
+         f"(a) Difference frequency, 13 / 14 kHz — d(d,2) = {dfd2 * 100:.2f} %",
+         ((1000.0, "f2-f1"), (12000.0, "2f1-f2"), (15000.0, "2f2-f1")),
+         "denominator: a(f1) + a(f2)"),
+        (y_tdfd, (0.0, 16000.0),
+         (f"(b) Total difference frequency, 8 / 11.95 kHz — "
+          f"d(TDFD) = {tdfd * 100:.2f} %"),
+         ((3950.0, "f0-delta"), (4050.0, "f0+delta")),
+         "only the two in-band products count"),
+        (y_dim, (0.0, 16000.0),
+         (f"(c) Dynamic intermodulation, 15 kHz + 3.15 kHz square — "
+          f"DIM = {dim * 100:.2f} %"),
+         tuple((abs(k * 3150.0 - 15000.0), f"k={k}") for k in (1, 2, 3, 4, 5)
+               if 0.0 < abs(k * 3150.0 - 15000.0) < 15000.0),
+         "denominator: the 15 kHz sine alone"),
+    )
+
+    _fig, axes = plt.subplots(3, 1, figsize=(10, 10.5), sharex=True)
+    for ax, (sig, xlim, title, marks, note) in zip(axes, panels, strict=True):
+        f, mag_db = spectrum(sig)
+        ax.plot(f, mag_db, color=COLOR_PRIMARY, linewidth=0.9, alpha=0.85)
+        for j, (fm, lab) in enumerate(marks):
+            k = int(np.argmin(np.abs(f - fm)))
+            ax.plot([f[k]], [mag_db[k]], "o", color=COLOR_SECONDARY,
+                    markersize=6, zorder=6)
+            ax.annotate(lab, xy=(f[k], mag_db[k]),
+                        xytext=(0, 10 if j % 2 == 0 else 22),
+                        textcoords="offset points", ha="center", fontsize=8,
+                        color=COLOR_SECONDARY)
+        ax.set_xlim(*xlim)
+        ax.set_ylim(-110.0, 8.0)
+        ax.set_ylabel("Level [dB]")
+        ax.set_title(title, fontweight="bold", fontsize=10, pad=6)
+        ax.grid(which="major", color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+        ax.text(0.985, 0.06, note, transform=ax.transAxes, va="bottom",
+                ha="right", fontsize=8.5, color=COLOR_FG)
+    axes[-1].set_xlabel("Frequency [Hz]")
+    plt.tight_layout()
+    save_figure(output_dir, "intermodulation_tests.svg")
+    plt.close()
+
+
+def generate_feedback_stability(output_dir: str) -> None:
+    """The gain structure of Long's criterion, one open microphone and four."""
+    print("Generating feedback_stability...")
+    from phonometry import electroacoustics as ea
+
+    one = ea.feedback_stability(-6.0, 76.0, 80.0)
+    four = ea.feedback_stability(-6.0, 76.0, 80.0, open_microphones=4)
+
+    _fig, axes = plt.subplots(2, 1, figsize=(10, 9.2), sharey=True)
+    titles = (
+        f"One open microphone — headroom {one.headroom:+.1f} dB",
+        f"Four open microphones — headroom {four.headroom:+.1f} dB",
+    )
+    for ax, res, title in zip(axes, (one, four), titles, strict=True):
+        res.plot(ax=ax, language=_LANG)
+        ax.set_title(title, fontweight="bold", fontsize=11, pad=8)
+    plt.tight_layout()
+    save_figure(output_dir, "feedback_stability.svg")
+    plt.close()
+
+
+def generate_microphone_patterns(output_dir: str) -> None:
+    """The first-order family and the directivity index each member returns."""
+    print("Generating microphone_patterns...")
+    from phonometry import MicrophoneDirectivity, microphone_characteristics
+
+    freqs = np.geomspace(20.0, 20000.0, 200)
+    response = -10.0 * np.log10(1.0 + (30.0 / freqs) ** 4)
+    angles = np.linspace(0.0, 179.0, 359)
+    family = (
+        (0.0, "Omnidirectional"),
+        (1.0 / 3.0, "Subcardioid"),
+        (0.5, "Cardioid"),
+        (0.63, "Supercardioid"),
+        (0.75, "Hypercardioid"),
+        (1.0, "Figure-of-eight"),
+    )
+    # Six distinguishable inks; the two that share 4.8 dB (cardioid and
+    # figure-of-eight) are deliberately the two heaviest.
+    colors = (COLOR_MUTED, "#9467bd", COLOR_PRIMARY, COLOR_TERTIARY,
+              "#e8a838", COLOR_SECONDARY)
+
+    _fig, ax_any = plt.subplots(figsize=(8.4, 8.4),
+                                subplot_kw={"projection": "polar"})
+    ax: Any = ax_any
+    theta = np.radians(np.linspace(0.0, 360.0, 721))
+    for (b, name), col in zip(family, colors, strict=True):
+        polar_db = 20.0 * np.log10(
+            np.maximum(np.abs((1.0 - b) + b * np.cos(np.radians(angles))),
+                       10 ** (-30.0 / 20.0)))
+        res = microphone_characteristics(
+            freqs, response, 12.5, tolerance_db=3.0,
+            directivity=MicrophoneDirectivity(polar=(angles, polar_db),
+                                              frequency=1000.0))
+        assert res.directivity_index_db is not None, "polar input gives a DI"
+        di = float(res.directivity_index_db)
+        mag = np.maximum(np.abs((1.0 - b) + b * np.cos(theta)),
+                         10 ** (-30.0 / 20.0))
+        radius = np.maximum(20.0 * np.log10(mag), -30.0)
+        ax.plot(theta, radius, color=col, linewidth=2.0,
+                label=f"{name} (b = {b:.2f}): DI = {di:.1f} dB")
+    ax.set_ylim(-30.0, 0.0)
+    ax.set_yticks([-30.0, -20.0, -10.0, 0.0])
+    ax.set_theta_zero_location("N")
+    ax.set_theta_direction(-1)
+    ax.set_title("The First-Order Family and Its Directivity Index "
+                 "(IEC 60268-4 13.2.2)", fontweight="bold", pad=22)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), fontsize=9,
+              ncol=2)
+    plt.tight_layout()
+    save_figure(output_dir, "microphone_patterns.svg")
+    plt.close()
+
+
+def generate_microphone_noise_weightings(output_dir: str) -> None:
+    """How much of the dB(A)-to-dB(468) gap the *weighting* accounts for.
+
+    The customary "about 10 dB" mixes two effects: the network, which is what
+    the library implements and what this figure computes, and the ITU-R 468
+    quasi-peak detector, which it does not. Separating them also shows that
+    the weighting half is not a constant: it depends on the shape of the
+    particular capsule's noise.
+    """
+    print("Generating microphone_noise_weightings...")
+    from phonometry import electroacoustics
+
+    noise_f = np.geomspace(20.0, 20000.0, 31)
+    falling = 6.0 + 12.0 * np.log10(1000.0 / noise_f)   # the page's capsule
+    bright = 6.0 + 3.0 * np.log10(noise_f / 1000.0)     # a hissier capsule
+
+    fa, wa_curve = measure_weighting_response(48000, "A")
+    a_w = np.interp(noise_f, fa, wa_curve)
+    w468 = np.asarray(electroacoustics.itu_r_468_weighting(noise_f),
+                      dtype=float)
+
+    def total(bands: Any, weight: Any) -> float:
+        return float(10.0 * np.log10(np.sum(10.0 ** ((bands + weight) / 10.0))))
+
+    _fig, (ax_top, ax_bot) = plt.subplots(
+        2, 1, figsize=(10, 8.6), gridspec_kw={"height_ratios": [2.0, 1.2]})
+
+    ax_top.semilogx(noise_f, falling, color=COLOR_FG, linewidth=2.0,
+                    marker="o", markersize=4,
+                    label="Inherent noise, unweighted")
+    ax_top.semilogx(noise_f, falling + a_w, color=COLOR_PRIMARY, linewidth=1.8,
+                    linestyle="--", label="A-weighted")
+    ax_top.semilogx(noise_f, falling + w468, color=COLOR_SECONDARY,
+                    linewidth=1.8, linestyle="--",
+                    label="ITU-R BS.468-4 weighted")
+    ax_top.set_ylabel("Band level [dB]")
+    ax_top.set_xlabel(LABEL_FREQ_HZ)
+    ax_top.set_title("One Noise Voltage, Two Networks (IEC 60268-4 17.2)",
+                     fontweight="bold", pad=12)
+    ax_top.set_xlim(20.0, 20000.0)
+    format_frequency_axis(ax_top, 20.0, 20000.0)
+    ax_top.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_top.set_axisbelow(True)
+    ax_top.legend(loc="lower left", fontsize=9)
+
+    groups = (
+        ("this capsule\n(1/f, falling)", falling),
+        ("a hissier capsule\n(rising to 20 kHz)", bright),
+    )
+    width, offset = 0.34, 0.19
+    for k, (label, bands) in enumerate(groups):
+        la, l468 = total(bands, a_w), total(bands, w468)
+        ax_bot.bar(k - offset, la, width=width, color=COLOR_PRIMARY,
+                   label="A-weighted" if k == 0 else None)
+        ax_bot.bar(k + offset, l468, width=width, color=COLOR_SECONDARY,
+                   label="ITU-R BS.468-4" if k == 0 else None)
+        for xpos, val in ((k - offset, la), (k + offset, l468)):
+            ax_bot.annotate(f"{val:.1f} dB", xy=(xpos, val), xytext=(0, 4),
+                            textcoords="offset points", ha="center",
+                            fontsize=9, color=COLOR_FG)
+        ax_bot.annotate(f"network alone: {l468 - la:+.1f} dB",
+                        xy=(k, max(la, l468)), xytext=(0, 22),
+                        textcoords="offset points", ha="center", fontsize=9,
+                        color=COLOR_FG, fontweight="bold")
+    ax_bot.set_xticks([0, 1])
+    ax_bot.set_xticklabels([g[0] for g in groups])
+    ax_bot.set_ylabel("Band-summed level [dB]")
+    ax_bot.set_ylim(0.0, 34.0)
+    ax_bot.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_bot.set_axisbelow(True)
+    ax_bot.legend(loc="upper left", fontsize=9)
+    ax_bot.set_title("the quasi-peak detector of ITU-R BS.468-4 adds the rest "
+                     "of the customary ~10 dB, and is not implemented here",
+                     fontsize=9.5, pad=8)
+    plt.tight_layout()
+    save_figure(output_dir, "microphone_noise_weightings.svg")
+    plt.close()
+
+
+def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
+    """Each separated order is a full frequency response, not a number."""
+    print("Generating swept_sine_harmonic_responses...")
+    from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+    fs = 48000
+    f1, f2, seconds = 20.0, 6000.0, 4.0
+    a2, a3 = 0.12, 0.08
+    x = synchronized_sweep_signal(fs, f1, f2, seconds)
+    b, a = scipy_signal.butter(2, 3000.0, fs=fs)
+    y = scipy_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
+    res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+    h1_ref = 1.0 + 3.0 * a3 / 4.0
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    orders = (
+        (0, "|H1(f)|", COLOR_PRIMARY, h1_ref),
+        (1, "|H2(f)|", COLOR_SECONDARY, a2 / 2.0),
+        (2, "|H3(f)|", COLOR_TERTIARY, a3 / 4.0),
+    )
+    for idx, label, col, asymptote in orders:
+        mag = np.abs(np.asarray(res.harmonic_responses[idx]))
+        band = (res.frequencies >= (idx + 1) * f1) & (
+            res.frequencies <= (idx + 1) * f2)
+        ax.semilogx(res.frequencies[band],
+                    20.0 * np.log10(np.maximum(mag[band], 1e-9)),
+                    color=col, linewidth=1.8, label=f"{label} over [{idx + 1}f1, "
+                                                    f"{idx + 1}f2]")
+        ax.axhline(20.0 * np.log10(asymptote), color=col, linestyle=":",
+                   linewidth=1.2, alpha=0.8)
+
+    ax.set_xlabel("Frequency of the harmonic itself [Hz]")
+    ax.set_ylabel("Magnitude [dB]")
+    ax.set_title("The Separated Harmonic Frequency Responses "
+                 "(Farina / Novak)", fontweight="bold", pad=12)
+    ax.set_xlim(20.0, 20000.0)
+    ax.set_ylim(-70.0, 6.0)
+    format_frequency_axis(ax, 20.0, 20000.0)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+    ax.text(0.56, 0.04,
+            "dotted: the Chebyshev levels 1 + 3a3/4, a2/2 and a3/4;\n"
+            "each order rolls off at the 3 kHz post-filter, not at n f2",
+            transform=ax.transAxes, va="bottom", ha="center", fontsize=8.5,
+            color=COLOR_FG)
+    plt.tight_layout()
+    save_figure(output_dir, "swept_sine_harmonic_responses.svg")
+    plt.close()
+
+
+def generate_swept_sine_methods(output_dir: str) -> None:
+    """Synchronized against Farina on one recording: band and phase."""
+    print("Generating swept_sine_methods...")
+    from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+    fs = 48000
+    f1, f2, seconds = 20.0, 6000.0, 4.0
+    a2, a3 = 0.12, 0.08
+    x = synchronized_sweep_signal(fs, f1, f2, seconds)
+    # The memoryless cubic, with no post-filter: the Chebyshev identities then
+    # fix |H2| = a2/2 and arg H2 = -pi/2 at every frequency, so any departure
+    # on the figure is the method and not the device.
+    y = x + a2 * x**2 + a3 * x**3
+
+    # The synchronized generator quantises the duration slightly; the Farina
+    # analysis of the same recording has to be told the length it really is.
+    actual = len(x) / fs
+    sync = swept_sine_distortion(y, fs, f1, f2, actual, n_harmonics=3)
+    farina = swept_sine_distortion(y, fs, f1, f2, actual, n_harmonics=3,
+                                   method="farina")
+
+    _fig, (ax_mag, ax_ph) = plt.subplots(
+        2, 1, figsize=(10, 8.0), sharex=True,
+        gridspec_kw={"height_ratios": [1.4, 1.0]})
+
+    for res, label, col, style in ((sync, "synchronized", COLOR_PRIMARY, "-"),
+                                   (farina, "farina", COLOR_SECONDARY, "--")):
+        h2 = np.asarray(res.harmonic_responses[1])
+        band = (res.frequencies >= 2 * f1) & (
+            res.frequencies <= (2 * f2 if label == "synchronized" else f2))
+        ax_mag.semilogx(res.frequencies[band],
+                        20.0 * np.log10(np.maximum(np.abs(h2[band]), 1e-9)),
+                        color=col, linewidth=1.8, linestyle=style,
+                        label=f'|H2| — method="{label}"')
+        ax_ph.semilogx(res.frequencies[band],
+                       np.unwrap(np.angle(h2[band])), color=col,
+                       linewidth=1.6, linestyle=style,
+                       label=f'arg H2 — method="{label}"')
+
+    ax_mag.axhline(20.0 * np.log10(a2 / 2.0), color=COLOR_FG, linestyle=":",
+                   linewidth=1.2, label="Chebyshev level a2/2")
+    ax_mag.axvline(f2, color=COLOR_FG, linestyle=":", linewidth=1.2)
+    ax_mag.annotate("f2 = 6 kHz: the Farina band stops here",
+                    xy=(f2, -40.0), xytext=(-8, 0),
+                    textcoords="offset points", ha="right", fontsize=9,
+                    color=COLOR_FG)
+    ax_mag.axvline(2 * f2, color=COLOR_PRIMARY, linestyle=":", linewidth=1.2)
+    ax_mag.annotate("2 f2 = 12 kHz", xy=(2 * f2, -40.0), xytext=(8, 0),
+                    textcoords="offset points", ha="left", fontsize=9,
+                    color=COLOR_PRIMARY)
+    ax_mag.set_ylabel("Magnitude [dB]")
+    ax_mag.set_ylim(-70.0, 0.0)
+    ax_mag.set_title("Same Recording, Two Deconvolutions "
+                     "(Novak et al. 2015, Fig. 6)", fontweight="bold", pad=12)
+    ax_ph.axhline(-np.pi / 2.0, color=COLOR_FG, linestyle=":", linewidth=1.2)
+    ax_ph.annotate("true phase of H2: -pi/2 at every frequency",
+                   xy=(60.0, -np.pi / 2.0), xytext=(0, 8),
+                   textcoords="offset points", ha="left", fontsize=9,
+                   color=COLOR_FG)
+    ax_ph.set_ylabel("Unwrapped phase [rad]")
+    ax_ph.set_xlabel(LABEL_FREQ_HZ)
+    for axis in (ax_mag, ax_ph):
+        axis.set_xlim(40.0, 20000.0)
+        format_frequency_axis(axis, 40.0, 20000.0)
+        axis.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+        axis.set_axisbelow(True)
+        axis.legend(loc="lower left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "swept_sine_methods.svg")
+    plt.close()

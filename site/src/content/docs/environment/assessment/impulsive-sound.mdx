@@ -136,6 +136,12 @@ measurement of [ISO 1996-2](/phonometry/environment/assessment/environmental-lev
   width="96%"
 />
 
+*Both inputs matter but not equally: at a fixed onset rate, going from a 5 dB to
+a 30 dB level difference moves the prominence far less than an order of magnitude
+of onset rate does. Below P = 5 the adjustment is identically zero, so an impulse
+that does not qualify costs nothing at all — which is why the qualification test
+is the part of the method to get right.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -193,6 +199,20 @@ print(round(onset.onset_rate), round(onset.level_difference))  # 100 30
 print(round(onset.prominence, 2))                              # 8.95
 ```
 
+**What the recording has to be.** The chain reads a level history, so the
+conditions that make one valid are the conditions of the whole method: a class 1
+measurement chain calibrated before and after the session, and a signal in
+pascals, because although the adjustment itself is calibration-insensitive (it
+is built from level *differences*) the reported and adjusted $L_{Aeq}$ are not.
+The level history has to be sampled fast enough to resolve the rise — the method
+works on a 10 ms to 25 ms grid, which is the `dt` argument below — and the
+governing impulse is the one with the highest $P$ over a **30-minute** assessment
+period. Three things invalidate a period rather than lowering its score: no onset
+qualifying at the 10 dB/s gradient at all (the adjustment is then 0 dB and the
+period says nothing about the source), events overlapping so that one impulse
+starts on the decay tail of the previous one, and a level history that saturated
+or clipped at either end of the range.
+
 From a calibrated time signal (in pascal) the whole chain runs end to end:
 
 ```python
@@ -204,11 +224,34 @@ print(round(result.adjusted_laeq, 1))   # LAeq + KI
 result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
 ```
 
+Three keyword arguments of that call decide whether the number is defensible, and
+none of them is optional in practice:
+
+| Argument | Default | What it does |
+| :--- | :--- | :--- |
+| `dt` | `0.02` s | The logging interval of the level history. The method needs 10 ms to 25 ms; a coarser grid flattens the fitted onset rate and under-reports $P$, which is the caveat two paragraphs down made settable |
+| `calibration_offset` | `0.0` dB | Added to the level history to bridge a digital scale to a calibrated one: the difference between the calibrator's known level and the level this same processing reports for the calibration recording. It moves $L_{Aeq}$ and the adjusted $L_{Aeq}$ and leaves $K_I$ alone |
+| `laeq` | `None` | Supply the $L_{Aeq}$ measured over the assessment period instead of letting it be computed from the excerpt, which is what a real report does |
+| `reference_pressure` | `2e-05` Pa | Only change it for a non-air medium |
+| `onset_rate_method` | `'least_squares'` | The fit over the detected rise |
+
+`environment.sound_pressure_level_history(signal, fs, *, dt=..., calibration_offset=...)`
+is the same Clause 4 step on its own — A-weighting, F time weighting and
+resampling onto the 10-25 ms grid — for a caller who wants the history without
+the adjustment. It warm-starts the F integrator at the first window's mean
+square, so the beginning of a record does not register as an onset of the
+processing itself.
+
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg"
   alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive"
   width="90%"
 />
+
+*The three strikes are deliberately well separated, 1.6 s apart against a 0.08 s
+decay, so each onset starts from the same background and each fit has the whole
+rise to itself. That is the easy case: the two field errors described below both
+show up as a shallower fitted line on a visibly steep edge.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -284,6 +327,18 @@ impulses, not their energy: $K_I$ rides on top of the measured $L_{Aeq}$ in the
 rating level, it never replaces it.
 
 ## 5. Assessment report (`.report()`)
+
+An assessment report has to carry more than the fiche computes. State the
+standard applied and the edition; the source and the situation; the measurement
+position and the assessment period; the governing impulse with its onset rate and
+level difference; the prominence $P$ and the adjustment $K_I$; the source
+category the result puts the source in; and the $L_{Aeq}$ the adjustment rides
+on, with the instrumentation and calibration behind it. The fiche below fills the
+computed half automatically — the per-impulse table, the governing $P$, $K_I$ and
+the category — and takes the rest from `ReportMetadata`, which is why the
+metadata block is not decoration: without it the sheet documents an arithmetic
+result and not a measurement.
+
 
 `ImpulseProminenceResult.report(path)` renders a one-page PDF fiche laid out
 like an impulsive-sound assessment report of an environmental-noise laboratory,

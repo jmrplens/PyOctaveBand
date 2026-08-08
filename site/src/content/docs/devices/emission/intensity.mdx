@@ -55,6 +55,18 @@ $$
 I(f) = -\,\frac{\mathrm{Im}\{G_{12}(f)\}}{2\pi f\,\rho_0\,\Delta r}
 $$
 
+Everything on this page is then read as a level. The **sound intensity level**
+is $L_I = 10\log_{10}(\lvert I \rvert / I_0)$ with $I_0 = 1\ \text{pW/m}^2$: the
+level is of the *magnitude*, and the direction is carried separately, which is
+what `total_direction` reports as $\pm 1$. The two references were chosen to
+line up: in a plane progressive wave, where $I = p^2/(\rho c)$, the pressure and
+intensity levels agree to within $10\log_{10}(\rho c / 400) = 0.14$ dB at
+ordinary air conditions (IEC 61043 clause 5). That is why the left panel of the
+figure below shows two curves lying on top of each other, and why the
+pressure-intensity index has a floor near 0.14 dB rather than 0 — everything a
+field measurement shows above that floor is either a genuinely reactive or
+noise-contaminated field, or the instrument's own phase error.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Two-microphone p-p intensity probe with the spacer distance and the measurement axis" width="92%" loading="eager" />
 
 The probe itself is small enough to draw at true scale.
@@ -190,6 +202,13 @@ carries both:
 - **Reactive fields**: when `pressure_intensity_index` ($F_2$ in ISO 9614-1)
   approaches the probe's residual index $\delta_{pI0}$, phase errors dominate.
 
+Three symbols recur from here on, and they are derived in *The margin over the
+residual index* below: $\delta_{pI0}$ is the **residual** pressure-intensity
+index, the phase-error floor of the probe-spacer-analyser chain; $K$ is the bias
+factor the grade allows (10 dB engineering, 7 dB survey); and
+$L_d = \delta_{pI0} - K$ is the **dynamic capability**, the largest field index
+the instrument can afford at that grade.
+
 Before any of that, ISO 9614-1 asks a question about the *field* rather than
 the surface: is it steady enough to be scanned at all? In the initial test
 (clause 8.2) one typical position is picked on an initial measurement surface
@@ -229,8 +248,27 @@ phase-error floor. **$F_3$**, the negative partial power indicator, is the same
 difference taken with the *signed* mean intensity: $F_3 - F_2 > 0$ reveals power
 flowing inward through parts of the surface. **$F_4$**, the field non-uniformity
 indicator, is the normalised spread of the per-position intensities: the
-larger it is, the more measurement positions the surface needs. Together with
-the dynamic-capability criterion they are available directly:
+larger it is, the more measurement positions the surface needs.
+
+$F_4$ is the one that turns into a number of positions, through criterion 2 of
+Annex B, $N > C\,F_4^2$ (Eq. B.2). The factor $C$ is not a constant: Table B.2
+makes it depend on the band **and** on the grade being claimed — about 11 at low
+frequency rising to 29 in the mid band for engineering grade, and 19 rising to
+57 for precision, with 8 for the A-weighted survey case. So the same field
+non-uniformity asks for roughly twice as many positions at grade 1 as at
+grade 2. Worked: $F_4 = 0.5$ in the 1 kHz band needs $N > 29 \times 0.25$, so at
+least **8 positions** at engineering grade and at least **15** at precision; and
+when one position count is used for every band, the standard applies the
+criterion at the band with the largest $C F_4^2$.
+
+$F_4$ is also directly reportable, which is what makes it worth computing even
+when the count is already fixed: the 95 % confidence interval on a band level is
+$10\log_{10}(1 \pm 2 F_4/\sqrt{N})$ (Eq. B.3), so $F_4 = 0.5$ over 10 positions
+carries **+1.2 dB / −1.7 dB**. A band that fails criterion 2 may still be
+recorded, but only accompanied by that interval.
+
+Together with the dynamic-capability criterion the indicators are available
+directly:
 
 ```python
 import numpy as np
@@ -350,6 +388,55 @@ $\delta_{pI}$ reaches $\delta_{pI0}$ the reading is pure phase error, of
 either sign. This is why the
 pressure-intensity index, not the microphone quality, gates the achievable
 accuracy of every intensity measurement.
+
+### Measuring the residual index, and checking the probe
+
+$\delta_{pI0}$ is the number every criterion on this page and the whole
+[scanning page](/phonometry/devices/emission/sound-power-intensity/) rests on,
+and the library does not compute it: it is measured, once per
+probe-spacer-analyser chain, on a bench.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_residual_intensity_check.svg" alt="Three panels. First, the IEC 61043 residual-intensity testing device: a small coupler driving pink or white noise onto both probe capsules at the same level within plus or minus 0.1 decibel, from which the residual index is read as the pressure level minus the indicated intensity level. Second, an IEC 60942 class 0 or class 1 sound calibrator applied to one microphone at a time, with the instrument adjusted to within plus or minus 0.1 decibel in both channels. Third, the in-situ probe-reversal test: the probe on the measurement surface reading a positive normal intensity, then rotated 180 degrees about its acoustic centre and reading a negative one, accepted when the two have opposite signs and differ by less than 1.5 decibel in the band of maximum level" width="92%" />
+
+**The residual-intensity test (IEC 61043 clause 10.2).** The testing device is a
+small coupler that presents *the same* sound field to both capsules over the
+whole or part of 45 Hz to 7,1 kHz, driven with pink or white noise, and applying
+the pressure to the two microphones at the same level within **±0,1 dB** at least
+from 45 Hz to 1 kHz, with a bounded inter-port phase difference. Because the true
+intensity in that field is exactly zero, whatever the instrument indicates is its
+own phase error, and $\delta_{pI0}$ is read band by band as the pressure level
+minus that indicated intensity level. Two consequences follow from *what* is in
+the coupler: the index belongs to the probe, the fitted spacer and the analyser
+**together**, so it must be re-measured whenever the spacer changes; and it is a
+property of the chain, not a specification of the microphones.
+
+**Before every series (clause 14).** Let the instrument warm up as the
+manufacturer says. In sound-pressure mode, apply a sound calibrator to the two
+microphones, in turn or simultaneously, and adjust to the correct indication
+within **±0,1 dB in both channels** — ISO 9614-2 clause 6.2.1 asks for a class 0
+or class 1 IEC 60942 calibrator here. Then apply the residual-intensity device
+again and confirm that $\delta_{pI0}$ still meets the class requirement over the
+range the device covers, with the manufacturer's phase compensation applied and,
+preferably, **at a level close to the level of use**.
+
+**In situ (ISO 9614-2 clause 6.2.2): the probe-reversal test.** This is the one
+check that needs no bench and catches the error no bench can see. Place the
+probe on the measurement surface, axis normal, at a position where the intensity
+exceeds the surface mean; record $I_n$ in every band. Rotate the probe **180°
+about an axis normal to the measurement axis**, keeping the acoustic centre in
+the same place — which in practice means mounting it on a stand rather than
+holding it — and measure again. For the measurement system to be acceptable, in
+the band of maximum level **the two values of $I_n$ must have opposite signs and
+the two intensity levels must differ by less than 1,5 dB**. Read the two failure
+modes as diagnoses: identical signs mean the channels are swapped or one is
+inverted, and a difference above 1,5 dB means the probe is disturbing its own
+field or the two channels are not matched. Clause 10.5 c) makes the result part
+of the test report.
+
+That sign is worth reading in normal use too, not only in the check. A negative
+net intensity over part of an enclosing surface means more power entering that
+patch than leaving it — entirely normal on the shadow side of a machine standing
+beside a louder one, and completely meaningless if the channels are swapped.
 
 ### Grading the instrument: IEC 61043 Table 2
 
@@ -523,6 +610,50 @@ The spacer sets both ends of the usable band, in opposite directions:
   $10\log_{10}(\Delta r/25\ \text{mm})$, so doubling the spacer is worth 3 dB of
   low-frequency margin.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spacer_bandwidth.svg" alt="Two stacked panels against frequency. Above, the finite-difference bias for 6, 12 and 50 mm spacers, each falling away from 0 dB and crossing the dashed minus 0.3 dB line exactly at its own maximum valid frequency of 5.72, 2.86 and 0.69 kHz. Below, the residual-index margin each spacer inherits relative to the 25 mm separation IEC 61043 Table 2 is written for: minus 6.2 dB for 6 mm, minus 3.2 dB for 12 mm and plus 3.0 dB for 50 mm" width="92%" />
+
+*The two limits close in from opposite sides. The upper panel is geometry: each
+spacer's `max_valid_frequency` is exactly where its own bias curve crosses
+−0.3 dB. The lower panel is the phase budget: the requirement moves with the
+spacer by $10\log_{10}(\Delta r/25\ \text{mm})$, so a 50 mm probe starts 3 dB
+better off than a 25 mm one and 9 dB better off than a 6 mm one. Where the two
+panels leave a spacer usable is the band it may be trusted over.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# The bias comes out of sound_intensity itself: bias_correction is the
+# compensating factor (k dr)/sin(k dr), so the bias is its reciprocal in dB.
+fs, c = 48000, 343.0
+rng = np.random.default_rng(61043)
+x = rng.standard_normal(fs)
+spectrum, bins = np.fft.rfft(x), np.fft.rfftfreq(fs, 1 / fs)
+
+fig, (axt, axb) = plt.subplots(2, 1, sharex=True)
+for dr in (0.006, 0.012, 0.050):
+    p2 = np.fft.irfft(spectrum * np.exp(-2j * np.pi * bins * dr / c), fs)
+    res = emission.sound_intensity(x, p2, fs, dr, fraction=3,
+                                   limits=[20.0, 12500.0])
+    usable = res.frequency < c / (4.0 * dr)      # drop the clamped bands
+    axt.semilogx(res.frequency[usable],
+                 -10.0 * np.log10(res.bias_correction[usable]),
+                 label=f"{dr * 1000:.0f} mm")
+    axt.axvline(res.max_valid_frequency, linestyle=":")
+    axb.semilogx(res.frequency,
+                 np.full(res.frequency.shape, 10.0 * np.log10(dr / 0.025)))
+axt.axhline(-0.3, linestyle="--")
+axt.set(ylabel="Bias [dB]", ylim=(-2.4, 0.35))
+axb.set(xlabel="Frequency [Hz]", ylabel="δpI0 margin re 25 mm [dB]")
+axt.legend()
+plt.show()
+```
+
+</details>
+
 No single spacer covers the full audio range: 6 mm suits high-frequency
 work, 50 mm low-frequency work, and the common 12 mm covers the mid band.
 Wide-band surveys are measured twice with two spacers and the band results
@@ -571,8 +702,10 @@ ISO 9614-3) live in
 [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
 The residual-intensity *test* of IEC 61043 is not performed by the library
 either: $\delta_{pI0}$ is a value the caller measures on their own probe-analyzer
-chain, with the spacer that will be fitted, and supplies. What phonometry
-does with it is grade it against Table 2.
+chain, with the spacer that will be fitted, and supplies — the procedure is in
+*Measuring the residual index* above, and what phonometry does with the number
+is grade it against Table 2. The before-use check of clause 14 and the
+ISO 9614-2 probe-reversal test are likewise procedures, not functions.
 
 ## See also
 

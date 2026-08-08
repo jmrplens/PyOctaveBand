@@ -8,8 +8,8 @@ references:
     title: "Predicting outdoor sound"
     edition: "2nd ed."
     publisher: "CRC Press"
-    doi: "10.1201/9780429470141"
-    note: "Chapter 2 (spherical-wave reflection over an impedance ground, the Weyl-Van der Pol equation and the boundary-loss factor) and Chapter 9 (outdoor noise barriers, the MacDonald and Hadden & Pierce diffraction solutions). ISBN 978-1-138-30655-2."
+    doi: "10.1201/9780429470806"
+    note: "Chapter 2 (spherical-wave reflection over an impedance ground, the Weyl-Van der Pol equation and the boundary-loss factor) and Chapter 9 (outdoor noise barriers, the MacDonald and Hadden & Pierce diffraction solutions). ISBN 978-1-4987-4007-4."
   - type: book
     authors: ["Salomons, E. M."]
     year: 2001
@@ -110,6 +110,7 @@ bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
 # Grassland (effective flow resistivity sigma = 200 kPa.s/m^2), source 1 m and
 # receiver 1.5 m high, 50 m apart. The impedance comes from the Delany-Bazley
 # porous model of phonometry.materials (a semi-infinite ground).
+# Argument order: frequencies, source_height, receiver_height, distance.
 res = ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
 print(res.excess_attenuation)     # the ground dip (dB re free field)
 print(res.reflection_coefficient) # complex Q per band
@@ -128,7 +129,12 @@ which a passive ground has $\operatorname{Im}(Z) > 0$; the porous models of
 from them (a `flow_resistivity` or a `PorousMediumResult`) is conjugated
 internally before it enters the Weyl-Van der Pol formulas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical.svg" alt="Excess attenuation (level re free field) against frequency on a log axis for four ground types. Fresh snow (10 kPa) dips deepest and lowest in frequency, near minus 18 dB around 150 Hz; forest floor (50 kPa) reaches about minus 15 dB near 290 Hz and grassland (200 kPa) about minus 12 dB near 540 Hz; asphalt (20000 kPa) hugs the plus 6 dB hard-ground enhancement limit until a deep dip near 2.4 kHz. A dotted line marks the plus 6 dB hard-ground limit and a solid line the 0 dB free field" width="90%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical.svg" alt="Excess attenuation (level re free field) against frequency on a log axis for four ground types. Fresh snow (10 kPa s/m2) dips deepest and lowest in frequency, near minus 18 dB around 150 Hz; forest floor (50 kPa s/m2) reaches about minus 15 dB near 290 Hz and grassland (200 kPa s/m2) about minus 12 dB near 540 Hz; asphalt (20000 kPa s/m2) hugs the plus 6 dB hard-ground enhancement limit until a deep dip near 2.4 kHz. A dotted line marks the plus 6 dB hard-ground limit and a solid line the 0 dB free field" width="90%" loading="eager" />
+
+*Softer ground means a deeper dip at a lower frequency: the dip tracks the
+effective flow resistivity across more than a decade, and only asphalt stays
+near the +6 dB hard-ground limit across the speech range. Note the unit — the
+flow resistivity is a resistivity in Pa·s/m², not a pressure.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -140,10 +146,10 @@ from phonometry import ground_effect
 
 freqs = np.geomspace(50.0, 4000.0, 400)
 grounds = [
-    ("Fresh snow (10 kPa)", 10e3, "#2ca02c"),
-    ("Forest floor (50 kPa)", 50e3, "#9467bd"),
-    ("Grassland (200 kPa)", 200e3, "#1f77b4"),
-    ("Asphalt (20000 kPa)", 20000e3, "#d62728"),
+    ("Fresh snow (10 kPa·s·m⁻²)", 10e3, "#2ca02c"),
+    ("Forest floor (50 kPa·s·m⁻²)", 50e3, "#9467bd"),
+    ("Grassland (200 kPa·s·m⁻²)", 200e3, "#1f77b4"),
+    ("Asphalt (20 000 kPa·s·m⁻²)", 20000e3, "#d62728"),
 ]
 fig, ax = plt.subplots(figsize=(11, 6.4))
 for label, sigma, color in grounds:
@@ -166,6 +172,58 @@ $|w| \to 0$, $F \to 1$ and $Q \to 1$, so $\Delta L$ reaches +6 dB in phase;
 the effective flow resistivity $\sigma \to \infty$ tends to that hard ground;
 grazing incidence ($h_s, h_r \to 0$) gives $R_p \to -1$; and the ground
 effect is reciprocal under an exchange of source and receiver heights.
+
+The ground wave is easiest to see by taking the geometry towards grazing and
+watching $R_p$ and $Q$ come apart.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_reflection_coefficient.svg" alt="Two panels against source and receiver height falling from 3 m to 0.02 m at 50 m range and 500 Hz over grassland. Left: the magnitude of the plane-wave reflection coefficient Rp rising to 1 while its phase runs to 180 degrees, and the magnitude of the spherical-wave coefficient Q departing upward from it and settling near 1.26, with the magnitude of the boundary-loss factor F(w) on a second axis. Right: the excess attenuation computed with Q, which flattens near minus 12 dB, against the same quantity computed with Rp alone, which falls through minus 40 dB towards the silence a plane-wave model predicts at grazing incidence" width="90%" />
+
+*At 3 m of height the two coefficients agree to within a few per cent and the
+ground wave is irrelevant. By 0.02 m, $R_p$ has reached $-1$ (magnitude 0.993 at
+179.6°) and a plane-wave model predicts $-40.1$ dB — near silence. The spherical
+coefficient reaches $|Q| = 1.26$ instead and the field settles at $-11.9$ dB.
+That 28 dB is what the Faddeeva term $F(w)$ buys, and it is why a grazing outdoor
+path is audible at all.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `ground_effect` is imported by the snippet above.
+heights = np.geomspace(3.0, 0.02, 60)
+c0, f, d = 343.0, 500.0, 50.0
+k = 2 * np.pi * f / c0
+q_mag, rp_mag, dl_q, dl_p = [], [], [], []
+for h in heights:
+    res = ground_effect([f], h, h, d, flow_resistivity=2e5, model="miki")
+    rp = res.plane_reflection_coefficient[0]
+    q = res.reflection_coefficient[0]
+    phase = np.exp(1j * k * (float(res.r_reflected) - float(res.r_direct)))
+    ratio = float(res.r_direct) / float(res.r_reflected)
+    rp_mag.append(abs(rp))
+    q_mag.append(abs(q))
+    dl_q.append(20 * np.log10(abs(1 + q * ratio * phase)))
+    dl_p.append(20 * np.log10(abs(1 + rp * ratio * phase)))
+
+fig, (left, right) = plt.subplots(1, 2, figsize=(11, 4.6))
+left.semilogx(heights, rp_mag, label="|Rp| (plane wave)")
+left.semilogx(heights, q_mag, label="|Q| (spherical wave)")
+left.invert_xaxis()
+left.set(xlabel="Source = receiver height [m]", ylabel="Magnitude")
+left.legend()
+right.semilogx(heights, dl_q, label="with Q")
+right.semilogx(heights, dl_p, label="with Rp only")
+right.invert_xaxis()
+right.set(xlabel="Source = receiver height [m]",
+          ylabel="Level re free field [dB]")
+right.legend()
+plt.show()
+```
+
+</details>
 
 ### Choosing the ground impedance
 
@@ -260,11 +318,47 @@ the auxiliary Fresnel functions. It gives 6 dB at the shadow boundary (the
 field is exactly halved, the flat-wedge limit) and tracks Kurze-Anderson through
 the shadow zone.
 
-**Thick barriers.** A `thickness` (top width $e$) lengthens the diffracted
-path to $A + e + B$, the double-edge Fresnel number
-$N = (2/\lambda)(A + B + e - d)$ of
-Bies Eq. 5.157, so a thick barrier or a soil mound attenuates monotonically more
-than the thin screen of the same height.
+**Thick barriers.** A `thickness` (top width $e$) moves the second diffraction
+edge downstream and lengthens the diffracted path to $A + e + B$, the double-edge
+Fresnel number $N = (2/\lambda)(A + B + e - d)$ of Bies Eq. 5.157. The
+improvement is monotone but it is small, and the reason is geometric: $B$ is now
+measured from the *far* edge, so most of what the top width adds it also gives
+back. On the 4 m screen of this page, a 4 m top width is worth **0.08 dB** at
+500 Hz and 0.14 dB at 8 kHz; even 30 m of width only reaches 1.2 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_thickness_gain.svg" alt="Two panels on what a thick barrier buys over a thin screen of the same height, for a 4 m barrier 50 m from a 1 m source with the receiver 1.5 m high at 100 m. Left: the insertion-loss gain over the thin screen against top width from 0 to 30 m at 250 Hz, 500 Hz and 1 kHz, staying below 1.5 dB across the whole sweep. Right: the same comparison run through the ISO 9613-2 screening term, where the double-diffraction factor C3 adds several decibels for the same widths, with the difference between the two answers annotated" width="90%" />
+
+*The path-length effect alone is worth a fraction of a decibel at road-traffic
+distances. ISO 9613-2 credits a well-separated double edge with a separate
+factor $C_3$ that rises from 1 towards 3, worth up to $10\log_{10}3 \approx
+4.8$ dB, which the wave-theoretic model here does not include: for the same 4 m
+top width $D_z$ goes from 7.6 dB to 9.0 dB at 500 Hz. Neither number licenses
+building a berm and expecting the ISO bonus from this page's model.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `barrier_insertion_loss` is imported by the snippet above.
+widths = np.linspace(0.0, 30.0, 40)
+fig, ax = plt.subplots()
+for freq in (250.0, 500.0, 1000.0):
+    thin = float(barrier_insertion_loss(
+        [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact").insertion_loss[0])
+    gain = [0.0 if e == 0.0 else float(barrier_insertion_loss(
+        [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact",
+        thickness=e).insertion_loss[0]) - thin for e in widths]
+    ax.plot(widths, gain, label=f"{freq:g} Hz")
+ax.set_xlabel("Top width e [m]")
+ax.set_ylabel("Gain over the thin screen [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Coherent barrier on the ground.** With a `ground_impedance` (or a
 `ground_flow_resistivity`) the four source-image / receiver-image diffracted
@@ -276,6 +370,8 @@ $Q$ (over the
 overall source-receiver geometry) weights every bounce rather than a separate
 coefficient per image path; the model is coherent and reciprocal but not a full
 boundary-element solution.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_barrier_four_paths.svg" alt="To-scale section of the coherent four-path barrier model: a source 1 m above the ground with its mirror image 1 m below, a 4 m screen at 50 m, and a receiver 1.5 m high at 100 m with its own mirror image below the ground. Four diffracted routes are drawn in four distinguishable strokes from the source or its image over the top edge to the receiver or its image, each labelled with the number of ground bounces and with the spherical reflection coefficient Q marked at every bounce; a side panel lists the four path lengths and the path-length differences that set the interference, and an inset repeats the two-edge geometry of a thick barrier with its top width e" width="92%" />
 
 ```python
 il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
@@ -292,6 +388,13 @@ ground-effect dip of the unscreened path, down where the four diffracted paths
 interfere destructively.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods.svg" alt="Barrier insertion loss against frequency on a log axis for a 4 m screen between a 1 m source at 50 m and a 1.5 m receiver at 100 m. The dashed Kurze-Anderson curve and the solid exact rigid half-plane curve rise together from about 6 dB at 50 Hz to 19 dB at 5 kHz, never more than about 1.5 dB apart; the coherent four-path ground curve oscillates around them, peaking above 45 dB near 230 Hz where the unscreened ground dip is removed and falling below minus 10 dB near 550 Hz, with the dotted Kurze-Anderson 5 dB grazing-limit line underneath" width="90%" />
+
+*The two thin-screen models never separate by more than about 1.5 dB, so the
+choice between them barely matters. The coherent ground curve is a different
+kind of object: it swings from above +45 dB near 230 Hz, where the barrier
+removes the unscreened path's own ground dip, to below −10 dB near 550 Hz, where
+the four diffracted paths cancel. Both extremes are narrowband and neither is a
+design value.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -352,9 +455,83 @@ plt.show()
 
 </details>
 
+### `ground_effect()` and `barrier_insertion_loss()` parameters
+
+Both entry points take their distances **along the ground from the source**, and
+neither takes a distance from the barrier. That is the trap worth naming: in
+`barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5)` the receiver is
+100 m from the *source*, i.e. 50 m past the screen, not 100 m past it. The two
+functions also spell the same option differently — `model=` on `ground_effect`,
+`ground_model=` on `barrier_insertion_loss` — and order their geometry
+differently, which is why the two positional calls on this page are not
+parallel.
+
+| `ground_effect` parameter | Type / shape | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequencies` | scalar or 1D array | Hz | > 0 | Narrowband: no band smoothing |
+| `source_height` | float | m | ≥ 0 | $h_s$ |
+| `receiver_height` | float | m | ≥ 0 | $h_r$ (**before** the distance) |
+| `distance` | float | m | > 0 | Horizontal source-receiver distance |
+| `impedance` | array, `PorousMediumResult` or None | — | `None` | Normalized $Z$ in the $e^{-i\omega t}$ convention |
+| `flow_resistivity` | float or None | Pa·s/m² | `None` | Effective $\sigma$; feeds the porous model |
+| `model` | `"delany_bazley"` \| `"miki"` | — | `"delany_bazley"` | Prefer `"miki"` below the fit range |
+| `speed_of_sound` / `air_density` | float | m/s, kg/m³ | 343.0 / 1.205 | |
+
+| `barrier_insertion_loss` parameter | Type / shape | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequencies` | scalar or 1D array | Hz | > 0 | |
+| `source_height` | float | m | ≥ 0 | $h_s$ |
+| `barrier_distance` | float | m | > 0 | Source to the (near) edge, along the ground |
+| `barrier_height` | float | m | > 0 | Edge height above the ground |
+| `receiver_distance` | float | m | > `barrier_distance` (+ `thickness`) | Measured **from the source** |
+| `receiver_height` | float | m | ≥ 0 | $h_r$ (**after** the distance) |
+| `method` | `"kurze_anderson"` \| `"exact"` | — | `"exact"` | `"exact"` is the rigid half-plane |
+| `thickness` | float or None | m | `None` | Top width $e$; double edge |
+| `ground_impedance` | array, `PorousMediumResult` or None | — | `None` | Selects the coherent four-path model |
+| `ground_flow_resistivity` | float or None | Pa·s/m² | `None` | Same, from an effective $\sigma$ |
+| `ground_model` | `"delany_bazley"` \| `"miki"` | — | `"delany_bazley"` | Note the name: not `model=` |
+| `speed_of_sound` / `air_density` | float | m/s, kg/m³ | 343.0 / 1.205 | |
+
+A ground argument requires `method="exact"`; `method="kurze_anderson"` with a
+ground raises `ValueError`.
+
+### Choosing a model, and what none of them models
+
+**Which one to use.** Kurze-Anderson for an octave-band engineering estimate,
+where its ±1.5 dB against the exact solution is far inside the uncertainty of
+everything else in the chain. The exact rigid half-plane when the behaviour near
+the shadow boundary matters (it gives 6 dB there against Kurze-Anderson's 5 dB,
+and the 6 dB is the physically correct halved field). The coherent four-path
+model only when the narrowband interference structure is the question — never
+raw as a design value.
+
+**The coherent curve must be averaged before it means anything.** It is a
+coherent, narrowband, fully deterministic result. Real atmospheric turbulence
+decorrelates the four paths, a real source has bandwidth, and a real receiver
+moves; all three wash out the extremes. A +45 dB narrowband insertion loss is
+not a barrier that removes 45 dB, it is a frequency at which the *unscreened*
+path happened to sit in its own ground dip. Band-average the curve, or read it
+as structure rather than as a level.
+
+**All four models are two-dimensional endless screens.** A real barrier of
+finite length lets sound flank around its ends, and two parallel barriers either
+side of a road reflect between each other and lose several decibels of their
+nominal performance. Neither effect exists in any model on this page.
+
+**Diffraction is the screening limit, not the realised one.** The insertion loss
+a built barrier delivers is the smaller of the diffraction result and the
+transmission loss of the panel itself, and the obstacle has to qualify as a
+barrier in the first place — surface density, a closed surface, and a horizontal
+extent normal to the path larger than the wavelength. Those qualifying rules are
+stated in the
+["Barrier pitfalls" section of Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/);
+they apply here unchanged.
+
 ## Relation to ISO 9613-2
 
-The tabulated $A_{gr}$ and $D_z$ of the
+The Kurze-Anderson insertion loss written $\Delta$ here is the same quantity
+ISO 9613-2 calls $D_z$, and the two diffracted segments called $A$ and $B$ here
+are its $d_{ss}$ and $d_{sr}$. The tabulated $A_{gr}$ and $D_z$ of the
 [ISO 9613-2 method](/phonometry/environment/propagation/outdoor-propagation/) are octave-band,
 energy-based engineering fits; `ground_effect` and `barrier_insertion_loss` are
 their narrowband wave-acoustic counterparts. Over hard ground both agree on the
@@ -387,4 +564,8 @@ solution.
 
 ## See also
 
+- [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/): the octave-band ISO 9613-2 fits these models sit underneath, and the rule an obstacle has to satisfy to be a barrier at all.
+- [Atmospheric refraction: rays and the GFPE](/phonometry/environment/propagation/atmospheric-refraction/): the vertical sound-speed gradient both models here assume away.
+- [Porous absorbers](/phonometry/materials/absorbers/porous-absorbers/): the Delany-Bazley and Miki models behind `flow_resistivity`, and their fit range.
 - Theory: [Outdoor propagation and occupational exposure](/phonometry/reference/theory/environment-transport/#outdoor-propagation-and-occupational-exposure-iso-9613-12-iso-9612): the ground and barrier terms of ISO 9613-2 in the context of the whole attenuation sum.
+- API reference: [`environment.propagation.ground_barriers`](/phonometry/reference/api/environment/ground-barriers/).
