@@ -1,6 +1,6 @@
 ---
 title: "Erratas de las fuentes publicadas"
-description: "Defectos encontrados en las normas, los documentos de guía y los libros de los que parte la librería: erratas de imprenta, ejemplos resueltos que contradicen su propio articulado y qué hace la librería con cada uno."
+description: "Defectos encontrados en las normas, los documentos de guía y los libros de los que parte la biblioteca: erratas de imprenta, ejemplos resueltos que contradicen su propio articulado y qué hace la biblioteca con cada uno."
 ---
 
 Implementar una norma en sala limpia significa volver a deducir cada fórmula,
@@ -13,14 +13,14 @@ dígito, una referencia cruzada que apunta a la ecuación equivocada.
 Esta página es el registro de esos hallazgos. Cada entrada nombra la edición
 impresa y el punto exacto, cita lo que dice el documento, muestra por qué no
 puede ser correcto, aporta la evidencia independiente y declara qué lectura
-implementa la librería y qué test de regresión la fija. Un defecto listado
+implementa la biblioteca y qué test de regresión la fija. Un defecto listado
 aquí nunca es un defecto del *método*: en todos los casos la lectura
 pretendida se ha podido establecer a partir del propio documento o de la
 física.
 
 Léela junto al
 [informe de conformidad](/phonometry/es/reference/conformance/), que muestra
-los números que calcula la librería; esta página explica el puñado de sitios
+los números que calcula la biblioteca; esta página explica el puñado de sitios
 donde lo que está mal es el valor esperado impreso.
 
 :::note

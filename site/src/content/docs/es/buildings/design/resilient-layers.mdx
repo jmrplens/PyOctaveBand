@@ -35,7 +35,7 @@ references:
     title: "Acoustics — Determination of dynamic stiffness — Part 1: Materials used under floating floors in dwellings"
     designation: "EN 29052-1:1992 (ISO 9052-1:1989)"
     url: "https://www.iso.org/standard/16620.html"
-    note: "La medida de la rigidez dinámica por unidad de área s' de la que parte toda fórmula de esta página."
+    note: "La medida de la rigidez dinámica por unidad de superficie s' de la que parte toda fórmula de esta página."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -202,14 +202,14 @@ El modelo trata el revestimiento como un resorte *lineal*. Bajo la fuerza
 elevada de la máquina de impactos muchos revestimientos reales se endurecen y
 presentan dos o tres pendientes entre 5 y 22 dB por octava en vez de una, y
 por eso un $\Delta L$ de laboratorio sigue siendo la referencia en cuanto
-existe una probeta.
+existe un elemento de ensayo.
 
 ## Suelos flotantes: tres leyes sobre una resonancia
 
 Un suelo flotante es una superficie de paso rígida sobre una capa elástica, y
 su resonancia sale de los dos números conocidos en fase de proyecto, la masa
 por unidad de superficie $m'$ de la solera y la rigidez dinámica por unidad de
-área $s'$ de la capa según EN 29052-1:
+superficie $s'$ de la capa según EN 29052-1:
 
 $$
 f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
@@ -317,9 +317,10 @@ resilient_mount_improvement(
 ## Capas adicionales: el anexo D lee la magnitud global en la resonancia
 
 Una capa adicional sobre una pared (un trasdosado, en el lenguaje de obra;
-"capa adicional" es el término que emplea la versión española de la norma,
+«capa adicional» es el término que emplea la versión española de la norma,
 comprobado en UNE-EN ISO 12354-2:2018) es el mismo
-problema de resorte con el signo cambiado: puede *reducir* el aislamiento acústico, y el anexo D de
+problema de resorte con el signo cambiado: puede *reducir* el aislamiento
+acústico, y el anexo D de
 ISO 12354-1 predice cuánto solo a partir de la frecuencia de resonancia. Qué
 fórmula da $f_0$ depende de cómo se fije la capa:
 
@@ -383,7 +384,7 @@ de Hopkins), la clasificación sobre/subcrítica de sus cuatro superficies de
 paso, las dos resonancias del suelo flotante doble, las resonancias de capa
 adicional de su fig. 4.48 y el espectro de suelo flotante de la tabla G.4 de
 ISO 12354-2:2017, cuyos 21 valores impresos, de 0,0 dB a 50 Hz a 59,3 dB a
-5 kHz, la librería reproduce con la precisión impresa de 0,1 dB.
+5 kHz, la biblioteca reproduce con la precisión impresa de 0,1 dB.
 
 De ese anclaje en la tabla G.4 conviene saber tres cosas. Su columna se rotula
 $\Delta L_\text{situ}$, la mejora *in situ*, y sirve de sustituto de la
@@ -394,11 +395,11 @@ construcción del apartado G.1.1 y repetido en el recuadro bajo la tabla, no un
 valor deducido de la retícula. Y el 0,0 dB inicial a 50 Hz exige un recorte
 por debajo de $f_0$ que ninguna fórmula impresa establece: la fórmula (C.1)
 está escrita como $\Delta L = 30\log_{10}(f/f_0)$ sin rango de validez alguno, y la
-única condición impresa en todo el documento es el informal "for $f > f_0$"
+única condición impresa en todo el documento es el informal «for $f > f_0$»
 de ese mismo recuadro. La tabla L.4 de ISO 12354-1:2017 imprime los mismos 21
 números como $\Delta R_\text{d,situ}$, lo que confirma la transcripción en un
 segundo documento publicado, pero su propio recuadro dice que la columna
-procede de "ISO 12354-2:2017, Formula (C.1)" con los mismos $m'$, $s'$ y
+procede de «ISO 12354-2:2017, Formula (C.1)» con los mismos $m'$, $s'$ y
 $f_0$, así que es el mismo cálculo vuelto a publicar y no uno independiente.
 
 **Implementadas tal como se imprimen, sin número publicado contra el que
@@ -406,7 +407,7 @@ comprobarlas.** La rigidez de cámara $0{,}111/d$ de la fórmula (D.2); el
 ajuste ponderado de asfalto y suelos secos de la fórmula (C.5), cuyo origen es
 el nomograma de la figura C.2; y los ajustes de sistema exterior, anclajes,
 superficie encolada, montantes y traslado de laboratorio a obra de las
-fórmulas (D.3) a (D.8). Para estas la librería reproduce la expresión impresa
+fórmulas (D.3) a (D.8). Para estas la biblioteca reproduce la expresión impresa
 y los tests fijan la transcripción y las relaciones cualitativas que la norma
 afirma, que es todo lo que se puede hacer honestamente sin ejemplo resuelto.
 

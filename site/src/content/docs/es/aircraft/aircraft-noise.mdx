@@ -1,6 +1,6 @@
 ---
 title: "Ruido de aeronaves: nivel efectivo de ruido percibido"
-description: "El nivel efectivo de ruido percibido (EPNL) del Anexo 16 de la ICAO, Vol. I, Apéndice 2: la molestia percibida y el PNL, la corrección tonal por el método de pendientes, la corrección por duración de 10 dB por debajo, y el verificador de sistema de medida IEC 61265."
+description: "El nivel efectivo de ruido percibido (EPNL) del Anexo 16 de la OACI, Vol. I, Apéndice 2: la molestia percibida y el PNL, la corrección tonal por el método de pendientes, la corrección por duración de 10 dB por debajo, y el verificador de sistema de medida IEC 61265."
 references:
   - type: standard
     organization: "International Civil Aviation Organization"
@@ -45,23 +45,23 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 El **nivel efectivo de ruido percibido (EPNL)** es la métrica de certificación
 acústica de las aeronaves de transporte. Condensa una historia temporal
 espectral de tercio de octava (cada medio segundo) de un sobrevuelo en un único
-número, en EPNdB, mediante cinco pasos del **Anexo 16 de la ICAO, Vol. I,
+número, en EPNdB, mediante cinco pasos del **Anexo 16 de la OACI, Vol. I,
 Apéndice 2**. Esta página cubre las cuatro primitivas que construyen la métrica
 y el verificador de sistema de medida IEC 61265. Cada magnitud se valida contra
-los ejemplos trabajados del Manual Técnico Ambiental (ETM) Vol. I, ICAO
-Doc 9501.
+los ejemplos trabajados del Manual Técnico Ambiental (ETM) Vol. I, Doc
+9501 de la OACI.
 
 Cada nivel de certificación de esta página se exige en uno de los tres puntos
 de referencia que el Anexo 16 fija alrededor de la pista, así que conviene
 verlos antes que las matemáticas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification_es.svg" alt="Los tres puntos de certificación de ruido del Capítulo 3 del Anexo 16 de la OACI, en planta y alzado con la misma escala de distancias: una línea lateral de referencia paralela a la pista a 450 m donde el ruido de despegue es máximo, con un punto simétrico al otro lado; el punto de sobrevuelo sobre la prolongación del eje a 6 500 m del inicio de rodadura, bajo la subida inicial; y el punto de aproximación a 2 000 m del umbral, 120 m bajo la senda de 3 grados que corta el suelo 300 m más allá del umbral; los micrófonos van a 1,2 m del suelo y la métrica en los tres puntos es el EPNL en EPNdB" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification_es.svg" alt="Los tres puntos de certificación de ruido del Capítulo 3 del Anexo 16 de la OACI, en planta y alzado con la misma escala de distancias: una línea lateral de referencia paralela a la pista a 450 m donde el ruido de despegue es máximo, con un punto simétrico al otro lado; el punto de sobrevuelo sobre la prolongación del eje a 6 500 m del inicio del recorrido de despegue, bajo la subida inicial; y el punto de aproximación a 2 000 m del umbral, 120 m bajo la senda de 3 grados que corta el suelo 300 m más allá del umbral; los micrófonos van a 1,2 m del suelo y la métrica en los tres puntos es el EPNL en EPNdB" width="92%" />
 
-## Molestia percibida y PNL
+## Ruidosidad percibida y PNL
 
 Cada uno de los 24 niveles de banda de tercio de octava (50 Hz–10 kHz) se
-convierte en una **molestia** percibida en noys mediante la ley analítica a
-trozos de la Tabla A2-3, y se combinan en la molestia total
+convierte en una **ruidosidad** percibida en noys mediante la ley analítica a
+trozos de la Tabla A2-3, y se combinan en la ruidosidad total
 $N = 0{,}85\,n_{\max} + 0{,}15\sum n$ y el nivel de ruido percibido
 $\mathrm{PNL} = 40 + (10/\log_{10} 2)\,\log_{10} N$.
 
@@ -77,7 +77,7 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 Un tono puro se juzga mucho más molesto que la misma energía repartida por su
 banda de tercio de octava, así que las irregularidades espectrales (tonos de
 ventilador y de turbina) se penalizan con una **corrección tonal** $C$. El
-método de pendientes ("encircling") reconstruye qué aspecto tendría el espectro
+método de pendientes («encircling») reconstruye qué aspecto tendría el espectro
 *sin* el tono suavizando las pendientes de banda a banda hasta un fondo
 $\mathrm{SPL}''$, de modo que el exceso
 $F = \mathrm{SPL} - \mathrm{SPL}''$ es una magnitud que solo contiene el tono.
@@ -92,13 +92,13 @@ Tabla A2-2, y se toma el máximo sobre las bandas:
 La rama de frecuencias medias penaliza un tono el doble de duro, que es la razón
 por la que un tono de ventilador de 2500 Hz domina la corrección de un espectro
 de turbofán. La implementación reproduce exactamente el ejemplo del turbofán de
-la Tabla 3-7 del ETM Vol. I de ICAO Doc 9501
+la Tabla 3-7 del ETM Vol. I de Doc 9501 de la OACI
 ($C = 2{,}0\ \text{dB}$ en 2500 Hz).
 
 El método trae dos trampas. Un espectro rizado pero sin tonos puede producir una
 corrección, que la propia norma permite rechazar tras un reanálisis en banda
 estrecha (§4.3.1, paso 10). Y un tono que cae entre dos bandas reparte su
-exceso, de modo que la corrección cruda sale demasiado pequeña; el **ajuste por
+exceso, de modo que la corrección en bruto sale demasiado pequeña; el **ajuste por
 reparto de bandas** $\Delta_B$, el defecto de $C$ en el registro de
 $\mathrm{PNLTM}$ frente a la media de los registros que quedan a menos de un
 segundo de él, lo devuelve antes de localizar la ventana de 10 dB por debajo.
@@ -158,11 +158,11 @@ aircraft.effective_perceived_noise_level(spectra, dt).plot(language="es")
 
 </details>
 
-### Informe EPNL de ICAO (`.report()`)
+### Informe EPNL de la OACI (`.report()`)
 
 `EPNLResult.report(path)` renderiza una ficha PDF de una página con el formato de
 una hoja de datos de certificación de ruido de aeronaves: la línea de base
-normativa (Anexo 16 de la ICAO, Vol. I, Apéndice 2), un bloque opcional de metadatos de
+normativa (Anexo 16 de la OACI, Vol. I, Apéndice 2), un bloque opcional de metadatos de
 cabecera al estilo TCDSN (aeronave, fabricante / titular del certificado de tipo,
 solicitante, punto de medida), una tabla de métricas de las magnitudes
 intermedias informativas (el máximo $\mathrm{PNLTM}$, la corrección por
@@ -174,7 +174,8 @@ caja, una fila de veredicto Nivel | Límite | Margen cuando se aporta un límite
 certificación, una franja estática de condiciones de referencia (25 °C, 70 % HR,
 nivel del mar, viento nulo, ISA) y un pie con el descargo fijo. Usa el mismo
 contenedor `ReportMetadata` y el mismo motor de renderizado que la
-[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
+[ficha de aislamiento de ISO
+717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` aportado se lee como el límite de certificación EPNL en EPNdB
 (el EPNL cumple si es igual o inferior), y `metadata=None` produce una ficha de
 predicción ligera sin fila de veredicto. El renderizado necesita reportlab y,
@@ -212,9 +213,9 @@ ficha informa de 114,0 EPNdB y de un NO CUMPLE frente a ese mismo límite de
 
 <ReportPreview
 	name="icao_epnl_example"
-	title="Informe de ejemplo EPNL del Anexo 16 de la ICAO (PDF)"
+	title="Informe de ejemplo EPNL del Anexo 16 de la OACI (PDF)"
 	description="Ficha de certificación de ruido de aeronaves de una página: una cabecera de metadatos, una franja de condiciones de referencia, una tabla de métricas con el máximo PNLTM y la corrección por duración D y la ventana de registros de 10 dB por debajo, la gráfica temporal PNL/PNLT a todo el ancho con el PNLTM marcado y la ventana de integración sombreada, el resultado de un solo número EPNL = 98,3 EPNdB en caja y una fila de veredicto CUMPLE frente a un límite de certificación de 101 EPNdB."
-	caption="Ficha de certificación EPNL del Anexo 16 de la ICAO (EPNLResult.report), EPNL en EPNdB con PNLTM y la corrección por duración D."
+	caption="Ficha de certificación EPNL del Anexo 16 de la OACI (EPNLResult.report), EPNL en EPNdB con PNLTM y la corrección por duración D."
 />
 
 ## Verificación del sistema de medida (IEC 61265)
@@ -223,7 +224,7 @@ ficha informa de 114,0 EPNdB y de un NO CUMPLE frente a ese mismo límite de
 tolerancias de la IEC 61265:1995: los límites de respuesta direccional del
 micrófono (Tabla 1) y los límites escalares de respuesta en frecuencia,
 linealidad y resolución. El filtrado de tercio de octava lo cubre la
-verificación de clase 2 de filtros IEC 61260 de la librería.
+verificación de clase 2 de filtros IEC 61260 de la biblioteca.
 
 ```python
 from phonometry import aircraft
@@ -293,7 +294,7 @@ evento único, es el método de ECAC Doc 29 de
 
 ## Qué cubre esta guía
 
-**Cubierto.** El Anexo 16 de la ICAO, Vol. I, Apéndice 2: la molestia
+**Cubierto.** El Anexo 16 de la OACI, Vol. I, Apéndice 2: la ruidosidad
 percibida y el PNL de la Tabla A2-3 (`perceived_noisiness`,
 `perceived_noise_level`), la corrección tonal por el método de pendientes
 (`tone_correction`, que reproduce el ejemplo del turbofán de la Tabla 3-7 del

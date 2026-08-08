@@ -59,7 +59,7 @@ f(t) = f_1 \left( \frac{f_2}{f_1} \right)^{t/T},
 $$
 
 de modo que el tiempo invertido por octava es constante y la excitación
-imita al ruido rosa (energía constante por banda de octava fraccionaria).
+imita al ruido rosa (energía constante por banda de fracción de octava).
 La RI se recupera mediante división espectral lineal (con relleno de ceros,
 no circular),
 
@@ -225,7 +225,7 @@ plt.xlabel("Tiempo [s]"); plt.ylabel("Nivel re pico [dB]")
 | `f2` | float | Hz | `f1 < f2 <= fs/2` | Frecuencia final del barrido |
 | `seconds` | float | s | cualquiera; mayor ⇒ más SNR | Duración del barrido |
 | `amplitude` | float | — | por defecto `1.0` | Amplitud de pico |
-| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido medio Hann (elimina transitorios de inicio/fin) |
+| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido (medio Hann; elimina transitorios de inicio/fin) |
 
 ### Parámetros de `impulse_response()`
 
@@ -247,8 +247,8 @@ necesita que `recorded` abarque un número entero de periodos de MLS.
 ## Dónde medir
 
 Una RI caracteriza un único par fuente–receptor; un parámetro
-de sala se obtiene promediando sobre varios. ISO 3382-1 (espacios para
-interpretación) pide al menos dos posiciones de fuente y micrófonos separados
+de sala se obtiene promediando sobre varios. ISO 3382-1 (salas de
+espectáculos) pide al menos dos posiciones de fuente y micrófonos separados
 $\geq 2$ m entre sí, $\geq 1$ m de cualquier superficie, a $1{,}2$ m
 (altura de oído sentado); ISO 3382-2 fija el número mínimo de posiciones de
 fuente, de micrófono y de combinaciones fuente–micrófono según el grado de
@@ -332,8 +332,9 @@ grados de exactitud) se citan para la planificación.
 de sonido, la calibración de nivel de la cadena) quedan fuera de la
 biblioteca. Los diagnósticos de varianza temporal y de distorsión de
 ISO 18233 no están implementados: la guía explica cómo el barrido separa la
-distorsión, pero ningún ayudante la cuantifica (esa lectura vive en la
-[guía de distorsión por barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
+distorsión, pero ninguna función auxiliar la cuantifica (esa lectura vive en la
+[guía de distorsión por barrido
+sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
 Las reglas de posiciones son prosa de orientación: nada comprueba cuántas
 posiciones se midieron ni dónde.
 
@@ -357,7 +358,7 @@ posiciones se midieron ni dónde.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración
   de Schroeder que el análisis del decaimiento aplica a esta RI.
 - Referencia de la API: [`room.impulse_response`](/phonometry/es/reference/api/rooms/impulse-response/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la integración inversa de Schroeder y la deconvolución en la que se apoya el método del barrido.
+- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la integración hacia atrás de Schroeder y la deconvolución en la que se apoya el método del barrido.
 
 ## Respuestas rápidas
 

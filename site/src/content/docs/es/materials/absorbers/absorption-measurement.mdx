@@ -172,11 +172,11 @@ m = materials.measure_sound_absorption(
 m.report(
     "alpha_s_fiche.pdf",
     metadata=ReportMetadata(
-        specimen="50 mm porous absorber over a 100 mm air gap",
-        mounting="Type A (against a rigid wall)",
+        specimen="Absorbente poroso de 50 mm sobre cámara de aire de 100 mm",
+        mounting="Tipo A (contra pared rígida)",
         measurement_standard="ISO 354",
-        test_room="Reverberation room R1",
-        laboratory="Phonometry Reference Laboratory",
+        test_room="Sala reverberante R1",
+        laboratory="Laboratorio de referencia Phonometry",
     ),
 )                                  # alpha_s en tercios de octava, 100 Hz a 5000 Hz
 ```
@@ -209,7 +209,7 @@ con $c$ a partir de la temperatura del aire de la cámara $t$ en °C (válida
 0; convierte un $\alpha$ de ISO 9613-1 en dB/m con `attenuation_from_alpha`).
 Como los efectos de borde y difracción pueden dispersar más energía de la que
 intercepta el área plana de la muestra, $\alpha_s$ puede superar 1,0 y nunca se
-satura (ISO 354 Cláusula 3.7).
+satura (ISO 354 Apartado 3.7).
 
 ```python
 import numpy as np
@@ -279,7 +279,7 @@ número único comparable entre productos.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso11654_es.svg" alt="Flujo de valoración ISO 11654: el alpha_s medido pasa a alpha_p práctico por banda de octava, la curva de referencia se desplaza hasta el mejor ajuste, alpha_w se lee a 500 Hz con indicadores de forma, dando la clase de absorción A a E" width="82%" loading="eager" />
 
-**Coeficiente de absorción práctico (cláusula 4.1).** Los datos de tercio de
+**Coeficiente de absorción práctico (apartado 4.1).** Los datos de tercio de
 octava se agrupan primero en bandas de octava, cada una la media aritmética de
 sus tres tercios:
 
@@ -287,26 +287,27 @@ $$
 \alpha_{p,i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
 $$
 
-evaluado al segundo decimal y luego redondeado en pasos de $0{,}05$ (la NOTA de la
-cláusula 4.1 fija el redondeo, p. ej. $0{,}92 \to 0{,}90$); las medias redondeadas
+evaluado al segundo decimal y luego redondeado en pasos de $0{,}05$ (la NOTA del
+apartado 4.1 fija el redondeo, p. ej. $0{,}92 \to 0{,}90$); las medias redondeadas
 por encima de $1{,}00$ se fijan en $1{,}00$. Las cinco bandas de valoración son 250,
 500, 1000, 2000 y 4000 Hz.
 
-**Absorción ponderada (cláusula 4.2).** Una curva de referencia fija
-$\{250{:}\,0{,}80,\ 500{:}\,1{,}00,\ 1000{:}\,1{,}00,\ 2000{:}\,1{,}00,\ 4000{:}\,0{,}90\}$
+**Absorción ponderada (apartado 4.2).** Una curva de referencia fija
+$\{250{:}\,0{,}80,\ 500{:}\,1{,}00,\ 1000{:}\,1{,}00,\ 2000{:}\,1{,}00,\
+4000{:}\,0{,}90\}$
 se desplaza hacia abajo, hacia el $\alpha_p$ medido, en pasos de $0{,}05$ hasta que
 la suma de las desviaciones **desfavorables** (tomadas solo donde la medida
 queda por debajo de la curva desplazada, con magnitud
 $(\text{curva} - \text{medida})$) no supera $0{,}10$. El coeficiente ponderado
 $\alpha_w$ es el valor de la curva desplazada leído a 500 Hz.
 
-**Indicadores de forma (cláusula 4.3).** Cuando un coeficiente práctico supera la
+**Indicadores de forma (apartado 4.3).** Cuando un coeficiente práctico supera la
 curva desplazada en $0{,}25$ o más, se añade un indicador de forma: `L` a 250 Hz,
 `M` a 500 o 1000 Hz, `H` a 2000 o 4000 Hz (p. ej. `0.60(M)`).
 
 **Clase de absorción (Tabla B.1).** Por último, $\alpha_w$ se asigna a una clase:
-A (0,90–1,00), B (0,80–0,85), C (0,60–0,75), D (0,30–0,55), E (0,15–0,25) o "no
-clasificado" (0,00–0,10). Como $\alpha_w$ es siempre un múltiplo de $0{,}05$, estos
+A (0,90–1,00), B (0,80–0,85), C (0,60–0,75), D (0,30–0,55), E (0,15–0,25) o «no
+clasificado» (0,00–0,10). Como $\alpha_w$ es siempre un múltiplo de $0{,}05$, estos
 rangos particionan la rejilla de forma exacta.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
@@ -426,15 +427,15 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso11654_absorption_example"
 	title="Informe de ejemplo de absorción ISO 11654 (PDF)"
-	description="Ficha de absorción de una página: una cabecera de metadatos (cliente, muestra, superficie de la probeta, montaje, temperatura, humedad y presión de la cámara reverberante), la tabla completa de alpha_s de tercio de octava con el alpha_p de octava en las filas correspondientes junto a la curva práctica frente a la referencia desplazada, el resultado de un solo número alpha_w = 0,60 (M) en caja con la clase de absorción C y el desplazamiento aplicado, y una fila de veredicto CUMPLE frente al requisito de 0,55."
+	description="Ficha de absorción de una página: una cabecera de metadatos (cliente, muestra, superficie del elemento de ensayo, montaje, temperatura, humedad y presión de la cámara reverberante), la tabla completa de alpha_s de tercio de octava con el alpha_p de octava en las filas correspondientes junto a la curva práctica frente a la referencia desplazada, el resultado de un solo número alpha_w = 0,60 (M) en caja con la clase de absorción C y el desplazamiento aplicado, y una fila de veredicto CUMPLE frente al requisito de 0,55."
 	caption="Ficha de absorción ponderada (AbsorptionRatingResult.report), alpha_w con su clase."
 />
 
 
 ## ¿Tubo o cámara reverberante?
 
-El tubo y la cámara reverberante entregan ambos un número llamado "coeficiente
-de absorción", y los dos se confunden de forma rutinaria. Son magnitudes
+El tubo y la cámara reverberante entregan ambos un número llamado «coeficiente
+de absorción», y los dos se confunden de forma rutinaria. Son magnitudes
 físicas distintas, medidas bajo campos sonoros distintos, y no coinciden, a
 veces ni de lejos.
 
@@ -519,25 +520,25 @@ estimada a partir de ensayos interlaboratorio según ISO 5725. Es la compañera,
 en absorción acústica, de la incertidumbre de aislamiento de la ISO 12999-1
 ([Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)).
 
-**Bandas de tercio de octava (cláusula 5).** Para el coeficiente de absorción, la
+**Bandas de tercio de octava (apartado 5).** Para el coeficiente de absorción, la
 desviación típica de reproducibilidad es $\sigma_R = m\,\alpha_s + n$ (fórmula (1)),
 y para el área de absorción equivalente $\sigma_R = m\,A_T + n\,S$ con
 $S = 10\ \text{m}^2$ (fórmula (2)), donde $m$ y $n$ son las constantes dependientes
 de la frecuencia de la Tabla 1 (63–5000 Hz). El valor de repetibilidad es
 $\sigma_r = 0{,}6\,\sigma_R$ (fórmula (3)).
 
-**Coeficiente práctico (cláusula 6).** Para el coeficiente práctico de ISO 11654,
+**Coeficiente práctico (apartado 6).** Para el coeficiente práctico de ISO 11654,
 $\sigma_R = m\,\alpha_p + n$ en bandas de octava con las constantes de la Tabla 2
 (250–4000 Hz); de nuevo $\sigma_r = 0{,}6\,\sigma_R$.
 
-**Números únicos (cláusula 7).** El coeficiente ponderado $\alpha_w$ tiene una
+**Números únicos (apartado 7).** El coeficiente ponderado $\alpha_w$ tiene una
 incertidumbre típica constante ($\sigma_R = 0{,}035$, $\sigma_r = 0{,}020$); la
 valoración de número único $DL_{\alpha,\text{NRD}}$ de EN 1793-1 escala con el
 valor ($\sigma_R = 0{,}10\,DL_\alpha$, $\sigma_r = 0{,}02\,DL_\alpha$).
 
-**Notificación (cláusula 8).** La incertidumbre expandida es $U = k\,u$
+**Declaración (apartado 8).** La incertidumbre expandida es $U = k\,u$
 (fórmula (10)) con el factor de cobertura $k$ de la Tabla 3 ($k = 2{,}0$ al 95 %,
-gaussiano). El $U$ notificado se redondea a dos decimales para los coeficientes de
+gaussiano). El $U$ declarado se redondea a dos decimales para los coeficientes de
 absorción y a un decimal para el área equivalente y $DL_{\alpha,\text{NRD}}$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
@@ -569,7 +570,7 @@ print(round(float(r.standard_uncertainty[0]), 4))            # 0.0422 (sigma_R)
 print(float(r.reported_expanded_uncertainty[0]))             # 0.08  (U, k=2)
 r.plot()   # la figura de arriba: alpha_s con su banda +/-U (k = 2)
 
-# Valoraciones de número único (ejemplos resueltos de la cláusula 7).
+# Valoraciones de número único (ejemplos resueltos del apartado 7).
 print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_uncertainty[0]))  # 0.07
 print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
 ```
@@ -578,15 +579,15 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
 ## Qué cubre esta guía
 
 **Cubierto.** La inversión de Sabine de ISO 354:2003 (Ecs. (5)-(9)) en
-`measure_sound_absorption`, y la conversión (cláusulas 4/8.1) de una pareja
+`measure_sound_absorption`, y la conversión (apartados 4/8.1) de una pareja
 $T_1$/$T_2$ ya medida en `absorption_area` y `absorption_coefficient` (con
 `attenuation_from_alpha` para el término del aire). La valoración ponderada
-de absorción de ISO 11654:1997: el coeficiente práctico de la cláusula 4.1,
-el desplazamiento de la curva de referencia de la cláusula 4.2, los
-indicadores de forma de la cláusula 4.3 y la clase de absorción de la
+de absorción de ISO 11654:1997: el coeficiente práctico del apartado 4.1,
+el desplazamiento de la curva de referencia del apartado 4.2, los
+indicadores de forma del apartado 4.3 y la clase de absorción de la
 Tabla B.1, construidos por `weighted_absorption` y
 `weighted_absorption_from_third_octave`. Las fórmulas de incertidumbre de
-medida de ISO 12999-2:2020 (cláusulas 5-8) para los coeficientes de tercio
+medida de ISO 12999-2:2020 (apartados 5-8) para los coeficientes de tercio
 de octava y prácticos y para las valoraciones de número único, en
 `sound_absorption_coefficient_uncertainty`,
 `weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`.
@@ -601,7 +602,7 @@ cualificación de la sala de ISO 354 (Anexo A:
 número de posiciones de altavoz y micrófono, elementos difusores) no se
 comprueban; `absorption_area`/`absorption_coefficient` solo convierten una
 pareja $T_1$/$T_2$ ya medida y emiten un aviso cuando el volumen de la sala o
-el área de la probeta salen de los límites de la cláusula 6. La fórmula de
+el área de la probeta salen de los límites del apartado 6. La fórmula de
 incertidumbre de ISO 12999-2 para la valoración de número único de EN 1793-1
 $DL_{\alpha,\text{NRD}}$ está implementada, pero el propio método de medida
 in situ de EN 1793-1 (dispositivos reductores de ruido de tráfico rodado) no

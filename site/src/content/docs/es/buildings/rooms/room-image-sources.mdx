@@ -6,7 +6,7 @@ references:
     authors: ["Kuttruff, H."]
     year: 2016
     title: "Room acoustics"
-    edition: "6th ed."
+    edition: "6.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781315372150"
     note: "La construcción por fuentes imagen (§4.1), la reverberación de Eyring y la distancia de reverberación (§5.5–5.6) y la frecuencia de Schroeder (§3.6) de esta página."
@@ -14,7 +14,7 @@ references:
     authors: ["Vorländer, M."]
     year: 2020
     title: "Auralization: Fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-3-030-51202-6"
     note: "El modelo de fuentes especulares del §1 (capítulo 11), con las expresiones de factor de reflexión y retardo."
@@ -27,12 +27,12 @@ references:
     issue: 4
     pages: "943-950"
     doi: "10.1121/1.382599"
-    note: "La descomposición del recuento de reflexiones de la red de imágenes de la sala rectangular usada en §1."
+    note: "La descomposición del recuento de reflexiones de la retícula de imágenes de la sala rectangular usada en §1."
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "El campo estacionario de sala y la constante de sala del §2 (§6.4)."
@@ -40,7 +40,7 @@ references:
     authors: ["Long, M."]
     year: 2014
     title: "Architectural acoustics"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Academic Press"
     doi: "10.1016/C2012-0-03257-5"
     note: "Los modos de la sala rectangular del §3: las frecuencias propias de la ecuación (8.43), la sala de ejemplo de la tabla 8.1 y el recuento de modos y la densidad modal de Morse y Pierce de las ecuaciones (8.45) y (8.46)."
@@ -67,8 +67,8 @@ que produce en el interior.
 Una sala rectangular rígida o absorbente — una *caja de zapatos* — refleja una
 fuente puntual en sus seis paredes, y cada reflexión es exactamente el sonido en
 campo libre de una **imagen especular** de la fuente. Reflejar una coordenada en
-una pared ($S_n = S - 2 d\,\mathbf{n}$) convierte la fuente en una red regular
-de imágenes, y la respuesta al impulso es el sonido directo más un impulso
+una pared ($S_n = S - 2 d\,\mathbf{n}$) convierte la fuente en una retícula
+regular de imágenes, y la respuesta al impulso es el sonido directo más un impulso
 retardado y atenuado por imagen,
 
 $$
@@ -130,7 +130,7 @@ print(round(float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)])), 2))
 
 `image_source_rir` devuelve un `ImageSourceResult`. Su `ir` es la RIR muestreada
 (un array 1D en banda ancha, o una fila por banda de octava con absorción por
-banda), mientras que la tabla **exacta** de reflexiones a resolución subenteros
+banda), mientras que la tabla **exacta** de reflexiones a resolución submuestral
 se guarda en `times`, `distances`, `orders`, `amplitudes` e `image_positions`,
 de modo que la geometría es exacta con independencia de la frecuencia de
 muestreo. El sonido directo y las reflexiones tempranas individuales son
@@ -287,7 +287,7 @@ dos décimas de segundo.
 
 **`t30_valid` no ve una retícula truncada.** Lee el rango de decaimiento del
 array que le entreguen, así que devuelve `True` en todos los órdenes de la tabla
-anterior. La bandera detecta una *grabación* ruidosa o demasiado corta; no puede
+anterior. El indicador detecta una *grabación* ruidosa o demasiado corta; no puede
 detectar un modelo que dejó de generar reflexiones. Una `duration` más corta que
 el decaimiento trunca la cola exactamente igual, y en silencio.
 
@@ -304,7 +304,7 @@ tiempo de reverberación vuelve impracticable la ejecución — una sala grande 
 un $L_\text{min}$ pequeño, o una cola larga — al método de imágenes puro se le
 está pidiendo un trabajo que corresponde a un modelo híbrido con cola tardía
 estadística, o al
-[solver FDTD](/phonometry/es/simulation/fdtd-simulation/).
+[solucionador FDTD](/phonometry/es/simulation/fdtd-simulation/).
 
 ## 2. Campo estacionario de sala
 
@@ -463,7 +463,7 @@ print(round(modes.schroeder_frequency, 0))                     # 175 Hz
 modes.plot()                    # escalera de modos por familia + densidad modal
 ```
 
-Contar los puntos de la red dentro del octante positivo de una esfera de radio
+Contar los puntos de la retícula dentro del octante positivo de una esfera de radio
 $k = 2\pi f/c_0$, con las correcciones de medio y de cuarto peso para los
 puntos situados en los planos y ejes coordenados, da el **recuento integrado de
 modos** (ec. (8.45), tras Morse y Pierce) y su derivada, la **densidad modal**
@@ -632,7 +632,7 @@ proporciones preferentes de Bolt se comentan pero no se tabulan.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): el `Lw` que impulsa el
   nivel estacionario.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el
-  solver de ondas independiente usado para contrastar el eco de pared rígida y
+  solucionador de ondas independiente usado para contrastar el eco de pared rígida y
   el decaimiento.
 - [Teoría: Salas y edificación](/phonometry/es/reference/theory/rooms-buildings/):
   las derivaciones de la red de imágenes y del campo estacionario.

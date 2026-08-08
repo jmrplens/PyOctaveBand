@@ -1,6 +1,6 @@
 ---
 title: "Evaluación y normativa"
-description: "Evaluar el ruido ambiental una vez ha llegado: los indicadores y el nivel de evaluación de ISO 1996-1, la cadena de determinación de ISO 1996-2 con su corrección de ruido residual y su balance de incertidumbre, el ajuste por sonidos impulsivos, y una aplicación nacional de toda la cadena."
+description: "Evaluar el ruido ambiental una vez ha llegado: los indicadores y el nivel de evaluación de ISO 1996-1, la cadena de determinación de ISO 1996-2 con su corrección de ruido residual y su presupuesto de incertidumbre, el ajuste por sonidos impulsivos, y una aplicación nacional de toda la cadena."
 ---
 
 La propagación dice qué llega al receptor. La evaluación dice cómo se
@@ -21,7 +21,7 @@ evaluación compuesto del apartado 6.5 generaliza ambos a periodos arbitrarios
 con ajustes por fuente y por carácter, desde +5 dB para el sonido impulsivo
 regular hasta +12 dB para el altamente impulsivo. La mitad de ISO 1996-2 de la
 página *determina* en vez de definir: el ajuste tonal del Anexo C, la
-corrección de ruido residual del apartado 10.4 y el balance de incertidumbre
+corrección de ruido residual del apartado 10.4 y el presupuesto de incertidumbre
 del Anexo F, que dice cuánto vale el nivel de evaluación. Parte de niveles por
 periodo que ya tienes; producirlos es
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/).
@@ -55,7 +55,7 @@ nacional de ambas.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   Lden, Ldn y el nivel de evaluación compuesto del apartado 6.5, el ajuste
   tonal del Anexo C, la corrección de ruido residual del apartado 10.4 y el
-  balance de incertidumbre del Anexo F.
+  presupuesto de incertidumbre del Anexo F.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/):
   la prominencia predicha de los sonidos impulsivos, el ajuste graduado KI del
   LAeq, la cadena de medición de ISO/PAS 1996-3 y la ficha de evaluación.

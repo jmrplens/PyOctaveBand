@@ -181,8 +181,8 @@ plt.show()
 `surface_level`, `area` y `volume` son todos opcionales: solo con `l1_2m`, `l2`
 y `t2` la función devuelve `d_2m` y `d_2m_nt`; añade `volume` para `d_2m_n`;
 añade `surface_level` **y** `area` **y** `volume` para `r_prime`. Las posiciones
-se promedian en energía con la fórmula del nivel superficial (Cláusula 9.5.1);
-se asume que los niveles por banda ya están corregidos por ruido de fondo.
+se promedian en energía con la fórmula del nivel superficial (Apartado 9.5.1);
+se supone que los niveles por banda ya están corregidos por ruido de fondo.
 
 ### Parámetros de `facade_insulation()`
 
@@ -211,7 +211,7 @@ a la referencia desplazada, el índice de campo $D_{2m,nT,w}\ (C;\ C_{tr})$ en
 su recuadro, la declaración de método de ingeniería, un veredicto opcional
 (una diferencia de
 niveles cumple si iguala o supera el requisito) y un pie. `quantity="d_2m_nt"`
-(por defecto) informa la diferencia de niveles estandarizada; `"d_2m_n"` la
+(por defecto) da la diferencia de niveles estandarizada; `"d_2m_n"` la
 normalizada; `"r_prime"` el índice de reducción acústica aparente $R'_{45}$.
 `verbose=True`, `metadata`, `language="es"` y el extra `phonometry[report]` se
 comportan igual que en las fichas anteriores.
@@ -355,7 +355,7 @@ $R_{p,w}$ de cada elemento) junto a la gráfica por elemento / $R'$ /
 $D_{2m,nT}$, el número único previsto $D_{2m,nT,w}$ en un recuadro (con
 $R'_{tr,s,w}$ y $C_{tr}$), la
 declaración de predicción y, cuando se aporta un `requirement`, un veredicto
-APTO/NO APTO (la diferencia de niveles cumple si es igual o mayor). `verbose=True`
+CUMPLE/NO CUMPLE (la diferencia de niveles cumple si es igual o mayor). `verbose=True`
 añade la fracción de energía sonora transmitida por cada elemento, que señala el
 elemento limitante (aquí la entrada de aire, no la pared). El informe necesita
 los índices de número único de ISO 717-1, así que construye el resultado sobre
@@ -383,7 +383,7 @@ elements = [
 fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
                              frequencies=[125, 250, 500, 1000, 2000], bands="octave")
 fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
-    specimen="Masonry wall + window + roof light + air inlet", area=11.3,
+    specimen="Muro de fábrica + ventana + lucernario + aireador", area=11.3,
     receiving_volume=50.0, requirement=30.0,
     notes="Fachada plana, ΔLfs = 0 dB (Anexo C)."))         # D2m,nT,w = 33 dB
 ```
@@ -391,7 +391,7 @@ fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
 <ReportPreview
 	name="iso12354_facade_prediction_example"
 	title="Informe de ejemplo de fachada prevista EN 12354-3 (PDF)"
-	description="Informe de una página de aislamiento acústico de fachada previsto (EN 12354-3 Anexo F): la cabecera de metadatos (conjunto de elementos de la fachada, superficie expuesta, volumen del recinto receptor, situación de tráfico), la tabla de elementos de la fachada (el índice parcial ponderado Rp,w de cada elemento) junto a la gráfica por elemento y R' / D2m,nT, el número único previsto D2m,nT,w = 33 dB en un recuadro (con R'tr,s,w = 31 y Ctr = -3), la declaración de predicción indicando la desviación típica del modelo de unos 2 dB y un veredicto APTO frente al requisito de 30 dB."
+	description="Informe de una página de aislamiento acústico de fachada previsto (EN 12354-3 Anexo F): la cabecera de metadatos (conjunto de elementos de la fachada, superficie expuesta, volumen del recinto receptor, situación de tráfico), la tabla de elementos de la fachada (el índice parcial ponderado Rp,w de cada elemento) junto a la gráfica por elemento y R' / D2m,nT, el número único previsto D2m,nT,w = 33 dB en un recuadro (con R'tr,s,w = 31 y Ctr = -3), la declaración de predicción indicando la desviación típica del modelo de unos 2 dB y un veredicto CUMPLE frente al requisito de 30 dB."
 	caption="Ficha de fachada prevista (FacadePredictionResult.report), D2m,nT,w."
 />
 
@@ -636,7 +636,7 @@ donde aparecen: la implementación sigue las fórmulas y no las filas impresas.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   la magnitud de fachada en bandas de octava del método rápido de control.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masa, la coincidencia y los modelos de aberturas tras los valores
+  la ley de masas, la coincidencia y los modelos de aberturas tras los valores
   de $R$ de elemento que consume la predicción.
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   la propagación desde la fuente hasta la posición a 2 m frente a la fachada y,

@@ -154,7 +154,7 @@ presión escalares. Pasar `exact_midband=True` ajusta cada frecuencia solicitada
 la frecuencia central exacta de tercio de octava $f_m = 1000 \cdot 10^{k/10}$
 (Ec. (6), Nota 5) empleada para calcular la Tabla 1, de modo que la biblioteca
 reproduce cada punto tabulado con menos del 0,4 %, la propia precisión de tres
-cifras significativas del estándar, muy dentro de su exactitud declarada de
+cifras significativas de la norma, muy dentro de su exactitud declarada de
 $\pm 10$ % (apartado 7.1). Las entradas fuera de los rangos tabulados
 (−20…+50 °C, 10…100 % HR, 50…10 000 Hz, o por encima de la envolvente de validez
 de 200 kPa) siguen calculándose pero emiten una `AtmosphericAbsorptionWarning`;
@@ -248,7 +248,7 @@ $D_c$ la corrección de directividad (índice de directividad más un índice de
 ángulo sólido $D_\Omega$) y $A$ la atenuación total. La biblioteca implementa los
 cuatro términos generales del apartado 7; el $A_{misc}$ informativo (vegetación,
 zonas industriales, edificación; anexo A) y las reflexiones en obstáculos
-verticales (apartado 7.5) **no están implementados**: el estándar los trata como
+verticales (apartado 7.5) **no están implementados**: la norma los trata como
 informativos y se dejan a criterio del usuario.
 
 La geometría del término de apantallamiento fija el vocabulario: el borde de
@@ -385,7 +385,7 @@ print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
 `predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_c - A$ con
 $D_c$ el `DirectivityCorrection` (`index` $+$ `d_omega`). Pasa `c0=` para restar la corrección
 meteorológica $C_{met}$ (Ec. (21)/(22)) banda a banda y obtener una media a largo
-plazo; ten en cuenta que el estándar aplica $C_{met}$ al nivel ponderado A, así
+plazo; ten en cuenta que la norma aplica $C_{met}$ al nivel ponderado A, así
 que la forma por bandas aquí es una **comodidad**, no una lectura literal del
 apartado 8.
 
@@ -528,7 +528,7 @@ una evaluación en baja frecuencia queda fuera de este método.
 
 ## 3. Alcance, hipótesis y errores habituales
 
-### Qué significan las "condiciones favorables a la propagación"
+### Qué significan las «condiciones favorables a la propagación»
 
 La ISO 9613-2 no predice el nivel con la meteorología del momento. Todas sus
 ecuaciones suponen condiciones **favorables a la propagación** (apartado 5):
@@ -559,7 +559,7 @@ deciden si una barrera real entrega su $D_z$ calculado:
   difracción simple y 25 dB en difracción doble por alta que sea la pared,
   porque la turbulencia atmosférica dispersa sonido hacia la zona de sombra y
   fija un techo que la altura extra no puede compensar. Una pérdida por
-  inserción por encima de unos 20 dB es territorio de encapsulamientos, no de
+  inserción por encima de unos 20 dB es territorio de cerramientos, no de
   pantallas. La propia Ec. (14) es una curva de ingeniería suavizada en la
   tradición del ábaco de pantallas de Maekawa, un ajuste empírico sobre tres
   décadas del número de Fresnel $N = 2z/\lambda$.

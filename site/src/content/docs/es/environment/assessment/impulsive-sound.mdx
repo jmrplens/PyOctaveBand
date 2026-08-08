@@ -1,6 +1,6 @@
 ---
 title: "Prominencia de sonidos impulsivos (NT ACOU 112)"
-description: "El método Nordtest NT ACOU 112:2002 para la prominencia de los sonidos impulsivos: la prominencia prevista P a partir de la tasa de crecimiento y la diferencia de nivel de cada impulso (cláusula 7), el ajuste graduado KI que se suma al LAeq (cláusula 8) y el nivel de evaluación sobre un intervalo de tiempo de referencia."
+description: "El método Nordtest NT ACOU 112:2002 para la prominencia de los sonidos impulsivos: la prominencia prevista P a partir de la tasa de crecimiento y la diferencia de nivel de cada impulso (apartado 7), el ajuste graduado KI que se suma al LAeq (apartado 8) y el nivel de evaluación sobre un intervalo de tiempo de referencia."
 references:
   - type: standard
     organization: "Nordtest"
@@ -8,7 +8,7 @@ references:
     title: "Acoustics: Prominence of impulsive sounds and for adjustment of LAeq"
     designation: "NT ACOU 112:2002"
     url: "https://www.nordtest.info/wp/2002/05/01/acoustics-prominence-of-impulsive-sounds-and-for-adjustment-of-laeq-nt-acou-112/"
-    note: "El método implementado, descargable gratis del archivo Nordtest: la prominencia prevista (cláusula 7, Fórmula 1), el ajuste al LAeq (cláusula 8, Fórmula 2) y el nivel de evaluación (cláusula 8, Nota 1), con el arranque definido en las cláusulas 4.5-4.7."
+    note: "El método implementado, descargable gratis del archivo Nordtest: la prominencia prevista (apartado 7, Fórmula 1), el ajuste al LAeq (apartado 8, Fórmula 2) y el nivel de evaluación (apartado 8, Nota 1), con el arranque definido en los apartados 4.5-4.7."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2016
@@ -44,7 +44,7 @@ crece (la **tasa de crecimiento**) y cuánto crece (la **diferencia de nivel**).
   loading="eager"
 />
 
-## 1. Prominencia prevista (cláusula 7)
+## 1. Prominencia prevista (apartado 7)
 
 Para cada impulso candidato, la **prominencia prevista** $P$ combina la tasa de
 crecimiento (en dB/s) y la diferencia de nivel (en dB) en escala logarítmica
@@ -57,9 +57,9 @@ $$
 Los coeficientes se ajustaron a partir de ensayos de escucha y $P$ está diseñada
 para alcanzar unos 15 en impulsos muy súbitos e intensos. El impulso con la $P$
 **más alta** en un periodo de 30 minutos es el determinante. Una subida de
-nivel solo *cualifica* como impulso cuando su tasa de subida supera 10 dB/s
+nivel solo *cualifica* como impulso cuando su tasa de crecimiento supera 10 dB/s
 (apartado 4.5; el apartado 8 aplica el ajuste únicamente «para sonidos con
-tasas de subida mayores de 10 dB/s»): `impulse_prominence` marca los eventos
+tasas de crecimiento mayores de 10 dB/s»): `impulse_prominence` marca los eventos
 no cualificados en su máscara `qualifies`, avisa de ellos y nunca les permite
 fijar la prominencia determinante ni un $K_I$ (el ajuste es 0 dB cuando ningún
 evento cualifica).
@@ -93,7 +93,7 @@ from phonometry import environment
 print(round(environment.predicted_prominence(1000.0, 30.0), 4))  # 11.9542
 ```
 
-## 2. Ajuste al LAeq (cláusula 8)
+## 2. Ajuste al LAeq (apartado 8)
 
 Por debajo de una prominencia de 5 el impulso no es lo bastante audible como para
 importar; por encima, el ajuste crece linealmente (Fórmula 2):
@@ -111,7 +111,7 @@ print(float(environment.impulse_adjustment(5.0)))   # 0.0 dB (en el umbral)
 
 El ajuste se aplica al $L_{Aeq,30\text{min}}$ del evento con la prominencia más alta. El
 **nivel de evaluación** sobre un tiempo de referencia mayor combina los niveles
-equivalentes ajustados por impulso de los subintervalos (cláusula 8, Nota 1):
+equivalentes ajustados por impulso de los subintervalos (apartado 8, Nota 1):
 
 $$
 L_{Ar,T} = 10\,\log_{10}\!\left(\frac{1}{T}\sum_N \Delta t_N\,
@@ -171,7 +171,7 @@ muestrea el historial de nivel $L_{pAF}$ cada 10-25 ms, detecta cada arranque (e
 tramo contiguo cuyo gradiente supera 10 dB/s, fusionando eventos separados menos
 de 50 ms), mide su diferencia de nivel $L_D = L_e - L_s$ y su tasa de crecimiento
 $\mathrm{OR}$ por mínimos cuadrados, y devuelve el ajuste determinante $K_I$ con la
-categoría de fuente de la cláusula 7: *no impulsiva* ($K_I = 0$), *impulsiva
+categoría de fuente del apartado 7: *no impulsiva* ($K_I = 0$), *impulsiva
 regular* ($0 < K_I \le 5$) o *altamente impulsiva* ($K_I > 5$).
 
 La detección de arranques puede ejecutarse directamente sobre un historial de
@@ -181,7 +181,7 @@ nivel con `detect_onsets`, cómodo para sonómetros que ya registran $L_{pAF}$:
 import numpy as np
 from phonometry import environment
 
-# Historial LpAF muestreado cada 20 ms: silencio, subida de 30 dB en 0,30 s, estable.
+# Historial LpAF muestreado cada 20 ms: silencio, subida de 30 dB a 0,30 s, estable.
 dt = 0.02
 levels = np.concatenate([
     np.full(10, 40.0),
@@ -255,7 +255,7 @@ que aparenta merecer.
 
 Como la tasa de crecimiento y la diferencia de nivel son *diferencias* de
 nivel, el ajuste es insensible a la calibración absoluta del sonómetro
-(cláusula 8); solo el $L_{Aeq}$ reportado y el $L_{Aeq}$ ajustado dependen de ella. El
+(apartado 8); solo el $L_{Aeq}$ declarado y el $L_{Aeq}$ ajustado dependen de ella. El
 alcance del documento indica que el ajuste suele quedar entre 0,0 dB y 9,0 dB;
 la propia fórmula no está acotada, así que un impulso muy súbito e intenso puede
 superar ese rango. `ImpulsiveSoundResult.plot()` dibuja el historial $L_{pAF}$ con
@@ -296,19 +296,20 @@ ISO/PAS 1996-3:2022): la línea de base normativa, un bloque de metadatos
 opcional (fuente/situación, cliente, posición de medición, instrumentación y
 fecha, con el periodo de evaluación de 30 minutos siempre visible), una tabla a
 todo ancho por impulso (tasa de inicio, diferencia de nivel, prominencia
-prevista $P$ y si el inicio se califica como impulso) sobre el gráfico de la
+prevista $P$ y si el inicio se cualifica como impulso) sobre el gráfico de la
 curva de ajuste $K_I(P)$ con los impulsos candidatos marcados, la
 prominencia rectora $P$ enmarcada junto con el ajuste de $L_{Aeq}$
-derivado $K_I$ (Fórmula 2), una fila de veredicto APTO/NO APTO opcional
+derivado $K_I$ (Fórmula 2), una fila de veredicto CUMPLE/NO CUMPLE opcional
 y una nota de categoría de prominencia, y un pie con el descargo fijo.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
-[ficha de sonoridad ISO 532-1](/phonometry/es/perception/psychoacoustics/loudness/#informe-de-iso-532-1-report);
+[ficha de sonoridad ISO
+532-1](/phonometry/es/perception/psychoacoustics/loudness/#informe-de-iso-532-1-report);
 un `requirement` indicado se interpreta como la prominencia rectora $P$ máxima
-admisible (un impulso menos destacado es apto). El renderizado necesita
+admisible (un impulso menos destacado cumple). El renderizado necesita
 reportlab y, para la figura que incrusta la ficha, matplotlib (`pip install
 "phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
-genera en inglés por defecto; pase `language="es"` para una ficha en español
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
 (cadenas fijas traducidas y separador decimal de coma), p. ej.
 `res.report("impulse_fiche_es.pdf", language="es")`.
 
@@ -330,12 +331,12 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; pulse la vista previa para abrir el PDF.
+el repositorio; Pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="ntacou112_impulse_prominence_example"
 	title="Informe de ejemplo de prominencia de sonidos impulsivos NT ACOU 112 (PDF)"
-	description="Ficha de evaluación de sonidos impulsivos de una página: un encabezado de metadatos, una tabla por impulso con la tasa de inicio, la diferencia de nivel y la prominencia prevista P, el gráfico de la curva de ajuste KI(P) con los impulsos candidatos marcados, la prominencia rectora P = 12,25 enmarcada con el ajuste de LAeq KI = 13,0 dB (NT ACOU 112:2002 Fórmula 2) y un veredicto NO APTO frente a una prominencia rectora máxima de 10."
+	description="Ficha de evaluación de sonidos impulsivos de una página: un encabezado de metadatos, una tabla por impulso con la tasa de inicio, la diferencia de nivel y la prominencia prevista P, el gráfico de la curva de ajuste KI(P) con los impulsos candidatos marcados, la prominencia rectora P = 12,25 enmarcada con el ajuste de LAeq KI = 13,0 dB (NT ACOU 112:2002 Fórmula 2) y un veredicto NO CUMPLE frente a una prominencia rectora máxima de 10."
 	caption="Ficha de prominencia de sonidos impulsivos (ImpulseProminenceResult.report), prominencia rectora P con el ajuste de LAeq KI."
 />
 

@@ -1,6 +1,6 @@
 ---
 title: "Por qué phonometry"
-description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad, el registro de defectos encontrados en las propias normas publicadas y cómo se compara phonometry con otras librerías de Python."
+description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad, el registro de defectos encontrados en las propias normas publicadas y cómo se compara phonometry con otras bibliotecas de Python."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -16,7 +16,7 @@ según **IEC 61672-1:2013**) y resume qué está verificado por conformidad hoy.
 El análisis de la ponderación temporal se publicó originalmente en la
 [incidencia #38](https://github.com/jmrplens/phonometry/issues/38).
 
-## Filosofía de diseño: un caso de estudio en ponderación temporal
+## Filosofía de diseño: un caso de estudio sobre la ponderación temporal
 
 La ponderación temporal estándar se define como una **función continua del
 tiempo** mediante la ecuación diferencial
@@ -25,19 +25,19 @@ $$
 \tau \frac{dy(t)}{dt} + y(t) = x^2(t)
 $$
 
-que corresponde a un filtro paso-bajo de primer orden estable con un polo en el
+que corresponde a un filtro paso bajo de primer orden estable con un polo en el
 semiplano izquierdo ($s = -1/\tau$).
 
 | | phonometry | python-acoustics |
 | :--- | :--- | :--- |
 | Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada $\tau$ segundos) |
-| Unidades de entrada | Presión acústica cruda (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
+| Unidades de entrada | Presión acústica en bruto (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
 | Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada $\tau$ segundos |
 | Comportamiento | Ponderación temporal IEC verdadera | Más cercano a un integrador por bloques ($L_{eq,\tau}$) |
 
 Un polo en el eje real negativo corresponde a una respuesta al impulso
 exponencial decreciente ($h(t) \propto e^{-t/\tau}$), exactamente lo que
-significa "ponderación temporal exponencial": los eventos pasados se olvidan
+significa «ponderación temporal exponencial»: los eventos pasados se olvidan
 exponencialmente. Un polo en el eje real positivo crece sin límite; el reinicio
 por bloques lo oculta, pero cambia la naturaleza de la medición.
 
@@ -84,7 +84,7 @@ Fast de esa ráfaga, expresado respecto de la referencia:
 $10\log_{10}(\max \text{env} / \text{ref})$, que es el $L_{AFmax} - L_A$ de la
 norma. Fíjate en qué verifica y qué no: la IEC 61672-1 enuncia estos límites
 para el dispositivo de entrada eléctrica sobre un rango definido de niveles
-estacionarios y sin indicación de sobrecarga (cláusulas 5.9.5-5.9.6), así que
+estacionarios y sin indicación de sobrecarga (apartados 5.9.5-5.9.6), así que
 los números de abajo verifican la *balística*, no un instrumento completo. Los
 mismos valores de referencia están transcritos en
 `tests/filters/test_iec_compliance.py` para F y S y para la columna $L_{AE}$.
@@ -99,7 +99,7 @@ mismos valores de referencia están transcritos en
 | 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | ✅ PASA |
 
 **Resultados de python-acoustics (ponderación Fast, pasando la señal al cuadrado
-como requiere esa librería):**
+como requiere esa biblioteca):**
 
 | Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | python-acoustics (dB) | Error (dB) | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -108,7 +108,7 @@ como requiere esa librería):**
 | 10 ms | −11,1 | ±1,0 | −10,90 | +0,20 | ✅ PASA |
 | 1 ms | −21,0 | +1,0 / −2,0 | −20,90 | +0,10 | ✅ PASA |
 
-**Las dos librerías pasan todas las filas mostradas**, y decir lo contrario
+**Las dos bibliotecas pasan todas las filas mostradas**, y decir lo contrario
 sería exagerar el caso: lo que importa aquí es la *forma* del error, no un
 incumplimiento. phonometry se queda dentro de 0,05 dB de la referencia de la
 Tabla 4 en todas las duraciones, menos del 5 % del margen de clase 1, porque a
@@ -140,11 +140,11 @@ que las filas de phonometry se pueden reproducir directamente.
   métrica distinta e igualmente válida; puedes calcularla con
   [`leq`](/phonometry/es/signals/levels/levels/) sobre segmentos consecutivos.
 - Ambos enfoques son útiles; simplemente responden preguntas distintas. La
-  discrepancia reportada en la incidencia #38 proviene de comparar una
+  discrepancia descrita en la incidencia #38 proviene de comparar una
   envolvente continua con un integrador por bloques, no de un error de
   implementación.
 
-## Verificación por conformidad en toda la librería
+## Verificación por conformidad en toda la biblioteca
 
 Una nota sobre qué es una **clase de prestaciones**, ya que todos los veredictos
 de esta página lo son. En IEC 61672-1 e IEC 61260-1 una clase no es un grado de
@@ -160,7 +160,7 @@ significa que el error sea cero, y el tamaño del margen es el número
 interesante.
 
 El caso de las ráfagas de tono de arriba no es una comprobación aislada. Para
-cada norma que la librería implementa, los valores de referencia y los límites
+cada norma que la biblioteca implementa, los valores de referencia y los límites
 de aceptación se transcriben del texto oficial a la batería de tests, de modo
 que cualquier regresión hace fallar la CI. Una muestra del núcleo de
 metrología:
@@ -179,21 +179,22 @@ metrología:
 | IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()` | `tests/signals/test_levels.py` |
 
 La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
-batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en {domains} dominios y
+batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en
+{domains} dominios y
 {standards} normas, que abarcan la psicoacústica y la inteligibilidad del
 habla, la acústica de salas, edificación y materiales, la vibración humana y de
 máquinas, el ruido ambiental, el de aeronaves y helicópteros y el submarino, la
 electroacústica, la sonoridad de programa, el control de ruido industrial, el
-análisis espectral calibrado y el solver FDTD de ondas. El informe numérico
-completo (el valor esperado y el valor que calcula la librería para cada
+análisis espectral calibrado y el solucionador FDTD de ondas. El informe numérico
+completo (el valor esperado y el valor que calcula la biblioteca para cada
 comprobación, regenerado en cada pull request) está publicado como
 [informe de conformidad](/phonometry/es/reference/conformance/).
 
-La misma costumbre de "primero la norma" aparece por debajo del nivel de las
+La misma costumbre de «primero la norma» aparece por debajo del nivel de las
 métricas completas, en la parte numérica. Los bancos de filtros sitúan sus
 puntos de −3 dB en los bordes de banda de **ANSI S1.11 / IEC 61260-1** para las
 tres arquitecturas cuya parametrización lo permite, Butterworth, Chebyshev II y
-Bessel, las dos últimas mediante correcciones que la parametrización cruda de
+Bessel, las dos últimas mediante correcciones que la parametrización en bruto de
 scipy no aplicaría; Chebyshev I y el elíptico leen esos mismos bordes como su
 borde de banda de paso con rizado constante, algo que se declara con su coste
 medido en [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). El
@@ -217,12 +218,12 @@ Esos casos no se parchean en silencio. Cada caso confirmado queda registrado en
 las [erratas de las fuentes publicadas](/phonometry/es/reference/errata/) con
 la edición impresa y el punto exacto, lo que dice el documento, por qué no
 puede ser correcto, la evidencia independiente y la lectura que implementa la
-librería. Cuando esa lectura cambia algún número que la librería reporta, la
+biblioteca. Cuando esa lectura cambia algún número que la biblioteca da, la
 entrada nombra la comprobación o el test que lo fija; cuando no lo cambia,
 porque el defecto es una etiqueta, una referencia cruzada o una tabla que la
-librería nunca lee, la entrada lo dice así. Ya son {errataEntries}, entre
+biblioteca nunca lee, la entrada lo dice así. Ya son {errataEntries}, entre
 normas, documentos de guía, libros y artículos de revista, cada uno marcado
-como reportado al organismo emisor o no. Un defecto listado ahí nunca es un
+como notificado al organismo emisor o no. Un defecto listado ahí nunca es un
 defecto del método: en todos los casos la lectura pretendida se ha podido
 establecer a partir del propio documento o de la física.
 
@@ -256,7 +257,7 @@ desde otra implementación hereda lo que la errata le hiciera hacer, y nada en
   conformación de haz, estimación de la dirección de llegada), y también llega
   al lado de la medición, con adquisición de la respuesta al impulso por barrido
   y un estimador de RT60. Lo que no lleva es el juego de parámetros de
-  ISO 3382. Los solvers de fuentes imagen y FDTD de phonometry están fijados a
+  ISO 3382. Los solucionadores de fuentes imagen y FDTD de phonometry están fijados a
   formas cerradas publicadas, y la respuesta al impulso de fuentes imagen pasa
   por el mismo análisis de `room_parameters` (EDT, T20, T30, C50, C80, D50, Ts,
   por bandas, con los indicadores de validez del rango de decaimiento de

@@ -1,6 +1,6 @@
 ---
 title: "Acústica submarina"
-description: "El sonido en el mar: los niveles de referencia de ISO 18405, el ruido radiado por buques (ISO 17208) y la exposición por hincado de pilotes (ISO 18406), la propagación desde la pérdida de transmisión en forma cerrada y la ecuación del sonar hasta el ruido ambiente y los solvers numéricos, y los criterios auditivos de mamíferos marinos que convierten un nivel en una evaluación."
+description: "El sonido en el mar: los niveles de referencia de ISO 18405, el ruido radiado por buques (ISO 17208) y la exposición por hincado de pilotes (ISO 18406), la propagación desde la pérdida de transmisión en forma cerrada y la ecuación del sonar hasta el ruido ambiente y los solucionadores numéricos, y los criterios auditivos de mamíferos marinos que convierten un nivel en una evaluación."
 ---
 
 La acústica submarina funciona con la misma física que la acústica aérea pero
@@ -18,8 +18,8 @@ menos intensidad que en el aire, porque la impedancia característica del agua
 de mar es unas 3 700 veces la del aire. Un 120 dB submarino y un 120 dB aéreo
 describen, por tanto, situaciones físicas completamente distintas, y los dos no
 deben compararse nunca. La regla que sigue esta sección es sencilla: todo nivel
-lleva su referencia explícita, una conversión entre ambos convenios es puro
-recambio de referencia y nunca una equivalencia energética, y el único sitio
+lleva su referencia explícita, una conversión entre ambos convenios es un puro
+cambio de referencia y nunca una equivalencia energética, y el único sitio
 donde aparece aquí la referencia aérea es en los dos grupos auditivos de
 carnívoros en aire de la página de exposición.
 
@@ -40,9 +40,11 @@ Thorp), los cuatro regímenes de aguas someras de Weston con sus distancias de
 transición, la velocidad del sonido en agua de mar por cuatro formulaciones,
 las ecuaciones de sonar pasivo y activo con la inversión del alcance de
 detección, la pérdida por reflexión en el lecho marino de Rayleigh, y el
-espectro de ruido ambiente de Wenz con el tráfico marítimo JOMOPANS-ECHO. Cuando la refracción y los contornos deciden la
+espectro de ruido ambiente de Wenz con el tráfico marítimo JOMOPANS-ECHO.
+Cuando la refracción y los contornos deciden la
 respuesta,
-[Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/)
+[Solucionadores numéricos de propagación
+submarina](/phonometry/es/underwater/underwater-solvers/)
 calcula el campo en su lugar: la expansión en modos normales, el trazado de
 rayos y la ecuación parabólica split-step de Fourier, con la guía para
 elegir entre ellos y las formas cerradas.
@@ -69,8 +71,8 @@ de teoría.
 - [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
   pérdida de transmisión, velocidad del sonido, ecuación del sonar, reflexión
   en el lecho y ruido ambiente oceánico, en forma cerrada.
-- [Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los solvers de modos normales, trazado de rayos y ecuación parabólica de
+- [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
+  los solucionadores de modos normales, trazado de rayos y ecuación parabólica de
   la guía de ondas estratificada, cada uno validado contra una forma cerrada
   exacta, y cómo elegir modelo de propagación.
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
@@ -82,7 +84,7 @@ de teoría.
 
 **La disciplina de medida no está implementada, solo su aritmética.** El
 promediado de cuatro pasadas y tres hidrófonos de la ISO 17208-1, sus
-comprobaciones de geometría de CPA y profundidad de agua, el puntuado de su
+comprobaciones de geometría de CPA y profundidad de agua, la puntuación de su
 ventana de datos de ±30° y su corrección de ruido de fondo quedan a cargo del
 operador; la biblioteca aporta los niveles de ruido radiado y de fuente
 monopolar en forma cerrada que vienen después. La propia ISO 18406 excluye el
@@ -91,14 +93,14 @@ continuo no tiene forma cerrada aquí ni en ningún otro lugar de la biblioteca.
 
 **El lecho marino es delgado.** La página de formas cerradas lo modela como una
 reflexión de Rayleigh fluido-fluido sin pérdidas, así que la atenuación del
-sedimento queda fuera de alcance, y los tres solvers asumen una columna de agua
+sedimento queda fuera de alcance, y los tres solucionadores suponen una columna de agua
 **independiente de la distancia**, sin fondo absorbente ni elástico y sin
 batimetría real — lo que deja fuera por completo los problemas dependientes de
-la distancia. El solver de rayos devuelve caminos y tiempos de propagación pero
+la distancia. El solucionador de rayos devuelve caminos y tiempos de propagación pero
 no amplitudes (sin intensidad de tubo de rayos, sin corrección de cáusticas), y
 la ecuación parabólica es la forma estándar de ángulos pequeños de Tappert y no
 una variante de gran angular de Padé. Para la física del lecho elástico que
-estos solvers fluidos dejan fuera, el [solucionador de ondas
+estos solucionadores fluidos dejan fuera, el [solucionador de ondas
 elásticas](/phonometry/es/simulation/elastic-waves/) es lo más parecido que
 tiene la biblioteca.
 

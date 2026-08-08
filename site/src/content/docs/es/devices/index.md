@@ -48,10 +48,10 @@ se construye.
   los métodos directo y de comparación de ISO 3741.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
-- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+- [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   la potencia radiada a partir del nivel de velocidad promediado en la
   superficie y el factor de radiación, para el caso en que la máquina no puede
-  moverse, la sala no está calificada y solo se dispone de un acelerómetro: el
+  moverse, la sala no está cualificada y solo se dispone de un acelerómetro: el
   límite superior de la Parte 1 y el valor de ingeniería de la Parte 2.
 
 ## [Electroacústica](/phonometry/es/devices/electroacoustics/)
@@ -91,7 +91,7 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
   fondo, y el corte de modos superiores que limita todo método de onda plana.
 - [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/):
   la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
-  transmisión que necesita una partición o un encapsulado para cumplir un
+  transmisión que necesita una partición o un cerramiento para cumplir un
   criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de
@@ -99,16 +99,16 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
 
 ## Qué no cubre esta sección
 
-**Aquí no se califica ningún recinto.** La calificación de campo libre de una
-sala anecoica de ISO 3745, la calificación de la cámara reverberante de ISO 3741
+**Aquí no se cualifica ningún recinto.** La cualificación de campo libre de una
+sala anecoica de ISO 3745, la cualificación de la cámara reverberante de ISO 3741
 y el ensayo de intensidad residual de una sonda de IEC 61043 se dan todos por
 hechos: la biblioteca avisa de los criterios orientativos gruesos que una norma
-declara explícitamente y califica un índice residual que aportas tú, pero no
+declara explícitamente y cualifica un índice residual que aportas tú, pero no
 certifica ni una sala ni un instrumento. El mismo límite recorre las páginas de
 electroacústica, que **reducen y presentan curvas que aporta el laboratorio** en
 vez de decirte cómo adquirirlas, y la ISO/TS 7849, cuyos apartados 5 a 7 sobre
 instrumentación, instalación y posiciones de medición son práctica de
-laboratorio que esta biblioteca asume.
+laboratorio que esta biblioteca supone.
 
 Conviene conocer tres ausencias concretas antes de planificar un trabajo. La
 suma de potencia en puntos fijos discretos de ISO 9614-1 **no está implementada

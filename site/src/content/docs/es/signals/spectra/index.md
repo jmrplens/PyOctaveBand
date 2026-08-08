@@ -4,8 +4,8 @@ description: "Análisis de señal en frecuencia y en tiempo en phonometry: estim
 ---
 
 Los niveles de banda responden a *cuánto*; esta sección responde a *qué hay
-en la señal*. Donde el resto del núcleo trabaja en bandas de octava
-fraccional, estas páginas trabajan con los estimadores de grano fino del
+en la señal*. Donde el resto del núcleo trabaja en bandas de fracción
+de octava, estas páginas trabajan con los estimadores de grano fino del
 análisis de señal clásico: densidades espectrales, funciones de correlación,
 retardos y envolventes. Comparten una misma disciplina, tomada de Bendat y
 Piersol: cada estimación está **calibrada** (los mismos marcos de referencia
@@ -21,7 +21,7 @@ terreno intermedio tiempo-frecuencia
 ([espectrogramas](/phonometry/es/signals/spectra/time-frequency/)), los métodos
 sobre la forma del espectro
 ([cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/)), los métodos del
-dominio del período ([promediado
+dominio del periodo ([promediado
 síncrono](/phonometry/es/signals/spectra/synchronous-averaging/)), los
 estimadores del dominio del tiempo ([correlación y
 retardo](/phonometry/es/signals/spectra/correlation-delay/)), y la caja de
@@ -35,18 +35,19 @@ forma de celda de un espectrograma, el número de promedios que hay detrás de
 cada intervalo de confianza, el retardo más largo que puede ver una
 correlación cruzada generalizada y los grados de libertad que le quedan a una
 estimación MISO condicionada, así que elegirla una vez y mantenerla es lo que
-hace mutuamente consistentes una PSD, una coherencia y un retardo calculados
+hace mutuamente congruentes una PSD, una coherencia y un retardo calculados
 sobre el mismo registro. La segunda es la **estacionariedad**. Todo promedio
 de estas páginas, y toda fórmula de error citada a su lado, supone que el
 proceso no derivó mientras se grababa, que es exactamente lo que deciden los
-tests de [calificación de
+tests de [cualificación de
 datos](/phonometry/es/signals/metrology/data-qualification/); cuando un
 registro no los pasa, las herramientas honestas son las vistas de tiempo corto
 y no las promediadas.
 
 [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/) es
-donde empieza la familia del dominio de la frecuencia. Los estimadores de Welch de densidad
-espectral de potencia y cruzada reportan su número efectivo de promedios, sus
+donde empieza la familia del dominio de la frecuencia. Los estimadores de
+Welch de densidad
+espectral de potencia y cruzada declaran su número efectivo de promedios, sus
 errores aleatorios normalizados y sus intervalos de confianza chi-cuadrado;
 el espectro de salida coherente separa una salida medida en la parte
 explicada por una entrada y la parte que es ruido, con una relación
@@ -55,8 +56,8 @@ de vuelta al mundo de bandas; y los generadores de ruido de colores
 sintetizan señales de prueba blancas, rosas, rojas, azules y violetas con
 pendiente exacta en ley de potencias.
 [La coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/) lleva
-esa misma maquinaria del espectro cruzado a varias fuentes correladas a la vez:
-a partir de varias entradas correladas y una salida separa la coherencia que una
+esa misma maquinaria del espectro cruzado a varias fuentes correlacionadas a la vez:
+a partir de varias entradas correlacionadas y una salida separa la coherencia que una
 fuente aporta de verdad de la parte que solo comparte con otra, y sus espectros
 de salida coherente parciales indican qué fuente domina cada banda.
 
@@ -67,16 +68,18 @@ leyendo un nivel absoluto en el mismo escalado que los estimadores de
 Welch, y la FFT con zoom calcula el espectro de una banda estrecha en una
 malla arbitrariamente fina para separar tonos más próximos que un bin
 práctico de FFT.
-[Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/)
+[Cepstro, ecos y espectro de la
+envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/)
 trabaja sobre la *forma* del espectro. El cepstro de potencia, real y
 complejo colapsa el rizado espectral periódico en picos de quefrencia, la
 detección de ecos lee el retardo y el coeficiente de una reflexión en el
 pico cepstral, el liftering separa un espectro logarítmico en envolvente
 suave y estructura fina, y el espectro de la envolvente convierte las
 modulaciones de amplitud en líneas discretas en la frecuencia de modulación.
-[El promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
-extrae una forma de onda repetitiva de período conocido del ruido asíncrono
-promediando períodos sucesivos: el ruido residual cae como la raíz cuadrada
+[El promediado síncrono en el
+tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
+extrae una forma de onda repetitiva de periodo conocido del ruido asíncrono
+promediando periodos sucesivos: el ruido residual cae como la raíz cuadrada
 del número de promedios, y elegir ese número para situar un nodo del filtro
 peine sobre un orden interferente lo rechaza mucho mejor que la potencia de
 dos habitual.
@@ -91,18 +94,20 @@ respuestas al impulso pueden retardarse y alinearse con precisión
 submuestral; y la transformada de Hilbert produce la envolvente con fase y
 frecuencia instantáneas.
 
-[Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/)
-es la caja de herramientas que hay debajo de todo lo demás: salvas de tono
+[Señales de prueba y herramientas de
+muestreo](/phonometry/es/signals/spectra/test-signals/)
+es la caja de herramientas que hay debajo de todo lo demás: ráfagas de tono
 con la conmutación exacta de IEC 60268-1 (inicio en el paso por cero, número
-entero de períodos completos, trenes repetitivos) que ejercitan las balísticas
+entero de periodos completos, trenes repetitivos) que ejercitan las balísticas
 del detector, remuestreo polifásico tras una especificación antialias
 explícita cuyo filtro diseñado viaja con el resultado y que necesita toda
 comparación entre frecuencias de muestreo distintas, y retardo fraccionario de
 banda limitada con frontera lineal o circular, cuyo núcleo comparten la
 alineación de respuestas al impulso de
 [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/)
-y la alineación de períodos no enteros de
-[Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
+y la alineación de periodos no enteros de
+[Promediado síncrono en el
+tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
 
 [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/) orienta la
 caja de herramientas hacia la medición de los propios sistemas: los pares
@@ -129,9 +134,9 @@ estimaciones.
   generadores de ruido de colores con pendiente exacta.
 - [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/):
   las funciones de coherencia de entradas múltiples de Bendat y Piersol para
-  varias fuentes correladas y una salida, con el condicionamiento por
+  varias fuentes correlacionadas y una salida, con el condicionamiento por
   eliminación de Gauss que distingue una causa real de una fuente que solo
-  correla con ella, y los espectros de salida coherente parciales que indican
+  se correlaciona con ella, y los espectros de salida coherente parciales que indican
   qué fuente domina cada banda.
 - [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): el
   espectrograma STFT calibrado en unidades absolutas (dB SPL para pascales)
@@ -143,7 +148,7 @@ estimaciones.
   bajo/paso alto, la ida y vuelta homomórfica y el espectro de la envolvente
   de las modulaciones de amplitud.
 - [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):
-  extracción de una forma de onda periódica de período conocido por promediado
+  extracción de una forma de onda periódica de periodo conocido por promediado
   en el dominio del tiempo, el filtro peine que describe la operación en el
   dominio de la frecuencia, la ley de reducción de ruido en raíz cuadrada, y la
   elección del número de promedios que sitúa un nodo del peine sobre un orden
@@ -154,7 +159,7 @@ estimaciones.
   alineación submuestral de respuestas al impulso, y la envolvente de
   Hilbert.
 - [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
-  salvas de tono IEC 60268-1 con conmutación exacta, remuestreo con
+  ráfagas de tono IEC 60268-1 con conmutación exacta, remuestreo con
   especificación antialias declarada y retardo fraccionario de banda
   limitada.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/):

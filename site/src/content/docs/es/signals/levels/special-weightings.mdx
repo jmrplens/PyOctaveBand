@@ -50,7 +50,7 @@ sirve para comparaciones con datos heredados, y la **AU** (IEC 61012), aún en
 vigor como la curva G, mantiene las componentes ultrasónicas fuera de una
 lectura de exposición audible.
 
-Las cuatro comparten la maquinaria de las curvas de IEC 61672-1 (0 dB en
+Las cuatro comparten la maquinaria de las curvas de IEC 61672-1 (0 dB a
 1 kHz donde aplica, procesado multicanal y por bloques con estado), y B, D y
 AU toman además el sobremuestreo `high_accuracy`; la G ignora ese indicador,
 porque su rango de 0,25 Hz a 315 Hz ya es exacto con el diseño simple, y,
@@ -64,7 +64,7 @@ IEC 61672-1 son el tema de
 
 La **ponderación frecuencial G** (ISO 7196:1995) valora el infrasonido igual que
 la ponderación A valora el ruido audible. Se define por una configuración de
-polos y ceros con ganancia de 0 dB en 10 Hz, sube a 12 dB/octava entre 1 Hz y
+polos y ceros con ganancia de 0 dB a 10 Hz, sube a 12 dB/octava entre 1 Hz y
 20 Hz (siguiendo el crecimiento abrupto de la percepción en esa banda) y cae a
 24 dB/octava fuera de ella. Úsala con fuentes con energía significativa por
 debajo de 20 Hz (aerogeneradores, climatización, voladuras):
@@ -102,7 +102,7 @@ spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve="G"))
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.semilogx(freqs[1:],
             20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps))
-ax.plot(10, 0, "o", color="tab:red", label="0 dB en 10 Hz")
+ax.plot(10, 0, "o", color="tab:red", label="0 dB a 10 Hz")
 ax.set(xlim=(0.1, 1000), ylim=(-90, 15),
        xlabel="Frecuencia [Hz]", ylabel="Respuesta de la ponderación G [dB]")
 ax.grid(True, which="both", alpha=0.3)
@@ -131,7 +131,7 @@ como la propia A con un paso bajo añadido.
 *Las tres curvas frente a la referencia A (gris ancha), medidas a 96 kHz para
 que el eje llegue a los 40 kHz donde IEC 61012 aún especifica el paso bajo U.
 B (verde, discontinua) descarta menos graves que A; D (morada) lleva la joroba
-de +11,5 dB en 3,15 kHz, donde más molesta el silbido de la turbomaquinaria;
+de +11,5 dB a 3,15 kHz, donde más molesta el silbido de la turbomaquinaria;
 AU (naranja) recorre el interior de la referencia A hasta 10 kHz y luego se
 desprende con U, hasta quedar 13 dB por debajo de A en 16 kHz. La curva G de
 infrasonido conserva su propia gráfica en la sección 1, y A, C y Z están en
@@ -171,7 +171,7 @@ plt.show()
 ### B (ANSI S1.4-1983, histórica)
 
 La curva intermedia del esquema original de conmutación por niveles A/B/C,
-trazada a partir de la isófona de ~70 fonios. Analíticamente es la
+trazada a partir de la línea isofónica de ~70 fonios. Analíticamente es la
 ponderación C con un cero más en el origen y un polo real adicional en
 $f_5 = 158{,}49\ \text{Hz}$ (Apéndice C de ANSI S1.4-1983), así que descarta
 menos graves que A y más que C. Se eliminó cuando IEC 61672-1 sustituyó a las
@@ -218,7 +218,7 @@ print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
 ### AU (IEC 61012, vigente: sonido audible en presencia de ultrasonidos)
 
 La única de las tres aún en vigor. `AU` es la ponderación A en cascada con el
-filtro paso-bajo **U** de IEC 61012:1990 (seis polos, Tabla 2): plana
+filtro paso bajo **U** de IEC 61012:1990 (seis polos, Tabla 2): plana
 respecto a A hasta 10 kHz y con un corte abrupto después (-13 dB a 16 kHz,
 -61,8 dB a 40 kHz para U sola). Úsala cuando componentes ultrasónicos
 intensos (limpiadores y soldadores ultrasónicos, ahuyentadores de roedores,
@@ -275,8 +275,8 @@ informe de conformidad de CI).
 
 **Cubierto.** ISO 7196:1995 para la curva G (valores de
 polo/cero de la Tabla 1, verificados frente a todos los valores nominales de
-la Tabla 2). ANSI S1.4-1983 para la curva histórica B (definición del Anexo
-C, objetivos de diseño de la Tabla IV, límites de tolerancia de la
+la Tabla 2). ANSI S1.4-1983 para la curva histórica B (definición del
+Apéndice C, objetivos de diseño de la Tabla IV, límites de tolerancia de la
 Tabla V). IEC 61012:1990 para AU (el paso bajo U de la Tabla 2 en cascada
 con A, verificado frente a la Tabla 1). IEC 537:1976 para la curva D de
 ruido de aeronaves, retirada, implementada desde su función de transferencia
@@ -285,7 +285,7 @@ publicada y contrastada con dos implementaciones independientes.
 **No cubierto.** `verify_weighting_class` no produce un veredicto de clase
 para G ni para D: ISO 7196 define una única tolerancia de ±1 dB sin
 estructura de clases, y la retirada IEC 537 no dejó tabla de tolerancias.
-Ambas curvas se fijan numéricamente frente a sus tablas publicadas en el
+Ambas curvas se anclan numéricamente a sus tablas publicadas en el
 informe de conformidad de CI en su lugar, no a través de este verificador
 público. B y D se ofrecen solo para datos históricos y códigos nacionales
 antiguos; ninguna es práctica actual (IEC 61672-1 sustituyó a B, y la
@@ -304,4 +304,8 @@ ponderación A simples en lugar de D).
 
 ### ¿Qué ponderación debo usar para infrasonido por debajo de 20 Hz?
 
-Usa la ponderación frecuencial G de ISO 7196:1995, que valora el infrasonido igual que la ponderación A valora el ruido audible. Tiene ganancia de 0 dB en 10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz y cae a 24 dB/octava fuera de esa banda. Aplícala a fuentes como aerogeneradores, climatización y voladuras, y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
+Usa la ponderación frecuencial G de ISO 7196:1995, que valora el infrasonido
+igual que la ponderación A valora el ruido audible. Tiene ganancia de 0 dB a
+10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz y cae a 24 dB/octava fuera de
+esa banda. Aplícala a fuentes como aerogeneradores, climatización y voladuras,
+y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).

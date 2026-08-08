@@ -27,7 +27,7 @@ import ReportPreview from '../../../../../components/ReportPreview.astro';
 Un sistema de megafonía, un interfono, un aula reverberante: cada uno es un
 *canal de transmisión* entre la boca de quien habla y el oído de quien escucha,
 y cada uno degrada el habla a su manera. El **índice de transmisión del habla**
-(STI) de IEC 60268-16 califica ese canal con un único número en $[0, 1]$ midiendo
+(STI) de IEC 60268-16 valora ese canal con un único número en $[0, 1]$ midiendo
 cuánta de la *envolvente* del habla sobrevive al trayecto. Esta página cubre la
 física de transferencia de modulación en la que se basa el índice, el método indirecto desde
 una respuesta al impulso medida en la sala y la medición STIPA directa con su
@@ -58,7 +58,7 @@ emborronan su *envolvente*: las modulaciones lentas de intensidad
 (0,63–12,5 Hz) que transportan las sílabas. El STI cuantifica cuánta de esa
 modulación sobrevive de la boca al oído, por banda de octava, como la
 **función de transferencia de modulación (MTF)** $m(F)$. Un canal tipo delta
-mantiene $m = 1$ (STI = 1); la reverberación filtra paso-bajo la envolvente
+mantiene $m = 1$ (STI = 1); la reverberación filtra paso bajo la envolvente
 siguiendo la forma cerrada de Schroeder, y el ruido estacionario la escala:
 
 $$
@@ -83,7 +83,7 @@ efectiva de la *envolvente*, llevada a $[0, 1]$.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg"
-  alt="STI frente al tiempo de reverberación con las bandas de calificación del Anexo F de IEC 60268-16 sombreadas"
+  alt="STI frente al tiempo de reverberación con las bandas de valoración del Anexo F de IEC 60268-16 sombreadas"
   width="80%"
   loading="eager"
 />
@@ -161,7 +161,8 @@ import matplotlib.pyplot as plt
 from phonometry import speech
 
 # Una cámara reverberante (T60 = 0,9 s) medida con una relación señal-ruido de
-# habla de 15 dB: una caída exponencial sintetizada hace de RI medida.
+# habla de 15 dB: una caída exponencial sintetizada hace de respuesta al
+# impulso medida.
 fs = 48000
 rng = np.random.default_rng(0)
 n = np.arange(fs)
@@ -240,7 +241,7 @@ de conformidad.
 
 Cada vía tiene modos de fallo que la norma hace explícitos:
 
-- **Canales no lineales o variantes en el tiempo.** El método indirecto asume
+- **Canales no lineales o variantes en el tiempo.** El método indirecto supone
   un canal lineal e invariante en el tiempo: una respuesta al impulso no puede
   representar el recorte, los compresores, el control automático de ganancia
   ni un vocoder. Para un sistema de sonido con procesado no lineal en la
@@ -285,15 +286,16 @@ Ambas devuelven `STIResult`: `sti`, `mti` (7 bandas), `mtf` (7×14 o 7×2),
 
 `STIResult.report(path)` genera una ficha PDF de una página dispuesta como un
 informe de verificación de inteligibilidad de un sistema de megafonía o de
-alarma por voz: una línea de norma base que indica el método de medición (el
+alarma por voz: una línea de base normativa que indica el método de medición (el
 método indirecto de STI completo a partir de una respuesta al impulso, o el
 método directo STIPA sobre una señal grabada), un bloque de metadatos
 opcional, una tabla del índice de transferencia de modulación MTI por bandas de
 octava junto a las barras de MTI por banda (el `.plot()` del propio resultado),
-el número único enmarcado `STI = X` con la banda de calificación del Anexo F,
+el número único enmarcado `STI = X` con la banda de valoración del Anexo F,
 una fila de veredicto opcional y un pie con el descargo fijo. Usa el mismo
 contenedor `ReportMetadata` y el mismo motor que la
-[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
+[ficha de aislamiento de ISO
+717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` indicado se interpreta como el STI mínimo exigido (un STI mayor
 cumple). La generación necesita reportlab y, para la figura que incrusta la
 ficha, matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
@@ -321,7 +323,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iec60268_16_sti_example"
 	title="Informe de ejemplo STI IEC 60268-16 (PDF)"
-	description="Ficha de índice de transmisión del habla de una página: cabecera de metadatos, tabla del índice de transferencia de modulación por bandas de octava, barras de MTI por banda, el número único enmarcado STI = 0,64 con la banda de calificación del Anexo F y un veredicto CUMPLE frente a un mínimo de 0,5."
+	description="Ficha de índice de transmisión del habla de una página: cabecera de metadatos, tabla del índice de transferencia de modulación por bandas de octava, barras de MTI por banda, el número único enmarcado STI = 0,64 con la banda de valoración del Anexo F y un veredicto CUMPLE frente a un mínimo de 0,5."
 	caption="Ficha de índice de transmisión del habla (STIResult.report), STI con la banda del Anexo F."
 />
 

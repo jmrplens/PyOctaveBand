@@ -92,7 +92,7 @@ print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
 m.plot()   # la regresión de decaimiento espacial de la figura de abajo
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina abierta: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -283,7 +283,7 @@ posición puede medirse a su vez con las herramientas STIPA de la
 
 `OpenPlanResult.report(path)` renderiza una ficha PDF de una página con el
 formato de un informe de medición de privacidad acústica en oficinas diáfanas:
-la línea de norma base, un bloque de cabecera de metadatos opcional, una tabla
+la línea de base normativa, un bloque de cabecera de metadatos opcional, una tabla
 compacta de las cuatro magnitudes que devuelve `open_plan_metrics` ($D_{2,S}$,
 $L_{p,A,S,4m}$, la distancia de distracción $r_D$ y la distancia de privacidad
 $r_P$) apilada sobre la gráfica de decaimiento espacial a todo el ancho del
@@ -292,14 +292,16 @@ distancia con la lectura a 4 m y los cruces $r_D$ / $r_P$ marcados, la curva al
 estilo de la Figura 3), el $D_{2,S}$ enmarcado con las demás magnitudes al lado,
 y un pie
 con el descargo fijo. La ISO 3382-3 **caracteriza** un espacio en lugar de
-definir un apto/no apto intrínseco, por lo que la fila de veredicto aparece solo
+definir un cumple/no cumple intrínseco, por lo que la fila de veredicto aparece solo
 cuando se suministra una tasa de decaimiento espacial objetivo a través del
 campo `requirement` de los metadatos (`ReportMetadata(requirement=...)`,
 interpretada como el $D_{2,S}$ mínimo aceptable en dB, según los intervalos de
 calidad informativos del Anexo A donde un mayor decaimiento espacial es mejor;
 la sala cumple igualando o superando el objetivo). Usa el mismo contenedor
 `ReportMetadata` y el mismo motor de renderizado que la
-[ficha de acústica de salas ISO 3382-1/-2](/phonometry/es/buildings/rooms/room-acoustics/#informe-iso-3382-report); los
+[ficha de acústica de salas ISO
+3382-1/-2](/phonometry/es/buildings/rooms/room-acoustics/#informe-iso-3382-report);
+los
 campos propios de oficinas diáfanas `area` (superficie del suelo),
 `source_positions` y `receiver_positions` (el número de posiciones de medición)
 rellenan la cabecera, junto con `client`, `test_room` (la oficina o zona),
@@ -338,7 +340,7 @@ result.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso3382_3_open_plan_example"
@@ -375,13 +377,13 @@ sala.
 ```python
 from phonometry import room
 
-# El restaurante duro de Long: unos 20 sabinios métricos, un hablante con
+# El restaurante duro de Long: unos 20 m² de absorción, un hablante con
 # Lw = 70 dB y un oyente a 1,2 m al otro lado de la mesa.
 print(round(room.speech_direct_level(1.2)))          # campo directo de 60 dB
 print(round(room.crowd_noise_level(1, 20.0)))        # 63 dB con un hablante
 print(round(room.crowd_noise_level(20, 20.0)))       # 76 dB con 20 mesas
 
-# Un techo de alfa 0,9 sobre la sala de 13,7 x 13,7 m añade 170 sabinios.
+# Un techo de alfa 0,9 sobre la sala de 13,7 x 13,7 m añade 170 m² de absorción.
 print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
 ```
 
@@ -407,7 +409,7 @@ $$
 :::caution
 **La primera constante está impresa como 6,33.** La forma cerrada de arriba,
 con el mismo $Q = 2$ que da exactamente la segunda constante 3,16 del propio
-Long, da 6,31, y su texto ("6,3 metros cuadrados o más, 68 sq ft") equivale a
+Long, da 6,31, y su texto («6,3 metros cuadrados o más, 68 sq ft») equivale a
 6,317 m². La biblioteca calcula ambas cotas a partir de la relación
 habla-ruido en lugar de fijar ninguna constante, de modo que se mantienen
 mutuamente coherentes; la errata queda recogida en el [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
@@ -423,7 +425,7 @@ crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
 crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_es.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 sabinios métricos, con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_es.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 m², con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
 
 *Los mismos 20 hablantes en tres salas. La sala dura (20 m² de absorción)
 cruza el límite de comunicación antes de que se ocupe la cuarta mesa; añadir

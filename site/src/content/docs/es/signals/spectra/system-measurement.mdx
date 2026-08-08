@@ -18,7 +18,7 @@ references:
     issue: 6
     pages: "443-471"
     url: "https://aes2.org/publications/elibrary-page/?id=10189"
-    note: "El capítulo de síntesis de barridos tras el §2: construcción en el dominio de la frecuencia a partir de magnitud y retardo de grupo (Sec. 4.2), la recursión del retardo de grupo para espectros de magnitud arbitrarios (Sec. 4.3, Ecs. (11)-(12)) y la discusión de inversión limitada en banda de las Secs. 3.1 y 4.5. Se consultó la edición extendida \"Director's Cut\"."
+    note: "El capítulo de síntesis de barridos tras el §2: construcción en el dominio de la frecuencia a partir de magnitud y retardo de grupo (Sec. 4.2), la recursión del retardo de grupo para espectros de magnitud arbitrarios (Sec. 4.3, Ecs. (11)-(12)) y la discusión de inversión de banda limitada de las Secs. 3.1 y 4.5. Se consultó la edición extendida \"Director's Cut\"."
   - type: article
     authors: ["Kirkeby, O.", "Nelson, P. A."]
     year: 1999
@@ -83,7 +83,7 @@ $$
 una delta exacta (Ec. (2)). La autocorrelación de una MLS tiene un residuo
 $-1$ en cada retardo no nulo; los lóbulos laterales de Golay se cancelan
 idénticamente. La medición emite cada código por turnos - reproducir $a$
-periódicamente, grabar un período en régimen estacionario, y lo mismo con
+periódicamente, grabar un periodo en régimen estacionario, y lo mismo con
 $b$ - y suma las dos correlaciones cruzadas circulares (Ec. (4)): para un
 sistema lineal e invariante en el tiempo sin ruido, la respuesta al impulso
 vuelve con precisión de máquina, una identidad de forma cerrada que los tests
@@ -99,7 +99,7 @@ fs = 48000
 pair = golay_pair(14)                       # dos códigos de 16384 muestras
 
 # Medición simulada: reproducir cada código periódicamente y grabar un
-# período en régimen estacionario de un sistema paso banda tipo sala.
+# periodo en régimen estacionario de un sistema paso banda tipo sala.
 b, a = signal.butter(2, [80.0, 12000.0], btype="bandpass", fs=fs)
 length = pair[0].size
 rec_a = signal.lfilter(b, a, np.tile(pair[0], 3))[2 * length:]
@@ -163,12 +163,12 @@ El resultado es el mismo `ImpulseResponseResult` que devuelven los frontales
 de barrido y MLS, así que todo lo que viene después -
 [parámetros de sala](/phonometry/es/buildings/rooms/room-acoustics/), curvas de
 caída, [STI](/phonometry/es/perception/speech/speech-transmission/) - lo consume sin
-cambios. Las grabaciones de varios períodos se promedian síncronamente, de
-modo que el ruido de fondo no correlado cae 3 dB por duplicación mientras la
+cambios. Las grabaciones de varios periodos se promedian síncronamente, de
+modo que el ruido de fondo no correlacionado cae 3 dB por duplicación mientras la
 parte determinista permanece exacta. Los compromisos son un espejo de la
 MLS: la recuperación es circular (el sistema debe decaer dentro de un
-período del código, o un `ImpulseResponseWarning` señala la cola con
-aliasing), los productos de distorsión se reparten por el período en vez de
+periodo del código, o un `ImpulseResponseWarning` señala la cola con
+aliasing), los productos de distorsión se reparten por el periodo en vez de
 separarse como en un barrido, y los dos regímenes estacionarios secuenciales
 hacen del par el más expuesto de la familia a la variación temporal (Sec. 2
 de Xiang) - el precio de la complementariedad exacta.
@@ -268,7 +268,7 @@ from phonometry import impulse_response, shaped_sweep_signal
 
 fs = 48000
 freqs = np.array([50.0, 200.0, 1000.0, 8000.0])
-emphasis = np.array([12.0, 6.0, 0.0, 0.0])   # refuerzo LF contra el retumbe
+emphasis = np.array([12.0, 6.0, 0.0, 0.0])   # refuerzo LF contra el retumbo
 sweep = shaped_sweep_signal(fs, 50.0, 8000.0, 3.0,
                             target=(freqs, emphasis))
 
@@ -304,7 +304,7 @@ $$
 con $\varepsilon(f)$ pequeña dentro de la banda a ecualizar y grande fuera. En
 banda, la magnitud ecualizada $|H \cdot H_{inv}|$ se desvía de la unidad
 exactamente en $\varepsilon/(|H|^2 + \varepsilon)$ - una forma cerrada que la
-suite de conformidad comprueba bin a bin - y fuera de banda la ganancia del
+batería de conformidad comprueba bin a bin - y fuera de banda la ganancia del
 filtro nunca puede superar $1/(2\sqrt{\varepsilon})$, el máximo analítico de
 $x/(x^2 + \varepsilon)$. Un retardo de modelado de medio bloque del filtro hace
 causal la inversa, en general anticausal, de una
@@ -452,7 +452,7 @@ frecuencia de Kirkeby y Nelson (1999, Ec. 17 y sec. 2.4), implementada por
 
 **No cubierto.** Son métodos de ingeniería de medición tomados de la
 literatura de funciones de transferencia, no de una norma de
-certificación, así que no hay ninguna cláusula de cumplimiento contra la
+certificación, así que no hay ningún apartado de cumplimiento contra la
 que comprobar. La inversión original de Kirkeby y Nelson apunta a la
 reproducción sonora multialtavoz, con una regularización matricial para la
 cancelación de diafonía entre varios canales. `regularized_inverse_filter`

@@ -1,5 +1,5 @@
 ---
-title: "Potencia acústica desde vibración (ISO/TS 7849)"
+title: "Potencia acústica a partir de la vibración (ISO/TS 7849)"
 description: "La estimación según ISO/TS 7849 de la potencia acústica aérea a partir de la vibración superficial de una máquina: la potencia radiada P = Z_c⟨v²⟩Sε, el nivel de velocidad y su calibración, la media sobre la superficie, el factor de radiación ε y el nivel de potencia acústica L_W = L_v + 10 lg(S/S0) + 10 lg(ε) + 10 lg(411/400), con el límite superior de la Parte 1 (ε=1) y el valor de ingeniería de la Parte 2."
 references:
   - type: book
@@ -140,9 +140,9 @@ plt.show()
 
 ## 1. Las dos partes
 
-Las dos partes difieren solo en el factor de radiación. La **Parte 1** (*survey
-method*, sin versión en español)
-asume $\varepsilon = 1$ y da el *límite superior* $L_{W,\max}$, necesitando
+Las dos partes difieren solo en el factor de radiación. La **Parte 1 (método
+de control)**
+supone $\varepsilon = 1$ y da el *límite superior* $L_{W,\max}$, necesitando
 solo el nivel de velocidad y el área. La **Parte 2 (ingeniería)** aplica un
 factor de radiación por banda $\varepsilon_j$ determinado (según ISO 9614) como
 $\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
@@ -278,7 +278,7 @@ de ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área radiante $S$ procede del propio resultado y se
 imprime en el recuadro, junto con la relación de potencia acústica
 $L_W = L_v + 10\log_{10}(S/S_0) + 10\log_{10}\varepsilon + 10\log_{10}(Z_{c,n}/Z_{c,0})$ en la
-tira de base. Aportar `requirement` añade un veredicto APTO/NO APTO frente a un
+tira de base. Aportar `requirement` añade un veredicto CUMPLE/NO CUMPLE frente a un
 límite de potencia acústica ponderado A declarado (una emisión de potencia
 acústica es una magnitud en la que menos es mejor, así que la fuente cumple en
 el límite o por debajo). `verbose=True` añade la columna del factor de radiación
@@ -303,12 +303,12 @@ res.report(
         specimen="Carcasa de reductor (panel de acero)",
         test_room="Nave de máquinas (medición de vibración de la fuente)",
         instrumentation="Acelerómetro piezoeléctrico (calibración ISO 16063-21), n/s 0042",
-        laboratory="Ejemplo de referencia de phonometry",
+        laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-7849",
         requirement=90.0,
     ),
     language="es",
-)   # LWA = 88,7 dB(A) re 1 pW -> límite declarado 90 dB(A): APTO
+)   # LWA = 88,7 dB(A) re 1 pW -> límite declarado 90 dB(A): CUMPLE
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
@@ -317,7 +317,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso7849_vibration_power_example"
 	title="Informe de ejemplo de potencia acústica por vibración ISO/TS 7849 (PDF)"
-	description="Ficha de determinación de potencia acústica por vibración ISO/TS 7849-2 de una página: una cabecera con el cliente, la máquina/fuente, el entorno de ensayo en nave de máquinas y el acelerómetro y el clima, la tabla por bandas de octava (125 Hz a 4 kHz) de niveles de velocidad vibratoria superficial Lv y niveles de potencia acústica de banda radiada LW, el espectro de potencia acústica LW(f) con eje de banda nominal, el nivel de potencia acústica ponderado A LWA = 88,7 dB(A) re 1 pW recuadrado con el total LW = 90,0 dB, el área radiante S = 1,60 m2 y el método de ingeniería, y un veredicto APTO frente al límite declarado de 90 dB(A), cerrado por una tira de base que enuncia la relación LW = Lv + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(411/400) con su término de impedancia fijo y el modelo del factor de radiación."
+	description="Ficha de determinación de potencia acústica por vibración ISO/TS 7849-2 de una página: una cabecera con el cliente, la máquina/fuente, el entorno de ensayo en nave de máquinas y el acelerómetro y el clima, la tabla por bandas de octava (125 Hz a 4 kHz) de niveles de velocidad vibratoria superficial Lv y niveles de potencia acústica de banda radiada LW, el espectro de potencia acústica LW(f) con eje de banda nominal, el nivel de potencia acústica ponderado A LWA = 88,7 dB(A) re 1 pW recuadrado con el total LW = 90,0 dB, el área radiante S = 1,60 m2 y el método de ingeniería, y un veredicto CUMPLE frente al límite declarado de 90 dB(A), cerrado por una tira de base que enuncia la relación LW = Lv + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(411/400) con su término de impedancia fijo y el modelo del factor de radiación."
 	caption="Ficha de potencia acústica por vibración (VibrationSoundPowerResult.report), una determinación por el método de ingeniería ISO/TS 7849-2 con el factor de radiación medido y el LWA recuadrado."
 />
 
@@ -342,10 +342,10 @@ en $\varepsilon$.
 (instrumentación, instalación de la fuente, el número y montaje de las
 posiciones de medición, las condiciones ambientales: apartados 5 a 7) y sus
 apartados de incertidumbre de medida y anexos informativos no están
-implementados: son práctica de laboratorio que esta guía asume. El apartado
+implementados: son práctica de laboratorio que esta guía supone. El apartado
 8 de la Parte 2 pide además el factor de radiación de un lote o familia de
 máquinas, promediando $\varepsilon_j$ sobre varias máquinas y su desviación
-estándar (Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola
+típica (Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola
 máquina, así que pasa un $\varepsilon$ ya promediado para una determinación de
 familia. La
 potencia acústica que alimenta a `radiation_factor` debe proceder de una

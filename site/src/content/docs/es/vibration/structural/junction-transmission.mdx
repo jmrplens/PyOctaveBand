@@ -1,6 +1,6 @@
 ---
 title: "Transmisión de onda de flexión en uniones de placas"
-description: "Los coeficientes de transmisión de onda de flexión independientes de la frecuencia del enfoque ondulatorio para uniones rígidas de placas en X, T, L y en línea (Cremer et al. 1973; Craik 1981/1996; Hopkins 2007, Sección 5.2.1.3): los parámetros de onda chi y psi, los coeficientes de esquina y de tramo recto tau12(theta) y tau13(theta), su media angular en campo difuso, y el factor de pérdidas por acoplamiento SEA y el índice de reducción vibracional Kij derivados."
+description: "Los coeficientes de transmisión de onda de flexión independientes de la frecuencia del enfoque ondulatorio para uniones rígidas de placas en X, T, L y en línea (Cremer et al. 1973; Craik 1981/1996; Hopkins 2007, Sección 5.2.1.3): los parámetros de onda chi y psi, los coeficientes de esquina y de tramo recto tau12(theta) y tau13(theta), su media angular en campo difuso, y el factor de pérdidas por acoplamiento SEA y el índice de reducción vibratoria Kij derivados."
 references:
   - type: book
     authors: ["Cremer, L.", "Heckl, M.", "Ungar, E. E."]
@@ -49,7 +49,7 @@ y los coeficientes resultantes son **independientes de la frecuencia**. Eso es
 lo que los convierte en entradas convenientes en forma cerrada para el análisis
 estadístico de energía (SEA) y para el modelo de transmisión por flancos de la
 EN 12354, donde alimentan el factor de pérdidas por acoplamiento $\eta_{ij}$ y
-el índice de reducción vibracional $K_{ij}$.
+el índice de reducción vibratoria $K_{ij}$.
 
 Primero el objeto en sí: una unión en T donde un forjado de hormigón de 140 mm
 muere contra un muro continuo de 200 mm. Un resultado de `junction_transmission`
@@ -158,8 +158,8 @@ tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
 El clip de abajo ejecuta este experimento en el dominio del tiempo con el
-[solver FDTD elástico 2D](/phonometry/es/simulation/elastic-waves/) de la
-librería: un paquete de flexión sobre una placa
+[solucionador FDTD elástico 2D](/phonometry/es/simulation/elastic-waves/) de la
+biblioteca: un paquete de flexión sobre una placa
 de acero de 10 mm llega a una unión en L con una placa idéntica, y la esquina
 lo divide en las ondas reflejada y transmitida que esta sección tasa en
 $\tau_{12}(0°) = 0{,}5$. El precursor rápido de onda en el plano que baja por
@@ -171,7 +171,7 @@ deja fuera a propósito.
   width={2400}
   height={1350}
   title="Ondas de flexión en una unión en L en una simulación FDTD elástica 2D"
-  description="Una fuerza en salva de tono de 4 kHz lanza un paquete de ondas de flexión por una placa de acero de 10 mm. En la placa recta de control el paquete sigue de largo y no vuelve nada. En una unión en L con una placa perpendicular idéntica se divide: parte se refleja, parte dobla la esquina como onda de flexión que baja por la placa vertical, y un precursor de onda en el plano más rápido se adelanta, con el coeficiente de transmisión en forma cerrada de 0,50 en incidencia normal y el índice de reducción vibracional difuso de 5,2 dB anotados."
+  description="Una fuerza en ráfaga de tono de 4 kHz lanza un paquete de ondas de flexión por una placa de acero de 10 mm. En la placa recta de control el paquete sigue de largo y no vuelve nada. En una unión en L con una placa perpendicular idéntica se divide: parte se refleja, parte dobla la esquina como onda de flexión que baja por la placa vertical, y un precursor de onda en el plano más rápido se adelanta, con el coeficiente de transmisión en forma cerrada de 0,50 en incidencia normal y el índice de reducción vibratoria difuso de 5,2 dB anotados."
 />
 
 ## 3. Media angular en campo difuso
@@ -201,12 +201,12 @@ Las dos direcciones cumplen la relación de consistencia SEA (Ec. 5.7),
 $\bar{\tau}_{12} = \chi\,\bar{\tau}_{21}$, de modo que solo hace falta calcular
 una dirección.
 
-## 4. Factor de pérdidas por acoplamiento e índice de reducción vibracional
+## 4. Factor de pérdidas por acoplamiento e índice de reducción vibratoria
 
 La media angular es el puente hacia los dos descriptores de unión usados en los
 modelos de edificios basados en SEA: el **factor de pérdidas por acoplamiento**
 (Ec. 2.154) $\eta_{ij} = c_{g,i} L_{ij} \tau_{ij} / (2\pi^2 f S_i)$ y el
-**índice de reducción vibracional** del enfoque ondulatorio (Ec. 5.116)
+**índice de reducción vibratoria** del enfoque ondulatorio (Ec. 5.116)
 $K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref})$ con
 $f_\text{ref} = 1000\ \text{Hz}$ y $f_{c,j}$
 la frecuencia crítica de la placa *receptora*. Combinada con la reciprocidad de
@@ -242,7 +242,7 @@ caminos de esquina se endurecen deprisa con una placa receptora más pesada,
 mientras que el camino recto (en línea) de la unión en X es el que más sube,
 porque las placas perpendiculares fijan cada vez más la línea de unión:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness_es.svg" alt="Índice de reducción de vibraciones Kij del enfoque ondulatorio frente a la relación de espesores de dos placas de hormigón para los caminos de esquina y recto de la unión en X, la esquina de la unión en T y la esquina de la unión en L, con el valor de la unión en X de placas idénticas de unos 7,3 dB marcado" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness_es.svg" alt="Índice de reducción vibratoria Kij del enfoque ondulatorio frente a la relación de espesores de dos placas de hormigón para los caminos de esquina y recto de la unión en X, la esquina de la unión en T y la esquina de la unión en L, con el valor de la unión en X de placas idénticas de unos 7,3 dB marcado" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -279,7 +279,7 @@ res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
 ax.scatter([1.0], [res_eq.corner_reduction_index], zorder=6,
            label="placas idénticas (tau = 1/12)")
 ax.set_xlabel("Relación de espesores h2/h1")
-ax.set_ylabel("Índice de reducción de vibraciones Kij [dB]")
+ax.set_ylabel("Índice de reducción vibratoria Kij [dB]")
 ax.set_title("Kij de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)")
 ax.legend()
 plt.show()
@@ -295,7 +295,7 @@ figura de $\tau(\theta)$ del apartado 2: su camino de esquina da
 $K_{12} = 9{,}8\ \text{dB}$.
 Entregarlo a
 `flanking_element` en lugar de un valor tabulado del Anexo E valora los tres
-caminos de flancos de la unión y su efecto sobre el índice aparente:
+trayectorias por flancos de la unión y su efecto sobre el índice aparente:
 
 ```python
 from phonometry import building, junction_transmission
@@ -319,10 +319,10 @@ $R_w = 57\ \text{dB}$ directo; un edificio completo repite esto para cada
 unión, que es la
 [guía de predicción EN 12354](/phonometry/es/buildings/design/insulation-prediction/).
 
-La contraparte medida de la EN 12354 de $K_{ij}$ (a partir de la diferencia de
-niveles de velocidad promediada en dirección) es el `vibration_reduction_index`
-separado de la transmisión por flancos; esta página es el valor *predicho* en
-forma cerrada del enfoque ondulatorio.
+La contraparte de $K_{ij}$ medida según la EN 12354 (a partir de la diferencia
+de niveles de velocidad promediada en dirección) es el
+`vibration_reduction_index` separado de la transmisión por flancos; esta
+página es el valor *predicho* en forma cerrada del enfoque ondulatorio.
 
 ## Qué cubre esta guía
 
@@ -334,7 +334,7 @@ homogéneas e isótropas: los parámetros de onda $\chi$/$\psi$, los
 coeficientes de esquina y de tramo recto
 $\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso,
 el factor de pérdidas por acoplamiento SEA y el índice de reducción
-vibracional $K_{ij}$ del enfoque ondulatorio, mediante
+vibratoria $K_{ij}$ del enfoque ondulatorio, mediante
 `junction_wave_parameters`, `corner_transmission_coefficient`,
 `straight_transmission_coefficient`,
 `angular_average_transmission_coefficient`, `coupling_loss_factor`,
@@ -462,19 +462,19 @@ plt.show()
 
 </details>
 
-Entre ambas vías hay dos formas cerradas que son con las que normalmente se
-contrasta un valor medido. `right_angle_transmission_coefficient` da el
+Entre ambas vías hay dos formas cerradas, y son ellas con las que normalmente
+se contrasta un valor medido. `right_angle_transmission_coefficient` da el
 coeficiente de transmisión de onda de una unión de placas en ángulo recto sin
 ninguna integración angular (Ecs. 6.53 a 6.55, según Bies y Hamid y Cremer et
-al.); pasarlo a `coupling_loss_factor` reproduce idénticamente la Ec. (6.52) de
-Norton, porque esa ecuación y la Ec. (2.154) de Hopkins son la misma expresión
-en cuanto $c_g = 2 c_B$. Y `point_connection_coupling_loss_factor` cubre las
-placas unidas en $N$ puntos discretos en vez de a lo largo de una línea
-(Ec. 6.56). Cuál de las dos aplica lo decide la longitud de onda de flexión: la
-forma puntual cuando es menor que la longitud de la unión, y la lineal cuando
-es mayor. Las dos difieren en pendiente además de en nivel, $1/f$ frente a
-$1/\sqrt{f}$, así que atornillar y soldar no son intercambiables a lo largo del
-espectro.
+al.); pasarlo a `coupling_loss_factor` reproduce idénticamente la Ec. (6.52)
+de Norton, porque esa ecuación y la Ec. (2.154) de Hopkins son la misma
+expresión en cuanto $c_g = 2 c_B$. Y `point_connection_coupling_loss_factor`
+cubre las placas unidas en $N$ puntos discretos en vez de a lo largo de una
+línea (Ec. 6.56). Cuál de las dos se aplica lo decide la longitud de onda de
+flexión: la forma puntual cuando es menor que la longitud de la unión, y la
+lineal cuando es mayor. Las dos difieren en pendiente además de en nivel,
+$1/f$ frente a $1/\sqrt{f}$, así que atornillar y soldar no son
+intercambiables a lo largo del espectro.
 
 Cuando no se dispone de un valor independiente de los factores de pérdidas
 internos, la inversión con una sola excitación queda indeterminada, y el
@@ -500,7 +500,7 @@ se sostiene siquiera.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
   la medición de $K_{ij}$ a partir de diferencias de niveles de velocidad, la
   contraparte empírica de las formas cerradas de esta página.
-- [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   la potencia de la fuente que estas transmisiones de unión reparten por el
   edificio.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):

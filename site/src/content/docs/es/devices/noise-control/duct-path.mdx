@@ -168,8 +168,8 @@ Dos costumbres mantienen esto honesto. La ley supone condiciones ideales de
 flujo en la aspiración y en la descarga, así que un ventilador encajonado en
 una sala de máquinas con una mala aspiración es más ruidoso de lo que ella
 dice; y la propia guía vigente de ASHRAE es que la potencia acústica de un
-ventilador "se obtiene mejor de los datos de ensayo del fabricante" según
-AMCA Standard 300 o ASHRAE Standard 68. Trate la Ec. 13.1 como el recurso de
+ventilador «se obtiene mejor de los datos de ensayo del fabricante» según
+AMCA Standard 300 o ASHRAE Standard 68. Trata la Ec. 13.1 como el recurso de
 anteproyecto, no como la respuesta. El ventilador radia la misma potencia por
 la aspiración que por la descarga, y por eso los trayectos de impulsión y de
 retorno de una hoja real parten de la *misma* fila.
@@ -268,8 +268,8 @@ R = 10\log_{10}\!\left[1 + \left(\frac{a\,c}{\pi f d}\right)^{1.88}\right],
 $$
 
 con $a = 0{,}8$ para una terminación enrasada y $a = 1$ para una libre. Los
-dos coinciden dentro de un decibelio en las bandas que ambos cubren. Use
-`equivalent_diameter(area)` para un conducto rectangular, y no aplique la
+dos coinciden dentro de un decibelio en las bandas que ambos cubren. Usa
+`equivalent_diameter(area)` para un conducto rectangular, y no apliques la
 corrección en absoluto cuando el conducto termina en un difusor: el
 abocinamiento suaviza la transición de impedancia, y la valoración de un
 difusor de fabricante ya contiene lo que quede de ella.
@@ -308,7 +308,7 @@ print(np.round(sil.values, 1))
 print(round(plenum_attenuation(0.36, 2.4, 74.0, 0.5), 1))   # 16.1 dB
 ```
 
-Interprete esa estimación por lo que es. La unidad de 5 ft que especifica de
+Interpreta esa estimación por lo que es. La unidad de 5 ft que especifica de
 verdad el trayecto de retorno de Long es un diseño de baja frecuencia que
 vale 16 y 21 dB a 63 y 125 Hz, donde este modelo puramente geométrico da 6 y
 9. La pérdida por inserción dinámica publicada por el fabricante, medida con
@@ -415,7 +415,7 @@ print(air_terminal_damper_correction(3.0, location="supply_duct"))    #  2.0 dB
 
 Quince decibelios en el cuello frente a dos decibelios a 1,5 m aguas arriba
 en el conducto, para la misma relación de presiones, es toda la regla de
-diseño: estrangule lejos de la boca de salida, o equilibre el sistema
+diseño: estrangula lejos de la boca de salida, o equilibra el sistema
 dimensionando los conductos.
 
 ## 5. De la potencia acústica al nivel en la sala
@@ -442,7 +442,7 @@ que una única absorción media de 0,15 cae en el sitio correcto; una absorción
 por bandas da un efecto de sala por bandas, que es lo que la moqueta hace en
 realidad.
 
-Pase `target=` y `criterion=` a `duct_path` y el resultado se valora solo.
+Pasa `target=` y `criterion=` a `duct_path` y el resultado se valora solo.
 `criterion_curve` muestrea la curva NC o RC en las bandas de análisis,
 `exceedance` es el exceso banda a banda sobre ella, `meets_target` es el
 veredicto banda a banda que aplica una hoja de diseño, y `rating` es el
@@ -577,7 +577,7 @@ total.report("ruido-conductos.pdf", language="es")   # la combinación; necesita
 ```
 
 La ficha de ejemplo es la **mitad de impulsión** de la hoja, regenerada con
-`make reports` y mantenida renderizada en el repositorio. Pulse la vista
+`make reports` y mantenida renderizada en el repositorio. Pulsa la vista
 previa para abrir el PDF:
 
 <ReportPreview

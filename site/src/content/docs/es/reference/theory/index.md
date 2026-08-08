@@ -27,8 +27,10 @@ porque si no la deducción y el único método al que sirve quedarían separados
 para nada. Es el caso de los módulos submarinos
 ([Acústica submarina](/phonometry/es/underwater/underwater-acoustics/),
 [Propagación submarina](/phonometry/es/underwater/underwater-propagation/),
-[Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/) y
-[Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/));
+[Solucionadores numéricos de propagación
+submarina](/phonometry/es/underwater/underwater-solvers/) y
+[Exposición a ruido de mamíferos
+marinos](/phonometry/es/underwater/marine-mammal-exposure/));
 de los métodos de certificación y de curvas de ruido de
 [Ruido de aeronaves](/phonometry/es/aircraft/); de los modelos de emisión viaria
 y ferroviaria de CNOSSOS-EU en
@@ -37,7 +39,7 @@ electroacústicas de IEC 60268 y la cadena de radiodifusión de BS.1770 en
 [Electroacústica](/phonometry/es/devices/electroacoustics/) y
 [Radiodifusión](/phonometry/es/devices/broadcast/); de los modelos de
 silenciador, de conductos y de recinto a recinto de [Control de
-ruido](/phonometry/es/devices/noise-control/); y de los solvers FDTD y elástico,
+ruido](/phonometry/es/devices/noise-control/); y de los solucionadores FDTD y elástico,
 cuyo método numérico, cota de estabilidad y regla de dispersión se desarrollan
 en las propias páginas de [simulación de ondas](/phonometry/es/simulation/).
 Todo lo de abajo va listado con las secciones que aloja cada página de dominio.
@@ -90,12 +92,12 @@ que comparten la misma matemática de reverberación y de curvas de referencia.
 
 Las normas de caracterización y no los modelos de predicción: qué mide cada uno
 de los coeficientes de dispersión y de difusión y por qué no hay que
-intercambiarlos, cómo una medida in situ de un firme separa la reflexión en el
+intercambiarlos, cómo una medida in situ de un pavimento separa la reflexión en el
 tiempo, y las definiciones que hay detrás de las magnitudes de absorción y de
 impedancia de laboratorio.
 
 - [Dispersión superficial y difusión (ISO 17497-1, ISO 17497-2)](/phonometry/es/reference/theory/materials-surfaces/#dispersión-superficial-y-difusión-iso-17497-1-iso-17497-2)
-- [Absorción in situ de superficies de carretera (ISO 13472-1, ISO 13472-2)](/phonometry/es/reference/theory/materials-surfaces/#absorción-in-situ-de-superficies-de-carretera-iso-13472-1-iso-13472-2)
+- [Absorción in situ de pavimentos de carretera (ISO 13472-1, ISO 13472-2)](/phonometry/es/reference/theory/materials-surfaces/#absorción-in-situ-de-pavimentos-de-carretera-iso-13472-1-iso-13472-2)
 - [Caracterización de materiales acústicos (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)](/phonometry/es/reference/theory/materials-surfaces/#caracterización-de-materiales-acústicos-iso-11654-iso-9053-12-iso-10534-12-astm-e2611)
 
 ## [Medio ambiente y transporte](/phonometry/es/reference/theory/environment-transport/)

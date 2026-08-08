@@ -16,7 +16,7 @@ references:
     title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
     designation: "IEC 61260-1:2014"
     url: "https://webstore.iec.ch/en/publication/5063"
-    note: "El procesado por bloques no añade contenido normativo propio: los filtros de octava y de octava fraccional en streaming son los mismos diseños que rige esta norma, y conservar el estado interno del filtro entre bloques es exactamente lo que hace que la salida concatenada sea idéntica a una pasada única, por lo que toda afirmación de clase y tolerancia de la página de bancos de filtros se mantiene sin cambios en uso streaming."
+    note: "El procesado por bloques no añade contenido normativo propio: los filtros de octava y de fracción de octava en streaming son los mismos diseños que rige esta norma, y conservar el estado interno del filtro entre bloques es exactamente lo que hace que la salida concatenada sea idéntica a una pasada única, por lo que toda afirmación de clase y tolerancia de la página de bancos de filtros se mantiene sin cambios en uso streaming."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2013
@@ -135,7 +135,7 @@ Usa la clase `TimeWeighting` (el estado se lleva automáticamente):
 from phonometry import filters
 
 tw = filters.TimeWeighting(fs, mode="fast")
-# audio_blocks: fotogramas sucesivos de tu grabación de micrófono (Pa),
+# audio_blocks: tramas sucesivas de tu grabación de micrófono (Pa),
 #   p. ej. de sf.blocks("measurement.wav", ...) como en el bloque anterior.
 for block in audio_blocks:
     envelope = tw.process(block)
@@ -148,8 +148,8 @@ O gestiona el estado tú mismo con la API funcional; consulta
 
 Todas las clases con estado gestionan entrada multicanal `(channels, samples)`:
 el estado se reserva de forma perezosa en la primera llamada para ajustarse al
-número de canales, y se realoja si este cambia (p. ej. pasar de estéreo a mono
-reinicia el estado).
+número de canales, y se vuelve a reservar si este cambia (p. ej. pasar de
+estéreo a mono reinicia el estado).
 
 ## Qué es el estado que se transporta
 
@@ -176,7 +176,7 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
 ### Trampas del streaming
 
 - **El preprocesado por bloque crea costuras.** Cualquier cosa calculada a
-  partir de un solo bloque que debería ser global, como el detrending
+  partir de un solo bloque que debería ser global, como el eliminación de tendencia
   (restar la media del propio bloque) o la normalización, da a cada bloque
   una operación ligeramente distinta: las salidas ya no se concatenan en el
   resultado continuo. Por eso `detrend` debe ser `False` en modo con estado.
@@ -218,7 +218,7 @@ for x in audio_stream(block):            # tu callback de captura
 
 | Opción | Comportamiento con estado | Motivo |
 | :--- | :--- | :--- |
-| `detrend` | debe ser `False` | El detrending por bloque crea discontinuidades en las fronteras |
+| `detrend` | debe ser `False` | El eliminación de tendencia por bloque crea discontinuidades en las fronteras |
 | `resample` | debe ser `False` | El remuestreador no conserva estado |
 | `zero_phase` | no soportado | El filtrado bidireccional necesita la señal completa |
 | `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |

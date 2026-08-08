@@ -47,7 +47,7 @@ alimenta después la resistividad medida.
 
 La resistencia al flujo de aire cuantifica con qué fuerza un material poroso se
 opone a un flujo estacionario o lentamente oscilante. Ambas partes comparten las
-mismas tres magnitudes y unidades (ISO 9053-1:2018, cláusula 3):
+mismas tres magnitudes y unidades (ISO 9053-1:2018, apartado 3):
 
 $$
 R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
@@ -69,7 +69,7 @@ En el método estático (ISO 9053-1:2018) un flujo laminar estacionario se aumen
 por escalones y la diferencia de presión se traza frente a la velocidad lineal
 $u = q_v/A$. Se ajusta una regresión de al menos segundo orden **forzada a pasar
 por el origen**, $\Delta p = a\,u + b\,u^2$, y $\Delta p$ y $R_s$ se leen a la
-velocidad de referencia $u = 0{,}5\ \text{mm/s}$ (cláusula 7.5); la velocidad más
+velocidad de referencia $u = 0{,}5\ \text{mm/s}$ (apartado 7.5); la velocidad más
 alta no debe superar los 15 mm/s. Como $R_s = \Delta p/u = a + b\,u$, el término
 lineal $a$ es la resistencia específica al flujo de aire a velocidad nula.
 
@@ -157,11 +157,11 @@ r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
 r.report(
     "airflow_fiche.pdf",
     metadata=ReportMetadata(
-        specimen="50 mm porous absorber (open-cell)",
+        specimen="Absorbente poroso de 50 mm (célula abierta)",
         thickness=0.050,
         measurement_standard="ISO 9053-1",
-        test_room="Static airflow rig, 100 mm cell",
-        laboratory="Phonometry Reference Laboratory",
+        test_room="Banco de flujo estático, celda de 100 mm",
+        laboratory="Laboratorio de referencia Phonometry",
     ),
 )                                  # R_s, R y sigma a u = 0.5 mm/s
 ```
@@ -186,7 +186,7 @@ R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
     10^{(L_{p,s} - L_{p,t})/20},
 $$
 
-donde $\kappa'$ es la razón **efectiva** de calores específicos. La conducción de
+donde $\kappa'$ es la relación **efectiva** de calores específicos. La conducción de
 calor entre el aire oscilante y las paredes de la cavidad hace que la compresión
 no sea plenamente adiabática; el Anexo A normativo corrige $\kappa$ a la baja
 hasta
@@ -207,7 +207,7 @@ from phonometry import materials
 
 # Cavidad del Anexo A.3: cilindro cerrado de 100 mm x 100 mm, pistón a 2 Hz
 kp = materials.effective_kappa(cavity_surface=0.0471, cavity_volume=7.854e-4, frequency=2.0)
-print(round(kp, 3))               # 1.37   razón efectiva de calores específicos
+print(round(kp, 3))               # 1.37   relación efectiva de calores específicos
 
 R = materials.alternating_airflow_resistance(
     level_specimen=74.0, level_termination=90.0,
@@ -234,7 +234,7 @@ solas*, mediante el cociente adimensional $X = \rho_0 f/\sigma$; el modelo
 físico de Johnson-Champoux-Allard conserva $\sigma$ como el primero de sus
 cinco parámetros. Ajustados una vez a una medida de tubo o de cámara
 reverberante, esos modelos predicen después la capa a cualquier espesor,
-respaldo o ángulo de incidencia. Toda la familia de modelos, y el solver
+respaldo o ángulo de incidencia. Toda la familia de modelos, y el solucionador
 multicapa que apila las capas, vive en
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/);
 la ventana de validez de la regresión de Delany-Bazley ($0{,}01 < X < 1$) se
@@ -275,16 +275,17 @@ $\sigma$ medida, no en un valor de catálogo.
 El número también viaja más allá de los modelos porosos. Las impedancias del
 panel perforado y del microperforado contienen la misma física viscosa
 evaluada en un solo orificio; el
-[absorbedor de rendija](/phonometry/es/materials/absorbers/metamaterial-absorbers/) la hereda
-por rendija; y cuando una medida en
+[absorbente de
+ranura](/phonometry/es/materials/absorbers/metamaterial-absorbers/) la hereda
+por ranura; y cuando una medida en
 [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) discrepa de una
 predicción de modelo, el primer parámetro que conviene volver a medir, antes
 de tocar el modelo, es $\sigma$.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las dos partes de ISO 9053: el método estático de la
-cláusula 7.5 (`static_airflow_resistance`, la regresión por el origen y la
+**Cubierto.** Las dos partes de ISO 9053: el método estático del
+apartado 7.5 (`static_airflow_resistance`, la regresión por el origen y la
 velocidad de evaluación de 0,5 mm/s) y el método alterno de la Fórmula (2) de
 ISO 9053-2 con la relación efectiva de calores específicos del Anexo A
 (`effective_kappa`, `alternating_airflow_resistance`), incluidos los avisos
@@ -302,7 +303,7 @@ valoración de número único, así que la ficha no lleva ninguno de los dos.
 
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
   los modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard que consumen
-  la resistividad, y el solver multicapa por matrices de transferencia.
+  la resistividad, y el solucionador multicapa por matrices de transferencia.
 - [Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/): la medida a
   incidencia normal contra la que suele ajustarse un modelo anclado en
   $\sigma$.

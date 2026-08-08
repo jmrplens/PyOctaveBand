@@ -38,7 +38,7 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 correlación. Cada una compara una referencia limpia con una versión degradada o
 procesada de la misma habla y devuelve un escalar con relación monótona con la
 fracción de palabras que un oyente entendería: `1` cuando la señal degradada
-coincide con la limpia y cerca de `0` para ruido incorrelado. Trabajan
+coincide con la limpia y cerca de `0` para ruido no correlacionado. Trabajan
 directamente sobre las dos formas de onda, lo que las convierte en la vara de
 medir habitual para el habla con **ponderación tiempo-frecuencia**: reducción de
 ruido, separación de fuentes y procesado por máscara binaria, donde separar el
@@ -49,9 +49,10 @@ habla limpia de su distorsión no es inmediato.
 *y* la señal degradada, y valoran el procesado entre ambas. El
 [índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/)
 valora un canal de transmisión a partir de su respuesta al impulso, y el
-[índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/)
+[índice de inteligibilidad del
+habla](/phonometry/es/perception/speech/speech-intelligibility/)
 predice la audibilidad a partir de espectros de habla, ruido y umbral. Usa
-STOI/ESTOI cuando dispones de un par antes/después.
+STOI/ESTOI cuando dispongas de un par antes/después.
 :::
 
 :::caution
@@ -139,7 +140,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, lfilter
 from phonometry import stoi
 
-# Material tipo habla: ruido limitado en banda con envolvente silábica de
+# Material tipo habla: ruido de banda limitada con envolvente silábica de
 # 3,5 Hz, en un enmascarador plano con SNR de 0 dB.
 fs = 10000
 rng = np.random.default_rng(11)
@@ -240,7 +241,7 @@ plt.show()
 | Magnitud intermedia | Correlación de envolventes por banda, con recorte | Correlación espectral normalizada por filas y por columnas |
 | Invariancia al nivel | Sí (normalización por segmento) | Sí (normalización por fila y por columna) |
 | Enmascaradores estacionarios | Bien validada | Bien validada |
-| Enmascaradores modulados, hablantes competidores | Infravalora el beneficio de los vistazos | Lo sigue |
+| Enmascaradores modulados, hablantes competidores | Infravalora el beneficio del habla vislumbrada | Lo sigue |
 | Coste | Menor | Algo mayor |
 
 Para ruido aditivo estacionario las dos medidas son intercambiables y STOI es la

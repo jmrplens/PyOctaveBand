@@ -64,7 +64,7 @@ Toda la Recomendación es una cadena de medición, y cada sección de abajo
 detalla uno de sus bloques. El diagrama la despliega primero, con los
 números de los ejemplos de esta página.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness_es.svg" alt="Diagrama de bloques de la cadena de sonoridad de programa de BS.1770 y EBU R 128: el programa ponderado por canal, anclado para que un seno de 997 hercios a plena escala en un canal frontal marque menos 3,01 LKFS, pasa la ponderación K de estante de más 4 decibelios y paso alto RLB, se mide en bloques de media cuadrática de 400 milisegundos con 75 por ciento de solape, se filtra con la puerta absoluta de menos 70 LUFS y la relativa 10 unidades de sonoridad bajo los supervivientes, menos 39,0 LUFS en el ejemplo de 10 segundos de programa más 30 segundos de silencio, y da una sonoridad integrada de menos 23,1 LUFS frente al objetivo de menos 23,0; sendas ramas muestran el rango de sonoridad de 10,0 unidades en el caso de dos escalones de Tech 3342 y el pico verdadero de más 0,12 dBTP donde el pico muestral marca menos 3,01 decibelios, bajo el techo de producción de menos 1 dBTP" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness_es.svg" alt="Diagrama de bloques de la cadena de sonoridad de programa de BS.1770 y EBU R 128: el programa ponderado por canal, anclado para que una senoide de 997 hercios a plena escala en un canal frontal marque menos 3,01 LKFS, pasa la ponderación K de realce de cabeza esférica de más 4 decibelios y paso alto RLB, se mide en bloques de media cuadrática de 400 milisegundos con 75 por ciento de solape, se filtra con la puerta absoluta de menos 70 LUFS y la relativa 10 unidades de sonoridad bajo los supervivientes, menos 39,0 LUFS en el ejemplo de 10 segundos de programa más 30 segundos de silencio, y da una sonoridad integrada de menos 23,1 LUFS frente al objetivo de menos 23,0; sendas ramas muestran el rango de sonoridad de 10,0 unidades en el caso de dos escalones de Tech 3342 y el pico verdadero de más 0,12 dBTP donde el pico muestral marca menos 3,01 decibelios, bajo el techo de producción de menos 1 dBTP" width="92%" />
 
 ## 1. La ponderación K y la medida de sonoridad (Anexo 1)
 
@@ -80,7 +80,7 @@ $$
 
 donde la constante cancela la ganancia de la ponderación K a 997 Hz y $G_i$
 pondera cada canal (1,0 los canales frontales, 1,41 los envolventes, LFE
-excluido, Tabla 3). La Recomendación ancla la escala: un seno de 997 Hz a
+excluido, Tabla 3). La Recomendación ancla la escala: una senoide de 997 Hz a
 0 dB FS en un canal frontal marca −3,01 LKFS. La unidad se escribe LKFS en
 la UIT y LUFS en la EBU; son idénticas, y 1 LU es 1 dB.
 
@@ -435,14 +435,14 @@ pesos = broadcast.channel_weight([0, 30, -30, 90, -90], [0, 0, 0, 0, 0])
 ```
 
 El audio basado en objetos (Anexo 4) se mide renderizando primero a una
-configuración de altavoces y midiendo el render; el renderizado en sí queda
+configuración de altavoces y midiendo el renderizado; el renderizado en sí queda
 fuera de este alcance.
 
 ## Informe de EBU R 128 (`.report()`)
 
 `ProgramLoudnessResult.report(path)` renderiza una ficha PDF de una página con
 el formato de una hoja de conformidad de entrega para radiodifusión: la línea
-de norma base, un bloque opcional de metadatos, una tabla de conformidad a todo
+de base normativa, un bloque opcional de metadatos, una tabla de conformidad a todo
 lo ancho (`Métrica | Medido | Objetivo / Límite | Resultado`) y, debajo, la
 gráfica de sonoridad frente al tiempo a todo lo ancho (el propio `.plot()` del
 resultado, con las trazas momentánea y de corto plazo, la línea de la integrada
@@ -504,7 +504,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## 7. Validación
 
-Cada señal sintetizable de "requisitos mínimos" de EBU Tech 3341 (casos 1-6
+Cada señal sintetizable de «requisitos mínimos» de EBU Tech 3341 (casos 1-6
 y 9-23) y de Tech 3342 (casos 1-4) se ejecuta en la batería de tests con su
 tolerancia oficial (±0,1 LU en sonoridad, +0,2/−0,4 dB en pico verdadero,
 ±1 LU en LRA), junto con el ancla de 997 Hz y la cota de infravaloración en

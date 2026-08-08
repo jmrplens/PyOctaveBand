@@ -161,8 +161,8 @@ plt.show()
 
 </details>
 
-**Cuando los dos ratios discrepan.** Cerca de los criterios los veredictos
-pueden diferir, porque cada ratio es frágil en una situación distinta. El TNR
+**Cuando las dos relaciones discrepan.** Cerca de los criterios los veredictos
+pueden diferir, porque cada una es frágil en una situación distinta. El TNR
 tiene que *separar* primero las líneas de la banda crítica en tonales y de
 ruido, así que se degrada cuando esa separación es ambigua: un tono montado
 sobre una pendiente abrupta de ruido, o componentes muy juntos cuyas faldas se
@@ -188,13 +188,13 @@ ECMA-74 (que delega la evaluación tonal en ECMA-418-1) también fija dónde med
 Los tonos secundarios próximos en la misma banda crítica se combinan según el
 apartado 11.6; para complejos armónicos evalúa cada componente (`tone_freq=`).
 Ambos métodos trabajan sobre espectros promediados RMS con ventana Hann y no
-necesitan calibración absoluta (los ratios son diferencias de nivel).
+necesitan calibración absoluta (ambas relaciones son diferencias de nivel).
 
 ### Parámetros de `tone_to_noise_ratio()` / `prominence_ratio()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `x` | array 1D | cualquiera (vale sin calibrar) | ≥ `fs/resolution_hz` muestras | Los ratios son diferencias de nivel: la calibración se cancela |
+| `x` | array 1D | cualquiera (vale sin calibrar) | ≥ `fs/resolution_hz` muestras | Las relaciones son diferencias de nivel: la calibración se cancela |
 | `fs` | int | Hz | > 0 | |
 | `tone_freq` | float, opcional | Hz | 89,1–11 200; por defecto `None` | `None` evalúa el pico más alto del rango de interés |
 | `resolution_hz` | float | Hz | > 0; por defecto `1.0` | La banda del tono debe quedar dentro del 15 % de la banda crítica (apartado 11.2) |
@@ -212,7 +212,7 @@ objetivo, su entrada y su salida.
 | Norma | ECMA-418-1:2024, apartados 11 y 12 | ISO/PAS 20065:2016, adoptada por el Anexo J de ISO 1996-2:2017 | ECMA-418-2:2025, apartado 6 | IEC 61400-11:2012, apartado 9.5 |
 | Pregunta que responde | ¿Es prominente este tono discreto en la emisión de un equipo? | ¿Es audible el tono por encima del ruido que lo enmascara, y en cuánto? | ¿Cuán tonal se percibe el sonido? | ¿Es audible el tono del aerogenerador en la posición de referencia, bin de viento a bin de viento? |
 | Entrada | Un espectro FFT, sin necesidad de calibración | Espectros de banda estrecha con la separación entre líneas declarada | La señal de presión calibrada, a través del modelo auditivo de Sottek | Espectros de banda estrecha por bin de velocidad de viento, con la distancia de referencia |
-| Salida | Un ratio en dB frente a un criterio dependiente de la frecuencia, más un veredicto prominente / no prominente | Una audibilidad en dB, cuyos valores decisivo y medio alimentan el ajuste tonal `Kt` | Una tonalidad en `tu_HMS`, una magnitud perceptiva sin criterio asociado | Una audibilidad en dB por bin, informada junto a la potencia acústica del aerogenerador |
+| Salida | Una relación en dB frente a un criterio dependiente de la frecuencia, más un veredicto prominente / no prominente | Una audibilidad en dB, cuyos valores decisivo y medio alimentan el ajuste tonal `Kt` | Una tonalidad en `tu_HMS`, una magnitud perceptiva sin criterio asociado | Una audibilidad en dB por bin, informada junto a la potencia acústica del aerogenerador |
 | Se usa para | Declarar la emisión de equipos TIC (Anexo D de ECMA-74) | Evaluación de ruido ambiental: justificar, o descartar, una penalización tonal | Calidad sonora: comparar diseños, no superar un límite | Ensayos de tipo y aceptación de aerogeneradores |
 
 La tabla se lee como una decisión: la métrica la elige el *objetivo del
@@ -266,7 +266,7 @@ están implementados aquí.
   cribado de emisión complementario.
 - [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/): la tonalidad
   psicoacústica T en tu_HMS de ECMA-418-2, la contraparte de modelo auditivo de
-  estos ratios FFT.
+  estas relaciones FFT.
 - [Audibilidad objetiva de tonos en ruido](/phonometry/es/perception/psychoacoustics/tone-audibility/): la
   audibilidad ΔL de ISO/PAS 20065 de la que se lee el ajuste tonal Kt de ISO 1996-2.
 - [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/): la audibilidad

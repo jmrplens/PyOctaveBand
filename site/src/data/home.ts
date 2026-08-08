@@ -388,7 +388,7 @@ export const es: HomeContent = {
 			{
 				name: 'Simulación de ondas',
 				href: '/phonometry/es/simulation/',
-				summary: 'Solvers FDTD 2D deterministas, acústicos y elásticos P-SV, validados frente a oráculos analíticos y no frente a una norma.',
+				summary: 'Solucionadores FDTD 2D deterministas, acústicos y elásticos P-SV, validados frente a oráculos analíticos y no frente a una norma.',
 				standards: ['sin norma que la rija'],
 			},
 		],

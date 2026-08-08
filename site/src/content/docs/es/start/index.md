@@ -6,7 +6,7 @@ description: "Por dónde empezar con phonometry: el primer análisis de principi
 phonometry calcula magnitudes acústicas a partir del texto de las normas que
 las definen — ISO, IEC, ANSI y ASTM, el anexo CNOSSOS-EU de la Directiva
 2002/49/CE y los documentos de aeronaves de OACI y ECAC — y cada métrica cita
-la cláusula que implementa. Qué te aporta eso, y cómo se comprueba, está en
+el apartado que implementa. Qué te aporta eso, y cómo se comprueba, está en
 [Por qué phonometry](/phonometry/es/start/why-phonometry/).
 
 Cinco páginas breves, pensadas para leerse una vez antes que nada. Cada una
@@ -52,13 +52,13 @@ bajo qué licencia.
 dB SPL, anclado por un tono de calibrador grabado o por una sensibilidad de
 micrófono conocida, o bien *digital*, en dBFS respecto al fondo de escala. Los
 dos no son intercambiables, y casi todas las guías dan por supuesto el primero:
-una función de nivel a la que se le pasan muestras crudas de la tarjeta de
+una función de nivel a la que se le pasan muestras en bruto de la tarjeta de
 sonido devuelve un número cuya referencia es arbitraria, y eso tiene exactamente
 el mismo aspecto que una respuesta válida. [Calibración y
 dBFS](/phonometry/es/signals/metrology/calibration/) lo resuelve.
 
 **Que casi todo lo que viene después consume bandas.** Por debajo de la señal
-cruda hay una única descomposición: bandas de octava fraccionaria cuyos bordes
+en bruto hay una única descomposición: bandas de fracción de octava cuyos bordes
 a −3 dB caen en las frecuencias nominales de ANSI S1.11 / IEC 61260-1. Un
 modelo de sonoridad, un parámetro de sala y una valoración ambiental parten
 todos de ahí, y por eso la página del filtrado por bandas es el único requisito
@@ -70,9 +70,9 @@ filtros](/phonometry/es/signals/filters/filter-banks/).
 Vale la pena saberlo antes de abrir ninguna, porque es lo que permite decidir en
 treinta segundos si una página responde a tu pregunta. Toda guía abre con la
 norma que implementa, las magnitudes que esa norma define y las hipótesis que
-asume la implementación; después viene el código ejecutable y la figura que
+supone la implementación; después viene el código ejecutable y la figura que
 dibuja; y cierra con un bloque «Qué cubre esta guía» que dice sin rodeos qué
-cláusulas, anexos y métodos están implementados y cuáles no. Esto último es la
+apartados, anexos y métodos están implementados y cuáles no. Esto último es la
 parte por la que pregunta quien revisa, y está escrita a propósito de la forma
 más franca.
 
@@ -80,7 +80,7 @@ más franca.
 
 - Una primera medición llevada de principio a fin: [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/).
 - El inventario completo, por temas: [Todas las guías](/phonometry/es/start/guides/).
-- Un símbolo que tienes pero no sabes nombrar: el [glosario](/phonometry/es/reference/glossary/), con su unidad, la cláusula que lo define y la guía que lo calcula.
+- Un símbolo que tienes pero no sabes nombrar: el [glosario](/phonometry/es/reference/glossary/), con su unidad, el apartado que lo define y la guía que lo calcula.
 - Pruebas de que un número es defendible: el [informe de conformidad](/phonometry/es/reference/conformance/), que imprime el valor esperado de cada norma junto al calculado.
 - Un valor esperado impreso que no concuerda con la biblioteca: el [registro de erratas](/phonometry/es/reference/errata/), que dice cuál de los dos está mal y por qué.
 

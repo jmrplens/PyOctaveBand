@@ -1,6 +1,6 @@
 ---
 title: "Transmisión por flancos en laboratorio (ISO 10848)"
-description: "La medición en laboratorio de la transmisión por flancos de ISO 10848: el índice de reducción de vibraciones Kij desde diferencias de nivel de velocidad promediadas por dirección y longitudes de absorción equivalentes, los descriptores globales Dn,f y Ln,f, las comprobaciones de validez por solape modal de la parte 4 y las fichas acreditadas."
+description: "La medición en laboratorio de la transmisión por flancos de ISO 10848: el índice de reducción vibratoria Kij desde diferencias de nivel de velocidad promediadas por dirección y longitudes de absorción equivalentes, los descriptores globales Dn,f y Ln,f, las comprobaciones de validez por solape modal de la parte 4 y las fichas acreditadas."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -8,14 +8,14 @@ references:
     title: "Sound insulation"
     publisher: "Butterworth-Heinemann"
     doi: "10.4324/9780080550473"
-    note: "La monografía de referencia de la transmisión por flancos y el índice de reducción de vibraciones, incluida la base de análisis estadístico de energía de las comprobaciones de validez. ISBN 978-0-7506-6526-1."
+    note: "La monografía de referencia de la transmisión por flancos y el índice de reducción vibratoria, incluida la base de análisis estadístico de energía de las comprobaciones de validez. ISBN 978-0-7506-6526-1."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2006
     title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 1: Frame document"
     designation: "ISO 10848-1:2006"
     url: "https://www.iso.org/standard/38284.html"
-    note: "El documento marco de la medición de la transmisión por flancos: definiciones, el índice de reducción de vibraciones Kij, la longitud de absorción equivalente y los descriptores de flanco normalizados D_n,f / L_n,f que alimentan la predicción EN 12354. Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se ancla en identidades de forma cerrada."
+    note: "El documento marco de la medición de la transmisión por flancos: definiciones, el índice de reducción vibratoria Kij, la longitud de absorción equivalente y los descriptores de flanco normalizados D_n,f / L_n,f que alimentan la predicción EN 12354. Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se ancla en identidades de forma cerrada."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2006
@@ -36,7 +36,7 @@ references:
     title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 4: Application to junctions with at least one heavy element"
     designation: "ISO 10848-4:2010"
     url: "https://www.iso.org/standard/45360.html"
-    note: "Aplicación a uniones con al menos un elemento pesado, con las comprobaciones de validez por densidad modal, número de modos por banda y solapamiento modal (bandas con M < 0,25 acotadas, Cláusula 9)."
+    note: "Aplicación a uniones con al menos un elemento pesado, con las comprobaciones de validez por densidad modal, número de modos por banda y solapamiento modal (bandas con M < 0,25 acotadas, Apartado 9)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 1985
@@ -63,14 +63,14 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-EN 12354 predice un edificio a partir de sus uniones, e ISO 10848 es la vía
+EN 12354 predice un edificio a partir de sus uniones, e ISO 10848 es la trayectoria
 por la que una unión consigue su número. Dos elementos unidos rígidamente a lo
 largo de un borde común se montan en un banco de laboratorio cuyos recintos
 están aislados estructuralmente entre sí y de la estructura circundante, de modo
-que la unión ensayada es el único camino entre ellos; excitadores y máquinas de
+que la unión ensayada es la única trayectoria entre ellos; excitadores y máquinas de
 impactos accionan uno de los elementos, y las diferencias
 de nivel de velocidad a través de la unión se condensan en el **índice de
-reducción de vibraciones** $K_{ij}$, junto con los descriptores globales de
+reducción vibratoria** $K_{ij}$, junto con los descriptores globales de
 flanco $D_{n,f}$ (aéreo) y $L_{n,f}$ (impacto). Esta guía cubre esa cadena
 de medición: la diferencia de niveles de velocidad promediada por dirección,
 las longitudes de absorción equivalentes, las comprobaciones de validez SEA
@@ -78,17 +78,19 @@ de la parte 4 y las tres fichas acreditadas. Los valores empíricos de unión
 a los que recurre una predicción cuando no hay medición viven en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/);
 el $K_{ij}$ de teoría ondulatoria de uniones ideales de placas se deriva en
-[Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/).
+[Transmisión de onda de flexión en uniones de
+placas](/phonometry/es/vibration/structural/junction-transmission/).
 
-## El índice de reducción de vibraciones y los descriptores de flanco
+## El índice de reducción vibratoria y los descriptores de flanco
 
 ISO 10848:2006/2010 es el método de laboratorio que **mide** el **índice de
-reducción de vibraciones** de unión $K_{ij}$ que la [predicción EN 12354](/phonometry/es/buildings/design/insulation-prediction/)
+reducción vibratoria** de unión $K_{ij}$ que la [predicción EN
+12354](/phonometry/es/buildings/design/insulation-prediction/)
 toma como entrada, junto con los descriptores globales de flanco $D_{n,f}$
 (aéreo) y $L_{n,f}$ (impacto). Es la contraparte de medición de la función
 empírica `junction_vibration_reduction()` de esa predicción.
 
-**Índice de reducción de vibraciones (Fórmula (13)).**
+**Índice de reducción vibratoria (Fórmula (13)).**
 $K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, a
 partir de la diferencia de nivel de velocidad promediada en dirección
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Fórmula (11), que hace
@@ -106,7 +108,7 @@ los motores de ISO 717. El número único $\overline{K}_{ij}$ es la media
 aritmética entre 200 y 1250 Hz en tercios de octava, o entre 125 y 1000 Hz en
 bandas de octava (Anexo A).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission_es.svg" alt="Índice de reducción de vibraciones de unión Kij ISO 10848 creciendo entre 100 Hz y 5000 Hz en tercios de octava para una unión rígida en T de dos paredes pesadas, con el Kij medio de un solo número entre 200 y 1250 Hz en línea discontinua" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission_es.svg" alt="Índice de reducción vibratoria de unión Kij ISO 10848 creciendo entre 100 Hz y 5000 Hz en tercios de octava para una unión rígida en T de dos paredes pesadas, con el Kij medio de un solo número entre 200 y 1250 Hz en línea discontinua" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -140,7 +142,7 @@ dónde el número de modos es demasiado bajo para que $K_{ij}$ sea fiable. Pasa 
 factor de solapamiento modal por banda a
 `vibration_reduction_index(..., modal_overlap=M)`: las bandas con $M < 0{,}25$ se
 marcan en `result.bracketed` y quedan excluidas del número único
-$\overline{K}_{ij}$, como exige la Cláusula 9 de la Parte 4.
+$\overline{K}_{ij}$, como exige el Apartado 9 de la Parte 4.
 Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se
 ancla en identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ a
 $f_\text{ref}$, $\eta$).
@@ -181,7 +183,7 @@ res_m.bracketed    # marcas por banda; las bandas acotadas salen del número ún
 
 *El descriptor global de flancos $D_{n,f}$ es una magnitud aérea, así que su
 número único $D_{n,f,w}$ sale del motor de ISO 717-1 sin cambios; entra
-directamente en el modelo EN 12354-1 como dato del camino de flancos de la
+directamente en el modelo EN 12354-1 como dato de la trayectoria por flancos de la
 unión ensayada (el homólogo de impactos $L_{n,f}$ se evalúa igual según
 ISO 717-2).*
 
@@ -194,7 +196,7 @@ import numpy as np
 from phonometry import building
 
 # Una unión ligera en el laboratorio: nivel del recinto emisor, nivel del
-# recinto receptor por el camino de flancos y el área de absorción receptora.
+# recinto receptor por la trayectoria por flancos y el área de absorción receptora.
 l1 = np.full(16, 80.0)
 dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
                        58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
@@ -344,7 +346,7 @@ print(weighted_rating(iso).rating)                          # Dn,c,w
 
 Cada uno de los tres resultados genera una ficha PDF de una página.
 `VibrationReductionResult.report()` escribe un informe de **caracterización de
-la unión** del índice de reducción de vibraciones $K_{ij}$ (ISO 10848-1:2006):
+la unión** del índice de reducción vibratoria $K_{ij}$ (ISO 10848-1:2006):
 la línea de base normativa, una cabecera de metadatos opcional, la tabla de
 $K_{ij}$ por banda junto a la curva $K_{ij}(f)$ y un recuadro con el número
 único (media de $K_{ij}$) sobre el intervalo de bandas del anexo A, con el
@@ -403,9 +405,9 @@ repositorio. Pulsa una vista previa para abrir el PDF:
 
 <ReportPreview
 	name="iso10848_kij_example"
-	title="Informe del índice de reducción de vibraciones de unión ISO 10848-1 (PDF)"
-	description="Informe de una página de caracterización de la unión del índice de reducción de vibraciones Kij: la cabecera de metadatos, la tabla de Kij por banda junto a la curva Kij(f) y el recuadro con el número único (media de Kij) sobre el intervalo del anexo A con el recuento de bandas promediadas y acotadas (las tres bandas más bajas acotadas por solapamiento modal insuficiente)."
-	caption="Ficha del índice de reducción de vibraciones (VibrationReductionResult.report), Kij medio."
+	title="Informe del índice de reducción vibratoria de unión ISO 10848-1 (PDF)"
+	description="Informe de una página de caracterización de la unión del índice de reducción vibratoria Kij: la cabecera de metadatos, la tabla de Kij por banda junto a la curva Kij(f) y el recuadro con el número único (media de Kij) sobre el intervalo del anexo A con el recuento de bandas promediadas y acotadas (las tres bandas más bajas acotadas por solapamiento modal insuficiente)."
+	caption="Ficha del índice de reducción vibratoria (VibrationReductionResult.report), Kij medio."
 />
 
 <ReportPreview
@@ -424,7 +426,7 @@ repositorio. Pulsa una vista previa para abrir el PDF:
 
 ## Qué cubre esta guía
 
-**Cubierto.** El índice de reducción de vibraciones $K_{ij}$ de
+**Cubierto.** El índice de reducción vibratoria $K_{ij}$ de
 ISO 10848-1:2006 (Fórmula (13)) desde la diferencia de niveles de velocidad
 promediada por dirección (Fórmula (11)) y las longitudes de absorción
 equivalentes (Fórmula (12)), con la forma simplificada para elementos
@@ -443,7 +445,7 @@ entre corchetes las bandas poco fiables
 fichas de una página con `.report()`.
 
 **No cubierto.** Las partes 2, 3 y 4 de ISO 10848 difieren en los tipos de
-unión y de probeta a los que se aplican; phonometry implementa solo las
+unión y de elemento de ensayo a los que se aplican; phonometry implementa solo las
 fórmulas genéricas de $K_{ij}$/$D_{n,f}$/$L_{n,f}$ de la parte 1, más la
 comprobación de solape modal de la parte 4, no los montajes de ensayo
 específicos de instalación que describen las otras partes. Como ISO 10848
@@ -476,13 +478,12 @@ conducto revestido es aquí un dato de entrada, no una predicción.
   los coeficientes de transmisión de teoría ondulatoria tras el $K_{ij}$ de
   una unión ideal.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
-  la instalación de ISO 10140 cuya transmisión directa esquivan estas vías
-  de flanco.
+  la instalación de ISO 10140 cuya transmisión directa esquivan estas trayectorias por flancos.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia tras $D_{n,f,w}$ y $L_{n,f,w}$.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): las fórmulas
   de flancos en la derivación de EN 12354.
-- [Acústica de recintos y espacios diáfanos](/phonometry/es/buildings/rooms/open-plan-acoustics/): el contexto de oficina
+- [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/): el contexto de oficina
   diáfana en el que suele aparecer el trayecto por el techo.
 - Referencia de la API: [`building.measurement.flanking_transmission`](/phonometry/es/reference/api/building/flanking-transmission/)
   y [`building.prediction.ceiling_plenum`](/phonometry/es/reference/api/building/ceiling-plenum/).

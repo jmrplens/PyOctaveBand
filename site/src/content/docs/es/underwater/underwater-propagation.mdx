@@ -1,6 +1,6 @@
 ---
 title: "Propagación submarina del sonido"
-description: "Propagación submarina de forma cerrada: ensanchamiento geométrico más absorción de volumen (Francois-Garrison, Ainslie-McColm, Thorp), los cuatro regímenes de aguas someras de Weston, la velocidad del sonido en agua de mar (UNESCO/Chen-Millero, Del Grosso, Mackenzie, Medwin), la ecuación del sonar con la inversión del alcance de detección, la pérdida por reflexión en el fondo (Rayleigh) y el espectro de ruido ambiental oceánico (viento/térmico de Wenz más tráfico marítimo JOMOPANS-ECHO)."
+description: "Propagación submarina de forma cerrada: divergencia geométrica más absorción de volumen (Francois-Garrison, Ainslie-McColm, Thorp), los cuatro regímenes de aguas someras de Weston, la velocidad del sonido en agua de mar (UNESCO/Chen-Millero, Del Grosso, Mackenzie, Medwin), la ecuación del sonar con la inversión del alcance de detección, la pérdida por reflexión en el fondo (Rayleigh) y el espectro de ruido ambiental oceánico (viento/térmico de Wenz más tráfico marítimo JOMOPANS-ECHO)."
 references:
   - type: article
     authors: ["Francois, R. E.", "Garrison, G. R."]
@@ -173,10 +173,10 @@ la **pérdida por transmisión**, la **velocidad del sonido** en agua de mar, la
 La pérdida por transmisión es
 
 $$
-TL = \text{ensanchamiento} + \alpha R .
+TL = \text{divergencia} + \alpha R .
 $$
 
-El ensanchamiento geométrico es $20 \log_{10} R$ (esférico), $10 \log_{10} R$ (cilíndrico)
+La divergencia geométrica es $20 \log_{10} R$ (esférico), $10 \log_{10} R$ (cilíndrico)
 o esférico hasta una distancia de transición $R_0$ y cilíndrico más allá
 de esta (`"practical"`). El coeficiente de absorción de volumen $\alpha$ (dB/km)
 procede de **Francois-Garrison** (`model="francois-garrison"`, 1982, el valor
@@ -184,7 +184,7 @@ por defecto y la referencia), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) o
 **Thorp** (`"thorp"`, 1967, solo frecuencia); los dos primeros coinciden en
 ~10 % entre 100 Hz y 1 MHz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_es.svg" alt="Pérdida por transmisión submarina frente a la distancia a 10 kHz, con las contribuciones de ensanchamiento geométrico y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_es.svg" alt="Pérdida por transmisión submarina frente a la distancia a 10 kHz, con las contribuciones de divergencia geométrica y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -194,13 +194,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import underwater
 
-# 10 kHz a 10 °C, 35 ppt y 100 m de profundidad; ensanchamiento "practical" con R0 = 1000 m.
+# 10 kHz a 10 °C, 35 ppt y 100 m de profundidad; divergencia "practical" con R0 = 1000 m.
 ranges = np.linspace(10.0, 20_000.0, 400)
 tl = underwater.transmission_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
 print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot(language="es")   # TL total con las contribuciones de ensanchamiento y absorción
+tl.plot(language="es")   # TL total con las contribuciones de divergencia y absorción
 plt.show()
 ```
 
@@ -224,7 +224,7 @@ for model in ("ainslie-mccolm", "thorp"):
                               salinity=35.0, depth=100.0, model=model)
     print(model, round(other.absorption_coefficient, 3))   # 0.973 / 1.15
 
-tl.plot()   # TL frente a distancia con la separación ensanchamiento/absorción
+tl.plot()   # TL frente a distancia con la separación divergencia/absorción
 ```
 
 ### Regímenes de aguas someras de Weston
@@ -283,9 +283,10 @@ print(underwater.reflection_loss_gradient("sand"))   # 0.278 Np/rad
 ```
 
 Al ser un resultado *incoherente*, el flujo describe el campo promediado en
-distancia, y eso es justo lo que lo convierte en referencia para los solvers
+distancia, y eso es justo lo que lo convierte en referencia para los solucionadores
 numéricos de
-[Solvers de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+[Solucionadores de propagación
+submarina](/phonometry/es/underwater/underwater-solvers/).
 Con el ángulo crítico a 90° y el gradiente de pérdida a cero, la rama cilíndrica
 se reduce a $F = \pi/(rH)$, el límite exacto de muchos modos de una guía ideal;
 la pérdida por modos normales promediada en profundidad y distancia cae sobre
@@ -438,15 +439,15 @@ entre por $DT$; la alternativa suma $10\log_{10} B$ a una señal de banda ancha
 El resultado del buque lleva los niveles de banda de decidécada junto a su
 densidad justo para esta conversión.
 
-La cifra de mérito se expresa más abajo como «dB re m²»: Ainslie la escribe como
+La figura de mérito se expresa más abajo como «dB re m²»: Ainslie la escribe como
 un *factor de propagación* máximo y no como una pérdida, y el factor de
 propagación tiene unidades de m², así que el mismo número que se lee como
-pérdida por transmisión máxima admisible en decibelios se lee como cifra de
+pérdida por transmisión máxima admisible en decibelios se lee como figura de
 mérito re 1 m².
 
 ### Alcance de detección
 
-Como la cifra de mérito *es* la pérdida por transmisión máxima admisible,
+Como la figura de mérito *es* la pérdida por transmisión máxima admisible,
 invertir una ley de pérdida en $TL = FOM$ da el **alcance de detección**, la
 distancia a la que la probabilidad de detección es del 50 %. `detection_range`
 invierte la pérdida en forma cerrada anterior, que crece monótonamente con la
@@ -544,7 +545,7 @@ sr.plot()   # |R| frente al ángulo rasante (necesita matplotlib)
 ## Ruido ambiental oceánico
 
 El nivel espectral de ruido ambiental es la suma energética de las componentes
-físicas de Wenz: el ruido de **viento / superficie** por la "regla de los cincos"
+físicas de Wenz: el ruido de **viento / superficie** por la «regla de los cincos»
 (el ancla histórica de 25 dB a 1 kHz con 5 nudos es re 20 µPa, es decir ~51 dB
 re 1 µPa; válida en ~500 Hz–5 kHz) y el ruido **térmico de
 Mellen** (dominante por encima de ~50 kHz). El rango amplio del ejemplo mantiene
@@ -641,31 +642,32 @@ print(round(float(np.interp(100.0, ship.frequency, noise.spectrum_level)), 1))
 # recibido, y el error es la pérdida por transmisión entera.
 ```
 
-Ni siquiera eso es más que una estimación de un solo buque. El ruido de tráfico
-marítimo medido en un emplazamiento es la suma sobre todo el campo de tráfico,
-así que un término realista integra muchos buques sobre sus distancias y clases,
-que es la razón por la que `ocean_ambient_noise` deja el espectro de tráfico a
-quien llama en vez de construir uno por dentro. Una sola comprobación de
-sensatez se lleva casi todo el valor: un espectro ambiental compuesto por encima
-de unos 120 dB re 1 µPa²/Hz es un error de unidades o de geometría, no un mar
-ruidoso.
+Ni siquiera eso es más que una estimación de un solo buque. El ruido de
+tráfico marítimo medido en un emplazamiento es la suma sobre todo el campo de
+tráfico, así que un término realista integra muchos buques sobre sus
+distancias y clases, que es la razón por la que `ocean_ambient_noise` deja el
+espectro de tráfico a quien llama en vez de construir uno por dentro. Una sola
+comprobación de plausibilidad se lleva casi todo el valor: un espectro
+ambiental compuesto por encima de unos 120 dB re 1 µPa²/Hz es un error de
+unidades o de geometría, no un mar ruidoso.
 
 Todas las formas cerradas anteriores dejan de bastar cuando la refracción y
 los contornos deciden la respuesta: un mínimo de velocidad del sonido que
 atrapa energía, reflexiones en la superficie y el fondo en aguas someras, o
 una distancia de detección que oscila con la elección de la ley de
-ensanchamiento. En ese punto el campo hay que calcularlo, y los solvers de
+divergencia. En ese punto el campo hay que calcularlo, y los solucionadores de
 modos normales, trazado de rayos y ecuación parabólica del módulo, junto
 con la guía para elegir entre ellos y estas formas cerradas, tienen su
 propia guía:
-[Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+[Solucionadores numéricos de propagación
+submarina](/phonometry/es/underwater/underwater-solvers/).
 
 ## Qué cubre esta guía
 
 **Cubierto.** La terminología de la ISO 18405:2017 (pérdida por propagación,
 nivel de fuente, niveles re 1 µPa) sustenta cada magnitud de esta página.
-`transmission_loss` y `seawater_absorption` implementan el ensanchamiento
-geométrico más los modelos de absorción de Francois-Garrison (1982, por
+`transmission_loss` y `seawater_absorption` implementan la divergencia
+geométrica más los modelos de absorción de Francois-Garrison (1982, por
 defecto), Ainslie-McColm (1998) y Thorp (1967). `sea_water_sound_speed` y
 `sound_speed_profile` implementan las ecuaciones de velocidad del sonido
 UNESCO/Chen-Millero (forma ITS-90 de Wong y Zhu de 1995, por defecto), Del
@@ -676,10 +678,10 @@ de Weston y sus distancias de transición (Ainslie sección 9.1.1.2, Tabla 9.1).
 `passive_sonar_equation` y `active_sonar_equation` implementan las ecuaciones
 del sonar pasivo y activo monostático (Urick, vía Etter 2003), y
 `detection_range` / `detection_range_from_curve` invierten una pérdida por
-transmisión en la cifra de mérito. `seabed_reflection` y
+transmisión en la figura de mérito. `seabed_reflection` y
 `bottom_reflection_loss` implementan el coeficiente de reflexión de Rayleigh
 fluido-fluido y el ángulo crítico (Medwin & Clay). `ocean_ambient_noise` suma
-el ruido de viento de Wenz por la "regla de los cincos" y el ruido térmico de
+el ruido de viento de Wenz por la «regla de los cincos» y el ruido térmico de
 Mellen. `ship_source_spectrum` implementa los modelos de nivel de fuente
 JOMOPANS-ECHO (por defecto), RANDI 3.1 y Wales & Heitmeyer (2002).
 
@@ -689,14 +691,15 @@ de alcance. `active_sonar_equation` es solo monostática: no hay geometría
 biestática. `ocean_ambient_noise` deja fuera la banda de turbulencia de baja
 frecuencia y cualquier modelo integrado de tráfico marítimo lejano; hay que
 aportar un espectro de tráfico propio, por ejemplo con
-`ship_source_spectrum` de arriba. Los solvers numéricos del campo
+`ship_source_spectrum` de arriba. Los solucionadores numéricos del campo
 (`normal_modes`, `ray_trace`, `parabolic_equation`) se cubren en
-[Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
+[Solucionadores numéricos de propagación
+submarina](/phonometry/es/underwater/underwater-solvers/).
 
 ## Véase también
 
-- [Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los solvers de modos normales, trazado de rayos y ecuación parabólica para
+- [Solucionadores numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
+  los solucionadores de modos normales, trazado de rayos y ecuación parabólica para
   los casos en que estas formas cerradas no bastan, y la guía de selección
   de modelo.
 - Referencia de la API: [`underwater.propagation.closed_form`](/phonometry/es/reference/api/underwater/closed-form/) y [`underwater.propagation.sound_speed`](/phonometry/es/reference/api/underwater/sound-speed/).

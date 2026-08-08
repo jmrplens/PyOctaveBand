@@ -113,7 +113,7 @@ plt.show()
 
 El resultado siempre lleva la función coeficiente junto a la normalización
 solicitada, porque el coeficiente es lo que necesitan las fórmulas de error.
-Para datos gaussianos limitados en banda de ancho $B$ observados durante
+Para datos gaussianos de banda limitada, de ancho $B$, observados durante
 $T$ segundos (ecuaciones 8.109/8.112, válidas para $T \ge 10\,|\tau|$ y
 $BT \ge 5$):
 
@@ -131,8 +131,8 @@ $B = 100\ \text{Hz}$ y $T = 5\ \text{s}$ reproduce el
 $\varepsilon \approx 0{,}35$ del ejemplo 8.5 del libro, uno de los anclajes
 fijados de conformidad. Dos formas cerradas anclan el propio estimador en
 los tests: la autocorrelación de un seno, $(A^2/2)\cos(2\pi f_0\tau)$, y la
-autocorrelación $\sin(2\pi B\tau)/(2\pi B\tau)$ del ruido blanco limitado
-en banda (ecuación 8.120).
+autocorrelación $\sin(2\pi B\tau)/(2\pi B\tau)$ del ruido blanco de
+banda limitada (ecuación 8.120).
 
 ## 2. Estimación del retardo
 
@@ -210,7 +210,7 @@ plt.show()
 
 Los métodos de pico de correlación refinan el pico muestral con
 interpolación parabólica de tres puntos, opcionalmente tras un
-**sobremuestreo local limitado en banda** (`upsample=16` remuestrea una
+**sobremuestreo local de banda limitada** (`upsample=16` remuestrea una
 ventana alrededor del pico dieciséis veces antes de la parábola). La
 precisión submuestral presupone que el pico está sobremuestreado, es decir,
 que las señales están limitadas en banda por debajo de Nyquist; en un par
@@ -250,7 +250,7 @@ La correlación cruzada de una respuesta al impulso con un impulso unidad
 ideal es la propia RI, así que la localización submuestral del pico de su
 magnitud es su tiempo de llegada. `impulse_response_delay` aplica
 exactamente el mismo refinamiento que el pico de la TDE (sobremuestreo
-local limitado en banda, ×8 por defecto, más la parábola), y con una RI de
+local de banda limitada, ×8 por defecto, más la parábola), y con una RI de
 `reference` mide el retardo entre el par a partir de su correlación cruzada
 sobre el registro completo (los transitorios de un solo disparo no son
 registros estacionarios, así que se usa el correlador directo en lugar de
@@ -311,12 +311,12 @@ plt.show()
 </details>
 
 `align_impulse_responses` elimina el retardo estimado con un desplazamiento
-fraccionario exacto limitado en banda (una rampa de fase en el dominio de la
+fraccionario exacto de banda limitada (una rampa de fase en el dominio de la
 frecuencia sobre un registro con relleno de ceros, así que nada se enrolla):
 la herramienta para promediar conjuntos de RI o comparar mediciones tomadas
 a distancias ligeramente distintas. Los tests sintéticos de retardo
 fraccionario documentan la precisión alcanzable sobre un pulso suave
-limitado en banda: en torno a 1e-2 muestras con la parábola sola, 1e-3 con
+de banda limitada: en torno a 1e-2 muestras con la parábola sola, 1e-3 con
 el `upsample=8` por defecto y por debajo de 1e-5 a ×32.
 
 ## 4. Envolvente de Hilbert y frecuencia instantánea
@@ -390,7 +390,7 @@ plt.show()
 
 </details>
 
-La envolvente de una señal limitada en banda es a su vez de baja frecuencia,
+La envolvente de una señal de banda limitada es a su vez de baja frecuencia,
 así que el resultado ofrece **decimación** opcional: un filtro antialias FIR
 de fase cero por defecto, o submuestreo simple con `antialias=False`,
 exactamente el convenio que la cadena de sonoridad/aspereza ECMA-418-2 de

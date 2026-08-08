@@ -97,7 +97,7 @@ $$
 
 La Tabla [2.2.a] fija cinco categorías modelizadas: **1** vehículos ligeros,
 **2** vehículos pesados medios, **3** vehículos pesados, **4a** ciclomotores y
-**4b** motocicletas. (Existe una sexta categoría "abierta" en el texto, pero no
+**4b** motocicletas. (Existe una sexta categoría «abierta» en el texto, pero no
 tiene coeficientes.)
 
 <ThemeImage
@@ -286,8 +286,8 @@ también se anulan los dos términos de velocidad, las potencias acústicas
 ## 6. Entregar la fuente a un modelo de propagación
 
 La etapa de emisión produce una potencia por metro. Trocear esa línea en fuentes
-puntuales equivalentes queda, en palabras del apartado 2.5.3, "fuera del alcance
-de la presente metodología": una fuente puntual que representa un tramo de
+puntuales equivalentes queda, en palabras del apartado 2.5.3, «fuera del alcance
+de la presente metodología»: una fuente puntual que representa un tramo de
 longitud $dL$ lleva simplemente $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, que
 es aritmética y se ofrece como tal.
 
@@ -342,7 +342,7 @@ propagación en el apartado 2.5 del Anexo II, y no es la ISO 9613-2: difieren en
 el modelo de suelo, en el tratamiento de la difracción y en la forma de combinar
 las condiciones favorables y las homogéneas. Encadenar una emisión CNOSSOS con
 la propagación ISO 9613-2 de esta biblioteca es una estimación de ingeniería
-legítima, pero no es la cadena normativa CNOSSOS y no debe informarse como tal.
+legítima, pero no es la cadena normativa CNOSSOS y no debe declararse como tal.
 
 Para el total ponderado A, usa la ponderación por bandas de octava que la propia
 Directiva imprime en el 2.5.5 modificado, en lugar de recalcularla:
@@ -389,7 +389,7 @@ se use: pedir una categoría que no lleva lanza `ValueError` en lugar de fallar
 más adelante.
 
 Ese mecanismo es además lo que ancla la implementación: la Comisión Europea
-publicó un juego de prueba de 4.875 casos de emisión viaria calculados con los
+publicó un juego de prueba de 4 875 casos de emisión viaria calculados con los
 coeficientes de 2015, y alimentar las ecuaciones implementadas con esa base
 superada (no con las tablas de 2021 que la biblioteca trae por defecto)
 reproduce todos los niveles publicados por banda con 0,005 dB, dentro de los dos

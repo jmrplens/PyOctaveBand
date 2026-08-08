@@ -23,8 +23,10 @@ solo es una prueba cuando se asienta sobre una línea con nombre. Esta página
 cubre la cinemática de M. P. Norton y D. G. Karczub, *Fundamentals of Noise and
 Vibration Analysis for Engineers* (2.ª ed., Cambridge University Press, 2003),
 sección 8.4, y cómo se combina con la cadena de señal que la biblioteca ya
-ofrece: el [espectro de envolvente y el cepstrum](/phonometry/es/signals/spectra/cepstrum-echoes/)
-y el [promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
+ofrece: el [espectro de envolvente y el
+cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/)
+y el [promediado síncrono en el
+tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
 
 La vista de trabajo es la unión de ambas cosas: el espectro de envolvente de un
 registro de vibración filtrado en banda con las líneas previstas dibujadas
@@ -102,8 +104,8 @@ golpea una pista — dos veces por vuelta del elemento, una contra cada pista. L
 evidencia de un elemento rodante dañado se espera, por tanto, en la `BDF`
 (183,3 Hz para el rodamiento de arriba), normalmente modulada a la frecuencia
 de la jaula `FTF`, mientras que la línea que la figura dibuja en 91,7 Hz es la
-frecuencia de rotación del elemento rodante, la `BSF`. Dos identidades
-conviene recordarlas porque son
+frecuencia de rotación del elemento rodante, la `BSF`. Conviene recordar dos
+identidades, porque son
 exactas y detectan al instante los errores de introducción de datos:
 $\text{BPFO} + \text{BPFI} = Z f_s$ siempre, y
 $\text{BPFO} = Z \times \text{FTF}$ siempre que la pista exterior esté
@@ -248,7 +250,7 @@ función para cada uno:
    impactos es una modulación de amplitud de esa resonancia, así que se
    convierte en una *línea* del espectro de envolvente, a la frecuencia de fallo
    y a sus armónicos. Véase la
-   [guía del cepstrum y el espectro de envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/).
+   [guía del cepstro y el espectro de envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/).
 3. **Nombrar las líneas.** Se superpone la previsión cinemática.
    `.plot(spectrum=…)` acepta cualquier resultado de `envelope_spectrum` (o
    cualquier objeto que exponga `frequencies` y `amplitude`) y dibuja encima las
@@ -256,11 +258,12 @@ función para cada uno:
    se lean como prueba de un fallo de rodamiento.
 
 Hay otras dos herramientas que ayudan cuando el registro está cargado. El
-[promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
+[promediado síncrono en el
+tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
 elimina todo lo que no esté enganchado a un eje, lo que separa los dos ejes de
 una caja de engranajes antes de leer las bandas laterales; y el
-[cepstrum](/phonometry/es/signals/spectra/cepstrum-echoes/) colapsa toda una familia de
-armónicos o de bandas laterales en una única espiga de cuefrencia, que es la
+[cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/) colapsa toda una familia de
+armónicos o de bandas laterales en una única espiga de quefrencia, que es la
 forma más rápida de saber *qué* periodicidad domina cuando hay varias
 superpuestas.
 
@@ -311,7 +314,7 @@ laterales de una barra rota y no la multiplica por el número de polos.
 
 ## Véase también
 
-- [Cepstrum, ecos y espectro de envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
   el espectro de envolvente sobre el que se dibujan estas líneas y el colapso
   cepstral de una familia de armónicos.
 - [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):

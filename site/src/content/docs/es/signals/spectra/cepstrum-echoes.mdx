@@ -8,7 +8,7 @@ references:
     title: "Handbook of signal processing in acoustics"
     publisher: "Springer"
     doi: "10.1007/978-0-387-30441-0"
-    note: "Capítulo 27 (Milner: la transformada cepstral como DFT inversa del espectro logarítmico de potencia, la quefrencia, liftering paso bajo/paso alto), capítulo 87 (Neelamani: el cepstro complejo, deconvolución homomórfica, trenes de picos periódicos por reverberación) y capítulo 75 (Tohyama: manipulación fase mínima/pasa-todo en el dominio cepstral). ISBN 978-0-387-77698-9."
+    note: "Capítulo 27 (Milner: la transformada cepstral como DFT inversa del espectro logarítmico de potencia, la quefrencia, liftering paso bajo/paso alto), capítulo 87 (Neelamani: el cepstro complejo, deconvolución homomórfica, trenes de picos periódicos por reverberación) y capítulo 75 (Tohyama: manipulación fase mínima/paso todo en el dominio cepstral). ISBN 978-0-387-77698-9."
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
@@ -21,13 +21,14 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Los [estimadores espectrales](/phonometry/es/signals/spectra/spectral-analysis/) describen
+Los [estimadores
+espectrales](/phonometry/es/signals/spectra/spectral-analysis/) describen
 *qué frecuencias* contiene una señal; esta página cubre lo que se esconde en
 la *forma* de ese espectro. El **cepstro** - la transformada de Fourier
 inversa del espectro logarítmico - vive en `phonometry.signals` y convierte
 dos problemas espectrales difíciles en simple localización de picos: el
 rizado espectral periódico (un eco, una familia de armónicos) colapsa en un
-único pico en la **quefrencia** de su período, y la envolvente espectral
+único pico en la **quefrencia** de su periodo, y la envolvente espectral
 suave se separa de la estructura fina mediante un simple enventanado -
 **liftering** - en el dominio de la quefrencia. La misma maquinaria extiende
 la [envolvente de Hilbert](/phonometry/es/signals/spectra/correlation-delay/) con un
@@ -50,7 +51,7 @@ se separan - en el dominio cepstral (Havelock cap. 27, Ecs. (22)-(23)).
 - `'power'` (por defecto): la DFT inversa de $\ln|X|^2$ (Fig. 21 de Milner).
   Real, par y ciega a la fase - el caballo de batalla para detectar ecos y
   familias de armónicos. Es el cepstro *con signo* del espectro logarítmico
-  de potencia según Milner; el "cepstro de potencia" original de Bogert
+  de potencia según Milner; el «cepstro de potencia» original de Bogert
   (1963) eleva al cuadrado una vez más y es no negativo - la biblioteca
   sigue a Milner en todo, así que los rahmónicos negativos conservan su
   signo;
@@ -129,7 +130,7 @@ exactamente igual que el relleno `oversample` de
 ## 2. Detección de ecos: el tren de picos rahmónicos
 
 Una reflexión única $x(t) = s(t) + a\,s(t-t_0)$ multiplica el espectro por
-$1 + a e^{-j 2\pi f t_0}$ - un rizado de período $1/t_0$ en toda la banda.
+$1 + a e^{-j 2\pi f t_0}$ - un rizado de periodo $1/t_0$ en toda la banda.
 Su logaritmo se expande, para $|a| < 1$, en la serie exactamente sumable
 
 $$
@@ -297,7 +298,7 @@ Para la señal de eco puro el rizado del paso alto oscila entre las formas
 cerradas $20\log_{10}(1+a)$ y $20\log_{10}(1-a)$ dB, otro oráculo que fijan los
 tests. En análisis de voz la misma operación separa la envolvente del tracto
 vocal (formantes) de los armónicos de la excitación; aquí es la herramienta
-general para separar "lo suave de lo periódico" en cualquier respuesta en
+general para separar «lo suave de lo periódico» en cualquier respuesta en
 magnitud medida.
 
 ## 4. El cepstro complejo y la conexión con la fase mínima

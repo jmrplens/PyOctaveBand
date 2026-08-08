@@ -33,20 +33,23 @@ La *presión* sonora depende de dónde te sitúes y de la sala en la que estés;
 la **potencia** acústica no. El nivel de potencia acústica $L_W$ es la energía
 acústica total por segundo que radia una fuente, referida a $P_0 = 1\ \text{pW}$, y es
 el descriptor de **emisión** independiente del dispositivo que figura en una
-ficha técnica, alimenta una predicción de sala (EN 12354) o se contrasta con
+hoja de datos, alimenta una predicción de sala (EN 12354) o se contrasta con
 un límite de emisión de ruido. phonometry implementa cinco vías normalizadas
 para obtenerlo, repartidas en tres guías de método: una superficie
 envolvente de *presión* en campo (ISO 3744/3746) y el grado de precisión en
 *cámara anecoica* (ISO 3745), cubiertas en
-[Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/);
+[Potencia acústica por métodos de
+presión](/phonometry/es/devices/emission/sound-power-pressure/);
 el campo difuso de una *cámara reverberante* (ISO 3741), cubierto en
-[Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/);
+[Potencia acústica en cámara
+reverberante](/phonometry/es/devices/emission/sound-power-reverberation/);
 y el *barrido* de intensidad sobre una superficie (ISO 9614-2), con su
 homólogo de precisión (ISO 9614-3), cubierto en
-[Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
+[Potencia acústica por barrido de
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
 Esta página es la puerta de entrada: cómo elegir entre ellas, qué prometen
 realmente los grados de precisión y cómo un $L_W$ medido se convierte en la
-declaración de emisión sonora ISO 4871 que imprime una ficha técnica.
+declaración de emisión sonora ISO 4871 que imprime una hoja de datos.
 
 <Video
   name="anim_power_two_rooms"
@@ -122,7 +125,7 @@ La tabla se condensa en una breve secuencia de preguntas (ISO 3740 dedica su
 Tabla 3 y su Anexo D exactamente a esta decisión). Recórrelas en orden; la
 primera coincidencia nombra la norma.
 
-1. **¿Para qué es el número?** Una declaración de ficha técnica o una
+1. **¿Para qué es el número?** Una declaración de hoja de datos o una
    comprobación frente a un límite piden normalmente grado de ingeniería
    (grado 2, el grado preferido para las declaraciones de ruido); una fuente
    de referencia, una clasificación de productos o un litigio piden precisión
@@ -186,11 +189,11 @@ verifica un valor declarado. La magnitud preferida es el nivel de potencia
 acústica ponderado A $L_{WA}$, acompañado opcionalmente del nivel de presión
 acústica de emisión ponderado A $L_{pA}$ en un puesto de trabajo.
 
-Una declaración adopta una de dos formas alternativas (cláusula 4):
+Una declaración adopta una de dos formas alternativas (apartado 4):
 
-- la forma de **doble número** (cláusula 3.16): el valor medido $L_{WA}$ y su
+- la forma de **doble número** (apartado 3.16): el valor medido $L_{WA}$ y su
   incertidumbre $K_{WA}$ indicados juntos pero por separado; y
-- la forma de **número único** (cláusula 3.15): el valor declarado derivado
+- la forma de **número único** (apartado 3.15): el valor declarado derivado
   $L_{WAd} = L_{WA} + K_{WA}$, un límite superior que es improbable que las mediciones
   repetidas superen al nivel de confianza indicado.
 
@@ -216,7 +219,7 @@ declaration = result.declare(
     machine="Type 990, Model 11-TC",
     operating_conditions="50 Hz, 230 V, carga nominal",
     basic_standards="ISO 3744",
-    verification_level=result.sound_power_level_a,  # L_1 para la cláusula 6.2
+    verification_level=result.sound_power_level_a,  # L_1 para el apartado 6.2
 )
 declaration.report(
     "iso4871.pdf",
@@ -247,13 +250,13 @@ ph.NoiseEmissionDeclaration(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
-el repositorio; pulse la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso4871_declaration_example"
 	title="Informe de ejemplo de declaración de emisión sonora ISO 4871 (PDF)"
-	description="Ficha de declaración de emisión sonora ISO 4871 de una página: una cabecera con la identificación de la máquina y las condiciones de funcionamiento, la tabla declarada de doble número en dos columnas de modo de funcionamiento con el nivel de potencia acústica ponderado A medido L_WA, su incertidumbre K_WA, el nivel de presión acústica de emisión L_pA y el valor declarado derivado L_WAd = L_WA + K_WA (90 y 97 dB), la nota del código de ensayo de ruido y las normas básicas, y una tabla de verificación de la cláusula 6.2 donde el modo 1 cumple y el modo 2 no cumple."
-	caption="Ficha de declaración de emisión sonora (NoiseEmissionDeclaration.report), la tabla de doble número del anexo B de ISO 4871 con el valor declarado L_WAd = L_WA + K_WA y el veredicto de verificación de la cláusula 6.2."
+	description="Ficha de declaración de emisión sonora ISO 4871 de una página: una cabecera con la identificación de la máquina y las condiciones de funcionamiento, la tabla declarada de doble número en dos columnas de modo de funcionamiento con el nivel de potencia acústica ponderado A medido L_WA, su incertidumbre K_WA, el nivel de presión acústica de emisión L_pA y el valor declarado derivado L_WAd = L_WA + K_WA (90 y 97 dB), la nota del código de ensayo de ruido y las normas básicas, y una tabla de verificación del apartado 6.2 donde el modo 1 cumple y el modo 2 no cumple."
+	caption="Ficha de declaración de emisión sonora (NoiseEmissionDeclaration.report), la tabla de doble número del anexo B de ISO 4871 con el valor declarado L_WAd = L_WA + K_WA y el veredicto de verificación del apartado 6.2."
 />
 
 
@@ -289,7 +292,7 @@ $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
   el método de precisión en campo difuso con las correcciones de Waterhouse
   y meteorológicas.
 - [Potencia acústica por barrido de intensidad (ISO 9614-2 / ISO 9614-3)](/phonometry/es/devices/emission/sound-power-intensity/):
-  las vías que toleran el ruido de fondo estacionario, calificadas por sus
+  las vías que toleran el ruido de fondo estacionario, cualificadas por sus
   indicadores de campo.
 - [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): la sonda de
   dos micrófonos detrás de los métodos de barrido.
@@ -313,7 +316,7 @@ $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
 La presión acústica depende de dónde te sitúes y de la sala; la potencia
 acústica no. El nivel de potencia acústica $L_W$ es la energía acústica total
 por segundo que radia una fuente, referida a $P_0 = 1\ \text{pW}$, y es el descriptor
-de emisión independiente del dispositivo que figura en una ficha técnica o
+de emisión independiente del dispositivo que figura en una hoja de datos o
 se contrasta con un límite de emisión de ruido; lo determinan ISO 3744,
 ISO 3741, ISO 9614-2, ISO 3745 e ISO 9614-3.
 

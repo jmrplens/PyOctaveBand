@@ -37,8 +37,8 @@ sus vecinas y cómo trata los transitorios, no dónde se sitúa la banda. Los do
 diseños de rizado constante son la excepción, y el apartado 3 da su tamaño:
 `cheby1` y `ellip` toman los bordes de banda como su borde de rizado, así que
 sus bandas son efectivamente más anchas y todos sus niveles por banda salen unas
-décimas de decibelio altos. Esta página pone las arquitecturas frente a frente: la
-comparación en el cruce a −3 dB, la galería completa de respuestas en
+décimas de decibelio por encima. Esta página pone las arquitecturas frente a
+frente: la comparación en el cruce a −3 dB, la galería completa de respuestas en
 octava y tercio de octava, ejemplos de uso por arquitectura y el crossover
 Linkwitz-Riley para cuando el objetivo es dividir una señal en lugar de
 medir bandas.
@@ -329,8 +329,8 @@ es incorrecta para la mitad de los órdenes pares:
 
 Con los órdenes 2 y 6 las ramas quedan en antifase en $f_c$ y `low + high` se
 hunde ahí en una muesca profunda en vez de sumar plano. Incluso en los casos
-planos la suma es **paso todo**, no libre de fase: su magnitud es plana con
-mejor de 0,001 dB de 20 Hz a 20 kHz mientras su fase gira 360° completos a
+planos la suma es **paso todo**, no libre de fase: su magnitud es plana dentro
+de 0,001 dB de 20 Hz a 20 kHz mientras su fase gira 360° completos a
 través del cruce.
 
 ```python
@@ -348,7 +348,7 @@ low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
 recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso-bajo, paso-alto y su suma plana" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso bajo, paso alto y su suma plana" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -369,8 +369,8 @@ w, h_lp = freqz(low, worN=8192, fs=fs)
 _, h_hp = freqz(high, worN=8192, fs=fs)
 
 fig, ax = plt.subplots(figsize=(9, 5))
-ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), label="Paso-bajo (LR4)")
-ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), label="Paso-alto (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), label="Paso bajo (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), label="Paso alto (LR4)")
 ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), "--",
             label="Suma (plana)")
 ax.set(xlim=(20, 20000), ylim=(-60, 5),
@@ -384,9 +384,9 @@ plt.show()
 
 **En un crossover real** las dos ramas suman acústicamente, no eléctricamente, y
 la planitud de arriba solo sobrevive si los dos caminos acústicos están
-alineados en el tiempo. Un desfase de unos pocos centímetros entre los centros
-acústicos del woofer y el tweeter basta como rotación de fase a 1 kHz para
-hundir la suma en una muesca, y el remedio es un retardo en el altavoz
+alineados en el tiempo. Bastan unos pocos centímetros de desalineamiento entre
+los centros acústicos del woofer y el tweeter para que la rotación de fase a
+1 kHz hunda la suma en una muesca, y el remedio es un retardo en el altavoz
 adelantado, no otro orden de filtro. Se comprueba midiendo la respuesta sumada
 en eje con el método de barrido senoidal de
 [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/).

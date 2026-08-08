@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 2: Measurement of airborne sound insulation"
     designation: "ISO 10140-2:2010"
     url: "https://www.iso.org/standard/42088.html"
-    note: "El índice de reducción acústica R de laboratorio con la corrección de ruido de fondo (Cláusula 4.3)."
+    note: "El índice de reducción acústica R de laboratorio con la corrección de ruido de fondo (Apartado 4.3)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -91,8 +91,8 @@ ensayo montado en una abertura de ensayo de unos 10 m² entre ambas.
 | Índice global | $R'_w$, $D_{nT,w}$, $L'_{n,w}$, $L'_{nT,w}$ | $R_w$, $L_{n,w}$ |
 | Área de absorción | medida en la sala | propiedad de la instalación |
 
-El apóstrofo es el marcador de flancos de la acústica de edificios, y viaja
-con la magnitud hasta su índice global: $R_w$ califica un espectro de
+La prima es el marcador de flancos de la acústica de edificios, y viaja
+con la magnitud hasta su índice global: $R_w$ valora un espectro de
 laboratorio, $R'_w$ uno de campo. Las diferencias de nivel estandarizada y
 normalizada $D_{nT}$ y $D_n$ no llevan prima porque describen la pareja de
 salas y no un elemento, así que no hay contraparte sin flancos que marcar. En
@@ -106,7 +106,7 @@ Los índices de un solo número reutilizan los mismísimos motores de ISO 717-1/
 (`weighted_rating`, `weighted_impact_rating`): un espectro $R$ se valora a $R_w$
 exactamente igual que un espectro $R'$ se valoraba a $R'_w$. Antes de formar el
 índice, los niveles del recinto receptor deben **corregirse por ruido de fondo**
-(Cláusula 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
+(Apartado 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
 se aplica para un margen señal-fondo de 6–15 dB, una corrección fija de 1,3 dB
 (el *límite de medición*) en 6 dB o por debajo, y ninguna corrección en 15 dB o
 por encima.
@@ -225,7 +225,7 @@ impactos normalizado $L_n$ (ISO 10140-3:2010). Cada ficha nombra la norma de
 laboratorio en su línea de base, evalúa el índice global de ISO 717-1 /
 ISO 717-2 (16 bandas de tercio de octava de 100 Hz a 3150 Hz, o las 5 bandas de
 octava), presenta la magnitud con un decimal tanto en forma de tabla como en
-forma de curva frente a la curva de referencia desplazada, encaja el índice de
+forma de curva frente a la curva de referencia desplazada, enmarca el índice de
 laboratorio (`Rw (C; Ctr)` o `Ln,w (CI)`) e imprime la declaración de que la
 evaluación se basa en resultados de medidas en laboratorio obtenidos mediante un
 método de precisión. Como un laboratorio cualificado suprime la transmisión por
@@ -277,7 +277,7 @@ imp.report("Lnw_lab.pdf",
 ```
 
 Ambas fichas de ejemplo se regeneran con `make reports` y se guardan en el
-repositorio. Haz clic en cualquier vista previa para abrir el PDF:
+repositorio. Pulsa cualquier vista previa para abrir el PDF:
 
 <ReportPreview
 	name="iso10140_airborne_example"
@@ -309,7 +309,7 @@ datos de unión que consume la predicción EN 12354 se miden según
 ## Qué cubre esta guía
 
 **Cubierto.** ISO 10140-2:2010 (el índice de reducción acústica de
-laboratorio $R$ con la corrección de ruido de fondo de la cláusula 4.3) e
+laboratorio $R$ con la corrección de ruido de fondo del apartado 4.3) e
 ISO 10140-3:2010 (el nivel de impactos normalizado de laboratorio $L_n$),
 mediante `building.lab_airborne_insulation`,
 `building.lab_impact_insulation` y `building.background_correction`; los
@@ -320,8 +320,8 @@ forma detallada.
 
 **No cubierto.** Los requisitos generales de instalación de ensayo y de
 tipo de montaje de ISO 10140-1 no están implementados; la guía solo los
-cita como cadena de texto en los metadatos del informe (`"Type A mounting,
-mortar-bedded perimeter (ISO 10140-1)"`). Los métodos de laboratorio que
+cita como cadena de texto en los metadatos del informe (`"Montaje tipo A,
+perímetro recibido con mortero (ISO 10140-1)"`). Los métodos de laboratorio que
 compartían esta página están cubiertos por sus propias guías: el
 aislamiento por intensidad (ISO 15186), la mejora de revestimientos de
 suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
@@ -338,7 +338,7 @@ suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
   la $\Delta L$ en maqueta a pequeña escala de revestimientos blandos.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
-  el índice de reducción de vibraciones de unión medido.
+  el índice de reducción vibratoria de unión medido.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   el motor de curva de referencia tras $R_w$ y $L_{n,w}$.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): los métodos de $L_W$

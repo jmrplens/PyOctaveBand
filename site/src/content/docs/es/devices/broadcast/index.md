@@ -10,7 +10,7 @@ diluya, y un rango que dice cuánto se mueve el programa.
 La palabra *sonoridad* tiene dos significados en este sitio, y no son versiones
 uno del otro. Aquí es una **medida energética**: una media cuadrática ponderada
 en K sobre el programa entero, con puertas, expresada en LUFS, pensada para que
-dos programas normalizados al mismo número suenen igual de fuertes en la misma
+dos programas normalizados al mismo número suenen igual de sonoros en la misma
 cadena de reproducción. En
 [Psicoacústica](/phonometry/es/perception/psychoacoustics/loudness/) es una
 **magnitud perceptual en sonios**, calculada por un modelo auditivo con

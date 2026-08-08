@@ -39,7 +39,7 @@ references:
     issue: 1
     pages: "19-27"
     doi: "10.1121/1.2369239"
-    note: "Las curvas NC originales calificadas por el método de tangencia de la sección de ruido de salas."
+    note: "Las curvas NC originales valoradas por el método de tangencia de la sección de ruido de salas."
   - type: article
     authors: ["Blazier, W. E."]
     year: 1997
@@ -70,7 +70,7 @@ references:
     title: "Criteria for evaluating room noise"
     designation: "ANSI/ASA S12.2-2019"
     url: "https://webstore.ansi.org/standards/asa/ansiasas122019"
-    note: "El método de tangencia NC normativo y la calificación RC Mark II del Anexo D con su etiqueta espectral."
+    note: "El método de tangencia NC normativo y la valoración RC Mark II del Anexo D con su etiqueta espectral."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2006
@@ -142,11 +142,11 @@ Esta página reúne la teoría de salas y edificación: la medición de respuest
 
 ## Criterios de ruido de salas (ANSI S12.2)
 
-ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a familias de curvas por bandas de octava (16 Hz – 8 kHz). El **índice NC** sigue el procedimiento en dos pasos de la cláusula 5.2.2 sobre las curvas de la Tabla 1 (NC-15 a NC-70): el nivel de interferencia con el habla $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (cláusula 3.2) selecciona la curva NC-(SIL) y, si ninguna banda la supera, el espectro se designa NC-(SIL); en caso contrario se aplica el método de tangencia (cláusula 5.2.3): cada banda medida se interpola frente a los valores tabulados de las curvas, el índice es el mayor valor por banda y la banda que lo fija es la banda determinante; la interpolación hace el índice continuo (un NC-42,5 se informa como tal, sin ajustarlo a una curva). Los espectros por encima de NC-70 o por debajo de NC-15 quedan fuera de la familia y se marcan (>NC-70 con la banda de mayor exceso, o &lt;NC-15) en lugar de recibir un número fabricado. El contorno **RC Mark II** (Anexo D) es una recta pura de −5 dB/octava anclada a su valor a 1000 Hz con un suelo en baja frecuencia de $\max(\mathrm{RC} + 25,\ 55)$ dB a 16/31,5 Hz; el índice es la media aritmética de los niveles a 500/1000/2000 Hz redondeada a un entero (cláusula D.4), y la etiqueta de calidad espectral compara el espectro con el contorno de referencia (cláusula D.3): retumbo "R" cuando alguna banda a 500 Hz o por debajo lo supera en más de 5 dB, siseo "H" cuando alguna banda a 1 kHz o por encima lo supera en más de 3 dB (ambos a la vez, "RH"), y neutro "N" en otro caso, informado como p. ej. RC-35(N). Los contornos RC generados reproducen la Tabla D.1 dígito a dígito, y realimentar cualquier curva NC de la Tabla 1 devuelve su propio índice de tangencia. NCB, RNC (Anexo A) y el QAI (cláusula D.5) quedan deliberadamente fuera de alcance.
+ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a familias de curvas por bandas de octava (16 Hz – 8 kHz). El **índice NC** sigue el procedimiento en dos pasos del apartado 5.2.2 sobre las curvas de la Tabla 1 (NC-15 a NC-70): el nivel de interferencia con el habla $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (apartado 3.2) selecciona la curva NC-(SIL) y, si ninguna banda la supera, el espectro se designa NC-(SIL); en caso contrario se aplica el método de tangencia (apartado 5.2.3): cada banda medida se interpola frente a los valores tabulados de las curvas, el índice es el mayor valor por banda y la banda que lo fija es la banda determinante; la interpolación hace el índice continuo (un NC-42,5 se informa como tal, sin ajustarlo a una curva). Los espectros por encima de NC-70 o por debajo de NC-15 quedan fuera de la familia y se marcan (>NC-70 con la banda de mayor exceso, o &lt;NC-15) en lugar de recibir un número fabricado. El contorno **RC Mark II** (Anexo D) es una recta pura de −5 dB/octava anclada a su valor a 1000 Hz con un suelo en baja frecuencia de $\max(\mathrm{RC} + 25,\ 55)$ dB a 16/31,5 Hz; el índice es la media aritmética de los niveles a 500/1000/2000 Hz redondeada a un entero (apartado D.4), y la etiqueta de calidad espectral compara el espectro con el contorno de referencia (apartado D.3): retumbo «R» cuando alguna banda a 500 Hz o por debajo lo supera en más de 5 dB, siseo «H» cuando alguna banda a 1 kHz o por encima lo supera en más de 3 dB (ambos a la vez, «RH»), y neutro «N» en otro caso, informado como p. ej. RC-35(N). Los contornos RC generados reproducen la Tabla D.1 dígito a dígito, y realimentar cualquier curva NC de la Tabla 1 devuelve su propio índice de tangencia. NCB, RNC (Anexo A) y el QAI (apartado D.5) quedan deliberadamente fuera de alcance.
 
 Consulta la [guía de criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la calificación NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
 
 *El mismo espectro valorado por las dos vías: tangencia NC en la banda dominante (izquierda) y la referencia RC Mark II con el exceso de retumbo (derecha).*
 
@@ -154,7 +154,7 @@ Consulta la [guía de criterios de ruido de salas](/phonometry/es/buildings/room
 
 ### Respuesta al impulso por excitación determinista (ISO 18233)
 
-Una sala o un camino de transmisión se modela como **lineal e invariante en el tiempo**, de modo que su respuesta al impulso $h(t)$ lo contiene todo. ISO 18233 sustituye el decaimiento clásico por ráfaga de ruido por una excitación determinista que se **deconvoluciona** para obtener $h(t)$, ganando 20–30 dB de relación señal-ruido efectiva. El barrido sinusoidal exponencial (ESS, Anexo B) tiene una frecuencia instantánea $f(t) = f_1 (f_2/f_1)^{t/T}$, de modo que su fase es la integral en forma cerrada de $2 \pi f(t)$:
+Una sala o una trayectoria de transmisión se modela como **lineal e invariante en el tiempo**, de modo que su respuesta al impulso $h(t)$ lo contiene todo. ISO 18233 sustituye el decaimiento clásico por ráfaga de ruido por una excitación determinista que se **deconvoluciona** para obtener $h(t)$, ganando 20–30 dB de relación señal-ruido efectiva. El barrido sinusoidal exponencial (ESS, Anexo B) tiene una frecuencia instantánea $f(t) = f_1 (f_2/f_1)^{t/T}$, de modo que su fase es la integral en forma cerrada de $2 \pi f(t)$:
 
 $$
 \varphi(t) = \frac{2 \pi f_1 T}{\ln(f_2/f_1)} \left[ \left( \frac{f_2}{f_1} \right)^{t/T} - 1 \right] .
@@ -162,7 +162,7 @@ $$
 
 Un tiempo por octava constante hace que el espectro del ESS sea rosa (−3 dB/octava). La deconvolución se realiza mediante división espectral **lineal** (no circular, con relleno de ceros) $H = Y\ \overline{X} / (|X|^2 + \varepsilon)$, donde el término de Tikhonov $\varepsilon$ (una fracción de $\max |X|^2$) evita la amplificación del ruido en los extremos de banda. Como un barrido de grave a agudo sitúa los productos de distorsión armónica en tiempos de llegada negativos, caen en la cola envuelta y se eliminan conservando la parte causal (Farina). El método MLS (Anexo A) explota en cambio que la autocorrelación circular de una secuencia de longitud máxima de longitud $2^N-1$ es una delta periódica, de modo que $h = \operatorname{xcorr}_{\text{circ}}(\text{recorded}, \text{mls}) / 2^N$; el promediado síncrono de $n$ periodos añade $10 \log_{10} n$ dB.
 
-### Integración inversa de Schroeder (ISO 3382-1, 5.3.3)
+### Integración hacia atrás de Schroeder (ISO 3382-1, 5.3.3)
 
 La curva de decaimiento por banda es la respuesta al impulso al cuadrado **integrada hacia atrás** (Schroeder):
 
@@ -176,7 +176,7 @@ es decir, una suma acumulada invertida en tiempo discreto. La integración hacia
 
 *Una respuesta al impulso al cuadrado, su integral inversa de Schroeder y las ventanas de regresión EDT/T20/T30 del siguiente apartado.*
 
-### Ventanas de regresión y validez (ISO 3382-2, Cláusula 6, Anexo B/C)
+### Ventanas de regresión y validez (ISO 3382-2, Apartado 6, Anexo B/C)
 
 El tiempo de reverberación es un ajuste por mínimos cuadrados $L = a + b t$ sobre una ventana, extrapolado a 60 dB mediante $T = -60/b$ (Anexo C): **EDT** de 0 a −10 dB, **T20** de −5 a −25 dB, **T30** de −5 a −35 dB. Un decaimiento de una sola pendiente da EDT = T20 = T30; una doble pendiente rápida al principio y lenta al final da EDT < T30. La validez se basa en la regla de rango dinámico de 5.3.3: el ruido debe situarse al menos 25 dB por debajo del pico de la respuesta al impulso para EDT (rango de evaluación + 15 dB), aumentado a 46 dB para T20 y 54 dB para T30 de modo que el sesgo de compensación de cola de un valor marcado como válido se mantenga dentro del 5 % del JND. La **curvatura** $C = 100\ (T_{30}/T_{20} - 1)$ % (Anexo B) señala un decaimiento no recto por encima del 10 %.
 
@@ -200,7 +200,7 @@ temprano/tardío de esa misma respuesta al impulso, y C50 y C80 crecen con la
 frecuencia por la misma razón por la que cae el tiempo de reverberación: cuanto
 más tardía es la energía, mayor parte de ella ha eliminado ya la sala.*
 
-### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, Cláusula 6)
+### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, Apartado 6)
 
 La tasa de decaimiento espacial del habla ponderada A es la pendiente por mínimos cuadrados ordinarios de $L_{p,A,S}$ frente a $\log_{10}(r/r_0)$ ($r_0 = 1$ m) sobre las posiciones de 2–16 m, reescalada a una cifra por duplicación, y el nivel nominal se lee en la misma recta a 4 m:
 
@@ -208,12 +208,16 @@ $$
 L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \log_{10}(4/r_0).
 $$
 
-La distancia de distracción rD y la distancia de privacidad rP son las distancias donde una regresión **lineal** (no logarítmica) del STI frente a la distancia cruza 0,50 y 0,20; una pendiente ajustada no negativa (el STI no decrece con la distancia) las deja indefinidas, materializando la nota de la norma de que "puede resultar imposible de determinar".
+La distancia de distracción rD y la distancia de privacidad rP son las
+distancias donde una regresión **lineal** (no logarítmica) del STI frente a la
+distancia cruza 0,50 y 0,20; una pendiente ajustada no negativa (el STI no
+decrece con la distancia) las deja indefinidas, materializando la nota de la
+norma de que «puede resultar imposible de determinar».
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión de D2,S, el marcador de Lp,A,S,4m a 4 m y los cruces de las distancias rD y rP" width="80%" />
 
 *Dos regresiones sobre dos ejes distintos, que es lo que hace difícil de
-retener esta cláusula. La recta de nivel se ajusta frente a
+retener este apartado. La recta de nivel se ajusta frente a
 $\log_{10}(r/r_0)$ y se lee dos veces: como la pendiente $D_{2,S}$ por
 duplicación y en $r = 4$ m para $L_{p,A,S,4\text{m}}$. La recta del STI se
 ajusta frente a $r$ mismo, de forma **lineal**, y se lee donde cruza 0,50 y
@@ -224,7 +228,7 @@ sale plano o creciente, las dos distancias no existen, no es que sean grandes.*
 
 Por banda de tercio de octava, la diferencia de niveles $D = L_1 - L_2$ (promediada en energía sobre las posiciones de micrófono, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) se normaliza de dos formas: la diferencia de niveles estandarizada $D_{nT} = D + 10 \log_{10}(T/T_0)$ con $T_0 = 0{,}5$ s (de modo que $D_{nT} = D$ cuando $T = T_0$), y el índice de reducción acústica aparente $R' = D + 10 \log_{10}(S/A)$ con el área de absorción de Sabine $A = 0{,}16\ V / T$, por tanto $R' = D + 10 \log_{10}[S T / (0{,}16\ V)]$.
 
-El índice de un solo número (ISO 717-1, Cláusula 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
+El índice de un solo número (ISO 717-1, Apartado 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
@@ -233,7 +237,7 @@ El índice de un solo número (ISO 717-1, Cláusula 4.4) desplaza la **curva de 
 ### Aislamiento a impactos y absorción (ISO 16283-2, ISO 717-2, ISO 354)
 
 El aislamiento a impactos cambia la fuente aérea por una **máquina de impactos
-normalizada** y califica el nivel del recinto receptor, así que las convenciones
+normalizada** y valora el nivel del recinto receptor, así que las convenciones
 de signo se invierten. Los niveles de impactos estandarizado y normalizado son $L'_{nT} = L_i - 10 \log_{10}(T/T_0)$
 (el término de reverberación se *resta*, al contrario que $D_{nT}$) y
 $L'_n = L_i + 10 \log_{10}(A/A_0)$ con $A_0 = 10$ m² y $A = 0{,}16\ V/T$. El índice
@@ -268,15 +272,15 @@ es $A_T = A_2 - A_1$ y su coeficiente $\alpha_s = A_T/S$. Con la velocidad del
 sonido de la Ec. (6), $c = 331 + 0{,}6\ t$ (°C), y $m$ convertido de un
 coeficiente de atenuación de ISO 9613-1 mediante $m = \alpha / (10 \log_{10} e)$. Como
 la difracción y la dispersión de borde interceptan más que el área plana de la
-muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (Cláusula 3.7
+muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (Apartado 3.7
 NOTA 2).
 
 ### Normalización en laboratorio frente a campo (ISO 10140, ISO 16283)
 
 Los índices de campo llevan una prima porque el nivel del recinto receptor del
-que parten incluye la transmisión por flancos alrededor del cerramiento; los
-índices de laboratorio no, porque una instalación cualificada la suprime. Las
-fórmulas son, por tanto, las *mismas*, y la prima es una afirmación sobre la
+que parten incluye la transmisión por flancos alrededor del elemento separador;
+los índices de laboratorio no, porque una instalación cualificada la suprime.
+Las fórmulas son, por tanto, las *mismas*, y la prima es una afirmación sobre la
 probeta y no sobre la aritmética: el índice de reducción acústica directo de
 laboratorio $R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) y el índice
 aparente de campo $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1) son una
@@ -292,7 +296,7 @@ de ellos, el nivel del recinto receptor se corrige por ruido de fondo mediante l
 resta energética $L = 10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ para un margen
 señal-fondo de 6–15 dB, saturada en un valor fijo de $1{,}3$ dB (el límite de
 medición) en 6 dB o por debajo y omitida en 15 dB o por encima (ISO 10140-4,
-Cláusula 4.3), el análogo de laboratorio de la regla 6/10 dB de ISO 16283-1. La
+Apartado 4.3), el análogo de laboratorio de la regla 6/10 dB de ISO 16283-1. La
 extensión a fachadas (ISO 16283-3) sustituye el nivel del recinto emisor por el
 nivel 2 m frente a la fachada, $D_{2m} = L_{1,2m} - L_2$, y añade una corrección
 fija por ángulo de incidencia al índice de reducción acústica del elemento, $-1{,}5$
@@ -302,9 +306,9 @@ tráfico rodado con todos los ángulos ($R'_{tr,s}$); los tres llevan el número
 
 ### Predicción de la transmisión por flancos (EN 12354-1/2)
 
-El índice aparente de campo es la suma energética del camino directo $Dd$ y, para
-cada elemento de flanco $F=f$ a través de su unión con el elemento separador, los
-tres caminos $Ff$, $Df$ y $Fd$ (EN 12354-1, modelo simplificado de un solo
+El índice aparente de campo es la suma energética de la trayectoria directa $Dd$ y, para
+cada elemento de flanco $F=f$ a través de su unión con el elemento separador, las
+tres trayectorias $Ff$, $Df$ y $Fd$ (EN 12354-1, modelo simplificado de un solo
 número, Fórmula 26):
 
 $$
@@ -313,9 +317,9 @@ R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
        + \sum 10^{-R_{Fd,w}/10} \Big].
 $$
 
-El camino directo es $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Fórmula 27), el
+La trayectoria directa es $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Fórmula 27), el
 índice de laboratorio del elemento separador más cualquier mejora del trasdosado.
-Cada camino de flanco (Fórmula 28a) es
+Cada trayectoria por flancos (Fórmula 28a) es
 
 $$
 R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
@@ -326,7 +330,7 @@ con $R_{i,w}$, $R_{j,w}$ los índices de laboratorio de los dos elementos que se
 encuentran en la unión ($i$ lado emisor, $j$ lado receptor), $\Delta R_{ij,w}$ la
 mejora combinada del trasdosado, $S_s$ la superficie del elemento separador,
 $l_f$ la longitud de acoplamiento de la unión y $l_0 = 1$ m la longitud de
-acoplamiento de referencia. $K_{ij}$ es el **índice de reducción de vibraciones** de
+acoplamiento de referencia. $K_{ij}$ es el **índice de reducción vibratoria** de
 la unión (Anexo E), una función empírica de la relación de masas
 $M = \log_{10}(m'_{\perp,i}/m'_i)$: para una unión rígida en cruz
 $K_{13} = 8{,}7 + 17{,}1 M + 5{,}7 M^2$ (a través) y $K_{12} = 8{,}7 + 5{,}7 M^2$
@@ -340,12 +344,12 @@ revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
 Tabla 1. Los ejemplos resueltos del Anexo H.3 de EN 12354-1 ($R'_w = 52$ dB) y del
 Anexo E.3 de EN 12354-2 ($L'_{n,w} = 45$ dB) se reproducen exactamente; se
 declara que el modelo simplificado tiene una desviación típica de unos 2 dB
-(Cláusula 5).
+(Apartado 5).
 
 ### Absorción acústica en recintos (EN 12354-6)
 
 EN 12354-6:2003 predice el área de absorción equivalente de un recinto a
-partir de sus partes (el modelo normativo de la Cláusula 4). El total
+partir de sus partes (el modelo normativo de el Apartado 4). El total
 (Fórmula 1) suma las superficies, los objetos y el aire:
 
 $$
@@ -358,14 +362,14 @@ Tabla 1 lo tabula para seis climas de temperatura/humedad sobre las bandas de
 octava de 125 Hz a 8 kHz), $\psi = \sum V_{obj} / V$ la fracción de volumen
 ocupada por objetos (Fórmula 3), y un objeto duro irregular aproximado por
 $A_{obj} = V_{obj}^{2/3}$ (Fórmula 4). El tiempo de reverberación se sigue de
-Sabine aplicado al volumen libre (cláusula 4.4, Fórmula 5):
+Sabine aplicado al volumen libre (apartado 4.4, Fórmula 5):
 
 $$
 T = \frac{55{,}3}{c_0}\ \frac{V\ (1 - \psi)}{A},
 $$
 
 con $c_0 = 345{,}6$ m/s elegido para que $55{,}3/c_0$ sea el familiar
-$0{,}16$ (cláusula 4.4 NOTA). Los tres casos resueltos del Anexo E se
+$0{,}16$ (apartado 4.4 NOTA). Los tres casos resueltos del Anexo E se
 reproducen: la sala desnuda de 29,75 m³ da $A = 2{,}26$ m² y $T = 2{,}1$ s a
 1 kHz, y añadir objetos duros ($\psi \approx 0{,}072$) sube $A$ a 5,03 m² y
 baja $T$ a 0,9 s. El método informativo del Anexo D para espacios irregulares
@@ -433,7 +437,7 @@ $d + 2e = z\lambda/2$) o de un orificio circular (Wilson y Soroka, Ec. 4.102) se
 combina con la pared en la suma energética ponderada por área
 $R = -10\log_{10}[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Ec. 4.92), de modo que una
 abertura desnuda de área relativa $S_a/S$ limita la composición a
-$10\log_{10}(S/S_a)$. El camino de transmisión resonante y la radiación de la pared
+$10\log_{10}(S/S_a)$. La trayectoria de transmisión resonante y la radiación de la pared
 doble se apoyan en la eficiencia de radiación de placa y las movilidades
 puntuales de la [teoría de vibración](/phonometry/es/reference/theory/vibration/).
 

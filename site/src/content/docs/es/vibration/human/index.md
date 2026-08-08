@@ -1,6 +1,6 @@
 ---
 title: "Vibración en humanos"
-description: "La vibración transmitida a las personas: las ponderaciones de ISO 8041-1 y las métricas de cuerpo completo de ISO 2631-1, la exposición mano-brazo según ISO 5349 con los valores de acción y límite de la Directiva 2002/44/CE, y el modelo de respuesta espinal de ISO 2631-5 para choques repetidos."
+description: "La vibración transmitida a las personas: las ponderaciones de ISO 8041-1 y las métricas de cuerpo entero de ISO 2631-1, la exposición mano-brazo según ISO 5349 con los valores de acción y límite de la Directiva 2002/44/CE, y el modelo de respuesta espinal de ISO 2631-5 para choques repetidos."
 ---
 
 La vibración transmitida a una persona se evalúa con una cadena de medida
@@ -12,7 +12,7 @@ actuar. Las dos páginas de esta sección cubren la cadena general y el caso
 especial que la rompe.
 
 [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) es la cadena
-general. Cubre las ponderaciones frecuenciales de cuerpo completo y
+general. Cubre las ponderaciones frecuenciales de cuerpo entero y
 mano-brazo de **ISO 8041-1**, la aceleración r.m.s. ponderada y las medidas
 móviles y de dosis de **ISO 2631-1** (MTVV, VDV, MSDV, factor de cresta) que
 delatan los choques que un r.m.s. simple esconde, la ponderación `Wm`
@@ -36,12 +36,12 @@ Usa primero las métricas de la ISO 2631-1, y deja que dos números decidan
 cuándo pasar a otra cosa. Un **factor de cresta por encima de 9** dice que el
 método básico del valor eficaz ponderado ya no es adecuado para ese registro,
 que es el disparador de la ISO 2631-1 para echar mano de las medidas móviles y
-de dosis. Una **aceleración de pico vertical limitada en banda por encima de
+de dosis. Una **aceleración de pico vertical de banda limitada por encima de
 9,81 m/s²** — 1 g, el umbral de caída libre — sitúa la exposición en el régimen
-de la cláusula 5 de la ISO 2631-5, los choques severos con posible pérdida de
+del apartado 5 de la ISO 2631-5, los choques severos con posible pérdida de
 contacto con el asiento que esta biblioteca implementa, y no en su modelo de
 elementos finitos del Anexo A para exposiciones en las que el ocupante
-permanece sentado. El frontal de medida (filtros de ponderación, análisis en
+permanece sentado. El front-end de medida (filtros de ponderación, análisis en
 bandas) se comparte con la sección de [análisis de
 señal](/phonometry/es/signals/).
 
@@ -69,7 +69,7 @@ propósito los valores orientativos de su predecesora, así que no hay magnitude
 admisibles de vibración en edificios con las que comparar. Quien busque un
 límite no lo encontrará aquí, y tampoco lo encontrará en la norma.
 
-**De la ISO 2631-5, solo el modelo de la cláusula 5.** El modelo de elementos
+**De la ISO 2631-5, solo el modelo del apartado 5.** El modelo de elementos
 finitos del Anexo A para exposiciones sentadas menos severas lo distribuye ISO
 por separado y no está implementado, que es lo que convierte la delimitación de
 1 g de más arriba en una decisión de encaminamiento y no en una preferencia.

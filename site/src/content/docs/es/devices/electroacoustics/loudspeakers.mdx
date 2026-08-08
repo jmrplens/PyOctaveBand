@@ -22,7 +22,7 @@ references:
     title: "Scales and sizes for plotting frequency characteristics and polar diagrams"
     designation: "IEC 60263:1982"
     url: "https://webstore.iec.ch/en/publication/1218"
-    note: "Las proporciones de escala de los gráficos de características: una década de frecuencia igual a 25 dB en la ordenada (cláusula 2) y el diagrama polar sobre un círculo de referencia de 25 dB de radio (cláusula 3)."
+    note: "Las proporciones de escala de los gráficos de características: una década de frecuencia igual a 25 dB en la ordenada (apartado 2) y el diagrama polar sobre un círculo de referencia de 25 dB de radio (apartado 3)."
   - type: book
     authors: ["Long, M."]
     year: 2014
@@ -61,10 +61,10 @@ altavoz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_es.svg" alt="Medición de la sensibilidad de un altavoz en campo libre según IEC 60268-5: un altavoz sobre un soporte en una cámara anecoica, alimentado por un amplificador a 2,83 V, con un micrófono de medición a la distancia de referencia r = 1 m sobre el eje de referencia, y las relaciones que gobiernan: la sensibilidad característica como Lp a 1 m para 1 W en la impedancia nominal, la tensión de excitación Up = raíz de (R por 1 W), la referencia por distancia inversa Lp(1 m) = Lp(r) + 20 lg(r / 1 m), y la sensibilidad de micrófono de IEC 60268-4 en mV/Pa o dB re 1 V/Pa" width="92%" />
 
-**Altavoces (IEC 60268-5, cláusula 20.3).** La sensibilidad característica es
+**Altavoces (IEC 60268-5, apartado 20.3).** La sensibilidad característica es
 la presión acústica producida a 1 m sobre el eje de referencia, en campo
 libre, referida a una entrada de 1 W en la impedancia nominal; expresada como
-nivel re 20 µPa (cláusula 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
+nivel re 20 µPa (apartado 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
 esconden dos normalizaciones:
 
 - *La eléctrica.* La tensión de ensayo es $U_p = \sqrt{R \cdot 1\,\text{W}}$,
@@ -74,7 +74,7 @@ esconden dos normalizaciones:
   comprueba la impedancia nominal antes de comparar.
 - *La geométrica.* 1 m es una distancia de **referencia**, no necesariamente
   la de medición. La norma manda medir en campo lejano (a 0,5 m o a un número
-  entero de metros, cláusula 7.1) y referir el resultado con la ley de la
+  entero de metros, apartado 7.1) y referir el resultado con la ley de la
   distancia inversa, $L_p(1\ \text{m}) = L_p(r) + 20\log_{10}(r / 1\ \text{m})$.
   Ese escalado solo
   vale donde el nivel cae de verdad 6 dB por duplicación de distancia, de ahí
@@ -501,8 +501,8 @@ directamente, y `plot_sound_reinforcement_geometry` dibuja el lazo de arriba.
 
 **Cubierto.** Las convenciones de sensibilidad de IEC 60268-5:2003+A1:2007
 (la sensibilidad característica referida a 1 W en la impedancia nominal a
-1 m, cláusulas 20.3/20.4, y la referencia por distancia inversa de la
-cláusula 7.1). El modelo de radiación del pistón en pantalla
+1 m, apartados 20.3/20.4, y la referencia por distancia inversa del
+apartado 7.1). El modelo de radiación del pistón en pantalla
 (`radiating_piston`, `piston_directivity_pattern`, Beranek y Mellow
 §4.19/§13.7): la resistencia y reactancia de radiación normalizadas, la
 masa de radiación, la directividad de campo lejano y el dibujo de la
@@ -518,13 +518,14 @@ antes de la realimentación del capítulo 18 de *Architectural Acoustics*
 
 **No cubierto.** Los valores eléctricos y mecánicos que la norma define
 alrededor de la potencia admisible (potencia de ruido nominal, tensiones
-máximas de entrada de corta y larga duración, cláusula 17) los declara el
+máximas de entrada de corta y larga duración, apartado 17) los declara el
 fabricante, no se calculan aquí. La extracción de parámetros de
 Thiele-Small de la curva de impedancia no está implementada: el panel de
 impedancia presenta el módulo medido frente a las líneas de impedancia
 nominal. La propia curva de distorsión procede de una medición, por
 ejemplo de la cadena de
-[distorsión con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+[distorsión con barrido
+sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
 El criterio de realimentación es una contabilidad de niveles, no un
 modelo acústico: consume los dos niveles de campo directo que produce
 el altavoz y no los calcula a partir de un patrón de cobertura, ni

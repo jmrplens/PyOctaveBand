@@ -1,10 +1,10 @@
 ---
 title: "Superficies medidas in situ"
-description: "Superficies que no tienen probeta: por qué un firme se caracteriza donde está, la técnica de sustracción de ISO 13472-1 frente al tubo puntual de ISO 13472-2, a qué está acotado cada uno, y las ediciones que implementa la biblioteca."
+description: "Superficies que no tienen probeta: por qué un pavimento se caracteriza donde está, la técnica de sustracción de ISO 13472-1 frente al tubo puntual de ISO 13472-2, a qué está acotado cada uno, y las ediciones que implementa la biblioteca."
 ---
 
 Un coeficiente de cámara reverberante o de tubo de impedancia describe una
-*probeta*. Algunas superficies no tienen probeta. Un firme no se puede recortar
+*probeta*. Algunas superficies no tienen probeta. Un pavimento no se puede recortar
 y llevar a un laboratorio sin destruir justo aquello que gobierna su absorción
 — la estructura de poros conectados de la capa extendida y compactada — y un
 testigo extraído de él ya no es la superficie por la que rueda un neumático.
@@ -13,12 +13,13 @@ pagan con un problema de geometría: el micrófono oye juntos el sonido directo 
 la reflexión en la superficie, así que el método se construye alrededor de
 separarlos en el **tiempo** y no en el espacio.
 
-[Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/)
+[Absorción in situ de pavimentos de
+carretera](/phonometry/es/materials/surfaces/road-absorption/)
 implementa las dos partes de ISO 13472 y, más útil todavía, dice cuál de ellas
-admite un firme dado. La **técnica de sustracción** de la Parte 1 sitúa una
+admite un pavimento dado. La **técnica de sustracción** de la Parte 1 sitúa una
 fuente y un micrófono sobre la superficie, resta una medición de referencia en
 campo libre y aplica la ventana de Adrienne para quedarse con la reflexión y
-descartar todo lo posterior. Cubre el rango completo, de firmes reflectantes a
+descartar todo lo posterior. Cubre el rango completo, de pavimentos reflectantes a
 muy absorbentes, abarca de 250 Hz a 4 kHz y promedia sobre un parche de metros
 de lado — una ventana de 5 ms da un radio máximo de área muestreada de unos
 1,34 m, del orden de 5,6 m² de pavimento, así que ve textura y juntas en vez de
@@ -37,11 +38,11 @@ magnitud, el coeficiente de absorción a incidencia normal en bandas de tercio
 de octava. Un carril de baja absorción puede así inspeccionarse con el tubo y
 anclarse con una medición por sustracción en unas pocas posiciones. Ese número
 es contra el que se escribe una especificación de pavimento de baja sonoridad,
-y el que consume el término de suelo de un modelo de propagación en exteriores.
+y el que alimenta el término de suelo de un modelo de propagación en exteriores.
 
 ## Páginas de esta sección
 
-- [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
+- [Absorción in situ de pavimentos de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la técnica de sustracción de ISO 13472-1 con la ventana de Adrienne y sus
   funciones de geometría y validez, el tubo puntual de ISO 13472-2 con sus
   límites de aplicabilidad, y la comparación que decide entre ambos.

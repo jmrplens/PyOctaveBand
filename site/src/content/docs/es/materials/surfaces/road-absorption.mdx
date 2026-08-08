@@ -1,6 +1,6 @@
 ---
-title: "Absorción in situ de firmes de carretera"
-description: "Medir la absorción sonora de los firmes de carretera donde están: la técnica de sustracción de superficie extensa de ISO 13472-1 con la ventana de Adrienne y el radio de área muestreada, el tubo puntual de ISO 13472-2 con sus límites de onda plana, y cómo elegir entre ambos."
+title: "Absorción in situ de pavimentos de carretera"
+description: "Medir la absorción sonora de los pavimentos de carretera donde están: la técnica de sustracción de superficie extensa de ISO 13472-1 con la ventana de Adrienne y el radio de área muestreada, el tubo puntual de ISO 13472-2 con sus límites de onda plana, y cómo elegir entre ambos."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -29,7 +29,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Cuánto sonido absorbe un firme decide lo ruidoso que es su tráfico, y de una
+Cuánto sonido absorbe un pavimento decide lo ruidoso que es su tráfico, y de una
 autovía no se puede recortar un testigo y llevarlo al laboratorio. ISO 13472
 mide la absorción *in situ*, sobre el pavimento tal y como está construido,
 por partida doble. La **técnica de sustracción** de la Parte 1 dispara un
@@ -53,7 +53,7 @@ absorción.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_es.svg" alt="Absorción in situ de pavimentos por la técnica de sustracción de ISO 13472-1: un altavoz a 1,25 m y un micrófono a 0,25 m sobre la superficie del pavimento, con los trayectos de rayo directo y reflejado por el pavimento y una medición de referencia en campo libre, con la componente reflejada aislada por una ventana temporal de Adrienne" width="92%" loading="eager" />
 
-**Divergencia geométrica (cláusula 4.1).** La onda reflejada recorre más camino
+**Divergencia geométrica (apartado 4.1).** La onda reflejada recorre más camino
 que la directa, así que se atenúa por el factor de divergencia geométrica
 
 $$
@@ -72,7 +72,7 @@ $$
 import numpy as np
 from phonometry import materials
 
-# Una respuesta al impulso incidente limitada en banda y una reflexión de
+# Una respuesta al impulso incidente de banda limitada y una reflexión de
 # pavimento sintética hr = Kr * r0 * delayed(hi): una reflexión de magnitud
 # r0 = 0.4, retardada por el camino adicional y escalada por el factor de
 # divergencia geométrica Kr.
@@ -92,7 +92,7 @@ print(round(kr, 4))                # 0.6667
 print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 ```
 
-**Ventana de Adrienne (cláusula 6.4).** La ventana temporal que aísla la
+**Ventana de Adrienne (apartado 6.4).** La ventana temporal que aísla la
 reflexión solo exige un flanco de subida abrupto, una porción plana de 5 ms y un
 flanco de bajada de coseno cuadrado o Blackman-Harris; las duraciones exactas se
 informan en cada medición, no son fijas, así que aquí son configurables.
@@ -119,7 +119,7 @@ from scipy.signal import firwin, lfilter
 # Una medición sintética pero realista. hi es un impulso incidente unitario; la
 # reflexión del pavimento hr = Kr * r0 * roll(hi, shift) usa el factor de
 # divergencia geométrica Kr, un r0 levemente dependiente de la frecuencia (un
-# suave paso-bajo, de modo que una superficie porosa refleja menos al subir la
+# suave paso bajo, de modo que una superficie porosa refleja menos al subir la
 # frecuencia) y el retardo del camino reflejado shift = round(2 dm / c * fs).
 fs, n = 48000.0, 8192
 kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
@@ -139,7 +139,7 @@ result.plot()   # diagrama de barras alpha(f) en 250-4000 Hz (requiere matplotli
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_es.svg" alt="Un espectro de absorción de pavimento in situ en tercios de octava calculado por la vía del factor de reflexión a partir de una reflexión de pavimento sintética, creciendo desde cerca de 0,3 a 250 Hz hasta casi 1,0 por encima de 2 kHz" width="88%" />
 
 *La absorción crece con la frecuencia porque la superficie refleja menos energía
-de alta frecuencia, exactamente como dicta el factor de reflexión paso-bajo
+de alta frecuencia, exactamente como dicta el factor de reflexión paso bajo
 $r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
 
 <details>
@@ -154,7 +154,7 @@ from phonometry import materials
 # Una medición sintética pero realista. hi es un impulso incidente unitario; la
 # reflexión del pavimento hr = Kr * r0 * roll(hi, shift) usa el factor de
 # divergencia geométrica Kr, un r0 levemente dependiente de la frecuencia (un
-# suave paso-bajo, de modo que una superficie porosa refleja menos al subir la
+# suave paso bajo, de modo que una superficie porosa refleja menos al subir la
 # frecuencia) y el retardo del camino reflejado shift = round(2 dm / c * fs).
 fs, n = 48000.0, 8192
 kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
@@ -188,7 +188,7 @@ plt.show()
 
 **Área máxima muestreada (Anexo A).** La ventana temporal finita limita cuánta
 superficie contribuye a la reflexión. El área máxima muestreada es un círculo
-cuyo radio la librería calcula a partir de la geometría y la anchura de la
+cuyo radio la biblioteca calcula a partir de la geometría y la anchura de la
 ventana; el ejemplo trabajado del Anexo A ($d_s = 1{,}25$ m, $d_m = 0{,}25$ m,
 $c = 340$ m/s, ventana plana de 5 ms) da unos 1,34 m.
 
@@ -231,8 +231,9 @@ plt.show()
 
 Para parches más pequeños, ISO 13472-2 sella un tubo circular corto sobre la
 superficie y mide la absorción con el método de la función de transferencia de
-dos micrófonos de ISO 10534-2. La librería aporta la geometría del método puntual
-y los ayudantes de validez; el propio DSP de la función de transferencia es la
+dos micrófonos de ISO 10534-2. La biblioteca aporta la geometría del método puntual
+y las funciones auxiliares de validez; el propio DSP de la función de
+transferencia es la
 rutina de tubo de impedancia `two_microphone_impedance` (véase la
 [guía del Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/)).
 
@@ -240,7 +241,7 @@ rutina de tubo de impedancia `two_microphone_impedance` (véase la
 
 El aparato es un tubo de impedancia portátil puesto en vertical: un altavoz
 en la parte superior, dos micrófonos enrasados con espaciado $s$ en la pared
-del tubo, y la propia superficie del firme como muestra. Un útil de ensayo
+del tubo, y la propia superficie del pavimento como muestra. Un útil de ensayo
 con un anillo de material deformable (una junta tórica de goma o similar)
 hace un sellado estanco entre la boca del tubo y el pavimento, de modo que
 sea el parche bajo la boca, y no la fuga a su alrededor, lo que termina el
@@ -257,7 +258,7 @@ normales la norma reparte las posiciones de medida sobre el área de interés
 con énfasis en las rodadas (como orientación, una posición cada 10 m), sobre
 una superficie que debe estar lisa, plana, libre de detritos y seca.
 
-**Límites de onda plana (cláusula 5.4).** El tubo solo soporta ondas planas por
+**Límites de onda plana (apartado 5.4).** El tubo solo soporta ondas planas por
 debajo de
 
 $$
@@ -290,7 +291,7 @@ suelo de 250 Hz es un límite de **espaciado**, no de longitud: por debajo de
 $f_{min}$ los dos micrófonos están a menos del 5 % de una longitud de onda uno
 de otro y no queda diferencia de fase que resolver. La longitud del tubo
 responde a otra pregunta: tiene que ser suficiente para que se forme una onda
-plana, lo que la cláusula 5.4.2 consigue poniendo los micrófonos al menos a
+plana, lo que el apartado 5.4.2 consigue poniendo los micrófonos al menos a
 $3d$ de la fuente (una longitud mínima de 480 mm para el tubo de 100 mm). La
 ventana de espaciado resultante, de 78 mm a 86 mm aquí, es la razón de que la
 norma especifique $(81 \pm 4)$ mm para una única pareja de micrófonos. Es una
@@ -300,7 +301,7 @@ reducción es la cadena de ISO 10534-2 sin cambios: la función de
 transferencia entre los dos micrófonos separa las ondas incidente y
 reflejada, y el Anexo A de la norma resta además las pérdidas internas del
 sistema (medidas una vez contra una placa rígida) para que la disipación
-propia del tubo no se cargue al firme; esa corrección es
+propia del tubo no se cargue al pavimento; esa corrección es
 `spot_internal_loss_correction`.
 
 ## ¿Sustracción o método puntual?
@@ -369,7 +370,7 @@ micrófonos real es la rutina ISO 10534-2 de la
   dos micrófonos ISO 10534-2 al que el tubo puntual confía sus matemáticas, y
   el instrumento de laboratorio que el método puntual miniaturiza.
 - [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/): la otra
-  familia de medidas de superficie, que califica adónde envía una superficie
+  familia de medidas de superficie, que valora adónde envía una superficie
   su reflexión en lugar de cuánto absorbe.
 - [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
   la medición de absorción de laboratorio (cámara reverberante) y su
@@ -378,4 +379,4 @@ micrófonos real es la rutina ISO 10534-2 de la
   donde la absorción de la superficie del suelo entra en los modelos de
   propagación.
 - Referencia de la API: [`materials.surfaces.road_absorption`](/phonometry/es/reference/api/materials/road-absorption/).
-- Teoría: [Absorción in situ de superficies de carretera](/phonometry/es/reference/theory/materials-surfaces/#absorción-in-situ-de-superficies-de-carretera-iso-13472-1-iso-13472-2): la sustracción de ISO 13472 y la geometría que hace posible una medición in situ.
+- Teoría: [Absorción in situ de pavimentos de carretera](/phonometry/es/reference/theory/materials-surfaces/#absorción-in-situ-de-pavimentos-de-carretera-iso-13472-1-iso-13472-2): la sustracción de ISO 13472 y la geometría que hace posible una medición in situ.

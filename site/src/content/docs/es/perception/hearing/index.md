@@ -8,11 +8,12 @@ historia: dónde se sitúa el **umbral de audición** de una población, cómo s
 mide la **exposición laboral al ruido**, y cómo esa exposición **desplaza el
 umbral** de forma permanente a lo largo de una vida de trabajo.
 
-[Umbral de audición (edad y cero de referencia)](/phonometry/es/perception/hearing/hearing-threshold/)
+[Umbral de audición (edad y cero de
+referencia)](/phonometry/es/perception/hearing/hearing-threshold/)
 establece la línea base. **ISO 7029:2017** da la distribución estadística del
 umbral de audición con la edad para una población otológicamente normal: la
 pérdida lenta, que empieza por las altas frecuencias, de la presbiacusia,
-resuelta por edad, sexo y fractil de población. **ISO 389-7:2005** fija el
+desglosada por edad, sexo y fractil de población. **ISO 389-7:2005** fija el
 otro extremo de la escala: el umbral de referencia de audición, el nivel de
 presión acústica físico al que corresponde el 0 dB HL audiométrico en escucha
 de campo libre y campo difuso.
@@ -20,7 +21,7 @@ de campo libre y campo difuso.
 [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/)
 mide la causa. El nivel de exposición diario regulado LEX,8h se ensambla a
 partir de muestras de una jornada real por una de tres estrategias (por
-tareas, por puesto o de jornada completa), y se reporta con el presupuesto de
+tareas, basada en la función o de jornada completa), y se declara con el presupuesto de
 incertidumbre normativo del Anexo C y su límite superior unilateral al 95 %,
 que es lo que un higienista compara realmente con los valores de acción.
 

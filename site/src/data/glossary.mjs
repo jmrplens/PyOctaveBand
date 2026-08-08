@@ -171,7 +171,7 @@ export const glossary = [
         guide: "devices/emission/sound-power-pressure",
         definition: {
           en: "Background noise correction: what is subtracted from the surface level to remove the background's own contribution, $-10\\log_{10}(1 - 10^{-0,1\\Delta L_p})$ from the source-on minus source-off margin. It is a cliff rather than a slope: above a 15 dB margin it is taken as zero, between 6 and 15 dB it is computed, and below 6 dB the standard caps it at 1,3 dB and warns that the result has lost accuracy.",
-          es: "Corrección por ruido de fondo: lo que se resta al nivel de la superficie de medida para eliminar la contribución del propio fondo, $-10\\log_{10}(1 - 10^{-0,1\\Delta L_p})$ a partir del margen entre fuente en marcha y fuente parada. Es un escalón y no una pendiente: por encima de 15 dB de margen se toma como cero, entre 6 y 15 dB se calcula, y por debajo de 6 dB la norma la limita a 1,3 dB y advierte de que el resultado ha perdido exactitud.",
+          es: "Corrección por ruido de fondo: lo que se resta al nivel de la superficie de medición para eliminar la contribución del propio fondo, $-10\\log_{10}(1 - 10^{-0,1\\Delta L_p})$ a partir del margen entre fuente en marcha y fuente parada. Es un escalón y no una pendiente: por encima de 15 dB de margen se toma como cero, entre 6 y 15 dB se calcula, y por debajo de 6 dB la norma la limita a 1,3 dB y advierte de que el resultado ha perdido exactitud.",
         },
       },
       {
@@ -186,7 +186,7 @@ export const glossary = [
         guide: "devices/emission/sound-power-pressure",
         definition: {
           en: "Environmental correction: what is subtracted to remove the energy the test room reflects back onto the measurement surface, $10\\log_{10}(1 + 4S/A)$ from the surface area and the room's equivalent absorption area. Its ceiling is the grade of accuracy rather than a preference: an engineering-grade result is only valid where $K_{2A} \\le 4$ dB, the survey method allows 7 dB, and a qualified hemi-anechoic room gives zero.",
-          es: "Corrección ambiental: lo que se resta para eliminar la energía que la sala de ensayo refleja de vuelta sobre la superficie de medida, $10\\log_{10}(1 + 4S/A)$ a partir del área de la superficie y del área de absorción equivalente de la sala. Su techo lo fija el grado de exactitud y no una preferencia: un resultado de grado de ingeniería solo es válido si $K_{2A} \\le 4$ dB, el método de control admite 7 dB y una sala semianecoica cualificada da cero.",
+          es: "Corrección ambiental: lo que se resta para eliminar la energía que la sala de ensayo refleja de vuelta sobre la superficie de medición, $10\\log_{10}(1 + 4S/A)$ a partir del área de la superficie y del área de absorción equivalente de la sala. Su techo lo fija el grado de exactitud y no una preferencia: un resultado de grado de ingeniería solo es válido si $K_{2A} \\le 4$ dB, el método de control admite 7 dB y una sala semianecoica cualificada da cero.",
         },
       },
       {
@@ -271,7 +271,7 @@ export const glossary = [
         guide: "environment/assessment/environmental-levels",
         definition: {
           en: "Rating level: the whole-day composite level after the source-character and time-of-day adjustments.",
-          es: "Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria.",
+          es: "Nivel de evaluación: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria.",
         },
       },
       {
@@ -286,7 +286,7 @@ export const glossary = [
         guide: "environment/assessment/impulsive-sound",
         definition: {
           en: "Rating level of an impulsive source over a reference interval, $L_{Aeq}$ plus the graduated impulse adjustment.",
-          es: "Nivel de valoración de una fuente impulsiva en un intervalo de referencia: el $L_{Aeq}$ más el ajuste graduado por impulsos.",
+          es: "Nivel de evaluación de una fuente impulsiva en un intervalo de referencia: el $L_{Aeq}$ más el ajuste graduado por impulsos.",
         },
       },
       {
@@ -717,7 +717,7 @@ export const glossary = [
         guide: "devices/electroacoustics/electroacoustics",
         definition: {
           en: "The broadcast noise weighting: zero at 1 kHz, peaking at $+12{,}2$ dB at 6,3 kHz and falling to $-29{,}9$ dB at 31,5 Hz, shaped to how audible a noise is rather than how loud a tone is. The Recommendation pairs it with a quasi-peak detector and quotes results as dB(468); AES17 reuses the same curve with an r.m.s. detector, which is a different number from the same filter.",
-          es: "La ponderación de ruido para radiodifusión: cero en 1 kHz, con máximo de $+12{,}2$ dB en 6,3 kHz y caída hasta $-29{,}9$ dB en 31,5 Hz, con la forma de lo audible que resulta un ruido y no de lo sonoro que resulta un tono. La Recomendación la combina con un detector de cuasipico y expresa el resultado en dB(468); la AES17 reutiliza la misma curva con un detector eficaz, lo que da otro número con el mismo filtro.",
+          es: "La ponderación de ruido para radiodifusión: cero en 1 kHz, con máximo de $+12{,}2$ dB a 6,3 kHz y caída hasta $-29{,}9$ dB a 31,5 Hz, con la forma de lo audible que resulta un ruido y no de lo sonoro que resulta un tono. La Recomendación la combina con un detector de cuasipico y expresa el resultado en dB(468); la AES17 reutiliza la misma curva con un detector eficaz, lo que da otro número con el mismo filtro.",
         },
       },
       {
@@ -725,7 +725,7 @@ export const glossary = [
         symbol: "$W_b$, $W_c$, $W_d$, $W_e$, $W_f$, $W_j$, $W_k$, $W_m$",
         qualifier: {
           en: "whole-body",
-          es: "cuerpo completo",
+          es: "cuerpo entero",
         },
         unit: {
           en: "dimensionless",
@@ -739,7 +739,7 @@ export const glossary = [
         guide: "vibration/human/human-vibration",
         definition: {
           en: "The whole-body frequency weightings, one parameter row each of the same four-stage filter: $W_k$ for the vertical axis and $W_d$ for the two horizontal ones in health and comfort, with $W_b$, $W_c$, $W_e$, $W_f$, $W_j$ and $W_m$ for ride comfort, the seat back, rotational axes, motion sickness and the head. The weighted acceleration $a_w$ is what comes out of them; the standard that names the curve is not the one that says where to apply it.",
-          es: "Las ponderaciones en frecuencia para cuerpo completo, cada una una fila de parámetros del mismo filtro de cuatro etapas: $W_k$ para el eje vertical y $W_d$ para los dos horizontales en salud y confort, con $W_b$, $W_c$, $W_e$, $W_f$, $W_j$ y $W_m$ para el confort de marcha, el respaldo, los ejes de rotación, el mareo por movimiento y la cabeza. De ellas sale la aceleración ponderada $a_w$; la norma que define la curva no es la que dice dónde aplicarla.",
+          es: "Las ponderaciones en frecuencia para cuerpo entero, cada una una fila de parámetros del mismo filtro de cuatro etapas: $W_k$ para el eje vertical y $W_d$ para los dos horizontales en salud y confort, con $W_b$, $W_c$, $W_e$, $W_f$, $W_j$ y $W_m$ para el confort de marcha, el respaldo, los ejes de rotación, el mareo por movimiento y la cabeza. De ellas sale la aceleración ponderada $a_w$; la norma que define la curva no es la que dice dónde aplicarla.",
         },
       },
       {
@@ -761,7 +761,7 @@ export const glossary = [
         guide: "vibration/human/human-vibration",
         definition: {
           en: "The hand-arm frequency weighting: one curve, band-limited from 8 Hz to 1 kHz, applied to each of the three axes before they are combined into the vibration total value. Unlike the whole-body case there is no axis multiplier, so the three weighted values enter the total on equal terms.",
-          es: "La ponderación en frecuencia para vibración mano-brazo: una sola curva, limitada en banda de 8 Hz a 1 kHz, aplicada a cada uno de los tres ejes antes de combinarlos en el valor total de vibración. A diferencia del caso de cuerpo completo no hay multiplicador por eje, así que los tres valores ponderados entran en el total en igualdad de condiciones.",
+          es: "La ponderación en frecuencia para vibración mano-brazo: una sola curva, limitada en banda de 8 Hz a 1 kHz, aplicada a cada uno de los tres ejes antes de combinarlos en el valor total de vibración. A diferencia del caso de cuerpo entero no hay multiplicador por eje, así que los tres valores ponderados entran en el total en igualdad de condiciones.",
         },
       },
     ],
@@ -919,7 +919,7 @@ export const glossary = [
         id: "cepstrum",
         name: {
           en: "Cepstrum and quefrency",
-          es: "Cepstrum y quefrencia",
+          es: "Cepstro y quefrencia",
         },
         unit: {
           en: "quefrency in s",
@@ -936,7 +936,7 @@ export const glossary = [
         guide: "signals/spectra/cepstrum-echoes",
         definition: {
           en: "Cepstrum: the inverse transform of the logarithmic spectrum, in which the periodic ripple an echo or a harmonic family leaves across the spectrum collapses onto a single peak. Quefrency is its independent variable, a time in seconds, at which that peak stands at the echo's own delay — which is why a bearing report quotes a quefrency and not a frequency.",
-          es: "Cepstrum: la transformada inversa del espectro logarítmico, en la que el rizado periódico que un eco o una familia de armónicos deja en el espectro se concentra en un único pico. La quefrencia es su variable independiente, un tiempo en segundos, en la que ese pico aparece al retardo propio del eco, y por eso un informe de rodamientos cita una quefrencia y no una frecuencia.",
+          es: "Cepstro: la transformada inversa del espectro logarítmico, en la que el rizado periódico que un eco o una familia de armónicos deja en el espectro se concentra en un único pico. La quefrencia es su variable independiente, un tiempo en segundos, en la que ese pico aparece al retardo propio del eco, y por eso un informe de rodamientos cita una quefrencia y no una frecuencia.",
         },
       },
       {
@@ -1202,7 +1202,7 @@ export const glossary = [
         guide: "buildings/rooms/open-plan-acoustics",
         definition: {
           en: "Distraction distance: the distance from the talker at which the speech transmission index falls below 0,50, beyond which concentration and privacy start to improve rapidly. It is the single number an open-plan office is usually specified on, and the only rating in the corpus that is a distance rather than a level.",
-          es: "Distancia de distracción: la distancia al hablante a la que el índice de transmisión del habla cae por debajo de 0,50 y a partir de la cual la concentración y la privacidad mejoran rápidamente. Es el número con el que suele especificarse una oficina diáfana y la única calificación de todo el corpus que es una distancia y no un nivel.",
+          es: "Distancia de distracción: la distancia al hablante a la que el índice de transmisión del habla cae por debajo de 0,50 y a partir de la cual la concentración y la privacidad mejoran rápidamente. Es el número con el que suele especificarse una oficina diáfana y la única valoración de todo el corpus que es una distancia y no un nivel.",
         },
       },
       {
@@ -1237,7 +1237,7 @@ export const glossary = [
         guide: "perception/speech/speech-transmission",
         definition: {
           en: "Modulation transfer function: the fraction of the speech envelope modulation depth at modulation frequency $F$ that survives the transmission path.",
-          es: "Función de transferencia de modulación: la fracción de la profundidad de modulación de la envolvente del habla, a la frecuencia de modulación $F$, que sobrevive al camino de transmisión.",
+          es: "Función de transferencia de modulación: la fracción de la profundidad de modulación de la envolvente del habla, a la frecuencia de modulación $F$, que sobrevive al canal de transmisión.",
         },
       },
       {
@@ -1419,7 +1419,7 @@ export const glossary = [
         guide: "buildings/insulation/insulation-lab",
         definition: {
           en: "Sound reduction index: the level difference corrected by the partition area over the receiving-room absorption area, measured in the laboratory with flanking suppressed.",
-          es: "Índice de reducción acústica: la diferencia de niveles corregida por el área del cerramiento partido por el área de absorción del recinto receptor, medida en laboratorio con los flancos suprimidos.",
+          es: "Índice de reducción acústica: la diferencia de niveles corregida por el área de la partición partido por el área de absorción del recinto receptor, medida en laboratorio con los flancos suprimidos.",
         },
       },
       {
@@ -1434,7 +1434,7 @@ export const glossary = [
         guide: "buildings/insulation/insulation-field",
         definition: {
           en: "Apparent sound reduction index: the same construction measured in the building, so it includes every flanking path. The prime is the lab-versus-field marker.",
-          es: "Índice de reducción acústica aparente: la misma construcción medida en el edificio, así que incluye todas las vías de flanco. La prima es la marca que distingue el laboratorio del campo.",
+          es: "Índice de reducción acústica aparente: la misma construcción medida en el edificio, así que incluye todas las trayectorias por flancos. La prima es la marca que distingue el laboratorio del campo.",
         },
       },
       {
@@ -1642,7 +1642,7 @@ export const glossary = [
         guide: "buildings/insulation/flanking-lab",
         definition: {
           en: "Vibration reduction index of a junction: the direction-averaged velocity level difference corrected by the junction length and the equivalent absorption lengths.",
-          es: "Índice de reducción vibracional de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes.",
+          es: "Índice de reducción vibratoria de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes.",
         },
       },
       {
@@ -1881,7 +1881,7 @@ export const glossary = [
         guide: "materials/absorbers/absorption-measurement",
         definition: {
           en: "The A to E letter class the weighted coefficient maps to, or \"not classified\".",
-          es: "La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o \"sin clasificar\".",
+          es: "La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o «sin clasificar».",
         },
       },
       {
@@ -1992,7 +1992,7 @@ export const glossary = [
         guide: "materials/resilient/dynamic-stiffness",
         definition: {
           en: "Dynamic stiffness per unit area of a resilient layer: a dynamic force per unit area divided by the resulting change in thickness.",
-          es: "Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca.",
+          es: "Rigidez dinámica por unidad de superficie de una capa elástica: una fuerza dinámica por unidad de superficie dividida por la variación de espesor que provoca.",
         },
       },
       {
@@ -2412,7 +2412,7 @@ export const glossary = [
         guide: "vibration/structural/junction-transmission",
         definition: {
           en: "Junction transmission coefficient: the fraction of the bending-wave power arriving at a junction from plate $i$ that continues into plate $j$, angle by angle and then averaged over a diffuse field. Both the coupling loss factor $\\eta_{ij}$ and the vibration reduction index $K_{ij}$ are derived from it, so it is the wave-approach quantity the junction family bottoms out in.",
-          es: "Coeficiente de transmisión en la unión: la fracción de la potencia de ondas de flexión que llega a una unión desde la placa $i$ y continúa hacia la placa $j$, ángulo a ángulo y después promediada en campo difuso. De él se derivan tanto el factor de pérdidas por acoplamiento $\\eta_{ij}$ como el índice de reducción vibracional $K_{ij}$, así que es la magnitud del enfoque ondulatorio en la que se apoya toda la familia de uniones.",
+          es: "Coeficiente de transmisión en la unión: la fracción de la potencia de ondas de flexión que llega a una unión desde la placa $i$ y continúa hacia la placa $j$, ángulo a ángulo y después promediada en campo difuso. De él se derivan tanto el factor de pérdidas por acoplamiento $\\eta_{ij}$ como el índice de reducción vibratoria $K_{ij}$, así que es la magnitud del enfoque ondulatorio en la que se apoya toda la familia de uniones.",
         },
       },
     ],

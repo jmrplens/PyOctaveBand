@@ -23,7 +23,7 @@ references:
     title: "Psychoacoustic metrics for ITT equipment — Part 2 (methods for describing human perception based on the Sottek Hearing Model)"
     designation: "ECMA-418-2:2025"
     url: "https://ecma-international.org/publications-and-standards/standards/ecma-418/"
-    note: "La tonalidad (tu_HMS, cláusula 6), la aspereza (asper, cláusula 7) y la intensidad de fluctuación (vacil_HMS, cláusula 9, el análisis de envolvente basado en HSA) del modelo de Sottek."
+    note: "La tonalidad (tu_HMS, apartado 6), la aspereza (asper, apartado 7) y la intensidad de fluctuación (vacil_HMS, apartado 9, el análisis de envolvente basado en HSA) del modelo de Sottek."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -40,7 +40,7 @@ comparte el mismo front-end auditivo, está en
 Las cuatro métricas forman una familia: una única señal calibrada se reparte
 entre dos etapas auditivas, y cada rama se ancla a un sonido de referencia
 cuyo objetivo normativo es exactamente 1. El diagrama traza la familia con
-los valores que la librería calcula realmente para cada referencia
+los valores que la biblioteca calcula realmente para cada referencia
 (resultados redondeados como 0,9999 asper y 0,9957 vacil_HMS frente a ese
 objetivo de 1).
 
@@ -49,7 +49,7 @@ objetivo de 1).
 ## Agudeza en acum (DIN 45692)
 
 Dos sonidos pueden ser igual de sonoros y aun así uno se percibe más
-"afilado" (siseante, metálico) porque su sonoridad se sitúa más arriba en la
+«afilado» (siseante, metálico) porque su sonoridad se sitúa más arriba en la
 escala Bark. La agudeza es el primer momento del patrón de sonoridad
 específica ponderado por $g(z)$:
 
@@ -80,13 +80,13 @@ import numpy as np
 z = np.arange(1, 241) * 0.1                     # bins de Bark, 0.1 .. 24.0
 g_din = np.where(z > 15.8, 0.15 * np.exp(0.42 * (z - 15.8)) + 0.85, 1.0)
 g_bis = np.where(z > 15.0, 0.2 * np.exp(0.308 * (z - 15.0)) + 0.8, 1.0)
-n = 4.0                                         # Aures depende de la sonoridad total (sonos)
+n = 4.0                                         # Aures depende de la sonoridad total (sonios)
 g_aures = 0.078 * np.exp(0.171 * z) / z * (n / np.log(n * 0.05 + 1.0))
 
 fig, ax = plt.subplots()
 ax.semilogy(z, g_din, label="DIN 45692 g(z)")
 ax.semilogy(z, g_bis, "--", label="von Bismarck (Anexo B)")
-ax.semilogy(z, g_aures, "-.", label="Aures (Anexo B, N = 4 sonos)")
+ax.semilogy(z, g_aures, "-.", label="Aures (Anexo B, N = 4 sonios)")
 ax.axvline(15.8, linestyle=":", color="0.5")    # codo DIN: g crece a partir de 15.8 Bark
 ax.set(xlabel="Razón de banda crítica z [Bark]", ylabel="Ponderación g(z)")
 ax.grid(True, which="both", alpha=0.3)
@@ -199,7 +199,7 @@ Devuelve un `EcmaTonality`: `tonality` ($T$, tu_HMS), `specific_tonality`
 `tonal_frequency_vs_time`,
 `field`.
 
-## Aspereza (ECMA-418-2): capacidad nueva
+## Aspereza (ECMA-418-2): nueva capacidad
 
 La aspereza es la sensación áspera y zumbante de una modulación de amplitud
 rápida (aproximadamente 20–300 Hz, con máximo cerca de 70 Hz): la cualidad de
@@ -207,7 +207,7 @@ un ralentí diésel o de un altavoz distorsionado. Es una **métrica nueva** en
 phonometry. ECMA-418-2 extrae la envolvente de cada banda, pondera su espectro
 de modulación por la tasa y la profundidad de modulación, y correlaciona la
 modulación entre bandas; el resultado $R$ se da en **asper**. El sonido de
-referencia (portador de 1 kHz, modulado en amplitud al 100 % a 70 Hz, nivel
+referencia (portadora de 1 kHz, modulada en amplitud al 100 % a 70 Hz, nivel
 global de 60 dB SPL) se define como 1 asper; esta implementación de sala
 limpia devuelve 0,9999 asper con la constante de calibración tabulada $c_R$
 (Fórmula 104) usada **sin** reajustarla hacia atrás al objetivo.
@@ -233,7 +233,7 @@ res.plot()   # aspereza R(l50) dependiente del tiempo + mapa de calor de asperez
   width="80%"
 />
 
-*Las dos sensaciones, cada una leída como la define su cláusula: la tonalidad
+*Las dos sensaciones, cada una leída como la define su apartado: la tonalidad
 como traza temporal, que separa un tono en ruido del ruido solo, y la aspereza
 en función de la tasa de modulación, cuyo máximo a 70 Hz sobre una portadora de
 1 kHz totalmente modulada a 60 dB es el punto de calibración del asper.*
@@ -304,7 +304,7 @@ sirena, tonos batientes, el habla al ritmo silábico. Es la contraparte lenta
 de la aspereza: el mismo modelo auditivo separa la modulación de la
 envolvente en un paso de banda lento con máximo cerca de 4 Hz (intensidad de
 fluctuación, en **vacil_HMS**) y otro rápido con máximo cerca de 70 Hz
-(aspereza). La cláusula 9 de ECMA-418-2 analiza la envolvente de cada banda
+(aspereza). El apartado 9 de ECMA-418-2 analiza la envolvente de cada banda
 con análisis espectral de alta resolución (HSA), un ajuste por mínimos
 cuadrados de pares de líneas espectrales del núcleo de la ventana que
 resuelve tasas de modulación muy por debajo del ancho de bin de la DFT, con
@@ -317,7 +317,7 @@ sala limpia converge a 0,9958 vacil_HMS a los 12 s con la constante de
 calibración tabulada $c_F$ (fórmula 163) usada **sin** reajustarla al objetivo
 (el ejemplo de 8 s de abajo imprime 0,9957). Una señal cuyo valor único $F$
 supera 0,2 vacil_HMS tiene una intensidad de fluctuación *prominente*
-(cláusula 9.2).
+(apartado 9.2).
 
 ```python
 import numpy as np
@@ -353,7 +353,7 @@ t = np.arange(int(3.0 * fs)) / fs
 carrier = np.sin(2 * np.pi * 1000 * t)
 
 def am_tone(fmod):
-    # AM del 100 % a un nivel global de 60 dB SPL (convención de las cláusulas 7/9)
+    # AM del 100 % a un nivel global de 60 dB SPL (convención de los apartados 7/9)
     x = (1.0 + np.sin(2 * np.pi * fmod * t)) * carrier
     return x * 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))
 
@@ -389,8 +389,9 @@ el percentil 90 de $F(l_{50})$), `specific_fluctuation_strength`
 
 Los modelos de intensidad de fluctuación de Fastl y Zwicker (forma cerrada
 para ruido de banda ancha AM y el modelo de señal de Osses 2016) están en
-[Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/);
-esta métrica de la cláusula 9 es la contraparte normativa del modelo de
+[Molestia
+psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/);
+esta métrica del apartado 9 es la contraparte normativa del modelo de
 Sottek.
 
 Consulta [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/)

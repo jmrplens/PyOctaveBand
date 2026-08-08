@@ -24,7 +24,7 @@ Una cuarta ruta no mide sonido en absoluto.
 [Potencia acústica desde la vibración superficial (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
 estima la potencia radiada a partir del nivel de velocidad promediado en la
 superficie y un factor de radiación, que es lo que queda cuando la máquina no
-puede llevarse a una sala calificada y su entorno es demasiado ruidoso para una
+puede llevarse a una sala cualificada y su entorno es demasiado ruidoso para una
 superficie envolvente: la Parte 1 da un valor de límite superior solo con la
 velocidad, y la Parte 2 un valor de ingeniería una vez estimado como es debido
 el factor de radiación. Además responde a una pregunta algo distinta de la de
@@ -64,7 +64,7 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
   de ISO 3745.
 - [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/):
   los métodos directo y de comparación de ISO 3741.
-- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+- [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   la potencia radiada a partir del nivel de velocidad promediado en la
   superficie y el factor de radiación, con el límite superior de la Parte 1 y
   el valor de ingeniería de la Parte 2.
@@ -73,15 +73,15 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
 
 ## Qué no cubre esta sección
 
-Los métodos de determinación empiezan después de haber calificado el recinto y
-la sonda. La calificación de campo libre de una sala anecoica o semianecoica de
-ISO 3745, la calificación de la cámara reverberante de ISO 3741 (recuento de
+Los métodos de determinación empiezan después de haber cualificado el recinto y
+la sonda. La cualificación de campo libre de una sala anecoica o semianecoica de
+ISO 3745, la cualificación de la cámara reverberante de ISO 3741 (recuento de
 frecuencias propias o comparación con una fuente de referencia) y el ensayo de
 intensidad residual de IEC 61043 de una cadena de sonda y analizador se **dan
 por supuestos, no se ejecutan**: la biblioteca avisa de los criterios
 orientativos gruesos que las normas declaran explícitamente — el volumen mínimo
 de la Tabla 1, el número de posiciones, una dispersión entre posiciones superior
-a 1,5 dB, la validez de K₂ en ISO 3744 — y califica un índice de intensidad
+a 1,5 dB, la validez de K₂ en ISO 3744 — y cualifica un índice de intensidad
 residual que has medido tú. La corrección meteorológica C₃ de ISO 3745
 necesita igualmente un coeficiente de absorción del aire que aportas tú; aquí no
 se calcula a partir de ISO 9613-1.

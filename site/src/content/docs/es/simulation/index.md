@@ -55,13 +55,16 @@ documentación son salida de estos dos solucionadores, y están archivadas en la
 guías cuya física zanjan y no aquí. Los modos de sala creciendo en resonancia y
 fuera de ella aparecen en
 [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y en
-[predicción de la reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/),
+[predicción de la
+reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/),
 que además lleva la sala de columnas que convierte un solo frente de onda en un
 campo mezclado; la difracción por barrera a dos longitudes de onda, en
 [propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/)
-y en [efecto del suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/);
+y en [efecto del suelo y
+barreras](/phonometry/es/environment/propagation/ground-barriers/);
 la refracción a favor y en contra del viento, en
-[refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/);
+[refracción
+atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/);
 el patrón de lóbulos del efecto del suelo, en propagación en exteriores y en
 [ruido de aeropuerto](/phonometry/es/aircraft/airport-noise/); los tubos de onda
 estacionaria y de transmisión, en
@@ -69,10 +72,13 @@ estacionaria y de transmisión, en
 paneles QRD y de metadifusor, en
 [difusores](/phonometry/es/materials/diffusers/diffusers/) y
 [metadifusores](/phonometry/es/materials/diffusers/metadiffusers/); el absorbente
-de rendija, en [absorbentes metamateriales](/phonometry/es/materials/absorbers/metamaterial-absorbers/);
-la cámara de expansión, en [silenciadores](/phonometry/es/devices/noise-control/silencers/);
+de ranura, en [absorbentes
+metamateriales](/phonometry/es/materials/absorbers/metamaterial-absorbers/);
+la cámara de expansión, en
+[silenciadores](/phonometry/es/devices/noise-control/silencers/);
 la abertura en la pared, en
-[aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/);
+[aislamiento acústico de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/);
 y el canal SOFAR, en
 [propagación submarina](/phonometry/es/underwater/underwater-propagation/). El
 solucionador elástico aporta dos más: el paquete de flexión que entra en una
@@ -141,7 +147,7 @@ del sonido dependiente de la altura y no de un campo de flujo. El único contorn
 de impedancia es uno real independiente de la frecuencia, así que un absorbente
 poroso hay que mallarlo en vez de declararlo. Del lado elástico el sólido es
 isótropo y puramente elástico: sin anisotropía y sin amortiguamiento
-viscoelástico más allá de la tasa de caída volumétrica, así que no se puede
+viscoelástico más allá de la tasa de decaimiento volumétrica, así que no se puede
 introducir un factor de pérdidas del material.
 
 Y aquí no hay ningún paquete de acústica de salas. No hay importador de

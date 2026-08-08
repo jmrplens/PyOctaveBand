@@ -38,10 +38,11 @@ servir, los modos propios discretos de la propia caja de zapatos.
 
 Antes de las dos páginas de predicción, una página responde a una pregunta
 distinta sobre la misma sala.
-[Criterios de ruido de salas (NC / RC Mark II)](/phonometry/es/buildings/rooms/room-noise/)
+[Criterios de ruido de salas (NC / RC Mark
+II)](/phonometry/es/buildings/rooms/room-noise/)
 pregunta si su ruido de fondo estacionario (ventilación, tráfico lejano) es
 aceptable para su uso, valorado contra las curvas de criterio de
-ANSI/ASA S12.2, con la etiqueta retumbe/siseo del RC Mark II diagnosticando
+ANSI/ASA S12.2, con la etiqueta retumbo/siseo del RC Mark II diagnosticando
 *por qué* falla un espectro.
 
 La predicción recibe dos páginas porque conviven dos tradiciones. Las dos son
@@ -60,8 +61,8 @@ diseño.
 
 **¿Cuál de las dos?** Cita EN 12354-6 cuando el entregable sea un informe de
 diseño dentro de un marco europeo de acústica de la edificación, cuando la sala
-sea un espacio corriente de edificio dentro de los límites de validez de la
-cláusula 4.6 y cuando la absorción del recinto receptor tenga que alimentar una
+sea un espacio corriente de edificio dentro de los límites de validez del
+apartado 4.6 y cuando la absorción del recinto receptor tenga que alimentar una
 predicción de aislamiento EN 12354. Usa la familia clásica cuando la sala quede
 fuera de ese alcance — un auditorio, un teatro, un espacio industrial o una sala
 cuya absorción se concentra en un eje, de modo que haga falta un modelo axial —
@@ -69,17 +70,19 @@ o cuando lo que merezca la situación sea un *abanico* de predicciones y no un
 único valor normativo. Las dos comparten un mismo modo de fallo, la pérdida de
 difusividad, y fallan en la misma dirección: el tiempo de reverberación medido
 sale más largo que el previsto, hasta el doble en las salas de baja difusividad
-que registra la propia cláusula de precisión de la norma. Y ninguna sustituye a
+que registra el propio apartado de precisión de la norma. Y ninguna sustituye a
 una medición: la contrapartida medida es
 [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/).
 
 Páginas relacionadas en otras secciones: el coeficiente de absorción que
 consume la cadena de predicción se mide en
-[Medida y valoración de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/),
+[Medida y clasificación de la absorción
+sonora](/phonometry/es/materials/absorbers/absorption-measurement/),
 el aislamiento *entre* salas continúa en
 [Aislamiento acústico](/phonometry/es/buildings/insulation/), y la
 inteligibilidad del habla que ofrece una sala la cuantifica el
-[índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
+[índice de transmisión del
+habla](/phonometry/es/perception/speech/speech-transmission/).
 
 ## Páginas de esta sección
 
@@ -124,13 +127,13 @@ dimensiones, coeficientes y respuestas al impulso como entradas, y devuelven
 parámetros. Los propios coeficientes de absorción salen de
 [Materiales y superficies](/phonometry/es/materials/absorbers/), y el modelo
 yerra por el lado optimista cuando la sala no es difusa — fuera de los límites
-de la cláusula 4.6 de EN 12354-6 (ninguna dimensión más de cinco veces otra,
+del apartado 4.6 de EN 12354-6 (ninguna dimensión más de cinco veces otra,
 superficies opuestas dentro de un factor de tres en absorción, fracción de
 objetos por debajo de 0,2) el tiempo de reverberación medido puede llegar al
 doble del previsto.
 
 Dos fronteras de cobertura siguen a las normas. De EN 12354-6 solo está
-implementado el modelo normativo de la cláusula 4, no su método informativo del
+implementado el modelo normativo del apartado 4, no su método informativo del
 Anexo D para recintos irregulares. Y nada de esta sección mide el aislamiento
 *entre* salas: eso es
 [Aislamiento acústico](/phonometry/es/buildings/insulation/).

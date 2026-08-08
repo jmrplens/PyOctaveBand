@@ -15,7 +15,7 @@ references:
     title: "Acoustics — Field measurements of airborne and impact sound insulation and of service equipment sound — Survey method"
     designation: "ISO 10052:2021"
     url: "https://www.iso.org/standard/76560.html"
-    note: "El método de control en campo: la corrección por índice de reverberación, las magnitudes aérea, de impacto y de fachada estandarizadas/normalizadas, y el ruido de equipos de servicio. Las fórmulas y la tabla del índice de reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010."
+    note: "El método de control en campo: la corrección por índice de reverberación, las magnitudes aérea, de impacto y de fachada estandarizadas/normalizadas, y el ruido de equipamientos. Las fórmulas y la tabla del índice de reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -35,7 +35,9 @@ los motores de número único tras los índices del método de control en
 
 ## Bandas de octava y el índice de reverberación
 
-Los [métodos de ingeniería](/phonometry/es/buildings/insulation/insulation-field/) compran precisión con esfuerzo:
+Los [métodos de
+ingeniería](/phonometry/es/buildings/insulation/insulation-field/) compran
+precisión con esfuerzo:
 micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
 fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
 un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
@@ -47,17 +49,17 @@ $D_n = D + k + 10\log_{10}(A_0 T_0/(0{,}16\,V))$, la aparente
 $R' = D + k + 10\log_{10}(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
 mayor) y, para impactos y fachadas, $L'_{nT} = L_i - k$ y
 $D_{2m,nT} = D_{2m} + k$. Las referencias a
-cláusulas siguen ISO 10052:2021; las fórmulas y la tabla del índice de
+apartados siguen ISO 10052:2021; las fórmulas y la tabla del índice de
 reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
 
 El índice de reverberación se **mide** (pasa el tiempo de reverberación a
 `reverberation_index(T)`) o, en un control, se **estima** a partir del tipo de
 sala y el volumen con `estimate_reverberation_index(V, room)`: amueblada
 `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de construcción sin
-amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`. La cláusula 6.5 separa eso
+amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`. El apartado 6.5 separa eso
 en dos: la **Tabla 3** clasifica el recinto y le asigna su letra, y la
 **Tabla 4** convierte la letra y el volumen en el índice. Una cuarta
-magnitud propia de este método es el **ruido de equipos de servicio**
+magnitud propia de este método es el **ruido de equipamientos**
 $L_{XY}$: la
 media energética de tres posiciones ponderadas A o C.
 
@@ -106,7 +108,7 @@ print(res.r_prime_rating.rating)               # 48  ->  R'w
 k_est = building.estimate_reverberation_index(50.0, "h")
 print(k_est)                                   # [5.  5.5 6.  5.  5.5]
 
-# Ruido de equipos de servicio: media energética de tres posiciones (dB(A)).
+# Ruido de equipamientos: media energética de tres posiciones (dB(A)).
 se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
 print(round(float(se.l_xy), 1), round(float(se.l_xy_nt), 1))   # 32.8 29.8
 
@@ -129,7 +131,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import building
 
-# Niveles por bandas de octava (125-2000 Hz) y el T medido del recinto receptor.
+# Niveles de bandas de octava (125-2000 Hz) y el T medido del recinto receptor.
 bands = [125, 250, 500, 1000, 2000]
 l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
 l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
@@ -153,12 +155,12 @@ plt.show()
 ### Ruido de fondo: un umbral que cumplir, no una corrección que aplicar
 
 A diferencia de los métodos de ingeniería, el método de control nunca corrige
-por ruido de fondo (cláusula 6.2.1). Fija en su lugar un umbral de relación
+por ruido de fondo (apartado 6.2.1). Fija en su lugar un umbral de relación
 señal/ruido: ajusta la fuente para que el nivel en el recinto receptor supere
 al fondo en al menos 6 dB en todas las bandas, comprobado encendiendo y
 apagando la fuente antes de la tanda. Donde el margen siga por debajo de
 6 dB, registra el nivel sin corregir y haz constar en el informe que la
-diferencia de niveles queda infravalorada (o, para equipos de servicio, que el
+diferencia de niveles queda infravalorada (o, para equipamientos, que el
 nivel queda sobrevalorado) en una cantidad desconocida. Por eso no aparece
 ninguna llamada de corrección en toda esta página:
 `building.background_correction` implementa la regla de laboratorio de
@@ -197,7 +199,7 @@ $D_{2m,nT,w}$), la
 declaración del método de control, un veredicto opcional (las diferencias de
 niveles cumplen si igualan o superan el requisito, y el nivel de impactos si lo
 iguala o queda por debajo) y un pie. El resultado a ruido aéreo informa
-`quantity="dnt"` (por defecto) o `"r_prime"`; `verbose=True`, `metadata` y
+de `quantity="dnt"` (por defecto) o de `"r_prime"`; `verbose=True`, `metadata` y
 `language="es"` se comportan igual que en las fichas anteriores.
 
 ```python
@@ -302,7 +304,7 @@ sobre espectros de 5 octavas o 16 tercios; y las fichas del método con
 sonómetro, las alturas de medición fijas, la colocación de la máquina de
 impactos del método) no se comprueba: las funciones consumen niveles por
 banda vengan de donde vengan. Nada verifica que se cumpliese el umbral de
-6 dB de señal a fondo de la cláusula 6.2.1, y no se aplica corrección alguna
+6 dB de señal a fondo del apartado 6.2.1, y no se aplica corrección alguna
 cuando no se cumplió: esa es la regla del propio método, no una omisión. La
 declaración de exactitud
 del método frente a ISO 16283 se cita de la norma, no se modela; cuando
@@ -319,7 +321,7 @@ sube lo que hay en juego, pasa a
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los tiempos de
   reverberación medidos tras el índice de reverberación.
 - [Niveles](/phonometry/es/signals/levels/levels/): el promediado en energía tras
-  los niveles en bandas de octava.
+  los niveles de bandas de octava.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación
   de la curva de referencia tras los índices globales ponderados.
 - Referencia de la API: [`building.measurement.survey_insulation`](/phonometry/es/reference/api/building/survey-insulation/).

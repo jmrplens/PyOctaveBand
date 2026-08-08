@@ -16,7 +16,7 @@ rodante, el diámetro primitivo y el ángulo de contacto; su suma es
 exactamente el número de
 elementos por la frecuencia de giro del eje, lo que detecta al instante una
 geometría mal tecleada. En un **par de engranajes**, la frecuencia de engrane y
-las familias de bandas laterales que distinguen un diente descascarillado de una
+las familias de bandas laterales que distinguen un diente astillado de una
 rueda excéntrica. En **motores y rotores con palas**, las líneas de
 alimentación, deslizamiento, paso de polos y ranura del rotor de un motor de
 inducción y los tonos de paso de pala de ventiladores, soplantes y bombas, con

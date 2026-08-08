@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica en cámara reverberante"
-description: "La determinación de precisión del nivel de potencia acústica en una cámara reverberante cualificada según ISO 3741: el método directo mediante el área de absorción de Sabine con las correcciones de Waterhouse y meteorológicas C1/C2, el método de comparación con una fuente sonora de referencia, los avisos de calificación y la ficha de ensayo de estilo acreditado."
+description: "La determinación de precisión del nivel de potencia acústica en una cámara reverberante cualificada según ISO 3741: el método directo mediante el área de absorción de Sabine con las correcciones de Waterhouse y meteorológicas C1/C2, el método de comparación con una fuente sonora de referencia, los avisos de cualificación y la ficha de ensayo de estilo acreditado."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -15,7 +15,7 @@ references:
     title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for reverberation test rooms"
     designation: "ISO 3741:2010"
     url: "https://www.iso.org/standard/52053.html"
-    note: "Los métodos directo (Ec. 20) y de comparación (Ec. 21) de esta guía, con las correcciones de Waterhouse y meteorológicas y los criterios de calificación de la Tabla 1."
+    note: "Los métodos directo (Ec. 20) y de comparación (Ec. 21) de esta guía, con las correcciones de Waterhouse y meteorológicas y los criterios de cualificación de la Tabla 1."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -32,7 +32,7 @@ estacionarias y de banda ancha lo bastante pequeñas para viajar a una cámara
 cualificada. Esta guía cubre el método directo mediante el área de
 absorción de Sabine, las correcciones de Waterhouse y meteorológicas, el
 método de comparación con una fuente sonora de referencia, los avisos de
-calificación y la ficha de ensayo de estilo acreditado. Qué vía encaja con
+cualificación y la ficha de ensayo de estilo acreditado. Qué vía encaja con
 qué trabajo, y las alternativas de presión e intensidad, se sopesan en
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 
@@ -71,7 +71,7 @@ $L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
 El panel derecho del clip de abajo es este método. La misma fuente suena en
 las dos salas; en la cámara anecoica de la izquierda los micrófonos solo ven
 lo que la fuente les envía, así que el nivel cae con la distancia y la vía de
-campo libre tiene que integrar sobre una superficie de medida, mientras que
+campo libre tiene que integrar sobre una superficie de medición, mientras que
 en la cámara reverberante de la derecha la energía reflejada llena el espacio
 y el nivel deja de depender de dónde esté un micrófono. Esa es toda la razón
 de que la Ec. 20 pueda sustituir una integral de superficie por un puñado de
@@ -248,7 +248,7 @@ res.report(
         specimen="Grupo hidráulico (de suelo)",
         test_room="Cámara reverberante cualificada, V = 200 m3, T60 = 2,0 s",
         instrumentation="Sonómetro clase 1 (IEC 61672-1), n/s 0042",
-        laboratory="Ejemplo de referencia de phonometry",
+        laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-3741",
         requirement=96.0,
     ),
@@ -257,7 +257,7 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso3741_reverberation_power_example"
@@ -278,7 +278,7 @@ corrección de fondo por banda y el total ponderado A del Anexo F,
 presentados como ficha de potencia acústica de estilo acreditado mediante
 `.report()`.
 
-**No cubierto.** La propia calificación de la cámara reverberante
+**No cubierto.** La propia cualificación de la cámara reverberante
 (Anexo C/D, recuento de frecuencias propias o comparación con una fuente de
 referencia) se da por supuesta, no se ejecuta; la biblioteca solo avisa de
 los criterios orientativos que ISO 3741 declara explícitamente (el volumen

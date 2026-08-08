@@ -79,7 +79,7 @@ produce **absorción perfecta**, $\alpha = 1$, a una frecuencia de diseño en la
 que el panel solo tiene $\lambda/38$ de profundidad; diseños publicados de la
 misma familia llegan a $\lambda/88$ (Jiménez et al. 2016). Esta guía cubre la
 condición de acoplamiento crítico que hace posible la absorción perfecta, el
-panel ranurado de sonido lento implementado en la librería, y los absorbentes
+panel ranurado de sonido lento implementado en la biblioteca, y los absorbentes
 resonantes clásicos releídos bajo la misma óptica.
 
 ## 1. Acoplamiento crítico: cuando la pérdida compensa exactamente la fuga
@@ -88,15 +88,15 @@ Un panel absorbente con respaldo rígido es un resonador de un solo puerto: el
 sonido entra por la cara, resuena dentro, y o bien vuelve a fugarse o bien se
 disipa. Su coeficiente de reflexión sobre el plano de frecuencia compleja
 tiene un polo y un cero por cada resonancia. En la resonancia compiten dos
-ritmos: el **ritmo de fuga**, lo rápido que la energía almacenada vuelve a
-radiarse al medio incidente, y el **ritmo de pérdida intrínseca**, lo rápido
+tasas: la **tasa de fuga**, lo rápido que la energía almacenada vuelve a
+radiarse al medio incidente, y la **tasa de pérdida intrínseca**, lo rápido
 que las capas límite viscotérmicas de la estructura la disipan.
 
 - Con demasiado poca pérdida (un panel casi sin pérdidas) la energía se fuga
   casi toda de vuelta: la reflexión cae pero se recupera, $|R| > 0$.
 - Con demasiada pérdida (un panel sobreamortiguado) la onda apenas entra: el
   panel vuelve a parecer rígido, $|R| > 0$ desde el otro lado.
-- Cuando los dos ritmos son **iguales**, el cero del coeficiente de reflexión
+- Cuando las dos tasas son **iguales**, el cero del coeficiente de reflexión
   cae exactamente sobre el eje de frecuencia real: a esa frecuencia no se
   refleja nada, $R = 0$ y $\alpha = 1 - |R|^2 = 1$. Esta es la **condición de
   acoplamiento crítico** (Jiménez et al. 2017).
@@ -301,7 +301,7 @@ rompe y la reflexión la reconstruye.
   name="anim_fdtd_slit_absorber"
   width={2400}
   height={1350}
-  title="Dentro del absorbedor de ranura de sonido lento en una simulación FDTD 2D"
+  title="Dentro del absorbente de ranura de sonido lento en una simulación FDTD 2D"
   description="Un tono plano de 300 Hz en un tubo FDTD 2D llega a la celda de acoplamiento crítico mallada, con su ranura de 0,98 mm y su resonador de Helmholtz resueltos en la rejilla y mostrados en un panel ampliado. A la altura de ranura de diseño la envolvente de presión queda plana y se anota la absorción 1,00 de la biblioteca; la ranura 1,7 veces más ancha sostiene una onda estacionaria profunda frente al panel y la absorción cae a 0,34."
 />
 
@@ -375,15 +375,15 @@ de la [guía de porosos y multicapa](/phonometry/es/materials/absorbers/porous-a
   bajan la de la ranura.
 - **La pregunta de diseño es siempre la misma.** Se elige la resonancia con
   la geometría y después se adapta la pérdida a la fuga. Los modelos de capa
-  porosa preguntan "cuánto espesor"; la familia resonante pregunta "cuánta
-  pérdida", y `critical_coupling_design` lo responde exactamente para el
+  porosa preguntan «cuánto espesor»; la familia resonante pregunta «cuánta
+  pérdida», y `critical_coupling_design` lo responde exactamente para el
   panel ranurado.
 
 El precio de la resonancia es el ancho de banda: un pico con acoplamiento
 crítico es estrecho, y lejos de él el panel refleja como la pared rígida que
 casi es. Los metaabsorbentes de banda ancha apilan celdas desintonizadas lado
 a lado (el absorbente iridiscente de Jiménez et al. 2017 encadena
-resonadores de dimensiones graduadas justo por esto); en la librería el
+resonadores de dimensiones graduadas justo por esto); en la biblioteca el
 espectro de cualquier geometría candidata sale de `slit_helmholtz_absorber`
 sobre un array de frecuencias, así que un diseño graduado es un bucle sobre
 celdas.
@@ -401,14 +401,15 @@ solucionador de diseño con acoplamiento crítico (`critical_coupling_design`)
 que ajusta longitud de cavidad y altura de ranura hasta que el cero de
 reflexión queda sobre el eje de frecuencia real.
 
-**No cubierto.** Ningún estándar de medida rige estos modelos de predicción;
+**No cubierto.** Ninguna norma de medida rige estos modelos de predicción;
 un panel construido se verificaría en el
 [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) (ISO 10534-2) o
 en la [cámara reverberante](/phonometry/es/materials/absorbers/absorption-measurement/)
 (ISO 354). Los absorbentes de membrana y membrana decorada de la sección 4 se
 tratan solo como contexto; las capas clásicas perforadas, microperforadas y
 de membrana están implementadas en
-[Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y
+[Absorbentes porosos y
+multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y
 la ranura cargada con resonadores usada como elemento de fase en vez de como
 absorbente es el tema de
 [Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/).

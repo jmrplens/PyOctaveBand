@@ -1,23 +1,24 @@
 ---
-title: "Capas resilientes"
-description: "La propiedad mecánica en torno a la que se diseña un suelo flotante: la rigidez dinámica por unidad de área de una capa resiliente, la resonancia de placa de carga de EN 29052-1 que la mide, el término del gas encerrado y la frecuencia natural que fija bajo una solera."
+title: "Capas elásticas"
+description: "La propiedad mecánica en torno a la que se diseña un suelo flotante: la rigidez dinámica por unidad de superficie de una capa elástica, la resonancia de placa de carga de EN 29052-1 que la mide, el término del gas encerrado y la frecuencia natural que fija bajo una solera."
 ---
 
 Un suelo flotante es un sistema masa-resorte: la solera es la masa, la capa
-resiliente es el resorte, y la mejora a ruido de impactos que compra el
+elástica es el resorte, y la mejora a ruido de impactos que compra el
 conjunto empieza por encima de la resonancia que fijan entre los dos. Esa
 resonancia la fijan la masa por unidad de superficie m' de la losa, en kg/m², y
-la **rigidez dinámica por unidad de área** s' de la capa, en MN/m³ — la fuerza
-dinámica por unidad de área dividida por la variación de espesor que produce.
+la **rigidez dinámica por unidad de superficie** s' de la capa, en MN/m³ — la fuerza
+dinámica por unidad de superficie dividida por la variación de espesor que produce.
 Una solera de 120 kg/m² sobre una capa de 10 MN/m³ resuena cerca de 46 Hz;
 reducir la rigidez a la mitad baja esa cifra en un factor raíz de dos, y todo
 lo que el suelo consigue en las bandas de valoración se sigue de dónde quede la
 resonancia. Por eso s' es el único número que una hoja de datos de capa
-resiliente tiene que llevar, y por eso es una rigidez *dinámica*: un ensayo de
+elástica tiene que llevar, y por eso es una rigidez *dinámica*: un ensayo de
 compresión estático no describe ni el rango de frecuencias de audio ni la
 precarga de servicio.
 
-[Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/)
+[Rigidez dinámica de materiales resilientes (EN
+29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/)
 es la medición que la produce. Una probeta de 200 mm × 200 mm soporta una placa
 de carga de 8 kg — 200 kg/m² en total, que reproduce la precarga estática de
 unos 2 kPa de un suelo flotante real — y un excitador vertical con un
@@ -27,16 +28,17 @@ aire, el aire de los poros es un segundo resorte en paralelo con el esqueleto, y
 la norma lo devuelve mediante un término del gas encerrado que depende del
 espesor bajo carga: la rigidez instalada depende por tanto de cómo se vaya a
 sellar la capa y de su resistividad lateral al flujo de aire, que es lo que
-deciden los regímenes de la cláusula 8.2. La guía lo encadena todo y genera la
-ficha de informe de ensayo de la cláusula 9.
+deciden los regímenes del apartado 8.2. La guía lo encadena todo y genera la
+ficha de informe de ensayo del apartado 9.
 
 Dos entradas vienen de fuera de esta subsección. La frecuencia de resonancia
-hay que extrapolarla a amplitud de fuerza nula por el procedimiento de la
-cláusula 7, y la resistividad al flujo de aire se mide según ISO 9053 en
+hay que extrapolarla a amplitud de fuerza nula por el procedimiento del
+apartado 7, y la resistividad al flujo de aire se mide según ISO 9053 en
 [Resistencia al flujo de aire](/phonometry/es/materials/absorbers/airflow-resistance/)
-— ojo a que ISO 9053 la reporta en Pa·s/m² mientras que el argumento de esta
+— ojo a que ISO 9053 la da en Pa·s/m² mientras que el argumento de esta
 página va en kPa·s/m². Lo que el lado del diseño hace con s' está en
-[Predicción del comportamiento de capas resilientes](/phonometry/es/buildings/design/resilient-layers/),
+[Predicción del comportamiento de capas
+elásticas](/phonometry/es/buildings/design/resilient-layers/),
 que lo convierte en la mejora del suelo flotante y en la valoración de la capa
 adicional del Anexo D de ISO 12354-1.
 
@@ -45,8 +47,7 @@ adicional del Anexo D de ISO 12354-1.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   el método de resonancia con placa de carga, la rigidez aparente que da, el
   término del gas encerrado para capas permeables al aire, los regímenes por
-  resistividad al flujo de la cláusula 8.2 y la ficha de informe de ensayo de
-  la cláusula 9.
+  resistividad al flujo del apartado 8.2 y la ficha de informe de ensayo del apartado 9.
 
 ## Véase también
 
@@ -55,17 +56,17 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 - [Resistencia al flujo de aire](/phonometry/es/materials/absorbers/airflow-resistance/):
   la medición ISO 9053 de la resistividad lateral que necesita la regla de
   régimen.
-- [Predicción del comportamiento de capas resilientes](/phonometry/es/buildings/design/resilient-layers/):
+- [Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/):
   el consumidor, donde s' se convierte en la mejora de un suelo flotante.
 
 ## Qué no cubre esta sección
 
 La medición empieza un paso después de la señal. La extracción de la frecuencia
-de resonancia de la señal bruta de excitación-respuesta de la cláusula 7 — por
+de resonancia de la señal bruta de excitación-respuesta del apartado 7 — por
 excitación sinusoidal, de ruido blanco o de impulso — y su extrapolación a
 amplitud de fuerza nula **no están implementadas**: pasa una frecuencia de
 resonancia ya extrapolada. La resistividad lateral al flujo de aire es una
-entrada, no una medición. El requisito de selección de probetas de la cláusula
+entrada, no una medición. El requisito de selección de probetas del apartado
 6, al menos tres probetas de 200 mm × 200 mm, no se aplica, así que nada aquí
 protesta si caracterizas un material a partir de una sola. Y las demás
 propiedades de la capa — fluencia bajo carga de larga duración, resistencia a

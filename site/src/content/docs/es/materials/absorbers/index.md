@@ -28,26 +28,27 @@ frecuencia de un absorbente poroso y ancla todos los modelos porosos aguas
 abajo.
 
 [Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) es la escala de
-muestra: el factor de reflexión, la impedancia superficial y la absorción
-complejos a incidencia normal, por los métodos de la razón de onda
+muestra: el factor de reflexión y la impedancia superficial complejos, y la
+absorción, a incidencia normal, por los métodos de la razón de onda
 estacionaria de ISO 10534-1 y de la función de transferencia de ISO 10534-2,
 más la pérdida por transmisión con cuatro micrófonos de ASTM E2611, y el tubo
-FDTD virtual que contrasta el solver de ondas con las mismas cadenas de
+FDTD virtual que contrasta el solucionador de ondas con las mismas cadenas de
 reducción.
 
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/)
 cierra el ciclo con la predicción: los modelos de fluido equivalente de
 Delany-Bazley, Miki y Johnson-Champoux-Allard convierten la resistividad
-medida en impedancia característica y número de onda, y el solver multicapa
+medida en impedancia característica y número de onda, y el solucionador multicapa
 por matrices de transferencia predice la absorción de una construcción
 completa, a cualquier incidencia y en campo difuso, antes de construir nada.
 
-[Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/) es donde los
+[Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/)
+es donde los
 modelos de predicción dejan atrás las reglas clásicas: paneles ranurados de
 sonido lento cargados con resonadores de Helmholtz alcanzan la absorción
 perfecta en el acoplamiento crítico con paneles de una cuarentava parte de la
 longitud de onda de profundidad, con el modelo de matrices de transferencia,
-el solucionador de diseño y la validación cruzada FDTD de la celda mallada.
+el solucionador de diseño y la comprobación cruzada FDTD de la celda mallada.
 
 ## Páginas de esta sección
 
@@ -61,7 +62,7 @@ el solucionador de diseño y la validación cruzada FDTD de la celda mallada.
   la impedancia superficial y la pérdida por transmisión ASTM E2611 a
   incidencia normal, más el tubo FDTD virtual.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
-  los modelos de fluido equivalente y el solver multicapa por matrices de
+  los modelos de fluido equivalente y el solucionador multicapa por matrices de
   transferencia con capas perforadas, microperforadas y de membrana.
 - [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/): la
   condición de acoplamiento crítico y el panel ranurado de sonido lento con
@@ -80,7 +81,7 @@ E2611-24. Los refinamientos del recorrido de la sonda de ISO 10534-1
 (extrapolar los mínimos hasta la cara de la muestra, correcciones por el cuerpo
 de la sonda) se describen pero no se automatizan. Los modelos de predicción van
 en un solo sentido: convierten una resistividad en una impedancia, y no hay
-ningún solver inverso que recupere los parámetros del material a partir de una
+ningún solucionador inverso que recupere los parámetros del material a partir de una
 curva medida. Y ninguna norma de medida gobierna los diseños de metamaterial —
 un panel construido se verifica en el tubo de impedancia o en la cámara
 reverberante como cualquier otro absorbente, y por eso esa página da una

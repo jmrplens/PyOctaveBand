@@ -38,7 +38,7 @@ situ (ISO 9614) donde una medición de presión por sí sola no puede.
 
 ## El principio de dos micrófonos (IEC 61043)
 
-Una sonda p-p sostiene dos micrófonos apareados a una pequeña distancia
+Una sonda p-p sostiene dos micrófonos emparejados a una pequeña distancia
 $\Delta r$. La
 presión en el centro de la sonda es su media, y la velocidad de partícula
 proviene del *gradiente* de presión (ecuación de Euler, en forma de
@@ -57,7 +57,7 @@ $$
 I(f) = -\ \frac{\mathrm{Im}\lbrace G_{12}(f)\rbrace}{2\pi f\ \rho_0\ \Delta r}
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del separador y el eje de medición" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del espaciador y el eje de medición" width="92%" loading="eager" />
 
 La propia sonda es lo bastante pequeña para dibujarla a escala real.
 `plot_pp_probe_geometry` coloca el clásico espaciador macizo de 12 mm entre
@@ -92,7 +92,7 @@ plt.show()
 La medición en sí son dos canales síncronos: `p1` y `p2` son las presiones
 calibradas de las dos cápsulas en pascales, `p1` la más cercana a la fuente,
 adquiridas en el mismo analizador a la misma frecuencia de muestreo y con el
-eje de la sonda normal a la superficie de medida.
+eje de la sonda normal a la superficie de medición.
 
 ```python
 import numpy as np
@@ -189,8 +189,8 @@ ambos:
   factor $\sin(k\Delta r)/(k\Delta r)$, verificado en CI contra la Tabla 3 de
   IEC 61043. `IntensityResult.bias_correction` proporciona el factor y
   `max_valid_frequency` ($\approx 0{,}1\,c/\Delta r$; 2,9 kHz para un
-  separador de 12 mm) el
-  techo práctico. Los separadores mayores alcanzan frecuencias más bajas; los
+  espaciador de 12 mm) el
+  techo práctico. Los espaciadores mayores alcanzan frecuencias más bajas; los
   menores, más altas.
 - **Campos reactivos**: cuando `pressure_intensity_index` ($F_2$ en ISO 9614-1)
   se acerca al índice residual $\delta_{pI0}$ de la sonda, dominan los errores
@@ -198,17 +198,17 @@ ambos:
 
 Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
 la superficie: ¿es lo bastante estacionario como para barrerlo? En el ensayo
-inicial (apartado 8.2) se elige una posición "típica" sobre una superficie
+inicial (apartado 8.2) se elige una posición «típica» sobre una superficie
 inicial de medida y allí se muestrea la intensidad normal $M$ veces con un
 tiempo de promediación corto (la nota 9 sugiere $M = 10$ y, para señales
 periódicas, de 8 s a 12 s por muestra o cualquier número entero de ciclos).
 **$F_1$**, el indicador de variabilidad temporal, es el coeficiente de
 variación de esas muestras (ecuaciones (A.1)-(A.2)), de modo que vale cero
 para un campo perfectamente estacionario y crece a medida que la intensidad
-parásita fluctúa. La tabla B.3 exige el código de acción (e) cuando
+parásita fluctúa. La tabla B.3 pide el código de acción (e) cuando
 $F_1$ supera 0,6: reducir la variabilidad, medir en periodos más tranquilos o
-alargar el tiempo de promediación en cada posición. El Anexo B además lo
-evalúa inmediatamente antes y después de la medida en cualquiera de las
+alargar el tiempo de promediación en cada posición. El Anexo B además exige
+que se evalúe inmediatamente antes y después de la medida en cualquiera de las
 superficies (B.1.4).
 
 ```python
@@ -230,7 +230,7 @@ print(fi.field_is_stationary())              # True (límite 0,6 de la tabla B.3
 ```
 
 Sobre una superficie de medición, los demás indicadores de campo del Anexo A
-de ISO 9614-1 califican el propio barrido. **$F_2$**, el indicador
+de ISO 9614-1 cualifican el propio barrido. **$F_2$**, el indicador
 presión-intensidad de superficie, es el nivel de presión de superficie menos
 el nivel de la *magnitud* media de la intensidad normal: cuanto mayor es,
 más cerca está la medición del suelo de error de fase de la sonda. **$F_3$**, el
@@ -269,7 +269,7 @@ fi.plot(dynamic_capability=ld)   # F2/F3 por banda frente a Ld, F4 en eje gemelo
 
 *$F_2$ sube hacia baja frecuencia al volverse reactivo el campo y en 125 Hz
 cruza la capacidad dinámica del instrumento $L_d = \delta_{pI0} - K$: esa banda
-falla el criterio 1, y ningún promediado lo arregla — pide un separador mayor,
+falla el criterio 1, y ningún promediado lo arregla — pide un espaciador mayor,
 otra superficie o una sala más silenciosa. Que $F_3$ suba por encima de $F_2$
 en la misma banda revela intensidad parcial entrante (negativa), y las barras
 de $F_4$ fijan el número de posiciones que necesita la superficie (criterio 2,
@@ -371,7 +371,7 @@ IEC 61043 clasifica el hardware. La tabla 2 de la norma fija un $\delta_{pI0}$
 **mínimo** en cada banda de tercio de octava de 50 Hz a 6,3 kHz, por separado
 para una **sonda**, un **procesador** y un **instrumento completo**, en
 clase 1 y clase 2, impreso para la separación nominal entre micrófonos de
-25 mm. La nota 1 reescala toda la tabla para cualquier otro separador con
+25 mm. La nota 1 reescala toda la tabla para cualquier otro espaciador con
 $+10\log_{10}(x/25)$, con $x$ en milímetros: los mismos 3 dB por duplicación a los
 que llegaba el apartado anterior a partir de la física.
 
@@ -385,7 +385,7 @@ todas las bandas, o `None` cuando alguna banda no supera ninguna de las dos.
 from phonometry import metrology
 
 # Las frecuencias centrales sobre las que se define la tabla 2, y el índice
-# residual medido de la cadena: un valor por banda, tomado con el separador que
+# residual medido de la cadena: un valor por banda, tomado con el espaciador que
 # se montará en campo. Sustituye el marcador por tu propio ensayo residual.
 freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
 measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
@@ -401,10 +401,10 @@ res.plot()                        # δpI0 medido sobre las dos máscaras de la t
 res.report("verificacion.pdf")    # ficha de verificación de una página (PDF)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con separador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con espaciador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
 
 *Ambas máscaras de la tabla 2 bajan $10\log_{10}(12/25) = -3{,}2\ \text{dB}$ por el
-separador
+espaciador
 de 12 mm. El índice medido sube 10 dB por década en baja frecuencia, paralelo
 al requisito, porque un desfase entre canales constante en grados compra
 exactamente esa pendiente; se aplana por encima de 1 kHz, donde el desfase de
@@ -421,7 +421,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import metrology
 
-# Un instrumento completo con el separador habitual de 12 mm. El índice medido
+# Un instrumento completo con el espaciador habitual de 12 mm. El índice medido
 # se modela a partir de la física que hay tras la tabla 2: un desfase residual
 # φs se lee como δpI0 = 10 lg(kd/φs), de modo que un desfase constante en
 # grados ya sube 10 dB por década y, por encima de 1 kHz, el desfase de una
@@ -454,13 +454,13 @@ combina componentes suministrados por separado:
 solo cuando ambos son de clase 1, y 2 para cualquier otra combinación.
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iec61043_intensity_example"
 	title="Informe de ejemplo de verificación de clase de instrumento de intensidad IEC 61043 (PDF)"
-	description="Ficha de verificación de clase de instrumento de una página: una cabecera de metadatos, una tabla por bandas con los mínimos de clase 1 y clase 2, el índice residual medido, el margen y la clase alcanzada en cada banda de tercio de octava de 50 Hz a 6,3 kHz, el índice medido trazado como curva escalonada sobre las dos máscaras de la Tabla 2 con la banda de 100 Hz marcada por debajo del mínimo de clase 1, el resultado encuadrado Class 2 - COMPLIES (binding margin +4.20 dB), la separación entre micrófonos y el desfase equivalente, y un veredicto FAIL frente a la clase 1 exigida."
-	caption="Ficha de verificación de clase de instrumento (IntensityInstrumentComplianceResult.report), la clase alcanzada con su margen vinculante y el δpI0 medido sobre los mínimos de la Tabla 2 reescalados al separador de 12 mm."
+	description="Ficha de verificación de clase de instrumento de una página: una cabecera de metadatos, una tabla por bandas con los mínimos de clase 1 y clase 2, el índice residual medido, el margen y la clase alcanzada en cada banda de tercio de octava de 50 Hz a 6,3 kHz, el índice medido trazado como curva escalonada sobre las dos máscaras de la Tabla 2 con la banda de 100 Hz marcada por debajo del mínimo de clase 1, el resultado encuadrado Class 2 - COMPLIES (binding margin +4.20 dB), la separación entre micrófonos y el desfase equivalente, y un veredicto NO CUMPLE frente a la clase 1 exigida."
+	caption="Ficha de verificación de clase de instrumento (IntensityInstrumentComplianceResult.report), la clase alcanzada con su margen vinculante y el δpI0 medido sobre los mínimos de la Tabla 2 reescalados al espaciador de 12 mm."
 />
 
 ### Leer `δpI0` como un error de fase
@@ -479,7 +479,7 @@ y las dos conversiones funcionan en ambos sentidos:
 ```python
 from phonometry import metrology
 
-# 20 dB de índice residual a 1 kHz con un separador de 25 mm:
+# 20 dB de índice residual a 1 kHz con un espaciador de 25 mm:
 phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
 print(round(float(phi), 2))     # 0.26 grados, una centésima de kd
 
@@ -497,12 +497,12 @@ clase 2, que es además donde la tabla deja de avanzar en decibelios enteros
 (el instrumento pasa por 14 dB a 315 Hz, 14,5 dB a 400 Hz y 15 dB a 500 Hz).
 También por eso una décima de grado de desfase entre canales es
 una especificación exigente, y por eso una sonda debe verificarse con el
-separador con el que realmente se va a usar.
+espaciador con el que realmente se va a usar.
 
 ## Elegir la sonda
 
 Antes de tomar ningún dato hay dos decisiones: dónde se puede colocar la
-superficie de medida y qué separador se monta en la sonda.
+superficie de medición y qué espaciador se monta en la sonda.
 
 ### Campos reactivos cerca de la fuente
 
@@ -511,43 +511,44 @@ velocidad de partícula tienden a la cuadratura, así que una presión grande
 transporta poco flujo neto. Para una fuente pequeña la componente en
 cuadratura crece como $1/(kr)$; a 100 Hz y 0,25 m de la fuente ya es
 aproximadamente el doble de la activa, y $\delta_{pI}$ sube igual que en la onda
-estacionaria de la figura de dos paneles del principio de esta página. Lo mismo ocurre entre una máquina y una
+estacionaria de la figura de dos paneles del principio de esta página. Lo
+mismo ocurre entre una máquina y una
 superficie reflectante rígida, y en cámaras reverberantes donde el campo difuso
 eleva la presión sin transportar energía hacia fuera. Por eso ISO 9614-1
-mantiene la superficie de medida a más de 0,5 m de la fuente en promedio, y
+mantiene la superficie de medición a más de 0,5 m de la fuente en promedio, y
 por eso, cuando un barrido no cumple el criterio de capacidad dinámica,
 alejar la superficie o añadir absorción a la sala suele bajar $F_2$ por
 debajo de $L_d$ con menos coste que un hardware mejor.
 
-### Elegir el separador
+### Elegir el espaciador
 
-El separador fija los dos extremos de la banda utilizable, en sentidos
+El espaciador fija los dos extremos de la banda utilizable, en sentidos
 opuestos:
 
 - **El extremo alto es geometría.** La diferencia finita subestima el
   gradiente en el factor $\sin(k\Delta r)/(k\Delta r)$, así que el techo escala
   como $1/\Delta r$: `max_valid_frequency` $\approx 0{,}1\,c/\Delta r$
   mantiene el sesgo dentro de unos 0,3 dB,
-  lo que da aproximadamente 5,7 kHz con un separador de 6 mm, 2,9 kHz con
+  lo que da aproximadamente 5,7 kHz con un espaciador de 6 mm, 2,9 kHz con
   12 mm y 690 Hz con 50 mm (`bias_correct=True` deshace el sesgo conocido
   algo más allá).
 - **El extremo bajo es fase.** Una onda progresiva introduce solo
-  $360\,f\,\Delta r/c$ grados de fase verdadera a lo largo del separador,
+  $360\,f\,\Delta r/c$ grados de fase verdadera a lo largo del espaciador,
   0,8° a 63 Hz con 12 mm, mientras el desajuste entre canales permanece fijo.
   Bajar la frecuencia encoge la señal, no el error, así que el margen sobre
-  $\delta_{pI0}$ se desploma en baja frecuencia. Un separador mayor recupera
+  $\delta_{pI0}$ se desploma en baja frecuencia. Un espaciador mayor recupera
   ese margen: los requisitos de índice residual de IEC 61043 escalan como
-  $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el separador aporta
+  $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el espaciador aporta
   3 dB de margen en baja frecuencia.
 
-Ningún separador cubre por sí solo todo el rango de audio: el de 6 mm sirve
+Ningún espaciador cubre por sí solo todo el rango de audio: el de 6 mm sirve
 para el trabajo en alta frecuencia, el de 50 mm para la baja frecuencia y el
 habitual de 12 mm cubre la banda media. Las mediciones de banda ancha se
-realizan dos veces con dos separadores y se combinan los resultados por
-banda; sea cual sea el separador montado, verifica $\delta_{pI0}$ con ese
-separador
+realizan dos veces con dos espaciadores y se combinan los resultados por
+banda; sea cual sea el espaciador montado, verifica $\delta_{pI0}$ con ese
+espaciador
 instalado, porque el índice pertenece a la cadena
-sonda-separador-analizador, no a los micrófonos por sí solos.
+sonda-espaciador-analizador, no a los micrófonos por sí solos.
 
 ## Parámetros de `sound_intensity()`
 
@@ -559,8 +560,8 @@ sonda-separador-analizador, no a los micrófonos por sí solos.
 | `rho` | float | kg/m³ | por defecto `1.204` | Densidad del aire |
 | `c` | float | m/s | por defecto `343.0` | Velocidad del sonido (estimaciones de sesgo/validez) |
 | `fraction` | int, opcional | — | `1`, `3` o `None` (por defecto) | Integración en bandas de octava/tercio de octava |
-| `limits` | lista, opcional | Hz | por defecto el rango de bandas de la librería | Límites del análisis por bandas |
-| `bias_correct` | bool | — | defecto `False` | Aplica la corrección por bin $(k\Delta r)/\sin(k\Delta r)$ (IEC 61043 §7.3) antes de sumar, para que los totales de banda/banda ancha dejen de subestimar cuando $f \to$ `max_valid_frequency`; los bins pasado el primer nulo se dejan sin corregir. El factor `bias_correction` por banda se reporta en ambos casos |
+| `limits` | lista, opcional | Hz | por defecto el rango de bandas de la biblioteca | Límites del análisis por bandas |
+| `bias_correct` | bool | — | defecto `False` | Aplica la corrección por bin $(k\Delta r)/\sin(k\Delta r)$ (IEC 61043 §7.3) antes de sumar, para que los totales de banda/banda ancha dejen de subestimar cuando $f \to$ `max_valid_frequency`; los bins pasado el primer nulo se dejan sin corregir. El factor `bias_correction` por banda se da en ambos casos |
 
 Consulta [Teoría](/phonometry/es/reference/theory/signal-analysis/) para las derivaciones y
 [Calibración](/phonometry/es/signals/metrology/calibration/) para el escalado absoluto de
@@ -591,11 +592,12 @@ puntos de medida discretos hasta $L_W$, no está implementada como función aqu�
 calidad de campo, no de una potencia sumada. Las vías de barrido que sí
 calculan $L_W$ a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
 la guía de
-[potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
+[potencia acústica por barrido de
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
 El propio *ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la
 biblioteca: $\delta_{pI0}$ es un valor que quien mide obtiene en su propia
 cadena
-sonda-analizador, con el separador que va a montar, y aporta. Lo que
+sonda-analizador, con el espaciador que va a montar, y aporta. Lo que
 phonometry hace con él es clasificarlo frente a la tabla 2.
 
 ## Véase también

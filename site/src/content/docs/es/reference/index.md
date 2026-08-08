@@ -13,11 +13,11 @@ un informe que se está redactando o desde la pregunta de un revisor.
 Úsala cuando estés defendiendo un resultado y no produciéndolo. Si un colega
 pregunta qué apartado de la norma ISO 3382-1 sigue el tiempo de
 reverberación, las páginas de teoría lo dicen; si un cliente pide pruebas de
-que la librería lo calcula correctamente, el informe de conformidad muestra el
+que la biblioteca lo calcula correctamente, el informe de conformidad muestra el
 valor esperado de la propia norma junto al calculado; si un valor esperado
-impreso no concuerda con la librería, el registro de erratas dice cuál de los
+impreso no concuerda con la biblioteca, el registro de erratas dice cuál de los
 dos está mal y por qué; si un símbolo de un informe necesita nombre, el glosario
-tiene su unidad y la cláusula que lo define; y si una revista pide la fuente de
+tiene su unidad y el apartado que lo define; y si una revista pide la fuente de
 un modelo, la bibliografía tiene el DOI.
 
 Si solo buscas la firma de una función, lo que quieres es la
@@ -32,14 +32,14 @@ La evidencia existe; esto es cuál de ella tiene sitio en el documento que
 entregas. **Anota la versión exacta de phonometry que produjo los números**, y
 su DOI de versión, porque el informe de conformidad se regenera en cada pull
 request y solo el informe de la versión fijada es evidencia sobre tu ejecución.
-**Nombra la norma y el apartado que implementa cada magnitud reportada**; las
+**Nombra la norma y el apartado que implementa cada magnitud declarada**; las
 páginas de teoría y el glosario dan las dos cosas. **Adjunta o enlaza las filas
 de conformidad de esas magnitudes**, ya que llevan el valor esperado normativo
 junto al calculado. **Consulta el registro de erratas para las normas que
 cites**: cuando un defecto impreso cambió la lectura que implementa la
-librería, esa entrada es lo que explica una diferencia frente al número de otra
+biblioteca, esa entrada es lo que explica una diferencia frente al número de otra
 implementación. Y lee el bloque «Qué cubre esta guía» de cada guía que hayas
-usado para saber qué cláusulas *no* están implementadas, que es la parte por la
+usado para saber qué apartados *no* están implementados, que es la parte por la
 que pregunta primero quien revisa.
 
 ## [Teoría](/phonometry/es/reference/theory/)
@@ -69,7 +69,7 @@ quedan dentro de las propias guías, donde ya está la geometría que las motiva
 ## [Informe de conformidad](/phonometry/es/reference/conformance/)
 
 La evidencia numérica. Cada comprobación nombra una norma, un apartado o
-tabla, el valor esperado normativo, el valor que calcula la librería, la
+tabla, el valor esperado normativo, el valor que calcula la biblioteca, la
 desviación y un veredicto de conformidad. Se regenera y se exige en CI en cada
 pull request, así que describe el código tal como está ahora y no como se
 documentó una vez. Léelo cuando necesites demostrar que un número es
@@ -81,7 +81,7 @@ comparación contra un número impreso en una norma: algunas normas no publican
 ningún ejemplo resuelto, y esas comprobaciones se anclan a la forma cerrada del
 texto normativo y se fijan con un caso sintetizado a un resultado conocido, lo
 que es una evidencia más débil y así se describe en la fila. Y no toda marca
-distinta de «apto» es un defecto: la galería de filtros incluye a propósito
+distinta de «cumple» es un defecto: la galería de filtros incluye a propósito
 arquitecturas que por construcción no pueden cumplir la máscara de
 IEC 61260-1, Chebyshev I y el elíptico porque la cambian por rizado de banda de
 paso y Bessel por retardo de grupo, y esas filas llevan el veredicto «Por
@@ -96,13 +96,13 @@ resuelto a partir del documento fuente demuestra de vez en cuando que quien se
 equivoca es el *documento*: un ejemplo que contradice su propio articulado,
 una constante mal impresa, una referencia cruzada que apunta a la ecuación
 equivocada. Cada caso confirmado queda registrado con la edición impresa, la
-evidencia, la lectura que implementa la librería y el test que la fija. Léelo
-cuando un valor esperado impreso y la librería no coincidan, antes de dar por
-hecho que el error es de la librería.
+evidencia, la lectura que implementa la biblioteca y el test que la fija. Léelo
+cuando un valor esperado impreso y la biblioteca no coincidan, antes de dar por
+hecho que el error es de la biblioteca.
 
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
-Una selección curada de los libros y artículos en los que se apoyan las guías,
+Una selección cuidada de los libros y artículos en los que se apoyan las guías,
 en una sola lista agrupada por dominio, cada entrada con un DOI verificado o un
 enlace oficial del editor, media frase sobre qué sustenta y las páginas de guía
 que la citan. Es una lista de lectura del campo más que el índice completo de
@@ -112,15 +112,15 @@ Referencias de esa misma página, generada a partir de su frontmatter.
 ## [Glosario](/phonometry/es/reference/glossary/)
 
 Las magnitudes acústicas que más a menudo calculan las guías, cada una con su
-símbolo, una definición de una frase, su unidad, la norma y cláusula que la
+símbolo, una definición de una frase, su unidad, la norma y apartado que la
 define y la guía que la implementa. Léelo cuando un símbolo de una fórmula
-necesite nombre, o un nombre necesite la cláusula de la que viene. Una magnitud
+necesite nombre, o un nombre necesite el apartado del que viene. Una magnitud
 que no esté listada sigue estando definida allí donde se calcula: toda guía
 enuncia sus magnitudes antes de su código.
 
 ## Qué no cubre esta sección
 
-**No es evidencia sobre tu medición, solo sobre la librería.** El informe de
+**No es evidencia sobre tu medición, solo sobre la biblioteca.** El informe de
 conformidad dice que la implementación reproduce el valor esperado de cada
 norma; no dice nada de tu micrófono, de tu sala ni de tu operador, y una
 medición acreditada necesita una cadena de calibración trazable y un
@@ -138,4 +138,4 @@ API](/phonometry/es/reference/api/), que es otra sección de la barra lateral.
 comparten varias guías, y dicen sin rodeos qué áreas se quedan con su teoría
 dentro; el registro de erratas lista solo los defectos que este proyecto ha
 confirmado contra una página impresa; y la bibliografía lista las fuentes que
-implementa la librería, no la literatura del campo.
+implementa la biblioteca, no la literatura del campo.

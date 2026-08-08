@@ -22,7 +22,7 @@ references:
     title: "Scales and sizes for plotting frequency characteristics and polar diagrams"
     designation: "IEC 60263:1982"
     url: "https://webstore.iec.ch/en/publication/1218"
-    note: "Las proporciones de escala de los gráficos de características: una década de frecuencia igual a 25 dB en la ordenada (cláusula 2) y el diagrama polar sobre un círculo de referencia de 25 dB de radio (cláusula 3)."
+    note: "Las proporciones de escala de los gráficos de características: una década de frecuencia igual a 25 dB en la ordenada (apartado 2) y el diagrama polar sobre un círculo de referencia de 25 dB de radio (apartado 3)."
   - type: standard
     organization: "International Telecommunication Union"
     year: 1986
@@ -49,9 +49,9 @@ distorsión y respuesta en frecuencia en sí viven en
 [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/); el homólogo de
 altavoz tiene [su propia guía](/phonometry/es/devices/electroacoustics/loudspeakers/).
 
-## 1. La sensibilidad y sus referencias (IEC 60268-4, cláusula 11)
+## 1. La sensibilidad y sus referencias (IEC 60268-4, apartado 11)
 
-**Micrófonos (IEC 60268-4, cláusula 11).** La sensibilidad $M$ es la tensión
+**Micrófonos (IEC 60268-4, apartado 11).** La sensibilidad $M$ es la tensión
 de salida por unidad de presión acústica, expresada en mV/Pa; el *nivel* de
 sensibilidad es $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$ dB, negativo para todo
 micrófono real (un condensador de estudio de 50 mV/Pa queda en −26 dB re
@@ -74,11 +74,11 @@ y sobrevive al maltrato, pero convierte con mucha menos eficiencia,
 alrededor de 1-3 mV/Pa, y por eso un dinámico ante una fuente silenciosa
 agota la ganancia del preamplificador antes que un condensador. La
 sensibilidad nominal de la norma se expresa a la frecuencia de referencia
-de 1 kHz (cláusula 11.3), sobre la carga nominal, y el tipo declarado
+de 1 kHz (apartado 11.3), sobre la carga nominal, y el tipo declarado
 (campo libre, campo difuso o presión) forma parte de la especificación, no es
 un detalle.
 
-## 2. El patrón direccional y el índice de directividad (cláusula 13)
+## 2. El patrón direccional y el índice de directividad (apartado 13)
 
 La respuesta direccional se declara como el patrón de sensibilidad frente
 al ángulo de incidencia, normalizado al eje de referencia. La familia
@@ -89,9 +89,9 @@ omnidireccional, $b = 1/2$ el cardioide con su nulo a 180° y $b = 1$ la
 figura en ocho con nulos a ±90°. Un número condensa el patrón: el **índice
 de directividad** $D = 20\log_{10}(M_0/M_\mathrm{diff})$ compara la sensibilidad
 en el eje de referencia con la sensibilidad de campo difuso obtenida de la
-integral de la cláusula 11.2.2 a) sobre un patrón con simetría de
-revolución (cláusula 13.2.2; el índice se ancla en dos cláusulas porque el
-$M_\mathrm{diff}$ por el que divide es el que define la cláusula 11.2.2 a),
+integral del apartado 11.2.2 a) sobre un patrón con simetría de
+revolución (apartado 13.2.2; el índice se ancla en dos apartados porque el
+$M_\mathrm{diff}$ por el que divide es el que define el apartado 11.2.2 a),
 como el valor eficaz del patrón sobre un ángulo sólido con simetría de
 revolución). Un omni puntúa 0 dB; el cardioide ideal y la figura en ocho,
 ambos $10\log_{10} 3 = 4{,}8$ dB: en un campo difuso de sala, un cardioide
@@ -103,7 +103,7 @@ tamaño de la cápsula vuelve directivo a cualquier micrófono, y por eso
 divergen ahí las sensibilidades de campo libre y de campo difuso de una
 misma cápsula.
 
-## 3. Ruido propio: dB(A) y dB(468) (cláusula 17)
+## 3. Ruido propio: dB(A) y dB(468) (apartado 17)
 
 La electrónica del micrófono y la carga de aire sobre su diafragma fijan un
 suelo de ruido, expresado como el **nivel de ruido equivalente**: el nivel
@@ -121,9 +121,10 @@ ponderaciones distintas de la misma tensión, y comparar un dB(A) de una
 hoja de datos con un dB(468) de otra favorece en silencio a la primera por
 ese margen. La relación señal-ruido re 1 Pa (94 dB SPL) se deriva del mismo
 nivel de ruido equivalente, y el nivel de presión acústica de sobrecarga
-(cláusula 15.2) acota el rango útil por arriba. La propia curva de
+(apartado 15.2) acota el rango útil por arriba. La propia curva de
 ponderación BS.468 está expuesta como `itu_r_468_weighting` en el
-[conjunto de distorsión de electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
+[conjunto de distorsión de
+electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
 donde también pondera la THD.
 
 ## 4. Informe de características del micrófono (IEC 60268-4)

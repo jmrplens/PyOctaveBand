@@ -71,7 +71,7 @@ lados de un cerramiento) consulta la guía complementaria
 ## Análisis del decaimiento y parámetros de sala (ISO 3382-1/2)
 
 La RI se filtra en bandas de octava (o de tercio de octava) y cada banda se
-convierte en una **curva de decaimiento** mediante la integración inversa de
+convierte en una **curva de decaimiento** mediante la integración hacia atrás de
 Schroeder de la RI al cuadrado:
 
 $$
@@ -240,7 +240,7 @@ lleva información:
 - **T20 ≈ T30** (curvatura por debajo del 10 %): el decaimiento se acerca
   a una única pendiente recta en ambas ventanas de evaluación, algo
   compatible con un campo difuso (aunque no lo demuestra), y cualquiera
-  de los dos tiempos puede representar "el" tiempo de reverberación de la
+  de los dos tiempos puede representar «el» tiempo de reverberación de la
   banda.
 - **T30 > T20** (curvatura por encima del 10 %): el decaimiento se comba,
   con la energía tardía decayendo más despacio que la temprana. Las causas
@@ -305,7 +305,7 @@ se organiza en ese patrón nodal (2,1).
 | `fs` | int | Hz | > 0 | Frecuencia de muestreo |
 | `limits` | (float, float) o `None` | Hz | por defecto `(125.0, 4000.0)` | Límites de centros de banda; `None` = banda única de banda ancha |
 | `fraction` | int | — | `1` (octava, por defecto) / `3` (tercio) | Fracción de ancho de banda |
-| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $BT > 16$ a $BT > 4$); elimina el retardo de grupo del filtro antes de la integración inversa y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
+| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $BT > 16$ a $BT > 4$); elimina el retardo de grupo del filtro antes de la integración hacia atrás y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
 
 Devuelve un `RoomAcousticsResult`: `frequency` (centros de banda, o `None` en
 banda ancha), `edt`/`t20`/`t30` (s), `c50`/`c80` (dB), `d50`, `ts` (s),
@@ -320,26 +320,28 @@ devuelve solo la curva `(time, level)` para una banda o la respuesta de banda an
 ### Informe ISO 3382 (`.report()`)
 
 `RoomAcousticsResult.report(path)` genera una ficha PDF de una página con el
-formato de un informe de medición de acústica de salas (un espacio para
+formato de un informe de medición de acústica de salas (una sala de
 espectáculos según la ISO 3382-1:2009 o una sala ordinaria según la
 ISO 3382-2:2008, ambos evaluados por el método de la respuesta al impulso
-integrada): una línea de norma base, un bloque opcional de metadatos de
+integrada): una línea de base normativa, un bloque opcional de metadatos de
 cabecera, la tabla de parámetros por bandas a ancho completo ($T_{20}$,
 $T_{30}$, EDT, $C_{50}$, $C_{80}$, $D_{50}$, $T_s$) sobre la gráfica de tiempos
 de caída por banda del propio resultado (`.plot()`), el resultado enmarcado del
 tiempo de reverberación de frecuencias medias $T_\text{mid}$ (la media de los
 $T_{30}$ de las octavas de 500 Hz y 1000 Hz, el descriptor habitual de la sala)
 con el EDT de medias al lado, y un pie con el descargo de responsabilidad fijo.
-La ISO 3382-1/-2 son normas de **caracterización** sin apto/no apto intrínseco,
+La ISO 3382-1/-2 son normas de **caracterización** sin cumple/no cumple intrínseco,
 por lo que solo aparece una fila de veredicto cuando se aporta un tiempo de
 reverberación de medias objetivo mediante el campo `requirement` de los
 metadatos (`ReportMetadata(requirement=...)`, leído como el $T_\text{mid}$
 máximo aceptable, la forma habitual de un límite de aula u oficina diáfana). Un
 resultado de banda ancha no tiene octavas de 500 Hz / 1000 Hz que promediar, de
 modo que su recuadro y su veredicto recurren al $T_{30}$ de banda ancha sin
-afirmación de "500-1000 Hz". Usa el mismo contenedor `ReportMetadata` y el mismo motor de
+afirmación de «500-1000 Hz». Usa el mismo contenedor `ReportMetadata` y el
+mismo motor de
 renderizado que la
-[ficha de absorción ISO 11654](/phonometry/es/materials/absorbers/absorption-measurement/#informe-de-iso-11654-report);
+[ficha de absorción ISO
+11654](/phonometry/es/materials/absorbers/absorption-measurement/#informe-de-iso-11654-report);
 los campos específicos de sala `room_volume`, `source_positions` y
 `receiver_positions` rellenan la cabecera (la ISO 3382 exige indicar el volumen
 de la sala y el número de posiciones de fuente y de micrófono), junto con
@@ -373,7 +375,7 @@ result.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso3382_room_acoustics_example"
@@ -393,7 +395,7 @@ son [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-a
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración regresiva y
+**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración hacia atrás y
 las fórmulas de parámetros del anexo A) y la ISO 3382-2:2008 (apartado 6 y
 el criterio de rango dinámico del apartado 5.3.3), calculados por
 `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
@@ -433,8 +435,8 @@ $T_1$/$T_2$ medido vive en
 - [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) y
   [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/): la sonoridad, la
   agudeza y las demás métricas de percepción de lo que entrega la sala.
-- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): los filtros de octava
-  fraccionaria IEC 61260 usados para las curvas de decaimiento por banda y los espectros de
+- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): los filtros de fracción
+  de octava IEC 61260 usados para las curvas de decaimiento por banda y los espectros de
   aislamiento.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración de Schroeder, las ventanas de
   regresión y la derivación de la curva de referencia.
@@ -447,7 +449,7 @@ $T_1$/$T_2$ medido vive en
 
 ### ¿Cómo se definen EDT, T20 y T30?
 
-Cada banda de la respuesta al impulso se convierte en una curva de decaimiento mediante la integración inversa de Schroeder de la RI al cuadrado, y una recta ajustada por mínimos cuadrados sobre un rango de evaluación se extrapola a una caída completa de 60 dB, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT de 0 a −10 dB (reverberación percibida), T20 de −5 a −25 dB y T30 de −5 a −35 dB.
+Cada banda de la respuesta al impulso se convierte en una curva de decaimiento mediante la integración hacia atrás de Schroeder de la RI al cuadrado, y una recta ajustada por mínimos cuadrados sobre un rango de evaluación se extrapola a una caída completa de 60 dB, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT de 0 a −10 dB (reverberación percibida), T20 de −5 a −25 dB y T30 de −5 a −35 dB.
 
 ### ¿Cuánto rango de decaimiento necesito para un T20 o T30 válido?
 

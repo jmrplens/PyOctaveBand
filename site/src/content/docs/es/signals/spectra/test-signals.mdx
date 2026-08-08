@@ -1,6 +1,6 @@
 ---
 title: "Señales de prueba y herramientas de muestreo"
-description: "La caja de señales del dominio de metrología: salvas de tono IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
+description: "La caja de señales del dominio de metrología: ráfagas de tono IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,7 @@ references:
     title: "Sound system equipment — Part 1: General"
     designation: "IEC 60268-1:1985"
     url: "https://webstore.iec.ch/en/publication/1180"
-    note: "Anexo A, cláusula A2: salvas de tono que comienzan en el paso por cero del tono con un número entero de períodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
+    note: "Anexo A, apartado A2: ráfagas de tono que comienzan en el paso por cero del tono con un número entero de periodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
@@ -23,9 +23,10 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una medición es tan fiable como su estímulo y su contabilidad de la
 frecuencia de muestreo. Esta página cubre la caja de señales de
-`phonometry.signals`: **salvas de tono** con la conmutación exacta que
+`phonometry.signals`: **ráfagas de tono** con la conmutación exacta que
 prescribe IEC 60268-1, los **generadores de ruido de colores** (detallados
-en la [guía de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores)),
+en la [guía de análisis
+espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores)),
 **remuestreo** cuyo rechazo de alias es una especificación declarada y
 verificable en lugar de un valor por defecto de la biblioteca, y **retardo
 fraccionario** que desplaza un registro cualquier fracción de muestra con
@@ -34,27 +35,27 @@ exactitud de banda limitada.
 Antes de los detalles, el retrato de familia: qué aspecto tiene cada
 estímulo en el tiempo y dónde se reparte su energía en frecuencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una salva de tono IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga de tono IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
 
-## 1. Salvas de tono (IEC 60268-1)
+## 1. Ráfagas de tono (IEC 60268-1)
 
 La salva sinusoidal conmutada es el estímulo estándar del comportamiento
 dinámico: balística de sonómetros, medidores de cuasipico, potencia
-admisible de altavoces. IEC 60268-1:1985 (cláusula A2.1) fija qué es una
-salva bien formada: "debe comenzar en el paso por cero del tono y constar de
-un número entero de períodos completos". `tone_burst` genera exactamente
-eso, como salva única o como el tren repetitivo de la cláusula A2.2 en el
-que cada salva ocupa un período de repetición completo:
+admisible de altavoces. IEC 60268-1:1985 (apartado A2.1) fija qué es una
+salva bien formada: «debe comenzar en el paso por cero del tono y constar de
+un número entero de periodos completos». `tone_burst` genera exactamente
+eso, como salva única o como el tren repetitivo del apartado A2.2 en el
+que cada salva ocupa un periodo de repetición completo:
 
 ```python
 from phonometry import tone_burst
 
-# Una salva de 5 ms de tono de 5 kHz (25 períodos completos), como en la
+# Una salva de 5 ms de tono de 5 kHz (25 periodos completos), como en la
 # tabla AII.
 single = tone_burst(48000, 5000, 25)
 print(single.burst_samples)         # 240 muestras = 5 ms a 48 kHz
 
-# Cláusula A2.2: salvas de 5 ms a 10 salvas por segundo.
+# Apartado A2.2: salvas de 5 ms a 10 salvas por segundo.
 train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
 print(train.period_samples, train.duty_cycle)   # 4800, 0.05
 train.plot(language="es")           # forma de onda con la envolvente
@@ -64,11 +65,11 @@ El resultado lleva el registro, la **envolvente** rectangular de
 conmutación y la contabilidad exacta de muestras (`burst_samples`,
 `onset_sample`, `period_samples`, `duty_cycle`), de modo que un informe de
 ensayo puede declarar su estímulo numéricamente. Como la puerta abarca un
-número entero de períodos completos empezando en un paso por cero, la
+número entero de periodos completos empezando en un paso por cero, la
 energía de la salva tiene la forma cerrada exacta $A^2 N/2$, que es como se
 verifica el generador.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Salvas de tono IEC 60268-1: una salva única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro salvas a 10 salvas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Ráfagas de tono IEC 60268-1: una salva única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro salvas a 10 salvas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -255,9 +256,9 @@ al impulso y emborronarlas.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El anexo A, cláusula A2, de la IEC 60268-1:1985: la salva de
-tono que "debe comenzar en el paso por cero del tono y constar de un
-número entero de períodos completos" (A2.1) y el tren repetitivo de salvas
+**Cubierto.** El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga de
+tono que «debe comenzar en el paso por cero del tono y constar de un
+número entero de periodos completos» (A2.1) y el tren repetitivo de salvas
 de A2.2, implementados por `tone_burst` y comprobados a mano contra las
 duraciones de la tabla AII. El requisito antialias de la sección 10.2 de
 Bendat y Piersol, convertido en una especificación explícita y verificable
@@ -265,7 +266,7 @@ por el rechazo de banda eliminada y la anchura de transición de
 `resample_signal`.
 
 **No cubierto.** La IEC 60268-1:1985 es una norma general para equipos de
-sistemas de sonido. Aquí solo se implementan las cláusulas de salvas de
+sistemas de sonido. Aquí solo se implementan los apartados de ráfagas de
 tono del anexo A; el resto de sus partes (amplificadores, altavoces,
 conectores, etc.) quedan sin tocar. `fractional_delay` y los generadores
 de ruido de colores de `noise_signal` son herramientas de DSP de
@@ -274,8 +275,8 @@ exactitud son formas cerradas, no normativas.
 
 ## Véase también
 
-- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las salvas de tono (IEC 61672-1, Tabla 4).
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las ráfagas de tono (IEC 61672-1, Tabla 4).
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
-- [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
+- [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de periodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
 - [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
 - Referencia de la API: [`signals.test_signals`](/phonometry/es/reference/api/signals/test-signals/).

@@ -1,6 +1,6 @@
 ---
 title: "Ruido estructural instalado (EN 12354-5)"
-description: "La predicción según EN 12354-5:2009 del nivel de presión acústica en un recinto receptor por equipos de servicio del edificio que inyectan ruido estructural: el término de acoplamiento D_C a partir de las movilidades de fuente y receptor (Fórmula 19b-e), la potencia instalada L_Ws,inst = L_Ws,c − D_C (Fórmula 18b) y el nivel de presión normalizado por camino con su total energético (Fórmulas 18a/17)."
+description: "La predicción según EN 12354-5:2009 del nivel de presión acústica en un recinto receptor por equipamientos del edificio que inyectan ruido estructural: el término de acoplamiento D_C a partir de las movilidades de fuente y receptor (Fórmula 19b-e), la potencia instalada L_Ws,inst = L_Ws,c − D_C (Fórmula 18b) y el nivel de presión normalizado por trayectoria con su total energético (Fórmulas 18a/17)."
 references:
   - type: book
     authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
@@ -9,28 +9,28 @@ references:
     edition: "3.ª ed."
     publisher: "Springer"
     doi: "10.1007/b137728"
-    note: "El acoplamiento de movilidades fuente-receptor y la transmisión estructural a través de uniones que sustentan el término de acoplamiento y el modelo de vías. ISBN 978-3-540-22696-3."
+    note: "El acoplamiento de movilidades fuente-receptor y la transmisión estructural a través de uniones que sustentan el término de acoplamiento y el modelo de trayectorias. ISBN 978-3-540-22696-3."
   - type: book
     authors: ["Hopkins, C."]
     year: 2007
     title: "Sound insulation"
     publisher: "Butterworth-Heinemann"
     doi: "10.4324/9780080550473"
-    note: "Sección 2.8 (impedancia y movilidad en el punto de excitación): la potencia que una fuente mecánica inyecta en una placa a través de las movilidades de fuente y receptor, la lectura de acústica de la edificación del término de acoplamiento de la cláusula 4.4.3. ISBN 978-0-7506-6526-1."
+    note: "Sección 2.8 (impedancia y movilidad en el punto de excitación): la potencia que una fuente mecánica inyecta en una placa a través de las movilidades de fuente y receptor, la lectura de acústica de la edificación del término de acoplamiento del apartado 4.4.3. ISBN 978-0-7506-6526-1."
   - type: standard
     organization: "European Committee for Standardization"
     year: 2009
     title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 5: Sound levels due to service equipment"
     designation: "EN 12354-5:2009"
     url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-building-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment"
-    note: "El término de acoplamiento (cláusula 4.4.3, Fórmulas 19a-19e), el nivel de potencia estructural instalada (Fórmula 18b), el término de ajuste estructura-a-aéreo (cláusula 4.4.4, Fórmulas 20a/20b) y el nivel de presión acústica normalizado por camino y su combinación energética (Fórmulas 18a, 17). La conformidad se ancla en el límite de fuente de fuerza del término de acoplamiento y en los ejemplos resueltos del propio Anexo I de la norma: la bañera de hidromasaje de I.2 (Tabla I.6a: corrección de movilidad y camino 11) y la cisterna de I.3 (Tablas I.8/I.9: conversión de la fuente, los cuatro caminos de transmisión, el total de la Fórmula 17 y su cierre a 29 dB(A)), dentro del redondeo de ±0,15 dB de los intermedios impresos con un decimal. D_sa y R_ij,ref son entradas (de medición / EN 12354-1 / Anexos D y F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-5:2009; revisada después como EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
+    note: "El término de acoplamiento (apartado 4.4.3, Fórmulas 19a-19e), el nivel de potencia estructural instalada (Fórmula 18b), el término de ajuste estructura-a-aéreo (apartado 4.4.4, Fórmulas 20a/20b) y el nivel de presión acústica normalizado por trayectoria y su combinación energética (Fórmulas 18a, 17). La conformidad se ancla en el límite de fuente de fuerza del término de acoplamiento y en los ejemplos resueltos del propio Anexo I de la norma: la bañera de hidromasaje de I.2 (Tabla I.6a: corrección de movilidad y trayectoria 11) y la cisterna de I.3 (Tablas I.8/I.9: conversión de la fuente, las cuatro trayectorias de transmisión, el total de la Fórmula 17 y su cierre a 29 dB(A)), dentro del redondeo de ±0,15 dB de los intermedios impresos con un decimal. D_sa y R_ij,ref son entradas (de medición / EN 12354-1 / Anexos D y F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-5:2009; revisada después como EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 La **EN 12354-5:2009** predice el nivel de presión acústica en un recinto receptor
-causado por equipos de servicio del edificio (bombas, ventiladores, ascensores,
+causado por equipamientos del edificio (bombas, ventiladores, ascensores,
 instalaciones de agua) que inyectan **ruido estructural** en el edificio. Cierra
 la cadena de vibroacústica estructural: la fuente se describe por su nivel de
 potencia acústica estructural característica $L_{Ws,c}$, derivado de la medición
@@ -46,7 +46,7 @@ $L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{
 con $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
 con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por camino y su total energético" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por trayectoria y su total energético" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -63,7 +63,7 @@ ys = (2e-4 + 1e-4j) * (bands / 250.0)        # movilidad de la fuente
 yi = (3e-5 + 1e-5j) * np.ones_like(bands)    # movilidad del receptor
 dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
 
-# Dos vías de transmisión: el forjado excitado y una pared de flanco. Dsa es
+# Dos trayectorias de transmisión: el forjado excitado y una pared de flanco. Dsa es
 # negativo y cae con la frecuencia (Anexo F.2), y entra con signo menos.
 paths = [
     {"adjustment_term": np.array([-14.0, -17.0, -20.0, -25.0, -30.0, -35.0, -40.0]),
@@ -74,7 +74,7 @@ paths = [
      "flanking_reduction_index": np.linspace(46.0, 64.0, 7)},
 ]
 res = building.installed_source_prediction(lws_c, dc, paths, frequencies=bands)
-res.plot(language="es")   # potencia característica e instalada, niveles por vía y el total
+res.plot(language="es")   # potencia característica e instalada, niveles por trayectoria y el total
 plt.show()
 ```
 
@@ -98,7 +98,7 @@ movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
 potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
 
 Este $L_{Ws,\mathrm{inst}}$ es el mismo que el de la corrección por movilidad
-del Anexo I de la introducción, alcanzado por otro camino: usa la Fórmula (18b)
+del Anexo I de la introducción, alcanzado por otra trayectoria: usa la Fórmula (18b)
 cuando $D_C$ se conoce a partir de las dos movilidades, y la corrección directa
 $L_{Ws,n} + 10\log_{10}(Y_{\infty,i}/Y_{\infty,\mathrm{rec}})$ cuando no. Sobre
 la cisterna del Anexo I.3 las dos dan 68,2 dB a 63 Hz, a partir de
@@ -131,21 +131,22 @@ print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))
 
 ## 2. Transmisión al recinto receptor
 
-Las partes 1 y 2 de EN 12354 tratan recintos excitados por vía aérea y por la
+Las partes 1 y 2 de EN 12354 tratan recintos excitados por trayectoria aérea y por la
 máquina de impactos normalizada; la parte 5 cubre las fuentes que sacuden el
 edificio *directamente*: bombas, ventiladores, ascensores, bañeras de
 hidromasaje, cisternas y las conducciones que las anclan a paredes y forjados.
 Una vez que la potencia instalada está en la estructura, varios elementos
 radian al recinto receptor: el propio elemento excitado y cada elemento al
 que la vibración llega a través de las uniones. Cada par elemento
-excitado/elemento radiante $i \to j$ es una vía de transmisión con su propio
+excitado/elemento radiante $i \to j$ es una trayectoria de transmisión con su propio
 término de ajuste y su índice de flancos:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Vías de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda vía recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Trayectorias de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda trayectoria recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
 
-Cada camino de transmisión $i \to j$ da un nivel de presión acústica normalizado a
+Cada trayectoria de transmisión $i \to j$ da un nivel de presión acústica normalizado a
 partir de la potencia instalada, el término de ajuste estructura-a-aéreo $D_{sa}$,
-el índice de reducción acústica de flancos $R_{ij,\mathrm{ref}}$ (EN 12354-1) y el área del
+el índice de reducción acústica de flancos $R_{ij,\mathrm{ref}}$ (EN 12354-1)
+y el área del
 elemento (Fórmula 18a):
 
 $$
@@ -153,7 +154,7 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-con $S_0 = A_0 = 10\ \text{m}^2$, y los caminos se combinan energéticamente (Fórmula 17).
+con $S_0 = A_0 = 10\ \text{m}^2$, y las trayectorias se combinan energéticamente (Fórmula 17).
 
 ### El término de ajuste $D_{sa}$
 
@@ -224,10 +225,10 @@ res = building.installed_source_prediction(
 print(np.round(res.total_level, 1))      # total L_n,s por banda
 print(round(res.overall_level, 1))       # nivel sumado en bandas [dB]
 
-res.plot()   # la cascada L_n,s por camino y total, como en la figura de arriba (requiere matplotlib)
+res.plot()   # la cascada L_n,s por trayectoria y total, como en la figura de arriba (requiere matplotlib)
 ```
 
-El `InstalledSourceResult` transporta los niveles por camino, el total por banda,
+El `InstalledSourceResult` transporta los niveles por trayectoria, el total por banda,
 el nivel de potencia instalada y `.overall_level`, y su `.plot()` dibuja toda la
 cascada.
 
@@ -239,20 +240,20 @@ etiquetada como predicción, no como medición**: una línea de base de predicci
 que nombra la EN 12354-5:2009, una cabecera de metadatos opcional (cliente,
 equipo fuente, recinto receptor, instrumentación, clima, fecha), una tabla por
 bandas (frecuencia nominal de octava/tercio de octava, el nivel de potencia
-acústica estructural instalada $L_{Ws,inst}$, el NPS normalizado de cada camino
+acústica estructural instalada $L_{Ws,inst}$, el NPS normalizado de cada trayectoria
 de transmisión $L_{n,s,ij}$ y el total combinado $L_{n,s}$), los espectros
-$L_{n,s}(f)$ por camino y total, y el total sumado en bandas $L_{n,s}$ (dB)
-recuadrado, con la potencia instalada total y el número de caminos.
+$L_{n,s}(f)$ por trayectoria y total, y el total sumado en bandas $L_{n,s}$ (dB)
+recuadrado, con la potencia instalada total y el número de trayectorias.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
 aquí son el **equipo fuente** (`specimen`), el **recinto receptor**
 (`test_room`), el **cliente**, la **instrumentación** y la identidad del pie
 (`laboratory`, `operator`, `report_id`, `notes`). Aportar `requirement` añade un
-veredicto PASS/FAIL frente a un límite superior declarado sobre el $L_{n,s}$
-global (menos es mejor). `verbose=True` añade una columna por camino de
+veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado sobre el $L_{n,s}$
+global (menos es mejor). `verbose=True` añade una columna por trayectoria de
 transmisión (hasta cinco); en otro caso solo se muestran la potencia instalada
 y el total combinado. `language="es"` genera la ficha en español con comas
-decimales. La franja de base indica las Fórmulas 18a/17 y el aviso de
+decimales. La tira de base indica las Fórmulas 18a/17 y el aviso de
 predicción.
 
 ```python
@@ -275,14 +276,14 @@ res = installed_source_prediction(lwc, 16.2, paths, frequencies=bands)
 res.report(
     "installed_structure_borne.pdf",
     metadata=ReportMetadata(
-        client="Example dwelling refurbishment",
-        specimen="WC flushing cistern (wall-fixed)",
-        test_room="Receiving room: adjacent bedroom",
+        client="Rehabilitación de vivienda de ejemplo",
+        specimen="Cisterna de inodoro (fijada a pared)",
+        test_room="Recinto receptor: dormitorio contiguo",
         report_id="EXAMPLE-12354-5",
         requirement=45.0,
     ),
     language="es",
-)   # L_n,s global ~ 43 dB -> límite declarado 45 dB: PASS
+)   # L_n,s global ~ 43 dB -> límite declarado 45 dB: CUMPLE
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
@@ -291,18 +292,18 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="en12354_5_installed_structure_borne_example"
 	title="Informe de ejemplo de predicción estructural instalada EN 12354-5 (PDF)"
-	description="Ficha de una página de predicción de sonido estructural instalado de la EN 12354-5:2009, claramente etiquetada como predicción y no como medición: una cabecera con el cliente, el equipo fuente, el recinto receptor y la identidad, la tabla en bandas de octava (63 Hz a 2 kHz) del nivel de potencia acústica estructural instalada L_Ws,inst, el NPS normalizado L_n,s,ij de los dos caminos por flancos y el total combinado L_n,s, los espectros L_n,s(f) por camino y total, y el total sumado en bandas L_n,s recuadrado con la potencia instalada total y el número de caminos, cerrada por una franja de base con las Fórmulas 18a/17 y el aviso de predicción, con un veredicto PASS frente al límite declarado de 45 dB."
+	description="Ficha de una página de predicción de ruido estructural instalado de la EN 12354-5:2009, claramente etiquetada como predicción y no como medición: una cabecera con el cliente, el equipo fuente, el recinto receptor y la identidad, la tabla en bandas de octava (63 Hz a 2 kHz) del nivel de potencia acústica estructural instalada L_Ws,inst, el NPS normalizado L_n,s,ij de las dos trayectorias por flancos y el total combinado L_n,s, los espectros L_n,s(f) por trayectoria y total, y el total sumado en bandas L_n,s recuadrado con la potencia instalada total y el número de trayectorias, cerrada por una tira de base con las Fórmulas 18a/17 y el aviso de predicción, con un veredicto CUMPLE frente al límite declarado de 45 dB."
 	caption="Ficha de predicción estructural instalada (InstalledSourceResult.report), una estimación EN 12354-5 del NPS estructural normalizado en el recinto receptor."
 />
 
 ## Qué cubre esta guía
 
 **Cubierto.** La EN 12354-5:2009: el término de acoplamiento $D_C$
-(cláusula 4.4.3, Fórmulas 19b-e, con sus límites de fuente de fuerza y de
+(apartado 4.4.3, Fórmulas 19b-e, con sus límites de fuente de fuerza y de
 fuente de velocidad) mediante `coupling_term`, el nivel de potencia
 instalada $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
 `installed_structure_borne_power_level`, y el nivel de presión acústica
-normalizado por camino y su total energético (Fórmulas 18a, 17) mediante
+normalizado por trayectoria y su total energético (Fórmulas 18a, 17) mediante
 `installed_source_prediction`. Validado contra los propios ejemplos
 resueltos del Anexo I de la norma, la bañera de hidromasaje (I.2) y la
 cisterna (I.3), dentro del redondeo de ±0,15 dB de los intermedios impresos.
@@ -315,12 +316,12 @@ norma. Solo está implementada la edición de 2009, no la revisión de 2023.
 
 ## Véase también
 
-- [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   la caracterización sobre placa receptora que aporta $L_{Ws,c}$ y la movilidad
   de fuente que consume esta predicción.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):
   las $Y_s$ e $Y_i$ medidas tras el término de acoplamiento.
-- [Transmisión de ondas de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
   la física de unión que lleva la potencia instalada a los radiadores por
   flancos.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):

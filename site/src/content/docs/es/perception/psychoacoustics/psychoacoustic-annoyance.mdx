@@ -18,7 +18,7 @@ references:
     volume: 28
     pages: "050005"
     doi: "10.1121/2.0000410"
-    note: "El modelo de señal de la intensidad de fluctuación implementado en la sección 3.2 (presentado en el ICA 2016; clean-room, sin norma numérica, calibrado a 1 vacil en el tono AM de referencia), incluidos los valores de su Tabla 1 usados como contraste."
+    note: "El modelo de señal de la intensidad de fluctuación implementado en la sección 3.2 (presentado en el ICA 2016; sala limpia, sin norma numérica, calibrado a 1 vacil en el tono AM de referencia), incluidos los valores de su Tabla 1 usados como contraste."
   - type: web
     authors: ["Felix Greco, G.", "Merino-Martínez, R.", "Osses, A.", "Lotinga, M. J. B."]
     year: 2025
@@ -150,10 +150,10 @@ res.plot()   # la misma vista PA / wS / wFR, ahora con las cuatro sensaciones de
 :::caution
 **Advertencia sobre la mezcla de modelos.** Este compuesto mezcla familias de
 modelos: $N_5$ y $S$ de la familia Zwicker, $R$ de Sottek y $F$ de Osses. El
-modelo $PA$ se calibró con sensaciones de la familia Zwicker, así que trate la
+modelo $PA$ se calibró con sensaciones de la familia Zwicker, así que trata la
 utilidad de señal como una *estimación de ingeniería*. Para resultados exactos y
-reproducibles, calcule las cuatro magnitudes con los modelos en los que confíe y
-páselas directamente a `psychoacoustic_annoyance` (la función de cuatro
+reproducibles, calcula las cuatro magnitudes con los modelos en los que confíes
+y pásalas directamente a `psychoacoustic_annoyance` (la función de cuatro
 argumentos es el modelo exacto).
 :::
 
@@ -167,7 +167,7 @@ máximo de la
 aspereza en ~70 Hz. Por definición, un tono de 1 kHz a 60 dB, modulado en
 amplitud al 100 % a 4 Hz, produce 1 vacil. Esta página cubre los modelos de
 Fastl y Zwicker; la intensidad de fluctuación normativa del modelo de Sottek
-(cláusula 9 de ECMA-418-2) está en
+(apartado 9 de ECMA-418-2) está en
 [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="Intensidad de fluctuación frente a la frecuencia de modulación en un eje logarítmico: la curva de forma cerrada para ruido de banda ancha AM y el barrido del modelo de señal para tono AM muestran ambos una característica de paso de banda con máximo a 4 Hz" width="82%" />
@@ -296,7 +296,7 @@ que admite la forma cerrada única.
 
 :::note
 **Sin norma numérica.** La intensidad de fluctuación no tiene norma ISO/IEC. Esta
-es una implementación clean-room a partir del artículo de Osses 2016, calibrada
+es una implementación sala limpia a partir del artículo de Osses 2016, calibrada
 para que el tono AM de 1 kHz / 60 dB / $m = 1$ / 4 Hz marque 1,00 vacil por
 construcción, y contrastada con los valores de la literatura de la Tabla 1 de
 Osses 2016 y con la referencia abierta SQAT (usada solo como oráculo numérico).
@@ -304,9 +304,10 @@ En el barrido de tono AM a 70 dB
 $f_{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ da
 `[0,40, 0,79, 1,09, 1,05, 0,17, 0,09]` vacil frente a la literatura
 `[0,39, 0,84, 1,25, 1,30, 0,36, 0,06]` ($r$ de Pearson $= 0{,}98$, máximo
-correcto a 4 Hz, dentro de ~2,1×). La exactitud para tonos FM no se persigue explícitamente.
+correcto a 4 Hz, dentro de ~2,1×). La exactitud para tonos FM no se persigue
+explícitamente.
 Para **ruido de banda ancha AM** el modelo de señal sobreestima el nivel absoluto
-(reparte la energía modulada entre las bandas); cite la forma cerrada
+(reparte la energía modulada entre las bandas); cita la forma cerrada
 `fluctuation_strength_am_noise` (§3.1) para ese estímulo.
 :::
 
@@ -328,9 +329,9 @@ también se aparta del planteamiento exacto del artículo (tramas de 2 s,
 solape del 90 %, umbral absoluto de audición). Como resultado, un tono
 estacionario de 1 kHz marca unos 0,09 vacil en vez de 0, y el ruido de banda
 ancha estacionario marca unos 0,4 vacil. Para el ruido de banda ancha AM,
-cite `fluctuation_strength_am_noise` (§3.1) en vez de `fluctuation_strength`,
+cita `fluctuation_strength_am_noise` (§3.1) en vez de `fluctuation_strength`,
 que sobreestima ese estímulo. La intensidad de fluctuación normativa del
-modelo de Sottek de la cláusula 9 de ECMA-418-2 no está implementada en esta
+modelo de Sottek del apartado 9 de ECMA-418-2 no está implementada en esta
 página: está en
 [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
 

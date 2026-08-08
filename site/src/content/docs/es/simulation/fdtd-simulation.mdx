@@ -33,7 +33,7 @@ references:
     volume: "7"
     pages: "5389"
     doi: "10.1038/s41598-017-05710-5"
-    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este solucionador, el contraste TMM frente a onda completa que reporta el artículo."
+    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este solucionador, el contraste TMM frente a onda completa que documenta el artículo."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -160,7 +160,7 @@ arranque no salpique el campo con un transitorio de banda ancha) y
 linealmente sobre los pasos temporales de la simulación). Las sondas
 registran la presión en su celda en cada paso temporal dentro del resultado.
 
-**Ondas planas "desde el infinito".** Una fuente puntual en 2D es en
+**Ondas planas «desde el infinito».** Una fuente puntual en 2D es en
 realidad una fuente lineal, así que un difusor o una barrera se interrogan
 mejor con un frente plano. Dos herramientas lo cubren, cada una
 unidireccional por su propio mecanismo:
@@ -273,12 +273,13 @@ plt.show()
 
 Un dominio de tres filas con paredes rígidas es un tubo de onda plana, y con
 el mapa de `damping` por celda una muestra porosa se convierte en un fluido
-equivalente, lo que convierte al propio solver en una probeta medible: la
-[guía del tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) ejecuta
+equivalente, lo que convierte al propio solucionador en una probeta medible: la
+[guía del tubo de
+impedancia](/phonometry/es/materials/absorbers/impedance-tube/) ejecuta
 las mediciones ISO 10534-2 y ASTM E2611 de forma virtual sobre exactamente
 ese dominio, animaciones incluidas, y recupera la absorción y la pérdida por
 transmisión analíticas de la muestra modelada con las propias cadenas de
-reducción de la biblioteca (los crosschecks de `tests/simulation` lo ejecutan
+reducción de la biblioteca (los contrastes de `tests/simulation` lo ejecutan
 en cada commit).
 
 ## 2b. Del campo cercano al campo lejano
@@ -337,19 +338,19 @@ de 0,94, coeficiente de difusión direccional ISO 17497-2 dentro de
 
 La cadena de campo lejano es la que por fin cierra de extremo a extremo el
 círculo del metadifusor: el panel de la Tabla 1 del artículo, con cada
-rendija, cuello y cavidad mallados a 0,5 mm, llevado al régimen
+ranura, cuello y cavidad mallados a 0,5 mm, llevado al régimen
 estacionario por una onda plana, capturado sobre un contorno y
 transformado, frente al modelo
 [`metadiffuser_polar_response`](/phonometry/es/reference/api/materials/metadiffuser/)
-(TMM + Fraunhofer) del módulo de materiales. Es la réplica en la librería
-del contraste TMM frente a FEM que reporta el propio artículo de los
+(TMM + Fraunhofer) del módulo de materiales. Es la réplica en la biblioteca
+del contraste TMM frente a FEM que documenta el propio artículo de los
 metadifusores, pequeñas discrepancias incluidas: el modelo de matrices de
 transferencia homogeneiza cada celda de 7 cm en un único coeficiente de
 reflexión de reacción local e ignora el acoplamiento evanescente entre
 bocas vecinas, así que la estructura de lóbulos coincide mientras algunos
 nulos se desplazan unos grados.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la librería, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la biblioteca, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
 
 *Dos rutas independientes al mismo campo lejano: el panel mallado en un
 solucionador de onda completa en el dominio del tiempo (continuo) frente a
@@ -371,7 +372,7 @@ rows = [(14.7, 13.0, 16.4, 6.2, 9.0), (30.9, 9.1, 4.3, 3.5, 9.0),
         (30.9, 9.1, 4.3, 3.5, 9.0), (15.7, 13.3, 17.0, 6.3, 9.0),
         (20.3, 18.0, 20.7, 3.2, 9.0)]     # Tabla 1: h, l_n, l_c, w_n, w_c
 
-# Mallar el panel real: una losa rígida con las rendijas, cuellos y
+# Mallar el panel real: una losa rígida con las ranuras, cuellos y
 # cavidades excavados a 0,5 mm (el cuello más estrecho, 3,2 mm, abarca
 # seis celdas).
 sponge, gap, marg, front = 60, 60, 20, 40
@@ -386,7 +387,7 @@ for n, (h, ln, lc, wn, wc) in enumerate(rows):
     xs = (n + 0.12) * pitch
     c0s, c1s = lat + round(xs / dx), lat + round((xs + h * 1e-3) / dx)
     mask[r_face:r_face + round(0.02 / dx), c0s:c1s] = False
-    for m in range(2):                    # dos resonadores por rendija
+    for m in range(2):                    # dos resonadores por ranura
         ym, xn = (m + 0.5) * 0.01, xs + h * 1e-3
         r0 = r_face + round((ym - 0.5e-3 * wn) / dx)
         r1 = r_face + round((ym + 0.5e-3 * wn) / dx)
@@ -552,8 +553,8 @@ duplicación de distancia) en lugar del $1/r$ esférico (6,0 dB) de una
 fuente puntual 3D, y la respuesta impulsional 2D arrastra una estela tras el
 frente en vez de pasar limpiamente. Los *patrones* de interferencia y
 difracción son fieles; los niveles absolutos y las tasas de caída no son los
-de una sala 3D. Trate las ejecuciones 2D como secciones y demostraciones, y
-valide cualquier afirmación cuantitativa 3D contra una forma cerrada o un
+de una sala 3D. Trata las ejecuciones 2D como secciones y demostraciones, y
+valida cualquier afirmación cuantitativa 3D contra una forma cerrada o un
 solucionador 3D.
 
 <span id="dispersion-numerica-y-precision"></span>
@@ -634,20 +635,20 @@ Kirchhoff-Helmholtz 2D (`far_field_from_contour`, Williams cap. 8),
 validada contra los campos exactos de las fuentes lineales monopolo y
 dipolo, la propiedad de extinción, y los paneles QRD y metadifusor
 mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
-la librería.
+la biblioteca.
 
-**No cubierto.** El solver es solo bidimensional: modela una fuente lineal en
-sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la propagación
-esférica $1/r$ de una fuente puntual 3D, así que los niveles absolutos y las
-tasas de decaimiento no son los de una sala 3D. El contorno abierto es la
-capa absorbente de rampa cuadrática descrita como «el precursor sencillo» de
-una verdadera capa perfectamente adaptada, no una PML en sí. Las ecuaciones
-de gobierno asumen un medio en reposo, así que no se modela la advección por
-viento o flujo, y el único contorno de impedancia es el real independiente
-de la frecuencia de las Ecs. 4.33-4.35. Los medios elásticos no se cubren
-aquí: el solucionador compañero P-SV, sus superficies libres y su física
-fluido-sólido tienen su propia guía,
-[Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/simulation/elastic-waves/).
+**No cubierto.** El solucionador es solo bidimensional: modela una fuente
+lineal en sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la
+propagación esférica $1/r$ de una fuente puntual 3D, así que los niveles
+absolutos y las tasas de decaimiento no son los de una sala 3D. El contorno
+abierto es la capa absorbente de rampa cuadrática descrita como «el precursor
+sencillo» de una verdadera capa perfectamente adaptada, no una PML en sí. Las
+ecuaciones de gobierno suponen un medio en reposo, así que no se modela la
+advección por viento o flujo, y el único contorno de impedancia es el real
+independiente de la frecuencia de las Ecs. 4.33-4.35. Los medios elásticos no
+se cubren aquí: el solucionador compañero P-SV, sus superficies libres y su
+física fluido-sólido tienen su propia guía, [Ondas elásticas y acoplamiento
+fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 
 ## Véase también
 
@@ -663,7 +664,7 @@ fluido-sólido tienen su propia guía,
 
 ### ¿Cómo elijo el paso de malla en FDTD?
 
-Resuelva al menos 10 celdas por longitud de onda más corta,
+Resuelve al menos 10 celdas por longitud de onda más corta,
 $\Delta x \le c_\text{min} / (10 f_\text{max})$, con la velocidad de sonido
 más baja del
 dominio. Con exactamente 10 celdas la cota del error de dispersión sobre el
@@ -693,5 +694,5 @@ amplitud se expande cilíndricamente como $1/\sqrt{r}$, 3,0 dB por
 duplicación de distancia, en lugar del $1/r$ esférico (6,0 dB por
 duplicación) de una fuente puntual 3D. Los patrones de interferencia y
 difracción son fieles, pero los niveles absolutos y las tasas de caída no
-son los de una sala 3D; valide cualquier afirmación cuantitativa 3D contra
+son los de una sala 3D; valida cualquier afirmación cuantitativa 3D contra
 una forma cerrada o un solucionador 3D.

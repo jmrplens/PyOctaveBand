@@ -1,6 +1,6 @@
 ---
 title: "Absorción acústica en recintos (EN 12354-6)"
-description: "La predicción de EN 12354-6:2003 del área de absorción acústica equivalente total de una sala y su tiempo de reverberación a partir de la absorción de sus superficies y objetos (el modelo normativo de la cláusula 4): el área de absorción de la Fórmula 1, los términos de objetos y aire, y el tiempo de reverberación de la Fórmula 5."
+description: "La predicción de EN 12354-6:2003 del área de absorción acústica equivalente total de una sala y su tiempo de reverberación a partir de la absorción de sus superficies y objetos (el modelo normativo del apartado 4): el área de absorción de la Fórmula 1, los términos de objetos y aire, y el tiempo de reverberación de la Fórmula 5."
 references:
   - type: standard
     organization: "European Committee for Standardization"
@@ -8,7 +8,7 @@ references:
     title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 6: Sound absorption in enclosed spaces"
     designation: "EN 12354-6:2003"
     url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sound-absorption-in-enclosed-spaces"
-    note: "El modelo de la cláusula 4, sus reglas de datos de entrada y sus límites de validez: el área de absorción equivalente total (cláusula 4.3, Fórmulas 1-4, Tabla 1) y el tiempo de reverberación (cláusula 4.4, Fórmula 5), validados frente a los tres casos resueltos del Anexo E. La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-6:2003."
+    note: "El modelo del apartado 4, sus reglas de datos de entrada y sus límites de validez: el área de absorción equivalente total (apartado 4.3, Fórmulas 1-4, Tabla 1) y el tiempo de reverberación (apartado 4.4, Fórmula 5), validados frente a los tres casos resueltos del Anexo E. La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-6:2003."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2003
@@ -35,17 +35,17 @@ superficies y objetos, la contraparte de diseño del tiempo de reverberación
 medido. Es el miembro de absorción de la familia de acústica de la edificación
 EN 12354 (los miembros de aislamiento aéreo y de impacto están en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)).
-phonometry implementa el modelo normativo de la cláusula 4. (El método
+phonometry implementa el modelo normativo del apartado 4. (El método
 informativo del Anexo D para recintos irregulares queda fuera de alcance.)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_en12354_6_es.svg" alt="Flujo desde las superficies y objetos de la sala hasta el área de absorción equivalente total A, la fracción de objetos psi, y el tiempo de reverberación T = 55,3/c0 por V por (1 menos psi) entre A" width="82%" loading="eager" />
 
-## 1. Área de absorción equivalente (cláusula 4.3)
+## 1. Área de absorción equivalente (apartado 4.3)
 
 El área de absorción equivalente total suma, sobre las superficies $i$, los
-objetos $j$ y las matrices de objetos $k$, el área de cada superficie por su
+objetos $j$ y los conjuntos de objetos $k$, el área de cada superficie por su
 coeficiente de absorción, las áreas de absorción equivalentes de los objetos,
-las matrices de objetos (grupos de objetos idénticos tratados como una
+los conjuntos de objetos (grupos de objetos idénticos tratados como una
 superficie absorbente de área $S_k$) y la absorción del aire (Fórmula 1):
 
 $$
@@ -71,7 +71,7 @@ La absorción del aire usa el coeficiente de atenuación de potencia $m$
 (Fórmula 2): $A_{\mathrm{air}} = 4\,m\,V\,(1 - \psi)$. Por debajo de 1 kHz y
 para salas de menos de 200 m³ puede despreciarse.
 
-## 2. Tiempo de reverberación (cláusula 4.4)
+## 2. Tiempo de reverberación (apartado 4.4)
 
 El tiempo de reverberación se obtiene del área de absorción, el volumen y la
 fracción de objetos $\psi = \sum V_{\mathrm{obj}}/V$ (Fórmula 5):
@@ -191,24 +191,25 @@ sola.
 atenuación de potencia $m$ de la Tabla 1 de la norma, resuelto por las
 cadenas `air_condition` (clase de temperatura y humedad relativa, derivada
 de ISO 9613-1); solo importa por encima de 1 kHz y crece con el volumen.
-Los seis perfiles integrados, de `"10C_30-50"` a `"20C_70-90"` (la
-cláusula 4.3 recomienda `"20C_50-70"` cuando no se especifican
+Los seis perfiles integrados, de `"10C_30-50"` a `"20C_70-90"` (el
+apartado 4.3 recomienda `"20C_50-70"` cuando no se especifican
 condiciones), cubren solo las bandas de octava estándar de 125 Hz a 8 kHz
 y no pueden combinarse con un eje de frecuencias propio;
 `air_condition=None` (el valor por defecto) omite el término de aire, y
 para otras frecuencias o condiciones, calcula $m$ según ISO 9613-1 y
 encadena `air_absorption_area` con `equivalent_absorption_area`.
 
-**Límites de validez (cláusula 4.6).** El modelo supone una sala corriente
+**Límites de validez (apartado 4.6).** El modelo supone una sala corriente
 y razonablemente difusa: ninguna dimensión más de 5 veces otra, pares de
 superficies opuestas cuyos coeficientes difieran en menos de un factor 3
 (salvo que haya objetos difusores) y una fracción de objetos por debajo de
 0,2. Fuera de esos límites el campo no es difuso y el modelo yerra por el
-lado optimista: la propia cláusula de precisión de la norma registra
+lado optimista: el propio apartado de precisión de la norma registra
 tiempos de reverberación medidos de hasta el doble de la predicción en
 salas de baja difusividad. Las alternativas clásicas para esos casos viven
 en
-[Predicción del tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/).
+[Predicción del tiempo de
+reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/).
 
 ## 4. Informe del recinto (`.report()`)
 
@@ -266,7 +267,7 @@ result.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="enclosed_space_absorption_example"

@@ -1,24 +1,24 @@
 ---
 title: "Entre recintos: partición, receptor y criterio"
-description: "La cadena compuesta de reducción de ruido entre recintos: el nivel reverberante que una máquina establece en el recinto emisor, la pérdida por transmisión de la partición, la absorción del recinto receptor y el veredicto NC, junto con la pérdida por transmisión que una partición o un encapsulado necesita para cumplir un criterio, anclada en los problemas resueltos 4.16, 4.18 y 4.21 de Norton y Karczub."
+description: "La cadena compuesta de reducción de ruido entre recintos: el nivel reverberante que una máquina establece en el recinto emisor, la pérdida por transmisión de la partición, la absorción del recinto receptor y el veredicto NC, junto con la pérdida por transmisión que una partición o un cerramiento necesita para cumplir un criterio, anclada en los problemas resueltos 4.16, 4.18 y 4.21 de Norton y Karczub."
 references:
   - type: book
     authors: ["Norton, M. P.", "Karczub, D. G."]
     year: 2003
     title: "Fundamentals of noise and vibration analysis for engineers"
-    edition: "2nd ed."
+    edition: "2.ª ed."
     publisher: "Cambridge University Press"
     doi: "10.1017/CBO9781139163927"
     primary: true
-    note: "Los modelos de potencia acústica del apartado 4.6 (Tabla 4.5, Ecs. 4.53-4.56), el balance de potencia entre recintos del apartado 4.9 (Ecs. 4.92-4.101), la ecuación de diseño del encapsulado del apartado 4.10 (Ecs. 4.102-4.115) y los problemas resueltos 4.16, 4.18 y 4.21 con sus respuestas impresas por banda de octava, sobre los que se construye esta guía."
+    note: "Los modelos de potencia acústica del apartado 4.6 (Tabla 4.5, Ecs. 4.53-4.56), el balance de potencia entre recintos del apartado 4.9 (Ecs. 4.92-4.101), la ecuación de diseño del cerramiento del apartado 4.10 (Ecs. 4.102-4.115) y los problemas resueltos 4.16, 4.18 y 4.21 con sus respuestas impresas por banda de octava, sobre los que se construye esta guía."
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
     title: "Engineering noise control"
-    edition: "5th ed."
+    edition: "5.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
-    note: "Las relaciones de campo estacionario en recinto (apartado 6.4, Ecs. 6.43-6.44) en las que se apoyan steady_state_spl y room_constant, y la pérdida por inserción del encapsulado del apartado 7.4.2 (Ecs. 7.103, 7.111), que es el modelo de encapsulado por omisión de la biblioteca."
+    note: "Las relaciones de campo estacionario en recinto (apartado 6.4, Ecs. 6.43-6.44) en las que se apoyan steady_state_spl y room_constant, y la pérdida por inserción del cerramiento del apartado 7.4.2 (Ecs. 7.103, 7.111), que es el modelo de cerramiento por omisión de la biblioteca."
   - type: standard
     organization: "American National Standards Institute"
     year: 2019
@@ -29,7 +29,7 @@ references:
     authors: ["Kuttruff, H."]
     year: 2016
     title: "Room acoustics"
-    edition: "6th ed."
+    edition: "6.ª ed."
     publisher: "CRC Press"
     note: "La frecuencia de Schroeder (Ec. 3.44), que acota por abajo la hipótesis de campo difuso."
 ---
@@ -51,13 +51,14 @@ a fin los problemas resueltos de Norton y Karczub. La referencia en todo el
 texto es Norton, M. P. y Karczub, D. G., *Fundamentals of Noise and Vibration
 Analysis for Engineers* (2.ª ed., Cambridge University Press 2003),
 capítulo 4: el apartado 4.6 para los modelos de potencia acústica, el 4.9
-para el balance entre recintos y el 4.10 para el encapsulado. Sus problemas
+para el balance entre recintos y el 4.10 para el cerramiento. Sus problemas
 4.16, 4.18 y 4.21 traen respuestas impresas por banda de octava, y los tres
 están fijados en el [informe de conformidad](/phonometry/es/reference/conformance/).
 
 De dónde sale *la partición misma* es otra pregunta, que responden
-[Aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
-(ley de masa, coincidencia, dobles hojas, método de la meseta) o la medición.
+[Aislamiento acústico de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
+(ley de masas, coincidencia, dobles hojas, método de la meseta) o la medición.
 Esta página toma la pérdida por transmisión como dato, igual que hace un
 cálculo a mano.
 
@@ -136,7 +137,7 @@ for name, tl in partitions.items():
 ```
 
 Esas son las respuestas impresas de Norton con precisión de una décima de
-decibelio. Fíjese en lo que les hizo el recinto receptor. A 125 Hz el recinto
+decibelio. Fíjate en lo que les hizo el recinto receptor. A 125 Hz el recinto
 absorbe 27,1 m² frente a una partición de 24 m², así que cada muro entrega
 medio decibelio *más* que su pérdida por transmisión. A 250 Hz el techo ha
 dejado de absorber y el suelo no ha empezado, el recinto baja a 22,8 m², y
@@ -299,13 +300,13 @@ la curva NC 45 en una banda, porque el procedimiento de designación en dos
 pasos de la norma y el criterio de hoja de diseño de que «ninguna banda esté
 por encima de la curva» son preguntas distintas.
 
-## 5. Un encapsulado frente a un criterio
+## 5. Un cerramiento frente a un criterio
 
 El problema 4.16 (pp. impresas 584-585) plantea la misma pregunta con un
-encapsulado en lugar de una partición: un compresor de refrigeración produce
+cerramiento en lugar de una partición: un compresor de refrigeración produce
 un nivel reverberante en su recinto, el técnico necesita bajar ese nivel a
-una curva NC-45, y las paredes del encapsulado tienen que cubrir la
-diferencia. Norton deduce la ecuación del encapsulado del mismo balance de
+una curva NC-45, y las paredes del cerramiento tienen que cubrir la
+diferencia. Norton deduce la ecuación del cerramiento del mismo balance de
 potencia del apartado 4.9 y obtiene la Ecuación (4.115),
 
 $$
@@ -313,7 +314,7 @@ $$
 $$
 
 con $S_E$ el área radiante exterior y $R_i$ la constante de recinto del
-interior del encapsulado, superficie de la máquina incluida. Resuelta para
+interior del cerramiento, superficie de la máquina incluida. Resuelta para
 los paneles, $\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, que es
 `enclosure_required_transmission_loss`.
 
@@ -328,7 +329,7 @@ concrete = [0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.03, 0.03]
 lp1 = np.array([72.0, 79.0, 81.0, 84.0, 83.0, 81.0, 80.0, 75.0])   # sin encapsular
 nc45 = np.array([67.0, 60.0, 54.0, 49.0, 46.0, 44.0, 43.0, 41.0])  # objetivo
 
-# Encapsulado de 2,5 x 3,5 x 2,5 m sobre el suelo de hormigón: las paredes y
+# Cerramiento de 2,5 x 3,5 x 2,5 m sobre el suelo de hormigón: las paredes y
 # la cubierta radian (38,75 m2) y sus caras interiores llevan el revestimiento.
 # El resto del interior es el suelo no cubierto más las cinco caras expuestas
 # de la máquina de 1,5 x 2,5 x 1,5 m, ambos con la absorción del hormigón.
@@ -357,10 +358,10 @@ ya se ha callado. Un panel elegido por su comportamiento entre 500 Hz y 2 kHz
 es el panel correcto aquí.
 
 Dos notas al pie sobre ese fragmento, las dos acerca de ser fiel a la fuente.
-`model="norton"` importa: el modelo de encapsulado por omisión de la
+`model="norton"` importa: el modelo de cerramiento por omisión de la
 biblioteca es la Ecuación (7.111) de Bies, Hansen y Howard, que lleva un
 $0{,}3$ dentro del logaritmo y por tanto limita la pérdida por inserción de
-un encapsulado totalmente revestido a $\text{TL} + 5{,}2\ \text{dB}$. La
+un cerramiento totalmente revestido a $\text{TL} + 5{,}2\ \text{dB}$. La
 Ecuación (4.115) de
 Norton no tiene ese límite. Las dos coinciden en unas décimas mientras el
 interior es duro y divergen cuando el revestimiento domina, y reproducir una
@@ -383,7 +384,7 @@ simplemente el muro que no llega al forjado, y la respuesta de la ecuación
 pasa a ser una cota superior.
 
 El clip de abajo dibuja lo que la ecuación deja fuera. La cadena del
-apartado 3 tarifa solo el camino directo, la vía **Dd** a través de la
+apartado 3 tarifa solo la trayectoria directa, la vía **Dd** a través de la
 partición; los otros tres pulsos salen del recinto emisor por los muros,
 el suelo o el techo de flanco — **Ff** de flanco a flanco, **Fd** de flanco a
 partición, **Df** de partición a flanco — y vuelven a radiar al otro lado sin
@@ -396,8 +397,8 @@ sobre una buena partición.
   name="anim_flanking_paths"
   width={2400}
   height={1350}
-  title="Pulsos de energía por el camino directo y los de flanco"
-  description="Los pulsos de energía salen del recinto emisor por el camino directo Dd y por los caminos de flanco Ff, Fd y Df, menguando en cada elemento y en cada unión, y la etiqueta de cada camino se enciende cuando su pulso vuelve a radiar en el recinto receptor."
+  title="Pulsos de energía por la trayectoria directa y las de flancos"
+  description="Los pulsos de energía salen del recinto emisor por la trayectoria directa Dd y por las trayectorias por flancos Ff, Fd y Df, menguando en cada elemento y en cada unión, y la etiqueta de cada trayectoria se enciende cuando su pulso vuelve a radiar en el recinto receptor."
 />
 
 `DesignCriterion.flanking_penalty` es el cargo explícito por eso, en
@@ -418,10 +419,11 @@ print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      cada banda 3 dB peor
 ```
 
-Cuando las vías de flanco *sí* se modelan en lugar de aprovisionarse, las
+Cuando las trayectorias por flancos *sí* se modelan en lugar de aprovisionarse, las
 herramientas correctas son los modelos de predicción de la EN 12354, y esos
 viven en
-[Predicción del aislamiento acústico en edificios](/phonometry/es/buildings/design/insulation-prediction/)
+[Predicción del aislamiento acústico en
+edificios](/phonometry/es/buildings/design/insulation-prediction/)
 y en [Transmisión por flancos](/phonometry/es/buildings/insulation/flanking-lab/).
 
 La otra hipótesis es la difusividad. La Ecuación (4.101) es un balance de

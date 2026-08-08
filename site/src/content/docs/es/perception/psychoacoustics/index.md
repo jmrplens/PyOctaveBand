@@ -3,12 +3,12 @@ title: "Psicoacústica"
 description: "Las métricas perceptivas del sonido: modelos de sonoridad (ISO 532, ECMA-418-2), agudeza, tonalidad, aspereza e intensidad de fluctuación, los dos métodos de evaluación tonal (prominencia ECMA-418-1 y audibilidad ISO/PAS 20065), y la molestia psicoacústica de Fastl y Zwicker."
 ---
 
-La psicoacústica sustituye la pregunta "¿cuántos decibelios?" por "¿qué
-percibe el oyente?". Su magnitud base es la **sonoridad**: una magnitud
+La psicoacústica sustituye la pregunta «¿cuántos decibelios?» por «¿qué
+percibe el oyente?». Su magnitud base es la **sonoridad**: una magnitud
 perceptiva en sonios, calculada por modelos auditivos que tienen en cuenta el
 filtrado, el enmascaramiento y la compresión del oído. Sobre la sonoridad se
 asientan las sensaciones de **calidad sonora** que distinguen dos sonidos
-igual de fuertes: la agudeza (énfasis en altas frecuencias), la tonalidad
+igual de sonoros: la agudeza (énfasis en altas frecuencias), la tonalidad
 (tonos discretos audibles), la aspereza (modulación rápida) y la intensidad
 de fluctuación (modulación lenta). Y encima, una métrica combinada de **molestia** que pesa la sonoridad, la agudeza, la aspereza y la intensidad de fluctuación en un único escalar.
 
@@ -18,7 +18,7 @@ por una unidad física, y conocer el ancla es lo que hace legible una cifra:
 crítica a 1 kHz y 60 dB; 1 asper, una portadora de 1 kHz totalmente modulada a
 70 Hz a 60 dB; 1 vacil, esa misma portadora modulada a 4 Hz; y 1 tu_HMS, un tono
 de 1 kHz a 40 dB. Están tabuladas juntas, al lado de las escalas de habla y de
-audición, bajo "Cómo leer las cifras" en la
+audición, bajo «Cómo leer las cifras» en la
 [página de la sección](/phonometry/es/perception/).
 
 Las dos familias de páginas difieren en propósito, y esa diferencia decide qué
@@ -33,23 +33,28 @@ informativos, que es lo más parecido a una nota de aprobado dentro de la famili
 de las magnitudes. Todas comparten un prerrequisito: una señal calibrada de
 forma absoluta en pascales, porque toda métrica de aquí depende del nivel.
 
-[Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) es la página fundacional: el
+[Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) es la página
+fundacional: el
 método de referencia Zwicker de ISO 532-1 con su ficha de una página, junto
-con las curvas isofónicas de ISO 226:2023 que anclan la escala perceptiva
+con las líneas isofónicas de ISO 226:2023 que anclan la escala perceptiva
 para tonos puros. Las familias de modelos más recientes, Moore-Glasberg según
 ISO 532-2/-3 y el modelo auditivo de Sottek de ECMA-418-2, continúan en
-[Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/), que además
+[Sonoridad
+avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/), que
+además
 lleva la tabla de elección de modelo.
-[Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) añade la
+[Métricas de calidad
+sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) añade la
 agudeza según DIN 45692 y la tonalidad, la aspereza y la intensidad de
-fluctuación de ECMA-418-2, que comparten el frontal auditivo de Sottek.
+fluctuación de ECMA-418-2, que comparten el front-end auditivo de Sottek.
 
 Los tonos en ruido reciben dos páginas dedicadas porque se les hacen dos
 preguntas distintas.
-[Tonos discretos prominentes (ECMA-418-1)](/phonometry/es/perception/psychoacoustics/tone-prominence/)
+[Tonos discretos prominentes
+(ECMA-418-1)](/phonometry/es/perception/psychoacoustics/tone-prominence/)
 responde a una pregunta de ruido de producto: ¿es este tono *prominente*
-según los criterios de razón tono-ruido y razón de prominencia usados en las
-declaraciones de equipos informáticos?
+según los criterios de relación tono-ruido y relación de prominencia usados
+en las declaraciones de equipos informáticos?
 [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/)
 responde a una ambiental: ¿en cuántos decibelios supera el tono su umbral de
 enmascaramiento?, la audibilidad que alimenta la penalización tonal de
@@ -68,7 +73,7 @@ misma sensación, bajo otro nombre de unidad.
 ## Páginas de esta sección
 
 - [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/): la sonoridad Zwicker de
-  ISO 532-1 en sonios, más las curvas isofónicas de ISO 226:2023.
+  ISO 532-1 en sonios, más las líneas isofónicas de ISO 226:2023.
 - [Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)](/phonometry/es/perception/psychoacoustics/advanced-loudness/):
   los modelos de sonoridad Moore-Glasberg y Sottek y la tabla de elección de
   modelo.
@@ -76,7 +81,7 @@ misma sensación, bajo otro nombre de unidad.
   (DIN 45692) y tonalidad, aspereza e intensidad de fluctuación de
   ECMA-418-2.
 - [Tonos discretos prominentes (ECMA-418-1)](/phonometry/es/perception/psychoacoustics/tone-prominence/):
-  razones tono-ruido y de prominencia con veredictos de prominencia.
+  relaciones tono-ruido y de prominencia con veredictos de prominencia.
 - [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/):
   la audibilidad de un tono sobre el umbral de enmascaramiento, que alimenta
   el ajuste tonal de ISO 1996-2.
