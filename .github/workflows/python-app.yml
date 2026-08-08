@@ -313,8 +313,8 @@ jobs:
   # evaluates as JavaScript); the other is silent and ships a quoted block in
   # the middle of a paragraph. Needs no dependencies, so it runs on its own
   # rather than waiting behind an install.
-  markdown-wrapping:
-    name: Prose does not wrap onto a block marker
+  markdown-hazards:
+    name: Markdown renders the way it reads
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -327,7 +327,7 @@ jobs:
       with:
         python-version: "3.13"
     - name: Check the hand-written markdown
-      run: python scripts/check_markdown_wrapping.py
+      run: python scripts/check_markdown_hazards.py
 
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Gate for prose that wraps onto a markdown block marker.
+"""Gate for markdown that does not render the way it reads.
 
 The guides are hard-wrapped, so a sentence long enough to wrap can put a
 ``-``, a ``>`` or a digit-and-dot at the start of a line. CommonMark does not
@@ -7,7 +7,9 @@ read that as the middle of a sentence: it reads it as a list item, a block
 quote or an ordered list, and it ends the paragraph there. The author sees a
 paragraph; the reader gets two blocks, or worse.
 
-Two checks, because the two ways this fails are not equally visible.
+Three checks. The first two are the same defect seen twice, and they are not
+equally visible; the third is a different one with the same shape, a source
+that looks right and renders wrong.
 
 1. **Unclosed inline maths.** An inline ``$...$`` that wraps onto a block
    marker never closes: the marker ends the paragraph first. The maths is then
@@ -28,12 +30,20 @@ Two checks, because the two ways this fails are not equally visible.
    two languages. A deliberate block quote in this corpus is preceded by a
    blank line, which is why the rule can be this simple.
 
+3. **A same-page link to an accented heading.** Markdown percent-encodes
+   non-ASCII in a URL, so ``[La medición](#la-medición-...)`` ships as
+   ``href="#la-medici%C3%B3n-..."`` while the heading keeps its id unencoded.
+   A browser resolves it; the accessibility audit compares the raw attribute
+   against the ids and reports a dangling anchor, and it only samples 66 URLs,
+   so five of the six the corpus had went unreported. The fix the corpus
+   already used in two places is an ASCII ``<span id=...>`` above the heading.
+
 Display maths (``$$``) is exempt: it is a block of its own and the delimiters
 are on their own lines.
 
 Usage::
 
-    python scripts/check_markdown_wrapping.py
+    python scripts/check_markdown_hazards.py
 
 Exit status 0 when every page is clean, 1 otherwise, with the file, the line
 and the offending text.
@@ -66,6 +76,10 @@ _QUOTE = re.compile(r"^>\s*\S")
 #: Text that continues a paragraph rather than starting a block of its own.
 _PROSE = re.compile(r"^\s{0,3}[^\s\-*+>#|<:0-9]")
 
+#: A same-page link whose target carries a character markdown will
+#: percent-encode on the way out.
+_ANCHOR = re.compile(r"\]\(#([^)]+)\)")
+
 
 def _unescaped_dollars(line: str) -> int:
     """Inline ``$`` delimiters on a line, ignoring ``\\$`` and ``$$``."""
@@ -95,6 +109,17 @@ def _check(path: pathlib.Path) -> list[str]:
             )
             open_math = False
 
+        for anchor in _ANCHOR.finditer(line):
+            target = anchor.group(1)
+            if not target.isascii():
+                problems.append(
+                    f"{rel}:{number}: the same-page link "
+                    f"'#{target}' will be percent-encoded in the href, and the accessibility "
+                    f"audit compares the raw attribute against the ids, so it reads as a "
+                    f"dangling anchor. Put <span id=\"ascii-slug\"></span> above the heading "
+                    f"and link to that, as the pages that already hit this do."
+                )
+
         if number > 1 and _QUOTE.match(line) and _PROSE.match(lines[number - 2]):
             problems.append(
                 f"{rel}:{number}: {line.strip()[:40]!r} continues the sentence above but "
@@ -120,12 +145,12 @@ def main() -> int:
             problems.extend(_check(path))
 
     if problems:
-        print("::error::prose wraps onto a markdown block marker", file=sys.stderr)
+        print("::error::markdown that does not render the way it reads", file=sys.stderr)
         for problem in problems:
             print(f"  - {problem}", file=sys.stderr)
         return 1
 
-    print(f"No paragraph wraps onto a block marker: {checked} pages.")
+    print(f"Markdown renders the way it reads: {checked} pages.")
     return 0
 
 

@@ -85,7 +85,7 @@ resultado lleva la diferencia de niveles bruta `d`, la estandarizada `dnt` y,
 cuando se dan `area` y `volume`, la aparente `r_prime`. Si se ha movido un único
 altavoz entre posiciones, repite eso para cada posición y combina los
 *resultados* con la Fórmula (6), no los niveles; véase
-[La medición](#la-medición-apartados-7-y-9-de-iso-16283-1).
+[La medición](#la-medicion-iso-16283-1).
 Las mediciones de
 impactos pasan por `building.impact_insulation(li, t2, volume=V)`, y cualquiera
 de los dos espectros se valora con `building.weighted_rating` /
@@ -165,6 +165,8 @@ de esos espectros en $R_w$, $R'_w$ o $D_{nT,w}$, sus términos de adaptación
 espectral y sus variantes de rango ampliado están en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
 
+<span id="la-medicion-iso-16283-1"></span>
+
 ## La medición (apartados 7 y 9 de ISO 16283-1)
 
 Las funciones consumen niveles por banda; la norma dice de dónde salen esos
@@ -193,6 +195,8 @@ recinto — y, con un único altavoz desplazado entre posiciones, cinco por
 recinto *y por posición de altavoz*. No puede haber dos posiciones en el mismo
 plano respecto a los paramentos del recinto, y el conjunto no debe formar una
 retícula regular.
+
+<span id="correccion-por-ruido-de-fondo"></span>
 
 ### Corrección por ruido de fondo (apartado 9.2)
 
@@ -598,7 +602,7 @@ usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1). La
 *medición* del nivel de fondo — fuente apagada, mismas posiciones, mismo
 promediado — es cosa del operador, y aquí nada verifica que se haya cumplido el
 suelo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
-[Corrección por ruido de fondo](#corrección-por-ruido-de-fondo-apartado-92)
+[Corrección por ruido de fondo](#correccion-por-ruido-de-fondo)
 más arriba. (`building.background_correction` es la variante de *laboratorio*
 de ISO 10140-4 y no coincide con los umbrales de campo.) Los
 propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (el número
