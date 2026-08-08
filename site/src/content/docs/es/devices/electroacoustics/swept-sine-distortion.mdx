@@ -53,7 +53,7 @@ $$
 \qquad L = \frac{T}{\ln(f_2/f_1)} ,
 $$
 
-de modo que ventanear cada llegada produce las **respuestas en frecuencia
+de modo que enventanar cada llegada produce las **respuestas en frecuencia
 armónicas** $H_1(f), H_2(f), \dots, H_N(f)$ y, a partir de ellas, la distorsión
 armónica total en función de la frecuencia de excitación con un barrido en
 lugar de un recorrido tono a tono. Esta página cubre esa separación en
@@ -70,7 +70,7 @@ $f$, el producto de distorsión del armónico n aparece en $n f$: exactamente
 donde estará el propio barrido $L\ln(n)$ segundos después. Deconvolucionar
 la grabación contra el barrido comprime por tanto cada orden en su propia
 respuesta al impulso, $L\ln(n)$ *antes* de la lineal.
-`swept_sine_distortion` ventanea cada llegada (con el alineado exacto de
+`swept_sine_distortion` enventana cada llegada (con el alineado exacto de
 fracción de muestra), la transforma en $H_n(f)$ y lee la distorsión de orden
 $n$ a la frecuencia de excitación $f$ de $|H_n(n f)|$:
 
@@ -84,6 +84,11 @@ convolucionar con el filtro inverso, y los armónicos caen por delante de la
 respuesta lineal con sus adelantos fijos.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido sinusoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
+
+*Los adelantos los fija el barrido por sí solo — aquí
+$L = T/\ln(f_2/f_1) = 0{,}70$ s — y no el dispositivo, que es la razón de que
+las mismas ventanas sirvan para cualquier sistema débilmente no lineal y de
+que alargar el barrido sea lo que compra separación.*
 
 ```python
 import numpy as np
@@ -100,7 +105,79 @@ res.distortion_ratios     # |Hn(n f)| / |H1(f)| por orden
 res.plot()                # magnitudes |Hn| + THD(f)
 ```
 
+### 1.1 Cómo se reproduce y se graba
+
+Una curva de THD(f) es una propiedad del dispositivo **a un solo nivel de
+excitación**, así que hay que publicarla con ese nivel y, si la medición es
+acústica, con el nivel de presión acústica que produjo en el micrófono. El mismo
+altavoz medido 6 dB más fuerte devuelve una curva varios decibelios más alta *y
+con otra forma*, porque los mecanismos que dominan cambian con la excursión.
+Elige el nivel entre dos paredes: lo bastante alto para que los armónicos
+destaquen sobre el fondo, porque la ganancia de proceso de la deconvolución
+ayuda mucho más a la respuesta lineal que a las prellegadas, y lo bastante bajo
+para que no recorte ni el dispositivo ni ningún conversor de la cadena, porque
+un registro recortado fabrica exactamente los armónicos de orden impar que se
+están midiendo, y en todas las ventanas. Ten en cuenta además que un barrido
+tiene un factor de cresta mucho más bajo que una ráfaga tonal, así que a igual
+amplitud de pico entrega más energía y exige más al dispositivo que un ensayo
+con tono al mismo nivel nominal.
+
+Hay cuatro cosas que fijar antes de la primera toma:
+
+```python
+import numpy as np
+
+# `synchronized_sweep_signal` y `swept_sine_distortion` importados arriba.
+x = synchronized_sweep_signal(fs, f1, f2, seconds, amplitude=0.5, fade=0.02)
+# ... reproduce x, graba y, y sigue grabando hasta que la caída se apague ...
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3,
+                            amplitude=0.5, fade=0.02)
+```
+
+- **`amplitude`** es la referencia contra la que se calculan el $H_1$ devuelto y
+  todas las razones, así que tiene que ser el nivel realmente reproducido, y el
+  *mismo* valor tiene que llegar a las dos llamadas: el análisis toma 1.0 por
+  defecto, así que un barrido generado a 0.5 y analizado con el valor por
+  defecto devuelve una ganancia 6 dB baja.
+- **`fade`** aplica un breve enventanado de medio Hann en los dos extremos. Vale
+  0 por defecto porque el análisis es exacto sobre el barrido sin fundido, pero
+  un barrido sin fundido empieza y acaba en una discontinuidad a plena amplitud
+  que suena como un chasquido a través de un amplificador y un altavoz reales y
+  reparte energía por todo el eje temporal de los armónicos. El mismo valor hay
+  que pasarlo al análisis, o la deconvolución queda desemparejada; 20 ms solo
+  retocan los bordes extremos de la banda.
+- **Recorte.** Comprueba todas las etapas, no solo el conversor: cualquier
+  elemento que recorte antes del que está bajo ensayo destruye el sentido de la
+  medición.
+- **La cola.** Graba el barrido *más* toda su caída, o las prellegadas armónicas
+  se enrollan por la deconvolución circular hasta el final de la respuesta
+  lineal.
+
+Hay dos modos de fallo silenciosos en vez de evidentes. El método supone que el
+sistema no cambia durante el barrido, así que un ventilador en marcha, una
+persona que se mueve, una bobina móvil que se calienta o una temperatura de sala
+que deriva descorrelacionan la parte final del barrido de la inicial y aparecen
+como un suelo de ruido levantado alrededor de las llegadas armónicas, no como un
+fallo evidente, que es la razón de que las mediciones largas se promedien en vez
+de alargarse indefinidamente. Y cualquier suceso impulsivo de la grabación lo
+reparte la deconvolución por todo el eje temporal y aterriza dentro de las
+ventanas armónicas, donde se lee como distorsión: un solo chasquido fuerte puede
+inventarse una THD de varios por ciento, así que repite la medición en vez de
+intentar recortarlo con una ventana. Por último, el suelo de ruido residual de
+la deconvolución es el suelo de la curva de THD(f) — una captura con 60 dB de
+relación señal-ruido no puede mostrar un armónico del 0,05 % por bien colocadas
+que estén las ventanas —, así que informa del suelo de ruido medido junto a la
+curva.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sweep_bench_es.svg" alt="Dos bancos para una medición con barrido: el panel (a), una interfaz de audio que excita un dispositivo eléctrico bajo ensayo con un segundo canal de la interfaz cableado directamente de vuelta desde la salida como referencia de bucle que fija t igual a cero; el panel (b), un altavoz y un micrófono de medición, los dos a 1,20 m sobre un suelo duro y separados 1,00 m, con el camino reflejado de 2,60 m en trazo discontinuo y el tiempo libre de reflexiones resultante de 4,7 ms indicado; debajo de ambos, el eje temporal propio del barrido con la llegada lineal en t igual a cero, las prellegadas del segundo y el tercer armónico en menos 0,49 y menos 0,77 segundos, la ventana por orden de 8192 muestras y la separación de llegadas más corta L ln(3/2) igual a 0,28 s" width="92%" />
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd_es.svg" alt="Distorsión armónica total y razones del segundo y tercer armónico de un polinomio cúbico seguido de un paso bajo de 3 kHz, frente a la frecuencia de excitación: cada orden se asienta exactamente en su nivel de Chebyshev a baja frecuencia y cae donde su propio producto cruza el corte del filtro" width="82%" loading="eager" />
+
+*Las mesetas planas de baja frecuencia son los niveles de Chebyshev
+$(a_2/2)/H_1$ y $(a_3/4)/H_1$ del polinomio sin memoria, y cada orden se dobla
+hacia abajo donde su propio producto $nf$ cruza el postfiltro de 3 kHz, de modo
+que los codos quedan en 1,5 kHz para $d_2$ y en 1 kHz para $d_3$, sobre el eje
+de excitación. Ese es el mismo oráculo que fijan los tests de conformidad.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -144,9 +221,63 @@ $|H_3| = a_3/4$ (fase $\pi$) y $\mathrm{THD} = \sqrt{(a_2/2)^2 + (a_3/4)^2}/(1 +
 suites de tests y de conformidad fijan los cuatro valores, y la misma THD
 medida tono a tono con `phonometry.thd` coincide al 0,1 %.
 
+Lo que el método existe para producir, sin embargo, no son las razones escalares
+— un barrido de tonos por pasos también las da — sino el **conjunto de funciones
+de transferencia armónicas**. Cada $H_n$ es una respuesta en frecuencia completa
+sobre su propia banda $[n f_1, n f_2]$:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_harmonic_responses_es.svg" alt="Las magnitudes de las tres respuestas armónicas separadas de un polinomio cúbico seguido de un paso bajo de 3 kHz, cada una dibujada sobre su propia banda: H1 de 20 Hz a 6 kHz, H2 de 40 Hz a 12 kHz y H3 de 60 Hz a 18 kHz, cada una asentada en su nivel de Chebyshev punteado a baja frecuencia y cayendo en el mismo corte del postfiltro de 3 kHz" width="82%" />
+
+*Cada orden es una respuesta, no un número, y aquí están representados frente a
+la frecuencia del propio armónico: los tres caen en los mismos 3 kHz, porque el
+postfiltro actúa sobre el producto y no sobre la excitación. Las líneas
+punteadas son los niveles de Chebyshev. `res.plot()` dibuja estas magnitudes
+junto con el panel de THD(f) de arriba.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+
+# `swept_sine_distortion` y `synchronized_sweep_signal` importados arriba.
+fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
+a2, a3 = 0.12, 0.08
+x = synchronized_sweep_signal(fs, f1, f2, seconds)
+b, a = sp_signal.butter(2, 3000.0, fs=fs)
+y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+for k in range(3):
+    mag = np.abs(np.asarray(res.harmonic_responses[k]))
+    plt.semilogx(res.frequencies, 20 * np.log10(np.maximum(mag, 1e-9)))
+plt.show()
+```
+
+</details>
+
+**Cómo se lee un dispositivo real.** En un altavoz medido la curva tiene una
+forma que conviene reconocer: distorsión que sube con fuerza por debajo de la
+resonancia fundamental, donde la excursión crece a la vez que cae la respuesta;
+un pico local allí donde se está excitando con fuerza una resonancia; y un suelo
+de una fracción de por ciento por la banda media a excitación moderada. Separar
+los órdenes es lo que hace diagnóstica la curva: un **segundo** armónico
+dominante es asimetría — una bobina móvil descentrada en el entrehierro, una
+suspensión más rígida en un sentido que en el otro — mientras que un **tercero**
+dominante es limitación simétrica, la suspensión o el entrehierro magnético
+agotándose en los dos extremos, y las dos cosas piden arreglos distintos. Como
+orden de magnitud, por debajo de un 1 % en la banda media no tiene nada de
+particular en un radiador directo a niveles de conversación, un 10 % es la marca
+convencional del límite de excursión que define el extremo grave útil de un
+altavoz, y cualquier amplificador que llegue al 1 % por debajo del recorte está
+averiado. Recuerda que la abscisa es la frecuencia de *excitación*: un rasgo a
+100 Hz en la traza de $d_2$ es energía radiada a 200 Hz, que es donde se oirá.
+
 ## 2. El barrido sincronizado (Novak et al. 2015)
 
-El ventaneado separa las *magnitudes* armónicas con cualquier barrido
+El enventanado separa las *magnitudes* armónicas con cualquier barrido
 exponencial, pero las *fases* de $H_2 \dots H_N$ solo tienen sentido si retrasar
 el barrido $L\ln(n)$ equivale exactamente a generar su armónico n. Eso solo
 se cumple para
@@ -176,18 +307,18 @@ analítica extiende la banda útil de cada $H_n$ hasta $[n f_1, n f_2]$
 hasta 12 kHz.
 
 Dos notas prácticas del artículo vienen incorporadas: la media de la
-grabación se resta por defecto (`remove_dc=True`; un offset de continua
-filtra si no una copia escalada del filtro inverso en la respuesta al
-impulso), y la parte no entera de cada llegada $L\ln(n) f_s$ se elimina en
+grabación se resta por defecto (`remove_dc=True`; de lo contrario, un offset de
+continua cuela en la respuesta al impulso una copia escalada del filtro
+inverso), y la parte no entera de cada llegada $L\ln(n) f_s$ se elimina en
 el dominio de la frecuencia, de modo que las fases armónicas no arrastran
 sesgo sub-muestra residual.
 
-## 3. Analizar grabaciones con el ESS clásico (`method="farina"`)
+## 3. Analizar grabaciones con el barrido exponencial (ESS) clásico (`method="farina"`)
 
-Las grabaciones hechas con el barrido exponencial simple de
+Las grabaciones hechas con el **barrido sinusoidal exponencial (ESS)** simple de
 `phonometry.sweep_signal` (la excitación de ISO 18233 que usa
 [`impulse_response`](/phonometry/es/buildings/rooms/room-acoustics/)) se analizan con
-`method="farina"`: el mismo ventaneado sobre el filtro inverso invertido en
+`method="farina"`: el mismo enventanado sobre el filtro inverso invertido en
 el tiempo y compensado en amplitud de Farina (2000). Las **magnitudes**
 armónicas y la THD son correctas (el oráculo de Chebyshev pasa igual), pero
 el término de fase `-1` del barrido rompe la equivalencia
@@ -206,24 +337,70 @@ res.plot()   # los mismos paneles |Hn| + THD(f) que el método sincronizado (nec
 El resultado es el mismo `SweptSineDistortionResult` dibujable que el del
 método sincronizado, así que los paneles `|Hn|` y `THD(f)` de la figura de la
 sección 1 se leen idénticos; entre los dos métodos solo cambian las fases de
-los armónicos (y el tope de banda de cada orden).
+los armónicos (y el tope de banda de cada orden). Las dos diferencias se ven
+sobre una misma grabación:
 
-Reglas de dimensionado para ambos métodos: el par de llegadas más próximo
-dista $L\ln(N/(N-1))$ segundos, así que la ventana por orden (`ir_length`,
-por defecto la mayor potencia de dos que cabe, con tope en 8192 muestras)
-no debe excederlo: alarga el barrido o baja `n_harmonics` en sistemas
-reverberantes cuyas colas necesiten ventanas más largas. Mantén
-`n_harmonics` $\cdot f_2$ por debajo de Nyquist: los productos de distorsión por
-encima se pliegan en cualquier grabación real. El análisis queda referido a
-la `amplitude` de la excitación, así que $H_1$ es la ganancia lineal y la
-THD queda referida al nivel exactamente como se excitó.
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_methods_es.svg" alt="La respuesta del segundo armónico de una misma grabación de un cúbico sin memoria, analizada dos veces: en el panel superior las magnitudes coinciden sobre el nivel de Chebyshev a2 entre 2, pero la curva de Farina se corta en seco en f2 igual a 6 kHz mientras la sincronizada continúa hasta 2 f2 igual a 12 kHz; en el panel inferior la fase sincronizada se mantiene en el valor verdadero de menos pi entre dos en todas las frecuencias mientras la fase de Farina se aparta por encima de aproximadamente 1 kHz" width="82%" />
 
-## 4. Utilidades de fase: fase mínima, retardo de grupo, exceso de fase
+*La misma grabación, las mismas magnitudes, dos diferencias. La deconvolución
+sincronizada mide $H_2$ hasta $2f_2$; el filtro inverso de Farina lo detiene en
+$f_2$. Y en un dispositivo cuya fase verdadera de $H_2$ es exactamente $-\pi/2$
+en todas las frecuencias (el cúbico sin memoria del oráculo), solo la fase
+sincronizada la reproduce, que es la razón de que `method="farina"` devuelva
+fases que hay que descartar en vez de leer.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `synchronized_sweep_signal` y `swept_sine_distortion` importados arriba.
+x = synchronized_sweep_signal(48000, 20.0, 6000.0, 4.0)
+y = x + 0.12 * x**2 + 0.08 * x**3            # el oráculo sin memoria
+actual = len(x) / 48000                       # el generador cuantiza T
+for method in ("synchronized", "farina"):
+    res = swept_sine_distortion(y, 48000, 20.0, 6000.0, actual,
+                                n_harmonics=3, method=method)
+    plt.semilogx(res.frequencies,
+                 np.unwrap(np.angle(np.asarray(res.harmonic_responses[1]))))
+plt.show()
+```
+
+</details>
+
+## 4. Dimensionar el barrido
+
+Antes de grabar nada, tres números tienen que casar: la duración del barrido
+$T$, el número de órdenes armónicos $N$ y la frecuencia superior $f_2$. Las
+reglas de abajo rigen para **los dos** métodos.
+
+- **La ventana frente a la separación entre llegadas.** El par de llegadas más
+  próximo dista $L\ln\bigl(N/(N-1)\bigr)$ segundos, así que la ventana por orden
+  (`ir_length`, por defecto la mayor potencia de dos que cabe, con tope en 8192
+  muestras) no debe excederlo. Alarga el barrido o baja `n_harmonics` en un
+  sistema reverberante cuya cola necesite una ventana más larga.
+- **El techo de Nyquist.** Mantén $N f_2$ por debajo de $f_s/2$: los productos
+  de distorsión por encima se pliegan en cualquier grabación real y quedan
+  contados entonces en la frecuencia equivocada.
+- **La referencia de amplitud.** El análisis queda referido a la `amplitude` de
+  la excitación, así que $H_1$ es la ganancia lineal y la THD queda referida al
+  nivel exactamente como se excitó.
+
+Hecho para el barrido que usa esta página: $f_1 = 20$ Hz, $f_2 = 6$ kHz y
+$T = 4$ s dan $L = T/\ln(f_2/f_1) = 0{,}70$ s, así que la separación entre $H_3$
+y $H_2$ es $0{,}70\ln(3/2) = 0{,}28$ s y la ventana por defecto de 8192 muestras
+(0,17 s a 48 kHz) cabe dentro con holgura. Con $N = 3$ y $f_2 = 6$ kHz, el techo
+$N f_2 = 18$ kHz queda cómodamente por debajo de la frecuencia de Nyquist de
+24 kHz.
+
+## 5. Utilidades de fase: fase mínima, retardo de grupo, exceso de fase
 
 En un sistema causal, estable y de fase mínima, la log-magnitud y la fase
 de la respuesta en frecuencia forman un par de transformadas de Hilbert
 (Bendat y Piersol, Sec. 13.1.4): la fase queda totalmente determinada por
-`|H(f)|`. Las utilidades de `phonometry.signals` calculan esa
+$|H(f)|$. Las utilidades de `phonometry.signals` calculan esa
 reconstrucción con el cepstrum real y descomponen cualquier respuesta
 medida en su parte invertible y su parte paso todo:
 
@@ -250,6 +427,21 @@ procesado de 2,5 ms: la parte de fase mínima lleva solo la pequeña ondulación
 de fase que un ecualizador podría invertir, el exceso de fase es la rampa pura
 $-2\pi f t_0$ del retardo, y el retardo de grupo de exceso lee la latencia
 directamente como una línea plana de 2,5 ms.*
+
+**En una medición acústica esa parte plana no es latencia, es distancia.** El
+tiempo de vuelo de altavoz a micrófono es de unos 2,9 ms por metro, así que una
+respuesta medida a 1 m lleva un exceso de retardo de grupo de 2,9 ms que no
+tiene nada que ver con la electrónica, y quien lo lea como latencia de procesado
+intentará compensar un retardo que no existe. Quítalo primero — recorta la
+respuesta al impulso hasta su llegada, o resta la distancia conocida —, porque
+nada más del exceso de fase se puede interpretar hasta que se haya ido. Lo que
+queda tras quitarlo es la parte que importa: un residuo paso todo que ningún
+ecualizador puede invertir, producido por un comportamiento genuinamente de fase
+no mínima, como una reflexión fuerte que llega después del sonido directo, o un
+cruce cuyos centros acústicos no están alineados. Esa es la pregunta de diseño
+que de verdad se le hace a `phase_decomposition` en corrección de altavoces y de
+salas: una respuesta que es de fase mínima una vez quitado el retardo se puede
+corregir en magnitud y fase a la vez con un solo filtro; una que no lo es, no.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -281,16 +473,16 @@ plt.show()
 La descomposición $H = H_\text{min} H_\text{ap}$ separa lo que un ecualizador puede
 invertir ($H_\text{min}$, fase mínima, causal y causalmente invertible) de lo que
 nunca podrá ($H_\text{ap}$, el exceso paso todo: latencia más ceros de fase no
-mínima como las reflexiones). El exceso de fase es `0` para una respuesta
+mínima como las reflexiones). El exceso de fase es $0$ para una respuesta
 de fase mínima y exactamente $-2\pi f t_0$ para una latencia pura $t_0$; su
 retardo de grupo lee la latencia en segundos.
 
 Contrato numérico, fijado por los tests: sobre un biquad estrictamente de
 fase mínima muestreado en una malla densa, la fase reconstruida coincide
-con la real a mejor de `1e-12` rad; el retardo de grupo de un paso todo de
+con la real a mejor de $10^{-12}$ rad; el retardo de grupo de un paso todo de
 primer orden coincide con la forma cerrada $(1-a^2)/(1+2a\cos\omega+a^2)$ a
-`1e-5` muestras; el exceso de retardo de grupo de un biquad retardado
-devuelve el retardo a `1e-6` muestras. Las precauciones están documentadas
+$10^{-5}$ muestras; el exceso de retardo de grupo de un biquad retardado
+devuelve el retardo a $10^{-6}$ muestras. Las precauciones están documentadas
 con la API: la respuesta debe muestrearse uniformemente de DC a Nyquist
 inclusive (la disposición `rfft`) y con densidad suficiente para que la
 respuesta al impulso subyacente quepa en el registro implícito; los ceros
@@ -309,7 +501,19 @@ gruesas.
 - [`thd` / `harmonic_analysis`](/phonometry/es/devices/electroacoustics/electroacoustics/)
   miden la distorsión de un tono estacionario a una frecuencia; el
   separador por barrido devuelve las mismas razones como función continua
-  de la frecuencia, con una sola medición.
+  de la frecuencia, con una sola medición. La rapidez es la menor de las
+  razones para preferirlo. Deconvolucionar un barrido de duración $T$ concentra
+  toda la excitación en un solo impulso, de modo que la relación señal-ruido del
+  resultado supera a la de la grabación en bruto en aproximadamente
+  $10\log_{10}$ del producto tiempo-ancho de banda, que es como un barrido mide
+  un dispositivo silencioso en una sala en la que un tono por pasos no podría
+  trabajar. Y la separación es *en el tiempo, no en frecuencia*: no se aplica
+  ningún filtro de muesca ni hay que declarar armónico ningún bin, que es lo que
+  mantiene con sentido la THD(f) allí donde los armónicos propios de un
+  dispositivo caen fuera de su banda de paso. La contrapartida es que una cola
+  reverberante que dure más que la separación $L\ln(N/(N-1))$ contamina el orden
+  vecino, que es justo lo que las reglas de dimensionado de la sección 4 existen
+  para evitar.
 - Las utilidades de fase operan sobre cualquier respuesta unilateral
   *compleja*: una `rfft` de una RI medida, o la `response` de una estimación con
   [`transfer_function`](/phonometry/es/devices/electroacoustics/electroacoustics/) sobre una
@@ -323,6 +527,11 @@ AES 5093, 2000) y el barrido sincronizado coherente en fase de Novak,
 Lotton y Simon (2015): la separación armónica, el espectro en forma
 cerrada del filtro inverso y la corrección de sesgo sub-muestra,
 implementadas por `swept_sine_distortion` y `synchronized_sweep_signal`.
+Las condiciones de adquisición de las que depende el resultado: el nivel de
+excitación y su referencia `amplitude`, el `fade` que tiene que llegar a las
+dos llamadas, los requisitos de recorte y de cola, los modos de fallo por
+variación en el tiempo y por ruido impulsivo, y las reglas de dimensionado que
+relacionan $T$, $N$ y $f_2$.
 Las utilidades de fase `minimum_phase`, `group_delay`, `excess_phase` y
 `phase_decomposition` implementan la relación de transformada de Hilbert
 de la sección 13.1.4 de Bendat y Piersol mediante el cepstrum real.
@@ -337,4 +546,21 @@ práctica (fundidos, técnica del filtro inverso), no como una fórmula
 concreta implementada. Con `method="farina"`, las fases armónicas de
 $H_2 \dots H_N$ se devuelven pero deben ignorarse: el barrido exponencial simple
 rompe la equivalencia desplazamiento-armónico de la que depende el método
-sincronizado.
+sincronizado. Aquí tampoco se comprueba ninguna de las condiciones de
+adquisición de la sección 1.1: las funciones toman los arrays que se les dan,
+así que el nivel de excitación, la ausencia de recorte y la longitud de la cola
+quedan a cargo de quien opera, que además tiene que informar de ellos.
+
+## Véase también
+
+- [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/): el
+  conjunto de $\mathrm{THD}$ con tono estacionario, THD+N e intermodulación de
+  IEC 60268-3 que este barrido complementa, y el punto de funcionamiento en el
+  que están todos definidos.
+- [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/):
+  la curva de THD(f) que se produce aquí es el panel de distorsión de ese
+  informe de características nominales.
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/):
+  `impulse_response`, que es la mitad lineal de la misma grabación.
+- Referencia de la API: [`electroacoustics.swept_sine`](/phonometry/es/reference/api/electroacoustics/swept-sine/)
+  y [`signals.phase`](/phonometry/es/reference/api/signals/phase/).

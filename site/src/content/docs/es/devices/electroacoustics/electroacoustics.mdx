@@ -1,6 +1,6 @@
 ---
 title: "Electroacústica: distorsión y respuesta en frecuencia"
-description: "Distorsión IEC 60268-3: distorsión armónica total y de orden n, THD+N y SINAD a través del ancho de banda de medición AES17, la intermodulación por órdenes de modulación y por frecuencia diferencia, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, el rango dinámico y el ruido de canal en reposo de AES17 (ponderación CCIR-RMS), más los estimadores de respuesta en frecuencia H1/H2 de Bendat y Piersol y la coherencia ordinaria."
+description: "Distorsión IEC 60268-3: distorsión armónica total y de orden n, THD+N y SINAD a través del ancho de banda de medición AES17, la intermodulación por órdenes de modulación y por diferencia de frecuencias, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, el rango dinámico y el ruido de canal en reposo de AES17 (ponderación CCIR-RMS), más los estimadores de respuesta en frecuencia H1/H2 de Bendat y Piersol y la coherencia ordinaria."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,7 @@ references:
     title: "Sound system equipment – Part 3: Amplifiers"
     designation: "IEC 60268-3:2013"
     url: "https://webstore.iec.ch/en/publication/1220"
-    note: "Apartados 14.12.2-14.12.11: distorsión armónica total THD_F/THD_R (la fórmula de 14.12.3.2 define la forma R), distorsión armónica de orden n d_n, la intermodulación por órdenes de modulación (d_m,n) y por frecuencia diferencia (d_d,n), distorsión total por frecuencia diferencia, intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4 / IEC 60268-1."
+    note: "Apartados 14.12.2-14.12.11: distorsión armónica total THD_F/THD_R (la fórmula de 14.12.3.2 define la forma R), distorsión armónica de orden n d_n, la intermodulación por órdenes de modulación (d_m,n) y por diferencia de frecuencias (d_d,n), distorsión total por diferencia de frecuencias, intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4 / IEC 60268-1."
   - type: standard
     organization: "Audio Engineering Society"
     year: 2015
@@ -30,31 +30,85 @@ references:
     edition: "4.ª ed."
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
-    note: "ISBN 978-0-470-24877-5. Los estimadores de respuesta en frecuencia H1 y H2 y la coherencia ordinaria γ² de la sección 4."
+    note: "ISBN 978-0-470-24877-5. Los estimadores de respuesta en frecuencia H1 y H2 y la coherencia ordinaria γ² de la sección 5."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Dos pilares de la caracterización de equipos de audio, a partir de una señal
 capturada: cuánto **distorsiona** un amplificador o un transductor un tono de
 prueba, y qué **respuesta en frecuencia** revela una medición de entrada/salida.
 Esta página cubre el conjunto de distorsión de la IEC 60268-3: distorsión
 armónica total y de orden n, THD+N y SINAD a través del ancho de banda de
-medición AES17, la intermodulación por órdenes de modulación y por frecuencia
-diferencia, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, y
-los estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y
+medición AES17, la intermodulación por órdenes de modulación y por diferencia
+de frecuencias, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468,
+y los estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y
 Piersol con la coherencia ordinaria $\gamma^2$. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
-los valores son verificables y no ajustados. Las hojas de características de
-transductor que estas mediciones alimentan tienen sus propias guías:
-[Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/),
-con las convenciones de sensibilidad y el modelo de radiación del pistón en
-pantalla, y
+los valores son verificables y no ajustados.
+
+Todo lo de aquí se mide sobre una señal capturada. Lo que después hace una hoja
+de características de transductor con esas curvas es el asunto de las dos guías
+de ensayo de tipo,
+[Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/)
+y
 [Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/devices/electroacoustics/microphones/),
-con los patrones direccionales y las ponderaciones de ruido propio.
+que se ocupan de las convenciones de sensibilidad, de los patrones polares y de
+las fichas de características nominales. La alternativa de un solo barrido a los
+ensayos de tono estacionario de las secciones 1 y 2, con la THD como función
+continua de la frecuencia de excitación, es
+[Distorsión con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+
+## 0. Qué se captura y en qué condiciones
+
+Toda razón de esta página es una propiedad de un dispositivo **en un punto de
+funcionamiento**, no del dispositivo, así que la IEC 60268-3 las define todas
+bajo un mismo conjunto de condiciones y sin él los valores no significan nada.
+
+**El banco.** El apartado 3.1.2 pone el amplificador en *condiciones
+nominales*: la alimentación nominal; la f.e.m. de la fuente aplicada a través de
+la **impedancia de fuente nominal**; los terminales de salida cargados con la
+**impedancia de carga nominal** — una resistencia de potencia no inductiva, no
+un altavoz, para que la carga sea conocida y la medición repetible —; la fuente,
+una sinusoide a la frecuencia de referencia normalizada de 1 kHz de la
+IEC 60268-1; el control de volumen ajustado para que aparezca la tensión de
+salida nominal limitada por distorsión; los controles de tono planos y el de
+balance centrado. Todo lo que va después de la carga es instrumentación: un
+atenuador o un divisor hasta el analizador, con al menos 10 dB de margen en el
+conversor para que sea el amplificador, y nunca el conversor, el elemento que
+recorta.
+
+**El punto de funcionamiento.** Las *condiciones normalizadas de medición*
+(apartado 3.1.3) son las condiciones nominales con la f.e.m. de la fuente bajada
+10 dB. La razón que da el propio apartado (14.12.3.1, NOTA 1) es que un sistema
+bien diseñado pasa la mayor parte del tiempo unos 10 dB por debajo de la salida
+nominal limitada por distorsión, porque ahí es donde se sitúa la distribución de
+amplitud del habla y de la música. Una THD medida a plena salida nominal y otra
+medida en condiciones normalizadas de medición son, por tanto, valores distintos
+del mismo amplificador, y una cifra de hoja de características citada sin su
+nivel no se puede comparar con ninguna de las dos.
+
+**Dos condiciones que se saltan con facilidad.** Una salida en clase D tiene que
+pasar por el filtro paso bajo analógico de la IEC 61606-1 entre la carga y el
+analizador (apartado 3.1.2, NOTA 2, Figura 2), o el residuo de conmutación se
+cuenta como ruido — y la limitación digital de banda a 20 kHz de AES17 de la
+sección 2 no puede quitar un residuo que ya ha entrado por aliasing dentro del
+conversor. Y el apartado 9 exige que el amplificador funcione aproximadamente en
+condiciones normalizadas de medición durante 1 h antes de la primera lectura,
+porque el calentamiento interno mueve la tensión de salida.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_distortion_bench_es.svg" alt="Banco de distorsión eléctrica de la IEC 60268-3: un generador de sinusoide con la f.e.m. de fuente nominal reducida 10 dB alimenta el amplificador bajo ensayo a través de la impedancia de fuente nominal, los terminales de salida se cargan con una resistencia de carga nominal no inductiva, una rama de trazos inserta el filtro paso bajo analógico de la IEC 61606-1 para las salidas en clase D, y un divisor resistivo alimenta el analizador con al menos 10 dB de margen, con las tres comprobaciones de aceptación y el ancho de banda de medición AES17 de 20 Hz a 20 kHz anotados debajo" width="92%" />
+
+**Qué hay que anotar.** Ninguna de las razones de abajo significa nada por sí
+sola. Informa, junto a cada cifra, de la frecuencia fundamental, de la tensión o
+la potencia de salida (o del nivel de presión acústica, si la medición es
+acústica), de la impedancia de carga, del ancho de banda de medición y de
+cualquier ponderación, y del número de órdenes armónicos sumados. `thd` y
+`harmonic_analysis` toman por defecto `n_harmonics=10`; un analizador que sume
+cinco órdenes lee menos sobre la misma señal, así que el recuento de órdenes va
+al lado del número.
 
 ## 1. Distorsión armónica (IEC 60268-3 14.12.2–5)
 
@@ -71,18 +125,55 @@ d_n = \frac{a_n}{\sqrt{\sum_{k\ge 1} a_k^2}}.
 $$
 
 $d_n$ es la distorsión armónica de orden n (el armónico n respecto al total). Los
-tonos deben caer en las líneas de la FFT: usa muestreo coherente (un número
+tonos deben caer en los bins de la FFT: usa muestreo coherente (un número
 entero de periodos) o una ventana de baja fuga para leer las amplitudes sin
 fuga espectral.
 
+Solo se suman los armónicos que caen **por debajo de Nyquist** — la
+implementación detiene la suma en el primer orden que alcanza $f_s/2$ —, así que
+el recuento efectivo de órdenes se encoge a medida que sube la frecuencia de
+ensayo: a 48 kHz un ensayo de 1 kHz suma diez órdenes y uno de 7 kHz suma dos, y
+un barrido de THD con `n_harmonics` fijo no mide la misma magnitud en los dos
+extremos. Muestrea a 96 kHz o más cuando ensayes por encima de unos 2 kHz. En la
+grabación misma, el conversor repliega dentro de la banda cualquier producto de
+distorsión real generado por encima de su propia frecuencia de Nyquist, y ahí
+aterriza en una frecuencia sin relación con las demás: la THD+N lo cuenta y la
+suma armónica no, que es una de las razones por las que ambas pueden discrepar
+más de lo que explica el suelo de ruido.
+
+La distorsión es una propiedad del dispositivo *a un nivel*, y por eso la
+IEC 60268-3 cita cada cifra con su frecuencia y con su nivel de entrada o de
+salida, y por eso una curva de THD frente al nivel dice más que cualquier número
+aislado: un amplificador está más limpio a unos pocos vatios y se dispara cerca
+del recorte, mientras que la THD de un altavoz crece de forma monótona con la
+excursión. Conviene llevar encima los órdenes de magnitud — por debajo del
+0,01 % para un amplificador de potencia competente a la salida nominal, del 0,1
+al 1 % para una cadena de conversión, del 1 al 3 % para un radiador directo en
+su banda media y en torno al 10 % donde alcanza su límite de excursión —, porque
+significan que una lectura del «2 %» condena a un amplificador y no tiene nada
+de particular en un woofer.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/distortion_es.svg" alt="Espectro de magnitud de un ensayo con tono único de 1 kHz en dB respecto al fundamental, con los cinco primeros armónicos marcados sobre un suelo de ruido de banda ancha, anotado con THD (F), THD (R), THD+N y SINAD" width="82%" loading="eager" />
+
+*La escalera de armónicos es la firma del dispositivo, y su forma es
+diagnóstica: un segundo armónico dominante apunta a una no linealidad asimétrica
+(una etapa polarizada, una bobina móvil descentrada), y un tercero dominante a
+una compresión simétrica (recorte, una suspensión que llega a su límite). Cada
+marcador se lee directamente como porcentaje, ya que $-34$ dB respecto al
+fundamental son un 2 %. Los cuatro números anotados son una misma captura leída
+de cuatro maneras: la $\mathrm{THD}_F$ cuenta los armónicos contra el
+fundamental y la $\mathrm{THD}_R$ contra el total — se diferencian en el factor
+$1/\sqrt{1 + \mathrm{THD}_F^2}$ y son indistinguibles por debajo de un 10 %
+aproximadamente, que es la razón de que aquí las dos anotaciones queden una
+encima de otra —, mientras que la THD+N añade la hierba que hay entre los
+armónicos y el SINAD es su recíproco en dB.*
 
 ```python
 from phonometry import electroacoustics
 
 thd_f = electroacoustics.thd(signal, fs, 1000.0, kind="F")          # respecto al fundamental
 thd_r = electroacoustics.thd(signal, fs, 1000.0, kind="R")          # respecto al RMS total
-d2 = electroacoustics.harmonic_distortion(signal, fs, 1000.0, 2)    # armónico de 2º orden
+d2 = electroacoustics.harmonic_distortion(signal, fs, 1000.0, 2)    # armónico de 2.º orden
 ```
 
 `harmonic_analysis` agrupa el fundamental, las amplitudes armónicas y la THD
@@ -105,7 +196,7 @@ import numpy as np
 from phonometry import electroacoustics
 
 fs = 48000
-n = fs                     # 1 s -> líneas de 1 Hz; los armónicos caen en líneas
+n = fs                     # 1 s -> bins de 1 Hz; los armónicos caen en bins
 t = np.arange(n) / fs
 f0 = 1000.0
 amps = {1: 1.0, 2: 0.02, 3: 0.012, 4: 0.006, 5: 0.003}
@@ -118,6 +209,41 @@ plt.show()
 ```
 
 </details>
+
+:::caution
+**Tres comprobaciones antes de creerte un valor de distorsión.**
+
+- *Pureza de la fuente* (14.12.3.2 a). La distorsión armónica total de la fuente
+  de señal tiene que estar al menos 10 dB por debajo de la distorsión más
+  pequeña que se vaya a medir. Un generador de tarjeta de sonido suele no
+  cumplirlo, así que mide primero el generador directamente contra el analizador
+  y toma el resultado como el suelo del banco.
+- *Residuo de ruido* (14.12.3.2 d). Con la f.e.m. de la fuente reducida a cero,
+  la salida residual tiene que ser **menor que un tercio** de la tensión de
+  distorsión medida; si no lo es, el apartado dice que la medición está afectada
+  por el ruido y que los resultados se han de descartar. La alternativa que él
+  mismo nombra es la medición por órdenes de 14.12.5, que es lo que da
+  `harmonic_distortion`.
+- *Techo de banda* (14.12.4.1). Si los armónicos que importan caen por encima
+  del límite superior del amplificador o del analizador, la THD medida resulta
+  engañosamente baja. El fundamental válido más alto es $f_\text{límite}/n$ para
+  el orden significativo más alto $n$ — el caso del propio apartado es un límite
+  de 30 kHz con un quinto armónico significativo, que da 6 kHz, o 10 kHz si el
+  tercero es el más alto que importa. Un barrido de THD llevado hasta 10 kHz con
+  muestreo a 48 kHz cae por ese motivo, y no porque el dispositivo haya
+  mejorado.
+
+:::
+
+El ensayo del residuo son dos líneas, y el apartado lo hace obligatorio y no
+orientativo:
+
+```python
+# `electroacoustics` importado arriba. Captura `idle` con la misma longitud que
+# `signal`, con el generador silenciado, y ejecuta sobre ella la misma llamada.
+residual = electroacoustics.thd(idle, fs, 1000.0, kind="F")
+print(residual < thd_f / 3.0)   # False -> descartar, y bajar a harmonic_distortion
+```
 
 ## 2. THD+N y SINAD (AES17-2015 6.3)
 
@@ -148,10 +274,11 @@ wide = electroacoustics.thd_plus_noise(signal, fs, 1000.0, bandwidth=None)  # Ny
 ```
 
 Como la THD+N incluye el suelo de ruido en banda, es igual o mayor que la THD de
-solo armónicos; el `SINAD` es el correspondiente margen señal-a-ruido-y-distorsión
-en dB (una magnitud derivada de la THD+N de AES17; la propia AES17 no define el
-SINAD). La muesca descarta internamente un transitorio de arranque/parada, así
-que la medición requiere una captura estacionaria y suficientemente larga.
+solo armónicos; el `SINAD` es el correspondiente margen de señal frente a ruido
+más distorsión, en dB (una magnitud derivada de la THD+N de AES17; la propia
+AES17 no define el SINAD). La muesca descarta internamente un transitorio de
+arranque/parada, así que la medición requiere una captura estacionaria y
+suficientemente larga.
 
 ### 2.1 THD ponderada (IEC 60268-3 14.12.11)
 
@@ -171,17 +298,53 @@ print(electroacoustics.weighted_thd(signal, fs, 100.0, weighting="A"))   # varia
 print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2] dB
 ```
 
-### 2.2 Rango dinámico y ruido de canal en reposo (AES17-2015 6.4)
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/itu_r_468_weighting_es.svg" alt="La red de ponderación ITU-R BS.468-4 frente a la frecuencia, que sube hasta más 12,2 dB cerca de 6,3 kHz y cae bruscamente por encima, con la variante CCIR-RMS desplazada 5,63 dB hacia abajo para que valga 0 dB a 2 kHz, y la curva de ponderación A dibujada en tono claro como referencia; los puntos marcados son 0 dB a 1 kHz y más 12,2 dB a 6,3 kHz para la forma 468, y menos 5,63 dB a 1 kHz para la CCIR-RMS" width="82%" />
 
-Las dos cifras de catálogo de cualquier conversor comparten la ponderación
-AES17 **CCIR-RMS** (5.2.7): la curva ITU-R BS.468-4 desplazada un valor plano de
--5,63 dB para que sea unidad a 2 kHz. El **rango dinámico** (6.4.1) excita el
-dispositivo con una sinusoide de 997 Hz 60 dB por debajo de plena escala, elimina la
-fundamental con la muesca normalizada (5.2.8) y pondera el residuo de
-ruido-más-distorsión, y luego informa de la razón del seno de plena escala a ese
-residuo ponderado (también conocida como relación señal-ruido). El **ruido de
-canal en reposo** (6.4.2) es el mismo nivel ponderado medido con el dispositivo
-excitado por cero digital, referido a plena escala:
+*Una sola curva gobierna tres magnitudes de esta página y una cuarta en la guía
+de micrófonos, así que vale la pena leerla una vez. No es una curva de sonoridad:
+es más abrupta que la ponderación A en los dos flancos y su pico está dos octavas
+más arriba. Para el fundamental de 100 Hz del fragmento descuenta 13,8 dB al
+segundo armónico y 10,3 dB al tercero, y levanta todo lo que queda por encima de
+1 kHz — del orden décimo en adelante —, así que una THD ponderada no es una THD
+«más exacta», sino una reordenación deliberada: perdona la distorsión de orden
+bajo de una no linealidad suave y penaliza los productos de orden alto que
+sueltan un cruce por cero o un límite de slew rate. Por eso el apartado restringe
+la medición a fundamentales entre 31,5 Hz y 400 Hz, donde los órdenes que
+importan caen bajo el pico. La forma CCIR-RMS es la misma curva bajada para que
+el punto unidad sea 2 kHz en vez de 1 kHz: una renormalización, no una red
+distinta.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `electroacoustics` importado arriba.
+f = np.geomspace(20.0, 20000.0, 500)
+plt.semilogx(f, electroacoustics.itu_r_468_weighting(f), label="ITU-R BS.468-4")
+plt.semilogx(f, electroacoustics.itu_r_468_weighting(f) - 5.63,
+             ls="--", label="CCIR-RMS (0 dB a 2 kHz)")
+plt.show()
+```
+
+</details>
+
+## 3. Rango dinámico y ruido de canal en reposo (AES17-2015 6.4)
+
+Las dos cifras de catálogo de cualquier conversor reutilizan la muesca de la
+sección 2 y la curva ITU-R 468 de la sección 2.1, pero la excitación es
+distinta, y por eso el apartado 6.4 es hermano del apartado de THD+N y no hijo
+suyo. Ambas comparten la ponderación AES17 **CCIR-RMS** (5.2.7): la curva
+ITU-R BS.468-4 desplazada un valor plano de -5,63 dB para que sea unidad a
+2 kHz. El **rango dinámico** (6.4.1) excita el dispositivo con una sinusoide de
+997 Hz 60 dB por debajo de plena escala, elimina el fundamental con la muesca
+normalizada (5.2.8) y pondera el residuo de ruido-más-distorsión, y luego
+informa de la razón del seno de plena escala a ese residuo ponderado (también
+conocida como relación señal-ruido). El **ruido de canal en reposo** (6.4.2) es
+el mismo nivel ponderado medido con el dispositivo excitado por cero digital,
+referido a plena escala:
 
 ```python
 from phonometry import electroacoustics
@@ -193,43 +356,89 @@ dr = electroacoustics.dynamic_range(output, fs, 997.0)     # dB CCIR-RMS
 idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 ```
 
-Ambas reutilizan la muesca y la curva ITU-R 468 de la cadena de THD+N, y ambas
-se miden a través de la banda AES17 (un paso alto de 20 Hz más el paso bajo
-normalizado en `bandwidth`). Como el filtro CCIR-RMS marca -5,63 dB a 1 kHz, un
-tono de 1 kHz mide su propio dBFS menos 5,63 dB, lo que fija la ponderación con
-exactitud.
+Ambas se miden a través de la banda AES17 (un paso alto de 20 Hz más el paso
+bajo normalizado en `bandwidth`). Como el filtro CCIR-RMS marca -5,63 dB a
+1 kHz, un tono de 1 kHz mide su propio dBFS menos 5,63 dB, lo que fija la
+ponderación con exactitud.
 
-## 3. Distorsión por intermodulación (IEC 60268-3 14.12.7–10)
+Ninguna de las constantes del ensayo es arbitraria. 997 Hz es un número primo,
+así que es inconmensurable tanto con 44,1 kHz como con 48 kHz: el tono no se
+repite nunca dentro de un registro corto y recorre todo el espacio de códigos
+del conversor, mientras que un tono de 1000 Hz a 48 kHz volvería eternamente
+sobre las mismas 48 muestras y escondería los errores de no linealidad
+diferencial de los códigos que nunca toca. El nivel de -60 dBFS mantiene el
+conversor bien lejos de su propia región de sobrecarga, donde dominaría su
+distorsión en vez de su ruido, y a la vez sigue dando a la muesca un fundamental
+que eliminar, que es la razón de que el resultado se refiera a plena escala y no
+al tono de ensayo.
 
-Cuando dos tonos atraviesan una no linealidad, laten entre sí y producen
-productos de suma y diferencia. La IEC 60268-3 normaliza tres ensayos, cada uno
-con su definición por órdenes:
+Lee el resultado en esta escala. Un camino de 16 bits con el dither correcto
+está acotado en unos 93 dB sin ponderar ($6{,}02 \times 16 + 1{,}76 - 4{,}77$ dB
+con dither triangular), y la CCIR-RMS cuesta otros 1,6 dB sobre un suelo de
+ruido plano, así que cualquier valor cercano a 92 dB son 16 bits funcionando a
+la perfección, y de esa longitud de palabra no se saca nada mejor; un conversor
+moderno de 24 bits se cita en 110 dB y más. El ruido de canal en reposo suele
+salir unos pocos decibelios mejor que el rango dinámico del mismo dispositivo,
+porque no lleva distorsión ninguna. Ambas son cifras ponderadas, así que una
+especificación de ruido sin ponderar de otra hoja de características lee varios
+decibelios peor para el mismo equipo y las dos cifras no deben compararse entre
+sí.
 
-- **Distorsión de modulación** (14.12.7): un tono grave grande $f_\text{low}$
-  y un tono agudo pequeño $f_\text{high}$ (preferiblemente 4:1). Los valores
-  por orden son sumas *aritméticas* de las amplitudes de las bandas laterales
-  respecto a la salida en $f_\text{high}$:
+## 4. Distorsión por intermodulación (IEC 60268-3 14.12.7–10)
+
+Cuando dos tonos atraviesan una no linealidad, se mezclan entre sí y producen
+productos de suma y diferencia. La IEC 60268-3 normaliza cuatro ensayos de dos
+tonos, cada uno con su definición por órdenes; el último es una variante del
+segundo con los tonos fijados, y los puntos van en orden de apartado:
+
+- **Distorsión de modulación** (14.12.7): un tono grave de gran amplitud $f_1$ y
+  un tono agudo de pequeña amplitud $f_2$, cuya relación de *amplitudes* — no
+  una relación de frecuencias — es preferiblemente 4:1, algo que el apartado
+  materializa poniendo la salida en $f_1$ 12 dB y la salida en $f_2$ 24 dB por
+  debajo de la tensión de salida nominal. Las frecuencias se eligen muy
+  separadas (60 Hz y 7 kHz aquí) para que las bandas laterales sean resolubles
+  y para que $f_2 - 2f_1$ quede por encima del armónico significativo más alto
+  de $f_1$. Los valores por orden son sumas *aritméticas* de las amplitudes de
+  las bandas laterales respecto a la salida en $f_2$:
   $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ y
   $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. El resultado también lleva el
   valor `smpte` de RMS combinado que dan los analizadores tipo SMPTE (no
   es una magnitud IEC).
-- **Distorsión por frecuencia diferencia** (14.12.8): dos tonos agudos iguales
-  $f_1 < f_2$, referida a $U_{2,\text{ref}} = 2U_{2,f_2}$ (la suma de las
+- **Distorsión por diferencia de frecuencias** (14.12.8): dos tonos agudos
+  iguales $f_1 < f_2$, referida a $U_{2,\text{ref}} = 2U_{2,f_2}$ (la suma de las
   amplitudes de ambos tonos): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ y la
   suma aritmética $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
-- **Distorsión total por frecuencia diferencia** (14.12.10): un ensayo de dos
-  tonos específico ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; los tonos
-  normalizados de 8 kHz y 11,95 kHz son los valores por defecto) donde solo
-  cuentan los dos productos en banda en $f_0 \mp \delta$:
-  $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
 - **Intermodulación dinámica** (DIM, 14.12.9): una sinusoide de 15 kHz más una onda
   cuadrada de 3,15 kHz filtrada en paso bajo (1:4 pico a pico). La DIM es el
   RMS de los productos de intermodulación
   $|k\,f_\text{square} \pm f_\text{sine}|$ que caen por
   debajo de $f_\text{sine}$ (Tabla 2 de la IEC 60268-3), respecto a la amplitud del
   seno de 15 kHz (la definición de 14.12.9.1; el denominador impreso en
-  14.12.9.2 f) es un defecto editorial, véase la
-  [fe de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)).
+  14.12.9.2 f) es un defecto editorial, véase el
+  [registro de erratas](/phonometry/es/reference/errata/)).
+- **Distorsión total por diferencia de frecuencias** (14.12.10): el ensayo de
+  14.12.8 con sus tonos fijados ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; los tonos
+  normalizados de 8 kHz y 11,95 kHz son los valores por defecto) y contando solo
+  los dos productos en banda en $f_0 \mp \delta$:
+  $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
+
+**Cuál ejecutar.** La distorsión de modulación para un dispositivo de banda
+ancha alimentado con programa cargado de graves, la de diferencia de frecuencias
+para la parte alta de la banda, donde los armónicos de los tonos de ensayo caen
+del todo fuera de ella, y la DIM para cualquier cosa con realimentación y un
+límite de slew rate. La razón para ejecutar alguna de ellas cuando ya se tiene
+una THD es que los productos de intermodulación son *inarmónicos*: el oído los
+lee como aspereza y no como timbre, y los oye a niveles a los que una THD
+equivalente pasaría inadvertida; y un dispositivo con memoria — un amplificador
+modulado térmicamente, un woofer que desplaza por efecto Doppler la salida de un
+tweeter — puede dar una THD baja y una distorsión de modulación mala.
+
+Una advertencia sobre la referencia. La IEC 60268-3 admite dos presentaciones de
+las mismas bandas laterales: contra la salida en $f_2$, que es la $d_m$ que
+devuelve esta función, y contra la tensión de referencia combinada 4:1
+$U_{2,\text{ref}} = 5\,U_{2,f_2}$, que da $d'_m = 5\,d_m$. Una cifra sacada de
+una hoja de características puede ser, por tanto, cinco veces (14 dB) la
+calculada aquí, así que la referencia se tiene que citar junto al número.
 
 ```python
 from phonometry import electroacoustics
@@ -251,6 +460,11 @@ cuadrático y cúbico de la no linealidad:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion_es.svg" alt="Espectro de distorsión de modulación de un ensayo de dos tonos de 60 Hz más 7 kHz a través de un amplificador débilmente no lineal: la portadora a 7 kHz como referencia de 0 dB y las cuatro bandas laterales de intermodulación a 7 kHz más menos 60 y 120 Hz marcadas con su orden, anotado con los valores por orden d2 y d3 de IEC 60268-3 y el RMS combinado SMPTE" width="82%" />
 
+*El par $n = 2$ lee el término cuadrático de la no linealidad y el par $n = 3$
+el cúbico, así que su relación dice qué orden domina antes de abrir ningún
+circuito. Todo lo de la figura está referido a la portadora en $f_2$, que es la
+referencia que usan los `d2` y `d3` devueltos.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -271,12 +485,44 @@ plt.show()
 
 </details>
 
-## 4. Respuesta en frecuencia y coherencia (Bendat y Piersol)
+Los otros tres ensayos devuelven escalares, así que la única forma de ver *qué*
+productos cuenta cada uno — que es toda la diferencia entre ellos — es marcarlos
+sobre el espectro de un mismo dispositivo:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intermodulation_tests_es.svg" alt="Tres espectros apilados del mismo dispositivo débilmente no lineal: el ensayo de diferencia de frecuencias a 13 y 14 kHz con el producto de segundo orden en 1 kHz y los dos productos de tercer orden en 12 y 15 kHz etiquetados; el ensayo de distorsión total por diferencia de frecuencias a 8 y 11,95 kHz con solo los dos productos en banda cerca de 3,95 y 4,05 kHz sombreados; y la señal de intermodulación dinámica, cuyo peine de onda cuadrada de 3,15 kHz filtrada en paso bajo se mezcla con la sinusoide de 15 kHz y deja un conjunto de productos por debajo de 15 kHz, cada uno con su tallo y etiquetado con su índice armónico k" width="92%" />
+
+*El mismo dispositivo, tres ensayos, tres conjuntos distintos de productos. El
+ensayo de diferencia de frecuencias cuenta el producto grave $f_2 - f_1$ y los
+dos productos de tercer orden que flanquean el par; el de distorsión total por
+diferencia de frecuencias se queda solo con los dos productos que el par de
+tonos fijo deja cerca de $f_0$; la DIM cuenta todo
+$|k f_\text{square} \pm f_\text{sine}|$ que aterrice por debajo de la sinusoide.
+El denominador también cambia — $a_{f_1} + a_{f_2}$ para los dos primeros, y
+solo la amplitud de la sinusoide para la DIM, que es la magnitud de la que trata
+la entrada del [registro de erratas](/phonometry/es/reference/errata/).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+
+# `electroacoustics` importado arriba; 96 kHz para que los productos DIM sigan en banda.
+fs_im = 96000
+t = np.arange(fs_im) / fs_im                 # 1 s -> cada tono cae en un bin
+x = 0.5 * (np.sin(2 * np.pi * 13000.0 * t) + np.sin(2 * np.pi * 14000.0 * t))
+y = x + 0.05 * x**2 + 0.02 * x**3            # la misma no linealidad débil
+print(electroacoustics.difference_frequency_distortion(y, fs_im, 13e3, 14e3, order=2))
+```
+
+</details>
+
+## 5. Respuesta en frecuencia y coherencia (Bendat y Piersol)
 
 Dada una entrada `x` y la salida `y` de un dispositivo, la **respuesta en
 frecuencia** $H(f)$ se estima a partir de los autoespectros y el espectro cruzado
-promediados con Welch. Bendat y Piersol (*Random Data*, 4ª ed.) dan dos
-estimadores, que difieren en qué canal soporta el ruido, más la **coherencia
+promediados con Welch. Bendat y Piersol (*Random Data*, 4.ª ed.) dan dos
+estimadores, que difieren en qué canal lleva el ruido, más la **coherencia
 ordinaria** $\gamma^2$, la fracción de la potencia de salida explicada
 linealmente por la entrada:
 
@@ -290,7 +536,14 @@ entrada; para un camino lineal sin ruido ambos recuperan la respuesta verdadera
 y $\gamma^2 = 1$. El ruido aditivo a la salida sesga $H_2$ al alza y baja la
 coherencia hasta $\mathrm{SNR}/(1+\mathrm{SNR})$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response_es.svg" alt="Magnitud de Bode de una respuesta en frecuencia estimada con H1 que sigue la respuesta verdadera de un sistema paso banda, con la coherencia ordinaria debajo cayendo hacia los bordes de banda donde la señal de salida es débil frente al ruido" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response_es.svg" alt="Tres paneles que comparan los estimadores H1 y H2 del mismo dispositivo paso banda: con el ruido en la salida, H1 sigue la respuesta verdadera y H2 se eleva por encima de ella hacia los bordes de banda; con el ruido en la entrada el veredicto se invierte y H2 es el estimador insesgado; y el panel compartido de coherencia de abajo muestra la gamma cuadrado medida asentada sobre la predicción punteada SNR partido por uno más SNR" width="82%" />
+
+*Elige el estimador cuyo canal ruidoso está en el denominador: $H_1$ cuando el
+ruido está en la salida y $H_2$ cuando está en la entrada, y el mismo registro
+invierte el veredicto en cuanto el ruido cambia de sitio. El panel de coherencia
+dice cuánto te están mintiendo: su desplome en los bordes de banda no es una
+propiedad del dispositivo, sino de la relación señal-ruido que hay allí, y es lo
+que dice qué parte de la curva de magnitud hay que creerse.*
 
 ```python
 from phonometry import electroacoustics
@@ -302,8 +555,38 @@ res.plot()   # magnitud/fase de Bode + coherencia (necesita matplotlib)
 freqs, gamma2 = electroacoustics.coherence(x, y, fs)
 ```
 
-La coherencia necesita promediarse sobre varios segmentos de Welch para ser
-significativa; un único segmento da $\gamma^2 \equiv 1$ por construcción.
+**Cómo adquirir `x` e `y`.** Captura la referencia y la respuesta en dos canales
+sincronizados muestra a muestra de *un solo* conversor: dos relojes derivan uno
+respecto al otro y destruyen la coherencia justo al ritmo que hace que el
+resultado parezca un dispositivo ruidoso. Toma la referencia eléctricamente
+después del generador, en vez de reutilizar el array ideal que generaste, para
+que lo que haga el propio generador aparezca en los dos canales y se cancele.
+Excita con ruido de banda ancha o con un barrido a un nivel que mantenga el
+dispositivo en el punto de funcionamiento de la sección 0. Elimina el retardo
+entre los dos canales — o haz el segmento de Welch varias veces más largo que
+él —, porque un retardo sin compensar inclina la fase de $H_1$ y hunde
+$\gamma^2$ banda a banda. `transfer_function` elige `nperseg` para una
+resolución de unos 4 Hz cuando no se lo das; la disposición física es la que
+está dibujada en
+[Medición de sistemas de dos canales](/phonometry/es/signals/spectra/system-measurement/).
+
+**Cómo leer la coherencia.** Un valor por debajo de uno tiene tres causas
+físicamente distintas, y se distinguen por experimento: ruido ajeno en
+cualquiera de los dos canales (la coherencia se recupera al subir el nivel de
+excitación), no linealidad en el dispositivo (cae con excitación alta y se
+recupera con excitación baja) y errores de sesgo, es decir, fuga espectral donde
+la resolución es demasiado gruesa cerca de una resonancia aguda y, sobre todo,
+un retardo más largo que el segmento. El promediado es lo que convierte la
+coherencia en una barra de error: el error aleatorio normalizado de la
+estimación de $|H_1|$ es
+$\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_d})$ para $n_d$
+promedios, así que $\gamma^2 = 0{,}9$ necesita unos 22 promedios para un error
+de magnitud del 5 %. Como regla de trabajo, una banda cuya coherencia se queda
+por debajo de 0,9 aproximadamente está **sin medir**, más que mal medida, y su
+magnitud de $H_1$ no debería darse: una coherencia baja es la medición
+diciéndote que la salida de ahí no queda explicada linealmente por la entrada.
+Un único segmento da $\gamma^2 \equiv 1$ por construcción y no significa
+absolutamente nada.
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -322,40 +605,38 @@ b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # dispositivo bajo e
 y = sp.lfilter(b, a, x)
 y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # ruido de salida
 
-res = electroacoustics.transfer_function(x, y, fs, estimator="H1")
-res.plot(language="es")
+# La columna izquierda de la figura: el mismo registro, los dos estimadores.
+h1 = electroacoustics.transfer_function(x, y, fs, estimator="H1")
+h2 = electroacoustics.transfer_function(x, y, fs, estimator="H2")
+plt.semilogx(h1.frequencies, h1.magnitude_db, label="H1")
+plt.semilogx(h2.frequencies, h2.magnitude_db, label="H2")
 plt.show()
 ```
 
 </details>
 
-Lo que estas mediciones alimentan, al final, es una hoja de características de
-transductor. Las convenciones de sensibilidad de IEC 60268-5 (donde fallan
-la mayoría de las comparaciones entre hojas de características), el modelo de
-radiación del pistón en pantalla detrás de la directividad de un cono y el
-informe de características nominales que compone la hoja de características de la
-norma viven en
-[Caracterización de altavoces (IEC 60268-5)](/phonometry/es/devices/electroacoustics/loudspeakers/);
-el lado de micrófono, sus referencias de sensibilidad, patrones
-direccionales, ponderaciones de ruido propio y su propio informe de
-características nominales, vive en
-[Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/devices/electroacoustics/microphones/).
-
 ## Qué cubre esta guía
 
-**Cubierto.** El conjunto de distorsión de IEC 60268-3 (apartados
+**Cubierto.** Las condiciones nominales y las condiciones normalizadas de
+medición de la IEC 60268-3 (apartados 3.1.2/3.1.3 y el preacondicionamiento de
+1 h del apartado 9) y las comprobaciones de aceptación de 14.12.3.2 y 14.12.4.1,
+como las condiciones en las que queda definida cada una de las razones de abajo.
+El conjunto de distorsión de IEC 60268-3 (apartados
 14.12.2-14.12.11): $\mathrm{THD}_F$ y $\mathrm{THD}_R$ (`thd`), la distorsión armónica de orden n
 (`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de
 medición de AES17-2015 (`harmonic_analysis`, apartados 5.2.5/5.2.8/6.3.1 de
-AES17), la intermodulación por modulación y por frecuencia diferencia, la
+AES17), la intermodulación por modulación y por diferencia de frecuencias, la
 intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
-margen dinámico y el ruido de canal en reposo de AES17-2015. Los
+rango dinámico y el ruido de canal en reposo de AES17-2015. Los
 estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y Piersol y la
 coherencia ordinaria.
 
-**No cubierto.** Otras partes de la serie IEC 60268 quedan fuera de esta
-página: la Parte 16 (inteligibilidad objetiva del habla, el índice de
-transmisión del habla) no está implementada, y los informes de
+**No cubierto.** Ninguna de las condiciones de la sección 0 la comprueban las
+funciones: toman un array capturado y calculan la razón que define el apartado,
+así que el banco, el punto de funcionamiento y las tres comprobaciones de
+aceptación quedan a cargo de quien lee. Otras partes de la serie IEC 60268
+quedan fuera de esta página: la Parte 16 (inteligibilidad objetiva del habla, el
+índice de transmisión del habla) no está implementada, y los informes de
 características nominales de micrófono (Parte 4) y de altavoz (Parte 5) se
 han trasladado a
 [Caracterización de micrófonos](/phonometry/es/devices/electroacoustics/microphones/) y
@@ -377,4 +658,7 @@ AES17-2020 no es la comprobada.
 - [Distorsión con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/):
   la separación armónica de Farina/Novak cuya THD(f) alimenta el panel de
   distorsión del altavoz.
-- Referencia de la API: [`electroacoustics.distortion`](/phonometry/es/reference/api/electroacoustics/distortion/) y [`electroacoustics.frequency_response`](/phonometry/es/reference/api/electroacoustics/frequency-response/).
+- [Medición de sistemas de dos canales](/phonometry/es/signals/spectra/system-measurement/):
+  la disposición física detrás de la estimación de $H_1$ de la sección 5, con la
+  toma de referencia y los dos canales sincronizados dibujados.
+- Referencia de la API: [`electroacoustics.distortion`](/phonometry/es/reference/api/electroacoustics/distortion/), [`electroacoustics.intermodulation`](/phonometry/es/reference/api/electroacoustics/intermodulation/), [`electroacoustics.noise_measurements`](/phonometry/es/reference/api/electroacoustics/noise-measurements/) y [`electroacoustics.frequency_response`](/phonometry/es/reference/api/electroacoustics/frequency-response/).

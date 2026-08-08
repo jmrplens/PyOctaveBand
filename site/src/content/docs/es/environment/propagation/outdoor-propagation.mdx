@@ -251,6 +251,41 @@ zonas industriales, edificación; anexo A) y las reflexiones en obstáculos
 verticales (apartado 7.5) **no están implementados**: la norma los trata como
 informativos y se dejan a criterio del usuario.
 
+### Convertir una fuente real en fuentes puntuales
+
+Todas las ecuaciones de abajo están escritas para una fuente **puntual**, así que
+el primer paso de modelado es convertir una instalación real en un conjunto de
+ellas (apartado 4). Una fuente extensa, una carretera, una línea ferroviaria, un
+recinto industrial, se divide en secciones, una fuente lineal en tramos de línea
+y una fuente superficial en tramos de superficie, cada uno con su propia potencia
+acústica y su directividad, y cada uno representado por una fuente puntual en su
+centro. Un grupo de fuentes puntuales puede después reducirse a una única fuente
+puntual equivalente en el centro del grupo, pero solo cuando se cumplen las tres
+condiciones de la norma a la vez: que las fuentes tengan aproximadamente la misma
+potencia y la misma altura sobre el plano local del suelo, que las condiciones de
+propagación desde cada una hasta el receptor sean las mismas, y que la distancia
+$d$ de la fuente equivalente al receptor supere el doble de la mayor dimensión
+$H_{max}$ del grupo ($d > 2H_{max}$). Si $d \le 2H_{max}$, o si las condiciones
+de propagación difieren entre subfuentes (una apantallada por un edificio y otra
+no), el apartado 4 exige volver a descomponer el grupo en sus componentes.
+
+Aplicado al caso que ejecuta esta sección: una nave de compresores cuyas
+superficies radiantes abarcan 30 m se reduce a una sola fuente puntual solo más
+allá de 60 m, así que el receptor a 200 m de abajo es legítimo y uno a 50 m en el
+mismo emplazamiento no lo es, y ahí la nave hay que modelarla cara a cara. La
+propia potencia acústica queda fuera del alcance: sale de una medición de la
+familia ISO 3740 o de la declaración del suministrador, en las ocho bandas de
+octava de 63 Hz a 8 kHz. Cuando solo se dispone de un $L_{WA}$ ponderado A, el
+recurso que la propia norma prevé (apartado 1, Nota 1) es evaluar los términos de
+atenuación a 500 Hz y aplicarlos a ese único número, que es una estimación y no
+una predicción por bandas. Las dos guías de emisión de CNOSSOS-EU,
+[carretera](/phonometry/es/environment/sources/cnossos-road-emission/) y
+[ferrocarril](/phonometry/es/environment/sources/cnossos-rail-emission/), se
+detienen justo donde empieza esta regla: las dos entregan una potencia acústica
+*por metro de línea fuente* y las dos declaran la segmentación fuera de su
+alcance, así que elegir la longitud del tramo y sumar los tramos
+energéticamente es una decisión de ingeniería del usuario.
+
 La geometría del término de apantallamiento fija el vocabulario: el borde de
 difracción divide la distancia fuente-receptor en $d_{ss}$ y $d_{sr}$, y el
 exceso de recorrido sobre el borde es $z = d_{ss} + d_{sr} - d$. Cuando la
@@ -290,6 +325,40 @@ margen libre, sin bajar nunca de cero.
   $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
   $A_{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
 
+### Elegir los factores de suelo
+
+$G_s$, $G_m$ y $G_r$ no son una blandura difusa: cada uno es la *fracción porosa*
+de una región cuya extensión fija la norma (7.3.1, figura 1). Medida a lo largo
+de la distancia $d_p$ proyectada sobre el suelo, la **región de la fuente** ocupa
+$30 h_s$ desde la fuente hacia el receptor (recortada a $d_p$), la **región del
+receptor** ocupa $30 h_r$ hacia atrás desde el receptor, y la **región media** es
+lo que quede entre ambas. La cubierta dura (pavimento, agua, hielo, hormigón,
+tierra apisonada) es $G = 0$; la cubierta porosa (hierba, arbolado, cultivos) es
+$G = 1$; una región mixta toma la fracción de su longitud que sea porosa.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_regions_es.svg" alt="Sección a escala de un recorrido de 200 m con fuente y receptor a 1,5 m del suelo: la región de la fuente sombreada sobre los primeros 45 m como 30 por hs, la región del receptor sombreada sobre los últimos 45 m como 30 por hr, y la región media de 110 m entre ellas rayada en 70 m de hierba y 40 m de asfalto con Gm = 70/110 = 0,64; un recuadro de fórmula da q = 1 menos 30 por (hs más hr) partido por dp, y un recuadro secundario repite el mismo recorrido a 60 m, donde las regiones de fuente y receptor se solapan, q = 0 y la región media no existe" width="92%" />
+
+En el ejemplo de 200 m de esta sección ($h_s = h_r = 1,5$ m, así que
+$d_p \approx d$) eso son 45 m de región de fuente, 45 m de región de receptor y
+110 m de región media: poner los tres factores a 1,0 afirma que los 200 m enteros
+son hierba. Un camino que sale de la planta cruzando una explanada de hormigón de
+20 m toma $G_s = 25/45 \approx 0,55$, y una región media de 70 m de hierba y
+40 m de asfalto toma $G_m = 70/110 \approx 0,64$.
+
+La región media también puede desaparecer. La nota 2 de la Tabla 3 define
+$q = 1 - 30(h_s + h_r)/d_p$ cuando $d_p > 30(h_s + h_r)$ y $q = 0$ por debajo, y
+$A_m$ es proporcional a $q$: con estas dos alturas el umbral queda en
+$d_p = 30(1,5 + 1,5) = 90$ m, así que en un recorrido de 60 m `ground_middle`
+**se ignora por completo**, y pasar 0.0 o 1.0 devuelve el mismo $A_{gr}$, en
+silencio. Ese mismo $q$ da la comprobación de coherencia de todo el término. Sobre
+suelo duro en todas partes, $A_s = A_r = -1,5$ dB y $A_m = -3q$ en todas las
+bandas, así que el recorrido de 200 m tiene que devolver $A_{gr} = -4,65$ dB
+($q = 0,55$) y el de 60 m los $-3$ dB conocidos de un plano perfectamente
+reflectante. Haz esa comprobación antes de fiarte de un factor de suelo: es el
+único caso con respuesta en forma cerrada. El agua y el hielo cuentan como suelo
+duro a efectos del ajuste, pero la ISO 9613-2 no pretende cubrir la propagación
+sobre agua en absoluto.
+
 `outdoor_propagation_attenuation` ensambla los cuatro términos en un resultado
 `OutdoorAttenuation` cuyos arrays por banda suman, banda a banda, a `a_total`, de
 modo que las contribuciones de divergencia, atmosférica, suelo y barrera quedan
@@ -299,6 +368,12 @@ la absorción atmosférica solo muerde a 8 kHz y la caída del suelo vive en las
 bandas medias.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_es.svg" alt="Desglose por bandas de octava de la atenuación ISO 9613-2 como barra apilada de Adiv, Aatm, Agr y Abar con el total A superpuesto, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
+
+*Los cuatro términos llevan signo y suman el total: la divergencia son 57,0 dB
+planos a 200 m, la barrera satura en su tope de 20 dB desde 2 kHz, el aire solo
+muerde a 8 kHz (18,7 dB de los 95,8 dB del total) y el suelo es una **ganancia**
+de 4,65 dB a 63 Hz, razón por la que ahí la barrera tiene que gastarse el
+$A_{gr}$ antes de comprar nada.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -365,7 +440,7 @@ att = environment.outdoor_propagation_attenuation(
 print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergencia
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
-print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 95.8]
 att.plot()                        # el desglose apilado de arriba (necesita matplotlib)
 
 # Nivel predicho en el receptor a partir de una potencia acústica por bandas Lw = 95 dB
@@ -379,8 +454,58 @@ lp = environment.predicted_receiver_level(
     atmosphere=environment.AtmosphericConditions(
         temperature=15.0, relative_humidity=70.0),
 )
-print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
+
+# Dz por sí solo: la pérdida por inserción por difracción de la Ec. (14), antes de la Ec. (12)
+dz = environment.barrier_attenuation(barrier, 200.0, bands)
+print(np.round(dz, 2))            # [ 9.13 11.24 13.73 16.45 19.31 20.   20.   20.  ]
+print(np.allclose(att.a_bar, np.maximum(dz - att.a_gr, 0.0)))   # True
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_level_cascade_es.svg" alt="Diagrama de cascada sobre las ocho bandas de octava desde un nivel de potencia acústica de fuente plano de 95 dB hasta el nivel predicho en el receptor a favor del viento, con un escalón descendente por cada término de atenuación: divergencia, absorción atmosférica, efecto del suelo y apantallamiento por barrera, con el escalón del suelo subiendo en lugar de bajar a 63 Hz, y el nivel final marcado en cada banda" width="88%" />
+
+*Adónde van los 95 dB de potencia de la fuente, banda a banda: la divergencia
+gasta los mismos 57,0 dB en todas, la barrera no vale nada a 250 Hz y vale 20 dB
+por encima de 2 kHz, y a 8 kHz solo el aire quita 18,7 dB y lleva el nivel en el
+receptor por debajo de 0 dB. La columna de 63 Hz es la única donde un escalón
+sube: el suelo devuelve 4,65 dB antes de que la barrera se los vuelva a llevar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `att`, `bands` y `lw` son los objetos que ya construyó el fragmento de arriba.
+nivel = lw.copy()
+fig, ax = plt.subplots()
+for term, label in [(att.a_div, "-Adiv"), (att.a_atm, "-Aatm"),
+                    (att.a_gr, "-Agr"), (att.a_bar, "-Abar")]:
+    ax.bar(np.arange(len(bands)), -term, bottom=nivel, label=label)
+    nivel = nivel - term
+ax.plot(np.arange(len(bands)), nivel, "D-", color="black", label="LfT(DW)")
+ax.set_xticks(np.arange(len(bands)))
+ax.set_xticklabels([f"{b:g}" for b in bands])
+ax.set_xlabel("Frecuencia central de banda de octava [Hz]")
+ax.set_ylabel("Nivel [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+`barrier_attenuation` devuelve el propio $D_z$, la pérdida por inserción por
+difracción en bruto de la Ec. (14), que *no* es lo que declara el compuesto. Para
+una barrera de borde superior, `a_bar` es `np.maximum(dz - a_gr, 0)` (Ec. (12),
+Nota 13), y la igualdad impresa arriba es la forma más limpia de ver que el
+efecto del suelo se gasta en vez de conservarse: a 250 Hz el camino apantallado
+tenía 13,79 dB de atenuación por suelo y 13,73 dB de difracción, así que la
+barrera no aporta exactamente nada. $D_z$ es también donde muerden los topes de
+20 dB de borde simple y 25 dB de doble borde, así que imprimirlo es la manera de
+que el lector sepa que la pared ha saturado y que más altura no compra nada
+(aquí, desde 2 kHz hacia arriba). Solo para una barrera lateral
+(`lateral=True`, Ec. (13)) `a_bar` es igual a $D_z$.
 
 `predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_c - A$ con
 $D_c$ el `DirectivityCorrection` (`index` $+$ `d_omega`). Pasa `c0=` para restar la corrección
@@ -401,11 +526,28 @@ automáticamente** en `outdoor_propagation_attenuation` (que siempre usa el mét
 general por regiones del 7.3.1); combínalos a mano cuando proceda el método
 alternativo.
 
+$h_m$ **no** es el promedio de las dos alturas extremas. La Figura 3 la define
+como $h_m = F/d$, con $F$ el área encerrada entre la recta fuente-receptor y el
+perfil del terreno: sobre suelo plano se reduce a $(h_s + h_r)/2$, sobre un
+desmonte se derrumba hacia cero, y sobre un valle cruzado por un camino elevado
+crece muy por encima de cualquiera de las dos alturas extremas. Ese único término
+es la forma en que el método alternativo absorbe la forma del terreno, y leerlo
+como una altura es el error que embellece una predicción. Ojo a la dirección del
+recorte: $A_{gr}$ está acotado por abajo en 0, así que un camino que va alto
+sobre el suelo no gana atenuación por suelo en absoluto (a $d = 200$ m,
+$h_m = 8$ m todavía da 3,32 dB, pero $h_m = 8$ m a 50 m da 0,00 dB), mientras
+que un camino rasante gana los 4,8 dB completos. Las tres condiciones de validez
+viajan con la fórmula: solo el nivel ponderado A, suelo poroso o mayoritariamente
+poroso, y ningún tono puro. Cualquier otra cosa vuelve al método por regiones del
+7.3.1.
+
 ```python
 from phonometry import environment
 
-# Término de suelo alternativo (altura media del recorrido hm = 2 m, d = 200 m)
+# Término de suelo alternativo (altura media del recorrido hm = F/d = 2 m, d = 200 m)
 print(round(environment.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
+# El recorte: un camino alto sobre una distancia corta no gana nada
+print(round(environment.ground_attenuation_alternative(50.0, 8.0), 2))           # 0.0 dB
 # Su índice de ángulo sólido asociado (súmalo a Dc al usar la Ec. (10))
 print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
 # Corrección meteorológica a largo plazo (C0 = 2 dB) a restar de LAT(DW)
@@ -583,6 +725,61 @@ deciden si una barrera real entrega su $D_z$ calculado:
   ganancia *neta* de construir la barrera es proporcionalmente menor que su
   $D_z$ nominal; los dos efectos no se apilan.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso9613_screening_anatomy_es.svg" alt="Dos paneles sobre el término de apantallamiento de ISO 9613-2. Izquierda: la pérdida por inserción por difracción Dz a 500 Hz frente a la altura de barrera para un recorrido de 200 m, una curva para borde simple, otra para doble borde con una separación de bordes de 2 m y otra para el borde simple con el factor meteorológico Kmet, con los topes de 20 dB y 25 dB dibujados como techos horizontales contra los que chocan las curvas. Derecha: Dz frente a la frecuencia de banda de octava para una pantalla de 4 m junto a Abar = Dz menos Agr sobre suelo poroso, siendo la separación entre las dos curvas el efecto del suelo que la barrera tiene que gastarse antes de comprar nada, y con Abar recortado a cero en la banda de 250 Hz" width="88%" />
+
+*Izquierda: más altura deja de pagar en cuanto $D_z$ toca su tope; más allá de
+unos 7 m de pantalla en este recorrido, la curva de borde simple es plana en
+20 dB, y $K_{met}$ ya le ha quitado de 1 a 2 dB a 200 m. Derecha: las dos curvas
+son la misma barrera; la separación entre ellas es $A_{gr}$, y donde el suelo ya
+valía más que la difracción (la octava de 250 Hz) el $A_{bar}$ neto es cero.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment` es el módulo que importa el fragmento de la sección 1.
+alturas = np.linspace(1.6, 12.0, 60)
+simple, doble = [], []
+for h in alturas:
+    # Una pantalla a media distancia en un recorrido de 200 m; dss = dsr por la geometría.
+    tramo = float(np.hypot(100.0, h - 1.5))
+    simple.append(float(environment.barrier_attenuation(
+        environment.Barrier(source_to_edge=tramo, edge_to_receiver=tramo),
+        200.0, [500.0])[0]))
+    doble.append(float(environment.barrier_attenuation(
+        environment.Barrier(source_to_edge=tramo, edge_to_receiver=tramo,
+                            edge_separation=2.0), 200.0, [500.0])[0]))
+fig, ax = plt.subplots()
+ax.plot(alturas, simple, label="Borde simple")
+ax.plot(alturas, doble, label="Doble borde, e = 2 m")
+ax.axhline(20.0, linestyle=":", label="Tope de 20 dB")
+ax.axhline(25.0, linestyle=":", label="Tope de 25 dB")
+ax.set_xlabel("Altura de barrera [m]")
+ax.set_ylabel("Dz a 500 Hz [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+El caso de línea de visión libre que describe el párrafo del vocabulario está a
+una llamada de distancia, y merece la pena ejecutarlo una vez: $D_z$ no cae a
+cero en cuanto la línea de visión libra el borde, sino que decae desde
+$10 \log_{10} 3 = 4,77$ dB a lo largo de los primeros centímetros de diferencia
+de recorrido.
+
+```python
+for extra in (0.0, 0.001, 0.010, 0.050):   # diferencia de recorrido sobre el borde [m]
+    libre = environment.Barrier(source_to_edge=100.0 + extra / 2,
+                                edge_to_receiver=100.0 + extra / 2,
+                                line_of_sight_clear=True)
+    print(round(float(environment.barrier_attenuation(libre, 200.0, [500.0])[0]), 3))
+# 4,771, 4,728, 4,323, 1,845 dB a 500 Hz
+```
+
 Además, un obstáculo tiene que cumplir los requisitos para considerarse
 barrera (apartado 7.4):
 densidad superficial de al menos 10 kg/m², superficie cerrada sin huecos
@@ -609,7 +806,15 @@ preguntas distintas:
   Agrupa modelos de *emisión* para fuentes viarias, ferroviarias e
   industriales (y delega las aeronaves en el Doc 29 de la CEAC) con su propia
   parte de propagación derivada del método francés NMPB 2008, produciendo los
-  indicadores $L_{den}$/$L_{night}$ que la Directiva exige.
+  indicadores $L_{den}$/$L_{night}$ que la Directiva exige. Esta biblioteca
+  implementa la mitad de *emisión* de CNOSSOS-EU en
+  [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/)
+  y
+  [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/);
+  el método de *propagación* de CNOSSOS-EU del apartado 2.5 **no** está
+  implementado, así que llevar una potencia de línea de CNOSSOS por la cadena de
+  la ISO 9613-2 de esta página es una estimación de ingeniería y no la cadena
+  normativa que prescribe la Directiva.
 
 Las partes de propagación discrepan por diseño, no por accidente. CNOSSOS-EU
 evalúa cada camino dos veces, una con atmósfera homogénea y otra en
@@ -702,7 +907,9 @@ import numpy as np
 from phonometry import ReportMetadata, barrier_insertion_loss
 
 freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
-result = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+# hs = 1 m, barrera de 4 m de alto a 50 m, receptor a 1,5 m de altura y a 100 m
+# *de la fuente*; method="exact" es el semiplano rígido ondulatorio que nombra la ficha.
+result = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5, method="exact")
 result.report(
     "barrier_insertion_loss.pdf",
     metadata=ReportMetadata(
@@ -727,5 +934,9 @@ coherente.
 
 ## Véase también
 
+- [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/): la acústica ondulatoria que hay debajo del ajuste de suelo de la Tabla 3 y de la curva de apantallamiento de la Ec. (14).
+- [Refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/): lo que la hipótesis de condiciones favorables y el $C_{met}$ vienen a sustituir.
+- [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/) y [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/): las potencias de fuente a las que se refiere la comparación de la sección 3.
+- [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): qué le pasa al nivel predicho cuando pasa a ser un nivel evaluado.
 - Referencia de la API: [`environment.propagation.outdoor_propagation`](/phonometry/es/reference/api/environment/outdoor-propagation/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).
 - Teoría: [Propagación en exteriores y exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-y-exposición-al-ruido-en-el-trabajo-iso-9613-12-iso-9612): los términos de atenuación de ISO 9613-2 derivados uno a uno, y la absorción atmosférica de la Parte 1.

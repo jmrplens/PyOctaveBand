@@ -86,11 +86,49 @@ referidas al plano tangente a las dos superficies superiores de los carriles:
 | **0,5 m** (fuente A) | $h = 1$ | Ruido de rodadura (carril, rueda y superestructura de mercancías), ruido de impacto, chirrido en curva, ruido de puente, y las componentes de tracción y aerodinámicas que van bajas: engranajes, motores, carenados y pantallas. |
 | **4,0 m** (fuente B) | $h = 2$ | Las componentes de tracción y aerodinámicas que van altas: escapes diésel, equipos de techo, el hueco del pantógrafo. |
 
-Nada en el método decide por usted el reparto de la tracción. La Tabla G-5
+Nada en el método decide por ti el reparto de la tracción. La Tabla G-5
 tabula la potencia acústica de tracción **por separado para las dos alturas**, de
 modo que el reparto se lee de la base de datos en lugar de suponerse; la
 Directiva solo añade que, cuando una componente real queda entre las dos alturas
 del modelo, su energía se distribuye proporcionalmente entre ambas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_rail_es.svg" alt="Dos paneles de la geometría de la fuente ferroviaria CNOSSOS-EU. Sección: una vía de doble carril sobre balasto de 1,435 m de ancho con el plano tangente a las dos superficies superiores de los carriles dibujado como referencia, la fuente A en el eje de la vía a 0,5 m por encima de él y la fuente B a 4,0 m, cada una con la lista de componentes que se le asignan, un receptor a 25 m y a 4 m del suelo con línea de visión a cada fuente, y el ángulo vertical psi acotado desde el plano horizontal que pasa por la fuente, con el semiespacio inferior sombreado y etiquetado como la región donde la corrección vertical de la fuente A es idénticamente nula. Planta: el eje de la vía, la dirección al receptor, el ángulo horizontal phi acotado desde el eje de la vía y el diagrama polar dipolar dibujado a escala con 0 dB en la perpendicular y menos 20 dB a lo largo de la vía" width="92%" />
+
+### De una línea real a los descriptores
+
+Los **descriptores** de las Tablas [2.3.a] y [2.3.b] son la interfaz entre un
+registro nacional de material rodante y de vía y las tablas que se distribuyen:
+cada dígito del código selecciona una de ellas. Un vehículo lleva cuatro dígitos
+y una vía seis.
+
+| Dígito del vehículo | Qué selecciona | Códigos | Biblioteca |
+| :--- | :--- | :--- | :--- |
+| 1 | Tipo de vehículo | `h` alta velocidad (> 200 km/h), `m` coche de viajeros automotor, `p` coche de viajeros remolcado, `c` tranvía urbano o metro ligero, `d` locomotora diésel, `e` locomotora eléctrica, `a` mercancías genérico, `o` otros | Elige la fila de `TractionVehicle` de la Tabla G-5 y si aplica el término de superestructura de mercancías |
+| 2 | Número de ejes por vehículo | el número real | `RollingStock(axles=...)`, el $10\log_{10} N_a$ de (2.3.8) |
+| 3 | Tipo de freno | `c` zapata de fundición, `k` zapata de material compuesto o sinterizado, `n` sin freno sobre la banda de rodadura (disco, tambor, magnético) | `BrakeType.CAST_IRON` / `.COMPOSITE` / `.NON_TREAD` → la rugosidad de rueda de G-1a |
+| 4 | Medida en la rueda | `n` ninguna, `d` amortiguadores, `s` pantallas, `o` otras | No selecciona ninguna tabla en el Apéndice G |
+
+| Dígito de la vía | Qué selecciona | Códigos | Biblioteca |
+| :--- | :--- | :--- | :--- |
+| 1 | Base de la vía | `B` balasto, `S` losa, `L` puente con balasto, `N` puente sin balasto, `T` vía embebida, `O` otras | Con el dígito 3, la `TrackTransferClass` de G-3a; `L`/`N` activan además la fuente de puente de la sección 8 |
+| 2 | Rugosidad de la cabeza del carril | `E` bien mantenida y muy lisa, `M` mantenimiento normal, `N` mal mantenida, `B` sin mantener y en mal estado | `RailRoughnessClass.WELL_MAINTAINED` / `.NORMAL` / `.NOT_WELL_MAINTAINED` / `.BAD` → G-1b |
+| 3 | Tipo de placa de asiento | `S` blanda (150-250 MN/m), `M` media (250-800), `H` rígida (800-1 000) | La segunda mitad de la etiqueta de `TrackTransferClass`: `MONOBLOCK_MEDIUM` es «M/M» |
+| 4 | Medidas adicionales | `N` ninguna, `D` amortiguador de carril, `B` barrera baja, `A` placa absorbente sobre losa, `E` carril embebido, `O` otras | Fuera del modelo de emisión |
+| 5 | Juntas de carril | `N` ninguna, `S` una sola junta o aguja, `D` dos por cada 100 m, `M` más de dos por cada 100 m | La densidad de juntas $n_l$ de (2.3.12) |
+| 6 | Curvatura | `N` recta, `L` 1 000-500 m, `M` por debajo de 500 y por encima de 300 m, `H` por debajo de 300 m | El radio que se pasa a `curve_squeal_excess` |
+
+Dos selectores no tienen ningún dígito de descriptor y hay que tomarlos de la
+hoja de características del vehículo: el **diámetro de rueda**
+(`WheelDiameter`, que elige la función de transferencia de rueda de G-3b) y el
+**filtro de contacto** (`ContactFilter`, una carga por eje en kN emparejada con
+ese diámetro, Tabla G-2). Los fragmentos de esta página nombran los miembros de
+la enumeración directamente por esa misma razón.
+
+Cuando el registro no contesta, el propio método se agota: las clases de
+rugosidad `N` y `B` no llevan espectro en el Apéndice G y las tiene que aportar
+el Estado miembro, y lo mismo pasa con un sistema de vía que no encaje en ninguna
+fila de G-3a: no hay valor por defecto ni interpolación, así que lo honrado es
+declarar el espectro sustituido junto al resultado.
 
 Para cada banda de tercio de octava, la ecuación de flujo convierte la potencia
 acústica de un vehículo en potencia por metro de línea (2.3.2):
@@ -157,6 +195,58 @@ result = railway_source_power(
     RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
 )
 result.plot(language="es")
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_components_es.svg" alt="Dos paneles para una unidad eléctrica de cuatro ejes sobre vía monobloque con mantenimiento normal. Izquierda: la potencia acústica en tercios de octava de cada componente de la escena de 160 km/h, con el ruido de rodadura de la fuente A unos veinte decibelios por encima del ruido de tracción, el ruido de tracción presente en las dos alturas de fuente, y las componentes aerodinámica y de puente ausentes porque ninguna está activa a esta velocidad. Derecha: la potencia de línea total por bandas de octava de la fuente A a 0,5 m y de la fuente B a 4,0 m frente a la velocidad de 60 a 350 km/h; la fuente A sube de forma continua todo el rango mientras que la fuente B baja despacio hasta un mínimo a 200 km/h y luego salta nueve decibelios cuando se activa el término aerodinámico, estrechando la separación entre las dos líneas de unos 30 dB a 19 dB" width="92%" />
+
+*Izquierda: la tabla de asignación de esta sección, dibujada. El ruido de
+rodadura es toda la fuente A a 160 km/h; la tracción es la única componente
+presente en las dos alturas, y las entradas aerodinámica y de puente de
+`result.components` vuelven como `nan` porque ninguna está activa aquí, que es la
+regla de asignación mostrándose. Derecha: la fuente B es casi plana y luego
+**salta**, porque el ruido aerodinámico solo se modela por encima de 200 km/h; la
+fuente A no deja de subir. La fuente B no adelanta a la fuente A en este vehículo
+a ninguna velocidad. La separación se cierra de 29,9 dB a 200 km/h a 18,7 dB a
+350 km/h, y ese estrechamiento es el sentido en que el pantógrafo empieza a
+importar.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `stock`, `track`, `railway_source_power` y `RailwayVehicle` vienen del
+# fragmento de la figura anterior; el resultado lleva sus propios ejes de frecuencia.
+def total(bands):
+    return 10.0 * np.log10(np.sum(10.0 ** (np.asarray(bands) / 10.0)))
+
+fig, (izq, der) = plt.subplots(1, 2, figsize=(12, 4.6))
+result = railway_source_power(
+    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0)
+for name, spectrum in result.components.items():
+    for row, height in ((0, "0,5 m"), (1, "4,0 m")):
+        values = np.asarray(spectrum)[row]
+        if np.any(np.isfinite(values)):
+            izq.semilogx(result.third_octave_frequencies, values,
+                         label=f"{name} @ {height}")
+izq.set(xlabel="Banda de 1/3 de octava [Hz]", ylabel="Potencia acústica [dB]")
+izq.legend(fontsize="small")
+
+velocidades = np.linspace(60.0, 350.0, 30)
+for row, label in [(0, "Fuente A (0,5 m)"), (1, "Fuente B (4,0 m)")]:
+    der.plot(velocidades, [
+        total(railway_source_power(
+            RailwayVehicle(stock, flow_rate=96.0, speed=float(v)),
+            track, phi=90.0, psi=10.0).line_power[row]) for v in velocidades],
+        label=label)
+der.axvline(200.0, ls=":", label="Umbral aerodinámico")
+der.set(xlabel="Velocidad v [km/h]", ylabel="Potencia de línea total [dB/m]")
+der.legend(fontsize="small")
 plt.show()
 ```
 
@@ -332,9 +422,12 @@ cierra ambos intervalos.
 El **ruido de tracción** se tabula por vehículo y por altura de fuente
 (Tabla G-5). La Directiva solo modeliza dos condiciones de marcha, velocidad
 constante (que, dice, vale igualmente cuando el tren acelera o decelera) y
-ralentí, y toma la potencia de la fuente en condiciones de carga máxima, de modo
-que $L_{W,0,\mathrm{const},i} = L_{W,0,\mathrm{idling},i}$ y una sola tabla
-sirve para ambas. El ralentí
+ralentí, y en las dos toma la potencia de la fuente en condiciones de carga
+máxima. La Tabla G-5 tabula por tanto un **único** valor por banda y altura, y el
+método lo lee para las dos condiciones: que
+$L_{W,0,\mathrm{const},i} = L_{W,0,\mathrm{idling},i}$ es una consecuencia de
+cómo está impresa la tabla, no una afirmación física de que una locomotora al
+ralentí suene tanto como una en marcha. El ralentí
 solo se considera si los trenes están parados más de media hora.
 
 El **ruido aerodinámico** solo es relevante por encima de **200 km/h** y sigue
@@ -354,8 +447,9 @@ pantógrafo.
 ## 7. Directividad de la fuente
 
 Cada fuente se corrige en los dos planos antes de añadir el término de flujo
-(2.3.5). La corrección **horizontal** es un dipolo (2.3.15), 0 dB de través y
-$10\log_{10} 0{,}01 = -20\ \text{dB}$ a lo largo de la vía:
+(2.3.5). La corrección **horizontal** es un dipolo (2.3.15), 0 dB en la
+perpendicular a la vía y
+$10\log_{10} 0{,}01 = -20\ \text{dB}$ a lo largo de ella:
 
 $$
 \Delta L_{W,\mathrm{dir,hor},i} = 10\,\log_{10}\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
@@ -383,6 +477,49 @@ from phonometry import DirectivityEdition, vertical_directivity
 vertical_directivity(-30.0)                                        # ceros
 vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positivo
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_directivity_es.svg" alt="Dos diagramas polares de la directividad ferroviaria de CNOSSOS-EU. Izquierda, la corrección vertical de la fuente A a 250 Hz y 4 kHz para las dos ediciones: la forma de 2021 es idénticamente nula en todo el semiespacio por debajo del horizonte y por encima de unos 41,4 grados se vuelve negativa, mientras que la de 2015 es simétrica respecto al horizonte y positiva a ambos lados, coincidiendo las dos solo en la cuña de 0 a 41,4 grados. Derecha, el dipolo horizontal en el plano de la vía: 0 dB en la perpendicular a la vía y menos 20 dB a lo largo de ella, con el cero longitudinal marcado" width="92%" />
+
+*Izquierda: las dos ediciones solo coinciden en el primer cuadrante por debajo de
+41,4°, que es exactamente donde el corchete
+$\tfrac{2}{3}\sin 2\psi - \sin\psi$ es positivo. Por debajo del horizonte, el
+texto de 2021 devuelve 0 dB donde el de 2015 devolvía hasta +2,4 dB a 250 Hz y
+60° por debajo del horizonte; por encima de 41,4° la forma vigente se vuelve
+negativa y la antigua no. Un estudio calculado antes de 2021 no es comparable
+banda a banda si no se declara la edición. Derecha: el dipolo horizontal vale
+20 dB entre un receptor situado al lado de la vía y otro situado en su
+prolongación, y por eso una vía que apunta a una vivienda es un problema distinto
+de una que pasa por delante.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `vertical_directivity` y `DirectivityEdition` vienen del fragmento de arriba;
+# el dipolo horizontal es la propia fórmula (2.3.15), una línea de numpy.
+psi = np.linspace(-89.0, 89.0, 179)
+bands = {7: "250 Hz", 19: "4 kHz"}       # índices en los 24 tercios de octava
+fig, (izq, der) = plt.subplots(1, 2, subplot_kw={"projection": "polar"},
+                               figsize=(12, 5.0))
+for band, name in bands.items():
+    for edition, style in [(DirectivityEdition.CURRENT, "-"),
+                           (DirectivityEdition.ORIGINAL_2015, "--")]:
+        values = [float(vertical_directivity(float(a), edition=edition)[band])
+                  for a in psi]
+        izq.plot(np.radians(psi), values, style,
+                 label=f"{name}, {edition.value}")
+izq.legend(fontsize="small", loc="lower left")
+
+phi = np.radians(np.linspace(0.0, 360.0, 361))
+der.plot(phi, 10.0 * np.log10(0.01 + 0.99 * np.sin(phi) ** 2))
+der.set_title("Dipolo horizontal (2.3.15)", fontsize="small")
+plt.show()
+```
+
+</details>
 
 En la fuente B solo es direccional la fuente aerodinámica, $10\log_{10}(\cos^2\psi)$
 para $\psi < 0$ (2.3.17); todo lo demás a 4,0 m es omnidireccional, igual que el
@@ -414,12 +551,19 @@ normal, con la función de transferencia del sistema de vía que hay realmente e
 el puente; el término de puente se le suma. Se asienta en la fuente A y es
 omnidireccional, cosa que la modificación declara de forma explícita.
 
+La Tabla G-7 tiene exactamente dos columnas, y la Directiva las rotula por el
+exceso de puente ponderado A que representan y no por un tipo constructivo:
+`BridgeType.PLUS_10_DBA` selecciona la columna «+10 dB(A)» y
+`BridgeType.PLUS_15_DBA` la de «+15 dB(A)». No hay tercera columna ni
+interpolación, así que elegir entre las dos es un juicio sobre el tablero, hecho
+antes del cálculo y registrado con él.
+
 ```python
 from phonometry import BridgeType, RailwayTrack, bridge_transfer
 
 RailwayTrack(
     rail_roughness=..., track_transfer=...,
-    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),
+    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),   # Tabla G-7, col. 1
 )
 ```
 
@@ -430,12 +574,23 @@ después energéticamente en bandas de octava para la propagación, que es lo qu
 exige el 2.3.2 y lo que hizo explícito el punto (1) de la (UE) 2021/1226. El
 objeto de resultado lleva ambas:
 
+El `result` de aquí es el que construyó el fragmento de la sección 2 (abre su
+bloque `<details>` para ver el vehículo y la vía que describe). **La fila 0 es la
+fuente A a 0,5 m y la fila 1 la fuente B a 4,0 m**, los $h = 1$ y $h = 2$ de la
+tabla de la sección 2:
+
 ```python
 result.third_octave_line_power   # (2, 24), las dos alturas en tercios de octava
 result.line_power                # (2, 8), lo mismo en bandas de octava
 result.total_line_power          # (8,), las dos alturas sumadas energéticamente
 result.components["rolling"]     # el desglose por fuente, antes de la directividad
+result.frequencies               # los 8 centros de banda de octava
+result.third_octave_frequencies  # los 24 centros de tercio de octava
 ```
+
+Una componente que no está activa en la condición modelada vuelve como `nan` en
+lugar de como un valor de suelo, así que `components["aerodynamic"]` por debajo
+de 200 km/h y `components["bridge"]` fuera de un puente son ambas todo `nan`.
 
 Dividir una línea fuente en fuentes puntuales equivalentes queda, en palabras
 del apartado 2.5.3, «fuera del alcance de la presente metodología»: una fuente

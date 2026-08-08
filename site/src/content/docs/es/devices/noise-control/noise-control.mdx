@@ -1,6 +1,6 @@
 ---
 title: "Control de ruido industrial: HVAC y cerramientos"
-description: "Atenuación y ruido de flujo en conductos HVAC (reflexión de extremo, codos, plenums, ruido regenerado) y pérdida de inserción de cerramientos de máquina, según Bies, Hansen y Howard, con los silenciadores reactivos en su propia guía."
+description: "Atenuación y ruido de flujo en conductos HVAC (reflexión de extremo, codos, plenums, ruido regenerado) y pérdida por inserción de cerramientos de máquina, según Bies, Hansen y Howard, con los silenciadores reactivos en su propia guía."
 references:
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
@@ -18,38 +18,46 @@ references:
     publisher: "Wiley"
     doi: "10.1002/9780470172568"
     note: "El tratamiento complementario de los conductos y cerramientos de esta página."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1995
+    title: "Acoustics — Determination of sound insulation performances of enclosures — Part 1: Measurements under laboratory conditions (for declaration purposes)"
+    designation: "ISO 11546-1:1995"
+    url: "https://www.iso.org/standard/19519.html"
+    note: "La medición por sustitución de la pérdida por inserción del cerramiento del apartado 2.2: la elección de método (apartado 4), la serie con y sin cerramiento (apartado 6) y lo que hay que registrar (apartado 9)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1995
+    title: "Acoustics — Determination of sound insulation performances of enclosures — Part 2: Measurements in situ (for acceptance and verification purposes)"
+    designation: "ISO 11546-2:1995"
+    url: "https://www.iso.org/standard/19520.html"
+    note: "La forma in situ de esa misma medición, con los requisitos de corrección ambiental y de ruido de fondo de la Tabla C.1."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
-import Video from '../../../../../components/Video.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-Tres medidas pasivas dominan el control de ruido aplicado: los **silenciadores**
-en un conducto, las atenuaciones pasivas y el ruido autogenerado de una
-instalación **HVAC**, y el **cerramiento de máquina**. `phonometry.noise_control`
-cubre las tres con la teoría de ingeniería de Bies, Hansen y Howard. Los
-silenciadores se construyen sobre el método unidimensional de cuatro polos
-(matrices de transferencia), que encadena elementos acústicos reutilizables; los
-métodos HVAC son las tablas ASHRAE y las formas cerradas de codos, reflexión de
-extremo, plenums y ruido de flujo; y el modelo de cerramiento combina una pérdida
-de transmisión del panel aportada por el usuario con la acumulación reverberante
-en el interior. El [pistón](/phonometry/es/devices/electroacoustics/loudspeakers/) radiante del
-dominio de electroacústica es el modelo de radiador complementario.
+Tres medidas pasivas dominan el control de ruido aplicado: un **silenciador** en
+el conducto, la atenuación y el ruido regenerado de la propia **instalación
+HVAC**, y el **cerramiento de máquina**. Esta página se queda con la segunda y
+la tercera, con la teoría de ingeniería de Bies, Hansen y Howard: las tablas
+ASHRAE y las formas cerradas de codos, reflexión de extremo, plenums y ruido de
+flujo, y un modelo de cerramiento que combina una pérdida de transmisión del
+panel que aportas tú con la acumulación reverberante en el interior. La primera,
+el silenciador reactivo de cuatro polos, tiene guía propia,
+[Silenciadores](/phonometry/es/devices/noise-control/silencers/), que además cubre
+el compromiso frente a los revestimientos disipativos.
+
+Todo lo que sigue es una **predicción** a partir de una geometría declarada y de
+unos datos de material declarados. El apartado 2.2 nombra las normas que miden
+esa misma magnitud sobre el objeto terminado, y explica por qué un valor
+declarado y uno calculado no son intercambiables.
 
 Las tres familias en una escena: encapsular la fuente, silenciar el camino y
 proteger al receptor. Cada medida lleva el valor que calcula su sección, aquí
 o en la guía de silenciadores.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control_es.svg" alt="Escena de control de ruido dividida en tres zonas: en la fuente una máquina dentro de un cerramiento revestido con IL = R − C = 25 dB a 500 Hz, en el camino un conducto de 113 mm con una cámara de expansión de 0,30 m y relación de áreas 4 cuyo pico de pérdidas de transmisión es de 6,5 dB a 286 Hz, un codo revestido que aporta 6 dB a 1 kHz y un extremo abierto que refleja 18 dB a 63 Hz, y en el receptor una cabina de operario valorada con la misma fórmula en 31 dB a 1 kHz, con una persona de pie en su interior" width="92%" loading="eager" />
-
-El elemento del camino, el silenciador en sí, tiene guía propia:
-[Silenciadores](/phonometry/es/devices/noise-control/silencers/) cubre el método reactivo
-de cuatro polos, la cámara de expansión en forma cerrada, los resonadores de
-Helmholtz, de cuarto de onda y de tubo extendido, el contraste independiente
-con FDTD y el compromiso frente a los revestimientos disipativos. Esta página
-se queda con el resto de la instalación: lo que el trazado de conductos suma
-y resta por sí solo, y lo que un cerramiento alrededor de la máquina entrega
-de verdad.
 
 ## 1. Atenuación y ruido de flujo en conductos HVAC
 
@@ -59,30 +67,33 @@ flujo se perturba. `phonometry.noise_control.hvac` reúne los métodos del
 Capítulo 8 de Bies.
 
 ```python
+import numpy as np
 from phonometry.noise_control import hvac
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
 
 # Reflexión de baja frecuencia en el extremo abierto (ASHRAE Tabla 8.14).
 er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
-
-# Pérdida de inserción de un codo cuadrado a 90 grados con revestimiento (Tabla 8.11).
-el = hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square", lined=True)
 er.plot()   # la atenuación por banda (o la Lw regenerada) en una línea (necesita matplotlib)
+
+# Pérdida por inserción de un codo cuadrado a 90 grados con revestimiento (Tabla 8.11).
+el = hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square", lined=True)
+print(np.round(el.values, 1))                    # [0. 0. 1. 6. 11. 10.] dB
 
 # TL de plenum por el método de Wells (forma cerrada).
 tl = hvac.plenum_attenuation(exit_area=0.1, line_of_sight=1.0,
                              wall_area=20.0, mean_absorption=0.2)
-print(round(tl, 1))                              # dB
+print(round(tl, 1))                              # 12.9 dB
 
 # Ruido autogenerado (de flujo) de un conducto recto (VDI 2081).
 fn = hvac.flow_noise_straight_duct(bands, flow_velocity=10.0, area=0.04)
+print(round(float(fn.values[3]), 1))             # 32.4 dB, L_W regenerada a 500 Hz
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection_es.svg" alt="Pérdida por reflexión del extremo del conducto por banda de octava para terminaciones enrasadas de 150, 300 y 600 mm de diámetro: la reflexión de vuelta al conducto crece con fuerza hacia baja frecuencia y disminuye con el tamaño del conducto, superando 17 dB a 63 Hz para el conducto de 150 mm y desapareciendo por encima de 1 kHz" width="88%" />
 
 *El extremo abierto de un conducto refleja energía de baja frecuencia de vuelta
-a la instalación — gratis, antes de cualquier silenciador: cuanto más pequeño
+por el conducto — gratis, antes de cualquier silenciador: cuanto más pequeño
 es el conducto frente a la longitud de onda, mayor es la pérdida, lo que
 explica que los cuellos de difusor pequeños domen el retumbo de baja frecuencia
 del ventilador, y por qué la corrección no debe contarse dos veces cuando los
@@ -117,6 +128,92 @@ plt.show()
 
 </details>
 
+El codo es el elemento que el proyectista todavía suele poder elegir, y ese
+mismo flujo que el codo atenúa es el que regenera ruido un poco más adelante
+en el trazado. Los dos van en la misma hoja.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_elbow_flow_noise_es.svg" alt="Dos paneles. Izquierda: pérdida por inserción por banda de octava de un codo de 300 mm para cuatro construcciones, un codo cuadrado revestido que alcanza 11 dB por encima de 1 kHz, un codo cuadrado desnudo con un máximo de 8 dB que vuelve a caer a 3 dB, un codo cuadrado con álabes en 6 dB y un codo circular plano en 3 dB, con la abscisa W partido por lambda igual a uno marcada cerca de 1,1 kHz. Derecha: potencia acústica generada por el flujo en ese mismo conducto de 0,04 metros cuadrados a 5, 10 y 20 metros por segundo, tres espectros paralelos separados unos 16 dB por cada duplicación, más un codo a inglete a 10 metros por segundo que queda por encima del conducto recto a 20 metros por segundo por debajo de 500 Hz y por debajo de él por encima" width="92%" />
+
+*Un codo cuadrado revestido vale de tres a cuatro veces uno circular por encima
+de 1 kHz y prácticamente nada por debajo de 250 Hz, donde $W/\lambda$ es pequeño
+y el codo es acústicamente invisible; las tablas de codos están indexadas por
+esa relación, y por eso un conducto de 300 mm y otro de 600 mm se comportan
+igual con una octava de diferencia. A la derecha, ese mismo trazado es una
+fuente: el nivel del conducto recto sube 15,6 dB a 63 Hz y 21,6 dB a 4 kHz por
+cada duplicación de la velocidad media, y un solo codo a inglete a 10 m/s mete
+en el conducto más potencia de baja frecuencia que un tramo recto al doble de
+velocidad.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np                    # hvac: importado en el fragmento anterior
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+
+# Una línea para un elemento: el HvacSpectrumResult del codo cuadrado revestido.
+hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square",
+                          lined=True).plot(language="es")
+plt.show()
+
+# A mano: las cuatro construcciones de codo del panel izquierdo.
+fig, ax = plt.subplots()
+for label, kwargs in (("Cuadrado, revestido", {"bend_type": "square", "lined": True}),
+                      ("Cuadrado, desnudo", {"bend_type": "square"}),
+                      ("Cuadrado, con álabes", {"bend_type": "square", "vanes": True}),
+                      ("Circular, desnudo", {"bend_type": "round"})):
+    el = hvac.elbow_insertion_loss(bands, width=0.3, **kwargs)
+    ax.semilogx(el.frequencies, el.values, "o-", label=label)
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Pérdida por inserción [dB por codo]")
+ax.legend()
+plt.show()
+
+# Y el panel derecho: ese mismo conducto como fuente, a tres velocidades.
+fig, ax = plt.subplots()
+for velocity in (5.0, 10.0, 20.0):
+    fn = hvac.flow_noise_straight_duct(bands, flow_velocity=velocity, area=0.04)
+    ax.semilogx(fn.frequencies, fn.values, "o-", label=f"U = {velocity:.0f} m/s")
+ax.semilogx(bands, hvac.flow_noise_bend(bands, flow_velocity=10.0, area=0.04,
+                                        height=0.2).values, "s--",
+            label="Codo a inglete, 10 m/s")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("L_W regenerada [dB re 1 pW]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Con esas dos curvas viajan dos condiciones. Los valores del codo revestido
+suponen que **el revestimiento del conducto se extiende al menos tres diámetros
+aguas arriba y aguas abajo del codo**, así que `lined=True` describe un tramo
+revestido que contiene un codo, no un codo revestido en un conducto por lo
+demás desnudo; un codo en conducto desnudo va por la columna sin revestir, y
+tomar en su lugar la revestida sobrestima la atenuación en todo el incremento
+tabulado, 10 dB en las bandas medias para el codo cuadrado de 300 mm de arriba.
+Y el modelo de ruido de flujo es para un tramo recto y sin perturbar: una
+compuerta, una transición mal ejecutada o el propio codo regeneran mucho más,
+que es la razón de que exista `flow_noise_bend` y de que el estrangulamiento
+deba quedar tan lejos de la boca de salida como permita el trazado.
+
+La velocidad es la única variable de diseño que gobierna todo el segundo panel.
+La potencia acústica lleva $50\log_{10}U$, así que solo el término de velocidad
+cuesta 15,1 dB por duplicación, y como la forma del espectro también se desplaza
+hacia arriba los niveles por banda que entrega este conducto suben 15,6 dB a
+63 Hz y 21,6 dB a 4 kHz entre 10 y 20 m/s. La ficha de más abajo cumple su
+requisito de 45 dB(A) a 12 m/s con 38,8 dB(A); ese mismo conducto a 17 m/s
+devuelve 48,1 dB(A) y no cumple, sin ningún otro cambio. De ahí las velocidades
+de diseño habituales — del orden de 7 a 10 m/s en los colectores de sala de
+máquinas, de 4 a 5 m/s en los ramales y de 2 a 3 m/s en el último tramo antes
+de un local ocupado — y de ahí la regla de que sobredimensionar el conducto es
+el silenciador más barato que existe. Lo que devuelve el modelo es un **nivel de
+potencia acústica de un solo elemento**: hay que meterlo en un cálculo de
+trayecto y combinarlo en energía con todo lo demás, que es lo que hace
+[Ruido por conductos](/phonometry/es/devices/noise-control/duct-path/).
+
 La fórmula de plenum de Wells toma solo dos entradas de verdad geométricas,
 la línea de visión entrada-salida $r$ y el área de salida, más el área de
 pared revestida; `plot_plenum_geometry` dibuja exactamente esas, respetando
@@ -128,6 +225,29 @@ $r$ y su ángulo respecto al eje de entrada.
 $S_\text{out}$ y $S_w$ entran en el método de Wells como áreas a secas, así que
 cualquier plenum que comparta estos cuatro números tiene la misma atenuación
 predicha.*
+
+La fórmula es una suma de dos términos dentro de un mismo logaritmo, uno directo
+$\cos\theta/\pi r^2$ y otro reverberante $(1-\alpha)/S_w\alpha$, y cuál de los
+dos domina decide qué movimiento de diseño merece la pena. Para el plenum
+dibujado arriba ($r = 1{,}2$ m, $S_w = 6$ m², $\alpha = 0{,}2$) valen 0,221 y 0,667,
+así que manda el término reverberante: duplicar la línea de visión hasta 2,4 m
+aporta 0,9 dB y desviar la salida un radián entero del eje de entrada aporta
+0,6 dB, mientras que subir la absorción del revestimiento de 0,2 a 0,6 aporta
+4,2 dB. Revístelo primero. Una vez *está* revestido el equilibrio se invierte:
+con $\alpha = 0{,}6$ el término reverberante cae a 0,111, por debajo del directo,
+y esos mismos dos movimientos geométricos valen ahora 3,0 dB y 1,8 dB, 19,0 dB
+frente a 15,2 dB cuando se hacen los dos. El orden práctico es, por tanto:
+revestir el plenum, luego sacar la salida del eje de entrada para que ninguna
+recta una las dos aberturas, y luego alargar el recorrido.
+
+Lee el resultado por lo que es. El método de Wells supone una cámara grande
+frente a la longitud de onda y un interior reverberante, vale por encima de la
+frecuencia de corte de la entrada e **infra**estima la pérdida de baja
+frecuencia entre 5 y 10 dB, así que a un plenum revestido y bien desalineado que
+vale de 10 a 20 dB en las bandas medias no se le está acreditando todo lo que da
+a 63 Hz. Tampoco lleva dependencia con la frecuencia propia más allá de
+$\alpha$, y no dice nada del ruido de flujo que generan la entrada y la salida
+del propio plenum, que hay que añadir aparte con los modelos anteriores.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -158,12 +278,12 @@ interpola la tabla.
 :::
 
 Un `HvacSpectrumResult` también se archiva solo: `.report()` genera una ficha de
-una página con el ruido del conducto, la tabla por banda junto al espectro, el
+ruido de conducto de una página, con la tabla por banda junto al espectro, el
 resultado de número único en su recuadro — el nivel de potencia acústica
-ponderado A para un espectro de ruido regenerado, la atenuación media para uno
-de atenuación — y, cuando se declara un `requirement`, el veredicto frente a él
-(un $L_{WA}$ máximo para el ruido regenerado, una atenuación media mínima para
-una atenuación).
+ponderado A cuando el espectro es ruido regenerado, la atenuación media cuando
+es una pérdida — y, cuando se declara un `requirement`, el veredicto frente a
+él: un $L_{WA}$ máximo en el primer caso, una atenuación media mínima en el
+segundo.
 
 ```python
 from phonometry import ReportMetadata
@@ -186,7 +306,7 @@ duct.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="hvac_duct_noise_example"
@@ -197,19 +317,50 @@ el repositorio; Pulsa la vista previa para abrir el PDF.
 
 ## 2. Cerramientos de máquina
 
+Un cerramiento es una construcción, y cada símbolo de la ecuación de abajo es un
+rasgo suyo. Este es el caso de la ficha del final del apartado, dibujado: 24 m²
+de envolvente expuesta, 30 m² de superficie interior con una absorción media de
+0,30, y los cuatro elementos — puerta, pasamuros, aberturas de refrigeración y
+apoyo de la máquina — que deciden si entrega lo que prometen los paneles.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_machine_enclosure_es.svg" alt="Sección de un cerramiento de máquina ajustado, de 3,0 m de largo y 1,8 m de alto, apoyado sobre una solera, con la pared dibujada en tres capas (masa de chapa de acero, revestimiento absorbente y chapa perforada). Dentro, la máquina se apoya sobre aisladores de vibración sin tocar la envolvente. Una puerta de acceso abatible de 1,28 metros cuadrados y 15 dB de pérdida de transmisión lleva una junta de compresión arriba y abajo y una rendija sin sellar de 0,24 metros cuadrados a sus pies. Una entrada de cables y tuberías atraviesa un pasamuros sellado en la cubierta, un conducto revestido corto saca el aire de refrigeración por la cubierta y otro lo introduce por la pared derecha. El pie de figura imprime IL = R menos C con C = 3,4 dB, una pérdida por inserción media de 28,9 dB para la envolvente sellada, 21,4 dB con la puerta y 15,1 dB una vez añadida la rendija, frente al tope de 20 dB que fija el área abierta" width="92%" />
+
 Un cerramiento sellado reduce el ruido radiado en la pérdida de transmisión del
 panel $R$, menos una penalización $C$ por la acumulación reverberante en la
 cavidad pequeña y dura (Bies Ecs. (7.103), (7.111)):
 
 $$
-\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_E}{R_i}\right),
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0{,}3 + \frac{S_E}{R_i}\right),
 $$
 
 con el área externa $S_E$ y la **constante de sala** interior
 $R_i = S_i \alpha_i/(1-\alpha_i)$ (la misma
 [`room_constant`](/phonometry/es/buildings/rooms/room-image-sources/) del campo estacionario
-de sala). Un interior duro desperdicia gran parte de $R$; revestirlo lleva $C$
-hacia su límite inferior $10\log_{10}0.3 = -5.2$ dB.
+de sala).
+
+$C$ no es un factor de ajuste: es la acumulación reverberante. Encierra una
+fuente en una caja pequeña y dura y el nivel interior sube por encima del nivel
+en campo libre de esa misma fuente hasta que la absorción equilibra la emisión,
+y es *ese* nivel elevado el que los paneles tienen luego que contener, así que
+el cerramiento entrega menos que el índice de panel que declara una hoja de
+características. El $0{,}3$ es el suelo empírico que Bies mantiene para el campo
+directo y el campo próximo, que ningún revestimiento elimina, de modo que $C$
+nunca puede bajar de $10\log_{10}0{,}3 = -5{,}2$ dB por muy bien tratado que
+esté el interior.
+
+Eso se convierte en una regla de diseño. $C$ cambia de signo en $R_i = S_E/0{,}7$:
+una constante de sala interior de alrededor de vez y media el área externa es el
+punto de equilibrio, por debajo el cerramiento entrega menos que sus paneles y
+por encima algo más. El caso de la figura ($S_E = 6$ m², $S_i = 5$ m²,
+$\alpha_i = 0{,}3$) da $R_i = 2{,}14$ m² y $C = +4{,}9$ dB, claramente en el lado
+perdedor, que es donde se sitúa siempre una caja sin revestir o poco revestida;
+el equilibrio aquí exigiría $\alpha_i = 0{,}63$. Como $R_i$ crece con fuerza
+cuando $\alpha_i$ se acerca a uno, el paso de $\alpha_i = 0{,}3$ a $0{,}7$ es un
+factor cinco en $R_i$ y lleva $C$ de $+4{,}9$ a $-0{,}9$ dB: **5,8 dB de pérdida por
+inserción al precio del revestimiento**. Conviene notar que `model="norton"`
+prescinde del $0{,}3$ y por tanto no tiene suelo, así que los dos modelos
+coinciden mientras el interior es duro y divergen en cuanto está bien revestido
+(2,0 dB de diferencia con $\alpha_i = 0{,}7$ para esta caja).
 
 **La pérdida de transmisión del panel $R$ la aportas tú** como un array por banda
 (medido, o predicho por un modelo de panel), o como una función de la frecuencia.
@@ -274,9 +425,9 @@ plt.show()
 `panel_transmission_loss` del panel, la `correction` interior, la `insertion_loss`
 neta, la `room_constant` interior y `.plot()`. También se archiva solo:
 `.report()` genera una ficha de cerramiento de una página con la tabla por banda
-de $R$, $C$ e $\mathrm{IL}$ junto a las tres curvas, la pérdida de inserción
+de $R$, $C$ e $\mathrm{IL}$ junto a las tres curvas, la pérdida por inserción
 media en su recuadro con las áreas de las que sale y, cuando se declara un
-`requirement`, el veredicto frente a esa pérdida de inserción media mínima.
+`requirement`, el veredicto frente a esa pérdida por inserción media mínima.
 
 ```python
 import numpy as np
@@ -302,7 +453,7 @@ case.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="enclosure_insertion_loss_example"
@@ -311,15 +462,125 @@ el repositorio; Pulsa la vista previa para abrir el PDF.
 	caption="Ficha de cerramiento de máquina (EnclosureResult.report), la pérdida por inserción neta IL = R - C que entrega el caso de diseño de chapa de acero."
 />
 
+### 2.1 Lo que el cerramiento entrega de verdad: fugas, puertas y aberturas
+
+Un cerramiento es un **compuesto**, así que los elementos se combinan en energía
+antes de aplicar siquiera $\mathrm{IL} = R - C$, y el resultado lo fija el peor
+de ellos, no los paneles. De ahí salen dos hechos. Una puerta de 1,28 m² con
+$R = 15$ dB en la envolvente de 24 m² de arriba baja el $R$ compuesto medio de
+32,3 dB a 24,7 dB y la pérdida por inserción media de 28,9 a 21,4 dB. Y una
+**abertura desnuda** de área relativa $S_a/S_E$ limita el compuesto a
+$10\log_{10}(S_E/S_a)$ sean cuales sean los paneles: un 1 % de área abierta la
+limita a 20 dB, y un 10 % a 10 dB. Añade una rendija de 0,24 m² a los pies de la
+puerta — el 1 % de esta envolvente, el ancho de una puerta mal colgada — y los
+28,9 dB de la ficha se quedan en 15,1 dB.
+
+La combinación es la suma energética ponderada por área, y una abertura desnuda
+entra en ella con $R = 0$ ($\tau = 1$):
+
+$$
+R_\text{composite} = -10\log_{10}\!\left[\frac{1}{\sum_n S_n}
+\sum_n S_n\,10^{-R_n/10}\right].
+$$
+
+```python
+import numpy as np                          # enclosure_insertion_loss: importado arriba
+
+octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+sheet_steel = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
+door = np.full_like(octaves, 15.0)          # puerta de acceso con junta
+opening = np.zeros_like(octaves)            # una rendija desnuda: R = 0, tau = 1
+
+areas = np.array([24.0 - 1.28 - 0.24, 1.28, 0.24])[:, None]
+elements = np.vstack([sheet_steel, door, opening])
+built = -10.0 * np.log10((areas * 10.0 ** (-elements / 10.0)).sum(0)
+                         / areas.sum())
+
+leaky = enclosure_insertion_loss(
+    built, external_area=24.0, internal_area=30.0,
+    internal_absorption=0.30, frequencies=octaves,
+)
+print(round(float(np.mean(leaky.insertion_loss)), 1))    # 15.1 dB, no 28.9
+print(round(10 * np.log10(24.0 / 0.24), 1))              # 20.0 dB, el límite
+```
+
+La biblioteca escribe esa suma por ti con `composite_transmission_loss(areas,
+reduction_indices)`, y `enclosure_insertion_loss` toma su resultado directamente
+como el $R$ del panel, así que una hoja de verdad son dos llamadas en lugar de
+la aritmética de arriba.
+
+Por eso la junta de una puerta, un pasamuros de cable y una junta de panel
+estanca son elementos de diseño con su propio $R$, y no detalles. Las aberturas
+de refrigeración tampoco se pueden sellar sin más: una máquina encerrada tiene
+que respirar, así que la entrada y la salida se convierten en conductos
+revestidos cortos o en silenciadores de bafles cuya propia pérdida por inserción
+debe superar la del panel; los modelos están en el apartado 1 y en
+[Silenciadores](/phonometry/es/devices/noise-control/silencers/). Los modelos de
+transmisión por rendija y por orificio circular, que dan a un hueco su propio
+$R$ dependiente de la frecuencia, están en
+[Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
+
+El último cortocircuito no es aéreo en absoluto. Una máquina atornillada a la
+envolvente, o apoyada sobre la misma solera, excita el cerramiento como una
+prolongación radiante de sí misma y todo el cálculo aéreo deja de aplicarse, que
+es la razón de que el dibujo ponga la máquina sobre aisladores y la mantenga
+separada de las paredes. Y conviene fijarse en el límite de baja frecuencia de
+la corrección interior: supone campo difuso dentro de la caja, que unos pocos
+metros cúbicos de aire no tienen por debajo de sus primeros modos, así que las
+entradas de 63 y 125 Hz de un cerramiento pequeño son estimaciones.
+
+### 2.2 Cómo se mide esa misma pérdida por inserción
+
+El número que produce este módulo es una predicción. La magnitud en sí se mide
+según la **ISO 11546-1:1995** en condiciones de laboratorio, para declaración, y
+según la **ISO 11546-2:1995** in situ, para aceptación y verificación. Las dos
+son mediciones por sustitución con una misma forma: se determina el nivel de
+potencia acústica (o el nivel de presión acústica en una posición especificada)
+**con** el cerramiento y otra vez **sin** él, y se informa la diferencia banda a
+banda — $D_W = L_W(\text{sin}) - L_W(\text{con})$, ISO 11546-1 Fórmula (1) —
+al menos de 100 Hz a 5 kHz en tercios de octava o de 125 Hz a 4 kHz en octavas,
+siendo preferibles de 50 Hz a 10 kHz y de 63 Hz a 8 kHz (apartado 6.2).
+
+Cuatro condiciones deciden si el resultado significa algo. La **fuente** debería
+ser la máquina real: el apartado 4 lo hace método preferente y limita las
+alternativas de reciprocidad y de fuente artificial a cerramientos de menos de
+2 m³, lo que excluye por completo los cerramientos ajustados como el dibujado
+arriba. Su **régimen de funcionamiento no debe cambiar** entre las dos series
+(apartado 6.1.2), y los elementos activos, como los ventiladores de
+refrigeración, tienen que estar funcionando (apartado 6.1.3). Las **posiciones
+de micrófono deben ser las mismas** con y sin cerramiento, para que las
+correcciones ambientales se cancelen y la diferencia de niveles sea la
+diferencia de potencias sin convertir ninguna de las dos (apartado 6.1.4). Y el
+**entorno de ensayo** tiene que ser lo bastante bueno para la norma de potencia
+acústica que se elija de la Tabla 1: la Tabla C.1 de ISO 11546-2 pide una
+corrección ambiental $K_2 \le 2$ dB y una señal al menos 6 dB por encima del
+ruido de fondo para ISO 3744, frente a $K_2 \le 7$ dB y 3 dB para la ISO 3746 de
+grado de inspección, que es el techo práctico de cuánta pérdida por inserción se
+puede medir en un taller. Verifica toda la cadena con un calibrador de clase 1
+con $\pm 0{,}3$ dB antes y después de cada serie (apartado 5).
+
+Lo que hay que registrar está en el apartado 9, y dos entradas son justamente
+las que una predicción nunca captura: la **relación de fugas** $\theta$, el área
+abierta total dividida por la superficie interior total, con una descripción de
+las aberturas; y la **relación de llenado** $\phi$, el volumen de la fuente entre
+el volumen interior. Junto a ellas van la identificación y los planos del
+cerramiento, la construcción de paneles, ventanas, puertas y juntas, la unión
+entre cerramiento y máquina, los volúmenes y áreas interiores y exteriores, las
+superficies interiores y los apoyos en el suelo. Un valor declarado se verifica
+después según ISO 4871. Sin ese registro, el valor de un suministrador viaja
+solo hasta donde llega su geometría, y compararlo con un valor calculado aquí es
+comparar dos cosas distintas.
+
 ## Qué cubre esta guía
 
 **Cubierto.** Los métodos HVAC de Bies §8.11-8.17 / ASHRAE:
 `hvac.end_reflection_loss` y `hvac.elbow_insertion_loss` (tablas
 interpoladas), `hvac.plenum_attenuation` (forma cerrada de Wells) y
-`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). La pérdida de
+`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). La pérdida por
 inserción de cerramientos de máquina de Bies §7.4 (Ecs. (7.103), (7.111)),
 `enclosure_insertion_loss`, que combina una pérdida de transmisión de panel
-aportada con la corrección por la constante de sala interior.
+aportada con la corrección por la constante de sala interior, y el compuesto de
+paneles, puertas y aberturas que la alimenta (`composite_transmission_loss`).
 
 **No cubierto.** Los elementos de silenciador reactivo (cámaras de
 expansión, ramas laterales, tubos extendidos) se han trasladado a
@@ -329,7 +590,10 @@ propiedades del revestimiento en ninguna parte: los valores de codo revestido
 y de plenum de esta página son tablas de instalación interpoladas.
 `enclosure_insertion_loss` nunca predice la pérdida de transmisión de panel
 $R$; se aporta medida o de otro modelo, y el módulo solo la combina con la
-corrección interior.
+corrección interior. Nada de lo que hay aquí es una medición: el procedimiento
+de ISO 11546 del apartado 2.2 se describe para poder leer un valor declarado, no
+para implementarlo, y la transmisión estructural de una máquina a su cerramiento
+o a su solera queda fuera de todos los modelos de la página.
 
 ## Véase también
 
@@ -345,6 +609,10 @@ corrección interior.
   alimenta un conducto o un cerramiento.
 - [Fuentes imagen y campo estacionario](/phonometry/es/buildings/rooms/room-image-sources/):
   la `room_constant` reutilizada por la corrección interior del cerramiento.
+- [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
+  la pérdida de transmisión del panel que esta página te pide que aportes, y los
+  modelos de rendija y de orificio circular que hay detrás del compuesto del
+  apartado 2.1.
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   las formas cerradas y los anclajes resueltos con los que se validan estas
   implementaciones.

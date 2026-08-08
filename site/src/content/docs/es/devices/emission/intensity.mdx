@@ -57,6 +57,19 @@ $$
 I(f) = -\ \frac{\mathrm{Im}\lbrace G_{12}(f)\rbrace}{2\pi f\ \rho_0\ \Delta r}
 $$
 
+Todo lo de esta página se lee después como nivel. El **nivel de intensidad
+acústica** es $L_I = 10\log_{10}(\lvert I \rvert / I_0)$ con
+$I_0 = 1\ \text{pW/m}^2$: el nivel es el del *módulo*, y el sentido va aparte,
+que es lo que declara `total_direction` como $\pm 1$. Las dos referencias se
+eligieron para que casen: en una onda plana progresiva, donde $I = p^2/(\rho c)$,
+el nivel de presión y el de intensidad coinciden dentro de
+$10\log_{10}(\rho c / 400) = 0{,}14$ dB en condiciones normales del aire
+(apartado 5 de IEC 61043). Por eso el panel izquierdo de la figura de abajo
+muestra dos curvas superpuestas, y por eso el índice presión-intensidad tiene un
+suelo cercano a 0,14 dB y no a 0 — todo lo que una medición en campo enseñe por
+encima de ese suelo es o bien un campo genuinamente reactivo o contaminado por
+ruido, o bien el propio error de fase del instrumento.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del espaciador y el eje de medición" width="92%" loading="eager" />
 
 La propia sonda es lo bastante pequeña para dibujarla a escala real.
@@ -196,6 +209,13 @@ ambos:
   se acerca al índice residual $\delta_{pI0}$ de la sonda, dominan los errores
   de fase.
 
+De aquí en adelante se repiten tres símbolos, deducidos en *El margen sobre el
+índice residual*, más abajo: $\delta_{pI0}$ es el índice presión-intensidad
+**residual**, el suelo de error de fase de la cadena sonda-espaciador-analizador;
+$K$ es el factor de sesgo que permite el grado (10 dB en ingeniería, 7 dB en
+inspección); y $L_d = \delta_{pI0} - K$ es la **capacidad dinámica**, el mayor
+índice de campo que el instrumento puede permitirse con ese grado.
+
 Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
 la superficie: ¿es lo bastante estacionario como para barrerlo? En el ensayo
 inicial (apartado 8.2) se elige una posición «típica» sobre una superficie
@@ -238,8 +258,29 @@ indicador de potencia parcial negativa, es la misma diferencia tomada con la
 intensidad media *con signo*: $F_3 - F_2 > 0$ revela potencia que entra por
 partes de la superficie. **$F_4$**, el indicador de no uniformidad del campo, es
 la dispersión normalizada de las intensidades por posición: cuanto mayor es,
-más posiciones de medición necesita la superficie. Junto con el criterio de
-capacidad dinámica están disponibles directamente:
+más posiciones de medición necesita la superficie.
+
+$F_4$ es el que se convierte en un número de posiciones, mediante el criterio 2
+del Anexo B, $N > C\,F_4^2$ (ecuación (B.2)). El factor $C$ no es una constante:
+la tabla B.2 lo hace depender de la banda **y** del grado que se pretende — unos
+11 en baja frecuencia y hasta 29 en la banda media para el grado de ingeniería,
+y 19 subiendo hasta 57 para precisión, con 8 para el caso ponderado A de
+inspección. Así que una misma no uniformidad del campo pide alrededor del doble
+de posiciones en grado 1 que en grado 2. Con números: $F_4 = 0{,}5$ en la banda
+de 1 kHz necesita $N > 29 \times 0{,}25$, es decir, al menos **8 posiciones** en
+grado de ingeniería y al menos **15** en precisión; y cuando se usa un mismo
+número de posiciones para todas las bandas, la norma aplica el criterio en la
+banda con el mayor $C F_4^2$.
+
+$F_4$ además se declara tal cual, que es lo que hace que merezca la pena
+calcularlo aunque el número de posiciones ya esté fijado: el intervalo de
+confianza del 95 % sobre el nivel de una banda es
+$10\log_{10}(1 \pm 2 F_4/\sqrt{N})$ (ecuación (B.3)), así que $F_4 = 0{,}5$
+sobre 10 posiciones lleva **+1,2 dB / −1,7 dB**. Una banda que falle el
+criterio 2 puede registrarse igualmente, pero solo acompañada de ese intervalo.
+
+Junto con el criterio de capacidad dinámica, los indicadores están disponibles
+directamente:
 
 ```python
 import numpy as np
@@ -363,6 +404,61 @@ $\delta_{pI0}$ la lectura es puro
 error de fase, de cualquier signo. Por eso el índice presión-intensidad, y
 no la calidad de los micrófonos, es el que acota la exactitud alcanzable de
 toda medida de intensidad.
+
+### Medir el índice residual, y comprobar la sonda
+
+$\delta_{pI0}$ es el número sobre el que descansan todos los criterios de esta
+página y de la
+[página de barrido](/phonometry/es/devices/emission/sound-power-intensity/)
+entera, y la biblioteca no lo calcula: se mide, una vez por cadena
+sonda-espaciador-analizador, en el banco.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_residual_intensity_check_es.svg" alt="Tres paneles. Primero, el dispositivo de ensayo de intensidad residual de IEC 61043: un pequeño acoplador que lleva ruido rosa o blanco a las dos cápsulas de la sonda al mismo nivel dentro de más menos 0,1 decibelios, del que se lee el índice residual como el nivel de presión menos el nivel de intensidad indicado. Segundo, un calibrador acústico de clase 0 o clase 1 según IEC 60942 aplicado a un micrófono cada vez, con el instrumento ajustado dentro de más menos 0,1 decibelios en los dos canales. Tercero, el ensayo in situ de inversión de la sonda: la sonda sobre la superficie de medición marcando una intensidad normal positiva y después girada 180 grados alrededor de su centro acústico marcando una negativa, aceptado cuando las dos tienen signos opuestos y difieren menos de 1,5 decibelios en la banda de nivel máximo" width="92%" />
+
+**El ensayo de intensidad residual (apartado 10.2 de IEC 61043).** El
+dispositivo de ensayo es un pequeño acoplador que presenta *el mismo* campo
+sonoro a las dos cápsulas en todo o parte del rango de 45 Hz a 7,1 kHz, excitado
+con ruido rosa o blanco, y que aplica la presión a los dos micrófonos al mismo
+nivel dentro de **±0,1 dB** al menos de 45 Hz a 1 kHz, con una diferencia de fase
+acotada entre puertos. Como la intensidad verdadera en ese campo es exactamente
+cero, lo que indique el instrumento es su propio error de fase, y $\delta_{pI0}$
+se lee banda a banda como el nivel de presión menos ese nivel de intensidad
+indicado. De *qué* hay en el acoplador se siguen dos consecuencias: el índice
+pertenece a la sonda, al espaciador montado y al analizador **juntos**, así que
+hay que volver a medirlo cada vez que cambie el espaciador; y es una propiedad de
+la cadena, no una especificación de los micrófonos.
+
+**Antes de cada serie (apartado 14).** Deja calentar el instrumento lo que diga
+el fabricante. En modo de presión acústica, aplica un calibrador acústico a los
+dos micrófonos, por turnos o a la vez, y ajusta hasta la indicación correcta
+dentro de **±0,1 dB en los dos canales** — el apartado 6.2.1 de ISO 9614-2 pide
+aquí un calibrador IEC 60942 de clase 0 o de clase 1. Después aplica otra vez el
+dispositivo de intensidad residual y confirma que $\delta_{pI0}$ sigue cumpliendo
+el requisito de clase en el rango que cubre el dispositivo, con la compensación
+de fase del fabricante aplicada y, preferiblemente, **a un nivel próximo al de
+uso**.
+
+**In situ (apartado 6.2.2 de ISO 9614-2): el ensayo de inversión de la sonda.**
+Es la única comprobación que no necesita banco y la que caza el error que ningún
+banco puede ver. Coloca la sonda sobre la superficie de medición, con el eje
+normal, en una posición donde la intensidad supere la media de la superficie;
+registra $I_n$ en todas las bandas. Gira la sonda **180° alrededor de un eje
+normal al eje de medición**, dejando el centro acústico en el mismo sitio — lo
+que en la práctica significa montarla en un trípode en vez de sostenerla a mano
+— y mide otra vez. Para que el sistema de medición sea aceptable, en la banda de
+nivel máximo **los dos valores de $I_n$ deben tener signos opuestos y los dos
+niveles de intensidad deben diferir menos de 1,5 dB**. Los dos modos de fallo se
+leen como diagnóstico: signos iguales significan que los canales están cruzados
+o que uno está invertido, y una diferencia de más de 1,5 dB significa que la
+sonda está perturbando su propio campo o que los dos canales no están
+emparejados. El apartado 10.5 c) hace que el resultado forme parte del informe
+de ensayo.
+
+Ese signo merece leerse también en el uso normal, no solo en la comprobación. Una
+intensidad neta negativa en parte de una superficie envolvente significa que
+entra más potencia por ese trozo de la que sale — de lo más normal en la cara a
+la sombra de una máquina que está junto a otra más ruidosa, y completamente
+carente de sentido si los canales están cruzados.
 
 ### Clasificar el instrumento: tabla 2 de IEC 61043
 
@@ -541,6 +637,52 @@ opuestos:
   $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el espaciador aporta
   3 dB de margen en baja frecuencia.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spacer_bandwidth_es.svg" alt="Dos paneles apilados frente a la frecuencia. Arriba, el sesgo por diferencias finitas de los espaciadores de 6, 12 y 50 mm, cada uno alejándose de 0 dB y cruzando la línea discontinua de menos 0,3 dB justo en su propia frecuencia máxima válida de 5,72, 2,86 y 0,69 kHz. Abajo, el margen de índice residual que hereda cada espaciador respecto a la separación de 25 mm para la que está escrita la tabla 2 de IEC 61043: menos 6,2 dB con 6 mm, menos 3,2 dB con 12 mm y más 3,0 dB con 50 mm" width="92%" />
+
+*Los dos límites se cierran desde lados opuestos. El panel superior es
+geometría: la `max_valid_frequency` de cada espaciador está exactamente donde su
+propia curva de sesgo cruza los −0,3 dB. El panel inferior es el presupuesto de
+fase: el requisito se mueve con el espaciador según
+$10\log_{10}(\Delta r/25\ \text{mm})$, así que una sonda de 50 mm parte con 3 dB
+de ventaja sobre una de 25 mm y con 9 dB sobre una de 6 mm. Donde los dos
+paneles dejan utilizable un espaciador está la banda en la que se le puede
+creer.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# El sesgo sale de la propia sound_intensity: bias_correction es el factor
+# compensador (k dr)/sin(k dr), así que el sesgo es su inverso en dB.
+fs, c = 48000, 343.0
+rng = np.random.default_rng(61043)
+x = rng.standard_normal(fs)
+espectro, bins = np.fft.rfft(x), np.fft.rfftfreq(fs, 1 / fs)
+
+fig, (axs, axi) = plt.subplots(2, 1, sharex=True)
+for dr in (0.006, 0.012, 0.050):
+    p2 = np.fft.irfft(espectro * np.exp(-2j * np.pi * bins * dr / c), fs)
+    res = emission.sound_intensity(x, p2, fs, dr, fraction=3,
+                                   limits=[20.0, 12500.0])
+    utiles = res.frequency < c / (4.0 * dr)      # descartar las bandas saturadas
+    axs.semilogx(res.frequency[utiles],
+                 -10.0 * np.log10(res.bias_correction[utiles]),
+                 label=f"{dr * 1000:.0f} mm")
+    axs.axvline(res.max_valid_frequency, linestyle=":")
+    axi.semilogx(res.frequency,
+                 np.full(res.frequency.shape, 10.0 * np.log10(dr / 0.025)))
+axs.axhline(-0.3, linestyle="--")
+axs.set(ylabel="Sesgo [dB]", ylim=(-2.4, 0.35))
+axi.set(xlabel="Frecuencia [Hz]", ylabel="Margen de δpI0 re 25 mm [dB]")
+axs.legend()
+plt.show()
+```
+
+</details>
+
 Ningún espaciador cubre por sí solo todo el rango de audio: el de 6 mm sirve
 para el trabajo en alta frecuencia, el de 50 mm para la baja frecuencia y el
 habitual de 12 mm cubre la banda media. Las mediciones de banda ancha se
@@ -597,14 +739,17 @@ intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
 El propio *ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la
 biblioteca: $\delta_{pI0}$ es un valor que quien mide obtiene en su propia
 cadena
-sonda-analizador, con el espaciador que va a montar, y aporta. Lo que
-phonometry hace con él es clasificarlo frente a la tabla 2.
+sonda-analizador, con el espaciador que va a montar, y aporta — el
+procedimiento está en *Medir el índice residual*, más arriba, y lo que
+phonometry hace con el número es clasificarlo frente a la tabla 2. La
+comprobación previa al uso del apartado 14 y el ensayo de inversión de la sonda
+de ISO 9614-2 son igualmente procedimientos, no funciones.
 
 ## Véase también
 
-- [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/) — las rutas de ISO 9614-2/-3 que consumen $\delta_{pI}$, los indicadores de campo y la capacidad dinámica.
-- [Potencia acústica](/phonometry/es/devices/emission/sound-power/) — la elección entre las rutas de intensidad, de presión y de cámara reverberante.
-- [Potencia acústica desde la vibración superficial](/phonometry/es/devices/emission/vibration-sound-power/) — el factor de radiación de ISO/TS 7849-2 necesita una potencia medida por intensidad.
+- [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/) — las vías de ISO 9614-2/-3 que consumen $\delta_{pI}$, los indicadores de campo y la capacidad dinámica.
+- [Potencia acústica](/phonometry/es/devices/emission/sound-power/) — la elección entre las vías de intensidad, de presión y de cámara reverberante.
+- [Potencia acústica a partir de la vibración](/phonometry/es/devices/emission/vibration-sound-power/) — el factor de radiación de ISO/TS 7849-2 necesita una potencia medida por intensidad.
 - [Calibración](/phonometry/es/signals/metrology/calibration/) — el escalado absoluto de los dos canales que el estimador da por supuesto.
 - [Teoría: análisis de señal](/phonometry/es/reference/theory/signal-analysis/) — la derivación por espectro cruzado que hay detrás de $I(f) = -\mathrm{Im}\{G_{12}\}/(2\pi f \rho_0 \Delta r)$.
 - Referencia de la API: [`emission.intensity`](/phonometry/es/reference/api/power/intensity/).

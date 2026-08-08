@@ -26,6 +26,13 @@ references:
     publisher: "Wiley"
     doi: "10.1002/9780470172568"
     note: "El tratamiento complementario de silenciadores reactivos y disipativos."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2003
+    title: "Acoustics — Laboratory measurement procedures for ducted silencers and air-terminal units — Insertion loss, flow noise and total pressure loss"
+    designation: "ISO 7235:2003 (EN ISO 7235:2009)"
+    url: "https://www.iso.org/standard/28379.html"
+    note: "La medición por sustitución del apartado 3: la fuente, el filtro modal, la transición y el conducto de sustitución del apartado 5.2, las tres disposiciones del lado receptor del 5.2.4, las dos series del 6.2.1 con los límites de dispersión de la Tabla 6, y la pérdida de inserción límite del apartado 7.4 y el Anexo C."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -51,11 +58,11 @@ conductos HVAC, el ruido de flujo y los cerramientos de máquina, vive en
 
 ## 1. Silenciadores reactivos (método de cuatro polos)
 
-Un silenciador reactivo atenúa *reflejando* el sonido con discontinuidades de
-impedancia. Cada elemento acústico es una matriz de transferencia 2x2 que
-relaciona la presión $p$ y la velocidad de volumen $Su$ en sus dos extremos, y un
-silenciador compuesto es el producto ordenado de las matrices de sus elementos
-(Bies §8.9). Un conducto recto de longitud $L$ y área $S$ es
+La reflexión se calcula elemento a elemento. Cada elemento acústico es una
+matriz de transferencia 2x2 que relaciona la presión $p$ y la velocidad de
+volumen $Su$ en sus dos extremos, y un silenciador compuesto es el producto
+ordenado de las matrices de sus elementos (Bies §8.9). Un conducto recto de
+longitud $L$ y área $S$ es
 
 $$
 \begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
@@ -123,6 +130,14 @@ cámara.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber_es.svg" alt="Pérdida de transmisión de la cámara de expansión frente a la frecuencia para relaciones de áreas m = 2, 4, 8 y 16, con máximos periódicos que crecen con m en los múltiplos impares de la frecuencia de cuarto de onda y caídas que vuelven a 0 dB en cada media longitud de onda de la cámara" width="88%" />
 
+*Dos palancas de diseño, y solo una es barata. El máximo,
+$10\log_{10}[1 + \tfrac14(m - 1/m)^2]$, crece solo con el logaritmo de la
+relación de áreas — $m = 2$ da 1,9 dB y $m = 16$ da 18,1 dB, así que
+cuadruplicar la sección de la cámara vale unos 6 dB —, mientras que las
+frecuencias de las caídas, $n\,c/2L$, no se mueven en absoluto, porque dependen
+solo de la longitud. Una cámara se alarga para mover la muesca y se ensancha
+para profundizar el máximo.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -133,10 +148,14 @@ from phonometry import expansion_chamber
 
 freqs = np.linspace(20.0, 2000.0, 2000)
 
-# Una línea para una cámara: TL vs frecuencia (con la pérdida de inserción si
-# se dan las impedancias de fuente y radiación).
+# Una línea para una cámara: TL vs frecuencia, más la pérdida de inserción
+# cuando se dan las dos impedancias acústicas (Pa.s/m3; de dónde salen, en el
+# subapartado siguiente). Con las dos puestas a rho c / S = 4.14e4 para este
+# tubo de 0.01 m2 las dos curvas coinciden, que es lo que significa «puertos
+# anecoicos».
 expansion_chamber(freqs, 0.3, 0.04, 0.01,
-                  source_impedance=4e4, radiation_impedance=5e3).plot(language="es")
+                  source_impedance=4.14e4,
+                  radiation_impedance=4.14e4).plot(language="es")
 plt.show()
 
 # A mano: la familia de relaciones de áreas de la figura de concepto.
@@ -184,6 +203,98 @@ plt.show()
 ```
 
 </details>
+
+### Pérdida de transmisión, pérdida de inserción y cuál cita una hoja de características
+
+Circulan tres magnitudes y no son intercambiables. La **pérdida de transmisión**
+compara la potencia incidente que entra en el elemento con la que sale de él
+hacia una terminación sin reflexiones, así que es una propiedad del elemento
+solo, que es justo lo que permite calcularla a partir de la geometría y la razón
+de que la fórmula de arriba fije $Z_1 = \rho c/S_\text{in}$ y
+$Z_n = \rho c/S_\text{out}$ sin preguntar a qué está conectado el silenciador. La
+**pérdida de inserción** compara el nivel en un punto fijo con y sin el elemento
+puesto, así que depende de la fuente y de aquello a lo que el conducto radia, y
+una misma cámara presenta pérdidas de inserción distintas en dos instalaciones.
+La **reducción de ruido** es la diferencia de niveles a secas a través del
+elemento, que es lo que devuelve una medición con dos micrófonos en un conducto
+en servicio.
+
+Un elemento reactivo es donde más divergen, porque funciona devolviendo energía
+hacia una fuente que puede volver a reflejarla. Las dos impedancias son
+acústicas, en Pa·s/m³ (presión por velocidad de volumen), y tienen una escala:
+$\rho c/S$ para el tubo de entrada de 0,01 m² vale $4{,}14 \times 10^{4}$, así
+que una fuente muy por encima de ese valor se aproxima a una máquina de
+velocidad de volumen constante, como un motor alternativo, y una muy por debajo
+a una fuente de presión constante. La terminación no es una elección libre en
+absoluto: para un conducto que descarga a una sala es la impedancia de radiación
+del extremo abierto, $Z_r = (\rho c/S)(R_1 + jX_1)$, cuyas $R_1$ y $X_1$
+normalizadas devuelve el
+[pistón radiante](/phonometry/es/devices/electroacoustics/loudspeakers/#piston-radiante)
+del dominio de electroacústica como `radiating_piston(...).resistance` y
+`.reactance` (sus `radiation_resistance` y `radiation_reactance` son la
+impedancia *mecánica* $\rho c S(R_1 + jX_1)$ en N·s/m, a un factor $S^2$ de
+distancia, y es fácil meterlas por equivocación). La impedancia de la fuente de
+un ventilador o de un motor, en cambio, rara vez se conoce y depende mucho de la
+frecuencia, que es precisamente por lo que en la práctica la pérdida de
+inserción es una magnitud *medida*.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss_es.svg" alt="Atenuación frente a la frecuencia de 20 a 880 Hz de una cámara de expansión de 0,3 m y relación de áreas 4. Una curva gruesa da la pérdida de transmisión, una joroba suave entre 0 y 6,5 dB con un cero en 572 Hz. Dos curvas más finas dan la pérdida de inserción de esa misma cámara descargando por la impedancia de radiación de su extremo abierto, una para una fuente adaptada al tubo y otra para una fuente veinte veces más rígida: las dos bajan muy por debajo de cero cerca de 180 Hz, hasta menos 9,3 y menos 22,6 dB, vuelven a bajar cerca de 645 Hz hasta menos 2,9 y menos 8,5 dB, y se reencuentran con la pérdida de transmisión en la parte alta de la banda" width="88%" />
+
+*La misma cámara, tres respuestas. La pérdida de transmisión nunca baja de cero,
+porque está definida contra una terminación que no refleja nada. La de inserción
+sí puede: cerca de 180 Hz esta cámara y el extremo abierto por el que descarga
+resuenan juntos, y la instalación es **más ruidosa** con el silenciador puesto
+que sin él — 9,3 dB más para una fuente adaptada al tubo y 22,6 dB para una
+rígida —, allí donde la pérdida de transmisión marca unos cómodos +5 dB. Por eso
+un catálogo publica una pérdida de inserción dinámica medida con el caudal de
+diseño y en el sentido de diseño, y por eso una TL calculada es una herramienta
+de dimensionado y no una especificación.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import special          # expansion_chamber: importado en el apartado 1
+
+freqs = np.linspace(20.0, 880.0, 1600)     # por debajo del corte de 890.8 Hz
+rho, c, pipe_area = 1.206, 343.0, 0.01
+z0 = rho * c / pipe_area                   # 41.4 kPa.s/m3
+
+# El extremo abierto, como pistón embridado: R1(2ka) y X1(2ka). Esos dos mismos
+# números salen de radiating_piston(a, freqs).resistance / .reactance.
+a = np.sqrt(pipe_area / np.pi)
+x = 2.0 * (2.0 * np.pi * freqs / c) * a
+z_r = z0 * ((1.0 - 2.0 * special.j1(x) / x)
+            + 1j * (2.0 * special.struve(1, x) / x))
+
+# Una línea: el resultado dibuja la pérdida de inserción junto a la de
+# transmisión siempre que se den las dos impedancias.
+expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                  source_impedance=z0, radiation_impedance=z_r).plot(language="es")
+plt.show()
+
+# A mano: las dos impedancias de fuente de la figura contra la misma salida.
+fig, ax = plt.subplots()
+ax.plot(freqs, expansion_chamber(freqs, 0.3, 0.04, pipe_area).transmission_loss,
+        label="Pérdida de transmisión")
+for factor, label in ((20.0, "fuente rígida"), (1.0, "fuente adaptada")):
+    res = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                            source_impedance=factor * z0, radiation_impedance=z_r)
+    ax.plot(freqs, res.insertion_loss, label=f"Pérdida de inserción, {label}")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Atenuación [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La regla que se sigue de ahí es corta: **no compares una pérdida de transmisión
+calculada con una pérdida de inserción publicada.** Escribe los requisitos en
+pérdida de inserción con la terminación declarada, toma la cifra del
+suministrador o de un ensayo (apartado 3), y trata la pérdida de transmisión que
+calcula esta página como la herramienta que dice qué geometría hay que pedir.
 
 El clip de abajo ejecuta una cámara con $m = 4$ y la misma longitud de 0,30 m
 en un conducto FDTD 2D a sus dos frecuencias características. En $kL = \pi$ la
@@ -258,7 +369,78 @@ print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, no 285.8
 # Una extensión de entrada de L/4 rellena la primera caída de la cámara.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
+print(round(float(et.transmission_loss[np.argmin(abs(f - 428.75))]), 1))
+# 5.1 dB donde la cámara simple marca 0.0
 ```
+
+Una extensión es un tubo de cuarto de onda alojado dentro de la cámara, así que
+trabaja justo donde la cámara no tiene nada. La cámara simple de 0,4 m es
+transparente en $c/2L = 429$ Hz; una extensión de entrada de 0,1 m ($L/4$)
+devuelve ahí 5,1 dB, y añadir una extensión de salida de 0,2 m ($L/2$) convierte
+la caída en un pico de 74 dB. El precio se ve en la misma figura: cada extensión
+es a su vez un resonador, así que abre una caída **nueva** propia, en 355 Hz con
+la extensión de entrada sola y en 261 Hz con las dos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube_es.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como joroba discontinua que llega a 6,5 dB y cae a cero en 429 Hz, esa misma cámara con una extensión de entrada de 0,10 m que aporta 5,1 dB en 429 Hz pero abre un cero nuevo en 355 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se dispara por encima de 45 dB en 429 Hz y abre su propio cero en 261 Hz" width="88%" />
+
+*Lo que compra una extensión interior, y lo que cuesta. Las caídas a 0 dB de la
+cámara simple en cada media longitud de onda son su defecto fatal; una extensión
+de cuarto de onda rellena la primera, y una segunda extensión de la mitad de
+longitud la convierte en un cortocircuito. Cada extensión pasa entonces a
+resonar en su propia longitud, que es la razón de que las caídas se muevan en
+lugar de desaparecer y de que una cámara de tubo extendido se diseñe contra el
+espectro de la fuente y no en general.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `f`, y extended_tube_chamber / expansion_chamber, como en el apartado 1.
+plain = expansion_chamber(f, 0.4, 0.04, 0.01)
+inlet = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)
+both = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                             outlet_extension=0.2)
+
+# Una línea para un dispositivo:
+inlet.plot(language="es")
+plt.show()
+
+fig, ax = plt.subplots()
+for res, label in ((plain, "Cámara simple"), (inlet, "Entrada L/4"),
+                   (both, "Entrada L/4 y salida L/2")):
+    ax.plot(f, res.transmission_loss, label=label)
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Pérdida de transmisión [dB]")
+ax.set_ylim(0.0, 46.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La extensión es un trozo de tubo real metido en la cámara, y `.plot_geometry()`
+la dibuja a escala como a todos los demás dispositivos de esta página.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_tube_geometry_es.svg" alt="Sección a escala de la cámara de tubo extendido: una cámara de 400 mm y 225,7 mm de diámetro equivalente entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con el tubo de entrada metido 100 mm en la cámara y el de salida 200 mm, ambos acotados" width="88%" />
+
+*La misma cámara de 0,4 m de arriba, con el tubo de entrada metido 100 mm y el
+de salida 200 mm. Por fuera no se añade nada: las dos ramas de cuarto de onda
+son los espacios anulares que crean las extensiones.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# Una línea: la sección acotada del dispositivo recién calculado.
+extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                      outlet_extension=0.2).plot_geometry(language="es")
+plt.show()
+```
+
+</details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_es.svg" alt="Pérdida de transmisión de un resonador de Helmholtz y de un tubo de cuarto de onda cerrado sobre el mismo conducto de 10 cm2: cada rama lateral produce un pico agudo en su propia frecuencia de sintonía, cerca de 120 Hz para el volumen de Helmholtz y cerca de 285 Hz para el tubo de 0,3 m, y es transparente en el resto" width="88%" />
 
@@ -266,6 +448,22 @@ et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
 sintonía y es casi transparente en el resto: el pico estrecho es la razón de
 que los resonadores se sintonicen a una frecuencia de encendido o al tono de
 paso de álabes de un ventilador en lugar de usarse en banda ancha.*
+
+**No leas la altura de ese pico.** Los dos modelos de rama toman
+`resistance=0.0` por omisión, así que la rama es un cortocircuito perfecto en
+$f_0$ y la pérdida de transmisión calculada diverge ahí; lo que muestra la
+figura es dónde cayó la malla de frecuencias, y por eso el código a mano de
+abajo tiene que recortar el eje en 50 dB. Lo que limita el pico en un metal real
+es la pérdida viscosa del cuello, la radiación de las paredes de la cavidad y el
+amortiguamiento que se añada a propósito. Un resonador bien hecho entrega del
+orden de 15 a 25 dB en su frecuencia de sintonía, sobre un ancho de banda
+relativo que fija su $Q$ y que suele ser de unos pocos por ciento, una fracción
+de octava. `resistance=` es donde va una resistencia acústica medida o estimada,
+y añadirla baja y ensancha el pico, que es el compromiso entre profundidad y
+tolerancia a un error de sintonía. Léelo junto a la advertencia sobre las
+correcciones de extremo de más arriba: una muesca desviada un 22 % de su
+objetivo no vale nada, así que el diseño amortiguado y más ancho suele ser el
+más seguro.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -379,9 +577,38 @@ plt.show()
 
 Cada uno devuelve un `ReactiveSilencerResult` con `transmission_loss`,
 `insertion_loss` (cuando se dan las impedancias), la matriz compuesta
-`transfer_matrix` y `.plot()`. Las configuraciones avanzadas encadenan elementos
-directamente con `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` e
+`transfer_matrix`, el `plane_wave_limit` de su sección más ancha y `.plot()`.
+Las configuraciones avanzadas encadenan elementos directamente con
+`duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` e
 `insertion_loss`.
+
+Ese `plane_wave_limit` es el techo de validez de todo lo que hay en esta página.
+Por encima del primer corte de orden superior de la sección más ancha se
+propagan varios modos, cada uno con su propio número de onda axial, y los
+máximos y mínimos calculados no sobreviven; el resultado lanza un
+`PlaneWaveWarning` cuando la malla de análisis rebasa esa frecuencia. Para la
+cámara de 0,04 m² de las figuras de arriba el límite son **890,8 Hz**, así que
+los barridos hasta 2 kHz de los fragmentos se salen del modelo en más de la
+mitad y el segundo y el tercer máximo de la figura de la familia $m$ hay que
+leerlos como forma de diseño y no como predicción. El análisis de corte en sí
+está en
+[Ruido por conductos](/phonometry/es/devices/noise-control/duct-path/#el-limite-de-onda-plana).
+
+Hay tres cosas del hardware que quedan fuera del álgebra y que deciden si un
+dispositivo construido se comporta como la curva. La **envolvente** de una
+cámara es un radiador grande de pared delgada: si su propia pérdida de
+transmisión queda por debajo de la del silenciador, el sonido se marcha por la
+envolvente y el dispositivo entrega la cifra de la envolvente, que es la versión
+en obra de la pérdida de inserción límite del apartado 3. Los dos **saltos de
+área llevan correcciones de extremo**, igual que el cuello de un resonador, así
+que la longitud acústica supera a la geométrica y las caídas medidas quedan un
+poco por debajo del $c/2L$ que aquí se imprime: una sintonía de tanteo hay que
+verificarla, no darla por buena. Y la expansión **regenera ruido de flujo en su
+propia salida**, lo que pone un suelo al espectro entregado del que la pérdida
+de transmisión no dice nada; esa magnitud es `flow_noise_straight_duct` en la
+[página de control de ruido industrial](/phonometry/es/devices/noise-control/noise-control/)
+y `silencer_self_noise` en la
+[página de ruido por conductos](/phonometry/es/devices/noise-control/duct-path/#4-lo-que-el-sistema-devuelve).
 
 `ReactiveSilencerResult` también se archiva solo: `.report()` genera un PDF de
 una página con la disposición de una hoja de prestaciones de silenciador, con
@@ -446,8 +673,8 @@ para elegir:
   revestimiento, así que la atenuación de las dos familias se desploma y solo
   las geometrías de bafles (pasos estrechos, más perímetro revestido por
   unidad de superficie) siguen funcionando.
-- **Tipo de espectro.** Una fuente tonal, un orden de encendido de un motor o
-  una frecuencia de paso de álabes, es la presa natural de un resonador; el
+- **Tipo de espectro.** Una fuente tonal, un armónico de encendido de un motor
+  o una frecuencia de paso de álabes, es la presa natural de un resonador; el
   ruido de ventilador o de flujo, de banda ancha, pide la banda disipativa.
   Los silenciadores de escape de serie combinan de forma rutinaria ambas
   cosas, rellenando de fibra una cámara de expansión para que las caídas
@@ -461,6 +688,51 @@ para elegir:
   pasada cierta pérdida de carga el silenciador se convierte en la fuente de
   ruido.
 
+Son tres afirmaciones que dependen de la frecuencia, así que aquí están sobre un
+mismo eje, con todas las curvas calculadas con los modelos que se distribuyen y
+no dibujadas a mano.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_selection_es.svg" alt="Atenuación de 40 Hz a 8 kHz de cinco dispositivos. En azul, la familia reactiva: la cámara de expansión de 0,3 m, una joroba ancha que llega a 6,5 dB con un cero en 572 Hz, y una rama de Helmholtz sintonizada a 100 Hz, un pico de unos pocos hercios de ancho que llega a 18 dB y nada en el resto. En verde, 1,5 m de conducto revestido de 36 por 24 pulgadas con 25 mm y con 50 mm de revestimiento, que suben por las bandas medias hasta 12,6 y 13,6 dB y caen despacio por encima. En rojo, una unidad de bafles de cinco pasos, de 10,7 dB a 63 Hz a 40 dB a 500 Hz y de vuelta a 12,1 dB a 8 kHz. Una línea vertical de puntos en 891 Hz marca el primer corte del conducto, más allá del cual no se dibujan las curvas azules de cuatro polos" width="88%" />
+
+*La regla de selección, dibujada. El resonador solo gana donde está el tono, y
+es transparente dos semitonos más allá. La cámara vale unos pocos decibelios en
+una banda baja ancha y nada en absoluto en sus propias caídas de media onda. Un
+revestimiento realista casi no hace nada a 63 Hz — 1,2 dB con 25 mm sobre 1,5 m
+— y doblar el espesor del revestimiento aporta 7 dB a 500 Hz y nada por encima
+de 1 kHz, porque ahí el sonido ya se colima por el paso libre. Solo la unidad de
+bafles, que estrecha el paso y multiplica el perímetro revestido, mantiene 30 dB
+en toda la zona media. Las curvas azules se cortan en 891 Hz porque es donde se
+corta su modelo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# El lado reactivo, dibujado solo hasta su propio techo de validez.
+chamber = expansion_chamber(f, 0.3, 0.04, 0.01)
+inside = f <= chamber.plane_wave_limit
+
+fig, ax = plt.subplots()
+ax.semilogx(f[inside], chamber.transmission_loss[inside],
+            label="Cámara de expansión, m = 4")
+ax.semilogx(f[inside], hr.transmission_loss[inside],
+            "--", label="Rama de Helmholtz")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Atenuación [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Las curvas disipativas salen de los modelos de instalación de los
+[métodos HVAC](/phonometry/es/devices/noise-control/noise-control/), no de este
+módulo: `hvac.lined_rectangular_duct_attenuation(bands, 36 in, 24 in, 1.5 m, t,
+include_unlined=True)` para los dos revestimientos, y
+`hvac.splitter_silencer_insertion_loss(bands, 24 in, 5 ft, [4 in] * 5, 8 in)`
+para la unidad de bafles.
+
 phonometry modela la familia reactiva en forma cerrada en esta página. El
 lado disipativo entra por los datos de instalación de los
 [métodos HVAC](/phonometry/es/devices/noise-control/noise-control/): la pérdida de inserción
@@ -471,11 +743,83 @@ desde primeros principios, los modelos de fluido equivalente alimentados por
 la resistividad al flujo de aire, es la misma teoría de materiales que
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
 
+<span id="como-se-mide-un-silenciador-iso-7235"></span>
+
+## 3. Cómo se mide un silenciador (ISO 7235)
+
+Todo lo anterior se calcula a partir de la geometría. La cifra que publica un
+suministrador, no: es una **pérdida de inserción medida por sustitución**, y la
+ISO 7235:2003 (publicada en Europa como EN ISO 7235:2009) es el método que hay
+detrás. Leer la ficha de esta página sin saberlo es la forma de acabar poniendo
+en la misma frase unos 8,9 dB calculados y los «25 dB» de un catálogo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235_es.svg" alt="Dos montajes apilados sobre un mismo eje de conducto. En el de arriba, la serie uno: una caja de altavoces estanca y revestida alimenta un filtro modal, después una transición, después el objeto de ensayo, y después un conducto de ensayo con terminación anecoica de cuñas que lleva tres posiciones de micrófono sobre una recta inclinada respecto al eje del conducto. El montaje de abajo, la serie dos, es idéntico salvo que el objeto de ensayo se sustituye por un conducto de sustitución vacío. Se marcan con trazo discontinuo los planos de cualificación en el objeto de ensayo y en el conducto receptor. Debajo, la pérdida de inserción se da como la diferencia de los dos niveles del lado receptor, tercio de octava a tercio de octava, con la atenuación del filtro modal, el límite del coeficiente de reflexión, la tolerancia del conducto de sustitución y la regla de relación señal-ruido de fondo enumerados con los números de apartado de la propia norma" width="92%" />
+
+El banco tiene cuatro partes y cada una lleva su requisito. La **fuente** es un
+generador de ruido aleatorio y un amplificador que atacan unos altavoces
+alojados en una caja acústicamente estanca y revestida de absorbente, con
+aberturas de compensación de presión para los ensayos con flujo, y con potencia
+suficiente para que todo punto de medida quede al menos 6 dB, y preferiblemente
+10 dB, por encima del ruido de fondo (apartado 5.2.2.2). Después va un **filtro
+modal**: un tramo de conducto con elementos absorbentes o reactivos que atenúa
+poco el modo fundamental y mucho los de orden superior, al menos 3 dB sobre el
+fundamental en el extremo de baja frecuencia y al menos 5 dB por encima del
+corte de los modos de orden superior, y que además desacopla la fuente del
+objeto de ensayo (5.2.2.3). Un **elemento de transición** rígido los une sin
+radiar ruido por sus paredes (5.2.2.4). Y el **conducto de sustitución** no es
+absorbente, idealmente es la propia envolvente vacía del objeto de ensayo y, si
+no, se ajusta a su entrada y a su salida con un 5 % en cada dimensión lineal
+(5.2.3).
+
+El lado receptor es uno de tres (5.2.4). Una **cámara reverberante** conforme a
+ISO 3741, cualificada al menos hasta el tercio de octava de 125 Hz, es la
+disposición preferente. Un **conducto de ensayo con terminación anecoica** es el
+recurso siguiente: de al menos media longitud de onda de la banda más baja y al
+menos cuatro veces la dimensión transversal máxima, con un coeficiente de
+reflexión no mayor que 0,3, y con los micrófonos y sus soportes obstruyendo
+menos del 5 % del área del conducto. Se admiten **condiciones esencialmente de
+campo libre** en el extremo abierto cuando el sonido directo supera en 10 dB a
+la reflexión más fuerte, lo que se cumple si la superficie reflectante más
+próxima está a más del doble de distancia que el micrófono.
+
+El procedimiento son luego dos series sin cambiar nada más. Se determina
+$L_{pI}$ con el objeto de ensayo instalado y $L_{pII}$ con el conducto de
+sustitución en su lugar, en puntos o recorridos idénticos y con un espectro de
+fuente inalterado, y la pérdida de inserción es $D_i = L_{pI} - L_{pII}$ tercio
+de octava a tercio de octava (6.2.1). En un conducto de ensayo el promedio
+espacial toma **al menos tres posiciones equiespaciadas** sobre una recta
+inclinada respecto al eje del conducto, a la mitad de su longitud
+aproximadamente, abarcando al menos un cuarto de longitud de onda de la banda
+más baja, y pasa a cinco cuando la dispersión entre las tres supera los límites
+de la Tabla 6: 10 dB a 50 y 63 Hz, 8 dB a 80 y 100 Hz, 7 dB a 125 Hz y 6 dB por
+encima de 160 Hz. La cadena es de clase 1 con filtros de tercio de octava
+conformes a IEC 61260 (5.2.4.6) y se verifica con un calibrador de clase 1 con
+$\pm 0{,}3$ dB antes y después de cada serie (6.1).
+
+Con la cifra viajan dos consecuencias. La primera, que lo que se informa es una
+**pérdida de inserción contra un conducto de sustitución**, no una pérdida de
+transmisión, así que no es la magnitud que calcula esta página y las dos no
+deben compararse directamente. La segunda, que toda instalación tiene una
+**pérdida de inserción límite**: el techo que le imponen los flancos por las
+paredes de su propio conducto, medido con el conducto de sustitución bloqueado
+acústicamente y registrado en función de la frecuencia (7.4). Una cifra de
+catálogo muy grande afirma tanto sobre la disposición de ensayo como sobre el
+dispositivo, que es la razón de que la disposición tenga que constar en el
+informe. Para hacerse una idea de lo repetible que es todo esto, las
+desviaciones típicas de reproducibilidad que da la propia norma para la
+pérdida de inserción son 1,5 dB de 50 a 100 Hz, 1 dB de 125 a 500 Hz, 2 dB de
+630 Hz a 1,25 kHz y 3 dB por encima (Tabla 7), con la incertidumbre expandida
+al doble de esos valores.
+
+Dos normas vecinas completan el cuadro: la **ISO 11691** es el método de
+laboratorio en grado de inspección, sin flujo, y la **ISO 11820** mide un
+silenciador in situ, donde el truco de la sustitución suele ser imposible.
+
 ## Contraste con la simulación FDTD
 
 Ese contraste es el clip incrustado en el apartado 1, y vale la pena volver a
 él ahora con el álgebra en la mano. La cámara de expansión de cuatro polos se
-contrasta con el
+contrasta con la
 [simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
 independiente, que no comparte con el producto de matrices de transferencia
 ninguna fórmula ni ninguna hipótesis más allá de la propia ecuación de ondas:
@@ -500,7 +844,9 @@ cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
 los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
 `insertion_loss` para encadenar elementos arbitrarios, cada uno con su
 dibujo a escala `.plot_geometry()`, contrastados contra la simulación FDTD
-independiente.
+independiente; el `plane_wave_limit` que acota a todos ellos; y, como prosa y
+no como código, la medición por sustitución de ISO 7235 que produce la pérdida
+de inserción que publica un suministrador.
 
 **No cubierto.** Solo se calculan elementos reactivos: los silenciadores
 disipativos (absorbentes, con revestimiento interior) se discuten para la
@@ -510,7 +856,10 @@ los datos de codo revestido y plenum de los
 instalación interpoladas, no un modelo de revestimiento. Los efectos del
 flujo medio (convección, gradientes de temperatura, impedancia de los
 perforados dependiente del flujo) quedan fuera de las matrices de elemento
-sin flujo que se usan aquí.
+sin flujo que se usan aquí. Nada de lo que hay en esta página es una medición:
+no se implementa ninguna parte de la ISO 7235, no se modelan ni la radiación por
+la envolvente ni las correcciones de extremo de los saltos de área, y los
+modelos de rama son sin pérdidas salvo que se dé una `resistance`.
 
 ## Véase también
 

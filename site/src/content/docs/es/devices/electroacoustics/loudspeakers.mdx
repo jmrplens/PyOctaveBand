@@ -45,8 +45,13 @@ phonometry implementa alrededor de una respuesta en eje medida: las
 entre hojas de características, el **pistón radiante** en pantalla que es el modelo
 físico canónico detrás de la impedancia de radiación y la directividad de
 un cono, y el **informe de características nominales** que compone la hoja
-de datos de la norma, con cada panel dibujado según las convenciones de
-escala de IEC 60263. Las mediciones de distorsión y respuesta en
+de características de la norma, con cada panel dibujado según las convenciones
+de escala de IEC 60263. Un altavoz en una sala con un micrófono abierto es un
+lazo cerrado y no una hoja de características, así que la guía cierra con el
+criterio de Long de **ganancia antes de la realimentación**
+(*Architectural Acoustics* 2.ª ed., cap. 18): las ganancias en lazo abierto y de
+realimentación, el margen de estabilidad de 10 dB y la corrección por número de
+micrófonos abiertos. Las mediciones de distorsión y respuesta en
 frecuencia que lo alimentan viven en
 [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/); el homólogo de
 micrófono tiene [su propia guía](/phonometry/es/devices/electroacoustics/microphones/).
@@ -55,13 +60,18 @@ micrófono tiene [su propia guía](/phonometry/es/devices/electroacoustics/micro
 
 Las cifras de distorsión y de respuesta solo son comparables entre
 dispositivos cuando coinciden las convenciones de *sensibilidad* que hay
-detrás, y dos convenciones hacen tropezar constantemente: el nivel de
-referencia del micrófono y la normalización de potencia y distancia del
-altavoz.
+detrás, y la del altavoz es la que hace tropezar: una normalización de potencia
+y distancia con dos trampas independientes en una sola frase del apartado 20.3.
+(La trampa del micrófono es el *valor de referencia*, y tiene
+[su propia sección](/phonometry/es/devices/electroacoustics/microphones/#1-la-sensibilidad-y-sus-referencias-iec-60268-4-apartado-11).)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_es.svg" alt="Medición de la sensibilidad de un altavoz en campo libre según IEC 60268-5: un altavoz sobre un soporte en una cámara anecoica, alimentado por un amplificador a 2,83 V, con un micrófono de medición a la distancia de referencia r = 1 m sobre el eje de referencia, y las relaciones que gobiernan: la sensibilidad característica como Lp a 1 m para 1 W en la impedancia nominal, la tensión de excitación Up = raíz de (R por 1 W), la referencia por distancia inversa Lp(1 m) = Lp(r) + 20 lg(r / 1 m), y la sensibilidad de micrófono de IEC 60268-4 en mV/Pa o dB re 1 V/Pa" width="92%" />
 
-**Altavoces (IEC 60268-5, apartado 20.3).** La sensibilidad característica es
+*La trampa que el dibujo existe para evitar es la de los 2,83 V: esa tensión es
+1 W en 8 Ω y 2 W en 4 Ω, así que la misma cifra infla un altavoz de 4 Ω en
+3 dB.*
+
+La sensibilidad característica es
 la presión acústica producida a 1 m sobre el eje de referencia, en campo
 libre, referida a una entrada de 1 W en la impedancia nominal; expresada como
 nivel re 20 µPa (apartado 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
@@ -82,9 +92,86 @@ esconden dos normalizaciones:
   campo cercano aún no haya terminado, y la cifra «a 1 m» es entonces una
   magnitud referida, no lo que leería un micrófono colocado a 1 m.
 
-El homólogo de micrófono, el nivel de sensibilidad re 1 V/Pa y su tropiezo
-del valor de referencia, se cubre en
-[Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/devices/electroacoustics/microphones/).
+### 1.1 Cómo se toma la curva en el eje
+
+**Dónde empieza el «campo lejano».** El segundo punto de la sección 1 avisa de
+que una medición puede quedarse demasiado cerca, pero no dice cuánto es
+demasiado cerca. Antes de que la referencia por distancia inversa sea legítima
+tienen que cumplirse tres condiciones a la vez: la distancia debe superar unas
+cuantas veces la dimensión mayor de la superficie radiante, para que la fuente
+subtienda un ángulo pequeño; debe superar la longitud de onda de la frecuencia
+más baja de interés, para que el campo cercano reactivo se haya extinguido; y
+debe superar la **distancia de Rayleigh** $\pi a^2/\lambda$ del radiador, más
+allá de la cual la presión en el eje deja de oscilar y se asienta en su caída
+$1/r$. Hazlo para el pistón de 75 mm de radio de la sección 2 a 4 kHz:
+$\pi (0{,}075)^2 / 0{,}0858 = 0{,}21$ m, así que 1 m está holgadamente lejos.
+Una columna de 2 m de alto no ha terminado de sumar sus altavoces a 1 m en
+*ninguna* frecuencia, y hay que medirla a 4 m o más y referirla después a 1 m,
+que es la razón de que el apartado 7.1.1 admita 0,5 m o un número entero de
+metros con referencia al valor normalizado de 1 m en vez de insistir en 1 m, y
+de que la cifra «a 1 m» de una hoja de características de una caja grande sea
+siempre una magnitud referida.
+
+**El montaje y las tres geometrías de referencia.** La carga acústica forma
+parte del resultado medido, así que el apartado 10.1 exige describirla junto al
+resultado y admite exactamente tres montajes para un altavoz elemental: sobre
+una pantalla normalizada, dentro de una envoltura de medición normalizada
+(tipo A o tipo B) o dentro de una envoltura (caja) especificada; al aire, sin
+pantalla ninguna; o enrasado con el plano reflectante en campo libre sobre
+semiespacio. Los tres no son comparables — un altavoz medido al aire pierde
+todo su extremo grave por cancelación entre la cara delantera y la trasera,
+mientras que ese mismo altavoz enrasado en el plano gana los 6 dB del
+semiespacio — y el apartado 11.1 señala que el borde radiante tiene que quedar
+sustancialmente enrasado con la superficie frontal, mediante un chaflán o una
+subpantalla fina y rígida. Un *sistema* de altavoces se mide normalmente sin
+pantalla adicional (10.2). El apartado 15 define después las tres cosas desde
+las que se miden todas las distancias y todos los ángulos de esta página, y son
+declaraciones del fabricante más que mediciones: el **plano de referencia**
+(15.1, ligado a un elemento físico del altavoz o de la caja), el **punto de
+referencia** sobre él (15.2) y el **eje de referencia** que pasa por ese punto
+(15.3), que es el cero tanto de las mediciones direccionales como de las de
+respuesta en frecuencia. Sin ellas, «1 m» desde la pantalla, desde el vértice
+del cono y desde la parte trasera de la caja son tres sensibilidades distintas.
+Anota en qué punto de la caja se situó el punto de referencia. El apartado 12
+añade un paso de preacondicionamiento antes de todo esto: una señal de programa
+simulada a la tensión de ruido nominal durante al menos 1 h, y después al
+menos 1 h desconectado.
+
+**La excitación, que no es un seno.** Una sensibilidad característica se mide
+con **ruido rosa** limitado en banda, no con un tono barrido (20.1.2): la cadena
+es un generador de ruido rosa, un filtro paso banda con pendientes de al menos
+24 dB/octava que limita la señal a la banda que se mide, el altavoz y el
+micrófono a la distancia declarada; la excitación es una tensión declarada
+$U_p$, que para la sensibilidad característica vale numéricamente $\sqrt{R}$
+(20.3.2). Donde no exista un filtro del ancho de banda adecuado, el apartado
+20.1.2.4 da el sustituto práctico: partir la banda en $n$ bandas de tercio de
+octava según IEC 61260, excitar cada una a $U_p/\sqrt{n}$ y recombinar como el
+valor eficaz de las presiones de banda. La cadena de instrumentos — generador,
+amplificador, altavoz, amplificador de micrófono — tiene que ser plana dentro de
+±0,5 dB en todo el rango y con no linealidad de amplitud despreciable, y todos
+los medidores han de ser de valor eficaz verdadero (apartado 8); el rango de
+frecuencias en el que el error total se mantiene dentro de ±2 dB hay que
+declararlo junto al resultado (apartado 9).
+
+**La medición enventanada, para quien no tiene cámara anecoica.** Los apartados
+5.5 y 7.3 admiten campo libre *simulado*, que es como se toma en realidad casi
+toda respuesta que circula por internet: colocar el altavoz y el micrófono de
+modo que se **maximice el tiempo hasta que llega al micrófono la primera
+reflexión no deseada**, y excluir por enventanado todo lo que venga desde esa
+llegada. La distancia se elige entonces para comprar tiempo, y no para ser
+exactamente 1 m, y el resultado se refiere después a 1 m. Los errores debidos a
+las puntas de las cuñas, al suelo y a los soportes han de quedarse por debajo
+de 0,5 dB (7.3), y hay que declarar junto al resultado la distancia del
+micrófono *y el tiempo de captura máximo que permite el recinto*. El precio es
+un límite duro en baja frecuencia: una ventana solo puede resolver una
+frecuencia cuyo periodo quepa dentro de ella, así que una ventana libre de
+reflexiones de 5 ms — la que da una medición a 1 m con el micrófono a 1,2 m
+sobre un suelo duro — no sirve por debajo de unos 200 Hz, y el extremo grave
+tiene que venir empalmado de una medición en campo cercano o en semiespacio.
+Esa es también la razón de que una curva enventanada y una curva anecoica
+discrepen por debajo de unos pocos cientos de hercios. La maquinaria de
+enventanado es la misma que la de
+[Respuesta al impulso de una sala](/phonometry/es/buildings/rooms/room-impulse-response/).
 
 <span id="piston-radiante"></span>
 
@@ -129,6 +216,18 @@ en el que la salida de un altavoz está limitada por rigidez y masa), y por
 encima la resistencia se asienta en $\rho c S$ con rizados de interferencia
 mientras la reactancia se desvanece.*
 
+El eje $ka$ se lee como un eje de frecuencia en cuanto se fija el cono:
+$ka = 1$ en $f = c/(2\pi a)$, que son 728 Hz para este radio de 75 mm y 546 Hz
+para el de 100 mm de la figura de geometría de más abajo. El índice de
+directividad que imprime el fragmento arranca en 3,01 dB y no en 0 dB porque un
+pistón en pantalla infinita radia hacia un *semi*espacio, así que, aunque sea
+omnidireccional dentro de ese semiespacio, concentra el doble de potencia que
+una fuente puntual en campo libre, y $10\log_{10} 2 = 3{,}01$ dB es el suelo
+desde el que sube. El ancho de haz sigue al primer nulo: el semiángulo de
+$-6$ dB se estrecha aproximadamente como $\arcsin(2{,}2/ka)$, así que un cono de
+100 mm sigue siendo hemisférico a 500 Hz y baja hasta unos 18° a 4 kHz, que es
+donde tiene que producirse el cruce a un radiador más pequeño.
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -148,9 +247,31 @@ plt.show()
 `reactance` normalizadas, la `radiation_resistance`/`radiation_reactance`
 mecánicas, la `radiation_mass`, el `directivity_index`, el patrón de campo lejano
 `directivity` (cuando se dan `angles`) y `.plot()`. Los bloques
-`piston_resistance`, `piston_reactance` y `piston_directivity` también son
-invocables directamente. El pistón es el modelo de radiador complementario de los
+`piston_resistance`, `piston_reactance`, `piston_directivity` y
+`plot_piston_geometry` también son invocables directamente, el último de ellos
+sin objeto de resultado ninguno. El pistón es el modelo de radiador
+complementario de los
 [silenciadores reactivos](/phonometry/es/devices/noise-control/silencers/).
+
+:::note[Hasta dónde llega el modelo]
+Cada palabra de «pistón circular rígido en pantalla infinita» es una hipótesis
+que un altavoz real incumple, y cada una tiene su fallo conocido. Una caja es
+una pantalla **finita**, así que por debajo de la frecuencia cuya longitud de
+onda supera la anchura de la pantalla la radiación se carga en $4\pi$ en vez de
+en $2\pi$ y la respuesta cae hasta 6 dB — el escalón de la pantalla —, con la
+difracción en los cantos añadiendo unos decibelios de rizado alrededor; nada de
+eso está en este modelo. Un cono deja de moverse **como una sola pieza** por
+encima de su primer modo de ruptura, típicamente unas cuantas veces la
+frecuencia de $ka = 1$ para un cono de papel, y a partir de ahí la directividad
+real es más ancha y más irregular de lo que predice el patrón de Bessel. Y un
+sistema de dos vías cerca de su cruce son **dos fuentes**, no una, así que su
+respuesta polar lleva lóbulos de interferencia que un solo pistón no puede
+mostrar, y por eso el panel polar de la ficha se declara a una frecuencia. El
+modelo es exacto en el uso que se le da aquí: como impedancia de radiación de
+una superficie rígida pequeña, como directividad en baja frecuencia de un solo
+altavoz sobre una pantalla grande, y como caso de referencia contra el que se
+lee una directividad medida.
+:::
 
 El **patrón de directividad** es, por sí mismo, un resultado representable:
 `piston_directivity_pattern(ka)` muestrea $D(\theta)$ para uno o varios valores
@@ -169,6 +290,11 @@ pattern.plot()                       # diagrama de haz polar en dB (necesita mat
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity_es.svg" alt="Directividad de campo lejano en polar de un pistón circular con pantalla para ka de 3, 8 y 16 sobre el hemisferio frontal, con el nivel en el eje arriba como referencia de 0 dB, que muestra el estrechamiento del lóbulo principal y la aparición de los lóbulos secundarios al crecer ka" width="72%" />
+
+*Un pistón a tres frecuencias, no tres pistones: el primer nulo sigue a
+$ka\sin\theta = 3{,}8317$, así que un cono de 75 mm de radio alcanza $ka = 16$
+cerca de 12 kHz y para entonces ya radia en un haz de unos pocos grados de
+anchura.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -211,6 +337,11 @@ res.plot_geometry(language="es")
 plt.show()
 ```
 
+`plot_piston_geometry(radius, angles=..., directivity=..., lobe_label=...)`
+dibuja la misma imagen a partir de un radio pelado, sin ningún
+`RadiatingPistonResult`, que es la forma a la que echar mano cuando se
+dimensiona un cono o se mete la pantalla en una transparencia.
+
 </details>
 
 ## 3. Informe de características del altavoz (IEC 60268-5)
@@ -230,6 +361,41 @@ números se calculan a partir de la respuesta en lugar de solo repetirse:
   mantiene dentro de 10 dB del nivel promediado en la banda de una octava en la
   región de máxima sensibilidad; los valles más estrechos que 1/9 de octava se
   desprecian.
+
+El resto de la ficha mezcla dos clases de número, y la norma traza la raya con
+claridad. Las magnitudes de los apartados 20 y 21 de arriba están **derivadas de
+la medición**. Las potencias admisibles del apartado 18, el rango de frecuencias
+nominal del 19.1 y la frecuencia de resonancia del 19.2 son **declaraciones que
+hace el fabricante** y que el informe imprime; se aportan mediante
+`ratings=LoudspeakerRatings(frequency_range=..., noise_power=...,
+sinusoidal_power=..., resonance_frequency=...)`. El rango de frecuencias nominal
+no es decoración: el apartado 16.1 aplica el criterio de impedancia mínima sobre
+*esa* banda, así que omitirlo hace que `minimum_impedance` recorra toda la curva
+medida y dé un valor que la norma no daría. La potencia de ruido nominal y la
+potencia sinusoidal nominal salen de los ensayos de resistencia del apartado 17,
+y por eso aquí son entradas y no salidas.
+
+**La línea del 80 % es un criterio de aceptación, no un adorno.** El apartado
+16.1 dice que la impedancia nominal es una resistencia pura que el fabricante
+*declara*, y acota esa declaración: el módulo más bajo **dentro del rango de
+frecuencias nominal** no será menor del 80 % de ella, y cualquier caída por
+debajo de ese valor fuera del rango — la corriente continua incluida — se
+declarará en la especificación. Esa es la línea dibujada en el panel de
+impedancia, y `minimum_impedance` es exactamente la magnitud a la que se le
+aplica. Lo que le importa a quien compra el altavoz es el módulo mínimo, no el
+nominal: una caja de «8 Ω» que baja a 3,2 Ω solo es legal si esa caída queda
+fuera del rango nominal, y un amplificador elegido por la cifra de la placa de
+características puede entrar allí en limitación de corriente. Esa misma regla
+del 80 % es la razón de que las especificaciones nominales de 4 y 8 Ω sobrevivan
+sobre un módulo que varía en un orden de magnitud a lo largo de la banda.
+
+El apartado 16.2.2 fija cómo se toma la curva: el altavoz en condiciones
+normales de medición, excitado a tensión constante o a corriente constante — lo
+primero suele preferirse — a un nivel lo bastante pequeño para mantenerlo en
+región lineal, con la advertencia de la propia norma de que la impedancia está
+muy influida por el nivel de excitación y de que habría que comprobar la
+coherencia de los datos a varios niveles. El módulo se mide al menos de 20 Hz a
+20 kHz, y la tensión o la corriente empleadas se informan junto al resultado.
 
 ```python
 import numpy as np
@@ -255,12 +421,33 @@ result = loudspeaker_characteristics(
         frequency=2000.0,
     ),
 )
-print(round(result.sensitivity_level_db, 1))                 # dB, 1 W / 1 m
-print(tuple(round(x) for x in result.effective_range))       # Hz
+print(round(result.sensitivity_level_db, 1))                 # 87.1 dB, 1 W / 1 m
+print(tuple(round(x) for x in result.effective_range))       # (37, 21361) Hz
+print(round(result.minimum_impedance, 1))                    # 6.6 ohmios
+
+# La misma respuesta, pero medida de verdad a 2 m con 1 V en 8 ohmios.
+referred = loudspeaker_characteristics(
+    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    distance=2.0, input_voltage=1.0,
+)
+print(round(referred.sensitivity_level_db, 1))               # 102.1 dB: +15.1
 
 result.report("altavoz.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-5"),
               language="es")
 ```
+
+`distance` es la distancia a la que se midió realmente la respuesta e
+`input_voltage` la tensión con la que se excitó, y aportarlas es la manera de
+aplicar las dos normalizaciones de la sección 1. Los valores por defecto son el
+caso de 1 m y $\sqrt{R}$, de modo que una respuesta a 1 m con 2,83 V en 8 Ω
+devuelve su propia media de banda sin cambios. Medida en cambio a 2 m y con 1 V,
+esa misma curva se corrige al alza en 6,0 dB por la distancia y en 9,0 dB por la
+tensión: 15,1 dB en total, que es el tamaño del error que se publicaría de no
+hacerlo. Hay otra restricción de entrada fácil de pasar por alto: las medias de
+banda pesan igual todas las muestras, así que un eje de frecuencias espaciado
+*linealmente* pone la mayoría de sus muestras en la octava superior y arrastra
+el nivel de sensibilidad hacia los agudos. Por eso todos los ejemplos de aquí
+construyen su eje con `np.geomspace`.
 
 `loudspeaker_characteristics` devuelve un `LoudspeakerCharacteristics` con el
 `sensitivity_level_db`, el `effective_range`, el `reference_level_db`, la
@@ -290,6 +477,13 @@ result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 d
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
+*La ordenada está comprimida a la proporción de IEC 60263 de una década de
+frecuencia por cada 25 dB, que es lo que hace comparables a ojo dos hojas de
+características. La banda sombreada es la tolerancia $\pm$ que declara quien
+llama (`tolerance_db`, 3 dB aquí) y los marcadores son los bordes del rango
+efectivo del apartado 21.2, leídos contra la línea de $-10$ dB referida a la
+octava de máxima sensibilidad, no a la media de toda la curva.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 
@@ -312,6 +506,12 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance_es.svg" alt="Módulo de impedancia del altavoz frente a la frecuencia con la línea de impedancia nominal y la línea del 80 % de la nominal" width="82%" />
+
+*El pico a 52 Hz de este ejemplo es la resonancia fundamental del altavoz, donde
+la masa móvil y la compliancia de la suspensión intercambian energía y la fuerza
+contraelectromotriz del motor es máxima: ahí no se puede leer la especificación.
+La línea del 80 % es el límite de aceptación del apartado 16.1, y el módulo
+mínimo, no el nominal, es la carga que ve realmente el amplificador.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -337,6 +537,13 @@ plt.show()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd_es.svg" alt="Distorsión armónica total del altavoz en porcentaje frente a la frecuencia" width="82%" />
 
+*Se lee contra la respuesta de encima: un pico de distorsión que coincide con un
+pico de respuesta es una resonancia excitada con fuerza, y una subida hacia baja
+frecuencia es el cono quedándose sin excursión. La distorsión se cita a una
+excitación declarada, así que una curva de THD sin su tensión de entrada y sin
+el nivel de presión acústica que produjo a 1 m es ininterpretable (apartado
+24.1.2.7).*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 
@@ -360,6 +567,36 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity_es.svg" alt="Respuesta direccional polar del altavoz a 2000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
+
+*Dibujada sobre el círculo de referencia del apartado 3 de IEC 60263: el radio
+completo son 25 dB y cada anillo son 5 dB, así que el semiángulo de $-6$ dB — la
+cifra de cobertura con la que trabaja quien diseña un sistema — se lee
+directamente. El cero polar es el nivel en el eje de referencia, y por eso hay
+que reajustar la excitación en cada banda mientras se toma el corte.*
+
+El panel es un corte, y el apartado 23.1.2 dice cómo se toma un corte:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_polar_es.svg" alt="Vista en planta de una medición polar en cámara anecoica: el altavoz está sobre un plato giratorio con su punto de referencia sobre el eje de giro y su eje de referencia a cero grados, el micrófono de medición está fijo sobre ese eje a r = 2 m, y el arco barrido de cero a 180 grados lleva los pasos de theta de 10 o 15 grados. Al lado, la condición de excitación: la tensión de entrada se reajusta en cada frecuencia o banda para que el nivel en el eje de referencia se mantenga constante, con las frecuencias preferentes de 500 Hz, 1, 2, 4 y 8 kHz, y un recuadro con el corte resultante sobre el círculo de referencia de 25 dB de IEC 60263. Un pie da las dos vías para el índice de directividad" width="92%" />
+
+El altavoz gira y el micrófono no: el punto de referencia se sitúa sobre el eje
+de giro para que la distancia de medición no cambie al barrer $\theta$
+(23.1.2.2). La regla que convierte el resultado en un *patrón* en lugar de en
+una familia de respuestas es la 23.1.2.3 — la tensión de entrada se reajusta en
+cada frecuencia o banda para que la presión acústica en un punto especificado
+del eje de referencia se mantenga constante — y la presentación preferente es
+una familia de curvas polares en bandas declaradas, al menos 500 Hz, 1, 2, 4 y
+8 kHz, con el nivel en el eje de referencia como cero del diagrama. La variante
+paso a paso del apartado 13.1.2 de la norma de micrófonos usa 10° o 15°; aquí el
+23.1.2.4 recomienda un dispositivo que dé variación angular continua, con la
+variante de respuesta en frecuencia a intervalos de 15°.
+
+El **índice de directividad** que imprime la ficha tiene dos vías admisibles
+(23.3.2). O bien se mide el nivel en el eje a 1 m en campo libre y el nivel del
+mismo altavoz en una cámara reverberante, y se corrige:
+$D_i = L_{ax} - L_p + 10\lg(T/T_0) - 10\lg(V/V_0) + 25$ dB, con $T_0 = 1$ s y
+$V_0 = 1\ \mathrm{m^3}$; o bien se integran sobre la esfera las presiones al
+cuadrado de estas curvas polares. `LoudspeakerDirectivity` acepta o un `index_db`
+ya calculado, o los datos polares que necesita la segunda vía.
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -401,9 +638,9 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## 4. Ganancia antes de la realimentación en refuerzo sonoro
 
-Todo lo anterior caracteriza un altavoz aislado. Colócalo en una sala con un
-micrófono abierto y la magnitud interesante deja de ser un número de catálogo
-para ser un **lazo cerrado**: el altavoz alimenta al público, pero también al
+Todo eso describe el aparato sobre un soporte. Colócalo en una sala con un
+micrófono abierto y la cifra que manda ya no está en la hoja de características:
+el sistema es un **lazo cerrado**: el altavoz alimenta al público, pero también al
 micrófono que lo excita. Long (*Architectural Acoustics* 2.ª ed., cap. 18,
 ecs. (18.13) a (18.24)) escribe ese lazo con dos ganancias en decibelios. La
 **ganancia del sistema en lazo abierto** es lo que el sistema le aporta al
@@ -465,6 +702,63 @@ print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
 res.plot()      # la estructura de ganancias frente a la oscilación y el margen
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/feedback_stability_es.svg" alt="Dos diagramas de barras apilados del mismo caso de auditorio. En el de arriba, con un solo micrófono abierto, la ganancia en lazo abierto de menos 6 dB y la ganancia del lazo de realimentación de menos 4 dB se acumulan hasta una ganancia de lazo total de menos 10 dB, justo sobre el límite de estabilidad discontinuo de 10 dB, con un margen de cero. En el de abajo, cuatro micrófonos abiertos añaden una corrección de más 6 dB y el total sube a menos 4 dB, seis decibelios por encima del límite y por tanto inestable" width="82%" />
+
+*El tipo de altavoz, su número y su potencia no aparecen por ninguna parte de la
+pila, y por eso poner más amplificador nunca compra ganancia antes de la
+realimentación. Abrir cuatro micrófonos en vez de uno añade $10\lg 4 = 6$ dB y
+se come el margen entero: la misma sala, el mismo altavoz, el mismo hablante, y
+un sistema que ahora se acopla. Long reparte esos 10 dB en 6 dB para un tono
+sostenido que se suma en fase con una reflexión en superficie dura y 4 dB de
+seguridad.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `ea` importado arriba.
+fig, axes = plt.subplots(2, 1, sharey=True)
+ea.feedback_stability(-6.0, 76.0, 80.0).plot(ax=axes[0], language="es")
+ea.feedback_stability(-6.0, 76.0, 80.0, open_microphones=4).plot(ax=axes[1], language="es")
+plt.show()
+```
+
+</details>
+
+### Cómo se obtienen las cuatro entradas
+
+El criterio consume tres niveles y un índice de directividad, y los cuatro son
+mediciones, no suposiciones. Tómalos en este orden.
+
+1. **Ajusta el sistema una vez y no lo toques.** $L_{H\text{-}M}$ y
+   $L_{H\text{-}L}$ son un *par* leído con un mismo ajuste de ganancia sin
+   mover, así que solo importa su diferencia y basta con una lectura relativa,
+   pero el ajuste no puede cambiar entre una y otra.
+2. **Excita con ruido rosa** y lee el nivel en la posición del micrófono con el
+   micrófono físicamente en su sitio y su orientación de trabajo: su presencia y
+   hacia dónde apunta forman parte del lazo. Eso es $L_{H\text{-}M}$. Mover la
+   cápsula 0,3 m hacia el altavoz o alejándola de él lo cambia en varios
+   decibelios, y es el arreglo más barato que hay cuando el criterio no se
+   cumple.
+3. **Lee $L_{H\text{-}L}$** con el mismo ajuste, promediado sobre tres a cinco
+   butacas representativas.
+4. **Mide $L_{T\text{-}M}$** con un hablante o una boca artificial a la
+   distancia de hablante de diseño; eso fija
+   $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$.
+5. **Lee $D_M(\theta)$** en los propios datos polares del micrófono, en la
+   dirección en que queda el altavoz *respecto al* hablante — véase la
+   [familia de patrones](/phonometry/es/devices/electroacoustics/microphones/#patron-direccional)
+   —, en vez de suponerlo. Vale cero para una cápsula omnidireccional apunte a
+   donde apunte.
+
+La prueba de aceptación que todo el mundo acaba haciendo es el **ring-out**:
+subir la ganancia hasta que el sistema se acopla, anotar la frecuencia a la que
+lo hace y bajar la ganancia en la cuantía del margen. Esa frecuencia es el pico
+del conjunto sala más sistema que los 10 dB existen para cubrir, y el ring-out
+es lo que confirma sobre el terreno la aritmética de arriba.
+
 Esos dos casos particulares son los del propio Long (ecs. (18.21) y (18.22)):
 con $Z_S = -6$ dB el criterio se reduce a
 $L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, de modo que un micrófono
@@ -472,12 +766,13 @@ omnidireccional debe ver el altavoz 4 dB por debajo del nivel medio en el
 público, mientras que un cardioide puede dejarlo subir hasta 2 dB por debajo.
 
 :::caution
-**Un desliz de signo en la ecuación impresa.** Long imprime la ec. (18.24) con `+ D_M(theta)` en el segundo miembro, lo que
-contradice las ecs. (18.20) a (18.22) que generaliza y convertiría la ventaja
-de un micrófono direccional en una penalización. `feedback_stability`
-implementa el signo de la ec. (18.20), de modo que con $N_m = 1$ reproduce
-exactamente los casos particulares del propio Long. El defecto queda
-recogido en el [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
+**Un desliz de signo en la ecuación impresa.** Long imprime la ec. (18.24) con
+$+D_M(\theta)$ en el segundo miembro donde las ecs. (18.20) a (18.22) exigen
+$-D_M(\theta)$, lo que convertiría la ventaja de un micrófono direccional en una
+penalización. `feedback_stability` implementa el signo de la ec. (18.20), de
+modo que con $N_m = 1$ reproduce exactamente los casos particulares del propio
+Long. El defecto queda recogido en el
+[registro de erratas](/phonometry/es/reference/errata/).
 :::
 
 ### Parámetros de `feedback_stability()`
@@ -502,7 +797,14 @@ directamente, y `plot_sound_reinforcement_geometry` dibuja el lazo de arriba.
 **Cubierto.** Las convenciones de sensibilidad de IEC 60268-5:2003+A1:2007
 (la sensibilidad característica referida a 1 W en la impedancia nominal a
 1 m, apartados 20.3/20.4, y la referencia por distancia inversa del
-apartado 7.1). El modelo de radiación del pistón en pantalla
+apartado 7.1) y las condiciones en las que quedan definidas: los tres
+montajes del apartado 10, el plano, el punto y el eje de referencia del
+apartado 15, el preacondicionamiento de 1 h del apartado 12, la excitación
+con ruido rosa limitado en banda de 20.1.2 con su sustituto por tercios de
+octava, los requisitos de instrumentación de los apartados 8 y 9, el campo
+libre simulado de 5.5/7.3, y la geometría polar, la regla de excitación y las
+dos vías del índice de directividad del apartado 23. El modelo de radiación
+del pistón en pantalla
 (`radiating_piston`, `piston_directivity_pattern`, Beranek y Mellow
 §4.19/§13.7): la resistencia y reactancia de radiación normalizadas, la
 masa de radiación, la directividad de campo lejano y el dibujo de la
@@ -516,7 +818,11 @@ antes de la realimentación del capítulo 18 de *Architectural Acoustics*
 `feedback_loop_gain`, `open_microphone_correction` y
 `plot_sound_reinforcement_geometry`.
 
-**No cubierto.** Los valores eléctricos y mecánicos que la norma define
+**No cubierto.** Ninguna de las condiciones de arriba la comprueban las
+funciones: reducen y presentan las curvas que se les entregan, así que el
+montaje, la excitación, el enventanado y la condición de campo quedan a cargo
+de quien opera, que además tiene que declararlos junto al resultado. Los
+valores eléctricos y mecánicos que la norma define
 alrededor de la potencia admisible (potencia de ruido nominal, tensiones
 máximas de entrada de corta y larga duración, apartado 17) los declara el
 fabricante, no se calculan aquí. La extracción de parámetros de
@@ -550,4 +856,4 @@ entra en el diseño por separado.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): el descriptor de
   potencia radiada, para cuando la pregunta es cuánta potencia acústica emite
   la fuente y no cómo responde en el eje.
-- Referencia de la API: [`electroacoustics.piston`](/phonometry/es/reference/api/electroacoustics/piston/) y [`electroacoustics.loudspeaker`](/phonometry/es/reference/api/electroacoustics/loudspeaker/).
+- Referencia de la API: [`electroacoustics.piston`](/phonometry/es/reference/api/electroacoustics/piston/), [`electroacoustics.loudspeaker`](/phonometry/es/reference/api/electroacoustics/loudspeaker/) y [`electroacoustics.sound_reinforcement`](/phonometry/es/reference/api/electroacoustics/sound-reinforcement/).

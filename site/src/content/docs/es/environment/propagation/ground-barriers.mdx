@@ -8,8 +8,8 @@ references:
     title: "Predicting outdoor sound"
     edition: "2.ª ed."
     publisher: "CRC Press"
-    doi: "10.1201/9780429470141"
-    note: "Capítulo 2 (reflexión de onda esférica sobre suelo de impedancia, la ecuación de Weyl-Van der Pol y el factor de pérdida por frontera) y capítulo 9 (barreras acústicas al aire libre, las soluciones de difracción de MacDonald y de Hadden y Pierce). ISBN 978-1-138-30655-2."
+    doi: "10.1201/9780429470806"
+    note: "Capítulo 2 (reflexión de onda esférica sobre suelo de impedancia, la ecuación de Weyl-Van der Pol y el factor de pérdida por frontera) y capítulo 9 (barreras acústicas al aire libre, las soluciones de difracción de MacDonald y de Hadden y Pierce). ISBN 978-1-4987-4007-4."
   - type: book
     authors: ["Salomons, E. M."]
     year: 2001
@@ -33,7 +33,7 @@ references:
     issue: 1
     pages: "35-53"
     doi: "10.1016/0003-682X(71)90024-7"
-    note: "El ajuste en forma cerrada de la carta de Maekawa en el número de Fresnel."
+    note: "El ajuste en forma cerrada del ábaco de Maekawa en el número de Fresnel."
   - type: article
     authors: ["Hadden, W. J.", "Pierce, A. D."]
     year: 1981
@@ -109,6 +109,7 @@ bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
 # Pradera (resistividad al flujo efectiva sigma = 200 kPa.s/m^2), fuente a 1 m y
 # receptor a 1.5 m de altura, separados 50 m. La impedancia procede del modelo
 # poroso de Delany-Bazley de phonometry.materials (suelo semiinfinito).
+# Orden de los argumentos: frecuencias, source_height, receiver_height, distancia.
 res = ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
 print(res.excess_attenuation)     # la caída del suelo (dB re campo libre)
 print(res.reflection_coefficient) # Q complejo por banda
@@ -128,7 +129,13 @@ ellos (una `flow_resistivity` o un
 `PorousMediumResult`) se conjuga internamente antes de entrar en las fórmulas
 de Weyl-Van der Pol.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical_es.svg" alt="Atenuación en exceso (nivel respecto al campo libre) frente a la frecuencia en eje logarítmico para cuatro tipos de suelo. La nieve reciente (10 kPa) cae más profundo y a menor frecuencia, cerca de menos 18 dB alrededor de 150 Hz; el suelo forestal (50 kPa) llega a unos menos 15 dB cerca de 290 Hz y la pradera (200 kPa) a unos menos 12 dB cerca de 540 Hz; el asfalto (20000 kPa) se ciñe al límite de realce de suelo rígido de más 6 dB hasta una caída profunda cerca de 2,4 kHz. Una línea de puntos marca el límite de suelo rígido de más 6 dB y una línea continua el campo libre de 0 dB" width="90%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical_es.svg" alt="Atenuación en exceso (nivel respecto al campo libre) frente a la frecuencia en eje logarítmico para cuatro tipos de suelo. La nieve reciente (10 kPa s/m2) cae más profundo y a menor frecuencia, cerca de menos 18 dB alrededor de 150 Hz; el suelo forestal (50 kPa s/m2) llega a unos menos 15 dB cerca de 290 Hz y la pradera (200 kPa s/m2) a unos menos 12 dB cerca de 540 Hz; el asfalto (20000 kPa s/m2) se ciñe al límite de realce de suelo rígido de más 6 dB hasta una caída profunda cerca de 2,4 kHz. Una línea de puntos marca el límite de suelo rígido de más 6 dB y una línea continua el campo libre de 0 dB" width="90%" loading="eager" />
+
+*Cuanto más blando es el suelo, más profunda es la caída y a menor frecuencia:
+la caída sigue a la resistividad al flujo efectiva a lo largo de más de una
+década, y solo el asfalto se mantiene cerca del límite de suelo rígido de +6 dB
+en todo el rango de la voz. Ojo a la unidad: la resistividad al flujo es una
+resistividad en Pa·s/m², no una presión.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -140,10 +147,10 @@ from phonometry import ground_effect
 
 freqs = np.geomspace(50.0, 4000.0, 400)
 grounds = [
-    ("Nieve reciente (10 kPa)", 10e3, "#2ca02c"),
-    ("Suelo forestal (50 kPa)", 50e3, "#9467bd"),
-    ("Pradera (200 kPa)", 200e3, "#1f77b4"),
-    ("Asfalto (20000 kPa)", 20000e3, "#d62728"),
+    ("Nieve reciente (10 kPa·s·m⁻²)", 10e3, "#2ca02c"),
+    ("Suelo forestal (50 kPa·s·m⁻²)", 50e3, "#9467bd"),
+    ("Pradera (200 kPa·s·m⁻²)", 200e3, "#1f77b4"),
+    ("Asfalto (20 000 kPa·s·m⁻²)", 20000e3, "#d62728"),
 ]
 fig, ax = plt.subplots(figsize=(11, 6.4))
 for label, sigma, color in grounds:
@@ -167,6 +174,59 @@ alcanza +6 dB en fase; la resistividad al flujo efectiva $\sigma \to \infty$
 tiende a ese suelo rígido; la incidencia rasante ($h_s, h_r \to 0$) da
 $R_p \to -1$; y el efecto suelo es recíproco al intercambiar las alturas de
 fuente y receptor.
+
+La onda de superficie se ve mejor llevando la geometría hacia la incidencia
+rasante y mirando cómo se separan $R_p$ y $Q$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_reflection_coefficient_es.svg" alt="Dos paneles frente a la altura de fuente y receptor bajando de 3 m a 0,02 m a 50 m de distancia y 500 Hz sobre pradera. Izquierda: el módulo del coeficiente de reflexión de onda plana Rp subiendo hacia 1 mientras su fase corre hacia 180 grados, y el módulo del coeficiente de onda esférica Q separándose de él hacia arriba y estabilizándose cerca de 1,26, con el módulo del factor de pérdida por frontera F(w) en un segundo eje. Derecha: la atenuación en exceso calculada con Q, que se aplana cerca de menos 12 dB, frente a la misma magnitud calculada solo con Rp, que cae pasando de menos 40 dB hacia el silencio que un modelo de onda plana predice en incidencia rasante" width="90%" />
+
+*A 3 m de altura los dos coeficientes coinciden dentro de un pequeño porcentaje y
+la onda de superficie es irrelevante. A 0,02 m, $R_p$ ya ha llegado a $-1$
+(módulo 0,993 a 179,6°) y un modelo de onda plana predice $-40,1$ dB, casi el
+silencio. El coeficiente esférico llega en cambio a $|Q| = 1,26$ y el campo se
+asienta en $-11,9$ dB. Esos 28 dB son lo que compra el término de Faddeeva
+$F(w)$, y son la razón de que una trayectoria exterior rasante sea audible
+siquiera.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `ground_effect` se importa en el fragmento de arriba.
+alturas = np.geomspace(3.0, 0.02, 60)
+c0, f, d = 343.0, 500.0, 50.0
+k = 2 * np.pi * f / c0
+q_mod, rp_mod, dl_q, dl_p = [], [], [], []
+for h in alturas:
+    res = ground_effect([f], h, h, d, flow_resistivity=2e5, model="miki")
+    rp = res.plane_reflection_coefficient[0]
+    q = res.reflection_coefficient[0]
+    fase = np.exp(1j * k * (float(res.r_reflected) - float(res.r_direct)))
+    razon = float(res.r_direct) / float(res.r_reflected)
+    rp_mod.append(abs(rp))
+    q_mod.append(abs(q))
+    dl_q.append(20 * np.log10(abs(1 + q * razon * fase)))
+    dl_p.append(20 * np.log10(abs(1 + rp * razon * fase)))
+
+fig, (izq, der) = plt.subplots(1, 2, figsize=(11, 4.6))
+izq.semilogx(alturas, rp_mod, label="|Rp| (onda plana)")
+izq.semilogx(alturas, q_mod, label="|Q| (onda esférica)")
+izq.invert_xaxis()
+izq.set(xlabel="Altura de fuente = receptor [m]", ylabel="Módulo")
+izq.legend()
+der.semilogx(alturas, dl_q, label="con Q")
+der.semilogx(alturas, dl_p, label="solo con Rp")
+der.invert_xaxis()
+der.set(xlabel="Altura de fuente = receptor [m]",
+        ylabel="Nivel respecto al campo libre [dB]")
+der.legend()
+plt.show()
+```
+
+</details>
 
 ### Elección de la impedancia del suelo
 
@@ -267,11 +327,49 @@ en integrales de Fresnel de la solución de MacDonald / Hadden y Pierce
 auxiliares. Da 6 dB en el límite de sombra (el campo se reduce a la mitad, el
 límite de cuña plana) y sigue a Kurze-Anderson en la zona de sombra.
 
-**Barreras gruesas.** Un `thickness` (ancho superior $e$) alarga el camino
-difractado a $A + e + B$, el número de Fresnel de doble borde
-$N = (2/\lambda)(A + B + e - d)$ de Bies Ec. 5.157, de modo que una barrera
-gruesa o
-un caballón atenúa monótonamente más que la pantalla fina de la misma altura.
+**Barreras gruesas.** Un `thickness` (ancho superior $e$) desplaza aguas abajo el
+segundo borde de difracción y alarga el camino difractado a $A + e + B$, el
+número de Fresnel de doble borde $N = (2/\lambda)(A + B + e - d)$ de Bies
+Ec. 5.157. La mejora es monótona, pero es pequeña, y la razón es geométrica: $B$
+se mide ahora desde el borde *lejano*, así que casi todo lo que el ancho superior
+añade lo devuelve también. Sobre la pantalla de 4 m de esta página, un ancho
+superior de 4 m vale **0,08 dB** a 500 Hz y 0,14 dB a 8 kHz; incluso 30 m de
+ancho solo llegan a 1,2 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_thickness_gain_es.svg" alt="Dos paneles sobre lo que compra una barrera gruesa frente a una pantalla delgada de la misma altura, para una barrera de 4 m a 50 m de una fuente a 1 m con el receptor a 1,5 m de altura a 100 m. Izquierda: la ganancia de pérdida por inserción sobre la pantalla delgada frente al ancho superior de 0 a 30 m a 250 Hz, 500 Hz y 1 kHz, que se queda por debajo de 1,5 dB en todo el barrido. Derecha: la misma comparación pasada por el término de apantallamiento de ISO 9613-2, donde el factor de doble difracción C3 añade varios decibelios para los mismos anchos, con la diferencia entre las dos respuestas anotada" width="90%" />
+
+*El efecto de la longitud del camino, por sí solo, vale una fracción de decibelio
+a distancias de tráfico rodado. La ISO 9613-2 concede a un doble borde bien
+separado un factor aparte $C_3$ que sube de 1 hacia 3, hasta
+$10\log_{10}3 \approx 4,8$ dB, que el modelo ondulatorio de aquí no incluye: para
+ese mismo ancho superior de 4 m, $D_z$ pasa de 7,6 dB a 9,0 dB a 500 Hz. Ninguna
+de las dos cifras autoriza a construir un caballón y esperar la bonificación de
+ISO con el modelo de esta página.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `barrier_insertion_loss` se importa en el fragmento de arriba.
+anchos = np.linspace(0.0, 30.0, 40)
+fig, ax = plt.subplots()
+for freq in (250.0, 500.0, 1000.0):
+    delgada = float(barrier_insertion_loss(
+        [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact").insertion_loss[0])
+    ganancia = [0.0 if e == 0.0 else float(barrier_insertion_loss(
+        [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact",
+        thickness=e).insertion_loss[0]) - delgada for e in anchos]
+    ax.plot(anchos, ganancia, label=f"{freq:g} Hz")
+ax.set_xlabel("Ancho superior e [m]")
+ax.set_ylabel("Ganancia sobre la pantalla delgada [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Barrera coherente sobre el suelo.** Con una `ground_impedance` (o una
 `ground_flow_resistivity`) se combinan coherentemente los cuatro caminos
@@ -283,6 +381,8 @@ simplificación de primer orden, un único $Q$ (sobre la geometría global
 fuente-receptor) pondera
 todos los rebotes en lugar de un coeficiente por camino imagen; el modelo es
 coherente y recíproco pero no una solución completa por elementos de contorno.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_barrier_four_paths_es.svg" alt="Sección a escala del modelo coherente de barrera de cuatro caminos: una fuente a 1 m del suelo con su imagen especular 1 m por debajo, una pantalla de 4 m a 50 m, y un receptor a 1,5 m de altura a 100 m con su propia imagen especular bajo el suelo. Se dibujan cuatro rutas difractadas con cuatro trazos distinguibles desde la fuente o su imagen sobre el borde superior hasta el receptor o su imagen, cada una etiquetada con el número de rebotes en el suelo y con el coeficiente de reflexión esférica Q marcado en cada rebote; un panel lateral enumera las cuatro longitudes de camino y las diferencias de camino que fijan la interferencia, y un recuadro repite la geometría de dos bordes de una barrera gruesa con su ancho superior e" width="92%" />
 
 ```python
 il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
@@ -300,6 +400,14 @@ apantallar, hacia abajo donde los cuatro caminos difractados interfieren
 destructivamente.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods_es.svg" alt="Pérdida por inserción de barrera frente a la frecuencia en eje logarítmico para una pantalla de 4 m entre una fuente a 1 m de altura a 50 m y un receptor a 1,5 m a 100 m. La curva a trazos de Kurze-Anderson y la curva continua del semiplano rígido exacto suben juntas desde unos 6 dB a 50 Hz hasta 19 dB a 5 kHz, sin separarse más de 1,5 dB; la curva coherente de cuatro caminos con suelo oscila alrededor de ellas, superando 45 dB cerca de 230 Hz donde desaparece el valle del efecto suelo sin barrera y cayendo por debajo de -10 dB cerca de 550 Hz, con la línea punteada del límite rasante de Kurze-Anderson de 5 dB por debajo" width="90%" />
+
+*Los dos modelos de pantalla delgada nunca se separan más de unos 1,5 dB, así que
+elegir entre ellos apenas importa. La curva coherente con suelo es un objeto de
+otra clase: oscila desde por encima de +45 dB cerca de 230 Hz, donde la barrera
+elimina el propio valle del efecto suelo del camino sin apantallar, hasta por
+debajo de −10 dB cerca de 550 Hz, donde los cuatro caminos difractados se
+cancelan. Los dos extremos son de banda estrecha y ninguno es un valor de
+diseño.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -361,9 +469,87 @@ plt.show()
 
 </details>
 
+### Parámetros de `ground_effect()` y `barrier_insertion_loss()`
+
+Las dos entradas toman sus distancias **a lo largo del suelo desde la fuente**, y
+ninguna toma una distancia desde la barrera. Esa es la trampa que conviene
+nombrar: en `barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5)` el
+receptor está a 100 m de la *fuente*, es decir 50 m más allá de la pantalla, no
+100 m más allá. Las dos funciones escriben además la misma opción de forma
+distinta (`model=` en `ground_effect`, `ground_model=` en
+`barrier_insertion_loss`) y ordenan su geometría de otra manera, y por eso las
+dos llamadas posicionales de esta página no son paralelas.
+
+| Parámetro de `ground_effect` | Tipo / forma | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequencies` | escalar o array 1D | Hz | > 0 | Banda estrecha: sin suavizado por bandas |
+| `source_height` | float | m | ≥ 0 | $h_s$ |
+| `receiver_height` | float | m | ≥ 0 | $h_r$ (**antes** de la distancia) |
+| `distance` | float | m | > 0 | Distancia horizontal fuente-receptor |
+| `impedance` | array, `PorousMediumResult` o None | — | `None` | $Z$ normalizada en el convenio $e^{-i\omega t}$ |
+| `flow_resistivity` | float o None | Pa·s/m² | `None` | $\sigma$ efectiva; alimenta el modelo poroso |
+| `model` | `"delany_bazley"` \| `"miki"` | — | `"delany_bazley"` | Prefiere `"miki"` por debajo del rango de ajuste |
+| `speed_of_sound` / `air_density` | float | m/s, kg/m³ | 343.0 / 1.205 | |
+
+| Parámetro de `barrier_insertion_loss` | Tipo / forma | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequencies` | escalar o array 1D | Hz | > 0 | |
+| `source_height` | float | m | ≥ 0 | $h_s$ |
+| `barrier_distance` | float | m | > 0 | De la fuente al borde (cercano), sobre el suelo |
+| `barrier_height` | float | m | > 0 | Altura del borde sobre el suelo |
+| `receiver_distance` | float | m | > `barrier_distance` (+ `thickness`) | Medida **desde la fuente** |
+| `receiver_height` | float | m | ≥ 0 | $h_r$ (**después** de la distancia) |
+| `method` | `"kurze_anderson"` \| `"exact"` | — | `"exact"` | `"exact"` es el semiplano rígido |
+| `thickness` | float o None | m | `None` | Ancho superior $e$; doble borde |
+| `ground_impedance` | array, `PorousMediumResult` o None | — | `None` | Selecciona el modelo coherente de cuatro caminos |
+| `ground_flow_resistivity` | float o None | Pa·s/m² | `None` | Lo mismo, a partir de una $\sigma$ efectiva |
+| `ground_model` | `"delany_bazley"` \| `"miki"` | — | `"delany_bazley"` | Ojo al nombre: no es `model=` |
+| `speed_of_sound` / `air_density` | float | m/s, kg/m³ | 343.0 / 1.205 | |
+
+Un argumento de suelo exige `method="exact"`; `method="kurze_anderson"` con
+suelo lanza `ValueError`.
+
+### Elegir un modelo, y qué no modela ninguno
+
+**Cuál usar.** Kurze-Anderson para una estimación de ingeniería por bandas de
+octava, donde sus ±1,5 dB frente a la solución exacta quedan muy dentro de la
+incertidumbre de todo lo demás de la cadena. El semiplano rígido exacto cuando
+importa el comportamiento junto a la frontera de sombra (ahí da 6 dB frente a los
+5 dB de Kurze-Anderson, y los 6 dB son el campo reducido a la mitad,
+físicamente correcto). El modelo coherente de cuatro caminos solo cuando la
+pregunta es la estructura de interferencia en banda estrecha, nunca en crudo como
+valor de diseño.
+
+**La curva coherente hay que promediarla antes de que signifique nada.** Es un
+resultado coherente, de banda estrecha y completamente determinista. La
+turbulencia atmosférica real descorrelaciona los cuatro caminos, una fuente real
+tiene ancho de banda y un receptor real se mueve; las tres cosas borran los
+extremos. Una pérdida por inserción de +45 dB en banda estrecha no es una barrera
+que quite 45 dB, es una frecuencia en la que el camino *sin apantallar* caía
+justo en su propio valle de efecto suelo. Promedia la curva por bandas, o léela
+como estructura y no como un nivel.
+
+**Los cuatro modelos son pantallas bidimensionales infinitas.** Una barrera real
+de longitud finita deja que el sonido la flanquee por los extremos, y dos
+barreras paralelas a ambos lados de una vía se reflejan entre sí y pierden varios
+decibelios de su prestación nominal. Ninguno de los dos efectos existe en ningún
+modelo de esta página.
+
+**La difracción es el límite de apantallamiento, no el realizado.** La pérdida
+por inserción que entrega una barrera construida es la menor entre el resultado
+de difracción y el índice de reducción sonora del propio panel, y el obstáculo
+tiene que cualificar antes como barrera: masa por unidad de superficie, una
+superficie cerrada y una extensión horizontal normal a la trayectoria mayor que
+la longitud de onda. Esas reglas de cualificación están enunciadas en el
+[apartado de errores habituales con barreras de Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/);
+aquí se aplican sin cambios.
+
 ## Relación con ISO 9613-2
 
-Los términos tabulados $A_{gr}$ y $D_z$ del
+La pérdida por inserción de Kurze-Anderson que aquí se escribe $\Delta$ es la
+misma magnitud que la ISO 9613-2 llama $D_z$, y los dos segmentos difractados
+llamados aquí $A$ y $B$ son sus $d_{ss}$ y $d_{sr}$. Los términos tabulados
+$A_{gr}$ y $D_z$ del
 [método ISO
 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/) son
 ajustes de
@@ -402,4 +588,8 @@ completa por elementos de contorno.
 
 ## Véase también
 
+- [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/): los ajustes por bandas de octava de ISO 9613-2 bajo los que se sitúan estos modelos, y la regla que un obstáculo tiene que cumplir para ser barrera siquiera.
+- [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/): el gradiente vertical de velocidad del sonido que los dos modelos de aquí dan por inexistente.
+- [Absorbentes porosos](/phonometry/es/materials/absorbers/porous-absorbers/): los modelos de Delany-Bazley y de Miki que hay detrás de `flow_resistivity`, y su rango de ajuste.
 - Teoría: [Propagación en exteriores y exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-y-exposición-al-ruido-en-el-trabajo-iso-9613-12-iso-9612): los términos de suelo y de barrera de ISO 9613-2 en el contexto de toda la suma de atenuaciones.
+- Referencia de la API: [`environment.propagation.ground_barriers`](/phonometry/es/reference/api/environment/ground-barriers/).

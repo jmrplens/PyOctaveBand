@@ -126,7 +126,7 @@ síncrono, Golay por los pares complementarios.
   Citado por [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) y la
   [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/).
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
-  measurement procedures* (4.a ed.). Wiley. ISBN 978-0-470-24877-5.
+  measurement procedures* (4.ª ed.). Wiley. ISBN 978-0-470-24877-5.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
   La referencia de los estimadores espectrales de Welch y su calidad
   estadística, y de las funciones de coherencia de sistemas de entradas
@@ -861,7 +861,7 @@ por encima.
   Citado por [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/).
 - Craik, R. J. M. (1996). *Sound transmission through buildings using
   statistical energy analysis*. Gower. ISBN 978-0-566-07572-8.
-  [Ficha de Open Library](https://openlibrary.org/isbn/9780566075728).
+  [Ficha en Open Library](https://openlibrary.org/isbn/9780566075728).
   El tratamiento SEA de la transmisión aérea y estructural en edificios, con los
   coeficientes de transmisión de onda de flexión tabulados para uniones en X, T,
   L y en línea.
@@ -1010,21 +1010,24 @@ aproxima.
 - International Electrotechnical Commission. (2018). *Wind turbines —
   Part 11: Acoustic noise measurement techniques*
   (IEC 61400-11:2012+AMD1:2018 CSV).
-  [Tienda IEC](https://webstore.iec.ch/en/publication/63367).
+  [Catálogo IEC](https://webstore.iec.ch/en/publication/63367).
   La geometría de potencia acústica aparente, la clasificación por velocidades
   de viento y la audibilidad tonal de aerogeneradores.
   Citado por [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/).
 - International Electrotechnical Commission. (2005). *Wind turbines —
   Part 14: Declaration of apparent sound power level and tonality values*
   (IEC TS 61400-14:2005).
-  [Tienda IEC](https://webstore.iec.ch/en/publication/5432).
+  [Catálogo IEC](https://webstore.iec.ch/en/publication/5432).
   Los valores declarados y su incertidumbre para un lote de aerogeneradores.
   Citado por [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/).
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
   (2.ª ed.). CRC Press.
-  [doi:10.1201/9780429470141](https://doi.org/10.1201/9780429470141).
-  Capítulo 11 (refracción por gradientes de viento y de temperatura, modelos
-  de rayos y zonas de sombra). ISBN 978-1-138-30655-2. Citado por
+  [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).
+  Capítulos 2 y 9 (reflexión de onda esférica en el suelo; barreras en
+  exteriores) y capítulo 11 (refracción por gradientes de viento y de
+  temperatura, modelos de rayos y zonas de sombra).
+  ISBN 978-1-4987-4007-4 (tapa dura), 978-0-429-47080-6 (libro
+  electrónico). Citado por
   [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/)
   y
   [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/).
@@ -1354,7 +1357,7 @@ de afirmarse.
   Instruments for the measurement of sound intensity — Measurements with
   pairs of pressure sensing microphones* (IEC 61043:1993; adoptada en Europa
   como EN 61043:1994).
-  [Tienda IEC](https://webstore.iec.ch/en/publication/4353).
+  [Catálogo IEC](https://webstore.iec.ch/en/publication/4353).
   La norma de instrumentación p-p: el estimador por espectro cruzado y el
   índice presión-intensidad residual.
   Citado por [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/).
@@ -1447,7 +1450,7 @@ ella.
 - International Organization for Standardization. (2020). *Acoustics —
   Determination and application of measurement uncertainties in building
   acoustics — Part 1: Sound insulation* (ISO 12999-1:2020).
-  [Catálogo de iso.org](https://www.iso.org/standard/73930.html).
+  [Catálogo iso.org](https://www.iso.org/standard/73930.html).
   El balance de reproducibilidad específico de la acústica de la edificación
   para magnitudes de número único, complemento de la maquinaria general de la
   GUM.
