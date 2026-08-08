@@ -27,8 +27,14 @@ privacidad, y una sala que luce bien en los parámetros de sala cerrada puede
 suspenderlo igualmente. ISO 3382-3 caracteriza por ello la oficina con
 cuatro números únicos — $r_D$, $D_{2,S}$, $L_{p,A,S,4m}$ y el ruido de fondo
 medio $L_{p,A,B}$ — medidos a lo largo de una línea de puestos de trabajo,
-alejándose de un hablante. Esta guía cubre esa cadena de medición: las
-magnitudes, la línea de medición a escala y la ficha acreditada. Las
+alejándose de un hablante. Esta guía cubre esa cadena de medición — las
+magnitudes, la línea de medición a escala y la ficha acreditada — y después le
+da la vuelta a la pregunta: en fase de proyecto, antes de que exista ninguna
+oficina ni ningún restaurante, el modelo de Long de ruido autogenerado por los
+ocupantes predice el fondo que genera una sala ocupada a partir de sus propios
+ocupantes, y convierte una relación habla-ruido objetivo en un área de absorción
+por mesa. Primero la medición, después el diseño; las dos mitades no comparten
+más que la sala. Las
 respuestas al impulso y los niveles que la sustentan se adquieren como en
 [Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/);
 el STI por posición sale de la
@@ -59,8 +65,34 @@ $$
 con **$L_{p,A,S,4m}$** leído en la misma recta a 4 m. La **distancia de
 distracción** $r_D$ (STI = 0,50) y la **distancia de privacidad** $r_P$
 (STI = 0,20) provienen de una regresión lineal del STI frente a la distancia.
-Las buenas oficinas empujan $r_D$ por debajo de ~5 m; las malas dejan el habla
-molesta más allá de 10 m.
+
+Las dos distancias se leen **sobre la recta ajustada**, y el apartado 6.3
+permite que la lectura caiga fuera del tramo medido: la Figura 3 b) dibuja la
+recta prolongada hasta el cruce. Así que un $r_D$ que cae dentro de la línea es
+una medición, mientras que un $r_P$ bastante más allá de la última posición es
+una extrapolación cuya confianza decae con la distancia: decláralo con el tramo
+medido al lado («$r_P$ = 17 m, extrapolado desde posiciones hasta 16 m»). La
+norma también prevé oficinas en las que el STI nunca baja a 0,20 — «puede
+resultar imposible determinar la distancia de privacidad si el STI > 0,20 en
+todas las posiciones» — y eso es lo que significa aquí un `nan`, no un fallo. Un
+STI *no decreciente* a lo largo de la línea suele indicar que la última posición
+quedó cerca de una superficie reflectante, donde suben tanto el nivel como el
+STI; el apartado 6.2 dice que se descarte esa posición de los ajustes de
+$D_{2,S}$ y $r_D$ en lugar de darle vueltas.
+
+El Anexo A de la ISO 3382-3 es informativo, pero fija los dos extremos de la
+escala:
+
+| Magnitud | Oficina mala típica | Objetivo bueno |
+| :--- | :---: | :---: |
+| $D_{2,S}$ | < 5 dB | ≥ 7 dB |
+| $L_{p,A,S,4m}$ | > 50 dB | ≤ 48 dB |
+| $r_D$ | > 10 m | ≤ 5 m |
+
+Esos intervalos son informativos, y las guías nacionales o el pliego del cliente
+prevalecen sobre ellos. Lee $D_{2,S}$ y $L_{p,A,S,4m}$ **como una pareja**: la
+tasa de decaimiento es una pendiente y el nivel a 4 m es su ordenada, así que
+citar cualquiera de los dos por separado favorece o condena la sala.
 
 $L_{p,A,B}$ es la cuarta magnitud exigida y no es un adorno: el ruido de fondo
 se mide en bandas de octava en todas las posiciones con la misma integración de
@@ -82,6 +114,9 @@ nada haya cambiado en la sala.
 import numpy as np
 from phonometry import room
 
+# Una línea de laboratorio: los niveles están construidos con 7 dB limpios por
+# duplicación y el STI con una recta de -0,03 por metro, para que cada número
+# impreso pueda comprobarse a mano. Una línea medida no es tan pulcra (ver abajo).
 r = np.array([2.0, 4.0, 6.0, 8.0, 12.0, 16.0])       # distancias al hablante (m)
 lp = 65.0 - 7.0 * np.log2(r)                          # nivel de habla ponderado A (dB)
 sti = 0.70 - 0.03 * r                                 # STI por posición
@@ -92,10 +127,24 @@ print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
 m.plot()   # la regresión de decaimiento espacial de la figura de abajo
 ```
 
+**Leer esta oficina.** $D_{2,S}$ = 7,0 dB es exactamente el umbral de oficina
+buena del Anexo A, pero $L_{p,A,S,4m}$ = 51,0 dB queda por encima de la línea de
+50 dB de oficina *mala*, y $r_D$ se queda aun así en 6,7 m. Es una buena tasa de
+decaimiento gastada desde un nivel de partida demasiado alto, así que la
+corrección es atenuar **cerca del hablante** — una mampara, una isla acústica
+sobre el puesto — y no ganar más decaimiento más lejos. Y una línea medida no se
+parece a esta: las posiciones se dispersan en torno a la recta ajustada,
+típicamente uno o dos decibelios, con las cercanas tiradas hacia arriba por el
+campo directo y las lejanas aplanadas por el suelo de ruido de fondo. Lo que se
+declara es la **regresión**, no ninguna posición suelta: $L_{p,A,S,4m}$ se lee
+sobre la recta aunque no hubiera ningún micrófono a 4 m, que es también la razón
+de que se prefieran seis posiciones — cuatro apenas sujetan una pendiente en
+cuanto hay que descartar una de ellas.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -156,6 +205,39 @@ plt.show()
 
 </details>
 
+Frente a la escala del Anexo A, esa única oficina queda entre dos salas muy
+distintas:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_quality_es.svg" alt="Dos paneles apilados sobre un eje logarítmico de distancia común de 2 a 16 metros. Arriba, el nivel de habla ponderado A de una oficina tratada decayendo a 8 dB por duplicación y pasando por 47 dB a 4 metros, y el de una sin tratar a 4 dB por duplicación pasando por 52 dB, con las bandas del Anexo A sombreadas: por encima de 50 dB mala, en 48 dB o por debajo el objetivo bueno. Abajo, las dos regresiones de STI cruzando 0,50 a 4,5 y 11,0 metros, con la banda buena hasta 5 metros y la banda mala más allá de 10 metros sombreadas y la línea de privacidad STI = 0,20 marcada" width="92%" />
+
+*Los dos extremos del Anexo A sobre un mismo eje. La oficina tratada cumple los
+tres objetivos; la sin tratar incumple los tres, y su distancia de privacidad
+— 24 m leídos sobre una línea de 16 m — es exactamente la extrapolación de la que
+se advertía arriba.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es el import del primer fragmento de arriba.
+
+positions = np.array([2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 16.0])
+for d2s, lp_4m, sti_0, sti_slope in ((8.0, 47.0, 0.62, 0.0267),
+                                     (4.0, 52.0, 0.75, 0.0227)):
+    slope = -d2s / np.log10(2.0)
+    levels = (lp_4m - slope * np.log10(4.0)) + slope * np.log10(positions)
+    res = room.open_plan_metrics(positions, levels, sti_0 - sti_slope * positions)
+    print(round(res.d2s, 1), round(res.lp_as_4m, 1),
+          round(res.rd, 1), round(res.rp, 1))
+    # 8.0 47.0 4.5 15.7   /   4.0 52.0 11.0 24.2
+    plt.semilogx(positions, levels, "o--")
+plt.show()
+```
+
+</details>
+
 La propia línea merece una planta a escala. `plot_open_plan_geometry` dibuja
 la fuente, la línea de micrófonos entre los puestos de trabajo y las dos
 distancias sobre el eje, y un resultado que retuvo sus posiciones redibuja su
@@ -168,7 +250,7 @@ micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_D$ y $r_P$
 cayendo entre ellos.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -185,6 +267,61 @@ plt.show()
 ```
 
 </details>
+
+## Medir la línea
+
+Los apartados 5.1 y 5.2 fijan todo lo que el dibujo de arriba deja implícito.
+
+**La fuente (5.1.1).** Un altavoz **omnidireccional** radiando **ruido rosa**,
+que cumpla los requisitos de omnidireccionalidad de la ISO 3382-1 — la norma es
+explícita sobre el porqué: quien trabaja en una oficina diáfana no habla de forma
+continua en ninguna dirección fija. Una señal determinista de espectro rosa (una
+MLS o un barrido, adquiridos como en la
+[guía de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/))
+es un sustituto admitido, y los resultados se obtienen de la respuesta al
+impulso. Su potencia acústica se verifica como en la ISO 3382-1, con la fuente a
+1,2 m, y el apartado 6.2 fija el nivel: suficiente en cada banda de octava para
+que el ruido rosa supere al fondo en **6 dB en la posición más lejana**.
+
+**La cadena de recepción (5.1.2).** Un sonómetro que cumpla la **clase 1** de la
+IEC 61672-1, un micrófono **omnidireccional** (incluido todo lo que se le acople)
+y filtros de octava conformes a la **IEC 61260**. Si la señal se graba para
+procesarla después, toda la cadena tiene que cumplir.
+
+**El estado de la sala (5.2.1).** Se mide **amueblada**, sin nadie presente salvo
+los operadores, y con la climatización y cualquier **sistema de enmascaramiento
+funcionando a la potencia de un día de trabajo normal**. La norma enuncia el
+fallo directamente: si las fuentes funcionan a potencia reducida, los valores de
+STI salen demasiado altos, lo que sobrestima tanto $r_D$ como $r_P$. Y como no
+hay personas, el enmascaramiento que aporta la conversación real tampoco está en
+la medición, así que las distancias reales en uso son *más cortas* que las
+medidas.
+
+**La línea (5.2.2).** Cruza los puestos de trabajo y **no tiene por qué ser
+recta**. Se prefieren **de 6 a 10** posiciones sucesivas y el mínimo es **4**, con
+la primera en el **puesto más cercano**. La fuente y el micrófono se sitúan ambos
+a la altura de la cabeza en un puesto, **1,2 m** sobre el suelo — los puestos de
+trabajo de pie quedan fuera de alcance —, y al menos a **0,5 m de las mesas** y a
+**2,0 m de las paredes y demás superficies reflectantes**. Se usan **al menos dos
+posiciones de fuente**; si solo cabe una línea, se mide con dos fuentes emitiendo
+en sentidos opuestos. Allí donde cambian el techo o el mobiliario, la oficina se
+trata como **zonas** distintas, cada una con su propio juego de números únicos.
+
+**Qué se registra en cada punto (5.2.3).** Cuatro cosas: el nivel de ruido rosa
+por bandas de octava, el STI, el nivel de fondo por bandas de octava y la
+distancia a la fuente — de **125 Hz a 8 kHz**, con un tiempo de integración de
+**al menos 10 s** (más largo con un fondo no estacionario, como el tráfico).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_setup_es.svg" alt="Dos paneles. El panel a es una planta de una oficina diáfana de 30 por 12 metros dividida en una zona con islas absorbentes y otra de yeso a secas, con una franja de exclusión de 2,0 metros a lo largo de todas las paredes, grupos de mesas con mamparas de 1,2 metros, la fuente S1 en la posición de cabeza de un puesto y la fuente S2 en el extremo opuesto emitiendo de vuelta, ocho posiciones de medición sobre un recorrido no recto con P1 en el puesto más cercano, una acotación de holgura de 0,5 metros junto a una mesa y la ventana de regresión de 2 a 16 metros acotada. El panel b es una sección que fija el centro acústico del altavoz y el micrófono a 1,2 metros junto a un ocupante sentado, con la lista de apartados de la fuente, la cadena de recepción, el estado de la sala y la línea" width="94%" />
+
+**Por qué la ventana se detiene en 2 m y en 16 m.** El apartado 6.2 solo admite
+en la regresión de $D_{2,S}$ las posiciones entre 2 m y 16 m, y los dos extremos
+tienen su razón. Más cerca de 2 m el receptor está en el campo directo del
+hablante, cuyos 6 dB por duplicación son una propiedad del campo libre y no de la
+oficina; más allá de 16 m el nivel de habla ha alcanzado normalmente el fondo, de
+modo que la regresión estaría ajustando ruido. Una línea de seis posiciones de
+2 m a 16 m mantiene así al menos cuatro puntos dentro del ajuste aunque haya que
+descartar el último por estar cerca de una pared.
 
 ### Del ruido rosa medido a $L_{p,A,S,n}$
 
@@ -320,6 +457,8 @@ import numpy as np
 from phonometry import room, ReportMetadata
 
 r = np.array([2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 16.0])   # distancias al hablante (m)
+# Otra línea de laboratorio, construida con 7 dB limpios por duplicación como
+# antes; una medida se dispersa un decibelio o dos en torno al ajuste.
 lp = 62.0 - 7.0 * np.log2(r)                           # nivel de habla ponderado A (dB)
 sti = 0.65 - 0.03 * r                                  # STI por posición
 
@@ -421,9 +560,65 @@ from phonometry import room
 print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6.31 m2 por mesa a 1 m
 print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19.8 m2 con paso de 2,5 m
 
+# Una distribución real: 1,2 m a través de la mesa, 2,0 m hasta la siguiente.
+print(round(room.absorption_per_table(1.2, -6.0), 2))   # 9.09 m2, cota inferior
+print(round(room.absorption_per_table(2.0, -9.0), 2))   # 12.66 m2, cota superior
+
 crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
 crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB
 ```
+
+Las dos cotas son una **ventana**, y puede estar vacía. Exigir
+$6{,}31\,r_s^2 < A_\text{mesa} < 3{,}16\,r_t^2$ significa que la ventana solo
+existe cuando $r_t/r_s > \sqrt{6{,}31/3{,}16} \approx 1{,}41$: junta las mesas más
+que eso y no hay absorción alguna que permita conversar a través de tu propia
+mesa sin que te oigan en la de al lado. La distribución de arriba pasa, con
+$r_t/r_s = 1{,}67$ y 3,6 m² de margen entre las cotas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_per_table_es.svg" alt="Dos paneles. A la izquierda, la absorción por mesa ocupada frente a la separación, con la cota de comunicación 6,31 r al cuadrado por encima de la cota de privacidad 3,16 r al cuadrado, los dos puntos calculados a 1 metro y a 2,5 metros marcados, y la banda factible de 9,1 a 12,7 metros cuadrados sombreada para una distribución con 1,2 metros a través de la mesa y 2,0 metros entre mesas. A la derecha, la anchura de esa ventana factible frente a la razón entre el paso de mesas y la separación a través de la mesa, cruzando el cero en 1,41 y alcanzando 3,6 metros cuadrados en la razón 1,67 de esta distribución" width="94%" />
+
+*Izquierda: para una distribución, las dos desigualdades dejan una banda de
+absorción por mesa factible. Derecha: cuánto mide esa banda a medida que las
+mesas se separan — por debajo de $r_t/r_s = 1{,}41$ tiene anchura negativa, que es
+el enunciado geométrico de que conversación y privacidad se han vuelto
+incompatibles sea cual sea el material del techo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es el import del bloque de arriba.
+
+span = np.linspace(0.6, 3.2, 200)
+plt.plot(span, room.absorption_per_table(span, -6.0), label="comunicación")
+plt.plot(span, room.absorption_per_table(span, -9.0), label="privacidad")
+
+r_s, r_t = 1.2, 2.0
+lower = float(room.absorption_per_table(r_s, -6.0))
+upper = float(room.absorption_per_table(r_t, -9.0))
+plt.axhspan(lower, upper, alpha=0.2)
+print(round(upper - lower, 1), round(r_t / r_s, 2))     # 3.6 1.67
+print(round(float(np.sqrt(6.31 / 3.16)), 2))            # 1.41: la razón de cierre
+plt.legend(); plt.show()
+```
+
+</details>
+
+**De dónde sale el propio $A_\text{mesa}$.** Para una sala que ya existe, mide el
+tiempo de reverberación según la ISO 3382-2 e invierte Sabine, $A = 0{,}161\,V/T$
+— la misma convención que define la ISO 354 —, con las guías de
+[respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/)
+y [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)
+aportando $T$. Para una sala en proyecto, mídela superficie a superficie como en
+[Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
+En cualquiera de los dos casos $A_\text{mesa} = A/N$, con $N$ el número de mesas
+**ocupadas simultáneamente** — no los comensales, y no las mesas instaladas. Eso
+es lo que hace que un restaurante a media entrada sea una sala distinta de uno
+lleno con la misma absorción, y es la razón de que añadir mesas con la absorción
+fija sea lo que empuja una sala más allá de su límite. Significa también que un
+T30 medido con la sala vacía basta para predecir cómo sonará llena.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_es.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 m², con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
 
@@ -435,7 +630,7 @@ $10\log_{10} N$: la única variable de diseño es el desplazamiento vertical, qu
 la absorción.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -484,9 +679,12 @@ y `absorption_per_table` son invocables directamente.
 apartados 6.2/6.3 de la ISO 3382-3:2012 ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$,
 $r_P$) de `room.open_plan_metrics`, con el dibujo a escala de la línea de
 medición (`room.plot_open_plan_geometry` y `.plot_geometry()`) y la ficha
-ISO 3382-3 de una página con `.report()`. El modelo de ruido autogenerado por
+ISO 3382-3 de una página con `.report()`. Las condiciones de medición de los
+apartados 5.1 y 5.2 y los intervalos de calidad del Anexo A se citan aquí para
+planificar y para leer los resultados. El modelo de ruido autogenerado por
 los ocupantes del capítulo 17 de *Architectural Acoustics* 2.ª ed. de Long
-(ecs. (17.50) a (17.54)) mediante `room.crowd_noise` y sus piezas.
+(ecs. (17.50) a (17.54)) mediante `room.crowd_noise` y sus piezas, con la
+ventana de diseño de las ecs. (17.53)-(17.54) y su condición de cierre.
 
 **No cubierto.** El STI por posición de la ISO 3382-3 se toma como entrada
 de `open_plan_metrics` en lugar de calcularse dentro de la función: mídela
@@ -496,10 +694,11 @@ La cuarta magnitud de número único exigida, el ruido de fondo medio ponderado 
 $L_{p,A,B}$, tampoco se calcula aquí: es la media energética ponderada A de los
 niveles de fondo por banda de octava de cada posición, y le corresponde ir en el
 informe junto a las tres que sí produce esta página.
-El propio procedimiento de medición de la norma (la directividad del
-altavoz, las condiciones amueblada frente a desocupada, la captura del
-ruido de fondo) no se comprueba: la función consume distancias, niveles y
-valores de STI vengan de donde vengan. El modelo de ruido autogenerado es un
+Tampoco **se comprueba** ninguna de las condiciones de medición de los
+apartados 5.1 y 5.2: la función consume distancias, niveles y valores de STI
+vengan de donde vengan, así que la directividad de la fuente, el estado amueblado
+y desocupado y la captura del ruido de fondo son responsabilidad del operador y
+no de la biblioteca. El modelo de ruido autogenerado es un
 cálculo de *diseño* y deliberadamente no modela el reflejo de Lombard: se
 cancela en $L_{SN}$ mientras todo el mundo alce la voz por igual, de modo que
 el modelo explica por qué el nivel se dispara en una sala dura, no dónde se

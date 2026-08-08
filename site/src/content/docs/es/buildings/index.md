@@ -8,7 +8,7 @@ línea natural: lo que ocurre **dentro** de una sala y lo que pasa **entre**
 salas. Dentro de una sala, la magnitud que gobierna es la absorción: fija el
 tiempo de reverberación y la claridad que la acústica de salas mide
 (ISO 3382) y predice (Sabine y sus refinamientos, EN 12354-6), mientras que
-el ruido de fondo en que se asienta la sala se valora contra curvas de
+el ruido de fondo en que se asienta la sala se valora frente a curvas de
 criterio (ANSI/ASA S12.2). Entre salas, la magnitud que gobierna es el
 aislamiento: cuánto
 sonido aéreo y de impacto transmiten una partición y sus trayectorias por flancos,
@@ -38,7 +38,7 @@ y [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/de
 ## [Acústica de salas](/phonometry/es/buildings/rooms/)
 
 El campo sonoro dentro de una sala: medido desde una respuesta al impulso,
-valorado contra curvas de criterio y predicho desde el volumen y la
+valorado frente a curvas de criterio y predicho desde el volumen y la
 absorción.
 
 - [Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/):
@@ -79,8 +79,9 @@ laboratorio y predicho a partir de datos de elemento.
   fuerza de impacto que las especifica y el número único del anexo D de
   ISO 717-2.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
-  el índice de reducción vibratoria de unión medido y los descriptores de
-  flanco.
+  el índice de reducción vibratoria de unión medido, los descriptores de
+  flanco y el trayecto por el plenum del techo suspendido con su clase de
+  atenuación de techo.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia tras Rw, DnT,w, Ln,w y sus términos de
   adaptación.

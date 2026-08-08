@@ -81,8 +81,12 @@ Each image at distance $r_n$ from the receiver arrives at $t_n = r_n/c$ with an
 amplitude built from the $1/(4\pi r_n)$ spherical spreading, the product of the
 wall **pressure reflection factors** $R_w = \sqrt{1 - \alpha_w}$ each raised to
 the number of reflections $k_{w,n}$ that image made off wall $w$, and the air
-pressure loss $e^{-m r_n/2}$ over the path ($m$ the intensity attenuation
-coefficient, so intensity falls as $e^{-m r}$). A shoebox has exactly
+pressure loss $e^{-m r_n/2}$ over the path ($m$ the power (intensity)
+attenuation coefficient in neper per metre, so intensity falls as $e^{-m r}$ and
+pressure as $e^{-m r/2}$ — the same $m$ the
+[reverberation-time](/phonometry/buildings/rooms/reverberation-prediction/) and
+[EN 12354-6](/phonometry/buildings/rooms/enclosed-space-absorption/) guides feed
+to their $4mV$ terms). A shoebox has exactly
 $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to reflection order
 $i_0$ (1560 at order 10), and the reflection density grows as
 $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$.
@@ -178,10 +182,11 @@ grid, coloured by reflection order.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan.svg" alt="Plan view of the image-source lattice of a 7 by 5 metre room outlined in the centre, with the source as a red star at (2, 1.6), the receiver as a blue triangle at (5.2, 3.4), and the image sources at the plane of the source coloured by reflection order, first order orange, second order green and third order purple, spreading in a regular grid of mirror rooms out to about 26 metres" width="88%" />
 
-*The lattice the reflectogram comes from, to scale: each image sits in a
-mirror room at the height plane of the source, and its distance to the
-receiver alone fixes the arrival time and the $1/(4\pi r)$ spreading of that
-reflection.*
+*The same room, source and receiver as the reflectogram above, drawn to third
+order so the lattice stays legible — the reflectogram runs to order 10 and this
+plan is its first three shells. Each image sits in a mirror room at the height
+plane of the source, and its distance to the receiver alone fixes the arrival
+time and the $1/(4\pi r)$ spreading of that reflection.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -191,7 +196,7 @@ import matplotlib.pyplot as plt
 from phonometry import room
 
 res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=3)
 
 # One line: the image lattice in plan, coloured by reflection order.
 res.plot_geometry()
@@ -211,13 +216,53 @@ high-frequency tail.
 import numpy as np
 from phonometry import room
 
-freqs = [250.0, 500.0, 1000.0, 2000.0]
-alpha = np.array([[0.10, 0.15, 0.25, 0.40]] * 6)     # (6 walls, 4 bands)
+freqs = [250.0, 500.0, 1000.0, 2000.0, 4000.0]
+alpha = np.array([[0.10, 0.15, 0.25, 0.40, 0.50]] * 6)   # (6 walls, 5 bands)
 res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
-                            alpha, fs=48000, max_order=12, frequencies=freqs)
-print(res.ir.shape)                                  # (4 bands, n_samples)
-print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # more absorption -> less energy
+                            alpha, fs=48000, max_order=60, frequencies=freqs)
+print(res.ir.shape)                                  # (5 bands, n_samples)
+res.plot()   # one decay per band; the figure below adds the air term
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_bands.svg" alt="Schroeder decay curves of the five octave bands of a 7 by 5 by 3 metre room, each band drawn twice: solid without air attenuation and dashed with the coefficient m at 20 degrees Celsius and 50 per cent relative humidity. The bands fan out from a 1.06 second decay at 250 hertz to 0.25 seconds at 4 kilohertz, and each dashed curve sits only slightly below its solid partner, the gap widening with frequency" width="88%" />
+
+*The banded branch of `image_source_rir` for the page's own room, each band
+drawn without air (solid) and with $m$ at 20 °C / 50 % RH (dashed). The bands
+fan out because the wall absorption rises with frequency, from T30 = 1.06 s at
+250 Hz to 0.25 s at 4 kHz. The air term is the second, much smaller mechanism
+here: it takes 0.4 % off the 250 Hz decay and 4.4 % off the 4 kHz decay. That is
+the honest size of the effect in a 105 m³ room — the reflections simply do not
+travel far enough — and it is why air absorption is a
+[volume effect](/phonometry/buildings/rooms/reverberation-prediction/#1-sabine-eyring-and-millington-sette)
+rather than a frequency effect: put the same walls around 2 000 m³ and the same
+argument takes tens of per cent off the top band.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np`, `room`, `freqs` and `alpha` come from the per-band block above.
+
+# environment.air_attenuation_m(freqs, 20.0, 50.0), Np/m at 20 C / 50 % RH
+m = [3.02e-4, 6.28e-4, 1.074e-3, 2.277e-3, 6.831e-3]
+
+fig, ax = plt.subplots()
+for attenuation, style in ((0.0, "-"), (m, "--")):
+    banded = room.image_source_rir(
+        (7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7), alpha,
+        fs=48000, max_order=60, frequencies=freqs,
+        air_attenuation=attenuation,
+    )
+    for row, f in zip(banded.ir, freqs):
+        time, level = room.decay_curve(row, banded.fs)
+        ax.plot(time, level, style, label=f"{f:g} Hz")
+ax.set_xlabel("Time [s]")
+ax.set_ylabel("Level re steady state [dB]")
+plt.show()
+```
+
+</details>
 
 **Reproducing the statistical decay.** The initial decay rate of the synthetic
 RIR reproduces the **Eyring** reverberation time
@@ -230,6 +275,56 @@ exactly the anisotropy the
 were built to correct. The model captures specular reflections only (no
 diffraction, no diffuse scattering) and is exact for real, angle-independent
 wall reflection factors.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_anisotropy.svg" alt="Specular initial-decay time against room elongation at constant volume and constant mean absorption: the Eyring prediction falls slowly as the room is stretched while the specular decay rises, so the ratio between them grows from 1.05 at a cube to about 2.5 at a six to one corridor, leaving the shaded plus or minus 10 per cent band around Eyring at an elongation of roughly 1.5 to 1" width="88%" />
+
+*The same 105 m³ and the same uniform $\bar\alpha$ = 0.12, stretched from a cube
+to a 6:1 corridor. Eyring *falls* as the room is stretched, because stretching
+at constant volume adds boundary area; the specular decay *rises*, because the
+long axis keeps returning energy that the mean free path has already written
+off. The two agree to 5 % for the cube — the documented tolerance of the
+Validation section below — and part company immediately: past about 1.5:1 the
+specular decay is outside the ±10 % band, and at 6:1 it is 2.5 times the Eyring
+estimate. This is the anisotropy that motivates the Fitzroy and Arau-Puchades
+models, and the reason the reverberation-prediction guide lists disproportionate
+rooms among the cases where every statistical formula fails.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np` and `room` are the imports of the per-band block above.
+
+volume, alpha = 105.0, 0.12
+side = volume ** (1.0 / 3.0)
+ratios, specular, eyring = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0], [], []
+for r in ratios:
+    lx, ly = side * r ** (2.0 / 3.0), side * r ** (-1.0 / 3.0)
+    area = 2.0 * (2.0 * lx * ly + ly * ly)      # a box lx x ly x ly
+    eyring.append(room.eyring_reverberation_time(volume, [(area, alpha)]))
+    res = room.image_source_rir((lx, ly, ly), (lx * 0.28, ly * 0.32, ly * 0.5),
+                                (lx * 0.74, ly * 0.68, ly * 0.57), alpha,
+                                fs=48000, max_order=60)
+    # The initial slope of the reverberant energy density, from the exact
+    # reflection table rather than from the sampled IR.
+    edges = np.arange(0.0, float(np.max(res.times)), 0.004)
+    energy, _ = np.histogram(res.times, bins=edges, weights=np.asarray(res.amplitudes) ** 2)
+    centres, good = 0.5 * (edges[:-1] + edges[1:]), energy > 0.0
+    level = 10.0 * np.log10(np.where(good, energy, 1.0) / energy[good][0])
+    band = good & (level <= -1.0) & (level >= -20.0)
+    specular.append(-60.0 / np.polyfit(centres[band], level[band], 1)[0])
+
+fig, ax = plt.subplots()
+ax.plot(ratios, eyring, "--", label="Eyring")
+ax.plot(ratios, specular, "-o", label="specular (image source)")
+ax.set_xlabel("Room elongation $L_x : L_y = L_z$")
+ax.set_ylabel("Reverberation time [s]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### `image_source_rir()` parameters
 
@@ -247,7 +342,8 @@ wall reflection factors.
 
 Returns an `ImageSourceResult` (`ir`, `fs`, `frequencies`, and the exact
 `times`/`distances`/`orders`/`amplitudes`/`image_positions` reflection table)
-with `.plot()` and a `direct_time` property. `audible_image_count(order)` gives
+with `.plot()`, `.plot_geometry()` (the mirror-room plan above) and a
+`direct_time` property. `audible_image_count(order)` gives
 the shoebox image count and `reflection_density(t, volume)` the density
 $4\pi c^3 t^2 / V$.
 
@@ -277,6 +373,48 @@ the fitted T30 comes out short:
 The Eyring estimate for this room is 0.93 s, so order 12 is 3.3× short and the
 default 20 is 2.1× short. The cost objection does not apply: order 60 is
 295 360 images and runs in a fifth of a second.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_order_convergence.svg" alt="Fitted T30 and EDT of the 7 by 5 by 3 metre room against the reflection-order cut-off from 8 to 60: both rise steeply and almost linearly with order, T30 crossing the 0.93 second Eyring line and its shaded plus or minus 10 per cent band at about order 51 and continuing to rise, while a second axis shows the audible image count growing from about 800 to 295 thousand" width="88%" />
+
+*T30 read by `room_parameters` from the synthetic RIR, against the order the
+lattice was built to. The rise is the truncation: every extra order adds a shell
+of later arrivals, so the fit window keeps finding more decay to fit. The
+completeness rule sets the **floor** — below the order that covers the fit
+window the number is simply wrong, which is what the table above quantifies —
+but it is not a convergence criterion. Past the crossing the specular T30 keeps
+drifting above Eyring, because a 7 × 5 × 3 room is not near-cubic and its long
+axis sustains energy the diffuse-field estimate has already spent; the next
+figure sweeps exactly that. Read T30 from this model as an order-dependent
+specular quantity, not as a prediction of a measured reverberation time.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `room` is the import of the section 1 block above.
+
+orders = list(range(8, 62, 2))
+t30 = []
+for order in orders:
+    res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                                (5.2, 3.4, 1.7), 0.12, fs=48000,
+                                max_order=order)
+    params = room.room_parameters(res.ir, res.fs, limits=None)
+    t30.append(float(params.t30[0]))
+
+eyring = float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)]))
+fig, ax = plt.subplots()
+ax.plot(orders, t30, "-o", label="T30 from the synthetic RIR")
+ax.axhline(eyring, ls="--", label=f"Eyring, {eyring:.2f} s")
+ax.fill_between(orders, 0.9 * eyring, 1.1 * eyring, alpha=0.15)
+ax.set_xlabel("max_order")
+ax.set_ylabel("Reverberation time [s]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **`t30_valid` cannot see a truncated lattice.** It reads the decay range of
 whatever array it is handed, so it returns `True` at every order in the table
@@ -315,6 +453,31 @@ $r_c = \sqrt{Q R / 16\pi}$: closer than $r_c$ the direct field dominates and
 doubling the distance drops the level by 6 dB; farther out the reverberant
 field takes over and moving away barely helps.
 
+The $(1-\bar\alpha)$ in the denominator of $R$ and the 4 in the level equation
+come from the same bookkeeping. Only the power *not* absorbed at the first
+encounter goes on to build the reverberant field, which is what divides $A$ by
+$(1-\bar\alpha)$; and the 4 is the diffuse-field factor between energy density
+and the intensity striking a surface — the same 4 as in the $4mV$ air term of
+the reverberation formulae. That gives $R$ its reading: it is the area of open
+window that would remove power at the same rate, so a room with $R$ = 25 m²
+behaves, as far as a distant listener is concerned, like a room with 25 m² of
+open window. $R$ therefore always exceeds the Sabine area $A = S\bar\alpha$, and
+the difference vanishes as $\bar\alpha \to 0$, which is why the module prefers
+$R$ and why Kuttruff's $A/16\pi$ agrees with it in a live room.
+
+Where a source is mounted is not a detail, because $Q$ moves $r_c$ as
+$\sqrt{Q}$: the same machine has a 1.11 m critical distance on a stand and a
+3.14 m one in the corner of the same workshop. The plate below fixes the four
+values to real mountings.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_directivity_factor.svg" alt="Four isometric cells in a row showing the same compact source radiating into a shaded solid angle: free space on a stand into 4 pi steradians with Q equal to 1, on the slab into 2 pi with Q equal to 2, against a wall on the slab into pi with Q equal to 4, and in a trihedral corner into pi over 2 with Q equal to 8; each cell prints the critical distance the mounting gives in a workshop with a room constant of 62 square metres, 1.11, 1.57, 2.22 and 3.14 metres" width="92%" />
+
+*The four values of $Q$ as four mountings, with the critical distance each
+produces in the 12 × 8 × 4 m workshop of the figure below ($R$ = 62 m²). $Q$
+multiplies the direct term only: the reverberant plateau does not move, so
+mounting a machine in the corner raises the level near it without changing the
+level at the far end of the room.*
+
 ```python
 from phonometry import room
 
@@ -328,10 +491,11 @@ print(round(field.critical_distance, 2))       # 0.71 m
 field.plot()                                    # direct / reverberant / total vs distance
 ```
 
-The `SteadyFieldResult.plot()` draws the direct, reverberant and total levels
-against distance with the critical distance marked: the total curve follows the
-$1/r^2$ direct field near the source and flattens onto the reverberant plateau
-beyond $r_c$.
+On a room worth drawing — a 12 × 8 × 4 m workshop, $S$ = 352 m²,
+$\bar\alpha$ = 0.15, so $R$ = 62 m² — `SteadyFieldResult.plot()` draws the
+direct, reverberant and total levels against distance with the critical distance
+marked: the total curve follows the $1/r^2$ direct field near the source and
+flattens onto the reverberant plateau beyond $r_c$ = 1.11 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%" />
 
@@ -373,6 +537,49 @@ plt.show()
 
 </details>
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_directivity.svg" alt="Left panel, the total steady-state level against distance in a 12 by 8 by 4 metre workshop for source directivity factors of 1, 2, 4 and 8: the four curves share one reverberant plateau far from the source and separate near it, with the marked critical distance moving outward from 1.11 to 3.14 metres as the square root of Q. Right panel, the same room at a fixed Q of 2 with the mean absorption stepped over 0.05, 0.15 and 0.35: the plateau drops with absorption while the direct-field asymptote near the source does not move" width="92%" />
+
+*Left: $Q$ moves the crossover, not the plateau. Doubling $Q$ raises the direct
+field by 3 dB and pushes $r_c$ out by $\sqrt{2}$, but the reverberant level far
+from the source is identical in all four curves, because $Q$ never enters the
+$4/R$ term. Right: absorption does the opposite. Stepping $\bar\alpha$ from 0.05
+to 0.35 takes the room constant from 18.5 m² to 189.5 m² and the plateau from
+83.3 dB to 73.2 dB — 10.1 dB, exactly $10\lg(R_2/R_1)$ — while the near-field
+asymptote does not move. That is the precise content of "beyond $r_c$ only
+absorption, not distance, lowers the level", and it is a seven-fold increase in
+absorption for 10 dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` is the import of the steady-state block above.
+
+grid = np.logspace(-1, 1.3, 200)
+fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.0), sharey=True)
+for q in (1.0, 2.0, 4.0, 8.0):
+    field = room.steady_state_field(sound_power_level=90.0, surface_area=352.0,
+                                    mean_absorption=0.15, distances=grid,
+                                    directivity=q)
+    left.semilogx(field.distances, field.total, label=f"Q = {q:g}")
+    left.axvline(field.critical_distance, ls=":", alpha=0.5)
+for absorption in (0.05, 0.15, 0.35):
+    field = room.steady_state_field(sound_power_level=90.0, surface_area=352.0,
+                                    mean_absorption=absorption, distances=grid,
+                                    directivity=2.0)
+    right.semilogx(field.distances, field.total,
+                   label=rf"$\bar\alpha$ = {absorption:g}")
+for ax in (left, right):
+    ax.set_xlabel("Distance from source [m]")
+    ax.legend()
+left.set_ylabel("Sound pressure level [dB]")
+plt.show()
+```
+
+</details>
+
 The building blocks are exposed individually, so an emission
 measurement can flow straight into a level prediction:
 
@@ -383,6 +590,43 @@ R = room.room_constant(100.0, 0.2)                     # Bies room constant, 25 
 print(round(float(room.critical_distance(R)), 3))      # 0.705 m (Q = 1)
 print(round(float(room.steady_state_spl(90.0, 5.0, R)), 2))   # level at 5 m, dB
 ```
+
+**$Q$ enters twice, and the second time is a modelling choice.** It always
+concentrates the direct field into $Q/(4\pi r^2)$. Whether it *also* raises the
+radiated power depends on the source's own impedance behaviour (Norton &
+Karczub 2e, Table 4.5), and `steady_state_spl` exposes that as `source_model`.
+A **constant-power** source radiates $\Pi_0$ wherever it stands — the default,
+and the right model for a machine whose output is set by its internal losses. A
+**constant-volume** source is loaded by the reflecting boundaries and radiates
+$\Pi_0 Q$, so a corner adds $10\lg Q$ = 9 dB on top of the directivity
+concentration; that is the conservative upper bound to quote when the source
+type is unknown. A **constant-pressure** source radiates $\Pi_0/Q$, the
+theoretical lower bound.
+
+```python
+# `room` and `R` come from the block above.
+print([round(float(room.steady_state_spl(90.0, 5.0, R, directivity=8.0,
+                                         source_model=model)), 1)
+       for model in room.SOURCE_POWER_MODELS])
+# [82.7, 91.7, 73.7] dB for constant_power / constant_volume / constant_pressure
+```
+
+Eighteen decibels between the bounds, for one corner-mounted machine. The
+standards leave the choice to the engineer, so state which model a predicted
+level assumes in any report that carries it.
+
+**What the reverberant plateau is worth.** Because the plateau is
+$L_W + 10\lg(4/R)$, adding absorption changes it by $10\lg(R_2/R_1)$: doubling
+the room constant buys 3 dB, and a realistic retrofit in a hard workshop buys
+perhaps 5 to 8 dB before the $(1-\bar\alpha)$ denominator saturates the return.
+Two consequences follow. Treating the room only helps receivers **beyond** the
+critical distance, so an operator standing at the machine gains nothing from an
+acoustic ceiling and the fix there is the source, an enclosure or a screen. And
+the flat plateau is an idealisation: in a large or flat industrial space the
+level keeps falling with distance well past the predicted crossover, so this
+model over-predicts the level far from the source, under-predicts the benefit
+of distance, and the crossover is best read as an order-of-magnitude landmark
+rather than a boundary.
 
 Kuttruff's reverberation distance ($r_c = \sqrt{A/16\pi}$ for $Q = 1$) uses the
 Sabine absorption area $A = S\bar\alpha$ rather than the room constant
@@ -397,6 +641,22 @@ transition, a heuristic crossover rather than a sharp cutoff: well below it
 discrete modes dominate and the diffuse assumptions of $R$ and $r_c$ grow
 unreliable, well above it the modes overlap and this statistical picture
 holds. Borderline rooms warrant a band-by-band check.
+
+The constant 2000 is one line of reasoning away from material this page already
+carries. Damping gives each mode a half-power bandwidth of about $2.2/T$ hertz,
+so the modes of a decaying room are overlapping resonances rather than lines;
+the number of them per hertz is the **modal density** derived in §3, which grows
+as the square of frequency, so overlap becomes inevitable above some frequency.
+Ask for roughly three modes inside one bandwidth — set
+$3 \approx (2.2/T)\,(4\pi V f^2/c_0^3)$ — and solving for $f$ gives
+$f_s \approx 2000\sqrt{T/V}$ at $c_0 \approx 343$ m/s. Three things follow. The
+constant encodes a *choice* of how much overlap counts as diffuse, so stricter
+authors quote 4000 for the same physics. A large room reaches the transition at
+a lower frequency purely because it has more modes at every frequency. And the
+transition is soft, so a band straddling $f_s$ should be checked position by
+position rather than trusted. The mode-ladder figure of §3 shows the crossing
+directly: its modal density passes one mode per hertz right around the marked
+Schroeder frequency.
 
 ```python
 from phonometry import room
@@ -546,6 +806,63 @@ why a cubic room is the worst possible listening room and why the ratio tables
 of Bolt and others exist. And modes crowd together as frequency rises, until
 they merge into the continuum the statistical model of §2 assumes.
 
+Degeneracy is a countable thing, not a matter of taste. Three rooms of the same
+105 m³ volume, enumerated up to 200 Hz, hold about the same *number* of modes
+and a completely different number of *frequencies*.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_proportion_modes.svg" alt="Three stacked raster rows of mode ticks up to 200 hertz for three rooms of the same 105 cubic metre volume, coloured by family: a 4.72 metre cube whose ticks pile onto a few frequencies separated by wide empty gaps, a 7.49 by 3.74 by 3.74 metre room slightly better, and a Bolt-ratio room of 3.40 by 4.77 by 6.47 metres whose ticks are strewn almost evenly; a fourth panel below plots the spacing between consecutive distinct frequencies for the three rooms" width="88%" />
+
+*The same volume in three shapes. The 4.72 m cube enumerates 132 modes at only
+**26 distinct frequencies** — a five-fold pile-up — with a 15.0 Hz hole in the
+ladder; the 2:1:1 room manages 36 distinct frequencies out of 129 and an even
+wider 22.9 Hz hole; the Bolt-ratio room 1 : 1.4 : 1.9 gives **121 distinct
+frequencies out of 126** and its largest gap is 9.5 Hz. Piled-up frequencies are
+heard as coloration on those notes, and the gaps between them as notes the room
+swallows. This is what proportion buys, and it costs nothing at design time.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` is the import of the mode block above.
+
+volume = 105.0
+half = (volume / 2.0) ** (1 / 3)
+bolt = (volume / (1.0 * 1.4 * 1.9)) ** (1 / 3)
+shapes = {
+    "cube": (volume ** (1 / 3),) * 3,
+    "2 : 1 : 1": (2 * half, half, half),
+    "Bolt 1 : 1.4 : 1.9": (bolt, 1.4 * bolt, 1.9 * bolt),
+}
+fig, axes = plt.subplots(len(shapes), 1, sharex=True)
+for ax, (name, dims) in zip(axes, shapes.items()):
+    modes = room.room_modes(dims, max_frequency=200.0)
+    freqs = np.asarray(modes.frequencies)
+    ax.vlines(freqs, 0, 1)
+    ax.set_ylabel(f"{name}\n{np.unique(np.round(freqs, 1)).size} distinct")
+axes[-1].set_xlabel("Frequency [Hz]")
+plt.show()
+```
+
+</details>
+
+**Where the pressure is.** The mode shape of $(n_x, n_y, n_z)$ in a rigid box is
+the product of cosines $\cos(n_x\pi x/l_x)\cos(n_y\pi y/l_y)\cos(n_z\pi z/l_z)$,
+and two consequences of that one formula are worth more than the whole
+frequency list. Every mode has a pressure **antinode at every corner**, because
+every cosine is at $\pm 1$ there — which is why a subwoofer and a bass trap both
+belong in a corner, and why a microphone in one over-reads the low bands. And an
+axis whose order is odd has a **node at its midpoint**, so a listening position
+at exactly half a room dimension sits in a null of every odd axial mode on that
+axis; low-frequency measurement positions are kept off the mid-planes for the
+same reason. The source matters as much as the receiver: a source sitting on a
+mode's nodal plane cannot drive that mode at all. What the rigid-wall model
+cannot tell you is how strongly each resonance rings, since that is set by the
+damping it omits — for that, mesh the room and run the
+[2D FDTD solver](/phonometry/simulation/fdtd-simulation/).
+
 ## Validation
 
 The implementations are checked against the closed forms and the source
@@ -584,7 +901,7 @@ and `room.schroeder_frequency`; and Long's *Architectural Acoustics*
 Chapter 8 (the rectangular-room eigenfrequencies of Eq. (8.43) with their
 axial/tangential/oblique classification, and the Morse/Pierce mode count
 and modal density of Eqs. (8.45) and (8.46)) implemented by
-`room.modes`, `room.room_mode_frequency`, `room.room_mode_count` and
+`room.room_modes`, `room.room_mode_frequency`, `room.room_mode_count` and
 `room.room_modal_density`.
 
 **Not covered.** The image-source model captures specular reflections

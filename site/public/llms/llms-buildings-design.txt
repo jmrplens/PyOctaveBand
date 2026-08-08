@@ -45,10 +45,12 @@ detailed model buys is the spectrum behind the single number.
 
 [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/)
 goes one level deeper, to where the element $R$ itself comes from: the mass law
-and the coincidence dip of a single panel, the mass-spring-mass behaviour of a
-double wall, transmission through slits and apertures, plate radiation
-efficiency and point mobilities. It is the physics a catalogue value expresses
-in one number.
+and the coincidence dip of a single panel, the plateau shortcut that estimates
+the whole curve by hand, the coincidence *range* of a corrugated or ribbed sheet,
+the mass-spring-mass behaviour of a double wall and the wall-tie bridge that
+limits a masonry cavity one, transmission through slits and apertures, plate
+radiation efficiency and point mobilities. It is the physics a catalogue value
+expresses in one number.
 
 Two pages here carry the floor half of any design, one measuring and one
 predicting.
@@ -77,15 +79,29 @@ takes that source description, loses part of it to the coupling term the source
 and receiver mobilities set, and carries the rest to a room that may be several
 junctions away.
 
-One bookkeeping note runs through the whole section: the family exists as
-EN 12354:2000 and as ISO 12354:2017, and the two are not interchangeable in
-every clause. The simplified models on
-[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
-follow the 2000 text — including the tabulated flanking correction $K$ that the
-2017 impact part replaced with explicit per-path formulae — while
-[Detailed Per-Band Prediction](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/)
-follows the 2017 text. Check which edition your regulation calls up before
-quoting a correction from either.
+**EN 12354 or ISO 12354?** One bookkeeping note runs through the whole section.
+The prediction family was published by CEN as EN 12354-1 to -6 and later
+reissued by ISO as a second edition, ISO 12354-1:2017 and ISO 12354-2:2017,
+which is not word for word the earlier text: where a formula changed between the
+prints, the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/) records both. Parts
+3 to 6 keep their EN designation in the editions used here. Every guide names
+the edition it was read from — EN 12354-1:2000 and EN 12354-2:2000 for the
+simplified models on
+[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/),
+including the tabulated flanking correction $K$ that the 2017 impact part
+replaced with explicit per-path formulae; ISO 12354-1:2017 and ISO 12354-2:2017
+for the per-band models and the Annex L/G worked examples of
+[Detailed Per-Band Prediction](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/);
+and EN 12354-3:2000 to EN 12354-6:2003 for façades, service equipment and
+enclosed spaces. Check which edition your regulation calls up before quoting a
+clause or a correction from either.
+
+And one caveat both parts print, in Clause 5: the models predict the *measured*
+performance of buildings **assuming good workmanship and high measurement
+accuracy**. A prediction is therefore a statement about a correctly built
+construction, not about the one that will be built; the standard's own advice is
+to vary the uncertain inputs and read the spread in the answer, which
+ISO 12354-1:2017 Annex K systematises into an uncertainty on the result.
 
 Every prediction here starts from measured data that came from somewhere else,
 and the design report has to say where. The element $R$ and $L_n$ come from
@@ -110,9 +126,11 @@ measurement in [Sound insulation](https://jmrplens.github.io/phonometry/building
   junction conversion, the flanking indices per band and the per-path
   contributions behind the rating.
 - [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
-  the mass law and coincidence dip (Sharp), double walls (Bies), slits and
-  apertures (Gomperts, Wilson-Soroka), radiation efficiency
-  (Leppington/Maidanik) and point mobilities (Cremer).
+  the mass law, the plateau shortcut and the coincidence dip of a single panel
+  (Sharp, Norton), the coincidence range of a corrugated or ribbed sheet
+  (Vigran/Heckl), double walls and the wall-tie bridge of a masonry cavity wall
+  (Bies, Hopkins), slits and apertures (Gomperts, Wilson-Soroka), radiation
+  efficiency (Leppington/Maidanik) and point mobilities (Cremer).
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the weighted improvement of a soft floor covering measured on a small
   heavyweight mock-up.

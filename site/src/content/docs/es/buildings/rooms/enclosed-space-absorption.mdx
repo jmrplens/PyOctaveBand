@@ -38,6 +38,20 @@ EN 12354 (los miembros de aislamiento aéreo y de impacto están en
 phonometry implementa el modelo normativo del apartado 4. (El método
 informativo del Anexo D para recintos irregulares queda fuera de alcance.)
 
+Esa pertenencia a la familia es la razón por la que la mayoría de los acústicos
+hace este cálculo. El área de absorción equivalente $A$ no es solo un fin en sí
+misma: es la magnitud que convierte una predicción de aislamiento en una
+predicción valorada. Una predicción produce una diferencia de niveles $D$, y las
+valoraciones solo quedan definidas una vez que se conoce la absorción del recinto
+receptor — $D_{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$ —, mientras que la
+EN 12354-5 necesita esa misma $A$ para convertir la potencia acústica de una
+instalación de servicio en un nivel de sala. La dirección del error importa:
+sobrestimar la absorción del recinto receptor *favorece* el $D_{nT}$ previsto, de
+modo que los mismos datos optimistas de $\alpha_s$ que acortan el tiempo de
+reverberación previsto inflan también la valoración de aislamiento prevista. Por
+eso la norma insiste en que se declare en el informe la procedencia de cada
+coeficiente.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_en12354_6_es.svg" alt="Flujo desde las superficies y objetos de la sala hasta el área de absorción equivalente total A, la fracción de objetos psi, y el tiempo de reverberación T = 55,3/c0 por V por (1 menos psi) entre A" width="82%" loading="eager" />
 
 ## 1. Área de absorción equivalente (apartado 4.3)
@@ -55,12 +69,36 @@ $$
 
 Para objetos duros e irregulares cuya absorción no se mide, se usa una
 estimación empírica a partir del volumen (Fórmula 4):
-$A_{\mathrm{obj}} = V_{\mathrm{obj}}^{2/3}$.
+$A_{\mathrm{obj}} = V_{\mathrm{obj}}^{2/3}$. El exponente es un escalado de
+superficie: el área expuesta de un objeto crece como la potencia dos tercios de
+su volumen, así que la fórmula le atribuye a un objeto duro aproximadamente una
+cara de su cubo envolvente de superficie perfectamente absorbente. Es
+independiente de la frecuencia por construcción, y por eso queda restringida a
+objetos *duros e irregulares* — cualquier cosa blanda, resonante o tabulada
+necesita en su lugar un $A_{\mathrm{obj}}$ medido — y por eso el apartado 4.5
+añade que los objetos solo cuentan cuando son grandes frente a la longitud de
+onda, de modo que lo que mida menos de 1 m puede dejarse fuera normalmente.
+
+La medición de superficies es, en sí misma, la mitad del cálculo que un plano no
+te da hecha. El diagrama de abajo convierte la propia sala del Anexo E de la
+EN 12354-6 en las tres listas de entrada que consumen las fórmulas, para que cada
+número del fragmento que sigue tenga una superficie detrás.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_en12354_6_takeoff_es.svg" alt="Vista seccionada de la sala del Anexo E de EN 12354-6, de 4,54 por 2,73 por 2,40 metros y 29,75 metros cúbicos, con cada cerramiento etiquetado con su área, su material y su coeficiente de absorción: suelo de 12,39 metros cuadrados con 0,05, techo de 12,39 con 0,02, pared larga de 10,90 con 0,04, fachada acristalada de 10,90 con 0,04 y dos paredes cortas de 6,55 con 0,04, cada etiqueta con el color de la fila correspondiente de la lista de superficies impresa junto a la sala; el mobiliario del caso 2 dibujado dentro con sus volúmenes alimentando la lista de objetos y la fracción de objetos 0,072; y un recuadro que muestra una pared partida por una ventana en dos filas cuyas áreas suman la pared" width="92%" />
+
+*La sala del Anexo E a 1 kHz, medida superficie a superficie. Cada fila de la
+lista `surfaces` de abajo es un cerramiento etiquetado; el mobiliario se
+convierte en la lista `objects` mediante la Fórmula 4, y su volumen sumado se
+convierte en $\psi$. El recuadro es la regla que gobierna cualquier sala real:
+una pared con una ventana son dos filas cuyas áreas suman la pared, nunca una
+sola fila con un coeficiente promediado.*
 
 ```python
 from phonometry import room
 
 # EN 12354-6 Anexo E, sala desnuda (29.75 m3), banda de octava de 1000 Hz.
+# Las seis filas son el suelo, el techo, la pared larga, la fachada
+# acristalada y las dos paredes cortas de una sala de 4,54 x 2,73 x 2,40 m.
 surfaces = [(12.39, 0.05), (12.39, 0.02), (10.90, 0.04),
             (10.90, 0.04), (6.55, 0.04), (6.55, 0.04)]
 print(round(room.equivalent_absorption_area(surfaces), 2))  # 2.26  m2
@@ -83,6 +121,18 @@ $$
 donde la velocidad del sonido $c_0 = 345{,}6\ \text{m/s}$ hace que el factor
 $55{,}3/c_0$ sea el familiar $0{,}16$.
 
+El 55,3 es $24\ln 10 = 55{,}262$, la constante que sale del decaimiento en campo
+difuso cuando el recorrido libre medio es $4V/S$ y el decaimiento se extrapola a
+una caída completa de 60 dB (la
+[derivación clásica](/phonometry/es/buildings/rooms/reverberation-prediction/#1-sabine-eyring-y-millington-sette)).
+La Fórmula 5 es, por tanto, la ley de Sabine aplicada al volumen *libre* que
+queda después de que los objetos hayan desplazado su parte, y el $c_0$ inusual de
+la norma es una convención de redondeo más que una afirmación sobre la
+temperatura del aire: 345,6 m/s se elige precisamente para que el cociente sea el
+tradicional 0,16. El residuo es pequeño pero real: para la misma sala esto
+devuelve tiempos un 0,7 % más cortos que `sabine_reverberation_time` con su
+propio $c_0 = 343$ m/s.
+
 ```python
 from phonometry import room
 
@@ -99,6 +149,61 @@ a2 = room.equivalent_absorption_area(surfaces, objects=aobj)
 print(round(a2, 2), round(room.reverberation_time(a2, 29.75, object_fraction=psi), 1))
 # 5.03 0.9
 ```
+
+Los dos números merecen leerse en vez de pasarlos por alto. Una sala desnuda de
+30 m³ con 2,1 s es inservible para el habla — más del triple de cualquier
+objetivo de aula — y seis muebles duros aportan después 2,77 m² de absorción
+frente a los 2,26 m² de las seis superficies de la sala juntas, con lo que
+duplican con creces $A$ y reducen $T$ a la mitad. Casi todo eso viene de la
+absorción propia de los objetos; el término $\psi$ solo aporta el último 7 %,
+como separa el panel derecho de abajo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_objects_es.svg" alt="Panel izquierdo, barras apiladas del área de absorción equivalente por banda de octava de la sala del Anexo E de EN 12354-6 desnuda y amueblada, con la pila repartida en superficies, objetos y aire, y con la capa de objetos dominando las barras de la sala amueblada. Panel derecho, el tiempo de reverberación por banda de octava en tres curvas para la misma sala: desnuda, amueblada con la fracción de objetos puesta a cero, y amueblada con la fracción de objetos real de 0,072, separadas estas dos últimas por una pequeña diferencia constante" width="92%" />
+
+*El par del Anexo E, por banda de octava. Los objetos añaden 2,77 m² planos e
+independientes de la frecuencia (la Fórmula 4 no lleva frecuencia dentro), y por
+eso las barras de la sala amueblada ganan la misma altura absoluta en todas las
+bandas y la mejora relativa es mayor donde la sala ya era más sorda. A la
+derecha, la diferencia entre las dos curvas de la sala amueblada es todo el
+efecto del volumen desplazado: $\psi$ = 0,072 quita el 7,2 % del volumen libre y
+acorta $T$ un 7,2 %, un orden de magnitud menos de lo que hace la absorción de
+los objetos.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es la importación del bloque del Anexo E de arriba.
+
+bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+alpha = {"floor": 0.05, "ceiling": 0.02, "wall": 0.04}   # 1 kHz, fijo por banda
+per_band = [(12.39, [alpha["floor"]] * 7), (12.39, [alpha["ceiling"]] * 7),
+            (10.90, [alpha["wall"]] * 7), (10.90, [alpha["wall"]] * 7),
+            (6.55, [alpha["wall"]] * 7), (6.55, [alpha["wall"]] * 7)]
+volumes = [0.15, 0.60, 0.05, 0.05, 0.65, 0.65]
+bare = room.enclosed_space_reverberation(per_band, 29.75, air_condition="20C_50-70")
+furnished = room.enclosed_space_reverberation(
+    per_band, 29.75, objects=room.hard_object_absorption(volumes),
+    object_fraction=room.object_fraction(volumes, 29.75),
+    air_condition="20C_50-70",
+)
+
+fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.0))
+x = np.arange(len(bands))
+left.bar(x - 0.2, bare.absorption_area, 0.4, label="desnuda")
+left.bar(x + 0.2, furnished.absorption_area, 0.4, label="amueblada")
+left.set_ylabel(r"$A$ [m$^2$]")
+left.legend()
+right.semilogx(bands, bare.reverberation_time, label="desnuda")
+right.semilogx(bands, furnished.reverberation_time, label=r"amueblada, $\psi$ = 0,072")
+right.set_ylabel(r"$T$ [s]")
+right.legend()
+plt.show()
+```
+
+</details>
 
 Por banda de octava, una sola llamada toma las superficies (con coeficientes de
 absorción por banda) y la condición del aire, y devuelve todo el espectro:
@@ -162,6 +267,63 @@ reverberación medido en
 (ISO 3382) y de la absorción en cámara reverberante de
 [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/) (ISO 354).
 
+## 2b. Diseñar hacia un objetivo
+
+La EN 12354-6 existe para dar soporte al diseño, y el diseño recorre las
+fórmulas al revés: de un tiempo de reverberación objetivo al área de absorción
+que la sala debe tener, de ahí al déficit frente a la sala sin tratar, y de ahí
+a la superficie de un producto elegido. Invertir la Fórmula 5 da
+
+$$
+A_{\text{necesaria}} = \frac{55{,}3}{c_0}\,\frac{V\,(1 - \psi)}{T_{\text{objetivo}}}
+\;=\; \frac{0{,}16\,V\,(1-\psi)}{T_{\text{objetivo}}},
+$$
+
+que hay que evaluar **banda a banda**, porque el objetivo suele ser un intervalo
+de 125 Hz a 4 kHz y no un número único. Resta la absorción que la sala sin tratar
+ya tiene para obtener el déficit por banda, divide el déficit por el $\alpha_s$
+por banda del producto candidato para obtener la superficie a instalar, y
+comprueba después que esa superficie cabe de verdad en los paramentos
+disponibles.
+
+```python
+import numpy as np
+# `room`, `plaster` y `tile` vienen del bloque por bandas de arriba.
+
+bare = room.enclosed_space_reverberation(
+    [(54.0, plaster), (20.0, plaster), (20.0, plaster)],
+    volume=60.0, air_condition="20C_50-70",
+)
+required = 0.16 * 60.0 / 0.6                     # 16.0 m2 para un objetivo de 0.6 s
+deficit = required - bare.absorption_area
+print(np.round(deficit, 1))                      # [14.1 13.1 13.  12.  10.9 10.3  8.1]
+print(np.round(deficit / np.array(tile), 0))     # [94. 37. 20. 14. 12. 11.  9.] m2 de placa
+```
+
+La respuesta es la lección de diseño. Por encima de 500 Hz el objetivo necesita
+unos 20 m² de placa, que es exactamente el área del techo, y la sala tratada del
+§2 aterriza en efecto en 0,48 s. A 125 Hz haría falta **94 m²** — todo el
+cerramiento de la sala —, así que el objetivo es sencillamente inalcanzable con
+un producto poroso delgado, que es la regla general: el déficit es mayor a 125 Hz,
+justo donde esos productos son más flojos. Del propio modelo se siguen dos
+consecuencias. Como el nivel reverberante cae con $10\lg A$, duplicar el área de
+absorción solo compra 3 dB, de modo que una sala un segundo por encima del
+objetivo no se rescata con una alfombra. Y como $A$ está en el denominador, los
+primeros metros cuadrados de tratamiento valen mucho más que los últimos: pasar
+de 2 m² a 6 m² de absorción divide el tiempo de reverberación por tres, mientras
+que pasar de 20 m² a 24 m² lo cambia en una sexta parte.
+
+Referencias para el objetivo mismo, ya que la norma no da ninguna: las salas
+críticas para el habla, como aulas y salas de reuniones, suelen situarse entre
+unos 0,4 s y 0,8 s en frecuencias medias según el volumen, y la Tabla 1 de la
+ANSI/ASA S12.60-1:2010 limita las aulas principales desocupadas y amuebladas a
+0,6 s hasta 283 m³ y a 0,7 s de 283 m³ a 566 m³; las oficinas diáfanas, los
+pasillos y las escaleras se especifican por *área de absorción* y no por tiempo
+de reverberación, que es el propio consejo del apartado 4.5 (§3); y los espacios
+para música necesitan tiempos más largos de lo que esta norma pretende cubrir. La
+[guía de predicción clásica](/phonometry/es/buildings/rooms/reverberation-prediction/#a-qué-valor-apuntar)
+recoge las mismas referencias con sus reglas de forma en frecuencia.
+
 ## 3. De dónde salen los datos de entrada
 
 **Coeficientes de superficie.** La norma espera que los $\alpha_{s,i}$
@@ -175,6 +337,31 @@ Un coeficiente de cámara reverberante puede superar 1,0 (la difracción de
 borde dispersa hacia la muestra más energía de la que intercepta su área
 plana); entra en la Fórmula 1 tal como se midió, sin recorte, porque la
 misma convención de campo difuso que lo produjo es la que supone el modelo.
+
+**Nunca la valoración de número único.** La norma admite *solo datos por bandas
+de frecuencia*. La NOTA del apartado 3.2.1 dice de forma explícita que una
+valoración de número único obtenida según la EN ISO 11654 — $\alpha_w$, y por el
+mismo argumento el NRC y el SAA de la práctica norteamericana — puede usarse para
+comparar o especificar productos, pero **no puede usarse directamente para
+calcular las prestaciones in situ**. Esta es la forma más habitual de equivocar
+el cálculo, y ocurre en silencio, porque la API acepta un coeficiente escalar por
+superficie y aplicará sin más a todas las bandas la cifra de portada de una
+hoja de características. Tres propiedades de la valoración hacen que esa sustitución falle
+en una dirección conocida. Es una *curva de referencia desplazada* leída a
+500 Hz, ajustada moviendo la curva en pasos de 0,05 hasta que las desviaciones
+desfavorables sumadas caen a 0,10 o menos, de modo que una banda que rinde de
+menos se absorbe en esa tolerancia en lugar de declararse. Sus entradas, los
+coeficientes prácticos $\alpha_p$, ya vienen redondeadas en pasos de 0,05 y
+limitadas a 1,00. Y su curva de referencia se detiene en la octava de 250 Hz, así
+que la ISO 11654 declara que la valoración **no es apropiada por debajo de esa
+frecuencia** en absoluto: un $\alpha_w$ a secas no lleva ninguna información
+sobre la banda de 125 Hz, que es donde las salas suelen fallar. Compara la placa
+de 20 mm del §2, cuyo $\alpha_s$ va de 0,15 a 125 Hz a 0,85 a 1 kHz, con la única
+cifra «Clase A» que imprimiría su hoja de características. Toma la tabla por tercios de
+octava del informe de ensayo ISO 354 y promedia los tres tercios en cada octava;
+cuando solo se disponga de una valoración, trata la predicción como orientativa y
+dilo en el informe. La valoración en sí está definida en
+[Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
 
 **Mobiliario y ocupantes.** Los objetos contribuyen por tres vías: un área
 de absorción equivalente medida $A_{obj}$ cuando existe (personas y
@@ -199,6 +386,55 @@ y no pueden combinarse con un eje de frecuencias propio;
 para otras frecuencias o condiciones, calcula $m$ según ISO 9613-1 y
 encadena `air_absorption_area` con `equivalent_absorption_area`.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_air_term_es.svg" alt="Panel izquierdo, el área de absorción del aire 4 m V por uno menos psi por banda de octava para los seis perfiles climáticos integrados a un volumen fijo de 2000 metros cúbicos: las seis curvas coinciden a 125 hercios y se abren en abanico por encima de 1 kilohercio, hasta abarcar un factor de casi tres a 8 kilohercios. Panel derecho, el tiempo de reverberación con y sin el término de aire para una oficina de 60 metros cúbicos y una sala grande de 2000 metros cúbicos con la misma absorción media: el par de la sala pequeña se mantiene junto hasta 4 kilohercios, mientras que el de la sala grande se separa desde 1 kilohercio hacia arriba" width="92%" />
+
+*Izquierda: el término de aire de los seis perfiles integrados a un volumen fijo
+de 2000 m³. La Tabla 1 de la EN 12354-6 da los mismos 0,1 × 10⁻³ Np/m a 125 Hz
+para todos los climas, así que ahí las seis curvas son indistinguibles; a 8 kHz
+van de 10,6 a 29,0 × 10⁻³ Np/m, un factor de 2,7, y es el perfil frío y seco el
+que más absorbe. Derecha: el mismo $\bar\alpha$ = 0,15 en dos volúmenes, para ver
+lo que valen los umbrales de la prosa. En la oficina de 60 m³ el término de aire
+cuesta un 1,7 % a 1 kHz y sigue por debajo del 3 % a 2 kHz; en la sala de 2000 m³
+cuesta un 5,1 % a 1 kHz, un 18 % a 4 kHz y un 42 % a 8 kHz. El umbral de volumen
+y el umbral de frecuencia son una sola regla, no dos: el término vale $4mV$
+frente a un término de cerramiento que solo crece con el área.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `room` es la importación del bloque por bandas de arriba.
+
+bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+profiles = ["10C_30-50", "10C_50-70", "10C_70-90",
+            "20C_30-50", "20C_50-70", "20C_70-90"]
+soft = [0.15] * 7
+
+# El término de aire es la diferencia que introduce la cadena air_condition en A.
+fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.0))
+still = room.enclosed_space_reverberation([(1000.0, soft)], 2000.0)
+for name in profiles:
+    humid = room.enclosed_space_reverberation(
+        [(1000.0, soft)], 2000.0, air_condition=name)
+    left.loglog(bands, humid.absorption_area - still.absorption_area,
+                marker="o", label=name)
+left.set_ylabel(r"$A_{air}$ [m$^2$]")
+left.legend(fontsize=8)
+
+for volume, area in ((60.0, 94.0), (2000.0, 1000.0)):
+    for condition in (None, "20C_50-70"):
+        res = room.enclosed_space_reverberation(
+            [(area, soft)], volume, air_condition=condition)
+        right.semilogx(bands, res.reverberation_time,
+                       label=f"{volume:g} m3, aire={condition}")
+right.set_ylabel(r"$T$ [s]")
+right.legend(fontsize=8)
+plt.show()
+```
+
+</details>
+
 **Límites de validez (apartado 4.6).** El modelo supone una sala corriente
 y razonablemente difusa: ninguna dimensión más de 5 veces otra, pares de
 superficies opuestas cuyos coeficientes difieran en menos de un factor 3
@@ -210,6 +446,63 @@ salas de baja difusividad. Las alternativas clásicas para esos casos viven
 en
 [Predicción del tiempo de
 reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/).
+
+Por encima de esos límites numéricos hay dos declaraciones de alcance. El
+apartado 1 dice que el modelo está basado en la experiencia con salas de
+viviendas y oficinas y con espacios comunes como escaleras, pasillos y salas con
+maquinaria, y que **no está pensado para espacios muy grandes o de forma
+irregular, como auditorios, teatros y naves industriales** — para los cuales las
+herramientas adecuadas son las normas de medición de acústica de salas y las
+fórmulas clásicas. Y el apartado 4.1 fija el intervalo normal de cálculo en las
+octavas de 125 Hz a 4 kHz, con una NOTA que deja constancia de que no existe
+información de exactitud fuera de él; la tabla del aire y esta implementación
+llegan hasta 8 kHz, así que trata esa banda como una extrapolación. El Anexo E
+aporta una demostración resuelta de que los límites muerden: su propio caso 3,
+una sola pared revestida en más del 90 % de su superficie, se declara fuera de
+los límites de aplicación del modelo, y el anexo remite el caso al método
+informativo del Anexo D.
+
+**Leer los números (apartado 4.5).** Las interpretaciones de la propia norma
+convierten tres de las magnitudes de esta página en juicios:
+
+- Los objetos de menos de 1 m pueden despreciarse normalmente, porque solo
+  cuentan cuando sus dimensiones superan la longitud de onda.
+- Una sala vacía tiene típicamente $\psi < 0{,}05$ y una amueblada
+  $0{,}05 \leq \psi \leq 0{,}2$, lo que sitúa el valor 0,072 del Anexo E de lleno
+  en el intervalo corriente de sala amueblada. Un $\psi$ muy por encima de esa
+  banda delata una sala de máquinas cuyo espacio libre restante puede que ya no
+  se comporte como un único recinto, lo cual es una cuestión de alcance y no de
+  exactitud.
+- En una escalera, un vestíbulo o una sala de máquinas el tiempo de reverberación
+  es un descriptor pobre y el requisito se escribe mejor como una cantidad de
+  absorción — por eso `equivalent_absorption_area` se expone de forma
+  independiente de `reverberation_time`, y no solo como un paso intermedio.
+
+**Estimar la exactitud (apartado 5).** La norma se niega a declarar una exactitud
+y, en su lugar, da un único consejo práctico: varía los datos de entrada, sobre
+todo en situaciones complicadas y con elementos atípicos, y lee la dispersión
+resultante como la exactitud esperable.
+
+```python
+# `room`, `plaster` y `tile` vienen del bloque por bandas de arriba.
+for factor in (0.8, 1.0, 1.2):                 # el alfa del techo, más o menos un 20 %
+    ceiling = [a * factor for a in tile]
+    res = room.enclosed_space_reverberation(
+        [(54.0, plaster), (20.0, plaster), (20.0, ceiling)],
+        volume=60.0, air_condition="20C_50-70",
+    )
+    print(factor, res.reverberation_time.round(2))
+# 0.8 [2.46 1.22 0.75 0.57 0.52 0.5  0.47]
+# 1.0 [2.13 1.03 0.62 0.48 0.43 0.42 0.4 ]
+# 1.2 [1.88 0.9  0.53 0.41 0.37 0.37 0.35]
+```
+
+Una incertidumbre del ±20 % en el coeficiente de una sola superficie mueve la
+predicción a 1 kHz de 0,48 s a 0,57 s o a 0,41 s — un +19 % y un −15 %,
+asimétricos porque $T$ va como $1/A$ — y de 2,13 s a 2,46 s o a 1,88 s a 125 Hz,
+donde el techo carga con menos del total. Esa dispersión *es* la declaración de
+exactitud que la norma se niega a dar, de modo que un diseño que supere su
+objetivo por menos que eso no lo ha superado de verdad.
 
 ## 4. Informe del recinto (`.report()`)
 
@@ -276,7 +569,43 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de recinto (ReverberationResult.report), la tabla A/T por bandas y el T_mid destacado."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El apartado 4 de la EN 12354-6:2003: el área de absorción acústica
+equivalente total de las Fórmulas 1 a 4 con sus términos de superficies, objetos,
+conjuntos de objetos y aire (`room.equivalent_absorption_area`,
+`room.hard_object_absorption`, `room.object_fraction`,
+`room.air_absorption_area`), el tiempo de reverberación de la Fórmula 5
+(`room.reverberation_time`), la cadena por bandas de octava
+(`room.enclosed_space_reverberation`) y la ficha de una página con `.report()`,
+validados frente a los tres casos resueltos del Anexo E. Las reglas de datos de
+entrada del apartado 4.2, las interpretaciones del apartado 4.5 y los límites del
+apartado 4.6 están en el §3, y la inversión de diseño de la Fórmula 5 en el §2b.
+
+**No cubierto.** El método informativo del Anexo D para recintos irregulares y
+distribución irregular de la absorción, que es adonde la propia norma manda los
+casos que incumplen el apartado 4.6 (incluido su propio caso 3 del Anexo E). Las
+exclusiones de alcance de la norma — espacios muy grandes o de forma irregular,
+como auditorios, teatros y naves industriales — quedan fuera del modelo más que
+fuera de esta implementación. Aquí nada emite un veredicto: la EN 12354-6 da una
+estimación de campo difuso, y un objetivo pasado por `requirement` se dibuja solo
+como línea de referencia.
+
 ## Véase también
 
+- [Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/buildings/rooms/reverberation-prediction/):
+  la familia clásica, y los modelos a los que recurrir cuando fallan los límites
+  del apartado 4.6.
+- [Parámetros acústicos de salas (ISO 3382-1/2)](/phonometry/es/buildings/rooms/room-acoustics/):
+  la contraparte medida del tiempo de reverberación que aquí se predice.
+- [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
+  de dónde salen los $\alpha_s$ (ISO 354) y dónde se define $\alpha_w$
+  (ISO 11654), la valoración que el §3 prohíbe como entrada.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
+  el miembro de la familia que consume la $A$ que aquí se calcula, a través de
+  $D_{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$.
+- [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  los tres casos del Anexo E frente a los que se comprueban estas
+  implementaciones.
 - Referencia de la API: [`room.enclosed_space_absorption`](/phonometry/es/reference/api/rooms/enclosed-space-absorption/).
 - Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la definición de área de absorción equivalente que calcula el procedimiento de EN 12354-6.

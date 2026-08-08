@@ -83,9 +83,9 @@ plt.show()
 ## 1. Acoplamiento y potencia instalada
 
 Solo parte de la potencia característica se inyecta en el elemento soporte; la
-pérdida es el **término de acoplamiento** $D_C$ (siempre positivo), fijado para
-una excitación puntual por la movilidad de la fuente $Y_s$ y la del receptor
-$Y_i$ (Fórmula 19b):
+pérdida es el **término de acoplamiento** $D_C$, fijado para una excitación
+puntual por la movilidad de la fuente $Y_s$ y la del receptor $Y_i$
+(Fórmula 19b):
 
 $$
 D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
@@ -96,6 +96,25 @@ de fuente alta, Fórmula 19c) y a $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ para
 velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añade su
 movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
 potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+
+Los dos límites son utilizables en cuanto las movilidades se diferencian en un
+orden de magnitud aproximadamente: con $|Y_s|/|Y_i| = 10$ la forma de fuente de
+fuerza queda 0,8 dB por debajo del valor exacto de la Fórmula 19b y con 100 queda
+0,1 dB por debajo, mientras que entre esos extremos es la relación de fases la
+que decide la respuesta y hay que evaluar la Fórmula 19b con movilidades
+complejas y no con módulos. Lee las dos idealizaciones en términos físicos: una
+**fuente de fuerza** impone su fuerza haga lo que haga el receptor, así que un
+receptor más rígido simplemente vibra menos y acepta menos potencia, y $D_C$ deja
+de depender del módulo del receptor; una **fuente de velocidad** impone su
+movimiento, así que un receptor más rígido le saca ahora *más* potencia y la
+dependencia se invierte. Una bomba sobre una losa de hormigón es la fuente de
+fuerza de libro; una máquina pesada atornillada rígidamente a un forjado ligero
+de madera es el caso en el que la intuición se da la vuelta, y la zona intermedia
+— una máquina montada cerca de la resonancia de sus apoyos — es donde $D_C$ es
+menor e incluso puede hacerse negativo, porque el numerador $|Y_s + Y_i|^2$ se
+desploma cuando las dos movilidades son comparables y están en oposición de fase.
+La curva exacta toca fondo con las movilidades igualadas, que es la mejor
+transferencia de potencia y, por tanto, el peor aislamiento.
 
 Este $L_{Ws,\mathrm{inst}}$ es el mismo que el de la corrección por movilidad
 del Anexo I de la introducción, alcanzado por otra trayectoria: usa la Fórmula (18b)
@@ -125,9 +144,128 @@ from phonometry import building
 
 # Una fuente casi de fuerza (Y_s >> Y_i) sobre un forjado de hormigón:
 dc = building.coupling_term(2e-4 + 1e-4j, 3e-5 + 1e-5j)
-print(round(float(dc), 2))                                          # ~8.5 dB
-print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # L_Ws instalada
+print(round(float(dc), 2))                                          # 9.86 dB
+print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # 72.1 dB
+
+# Los dos límites, para comparar: aquí |Y_s|/|Y_i| es solo 7, así que la forma
+# de fuente de fuerza ya está a 1.1 dB del valor exacto de la Fórmula 19b.
+print(round(float(building.coupling_term_force_source(2e-4 + 1e-4j, 3e-5 + 1e-5j)), 2))      # 8.72
+print(round(float(building.coupling_term_velocity_source(2e-4 + 1e-4j, 1 / (3e-5 + 1e-5j))), 2))  # -8.27
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coupling_term_regimes_es.svg" alt="Término de acoplamiento frente a la relación de movilidades fuente-receptor: la curva exacta de la Fórmula 19b con sus asíntotas de fuente de fuerza y de fuente de velocidad, el mínimo con las movilidades igualadas, el ejemplo de la bomba marcado, y dos curvas con apoyo elástico que muestran los decibelios que compra un soporte" width="92%" />
+
+*Toda la Fórmula 19b sobre un mismo eje. Muy a la derecha la fuente es una fuente
+de fuerza y $D_C$ sigue a $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$; muy a la izquierda
+es una fuente de velocidad y sigue a $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$; la
+curva exacta se separa de las dos asíntotas dentro de una década alrededor de las
+movilidades igualadas, donde alcanza su mínimo de 6,2 dB — máxima transferencia
+de potencia, mínimo aislamiento. La bomba del fragmento de código está en una
+relación de solo 7,1, que es por lo que sus 9,9 dB exactos quedan 1,1 dB por
+encima del límite de fuente de fuerza. Añadir un apoyo elástico (Fórmula 19e)
+desplaza toda la curva hacia arriba: una movilidad de transferencia de
+$10^{-4}$ m/(N·s) compra 2,7 dB en la relación de la bomba y una de
+$10^{-3}$ compra 13,7 dB, que es el presupuesto de aislamiento de un soporte
+leído directamente en el término de acoplamiento.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `building` es el módulo que importa el fragmento de arriba.
+
+yi = 3e-5 + 1e-5j                     # movilidad del receptor, fija
+ratio = np.logspace(-3.0, 3.0, 400)   # |Y_s| / |Y_i|
+ys = abs(yi) * ratio * (2 + 1j) / abs(2 + 1j)
+
+exact = np.array([float(building.coupling_term(a, yi)) for a in ys])
+force = np.array([float(building.coupling_term_force_source(a, yi)) for a in ys])
+velocity = np.array([float(building.coupling_term_velocity_source(a, 1 / yi))
+                     for a in ys])
+
+fig, ax = plt.subplots()
+ax.semilogx(ratio, exact, label="Fórmula 19b (exacta)")
+ax.semilogx(ratio, force, "--", label="fuente de fuerza (19c)")
+ax.semilogx(ratio, velocity, ":", label="fuente de velocidad (19d)")
+for yk in (1e-4, 1e-3):               # apoyo elástico, Fórmula 19e
+    ax.semilogx(ratio, [float(building.coupling_term(a, yi, transfer_mobility=yk))
+                        for a in ys], label=f"con $Y_k$ = {yk:g} m/(N·s)")
+ax.plot(7.07, 9.86, "o")              # la bomba del fragmento de código
+ax.set(xlabel="Relación de movilidades $|Y_s| / |Y_i|$",
+       ylabel="Término de acoplamiento $D_C$ [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Dónde se fija la máquina es parte de $Y_i$
+
+La movilidad del receptor no es una constante de material del elemento; es una
+propiedad del *punto* al que se atornilla la máquina. El Anexo F.3 de
+EN 12354-5 da tres vías para llegar a ella, en orden decreciente de autoridad.
+
+**Medida.** Movilidades puntuales en los puntos de contacto reales, normales a
+la superficie, conforme a ISO 7626-1 con excitación translacional en un solo
+punto según ISO 7626-2 (se admite la excitación por impacto de ISO 7626-5), en
+banda estrecha y reducidas después a tercios de octava. El receptor **no** debe
+estar cargado dinámicamente mientras se mide su movilidad — una asimetría
+importante con la fuente, que en cambio se aísla o se suspende libremente.
+
+**Calculada, en el centro del panel.** Para una excitación en la zona central de
+un elemento homogéneo grande, la Fórmula (F.4) da el valor de placa infinita,
+real e independiente de la frecuencia,
+$Y_{i,\infty} = 1/(8\sqrt{m'B'}) = (2{,}3\,c_L\rho t^2)^{-1}$, que en la
+biblioteca es `vibration.infinite_plate_mobility(B, m)`. Solo vale *por encima*
+de la resonancia más baja del elemento,
+$f_{11} = (c_0^2/4f_c)(1/l_1^2 + 1/l_2^2)$ (Fórmula F.5); por debajo de $f_{11}$
+la movilidad se vuelve compleja y la fija la rigidez de los apoyos del elemento,
+no su propia masa y rigidez a flexión. Para el forjado de hormigón de 220 mm y
+5,00 m × 4,00 m del edificio resuelto, $f_{11}$ vale 39 Hz, holgadamente por
+debajo del rango, pero para una bancada de hormigón de 1,20 m × 0,80 m del mismo
+espesor vale 781 Hz, justo en medio — así que en elementos pequeños y rígidos la
+forma cerrada es la herramienta equivocada. Los elementos con vigas se dividen
+otra vez (Fórmula F.3.2): por debajo de $f_{11}$ se usa la rigidez a flexión
+efectiva $\sqrt{B'_xB'_y}$; por encima, la excitación entre vigas usa el campo de
+placa y la excitación sobre una viga usa la movilidad de la propia viga.
+
+**Corregida por la posición de fijación.** Cerca de un borde rígido la parte real
+se desploma como
+$\mathrm{Re}\{Y_i\} = \mathrm{Re}\{Y_{i,\infty}\}\,[1 - J_0(2k_Ba)]$
+(Fórmula F.6a, con una forma de esquina F.6b), siendo $a$ la distancia al borde.
+Eso convierte la distancia de fijación en una variable de proyecto y no en un
+detalle: en ese mismo forjado de hormigón, a 63 Hz, atornillar la máquina a
+0,20 m de una pared deja un 6,5 % de la parte real de la movilidad de centro de
+panel — 11,9 dB menos de potencia inyectada — y a 0,50 m deja un 37 %, que valen
+4,3 dB. Acerca una bomba a una unión y alimentará menos al edificio.
+
+```python
+import numpy as np
+from scipy.special import j0
+
+rho, c_l, t = 2200.0, 3800.0, 0.220         # hormigón, 220 mm
+m, b = rho * t, c_l**2 * rho * t**3 / 12.0  # masa por superficie, rigidez a flexión
+y_inf = 1.0 / (8.0 * np.sqrt(m * b))        # Fórmula (F.4), centro de panel
+print(f"{y_inf:.3g}")                       # 1.07e-06 m/(N.s)
+
+f_c = 343.0**2 / (1.8 * c_l * t)            # frecuencia crítica
+f_11 = 343.0**2 / (4 * f_c) * (1 / 5.0**2 + 1 / 4.0**2)
+print(round(f_c, 1), round(f_11, 1))        # 78.2 Hz, 38.6 Hz -> F.4 vale aquí
+
+f, a = 63.0, 0.20                           # a 0.20 m de un borde rígido
+k_b = np.sqrt(2 * np.pi * f) * (m / b) ** 0.25
+print(round(float(1 - j0(2 * k_b * a)), 3))                    # 0.065
+print(round(float(-10 * np.log10(1 - j0(2 * k_b * a))), 1))    # 11.9 dB menos
+```
+
+La movilidad de transferencia $Y_k$ de la Fórmula (19e) no es una magnitud de
+placa en absoluto: es la rigidez dinámica de transferencia del soporte, medida en
+el [banco de ISO 10846](/phonometry/es/vibration/structural/transfer-stiffness/).
+La posición de fijación y la hoja de características del soporte van las dos en el `notes`
+del informe, porque son las dos cosas que hacen reproducible una predicción
+repetida.
 
 ## 2. Transmisión al recinto receptor
 
@@ -143,6 +281,28 @@ término de ajuste y su índice de flancos:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Trayectorias de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda trayectoria recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
 
+El diagrama dibuja el caso simple, con una unión entre el elemento excitado y el
+radiante. En las partes 1 y 2 los dos recintos comparten siempre el elemento
+separador, y el apartado 4.2.4 de ISO 12354-1 dice con todas las letras que el
+modelo describe la transmisión entre recintos *adyacentes*. Los equipamientos
+rompen esa hipótesis a menudo: el propio ejemplo de la cisterna de la norma pone
+el recinto receptor en diagonal por debajo del baño, y una bajante o el hueco de
+un ascensor pueden estar a tres uniones de quien se queja. El Anexo F.1 dice qué
+hacer. $K_{ij}$ deja entonces de ser el invariante de una unión y hay que leerlo
+como algo que cubre la cadena entera: los índices de unión se suman a lo largo de
+la trayectoria (Fórmula F.1), las longitudes de absorción equivalentes de los
+elementos intermedios se pueden tomar numéricamente iguales a sus superficies
+como primera estimación en elementos grandes o bien amortiguados, y un ajuste
+$\Delta K$ cubre las ondas longitudinales y en el plano que la teoría de ondas de
+flexión se pierde — unos 4 dB para dos uniones y 6 dB para tres o más, con el
+$K_{ij}$ encadenado acotado inferiormente cerca de $-5$ dB, que corresponde a
+transmisión estructural total. Dos consecuencias para el dato que aportas aquí:
+un $R_{ij,\mathrm{ref}}$ calculado para una sola unión sobrestima el aislamiento
+de una ruta con varias uniones, y varias rutas distintas suelen unir el mismo par
+de elementos, y cada una hay que contarla como su propia trayectoria o refundirla
+antes en un único $R_{ij,\mathrm{ref}}$ efectivo. Donde las trayectorias se
+multiplican, el Anexo F.1 remite a un modelo SEA completo.
+
 Cada trayectoria de transmisión $i \to j$ da un nivel de presión acústica normalizado a
 partir de la potencia instalada, el término de ajuste estructura-a-aéreo $D_{sa}$,
 el índice de reducción acústica de flancos $R_{ij,\mathrm{ref}}$ (EN 12354-1)
@@ -154,7 +314,34 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-con $S_0 = A_0 = 10\ \text{m}^2$, y las trayectorias se combinan energéticamente (Fórmula 17).
+con $S_0 = A_0 = 10\ \text{m}^2$. Lee los cinco términos en orden, porque cada uno
+deshace una normalización distinta. $L_{Ws,\mathrm{inst},i}$ es la potencia que
+entró realmente en el elemento $i$. $D_{sa,i}$ convierte esa excitación
+estructural en la excitación *aérea* equivalente, para que el término siguiente
+pueda ser una magnitud aérea siquiera. $R_{ij,\mathrm{ref}}$ es ese índice aéreo
+de flancos, definido para un elemento de referencia de $S_0 = 10\ \text{m}^2$.
+$10\lg(S_i/S_0)$ devuelve, por tanto, el elemento real a su sitio: la misma
+potencia inyectada repartida sobre un elemento mayor da una amplitud de vibración
+menor por unidad de superficie, así que un $S_i$ mayor baja el nivel radiado. Y
+$10\lg(A_0/4)$ convierte la potencia radiada en un nivel de presión acústica
+reverberante, a través de la relación de campo difuso $p^2 = 4\rho_0c_0W/A$
+evaluada en el área de absorción de referencia $A_0$. Ese último término es lo
+que significa «normalizado» en esta página: el resultado es el nivel que
+*tendría* el recinto si su área de absorción equivalente fuese de 10 m². Un
+recinto real con más absorción mide menos; las mediciones en campo de
+equipamientos según ISO 16032 suelen ser en cambio *estandarizadas*, referidas a
+un tiempo de reverberación de 0,5 s, y las dos no son intercambiables.
+
+Las trayectorias se combinan después energéticamente, banda a banda (Fórmula 17):
+
+$$
+L_{n,s} = 10\log_{10}\sum_{ij} 10^{L_{n,s,ij}/10}.
+$$
+
+`res.total_level` es esa combinación por bandas y `res.overall_level` la suma de
+ella sobre el espectro. Para la cisterna del Anexo I.3 las cuatro trayectorias
+suman 41,4 dB a 63 Hz y el espectro entero cierra en 29 dB(A) — véase la nota
+sobre la ponderación que hay debajo del fragmento de código.
 
 ### El término de ajuste $D_{sa}$
 
@@ -232,6 +419,37 @@ El `InstalledSourceResult` transporta los niveles por trayectoria, el total por 
 el nivel de potencia instalada y `.overall_level`, y su `.plot()` dibuja toda la
 cascada.
 
+### `overall_level` no es el número que limita un reglamento
+
+`overall_level` es la suma energética simple de los $L_{n,s}$ por banda sobre las
+bandas que hayas dado. **No** está ponderado A, y la magnitud en la que está
+escrita cualquier exigencia nacional de ruido de equipamientos — y la magnitud
+que produce la medición en campo de ISO 16032 — es el número único ponderado A
+$L_{n,s}(A)$. Los dos ejemplos resueltos de EN 12354-5 cierran en uno: 26 dB(A)
+para la bañera de hidromasaje del Anexo I.2 y 29 dB(A) para la cisterna del
+Anexo I.3. La diferencia no es pequeña. Los espectros de equipamientos están
+cargados hacia las bandas bajas, justo donde la ponderación A es más abrupta, así
+que para la cisterna del Anexo I.3 la suma sin ponderar da 44,0 dB frente a los
+29 dB(A) de la norma: quince decibelios de margen que no existen. Pondera los
+niveles de banda antes de sumarlos:
+
+```python
+import numpy as np
+
+# Total por banda de octava del Anexo I.3, y las correcciones de ponderación A
+# para esas frecuencias centrales nominales (ISO 3744 Anexo E Tabla E.2 /
+# IEC 61672-1).
+l_ns = np.array([41.4, 39.6, 30.5, 28.9, 18.5, 4.4])       # de 63 Hz a 2 kHz
+a_corr = np.array([-26.2, -16.1, -8.6, -3.2, 0.0, 1.2])
+print(round(float(10 * np.log10(np.sum(10 ** (0.1 * l_ns)))), 1))            # 44.0 dB
+print(round(float(10 * np.log10(np.sum(10 ** (0.1 * (l_ns + a_corr))))), 1))  # 29.3 dB(A)
+```
+
+Lee un resultado frente a esa escala, no frente al total sin ponderar: 29 dB(A)
+para una cisterna y 26 dB(A) para una bañera de hidromasaje son lo que producen
+los propios ejemplos conformes de la norma, y los límites de vivienda para
+equipamientos suelen andar por los treinta y pocos.
+
 ## 3. El informe de predicción (`.report()`)
 
 Una predicción termina como un *documento*. El `InstalledSourceResult` expone
@@ -255,6 +473,17 @@ transmisión (hasta cinco); en otro caso solo se muestran la potencia instalada
 y el total combinado. `language="es"` genera la ficha en español con comas
 decimales. La franja de base indica las Fórmulas 18a/17 y el aviso de
 predicción.
+
+Dos números del fragmento de código de abajo son de la norma, no inventados:
+`16.2` es el término de acoplamiento de la cisterna del Anexo I.3 en su contacto
+con la pared, y el array `lwc` es el nivel de potencia característico de esa
+cisterna, los 84,4 dB que la
+[página de EN 15657](/phonometry/es/buildings/design/structure-borne-power/)
+deriva a 63 Hz. `requirement` se compara con `overall_level`, así que los 45 dB
+de abajo son un límite de suma de bandas *sin ponderar*; un reglamento enunciado
+en dB(A) hay que comprobarlo, en cambio, contra la suma ponderada A del apartado
+anterior, y frente al espectro de este ejemplo las dos se diferencian en unos
+15 dB.
 
 ```python
 import numpy as np

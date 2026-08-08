@@ -113,18 +113,41 @@ que especializa la misma física al apartado 4 de esa norma.
 phonometry ofrece cinco modelos, ordenados según cuánto tienen en cuenta una
 distribución de absorción **no uniforme**:
 
-| Modelo | Término de absorción en $T = k\,V / (\text{término} + 4mV)$ | Idóneo para |
+| Modelo | Cómo entra la absorción | Idóneo para |
 |:---|:---|:---|
-| **Sabine** | $A = \sum_i S_i\alpha_i$ | absorción baja y uniforme |
-| **Eyring** (Norris-Eyring) | $-S\ln(1-\bar\alpha)$ | absorción fuerte y uniforme |
-| **Millington-Sette** | $-\sum_i S_i\ln(1-\alpha_i)$ | unas pocas superficies muy absorbentes |
+| **Sabine** | término de absorción $A = \sum_i S_i\alpha_i$ | absorción baja y uniforme |
+| **Eyring** (Norris-Eyring) | término de absorción $-S\ln(1-\bar\alpha)$ | absorción fuerte y uniforme |
+| **Millington-Sette** | término de absorción $-\sum_i S_i\ln(1-\alpha_i)$ | unas pocas superficies muy absorbentes |
 | **Fitzroy** | media **aritmética** ponderada por área de tres tiempos de Eyring axiales | salas anisótropas |
 | **Arau-Puchades** | media **geométrica** ponderada por área de los mismos tres | salas anisótropas (recomendado por el autor) |
 
-con la constante de Sabine $k = 24\ln 10 / c_0$ (así $k = 0{,}161$ para
-$c_0 = 343\ \mathrm{m/s}$) y el término de absorción del aire $4mV$.
+Los tres primeros modelos solo se diferencian en el denominador de
+$T = k\,V / (\text{término} + 4mV)$, con la constante de Sabine
+$k = 24\ln 10 / c_0$ (así $k = 0{,}161$ para $c_0 = 343\ \mathrm{m/s}$) y el
+término de absorción del aire $4mV$. Fitzroy y Arau-Puchades funcionan de otra
+manera: calculan tres *tiempos* de Eyring axiales y los combinan, de modo que sus
+entradas son tiempos de reverberación y no pueden sustituirse en ese denominador
+(§2).
+
+La EN 12354-6 fija la misma constante de otra forma. Redondea $24\ln 10$ a 55,3 y
+fija $c_0 = 345{,}6\ \mathrm{m/s}$ para que el factor sea exactamente el
+tradicional 0,16, lo que hace que el
+[modelo de recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/)
+devuelva tiempos de reverberación un 0,7 % más cortos que
+`sabine_reverberation_time` para la misma sala — 0,608 s frente a 0,612 s para la
+sala rectangular de 8 × 5 × 3 m del §1. Es una convención de redondeo, no un
+desacuerdo físico: pasar `speed_of_sound=345.6` a la función clásica deja las dos
+dentro de un 0,07 %, el residuo de redondear $24\ln 10 = 55{,}262$ a 55,3.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/reverberation_models_es.svg" alt="Tiempo de reverberación por banda de octava para una sala con suelo y techo absorbentes pero paredes duras, calculado por cinco modelos" width="82%" loading="eager" />
+
+*Una sala de 10 × 7 × 3,5 m con suelo enmoquetado y techo acústico entre paredes
+de fondo duras, pasada por los cinco modelos. Fitzroy queda bastante por encima
+del resto porque un único par de paredes carga con casi toda la absorción; Sabine
+y Eyring acotan la zona intermedia, y Arau-Puchades templa la sobrepredicción de
+Fitzroy con una media geométrica. Cuando los cinco se separan así, la sala te está
+diciendo que su campo no es difuso (§4): la separación es el diagnóstico, no un
+defecto de una de las fórmulas.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -149,7 +172,99 @@ plt.show()
 
 </details>
 
+## 0. Reunir los datos de entrada
+
+Los cinco modelos consumen dos cosas que un plano no te da directamente: una
+lista de áreas con un coeficiente cada una y — para Fitzroy y Arau-Puchades — un
+coeficiente medio por cada par de paredes opuestas. Casi toda predicción
+equivocada es una medición de superficies equivocada, no una fórmula equivocada,
+así que este paso merece tanto cuidado como la elección de modelo.
+
+**Áreas.** Usa las áreas de contorno *interiores* de la sala, medidas a las
+superficies acabadas, y da a cada material su propia fila: una pared con una
+ventana y una puerta pasa a ser tres filas cuyas áreas suman la pared. El caso 3
+del Anexo E de la EN 12354-6 hace exactamente esto y parte una pared larga de
+10,90 m² en 9,81 m² revestidos con $\alpha_s$ = 0,85 más 1,09 m² desnudos con
+0,04. No promedies a mano un revestimiento con su pared; las fórmulas ya hacen la
+ponderación por áreas, y Millington-Sette la hace de forma no lineal, así que
+promediar antes cambia el resultado.
+
+**Coeficientes.** Son valores de incidencia aleatoria medidos según la ISO 354
+sobre una probeta de 10-12 m² en un montaje declarado, no constantes del material
+([Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/)).
+La profundidad del montaje y la condición del borde los cambian sustancialmente,
+así que un coeficiente declarado para un producto adherido directamente al
+soporte no describe al mismo producto sobre un plenum de 200 mm. La ISO 354
+entrega datos en tercios de octava y un cálculo en bandas de octava toma la media
+aritmética de los tres tercios. La valoración de número único de una hoja de
+datos — $\alpha_w$, NRC, SAA — *no* sustituye a la tabla por bandas (ver la
+[guía de la EN 12354-6](/phonometry/es/buildings/rooms/enclosed-space-absorption/#3-de-dónde-salen-los-datos-de-entrada),
+que enuncia la prohibición de forma normativa). El público y los asientos se
+valoran por metro cuadrado de la superficie de suelo que ocupan, no por persona.
+Reintroducir en Sabine los datos de cámara reverberante es autoconsistente porque
+el coeficiente de la ISO 354 se *define* a través de la fórmula de Sabine, que es
+también la razón de que un coeficiente por encima de 1,0 sea un resultado
+documentado y no un error (§4).
+
+**Medias por par de paredes.** `fitzroy_reverberation_time` y
+`arau_puchades_reverberation_time` toman un coeficiente medio por cada *par
+opuesto*, en el orden $(\bar\alpha_x, \bar\alpha_y, \bar\alpha_z)$, donde
+$\bar\alpha_i$ corresponde al par perpendicular al eje $i$. Cada uno es la media
+ponderada por área sobre las dos superficies del par. En una sala rectangular las
+dos superficies tienen igual área, así que se reduce a su media aritmética — pero
+ya no en cuanto una de ellas queda partida por una ventana o un revestimiento. La
+absorción repartida de forma desigual *dentro* de un mismo par (una pared
+absorbente enfrentada a una dura) queda fuera de los dos modelos aunque el código
+siga devolviendo un número; ese caso pertenece a la lista de fallos del §4.
+
+```python
+# `room` es la importación del bloque de la figura de arriba.
+# Un aula de 9 x 7 x 3 m (V = 189 m3), banda de octava de 1 kHz, medida por material.
+surfaces = [
+    (63.0, 0.05),   # suelo, vinilo sobre hormigón
+    (63.0, 0.70),   # techo, placa acústica de 20 mm
+    (12.0, 0.04),   # pared larga A: acristalamiento
+    (15.0, 0.05),   # pared larga A: yeso alrededor del acristalamiento
+    (2.0, 0.10),    # pared larga B: puerta de madera
+    (25.0, 0.05),   # pared larga B: yeso
+    (21.0, 0.05),   # pared corta, yeso
+    (21.0, 0.05),   # pared corta, yeso
+]
+print(round(room.sabine_reverberation_time(189.0, surfaces), 2))   # 0.59 s
+
+def pair_mean(rows):                       # media ponderada por área de un par
+    area = sum(s for s, _ in rows)
+    return sum(s * a for s, a in rows) / area
+
+means = (pair_mean(surfaces[6:8]),         # par x: las dos paredes cortas
+         pair_mean(surfaces[2:6]),         # par y: las dos paredes largas
+         pair_mean(surfaces[0:2]))         # par z: suelo y techo
+print([round(a, 3) for a in means])                                # [0.05, 0.05, 0.375]
+print(round(room.fitzroy_reverberation_time((9.0, 7.0, 3.0), means), 2))       # 1.33 s
+print(round(room.arau_puchades_reverberation_time((9.0, 7.0, 3.0), means), 2)) # 0.76 s
+```
+
+Una sola medición de superficies, las dos formas de entrada. La separación que
+produce — 0,59 s de Sabine frente a 1,33 s de Fitzroy — no es un fallo: toda la
+absorción de esta sala está sobre un único par de paredes, que es exactamente el
+caso para el que existe el §2 y del que avisa el §4.
+
 ## 1. Sabine, Eyring y Millington-Sette
+
+Todos los modelos de la familia salen de una misma imagen. En un campo difuso un
+rayo recorre un **recorrido libre medio** $4V/S$ entre reflexiones, así que
+alcanza un contorno $cS/4V$ veces por segundo y cede parte de su energía en cada
+una. Toma esa pérdida como $\alpha$ por reflexión y linealízala y obtienes
+**Sabine**: la tasa de decaimiento es proporcional a $\sum_i S_i\alpha_i$, y una
+caída de 60 dB tarda $k V / A$ segundos. Mantén la pérdida como multiplicativa
+— tras $n$ reflexiones la energía ha bajado en $(1-\bar\alpha)^n$ — y el
+logaritmo de ese factor da el $-S\ln(1-\bar\alpha)$ de **Eyring**, que es la razón
+de que Eyring sea siempre el más corto de los dos y de que ambos converjan cuando
+$\bar\alpha \to 0$. Haz esa misma contabilidad superficie a superficie en lugar de
+sobre la media y obtienes **Millington-Sette**, que se derrumba a cero en cuanto
+una superficie absorbe perfectamente, porque un rayo que la alcanza no vuelve. El
+término de aire $4mV$ es esa misma longitud de recorrido aplicada al medio en
+lugar de al contorno.
 
 Los tres modelos estadísticos toman el volumen de la sala y una lista de
 superficies `(área, coeficiente_de_absorción)`. **Sabine** solo es exacto para
@@ -179,9 +294,7 @@ Para una distribución **uniforme**, Eyring y Millington-Sette coinciden, y ambo
 quedan por debajo de Sabine; la sobrestimación de Sabine con absorción alta es
 la razón de ser de Eyring. Cuando $\alpha \to 0$, Eyring se reduce a Sabine. La
 absorción del aire entra en todos los modelos a través del coeficiente de
-atenuación de potencia $m$ (en neper por metro, de la
-[absorción atmosférica](/phonometry/es/environment/propagation/outdoor-propagation/) de
-ISO 9613-1):
+atenuación de potencia (intensidad) $m$, en neper por metro:
 
 ```python
 from phonometry import environment, room
@@ -190,12 +303,32 @@ m = environment.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50
 surfaces = [(40.0, 0.3), (40.0, 0.3), (24.0, 0.3),
             (24.0, 0.3), (15.0, 0.3), (15.0, 0.3)]
 print(round(room.eyring_reverberation_time(120.0, surfaces, air_attenuation=m), 3))
+# 0.337 s, frente a 0.343 s omitiendo el término de aire
 ```
 
+Seis milisegundos sobre un tercio de segundo es la razón de que el término de
+aire suela ignorarse en una sala de este tamaño, y es un argumento de escalado más
+que una regla empírica: $4mV$ crece con el **volumen** mientras que el término de
+contorno crece con el **área**, así que la cuota del aire sube con la dimensión
+lineal de la sala. En esa misma sala de 120 m³ la corrección a 2 kHz es del 1,9 %;
+en un auditorio de 20 000 m³ con $\bar\alpha = 0{,}15$ el tiempo de Eyring a 4 kHz
+baja de 4,31 s a 2,49 s a 20 °C y 50 % de HR — un 42 % — y a 1,52 s si la sala
+está seca, al 20 % de HR. Esa es la segunda mitad del comportamiento: $m$ sube con
+fuerza al subir la frecuencia y baja con la humedad, así que la condición más seca
+es el caso más desfavorable, y un auditorio que mide bien en un verano húmedo
+puede sonar notablemente más brillante en invierno. El coeficiente en sí sale del
+modelo de
+[absorción atmosférica](/phonometry/es/environment/propagation/outdoor-propagation/)
+de la ISO 9613-1, evaluado a la temperatura y la humedad de la propia sala.
+
 Todos los modelos estadísticos suponen además un **campo difuso**, y las
-bajas frecuencias son las primeras en romper esa suposición: por debajo de
-la frecuencia de Schroeder la sala responde como un conjunto de modos
-discretos, no como una mezcla reverberante. La simulación FDTD 2D siguiente
+bajas frecuencias son las primeras en romper esa suposición: por debajo de la
+**frecuencia de Schroeder** $f_s \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s
+— 141 Hz para un aula de 200 m³ con $T$ = 1 s) la sala responde como un conjunto
+de modos discretos, no como una mezcla reverberante.
+`room.schroeder_frequency(T, V)` la calcula, y
+[los modos de una sala rectangular](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular)
+enumeran lo que hay ahí abajo. La simulación FDTD 2D siguiente
 excita una sala rígida de 5 m por 3,5 m exactamente en su modo (2,1) y
 después entre dos modos; el patrón de onda estacionaria que se forma en
 resonancia es lo que Sabine y Eyring no pueden ver.
@@ -221,6 +354,21 @@ $$
 T_{\text{Fitz}} = \sum_i \frac{S_i}{S}\,T_i \quad(\text{aritmética}), \qquad
 T_{\text{Arau}} = \prod_i T_i^{\,S_i/S} \quad(\text{geométrica}).
 $$
+
+Cada $T_i$ tiene una lectura física: es el tiempo de reverberación que *tendría*
+la sala si todos sus contornos absorbieran como el par de paredes del eje $i$, de
+modo que es el decaimiento que experimenta el sonido que rebota predominantemente
+a lo largo de ese eje — por eso la fórmula usa la superficie total $S$ y no $S_i$.
+El peso $S_i/S$ es entonces la fracción de contorno que encauza la energía hacia
+ese eje. Una sala rectangular con suelo y techo blandos entre paredes duras tiene
+por tanto tres tasas de decaimiento coexistiendo, y los dos modelos solo se
+diferencian en cómo las mezclan: Fitzroy las promedia aritméticamente, con lo que
+domina el eje más lento y el resultado sale alto cuando un par es muy reflectante;
+Arau-Puchades las promedia geométricamente, lo que deja que el eje más rápido tire
+del resultado hacia abajo. Los dos suponen una sala rectangular y absorción
+uniforme *dentro* de cada par, así que una sala con una pared absorbente
+enfrentada a una dura del mismo par queda fuera del modelo aunque el código siga
+devolviendo un número (§0).
 
 ```python
 from phonometry import room
@@ -294,7 +442,52 @@ estadísticas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_prediction_es.svg" alt="Diagrama de bloques de la predicción del tiempo de reverberación: una sala de 10 por 7 por 3,5 metros con 245 metros cúbicos, 259 metros cuadrados y una absorción media que sube de 0,21 a 125 hercios a 0,51 a 4 kilohercios alimenta las fórmulas de Sabine y Eyring, cuya tabla por banda de octava va de 0,74 a 0,30 segundos para Sabine y de 0,66 a 0,22 segundos para Eyring, con Eyring entre un 11 y un 29 por ciento más corto; una nota final acota el dominio de validez a un campo difuso, excluyendo las bandas bajo la frecuencia de Schroeder, los volúmenes acoplados y las salas tipo pasillo" width="92%" />
 
+*La misma sala de 245 m³ por Sabine y Eyring solos. Eyring lee un 11 % más corto
+a 125 Hz y un 29 % más corto a 4 kHz, porque su corrección crece con la absorción
+media, que aquí sube de 0,21 a 0,51 a lo largo del espectro. La nota final es el
+dominio que comparten los dos.*
+
 ## 4. Elegir un modelo, y cuándo fallan todos
+
+El único eje en el que discrepan los tres primeros modelos es la absorción media,
+así que merece la pena verlos representados frente a ella antes de leer los
+puntos de abajo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/reverberation_model_absorption_es.svg" alt="Panel superior, tiempo de reverberación en eje logarítmico frente a la absorción media de 0,02 a 0,99 para una sala rectangular de 120 metros cúbicos: las curvas de Sabine, Eyring y Millington-Sette coinciden con absorción baja y se separan por encima de 0,2 aproximadamente, con Sabine aplanándose en un valor finito con absorción total mientras que Eyring y Millington-Sette caen a cero. Panel inferior, la desviación de Eyring y Millington-Sette respecto a Sabine en tanto por ciento, pasando por menos 10 por ciento con una absorción media de 0,2 y por menos 30 por ciento con 0,5" width="88%" />
+
+*Una sala rectangular de 8 × 5 × 3 m con una absorción media uniforme barrida de
+0,02 a 0,99. Por debajo de $\bar\alpha \approx 0{,}1$ los tres coinciden, que es la
+razón de que Sabine haya sobrevivido a un siglo de uso. Eyring y Millington-Sette
+son idénticos para una distribución uniforme y se alejan de Sabine a medida que
+sube la absorción: −10 % con $\bar\alpha$ = 0,2, −28 % con 0,5, −61 % con 0,9. En
+el borde derecho se ve la diferencia estructural: Sabine sigue prediciendo unos
+finitos 0,12 s para una sala con una abertura en todas las direcciones, mientras
+que los modelos logarítmicos llegan a cero.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# `room` y `plt` son las importaciones del bloque de la figura del principio.
+import numpy as np
+
+alpha = np.linspace(0.02, 0.99, 200)
+volume, area = 120.0, 158.0
+sab = np.array([room.sabine_reverberation_time(volume, [(area, a)]) for a in alpha])
+eyr = np.array([room.eyring_reverberation_time(volume, [(area, a)]) for a in alpha])
+
+fig, (top, bottom) = plt.subplots(2, 1, sharex=True)
+top.semilogy(alpha, sab, label="Sabine")
+top.semilogy(alpha, eyr, "--", label="Eyring")
+top.set_ylabel("T [s]")
+top.legend()
+bottom.plot(alpha, 100.0 * (eyr / sab - 1.0))
+bottom.set_xlabel(r"Absorción media $\bar\alpha$")
+bottom.set_ylabel("Desviación respecto a Sabine [%]")
+plt.show()
+```
+
+</details>
 
 Las cinco fórmulas no compiten en un único eje de precisión; cada una tiene
 su dominio de validez:
@@ -317,39 +510,52 @@ su dominio de validez:
   duras mejor que una única media, pero está pensado para coeficientes
   medidos por debajo de la unidad: una sola superficie con $\alpha_i = 1$
   lleva toda la predicción a cero. Los coeficientes de cámara reverberante
-  iguales o superiores a 1,0 (un resultado documentado de ISO 354, ver la
-  sección de absorción de
-  [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)) quedan fuera
-  del dominio del término logarítmico, así que phonometry aplica a cada
-  fórmula su propio dominio: Sabine acepta esos coeficientes tal cual (su
-  $A = \sum_i S_i\alpha_i$ lineal sigue siendo finita); Eyring los acepta
-  siempre que la media que entra en $\ln(1-\bar\alpha)$ quede por debajo
-  de 1 (Fitzroy y Arau-Puchades toman como entrada las propias medias de
-  cada par de paredes, así que cada una debe estar ya por debajo de 1);
-  Millington-Sette rechaza cualquier coeficiente igual o superior a 1. Para usar Millington de
-  todos modos, llevar un coeficiente así a $[0, 1)$ es una decisión de
-  modelado que la fórmula no prescribe: el ajuste que elijas (es habitual
-  limitarlo justo por debajo de 1) debe registrarse junto a la predicción.
+  iguales o superiores a 1,0 son un resultado documentado de la ISO 354 — la
+  difracción de borde dispersa hacia la probeta más energía de la que intercepta
+  su área plana, ver
+  [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/)
+  — y quedan fuera del dominio del término logarítmico. Para usar
+  Millington-Sette de todos modos hay que llevar el coeficiente a $[0, 1)$, y esa
+  es una decisión de modelado que la fórmula no prescribe: el ajuste que elijas
+  (es habitual limitarlo justo por debajo de 1) debe registrarse junto a la
+  predicción.
 - **Fitzroy** y **Arau-Puchades** apuntan a salas rectangulares con la
   absorción concentrada en un eje, la oficina o vivienda típica con suelo y
   techo blandos entre paredes duras. La media geométrica de Arau templa la
   conocida sobrepredicción de Fitzroy cuando un par de paredes es muy
   reflectante.
 
+**Qué acepta cada modelo.** phonometry aplica a cada fórmula su propio dominio,
+así que un coeficiente fuera de dominio lanza un `ValueError` en lugar de
+devolver un número sin sentido:
+
+| Modelo | Acepta | Por qué |
+|:---|:---|:---|
+| Sabine | cualquier $\alpha_i \geq 0$, incluso por encima de 1 | la suma lineal $\sum_i S_i\alpha_i$ sigue siendo finita |
+| Eyring | $\alpha_i$ individuales por encima de 1, siempre que $\bar\alpha < 1$ | en $\ln(1-\bar\alpha)$ solo entra la media |
+| Millington-Sette | todos los $\alpha_i < 1$ | su $\ln(1-\alpha_i)$ por superficie diverge en 1 |
+| Fitzroy | cada media de par de paredes $< 1$ | las medias son la entrada, y cada una entra en un logaritmo |
+| Arau-Puchades | cada media de par de paredes $< 1$ | igual |
+
+Los cinco rechazan de plano un coeficiente por encima de 2,0, por entender que es
+un porcentaje pasado como fracción: los valores medidos según la ISO 354 no
+superan aproximadamente 1,2.
+
 **Cuándo fallan todas las fórmulas.** Las cinco heredan la misma hipótesis:
 un campo difuso, con sonido llegando por igual desde todas las direcciones
 en todos los puntos, que permanece difuso mientras decae. Las rupturas
 habituales:
 
-- **Por debajo de la frecuencia de Schroeder** la banda contiene un puñado
+- [**Por debajo de la frecuencia de Schroeder**](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular)
+  la banda contiene un puñado
   de modos discretos (la animación del §1) y un tiempo de reverberación
   estadístico ni siquiera está definido; cada modo decae a su propio ritmo,
   fijado por las impedancias de las paredes que realmente toca.
 - **Los volúmenes acoplados** (una sala con la caja escénica abierta, dos
   recintos a través de una puerta) producen decaimientos de doble
   pendiente; no existe un único $T$, y los T20 y T30 medidos discrepan (el
-  diagnóstico de curvatura de
-  [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)).
+  [diagnóstico de curvatura](/phonometry/es/buildings/rooms/room-acoustics/#leer-edt-t20-y-t30-unos-frente-a-otros)
+  de la guía de parámetros de sala).
 - **Las salas desproporcionadas** (pasillos, salas bajas y extensas) con la
   absorción en un solo par de superficies mantienen un campo rasante
   paralelo a las superficies duras que el absorbente apenas toca; el tiempo
@@ -389,6 +595,42 @@ En la práctica, indica un *abanico* de predicciones (Sabine y
 Eyring, o Fitzroy y Arau-Puchades en los casos axiales) en lugar de un
 único valor; donde los modelos se separan, la sala está diciendo que su
 campo no es difuso.
+
+### A qué valor apuntar
+
+Una predicción solo sirve frente a un objetivo, y un requisito de tiempo de
+reverberación es un **intervalo a lo largo de las bandas de octava**, no un único
+límite superior — que es la razón de que la ficha del §5 imprima el objetivo como
+línea de referencia y no emita ningún veredicto. Referencias que conviene llevar
+encima:
+
+- Las **salas críticas para el habla** (aulas, salas de reuniones, salas de
+  conferencias) se sitúan aproximadamente entre 0,4 s y 0,8 s en frecuencias
+  medias, y se ajustan más cuanto más pequeña es la sala. La Tabla 1 de la
+  ANSI/ASA S12.60-1:2010 es la versión más estricta de uso extendido: para aulas
+  principales desocupadas y amuebladas limita la media de las octavas de 500 Hz,
+  1 kHz y 2 kHz a **0,6 s** hasta 283 m³ y a **0,7 s** de 283 m³ a 566 m³, sin
+  requisito por encima de ese volumen, y pide además que las salas más pequeñas
+  puedan adaptarse hasta 0,3 s.
+- Las **oficinas diáfanas, los pasillos y las escaleras** se especifican por *área*
+  de absorción y no por tiempo de reverberación, porque su campo está demasiado
+  lejos de ser difuso para que un único $T$ lo describa (este es el propio consejo
+  del apartado 4.5 de la EN 12354-6, y las magnitudes de la ISO 3382-3 de
+  [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/)
+  sustituyen por completo a $T$).
+- Los **espacios de ensayo e interpretación musical** necesitan más de 1 s y
+  suben con el volumen; la Tabla A.1 de la ISO 3382-1 da de 1,0 s a 3,0 s como
+  intervalo típico de EDT de salas de conciertos y polivalentes desocupadas de
+  hasta 25 000 m³.
+
+Con los números van dos reglas de forma. El objetivo se lee normalmente en las
+octavas de 500 Hz y 1 kHz, y la meta a lo largo de la frecuencia es un espectro
+**plano**: una subida en baja frecuencia de más de un 20 % aproximadamente sobre
+el valor de frecuencias medias es lo que hace que una sala tratada suene retumbante
+aunque cumpla a 500 Hz, y una subida de ese tamaño se tolera en espacios musicales
+pero no en aulas. Y como la banda de predicción suele ser del 20 al 30 % de ancho
+— el aula del §0 va de 0,59 s a 1,33 s —, un diseño que solo cumple su objetivo
+por los pelos con el modelo más favorable no tiene margen ninguno.
 
 ## 5. Informe de predicción (`.report()`)
 
@@ -475,5 +717,15 @@ de una predicción estadística.
 
 ## Véase también
 
+- [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
+  la medición ISO 354 de la que sale cada $\alpha_s$ de esta página, su
+  dependencia del montaje y la valoración ISO 11654 que *no* debe sustituir a la
+  tabla por bandas (§0).
+- [Parámetros acústicos de salas (ISO 3382-1/2)](/phonometry/es/buildings/rooms/room-acoustics/#cuánto-rango-de-decaimiento-permite-el-suelo-de-ruido):
+  la contraparte medida, y el diagnóstico de curvatura que avisa de que la
+  hipótesis de campo difuso de una predicción ha fallado.
+- [Modos de una sala rectangular](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular):
+  qué hay por debajo de la frecuencia de Schroeder, donde no se aplica ninguna de
+  estas cinco fórmulas.
 - Referencia de la API: [`room.reverberation_prediction`](/phonometry/es/reference/api/rooms/reverberation-prediction/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).
 - Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la hipótesis de campo difuso que supone toda fórmula de la familia Sabine, y dónde deja de cumplirse.

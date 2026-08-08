@@ -1,6 +1,6 @@
 ---
 title: "Room-noise criteria (NC / RC Mark II)"
-description: "The ANSI/ASA S12.2-2019 room-noise ratings: the Noise Criteria (NC) rating over the Table 1 curves (NC-(SIL) designation with the tangency method when exceeded), and the Room Criteria Mark II (RC) rating with its rumble/hiss/neutral spectral tag (Annex D)."
+description: "The ANSI/ASA S12.2-2019 room-noise ratings: the Noise Criteria (NC) rating over the Table 1 curves (the NC-(SIL) designation, falling back to the tangency method when a band rises above that curve), and the Room Criteria Mark II (RC) rating with its rumble/hiss/neutral spectral tag (Annex D)."
 references:
   - type: article
     authors: ["Beranek, L. L."]
@@ -53,7 +53,85 @@ levels over the ten bands from 16 Hz to 8000 Hz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise.svg" alt="The two ANSI S12.2 rating methods from one octave-band spectrum: on the left the NC tangency method (from the Table 1 curves, the NC value in each band, then NC equals the highest curve touched, giving NC-NN with a governing band); on the right the RC Mark II method (the mid-frequency average LMF of the 500, 1000 and 2000 Hz levels rounded to give RC-NN, then the spectral tag R for rumble, H for hiss or N for neutral by the clause D.3 deviation rules)" width="94%" loading="eager" />
 
+## 0. Measuring the spectrum
+
+Both ratings consume ten numbers, and the standard is specific about how those
+ten numbers are obtained. Clause 5.2.5 (repeated at 5.1.2 for the A-weighted
+criteria) fixes the instrument, the height and the clearances.
+
+**The instrument and the quantity.** The measured quantity is
+$L_{\mathrm{EQ}}$ per octave band, taken with an **integrating-averaging**
+meter — not a needle read by eye. Clause 5.1.1 sets the floor for the
+A-weighted criteria at a meter meeting at least the **class 2** requirements
+of ANSI/ASA S1.4 Part 3 / IEC 61672-3; use a class 1 chain when the result
+will be argued over. There are two admissible geometries: characterise a
+**specific position**, in which case the microphone stands at that position,
+or characterise the **whole space**, in which case the microphone is swept
+slowly around it at **not more than 0.5 m/s for not less than 20 s**.
+
+**Where the microphone goes.** At the occupants' ear height —
+**1.6 m** standing and **1.2 m** seated for adults, **1.1 m** and **0.75 m**
+for children — and no closer than **0.6 m** to any reflecting surface,
+**1.2 m** to the intersection of two, or **2.4 m** to the intersection of
+three. The standoff rule is the one that bites in a small room: a microphone
+tucked into a corner sees pressure doubling in the low bands and can add
+several decibels below 250 Hz, which is enough to fabricate a rumble tag or
+to move the NC governing band.
+
+**The operating condition.** The room is measured **unoccupied**, with the
+services running at their **design condition**, not with the plant at part
+load; the informative criteria of Annex C and Annex D are written for that
+state, with human activity excluded. Intermittent events (a door, a printer,
+a passing vehicle) are excluded from the integration or reported separately.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_setup.svg" alt="Section through a 6.0 by 2.7 m office served from a ceiling plenum: the supply duct and diffuser above the ceiling and the air handler beyond the wall at its design condition, a seated occupant, the measurement microphone dimensioned 1.2 m above the floor with the 1.6 m standing height ghosted on the same stand, the 0.6 m, 1.2 m and 2.4 m microphone exclusion zones drawn against one surface, a two-surface edge and the trihedral corner, the alternative slow scan path at 0.5 metres per second for at least 20 seconds, and the clause 5.3.2 screening test that decides whether a single spectrum may be rated at all" width="94%" />
+
+:::caution[The two lowest octaves are the fragile ones]
+The standard's own NOTE to 5.2.5 records what makes 16 Hz and 31.5 Hz
+awkward: at those wavelengths "pressure doubling may occur well beyond the
+standoff distances given above", so a scan of a large space can come back
+biased high; and "the lower the frequency, the narrower the bandwidth, and
+hence, the greater the temporal fluctuation", so a short integration in a
+16 Hz octave — only about 11 Hz wide — scatters. Use instrumentation with a
+genuine response below 20 Hz, fit a windscreen even indoors, integrate for
+long enough, and if the lowest bands are still suspect, report from 31.5 Hz
+and say so. Both bands are load-bearing here: the RC tag and the NC
+out-of-range label are read from them.
+:::
+
+The octave-band arithmetic behind the input spectrum — filters, weighting,
+energetic averaging — is in
+[Levels](/phonometry/signals/levels/levels/) and
+[Filter Banks](/phonometry/signals/filters/filter-banks/).
+
 ## 1. Noise Criteria: SIL designation and tangency
+
+### Before you rate: is the noise steady?
+
+:::caution
+Both single-spectrum ratings assume a **steady** sound field, and clause 5.3.2
+makes that a test rather than an assumption. Screen the field for **surging**
+and for **large random fluctuations** *before* computing either rating:
+
+- **Surging** (5.3.2.1) is screened aurally and/or visually, watching the
+  16, 31.5 and 63 Hz octave bands with the meter set to **fast** response
+  and **Z** ("flat") weighting.
+- **Large random fluctuations** (5.3.2.2) are screened from the differences
+  $L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ and $L_{10} - L_{\mathrm{EQ}}$ in the
+  16, 31.5, 63 and 125 Hz bands, again on fast, against Table 3:
+
+  | Difference | Combined 16, 31.5 and 63 Hz | 125 Hz |
+  | :--- | ---: | ---: |
+  | $L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ | 7 dB | 6 dB |
+  | $L_{10} - L_{\mathrm{EQ}}$ | 3.5 dB | 3 dB |
+
+Exceed any of those and large random fluctuations are indicated. A field that
+fails either screen belongs to the **RNC** method of clause 5.3, which needs a
+time series rather than a single spectrum and which this module does not
+implement — so `noise_criterion` and `room_criterion` would return a number
+that is not the standard's answer for that room. Both functions assume the
+screen has passed.
+:::
 
 The **NC curves** (ANSI/ASA S12.2-2019 Table 1) are a family of octave-band
 limits, each designated by its value at 1000 Hz (NC-15 up to NC-70). Clause
@@ -98,17 +176,47 @@ NC-15 curve) therefore gets `rating = nan` and an `out_of_range` flag of
 with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 `NC-14` style numbers are ever fabricated.
 
+### Reading the low-frequency excess
+
+The tangency rating stops at "which band?", but clause 5.2.4 goes one step
+further and asks "by how much, and does it matter?". The procedure is four
+steps, in the standard's order: compute the SIL; select the NC criterion
+curve **with the same number** as the SIL; plot the measured spectrum against
+that curve; and read the differences in the octave bands **below 500 Hz**
+against Table 2.
+
+| Deviation above the NC-(SIL) curve | 31.5 Hz | 63 Hz | 125 Hz | 250 Hz |
+| :--- | :---: | :---: | :---: | :---: |
+| Possible serious dissatisfaction | — | 6–9 dB | 6–9 dB | 6–9 dB |
+| Likely serious dissatisfaction | — | > 9 dB | > 9 dB | > 9 dB |
+
+The 31.5 Hz column is blank in the standard because there were not enough
+data to quantify it. That is worth knowing, because these bands are not a
+model: they come from *measured* spectra in offices, lecture halls and
+meeting rooms where the low-frequency noise had already been severe enough to
+require remedial work on the HVAC system. So the procedure is diagnostic, not
+pass/fail: more than 9 dB over the curve in any one of the 63, 125 or 250 Hz
+bands means complaints strong enough to require remedial action are *likely*.
+The table's footnote adds the other half of the story — in some of those same
+rooms the 31.5 Hz levels were high enough to indicate clearly perceptible
+vibration and rattle, which is the condition behind the $RV$ tag this module
+does not implement.
+
+Everything the procedure needs is already on the result: `nc.sil` selects the
+curve, `nc.levels` carries the measured spectrum, and `verbose=True` on the
+fiche (section 4) prints the per-band NC contour the tangency method read.
+
 ## 2. Room Criteria Mark II: rating and spectral tag
 
 The **RC Mark II** curves (ANSI/ASA S12.2-2019 Annex D, Table D.1) have a
 constant slope of **−5 dB/octave**, keyed to their value at 1000 Hz, with the
 16 Hz level equal to the 31.5 Hz level and a low-frequency floor of 55 dB.
-The numerical rating is the **mid-frequency average** $\text{LMF}$, the mean of
+The numerical rating is the **mid-frequency average** $L_\text{MF}$, the mean of
 the 500, 1000 and 2000 Hz levels, rounded to the nearest decibel (clause D.4):
 
 $$
-\text{LMF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
-\qquad \text{RC} = \operatorname{round}(\text{LMF}).
+L_\text{MF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
+\qquad \text{RC} = \operatorname{round}(L_\text{MF}).
 $$
 
 A **spectral tag** then describes the *character* of the noise by how the
@@ -116,6 +224,23 @@ spectrum deviates from the reference RC curve (clause D.3): **rumble** ($R$)
 when a band at or below 500 Hz exceeds the curve by more than 5 dB, **hiss**
 ($H$) when a band at or above 1000 Hz exceeds it by more than 3 dB, and
 **neutral** ($N$) when neither happens.
+
+None of those four shape rules is arbitrary. The **−5 dB per octave** slope is
+the balance point at which a broadband ventilation background is heard as
+bland rather than boomy or hissy — close enough to the ear's own falling
+sensitivity that the spectrum carries no timbre of its own, which is why
+Annex D was derived from 68 offices where nobody complained. The **55 dB
+floor** on the low RC numbers exists because below it the question stops being
+audibility and becomes perceptible **vibration and rattle** in lightweight
+walls, ceilings and ductwork: that region is what the $RV$ tag and its
+separate Table 6 test address, and it is the same effect the Table 2 footnote
+recorded at 31.5 Hz. The **asymmetric tolerances** follow from where the
+excess sits: a low-frequency excess is spread over the four bands at and below
+500 Hz and is tolerated to 5 dB before it colours the sound, whereas a
+high-frequency excess at or above 1 kHz lands squarely in the speech range and
+is objectionable at 3 dB. The tag is computed only over the bands actually
+supplied, which is why a spectrum missing bands still rates but emits a
+`UserWarning`.
 
 ```python
 import numpy as np
@@ -128,13 +253,30 @@ print(rc.label)             # RC-35(R)   -  a rumbly room
 print(round(rc.lmf, 1))     # 35.3
 print(rc.classification)    # R
 rc.plot()   # the spectrum over the RC reference (right panel below)
+
+# The whole Table D.1 family is one call away, so a design target exists
+# before any spectrum does: rc_curve(index) returns the octave-band levels
+# of a named RC curve over the same 16 Hz - 8 kHz bands.
+target = room.rc_curve(35.0)
+print(target.round(1))      # [60. 60. 55. 50. 45. 40. 35. 30. 25. 20.]
+print((spl - target).round(1))   # [ 2.  2.  4.  7.  7.  2.  0. -1. -1. -1.]
 ```
+
+That last line is the number a specification is written against: band by band,
+how far the room sits above or below "RC-35(N)". `rc_curve` accepts any index,
+while Table D.1 tabulates RC-25 to RC-50 only — which is what
+`RCResult.out_of_family` flags.
 
 The strong low-frequency content of this spectrum lifts the 63–250 Hz bands
 well above the reference curve, so the noise is tagged $R$ (rumble): the
 subjective "throb" of an oversized air handler.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (plus 5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (plus 3 dB at and above 1000 Hz) shaded for comparison" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the RC Mark II family drawn from RC-25 to RC-50, showing the constant minus 5 dB per octave slope running into the flat 55 dB low-frequency floor, with the reference RC-35 curve highlighted, the low-frequency bands rising through the shaded rumble tolerance (plus 5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (plus 3 dB at and above 1000 Hz) shaded for comparison" width="96%" />
+
+*The same ten numbers read two ways. Left, the Table 1 NC family with the
+250 Hz tangency that sets NC-42.5; right, the Table D.1 RC family, whose
+−5 dB/octave lines flatten onto the 55 dB floor at 16 and 31.5 Hz, with the
+measured spectrum breaking the +5 dB rumble tolerance of its RC-35 reference.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -151,7 +293,10 @@ room.noise_criterion(spl).plot()
 room.room_criterion(spl).plot()
 plt.show()
 
-# By hand, mirroring what NCResult.plot() / RCResult.plot() draw:
+# By hand, mirroring what NCResult.plot() / RCResult.plot() draw. Either
+# family can also be built one curve at a time from the public helpers
+# room.nc_curve(index) and room.rc_curve(index), which is what the RC panel
+# below does; OCTAVE_BANDS is re-exported at the top level as well.
 from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -163,6 +308,8 @@ gov = spl[OCTAVE_BANDS == nc.governing_frequency][0]
 ax1.plot([nc.governing_frequency], [gov], "D", color="#d62728")
 ax1.set_xscale("log"); ax1.set_title(f"NC-{nc.rating:g}")
 
+for idx in range(25, 51, 5):        # the Table D.1 family, RC-25 to RC-50
+    ax2.plot(OCTAVE_BANDS, room.rc_curve(float(idx)), color="#bbbbbb", lw=0.8)
 ref = rc.reference_curve
 low, high = OCTAVE_BANDS <= 500, OCTAVE_BANDS >= 1000
 ax2.plot(OCTAVE_BANDS, ref, "s--", color="#7f7f7f", label=f"Reference RC-{rc.rating}")
@@ -189,16 +336,101 @@ least the 31.5 Hz to 4000 Hz octave bands: a spectrum missing any of them
 still rates, but emits a `UserWarning` because the absent bands are skipped
 by the tag deviation tests.
 
-The balanced noise criteria (NCB), the room noise criterion for fluctuating
-low-frequency noise (RNC, which needs a time series rather than a single
-spectrum), the vibration/rattle tag ($RV$, which needs the Table 6 test) and
-the numeric quality-assessment index (QAI, which the standard defers to
-external references) are not part of this module.
-
 ## 3. Choosing a criterion: NC, RC Mark II or NR
 
-The two ratings answer different questions, and a third family exists that
-this module deliberately does not implement:
+### What rating a room should meet
+
+A rating on its own is not an answer, and the standard knows it: S12.2 pairs
+each method with an informative table of recommended criteria by occupancy —
+an A-weighted table (Annex C, Table C.1), an NC/RNC table (Annex C, Table C.2,
+which clause 5.2.6 points at) and an RC Mark II table (Annex D, Table D.2). A
+specification normally cites one of them, or a national equivalent. Anchors
+from the NC/RNC table:
+
+| Occupancy | Recommended NC / RNC |
+| :--- | :---: |
+| Concert halls, opera houses, recital halls | 15–18 |
+| TV and broadcast studios (close pickup) | 15–25 |
+| Large auditoriums and drama theatres (> 500 seats) | 20–25 |
+| Small auditoriums (≤ 500 seats) | 25–30 |
+| Bedrooms | 25–30 |
+| Lecture and classrooms, core learning space ≤ 566 m³ | 25–30 |
+| Lecture and classrooms, core learning space > 566 m³ | 30–35 |
+| Apartments, family and living rooms | 30–40 |
+| Hotel individual rooms or suites | 30–35 |
+| Open-plan office areas | 35–40 |
+| Hotel service support areas | 40–50 |
+
+These are **informative** and **unoccupied** values, with the noise of human
+activity excluded, and the RC table adds `(N)` to every entry — only a neutral
+spectrum should normally be accepted as a specification (clause D.3.1). Read
+them as ranges: a rating inside the range complies, and the governing band
+tells you where the margin is thinnest. They are also written for **steady**
+noise, so an intermittent source is assessed separately and — per the screen
+at the head of section 1 — a fluctuating or surging one is not assessed by
+these methods at all.
+
+### The two numbers are not on the same scale
+
+The spectrum of section 1 rates **NC-42.5** and the same spectrum in section 2
+rates **RC-35**. Nothing went wrong: they are different scales and must never
+be substituted for one another. NC by tangency is set by the single worst
+band wherever it falls — here the 250 Hz rumble — while the RC number is the
+arithmetic mean of the 500, 1000 and 2000 Hz levels and ignores everything
+else in its numeric part, moving the character of the spectrum into the tag
+instead. A rumbly spectrum therefore always rates worse on NC than on RC, and
+the size of the NC-minus-RC gap is itself a measure of the imbalance; a room
+where the two agree closely already follows the criterion shape. The
+specification rule follows: rate against whichever family the specification
+cites, report both when the client wants a diagnosis, and never claim
+compliance with an NC limit using an RC value, or the reverse.
+
+The corollary is the one worth carrying away. Two rooms can share an NC rating
+and sound nothing alike:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nc_blind_spot.svg" alt="Two octave-band spectra that both rate NC-40. Left panel: over the NC curve family, a duct-rumble spectrum touching the NC-40 curve at 125 Hz and a diffuser-hiss spectrum touching the same curve at 4000 Hz, with one rating printed for both. Right panel: the same two spectra as deviations from their own RC Mark II reference curves, against the clause D.3 step threshold of plus 5 dB at and below 500 Hz and plus 3 dB at and above 1000 Hz, so the rumble spectrum breaks the threshold at low frequency and is tagged RC-34(R) while the hiss spectrum breaks it at high frequency and is tagged RC-36(H)" width="96%" />
+
+*Both rooms are NC-40, and the tangency method has nothing left to say about
+the difference. The right panel plots each spectrum against its **own** RC
+reference curve: the duct-rumble room runs 7–8 dB over it below 250 Hz, the
+diffuser room 12–13 dB over it above 2 kHz, and the D.3 threshold turns that
+into one letter — RC-34(R) against RC-36(H).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` is the import of the section 1 snippet above.
+
+bands = np.array([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rumbly = np.array([66.0, 64.0, 62.0, 56.0, 48.0, 40.0, 34.0, 28.0, 24.0, 19.0])
+hissy = np.array([52.0, 52.0, 50.0, 46.0, 43.0, 39.0, 35.0, 34.0, 38.0, 34.0])
+
+for spectrum in (rumbly, hissy):
+    nc, rc = room.noise_criterion(spectrum), room.room_criterion(spectrum)
+    print(nc.label, rc.label)     # NC-40 (125 Hz) RC-34(R) / NC-40 (4000 Hz) RC-36(H)
+
+# The right panel: each spectrum against its own reference curve, with the
+# clause D.3 threshold as one step (+5 dB below 500 Hz, +3 dB above).
+threshold = np.where(bands <= 500.0, 5.0, 3.0)
+fig, ax = plt.subplots()
+ax.step(bands, threshold, where="mid", ls="--", color="k", label="Tag threshold")
+for spectrum, name in ((rumbly, "Duct rumble"), (hissy, "Diffuser hiss")):
+    rc = room.room_criterion(spectrum)
+    ax.plot(bands, spectrum - rc.reference_curve, "o-", label=f"{name} — {rc.label}")
+ax.set_xscale("log")
+ax.set_xlabel("Octave-band center frequency [Hz]")
+ax.set_ylabel("Level minus the room's own RC curve [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The two ratings answer different questions, and a third family exists
+that this module deliberately does not implement:
 
 - **NC** answers *"does the room meet its limit, and which band breaks
   it?"*. It is the compliance rating of North-American practice
@@ -235,7 +467,12 @@ occupants. A hiss tag (`H`, more than 3 dB over at or above 1000 Hz)
 points at the terminal end: diffuser and grille face velocities or a
 throttled damper close to the outlet, and it is the range that masks
 speech. A neutral tag (`N`) means the level can still be wrong, but the
-character is right: reduce the whole spectrum rather than reshape it.
+character is right: reduce the whole spectrum rather than reshape it — which
+usually means more room absorption rather than more duct lining, so it hands
+the problem to
+[Reverberation-time prediction](/phonometry/buildings/rooms/reverberation-prediction/)
+and
+[Sound absorption in enclosed spaces](/phonometry/buildings/rooms/enclosed-space-absorption/).
 
 ## 4. Room-noise reports (`.report()`)
 
@@ -294,7 +531,45 @@ repository; click a preview to open the PDF.
 	caption="Room Criteria fiche (RCResult.report), the RC rating and its spectral tag."
 />
 
+## What this guide covers
+
+**Covered.** ANSI/ASA S12.2-2019 Table 1 and clauses 5.2.2/5.2.3 — the
+NC-(SIL) designation and the tangency method with its governing band — through
+`room.noise_criterion`; and the informative Annex D RC Mark II family of
+Table D.1 (`room.rc_curve`) with the clause D.4 mid-frequency-average rating
+and the clause D.3 neutral/rumble/hiss tag, through `room.room_criterion`.
+Both work over the ten octave bands from 16 Hz to 8 kHz, and each result
+renders its own one-page fiche through `.report()`. The clause 5.2.5
+measurement conditions, the clause 5.2.4 low-frequency-excess procedure and
+the Annex C / Annex D criterion tables are quoted here for planning and
+reading.
+
+**Not covered.** The clause 5.3.2 screening test is described in section 1 but
+not implemented: the reader must perform it, because a spectrum that fails it
+is outside the domain of both functions. The balanced noise criteria (NCB),
+the room noise criterion for fluctuating low-frequency noise (RNC, which needs
+a time series rather than a single spectrum), the vibration/rattle tag ($RV$,
+which needs the Table 6 test) and the numeric quality-assessment index (QAI,
+which the standard defers to external references) are not part of this module.
+Neither is the NR curve family (see section 3). The criterion tables are
+reproduced only as anchors: check the standard, or the national or client
+document that governs the job, before quoting a limit.
+
 ## See also
 
+- [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the ISO 3382
+  decay parameters of the same room, measured from an impulse response.
+- [Reverberation-time prediction](/phonometry/buildings/rooms/reverberation-prediction/)
+  and
+  [Sound absorption in enclosed spaces](/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the absorption that lowers a whole spectrum once the tag says the character
+  is right.
+- [Speech Transmission Index](/phonometry/perception/speech/speech-transmission/):
+  the intelligibility that both criterion families were built to protect.
+- [Levels](/phonometry/signals/levels/levels/) and
+  [Filter Banks](/phonometry/signals/filters/filter-banks/): the octave-band
+  measurement that produces the input spectrum.
+- [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/):
+  when the source is next door rather than overhead.
 - API reference: [`room.noise_criteria`](/phonometry/reference/api/rooms/noise-criteria/).
 - Theory: [Room noise criteria (ANSI S12.2)](/phonometry/reference/theory/rooms-buildings/#room-noise-criteria-ansi-s122): how the NC, RC Mark II and NR families are constructed and what each was designed to penalise.

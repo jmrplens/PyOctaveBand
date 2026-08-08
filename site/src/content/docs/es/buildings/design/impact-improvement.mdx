@@ -68,6 +68,83 @@ la excita y se mide el **nivel de aceleración** estructural en la cara inferior
 y sin el revestimiento. Para revestimientos de reacción local, esa diferencia de
 niveles de aceleración equivale a la reducción de ruido de impactos de ISO 10140.
 
+### «De reacción local» es la condición sobre la que descansa todo el método
+
+El apartado 3.3 lo define: un revestimiento es **de reacción local** cuando el
+impacto se transmite al forjado portante *predominantemente a través de la zona
+que los martillos excitan directamente*. La energía no se propaga lateralmente
+por el propio revestimiento, así que — como dice la nota de la propia norma — la
+mejora no depende del tamaño de la probeta. Esa única propiedad es lo que permite
+que una placa de 120 cm × 80 cm sustituya a una instalación de transmisión
+completa: si una muestra de 1 m² y un forjado de 20 m² dan el mismo $\Delta L$,
+el banco pequeño no es una aproximación del grande, es la misma medición.
+
+La familia admitida está nombrada en el objeto y campo de aplicación:
+revestimientos blandos y flexibles — moquetas, PVC y linóleo —, que se
+corresponden con la **categoría I** del anexo H de ISO 10140-1:2010. La familia
+excluida es todo lo que lleve una capa de uso rígida que reparta la carga del
+martillo sobre un área que acaba acotando el propio tamaño de la probeta:
+laminados, sistemas de clic y cualquier suelo flotante, cuya solera es
+precisamente una placa de reparto. La norma enuncia las consecuencias sin
+rodeos. Para revestimientos que no sean blandos y flexibles «pueden aparecer
+desviaciones mayores respecto de los resultados del método de la serie ISO 10140
+debido a la dependencia del tamaño de la probeta»; y **en caso de discrepancia
+con ISO 10140, se debe utilizar el resultado de la medición según ISO 10140**.
+La maqueta nunca se impone a la instalación a tamaño real.
+
+Del mismo apartado sale una regla de valoración. Cuando se ensaya más de una
+probeta del mismo producto, los $\Delta L$ por bandas de las probetas se
+**promedian aritméticamente primero y ISO 717-2 se aplica al promedio**
+(apartado 6.5). Valorar cada probeta y promediar después las valoraciones da un
+número distinto y no es lo que pide la norma.
+
+### El banco, y por qué cada una de sus dimensiones está en la norma
+
+El anexo A es normativo y consta de dos planos de montaje. La placa mide
+(120 ± 5) cm × (80 ± 5) cm × (20 ± 1) cm, es homogénea y de espesor uniforme,
+plana dentro de ± 1 mm a lo largo de una línea horizontal de borde a borde y lo
+bastante dura para aguantar los martillos — se le puede añadir una capa de
+mortero para conseguir esa planeidad. Descansa sobre cuatro apoyos elásticos en
+las esquinas, ninguno mayor de 10 cm × 10 cm, y la resonancia vertical de la
+placa sobre esos apoyos debe quedar **por debajo de 20 Hz**. Se atornillan o
+pegan al menos cuatro posiciones de acelerómetro en la cara inferior,
+distribuidas de forma uniforme pero aleatoria, evitando líneas simétricas y a
+10 cm como mínimo de los bordes. La máquina de impactos ocupa al menos dos
+posiciones, separadas 30 cm como mínimo, oblicuas a los bordes, sin ningún
+martillo a menos de 10 cm de un borde y con las cuatro patas apoyadas sobre la
+probeta.
+
+Cada uno de esos números hace algo. Los 20 cm de espesor reproducen el forjado
+pesado normalizado de ISO 10140, que es lo que hace que la mejora sea
+trasladable a un edificio real. La resonancia de los apoyos por debajo de 20 Hz
+deja todo el rango de medición por encima de los modos de sólido rígido, así que
+la placa se comporta como un cuerpo libre y su aceleración refleja solo la
+fuerza que inyectan los martillos. La planeidad importa porque $\Delta L$ es el
+cociente de dos entradas de fuerza y una superficie irregular cambia la forma en
+que golpean los martillos. Las distancias a los bordes y las posiciones
+aleatorias y asimétricas evitan que el promedio de cuatro posiciones caiga sobre
+una línea nodal de los modos propios de la placa. Y los cuatro niveles de
+acelerómetro y las dos posiciones de máquina no son adorno: la Fórmula (4)
+promedia $\Delta L$ sobre los $t \times a$ pares, que es exactamente lo que
+consume `impact_improvement`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso16251_mockup_es.svg" alt="La maqueta de suelo pequeña de ISO 16251-1: una sección de la placa de hormigón de 200 mm sobre sus cuatro apoyos elásticos con la probeta de revestimiento y la máquina de impactos, una planta de la placa de 1200 por 800 mm con las dos posiciones de máquina y las cuatro posiciones de acelerómetro y sus distancias a los bordes, y los tres ciclos de medición" width="92%" />
+
+La cadena de instrumentación también está especificada (apartado 5.2): se debe
+declarar que el sistema de medición cumple la clase 1 de IEC 61672-1 con el
+micrófono sustituido por el acelerómetro, los filtros de tercio de octava la
+clase 1 de IEC 61260, la máquina de impactos ISO 10140-5 y la calibración de
+vibraciones ISO 16063. La norma advierte de que la señal de aceleración de la
+placa desnuda es un tren de pulsos extremadamente cortos que algunas cadenas por
+lo demás conformes tratan mal, y pide una comprobación inicial frente a una
+medición según ISO 10140. Se registran tres ciclos — con la probeta, sin ella
+(repitiendo las posiciones de los martillos dentro de ± 2 cm) y de fondo —, cada
+uno promediado durante **no menos de 20 s**, anotando temperatura y humedad
+antes y después y calibrando la cadena antes y volviéndola a comprobar al final.
+
+Nada de esto lo comprueba la biblioteca, que parte de los niveles de aceleración
+medidos: demostrar la conformidad de la instalación le corresponde al operador.
+
 **Nivel de aceleración (Fórmula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 referencia $a_0 = 10^{-6}\ \text{m/s}^2$. La **corrección de ruido de fondo
 (Fórmula (2))** sigue la regla de tres ramas de ISO 10140 (sin cambio si ≥ 15 dB;
@@ -87,6 +164,24 @@ opcionalmente ampliadas hasta 50 Hz); la valoración se forma sobre el subrango
 $C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020, Fórmula (A.4)), expuesto
 como `ci_delta` en el resultado y de forma independiente como
 `impact_improvement_adaptation_term()`.
+
+**Y $C_{I,\Delta}$ es la mitad de la respuesta, así que léelo.** La valoración
+ponderada desliza una curva de referencia hasta que encaja el exceso, lo que
+premia la mejora ocurra donde ocurra en el espectro; el ruido de pisadas real lo
+dominan las bandas bajas y medias, que es justo donde menos hace una capa
+elástica delgada. $C_I$ es el término de adaptación que compara la suma
+energética *sin ponderar* con la valoración ponderada, y
+$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ contrasta el suelo de referencia tal cual
+frente al suelo de referencia con el revestimiento encima, con $C_{I,r,0}$ fijado
+en $-11$ dB (A.2.2; $-10{,}3$ dB cuando se exige un decimal). La Fórmula (A.5)
+dice entonces qué significa la pareja:
+$\Delta L_\text{lin} = \Delta L_w + C_{I,\Delta}$. La moqueta de esta página se
+valora en 29 ($-13$) dB, así que en la escala de respuesta plana compra
+**16 dB**, no 29. Un $C_{I,\Delta}$ muy negativo es la firma de un revestimiento
+que solo funciona arriba — típico de las capas elásticas delgadas, y justo donde
+la máquina de impactos las favorece —; un revestimiento con $C_{I,\Delta}$ cerca
+de cero mejora todo el rango. Una ficha que solo imprime $\Delta L_w$ te ha
+contado la mejor mitad de la historia.
 
 El ejemplo siguiente es una medición real: la mejora de una moqueta textil sobre
 la maqueta pesada del CSTB, digitalizada de la Figura 4 de Foret, Chéné y
@@ -126,6 +221,14 @@ from phonometry import building
 delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
 print(building.weighted_impact_improvement(delta_l))    # 29 dB (moqueta)
 
+# Dos probetas del mismo producto: promedia PRIMERO las mejoras por bandas y
+# valora después el promedio (apartado 6.5). Valorar cada probeta y promediar
+# las valoraciones da un número distinto.
+import numpy as np
+sample_a = np.array(delta_l, dtype=float)
+sample_b = sample_a + np.array([1, 0, -1, 1, 0, -1, 1, 0, -1, 1, 0, -1, 1, 0, -1, 1])
+print(building.weighted_impact_improvement(0.5 * (sample_a + sample_b)))   # 29 dB
+
 # A partir de los niveles de aceleración medidos (desnudo/cubierto) y un fondo:
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
          1000, 1250, 1600, 2000, 2500, 3150]
@@ -143,12 +246,31 @@ res.plot()            # el espectro de mejora delta-L(f) de arriba (requiere mat
 
 ## Informe de mejora a impacto de ISO 16251-1 (`.report()`)
 
+Los apartados 8 y 9 deciden qué tiene que llevar un resultado para ser
+declarable, y la mayor parte la aportas tú, no la calcula la biblioteca. Junto a
+la propia mejora, la tabla debe mostrar el **nivel de aceleración de la placa
+desnuda $L_{a,0}$** con su referencia $a_0$, el $\Delta L$ por bandas de *cada*
+probeta ensayada, su promedio cuando hay más de una, la mejora o mejoras
+ponderadas y el término o términos de adaptación — todo redondeado a **un
+decimal**, y con las bandas cuya corrección de fondo haya llegado al límite de
+1,3 dB escritas como «> $\Delta L$». El informe añade además: la identificación
+del fabricante y del producto, una descripción detallada del revestimiento con el
+número y el tamaño de las probetas, el **método de montaje y, en particular, el
+adhesivo con su masa por unidad de superficie y su tiempo de curado**, la
+temperatura y la humedad durante el ensayo, las **posiciones de la máquina de
+impactos y de los acelerómetros**, y una declaración de si la probeta sufrió
+daños visibles, como compactación. Todo eso se corresponde con los campos
+`manufacturer`, `specimen`, `mounting`, `mass_per_area`, `temperature`,
+`pressure`, `test_date` y `notes` del `ReportMetadata` de más abajo; la
+declaración de daños y el detalle del montaje no tienen campo propio y van en
+`notes`.
+
 `FloorCoveringImprovementResult.report(path)` escribe una ficha acreditada de
 mejora a impacto de una página: la línea de base normativa, una cabecera de
 metadatos, la tabla por bandas (frecuencia y $\Delta L$, con las bandas en el
 límite de 1,3 dB precedidas por `>`) junto a la curva de mejora $\Delta L(f)$,
 el número único encuadrado $\Delta L_w\ (C_{I,\Delta})$ (la expresión de
-resultados de el Apartado 8 e) de ISO 16251-1) y un pie. Pasa un
+resultados del apartado 8 e) de ISO 16251-1) y un pie. Pasa un
 `ReportMetadata` para la cabecera; los campos aplicables son `specimen` (el
 revestimiento de suelo ensayado), `client`, `manufacturer`, `mounting`,
 `mass_per_area`, `test_room`, `test_date`, `temperature`, `pressure`,

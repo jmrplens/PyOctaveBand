@@ -60,13 +60,53 @@ $$
 K_r = \frac{d_s - d_m}{d_s + d_m},
 $$
 
-que vale $2/3$ para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m. La
-absorción se obtiene de los espectros incidente y reflejado enventanados $H_i$,
-$H_r$:
+que vale $2/3$ para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m.
+Las dos alturas se mantienen dentro de 0,005 m a lo largo del promediado, y los
+centros acústicos de fuente y micrófono quedan sobre una misma recta normal a la
+superficie, con el eje del micrófono paralelo a ella. La absorción se obtiene de
+los espectros incidente y reflejado enventanados $H_i$, $H_r$:
 
 $$
 \alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
 $$
+
+### 1.1 Qué se sustrae
+
+El micrófono oye la onda directa y la reflexión del pavimento en la misma
+respuesta al impulso, y la geometría obligatoria las deja separadas solo
+$2 d_m / c \approx 1{,}5$ ms, muchísimo menos de lo necesario para separarlas
+con una puerta en el extremo bajo de la banda declarada. Por eso la ISO 13472-1
+exige la **técnica de sustracción** (apartado 4.2) y no un simple enventanado
+temporal, y de ese paso salen los dos arrays que consumen las funciones de esta
+página:
+
+1. Montar la fuente y el micrófono de modo que su separación **no pueda**
+   cambiar: la norma pide una conexión mecánica fija y estable entre ambos,
+   porque la sustracción es una cancelación de dos formas de onda nominalmente
+   idénticas.
+2. Medir sobre el pavimento y promediar hasta que la respuesta al impulso sea
+   estable: **al menos 50** respuestas (apartado 4.3), que es lo que vence al
+   ruido de fondo y a la variación meteorológica.
+3. Repetir la medición idéntica con el conjunto apartado de cualquier superficie
+   reflectante. Esa respuesta de campo libre **es** $h_i$. Corregir cualquier
+   desplazamiento temporal residual entre las dos tomas y hacerlas con poco
+   tiempo de diferencia (la norma recomienda menos de 10 minutos), porque el
+   retardo depende de la temperatura.
+4. Restar: $h_r = h_\text{pavimento} - h_i$. Todo lo que comparten las dos
+   tomas (la onda directa, el altavoz, el micrófono, la cadena entera) se
+   cancela, y lo que sobrevive es únicamente la reflexión de la superficie.
+5. Enventanar $h_i$ y $h_r$ con la **misma** ventana aplicada en sus respectivos
+   tiempos de llegada ($T_{w,\text{directo}} = T_{w,\text{reflejado}}$),
+   transformar y formar $\alpha$ con $K_r$.
+
+De esa cadena cuelgan dos condiciones de aceptación. La relación señal-ruido
+debe superar **10 dB en todas las bandas de tercio de octava de 250 Hz a
+4 kHz** (apartado 7.4), y no hace falta calibración de nivel alguna, porque el
+método es un cociente de dos funciones de transferencia de la misma cadena
+(apartado 6.1); pero, por esa misma razón, la medición de referencia del
+Anexo B de la sección 1.2 no es opcional. Los fragmentos de abajo parten de una
+`hi` y una `hr` que hacen las veces de esa pareja; en campo son la referencia de
+campo libre y la reflexión del pavimento enventanada, por ese orden.
 
 ```python
 import numpy as np
@@ -92,6 +132,57 @@ print(round(kr, 4))                # 0.6667
 print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 ```
 
+### 1.2 La superficie de referencia (Anexo B)
+
+El cociente en bruto $|H_r/H_i|^2/K_r^2$ supone que la cadena electroacústica y
+el factor geométrico se cancelan exactamente. No lo hacen: el altavoz y el
+micrófono tienen sus propias respuestas a lo largo de caminos de longitud
+distinta, y el $K_r = 2/3$ obligatorio es una idealización de onda plana de una
+geometría finita. En el extremo bajo de la banda, donde un pavimento denso
+absorbe un pequeño porcentaje, ese error residual es comparable con la magnitud
+que se mide, que es la razón de que el Anexo B haga la **medición de referencia
+obligatoria** y no orientativa.
+
+El remedio es una medición extra por montaje. Colocar una placa muy reflectante
+(plana, lisa, densa y sin juntas, y lo bastante grande como para cubrir toda el
+área máxima muestreada) en el mismo sitio, y repetir todo el procedimiento sobre
+ella sin cambiar la geometría del conjunto. El factor de reflexión de presión
+medido de la referencia es entonces la función de error $e(f)$ de la propia
+cadena, porque la placa lo refleja todo; dividir el factor medido del pavimento
+por él elimina $e(f)$ y, como la geometría es idéntica, con él el factor $K_r$:
+
+$$
+\alpha_\text{pavimento}(f) = 1 -
+  \left|\frac{Q_{p,\text{pav,med}}(f)}{Q_{p,\text{ref,med}}(f)}\right|^2 .
+$$
+
+```python
+import numpy as np
+
+# `materials` lo importa el bloque de arriba. Dos factores de reflexión de
+# presión complejos del montaje idéntico: uno sobre el pavimento, otro sobre la
+# placa de referencia. Su cociente es el Anexo B.
+freq = np.array([250.0, 500.0, 1000.0, 2000.0, 4000.0])
+q_road = np.array([0.97, 0.94, 0.88, 0.72, 0.55]) * np.exp(-0.05j * freq / 1e3)
+q_ref = np.array([1.02, 1.01, 1.00, 0.99, 0.98]) * np.exp(-0.05j * freq / 1e3)
+print(np.round(materials.absorption_reference_corrected(q_road, q_ref), 3))
+# [0.096 0.134 0.226 0.471 0.685]
+
+# Sin corregir, los mismos datos de pavimento darían:
+print(np.round(1.0 - np.abs(q_road) ** 2, 3))
+# [0.059 0.116 0.226 0.482 0.698]
+```
+
+La propia placa debe verificarse: se mide una muestra de su material en tubo de
+impedancia según ISO 10534-1 o ISO 10534-2 para confirmar un coeficiente de
+absorción por debajo de **0,05** en todo el rango declarado, que es lo que
+autoriza a suponer $|Q_{p,\text{ref}}| = 1$. Una superficie de referencia
+portátil debe ser además lo bastante rígida como para no poder resonar. En la
+práctica, la referencia es lo primero a lo que recurrir cuando un espectro
+medido presenta absorciones ligeramente negativas en las bandas más bajas: como
+enseñan los valores impresos arriba, la corrección mueve la banda de 250 Hz más
+que el propio valor.
+
 **Ventana de Adrienne (apartado 6.4).** La ventana temporal que aísla la
 reflexión solo exige un flanco de subida abrupto, una porción plana de 5 ms y un
 flanco de bajada de coseno cuadrado o Blackman-Harris; las duraciones exactas se
@@ -105,6 +196,58 @@ w = materials.adrienne_window(48000.0)
 print(w.shape[0])          # 504 muestras a 48 kHz
 print(round(float(w.max()), 3))   # 1.0  (la meseta y los flancos se encuentran en la unidad)
 ```
+
+Esa longitud es el único parámetro libre del método, y es un compromiso con dos
+extremos. La duración **total** de la ventana fija la frecuencia más baja que la
+transformada puede resolver: 10,5 ms son unos 95 Hz, y un límite inferior de
+220 Hz necesita del orden de 5 ms de porción plana, que es la razón de que la
+banda declarada empiece en 250 Hz y no más abajo. Alargarla compra validez en
+baja frecuencia, y cada milisegundo añadido admite además reflexiones del
+mástil, del vehículo, de quien opera y de cualquier otra cosa dentro del radio
+correspondiente, y agranda el trozo de pavimento que contribuye a la respuesta.
+La regla práctica: elegir la ventana más larga que quede libre de la primera
+llegada parásita visible en la respuesta al impulso en bruto, aplicar la misma
+ventana a la referencia de campo libre y a la reflexión, y **declarar la forma y
+las duraciones junto al resultado**, ya que la norma no fija ninguna de las dos
+y dos laboratorios con ventanas distintas no están midiendo lo mismo. Un
+espectro que sube de forma inverosímil en las bandas declaradas más bajas es la
+señal habitual de una ventana demasiado corta, o de una llegada parásita dentro
+de ella.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/adrienne_window_es.svg" alt="Tres paneles apilados sobre un eje temporal común: la respuesta al impulso de referencia en campo libre con la ventana de Adrienne colocada sobre el sonido directo; la respuesta medida sobre el pavimento, donde las llegadas directa y reflejada se solapan, con su separación de 1,47 milisegundos acotada, la reflexión de la superficie ya restada y la ventana de Adrienne de 10,5 milisegundos dibujada encima con una llegada parásita justo fuera de la puerta; y los espectros incidente y reflejado enventanados resultantes, con el límite recíproco de la ventana de 95 hercios marcado y la región por debajo de la banda declarada de 250 hercios sombreada" width="88%" />
+
+*Todo el método en tres trazas. Las dos llegadas están separadas 1,47 ms en la
+geometría obligatoria, así que ninguna puerta las separa; la traza roja del
+panel central es lo que deja la sustracción una vez retirada la referencia de
+campo libre. La puerta verde es la ventana de Adrienne en su valor por defecto
+de 0,5 + 5 + 5 ms, cuya duración total fija tanto el suelo de 95 Hz marcado en
+el panel inferior como el radio de 1,34 m de pavimento que contribuye. La
+llegada parásita de 15,8 ms queda fuera, y no lo estaría si la ventana se
+alargara para llegar más abajo en frecuencia.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` se importa arriba. La ventana en sí, colocada en la llegada
+# reflejada de la geometría obligatoria (2 dm / c tras el sonido directo).
+fs = 48000.0
+w = materials.adrienne_window(fs)
+t = np.arange(w.size) / fs + (1.5 / 340.0) - 0.5e-3
+fig, ax = plt.subplots()
+ax.plot(t * 1e3, w)
+ax.axvline(1.0 / 340.0 * 1e3, linestyle=":", label="llegada directa")
+ax.axvline(1.5 / 340.0 * 1e3, linestyle="--", label="llegada reflejada")
+ax.set_xlabel("Tiempo [ms]")
+ax.set_ylabel("Ventana")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Espectro de principio a fin.** `insitu_absorption_spectrum` ejecuta toda la
 cadena (de las respuestas al impulso incidente y reflejada enventanadas a la
@@ -143,7 +286,7 @@ de alta frecuencia, exactamente como dicta el factor de reflexión paso bajo
 $r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -189,7 +332,7 @@ plt.show()
 **Área máxima muestreada (Anexo A).** La ventana temporal finita limita cuánta
 superficie contribuye a la reflexión. El área máxima muestreada es un círculo
 cuyo radio la biblioteca calcula a partir de la geometría y la anchura de la
-ventana; el ejemplo trabajado del Anexo A ($d_s = 1{,}25$ m, $d_m = 0{,}25$ m,
+ventana; el ejemplo resuelto del Anexo A ($d_s = 1{,}25$ m, $d_m = 0{,}25$ m,
 $c = 340$ m/s, ventana plana de 5 ms) da unos 1,34 m.
 
 ```python
@@ -209,7 +352,7 @@ misma vertical, y la ventana de 5 ms convertida en los 1,34 m de radio de
 calzada que de verdad contribuyen a la reflexión.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -226,6 +369,85 @@ plt.show()
 ```
 
 </details>
+
+### 1.3 Antes de darle a grabar
+
+Ese radio no es un número para admirar; es una distancia libre que se recorre a
+pie. Calcúlalo, camínalo y mira qué hay dentro. Los apartados 7 y 8 de
+ISO 13472-1 dan los filtros que deciden si la medición puede llegar a hacerse, y
+son ellos, y no el procesado de señal, los que suelen invalidar una campaña de
+carretera.
+
+- **El área máxima muestreada debe estar despejada.** Cualquier objeto que no
+  sea el pavimento (una valla, una roca, una barrera, un coche aparcado) es un
+  objeto reflectante. Ninguno puede estar dentro del área muestreada, y lo que
+  quede fuera debe estar más lejos del micrófono que $d_s$, es decir, a más de
+  1,25 m. El propio trípode del micrófono no debe influir en la medición.
+- **La superficie debe ser visualmente homogénea** y estar libre de cambios de
+  material, y debe estar **seca**. En una superficie con un contenido de huecos
+  apreciable, verificar que también los poros están secos, y no solo la
+  superficie. Las mediciones en mojado son legítimas para investigación, y sus
+  resultados no pueden usarse para clasificar ni cualificar una superficie.
+- **El viento** a la altura del micrófono no debe superar 5 m/s.
+- **Temperatura**: aire ambiente entre 0 °C y 35 °C, y superficie del pavimento
+  entre 0 °C y 50 °C.
+- **La superficie de referencia de la sección 1.2 debe cubrir al menos esa
+  misma área muestreada**, así que el radio dimensiona tanto la placa que hay
+  que transportar como la distancia libre que hay que encontrar.
+
+La medición en sí es un procedimiento de trece pasos cuyo orden importa:
+comprobar la superficie y el tiempo, colocar el conjunto, calcular y caminar el
+radio, elegir la fuente y la señal, promediar al menos 50 respuestas sobre el
+pavimento, tomar la referencia de campo libre con el conjunto lejos de todo,
+restar, enventanar, transformar, formar el factor de reflexión con $K_r$,
+repetirlo todo sobre la placa de referencia y solo entonces promediar en tercios
+de octava. Un resultado declarado sin la forma y las duraciones de la ventana, y
+sin la medición de referencia, no es un resultado de ISO 13472-1.
+
+### 1.4 Cuando el emplazamiento obliga a un ángulo
+
+Todo lo anterior es la **geometría obligatoria de incidencia normal**: fuente y
+micrófono sobre la misma vertical de la superficie. El Anexo F prevé una
+disposición oblicua, y la biblioteca lo sigue. Cambian dos cosas y las dos están
+expuestas:
+
+- El factor de divergencia geométrica adquiere una forma angular,
+  $K_{r,\theta}^2 = 1 - \cos^2\theta\,(1 - K_r^2)$, que calcula
+  `geometric_spreading_factor_angle` y que usa automáticamente
+  `insitu_absorption_spectrum` cuando se le da un `incidence_angle`. Las dos
+  toman el ángulo en **radianes**, al contrario que los grados que cita el resto
+  de esta página.
+- El área muestreada deja de ser el círculo de la figura de arriba. Pasa a ser
+  la intersección de la superficie con un elipsoide de revolución cuyos focos
+  son la fuente y el micrófono, así que es una **elipse estirada en la dirección
+  de incidencia**, cuyo eje mayor devuelve `msa_major_axis` a partir de la
+  anchura de la ventana y de la distancia proyectada entre fuente y micrófono. A
+  30° el círculo de 1,34 m se convierte en una elipse de 3,43 m de eje mayor,
+  así que la zona despejada que hay que comprobar crece con el ángulo y la
+  medición promedia sobre más pavimento, y de forma menos simétrica.
+
+```python
+import numpy as np
+
+# `materials` se importa arriba. Treinta grados fuera de la normal, con las
+# mismas dos alturas: el factor de divergencia sube hacia uno y el área
+# muestreada deja de ser un círculo de 1,34 m. Las dos funciones auxiliares
+# toman el ángulo en RADIANES.
+print(round(float(materials.geometric_spreading_factor()), 4))           # 0.6667
+print(round(float(materials.geometric_spreading_factor_angle(
+    np.radians(30.0))), 4))                                              # 0.7638
+
+# La distancia proyectada entre fuente y micrófono sobre la superficie,
+# (ds + dm) tan(theta), es lo que estira la elipse.
+dp = 1.5 * np.tan(np.radians(30.0))
+print(round(dp, 3))                                                      # 0.866
+print(round(float(materials.max_sampled_area_radius(5.0e-3)), 3))        # 1.343
+print(round(float(materials.msa_major_axis(5.0e-3, dp)), 3))             # 3.432
+```
+
+Mantén la geometría de incidencia normal siempre que el emplazamiento lo
+permita: es la disposición que supone la comparación con el método puntual, y
+aquella para la que se citan los datos publicados de pavimentos.
 
 ## 2. Método puntual (ISO 13472-2)
 
@@ -304,6 +526,62 @@ sistema (medidas una vez contra una placa rígida) para que la disipación
 propia del tubo no se cargue al pavimento; esa corrección es
 `spot_internal_loss_correction`.
 
+### 2.1 Una posición, paso a paso
+
+El tubo es portátil y el procedimiento es corto, que es justamente la razón de
+que merezca la pena escribirlo: casi todo lo que sale mal en una medición
+puntual sale mal en los dos minutos anteriores a encender la fuente. Los
+apartados 6 a 8 dan el orden.
+
+1. **Comprobar primero los filtros.** La superficie debe estar lisa, plana,
+   libre de detritos y seca; el aire entre 5 °C y 30 °C y la superficie del
+   pavimento entre 5 °C y 45 °C, fuera de la luz solar directa y lejos de
+   fuentes de calor intensas; medir de noche donde eso no pueda cumplirse. Si
+   falla cualquiera de estas condiciones, la medición no puede llevarse a cabo.
+2. **Calentar.** Encender el sistema y dejarlo funcionando **al menos
+   15 minutos**. El método vive de la exactitud de fase, y la electrónica, la
+   bobina del altavoz y el propio tubo tienen que estabilizarse térmicamente.
+3. **Calibrar los micrófonos** por el procedimiento del apartado 7.5 de
+   ISO 10534-2, antes de cada serie de mediciones y después de cada hora de
+   medición, para cada posición de micrófono utilizada. Esa calibración es lo
+   que corrige el desajuste de fase y de amplitud entre las dos cápsulas.
+4. **Tomar la medición de referencia** sobre una probeta totalmente reflectante:
+   una placa de acero de 10 mm es el propio ejemplo de la norma. Su absorción en
+   tercios de octava debe salir por debajo de **0,03**; el resultado alimenta la
+   corrección de pérdidas internas del Anexo A, y se toma en el mismo sitio
+   inmediatamente antes o después de la serie.
+5. **Medir el fondo** con la fuente apagada, y exigir al menos **10 dB** de
+   relación señal-ruido en todas las bandas frente a él. Mantenerse al menos a
+   **25 m** del paso de vehículos pesados y motocicletas, y descartar cualquier
+   tanda que perturbara un vehículo al pasar.
+6. **Sellar.** Poner un cordón de sellante en la ranura del útil, dimensionado a
+   la textura de la superficie: unos pocos milímetros sobre una superficie lisa,
+   más grueso sobre una gruesa. Presionar el útil contra el pavimento: la
+   cantidad correcta es aquella con la que rebosa un poco de material. Si no
+   rebosa casi nada, levantar el útil, comprobar que hay una **impronta circular
+   continua**, añadir sellante y repetir. Montar después el tubo sin mover el
+   útil y comprobar que no hay fugas por el perímetro, por ejemplo escuchando a
+   través de un tubo abierto.
+7. **Ejecutar y comprobar.** Promediar hasta que el resultado sea estable, o
+   sobre 50 barridos o ráfagas si no hay lectura en vivo. Si la relación
+   señal-ruido es demasiado baja, subir el nivel de la fuente, eliminar la
+   fuente de ruido o esperar.
+8. **Verificar el sellado otra vez.** Levantar el útil y confirmar que el
+   material de sellado estuvo en contacto apretado formando un círculo cerrado.
+   En caso de duda, volver a sellar y repetir la posición: una fuga de aire se
+   lee como absorción y no hay nada en los datos que distinga una cosa de la
+   otra.
+
+Dos cosas más sobre la reducción. Los sistemas suelen llevar **dos parejas de
+micrófonos** y empalmar sus resultados de banda estrecha, cada pareja en la
+parte de la banda donde su espaciado es óptimo (`spot_microphone_spacing_bounds`
+da esa ventana para cualquier pareja). Y la corrección de pérdidas internas del
+Anexo A se aplica **después** de haber promediado los resultados de banda
+estrecha en tercios de octava y **antes** de recortar a cero las bandas
+negativas: la norma deja deliberadamente que la FFT produzca valores de banda
+estrecha negativos y recorta solo al final. Terminar repitiendo en **al menos
+cuatro posiciones** y declarando la media y la desviación típica por banda.
+
 ## ¿Sustracción o método puntual?
 
 Las dos partes de ISO 13472 son complementarias, no competidoras, y la propia
@@ -332,6 +610,38 @@ entre 315 Hz y 1600 Hz aunque sus campos de aplicación difieran:
   tipos de superficie y los criterios de aceptación, esa diferencia práctica
   suele ser la que decide.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_method_windows_es.svg" alt="Dos paneles: arriba, los rangos declarados en tercios de octava de los dos métodos dibujados como barras sobre un eje logarítmico de frecuencia común, de 250 a 4000 hercios para la técnica de sustracción y de 250 a 1600 hercios para el tubo puntual, con el intervalo de 315 a 1600 hercios en el que la Parte 2 espera que coincidan sombreado; abajo, el techo de onda plana del tubo puntual cayendo según crece el diámetro, con el ejemplo resuelto de 100 milímetros marcado en 1989 hercios y la región por debajo del borde superior de banda de 1800 hercios sombreada para mostrar que un diámetro por encima de 111 milímetros deja de cubrir el rango declarado" width="88%" />
+
+*Por qué la elección se decide tanto por ancho de banda como por logística. El
+techo del tubo puntual lo fija su propio diámetro, y el diámetro tiene dos
+tareas que tiran en sentidos opuestos: debe ser lo bastante ancho para sellar
+sobre un pavimento con textura y lo bastante estrecho para mantener ondas planas
+hasta lo alto del rango declarado. En 111 mm los dos requisitos se encuentran;
+más allá, la banda de 1600 Hz deja de estar cubierta. El intervalo sombreado de
+arriba es donde la introducción de la Parte 2 espera que los dos métodos
+coincidan, y es también el intervalo sobre el que debería juzgarse una
+comparación entre ellos.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` se importa arriba. El techo de onda plana frente al diámetro.
+bores = np.linspace(0.055, 0.155, 300)
+ceiling = [materials.spot_tube_upper_frequency(d, 343.0) for d in bores]
+fig, ax = plt.subplots()
+ax.plot(bores * 1e3, ceiling)
+ax.axhline(1800.0, linestyle="--")     # borde superior de la banda de 1600 Hz
+ax.set_xlabel("Diámetro del tubo d [mm]")
+ax.set_ylabel("Techo de onda plana [Hz]")
+plt.show()
+```
+
+</details>
+
 Ambos métodos informan la misma magnitud, el coeficiente de absorción a
 incidencia normal en bandas de tercio de octava, de modo que un carril de
 baja absorción puede inspeccionarse con el tubo puntual y anclarse con una
@@ -348,7 +658,10 @@ a tercios de octava (`materials.insitu_absorption_coefficient`,
 `materials.insitu_absorption_spectrum`) y el radio de área muestreada del
 Anexo A (`materials.max_sampled_area_radius`), con la corrección de
 superficie de referencia del Anexo B
-(`materials.absorption_reference_corrected`); y el límite de frecuencia de
+(`materials.absorption_reference_corrected`) y el caso de incidencia oblicua
+del Anexo F (`materials.geometric_spreading_factor_angle`,
+`materials.msa_major_axis` y el argumento `incidence_angle` de
+`materials.insitu_absorption_spectrum`); y el límite de frecuencia de
 onda plana, la geometría de separación de micrófonos y la corrección de
 pérdidas internas del Anexo A del método puntual de la ISO 13472-2:2010
 (`materials.spot_tube_upper_frequency`,
@@ -363,6 +676,11 @@ la ISO 13472-2 tampoco está implementado en este módulo: solo se proporcionan
 la geometría, las funciones de validación y las correcciones, y el DSP de dos
 micrófonos real es la rutina ISO 10534-2 de la
 [guía del Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/).
+Tampoco se hacen cumplir en ningún sitio del código ni la adquisición en sí ni
+los filtros de campo: el promediado, la referencia de campo libre, las
+comprobaciones de señal-ruido, la verificación del sellado y los límites
+meteorológicos de las secciones 1.1 a 1.4 y 2.1 son de quien opera, y la
+biblioteca solo ve los dos arrays que salen de ellos.
 
 ## Véase también
 

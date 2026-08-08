@@ -1,6 +1,6 @@
 ---
 title: "Predicting Panel Sound Insulation"
-description: "Theoretical airborne sound insulation of panels from physical properties: the mass law and coincidence dip (Sharp), double-wall mass-spring-mass behaviour, transmission through slits and apertures (Gomperts), plate radiation efficiency (Leppington/Maidanik) and the point mobilities of infinite plates and beams (Cremer)."
+description: "Theoretical airborne sound insulation of panels from physical properties: the mass law, the plateau shortcut and the coincidence dip of a single panel (Sharp, Norton), the coincidence range of an orthotropic or corrugated sheet (Vigran/Heckl), double-wall mass-spring-mass behaviour and the wall-tie bridge of a masonry cavity wall (Hopkins), transmission through slits and apertures (Gomperts), plate radiation efficiency (Leppington/Maidanik) and the point mobilities of infinite plates and beams (Cremer)."
 references:
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
@@ -32,6 +32,14 @@ references:
     publisher: "Taylor & Francis"
     doi: "10.1201/9781482266016"
     note: "Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission, Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993). ISBN 978-0-415-42853-8."
+  - type: book
+    authors: ["Norton, M. P.", "Karczub, D. G."]
+    year: 2003
+    title: "Fundamentals of noise and vibration analysis for engineers"
+    edition: "2nd ed."
+    publisher: "Cambridge University Press"
+    doi: "10.1017/CBO9781139163927"
+    note: "Section 3.9.1: the plateau method after Watters, with Table 3.1 (surface density per millimetre, plateau height and the B/A frequency ratio) behind PLATEAU_MATERIALS; Eqs. 3.104/3.106 (field-incidence mass law), Eq. 3.110 (the above-coincidence branch of the coincidence_model='cremer' variant) and problem 3.11, the worked brick wall reproduced here. ISBN 978-0-521-49913-2."
   - type: article
     authors: ["Hopkins, C.", "Wilson, R.", "Craik, R. J. M."]
     year: 1999
@@ -39,6 +47,19 @@ references:
     journal: "Applied Acoustics 58, 51-68"
     doi: "10.1016/S0003-682X(98)00068-1"
     note: "The measurement behind the 50 mm rows of Hopkins' Table A4: butterfly 1,7 MN/m, double-triangle 16,1 MN/m and vertical-twist 94,0 MN/m."
+  - type: article
+    authors: ["Hall, R.", "Hopkins, C."]
+    year: 2001
+    title: "The measurement of dynamic stiffness of wall ties used in masonry cavity walls"
+    journal: "Proceedings of the Institute of Acoustics 23(8), 259-266"
+    note: "The 100 mm cavity row of Hopkins' Table A4: the proprietary vertical-twist tie at 43,4 MN/m."
+  - type: article
+    authors: ["Craik, R. J. M.", "Wilson, R."]
+    year: 1995
+    title: "Sound transmission through masonry cavity walls"
+    journal: "Journal of Sound and Vibration 179(1), 79-96"
+    doi: "10.1006/jsvi.1995.0006"
+    note: "Table 1: the same tie types measured at an 85 mm cavity (butterfly 1,1 MN/m, double-triangle 4,3 MN/m), which corroborate the ordering of Table A4 but not its values, since the dynamic stiffness is defined at a given cavity width."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -51,9 +72,25 @@ airborne insulation of a single panel (the mass law and the coincidence dip),
 the double wall (its mass-spring-mass resonance), the transmission through slits
 and apertures that caps any real construction, the radiation efficiency of a
 bending plate, and the point mobilities that set the vibrational power a
-structure absorbs. The measured counterparts these predictions feed live in
+structure absorbs. Beside those it carries three shortcuts and special cases the
+same sources give: the **plateau method**, a hand estimate of a single panel's
+whole curve from a table of materials (Norton 3.9.1); the **orthotropic panel**,
+where a corrugated or ribbed sheet has two critical frequencies and therefore a
+coincidence *range* instead of a dip (Vigran 6.5.3); and the **wall-tie bridge**
+that limits a masonry cavity wall whatever its leaves are worth (Hopkins
+4.3.5.4). The measured counterparts these predictions feed live in
 [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/)
 and [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/).
+
+**A note on two symbols before the formulae start.** The sound reduction index
+$R$ of the European standards and the transmission loss $TL$ of the North
+American literature this page follows are the *same quantity*,
+$TL \equiv R = -10\lg\tau$; the page keeps each source's own symbol so its
+formulae can be checked against the printed text, which is why the results expose
+`transmission_loss` and rate it as $R_w$. Likewise, this page writes the mass per
+unit area $m''$, which is Bies's and Hopkins's notation for the $m'$ used
+throughout the ISO 12354 guides; $m$ alone is reserved elsewhere on the site for
+the air power-attenuation coefficient of the reverberation formulae, in 1/m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%" loading="eager" />
 
@@ -122,6 +159,22 @@ The predicted spectrum plugs straight into the ISO 717-1 rating through
 `res.rating()`, and into EN 12354 as the "predicted" element $R$ where the
 standard would otherwise demand a laboratory measurement.
 
+**Which loss factor is $\eta$?** The **total** loss factor of the element *as
+mounted*, not the material's internal loss factor. In a mounted element the total
+is internal plus radiation plus the losses at the edges, and for a heavy element
+in a test opening the edge term dominates: ISO 12354-1 Annex C gives
+$\eta_\text{tot,lab} \approx \eta_\text{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
+m'/(485\sqrt{f})$ for elements below 800 kg/m², reachable without leaving the
+library as `laboratory_total_loss_factor`. For this 15 kg/m² pane that estimate
+is 0,011 at 500 Hz, barely above the internal value; for a 484 kg/m² concrete
+floor it is 0,055, five times the material figure. The measured route is the
+structural reverberation time and $\eta = 2{,}2/(fT_s)$, the same quantity the
+[ISO 10848](/phonometry/buildings/insulation/flanking-lab/) and
+[EN 15657](/phonometry/buildings/design/structure-borne-power/) guides measure.
+The stake is worth knowing: the dip depth carries $10\lg\eta$, so a factor of
+three in $\eta$ moves the coincidence region by 4,8 dB and changes nothing below
+$f_c/2$.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%" />
 
 *The predicted Sharp spectrum rated exactly like a measurement: the
@@ -165,7 +218,7 @@ ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
                 alpha=0.3, label="unfavourable deviations")
 ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
 ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Sound reduction index R [dB]")
+ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
 ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
 ax.legend()
 plt.show()
@@ -445,7 +498,8 @@ ax.semilogx(bands, flat.transmission_loss, "-o", ms=4, label="flat sheet")
 ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
             label="corrugated, integral")
 ax.semilogx(bands, heckl.transmission_loss, "--", label="Heckl approximation")
-ax.set(xlabel="Frequency [Hz]", ylabel="Transmission loss TL [dB]")
+ax.set(xlabel="Frequency [Hz]",
+       ylabel="Sound reduction index $R$ (transmission loss $TL$) [dB]")
 ax.legend()
 plt.show()
 ```
@@ -657,7 +711,7 @@ from phonometry import (
 
 # A 2 mm x 100 mm-deep slit: its transmission peaks at the half-wavelength
 # resonances of the slit depth.
-print(slit_resonance_frequencies(0.1, 0.002, orders=2).round().tolist())   # [~1500, ~3100]
+print(slit_resonance_frequencies(depth=0.1, width=0.002, orders=2).round().tolist())  # [~1500, ~3100]
 
 # A wall of Rw = 50 dB with 1 % of its area left open as a slit is capped:
 print(round(float(composite_transmission_loss([0.99, 0.01], [50.0, 0.0])), 1))   # 20.0
@@ -682,7 +736,7 @@ import numpy as np
 from phonometry import slit_transmission_coefficient
 
 f = np.geomspace(100.0, 5000.0, 200)
-result = slit_transmission_coefficient(f, 0.002, 0.1)
+result = slit_transmission_coefficient(f, width=0.002, depth=0.1)
 
 # One line: the wall section with the slit to scale.
 result.plot_geometry()
@@ -750,6 +804,41 @@ And the coincidence dip in $R$ and the coincidence peak in $\sigma$ are the
 same event seen from the two sides — the same $\sigma$ reappears in the
 transmission factor of the detailed EN 12354 model and as the radiation factor
 ISO 7849 measures.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_panels.svg" alt="Left: radiation efficiency against frequency for a 1.5 by 1.25 metre glass pane and a 0.5 by 0.4 metre pane of the same glass, both with the critical frequency and the unity line marked, showing the smaller pane radiating three times better below coincidence. Right: the baffled simply supported plate the model assumes, drawn to scale" width="92%" />
+
+*Three regimes on one axis. Below $f_c$ the two panes differ by a factor of three
+in $\sigma$ although they are the same glass — the smaller one radiates
+relatively better, because its uncancelled edge strip is a larger fraction of it.
+At coincidence both peak above unity, the 1.5 × 1.25 m pane at 2.61 in the 2 kHz
+band that straddles $f_c$ = 2 107 Hz. Above it $\sigma$ falls back towards 1 only
+slowly: still 1.74 one third of an octave past coincidence and 1.32 at 5 kHz. The
+right-hand panel is the geometry the model assumes and the reason it needs two
+dimensions and an edge condition.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+sig_big = radiation_efficiency(bands, 1.5, 1.25, fc)
+sig_small = radiation_efficiency(bands, 0.5, 0.4, fc)
+
+fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(11, 4.5))
+ax_l.loglog(bands, sig_big.radiation_efficiency, "-o", ms=3, label="1.5 x 1.25 m")
+ax_l.loglog(bands, sig_small.radiation_efficiency, "-s", ms=3, label="0.5 x 0.4 m")
+ax_l.axhline(1.0, ls=":")
+ax_l.axvline(fc, ls=":", color="r")
+ax_l.set(xlabel="Frequency [Hz]", ylabel=r"Radiation efficiency $\sigma$")
+ax_l.legend()
+
+# One line — the baffled plate the model assumes:
+sig_big.plot_geometry(ax=ax_r)
+plt.show()
+```
+
+</details>
 
 ```python
 from phonometry import radiation_efficiency, sound_power_from_vibration
@@ -847,7 +936,8 @@ fig.tight_layout(); plt.show()
 | `mass1` / `mass2` | float | kg/m² | > 0 | Double-wall leaf surface densities |
 | `gap` | float | m | > 0 | Cavity depth $d$ |
 | `cavity_medium` | `PorousMediumResult` | — | default `None` | Porous fill; lowers $f_0$ |
-| `width` / `depth` (slit) | float | m | > 0 | Slit width $w$ / depth $d$ |
+| `width` (slit) | float | m | > 0 | Slit width $w$. Third positional argument of `slit_transmission_coefficient`, **second** of `slit_resonance_frequencies` |
+| `depth` (slit) | float | m | > 0 | Slit depth $d$ (the wall thickness). Fourth positional argument of `slit_transmission_coefficient`, **first** of `slit_resonance_frequencies` |
 | `field` / `position` (slit) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Incident field and slit location |
 | `radius` / `depth` (hole) | float | m | > 0 | Circular-aperture radius $a$ / depth $d$ |
 | `areas` / `reduction_indices` | seq | m² / dB | length $N$ | Composite elements (1-D or (N, bands)) |

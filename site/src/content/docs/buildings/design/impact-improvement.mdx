@@ -66,6 +66,76 @@ concrete plate; a standard tapping machine excites it and the structure-borne
 covering. For locally-reacting coverings that acceleration-level difference
 equals the ISO 10140 impact sound reduction.
 
+### "Locally reacting" is the condition the whole method rests on
+
+Clause 3.3 defines it: a covering is **locally reacting** when the impact is
+transmitted into the bearing floor *predominantly through the area the hammers
+directly excite*. The energy does not spread sideways through the covering
+itself, so — as the standard's own note says — the improvement does not depend on
+the size of the specimen. That single property is what lets a
+120 cm × 80 cm plate stand in for a full transmission suite: if a 1 m² sample and
+a 20 m² floor give the same $\Delta L$, the small rig is not an approximation of
+the large one, it is the same measurement.
+
+The qualifying family is named in the scope: soft, flexible coverings — carpets,
+PVC and linoleum — which map onto ISO 10140-1:2010 Annex H, **category I**. The
+disqualifying family is anything with a stiff wearing layer that distributes the
+hammer load over an area the specimen's own size then bounds: laminates, click
+systems, and any floating floor, whose screed is precisely a load-spreading
+plate. The standard states the consequences plainly. For non-soft, non-flexible
+floorings "increased deviations from the results of the ISO 10140 series method
+may occur due to the dependency on the specimen size"; and **in the case of
+difference with ISO 10140, the result of the ISO 10140 measurement shall be
+used**. The mock-up never overrules the full-size suite.
+
+One rating rule follows from the same clause. Where more than one sample of the
+same product is tested, the per-band $\Delta L$ of the samples are **arithmetically
+averaged first, and ISO 717-2 is applied to the average** (Clause 6.5). Rating
+each sample and averaging the ratings is a different number and is not what the
+standard asks for.
+
+### The rig, and why every dimension of it is in the standard
+
+Annex A is normative and consists of two setup drawings. The slab is
+(120 ± 5) cm × (80 ± 5) cm × (20 ± 1) cm, homogeneous and of uniform thickness,
+flat to ± 1 mm along a horizontal line from edge to edge and hard enough to
+endure the hammers — a screed may be added to provide the flatness. It rests on
+four elastic supports at the corners, none exceeding 10 cm × 10 cm, and the
+vertical resonance of the slab on those bearings shall lie **below 20 Hz**. At
+least four accelerometer positions are screwed or glued to the lower surface,
+uniformly but randomly distributed, avoiding symmetric lines and at least 10 cm
+from the edges. The tapping machine takes at least two positions, at least 30 cm
+apart, skew to the edges, with no hammer closer than 10 cm to an edge and all
+four feet standing on the specimen.
+
+Each of those numbers is doing something. The 20 cm thickness reproduces the
+ISO 10140 standard heavyweight floor, which is what makes the improvement
+transferable to a real building. The sub-20 Hz support resonance puts the whole
+measurement range above the rigid-body modes, so the plate behaves as a free
+body and its acceleration reflects only the force the hammers inject. The
+flatness matters because $\Delta L$ is the ratio of two force inputs and an
+uneven surface changes how the hammers strike. The edge clearances and the
+randomised, asymmetric positions keep the four-position average from landing on a
+nodal line of the plate's own modes. And the four accelerometer levels and two
+machine positions are not decoration: Formula (4) averages $\Delta L$ over the
+$t \times a$ pairs, which is exactly what `impact_improvement` consumes.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso16251_mockup.svg" alt="The ISO 16251-1 small floor mock-up: a section through the 200 mm concrete slab on its four elastic pads with the covering specimen and the tapping machine, a plan of the 1200 by 800 mm slab with the two machine positions and four accelerometer positions and their clearances, and the three measurement cycles" width="92%" />
+
+The instrument chain is specified too (Clause 5.2): the measurement system shall
+be declared to meet IEC 61672-1 class 1 with the microphone replaced by the
+accelerometer, the one-third-octave filters IEC 61260 class 1, the tapping
+machine ISO 10140-5, and the vibration calibration ISO 16063. The standard warns
+that the bare plate's acceleration signal is a train of extremely short pulses
+which some otherwise-compliant chains handle badly, and asks for a first-use
+check against an ISO 10140 measurement. Three cycles are recorded — with the
+specimen, without it (hammer positions repeating within ± 2 cm) and background —
+each averaged for **not less than 20 s**, with temperature and humidity noted
+before and after and the chain calibrated before and rechecked after.
+
+None of this is checked by the library, which starts from the measured
+acceleration levels: conformity of the facility is the operator's to demonstrate.
+
 **Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
 follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
@@ -85,6 +155,22 @@ results (clause 8 e)) also carries the spectrum adaptation term
 $C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020 Formula (A.4)), exposed as
 `ci_delta` on the result and standalone as
 `impact_improvement_adaptation_term()`.
+
+**And $C_{I,\Delta}$ is half the answer, so read it.** The weighted rating slides
+a reference curve until the excess fits, which rewards improvement wherever in
+the spectrum it happens; real footfall noise is dominated by the low and mid
+bands, where a thin resilient covering does least. $C_I$ is the adaptation term
+that compares the *unweighted* energetic sum with the weighted rating, and
+$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ contrasts the reference floor as it is
+against the reference floor with the covering on it, with $C_{I,r,0}$ fixed at
+$-11$ dB (A.2.2; $-10{,}3$ dB when one decimal is required). Formula (A.5) then
+says what the pair means:
+$\Delta L_\text{lin} = \Delta L_w + C_{I,\Delta}$. This page's carpet is rated
+29 ($-13$) dB, so on the flat-response scale it buys **16 dB**, not 29. A
+strongly negative $C_{I,\Delta}$ is the signature of a covering that works only
+high up — typical of thin resilient layers, and exactly where the tapping machine
+flatters them; a covering with $C_{I,\Delta}$ near zero improves the whole range.
+A fiche that prints only $\Delta L_w$ has told you the better half of the story.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement.svg" alt="ISO 16251-1 floor-covering impact sound improvement: the improvement delta-L of a soft carpet rising with frequency across one-third-octave bands from 100 Hz to 3150 Hz, with the shaded improvement area and the weighted single-number delta-Lw annotated" width="80%" />
 
@@ -117,6 +203,14 @@ from phonometry import building
 delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
 print(building.weighted_impact_improvement(delta_l))    # 29 dB (carpet)
 
+# Two samples of the same product: average the per-band improvements FIRST,
+# then rate the average (Clause 6.5). Rating each sample and averaging the
+# ratings is a different number.
+import numpy as np
+sample_a = np.array(delta_l, dtype=float)
+sample_b = sample_a + np.array([1, 0, -1, 1, 0, -1, 1, 0, -1, 1, 0, -1, 1, 0, -1, 1])
+print(building.weighted_impact_improvement(0.5 * (sample_a + sample_b)))   # 29 dB
+
 # From the measured bare/covered acceleration levels, with a background trace:
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
          1000, 1250, 1600, 2000, 2500, 3150]
@@ -133,6 +227,23 @@ res.plot()            # the delta-L(f) improvement spectrum above (needs matplot
 ```
 
 ## ISO 16251-1 impact-improvement report (`.report()`)
+
+Clauses 8 and 9 decide what a result has to carry to be reportable, and most of
+it is yours to supply rather than the library's to compute. Beside the improvement
+itself the table must show the **bare-plate acceleration level $L_{a,0}$** with
+its reference $a_0$, the per-band $\Delta L$ of *every* sample tested, their
+average where there is more than one, the weighted improvement(s) and the
+adaptation term(s) — all rounded to **one decimal place**, with any band whose
+background correction hit the 1,3 dB limit written as "> $\Delta L$". The report
+then adds: the manufacturer and product identification, a detailed description of
+the covering with the number and size of the specimens, the **method of mounting,
+in particular the adhesive with its mass per area and curing time**, the
+temperature and humidity during the test, the **positions of the tapping machine
+and the accelerometers**, and a statement of whether the specimen suffered
+visible damage such as compaction. Those map onto the `manufacturer`, `specimen`,
+`mounting`, `mass_per_area`, `temperature`, `pressure`, `test_date` and `notes`
+fields of `ReportMetadata` below; the damage statement and the mounting detail
+have no field of their own and belong in `notes`.
 
 `FloorCoveringImprovementResult.report(path)` writes a one-page accredited
 impact-improvement fiche: the standard-basis line, a metadata header, the

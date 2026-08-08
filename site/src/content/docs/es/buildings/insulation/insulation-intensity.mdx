@@ -34,10 +34,10 @@ que lo traiga, y el área de absorción convierte el nivel de la sala de nuevo
 en potencia. El método por **intensidad acústica** de ISO 15186 sustituye esa
 inferencia por una lectura directa: una sonda de intensidad p-p barre una
 superficie de medición que envuelve el elemento de ensayo y mide la potencia
-radiada solo por el elemento ensayado, así que la transmisión por flancos
-queda fuera del número. Esta guía cubre el índice de reducción acústica por
-intensidad $R_I$ y su forma modificada con $K_c$, la diferencia de niveles
-normalizada de elemento para elementos constructivos pequeños, el indicador de
+radiada solo por él, así que la transmisión por flancos queda fuera del
+número. Esta guía cubre el índice de reducción acústica por intensidad
+$R_I$ y su forma modificada con $K_c$, la diferencia de niveles normalizada
+de elemento para elementos constructivos pequeños, el indicador de
 cualificación de la superficie y las fichas de ensayo acreditadas. La cadena
 de laboratorio por presión vive en
 [Medición del aislamiento en
@@ -47,28 +47,40 @@ la física de la sonda y sus indicadores de campo son el tema de la
 
 ## Medir la potencia transmitida directamente (ISO 15186-1)
 
+La magnitud que se mide es una **integral de superficie**: la potencia acústica
+neta que atraviesa una superficie imaginaria trazada alrededor de la cara
+radiante del elemento de ensayo,
+$W = \int_S \mathbf{I} \cdot \mathbf{n}\, \mathrm{d}S$, con $\mathbf{I}$ el
+vector intensidad promediado en el tiempo y $\mathbf{n}$ la normal saliente. De
+ahí se siguen dos consecuencias que, juntas, son todo el método. La primera:
+una fuente situada *fuera* de la superficie cerrada no aporta nada a la
+integral, porque lo que entra por una cara sale por otra, de modo que una pared
+de flanco que radia al mismo recinto receptor se cancela a sí misma y solo
+sobrevive el elemento de ensayo encerrado. La segunda: el signo importa, porque
+un trozo de superficie por el que la energía vuelve *hacia* el elemento de
+ensayo resta, y por eso la norma lleva una regla del signo menos
+(apartado 6.4.6) que ningún método basado en presión necesita. La sonda lee
+$\mathbf{I} \cdot \mathbf{n}$ punto a punto y quien mide hace la integración
+moviéndola, lo que convierte el patrón de barrido en parte de la medición y no
+en una cuestión de destreza.
 
-El [método de laboratorio de ISO
-10140](/phonometry/es/buildings/insulation/insulation-lab/)
-lee la potencia transmitida de forma
-*indirecta*, a partir del nivel del recinto receptor y de su área de absorción,
-lo que falla cuando los flancos filtran una potencia que la sala integra
-igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
-de intensidad barre una superficie de medición que envuelve el elemento de
-ensayo y mide la potencia radiada de forma *directa*, así que solo contribuye
-el elemento ensayado. Es la herramienta preferida cuando la transmisión por
-flancos es alta (ISO 15186-1:2000, apartado 1). A partir del nivel del recinto
-emisor $L_{p1}$ y del nivel medio de intensidad normal $L_{In}$ sobre la
-superficie (área $S_m$), para un elemento de ensayo de área $S$,
+Eso es lo que el método por presión no puede hacer. Lee la potencia transmitida
+de forma *indirecta*, a partir del nivel del recinto receptor y de su área de
+absorción, y la sala integra cada vatio que llega, sea cual sea la trayectoria
+que lo trajo. El método por intensidad es por eso la herramienta preferida
+cuando la transmisión por flancos es alta
+(ISO 15186-1:2000, apartado 1). A partir del nivel del recinto emisor $L_{p1}$ y
+del nivel medio de intensidad normal $L_{In}$ sobre la superficie (área $S_m$),
+para un elemento de ensayo de área $S$,
 
 $$
 R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
 $$
 
-donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
-y el nivel de intensidad incidente. La misma fórmula da el índice aparente
-$R'_I$ en campo (ISO 15186-2). El barrido de intensidad mide directamente la
-potencia transmitida. El método por presión en cámara reverberante no: infiere
+donde los $6$ dB son el desplazamiento de campo difuso entre el nivel de
+presión acústica y el nivel de intensidad incidente. La misma fórmula da el
+índice aparente $R'_I$ en campo (ISO 15186-2). El barrido de intensidad mide
+directamente la potencia transmitida. El método por presión en cámara reverberante no: infiere
 la potencia a partir del nivel del recinto receptor y por eso la *subestima*,
 lo que hace que el $R$ de ISO 10140-2 salga ligeramente alto. El **índice
 modificado** $R_{I,M} = R_I + K_c$ vuelve a añadir ese mismo sesgo al resultado
@@ -104,6 +116,10 @@ print(res.rating.rating)                     # 38  ->  RI,w (motor ISO 717-1)
 
 # Cualifica la superficie de medición: FpI = Lp - LIn debe quedar < 10 dB (< 6 dB
 # si el lado receptor es absorbente); el índice residual de la sonda > FpI+10.
+# Lp es el nivel de presión del recinto receptor medido sobre la misma
+# superficie, a ser posible simultáneamente con el barrido (apartado 6.4.2).
+# Aquí queda 6 dB por encima de LIn, es decir, justo en el criterio del
+# elemento absorbente.
 fpi = building.surface_pressure_intensity_indicator(np.full(16, 46.0), l_in)
 print(round(float(fpi[0]), 1))               # 6.0
 
@@ -115,12 +131,7 @@ res.plot()   # RI medido vs curva de referencia ISO 717-1 desplazada (necesita m
 *El índice modificado $R_{I,M} = R_I + K_c$ eleva $R_I$ (más en las bandas
 bajas, donde $K_c$ es mayor), de modo que una medición por intensidad reproduce
 el resultado por presión de la ISO 10140-2. El índice automático solo se forma
-con exactamente 16 valores de tercio de octava o 5 de octava
-(`rating`/`rating_modified` son `None` en otro caso). Las subáreas barridas por
-separado se combinan primero con `combine_subareas` (Fórmulas (11)-(12)); una
-subárea cuya energía neta fluye de vuelta hacia el elemento de ensayo se introduce con
-área negativa, aplicando la regla del signo menos de el Apartado 6.4.6
-mientras $S_m$ conserva la suma de áreas sin signo.*
+con exactamente 16 valores de tercio de octava o 5 de octava.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -155,6 +166,156 @@ plt.show()
 
 </details>
 
+## Barrer la superficie de medición (apartado 6.4)
+
+Un método definido por cómo se mueve una sonda no queda documentado por su
+fórmula. Todo lo que sigue fija un número que la fórmula consume después, y
+nada de ello lo comprueban las funciones de esta página.
+
+**La superficie (apartado 6.4.1).** La superficie de medición envuelve por
+completo el elemento de ensayo. Un elemento alojado en un nicho de más de 0,1 m
+de profundidad se mide normalmente sobre la superficie plana de la boca del
+nicho; en los demás casos, y para la mayoría de los elementos constructivos
+pequeños, la superficie tiene forma de caja. Elige la distancia de medición en
+la franja de **0,1 m a 0,3 m**. Por debajo de 0,1 m el campo próximo del
+elemento vibrante hace que la intensidad cambie de signo repetidamente y la
+integral deja de converger; por encima de 0,3 m una superficie en forma de caja
+recoge demasiada sala.
+
+**Cualificar la superficie (apartado 6.4.2).** Mide $L_{In}$ y, a ser posible
+simultáneamente, el nivel de presión promediado sobre la superficie $L_p$, y
+forma el indicador superficial presión-intensidad $F_{pI} = L_p - L_{In}$
+(Fórmula (10)). La superficie no queda cualificada si la intensidad medida es
+negativa, o si $F_{pI} > 10$ dB en un elemento reflectante o $> 6$ dB en uno
+con una superficie absorbente mirando al recinto receptor. El remedio está
+**ordenado**: primero aumenta la distancia de medición entre 5 cm y 10 cm; solo si
+eso falla, añade absorción al recinto receptor. El criterio se aplica por
+barrido y por posición de altavoz, y a la superficie *total*, no a las subáreas
+individuales (con posiciones discretas, al promedio sobre la superficie). La
+regla práctica de la norma para saber cuánta absorción basta es
+$S/A < 1{,}25$, con $S$ la superficie de medición y $A$ el área de absorción
+del recinto receptor, y cuanta más transmisión por flancos haya, mayor tiene
+que ser $A$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_field_indicator_es.svg" alt="El indicador superficial presión-intensidad FpI por banda de tercio de octava de 100 Hz a 3150 Hz, superando el criterio de 10 dB del elemento reflectante en las tres bandas más bajas y estabilizándose en 6,5 dB por encima de 630 Hz, con las líneas de criterio de 10 dB y de 6 dB dibujadas" width="88%" />
+
+*La cualificación es por banda, y falla justo donde un recinto receptor es
+menos absorbente. Aquí las tres bandas más bajas quedan por encima de la línea
+de 10 dB, así que la superficie no está cualificada en absoluto para un
+elemento reflectante y el barrido todavía no es un resultado; e incluso la
+parte cualificada queda por encima de la línea de 6 dB, así que esta superficie
+no podría usarse con un elemento de cara absorbente. La norma ordena el
+remedio: primero añade de 5 cm a 10 cm de distancia de medición, y solo después
+mete absorción en el recinto receptor.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np` y `building` son los imports del primer bloque de arriba.
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]
+l_p = np.array([64.0, 63.0, 61.5, 59.0, 57.5, 56.0, 55.0, 54.0,
+                53.0, 52.0, 51.0, 50.5, 50.0, 50.0, 51.0, 55.0])
+l_in_q = np.array([51.5, 51.5, 51.0, 49.5, 49.0, 48.0, 47.5, 47.0,
+                   46.5, 45.5, 44.5, 44.0, 43.5, 43.5, 44.5, 48.5])
+f_pi = building.surface_pressure_intensity_indicator(l_p, l_in_q)
+print(int((f_pi > 10.0).sum()), "bandas incumplen el criterio reflectante")   # 3
+
+fig, ax = plt.subplots()
+x = np.arange(len(freqs))
+ax.fill_between(x, 0.0, f_pi, where=f_pi > 10.0, alpha=0.25,
+                label="superficie no cualificada")
+ax.plot(x, f_pi, "-o", label="FpI = Lp - LIn (Fórmula (10))")
+ax.axhline(10.0, ls="--", label="10 dB: elemento reflectante (6.4.2)")
+ax.axhline(6.0, ls=":", label="6 dB: elemento absorbente")
+ax.set_xticks(x, [str(f) for f in freqs], rotation=45, fontsize=8)
+ax.set(xlabel="Frecuencia [Hz]",
+       ylabel="Indicador superficial presión-intensidad FpI [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**El barrido (apartado 6.4.3).** Sostén la sonda **normal** a la superficie,
+con su sentido positivo apuntando hacia fuera, en dirección contraria al
+elemento. Barre en líneas paralelas, girando en cada borde, con una separación
+de líneas normalmente igual a la distancia de medición y más densa donde la
+radiación sea irregular (fugas). Mantén la velocidad de barrido constante entre
+**0,1 m/s y 0,3 m/s**, haz que el tiempo de barrido de cada subárea sea
+proporcional a su área, e interrumpe la medición al pasar de una subárea a la
+siguiente en lugar de pararte a mitad de un área. Donde una superficie en forma
+de caja se encuentra con el elemento separador, barre lo más cerca posible de
+la pared: esa intersección es por donde más fácilmente se pierde potencia
+radiada fuera de la integral.
+
+**Dos barridos, no uno (apartado 6.4.5).** Para cada posición fija de altavoz,
+realiza **dos barridos completos** con el recorrido girado 90° entre uno y
+otro. Si difieren menos de 1,0 dB en todas las bandas, el resultado es su media
+aritmética; si alguna banda difiere más, **la medición no es válida**: repite
+la pareja y, si sigue fallando, cambia la densidad de líneas, la superficie o
+el entorno. Con varias posiciones de altavoz, haz una pareja cualificante para
+cada una y declara la media aritmética de todos los barridos. Con altavoz
+móvil, cada barrido ocupa un recorrido completo (al menos uno para puertas,
+ventanas y elementos pequeños, y dos para paredes), y el tiempo total de
+barrido o recorrido por patrón es de al menos 120 s en ventanas, puertas y
+elementos pequeños y de al menos 600 s en paredes.
+
+**Posiciones discretas en su lugar (apartado 6.4.4).** Espacia las posiciones
+aproximadamente a la distancia de medición, más densas en elementos con fugas o
+no homogéneos pero a distancia constante, sigue el procedimiento de grado 2 de
+ISO 9614-1 y comprueba la retícula con su Anexo B, y permanece al menos 10 s en
+cada posición. Un altavoz móvil necesita al menos dos recorridos sobre el
+conjunto completo de posiciones en puertas, ventanas y elementos pequeños, y
+ocho en paredes.
+
+**Ruido de fondo (apartado 6.5).** Tanto el nivel de presión como el de
+intensidad deben superar el fondo en al menos 10 dB. La prueba que da la propia
+norma es elegante: con $F_{pI} < 10$ dB, baja el nivel de la fuente 10 dB; si
+$F_{pI}$ se mueve menos de 1 dB, el requisito se cumple.
+
+### Combinar subáreas, y el signo que las acompaña
+
+Un elemento de ensayo grande o no homogéneo se barre como varias subáreas
+$S_{mi}$, y `combine_subareas` hace el promedio energético ponderado por área
+de la Fórmula (11) con $S_m = \sum_i |S_{mi}|$ (Fórmula (12)). El
+apartado 6.4.6 añade la regla que no tiene equivalente en ningún método por
+presión: cuando la intensidad neta de una subárea apunta al *lado equivocado*,
+con la energía volviendo hacia el objeto de ensayo, delante de ese $S_{mi}$ va
+un signo menos en la Fórmula (11). Exprésalo pasando el área de esa subárea
+como número negativo; su energía se resta entonces del numerador mientras $S_m$
+conserva la suma sin signo.
+
+```python
+# `np` y `building` son los imports del primer bloque de arriba.
+
+# Tres subáreas de una superficie de 12 m2: los dos acristalamientos y el
+# marco. La tira del marco lee un flujo neto entrante, así que su área entra
+# negativa en la Fórmula (11).
+l_in_sub = np.array([
+    np.full(16, 41.0),    # 5.0 m2, hacia fuera
+    np.full(16, 39.0),    # 5.5 m2, hacia fuera
+    np.full(16, 33.0),    # 1.5 m2, HACIA DENTRO -> área negativa
+])
+l_in_comb, s_m = building.combine_subareas(l_in_sub, [5.0, 5.5, -1.5])
+print(round(float(l_in_comb[0]), 2), s_m)     # 39.36 12.0
+
+# Ignorar el signo infla la potencia transmitida, es decir, baja RI:
+l_in_naive, _ = building.combine_subareas(l_in_sub, [5.0, 5.5, 1.5])
+print(round(float(l_in_naive[0] - l_in_comb[0]), 2))   # 0.24
+```
+
+Una subárea que lee hacia dentro no es una curiosidad que se despache con un
+signo. Significa que la superficie envolvente está cortando el campo de algo
+que queda *fuera* de ella, un elemento de flanco o una segunda fuente en el
+recinto receptor, así que conviene rehacer la cualificación del apartado 6.4.2
+antes siquiera de declarar el número. $S_m$ conserva el área sin signo porque
+es el área realmente barrida, que es lo que necesita el término
+$10\log_{10}(S_m/S)$ de $R_I$.
+
 ### Parámetros de `intensity_sound_reduction()` / `adaptation_term_kc()`
 
 | Parámetro | Tipo | Unidades | Rango / def. | Notas |
@@ -166,12 +327,18 @@ plt.show()
 | `kc` | array 1D | dB | uno por banda / `None` | Término de adaptación para el índice modificado |
 | `freq` | array 1D | Hz | > 0 | Frecuencias centrales (`adaptation_term_kc`) |
 | `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala $S_{b2}$ / $V_2$ para la Fórmula (B.1) |
+| `n` | int | unidades de elemento | ≥ 1, por defecto `1` | Número de elementos idénticos (solo `intensity_element_normalized_difference`) |
 
 `intensity_sound_reduction()` devuelve un `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
 `intensity_element_normalized_difference()` un
 `IntensityElementNormalizedResult` (`d_i_n_e`, `rating`);
-`surface_pressure_intensity_indicator()` y `combine_subareas()` devuelven arrays.
+`surface_pressure_intensity_indicator()` devuelve un array y
+`combine_subareas()` una pareja `(LIn, Sm)`. Los campos `rating` solo se forman
+con exactamente 16 valores de tercio de octava o 5 de octava, y son `None` en
+otro caso, así que un barrido tomado sobre el rango completo de ISO 15186-1, de
+100 Hz a 5000 Hz (apartado 6.6, 18 bandas), hay que recortarlo al rango de
+ISO 717-1 antes de poder valorarlo.
 
 
 ## Informe de ensayo por intensidad de ISO 15186-1 (`.report()`)
@@ -230,7 +397,7 @@ repositorio. Pulsa la vista previa para abrir el PDF:
 <ReportPreview
 	name="iso15186_intensity_example"
 	title="Informe de ejemplo por intensidad ISO 15186-1 (PDF)"
-	description="Informe de ensayo de aislamiento acústico por intensidad en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de RI en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice RI,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
+	description="Informe de ensayo de aislamiento acústico por intensidad en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de RI en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice RI,w (C; Ctr) en un recuadro evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
 	caption="Ficha por intensidad (IntensityReductionResult.report), RI,w (C; Ctr)."
 />
 
@@ -241,10 +408,10 @@ ventana pequeña) el método por intensidad informa en su lugar de la diferencia
 de niveles normalizada de elementos $D_{I,n,e}$ (Fórmula (8)), normalizada al área
 de absorción de referencia $A_0 = 10\ \text{m}^2$.
 `IntensityElementNormalizedResult.report()` escribe la misma ficha de una página
-a través del renderizador compartido, con `DI,n,e,w (C; Ctr)` en caja evaluado
-según ISO 717-1; `verbose=True` muestra la evaluación ISO 717 por banda y un
-`requirement` añade un veredicto CUMPLE/NO CUMPLE (el aislamiento del elemento
-cumple igualando o superando el objetivo).
+a través del renderizador compartido, con `DI,n,e,w (C; Ctr)` en un recuadro
+evaluado según ISO 717-1; `verbose=True` muestra la evaluación ISO 717 por
+banda y un `requirement` añade un veredicto CUMPLE/NO CUMPLE (el aislamiento
+del elemento cumple igualando o superando el objetivo).
 
 ```python
 import numpy as np
@@ -317,7 +484,7 @@ plt.show()
 <ReportPreview
 	name="iso15186_element_example"
 	title="Informe de ejemplo de elementos por intensidad ISO 15186-1 (PDF)"
-	description="Informe de ensayo de aislamiento acústico por intensidad normalizado de elementos en laboratorio de un elemento constructivo pequeño de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie del elemento), la tabla de DI,n,e en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice DI,n,e,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
+	description="Informe de ensayo de aislamiento acústico por intensidad normalizado de elementos en laboratorio de un elemento constructivo pequeño de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie del elemento), la tabla de DI,n,e en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice DI,n,e,w (C; Ctr) en un recuadro evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
 	caption="Ficha de elementos por intensidad (IntensityElementNormalizedResult.report), DI,n,e,w (C; Ctr)."
 />
 
@@ -358,7 +525,12 @@ barrido, la adquisición con dos micrófonos y la calibración del desajuste de
 fase tras $L_{p1}$ y $L_{In}$) no está implementada: ambos niveles se toman
 como entradas ya medidas, y la ficha de ISO 15186-1 declara explícitamente
 que no tiene campo para la geometría de la superficie de medición ni para el
-método de adquisición por barrido o por puntos discretos. Tampoco están
+método de adquisición por barrido o por puntos discretos. Aquí tampoco se
+impone la adquisición del apartado 6.4 documentada más arriba: la separación de
+0,1 a 0,3 m, la velocidad de barrido de 0,1 a 0,3 m/s, el segundo barrido
+girado 90° y su prueba de validez de 1,0 dB, el margen de 10 dB sobre el ruido
+de fondo. Un solo barrido produce un número igual de fácilmente que una pareja
+cualificada. Tampoco están
 implementados el procedimiento de campo propio de ISO 15186-2 (posiciones
 de altavoz, los casos de fachada) ni la variante de baja frecuencia de la
 parte 3: las fórmulas de esta página se aplican sin cambios a datos de

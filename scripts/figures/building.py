@@ -1030,3 +1030,359 @@ def generate_dbhr_global_index(output_dir: str) -> None:
     ra(r_prime).plot(ax=ax, language=_LANG)
     save_figure(output_dir, "dbhr_global_index.png")
     plt.close()
+
+
+def generate_insulation_adaptation_terms(output_dir: str) -> None:
+    """Two constructions with the same Rw and very different Ctr."""
+    print("Generating insulation_adaptation_terms.png...")
+    from phonometry import (
+        double_wall_transmission_loss,
+        single_panel_transmission_loss,
+        weighted_rating,
+    )
+
+    freqs = np.asarray(_THIRD_OCTAVE_16, dtype=float)
+
+    # Two real constructions, both drawn by the library's own panel models.
+    # Heavy: 150 mm dense concrete, m' = 2300 x 0.15 = 345 kg/m2, fc = 125 Hz.
+    heavy = np.round(
+        single_panel_transmission_loss(
+            freqs, 345.0, critical_frequency=125.0
+        ).transmission_loss, 1)
+    # Light: metal-stud double leaf, 12 kg/m2 per leaf, 90 mm cavity, whose
+    # mass-air-mass resonance lands at 81.5 Hz and drags the low bands down.
+    light_result = double_wall_transmission_loss(
+        freqs, mass1=12.0, mass2=12.0, gap=0.09
+    )
+    light = np.round(light_result.transmission_loss, 1)
+    f0 = light_result.resonance_frequency
+
+    w_heavy = weighted_rating(heavy)
+    w_light = weighted_rating(light)
+
+    _fig, (ax_spec, ax_bar) = plt.subplots(
+        1, 2, figsize=(13.0, 5.8), gridspec_kw={"width_ratios": [1.35, 1.0]}
+    )
+
+    x = _band_index_axis(ax_spec, _THIRD_OCTAVE_16, fontsize=8)
+    assert w_heavy.shifted_reference is not None
+    ax_spec.plot(x, w_heavy.shifted_reference, "--", color=COLOR_FG,
+                 linewidth=1.5, zorder=3,
+                 label=f"shifted reference (both, Rw = {w_heavy.rating} dB)")
+    ax_spec.plot(x, heavy, "-o", color=COLOR_PRIMARY, linewidth=2.4,
+                 markersize=5, zorder=5, label="150 mm dense concrete")
+    ax_spec.plot(x, light, "-s", color=COLOR_SECONDARY, linewidth=2.4,
+                 markersize=5, zorder=5, label="double leaf, 12 kg/m2 + 90 mm")
+    ax_spec.annotate(f"mass-air-mass resonance at {f0:.0f} Hz, below the\n"
+                     "rated range: the double leaf enters it still climbing",
+                     xy=(0.0, float(light[0])), xytext=(1.4, float(light.min()) + 2.0),
+                     fontsize=9, color=COLOR_FG,
+                     arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax_spec.set_ylabel("Sound reduction index R [dB]")
+    ax_spec.set_title("Same weighted rating, different spectrum",
+                      fontweight="bold", pad=10)
+    ax_spec.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_spec.set_axisbelow(True)
+    ax_spec.legend(loc="lower right", fontsize=9)
+
+    groups = ("Rw", "Rw + C", "Rw + Ctr")
+    heavy_vals = [w_heavy.rating, w_heavy.rating + w_heavy.c,
+                  w_heavy.rating + w_heavy.ctr]
+    light_vals = [w_light.rating, w_light.rating + w_light.c,
+                  w_light.rating + w_light.ctr]
+    xb = np.arange(len(groups))
+    ax_bar.bar(xb - 0.19, heavy_vals, width=0.36, color=COLOR_PRIMARY,
+               edgecolor=COLOR_FG, linewidth=0.7, zorder=3, label="concrete")
+    ax_bar.bar(xb + 0.19, light_vals, width=0.36, color=COLOR_SECONDARY,
+               edgecolor=COLOR_FG, linewidth=0.7, zorder=3, label="double leaf")
+    for i, (hv, lv) in enumerate(zip(heavy_vals, light_vals, strict=True)):
+        ax_bar.text(i - 0.19, hv + 0.6, f"{hv}", ha="center", fontsize=9,
+                    color=COLOR_FG)
+        ax_bar.text(i + 0.19, lv + 0.6, f"{lv}", ha="center", fontsize=9,
+                    color=COLOR_FG)
+    spread = heavy_vals[2] - light_vals[2]
+    ax_bar.annotate(f"{spread} dB apart\nagainst traffic",
+                    xy=(2.0, (heavy_vals[2] + light_vals[2]) / 2.0),
+                    xytext=(0.55, float(min(light_vals)) - 6.5), fontsize=10,
+                    fontweight="bold", color=COLOR_FG,
+                    arrowprops={"arrowstyle": "->", "lw": 1.2})
+    ax_bar.set_xticks(xb)
+    ax_bar.set_xticklabels(groups)
+    ax_bar.set_ylabel("Single number [dB]")
+    ax_bar.set_ylim(float(min(light_vals)) - 9.0, float(max(heavy_vals)) + 5.0)
+    ax_bar.set_title("Rw alone is not a specification",
+                     fontweight="bold", pad=10)
+    ax_bar.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_bar.set_axisbelow(True)
+    ax_bar.legend(loc="lower left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "insulation_adaptation_terms.png")
+    plt.close()
+
+
+def generate_background_correction_regimes(output_dir: str) -> None:
+    """The three-regime background correction, laboratory against field."""
+    print("Generating background_correction_regimes.png...")
+    margin = np.linspace(0.0, 20.0, 401)
+    # Formula (4) / (14): the energy subtraction, written on the margin alone.
+    # Only used above 6 dB of margin, where the logarithm is finite.
+    with np.errstate(divide="ignore"):
+        formula = margin - 10.0 * np.log10(10.0 ** (margin / 10.0) - 1.0)
+    cap = 1.3
+
+    lab = np.where(margin <= 6.0, cap, np.where(margin < 15.0, formula, 0.0))
+    field = np.where(margin <= 6.0, cap, np.where(margin < 10.0, formula, 0.0))
+
+    _fig, ax = plt.subplots(figsize=(10.5, 6.0))
+    ax.fill_between(margin, 0.0, cap, where=(margin <= 6.0).tolist(),
+                    color=theme_fill(COLOR_SECONDARY, ax), zorder=1)
+    ax.plot(margin, lab, "-", color=COLOR_PRIMARY, linewidth=2.6, zorder=5,
+            label="ISO 10140-4 laboratory (6 / 15 dB)")
+    ax.plot(margin, field, "--", color=COLOR_TERTIARY, linewidth=2.4, zorder=4,
+            label="ISO 16283-1 field (6 / 10 dB)")
+    for edge, style in ((6.0, "-"), (10.0, ":"), (15.0, ":")):
+        ax.axvline(edge, color=COLOR_FG, linewidth=1.0, linestyle=style,
+                   alpha=0.7, zorder=2)
+    ax.text(3.0, cap + 0.18, "limit of measurement\n(fixed 1,3 dB, flag the band)",
+            ha="center", fontsize=9, color=COLOR_FG)
+    ax.annotate(f"6 - 10 lg(10^0,6 - 1) = {formula[margin.searchsorted(6.0)]:.2f} dB",
+                xy=(6.0, cap), xytext=(7.4, cap + 0.62), fontsize=9,
+                color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate("the field rule stops here", xy=(10.0, 0.0),
+                xytext=(10.6, 0.55), fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate("the laboratory rule stops here", xy=(15.0, 0.0),
+                xytext=(12.4, 0.95), fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.set_xlim(0.0, 20.0)
+    ax.set_ylim(-0.15, 2.3)
+    ax.set_xlabel("Signal-to-background margin Lsb - Lb [dB]")
+    ax.set_ylabel("Correction applied, Lsb - L [dB]")
+    ax.set_title("Background-noise correction: two standards, two thresholds",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "background_correction_regimes.png")
+    plt.close()
+
+
+def generate_fast_reverberation_correction(output_dir: str) -> None:
+    """Why a Fast maximum needs its own reverberation standardization."""
+    print("Generating fast_reverberation_correction.png...")
+    from phonometry import fast_reverberation_correction
+
+    t = np.linspace(0.2, 5.0, 481)
+    # Both curves are the term *subtracted* in the standardization, so they are
+    # directly comparable: 10 lg[g(C)/g(C0)] against 10 lg(T/T0).
+    fast = np.asarray(fast_reverberation_correction(t), dtype=float)
+    energy = 10.0 * np.log10(t / 0.5)
+
+    _fig, ax = plt.subplots(figsize=(10.5, 6.0))
+    diverge = np.abs(fast - energy) > 1.0
+    ax.fill_between(t, fast, energy, where=diverge.tolist(), interpolate=True,
+                    color=theme_fill(COLOR_SECONDARY, ax), zorder=1,
+                    label="more than 1 dB apart")
+    ax.plot(t, fast, "-", color=COLOR_PRIMARY, linewidth=2.6, zorder=5,
+            label="Fast maximum: 10 lg[g(C)/g(C0)] (ISO 16283-2)")
+    ax.plot(t, energy, "--", color=COLOR_TERTIARY, linewidth=2.2, zorder=4,
+            label="energy average: 10 lg(T/T0)")
+    ax.axhline(0.0, color=COLOR_FG, linewidth=1.0, alpha=0.6, zorder=2)
+    ax.axvline(0.5, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
+               zorder=2)
+    ax.axvline(1.7275, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
+               zorder=2)
+    ax.annotate("T = T0 = 0,5 s\nboth terms vanish", xy=(0.5, 0.0),
+                xytext=(0.62, 4.4), fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate("T = 1,7275 s: C = 1, g = 1/e", xy=(1.7275, float(
+        np.interp(1.7275, t, fast))), xytext=(1.95, 1.1), fontsize=9,
+        color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate(f"at T = 5 s the energy average has grown to "
+                f"{energy[-1]:.1f} dB\nwhile the Fast term has saturated at "
+                f"{fast[-1]:.1f} dB",
+                xy=(5.0, float(fast[-1])), xytext=(2.55, 8.4), fontsize=9,
+                color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.set_xlim(0.2, 5.0)
+    ax.set_xlabel("Receiving-room reverberation time T [s]")
+    ax.set_ylabel("Term subtracted from the measured level [dB]")
+    ax.set_title("A Fast detector cannot follow a long decay",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "fast_reverberation_correction.png")
+    plt.close()
+
+
+def generate_lab_versus_field_insulation(output_dir: str) -> None:
+    """One partition, three spectra: laboratory R and two field R'."""
+    print("Generating lab_versus_field_insulation.png...")
+    from phonometry import (
+        flanking_reduction_index,
+        single_panel_transmission_loss,
+        weighted_rating,
+    )
+
+    freqs = np.asarray(_THIRD_OCTAVE_16, dtype=float)
+    # Separating wall: 150 mm dense concrete, Ss = 11.5 m2.
+    lab = np.round(single_panel_transmission_loss(
+        freqs, 345.0, critical_frequency=125.0).transmission_loss, 1)
+    # Flanking elements: 140 mm concrete floor/ceiling and a 100 mm facade.
+    floor = np.round(single_panel_transmission_loss(
+        freqs, 322.0, critical_frequency=135.0).transmission_loss, 1)
+    facade = np.round(single_panel_transmission_loss(
+        freqs, 230.0, critical_frequency=160.0).transmission_loss, 1)
+
+    def apparent(dv_500: float) -> np.ndarray:
+        """R' with twelve flanking paths of a given junction quality."""
+        dv = dv_500 + 6.0 * np.log10(freqs / 100.0)
+        tau = 10.0 ** (-lab / 10.0)
+        for r_flank, area, length in ((floor, 13.5, 4.5), (floor, 13.5, 4.5),
+                                      (facade, 7.65, 2.55), (facade, 7.65, 2.55)):
+            for _ in range(3):  # the Ff, Fd and Df paths of that element
+                r_ij = flanking_reduction_index(
+                    index_i=r_flank, index_j=r_flank,
+                    velocity_level_difference=dv,
+                    separating_area=11.5, area_i=area, area_j=area,
+                )
+                tau = tau + 10.0 ** (-np.asarray(r_ij) / 10.0)
+        return np.round(-10.0 * np.log10(tau), 1)
+
+    good = apparent(14.0)
+    poor = apparent(4.0)
+    w_lab, w_good, w_poor = (weighted_rating(s) for s in (lab, good, poor))
+
+    _fig, ax = plt.subplots(figsize=(11.0, 6.4))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16, fontsize=8)
+    ax.fill_between(x, poor, lab, color=theme_fill(COLOR_SECONDARY, ax),
+                    zorder=1)
+    ax.plot(x, lab, "-o", color=COLOR_PRIMARY, linewidth=2.6, markersize=5,
+            zorder=5, label=f"laboratory R (Rw = {w_lab.rating} dB)")
+    ax.plot(x, good, "-s", color=COLOR_TERTIARY, linewidth=2.2, markersize=4,
+            zorder=4, label=f"field R', good junctions (R'w = {w_good.rating} dB)")
+    ax.plot(x, poor, "-^", color=COLOR_SECONDARY, linewidth=2.2, markersize=4,
+            zorder=4, label=f"field R', flanking dominant (R'w = {w_poor.rating} dB)")
+
+    mid = len(x) // 2
+    ax.annotate("", xy=(mid, float(lab[mid])), xytext=(mid, float(good[mid])),
+                arrowprops={"arrowstyle": "<->", "lw": 1.4, "color": COLOR_FG})
+    ax.text(mid + 0.25, (float(lab[mid]) + float(good[mid])) / 2.0,
+            f"{w_lab.rating - w_good.rating} dB: normal", fontsize=9,
+            color=COLOR_FG)
+    ax.annotate("", xy=(mid + 3, float(lab[mid + 3])),
+                xytext=(mid + 3, float(poor[mid + 3])),
+                arrowprops={"arrowstyle": "<->", "lw": 1.4, "color": COLOR_FG})
+    ax.text(mid + 3.25, (float(lab[mid + 3]) + float(poor[mid + 3])) / 2.0,
+            f"{w_lab.rating - w_poor.rating} dB: find the path", fontsize=9,
+            color=COLOR_FG)
+
+    ax.set_ylabel("Sound reduction index [dB]")
+    ax.set_title("The same wall, in the laboratory and in two buildings\n"
+                 "(EN 12354-1 flanking over twelve paths)",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "lab_versus_field_insulation.png")
+    plt.close()
+
+
+def generate_composite_facade_weak_element(output_dir: str) -> None:
+    """The weak element rules a composite facade, made general."""
+    print("Generating composite_facade_weak_element.png...")
+    from phonometry import composite_transmission_loss
+
+    window = np.linspace(20.0, 55.0, 351)
+    _fig, ax = plt.subplots(figsize=(10.5, 6.2))
+    colours = (COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY)
+    for blind, colour in zip((40.0, 50.0, 60.0), colours, strict=True):
+        overall = [composite_transmission_loss([6.0, 2.0], [blind, float(w)])
+                   for w in window]
+        ax.plot(window, overall, "-", color=colour, linewidth=2.4, zorder=4,
+                label=f"blind part RA = {blind:g} dBA")
+        ax.axhline(blind, color=colour, linewidth=1.0, linestyle=":",
+                   alpha=0.6, zorder=2)
+
+    marks = ((26.0, 40.0, -4.6, -2.0), (26.0, 50.0, -4.6, 1.4),
+             (31.0, 40.0, -3.6, 1.4))
+    for w_val, blind, dx, dy in marks:
+        y = composite_transmission_loss([6.0, 2.0], [blind, w_val])
+        ax.plot([w_val], [y], "o", color=COLOR_FG, markersize=7, zorder=6)
+        ax.annotate(f"{y:.2f}", xy=(w_val, y), xytext=(w_val + dx, y + dy),
+                    fontsize=9, color=COLOR_FG)
+
+    ax.annotate("+10 dBA on the blind part: +0.4 dBA",
+                xy=(26.0, composite_transmission_loss([6.0, 2.0], [50.0, 26.0])),
+                xytext=(33.0, 27.0), fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate("+5 dBA on the window: +4.1 dBA",
+                xy=(31.0, composite_transmission_loss([6.0, 2.0], [40.0, 31.0])),
+                xytext=(33.0, 31.0), fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+
+    ax.set_xlim(20.0, 55.0)
+    ax.set_xlabel("Window RA [dBA]  (2 m2 of an 8 m2 facade)")
+    ax.set_ylabel("Overall facade RA [dBA]")
+    ax.set_title("The weak element sets the composite\n"
+                 "(Ejemplo 7.5 geometry: 6 m2 blind part + 2 m2 window)",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "composite_facade_weak_element.png")
+    plt.close()
+
+
+def generate_intensity_field_indicator(output_dir: str) -> None:
+    """The ISO 15186-1 surface qualification, band by band."""
+    print("Generating intensity_field_indicator.png...")
+    from phonometry import surface_pressure_intensity_indicator
+
+    freqs = _THIRD_OCTAVE_16
+    # A scan that qualifies over most of the range and fails at the bottom,
+    # which is where a receiving room is least absorbent.
+    l_p = np.array([64.0, 63.0, 61.5, 59.0, 57.5, 56.0, 55.0, 54.0,
+                    53.0, 52.0, 51.0, 50.5, 50.0, 50.0, 51.0, 55.0])
+    l_in = np.array([51.5, 51.5, 51.0, 49.5, 49.0, 48.0, 47.5, 47.0,
+                     46.5, 45.5, 44.5, 44.0, 43.5, 43.5, 44.5, 48.5])
+    f_pi = np.asarray(surface_pressure_intensity_indicator(l_p, l_in))
+
+    _fig, ax = plt.subplots(figsize=(10.5, 6.0))
+    x = _band_index_axis(ax, freqs, fontsize=8)
+    failing = (f_pi > 10.0).tolist()
+    ax.fill_between(x, 0.0, f_pi, where=failing, interpolate=False,
+                    color=theme_fill(COLOR_SECONDARY, ax), zorder=1,
+                    label="surface not qualified")
+    ax.plot(x, f_pi, "-o", color=COLOR_PRIMARY, linewidth=2.4, markersize=5,
+            zorder=5, label="FpI = Lp - LIn (Formula (10))")
+    ax.axhline(10.0, color=COLOR_FG, linewidth=1.6, linestyle="--", zorder=3,
+               label="10 dB: reflecting specimen (6.4.2)")
+    ax.axhline(6.0, color=COLOR_TERTIARY, linewidth=1.6, linestyle=":",
+               zorder=3, label="6 dB: absorbing specimen")
+    ax.text(0.35, float(f_pi.max()) + 0.5,
+            "remedy in order: +5 to 10 cm of measurement distance first,\n"
+            "then absorption in the receiving room",
+            fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    ax.set_ylim(0.0, float(f_pi.max()) + 3.4)
+    ax.set_ylabel("Surface pressure-intensity indicator FpI [dB]")
+    ax.set_title("Qualifying the measurement surface (ISO 15186-1, 6.4.2)",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "intensity_field_indicator.png")
+    plt.close()

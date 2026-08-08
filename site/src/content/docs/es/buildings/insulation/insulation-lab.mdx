@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 2: Measurement of airborne sound insulation"
     designation: "ISO 10140-2:2010"
     url: "https://www.iso.org/standard/42088.html"
-    note: "El índice de reducción acústica R de laboratorio con la corrección de ruido de fondo (Apartado 4.3)."
+    note: "El índice de reducción acústica R de laboratorio con la corrección de ruido de fondo (apartado 4.3)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -62,15 +62,17 @@ y la predicción que consume estos índices de laboratorio en
 
 ## Medición en laboratorio (ISO 10140)
 
-Una [medición ISO 16283 en campo](/phonometry/es/buildings/insulation/insulation-field/) da las magnitudes
-con prima ($R'$, $L'_n$): el número que un edificio real alcanza, con
-transmisión por flancos incluida. Para valorar un elemento por sí solo (un tipo de pared, un suelo
-flotante, una ventana), se lleva a un **laboratorio** cualificado (ISO 10140),
-donde la transmisión por flancos suprimida hace que la transmisión *directa* sea
-toda la historia. Las fórmulas pierden sus primas: el **índice de reducción
-acústica** $R$ (no $R'$) y el **nivel de impactos normalizado** $L_n$ (no $L'_n$),
-con el área de absorción del recinto receptor $A = 0{,}16\ V/T$ ahora una propiedad
-conocida de la instalación:
+Lo que compra el laboratorio es **comparabilidad**. Una vez suprimidos los
+flancos desaparecen las primas y, con ellas, la dependencia de la pareja
+concreta de recintos en la que el elemento se hubiera montado: el área de
+absorción del recinto receptor $A = 0{,}16\ V/T$ pasa a ser una propiedad
+conocida de la instalación en lugar de una magnitud del edificio, de modo que
+la misma pared medida en Madrid y en Múnich debería dar el mismo número. Eso es
+lo que hace posible un catálogo, y es la razón por la que toda predicción de
+este sitio toma como entrada el $R$ y el $L_n$ de laboratorio. Nada más en
+acústica de la edificación es transferible de esa manera. Las dos magnitudes
+son el **índice de reducción acústica** $R$ (no $R'$) y el **nivel de impactos
+normalizado** $L_n$ (no $L'_n$):
 
 $$
 R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
@@ -80,6 +82,26 @@ $$
 La propia instalación es la que suprime los flancos: dos cámaras reverberantes
 desacopladas estructuralmente de al menos 50 m³ cada una, con el elemento a
 ensayo montado en una abertura de ensayo de unos 10 m² entre ambas.
+
+La supresión nunca es total, y el residuo importa. Toda cámara tiene un
+**índice de reducción acústica máximo medible** $R'_\text{max}$, fijado por las
+trayectorias indirectas que sobreviven y estimado por el Anexo A normativo de
+ISO 10140-5:2010; un elemento de ensayo medido cerca de ese techo está
+declarando la instalación y no a sí mismo, y por eso un informe acreditado
+indica la curva de $R'_\text{max}$ de la cámara junto al resultado. El Anexo A
+lo cualifica sobre construcciones representativas y no en abstracto, seis de
+ellas, desde una partición ligera de doble hoja hasta un muro de fábrica de
+(400 ± 40) kg/m² con trasdosado independiente, y los valores obtenidos valen
+solo para las configuraciones ensayadas. Su propia tabla ilustrativa, para una
+cámara capaz de medir paredes y forjados de tipo C hasta $R_w = 55$ dB, va de
+45,0 dB a 100 Hz a 86,0 dB a 3150 Hz, y la norma dice con todas las letras que
+son ejemplos y no objetivos. Cuando se espera que un elemento choque con ese
+techo, la vía de intensidad de
+[Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/)
+lee en su lugar la potencia transmitida sobre la cara radiante y es la
+herramienta preferida cuando la transmisión por flancos es alta, que es
+también, exactamente, para lo que existe el índice de intensidad modificado con
+$K_c$: para volver a hacerla comparable.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_es.svg" alt="Vista en planta de las cámaras de transmisión de laboratorio ISO 10140: recintos emisor y receptor reverberantes desacoplados estructuralmente de unos 59 y 51 metros cúbicos, el elemento de ensayo montado en la abertura de ensayo de 10 metros cuadrados entre ambos, un altavoz en esquina en el recinto emisor y un micrófono en movimiento continuo con radio de barrido de al menos 1 m en cada recinto" width="92%" />
 
@@ -100,37 +122,91 @@ una construcción bien ejecutada $R'_w$ queda unos pocos dB por debajo del
 $R_w$ de laboratorio de la misma partición; una diferencia mucho mayor dice
 que dominan los flancos, y el
 [modelo EN 12354](/phonometry/es/buildings/design/insulation-prediction/) dice qué vía
-domina.
+domina. La figura de más abajo dibuja las tres curvas de una misma pared.
 
 Los índices de un solo número reutilizan los mismísimos motores de ISO 717-1/2
 (`weighted_rating`, `weighted_impact_rating`): un espectro $R$ se valora a $R_w$
 exactamente igual que un espectro $R'$ se valoraba a $R'_w$. Antes de formar el
 índice, los niveles del recinto receptor deben **corregirse por ruido de fondo**
-(Apartado 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
-se aplica para un margen señal-fondo de 6–15 dB, una corrección fija de 1,3 dB
+(apartado 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
+(Fórmula (4)) se aplica para un margen por encima de 6 dB y por debajo de
+15 dB, una corrección fija de 1,3 dB
 (el *límite de medición*) en 6 dB o por debajo, y ninguna corrección en 15 dB o
-por encima.
+por encima. Esos son los umbrales de **laboratorio**; ISO 16283-1 usa 6 dB y
+10 dB en campo, así que las dos reglas no son intercambiables; véase
+[Medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/#correccion-por-ruido-de-fondo).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/background_correction_regimes_es.svg" alt="La corrección aplicada a un nivel del recinto receptor frente al margen señal-fondo: plana en la saturación de 1,3 dB por debajo de 6 dB, después la curva de resta energética, cayendo a cero en 15 dB con la regla de laboratorio de ISO 10140-4 y en 10 dB con la regla de campo de ISO 16283-1" width="88%" />
+
+*Una regla de tres ramas con dos umbrales, y los umbrales no son los mismos en
+las dos normas. La saturación de 1,3 dB no es una constante mágica: es el valor
+de la resta energética justo con 6 dB de margen,
+$6 - 10\log_{10}(10^{0,6} - 1) = 1{,}26$ dB, redondeado hacia arriba y
+congelado. Entre 6 y 10 dB las dos reglas coinciden, y la curva de campo
+discontinua queda escondida bajo la de laboratorio; se separan por encima de
+10 dB, donde la norma de campo deja de corregir y la de laboratorio sigue hasta
+15 dB. Las bandas corregidas por la saturación son cotas inferiores del
+aislamiento y hay que marcarlas como límite de medición.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+margin = np.linspace(0.0, 20.0, 401)
+# La resta energética de la Fórmula (4), escrita solo sobre el margen. Solo se
+# usa por encima de 6 dB, donde el logaritmo es finito.
+with np.errstate(divide="ignore"):
+    formula = margin - 10 * np.log10(10 ** (margin / 10) - 1)
+cap = 1.3
+lab = np.where(margin <= 6, cap, np.where(margin < 15, formula, 0.0))
+field = np.where(margin <= 6, cap, np.where(margin < 10, formula, 0.0))
+print(round(float(formula[np.searchsorted(margin, 6.0)]), 2))   # 1.26
+
+fig, ax = plt.subplots()
+ax.fill_between(margin, 0.0, cap, where=margin <= 6, alpha=0.25)
+ax.plot(margin, lab, label="ISO 10140-4 laboratorio (6 / 15 dB)")
+ax.plot(margin, field, "--", label="ISO 16283-1 in situ (6 / 10 dB)")
+ax.set(xlabel="Margen señal-fondo Lsb - Lb [dB]",
+       ylabel="Corrección aplicada, Lsb - L [dB]", ylim=(-0.15, 2.3))
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ```python
 import numpy as np
 from phonometry import building
 
-# Niveles emisor/receptor y T del recinto receptor en las 16 bandas de tercio
-# de octava; S es el área libre de la abertura de ensayo, V el volumen del recinto receptor.
-l1 = np.full(16, 80.0)
-l2 = np.full(16, 40.0)
-t2 = np.full(16, 0.5)
-lab = building.lab_airborne_insulation(l1, l2, t2, area=10.0, volume=50.0)
-print(round(float(lab.r[0]), 1))              # 38.0  R = L1 - L2 + 10 lg(S/A)
-print(round(float(lab.absorption[0]), 1))     # 16.0  A = 0.16 V / T (m^2)
-print(lab.rating.rating, lab.rating.c, lab.rating.ctr)   # 38 0 0  ->  Rw(C;Ctr)
+# El muro del Anexo C de ISO 717-1 en una cámara ISO 10140: el nivel del
+# recinto emisor, el nivel que produce en el receptor y el T del receptor, en
+# las 16 bandas de tercio de octava. S = 10 m2 es la abertura de ensayo libre y
+# V = 50 m3.
+r_annex_c = np.array([20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+                      28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5])
+l1 = np.full(16, 90.0)
+t2 = np.full(16, 0.8)
+lab = building.lab_airborne_insulation(l1, l1 - r_annex_c, t2,
+                                       area=10.0, volume=50.0)
+print(round(float(lab.absorption[0]), 1))     # 10.0  A = 0.16 V / T (m^2)
+print(round(float(lab.r[0]), 1))              # 20.4  R = L1 - L2 + 10 lg(S/A)
+print(lab.rating.rating, lab.rating.c, lab.rating.ctr)  # 30 -2 -3  Rw(C;Ctr)
 
 # Impactos: el nivel de la máquina de impactos Li normalizado a A0 = 10 m^2 da Ln
 li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
                73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2])
 imp = building.lab_impact_insulation(li, t2, volume=50.0)
-print(round(float(imp.l_n[0]), 1))            # 64.1  Ln = Li + 10 lg(A/A0)
-print(imp.rating.rating, imp.rating.ci)       # 81 -11  ->  Ln,w(CI)
+print(round(float(imp.l_n[0]), 1))            # 62.1  Ln = Li + 10 lg(A/A0)
+print(imp.rating.rating, imp.rating.ci)       # 79 -11  ->  Ln,w(CI)
+
+# Comprobación del álgebra, no de una pared: con S = A el término 10 lg(S/A) se
+# anula, así que una diferencia de niveles plana de 40 dB se lee como R = 40 dB.
+flat = building.lab_airborne_insulation(np.full(16, 80.0), np.full(16, 40.0),
+                                        np.full(16, 0.5), area=16.0, volume=50.0)
+print(round(float(flat.r[0]), 1))             # 40.0
 
 # Corrección por ruido de fondo: márgenes 6 / 1 / 20 dB -> saturado / saturado / sin cambio
 corrected = building.background_correction([30.0, 33.0, 50.0], [24.0, 32.0, 30.0])
@@ -139,11 +215,24 @@ print(np.round(corrected, 1))                 # [28.7 31.7 50.0]  (saturación d
 lab.rating.plot()   # R medido frente a la referencia ISO 717-1 desplazada (requiere matplotlib)
 ```
 
-Un margen en 6 dB o por debajo emite un `LabInsulationWarning` y marca la banda
-como el límite de medición; captúralo con `warnings.simplefilter("error",
-LabInsulationWarning)`. El índice automático se forma solo cuando se suministran
-exactamente 16 valores en tercio de octava o 5 en octava (`rating` es `None` en
-caso contrario).
+Lee los números en lugar de coleccionarlos. $R_w = 30$ dB es una partición
+ligera, una sola hoja de placa de yeso o un acristalamiento fino, muy por
+debajo de los 45 a 55 dB con los que normalmente se especifica una pared
+separadora de vivienda, y su $C_{tr} = -3$ dB dice que cede otros 3 dB frente
+al tráfico, así que se declararía como 27 dB frente a una carretera.
+$L_{n,w} = 79$ dB es un forjado estructural desnudo, sin revestimiento ni suelo
+flotante: los límites europeos de impacto para vivienda rondan los 50 a 60 dB,
+así que este forjado los incumple todos por unos 20 dB. Su $C_I = -11$ dB es la
+mitad interesante: un $C_I$ muy negativo significa que el espectro medido está
+mucho más cargado hacia la alta frecuencia que la curva de referencia, así que
+el forjado es *mejor* en las bajas frecuencias que realmente excitan las
+pisadas de lo que sugiere el $L_{n,w}$ por sí solo, y un revestimiento blando
+(que actúa en alta frecuencia) mejorará el número único más de lo que mejora lo
+que oye el vecino. Los dos índices globales se forman solo cuando se
+suministran exactamente 16 valores en tercio de octava o 5 en octava (`rating`
+es `None` en caso contrario). Un margen en 6 dB o por debajo emite un
+`LabInsulationWarning` y marca la banda como el límite de medición; captúralo
+con `warnings.simplefilter("error", LabInsulationWarning)`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión acústica de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
 
@@ -198,6 +287,154 @@ plt.show()
 
 </details>
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_versus_field_insulation_es.svg" alt="Una misma partición de hormigón de 150 mm dibujada tres veces por banda de tercio de octava: el índice de reducción acústica R de laboratorio con Rw = 49 dB, el R' aparente de la misma pared en un edificio con uniones buenas con R'w = 47 dB, y el R' aparente donde dominan los flancos con R'w = 42 dB, con las dos brechas acotadas" width="92%" />
+
+*La misma pared de hormigón de 150 mm, medida de tres maneras. Dos decibelios
+de pérdida es lo que cuesta una unión bien ejecutada y es el número que hay que
+esperar; siete dicen que el sonido llega por una ruta que la partición no
+controla, y las doce trayectorias por flancos del modelo EN 12354-1, tres por
+cada elemento de flanco, son donde hay que buscarlo. Las dos curvas de campo
+son predicciones, no desplazamientos: entre ellas solo cambia la calidad de la
+unión, a través de la diferencia de nivel de velocidad promediada
+direccionalmente $\overline{D}_{v,ij}$ que suministra una
+[medición ISO 10848](/phonometry/es/buildings/insulation/flanking-lab/).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `building` es el import del bloque de laboratorio de arriba.
+
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+lab_r = np.round(building.single_panel_transmission_loss(
+    freqs, 345.0, critical_frequency=125.0).transmission_loss, 1)
+floor = np.round(building.single_panel_transmission_loss(
+    freqs, 322.0, critical_frequency=135.0).transmission_loss, 1)
+facade = np.round(building.single_panel_transmission_loss(
+    freqs, 230.0, critical_frequency=160.0).transmission_loss, 1)
+
+def apparent(dv_100):
+    """R' por la trayectoria directa más doce trayectorias por flancos (Fórmula 15)."""
+    dv = dv_100 + 6 * np.log10(freqs / 100)
+    tau = 10 ** (-lab_r / 10)
+    for r_flank, area, length in ((floor, 13.5, 4.5), (floor, 13.5, 4.5),
+                                  (facade, 7.65, 2.55), (facade, 7.65, 2.55)):
+        for _ in range(3):                      # las trayectorias Ff, Fd y Df
+            r_ij = building.flanking_reduction_index(
+                index_i=r_flank, index_j=r_flank,
+                velocity_level_difference=dv,
+                separating_area=11.5, area_i=area, area_j=area)
+            tau = tau + 10 ** (-np.asarray(r_ij) / 10)
+    return np.round(-10 * np.log10(tau), 1)
+
+good, poor = apparent(14.0), apparent(4.0)
+print(building.weighted_rating(lab_r).rating,
+      building.weighted_rating(good).rating,
+      building.weighted_rating(poor).rating)          # 49 47 42
+
+fig, ax = plt.subplots()
+x = np.arange(16)
+ax.fill_between(x, poor, lab_r, alpha=0.2)
+ax.plot(x, lab_r, "-o", label="R de laboratorio")
+ax.plot(x, good, "-s", label="R' in situ, uniones buenas")
+ax.plot(x, poor, "-^", label="R' in situ, flancos dominantes")
+ax.set_xticks(x, [f"{f:g}" for f in freqs], rotation=45, fontsize=8)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Índice de reducción acústica [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Procedimiento (ISO 10140-4:2010)
+
+Las reglas de laboratorio no son las de campo, y quien pase de esta página a su
+[hermana de campo](/phonometry/es/buildings/insulation/insulation-field/)
+aplicará las equivocadas si no se ponen una al lado de la otra.
+
+**Bandas (apartado 4.1).** Tercios de octava de 100 Hz a **5000 Hz**, 18
+bandas, dos más que las 16 que consume el índice de ISO 717, con 50, 63 y 80 Hz
+añadidas cuando se quiere información en baja frecuencia (Anexo A).
+
+**Micrófonos (apartados 4.2.2 y 4.2.3).** Separaciones mínimas, que conviene
+superar cuando se pueda: 0,7 m entre posiciones fijas, 0,7 m a los paramentos
+del recinto, 0,7 m a cualquier difusor, **1,0 m al elemento de ensayo** y 1,0 m
+a la fuente sonora. El patrón de 0,7 m y 1,0 m de la norma de campo se parece y
+no es la misma lista. Promedia al menos 6 s por banda en cada posición fija de
+100 Hz a 400 Hz, bajando a no menos de 4 s por encima de ahí; un micrófono en
+movimiento continuo integra sobre un número entero de recorridos y nunca menos
+de 30 s.
+
+**Aéreo (apartados 4.4.1 a 4.4.3).** Altavoces en al menos dos posiciones, o un
+altavoz desplazado a dos como mínimo, o un altavoz móvil, cualificado según el
+Anexo D de ISO 10140-5:2010. Con micrófonos fijos: al menos **cinco**
+posiciones en cada recinto, sin que haya dos en el mismo plano respecto a los
+paramentos y nunca en retícula regular, y con un *único* altavoz, cinco por
+recinto **y por posición de altavoz**. Con micrófono en movimiento continuo:
+radio de barrido de 1 m como mínimo, el plano del recorrido inclinado de forma
+que quede al menos a 10° de todas las superficies del recinto, periodo de
+recorrido de 15 s como mínimo, y una medición por posición de altavoz.
+
+**Impactos (apartado 4.5).** La máquina de impactos normalizada del Anexo E de
+ISO 10140-5:2010, cinco martillos en línea con separación entre centros de
+$(100 \pm 3)$ mm, cada uno con una masa efectiva de 500 g cayendo libremente
+40 mm (de modo que llega a $(0{,}886 \pm 0{,}022)$ m/s), impactos sucesivos
+separados $(100 \pm 20)$ ms y el conjunto por debajo de 25 kg para que no
+cargue un forjado ligero, en **no menos de cuatro** posiciones. Con micrófonos
+fijos, el número de posiciones de micrófono es igual al de posiciones de
+máquina o un múltiplo entero de él: con cuatro o cinco posiciones de máquina,
+al menos dos mediciones en cada una desde al menos dos posiciones de micrófono;
+con seis o más, al menos una medición por posición de máquina, cada una en una
+posición de micrófono distinta. El Anexo F de ISO 10140-5:2010 especifica la
+pelota de caucho junto a la máquina de impactos, y sus golpes de baja
+frecuencia se valoran con un motor completamente distinto; véase
+[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+
+**Tiempo de reverberación (apartado 4.6).** Método de ingeniería de ISO 3382-2
+(se admite el método de precisión), evaluado desde 5 dB por debajo del nivel
+inicial sobre un rango preferente de 20 dB cuyo extremo inferior quede al menos
+10 dB por encima del ruido de fondo del sistema. Al menos **seis** mediciones
+por banda: ruido interrumpido con una posición de altavoz y, o bien tres
+posiciones de micrófono medidas dos veces, o bien seis medidas una vez; o la
+respuesta al impulso integrada con una posición de fuente y seis posiciones
+fijas de micrófono, integrada hacia atrás. Después,
+$A = 0{,}16\,V/T$ (Fórmula (5)).
+
+### El montaje es una variable, no un pie de foto
+
+La cadena `mounting` de los metadatos de la ficha, más abajo, es el único texto
+del informe que cambia el número. ISO 10140-1:2010 fija las condiciones de
+contorno y de montaje **por tipo de elemento**, un anexo para cada uno
+(paredes, puertas, ventanas, vidrios, revestimientos de suelo y demás), porque
+no hay una regla única que pudiera servirles a todos:
+
+- En una pared ligera de doble hoja (Anexo A.3) los parámetros decisivos son la
+  profundidad del nicho y dónde queda la partición respecto a la **junta
+  acústica** del laboratorio. La partición se construye a un lado de la junta,
+  no a caballo de ella, precisamente porque montarla a caballo puede dar un
+  índice de reducción acústica *mayor* (NOTA 1): de otro modo un laboratorio
+  podría favorecer a un producto por construcción.
+- En una ventana (Anexo C.3) los nichos de los dos lados han de tener
+  profundidades distintas, preferiblemente en una relación de unos 2:1, y la
+  holgura perimetral de 10 mm a 13 mm se rellena con material absorbente y se
+  sella con estanquidad al aire por ambas caras.
+- Puede usarse cualquier otro montaje, pero **debe describirse por completo en
+  el informe de ensayo**. Esa frase es la razón de que la etiqueta exista.
+
+La propia abertura de ensayo forma parte de ello: unos 10 m² para paredes, de
+10 m² a 20 m² para forjados, con el lado más corto no menor que 2,3 m
+(ISO 10140-5:2010, apartado 3.3.1). En un elemento de ensayo pesado el
+encuentro perimetral no debe amortiguarlo hasta darle un resultado mejor, así
+que el factor de pérdidas del elemento de ensayo debe ser al menos
+$\eta_\text{min} = 0{,}01 + 0{,}3/\sqrt{f}$ (Fórmula (2)), comprobado con un
+muro de ladrillo o bloque de (400 ± 40) kg/m² enfoscado por una cara. Un $R_w$
+de catálogo declarado sin su etiqueta de montaje y sin la geometría de su
+abertura no es una propiedad del producto, y el mismo elemento de ensayo en una
+abertura distinta es una medición distinta.
+
 ### Parámetros de `lab_airborne_insulation()` / `lab_impact_insulation()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
@@ -214,7 +451,7 @@ plt.show()
 `background_correction(signal_and_background, background)` devuelve los niveles
 corregidos directamente.
 
-### Informe de ensayo en laboratorio de ISO 10140 (`.report()`)
+## Informe de ensayo en laboratorio de ISO 10140 (`.report()`)
 
 Ambos resultados de laboratorio escriben directamente el informe de ensayo de
 ISO 10140 en una página, con el formato de los informes de laboratorio
@@ -282,21 +519,20 @@ repositorio. Pulsa cualquier vista previa para abrir el PDF:
 <ReportPreview
 	name="iso10140_airborne_example"
 	title="Informe de ejemplo aéreo en laboratorio ISO 10140-2 (PDF)"
-	description="Informe de ensayo de aislamiento a ruido aéreo en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de R en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de laboratorio Rw (C; Ctr) en caja, la declaración del método de precisión y un veredicto CUMPLE frente al requisito de 30 dB."
+	description="Informe de ensayo de aislamiento a ruido aéreo en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de R en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de laboratorio Rw (C; Ctr) en un recuadro, la declaración del método de precisión y un veredicto CUMPLE frente al requisito de 30 dB."
 	caption="Ficha aérea de laboratorio (LabAirborneInsulationResult.report), Rw (C; Ctr)."
 />
 
 <ReportPreview
 	name="iso10140_impact_example"
 	title="Informe de ejemplo de impactos en laboratorio ISO 10140-3 (PDF)"
-	description="Informe de ensayo de aislamiento a ruido de impactos en laboratorio de un suelo bajo excitación con la máquina de impactos: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el índice de laboratorio Ln,w (CI) en caja, la declaración del método de precisión y un veredicto CUMPLE frente al requisito de 80 dB (un nivel de impactos menor es mejor)."
+	description="Informe de ensayo de aislamiento a ruido de impactos en laboratorio de un suelo bajo excitación con la máquina de impactos: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el índice de laboratorio Ln,w (CI) en un recuadro, la declaración del método de precisión y un veredicto CUMPLE frente al requisito de 80 dB (un nivel de impactos menor es mejor)."
 	caption="Ficha de impactos de laboratorio (LabImpactInsulationResult.report), Ln,w (CI)."
 />
 
 ## Más allá del método por presión
 
-Tres mediciones de laboratorio hermanas compartían esta página y ahora
-tienen guías propias. Cuando los flancos son demasiado altos para el método
+Tres mediciones de laboratorio vecinas tienen guías propias. Cuando los flancos son demasiado altos para el método
 por presión,
 [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/)
 lee la potencia transmitida directamente sobre la cara radiante. Para un
@@ -318,11 +554,20 @@ y ambos resultados escriben la ficha ISO 10140 de una página con
 `.report()`, con el anexo de área de absorción de ISO 10140-4:2010 en la
 forma detallada.
 
-**No cubierto.** Los requisitos generales de instalación de ensayo y de
-tipo de montaje de ISO 10140-1 no están implementados; la guía solo los
-cita como cadena de texto en los metadatos del informe (`"Montaje tipo A,
-perímetro recibido con mortero (ISO 10140-1)"`). Los métodos de laboratorio que
-compartían esta página están cubiertos por sus propias guías: el
+**No cubierto.** El procedimiento de ISO 10140-4:2010 y los requisitos de
+instalación y de montaje de ISO 10140-1:2010 e ISO 10140-5:2010 están
+documentados más arriba y no están implementados en ninguna parte: nada
+comprueba los recuentos de posiciones, las separaciones, los tiempos de
+promediado, el rango de bandas, la geometría de la abertura de ensayo ni el
+requisito de factor de pérdidas, y la condición de montaje sobrevive solo como
+etiqueta de texto libre en los metadatos del informe (`"Montaje tipo A,
+perímetro recibido con mortero (ISO 10140-1)"`), que es lo que pide
+ISO 10140-1, ya que exige que cualquier montaje se *describa* en lugar de
+elegirse de una lista. Tampoco se estima el $R'_\text{max}$ de la cámara, así
+que un resultado que se acerque al techo de la instalación se producirá sin
+queja alguna; esa cualificación tiene que venir de los propios ensayos del
+Anexo A del laboratorio. Las mediciones de laboratorio vecinas
+están cubiertas por sus propias guías: el
 aislamiento por intensidad (ISO 15186), la mejora de revestimientos de
 suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
 
@@ -339,6 +584,9 @@ suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
   la $\Delta L$ en maqueta a pequeña escala de revestimientos blandos.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
   el índice de reducción vibratoria de unión medido.
+- [Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/):
+  la pelota de caucho que el Anexo F de ISO 10140-5:2010 especifica junto a la
+  máquina de impactos del Anexo E, y la valoración del Anexo D que la acompaña.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   el motor de curva de referencia tras $R_w$ y $L_{n,w}$.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): los métodos de $L_W$

@@ -1755,3 +1755,142 @@ def animate_comb_filtering(output_dir: str) -> None:
                 notch_txt, stage_txt)
 
     _render_clip(fig, update, output_dir, "anim_comb_filtering")
+
+
+def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
+    """EN 29052-1 resonance sweep: the load plate on its resilient specimen
+    driven through fr, with the amplitude peaking and the response flipping
+    from in phase with the force to a quarter cycle behind it and on to
+    antiphase, which is what the measurement actually reads."""
+    from matplotlib.patches import Rectangle
+
+    T = _translate_str
+
+    # The worked determination of the guide: an 8 kg plate (m't = 200 kg/m2)
+    # on a 200 mm specimen resonating at fr = 25 Hz. eta is the loss factor a
+    # mineral-wool layer of this class shows on the rig.
+    f_r, eta = 25.0, 0.14
+    f_lo, f_hi = 8.0, 60.0
+    freqs = np.linspace(f_lo, f_hi, 800)
+
+    def response(f: np.ndarray | float) -> Any:
+        ratio = np.asarray(f, dtype=float) / f_r
+        return 1.0 / (1.0 - ratio ** 2 + 1j * eta * ratio)
+
+    mag = np.abs(response(freqs))
+    phase = np.degrees(np.angle(response(freqs)))
+
+    fig = _anim_figure()
+    fig.suptitle(T("Reading fr on the EN 29052-1 rig"), fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
+                          height_ratios=[1.0, 1.0])
+
+    # --- left: the rig, stroboscopic at the drive frequency ---------------
+    ax_r = fig.add_subplot(gs[:, 0])
+    _schematic_axes(ax_r, (0.0, 4.0), (0.0, 5.4))
+    ax_r.add_patch(Rectangle((0.35, 0.35), 3.3, 0.34, facecolor="none",
+                             edgecolor=COLOR_FG, lw=1.6))
+    for hx in np.linspace(0.45, 3.55, 14):
+        ax_r.plot([hx, hx - 0.12], [0.35, 0.20], color=COLOR_FG, lw=0.8)
+    ax_r.text(2.0, 0.51, T("rigid base"), ha="center", va="center",
+              color=COLOR_FG, fontsize=8.5)
+    spec = Rectangle((0.9, 0.69), 2.2, 0.62, facecolor=COLOR_TERTIARY,
+                         alpha=0.28, edgecolor=COLOR_TERTIARY, lw=1.6)
+    ax_r.add_patch(spec)
+    plate = Rectangle((0.75, 1.31), 2.5, 0.42, facecolor="none",
+                          edgecolor=COLOR_PRIMARY, lw=2.4)
+    ax_r.add_patch(plate)
+    plate_lbl = ax_r.text(2.0, 1.52, T("load plate, 8 kg"), ha="center",
+                          va="center", color=COLOR_FG, fontsize=9)
+    spec_lbl = ax_r.text(3.25, 1.00, T("specimen"), ha="left", va="center",
+                         color=COLOR_FG, fontsize=8.5)
+    y_arrow = 2.75
+    force = ax_r.annotate("", xy=(1.2, y_arrow), xytext=(1.2, y_arrow),
+                          arrowprops={"arrowstyle": "-|>", "lw": 2.6,
+                                      "color": COLOR_SECONDARY})
+    ax_r.text(0.95, 3.58, T("F(t)"), ha="center", va="bottom",
+              color=COLOR_SECONDARY, fontsize=10, family="monospace")
+    ax_r.plot([1.2, 1.2], [y_arrow - 0.03, y_arrow + 0.03],
+              color=COLOR_SECONDARY, lw=1.0)
+    motion = ax_r.annotate("", xy=(2.9, y_arrow), xytext=(2.9, y_arrow),
+                           arrowprops={"arrowstyle": "-|>", "lw": 2.6,
+                                       "color": COLOR_PRIMARY})
+    ax_r.text(3.0, 3.58, T("plate motion"), ha="center", va="bottom",
+              color=COLOR_PRIMARY, fontsize=9)
+    state_txt = ax_r.text(2.0, 4.9, "", ha="center", va="top", color=COLOR_FG,
+                          fontsize=10)
+    drive_txt = ax_r.text(2.0, 4.35, "", ha="center", va="top", color=COLOR_FG,
+                          fontsize=11, family="monospace")
+
+    # --- right: magnitude and phase, with the sweep marker ----------------
+    ax_m = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_m)
+    ax_m.plot(freqs, mag, color=COLOR_PRIMARY, lw=2.0)
+    ax_m.axvline(f_r, color=COLOR_FG, lw=0.9, ls=":", alpha=0.7)
+    ax_m.set_xlim(f_lo, f_hi)
+    ax_m.set_ylim(0.0, float(mag.max()) * 1.18)
+    ax_m.set_ylabel(T("Response magnitude"), fontsize=9)
+    ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T("fr = 25 Hz"), ha="left",
+              va="top", color=COLOR_FG, fontsize=9)
+    (dot_m,) = ax_m.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
+
+    ax_p = fig.add_subplot(gs[1, 1], sharex=ax_m)
+    _grid_axes(ax_p)
+    ax_p.plot(freqs, phase, color=COLOR_PRIMARY, lw=2.0)
+    ax_p.axvline(f_r, color=COLOR_FG, lw=0.9, ls=":", alpha=0.7)
+    ax_p.axhline(-90.0, color=COLOR_SECONDARY, lw=1.0, ls="--", alpha=0.8)
+    ax_p.set_xlim(f_lo, f_hi)
+    ax_p.set_ylim(-190.0, 10.0)
+    ax_p.set_yticks([0, -90, -180])
+    ax_p.set_xlabel(T("Excitation frequency [Hz]"))
+    ax_p.set_ylabel(T("Phase [deg]"), fontsize=9)
+    ax_p.text(f_lo + 1.0, -83.0, T("-90 deg: resonance"), ha="left",
+              va="bottom", color=COLOR_SECONDARY, fontsize=8.5)
+    (dot_p,) = ax_p.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
+
+    sweep_s = (_ANIM_FRAMES - _ANIM_HOLD) / _ANIM_FPS
+    # The plate is watched stroboscopically, one slow cycle per second of
+    # clip, so what moves on screen is the phase of the response relative to
+    # the force, not the 25 Hz oscillation itself.
+    strobe_hz = 1.0
+
+    def update(kf: int) -> tuple[Any, ...]:
+        tc = min(kf / _ANIM_FPS, sweep_s)
+        f = f_lo + (f_hi - f_lo) * tc / sweep_s
+        h = complex(response(f))
+        ang = 2.0 * np.pi * strobe_hz * tc
+        drive = float(np.cos(ang))
+        norm = float(mag.max())
+        # Amplitude compressed for the drawing so that the phase stays
+        # readable far from resonance; the magnitude panel carries the true
+        # amplitude. Positive displacement is drawn downward, like the force.
+        amp = (abs(h) / norm) ** 0.35
+        disp = amp * float(np.cos(ang + np.angle(h)))
+
+        # The plate rides its displacement; the specimen compresses with it.
+        y_plate = 1.31 - 0.26 * disp
+        plate.set_y(y_plate)
+        plate_lbl.set_position((2.0, y_plate + 0.21))
+        spec.set_height(max(0.12, y_plate - 0.69))
+        spec_lbl.set_position((3.25, 0.69 + 0.5 * (y_plate - 0.69)))
+        force.set_position((1.2, y_arrow))
+        force.xy = (1.2, y_arrow - 0.75 * drive)
+        motion.set_position((2.9, y_arrow))
+        motion.xy = (2.9, y_arrow - 0.75 * disp)
+
+        dot_m.set_data([f], [abs(h)])
+        dot_p.set_data([f], [np.degrees(np.angle(h))])
+        deg = np.degrees(np.angle(h))
+        if f < f_r - 3.0:
+            state = T("below fr: the plate follows the force")
+        elif f <= f_r + 3.0:
+            state = T("at fr: a quarter cycle behind, amplitude peaks")
+        else:
+            state = T("above fr: the plate moves against the force")
+        state_txt.set_text(state)
+        drive_txt.set_text(f"f = {f:4.1f} Hz    "
+                           + T("phase") + f" = {deg:6.1f}\u00b0")
+        return (plate, plate_lbl, spec, spec_lbl, force, motion, dot_m, dot_p,
+                state_txt, drive_txt)
+
+    _render_clip(fig, update, output_dir, "anim_dynamic_stiffness_sweep")

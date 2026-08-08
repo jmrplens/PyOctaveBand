@@ -73,7 +73,6 @@ _SKIP: dict[str, str] = {
     "correlation-delay": "excerpt: starts from the record of the prose",
     "detailed-prediction": "excerpt: starts from the paths of the prose",
     "electroacoustics": "excerpt: starts from the captured signal of the prose",
-    "flanking-lab": "excerpt: starts from the measured levels of the prose",
     "impulsive-sound": "excerpt: starts from the recording of the prose",
     "intensity": "excerpt: starts from the band levels of the prose",
     "machine-diagnostics": "excerpt: starts from the record of the prose",

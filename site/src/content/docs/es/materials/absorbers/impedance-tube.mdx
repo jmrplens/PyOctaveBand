@@ -94,6 +94,36 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tube_working_ranges_es.svg" alt="Barras horizontales sobre un eje de frecuencia logarítmico compartido de 100 Hz a 8 kHz con la rejilla de tercios de octava marcada: un tubo de 100 mm con separaciones de micrófono de 100 mm y 50 mm, un tubo de 29 mm con separación de 20 mm, y el mismo tubo de 100 mm bajo los límites de ASTM E2611; cada barra lleva rotulado el límite que la restringe en cada extremo, y el solape entre el tubo grande y el pequeño va rayado" width="86%" />
+
+*Qué tubo ve qué bandas. Cada barra es una geometría, y cada extremo lleva
+rotulada la restricción que lo limita: el extremo bajo es siempre el suelo de
+resolución de fase $c_0/(20 s)$, mientras que el extremo alto es el corte
+$0{,}58\,c_0/d$ para un tubo de separación amplia y la singularidad de
+separación $0{,}45\,c_0/s$ en cuanto los micrófonos se alejan. El tubo de
+100 mm con separación de 100 mm cubre las bandas de tercio de octava de 200 Hz
+a 1250 Hz, y el de 29 mm con separación de 20 mm las bandas de 1 kHz a 5 kHz,
+así que la pareja empalma en el solape de 1 kHz a 1,25 kHz; y ni siquiera
+juntos llegan a las bandas de 100 Hz, 125 Hz y 160 Hz, que es la razón de que
+los datos de absorción en baja frecuencia vengan de la cámara reverberante y no
+de un tubo. La barra ASTM es el mismo equipo bajo las constantes de E2611: más
+ancha por abajo (un suelo del 1 % de la longitud de onda en lugar del 5 %) y
+más estrecha por arriba (una cota de separación de $0{,}40\,c$ en lugar de
+$0{,}45\,c$).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+for spacing, diameter in ((0.100, 0.100), (0.050, 0.100), (0.020, 0.029)):
+    iso = materials.plane_wave_frequency_range(spacing, 343.2, diameter=diameter)
+    astm = materials.plane_wave_frequency_range_astm(spacing, 343.2, diameter=diameter)
+    print(f"tubo de {diameter * 1e3:.0f} mm, s = {spacing * 1e3:.0f} mm:",
+          f"ISO {iso[0]:.0f}-{iso[1]:.0f} Hz, ASTM {astm[0]:.0f}-{astm[1]:.0f} Hz")
+```
+
+</details>
+
 Esos límites se ven mejor sobre el propio equipo.
 `plot_impedance_tube_geometry` dibuja un tubo a escala con su banda de onda
 plana ya calculada, y un resultado medido de `two_microphone_impedance` al
@@ -127,6 +157,41 @@ plt.show()
 
 </details>
 
+### 1.1 Dónde pueden ir los micrófonos
+
+El rango de trabajo lo fijan $d$ y $s$; *en qué punto del tubo* se coloca la
+pareja es otro conjunto de restricciones, y el apartado 4.3 fija sus dos
+extremos.
+
+**Lejos de la fuente.** El altavoz radia modos transversales además de la onda
+plana. Por debajo del primer corte se extinguen en unos tres diámetros de tubo,
+así que se recomienda que el micrófono más cercano esté al menos a tres
+diámetros de la fuente y, en todo caso, nunca a menos de uno: 300 mm y 100 mm
+respectivamente en el tubo de 100 mm de la figura de arriba.
+
+**Lejos de la probeta.** La probeta también distorsiona el campo cerca de su
+cara, y el mínimo depende de qué aspecto tenga: medio diámetro para una muestra
+*no estructurada*, un diámetro para una *semiestructurada lateralmente* y dos
+diámetros para una *fuertemente asimétrica*. En un tubo de 100 mm eso son
+50 mm, 100 mm y 200 mm, así que el $x_1$ = 150 mm de la figura de arriba es
+holgado para una muestra porosa simple, suficiente para una lámina perforada y
+demasiado corto para una probeta muy estructurada, como una matriz de
+resonadores. Nada de esto se hace cumplir: `reflection_factor` solo rechaza
+$x_1 \le 0$, así que un $x_1$ elegido a ojo puede caer dentro del campo cercano
+evanescente de una muestra perforada y aun así devolver un espectro de aspecto
+perfectamente plausible.
+
+**Con qué exactitud hay que conocer las distancias.** Posiciones fijas de
+micrófono a ±0,2 mm o mejor, y las de traslación a ±0,5 mm (apartado 4.5); la
+posición del plano de referencia respecto al micrófono 1 declarada a ±0,5 mm
+(apartado 7.1); y el diámetro del micrófono por debajo del 20 % de la
+separación, y pequeño frente a $c_0/f_u$, para que la cápsula promedie un trozo
+despreciable de la onda (apartado 4.4). El plano de referencia, $x = 0$, es
+normalmente la superficie de la probeta, pero una probeta perfilada o
+estructurada lateralmente tiene su plano de referencia situado a cierta
+distancia *por delante* de ella, y $x_1$ se mide hasta ese plano, no hasta el
+portamuestras.
+
 La misma función auxiliar cubre tubos cuadrados y rectangulares: con `shape="square"`
 o `shape="rectangular"` el factor de la Ec. (3) sustituye al circular, con
 $d$ el lado mayor. La rama de cuatro micrófonos mantiene sus propios límites
@@ -149,11 +214,16 @@ cadena de reducción.
 
 ## 2. Método de la razón de onda estacionaria (ISO 10534-1)
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_standing_wave_tube_es.svg" alt="Aparato de onda estacionaria de ISO 10534-1 en vista lateral: un altavoz sellado al extremo izquierdo excitado con un tono puro cada vez a través de un analizador de banda estrecha, un micrófono de sonda sobre un carro graduado que recorre el eje del tubo, la probeta de ensayo contra el respaldo rígido a la derecha con su cara marcada como x = 0, la envolvente de onda estacionaria dibujada dentro del tubo con sus máximos decayendo al alejarse de la probeta, la diferencia de nivel entre el primer máximo y el primer mínimo, y el primer mínimo acotado desde la cara de la probeta" width="92%" />
+
 Una sonda recorre la
 onda estacionaria y lee la diferencia de nivel
 $\Delta L = L_\text{max} - L_\text{min}$ entre un máximo de presión y el mínimo
-adyacente. La razón de onda estacionaria, la magnitud de reflexión y la
-absorción se obtienen en forma cerrada:
+adyacente. La razón de onda estacionaria (escrita $s$ en ISO 10534-1, la misma
+letra que la parte 2 usa para la separación de micrófonos de la sección 1; las
+dos nunca aparecen en la misma ecuación, y el código las mantiene separadas como
+`swr` y `spacing`) se obtiene en forma cerrada junto con la magnitud de
+reflexión y la absorción:
 
 $$
 s = 10^{\Delta L/20}, \qquad |r| = \frac{s-1}{s+1}, \qquad
@@ -234,18 +304,69 @@ el mismo $r$ complejo, y por tanto la misma impedancia normalizada
 $Z/\rho c_0 = (1+r)/(1-r)$, que el método de la función de transferencia de
 la sección 3 calcula de una vez a partir de $H_{12}$.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standing_wave_envelope_es.svg" alt="El nivel de la envolvente de onda estacionaria en decibelios a lo largo del primer metro de un tubo de 100 mm a 500 Hz para tres terminaciones: una pared rígida cuyos mínimos se hunden fuera del eje, con el primero en la cara de la probeta; la muestra resuelta de magnitud de reflexión 0,5, cuyo primer mínimo queda a 12 centímetros y a menos 6 decibelios; y una terminación casi anecoica que es casi plana. Una copia punteada del caso 0,5 lleva la atenuación de tubo de ISO 10534-2, y se anotan los niveles de sus tres primeros mínimos" width="84%" />
+
+*Lo que recorre de verdad el carro, dibujado como el nivel que muestra el
+analizador a 500 Hz en un tubo de 100 mm. La pared rígida ($|r| = 1$) tiene sus
+mínimos en presión nula y el primero en la cara, $\Phi = -\pi$; la muestra
+resuelta ($|r| = 0{,}5$) da $\Delta L$ = 9,54 dB entre el máximo y el mínimo
+adyacente, con el primero en $x_{\min,1}$ = 12 cm, y la regla del cuarto de
+longitud de onda convierte esa distancia en $\Phi = -54{,}1°$; el caso casi
+anecoico ($|r| = 0{,}1$) modula solo 1,74 dB, que es la razón de que el método
+pierda precisión justo donde un absorbente es bueno. La curva punteada es la
+misma muestra de $|r| = 0{,}5$ con la atenuación de tubo de la Ec. (A.18):
+cuanto más lejos de la cara, más se ha atenuado la onda reflejada, así que los
+valles se rellenan; los tres primeros mínimos leen −5,99, −5,92 y −5,85 dB. Esa
+deriva es pequeña aquí porque la Ec. (A.18) es una cota inferior; la
+extrapolación aproximada de ISO 10534-1 (Anexo A.2.1.4) se ofrece mientras la
+diferencia entre el primer y el segundo mínimo se mantenga por debajo de 2 dB,
+y por encima de eso la atenuación hay que medirla con el tubo vacío. En
+cualquier caso, es la razón de que el operador lea el mínimo *más próximo* a la
+muestra.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# El campo interior de la sección 2, para tres factores de reflexión.
+c0 = 343.2
+x = np.linspace(0.0, 1.0, 800)
+k = 2 * np.pi * 500.0 / c0
+for magnitude, phi in ((1.0, -np.pi), (0.5, np.radians(-54.1)), (0.1, 0.0)):
+    envelope = np.sqrt(1 + magnitude**2 + 2 * magnitude * np.cos(2 * k * x - phi))
+    print(round(float(envelope.min()), 3), round(float(envelope.max()), 3))
+
+# La variante atenuada usa la constante de cota inferior de la Ec. (A.18).
+print(round(float(materials.tube_attenuation_constant(500.0, c0, 0.10)), 4))
+```
+
+</details>
+
+El módulo y la posición son las dos mitades de la lectura, y la biblioteca las
+toma juntas: `standing_wave_reflection(swr, x_min1, wavelength)` devuelve la $r$
+compleja (Ecs. (17)-(23)) y `standing_wave_normalized_impedance`, la relación
+$Z/\rho c_0$ (Ecs. (24)-(26)). Las dos aceptan arrays, así que un recorrido con
+motor paso a paso que registre $(\Delta L, x_{\min,1})$ por tono se reduce a dos
+llamadas:
+
 ```python
 import numpy as np
 from phonometry import materials
 
-# Una lectura a 500 Hz: 9,54 dB entre máximo y mínimo, primer mínimo a 12 cm.
-f, c0 = 500.0, 343.2
-swr = float(materials.standing_wave_ratio_from_level(9.542))
-r_mag = float(materials.standing_wave_reflection_magnitude(swr))
-phase = 4 * np.pi * 0.12 * f / c0 - np.pi         # Phi desde x_min,1
-refl = r_mag * np.exp(1j * phase)
-print(round(r_mag, 2), round(np.degrees(phase), 1))   # 0.5 -54.1
-print(np.round((1 + refl) / (1 - refl), 2))           # Z / rho c0: (1.13-1.22j)
+# Un recorrido de tres tonos: la diferencia de nivel y la distancia del primer
+# mínimo leídas en cada frecuencia, que es todo lo que produce el método.
+f = np.array([500.0, 1000.0, 2000.0])
+c0 = 343.2
+level_difference = np.array([9.542, 6.021, 3.522])   # L_max - L_min [dB]
+x_min1 = np.array([0.120, 0.061, 0.030])             # primer mínimo [m]
+
+swr = materials.standing_wave_ratio_from_level(level_difference)
+lam = c0 / f
+r = materials.standing_wave_reflection(swr, x_min1, lam)
+z = materials.standing_wave_normalized_impedance(swr, x_min1, lam)
+print(np.round(np.abs(r), 2))                  # [0.5  0.33 0.2 ]
+print(np.round(np.degrees(np.angle(r)), 1))    # [-54.1 -52.  -54.1]
+print(np.round(z, 2))                          # Z / rho c0
 ```
 
 Dos cautelas prácticas del propio texto de la norma. Los mínimos lejos de la
@@ -271,8 +392,22 @@ r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-con $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, la separación de micrófonos $s$ y
-$x_1$ la distancia de la muestra al micrófono más lejano.
+con $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, la separación de micrófonos $s$
+(otra vez el sentido que la letra tiene en la parte 2) y $x_1$ la distancia del
+plano de referencia al micrófono más lejano.
+
+**Qué cuesta un error en $x_1$, y qué no.** $x_1$ entra solo a través de
+$e^{\,2 j k_0 x_1}$, una rotación de fase pura. Deja por tanto $|r|$, y con él
+el espectro de absorción, completamente intacto, mientras rota las partes real
+e imaginaria de la impedancia superficial. A 1,5 kHz en aire, un error de 2 mm
+en $x_1$ rota la fase de reflexión unos 6°, suficiente para mover de forma
+apreciable una resistividad al flujo ajustada a partir de esa impedancia. Las
+consecuencias prácticas son dos: medir $x_1$ hasta el *plano de referencia* (la
+cara de la probeta, o el plano por delante de una probeta perfilada) y no hasta
+el portamuestras, porque una probeta que no queda donde debía se lleva $x_1$
+consigo; y leer un $\alpha$ de aspecto sano junto a una impedancia inverosímil
+(una parte real negativa, por ejemplo) como un fallo de $x_1$ o de desajuste, y
+no como un resultado del material.
 
 <Video
   name="anim_standing_wave_tube"
@@ -300,15 +435,141 @@ r = materials.reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
 print(np.round(materials.absorption_from_reflection(r), 3))     # [0.75 0.75 0.75]
 print(np.round(materials.normalized_surface_impedance(r), 2))   # Z / rho c0
 # [1.15-1.23j 1.15-1.23j 1.15-1.23j]
+print(np.round(materials.normalized_surface_admittance(r), 2))  # su recíproca,
+# [0.41+0.43j 0.41+0.43j 0.41+0.43j]     lo que pide una condición de impedancia
 ```
 
 El `two_microphone_impedance` de alto nivel envuelve esta cadena y devuelve un
 `ImpedanceTubeResult` con la absorción, el factor de reflexión, la impedancia
 superficial y la impedancia normalizada, aplicando la comprobación del rango de
-frecuencias de onda plana y la atenuación opcional del tubo; corrige antes
-cualquier desajuste de micrófonos con `apply_mic_calibration`. Su `.plot()`
+frecuencias de onda plana y la atenuación opcional del tubo. Su `.plot()`
 dibuja el espectro de absorción $\alpha(f)$ con el módulo del factor de
-reflexión $|r|$ superpuesto.
+reflexión $|r|$ superpuesto, y `normalized_surface_admittance(r)` da la magnitud
+recíproca que consume una condición de contorno de reacción local: una pared
+FDTD o BEM, o la propia simulación de la biblioteca.
+
+### 3.1 Corregir el desajuste entre canales (apartado 7.5)
+
+Un canal es un micrófono más su preamplificador más su entrada de analizador, y
+no hay dos iguales. El apartado 7.5 de ISO 10534-2 no recomienda corregir eso:
+lo **exige**, «se debe utilizar uno de los procedimientos siguientes». El Anexo
+E.1.2 es aún más tajante (con dos micrófonos, el desajuste de fase «es
+inevitable y se debe compensar»), y E.1.3 añade que las amplitudes deberían
+estar de entrada dentro de 0,3 dB una de otra. La corrección es una división
+compleja que se aplica justo donde $|r|$ es pequeño y la fase de $H_{12}$ lleva
+toda la respuesta, y por eso el síntoma de saltársela es un vagabundeo
+dependiente de la frecuencia y no un desplazamiento constante: el fragmento de
+abajo deja sin corregir un desajuste de 0,5 dB / 1° sobre una probeta cuya
+absorción verdadera es 0,75 y obtiene 0,73, 0,78 y 0,72 en tres bandas
+contiguas. Sobre un absorbente casi perfecto, ese mismo desajuste empuja el
+espectro contra el techo de $\alpha = 1$, que es de donde sale la firma clásica
+del tubo sin corregir: una absorción justo por encima de 1 o justo por debajo
+de 0.
+
+Los dos procedimientos permitidos usan la misma medición, hecha dos veces:
+
+1. Colocar una probeta absorbente en el tubo y medir $H_{12}^{I}$ en la
+   configuración estándar.
+2. **Intercambiar físicamente los dos cartuchos de micrófono**, de modo que A
+   ocupe la posición exacta que ocupaba B y viceversa, *sin* mover los cables
+   del preamplificador ni del analizador. Medir $H_{12}^{II}$.
+3. Formar $H_c = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Ec. (10)) y dividir por él la
+   función de transferencia de trabajo.
+
+La diferencia entre los dos procedimientos es solo con qué frecuencia se hace el
+paso 2. El apartado 7.5.1 repite el intercambio para *cada* probeta, lo que
+conviene con pocas muestras; el apartado 7.5.2 determina $H_c$ una vez contra
+una probeta de calibración y lo conserva para toda la serie, lo que conviene en
+una tirada de producción, tras lo cual los micrófonos deben quedarse donde
+están. La técnica de un solo micrófono del Anexo B no necesita corrección
+alguna, porque solo hay un canal: lo paga con tiempo de medición, y es el mismo
+argumento que hace del método de onda estacionaria de la sección 2 el método de
+arbitraje.
+
+```python
+# Una pareja de canales desajustada en 0,5 dB y 1 grado, y su eliminación. Las
+# dos configuraciones difieren exactamente en ese factor, que es lo que
+# recupera la Ec. (10).
+mismatch = 10 ** (0.5 / 20) * np.exp(1j * np.radians(1.0))
+h12_i = h12 * mismatch            # configuración estándar
+h12_ii = h12 / mismatch           # micrófonos intercambiados físicamente
+
+hc = materials.mic_calibration_factor(h12_i, h12_ii)
+print(round(float(np.abs(hc[0])), 4), round(float(np.degrees(np.angle(hc[0]))), 2))
+# 1.0593 1.0 -- el propio desajuste, recuperado
+h12_corrected = materials.apply_mic_calibration(h12_i, hc)
+print(float(np.abs(h12_corrected - h12).max()) < 1e-12)   # True
+
+# Lo que habrían afirmado los datos sin corregir, sobre una muestra de alpha = 0.75:
+bad = materials.reflection_factor(h12_i, spacing=spacing, x1=x1, wavenumber=k0)
+print(np.round(materials.absorption_from_reflection(bad), 3))   # [0.732 0.775 0.718]
+```
+
+### 3.2 El resto del instrumento
+
+La cadena de reducción de arriba son unas pocas líneas; las condiciones que
+hacen fiables sus entradas son la mayor parte de ISO 10534-2. En el orden en que
+importan:
+
+- **El aire, medido y no supuesto (apartado 7.2).** $c_0$ y $\rho c_0$ no son
+  constantes del método, son lecturas. La temperatura del aire del tubo debe
+  medirse y mantenerse a ±1 K con un transductor exacto a ±0,5 K, y la presión
+  atmosférica a ±0,5 kPa (apartado 4.12); la Ec. (5) convierte la primera en
+  $c_0$ y la Ec. (7) la pareja en $\rho$. La biblioteca expone las dos:
+  `speed_of_sound_iso(temperature)` toma kelvin, y
+  `air_density_iso(temperature, atmospheric_pressure)` toma kelvin y
+  kilopascales; el fragmento de la ficha de abajo las alimenta directamente a
+  `two_microphone_impedance` en lugar de usar literales. Ojo: las funciones
+  auxiliares de ASTM E2611 de la sección 4 toman grados Celsius, y las dos no
+  son intercambiables.
+- **Excitación (apartados 4.10 y 7.3).** Una señal estacionaria con densidad
+  espectral plana en el rango de interés: aleatoria, pseudoaleatoria,
+  pseudoaleatoria periódica o chirp. El nivel debe quedar al menos 10 dB por
+  encima del fondo en *todas* las frecuencias de interés, y toda frecuencia cuya
+  respuesta esté 60 dB por debajo del máximo se rechaza sin más. El número de
+  promedios espectrales sale de la exactitud que se quiera en $H_{12}$; un
+  producto ancho de banda por tiempo de 50 a 100 es el objetivo habitual
+  (Anexo E.2), y el registro debe ser mucho más largo que $2x_1/c_0$ o el
+  solapamiento temporal lo corrompe (Ec. (E.1)).
+- **Calentamiento (apartado 5).** Al menos 10 minutos de altavoz en marcha antes
+  de la primera medición, para que la temperatura del aire del tubo haya dejado
+  de derivar.
+- **El extremo de fuente (apartados 4.9 y 4.11).** La membrana del altavoz cubre
+  al menos dos tercios de la sección del tubo, va en una caja aislante frente a
+  la transmisión aérea por flancos hacia los micrófonos, y está aislada
+  elásticamente del tubo: la excitación estructural de la pared del tubo es una
+  imitación clásica de la absorción. Al menos 200 mm de revestimiento absorbente
+  eficaz cerca del altavoz amortiguan las resonancias de la columna de aire.
+- **El extremo de la probeta (apartado 4.7).** La placa trasera es rígida y está
+  firmemente fijada, y se recomienda una placa metálica de al menos 20 mm,
+  porque es la terminación rígida sobre la que descansan la mayoría de las
+  mediciones. Un portamuestras independiente debe ajustar al diámetro del tubo
+  con ±0,2 % y sellarse con vaselina en vez de con una junta elástica.
+- **El analizador (apartado 4.8).** Más de 65 dB de rango dinámico, y errores de
+  función de transferencia por no linealidad, resolución, inestabilidad y
+  temperatura por debajo de 0,2 dB.
+
+Todo lo que el informe de ISO 10534-2 necesita sobre la geometría ya está en el
+bloque de metadatos de la ficha (diámetro y forma del tubo, separación de
+micrófonos, montaje, temperatura y presión), de modo que ese bloque se lee como
+una lista de comprobación del informe y no como decoración.
+
+**La atenuación del tubo, y cuándo activarla.** La onda plana del tubo no está
+libre de pérdidas: las capas límite viscosa y térmica de la pared atenúan la
+onda incidente y la reflejada a lo largo de la distancia $x_1$, y una atenuación
+que no se contabiliza se lee como absorción de la muestra.
+`tube_attenuation_constant` es la estimación de la Ec. (A.18),
+$k_0'' = 1{,}94\times10^{-2}\sqrt{f}/(c_0 d)$, y su escalado dice dónde importa:
+crece como $\sqrt{f}$ y cae como $1/d$, así que un tubo de 29 mm sufre unas tres
+veces y media la pérdida de uno de 100 mm a la misma frecuencia, y acercar la
+pareja de micrófonos a la probeta la reduce directamente. Importa sobre todo con
+un absorbente casi perfecto, donde la onda reflejada ya es débil. Vienen con ella
+dos cautelas. El apartado A.2.1.5 dice sin rodeos que esta estimación ignora las
+paredes porosas o sucias y cualquier objeto dentro del tubo, así que es un
+**límite inferior**: una discrepancia grande es señal de limpiar o volver a
+cualificar el tubo, no un número del que fiarse. Y la norma prefiere la vía
+medida: determinar la atenuación con el tubo vacío en frecuencias medias y altas
+(Ecs. (A.13)/(A.14), tras cada modificación del tubo) y extrapolar hacia abajo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_es.svg" alt="Resultado del tubo de dos micrófonos ISO 10534-2 para un absorbente poroso de 50 mm: el coeficiente de absorción a incidencia normal sube desde unos 0,2 a 200 Hz hasta 0,97 por encima de 1 kHz, con el módulo del factor de reflexión cayendo como su imagen especular" width="80%" />
 
@@ -453,6 +714,38 @@ $$
              + \rho c\,T_{21} + T_{22}}{2}\right|.
 $$
 
+**Qué es una «carga», y por qué hay dos.** Una carga es una terminación aguas
+abajo. La matriz tiene cuatro incógnitas, y una medición de las cuatro funciones
+de transferencia de micrófono aporta solo dos ecuaciones independientes, así que
+el método general cambia la terminación y repite la medición completa: el
+apartado 8.5.4.1 de E2611 resuelve los dos conjuntos a la vez (Ec. (22)). En la
+práctica el tubo termina en una terminación débilmente anecoica (una cuña o
+pirámide de lana de vidrio de unos 30 cm), y el apartado 6.2.8 pide que sea
+*fácilmente extraíble* precisamente para que un extremo abierto o cerrado pueda
+aportar la segunda carga. Las cuatro funciones de transferencia de cada carga se
+refieren a un mismo canal común, y cada una de ellas lleva la misma corrección
+de desajuste por configuración conmutada de la sección 3 (apartado 8.5.3): el
+método de cuatro micrófonos no se libra de ese requisito, lo multiplica. El
+extremo de fuente va sellado y aislado del tubo (apartado 6.4.2), igual que en
+la parte 2.
+
+**El método de una carga no es el método general con menos pasos.** El
+apartado 8.5.4.2 cierra el sistema, en cambio, *suponiendo* que la probeta es
+geométricamente simétrica, «que presenta las mismas propiedades físicas al campo
+sonoro por ambos lados», de modo que la reciprocidad da $T_{11} = T_{22}$ y
+$T_{11}T_{22} - T_{12}T_{21} = 1$ (Ec. (23)), y basta con una terminación,
+preferiblemente la anecoica. Eso vale para una capa homogénea y falla en
+cualquier composición asimétrica: una lámina por una cara, una densidad en
+gradiente, una membrana montada, un apilado de capas desiguales, que es la mayor
+parte de lo que la gente mete de verdad en un tubo de transmisión.
+`transfer_matrix_one_load` no detecta la asimetría, ni puede: avisa del rango de
+onda plana y de un denominador mal condicionado, y por lo demás devuelve una
+matriz plausible y equivocada, y con ella una pérdida por transmisión
+equivocada. La regla es sencilla: si la probeta tiene un delante y un detrás,
+usa dos cargas. Si crees que es simétrica, ejecuta los dos métodos y
+compara. Nada de esto afecta a la vía de absorción con respaldo rígido de la
+sección 3, que solo necesita la impedancia superficial.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_es.svg" alt="Tubo de pérdida por transmisión de cuatro micrófonos de ASTM E2611: una fuente sonora, dos micrófonos aguas arriba y dos aguas abajo de la probeta de ensayo a las separaciones s1 y s2 y los desplazamientos l1 y l2, una terminación ajustable para el método de dos cargas, las ondas viajeras A y B aguas arriba y C y D aguas abajo, y las relaciones de matriz de transferencia y pérdida por transmisión" width="92%" />
 
 A escala tiene este aspecto. Una `TransferMatrix` recuperada por los
@@ -537,6 +830,25 @@ tm.plot(f, 407.0)   # TL(f) con la absorción con respaldo rígido superpuesta
 deja pasar la capa exenta (la pérdida de transmisión, Ec. (26)) y cuánto
 absorbe la misma capa con respaldo rígido (Ec. (28)).*
 
+**Un TL de tubo no es un índice de reducción sonora.** La ficha de la sección 3
+avisa de que el $\alpha$ a incidencia normal no es el $\alpha_s$ a incidencia
+aleatoria; el mismo aviso vale del lado de la transmisión, y ahí se pasa por
+alto más a menudo. Lo que mide el tubo es la pérdida por transmisión de una
+probeta de unos pocos centímetros, para una onda plana a un ángulo, con los
+bordes de la probeta empotrados por la pared del tubo. Lo que es el
+[índice de reducción sonora $R$](/phonometry/es/buildings/insulation/insulation-lab/)
+es una magnitud de campo difuso medida sobre un elemento a tamaño real con su
+montaje real, y lleva consigo las ondas de flexión del propio elemento, sus
+condiciones de borde y su caída de aislamiento en la coincidencia, nada de lo cual existe dentro
+de un tubo. Espera que el valor a incidencia normal quede *por encima* de una
+estimación a incidencia de campo para una capa gobernada por la masa, y espera
+que el tubo se pierda por completo los valles de resonancia y de coincidencia de
+un panel real. Usa el TL de tubo para comparar materiales y para ajustar y
+verificar un modelo de matriz de transferencia; predice después la construcción
+con el modelo, o con
+[EN 12354](/phonometry/es/buildings/design/insulation-prediction/), y nunca
+llevando el número del tubo a un cálculo de partición.
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -580,7 +892,7 @@ el portamuestras, mucho antes del procesado de señal. Los fallos recurrentes:
   lámina de aire junto a la pared del tubo. El sonido se cortocircuita
   alrededor y por detrás de la muestra, y la propia holgura resuena, de modo
   que la absorción medida gana una joroba espuria de baja a media frecuencia.
-  Corte con ajuste deslizante ceñido y selle el borde (una película fina de
+  Corta con ajuste deslizante ceñido y sella el borde (una película fina de
   vaselina es el remedio clásico) sin cargar la cara frontal.
 - **Compresión.** Una probeta cortada grande y embutida a la fuerza es más
   densa que el producto que debe representar: la resistividad al flujo sube,
@@ -594,10 +906,10 @@ el portamuestras, mucho antes del procesado de señal. Los fallos recurrentes:
   declaradas con el resultado.
 - **Cara no plana.** Una cara frontal abombada, inclinada o desgarrada
   dispersa hacia modos transversales por debajo del corte nominal y rompe la
-  hipótesis de incidencia normal sobre la que descansan las ecuaciones. Corte
-  con herramienta afilada; no rasgue los materiales fibrosos a medida.
+  hipótesis de incidencia normal sobre la que descansan las ecuaciones. Corta
+  con herramienta afilada; no rasgues los materiales fibrosos a medida.
 - **Una probeta no es el material.** Los productos porosos son inhomogéneos a
-  la escala de una muestra de tubo. Mida varios cortes y promedie; la
+  la escala de una muestra de tubo. Mide varios cortes y promedia; la
   dispersión entre probetas es varianza del producto que merece declararse,
   no ruido de medida que esconder.
 
@@ -674,12 +986,17 @@ atenuada que resuelven los cuatro micrófonos ASTM.
 
 **Cubierto.** El trío del tubo de impedancia. El método de la razón de onda
 estacionaria de ISO 10534-1 (`standing_wave_ratio_from_level`,
-`standing_wave_reflection_magnitude`, `standing_wave_absorption`). El método
+`standing_wave_reflection_magnitude`, `standing_wave_absorption`, y la mitad de
+posición de la lectura en `standing_wave_reflection` y
+`standing_wave_normalized_impedance`). El método
 de la función de transferencia de ISO 10534-2 con su comprobación de rango de
 frecuencias del apartado 4 (`two_microphone_impedance`,
 `plane_wave_frequency_range`, `reflection_factor`,
 `absorption_from_reflection`, `normalized_surface_impedance`,
-`apply_mic_calibration`, `tube_attenuation_constant`). El método de matriz de
+`normalized_surface_admittance`, las propiedades del aire del apartado 7.2
+`speed_of_sound_iso` y `air_density_iso`, la pareja de desajuste del
+apartado 7.5 `mic_calibration_factor` y `apply_mic_calibration`, y
+`tube_attenuation_constant`). El método de matriz de
 transferencia con cuatro micrófonos de ASTM E2611 (`transfer_matrix_two_load`,
 `transfer_matrix_one_load`, `TransferMatrix`,
 `plane_wave_frequency_range_astm`, `hydraulic_diameter`), con los dibujos a
@@ -694,7 +1011,15 @@ E2611-19). ISO 10534-1:1996 está implementada como su adopción europea
 BS EN ISO 10534-1:2001, no leída directamente del texto ISO de 1996; sus
 refinamientos de sonda (extrapolar los niveles de los mínimos hasta la cara
 de la muestra, correcciones por el cuerpo de la sonda) se describen en la
-sección 2 pero no están automatizados. El $\alpha_s$ de incidencia aleatoria
+sección 2 pero no están automatizados. Tampoco lo están los apartados de equipo
+y procedimiento de las secciones 1.1 y 3.2: las distancias de campo cercano del
+apartado 4.3, las tolerancias de posición del apartado 4.5, el suelo de relación
+señal-ruido del apartado 7.3 y el calentamiento del apartado 5 se enuncian para
+el operador, y nada de la biblioteca comprueba que se haya cumplido ninguno de
+ellos. `tube_attenuation_constant` implementa solo la estimación de la
+Ec. (A.18), que la propia norma llama límite inferior; la determinación medida
+de las Ecs. (A.13)/(A.14) con el tubo vacío no está implementada.
+El $\alpha_s$ de incidencia aleatoria
 de la cámara reverberante es otra magnitud con su propia guía:
 [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
 

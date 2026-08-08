@@ -13,6 +13,156 @@ from __future__ import annotations
 # Spanish variants of every user-visible string. Strings not in the table
 # (numbers, unit-only labels, code identifiers) are shared between languages.
 _ES: dict[str, str] = {
+    # Facade sound insulation setup (buildings/insulation/facade-insulation).
+    "Facade sound insulation setup (ISO 16283-3)":
+        "Montaje de aislamiento acustico de fachada (ISO 16283-3)",
+    "Receiving room": "Recinto receptor",
+    "S = 11.5 m²": "S = 11,5 m²",
+    "Loudspeaker": "Altavoz",
+    "(on the ground)": "(sobre el suelo)",
+    "45° ± 5°": "45° ± 5°",
+    "r ≥ 5 m element / ≥ 7 m global": "r ≥ 5 m elemento / ≥ 7 m global",
+    "D > 3.5 m (element) / > 5 m (global)":
+        "D > 3,5 m (elemento) / > 5 m (global)",
+    "L₁,s  element method": "L₁,s  metodo de elemento",
+    "≤ 10 mm parallel / ≤ 3 mm normal": "≤ 10 mm paralelo / ≤ 3 mm normal",
+    "3 to 10 positions, never gridded":
+        "de 3 a 10 posiciones, nunca en rejilla",
+    "L₁,2m  global method": "L₁,2m  metodo global",
+    "(2.0 ± 0.2) m": "(2,0 ± 0,2) m",
+    "1.5 m": "1,5 m",
+    "above the": "por encima del",
+    "receiving-room floor": "suelo del recinto receptor",
+    "Element method → R'45° (loudspeaker) or R'tr,s (traffic): "
+    "one component, comparable with a laboratory R.":
+        "Metodo de elemento → R'45° o R'tr,s: un componente, comparable "
+        "con una R de laboratorio.",
+    "Global method → D2m,nT: the whole facade as built, "
+    "not comparable with a laboratory R.":
+        "Metodo global → D2m,nT: la fachada tal como esta construida; "
+        "no comparable con laboratorio.",
+    "Road traffic replaces the loudspeaker at all angles: "
+    "simultaneous inside and outside, ≥ 50 pass-bys.":
+        "El trafico rodado incide desde todos los angulos: medicion "
+        "simultanea dentro y fuera, ≥ 50 pasos.",
+    "Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "
+    "by the functions.":
+        "Apartados 9.4, 9.5.1, 9.6.1 y 10.2. Nada de esto lo comprueban "
+        "las funciones.",
+    # Heavy and soft impact sources (buildings/insulation/heavy-impact-sources).
+    "Standard heavy and soft impact sources (ISO 16283-2, JIS A 1418-2)":
+        "Fuentes de impacto normalizadas (ISO 16283-2, JIS A 1418-2)",
+    "Floor under test (source room)": "Forjado ensayado (recinto emisor)",
+    "(a) tapping machine": "(a) maquina de impactos",
+    "ISO 10140-5 Annex E": "ISO 10140-5 Anexo E",
+    "5 hammers, 500 g each": "5 martillos de 500 g cada uno",
+    "(100 ± 20) ms apart": "separados (100 ± 20) ms",
+    "40 mm": "40 mm",
+    "(b) rubber ball": "(b) pelota de caucho",
+    "ISO 16283-2 Annex A / ISO 10140-5 Annex F":
+        "ISO 16283-2 Anexo A / ISO 10140-5 Anexo F",
+    "180 mm": "180 mm",
+    "30 mm wall": "pared de 30 mm",
+    "m_eff = (2.5 ± 0.1) kg": "m_ef = (2,5 ± 0,1) kg",
+    "e = 0.8 ± 0.1": "e = 0,8 ± 0,1",
+    "(100 ± 1) cm": "(100 ± 1) cm",
+    "from the ball's BOTTOM": "desde la BASE de la pelota",
+    "(c) bang machine": "(c) maquina de golpes",
+    "JIS A 1418-2 only": "solo en JIS A 1418-2",
+    "(2.4 ± 0.2)·10⁵ Pa": "(2,4 ± 0,2)·10⁵ Pa",
+    "m_eff = (7.3 ± 0.2) kg": "m_ef = (7,3 ± 0,2) kg",
+    "85 cm": "85 cm",
+    "source": "fuente",
+    "rigid floor +": "suelo rigido +",
+    "force plate": "plataforma de fuerza",
+    "octave filter": "filtro de octava",
+    "analyser → L_FE": "analizador → L_FE",
+    "JIS A 1418-2 Annex C: the filter goes BEFORE the analyser,":
+        "JIS A 1418-2 Anexo C: el filtro va ANTES del analizador,",
+    "so L_FE is evaluated once per band":
+        "de modo que L_FE se evalua una vez por banda",
+    "The dimensions above are the standards' informative construction "
+    "examples;":
+        "Las dimensiones anteriores son ejemplos constructivos informativos "
+        "de las normas;",
+    "the specification is the force spectrum, not the shape.":
+        "la especificacion es el espectro de fuerza, no la forma.",
+    # ISO 10052 survey sweep (buildings/insulation/insulation-survey).
+    "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)":
+        "El barrido del metodo de control ISO 10052 (apartados 6.2 y 6.3)",
+    "Plan of the room": "Planta del recinto",
+    "separating element": "elemento separador",
+    "≥ 0.5 m": "≥ 0,5 m",
+    "corner opposite the element,": "esquina opuesta al elemento,",
+    "facing into the corner": "orientado hacia la esquina",
+    "facing away": "de espaldas",
+    "arm's length": "brazo extendido",
+    "180° × 4 traverses,": "180° × 4 barridos,",
+    "≈ 30 s in total": "≈ 30 s en total",
+    "Elevation: the same sweep": "Alzado: el mismo barrido",
+    "raise and lower the arm": "subir y bajar el brazo",
+    "during each traverse": "durante cada barrido",
+    "Alternative (Clause 6.3.1): a rotating microphone on a stand, ≥ 10° to "
+    "the horizontal, sweep radius ≥ 1 m.":
+        "Alternativa (apartado 6.3.1): microfono giratorio sobre soporte, "
+        "≥ 10° respecto a la horizontal, radio de barrido ≥ 1 m.",
+    "Without a real-time octave analyser, repeat the whole sweep once per "
+    "band and read each 30 s Leq.":
+        "Sin analizador de octavas en tiempo real, repetir todo el barrido "
+        "una vez por banda y leer cada Leq de 30 s.",
+    "Tapping machine (6.2.3): centre of the floor, on the diagonal; "
+    "three positions at 45° to the ribs.":
+        "Maquina de impactos (6.2.3): centro del forjado, en la diagonal; "
+        "tres posiciones a 45° respecto a las viguetas.",
+    # Rooms / prediction: the EN 12354-6 take-off plate and the directivity
+    # plate (buildings/rooms/enclosed-space-absorption, room-image-sources).
+    "Room take-off: one room, three input lists (EN 12354-6)":
+        "Levantamiento del recinto: una sala, tres listas de entrada "
+        "(EN 12354-6)",
+    "1000 Hz octave band": "banda de octava de 1000 Hz",
+    "V = 29.75 m³": "V = 29,75 m³",
+    "ceiling  12.39 m²  αs 0.02": "techo  12,39 m²  αs 0,02",
+    "glass facade  10.90 m²  αs 0.04": "fachada de vidrio  10,90 m²  αs 0,04",
+    "floor  12.39 m²  αs 0.05": "suelo  12,39 m²  αs 0,05",
+    "short wall  6.55 m²  αs 0.04  (x2)": "pared corta  6,55 m²  αs 0,04  (x2)",
+    "long wall (brick)  10.90 m²  αs 0.04":
+        "pared larga (ladrillo)  10,90 m²  αs 0,04",
+    "objects: 0.15, 0.60, 2 × 0.05, 2 × 0.65 m³":
+        "objetos: 0,15, 0,60, 2 × 0,05, 2 × 0,65 m³",
+    "A = 2.26 m²   (Formula 1)": "A = 2,26 m²   (fórmula 1)",
+    "Aobj = 2.77 m²    ψ = 0.072": "Aobj = 2,77 m²    ψ = 0,072",
+    "(Formula 4, then Formula 3)": "(fórmula 4, después fórmula 3)",
+    "One wall, two rows": "Una pared, dos filas",
+    "window": "ventana",
+    "one wall on the drawing": "una pared en el plano",
+    "areas sum to the wall": "las áreas suman la pared",
+    "Never average a lining into its wall by hand: the areas are weighted "
+    "inside the formula.":
+        "Nunca promedie a mano un revestimiento con su pared: la fórmula ya "
+        "pondera por área.",
+    "Directivity factor Q: four mountings, four critical distances":
+        "Factor de directividad Q: cuatro montajes, cuatro distancias críticas",
+    "The same compact source, four mountings (workshop with R = 62 m²)":
+        "La misma fuente compacta, cuatro montajes (taller con R = 62 m²)",
+    "radiates into 4π sr": "radia en 4π sr",
+    "radiates into 2π sr": "radia en 2π sr",
+    "radiates into π sr": "radia en π sr",
+    "radiates into π/2 sr": "radia en π/2 sr",
+    "free space": "campo libre",
+    "hard floor": "suelo rígido",
+    "floor-wall edge": "arista suelo-pared",
+    "trihedral corner": "rincón triedro",
+    "on a stand": "sobre un trípode",
+    "on the slab": "sobre la solera",
+    "against a wall on the slab": "contra una pared, sobre la solera",
+    "in the corner of the workshop": "en el rincón del taller",
+    "Q multiplies the direct term only: the reverberant plateau does not move.":
+        "Q solo multiplica el término directo: la meseta reverberante no se "
+        "mueve.",
+    "rc = √(Q·R/16π), so two steps of mounting move the crossover by a "
+    "factor of 2.":
+        "rc = √(Q·R/16π), así que dos escalones de montaje desplazan el cruce "
+        "un factor 2.",
     "Calibration chain — from calibrator to physical units":
         "Cadena de calibración — del calibrador a unidades físicas",
     # Speech Intelligibility Index (ANSI S3.5-1997)
@@ -40,6 +190,159 @@ _ES: dict[str, str] = {
         "H  siseo: una banda ≥ 1000 Hz supera RC en > 3 dB",
     "N  neutral: within both tolerances":
         "N  neutro: dentro de ambas tolerancias",
+    # Measuring the rated spectrum (ANSI/ASA S12.2-2019, clause 5.2.5)
+    "Measuring the rated spectrum (ANSI/ASA S12.2-2019, clause 5.2.5)":
+        "Medida del espectro que se califica (ANSI/ASA S12.2-2019, cláusula 5.2.5)",
+    "ceiling plenum": "plénum del falso techo",
+    "supply duct": "conducto de impulsión",
+    "diffuser": "difusor",
+    "air handler": "climatizadora",
+    "design condition": "en su régimen de diseño",
+    "0.6 m": "0,6 m",
+    "1.2 m": "1,2 m",
+    "2.4 m": "2,4 m",
+    "1.1 m": "1,1 m",
+    "0.75 m": "0,75 m",
+    "≥ 0.6 m": "≥ 0,6 m",
+    "≥ 1.2 m": "≥ 1,2 m",
+    "≥ 2.4 m": "≥ 2,4 m",
+    "Microphone height (5.2.5)": "Altura del micrófono (5.2.5)",
+    "Adult, standing": "Adulto, de pie",
+    "Adult, seated": "Adulto, sentado",
+    "Child, standing": "Niño, de pie",
+    "Child, seated": "Niño, sentado",
+    "Standoff (5.2.5)": "Separación (5.2.5)",
+    "One reflecting surface": "Una superficie",
+    "Two surfaces meeting": "Dos superficies",
+    "Three surfaces meeting": "Tres superficies",
+    "Instrument and condition": "Instrumento y condición",
+    "Integrating-averaging, L_EQ": "Integrador-promediador, L_EQ",
+    "Class 2 minimum (5.1.1)": "Clase 2 como mínimo (5.1.1)",
+    "Octave bands 16 Hz – 8 kHz": "Bandas de octava 16 Hz – 8 kHz",
+    "Room unoccupied, plant running": "Sala vacía, instalación en marcha",
+    "L_EQ at the named position — or scan the whole space at ≤ 0.5 m/s "
+    "for ≥ 20 s":
+        "L_EQ en la posición indicada — o barrer toda la sala a ≤ 0,5 m/s "
+        "durante ≥ 20 s",
+    "green dashed: microphone exclusion zones (5.2.5)":
+        "verde discontinuo: zonas excluidas para el micrófono (5.2.5)",
+    "Before rating (5.3.2): is the noise steady?":
+        "Antes de calificar (5.3.2): ¿es estacionario el ruido?",
+    "screen 16, 31.5 and 63 Hz aurally and on a fast, Z-weighted meter, "
+    "then check L_MAX − L_EQ and L_10 − L_EQ":
+        "explorar 16, 31,5 y 63 Hz de oído y con el sonómetro en rápida y "
+        "ponderación Z; comprobar",
+    "against Table 3 — a field that fails belongs to RNC (clause 5.3), "
+    "not to NC or RC":
+        "L_MAX − L_EQ y L_10 − L_EQ frente a la Tabla 3 — si falla, es RNC "
+        "(cláusula 5.3), no NC ni RC",
+    # Where the ISO 3382-3 measurement line goes (clauses 5.1 and 5.2)
+    "Where the ISO 3382-3 measurement line goes (clauses 5.1 and 5.2)":
+        "Dónde va la línea de medida de la ISO 3382-3 (cláusulas 5.1 y 5.2)",
+    "(a) Plan — 30 × 12 m floor, two ceiling zones":
+        "(a) Planta — superficie de 30 × 12 m, dos zonas de techo",
+    "absorbent raft ceiling": "techo con islas absorbentes",
+    "plain plaster ceiling": "techo de yeso liso",
+    "zones measured and reported separately":
+        "las zonas se miden y se reportan por separado",
+    "≥ 2.0 m from walls and other reflecting surfaces":
+        "≥ 2,0 m de paredes y otras superficies reflectantes",
+    "1.2 m screens": "mamparas de 1,2 m",
+    "P1 at the nearest workstation; the path need not be straight":
+        "P1 en el puesto más cercano; la trayectoria no tiene que ser recta",
+    "only 2 m to 16 m enter D2,S": "solo de 2 m a 16 m entran en D2,S",
+    "≥ 0.5 m from tables": "≥ 0,5 m de las mesas",
+    "(b) Section — both heights are 1.2 m (5.2.2)":
+        "(b) Sección — ambas alturas son 1,2 m (5.2.2)",
+    "omnidirectional, pink noise": "omnidireccional, ruido rosa",
+    "seated head position": "posición de la cabeza sentada",
+    "Source (5.1.1):": "Fuente (5.1.1):",
+    "omnidirectional, pink noise, ISO 3382-1":
+        "omnidireccional, ruido rosa, directividad",
+    "directivity; a pink-spectrum sweep or":
+        "según ISO 3382-1; también vale un barrido",
+    "MLS may be used instead": "o un MLS de espectro rosa",
+    "Receiver (5.1.2):": "Recepción (5.1.2):",
+    "class 1 to IEC 61672-1, IEC 61260 octave":
+        "clase 1 según IEC 61672-1, filtros de octava",
+    "filters, omnidirectional capsule,":
+        "IEC 61260, micrófono omnidireccional,",
+    "≥ 10 s integration": "integración ≥ 10 s",
+    "Room (5.2.1):": "Sala (5.2.1):",
+    "furnished, nobody present but the":
+        "amueblada, sin más personas que los",
+    "operators, HVAC and any masking system":
+        "operadores, climatización y enmascaramiento",
+    "at working-day power": "a la potencia de un día normal",
+    "Line (5.2.2):": "Línea (5.2.2):",
+    "6 to 10 positions preferred, 4 the minimum;":
+        "de 6 a 10 posiciones preferible, 4 el mínimo;",
+    "≥ 2 source positions, or the line walked":
+        "≥ 2 posiciones de fuente, o recorrer la línea",
+    "in both directions": "en los dos sentidos",
+    # Room-acoustics measurement setup (ISO 3382-1 / ISO 3382-2)
+    "Room plan (top view) — 10.0 × 6.0 m, 3.5 m high":
+        "Planta de la sala (vista superior) — 10,0 × 6,0 m, 3,5 m de altura",
+    "avoid symmetry lines": "evitar las líneas de simetría",
+    "2.4 m > d_min": "2,4 m > d_min",
+    "d_min": "d_min",
+    "• source height 1.5 m": "• fuente a 1,5 m de altura",
+    "• off the symmetry axes": "• fuera de los ejes de simetría",
+    "ISO 3382-2 (source clearance):":
+        "ISO 3382-2 (separación a la fuente):",
+    "d_min = 2√(V/cT̂) = 2.0 m": "d_min = 2√(V/cT̂) = 2,0 m",
+    "for V = 210 m³, T̂ = 0.6 s": "para V = 210 m³, T̂ = 0,6 s",
+    # The measuring chain in section (ISO 3382-1, 4.2 and 4.3)
+    "The measuring chain in section (ISO 3382-1 clauses 4.2 and 4.3)":
+        "La cadena de medida en sección (ISO 3382-1, cláusulas 4.2 y 4.3)",
+    "Section through the same 10.0 × 6.0 × 3.5 m room":
+        "Sección de la misma sala de 10,0 × 6,0 × 3,5 m",
+    "dodecahedron": "dodecaedro",
+    "acoustic centre": "centro acústico",
+    "d_min = 2.0 m": "d_min = 2,0 m",
+    "ISO 3382-1 Table 1 — omnidirectionality over gliding 30° arcs":
+        "ISO 3382-1 Tabla 1 — omnidireccionalidad (arcos de 30°)",
+    "Hz / dB, measured at ≥ 1.5 m — in practice a dodecahedron, not a monitor":
+        "Hz / dB, medido a ≥ 1,5 m — en la práctica un dodecaedro, no un monitor",
+    "Level (4.2.1):": "Nivel (4.2.1):",
+    "≥ 45 dB over the background": "≥ 45 dB sobre el ruido de fondo",
+    "per band for T30, ≥ 35 dB for T20": "por banda para T30; 35 dB para T20",
+    "Receiving chain (4.2.2.2):": "Cadena de recepción (4.2.2.2):",
+    "class 1 to IEC 61672-1,": "clase 1 según IEC 61672-1,",
+    "IEC 61260 filters, omnidirectional": "filtros IEC 61260, micrófono",
+    "capsule, ≤ 13 mm preferred": "omnidireccional, ≤ 13 mm preferible",
+    # Dimensioning the ISO 18233 excitation (T = 1.2 s)
+    "Dimensioning the excitation for a room with T = 1.2 s (ISO 18233)":
+        "Dimensionado de la excitación para una sala con T = 1,2 s (ISO 18233)",
+    "1  What you play, and how long you keep recording":
+        "1  Qué se reproduce, y cuánto se sigue grabando",
+    "sweep, 4.0 s = 3.3 × T": "barrido, 4,0 s = 3,3 × T",
+    "silence ≈ T": "silencio ≈ T",
+    "record window 5.2 s": "ventana de grabación 5,2 s",
+    "B.3.1: sweep 2–4 × T, silent gap ≈ T   |   B.6: +3 dB effective SNR "
+    "per doubling":
+        "B.3.1: barrido 2–4 × T, silencio ≈ T   |   B.6: +3 dB de S/R "
+        "efectiva por duplicación",
+    "2  If the excitation repeats, the period must exceed T (6.2.2.2)":
+        "2  Si la excitación se repite, el periodo debe superar T (6.2.2.2)",
+    "period 1, warm-up: discarded": "periodo 1, arranque: se descarta",
+    "period 2, kept": "periodo 2, se conserva",
+    "order 17 → 2.73 s ≥ T": "orden 17 → 2,73 s ≥ T",
+    "0.68 s": "0,68 s",
+    "order 15 is shorter than T: the tail folds onto the head and T comes "
+    "out short":
+        "el orden 15 es más corto que T: la cola se pliega sobre el inicio y "
+        "T sale corto",
+    "3  After linear deconvolution (B.5)":
+        "3  Tras la deconvolución lineal (B.5)",
+    "kept by default: the linear impulse response and its tail":
+        "se conserva por defecto: la respuesta al impulso lineal y su cola",
+    "discarded, or read as distortion":
+        "se descarta, o se lee como distorsión",
+    "the linear deconvolution's own decaying noise tail — not the room":
+        "la cola de ruido decreciente de la propia deconvolución — no la sala",
+    "Arrival time relative to the linear impulse response [s]":
+        "Tiempo de llegada respecto a la respuesta al impulso lineal [s]",
     # Hearing threshold (ISO 7029 / ISO 389-7)
     "Hearing-threshold model (ISO 7029 age distribution, ISO 389-7 zero)":
         "Modelo del umbral de audición (ISO 7029 por edad, cero ISO 389-7)",
@@ -266,13 +569,10 @@ _ES: dict[str, str] = {
     "Airborne sound insulation setup (ISO 16283-1)":
         "Montaje de aislamiento acústico aéreo (ISO 16283-1)",
     "Source room": "Recinto emisor",
-    "Receiving room": "Recinto receptor",
     "Test partition": "Partición de ensayo",
-    "Loudspeaker": "Altavoz",
     "microphone positions": "posiciones de micrófono",
     "≥ 1.0 m": "≥ 1,0 m",
     "≥ 0.7 m": "≥ 0,7 m",
-    "≥ 0.5 m": "≥ 0,5 m",
     "7.6 a) ≥ 0.7 m between microphone positions":
         "7.6 a) ≥ 0,7 m entre posiciones de micrófono",
     "7.6 b) ≥ 0.5 m to room boundaries":
@@ -415,6 +715,77 @@ _ES: dict[str, str] = {
     "piston  f = 1–4 Hz": "pistón  f = 1–4 Hz",
     "R from L_p,s − L_p,t   (κ′ per Annex A)":
         "R por L_p,s − L_p,t   (κ′ según Anexo A)",
+    "seal": "sellado",
+    "grid": "rejilla",
+    "specimen  A, d": "probeta  A, d",
+    "flow source": "fuente de caudal",
+    "≥ 1 bore": "≥ 1 diámetro",
+    "cell ≥ 29 mm bore, ≥ 1 bore of free space above":
+        "celda ≥ 29 mm de diámetro, ≥ 1 diámetro libre por encima",
+    "q_v and Δp each to ±5 %, Δp readable to 0.1 Pa":
+        "q_v y Δp con ±5 % cada uno, Δp legible hasta 0,1 Pa",
+    "grid ≥ 50 % open, R < 1 %; d measured in position":
+        "rejilla ≥ 50 % abierta, R < 1 %; d medido en posición",
+    "measurement cell → L_p,s (h_s)": "celda de medida → L_p,s (h_s)",
+    "airtight termination → L_p,t (h_t)": "terminación estanca → L_p,t (h_t)",
+    # d24 - ISO 354 reverberation-room sound absorption
+    "Reverberation-room sound absorption (ISO 354)":
+        "Absorción acústica en cámara reverberante (ISO 354)",
+    "Reverberation room · plan": "Cámara reverberante · planta",
+    "V = 200 m³ (≥ 150 m³)": "V = 200 m³ (≥ 150 m³)",
+    "diffusers  0.8–3 m² each, ≈ 5 kg/m² (Annex A)":
+        "difusores  0,8–3 m² cada uno, ≈ 5 kg/m² (Anexo A)",
+    "Test specimen  S = 10.8 m²": "Probeta de ensayo  S = 10,8 m²",
+    "10–12 m², width/length 0.7–1, edges not parallel to the room":
+        "10–12 m², anchura/longitud 0,7–1, bordes no paralelos a la cámara",
+    "microphones ≥ 1.5 m apart, ≥ 2 m from a source, ≥ 1 m from any "
+    "surface and from the specimen":
+        "micrófonos separados ≥ 1,5 m, a ≥ 2 m de una fuente y a ≥ 1 m de "
+        "cualquier superficie y de la probeta",
+    "≥ 0.75 m": "≥ 0,75 m",
+    "≥ 1.5 m": "≥ 1,5 m",
+    "The measurement is a difference": "La medida es una diferencia",
+    "1 · empty room": "1 · cámara vacía",
+    "2 · specimen installed": "2 · probeta instalada",
+    "Annex B mounting (part of the result)":
+        "Montaje del Anexo B (parte del resultado)",
+    "Type A: directly on the rigid floor":
+        "Tipo A: directamente sobre el suelo rígido",
+    "Type E-400: 400 mm face to floor":
+        "Tipo E-400: 400 mm de la cara al suelo",
+    "perimeter frame, flush": "marco perimetral, enrasado",
+    "A = 55.3 V/(c T) − 4 V m   ·   c = 331 + 0.6 t  (15–30 °C)":
+        "A = 55,3 V/(c T) − 4 V m   ·   c = 331 + 0,6 t  (15–30 °C)",
+    "≥ 12 spatially independent decays = ≥ 3 microphones × ≥ 2 sources "
+    "· T₂₀ read from −5 dB over 20 dB":
+        "≥ 12 curvas de caída espacialmente independientes = ≥ 3 micrófonos "
+        "× ≥ 2 fuentes · T₂₀ leído desde −5 dB sobre 20 dB",
+    "the empty-room A₁ must clear the Table 1 ceiling, and T₁ is "
+    "measured without the specimen frame":
+        "A₁ de la cámara vacía debe quedar bajo el techo de la Tabla 1, y T₁ "
+        "se mide sin el marco de la probeta",
+    # d25 - ISO 10534-1 standing-wave-ratio apparatus
+    "Standing-wave-ratio tube: probe traverse and the minima (ISO 10534-1)":
+        "Tubo de onda estacionaria: recorrido de la sonda y los mínimos "
+        "(ISO 10534-1)",
+    "one pure tone at a time": "un tono puro cada vez",
+    "Test specimen on the rigid backing":
+        "Probeta sobre la terminación rígida",
+    "probe microphone on a graduated carriage":
+        "micrófono de sonda sobre carro graduado",
+    "|p(x)| envelope": "envolvente |p(x)|",
+    "minima far from the specimen fill in (wall losses, exaggerated "
+    "here): read the nearest one":
+        "los mínimos lejanos a la probeta se rellenan (pérdidas en la pared, "
+        "exageradas aquí): leer el más cercano",
+    "one channel: the microphone sensitivity cancels and there is no "
+    "inter-channel phase mismatch":
+        "un solo canal: la sensibilidad del micrófono se cancela y no hay "
+        "desajuste de fase entre canales",
+    "magnitude from the ratio, phase from the position — which is why "
+    "Part 1 is the arbitration method":
+        "magnitud por la razón, fase por la posición — por eso la Parte 1 es "
+        "el método de arbitraje",
     # d15 - ISO 17497-1 random-incidence scattering (reverberation room)
     "Random-incidence scattering in a reverberation room (ISO 17497-1)":
         "Dispersión a incidencia aleatoria en cámara reverberante (ISO 17497-1)",
@@ -616,7 +987,6 @@ _ES: dict[str, str] = {
     "Band metrics widen the reduced axis instead: (…, bands).":
         "Las métricas por banda ensanchan el eje reducido: (…, bandas).",
     # open-plan
-    "source": "fuente",
     "spatial-decay fit range (2 m to 16 m)":
         "rango de ajuste de caída espacial (2 m a 16 m)",
     "spatial decay rate": "tasa de caída espacial",
@@ -741,22 +1111,45 @@ _ES: dict[str, str] = {
     "day 1": "día 1",
     "choose by work pattern (Table B.1)  →  LEX,8h + Annex C uncertainty":
         "según el patrón de trabajo (Tabla B.1)  →  LEX,8h + U del Anexo C",
-    # Dynamic-stiffness resonance rig (ISO 9052-1)
-    "Dynamic-stiffness resonance rig (ISO 9052-1)":
-        "Banco de resonancia de rigidez dinámica (ISO 9052-1)",
-    "Resonance rig": "Banco de resonancia",
-    "Rigid foundation": "Base rígida",
-    "Load plate": "Placa de carga",
-    "Resilient specimen": "Probeta resiliente",
-    "Exciter": "Excitador",
-    "Accelerometer": "Acelerómetro",
+    # Dynamic-stiffness resonance rig (EN 29052-1)
+    "Dynamic-stiffness resonance rig (EN 29052-1)":
+        "Banco de resonancia de rigidez dinámica (EN 29052-1)",
+    "The three excitation arrangements (Figures 1 to 3)":
+        "Las tres disposiciones de excitación (Figuras 1 a 3)",
+    "Rigid base": "Base rígida",
+    "load plate measured": "se mide la placa de carga",
+    "Isolated baseplate": "Placa base aislada",
+    "load plate driven, both measured":
+        "se excita la placa de carga; se miden ambas",
+    "baseplate driven, both measured":
+        "se excita la placa base; se miden ambas",
+    "Rigid foundation": "Cimentación rígida",
+    "Baseplate ≥ 100 kg": "Placa base ≥ 100 kg",
+    "all three are equivalent; sinusoidal excitation is the reference "
+    "method in case of dispute (7.1)":
+        "las tres son equivalentes; la excitación sinusoidal es el método "
+        "de referencia en caso de litigio (7.1)",
+    "Specimen and load (Clauses 5 and 6)":
+        "Probeta y carga (capítulos 5 y 6)",
+    "plaster of Paris ≥ 5 mm on 0.02 mm foil":
+        "escayola ≥ 5 mm sobre lámina de 0,02 mm",
+    "Load plate, steel": "Placa de carga, acero",
+    "(200 ± 3) mm square, flat to 0.5 mm":
+        "(200 ± 3) mm de lado, planitud 0,5 mm",
+    "8 kg ± 0.5 kg with every device on it":
+        "8 kg ± 0,5 kg con todos los equipos encima",
+    "Resilient specimen, 200 mm × 200 mm":
+        "Probeta resiliente, 200 mm × 200 mm",
+    "three of them; irregularities < 3 mm":
+        "tres probetas; irregularidades < 3 mm",
+    "petroleum-jelly fillet (closed-cell materials)":
+        "cordón de vaselina (materiales de celda cerrada)",
     "Mass-spring model": "Modelo masa-resorte",
-    "resonance read from the response peak":
-        "la resonancia se lee del pico de la respuesta",
+    "read at the peak, extrapolated to zero force":
+        "se lee en el pico, extrapolado a fuerza nula",
     "s′t = 4π² m′t fr²   (Formula 4)": "s′t = 4π² m′t fr²   (Fórmula 4)",
-    "then f₀ = (1/2π)·√(s′/m′) for the installed floating floor   (Formula 2)":
-        "luego f₀ = (1/2π)·√(s′/m′) para el suelo flotante instalado   "
-        "(Fórmula 2)",
+    "f₀ = (1/2π)·√(s′/m′)   (Formula 2)":
+        "f₀ = (1/2π)·√(s′/m′)   (Fórmula 2)",
     # Mechanical-mobility rig (ISO 7626)
     "Mechanical-mobility measurement on a beam (ISO 7626)":
         "Medición de movilidad mecánica sobre una viga (ISO 7626)",
@@ -1000,7 +1393,6 @@ _ES: dict[str, str] = {
         "Refracción atmosférica: multitrayecto y sombra por el viento",
     "wind u(z)": "viento u(z)",
     "acoustic shadow": "sombra acústica",
-    "1.5 m": "1,5 m",
     "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB":
         "Contra el viento: los rayos suben; desde ≈ 220 m se abre una "
         "sombra y el nivel cae más de 20 dB",
@@ -1728,4 +2120,175 @@ _ES: dict[str, str] = {
         "sigbands=True devuelve además la señal de banda a fs",
     "the decimated branch is interpolated back with resample_poly(M, 1)":
         "la rama diezmada se interpola de vuelta con resample_poly(M, 1)",
+    # --- B9: buildings/design plates (EN 15657, ISO 16251-1, ISO 12354) ---
+    "EN 15657 low- and high-mobility reception plates":
+        "Placas receptoras de baja y alta movilidad de la EN 15657",
+    "Low-mobility plate (7.2.2)": "Placa de baja movilidad (7.2.2)",
+    "3,15 m x 2,23 m": "3,15 m x 2,23 m",
+    "100 mm concrete, ρ = 2 300 ± 200 kg/m³":
+        "hormigón de 100 mm, ρ = 2 300 ± 200 kg/m³",
+    "S = 7,0 m² (≥ 5 m²), sides ≈ √2 : 1":
+        "S = 7,0 m² (≥ 5 m²), lados ≈ √2 : 1",
+    "η ≥ 0,08 over 50 Hz to 100 Hz": "η ≥ 0,08 de 50 Hz a 100 Hz",
+    "≥ 6 velocity positions, ≈ 0,5 m apart":
+        "≥ 6 posiciones de velocidad, a ≈ 0,5 m entre sí",
+    "and ≥ 0,1 m from any contact point":
+        "y a ≥ 0,1 m de cualquier punto de contacto",
+    "elastic pads ≤ 100 × 100 mm": "apoyos elásticos ≤ 100 × 100 mm",
+    "High-mobility plate (7.3.2)": "Placa de alta movilidad (7.3.2)",
+    "source bolted rigidly": "fuente atornillada rígidamente",
+    "support frame": "bastidor de sujeción",
+    "1 mm steel or 1,5 mm aluminium": "acero de 1 mm o aluminio de 1,5 mm",
+    "≈ 50 % perforated, ⌀ ≈ 6 mm holes,":
+        "≈ 50 % perforada, agujeros de ⌀ ≈ 6 mm,",
+    "so the source's own airborne sound":
+        "para que el ruido aéreo de la propia fuente",
+    "cannot drive the sheet": "no excite la lámina",
+    "Ts and Y measured with the": "Ts e Y medidos con la",
+    "source fitted (7.1)": "fuente instalada (7.1)",
+    "Three-plate bench (Figure 2)": "Banco de tres placas (figura 2)",
+    "whirlpool bath": "bañera de hidromasaje",
+    "> 10 dB between plates": "> 10 dB entre placas",
+    "up to three isolated plates,": "hasta tres placas aisladas,",
+    "for a source that touches": "para una fuente que toca",
+    "several building elements": "varios elementos constructivos",
+    "the velocity level difference": "la diferencia de nivel de velocidad",
+    "is measured per EN ISO 10848-1": "se mide según la EN ISO 10848-1",
+    "in every band, with the": "en cada banda, con el",
+    "equipment removed": "equipo desmontado",
+    "low-mobility plate -> blocked force (15) -> characteristic power L_Wsn (17)":
+        "placa de baja movilidad -> fuerza bloqueada (15) -> potencia característica L_Wsn (17)",
+    "high-mobility plate -> free velocity (18) -> source mobility |Y_S,eq| (19)":
+        "placa de alta movilidad -> velocidad libre (18) -> movilidad de fuente |Y_S,eq| (19)",
+    "ISO 16251-1 small floor mock-up for floor-covering improvement":
+        "Maqueta de suelo de la ISO 16251-1 para la mejora de un revestimiento",
+    "Section": "Sección",
+    "concrete slab, 200 ± 10 mm": "losa de hormigón, 200 ± 10 mm",
+    "covering specimen": "probeta de revestimiento",
+    "tapping machine (ISO 10140-5)": "máquina de impactos (ISO 10140-5)",
+    "5 hammers, 0,5 kg from 40 mm, 10 s⁻¹":
+        "5 martillos, 0,5 kg desde 40 mm, 10 s⁻¹",
+    "accelerometer screwed or glued underneath":
+        "acelerómetro atornillado o pegado por debajo",
+    "elastic pads": "apoyos elásticos",
+    "four elastic pads at the corners, each ≤ 100 × 100 mm":
+        "cuatro apoyos elásticos en las esquinas, cada uno ≤ 100 × 100 mm",
+    "vertical resonance of the slab on its pads < 20 Hz":
+        "resonancia vertical de la losa sobre sus apoyos < 20 Hz",
+    "top flat to ± 1 mm in a line edge to edge":
+        "cara superior plana a ± 1 mm en línea de borde a borde",
+    "Plan": "Planta",
+    "machine positions above, accelerometers below":
+        "posiciones de la máquina arriba, acelerómetros abajo",
+    "1 200 × 800 mm (± 50 mm)": "1 200 × 800 mm (± 50 mm)",
+    "≥ 2 machine positions, skew to the edges,":
+        "≥ 2 posiciones de la máquina, oblicuas a los bordes,",
+    "no hammer within 100 mm of an edge, all feet on the specimen":
+        "ningún martillo a menos de 100 mm de un borde, todas las patas sobre la probeta",
+    "≥ 4 accelerometer positions, uniform but random,":
+        "≥ 4 posiciones de acelerómetro, uniformes pero aleatorias,",
+    "off the symmetry lines and ≥ 100 mm from every edge":
+        "fuera de las líneas de simetría y a ≥ 100 mm de cada borde",
+    "three cycles: with specimen  |  without specimen (hammers repeated within ± 20 mm)  |  background":
+        "tres ciclos: con probeta  |  sin probeta (martillos repetidos dentro de ± 20 mm)  |  ruido de fondo",
+    "≥ 20 s per level; background rule: unchanged ≥ 15 dB, energy subtraction 6-15 dB, −1,3 dB below 6 dB":
+        "≥ 20 s por nivel; regla de fondo: sin cambio ≥ 15 dB, resta energética 6-15 dB, −1,3 dB por debajo de 6 dB",
+    "L_a = 10 lg(<a²>/a₀²),  a₀ = 10⁻⁶ m/s²   (Formula 1)":
+        "L_a = 10 lg(<a²>/a₀²),  a₀ = 10⁻⁶ m/s²   (fórmula 1)",
+    "EN 12354-1 Annex E junction types, path branches and the mass ratio":
+        "Tipos de unión del anexo E de la EN 12354-1, ramas de vía y cociente de masas",
+    "rigid cross": "cruz rígida",
+    "rigid T": "T rígida",
+    "T with a flexible interlayer": "T con capa elástica intermedia",
+    "elastic layer": "capa elástica",
+    "corner": "esquina",
+    "thickness change": "cambio de espesor",
+    "lightweight double leaf": "doble hoja ligera",
+    "rigid cross:": "cruz rígida:",
+    "rigid T:": "T rígida:",
+    "flexible T:": "T flexible:",
+    "corner:": "esquina:",
+    "thickness change:": "cambio de espesor:",
+    "lightweight double leaf:": "doble hoja ligera:",
+    "M = lg(m'perp,i / m'i): m'i is the element carrying the path, so the ratio is per path, not per junction.":
+        "M = lg(m'perp,i / m'i): m'i es el elemento que lleva la vía, así que el cociente es por vía, no por unión.",
+    "The functions take the RATIO, not M. Annex H.3 floor, ratio 1,61: 'through' -> K13 = 12,5 dB, 'corner' -> K12 = 8,9 dB":
+        "Las funciones toman el COCIENTE, no M. Forjado del anexo H.3, cociente 1,61: 'through' -> K13 = 12,5 dB, 'corner' -> K12 = 8,9 dB",
+    "ℓf is the coupling length along the junction line, measured surface to surface. Annex E values are read at 500 Hz, +/- 3 dB.":
+        "ℓf es la longitud de acoplamiento a lo largo de la unión, medida de superficie a superficie. Los valores del anexo E se leen a 500 Hz, +/- 3 dB.",
+    "ISO 12354-1 Annex L worked building: elements, junctions, paths":
+        "Edificio resuelto del anexo L de la ISO 12354-1: elementos, uniones y vías",
+    "Section: two stacked dwellings": "Sección: dos viviendas superpuestas",
+    "source dwelling": "vivienda emisora",
+    "receiving dwelling": "vivienda receptora",
+    "T  rigid T (floor to external wall): Kij = 6,4 / 11,2 dB":
+        "T  T rígida (forjado a muro exterior): Kij = 6,4 / 11,2 dB",
+    "X  rigid cross (floor to internal wall): Kij = 8,8 / 11,0 dB":
+        "X  cruz rígida (forjado a tabique interior): Kij = 8,8 / 11,0 dB",
+    "separating floor  220 mm concrete, 484 kg/m², fc = 76,8 Hz":
+        "forjado separador  hormigón de 220 mm, 484 kg/m², fc = 76,8 Hz",
+    "on it  35 mm screed, 73,5 kg/m², on s' = 8 MN/m³":
+        "sobre él  solera de 35 mm, 73,5 kg/m², sobre s' = 8 MN/m³",
+    "external walls  365 mm AAC, 219 kg/m², fc = 92,6 Hz":
+        "muros exteriores  hormigón celular de 365 mm, 219 kg/m², fc = 92,6 Hz",
+    "internal walls  200 mm calcium silicate, 360 kg/m², fc = 128,4 Hz":
+        "tabiques interiores  silicocalcáreo de 200 mm, 360 kg/m², fc = 128,4 Hz",
+    "Plan: the separating floor": "Planta: el forjado separador",
+    "external wall (T)": "muro exterior (T)",
+    "internal wall (X)": "tabique interior (X)",
+    "two external and two internal walls meet the floor, with":
+        "dos muros exteriores y dos interiores llegan al forjado, con",
+    "5,00 m of junction along each long edge and 4,00 m along":
+        "5,00 m de unión en cada borde largo y 4,00 m en",
+    "each short one: perimeter sum 9 m external + 9 m internal":
+        "cada borde corto: suma del perímetro 9 m exterior + 9 m interior",
+    "13 airborne paths = 1 direct (Dd) + 4 flanking elements × 3 branches (Ff, Df, Fd)":
+        "13 vías aéreas = 1 directa (Dd) + 4 elementos de flanco × 3 ramas (Ff, Df, Fd)",
+    "5 impact paths = 1 direct + 4 Df: only the floor is excited, so there is no Ff or Fd":
+        "5 vías de impacto = 1 directa + 4 Df: solo se excita el forjado, así que no hay Ff ni Fd",
+    "Resilient layers in section: floating floor, mounts, wall lining":
+        "Capas elásticas en sección: suelo flotante, apoyos y trasdosado",
+    "(a) floating floor": "(a) suelo flotante",
+    "220 mm structural slab": "forjado estructural de 220 mm",
+    "35 mm screed, 73,5 kg/m²": "solera de 35 mm, 73,5 kg/m²",
+    "edge strip, both sides": "banda perimetral, en ambos lados",
+    "any rigid bridge here": "cualquier puente rígido aquí",
+    "short-circuits the spring": "cortocircuita el muelle",
+    "s' = 8 MN/m³  →  fo = 52,8 Hz": "s' = 8 MN/m³  →  fo = 52,8 Hz",
+    "ΔL = 30 lg(f/fo) or 40 lg(f/fo)": "ΔL = 30 lg(f/fo) o 40 lg(f/fo)",
+    "(ISO 12354-2 C.1 / C.3)": "(ISO 12354-2 C.1 / C.3)",
+    "(b) discrete mounts": "(b) apoyos discretos",
+    "structural slab": "forjado estructural",
+    "50 mm surface, 115 kg/m²": "capa de paso de 50 mm, 115 kg/m²",
+    "reverberant bending field": "campo reverberante de flexión",
+    "4 mounts per m² of 2 MN/m": "4 apoyos por m² de 2 MN/m",
+    "30 dB per decade, not 40": "30 dB por década, no 40",
+    "(Vér's two-subsystem SEA model)": "(modelo SEA de dos subsistemas de Vér)",
+    "(c) wall lining: two fixings": "(c) trasdosado: dos fijaciones",
+    "masonry": "fábrica",
+    "adhesive dabs": "pelladas",
+    "studs + cavity": "montantes + cámara",
+    "(D.1)  fo = 542 Hz": "(D.1)  fo = 542 Hz",
+    "(D.2)  fo = 70,8 Hz": "(D.2)  fo = 70,8 Hz",
+    "the same board, two fixings: nearly 23 dB between them, and no formula here can see which one was built":
+        "la misma placa, dos fijaciones: casi 23 dB entre ellas, y ninguna fórmula de aquí ve cuál se construyó",
+    "s' is the EN 29052-1 value measured WITHOUT pre-load, and the series law (C.6) holds only for an uncut layer":
+        "s' es el valor EN 29052-1 medido SIN precarga, y la ley en serie (C.6) solo vale si la capa no está cortada",
+    # --- B9 reconstruction of B10b's decay-range plate ---
+    "The decay-range budget of one band: INR, truncation and the evaluation windows (ISO 3382)":
+        "El presupuesto de rango de caída de una banda: INR, truncamiento y ventanas de evaluación (ISO 3382)",
+    "Level [dB]": "Nivel [dB]",
+    "peak": "pico",
+    "background noise": "ruido de fondo",
+    "integration truncated here (t₁)": "integración truncada aquí (t₁)",
+    "tail compensated as": "cola compensada como",
+    "an exponential decay (C)": "una caída exponencial (C)",
+    "INR = 55 dB": "INR = 55 dB",
+    "Evaluation windows": "Ventanas de evaluación",
+    "hatched: the 15 dB margin ISO 3382-1 asks for beyond each window — EDT needs 25 dB, T20 35 dB, T30 45 dB":
+        "rayado: el margen de 15 dB que exige la ISO 3382-1 más allá de cada ventana — EDT necesita 25 dB, T20 35 dB y T30 45 dB",
+    "the library flags at 46 dB and 54 dB instead, where the fit's positive bias crosses 5 %":
+        "la biblioteca avisa en 46 dB y 54 dB, donde el sesgo positivo del ajuste cruza el 5 %",
+    "short of range? T20 instead of T30 -> a longer sweep or more averages -> EDT; never a fit into the noise":
+        "¿falta rango? T20 en vez de T30 -> un barrido más largo o más promedios -> EDT; nunca un ajuste metido en el ruido",
 }

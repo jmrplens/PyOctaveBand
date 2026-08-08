@@ -108,6 +108,84 @@ absorción negativo significa que los miembros de una pareja entraron al revés.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_es.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria y su placa base a al menos 1 m de las paredes, dos posiciones fijas de altavoz y tres posiciones fijas de micrófono, siendo la plataforma lo único que se mueve, y el mapeo de la Tabla 2 de T1 a T4 sobre los coeficientes de absorción de incidencia aleatoria y especular a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
 
+**Por qué al girar la muestra sale un segundo coeficiente de absorción
+(apartado 4).** Las reflexiones filtradas por banda de una misma superficie
+rugosa en orientaciones distintas comparten un frente de ataque idéntico y
+difieren en la cola: la cabeza es la componente especular coherente, y la cola,
+la dispersada. Promediar las respuestas al impulso *enganchadas en fase* a la
+excitación sobre muchas orientaciones suma por tanto las partes especulares en
+fase mientras las dispersadas interfieren de forma destructiva, y el
+decaimiento que sobrevive es el que habría dado una superficie puramente
+especular con algo de pérdida aparente de más. Esa pérdida aparente de más es
+la energía dispersada, que es la razón de que $\alpha_{spec} \ge \alpha_s$ y de
+que la ec. (5) se lea como una fracción de energía no especular. De ahí se
+siguen directamente dos consecuencias, fáciles de incumplir: el promediado debe
+ser síncrono con la adquisición, así que una plataforma girando libremente que
+emborrone la respuesta al impulso no hace esto; y la probeta debe presentar la
+misma superficie, en una orientación distinta, en cada promedio, que es la razón
+de que sea circular y esté centrada sobre el eje.
+
+### 1.1 El banco y la tanda
+
+Cada término de la ec. (5) es una diferencia de dos tiempos de decaimiento casi
+iguales, así que el método hereda por partida doble la sensibilidad de una
+medición ISO 354. Las condiciones de abajo son lo que hace que esas diferencias
+signifiquen algo, y los fragmentos de más abajo no pueden reparar una tanda que
+las rompió.
+
+- **Bandas y escala.** Bandas de tercio de octava de 100 Hz a 5000 Hz a escala
+  natural (apartado 5). El método se ejecuta rutinariamente sobre maquetas
+  físicas a escala 1:$N$, donde cada frecuencia central se multiplica por $N$ y
+  cada longitud de esta lista se divide por él: así es como llegan a
+  clasificarse superficies demasiado grandes para cualquier cámara
+  reverberante.
+- **Sala.** Volumen $V \ge 200\,N^{-3}$ m³ (apartado 6.1.2) y área de absorción
+  equivalente de la sala vacía $A_1 \le 0{,}30\,V^{2/3}$ (apartado 6.1.3), cuya
+  forma de regla práctica es $A_1/S \le 1$: una sala demasiado absorbente deja
+  los cuatro decaimientos demasiado cortos para diferir de forma medible. Los
+  elementos difusores deben ser **fijos** (las palas rotatorias están
+  explícitamente prohibidas, al contrario que en ISO 354), la sala y su
+  contenido deben permanecer invariables y cualquier sistema de circulación de
+  aire debe estar apagado (apartado 6.1.1).
+- **Plataforma giratoria y placa base.** Una placa base circular y rígida,
+  simétrica respecto al eje de rotación y dimensionada a la mayor dimensión de
+  la muestra, sin que ninguna parte de la plataforma quede a menos de
+  $N^{-1} \times 1{,}0$ m de las paredes de la sala (apartado 6.2).
+- **Probeta.** Circular, de al menos $N^{-1} \times 3{,}0$ m de diámetro; o
+  cuadrada, con un lado de al menos $N^{-1} \times 2{,}65$ m, montada a ras
+  sobre una placa base de al menos $N^{-1} \times 3{,}75$ m de diámetro
+  (apartado 6.3.1), de donde salen los 10 m² del fragmento de abajo. La
+  profundidad estructural debe mantenerse por debajo de $h \le d/16$ del
+  diámetro $d$ de la plataforma (apartado 6.3.2), el perímetro debe sellarse
+  pero **no** encajonarse con un borde rígido de altura fija (apartado 6.3.3),
+  una probeta con simetría de revolución debe desplazarse del eje al menos $d/8$
+  para que la rotación cambie de verdad la orientación, y la absorción de la
+  propia probeta debería quedarse por debajo de $\alpha_s = 0{,}50$
+  (apartado 6.3.4).
+- **Excitación y promediado.** Una señal determinista, evaluada por el método de
+  la respuesta al impulso integrada (apartado 7.1): ruido pseudoaleatorio
+  periódico o un barrido según ISO 18233. O bien radiar de forma continua
+  durante una revolución completa de la plataforma (con un periodo de 5 s y una
+  revolución por minuto, 12 periodos de señal), o bien tomar $n$ mediciones con
+  la muestra avanzada a pasos de $\Delta\varphi = 360°/n$, con
+  $60 \le n \le 120$ y con $n = 72$ (pasos de 5°) como preferencia, con la
+  excitación idéntica cada vez y el promediado enganchado en fase
+  (apartado 7.3).
+- **Posiciones.** Al menos dos posiciones de fuente y tres de micrófono, seis
+  mediciones en total, promediadas aritméticamente (apartado 7.3). Las mismas
+  seis posiciones se usan en las cuatro situaciones.
+- **Evaluación.** Integración inversa restringida al tramo lineal, con el
+  límite de integración en $-30$ dB y el tiempo de reverberación leído entre
+  $-5$ y $-20$ dB (apartado 7.5). $T_1$, $T_2$ y $T_3$ decaen linealmente, pero
+  **$T_4$ es una superposición de dos decaimientos y solo se evalúa el
+  primero**: leer la pendiente tardía de $T_4$ es la forma más común de
+  inventarse una dispersión que no está.
+- **Estabilización y clima.** No empezar hasta $15/N$ minutos después de salir
+  de la sala y cerrar la puerta, y tomar las cuatro situaciones lo más rápido
+  posible (apartado 7.3). Medir la temperatura y la humedad relativa de la sala
+  antes y después de **cada** una de las cuatro situaciones y usar la media por
+  situación (apartado 7.4).
+
 **Absorción a partir del tiempo de reverberación (apartado 6).** Cada situación se
 convierte en un coeficiente de absorción de Sabine con el propio término de
 atenuación del aire de la norma:
@@ -153,6 +231,45 @@ print(round(float(alpha_spec), 4))  # 0.2148
 print(round(float(s), 4))           # 0.0931
 ```
 
+**El clima no es un detalle (apartado 7.4).** Ese fragmento pasa una única
+velocidad del sonido y ninguna atenuación del aire, cosa que solo es segura
+cuando las cuatro situaciones compartieron de verdad el clima. La API admite una
+$c$ y una $m$ distintas para cada situación porque la norma lo hace: el término
+de corrección $-4(V/S)(m_2 - m_1)$ resta la absorción propia del aire, y en las
+bandas altas es comparable con la de la probeta. Calcula $c$ con la ec. (2)
+mediante `speed_of_sound`, y $m$ a partir de la atenuación en tono puro de
+ISO 9613-1 con `air_attenuation_coefficient` (ec. (3),
+$m \approx \alpha/4{,}343$ para $\alpha$ en dB/m), una vez por situación, a
+partir de la media de las lecturas tomadas antes y después de ella:
+
+```python
+import numpy as np
+
+# Las cuatro situaciones se ejecutan seguidas a lo largo de media hora: la sala
+# se calienta 1,5 K y la humedad relativa baja 9 puntos mientras se miden.
+temps = [20.0, 20.5, 21.0, 21.5]        # degC, media por situación (apartado 7.4)
+# La atenuación en tono puro de ISO 9613-1 a 5 kHz para esos cuatro climas, en
+# dB/m: air_attenuation(5000.0, t, rh) en la guía de propagación exterior.
+alpha = [0.04062, 0.04189, 0.04334, 0.04502]
+c = [float(materials.speed_of_sound(t)) for t in temps]           # ec. (2)
+m = [float(materials.air_attenuation_coefficient(a)) for a in alpha]  # ec. (3)
+print(np.round(c, 2))    # [343.2  343.49 343.78 344.08]
+print(np.round(m, 5))    # [0.00935 0.00965 0.00998 0.01037]   1/m a 5 kHz
+
+alpha_s = materials.random_incidence_absorption(200.0, 10.0,
+    c1=c[0], t1=8.0, m1=m[0], c2=c[1], t2=6.0, m2=m[1])
+alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0,
+    c3=c[2], t3=7.5, m3=m[2], c4=c[3], t4=5.0, m4=m[3])
+print(round(float(materials.scattering_coefficient(alpha_spec, alpha_s)), 4))
+# 0.0816   frente a 0.0931 con los mismos cuatro decaimientos y la deriva ignorada
+```
+
+Nueve puntos de humedad a lo largo de las cuatro situaciones mueven el
+coeficiente de dispersión de 5 kHz en 0,012, un octavo del valor, y en el
+sentido que lo *sobre*declara. Esa es toda la razón de que el apartado 6.1.1
+quiera la sala intacta y el apartado 7.3 quiera la tanda terminada deprisa; la
+corrección repara una deriva que se midió, no una que se adivinó después.
+
 Sobre una medición completa en tercios de octava, `scattering_coefficient_spectrum`
 empareja los $\alpha_{spec}$ y $\alpha_s$ por banda con sus centros de banda y
 devuelve un `ScatteringResult` representable:
@@ -174,15 +291,20 @@ print(np.round(result.scattering[[0, 6, 12]], 3))   # [0.011 0.428 0.844]
 result.plot()   # s(f) en eje de frecuencia logarítmico, de 0 a 1 (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es.svg" alt="El coeficiente de dispersión de incidencia aleatoria s de una superficie difusora sobre las 13 bandas de tercio de octava de 250 a 4000 Hz, creciendo suavemente desde casi cero a baja frecuencia hasta 0,84 a 4 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es.svg" alt="Dos paneles apilados sobre las 13 bandas de tercio de octava de 250 a 4000 Hz: arriba, el coeficiente de absorción de incidencia aleatoria plano medido con la plataforma inmóvil y el coeficiente de absorción especular medido con la plataforma en rotación subiendo por encima de él, con el hueco entre ambos sombreado como numerador de la ecuación 5; abajo, el coeficiente de dispersión resultante creciendo desde casi cero hasta 0,84 a 4 kHz" width="88%" />
 
-*El coeficiente de dispersión asciende con la frecuencia: a baja frecuencia el
-relieve de la superficie es pequeño frente a la longitud de onda y la reflexión
-permanece especular ($s \to 0$); al acortarse la longitud de onda el relieve
-dispersa más energía fuera de la dirección especular ($s \to 1$).*
+*La ec. (5) dibujada tal como se calcula. El hueco sombreado del panel superior
+es el numerador, $\alpha_{spec} - \alpha_s$: la pareja inmóvil $(T_1, T_2)$ da
+la curva inferior y la pareja en rotación $(T_3, T_4)$ la superior, así que toda
+la medición existe para abrir ese hueco. El coeficiente de dispersión de abajo
+asciende con la frecuencia porque el relieve de la superficie es pequeño frente
+a la longitud de onda en el extremo bajo de la banda ($s \to 0$) y comparable
+con ella en el alto ($s \to 1$). El denominador $1 - \alpha_s$ es la curva
+inferior plana, que es la razón de que una probeta absorbente vuelva incierto
+el $s$.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -202,25 +324,52 @@ result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
 result.plot(language="es")
 plt.show()
 
-# A mano, a partir de los campos del resultado, replicando lo que dibuja ScatteringResult.plot():
-fig, ax = plt.subplots()
-ax.semilogx(result.frequencies, result.scattering, "o-", color="#1f77b4")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Coeficiente de dispersión s")
-ax.set_ylim(0.0, 1.0)
-ax.set_title("Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)")
+# A mano, los dos paneles de la figura: la pareja de alpha con el numerador de
+# la ec. (5) relleno, y el s(f) que dibuja ScatteringResult.plot().
+fig, (top, bottom) = plt.subplots(2, 1, sharex=True)
+top.fill_between(freqs, alpha_s, alpha_spec, color="#2ca02c", alpha=0.25)
+top.semilogx(freqs, alpha_spec, "s-", color="#d62728", label="alpha_spec")
+top.semilogx(freqs, alpha_s, "o-", color="#1f77b4", label="alpha_s")
+top.set_ylabel("Coeficiente de absorción")
+top.set_ylim(0.0, 1.0)
+top.legend()
+bottom.semilogx(result.frequencies, result.scattering, "o-", color="black")
+bottom.set_xlabel("Frecuencia [Hz]")
+bottom.set_ylabel("Coeficiente de dispersión s")
+bottom.set_ylim(0.0, 1.0)
 plt.show()
 ```
 
 </details>
 
-**Comprobación de la placa base (apartado 6.4, Tabla 1).** La placa base vacía
-debe dispersar por sí sola de forma despreciable, o sesgaría el resultado.
-ISO 17497-1 limita el coeficiente de dispersión de la placa base por banda de
-tercio de octava; la biblioteca expone esos límites y un comprobador.
+### 1.2 ¿Es utilizable la medición?
+
+Lo deciden dos comprobaciones, y las dos están ya en la biblioteca.
+
+**Comprobación de la placa base (apartado 6.2, ec. (6), Tabla 1).** En
+condiciones ideales $T_1$ y $T_3$ son iguales: la placa base vacía es el mismo
+absorbente gire o no. Una placa base que no es del todo simétrica respecto al
+eje acorta $T_3$, y la ec. (6) vuelve a leer esa asimetría como un coeficiente
+de dispersión espurio de la propia disposición, con la misma aritmética de la
+ec. (5) aplicada a la pareja que no lleva probeta:
+
+$$
+s_{base} = 55{,}3\,\frac{V}{S}\left(\frac{1}{c_3 T_3} - \frac{1}{c_1 T_1}\right)
+        - 4\,\frac{V}{S}\,(m_3 - m_1).
+$$
+
+Se supone que el error persiste cuando la probeta está presente, así que
+ISO 17497-1 limita $s_{base}$ por banda de tercio de octava (Tabla 1) y la
+disposición queda descalificada por encima del techo.
 
 ```python
 from phonometry import materials
+
+# Los mismos T1 y T3 de arriba: la placa base sola, inmóvil y en rotación.
+s_base = materials.base_plate_scattering(200.0, 10.0,
+                                         c1=343.2, t1=8.0,   # T1
+                                         c3=343.2, t3=7.5)   # T3
+print(round(float(s_base), 4))   # 0.0269
 
 # Los techos normativos por banda (Tabla 1): 0.05 hasta 500 Hz, ascendiendo a 0.25.
 # materials.BASE_PLATE_BANDS es la tupla de bandas; materials.BASE_PLATE_MAX_SCATTERING asigna banda -> techo.
@@ -230,6 +379,49 @@ print(materials.BASE_PLATE_BANDS[0], materials.BASE_PLATE_MAX_SCATTERING[100])  
 # una banda que lo supera lanza un ScatteringDiffusionWarning que lista las infractoras.
 materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
 ```
+
+**Incertidumbre (Anexo A).** Las seis mediciones de posición de cada situación
+dan una incertidumbre típica de su tiempo de reverberación medio (ecs. (A.1) y
+(A.2)); esas se propagan a $u(\alpha_s)$ y $u(\alpha_{spec})$ (ecs. (A.3) y
+(A.4)) y de ahí a $u_s$ (ec. (A.5)), con la incertidumbre expandida
+$U = 2u_s$ al nivel del 95 %.
+
+```python
+import numpy as np
+
+# Las seis mediciones de posición que hay detrás de cada uno de los cuatro
+# tiempos promediados.
+t1 = [8.05, 7.94, 8.12, 7.88, 8.03, 7.98]
+t2 = [6.03, 5.95, 6.08, 5.92, 6.01, 6.01]
+t3 = [7.56, 7.44, 7.61, 7.39, 7.52, 7.48]
+t4 = [5.04, 4.95, 5.09, 4.92, 5.01, 4.99]
+u = {k: float(materials.reverberation_time_uncertainty(v))
+     for k, v in (("t1", t1), ("t2", t2), ("t3", t3), ("t4", t4))}   # ec. (A.1)
+print(round(u["t1"], 4), round(u["t4"], 4))    # 0.0347 0.025
+
+u_alpha_s = materials.absorption_coefficient_uncertainty(   # ec. (A.3)
+    200.0, 10.0, c=343.2, t_a=np.mean(t2), u_a=u["t2"],
+                          t_b=np.mean(t1), u_b=u["t1"])
+u_alpha_spec = materials.absorption_coefficient_uncertainty(   # ec. (A.4)
+    200.0, 10.0, c=343.2, t_a=np.mean(t4), u_a=u["t4"],
+                          t_b=np.mean(t3), u_b=u["t3"])
+unc = materials.scattering_coefficient_uncertainty(   # ec. (A.5)
+    0.2148, 0.1343, u_alpha_spec, u_alpha_s)
+print(round(float(unc.u_scattering), 4), round(float(unc.expanded), 4))
+# 0.0052 0.0103   ->  s = 0.093 +/- 0.010 al 95 %
+
+# La misma dispersión de seis posiciones sobre una probeta absorbente
+# (alpha_s = 0.50, el techo del apartado 6.3.4): el denominador (1 - alpha_s)
+# de la ec. (5) la infla.
+print(round(float(materials.scattering_coefficient_uncertainty(
+    0.60, 0.50, u_alpha_spec, u_alpha_s).expanded), 4))   # 0.0173
+```
+
+Esa última pareja de números es el límite práctico del método: el mismo banco y
+la misma repetibilidad dan una incertidumbre expandida de 0,010 sobre una
+probeta poco absorbente y de 0,017 en cuanto la probeta absorbe la mitad de la
+energía incidente, porque la ec. (5) divide por $1 - \alpha_s$. Es también la
+razón de que el apartado 6.3.4 pida $\alpha_s \le 0{,}50$ de entrada.
 
 ### Ficha de informe de ensayo de dispersión
 
@@ -259,6 +451,122 @@ autocorrelación normalizada de la distribución de energía polar.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer_es.svg" alt="Goniómetro de difusión en campo libre de ISO 17497-2: una muestra de ensayo sobre una plataforma giratoria, una fuente de altavoz fija y un arco semicircular de micrófonos receptores muestreando la respuesta polar reflejada, a partir de la cual se calcula el coeficiente de difusión por autocorrelación" width="92%" />
 
+### 2.1 De tres respuestas al impulso a un nivel
+
+«Registra el nivel reflejado» esconde toda la medición. Un micrófono del arco
+oye el sonido directo, la reflexión de la muestra y todo lo demás de la sala, y
+el apartado 7 es la receta que deja solo lo del medio. Para **cada** pareja
+fuente-receptor (apartado 7.3):
+
+1. Medir $h_1(t)$, la respuesta al impulso con la superficie de ensayo puesta.
+2. Medir $h_2(t)$, lo mismo con la superficie de ensayo retirada. Nada más puede
+   moverse entre las dos tomas: la resta de abajo vale exactamente lo que valga
+   eso.
+3. Medir $h_3(t)$, otra vez sin la superficie de ensayo, con la fuente centrada
+   sobre el punto de referencia y mirando al receptor. Esta hace falta en cuanto
+   el banco tiene más de una posición de micrófono o de fuente.
+
+El apartado 7.4 las reduce después. Restar $h_2$ de $h_1$ cancela todo lo que
+aporta la sala y deja la reflexión propia de la muestra; dividir ese residuo por
+$h_3$ en el dominio de la frecuencia quita el altavoz y el micrófono de la
+respuesta, de modo que lo que sobrevive es una propiedad de la superficie y no
+del equipo (fórmula (1)):
+
+$$
+h_4(t) = \mathcal{F}^{-1}\!\left[
+  \frac{\mathcal{F}\{h_1(t) - h_2(t)\}}{\mathcal{F}\{h_3(t)\}}
+\right].
+$$
+
+Sobre $h_4$ se coloca después una ventana **rectangular**: unidad donde están
+las reflexiones de la muestra y cero fuera (apartado 7.4.3). Sus bordes salen
+del camino muestra-receptor más corto y del más largo; el más corto, de
+geometría pura, y el más largo, de caminos que no son reflexiones de primer
+orden, que es la razón de que la norma recomiende mirar la respuesta al impulso
+en lugar de calcular la ventana a ciegas. Aquí hay dos trampas: la
+deconvolución desplaza el sonido directo de $h_4$ respecto de donde está en
+$h_3$, así que la ventana no puede colocarse a partir de $h_3$; y la longitud de
+la ventana fija la resolución en baja frecuencia, así que una puerta corta
+destruye en silencio las bandas bajas.
+
+La medición se acepta o se rechaza después con un número. Dentro de la ventana,
+el panel plano de referencia debe presentar una relación señal-ruido de al menos
+**40 dB**, calculada banda a banda con la fórmula (2) como el cociente entre la
+energía de $h_1 - h_2$ y la energía de $h_2$ a lo largo de la ventana. «Ruido»
+aquí no es solo error aleatorio: una reflexión no deseada que sobreviviera a la
+resta cuenta contra esos mismos 40 dB. Tras la transformada, cada nivel de
+tercio de octava $L'$ se obtiene por integración numérica con al menos tres
+puntos espectrales dentro de la banda, y no vale rellenar con ceros para llegar
+a esa cuenta (apartado 7.4.4).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_measurement_chain_es.svg" alt="Cinco trazas temporales apiladas de la reducción de datos de ISO 17497-2: la respuesta con la muestra, que enseña un pulso directo, la reflexión de la muestra y una reflexión tardía de la sala; la respuesta de fondo sin la muestra; su diferencia, ya sin la aportación de la sala; la respuesta de la muestra deconvolucionada; y esa misma traza con la ventana rectangular dibujada sobre la reflexión, con sus bordes anotados con los tiempos de camino muestra-receptor más corto y más largo" width="88%" />
+
+*La cadena del apartado 7.4 sobre la geometría del propio QRD de $N = 7$ de esta
+página, dibujada sobre un eje de un milisegundo. El panel (c) es donde
+desaparece la sala; el panel (e) es la única elección libre de toda la medición,
+y sus dos bordes son los tiempos de camino muestra-receptor más corto y más
+largo. Todo lo que queda fuera de la ventana se tira, incluida cualquier
+reflexión que la resta no consiguiera cancelar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Sustitutos sintéticos de las tres respuestas medidas, sobre la geometría
+# normalizada (fuente a 10 m, arco a 5 m): un pulso directo, la reflexión de la
+# muestra repartida por los retardos de los pozos y una reflexión tardía de la
+# sala presente tanto en h1 como en h2, de modo que la resta la elimina exacta.
+fs, n = 96000.0, 4096
+t = np.arange(n) / fs
+
+def pulse(delay, amp, f0=2000.0, q=6.0):
+    env = np.exp(-((t - delay) * f0 / q) ** 2)
+    return amp * env * np.cos(2 * np.pi * f0 * (t - delay))
+
+direct = pulse(1.0e-3, 1.0)
+room = pulse(9.0e-3, 0.35)
+sample = sum(pulse(4.4e-3 + k * 0.12e-3, 0.30 / (1 + k)) for k in range(7))
+h1, h2 = direct + sample + room, direct + room
+h4 = h1 - h2                       # fórmula (1) con una h3 plana
+window = ((t > 3.9e-3) & (t < 6.2e-3)).astype(float)
+
+fig, axes = plt.subplots(5, 1, sharex=True, figsize=(10, 9))
+for ax, y, label in zip(axes, (h1, h2, h1 - h2, h4, h4 * window),
+                        ("h1: muestra puesta", "h2: muestra retirada",
+                         "h1 - h2: sin la sala", "h4: deconvolucionada",
+                         "enventanada")):
+    ax.plot(t * 1e3, y)
+    ax.set_ylabel(label, fontsize=8)
+axes[-1].plot(t * 1e3, window * np.abs(h4).max(), "--")
+axes[-1].set_xlabel("Tiempo [ms]")
+plt.show()
+```
+
+</details>
+
+Otras dos condiciones deciden si los niveles significan algo. El altavoz debe
+iluminar toda la muestra como lo haría una fuente omnidireccional, dentro de
+$\pm 2$ dB en módulo y $\pm 20°$ en fase sobre la superficie plana de
+referencia, y los micrófonos deben responder a todo camino de reflexión
+concebible dentro de $\pm 1$ dB y $\pm 10°$ (apartado 7.2). Y **la misma
+cadena, sobre el mismo banco, debe ejecutarse de nuevo sobre un panel plano de
+referencia de la misma huella**: ese segundo juego de niveles es el que aporta
+el $d_{ref}$ del coeficiente normalizado $d_\mathrm{norm}$ de la fórmula (7).
+Un coeficiente normalizado citado contra una referencia medida en otro sitio no
+es un coeficiente normalizado.
+
+*Una nota sobre los símbolos, antes de las fórmulas.* La ISO 17497-2 escribe el
+coeficiente normalizado como $d_n$; esta página lo escribe $d_\mathrm{norm}$,
+porque la sección 3 necesita el subíndice $n$ para el índice de pozo y escribe
+$d_n$ para una **profundidad** de pozo. En el mismo espíritu, el $s_n$ de la
+sección 3 es un índice de profundidad de residuo cuadrático y no el coeficiente
+de dispersión $s$ de la sección 1; el factor de área $N_i$ de abajo no tiene
+relación con el orden de secuencia $N$ de la sección 3; y la $n$ de la
+fórmula (5) cuenta receptores, no pozos.
+
 **Autocorrelación (fórmula (5)).** Para $n$ receptores con espaciado angular
 igual, con $p_i = 10^{L_i/10}$ la energía de banda en el receptor $i$,
 
@@ -270,7 +578,8 @@ $$
 Una respuesta polar perfectamente uniforme ($L_i$ todos iguales) da $d = 1$; un
 único lóbulo especular agudo da $d = 0$. Cuando los receptores subtienden ángulos
 sólidos desiguales, la fórmula (6) pondera por área cada energía con
-$N_i = A_i / A_\text{min}$ de la fórmula (8), con
+$N_i = A_i / A_\text{min}$ (sin relación con el orden de secuencia $N$ de la
+sección 3) de la fórmula (8), con
 
 $$
 A_i = \frac{4\pi}{\Delta\phi}\sin^2\frac{\Delta\theta}{4}\ (\theta = 0),
@@ -289,6 +598,36 @@ menor, así que $A_\text{min}$) y 0,0436 en el polo, de modo que los pesos van
 comprobar los propios con `materials.area_factors(elevations, delta_theta=5.0)`
 antes de meter un vector de pesos construido a mano en la fórmula (6).
 
+### 2.2 El campo lejano, y por qué 10 m y 5 m
+
+Esas distancias no son una convención. La ISO 17497-2 define el campo lejano
+como la región en la que el nivel reflejado cae 6 dB por cada duplicación de la
+distancia (3.4), y hace geométrica la prueba práctica: **al menos el 80 % de las
+posiciones de receptor deben quedar fuera de la zona especular**
+(apartado 6.2.2), el sector angular hacia el que un panel plano de la misma
+huella enviaría la reflexión de la fuente. Una fuente a 10 m del punto de
+referencia y un arco de 5 m de radio es la disposición que satisface eso para un
+panel de ensayo típico; encoge el arco y caerán más receptores dentro de la zona
+especular, lo que hace que el panel parezca más difusor de lo que es. El
+espaciado de 5° entre receptores es un máximo ($\Delta\theta \le 5°$,
+$\Delta\varphi \le 5°$), no una sugerencia, y las cinco posiciones de fuente que
+usa la técnica bidimensional (0°, $\pm 30°$ y $\pm 60°$ desde la normal de
+referencia) son las que hay detrás de los `TWO_DIMENSIONAL_SOURCE_WEIGHTS` del
+fragmento de incidencia aleatoria de más abajo.
+
+Existen dos desviaciones legítimas, y las dos deben declararse junto al
+coeficiente. Un difusor pensado para escucha cercana se clasifica *también* en
+campo próximo, en posiciones realistas de aplicación, porque es ahí donde
+aparece el enfoque; el ensayo en campo lejano sigue ejecutándose junto a él
+(apartado 6.2.1). Y un banco cuyos radios difieran de 10 m y 5 m corrige sus
+niveles hasta esa pareja con las fórmulas (3) y (4): la distancia combinada es
+$r = 2 r_1 r_2/(r_1 + r_2)$ y la corrección es $\varepsilon\,10\lg(r/6{,}67)$ dB,
+con $\varepsilon = 2$ para divergencia esférica y 1 para cilíndrica
+(apartado 7.4.5). Sobre un arco verdadero esa corrección es la misma para todos
+los receptores, así que se cancela dentro de la fórmula (5) y deja $d$ intacto;
+importa cuando los radios de los receptores difieren entre sí, que es
+exactamente la razón de que la norma pida un arco siempre que sea posible.
+
 El montaje que suponen esas fórmulas merece dibujarse a escala.
 `plot_goniometer_geometry` traza la disposición estándar en planta: el
 semicírculo de 37 micrófonos cada 5 grados a 5 m alrededor de la muestra, con
@@ -298,10 +637,11 @@ la fuente a 10 m sobre la normal.
 
 *El arco polar detrás de cada $L_i$ de la fórmula (5), a escala: 37 receptores
 cada 5 grados a 5 m, la fuente al doble de distancia sobre la normal y la
-muestra como una lámina en el centro.*
+muestra como una lámina en el centro. La muestra es así de pequeña a propósito:
+es lo que mantiene al 80 % de esos receptores fuera de la zona especular.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -337,6 +677,14 @@ misma distancia, que es justo lo que fija la ISO 17497-2 con los tres.
   description="Simulación FDTD 2D de un frente de onda plano incidiendo sobre un panel rígido plano y un difusor de Schroeder de residuos cuadráticos lado a lado. El panel plano devuelve un haz especular colimado mientras que los pozos del difusor reparten la misma energía en un abanico ancho, y el campo dispersado sobre un arco de receptores da coeficientes de difusión de 0,32 frente a 0,63."
 />
 
+Los datos polares medidos son voluminosos, así que el ejemplo que sigue usa en
+su lugar niveles *predichos*: el modelo de campo lejano de la sección 3 evaluado
+sobre una geometría de difusor publicada, que produce exactamente los 37 niveles
+$L_i$ que entregaría la cadena de la sección 2.1. Lo que el coeficiente hace con
+esos niveles es idéntico en cualquiera de los dos casos; de dónde salen es el
+tema de la sección 3, y el vocabulario de residuos cuadráticos de abajo se
+define allí.
+
 La respuesta de un solo plano de abajo es la predicción en campo lejano de una
 geometría de difusor publicada: un difusor de residuos cuadráticos $N = 7$ de
 6 periodos, 3,6 m de anchura total y 0,2 m de profundidad máxima de pozo (la
@@ -366,7 +714,7 @@ convertidos en una superficie construible. La frecuencia de diseño de
 490 Hz es la que deja el pozo más profundo exactamente en 200 mm.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -408,9 +756,11 @@ d_ref = materials.directional_diffusion_coefficient(flat.levels)
 print(round(float(d_ref), 4))        # 0.0049
 
 # Normaliza frente a la referencia plana para aislar el efecto propio del
-# difusor (fórmula (7)): d_n = (d - d_ref) / (1 - d_ref).
-d_n = materials.normalized_diffusion_coefficient(d, d_ref)
-print(round(float(d_n), 4))          # 0.1055
+# difusor (fórmula (7)): d_norm = (d - d_ref) / (1 - d_ref). La ISO 17497-2 lo
+# escribe d_n; esta página reserva el subíndice n para el índice de pozo de la
+# sección 3.
+d_norm = materials.normalized_diffusion_coefficient(d, d_ref)
+print(round(float(d_norm), 4))       # 0.1055
 
 # Valor de incidencia aleatoria: promedia los coeficientes de banda sobre las
 # posiciones de fuente, con la ponderación 2-D de la norma (0 grados -> 1,
@@ -448,7 +798,7 @@ por lóbulos de los arrays periódicos es justo el motivo por el que
 Cox & D'Antonio recomiendan disposiciones moduladas.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -483,18 +833,48 @@ plt.show()
 
 </details>
 
+### 2.3 Leer el número
+
+La página ha impreso ya 0,1099, 0,0049, 0,1055 y 0,2231, y ninguno significa
+nada sin una escala. La ISO 17497-2 acota $d$ entre 0 y 1, y su propia nota de
+definición es tajante sobre el extremo alto de ese rango: la difusión completa
+daría 1, pero **los difusores reales rara vez superan 0,7** (3.9). Un panel
+plano de la misma huella saca unas pocas milésimas en el mismo banco, los
+difusores comerciales ocupan aproximadamente la franja de 0,2 a 0,6 dentro de su
+rango de trabajo, y una respuesta polar uniforme en todos los ángulos, que es lo
+que exige el 1, no existe.
+
+¿Y por qué el ejemplo resuelto se queda en 0,11 y no en una cifra de folleto?
+Porque es una frecuencia, una dirección de fuente y seis repeticiones de un
+periodo: los lóbulos de red de un array periódico dominan una respuesta polar
+monofrecuencia, y la fórmula (5) lee un abanico de lóbulos como mala
+uniformidad. La magnitud que clasifica un producto es el $d_\mathrm{norm}$ de
+incidencia aleatoria banda a banda, promediado sobre las posiciones de fuente
+del apartado 8.4, que es a la vez más alto y más suave. De ahí salen tres reglas
+de lectura:
+
+- Compara $d_\mathrm{norm}$, nunca $d$, entre productos de tamaños distintos: la
+  normalización es lo que quita la difracción de borde que enseña todo panel
+  finito y que crece según encoge el panel.
+- Lee el espectro entero. La difusión cae por debajo de la frecuencia a la que
+  el relieve de la superficie es comparable con la longitud de onda, y otra vez
+  por encima de la frecuencia a la que los pozos dejan de comportarse como guías
+  de onda de un solo modo (sección 3).
+- Un número único sin banda y sin posición de fuente no es un resultado de
+  ISO 17497-2, esté impreso al lado de lo que esté.
+
 ### Ficha de informe de ensayo de difusión
 
 Reunido a lo largo de las bandas de tercio de octava, el coeficiente de difusión
 $d(f)$ forma un `DiffusionSpectrum`, cuyo `report(path)` genera un informe de
-ensayo de difusión de una página (ISO 17497-2, Apartado 8.5): la tabla por banda
+ensayo de difusión de una página (ISO 17497-2, apartado 8.5): la tabla por banda
 de $d$ junto a la curva $d(f)$ con eje de bandas, con un titular de
-caracterización enmarcado. Según el Apartado 8.4, el coeficiente de incidencia
+caracterización enmarcado. Según el apartado 8.4, el coeficiente de incidencia
 aleatoria es a su vez una magnitud por banda, la media de los coeficientes
 direccionales sobre las posiciones de fuente banda a banda (**no** una media a
 través de las frecuencias), de modo que aquí $d$ es un coeficiente por banda.
-`verbose=True` añade la columna del coeficiente normalizado $d_n$ a la tabla (la
-curva siempre dibuja $d_n$ como acompañante cuando está presente).
+`verbose=True` añade la columna del coeficiente normalizado $d_\mathrm{norm}$ a
+la tabla (la curva siempre lo dibuja como acompañante cuando está presente).
 
 ```python
 import numpy as np
@@ -504,7 +884,7 @@ from phonometry import materials
 # práctica, la d de incidencia aleatoria de cada banda es la media, sobre las
 # posiciones de fuente, de los coeficientes direccionales: para la banda k, se
 # promedia directional_diffusion_coefficient sobre las fuentes con
-# random_incidence_diffusion (Apartado 8.4).
+# random_incidence_diffusion (apartado 8.4).
 freqs = np.array([250, 500, 1000, 2000, 4000], float)
 d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
 spectrum = materials.diffusion_spectrum(freqs, d)
@@ -588,7 +968,90 @@ Del propio dibujo se deducen unas cuantas reglas de diseño:
   respuesta polar de arriba. Modular dos secuencias distintas (o una
   secuencia y su inversa) rompe la periodicidad y recupera la difusión; las
   secuencias de raíz primitiva ($s_n = r^n \bmod N$) suprimen además el
-  lóbulo especular a la frecuencia de diseño.
+  lóbulo especular a la frecuencia de diseño, un efecto que es más fuerte
+  sobre uno o dos periodos y se diluye según se añaden periodos.
+
+Las dos primeras reglas definen juntas la banda en la que un diseño funciona de
+verdad, y el modelo reproduce las dos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_working_band_es.svg" alt="Coeficiente de difusión predicho de un difusor de residuos cuadráticos N = 7 diseñado para 500 Hz con pozos de 10 cm y cinco periodos, sobre una rejilla fina de frecuencias de 200 a 6000 Hz: la curva sube hasta un pico en la frecuencia de diseño de 500 Hz, se desploma sobre la referencia casi nula del panel plano en un valle ancho centrado en 3500 Hz, y la región por encima de 1715 Hz aparece sombreada como la banda en la que un pozo ya no es una guía de onda de un solo modo" width="88%" />
+
+*Las dos reglas de diseño, dibujadas sobre una rejilla fina en lugar de en los
+centros de banda para que las dos queden resueltas. En $N f_0 = 3500$ Hz todos
+los pozos tienen un número entero de medias longitudes de onda de profundidad,
+la secuencia de fases se anula y la difusión predicha del panel cae sobre la
+referencia plana. Por encima de $f_{max} = c/(2w) = 1715$ Hz la imagen de una
+única onda plana dentro de un pozo de 10 cm deja de valer, así que lo que el
+modelo dibuja ahí es una extrapolación y no una predicción.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` lo importan los bloques de arriba. El diseño de esta sección sobre
+# una rejilla lineal fina: los centros de tercio de octava son demasiado gruesos
+# para resolver el desplome de N f0 en 3500 Hz.
+c, width = 343.0, 0.10
+grid = np.linspace(200.0, 6000.0, 601)
+depths = materials.qrd_well_depths(7, 500.0, speed_of_sound=c)
+qrd = materials.predicted_diffusion_spectrum(width, grid, depths=depths,
+                                             periods=5, normalize=False)
+flat = materials.predicted_diffusion_spectrum(width, grid,
+                                              depths=np.zeros_like(depths),
+                                              periods=5, normalize=False)
+fig, ax = plt.subplots()
+ax.axvspan(c / (2 * width), grid[-1], color="#9e9e9e", alpha=0.16)
+ax.axvline(7 * 500.0, color="#d62728", linestyle="--")
+ax.plot(grid, qrd.diffusion, color="#1f77b4", label="QRD N = 7")
+ax.plot(grid, flat.diffusion, color="#9e9e9e", linestyle="--", label="Plano")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Coeficiente de difusión predicho d")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La cuarta regla merece más probarla que creérsela, porque el modelo acepta un
+array de profundidades arbitrario por el argumento `depths` y la comparación no
+cuesta nada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_modulation_es.svg" alt="Dos paneles que comparan seis repeticiones de un periodo de residuos cuadráticos N = 7 frente al mismo periodo alternado con su inverso sobre la misma huella de 4,2 m: a la izquierda, un diagrama polar semicircular a 1 kHz donde la disposición modulada llena el arco de forma más uniforme y alcanza un coeficiente de difusión de 0,32 frente a 0,22; a la derecha, el coeficiente de difusión normalizado banda a banda de 250 a 2000 Hz, donde la disposición modulada es más alta en todas las bandas salvo en la frecuencia de diseño de 500 Hz" width="92%" />
+
+*Los mismos 42 pozos, los mismos 4,2 m de pared, una sola diferencia: si el
+periodo se repite o se alterna con su inverso. La modulación compra difusión en
+toda la banda de trabajo, 0,32 frente a 0,22 a 1 kHz, y la devuelve en la propia
+frecuencia de diseño, que es el único sitio donde la secuencia de residuos
+cuadráticos sin romper tiene su propiedad de módulo plano que gastar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` lo importan los bloques de arriba.
+base = materials.qrd_well_depths(7, 500.0)
+inverse = base.max() - base
+periodic = np.tile(base, 6)
+modulated = np.concatenate([base if k % 2 == 0 else inverse for k in range(6)])
+bands = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000], float)
+fig, ax = plt.subplots()
+for depths, label in ((periodic, "Periódico"), (modulated, "Modulado")):
+    spectrum = materials.predicted_diffusion_spectrum(0.10, bands,
+                                                      depths=depths, periods=1)
+    ax.semilogx(bands, spectrum.normalized, "o-", label=label)
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Coeficiente de difusión normalizado")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 `qrd_well_depths` evalúa la secuencia de profundidades y
 `predict_diffuser_polar_response` valora el diseño antes de construir nada,
@@ -629,10 +1092,10 @@ print(np.round(depths * 100, 1))               # profundidades de pozo en cm:
 surface = materials.predict_diffuser_polar_response(0.10, 2000.0, depths=depths,
                                                     periods=5)
 print(round(surface.coefficient, 3))           # 0.210
-surface.plot()   # respuesta polar predicha, d en el titulo (requiere matplotlib)
+surface.plot()   # respuesta polar predicha, d en el título (requiere matplotlib)
 
 # La variante de espectro normaliza banda a banda frente a la referencia plana
-# de la misma huella (Formula (7)): el panel plano se aplica a cero exacto y el
+# de la misma huella (Fórmula (7)): el panel plano se aplica a cero exacto y el
 # QRD queda muy por encima.
 freqs = np.array([500, 1000, 2000, 4000], float)
 qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
@@ -671,7 +1134,7 @@ freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
 depths = materials.qrd_well_depths(7, 500.0)
 qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
 
-# El DiffusionSpectrum dibuja la d(f) predicha directamente. Una linea:
+# El DiffusionSpectrum dibuja la d(f) predicha directamente. Una línea:
 qrd.plot(language="es")
 plt.show()
 
@@ -728,9 +1191,9 @@ decente no significa que se dispersara mucha energía.
 - **El coeficiente de difusión valora difusores.** Cuando la tarea es
   deshacer un eco, un flutter o una reflexión focalizada, lo que importa es
   que la energía reflejada se reparta en ángulo, y $d$ mide exactamente eso.
-  El $d_n$ normalizado (fórmula (7)) resta además la difracción de borde que
-  exhibe todo panel finito, de modo que productos de tamaños distintos puedan
-  compararse con justicia.
+  El $d_\mathrm{norm}$ normalizado (fórmula (7)) resta además la difracción de
+  borde que exhibe todo panel finito, de modo que productos de tamaños distintos
+  puedan compararse con justicia.
 
 Intercambiarlos falla en ambos sentidos: un coeficiente de difusión metido en
 la casilla de dispersión de un simulador sesga el reparto de energía, y un

@@ -16,21 +16,36 @@ import os
 
 from .aircraft import _d_aircraft_certification, _d_rotorcraft_certification
 from .buildings import (
+    _d_decay_range,
+    _d_directivity_factor,
+    _d_en12354_6_takeoff,
     _d_enclosed_space_absorption,
+    _d_facade_setup,
     _d_flanking,
+    _d_heavy_impact_sources,
     _d_impact,
     _d_installed_paths,
     _d_insulation_lab,
     _d_insulation_setup,
     _d_ir_measurement,
+    _d_iso12354_annexl,
     _d_iso12999,
+    _d_iso16251_mockup,
+    _d_junction_catalogue,
     _d_open_plan,
+    _d_open_plan_setup,
     _d_panel_insulation,
     _d_reception_plate,
+    _d_reception_plate_rigs,
+    _d_resilient_buildups,
     _d_reverberation_prediction,
     _d_room_image_sources,
     _d_room_measurement,
+    _d_room_measurement_section,
     _d_room_noise,
+    _d_room_noise_setup,
+    _d_survey_sweep,
+    _d_sweep_budget,
 )
 from .canvas import _write
 from .devices import (
@@ -61,10 +76,12 @@ from .materials import (
     _d_dynamic_stiffness_rig,
     _d_impedance_tube,
     _d_insitu_subtraction,
+    _d_iso354_room,
     _d_iso11654,
     _d_porous_layer,
     _d_scattering_reverb,
     _d_spot_tube,
+    _d_standing_wave_tube,
 )
 from .perception import (
     _d_dosimeter,
@@ -128,6 +145,15 @@ DIAGRAMS = {
         _d_surfaces, "ISO 3744 / 3746 sound power measurement surfaces", 640),
     "diagram_impact_setup": (
         _d_impact, "ISO 16283-2 impact sound insulation setup", 600),
+    "diagram_facade_setup": (
+        _d_facade_setup, "Facade sound insulation setup (ISO 16283-3)", 700),
+    "diagram_heavy_impact_sources": (
+        _d_heavy_impact_sources,
+        "Standard heavy and soft impact sources (ISO 16283-2, JIS A 1418-2)",
+        680),
+    "diagram_survey_sweep": (
+        _d_survey_sweep, "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)",
+        560),
     "sound_power_methods": (
         _d_methods, "Sound power methods compared", 620),
     "diagram_flanking_paths": (
@@ -139,7 +165,13 @@ DIAGRAMS = {
     "diagram_astm_tube": (
         _d_astm_tube, "Four-microphone transmission-loss tube (ASTM E2611)", 560),
     "diagram_airflow_resistance": (
-        _d_airflow, "Airflow resistance: static and alternating methods (ISO 9053-1/-2)", 540),
+        _d_airflow, "Airflow resistance: static and alternating methods (ISO 9053-1/-2)", 660),
+    "diagram_iso354_room": (
+        _d_iso354_room,
+        "Reverberation-room sound absorption (ISO 354)", 730),
+    "diagram_standing_wave_tube": (
+        _d_standing_wave_tube,
+        "Standing-wave-ratio tube: probe traverse and the minima (ISO 10534-1)", 680),
     "diagram_scattering_reverb": (
         _d_scattering_reverb,
         "Random-incidence scattering in a reverberation room (ISO 17497-1)", 560),
@@ -167,9 +199,18 @@ DIAGRAMS = {
     "diagram_room_measurement": (
         _d_room_measurement,
         "Room-acoustics measurement setup (ISO 3382-1 / ISO 3382-2)", 620),
+    "diagram_room_measurement_section": (
+        _d_room_measurement_section,
+        "The measuring chain in section (ISO 3382-1 clauses 4.2 and 4.3)", 600),
     "diagram_room_noise": (
         _d_room_noise,
         "Room-noise rating methods (ANSI/ASA S12.2-2019): NC and RC Mark II", 580),
+    "diagram_room_noise_setup": (
+        _d_room_noise_setup,
+        "Measuring the rated spectrum (ANSI/ASA S12.2-2019, clause 5.2.5)", 600),
+    "diagram_sweep_budget": (
+        _d_sweep_budget,
+        "Dimensioning the excitation for a room with T = 1.2 s (ISO 18233)", 560),
     "diagram_hearing_threshold": (
         _d_hearing_threshold,
         "Hearing-threshold model (ISO 7029 age distribution, ISO 389-7 zero)", 600),
@@ -188,6 +229,15 @@ DIAGRAMS = {
     "diagram_en12354_6": (
         _d_enclosed_space_absorption,
         "Absorption area and reverberation time of a room (EN 12354-6)", 410),
+    "diagram_en12354_6_takeoff": (
+        _d_en12354_6_takeoff,
+        "Room take-off: one room, three input lists (EN 12354-6)", 580),
+    "diagram_decay_range": (
+        _d_decay_range,
+        "The decay-range budget of one band (ISO 3382)", 520),
+    "diagram_directivity_factor": (
+        _d_directivity_factor,
+        "Directivity factor Q: four mountings, four critical distances", 410),
     "diagram_time_weighting": (
         _d_time_weighting,
         "Exponential-detector chain of the time weightings (IEC 61672-1)", 460),
@@ -200,6 +250,10 @@ DIAGRAMS = {
     "diagram_open_plan": (
         _d_open_plan,
         "Open-plan office spatial decay of speech (ISO 3382-3)", 500),
+    "diagram_open_plan_setup": (
+        _d_open_plan_setup,
+        "Where the ISO 3382-3 measurement line goes (clauses 5.1 and 5.2)",
+        780),
     "diagram_iso12999": (
         _d_iso12999,
         "Measurement uncertainty from tables to expanded U (ISO 12999-1)", 500),
@@ -221,7 +275,7 @@ DIAGRAMS = {
         "Occupational noise exposure measurement (ISO 9612)", 640),
     "diagram_dynamic_stiffness_rig": (
         _d_dynamic_stiffness_rig,
-        "Dynamic-stiffness resonance rig (ISO 9052-1)", 560),
+        "Dynamic-stiffness resonance rig (EN 29052-1)", 880),
     "diagram_mobility_rig": (
         _d_mobility_rig,
         "Mechanical-mobility measurement on a beam (ISO 7626)", 560),
@@ -231,6 +285,22 @@ DIAGRAMS = {
     "diagram_reception_plate": (
         _d_reception_plate,
         "Reception-plate measurement of structure-borne power (EN 15657)", 560),
+    "diagram_reception_plate_rigs": (
+        _d_reception_plate_rigs,
+        "EN 15657 low- and high-mobility reception plates", 600),
+    "diagram_iso16251_mockup": (
+        _d_iso16251_mockup,
+        "ISO 16251-1 small floor mock-up for floor-covering improvement", 600),
+    "diagram_iso12354_annexl": (
+        _d_iso12354_annexl,
+        "ISO 12354-1 Annex L worked building: elements, junctions, paths", 616),
+    "diagram_resilient_buildups": (
+        _d_resilient_buildups,
+        "Resilient layers in section: floating floor, mounts, wall lining", 500),
+    "diagram_junction_catalogue": (
+        _d_junction_catalogue,
+        "EN 12354-1 Annex E junction types, path branches and the mass ratio",
+        686),
     "diagram_installed_paths": (
         _d_installed_paths,
         "Installed structure-borne sound paths (EN 12354-5)", 620),

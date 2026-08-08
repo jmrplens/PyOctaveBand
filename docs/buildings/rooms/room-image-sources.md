@@ -182,6 +182,26 @@ plt.show()
 
 </details>
 
+### `image_source_rir()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `dimensions` | (float, float, float) | m | all > 0 | Room lengths `(Lx, Ly, Lz)` |
+| `source` / `receiver` | (float, float, float) | m | strictly inside the room | Positions `(x, y, z)` |
+| `absorption` | scalar / (6,) / (n,) / (6, n) | -- | `[0, 1]` | Uniform, per-wall, per-band, or per-wall per-band |
+| `fs` | int | Hz | > 0 | Sample rate |
+| `max_order` | int | -- | >= 0, default 20 | Reflection-order cut-off |
+| `speed_of_sound` | float | m/s | > 0, default 343 | Speed of sound `c` |
+| `air_attenuation` | float or (n,) | Np/m | >= 0, default 0 | Air power (intensity) attenuation coefficient `m` |
+| `duration` | float, optional | s | > 0 | RIR length (default: last image arrival) |
+| `frequencies` | (n,), optional | Hz | -- | Band centres labelling a per-band result |
+
+Returns an `ImageSourceResult` (`ir`, `fs`, `frequencies`, and the exact
+`times`/`distances`/`orders`/`amplitudes`/`image_positions` reflection table)
+with `.plot()`, `.plot_geometry()` and a `direct_time` property.
+`audible_image_count(order)` gives the shoebox image count and
+`reflection_density(t, volume)` the density $4\pi c^3 t^2 / V$.
+
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
 reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff
@@ -291,6 +311,26 @@ plt.show()
 ```
 
 </details>
+
+### `steady_state_field()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `sound_power_level` | float | dB re 1 pW | -- | Source power level `Lw` |
+| `surface_area` | float | m2 | > 0 | Total boundary area `S` |
+| `mean_absorption` | float | -- | `(0, 1)` | Mean Sabine absorption `alpha_bar` |
+| `distances` | 1D array, optional | m | > 0 | Distance grid (default: `0.1 rc` to `10 rc`) |
+| `directivity` | float | -- | > 0, default 1 | Source directivity factor `Q` |
+| `characteristic_impedance` | float, optional | Pa*s/m | > 0 | Adds the `10 lg(rho c / 400)` term |
+
+Returns a `SteadyFieldResult` (`distances`, `direct`, `reverberant`, `total`,
+`critical_distance`, `room_constant`) with `.plot()`. The pieces
+`room_constant`, `critical_distance`, `schroeder_frequency` and
+`steady_state_spl` are also callable directly, and each accepts per-band arrays.
+`steady_state_spl` additionally takes `source_model`, one of `constant_power`
+(the default), `constant_volume` or `constant_pressure`: whether the mounting
+that raises `Q` also raises the radiated power is a modelling choice worth up to
+18 dB for a corner source, and it should be stated in any report.
 
 The **Schroeder frequency**
 

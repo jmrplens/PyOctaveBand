@@ -53,6 +53,15 @@ side lives in
 and
 [Dynamic stiffness of resilient materials](/phonometry/materials/resilient/dynamic-stiffness/).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_resilient_buildups.svg" alt="Three resilient constructions in section with their mass-spring analogues: a floating screed on a continuous layer turned up at the wall, a walking surface on discrete mounts, and a wall lining bonded with adhesive dabs beside the same lining on studs over a filled cavity" width="92%" />
+
+Every formula below is chosen by a construction detail, so it is worth having the
+three build-ups in view: a continuous resilient layer under a screed, discrete
+mounts under a walking surface, and a lining fixed to a wall either by bonding or
+on studs over a cavity. Which of them you have built decides which law applies —
+and, as the last section of this page shows, whether the prediction means
+anything at all.
+
 ## The excitation: the tapping machine as a mass-spring-dashpot
 
 Everything downstream depends on the force the standard tapping machine
@@ -113,6 +122,48 @@ res.peak_force               # |Fn| per band, within 1 dB of res.upper_limit
 res.power_input_level        # 10 lg(Win/1 pW), rising 3 dB per doubling
 res.plot()                   # the force spectrum with both asymptotes
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tapping_force_spectrum.svg" alt="Tapping-machine force spectrum on a 140 mm concrete slab and on a 22 mm chipboard walking surface, each with its upper and lower momentum asymptotes, its cut-off frequency and the hammer limiting frequency marked, and the 6 dB gap between the two asymptotes annotated" width="88%" />
+
+*The same machine, two floors. On concrete the hammer rebounds
+(**under-critical**) and the spectrum hugs the upper asymptote
+$|F_n|_\text{upper} = 2mv_\text{h}/T_i$ to within 1 dB right across the building
+acoustics range, its cut-off sitting at 6 948 Hz and its hammer limiting
+frequency at 120 kHz — both far outside anything that is rated. On 22 mm
+chipboard the surface gives way, the hammer does not rebound
+(**over-critical**), and both frequencies collapse into the middle of the range:
+$f_\text{co}$ = 589 Hz and $f_\text{limit}$ = 555 Hz, so the spectrum bends
+towards the lower asymptote $mv_\text{h}/T_i$ where a rated band actually sits.
+The two asymptotes are 6.0 dB apart in mean square, and that gap is the whole
+reason a tapping-machine level measured on a timber floor cannot be compared with
+one measured on concrete: the machine is injecting a different force.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# The names come from the import block above.
+
+freqs = np.logspace(np.log10(50.0), np.log10(20000.0), 400)
+fig, ax = plt.subplots()
+for label, rho_s, c_s, nu_s, h_s in (("140 mm concrete", 2200.0, 3800.0, 0.2, 0.14),
+                                     ("22 mm chipboard", 650.0, 2400.0, 0.3, 0.022)):
+    e_s = rho_s * c_s**2 * (1 - nu_s**2)
+    z_s = infinite_plate_impedance(plate_bending_stiffness(e_s, h_s, nu_s),
+                                   rho_s * h_s)
+    k_s = plate_contact_stiffness(e_s, poisson_ratio=nu_s)
+    r = tapping_force_spectrum(freqs, k_s, z_s)
+    ax.loglog(freqs, r.peak_force, label=f"{label} (fco = {r.cut_off_frequency:.0f} Hz)")
+    ax.axhline(r.upper_limit, ls="--", lw=0.8)
+    ax.axhline(r.lower_limit, ls=":", lw=0.8)
+ax.set(xlabel="Frequency [Hz]", ylabel="Line force $|F_n|$ [N]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Soft floor coverings: the cut-off frequency is the design
 
@@ -362,6 +413,60 @@ res.plot()   # the Annex D ratings against fo, with this system marked
 # A laboratory rating transfers to the field through Formula (D.8).
 round(lining_improvement_in_situ(10.0, 100.0, 60.0), 1)  # 4.4 dB on a Rw 60 wall
 ```
+
+## What the formulae assume about the build
+
+Every model on this page assumes the resilient layer is the *only* mechanical
+connection between the two masses. None of them can see a rigid bridge, so all of
+them are upper bounds on a correctly built construction — and in the field the
+gap between a prediction and a measurement is far more often a bridge than a
+wrong $s'$.
+
+**Start with the right $s'$.** ISO 12354-2 Annex C qualifies it three times, in
+Formulae (C.2), (C.4)/(C.5) and (C.6), with the same phrase: the dynamic
+stiffness per unit area in accordance with EN 29052-1 **measured without any
+pre-load**. A stiffness quoted under service load is a different number, and
+since $f_0 \propto \sqrt{s'}$ a factor of two in the declared stiffness moves the
+resonance by $\sqrt{2}$ and shifts the whole improvement spectrum by
+$30\lg\sqrt{2} = 4{,}5$ dB on the 30 lg law, 6,0 dB on the 40 lg one. The
+[dynamic-stiffness guide](/phonometry/materials/resilient/dynamic-stiffness/)
+shows what the load plate does and why it is what it is.
+
+**The series law has a condition printed under it.** Formula (C.6),
+$s'_\text{tot} = (\sum 1/s'_i)^{-1}$, is followed verbatim by: this holds only if
+every resilient layer covers the whole area of the floor without any separations
+or cuttings, for example by heating or water-supply pipes or electrical devices.
+Services crossing a layer therefore invalidate it; the layer is laid *over* them,
+not around them.
+
+**Then the bridges.** These are the ways the assumption fails on site, roughly in
+order of how often:
+
+- screed in contact with the wall, because the edge strip was cut short, folded
+  down before the pour, or trimmed flush and then grouted over by the skirting;
+- screed touching a service penetration — a pipe, a conduit, a floor box — that
+  was not sleeved;
+- debris and mortar droppings left on the resilient layer before the pour, each
+  one a point bridge;
+- skirtings, door thresholds or floor finishes fixed *through* the floating slab
+  into the structure below;
+- a wall lining bonded with too many or too large adhesive dabs, which moves the
+  construction from the intended soft case to the D.1 bonded case;
+- for discrete mounts, any contact at all besides the mounts.
+
+The scale is brutal and the signature is recognisable. A handful of point bridges
+can cost 10 dB or more; a continuous edge contact can remove the improvement
+almost entirely. And because a bridge short-circuits the spring rather than
+detuning it, a bridged floating floor loses across the *whole* range above $f_0$
+rather than in one band — which is how it is told apart from a wrong $s'$ or a
+misplaced resonance in a
+[field measurement](/phonometry/buildings/insulation/insulation-field/).
+
+For linings the same point has a number on it, and it is on this page already:
+the Annex D formula is chosen by the fixing, so a board specified on studs over a
+filled cavity but built with adhesive dabs moves $f_0$ from 70,8 Hz to 542 Hz and
+turns a +13,8 dB gain into a $-9{,}0$ dB loss. Nearly twenty-three decibels, from
+a site decision that never reached a drawing.
 
 ## What is anchored on a published number, and what is not
 

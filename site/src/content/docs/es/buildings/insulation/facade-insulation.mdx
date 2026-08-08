@@ -73,9 +73,19 @@ del Anexo F de EN 12354-3 de más abajo, `fac.d_2m_nt_w` vale 33 dB.
 
 ## Medición en campo (ISO 16283-3)
 
-La misma lógica fuente/receptor alcanza la **fachada** del edificio, pero ahora
-la fuente está *en el exterior*: un altavoz a 45° o el propio tráfico rodado. En
-lugar de una diferencia de niveles a través de un cerramiento interior,
+Una medición de fachada plantea una pregunta que un cerramiento interior nunca
+plantea: **qué hay fuera, y dónde está.** No hay recinto emisor, así que el
+nivel de referencia hay que establecerlo en un campo libre dentro del cual se
+levanta un edificio reflectante, y todas las magnitudes de esta página heredan
+la geometría de esa elección. ISO 16283-3 lo resuelve partiendo el método dos
+veces: un resultado *global*, que describe toda la envolvente tal como está
+construida, frente a un resultado de *elemento*, que describe un componente; y
+una fuente de *altavoz*, que controla quien mide, frente al *tráfico rodado*,
+que sale gratis pero llega de todas partes. Esas dos particiones dan las cuatro
+combinaciones de la Tabla 1 (más ferrocarril y aeronaves en el Anexo E), y se
+eligen por criterios distintos, que expone
+[Elegir y realizar el método](#elegir-y-realizar-el-metodo).
+Las magnitudes se siguen de la elección:
 ISO 16283-3 referencia el nivel del recinto receptor $L_2$ al nivel **2 m frente
 a la fachada** $L_{1,2m}$, dando la diferencia de niveles $D_{2m}$ y, exactamente
 como en el caso a ruido aéreo, sus formas estandarizada y normalizada:
@@ -100,6 +110,105 @@ $$
 La magnitud de fachada es a ruido aéreo, así que su índice de un solo número usa
 la curva de referencia de **ISO 717-1** a través de `weighted_rating` sin cambios
 (Anexo F).
+
+Ninguna de las dos constantes es arbitraria. Un micrófono sujeto sobre la
+fachada lee la presión incidente *más* la reflejada, porque la fachada es el
+reflector; la resta convierte ese nivel superficial de vuelta al nivel de la
+onda incidente sola, y cuánto hay que quitar depende de la geometría con la que
+llega el sonido. ISO 16283-3 declara la hipótesis que hay detrás de cada una en
+sus propias definiciones: los $-1{,}5$ dB de $R'_{45°}$ «se basan en la
+hipótesis de que el sonido incide desde un solo ángulo, 45°, y de que el campo
+sonoro del recinto receptor se aproxima a un campo difuso» (3.12, Nota 3),
+mientras que los $-3$ dB de $R'_{tr,s}$ suponen que el sonido llega «desde
+todos los ángulos» (3.13, Nota 2). Así que el 1,5 dB entre los dos métodos es
+una afirmación sobre la *fuente*, no sobre la pared, y es la razón por la que
+un resultado de altavoz se etiqueta $D_{ls,2m,nT}$ y uno de tráfico
+$D_{tr,2m,nT}$ en lugar de llamarse los dos igual.
+
+Los 2 m del método global son un compromiso del mismo tipo. Más cerca, el
+micrófono lee una presión dominada por la propia reflexión de la fachada y por
+el detalle del alzado contra el que quede; mucho más lejos, deja de describir
+esta fachada y empieza a describir la calle. Dos metros están lo bastante lejos
+para que los recorridos directo y reflejado se hayan asentado en una suma
+estable en casi todo el rango, y lo bastante cerca para seguir dentro del campo
+de la fachada; pero la norma es franca sobre el precio, y anota en el
+apartado 9.6.1 que «se producirán errores sistemáticos a bajas frecuencias
+debido a efectos de interferencia». La consecuencia práctica es la que hay que
+llevarse: el nivel de referencia de un $D_{2m,nT}$ se mide delante de una
+superficie reflectante y es por tanto más alto que el campo libre que la misma
+fuente produciría con el edificio quitado, así que un $D_{2m,nT}$ y un $D_{nT}$
+interior no son la misma clase de número aunque tengan el mismo tamaño.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_facade_setup_es.svg" alt="Sección por una fachada de vivienda: un altavoz sobre el terreno con la línea de incidencia de 45 grados más menos 5 grados hasta el centro de un elemento de ensayo de 11,5 metros cuadrados, la distancia oblicua r acotada en 5 m para el método del elemento y 7 m para el método global y la perpendicular D debajo, un micrófono sujeto enrasado sobre el elemento de ensayo con sus tolerancias de 10 mm en paralelo y 3 mm en normal, y el micrófono global a 2,0 más menos 0,2 m del plano de la fachada a 1,5 m sobre el suelo del recinto receptor" width="92%" loading="eager" />
+
+<span id="elegir-y-realizar-el-metodo"></span>
+
+### Elegir y realizar el método (apartados 9 y 10)
+
+**Global o de elemento.** Responden a preguntas distintas, y la Tabla 1 de
+ISO 16283-3 dice cuál se prefiere para cada una. Los métodos **globales** dan
+$D_{2m,nT}$ (o $D_{2m,n}$) y «cuantifican el aislamiento a ruido aéreo de una
+fachada completa o de un edificio completo en una situación especificada»; ese
+resultado «no puede compararse con un índice de reducción acústica obtenido en
+laboratorio», porque es una propiedad del edificio tal como está construido.
+Los métodos de **elemento** dan $R'_{45°}$ o $R'_{tr,s}$ y son la vía cuando lo
+que se busca es caracterizar un componente o compararlo con datos de
+laboratorio. El método 1, elemento con altavoz, es la manera *preferente* de
+estimar el índice aparente de un elemento; el método 6, global con tráfico
+rodado, es la manera *preferente* de estimar el aislamiento global de una
+fachada expuesta a tráfico rodado.
+
+**Altavoz o tráfico.** Un altavoz es controlable y siempre admisible; el
+tráfico sale gratis y es a lo que la fachada se enfrenta de verdad, pero viene
+con condiciones. El tráfico varía, así que los niveles interior y exterior
+**deben medirse simultáneamente**; el promedio debe incluir al menos **50 pasos
+de vehículo**; y el ruido de fondo del recinto receptor debe quedar al menos
+10 dB por debajo del nivel equivalente medido, porque con una fuente variable
+normalmente no puede aplicarse ninguna corrección por ruido de fondo
+(apartado 10.2). El tráfico debe circular aproximadamente en línea recta dentro
+de ±60° del ángulo de visión desde la fachada, con desviaciones de hasta ±15°,
+y el ángulo de elevación desde el punto de máxima proximidad debe quedar por
+debajo de ±40° (apartado 10.3.2). La norma declara además sin rodeos el techo
+del método de elemento con tráfico: el ruido de fondo suele limitarlo a
+elementos o fachadas con $R'_w < 40$ dB (NOTA del apartado 10.1).
+
+**Dónde va el altavoz (apartados 9.3 y 9.4).** Ángulo de incidencia de
+45° ± 5°, preferiblemente sobre el terreno o tan alto sobre él como permita la
+práctica, con una distancia oblicua $r$ de la fuente al centro del elemento de
+ensayo de al menos **5 m** ($D > 3{,}5$ m) en el método del elemento y de al
+menos **7 m** ($D > 5$ m) en el global, la distancia mayor porque el método
+global tiene que iluminar toda la fachada por igual y no un solo elemento.
+Elige la posición de modo que el nivel varíe lo menos posible sobre el
+elemento: el requisito de directividad es menos de 5 dB de variación local por
+banda sobre una superficie del tamaño y la orientación del elemento, relajado a
+10 dB (y declarado en el informe) cuando una dimensión supera los 5 m. El
+espectro de la fuente debe ser estacionario y continuo, con los niveles de
+tercio de octava dentro de una octava difiriendo no más de 6 dB a 125 Hz, 5 dB
+a 250 Hz y 4 dB por encima; y debe dejar el nivel del recinto receptor al menos
+6 dB por encima del fondo.
+
+**Dónde van los micrófonos.** *Método del elemento* (apartado 9.5.1): el
+micrófono se sujeta directamente al elemento de ensayo, con su eje paralelo a
+la superficie (centro de la membrana a 10 mm o menos de ella) o normal a ella
+(3 mm o menos), con pantalla antiviento hemisférica y firmemente fijado para
+que no pueda moverse, y de manera que la propia fijación no cambie lo que el
+elemento transmite. Usa de **3 a 10** posiciones fijas, repartidas de forma
+uniforme pero asimétrica y nunca en retícula regular. El número no se decide de
+antemano: empieza con $n = 3$ y, si dos posiciones cualesquiera difieren más de
+$n$ dB en alguna banda, añade posiciones, hasta 10. Un elemento de ensayo
+montado en un **retranqueo** lleva 10 posiciones de entrada, y una diferencia
+superior a 10 dB debe hacerse constar en el informe. *Método global*
+(apartados 9.6.1 y 10.4.1): un micrófono a $(2{,}0 \pm 0{,}2)$ m del plano de
+la fachada, delante de su punto medio, a una altura de **1,5 m sobre el suelo
+del recinto receptor**, o 1 m por delante de una barandilla o saliente similar
+cuando lo haya. Un recinto con más de una pared exterior, o uno muy grande,
+necesita una posición en cada fachada, y una fachada muy grande necesita varias
+posiciones de altavoz, cada una cumpliendo el apartado 9.4 por completo.
+
+Nada de esto lo comprueban las funciones de más abajo: `facade_insulation` y
+`facade_sound_reduction` promedian en energía las posiciones que se les den
+(apartado 9.5.1, Fórmula (7)) y combinan posiciones de altavoz con la
+Fórmula (8) si lo haces tú.
 
 ```python
 import numpy as np
@@ -181,7 +290,7 @@ plt.show()
 `surface_level`, `area` y `volume` son todos opcionales: solo con `l1_2m`, `l2`
 y `t2` la función devuelve `d_2m` y `d_2m_nt`; añade `volume` para `d_2m_n`;
 añade `surface_level` **y** `area` **y** `volume` para `r_prime`. Las posiciones
-se promedian en energía con la fórmula del nivel superficial (Apartado 9.5.1);
+se promedian en energía con la fórmula del nivel superficial (apartado 9.5.1);
 se supone que los niveles por banda ya están corregidos por ruido de fondo.
 
 ### Parámetros de `facade_insulation()`
@@ -257,6 +366,13 @@ EN ISO 717-1 (`weighted_rating`).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction_es.svg" alt="Índices de reducción acústica parciales por elemento y la reducción aparente de la fachada R' y la diferencia de nivel estandarizada D2m,nT resultantes para el ejemplo resuelto del Anexo F de EN 12354-3, con la entrada de aire limitando las bandas bajas" width="80%" />
 
+*Una fachada compuesta la gobierna su elemento peor, y las curvas dibujadas
+dicen cuál es banda a banda: la entrada de aire, una fracción de metro
+cuadrado, mantiene bajas las bandas graves mientras el muro de 6 m² no hace
+nada por limitar el resultado. Las dos curvas de salida quedan muy por debajo
+de todas las curvas de elemento porque el compuesto es una suma energética de
+potencia transmitida, no un promedio de índices.*
+
 ```python
 from phonometry import building
 
@@ -277,7 +393,7 @@ fac.plot()   # índices parciales por elemento con R' y D2m,nT superpuestos (req
 ```
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import numpy as np
@@ -311,11 +427,13 @@ fig.tight_layout(); plt.show()
 
 </details>
 
-El compuesto se razona mejor dibujado como áreas. `plot_facade_elements`
-tesela el alzado con el área dibujada de cada elemento igual a su área real
-(aquí un muro de fábrica de 6 m², una ventana de 1,5 m² y su cajón de persiana
-de 0,3 m²), y una predicción que retuvo sus `elements` redibuja su propia
-fachada con `fac.plot_geometry()`.
+El compuesto se razona mejor dibujado como áreas. El alzado de más abajo es una
+**segunda fachada, más sencilla** que la del Anexo F de arriba (un muro de
+fábrica de 6 m², una ventana de 1,5 m² y su cajón de persiana de 0,3 m²,
+elegida para que las piezas se lean), y no un dibujo de la predicción recién
+calculada. `plot_facade_elements` la tesela con el área dibujada de cada
+elemento igual a su área real, y una predicción que retuvo sus `elements`
+redibuja *su propia* fachada con `fac.plot_geometry()`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_es.svg" alt="Alzado a escala de una fachada compuesta: un muro de fábrica rayado de 6 m2, una ventana de 1,5 m2 y un estrecho cajón de persiana de 0,3 m2 dibujados como piezas de una fachada de 3,95 m por 1,97 m cuyas áreas dibujadas igualan las reales, cada pieza rotulada con su área y el ancho y alto totales acotados" width="88%" />
 
@@ -324,7 +442,7 @@ cuarto del área del muro pero cada metro cuadrado suyo transmite cien veces
 más, así que las piezas pequeñas deciden $R'$.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -383,7 +501,7 @@ elements = [
 fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
                              frequencies=[125, 250, 500, 1000, 2000], bands="octave")
 fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
-    specimen="Muro de fábrica + ventana + lucernario + aireador", area=11.3,
+    specimen="Muro de fábrica + ventana + tragaluz + entrada de aire", area=11.3,
     receiving_volume=50.0, requirement=30.0,
     notes="Fachada plana, ΔLfs = 0 dB (Anexo C)."))         # D2m,nT,w = 33 dB
 ```
@@ -421,7 +539,11 @@ seg = building.radiated_sound_power(
     r_prime_cap=40.0, octave_bands=bands)
 print(round(seg.l_w[0], 1), round(seg.l_w[1], 1))     # 59.8 61.2  (LW a 63/125 Hz)
 
-# Nivel exterior a 5 m frente al centro del lado de 60×10 m (LWA = 62.9 dB(A)).
+# El nivel exterior se calcula para un LADO completo, no para el segmento de
+# arriba. La Tabla G.8 del Anexo G suma los tres segmentos del lado 1 hasta
+# LWA = 62.9 dB(A) sobre el lado completo de 10 x 60 m; la Tabla G.9 lee
+# después el nivel a 5 m delante de su centro. (`seg.l_w_dba` vale 58.2 dB(A):
+# un segmento de ese lado, no el lado.)
 a_tot = building.outdoor_attenuation(width=60.0, height=10.0, distance=5.0)
 print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 36.6
 
@@ -494,6 +616,7 @@ plt.show()
 | `radiated_sound_power(r_prime_cap)` | float | dB | por defecto `None` (sin tope) | Tope de campo opcional sobre $R'$, nota al pie del ejemplo del Anexo G (usa 40 dB), no parte de la Fórmula (2)/(3) |
 | `radiated_sound_power(octave_bands)` | sec. de int | Hz | por defecto `None` | Centros de octava que casan con las bandas; habilita el $L_{WA}$ ponderado A |
 | `facade_sound_reduction(frequencies)` | secuencia | Hz | por defecto `None`; longitud = nº de bandas | Centros de banda que se conservan en el resultado para las gráficas |
+| `facade_sound_reduction(bands)` | str o `None` | — | `'octave'` / `'third-octave'` / `None` | En qué conjunto de bandas están los datos; `None` lo infiere del número, como en la [página de índices](/phonometry/es/buildings/insulation/insulation-ratings/) |
 | `outdoor_attenuation(width, height, distance)` | float | m | > 0 | Lado radiante finito y distancia de recepción (Anexo E) |
 | `outdoor_level(l_w, attenuation)` | float o sec. | dB | compatibles por difusión | $L_p$ exterior de uno o varios lados (Fórmula E.1) |
 
@@ -614,10 +737,19 @@ de ISO 717-1, y tanto la medición como la predicción escriben su ficha de una
 página con `.report()`.
 
 **No cubierto.** Los niveles por banda que se pasan a `facade_insulation` se
-suponen ya corregidos por ruido de fondo, y no se comprueban los requisitos de
-procedimiento de la propia ISO 16283-3 (el número y la colocación de las
-posiciones de altavoz y micrófono, el procedimiento de baja frecuencia, la
-elección entre el método global y el de elemento). Los ejemplos resueltos de
+suponen ya corregidos por ruido de fondo, y los requisitos de procedimiento de
+la propia ISO 16283-3, los que expone
+[Elegir y realizar el método](#elegir-y-realizar-el-metodo),
+están documentados pero no se comprueban: nada verifica la incidencia de
+45° ± 5°, las distancias oblicuas de 5 m y 7 m, la escalada de 3 a 10
+posiciones de micrófono y su caso especial del retranqueo, los 50 pasos de
+vehículo ni la simultaneidad de una medición con tráfico, ni que el método
+elegido corresponda a la pregunta planteada. El procedimiento de esquina en
+baja frecuencia del apartado 7 (la contraparte de fachada del
+[procedimiento de ISO 16283-1](/phonometry/es/buildings/insulation/insulation-field/#recintos-pequenos-apartado-8),
+activado por el mismo umbral de 25 m³ del recinto receptor) tampoco está
+implementado, y tampoco lo están los métodos de ferrocarril y aeronaves del
+Anexo E. Los ejemplos resueltos de
 EN 12354-3 y EN 12354-4 de las ediciones de 2000 llevan pequeñas
 inconsistencias internas de redondeo en las bandas de octava altas, señaladas
 donde aparecen: la implementación sigue las fórmulas y no las filas impresas.

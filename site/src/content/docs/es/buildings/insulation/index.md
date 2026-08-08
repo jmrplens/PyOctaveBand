@@ -82,8 +82,9 @@ emparentada EN 12354-5, vive en
   el método de control en bandas de octava, su índice de reverberación y sus
   magnitudes.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
-  el índice de reducción vibratoria Kij medido y los descriptores de
-  flanco Dn,f y Ln,f.
+  el índice de reducción vibratoria Kij medido, los descriptores de
+  flanco Dn,f y Ln,f, y el trayecto por el plenum del techo suspendido con su
+  atenuación normalizada del techo Dn,c y su clase de atenuación de techo.
 - [Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/):
   la pelota de caucho y la máquina de neumático, los niveles de exposición a
   la fuerza de impacto que las especifican, el nivel máximo con ponderación

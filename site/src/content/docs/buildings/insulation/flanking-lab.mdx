@@ -1,6 +1,6 @@
 ---
 title: "Laboratory Flanking Transmission (ISO 10848)"
-description: "The ISO 10848 laboratory measurement of flanking transmission: the junction vibration reduction index Kij from direction-averaged velocity level differences and equivalent absorption lengths, the overall Dn,f and Ln,f descriptors, the Part 4 modal-overlap validity checks and the accredited fiches."
+description: "The ISO 10848 laboratory measurement of flanking transmission: the junction vibration reduction index Kij, the Dn,f and Ln,f descriptors, the acquisition and shielding rules behind them, the Part 4 modal-overlap checks, and the suspended-ceiling plenum path with its normalized ceiling attenuation Dn,c and ceiling attenuation class."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -16,6 +16,13 @@ references:
     designation: "ISO 10848-1:2006"
     url: "https://www.iso.org/standard/38284.html"
     note: "The frame document of the flanking-transmission measurement: definitions, the vibration reduction index Kij, the equivalent absorption length and the normalized flanking descriptors D_n,f / L_n,f that feed the EN 12354 prediction. Because ISO 10848 contains no worked numeric example, conformance is anchored on closed-form identities."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 1: Frame document"
+    designation: "ISO 10848-1:2017"
+    url: "https://www.iso.org/standard/70534.html"
+    note: "The current frame document, whose Clauses 7.2 to 7.4 and 9 carry the acquisition rules quoted here: accelerometer mounting and the mass-loading inequality (7.2.3), excitation (7.2.4), the excitation and measurement position counts and separations (7.2.5), the structural reverberation time (7.3) and the shielding requirement (Clause 9)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2006
@@ -73,7 +80,7 @@ velocity level differences across the junction condense into the
 descriptors $D_{n,f}$ (airborne) and $L_{n,f}$ (impact). This guide covers
 that measurement chain: the direction-averaged velocity level difference,
 the equivalent absorption lengths, the SEA validity checks of Part 4 and
-the three accredited fiches. The empirical junction values a prediction
+the three accredited-report-style fiches. The empirical junction values a prediction
 falls back on when no measurement exists live in
 [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/);
 the wave-theory $K_{ij}$ of ideal plate junctions is derived in
@@ -95,7 +102,56 @@ makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
 **equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$
 (Formula (12), $f_\text{ref} = 1000$ Hz). For lightweight well-damped elements
 $a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
-Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
+Formula (14), which needs no $T_s$ at all.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig.svg" alt="ISO 10848 junction measurement rigs for an L-junction and a T-junction of 140 to 200 mm concrete plates: a shaker or hammer excites element i, accelerometers on elements i and j read the velocity level difference Dv,ij, and the junction length of at least 2.3 m runs along the highlighted corner line" width="92%" loading="eager" />
+
+Every symbol in Formula (13) is a length or an area in that drawing. The
+highlighted corner line is $l_{ij}$, the common edge of the two elements; $S_i$
+and $S_j$ are the areas of the two plates, which enter through their equivalent
+absorption lengths $a_i$ and $a_j$; and $\overline{D}_{v,ij}$ is what the pair
+of accelerometers reads, once with element $i$ driven and once with element $j$
+driven. The $10\log_{10}(l_{ij}/\sqrt{a_i a_j})$ term is what makes the index a
+property of the *junction* rather than of the two particular plates that were
+built into the rig, which is the entire reason EN 12354 can consume it.
+
+### The structural reverberation time, and where it comes from
+
+$T_{s,j}$ is the second most influential input on this page and the one most
+often assumed. It is **not** the room's reverberation time: it is the decay of
+*bending-wave* energy on the element itself, measured with accelerometers, and
+it is what carries the element's total loss factor into the absorption length,
+$\eta_\text{total} = 2.2/(f T_s)$ (ISO 10848-1:2017, Formula (19)). Because
+$a_j \propto 1/T_{s,j}$ and $K_{ij}$ carries $-10\log_{10}\sqrt{a_i a_j}$, a
+$T_s$ wrong by a factor of two moves $K_{ij}$ by 1.5 dB in each element, and it
+moves it in the direction that makes a junction look better than it is when
+$T_s$ is overestimated.
+
+Measure it as ISO 10848-1:2017 Clause 7.3 prescribes: point excitation by an
+electrodynamic shaker with an MLS or swept-sine signal (the preferred
+laboratory method, per ISO 18233) or by an impact hammer, the integrated
+impulse response of ISO 3382-2 with backward integration, acceleration rather
+than velocity so no integration smears the decay, at least three excitation
+positions and three measurement positions per excitation, and the minimum
+separations of Clause 7.3.3 (0.5 m from the element boundaries, 1 m between
+the excitation and the measurement positions, 0.5 m between measurement
+positions). Evaluate over 5 dB to 15 dB from a decay that starts at least
+35 dB above the background (Clause 7.3.4); heavy elements coupled to other
+heavy elements give a short straight decay followed by a curve as energy
+returns from the rest of the structure, so the short evaluation range is not a
+convenience but a requirement of the physics. Clause 7.3.5 sets the floor
+below which a forward analysis stops being reliable: $T_s > 70/f$ and
+$T_s > 2T_\text{det}$, with $T_\text{det}$ the reverberation time of the
+averaging detector.
+
+Expect a few tenths of a second on a heavy concrete plate built into a
+building, falling with frequency, and much less on a well-damped lightweight
+element — which is why the lightweight route of Formula (14) drops $T_s$
+entirely. The loss-factor identity is the sanity check on a measured value: at
+500 Hz a $T_s$ of 0.35 s gives $\eta = 2.2/(500 \times 0.35) = 0.013$, a
+plausible total loss factor for an in-situ heavy plate, while an $\eta$ coming
+out above about 0.1 or below 0.005 says the decay was misread rather than that
+the plate is unusual.
 
 **Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
 airborne) and $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
@@ -105,6 +161,11 @@ mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
 octave bands (Annex A).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission.svg" alt="ISO 10848 junction vibration reduction index Kij rising across one-third-octave bands from 100 Hz to 5000 Hz for a rigid T-junction of two heavy walls, with the single-number mean Kij over 200-1250 Hz drawn as a dashed line" width="80%" />
+
+*$K_{ij}$ climbs steadily with frequency for a rigid junction of heavy walls,
+so no single band represents it. The dashed line is the arithmetic mean over
+200–1250 Hz, the range Annex A prescribes, and it is that mean — not the curve
+— that an EN 12354 prediction consumes.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -220,6 +281,81 @@ plt.show()
 
 </details>
 
+## Making the measurement (ISO 10848-1:2017, Clauses 7 and 9)
+
+The formulae above are indifferent to how their inputs were obtained. The
+standard is not, and one of its requirements decides whether the number means
+anything at all.
+
+**Shielding comes first (Clause 9).** A junction of three or four elements has
+two elements facing each room, and a receiving-room level fed by *all* of them
+is not attributable to any one path. So the elements not under test are
+shielded, successively, and the rule differs by quantity: measuring $D_{n,f}$
+for transmission through $i$ and $j$, shield the other element **in both
+rooms**; measuring $L_{n,f}$, shield the other element **in the receiving
+room**; measuring $K_{ij}$ with structure-borne excitation, **no shielding is
+needed**, because the excitation is applied to one element rather than to a
+sound field. Radiated sound measured by intensity to ISO 15186-1 also needs no
+receiving-room shielding, because the enclosing surface does the same job.
+
+The shield has to be good enough to be worth building. Where the three or four
+elements of the junction are identical, a $\Delta R$ of 10 dB in every band
+suffices. In general, excite element 1 and then element 2 with the same kind of
+excitation, read the average velocity level of the receiving element $j$ in
+each case, and require
+$\Delta R_\text{min} = 10 - L_{v,1j} + L_{v,2j}$ when
+$L_{v,1j} - L_{v,2j} \le 10$ dB, and nothing at all when the difference already
+exceeds 10 dB (Formulae (23) and (24)). Heavy shielding on a light element can
+change the very transmission being measured and is to be avoided. **A $K_{ij}$
+or $D_{n,f}$ quoted without a statement of how the other elements were
+shielded, and of how that shielding was verified, is a room-pair number with a
+path label attached to it** — and it flows straight into an EN 12354
+prediction, where the error is unbounded in direction.
+
+**Accelerometers (Clause 7.2.3).** Mounted directly on the surface of the test
+element, stiff in the direction normal to it. Bees or petroleum wax is
+convenient, but a weak fixing costs high-frequency accuracy; where the surface
+texture defeats wax, cement a small metal washer to it and wax or stud onto
+that (ISO 5348). The accelerometer mass must be small enough not to load the
+plate, which Formula (16) makes explicit:
+$m_\text{acc} < 1/(2\pi f Y_\text{dp})$, with the driving-point mobility of a
+thin isotropic plate estimated by Formula (17) as
+$Y_\text{dp} = 1/(8\sqrt{B\rho_s}) = 1/(2.3\,\rho_s c_L h)$. The inequality
+bites at the **top** of the band range, so check it at the highest band, not
+the lowest.
+
+**Excitation (Clause 7.2.4).** Steady-state, from an electrodynamic shaker
+driven with noise or from a tapping machine (adapted for walls, with the
+impacts mechanically controlled to repeat), or transient, from single or
+manually repeated hammer blows — in which case $D_{v,ij}$ must be measured on
+both elements **simultaneously**. Manual multiple hits are spread over 1 m² to
+2 m² at 1 Hz to 2 Hz over 20 s to 30 s. In every band the receiving element's
+velocity level must exceed the background by at least 10 dB; below that, the
+ISO 10140-4 correction applies and must not exceed 1.3 dB. Take care that the
+source's own airborne noise, or radiation from the excited element, does not
+excite the others — that is the same failure the shielding exists to prevent,
+arriving by a different route.
+
+**Positions (Clause 7.2.5).** At least **four** excitation positions on a
+Type A (heavy, homogeneous) source element and **six** on a Type B one, with at
+least **three** measurement positions per excitation position on each plate,
+randomly distributed over the surface rather than gridded. The minimum
+separations are: 0.5 m from an excitation position to the element boundaries,
+1.0 m between excitation positions (0.7 m for Type B), 1.0 m from an excitation
+position to the junction under test, 1.0 m from an excitation position to its
+associated measurement positions, 0.25 m from a measurement position to the
+element boundaries and 0.5 m between the measurement positions of one
+excitation position. On inhomogeneous elements (hollow brick, beam-and-block)
+the positions must also be spread over the sub-elements, and on framed floors
+the tapping-machine axis sits at 45° to the joists. On lightweight junctions
+the operator should stay off the floor unless their weight and damping can be
+shown not to matter.
+
+**Both directions.** $K_{ij}$ is symmetric only because the standard makes it
+so: run the whole procedure with element $i$ excited and again with element $j$
+excited, and average the two level differences before Formula (13), which is
+exactly what `direction_averaged_level_difference` does in the snippet above.
+
 ## Suspended ceilings: the plenum flanking path (ISO 140-9, Vigran 9.2.3)
 
 Two offices separated by a partition that stops at the suspended ceiling share
@@ -230,11 +366,62 @@ open-plan fit-out, and it is not what a partition's $R_w$ describes.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking.svg" alt="Two panels: the ceiling-plenum flanking reduction index Rcl per octave band for two plenum depths against the sum of the two ceiling reduction indices, and the normalized ceiling attenuation of an accredited ASTM E1414 test report with the fitted ASTM E413 contour and its shaded deficiencies giving CAC 34" width="92%" />
 
-*Left: the plenum charges a fixed penalty against the sum of the two ceilings,
-and a deeper plenum pays some of it back. Right: the same measured quantity
-rated as a ceiling attenuation class.*
+*Left: the plenum charges a fixed penalty against the sum of the two ceilings —
+about 10 dB for this geometry — and doubling its depth pays back only 3 dB of
+it, which is why the tile is the lever and the void is not. Right: the same
+quantity as an accredited laboratory measures it, with the ASTM E413 contour
+fitted to the measured $D_{n,c}$ and its deficiencies shaded; the class is read
+off the shifted contour at 500 Hz.*
 
-**The one-dimensional model.** Mechel's one-dimensional variant, as presented
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+from phonometry import ceiling_attenuation_class, plenum_flanking_reduction_index
+
+fig, (ax_path, ax_cac) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+# Left: Vigran Section 9.2.3 geometry, LS = LR = 4.75 m, 9.5 mm plasterboard
+# ceiling, reflecting plenum sidewalls, at two plenum depths.
+freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+ceiling = np.array([17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0])
+x = np.arange(freqs.size)
+for depth, style in ((0.43, "-o"), (0.86, "--o")):
+    res = plenum_flanking_reduction_index(
+        ceiling, ceiling, ceiling_length=4.75, plenum_height=depth,
+        frequency=freqs,
+    )
+    ax_path.plot(x, res.reduction_index, style, label=f"Rcl, plenum h = {depth:g} m")
+ax_path.plot(x, 2.0 * ceiling, ":s", label="RS + RR (two ceilings)")
+ax_path.set_xticks(x, ["63", "125", "250", "500", "1k", "2k", "4k"])
+ax_path.set(xlabel="Frequency [Hz]", ylabel="Sound reduction index [dB]")
+ax_path.legend()
+
+# Right: an accredited ASTM E1414 test report rated per ASTM E413.
+dnc = np.array([14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+                41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9])
+cac = ceiling_attenuation_class(dnc)
+xc = np.arange(dnc.size)
+ax_cac.fill_between(xc, cac.measured, cac.shifted_reference,
+                    where=cac.measured < cac.shifted_reference,
+                    interpolate=True, alpha=0.25, label="deficiencies")
+ax_cac.plot(xc, cac.measured, "-o", label="Dn,c (measured)")
+ax_cac.plot(xc, cac.shifted_reference, "--s", label="ASTM E413 contour, fitted")
+ax_cac.set(xlabel="Frequency [Hz]",
+           ylabel="Normalized ceiling attenuation Dn,c [dB]",
+           title=f"CAC = {cac.rating} dB")
+ax_cac.legend()
+plt.show()
+```
+
+</details>
+
+### The one-dimensional model
+
+Mechel's one-dimensional variant, as presented
 by Vigran in Section 9.2.3, treats the plenum as a duct lined on one side. The
 ceiling on each side has a transmission factor $\tau_S = \tau_{S,pl}\tau_{S,a}$
 (plates times any plenum absorber, Eq. (9.14)); the injected power splits,
@@ -263,10 +450,8 @@ $R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Eq. (9.13)), which is what lets the
 ceiling path be added to the direct path as transmission factors.
 
 ```python
-from phonometry import (
-    partition_referenced_reduction_index,
-    plenum_flanking_reduction_index,
-)
+from phonometry import partition_referenced_reduction_index
+# `plenum_flanking_reduction_index` is the import of the figure block above.
 
 freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # 9.5 mm plasterboard
@@ -288,7 +473,9 @@ damped = plenum_flanking_reduction_index(
 print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
-**The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
+### The measured quantity: normalized ceiling attenuation
+
+A ceiling is not rated by $R_{cl}$ but by the
 **normalized ceiling attenuation** $D_{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
 clause 3.3), with $A$ the receiving-room equivalent absorption area and the
 reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
@@ -308,14 +495,18 @@ deficiency exceeds 8 dB (clauses 5.3 and 5.4), and reads the rating off the
 shifted contour at 500 Hz (clause 5.5).
 
 ```python
-from phonometry import (
-    ceiling_attenuation_class,
-    normalized_ceiling_attenuation,
-    weighted_rating,
-)
+from phonometry import normalized_ceiling_attenuation, weighted_rating
+# `ceiling_attenuation_class` is the import of the figure block above.
 
-# ASTM E1414 normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
-dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+# Dn,c from the measured pair: source- and receiving-room levels over the
+# common plenum and the receiving room's absorption area, per band. ASTM E1414
+# normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
+l1_c = [80.0] * 16                       # source room, per band
+l2_c = [45.0] * 16                       # receiving room, over the plenum path
+absorption = [12.0] * 16                 # receiving-room A per band (m2)
+astm = normalized_ceiling_attenuation(l1_c, l2_c, absorption, reference_area=12.0)
+iso140_9 = normalized_ceiling_attenuation(l1_c, l2_c, absorption)
+print(round(float(astm[0]), 2), round(float(iso140_9[0]), 2))   # 35.0 34.21
 
 # A 28 mm perforated plaster acoustic tile, measured to ASTM E1414 (CAC 34).
 dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
@@ -428,9 +619,15 @@ three one-page fiches through `.report()`.
 specimen types they apply to; phonometry implements only the Part 1
 $K_{ij}$/$D_{n,f}$/$L_{n,f}$ formulae generically, plus the Part 4
 modal-overlap validity check, not the facility-specific test setups the
-other parts describe. Because ISO 10848 contains no worked numeric
-example, conformance is anchored on closed-form identities (simplified
-$K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+other parts describe. The acquisition of
+[Making the measurement](#making-the-measurement-iso-10848-12017-clauses-7-and-9)
+is documented here and enforced nowhere: nothing checks that the other
+elements were shielded, that the shield met $\Delta R_\text{min}$, that the
+position counts and separations were kept, that the accelerometer satisfied
+the mass-loading inequality, or that $T_s$ was measured on the elements in
+their installed state rather than assumed. Because ISO 10848 contains no
+worked numeric example, conformance is anchored on closed-form identities
+(simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
 
 The suspended-ceiling branch covers the normalized ceiling
 attenuation $D_{n,c}$ of ISO 140-9:1985 clause 3.3, the ASTM E413-22
