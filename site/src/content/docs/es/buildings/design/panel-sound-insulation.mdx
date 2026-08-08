@@ -1,6 +1,6 @@
 ---
 title: "Predicción del aislamiento de paneles"
-description: "Aislamiento acústico aéreo teórico de paneles a partir de sus propiedades físicas: la ley de masas, el atajo de la meseta y el valle de coincidencia de un panel simple (Sharp, Norton), el rango de coincidencia de una chapa ortótropa o grecada (Vigran/Heckl), el comportamiento masa-muelle-masa de la pared doble y el puente de las llaves de un muro de fábrica con cámara (Hopkins), transmisión por rendijas y orificios (Gomperts), eficiencia de radiación de placa (Leppington/Maidanik) y movilidades puntuales de placas y vigas infinitas (Cremer)."
+description: "Aislamiento acústico aéreo teórico de paneles a partir de sus propiedades físicas: la ley de masas, el atajo de la meseta y la caída del aislamiento en la coincidencia de un panel simple (Sharp, Norton), el rango de coincidencia de una chapa ortótropa o grecada (Vigran/Heckl), el comportamiento masa-muelle-masa de la pared doble y el puente de las llaves de un muro de fábrica con cámara (Hopkins), transmisión por rendijas y orificios (Gomperts), eficiencia de radiación de placa (Leppington/Maidanik) y movilidades puntuales de placas y vigas infinitas (Cremer)."
 references:
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
@@ -69,7 +69,7 @@ Un ensayo de laboratorio mide el índice de reducción acústica $R$ de un eleme
 acabado; esta página, en cambio, **predice** $R(f)$ a partir de las propiedades
 físicas de la construcción, de modo que un cerramiento se puede diseñar antes de
 construirlo. Cubre el aislamiento aéreo de un panel simple (la ley de masas y el
-valle de coincidencia), la pared doble (su resonancia masa-muelle-masa), la
+caída del aislamiento en la coincidencia), la pared doble (su resonancia masa-muelle-masa), la
 transmisión por rendijas y aberturas que limita cualquier construcción real, la
 eficiencia de radiación de una placa en flexión y las movilidades puntuales que
 fijan la potencia vibratoria que una estructura absorbe. Junto a eso lleva tres
@@ -95,7 +95,7 @@ Hopkins para el $m'$ que usan las guías de ISO 12354; $m$ a secas está reserva
 en el resto del sitio para el coeficiente de atenuación de potencia del aire de
 las fórmulas de reverberación, en 1/m.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de panel simple con su valle de coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de panel simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
 
 ## Panel simple: ley de masas y coincidencia (Bies 7.2)
 
@@ -123,7 +123,7 @@ f_c = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B'}}
 $$
 
 la longitud de onda de flexión libre iguala la longitud de onda de traza del
-sonido incidente y el panel se vuelve transparente: el **valle de coincidencia**.
+sonido incidente y el panel se vuelve transparente: la **caída del aislamiento en la coincidencia**.
 El método de Sharp mantiene la ley de masas de campo hasta $f_c/2$, cae con una
 recta en $\log f$ y desde $f_c$ sigue (Ec. 7.44)
 $TL = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2] + 10\log_{10}(2\eta f/\pi f_c)$ con el factor
@@ -131,11 +131,11 @@ de pérdidas $\eta$. El valle se sitúa en el punto B de la carta de diseño de
 Bies, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
 
 Toda la sección en un esquema: un campo difuso excita una hoja simple y el
-$R(f)$ predicho sube con la ley de masas hasta el valle de coincidencia. Una
+$R(f)$ predicho sube con la ley de masas hasta la coincidencia. Una
 placa de yeso laminado de 12,5 mm sitúa $f_c$ cerca de 2,6 kHz y puntúa
 $R_w = 27$ dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_es.svg" alt="Sección de un ensayo de aislamiento: un panel de yeso laminado de 12,5 mm montado entre muros de relleno pesados, flechas verdes de incidencia difusa que llegan con varios ángulos desde el recinto emisor, flechas azules más finas transmitidas hacia el recinto receptor, una onda de flexión dibujada a lo largo de la placa y un recuadro con el índice de reducción acústica predicho subiendo 6 dB por octava hasta el valle de coincidencia en fc = 2,6 kHz, con la masa de 8,8 kg por metro cuadrado y la valoración Rw = 27 dB anotadas" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_es.svg" alt="Sección de un ensayo de aislamiento: un panel de yeso laminado de 12,5 mm montado entre muros de relleno pesados, flechas verdes de incidencia difusa que llegan con varios ángulos desde el recinto emisor, flechas azules más finas transmitidas hacia el recinto receptor, una onda de flexión dibujada a lo largo de la placa y un recuadro con el índice de reducción acústica predicho subiendo 6 dB por octava hasta la coincidencia en fc = 2,6 kHz, con la masa de 8,8 kg por metro cuadrado y la valoración Rw = 27 dB anotadas" width="92%" />
 
 ```python
 import numpy as np
@@ -181,10 +181,10 @@ Conviene saber qué hay en juego: la profundidad del valle lleva $10\lg\eta$, as
 que un factor de tres en $\eta$ mueve la región de coincidencia 4,8 dB y no
 cambia nada por debajo de $f_c/2$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con el valle de coincidencia hacia 2100 Hz marcado, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con la caída del aislamiento en la coincidencia, hacia 2100 Hz, marcada, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
 
 *El espectro de Sharp previsto se evalúa exactamente como una medición: el
-valle de coincidencia en $f_c \approx 2{,}1$ kHz concentra la mayor parte
+caída del aislamiento en $f_c \approx 2{,}1$ kHz concentra la mayor parte
 de las desviaciones desfavorables, y la referencia desplazada leída a
 500 Hz da el $R_w = 32$ dB de catálogo del vidrio de 6 mm.*
 
@@ -244,7 +244,7 @@ clavando el nivel transmitido en la cifra de `fc/2` aunque la ley de masas
 exige 12 dB más de bloqueo a cuatro veces la frecuencia. El aire excita el
 pesado acero tan débilmente que la onda de flexión resonante necesita decenas
 de metros de placa iluminada para desarrollarse del todo, y por eso las
-medidas muestran un valle de coincidencia real y no una transparencia total.
+medidas muestran una caída real del aislamiento y no una transparencia total.
 
 Lo que la placa deja pasar queda unos 47 dB por debajo de la onda incidente,
 así que en la escala de color que fija la onda estacionaria sobre la placa el
@@ -451,7 +451,7 @@ Las cuatro autofrecuencias son las respuestas impresas por Vigran (4,9 Hz y
 grecada es lo que demuestra que el factor de masa pertenece ahí: con los
 7,8 kg/m² planos las mismas fórmulas devuelven 26,7 Hz y 106,7 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_es.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propio valle de coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_es.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propia caída por coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
 
 *El intercambio que hace el grecado, sobre la propia geometría de Vigran. Por
 debajo de $f_{c1}$ los dos paneles quedan a unos 2 dB uno del otro (el grecado
@@ -820,7 +820,7 @@ Merece la pena llevarse dos consecuencias. Una placa *pequeña* es, por debajo d
 $f_c$, mejor radiador relativo que una grande del mismo material, porque la
 franja de borde que radia es una fracción mayor de ella: el panel de
 1,5 × 1,25 m de abajo da $\sigma = 0,011$ a 100 Hz, y un panel de 0,5 × 0,4 m
-del mismo vidrio, 0,034. Y el valle de coincidencia de $R$ y el pico de
+del mismo vidrio, 0,034. Y la caída de $R$ en la coincidencia y el pico de
 coincidencia de $\sigma$ son el mismo suceso visto por los dos lados — la misma
 $\sigma$ reaparece en el factor de transmisión del modelo detallado de
 EN 12354 y como el factor de radiación que mide ISO 7849.
@@ -1046,4 +1046,4 @@ exigiría toda la cadena sala-placa-cámara-placa-sala.
 - [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/): los
   modelos de relleno de cámara que consume una pared doble.
 - Referencia de la API: [`building.prediction.panel_transmission`](/phonometry/es/reference/api/building/panel-transmission/), [`building.prediction.masonry_cavity_wall`](/phonometry/es/reference/api/building/masonry-cavity-wall/), [`building.prediction.aperture_transmission`](/phonometry/es/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](/phonometry/es/reference/api/vibration/radiation-efficiency/) y [`vibration.structural.point_mobility`](/phonometry/es/reference/api/vibration/point-mobility/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la ley de masas, el valle de coincidencia y el coeficiente de transmisión que devuelven los modelos de panel.
+- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la ley de masas, la caída del aislamiento en la coincidencia y el coeficiente de transmisión que devuelven los modelos de panel.

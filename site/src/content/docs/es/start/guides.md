@@ -369,7 +369,7 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
   de elemento y de unión, el índice por flancos y el nivel de impactos, y la
   contribución de cada trayectoria a R'w y L'n,w.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masas y el valle de coincidencia, las paredes dobles, rendijas y
+  la ley de masas y la caída del aislamiento en la coincidencia, las paredes dobles, rendijas y
   aberturas, la eficiencia de radiación de placas y las movilidades puntuales.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
   la mejora ponderada de un revestimiento de suelo blando medida sobre una

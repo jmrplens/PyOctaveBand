@@ -45,7 +45,7 @@ del número único.
 [Predicción del aislamiento de
 paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masas y
-el valle de coincidencia de un panel simple, el atajo de la meseta que estima a
+la caída del aislamiento en la coincidencia de un panel simple, el atajo de la meseta que estima a
 mano la curva entera, el *rango* de coincidencia de una chapa grecada o nervada,
 el comportamiento masa-muelle-masa de una doble hoja y el puente de las llaves
 que limita a un muro de fábrica con cámara, la transmisión por rendijas y
@@ -131,7 +131,7 @@ construido se contrasta al final con la medición en campo de ISO 16283 en
   los datos de elemento y de unión, los índices por flancos banda a banda y las
   contribuciones por trayectoria que hay detrás de la valoración.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masas, el atajo de la meseta y el valle de coincidencia de un panel
+  la ley de masas, el atajo de la meseta y la caída del aislamiento en la coincidencia de un panel
   simple (Sharp, Norton), el rango de coincidencia de una chapa grecada o
   nervada (Vigran/Heckl), las dobles hojas y el puente de las llaves de un muro
   de fábrica con cámara (Bies, Hopkins), las rendijas y aberturas (Gomperts,
