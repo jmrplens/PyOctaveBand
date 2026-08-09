@@ -3506,8 +3506,7 @@ _ES: dict[str, str] = {
     "(a) normal incidence": "(a) incidencia normal",
     "(b) oblique: mode conversion": "(b) oblicua: conversión de modo",
     "(c) beyond both critical angles": "(c) más allá de ambos críticos",
-    "incident": "incidente",
-    "reflected": "reflejada",
+    # "incident" and "reflected" are already in this table, above.
     "P only": "solo P",
     "probe on the normal,": "sonda en la normal,",
     "0.12 m up": "0,12 m por encima",

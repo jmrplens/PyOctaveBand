@@ -9,6 +9,9 @@ against, and the GUM budget that puts an uncertainty on the number finally
 reported. Everything here is embedded by a page under ``signals/metrology/``.
 """
 
+from collections.abc import Callable
+from typing import Any
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -610,7 +613,9 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
     print("Generating uncertainty_gum_vs_mc...")
     import phonometry as ph
 
-    panels = []
+    # The three panels differ in arity and in whether they cap the y axis,
+    # so say so: inferring this from the first entry rejects the others.
+    panels: list[tuple[str, Callable[..., Any], list[Any], str, float | None]] = []
 
     # A. One dominant rectangular input: the output is nearly rectangular and
     # the Gaussian interval overcovers it.
@@ -639,9 +644,12 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
         mc = ph.monte_carlo(model, quantities, trials=400_000, coverage=0.95,
                             seed=1, keep_samples=True)
         _k, big = gum.expanded(0.95)
-        ax.hist(mc.samples, bins=160, density=True, color=COLOR_PRIMARY,
+        # Asked for with `keep_samples=True` above. The type is optional
+        # because callers that only want the interval do not pay for them.
+        samples = np.asarray(mc.samples if mc.samples is not None else [])
+        ax.hist(samples, bins=160, density=True, color=COLOR_PRIMARY,
                 alpha=0.35, label="Monte Carlo (Supplement 1)")
-        span = np.linspace(float(np.min(mc.samples)), float(np.max(mc.samples)), 500)
+        span = np.linspace(float(np.min(samples)), float(np.max(samples)), 500)
         u_c = gum.combined_uncertainty
         ax.plot(span, np.exp(-0.5 * ((span - gum.value) / u_c) ** 2)
                 / (u_c * np.sqrt(2 * np.pi)), color=COLOR_SECONDARY, lw=2,

@@ -151,9 +151,9 @@ from .signals import (
     _d_synchronous_averaging,
     _d_system_measurement,
     _d_test_signals,
-    _d_tsa_setup,
     _d_time_frequency,
     _d_time_weighting,
+    _d_tsa_setup,
     _d_uncertainty,
     _d_uncertainty_sources,
 )

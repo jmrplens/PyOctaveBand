@@ -1413,7 +1413,7 @@ def generate_peak_oversampling(output_dir: str) -> None:
                        fontweight="bold", pad=12)
     ax_right.set_xlabel("Samples per cycle")
     ax_right.set_ylabel("Under-read of the peak [dB]")
-    ax_right.xaxis.set_major_locator(mticker.FixedLocator(per_cycle))
+    ax_right.xaxis.set_major_locator(mticker.FixedLocator(per_cycle.tolist()))
     ax_right.xaxis.set_minor_locator(mticker.NullLocator())
     ax_right.xaxis.set_major_formatter(mticker.FixedFormatter(
         [f"{v:.0f}" for v in per_cycle]))
@@ -1677,8 +1677,10 @@ def generate_parametric_eq_cascade(output_dir: str) -> None:
         EQSection("highshelf", 8000.0, gain_db=3.0),
     ])
     result = eq.response(f_min=20.0, f_max=20000.0)
-    axes = result.plot(show_sections=True)
-    fig = np.atleast_1d(axes)[0].get_figure()
+    result.plot(show_sections=True)
+    # The result object drew through pyplot, so the figure it made is the
+    # current one; asking the axes for it hands back a union this cannot use.
+    fig = plt.gcf()
     fig.set_size_inches(10, 6.4)
     fig.tight_layout()
     save_figure(output_dir, "parametric_eq_cascade.png")
@@ -1834,7 +1836,7 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     n_blocks = steps.size
 
     def to_db(env: np.ndarray) -> np.ndarray:
-        return 10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2)
+        return np.asarray(10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2))
 
     # The reference must use the *same* weighting design streaming can use:
     # the oversampled high_accuracy path is not block-compatible, so a

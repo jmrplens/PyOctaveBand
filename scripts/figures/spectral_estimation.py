@@ -9,6 +9,8 @@ cross-spectral estimates that carry the same question to a second and a third
 input. Everything here is embedded by a page under ``signals/spectra/``.
 """
 
+from typing import Literal
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -28,6 +30,9 @@ from .theme import (
     LABEL_FREQ_HZ,
     save_figure,
 )
+
+#: The colour names ``noise_signal`` accepts, kept in step with its signature.
+NoiseColor = Literal["white", "pink", "red", "blue", "violet"]
 
 
 def generate_psd_confidence_smoothing(output_dir: str) -> None:
@@ -232,19 +237,19 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     # Right: the two errors against segment length, and where they cross.
     grid = 2 ** np.arange(9, 17)
     bias_db, random_db, measured = [], [], []
-    for nperseg in grid:
-        res = power_spectral_density(resonant, fs, nperseg=int(nperseg))
+    for segment in grid:
+        res = power_spectral_density(resonant, fs, nperseg=int(segment))
         eps_b = resolution_bias_error(res.resolution_bandwidth, b_r)
         bias_db.append(-10.0 * np.log10(max(1.0 + eps_b, 1e-6)))
         random_db.append(10.0 * np.log10(1.0 + res.random_error))
         band = (res.frequencies >= 850.0) & (res.frequencies <= 1150.0)
         measured.append(float(np.max(10.0 * np.log10(res.psd[band]))))
-    measured = np.asarray(measured)
+    measured_db = np.asarray(measured)
     ax_r.semilogx(grid, bias_db, "o-", color=COLOR_SECONDARY, base=2,
                   label="resolution bias, $-10\\lg(1+\\varepsilon_b)$ [dB]")
     ax_r.semilogx(grid, random_db, "s-", color=COLOR_PRIMARY, base=2,
                   label="random error, $10\\lg(1+1/\\sqrt{n_d})$ [dB]")
-    ax_r.semilogx(grid, measured.max() - measured, "^--", color=COLOR_TERTIARY,
+    ax_r.semilogx(grid, measured_db.max() - measured_db, "^--", color=COLOR_TERTIARY,
                   base=2, label="measured peak deficit [dB]")
     # bias - random falls monotonically with nperseg, so interpolate on the
     # reversed (increasing) difference to find where the two are equal.
@@ -273,9 +278,12 @@ def generate_noise_colors(output_dir: str) -> None:
     from phonometry import noise_signal, power_spectral_density
 
     fs = 48000.0
-    colors = (("violet", 2.0, COLOR_QUATERNARY), ("blue", 1.0, COLOR_TERTIARY),
-              ("white", 0.0, COLOR_FG), ("pink", -1.0, COLOR_PRIMARY),
-              ("red", -2.0, COLOR_SECONDARY))
+    # The names are the generator's own literals, not free-form strings, so
+    # spell the type out and a colour it does not know fails here.
+    colors: tuple[tuple[NoiseColor, float, str], ...] = (
+        ("violet", 2.0, COLOR_QUATERNARY), ("blue", 1.0, COLOR_TERTIARY),
+        ("white", 0.0, COLOR_FG), ("pink", -1.0, COLOR_PRIMARY),
+        ("red", -2.0, COLOR_SECONDARY))
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     for name, alpha, color in colors:
