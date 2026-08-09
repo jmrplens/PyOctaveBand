@@ -131,13 +131,18 @@ from .signals import (
     _d_bank_dataflow,
     _d_block_processing,
     _d_calibration_chain,
+    _d_calibration_coupling,
     _d_calibration_dataflow,
     _d_cepstrum_echoes,
     _d_correlation_delay,
     _d_data_qualification,
+    _d_echo_geometry,
     _d_equal_loudness_weighting,
+    _d_infrasound_chain,
     _d_miso_coherence,
+    _d_miso_setup,
     _d_multichannel,
+    _d_multichannel_capture,
     _d_multirate,
     _d_signal_chain,
     _d_slm_chain,
@@ -146,11 +151,18 @@ from .signals import (
     _d_synchronous_averaging,
     _d_system_measurement,
     _d_test_signals,
+    _d_tsa_setup,
     _d_time_frequency,
     _d_time_weighting,
     _d_uncertainty,
+    _d_uncertainty_sources,
 )
-from .simulation import _d_fdtd
+from .simulation import (
+    _d_elastic_fluid_solid,
+    _d_fdtd,
+    _d_immersed_plate_tl,
+    _d_ntff_contour,
+)
 from .underwater import (
     _d_hydrophone_deployment,
     _d_marine_mammal_exposure,
@@ -174,6 +186,9 @@ from .vibration import (
 
 DIAGRAMS = {
     "diagram_calibration_setup": (_d_calibration_chain, "Calibration chain — from calibrator to physical units", 560),
+    "diagram_calibration_coupling": (
+        _d_calibration_coupling,
+        "Coupling the calibrator (IEC 60942:2017)", 580),
     "diagram_env_measurement": (_d_env_positions, "Environmental noise measurement positions (ISO 1996-2)", 560),
     "diagram_tonality_positions": (_d_emission_positions, "Emission measurement positions (ECMA-74)", 560),
     "diagram_signal_chain": (_d_signal_chain, "phonometry processing chain", 400),
@@ -287,6 +302,15 @@ DIAGRAMS = {
     "diagram_uncertainty": (
         _d_uncertainty,
         "Uncertainty: GUM propagation vs Monte Carlo (Guide 98-3)", 540),
+    "diagram_uncertainty_sources": (
+        _d_uncertainty_sources,
+        "Where an acoustic budget's terms come from", 580),
+    "diagram_multichannel_capture": (
+        _d_multichannel_capture,
+        "Capturing an array: one clock, locked gains, a written row map", 580),
+    "diagram_infrasound_chain": (
+        _d_infrasound_chain,
+        "Measuring infrasound: the chain that must deliver 0,25 Hz", 580),
     "diagram_nihl": (
         _d_nihl,
         "Noise-induced hearing loss (ISO 1999): NIPTS and HTLAN", 470),
@@ -400,6 +424,18 @@ DIAGRAMS = {
     "diagram_fdtd": (
         _d_fdtd,
         "2D acoustic FDTD wave simulation (staggered leapfrog)", 500),
+    "diagram_ntff_contour": (
+        _d_ntff_contour,
+        "Near-to-far-field capture: contour, clearances and angle convention",
+        800),
+    "diagram_elastic_fluid_solid": (
+        _d_elastic_fluid_solid,
+        "A fluid-solid contact at three incidences, and where it sits on the grid",
+        720),
+    "diagram_immersed_plate_tl": (
+        _d_immersed_plate_tl,
+        "Immersed-plate transmission: the strip, the probes and the time gate",
+        660),
     "diagram_slm_chain": (
         _d_slm_chain,
         "Sound level meter measurement chain (IEC 61672-1)", 560),
@@ -487,15 +523,24 @@ DIAGRAMS = {
         _d_miso_coherence,
         "MISO coherence: from correlated sources to per-source contributions",
         540),
+    "diagram_miso_setup": (
+        _d_miso_setup,
+        "Instrumenting a MISO measurement: one reference per source", 580),
     "diagram_time_frequency": (
         _d_time_frequency,
         "The time-frequency trade-off: two tilings of the same record", 560),
     "diagram_cepstrum_echoes": (
         _d_cepstrum_echoes,
         "The cepstrum chain: an echo becomes a quefrency spike", 560),
+    "diagram_echo_geometry": (
+        _d_echo_geometry,
+        "Where the quefrency comes from: the geometry of one reflection", 600),
     "diagram_synchronous_averaging": (
         _d_synchronous_averaging,
         "Time synchronous averaging: trigger, slice, average", 580),
+    "diagram_tsa_setup": (
+        _d_tsa_setup,
+        "Instrumenting a synchronous average: tacho and accelerometer", 600),
     "diagram_correlation_delay": (
         _d_correlation_delay,
         "Time-delay estimation: two microphones and one correlation peak",

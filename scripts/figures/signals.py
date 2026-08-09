@@ -1104,3 +1104,861 @@ def generate_sel_concept(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
     save_figure(output_dir, "sel_concept.png")
     plt.close()
+
+
+def _slm_walkthrough_signals() -> tuple[int, np.ndarray, float]:
+    """The two recordings of ``signals/sound-level-meter.mdx``, verbatim.
+
+    The walkthrough page synthesizes a calibrator tone and a ten-second
+    "street" recording so it runs anywhere; both figures below are built from
+    exactly those arrays, so every number printed on them is a number the
+    reader's own run produces.
+    """
+    from phonometry import metrology
+    from phonometry import signals as level_signals
+
+    fs = 48000
+    calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
+    recording = level_signals.noise_signal(fs, 10.0, color="pink", rms=0.02,
+                                           seed=7)
+    recording[4 * fs: 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
+        2 * np.pi * 1000 * np.arange(fs) / fs
+    )
+    cal = float(metrology.sensitivity(calibrator, target_spl=94.0, fs=fs))
+    return fs, recording, cal
+
+
+def generate_slm_level_track(output_dir: str) -> None:
+    """The step-4 readouts drawn on the level history that produced them."""
+    print("Generating slm_level_track.png...")
+    from phonometry import signals as level_signals
+    from phonometry import time_weighting, weighting_filter
+
+    fs, recording, cal = _slm_walkthrough_signals()
+    weighted = weighting_filter(cal * recording, fs, curve="A")
+    envelope = time_weighting(weighted, fs, mode="fast")
+    laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
+
+    la_eq = float(level_signals.laeq(recording, fs, calibration_factor=cal))
+    ln = level_signals.ln_levels(recording, fs, n=(10, 50, 90), weighting="A",
+                                 calibration_factor=cal)
+    lae = float(level_signals.sel(recording, fs, weighting="A",
+                                  calibration_factor=cal))
+
+    t = np.arange(recording.size) / fs
+    _, ax = plt.subplots(figsize=(10, 5))
+    ax.axvspan(4.0, 5.0, color=COLOR_SECONDARY, alpha=0.20)
+    ax.annotate("the 1 s event", xy=(4.5, 82.5), ha="center",
+                color=COLOR_SECONDARY, fontsize=9)
+    ax.plot(t, laf_t, color=COLOR_PRIMARY, linewidth=0.8,
+            label="LAF(t), Fast A-weighted level")
+    for value, name, color, style in [
+        (la_eq, "LAeq", COLOR_FG, "--"),
+        (float(ln[10]), "L10", COLOR_SECONDARY, ":"),
+        (float(ln[50]), "L50", COLOR_TERTIARY, "-."),
+        (float(ln[90]), "L90", COLOR_QUATERNARY, (0, (6, 2))),
+    ]:
+        ax.axhline(value, color=color, linestyle=style, linewidth=1.4,
+                   label=f"{name} = {value:.1f} dB")
+    ax.annotate(f"LAE = {lae:.1f} dB: the whole event energy in 1 s",
+                xy=(5.0, lae), xytext=(6.0, lae + 3.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.set_title("What step 4 reports, drawn on the recording it read",
+                 fontweight="bold", pad=12)
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Level [dB re 20 uPa]")
+    ax.set_xlim(0, 10)
+    ax.set_ylim(40, 92)
+    ax.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax.legend(loc="lower right", fontsize=9, ncols=2)
+    save_figure(output_dir, "slm_level_track.png")
+    plt.close()
+
+
+def generate_slm_third_octave(output_dir: str) -> None:
+    """The step-5 spectrum, unweighted and A-weighted, on one axis."""
+    print("Generating slm_third_octave.png...")
+    from phonometry import LevelCalibration, octave_filter, weighting_filter
+
+    fs, recording, cal = _slm_walkthrough_signals()
+    spl_z, centres = octave_filter(recording, fs, fraction=3,
+                                   calibration=LevelCalibration(factor=cal))
+    weighted = weighting_filter(cal * recording, fs, curve="A")
+    spl_a, _ = octave_filter(weighted, fs, fraction=3)
+
+    total_z = 10 * np.log10(np.sum(10 ** (np.asarray(spl_z) / 10)))
+    total_a = 10 * np.log10(np.sum(10 ** (np.asarray(spl_a) / 10)))
+
+    _, ax = plt.subplots(figsize=(10, 5))
+    ax.axvspan(891.3, 1122.5, color=COLOR_SECONDARY, alpha=0.20)
+    ax.step(centres, spl_z, where="mid", color=COLOR_PRIMARY, linewidth=1.6,
+            label=f"Z (unweighted): bands sum to {total_z:.1f} dB")
+    ax.step(centres, spl_a, where="mid", color=COLOR_TERTIARY, linewidth=1.6,
+            linestyle="--", label=f"A-weighted: bands sum to {total_a:.1f} dB")
+    ax.annotate("the 1 kHz band holds the event", xy=(1000, 70.0),
+                xytext=(1900, 62.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.annotate("pink background: equal energy per band",
+                xy=(160, 43.2), xytext=(60, 33.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.set_title("One-third-octave spectrum of the same ten seconds",
+                 fontweight="bold", pad=12)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Band level [dB re 20 uPa]")
+    ax.set_ylim(-25, 78)
+    ax.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    format_frequency_axis(ax, 11.0, 23000.0)
+    ax.legend(loc="lower left", fontsize=9)
+    save_figure(output_dir, "slm_third_octave.png")
+    plt.close()
+
+
+def generate_energy_vs_arithmetic_mean(output_dir: str) -> None:
+    """Why decibels are combined as energy, and what the shortcut costs."""
+    print("Generating energy_vs_arithmetic_mean.png...")
+    levels = np.array([60.0, 80.0])
+    arithmetic = float(levels.mean())
+    energetic = float(10 * np.log10(np.mean(10 ** (levels / 10))))
+
+    sigma = np.linspace(0.0, 12.0, 121)
+    gaussian = (np.log(10) / 20.0) * sigma ** 2
+    two_level = 10 * np.log10(np.cosh(sigma * np.log(10) / 10))
+
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 4.8))
+
+    ax_left.bar(["first half", "second half"], levels, width=0.55,
+                color=COLOR_PRIMARY, alpha=0.65)
+    ax_left.axhline(arithmetic, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
+                    label=f"arithmetic mean of the dB values = {arithmetic:.0f} dB")
+    ax_left.axhline(energetic, color=COLOR_SECONDARY, linestyle="--",
+                    linewidth=1.8, label=f"Leq (energy mean) = {energetic:.0f} dB")
+    ax_left.annotate("", xy=(1.45, energetic), xytext=(1.45, arithmetic),
+                     arrowprops={"arrowstyle": "<->", "lw": 1.2})
+    ax_left.text(1.5, 0.5 * (arithmetic + energetic),
+                 f"{energetic - arithmetic:.0f} dB", va="center", fontsize=10)
+    ax_left.set_title("Two equal periods, 60 dB and 80 dB",
+                      fontweight="bold", pad=12)
+    ax_left.set_ylabel(LABEL_LEVEL_DB)
+    ax_left.set_ylim(50, 86)
+    ax_left.set_xlim(-0.6, 2.1)
+    ax_left.legend(loc="lower left", fontsize=9)
+    ax_left.grid(axis="y", color=COLOR_GRID, linestyle="-")
+
+    ax_right.plot(sigma, gaussian, color=COLOR_PRIMARY, linewidth=1.8,
+                  label="Gaussian spread: 0.115 sigma^2")
+    ax_right.plot(sigma, two_level, color=COLOR_TERTIARY, linewidth=1.8,
+                  linestyle="--", label="two levels, one sigma either side")
+    ax_right.axvline(5.0, color=COLOR_MUTED, linewidth=1.0)
+    ax_right.annotate("levels spread over 10 dB", xy=(5.0, 2.5),
+                      xytext=(5.6, 1.0), fontsize=9,
+                      arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax_right.set_title("The error of averaging decibels, and it never changes "
+                       "sign", fontweight="bold", pad=12)
+    ax_right.set_xlabel("Standard deviation of the levels [dB]")
+    ax_right.set_ylabel("Leq minus the arithmetic dB mean [dB]")
+    ax_right.set_xlim(0, 12)
+    ax_right.set_ylim(0, 18)
+    ax_right.grid(color=COLOR_GRID, linestyle="-")
+    ax_right.legend(loc="upper left", fontsize=9)
+
+    fig.tight_layout()
+    save_figure(output_dir, "energy_vs_arithmetic_mean.png")
+    plt.close()
+
+
+def _distribution_pair() -> tuple[int, np.ndarray, np.ndarray]:
+    """Two 60 s signals with the same LAeq and opposite level distributions."""
+    fs = 8000
+    duration = 60.0
+    n = int(fs * duration)
+    rng = np.random.default_rng(21)
+    t = np.arange(n) / fs
+
+    # (A) steady traffic-like noise: the level wanders with sigma = 3 dB.
+    slow = np.zeros(n)
+    for k in range(1, 12):
+        slow += rng.normal() * np.sin(2 * np.pi * k * t / duration
+                                      + rng.uniform(0.0, 2 * np.pi))
+    slow = 3.0 * slow / np.std(slow)
+    steady = 0.02 * 10 ** (slow / 20) * rng.standard_normal(n)
+
+    # (B) a quiet background with three short events 25 dB above it.
+    peaky = 0.004 * rng.standard_normal(n)
+    for centre in (12.0, 31.0, 47.0):
+        i0, i1 = int((centre - 0.4) * fs), int((centre + 0.4) * fs)
+        peaky[i0:i1] += (0.004 * 10 ** (25 / 20) * np.hanning(i1 - i0)
+                         * rng.standard_normal(i1 - i0))
+    return fs, steady, peaky
+
+
+def generate_level_distribution(output_dir: str) -> None:
+    """Same LAeq, opposite distributions: the percentiles read the shape."""
+    print("Generating level_distribution.png...")
+    from phonometry import laeq, ln_levels, time_weighting, weighting_filter
+
+    fs, steady, peaky = _distribution_pair()
+    peaky = peaky * 10 ** ((float(laeq(steady, fs)) - float(laeq(peaky, fs))) / 20)
+    la_eq = float(laeq(steady, fs))
+
+    percentages = tuple(range(1, 100))
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 4.8))
+    notes: list[tuple[str, str]] = []
+    styles = [
+        ("steady noise", steady, COLOR_PRIMARY, "-"),
+        ("quiet background, three events", peaky, COLOR_SECONDARY, "-"),
+    ]
+    for name, x, color, style in styles:
+        env = time_weighting(weighting_filter(x, fs, curve="A"), fs, mode="fast")
+        track = 10 * np.log10(np.maximum(env, 1e-12) / (2e-5) ** 2)
+        t = np.arange(x.size) / fs
+        # The Fast track is smooth on a 125 ms constant, so 80 samples per
+        # second of it is a faithful trace at a fraction of the file size.
+        ax_left.plot(t[::100], track[::100], color=color, linestyle=style,
+                     linewidth=0.7, label=name)
+
+        curve = ln_levels(x, fs, n=percentages, weighting="A")
+        values = np.array([float(curve[p]) for p in percentages])
+        ax_right.plot(percentages, values, color=color, linewidth=1.8,
+                      label=name)
+        for p in (10, 50, 90):
+            ax_right.plot(p, float(curve[p]), "o", color=color, markersize=5)
+            ax_right.annotate(f"L{p}", xy=(p, float(curve[p])), fontsize=8,
+                              color=color, textcoords="offset points",
+                              xytext=(4, 5))
+        spread = float(curve[10]) - float(curve[90])
+        gap = la_eq - float(curve[50])
+        note = (f"{name}:  L10 - L90 = {spread:.1f} dB"
+                f"   |   LAeq - L50 = {gap:.1f} dB")
+        notes.append((note, color))
+
+    ax_left.axhline(la_eq, color=COLOR_FG, linestyle="--", linewidth=1.6,
+                    label=f"LAeq = {la_eq:.1f} dB (both)")
+    ax_left.set_title("Two noises with the same LAeq", fontweight="bold", pad=12)
+    ax_left.set_xlabel("Time [s]")
+    ax_left.set_ylabel(LABEL_LEVEL_DB)
+    ax_left.set_xlim(0, 60)
+    ax_left.set_ylim(48, 84)
+    ax_left.grid(color=COLOR_GRID, linestyle="-")
+    ax_left.legend(loc="upper left", fontsize=8, ncols=2)
+
+    for row, (text, color) in enumerate(notes):
+        ax_right.text(0.03, 0.11 - 0.07 * row, text, transform=ax_right.transAxes,
+                      fontsize=9, color=color)
+    ax_right.set_title("Their exceedance curves", fontweight="bold", pad=12)
+    ax_right.set_xlabel("Percentage of the time exceeded [%]")
+    ax_right.set_ylabel(LABEL_LEVEL_DB)
+    ax_right.set_xlim(0, 100)
+    ax_right.set_ylim(44, 84)
+    ax_right.grid(color=COLOR_GRID, linestyle="-")
+    ax_right.legend(loc="upper right", fontsize=9)
+
+    fig.tight_layout()
+    save_figure(output_dir, "level_distribution.png")
+    plt.close()
+
+
+def generate_peak_oversampling(output_dir: str) -> None:
+    """What the on-grid maximum misses, and what oversample=8 recovers."""
+    print("Generating peak_oversampling.png...")
+    from phonometry import lc_peak
+
+    fs = 48000
+    f_tone = 8000.0
+    t_fine = np.linspace(0.0, 2.5 / f_tone, 2000)
+    n_grid = np.arange(0, int(2.5 * fs / f_tone) + 1)
+    t_grid = n_grid / fs
+    # Six samples per cycle: this phase puts the crest exactly midway between
+    # two of them, which is the worst case the grid can produce.
+    phase = np.pi / 3
+    fine = np.sin(2 * np.pi * f_tone * t_fine + phase)
+    grid = np.sin(2 * np.pi * f_tone * t_grid + phase)
+    on_grid = float(np.max(grid))
+
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 4.8))
+    ax_left.plot(t_fine * 1e3, fine, color=COLOR_PRIMARY, linewidth=1.6,
+                 label="the continuous 8 kHz tone")
+    ax_left.plot(t_grid * 1e3, grid, "o", color=COLOR_SECONDARY, markersize=6,
+                 label="its samples at 48 kHz (6 per cycle)")
+    ax_left.axhline(1.0, color=COLOR_FG, linestyle="--", linewidth=1.2,
+                    label="true peak")
+    ax_left.axhline(on_grid, color=COLOR_SECONDARY, linestyle=":",
+                    linewidth=1.4,
+                    label=f"largest sample: {20 * np.log10(on_grid):.2f} dB low")
+    ax_left.set_title("The crest falls between two samples",
+                      fontweight="bold", pad=12)
+    ax_left.set_xlabel("Time [ms]")
+    ax_left.set_ylabel("Amplitude")
+    ax_left.set_ylim(-1.25, 1.35)
+    ax_left.grid(color=COLOR_GRID, linestyle="-")
+    ax_left.legend(loc="lower right", fontsize=8)
+
+    t_tone = np.arange(int(0.05 * fs)) / fs
+    per_cycle = np.array([3.0, 4.0, 6.0, 8.0, 12.0, 24.0, 48.0])
+    phases = np.linspace(0.0, 2 * np.pi, 46)
+    colors = [COLOR_SECONDARY, COLOR_QUATERNARY, COLOR_TERTIARY, COLOR_PRIMARY]
+    for factor, color in zip((1, 2, 4, 8), colors):
+        worst = []
+        for n_samples in per_cycle:
+            tones = [np.sin(2 * np.pi * (fs / n_samples) * t_tone + p)
+                     for p in phases]
+            worst.append(max(float(lc_peak(tone, fs, oversample=16))
+                             - float(lc_peak(tone, fs, oversample=factor))
+                             for tone in tones))
+        ax_right.semilogx(per_cycle, worst, marker="o", color=color,
+                          linewidth=1.8, label=f"oversample={factor}")
+    ax_right.axhline(0.1, color=COLOR_MUTED, linestyle=":", linewidth=1.2)
+    ax_right.annotate("0.1 dB", xy=(30, 0.16), fontsize=9, color=COLOR_MUTED)
+    ax_right.set_title("Worst case over the phase of the tone",
+                       fontweight="bold", pad=12)
+    ax_right.set_xlabel("Samples per cycle")
+    ax_right.set_ylabel("Under-read of the peak [dB]")
+    ax_right.xaxis.set_major_locator(mticker.FixedLocator(per_cycle))
+    ax_right.xaxis.set_minor_locator(mticker.NullLocator())
+    ax_right.xaxis.set_major_formatter(mticker.FixedFormatter(
+        [f"{v:.0f}" for v in per_cycle]))
+    ax_right.set_ylim(0, 3.2)
+    ax_right.grid(color=COLOR_GRID, linestyle="-")
+    ax_right.legend(loc="upper right", fontsize=9)
+
+    fig.tight_layout()
+    save_figure(output_dir, "peak_oversampling.png")
+    plt.close()
+
+
+def generate_dose_exchange(output_dir: str) -> None:
+    """Iso-exposure contours: the equal-energy trade of level against time."""
+    print("Generating dose_exchange.png...")
+    from phonometry import laeq, lex_8h
+
+    fs = 48000
+    hours = np.geomspace(1.0 / 60.0, 8.0, 60)
+    sample = 0.4946 * np.random.default_rng(1).standard_normal(2 * fs)
+    base = float(laeq(sample, fs))
+    # lex_8h(sample, duration_hours=h) - LAeq(sample) is the 10 log10(h/8)
+    # normalisation, so the contour is the target minus that offset.
+    offsets = np.array([float(lex_8h(sample, fs, duration_hours=h)) - base
+                        for h in hours])
+
+    _, ax = plt.subplots(figsize=(10, 5.4))
+    styles = [(80.0, COLOR_TERTIARY, ":"), (85.0, COLOR_PRIMARY, "-"),
+              (87.0, COLOR_SECONDARY, "--")]
+    for target, color, style in styles:
+        exposure = 8.0 * (20e-6 * 10 ** (target / 20)) ** 2
+        ax.semilogx(hours, target - offsets, color=color, linestyle=style,
+                    linewidth=1.9,
+                    label=f"LEX,8h = {target:.0f} dB  (E = {exposure:.2f} Pa2h)")
+    ax.plot(8.0, 90.0, "o", color=COLOR_FG, markersize=7)
+    ax.annotate("90 dB(A) for 8 h = 3.20 Pa2h", xy=(8.0, 90.0),
+                xytext=(1.1, 96.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.annotate("+3 dB for every halving of the duration", xy=(2.0, 88.0),
+                xytext=(1.15, 79.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.set_title("Equal-energy exchange: every point on a line is the same "
+                 "daily exposure", fontweight="bold", pad=12)
+    ax.set_xlabel("Exposure duration [h]")
+    ax.set_ylabel("A-weighted level [dB]")
+    ax.set_xlim(1.0 / 60.0, 8.0)
+    ax.set_ylim(77, 113)
+    ax.set_xticks([1 / 60, 5 / 60, 15 / 60, 0.5, 1.0, 2.0, 4.0, 8.0])
+    ax.xaxis.set_major_formatter(mticker.FixedFormatter(
+        ["1 min", "5 min", "15 min", "30 min", "1 h", "2 h", "4 h", "8 h"]))
+    ax.grid(color=COLOR_GRID, linestyle="-")
+    ax.legend(loc="upper right", fontsize=9)
+    save_figure(output_dir, "dose_exchange.png")
+    plt.close()
+
+
+def generate_ballistics_vs_duration(output_dir: str) -> None:
+    """How much of an event each detector keeps, against event duration."""
+    print("Generating ballistics_vs_duration.png...")
+    from phonometry import time_weighting
+
+    fs = 48000
+    t = np.arange(int(3.0 * fs)) / fs
+    tone = np.sin(2 * np.pi * 4000 * t)
+    durations = np.geomspace(0.001, 2.0, 42)
+    start = int(0.5 * fs)
+    # The steady reference needs many time constants: Slow is still 8 % short
+    # of it after 2.5 s, which would bias the whole S curve by 0.4 dB.
+    long_t = np.arange(int(12.0 * fs)) / fs
+    long_tone = np.sin(2 * np.pi * 4000 * long_t)
+    steady = {m: float(np.mean(time_weighting(long_tone, fs, mode=m)[-fs:]))
+              for m in ("fast", "slow", "impulse")}
+
+    _, ax = plt.subplots(figsize=(10, 5.4))
+    modes = [("fast", 0.125, COLOR_PRIMARY, "-"),
+             ("slow", 1.0, COLOR_TERTIARY, "-"),
+             ("impulse", None, COLOR_SECONDARY, "-")]
+    measured: dict[str, np.ndarray] = {}
+    for mode, tau, color, style in modes:
+        reference = steady[mode]
+        peaks = []
+        for t_b in durations:
+            burst = np.zeros_like(t)
+            stop = start + int(t_b * fs)
+            burst[start:stop] = tone[start:stop]
+            peaks.append(10 * np.log10(
+                float(np.max(time_weighting(burst, fs, mode=mode))) / reference))
+        measured[mode] = np.asarray(peaks)
+        ax.semilogx(durations * 1e3, measured[mode], color=color, linestyle=style,
+                    linewidth=1.9, label=f"{mode} (measured)")
+        if tau is not None:
+            table = np.array([1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005,
+                              0.002, 0.001])
+            ax.plot(table * 1e3, 10 * np.log10(1 - np.exp(-table / tau)), "o",
+                    color=color, markersize=5, markerfacecolor="none")
+
+    # The F/S gap at exactly 100 ms, measured rather than interpolated.
+    at_100ms = {}
+    for mode in ("fast", "slow", "impulse"):
+        reference = steady[mode]
+        burst = np.zeros_like(t)
+        burst[start:start + int(0.1 * fs)] = tone[start:start + int(0.1 * fs)]
+        at_100ms[mode] = 10 * np.log10(
+            float(np.max(time_weighting(burst, fs, mode=mode))) / reference)
+    gap = at_100ms["fast"] - at_100ms["slow"]
+    ax.axvline(100.0, color=COLOR_MUTED, linewidth=1.0)
+    ax.annotate(f"at 100 ms, F reads {gap:.1f} dB above S",
+                xy=(100.0, -6.0), xytext=(150.0, -22.0), fontsize=9,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.annotate(f"even Impulse, with its 35 ms attack,\n"
+                f"loses {abs(measured['impulse'][0]):.0f} dB on a 1 ms burst",
+                xy=(1.05, measured["impulse"][0]), xytext=(1.6, -10.0),
+                fontsize=9, arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.set_title("Every detector under-reads every short event",
+                 fontweight="bold", pad=12)
+    ax.set_xlabel("Toneburst duration [ms]")
+    ax.set_ylabel("Peak level re the steady reading [dB]")
+    ax.set_xlim(1.0, 2000.0)
+    ax.set_ylim(-32, 2)
+    ax.xaxis.set_major_locator(mticker.FixedLocator(
+        [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000]))
+    ax.xaxis.set_minor_locator(mticker.NullLocator())
+    ax.xaxis.set_major_formatter(mticker.FixedFormatter(
+        ["1", "2", "5", "10", "20", "50", "100", "200", "500", "1k", "2k"]))
+    ax.grid(color=COLOR_GRID, linestyle="-")
+    ax.plot([], [], "o", color=COLOR_FG, markersize=5, markerfacecolor="none",
+            label="IEC 61672-1 Table 4, Equation (7)")
+    ax.legend(loc="lower right", fontsize=9)
+    save_figure(output_dir, "ballistics_vs_duration.png")
+    plt.close()
+
+
+def generate_c_minus_a_spectrum(output_dir: str) -> None:
+    """What a C - A difference of 23 dB looks like as a band spectrum."""
+    print("Generating c_minus_a_spectrum.png...")
+    from phonometry import leq, noise_signal, octave_filter, weighting_filter
+
+    fs = 48000
+    t = np.arange(10 * fs) / fs
+    rng = np.random.default_rng(1)
+    rumble = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
+    pink = noise_signal(fs, 10.0, color="pink", rms=0.02, seed=5)
+
+    scenes = [("A 50 Hz rumble under a light hiss", rumble),
+              ("Broadband pink noise", pink)]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5.0), sharey=True)
+    curves = [("Z", COLOR_MUTED, "-"), ("C", COLOR_PRIMARY, "--"),
+              ("A", COLOR_SECONDARY, ":")]
+    for ax, (title, x) in zip(axes, scenes):
+        for curve, color, style in curves:
+            weighted = weighting_filter(x, fs, curve=curve)
+            band_levels, centres = octave_filter(weighted, fs, fraction=3)
+            ax.semilogx(centres, band_levels, color=color, linestyle=style,
+                        linewidth=1.8, label=f"{curve}-weighted bands")
+        la = float(leq(weighting_filter(x, fs, curve="A")))
+        lc = float(leq(weighting_filter(x, fs, curve="C")))
+        ax.text(0.03, 0.05,
+                f"LAeq {la:.1f} dB\nLCeq {lc:.1f} dB\nC - A = {lc - la:.1f} dB",
+                transform=ax.transAxes, fontsize=10,
+                bbox={"boxstyle": "round", "facecolor": COLOR_PANEL,
+                      "edgecolor": COLOR_MUTED})
+        ax.set_title(title, fontweight="bold", pad=12)
+        ax.set_xlabel(LABEL_FREQ_HZ)
+        ax.set_ylim(-5, 82)
+        ax.grid(which="major", color=COLOR_GRID, linestyle="-")
+        ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+        format_frequency_axis(ax, 11.0, 23000.0)
+        ax.legend(loc="upper right", fontsize=9)
+    axes[0].set_ylabel("Band level [dB]")
+    fig.tight_layout()
+    save_figure(output_dir, "c_minus_a_spectrum.png")
+    plt.close()
+
+
+def generate_pole_migration(output_dir: str) -> None:
+    """Why the bank decimates: where the poles of a narrow band actually sit."""
+    print("Generating pole_migration.png...")
+    from scipy.signal import sos2zpk
+
+    fs = 48000
+    bank = OctaveFilterBank(fs=fs, fraction=3)
+    full = OctaveFilterBank(fs=fs, fraction=3,
+                            design=FilterDesign(resample=False))
+    idx = int(np.argmin(np.abs(np.asarray(bank.freq) - 25.0)))
+    f_m = float(bank.freq[idx])
+    factor = int(bank.factor[idx])
+
+    _, p_full, _ = sos2zpk(np.asarray(full.sos[idx]))
+    _, p_dec, _ = sos2zpk(np.asarray(bank.sos[idx]))
+
+    fig = plt.figure(figsize=(12, 5.2))
+    ax_a = fig.add_subplot(1, 3, 1)
+    ax_b = fig.add_subplot(1, 3, 2)
+    ax_c = fig.add_subplot(1, 3, 3)
+
+    for ax, poles, rate, title in (
+        (ax_a, p_full, fs, f"Designed at {fs / 1000:.0f} kHz"),
+        (ax_b, p_dec, fs / factor,
+         f"As the bank realizes it, at {fs / factor:.0f} Hz"),
+    ):
+        theta = np.linspace(0, 2 * np.pi, 512)
+        ax.plot(np.cos(theta), np.sin(theta), color=COLOR_MUTED, linewidth=1.2)
+        ax.plot(np.real(poles), np.imag(poles), "x", color=COLOR_SECONDARY,
+                markersize=9, markeredgewidth=2.0, label="poles")
+        ax.plot([0.0] * 4, [0.0] * 4, "o", color=COLOR_PRIMARY,
+                markerfacecolor="none", markersize=9, label="zeros (at z = 0)")
+        gap = 1.0 - float(np.max(np.abs(poles)))
+        ax.set_title(f"{title}\n1 - r = {gap:.1e}", fontweight="bold", pad=10)
+        ax.set_xlabel("Re z")
+        ax.set_ylabel("Im z")
+        ax.set_xlim(-1.25, 1.25)
+        ax.set_ylim(-1.25, 1.25)
+        ax.set_aspect("equal")
+        ax.grid(color=COLOR_GRID, linestyle="-")
+        ax.legend(loc="lower left", fontsize=8)
+
+    # The zoom that makes the collapsed pair visible.
+    inset = ax_a.inset_axes((0.52, 0.60, 0.44, 0.36))
+    inset.plot(np.real(p_full), np.imag(p_full), "x", color=COLOR_SECONDARY,
+               markersize=8, markeredgewidth=1.8)
+    theta = np.linspace(-0.01, 0.01, 200)
+    inset.plot(np.cos(theta), np.sin(theta), color=COLOR_MUTED, linewidth=1.0)
+    inset.set_xlim(0.9985, 1.0004)
+    inset.set_ylim(-0.0045, 0.0045)
+    inset.tick_params(labelsize=7)
+    inset.set_title("zoom at z = 1", fontsize=8)
+    ax_a.indicate_inset_zoom(inset, edgecolor=COLOR_FG)
+
+    radius_dec = [1.0 - float(np.max(np.abs(sos2zpk(np.asarray(s))[1])))
+                  for s in bank.sos]
+    radius_full = [1.0 - float(np.max(np.abs(sos2zpk(np.asarray(s))[1])))
+                   for s in full.sos]
+    ax_c.loglog(bank.freq, radius_full, "o-", color=COLOR_SECONDARY,
+                markersize=4, linewidth=1.6, label="resample=False (one rate)")
+    ax_c.loglog(bank.freq, radius_dec, "s-", color=COLOR_PRIMARY,
+                markersize=4, linewidth=1.6, label="the default multirate bank")
+    ax_c.set_title("Every band of the 1/3-octave bank", fontweight="bold",
+                   pad=10)
+    ax_c.set_xlabel(LABEL_FREQ_HZ)
+    ax_c.set_ylabel("1 - (largest pole radius)")
+    ax_c.grid(which="both", color=COLOR_GRID, linestyle="-")
+    ax_c.legend(loc="lower right", fontsize=8)
+    format_frequency_axis(ax_c, 11.0, 23000.0, minor=None)
+
+    fig.suptitle(f"The {f_m:.0f} Hz one-third-octave band, before and after "
+                 f"decimation by {factor}", fontweight="bold")
+    fig.tight_layout()
+    save_figure(output_dir, "pole_migration.png")
+    plt.close()
+
+
+def generate_parametric_eq_cascade(output_dir: str) -> None:
+    """The three sections of the guide's snippet and the cascade they sum to."""
+    print("Generating parametric_eq_cascade.png...")
+    from phonometry import EQSection, ParametricEQ
+
+    fs = 48000
+    eq = ParametricEQ(fs, [
+        EQSection("lowshelf", 100.0, gain_db=4.0),
+        EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),
+        EQSection("highshelf", 8000.0, gain_db=3.0),
+    ])
+    result = eq.response(f_min=20.0, f_max=20000.0)
+    axes = result.plot(show_sections=True)
+    fig = np.atleast_1d(axes)[0].get_figure()
+    fig.set_size_inches(10, 6.4)
+    fig.tight_layout()
+    save_figure(output_dir, "parametric_eq_cascade.png")
+    plt.close()
+
+
+def generate_architecture_tradeoff(output_dir: str) -> None:
+    """The architecture choice as two numbers: rejection and group delay."""
+    print("Generating architecture_tradeoff.png...")
+    from scipy.signal import sosfreqz
+
+    fs = 48000
+    names = ("butter", "cheby1", "cheby2", "ellip", "bessel")
+    two_fm, four_fm, delays = [], [], []
+    for ftype in names:
+        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                                design=FilterDesign(filter_type=ftype,
+                                                    resample=False))
+        idx = int(np.argmin(np.abs(np.asarray(bank.freq) - 1000.0)))
+        f_m = float(bank.freq[idx])
+        w, h = sosfreqz(bank.sos[idx], worN=1 << 17, fs=fs)
+        mag = 20 * np.log10(np.abs(h) + 1e-15)
+        mag -= mag.max()
+        two_fm.append(float(mag[int(np.argmin(np.abs(w - 2 * f_m)))]))
+        four_fm.append(float(mag[int(np.argmin(np.abs(w - 4 * f_m)))]))
+        grid = np.linspace(f_m * 0.95, f_m * 1.05, 4001)
+        _, h_c = sosfreqz(bank.sos[idx], worN=2 * np.pi * grid / fs)
+        delay = -np.gradient(np.unwrap(np.angle(h_c)), 2 * np.pi * grid)
+        delays.append(float(delay[len(delay) // 2]) * 1e3)
+
+    x = np.arange(len(names))
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(12, 5.0))
+    ax_a.bar(x - 0.19, two_fm, 0.36, color=COLOR_PRIMARY, label="at 2 f_m")
+    ax_a.bar(x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label="at 4 f_m")
+    for xi, value in zip(x - 0.19, two_fm):
+        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+                      fontsize=9, xytext=(0, -4), textcoords="offset points")
+    for xi, value in zip(x + 0.19, four_fm):
+        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+                      fontsize=9, xytext=(0, -4), textcoords="offset points")
+    ax_a.set_title("Relative attenuation out of band", fontweight="bold",
+                   pad=12)
+    ax_a.set_ylabel("Relative attenuation [dB]")
+    ax_a.set_ylim(-115, 6)
+    ax_a.set_xticks(x, names)
+    ax_a.grid(axis="y", color=COLOR_GRID, linestyle="-")
+    ax_a.legend(loc="lower right", fontsize=9)
+
+    ax_b.bar(x, delays, 0.5, color=COLOR_SECONDARY)
+    for xi, value in zip(x, delays):
+        ax_b.annotate(f"{value:.2f}", (xi, value), ha="center", va="bottom",
+                      fontsize=9, xytext=(0, 3), textcoords="offset points")
+    ax_b.set_title("Group delay at the band mid frequency", fontweight="bold",
+                   pad=12)
+    ax_b.set_ylabel("Group delay [ms]")
+    ax_b.set_ylim(0, 2.4)
+    ax_b.set_xticks(x, names)
+    ax_b.grid(axis="y", color=COLOR_GRID, linestyle="-")
+
+    fig.suptitle("The 1 kHz octave band at 48 kHz, order 6", fontweight="bold")
+    fig.tight_layout()
+    save_figure(output_dir, "architecture_tradeoff.png")
+    plt.close()
+
+
+def generate_class_mask_architectures(output_dir: str) -> None:
+    """The four architecture verdicts of the table, drawn on their own mask."""
+    print("Generating class_mask_architectures.png...")
+    from phonometry import filter_class_compliance
+
+    fs = 48000
+    cases = (("butter", "Butterworth: passes"),
+             ("cheby1", "Chebyshev I: passband ripple"),
+             ("ellip", "Elliptic: ripple in both bands"),
+             ("bessel", "Bessel: roll-off too slow"))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    for ax, (ftype, title) in zip(axes.ravel(), cases):
+        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                                design=FilterDesign(filter_type=ftype))
+        result = filter_class_compliance(bank)
+        result.plot(ax=ax)
+        verdict = result.overall_class
+        ax.set_title(f"{title}   (overall_class = {verdict})",
+                     fontweight="bold", pad=10)
+    fig.suptitle("The same 1 kHz octave band, order 6, on the IEC 61260-1 "
+                 "acceptance mask", fontweight="bold")
+    fig.tight_layout()
+    save_figure(output_dir, "class_mask_architectures.png")
+    plt.close()
+
+
+def generate_leakage_floor(output_dir: str) -> None:
+    """What a 70 dB stopband looks like as a measured band spectrum."""
+    print("Generating filter_leakage_floor.png...")
+    from phonometry import LevelCalibration, noise_signal, octave_filter
+
+    fs = 48000
+    t = np.arange(int(8.0 * fs)) / fs
+    # A 1 kHz tone at 100 dB SPL over pink noise whose band levels are 25 dB,
+    # so the real floor and the filter's own skirt are within reach of each
+    # other and the crossing is the point of the figure.
+    tone = np.sqrt(2) * (2e-5 * 10 ** (100 / 20)) * np.sin(2 * np.pi * 1000 * t)
+    floor = noise_signal(fs, 8.0, color="pink", rms=2.04e-3, seed=4)
+    x = tone + floor
+
+    calibration = LevelCalibration(factor=1.0)
+    _, ax = plt.subplots(figsize=(10, 5.4))
+    for order, color, style in ((6, COLOR_PRIMARY, "-"),
+                                (10, COLOR_TERTIARY, "--")):
+        levels, centres = octave_filter(x, fs, fraction=3, order=order,
+                                        calibration=calibration)
+        ax.semilogx(centres, levels, color=color, linestyle=style,
+                    linewidth=1.8, label=f"measured band levels, order {order}")
+    truth, centres = octave_filter(floor, fs, fraction=3, order=6,
+                                   calibration=calibration)
+    ax.semilogx(centres, truth, color=COLOR_SECONDARY, linestyle=":",
+                linewidth=1.8, label="the noise actually present")
+    ax.annotate("bands on the skirt are measuring\nthe filter, not the sound",
+                xy=(500.0, 34.0), xytext=(30.0, 58.0), fontsize=10,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.annotate("here the skirt has fallen below the noise:\n"
+                "these bands are measuring the sound",
+                xy=(11000.0, 22.5), xytext=(1500.0, 10.0), fontsize=10,
+                arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax.set_title("A 1 kHz tone at 100 dB over a pink-noise floor",
+                 fontweight="bold", pad=12)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Band level [dB re 20 uPa]")
+    ax.set_ylim(5, 108)
+    ax.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    format_frequency_axis(ax, 11.0, 23000.0)
+    ax.legend(loc="upper right", fontsize=9)
+    save_figure(output_dir, "filter_leakage_floor.png")
+    plt.close()
+
+
+def generate_streaming_level_seams(output_dir: str) -> None:
+    """The three streaming pitfalls, in the level domain the reader watches."""
+    print("Generating streaming_level_seams.png...")
+    from phonometry import (
+        TimeWeighting,
+        WeightingFilter,
+        time_weighting,
+        weighting_filter,
+    )
+
+    fs, block = 48000, 4800                     # 100 ms blocks
+    rng = np.random.default_rng(17)
+    steps = np.array([0.02, 0.02, 0.08, 0.08, 0.02, 0.02, 0.05, 0.05])
+    x = np.concatenate([a * rng.standard_normal(block) for a in steps])
+    t = np.arange(x.size) / fs
+    n_blocks = steps.size
+
+    def to_db(env: np.ndarray) -> np.ndarray:
+        return 10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2)
+
+    # The reference must use the *same* weighting design streaming can use:
+    # the oversampled high_accuracy path is not block-compatible, so a
+    # comparison against it would show a design difference, not a state one.
+    continuous = to_db(time_weighting(
+        weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
+        mode="fast"))
+
+    aw = WeightingFilter(fs, "A", stateful=True)
+    tw = TimeWeighting(fs, mode="fast")
+    stateful = np.concatenate([to_db(tw.process(aw.filter(
+        x[i * block:(i + 1) * block]))) for i in range(n_blocks)])
+
+    stateless = np.concatenate([to_db(time_weighting(weighting_filter(
+        x[i * block:(i + 1) * block], fs, curve="A", high_accuracy=False), fs,
+        mode="fast")) for i in range(n_blocks)])
+
+    seam = max(abs(float(stateless[i * block] - continuous[i * block]))
+               for i in range(1, n_blocks))
+    exact = float(np.max(np.abs(stateful - continuous)))
+
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(12, 5.0),
+                                     gridspec_kw={"width_ratios": [2.1, 1.0]})
+    for i in range(1, n_blocks):
+        ax_a.axvline(i * block / fs, color=COLOR_GRID, linestyle=":",
+                     linewidth=1.0)
+    ax_a.plot(t, continuous, color=COLOR_MUTED, linewidth=3.2, alpha=0.5,
+              label="one continuous pass")
+    ax_a.plot(t, stateful, color=COLOR_PRIMARY, linewidth=1.4,
+              label=f"stateful=True (max error {exact:.2g} dB)")
+    ax_a.plot(t, stateless, color=COLOR_SECONDARY, linewidth=1.2,
+              label=f"stateful=False (up to {seam:.0f} dB at a seam)")
+    ax_a.set_title("Eight 100 ms blocks of a level-stepping signal",
+                   fontweight="bold", pad=12)
+    ax_a.set_xlabel("Time [s]")
+    ax_a.set_ylabel("LAF [dB re 20 uPa]")
+    ax_a.set_xlim(0, t[-1])
+    ax_a.set_ylim(30, 85)
+    ax_a.grid(color=COLOR_GRID, linestyle="-")
+    ax_a.legend(loc="lower right", fontsize=8)
+
+    aw_s = WeightingFilter(fs, "A", stateful=True, steady_ic=True)
+    tw_s = TimeWeighting(fs, mode="fast")
+    shown = 8
+    steady = np.concatenate([to_db(tw_s.process(aw_s.filter(
+        x[i * block:(i + 1) * block]))) for i in range(shown)])
+    ax_b.axvspan(0.0, 0.625, color=COLOR_SECONDARY, alpha=0.20)
+    ax_b.plot(t[:shown * block], continuous[:shown * block], color=COLOR_MUTED,
+              linewidth=3.2, alpha=0.5, label="one continuous pass")
+    ax_b.plot(t[:shown * block], stateful[:shown * block], color=COLOR_PRIMARY,
+              linewidth=1.4, label="steady_ic=False")
+    ax_b.plot(t[:shown * block], steady, color=COLOR_TERTIARY, linewidth=1.4,
+              linestyle="--", label="steady_ic=True")
+    ax_b.annotate("5 tau on Fast: 0.63 s", xy=(0.31, 82.0), ha="center",
+                  fontsize=9, color=COLOR_SECONDARY)
+    ax_b.set_title("The settling ramp, magnified", fontweight="bold", pad=12)
+    ax_b.set_xlabel("Time [s]")
+    ax_b.set_xlim(0, shown * block / fs)
+    ax_b.set_ylim(30, 85)
+    ax_b.grid(color=COLOR_GRID, linestyle="-")
+    ax_b.legend(loc="lower right", fontsize=8)
+
+    fig.tight_layout()
+    save_figure(output_dir, "streaming_level_seams.png")
+    plt.close()
+
+
+def generate_survey_channel_average(output_dir: str) -> None:
+    """Energy average against dB average over a five-position room survey."""
+    print("Generating survey_channel_average.png...")
+    from phonometry import noise_signal, octave_filter
+
+    fs = 48000
+    rng = np.random.default_rng(23)
+    # Five positions in one room: the same source, a modal field below about
+    # 300 Hz where the positions disagree, and a diffuse field above it.
+    base = noise_signal(fs, 6.0, color="pink", rms=0.05, seed=1)
+    survey = []
+    for _ in range(5):
+        modal = np.zeros_like(base)
+        for f_mode in rng.uniform(40.0, 300.0, 40):
+            t = np.arange(base.size) / fs
+            modal += rng.uniform(0.03, 0.07) * np.sin(
+                2 * np.pi * f_mode * t + rng.uniform(0, 2 * np.pi))
+        survey.append(base * rng.uniform(0.85, 1.15) + modal)
+    x = np.stack(survey)
+
+    spl, centres = octave_filter(x, fs, fraction=3, limits=[25.0, 10000.0])
+    spl = np.asarray(spl)
+    energetic = 10 * np.log10(np.mean(10 ** (spl / 10), axis=0))
+    arithmetic = np.mean(spl, axis=0)
+    error = energetic - arithmetic
+    worst = int(np.argmax(error))
+
+    fig, (ax_a, ax_b) = plt.subplots(
+        2, 1, figsize=(10, 7.0), sharex=True,
+        gridspec_kw={"height_ratios": [2.4, 1.0]})
+    for i, row in enumerate(spl):
+        ax_a.semilogx(centres, row, color=COLOR_MUTED, linewidth=0.9,
+                      label="the five positions" if i == 0 else None)
+    ax_a.semilogx(centres, energetic, color=COLOR_PRIMARY, linewidth=2.4,
+                  label="energy average (correct)")
+    ax_a.semilogx(centres, arithmetic, color=COLOR_SECONDARY, linewidth=2.0,
+                  linestyle="--", label="arithmetic mean of the dB values")
+    ax_a.set_title("A five-position room survey in one octave_filter call",
+                   fontweight="bold", pad=12)
+    ax_a.set_ylabel("Band level [dB re 20 uPa]")
+    ax_a.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax_a.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    ax_a.legend(loc="lower left", fontsize=9)
+
+    ax_b.semilogx(centres, error, color=COLOR_SECONDARY, linewidth=1.8)
+    ax_b.axhline(0.0, color=COLOR_MUTED, linewidth=1.0)
+    ax_b.annotate(f"worst under-read {error[worst]:.1f} dB "
+                  f"at {centres[worst]:.0f} Hz",
+                  xy=(centres[worst], error[worst]),
+                  xytext=(centres[worst] * 2.2, error[worst] * 0.85),
+                  fontsize=9, arrowprops={"arrowstyle": "->", "lw": 0.9})
+    ax_b.set_xlabel(LABEL_FREQ_HZ)
+    ax_b.set_ylabel("Energy minus\ndB average [dB]")
+    ax_b.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax_b.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    format_frequency_axis(ax_b, 22.0, 12000.0)
+
+    fig.tight_layout()
+    save_figure(output_dir, "survey_channel_average.png")
+    plt.close()

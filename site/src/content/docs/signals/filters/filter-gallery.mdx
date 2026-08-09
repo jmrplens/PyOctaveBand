@@ -48,10 +48,14 @@ multirate decimation) and the parameter reference live in
 bank meets a performance class of IEC 61260-1 is
 [Filter Class Verification](/phonometry/signals/filters/filter-compliance/).
 
-## 1. Filter Comparison and Zoom
+## 1. The five architectures at the band edges
 
-We use Second-Order Sections (SOS) for all filters to ensure numerical stability.
-The following plot compares the architectures focusing on the -3 dB crossover point.
+All five designs are compared on the same 1 kHz octave band at 48 kHz. Read the
+figure twice: the wide view shows how fast each skirt falls away from the band,
+and the inset around the −3 dB line shows where they cross. What changes
+between those two views is that Chebyshev I ripples *inside* the band,
+Chebyshev II ripples *outside* it, Elliptic does both and falls fastest, and
+Bessel is the smoothest and the slowest.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Magnitude response comparison of the five filter architectures for the 1 kHz octave band, with a zoom at the -3 dB crossover" width="80%" />
 
@@ -75,6 +79,17 @@ for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     w, h = sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
     ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=ftype)
 ax.axhline(-3, color="gray", linestyle=":", label="-3 dB")
+
+# The inset the section is named after: the same curves around the crossover.
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+axins = inset_axes(ax, width="35%", height="45%", loc="upper left", borderpad=3)
+for line in ax.get_lines()[:-1]:
+    axins.semilogx(line.get_xdata(), line.get_ydata(), label=line.get_label())
+axins.axhline(-3, color="gray", linestyle=":")
+axins.set(xscale="log", xlim=(650, 1500), ylim=(-4, 0.5),
+          title="Zoom at -3 dB (log scale)")
+
 ax.set(xlim=(100, 8000), ylim=(-80, 5),
        xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
 ax.grid(True, which="both", alpha=0.3)
@@ -90,7 +105,70 @@ plt.show()
 | `cheby1` | **Chebyshev I** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby1', ripple=0.1))` | Sharper roll-off at the cost of ripple. |
 | `cheby2` | **Chebyshev II** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby2'))` | Flat passband with stopband zeros. |
 | `ellip` | **Elliptic** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Maximum selectivity. |
-| `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preserving transient waveform shapes. |
+| `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preserving transient waveform shapes (see the group-delay figure of [Filter Banks](/phonometry/signals/filters/filter-banks/#group-delay-quantified)). |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/architecture_tradeoff.svg" alt="Two panels for the 1 kHz octave band at 48 kHz, order 6. Left, grouped bars of the relative attenuation one and two octaves above the band mid frequency for each of the five architectures: Bessel is the shallowest at minus 16 and minus 60 decibels, Butterworth minus 40 and minus 88, Chebyshev I minus 50 and minus 102, Chebyshev II minus 55 and minus 73, Elliptic the steepest at minus 72 and minus 81. Right, the group delay at the band mid frequency in milliseconds: Bessel 1.22, Chebyshev II 1.58, Butterworth 1.74, Elliptic 1.75 and Chebyshev I 1.97" width="92%" />
+
+*The choice, quantified. Selectivity and group delay move in opposite
+directions, and the class column of the table below says which of the five you
+may actually use for a standards-compliant band measurement.*
+
+| Architecture | Ripple across the band centre | At $2f_m$ | At $4f_m$ | Group delay at $f_m$ | IEC 61260-1 class (order 6, 48 kHz) |
+| :--- | ---: | ---: | ---: | ---: | :---: |
+| `butter` | 0.00 dB | −39.6 dB | −88.2 dB | 1.74 ms | **1** |
+| `cheby1` | 0.10 dB | −50.2 dB | −101.6 dB | 1.97 ms | none |
+| `cheby2` | 0.00 dB | −55.1 dB | −73.0 dB | 1.58 ms | **1** |
+| `ellip` | 0.10 dB | −72.1 dB | −80.8 dB | 1.75 ms | none |
+| `bessel` | 0.21 dB | −16.4 dB | −60.2 dB | 1.22 ms | none |
+
+Read the last column first: **three of the five cannot be used for a
+standards-compliant band measurement at all** with the default parameters — the
+equiripple pair because their band edges are not their −3 dB points (see
+[Filter Banks](/phonometry/signals/filters/filter-banks/)), Bessel because it
+rolls off too slowly for the mask. That is a hard constraint, not a preference,
+and it comes before any of the other columns. Among the two that pass, the
+choice is a real trade: `cheby2` buys 15 dB more rejection one octave out and
+pays for it with a 15 dB shallower far stopband, because its equiripple floor
+is pinned at `attenuation`.
+
+One more thing the table cannot show: rejection only matters when a strong
+neighbour must not contaminate a weak band, and there the ceiling is the
+`attenuation` parameter (72 dB by default), not the architecture.
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+from scipy.signal import sosfreqz
+
+# `filters` is the import of the snippet above.
+fs = 48000
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    # resample=False so the response exists above the decimated Nyquist
+    bank = filters.OctaveFilterBank(
+        fs, fraction=1, order=6, limits=[800, 1200],
+        design=filters.FilterDesign(filter_type=ftype, resample=False))
+    idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+    f_m = float(bank.freq[idx])
+    w, h = sosfreqz(bank.sos[idx], worN=1 << 17, fs=fs)
+    mag = 20 * np.log10(np.abs(h) + 1e-15)
+    mag -= mag.max()
+
+    grid = np.linspace(f_m * 0.95, f_m * 1.05, 4001)
+    _, h_c = sosfreqz(bank.sos[idx], worN=2 * np.pi * grid / fs)
+    delay = -np.gradient(np.unwrap(np.angle(h_c)), 2 * np.pi * grid)
+
+    banked = filters.OctaveFilterBank(
+        fs, fraction=1, order=6, limits=[800, 1200],
+        design=filters.FilterDesign(filter_type=ftype))
+    print(f"{ftype:8s} {mag[np.argmin(abs(w - 2 * f_m))]:7.1f} dB "
+          f"{mag[np.argmin(abs(w - 4 * f_m))]:7.1f} dB "
+          f"{delay[len(delay) // 2] * 1e3:5.2f} ms "
+          f"class {filters.verify_filter_class(banked)['overall_class']}")
+```
+
+</details>
 
 ## 2. Gallery of Filter Bank Responses
 
@@ -103,6 +181,13 @@ Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions
 | **Chebyshev II** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6.svg" alt="Chebyshev II octave-band filter bank frequency response" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Chebyshev II one-third-octave filter bank frequency response" width="100%" /> |
 | **Elliptic** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6.svg" alt="Elliptic octave-band filter bank frequency response" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Elliptic one-third-octave filter bank frequency response" width="100%" /> |
 | **Bessel** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6.svg" alt="Bessel octave-band filter bank frequency response" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Bessel one-third-octave filter bank frequency response" width="100%" /> |
+
+*Compare the rows on two things only, and the differences stop being subtle.
+**Flat tops:** Chebyshev I puts its ripple *inside* each band, on the flat top;
+Chebyshev II puts it *outside*, as the notch train between bands; Elliptic does
+both. **Valley depth:** how far the response falls between two adjacent bands
+is the leakage budget of a band level, and Bessel's skirts overlap far more
+than any of the others — that overlap is its slow roll-off, drawn.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -202,7 +287,12 @@ Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
 stopband. It provides faster roll-off than Butterworth without affecting the
 signal in the passband. The stopband edges are placed automatically so that the
 −3 dB points land on the band edges (`attenuation` must be
-$> 3.01\ \text{dB}$).
+$> 3.01\ \text{dB}$ for a −3 dB point to exist at all; below that the design
+raises `ValueError`). Note that the default of 72 dB is set by conformance and
+not by realizability: SciPy pins the equiripple floor at exactly `attenuation`,
+and IEC 61260-1 class 1 demands 70 dB far from the band, so an `attenuation`
+of, say, 6 dB is arithmetically legal and silently loses the class — see
+[Filter Class Verification](/phonometry/signals/filters/filter-compliance/).
 
 ```python
 import numpy as np
@@ -272,7 +362,13 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 Bessel filters are optimized for **linear phase response** and minimal group
 delay. They preserve the shape of filtered waveforms (transients) better than
-any other type, but have the slowest roll-off.
+any other type, but have the slowest roll-off. That claim is temporal, so the
+evidence for it is temporal too, and it lives on the sibling page: the
+group-delay figure of
+[Filter Banks](/phonometry/signals/filters/filter-banks/#group-delay-quantified)
+shows Bessel staying nearly flat across the passband while Chebyshev I and
+Elliptic peak at the band edges, and the band-decomposition figure of the same
+page shows what a longer ring does to a transient.
 
 ```python
 import numpy as np
@@ -413,7 +509,7 @@ these architectures actually reaches, are
   the Table 1 acceptance mask, class 0 and the compliance fiche of these
   architectures.
 - API reference: [`phonometry`](/phonometry/reference/api/filters/phonometry/) and [`filters.core`](/phonometry/reference/api/filters/core/).
-- Theory: [Magnitude Responses](/phonometry/reference/theory/signal-analysis/#magnitude-responses-hjw): what a magnitude response is as a complex transfer function, and how the five architectures differ before any band is filtered.
+- Theory: [Magnitude Responses](/phonometry/reference/theory/signal-analysis/#magnitude-responses): what a magnitude response is as a complex transfer function, and how the five architectures differ before any band is filtered.
 
 ## Quick answers
 

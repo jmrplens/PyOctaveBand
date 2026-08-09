@@ -76,6 +76,18 @@ pascals yields Pa²/Hz. Two scalings are available: `'density'` (units²/Hz,
 integrates to the signal power) and `'spectrum'` (units², reads the power of
 discrete tones directly).
 
+The price of preserving the calibration is that any DC offset or slow drift
+stays in the record and leaks. The offset lands in the DC bin, and the Hann
+taper's sidelobes spread a fraction of it over the first few bins, so an
+uncorrected offset appears as a spurious low-frequency rise that no amount of
+averaging removes. When the lowest bins matter, subtract the mean or high-pass
+the record explicitly before the call — that is a change to the *signal*, not a
+setting on the estimator — and note that the same offset is invisible in a
+fractional-octave display, because no band reaches DC. The same condition
+returns in
+[Data qualification](/phonometry/signals/metrology/data-qualification/), whose
+level-crossing and peak statistics are written for a zero-mean process.
+
 The estimator is a fixed pipeline: the window sets the resolution bandwidth,
 and the effective averages follow from the record length (the raw segment
 count) together with the window and overlap. Once those are fixed every
@@ -106,7 +118,10 @@ freedom and a correspondingly wider interval.
 ```python
 from phonometry import power_spectral_density
 
-res = power_spectral_density(signal, fs)          # Hann, 50 % overlap, 95 % CI
+# record: one channel of a calibrated capture, in pascals (see the Calibration
+#   guide below); in dBFS work it is the raw [-1, 1] array and the result is
+#   FS^2/Hz. fs: its sample rate in Hz.
+res = power_spectral_density(record, fs)          # Hann, 50 % overlap, 95 % CI
 print(res.n_averages, res.random_error)           # nd and 1/sqrt(nd)
 print(res.ci_lower[10], res.psd[10], res.ci_upper[10])
 res.plot()                                        # PSD in dB with the CI band
@@ -133,6 +148,72 @@ Narrow $B_e$ (long segments) suppresses the bias but leaves fewer averages and
 a larger random error; the two requirements on segment length pull in
 opposite directions, which is exactly the trade-off the reported numbers make
 visible.
+
+### Choosing the segment length, and then the record length
+
+The bias formula is more useful read backwards. Keeping a resonance peak's bias
+under 1 dB means $\varepsilon_b \ge -0.2$, hence $B_e \le 0.775\,B_r$; keeping
+it under a tenth of a decibel means $B_e \le 0.263\,B_r$. The familiar rule of
+thumb — three or four analysis bandwidths across the half-power width of the
+narrowest feature that matters — is exactly this formula, and now it has a
+number attached to it.
+
+Work forward from the measurement rather than from a habitual `nperseg`. A mode
+at 100 Hz with $Q = 50$ has $B_r = f/Q = 2$ Hz. Holding its bias under 2 %
+(0.09 dB) needs $B_e \le B_r\sqrt{3 \times 0.02} = 0.49$ Hz, and for the Hann
+taper $B_e = 1.5\,f_s/\texttt{nperseg}$, so at 48 kHz that is
+`nperseg` $\ge 147\,000$, i.e. segments of at least **3.1 s**. Asking for a 10 %
+random error then needs $n_d = 100$ effective averages, which at 50 % overlap
+means a record of about **150 s**:
+
+```python
+target_bias = 0.02                     # 2 % on the peak, about 0.09 dB
+b_r, q = 100.0 / 50.0, 100             # a 100 Hz mode with Q = 50
+b_e = b_r * (3 * target_bias) ** 0.5   # the analysis bandwidth it allows
+nperseg = 1.5 * 48000 / b_e            # Hann: Be = 1.5 fs / nperseg
+record_s = q * 0.5 * nperseg / 48000   # nd = 100 averages at 50 % overlap
+print(round(b_e, 2), int(nperseg), round(record_s))     # 0.49 146969 153
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_segment_tradeoff.svg" alt="Left: the Welch estimate of a 25 hertz wide resonance at 1 kilohertz computed with segment lengths of 512, 1024, 4096 and 16384 samples; the short segments clip and broaden the peak while the long ones resolve it. Right: the resolution bias and the random error in decibels against segment length on a logarithmic axis, the bias falling steeply and the random error rising slowly, crossing near 7400 samples, with the measured peak deficit following the bias" width="92%" />
+
+*The same 25 Hz-wide resonance seen at four segment lengths. At
+`nperseg = 512` the analysis bandwidth is 140.6 Hz, five times the resonance
+width, and the peak reads about 8 dB low and far too broad; by 4096 the
+bandwidth is 17.6 Hz and the peak is essentially resolved. The right panel puts
+the two errors on one axis: the bias falls as $B_e^2$ and the random error rises
+as $n_d^{-1/2}$, and they are equal near `nperseg = 7400` for this resonance —
+which is the segment length to choose if there is no reason to favour one error
+over the other.*
+
+The two decisions are independent: **the segment length is set by the sharpest
+feature that matters, the record length by the precision you want.** Lengthening
+the segments without lengthening the record trades one error for the other and
+buys nothing. And 150 s of record is 150 s over which the process has to stay
+stationary — which is a claim, not an assumption, and the one
+[Data qualification](/phonometry/signals/metrology/data-qualification/) decides.
+When the record simply cannot be that long, the multitaper estimator of section
+7 is the escape.
+
+### From digital units to dB SPL
+
+`power_spectral_density` scales whatever it is given and applies no calibration
+of its own, so the sensitivity factor goes on the *record*, before the estimate:
+
+```python
+calibration_factor = 1.002             # Pa per digital unit, from the calibrator
+pressure = calibration_factor * record
+psd = power_spectral_density(pressure, fs)      # now in Pa^2/Hz
+```
+
+The ordinate is then $10\log_{10}(G_{xx}/p_0^2)$ dB re (20 µPa)²/Hz, and with
+`scaling="spectrum"` the same call reads a discrete tone's level directly as
+$10\log_{10}(P/p_0^2)$ dB. To get from there to the band level an acoustic
+report contains, integrate the density over the band — sum the bins and multiply
+by the bin spacing — and divide by $p_0^2$; `fractional_octave_smoothing` in
+section 4 is a display smoother and not a substitute for that integration, as
+that section spells out. The factor itself comes from
+[Calibration and dBFS](/phonometry/signals/metrology/calibration/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing.svg" alt="Welch power spectral density of pink noise in dB per Hz over 20 Hz to 20 kHz, with the 95 percent chi-square confidence band shaded around the estimate, the 1/3-octave smoothed curve on top and the exact -3.01 dB per octave power law as a dashed reference line" width="82%" loading="eager" />
 
@@ -343,6 +424,43 @@ negligible once $n_d$ reaches a
 few hundred, and another reason to average generously before trusting a low
 coherence.
 
+## Two channels in practice
+
+Sections 2 and 3 both start from a pair of records, and everything they report
+is only as good as the pair. Two halves: how to acquire it, and how to read a
+coherence that comes back below one.
+
+**Acquisition.** Use one interface with *simultaneously sampled* inputs, or
+measure the inter-channel skew and remove it. A converter that sequences its
+channels puts a fixed skew straight into the cross-spectrum phase and therefore
+into every group delay read off it: one sample of skew at 48 kHz is 20.8 µs,
+which is 15° of phase at 2 kHz and a flat 20.8 µs error on any delay estimate.
+Set both gains before the run and do not touch them, because the coherent output
+split of section 3 assumes the two channels share a fixed scale. Validate the
+pair once with a **zero-baseline run**: feed both channels the same signal — the
+generator split into both inputs, or the two microphones side by side — and
+confirm that the measured delay is a small fraction of a sample and the
+coherence is unity across the band. That one run separates a chain problem from
+a physics problem for every measurement afterwards.
+
+**Reading a coherence below one.** It is not automatically an SNR problem, and
+Bendat & Piersol name five causes with different fixes:
+
+| What you see | The cause | The fix |
+| :--- | :--- | :--- |
+| Coherence flat across the band, consistent with $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$ | uncorrelated noise at either sensor — the modelled case of section 3 | average more, raise the level, get closer |
+| Coherence falling progressively with frequency, worse as the record is segmented shorter | a bulk propagation delay comparable with the segment length | align the records first, or raise `nperseg` well above the delay — see [Correlation and delay](/phonometry/signals/spectra/correlation-delay/) |
+| Sharp dips exactly at the resonances | resolution bias: the analysis bandwidth smears the peak differently in the two channels | lengthen the segment; the $\varepsilon_b$ formula of section 1 says by how much |
+| Low at the harmonics of a strong tone while broadband coherence stays high | non-linearity, a rattle or a clipped channel | fix the path, or work below the level at which it appears |
+| Low over a band with no obvious structure | a second, uncorrelated source is also driving the output | the [MISO page](/phonometry/signals/spectra/miso-coherence/): one input cannot explain two sources |
+
+Two closing cautions. The coherence estimate is biased **high** by
+$(1-\gamma^2)^2/n_d$, so a low coherence read from a handful of averages is even
+lower than it looks. And read the other way, a coherence near one *is* the
+acceptance criterion that makes the whole estimate reportable: quote it band by
+band beside the transfer function, because the bands where it falls are exactly
+the bands where the numbers above it mean nothing.
+
 ## 4. Fractional-octave smoothing
 
 `fractional_octave_smoothing` averages a spectrum over a rectangular window
@@ -354,19 +472,56 @@ room responses. The average is always computed on **power** (amplitudes are
 squared first, dB levels converted and back), so band power is conserved
 rather than amplitude, and a flat spectrum passes through exactly unchanged.
 
+The three `domain=` values name what the ordinate you hand it *is*, because the
+averaging is always done on power and the conversion back has to know where it
+started: a density or a power spectrum (`"power"`, the default), a linear
+magnitude such as a frequency-response $|H|$ (`"amplitude"`, squared first), or
+a curve already in decibels (`"db"`, converted and converted back).
+
 ```python
 from phonometry import fractional_octave_smoothing
 
-smooth_psd = fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
-smooth_mag = fractional_octave_smoothing(freqs, np.abs(response), 6.0,
+freqs = res.frequencies                    # from the section 1 estimate
+smooth_psd = fractional_octave_smoothing(freqs, res.psd, 3.0)
+magnitude = np.sqrt(res.psd)               # any linear |H| would do here
+smooth_mag = fractional_octave_smoothing(freqs, magnitude, 6.0,
                                          domain="amplitude")  # an FRF |H|
-smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
+levels = 10.0 * np.log10(res.psd)          # any dB curve would do here
+smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")
 ```
 
 A single spectral line with PSD ordinate $P$ (units²/Hz) in a bin of width
 $\Delta f$ smooths to the closed-form level
 $P\,\Delta f / (f_0(2^{1/2n} - 2^{-1/2n}))$
 over one kernel width, the oracle pinned in the tests.
+
+### A smoothed density is still a density
+
+Smoothing changes the *resolution* of the estimate, never its units. The output
+of `fractional_octave_smoothing` is a density in units²/Hz, exactly as the input
+was — flat white noise smooths to the same flat density — whereas the
+one-third-octave **band levels** of that same white noise rise 3 dB per band.
+Overlay a smoothed PSD on a filter-bank spectrum without converting and the two
+disagree by 20 to 30 dB, and neither is wrong.
+
+The conversion is one term. A fractional-octave band of centre frequency $f_c$
+has bandwidth $B_n = f_c\,(2^{1/2n} - 2^{-1/2n})$, that is $0.2316\,f_c$ in one
+third of an octave and $0.7071\,f_c$ in a full octave, so
+
+$$
+L_\text{band} = 10\log_{10}\!\left(\frac{G(f_c)\,B_n}{p_0^2}\right),
+$$
+
+which at 1 kHz in one-third octave adds $10\log_{10}(0.2316 \times 1000) =
+23.65$ dB to the density level, and 3 dB more for every octave upward. Summing
+the PSD bins across the band and multiplying by the bin spacing is the exact
+form; the expression above is its flat-within-the-band approximation.
+
+Which presentation belongs where: the **smoothed density** for comparing
+loudspeaker and room magnitude responses, where the eye wants a curve at
+constant relative resolution; the **band level** for anything that faces a
+criterion, or that has to agree with `octave_filter` and `OctaveFilterBank` —
+see [Levels](/phonometry/signals/levels/levels/).
 
 ## 5. Colored-noise generators
 
@@ -399,6 +554,28 @@ Measured over three decades (20 Hz – 20 kHz) with the estimator of section 1,
 the regression slope of each color lands within a few thousandths of a
 dB/octave of the exact value; the conformance suite pins the pink slope at
 -3.0116 against the exact -3.0103.
+
+Those slopes are density slopes, and they are not what a fractional-octave
+display of the same signal shows. A band's width grows in proportion to its
+centre frequency, so a band level is the density plus $10\log_{10} B_n$ with
+$B_n \propto f_c$: **every colour reads 3 dB per octave higher in a band display
+than its density slope suggests.** White noise, whose density is flat, therefore
+rises 3 dB per octave through an octave-band filter bank, and pink noise, at
+−3 dB/octave, comes out flat — which is why pink is the reference stimulus for
+room and loudspeaker work, and why an octave-band spectrum of white noise
+sloping upward is not a bug. Red noise falls 3 dB per octave in a band display
+and blue rises 6. The same +3 dB per octave applies to any density-versus-band
+comparison in this library; section 4 above gives the exact conversion, and
+[Levels](/phonometry/signals/levels/levels/) is where the band side lives.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/noise_colors.svg" alt="Welch spectral densities of the five noise colours over 20 hertz to 20 kilohertz, each normalised to its own 1 kilohertz level so the five straight lines fan out from a single point: violet rising at 6 dB per octave, blue at 3, white flat, pink falling at 3 and red at 6, each with its exact power law dashed underneath and the measured regression slope in the legend" width="88%" />
+
+*The five generators over three decades, each normalised to its own 1 kHz level
+so the slopes fan out from one point, with the exact power law dashed
+underneath. The measured regression slopes land within four thousandths of a
+decibel per octave of the exact values, and the residual is the random error of
+the *estimator*, not of the generator: the same seed reproduces the record bit
+for bit.*
 
 ## 6. Choosing the window
 
@@ -499,18 +676,19 @@ Because the tapers are orthogonal the eigenspectra are nearly uncorrelated,
 so the average carries about $2K$ chi-square degrees of freedom from a
 single record - the same statistical machinery as the Welch result (random
 error, chi-square confidence interval), without segmenting. The
-half-bandwidth $W = NW\,f_s/N$ is set through the duration x half-bandwidth
-product $NW$ (default 4). $2W$ is the resolution of the estimate (reported
-as `resolution_bandwidth`), and only the tapers below the Shannon number
-$2NW$ keep their spectral-window energy inside the design band - their
+design parameter is the dimensionless duration-times-half-bandwidth product
+$p = NW$ (default 4), and for a record of $N_r$ samples at $f_s$ it fixes the
+half-bandwidth $W = p\,f_s/N_r$ in hertz. $2W$ is the resolution of the estimate
+(reported as `resolution_bandwidth`), and only the tapers below the Shannon
+number $2p$ keep their spectral-window energy inside the design band - their
 concentrations $\lambda_k$ are reported as `eigenvalues`, and the default
-taper count is $K = 2NW - 1$, all tapers with near-unity concentration.
-Larger $NW$ admits more tapers (lower variance) at the cost of resolution.
+taper count is $K = 2p - 1$, all tapers with near-unity concentration.
+Larger $p$ admits more tapers (lower variance) at the cost of resolution.
 
 ```python
 from phonometry import multitaper_psd
 
-res = multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptive
+res = multitaper_psd(record, fs)                 # p = NW = 4, K = 7, adaptive
 print(res.degrees_of_freedom.mean())             # ~2K from one record
 print(res.eigenvalues)                           # taper concentrations
 res.plot()                                       # density with the CI band
@@ -546,7 +724,17 @@ scaling spreads over the $2W$ band). The Slepian tapers themselves come from
 quadruple-precision table of Percival & Walden (Table 382) to machine
 precision, which is the anchor oracle of the test suite.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence.svg" alt="Thomson multitaper spectral density of a 171 millisecond pink noise record in dB per Hz over 20 Hz to 20 kHz, with the 95 percent chi-square confidence band around the seven-taper adaptive estimate, the single-taper estimate as a jagged gray context line and the exact -3.01 dB per octave power law as a dashed reference" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence.svg" alt="Left: the multitaper spectral density of a 171 millisecond pink noise record with its 95 percent confidence band, against a Welch estimate with only 6.7 effective averages and a visibly wider band, a single-taper estimate as a jagged grey line and the exact minus 3.01 dB per octave law dashed. Right: a 60 dB tone over a pink floor, where the Hann-windowed Welch estimate leaves a wider skirt around the tone than the adaptive multitaper, and the equivalent degrees of freedom drop from about nine to five where the adaptive weights spend them" width="94%" />
+
+*Left, the case the text claims multitaper wins: a 171 ms record. Welch with a
+2048-sample segment fits only $n_d = 6.7$ effective averages into it, so its
+confidence band is visibly the wider of the two and its curve the rougher, while
+the 7-taper adaptive estimate carries 13.7 equivalent degrees of freedom from
+the same record. Right, the other reason to reach for it: a 60 dB tone over a
+pink floor. The Hann taper leaves a broader skirt around the tone than the
+adaptive weights do, and the price is printed on the right-hand axis — the
+equivalent degrees of freedom fall wherever the weights bought that protection,
+which is exactly what widens the confidence interval there.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -586,11 +774,15 @@ Welch average cannot give; stay with `power_spectral_density` for long
 records, where segment averaging is cheaper than $K$ full-length FFTs and
 the two estimators agree.
 
-## Relation to the H1/H2 estimators
+## Consistency with the frequency-response and intensity estimators
 
 The [frequency-response estimators](/phonometry/devices/electroacoustics/electroacoustics/)
-`transfer_function` and `coherence`, the two-microphone
-[sound intensity](/phonometry/devices/emission/intensity/) probe and these estimators
+form the same cross-spectra into a transfer function — $H_1 = G_{xy}/G_{xx}$,
+unbiased when the noise is on the output, and $H_2 = G_{yy}/G_{yx}$, unbiased
+when it is on the input — and the two-microphone
+[sound intensity](/phonometry/devices/emission/intensity/) probe forms the
+imaginary part of $G_{xy}$. Those estimators,
+`transfer_function` and `coherence`, the intensity probe and these estimators
 all share one Welch core (same taper, overlap policy and detrend-off
 calibration), so a PSD, a coherence and an $H_1$ computed with the same segment
 length are mutually consistent bin by bin. The same cross-spectral matrix
@@ -622,4 +814,10 @@ against.
 
 ## See also
 
+- [Data qualification](/phonometry/signals/metrology/data-qualification/): the stationarity every chi-square interval on this page assumes.
+- [Calibration and dBFS](/phonometry/signals/metrology/calibration/): where the factor that turns this page's densities into Pa²/Hz comes from.
+- [MISO coherence](/phonometry/signals/spectra/miso-coherence/): the same cross-spectral matrix with several correlated inputs.
+- [Time-frequency analysis](/phonometry/signals/spectra/time-frequency/): the same Welch segmentation displayed instead of averaged.
+- [Levels](/phonometry/signals/levels/levels/): the band-level side of the density/band conversion of section 4.
+- API reference: [`signals.spectra`](/phonometry/reference/api/signals/spectra/), [`signals.windows`](/phonometry/reference/api/signals/windows/) and [`signals.multitaper`](/phonometry/reference/api/signals/multitaper/).
 - Theory: [Frequency Resolution vs FFT Bin Spacing](/phonometry/reference/theory/signal-analysis/#frequency-resolution-vs-fft-bin-spacing): why the bin spacing of an FFT is not the resolution of the estimate, and what the window does to both.

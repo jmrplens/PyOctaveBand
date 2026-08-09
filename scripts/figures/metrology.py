@@ -12,13 +12,15 @@ reported. Everything here is embedded by a page under ``signals/metrology/``.
 import matplotlib.pyplot as plt
 import numpy as np
 
-from phonometry._plot.common import theme_fill
+from phonometry._plot.common import format_frequency_axis, theme_fill
 
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
+    COLOR_MUTED,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
+    COLOR_TERTIARY,
     save_figure,
 )
 
@@ -58,6 +60,152 @@ def generate_calibration_stability(output_dir: str) -> None:
     ax.set_ylabel("F-weighted level re mean [dB]")
     ax.legend(loc="upper right", fontsize=9)
     save_figure(output_dir, "calibration_stability.png")
+    plt.close()
+
+
+def generate_calibration_narrowband_bias(output_dir: str) -> None:
+    """Sensitivity error against coupler SNR: broadband RMS vs Goertzel."""
+    print("Generating calibration_narrowband_bias...")
+    import warnings
+
+    from phonometry import sensitivity
+
+    fs = 48000
+    tt = np.arange(int(fs * 6.0)) / fs
+    # 1 Pa RMS tone landing on exactly 1.0 digital unit RMS, so the true
+    # sensitivity is the 94 dB pressure itself and the error reads directly.
+    tone = np.sqrt(2.0) * np.sin(2 * np.pi * 1000.0 * tt)
+    s_true = 2e-5 * 10 ** (94.0 / 20.0)
+    rng = np.random.default_rng(7)
+    raw = rng.standard_normal(tone.size)
+    raw /= np.sqrt(np.mean(raw ** 2))
+
+    snr_db = np.arange(0.0, 40.5, 1.0)
+    err_rms, err_nb = [], []
+    for snr in snr_db:
+        x = tone + raw * 10 ** (-snr / 20.0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            err_rms.append(20 * np.log10(sensitivity(x, fs=fs) / s_true))
+            err_nb.append(
+                20 * np.log10(sensitivity(x, fs=fs, narrowband=True) / s_true)
+            )
+    closed = -10 * np.log10(1.0 + 10 ** (-snr_db / 10.0))
+    # Where the broadband estimator alone eats the whole class 1 acceptance
+    # limit for the generated level (IEC 60942:2017 Table 2, 160 Hz-1.25 kHz).
+    limit = 0.25
+    crossing = 10 * np.log10(1.0 / (10 ** (limit / 10.0) - 1.0))
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.axhspan(-limit, limit, color=theme_fill(COLOR_PRIMARY, ax), zorder=0,
+               label="IEC 60942 Table 2 class 1 acceptance limit (±0.25 dB)")
+    ax.plot(snr_db, err_rms, color=COLOR_SECONDARY, linewidth=2.0,
+            label="narrowband=False (full-band RMS)")
+    ax.plot(snr_db, closed, color=COLOR_FG, linestyle=":", linewidth=1.4,
+            label=r"closed form $-10\log_{10}(1 + 1/\mathrm{SNR})$")
+    ax.plot(snr_db, err_nb, color=COLOR_PRIMARY, linewidth=2.0,
+            label="narrowband=True (Goertzel)")
+    ax.axvline(crossing, color=COLOR_SECONDARY, linestyle="--", linewidth=1.2,
+               alpha=0.8)
+    ax.annotate(f"below {crossing:.1f} dB SNR the estimator\nalone spends the "
+                "whole class 1 limit",
+                xy=(crossing, -limit), xytext=(crossing + 1.5, -0.95),
+                fontsize=9, color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
+                            "lw": 1.1})
+    ax.set_xlim(0, 40)
+    ax.set_ylim(-2.0, 0.5)
+    ax.set_xlabel("Coupler signal-to-noise ratio [dB]")
+    ax.set_ylabel(r"Sensitivity error $20\log_{10}(S/S_\mathrm{true})$ [dB]")
+    ax.set_title("Broadband noise in the calibrator take biases every later "
+                 "level", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "calibration_narrowband_bias.png")
+    plt.close()
+
+
+def generate_dbfs_versus_spl(output_dir: str) -> None:
+    """The two reference frames of a band spectrum, and the peak overshoot."""
+    print("Generating dbfs_versus_spl...")
+    import warnings
+
+    from phonometry import LevelCalibration, octave_filter, sensitivity, tone_burst
+
+    fs = 48000
+    tt = np.arange(fs) / fs
+    # A calibrator take sitting 12 dB below full scale, as a gain set for a
+    # louder measurement would leave it.
+    cal = 0.25 * np.sqrt(2.0) * np.sin(2 * np.pi * 1000.0 * tt)
+    rng = np.random.default_rng(3)
+    # A machine-like record: pink background, a fan hump around 250 Hz and a
+    # roll-off above 4 kHz, so the two frames have a shape to superimpose.
+    noise = rng.standard_normal(fs)
+    freqs = np.fft.rfftfreq(fs, 1.0 / fs)
+    shape = np.zeros_like(freqs)
+    shape[1:] = ((freqs[1:] / 1000.0) ** -0.5
+                 * (1.0 + 3.0 * np.exp(-((np.log2(freqs[1:] / 250.0)) ** 2) / 0.5))
+                 / np.sqrt(1.0 + (freqs[1:] / 4000.0) ** 4))
+    record = np.fft.irfft(np.fft.rfft(noise) * shape, n=fs)
+    record *= 0.02 / np.sqrt(np.mean(record ** 2))
+
+    limits = [22.0, 11300.0]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        factor = sensitivity(cal, fs=fs)
+        spl, bands = octave_filter(record, fs, fraction=3, limits=limits,
+                                   calibration=LevelCalibration(factor=factor))
+        dbfs, _ = octave_filter(record, fs, fraction=3, limits=limits,
+                                calibration=LevelCalibration(dbfs=True))
+    offset = 20 * np.log10(factor / 2e-5)
+
+    _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+
+    # --- Left: one spectrum, two origins. ---
+    ax_l.semilogx(bands, spl, color=COLOR_PRIMARY, marker="o", markersize=3.5,
+                  linewidth=1.8, label="dB SPL (factor from the calibrator)")
+    ax_l.semilogx(bands, dbfs + offset, color=COLOR_SECONDARY, linestyle="--",
+                  linewidth=1.8, label=f"dBFS + {offset:.2f} dB")
+    ax_l.set_xlabel("Frequency [Hz]")
+    ax_l.set_ylabel("Third-octave band level [dB]")
+    ax_l.set_title(f"Same shape, different origin: {offset:.2f} dB apart",
+                   fontweight="bold", pad=10)
+    ax_l.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_l.set_axisbelow(True)
+    format_frequency_axis(ax_l, 22.0, 11300.0)
+    ax_l.legend(loc="upper left", fontsize=9)
+
+    # --- Right: the band-filter onset overshoot the peak mode reads. ---
+    drive = 0.5
+    burst = tone_burst(fs, 1000.0, 40, amplitude=drive, post_silence=0.03)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        _levels, _bands, filtered = octave_filter(burst.signal, fs, fraction=1,
+                                                  sigbands=True)
+    idx = int(np.argmin(np.abs(np.asarray(_bands, dtype=float) - 1000.0)))
+    band = np.asarray(filtered[idx], dtype=float)
+    overshoot = float(np.max(np.abs(band)))
+    axis_ms = np.arange(band.size) / fs * 1000.0
+    ax_r.plot(axis_ms, band, color=COLOR_MUTED, linewidth=0.8,
+              label="1 kHz band signal")
+    ax_r.axhline(drive, color=COLOR_FG, linestyle=":", linewidth=1.2,
+                 label=f"drive amplitude {drive}")
+    ax_r.axhline(overshoot, color=COLOR_SECONDARY, linewidth=1.4,
+                 label=f"band peak, +{20 * np.log10(overshoot / drive):.2f} dB "
+                       "over the steady tone")
+    ax_r.set_xlim(0, 12.0)
+    ax_r.set_xlabel("Time [ms] (onset of a 40-cycle burst)")
+    ax_r.set_ylabel("Band signal [digital units]")
+    ax_r.set_title("mode='peak' reads the filter's onset transient",
+                   fontweight="bold", pad=10)
+    ax_r.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_r.set_axisbelow(True)
+    ax_r.legend(loc="lower right", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "dbfs_versus_spl.png")
     plt.close()
 
 
@@ -299,6 +447,285 @@ def generate_uncertainty(output_dir: str) -> None:
 
     plt.tight_layout()
     save_figure(output_dir, "uncertainty_budget.png")
+    plt.close()
+
+
+def generate_stationarity_glide_blind_spot(output_dir: str) -> None:
+    """The nonstationary record the full-band mean square cannot see."""
+    print("Generating stationarity_glide_blind_spot...")
+    from scipy import signal as scipy_signal
+
+    from phonometry import stationarity_test
+
+    fs = 8192.0
+    n = 1 << 16
+    tt = np.arange(n) / fs
+    # Constant-amplitude linear glide, 200 Hz to 2 kHz over the record.
+    f0, f1 = 200.0, 2000.0
+    glide = np.sin(2 * np.pi * (f0 * tt + (f1 - f0) / (2 * tt[-1]) * tt ** 2))
+    lo, hi = 200.0, 400.0
+    sos = scipy_signal.butter(6, [lo / (fs / 2), hi / (fs / 2)], btype="band",
+                              output="sos")
+    banded = scipy_signal.sosfiltfilt(sos, glide)
+
+    full = stationarity_test(glide, fs)
+    band = stationarity_test(banded, fs)
+
+    _fig, axes = plt.subplots(3, 1, figsize=(10, 11))
+
+    # (a) The instantaneous frequency of the glide, and the band the test
+    # of panel (c) looks through. A line rather than a spectrogram: the
+    # figures of this project stay vector.
+    axes[0].plot(tt, f0 + (f1 - f0) * tt / tt[-1], color=COLOR_PRIMARY,
+                 linewidth=2.0, label="instantaneous frequency")
+    axes[0].axhspan(lo, hi, color=theme_fill(COLOR_SECONDARY, axes[0]),
+                    zorder=0, label=f"the {lo:.0f}-{hi:.0f} Hz band of panel (c)")
+    axes[0].set_xlim(0, tt[-1])
+    axes[0].set_ylim(0, 2200)
+    axes[0].set_xlabel("Time [s]")
+    axes[0].set_ylabel("Frequency [Hz]")
+    axes[0].grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    axes[0].set_axisbelow(True)
+    axes[0].legend(loc="upper left", fontsize=9)
+    axes[0].set_title(f"(a) The record: a {f0:.0f} Hz to {f1:.0f} Hz glide at "
+                      "constant amplitude", fontweight="bold", pad=8)
+
+    title_full = (f"(b) Full band: A = {full.count}, inside "
+                  f"{res_bounds(full)} — accepted, and blind")
+    title_band = (f"(c) Band-limited {lo:.0f}-{hi:.0f} Hz: A = {band.count}, "
+                  f"outside {res_bounds(band)} — rejected")
+    for ax, res, color, title in (
+        (axes[1], full, COLOR_PRIMARY, title_full),
+        (axes[2], band, COLOR_SECONDARY, title_band),
+    ):
+        idx = np.arange(1, res.n_segments + 1)
+        ax.plot(idx, res.segment_values, "o-", color=color, linewidth=1.6,
+                markersize=5)
+        ax.set_xlabel("Segment index")
+        ax.set_ylabel("Segment mean square")
+        # Both panels share one scale, so the flat sequence reads as flat
+        # rather than as the fifth-decimal noise a zoomed axis would show.
+        ax.set_ylim(-0.03, 0.58)
+        low, high = float(np.min(res.segment_values)), float(np.max(res.segment_values))
+        ax.text(0.98, 0.08, f"segment values span {low:.4f} to {high:.4f}",
+                transform=ax.transAxes, ha="right", fontsize=9,
+                color=COLOR_MUTED)
+        ax.set_title(title, fontweight="bold", pad=8)
+        ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+        ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    save_figure(output_dir, "stationarity_glide_blind_spot.png")
+    plt.close()
+
+
+def res_bounds(res: object) -> str:
+    """The half-open acceptance region of a qualification result, as text."""
+    lo, hi = res.bounds  # type: ignore[attr-defined]
+    return f"({lo}, {hi}]"
+
+
+def generate_rice_nongaussian_screen(output_dir: str) -> None:
+    """Crossing rates off the Rice curve, and what an out-of-band floor does."""
+    print("Generating rice_nongaussian_screen...")
+    from scipy import signal as scipy_signal
+
+    from phonometry import level_crossing_rate, peak_statistics
+
+    fs = 20480.0
+    n = 1 << 19
+    gauss = _bandlimited_gaussian_figure_record(0, fs, n, 800.0, 1200.0)
+    clipped = np.clip(gauss, -2.5, 2.5)
+    rng = np.random.default_rng(11)
+    impulsive = gauss.copy()
+    impulsive[rng.choice(n, 400, replace=False)] += 6.0 * rng.choice(
+        [-1.0, 1.0], 400)
+
+    _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.6))
+
+    levels = np.linspace(-4.0, 4.0, 33)
+    for record, color, marker, size, label in (
+        (gauss, COLOR_PRIMARY, "o", 6, "Gaussian reference"),
+        (clipped, COLOR_SECONDARY, "s", 4, "hard-clipped at 2.5 σ"),
+        (impulsive, COLOR_TERTIARY, "^", 4, "Gaussian + sparse 6 σ spikes"),
+    ):
+        res = level_crossing_rate(record, fs, levels=levels * np.std(record))
+        ax_l.plot(res.levels / np.std(record), res.rice_rates, color=color,
+                  linestyle="--", linewidth=1.2, alpha=0.8)
+        ax_l.plot(res.levels / np.std(record), res.rates, marker, color=color,
+                  markersize=size, linestyle="none", label=label)
+    for edge in (-2.5, 2.5):
+        ax_l.axvline(edge, color=COLOR_SECONDARY, linestyle=":", linewidth=1.1,
+                     alpha=0.8)
+    ax_l.text(-3.9, 0.16, "spikes lift both tails above the curve", fontsize=9,
+              color=COLOR_TERTIARY, ha="left")
+    ax_l.text(4.0, 0.16, "clipping: no crossings past 2.5 σ", fontsize=9,
+              color=COLOR_SECONDARY, ha="right")
+    ax_l.set_yscale("log")
+    ax_l.set_ylim(1e-1, 1e4)
+    ax_l.set_xlabel("Crossing level a / σ")
+    ax_l.set_ylabel("Crossings per second [1/s]")
+    ax_l.set_title("Measured rates against each record's own Rice curve",
+                   fontweight="bold", pad=10)
+    ax_l.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_l.set_axisbelow(True)
+    ax_l.legend(loc="upper left", fontsize=9)
+
+    # Right: what an out-of-band noise floor does to the irregularity factor.
+    fs2 = 51200.0
+    n2 = 1 << 20
+    rng2 = np.random.default_rng(3)
+    freqs = np.fft.rfftfreq(n2, 1.0 / fs2)
+    spec = rng2.standard_normal(freqs.size) + 1j * rng2.standard_normal(freqs.size)
+    floor = np.where(freqs <= 2000.0, 1.0, 10 ** (-50.0 / 20.0))
+    wide = np.fft.irfft(spec * floor, n2)
+    cutoffs = np.array([2500.0, 4000.0, 6000.0, 8000.0, 10000.0, 13000.0,
+                        16000.0, 19000.0, 22000.0])
+    factors = []
+    for cut in cutoffs:
+        sos = scipy_signal.butter(8, cut / (fs2 / 2), btype="low", output="sos")
+        factors.append(peak_statistics(scipy_signal.sosfiltfilt(sos, wide),
+                                       fs2).irregularity_factor)
+    ideal = float(np.sqrt(5) / 3)
+    ax_r.plot(cutoffs / 1000.0, factors, "o-", color=COLOR_PRIMARY, linewidth=2)
+    ax_r.axhline(ideal, color=COLOR_FG, linestyle="--", linewidth=1.2,
+                 label=f"ideal low-pass, $\\sqrt{{5}}/3$ = {ideal:.3f}")
+    ax_r.axvline(2.0, color=COLOR_SECONDARY, linestyle=":", linewidth=1.4,
+                 label="the physical band ends at 2 kHz")
+    ax_r.set_xlabel("Analysis upper cut-off [kHz]")
+    ax_r.set_ylabel("Irregularity factor $r$")
+    ax_r.set_title("A floor 50 dB down, and $m_4$ weighting by $f^4$",
+                   fontweight="bold", pad=10)
+    ax_r.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_r.set_axisbelow(True)
+    ax_r.legend(loc="lower left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "rice_nongaussian_screen.png")
+    plt.close()
+
+
+def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
+    """The three regimes in which the GUM interval and Monte Carlo diverge."""
+    print("Generating uncertainty_gum_vs_mc...")
+    import phonometry as ph
+
+    panels = []
+
+    # A. One dominant rectangular input: the output is nearly rectangular and
+    # the Gaussian interval overcovers it.
+    q_a = [ph.rectangular(0.0, 1.0, name="Dominant rectangular"),
+           ph.Quantity(0.0, 0.1, name="Small Gaussian")]
+    panels.append(("A dominant rectangular input", lambda a, b: a + b, q_a,
+                   "Correction [dB]", None))
+
+    # B. Non-linear model: the energy sum of two levels with wide inputs.
+    q_b = [ph.Quantity(70.0, 3.0, name="L1"), ph.Quantity(70.0, 3.0, name="L2")]
+    panels.append(("A non-linear model (energy sum)",
+                   lambda l1, l2: 10 * np.log10(10 ** (l1 / 10) + 10 ** (l2 / 10)),
+                   q_b, "Combined level [dB]", None))
+
+    # C. An output against a physical bound.
+    q_c = [ph.Quantity(0.95, 0.06, name="alpha")]
+    # The clamp piles a finite probability mass exactly on the bound, so the
+    # histogram spike there is cut off to keep the rest of the shape readable.
+    panels.append(("An output against a physical bound",
+                   lambda a: np.minimum(a, 1.0), q_c, "Absorption coefficient",
+                   9.0))
+
+    _fig, axes = plt.subplots(3, 1, figsize=(10, 11))
+    for ax, (title, model, quantities, xlabel, ymax) in zip(axes, panels):
+        gum = ph.combine_uncertainty(model, quantities)
+        mc = ph.monte_carlo(model, quantities, trials=400_000, coverage=0.95,
+                            seed=1, keep_samples=True)
+        _k, big = gum.expanded(0.95)
+        ax.hist(mc.samples, bins=160, density=True, color=COLOR_PRIMARY,
+                alpha=0.35, label="Monte Carlo (Supplement 1)")
+        span = np.linspace(float(np.min(mc.samples)), float(np.max(mc.samples)), 500)
+        u_c = gum.combined_uncertainty
+        ax.plot(span, np.exp(-0.5 * ((span - gum.value) / u_c) ** 2)
+                / (u_c * np.sqrt(2 * np.pi)), color=COLOR_SECONDARY, lw=2,
+                label="GUM Gaussian")
+        ax.axvspan(mc.interval[0], mc.interval[1], zorder=0,
+                   color=theme_fill(COLOR_PRIMARY, ax),
+                   label=f"MC 95 % interval [{mc.interval[0]:.2f}, "
+                         f"{mc.interval[1]:.2f}]")
+        for edge in (gum.value - big, gum.value + big):
+            ax.axvline(edge, color=COLOR_SECONDARY, ls="--", lw=1.4)
+        ax.axvline(gum.value - big, color=COLOR_SECONDARY, ls="--", lw=1.4,
+                   label=f"GUM Y ± U  [{gum.value - big:.2f}, "
+                         f"{gum.value + big:.2f}]")
+        if ymax is not None:
+            ax.set_ylim(0, ymax)
+            ax.annotate("all the mass beyond the bound\npiles up on it",
+                        xy=(1.0, ymax * 0.92), xytext=(0.87, ymax * 0.62),
+                        fontsize=9, color=COLOR_FG,
+                        arrowprops={"arrowstyle": "->", "color": COLOR_FG,
+                                    "lw": 1.1})
+        ax.set_title(title, fontweight="bold", pad=8)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("Probability density")
+        ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+        ax.set_axisbelow(True)
+        ax.legend(loc="upper left", fontsize=8.5)
+
+    plt.tight_layout()
+    save_figure(output_dir, "uncertainty_gum_vs_mc.png")
+    plt.close()
+
+
+def generate_uncertainty_correlation(output_dir: str) -> None:
+    """What ignoring correlation costs a two-term budget."""
+    print("Generating uncertainty_correlation...")
+    import phonometry as ph
+
+    u_i = 0.3
+    pair = [ph.Quantity(0.0, u_i, name="Term 1"),
+            ph.Quantity(0.0, u_i, name="Term 2")]
+    rho = np.linspace(-1.0, 1.0, 81)
+    same, opposite = [], []
+    for r in rho:
+        corr = [[1.0, float(r)], [float(r), 1.0]]
+        same.append(ph.combine_uncertainty(lambda a, b: a + b, pair,
+                                           correlation=corr).combined_uncertainty)
+        opposite.append(ph.combine_uncertainty(lambda a, b: a - b, pair,
+                                               correlation=corr).combined_uncertainty)
+    quad = float(np.hypot(u_i, u_i))
+
+    _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+    ax_l.plot(rho, same, color=COLOR_PRIMARY, lw=2.0,
+              label="sensitivities of the same sign")
+    ax_l.plot(rho, opposite, color=COLOR_SECONDARY, lw=2.0, ls="--",
+              label="sensitivities of opposite sign")
+    ax_l.axhline(quad, color=COLOR_FG, ls=":", lw=1.3,
+                 label=f"quadrature value {quad:.3f} dB (assumes ρ = 0)")
+    ax_l.set_xlabel("Correlation coefficient ρ between the two terms")
+    ax_l.set_ylabel("Combined standard uncertainty [dB]")
+    ax_l.set_title("Two terms of 0.3 dB each", fontweight="bold", pad=10)
+    ax_l.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_l.set_axisbelow(True)
+    ax_l.legend(loc="upper left", fontsize=9)
+
+    linear = 2 * u_i
+    bars = ax_r.bar(["assumed\nindependent", "traceable to the\nsame calibrator"],
+                    [quad, linear], color=[COLOR_PRIMARY, COLOR_SECONDARY],
+                    width=0.55, zorder=2)
+    for rect, val in zip(bars, (quad, linear)):
+        ax_r.text(rect.get_x() + rect.get_width() / 2, val + 0.012,
+                  f"{val:.3f} dB", ha="center", fontweight="bold")
+    ax_r.annotate(f"+{100 * (linear / quad - 1):.0f} % understated",
+                  xy=(1, linear), xytext=(0.28, linear * 0.72), fontsize=10,
+                  color=COLOR_SECONDARY,
+                  arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
+                              "lw": 1.2})
+    ax_r.set_ylim(0, linear * 1.22)
+    ax_r.set_ylabel("Combined standard uncertainty [dB]")
+    ax_r.set_title("The same budget, read two ways", fontweight="bold", pad=10)
+    ax_r.grid(axis="y", color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax_r.set_axisbelow(True)
+
+    plt.tight_layout()
+    save_figure(output_dir, "uncertainty_correlation.png")
     plt.close()
 
 

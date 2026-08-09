@@ -314,9 +314,12 @@ from figures.signals import (
 )
 from figures.simulation import (
     generate_elastic_halfspace_waves,
+    generate_elastic_probe_traces,
     generate_fdtd_domain_geometry,
+    generate_fdtd_plane_wave_launch,
     generate_fdtd_room_modes,
     generate_fdtd_simulation,
+    generate_metadiffuser_meshed_panel,
     generate_metadiffuser_ntff_polar,
     generate_scholte_interface_wave,
 )
@@ -508,6 +511,8 @@ __all__ = [
     "generate_facade_field_insulation",
     "generate_facade_prediction",
     "generate_fdtd_domain_geometry",
+    "generate_elastic_probe_traces",
+    "generate_fdtd_plane_wave_launch",
     "generate_fdtd_room_modes",
     "generate_fdtd_simulation",
     "generate_field_airborne_insulation",
@@ -576,6 +581,7 @@ __all__ = [
     "generate_masonry_wall_ties",
     "generate_mechanical_mobility",
     "generate_metadiffuser_geometry",
+    "generate_metadiffuser_meshed_panel",
     "generate_metadiffuser_ntff_polar",
     "generate_metadiffuser_polar",
     "generate_microphone_directivity",

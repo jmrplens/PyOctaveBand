@@ -117,7 +117,13 @@ oracle used to verify the implementation.
 
 The **partial coherence** of input $i$ (Eq. 7.87) is its coherence with the
 output once the linear effect of the inputs *before it in the conditioning
-order* has been removed:
+order* has been removed. The subscript notation is the book's, and the
+exclamation mark is **not a factorial**: a trailing $\cdot\,r!$ means
+*conditioned on inputs 1 through $r$, in the chosen order*. So
+$G_{ij\cdot r!}$ is the cross-spectrum of $i$ and $j$ with the linear effect of
+the first $r$ inputs removed, and $G_{yy\cdot q!}$ — which section 2 ends on —
+is the output spectrum with every input removed, that is the residual noise
+$G_{nn}$ of the multiple coherence above. In symbols:
 
 $$
 \gamma^2_{iy\cdot(i-1)!}(f)
@@ -189,6 +195,35 @@ dominant[np.argmin(abs(f - 200.0))]    # 0 (input 1 drives the low band)
 dominant[np.argmin(abs(f - 2500.0))]   # 1 (input 2 drives the high band)
 ```
 
+## Instrumenting a MISO measurement
+
+Everything above runs on synthetic arrays, and the method's whole value is on
+real machinery, in a real room, where the sources cannot be switched off one at
+a time — which is exactly why the technique exists. What it separates is what
+the *references* separate, so the reference sensors are the measurement.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_setup.svg" alt="Plan view of a plant room to scale: a fan on resilient mounts and a compressor three metres apart, each with its own reference sensor, an accelerometer stud-mounted on the fan foot and a microphone 0.3 m from the compressor casing, a receiver microphone at the operator position four metres away at 1.5 m height, a dashed leakage path showing the fan's airborne sound reaching the compressor's reference microphone, and a right-hand column with the four channels entering one simultaneously sampling front end" width="92%" />
+
+- **One reference per source, placed so that it hears its own source and as
+  little as possible of the others.** An accelerometer stud-mounted on the foot
+  of a machine, a microphone 0.2 to 0.5 m from the casing surface rather than
+  out in the room. A reference that picks up its neighbour is the input-to-input
+  correlation the conditioning then has to undo, and it undoes it only as far
+  as the arithmetic allows (see below).
+- **One simultaneously sampling front end for every reference and the
+  receiver.** The conditioning is built entirely from cross-spectra, so an
+  inter-channel skew tilts every one of them; a converter that sequences its
+  channels puts that skew in for free.
+- **Fixed gains for the whole run**, and every source running together at the
+  operating point being diagnosed.
+- **Averages to spare.** Each conditioning step spends one, so the last-ordered
+  input carries $n_d - (q-1)$; aim for a few hundred effective averages before
+  reading a small partial coherence as a physical zero.
+- **Record with the result:** sensor model, position and sensitivity per
+  channel, the machine speed and load, the segment length, and the conditioning
+  order actually applied (`res.order`) — the split is not reproducible without
+  the last one.
+
 ## 4. Statistical quality and the conditioning order
 
 The random errors follow Section 9.3. Conditioning on the $i-1$ preceding
@@ -202,15 +237,53 @@ The ordinary and multiple coherences do not depend on the conditioning order,
 but the partial coherences and the coherent-output decomposition do: each
 input is conditioned on whatever precedes it. Absent a physical ordering,
 Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
-ordinary coherence with the output. Pass `order` to choose:
+ordinary coherence with the output. Suppose a third, weakly coupled source is
+recorded alongside the two above — a fan in the next room, coherent with
+neither. Pass `order` to override the default:
 
 ```python
+x3 = noise_signal(fs, 32.0, color="white", seed=4)   # the third, weak source
 res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): the order actually applied
 res.plot()           # the two panels, recomputed in the applied order
 ```
 
-Two practical pitfalls are worth naming. *Averaging*: every conditioning
+The ordinary and multiple coherences come back identical whatever `order` says;
+the partial coherences and the per-source shares do not, because each input is
+credited only with what the inputs before it left unexplained.
+
+### Check the inputs against each other first
+
+The conditioning inverts the input cross-spectral matrix, so it separates only
+sources that are genuinely separable. Each Schur step divides by the power the
+pivot input still has *after* the preceding inputs have been removed, so two
+references that are nearly the same signal leave almost nothing in that pivot
+and the next step amplifies estimation noise without bound. Bendat & Piersol
+treat the limit as its own case (their Figure 7.3): an input-to-input coherence
+of one means the two records are one source reaching the output by two paths,
+and no two-input split exists at all.
+
+This implementation does not raise on that case. A conditioned pivot whose power
+falls below a relative floor is skipped, and the input contributes exactly zero
+— **which looks identical to the page's headline result**, a source that merely
+correlates, even when both sources are real and only the references were badly
+placed.
+
+So run the check before believing the split:
+
+1. Compute the ordinary coherence *between every pair of inputs* — one
+   `cross_spectral_density` per pair — before calling `miso_coherence`.
+2. In any band where a pair exceeds about 0.9, do not read the partial
+   coherences or the per-source shares. The multiple coherence and $G_{yy}$ are
+   still valid there; the attribution is not.
+3. Confirm by reordering. A well-conditioned decomposition barely moves when the
+   inputs are reordered; an ill-conditioned one moves a lot.
+
+The remedies are physical, not numerical: move a reference closer to its own
+source so it stops hearing the other one, run the sources one at a time if the
+machine allows it, or accept that the pair is one input and merge them.
+
+Two further pitfalls are worth naming. *Averaging*: every conditioning
 step spends a degree of freedom, so with few segments the partial
 coherences of the last-ordered inputs are the least trustworthy numbers on
 the page; average generously before reading a small partial coherence as

@@ -301,13 +301,19 @@ from .materials import (
 )
 from .media import _extract_poster
 from .metrology import (
+    generate_calibration_narrowband_bias,
     generate_calibration_stability,
+    generate_dbfs_versus_spl,
     generate_rice_level_crossings,
+    generate_rice_nongaussian_screen,
     generate_rice_peak_distribution,
     generate_runs_test,
+    generate_stationarity_glide_blind_spot,
     generate_stationarity_test,
     generate_trend_test,
     generate_uncertainty,
+    generate_uncertainty_correlation,
+    generate_uncertainty_gum_vs_mc,
 )
 from .perception import (
     generate_age_threshold_fractiles,
@@ -408,22 +414,37 @@ from .schematics import (
     animate_time_weighting_ballistics,
 )
 from .signals import (
+    generate_architecture_tradeoff,
+    generate_ballistics_vs_duration,
     generate_block_processing_continuity,
+    generate_c_minus_a_spectrum,
+    generate_class_mask_architectures,
     generate_class_mask_overlay,
     generate_crossover_plot,
     generate_decomposition_plot,
+    generate_dose_exchange,
+    generate_energy_vs_arithmetic_mean,
     generate_filter_class0_mask,
     generate_filter_responses,
     generate_filter_type_comparison,
     generate_g_weighting_response,
     generate_group_delay_comparison,
+    generate_leakage_floor,
+    generate_level_distribution,
     generate_ln_levels_example,
     generate_multichannel_response,
+    generate_parametric_eq_cascade,
     generate_parametric_eq_family,
+    generate_peak_oversampling,
+    generate_pole_migration,
     generate_sel_concept,
     generate_signal_responses,
+    generate_slm_level_track,
+    generate_slm_third_octave,
     generate_special_weighting_responses,
     generate_spectrogram_example,
+    generate_streaming_level_seams,
+    generate_survey_channel_average,
     generate_time_weighting_plot,
     generate_tone_burst_iec,
     generate_weighting_accuracy_hf,
@@ -433,9 +454,12 @@ from .signals import (
 )
 from .simulation import (
     generate_elastic_halfspace_waves,
+    generate_elastic_probe_traces,
     generate_fdtd_domain_geometry,
+    generate_fdtd_plane_wave_launch,
     generate_fdtd_room_modes,
     generate_fdtd_simulation,
+    generate_metadiffuser_meshed_panel,
     generate_metadiffuser_ntff_polar,
     generate_scholte_interface_wave,
 )
@@ -445,7 +469,9 @@ from .spectral_estimation import (
     generate_cross_spectral_density_delay,
     generate_miso_coherence,
     generate_multitaper_psd_confidence,
+    generate_noise_colors,
     generate_psd_confidence_smoothing,
+    generate_psd_segment_tradeoff,
     generate_window_functions_tradeoff,
     generate_zoom_fft_resolution,
 )
@@ -532,7 +558,29 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_filter_class0_mask,
     generate_weighting_class_mask,
     generate_calibration_stability,
+    generate_calibration_narrowband_bias,
+    generate_dbfs_versus_spl,
     generate_sel_concept,
+    generate_ballistics_vs_duration,
+    # Filter banks: the z-plane behind the multirate design, and the cascade
+    # the parametric-EQ snippet builds.
+    generate_pole_migration,
+    generate_parametric_eq_cascade,
+    generate_architecture_tradeoff,
+    generate_class_mask_architectures,
+    generate_leakage_floor,
+    generate_streaming_level_seams,
+    generate_survey_channel_average,
+    generate_c_minus_a_spectrum,
+    # Integrated and statistical levels: the distribution the percentiles are
+    # defined on, the energy-mean rule, the inter-sample peak and the dose.
+    generate_level_distribution,
+    generate_energy_vs_arithmetic_mean,
+    generate_peak_oversampling,
+    generate_dose_exchange,
+    # The sound level meter walkthrough: the readouts it computes, drawn.
+    generate_slm_level_track,
+    generate_slm_third_octave,
     generate_lden_profile,
     generate_rd1367_activity_assessment,
     generate_dbhr_global_index,
@@ -734,6 +782,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_enclosed_space_absorption,
     # Measurement uncertainty (GUM Guide 98-3 + Supplement 1 Monte Carlo).
     generate_uncertainty,
+    generate_uncertainty_gum_vs_mc,
+    generate_uncertainty_correlation,
+    generate_stationarity_glide_blind_spot,
+    generate_rice_nongaussian_screen,
     # Psychoacoustics / open-plan plots (sharpness weighting, spatial decay)
     generate_sharpness_weighting,
     generate_open_plan_decay,
@@ -797,6 +849,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Calibrated spectral analysis: PSD with chi-square confidence interval
     # and 1/3-octave smoothing on exact-slope pink noise (Bendat & Piersol).
     generate_psd_confidence_smoothing,
+    generate_psd_segment_tradeoff,
+    generate_noise_colors,
     # Thomson multitaper density of a short record with its chi-square
     # band against the single-taper estimate (Percival & Walden 1993).
     generate_multitaper_psd_confidence,
@@ -828,6 +882,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_trend_test,
     generate_stationarity_test,
     generate_rice_level_crossings,
+    generate_rice_nongaussian_screen,
     generate_rice_peak_distribution,
     # Regularized inversion (Kirkeby) and the Mueller-Massarani shaped sweep.
     generate_regularized_inversion,
@@ -900,10 +955,16 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_rotorcraft_kinematics,
     generate_rotorcraft_mean_ground_plane,
     generate_rotorcraft_terrain_screening,
-    # 2D FDTD wave simulation (public API concept figure).
+    # 2D FDTD wave simulation (public API concept figure), the one-way
+    # plane-wave launcher measured on its own scene, and the meshed
+    # metadiffuser panel the transfer matrix homogenises.
     generate_fdtd_simulation,
-    # Elastic P-SV FDTD: half-space snapshot with P/S/Rayleigh fronts.
+    generate_fdtd_plane_wave_launch,
+    generate_metadiffuser_meshed_panel,
+    # Elastic P-SV FDTD: half-space snapshot with P/S/Rayleigh fronts,
+    # and the water-column probe history the result plots by default.
     generate_elastic_halfspace_waves,
+    generate_elastic_probe_traces,
     # Elastic FDTD fluid-solid coupling: the Scholte interface wave.
     generate_scholte_interface_wave,
     # Theoretical panel sound insulation (single/double wall, radiation, slit).

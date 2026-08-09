@@ -22,6 +22,7 @@ from .theme import (
     COLOR_FG,
     COLOR_GRID,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
@@ -96,7 +97,22 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
     level_1k = float(np.mean(10.0 * np.log10(res.psd[band][anchor])))
     ref_db = level_1k - 10.0 * np.log10(freqs / 1000.0)
 
-    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    _fig, (ax, ax_hd) = plt.subplots(1, 2, figsize=(13.0, 6.0))
+    # The estimator the reader would otherwise reach for on this record: Welch
+    # with a 2048-sample segment, which fits about seven segments into 171 ms.
+    from phonometry import power_spectral_density
+
+    welch = power_spectral_density(x, fs, nperseg=2048)
+    wband = (welch.frequencies >= 20.0) & (welch.frequencies <= 20000.0)
+    ax.fill_between(
+        welch.frequencies[wband],
+        10.0 * np.log10(welch.ci_lower[wband]),
+        10.0 * np.log10(welch.ci_upper[wband]),
+        color=COLOR_SECONDARY, alpha=0.20, lw=0.0,
+        label=f"Welch 95 % interval ($n_d$ = {welch.n_averages:.1f})")
+    ax.semilogx(welch.frequencies[wband],
+                10.0 * np.log10(welch.psd[wband]), color=COLOR_SECONDARY,
+                linewidth=0.9, alpha=0.9, label="Welch, nperseg = 2048")
     # The single-taper estimate is the noisy thing the multitaper estimate is
     # being compared against, so it is drawn back: as a grey chosen against
     # the page, not as a grey diluted into it.
@@ -129,8 +145,168 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
             f"$\\bar\\nu$ = {nu:.1f} equivalent dof",
             transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
             color=COLOR_FG)
+
+    # --- Right: a high-dynamic-range case, where the adaptive weights earn
+    # their keep and the equivalent degrees of freedom pay for it. ---
+    n_hd = 1 << 15
+    tt = np.arange(n_hd) / fs
+    floor = noise_signal(fs, n_hd / fs, color="pink", seed=3)
+    tone_amp = float(np.sqrt(np.mean(floor ** 2))) * 10 ** (60.0 / 20.0)
+    hd = floor + tone_amp * np.sin(2 * np.pi * 1000.0 * tt)
+    w_hd = power_spectral_density(hd, fs, nperseg=4096)
+    m_hd = multitaper_psd(hd, fs)
+    hb = (m_hd.frequencies >= 200.0) & (m_hd.frequencies <= 5000.0)
+    wb = (w_hd.frequencies >= 200.0) & (w_hd.frequencies <= 5000.0)
+    ax_hd.semilogx(w_hd.frequencies[wb], 10.0 * np.log10(w_hd.psd[wb]),
+                   color=COLOR_SECONDARY, linewidth=1.0,
+                   label="Welch, Hann taper")
+    ax_hd.semilogx(m_hd.frequencies[hb], 10.0 * np.log10(m_hd.psd[hb]),
+                   color=COLOR_PRIMARY, linewidth=1.2,
+                   label="Multitaper, adaptive")
+    ax_hd.set_xlabel("Frequency [Hz]")
+    ax_hd.set_ylabel("PSD [dB re 1/Hz]")
+    ax_hd.set_title("A 60 dB tone over a pink floor, and what it costs",
+                    fontweight="bold", pad=12)
+    ax_hd.set_xlim(200.0, 5000.0)
+    format_frequency_axis(ax_hd, 200.0, 5000.0)
+    ax_hd.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_hd.set_axisbelow(True)
+    ax_dof = ax_hd.twinx()
+    ax_dof.semilogx(m_hd.frequencies[hb], m_hd.degrees_of_freedom[hb],
+                    color=COLOR_TERTIARY, linewidth=1.1, alpha=0.85,
+                    label="equivalent dof (right axis)")
+    ax_dof.set_ylabel("Equivalent degrees of freedom")
+    ax_dof.set_ylim(0.0, 2.4 * float(np.max(m_hd.degrees_of_freedom[hb])))
+    # The twin axis carries its own x formatter, which would print 10^n.
+    format_frequency_axis(ax_dof, 200.0, 5000.0)
+    handles, labels = ax_hd.get_legend_handles_labels()
+    h2, l2 = ax_dof.get_legend_handles_labels()
+    ax_hd.legend(handles + h2, labels + l2, loc="upper left", fontsize=8.5)
+
     plt.tight_layout()
     save_figure(output_dir, "multitaper_psd_confidence.svg")
+
+
+def generate_psd_segment_tradeoff(output_dir: str) -> None:
+    """Segment length against a resonance: bias one way, variance the other."""
+    print("Generating psd_segment_tradeoff...")
+    from scipy import signal as scipy_signal
+
+    from phonometry import (
+        noise_signal,
+        power_spectral_density,
+        resolution_bias_error,
+    )
+
+    fs = 48000.0
+    f_r, b_r = 1000.0, 25.0                 # a resonance of half-power width 25 Hz
+    x = noise_signal(fs, 20.0, color="white", seed=5)
+    q = f_r / b_r
+    b_coef, a_coef = scipy_signal.iirpeak(f_r, q, fs=fs)
+    resonant = scipy_signal.lfilter(b_coef, a_coef, x)
+
+    lengths = (512, 1024, 4096, 16384)
+    _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.6))
+
+    # Left: the peak itself, at four segment lengths.
+    colors = (COLOR_FG, COLOR_TERTIARY, COLOR_PRIMARY, COLOR_SECONDARY)
+    peak_ref = None
+    for nperseg, color in zip(lengths, colors):
+        res = power_spectral_density(resonant, fs, nperseg=nperseg)
+        band = (res.frequencies >= 880.0) & (res.frequencies <= 1120.0)
+        level = 10.0 * np.log10(res.psd[band])
+        if peak_ref is None or nperseg == lengths[-1]:
+            peak_ref = float(np.max(level))
+        ax_l.plot(res.frequencies[band], level, color=color, linewidth=1.5,
+                  label=f"nperseg = {nperseg}, "
+                        f"$B_e$ = {res.resolution_bandwidth:.1f} Hz")
+    ax_l.set_xlim(880.0, 1120.0)
+    ax_l.set_xlabel(LABEL_FREQ_HZ)
+    ax_l.set_ylabel("PSD [dB re 1/Hz]")
+    ax_l.set_title(f"A {b_r:.0f} Hz-wide resonance at {f_r:.0f} Hz",
+                   fontweight="bold", pad=10)
+    ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_l.set_axisbelow(True)
+    ax_l.legend(loc="upper right", fontsize=8.5)
+
+    # Right: the two errors against segment length, and where they cross.
+    grid = 2 ** np.arange(9, 17)
+    bias_db, random_db, measured = [], [], []
+    for nperseg in grid:
+        res = power_spectral_density(resonant, fs, nperseg=int(nperseg))
+        eps_b = resolution_bias_error(res.resolution_bandwidth, b_r)
+        bias_db.append(-10.0 * np.log10(max(1.0 + eps_b, 1e-6)))
+        random_db.append(10.0 * np.log10(1.0 + res.random_error))
+        band = (res.frequencies >= 850.0) & (res.frequencies <= 1150.0)
+        measured.append(float(np.max(10.0 * np.log10(res.psd[band]))))
+    measured = np.asarray(measured)
+    ax_r.semilogx(grid, bias_db, "o-", color=COLOR_SECONDARY, base=2,
+                  label="resolution bias, $-10\\lg(1+\\varepsilon_b)$ [dB]")
+    ax_r.semilogx(grid, random_db, "s-", color=COLOR_PRIMARY, base=2,
+                  label="random error, $10\\lg(1+1/\\sqrt{n_d})$ [dB]")
+    ax_r.semilogx(grid, measured.max() - measured, "^--", color=COLOR_TERTIARY,
+                  base=2, label="measured peak deficit [dB]")
+    # bias - random falls monotonically with nperseg, so interpolate on the
+    # reversed (increasing) difference to find where the two are equal.
+    diff = np.asarray(bias_db) - np.asarray(random_db)
+    cross = float(np.interp(0.0, diff[::-1], np.log2(grid)[::-1]))
+    ax_r.axvline(2 ** cross, color=COLOR_FG, linestyle=":", linewidth=1.3)
+    ax_r.text(2 ** cross * 1.25, 5.6,
+              f"the two errors are equal\nnear nperseg = {2 ** cross:.0f}",
+              fontsize=9, color=COLOR_FG)
+    ax_r.set_ylim(0.0, 8.0)
+    ax_r.set_xlabel("Segment length [samples]")
+    ax_r.set_ylabel("Error [dB]")
+    ax_r.set_title("Bias falls, variance rises", fontweight="bold", pad=10)
+    ax_r.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_r.set_axisbelow(True)
+    ax_r.legend(loc="upper center", fontsize=8.5)
+
+    plt.tight_layout()
+    save_figure(output_dir, "psd_segment_tradeoff.svg")
+    plt.close()
+
+
+def generate_noise_colors(output_dir: str) -> None:
+    """The five exact power-law generators, and their measured slopes."""
+    print("Generating noise_colors...")
+    from phonometry import noise_signal, power_spectral_density
+
+    fs = 48000.0
+    colors = (("violet", 2.0, COLOR_QUATERNARY), ("blue", 1.0, COLOR_TERTIARY),
+              ("white", 0.0, COLOR_FG), ("pink", -1.0, COLOR_PRIMARY),
+              ("red", -2.0, COLOR_SECONDARY))
+
+    _fig, ax = plt.subplots(figsize=(10, 6.4))
+    for name, alpha, color in colors:
+        x = noise_signal(fs, 20.0, color=name, seed=7)
+        res = power_spectral_density(x, fs, nperseg=8192)
+        band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
+        freqs = res.frequencies[band]
+        level = 10.0 * np.log10(res.psd[band])
+        # Normalise every colour to 0 dB at 1 kHz so the five slopes fan out
+        # from one point instead of overlapping at random offsets.
+        anchor = (freqs >= 900.0) & (freqs <= 1100.0)
+        level = level - float(np.mean(level[anchor]))
+        slope = float(np.polyfit(np.log2(freqs), level, 1)[0])
+        ax.semilogx(freqs, level, color=color, linewidth=1.0, alpha=0.55)
+        ax.semilogx(freqs, 3.0103 * alpha * np.log2(freqs / 1000.0),
+                    color=color, linestyle="--", linewidth=1.8,
+                    label=f"{name}: measured {slope:+.4f}, "
+                          f"exact {3.0103 * alpha:+.4f} dB/octave")
+    ax.set_xlim(20.0, 20000.0)
+    ax.set_ylim(-42.0, 48.0)
+    format_frequency_axis(ax, 20.0, 20000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("PSD re its own 1 kHz level [dB]")
+    ax.set_title("The five colours of noise_signal, over three decades",
+                 fontweight="bold", pad=12)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=8.5)
+    plt.tight_layout()
+    save_figure(output_dir, "noise_colors.svg")
+    plt.close()
 
 
 def generate_calibrated_spectrogram(output_dir: str) -> None:

@@ -71,6 +71,38 @@ recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
 )
 ```
 
+## 1b. Recording the two files
+
+A sound level meter built in software inherits every defect of the file it is
+handed, and three recorder settings decide whether the numbers below mean
+anything. **Set the input gain by hand and lock it.** Automatic gain control,
+limiting and noise suppression all move the sensitivity the next step measures
+once and step 4 then applies to every sample, so any of them silently voids the
+calibration. **Record uncompressed PCM, 24 bit, at 48 kHz or more.** A lossy
+codec redistributes the high-frequency energy the one-third-octave stage of
+step 5 reports, and a 44.1 kHz file has no band left above 22 kHz in which to
+support the class 1 A-weighting of step 3 near 16 kHz. **Choose the gain from
+the loudest event the measurement must be able to prove**, leaving roughly
+12 dB of headroom above its peak: the $L_{Cpeak}$ of step 4 reads the true
+inter-sample peak, and one clipped run invalidates it and the $L_{Aeq}$ with
+it.
+
+Two more decisions belong to the session rather than to the recorder. Record
+the calibrator tone through that same locked chain immediately before *and*
+immediately after the measurement, so the pair brackets the drift that step 7
+checks; a factor measured on another day, or after a gain control moved, is not
+a calibration of this file. Outdoors, keep the windscreen fitted and point the
+microphone in the reference direction its free-field calibration assumes.
+
+A field sheet worth copying:
+
+- Gain set by hand and written down; AGC, limiter and noise suppression off.
+- Uncompressed PCM, 24 bit, $f_s \ge 48$ kHz, one channel per microphone.
+- Peak headroom of about 12 dB above the loudest expected event.
+- Calibrator tone before and after, same gain, same chain, same session.
+- Windscreen fitted, microphone on a tripod, reference direction at the source.
+- Sample rate, gain setting, microphone and calibrator identifiers logged.
+
 ## 2. Calibrate: give the samples physical meaning
 
 Digital samples are dimensionless; the **sensitivity factor** converts them
@@ -166,9 +198,41 @@ percentiles read the other way round: the event fills exactly 10 % of the
 record, so it lifts $L_{10}$ to 78.0 dB and leaves $L_{90}$ at 54.9 dB, the
 background level.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_level_track.svg" alt="Fast A-weighted level history of the ten-second recording of this page, rising from about 55 dB of pink background to 80 dB during the one-second event at four seconds, with horizontal lines at LAeq 70.2 dB, L10 78.0 dB, L50 55.1 dB and L90 54.9 dB, the event second shaded, and an annotation reading LAE 80.2 dB, the whole event energy compressed into one second" width="88%" />
+
+*The readouts of this step drawn on the recording that produced them: the
+event second lifts $L_{Aeq}$ and $L_{10}$, and leaves $L_{50}$ and $L_{90}$ on
+the background.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+t = np.arange(recording.size) / fs
+fig, ax = plt.subplots(figsize=(9, 4))
+ax.axvspan(4.0, 5.0, color="C1", alpha=0.15)
+ax.plot(t, laf_t, linewidth=0.8, label="$L_{AF}(t)$")
+for value, name, style in [(la_eq, "LAeq", "--"), (ln[10], "L10", ":"),
+                           (ln[50], "L50", "-."), (ln[90], "L90", (0, (5, 1)))]:
+    ax.axhline(value, linestyle=style, linewidth=1.0,
+               label=f"{name} = {value:.1f} dB")
+ax.annotate(f"LAE = {lae:.1f} dB: the whole event energy in 1 s",
+            xy=(4.5, lae), xytext=(5.6, lae + 2),
+            arrowprops={"arrowstyle": "->"})
+ax.set(xlabel="Time [s]", ylabel="Level [dB re 20 µPa]", xlim=(0, 10))
+ax.legend(loc="lower right", ncols=2)
+plt.show()
+```
+
+</details>
+
 Deep guide: [Integrated and Statistical Levels](/phonometry/signals/levels/levels/),
-which adds noise dose and octave spectrograms; the $L_{den}$ and rating levels
-continue in [Environmental Levels](/phonometry/environment/assessment/environmental-levels/).
+which adds the maximum time-weighted level $L_{AFmax}$ that this same `laf_t`
+track yields, noise dose and octave spectrograms; the $L_{den}$ and rating
+levels continue in
+[Environmental Levels](/phonometry/environment/assessment/environmental-levels/).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
 
@@ -186,6 +250,59 @@ spl, bands = filters.octave_filter(
 # The '1k' band holds the event: ~70 dB, while its neighbors stay ~25 dB below.
 print(dict(zip(bands, np.round(spl, 1))))
 ```
+
+These are **unweighted (Z) band levels**: `octave_filter` ran on `recording`,
+not on the `weighted` signal of step 3, so their energy sum reproduces the
+unweighted $L_{eq}$ and not the $L_{Aeq}$ of step 4. That sum is the sanity
+check worth running once on every measurement:
+
+```python
+print(f"sum of the Z bands  {10 * np.log10(np.sum(10 ** (spl / 10))):.1f} dB")
+print(f"Leq(Z)              {signals.leq(recording, calibration_factor=cal):.1f} dB")
+# sum of the Z bands  70.3 dB
+# Leq(Z)              70.4 dB
+```
+
+The tenth or two of deficit is the energy outside the 12.5 Hz–20 kHz analysis
+range plus the band-edge shapes. A discrepancy larger than about half a decibel
+points at a calibration or a sample-rate mistake rather than at the filters.
+
+To obtain an *A-weighted* spectrum, band-filter the already weighted signal of
+step 3 instead of the raw recording:
+
+```python
+spl_a, _ = filters.octave_filter(weighted, fs, fraction=3, nominal=True)
+print(f"sum of the A bands  {10 * np.log10(np.sum(10 ** (spl_a / 10))):.1f} dB")
+# sum of the A bands  70.2 dB -> the LAeq of step 4, to a hundredth of a decibel
+```
+
+That identity closes the loop between the two halves of the meter: the
+weighting stage and the filter stage measure the same energy.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_third_octave.svg" alt="Thirty-three one-third-octave band levels of the recording of this page as a step plot from 12.5 Hz to 20 kHz, unweighted bands flat near 43 dB with the 1 kHz band highlighted at 70 dB, drawn beside the A-weighted spectrum of the same recording which falls away below 500 Hz and above 4 kHz" width="88%" />
+
+*The same recording read in bands, unweighted and A-weighted. Pink noise gives
+nearly constant fractional-octave band levels, so the flat floor is the
+background and the single bar 27 dB above it is the event; A-weighting tilts
+the floor without touching the 1 kHz band, where the A curve is 0 dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+_, centres = filters.octave_filter(recording, fs, fraction=3)  # exact centres
+
+fig, ax = plt.subplots(figsize=(9, 4))
+ax.step(centres, spl, where="mid", label="Z (unweighted)")
+ax.step(centres, spl_a, where="mid", linestyle="--", label="A-weighted")
+ax.axvspan(891.3, 1122.5, color="C1", alpha=0.15)   # the 1 kHz band
+ax.set(xscale="log", xlabel="Band centre frequency [Hz]",
+       ylabel="Band level [dB re 20 µPa]")
+ax.legend(loc="lower center")
+plt.show()
+```
+
+</details>
 
 Deep guides: [Filter Banks](/phonometry/signals/filters/filter-banks/) for the filter
 architectures and zero-phase mode,
@@ -216,19 +333,53 @@ verification) and
 [Filter Class Verification](/phonometry/signals/filters/filter-compliance/) (the
 Table 1 mask, class 0 and the compliance fiche).
 
-## Where to go next
+## 7. Is this measurement valid?
 
-The meter built here is the trunk; the rest of the core grows from it.
+Step 6 verified the *design* of the weighting and filter stages. It says
+nothing about the file. A hardware meter refuses to show a level it cannot
+stand behind: IEC 61672-1 clause 5.11 makes an overload indicator mandatory
+(5.11.5 latches it whenever time-averaged or exposure levels are being
+measured), and clause 5.12 adds an under-range indication.
+A meter assembled from functions has neither, so three checks on the recording
+replace them, and each of the three yields a number that belongs in the report.
 
-- [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
-  attach an uncertainty to the $L_{Aeq}$ you just computed, calibration term
-  included.
-- [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/): when
-  bands are too coarse, the Welch PSD with confidence intervals.
-- [Correlation, time delay and envelope](/phonometry/signals/spectra/correlation-delay/):
-  two microphones instead of one, and the delay between them.
-- [Block Processing](/phonometry/signals/filters/block-processing/): turn this page's
-  offline meter into a streaming one with carried filter state.
+```python
+# (a) Overload: any run of two or more samples pinned at full scale.
+at_full_scale = np.flatnonzero(np.abs(recording) >= 1.0 - 1e-6)
+runs = (np.split(at_full_scale, np.flatnonzero(np.diff(at_full_scale) > 1) + 1)
+        if at_full_scale.size else [])
+clipped_runs = sum(1 for run in runs if run.size >= 2)
+
+# (b) Under-range: the same chain capturing its own noise (dummy capsule).
+self_noise = signals.noise_signal(fs, 3.0, color="pink", rms=2e-4, seed=11)
+margin = la_eq - signals.laeq(self_noise, fs, calibration_factor=cal)
+
+# (c) Drift: the calibrator tone recorded again after the measurement.
+calibrator_post = 0.985 * calibrator          # 1.5 % lower in this session
+cal_post = metrology.sensitivity(calibrator_post, target_spl=94.0, fs=fs)
+drift = abs(20 * np.log10(cal_post / cal))
+
+print(f"clipped runs {clipped_runs} | S/N margin {margin:.1f} dB "
+      f"| drift {drift:.2f} dB")
+# clipped runs 0 | S/N margin 55.3 dB | drift 0.13 dB
+```
+
+Refuse the record if any clipped run exists, require at least 10 dB of margin
+over the chain's self-noise (below that, $L_{90}$ is reading the preamplifier
+rather than the background), and hold the pre/post sensitivity difference to
+the 0.5 dB gate of the
+[calibration guide](/phonometry/signals/metrology/calibration/), which also
+explains why that same difference is the drift term of the uncertainty budget.
+
+Learn the fingerprint of the failure the broadband level hides. Clipping barely
+moves $L_{Aeq}$ — hard-clipping a 1 kHz tone at 80 % of its peak costs 0.9 dB —
+while injecting an odd-harmonic ladder that lifts the 3.15 kHz one-third-octave
+band by 37 dB, the 5 kHz band by 37 dB and the 8 kHz band by 25 dB. A
+one-third-octave spectrum carrying regularly spaced peaks above anything the
+source can plausibly radiate is clipping until proven otherwise. The opposite
+failure looks nothing like it: a signal far below the converter's range gives a
+spectrum that barely changes when the source is switched off, which is what
+check (b) catches.
 
 ## What this guide covers
 
@@ -242,16 +393,29 @@ acceptance limits checked by `verify_weighting_class` and
 
 **Not covered.** `verify_weighting_class` and `verify_filter_class` check
 the frequency-response design of the digital filters against the standards'
-tables; they do not perform the IEC 61672-3 pattern evaluation tests a
+tables; they do not perform the IEC 61672-2:2013 pattern-evaluation tests a
 physical instrument needs for type approval, such as self-generated noise,
-linearity range, overload indication or directional response. A class
-verdict from this page describes the algorithm, not a built device. The
+linearity range, overload indication or directional response, nor the
+IEC 61672-3:2013 periodic tests a working instrument receives. A class
+verdict from this page describes the algorithm, not a built device, and the
+three checks of step 7 screen the *recording*, not the instrument. The
 IEC 60942:2017 calibrator conformance tests are likewise not run here; see
 the [calibration guide](/phonometry/signals/metrology/calibration/) for exactly what
 `sensitivity()` does and does not check.
 
 ## See also
 
+The meter built here is the trunk; the rest of the core grows from it.
+
+- [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
+  attach an uncertainty to the $L_{Aeq}$ you just computed, calibration term
+  included.
+- [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/): when
+  bands are too coarse, the Welch PSD with confidence intervals.
+- [Correlation, time delay and envelope](/phonometry/signals/spectra/correlation-delay/):
+  two microphones instead of one, and the delay between them.
+- [Block Processing](/phonometry/signals/filters/block-processing/): turn this page's
+  offline meter into a streaming one with carried filter state.
 - API reference: [`metrology.calibration`](/phonometry/reference/api/metrology/calibration/),
   [`filters.weighting`](/phonometry/reference/api/filters/weighting/),
   [`signals.levels`](/phonometry/reference/api/signals/levels/),

@@ -77,7 +77,13 @@ plt.show()
 
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
-* **Z-Weighting (`Z`):** Zero weighting, completely flat response.
+* **Z-Weighting (`Z`):** flat by specification, not by omission.
+  IEC 61672-1 defines Z as a nominally flat response from 10 Hz to
+  20 kHz with the same Table 3 tolerances as A and C, which is why
+  `verify_weighting_class` can grade it at all. The library implements it
+  as a bypass, so the *effective* bandwidth of a Z-weighted level is
+  whatever your capture chain delivered: remove DC (`detrend`) and
+  high-pass the wind noise yourself if the recording extends below 10 Hz.
 
 The `curve` argument also accepts the four special weightings, charted and
 documented in [Special Weightings](/phonometry/signals/levels/special-weightings/):
@@ -85,13 +91,9 @@ documented in [Special Weightings](/phonometry/signals/levels/special-weightings
 `'D'` (IEC 537), and `'AU'` for audible sound in the presence of ultrasound
 (IEC 61012).
 
-## How do I apply A-weighting to a signal in Python?
-
-Call `filters.weighting_filter(recording, fs, curve='A')` on a calibrated
-signal. It returns the A-weighted time signal, filtered with the pole-zero
-design of IEC 61672-1:2013 within class 1 tolerances, so
-`signals.leq()` on the output is the $L_{Aeq}$. The same function applies C,
-Z, B, D, AU and the infrasound G weighting through `curve`.
+The one-line answer is `filters.weighting_filter(recording, fs, curve='A')`.
+Section 2 shows it on a runnable signal, section 5 explains why the default
+design oversamples internally, and section 6 proves the result meets class 1.
 
 ## 1. Where the curves come from
 
@@ -108,8 +110,9 @@ $$
 
 C is a band-pass with double poles at $f_1$ and $f_4$ (2 zeros at the origin);
 A adds the $f_2$ and $f_3$ poles (4 zeros), which is why it keeps falling
-through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z is the
-absence of weighting. The full pole/zero derivation is in the
+through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z applies no shaping inside
+the specified band; its design goal is 0 dB everywhere from 10 Hz to
+20 kHz. The full pole/zero derivation is in the
 [Theory](/phonometry/reference/theory/signal-analysis/) page.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Equal-loudness contours per ISO 226 on the left, with the 40-phon contour highlighted; on the right the A-weighting curve overlaid on the inverted 40-phon contour, showing that A is the flipped contour frozen into a realizable filter" width="92%" />
@@ -166,6 +169,53 @@ print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # C - A above 20 dB: the A-weighted number alone would hide the rumble.
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/c_minus_a_spectrum.svg" alt="One-third-octave band levels of two signals, each drawn unweighted, A-weighted and C-weighted. On the left, a 50 Hz rumble under a light hiss: the unweighted and C-weighted curves coincide on a 77 dB spike in the 50 Hz band, while the A-weighted curve cuts that same band to 47 dB, and the box reads LAeq 52.4 dB, LCeq 75.7 dB, C minus A 23.2 dB. On the right, broadband pink noise: all three curves lie within a couple of decibels of each other from 1 kHz upward and the A curve falls away below it, and the box reads LAeq 54.6 dB, LCeq 56.4 dB, C minus A 1.8 dB" width="92%" />
+
+*The same three band levels for two signals. A concentrated low-frequency
+source (left) puts almost all its energy where A cuts hardest, so C − A reaches
+23 dB and the A-weighted level alone says nothing about it. Broadband pink
+noise (right) gives C − A = 1.8 dB, which is the regime the first bullet
+describes.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+for curve, style in (("Z", "-"), ("C", "--"), ("A", ":")):
+    band_levels, centres = filters.octave_filter(
+        filters.weighting_filter(x, fs, curve=curve), fs, fraction=3)
+    ax.semilogx(centres, band_levels, style, label=f"{curve}-weighted bands")
+ax.set(xlabel="Band centre frequency [Hz]", ylabel="Band level [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### What A-weighting cannot do
+
+A is a fixed filter derived from pure-tone equal-loudness data at one loudness
+level, and it is applied to complex spectra at every level. Three assumptions
+follow, and each breaks in a way worth naming. It says nothing about how bands
+*combine*, because the contours were measured with single tones; it is frozen
+at the 40-phon contour, so loud low-frequency sound is systematically
+under-rated as the real contours flatten with level; and it has no time
+structure at all, so an impulse and a steady sound of the same energy receive
+identical treatment.
+
+Each of those has a proper instrument. For perceived loudness, use the ISO 532
+models of [Loudness](/phonometry/perception/psychoacoustics/loudness/) rather
+than a different weighting curve. For content below 20 Hz, use the G curve of
+ISO 7196 ([Special Weightings](/phonometry/signals/levels/special-weightings/)).
+For tonal or impulsive character, use the ISO 1996-1 adjustments
+([Environmental Levels](/phonometry/environment/assessment/environmental-levels/)).
+None of that makes A wrong to use: A-weighted levels are the quantity the
+limits are written in, so a report states the A-weighted level and adds the
+other metrics as supporting evidence, never as a substitute.
+
 ## 2. Basic usage
 
 ```python
@@ -187,13 +237,50 @@ The special weightings take the same `curve` argument; each is documented,
 with its own response chart, in
 [Special Weightings](/phonometry/signals/levels/special-weightings/).
 
+### Weighting a spectrum, not a waveform
+
+The commonest desk task is not weighting a recording but A-weighting a table of
+one-third-octave band levels, and there are two routes that do not give the
+same answer. The **exact** one is what a meter does: weight the waveform, then
+band-filter it.
+
+```python
+band_source = signals.noise_signal(fs, 20.0, color="pink", rms=0.05, seed=3)
+weighted_bands, centres = filters.octave_filter(
+    filters.weighting_filter(band_source, fs, curve="A"), fs, fraction=3)
+print(f"energy sum of the A-weighted bands "
+      f"{10 * np.log10(np.sum(10 ** (weighted_bands / 10))):.2f} dB")
+print(f"LAeq of the same signal          "
+      f"{signals.laeq(band_source, fs):.2f} dB")
+# energy sum of the A-weighted bands 62.84 dB
+# LAeq of the same signal            62.79 dB
+```
+
+The **table** route is the one you are forced into when the data arrives as
+band levels already: add the tabulated $A(f_m)$ to each band level. It is an
+approximation, because A slopes steeply across the low bands, so its
+energy-weighted mean *inside* a band is not its value at the mid frequency.
+Measured against the exact route on the same pink noise: the two agree to
+better than 0.1 dB from 100 Hz to 8 kHz, the table route reads up to 0.7 dB low
+in the lowest bands (where A rises by about 12 dB per octave) and up to 1 dB
+high in the topmost band at 48 kHz (where A falls steeply and the band is
+clipped by Nyquist), while the *totals* agree to a few hundredths. So the error
+is not one-sided: it follows the sign of the curvature of the weighting across
+the band.
+
+Report which route produced a weighted spectrum. The totals will agree; the
+band levels will not, and a band-by-band comparison between a meter's
+A-weighted spectrum and a table-corrected one will show tenths of a decibel
+that are method, not measurement. The same argument applies unchanged to C and
+to G.
+
 ## 3. `weighting_filter()` / `WeightingFilter` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](/phonometry/signals/levels/special-weightings/); `'Z'` is a bypass |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](/phonometry/signals/levels/special-weightings/); `'Z'` is implemented as a bypass of a response the standard specifies as flat |
 | `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
@@ -302,6 +389,27 @@ for block in blocks:
 See [Block Processing](/phonometry/signals/filters/block-processing/) for the streaming workflow and
 [Theory](/phonometry/reference/theory/signal-analysis/) for the analytic curve definitions.
 
+:::note[Above a few kilohertz the filter is the smallest term]
+The oversampled design removes the *filter's* contribution to the
+high-frequency error, and once it is gone the filter stops being what decides
+the reading. Three larger terms take over, and all three live in the
+instrument, not in the code.
+
+A free-field microphone is calibrated for sound arriving from its reference
+direction, so it must be pointed at the source; indoors, in a diffuse field,
+that capsule reads high at high frequencies and a random-incidence capsule is
+the right choice instead. A windscreen carries its own frequency-dependent
+insertion loss, which IEC 61672-1 treats as part of the instrument (clause
+5.3.3, "Windscreens") and whose stated correction has to be applied before any
+high-frequency band level, or any A-weighted level near the top of the range,
+means anything. And the operator is a reflector: use a tripod and stand back.
+
+The class chain of the
+[calibration guide](/phonometry/signals/metrology/calibration/) says the rest:
+a class 1 verdict for the filter is one link, and the weakest link sets the
+accuracy of the reading.
+:::
+
 ## 6. Verifying against the tolerance tables (IEC 61672-1)
 
 `verify_weighting_class` checks a weighting filter against the acceptance
@@ -397,6 +505,14 @@ have their own guide:
 - Theory: [Weighting Curves (IEC 61672-1)](/phonometry/reference/theory/signal-analysis/#weighting-curves-iec-61672-1): the pole-zero definition of the A, C and Z curves and the bilinear design the oversampling repairs.
 
 ## Quick answers
+
+### How do I apply A-weighting to a signal in Python?
+
+Call `filters.weighting_filter(recording, fs, curve='A')` on a calibrated
+signal. It returns the A-weighted time signal, filtered with the pole-zero
+design of IEC 61672-1:2013 within class 1 tolerances, so
+`signals.leq()` on the output is the $L_{Aeq}$. The same function applies C,
+Z, B, D, AU and the infrasound G weighting through `curve`.
 
 ### When should I use C-weighting instead of A-weighting?
 

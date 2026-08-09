@@ -35,8 +35,11 @@ Every measurement result is incomplete without a statement of its uncertainty.
 The *Guide to the Expression of Uncertainty in Measurement* gives two ways to
 propagate the uncertainties of the inputs of a measurement model
 $y = f(x_1, \dots, x_N)$ to the output: the **law of propagation of
-uncertainty** (**ISO/IEC Guide 98-3:2008**, the GUM, clause 5) and the
-**Monte Carlo method** (**ISO/IEC Guide 98-3-1:2008**, Supplement 1, clause 7).
+uncertainty** (**JCGM 100:2008**, the GUM, published also as
+ISO/IEC Guide 98-3:2008, clause 5) and the **Monte Carlo method**
+(**JCGM 101:2008**, Supplement 1, published also as ISO/IEC Guide 98-3-1:2008,
+clause 7). Four designations, two documents; the rest of this page says "the
+GUM" and "Supplement 1".
 The first combines standard uncertainties analytically through the sensitivity
 coefficients; the second propagates the whole probability distributions
 numerically. They agree for linear models and diverge, informatively, when the
@@ -55,12 +58,71 @@ $$
 u_c^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
 $$
 
-`combine_uncertainty` evaluates the sensitivities by central differences, so any
-callable model works, with no hand-derived partials. Input quantities are described
-by a `Quantity` (best estimate, standard uncertainty, PDF, degrees of freedom).
-Type B evaluations from a half-width $a$ are built by `rectangular`
-($a/\sqrt{3}$), `triangular` ($a/\sqrt{6}$) and `u_shaped` ($a/\sqrt{2}$)
-(GUM clause 4.3).
+`combine_uncertainty` evaluates the sensitivities by central differences, so
+almost any callable model works, with no hand-derived partials. Input quantities
+are described by a `Quantity` (best estimate, standard uncertainty, PDF, degrees
+of freedom).
+
+The step of that difference is the input's *own* standard uncertainty, which is
+what the GUM recommends (5.1.4 NOTE 2), so the coefficient is the average slope
+over the range the input actually explores rather than the tangent at the
+estimate. For a smooth model that is a feature. It breaks on models that are not
+smooth over that range, and the failure is silent: a `max()`, a `min()` or a
+threshold — a clamp at a physical bound, a pass/fail correction — has one
+derivative on one side and another on the other; a table lookup or a rounded
+intermediate can return a sensitivity of exactly zero; a model that draws its own
+random numbers returns pure noise. Two defences: compare `result.sensitivities`
+against the analytic partials wherever you know them, and reach for `monte_carlo`
+whenever the model is non-smooth, because propagating distributions needs no
+derivative at all. The third panel of the figure in section 2 is exactly such a
+model.
+
+### Type A: uncertainty from repeated observations
+
+The GUM's first half is the one this page's API makes easiest to skip. Given $n$
+independent readings of the same quantity with experimental standard deviation
+$s$, the best estimate is their mean and the standard uncertainty **of that
+mean** is
+
+$$
+u = \frac{s}{\sqrt{n}}, \qquad \nu = n - 1
+$$
+
+(GUM 4.2.3) — exactly the pair a `Quantity` takes as `uncertainty` and `dof`.
+The Position input of the budget below is that: ten measurements at different
+microphone positions scattering with $s = 1.1$ dB give $u = 1.1/\sqrt{10} =
+0.35$ dB with `dof=9`.
+
+Two consequences worth internalising. First, $s$ and $u$ describe different
+things: $s$ is a property of the sound field and does not shrink when you
+measure more positions, while $u$ does — so *more positions* is the only lever
+on this term, and it is a $\sqrt{n}$ lever. Second, a small $n$ is expensive
+twice: once through $\sqrt{n}$, and once through the coverage factor, because
+9 degrees of freedom already lift $k$ from 1.96 to 2.11 and 4 degrees of freedom
+lift it to 2.78. Entering the raw $s$ instead of $s/\sqrt{n}$, or leaving `dof`
+at its infinite default, are the two commonest ways to get this term wrong, and
+they pull in opposite directions.
+
+### Type B: uncertainty from a stated bound
+
+Type B evaluations start from a half-width $a$ — a tolerance, a resolution, a
+manufacturer's limit — and a choice of distribution over it (GUM clause 4.3):
+
+| Constructor | $u$ | Use when |
+| :--- | :---: | :--- |
+| `rectangular(x, a)` | $a/\sqrt{3}$ | only bounds are known and nothing inside them: a class tolerance, a display resolution, a stated limit. The honest default |
+| `triangular(x, a)` | $a/\sqrt{6}$ | values near the centre are demonstrably more likely than values at the edges: the sum of two comparable rectangular influences, a quantity that was centred by adjustment |
+| `u_shaped(x, a)` | $a/\sqrt{2}$ | the influence *cycles* through its range and spends most of its time at the extremes: a thermostatted room swinging between switching points, a standing-wave field sampled at an arbitrary position |
+
+The two Type B inputs of the budget below are both bounds, hence both
+rectangular: the 0.20 dB calibration half-width is the calibrator's class
+tolerance together with the pre/post drift observed in the field check, and the
+0.30 dB instrument half-width is the meter's class tolerance at the reference
+frequency. The choice of distribution reaches the GUM result *only* through $u$,
+so the same half-width read as triangular would simply divide by $\sqrt{6}$; but
+it sets the shape of the Monte Carlo output entirely, which is why the two
+methods agree on this budget and would not if one rectangular term dominated it
+— the first panel of the figure in section 2.
 
 ```python
 from phonometry import metrology
@@ -84,29 +146,116 @@ k, U = result.expanded(0.95)
 print(round(k, 2), round(U, 2))               # 2.11 0.86  ->  Y = 74.0 ± 0.9 dB
 ```
 
+### Reading the budget you just computed
+
+A budget is a decision aid, not a certificate, and this one says something
+specific in one glance. The position term contributes 0.350 dB of the 0.407 dB
+total, which is **74 % of the variance** on its own; instrument and calibration
+together are the remaining 26 %; the reading itself contributes nothing, because
+it carries no uncertainty of its own in this model. The measurement is limited by
+*where the microphone was*, not by the instrument.
+
+Quadrature makes that lesson quantitative and slightly brutal. Removing the
+calibration term altogether — a perfect calibrator, no drift — moves $u_c$ from
+0.407 to 0.390 dB, a gain of 0.017 dB for an impossible effort. Halving the
+position term instead, which means four times as many positions, moves it to
+0.272 dB. Budgets are improved at the top of the bar chart and never at the
+bottom, and the bar chart is there to tell you which end is which.
+
+Finally, calibrate your expectations for the number itself. An expanded
+uncertainty near 1 dB is the ordinary outcome for a class 1 chain and a handful
+of positions. Standardized budgets for environmental and occupational
+measurements land between 1 and 3 dB once source, meteorological and sampling
+terms enter. Anything much below half a decibel should prompt a search for the
+term that was left out rather than satisfaction.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_sources.svg" alt="An outdoor A-weighted level measurement drawn to scale: a source, a sound level meter on a tripod with the microphone at 1.5 m above the ground and 4 m from a façade, three alternative microphone positions with a spread bracket, the calibrator beside the meter and a weather station; leader lines connect each element to the rows of a budget table naming its evaluation type, distribution and degrees of freedom, with the calibrator term marked as the one shared between channels" width="92%" />
+
+Every row of a budget is a piece of hardware or a decision about geometry, and
+budgets go wrong by omission far more often than by arithmetic: the forgotten
+meteorological term, the forgotten mounting or directivity term, the calibrator
+term counted twice as though the two channels had been calibrated independently.
+
+### Coverage factor and effective degrees of freedom
+
 The **expanded uncertainty** $U = k\,u_c$ scales the combined uncertainty by a
 coverage factor $k = t_p(\nu_\text{eff})$ from the $t$-distribution at the
 **effective degrees of freedom** given by the Welch–Satterthwaite formula
 (Annex G.4). Here the single Type A input (9 degrees of freedom) pulls
-$\nu_\text{eff}$ down to about 16, so $k = 2.11$ rather than the large-sample
-1.96. Correlated inputs are handled by passing a correlation matrix; a fully
+$\nu_\text{eff}$ down to 16.5, so $k = 2.11$ rather than the large-sample 1.96.
+This chain reproduces the GUM's own worked examples end to end: the Annex H.1
+end-gauge budget ($u_c = 31.7$ nm, $U_{99} = 92$ nm against the printed 32/93)
+and the Annex H.2 correlated resistance measurement ($u_c(R) = 0.071\ \Omega$,
+$u_c(X) = 0.295\ \Omega$, $u_c(Z) = 0.236\ \Omega$ from Table H.3).
+
+`expanded(0.95)` implements the GUM's own rule: a two-sided interval with $k$
+taken from the $t$-distribution at $\nu_\text{eff}$. Acoustics standards
+routinely fix $k$ by convention instead — $k = 2$ for a two-sided 95 % statement
+when the degrees of freedom are large, and $k = 1.65$ for the **one-sided** 95 %
+statement used when a level is compared against a limit and only exceedance
+matters. The same $u_c = 0.407$ dB then gives three different expanded
+uncertainties:
+
+| Convention | $k$ | $U$ |
+| :--- | :---: | :---: |
+| GUM, two-sided, $t$ at $\nu_\text{eff} = 16.5$ | 2.11 | 0.86 dB |
+| Conventional two-sided, large sample | 2 | 0.81 dB |
+| One-sided, against a limit | 1.65 | 0.67 dB |
+
+A compliance decision can turn on that choice alone, so the convention belongs
+next to every $U$ you quote. `coverage_factor_override` is how to impose a
+standard's prescribed $k$ — and it is also the only route when the budget is
+correlated, for the reason below.
+
+### Correlated inputs
+
+Correlated inputs are handled by passing a correlation matrix; a fully
 correlated sum then adds linearly instead of in quadrature. Correlation is the
 classic silent error in a budget: two corrections traceable to the *same*
-calibrator, or two channels sharing one instrument, do not average away the
-way independent terms would, and combining them in quadrature as if they were
-uncorrelated typically understates $u_c$ (with sensitivities of opposite sign
-the bias can point the other way). Because the GUM defines Welch–Satterthwaite
-for *independent* inputs only, a correlated budget with finite input degrees
-of freedom carries no effective degrees of freedom at all: `effective_dof` is
-NaN, a warning is issued, and `expanded()` requires an explicit
-`coverage_factor_override` (e.g. $k = 2$) rather than inventing one. Only when
-every input is Type B with infinite degrees of freedom does a correlated
-budget keep $\nu_\text{eff} = \infty$ and use the normal-distribution coverage
-factor. This chain reproduces the GUM's
-own worked examples end to end: the Annex H.1 end-gauge budget
-($u_c = 31.7$ nm, $U_{99} = 92$ nm against the printed 32/93) and the Annex
-H.2 correlated resistance measurement ($u_c(R) = 0.071\ \Omega$,
-$u_c(X) = 0.295\ \Omega$, $u_c(Z) = 0.236\ \Omega$ from Table H.3).
+calibrator, or two channels sharing one instrument, do not average away the way
+independent terms would, and combining them in quadrature as if they were
+uncorrelated typically understates $u_c$. With sensitivities of opposite sign
+the bias points the other way, and a fully correlated pair can cancel exactly.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_correlation.svg" alt="Left: the combined standard uncertainty of two 0.3 dB terms against their correlation coefficient, rising from zero at minus one through the quadrature value 0.424 at zero to 0.600 at plus one for same-sign sensitivities, and the mirrored curve for opposite signs. Right: the same budget as two bars, 0.424 dB assumed independent against 0.600 dB traceable to the same calibrator, annotated as 41 percent understated" width="92%" />
+
+*Two terms of 0.3 dB each, combined by `combine_uncertainty` with a correlation
+matrix. Treating a fully correlated pair as independent understates $u_c$ by
+41 % — 0.424 dB instead of 0.600 dB — and the error grows with the number of
+terms that share a source. Reading the same curve backwards: a pair with
+$\rho = -1$ and same-sign sensitivities cancels to zero, which is what a
+differential measurement through one instrument buys you.*
+
+Because the GUM defines Welch–Satterthwaite for *independent* inputs only, a
+correlated budget with finite input degrees of freedom carries no effective
+degrees of freedom at all. What to do depends on the budget:
+
+| The budget | `effective_dof` | What to do |
+| :--- | :--- | :--- |
+| Uncorrelated | Welch–Satterthwaite value | nothing: `expanded(p)` takes $k$ from $t$ at $\nu_\text{eff}$ |
+| Correlated, every input Type B with infinite dof | $\infty$ | nothing: $k$ comes from the normal distribution |
+| Correlated, any input with finite dof | `nan`, with a warning | pass an explicit $k$: `expanded(0.95, coverage_factor_override=2.0)` |
+
+```python
+# Same four inputs, now with the calibration and instrument terms fully
+# correlated because both are traceable to the same calibrator.
+correlation = [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 1.0, 0.0],
+    [0.0, 1.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+]
+correlated = metrology.combine_uncertainty(  # warns: no Welch-Satterthwaite here
+    lambda a, b, c, d: a + b + c + d, quantities, correlation=correlation)
+print(round(correlated.combined_uncertainty, 3))            # 0.454 dB (was 0.407)
+print(correlated.effective_dof)                             # nan
+print(round(correlated.expanded(0.95, coverage_factor_override=2.0)[1], 2))  # 0.91
+```
+
+Counting the shared calibrator once instead of twice costs 0.047 dB here, on a
+budget where the two Type B terms are small. On a budget where they dominate —
+a two-channel intensity measurement, a level difference between two rooms
+measured with one meter — the same mistake is the 41 % of the figure above.
 
 ## 2. The Monte Carlo method (Supplement 1)
 
@@ -161,6 +310,25 @@ represent it. In those regimes the Monte Carlo interval is the reference:
 Supplement 1 (clause 8) treats the GUM framework as validated precisely when
 it agrees with the Monte Carlo result, and as superseded by it when it does
 not.
+
+Those three regimes are worth seeing rather than being told about, because a
+reader who has never watched a GUM interval fail cannot recognise the failure in
+a budget of their own:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_gum_vs_mc.svg" alt="Three stacked panels, each a Monte Carlo histogram with the GUM Gaussian overlaid, the Monte Carlo coverage interval shaded and the GUM Y plus or minus U interval drawn as dashed rules. Top: a dominant rectangular input gives a nearly rectangular output that the Gaussian interval overcovers. Middle: the energy sum of two levels gives a skewed distribution whose mean is offset from the GUM value. Bottom: an absorption coefficient clamped at one gives an asymmetric interval that no symmetric statement can represent" width="88%" />
+
+*The three regimes, each computed with `combine_uncertainty` and
+`monte_carlo` on the same inputs. **Top**, one dominant rectangular term
+($a = 1$ dB) beside a small Gaussian one: the output is nearly rectangular, and
+the GUM interval $\pm 1.15$ dB overcovers the Monte Carlo $[-0.98, 0.98]$ by
+17 %. **Middle**, the energy sum $10\log_{10}(10^{L_1/10} + 10^{L_2/10})$ of two
+levels with $u = 3$ dB each: the Monte Carlo distribution is skewed and its mean,
+73.48 dB, sits 0.47 dB above the value the GUM propagates through the model,
+73.01 dB — the first-order expansion has lost a real bias. **Bottom**, an
+absorption coefficient of 0.95 with $u = 0.06$ against the physical bound at 1:
+the GUM interval reaches 1.06, which does not exist, while the Monte Carlo
+interval $[0.83, 1.00]$ is asymmetric and no $Y \pm U$ statement can express it.
+In all three, Supplement 1 clause 8 says the Monte Carlo result is the reference.*
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left: the GUM uncertainty budget, a horizontal bar chart of each input's contribution to the combined uncertainty with a dashed line at uc of 0.407 dB. Right: the Monte Carlo output histogram overlaid with the GUM Gaussian and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%" />
 
@@ -235,8 +403,13 @@ those standardized cases:
 
 - **Calibration.** The calibrator's class tolerance and the pre/post drift
   bound of [Calibration](/phonometry/signals/metrology/calibration/) are textbook
-  Type B inputs: propagate them (`Quantity(..., "rectangular")`) through
-  the level model rather than quoting the tolerance alone.
+  Type B inputs. Both are stated as **half-widths**, so build them with
+  `rectangular`, which applies the $a/\sqrt{3}$ divisor for you:
+  `metrology.rectangular(0.0, 0.4, name="Calibrator class 1")` for the IEC 60942
+  tolerance limit, and `metrology.rectangular(0.0, d / 2, name="Drift")` for a
+  pre/post difference $d$. Do not pass a half-width to `Quantity`, whose second
+  argument is already a *standard* uncertainty — that overstates the term by a
+  factor 1.73 and nothing downstream will notice.
 - **Environmental levels.** The ISO 1996-2 combined uncertainty of the
   [Environmental Levels](/phonometry/environment/assessment/environmental-levels/) page is
   Formula (2) of that standard: the same quadrature sum with the standard's
@@ -252,6 +425,28 @@ those standardized cases:
   [occupational measurements](/phonometry/perception/hearing/occupational-exposure/)
   budgets sampling, instrument and position contributions in exactly this
   way.
+
+## What this guide covers
+
+**Covered.** From the GUM: the clause 5 law of propagation with sensitivity
+coefficients evaluated numerically, the clause 4.2 Type A evaluation as the
+`uncertainty`/`dof` pair of a `Quantity`, the clause 4.3 Type B evaluations
+(`rectangular`, `triangular`, `u_shaped`), correlated inputs through a
+correlation matrix, the Annex G.4 Welch–Satterthwaite effective degrees of
+freedom and the Annex G coverage factor — validated against the Annex H.1
+end-gauge and Annex H.2 resistance budgets. From Supplement 1: Monte Carlo
+propagation of distributions with the clause 7.7 probabilistically symmetric
+coverage interval, checked against the clause 9.2 worked examples.
+
+**Not covered.** The adaptive trial-count procedure of Supplement 1 clause 7.9
+(the number of trials is fixed, with a minimum of 2), the shortest coverage
+interval of clause 5.3.4, and the multivariate-Gaussian sampling of clause 6.4.8
+— so a correlated budget stays with `combine_uncertainty`. Supplement 2
+(multiple output quantities) is not implemented at all. The clause 8 validation
+of the GUM framework against the Monte Carlo result is a comparison you make by
+reading the two results, not an automated verdict. Domain budgets prescribed by
+acoustics standards (ISO 1996-2, ISO 12999-1 and -2, ISO 9612) are implemented
+on their own pages, listed above, and are not derived here.
 
 ## See also
 

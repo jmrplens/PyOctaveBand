@@ -1,6 +1,6 @@
 ---
 title: "Calibration and dBFS"
-description: "Physical SPL calibration and digital full-scale analysis."
+description: "The sensitivity factor that turns digital units into pascals: deriving it from an IEC 60942 calibrator tone, coupling the calibrator, the short-term level-fluctuation check of clause 5.3.3, the arithmetic route from a rated microphone sensitivity, how the calibrator's class tolerance chains into every derived level, the field-check and drift schedule, and the digital dBFS frame for chains that never had a calibrated front end."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,14 @@ references:
     title: "Electroacoustics — Sound calibrators"
     designation: "IEC 60942:2017"
     url: "https://webstore.iec.ch/en/publication/30045"
-    note: "The calibrator level and class assumptions behind sensitivity() (the 94 dB principal level and the Table 1 class tolerances) and the short-term level-fluctuation stability check of the reference recording (clause 5.3.3, Table 2 class 1 limits per nominal frequency)."
+    note: "The calibrator level and class assumptions behind sensitivity() (the principal level of clause 5.3.1.3, the Table 2 acceptance limits with the Table A.1 maximum-permitted uncertainties they combine with under Annex D) and the short-term level-fluctuation stability check of the reference recording (clause 5.3.3, Table 2 class 1 limits per nominal frequency)."
+  - type: standard
+    organization: "Audio Engineering Society"
+    year: 2020
+    title: "AES standard method for digital audio engineering — Measurement of digital audio equipment"
+    designation: "AES17-2020"
+    url: "https://www.aes.org/publications/standards/search.cfm?docID=21"
+    note: "The full-scale-sine dBFS convention, which differs from this page's RMS-referenced convention by 3.01 dB."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2013
@@ -92,7 +99,8 @@ from phonometry import filters, metrology
 fs = 48000
 # calibrator_recording: your recorded 1 kHz calibrator tone (1 Pa RMS = 94 dB SPL).
 #   Synthesized here so the guide runs; in a real measurement, record your calibrator.
-calibrator_recording = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+#   Five seconds, as the coupling procedure below asks for.
+calibrator_recording = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(5 * fs) / fs)
 # recording: the mic capture you want to calibrate, same input chain (Pa after calibration).
 #   Synthesized here; in a real measurement this is your recorded signal.
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
@@ -105,7 +113,91 @@ spl, freq = filters.octave_filter(
     recording, fs,
     calibration=filters.LevelCalibration(factor=calibration_factor))
 # spl is now in dB SPL re 20 µPa
+print(f"S = {calibration_factor:.3f} Pa per digital unit")   # 1.002
+print(f"1 kHz band: {spl[freq.index(1000.0)]:.1f} dB SPL")   # 77.0
 ```
+
+Both numbers are worth reading rather than skipping. The synthetic calibrator
+take has an RMS of exactly 1.0 digital unit, so
+$S = 20\ \mu\text{Pa}\cdot 10^{94/20} / 1.0 = 1.002$ Pa per digital unit: one
+digital unit is one pascal, which is what a chain whose full scale sits just
+above the calibrator level looks like. The measurement record has amplitude
+0.2, hence an RMS of 0.141 digital units, hence 0.142 Pa, hence
+$20\log_{10}(0.142 / 2\times 10^{-5}) = 77.0$ dB SPL — which is the 1 kHz band
+the snippet prints.
+
+That gives the sanity rule for every later session. $S$ is the pascal-per-unit
+scale of the chain, so $94 - L_\text{cal,dBFS}$ — the calibrator level minus the
+RMS level of the calibrator take in dBFS — is the sound pressure level that
+would drive the converter to a digital RMS of 1.0. If that number is not within
+a few decibels of the loudest level the chain was set up for, something is wrong
+with the take: a clipped or half-scale recording, a `target_spl` left at 94.0 for
+a 114 dB calibrator, or a gain change between the two recordings. A factor wrong
+by exactly 20 dB is the usual outcome of the second mistake, and no later step
+will reveal it.
+
+### Coupling the calibrator
+
+The snippet is three lines; the step it hides is the one that goes wrong. The
+specified level of a sound calibrator is the level *at the diaphragm of the
+inserted microphone* (IEC 60942:2017, 5.3.1.2), so the mechanical assembly is
+part of the measurement, not a preliminary to it. Six steps:
+
+1. **Set the gain for the loudest level you expect, and lock it.** $S$ is valid
+   only while the chain stays exactly as calibrated, and a gain knob moved after
+   the check shifts every level by an amount nothing downstream can detect.
+2. **Disable every automatic process on the interface** — gain riding, limiting,
+   noise suppression, "voice" enhancement — and record at 24 bit. Any of them
+   makes the chain non-linear, and the calibrator take is the one signal on which
+   that is invisible, because it is a single steady tone.
+3. **Take the windscreen off and fit the adaptor supplied with the calibrator.**
+   An adaptor is an integral part of the sound calibrator (5.1.1), and where the
+   manual gives adaptor design data it also gives the insertion distance and the
+   minimum microphone diameter at which sealing occurs (6.3 u). Check that your
+   microphone model *and configuration* — with or without the protective grid —
+   is in the manual's list (6.3 a): the specified level holds for the models and
+   configurations stated there (5.3.1.3), and the manual states how much the
+   level moves with the effective load volume of the inserted microphone
+   (6.3 k), the air volume bounded by the reference plane, the diaphragm and the
+   capsule wall (3.13).
+4. **Insert the capsule fully to the reference plane** — the plane of contact
+   between microphone and calibrator (3.12) — hold the assembly still and let it
+   settle. The manual states two settling times: the calibrator's own, which may
+   not exceed 30 s (5.1.10), and the time the microphone-and-calibrator
+   combination needs after they are coupled (6.3 e).
+5. **Do the check away from the running source.** The cavity is not a sound
+   isolator. IEC 60942 makes this quantitative for its own tests: with the
+   microphone coupled and the calibrator *switched off*, the level the microphone
+   reads must be at least 30 dB below the level being measured for periodic
+   testing (B.4.2), and 40 dB below for pattern evaluation (A.5.3). For a 94 dB
+   calibrator that is a background below 64 dB at the capsule — a number you can
+   record and check in ten seconds, and the one that decides whether
+   `narrowband=True` is optional (see the figure below).
+6. **Record 5 to 10 s of settled tone**, trim the handling noise at both ends,
+   and pass the rest to `sensitivity(ref, fs=fs)`. The standard measures the
+   generated level as an average over 20 s to 25 s (A.5.5.1) and the short-term
+   fluctuation over 60 s sampled at least 30 times (5.3.3); a few settled seconds
+   is enough for the RMS to converge, and the stability check below is what tells
+   you the tone really was settled.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_coupling.svg" alt="Half-section through a sound calibrator cavity with a half-inch measurement microphone inserted to the reference plane, the effective load volume shaded between diaphragm and reference plane, a quarter-inch adaptor drawn as part of the calibrator, the windscreen removed to one side, and a second panel showing the background-level check with the calibrator switched off" width="92%" />
+
+**Pressure field in the cavity, free field in the measurement.** The coupler
+drives the diaphragm with a pressure excitation: the cavity is far smaller than a
+wavelength, so the sound pressure is uniform over it and no diffraction around
+the capsule takes place. The microphone you are calibrating is normally rated for
+a *free field*, where its own body and the grid raise the response at high
+frequency. The two ratings differ by tenths of a decibel below about 2 kHz and by
+several decibels near 10 kHz, which is why IEC 60942 confines the principal
+frequency of a sound calibrator to the 160 Hz to 1250 Hz range (5.4.1.1): there
+the pressure and free-field sensitivities of a measurement capsule coincide
+closely enough that no correction is applied. It also means $S$ is a
+single-frequency anchor. The *shape* of the chain's response away from the
+calibrator frequency comes from the microphone's own free-field data, not from
+this check — the three sensitivities and where each applies are laid out in
+[Microphones](/phonometry/devices/electroacoustics/microphones/). Put the
+windscreen back on before measuring, and remember it has its own insertion loss
+of a few tenths of a decibel at high frequency, which the calibration did not see.
 
 ## Calibrator assumptions (IEC 60942)
 
@@ -113,14 +205,50 @@ spl, freq = filters.octave_filter(
 calibrator as specified by **IEC 60942** (classes LS, 1 and 2):
 
 - The default `target_spl=94.0` matches the common 94 dB @ 1 kHz calibrator
-  output (the standard requires the principal level to be at least 90 dB re
-  20 µPa; 94 dB and 114 dB are the usual choices).
-- The resulting sensitivity inherits the calibrator's class tolerance (e.g.
-  ±0.4 dB for a class 1 calibrator between 160 Hz and 1.25 kHz, IEC 60942
-  Table 1) plus the RMS estimation error of your recording.
-- IEC 60942 specifies the generated level as a 20 s average: record a few
-  seconds of *stable* tone (excluding handling noise at the start/end) for the
-  RMS estimate to converge.
+  output. Clause 5.3.1.3 requires the principal level to be at least 90 dB re
+  20 µPa *when the calibrator is applied to the microphone models and
+  configurations specified in its instruction manual*; 94 dB and 114 dB are the
+  usual choices, and the principal frequency must lie between 160 Hz and
+  1.25 kHz (5.4.1.1).
+- The resulting sensitivity inherits the calibrator's own level tolerance, and
+  that number takes one step to obtain. IEC 60942:2017 deliberately does not
+  print tolerance limits: Table 2 gives the **acceptance limit** on the
+  generated level (0.25 dB for a class 1 calibrator from 160 Hz to 1.25 kHz,
+  0.40 dB for class 2, 0.10 dB for class LS) and Table A.1 the
+  **maximum-permitted uncertainty** of the laboratory measurement that
+  demonstrates it (0.15 dB for class 1 over the same range); Annex D, Figure D.1
+  places the tolerance limit at their sum. **±0.4 dB** is therefore the class 1
+  figure to carry into an uncertainty budget at 1 kHz, and it is a tolerance,
+  not a measured error. Add the RMS estimation error of your own recording on
+  top of it.
+- IEC 60942 measures the generated level as an average over 20 s to 25 s
+  (A.5.5.1): record a few seconds of *stable* tone (excluding handling noise at
+  the start/end) for the RMS estimate to converge.
+- **Environmental corrections, and which calibrators need them.** The generated
+  level is specified at the reference conditions of Clause 4: 23 °C,
+  101.325 kPa and 50 % relative humidity. Table 2 still applies without any
+  correction over a band around them (97 kPa to 105 kPa, 20 °C to 26 °C, 40 % to
+  65 % RH, clause 5.3.2), and outside that band a calibrator must stay inside
+  the wider limits of Tables 5 and 6 over its whole operating range, which for
+  class 1 is 65 kPa to 108 kPa, −10 °C to +50 °C and 25 % to 90 % RH (5.5).
+  Only *pistonphones* that need a static-pressure correction to meet their class
+  carry the letter **M** in their designation (class LS/M, class 1/M, 5.1.5 and
+  Table 1); they are supplied with a barometer, or their manual specifies one
+  (5.1.8), and the manual states the correction and its uncertainty (6.3 i, 6.3 m).
+  A pistonphone generates a fixed volume displacement, so its output follows the
+  ambient static pressure — of order a tenth of a decibel for ordinary weather
+  and around −1 dB at 1000 m above sea level. Every other calibrator, by
+  5.1.7, must meet its class with no environmental correction at all. When a
+  correction *is* required, apply it to the target level and not to the results:
+
+```python
+p_correction_db = 0.0  # from the calibrator manual and the barometer reading
+cal_corrected = metrology.sensitivity(
+    calibrator_recording, target_spl=94.0 + p_correction_db, fs=fs)
+```
+
+  The correction enters $S$ directly, so it moves every level of the session by
+  the same amount.
 
 ### Automatic stability validation
 
@@ -184,6 +312,67 @@ plt.show()
 
 </details>
 
+### Broadband noise in the take, and what it costs
+
+The RMS of the calibrator recording is the denominator of $S$, so anything in
+the take that is not the tone inflates it and shrinks the factor — and every
+level derived from that factor then reads *low*, by
+$-10\log_{10}(1 + 1/\mathrm{SNR})$ with SNR the tone-to-noise power ratio in the
+recording. Passing `narrowband=True` replaces the full-band RMS with a coherent
+Goertzel detector locked to the tone, which rejects the incoherent part:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_narrowband_bias.svg" alt="Sensitivity error against coupler signal-to-noise ratio: the full-band RMS estimator follows minus ten log of one plus one over SNR and leaves the class 1 acceptance band below 12.3 dB SNR, while the Goertzel estimator stays within hundredths of a decibel" width="88%" />
+
+*Sensitivity error against the signal-to-noise ratio of the calibrator take,
+measured by calling `sensitivity()` on a 1 kHz tone plus broadband noise. The
+full-band RMS estimator lands exactly on the closed form; it costs 0.41 dB at
+10 dB SNR, 0.05 dB at 20 dB and spends the whole class 1 acceptance limit of
+0.25 dB below 12.3 dB SNR. The Goertzel estimator stays inside 0.02 dB
+everywhere. The 30 dB background margin the coupling procedure asks for
+(B.4.2) therefore puts the plain RMS estimator at 0.004 dB, which is why
+`narrowband=False` is a sane default and `narrowband=True` is the repair for a
+take you could not make quiet enough.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# metrology comes from the first snippet on this page.
+fs = 48000
+t = np.arange(int(fs * 6.0)) / fs
+tone = np.sqrt(2) * np.sin(2 * np.pi * 1000 * t)     # 1 Pa RMS on 1.0 digital
+s_true = 2e-5 * 10 ** (94 / 20)
+noise = np.random.default_rng(7).standard_normal(t.size)
+noise /= np.sqrt(np.mean(noise ** 2))
+
+snr_db = np.arange(0.0, 40.5, 1.0)
+rms, goertzel = [], []
+for snr in snr_db:
+    x = tone + noise * 10 ** (-snr / 20)
+    # validate=False: the noisy takes deliberately fail the stability check,
+    # which is a second, independent reason not to accept them.
+    rms.append(
+        20 * np.log10(metrology.sensitivity(x, fs=fs, validate=False) / s_true))
+    goertzel.append(20 * np.log10(
+        metrology.sensitivity(x, fs=fs, narrowband=True, validate=False) / s_true))
+
+plt.figure(figsize=(9, 5))
+plt.axhspan(-0.25, 0.25, alpha=0.15)
+plt.plot(snr_db, rms, label="narrowband=False")
+plt.plot(snr_db, -10 * np.log10(1 + 10 ** (-snr_db / 10)), "k:",
+         label="closed form")
+plt.plot(snr_db, goertzel, label="narrowband=True")
+plt.xlabel("Coupler signal-to-noise ratio [dB]")
+plt.ylabel("Sensitivity error [dB]")
+plt.legend()
+plt.show()
+```
+
+</details>
+
 ### `sensitivity()` parameters
 
 | Parameter | Type / shape | Units | Range / default | Notes |
@@ -195,11 +384,87 @@ plt.show()
 | `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings |
 | `max_fluctuation_db` | float, optional | dB | default `None` → Table 2 class 1 | Explicit override of the stability limit |
 | `frequency` | float | Hz | default `1000.0` | Calibrator's nominal frequency; selects the IEC 60942 Table 2 row |
-| `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (~−0.44 dB at 20 dB SNR). Enable for noisy coupler recordings |
+| `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (−0.41 dB at 10 dB SNR, −0.04 dB at 20 dB; see the figure above). Enable for noisy coupler recordings |
 
 Returns the sensitivity factor (float) to pass as `calibration_factor=` to
 `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` and the dose functions, and as
 `calibration=LevelCalibration(factor=...)` to `octave_filter`.
+
+### What the factor also tells you: the measurable range
+
+$S$ is not only a conversion, it is the chain's scale, and both ends of the
+measurable range fall straight out of it.
+
+**The ceiling.** A signal whose digital RMS reaches 1.0 corresponds to
+$20\log_{10}(S/p_0)$ dB, which is also the calibrator level minus the dBFS level
+of the calibrator take. A full-scale *sine* has an RMS of $1/\sqrt{2}$, so it
+reads 3.01 dB lower, $L_\text{FS} = 20\log_{10}\!\big(S/(\sqrt{2}\,p_0)\big)$.
+That is the highest sine level the converter can carry without clipping; compare
+it against the microphone's own overload sound pressure level, which is a
+capsule-and-preamplifier property and not a converter one (see
+[Microphones](/phonometry/devices/electroacoustics/microphones/)), and keep the
+smaller of the two at least 10 dB above the loudest event you expect. A clipped
+event does not announce itself: it reads *low*, and plausibly so.
+
+**The floor.** Record 30 s with the capsule in a quiet enclosure — the closed
+calibrator cavity with the drive switched off does nicely, which is the same
+take the coupling step already asks for — and run it through the same factor.
+That level is the chain's inherent noise, microphone plus preamplifier plus
+converter. A measured level within 3 dB of it is not a measurement of the
+source; one within 10 dB needs the background correction that the emission and
+environmental guides apply.
+
+```python
+# Continues from the first snippet: calibration_factor and fs are already bound.
+ceiling = 20 * np.log10(calibration_factor / (np.sqrt(2) * 2e-5))
+quiet = 1e-4 * np.random.default_rng(0).standard_normal(30 * fs)  # your 30 s take
+floor = 20 * np.log10(np.sqrt(np.mean((quiet * calibration_factor) ** 2)) / 2e-5)
+print(f"full-scale sine {ceiling:.1f} dB SPL, noise floor {floor:.1f} dB SPL")
+```
+
+### Without a calibrator: from the rated sensitivity
+
+A calibrator is the only route to a *normative* level, but it is not the only
+route to a number. If the microphone datasheet states a sensitivity and the
+interface a full-scale input voltage, the chain gain is a product of three
+numbers you can read off, and $S$ can be assembled arithmetically:
+
+$$
+S = \frac{V_\text{FS}}{M\,G}
+$$
+
+where $M$ is the capsule's rated **free-field sensitivity in volts per pascal**
+at the reference frequency, $G$ the linear voltage gain of preamplifier plus
+interface, and $V_\text{FS}$ the input voltage *amplitude* that drives the
+converter to $\pm 1.0$. Note the trap in the last one: an interface datasheet
+normally quotes its maximum input level as the RMS of the sine that just reaches
+full scale, so $V_\text{FS} = \sqrt{2}$ times that figure.
+
+Worked through for a 12.5 mV/Pa half-inch capsule, +20 dB of gain and an input
+whose maximum level is 1.0 V RMS: $M = 0.0125$ V/Pa, $G = 10$,
+$V_\text{FS} = 1.414$ V, so $S = 11.31$ Pa per digital unit. One pascal (94 dB)
+then lands at $MG/V_\text{FS} = 0.0884$ digital units RMS, that is −21.1 dBFS,
+and the ceiling derived above is $20\log_{10}(11.31/(\sqrt{2}\cdot 2\times
+10^{-5})) = 112.0$ dB SPL. Both numbers are checkable against the chain in a
+few seconds, which is the point of the route.
+
+Beware the word *sensitivity*: it means reciprocal things on the two pages. Here
+$S$ is pascals per digital unit; on the
+[Microphones](/phonometry/devices/electroacoustics/microphones/) page $M$ is
+volts per pascal, exposed as `sensitivity_mv_per_pa`, and the free-field,
+pressure and random-incidence ratings are three different numbers for the same
+capsule — use the free-field one at the reference frequency.
+
+What the route costs: it inherits the capsule's individual deviation from its
+rated value (a few tenths of a decibel for a laboratory microphone with an
+individual calibration chart, but a *nominal* figure on a low-cost capsule can
+be a couple of decibels out), the repeatability of the gain setting, and the
+interface's own full-scale tolerance. Budget about a decibel against the few
+tenths of a calibrator check, and note what it cannot do at all: it cannot
+detect a damaged capsule, a leaking preamplifier or a changed gain, because
+nothing in it is measured. Use it for dBFS-adjacent work, for sanity-checking a
+calibrator result, and never for a level that faces a limit. And once the
+numbers are read, the gain must stay exactly where it was.
 
 ## Field checks, laboratory verification and drift
 
@@ -225,6 +490,26 @@ Calibration lives at three time scales:
   why a pre/post difference of half a decibel signals damage rather than
   weather. The largest "drift" of all is a touched gain knob: the factor
   $S$ is valid only while the chain stays exactly as calibrated.
+
+### What a calibration must record to be reportable
+
+The pre/post pair and the calibrator's class tolerance are the two Type B inputs
+that the [uncertainty budget](/phonometry/signals/metrology/gum-uncertainty/) of
+a level consumes. A check that was not written down cannot be propagated, so
+record, at the time of the check:
+
+- calibrator make, model, serial number, class designation (including the letter
+  M if present) and the date of its last laboratory verification;
+- microphone and preamplifier model and serial number, and the microphone
+  configuration used (with or without the protective grid);
+- the adaptor fitted, if any;
+- the sensitivity obtained before the series, the one obtained after it, and
+  their difference — the drift bound;
+- sample rate, bit depth and the gain setting, exactly as locked;
+- air temperature, static pressure and relative humidity, plus any static
+  pressure correction applied to `target_spl` and where it came from;
+- the background level read by the coupled capsule with the calibrator off;
+- the resulting factor $S$ and the tolerance assumed for it.
 
 One more class subtlety: tolerances chain. A class 1 measurement requires a
 class 1 (or LS) calibrator *and* a class 1 meter; calibrating a class 1
@@ -259,6 +544,49 @@ spl_dbfs, freq = filters.octave_filter(
 # Results will be negative (e.g., -20 dBFS)
 ```
 
+### The convention differs from AES17 by 3.01 dB
+
+This is the **RMS-referenced** convention: a signal whose RMS is 1.0 reads
+0 dBFS, so a full-scale sine, whose RMS is 0.707, reads −3.01 dBFS in
+`mode='rms'`. AES17 — and the meters, DAWs and loudness tools that follow it —
+normalise a full-scale *sine* to 0 dBFS instead, so the same file measured by
+two tools differs by exactly 3.01 dB with neither of them wrong. Note that
+`mode='peak'` with `dbfs=True` reads 0 dBFS for that same sine, because its peak
+*is* 1.0: the RMS-versus-peak choice below and the convention question are the
+same question asked twice. Any dBFS number quoted outside the library should
+carry its convention with it.
+
+### What survives the loss of a physical reference
+
+Half of what this library computes does not care which frame it is in, and the
+other half is silently meaningless without $S$. The dividing line is whether the
+quantity is built from a *ratio* or a *shape* — invariant — or from an absolute
+value — not.
+
+**Frame-invariant** (the same number in dBFS as in dB SPL): reverberation times
+and decay slopes, transfer functions and coherence, correlation and delay,
+spectral slopes and shapes, band-to-band differences, and any A-minus-C or
+C-minus-Z difference. These are the quantities you can legitimately get from an
+uncalibrated recording, and most of `signals/spectra` lives here.
+
+**Frame-dependent** (plausible, wrong, and silent without a calibration):
+$L_{Aeq}$ against a limit, SEL, noise dose and exposure, the percentile levels
+$L_N$, every psychoacoustic quantity anchored to 20 µPa (loudness in sones,
+sharpness, the ECMA-418-2 chain), the peak criteria of hearing-conservation
+rules, and every conformance verdict in the library. None of these functions
+refuses uncalibrated samples — they cannot tell — so the frame is a decision the
+analyst has to record beside the result.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbfs_versus_spl.svg" alt="Left: the same third-octave band spectrum computed with a calibration factor and with dbfs=True, superimposed once the constant offset is added. Right: the first cycles of a band-filtered tone burst overshooting the drive amplitude by 1.32 decibels, which is what mode='peak' reads" width="92%" />
+
+*Left: one record, two frames. The dBFS spectrum is the dB SPL spectrum shifted
+by a constant, here 106.04 dB, which is exactly the calibrator level minus the
+dBFS level of the calibrator take — the dBFS frame changes the origin and
+nothing else, which is why every shape-based quantity above survives it. Right:
+the onset of a 1 kHz tone burst after the octave filter, drive amplitude 0.5.
+The band signal overshoots to 0.582 before settling, so `mode='peak'` reads
+1.32 dB above the steady tone.*
+
 ## RMS versus peak levels
 
 Levels can be read two ways, and both are in use in commercial analysers:
@@ -286,8 +614,9 @@ spl_peak, freq = filters.octave_filter(recording, fs, mode='peak')
 :::note
 `mode='peak'` measures the absolute maximum of the **filtered** band signal,
 which includes the filter's onset transient (overshoot). Signals that start
-abruptly may read up to ~1 dB high. This is inherent to IIR band filters
-(an analog SLM behaves the same way), not a processing artifact.
+abruptly may read about 1 dB high — 1.32 dB for the tone burst drawn in the
+right-hand panel above. This is inherent to IIR band filters (an analog sound
+level meter behaves the same way), not a processing artifact.
 :::
 
 ## Integer audio input
@@ -309,10 +638,10 @@ anything else.
 ## What this guide covers
 
 **Covered.** IEC 60942:2017 as far as it constrains the *sensitivity factor*:
-the principal calibrator level that `target_spl` assumes, the Table 1 class
-tolerances quoted in the uncertainty discussion above, and the short-term
-level-fluctuation check of clause 5.3.3 against the class 1 limits of Table 2,
-which `sensitivity(ref, fs=fs)` runs on the reference recording.
+the principal calibrator level that `target_spl` assumes, the Table 2 and
+Table A.1 class tolerances quoted in the uncertainty discussion above, and the
+short-term level-fluctuation check of clause 5.3.3 against the class 1 limits of
+Table 2, which `sensitivity(ref, fs=fs)` runs on the reference recording.
 
 **Not covered.** The conformance tests of the calibrator itself (generated
 level, frequency, distortion, and the environmental corrections for static
@@ -342,4 +671,4 @@ Derive the sensitivity before each measurement series and check it again at the 
 
 ### Can I calibrate a class 1 chain with a class 2 calibrator?
 
-You can, but the tolerances chain: a class 1 measurement requires a class 1 (or LS) calibrator per IEC 60942 and a class 1 meter, so a class 2 calibrator silently downgrades every derived level to class 2 accuracy, because its wider level tolerance enters the sensitivity factor $S$ directly. For reference, the class 1 tolerance is ±0.4 dB between 160 Hz and 1.25 kHz (IEC 60942 Table 1).
+You can, but the tolerances chain: a class 1 measurement requires a class 1 (or LS) calibrator per IEC 60942 and a class 1 meter, so a class 2 calibrator silently downgrades every derived level to class 2 accuracy, because its wider level tolerance enters the sensitivity factor $S$ directly. For reference, the class 1 tolerance limit is ±0.4 dB between 160 Hz and 1.25 kHz: the 0.25 dB acceptance limit of IEC 60942:2017 Table 2 plus the 0.15 dB maximum-permitted measurement uncertainty of Table A.1, combined as Annex D describes.

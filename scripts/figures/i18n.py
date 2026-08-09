@@ -1456,6 +1456,50 @@ _ES_EXACT = {
     "Time [ms]": "Tiempo [ms]",
     "Pressure [Pa]": "Presión [Pa]",
     "FDTD probe pressure": "Presión en las sondas FDTD",
+    # Simulation: the one-way plane-wave launcher and the meshed panel.
+    "One-way plane-wave launch: flat front, absorbed back side":
+        "Lanzamiento de onda plana unidireccional: frente plano, dorso absorbido",
+    "Settled field, 1 kHz CW": "Campo estacionario, onda continua de 1 kHz",
+    "Cut across the front (row 80)": "Corte transversal del frente (fila 80)",
+    "What is left behind the line": "Lo que queda detrás de la línea",
+    "envelope over one period": "envolvente sobre un periodo",
+    "one snapshot": "una instantánea",
+    "injection line": "línea de inyección",
+    "sponge": "esponja",
+    "Row envelope [dB re the forward field]":
+        "Envolvente por fila [dB re el campo hacia delante]",
+    "largest difference between neighbouring columns:\n"
+    "0.0e+00 Pa — the row is bit-identical":
+        "mayor diferencia entre columnas contiguas:\n"
+        "0,0e+00 Pa — la fila es idéntica bit a bit",
+    "-38.4 dB of the field energy sits\n"
+    "in the 20 sponge rows behind the line":
+        "-38,4 dB de la energía del campo está\n"
+        "en las 20 filas de esponja tras la línea",
+    "What the transfer matrix homogenises: five slit resonators, each one "
+    "reflection coefficient":
+        "Lo que homogeneiza la matriz de transferencia: cinco resonadores de "
+        "ranura, cada uno un coeficiente de reflexión",
+    "What the solver steps on: the same panel as a boolean obstacle mask at "
+    "dx = 0.5 mm":
+        "Lo que integra el solver: el mismo panel como máscara booleana de "
+        "obstáculos con dx = 0,5 mm",
+    "The fifth cell magnified: the 3.2 mm neck is six cells wide, and it is "
+    "what sets dx":
+        "La quinta celda ampliada: el cuello de 3,2 mm ocupa seis celdas, y es "
+        "lo que fija dx",
+    "3.2 mm neck = 6 cells": "cuello de 3,2 mm = 6 celdas",
+    "20.3 mm slit": "ranura de 20,3 mm",
+    "3 mm rigid backing": "fondo rígido de 3 mm",
+    "Water over steel at normal incidence: the probe history res.plot() draws":
+        "Agua sobre acero con incidencia normal: el historial de sonda que "
+        "dibuja res.plot()",
+    "probe pressure, 7.5 m below the source":
+        "presión en la sonda, 7,5 m bajo la fuente",
+    "incident\n1.02 ms": "incidente\n1,02 ms",
+    "echo off the steel\n3.04 ms": "eco en el acero\n3,04 ms",
+    "echo / incident = 0.938\n(Z₂−Z₁)/(Z₂+Z₁) = 0.938":
+        "eco / incidente = 0,938\n(Z₂−Z₁)/(Z₂+Z₁) = 0,938",
     "Number of strikes N": "Número de golpes N",
     "Cumulative SEL [dB re 1 µPa²·s]": "SEL acumulado [dB re 1 µPa²·s]",
     "ICAO Aircraft Flyover — Effective Perceived Noise Level (Annex 16)":
