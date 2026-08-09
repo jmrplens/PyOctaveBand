@@ -97,3 +97,11 @@ stub/src/*.egg-info/
 # .github/images and .github/reports, which are the committed originals.
 site/public/media/
 site/lighthouse-results/
+
+# Fiches a snippet writes where it was run. The guides show `.report("x.pdf")`
+# with a bare filename, which is the honest way to document it, so running one
+# to check a number drops the PDF in whatever directory you were standing in.
+# Seventeen of them reached the repository root that way. The originals live in
+# .github/reports and are committed from there, so nothing at the root is ever
+# wanted.
+/*.pdf
