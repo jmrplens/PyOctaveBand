@@ -140,7 +140,7 @@ $$
 
 (Eqs. (11)-(12)), integrate the group delay into a phase, and inverse-FFT.
 The sweep then follows *any* spectral shape with a nearly constant envelope,
-keeping the crest factor close to a swept sine's ideal 3.02 dB - unlike a
+keeping the crest factor close to a swept sine's ideal 3.01 dB - unlike a
 noise signal with the same spectrum, which sits ~6 dB higher. `shaped_sweep_signal`
 implements the construction with the paper's band-limiting and Nyquist-phase
 details; `target` is `"pink"` (the classical room-measurement emphasis,
