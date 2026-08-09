@@ -1126,9 +1126,10 @@ from phonometry import load_anp_database
 
 db = load_anp_database()
 print(len(db.aircraft_ids))          # 155 aircraft types
-aircraft = db.aircraft("747100")
-print(aircraft.description)          # Boeing 747-100 / JT9DBD
-print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
+ac = db.aircraft("747100")
+print(ac.description)                # Boeing 747-100 / JT9DBD
+print(ac.engine_type, ac.num_engines, ac.weight_class)
+print(ac.power_parameter, ac.mounting)   # CNT (lb) wing
 ```
 
 An `AnpAircraft` describes itself with the engine type and count and the ICAO
@@ -1139,9 +1140,11 @@ pounds for most jets, so a power you pass to `level` has to be in those units.
 The engine **mounting** is the one field of the record the Doc 29 chain itself
 reads; it is derived from the ANP lateral directivity identifier, is one of
 `"wing"`, `"fuselage"` or `"propeller"`, and selects the engine-installation
-correction that [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) applies by hand. The shipped
-fleet splits 70 / 55 / 30 across the three, and an unrecognised identifier falls
-back to `"wing"`.
+correction that [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) applies by hand. The choice is
+not cosmetic: at small depression angles the wing and fuselage corrections differ
+by more than a decibel, a propeller takes none of that correction at all, and the
+shipped fleet splits 70 / 55 / 30 across the three. An unrecognised identifier
+falls back to `"wing"`.
 
 ## The noise-power-distance curves
 
@@ -1168,6 +1171,30 @@ downstream stays in SI. `curves.plot()` draws the whole family:
   <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd.svg" alt="Noise-power-distance curves of a Boeing 747-100 for three tabulated thrust settings, each level falling with slant distance on a logarithmic axis, with markers on the tabulated nodes" width="82%">
 </picture>
 
+The three tabulated thrust settings are close to parallel: power mostly shifts
+the level, while distance sets the shape.
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+curves = ac.npd_curves("D", "SEL")
+
+fig, ax = plt.subplots(figsize=(10, 6))
+curves.plot(ax=ax)
+ax.set_title(f"ANP NPD Curves - {ac.description} (SEL, departure)")
+ax.text(0.02, 0.06,
+        f"power parameter: {ac.power_parameter}\n"
+        "markers: tabulated NPD nodes",
+        transform=ax.transAxes, va="bottom", fontsize=9)
+plt.show()
+```
+
+</details>
 
 ## The default trajectory
 
@@ -1183,9 +1210,29 @@ ANP entries describe their departures as procedural steps instead (climb at this
 rate to that altitude, accelerate, retract flaps), which have to be flown
 through a flight-mechanics performance model before they become a path. That
 model is outside this bridge, so of the 155 aircraft in the shipped database 13
-have a fixed-point departure profile. Asking for one that does not exist raises
-a `KeyError` naming the stage lengths that do. NPD curves, on the other hand,
-are tabulated for every aircraft in the database.
+have a fixed-point *departure* profile and 20 a fixed-point *arrival* profile.
+Doc 29 Vol. 2 Appendix G3.5 defines the bins by trip length in nautical miles
+(1 is 0-500, 2 is 500-1 000, 3 is 1 000-1 500, 4 is 1 500-2 500, then 1 000 nmi
+steps), and the shipped profiles cover stage lengths 1 to 7 for departures and 1
+only for arrivals. Asking for one that does not exist raises a `KeyError` naming
+the stage lengths that do, which is how to discover them:
+
+```python
+from phonometry import load_anp_database
+
+db = load_anp_database()
+for identifier, operation, stage in (("A320-232", "D", 1), ("747100", "D", 9)):
+    try:
+        db.profile(identifier, operation, stage)
+    except KeyError as exc:
+        print(exc)
+# ... 'A320-232', operation 'D', stage length 1 (available stage lengths: [])
+# ... '747100', operation 'D', stage length 9 (available: [1, 2, 3, 4, 5, 6])
+```
+
+An empty list means the type has no fixed-point profile at all and needs a
+substitute trajectory. NPD curves, on the other hand, are tabulated for every
+aircraft in the database.
 
 ```python
 from phonometry import load_anp_database
@@ -1200,6 +1247,30 @@ profile.plot()
   <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile.svg" alt="Default departure profile of a Boeing 747-100: altitude against along-track distance, rising from the runway through eleven fixed points, with the ground-roll points marked at zero altitude" width="82%">
 </picture>
 
+The first points sit at zero altitude and are the ground roll; the climb gradient
+after them fixes the slant distance at every receiver, so it decides the contour.
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+profile = ac.profile("D", stage_length=1)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+profile.plot(ax=ax)
+ax.set_title(f"ANP Default Departure Profile - {ac.description}")
+ax.text(0.98, 0.06,
+        f"stage length {profile.stage_length}, "
+        f"{profile.path.shape[0]} fixed points",
+        transform=ax.transAxes, va="bottom", ha="right", fontsize=9)
+plt.show()
+```
+
+</details>
 
 ## Straight to an event level or a contour
 
@@ -1211,15 +1282,23 @@ functions the airport-noise page builds by hand.
 ```python
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
-print(round(float(flyover.level), 1))     # SEL in dB at that receiver
+ac = load_anp_database().aircraft("747100")
+flyover = ac.event_level([3000.0, 500.0, 0.0], "D")
+print(round(float(flyover.level), 1))     # 100.4 dB
 ```
 
-The observer is `(x, y, z)` in metres in the runway frame: along the track,
-across it and above the ground. The optional `temperature` and `pressure`
-arguments feed the Doc 29 atmospheric impedance adjustment and default to the
-15 °C and 101.325 kPa of the standard atmosphere.
+The observer is `(x, y, z)` in metres in the runway frame, whose origin is not
+the airport boundary: `x` runs along the runway centre line with `x = 0` at start
+of roll for a departure and at the landing threshold for an arrival, so arrival
+profiles carry negative `x` on final approach and the two frames sit nearly 35 km
+apart. `y` is the lateral offset from the extended centre line, positive to
+starboard, and its sign selects the depression-angle branch of the banked-segment
+rule; `z` is the receiver height above local ground, left at 0 here where Doc 29
+measures at 1.2 m. The metric defaults to the sound exposure level and the stage
+length to 1, and the optional `temperature` and `pressure` arguments feed the
+Doc 29 atmospheric impedance adjustment, defaulting to the 15 °C and 101.325 kPa
+of the standard atmosphere — a bookkeeping term worth +0.07 dB there, not a
+weather correction.
 
 ```python
 import numpy as np
@@ -1230,8 +1309,14 @@ contour = load_anp_database().aircraft("747100").noise_contour(
     x=np.linspace(-2000.0, 12000.0, 40),
     y=np.linspace(-3000.0, 3000.0, 30),
 )
-print(contour.level.shape)      # (30, 40): one SEL per grid point
+print(contour.level.shape)      # (30, 40): one SEL per grid point, indexed (y, x)
+contour.plot()
 ```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour.svg" alt="Single-event sound exposure level contour of a Boeing 747-100 departure computed from the shipped ANP database, with the take-off ground roll and the default ground track overlaid and the event_level receiver marked at 100.4 dB" width="90%">
+</picture>
 
 Everything these two return is the same result type the airport-noise page uses,
 so the plotting, the contour extraction and the per-segment breakdown all work
@@ -47208,7 +47293,8 @@ From FRF vocabulary to the predicted level in a receiving room.
 - [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
   the frequency-independent wave-approach coefficients for rigid X, T, L and
   in-line junctions, their angular average and the derived coupling loss factor
-  and Kij.
+  and Kij, and the experimental route that measures the same coupling loss
+  factors by power injection.
 - [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
   the dynamic transfer stiffness of vibration isolators by the direct and
   indirect methods.
@@ -47385,7 +47471,7 @@ already provides - the [envelope spectrum and cepstrum](https://jmrplens.github.
 The working view is the two put together: the envelope spectrum of a
 band-passed vibration record with the predicted lines drawn on top and named.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted ball spin frequency at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted rolling-element rotational frequency BSF at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear" width="92%"></picture>
 
 *The four tall lines land on BPFO and its harmonics; nothing appears on BPFI or
 BSF. That is the diagnosis: a spall on the outer race.*
@@ -47587,13 +47673,17 @@ from phonometry import (
     gear_mesh_frequencies,
 )
 
-# A gearbox bearing carries its own lines, the mesh family of the gear it
-# supports, and the shaft harmonics. Put them all on one axes.
-bearing = bearing_fault_frequencies(1500.0, 9, 7.94, 39.0)
-gear = gear_mesh_frequencies(1500.0, 28, harmonics=2, sidebands=1)
+record, fs = x, 20000.0          # the housing record and its sample rate
+shaft_rpm = 2000.0               # from the tacho, not from the nameplate
+
+# The bearing's own lines, the mesh family of the pinion it supports, and the
+# shaft harmonics. Put them all on one axes.
+bearing = bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+gear = gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
 lines = combine_fault_lines(bearing, gear)
 
-spectrum = envelope_spectrum(record, fs, band=(2500.0, 5000.0))
+spectrum = envelope_spectrum(record, fs, band=(2000.0, 4000.0))
 lines.within(1.0, 1600.0).plot(spectrum=spectrum)
 ```
 
@@ -47673,7 +47763,9 @@ Three pages then characterise the path elements.
 follows the power across the structure itself, with the wave-approach
 transmission coefficients for rigid X, T, L and in-line junctions, their
 diffuse-field angular average, and the coupling loss factor and vibration
-reduction index Kij they yield.
+reduction index Kij they yield — and, for joints no wave model describes,
+the experimental route that inverts the same coupling loss factors from
+measured subsystem energies.
 [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
 measures the dynamic transfer stiffness of the isolators, mounts and hoses
 inserted precisely to break the transmission path, by the direct and indirect
@@ -47699,7 +47791,9 @@ which is where this section meets the
   the FRF family, conversions and the SDOF reference resonator.
 - [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
   the wave-approach transmission coefficients for rigid X, T, L and in-line
-  junctions, their angular average and the derived coupling loss factor and Kij.
+  junctions, their angular average and the derived coupling loss factor and Kij,
+  plus experimental SEA: coupling loss factors inverted from measured energies
+  by power injection, with the modal densities they need.
 - [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
   dynamic transfer stiffness of isolators by the direct and indirect methods.
 
