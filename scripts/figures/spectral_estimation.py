@@ -297,7 +297,11 @@ def generate_noise_colors(output_dir: str) -> None:
         anchor = (freqs >= 900.0) & (freqs <= 1100.0)
         level = level - float(np.mean(level[anchor]))
         slope = float(np.polyfit(np.log2(freqs), level, 1)[0])
-        ax.semilogx(freqs, level, color=color, linewidth=1.0, alpha=0.55)
+        # The measured trace sits behind its own exact law, so it has to
+        # recede; by colour rather than by opacity, which on the dark page
+        # takes the red and the blue down to the ground they sit on.
+        ax.semilogx(freqs, level, color=theme_line(color, ax, quiet=0.55),
+                    linewidth=1.0)
         ax.semilogx(freqs, 3.0103 * alpha * np.log2(freqs / 1000.0),
                     color=color, linestyle="--", linewidth=1.8,
                     label=f"{name}: measured {slope:+.4f}, "

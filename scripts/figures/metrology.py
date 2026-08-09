@@ -178,7 +178,9 @@ def generate_dbfs_versus_spl(output_dir: str) -> None:
     ax_l.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_l.set_axisbelow(True)
     format_frequency_axis(ax_l, 22.0, 11300.0)
-    ax_l.legend(loc="upper left", fontsize=9)
+    # Lower left, not upper: the spectrum peaks near 250 Hz and an upper-left
+    # box clips the peak, which is the one feature the panel exists to show.
+    ax_l.legend(loc="lower left", fontsize=9)
 
     # --- Right: the band-filter onset overshoot the peak mode reads. ---
     drive = 0.5

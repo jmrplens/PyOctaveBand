@@ -650,38 +650,38 @@ L 432.043438 26.318125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 144.796406 338.733437 
-L 328.172813 338.733437 
-Q 329.972813 338.733437 329.972813 336.933438 
-L 329.972813 310.832031 
-Q 329.972813 309.032031 328.172813 309.032031 
-L 144.796406 309.032031 
-Q 142.996406 309.032031 142.996406 310.832031 
-L 142.996406 336.933438 
-Q 142.996406 338.733437 144.796406 338.733437 
+     <path d="M 47.225781 338.733437 
+L 230.602187 338.733437 
+Q 232.402187 338.733437 232.402187 336.933438 
+L 232.402187 310.832031 
+Q 232.402187 309.032031 230.602187 309.032031 
+L 47.225781 309.032031 
+Q 45.425781 309.032031 45.425781 310.832031 
+L 45.425781 336.933438 
+Q 45.425781 338.733437 47.225781 338.733437 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_71">
-     <path d="M 146.596406 316.320625 
-L 155.596406 316.320625 
-L 164.596406 316.320625 
+     <path d="M 49.025781 316.320625 
+L 58.025781 316.320625 
+L 67.025781 316.320625 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m44d939040c" x="155.596406" y="316.320625" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#m44d939040c" x="58.025781" y="316.320625" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="171.796406" y="319.470625" transform="rotate(-0 171.796406 319.470625)">dB SPL (factor from the calibrator)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="319.470625" transform="rotate(-0 74.225781 319.470625)">dB SPL (factor from the calibrator)</text>
     </g>
     <g id="line2d_72">
-     <path d="M 146.596406 329.821328 
-L 155.596406 329.821328 
-L 164.596406 329.821328 
+     <path d="M 49.025781 329.821328 
+L 58.025781 329.821328 
+L 67.025781 329.821328 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="171.796406" y="332.971328" transform="rotate(-0 171.796406 332.971328)">dBFS + 106.04 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="332.971328" transform="rotate(-0 74.225781 332.971328)">dBFS + 106.04 dB</text>
     </g>
    </g>
   </g>
