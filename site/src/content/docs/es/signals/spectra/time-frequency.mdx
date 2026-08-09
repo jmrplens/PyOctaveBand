@@ -97,7 +97,71 @@ determinista (tonos, barridos, transitorios), mientras que la
 [estimación de Welch](/phonometry/es/signals/spectra/spectral-analysis/) promediada
 es la herramienta de baja varianza para el fondo estacionario.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_es.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa a 45 decibelios rellena el fondo, con la barra de color leyendo el nivel de presión acústica absoluto" width="82%" loading="eager" />
+Ponle un número. Una única celda de periodograma de datos aleatorios es una
+ji-cuadrado con dos grados de libertad, así que su nivel tiene una desviación
+típica de unos **5,6 dB** y una dispersión al 90 % de unos **17 dB**: la textura
+moteada del fondo de ruido de la figura de abajo, y la razón de que una sola
+celda brillante no signifique absolutamente nada. De ahí sale la regla de
+lectura: un rasgo es real cuando **persiste en columnas o bins vecinos**, porque
+la fluctuación de celda a celda es independiente y la estructura no, de modo que
+el ojo hace el promediado que el estimador se negó a hacer. Los dos remedios
+cuestan algo: promediar columnas contiguas cambia resolución temporal por
+varianza y converge hacia la estimación de Welch, y suavizar en frecuencia con el
+núcleo de fracción de octava de la
+[página de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/)
+cambia resolución frecuencial por lo mismo. Y por eso mismo un fondo de
+ruido se *cuantifica* con una PSD y solo se *representa* en un espectrograma.
+
+### Elegir el segmento a partir del evento
+
+El compromiso está fijado, así que la elección tiene que venir de aquello que se
+mide.
+
+**Para un transitorio**, mantén $T_B$ por debajo de la caída que quieres ver.
+Los 12 ms de caída del impacto de la figura de abajo piden segmentos de unos
+pocos milisegundos, unas 256 muestras a 48 kHz, y la resolución frecuencial sale
+entonces en unos 190 Hz, la quieras o no.
+
+**Para una componente cuya frecuencia se mueve** a un ritmo $r$ en Hz/s, el tono
+se sale de su propio ancho de banda de resolución dentro de un mismo segmento
+salvo que $B_e \ge r\,T_B$. Con $B_e = 1{,}5/T_B$ eso da un óptimo
+$T_B = \sqrt{1{,}5/r}$. La sirena de abajo barre hasta unos 950 Hz/s, así que
+segmentos de menos de **40 ms** mantienen la cresta afilada, y la elección de
+1024 puntos a 16 kHz son 64 ms, ya pasado ese límite, que es por lo que la
+cresta engorda en la parte más empinada del barrido. Una subida de régimen que
+barre un orden de 500 Hz a 100 Hz/s pide segmentos de unos 0,12 s y nada más
+largo.
+
+Los dos requisitos entran en conflicto a menudo, como pasa en la
+propia escena de la figura. La receta honesta: elige $T_B$ a partir de lo más
+rápido que tenga que quedar nítido, contrasta el $B_e$ resultante con las dos
+componentes más próximas que tengan que quedar separadas y, cuando no se puedan
+cumplir las dos cosas, dilo en el pie en lugar de partir la diferencia.
+`res.time_resolution` y `res.resolution_bandwidth` informan del par realmente
+entregado, así que la elección se puede declarar en un informe.
+
+Una nota de adquisición, porque es el fallo que parece un resultado: captura los
+transitorios con un predisparo de al menos un segmento, fija la ganancia de
+antemano y verifica que ninguna muestra recorta; un impacto recortado dibuja una
+franja de altura completa que parece exactamente un evento de banda ancha.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_es.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa cuyo nivel de banda ancha es de 45 decibelios rellena la imagen con un nivel por celda mucho más bajo, con la barra de color leyendo el nivel de presión acústica absoluto" width="82%" loading="eager" />
+
+*Cómo leerla: la cresta de la sirena marca de verdad 70 dB SPL, porque un tono
+mete toda su potencia dentro de un ancho de banda de resolución y la celda
+`'spectrum'` es por tanto su valor cuadrático medio. El fondo rosa **no** marca
+45 dB en ninguna parte. Esos 45 dB son su nivel de *banda ancha* repartido por
+toda la banda, y cada celda solo lleva la parte que cae dentro de un $B_e$: unos
+25 dB por debajo aquí, para un segmento de 1024 puntos a 16 kHz. Para recuperar
+un nivel a partir del ruido, convierte las celdas en densidad restando
+$10\log_{10} B_e$ e integra en la banda que interese, o usa `'density'` e integra
+directamente. Y la celda de pico del impacto tampoco es el nivel del impacto: un
+transitorio más corto que el segmento reparte su energía por toda la columna, así
+que esa lectura depende de `nperseg`. La barra de color es una escala absoluta
+para la estructura tonal y una escala dependiente del ancho de banda para todo lo
+demás; cuando lo que se busca son niveles de banda absolutos a lo largo del
+tiempo, la herramienta correcta es el espectrograma de bandas de
+[Niveles](/phonometry/es/signals/levels/levels/).*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -180,13 +244,44 @@ res.plot(language="es")                  # espectro de potencia en dB
 Una distinción importa y el resultado la declara: la **malla** puede
 hacerse arbitrariamente fina (`n_points`), pero la **resolución** - la
 capacidad de separar dos tonos - la fijan la longitud del registro y la
-ventana, informada como `resolution_bandwidth`
+ventana, y se informa como `resolution_bandwidth`
 ($B_e = f_s \sum w^2/(\sum w)^2$, es decir, $1/T_r$ sin ventana y $1{,}5/T_r$
 con Hann; el mismo factor de ventana del apartado 1, aplicado aquí a la
 duración del registro $T_r$ en lugar de a un segmento, porque la FFT con zoom
 transforma el registro entero). El
 zoom refina el muestreo del mismo espectro subyacente; solo un registro
 más largo separa tonos más próximos.
+
+**El margen dinámico es otra cuestión, y el zoom no ayuda con ella.** La
+chirp-Z sigue evaluando la DFT del *registro entero con su ventana*, así que una
+componente fuerte fuera de la banda ampliada se cuela dentro por los lóbulos
+laterales de la ventana exactamente igual que en una FFT corriente: la banda
+ampliada compra resolución de la malla, no rechazo. El primer lóbulo lateral de
+la Hann está a −31,5 dB, que no da ni de lejos para ver una banda lateral 50 dB
+por debajo de una portadora a unos pocos hercios. El control es el argumento
+`window` (por defecto `"hann"`): pasa `window="blackman"`, o una Kaiser con beta
+alta, para cambiar anchura de lóbulo principal por rechazo de lóbulos laterales,
+recordando que un lóbulo principal más ancho sube $B_e$ y con él la separación
+mínima que puedes resolver, de modo que los dos objetivos tiran en sentidos
+opuestos. Las
+[figuras de mérito de las ventanas](/phonometry/es/signals/spectra/spectral-analysis/#6-elegir-la-ventana)
+ponen números a ese compromiso. Cuando ni la mejor ventana basta, filtra o
+elimina con un notch la componente dominante antes de ampliar: ninguna ventana
+sustituye a quitar la energía.
+
+**Y la máquina tiene que estarse quieta.** Separar dos rayas a 3 Hz una de otra
+cerca de 1 kHz pide un segundo de registro aproximadamente, y durante ese
+segundo el eje tiene que mantener su velocidad con un error menor que 3 partes
+en 1000, el 0,3 %, o la propia raya del rotor se emborrona más ancha que la
+separación que intentas resolver, y ningún zoom la recupera. En general la
+estabilidad de velocidad exigida es la resolución objetivo dividida por la
+frecuencia de la raya, lo que se vuelve severo enseguida: 0,5 Hz a 5 kHz es el
+0,01 %. Compruébalo antes de fiarte del zoom: pasa un espectrograma del mismo
+registro y confirma que la raya sale horizontal a lo largo de la ventana de
+análisis, o lee el periodo del eje con un tacómetro durante el registro. Cuando
+la máquina sí deriva, remuestrea angularmente contra el tacómetro (seguimiento de
+órdenes) para que las rayas queden estacionarias en orden en vez de en
+frecuencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution_es.svg" alt="FFT con zoom de un registro de un segundo con tonos a 997 y 1000 hercios: la FFT gruesa de 1024 puntos con bins de 8 hercios muestra un único bulto ancho, mientras que la FFT con zoom entre 980 y 1016 hercios dibuja dos lóbulos principales separados cuyos picos caen exactamente sobre las frecuencias verdaderas punteadas" width="82%" loading="lazy" />
 

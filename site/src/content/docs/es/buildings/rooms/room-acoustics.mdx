@@ -188,7 +188,7 @@ ax.plot(time, level, color="#1f77b4", label="Curva de Schroeder")
 for db in (-5.0, -25.0, -35.0):      # bordes de la ventana de evaluación T20 / T30
     ax.axhline(db, ls=":", alpha=0.4)
 ax.set_xlabel("Tiempo [s]")
-ax.set_ylabel("Nivel re régimen permanente [dB]")
+ax.set_ylabel("Nivel re estado estacionario [dB]")
 ax.set_ylim(top=3.0)
 ax.legend()
 plt.show()
@@ -519,7 +519,7 @@ devuelve solo la curva `(time, level)` para una banda o la respuesta de banda an
 
 Todo lo anterior analiza una única respuesta al impulso; un parámetro de sala
 declarado nunca es una única respuesta al impulso. El apartado 8 de la ISO 3382-2
-da dos procedimientos admisibles, y el que soporta esta API es el primero: la
+da dos procedimientos admisibles, y el que implementa esta API es el primero: la
 **media aritmética de los tiempos de reverberación individuales sobre todas las
 combinaciones fuente-micrófono independientes** (la alternativa, promediar el
 conjunto de curvas de decaimiento con sus inicios sincronizados, es otra operación
@@ -704,7 +704,7 @@ $T_1$/$T_2$ medido vive en
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md): los decaimientos en forma cerrada y las
   definiciones de parámetros frente a los que se validan las implementaciones de ISO 3382.
 - Referencia de la API: [`room.acoustics`](/phonometry/es/reference/api/rooms/acoustics/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): el modelo de decaimiento que hay detrás de T20, T30 y EDT y las relaciones de energía con las que se construyen los parámetros de claridad y definición.
+- Teoría: [Respuesta al impulso y parámetros de acústica de salas](/phonometry/es/reference/theory/rooms-buildings/#respuesta-al-impulso-y-parámetros-de-acústica-de-salas-iso-18233-iso-3382-1-2-3): el modelo de decaimiento que hay detrás de T20, T30 y EDT y las relaciones de energía con las que se construyen los parámetros de claridad y definición.
 
 ## Respuestas rápidas
 

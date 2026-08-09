@@ -52,9 +52,14 @@ lectura de exposición audible.
 
 Las cuatro comparten la maquinaria de las curvas de IEC 61672-1 (0 dB a
 1 kHz donde aplica, procesado multicanal y por bloques con estado), y B, D y
-AU toman además el sobremuestreo `high_accuracy`; la G ignora ese indicador,
-porque su rango de 0,25 Hz a 315 Hz ya es exacto con el diseño simple, y,
-como con A/C/Z, `high_accuracy` no puede combinarse con el procesado con
+AU toman además el sobremuestreo `high_accuracy`. La G ignora ese indicador,
+pero no porque sobremuestrear sea innecesario: **el diseño de G sobremuestrea
+siempre internamente**, hacia 48 kHz, de modo que su rango de 0,25 Hz a 315 Hz
+se mantiene dentro de unos 0,05 dB sea cual sea la frecuencia de entrada. Y eso
+importa justo donde se usa la G: el infrasonido se graba a menudo a 1 kHz o
+2 kHz, donde 315 Hz queda cerca de Nyquist y la deformación bilineal crece de
+forma cuadrática; a frecuencias de audio la corrección es despreciable. Como con
+A/C/Z, `high_accuracy` no puede combinarse con el procesado con
 estado. Las propias curvas A, C y Z, su origen, el diseño
 `high_accuracy` y la verificación de clase frente a la Tabla 3 de
 IEC 61672-1 son el tema de
@@ -64,9 +69,14 @@ IEC 61672-1 son el tema de
 
 La **ponderación frecuencial G** (ISO 7196:1995) valora el infrasonido igual que
 la ponderación A valora el ruido audible. Se define por una configuración de
-polos y ceros con ganancia de 0 dB a 10 Hz, sube a 12 dB/octava entre 1 Hz y
-20 Hz (siguiendo el crecimiento abrupto de la percepción en esa banda) y cae a
-24 dB/octava fuera de ella. Úsala con fuentes con energía significativa por
+polos y ceros normalizada a 0 dB a 10 Hz, y tiene tres pendientes, no dos. Por
+encima de 20 Hz la respuesta cae a 24 dB/octava, lo que mantiene la energía del
+rango audible fuera de una lectura de infrasonido; entre 1 Hz y 20 Hz
+aproximadamente *sube* a 12 dB/octava, siguiendo el crecimiento abrupto de la
+percepción del infrasonido; y por debajo de 1 Hz aproximadamente vuelve a caer a
+24 dB/octava, rechazando las fluctuaciones de presión casi estáticas — carga de
+viento, deriva barométrica, oscilación del edificio — que un micrófono registra
+y nadie oye. Úsala con fuentes con energía significativa por
 debajo de 20 Hz (aerogeneradores, climatización, voladuras):
 
 ```python
@@ -115,8 +125,72 @@ plt.show()
 La implementación sigue exactamente los polos/ceros de la Tabla 1 de ISO 7196 y
 se verifica en CI contra todos los valores nominales de respuesta de la Tabla 2
 (0,25 Hz a 315 Hz). `WeightingFilter(fs, "G")` admite el mismo procesado
-multicanal y por bloques que A/C. Los niveles medidos con la curva G se
-expresan como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
+multicanal y por bloques que A/C, pero el modo con estado ejecuta el diseño
+simple a la frecuencia de entrada, así que si procesas la ponderación G en
+streaming a una frecuencia de muestreo baja, verifica la respuesta antes de
+fiarte del nivel. Los niveles medidos con la curva G se expresan como
+$L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
+
+### Leer un LpG: la escala no es la escala dB(A)
+
+Un nivel ponderado G de 85 dB no significa nada hasta que sabes qué aspecto
+tiene la escala, y no se parece a la audible. La introducción de ISO 7196 da las
+referencias: el umbral normal de percepción a 10 Hz está en torno a 100 dB re
+20 µPa; los sonidos entre 1 Hz y 20 Hz que un oyente medio apenas percibe dan
+niveles ponderados G próximos a 100 dB; un infrasonido muy fuerte da un nivel
+ponderado G del orden de 120 dB, solo 20 dB por encima; y los niveles ponderados
+G por debajo de unos 90 dB no suelen ser significativos para la percepción
+humana.
+
+De ahí se siguen dos consecuencias. La primera, que el rango útil abarca unos
+30 dB y no los 100 dB a los que un lector está acostumbrado en dB(A), así que
+**unos pocos decibelios importan aquí muchísimo más**: un $L_{pG}$ de 85 dB y
+otro de 105 dB no son «parecidos», son inaudible y muy fuerte. La segunda, que
+como el crecimiento de la sensación con el nivel es mucho más rápido que en el
+rango audible y el propio umbral varía entre individuos, un nivel próximo a
+100 dB(G) puede ser imperceptible para una persona y claramente percibido por
+otra, y por eso las quejas por infrasonido se investigan caso por caso. Compara
+un $L_{pG}$ con estas referencias de percepción, nunca con un límite ponderado
+A, y no combines nunca las dos cosas en un solo número.
+
+### Medir infrasonido, no solo ponderarlo
+
+El filtro anterior es exacto desde 0,25 Hz. Casi ninguna cadena de captura
+corriente lo es, y nada en el código puede saberlo. El Anexo A de ISO 7196
+especifica una cadena, no solo una curva, y su primer requisito (A.2) es un
+micrófono con una respuesta en frecuencia sustancialmente constante o bien
+definida al menos entre 0,25 Hz y 160 Hz, y preferiblemente hasta 315 Hz. Una
+cápsula de medida de uso general no puede darlo: su orificio de compensación de
+presión estática se comporta como un paso alto de primer orden, y un punto de
+corte tan alto como 2 Hz ya cuesta 7,0 dB a 1 Hz y 12,3 dB a 0,5 Hz. Cualquier
+conmutador de corte de graves del grabador elimina la banda que se está
+midiendo. Lo único que *no* importa es el tamaño de la cápsula: el Anexo A hace
+notar que no hay límite práctico para las dimensiones del micrófono, porque los
+efectos direccionales son despreciables a longitudes de onda infrasónicas.
+
+De ahí salen dos acciones. **Documenta el punto de corte en baja frecuencia de
+la propia cadena** e informa el $L_{pG}$ solo hasta donde la cadena sea plana;
+un nivel dado hasta 0,25 Hz con una cadena que está 12 dB por debajo a 0,5 Hz no
+es una medida. **Elige un tiempo de promediación lo bastante largo para que el
+valor sea representativo**: el apartado A.5 da un tiempo de integración o
+constante de tiempo de 10 s como elección habitual, 1 s cuando lo que
+contribuye principalmente es la parte alta de la banda de 1 Hz a 20 Hz, y para
+ruido fluctuante una ventana rectangular de al menos 1 min, cuyo resultado se
+informa como nivel de presión acústica ponderado G equivalente. Eso es un orden
+de magnitud más largo que los 125 ms que un lector trae del detector Fast.
+
+En exteriores hay un tercer problema, y por debajo de 20 Hz suele ser el mayor:
+el viento sobre el diafragma genera más infrasonido que la fuente. Por eso el
+micrófono se coloca en el centro de una placa rígida sobre el suelo, dentro de
+un paravientos primario de espuma, con una pantalla hemisférica secundaria
+añadida cuando hay viento y con su pérdida de inserción documentada y corregida.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_infrasound_chain_es.svg" alt="La cadena de medida de infrasonido: una vista en sección de una cápsula de medida enrasada en el centro de una placa rígida sobre el suelo, con una llamada sobre su orificio de compensación de presión estática y el punto de corte de primer orden que ese orificio impone, un paravientos primario de espuma encima y una pantalla hemisférica secundaria alrededor; después la cadena eléctrica en tres bloques, un preamplificador cuyo punto de corte está muy por debajo de 0,25 Hz, un grabador con el conmutador de corte de graves desactivado, y la ponderación G seguida de un integrador de al menos 10 segundos; a la derecha, un recuadro con la respuesta de 0,1 Hz a 1 kHz que muestra la curva G de ISO 7196 con su tramo de 0,25 a 315 Hz sombreado y el punto de corte del paso alto de la propia cadena dibujado con línea discontinua sobre ella, con el solape anotado como banda utilizable" width="94%" />
+
+Lo que hay que dejar registrado para que el resultado sea informable es breve:
+el punto de corte en baja frecuencia de la propia cadena, la placa y las
+pantallas con sus correcciones, el tiempo de promediación y la forma de la
+ventana, y el $L_{pG}$ con el ancho de banda de análisis con el que se calculó.
 
 ## 2. Curvas históricas y de propósito especial: B, D y AU
 
@@ -253,8 +327,30 @@ de la Tabla 2 (reproducen todos los valores nominales de la Tabla 1 dentro
 de 0,05 dB) y se verifica en CI contra las tolerancias de la Tabla 1 hasta
 40 kHz.
 
-## 3. Verificación de B y AU frente a sus tablas de tolerancias
+La frecuencia de muestreo es solo el segundo requisito. El primero es el
+micrófono, y la aritmética anterior solo se sostiene si la cápsula y la interfaz
+entregaron de verdad la componente de 25 kHz con una respuesta conocida. La
+introducción de IEC 61012 plantea el problema sin rodeos: un sonómetro cuya
+respuesta llegue por casualidad hasta la frecuencia de trabajo del equipo
+ultrasónico da lecturas *infladas* de la parte audible, que es justo lo que la U
+existe para evitar; y cuando hay que cuantificar la propia componente
+ultrasónica, esa misma introducción pide un sistema de micrófono del que se
+sepa que su respuesta en frecuencia llega al menos hasta esa frecuencia de
+trabajo. En la práctica eso significa una cápsula de 1/4 o de 1/8 de pulgada en
+vez de la de 1/2 pulgada que se usa para el trabajo audible: una cápsula de 1/2
+pulgada ya está cayendo y es fuertemente direccional por encima de 20 kHz, así
+que sería ella, y no el filtro U, la que decidiría la lectura. Comprueba también
+el convertidor: una interfaz que corre a 96 kHz pero filtra el aliasing a 20 kHz
+no mide nada que rechazar. Y como el campo próximo de estos equipos cambia
+varios decibelios en unos pocos centímetros, toma la lectura en la posición de
+la cabeza del operador y déjalo anotado. Informa el $L_{AU}$
+junto con el nivel sin ponderar de la componente ultrasónica y el tipo de
+cápsula: separar esas dos cosas es todo el sentido de la ponderación AU.
 
+## 3. Verificación de clase: B y AU sí, G y D no
+
+Solo dos de las cuatro curvas de esta página pueden devolver un veredicto de
+clase, porque solo dos tienen tablas de tolerancias publicadas.
 El verificador `verify_weighting_class`, descrito en la sección 6 de
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/), también cubre
 las curvas de esta guía que tienen tablas de tolerancias publicadas. Para `B`
@@ -305,7 +401,12 @@ ponderación A simples en lugar de D).
 ### ¿Qué ponderación debo usar para infrasonido por debajo de 20 Hz?
 
 Usa la ponderación frecuencial G de ISO 7196:1995, que valora el infrasonido
-igual que la ponderación A valora el ruido audible. Tiene ganancia de 0 dB a
-10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz y cae a 24 dB/octava fuera de
-esa banda. Aplícala a fuentes como aerogeneradores, climatización y voladuras,
-y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
+igual que la ponderación A valora el ruido audible. Normalizada a 0 dB a
+10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz aproximadamente, cae a
+24 dB/octava por encima de 20 Hz y vuelve a caer a 24 dB/octava por debajo de
+1 Hz aproximadamente. Aplícala a fuentes como aerogeneradores, climatización y
+voladuras, y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel
+equivalente). Lee el resultado contra las referencias de percepción de
+ISO 7196, nunca contra un límite ponderado A: unos 100 dB(G) es el umbral
+normal, por debajo de unos 90 dB(G) el infrasonido no suele ser significativo, y
+un infrasonido muy fuerte ronda los 120 dB(G).

@@ -48,7 +48,7 @@ laboratorio](/phonometry/es/buildings/insulation/insulation-lab/).
 ## ¿Cómo predigo el aislamiento acústico con EN 12354 en Python?
 
 Construye las tres trayectorias por flancos de cada unión con
-`building.flanking_element()` y combínalos con
+`building.flanking_element()` y combínalas con
 `building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)`.
 Para el ejemplo del anexo H.3 de EN 12354-1 que se usa abajo devuelve
 `r_prime_w` = 52,2 dB, es decir $R'_w$ = 52 dB, y nombra la trayectoria dominante.
@@ -681,4 +681,4 @@ recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la $s'$ que alimenta el término de suelo flotante de EN 12354-2.
 - Referencia de la API: [`building.prediction.simplified_model`](/phonometry/es/reference/api/building/simplified-model/) y [`building.prediction.facade`](/phonometry/es/reference/api/building/facade/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): el modelo de trayectos de EN 12354 y las magnitudes de transmisión que suma.
+- Teoría: [Aislamiento acústico y absorción, predichos](/phonometry/es/reference/theory/rooms-buildings/#aislamiento-acústico-y-absorción-predichos-en-12354-1-2-6-bies-cremer-hopkins): el modelo de trayectos de EN 12354 y las magnitudes de transmisión que suma.

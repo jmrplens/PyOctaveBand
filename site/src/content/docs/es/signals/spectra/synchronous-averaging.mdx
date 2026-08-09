@@ -228,6 +228,75 @@ Así que un número de promedios potencia de dos, por conveniente que sea, no es
 en general la elección óptima: los órdenes interferentes presentes en la
 máquina deberían fijar $N$.
 
+## De dónde sale el periodo, y cuán estable tiene que ser
+
+Todo lo anterior da $T$ por sabido. En una medición real hay que *medir* $T$, y
+la suposición escondida detrás de un `period` escalar es que el eje mantiene ese
+periodo durante todo el registro, que es el modo de fallo dominante de la
+técnica y falla en silencio.
+
+**Conseguir el periodo.** Instrumenta el eje con un pulso por revolución: un
+sensor óptico apuntando a una única tira de cinta reflectante, una sonda
+inductiva sobre un chavetero, o la salida de índice de un encóder. Registra ese
+canal a la vez que la vibración y toma $T$ como el intervalo medio entre pulsos
+a lo largo del tramo analizado. No lo tomes de la velocidad de placa: una placa
+de características es un valor nominal, no una medida, y una máquina en carga no
+está en su placa.
+
+**Cuán estable tiene que ser.** El álgebra del peine del §1 lo responde con
+exactitud. Un error relativo de periodo $\delta$ mueve el $k$-ésimo armónico del
+diente del peine en el orden $k$ al orden $k(1+\delta)$, donde el mismo núcleo de
+Dirichlet lo atenúa en
+
+$$
+\left|\frac{\sin(\pi k N \delta)}{N \sin(\pi k \delta)}\right| ,
+$$
+
+de modo que la pérdida crece con el número de armónico **y** con el número de
+promedios, justo las dos cosas que uno quiere grandes. Mantener esa pérdida por
+debajo de 1 dB pide aproximadamente $k N \delta < 0{,}25$. Promediar 40
+revoluciones y esperar el 10.º armónico intacto exige por tanto que el periodo
+sea correcto con un error menor que $0{,}25/(10 \times 40) = 6{,}3 \times
+10^{-4}$, es decir, una **estabilidad de velocidad del 0,06 %**; el orden 20 con
+$N = 40$ exige el 0,03 %. Una máquina que mantiene la velocidad al 1 % pierde
+todo lo que hay por encima del primer orden o el segundo, de forma progresiva, y
+la forma de onda resultante parece suave, que es lo que se lee como un engranaje
+sano.
+
+**Los remedios, por orden.** Toma el periodo del tacómetro y no de la placa;
+trocea sobre los intervalos de pulso medidos (un promedio por meseta de
+velocidad si la velocidad va a saltos); remuestrea angularmente el registro
+contra el tacómetro (seguimiento de órdenes) antes de promediar cuando la
+velocidad deriva de forma continua; y si fallan los tres, promedia menos
+revoluciones y asume la penalización de $\sqrt{N}$, porque un promedio corto al
+periodo correcto vale más que uno largo al periodo equivocado.
+
+**La comprobación de aceptación.** `residual_rms` debería caer como
+$1/\sqrt{N}$. Si deja de caer, o la velocidad ha derivado, o lo que queda es
+síncrono y ningún número de promedios lo va a eliminar.
+
+### Cómo se monta la medición
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tsa_setup_es.svg" alt="Alzado a escala de un reductor de una etapa: el eje de entrada a 1800 revoluciones por minuto con una única tira de cinta reflectante y un cabezal de tacómetro óptico apuntándole a 20 mm, un piñón de 37 dientes que arrastra una rueda de 89 dientes, un acelerómetro atornillado sobre el soporte del rodamiento más cercano al piñón con su eje en la dirección de la carga, y ambos cables llegando a un frontal de dos canales con un solo reloj a 25,6 kHz; un recuadro muestra el tren de pulsos del tacómetro sobre el registro de vibración con las fronteras de troceado alineadas" width="92%" />
+
+- **Transductor y montaje.** Un acelerómetro atornillado o pegado sobre el
+  soporte del rodamiento más cercano al engranaje que interesa, con su eje en la
+  dirección de la carga. Una base magnética hunde la banda útil a un par de
+  kilohercios y esconde los armónicos de engrane que el promedio existe para
+  enseñar.
+- **La frecuencia de muestreo sale del contenido que quieres conservar.** Un
+  piñón de 37 dientes a 1800 r/min engrana a $37 \times 30 = 1110$ Hz, así que
+  conservar cinco armónicos de engrane pide $f_s \ge 2{,}56 \times 5550 =
+  14{,}2$ kHz: 16 kHz en la práctica, 25,6 kHz en un analizador que lo ofrezca.
+- **Longitud de registro de $N+1$ revoluciones**, con $N$ elegido por la regla de
+  los órdenes interferentes del §3 y no por costumbre.
+- **Los dos canales en un mismo frontal de muestreo simultáneo**, con la
+  ganancia fija durante toda la tirada: un desfase entre canales desplaza cada
+  frontera de bloque y gira la forma de onda promediada.
+- **Anota el punto de funcionamiento** (velocidad, carga, temperatura del
+  aceite), porque una forma de onda TSA solo es comparable con otra tomada en el
+  mismo punto.
+
 ## 4. Muestras por periodo no enteras
 
 Cuando $f_s T$ es entero, las fronteras de periodo caen sobre muestras, los
@@ -285,6 +354,19 @@ eliminada, exactamente sobre lo que conviene ejecutar el espectro de la
 envolvente cuando las componentes fuertes del engranaje ya no enmascaran la
 modulación.
 
+Lo que sale de esa cadena es un conjunto de *rayas*, y el diagnóstico lo lleva
+su frecuencia, no su amplitud. Las familias cinemáticas de la máquina (las
+frecuencias de paso de bola por la pista exterior y por la interior, el giro de
+la bola, la jaula, la frecuencia de engrane y sus bandas laterales a la
+frecuencia de eje, el paso de pala, el deslizamiento del motor y el paso de
+polos) se calculan a partir de la geometría y la velocidad de eje, y se dibujan
+sobre el espectro de la envolvente medido en
+[frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/).
+Como esas familias se expresan en *órdenes del eje*, la misma señal de
+tacómetro que fija el periodo de promediado fija también las frecuencias de las
+familias: un error de velocidad corrompe a la vez el promediado y la
+identificación.
+
 ## Qué cubre esta guía
 
 **Cubierto.** El modelo revisado de McFadden para el promediado en el
@@ -305,7 +387,7 @@ rodamiento, es el
 [espectro de la
 envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/#5-el-espectro-de-la-envolvente-modulaciones-como-líneas),
 también fuera de esta página. El artículo de McFadden no es una norma de
-certificación, así que no hay ningún apartado de cumplimiento contra la
+certificación, así que no hay ningún apartado de cumplimiento contra el
 que comprobar la implementación.
 
 ## Véase también
@@ -313,4 +395,5 @@ que comprobar la implementación.
 - [Cepstrum y ecos](/phonometry/es/signals/spectra/cepstrum-echoes/): detección sin referencia de familias de armónicos y bandas laterales, y el espectro de la envolvente.
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): la envolvente de Hilbert que sustenta el análisis de envolvente.
 - [Señales de prueba](/phonometry/es/signals/spectra/test-signals/): el núcleo de retardo fraccionario que usa la alineación de periodo no entero.
+- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/): las familias de rodamientos y engranajes contra las que se lee el espectro de la envolvente del residuo.
 - Referencia de la API: [`signals.synchronous_average`](/phonometry/es/reference/api/signals/synchronous-average/).

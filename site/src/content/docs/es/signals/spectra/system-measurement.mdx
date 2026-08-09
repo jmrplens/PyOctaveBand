@@ -59,20 +59,28 @@ siguiente medición.
 
 Las dos herramientas de adquisición recuperan la respuesta con su propia
 deconvolución: correlación con el par en Golay y división espectral por el
-espectro del barrido en los barridos conformados. El marco de dos canales
-del diagrama pertenece al flujo de ruido de banda ancha: la excitación
-eléctrica es la referencia, el micrófono la respuesta, y los espectros
-cruzados de Welch entre ambos dan la respuesta en frecuencia H1 más una
-coherencia que la vigila. La inversión regularizada trabaja después sobre
-la respuesta medida, como post-proceso.
+espectro del barrido en los barridos conformados. Las tres herramientas de esta
+página viven en el mismo marco de dos canales que dibuja el diagrama, un
+generador que excita el altavoz en ensayo, un canal con la referencia eléctrica
+y otro con el micrófono, y solo se diferencian en la excitación y en la
+deconvolución. El par de Golay del §1 recupera la respuesta por correlación con
+los códigos; el barrido conformado del §2, por división espectral; y la vía de
+ruido de banda ancha que el propio diagrama anota, que pertenece a la
+[guía de electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
+por el estimador $H_1 = G_{xy}/G_{xx}$ con una coherencia que lo vigila. La
+inversión regularizada del §3 trabaja después sobre la respuesta medida que
+salga de cualquiera de ellas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement_es.svg" alt="Cadena de medición de respuesta en frecuencia a dos canales: un generador de señal con ruido de banda ancha o un barrido alimenta un amplificador de potencia y el altavoz en ensayo, un micrófono de medición recoge la salida acústica, el canal 1 lleva la referencia eléctrica x(t) y el canal 2 la respuesta del micrófono y(t), el análisis FFT de dos canales con segmentos Hann promediados a la Welch con 50 por ciento de solape produce los espectros Gxx, Gyy y Gxy, y dos cajas de resultado dan el estimador H1 igual a Gxy entre Gxx, insesgado con ruido a la salida, y la coherencia gamma cuadrado igual al módulo al cuadrado de Gxy entre el producto Gxx por Gyy, que vale uno en un camino lineal sin ruido y cae con ruido, distorsión o un retardo que deriva o está desalineado" width="92%" />
 
 ## 1. Pares complementarios de Golay
 
-Un par de Golay son dos secuencias binarias $a$, $b$ de longitud $L = 2^n$,
-construidas con una recursión de dos líneas - anexar $b$ a $a$, y $-b$ a $a$
-(Havelock, Parte I, Cap. 6, Ec. (1)). Su propiedad definitoria es
+Un par de Golay son dos secuencias binarias $a$ y $b$ de longitud $L = 2^n$,
+construidas con una recursión de dos líneas (Havelock, Parte I, Cap. 6,
+Ec. (1)): partiendo de $a_1 = (+1, +1)$ y $b_1 = (+1, -1)$, cada paso hace
+$a_{k+1} = [\,a_k \mid b_k\,]$ y $b_{k+1} = [\,a_k \mid -b_k\,]$, duplicando la
+longitud cada vez, de modo que `golay_pair(14)` devuelve dos códigos de
+$2^{14} = 16384$ muestras. Su propiedad definitoria es
 *algebraica*, no aproximada: las dos autocorrelaciones periódicas suman
 
 $$
@@ -159,8 +167,9 @@ plt.show()
 
 </details>
 
-El resultado es el mismo `ImpulseResponseResult` que devuelven los frontales
-de barrido y MLS, así que todo lo que viene después -
+El resultado es el mismo
+[`ImpulseResponseResult`](/phonometry/es/reference/api/rooms/impulse-response/)
+que devuelven los frontales de barrido y MLS, así que todo lo que viene después -
 [parámetros de sala](/phonometry/es/buildings/rooms/room-acoustics/), curvas de
 caída, [STI](/phonometry/es/perception/speech/speech-transmission/) - lo consume sin
 cambios. Las grabaciones de varios periodos se promedian síncronamente, de
@@ -173,11 +182,48 @@ separarse como en un barrido, y los dos regímenes estacionarios secuenciales
 hacen del par el más expuesto de la familia a la variación temporal (Sec. 2
 de Xiang) - el precio de la complementariedad exacta.
 
+### Cómo se pasa el par en la práctica
+
+El fragmento de arriba finge la adquisición con `lfilter`, que da por supuesto
+sin decirlo un lazo de latencia cero y exacto a la muestra. Una tirada real tiene
+cuatro decisiones.
+
+**Emisión.** Reproduce cada código uno tras otro y **descarta al menos un periodo
+entero** antes de conservar nada, para que el sistema alcance el régimen
+estacionario periódico que supone la correlación circular, la misma condición que
+impone el aviso de aliasing, vista desde el otro lado. Después conserva un número
+entero de periodos, y repite con el segundo código sin tocar ganancia ni
+geometría.
+
+**Alineación, que es la que falla en silencio.** La recuperación es una
+correlación cruzada circular, así que cualquier latencia entre el flujo emitido y
+el grabado aparece como una *rotación* de la respuesta al impulso: molesta, pero
+recuperable. El daño de verdad es que **las dos grabaciones hay que cortarlas en
+el mismo desplazamiento**: la complementariedad exacta solo sobrevive si los
+registros de $a$ y de $b$ están alineados entre sí a la muestra, y una
+discrepancia de una sola muestra destruye la cancelación de lóbulos laterales
+sobre la que se apoya todo el método, dejando un suelo levantado que parece
+ruido. Consigue el desplazamiento una vez con un canal de retorno (graba la
+excitación eléctrica junto al micrófono y mídelo con `time_delay` de la página de
+[estimación de retardos](/phonometry/es/signals/spectra/correlation-delay/)) y
+después aplica el mismo corte a los dos.
+
+**Nivel y fondo.** Ajusta el amplificador de modo que el pico del código deje
+margen tanto en el altavoz como en el convertidor: los códigos de Golay son
+binarios, así que su factor de cresta es el peor de la familia, y el recorte se
+manifiesta como un suelo de ruido levantado y no como un artefacto evidente.
+Graba primero un periodo de silencio y comprueba que la respuesta queda muy por
+encima de él, porque el par rechaza el ruido solo promediando periodos.
+
+**Invariancia temporal,** que la página ya nombra: mantén la sala cerrada, la
+temperatura estable, y pasa los dos códigos uno detrás de otro y no con una hora
+de diferencia.
+
 ## 2. Barridos con un espectro objetivo arbitrario
 
 La energía de un barrido en una frecuencia dada puede fijarse de dos maneras:
 con su amplitud, o con *cuánto tiempo permanece en ella*. La síntesis en el
-dominio de la frecuencia de Mueller y Massarani (Secs. 4.2-4.3) usa la
+dominio de la frecuencia de Müller y Massarani (Secs. 4.2-4.3) usa la
 segunda palanca: definir la magnitud objetivo $|H(f)|$, hacer crecer el
 retardo de grupo en proporción a la potencia del objetivo,
 
@@ -254,7 +300,7 @@ Los metadatos de la síntesis viajan con el resultado: `frequencies` y
 conformación es ingeniería de la relación señal-ruido: adaptar el espectro
 emitido al ruido de fondo del recinto (o a los límites de potencia del
 altavoz) compra una SNR independiente de la frecuencia que ningún
-posprocesado puede recuperar (Mueller y Massarani, Sec. 3).
+posprocesado puede recuperar (Müller y Massarani, Sec. 3).
 
 La deconvolución no necesita nada nuevo: el resultado actúa como su propio
 array de referencia para el
@@ -285,15 +331,70 @@ El énfasis vuelve a ponderar el suelo de ruido de la medición, no la
 respuesta recuperada. Una sutileza heredada de la limitación dura en banda:
 el núcleo limitador de banda de la deconvolución es de fase cero, así que una
 pequeña cola anticausal queda al final del búfer completo de deconvolución -
-use `return_full=True` cuando persiga décimas de dB en los bordes de la
+usa `return_full=True` cuando persigas décimas de dB en los bordes de la
 banda.
 
+### Elegir el objetivo, el nivel y la duración
+
+El `emphasis = np.array([12.0, 6.0, 0.0, 0.0])` de arriba es una afirmación, no
+una medida. Cinco decisiones la convierten en una.
+
+- **El objetivo sale del fondo.** Mide primero el fondo en la posición del
+  micrófono con `power_spectral_density`, suavízalo a tercios de octava y usa su
+  *forma* más el margen que quieras como objetivo del barrido. El espectro
+  emitido sigue entonces al ruido y la respuesta deconvolucionada tiene una
+  relación señal-ruido plana, en lugar de un medio bueno y una octava grave
+  inservible.
+- **La duración sale del margen que te falte.** Duplicar la longitud del barrido
+  compra unos 3 dB de relación señal-ruido en la respuesta deconvolucionada, así
+  que la duración es aritmética, acotada por arriba por la invariancia temporal
+  del sistema: una sala con aire en movimiento, o un altavoz que se calienta,
+  pone el techo mucho antes que la aritmética.
+- **El registro necesita cola.** La excitación tiene que llevar un silencio al
+  menos tan largo como la caída del sistema después del barrido, que es para lo
+  que está el `np.zeros(fs)` de los fragmentos de arriba.
+- **El énfasis en baja frecuencia tiene un tope físico.** La excursión del
+  altavoz y el margen del amplificador te paran mucho antes que la síntesis.
+  Sube el nivel hasta que la respuesta deje de ser lineal y luego baja un poco:
+  compara dos tiradas separadas 6 dB y, si las respuestas deconvolucionadas
+  difieren, ya te habías pasado.
+- **Conformar no cuesta la separación de la distorsión.** Esa separación es una
+  propiedad del *retardo de grupo* del barrido, no de su magnitud: el $k$-ésimo
+  armónico de una frecuencia instantánea $f$ llega en el instante en que el
+  barrido pasa por $kf$, así que mientras el retardo de grupo sea monótono, cosa
+  que la recursión garantiza para cualquier objetivo no nulo, los productos de
+  distorsión siguen deconvolucionándose a tiempos anteriores a la respuesta
+  lineal. Conformar solo cambia cuánto antes, porque un objetivo que permanece
+  más tiempo en las frecuencias bajas reparte los paquetes armónicos de otra
+  manera que la permanencia constante por octava del barrido exponencial. Esos
+  paquetes separados se leen en
+  [distorsión con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+
 ## 3. Inversión espectral regularizada
+
+### Medir la respuesta que vas a invertir
+
+La inversión vale lo que valga su entrada, y la respuesta medida de un altavoz no
+es un paso banda sintético. Mide en el eje de referencia y a una distancia
+declarada (1 m es el convenio de IEC 60268-5 que usa la
+[guía de altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/)) con un
+micrófono de medición, en cámara anecoica si la tienes. Si no la tienes, separa
+fuente y micrófono de todas las superficies tanto como permita la sala y
+**enventana en el tiempo la respuesta al impulso antes de la primera reflexión**.
+Esa ventana fija la frecuencia válida más baja: para una fuente y un micrófono a
+1,2 m sobre un suelo duro y separados 1 m, la reflexión del suelo llega 4,7 ms
+después del sonido directo, así que la respuesta enventanada solo vale por encima
+de unos $1/4{,}7\ \text{ms} \approx 210$ Hz. Pon `f_range` dentro de la banda que
+la ventana haya validado de verdad y deja que la regularización limite todo lo
+que quede fuera, porque ecualizar una respuesta en sala sin enventanar mete los
+modos de la sala dentro del filtro, y esos modos se mueven con el micrófono. Por
+debajo del límite de la ventana, la alternativa habitual es una medida sobre
+plano rígido.
 
 Ecualizar con una respuesta medida significa invertirla, y un recíproco puro
 $1/H(f)$ estalla allí donde el sistema radia poca energía - un valle en
 banda, todo lo que queda fuera de banda - convirtiendo el ecualizador en un
-amplificador de ruido. Mueller y Massarani confinan la inversión con un paso
+amplificador de ruido. Müller y Massarani confinan la inversión con un paso
 banda (Secs. 3.1, 4.5); la forma general de ese confinamiento es la
 regularización de Tikhonov dependiente de la frecuencia de Kirkeby y Nelson,
 
@@ -395,10 +496,34 @@ flat_recording = inv.apply(recorded)             # retardo ya eliminado
 inv.plot(language="es")   # magnitudes medida, inversa y ecualizada (figura de arriba)
 ```
 
+### Invertir una respuesta medida
+
+Dos costumbres separan un ecualizador que funciona de un amplificador de ruido.
+
+**Suaviza primero la magnitud.** Un `fractional_octave_smoothing` de sexto a
+tercio de octava es la elección habitual, para que la inversa apunte a la
+tendencia y no a los valles. Un valle es un patrón de interferencia local: se
+mueve con el micrófono, así que no se puede ecualizar en ningún sitio salvo en
+ese punto, y reforzarlo gasta margen para amplificar ruido.
+
+**Regulariza como una medida, no como una señal sintética.** Sobre una respuesta
+medida, `regularization_inside` va en el intervalo de 1e-3 a 1e-2, lo que limita
+el aplanado en banda a unas décimas de decibelio y acota el refuerzo; el valor
+por defecto 1e-6 que da la planitud de 1e-5 dB de arriba solo tiene sentido con
+una respuesta sintética sin ruido, y esperar ese número de una medida real es el
+error. Lee en consecuencia los dos números que se informan: `flatness_db` es cómo
+de plana sale la banda, y `max_gain_db` el refuerzo en el peor caso que el filtro
+puede llegar a aplicar, el número que hay que contrastar con el margen del
+amplificador antes de reproducir nada a través de él.
+
+Conviene decir sin rodeos la asimetría en la que se apoya el oficio: **corta
+hondo y refuerza con timidez.** Un pico es una resonancia y existe en todas
+partes; un hundimiento suele ser interferencia y solo existe en el micrófono.
+
 ### Cerrando el círculo: preénfasis desde una respuesta medida
 
 Las dos mitades de esta página componen el propio flujo de trabajo de
-Mueller y Massarani (su Fig. 18): medir el altavoz, invertir su respuesta en
+Müller y Massarani (su Fig. 18): medir el altavoz, invertir su respuesta en
 la banda de transmisión y entregar la magnitud inversa a la síntesis del
 barrido como objetivo - la siguiente medición radia entonces un espectro
 acústico *plano*, con la ecualización hecha por la excitación en vez de por
@@ -427,11 +552,22 @@ sweep.plot(language="es")   # forma de onda y espectro contra el objetivo invert
 ## Relación con las demás herramientas
 
 El par de Golay se une a `sweep_signal` y `mls_signal` en la
-[familia de adquisición ISO 18233](/phonometry/es/buildings/rooms/room-acoustics/);
-elija el barrido por el rechazo de la distorsión, la MLS por hardware
-heredado, y el par cuando importe la deconvolución exactamente libre de ruido
-de un sistema invariante en el tiempo (bancos de HRTF, útiles de
-calibración). El análisis armónico de lo que los barridos *descartan* vive en
+[familia de adquisición ISO 18233](/phonometry/es/buildings/rooms/room-acoustics/),
+y las tres se diferencian en cuatro ejes que deciden una medición real:
+
+| | Par de Golay | Barrido exponencial | MLS |
+| :--- | :--- | :--- | :--- |
+| SNR por unidad de tiempo | las tres son deterministas y ganan 3 dB por duplicación del tiempo de medición, pero el par dedica la mitad de su tiempo a cada código y paga por ello **3 dB** frente a un único barrido de la misma duración total | referencia | como el par, menos el segundo código |
+| Distorsión | repartida por el periodo como un suelo con aspecto de ruido | separada en una región *anterior* a la respuesta lineal, donde se puede leer o descartar | repartida, como en el par |
+| Variación temporal | la más frágil: exige dos regímenes estacionarios idénticos, y la deriva levanta el suelo de ruido en vez de dar un error evidente | una sola pasada, así que solo esa pasada tiene que ser estacionaria | una pasada periódica |
+| Truncamiento | una caída más larga que un periodo se envuelve sobre el principio (el aviso de aliasing de arriba) | solo necesita que se le añada silencio suficiente | se envuelve, como en el par |
+
+Así pues: el barrido por el rechazo de la distorsión, la MLS por hardware
+heredado, y el par cuando importe la deconvolución exacta y libre de ruido de
+correlación de un *montaje estacionario* (bancos de HRTF, útiles de
+calibración), donde 3 dB de relación señal-ruido salen baratos y a lo que se ha
+venido es al último decimal de la respuesta al impulso. El análisis armónico de
+lo que los barridos *descartan* vive en
 [distorsión con seno barrido](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
 La maquinaria de Welch usada para verificar el barrido conformado es la
 página de [análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/),
@@ -452,8 +588,17 @@ frecuencia de Kirkeby y Nelson (1999, Ec. 17 y sec. 2.4), implementada por
 
 **No cubierto.** Son métodos de ingeniería de medición tomados de la
 literatura de funciones de transferencia, no de una norma de
-certificación, así que no hay ningún apartado de cumplimiento contra la
+certificación, así que no hay ningún apartado de cumplimiento contra el
 que comprobar. La inversión original de Kirkeby y Nelson apunta a la
 reproducción sonora multialtavoz, con una regularización matricial para la
 cancelación de diafonía entre varios canales. `regularized_inverse_filter`
 implementa solo el caso escalar de un único canal de su Ec. 17.
+
+## Véase también
+
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): las excitaciones de barrido y MLS de ISO 18233 junto a las que se sitúa el par de Golay.
+- [Distorsión con seno barrido](/phonometry/es/devices/electroacoustics/swept-sine-distortion/): leer los paquetes armónicos que un barrido separa.
+- [Altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/): el eje de referencia, la distancia y las condiciones de campo libre que necesita la respuesta medida.
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/): la maquinaria de Welch que verifica el barrido conformado, y el suavizado que la inversión quiere antes.
+- [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): la medida de retorno que alinea los dos registros de Golay.
+- Referencia de la API: [`signals.inversion`](/phonometry/es/reference/api/signals/inversion/).

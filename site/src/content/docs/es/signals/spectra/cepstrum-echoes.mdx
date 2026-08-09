@@ -2,6 +2,13 @@
 title: "Cepstrum, ecos y espectro de la envolvente"
 description: "El cepstrum de potencia, real y complejo con análisis de quefrencia, detección de ecos con el coeficiente de reflexión leído en el pico cepstral, liftering paso bajo y paso alto de un espectro logarítmico, la ida y vuelta homomórfica del cepstrum complejo y el espectro de la envolvente que convierte las modulaciones de amplitud en líneas discretas."
 references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Mechanical vibration and shock — Mechanical mounting of accelerometers"
+    designation: "ISO 5348:2021"
+    url: "https://www.iso.org/standard/76472.html"
+    note: "Los métodos de montaje que hay detrás de la frecuencia superior utilizable de una medición de análisis de envolvente: montaje atornillado y pegado frente a bases magnéticas y sondas de mano."
   - type: book
     authors: ["Havelock, D.", "Kuwano, S.", "Vorländer, M. (Eds.)"]
     year: 2008
@@ -40,6 +47,17 @@ multiplicativo en ondulación espectral aditiva, y la FFT inversa colapsa esa
 ondulación en un único pico de quefrencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_es.svg" alt="Diagrama de bloques de la cadena del cepstrum: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
+
+El vocabulario es el juego de palabras deliberado de Bogert sobre el dominio
+que refleja, que es el único dato que hace los nombres memorables en lugar de
+arbitrarios:
+
+| Término | Refleja | Qué es | Unidades |
+| :--- | :--- | :--- | :--- |
+| cepstrum | espectro | el espectro de un espectro logarítmico | unidades de la señal |
+| quefrencia | frecuencia | su variable independiente | segundos |
+| rahmónicos | armónicos | los picos que se repiten a lo largo de ella en $n t_0$ | segundos |
+| liftering | filtrado | seleccionar un tramo de ella | — |
 
 ## 1. El cepstrum y sus tres variantes
 
@@ -214,10 +232,60 @@ La banda de búsqueda empieza por encima de la región de quefrencias bajas
 que ocupa la envolvente espectral de la propia fuente (`min_quefrency`, por
 defecto 16 muestras) y termina en la mitad no ambigua del eje
 (`max_quefrency`). Los trenes de picos por reverberación de la sismología
-(Havelock cap. 87) son la misma firma a escala geofísica. Obsérvese el
+(Havelock cap. 87) son la misma firma a escala geofísica. Fíjate en el
 segundo rahmónico negativo en $2 t_0$ de la figura: el término $-a^2/2$ de la
 serie, una confirmación útil de que un pico es de verdad un eco y no una
 periodicidad espectral sin relación.
+
+### A partir de una respuesta al impulso medida
+
+Todo lo anterior corre sobre un clic sintético, y lo que el método consume de
+verdad es una respuesta al impulso. Mídela con cualquiera de las excitaciones de
+la biblioteca (un barrido exponencial, una MLS o la pareja de Golay de
+[medición de sistemas](/phonometry/es/signals/spectra/system-measurement/)),
+mantén el sonido directo y la reflexión dentro de un mismo registro y pásale la
+respuesta al impulso directamente a `echo_detection`.
+
+**El retardo es una diferencia de longitud de camino.** $\Delta d = c\,t_0$, así
+que los 8 ms de la página a 343 m/s significan que el camino reflejado es 2,74 m
+más largo que el directo, lo que fija el reflector una vez conocidas las
+posiciones de fuente y receptor. Haz la conversión con la temperatura que
+mediste, no con 343: la velocidad del sonido se mueve unos 0,6 m/s por kelvin,
+que es un 0,2 % sobre la distancia por cada grado.
+
+**El coeficiente es una razón de amplitudes en el micrófono, no una propiedad de
+la superficie.** $a = 0{,}5$ significa que la reflexión llega con la mitad de
+amplitud que el sonido directo (una cuarta parte de la energía), y las dos juntas
+ondulan el espectro de magnitud entre $+3{,}5$ y $-6{,}0$ dB, que es la
+ondulación que aísla el §3. Pero $a$ ya lleva dentro la divergencia esférica de
+más del camino largo, así que el factor de reflexión propio de la superficie es
+$R = a\,(r_\text{reflejado}/r_\text{directo})$. Para un retardo de 8 ms sobre un
+camino directo de 1 m esa razón es 3,74, así que $R = 3{,}74\,a$, un número que
+no puede pasar de uno, lo que significa que una $a$ aparente por encima de
+$1/(1 + c t_0/r_\text{directo})$ no es en absoluto una única reflexión especular.
+Donde $R$ es válido, el coeficiente de absorción a ese ángulo de incidencia es
+$\alpha = 1 - R^2$; las
+[páginas de absorción](/phonometry/es/materials/absorbers/absorption-measurement/)
+son las dueñas de las vías normalizadas hacia la misma magnitud.
+
+**Un pico negativo es una inversión de fase.** Una frontera de presión nula, o un
+camino eléctrico invertido, cambia el signo de la reflexión, y con él el de toda
+la serie de rahmónicos.
+
+Cuatro condiciones deciden si el número significa algo:
+
+1. `min_quefrency` por encima de la duración de la llegada directa, para que la
+   envolvente espectral de la propia fuente quede fuera de la banda de búsqueda.
+2. La reflexión al menos 10 dB por encima del fondo de ruido de la respuesta.
+3. El segundo rahmónico presente en $2t_0$ con el signo opuesto, la comprobación
+   que separa un eco real de una periodicidad espectral sin relación.
+4. Un tramo analizado varias veces mayor que el retardo buscado. La ondulación
+   tiene periodo $1/t_0$ en frecuencia y un registro de duración $T$ solo
+   resuelve el espectro hasta $1/T$; enventanar la respuesta alrededor de las
+   llegadas que interesan también evita que reflexiones posteriores añadan
+   rahmónicos propios.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_echo_geometry_es.svg" alt="Alzado dibujado a escala: una fuente y un micrófono de medición separados 1 m a 1,2 m sobre un suelo duro, el camino directo de 1,00 m trazado en recta y el camino reflejado en el suelo de 2,60 m trazado a través de la fuente imagen bajo el plano del suelo, lo que da una diferencia de camino de 1,60 m y un retardo de 4,7 ms a 343 m por segundo; un segundo panel repite la construcción para una pared lateral a 1,37 m, que da los 8 ms y los 2,74 m propios de la página" width="92%" />
 
 ## 3. Liftering: envolvente frente a estructura fina
 
@@ -335,6 +403,25 @@ positivas reconstruye la fase mínima a partir de $|H|$ únicamente:
 Piersol sec. 13.1.4; Tohyama, en Havelock cap. 75, edita la reverberación
 manipulando exactamente estas partes causal y anticausal).
 
+La ida y vuelta de arriba sale exacta con precisión de máquina porque el registro
+es suave, sin ruido y casi de fase mínima. El cepstrum complejo no es robusto en
+general, y la razón es la fase. Necesita una fase desenrollada que se pueda
+seguir de forma continua por toda la banda, y allí donde la magnitud se acerca a
+cero (un cero profundo, un cero cerca de la circunferencia unidad) la fase gira
+$\pi$ en el espacio de uno o dos bins y el desenrollador puede saltar en el
+sentido equivocado. Todas las quefrencias de ahí en adelante heredan el error.
+Los cepstra de potencia y real son inmunes, porque ni siquiera miran la fase.
+
+Tres salvaguardas. Rellena con ceros mediante `nfft` para que la fase quede
+muestreada lo bastante fina como para que el desenrollador la siga; mantén alta
+la relación señal-ruido del registro en las bandas que importan, porque el ruido
+aditivo aleatoriza la fase justo donde la magnitud es pequeña; y **comprueba la
+ida y vuelta con `invert()` antes de fiarte de ningún cepstrum editado**: un
+desenrollado fallido se manifiesta al instante como un error de reconstrucción
+muy por encima de 1e-10. Cuando el registro no da para tanto, usa el cepstrum de
+potencia para la detección y el plegado del cepstrum real de `minimum_phase`
+cuando solo hace falta una fase coherente con la magnitud.
+
 ## 5. El espectro de la envolvente: modulaciones como líneas
 
 Donde el cepstrum encuentra periodicidades *del espectro*, el **espectro de
@@ -350,7 +437,7 @@ frecuencia cae en un bin de análisis se lea como una línea con su amplitud
 exacta (las líneas fuera de bin leen de menos por la pérdida de scalloping
 de la ventana, hasta cerca de 1,4 dB con la Hann por defecto). El argumento
 opcional `band=(low, high)` reproduce el filtro paso banda de entrada de la
-figura - la cadena clásica de envolvente para rodamientos: aislar con un
+figura 13.11 del libro - la cadena clásica de envolvente para rodamientos: aislar con un
 paso banda de fase cero la banda de resonancia estructural que excitan los
 impactos del defecto y después obtener su envolvente - de modo que un
 interferente fuera de banda llega muy atenuado al detector (la caída de un
@@ -421,6 +508,78 @@ continua se conserva en `mean_level` (la amplitud de la portadora para el
 detector de magnitud), y `remove_dc=False` omite el eliminador cuando
 importa la línea de continua absoluta.
 
+### Elegir la banda, y montar el sensor
+
+El argumento de la banda es donde se gana o se pierde la cadena de rodamientos, y
+ni la banda ni el transductor son una elección libre.
+
+**La banda.** Pasa primero un espectro simple del registro bruto y busca la
+joroba ancha que excitan los impactos del defecto, una resonancia estructural del
+soporte, normalmente en algún punto entre 1 y 20 kHz para rodamientos de
+elementos rodantes. Coloca la banda alrededor de esa joroba. Hazla varias veces
+más ancha que la mayor tasa de repetición que necesites ver (de tres a cinco
+veces la mayor frecuencia de defecto, para que sus armónicos sobrevivan al
+detector), y elige $f_s$ al menos 2,56 veces el extremo superior de la banda.
+Cuando haya dos jorobas candidatas, quédate con aquella cuyo espectro de la
+envolvente dé mayor relación línea-fondo: la banda es una elección de relación señal-ruido,
+no una constante física. Una banda demasiado ancha vuelve a admitir las
+componentes fuertes de baja frecuencia que el filtro de entrada existe para
+eliminar; una demasiado estrecha deja a la envolvente sin energía de impacto; y
+el paso de fase cero deja transitorios en los dos bordes del registro, así que
+recórtalos antes de leer amplitudes.
+
+**El montaje.** La frecuencia superior utilizable la fija la resonancia del
+acelerómetro *montado*, no el límite de la hoja de características del sensor, y
+esa es justamente la banda que necesita la cadena de rodamientos. El montaje
+atornillado o con una capa fina de adhesivo mantiene utilizable un acelerómetro
+de uso general hasta unos 10 kHz; una base magnética suele hundir eso a un par de
+kilohercios, y una sonda de mano a cerca de 1 kHz, es decir, el montaje por sí
+solo puede destruir la banda de la que depende el método. Pon el sensor sobre el
+soporte del rodamiento, en la zona de carga, tan cerca de la pista exterior como
+permita la máquina, con su eje en la dirección de la carga y el cable con
+descarga de tracción. ISO 5348 es la referencia de montaje.
+
+```python
+# Una resonancia estructural de 3 kHz excitada a una tasa de defecto de 120 Hz,
+# bajo una línea de 50 Hz tres veces más fuerte: el paso banda es lo que las
+# separa.
+t_s = np.arange(int(4 * fs)) / fs
+ring = np.sin(2 * np.pi * 3000.0 * t_s) * np.exp(-(t_s % (1 / 120.0)) / 0.001)
+raw = ring + 3.0 * np.sin(2 * np.pi * 50.0 * t_s)
+
+wide = envelope_spectrum(raw, fs)
+narrow = envelope_spectrum(raw, fs, band=(2000.0, 4000.0))
+k120 = int(round(120.0 * wide.nfft / fs))
+print(round(wide.amplitude[k120], 4),        # 0,0093: enterrada
+      round(narrow.amplitude[k120], 4))      # 0,1964: 26 dB mejor
+```
+
+Las líneas que produce la cadena se identifican por su *frecuencia*, no por su
+amplitud, y las familias cinemáticas que les ponen nombre (paso de bola por la
+pista exterior y por la interior, giro de la bola, jaula, engrane y sus bandas
+laterales a la frecuencia de eje) se calculan a partir de la geometría y la
+velocidad de eje en
+[Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/),
+que las dibuja directamente sobre un espectro de la envolvente como este. Pasar
+la envolvente sobre el `residual` de un
+[promedio síncrono](/phonometry/es/signals/spectra/synchronous-averaging/) elimina
+antes las componentes deterministas del engranaje y deja limpias las líneas del
+rodamiento.
+
+## Relación con los demás estimadores
+
+El cepstrum parte de las mismas convenciones FFT de registro único que los
+[estimadores espectrales calibrados](/phonometry/es/signals/spectra/spectral-analysis/),
+y su núcleo de plegado es literalmente el que hay dentro de
+[`minimum_phase`](/phonometry/es/devices/electroacoustics/swept-sine-distortion/) - la
+refactorización queda fijada bit a bit en los tests. El espectro de la
+envolvente es la vista en frecuencia de la misma señal analítica que la
+[envolvente de Hilbert](/phonometry/es/signals/spectra/correlation-delay/) devuelve en
+el tiempo, y un preanálisis natural antes de las métricas dedicadas de
+[modulación de amplitud de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/):
+el espectro de la envolvente dice *si hay modulación y a qué ritmo*, las
+métricas del dominio la cuantifican normativamente.
+
 ## Qué cubre esta guía
 
 **Cubierto.** Las tres variantes del cepstrum y el liftering del *Handbook of
@@ -438,16 +597,11 @@ estrechas: no es un separador multi-eco. El módulo tampoco tiene un cepstrum
 en escala mel ni de tipo MFCC para rasgos de audio perceptual: `lifter` y
 `cepstrum` trabajan solo sobre el espectro logarítmico en frecuencia lineal.
 
-## Relación con los demás estimadores
+## Véase también
 
-El cepstrum parte de las mismas convenciones FFT de registro único que los
-[estimadores espectrales calibrados](/phonometry/es/signals/spectra/spectral-analysis/),
-y su núcleo de plegado es literalmente el que hay dentro de
-[`minimum_phase`](/phonometry/es/devices/electroacoustics/swept-sine-distortion/) - la
-refactorización queda fijada bit a bit en los tests. El espectro de la
-envolvente es la vista en frecuencia de la misma señal analítica que la
-[envolvente de Hilbert](/phonometry/es/signals/spectra/correlation-delay/) devuelve en
-el tiempo, y un preanálisis natural antes de las métricas dedicadas de
-[modulación de amplitud de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/):
-el espectro de la envolvente dice *si hay modulación y a qué ritmo*, las
-métricas del dominio la cuantifican normativamente.
+- [Correlación, retardo temporal y envolvente](/phonometry/es/signals/spectra/correlation-delay/): la envolvente de Hilbert que esta página convierte en espectro.
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/): el espectro logarítmico del que parte el cepstrum.
+- [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/): eliminar la parte síncrona antes de pasar un espectro de la envolvente sobre el residuo.
+- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/): las familias de rodamientos y engranajes que se leen exactamente sobre este espectro de la envolvente.
+- [Distorsión con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/): el plegado de fase mínima que comparte el núcleo de esta página.
+- Referencia de la API: [`signals.cepstrum`](/phonometry/es/reference/api/signals/cepstrum/).

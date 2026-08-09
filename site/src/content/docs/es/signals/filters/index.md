@@ -19,8 +19,8 @@ fije una arquitectura y la mantenga.
 La página fundacional es
 [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). Cubre la matemática
 de las bandas, cómo se descompone una señal en bandas de 1/1, 1/3 o 1/b
-arbitrario, el ecualizador paramétrico y el modo de fase cero fuera de línea
-para análisis donde el retardo del filtro no debe emborronar el resultado.
+arbitrario, el ecualizador paramétrico y el modo offline de fase cero para
+análisis donde el retardo del filtro no debe emborronar el resultado.
 Por dentro, cada banco es una cascada de secciones de segundo orden con
 diezmado multitasa, que es lo que mantiene numéricamente estables las bandas
 de baja frecuencia. Elegir entre las cinco arquitecturas (Butterworth,
@@ -40,7 +40,10 @@ Las otras dos páginas escalan esa base por dos ejes independientes.
 *tiempo*: las señales que no caben en memoria (grabaciones de horas,
 monitorización en vivo, registradores embebidos) se procesan búfer a búfer
 arrastrando el estado de los filtros, de modo que el resultado es idéntico
-bit a bit a procesar la señal entera de una vez.
+bit a bit a una única pasada *por ese mismo banco*: el streaming descarta
+tanto el diezmado multitasa como la eliminación de tendencia por bloque que
+un banco offline usa por defecto, así que la pasada offline contra la que se
+compara un resultado en streaming hay que construirla igual.
 [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/) la escala en
 *canales*: los arrays de micrófonos y las grabaciones multicanal se analizan
 vectorizados, una llamada para todos los canales, con notas sobre dónde se va
@@ -81,7 +84,7 @@ verificarse, así que mantén el borde de banda superior holgadamente por debajo
 de Nyquist o sube `fs`. Dos operaciones no admiten streaming: el filtrado de
 fase cero hacia delante y hacia atrás necesita la señal entera, y los
 estadísticos de rango como L90 hay que calcularlos una sola vez sobre la
-envolvente conjunta. Y el camino por canal nunca mezcla canales: el retardo
+envolvente conjunta. Y la ruta por canal nunca mezcla canales: el retardo
 entre dos micrófonos, o cuánto de un canal explica un segundo, son
 [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/) y
 [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/).

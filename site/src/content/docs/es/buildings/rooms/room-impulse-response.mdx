@@ -225,7 +225,7 @@ sensibilidad a los cambios del entorno, y un único barrido largo no.
 
 **El periodo de la MLS.** Una excitación periódica es distinta, y el apartado
 6.2.2.2 es normativo al respecto (ec. (10)): el periodo de repetición **no debe
-ser más corto que $T$**, de modo que caigan al menos dos rayas espectrales dentro
+ser más corto que $T$**, de modo que caigan al menos dos líneas espectrales dentro
 del ancho de banda de cualquier modo de la sala. Como el periodo de una secuencia
 de orden $N$ es $(2^N-1)/f_s$, eso fija el orden:
 
@@ -596,14 +596,14 @@ Cuatro errores de colocación sesgan la propia media:
 El tercer error es el que merece dibujarse, porque no parece un error en el
 resultado:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias_es.svg" alt="Dos paneles apilados que comparten un eje de distancia fuente-receptor de 0,6 a 7 metros, en la misma sala de 10 por 6 por 3,5 metros de los dibujos de configuración. Arriba, la T30 media de 500 a 1000 Hz se mantiene entre 0,54 y 0,66 segundos a lo largo de todo el barrido mientras el EDT sube de 0,18 a unos 0,45 segundos; abajo, la claridad C80 baja de 17,5 a unos 10,5 decibelios. La región interior a d_min = 2,0 metros aparece sombreada como excluida y la distancia crítica de 1,5 metros está marcada con una línea de puntos" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias_es.svg" alt="Dos paneles apilados que comparten un eje de distancia fuente-receptor de 0,6 a 7 metros, en la misma sala de 10 por 6 por 3,5 metros de los dibujos de configuración. Arriba, el T30 medio de 500 a 1000 Hz se mantiene entre 0,54 y 0,66 segundos a lo largo de todo el barrido mientras el EDT sube de 0,18 a unos 0,45 segundos; abajo, la claridad C80 baja de 17,5 a unos 10,5 decibelios. La región interior a d_min = 2,0 metros aparece sombreada como excluida y la distancia crítica de 1,5 metros está marcada con una línea de puntos" width="90%" />
 
 *EDT, T30 y C80 de la sala de arriba frente a la distancia a la fuente, a partir
 de respuestas al impulso sintéticas. Dentro de $d_{min}$, el EDT es corto por un
 factor de aproximadamente 2,5 y el C80 sale 7 dB alto — muchas veces la diferencia
 apenas perceptible del 5 % relativo y de 1 dB de la Tabla A.1 de la ISO 3382-1 —
-mientras que la T30 fluctúa 0,12 s a lo largo de todo el barrido sin tendencia en
-el extremo cercano. Esa asimetría es la trampa: un control que declare solo la T30
+mientras que el T30 fluctúa 0,12 s a lo largo de todo el barrido sin tendencia en
+el extremo cercano. Esa asimetría es la trampa: un control que declare solo el T30
 no notará que el micrófono estaba demasiado cerca, y todos los parámetros de
 energía que lo acompañan están mal.*
 
@@ -772,7 +772,7 @@ posiciones se midieron ni dónde.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración
   de Schroeder que el análisis del decaimiento aplica a esta RI.
 - Referencia de la API: [`room.impulse_response`](/phonometry/es/reference/api/rooms/impulse-response/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la integración inversa de Schroeder y la deconvolución en la que se apoya el método del barrido.
+- Teoría: [Respuesta al impulso y parámetros de acústica de salas](/phonometry/es/reference/theory/rooms-buildings/#respuesta-al-impulso-y-parámetros-de-acústica-de-salas-iso-18233-iso-3382-1-2-3): la integración inversa de Schroeder y la deconvolución en la que se apoya el método del barrido.
 
 ## Respuestas rápidas
 

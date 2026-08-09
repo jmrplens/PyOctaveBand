@@ -8,14 +8,14 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "El detector exponencial de ponderación temporal (apartado 3.8) con las constantes de tiempo F y S (apartado 5.7), y las respuestas de referencia a ráfagas tonales de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
+    note: "El detector exponencial de ponderación temporal (apartado 3.8) con las constantes de tiempo y las velocidades de caída objetivo de diseño F y S (apartado 5.8.1), el nivel sonoro máximo con ponderación temporal (apartado 3.7) y su función de retención (apartado 5.1.14), y las respuestas de referencia a ráfagas tonales de 4 kHz de la Tabla 4 y su ecuación (7) (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
   - type: standard
     organization: "American National Standards Institute"
     year: 1983
     title: "Specification for sound level meters"
     designation: "ANSI S1.4-1983"
     url: "https://webstore.ansi.org/standards/asa/ansiasas11983"
-    note: "La especificación clásica del sonómetro analógico: las características dinámicas FAST/SLOW de las que descienden las constantes F y S, y la característica IMPULSE (subida de 35 ms, caída lenta) que IEC 61672-1 ya no especifica."
+    note: "La especificación clásica del sonómetro analógico: las características dinámicas FAST/SLOW de las que descienden las constantes F y S, y la característica IMPULSE que IEC 61672-1 ya no especifica, definida en el apartado 2.7 como una constante de promediado temporal exponencial de 35 ms para las partes crecientes de la señal y de 1500 ms para las decrecientes."
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
     year: 2017
@@ -34,7 +34,7 @@ temporal*: antes de llegar a la lectura, la presión cuadrática ponderada en
 frecuencia pasa por un detector exponencial cuya constante de tiempo fija
 la rapidez con la que el nivel sigue a la señal. Esta página es ese
 detector, implementado como un filtro recursivo exacto por muestra: las
-características Fast y Slow de IEC 61672-1:2013 (apartado 5.7), la
+características Fast y Slow de IEC 61672-1:2013 (apartado 5.8), la
 balística asimétrica heredada Impulse, estado en streaming para el
 procesado por bloques y la verificación con ráfagas tonales contra la
 Tabla 4 de la norma.
@@ -51,7 +51,8 @@ cubre la práctica instrumental).
 
 Dos páginas hermanas completan la cadena. La salida del detector es la
 traza de nivel sobre la que se definen los niveles percentiles $L_N$ de
-[Niveles](/phonometry/es/signals/levels/levels/), mientras que las métricas
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/),
+mientras que las métricas
 integradas ($L_{eq}$, SEL) se saltan el detector por completo; y la cadena
 completa de instrumento IEC 61672-1 que envuelve este detector
 (ponderación, rangos, verificaciones periódicas) es el asunto de
@@ -82,18 +83,25 @@ instantes de una grabación.
 
 * **Fast (`fast`):** $\tau = 125\ \text{ms}$. Estándar para fluctuaciones de ruido.
 * **Slow (`slow`):** $\tau = 1000\ \text{ms}$. Estándar para ruido estacionario.
-* **Impulse (`impulse`):** ponderación temporal **asimétrica**. 35 ms de subida para
-  capturar ataques rápidos y 1500 ms de caída para facilitar la lectura.
+* **Impulse (`impulse`):** balística **asimétrica**, 35 ms de ataque y 1,5 s de
+  caída. Los dos números están especificados, no ajustados a ojo: el apartado
+  2.7 de ANSI S1.4-1983 define el nivel sonoro de impulso como un promediado
+  temporal exponencial de 35 ms para las partes crecientes de la señal y una
+  constante de tiempo de 1500 ms para las decrecientes.
 
 <Video
   name="anim_time_weighting"
   width={2400}
   height={1350}
   title="La balística de los detectores Fast, Slow e Impulse"
-  description="Una ráfaga tonal excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas de los medidores Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se construyen debajo mostrando el ataque rápido, el promedio lento y la retención asimétrica del modo Impulse."
+  description="Una ráfaga tonal excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas de los sonómetros Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se construyen debajo mostrando el ataque rápido, el promedio lento y la retención asimétrica del modo Impulse."
 />
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
+
+*Los tres detectores sobre una misma ráfaga de ruido de 0,5 s: Fast sube y baja
+con ella, Slow no llega nunca a su nivel, e Impulse sube con Fast y luego
+mantiene.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -147,6 +155,21 @@ y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
 \alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0{,}035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1{,}5)} & \text{en otro caso}\end{cases}
 $$
 
+Una constante de tiempo y una velocidad de caída son la misma afirmación. Un
+valor cuadrático medio que decae exponencialmente cae a un ritmo constante de
+$10/(\tau \ln 10)$ decibelios por segundo, y por eso el apartado 5.8.1 de
+IEC 61672-1 puede especificar F y S por duplicado: como constantes objetivo de
+diseño de 0,125 s y 1 s, y como velocidades de caída objetivo de diseño de
+34,7 dB/s y 4,3 dB/s. La misma aritmética convierte la constante de 1,5 s de las
+partes decrecientes de la característica analógica IMPULSE en 2,9 dB/s, la caída
+que un operador tenía que poder leer sobre una aguja en movimiento.
+
+La asimetría tiene una consecuencia que merece decirse: a diferencia de F y S,
+Impulse no es un filtro. Su coeficiente depende de la señal, así que un nivel
+ponderado I no es aditivo; el nivel ponderado I de dos fuentes funcionando a la
+vez no se puede deducir de las dos medidas por separado, mientras que sus
+$L_{eq}$ sí.
+
 ### Elegir F, S o I
 
 - **Fast** es el valor por defecto de casi todos los métodos modernos:
@@ -157,25 +180,71 @@ $$
 - **Slow** conviene a fuentes cuasi estacionarias y a cualquier
   procedimiento que necesite una lectura estable: promedia el parpadeo de
   una fuente fluctuante al precio de perder los eventos cortos (una ráfaga
-  de 100 ms alcanza un pico unos 7,5 dB más bajo en S que en F). Algunos
+  de 100 ms alcanza un pico 7,6 dB más bajo en S que en F). Algunos
   métodos heredados la prescriben directamente; el caso más famoso son los
   niveles de certificación de aeronaves, construidos sobre muestras con
   ponderación Slow.
 - **Impulse** es herencia histórica, y está desaconsejada para valorar.
-  Fue un intento de los años 60 de que la aguja del medidor siguiera la
+  Fue un intento de los años 60 de que la aguja del sonómetro siguiera la
   sonoridad percibida de los impactos; no lo consigue (el ataque de 35 ms
-  sigue perdiendo los impulsos muy cortos y la retención de 1,5 s exagera la
+  sigue perdiendo los impulsos muy cortos y la caída de 1,5 s exagera la
   duración). Entró en las normas internacionales con IEC 60651 y quedó fuera
   de los requisitos de su sucesora IEC 61672-1, cuya primera edición (2002)
   explica el porqué: los niveles ponderados I no son adecuados para
-  valorar sonidos impulsivos. Sobrevive en los medidores solo por
-  continuidad con requisitos nacionales antiguos. La práctica moderna
+  valorar sonidos impulsivos. La práctica *internacional* moderna
   valora la impulsividad
   con $L_{Aeq}$ más un ajuste (Tabla A.1 de ISO 1996-1, o el análisis de
   inicio de
   [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/))
   y evalúa el riesgo de daño auditivo con $L_{Cpeak}$, nunca con niveles
-  ponderados I.
+  ponderados I. Algunas normas nacionales siguen exigiendo explícitamente la
+  ponderación I: el RD 1367/2007 español gradúa su corrección por impulsividad
+  $K_i$ sobre $L_{AIeq} - L_{Aeq}$ (ver
+  [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/)),
+  y por eso `mode='impulse'` es aquí una opción de pleno derecho y no un parche
+  de compatibilidad.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ballistics_vs_duration_es.svg" alt="Nivel de pico de la envolvente respecto a la lectura estacionaria, en decibelios, frente a la duración de la ráfaga tonal de un milisegundo a dos segundos en eje logarítmico, con una curva medida por detector: Impulse la más alta, después Fast y después Slow. Las tres se acercan a cero decibelios para ráfagas de un segundo o más y caen con fuerza para las cortas, hasta menos 18, menos 21 y menos 30 decibelios a un milisegundo. Los círculos huecos de la ecuación 7 de la Tabla 4 de IEC 61672-1 caen exactamente sobre las curvas de Fast y Slow, un marcador vertical en 100 milisegundos anota la diferencia de 7,6 decibelios entre Fast y Slow en ese punto, y una anotación señala que incluso Impulse pierde 18 decibelios en una ráfaga de un milisegundo" width="88%" />
+
+*Cuánto conserva cada detector de un evento, en función de lo que dure el
+evento. Las curvas medidas caen sobre los puntos de referencia de la Tabla 4,
+así que toda la tabla es una línea de álgebra. La diferencia entre dos curvas a
+una duración dada es la razón por la que un nivel máximo tiene que nombrar su
+ponderación temporal; y la pérdida absoluta es la razón por la que los impulsos
+muy cortos se valoran con $L_{Cpeak}$ en su lugar: incluso Impulse, la balística
+diseñada para impactos, se queda 18 dB baja en una ráfaga de 1 ms.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+fs = 48000
+t = np.arange(int(3.0 * fs)) / fs
+tone = np.sin(2 * np.pi * 4000 * t)
+durations = np.geomspace(0.001, 2.0, 30)
+
+plt.figure()
+for mode in ('fast', 'slow', 'impulse'):
+    reference = filters.time_weighting(tone, fs, mode=mode)[int(2.5 * fs):].mean()
+    peaks = []
+    for t_b in durations:
+        burst = np.zeros_like(t)
+        stop = int(0.5 * fs) + int(t_b * fs)
+        burst[int(0.5 * fs):stop] = tone[int(0.5 * fs):stop]
+        peaks.append(10 * np.log10(
+            filters.time_weighting(burst, fs, mode=mode).max() / reference))
+    plt.semilogx(durations * 1e3, peaks, label=mode)
+plt.axvline(100.0, linewidth=0.8)
+plt.xlabel('Duración de la ráfaga tonal [ms]')
+plt.ylabel('Nivel de pico re la lectura estacionaria [dB]')
+plt.legend()
+plt.show()
+```
+
+</details>
 
 ## 3. Parámetros de `time_weighting()` / `TimeWeighting`
 
@@ -193,12 +262,37 @@ usa las funciones de nivel, que lo hacen por ti.
 
 ## 4. Respuesta temporal verificada (IEC 61672-1, Tabla 4)
 
+Esos valores de referencia no son una tabla de consulta sin fórmula detrás. La
+IEC 61672-1 los da en la nota 1 a la Tabla 4 como ecuación (7), la respuesta
+exacta del detector del apartado 1 a una ráfaga tonal aislada de 4 kHz de
+duración $T_b$:
+
+$$
+\Delta_{\mathrm{ref}} = 10\log_{10}\left(1 - e^{-T_b/\tau}\right)\ \text{dB}
+$$
+
+Léela en voz alta y sale la tabla entera. En Fast ($\tau = 125$ ms) una ráfaga
+de 200 ms da $-0{,}98$ dB, una de 50 ms $-4{,}82$ dB y una de 10 ms
+$-11{,}14$ dB: los tres paneles de abajo. Una ráfaga de 100 ms da $-2{,}59$ dB
+en Fast y $-10{,}21$ dB en Slow, y esos 7,6 dB son la cifra que cita la
+[guía de elección](#elegir-f-s-o-i) de más arriba. La física cabe en una frase:
+un detector con memoria $\tau$ no puede alcanzar su valor estacionario en un
+evento más corto que $\tau$, así que **todo sonómetro subestima todo evento
+corto**, en una cantidad que solo depende de $T_b/\tau$. Por eso un nivel máximo
+no significa nada sin su balística, y por eso los impulsos cortos frente a los
+125 ms se valoran con $L_{Cpeak}$ en su lugar.
+
 La respuesta de la envolvente Fast a ráfagas tonales de 4 kHz cae exactamente
-sobre los valores de referencia de la norma: el ejemplo de abajo verifica la
-fila de la ráfaga Fast de 200 ms; la batería de CI cubre la Tabla 4 completa,
-de 1 s a 1 ms en F y de 1 s a 2 ms en S, con límites de aceptación de clase 1:
+sobre los valores de referencia de la norma: el ejemplo de abajo verifica las
+tres filas de la Tabla 4 dibujadas en la figura; la batería de CI cubre la tabla
+completa, de 1 s a 1 ms en F y de 1 s a 2 ms en S, con límites de aceptación de
+clase 1:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_es.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de la Tabla 4 de IEC 61672-1" width="80%" />
+
+*Los picos de la envolvente Fast quedan en −1,0, −4,8 y −11,1 dB respecto al
+tono estacionario para las ráfagas de 200, 50 y 10 ms de la Tabla 4; la batería
+de CI comprueba la tabla completa, de 1 s a 1 ms.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -215,18 +309,20 @@ tone = np.sin(2 * np.pi * 4000 * t)
 # Referencia Fast en régimen permanente del tono continuo
 reference = filters.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
 
-# Ráfaga de 200 ms del mismo tono (objetivo de la Tabla 4 de IEC 61672-1: -1.0 dB)
-burst = np.zeros_like(t)
-burst[int(0.5 * fs):int(0.7 * fs)] = tone[int(0.5 * fs):int(0.7 * fs)]
-envelope = filters.time_weighting(burst, fs, mode='fast')
-env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
-
-plt.figure()
-plt.plot(t, env_db, label='Envolvente Fast')
-plt.axhline(-1.0, linestyle='--', label='Objetivo IEC −1.0 dB')
-plt.xlabel('Tiempo [s]')
-plt.ylabel('Nivel respecto al régimen permanente [dB]')
-plt.legend()
+# Las tres filas de la Tabla 4 que dibuja la figura publicada, con sus objetivos
+cases = [(0.200, -1.0), (0.050, -4.8), (0.010, -11.1)]
+fig, axes = plt.subplots(len(cases), 1, sharey=True, figsize=(8, 8))
+for ax, (t_b, target) in zip(axes, cases):
+    burst = np.zeros_like(t)
+    stop = int(0.5 * fs) + int(t_b * fs)
+    burst[int(0.5 * fs):stop] = tone[int(0.5 * fs):stop]
+    envelope = filters.time_weighting(burst, fs, mode='fast')
+    env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
+    ax.plot(t, env_db, label=f'Envolvente Fast, ráfaga de {t_b * 1e3:.0f} ms')
+    ax.axhline(target, linestyle='--', label=f'Objetivo IEC {target} dB')
+    ax.set_ylabel('Nivel respecto al régimen permanente [dB]')
+    ax.legend(loc='upper right')
+axes[-1].set_xlabel('Tiempo [s]')
 plt.show()
 ```
 
@@ -284,7 +380,7 @@ from phonometry import filters
 state = None
 
 # audio_blocks: tramas consecutivas de tu grabación calibrada (Pa),
-#   transmitidos desde tu tarjeta de sonido o leídos de un WAV por bloques.
+#   transmitidas desde tu tarjeta de sonido o leídas de un WAV por bloques.
 for block in audio_blocks:
     energy_envelope = filters.time_weighting(block, fs, mode='fast', initial_state=state)
     state = energy_envelope[-1]
@@ -304,7 +400,7 @@ from phonometry import filters
 
 tw = filters.TimeWeighting(fs, mode='fast')
 # audio_blocks: tramas consecutivas de tu grabación calibrada (Pa),
-#   transmitidos desde tu tarjeta de sonido o leídos de un WAV por bloques.
+#   transmitidas desde tu tarjeta de sonido o leídas de un WAV por bloques.
 for block in audio_blocks:
     energy_envelope = tw.process(block)
 ```
@@ -329,7 +425,7 @@ verificación con ráfagas tonales de IEC 61672-1.
 
 **Cubierto.** El detector exponencial de ponderación temporal de la
 IEC 61672-1:2013 (apartado 3.8) con las constantes de tiempo Fast y Slow
-(apartado 5.7), implementado como el filtro recursivo de `time_weighting`
+(apartado 5.8.1), implementado como el filtro recursivo de `time_weighting`
 y la clase `TimeWeighting` para streaming, verificado en CI contra las
 referencias de ráfaga tonal de clase 1 de la Tabla 4. La balística
 asimétrica heredada Impulse (35 ms de ataque, 1,5 s de caída), trasladada
@@ -354,6 +450,8 @@ no construida sobre la ponderación Impulse de aquí.
 - [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/): la cadena completa de instrumento IEC 61672-1 alrededor de este detector.
 - [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/): los filtros A/C/Z aplicados antes del detector.
 - [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): el detector en streaming sobre tramas sin discontinuidades de estado.
-- [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/): la valoración moderna de impulsos por análisis de inicio que sustituyó a la ponderación I.
+- [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/): la valoración de impulsos por análisis de inicio a la que se pasaron las normas internacionales.
+- [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/): una valoración en vigor que sigue exigiendo la ponderación I, a través de la corrección por impulsividad $K_i$ sobre $L_{AIeq} - L_{Aeq}$.
+- [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): los ensayos periódicos de IEC 61672-3, en los que esta balística se comprueba por muestreo contra los límites de clase sobre un instrumento real.
 - Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/).
 - Teoría: [Integración temporal](/phonometry/es/reference/theory/signal-analysis/#integración-temporal): la ecuación de primer orden que resuelven los detectores exponenciales, y qué cambiaría integrarla en su lugar sobre un bloque fijo.

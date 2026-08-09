@@ -41,7 +41,7 @@ dentro del espectro. El **modelo detallado** (ISO 12354-1:2017 apartado 4.2 a
 ruido aéreo, ISO 12354-2:2017 apartado 4.2 a ruido de impactos) lleva en cambio
 cada magnitud por las bandas de tercio de octava: convierte los datos de
 laboratorio del elemento en sus valores *in situ*, forma cada trayectoria de
-transmisión banda a banda, los suma energéticamente y solo entonces valora el
+transmisión banda a banda, las suma energéticamente y solo entonces valora el
 espectro con ISO 717. Es lo que se calcula cuando se conocen los espectros de
 los elementos y la pregunta no es «¿cumple?» sino «¿qué trayectoria tengo que
 corregir, y en qué bandas?».
@@ -329,8 +329,8 @@ sola llamada:
 
 ```python
 # `paths` contiene las doce trayectorias por flancos de los cuatro elementos,
-# construidos como `d1` más arriba; el bloque de código bajo la figura los
-# construye todos.
+# construidas como `d1` más arriba; el bloque de código bajo la figura las
+# construye todas.
 res = detailed_airborne_prediction(
     bands, direct_index=direct_reduction_index(el.sound_reduction_index,
                                                delta_r_source=delta),
@@ -346,7 +346,7 @@ res.plot()                                 # barras de contribución por banda
 el problema es el propio forjado separador, de modo que una losa más pesada o
 un suelo flotante mejor ayudarían; decae en la transición de 80 Hz a 160 Hz y a
 partir de 200 Hz ha salido por completo del reparto, y son las trayectorias por
-flancos a través de las paredes los que fijan $R'$ por sí solos, así que
+flancos a través de las paredes las que fijan $R'$ por sí solos, así que
 ningún trabajo sobre el forjado movería ya el resultado. El número único
 $R'_w = 57$ dB no dice nada de eso.*
 
@@ -682,4 +682,4 @@ en octavas.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la $s'$ que hay detrás de la frecuencia de resonancia del suelo flotante.
 - Referencia de la API: [`building.prediction.detailed_model`](/phonometry/es/reference/api/building/detailed-model/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): el álgebra de trayectos directos y de flancos que el modelo detallado desglosa.
+- Teoría: [Aislamiento acústico y absorción, predichos](/phonometry/es/reference/theory/rooms-buildings/#aislamiento-acústico-y-absorción-predichos-en-12354-1-2-6-bies-cremer-hopkins): el álgebra de trayectos directos y de flancos que el modelo detallado desglosa.

@@ -32,7 +32,7 @@ nivel recibido puede variar en decenas de decibelios. Esta página cubre
 `phonometry.environment.propagation.refraction`, el homólogo para atmósfera
 refractante de los métodos numéricos oceánicos de
 [`phonometry.underwater.propagation.numerical`](/phonometry/es/underwater/underwater-solvers/):
-un **modelo de rayos** y una **ecuación parabólica (PE)** marchada en distancia.
+un **modelo de rayos** y una **ecuación parabólica (PE)** que avanza en distancia.
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
 representativo de la capa superficial de ±0,1 s⁻¹ curva los rayos con un radio
@@ -94,7 +94,7 @@ for i in range(rayos.heights.shape[0]):
 axes[0].plot([0.0], [zs], "o", color="#d62728", label="Fuente")
 grad = (perfil.speed_at(10.0) - c0) / 10.0
 x_sh = shadow_zone_distance(float(grad), zs, zs, ground_speed=c0)
-axes[0].axvline(x_sh, color="#d62728", ls="--", label="Límite de zona de sombra")
+axes[0].axvline(x_sh, color="#d62728", ls="--", label="Límite de la zona de sombra")
 axes[0].set(ylabel="Altura [m]", ylim=(0, 40), title="Rayos sonoros (refracción hacia arriba)")
 axes[0].legend()
 
@@ -223,7 +223,7 @@ plt.show()
 
 En acústica geométrica un rayo sonoro cumple la ley de Snell
 $\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Ec. 4.3). `atmospheric_ray_paths` la integra
-con un esquema Runge-Kutta de cuarto orden, marchando en distancia y reflejando
+con un esquema Runge-Kutta de cuarto orden, avanzando en distancia y reflejando
 especularmente en el suelo, y devuelve los caminos curvos, los puntos de
 retorno, los tiempos de propagación y el número de reflexiones en el suelo.
 
@@ -340,7 +340,7 @@ plt.show()
 La **ecuación parabólica** es el método de referencia para la refracción y las
 zonas de sombra a larga distancia. Sustituye la ecuación de ondas por una
 ecuación unidireccional (saliente) válida dentro de un ángulo de elevación
-límite, y la marcha en distancia sobre una malla distancia-altura.
+límite, y la hace avanzar en distancia sobre una malla distancia-altura.
 `atmospheric_parabolic_equation` implementa la **PE de la función de Green**
 (GFPE, Salomons apéndice H), el miembro atmosférico de la misma familia
 split-step de Fourier que la
@@ -546,4 +546,4 @@ plano en $z = 0$; ninguno admite un perfil de elevación del terreno.
 
 ## Véase también
 
-- Teoría: [Propagación en exteriores y exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-y-exposición-al-ruido-en-el-trabajo-iso-9613-12-iso-9612): las hipótesis meteorológicas que hace ISO 9613-2, que es justo lo que la refracción desmonta.
+- Teoría: [Propagación en exteriores](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-iso-9613-12): las hipótesis meteorológicas que hace ISO 9613-2, que es justo lo que la refracción desmonta.

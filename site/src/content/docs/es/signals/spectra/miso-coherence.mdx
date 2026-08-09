@@ -18,7 +18,7 @@ Cuando varias fuentes parcialmente correlacionadas excitan una misma respuesta, 
 coherencia ordinaria de cada fuente con la salida engaña: una fuente que solo
 *se correlaciona* con la causa real hereda una coherencia espuria a través de ella, de
 modo que leer solo las coherencias ordinarias puede atribuir el mérito a la
-fuente equivocada. Bendat y Piersol, *Random Data* (4.a ed., 2010,
+fuente equivocada. Bendat y Piersol, *Random Data* (4.ª ed., 2010,
 capítulo 7), lo resuelven para un sistema de entradas múltiples y salida única
 (MISO) con las funciones de coherencia **múltiple** y **parcial**.
 `miso_coherence` las calcula desde el mismo núcleo de espectros cruzados de
@@ -39,7 +39,7 @@ from phonometry import miso_coherence, noise_signal
 fs = 8192.0
 # La entrada 1 excita un camino de baja frecuencia; la entrada 2 =
 # 0.7*x1 + ruido independiente excita un camino de alta frecuencia, de modo
-# que la entrada 2 esta correlacionada con la entrada 1.
+# que la entrada 2 está correlacionada con la entrada 1.
 x1 = noise_signal(fs, 32.0, color="white", seed=1)
 x2 = 0.7 * x1 + noise_signal(fs, 32.0, color="white", seed=2)
 low = signal.butter(4, 400.0, fs=fs, output="sos")
@@ -122,14 +122,20 @@ verifica la implementación.
 
 La **coherencia parcial** de la entrada $i$ (Ec. 7.87) es su coherencia con la
 salida una vez eliminado el efecto lineal de las entradas *anteriores a ella
-en el orden de condicionamiento*:
+en el orden de condicionamiento*. La notación de los subíndices es la del
+libro, y el signo de admiración **no es un factorial**: un $\cdot\,r!$ final
+significa *condicionado a las entradas 1 a $r$, en el orden elegido*. Así que
+$G_{ij\cdot r!}$ es el espectro cruzado de $i$ y $j$ con el efecto lineal de
+las $r$ primeras entradas eliminado, y $G_{yy\cdot q!}$, con el que termina el
+§2, es el espectro de salida con todas las entradas eliminadas, es decir, el
+ruido residual $G_{nn}$ de la coherencia múltiple de arriba. En símbolos:
 
 $$
 \gamma^2_{iy\cdot(i-1)!}(f)
    = \frac{|G_{iy\cdot(i-1)!}(f)|^2}{G_{ii\cdot(i-1)!}(f)\,G_{yy}(f)} .
 $$
 
-La definición de la 4.a edición mantiene la salida *total* $G_{yy}$ en el
+La definición de la 4.ª edición mantiene la salida *total* $G_{yy}$ en el
 denominador (no la salida condicionada). Esa elección hace que las
 coherencias parciales de las entradas ordenadas sumen la coherencia múltiple,
 $\gamma^2_{y:x} = \sum_i \gamma^2_{iy\cdot(i-1)!}$ (Ec. 7.116), y se reduzcan
@@ -194,6 +200,37 @@ dominant[np.argmin(abs(f - 200.0))]    # 0 (la entrada 1 excita la banda baja)
 dominant[np.argmin(abs(f - 2500.0))]   # 1 (la entrada 2 excita la banda alta)
 ```
 
+## Cómo se instrumenta una medición MISO
+
+Todo lo anterior corre sobre arrays sintéticos, y todo el valor del método
+está en máquinas reales, en una sala real, donde las fuentes no se pueden
+apagar de una en una, que es justo para lo que existe la técnica. Lo que
+separa es lo que separan las *referencias*, así que los sensores de referencia
+son la medición.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_setup_es.svg" alt="Planta a escala de una sala de máquinas: un ventilador sobre apoyos elásticos y un compresor separados tres metros, cada uno con su propio sensor de referencia, un acelerómetro atornillado a la pata del ventilador y un micrófono a 0,3 m de la carcasa del compresor, un micrófono receptor en el puesto del operario a cuatro metros y 1,5 m de altura, un camino de fuga a trazos que muestra el sonido aéreo del ventilador llegando al micrófono de referencia del compresor, y una columna a la derecha con los cuatro canales entrando en un único frontal de muestreo simultáneo" width="92%" />
+
+- **Una referencia por fuente, colocada de modo que oiga la suya y lo menos
+  posible de las demás.** Un acelerómetro atornillado a la pata de una máquina,
+  un micrófono a 0,2 o 0,5 m de la superficie de la carcasa y no en medio de la
+  sala. Una referencia que recoge a su vecina es la correlación entre entradas
+  que el condicionamiento tiene que deshacer después, y solo la deshace hasta
+  donde la aritmética lo permite (ver más abajo).
+- **Un único frontal de muestreo simultáneo para todas las referencias y el
+  receptor.** El condicionamiento se construye enteramente con espectros
+  cruzados, así que un desfase entre canales los inclina todos; un convertidor
+  que secuencia sus canales mete ese desfase de regalo.
+- **Ganancias fijas durante toda la tirada**, y todas las fuentes funcionando a
+  la vez en el punto de operación que se está diagnosticando.
+- **Promedios de sobra.** Cada paso de condicionamiento gasta uno, así que la
+  última entrada del orden lleva $n_d - (q-1)$; apunta a unos cuantos cientos de
+  promedios efectivos antes de leer una coherencia parcial pequeña como un cero
+  físico.
+- **Anota junto al resultado:** modelo, posición y sensibilidad del sensor de
+  cada canal, la velocidad y la carga de la máquina, la longitud de segmento y
+  el orden de condicionamiento realmente aplicado (`res.order`); sin este
+  último, el reparto no es reproducible.
+
 ## 4. Calidad estadística y el orden de condicionamiento
 
 Los errores aleatorios siguen la sección 9.3. Condicionar a las $i-1$ entradas
@@ -207,16 +244,56 @@ Las coherencias ordinaria y múltiple no dependen del orden de
 condicionamiento, pero las parciales y la descomposición de la salida
 coherente sí: cada entrada se condiciona a lo que la precede. A falta de un
 orden físico, Bendat y Piersol (sección 7.2.4) recomiendan ordenar las
-entradas por coherencia ordinaria descendente con la salida. Pasa `order` para
-elegirlo:
+entradas por coherencia ordinaria descendente con la salida. Supón que junto a
+las dos de arriba se registra una tercera fuente débilmente acoplada, un
+ventilador de la sala contigua, que no es coherente con ninguna de las dos.
+Pasa `order` para saltarte el orden por defecto:
 
 ```python
+x3 = noise_signal(fs, 32.0, color="white", seed=4)   # la tercera fuente, débil
 res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): el orden aplicado
 res.plot(language="es")   # los dos paneles, recalculados en el orden aplicado
 ```
 
-Merece la pena nombrar dos escollos prácticos. *Promediado*: cada paso de
+Las coherencias ordinaria y múltiple salen idénticas diga lo que diga
+`order`; las parciales y las porciones por fuente no, porque a cada entrada
+solo se le acredita lo que las anteriores dejaron sin explicar.
+
+### Comprueba antes las entradas entre sí
+
+El condicionamiento invierte la matriz de espectros cruzados de entrada, así
+que solo separa fuentes que sean de verdad separables. Cada paso de Schur
+divide por la potencia que a la entrada pivote le queda *después* de eliminar
+las anteriores, de modo que dos referencias que son casi la misma señal apenas
+dejan nada en ese pivote y el paso siguiente amplifica sin cota el ruido de
+estimación. Bendat y Piersol tratan el límite como un caso aparte (su figura
+7.3): una coherencia entre entradas igual a uno significa que los dos registros
+son una sola fuente que llega a la salida por dos caminos, y entonces no existe
+ningún reparto entre dos entradas.
+
+Esta implementación no lanza ningún error en ese caso. Un pivote condicionado
+cuya potencia cae por debajo de un suelo relativo se salta, y la entrada aporta
+exactamente cero, **que es idéntico al resultado estrella de esta página**, una
+fuente que solo se correlaciona, incluso cuando ambas fuentes son reales y lo
+único mal puesto eran las referencias.
+
+Así que haz la comprobación antes de creerte el reparto:
+
+1. Calcula la coherencia ordinaria *entre cada par de entradas*, un
+   `cross_spectral_density` por pareja, antes de llamar a `miso_coherence`.
+2. En cualquier banda donde una pareja pase de 0,9 aproximadamente, no leas ni
+   las coherencias parciales ni las porciones por fuente. La coherencia múltiple
+   y $G_{yy}$ siguen siendo válidas ahí; la atribución no.
+3. Confírmalo reordenando. Una descomposición bien condicionada apenas se mueve
+   al reordenar las entradas; una mal condicionada se mueve mucho.
+
+Los remedios son físicos, no numéricos: acercar una referencia a su propia
+fuente para que deje de oír a la otra, hacer funcionar las fuentes de una en una
+si la máquina lo permite, o aceptar que la pareja es una sola entrada y
+fundirlas.
+
+Merece la pena nombrar otros dos escollos. *Promediado*: cada paso de
 condicionamiento gasta un grado de libertad, así que con pocos segmentos
 las coherencias parciales de las últimas entradas del orden son los números
 menos fiables de la página; promedia con generosidad antes de leer una
@@ -232,7 +309,7 @@ Los estimadores comparten el núcleo de Welch de la página de
 [análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/)
 (mismo enventanado de Hann, solape del 50 % y calibración sin quitar
 tendencia), de modo que una coherencia MISO y un `power_spectral_density`
-calculados con la misma longitud de segmento son consistentes bin a bin.
+calculados con la misma longitud de segmento son congruentes bin a bin.
 
 ## Qué cubre esta guía
 

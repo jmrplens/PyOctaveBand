@@ -90,19 +90,42 @@ $$
 G = 10^{0{,}3}
 $$
 
+$G = 10^{0{,}3} \approx 1{,}9953$ es la razón de octava que IEC 61260-1 y
+ANSI S1.11 adoptan en lugar de un factor exacto de 2, porque una razón en base
+10 mantiene la retícula de bandas conmensurable con la retícula de décadas que
+usan los datos tabulados y deja 1 kHz exactamente sobre ella. El índice de banda
+$x$ es un entero, anclado de modo que $x = 30$ cae en la referencia de 1 kHz, y
+la frecuencia central depende de si la fracción $b$ es impar o par:
+
 **Frecuencia central:**
 
 $$
-f_m = 1000 \cdot G^{x/b}
+f_m = 1000 \cdot G^{(x-30)/b} \quad (b \text{ impar}), \qquad
+f_m = 1000 \cdot G^{(2x-59)/(2b)} \quad (b \text{ par})
 $$
 
-(para $b$ impar)
+La distinción no es cosmética. Con $b$ impar la referencia cae en el *centro* de
+una banda, así que un banco de tercios de octava tiene una banda centrada
+exactamente en 1000,00 Hz; con $b$ par cae en un *borde* de banda, así que un
+banco de sextos de octava tiene bandas en 944,1 Hz y 1059,3 Hz y ninguna en
+1 kHz. Una fórmula escrita solo para $b$ impar no puede producir el conjunto de
+bandas que la biblioteca devuelve con `fraction=2`, `fraction=6` o
+`fraction=12`.
 
 **Bordes de banda:**
 
 $$
 f_1 = f_m \cdot G^{-1/(2b)}, \quad f_2 = f_m \cdot G^{1/(2b)}
 $$
+
+**Centro exacto frente a etiqueta impresa.** El $f_m$ de arriba es la frecuencia
+central exacta; lo que imprime un instrumento (y lo que `nominal_frequencies`
+devuelve como cuarto elemento, o `octave_filter(..., nominal=True)`) es el
+número preferente de ISO 266 más próximo a ella. La banda de tercio de octava
+cuyo centro exacto es 1258,9 Hz se etiqueta 1250 Hz, y la banda de sexto de
+octava centrada en 1059,3 Hz se etiqueta 1.06k. Los niveles de banda se comparan
+entre herramientas por índice o por centro exacto, nunca casando cadenas de
+etiqueta: cada herramienta redondea las etiquetas a su manera.
 
 ## Resolución frecuencial vs separación de bins FFT
 
@@ -203,8 +226,12 @@ filtrada por cada banda. Aplicar Welch/FFT a una de esas señales puede servir
 como vista diagnóstica del contenido dentro de esa banda, pero no recupera bins
 FFT a partir de los niveles escalares por banda.
 
-## Respuestas en magnitud |H(jw)|
+## Respuestas en magnitud
 
+La respuesta en magnitud de un filtro es $|H(j\omega)|$, el módulo de su función
+de transferencia evaluada sobre el eje imaginario: lo que el filtro le hace a la
+amplitud de una sinusoide estacionaria en cada frecuencia, antes de filtrar
+banda ninguna.
 La biblioteca implementa los prototipos clásicos estándar:
 
 **1. Butterworth:** banda de paso máximamente plana.
@@ -226,7 +253,7 @@ $$
 |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}}
 $$
 
-**4. Elíptico:** rizado en ambas bandas, máxima selectividad.
+**4. Elíptico:** rizado uniforme en ambas bandas, máxima selectividad.
 
 $$
 |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
@@ -239,6 +266,49 @@ H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)}
 $$
 
 (donde $\theta_n$ es el polinomio de Bessel inverso)
+
+Los cinco no son intercambiables para un nivel de banda que se vaya a declarar,
+y la tabla dice cuál es cuál:
+
+| Prototipo | Banda de paso | Banda atenuada | Dónde se define su frecuencia de borde | Clase IEC 61260-1 alcanzable | Dónde encaja |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Butterworth | Monótona, máximamente plana | Monótona | −3 dB | **Clase 1** con los valores por defecto | El filtro por defecto del banco, y cualquier nivel que se declare |
+| Chebyshev II | Plana | Rizado uniforme | −3 dB (mapeado desde el borde de la banda atenuada) | Clase 1 en cuanto `attenuation` ≥ 70 dB | Una caída más abrupta al mismo orden |
+| Chebyshev I | Rizado uniforme (`ripple` dB) | Monótona | Borde de rizado de la banda de paso | Ninguna | Filtrado exploratorio |
+| Elíptico | Rizado uniforme | Rizado uniforme | Borde de rizado de la banda de paso | Ninguna | Filtrado exploratorio |
+| Bessel | Retardo de grupo máximamente plano | Caída lenta | −3 dB | Ninguna | Preservar la envolvente de una ráfaga o de una caída |
+
+El valor por defecto del banco es Butterworth de orden 6, y es la única
+arquitectura que supera la máscara de clase 1 de IEC 61260-1:2014 con los
+parámetros por defecto; Chebyshev II se le une en cuanto la atenuación de la
+banda atenuada sube a 70 dB o más. Chebyshev I, elíptico y Bessel incumplen la
+máscara por rizado en la banda de paso o por caída lenta con cualquier
+parámetro, así que pertenecen al filtrado exploratorio y no a un nivel de banda
+que se vaya a declarar. La razón física merece la pena llevársela: una banda de
+paso plana significa que un tono dentro de la banda se mide sin error de rizado
+esté donde esté, y una banda atenuada monótona hace predecible el leakage de una
+banda vecina fuerte. Un diseño de rizado uniforme alcanza la misma máscara con
+un orden menor, pero sesga una fuente de banda estrecha hasta el valor del
+rizado según dónde caiga dentro de la banda, y emborrona las señales impulsivas
+por distorsión de retardo de grupo cerca de los bordes. Bessel hace lo
+contrario: preserva la forma de una caída o de la envolvente de una ráfaga, que
+es lo que importa cuando la señal de banda alimenta un ajuste de tiempo de
+reverberación, pero no cumple la clase 1 a ningún orden razonable. Subir el
+orden aprieta el ajuste a la máscara y alarga el transitorio del filtro, que es
+lo que cuantifica la regla de establecimiento de más abajo.
+`filter_class_compliance` comprueba un banco diseñado contra las máscaras;
+consulta [Verificación de clase de
+filtro](/phonometry/es/signals/filters/filter-compliance/).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_es.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas de filtro para la banda de octava de 1 kHz, con un zoom en el cruce de −3 dB" width="88%" />
+
+*La misma banda de octava de 1 kHz diseñada de cinco maneras. Hay que mirar tres
+cosas: la planitud de la meseta de la banda de paso (Butterworth y Chebyshev II
+planas, Chebyshev I y elíptico rizando con el rizado de diseño), la pendiente de
+la falda justo fuera de los bordes y la forma de la banda atenuada profunda. El
+zoom del cruce es donde se hace visible la regla de bordes de banda de más
+abajo: los dos diseños de rizado uniforme no están ahí a −3 dB, porque no es ahí
+donde se define su borde.*
 
 ### Colocación de los bordes de banda
 
@@ -261,35 +331,78 @@ requieren tratamiento especial:
 
 ## Diseño del banco y estabilidad numérica
 
-Para garantizar una **estabilidad del 100 %** en todo el espectro audible (incluso a
-frecuencias bajas como 16 Hz con frecuencias de muestreo altas), phonometry
-emplea dos estrategias fundamentales:
+Un único paso banda de orden alto a 16 Hz y 192 kHz coloca sus polos a unos
+$10^{-4}$ del círculo unidad, donde los coeficientes en float64 ya no los
+resuelven y la ecuación en diferencias degenera. Dos medidas mantienen a todas
+las bandas del banco lejos de ese régimen:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" width="92%" />
 
-1. **Secciones de segundo orden (SOS):** todos los filtros se implementan como
-   biquads en cascada, evitando la pérdida catastrófica de precisión de las
-   funciones de transferencia de orden alto.
+1. **Secciones de segundo orden (SOS):** cada banda es una cascada de biquads en
+   lugar de una única función de transferencia de orden alto, así que un error
+   de redondeo en un coeficiente perturba un par de polos y no todos a la vez.
 2. **Diezmado multitasa:** siempre que la mitad de la frecuencia de muestreo
    siga por encima de 1,25 veces el borde superior de la banda, la señal se
-   diezma automáticamente por
+   diezma por
    $M = \lfloor (f_s/2) / (1{,}25\,f_\text{sup}) \rfloor$ antes de filtrar, lo
-   que ocurre en la mayoría de las bandas y no solo en las graves
-   (29 de las 33 bandas de tercio de octava a 48 kHz). Esto mantiene los polos
-   digitales lejos del borde del círculo unidad, evitando oscilaciones y ruido.
-   El nivel de banda se calcula sobre la señal diezmada; solo con
-   `sigbands=True` la señal de banda vuelve a la frecuencia de entrada, con
-   `resample_poly(M, 1)`. Los bancos
+   que se aplica a la mayoría de las bandas y no solo a las graves
+   (29 de las 33 bandas de tercio de octava a 48 kHz), de modo que cada banda se
+   filtra cerca de su propia frecuencia de muestreo natural y sus polos quedan
+   bien dentro
+   del círculo unidad. El nivel de banda se calcula sobre la señal diezmada;
+   solo con `sigbands=True` la señal de banda vuelve a la frecuencia de entrada,
+   con `resample_poly(M, 1)`. Los bancos
    Chebyshev II reservan margen de diezmado adicional para que sus bordes de
    banda atenuada queden por debajo del Nyquist diezmado.
+3. **El establecimiento, y dos efectos que sesgan un nivel de banda.** Un filtro
+   de banda necesita del orden de $5/f_\text{inf}$ segundos para establecerse,
+   así que un registro de 1 s ya trunca la respuesta de la banda de 16 Hz y la
+   lee varias décimas de decibelio baja, mientras que ese mismo registro sobra
+   por encima de 500 Hz; el registro analizado tiene que superar tanto
+   $5/f_\text{inf}$ como, en una medida de caída, el tiempo de reverberación de
+   la banda. `mode='peak'` lee la propia sobreoscilación de arranque del filtro,
+   de hasta cerca de 1 dB con un tono que empieza de golpe, así que un nivel de
+   banda de pico de una señal enventanada debería descartar los primeros
+   $5/f_\text{inf}$ segundos. Y `zero_phase=True` recorre la cascada hacia
+   delante y hacia atrás: el retardo de grupo desaparece, que es lo que pide el
+   apartado 7.3 de ISO 3382-2 para una caída, pero la banda de paso efectiva se
+   estrecha y el nivel de banda medido en **banda ancha** baja del orden de 0,2
+   a 0,3 dB por banda (un tono puro dentro de la banda no se ve afectado, porque
+   se sitúa donde ambas pasadas valen ≈ 0 dB), así que un nivel declarado para
+   conformidad debería salir de la pasada única hacia delante.
+
+Consulta la [guía de bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/) para su uso, la [galería
+de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/) para
+ver las cinco arquitecturas una al lado de otra y [Verificación de clase de
+filtros](/phonometry/es/signals/filters/filter-compliance/) para comprobar un
+banco diseñado contra las máscaras de IEC 61260-1.
 
 ## Curvas de ponderación (IEC 61672-1)
+
+Una ponderación frecuencial es una aproximación fija a la respuesta en
+frecuencia del oído *a una sola sonoridad*, obtenida invirtiendo una línea
+isofónica. La **A** sigue la inversa de la línea de 40 fonios, la **C** la
+inversa de una línea cercana a 100 fonios (de ahí que sea casi plana en la zona
+media, con solo las caídas de limitación de banda) y la **Z** es una respuesta
+plana definida entre unos límites de banda declarados, no la ausencia de filtro.
+Ese origen es además su dominio de validez: como la A está anclada en 40 fonios,
+subestima progresivamente el contenido de baja frecuencia de las fuentes
+fuertes, que es justo la razón de ser de los modelos de sonoridad, de los picos
+ponderados C y de la curva G de más abajo. Las líneas en sí están en [Líneas
+isofónicas](/phonometry/es/reference/theory/perception/#líneas-isofónicas-iso-2262023).
 
 La función de transferencia de la ponderación A:
 
 $$
 R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20{,}6^2)\sqrt{(f^2 + 107{,}7^2)(f^2 + 737{,}9^2)}(f^2 + 12194^2)}
 $$
+
+Las cuatro frecuencias de corte son los pares de polos en 20,6 Hz y 12194 Hz,
+que limitan la banda de la respuesta, y los polos simples en 107,7 Hz y
+737,9 Hz, que construyen la pendiente de baja frecuencia; el término
+$+2{,}00$ dB es la normalización que fuerza la respuesta a exactamente 0 dB a
+1 kHz.
 
 $$
 A(f) = 20 \log_{10}(R_A(f)) + 2{,}00
@@ -377,7 +490,7 @@ encima de 20 Hz.*
 
 Los infrasonidos necesitan su propia curva porque, cerca del umbral de audición, la sonoridad percibida de los tonos de muy baja frecuencia crece con el nivel de presión acústica mucho más abruptamente que a frecuencias medias (un pequeño incremento en dB sobre el umbral produce un gran salto de sonoridad), de modo que la curva A (anclada en 1 kHz) distorsiona por completo la molestia infrasónica.
 
-Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a tasas de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
+Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a las frecuencias de muestreo de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
 Consulta la [guía de ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) para su uso.
 
@@ -409,7 +522,7 @@ $$
 L_{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**.
+Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**. ISO 9612 prescribe cómo muestrear una jornada de trabajo para obtenerlo y cómo acotar el resultado; consulta [Exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-iso-9612).
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, apartado 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
@@ -443,6 +556,34 @@ $$
 
 El apartado 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda con exactamente este argumento y la Tabla 3 la tabula (p. ej. −10,5 dB a 6,3 kHz para un separador de 25 mm). Por debajo de $f = 0{,}1 c / \Delta r$ (es decir, $k \Delta r$ por debajo de 0,63) el sesgo se mantiene dentro de unos 0,3 dB; `bias_correction` proporciona el factor recíproco por banda y `max_valid_frequency` la cota.
 
+**La banda útil también está acotada por abajo, y la biblioteca no expone
+ninguna cota para eso.** Partir el separador por la mitad duplica el techo de la
+banda y a la vez *reduce a la mitad* la diferencia de presión verdadera entre
+los dos micrófonos, porque esa diferencia se encoge como $k \Delta r$. Cualquier
+desajuste de fase residual entre canales queda por tanto amplificado en la misma
+proporción, y a baja frecuencia acaba tapando a la intensidad verdadera, que es
+la razón por la que una sonda se entrega con un juego de separadores y no con
+uno solo. Como órdenes de magnitud, un separador de 50 mm cubre
+aproximadamente los tercios de 50 Hz a 1,25 kHz y uno de 12 mm
+aproximadamente de 200 Hz a 5 kHz, así que una campaña en todo el rango son dos
+pasadas cosidas por el solape. La consecuencia para la validez es que una banda
+falla no solo por quedar por encima de `max_valid_frequency`, sino siempre que
+la reactividad del campo se acerca al índice residual del instrumento a menos
+del factor de error de sesgo, y eso ocurre antes en el extremo de frecuencias
+*bajas*.
+
+Ese índice residual se mide, no se consulta en una tabla. Un dispositivo de
+ensayo de intensidad residual presenta la misma presión acústica a los dos
+micrófonos a la vez, con las dos entradas abiertas a una única cavidad pequeña,
+de modo que la intensidad que la sonda indique en ese estado es residual puro de
+desajuste de fase y $\delta_{pI0} = L_p - L_I$ en esas condiciones, banda a
+banda. Forma parte de las comprobaciones previas a una campaña, con los
+micrófonos en las mismas entradas y con la misma orientación con las que se van
+a usar, y cualquier compensación de fase aplicada ahí sigue aplicada durante la
+medición.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda p-p de intensidad acústica de dos micrófonos: dos micrófonos de presión con un separador entre ellos, a partir de los cuales se estiman el gradiente de presión y con él la intensidad normal" width="88%" />
+
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
 Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) para su uso.
@@ -453,7 +594,7 @@ Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/inte
 
 ## Incertidumbre de medida (ISO/IEC Guide 98-3: GUM y Suplemento 1)
 
-Los presupuestos de dominio como ISO 12999-1 y el Anexo C de ISO 9612 son
+Los balances de dominio como ISO 12999-1 y el Anexo C de ISO 9612 son
 instancias del marco general de la GUM (ISO/IEC Guide 98-3:2008). Dado un
 modelo de medición $y = f(x_1, \ldots, x_N)$, la ley de propagación de la
 incertidumbre (apartado 5) combina las incertidumbres típicas de entrada a
@@ -493,7 +634,7 @@ $k = t_{0{,}99}(\nu_{\mathrm{eff}} = 16) = 2{,}92$ y $U_{99} = 93$ nm.
 
 *Las dos vías sobre un mismo problema, un nivel ponderado A y no el ejemplo de
 cuatro términos del Suplemento 1 citado más arriba. A la izquierda, la ley de
-propagación como presupuesto: una barra por entrada, de modo que se ve cuál es
+propagación como balance: una barra por entrada, de modo que se ve cuál es
 el término que merece la pena reducir. A la derecha, la vía del Suplemento 1: la
 distribución de salida de Monte Carlo con la gaussiana GUM dibujada encima y el
 intervalo de cobertura del 95 % sombreado. Aquí las dos coinciden, que es lo que

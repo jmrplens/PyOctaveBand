@@ -1,6 +1,6 @@
 ---
 title: "Calibración y dBFS"
-description: "Calibración SPL física y análisis digital a fondo de escala."
+description: "El factor de sensibilidad que convierte unidades digitales en pascales: cómo obtenerlo del tono de un calibrador IEC 60942, cómo acoplar el calibrador, la comprobación de fluctuación de nivel a corto plazo del apartado 5.3.3, la vía aritmética a partir de la sensibilidad nominal de un micrófono, cómo la tolerancia de clase del calibrador se encadena en todo nivel derivado, el calendario de comprobaciones de campo y deriva, y el marco digital dBFS para cadenas que nunca tuvieron un front-end calibrado."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,14 @@ references:
     title: "Electroacoustics — Sound calibrators"
     designation: "IEC 60942:2017"
     url: "https://webstore.iec.ch/en/publication/30045"
-    note: "Los supuestos de nivel y clase del calibrador en sensitivity() (el nivel principal de 94 dB y las tolerancias de clase de la Tabla 1) y la comprobación de estabilidad por fluctuación de nivel a corto plazo de la grabación de referencia (apartado 5.3.3, límites de clase 1 de la Tabla 2 según la frecuencia nominal)."
+    note: "Los supuestos de nivel y clase del calibrador en sensitivity() (el nivel principal del apartado 5.3.1.3, los límites de aceptación de la Tabla 2 con las incertidumbres máximas permitidas de la Tabla A.1 con las que se combinan según el Anexo D) y la comprobación de estabilidad por fluctuación de nivel a corto plazo de la grabación de referencia (apartado 5.3.3, límites de clase 1 de la Tabla 2 según la frecuencia nominal)."
+  - type: standard
+    organization: "Audio Engineering Society"
+    year: 2020
+    title: "AES standard method for digital audio engineering — Measurement of digital audio equipment"
+    designation: "AES17-2020"
+    url: "https://www.aes.org/publications/standards/search.cfm?docID=21"
+    note: "El convenio dBFS referido a la sinusoide de fondo de escala, que difiere en 3,01 dB del convenio referido al valor eficaz de esta página."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2013
@@ -94,7 +101,8 @@ from phonometry import filters, metrology
 fs = 48000
 # calibrator_recording: tu tono de calibrador de 1 kHz grabado (1 Pa RMS = 94 dB SPL).
 #   Sintetizado aquí para que la guía funcione; en una medición real graba tu calibrador.
-calibrator_recording = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+#   Cinco segundos, como pide el procedimiento de acoplamiento de más abajo.
+calibrator_recording = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(5 * fs) / fs)
 # recording: la captura de micrófono que quieres calibrar, misma cadena de entrada (Pa tras calibrar).
 #   Sintetizada aquí; en una medición real es tu señal grabada.
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
@@ -107,7 +115,100 @@ spl, freq = filters.octave_filter(
     recording, fs,
     calibration=filters.LevelCalibration(factor=calibration_factor))
 # spl está ahora en dB SPL re 20 µPa
+print(f"S = {calibration_factor:.3f} Pa por unidad digital")   # 1.002
+print(f"banda de 1 kHz: {spl[freq.index(1000.0)]:.1f} dB SPL") # 77.0
 ```
+
+Merece la pena leer los dos números en lugar de saltárselos. La toma sintética
+del calibrador tiene un valor eficaz de exactamente 1,0 unidades digitales, así
+que $S = 20\ \mu\text{Pa}\cdot 10^{94/20} / 1{,}0 = 1{,}002$ Pa por unidad
+digital: una unidad digital es un pascal, que es el aspecto de una cadena cuyo
+fondo de escala queda justo por encima del nivel del calibrador. El registro de
+medición tiene amplitud 0,2, luego un valor eficaz de 0,141 unidades digitales,
+luego 0,142 Pa, luego $20\log_{10}(0{,}142 / 2\times 10^{-5}) = 77{,}0$ dB SPL,
+que es la banda de 1 kHz que imprime el fragmento.
+
+De ahí sale la regla de cordura para toda sesión posterior. $S$ es la escala de
+pascales por unidad de la cadena, así que $94 - L_\text{cal,dBFS}$, el nivel del
+calibrador menos el nivel eficaz en dBFS de la toma del calibrador, es el nivel
+de presión acústica que llevaría al convertidor a un valor eficaz digital de 1,0.
+Si ese número no queda a unos pocos decibelios del nivel más alto para el que se
+preparó la cadena, algo va mal en la toma: una grabación recortada o a media
+escala, un `target_spl` dejado en 94,0 para un calibrador de 114 dB, o un cambio
+de ganancia entre las dos grabaciones. Un factor equivocado en exactamente 20 dB
+es el desenlace habitual del segundo error, y ningún paso posterior lo va a
+delatar.
+
+### Acoplar el calibrador
+
+El fragmento son tres líneas; el paso que esconde es el que sale mal. El nivel
+especificado de un calibrador acústico es el nivel *en el diafragma del micrófono
+insertado* (IEC 60942:2017, 5.3.1.2), así que el montaje mecánico es parte de la
+medición y no un preliminar. Seis pasos:
+
+1. **Fija la ganancia para el nivel más alto que esperes, y bloquéala.** $S$ solo
+   vale mientras la cadena siga exactamente como se calibró, y un mando de
+   ganancia movido después de la comprobación desplaza todos los niveles en una
+   cantidad que nada aguas abajo puede detectar.
+2. **Desactiva todos los procesos automáticos de la interfaz** (control
+   automático de ganancia, limitación, supresión de ruido, realce de «voz») y
+   graba a 24 bits. Cualquiera de ellos vuelve no lineal la cadena, y la toma del
+   calibrador es la única señal en la que eso resulta invisible, porque es un
+   único tono estable.
+3. **Quita la pantalla antiviento y monta el adaptador que viene con el
+   calibrador.** Un adaptador es parte integrante del calibrador acústico
+   (5.1.1), y allí donde el manual da los datos de diseño del adaptador da
+   también la distancia de inserción y el diámetro mínimo de micrófono con el que
+   se produce el sellado (6.3 u). Comprueba que tu modelo de micrófono *y su
+   configuración*, con o sin rejilla protectora, están en la lista del manual
+   (6.3 a): el nivel especificado vale para los modelos y configuraciones que allí
+   se declaren (5.3.1.3), y el manual indica cuánto se mueve el nivel con el
+   volumen de carga efectivo del micrófono insertado (6.3 k), el volumen de aire
+   delimitado por el plano de referencia, el diafragma y la pared de la cápsula
+   (3.13).
+4. **Inserta la cápsula a fondo hasta el plano de referencia**, el plano de
+   contacto entre micrófono y calibrador (3.12), sujeta el conjunto quieto y deja
+   que se estabilice. El manual indica dos tiempos de estabilización: el propio
+   del calibrador, que no puede pasar de 30 s (5.1.10), y el que necesita el
+   conjunto micrófono más calibrador una vez acoplados (6.3 e).
+5. **Haz la comprobación lejos de la fuente en marcha.** La cavidad no es un
+   aislante acústico. IEC 60942 lo cuantifica para sus propios ensayos: con el
+   micrófono acoplado y el calibrador *apagado*, el nivel que lee el micrófono
+   tiene que quedar al menos 30 dB por debajo del nivel que se está midiendo para
+   los ensayos periódicos (B.4.2), y 40 dB por debajo para la evaluación de
+   modelo (A.5.3). Para un calibrador de 94 dB, eso es un fondo por debajo de
+   64 dB en la cápsula, un número que se puede grabar y comprobar en diez
+   segundos, y el que decide si `narrowband=True` es opcional (ver la figura de
+   más abajo).
+6. **Graba de 5 a 10 s de tono ya estabilizado**, recorta el ruido de
+   manipulación de los dos extremos y pasa el resto a `sensitivity(ref, fs=fs)`.
+   La norma mide el nivel generado como un promedio de 20 s a 25 s (A.5.5.1) y la
+   fluctuación a corto plazo a lo largo de 60 s muestreada al menos 30 veces
+   (5.3.3); unos pocos segundos ya estabilizados bastan para que el valor eficaz
+   converja, y la comprobación de estabilidad de más abajo es la que dice si el
+   tono estaba de verdad estabilizado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_coupling_es.svg" alt="Media sección de la cavidad de un calibrador acústico con un micrófono de medición de media pulgada insertado hasta el plano de referencia, el volumen de carga efectivo sombreado entre el diafragma y el plano de referencia, un adaptador de un cuarto de pulgada dibujado como parte del calibrador, la pantalla antiviento retirada a un lado, y un segundo panel que muestra la comprobación del nivel de fondo con el calibrador apagado" width="92%" />
+
+**Campo de presión en la cavidad, campo libre en la medición.** El acoplador
+excita el diafragma con una excitación de presión: la cavidad es mucho menor que
+una longitud de onda, así que la presión acústica es uniforme en ella y no hay
+difracción alrededor de la cápsula. El micrófono que estás calibrando está
+normalmente caracterizado para *campo libre*, donde su propio cuerpo y la rejilla
+elevan la respuesta en alta frecuencia. Las dos caracterizaciones difieren en
+décimas de decibelio por debajo de unos 2 kHz y en varios decibelios cerca de
+10 kHz, que es por lo que IEC 60942 confina la frecuencia principal de un
+calibrador acústico al margen de 160 Hz a 1250 Hz (5.4.1.1): ahí las
+sensibilidades de presión y de campo libre de una cápsula de medición coinciden
+lo bastante como para no aplicar ninguna corrección. También significa que $S$ es
+un anclaje a una sola frecuencia. La *forma* de la respuesta de la cadena lejos
+de la frecuencia del calibrador sale de los datos de campo libre del propio
+micrófono, no de esta comprobación: las tres sensibilidades y dónde se aplica
+cada una están en
+[Micrófonos](/phonometry/es/devices/electroacoustics/microphones/). Vuelve a poner
+la pantalla antiviento antes de medir, y recuerda que tiene su propia pérdida de
+inserción de unas décimas de decibelio en alta frecuencia, que la calibración no
+ha visto.
 
 ## Supuestos del calibrador (IEC 60942)
 
@@ -115,14 +216,51 @@ spl, freq = filters.octave_filter(
 calibrador acústico según **IEC 60942** (clases LS, 1 y 2):
 
 - El `target_spl=94.0` por defecto corresponde a la salida habitual de 94 dB
-  @ 1 kHz (la norma exige que el nivel principal sea al menos 90 dB re 20 µPa;
-  94 dB y 114 dB son los valores usuales).
-- La sensibilidad resultante hereda la tolerancia de clase del calibrador
-  (p. ej. ±0,4 dB para clase 1 entre 160 Hz y 1,25 kHz, IEC 60942 Tabla 1)
-  más el error de estimación RMS de tu grabación.
-- IEC 60942 especifica el nivel generado como promedio de 20 s: graba unos
-  segundos de tono *estable* (excluyendo el ruido de manipulación del
+  @ 1 kHz. El apartado 5.3.1.3 exige que el nivel principal sea al menos 90 dB re
+  20 µPa *cuando el calibrador se aplica a los modelos y configuraciones de
+  micrófono que especifica su manual de instrucciones*; 94 dB y 114 dB son los
+  valores usuales, y la frecuencia principal tiene que caer entre 160 Hz y
+  1,25 kHz (5.4.1.1).
+- La sensibilidad resultante hereda la tolerancia de nivel propia del calibrador,
+  y ese número cuesta un paso conseguirlo. IEC 60942:2017 no imprime a propósito
+  límites de tolerancia: la Tabla 2 da el **límite de aceptación** del nivel
+  generado (0,25 dB para un calibrador de clase 1 de 160 Hz a 1,25 kHz, 0,40 dB
+  para clase 2, 0,10 dB para clase LS) y la Tabla A.1, la **incertidumbre máxima
+  permitida** de la medida de laboratorio que lo demuestra (0,15 dB para clase 1
+  en ese mismo margen); el Anexo D, Figura D.1, sitúa el límite de tolerancia en
+  su suma. **±0,4 dB** es, por tanto, la cifra de clase 1 que hay que llevarse a
+  un balance de incertidumbre a 1 kHz, y es una tolerancia, no un error medido.
+  Súmale encima el error de estimación del valor eficaz de tu propia grabación.
+- IEC 60942 mide el nivel generado como un promedio de 20 s a 25 s (A.5.5.1):
+  graba unos segundos de tono *estable* (excluyendo el ruido de manipulación del
   principio y el final) para que la estimación RMS converja.
+- **Correcciones ambientales, y qué calibradores las necesitan.** El nivel
+  generado se especifica en las condiciones de referencia del apartado 4: 23 °C,
+  101,325 kPa y 50 % de humedad relativa. La Tabla 2 sigue valiendo sin ninguna
+  corrección en una franja alrededor de ellas (de 97 kPa a 105 kPa, de 20 °C a
+  26 °C, del 40 % al 65 % de HR, apartado 5.3.2), y fuera de esa franja un
+  calibrador tiene que quedarse dentro de los límites más anchos de las Tablas 5
+  y 6 en todo su margen de funcionamiento, que para clase 1 es de 65 kPa a
+  108 kPa, de −10 °C a +50 °C y del 25 % al 90 % de HR (5.5). Solo los
+  *pistófonos* que necesitan una corrección de presión estática para cumplir su
+  clase llevan la letra **M** en su designación (clase LS/M, clase 1/M, 5.1.5 y
+  Tabla 1); se suministran con un barómetro, o su manual especifica uno (5.1.8),
+  y el manual indica la corrección y su incertidumbre (6.3 i, 6.3 m). Un pistófono
+  genera un desplazamiento de volumen fijo, así que su salida sigue a la presión
+  estática ambiente: del orden de una décima de decibelio para el tiempo
+  corriente, y en torno a −1 dB a 1000 m sobre el nivel del mar. Cualquier otro
+  calibrador, por 5.1.7, tiene que cumplir su clase sin ninguna corrección
+  ambiental. Cuando la corrección *sí* haga falta, aplícala al nivel objetivo y
+  no a los resultados:
+
+```python
+p_correction_db = 0.0  # del manual del calibrador y la lectura del barómetro
+cal_corrected = metrology.sensitivity(
+    calibrator_recording, target_spl=94.0 + p_correction_db, fs=fs)
+```
+
+  La corrección entra directamente en $S$, así que mueve todos los niveles de la
+  sesión en la misma cantidad.
 
 ### Validación automática de estabilidad
 
@@ -187,6 +325,69 @@ plt.show()
 
 </details>
 
+### Ruido de banda ancha en la toma, y lo que cuesta
+
+El valor eficaz de la grabación del calibrador es el denominador de $S$, así que
+todo lo que haya en la toma que no sea el tono lo infla y encoge el factor, y
+todos los niveles derivados de ese factor se leen entonces *de menos*, en
+$-10\log_{10}(1 + 1/\mathrm{SNR})$, con SNR la relación de potencias entre el
+tono y el ruido de la grabación. Pasar `narrowband=True` sustituye el valor
+eficaz de banda completa por un detector coherente de Goertzel enganchado al
+tono, que rechaza la parte incoherente:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_narrowband_bias_es.svg" alt="Error de sensibilidad frente a la relación señal-ruido en el acoplador: el estimador del valor eficaz de banda completa sigue a menos diez log de uno más uno entre SNR y se sale de la banda de aceptación de clase 1 por debajo de 12,3 dB de SNR, mientras que el estimador de Goertzel se mantiene dentro de centésimas de decibelio" width="88%" />
+
+*Error de sensibilidad frente a la relación señal-ruido de la toma del
+calibrador, medido llamando a `sensitivity()` sobre un tono de 1 kHz más ruido de
+banda ancha. El estimador del valor eficaz de banda completa cae exactamente
+sobre la forma cerrada; cuesta 0,41 dB con 10 dB de SNR, 0,05 dB con 20 dB y se
+gasta entero el límite de aceptación de clase 1 de 0,25 dB por debajo de 12,3 dB
+de SNR. El estimador de Goertzel se queda dentro de 0,02 dB en todo el margen. El
+margen de fondo de 30 dB que pide el procedimiento de acoplamiento (B.4.2) deja
+por tanto al estimador del valor eficaz simple en 0,004 dB, que es por lo que
+`narrowband=False` es un valor por defecto sensato y `narrowband=True` es el
+remedio para una toma que no se pudo hacer lo bastante silenciosa.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# metrology viene del primer fragmento de esta página.
+fs = 48000
+t = np.arange(int(fs * 6.0)) / fs
+tone = np.sqrt(2) * np.sin(2 * np.pi * 1000 * t)     # 1 Pa RMS sobre 1,0 digital
+s_true = 2e-5 * 10 ** (94 / 20)
+noise = np.random.default_rng(7).standard_normal(t.size)
+noise /= np.sqrt(np.mean(noise ** 2))
+
+snr_db = np.arange(0.0, 40.5, 1.0)
+rms, goertzel = [], []
+for snr in snr_db:
+    x = tone + noise * 10 ** (-snr / 20)
+    # validate=False: las tomas ruidosas suspenden a propósito la comprobación
+    # de estabilidad, que es una segunda razón independiente para no aceptarlas.
+    rms.append(
+        20 * np.log10(metrology.sensitivity(x, fs=fs, validate=False) / s_true))
+    goertzel.append(20 * np.log10(
+        metrology.sensitivity(x, fs=fs, narrowband=True, validate=False) / s_true))
+
+plt.figure(figsize=(9, 5))
+plt.axhspan(-0.25, 0.25, alpha=0.15)
+plt.plot(snr_db, rms, label="narrowband=False")
+plt.plot(snr_db, -10 * np.log10(1 + 10 ** (-snr_db / 10)), "k:",
+         label="forma cerrada")
+plt.plot(snr_db, goertzel, label="narrowband=True")
+plt.xlabel("Relación señal-ruido en el acoplador [dB]")
+plt.ylabel("Error de sensibilidad [dB]")
+plt.legend()
+plt.show()
+```
+
+</details>
+
 ### Parámetros de `sensitivity()`
 
 | Parámetro | Tipo / forma | Unidades | Rango / defecto | Notas |
@@ -198,12 +399,96 @@ plt.show()
 | `validate` | bool | — | defecto `True` | Emite `CalibrationWarning` con grabaciones inestables/cortas |
 | `max_fluctuation_db` | float, opcional | dB | defecto `None` → Tabla 2 clase 1 | Sobrescritura explícita del límite de estabilidad |
 | `frequency` | float | Hz | defecto `1000.0` | Frecuencia nominal del calibrador; elige la fila de la Tabla 2 de IEC 60942 |
-| `narrowband` | bool | — | defecto `False` | Estima el tono con un detector coherente (Goertzel) cerca de `frequency` (requiere `fs`) en lugar del RMS de banda completa; rechaza el zumbido/ruido de banda ancha que si no infla el RMS y reduce todos los niveles posteriores (~−0,44 dB a 20 dB de SNR). Actívalo para grabaciones de acoplador ruidosas |
+| `narrowband` | bool | — | defecto `False` | Estima el tono con un detector coherente (Goertzel) cerca de `frequency` (requiere `fs`) en lugar del RMS de banda completa; rechaza el zumbido/ruido de banda ancha que si no infla el RMS y reduce todos los niveles posteriores (−0,41 dB a 10 dB de SNR, −0,04 dB a 20 dB; ver la figura de arriba). Actívalo para grabaciones de acoplador ruidosas |
 
 Devuelve el factor de sensibilidad (float) para pasarlo como
 `calibration_factor=` a `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` y las
 funciones de dosis, y como `calibration=LevelCalibration(factor=...)` a
 `octave_filter`.
+
+### Lo que el factor dice además: el margen medible
+
+$S$ no es solo una conversión, es la escala de la cadena, y de ella salen
+directamente los dos extremos del margen medible.
+
+**El techo.** Una señal cuyo valor eficaz digital llega a 1,0 corresponde a
+$20\log_{10}(S/p_0)$ dB, que es también el nivel del calibrador menos el nivel en
+dBFS de la toma del calibrador. Una *sinusoide* a fondo de escala tiene un valor
+eficaz de $1/\sqrt{2}$, así que se lee 3,01 dB por debajo:
+$L_\text{FS} = 20\log_{10}\!\big(S/(\sqrt{2}\,p_0)\big)$. Ese es el nivel
+sinusoidal más alto que el convertidor puede llevar sin recortar; contrástalo con
+el nivel de presión acústica de sobrecarga del propio micrófono, que es una
+propiedad de la cápsula y del preamplificador y no del convertidor (ver
+[Micrófonos](/phonometry/es/devices/electroacoustics/microphones/)), y mantén el
+menor de los dos al menos 10 dB por encima del suceso más fuerte que esperes. Un
+suceso recortado no se anuncia: se lee *de menos*, y de forma verosímil.
+
+**El suelo.** Graba 30 s con la cápsula en un recinto silencioso (la cavidad
+cerrada del calibrador con la excitación apagada sirve muy bien, y es la misma
+toma que ya pide el paso de acoplamiento) y pásala por el mismo factor. Ese nivel
+es el ruido propio de la cadena: micrófono más preamplificador más convertidor.
+Un nivel medido que quede a menos de 3 dB de él no es una medida de la fuente; uno
+a menos de 10 dB necesita la corrección por ruido de fondo que aplican las guías
+de emisión y de ruido ambiental.
+
+```python
+# Sigue del primer fragmento: calibration_factor y fs ya están definidos.
+ceiling = 20 * np.log10(calibration_factor / (np.sqrt(2) * 2e-5))
+quiet = 1e-4 * np.random.default_rng(0).standard_normal(30 * fs)  # tu toma de 30 s
+floor = 20 * np.log10(np.sqrt(np.mean((quiet * calibration_factor) ** 2)) / 2e-5)
+print(f"sinusoide a fondo de escala {ceiling:.1f} dB SPL, suelo de ruido {floor:.1f} dB SPL")
+```
+
+### Sin calibrador: a partir de la sensibilidad nominal
+
+Un calibrador es la única vía hacia un nivel *normativo*, pero no es la única vía
+hacia un número. Si la hoja de características del micrófono declara una
+sensibilidad y la de la interfaz una tensión de entrada de fondo de escala, la
+ganancia de la cadena es el producto de tres números que se pueden leer, y $S$ se
+puede montar aritméticamente:
+
+$$
+S = \frac{V_\text{FS}}{M\,G}
+$$
+
+donde $M$ es la **sensibilidad de campo libre en voltios por pascal** nominal de
+la cápsula a la frecuencia de referencia, $G$ la ganancia lineal de tensión del
+preamplificador más la interfaz, y $V_\text{FS}$ la *amplitud* de tensión de
+entrada que lleva al convertidor a $\pm 1{,}0$. Ojo con la trampa de esta última:
+la hoja de características de una interfaz suele declarar su nivel máximo de
+entrada como el valor eficaz de la sinusoide que justo alcanza el fondo de
+escala, así que $V_\text{FS} = \sqrt{2}$ veces esa cifra.
+
+Desarrollado para una cápsula de media pulgada de 12,5 mV/Pa, +20 dB de ganancia
+y una entrada cuyo nivel máximo es 1,0 V eficaces: $M = 0{,}0125$ V/Pa, $G = 10$,
+$V_\text{FS} = 1{,}414$ V, así que $S = 11{,}31$ Pa por unidad digital. Un pascal
+(94 dB) cae entonces en $MG/V_\text{FS} = 0{,}0884$ unidades digitales eficaces,
+es decir, −21,1 dBFS, y el techo deducido arriba es
+$20\log_{10}(11{,}31/(\sqrt{2}\cdot 2\times 10^{-5})) = 112{,}0$ dB SPL. Los dos
+números se pueden contrastar con la cadena en unos segundos, que es de lo que va
+esta vía.
+
+Cuidado con la palabra *sensibilidad*: significa cosas recíprocas en las dos
+páginas. Aquí $S$ son pascales por unidad digital; en la página de
+[Micrófonos](/phonometry/es/devices/electroacoustics/microphones/), $M$ son
+voltios por pascal, expuesta como `sensitivity_mv_per_pa`, y las
+caracterizaciones de campo libre, de presión y de incidencia aleatoria son tres
+números distintos para la misma cápsula: usa la de campo libre a la frecuencia de
+referencia.
+
+Lo que cuesta esta vía: hereda la desviación individual de la cápsula respecto de
+su valor nominal (unas décimas de decibelio en un micrófono de laboratorio con
+carta de calibración individual, pero una cifra *nominal* en una cápsula barata
+puede equivocarse en un par de decibelios), la repetibilidad del ajuste de
+ganancia y la tolerancia de fondo de escala de la propia interfaz. Cuenta en el
+balance con en torno a un decibelio, frente a las pocas décimas de una
+comprobación con calibrador, y ten en cuenta lo que no puede hacer en absoluto:
+no puede detectar
+una cápsula dañada, un preamplificador con fugas ni un cambio de ganancia, porque
+nada en ella está medido. Úsala para trabajo cercano al dBFS, para dar un
+repaso de cordura al resultado de un calibrador, y nunca para un nivel que se
+enfrente a un límite. Y una vez leídos los números, la ganancia tiene que quedarse
+exactamente donde estaba.
 
 <span id="comprobaciones-verificacion-y-deriva"></span>
 
@@ -233,6 +518,28 @@ La calibración vive en tres escalas de tiempo:
   antes/después de medio decibelio señala un daño y no el clima. La mayor
   «deriva» de todas es un mando de ganancia tocado: el factor $S$ solo vale
   mientras la cadena permanece exactamente como se calibró.
+
+### Qué tiene que registrar una calibración para poder declararse
+
+La pareja antes/después y la tolerancia de clase del calibrador son las dos
+entradas de Tipo B que consume el
+[balance de incertidumbre](/phonometry/es/signals/metrology/gum-uncertainty/) de un
+nivel. Una comprobación que no se escribió no se puede propagar, así que anota,
+en el momento de la comprobación:
+
+- marca, modelo, número de serie, designación de clase (incluida la letra M si la
+  lleva) y fecha de la última verificación de laboratorio del calibrador;
+- modelo y número de serie del micrófono y del preamplificador, y la
+  configuración de micrófono usada (con o sin rejilla protectora);
+- el adaptador montado, si lo hubo;
+- la sensibilidad obtenida antes de la serie, la obtenida al terminarla y su
+  diferencia, que es la cota de deriva;
+- frecuencia de muestreo, profundidad de bits y el ajuste de ganancia, tal cual
+  quedó bloqueado;
+- temperatura del aire, presión estática y humedad relativa, más cualquier
+  corrección de presión estática aplicada a `target_spl` y de dónde salió;
+- el nivel de fondo que leyó la cápsula acoplada con el calibrador apagado;
+- el factor $S$ resultante y la tolerancia que se le supone.
 
 Una sutileza más sobre clases: las tolerancias se encadenan. Una medición de
 clase 1 exige un calibrador de clase 1 (o LS) *y* un sonómetro de clase 1;
@@ -267,14 +574,62 @@ spl_dbfs, freq = filters.octave_filter(
 # Los resultados serán negativos (p. ej. -20 dBFS)
 ```
 
+### El convenio difiere del de AES17 en 3,01 dB
+
+Este es el convenio **referido al valor eficaz**: una señal cuyo valor eficaz es
+1,0 se lee como 0 dBFS, así que una sinusoide a fondo de escala, cuyo valor
+eficaz es 0,707, se lee como −3,01 dBFS en `mode='rms'`. AES17, y los medidores,
+DAW y herramientas de sonoridad que lo siguen, normalizan en cambio a 0 dBFS la
+*sinusoide* de fondo de escala, así que el mismo archivo medido por dos
+herramientas difiere en exactamente 3,01 dB sin que ninguna de las dos se
+equivoque. Fíjate en que `mode='peak'` con `dbfs=True` lee 0 dBFS para esa misma
+sinusoide, porque su pico *es* 1,0: la elección entre valor eficaz y pico de más
+abajo y la cuestión del convenio son la misma pregunta hecha dos veces. Cualquier
+número en dBFS que se cite fuera de la biblioteca debería llevar su convenio
+consigo.
+
+### Qué sobrevive a la pérdida de una referencia física
+
+La mitad de lo que calcula esta biblioteca es indiferente al marco en que esté, y
+la otra mitad carece de sentido en silencio sin $S$. La línea divisoria es si la
+magnitud está construida a partir de una *razón* o de una *forma* (invariante) o
+a partir de un valor absoluto (no).
+
+**Invariantes al marco** (el mismo número en dBFS que en dB SPL): tiempos de
+reverberación y pendientes de caída, funciones de transferencia y coherencia,
+correlación y retardo, pendientes y formas espectrales, diferencias entre bandas,
+y cualquier diferencia A menos C o C menos Z. Estas son las magnitudes que
+legítimamente se pueden sacar de una grabación sin calibrar, y aquí vive casi
+todo `signals/spectra`.
+
+**Dependientes del marco** (verosímiles, equivocadas y silenciosas sin
+calibración): el $L_{Aeq}$ frente a un límite, el SEL, la dosis y la exposición al
+ruido, los niveles percentiles $L_N$, toda magnitud psicoacústica anclada a
+20 µPa (la sonoridad en sonios, la agudeza, la cadena de ECMA-418-2), los
+criterios de pico de la normativa de conservación de la audición, y todos los
+veredictos de conformidad de la biblioteca. Ninguna de esas funciones rechaza
+muestras sin calibrar (no pueden saberlo), así que el marco es una decisión que el
+analista tiene que anotar junto al resultado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbfs_versus_spl_es.svg" alt="Izquierda: el mismo espectro en bandas de tercio de octava calculado con un factor de calibración y con dbfs=True, superpuestos una vez añadido el desplazamiento constante. Derecha: los primeros ciclos de una ráfaga tonal filtrada por bandas que sobrepasa la amplitud de excitación en 1,32 decibelios, que es lo que lee mode='peak'" width="92%" />
+
+*Izquierda: un registro, dos marcos. El espectro en dBFS es el espectro en dB SPL
+desplazado una constante, aquí 106,04 dB, que es exactamente el nivel del
+calibrador menos el nivel en dBFS de la toma del calibrador; el marco dBFS cambia
+el origen y nada más, que es por lo que todas las magnitudes basadas en formas de
+arriba lo sobreviven. Derecha: el ataque de una ráfaga tonal de 1 kHz después del
+filtro de octava, con amplitud de excitación 0,5. La señal de banda sobrepasa
+hasta 0,582 antes de asentarse, así que `mode='peak'` lee 1,32 dB por encima del
+tono estacionario.*
+
 ## RMS frente a niveles de pico
 
 Los niveles se pueden leer de dos maneras, y las dos se usan en los analizadores
 comerciales:
 
-- **RMS (`mode='rms'`)** integra energía sobre el frame, que es sobre lo que
+- **RMS (`mode='rms'`)** integra energía sobre la trama, que es sobre lo que
   está definido todo nivel normalizado ($L_{eq}$, $L_{Aeq}$, $L_N$).
-- **Pico (`mode='peak'`)** retiene el mayor valor instantáneo del frame, que es
+- **Pico (`mode='peak'`)** retiene el mayor valor instantáneo de la trama, que es
   contra lo que se comprueban los criterios de impacto y de límite de pico como
   $L_{Cpeak}$. Ojo: el pico de banda que se devuelve aquí está limitado en banda
   y sin ponderar, así que no es en sí mismo $L_{Cpeak}$.
@@ -295,9 +650,10 @@ spl_peak, freq = filters.octave_filter(recording, fs, mode='peak')
 :::note
 `mode='peak'` mide el máximo absoluto de la señal de banda **filtrada**, que
 incluye el transitorio de arranque del filtro (sobreimpulso). Las señales que
-empiezan de forma abrupta pueden leer hasta ~1 dB de más. Es inherente a los
-filtros de banda IIR (un sonómetro analógico se comporta igual), no un artefacto
-del procesado.
+empiezan de forma abrupta pueden leer alrededor de 1 dB de más: 1,32 dB para la
+ráfaga tonal dibujada en el panel derecho de arriba. Es inherente a los filtros
+de banda IIR (un sonómetro analógico se comporta igual), no un artefacto del
+procesado.
 :::
 
 ## Entrada de audio entero
@@ -321,8 +677,8 @@ de nada.
 
 **Cubierto.** La IEC 60942:2017 en lo que condiciona el *factor de
 sensibilidad*: el nivel principal del calibrador que supone `target_spl`, las
-tolerancias de clase de la Tabla 1 citadas arriba en la discusión de
-incertidumbre y la comprobación de fluctuación de nivel a corto plazo del
+tolerancias de clase de la Tabla 2 y la Tabla A.1 citadas arriba en la discusión
+de incertidumbre y la comprobación de fluctuación de nivel a corto plazo del
 apartado 5.3.3 frente a los límites de clase 1 de la Tabla 2, que
 `sensitivity(ref, fs=fs)` ejecuta sobre la grabación de referencia.
 
@@ -354,9 +710,9 @@ Obtén la sensibilidad antes de cada serie de mediciones y compruébala de nuevo
 al terminar: un criterio habitual invalida la serie cuando ambas difieren en
 más de 0,5 dB. Una cadena de clase 1 sana deriva unas centésimas de dB en una
 sesión, así que una diferencia antes/después de medio decibelio señala un daño
-y no el clima. Sea cual sea el umbral, lleva la diferencia al presupuesto de
+y no el clima. Sea cual sea el umbral, lleva la diferencia al balance de
 incertidumbre en lugar de suponerla cero.
 
 ### ¿Puedo calibrar una cadena de clase 1 con un calibrador de clase 2?
 
-Puedes, pero las tolerancias se encadenan: una medición de clase 1 exige un calibrador de clase 1 (o LS) según IEC 60942 y un sonómetro de clase 1, así que un calibrador de clase 2 degrada en silencio todos los niveles derivados a exactitud de clase 2, porque su tolerancia de nivel más ancha entra directamente en el factor de sensibilidad $S$. Como referencia, la tolerancia de clase 1 es de ±0,4 dB entre 160 Hz y 1,25 kHz (IEC 60942, Tabla 1).
+Puedes, pero las tolerancias se encadenan: una medición de clase 1 exige un calibrador de clase 1 (o LS) según IEC 60942 y un sonómetro de clase 1, así que un calibrador de clase 2 degrada en silencio todos los niveles derivados a exactitud de clase 2, porque su tolerancia de nivel más ancha entra directamente en el factor de sensibilidad $S$. Como referencia, el límite de tolerancia de clase 1 es de ±0,4 dB entre 160 Hz y 1,25 kHz: los 0,25 dB de límite de aceptación de la Tabla 2 de IEC 60942:2017 más los 0,15 dB de incertidumbre máxima permitida de medida de la Tabla A.1, combinados como describe el Anexo D.

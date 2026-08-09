@@ -48,9 +48,8 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
-phonometry soporta varios tipos de filtro, cada uno con su propia función de
+phonometry ofrece varios tipos de filtro, cada uno con su propia función de
 transferencia característica. Butterworth, Chebyshev II y Bessel sitúan sus
 **puntos de −3 dB en los bordes de banda de ANSI S1.11**, de modo que sus
 niveles por banda son directamente comparables. Los dos diseños de rizado
@@ -58,6 +57,16 @@ constante (Chebyshev I, Elíptico) no: toman esos bordes como borde de *rizado*,
 lo que ensancha la banda y sesga todos los niveles por banda en unas décimas de
 decibelio fijas — ver el apartado 1, porque el sesgo es sistemático y no se
 promedia a cero.
+
+Al terminar esta página sabrás diseñar un banco para cualquier fracción $1/b$,
+leer todos los argumentos en una sola tabla, encadenar secciones de EQ RBJ,
+extraer las señales temporales por banda y filtrar con fase cero. El apartado 1
+son las matemáticas sobre las que se apoya el diseño; si solo quieres llamar a
+la función, empieza por el apartado 2. En qué se diferencian las cinco
+arquitecturas es la
+[Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/),
+y qué significa «clase 1» para el resultado es
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
 
 ## 1. Bandas de fracción de octava: las matemáticas
 
@@ -67,7 +76,8 @@ Para la fracción de banda $1/b$, las frecuencias centrales y los bordes de
 banda siguen (5.2-5.5):
 
 $$
-f_m = 1000 \cdot G^{x/b} \quad (b\ \text{impar}), \qquad
+f_m = 1000 \cdot G^{x/b}\ (b\ \text{impar}), \qquad
+f_m = 1000 \cdot G^{(2x+1)/2b}\ (b\ \text{par}), \qquad
 f_1 = f_m G^{-1/2b}, \quad f_2 = f_m G^{+1/2b}
 $$
 
@@ -77,6 +87,17 @@ las frecuencias nominales (25, 31,5, 40 …) se repiten escaladas por 10.
 phonometry diseña cada banda como una cascada SOS sobre esos bordes, pero dónde
 acaba cayendo el punto de −3 dB depende de qué entiende cada arquitectura por su
 frecuencia de diseño, y solo tres de las cinco lo ponen en $f_1$ y $f_2$.
+
+Las dos formas existen para que la frecuencia de referencia de 1000 Hz sea una
+frecuencia **central** de banda cuando $b$ es impar y un **borde** de banda
+cuando $b$ es par. Eso es lo que mantiene anidadas las fracciones impares (cada
+banda de octava son exactamente tres bandas de tercio de octava) mientras que
+las pares parten justo en las fronteras de octava; las fórmulas de los bordes
+son las mismas en ambos casos. La consecuencia práctica es fácil de pisar: un
+espectro con `fraction=2`, `12` o `24` no tiene banda de 1 kHz en absoluto, sus
+etiquetas nominales salen del redondeo a cifras significativas del Anexo E.3 y
+no de la serie preferente de ISO 266, y compararlo banda a banda con una tabla
+de tercios de octava no significa nada.
 
 ### Dónde cae de verdad el punto de −3 dB de cada arquitectura
 
@@ -119,9 +140,9 @@ caída más lenta.
 
 Un paso banda digital es una constelación de polos y ceros en el plano z: los
 ceros en DC y Nyquist, o cerca de ellos, sujetan la respuesta lejos de la
-banda (hasta el suelo de la banda atenuada, en los diseños equirrizados), y
-los polos se agrupan justo dentro del círculo unidad en los ángulos
-$\omega = 2\pi f / f_s$ que abarca la banda de paso. De ahí salen dos
+banda (hasta el suelo de la banda atenuada, en los diseños de rizado
+constante), y los polos se agrupan justo dentro del círculo unidad en los
+ángulos $\omega = 2\pi f / f_s$ que abarca la banda de paso. De ahí salen dos
 intuiciones. Primera, la selectividad es proximidad: cuanto más cerca del
 círculo unidad están los polos, más abrupta es la banda y más tiempo resuena
 el filtro (los picos de retardo de grupo de la sección 4 son esa resonancia,
@@ -136,6 +157,33 @@ la mitad del problema: cada par de polos conserva sus propios coeficientes,
 de modo que los errores de redondeo quedan localizados en lugar de acumularse
 en un único polinomio de orden alto. La otra mitad, la minúscula razón
 $B / f_s$ en sí, es lo que arregla el diezmado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pole_migration_es.svg" alt="Tres paneles para la banda de tercio de octava de 25 Hz de un banco a 48 kHz. A la izquierda, la constelación en el plano z de la banda diseñada a la frecuencia completa: todos los polos colapsados sobre z = 1, con un recuadro ampliado que muestra los seis polos repartidos en menos de una milésima del radio y la anotación 1 menos r igual a 8,7e-05. En el centro, esa misma banda tal como la realiza de verdad el banco, a 96 Hz tras diezmar por 500: los polos aparecen claramente separados alrededor del círculo unidad, con 1 menos r igual a 4,6e-02. A la derecha, el mayor radio de polo de todas las bandas del banco en ejes log-log: el diseño a una sola frecuencia sube de forma sostenida desde 4e-05 a 12,5 Hz hasta 5e-02 a 20 kHz, mientras que el banco multitasa se mantiene fijo cerca de 5e-02 en todo el rango" width="94%" />
+
+*La selectividad es proximidad, y el precio es el condicionamiento. A la
+frecuencia completa, los polos de la banda de 25 Hz quedan a menos de $10^{-4}$
+del círculo unidad y unos encima de otros; esa misma banda realizada a su
+frecuencia diezmada los tiene repartidos y 500 veces más lejos. El panel derecho
+es la decisión de diseño resumida en una curva: el banco multitasa mantiene
+todas las bandas en la misma región bien condicionada, sea cual sea su
+frecuencia central.*
+
+<details>
+<summary>Cómo se midió esta figura</summary>
+
+Los dos bancos salen de la tabla de parámetros del apartado 2, uno con el
+`design` por defecto y otro con `design=FilterDesign(resample=False)`. Las
+posiciones de los polos se leen directamente del banco: `bank.sos[idx]` es la
+cascada SOS de la banda `idx` y `scipy.signal.sos2zpk` la convierte en ceros,
+polos y ganancia, de modo que la distancia al círculo unidad es
+`1 - abs(poles).max()`. Para la banda de 25,1 Hz de un banco de tercios de
+octava a 48 kHz esa distancia es **8.73e-05** a la frecuencia completa y
+**4.62e-02** a la frecuencia diezmada que el banco usa realmente
+(`bank.factor[idx]` vale 500, así que la banda corre a 96 Hz). SciPy lanza
+`BadCoefficients` al leer el diseño a la frecuencia completa: ese aviso es el
+argumento de este apartado, escrito por la biblioteca que se lo encontró.
+
+</details>
 
 ### Diezmado multitasa
 
@@ -177,6 +225,36 @@ que la cadena de captura le entrega:
   superior holgadamente por debajo de Nyquist o sube `fs`, y deja que
   `verify_filter_class` informe del margen restante.
 
+### ¿Cuánto tiene que durar el registro?
+
+Un nivel de banda no se lee de una señal, se *estima* a partir de ella, y cuanto
+más estrecha es la banda más tarda esa estimación. El ancho de banda de una
+banda de $1/b$ de octava es $B = f_m\,(G^{1/2b} - G^{-1/2b})$, que para tercios
+de octava vale $0{,}231\,f_m$, y de ahí se siguen dos consecuencias.
+
+El filtro tiene que **asentarse**: una banda resuena durante unas pocas veces
+$1/B$, así que ese trozo del principio del registro es transitorio y no nivel, y
+hay que descartarlo (alrededor de un segundo en la banda de 12,5 Hz, doce
+milisegundos a 1 kHz). Y la estimación arrastra un **error aleatorio** de unos
+$4{,}34/\sqrt{BT}$ dB con sonido de tipo ruido, así que una desviación típica de
+0,4 dB exige $BT = 100$:
+
+| Banda más baja informada | $B$ [Hz] | $T$ para una desviación típica de 0,4 dB |
+| :--- | ---: | ---: |
+| 12,5 Hz | 2,9 | 35 s |
+| 125 Hz | 29 | 3,5 s |
+| 1 kHz | 231 | 0,4 s |
+
+La regla que se sigue cabe en una línea: **la banda más baja que pienses
+informar fija la duración del registro de todo el banco.** Analizar un
+fragmento de 1 s hasta 12,5 Hz e informar el resultado con un decimal no es una
+medida de esa banda, y ni `octave_filter` ni `OctaveFilterBank` te avisan. La
+ley general $1/\sqrt{BT}$ se deduce en
+[Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/);
+esa misma aritmética aplicada por trama en vez de por registro es la nota sobre
+`window_time` de
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/).
+
 Las matemáticas de banda anteriores son comunes a todas las arquitecturas.
 Cómo difieren realmente las arquitecturas, la comparación en el cruce a
 −3 dB, la galería completa de respuestas en octava y tercio de octava y los
@@ -185,10 +263,13 @@ ejemplos de uso por arquitectura, hasta el crossover Linkwitz-Riley, es la
 
 ## 2. Parámetros de `octave_filter()` / `OctaveFilterBank`
 
-Las opciones avanzadas viajan en cuatro dataclases congeladas, así los cuatro
-argumentos de cada día siguen primero: `FilterDesign` (`design`),
-`LevelCalibration` (`calibration`), `BlockProcessing` (`block_processing`) y
-`ResponsePlot` (`response_plot`). La tabla nombra cada opción por su grupo.
+Los argumentos de cada día van primero y por posición — `x`, `fs`, `fraction`,
+`order`, `limits` — y todo lo demás se agrupa en cuatro dataclases congeladas
+que se pasan por palabra clave: `design` (`FilterDesign`), `calibration`
+(`LevelCalibration`), `block_processing` (`BlockProcessing`) y `response_plot`
+(`ResponsePlot`). Al ser congeladas son hashables, que es lo que permite que dos
+grupos de opciones iguales acierten en la misma caché de diseño. La tabla de
+abajo nombra cada opción por el grupo en el que viaja.
 
 Tres puntos de llamada comparten esta tabla, y no aceptan las mismas opciones,
 así que la columna **Dónde** nombra aquel al que pertenece cada una:
@@ -203,7 +284,7 @@ constructor y `bank.filter()` es el método por llamada.
 | `order` | función, constructor | int | — | por defecto `6` | Orden SOS por banda |
 | `limits` | función, constructor | lista `[lo, hi]` | Hz | por defecto `[12, 20000]` | Rango de análisis |
 | `design.filter_type` | función, constructor | str | — | `'butter'` (por defecto), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | Consulta la [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/) |
-| `design.ripple` / `design.attenuation` | función, constructor | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirrizado en exactamente este valor |
+| `design.ripple` / `design.attenuation` | función, constructor | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo de rizado constante en exactamente este valor |
 | `design.resample` | función, constructor | bool | — | por defecto `True` | Filtra cada banda a una frecuencia diezmada (multitasa) |
 | `response_plot.show` | función, constructor | bool | — | por defecto `False` | Dibuja la respuesta del banco (requiere matplotlib) |
 | `response_plot.file` | función, constructor | str o `None` | — | por defecto `None` | Guarda la gráfica de respuesta del banco en esta ruta |
@@ -240,6 +321,27 @@ una suma energética que hace quien llama,
 aceptación de la Tabla 1 de IEC 61260-1 e informa de la clase (`1`, `2` o `None` si queda fuera de ambas) con los
 márgenes por banda.
 
+### Qué compra `order`, y dónde deja de comprar
+
+`order` es el orden de cada par de secciones paso banda, así que fija con qué
+rapidez caen las faldas y, por tanto, cuánto se cuela una banda vecina en el
+nivel de una banda. El orden 6 es el valor por defecto porque supera la máscara
+de IEC 61260-1 con holgura para Butterworth, y la aritmética merece verse: a
+48 kHz sobre un banco Butterworth de tercios de octava, el orden 2 se queda a
+27,03 dB de la clase 1 en la banda atenuada lejana, mientras que los órdenes 4,
+6, 8 y 10 pasan todos con un margen de clase 1 de exactamente +0,40 dB.
+
+Que el margen sea idéntico no es casualidad, y es la mitad útil de la regla. A
+partir del orden 4 la restricción que manda se ha desplazado de la banda
+atenuada a la banda de paso, donde un diseño máximamente plano se queda en 0 dB
+de desviación y el corredor de clase 1 es de ±0,4 dB: subir más el orden compra
+profundidad en la banda atenuada, pero ni un decibelio de margen de clase. Y
+cuesta: cada par de polos de más alarga la resonancia (los picos de retardo de
+grupo del apartado 4 crecen con el orden), que es la razón por la que el trabajo
+con transitorios y los espectrogramas de ventana corta prefieren órdenes bajos.
+La aritmética del margen en sí es
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
+
 ## 3. EQ paramétrico (`ParametricEQ`)
 
 Secciones biquad de ecualización según el **RBJ Audio EQ Cookbook**
@@ -274,6 +376,13 @@ axes = res.plot(language="es")  # magnitud + fase de la cascada
 Para procesado por bloques pasa `stateful=True` (la misma convención que
 `WeightingFilter`); el atajo de un solo uso es
 `parametric_eq(x, fs, sections)`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade_es.svg" alt="Dos paneles apilados dibujados por el propio objeto resultado. Arriba, la magnitud de la cascada de tres secciones del fragmento: más 4 dB por debajo de 100 Hz del shelving grave, una campana de menos 6 dB y una octava de ancho a 1 kHz, y más 3 dB por encima de 8 kHz del shelving agudo, con cada sección individual dibujada en gris claro por debajo de la línea gruesa de la cascada. Abajo, la fase de esa misma cascada en grados, oscilando unos veinte grados a cada lado de cero en torno a las frecuencias de los shelving y de la campana" width="88%" />
+
+*Las tres secciones del fragmento (en gris) y la cascada que suman; el panel
+inferior es la fase que cuesta esa magnitud. Cualquier resultado de la
+biblioteca se redibuja así: el `res.plot()` de arriba produjo exactamente esta
+figura.*
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family_es.svg" alt="Respuestas en magnitud de la familia de biquads del RBJ Audio EQ Cookbook: campana, shelving, paso bajo/alto, paso banda y rechazo de banda" width="80%" />
 
@@ -315,11 +424,15 @@ la máscara de aceptación de la Tabla 1, la clase 0 más estricta de la edició
 retirada de 1995, qué aporta una clase en una medición y la ficha de
 conformidad acreditada.
 
-## 4. Descomposición de la señal y estabilidad
+## 4. Señales de banda y retardo de grupo
 
-Con `sigbands=True` puedes recuperar las componentes en el dominio del tiempo de
-cada banda. Esto permite análisis avanzados o comparar cómo afectan distintas
-arquitecturas (p. ej. Butterworth vs Chebyshev) a la fase y al transitorio.
+`sigbands=True` devuelve las señales temporales por banda junto a los niveles, y
+es lo que hace visible el comportamiento en fase y en transitorio, y lo que deja
+al descubierto el retardo de grupo que cada arquitectura paga por su
+selectividad. La estabilidad en sí es asunto del apartado 1, en
+[Polos, ceros y estabilidad](#polos-ceros-y-estabilidad); lo que este apartado
+añade es la prueba, porque un filtro cuya respuesta al impulso decae a cero es
+un filtro estable.
 
 ```python
 import numpy as np
@@ -343,9 +456,12 @@ spl_c2, _, xb_cheby2 = filters.octave_filter(
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition_es.svg" alt="Descomposición por bandas en el tiempo comparando Butterworth y Chebyshev II, incluida la respuesta al impulso" width="80%" />
 
-*La gráfica compara las respuestas de **Butterworth** (azul, línea continua) y
-**Chebyshev II** (rojo, discontinua). El panel inferior muestra la **respuesta al
-impulso**, destacando las diferencias de estabilidad y decaimiento transitorio.*
+*El panel superior es la entrada, los intermedios son sus señales de banda con
+**Butterworth** (línea continua) y **Chebyshev II** (discontinua), y el inferior
+es la respuesta al impulso de la banda de 1 kHz de cada uno. Las dos respuestas
+al impulso decaen a cero — esa es la comprobación de estabilidad —, pero la
+resonancia de Chebyshev II dura visiblemente más, que es el precio en
+transitorio de su falda más abrupta.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -365,13 +481,27 @@ bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 200
 _, freq, xb_butter = bank_b.filter(y, sigbands=True)
 _, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
 
-fig, axes = plt.subplots(len(freq), 1, figsize=(9, 2 * len(freq)), sharex=True)
-for ax, fc, xb, xc in zip(axes, freq, xb_butter, xb_cheby2):
+# La figura publicada lleva dos paneles más: la entrada arriba y, abajo, la
+# banda de 1 kHz de un impulso unitario a través de cada banco.
+impulse = np.zeros_like(t)
+impulse[0] = 1.0
+_, _, imp_butter = bank_b.filter(impulse, sigbands=True)
+_, _, imp_cheby2 = bank_c.filter(impulse, sigbands=True)
+one_k = int(np.argmin(np.abs(np.asarray(freq) - 1000.0)))
+
+fig, axes = plt.subplots(len(freq) + 2, 1, figsize=(9, 2 * (len(freq) + 2)),
+                         sharex=True)
+axes[0].plot(t, y)
+axes[0].set_title("Señal original (250 Hz + 1000 Hz)")
+for ax, fc, xb, xc in zip(axes[1:-1], freq, xb_butter, xb_cheby2):
     ax.plot(t, xb, label="Butterworth")
     ax.plot(t, xc, "--", label="Chebyshev II")
     ax.set_title(f"Banda de {fc:.0f} Hz")
-    ax.set_xlim(0, 0.04)
-axes[0].legend()
+axes[-1].plot(t, imp_butter[one_k], label="Butterworth")
+axes[-1].plot(t, imp_cheby2[one_k], "--", label="Chebyshev II")
+axes[-1].set_title("Respuesta al impulso, banda de 1 kHz")
+axes[1].legend()
+axes[0].set_xlim(0, 0.04)
 axes[-1].set_xlabel("Tiempo [s]")
 plt.tight_layout()
 plt.show()
@@ -531,6 +661,9 @@ margen cómodo respecto a Nyquist, o sube `fs`, y confirma el margen con
 IEC 61260-1:2014 (apartados 5.2-5.5) construye cada banda a partir de la
 razón de octava en base 10 $G = 10^{3/10} \approx 1{,}99526$, de modo que
 una octava no es exactamente 2. Las frecuencias centrales siguen
-$f_m = 1000 \cdot G^{x/b}$ (para $b$ impar) y los bordes son
-$f_1 = f_m G^{-1/2b}$ y $f_2 = f_m G^{+1/2b}$; cada banda de tercio de
+$f_m = 1000 \cdot G^{x/b}$ para $b$ impar y
+$f_m = 1000 \cdot G^{(2x+1)/2b}$ para $b$ par — de modo que 1 kHz es una
+frecuencia central de banda en las fracciones impares y un *borde* de banda
+en las pares — y los bordes son $f_1 = f_m G^{-1/2b}$ y
+$f_2 = f_m G^{+1/2b}$ en ambos casos; cada banda de tercio de
 octava abarca $G^{1/3} \approx 1{,}2589$, diez bandas por década.

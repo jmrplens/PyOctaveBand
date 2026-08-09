@@ -272,7 +272,7 @@ no), el apartado 4 exige volver a descomponer el grupo en sus componentes.
 Aplicado al caso que ejecuta esta sección: una nave de compresores cuyas
 superficies radiantes abarcan 30 m se reduce a una sola fuente puntual solo más
 allá de 60 m, así que el receptor a 200 m de abajo es legítimo y uno a 50 m en el
-mismo emplazamiento no lo es, y ahí la nave hay que modelarla cara a cara. La
+mismo emplazamiento no lo es, y ahí la nave hay que modelarla cara por cara. La
 propia potencia acústica queda fuera del alcance: sale de una medición de la
 familia ISO 3740 o de la declaración del suministrador, en las ocho bandas de
 octava de 63 Hz a 8 kHz. Cuando solo se dispone de un $L_{WA}$ ponderado A, el
@@ -782,7 +782,7 @@ for extra in (0.0, 0.001, 0.010, 0.050):   # diferencia de recorrido sobre el bo
 
 Además, un obstáculo tiene que cumplir los requisitos para considerarse
 barrera (apartado 7.4):
-densidad superficial de al menos 10 kg/m², superficie cerrada sin huecos
+masa por unidad de superficie de al menos 10 kg/m², superficie cerrada sin huecos
 grandes y una extensión horizontal normal al camino mayor que la longitud de
 onda. Una valla de lamas o un contenedor corto apantallan bastante menos de lo
 que promete la Ec. (14).
@@ -939,4 +939,4 @@ coherente.
 - [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/) y [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/): las potencias de fuente a las que se refiere la comparación de la sección 3.
 - [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): qué le pasa al nivel predicho cuando pasa a ser un nivel evaluado.
 - Referencia de la API: [`environment.propagation.outdoor_propagation`](/phonometry/es/reference/api/environment/outdoor-propagation/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).
-- Teoría: [Propagación en exteriores y exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-y-exposición-al-ruido-en-el-trabajo-iso-9613-12-iso-9612): los términos de atenuación de ISO 9613-2 derivados uno a uno, y la absorción atmosférica de la Parte 1.
+- Teoría: [Propagación en exteriores](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-iso-9613-12): los términos de atenuación de ISO 9613-2 derivados uno a uno, y la absorción atmosférica de la Parte 1.
