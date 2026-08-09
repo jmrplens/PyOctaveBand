@@ -26,6 +26,14 @@ correlated inputs and one output.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band up to about 400 Hz and input 2 fills the high band above about 1.5 kHz, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null." width="88%" loading="eager" />
 
+*The whole case for the chapter, in one measurement. Input 2 drives nothing
+below 400 Hz, yet its **ordinary** coherence with the output averages 0.324
+there, inherited entirely through its correlation with input 1. Condition input
+1 out and its **partial** coherence in the same band falls below 1×10⁻⁴ — at
+200 Hz, 2.6×10⁻⁶. Multiple coherence stays at 0.997 across that band, so the
+model is not at fault: an engineer reading the ordinary coherences alone would
+spend money quietening the wrong source.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

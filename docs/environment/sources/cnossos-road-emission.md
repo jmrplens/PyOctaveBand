@@ -324,3 +324,41 @@ split into point sources is declared out of scope by the method itself.
   carries a source power to a receiver.
 - [Environmental noise levels](../assessment/environmental-levels.md): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
+
+## References
+
+- Kephalopoulos, S., Paviotti, M., & Anfosso-Lédée, F. (2012). *Common noise
+  assessment methods in Europe (CNOSSOS-EU)* (EUR 25379 EN). Publications
+  Office of the European Union.
+  [doi:10.2788/31776](https://doi.org/10.2788/31776).
+  The Joint Research Centre reference report the Directive text descends from,
+  and the only place the measurement campaigns behind the Appendix F
+  coefficients are described.
+- International Organization for Standardization. (1996). *Acoustics —
+  Attenuation of sound during propagation outdoors — Part 2: General method of
+  calculation* (ISO 9613-2:1996).
+  [iso.org catalogue](https://www.iso.org/standard/20649.html).
+  The propagation model this library uses to carry the emission to a receiver.
+  CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which
+  is not ISO 9613-2.
+
+## Standards
+
+Directive 2002/49/EC, Annex II, section 2.2 with the coefficient database of
+Appendix F, in the consolidated text — which is three instruments read
+together, and reading only one of them is the easiest way to ship a wrong
+table:
+
+- Commission Directive (EU) 2015/996
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2015/996/oj)),
+  which replaced Annex II with the CNOSSOS-EU methods. The implemented road
+  source is section 2.2, formulae 2.2.1 to 2.2.20.
+- Its corrigendum of 10 January 2018, OJ L 5, p. 35
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01))),
+  which sets the octave-band range of the road source to 63 Hz - 8 kHz and
+  replaces the whole of Appendix G.
+- Commission Delegated Directive (EU) 2021/1226
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj)),
+  in force since 31 December 2021, which replaces Tables F-1 and F-4 in their
+  entirety and prints the octave-band A-weighting used to sum the source
+  spectrum.

@@ -235,6 +235,16 @@ The natural companion is the sonar-equation chapter of
 merit machinery that gives a sonar detection range gives the range at which a
 piling campaign's weighted exposure falls below a criterion.
 
+## See also
+
+- [Underwater acoustics: radiated noise and pile driving](underwater-acoustics.md):
+  the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
+  feed this page.
+- [Underwater sound propagation](underwater-propagation.md):
+  the transmission loss and figure-of-merit machinery that turns a criterion
+  into a range.
+- API reference: [`underwater.bioacoustics.weighting`](https://jmrplens.github.io/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](https://jmrplens.github.io/phonometry/reference/api/underwater/audiograms/).
+
 ## References
 
 - National Marine Fisheries Service (2018). *2018 Revision to: Technical

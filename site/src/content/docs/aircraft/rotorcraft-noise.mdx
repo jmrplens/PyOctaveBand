@@ -222,6 +222,13 @@ CNOSSOS flow-resistivity classes `"A"`-`"H"`).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_ground_effect.svg" alt="Rotorcraft ground-effect adjustment versus one-third-octave frequency for hard and soft ground, showing low-frequency reinforcement, a deep interference dip and the incoherent high-frequency region" width="82%" loading="eager" />
 
+*One geometry, two ground classes, and the hard surface is the more extreme in
+both directions: it reinforces more at low frequency (+5.3 dB against +4.7 dB at
+50 Hz), cancels far more completely at the first minimum (−13.7 dB against
+−7.8 dB) and is still oscillating around +2.4 dB at 5 kHz where the soft curve
+has settled towards an incoherent sum near +0.6 dB. The three regions are read
+below the code.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -279,7 +286,7 @@ reflected wave and absorbs part of it, so the reinforcement is a little smaller
 (4.7 dB at 50 Hz) and, more importantly, the cancellation is far less complete:
 the first minimum is 7.8 dB rather than 13.7 dB. At high frequency the two paths
 decorrelate towards an incoherent sum, which is where the soft curve settles
-near 1 dB while the hard one is still ringing at 2.4 dB at 5 kHz. All of it is
+near 0.6 dB while the hard one is still ringing at 2.4 dB at 5 kHz. All of it is
 coherent by construction, so a level averaged over a whole event shows far less
 structure than any single frozen spectrum here.
 
@@ -496,6 +503,15 @@ hemisphere rather than a source level.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event.svg" alt="A-weighted level versus recorded time for a level rotorcraft flyover: a smooth rise to LASmax over the 10 dB-down window and a slower decay, annotated with the SEL and EPNL of the event" width="82%" />
 
+*Two asymmetries in one curve, and neither is a modelling artefact.
+$L_{AS,max}$ = 78.5 dB(A) arrives at 64.56 s, a full second **before** the sound
+emitted at the closest point of approach (65.56 s), because the hemisphere's
+loudest direction is reached slightly before abeam. And the 10 dB-down window
+runs 9.4 s up and 11.5 s down about the peak — the retarded time compresses the
+approach and stretches the departure. Integrating all 20.9 s of it and
+normalising to one second gives SEL = 88.8 dB(A), 10.3 dB above the peak the
+meter would show.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -684,6 +700,14 @@ res.plot()                             # the section geometry
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_terrain_screening.svg" alt="Terrain screening section with a helicopter source, a hill blocking the line of sight to the microphone and the diffracted path over its crest, above the per-band ground-and-screening adjustment compared with the flat-ground comb" width="82%" />
+
+*The hill is worth 0.766 m of path difference, and that single number is the
+whole spectrum. It is a ninth of a wavelength at 50 Hz and nearly nine
+wavelengths at 4 kHz, so the screened curve reads −7.3 dB in the lowest band
+and saturates near the 25 dB cap from about 2.5 kHz up — 23.9 dB at 4 kHz. Read
+against the flat-ground comb, the hill buys 12.3 dB at 50 Hz and about 25 dB
+across the top of the range. Terrain screening is a high-frequency instrument,
+and it does not fix a low-frequency complaint.*
 
 <details>
 <summary>Show the code for this figure</summary>

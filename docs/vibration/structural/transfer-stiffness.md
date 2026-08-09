@@ -250,6 +250,19 @@ repository. Click the preview to open the PDF:
 *Dynamic-transfer-stiffness fiche (`TransferStiffnessResult.report`): the FRF
 characteristic points and the transfer-stiffness level spectrum.*
 
+## See also
+
+- [Mechanical mobility and the FRF family (ISO 7626-1)](mechanical-mobility.md):
+  the source/receiver mobility rule that says when a blocked force is the right
+  description at all, and the FRF vocabulary this page's conversions belong to.
+- [Structure-borne sound power of equipment (EN 15657)](../../buildings/design/structure-borne-power.md):
+  the source characterisation that sits on the other side of the isolator.
+- [Installed structure-borne sound (EN 12354-5)](../../buildings/design/installed-structure-borne.md):
+  the prediction that consumes $k_{2,1}$ together with both mobilities and
+  turns it into a level in a receiving room.
+- API reference: [`vibration.structural.transfer_stiffness`](https://jmrplens.github.io/phonometry/reference/api/vibration/transfer-stiffness/) and [`vibration.structural.mechanical_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/mechanical-mobility/).
+- Theory: [Point mobilities and radiation efficiency](../../reference/theory/vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the mobility and impedance definitions the transfer stiffness is the reciprocal of.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne

@@ -49,7 +49,7 @@ varias guías.
   [doi:10.1007/978-1-4939-0755-7](https://doi.org/10.1007/978-1-4939-0755-7).
   Un panorama en un solo volumen de todos los dominios que toca esta
   biblioteca, desde la acústica de salas hasta la psicoacústica y el sonido
-  submarino; la referencia transversal de consulta obligada.
+  submarino; la referencia transversal a la que acudir primero.
 - Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
   transducers*. Academic Press. ISBN 978-0-12-391421-7.
   [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
@@ -663,7 +663,7 @@ medibles, y Maa es el panel microperforado en forma cerrada.
   108(4), 1710-1720.
   [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
   El método del coeficiente de difusión en campo libre tras ISO 17497-2 y la
-  geometría publicada del QRD N = 7 del ejemplo trabajado.
+  geometría publicada del QRD N = 7 del ejemplo resuelto.
   Citado por [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/).
 - Audio Engineering Society. (2001). *AES information document for room
   acoustics and sound reinforcement systems — Characterization and
@@ -1011,8 +1011,8 @@ aproxima.
   Part 11: Acoustic noise measurement techniques*
   (IEC 61400-11:2012+AMD1:2018 CSV).
   [Catálogo IEC](https://webstore.iec.ch/en/publication/63367).
-  La geometría de potencia acústica aparente, la clasificación por velocidades
-  de viento y la audibilidad tonal de aerogeneradores.
+  La geometría de potencia acústica aparente, la clasificación en intervalos de
+  velocidad de viento y la audibilidad tonal de aerogeneradores.
   Citado por [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/).
 - International Electrotechnical Commission. (2005). *Wind turbines —
   Part 14: Declaration of apparent sound power level and tonality values*
@@ -1048,7 +1048,7 @@ aproxima.
 
 Aquí van primero los documentos de certificación, porque la magnitud la definen
 ellos y no un libro de texto; las prácticas SAE son la maquinaria atmosférica y
-espectral a la que llaman. Lee el ECAC Doc 29 cuando la pregunta sea una curva
+espectral a la que recurren. Lee el ECAC Doc 29 cuando la pregunta sea una curva
 de ruido alrededor de un aeropuerto y no un nivel bajo una trayectoria de
 vuelo.
 
@@ -1063,7 +1063,7 @@ vuelo.
   manual — Volume I: Procedures for the noise certification of aircraft*
   (Doc 9501, 3.ª ed.).
   [Tienda ICAO](https://store.icao.int/en/environmental-technical-manual-volume-1-procedures-for-the-noise-certification-of-aircraft-doc-9501-1).
-  La guía de certificación cuyos ejemplos trabajados (corrección tonal, EPNL
+  La guía de certificación cuyos ejemplos resueltos (corrección tonal, EPNL
   por el método integrado) sirven de oráculos numéricos.
   Citado por [Ruido de aeronaves](/phonometry/es/aircraft/aircraft-noise/).
 - International Electrotechnical Commission. (1995). *Electroacoustics —
@@ -1159,7 +1159,7 @@ absorción de alcance decreciente y no tres alternativas.
   El tratamiento sistemático de las magnitudes acústicas submarinas en la
   línea que la ISO 18405 normalizó, los regímenes de propagación de flujo de
   energía de Weston en aguas someras, las ecuaciones del sonar con siete
-  ejemplos trabajados totalmente numéricos y el audiograma de orca.
+  ejemplos resueltos totalmente numéricos y el audiograma de orca.
   Citado por [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/),
   [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
   y [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/).
@@ -1269,7 +1269,7 @@ absorción de alcance decreciente y no tres alternativas.
   Hearing (Version 2.0)*. NOAA Technical Memorandum NMFS-OPR-59.
   [NOAA Fisheries](https://www.fisheries.noaa.gov/s3/2023-05/TECHMEMOGuidance508.pdf).
   Los parámetros de ponderación auditiva y los umbrales de inicio de PTS de la
-  guía de 2018, con el ejemplo trabajado del Apéndice D.
+  guía de 2018, con el ejemplo resuelto del Apéndice D.
   Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/).
 - National Marine Fisheries Service (2024). *2024 Update to: Technical
   Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
@@ -1302,7 +1302,12 @@ Estas son las obras que hay detrás de la emisión, no de la inmisión. Munjal e
 la referencia de conductos y silenciadores y la fuente de la formulación por
 matrices de transferencia; Fahy es el que hay que abrir para la intensidad,
 donde la aproximación por diferencias finitas y sus errores se deducen en lugar
-de afirmarse.
+de afirmarse. Las seis últimas entradas son la cadena de sonoridad de
+radiodifusión, que es un bloque normativo propio: UIT-R BS.1770 define los
+algoritmos, EBU R 128 fija el nivel objetivo y el techo, y los tres documentos
+EBU Tech aportan el comportamiento del medidor, el rango de sonoridad y la
+práctica de producción, junto con las señales de prueba con las que se valida la
+implementación.
 
 - Fahy, F. J. (1995). *Sound intensity* (2.ª ed.). E&FN Spon.
   ISBN 978-0-419-19810-9.
@@ -1376,14 +1381,55 @@ de afirmarse.
   se usa para la deconvolución y la separación con resolución de muestra
   fraccionaria. Citado por
   [Distorsión con barridos y utilidades de fase](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+- International Telecommunication Union. (2023). *Algorithms to measure audio
+  programme loudness and true-peak audio level*
+  (Recomendación UIT-R BS.1770-5 (11/2023)).
+  [Publicación UIT-R](https://www.itu.int/rec/R-REC-BS.1770).
+  El prefiltro de ponderación K (Anexo 1, Tablas 1-2), la sonoridad ponderada
+  por canal y sus puertas en dos etapas (Anexo 1, Fórmulas 1-7 y Tabla 3), las
+  directrices de estimación del pico verdadero (Anexo 2) y las ponderaciones de
+  canal dependientes de la posición para sistemas de sonido avanzados
+  (Anexo 3, Tablas 4-5).
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness normalisation and permitted
+  maximum level of audio signals* (EBU R 128).
+  [tech.ebu.ch/publications/r128](https://tech.ebu.ch/publications/r128).
+  El nivel objetivo de −23,0 LUFS, el techo de −1 dBTP y la práctica de
+  normalización construida sobre ellos.
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness metering: 'EBU Mode' metering
+  to supplement loudness normalisation* (EBU Tech 3341).
+  [tech.ebu.ch/publications/tech3341](https://tech.ebu.ch/publications/tech3341).
+  Las escalas temporales momentánea, de corto plazo e integrada, y las señales
+  de prueba de requisitos mínimos de su Tabla 1 con sus tolerancias, que son
+  sintetizables y son con las que se comprueba la implementación.
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness range: A measure to supplement
+  loudness normalisation* (EBU Tech 3342).
+  [tech.ebu.ch/publications/tech3342](https://tech.ebu.ch/publications/tech3342).
+  El algoritmo del rango de sonoridad, su implementación de referencia y las
+  señales de prueba de su Tabla 1, reproducidas dentro de ±1 LU.
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Guidelines for production of programmes
+  in accordance with EBU R 128* (EBU Tech 3343).
+  [tech.ebu.ch/publications/tech3343](https://tech.ebu.ch/publications/tech3343).
+  La práctica de producción que hay detrás de los números: qué normalizar,
+  cuándo, y qué restringe y qué no restringe un objetivo de sonoridad.
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
+- Steinmetz, C. J., & Reiss, J. D. (2021). pyloudnorm: A simple yet flexible
+  loudness meter in Python. *150th AES Convention*.
+  [github.com/csteinmetz1/pyloudnorm](https://github.com/csteinmetz1/pyloudnorm).
+  Una implementación independiente de BS.1770, útil como contraste de un
+  resultado de sonoridad con puertas.
+  Citado por [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/).
 
 ## Simulación de ondas
 
 Esta área no tiene norma aplicable, así que su literatura es su evidencia.
 Bilbao es la puerta de entrada a los esquemas en diferencias finitas en
 acústica, Virieux la formulación elástica original en malla escalonada, y Moczo
-et al. la revisión que reúne el análisis de estabilidad y de dispersión contra
-el que se comprueban los esquemas de la biblioteca.
+et al. la revisión que reúne el análisis de estabilidad y de dispersión con el
+que se contrastan los esquemas de la biblioteca.
 
 - Williams, E. G. (1999). *Fourier acoustics: Sound radiation and nearfield
   acoustical holography*. Academic Press.

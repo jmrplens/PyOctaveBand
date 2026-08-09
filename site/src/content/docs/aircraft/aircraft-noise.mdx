@@ -214,6 +214,14 @@ duration.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl.svg" alt="Aircraft-flyover perceived-noise-level time history: PNL and the tone-corrected PNLT versus time, with the maximum PNLTM marked and the 10 dB-down integration window shaded, annotated with the resulting EPNL and duration correction" width="82%" loading="eager" />
 
+*Two corrections, both visible. The gap between PNL and PNLT is the tone
+correction, worth 3.97 dB at the peak here because a 2500 Hz fan tone stands
+above its neighbours — which is why $\mathrm{PNLTM}$ = 120.57 PNdB sits above
+the 116.61 PNdB the plain PNL reaches. The shaded 10 dB-down window spans
+records 16 to 24, about 4 s, well short of the fixed 10 s reference, so the
+duration correction is $D = -6.56$ dB and $\mathrm{EPNL}$ = 114.01 EPNdB lands
+*below* the peak. A slower flyover over the same peak would score above it.*
+
 ```python
 from phonometry import aircraft
 
@@ -412,6 +420,13 @@ attenuation $\delta_B$, consistent with the Exact Method well beyond the 50 dB
 Approximate-Method limit.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption.svg" alt="Aircraft atmospheric absorption versus frequency for two path lengths; the SAE-Method band attenuation stays below the pure-tone mid-band value at high absorption" width="82%" />
+
+*Solid is the band, dashed the pure tone at the band centre, and the two only
+coincide where the absorption is small. At 1 km the gap is 0.18 dB in the 4 kHz
+band and 10.78 dB at 10 kHz; at 7620 m it is 29.95 dB at 4 kHz and 167.97 dB at
+10 kHz, against a mid-band value of 753.92 dB. Both are the same 25 °C, 70 % RH
+atmosphere: the difference is that a band keeps the energy of its low edge long
+after its centre frequency has gone.*
 
 A third-octave band is not a tone. The absorption coefficient rises steeply with
 frequency, so the low edge of a band is attenuated far less than its midband

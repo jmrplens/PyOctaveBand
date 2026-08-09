@@ -369,6 +369,28 @@ PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
 
+```python
+res.report("airborne-prediction.pdf")   # R'w, thirteen paths
+imp.report("impact-prediction.pdf")     # L'n,w, five paths
+```
+
+The example fiches, regenerated with `make reports`, are kept rendered in the
+repository; click a preview to open the PDF. Both show the Annex L building of
+this page — the same elements, junctions and floating floor the tables above
+are built from — so the share-of-energy table is the answer to the question
+this whole page exists for: which path carries the sound.
+
+[![ISO 12354-1 detailed airborne prediction example report: an identification header with the 20 m2 separating floor and the two 50 m3 dwellings, the share-of-energy table of all thirteen paths (the 2d flanking path largest at 18.0 %, the direct Dd path 6.3 %), the per-band figure stacking each path's contribution under the apparent sound reduction index curve from 50 Hz to 5 kHz, the boxed predicted R'w = 57 dB, the detailed model's 1.5 dB to 2.5 dB standard deviation, and a PASS against a requirement of 52 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_airborne_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_airborne_example.pdf)
+
+*Detailed airborne prediction fiche (`DetailedAirborneResult.report`), the
+thirteen paths of the Annex L building and their energy shares.*
+
+[![ISO 12354-2 detailed impact prediction example report for the same building in the impact direction: the identification header, the share-of-energy table of the direct path and the four flanking paths (Dd 65.6 %, Df2 13.2 %), the per-band figure of each path's contribution under the apparent normalized impact sound pressure level curve, and the boxed predicted L'n,w = 41 dB with the detailed model's standard deviation and a PASS against a requirement of 50 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_impact_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_impact_example.pdf)
+
+*Detailed impact prediction fiche (`DetailedImpactResult.report`), the same
+building excited by the tapping machine: the floor itself carries two thirds
+of the energy, and the four flanking paths the rest.*
+
 ## References
 
 - Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.

@@ -561,6 +561,19 @@ power radiated outwards by a building side and its exterior level (Annex G
 worked example). The single-number ratings come from ISO 717-1 (Annex F of
 ISO 16283-3 and EN ISO 717-1 for the prediction).
 
+**Not covered.** The band levels handed to `facade_insulation` are assumed
+already corrected for background noise, and ISO 16283-3's procedural
+requirements are documented but never checked: nothing verifies the 45° ± 5°
+incidence, the 5 m / 7 m slant distances, the 3 → 10 microphone escalation and
+its recess special case, the 50 pass-bys and the simultaneity of a traffic
+measurement, or that the method chosen matches the question asked. The
+low-frequency corner procedure of Clause 7 — the façade counterpart of the
+**ISO 16283-1** procedure, triggered by the same 25 m³ receiving-room threshold
+— is not implemented, and neither are the railway and aircraft methods of
+Annex E. The EN 12354-3 and EN 12354-4 worked examples of the 2000 editions
+carry small internal rounding inconsistencies in the higher octave bands; the
+implementation follows the formulae rather than the printed rows.
+
 ## See also
 
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the

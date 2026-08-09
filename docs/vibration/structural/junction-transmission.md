@@ -426,6 +426,40 @@ input: `modal_density_ratio` compares the measured $\eta_{21}/\eta_{12}$
 against the $n_1/n_2$ computed from the geometry, and a large disagreement
 means the subsystem boundaries were drawn in the wrong place.
 
+## What this guide covers
+
+**Covered.** The frequency-independent, rigid-junction transmission
+coefficients of Cremer, Heckl & Ungar (1973), tabulated by Craik (1981/1996)
+and collected in Hopkins (2007, Section 5.2.1.3), for X, T, L and in-line
+junctions of thin, homogeneous, isotropic plates: the wave parameters
+$\chi$/$\psi$, the corner and straight-section coefficients
+$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, their diffuse-field angular average,
+the SEA coupling loss factor and the wave-approach vibration reduction index
+$K_{ij}$, through `junction_wave_parameters`,
+`corner_transmission_coefficient`, `straight_transmission_coefficient`,
+`angular_average_transmission_coefficient`, `inline_transmission_coefficient`,
+`coupling_loss_factor`, `wave_vibration_reduction_index` and
+`junction_transmission`. Also the experimental route of Norton & Karczub
+Chapter 6: the two-subsystem power balance and its in-situ inversion
+(`power_injection_clf`, `power_injection_matrix`), the modal densities of bars,
+beams, flat plates and thin-walled cylindrical shells with the `ring_frequency`
+they are split about, and the two closed forms between the routes
+(`right_angle_transmission_coefficient`,
+`point_connection_coupling_loss_factor`).
+
+**Not covered.** The predicted $K_{ij}$ is a closed-form idealisation of a
+rigid, simply supported junction, not a measurement: the empirical $K_{ij}$
+from a direction-averaged velocity level difference is ISO 10848's
+`vibration_reduction_index`, in
+[Laboratory Flanking Transmission](../../buildings/insulation/flanking-lab.md).
+The straight-section coefficient $\tau_{13}$ is undefined for the T-junction
+(2) and L-junction geometries, which have no collinear third plate, so only the
+corner path applies there. The tabulated coefficients assume a *symmetric*
+junction — opposite plates identical — and there is no closed form here for one
+that is not. On the experimental side the inversion is written for **two**
+subsystems only, and `PowerInjectionResult.modal_density_ratio` is a
+consistency check the reader makes, not one the library automates.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](../../buildings/design/insulation-prediction.md): the

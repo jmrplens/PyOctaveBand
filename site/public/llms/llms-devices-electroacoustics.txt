@@ -407,6 +407,24 @@ microphone side, its sensitivity references, directional patterns,
 inherent-noise weightings and its own rated-characteristics report, lives
 in [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/).
 
+## See also
+
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the
+  rated-characteristics report these measurements feed.
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/):
+  the microphone sensitivity references, directional patterns, noise
+  weightings and rated-characteristics report.
+- [Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): HVAC duct
+  methods and machine enclosures on the receiving end of a noisy device.
+- [Swept-sine distortion](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/): the
+  Farina/Novak harmonic separation whose THD(f) feeds the loudspeaker
+  distortion panel.
+- [Two-channel system measurement](https://jmrplens.github.io/phonometry/signals/spectra/system-measurement/):
+  the physical arrangement behind the $H_1$ estimate of section 5, with the
+  reference tap and the two synchronous channels drawn.
+- API reference: [`electroacoustics.distortion`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/distortion/), [`electroacoustics.intermodulation`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/intermodulation/), [`electroacoustics.noise_measurements`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/noise-measurements/) and [`electroacoustics.frequency_response`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/frequency-response/).
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
@@ -1559,6 +1577,45 @@ grids.
   [`transfer_function`](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) estimate on a uniform grid.
   `minimum_phase` alone also accepts a plain magnitude array, e.g. a
   design target for equalization.
+
+## What this guide covers
+
+**Covered.** Farina's exponential-sweep deconvolution (AES preprint 5093, 2000)
+and the phase-coherent synchronized swept sine of Novak, Lotton & Simon (2015):
+the harmonic separation, the closed-form inverse-filter spectrum and the
+fractional-sample de-skewing, through `swept_sine_distortion` and
+`synchronized_sweep_signal`. With them, the acquisition conditions the answer
+depends on — the drive level and its `amplitude` reference, the `fade` that has
+to reach both calls, the clipping and tail requirements, the time-variance and
+impulsive-noise failure modes, and the sizing rules relating $T$, $N$ and
+$f_2$. The phase utilities `minimum_phase`, `group_delay`, `excess_phase` and
+`phase_decomposition` implement the Hilbert relation of Bendat & Piersol
+Section 13.1.4 through the real cepstrum.
+
+**Not covered.** Intermodulation and dynamic intermodulation
+(IEC 60268-3 clauses 14.12.7-10) come from steady tones on the
+[electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) page, not from a sweep; this page
+separates harmonic orders and nothing else. Müller & Massarani is cited for
+practice — fades, inverse-filter technique — not for an implemented formula.
+Under `method="farina"` the harmonic phases of $H_2 \dots H_N$ are returned but
+should be ignored: the plain exponential sweep breaks the time-shift/harmonic
+equivalence the synchronized method depends on. And nothing here polices the
+acquisition conditions: the functions take the arrays they are handed, so the
+drive level, the absence of clipping and the length of the tail are the
+operator's to keep and to report.
+
+## See also
+
+- [Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/): the
+  steady-tone $\mathrm{THD}$, THD+N and intermodulation set of IEC 60268-3
+  that this sweep complements, and the operating point they are all defined at.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the THD(f) curve produced here is the distortion panel of that
+  rated-characteristics report.
+- [Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): `impulse_response`,
+  which is the linear half of the same recording.
+- API reference: [`electroacoustics.swept_sine`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
+  and [`signals.phase`](https://jmrplens.github.io/phonometry/reference/api/signals/phase/).
 
 ## References
 

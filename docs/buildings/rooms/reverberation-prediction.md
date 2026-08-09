@@ -322,6 +322,21 @@ repository. Click the preview to open the PDF:
 
 *Reverberation-time prediction fiche (`ReverberationModelResult.report`), the five-model table and the boxed $T_\text{mid}$.*
 
+## See also
+
+- [Sound Absorption Measurement and Rating](../../materials/absorbers/absorption-measurement.md):
+  the ISO 354 measurement every $\alpha_s$ on this page comes from, its mounting
+  dependence, and the ISO 11654 rating that must *not* be substituted for the
+  per-band table (§0).
+- [Room acoustic parameters (ISO 3382-1/2)](room-acoustics.md#how-much-decay-range-do-i-need-for-a-valid-t20-or-t30):
+  the measured counterpart, and the curvature diagnostic that tells you a
+  prediction's diffuse-field assumption has failed.
+- [Modes of a rectangular room](room-image-sources.md#3-modes-of-a-rectangular-room):
+  what is below the Schroeder frequency, where none of these five formulae
+  applies.
+- API reference: [`room.reverberation_prediction`](https://jmrplens.github.io/phonometry/reference/api/rooms/reverberation-prediction/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
+- Theory: [Steady-state room field](../../reference/theory/rooms-buildings.md#steady-state-room-field-bies-64-kuttruff-56): the diffuse-field assumption every Sabine-family formula makes, and where it stops holding.
+
 ## References
 
 - Sabine, W. C. (1922). *Collected papers on acoustics*. Harvard University

@@ -196,6 +196,25 @@ component's frequency in time, the
 [Hilbert instantaneous frequency](correlation-delay.md) of
 `envelope` complements the STFT ridge.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol's calibrated spectrogram (Section 12.6.4.2):
+tapered, overlapped STFT segments kept as separate time columns instead of
+averaged, in `spectrogram`, with the exact Welch-module scaling and the
+Eq. 8.158 random error of an unaveraged cell. The zoom FFT of Section 11.5.4
+(Eqs. 11.122-11.130): band-limited, arbitrarily fine-grid spectra computed as
+the chirp-Z equivalent of the book's demodulate-decimate-DFT chain, in
+`zoom_fft`. Both share the Harris (1978) window catalogue behind the segment
+taper.
+
+**Not covered.** The constant-bandwidth, STFT family only. Its
+constant-percentage-bandwidth counterpart, the one a sound level meter draws,
+is `OctaveFilterBank.spectrogram` on [Levels](../levels/levels.md). Tracking a
+single component's instantaneous frequency over time is the Hilbert `envelope`
+of [Correlation, time delay and envelope](correlation-delay.md). As on the
+spectral-analysis page, these are a textbook's estimators and not a
+certification standard.
+
 ## See also
 
 - [Spectral analysis](spectral-analysis.md): the averaged Welch estimate

@@ -56,6 +56,14 @@ and log-linearly in slant distance (Eq. 4-4).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_noise.svg" alt="Noise-power-distance curves for two engine power settings, the event level falling log-linearly with slant distance between the tabulated nodes" width="82%" />
 
+*The markers are the only distances the table asserts; everything between them
+is the interpolation. The two curves are close to parallel — 8.7 to 9.2 dB
+apart over the whole range — so thrust mostly shifts the level while distance
+sets the shape, and the fall is 21.7 dB per decade of slant distance rather
+than the 20 dB of pure divergence, the excess being the reference atmosphere's
+absorption. Power is interpolated **linearly**, not in decibels: 16 000 N reads
+88.15 dB at 1 km, exactly halfway between the two tabulated rows.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -409,6 +417,14 @@ noise: strongest near an azimuth $\psi \approx 120°$ from the nose, falling
 off abeam ($\psi = 90°$) and directly behind ($\psi = 180°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor.svg" alt="Polar diagram of the start-of-roll directivity ΔSOR over the rearward semicircle for turbofan-jet and turboprop aircraft, both showing a lobe near 120° from the nose" width="75%" />
+
+*The lobe is narrow and the penalty behind it is large. At 300 m the jet peaks
+at +0.99 dB at $\psi$ = 123° and the turboprop at +1.96 dB at 121°, both within
+0.2 dB of abeam at 90°; by 180°, straight behind the aircraft, they are down to
+−13.5 and −10.1 dB. A receiver placed a few degrees off the lobe therefore sees
+a completely different start-of-roll contribution, which is why $\Delta_{SOR}$
+is applied per segment and per receiver rather than as a single correction to
+the event.*
 
 <details>
 <summary>Show the code for this figure</summary>

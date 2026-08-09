@@ -39,6 +39,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Getting Started](https://jmrplens.github.io/phonometry/start/getting-started/)
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/)
+- [About](https://jmrplens.github.io/phonometry/start/about/)
 - [Guides index](https://jmrplens.github.io/phonometry/start/guides/)
 - [Glossary of quantities](https://jmrplens.github.io/phonometry/reference/glossary/)
 

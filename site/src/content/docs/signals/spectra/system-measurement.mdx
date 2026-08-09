@@ -223,7 +223,7 @@ $$
 
 (Eqs. (11)-(12)), integrate the group delay into a phase, and inverse-FFT.
 The sweep then follows *any* spectral shape with a nearly constant envelope,
-keeping the crest factor close to a swept sine's ideal 3.02 dB - unlike a
+keeping the crest factor close to a swept sine's ideal 3.01 dB - unlike a
 noise signal with the same spectrum, which sits ~6 dB higher. `shaped_sweep_signal`
 implements the construction with the paper's band-limiting and Nyquist-phase
 details; `target` is `"pink"` (the classical room-measurement emphasis,
@@ -239,6 +239,14 @@ sweep.plot()
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shaped_sweep.svg" alt="Two panels for a pink shaped sweep from 50 hertz to 5 kilohertz: the time-domain waveform with a nearly constant envelope over two seconds, and below it the Welch spectrum of the sweep falling three decibels per octave exactly on top of the dashed pink target line inside the shaded sweep band" width="88%" loading="eager" />
+
+*The two panels are the same statement seen twice. The envelope is flat because
+the shape was bought with dwell time rather than amplitude, which is why the
+crest factor is 4.22 dB — 1.2 dB above the swept sine's ideal 3.01 and about
+6 dB below shaped noise of the same spectrum. The measured Welch spectrum fits
+−3.013 dB/octave and stays within 0.74 dB of the pink target across the whole
+50 Hz-5 kHz band, so what the amplifier sees is the target and not an
+approximation of it.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -410,6 +418,13 @@ inv.plot()
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/regularized_inversion.svg" alt="Magnitudes over log frequency for a regularized inversion of a band-pass response: the measured response in blue, the inverse filter in red mirroring it inside the shaded equalized band from 200 hertz to 4 kilohertz, and the equalized product in green reading exactly zero decibels across the band and rolling off outside it where the regularization caps the gain" width="88%" loading="eager" />
+
+*The green curve is the whole test: inside the equalized band it departs from
+0 dB by at most 9×10⁻⁶ dB, which is $\varepsilon/(|H|^2+\varepsilon)$ evaluated
+bin by bin and not a fitted result. Outside it the red inverse stops rather than
+climbing — the boost is capped at −6.03 dB relative to the in-band unity, the
+analytic $1/(2\sqrt\varepsilon)$ maximum. A plain $1/H$ would run off the top of
+this axis in the same two regions where the blue response runs off the bottom.*
 
 <details>
 <summary>Show the code for this figure</summary>

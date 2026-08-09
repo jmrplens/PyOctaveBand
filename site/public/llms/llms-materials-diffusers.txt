@@ -451,8 +451,6 @@ Per Clause 8.4 the random-incidence coefficient is itself a per-band quantity,
 the average of the directional coefficients over the source positions band by
 band (not a mean across frequency). `verbose=True` adds the normalised $d_n$
 column to the table (the curve always draws $d_n$ as a companion when present).
-A single band's polar response is itself reportable through
-`DiffusionResult.report(path)`.
 
 ```python
 import numpy as np
@@ -470,6 +468,18 @@ spectrum.report("diffusion.pdf")   # one-page fiche (needs phonometry[report])
 ```
 
 [![ISO 17497-2 diffusion example report: a metadata header, the per-one-third-octave table of the diffusion coefficient d beside the d(f) band-axis curve (with the normalised d_n drawn as a companion curve), and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.pdf)
+
+A single band's polar response is itself reportable:
+`DiffusionResult.report(path)` renders the corrected receiver-angle /
+reflected-level table beside the semicircular polar plot, boxing that band's
+directional diffusion coefficient.
+
+[![ISO 17497-2 polar-response example report: a metadata header, the corrected reflected level per receiver angle beside the semicircular polar plot, and the boxed directional diffusion coefficient](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_polar_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_polar_example.pdf)
+
+*Single-source polar-response fiche (`DiffusionResult.report`), the reflected
+level over the receiver arc. The spectrum fiche above grades a surface across
+frequency; this one is the raw evidence behind a single band of it, and it is
+what a goniometer session actually produces.*
 
 ## 3. Designing a Schroeder diffuser
 

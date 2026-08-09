@@ -60,10 +60,11 @@ y la ráfaga tonal, en el apartado siguiente.
 La ráfaga tonal sinusoidal conmutada es el estímulo estándar del comportamiento
 dinámico: balística de sonómetros, medidores de cuasipico, potencia
 admisible de altavoces. IEC 60268-1:1985 (apartado A2.1) fija qué es una
-ráfaga tonal bien formada: «debe comenzar en el paso por cero del tono y constar de
-un número entero de periodos completos». `tone_burst` genera exactamente
-eso, como ráfaga tonal única o como el tren repetitivo del apartado A2.2 en
-el que cada ráfaga tonal ocupa un periodo de repetición completo:
+ráfaga tonal bien formada: «debería comenzar en el paso por cero del tono y
+constar de un número entero de periodos completos». `tone_burst` genera
+exactamente eso, como ráfaga tonal única o como el tren repetitivo del
+apartado A2.2 en el que cada ráfaga tonal ocupa un periodo de repetición
+completo:
 
 ```python
 from phonometry import tone_burst
@@ -88,6 +89,15 @@ energía de la ráfaga tonal tiene la forma cerrada exacta $A^2 N/2$, que es com
 verifica el generador.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Ráfagas tonales IEC 60268-1: una ráfaga tonal única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro ráfagas tonales a 10 ráfagas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
+
+*Todas las cifras de la imagen son exactas y no nominales, que es de lo que trata
+el apartado A2.1. La ráfaga son 240 muestras, 25 periodos completos de 5 kHz a
+48 kHz, y la primera muestra de la puerta cae sobre un cero del tono, así que su
+energía es $A^2N/2 = 120$ hasta el último dígito. En el tren de abajo el periodo
+son 4800 muestras y el ciclo de trabajo es 0,05 exacto: la ráfaga ocupa la
+vigésima parte de cada repetición, que es lo que hace el tren utilizable para
+las balísticas de un sonómetro, donde el tiempo apagado tiene que estar tan bien
+definido como el encendido.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -306,7 +316,7 @@ al impulso y emborronarlas.
 ## Qué cubre esta guía
 
 **Cubierto.** El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga
-tonal que «debe comenzar en el paso por cero del tono y constar de un
+tonal que «debería comenzar en el paso por cero del tono y constar de un
 número entero de periodos completos» (A2.1) y el tren repetitivo de ráfagas tonales
 de A2.2, implementados por `tone_burst` y comprobados a mano contra las
 duraciones de la tabla AII. El requisito antialias de la sección 10.2 de

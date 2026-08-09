@@ -767,6 +767,19 @@ and the Paris integral to its locally reacting closed form. Misprints
 found in the sources during this work are recorded in the
 [errata registry](../../ERRATA.md).
 
+## See also
+
+- [Airflow Resistance](airflow-resistance.md),
+  [Impedance Tube](impedance-tube.md) and
+  [Sound Absorption Measurement and Rating](absorption-measurement.md):
+  the measurement standards these prediction models connect to, namely
+  ISO 9053-1/-2 (flow resistivity), ISO 10534-1/-2 and ASTM E2611 (impedance
+  tube), and ISO 354 / ISO 11654 (random-incidence absorption and rating).
+- [Metamaterial Absorbers](metamaterial-absorbers.md): the
+  slow-sound slit panels and the critical-coupling condition that push
+  perfect absorption into the deep-subwavelength regime.
+- Theory: [Acoustic material characterisation](../../reference/theory/materials-surfaces.md#acoustic-material-characterisation-iso-11654-iso-9053-12-iso-10534-12-astm-e2611): the characterisation quantities the empirical and phenomenological models take as input.
+
 ## References
 
 - Mechel, F. P. (Ed.). (2008). *Formulas of acoustics* (2nd ed.). Springer.

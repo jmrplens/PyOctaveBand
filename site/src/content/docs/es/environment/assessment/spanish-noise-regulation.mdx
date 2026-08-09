@@ -34,7 +34,7 @@ La evaluación acústica en España no termina en un $L_{Aeq}$. El Real Decreto
 construye sobre él toda la cadena de comprobación: se divide el día en periodos
 temporales de evaluación, cada periodo en fases de ruido, se corrige cada fase
 por componentes tonales, de baja frecuencia e impulsivas, se integra hasta un
-valor anual y se compara contra tres criterios distintos de la misma tabla de
+valor anual y se compara con tres criterios distintos de la misma tabla de
 valores límite de inmisión. Esta página implementa esa cadena completa.
 
 Los niveles por periodo que la alimentan salen de
@@ -86,7 +86,7 @@ con un margen demasiado pequeño tampoco puede sostener un veredicto de $K_t$,
 $K_f$ o $K_i$: los tres son diferencias de niveles corregidos por ruido de fondo,
 así que el mismo margen gobierna las correcciones de carácter y no solo el nivel.
 
-| Corrección | Magnitud de partida | Umbrales | Función |
+| Corrección | Magnitud de entrada | Umbrales | Función |
 | :--- | :--- | :--- | :--- |
 | $K_t$, componentes tonales emergentes | Espectro **sin ponderar** en tercios de octava; $L_t = L_f - L_s$, con $L_s$ la media **aritmética** de las dos bandas adyacentes | 8/12 dB (20 a 125 Hz), 5/8 dB (160 a 400 Hz), 3/5 dB (500 Hz a 10 kHz) | `tonal_correction()` |
 | $K_f$, componentes de baja frecuencia | $L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ | 0 dB hasta 10 dB, 3 dB si $10 < L_f \le 15$, 6 dB por encima | `low_frequency_correction()` |
@@ -178,7 +178,7 @@ módulo implementa las variantes propias del RD en lugar de delegar en aquellas:
 - [`tonal_seeking_survey()`](/phonometry/es/environment/assessment/environmental-levels/#ajuste-tonal-método-de-ingeniería-anexo-c-de-iso-1996-22007) (método de cribado, anexo K de ISO 1996-2:2017) es
   el pariente más cercano, porque también parte el espectro en 125 y 400 Hz,
   pero exige que la banda supere a **ambas** vecinas en 15/8/5 dB y solo
-  devuelve un indicador de prominencia; el RD compara contra la **media** de
+  devuelve un indicador de prominencia; el RD compara con la **media** de
   las vecinas con umbrales 8/5/3 dB y gradúa el resultado.
 - [`impulsive_sound_adjustment()`](/phonometry/es/environment/assessment/impulsive-sound/) es el método de tasa de crecimiento de
   ISO/PAS 1996-3 sobre una señal calibrada. El $K_i$ del RD es la diferencia
@@ -194,7 +194,7 @@ que sobresale 7,5 dB de la media aritmética de sus vecinas queda graduada con
 $K_t = 3$ dB por el reglamento y **no levanta ningún indicador** en el método de
 cribado de ISO, porque supera a cada vecina en menos de los 8 dB que ese método
 exige. Esa es exactamente la situación que un informe de inspección tiene que
-saber defender: el RD compara contra la **media** aritmética de las vecinas con
+saber defender: el RD compara con la **media** aritmética de las vecinas con
 umbrales 8/5/3 dB y gradúa el resultado en 0/3/6; el método de cribado exige que
 la banda supere a **ambas** vecinas en 15/8/5 dB y devuelve un indicador; el
 método de ingeniería del anexo C trabaja dentro de una banda crítica y devuelve
@@ -276,7 +276,7 @@ límite de inmisión** del anexo III son los que se exigen a un emisor concreto.
 | Anexo III, Tabla B1 | Valores límite de infraestructuras portuarias y actividades | `activity_limits()` |
 | Anexo III, Tabla B2 | Ruido transmitido por actividades a locales acústicamente colindantes | `adjacent_premises_limits()` |
 
-Dos detalles de la Tabla A conviene tener presentes. El área acústica de
+Conviene tener presentes dos detalles de la Tabla A. El área acústica de
 tipo f (sistemas generales de infraestructuras de transporte y equipamientos
 públicos) no tiene valor numérico: la nota 2 la remite a los objetivos de las
 áreas colindantes, y por eso `ACOUSTIC_AREA_TYPES` la lista pero las funciones
@@ -349,6 +349,13 @@ verdict.complies                         # False: LK,d supera los 55 dB
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment_es.svg" alt="Evaluación de una actividad según el RD 1367/2007: nivel máximo de fase, LKeq,x diario y LK,x anual de cada periodo frente a los valores límite +5 dB, +3 dB y de tabla, con el nivel anual del periodo día superando su límite" width="80%" />
 
+*Tres índices por periodo frente a tres criterios distintos, y solo el más
+estricto acaba mordiendo. En el periodo día la fase peor marca 59 dB frente a
+su criterio de 60 dB y el $L_{Keq,d}$ diario 57 dB frente a 58 dB, y ambos
+pasan, mientras que el $L_{K,d}$ anual de 56 dB incumple por un decibelio los
+55 dB de la Tabla B1. El periodo tarde (54 / 51 / 50 dB) cumple los tres.
+Leer solo la barra más alta llevaría a declarar conforme esta actividad.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -390,15 +397,15 @@ print(existing.complies)                 # True: el criterio anual no se aplica
 
 ## Gráficos e informe de inspección
 
-`ActivityAssessment.plot()` dibuja los tres índices de cada periodo contra sus
-tres criterios, como en la figura anterior, y `TonalCorrectionResult.plot()`
+`ActivityAssessment.plot()` dibuja los tres índices de cada periodo frente a
+sus tres criterios, como en la figura anterior, y `TonalCorrectionResult.plot()`
 dibuja el espectro de tercios de octava con las diferencias $L_t$ que
 justifican el $K_t$ aplicado.
 
 `ActivityAssessment.report()` va un paso más allá y renderiza un acta de
 inspección acústica de una página: cabecera de identificación, tabla de
 medición por fase con las correcciones $K_t$/$K_f$/$K_i$, evaluación por
-periodo contra los valores límite aplicables y el veredicto enmarcado. El
+periodo frente a los valores límite aplicables y el veredicto enmarcado. El
 idioma por defecto es el español, el del reglamento; `language="en"` la
 traduce.
 

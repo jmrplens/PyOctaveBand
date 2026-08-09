@@ -247,7 +247,7 @@ calibrador acústico según **IEC 60942** (clases LS, 1 y 2):
   Tabla 1); se suministran con un barómetro, o su manual especifica uno (5.1.8),
   y el manual indica la corrección y su incertidumbre (6.3 i, 6.3 m). Un pistófono
   genera un desplazamiento de volumen fijo, así que su salida sigue a la presión
-  estática ambiente: del orden de una décima de decibelio para el tiempo
+  estática ambiente: del orden de una décima de decibelio con la meteorología
   corriente, y en torno a −1 dB a 1000 m sobre el nivel del mar. Cualquier otro
   calibrador, por 5.1.7, tiene que cumplir su clase sin ninguna corrección
   ambiental. Cuando la corrección *sí* haga falta, aplícala al nivel objetivo y
@@ -293,6 +293,14 @@ La comprobación caza justo lo que arruina las calibraciones de campo (un acopla
 viento, ruido de manipulación):
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_stability_es.webp" alt="Nivel con ponderación F de un tono de calibración estable frente a otro con AM del 3 % contra el límite de ±0,07 dB de clase 1 de IEC 60942" width="80%" />
+
+*La comprobación es una decisión, y la figura enseña lo lejos que queda de ser
+apurada. El tono estable oscila entre +0,003 y −0,004 dB alrededor de su media,
+la vigésima parte del límite de clase 1 de 0,07 dB de la Tabla 2. Un 3 % de
+modulación de amplitud (un acoplador que no acaba de asentar, una mano sobre el
+micrófono) lo lleva a +0,142 y −0,143 dB, el doble del límite, mientras suena
+igual y da el mismo nivel medio. La media es lo que usa la sensibilidad; solo la
+fluctuación dice si se puede confiar en ella.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -557,7 +565,8 @@ En este modo:
 
 * **0 dBFS** corresponde a un nivel numérico de señal de 1,0 (RMS o pico).
 * El factor de calibración no se aplica (dBFS es relativo al fondo de escala digital).
-* Útil para analizar headroom, mastering digital o señales normalizadas.
+* Útil para analizar el margen hasta fondo de escala, el mastering digital o
+  las señales normalizadas.
 
 ```python
 import numpy as np

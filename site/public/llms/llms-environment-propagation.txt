@@ -714,6 +714,15 @@ Here too `result.plot()` previews the insertion-loss spectrum of the fiche;
 the [ground and barriers guide](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) draws the same result
 against the exact half-plane and coherent-ground models.
 
+## See also
+
+- [Spherical ground effect and advanced barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
+- [Atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/): what the favourable-condition assumption and $C_{met}$ stand in for.
+- [CNOSSOS-EU road emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/) and [CNOSSOS-EU rail emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/): the source strengths the comparison in section 3 refers to.
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): what happens to the predicted level once it becomes an assessed one.
+- API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
+- Theory: [Outdoor propagation](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
+
 ## References
 
 - Salomons, E. M. (2001). *Computational atmospheric acoustics*. Kluwer
@@ -1057,6 +1066,34 @@ hard ground both agree on the +6 dB enhancement and the 5 dB grazing barrier
 floor, but only the wave models resolve the interference dips that move with
 geometry, frequency and ground impedance, which is why they are the natural
 infrastructure for the meteorological schemes of Nord2000 and CNOSSOS.
+
+## What this guide covers
+
+**Covered.** The Weyl-Van der Pol spherical-wave ground reflection coefficient
+(`ground_effect`; Attenborough Eq. 2.40a/c, Salomons Eq. 3.2/D.58, with the
+Faddeeva-function boundary-loss factor), its hard-ground +6 dB,
+grazing-incidence and reciprocity limits pinned as tests; and wave-theoretic
+barrier diffraction in `barrier_insertion_loss` — the Kurze-Anderson closed form
+(`kurze_anderson_attenuation`, Bies Eq. 5.138), the exact rigid half-plane
+(MacDonald / Hadden & Pierce, Attenborough Eqs. 9.19-9.20), thick barriers
+through the double-edge Fresnel number (Bies Eq. 5.157) and the coherent
+four-path barrier-on-ground model weighted by the `ground_effect` coefficient.
+
+**Not covered.** Both models assume a homogeneous, non-refracting,
+non-turbulent atmosphere; a vertical sound-speed gradient is the subject of
+[atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/) instead. The coherent
+barrier-on-ground model weights all four diffracted paths with a single
+reflection coefficient $Q$ computed over the overall source-receiver geometry,
+not with a separate coefficient per image path — so it is coherent and
+reciprocal, but it is not a boundary-element solution.
+
+## See also
+
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the octave-band ISO 9613-2 fits these models sit underneath, and the rule an obstacle has to satisfy to be a barrier at all.
+- [Atmospheric refraction: rays and the GFPE](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/): the vertical sound-speed gradient both models here assume away.
+- [Porous absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/): the Delany-Bazley and Miki models behind `flow_resistivity`, and their fit range.
+- Theory: [Outdoor propagation](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-general-method-iso-9613-2): the ground and barrier terms of ISO 9613-2 in the context of the whole attenuation sum.
+- API reference: [`environment.propagation.ground_barriers`](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/).
 
 ## References
 
@@ -1420,6 +1457,29 @@ The models are anchored by independent oracles:
 
 These checks are pinned numerically in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) (section "Atmospheric refraction").
+
+## What this guide covers
+
+**Covered.** The ray model — Runge-Kutta integration of Snell's law in
+`atmospheric_ray_paths` — with the closed-form linear-profile geometry
+(`ray_curvature_radius`, `shadow_zone_distance`, Salomons Sec. 4.4), and the
+Green's Function parabolic equation (`atmospheric_parabolic_equation`, Salomons
+Appendices G and H): the Gaussian starter, the finite-impedance ground
+reflection, the refraction phase screen and the absorbing top layer. The
+homogeneous limit is checked against the exact spherical ground effect (a few
+tenths of a decibel, including the +6 dB rigid-ground enhancement), the ray
+geometry to machine precision, and reciprocity and the shadow-zone collapse as
+tests.
+
+**Not covered.** Both models take one effective sound-speed profile that varies
+with height alone. A horizontally inhomogeneous atmosphere — a gradient that
+changes along the path — is outside their range-independent formulation, which
+is the airborne counterpart of the range-independent ocean solvers. Both also
+assume flat ground at $z = 0$; neither accepts a terrain elevation profile.
+
+## See also
+
+- Theory: [Outdoor propagation](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-general-method-iso-9613-2): the meteorological assumptions ISO 9613-2 makes, which is what refraction takes apart.
 
 ## References
 

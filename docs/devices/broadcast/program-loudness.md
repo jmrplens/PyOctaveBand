@@ -413,6 +413,20 @@ independent [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) meter is
 a useful cross-check for real recordings; it was not used as a source for
 this implementation.
 
+## See also
+
+- [Loudness (ISO 532)](../../perception/psychoacoustics/loudness.md): the
+  psychoacoustic models, in sones and specific loudness, that answer the
+  perceived-magnitude question this page's gated LUFS deliberately does not.
+- [Integrated & Statistical Levels](../../signals/levels/levels.md):
+  $L_{eq}$, $L_{Ceq}$ and the same oversampled-peak machinery behind `lc_peak`.
+- [Frequency weightings](../../signals/levels/weighting.md): A, C and Z
+  against the K-weighting of this page.
+- [Electroacoustics (IEC 60268-3)](../electroacoustics/electroacoustics.md):
+  the chain that carries the programme once it has been normalised.
+- [Broadcast](index.md): the section overview.
+- API reference: [`broadcast`](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/).
+
 ## References
 
 - International Telecommunication Union. (2023). *Algorithms to measure

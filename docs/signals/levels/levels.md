@@ -445,6 +445,16 @@ to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
 over 8 h. Half the dose is -3 dB, and double duration at the same level is
 +3 dB.
 
+## See also
+
+- [Environmental Levels (ISO 1996-1/-2)](../../environment/assessment/environmental-levels.md): the $L_{den}$/$L_{dn}$ indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
+- [Time Weighting](time-weighting.md): the Fast/Slow/Impulse detector the percentile levels are defined on.
+- [Calibration](../metrology/calibration.md): the sensitivity factor that turns digital units into the pascals every level here assumes.
+- [Occupational exposure (ISO 9612)](../../perception/hearing/occupational-exposure.md): the workplace measurement strategies the dose measures feed.
+- [Multichannel and Performance](../filters/multichannel.md): per-channel levels and how to combine them energetically.
+- API reference: [`signals.levels`](https://jmrplens.github.io/phonometry/reference/api/signals/levels/).
+- Theory: [Event and dose metrics](../../reference/theory/signal-analysis.md#event-and-dose-metrics): the energy definitions behind Leq, SEL and the exposure quantities, and how the percentile levels relate to them.
+
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -475,3 +485,10 @@ meters*: the sound exposure E in Pa²h and the normalized 8 h level LEX,8h
 (≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. The ISO 1996-1/-2
 environmental indicators and determination procedures are covered in
 [Environmental levels](../../environment/assessment/environmental-levels.md).
+
+**Not covered.** **IEC 61252 was revised in 2025; only the formulae of the
+implemented first edition (1993) are here**, not the newer one. The ISO 1996-1
+whole-day indicators ($L_{den}$, $L_{dn}$, the rating levels) and the
+ISO 1996-2 determination procedures are not on this page either — they are in
+[Environmental levels](../../environment/assessment/environmental-levels.md).
+

@@ -148,8 +148,16 @@ velocidad del sonido empleada y la fórmula de conversión aplicada.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de espejo de Lloyd en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
 
+*La separación entre las dos curvas es la corrección de superficie, y cambia de
+signo. Para este calado de 6 m ($d_s$ = 4,2 m) suma 9,08 dB en 20 Hz, cruza el
+cero cerca de 59 Hz, se pasa hasta −4,07 dB en 160 Hz y solo entonces se asienta
+en los $-10\log_{10}(2) = -3{,}01$ dB de un par fuente e imagen incoherente, que
+alcanza hacia 4 kHz. Todo lo que queda a la izquierda del cruce es la inversión
+de una cancelación casi total: esa es la parte de un espectro de nivel de fuente
+publicado que más se mueve cuando la profundidad de fuente supuesta está mal.*
+
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import numpy as np
@@ -298,8 +306,16 @@ que el receptor se queda donde está, un supuesto sobre el que vuelve la guía d
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving_es.svg" alt="Forma de onda de presión de un golpe de hincado de pilotes por percusión con su pico marcado, y debajo el nivel de exposición sonora acumulado creciendo como SEL_ss más diez veces el logaritmo del número de golpes" width="82%" />
 
+*Los tres números que da un solo golpe no son intercambiables, y la figura
+enseña lo lejos que quedan entre sí: este golpe sintético tiene un pico de
+197,9 dB re 1 µPa, un SEL de golpe único de 178,7 dB re 1 µPa²·s y una duración
+de pulso al 90 % de energía de 60 ms. El panel inferior es una recta sobre un
+eje log-N por construcción, así que un pilote de 2000 golpes suma
+$10\lg 2000$ = 33,0 dB y llega a 211,7 dB: un criterio de lesión escrito sobre
+el SEL acumulado se cumple tanto por el recuento como por el martillo.*
+
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import numpy as np

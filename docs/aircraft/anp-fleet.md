@@ -220,6 +220,34 @@ Everything these two return is the same result type the airport-noise page uses,
 so the plotting, the contour extraction and the per-segment breakdown all work
 unchanged.
 
+## What this guide covers
+
+**Covered.** Opening the shipped EASA ANP database, or another ANP CSV export,
+with `load_anp_database`; what one aircraft record holds, including the power
+parameter its NPD table is indexed by and the engine mounting the Doc 29 chain
+reads; reading and interpolating the NPD surface with `npd_curves` and `level`;
+the default fixed-point trajectories and their stage-length bins; and driving
+the Doc 29 single-event level and ground-grid contour from an aircraft
+identifier with `event_level` and `noise_contour`.
+
+**Not covered.** The procedural-step profiles, which is how most ANP entries
+describe a departure. Turning those into a flight path needs the ICAO Doc 9911
+flight-mechanics performance model, which this bridge does not implement, so
+only the 13 types with a fixed-point *departure* profile and the 20 with a
+fixed-point *arrival* profile come with a trajectory ready to fly. The database
+is read and never written: version 2.3 ships with the package and the package
+does not update it.
+
+## See also
+Pages elsewhere on the site that this section leans on:
+
+- [Airport Noise (ECAC Doc 29)](airport-noise.md): the method
+  itself, built from a hand-written NPD table and flight path.
+- [Aircraft noise: Effective Perceived Noise Level](aircraft-noise.md):
+  the certification metric, which is measured rather than tabulated.
+- API reference:
+  [`aircraft.anp_fleet`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/anp-fleet/).
+
 ## References
 
 - EASA and EUROCONTROL, *Aircraft Noise and Performance (ANP) database*, version

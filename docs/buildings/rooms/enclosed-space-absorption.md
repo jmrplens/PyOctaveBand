@@ -225,6 +225,24 @@ repository. Click the preview to open the PDF:
 
 *Enclosed-space fiche (`ReverberationResult.report`), the per-band $A$/$T$ table and the boxed $T_\text{mid}$.*
 
+## See also
+
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](reverberation-prediction.md):
+  the classical family, and the models to reach for when the clause 4.6 limits
+  fail.
+- [Room acoustic parameters (ISO 3382-1/2)](room-acoustics.md):
+  the measured counterpart of the reverberation time predicted here.
+- [Sound Absorption Measurement and Rating](../../materials/absorbers/absorption-measurement.md):
+  where the $\alpha_s$ come from (ISO 354) and where $\alpha_w$ is defined
+  (ISO 11654) — the rating §3 forbids as an input.
+- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md):
+  the family member that consumes the $A$ computed here, through
+  $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the three Annex E cases these implementations are checked against.
+- API reference: [`room.enclosed_space_absorption`](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/).
+- Theory: [Absorption in enclosed spaces](../../reference/theory/rooms-buildings.md#absorption-in-enclosed-spaces-en-12354-6): the equivalent-absorption-area definition the EN 12354-6 procedure computes.
+
 ## References
 
 - European Committee for Standardization. (2003). *Building acoustics —

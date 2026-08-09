@@ -54,12 +54,24 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   (Runge-Kutta, vectorizadas sobre todos los rayos a la vez) a través de un
   perfil de velocidad del sonido, reflejando en la superficie y el fondo.
   Validado contra los arcos de círculo de un gradiente lineal.
-- **`parabolic_equation`** marcha la PE estándar (Tappert) con el algoritmo
-  split-step de Fourier. Validado contra la divergencia esférica en campo
+- **`parabolic_equation`** hace avanzar en distancia la PE estándar (Tappert)
+  con el algoritmo split-step de Fourier. Validado contra la divergencia esférica en campo
   libre; coincide en tendencia con la pérdida por transmisión de los modos
   normales.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_es.webp" alt="Un perfil de velocidad del sonido de Munk, trayectorias de rayos formando zonas de convergencia, y la pérdida por transmisión de modos normales frente a la ecuación parabólica coincidiendo en tendencia" width="100%" loading="eager" />
+
+*Tres paneles, tres preguntas distintas sobre la misma agua. A la izquierda,
+rayos en un perfil de Munk cuyo mínimo es de 1500,0 m/s a 1271 m frente a los
+1548,5 m/s de la superficie: 48 m/s de diferencia bastan para plegar sobre sí
+mismo el abanico de ±12° y formar zonas de convergencia, y el rayo de ±12°
+todavía barre de 143 m a 3997 m de profundidad. En el centro, el mismo entorno
+como campo de la PE, donde las zonas aparecen como interferencia y no como
+líneas. A la derecha, los dos métodos sobre una guía de ondas **distinta**,
+somera, de 200 m: siguen la misma tendencia con un desvío medio de 1,6 dB, pero
+la diferencia distancia a distancia llega a 25 dB en los mínimos de
+interferencia, que es la manera honesta de decir qué significa «coincidir en
+tendencia».*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -344,7 +356,7 @@ frecuencia. Lo que aquí no llevan es una amplitud completa: la intensidad
 geométrica del tubo de rayos diverge en las cáusticas, así que el objeto de
 resultado devuelve los caminos y deja el nivel al campo modal o de la PE.
 
-## 4. La ecuación parabólica: un campo de un solo sentido, marchado en distancia
+## 4. La ecuación parabólica: un campo de un solo sentido que avanza en distancia
 
 La ecuación parabólica cambia el problema de contorno de Helmholtz por un
 problema de valores iniciales en distancia. Factoriza la oscilación
@@ -360,7 +372,7 @@ $$
 \qquad n(z) = \frac{c_0}{c(z)} .
 $$
 
-El algoritmo **split-step de Fourier** la marcha por descomposición de
+El algoritmo **split-step de Fourier** la hace avanzar por descomposición de
 operadores, alternando dos semipasos físicos, exacto cada uno por separado: la
 difracción es una multiplicación por $e^{-i k_z^2 \Delta r / 2 k_0}$ en el
 dominio del número de onda vertical, y la refracción una pantalla de fase
@@ -372,7 +384,7 @@ presión nula. El precio es la aproximación **paraxial**: la PE estándar es
 precisa dentro de ±15-20° de la horizontal, aproximadamente, y la energía más
 empinada arrastra un error de fase que se nota a corta distancia en guías de
 ondas someras (Jensen §6.2). La calibración en campo libre es el oráculo: sin
-gradiente alguno, el campo marchado debe reproducir la divergencia
+gradiente alguno, el campo así avanzado debe reproducir la divergencia
 esférica,
 
 ```python
@@ -561,7 +573,7 @@ cap. 1):
 |---|---|---|
 | `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
@@ -696,7 +708,7 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
   por transmisión de esta página.
 - [Refracción atmosférica: rayos y la GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
   los hermanos aéreos de estos métodos, con la misma curvatura de rayos y
-  una PE de función de Green marchada sobre impedancia de suelo en lugar de
+  una PE de función de Green que avanza sobre impedancia de suelo en lugar de
   un lecho marino.
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): la
   alternativa en el dominio del tiempo tras la animación del canal SOFAR de

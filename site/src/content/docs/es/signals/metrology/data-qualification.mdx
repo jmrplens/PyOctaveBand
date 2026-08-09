@@ -126,12 +126,20 @@ values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
           5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
 
 res = trend_test(values)                  # B&P Ejemplo 4.4
-print(res.statistic, res.bounds)          # 86, (64, 125] — semiabierto
+print(res.statistic, res.bounds)          # 86, (64, 125]: semiabierto
 print(res.trend_free, round(res.p_value, 3))   # True, 0.586
 res.plot(language="es")
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test_es.svg" alt="Dos secuencias de veinte observaciones dibujadas frente al índice de muestra: el Ejemplo 4.4 de Bendat y Piersol, que fluctúa en torno a cinco con ochenta y seis inversiones de orden y se acepta como sin tendencia, y las mismas fluctuaciones con una deriva ascendente añadida que sube de unos cinco a nueve, cuyas treinta y ocho inversiones de orden caen por debajo del límite inferior de aceptación de sesenta y cuatro y se rechazan como con tendencia al nivel del cinco por ciento" width="82%" loading="eager" />
+
+*El test no mira nunca la pendiente ajustada, solo el orden de los valores. A la
+izquierda, el propio Ejemplo 4.4 de Bendat y Piersol: $A = 86$, holgadamente
+dentro de la región de aceptación $(64, 125]$, $p = 0{,}586$. A la derecha, las
+mismas veinte fluctuaciones con una deriva añadida que las lleva de 5,2 a 9,0:
+las fluctuaciones no cambian, pero el orden sí, y $A$ cae a 38, por debajo del
+límite inferior, con $p = 0{,}0001$. Lo que empuja $A$ hacia cero es una deriva
+monótona, que es por lo que el recuento funciona sin conocer la distribución.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -222,6 +230,14 @@ res.plot(language="es")
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test_es.svg" alt="Veinte medias cuadráticas por segmento de dos registros de ruido: un registro estable cuyos valores fluctúan en torno a uno con un conteo de inversiones de orden de noventa y uno, aceptado como estacionario, y el mismo ruido con una rampa de ganancia del veinte por ciento cuyas medias cuadráticas por segmento suben de forma sostenida hasta uno coma cinco, dando solo siete inversiones de orden, rechazado como no estacionario al nivel del cinco por ciento" width="82%" loading="eager" />
 
+*La misma secuencia de veinte segmentos cuenta la estacionariedad con la misma
+aritmética. Las medias cuadráticas por segmento del registro estable se quedan
+entre 0,982 y 1,034 y dan $A = 91$, dentro de $(64, 125]$. La rampa de ganancia
+del 20 % las sube de 1,016 a 1,476, un cambio de un factor 1,45 que nadie
+llamaría dramático a ojo sobre una traza temporal, y $A$ se desploma a 7. Bastan
+veinte números y un recuento de pares comparado con una tabla; no entra nada del
+ancho de banda ni de las unidades del registro.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -272,9 +288,9 @@ libro - más segmentos resuelven derivas más rápidas, pero cada intervalo debe
 seguir siendo largo frente a las frecuencias más bajas del registro para que los
 valores sean independientes.
 
-**¿Qué deriva tan pequeña llega a ver?** Cada media cuadrática de segmento es
-ella misma una variable aleatoria: para una banda de anchura $B$ observada
-durante $T_\text{seg}$ segundos, su error aleatorio normalizado es
+**¿Cómo de pequeña es la deriva que llega a ver?** Cada media cuadrática de
+segmento es ella misma una variable aleatoria: para una banda de anchura $B$
+observada durante $T_\text{seg}$ segundos, su error aleatorio normalizado es
 $1/\sqrt{B\,T_\text{seg}}$. Toma los 20 segmentos por defecto sobre un registro
 de 10 s de la banda de tercio de octava de 1 kHz ($B = 231$ Hz,
 $T_\text{seg} = 0{,}5$ s): $BT = 116$, así que cada valor de segmento se dispersa
@@ -385,7 +401,7 @@ print(trend_test(alternating, method="runs").trend_free)   # False
 *El veredicto bilateral del test de rachas: 20 rachas no llaman la atención
 en 40 observaciones gaussianas (izquierda, aceptado), pero el mismo
 recuento en una secuencia alternante de 20 valores supera su cota superior
-(derecha, rechazado): demasiadas rachas es tan poco aleatorio como
+(derecha, rechazado): **demasiadas** rachas es tan poco aleatorio como
 demasiado pocas.*
 
 <details>
@@ -467,6 +483,15 @@ res.plot(language="es")
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings_es.svg" alt="Tasas de cruce por nivel medidas de un registro de ruido gaussiano de banda limitada entre ochocientos y mil doscientos hercios, dibujadas como puntos frente al nivel de cruce desde menos tres coma cinco hasta más tres coma cinco unidades de la señal en un eje de tasas logarítmico, cayendo desde unos dos mil cruces por segundo en el nivel cero hasta unos pocos por segundo a tres sigmas, con la curva exponencial de Rice pasando por todos los puntos medidos" width="82%" loading="eager" />
+
+*Dos momentos del espectro predicen una curva que abarca casi tres décadas de
+tasa. La tasa de cruces por cero medida en este registro de 800-1200 Hz es de
+2012,7 cruces por segundo frente a la forma cerrada del Ejemplo 5.13,
+$2\sqrt{f_c^2 + B^2/12} = 2013{,}3$, una frecuencia aparente de 1007 Hz; a
+partir de ahí la exponencial de Rice $N_a = N_0 e^{-a^2/2\sigma_x^2}$ sigue los
+recuentos con menos de un 2 % de diferencia hasta $2\sigma$, donde la tasa ya ha
+caído a 268/s. Pasado $3\sigma$ el recuento es de un puñado de sucesos por
+segundo y la dispersión es la estadística del registro, no un fallo del modelo.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -574,6 +599,15 @@ res.plot(language="es")   # excedencia empírica contra la mezcla de Rice (figur
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution_es.svg" alt="Probabilidad de excedencia de la altura de pico de ruido gaussiano paso bajo en eje logarítmico frente a la altura de pico estandarizada desde menos dos coma cinco hasta cuatro coma cinco: la escalera empírica de medio millón de muestras sigue la curva de mezcla de Rice para un factor de irregularidad de cero coma siete cuatro seis, claramente por debajo del límite de Rayleigh discontinuo y por encima del límite gaussiano punteado, con una fracción visible de máximos negativos" width="82%" loading="eager" />
+
+*Un solo número decide qué curva siguen los picos. El ruido paso bajo ideal
+tiene la forma cerrada $r = \sqrt5/3 = 0{,}745$, y el registro mide 0,746, que
+es también por lo que el 12,6 % de sus 39 534 máximos son **negativos**, algo
+imposible bajo Rayleigh. La escalera empírica se apoya en la mezcla de Rice para
+ese $r$ y queda en todas partes entre los dos límites: la probabilidad de un
+pico más allá de $4\sigma$ es $2{,}5\times10^{-4}$, una cuarta parte por debajo
+del $e^{-8} = 3{,}4\times10^{-4}$ de Rayleigh. Suponer el límite de Rayleigh en
+un registro que no es de banda estrecha sobrestima los extremos.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

@@ -243,6 +243,18 @@ around an airport, the noise-power-distance tables, the per-segment
 corrections of a flight path and the ground contour of a single event, is
 the ECAC Doc 29 method of [Airport noise](airport-noise.md).
 
+## See also
+
+- [Airport noise (ECAC Doc 29)](airport-noise.md): the NPD
+  engine and the single-event contour chain around an airport.
+- [Rotorcraft noise: the hemisphere method](rotorcraft-noise.md):
+  the ECAC Doc 32 method, whose single-event EPNL is this same Appendix 2 chain
+  driven by a noise hemisphere instead of a certification flyover.
+- [The ANP fleet database](anp-fleet.md): the measured
+  noise-power-distance tables for real types, which is where the certification
+  data ends up for modelling work.
+- API reference: [`aircraft.certification`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/certification/) and [`aircraft.atmospheric_absorption`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/atmospheric-absorption/).
+
 ## References
 
 - International Civil Aviation Organization. (2017). *Annex 16 to the

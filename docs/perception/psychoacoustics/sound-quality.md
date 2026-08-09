@@ -331,6 +331,11 @@ See [Prominent Discrete Tones](tone-prominence.md) for the ECMA-418-1 TNR/PR
 prominence verdicts, [Speech Transmission Index](../speech/speech-transmission.md) for
 STI/STIPA, and [Theory](../../reference/theory/perception.md) for the underlying math.
 
+## See also
+
+- API reference: [`psychoacoustics.quality.sharpness`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/sharpness/), [`psychoacoustics.quality.tonality_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/), [`psychoacoustics.quality.roughness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/roughness-ecma/) and [`psychoacoustics.quality.fluctuation_strength_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/).
+- Theory: [Advanced loudness models and sound quality](../../reference/theory/perception.md#advanced-loudness-models--sound-quality): the specific-loudness pattern the sharpness, roughness and fluctuation-strength metrics are all built on.
+
 ## References
 
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*

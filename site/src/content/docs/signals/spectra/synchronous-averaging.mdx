@@ -28,6 +28,14 @@ of periodic waveforms by time domain averaging* (1987).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/synchronous_average.svg" alt="Two-panel figure. Left: one noisy period of a signal in faint grey swings far above and below a smooth curve; the average of forty periods, in blue, lies almost exactly on the dashed red true waveform, so the asynchronous noise has been removed. Right: the comb-filter magnitude across the orders between 31 and 33, with unit-height teeth at the integer orders; for N = 20 a deep node falls exactly on the interfering tone marked at 32.05 orders, whereas the power-of-two N = 32 leaves a side lobe there and lets the tone through." width="92%" loading="eager" />
 
+*Two things worth reading separately. Left, the $\sqrt N$ law doing its work:
+the noise on one period has an rms of 0.83, and after 40 averages the averaged
+waveform departs from the true one by 0.138 rms — a factor 6.0 against the
+$\sqrt{40} = 6.32$ the law predicts. Right, the choice that costs nothing: at
+order 32.05 the comb of $N = 20$ is 6×10⁻¹⁴, while the habitual power of two
+$N = 32$ still passes 0.19 of the interfering tone. Twenty averages beat
+thirty-two here, and only because of where the node lands.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

@@ -381,6 +381,48 @@ half-second reverberation time a Schroeder frequency of 163 Hz, which is
 exactly why the 125 Hz band of problem 4.18 - the band that governs the
 whole answer - should be read as an estimate and not as a number.
 
+## What this guide covers
+
+**Covered.** The Norton & Karczub §4.9 power balance (Eq. 4.101) as
+`room_to_room_transmission`, with `SourceRoom`, `equivalent_absorption_area`,
+`mean_absorption` and `room_constant`; the source-room level from a sound power
+level through the §4.6 Table 4.5 source models — constant power, constant
+volume, constant pressure — and the directivity of the machine's position;
+`DesignCriterion` with its target, its flanking allowance and its ANSI/ASA
+S12.2-2019 rating, NC by default and RC Mark II with
+`DesignCriterion(family="RC")`, plus `.required_transmission_loss`,
+`.exceedance`, `.meets_target` and `.table()`; and the §4.10 enclosure equation
+(Eq. 4.115) through `enclosure_required_transmission_loss` in both interior
+models listed by `ENCLOSURE_MODELS`.
+
+**Not covered.** The transmission loss of the partition itself, which is
+measured or predicted elsewhere; flanking as a modelled path rather than the
+flat allowance used here; and the leaks and openings of an enclosure, which
+need the composite of
+[Industrial noise control](noise-control.md). The whole chain is a diffuse-field
+argument, so it says nothing below either room's Schroeder frequency, or closer
+to a surface than roughly half a wavelength.
+
+## See also
+
+- [Panel sound insulation](../../buildings/design/panel-sound-insulation.md):
+  where the transmission loss this page consumes comes from.
+- [Building sound insulation prediction](../../buildings/design/insulation-prediction.md)
+  and [Flanking transmission](../../buildings/insulation/flanking-lab.md):
+  the EN 12354 models for the flanking paths this page only debits.
+- [Field sound insulation](../../buildings/insulation/insulation-field.md):
+  how the same room pair is measured, and the $D_{nT}$ and $R'$ a test report
+  hands back.
+- [Room-noise criteria](../../buildings/rooms/room-noise.md): the NC and
+  RC Mark II families the verdict is written in.
+- [Industrial noise control](noise-control.md):
+  the enclosure of section 5 as a construction, with its leaks and its
+  measurement standards.
+- [Sound power](../emission/sound-power.md): the machine $L_W$
+  the whole chain starts from.
+- API reference:
+  [`noise_control.room_to_room`](https://jmrplens.github.io/phonometry/reference/api/noise_control/room-to-room/).
+
 ## References
 
 - Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and

@@ -45,6 +45,14 @@ equipos instalados de EN 12354-5.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/structure_borne_power_es.svg" alt="Nivel de potencia acústica estructural inyectada en placa receptora por banda de tercio de octava, determinado en una placa de baja movilidad y otra de alta movilidad" width="82%" loading="eager" />
 
+*Una fuente, dos placas conformes, dos respuestas separadas 12,0 dB en todas las
+bandas (67,5 dB frente a 79,5 dB sumados en bandas). La placa ligera vibra
+35,1 dB más fuerte, pero también disipa a través de un $\eta m S$ unas 204 veces
+menor, y $L_{Ws}$ es la potencia que absorbe **esa placa**, no una propiedad de
+la máquina. Leída por su cuenta, ninguna de las dos curvas describe la fuente;
+la sección 4 es la que convierte cualquiera de ellas en las magnitudes
+independientes de la placa que consume EN 12354-5.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -92,8 +100,8 @@ plt.show()
 ¿Por qué una placa? Caracterizar la fuente directamente por sus fuerzas de
 contacto supondría instrumentar cada punto de fijación en hasta seis
 componentes cada uno (tres fuerzas, tres momentos), en una máquina que debe
-seguir funcionando con normalidad. La placa receptora esquiva el problema de
-contacto completo: deja la fuente funcionando sobre una placa resonante cuya
+seguir funcionando con normalidad. La placa receptora esquiva por completo el
+problema del contacto: deja la fuente funcionando sobre una placa resonante cuya
 disipación se conoce, espera al régimen estacionario, y entonces la potencia
 que la placa disipa es igual a la potencia que la fuente inyecta, sumada
 sobre todos los contactos y componentes a la vez. Un promedio espacial de la
@@ -277,8 +285,8 @@ diferencia de 1 dB entre dos determinaciones no significa nada.
 
 Hay tres modos de fallo silenciosos, y cada uno es la razón de ser de uno de los
 requisitos de arriba. El propio sonido aéreo de la fuente puede mover la placa —
-que es por lo que la placa de alta movilidad está perforada aproximadamente a la
-mitad. Un factor de pérdidas medido sobre la placa desnuda se puede arrastrar al
+que es por lo que la placa de alta movilidad está perforada en torno al 50 %. Un
+factor de pérdidas medido sobre la placa desnuda se puede arrastrar al
 caso de alta movilidad, donde la norma exige que la fuente esté colocada, y el
 error se va directo a $L_{Ws}$. Y una máquina que no ha alcanzado el régimen
 estacionario, o que se mide promediando un ciclo sin decirlo, produce un número
@@ -443,8 +451,8 @@ montada elásticamente; su media por posiciones de la ecuación (9) es
 
 Una caracterización termina como un *documento*. El
 `StructureBornePowerResult` expone un método `.report()` que escribe una ficha
-PDF de una página con el formato de una hoja de potencia acústica: la línea de
-base normativa que nombra el método de la placa de recepción de la
+PDF de una página con el formato de una hoja de ensayo de potencia acústica: la
+línea de base normativa que nombra el método de la placa receptora de la
 EN 15657:2018 (Fórmula 14), una cabecera de metadatos opcional (cliente, equipo
 fuente, entorno de ensayo, instrumentación, clima, fecha), una tabla por bandas
 (frecuencia nominal de octava/tercio de octava, el nivel de velocidad medio
@@ -482,9 +490,9 @@ res = reception_plate_power(               # la placa de baja movilidad del ap. 
 res.report(
     "structure_borne_power.pdf",
     metadata=ReportMetadata(
-        client="Instalador de servicios del edificio de ejemplo",
+        client="Empresa instaladora de ejemplo",
         specimen="Bomba circuladora (montada en pared)",
-        test_room="Banco de placa de recepción (placa pesada de hormigón)",
+        test_room="Banco de placa receptora (placa pesada de hormigón)",
         laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-15657",
     ),
@@ -498,8 +506,8 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="en15657_structure_borne_power_example"
 	title="Informe de ejemplo de potencia acústica estructural EN 15657 (PDF)"
-	description="Ficha de una página de potencia acústica estructural por el método de la placa de recepción de la EN 15657:2018: una cabecera con el cliente, el equipo fuente, el banco de placa de recepción y el acelerómetro y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de los niveles de velocidad medios de la placa Lv y los niveles de potencia acústica estructural inyectados L_Ws, el espectro L_Ws(f) con un eje de bandas nominal, y el total sumado en bandas L_Ws (dB re 1 pW) recuadrado con la masa por unidad de superficie de la placa m = 230 kg/m2 y el área S = 7,00 m2 de la placa de baja movilidad del apartado 7.2.2, cerrada por una franja de base con la relación de la Fórmula 14 y la conversión a las magnitudes de fuente independientes de la placa requerida antes de la EN 12354-5."
-	caption="Ficha de potencia acústica estructural (StructureBornePowerResult.report), una caracterización por placa de recepción EN 15657 con el total L_Ws recuadrado."
+	description="Ficha de una página de potencia acústica estructural por el método de la placa receptora de la EN 15657:2018: una cabecera con el cliente, el equipo fuente, el banco de placa receptora y el acelerómetro y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de los niveles de velocidad medios de la placa Lv y los niveles de potencia acústica estructural inyectados L_Ws, el espectro L_Ws(f) con un eje de bandas nominal, y el total sumado en bandas L_Ws (dB re 1 pW) recuadrado con la masa por unidad de superficie de la placa m = 230 kg/m2 y el área S = 7,00 m2 de la placa de baja movilidad del apartado 7.2.2, cerrada por una franja de base con la relación de la Fórmula 14 y la conversión a las magnitudes de fuente independientes de la placa requerida antes de la EN 12354-5."
+	caption="Ficha de potencia acústica estructural (StructureBornePowerResult.report), una caracterización por placa receptora EN 15657 con el total L_Ws recuadrado."
 />
 
 ## Qué cubre esta guía

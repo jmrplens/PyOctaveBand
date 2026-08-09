@@ -227,6 +227,15 @@ sustituto de esa integración, como detalla ese mismo apartado. El factor sale d
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing_es.svg" alt="Densidad espectral de potencia de Welch de ruido rosa en dB por Hz entre 20 Hz y 20 kHz, con la banda de confianza chi-cuadrado del 95 por ciento sombreada alrededor de la estimación, la curva suavizada en 1/3 de octava encima y la ley de potencias exacta de -3,01 dB por octava como línea discontinua de referencia" width="82%" loading="eager" />
 
+*Lo que compran 20 s de registro, leído sobre la figura. 467 segmentos de 4096
+muestras dan 442 promedios efectivos, un error aleatorio normalizado de 0,047 y
+una banda de confianza chi-cuadrado del 95 % de 0,81 dB de ancho, así que la
+estimación dentada no se aparta de la curva suavizada más de unos 0,8 dB en toda
+la década, y la afirmación honesta de lo que se sabe es la banda sombreada, no
+el rizado. Las dos curvas ajustan −3,007 dB/octava frente a los
+−3,01 dB/octava exactos del ruido rosa. Suavizar no estrecha nada: redibuja la
+misma estimación, y el intervalo que hay debajo sigue valiendo.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -646,6 +655,15 @@ $20\log_{10}(N\sin(\pi/2N))$, el núcleo de Dirichlet evaluado medio bin fuera d
 centro.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_es.svg" alt="Espectros de las ventanas rectangular, Hann, Hamming y Blackman a lo largo de 16 bins de la DFT, mostrando el compromiso entre anchura del lóbulo principal y nivel de los lóbulos laterales, con el ancho de banda equivalente de ruido y el lóbulo lateral máximo de cada ventana en la leyenda" width="82%" />
+
+*El compromiso en una imagen, y 0,73 de bin cuestan 44,8 dB de suelo de fuga.
+Pasar de la rectangular a la Blackman baja el lóbulo lateral máximo de −13,3 dB
+a −58,1 dB mientras el ENBW se ensancha de 1,000 a 1,727 bins y el lóbulo
+principal a −3 dB de 0,886 a 1,644 bins. La Hann se queda donde está el valor
+por defecto del módulo: −31,5 dB por 1,500 bins. Lee los dos ejes juntos: un
+lóbulo principal estrecho separa dos tonos de nivel parecido, un suelo de
+lóbulos laterales bajo encuentra un tono débil al lado de uno fuerte, y ninguna
+ventana hace las dos cosas.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

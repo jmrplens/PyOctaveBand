@@ -92,11 +92,12 @@ AREAS: tuple[tuple[str, str], ...] = (
     ("simulation", "Wave simulation"),
 )
 
-#: Pages that open the documentation rather than belonging to a topic. The
-#: About page is not here because it has no mirror edition: it is linked, by
-#: absolute URL, from the provenance section instead. It used to be listed and
-#: silently dropped, which is why an unresolvable entry is fatal now.
-START_ROUTES = ("start/getting-started", "start/why-phonometry")
+#: Pages that open the documentation rather than belonging to a topic. About
+#: joined them once it gained a mirror edition; before that it was linked by
+#: absolute URL from the provenance section instead. It used to be listed
+#: without a mirror and silently dropped, which is why an unresolvable entry is
+#: fatal now.
+START_ROUTES = ("start/getting-started", "start/why-phonometry", "start/about")
 
 
 def _check_areas_cover_the_tree() -> None:
@@ -787,7 +788,9 @@ def _check_readme_covers_the_mirror() -> None:
     The README is the GitHub front door of the docs, kept by hand, and three
     pages went missing from it inside one week of merges: nothing looked. The
     overview index files are exempt because the README's section structure is
-    its own index of the folders.
+    its own index of the folders, which
+    ``mirror_overviews.py --check`` asserts separately (it requires every
+    generated ``index.md`` to be linked from the README).
     """
     readme = (DOCS / "README.md").read_text(encoding="utf-8")
     missing = [

@@ -27,6 +27,15 @@ y una salida.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_es.svg" alt="Figura de dos paneles. Arriba: el autoespectro de salida medido en dB con la contribución de salida coherente de dos entradas sombreada debajo; la entrada 1 llena la banda baja hasta unos 400 Hz y la entrada 2 la banda alta por encima de unos 1,5 kHz, con el ruido residual muy por debajo. Abajo: para la segunda entrada correlacionada, su coherencia ordinaria ronda 0,3 en toda la banda baja aunque no excita ningún camino de baja frecuencia, mientras que su coherencia parcial se desploma a cero ahí una vez que se condiciona fuera la primera entrada; la coherencia múltiple se mantiene cerca de uno salvo en el nulo del cruce." width="88%" loading="eager" />
 
+*Toda la razón de ser de esta guía en una sola medición. La entrada 2 no excita
+nada por debajo de 400 Hz y, aun así, su coherencia **ordinaria** con la salida
+promedia ahí 0,324, heredada por entero a través de su correlación con la
+entrada 1. Si se condiciona fuera la entrada 1, su coherencia **parcial** en esa
+misma banda cae por debajo de 1×10⁻⁴: a 200 Hz, 2,6×10⁻⁶. La coherencia múltiple
+se mantiene en 0,997 en toda esa banda, así que el modelo no tiene la culpa:
+quien leyera solo las coherencias ordinarias se gastaría el dinero en silenciar
+la fuente equivocada.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 
@@ -307,7 +316,7 @@ mantén `nperseg` bien por encima del mayor retardo restante.
 
 Los estimadores comparten el núcleo de Welch de la página de
 [análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/)
-(mismo enventanado de Hann, solape del 50 % y calibración sin quitar
+(mismo enventanado de Hann, solape del 50 % y calibración sin eliminación de
 tendencia), de modo que una coherencia MISO y un `power_spectral_density`
 calculados con la misma longitud de segmento son congruentes bin a bin.
 

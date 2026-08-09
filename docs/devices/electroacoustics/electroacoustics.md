@@ -296,6 +296,24 @@ microphone side, its sensitivity references, directional patterns,
 inherent-noise weightings and its own rated-characteristics report, lives
 in [Microphone Characterisation (IEC 60268-4)](microphones.md).
 
+## See also
+
+- [Loudspeaker Characterisation (IEC 60268-5)](loudspeakers.md):
+  the sensitivity conventions, the radiating piston and the
+  rated-characteristics report these measurements feed.
+- [Microphone Characterisation (IEC 60268-4)](microphones.md):
+  the microphone sensitivity references, directional patterns, noise
+  weightings and rated-characteristics report.
+- [Industrial noise control](../noise-control/noise-control.md): HVAC duct
+  methods and machine enclosures on the receiving end of a noisy device.
+- [Swept-sine distortion](swept-sine-distortion.md): the
+  Farina/Novak harmonic separation whose THD(f) feeds the loudspeaker
+  distortion panel.
+- [Two-channel system measurement](../../signals/spectra/system-measurement.md):
+  the physical arrangement behind the $H_1$ estimate of section 5, with the
+  reference tap and the two synchronous channels drawn.
+- API reference: [`electroacoustics.distortion`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/distortion/), [`electroacoustics.intermodulation`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/intermodulation/), [`electroacoustics.noise_measurements`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/noise-measurements/) and [`electroacoustics.frequency_response`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/frequency-response/).
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and

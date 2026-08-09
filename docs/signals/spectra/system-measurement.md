@@ -1,3 +1,5 @@
+← [Documentation index](../../README.md)
+
 # System measurement: Golay, shaped sweeps, inversion
 
 The [room-acoustics guide](../../buildings/rooms/room-acoustics.md) recovers
@@ -138,7 +140,7 @@ $$
 
 (Eqs. (11)-(12)), integrate the group delay into a phase, and inverse-FFT.
 The sweep then follows *any* spectral shape with a nearly constant envelope,
-keeping the crest factor close to a swept sine's ideal 3.02 dB - unlike a
+keeping the crest factor close to a swept sine's ideal 3.01 dB - unlike a
 noise signal with the same spectrum, which sits ~6 dB higher. `shaped_sweep_signal`
 implements the construction with the paper's band-limiting and Nyquist-phase
 details; `target` is `"pink"` (the classical room-measurement emphasis,
@@ -381,6 +383,32 @@ machinery used to verify the shaped sweep is the
 [calibrated spectral analysis](spectral-analysis.md) page,
 and the equalized responses feed the same downstream chain as every
 [impulse response](../../buildings/rooms/room-acoustics.md).
+
+## What this guide covers
+
+**Covered.** The complementary Golay pair (Golay 1961; Havelock, Kuwano &
+Vorländer eds., 2008, Part I Ch. 6 by Xiang): the append recursion, the exact
+complementary-autocorrelation identity and the summed-correlation recovery, in
+`golay_pair` and `golay_impulse_response`. The group-delay sweep synthesis of
+Müller & Massarani (2001, Secs. 4.2-4.3), in `shaped_sweep_signal`. The
+frequency-dependent Tikhonov regularization of Kirkeby & Nelson (1999, Eq. 17
+and Sec. 2.4), in `regularized_inverse_filter`.
+
+**Not covered.** These are measurement-engineering methods from the
+transfer-function literature rather than a certification standard, so no
+compliance clause exists to check them against. Kirkeby & Nelson's original
+inversion targets multi-loudspeaker reproduction, with a matrix regularization
+for crosstalk cancellation between channels; `regularized_inverse_filter`
+implements the single-channel, scalar case of their Eq. 17 and nothing else.
+
+## See also
+
+- [Room acoustics](../../buildings/rooms/room-acoustics.md): the ISO 18233 sweep and MLS excitations the Golay pair sits beside.
+- [Swept-sine distortion](../../devices/electroacoustics/swept-sine-distortion.md): reading the harmonic packets a sweep separates out.
+- [Loudspeakers](../../devices/electroacoustics/loudspeakers.md): the reference axis, distance and free-field conditions the measured response needs.
+- [Calibrated spectral analysis](spectral-analysis.md): the Welch machinery that verifies the shaped sweep, and the smoothing the inversion wants first.
+- [Correlation and delay](correlation-delay.md): the loopback measurement that aligns the two Golay records.
+- API reference: [`signals.inversion`](https://jmrplens.github.io/phonometry/reference/api/signals/inversion/).
 
 ## References
 

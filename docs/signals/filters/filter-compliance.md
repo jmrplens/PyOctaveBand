@@ -331,3 +331,13 @@ IEC 61260:1995 and ANSI S1.11-2004, *Octave-Band and Fractional-Octave-Band …
 Filters*: the withdrawn edition's Table 1 (identical between the two)
 supplies the stricter class 0 mask offered by ``edition="1995"`` and
 verified in §2.
+
+**Not covered.** `verify_filter_class` checks a *designed digital response*
+against Table 1, not an instrument. IEC 61260-1's conformance tests for the
+physical filter — overload recovery, filter linearity, environmental influences
+— apply to hardware and are not run here; they belong to **IEC 61260-2:2016**
+(pattern evaluation) and **IEC 61260-3:2016** (periodic tests), which this page
+only summarises. Near Nyquist the bilinear transform warps the frequency axis
+and the bank carries no correction for it, so the stopband mask beyond the
+processing Nyquist is reported as `range_limited` rather than verified.
+

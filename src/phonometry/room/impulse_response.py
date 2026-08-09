@@ -739,7 +739,7 @@ class ShapedSweepResult:
     :ivar f_range: ``(f1, f2)`` band covered by the sweep, in Hz.
     :ivar crest_factor_db: Peak-to-RMS ratio over the sweep's central
         (constant-envelope) interval, in dB. A time-domain swept sine has
-        the ideal 3.02 dB; the frequency-domain synthesis stays close to
+        the ideal 3.01 dB; the frequency-domain synthesis stays close to
         it (Mueller & Massarani 2001, Sec. 4.3: normally below 4 dB).
         Their figure assumes the slight magnitude smoothing the paper
         applies before synthesis, which this module does not implement:
@@ -886,7 +886,7 @@ def shaped_sweep_signal(
     so the sweep dwells on each frequency for a time proportional to the
     energy it must radiate there and its temporal envelope stays nearly
     constant -- the crest factor stays close to a swept sine's ideal
-    3.02 dB regardless of the spectral shape (Sec. 4.3). The phase is the
+    3.01 dB regardless of the spectral shape (Sec. 4.3). The phase is the
     integral of the group delay, corrected to land on a real spectrum at
     Nyquist (Eq. (10)), and the sweep is obtained by inverse FFT over a
     block at least double the sweep length so the pre-ringing of the

@@ -331,6 +331,29 @@ The models are anchored by independent oracles:
 These checks are pinned numerically in the
 [conformance report](../../CONFORMANCE.md) (section "Atmospheric refraction").
 
+## What this guide covers
+
+**Covered.** The ray model — Runge-Kutta integration of Snell's law in
+`atmospheric_ray_paths` — with the closed-form linear-profile geometry
+(`ray_curvature_radius`, `shadow_zone_distance`, Salomons Sec. 4.4), and the
+Green's Function parabolic equation (`atmospheric_parabolic_equation`, Salomons
+Appendices G and H): the Gaussian starter, the finite-impedance ground
+reflection, the refraction phase screen and the absorbing top layer. The
+homogeneous limit is checked against the exact spherical ground effect (a few
+tenths of a decibel, including the +6 dB rigid-ground enhancement), the ray
+geometry to machine precision, and reciprocity and the shadow-zone collapse as
+tests.
+
+**Not covered.** Both models take one effective sound-speed profile that varies
+with height alone. A horizontally inhomogeneous atmosphere — a gradient that
+changes along the path — is outside their range-independent formulation, which
+is the airborne counterpart of the range-independent ocean solvers. Both also
+assume flat ground at $z = 0$; neither accepts a terrain elevation profile.
+
+## See also
+
+- Theory: [Outdoor propagation](../../reference/theory/environment-transport.md#outdoor-propagation-general-method-iso-9613-2): the meteorological assumptions ISO 9613-2 makes, which is what refraction takes apart.
+
 ## References
 
 - Salomons, E. M. (2001). *Computational Atmospheric Acoustics*. Kluwer /

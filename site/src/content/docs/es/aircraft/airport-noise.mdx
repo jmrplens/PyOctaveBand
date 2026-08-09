@@ -57,6 +57,15 @@ linealmente en potencia (Ec. 4-3) y log-linealmente en distancia oblicua
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_noise_es.svg" alt="Curvas nivel-potencia-distancia para dos ajustes de potencia; el nivel de evento cae log-linealmente con la distancia oblicua entre los nodos tabulados" width="82%" />
 
+*Los marcadores son las únicas distancias que la tabla afirma; todo lo que hay
+entre ellos es la interpolación. Las dos curvas son casi paralelas, separadas
+entre 8,7 y 9,2 dB en todo el intervalo, así que el empuje desplaza sobre todo
+el nivel mientras que la distancia fija la forma, y la caída es de 21,7 dB por
+década de distancia oblicua en lugar de los 20 dB de la divergencia sola,
+siendo el exceso la absorción de la atmósfera de referencia. La potencia se
+interpola **linealmente**, no en decibelios: 16 000 N da 88,15 dB a 1 km, justo
+a mitad de camino entre las dos filas tabuladas.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -259,9 +268,9 @@ plt.show()
 
 ### Un evento único, segmento a segmento
 
-`event_level` hace el ensamblado. Pon un receptor 3 km traza abajo, 500 m al
-costado de un despegue y 1,2 m sobre el suelo, y pídele su nivel de exposición
-sonora:
+`event_level` hace el ensamblado. Pon un receptor a 3 km a lo largo de la traza,
+500 m al costado de un despegue y 1,2 m sobre el suelo, y pídele su nivel de
+exposición sonora:
 
 ```python
 import numpy as np
@@ -363,8 +372,8 @@ razón por la que el contorno no cierra simétricamente en el extremo de la pist
 Los
 contornos más exteriores son los menos fiables: los fijan los segmentos a mayor
 distancia oblicua, donde la tabla NPD se está extrapolando. Esto es un
-movimiento, no un estudio: un contorno de planeamiento acumula muchos sucesos así
-en un índice tipo $L_{den}$, que es el «No cubierto» de esta página.*
+movimiento, no un estudio: un contorno de planeamiento acumula muchos eventos
+así en un índice tipo $L_{den}$, que es el «No cubierto» de esta página.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -420,6 +429,15 @@ de chorro: máxima hacia un acimut $\psi \approx 120°$ respecto al morro, y
 decreciente al través ($\psi = 90°$) y directamente detrás ($\psi = 180°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor_es.svg" alt="Diagrama polar de la directividad de inicio del recorrido de despegue ΔSOR sobre el semicírculo trasero para reactor turbofán y turbohélice, con un lóbulo cerca de 120° respecto al morro" width="75%" />
+
+*El lóbulo es estrecho y la penalización que queda detrás es grande. A 300 m el
+reactor alcanza su máximo de +0,99 dB en $\psi$ = 123° y el turbohélice +1,96 dB
+en 121°, los dos a menos de 0,2 dB del valor al través en 90°; en 180°, justo
+detrás de la aeronave, han bajado a −13,5 y −10,1 dB. Un receptor situado unos
+pocos grados fuera del lóbulo ve por tanto una contribución de inicio del
+recorrido de despegue completamente distinta, que es la razón de que
+$\Delta_{SOR}$ se aplique por segmento y por receptor y no como una corrección
+única al evento.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

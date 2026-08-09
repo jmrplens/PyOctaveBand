@@ -224,6 +224,13 @@ those standardized cases:
   [occupational measurements](../../perception/hearing/occupational-exposure.md) budgets sampling,
   instrument and position contributions in exactly this way.
 
+## See also
+
+- [Data qualification](data-qualification.md): the stationarity checks every averaged input silently assumes.
+- [Calibration](calibration.md): the tolerance and drift inputs of every calibrated chain.
+- API reference: [`metrology.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/metrology/uncertainty/).
+- Theory: [Measurement uncertainty (GUM)](../../reference/theory/signal-analysis.md#measurement-uncertainty-isoiec-guide-98-3-gum-and-supplement-1): the law of propagation of uncertainty, the coverage factor and where the Monte Carlo supplement takes over.
+
 ## References
 
 - Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement

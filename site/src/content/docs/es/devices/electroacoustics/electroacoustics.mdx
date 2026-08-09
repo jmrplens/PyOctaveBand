@@ -165,8 +165,8 @@ de cuatro maneras: la $\mathrm{THD}_F$ cuenta los armónicos contra el
 fundamental y la $\mathrm{THD}_R$ contra el total — se diferencian en el factor
 $1/\sqrt{1 + \mathrm{THD}_F^2}$ y son indistinguibles por debajo de un 10 %
 aproximadamente, que es la razón de que aquí las dos anotaciones queden una
-encima de otra —, mientras que la THD+N añade la hierba que hay entre los
-armónicos y el SINAD es su recíproco en dB.*
+encima de otra —, mientras que la THD+N añade el ruido de fondo que hay entre
+los armónicos y el SINAD es su recíproco en dB.*
 
 ```python
 from phonometry import electroacoustics
@@ -307,11 +307,11 @@ más arriba. Para el fundamental de 100 Hz del fragmento descuenta 13,8 dB al
 segundo armónico y 10,3 dB al tercero, y levanta todo lo que queda por encima de
 1 kHz — del orden décimo en adelante —, así que una THD ponderada no es una THD
 «más exacta», sino una reordenación deliberada: perdona la distorsión de orden
-bajo de una no linealidad suave y penaliza los productos de orden alto que
-sueltan un cruce por cero o un límite de slew rate. Por eso el apartado restringe
-la medición a fundamentales entre 31,5 Hz y 400 Hz, donde los órdenes que
-importan caen bajo el pico. La forma CCIR-RMS es la misma curva bajada para que
-el punto unidad sea 2 kHz en vez de 1 kHz: una renormalización, no una red
+bajo de una no linealidad suave y penaliza los productos de orden alto que genera
+una distorsión de cruce por cero o un límite de slew rate. Por eso el apartado
+restringe la medición a fundamentales entre 31,5 Hz y 400 Hz, donde los órdenes
+que importan caen bajo el pico. La forma CCIR-RMS es la misma curva bajada para
+que el punto unidad sea 2 kHz en vez de 1 kHz: una renormalización, no una red
 distinta.*
 
 <details>
@@ -583,8 +583,8 @@ $\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_d})$ para $n_d$
 promedios, así que $\gamma^2 = 0{,}9$ necesita unos 22 promedios para un error
 de magnitud del 5 %. Como regla de trabajo, una banda cuya coherencia se queda
 por debajo de 0,9 aproximadamente está **sin medir**, más que mal medida, y su
-magnitud de $H_1$ no debería darse: una coherencia baja es la medición
-diciéndote que la salida de ahí no queda explicada linealmente por la entrada.
+magnitud de $H_1$ no debería darse: con una coherencia baja, la medición te está
+diciendo que la salida de ahí no queda explicada linealmente por la entrada.
 Un único segmento da $\gamma^2 \equiv 1$ por construcción y no significa
 absolutamente nada.
 
@@ -600,16 +600,48 @@ from phonometry import electroacoustics
 fs = 48000
 n = 400000
 rng = np.random.default_rng(7)
-x = rng.standard_normal(n)
+clean_x = rng.standard_normal(n)
 b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # dispositivo bajo ensayo
-y = sp.lfilter(b, a, x)
-y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # ruido de salida
+clean_y = sp.lfilter(b, a, clean_x)
 
-# La columna izquierda de la figura: el mismo registro, los dos estimadores.
-h1 = electroacoustics.transfer_function(x, y, fs, estimator="H1")
-h2 = electroacoustics.transfer_function(x, y, fs, estimator="H2")
-plt.semilogx(h1.frequencies, h1.magnitude_db, label="H1")
-plt.semilogx(h2.frequencies, h2.magnitude_db, label="H2")
+# Las dos columnas: el mismo camino, con el ruido pasado de un canal al otro.
+# Un 5 % en la salida; un 50 % en la entrada, porque el sesgo por ruido de
+# entrada es uniforme en toda la banda y con un 5 % sería invisible a esta escala.
+out_noise, in_noise = 0.05, 0.5
+y_out = clean_y + rng.standard_normal(n) * np.sqrt(np.mean(clean_y ** 2)) * out_noise
+x_in = clean_x + rng.standard_normal(n) * np.sqrt(np.mean(clean_x ** 2)) * in_noise
+cases = (("Ruido en la salida: H1 es insesgado", clean_x, y_out),
+         ("Ruido en la entrada: H2 es insesgado", x_in, clean_y))
+
+fig, axes = plt.subplots(2, 2, figsize=(11.4, 7.6), sharex=True,
+                         gridspec_kw={"height_ratios": [2.0, 1.0]})
+for col, (title, xx, yy) in enumerate(cases):
+    h1 = electroacoustics.transfer_function(xx, yy, fs, estimator="H1")
+    h2 = electroacoustics.transfer_function(xx, yy, fs, estimator="H2")
+    _, h_true = sp.freqz(b, a, worN=h1.frequencies, fs=fs)
+    pos = h1.frequencies > 0.0
+    freqs = h1.frequencies[pos]
+
+    ax_mag, ax_coh = axes[0][col], axes[1][col]
+    ax_mag.semilogx(freqs, 20 * np.log10(np.abs(h_true[pos])), "--", label="|H| verdadera")
+    ax_mag.semilogx(freqs, h1.magnitude_db[pos], label="H1 = Gxy / Gxx")
+    ax_mag.semilogx(freqs, h2.magnitude_db[pos], "-.", label="H2 = Gyy / Gyx")
+    ax_mag.set(ylim=(-80.0, 12.0), title=title)
+    ax_mag.legend(fontsize=8)
+
+    # El suelo de coherencia que enuncia la sección, a partir de la SNR local.
+    if col == 0:   # ruido de salida: la SNR sigue a |H|, así que el suelo se hunde
+        snr = (np.abs(h_true[pos]) ** 2 * np.mean(clean_x ** 2)
+               / (np.mean(clean_y ** 2) * out_noise ** 2))
+    else:          # ruido de entrada: la misma relación en todas las bandas
+        snr = np.full_like(freqs, 1.0 / in_noise ** 2)
+    ax_coh.semilogx(freqs, h1.coherence[pos], label="medida")
+    ax_coh.semilogx(freqs, snr / (1.0 + snr), ":", label="SNR / (1 + SNR)")
+    ax_coh.axhline(0.9, ls="--", lw=1.0)
+    ax_coh.set(xlabel="Frecuencia [Hz]", ylim=(0.0, 1.05), xlim=(20.0, fs / 2))
+    ax_coh.legend(fontsize=8)
+axes[0][0].set_ylabel("Magnitud [dB]")
+axes[1][0].set_ylabel("Coherencia")
 plt.show()
 ```
 

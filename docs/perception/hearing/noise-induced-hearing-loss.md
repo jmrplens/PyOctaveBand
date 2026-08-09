@@ -87,6 +87,40 @@ cut-off level $L_0$ and the coefficients $u$, $v$ of Table 1 are lowest where
 the ear is most vulnerable, so the same $L_{EX,8h}$ buys far more shift at
 4 kHz than at 500 Hz.
 
+**Test-report fiche.** `NiptsResult.report(path)` renders the one-page
+prediction an occupational-hygiene service issues for an exposure group,
+following ISO 1999:2013 clause 6.3: a prediction-basis line, an optional
+metadata header (company, worker or group, workplace, date of assessment), a
+table of the median $N_{50}$ and the fractile NIPTS at the six audiometric
+frequencies beside the spectrum plot with its fractile band, and the boxed
+shift averaged over the 2/3/4 kHz hearing-handicap set together with the
+exposure conditions — $L_{EX,8h}$, the duration in years and the population
+percentage $Q$. Two notes keep it honest and both are printed on the fiche:
+the values are a statistical prediction for the exposed population, not
+anyone's audiogram, and ISO 1999 leaves the choice of handicap frequencies to
+the user. `verbose=True` adds the $d_u$/$d_l$ spread columns; a `requirement`
+in the metadata is read as the maximum acceptable representative NIPTS and adds
+a PASS/FAIL row, so a *smaller* shift passes. Rendering needs reportlab and
+matplotlib (`pip install "phonometry[report,plot]"`), only
+`engine="reportlab"` is supported, and `language="es"` renders a Spanish fiche.
+
+```python
+from phonometry import ReportMetadata, hearing
+
+# The 90 dB(A) / 20 year case above, most-susceptible tenth.
+res = hearing.nipts(90.0, 20.0, fractile=0.9)
+res.report(
+    "nipts_fiche.pdf",
+    metadata=ReportMetadata(
+        client="Example fabrication works",
+        specimen="Welders (homogeneous exposure group, 4 workers)",
+        test_room="Steel assembly hall, line 2",
+    ),
+)                                   # NIPTS averaged over 2/3/4 kHz (dB)
+```
+
+[![ISO 1999 NIPTS prediction example report: a metadata header (company, worker group, workplace, date of assessment), a table of the median N50 and the NIPTS at the requested fractile from 500 Hz to 6000 Hz (12.9 dB and 17.8 dB at 4000 Hz), the spectrum plot with its 10-90 % fractile band, and the boxed predicted NIPTS averaged over 2/3/4 kHz = 13.9 dB for a noise exposure LEX,8h = 90 dB over 20 years at population fractile Q = 10 %](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1999_nipts_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1999_nipts_example.pdf)
+
 ## 2. Age and noise combined: HTLAN (clause 6.1)
 
 The noise component does not simply add to the age component: ISO 1999
@@ -185,6 +219,51 @@ The `NiptsResult` carries the `median` ($N_{50}$), the
 and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
 alone is the subject of the [hearing-threshold](hearing-threshold.md) guide.
+
+**Test-report fiche.** `HtlanResult.report(path)` renders the companion fiche
+for the combined threshold, following ISO 1999:2013 clause 6.1. It carries the
+same prediction-basis line and metadata header as the NIPTS fiche, but its
+table has three columns — the age component $H$, the noise component $N$ and
+the combined $H'$ at each audiometric frequency — beside the three-curve plot,
+and the boxed value is the threshold averaged over the 2/3/4 kHz
+hearing-handicap set, printed with the listener and exposure conditions (age
+and sex, $L_{EX,8h}$ over the exposure years, and the population percentage
+$Q$). One note is specific to this fiche: the age component is database A
+evaluated from ISO 7029:2017, whose values differ from the illustrative
+Table A.3 selection of ISO 1999, which derives from an earlier edition.
+`verbose=True` gives the compression term $HN/120$ its own column, and a
+`requirement` is read as the maximum acceptable representative HTLAN.
+
+```python
+from phonometry import ReportMetadata, hearing
+
+# The 60-year-old machine operator of this section, median.
+res = hearing.htlan(60, "male", 95.0, 30.0, fractile=0.5)
+res.report(
+    "htlan_fiche.pdf",
+    metadata=ReportMetadata(
+        client="Example fabrication works",
+        specimen="Machine operator (60 years, 30 years in role)",
+        test_room="Steel assembly hall, line 2",
+    ),
+)                                   # HTLAN averaged over 2/3/4 kHz (dB HL)
+```
+
+[![ISO 1999 HTLAN prediction example report: a metadata header, a table of the age component H, the noise component N and the combined threshold H' from 500 Hz to 6000 Hz (20.2, 24.8 and 40.8 dB at 4000 Hz), the plot of the three curves, and the boxed predicted hearing threshold level averaged over 2/3/4 kHz = 33.0 dB HL for a 60-year-old male listener exposed at LEX,8h = 95 dB over 30 years at population fractile Q = 50 %](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1999_htlan_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1999_htlan_example.pdf)
+
+## See also
+
+- [Occupational noise exposure](occupational-exposure.md): the
+  ISO 9612 survey that produces the $L_{EX,8h}$ this model consumes, and the
+  uncertainty that comes with it.
+- [Hearing threshold](hearing-threshold.md): the ISO 7029 age
+  component $H$ this model adds the noise component to, and the ISO 389-7 zero
+  the dB HL scale is referred to.
+- [Speech Intelligibility Index](../speech/speech-intelligibility.md): what a
+  shifted threshold costs in speech audibility, which is the consequence a
+  worker actually notices.
+- API reference: [`hearing.noise_induced_hearing_loss`](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/).
+- Theory: [Noise-induced hearing loss (ISO 1999)](../../reference/theory/perception.md#noise-induced-hearing-loss-iso-1999): the ISO 1999 threshold-shift model, its median and its percentile spread.
 
 ## References
 

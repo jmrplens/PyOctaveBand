@@ -17,7 +17,7 @@ import os
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from .i18n import _ES
+from .i18n import lookup, visit
 
 
 @dataclass(frozen=True)
@@ -55,7 +55,7 @@ class SVG:
 
     def tr(self, s: str) -> str:
         """Translate a user-visible string for the current language."""
-        return _ES.get(s, s) if self.lang == "es" else s
+        return lookup(s, translate=self.lang == "es")
 
     # -- primitives -------------------------------------------------------
     def add(self, fragment: str) -> None:
@@ -208,6 +208,7 @@ def _write(output_dir: str, name: str, build: Callable[[SVG, Theme], None], titl
            height: int = 560) -> None:
     for lang, lang_suffix in (("en", ""), ("es", "_es")):
         for th in (LIGHT, DARK):
+            visit(name, lang)
             svg = SVG(900, height, th, lang)
             build(svg, th)
             path = os.path.join(output_dir, f"{name}{lang_suffix}{th.suffix}.svg")

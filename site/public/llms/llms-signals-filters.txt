@@ -460,6 +460,17 @@ octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
 edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
 one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
 
+## See also
+
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): the
+  five architectures compared at the band edges, the full response gallery
+  and per-architecture usage, with the Linkwitz-Riley crossover.
+- [Filter Class Verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signals/filters/filter-compliance/):
+  the Table 1 acceptance mask, class 0 and the compliance fiche of the banks
+  designed here.
+- API reference: [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/), [`filters.core`](https://jmrplens.github.io/phonometry/reference/api/filters/core/) and [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/).
+- Theory: [Octave Band Frequencies](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#octave-band-frequencies-ansi-s111--iec-61260): where the base-10 midband grid and the band edges come from, and why the bank is designed on them rather than on nominal labels.
+
 ## References
 
 - International Electrotechnical Commission. (2014). *Electroacoustics —
@@ -1222,6 +1233,15 @@ Filters*: the withdrawn edition's Table 1 (identical between the two)
 supplies the stricter class 0 mask offered by ``edition="1995"`` and
 verified in §2.
 
+**Not covered.** `verify_filter_class` checks a *designed digital response*
+against Table 1, not an instrument. IEC 61260-1's conformance tests for the
+physical filter — overload recovery, filter linearity, environmental influences
+— apply to hardware and are not run here; they belong to **IEC 61260-2:2016**
+(pattern evaluation) and **IEC 61260-3:2016** (periodic tests), which this page
+only summarises. Near Nyquist the bilinear transform warps the frequency axis
+and the bank carries no correction for it, so the stopband mask beyond the
+processing Nyquist is reported as `range_limited` rather than verified.
+
 ---
 
 
@@ -1421,6 +1441,15 @@ for x in audio_stream(block):            # your capture callback
 | `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
 | `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
+
+## See also
+
+- [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/): the offline bank streaming reproduces bit for bit, and the `zero_phase` mode streaming cannot use.
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signals/filters/multichannel/): one state per channel, and where the computation time actually goes.
+- [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/#6-block-processing): the functional detector API with the state passed by hand.
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): which metrics accumulate across blocks and which must be recomputed on the pooled envelope.
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.core`](https://jmrplens.github.io/phonometry/reference/api/filters/core/).
+- Theory: [Filter Bank Design and Numerical Stability](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#filter-bank-design--numerical-stability): why a bank is designed as second-order sections and decimated per band, which is what makes streaming state possible at all.
 
 ## References
 

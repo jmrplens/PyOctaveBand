@@ -410,6 +410,32 @@ assume stationarity. And when it passes, the
 *remaining* random error of every averaged estimate with a clean
 conscience.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol Section 4.5.2 with Table A.6 — the reverse
+arrangement trend test in `trend_test`, its exact and normal-approximation
+p-values and Example 4.4 — the Wald & Wolfowitz (1940) runs test
+(`trend_test(method="runs")`), the Section 10.3.1.1 segment mean-square
+stationarity procedure with Example 10.3 (`stationarity_test`), and the
+Rice (1945) level-crossing and peak statistics of Section 5.5
+(`level_crossing_rate`, `peak_statistics`, the irregularity factor and its
+Rayleigh/Gaussian peak-height limits).
+
+**Not covered.** The book's Section 10.3 is titled "data qualification" much
+more broadly, and also covers classification, validation and editing. Only its
+quantitative core, the segment mean-square stationarity test, is implemented.
+Classifying a record's type, validating it against physical limits and editing
+out glitches stay manual steps, the way the book describes them.
+
+## See also
+
+- [Spectral analysis](../spectra/spectral-analysis.md): the chi-square confidence interval that assumes the stationarity this page tests.
+- [Time-frequency analysis](../spectra/time-frequency.md): the short-time view for records that fail the test, and for the glides its mean square cannot see.
+- [GUM uncertainty](gum-uncertainty.md): propagating the remaining random error of a qualified average.
+- [Levels](../levels/levels.md): the $L_{eq}$ whose definition assumes one stationary measurement.
+- API reference: [`metrology.data_qualification`](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/).
+- Theory: [Measurement uncertainty (GUM)](../../reference/theory/signal-analysis.md#measurement-uncertainty-isoiec-guide-98-3-gum-and-supplement-1): the uncertainty framework the qualification criteria of this page feed.
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and

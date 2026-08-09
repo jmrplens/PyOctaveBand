@@ -235,7 +235,7 @@ $$
 (Ecs. (11)-(12)), integrar el retardo de grupo en una fase, y aplicar la FFT
 inversa. El barrido sigue entonces *cualquier* forma espectral con una
 envolvente casi constante, manteniendo el factor de cresta cerca del ideal
-de 3,02 dB de un seno barrido - a diferencia de una señal de ruido con el
+de 3,01 dB de un seno barrido - a diferencia de una señal de ruido con el
 mismo espectro, que queda ~6 dB por encima. `shaped_sweep_signal` implementa
 la construcción con los detalles de limitación en banda y de fase en Nyquist
 del artículo; `target` es `"pink"` (el énfasis clásico de medición de salas,
@@ -251,6 +251,14 @@ sweep.plot(language="es")
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shaped_sweep_es.svg" alt="Dos paneles para un barrido conformado rosa de 50 hercios a 5 kilohercios: la forma de onda temporal con una envolvente casi constante durante dos segundos y, debajo, el espectro de Welch del barrido cayendo tres decibelios por octava exactamente sobre la línea discontinua del objetivo rosa dentro de la banda sombreada del barrido" width="88%" loading="eager" />
+
+*Los dos paneles son la misma afirmación vista dos veces. La envolvente es plana
+porque la forma se compró con tiempo de permanencia y no con amplitud, que es
+por lo que el factor de cresta es de 4,22 dB: 1,2 dB por encima del ideal de
+3,01 dB de un seno barrido y unos 6 dB por debajo del ruido conformado con el
+mismo espectro. El espectro de Welch medido ajusta −3,013 dB/octava y se queda
+a menos de 0,74 dB del objetivo rosa en toda la banda de 50 Hz a 5 kHz, así que
+lo que ve el amplificador es el objetivo y no una aproximación suya.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -343,8 +351,8 @@ una medida. Cinco decisiones la convierten en una.
   micrófono con `power_spectral_density`, suavízalo a tercios de octava y usa su
   *forma* más el margen que quieras como objetivo del barrido. El espectro
   emitido sigue entonces al ruido y la respuesta deconvolucionada tiene una
-  relación señal-ruido plana, en lugar de un medio bueno y una octava grave
-  inservible.
+  relación señal-ruido plana, en lugar de una banda media buena y una octava
+  grave inservible.
 - **La duración sale del margen que te falte.** Duplicar la longitud del barrido
   compra unos 3 dB de relación señal-ruido en la respuesta deconvolucionada, así
   que la duración es aritmética, acotada por arriba por la invariancia temporal
@@ -392,7 +400,7 @@ debajo del límite de la ventana, la alternativa habitual es una medida sobre
 plano rígido.
 
 Ecualizar con una respuesta medida significa invertirla, y un recíproco puro
-$1/H(f)$ estalla allí donde el sistema radia poca energía - un valle en
+$1/H(f)$ se dispara allí donde el sistema radia poca energía - un valle en
 banda, todo lo que queda fuera de banda - convirtiendo el ecualizador en un
 amplificador de ruido. Müller y Massarani confinan la inversión con un paso
 banda (Secs. 3.1, 4.5); la forma general de ese confinamiento es la
@@ -430,6 +438,14 @@ inv.plot(language="es")
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/regularized_inversion_es.svg" alt="Magnitudes sobre frecuencia logarítmica para una inversión regularizada de una respuesta paso banda: la respuesta medida en azul, el filtro inverso en rojo reflejándola dentro de la banda ecualizada sombreada de 200 hercios a 4 kilohercios, y el producto ecualizado en verde leyendo exactamente cero decibelios en la banda y cayendo fuera, donde la regularización limita la ganancia" width="88%" loading="eager" />
+
+*La curva verde es toda la prueba: dentro de la banda ecualizada se aparta de
+0 dB como mucho 9×10⁻⁶ dB, que es $\varepsilon/(|H|^2+\varepsilon)$ evaluada
+bin a bin y no un resultado ajustado. Fuera de ella la inversa roja se detiene
+en lugar de trepar: el refuerzo queda acotado en −6,03 dB respecto de la unidad
+en banda, el máximo analítico $1/(2\sqrt\varepsilon)$. Un $1/H$ a secas se
+saldría por arriba de este eje justo en las dos zonas donde la respuesta azul se
+sale por abajo.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

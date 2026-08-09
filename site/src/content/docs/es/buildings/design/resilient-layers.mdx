@@ -201,6 +201,16 @@ ceros donde les corresponde.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/soft_covering_prediction_es.svg" alt="Mejora prevista del aislamiento a ruido de impactos de dos revestimientos de suelo blandos sobre una losa de hormigón de 140 mm: un revestimiento rígido de PVC cuya frecuencia de corte de 2318 Hz lo deja inútil en todo el rango de edificación, y un revestimiento con soporte elástico cuya frecuencia de corte de 100 Hz da 70 dB a 5 kHz, cada uno frente a su estimación de dos rectas de 12 dB por octava" width="80%" />
 
+*Dos revestimientos de 5 mm sobre la misma losa, que solo se diferencian en el
+módulo, y toda la distancia entre ellos es $f_\text{co}$. El PVC rígido la sitúa
+en 2318 Hz, por encima de casi todo el rango de valoración, así que a 3150 Hz
+todavía vale 3,4 dB y no compra nada donde vive el ruido de pisadas; el de
+soporte elástico, con 100 Hz, ya vale 17,0 dB a 250 Hz y llega a 69,6 dB a
+5 kHz. Por encima de $f_\text{co}$ ambos suben a 12 dB por octava, y la
+construcción punteada de dos rectas sigue los valores por banda dentro de unos
+3 dB salvo alrededor de los ceros de la transformada, donde la banda de 315 Hz
+queda 7,8 dB alta.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -268,7 +278,7 @@ f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
 \qquad (s'\ \text{en MN/m}^3,\ m'\ \text{en kg/m}^2),
 $$
 
-donde 160 es el redondeo que hace la norma de $1000/2\pi$. Por encima, qué ley
+donde 160 es el redondeo de $1000/2\pi$ que hace la norma. Por encima, qué ley
 se aplica es una pregunta sobre el amortiguamiento, no sobre la capa:
 
 | Modelo | Ley | Cuándo |
@@ -288,6 +298,13 @@ cerca de 100 Hz produce un $\Delta L_w$ optimista justo en la banda que decide
 la valoración. Comprueba dónde cae $f_0$ antes de fiarte del número.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_es.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 35 mm y 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
+
+*Mismos $s'$ y $m'$, la misma resonancia de 52,8 Hz, nada por debajo de ella — y
+tres respuestas que se separan justo por encima: a 1 kHz 38,3, 51,1 y 57,8 dB, y
+a 5 kHz 59,3, 79,1 y 98,7 dB. Elegir la rama es elegir la respuesta, y esa
+elección es una afirmación sobre el amortiguamiento interno de la solera y sobre
+la impedancia de la superficie de paso, no sobre la capa elástica, que es la
+misma en las tres.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -368,13 +385,10 @@ resilient_mount_improvement(
 
 ## Capas adicionales: el anexo D lee la magnitud global en la resonancia
 
-Una capa adicional sobre una pared (un trasdosado, en el lenguaje de obra;
-«capa adicional» es el término que emplea la versión española de la norma,
-comprobado en UNE-EN ISO 12354-2:2018) es el mismo
-problema de resorte con el signo cambiado: puede *reducir* el aislamiento
-acústico, y el anexo D de
-ISO 12354-1 predice cuánto solo a partir de la frecuencia de resonancia. Qué
-fórmula da $f_0$ depende de cómo se fije la capa:
+Una capa adicional sobre una pared (un trasdosado, en el lenguaje de obra) es el
+mismo problema de resorte con el signo cambiado: puede *reducir* el aislamiento
+acústico, y el anexo D de ISO 12354-1 predice cuánto solo a partir de la
+frecuencia de resonancia. Qué fórmula da $f_0$ depende de cómo se fije la capa:
 
 $$
 f_0 = \frac{1}{2\pi}\sqrt{s'\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
@@ -451,12 +465,12 @@ abastecimiento de agua o por dispositivos eléctricos. Las instalaciones que
 atraviesan una capa la invalidan, por tanto; la capa se tiende *por encima* de
 ellas, no rodeándolas.
 
-**Y luego los puentes.** Son las maneras en que la hipótesis falla en obra, más
-o menos por orden de frecuencia:
+**Y luego los puentes.** Son las maneras en que la hipótesis falla en obra,
+ordenadas más o menos de la más habitual a la menos:
 
-- la solera en contacto con la pared, porque la banda perimetral se cortó corta,
-  se dobló hacia dentro antes del vertido, o se recortó a ras y luego el rodapié
-  la rejuntó por encima;
+- la solera en contacto con la pared, porque la banda perimetral se cortó
+  demasiado corta, se dobló hacia dentro antes del vertido, o se recortó a ras y
+  luego el rodapié la rejuntó por encima;
 - la solera tocando una penetración de instalaciones — una tubería, un tubo
   corrugado, una caja de suelo — que no se enfundó en un manguito;
 - restos y goterones de mortero dejados sobre la capa elástica antes del

@@ -394,6 +394,14 @@ repository. Click the preview to open the PDF:
 *Daily vibration exposure fiche (`DailyVibrationExposure.report`), the
 ISO 5349-2 Annex E.3 hand-arm day with the Directive 2002/44/EC assessment.*
 
+## See also
+
+- [Multiple Shock Vibration](multiple-shock-vibration.md): where a record goes once its crest factor and its clause 6.3.3 ratios say the r.m.s. cannot describe it — the ISO 2631-5 spinal-response model, and the seat-pad acquisition this page's whole-body half points at.
+- [Sound power from surface vibration](../../devices/emission/vibration-sound-power.md): the other thing a surface acceleration is used for, when the question is what the machine radiates rather than what the operator receives.
+- [Calibration](../../signals/metrology/calibration.md): the before-and-after check of clause 6.3.1 and the traceability the fiche's `calibration` field records.
+- API reference: [`vibration.human.exposure`](https://jmrplens.github.io/phonometry/reference/api/vibration/exposure/).
+- Theory: [Human vibration](../../reference/theory/vibration.md#human-vibration-iso-8041-1-iso-2631-12-iso-5349-12-directive-200244ec): the frequency weightings of ISO 2631-1 and ISO 5349-1, and the running r.m.s., VDV and MTVV definitions.
+
 ## References
 
 - Griffin, M. J. (1996). *Handbook of human vibration*. Academic Press.

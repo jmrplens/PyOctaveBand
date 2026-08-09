@@ -600,6 +600,15 @@ Here too `result.plot()` previews the insertion-loss spectrum of the fiche;
 the [ground and barriers guide](ground-barriers.md) draws the same result
 against the exact half-plane and coherent-ground models.
 
+## See also
+
+- [Spherical ground effect and advanced barriers](ground-barriers.md): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
+- [Atmospheric refraction](atmospheric-refraction.md): what the favourable-condition assumption and $C_{met}$ stand in for.
+- [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 3 refers to.
+- [Environmental noise levels](../assessment/environmental-levels.md): what happens to the predicted level once it becomes an assessed one.
+- API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
+- Theory: [Outdoor propagation](../../reference/theory/environment-transport.md#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
+
 ## References
 
 - Salomons, E. M. (2001). *Computational atmospheric acoustics*. Kluwer

@@ -130,6 +130,14 @@ res.plot()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test.svg" alt="Two sequences of twenty observations plotted against the sample index: Bendat and Piersol Example 4.4, which fluctuates around five with eighty-six reverse arrangements and is accepted as trend free, and the same fluctuations with an added rising drift climbing from about five to nine, whose thirty-eight reverse arrangements fall below the lower acceptance bound of sixty-four and are rejected as trended at the five percent level" width="82%" loading="eager" />
 
+*The test never looks at the fitted slope, only at the order of the values. On
+the left, Bendat & Piersol's own Example 4.4: $A = 86$, comfortably inside the
+$(64, 125]$ acceptance region, $p = 0.586$. On the right, the same twenty
+fluctuations with a drift added that carries them from 5.2 to 9.0: the
+fluctuations are unchanged, but the ordering is not, and $A$ falls to 38, below
+the lower bound, at $p = 0.0001$. A monotonic drift is what pushes $A$ towards
+zero, which is why the counting works without knowing the distribution.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -216,6 +224,14 @@ res.plot()
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test.svg" alt="Twenty segment mean square values for two noise records: a steady record whose values fluctuate around one with a reverse arrangement count of ninety-one, accepted as stationary, and the same noise with a twenty percent gain ramp whose segment mean squares climb steadily to one point five, giving only seven reverse arrangements, rejected as nonstationary at the five percent level" width="82%" loading="eager" />
+
+*The same twenty-segment sequence tells a stationarity story with the same
+arithmetic. The steady record's segment mean squares stay between 0.982 and
+1.034 and give $A = 91$, inside $(64, 125]$. The 20 % gain ramp lifts them from
+1.016 to 1.476 — a change of a factor 1.45, which no eye would call dramatic on
+a time trace — and $A$ collapses to 7. Twenty numbers and a pair counted
+against a table are enough; nothing about the record's bandwidth or units
+enters.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -373,7 +389,7 @@ print(trend_test(alternating, method="runs").trend_free)   # False
 *The two-sided verdict of the runs test: 20 runs is unremarkable for 40
 Gaussian observations (left, accepted), but the same count from a strictly
 alternating 20-value sequence exceeds its upper bound (right, rejected):
-too *many* runs is as non-random as too few.*
+too **many** runs is as non-random as too few.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -454,6 +470,15 @@ res.plot()
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings.svg" alt="Measured level-crossing rates of a bandlimited Gaussian noise record between eight hundred and twelve hundred hertz, plotted as dots against the crossing level from minus three point five to plus three point five signal units on a logarithmic rate axis, falling from about two thousand crossings per second at level zero to a few per second at three sigma, with the Rice exponential curve passing through every measured point" width="82%" loading="eager" />
+
+*Two moments of the spectrum predict a curve spanning nearly three decades of
+rate. The measured zero-crossing rate of this 800-1200 Hz record is
+2012.7 crossings per second against Example 5.13's closed form
+$2\sqrt{f_c^2 + B^2/12} = 2013.3$, an apparent frequency of 1007 Hz; from there
+the Rice exponential $N_a = N_0 e^{-a^2/2\sigma_x^2}$ tracks the counts to
+within 2 % out to $2\sigma$, where the rate has already fallen to 268/s. Past
+$3\sigma$ the count is a handful of events per second and the scatter is the
+statistics of the record, not a failure of the model.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -557,6 +582,15 @@ res.plot()   # empirical exceedance against the Rice mixture (figure below)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution.svg" alt="Peak-height exceedance probability of low-pass Gaussian noise on a logarithmic axis against the standardized peak height from minus two point five to four point five: the empirical staircase from half a million samples follows the Rice mixture curve for irregularity factor zero point seven four six, clearly below the dashed Rayleigh limit and above the dotted Gaussian limit, with a visible fraction of negative maxima" width="82%" loading="eager" />
+
+*One number decides which curve the peaks follow. Ideal low-pass noise has the
+closed-form $r = \sqrt5/3 = 0.745$, and the record measures 0.746 — which is
+also why 12.6 % of its 39 534 maxima are **negative**, an impossibility under
+Rayleigh. The empirical staircase sits on the Rice mixture for that $r$ and
+between the two limits everywhere: the chance of a peak beyond $4\sigma$ is
+$2.5\times10^{-4}$, a quarter below the Rayleigh $e^{-8} = 3.4\times10^{-4}$.
+Assuming the Rayleigh limit on a record that is not narrowband over-predicts the
+extremes.*
 
 <details>
 <summary>Show the code for this figure</summary>

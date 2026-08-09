@@ -285,6 +285,34 @@ floor, but only the wave models resolve the interference dips that move with
 geometry, frequency and ground impedance, which is why they are the natural
 infrastructure for the meteorological schemes of Nord2000 and CNOSSOS.
 
+## What this guide covers
+
+**Covered.** The Weyl-Van der Pol spherical-wave ground reflection coefficient
+(`ground_effect`; Attenborough Eq. 2.40a/c, Salomons Eq. 3.2/D.58, with the
+Faddeeva-function boundary-loss factor), its hard-ground +6 dB,
+grazing-incidence and reciprocity limits pinned as tests; and wave-theoretic
+barrier diffraction in `barrier_insertion_loss` — the Kurze-Anderson closed form
+(`kurze_anderson_attenuation`, Bies Eq. 5.138), the exact rigid half-plane
+(MacDonald / Hadden & Pierce, Attenborough Eqs. 9.19-9.20), thick barriers
+through the double-edge Fresnel number (Bies Eq. 5.157) and the coherent
+four-path barrier-on-ground model weighted by the `ground_effect` coefficient.
+
+**Not covered.** Both models assume a homogeneous, non-refracting,
+non-turbulent atmosphere; a vertical sound-speed gradient is the subject of
+[atmospheric refraction](atmospheric-refraction.md) instead. The coherent
+barrier-on-ground model weights all four diffracted paths with a single
+reflection coefficient $Q$ computed over the overall source-receiver geometry,
+not with a separate coefficient per image path — so it is coherent and
+reciprocal, but it is not a boundary-element solution.
+
+## See also
+
+- [Outdoor Sound Propagation](outdoor-propagation.md): the octave-band ISO 9613-2 fits these models sit underneath, and the rule an obstacle has to satisfy to be a barrier at all.
+- [Atmospheric refraction: rays and the GFPE](atmospheric-refraction.md): the vertical sound-speed gradient both models here assume away.
+- [Porous absorbers](../../materials/absorbers/porous-absorbers.md): the Delany-Bazley and Miki models behind `flow_resistivity`, and their fit range.
+- Theory: [Outdoor propagation](../../reference/theory/environment-transport.md#outdoor-propagation-general-method-iso-9613-2): the ground and barrier terms of ISO 9613-2 in the context of the whole attenuation sum.
+- API reference: [`environment.propagation.ground_barriers`](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/).
+
 ## References
 
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting Outdoor Sound*

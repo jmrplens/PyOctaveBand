@@ -266,3 +266,14 @@ exposure — Engineering method*: the task-based (Clause 9), job-based
 (Formulae C.6, C.9 and C.12, Tables C.4/C.5) and the one-sided coverage factor
 k = 1.65 (Clause 14), validated against the worked examples of Annexes D, E
 and F.
+
+**Not covered.** The work analysis of Clause 7 and the microphone placement of
+Clauses 12.3 and 12.4 are procedures, not calculations: they stay with the
+surveyor, and Table B.1 is reproduced as guidance with the caller choosing the
+strategy — nothing here applies it. Hearing-protector attenuation (the
+**ISO 4869** series) is not applied, so the $L_{EX,8h}$ computed here, and the
+limit-value comparison the fiche prints on it, is the **unprotected** exposure
+— which is also what the **ISO 1999** hearing-loss model expects. Annex C
+offers no uncertainty model for $L_{p,Cpeak}$ (Table C.5, Note 1), which is why
+the peak is reported without one rather than with a zero one.
+

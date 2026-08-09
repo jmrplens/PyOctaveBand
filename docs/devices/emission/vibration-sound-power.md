@@ -242,6 +242,26 @@ repository. Click the preview to open the PDF:
 ISO/TS 7849-2 engineering-method determination with the measured radiation
 factor and the boxed LWA.*
 
+## See also
+
+- [Sound Power](sound-power.md): the route chooser
+  this method is the sixth entry of, the accuracy grades and the ISO 4871
+  declaration a result feeds.
+- [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
+  the determination that produces the $P_j$ behind a Part 2 radiation factor.
+- [Sound Intensity (p-p)](intensity.md): the probe,
+  its residual index and the field indicators that qualify that measurement.
+- [Panel Sound Insulation](../../buildings/design/panel-sound-insulation.md):
+  the same radiation-efficiency model, written $\sigma$ instead of
+  $\varepsilon$, and the coincidence physics behind it.
+- [Structure-borne source characterisation](../../buildings/design/structure-borne-power.md):
+  ISO 9611, EN 15657 and EN 12354-5, the standards that consume this kind of
+  result.
+- [Mechanical mobility (ISO 7626)](../../vibration/structural/mechanical-mobility.md):
+  the transducer practice behind a measured surface velocity.
+- API reference: [`emission.vibration_sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/).
+- Theory: [Point mobilities and radiation efficiency](../../reference/theory/vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the radiation efficiency that turns a surface velocity into a radiated power.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne

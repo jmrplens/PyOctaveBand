@@ -395,6 +395,18 @@ declaration forms, the declared value $L_{WAd} = L_{WA} + K_{WA}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
 ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
 
+**Not covered.** Three members of the ISO 3740 family are not implemented at
+all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
+level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
+is absent as well; only its field indicators exist, in
+[Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/). The emission sound pressure level
+$L_{pA}$ that stands beside $L_{WA}$ in a declaration is consumed here, never
+determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
+ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
+batch criteria of clause 6.3 are not, and the batch statistics beyond the
+single-machine $K = 1{,}645\,\sigma_R$ case of Annex A.2.2 are stated rather
+than derived.
+
 ---
 
 
@@ -842,6 +854,32 @@ repository. Click the preview to open the PDF:
 engineering-grade hemisphere measurement with the $K_1$/$K_2$ corrections and
 the boxed $L_{WA}$.*
 
+The precision result writes the same sheet from the ISO 3745 side, with the
+meteorological corrections on its basis strip in place of the $K_1$/$K_2$ pair.
+This is the 40-position hemisphere measurement of section 2, the one whose
+spectrum is plotted above:
+
+```python
+from phonometry import ReportMetadata
+
+result.report(
+    "precision-sound-power.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Mid-frequency-peaked machine",
+        test_room="Qualified anechoic room, 40-position hemisphere array",
+        measurement_standard="ISO 3745",
+    ),
+)   # LWA = 89.3 dB(A) re 1 pW, U = 4.1 dB
+```
+
+[![ISO 3745 precision sound power determination example report: a header with the client, the noise source and the qualified anechoic room with its 40-position hemisphere array, the octave-band table from 125 Hz to 8 kHz of surface sound-pressure levels Lp and band sound-power levels LW (78.0, 79.0, 82.6, 85.8, 82.6, 78.7 and 78.0 dB), the LW spectrum peaking at 1 kHz, and the boxed A-weighted sound power level LWA = 89.3 dB(A) re 1 pW with the total LW = 90.1 dB, the expanded uncertainty U = 4.1 dB and the measurement surface S = 6.28 m2, over a basis strip stating the applied meteorological corrections C1 = -0.13 dB, C2 = 0.00 dB and C3 = 0.0 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3745_precision_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3745_precision_power_example.pdf)
+
+*Precision sound power fiche (`PrecisionSoundPowerResult.report`), the ISO 3745
+anechoic determination: no $K_2$ at all, a 6.28 m² hemisphere instead of a
+100 m² one, and $U$ = 4.1 dB because the operating-and-mounting term dominates
+the reproducibility one.*
+
 
 ## See also
 
@@ -901,6 +939,16 @@ criteria. ISO 3745:2012, *… Precision methods for anechoic rooms and
 hemi-anechoic rooms*: the Clause 8 power level, the per-position background
 correction (Eq. 11), the meteorological corrections and the standardized
 microphone arrays of section 2.
+
+**Not covered.** Neither method performs the facility qualification it assumes:
+ISO 3745's free-field qualification of the anechoic or hemi-anechoic
+environment is taken for granted, and ISO 3744's $K_2$ validity only warns.
+ISO 3744 **Annex G**, the correction to reference meteorological conditions
+required above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied
+either: `sound_power_pressure` takes no temperature or pressure argument. The
+$C_3$ meteorological correction of ISO 3745 needs an air-absorption coefficient
+the caller supplies through `air_absorption_coefficient=`; this module does not
+compute it from **ISO 9613-1** itself.
 
 ---
 
@@ -1812,6 +1860,26 @@ repository. Click the preview to open the PDF:
 ISO/TS 7849-2 engineering-method determination with the measured radiation
 factor and the boxed LWA.*
 
+## See also
+
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser
+  this method is the sixth entry of, the accuracy grades and the ISO 4871
+  declaration a result feeds.
+- [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+  the determination that produces the $P_j$ behind a Part 2 radiation factor.
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the probe,
+  its residual index and the field indicators that qualify that measurement.
+- [Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  the same radiation-efficiency model, written $\sigma$ instead of
+  $\varepsilon$, and the coincidence physics behind it.
+- [Structure-borne source characterisation](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  ISO 9611, EN 15657 and EN 12354-5, the standards that consume this kind of
+  result.
+- [Mechanical mobility (ISO 7626)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  the transducer practice behind a measured surface velocity.
+- API reference: [`emission.vibration_sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/).
+- Theory: [Point mobilities and radiation efficiency](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the radiation efficiency that turns a surface velocity into a radiated power.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
@@ -2347,6 +2415,16 @@ the microphones alone.
 See [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the derivations and [Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/)
 for absolute scaling of the two channels.
 
+## See also
+
+- [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/) — the ISO 9614-2/-3 routes that consume $\delta_{pI}$, the field indicators and the dynamic capability.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) — choosing between the intensity, pressure and reverberation-room routes.
+- [Sound power from surface vibration](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/) — the ISO/TS 7849-2 radiation factor needs an intensity-measured power.
+- [Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) — the absolute scaling of the two channels the estimator assumes.
+- [Theory: signal analysis](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) — the cross-spectral derivation behind $I(f) = -\mathrm{Im}\{G_{12}\}/(2\pi f \rho_0 \Delta r)$.
+- API reference: [`emission.intensity`](https://jmrplens.github.io/phonometry/reference/api/power/intensity/).
+- Theory: [Sound intensity (IEC 61043)](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#sound-intensity-iec-61043): the finite-difference approximation behind a p-p probe and the errors it commits.
+
 ## References
 
 - Fahy, F. J. (1995). *Sound intensity* (2nd ed.). E&FN Spon.
@@ -2389,5 +2467,17 @@ field indicators $F_1$ (equations (A.1)–(A.2), evaluated in the initial test
 of clause 8.2 and again per Annex B, B.1.4), $F_2$, $F_3$ and $F_4$, the
 Table B.3
 temporal-variability limit and the dynamic-capability criterion (Annex B).
+
+**Not covered.** ISO 9614-1's own sound-power determination, clauses 8 and 9,
+which sums the partial powers $I_i S_i$ over the discrete points into $L_W$, is
+not implemented: `sound_intensity` and `field_indicators` report intensity and
+field quality, not a summed power. The scanning routes that do compute $L_W$
+from intensity, ISO 9614-2 and **ISO 9614-3**, are in
+[Sound power by intensity scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/). The residual-
+intensity *test* of IEC 61043 is not performed here either: $\delta_{pI0}$ is a
+value the caller measures on their own probe-and-analyser chain, with the
+spacer that will be fitted, and supplies — what the library does with the
+number is grade it against Table 2. The before-use check of clause 14 and the
+ISO 9614-2 probe-reversal test are procedures, not functions.
 
 ---

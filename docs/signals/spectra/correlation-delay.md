@@ -378,6 +378,34 @@ as discrete lines in frequency; and the sub-sample alignment shares its
 band-limited kernel with the public
 [fractional-delay and resampling tools](test-signals.md).
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol Chapter 5, Section 8.4 and Chapter 13:
+`correlation` with the biased, unbiased and coefficient normalizations and
+their random-error formulas (Eqs. 8.109/8.112); `time_delay` with the direct,
+phase-slope and Knapp & Carter (1976) generalized cross-correlation methods,
+including the Roth, SCOT, PHAT and maximum-likelihood weightings of their
+Table I; the peak-location uncertainty of Eq. 8.129; `impulse_response_delay`
+and `align_impulse_responses`; and the Hilbert `envelope` with instantaneous
+phase and frequency (Chapter 13).
+
+**Not covered.** `correlation` and `time_delay` model one common-path delay
+between exactly two sensors — the $y(t) = \alpha\,x(t-\tau_0) + n(t)$ model of
+Eq. 5.21. A record with several arrivals, a direct path plus reflections, is
+not separated: the direct correlator reports the single largest peak, the same
+limitation `echo_detection` carries on the
+[cepstrum](cepstrum-echoes.md). Estimating delays across more than two sensors,
+as an array or a beamformer would, means calling these functions pairwise;
+there is no multi-sensor TDOA solver.
+
+## See also
+
+- [Cepstrum, echoes and the envelope spectrum](cepstrum-echoes.md): the reference-free route to a delay, and the envelope this page constructs.
+- [Calibrated spectral analysis](spectral-analysis.md): the cross-spectrum the GCC weightings are built from, and the two-channel acquisition rules.
+- [Test signals](test-signals.md): the band-limited fractional-delay kernel behind the sub-sample alignment.
+- [Time synchronous averaging](synchronous-averaging.md): the same alignment applied per revolution.
+- API reference: [`signals.correlation`](https://jmrplens.github.io/phonometry/reference/api/signals/correlation/) and [`signals.envelope`](https://jmrplens.github.io/phonometry/reference/api/signals/envelope/).
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and

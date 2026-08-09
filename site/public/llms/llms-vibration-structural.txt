@@ -411,6 +411,23 @@ res.report(
 
 [![ISO 7626 mechanical-mobility example report: a metadata header, a table of the FRF characteristic points (type, frequency range, peak frequency, peak mobility and phase) beside the mobility magnitude spectrum, and the boxed peak mobility](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.pdf)
 
+## See also
+
+- [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
+  the blocked-force limit of section 1, applied to characterise an isolator.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  where a source's mobility and free velocity become an installed power.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the prediction that consumes a receiver mobility, measured or taken from
+  section 5.
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  what the plate mobilities of section 5 become at a junction between two of
+  them.
+- [Frequency response and coherence](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/):
+  the `transfer_function` and `coherence` estimators section 3 runs on.
+- API reference: [`vibration.structural.mechanical_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/mechanical-mobility/).
+- Theory: [Point mobilities and radiation efficiency](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the infinite-structure point mobilities and the radiation efficiency, and why they are averages a finite structure oscillates about.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
@@ -884,6 +901,40 @@ input: `modal_density_ratio` compares the measured $\eta_{21}/\eta_{12}$
 against the $n_1/n_2$ computed from the geometry, and a large disagreement
 means the subsystem boundaries were drawn in the wrong place.
 
+## What this guide covers
+
+**Covered.** The frequency-independent, rigid-junction transmission
+coefficients of Cremer, Heckl & Ungar (1973), tabulated by Craik (1981/1996)
+and collected in Hopkins (2007, Section 5.2.1.3), for X, T, L and in-line
+junctions of thin, homogeneous, isotropic plates: the wave parameters
+$\chi$/$\psi$, the corner and straight-section coefficients
+$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, their diffuse-field angular average,
+the SEA coupling loss factor and the wave-approach vibration reduction index
+$K_{ij}$, through `junction_wave_parameters`,
+`corner_transmission_coefficient`, `straight_transmission_coefficient`,
+`angular_average_transmission_coefficient`, `inline_transmission_coefficient`,
+`coupling_loss_factor`, `wave_vibration_reduction_index` and
+`junction_transmission`. Also the experimental route of Norton & Karczub
+Chapter 6: the two-subsystem power balance and its in-situ inversion
+(`power_injection_clf`, `power_injection_matrix`), the modal densities of bars,
+beams, flat plates and thin-walled cylindrical shells with the `ring_frequency`
+they are split about, and the two closed forms between the routes
+(`right_angle_transmission_coefficient`,
+`point_connection_coupling_loss_factor`).
+
+**Not covered.** The predicted $K_{ij}$ is a closed-form idealisation of a
+rigid, simply supported junction, not a measurement: the empirical $K_{ij}$
+from a direction-averaged velocity level difference is ISO 10848's
+`vibration_reduction_index`, in
+[Laboratory Flanking Transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/).
+The straight-section coefficient $\tau_{13}$ is undefined for the T-junction
+(2) and L-junction geometries, which have no collinear third plate, so only the
+corner path applies there. The tabulated coefficients assume a *symmetric*
+junction — opposite plates identical — and there is no closed form here for one
+that is not. On the experimental side the inversion is written for **two**
+subsystems only, and `PowerInjectionResult.modal_density_ratio` is a
+consistency check the reader makes, not one the library automates.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
@@ -1164,6 +1215,19 @@ repository. Click the preview to open the PDF:
 
 *Dynamic-transfer-stiffness fiche (`TransferStiffnessResult.report`): the FRF
 characteristic points and the transfer-stiffness level spectrum.*
+
+## See also
+
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  the source/receiver mobility rule that says when a blocked force is the right
+  description at all, and the FRF vocabulary this page's conversions belong to.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the source characterisation that sits on the other side of the isolator.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the prediction that consumes $k_{2,1}$ together with both mobilities and
+  turns it into a level in a receiving room.
+- API reference: [`vibration.structural.transfer_stiffness`](https://jmrplens.github.io/phonometry/reference/api/vibration/transfer-stiffness/) and [`vibration.structural.mechanical_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/mechanical-mobility/).
+- Theory: [Point mobilities and radiation efficiency](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the mobility and impedance definitions the transfer stiffness is the reciprocal of.
 
 ## References
 

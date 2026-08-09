@@ -24,7 +24,7 @@ from scipy import signal as scipy_signal
 from phonometry._plot.common import _register_field_dark_cmap
 
 from . import _publish
-from .i18n import _LANG_SUFFIX, _translate_figure
+from .i18n import _LANG_SUFFIX, _translate_figure, audit_figure
 
 # Constants for professional styling
 LABEL_FREQ_HZ = "Frequency [Hz]"
@@ -208,8 +208,9 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     across matplotlib builds and runs. In both cases ``filename`` may carry
     any extension; the real one is chosen here.
     """
-    _translate_figure(plt.gcf())
     stem = os.path.splitext(filename)[0]
+    audit_figure(stem)
+    _translate_figure(plt.gcf())
     ext = "webp" if stem in _RASTER_FIGURES else "svg"
     path = os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")
     if ext == "svg":

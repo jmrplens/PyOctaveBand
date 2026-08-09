@@ -347,6 +347,17 @@ Carlo.*
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre de la GUM, un diagrama de barras horizontales de la contribución de cada entrada a la incertidumbre combinada con una línea discontinua en uc de 0,407 dB. Derecha: el histograma de salida de Monte Carlo superpuesto con la gaussiana de la GUM y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
 
+*A la izquierda está adónde se va el dinero: las diez posiciones se llevan por sí
+solas el 73,9 % de la varianza, el instrumento el 18,1 % y el calibrador el
+8,0 %, así que $u_c$ = 0,407 dB es una afirmación sobre el diseño de la medición
+y no sobre el sonómetro. Reducir a la mitad el término del instrumento movería
+$u_c$ 0,02 dB; tres posiciones más lo mueven diez veces eso. A la derecha está el
+mismo balance remuestreado un millón de veces: la incertidumbre típica de Monte
+Carlo es de 0,4073 dB frente a los 0,4072 dB de la GUM, y su intervalo al 95 %,
+$[73{,}20,\ 74{,}80]$, coincide con $Y \pm U$ = 74,00 ± 0,86 dB con
+$k = 2{,}115$ y $\nu_\text{eff}$ = 16,5. Este es el caso casi lineal en el que
+los dos métodos concuerdan, y el panel de arriba enseña los tres en los que no.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -367,14 +378,14 @@ mc = metrology.monte_carlo(model, quantities, trials=1_000_000, coverage=0.95, s
                     keep_samples=True)
 k, U = result.expanded(0.95)
 
-# En una línea por panel — las barras del balance, y el histograma de Monte
+# Una línea por panel: las barras del balance, y el histograma de Monte
 # Carlo con su intervalo (la figura del repositorio superpone además la
 # gaussiana de la GUM):
 result.plot(language="es")
 mc.plot(language="es")
 plt.show()
 
-# A mano, ambos paneles — las barras del balance y la distribución de salida de Monte Carlo:
+# A mano, ambos paneles: las barras del balance y la distribución de salida de Monte Carlo:
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.4))
 ax1.barh(result.names, result.contributions)
 ax1.axvline(result.combined_uncertainty, ls="--",

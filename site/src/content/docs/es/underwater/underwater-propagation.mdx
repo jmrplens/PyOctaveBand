@@ -211,6 +211,15 @@ por defecto y la referencia), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) o
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_es.svg" alt="Pérdida por transmisión submarina frente a la distancia a 10 kHz, con las contribuciones de divergencia geométrica y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
 
+*Los dos términos se intercambian los papeles con la distancia, y por eso se
+dibujan aparte. Hasta la transición de 1 km la pérdida es divergencia y casi
+nada más: 61,0 dB en total frente a 60,1 dB de divergencia. Pasada la
+transición, la ley de divergencia se reduce a la mitad, $10\lg R$, y el término
+$\alpha R$ toma el relevo del crecimiento: en 20 km, los 92,0 dB totales son
+73,0 dB de divergencia más 19,0 dB de absorción a 0,95 dB/km. En 10 kHz la
+absorción no llega a superar a la divergencia en todo este intervalo; en 100 kHz
+lo habría hecho dentro del primer kilómetro.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -345,6 +354,15 @@ ambas se dibujan en el mismo eje.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
 
+*Aquí no se ha elegido nada: las tres transiciones en 42,7 m, 411,8 m y 20,1 km
+salen del lecho marino y de nada más, a través del ángulo crítico de 33,6° y del
+gradiente de pérdida por reflexión de 0,278 Np/rad de la arena media con 50 m de
+columna de agua. La compuesta es la envolvente inferior de las cuatro leyes a
+trazos, así que la pérdida se empina por etapas: 32,6 dB en la primera frontera,
+42,4 dB en la segunda y 67,7 dB en la tercera. La arena es la razón de que los
+dos regímenes intermedios existan siquiera: un lecho más duro aleja las
+transiciones y uno más blando descama los modos antes.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -412,6 +430,14 @@ casi 6 m/s, que es el único desacuerdo grande de la familia y es por entero
 cuestión de usarla fuera de su dominio.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed_es.svg" alt="Perfil de velocidad del sonido en agua de mar con la ecuación UNESCO: capa de mezcla cálida, termoclina, eje del canal sonoro en el mínimo y la velocidad creciendo con la presión en profundidad" width="60%" />
+
+*Por encima del eje manda la temperatura y por debajo la presión, y el punto de
+retorno es el canal sonoro. En este perfil la velocidad cae de 1515,79 m/s en la
+superficie a un mínimo de 1486,05 m/s a 775 m, donde el agua ya ha alcanzado su
+temperatura profunda, y vuelve a subir hasta 1517,85 m/s a 3000 m solo por
+presión, en agua isoterma. Toda la excursión son 32 m/s, alrededor del 2 %, que
+es la razón de que en el océano profundo sea la refracción, y no la absorción,
+la que decide adónde va el sonido.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -557,6 +583,14 @@ que escala con el nivel emitido y sustituye a $NL - DI$ en vez de sumarse a él.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation_es.svg" alt="Las dos geometrías del sonar: la pasiva, con un blanco que radia, una pérdida por transmisión de ida, un campo de ruido ambiental isótropo, un array receptor con su índice de directividad y un detector con su umbral de detección; y la activa monoestática, con emisor y receptor en un mismo punto, pérdidas por transmisión de ida y de vuelta, una fuerza del blanco dibujada como un lóbulo retrodispersado, y dispersión en la superficie, el volumen y el fondo que alimenta un nivel de reverberación que sustituye al término de ruido" width="92%" />
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_es.svg" alt="Ecuación del sonar pasivo: el exceso de señal cae con la pérdida por transmisión y cruza el cero, el límite de detección, en la figura de mérito" width="82%" />
+
+*Una recta de pendiente −1, y su ordenada en el origen es todo el diseño. El
+exceso de señal cae decibelio a decibelio con la pérdida por transmisión y cruza
+el cero en $FOM = SL - (NL - DI) - DT$ = 140 − (60 − 15) − 8 = 87,0 dB, así que
+el sonar detecta allí donde el canal pierde menos de 87 dB y en ningún otro
+sitio. Todos los términos desplazan la recta verticalmente y ninguno cambia su
+pendiente: 6 dB más de ganancia de array compran exactamente 6 dB más de pérdida
+admisible, que la curva de propagación convierte después en una distancia.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -705,6 +739,14 @@ Rayleigh para localizar el ángulo crítico y la forma de la pérdida por encima
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_es.svg" alt="Pérdida por reflexión en el fondo frente al ángulo rasante para un fondo arenoso rápido: pérdida nula por debajo del ángulo rasante crítico, creciendo bruscamente por encima" width="82%" />
 
+*Un rayo que se mantiene rasante no paga nada, y uno empinado lo paga casi todo.
+Para este par de agua sobre arena el ángulo crítico es de 24,62°: por debajo la
+pérdida es idénticamente nula, y un grado por encima la curva ya está subiendo,
+pasando por 5,21 dB en 30°, 7,89 dB en 45° y 9,05 dB en incidencia normal. Ese
+escalón es lo que convierte la propagación en aguas someras en un problema de
+filtrado angular: tras unos pocos rebotes solo sobreviven los rayos
+subcríticos, que es el descamado de modos que describen los regímenes de Weston.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -742,6 +784,13 @@ de reflexión $|R|$ (unidad por debajo del ángulo crítico y decreciente hasta 
 valor de incidencia normal a $90°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_coefficient_es.svg" alt="Módulo del coeficiente de reflexión del fondo frente al ángulo rasante para un fondo arenoso rápido: reflexión total por debajo del ángulo rasante crítico, decreciendo hasta el valor de incidencia normal por encima" width="82%" />
+
+*La misma interfase que la pérdida de arriba, leída como amplitud. $|R|$ vale
+exactamente 1 hasta 24,62° y a partir de ahí cae deprisa: 0,403 en 45° y 0,353
+en incidencia normal, la razón de impedancias de onda plana de los dos medios.
+La idealización sin pérdidas es lo que deja plana la parte subcrítica; un
+sedimento real, que absorbe, la baja unas centésimas por debajo de la unidad,
+cosa invisible en este eje y término dominante al cabo de cincuenta rebotes.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -802,6 +851,14 @@ entrada y no un océano insólito.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise_es.svg" alt="Niveles espectrales de ruido ambiental de Wenz para dos velocidades de viento, con el ruido de viento cayendo 5 dB por octava y el ruido térmico creciendo por encima de unos 50 kHz" width="82%" />
 
+*La regla de los cincos, medida: entre 500 Hz y 5 kHz la rama de viento cae
+5,02 dB por octava, y pasar de 5 a 20 nudos la levanta 10,03 dB en 1 kHz, de
+51,1 dB a 61,1 dB. Los dos mecanismos van luego en sentidos opuestos, así que el
+total tiene un mínimo: el ruido térmico llega a 25,3 dB en 100 kHz y con 5 nudos
+está ya a menos de 0,7 dB del total ahí, mientras que con 20 nudos sigue ganando
+el viento. Nada de lo que hay en esta figura es un suelo por debajo del cual
+pudiera bajar un hidrófono más silencioso: la rama térmica es el agua misma.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -842,6 +899,15 @@ Cuando no hay espectro medido, el nivel de fuente de un buque puede
 **RANDI 3.1** o **Wales & Heitmeyer** (2002).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_traffic_noise_es.svg" alt="Espectros de nivel de fuente predichos por JOMOPANS-ECHO para un portacontenedores, un crucero y un remolcador, con los buques de carga mostrando una joroba de baja frecuencia por debajo de 100 Hz" width="82%" />
+
+*La clase, la velocidad y la eslora son las únicas entradas, y abarcan 45 dB. El
+portacontenedores alcanza su máximo de 174,3 dB re 1 µPa²/Hz en 31,6 Hz, el
+crucero 158,7 dB en 25,1 Hz, y el remolcador, lento y corto, 129,5 dB y más
+arriba, en 125,9 Hz. De ahí salen dos cosas: la energía de la flota está por
+debajo de 100 Hz, que es justo donde el modelo de viento del apartado anterior
+es más flojo, y un número único de «ruido de tráfico marítimo» no significa nada
+sin la clase. Estos son niveles de **fuente** a 1 m; el fragmento de más abajo
+muestra lo que cuesta olvidarlo.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

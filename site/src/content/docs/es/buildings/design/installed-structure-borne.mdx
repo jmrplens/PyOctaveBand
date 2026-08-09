@@ -48,6 +48,16 @@ con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por trayectoria y su total energético" width="82%" loading="eager" />
 
+*Toda la cadena sobre un mismo eje, por banda de octava. El término de
+acoplamiento no es un peaje fijo: se lleva 6,6 dB de la potencia característica
+a 63 Hz y 20,8 dB a 4 kHz, así que el espectro instalado ya se inclina hacia
+abajo antes de aplicar ninguna trayectoria. Cada trayectoria resta después su
+propio $D_{sa}$, su índice de flancos y su término de superficie, y aquí la
+pared de flanco, más pequeña, le saca al forjado entre 1,3 y 2,3 dB. El nivel
+del recinto receptor es la **suma energética** de las trayectorias, de 2,0 a
+2,4 dB por encima de la mayor de las dos: arreglar solo la peor trayectoria
+compraría unos 2 dB, no la diferencia.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -269,7 +279,7 @@ repetida.
 
 ## 2. Transmisión al recinto receptor
 
-Las partes 1 y 2 de EN 12354 tratan recintos excitados por trayectoria aérea y por la
+Las partes 1 y 2 de EN 12354 tratan recintos excitados por vía aérea y por la
 máquina de impactos normalizada; la parte 5 cubre las fuentes que sacuden el
 edificio *directamente*: bombas, ventiladores, ascensores, bañeras de
 hidromasaje, cisternas y las conducciones que las anclan a paredes y forjados.
@@ -293,10 +303,11 @@ como algo que cubre la cadena entera: los índices de unión se suman a lo largo
 la trayectoria (Fórmula F.1), las longitudes de absorción equivalentes de los
 elementos intermedios se pueden tomar numéricamente iguales a sus superficies
 como primera estimación en elementos grandes o bien amortiguados, y un ajuste
-$\Delta K$ cubre las ondas longitudinales y en el plano que la teoría de ondas de
-flexión se pierde — unos 4 dB para dos uniones y 6 dB para tres o más, con el
-$K_{ij}$ encadenado acotado inferiormente cerca de $-5$ dB, que corresponde a
-transmisión estructural total. Dos consecuencias para el dato que aportas aquí:
+$\Delta K$ cubre las ondas longitudinales y en el plano que se le escapan a la
+teoría de ondas de flexión — unos 4 dB para dos uniones y 6 dB para tres o más,
+con el $K_{ij}$ encadenado acotado inferiormente cerca de $-5$ dB, que
+corresponde a transmisión estructural total. Dos consecuencias para el dato que
+aportas aquí:
 un $R_{ij,\mathrm{ref}}$ calculado para una sola unión sobrestima el aislamiento
 de una ruta con varias uniones, y varias rutas distintas suelen unir el mismo par
 de elementos, y cada una hay que contarla como su propia trayectoria o refundirla

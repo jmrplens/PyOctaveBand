@@ -193,6 +193,15 @@ res.plot(language="es")
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo_es.svg" alt="Cepstrum de potencia de una respuesta al impulso con una reflexión frente a la quefrencia en milisegundos: un pico positivo afilado exactamente a 8 milisegundos marcado como eco detectado, un segundo rahmónico negativo menor a 16 milisegundos, la envolvente de la fuente en las quefrencias bajas fuera de la banda de búsqueda sombreada y una línea discontinua en el retardo verdadero" width="82%" loading="eager" />
 
+*El cepstrum lee el eco en el eje y no en la forma de onda: el pico detectado
+cae en 8,000 ms y se levanta 0,488 frente al $a = 0{,}5$ verdadero. La
+confirmación es el pequeño pico **negativo** de 16,0 ms, −0,126 contra el
+$-a^2/2 = -0{,}125$ de la serie: una periodicidad espectral ajena no tiene por
+qué producir un tren de rahmónicos alternantes, así que el segundo pico es lo
+que separa un eco de una casualidad. Todo lo que queda a la izquierda de la
+banda sombreada es la envolvente de la propia fuente, que es por lo que la
+búsqueda empieza por encima de ella.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -469,6 +478,15 @@ res.plot(language="es")
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum_es.svg" alt="Espectro de la envolvente de un tono de un kilohercio modulado en amplitud dentro de ruido, frente a la frecuencia hasta cien hercios: una única línea afilada en la frecuencia de modulación de veinticinco hercios que alcanza exactamente la referencia punteada de amplitud cero coma cuatro, con un suelo de ruido plano en el resto" width="82%" loading="eager" />
 
+*La línea no es proporcional a la modulación: **es** la modulación. Con $f_m$ en
+un bin de análisis el detector de magnitud lee 0,3996 frente a la forma cerrada
+$A_0 m = 0{,}4$, y `mean_level` lee 1,001 frente a $A_0 = 1$. Ese es el sentido
+de escalar por la ganancia coherente de la ventana: la ordenada es una
+profundidad de modulación, no un nivel cualquiera. A su alrededor el suelo se queda cerca de
+5×10⁻⁴, así que la línea se despega unos 58 dB incluso con ruido blanco al 3 %
+de la portadora, que es por lo que la cadena encuentra defectos de rodamiento
+que el espectro de la propia portadora esconde.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -540,9 +558,9 @@ permita la máquina, con su eje en la dirección de la carga y el cable con
 descarga de tracción. ISO 5348 es la referencia de montaje.
 
 ```python
-# Una resonancia estructural de 3 kHz excitada a una tasa de defecto de 120 Hz,
-# bajo una línea de 50 Hz tres veces más fuerte: el paso banda es lo que las
-# separa.
+# Una resonancia estructural de 3 kHz excitada a una frecuencia de defecto de
+# 120 Hz, bajo una línea de 50 Hz tres veces más fuerte: el paso banda es lo
+# que las separa.
 t_s = np.arange(int(4 * fs)) / fs
 ring = np.sin(2 * np.pi * 3000.0 * t_s) * np.exp(-(t_s % (1 / 120.0)) / 0.001)
 raw = ring + 3.0 * np.sin(2 * np.pi * 50.0 * t_s)

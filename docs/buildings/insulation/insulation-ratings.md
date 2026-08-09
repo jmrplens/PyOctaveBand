@@ -411,6 +411,17 @@ ISO 10140 (laboratory), ISO 15186 (intensity), ISO 10052 (survey) and
 ISO 10848 (flanking); conformance is anchored on the standards' own Annex C
 worked examples.
 
+**Not covered.** Nothing here measures: every function takes an
+already-measured or predicted band spectrum from the field, laboratory,
+intensity, survey or flanking guides. The façade single number of
+**ISO 16283-3** Annex F and the flanking $D_{n,f,w}$ reuse these engines from
+their own pages rather than duplicating them. One member of the family is
+deliberately absent: the A-weighted maximum impact level of **ISO 717-2:2020
+Annex D**, which rates the rubber ball and the bang machine. It shifts no curve
+at all — it is an energy sum of A-weighted band levels — so it belongs with the
+sources it rates, in
+[Heavy and soft impact sources](heavy-impact-sources.md).
+
 ## See also
 
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the

@@ -28,6 +28,15 @@ periodic waveforms by time domain averaging* (1987).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/synchronous_average_es.svg" alt="Figura de dos paneles. Izquierda: un periodo ruidoso de una señal en gris tenue oscila muy por encima y por debajo de una curva suave; el promedio de cuarenta periodos, en azul, se sitúa casi exactamente sobre la forma de onda verdadera en rojo discontinuo, de modo que el ruido asíncrono se ha eliminado. Derecha: la magnitud del filtro peine entre los órdenes 31 y 33, con dientes de altura unidad en los órdenes enteros; para N = 20 un nodo profundo cae exactamente sobre el tono interferente marcado en 32,05 órdenes, mientras que la potencia de dos N = 32 deja allí un lóbulo lateral y deja pasar el tono." width="92%" loading="eager" />
 
+*Dos cosas que conviene leer por separado. A la izquierda, la ley de $\sqrt N$
+haciendo su trabajo: el ruido de un solo periodo tiene un valor eficaz de 0,83
+y, tras 40 promedios, la forma de onda promediada se aparta de la verdadera
+0,138 en valor eficaz, un factor 6,0 frente al $\sqrt{40} = 6{,}32$ que predice
+la ley. A la derecha, la elección que no cuesta nada: en el orden 32,05 el peine
+de $N = 20$ vale 6×10⁻¹⁴, mientras que la potencia de dos habitual, $N = 32$,
+todavía deja pasar 0,19 del tono interferente. Aquí veinte promedios le ganan a
+treinta y dos, y solo por dónde cae el nodo.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 

@@ -478,6 +478,14 @@ repository. Click the preview to open the PDF:
 *Daily vibration exposure fiche (`DailyVibrationExposure.report`), the
 ISO 5349-2 Annex E.3 hand-arm day with the Directive 2002/44/EC assessment.*
 
+## See also
+
+- [Multiple Shock Vibration](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/): where a record goes once its crest factor and its clause 6.3.3 ratios say the r.m.s. cannot describe it — the ISO 2631-5 spinal-response model, and the seat-pad acquisition this page's whole-body half points at.
+- [Sound power from surface vibration](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/): the other thing a surface acceleration is used for, when the question is what the machine radiates rather than what the operator receives.
+- [Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): the before-and-after check of clause 6.3.1 and the traceability the fiche's `calibration` field records.
+- API reference: [`vibration.human.exposure`](https://jmrplens.github.io/phonometry/reference/api/vibration/exposure/).
+- Theory: [Human vibration](https://jmrplens.github.io/phonometry/reference/theory/vibration/#human-vibration-iso-8041-1-iso-2631-12-iso-5349-12-directive-200244ec): the frequency weightings of ISO 2631-1 and ISO 5349-1, and the running r.m.s., VDV and MTVV definitions.
+
 ## References
 
 - Griffin, M. J. (1996). *Handbook of human vibration*. Academic Press.
@@ -735,6 +743,12 @@ repository. Click the preview to open the PDF:
 
 *Whole-body multiple-shock health-risk fiche (`MultipleShockResult.report`), the
 ISO 2631-5:2018 Annex C worked example with the Table C.2 risk classification.*
+
+## See also
+
+- [Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/): the ISO 2631-1 chain this page hands back to for the horizontal axes, and the crest factor and clause 6.3.3 ratios that decide whether a record belongs here at all.
+- API reference: [`vibration.human.multiple_shock`](https://jmrplens.github.io/phonometry/reference/api/vibration/multiple-shock/).
+- Theory: [Multiple shocks (ISO 2631-5)](https://jmrplens.github.io/phonometry/reference/theory/vibration/#multiple-shocks-iso-2631-5): the ISO 2631-5 response model, the acceleration dose and the Weibull risk law.
 
 ## References
 

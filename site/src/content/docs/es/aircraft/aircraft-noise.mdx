@@ -228,6 +228,16 @@ la ventana es apenas más larga que la duración de referencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_es.svg" alt="Historia temporal del nivel de ruido percibido de un sobrevuelo de aeronave: PNL y el PNLT corregido por tonos en función del tiempo, con el máximo PNLTM marcado y la ventana de integración de 10 dB por debajo sombreada, anotada con el EPNL resultante y la corrección por duración" width="82%" loading="eager" />
 
+*Dos correcciones, las dos a la vista. La separación entre el PNL y el PNLT es
+la corrección tonal, que aquí vale 3,97 dB en el máximo porque un tono de
+ventilador de 2500 Hz sobresale de sus bandas vecinas, y por eso el
+$\mathrm{PNLTM}$ = 120,57 PNdB queda por encima de los 116,61 PNdB a los que
+llega el PNL a secas. La ventana sombreada de 10 dB por debajo abarca del
+registro 16 al 24, unos 4 s, muy lejos de los 10 s de la referencia fija, así
+que la corrección por duración es $D = -6{,}56$ dB y el
+$\mathrm{EPNL}$ = 114,01 EPNdB cae *por debajo* del máximo. Un sobrevuelo más
+lento con el mismo máximo puntuaría por encima.*
+
 ```python
 from phonometry import aircraft
 
@@ -429,14 +439,22 @@ print(report["passed"], report["checks"])
 ## Absorción atmosférica (SAE ARP 5534)
 
 Corregir un sobrevuelo medido a condiciones atmosféricas de referencia requiere
-la atenuación en bandas de 1/3 de octava sobre el trayecto. El coeficiente de
+la atenuación en bandas de tercio de octava sobre el trayecto. El coeficiente de
 tono puro es el de ISO 9613-1 (idéntico, según ARP 5534 §3.1) que da
 `air_attenuation`; `sae_band_attenuation` añade el **método SAE** (ARP 5534
 §3.2.2) que mapea la atenuación de trayecto de tono puro medio de banda
-$\delta_t = \alpha\,s$ a la atenuación de banda $\delta_B$, consistente con el
+$\delta_t = \alpha\,s$ a la atenuación de banda $\delta_B$, coherente con el
 método exacto mucho más allá del límite de 50 dB del método aproximado.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_es.svg" alt="Absorción atmosférica aeronáutica frente a la frecuencia para dos distancias; la atenuación de banda del método SAE queda por debajo del valor de tono puro medio de banda a alta absorción" width="82%" />
+
+*La línea continua es la banda y la discontinua el tono puro en el centro de
+banda, y las dos solo coinciden donde la absorción es pequeña. A 1 km la
+diferencia es de 0,18 dB en la banda de 4 kHz y de 10,78 dB en la de 10 kHz; a
+7 620 m es de 29,95 dB en 4 kHz y de 167,97 dB en 10 kHz, frente a un valor
+medio de banda de 753,92 dB. Las dos son la misma atmósfera de 25 °C y 70 % HR:
+la diferencia está en que una banda conserva la energía de su borde inferior
+mucho después de que su frecuencia central se haya ido.*
 
 Una banda de tercio de octava no es un tono. El coeficiente de absorción sube con
 fuerza con la frecuencia, así que el borde inferior de una banda se atenúa mucho

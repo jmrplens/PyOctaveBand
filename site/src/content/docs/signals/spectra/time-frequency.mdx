@@ -261,6 +261,15 @@ in frequency.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="Zoom FFT of a one-second record containing tones at 997 and 1000 hertz: the coarse 1024-point FFT with 8 hertz bins shows a single broad lump, while the zoom FFT over 980 to 1016 hertz draws two separate mainlobes whose peaks sit exactly on the dotted true-tone frequencies" width="82%" loading="lazy" />
 
+*What separates the two tones is the second of record, not the zoom. The coarse
+view uses 1024 of the 8192 samples, so its 8 Hz bins cannot hold two lines 3 Hz
+apart and it shows one lump at 1000 Hz. The zoom transforms the **whole**
+record, whose Hann resolution bandwidth is 1.5 Hz, and puts a 0.25 Hz grid on
+it: the peaks land on 997.00 and 1000.00 Hz at −1.94 and −6.02 dB, the
+amplitudes of the two tones. A finer grid on a 1024-sample record would have
+changed nothing — this is the distinction the section makes between sampling
+density and resolution.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

@@ -375,6 +375,19 @@ not include a reconstructible screening case (the frame of its terrain model
 could not be pinned to the published outputs), so the diffraction chain
 itself rests on the closed-form anchors and its CNOSSOS-EU lineage.
 
+## See also
+
+- [Aircraft noise: Effective Perceived Noise Level](aircraft-noise.md):
+  the ICAO Annex 16 Appendix 2 chain this page's Doc 32 Eq. 28 term calls, and
+  the measurement practice a hemisphere campaign follows.
+- [Airport Noise (ECAC Doc 29)](airport-noise.md): the
+  fixed-wing contour method, where a noise-power-distance table plays the role
+  the noise hemisphere plays here.
+- [Outdoor sound propagation](../environment/propagation/outdoor-propagation.md):
+  the ISO 9613-2 ground effect and the CNOSSOS ground classes this two-ray
+  adjustment shares.
+- API reference: [`aircraft.rotorcraft_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/).
+
 ## References
 
 - European Civil Aviation Conference. (2026). *Report on standard method of

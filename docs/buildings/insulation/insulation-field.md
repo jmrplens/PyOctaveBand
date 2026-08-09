@@ -437,6 +437,21 @@ ISO 5725 (context, not implemented directly). The single-number ratings quoted
 here are those of ISO 717-1 and ISO 717-2, and the façade part of the same
 ISO 16283 family (ISO 16283-3:2016) has its own page.
 
+**Not covered.** Every field function takes levels the caller has already
+corrected for background noise (ISO 16283-1 Clause 9.2). Measuring the
+background level — source off, same positions, same averaging — is the
+operator's job, and nothing here verifies that the 6 dB floor was met.
+(`background_correction` is the **ISO 10140-4** *laboratory* variant and does
+not match the field thresholds.) The position counts, distances and averaging
+of ISO 16283-1/-2, and the corner measurements of the low-frequency procedure,
+are documented above and checked nowhere: energy averaging happens once
+positions are supplied, but nothing verifies how many were taken, where, or
+that the 25 m³ trigger was even tested for. The Formula (12)/(13) combination
+of the low-frequency procedure is two lines of NumPy, not a library function.
+The other members of the family have their own pages: the façade part
+(ISO 16283-3), the survey method (ISO 10052), the rating engines (ISO 717-1/-2)
+and the sound-intensity route (**ISO 15186-1**/-2).
+
 ## See also
 
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve

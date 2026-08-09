@@ -239,6 +239,15 @@ directo no es dominante y que el retardo que tienes es el de una reflexión.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay_es.svg" alt="Correlación cruzada normalizada de un par de señales coloreadas de dos sensores frente al retardo en milisegundos: el correlador directo muestra un pico ancho alrededor del retardo verdadero de 20 muestras mientras que la curva GCC-PHAT colapsa en una espiga afilada exactamente sobre la línea discontinua del retardo verdadero" width="82%" loading="eager" />
 
+*Los dos estimadores caen en el retardo de 2,441 ms (2,4413 ms el directo,
+2,4418 ms el PHAT), así que la discusión no es sobre la exactitud con un par
+limpio, sino sobre cuánto se puede fiar uno del pico. El preblanqueo estrecha el
+lóbulo principal de 0,73 ms a media altura a 0,24 ms, dos muestras a 8192 Hz,
+porque el correlador directo convoluciona la delta con la autocorrelación de una
+señal limitada en banda a 800 Hz mientras que el PHAT tira esa magnitud. Lee la
+anchura, no la posición: es la que dice si podría haber una reflexión escondida
+bajo el pico.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -479,7 +488,7 @@ plt.show()
 </details>
 
 La envolvente de una señal de banda limitada es a su vez de baja frecuencia,
-así que el resultado ofrece **decimación** opcional: un filtro antialias FIR
+así que el resultado ofrece **diezmado** opcional: un filtro antialias FIR
 de fase cero por defecto, o submuestreo simple con `antialias=False`,
 exactamente el convenio que la cadena de sonoridad/aspereza ECMA-418-2 de
 `phonometry.psychoacoustics` aplica internamente tras su paso de banda

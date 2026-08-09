@@ -368,6 +368,17 @@ octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
 edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
 one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
 
+## See also
+
+- [Filter Architecture Gallery](filter-gallery.md): the
+  five architectures compared at the band edges, the full response gallery
+  and per-architecture usage, with the Linkwitz-Riley crossover.
+- [Filter Class Verification (IEC 61260-1)](filter-compliance.md):
+  the Table 1 acceptance mask, class 0 and the compliance fiche of the banks
+  designed here.
+- API reference: [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/), [`filters.core`](https://jmrplens.github.io/phonometry/reference/api/filters/core/) and [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/).
+- Theory: [Octave Band Frequencies](../../reference/theory/signal-analysis.md#octave-band-frequencies-ansi-s111--iec-61260): where the base-10 midband grid and the band edges come from, and why the bank is designed on them rather than on nominal labels.
+
 ## References
 
 - International Electrotechnical Commission. (2014). *Electroacoustics —

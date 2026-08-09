@@ -217,6 +217,15 @@ that section spells out. The factor itself comes from
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing.svg" alt="Welch power spectral density of pink noise in dB per Hz over 20 Hz to 20 kHz, with the 95 percent chi-square confidence band shaded around the estimate, the 1/3-octave smoothed curve on top and the exact -3.01 dB per octave power law as a dashed reference line" width="82%" loading="eager" />
 
+*What 20 s of record buys, read off the figure. 467 segments of 4096 samples
+give 442 equivalent averages, a normalized random error of 0.047 and a 95 %
+chi-square band 0.81 dB wide — so the ragged estimate is never more than about
+0.8 dB from the smoothed curve anywhere in the decade, and the shaded band, not
+the ripple, is the honest statement of what is known. Both curves fit
+−3.007 dB/octave against the exact −3.01 dB/octave of pink noise. Smoothing
+narrows nothing: it redraws the same estimate, and the interval below it still
+applies.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -615,6 +624,14 @@ sampling), and the rectangular scalloping loss is $20\log_{10}(N\sin(\pi/2N))$,
 the Dirichlet kernel evaluated half a bin off center.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff.svg" alt="Spectra of the rectangular, Hann, Hamming and Blackman windows over 16 DFT bins, showing the trade-off between main-lobe width and sidelobe level, with each window's equivalent noise bandwidth and highest sidelobe level in the legend" width="82%" />
+
+*The trade in one picture, and it costs 44.8 dB of leakage floor to buy 0.73 of
+a bin. Going from rectangular to Blackman drops the highest sidelobe from
+−13.3 dB to −58.1 dB while the ENBW widens from 1.000 to 1.727 bins and the
+−3 dB main lobe from 0.886 to 1.644 bins. Hann sits where the module's default
+sits: −31.5 dB for 1.500 bins. Read the two axes together — a narrow main lobe
+separates two tones of similar level, a low sidelobe floor finds a weak tone
+beside a strong one, and no window does both.*
 
 <details>
 <summary>Show the code for this figure</summary>

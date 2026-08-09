@@ -303,6 +303,23 @@ res.report(
 
 [![ISO 7626 mechanical-mobility example report: a metadata header, a table of the FRF characteristic points (type, frequency range, peak frequency, peak mobility and phase) beside the mobility magnitude spectrum, and the boxed peak mobility](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.pdf)
 
+## See also
+
+- [Transfer stiffness of resilient elements (ISO 10846)](transfer-stiffness.md):
+  the blocked-force limit of section 1, applied to characterise an isolator.
+- [Structure-borne sound power of equipment (EN 15657)](../../buildings/design/structure-borne-power.md):
+  where a source's mobility and free velocity become an installed power.
+- [Installed structure-borne sound (EN 12354-5)](../../buildings/design/installed-structure-borne.md):
+  the prediction that consumes a receiver mobility, measured or taken from
+  section 5.
+- [Bending-wave transmission at plate junctions](junction-transmission.md):
+  what the plate mobilities of section 5 become at a junction between two of
+  them.
+- [Frequency response and coherence](../../devices/electroacoustics/electroacoustics.md):
+  the `transfer_function` and `coherence` estimators section 3 runs on.
+- API reference: [`vibration.structural.mechanical_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/mechanical-mobility/).
+- Theory: [Point mobilities and radiation efficiency](../../reference/theory/vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the infinite-structure point mobilities and the radiation efficiency, and why they are averages a finite structure oscillates about.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne

@@ -16,7 +16,7 @@ references:
     number: "Research Project NOISE SC01, entregable D1.5d, contrato EASA.2020.FC.06"
     institution: "European Union Aviation Safety Agency"
     url: "https://www.easa.europa.eu/en/downloads/132005/en"
-    note: "La guía a nivel de ecuación (Ec. 13-35) que sustenta la implementación, con los valores de atenuación de la Tabla 4 y los hemisferios de referencia usados como oráculos. Alcance implementado (§A.3-A.5): el hemisferio de ruido, la divergencia esférica, la atenuación atmosférica (ISO 9613-1, Tabla 4), el efecto de suelo de Chien-Soroka (impedancia de Delany-Bazley, resistividad de flujo CNOSSOS), la interpolación entre condiciones de vuelo (Ec. 3-10), la cinemática de la trayectoria (Ec. 16-21 / Doc 32 Ec. 8-10), el tiempo registrado (Ec. 22), las métricas de evento único SEL/LASmax y EPNL (Doc 32 Ec. 27/28, Anexo 16 de la OACI Ap. 2), el plano medio del suelo y las alturas equivalentes (Ec. 36-40), la resistividad de flujo media logarítmica (Ec. 41) y la cadena de apantallamiento por terreno (Ec. 42-47 con los apéndices de caminos de ruido de la guía; filiación CNOSSOS-EU). El tratamiento de fuente en hover, ralentí y rodaje (§A.3.5) queda fuera de la implementación. El PDF enlazado es la descarga gratuita; el proyecto está catalogado en la página del proyecto en EASA (https://www.easa.europa.eu/en/research-projects/environmental-research-rotorcraft-noise)."
+    note: "La guía a nivel de ecuación (Ec. 13-35) que sustenta la implementación, con los valores de atenuación de la Tabla 4 y los hemisferios de referencia usados como oráculos. Alcance implementado (§A.3-A.5): el hemisferio de ruido, la divergencia esférica, la atenuación atmosférica (ISO 9613-1, Tabla 4), el efecto de suelo de Chien-Soroka (impedancia de Delany-Bazley, resistividad de flujo CNOSSOS), la interpolación entre condiciones de vuelo (Ec. 3-10), la cinemática de la trayectoria (Ec. 16-21 / Doc 32 Ec. 8-10), el tiempo registrado (Ec. 22), las métricas de evento único SEL/LASmax y EPNL (Doc 32 Ec. 27/28, Anexo 16 de la OACI Ap. 2), el plano medio del suelo y las alturas equivalentes (Ec. 36-40), la resistividad de flujo media logarítmica (Ec. 41) y la cadena de apantallamiento por terreno (Ec. 42-47 con los apéndices de caminos de ruido de la guía; filiación CNOSSOS-EU). El tratamiento de fuente en estacionario, ralentí y rodaje (§A.3.5) queda fuera de la implementación. El PDF enlazado es la descarga gratuita; el proyecto está catalogado en la página del proyecto en EASA (https://www.easa.europa.eu/en/research-projects/environmental-research-rotorcraft-noise)."
   - type: article
     authors: ["Chien, C. F.", "Soroka, W. W."]
     year: 1975
@@ -52,7 +52,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 El ruido de los helicópteros es muy directivo, así que el método de **ECAC
 Doc 32** describe la fuente con un **hemisferio de ruido**: niveles de presión
-acústica en bandas de 1/3 de octava sobre una malla esférica de azimut
+acústica en bandas de tercio de octava sobre una malla esférica de acimut
 $\varphi$ y ángulo polar $\theta$, definidos a una distancia de referencia
 fija de **60 m** en condiciones atmosféricas de referencia de la OACI. Situar
 esa fuente en un receptor añade el ajuste de propagación
@@ -124,7 +124,7 @@ nivelada y descenso, y entra aquí como `level_offset`.
 ## El hemisferio de ruido
 
 Un `RotorcraftHemisphere` contiene los niveles de banda sobre la malla
-azimut/polar.
+acimut/polar.
 
 | Campo | Forma | Unidades y convenio |
 |---|---|---|
@@ -149,9 +149,9 @@ una directividad verosímil pero falsa. `NaN` y 0 dB no son intercambiables: los
 bins sin medir tienen que ser `NaN`, porque se rellenan desde el bin lleno
 angularmente más cercano antes de la consulta bilineal, y un 0 dB guardado se
 tomaría como dato. `h.mirrored()` implementa la relación de sentido de rotor de
-la Ec. 2 invirtiendo el signo del azimut.
+la Ec. 2 invirtiendo el signo del acimut.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_hemisphere_es.svg" alt="El hemisferio de ruido de helicópteros de ECAC Doc 32 y sus dos ángulos, en tres paneles. El panel a es el plano central vertical a azimut cero: un helicóptero con una semicircunferencia de 60 m de radio debajo, el ángulo polar theta corriendo de 0 en el morro a 90 justo debajo y a 180 en la cola, y la banda polar medida entre los dos instantes de 10 dB por debajo destacada sobre el arco. El panel b es el mismo hemisferio visto desde popa: el azimut phi vale 0 justo debajo, más 90 a estribor y menos 90 a babor, con la banda lateral medida de menos 60 a más 60 grados destacada y una nota de que fuera de ella los bins se rellenan. El panel c coloca la esfera de 60 m sobre una trayectoria de vuelo: el helicóptero sobre una traza a trazos con su ángulo de alabeo marcado y la distancia oblicua r bajando hasta un receptor a 1,2 m del suelo. El pie da los tres ajustes de propagación y el contrato del array: niveles indexados por azimut, ángulo polar y banda en dB a 60 m bajo la atmósfera de referencia de la OACI de 25 grados Celsius, 70 por ciento de humedad relativa y 101,325 kilopascales, 19 azimuts por 19 ángulos polares cada 10 grados y 31 bandas de tercio de octava de 10 Hz a 10 kHz, bins sin medir a NaN y nunca a 0 dB, y los miembros de clase con rotor especular leyendo los mismos datos en menos phi" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_hemisphere_es.svg" alt="El hemisferio de ruido de helicópteros de ECAC Doc 32 y sus dos ángulos, en tres paneles. El panel a es el plano central vertical a acimut cero: un helicóptero con una semicircunferencia de 60 m de radio debajo, el ángulo polar theta corriendo de 0 en el morro a 90 justo debajo y a 180 en la cola, y la banda polar medida entre los dos instantes de 10 dB por debajo destacada sobre el arco. El panel b es el mismo hemisferio visto desde popa: el acimut phi vale 0 justo debajo, más 90 a estribor y menos 90 a babor, con la banda lateral medida de menos 60 a más 60 grados destacada y una nota de que fuera de ella los bins se rellenan. El panel c coloca la esfera de 60 m sobre una trayectoria de vuelo: el helicóptero sobre una traza a trazos con su ángulo de alabeo marcado y la distancia oblicua r bajando hasta un receptor a 1,2 m del suelo. El pie da los tres ajustes de propagación y el contrato del array: niveles indexados por acimut, ángulo polar y banda en dB a 60 m bajo la atmósfera de referencia de la OACI de 25 grados Celsius, 70 por ciento de humedad relativa y 101,325 kilopascales, 19 acimutes por 19 ángulos polares cada 10 grados y 31 bandas de tercio de octava de 10 Hz a 10 kHz, bins sin medir a NaN y nunca a 0 dB, y los miembros de clase con rotor especular leyendo los mismos datos en menos phi" width="92%" />
 
 `hemisphere_source_level` lee el nivel en una dirección de emisión arbitraria:
 primero rellena los huecos de la malla desde los bins llenos angularmente más
@@ -167,7 +167,7 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # recto hacia abajo, por b
 h.plot()                                          # directividad proa-popa
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hemisphere_es.svg" alt="Dos paneles de un hemisferio de ruido de helicóptero sintético. A la izquierda, la sección proa-popa a azimut cero: nivel de fuente a 60 m frente al ángulo polar, de 0 hacia delante a 180 hacia atrás, para las bandas de 100 Hz, 631 Hz y 3981 Hz, con la banda polar medida entre 40 y 140 grados sombreada y las curvas planas fuera de ella, donde los valores están rellenados. A la derecha, la banda de 631 Hz sobre toda la malla azimut-polar como contorno relleno, con un lóbulo fuerte cerca de 140 grados de polar y azimut cero, la cobertura medida marcada con un rectángulo a trazos de 40 a 140 grados de polar y de menos 60 a más 60 grados de azimut, y una nota de que 9,4 dB separan la celda medida más ruidosa de la más silenciosa" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hemisphere_es.svg" alt="Dos paneles de un hemisferio de ruido de helicóptero sintético. A la izquierda, la sección proa-popa a acimut cero: nivel de fuente a 60 m frente al ángulo polar, de 0 hacia delante a 180 hacia atrás, para las bandas de 100 Hz, 631 Hz y 3981 Hz, con la banda polar medida entre 40 y 140 grados sombreada y las curvas planas fuera de ella, donde los valores están rellenados. A la derecha, la banda de 631 Hz sobre toda la malla acimut-polar como contorno relleno, con un lóbulo fuerte cerca de 140 grados de polar y acimut cero, la cobertura medida marcada con un rectángulo a trazos de 40 a 140 grados de polar y de menos 60 a más 60 grados de acimut, y una nota de que 9,4 dB separan la celda medida más ruidosa de la más silenciosa" width="92%" />
 
 *Por qué el método necesita un hemisferio: en la banda más directiva, 9,4 dB
 separan la dirección medida más ruidosa de la más silenciosa, y el lóbulo se
@@ -227,7 +227,14 @@ ISO 9613-1, Ec. 26/27) y `ground_effect_adjustment` (interferencia directo/
 reflejado sobre un plano de impedancia, Chien-Soroka Ec. 28-35, con la impedancia
 de Delany-Bazley y las clases de resistividad de flujo CNOSSOS `"A"`-`"H"`).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_ground_effect_es.svg" alt="Ajuste por efecto de suelo de helicópteros frente a la frecuencia de 1/3 de octava para suelo duro y blando, con refuerzo a baja frecuencia, un valle de interferencia profundo y la región incoherente de alta frecuencia" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_ground_effect_es.svg" alt="Ajuste por efecto de suelo de helicópteros frente a la frecuencia de tercio de octava para suelo duro y blando, con refuerzo a baja frecuencia, un valle de interferencia profundo y la región incoherente de alta frecuencia" width="82%" loading="eager" />
+
+*Una geometría, dos clases de suelo, y la superficie dura es la más extrema en
+los dos sentidos: refuerza más a baja frecuencia (+5,3 dB frente a +4,7 dB en
+50 Hz), cancela mucho más a fondo en el primer mínimo (−13,7 dB frente a
+−7,8 dB) y sigue oscilando en torno a +2,4 dB en 5 kHz, donde la curva blanda ya
+se ha asentado hacia una suma incoherente cercana a +0,6 dB. Las tres regiones
+se leen debajo del código.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -271,9 +278,9 @@ recibido = (lv
 ```
 
 La base de datos estándar está registrada a 60 m, el valor por defecto. Si un
-hemisferio usa otra distancia polar (`h.distance`, p. ej. anillos de hover a
-70 m), pásala a los dos ajustes dependientes de la distancia como
-`reference_distance=h.distance`.
+hemisferio usa otra distancia polar (`h.distance`, p. ej. anillos en vuelo
+estacionario a 70 m), pásala a los dos ajustes dependientes de la distancia
+como `reference_distance=h.distance`.
 
 La curva de suelo se lee en tres regiones. A baja frecuencia el rayo directo y su
 reflexión en el suelo llegan casi en fase, así que el nivel se acerca a 6 dB por
@@ -287,7 +294,7 @@ impedancia finita gira la fase de la onda reflejada y absorbe parte de ella, as�
 que el refuerzo es algo menor (4,7 dB en 50 Hz) y, lo que más importa, la
 cancelación es mucho menos completa: el primer mínimo es de 7,8 dB en lugar de
 13,7 dB. A alta frecuencia los dos caminos se descorrelacionan hacia una suma
-incoherente, que es donde la curva blanda se asienta cerca de 1 dB mientras la
+incoherente, que es donde la curva blanda se asienta cerca de 0,6 dB mientras la
 dura sigue oscilando en 2,4 dB a 5 kHz. Todo esto es coherente por construcción,
 así que un nivel promediado sobre un evento entero muestra mucha menos estructura
 que cualquiera de estos espectros congelados.
@@ -471,7 +478,7 @@ de cabeceo está implícita en los hemisferios), y el historial recibido en
 tercios de octava se expresa en tiempo registrado $t_r = t_e + r/c$ (Ec. 22,
 $c = 346{,}1\ \text{m/s}$) y se integra: `LASmax`, `SEL` sobre el historial
 completo y
-sobre la ventana de certificación de 10 dB de caída (Doc 32 Ec. 27), y `EPNL`
+sobre la ventana de certificación de 10 dB por debajo (Doc 32 Ec. 27), y `EPNL`
 según Anexo 16 de la OACI (Doc 32 Ec. 28).
 
 ```python
@@ -509,7 +516,16 @@ segundo *antes* que el sonido emitido en el punto de máxima aproximación, porq
 la dirección de emisión más ruidosa se alcanza un poco antes del través. Esa es
 la razón por la que el método lleva un hemisferio y no un nivel de fuente.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event_es.svg" alt="Nivel ponderado A frente al tiempo registrado para un sobrevuelo nivelado de un helicóptero: subida suave hasta LASmax sobre la ventana de 10 dB de caída y descenso más lento, anotado con el SEL y el EPNL del evento" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event_es.svg" alt="Nivel ponderado A frente al tiempo registrado para un sobrevuelo nivelado de un helicóptero: subida suave hasta LASmax sobre la ventana de 10 dB por debajo y descenso más lento, anotado con el SEL y el EPNL del evento" width="82%" />
+
+*Dos asimetrías en una misma curva, y ninguna es un artefacto del modelo. El
+$L_{AS,max}$ = 78,5 dB(A) llega a los 64,56 s, un segundo entero **antes** que
+el sonido emitido en el punto de máxima aproximación (65,56 s), porque la
+dirección más ruidosa del hemisferio se alcanza un poco antes del través. Y la
+ventana de 10 dB por debajo ocupa 9,4 s por delante del máximo y 11,5 s por
+detrás: el tiempo retardado comprime la aproximación y estira el alejamiento.
+Integrar sus 20,9 s enteros y normalizar a un segundo da SEL = 88,8 dB(A),
+10,3 dB por encima del máximo que marcaría el sonómetro.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -617,7 +633,7 @@ la maquinaria para emplazamientos reales. Una sección vertical variable se
 representa por su **plano medio del suelo** (Ec. 36-40), la recta de mínimos
 cuadrados a través de la polilínea del terreno calculada en forma cerrada; la
 fuente y el receptor entran en las ecuaciones de suelo plano con sus **alturas
-equivalentes**, medidas ortogonalmente a ese plano y con suelo mínimo de
+equivalentes**, medidas ortogonalmente a ese plano y con una cota inferior de
 0,1 m. El suelo que cambia de tipo a lo largo del camino promedia su
 resistividad de flujo por el logaritmo, ponderada por la longitud de cada
 segmento (Ec. 41).
@@ -628,7 +644,7 @@ segmento (Ec. 41).
 el terreno bajo él está 4 m por encima del plano que ajusta la sección, así que
 su altura equivalente es de 5,1 m, y el efecto de suelo es función de las alturas
 equivalentes, no de las verdaderas. Cuatro metros de relieve local mueven el
-primer mínimo de interferencia una octava. El suelo mínimo de 0,1 m existe para
+primer mínimo de interferencia una octava. La cota inferior de 0,1 m existe para
 el caso contrario, un receptor en una hondonada por encima de la cual pasa el
 plano ajustado.*
 
@@ -663,7 +679,7 @@ plt.show()
 </details>
 
 Cuando el terreno bloquea la línea de visión, el sonido sigue el camino
-convexo más corto sobre él (la guía NORAH2 lo llama la banda elástica) y cada
+convexo más corto sobre él (la guía NORAH2 lo llama la goma elástica) y cada
 vértice tocado es una **arista de difracción**. La atenuación combina la
 difracción pura de la diferencia de camino $\delta$ (Ec. 42-44,
 $10 C_h \log_{10}\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, con tope de 25 dB) con
@@ -700,12 +716,21 @@ freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)
 res = aircraft.terrain_screening_adjustment(
     freqs, source=(0.0, 90.0), receiver=(600.0, 3.2), distances=d, heights=z,
     flow_resistivity="D")
-res.screened, res.path_difference      # True, la delta de la banda elástica
+res.screened, res.path_difference      # True, la delta de la goma elástica
 res.adjustment                         # por banda, sustituye al ΔLg plano
 res.plot()                             # la geometría de la sección
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_terrain_screening_es.svg" alt="Sección de apantallamiento por terreno con una fuente de helicóptero, una colina que bloquea la línea de visión al micrófono y el camino difractado sobre su cresta, sobre el ajuste por banda de suelo y apantallamiento comparado con el peine de suelo plano" width="82%" />
+
+*La colina vale 0,766 m de diferencia de camino, y ese único número es todo el
+espectro. Es una novena parte de la longitud de onda en 50 Hz y casi nueve
+longitudes de onda en 4 kHz, así que la curva apantallada marca −7,3 dB en la
+banda más baja y satura cerca del tope de 25 dB a partir de unos 2,5 kHz:
+23,9 dB en 4 kHz. Leída frente al peine de suelo plano, la colina gana 12,3 dB
+en 50 Hz y unos 25 dB en lo alto del intervalo. El apantallamiento por terreno
+es un instrumento de alta frecuencia, y no arregla una queja de baja
+frecuencia.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -778,9 +803,9 @@ reproduce los casos ARP de verificación del prototipo NORAH2:
 
 :::note[Dos salvedades, no redondeo]
 La coincidencia del **EPNL** es un orden de magnitud más floja que todo lo demás
-porque el prototipo aplica una política de ruidosidad percibida por debajo del
-suelo de noys que difiere de la ley publicada del Anexo 16; la divergencia está
-en la referencia, no en la cadena.
+porque el prototipo aplica una política de ruidosidad percibida por debajo de
+la cota inferior de noys que difiere de la ley publicada del Anexo 16; la
+divergencia está en la referencia, no en la cadena.
 
 A gran distancia sobre **suelo blando** el prototipo amortigua la interferencia
 coherente de dos rayos de la Ec. 30 de la guía hacia la suma incoherente, cosa
@@ -794,7 +819,7 @@ suelo es exacto en perfiles lineales y simétricos, una sección plana
 reproduce el modelo de suelo plano a precisión de máquina y un plano
 inclinado su rotación analítica, la resistividad media logarítmica recupera
 la media geométrica, la difracción rasante da el clásico $10\log_{10} 3$, y
-una colina comprobada a mano fija la diferencia de camino de la banda
+una colina comprobada a mano fija la diferencia de camino de la goma
 elástica. El tratamiento del suelo por receptor valida de extremo a extremo
 contra el caso 3 ARP del prototipo (187 micrófonos, cada uno sobre su propia
 elevación: cada nivel por paso a 0,08 dB(A), `SEL`/`LASmax` a 0,05 dB, la
@@ -824,7 +849,7 @@ la Tabla 4 de la guía NORAH2, límites geométricos y rasantes en forma cerrada
 y de extremo a extremo contra los casos de verificación ARP del prototipo
 NORAH2.
 
-**No cubierto.** El tratamiento de fuente en hover, ralentí y rodaje (guía
+**No cubierto.** El tratamiento de fuente en estacionario, ralentí y rodaje (guía
 §A.3.5) queda fuera de la implementación: el modelo de fuente por hemisferio
 supone un sobrevuelo, no un helicóptero estacionario o en ralentí en tierra.
 **Con phonometry no se distribuye ninguna base de datos de hemisferios, y no hay

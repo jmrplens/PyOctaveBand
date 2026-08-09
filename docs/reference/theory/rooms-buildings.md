@@ -179,12 +179,24 @@ for the 45° loudspeaker method ($R'_{45°}$) and $-3$ dB for the all-angle
 road-traffic method ($R'_{tr,s}$); all three carry the ISO 717-1 airborne
 single number.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab.svg" alt="Plan view of an ISO 10140 laboratory transmission suite: structurally decoupled source and receiving reverberation rooms of about 59 and 51 cubic metres, the test element mounted in the 10 square metre test opening between them, a corner loudspeaker in the source room and a continuously moving microphone with a sweep radius of at least 1 m in each room" width="92%"></picture>
+
 ### Flanking transmission prediction (EN 12354-1/2)
 
 The apparent field index is the energetic sum of the direct path $Dd$ and, for
 each flanking element $F=f$ across its junction with the separating element, the
 three paths $Ff$, $Df$ and $Fd$ (EN 12354-1, simplified single-number model,
 Formula 26):
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths.svg" alt="The direct path Dd through the separating element and the three flanking paths Ff, Df and Fd across each junction between a flanking element and the separating element" width="92%"></picture>
+
+*The four labels are only meaningful on this drawing. Upper case is the source
+side and lower case the receiving side, so $Dd$ goes straight through the
+separating element, $Ff$ runs along a flanking element on both sides of the
+junction, and $Df$ and $Fd$ cross from one to the other. The junction they cross
+is where $K_{ij}$ and the coupling length $\ell_f$ live in the formula below,
+and the separating element is where $S_s$ is measured. Each junction contributes
+three flanking terms, so a room with four flanking elements sums thirteen paths.*
 
 $$
 R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}

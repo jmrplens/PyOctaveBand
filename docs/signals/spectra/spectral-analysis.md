@@ -522,6 +522,36 @@ matrix underlies [multiple and partial coherence](miso-coherence.md), which
 extends the ordinary coherence to several correlated inputs and one
 output.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol's Welch estimators (*Random Data*, 4th ed., 2010,
+Sections 5.2, 8.5, 9.1-9.2 and 11.5): `power_spectral_density` and
+`cross_spectral_density` with the effective number of averages, the chi-square
+confidence intervals and the resolution-bias error; the coherent output
+spectrum and the spectral SNR; the Harris (1978) window figures of merit in
+`window_metrics`; and the Thomson (1982) multitaper estimator of
+`multitaper_psd`, following Percival & Walden Chapters 7-8.
+`fractional_octave_smoothing` and `noise_signal` complete the toolbox.
+
+**Not covered.** The frequency-response estimators `transfer_function` and
+`coherence`, and the sound-intensity probe, share this page's Welch core but
+are documented on
+[Electroacoustics](../../devices/electroacoustics/electroacoustics.md) and
+[Sound intensity](../../devices/emission/intensity.md). So is multiple and
+partial coherence, on [MISO coherence](miso-coherence.md). And these are a
+textbook's estimators, not a certification standard, so there is no clause
+number and no compliance limit to check the page against.
+
+## See also
+
+- [Data qualification](../metrology/data-qualification.md): the stationarity every chi-square interval on this page assumes.
+- [Calibration and dBFS](../metrology/calibration.md): where the factor that turns this page's densities into Pa²/Hz comes from.
+- [MISO coherence](miso-coherence.md): the same cross-spectral matrix with several correlated inputs.
+- [Time-frequency analysis](time-frequency.md): the same Welch segmentation displayed instead of averaged.
+- [Levels](../levels/levels.md): the band-level side of the density/band conversion of section 4.
+- API reference: [`signals.spectra`](https://jmrplens.github.io/phonometry/reference/api/signals/spectra/), [`signals.windows`](https://jmrplens.github.io/phonometry/reference/api/signals/windows/) and [`signals.multitaper`](https://jmrplens.github.io/phonometry/reference/api/signals/multitaper/).
+- Theory: [Frequency Resolution vs FFT Bin Spacing](../../reference/theory/signal-analysis.md#frequency-resolution-vs-fft-bin-spacing): why the bin spacing of an FFT is not the resolution of the estimate, and what the window does to both.
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and

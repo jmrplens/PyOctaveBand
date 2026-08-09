@@ -266,6 +266,24 @@ accumulates more of it than the single closed form allows.
 > the absolute level (it spreads the modulated energy across bands); quote the
 > closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.
 
+## See also
+
+- [Loudness](loudness.md): the ISO 532-1
+  percentile loudness $N_5$ this model takes as its first argument, and the
+  acquisition rules the recording has to satisfy before any of it applies.
+- [Sound Quality Metrics](sound-quality.md):
+  the DIN 45692 sharpness $S$, the ECMA-418-2 roughness $R$ and the normative
+  vacil_HMS fluctuation strength of the same sensation this page models in
+  vacil.
+- [Advanced Loudness](advanced-loudness.md):
+  the alternative loudness models, and why mixing families makes the composite
+  an engineering estimate.
+- [Environmental Levels](../../environment/assessment/environmental-levels.md):
+  community annoyance, the other thing the word means, and the rating levels it
+  is assessed with.
+- Theory: [Advanced loudness models and sound quality](../../reference/theory/perception.md#advanced-loudness-models--sound-quality): the loudness and sound-quality metrics the annoyance model combines, derived one at a time.
+- API reference: [`psychoacoustics.quality.annoyance`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/annoyance/) and [`psychoacoustics.quality.fluctuation_strength`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength/).
+
 ## References
 
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*

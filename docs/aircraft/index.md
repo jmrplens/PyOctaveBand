@@ -115,5 +115,5 @@ motivates them.
 
 If you arrived here from a search and want the shape of the whole library,
 [What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
-and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+and [All guides](../README.md) lists every page with a line on
 each.
