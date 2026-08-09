@@ -14,7 +14,13 @@ from __future__ import annotations
 
 import os
 
-from .aircraft import _d_aircraft_certification, _d_rotorcraft_certification
+from .aircraft import (
+    _d_aircraft_certification,
+    _d_aircraft_noise_station,
+    _d_doc29_segment_geometry,
+    _d_rotorcraft_certification,
+    _d_rotorcraft_hemisphere,
+)
 from .buildings import (
     _d_decay_range,
     _d_directivity_factor,
@@ -105,13 +111,20 @@ from .perception import (
     _d_dosimeter,
     _d_emission_positions,
     _d_hearing_threshold,
+    _d_loudness_capture,
+    _d_mg_capture_routes,
     _d_nihl,
     _d_objective_intelligibility,
     _d_psychoacoustic_annoyance,
+    _d_slm_workstation,
     _d_sound_quality,
+    _d_soundfield_audiometry,
     _d_speech_intelligibility,
     _d_sti_chain,
+    _d_sti_setup,
+    _d_stoi_bench,
     _d_tone_audibility,
+    _d_tone_audibility_acquisition,
     _d_zwicker,
 )
 from .signals import (
@@ -138,12 +151,24 @@ from .signals import (
     _d_uncertainty,
 )
 from .simulation import _d_fdtd
-from .underwater import _d_hydrophone_deployment, _d_sofar_channel
+from .underwater import (
+    _d_hydrophone_deployment,
+    _d_marine_mammal_exposure,
+    _d_pile_driving_deployment,
+    _d_sofar_channel,
+    _d_sonar_equation,
+    _d_underwater_waveguide,
+)
 from .vibration import (
+    _d_fault_kinematics,
+    _d_hand_arm_vibration,
     _d_human_vibration,
+    _d_iso2631_5_setup,
     _d_junction_rig,
+    _d_machine_diagnostics,
     _d_mobility_rig,
     _d_multiple_shock,
+    _d_power_injection_rig,
     _d_transfer_stiffness_rig,
 )
 
@@ -223,6 +248,9 @@ DIAGRAMS = {
     "diagram_human_vibration": (
         _d_human_vibration,
         "Whole-body vibration measurement chain (ISO 2631-1 / ISO 8041-1)", 580),
+    "diagram_hand_arm_vibration": (
+        _d_hand_arm_vibration,
+        "Hand-transmitted vibration: where the accelerometer goes", 660),
     "diagram_speech_intelligibility": (
         _d_speech_intelligibility,
         "Speech Intelligibility Index computation flow (ANSI S3.5-1997)", 600),
@@ -244,6 +272,18 @@ DIAGRAMS = {
     "diagram_hearing_threshold": (
         _d_hearing_threshold,
         "Hearing-threshold model (ISO 7029 age distribution, ISO 389-7 zero)", 600),
+    "diagram_soundfield_audiometry": (
+        _d_soundfield_audiometry,
+        "Sound-field audiometry and the ISO 389-7 reference zero", 580),
+    "diagram_slm_workstation_iso9612": (
+        _d_slm_workstation,
+        "Sound level meter at a workstation (ISO 9612, Clause 12.4)", 580),
+    "diagram_sti_setup": (
+        _d_sti_setup,
+        "Setting up an STI measurement (IEC 60268-16, clause 7)", 580),
+    "diagram_stoi_bench": (
+        _d_stoi_bench,
+        "Capturing a STOI pair through a real device", 545),
     "diagram_uncertainty": (
         _d_uncertainty,
         "Uncertainty: GUM propagation vs Monte Carlo (Guide 98-3)", 540),
@@ -256,6 +296,9 @@ DIAGRAMS = {
     "diagram_iso2631_5": (
         _d_multiple_shock,
         "Multiple-shock spinal-response dose and injury risk (ISO 2631-5)", 580),
+    "diagram_iso2631_5_setup": (
+        _d_iso2631_5_setup,
+        "Getting the record (ISO 2631-5, clauses 5.1.2 and 5.1.4)", 600),
     "diagram_en12354_6": (
         _d_enclosed_space_absorption,
         "Absorption area and reverberation time of a room (EN 12354-6)", 410),
@@ -293,6 +336,10 @@ DIAGRAMS = {
     "diagram_zwicker": (
         _d_zwicker,
         "Zwicker loudness model chain (ISO 532-1)", 490),
+    "diagram_loudness_capture": (
+        _d_loudness_capture,
+        "Where the microphone goes for a loudness measurement (ISO 532-1)",
+        650),
     "diagram_equal_loudness_weighting": (
         _d_equal_loudness_weighting,
         "Why A-weighting: an equal-loudness contour, inverted (ISO 226)",
@@ -318,10 +365,10 @@ DIAGRAMS = {
         "Dynamic-stiffness resonance rig (EN 29052-1)", 880),
     "diagram_mobility_rig": (
         _d_mobility_rig,
-        "Mechanical-mobility measurement on a beam (ISO 7626)", 560),
+        "Mechanical-mobility measurement on a beam (ISO 7626)", 860),
     "diagram_transfer_stiffness_rig": (
         _d_transfer_stiffness_rig,
-        "Dynamic transfer stiffness: direct and indirect methods (ISO 10846)", 600),
+        "Dynamic transfer stiffness: direct and indirect methods (ISO 10846)", 1110),
     "diagram_reception_plate": (
         _d_reception_plate,
         "Reception-plate measurement of structure-borne power (EN 15657)", 560),
@@ -362,6 +409,17 @@ DIAGRAMS = {
     "diagram_junction_rig": (
         _d_junction_rig,
         "Junction vibration measurement on L- and T-junctions (ISO 10848)", 620),
+    "diagram_power_injection_rig": (
+        _d_power_injection_rig,
+        "Power injection: coupling loss factors from measured energies", 670),
+    "diagram_fault_kinematics": (
+        _d_fault_kinematics,
+        "Where the fault frequencies come from: bearing, gear pair, ducted fan",
+        790),
+    "diagram_machine_diagnostics": (
+        _d_machine_diagnostics,
+        "Condition monitoring on a motor-gearbox train (Norton Section 8.4)",
+        600),
     "diagram_vibration_sound_power": (
         _d_vibration_sound_power,
         "Sound power from surface vibration (ISO/TS 7849)", 580),
@@ -371,6 +429,18 @@ DIAGRAMS = {
     "diagram_sofar_channel": (
         _d_sofar_channel,
         "The SOFAR channel: a deep-ocean sound waveguide", 620),
+    "diagram_pile_driving": (
+        _d_pile_driving_deployment,
+        "Percussive pile-driving survey geometry (ISO 18406)", 670),
+    "diagram_sonar_equation": (
+        _d_sonar_equation,
+        "Sonar equation geometry: passive and active (ISO 18405)", 660),
+    "diagram_underwater_waveguide": (
+        _d_underwater_waveguide,
+        "The range-independent waveguide the three solvers share", 580),
+    "diagram_marine_mammal_exposure": (
+        _d_marine_mammal_exposure,
+        "Marine-mammal exposure: measured here, assessed there", 620),
     "diagram_atmospheric_refraction": (
         _d_atmospheric_refraction,
         "Atmospheric refraction: downwind multipath and the upwind shadow",
@@ -383,6 +453,18 @@ DIAGRAMS = {
         _d_rotorcraft_certification,
         "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)",
         620),
+    "diagram_aircraft_noise_station": (
+        _d_aircraft_noise_station,
+        "A noise certification measurement station (ICAO Annex 16, App. 2)",
+        750),
+    "diagram_doc29_segment": (
+        _d_doc29_segment_geometry,
+        "Flight-path segment geometry (ECAC Doc 29, Chapter 4)",
+        710),
+    "diagram_rotorcraft_hemisphere": (
+        _d_rotorcraft_hemisphere,
+        "The rotorcraft noise hemisphere and its angles (ECAC Doc 32)",
+        686),
     "diagram_swept_sine": (
         _d_swept_sine,
         "Swept-sine distortion: deconvolution and harmonic pre-arrivals",
@@ -425,6 +507,14 @@ DIAGRAMS = {
     "diagram_sound_quality": (
         _d_sound_quality,
         "Sound quality beyond loudness: four calibrated sensations", 500),
+    "diagram_mg_capture_routes": (
+        _d_mg_capture_routes,
+        "Which recording maps to which arguments (ISO 532-2 clause 7.2)",
+        690),
+    "diagram_tone_audibility_acquisition": (
+        _d_tone_audibility_acquisition,
+        "The spectra an ISO/PAS 20065 assessment is built on",
+        620),
     "diagram_tone_audibility": (
         _d_tone_audibility,
         "Tone audibility: from spectrum to penalty (ISO/PAS 20065)", 580),

@@ -101,19 +101,76 @@ $$
 
 $w_S$ is zero for $S \le 1.75\ \text{acum}$ (sharpness only adds annoyance
 above that threshold); $w_{FR}$ weights roughness more heavily than
-fluctuation strength
-(0.6 vs 0.4). `psychoacoustic_annoyance` takes the four quantities directly and
+fluctuation strength (0.6 vs 0.4). Those two choices are the whole of the
+modelling judgement in the formula, and they are easier to trust once seen:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/annoyance_weightings.svg" alt="Left: the sharpness weighting wS against sharpness from 1 to 5 acum for percentile loudnesses of 10, 30 and 60 sone, flat at zero below 1.75 acum and fanning out above it. Right: psychoacoustic annoyance against a sensation magnitude spent entirely on roughness or entirely on fluctuation strength at a fixed loudness of 30 sone and sharpness of 2 acum, the roughness curve rising to 45.4 against 40.5 for fluctuation strength at a magnitude of 1.5" width="94%" />
+
+*A sound has to be sharper than the 1.75 acum reference before sharpness costs
+anything at all, and the fan above that point is the loudness dependence of
+$w_S$. On the right, the same sensation magnitude buys about half again as much
+annoyance when it arrives as roughness rather than as fluctuation strength.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `psychoacoustics` is imported by the snippet above.
+sharpness = np.linspace(1.0, 5.0, 200)
+for n5 in (10.0, 30.0, 60.0):
+    w_s = [psychoacoustics.psychoacoustic_annoyance(n5, float(s), 0.0, 0.0).w_s
+           for s in sharpness]
+    plt.plot(sharpness, w_s, label=f"N5 = {n5:g} sone")
+plt.axvline(1.75, linestyle="--")
+plt.xlabel("Sharpness S [acum]")
+plt.ylabel("Sharpness weighting wS")
+plt.legend()
+plt.show()
+
+# The same magnitude spent on roughness or on fluctuation strength, at a
+# fixed N5 = 30 sone and S = 2.0 acum:
+rough = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.0, 1.5).annoyance
+fluct = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 1.5, 0.0).annoyance
+print(round(rough, 1), round(fluct, 1))   # 45.4 40.5
+```
+
+</details>
+
+`psychoacoustic_annoyance` takes the four quantities directly and
 returns the annoyance together with the two intermediate weightings:
 
 ```python
 from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
-print(round(res.annoyance, 4))   # 37.0478
+print(round(res.annoyance, 4))   # 37.0477
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
 
 res.plot()   # PA beside its wS and wFR weightings (needs matplotlib)
 ```
+
+**What that number means.** $PA$ carries no unit and no criterion. It is built
+so that a neutral sound — sharpness at or below 1.75 acum, no roughness, no
+fluctuation — has a $PA$ equal to its $N_5$ in sone, and every sharp, rough or
+fluctuating quality can only push it *above* that floor. So read $PA$ as "the
+loudness this sound is worth once its character is taken into account": the
+worked example's 37.05 against an $N_5$ of 30 sone says the character costs
+23 %. Comparison is the point — rank two designs of the same product, or
+quantify what a fix bought — and no limit exists to quote it against.
+
+:::caution
+**This is not the annoyance of environmental-noise assessment.** Psychoacoustic
+annoyance is a laboratory scaling of a single sound. It says nothing about
+long-term exposure, time of day, the attitude of the population towards the
+source, or the percentage highly annoyed, which is the business of the rating
+levels and exposure-response relations in
+[Environmental Levels](/phonometry/environment/assessment/environmental-levels/).
+A $PA$ of 37 is not "37 % highly annoyed", and the two quantities are not
+convertible.
+:::
 
 The figure above sweeps $PA$ against $N_5$ for three profiles: a neutral
 baseline ($S = 1.75\ \text{acum}$, $F = R = 0$, so $PA = N_5$), a sharp sound
@@ -134,14 +191,42 @@ ISO 532-1 Zwicker time-varying loudness, $S$ from DIN 45692 sharpness, $R$
 from the ECMA-418-2 Sottek roughness and $F$ from the fluctuation-strength
 signal model.
 
+The convenience is only as good as the record it is given, and neither entry
+point on this page takes a calibration argument, so `x` must already be
+**calibrated pressure in pascals** — see
+[Measuring the input](/phonometry/perception/psychoacoustics/loudness/#measuring-the-input-clause-4)
+on the loudness page for how that factor is obtained. Beyond calibration:
+unweighted; one declared operating state rather than a run-up; long enough that
+$N_5$ is a percentile of something and that the ~4 Hz fluctuation analysis has
+enough modulation periods, which in practice means several seconds and the same
+length for every design being compared; and `field=` matching how the sound was
+captured. A two-second clip yields an $N_5$ that is nearly $N_\text{max}$ and an
+$F$ biased low. A binaural or artificial-head recording is analysed one ear at a
+time, already equalized to the free or diffuse field, and the louder channel is
+the one usually reported.
+
 ```python
+import numpy as np
 from phonometry import psychoacoustics
 
+# A raw recording plus its calibration so the guide runs standalone. There is
+# no calibration_factor argument here, so x must already be in pascals.
+fs = 48000
+t = np.arange(int(5.0 * fs)) / fs
+x = (1.0 + 0.8 * np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (70 / 20) / np.sqrt(np.mean(x**2))   # calibrated to 70 dB SPL
+
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
-print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+print(f"PA = {res.annoyance:.1f}  (N5 = {res.n5:.1f} sone, S = {res.sharpness:.2f} acum,"
+      f" R = {res.roughness:.2f} asper, F = {res.fluctuation_strength:.2f} vacil)")
 
 res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
 ```
+
+All four sensations must come from the *same* record and the same operating
+state: PA is a combination rule, not a measurement in its own right, so
+computing $N_5$ over a minute and $R$ over two seconds of it silently mixes two
+different sounds. Quote each sensation with the model that produced it.
 
 :::caution
 **Model-mixing caveat.** This composite mixes model families: Zwicker-family $N_5$ and $S$, Sottek $R$
@@ -158,12 +243,22 @@ function is the exact model).
 loudness fluctuation. Like roughness it is a band-pass sensation of the
 modulation frequency, but it peaks about an order of magnitude lower, at
 $f_{mod} \approx 4\ \text{Hz}$ rather than the ~70 Hz roughness peak. By definition, a 1 kHz tone at 60 dB,
-100 % amplitude-modulated at 4 Hz, produces 1 vacil. This page covers the
-Fastl & Zwicker models; the normative Sottek-model fluctuation strength of
-ECMA-418-2 Clause 9 lives in
-[Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/).
+100 % amplitude-modulated at 4 Hz, produces 1 vacil. This page covers two of
+the three fluctuation-strength models in the library: the Fastl & Zwicker
+closed form for amplitude-modulated broadband noise (§3.1) and the Osses et
+al. (2016) signal model for arbitrary signals (§3.2). The normative
+Sottek-model fluctuation strength of ECMA-418-2 Clause 9, in vacil_HMS, lives
+in [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/) —
+note that this page's unit is the vacil and that one the vacil_HMS, so the two
+are not the same number for the same sound.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Fluctuation strength versus modulation frequency on a log axis: the closed-form AM broadband-noise curve and the AM-tone signal-model sweep both show a band-pass characteristic peaking at 4 Hz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Left: the closed-form and signal-model fluctuation strength of the same amplitude-modulated broadband noise at 60 dB against modulation frequency, both band-pass around 4 Hz, the signal model peaking at 5.5 vacil against the closed form's 3.7, a factor 1.5 overshoot at 4 Hz. Right: the signal model on the amplitude-modulated 1 kHz tone at 70 dB it was calibrated for, peaking at 1.09 vacil at 4 Hz" width="88%" />
+
+*The two models on the same stimulus, which is the comparison the caution box
+below turns into a rule. Both are band-passes centred near 4 Hz, but on AM
+broadband noise the signal model overshoots the closed form by about half
+again, because it accumulates modulation band by band across the whole Bark
+axis. On the AM tone it was calibrated for, right, it behaves.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -173,31 +268,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# Exact closed form (Eq. 10.2), AM broadband noise at 60 dB, 100 % modulation:
+# Left panel, the two models on the same stimulus: AM broadband noise at
+# 60 dB, 100 % modulation.
 fmod = np.logspace(np.log10(0.5), np.log10(32.0), 240)
 f_bbn = [psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod]
 
-# Osses 2016 signal model on a 1 kHz / 70 dB AM tone over the same sweep:
-fs = 48000
-t = np.arange(int(2.0 * fs)) / fs
-carrier = np.sin(2 * np.pi * 1000 * t)
-fm_tone = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
-f_tone = []
-for fm in fm_tone:
-    am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
-    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
-    f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+rng = np.random.default_rng(3)
+tn = np.arange(int(4.0 * fs)) / fs
+noise = rng.standard_normal(tn.size)
+fm_noise = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+f_noise = []
+for fm in fm_noise:
+    am = (1.0 + np.sin(2 * np.pi * fm * tn)) * noise
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (60 / 20)
+    f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
 fig, ax = plt.subplots()
-ax.semilogx(fmod, f_bbn, label="AM broadband noise (closed form)")
-ax2 = ax.twinx()
-ax2.plot(fm_tone, f_tone, "s--", color="tab:green", label="AM tone (signal model)")
+ax.semilogx(fmod, f_bbn, label="closed form, Eq. 10.2")
+ax.semilogx(fm_noise, f_noise, "s--", label="Osses 2016 signal model")
 ax.axvline(4.0, ls="--", color="0.4")
 ax.set_xlabel("Modulation frequency f_mod [Hz]")
 ax.set_ylabel("Fluctuation strength F [vacil]")
-h1, l1 = ax.get_legend_handles_labels()
-h2, l2 = ax2.get_legend_handles_labels()
-ax.legend(h1 + h2, l1 + l2, loc="upper right")
+ax.legend(loc="upper right")
 plt.show()
 ```
 
@@ -238,7 +331,7 @@ time-dependent trace.
 from phonometry import psychoacoustics
 
 res = psychoacoustics.fluctuation_strength(x, fs)
-print(res.fluctuation_strength)   # vacil
+print(round(res.fluctuation_strength, 2))   # 0.65 vacil for the signal above
 res.plot()   # specific fluctuation strength F′(z) over the Bark axis (needs matplotlib)
 ```
 
@@ -326,5 +419,18 @@ on this page: it lives in
 
 ## See also
 
-- API reference: [`psychoacoustics.quality.annoyance`](/phonometry/reference/api/psychoacoustics/annoyance/) and [`psychoacoustics.quality.fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/).
+- [Loudness](/phonometry/perception/psychoacoustics/loudness/): the ISO 532-1
+  percentile loudness $N_5$ this model takes as its first argument, and the
+  acquisition rules the recording has to satisfy before any of it applies.
+- [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/):
+  the DIN 45692 sharpness $S$, the ECMA-418-2 roughness $R$ and the normative
+  vacil_HMS fluctuation strength of the same sensation this page models in
+  vacil.
+- [Advanced Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/):
+  the alternative loudness models, and why mixing families makes the composite
+  an engineering estimate.
+- [Environmental Levels](/phonometry/environment/assessment/environmental-levels/):
+  community annoyance, the other thing the word means, and the rating levels it
+  is assessed with.
 - Theory: [Advanced loudness models and sound quality](/phonometry/reference/theory/perception/#advanced-loudness-models--sound-quality): the loudness and sound-quality metrics the annoyance model combines, derived one at a time.
+- API reference: [`psychoacoustics.quality.annoyance`](/phonometry/reference/api/psychoacoustics/annoyance/) and [`psychoacoustics.quality.fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/).

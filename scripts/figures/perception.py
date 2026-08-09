@@ -7,6 +7,7 @@ intelligibility, and the hearing-threshold and hearing-loss curves. Everything
 here is embedded by a page under ``perception/``.
 """
 
+import itertools
 from functools import cache
 
 import matplotlib.pyplot as plt
@@ -125,6 +126,524 @@ def generate_loudness_pattern(output_dir: str) -> None:
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
     ax.legend(loc="upper right", fontsize=9)
     save_figure(output_dir, "loudness_pattern.png")
+    plt.close()
+
+
+def _zwicker_burst_train(fs: int) -> np.ndarray:
+    """A 4.6 s train of 1 kHz bursts stepping 45 dB to 85 dB, in pascals.
+
+    Five bursts separated by 0.35 s of silence, the loudest of them short:
+    a signal with real dynamics, so the percentile loudness of ISO 532-1
+    clause 6.4 has something to be a percentile *of*, and so the brief peak
+    separates N5 from Nmax the way an impulsive event does.
+    """
+    parts: list[np.ndarray] = []
+    for level, seconds in ((45.0, 0.6), (55.0, 0.6), (65.0, 0.6),
+                           (75.0, 0.6), (85.0, 0.25)):
+        n = int(seconds * fs)
+        k = np.arange(n)
+        env = np.minimum(1.0, np.minimum(k, n - 1 - k) / (0.02 * fs))
+        amplitude = np.sqrt(2) * 2e-5 * 10 ** (level / 20)
+        parts.append(amplitude * np.sin(2 * np.pi * 1000.0 * k / fs) * env)
+        parts.append(np.zeros(int(0.35 * fs)))
+    return np.concatenate(parts)
+
+
+def generate_zwicker_time_varying(output_dir: str) -> None:
+    """The clause 6 loudness trace and the percentiles read off it."""
+    print("Generating zwicker_time_varying...")
+    from phonometry import loudness_zwicker
+
+    fs = 48000
+    x = _zwicker_burst_train(fs)
+    res = loudness_zwicker(x, fs)
+    trace = np.asarray(res.loudness_vs_time, dtype=float)
+    times = np.asarray(res.time, dtype=float)
+    n5, n10 = float(res.n5 or 0.0), float(res.n10 or 0.0)
+    stationary = loudness_zwicker(x, fs, stationary=True)
+
+    fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(11.5, 5.4), gridspec_kw={"width_ratios": [1.7, 1.0]})
+
+    ax.fill_between(times, trace, color=theme_fill(COLOR_PRIMARY, ax))
+    ax.plot(times, trace, color=COLOR_PRIMARY, linewidth=1.6,
+            label="Loudness-vs-time N(t), 2 ms steps")
+    for value, color, style, label in (
+        (res.loudness, COLOR_SECONDARY, "-",
+         f"Nmax = {res.loudness:.1f} sone (res.loudness)"),
+        (n5, COLOR_TERTIARY, "--", f"N5 = {n5:.1f} sone"),
+        (n10, COLOR_FG, ":", f"N10 = {n10:.1f} sone"),
+    ):
+        ax.axhline(value, color=color, linestyle=style, linewidth=1.5,
+                   label=label)
+    ax.axhline(float(trace.mean()), color=COLOR_FG, linestyle="-.",
+               linewidth=1.2, alpha=0.7,
+               label=f"arithmetic mean = {trace.mean():.1f} sone")
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Loudness N [sone]")
+    ax.set_xlim(0.0, float(times[-1]))
+    ax.set_ylim(0.0, float(trace.max()) * 1.32)
+    ax.set_title("1 kHz bursts stepping 45 to 85 dB",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    # The same numbers read as an exceedance: what a percentile of a trace is.
+    grid = np.linspace(0.0, float(trace.max()), 400)
+    exceeded = 100.0 * np.array([(trace >= g).mean() for g in grid])
+    ax2.plot(exceeded, grid, color=COLOR_PRIMARY, linewidth=2.0)
+    for pct, value, color, label in (
+        (5.0, n5, COLOR_TERTIARY, "N5"),
+        (10.0, n10, COLOR_FG, "N10"),
+    ):
+        ax2.plot([pct], [value], "o", color=color, markersize=8,
+                 markerfacecolor="white", markeredgewidth=1.8, zorder=6)
+        ax2.annotate(f"{label} = {value:.1f} sone", xy=(pct, value),
+                     xytext=(pct + 14, value + 1.4), fontsize=10, color=color,
+                     arrowprops={"arrowstyle": "->", "lw": 0.9,
+                                 "color": color})
+    ax2.set_xlabel("Percentage of the analysis time exceeding N [%]")
+    ax2.set_ylabel("Loudness N [sone]")
+    ax2.set_xlim(0.0, 100.0)
+    ax2.set_ylim(0.0, float(trace.max()) * 1.32)
+    ax2.set_title(f"Exceedance over the {times[-1]:.1f} s record",
+                  fontweight="bold", pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.text(
+        0.97, 0.95,
+        f"stationary=True on the same record: N = {stationary.loudness:.1f} sone",
+        transform=ax2.transAxes, ha="right", va="top", fontsize=9,
+        color=COLOR_FG,
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+              "edgecolor": COLOR_GRID})
+
+    fig.suptitle("Time-Varying Loudness and the Percentiles (ISO 532-1 "
+                 "clause 6)", fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "zwicker_time_varying.svg")
+    plt.close()
+
+
+def generate_tone_audibility_uncertainty(output_dir: str) -> None:
+    """The five Annex E decisive audibilities, their U, and the Kt ladder."""
+    print("Generating tone_audibility_uncertainty...")
+    from phonometry import environment, psychoacoustics
+
+    # ISO/PAS 20065 Annex E, Table E.4: the decisive audibility of each of the
+    # five measured 3 s spectra of the combustion engine, with the extended
+    # uncertainty U of that spectrum.
+    tones = (137.3, 430.7, 137.3, 433.4, 137.3)
+    decisive = np.array([9.18, 6.04, 7.46, 2.67, 7.17])
+    uncertainty = np.array([3.21, 2.95, 2.44, 2.52, 2.14])
+    mean = psychoacoustics.mean_audibility(decisive)
+    mean_u = psychoacoustics.mean_audibility_uncertainty(decisive, uncertainty)
+    k_t = environment.tonal_adjustment_from_mean_audibility(mean)
+    k_low = environment.tonal_adjustment_from_mean_audibility(mean - mean_u)
+
+    index = np.arange(1, decisive.size + 1)
+    _fig, ax = plt.subplots(figsize=(10, 6.4))
+
+    # ISO 1996-2:2017 Table J.1 read as a ladder of horizontal bands.
+    edges = [-2.0, 0.0, 2.0, 4.0, 6.0, 9.0, 12.0, 14.0]
+    for step, (low, high) in enumerate(itertools.pairwise(edges)):
+        ax.axhline(high, color=COLOR_GRID, linewidth=1.0, linestyle=":")
+        ax.text(0.46, (low + high) / 2, f"Kt = {step}", fontsize=9,
+                color=COLOR_FG, va="center", ha="left")
+    ax.axhline(0.0, color=COLOR_FG, linewidth=1.2)
+
+    ax.fill_between([0.4, 5.8], mean - mean_u, mean + mean_u,
+                    color=theme_fill(COLOR_SECONDARY, ax), zorder=1)
+    ax.axhline(mean, color=COLOR_SECONDARY, linewidth=1.8,
+               label=f"mean audibility {mean:.2f} ± {mean_u:.2f} dB (Formula 20)")
+    ax.errorbar(index, decisive, yerr=uncertainty, fmt="o",
+                color=COLOR_PRIMARY, markersize=8, markerfacecolor="white",
+                markeredgewidth=1.8, capsize=6, linewidth=1.6, zorder=5,
+                label="decisive audibility of each spectrum, ± U (clause 6)")
+    for x_i, y_i, f_i in zip(index, decisive, tones, strict=True):
+        ax.annotate(f"{f_i:g} Hz", xy=(x_i, y_i), xytext=(x_i + 0.09, y_i + 0.5),
+                    fontsize=9, color=COLOR_FG)
+
+    ax.annotate(
+        f"Kt = {k_t} dB, but the interval reaches into Kt = {k_low} dB",
+        xy=(3.0, mean - mean_u), xytext=(1.55, 1.1), fontsize=10,
+        color=COLOR_SECONDARY,
+        arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_SECONDARY})
+
+    ax.set_xlabel("Measured 3 s spectrum (Annex E, run index j)")
+    ax.set_ylabel("Audibility ΔL [dB]")
+    ax.set_xlim(0.4, 5.8)
+    ax.set_ylim(-2.0, 14.0)
+    ax.set_xticks(index)
+    ax.set_title("Decisive Audibility, Its Uncertainty and the Tonal "
+                 "Adjustment", fontweight="bold", pad=12)
+    ax.grid(axis="x", color=COLOR_GRID, linestyle="--", alpha=0.4)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "tone_audibility_uncertainty.svg")
+    plt.close()
+
+
+# DIN 45692 Table A.1 critical-band edges by centre frequency, and the
+# Table A.2 hearing-test target sharpness of critical-band-wide noise of the
+# same loudness as the reference sound (4 sone).
+_DIN45692_TABLE_A2: tuple[tuple[float, float, float, float], ...] = (
+    (250.0, 200.0, 300.0, 0.38), (350.0, 300.0, 400.0, 0.49),
+    (450.0, 400.0, 510.0, 0.60), (570.0, 510.0, 630.0, 0.71),
+    (700.0, 630.0, 770.0, 0.82), (840.0, 770.0, 920.0, 0.93),
+    (1000.0, 920.0, 1080.0, 1.00), (1170.0, 1080.0, 1270.0, 1.13),
+    (1370.0, 1270.0, 1480.0, 1.26), (1600.0, 1480.0, 1720.0, 1.35),
+    (1850.0, 1720.0, 2000.0, 1.49), (2150.0, 2000.0, 2320.0, 1.64),
+    (2500.0, 2320.0, 2700.0, 1.78), (2900.0, 2700.0, 3150.0, 2.06),
+    (3400.0, 3150.0, 3700.0, 2.40), (4000.0, 3700.0, 4400.0, 2.82),
+)
+
+
+def _critical_band_noise(f_low: float, f_high: float,
+                         level_db: float) -> np.ndarray:
+    """One critical band of noise at ``level_db``, in pascals at 48 kHz."""
+    from scipy import signal as sp_signal
+
+    rng = np.random.default_rng(7)
+    white = rng.standard_normal(48000 * 2)
+    sos = sp_signal.butter(8, [f_low, f_high], btype="band", fs=48000,
+                           output="sos")
+    band = sp_signal.sosfilt(sos, white)
+    band = band / np.sqrt(np.mean(band**2))
+    return np.asarray(band * 2e-5 * 10 ** (level_db / 20))
+
+
+def _level_for_four_sone(f_low: float, f_high: float) -> float:
+    """Band level that puts the band at the clause 6 loudness of 4 sone."""
+    from phonometry import loudness_zwicker
+
+    low, high = 30.0, 95.0
+    for _ in range(14):
+        mid = (low + high) / 2
+        loudness = loudness_zwicker(_critical_band_noise(f_low, f_high, mid),
+                                    48000, stationary=True).loudness
+        low, high = (mid, high) if loudness < 4.0 else (low, mid)
+    return (low + high) / 2
+
+
+@cache
+def _din45692_sweep() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Computed sharpness against the Table A.2 targets, at 4 sone each."""
+    from phonometry import sharpness_din
+
+    centres, targets, computed = [], [], []
+    for centre, f_low, f_high, target in _DIN45692_TABLE_A2:
+        level = _level_for_four_sone(f_low, f_high)
+        computed.append(float(sharpness_din(
+            _critical_band_noise(f_low, f_high, level), 48000)))
+        centres.append(centre)
+        targets.append(target)
+    return np.array(centres), np.array(targets), np.array(computed)
+
+
+def _sottek_am_reference(f_mod: float, seconds: float) -> np.ndarray:
+    """The ECMA-418-2 reference sound: 1 kHz, 100 % AM, 60 dB overall."""
+    fs = 48000
+    t = np.arange(int(seconds * fs)) / fs
+    x = (1.0 + np.cos(2 * np.pi * f_mod * t)) * np.sin(2 * np.pi * 1000.0 * t)
+    return np.asarray(x * 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2)))
+
+
+def _sottek_specific_panels(
+    output_dir: str, filename: str, *, bark: np.ndarray,
+    specific: np.ndarray, time: np.ndarray, trace: np.ndarray,
+    single: float, unit: str, symbol: str, title: str, stimulus: str,
+) -> None:
+    """The two views every ECMA-418-2 running metric carries.
+
+    Left, the average specific pattern over the Bark_HMS axis; right, the
+    time-dependent value with the 90th percentile that *is* the single
+    number drawn across it. Shared by the roughness and fluctuation-strength
+    figures, which differ only in their labels and stimulus.
+    """
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 4.8))
+
+    ax.fill_between(bark, specific, color=theme_fill(COLOR_PRIMARY, ax))
+    ax.plot(bark, specific, color=COLOR_PRIMARY, linewidth=1.8)
+    peak = int(np.argmax(specific))
+    ax.annotate(f"the carrier's band, {bark[peak]:.1f} Bark_HMS",
+                xy=(bark[peak], specific[peak]),
+                xytext=(bark[peak] + 2.0, specific[peak] * 0.92), fontsize=10,
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.set_xlabel("Critical-band rate z [Bark_HMS]")
+    ax.set_ylabel(f"Specific {title.lower()} {symbol}'(z) [{unit}/Bark_HMS]")
+    ax.set_xlim(0, 24)
+    ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
+    ax.set_title(f"Average specific {title.lower()}", fontweight="bold",
+                 pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+
+    ax2.plot(time, trace, color=COLOR_PRIMARY, linewidth=1.6,
+             label=f"{symbol}(l50), the running value")
+    ax2.axhline(single, color=COLOR_SECONDARY, linewidth=1.8, linestyle="--",
+                label=f"90th percentile = {single:.4f} {unit}")
+    ax2.set_xlabel("Time [s]")
+    ax2.set_ylabel(f"{title} {symbol} [{unit}]")
+    ax2.set_xlim(float(time[0]), float(time[-1]))
+    ax2.set_ylim(0.0, max(float(trace.max()), single) * 1.28)
+    ax2.set_title("The single value is a percentile of this trace",
+                  fontweight="bold", pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower right", fontsize=9)
+
+    fig.suptitle(f"{title} of the ECMA-418-2 Reference Sound ({stimulus})",
+                 fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, filename)
+    plt.close()
+
+
+def generate_sottek_specific_roughness(output_dir: str) -> None:
+    """R'(z) and R(l50) of the clause 7 reference sound."""
+    print("Generating sottek_specific_roughness...")
+    from phonometry import roughness_ecma
+
+    result = roughness_ecma(_sottek_am_reference(70.0, 2.0), 48000,
+                            field="free")
+    _sottek_specific_panels(
+        output_dir, "sottek_specific_roughness.svg",
+        bark=np.asarray(result.bark),
+        specific=np.asarray(result.specific_roughness),
+        time=np.asarray(result.time),
+        trace=np.asarray(result.roughness_vs_time),
+        single=float(result.roughness), unit="asper", symbol="R",
+        title="Roughness", stimulus="1 kHz, 100 % AM at 70 Hz, 60 dB")
+
+
+def generate_sottek_specific_fluctuation(output_dir: str) -> None:
+    """F'(z) and F(l50) of the clause 9 reference sound."""
+    print("Generating sottek_specific_fluctuation...")
+    from phonometry import fluctuation_strength_ecma
+
+    result = fluctuation_strength_ecma(_sottek_am_reference(4.0, 8.0), 48000,
+                                       field="free")
+    _sottek_specific_panels(
+        output_dir, "sottek_specific_fluctuation.svg",
+        bark=np.asarray(result.bark),
+        specific=np.asarray(result.specific_fluctuation_strength),
+        time=np.asarray(result.time),
+        trace=np.asarray(result.fluctuation_strength_vs_time),
+        single=float(result.fluctuation_strength), unit="vacil_HMS",
+        symbol="F", title="Fluctuation strength",
+        stimulus="1 kHz, 100 % AM at 4 Hz, 60 dB")
+
+
+def generate_sharpness_pair_and_targets(output_dir: str) -> None:
+    """Sharpness as a position on the Bark axis, and the Table A.2 check."""
+    print("Generating sharpness_pair_and_targets...")
+    from phonometry import loudness_zwicker, sharpness_din
+
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.6))
+
+    # Left: two critical bands of noise of the same loudness, one low and one
+    # high on the Bark axis.
+    for (centre, f_low, f_high), color in (
+            ((250.0, 200.0, 300.0), COLOR_PRIMARY),
+            ((4000.0, 3700.0, 4400.0), COLOR_SECONDARY)):
+        level = _level_for_four_sone(f_low, f_high)
+        band = _critical_band_noise(f_low, f_high, level)
+        result = loudness_zwicker(band, 48000, stationary=True)
+        acum = float(sharpness_din(band, 48000))
+        z = np.arange(1, result.specific.size + 1) * 0.1
+        centroid = float(np.sum(result.specific * z) / np.sum(result.specific))
+        ax.fill_between(z, result.specific, color=theme_fill(color, ax))
+        ax.plot(z, result.specific, color=color, linewidth=1.8,
+                label=(f"{centre:g} Hz critical band — "
+                       f"N = {result.loudness:.1f} sone, S = {acum:.2f} acum"))
+        ax.axvline(centroid, color=color, linestyle="--", linewidth=1.2)
+        ax.annotate(f"⟨z⟩ = {centroid:.1f} Bark", xy=(centroid, 0.06),
+                    xytext=(centroid + 0.7, 0.06), fontsize=9, color=color)
+    ax.set_xlabel("Critical-band rate z [Bark]")
+    ax.set_ylabel("Specific loudness N' [sone/Bark]")
+    ax.set_xlim(0, 24)
+    ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
+    ax.set_title("Equally loud, seven times as sharp", fontweight="bold",
+                 pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+
+    # Right: the Table A.2 verification sweep with its tolerance band.
+    centres, targets, computed = _din45692_sweep()
+    tolerance = np.maximum(0.05 * targets, 0.05)
+    ax2.fill_between(centres, targets - tolerance, targets + tolerance,
+                     color=theme_fill(COLOR_TERTIARY, ax2),
+                     label="permitted deviation: 5 % or 0.05 acum")
+    ax2.semilogx(centres, computed, color=COLOR_PRIMARY, linewidth=2.0,
+                 label="sharpness_din(), each band set to 4 sone")
+    ax2.semilogx(centres, targets, "o", color=COLOR_SECONDARY, markersize=7,
+                 markerfacecolor="white", markeredgewidth=1.6,
+                 label="Table A.2 hearing-test targets")
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Sharpness S [acum]")
+    ax2.set_ylim(0.0, 3.4)
+    ax2.set_title("DIN 45692 Table A.2, 250 Hz to 4 kHz", fontweight="bold",
+                  pad=10)
+    format_frequency_axis(ax2)
+    ax2.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper left", fontsize=9)
+
+    fig.suptitle("Sharpness: Where the Loudness Sits, Not How Much There Is",
+                 fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "sharpness_pair_and_targets.svg")
+    plt.close()
+
+
+@cache
+def _tnr_pr_neighbour_sweep() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """TNR and PR of a 1 kHz tone as a tone grows in the next band up."""
+    from phonometry import prominence_ratio, tone_to_noise_ratio
+
+    fs = 48000
+    rng = np.random.default_rng(7)
+    t = np.arange(8 * fs) / fs
+    # A 1 kHz tone in broadband noise, comfortably prominent on its own, plus
+    # a second tone at 1160 Hz: outside the 162 Hz critical band centred on
+    # 1 kHz, and therefore inside the upper contiguous band the PR uses as
+    # its noise estimate.
+    primary = np.sqrt(2) * 0.012 * np.sin(2 * np.pi * 1000.0 * t)
+    noise = 0.05 * rng.standard_normal(t.size)
+    relative = np.arange(-24.0, 12.1, 3.0)
+    tnr, pr = [], []
+    for rel in relative:
+        amplitude = np.sqrt(2) * 0.012 * 10 ** (rel / 20)
+        x = primary + amplitude * np.sin(2 * np.pi * 1160.0 * t) + noise
+        tnr.append(tone_to_noise_ratio(x, fs, tone_freq=1000.0).ratio_db)
+        pr.append(prominence_ratio(x, fs, tone_freq=1000.0).ratio_db)
+    return relative, np.array(tnr), np.array(pr)
+
+
+def generate_tnr_pr_comparison(output_dir: str) -> None:
+    """The two criteria side by side, and a case where they disagree."""
+    print("Generating tnr_pr_comparison...")
+    from phonometry import prominence_ratio, tone_to_noise_ratio
+
+    # The 250 Hz fan tone of the assessment figure, put to both methods.
+    fs = 48000
+    rng = np.random.default_rng(4)
+    t = np.arange(10 * fs) / fs
+    fan = (np.sqrt(2) * 0.011 * np.sin(2 * np.pi * 250.0 * t)
+           + 0.03 * rng.standard_normal(t.size))
+    tnr_fan = tone_to_noise_ratio(fan, fs)
+    pr_fan = prominence_ratio(fan, fs, tone_freq=250.0)
+
+    freqs = np.logspace(np.log10(89.1), np.log10(11200.0), 400)
+    tnr_criterion = np.where(freqs < 1000.0,
+                             8.0 + 8.33 * np.log10(1000.0 / freqs), 8.0)
+    pr_criterion = np.where(freqs < 1000.0,
+                            9.0 + 10.0 * np.log10(1000.0 / freqs), 9.0)
+
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.6))
+
+    ax.semilogx(freqs, tnr_criterion, color=COLOR_PRIMARY, linewidth=2.2,
+                label="TNR criterion (clause 11.5)")
+    ax.semilogx(freqs, pr_criterion, color=COLOR_SECONDARY, linewidth=2.2,
+                linestyle="--", label="PR criterion (clause 12.5)")
+    for value, color, name in ((tnr_fan.ratio_db, COLOR_PRIMARY, "TNR"),
+                               (pr_fan.ratio_db, COLOR_SECONDARY, "PR")):
+        ax.plot([250.0], [value], "o", color=color, markersize=9,
+                markerfacecolor="white", markeredgewidth=1.8, zorder=6)
+        ax.annotate(f"{name} = {value:.1f} dB", xy=(250.0, value),
+                    xytext=(430.0, 19.6 if name == "TNR" else 3.4),
+                    fontsize=10, color=color,
+                    arrowprops={"arrowstyle": "->", "lw": 1.0, "color": color})
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Ratio [dB]")
+    ax.set_ylim(0.0, 24.0)
+    ax.set_title("One 250 Hz fan tone, two criteria", fontweight="bold",
+                 pad=10)
+    format_frequency_axis(ax)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+
+    relative, tnr, pr = _tnr_pr_neighbour_sweep()
+    ax2.plot(relative, tnr, "o-", color=COLOR_PRIMARY, linewidth=2.0,
+             markersize=5, label="TNR of the 1 kHz tone")
+    ax2.plot(relative, pr, "s--", color=COLOR_SECONDARY, linewidth=2.0,
+             markersize=5, label="PR of the 1 kHz tone")
+    ax2.axhline(8.0, color=COLOR_PRIMARY, linewidth=1.2, linestyle=":")
+    ax2.axhline(9.0, color=COLOR_SECONDARY, linewidth=1.2, linestyle=":")
+    ax2.text(1.0, 6.4, "TNR criterion 8 dB", fontsize=9, color=COLOR_PRIMARY)
+    ax2.text(relative[0] + 0.4, 10.4, "PR criterion 9 dB", fontsize=9,
+             color=COLOR_SECONDARY)
+    ax2.set_ylim(-11.0, 12.5)
+    ax2.set_xlabel("Level of a second tone at 1160 Hz, relative to the "
+                   "1 kHz tone [dB]")
+    ax2.set_ylabel("Ratio [dB]")
+    ax2.set_title("A tone in the next critical band up", fontweight="bold",
+                  pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower left", fontsize=9)
+
+    fig.suptitle("Tone-to-Noise Ratio and Prominence Ratio Compared "
+                 "(ECMA-418-1)", fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "tnr_pr_comparison.svg")
+    plt.close()
+
+
+def generate_two_tone_separation(output_dir: str) -> None:
+    """Formula 19: when two tones in one critical band are rated apart."""
+    print("Generating two_tone_separation...")
+    from phonometry import psychoacoustics
+
+    freqs = np.logspace(np.log10(88.0), np.log10(1000.0), 400)
+    f_d = np.array([psychoacoustics.two_tone_separation_frequency(f)
+                    for f in freqs])
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.semilogx(freqs, f_d, color=COLOR_PRIMARY, linewidth=2.2,
+                label="Threshold fD (Formula 19)")
+    ax.fill_between(freqs, f_d, 100.0,
+                    color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
+    ax.plot([212.0], [21.0], "o", color=COLOR_SECONDARY, markersize=9,
+            markerfacecolor="white", markeredgewidth=1.8, zorder=5)
+    ax.annotate("minimum 21 Hz at 212 Hz", xy=(212.0, 21.0),
+                xytext=(240.0, 11.0), fontsize=10, color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "lw": 1.0,
+                            "color": COLOR_SECONDARY})
+
+    # The Annex E pair in the 137.3 Hz critical band: 118.4 and 137.3 Hz,
+    # 18.9 Hz apart, evaluated at the more audible of the two.
+    ax.plot([137.3], [18.9], "s", color=COLOR_TERTIARY, markersize=9,
+            zorder=5)
+    ax.annotate("Annex E pair: 118.4 and 137.3 Hz,\n"
+                "18.9 Hz apart — below fD, so combined",
+                xy=(137.3, 18.9), xytext=(95.0, 44.0), fontsize=10,
+                color=COLOR_TERTIARY,
+                arrowprops={"arrowstyle": "->", "lw": 1.0,
+                            "color": COLOR_TERTIARY})
+    ax.text(600.0, 62.0, "rated separately", fontsize=11, color=COLOR_FG,
+            ha="center")
+    ax.text(600.0, 12.0, "energy-summed into one FG entry", fontsize=11,
+            color=COLOR_FG, ha="center")
+
+    ax.set_xlabel("Frequency of the more audible tone fT [Hz]")
+    ax.set_ylabel("Frequency separation |fT1 − fT2| [Hz]")
+    ax.set_xlim(88.0, 1000.0)
+    ax.set_ylim(0.0, 100.0)
+    ax.set_title("Two Tones in One Critical Band: Separate or Combined "
+                 "(ISO/PAS 20065 Formula 19)", fontweight="bold", pad=12)
+    format_frequency_axis(ax)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "two_tone_separation.svg")
     plt.close()
 
 
@@ -602,8 +1121,30 @@ def _fluctuation_am_tone_sweep() -> tuple[np.ndarray, np.ndarray]:
     return fmods, np.array(f_vals)
 
 
+@cache
+def _fluctuation_am_noise_sweep() -> tuple[np.ndarray, np.ndarray]:
+    """Osses 2016 signal-model F of AM broadband noise at 60 dB vs f_mod.
+
+    The same stimulus the Fastl & Zwicker closed form of Eq. (10.2) is
+    written for, so the two can be read against each other; cached because
+    the signal model is the expensive half of the figure.
+    """
+    from phonometry.psychoacoustics import fluctuation_strength
+
+    rng = np.random.default_rng(3)
+    t = np.arange(int(4.0 * _FS_PSY)) / _FS_PSY
+    noise = rng.standard_normal(t.size)
+    fmods = np.array([0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0])
+    f_vals = []
+    for fm in fmods:
+        am = (1.0 + np.sin(2.0 * np.pi * fm * t)) * noise
+        am = am / np.sqrt(np.mean(am ** 2)) * _P_REF * 10.0 ** (60.0 / 20.0)
+        f_vals.append(fluctuation_strength(am, float(_FS_PSY)).fluctuation_strength)
+    return fmods, np.array(f_vals)
+
+
 def generate_fluctuation_strength(output_dir: str) -> None:
-    """Fluctuation strength F vs modulation frequency: the 4 Hz band-pass peak."""
+    """The two models on one stimulus, and the signal model on its own."""
     print("Generating fluctuation_strength...")
     from phonometry import fluctuation_strength_am_noise
 
@@ -613,43 +1154,45 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     f_bbn = np.array([fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod])
     bbn_peak = int(np.argmax(f_bbn))
 
-    # Osses 2016 signal model on an AM tone (70 dB), same modulation sweep.
+    # The Osses 2016 signal model on the same AM broadband noise, and on the
+    # AM tone it was calibrated for.
+    fm_noise, f_noise = _fluctuation_am_noise_sweep()
     fm_tone, f_tone = _fluctuation_am_tone_sweep()
     tone_peak = int(np.argmax(f_tone))
+    overshoot = float(f_noise[int(np.argmin(np.abs(fm_noise - 4.0)))]
+                      / fluctuation_strength_am_noise(60.0, 1.0, 4.0))
 
-    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(12.0, 5.6), gridspec_kw={"width_ratios": [1.55, 1.0]})
+
     ax.semilogx(fmod, f_bbn, color=COLOR_PRIMARY, linewidth=2.4,
-                label=(f"AM broadband noise (closed form, 60 dB), "
+                label=(f"closed form, Eq. 10.2 — "
                        f"peak {f_bbn[bbn_peak]:.1f} vacil"))
     ax.plot(fmod[bbn_peak], f_bbn[bbn_peak], "o", color=COLOR_PRIMARY,
             markersize=8, markerfacecolor="white", markeredgewidth=1.6, zorder=6)
+    ax.semilogx(fm_noise, f_noise, "s--", color=COLOR_SECONDARY, linewidth=2.0,
+                markersize=7,
+                label=(f"Osses 2016 signal model — "
+                       f"peak {f_noise.max():.1f} vacil"))
     ax.axvline(4.0, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.7,
                label="4 Hz reference")
+    ax.annotate(f"x{overshoot:.1f} at 4 Hz",
+                xy=(4.0, float(f_noise[int(np.argmin(np.abs(fm_noise - 4.0)))])),
+                xytext=(0.62, float(f_noise.max()) * 0.86), fontsize=10,
+                color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "lw": 1.0,
+                            "color": COLOR_SECONDARY})
     ax.set_xlabel("Modulation frequency f_mod [Hz]")
     ax.set_ylabel("Fluctuation strength F [vacil]")
-    ax.set_ylim(0.0, float(f_bbn.max()) * 1.18)
-    ax.set_title("Fluctuation Strength — 4 Hz Band-Pass Characteristic",
-                 fontweight="bold", pad=12)
+    ax.set_ylim(0.0, max(float(f_bbn.max()), float(f_noise.max())) * 1.20)
+    ax.set_title("Both models on AM broadband noise, 60 dB",
+                 fontweight="bold", pad=10)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.xaxis.set_major_formatter(mticker.ScalarFormatter())
     ax.set_xticks([0.5, 1, 2, 4, 8, 16, 32])
     ax.set_xticklabels(["0.5", "1", "2", "4", "8", "16", "32"])
-
-    # Overlay the signal-model AM-tone sweep on a secondary axis (its absolute
-    # scale differs from the broadband closed form, but the band-pass shape and
-    # 4 Hz maximum coincide).
-    ax2 = ax.twinx()
-    ax2.plot(fm_tone, f_tone, "s--", color=COLOR_TERTIARY, linewidth=1.8,
-             markersize=7, label=(f"AM tone (signal model, 70 dB), "
-                                  f"peak {f_tone[tone_peak]:.2f} vacil"))
-    ax2.set_ylabel("AM-tone F, signal model [vacil]", color=COLOR_TERTIARY)
-    ax2.tick_params(axis="y", labelcolor=COLOR_TERTIARY)
-    ax2.set_ylim(0.0, float(f_tone.max()) * 1.18)
-
-    lines1, labels1 = ax.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax.legend(lines1 + lines2, labels1 + labels2, loc="upper right", fontsize=9)
+    ax.legend(loc="upper right", fontsize=9)
 
     info = [
         "F = 5.8 (1.25 m - 0.25)(0.05 L - 1)",
@@ -660,8 +1203,93 @@ def generate_fluctuation_strength(output_dir: str) -> None:
             family="monospace",
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
+
+    # The stimulus the signal model was calibrated on, on its own axes.
+    ax2.semilogx(fm_tone, f_tone, "s--", color=COLOR_TERTIARY, linewidth=2.0,
+                 markersize=7,
+                 label=f"peak {f_tone[tone_peak]:.2f} vacil at "
+                       f"{fm_tone[tone_peak]:g} Hz")
+    ax2.axvline(4.0, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.7)
+    ax2.set_xlabel("Modulation frequency f_mod [Hz]")
+    ax2.set_ylabel("Fluctuation strength F [vacil]")
+    ax2.set_ylim(0.0, float(f_tone.max()) * 1.28)
+    ax2.set_title("Signal model on the AM tone, 70 dB", fontweight="bold",
+                  pad=10)
+    ax2.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.xaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax2.set_xticks([1, 2, 4, 8, 16, 32])
+    ax2.set_xticklabels(["1", "2", "4", "8", "16", "32"])
+    ax2.legend(loc="upper right", fontsize=9)
+
+    fig.suptitle("Fluctuation Strength — the 4 Hz Band-Pass, and Which Model "
+                 "to Quote", fontweight="bold")
     plt.tight_layout()
     save_figure(output_dir, "fluctuation_strength.svg")
+    plt.close()
+
+
+def generate_annoyance_weightings(output_dir: str) -> None:
+    """The two pieces of modelling judgement in the PA formula, drawn."""
+    print("Generating annoyance_weightings...")
+    from phonometry import psychoacoustic_annoyance
+
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.4))
+
+    # Left: the sharpness weighting against S, for three loudnesses.
+    sharpness = np.linspace(1.0, 5.0, 200)
+    for n5, style in ((10.0, "-"), (30.0, "--"), (60.0, ":")):
+        w_s = [psychoacoustic_annoyance(n5, float(s), 0.0, 0.0).w_s
+               for s in sharpness]
+        ax.plot(sharpness, w_s, style, color=COLOR_PRIMARY, linewidth=2.0,
+                label=f"N5 = {n5:g} sone")
+    ax.axvline(1.75, color=COLOR_SECONDARY, linewidth=1.4, linestyle="--")
+    ax.annotate("1.75 acum: below it sharpness costs nothing",
+                xy=(1.75, 0.02), xytext=(2.1, 0.06), fontsize=10,
+                color=COLOR_SECONDARY,
+                arrowprops={"arrowstyle": "->", "lw": 1.0,
+                            "color": COLOR_SECONDARY})
+    ax.set_xlabel("Sharpness S [acum]")
+    ax.set_ylabel("Sharpness weighting wS")
+    ax.set_xlim(1.0, 5.0)
+    ax.set_ylim(0.0, None)
+    ax.set_title("The kink at the reference sharpness", fontweight="bold",
+                 pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    # Right: the same magnitude spent on roughness or on fluctuation strength.
+    magnitude = np.linspace(0.0, 1.5, 120)
+    rough = [psychoacoustic_annoyance(30.0, 2.0, 0.0, float(v)).annoyance
+             for v in magnitude]
+    fluct = [psychoacoustic_annoyance(30.0, 2.0, float(v), 0.0).annoyance
+             for v in magnitude]
+    ax2.plot(magnitude, rough, color=COLOR_SECONDARY, linewidth=2.2,
+             label="all roughness: R = v, F = 0")
+    ax2.plot(magnitude, fluct, "--", color=COLOR_PRIMARY, linewidth=2.2,
+             label="all fluctuation: F = v, R = 0")
+    ax2.annotate(f"at v = 1.5, {rough[-1] - fluct[-1]:.1f} units apart",
+                 xy=(1.5, (rough[-1] + fluct[-1]) / 2),
+                 xytext=(0.30, rough[-1] * 0.985), fontsize=10, color=COLOR_FG,
+                 arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax2.set_xlabel("Sensation magnitude v [asper or vacil]")
+    ax2.set_ylabel("Psychoacoustic annoyance PA")
+    ax2.set_xlim(0.0, 1.5)
+    ax2.set_title("Roughness costs more than fluctuation (0.6 against 0.4)",
+                  fontweight="bold", pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper left", fontsize=9)
+    ax2.text(0.03, 0.03, "N5 = 30 sone, S = 2.0 acum throughout",
+             transform=ax2.transAxes, fontsize=9, color=COLOR_FG,
+             bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                   "edgecolor": COLOR_GRID})
+
+    fig.suptitle("The Two Weightings of the Psychoacoustic Annoyance Model",
+                 fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "annoyance_weightings.svg")
     plt.close()
 
 
@@ -1130,6 +1758,617 @@ def generate_hearing_threshold(output_dir: str) -> None:
 
     plt.tight_layout()
     save_figure(output_dir, "hearing_threshold.png")
+    plt.close()
+
+
+def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
+    """ISO 7029 at 4 kHz: the sex difference, and how the two spreads grow.
+
+    The guide states both claims in prose and neither is drawn anywhere. The
+    right panel is also the honest version: ``s_u`` pulls away from ``s_l``
+    only up to about age 64, then falls back and crosses under it at 75 --
+    which lands exactly in the range clause 4.1 marks informative-only from
+    3000 Hz upwards, because the oldest subjects ran off the audiometer scale.
+    """
+    print("Generating age_threshold_sex_and_spread.png...")
+    from phonometry import age_threshold
+    from phonometry.hearing.threshold import AUDIOMETRIC_FREQUENCIES
+
+    idx = int(np.argmin(np.abs(np.asarray(AUDIOMETRIC_FREQUENCIES) - 4000.0)))
+    ages = np.arange(18.0, 81.0, 1.0)
+    res = {s: [age_threshold(float(a), s, 0.5) for a in ages]
+           for s in ("male", "female")}
+    med = {s: np.array([r.median[idx] for r in res[s]]) for s in res}
+    s_u = np.array([r.spread_upper[idx] for r in res["male"]])
+    s_l = np.array([r.spread_lower[idx] for r in res["male"]])
+
+    _fig, (ax_sex, ax_spread) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+
+    # --- Left: the median at 4 kHz for the two sexes -----------------------
+    ax_sex.plot(ages, med["male"], "-", color=COLOR_PRIMARY, linewidth=2.0,
+                label="Male")
+    ax_sex.plot(ages, med["female"], "--", color=COLOR_SECONDARY,
+                linewidth=2.0, label="Female")
+    ax_sex.fill_between(ages, med["female"], med["male"],
+                        color=theme_fill(COLOR_PRIMARY, ax_sex), zorder=0)
+    for age, dx, dy in ((60.0, -16.0, 9.0), (80.0, -19.0, -8.0)):
+        k = int(np.argmin(np.abs(ages - age)))
+        gap = med["male"][k] - med["female"][k]
+        mid = 0.5 * (med["male"][k] + med["female"][k])
+        ax_sex.annotate(
+            f"{gap:.1f} dB", xy=(age, mid), xytext=(age + dx, mid + dy),
+            fontsize=11, arrowprops={"arrowstyle": "->", "lw": 1.0},
+        )
+    ax_sex.set_xlabel("Age [years]")
+    ax_sex.set_ylabel("Median deviation from age 18 [dB]")
+    ax_sex.set_title("ISO 7029 median at 4 kHz — men against women",
+                     fontweight="bold", pad=10)
+    ax_sex.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_sex.set_axisbelow(True)
+    ax_sex.legend(loc="upper left")
+
+    # --- Right: the two half-Gaussian spreads at the same frequency --------
+    ax_spread.plot(ages, s_u, "-", color=COLOR_PRIMARY, linewidth=2.0,
+                   label="$s_u$ (worse than the median)")
+    ax_spread.plot(ages, s_l, "--", color=COLOR_TERTIARY, linewidth=2.0,
+                   label="$s_l$ (better than the median)")
+    ax_spread.fill_between(ages, s_l, s_u, where=s_u >= s_l,
+                           color=theme_fill(COLOR_PRIMARY, ax_spread),
+                           zorder=0, label="$s_u - s_l$: the asymmetry")
+    ax_spread.set_ylim(0.0, max(s_u.max(), s_l.max()) + 7.0)
+    peak = int(np.argmax(s_u))
+    ax_spread.annotate(
+        f"$s_u$ peaks at {ages[peak]:.0f} yr ({s_u[peak]:.1f} dB)",
+        xy=(ages[peak], s_u[peak]), xytext=(24.0, s_u[peak] + 4.0),
+        fontsize=11, arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    cross = ages[np.argmax(s_u < s_l)]
+    ax_spread.axvline(70.0, color=COLOR_SECONDARY, linewidth=1.4,
+                      linestyle=":")
+    ax_spread.axvspan(70.0, ages[-1], color=theme_fill(COLOR_SECONDARY,
+                                                       ax_spread), zorder=0)
+    ax_spread.text(77.5, 21.5,
+                   "above 70 yr:\ninformative only\n(clause 4.1, f ≥ 3 kHz)",
+                   fontsize=10, ha="center", va="top", color=COLOR_SECONDARY)
+    ax_spread.annotate(
+        f"they cross at {cross:.0f} yr", xy=(cross, s_l[int(cross - 18)]),
+        xytext=(63.0, 3.5), fontsize=11,
+        arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    ax_spread.set_xlabel("Age [years]")
+    ax_spread.set_ylabel("Standard deviation at 4 kHz [dB]")
+    ax_spread.set_title("The spread around the median (male)",
+                        fontweight="bold", pad=10)
+    ax_spread.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_spread.set_axisbelow(True)
+    ax_spread.legend(loc="lower left", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "age_threshold_sex_and_spread.png")
+    plt.close()
+
+
+def generate_nipts_level_growth(output_dir: str) -> None:
+    """ISO 1999 NIPTS against exposure level: the cut-off and the square law."""
+    print("Generating nipts_level_growth.png...")
+    from phonometry import hearing
+    from phonometry.hearing.noise_induced_hearing_loss import NIPTS_FREQUENCIES
+
+    freqs = NIPTS_FREQUENCIES
+    levels = np.arange(75.0, 100.5, 0.5)
+    med = np.array([hearing.nipts(float(x), 40.0, 0.5).median for x in levels])
+
+    _fig, (ax_f, ax_t) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+
+    # --- Left: one curve per audiometric frequency, 40 years --------------
+    colors = ["#9e9e9e", "#7f7f7f", COLOR_TERTIARY, "#ff7f0e", COLOR_SECONDARY,
+              COLOR_PRIMARY]
+    for k, (f, color) in enumerate(zip(freqs, colors)):
+        ax_f.plot(levels, med[:, k], "-", color=color, linewidth=2.0,
+                  label=f"{f:g} Hz")
+        # The cut-off L0 is where the curve leaves zero.
+        lift = int(np.argmax(med[:, k] > 0.0))
+        ax_f.plot(levels[lift], 0.0, "o", color=color, markersize=6)
+    ax_f.axhline(0.0, color=COLOR_GRID, linewidth=1.0)
+    ax_f.annotate(
+        "each dot is that band's cut-off $L_0$\n(93, 89, 80, 77, 75, 77 dB)",
+        xy=(76.5, 1.0), xytext=(76.0, 22.0), fontsize=11,
+        arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    ax_f.set_xlabel(r"$L_{EX,8h}$ [dB(A)]")
+    ax_f.set_ylabel("Median NIPTS $N_{50}$ [dB]")
+    ax_f.set_title("ISO 1999 median NIPTS against level (40 years)",
+                   fontweight="bold", pad=10)
+    ax_f.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_f.set_axisbelow(True)
+    ax_f.legend(loc="upper left", fontsize=10)
+
+    # --- Right: 4 kHz alone, the duration family --------------------------
+    idx = int(np.argmin(np.abs(np.asarray(freqs) - 4000.0)))
+    for years, color in ((10, "#9e9e9e"), (20, "#7f7f7f"), (30, COLOR_PRIMARY),
+                         (40, COLOR_SECONDARY)):
+        curve = [hearing.nipts(float(x), float(years), 0.5).median[idx]
+                 for x in levels]
+        ax_t.plot(levels, curve, "-", color=color, linewidth=2.0,
+                  label=f"{years} yr")
+    forty = med[:, idx]
+    for lo, hi in ((85.0, 88.0), (95.0, 98.0)):
+        a = float(np.interp(lo, levels, forty))
+        b = float(np.interp(hi, levels, forty))
+        ax_t.annotate(
+            "", xy=(hi, b), xytext=(lo, a),
+            arrowprops={"arrowstyle": "<->", "lw": 1.4, "color": COLOR_FG},
+        )
+        ax_t.text(lo - 0.6, 0.5 * (a + b), f"+{b - a:.1f} dB", fontsize=11,
+                  ha="right", va="center", color=COLOR_FG)
+    ax_t.set_xlabel(r"$L_{EX,8h}$ [dB(A)]")
+    ax_t.set_ylabel("Median NIPTS at 4 kHz [dB]")
+    ax_t.set_title("The same 3 dB is worth more the louder the job",
+                   fontweight="bold", pad=10)
+    ax_t.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_t.set_axisbelow(True)
+    ax_t.legend(loc="upper left", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "nipts_level_growth.png")
+    plt.close()
+
+
+def generate_htlan_compression(output_dir: str) -> None:
+    """The ISO 1999 Formula (1) compression term over the (H, N) plane."""
+    print("Generating htlan_compression.png...")
+    from phonometry import hearing
+
+    grid = np.linspace(0.0, 60.0, 121)
+    hh, nn = np.meshgrid(grid, grid)
+    removed = hh + nn - hearing.combine_age_and_noise(hh, nn)
+
+    # The plotting area is a light colormap in both themes, so everything
+    # drawn on top of it is pinned dark rather than following the theme.
+    ink = "#1a1a1a"
+    _fig, ax = plt.subplots(figsize=(8.2, 6.4))
+    levels = np.arange(0.0, 31.0, 2.0)
+    cs = ax.contourf(hh, nn, removed, levels=levels, cmap="YlOrRd")
+    lines = ax.contour(hh, nn, removed, levels=levels[::2], colors=ink,
+                       linewidths=0.7, alpha=0.55)
+    ax.clabel(lines, fmt="%.0f dB", fontsize=9, colors=ink)
+    ax.grid(False)
+    cbar = _fig.colorbar(cs, ax=ax)
+    cbar.set_label("Decibels removed by $HN/120$")
+    ax.plot([0.0, 40.0], [40.0, 0.0], "--", color="#1f77b4", linewidth=2.2,
+            label="$H + N$ = 40 dB")
+    ax.plot(20.2, 24.8, "o", color="#1f77b4", markersize=9,
+            markeredgecolor=ink)
+    ax.annotate("the worked case: H = 20.2, N = 24.8\n45.0 dB sum → 40.8 dB "
+                "HTLAN, 4.2 dB removed",
+                xy=(20.2, 24.8), xytext=(2.0, 47.0), fontsize=11, color=ink,
+                arrowprops={"arrowstyle": "->", "lw": 1.0, "color": ink},
+                bbox={"boxstyle": "round,pad=0.35", "fc": "#ffffff",
+                      "ec": ink, "alpha": 0.88})
+    ax.set_xlabel("Age component $H$ (HTLA) [dB]")
+    ax.set_ylabel("Noise component $N$ (NIPTS) [dB]")
+    ax.set_title("ISO 1999 Formula (1): what the compression term removes",
+                 fontweight="bold", pad=10)
+    ax.legend(loc="lower right")
+    plt.tight_layout()
+    save_figure(output_dir, "htlan_compression.png")
+    plt.close()
+
+
+def generate_exposure_budget(output_dir: str) -> None:
+    """The ISO 9612 Annex C budget: where the variance comes from, and what
+    reduces it. Left, the Annex D day term by term; right, the expanded
+    uncertainty against the sample count for the two sampling models."""
+    print("Generating exposure_budget.png...")
+    from phonometry import hearing
+
+    tasks = [
+        hearing.Task(samples=(70.0,), duration_hours=1.5,
+                     label="planning/\nbreaks"),
+        hearing.Task(samples=(80.1, 82.2, 79.6), duration_hours=5.0,
+                     duration_range=(4.0, 6.0), label="welding"),
+        hearing.Task(samples=(86.5, 92.4, 89.3, 93.2, 87.8, 86.2),
+                     duration_hours=1.5, duration_range=(1.0, 2.0),
+                     label="cutting/\ngrinding"),
+    ]
+    res = hearing.task_based_exposure(tasks, warn=False)
+
+    _fig, (ax_b, ax_n) = plt.subplots(1, 2, figsize=(12.8, 5.4))
+
+    # --- Left: the Annex D variance budget, term by term ------------------
+    parts = [
+        ("sampling  $(c_{1a}u_{1a})^2$", COLOR_PRIMARY,
+         [(t.c1a * t.u1a) ** 2 for t in res.tasks]),
+        ("duration  $(c_{1b}u_{1b})^2$", COLOR_SECONDARY,
+         [(t.c1b * t.u1b) ** 2 for t in res.tasks]),
+        ("instrument  $(c_{1a}u_2)^2$", COLOR_TERTIARY,
+         [(t.c1a * t.u2) ** 2 for t in res.tasks]),
+        ("position  $(c_{1a}u_3)^2$", "#ff7f0e",
+         [(t.c1a * t.u3) ** 2 for t in res.tasks]),
+    ]
+    labels = [t.label for t in res.tasks] + ["whole day"]
+    xs = np.arange(len(labels), dtype=float)
+    bottom = np.zeros(len(labels))
+    for name, color, vals in parts:
+        col = np.array([*vals, float(np.sum(vals))])
+        ax_b.bar(xs, col, 0.62, bottom=bottom, color=color, label=name,
+                 edgecolor=COLOR_PANEL, linewidth=0.6)
+        bottom += col
+    total = float(bottom[-1])
+    ax_b.text(xs[-1], total + 0.12,
+              f"u = {np.sqrt(total):.2f} dB → U = {1.65 * np.sqrt(total):.1f} dB",
+              ha="center", fontsize=11, fontweight="bold")
+    ax_b.annotate(
+        "1.5 h of the day,\n91 % of the variance",
+        xy=(xs[2], bottom[2] * 0.5), xytext=(0.15, 3.0), fontsize=11,
+        arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    ax_b.set_xticks(xs)
+    ax_b.set_xticklabels(labels)
+    ax_b.set_ylim(0.0, total + 0.9)
+    ax_b.set_ylabel("Contribution to $u^2$ [dB²]")
+    ax_b.set_title("ISO 9612 Annex D: the Annex C budget, term by term",
+                   fontweight="bold", pad=10)
+    ax_b.grid(axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_b.set_axisbelow(True)
+    ax_b.legend(loc="upper left", fontsize=10)
+
+    # --- Right: U against the sample count, both sampling models ----------
+    counts = np.arange(3, 31, dtype=float)
+    u2, u3 = 1.5, 1.0
+    scatter = 3.0
+
+    def expanded(term: np.ndarray | float, inst: float = u2) -> np.ndarray:
+        return 1.65 * np.sqrt(np.asarray(term) ** 2 + inst**2 + u3**2)
+
+    ax_n.plot(counts, expanded(scatter / np.sqrt(counts)), "-",
+              color=COLOR_PRIMARY, linewidth=2.0,
+              label="task-based, $u_{1a}$ (Eq. C.6)")
+    ax_n.plot(counts,
+              expanded([hearing.table_c4_contribution(int(n), scatter)
+                        for n in counts]),
+              "--", color=COLOR_SECONDARY, linewidth=2.0,
+              label="job-based, $c_1u_1$ (Table C.4)")
+    ax_n.axhline(float(expanded(0.0)), color=COLOR_TERTIARY, linewidth=1.4,
+                 linestyle=":")
+    ax_n.axhline(float(expanded(0.0, 0.7)), color="#ff7f0e", linewidth=1.4,
+                 linestyle=":")
+    ax_n.text(3.4, float(expanded(0.0)) + 0.10,
+              "floor with a personal exposimeter or class 2 meter", fontsize=10,
+              ha="left", color=COLOR_TERTIARY)
+    ax_n.text(3.4, float(expanded(0.0, 0.7)) + 0.10,
+              "floor with a class 1 meter", fontsize=10, ha="left",
+              color="#ff7f0e")
+    ax_n.set_ylim(1.6, 7.0)
+    ax_n.set_xlabel("Samples per task ($I$) or per group ($N$)")
+    ax_n.set_ylabel("Expanded uncertainty $U$ [dB]")
+    ax_n.set_title("A 3 dB sample scatter: what more samples buy",
+                   fontweight="bold", pad=10)
+    ax_n.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_n.set_axisbelow(True)
+    ax_n.legend(loc="upper right", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "exposure_budget.png")
+    plt.close()
+
+
+def generate_stoi_segment_scores(output_dir: str) -> None:
+    """The time marginal of STOI, and what the front end throws away."""
+    print("Generating stoi_segment_scores.png...")
+    from phonometry import stoi
+
+    fs = 10000
+    rng = np.random.default_rng(11)
+    n = 4 * fs
+    t = np.arange(n) / fs
+    freq = np.fft.rfftfreq(n, 1.0 / fs)
+    spectrum = np.fft.rfft(rng.standard_normal(n))
+    spectrum[(freq < 200.0) | (freq > 4000.0)] = 0.0
+    carrier = np.fft.irfft(spectrum, n)
+    # Deeper syllabic pauses than the guide's own example - silent between
+    # words - so the 40 dB silent-frame rule actually has frames to remove.
+    envelope = np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2
+    envelope = np.where(envelope < 0.08, 0.0, envelope)
+    clean = carrier * envelope
+
+    noise = rng.standard_normal(n)
+    noise *= np.sqrt(np.mean(clean**2) / np.mean(noise**2))
+    steady = stoi(clean, clean + noise, fs)
+
+    # The same pair with a 0.35 s dropout instead of steady noise.
+    gate = np.ones(n)
+    gate[int(1.6 * fs):int(1.95 * fs)] = 0.0
+    dropout = stoi(clean, clean * gate, fs)
+
+    _fig, (ax_w, ax_s) = plt.subplots(
+        2, 1, figsize=(11.0, 6.6), sharex=True,
+        gridspec_kw={"height_ratios": [1.0, 1.2]})
+
+    # --- Top: the clean waveform, with the frames the 40 dB rule drops ----
+    hop = 128                                   # 50 % overlap of 256 samples
+    frames = np.lib.stride_tricks.sliding_window_view(clean, 256)[::hop]
+    energy = np.sum(frames**2, axis=1)
+    rms = np.sqrt(np.maximum(energy, 1e-24))
+    keep = 20.0 * np.log10(rms / rms.max()) > -40.0
+    ax_w.plot(t, clean, color=COLOR_PRIMARY, linewidth=0.5)
+    for k in np.flatnonzero(~keep):
+        ax_w.axvspan(k * hop / fs, (k * hop + 256) / fs,
+                     color=theme_fill(COLOR_SECONDARY, ax_w), lw=0, zorder=0)
+    ax_w.axvspan(1.6, 1.95, color=theme_fill(COLOR_TERTIARY, ax_w), lw=0,
+                 zorder=0)
+    ax_w.text(1.775, 0.92 * float(np.max(clean)), "dropout", fontsize=10,
+              ha="center", color=COLOR_TERTIARY)
+    dropped = int(np.count_nonzero(~keep))
+    ax_w.text(0.02, 0.94, f"{dropped} of {keep.size} frames fall 40 dB below "
+              "the loudest and are discarded",
+              transform=ax_w.transAxes, fontsize=10, va="top",
+              color=COLOR_SECONDARY)
+    ax_w.set_ylabel("Clean reference")
+    ax_w.set_title("The frames the 40 dB rule drops (shaded), and the segment "
+                   "scores under them", fontweight="bold", pad=10)
+    ax_w.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_w.set_axisbelow(True)
+
+    # --- Bottom: the two segment-score series -----------------------------
+    for res, color, style, label in (
+        (steady, COLOR_PRIMARY, "-",
+         f"steady noise at 0 dB (STOI = {steady.value:.3f})"),
+        (dropout, COLOR_TERTIARY, "--",
+         f"a 0.35 s dropout (STOI = {dropout.value:.3f})"),
+    ):
+        scores = np.asarray(res.segment_scores, dtype=float)
+        axis = np.linspace(0.0, float(t[-1]), scores.size)
+        ax_s.step(axis, scores, style, where="mid", color=color, linewidth=1.8,
+                  label=label)
+        ax_s.axhline(res.value, color=color, linewidth=1.2, linestyle=":")
+    ax_s.set_xlabel("Time [s]")
+    ax_s.set_ylabel("Segment score")
+    ax_s.set_ylim(-0.1, 1.05)
+    ax_s.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax_s.set_axisbelow(True)
+    ax_s.legend(loc="lower left", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "stoi_segment_scores.png")
+    plt.close()
+
+
+def _sii_low_band_noise(frequencies: np.ndarray, level: float) -> np.ndarray:
+    """Spectrum level *level* below 450 Hz, nothing above: a fan or a duct."""
+    return np.where(np.asarray(frequencies) <= 450.0, level, 0.0)
+
+
+def generate_sii_masking_chain(output_dir: str) -> None:
+    """The ANSI S3.5 clause 5 chain the guide states in equations only."""
+    print("Generating sii_masking_chain.png...")
+    from phonometry import speech
+
+    proc = speech.sii_procedure("one-third-octave")
+    freqs = np.asarray(proc.frequencies)
+    noise = _sii_low_band_noise(freqs, 60.0)
+    res = speech.speech_intelligibility_index("normal", noise)
+    e = np.asarray(res.speech_spectrum)
+    d = np.asarray(res.disturbance)
+
+    _fig, ax = plt.subplots(figsize=(10.4, 6.0))
+    pos = np.arange(freqs.size, dtype=float)
+    # The 30 dB window the audibility function lives inside.
+    ax.fill_between(pos, d - 15.0, d + 15.0,
+                    color=theme_fill(COLOR_TERTIARY, ax), zorder=0,
+                    label="the 30 dB window: Di − 15 to Di + 15")
+    ax.plot(pos, e, "o-", color=COLOR_PRIMARY, linewidth=2.0,
+            label="speech Ei'")
+    ax.plot(pos, noise, "s--", color=COLOR_FG, linewidth=1.6,
+            label="external noise Ni'")
+    ax.plot(pos, res.masking, "^-", color=COLOR_SECONDARY, linewidth=1.8,
+            label="equivalent masking Zi")
+    ax.plot(pos, d, ":", color=COLOR_TERTIARY, linewidth=2.2,
+            label="equivalent disturbance Di")
+    k = 8                                   # the 1 kHz band
+    ax.annotate(
+        f"at 1 kHz there is no noise in this band,\n"
+        f"yet Zi = {res.masking[k]:.0f} dB: the masking is spread up\n"
+        "from the low bands, not made here",
+        xy=(pos[k], res.masking[k]), xytext=(pos[k] + 0.6, 54.0), fontsize=10,
+        arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    ax2 = ax.twinx()
+    ax2.plot(pos, res.band_audibility, "-", color="#ff7f0e", linewidth=2.4,
+             alpha=0.9)
+    ax2.set_ylabel("Band audibility Ai", color="#ff7f0e")
+    ax2.set_ylim(0.0, 1.0)
+    ax2.tick_params(axis="y", colors="#ff7f0e")
+    ax.set_xticks(pos)
+    ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+    ax.set_xlabel("One-third-octave band [Hz]")
+    ax.set_ylabel("Equivalent spectrum level [dB]")
+    ax.set_ylim(-25.0, 72.0)
+    ax.set_title(f"The clause 5 chain under a low-frequency masker "
+                 f"(SII = {res.sii:.2f})", fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sii_masking_chain.png")
+    plt.close()
+
+
+def generate_sii_octave_masking_blindness(output_dir: str) -> None:
+    """What the octave procedure cannot see: the upward spread of masking."""
+    print("Generating sii_octave_masking_blindness.png...")
+    from phonometry import speech
+
+    levels = np.arange(45.0, 80.1, 1.0)
+    styles = {
+        "critical-band": ("-", COLOR_PRIMARY),
+        "equally-contributing": ("-", COLOR_TERTIARY),
+        "one-third-octave": ("-", COLOR_FG),
+        "octave": ("--", COLOR_SECONDARY),
+    }
+    curves: dict[str, np.ndarray] = {}
+    for method, (style, color) in styles.items():
+        proc = speech.sii_procedure(method)
+        freqs = np.asarray(proc.frequencies)
+        curves[method] = np.array([
+            speech.speech_intelligibility_index(
+                proc.speech_spectrum, _sii_low_band_noise(freqs, x),
+                method=method).sii
+            for x in levels
+        ])
+
+    _, ax = plt.subplots(figsize=(9.6, 5.8))
+    for method, (style, color) in styles.items():
+        width = 2.6 if method == "octave" else 1.8
+        ax.plot(levels, curves[method], style, color=color, linewidth=width,
+                label=method)
+    gap = float(curves["octave"][-1] - curves["one-third-octave"][-1])
+    ax.annotate(
+        f"{gap:.2f} index units apart",
+        xy=(levels[-1], 0.5 * (curves["octave"][-1]
+                               + curves["one-third-octave"][-1])),
+        xytext=(62.0, 0.52), fontsize=11,
+        arrowprops={"arrowstyle": "->", "lw": 1.0},
+    )
+    ax.annotate("", xy=(levels[-1], curves["octave"][-1]),
+                xytext=(levels[-1], curves["one-third-octave"][-1]),
+                arrowprops={"arrowstyle": "<->", "lw": 1.6,
+                            "color": COLOR_FG})
+    ax.set_xlabel("Spectrum level of the low-frequency noise below 450 Hz [dB]")
+    ax.set_ylabel("SII")
+    ax.set_ylim(0.0, 1.0)
+    ax.set_title("The octave procedure carries no spread of masking",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sii_octave_masking_blindness.png")
+    plt.close()
+
+
+def _sti_decay(t60: float, fs: int = 48000) -> np.ndarray:
+    """White noise under an exponential decay: the guide's own test channel."""
+    rng = np.random.default_rng(0)
+    n = np.arange(int(max(1.0, 2.5 * t60) * fs))
+    return rng.standard_normal(n.size) * np.exp(-6.9078 * n / fs / t60)
+
+
+def generate_sti_mtf_curves(output_dir: str) -> None:
+    """The two ways a channel destroys modulation: a corner, and a scaling."""
+    print("Generating sti_mtf_curves.png...")
+    from phonometry import speech
+    from phonometry.speech.sti import _MOD_FREQS, _STIPA_F1, _STIPA_F2
+
+    fs = 48000
+    band = 3                     # the 1 kHz octave band
+    mod = np.asarray(_MOD_FREQS)
+
+    _fig, (ax_t, ax_n) = plt.subplots(1, 2, figsize=(12.6, 5.2))
+
+    # --- Left: reverberation moves the low-pass corner --------------------
+    for t60, color in ((0.3, COLOR_TERTIARY), (0.9, COLOR_PRIMARY),
+                       (2.5, COLOR_SECONDARY)):
+        res = speech.sti_from_impulse_response(_sti_decay(t60), fs)
+        ax_t.semilogx(mod, res.mtf[band], "o-", color=color, linewidth=1.8,
+                      markersize=5, label=f"T60 = {t60:g} s")
+        closed = 1.0 / np.sqrt(1.0 + (2.0 * np.pi * mod * t60 / 13.8) ** 2)
+        ax_t.semilogx(mod, closed, "--", color=color, linewidth=1.2, alpha=0.8)
+    for f_stipa in (_STIPA_F1[band], _STIPA_F2[band]):
+        ax_t.axvline(f_stipa, color=COLOR_FG, linewidth=1.0, linestyle=":")
+    ax_t.text(np.sqrt(_STIPA_F1[band] * _STIPA_F2[band]), 0.04,
+              "STIPA probes only these two F in this band", fontsize=10,
+              ha="center", va="bottom", color=COLOR_FG)
+    ax_t.set_title("Reverberation: a low-pass corner that moves",
+                   fontweight="bold", pad=10)
+    ax_t.legend(loc="lower left", fontsize=10)
+
+    # --- Right: noise scales the whole curve ------------------------------
+    ir = _sti_decay(0.9)
+    for snr, color in ((20.0, COLOR_TERTIARY), (10.0, COLOR_PRIMARY),
+                       (0.0, COLOR_SECONDARY)):
+        res = speech.sti_from_impulse_response(ir, fs, snr=snr)
+        ax_n.semilogx(mod, res.mtf[band], "o-", color=color, linewidth=1.8,
+                      markersize=5, label=f"SNR = {snr:g} dB")
+    quiet = speech.sti_from_impulse_response(ir, fs)
+    ax_n.semilogx(mod, quiet.mtf[band], "--", color=COLOR_FG, linewidth=1.2,
+                  label="noise-free (T60 = 0.9 s)")
+    ax_n.annotate(r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$",
+                  xy=(1.25, 0.47), xytext=(5.0, 0.10), fontsize=11,
+                  ha="center", arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax_n.set_title("Steady noise: the same curve, scaled down",
+                   fontweight="bold", pad=10)
+    ax_n.legend(loc="lower left", fontsize=10)
+
+    for ax in (ax_t, ax_n):
+        ax.set_xlabel("Modulation frequency F [Hz]")
+        ax.set_ylabel("Modulation transfer m (1 kHz band)")
+        ax.set_ylim(0.0, 1.05)
+        ax.set_xticks([0.63, 1.0, 2.0, 4.0, 8.0, 12.5])
+        ax.set_xticklabels(["0.63", "1", "2", "4", "8", "12.5"])
+        ax.xaxis.set_minor_formatter(mticker.NullFormatter())
+        ax.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
+        ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sti_mtf_curves.png")
+    plt.close()
+
+
+def generate_sti_level_dependence(output_dir: str) -> None:
+    """The STI of one impulse response against the level it is played at."""
+    print("Generating sti_level_dependence.png...")
+    from phonometry import speech
+    from phonometry.speech.sti import _SPEECH_SPECTRUM_ED5
+
+    fs = 48000
+    ir = _sti_decay(0.9)
+    # A quiet but real hall: ventilation-dominated ambient octave-band levels.
+    ambient = np.array([45.0, 40.0, 35.0, 30.0, 28.0, 25.0, 22.0])
+    shape = np.asarray(_SPEECH_SPECTRUM_ED5)
+    shape_total = 10.0 * np.log10(np.sum(10.0 ** (shape / 10.0)))
+
+    totals = np.arange(40.0, 100.5, 2.5)
+    corrected = np.array([
+        speech.sti_from_impulse_response(
+            ir, fs, level=shape - shape_total + t, ambient=ambient).sti
+        for t in totals
+    ])
+    plain = speech.sti_from_impulse_response(ir, fs).sti
+
+    _, ax = plt.subplots(figsize=(9.2, 5.6))
+    ax.plot(totals, corrected, "-", color=COLOR_PRIMARY, linewidth=2.2,
+            label="with level= and ambient= (Tables A.2/A.3)")
+    ax.axhline(plain, color=COLOR_SECONDARY, linewidth=2.0, linestyle="--",
+               label=f"without them: a flat {plain:.3f}")
+    peak = int(np.argmax(corrected))
+    ax.plot(totals[peak], corrected[peak], "o", color=COLOR_PRIMARY,
+            markersize=8)
+    ax.annotate("reception threshold:\nthe speech is barely above\nthe room's "
+                "own noise",
+                xy=(45.0, float(np.interp(45.0, totals, corrected))),
+                xytext=(41.0, 0.06), fontsize=10, ha="left",
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.annotate("auditory masking:\nloud low bands mask\nthe high ones",
+                xy=(97.0, float(np.interp(97.0, totals, corrected))),
+                xytext=(80.0, 0.30), fontsize=10,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax.axvline(60.0, color=COLOR_TERTIARY, linewidth=1.4, linestyle=":")
+    ax.text(60.8, 0.10, "the standard's fallback level:\n60 dB(A) at 1 m "
+            "from the source", fontsize=10, color=COLOR_TERTIARY, ha="left")
+    ax.set_xlabel("Overall speech level at the listener [dB SPL]")
+    ax.set_ylabel("STI")
+    ax.set_ylim(0.0, 0.75)
+    ax.set_title("One impulse response against the level it is played at",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sti_level_dependence.png")
     plt.close()
 
 

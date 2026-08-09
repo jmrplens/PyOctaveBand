@@ -56,9 +56,10 @@ Sharpness, tonality and roughness live in
 Call `psychoacoustics.loudness_zwicker(x, fs, calibration_factor=sens)` on a
 calibrated recording. If you only have a spectrum, use
 `loudness_zwicker_from_spectrum(levels_28)` with the 28 one-third-octave band
-levels from 25 Hz to 12.5 kHz. Either result carries `loudness` in sones,
-`loudness_level` in phons and, for time-varying input, the percentiles `n5`
-and `n10`.
+levels from 25 Hz to 12.5 kHz. Either result carries `loudness_level` in phons
+and `loudness` in sones — the single stationary $N$ with `stationary=True`,
+the peak $N_\text{max}$ of the loudness trace otherwise — plus the reporting
+percentiles `n5` and `n10` for a time-varying run.
 
 ## Loudness in sones (ISO 532-1, Zwicker)
 
@@ -85,6 +86,75 @@ along the Bark axis and the area under it is the total loudness in sones.
   description="The specific-loudness pattern of a 1 kHz narrowband sound builds along the Bark axis as the band level steps from 45 to 85 dB, and the area under the pattern integrates to the total loudness in sones."
 />
 
+### Measuring the input (clause 4)
+
+Loudness is an absolute-level quantity: nothing in it cancels, so an
+uncalibrated or A-weighted recording produces a plausible number that is simply
+wrong, and the result carries no sign of it. ISO 532-1 therefore specifies the
+input before it specifies the model.
+
+**The chain.** A microphone, preamplifier and amplifier meeting
+IEC 61672-1:2013 class 1, and a field calibration that turns digital units into
+pascals — that factor is what `calibration_factor` expects, and
+[Calibration](/phonometry/signals/metrology/calibration/) is where it comes
+from. Clause 4 fixes the sampling rate of the reference implementation at
+48 kHz; other rates are resampled to it, which the library does internally.
+For the band-level entry point, the 28 one-third-octave levels must come from
+filters conforming to IEC 61260-1:2014 class 1 with centre frequencies from
+25 Hz to 12.5 kHz.
+
+**Two rules about the samples themselves.** No frequency weighting of any kind:
+definition 3.2 Note 1 states that weightings such as A-weighting shall not be
+used for loudness calculation, because the model applies the ear's own
+weighting internally and an A-weighted input weights it twice. And true sound
+pressure, not normalised or peak-scaled data (clause 4, "correct sound pressure
+values, no normalized data"). The `sens = 1.0` in the snippets below is a
+placeholder that keeps this page runnable, not a default worth keeping: get the
+calibration wrong by 10 dB and the reported loudness doubles or halves
+(13.1 sone becomes 26.6 or 6.5 on the example signal), which dwarfs every
+difference between the models on the next page.
+
+**Where the microphone goes.** Definition 3.19 Note 2 puts it at the point
+where the centre of the listener's head would be, with the listener absent;
+that is what makes the calculated loudness the loudness of a *diotic*
+presentation, the same sound at both ears. The geometry drawn below is the
+ECMA-74 bystander position — 1.00 m from the reference box, 1.50 m above the
+reflecting plane — because ISO 532-1 prescribes no distance of its own and
+takes it from whichever emission standard applies.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudness_capture.svg" alt="Three capture arrangements for an ISO 532-1 loudness measurement: panel A a hemi-anechoic room with the equipment under test in its reference box and a microphone 1.00 m in front at 1.50 m height where the absent listener's head would be, panel B the same equipment in a reverberant room with the reflected field reaching the microphone at the listening position, panel C a head-and-torso simulator whose two channels pass through a free-field, diffuse-field or ID equalization before two independent Zwicker chains" width="92%" />
+
+*The three routes to a valid input. Panel A gives $N_F$ and panel B $N_D$; the
+field type is part of the result, not a preference.*
+
+**Which field, and why it must be stated.** `field="free"` applies the frontal
+free-field transfer of the head and outer ear and suits a direct field —
+anechoic room, close to a source, outdoors; `field="diffuse"` applies the
+random-incidence transfer and suits a reverberant room or an in-situ
+measurement. The correction is a fixed spectral shape applied to the band
+levels before the critical-band stage, largest above 1 kHz where head
+diffraction and ear-canal resonance differ most: on a flat 60 dB spectrum the
+diffuse-field result is 33.9 sone against 31.9 sone free field, 6 % — small
+beside a calibration error, large enough to matter when two products are being
+compared. Clause 4 requires the field type to be specified and clause 7 makes
+it part of the report, so "N = 13.1 sone" is incomplete: write $N_F$ or $N_D$,
+or say "free field" beside the number.
+
+**Artificial-head recordings.** Annex D governs the head-and-torso route: the
+recording must already carry an equalization matched to the measuring
+environment — free-field only for a single frontal source beyond 1.5 m,
+diffuse-field in reflective surroundings, ID equalization in vehicles — and
+each ear channel is analysed separately, with both reported and the maximum or
+the mean quoted as the single value.
+
+**What the report has to contain** (clause 7): the sound assessed, a reference
+to ISO 532-1, which method was used (stationary clause 5 or time-varying
+clause 6), the sound field F or D, the type of input data (band levels or time
+signal), the loudness in sones, and — for a time-varying run — the loudness
+time function, with $N_\text{max}$ and $N_5$ where required.
+`ZwickerLoudness.report()` prints the acoustic half of that list; the rest
+arrives through `ReportMetadata`.
+
 ```python
 import numpy as np
 from phonometry import psychoacoustics
@@ -99,9 +169,19 @@ levels_28 = np.full(28, 60.0)                             # 28 one-third-octave 
 res = psychoacoustics.loudness_zwicker(x, fs, field="free", calibration_factor=sens)
 print(f"N = {res.loudness:.1f} sone  ({res.loudness_level:.0f} phon)")   # 13.1 sone (77 phon)
 
-# Time-varying signals: percentile loudness N5 is the reporting standard
-res = psychoacoustics.loudness_zwicker(x, fs)          # stationary=False (default)
-print(f"{res.n5:.1f} {res.n10:.1f} {res.loudness:.1f}")   # 13.1 13.1 13.1 — N5, N10, Nmax
+# Time-varying signals: percentile loudness N5 is the reporting standard.
+# A 4.4 s train of 1 kHz bursts stepping 45 -> 85 dB, the loudest one brief.
+segments = []
+for level, seconds in [(45.0, 0.6), (55.0, 0.6), (65.0, 0.6), (75.0, 0.6), (85.0, 0.25)]:
+    n = int(seconds * fs)
+    k = np.arange(n)
+    env = np.minimum(1.0, np.minimum(k, n - 1 - k) / (0.02 * fs))   # 20 ms ramps
+    p = np.sqrt(2) * 2e-5 * 10 ** (level / 20)                      # peak amplitude (Pa)
+    segments += [p * np.sin(2 * np.pi * 1000 * k / fs) * env, np.zeros(int(0.35 * fs))]
+bursts = np.concatenate(segments)
+
+tv = psychoacoustics.loudness_zwicker(bursts, fs)      # stationary=False (default)
+print(f"{tv.n5:.1f} {tv.n10:.1f} {tv.loudness:.1f}")   # 14.5 11.4 22.5 — N5, N10, Nmax
 
 # From 28 one-third-octave band levels (25 Hz .. 12.5 kHz)
 res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
@@ -167,9 +247,57 @@ $N(t)$ traces stay inside the standard's per-sample 5 % tolerance band.
 | `stationary` | bool | — | default `False` | `True`: single $N$ from the averaged spectrum |
 | `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
 
-Returns a `ZwickerLoudness` dataclass: `loudness` ($N$, sones), `loudness_level`
-(phon), `specific` ($N'(z)$, 240 bins of 0.1 Bark), and for time-varying runs
-`n5`, `n10`, `time`, `loudness_vs_time` (500 Hz trace).
+Returns a `ZwickerLoudness` dataclass: `loudness_level` (phon), `specific`
+($N'(z)$, 240 bins of 0.1 Bark), and for time-varying runs `n5`, `n10`, `time`
+and `loudness_vs_time` (500 Hz trace). `loudness` ($N$, sones) changes meaning
+with `stationary`: with `stationary=True` it is the single stationary $N$ of
+clause 5, and with the default `stationary=False` it is the peak
+$N_\text{max}$ of the clause 6 loudness-versus-time trace — which is why the
+first snippet above, run on a steady tone, already reports a maximum.
+
+### Reading a time-varying result (clause 6.4)
+
+A fluctuating sound has no single loudness, so ISO 532-1 clause 6.4 reports a
+percentile: $N_5$, the loudness exceeded 5 % of the analysis time, because the
+arithmetic mean of $N(t)$ sits systematically below what listeners judge — on
+the burst train above the mean is 4.1 sone against $N_5 = 14.5$. $N_{10}$ is
+the gentler companion for sounds with brief peaks, and `res.loudness` is
+$N_\text{max}$: the right quantity for hunting the worst instant, the wrong one
+to quote as "the loudness".
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zwicker_time_varying.svg" alt="Left: the ISO 532-1 loudness-versus-time trace of five 1 kHz bursts stepping from 45 to 85 dB, with horizontal lines at Nmax 22.5 sone, N5 14.5 sone, N10 11.4 sone and the arithmetic mean 4.1 sone. Right: the same record as an exceedance curve of loudness against the percentage of time exceeded, with N5 and N10 marked at 5 % and 10 %" width="92%" />
+
+*What a percentile of a loudness trace is. The brief 85 dB burst sets
+$N_\text{max}$ and almost nothing else: it occupies under 6 % of the record, so
+$N_5$ lands 8 sone below it. The same record analysed with `stationary=True`
+returns 10.0 sone, a fifth quantity again.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `bursts` and `tv` come from the snippet above.
+plt.plot(tv.time, tv.loudness_vs_time, label="N(t)")
+for value, label in [(tv.loudness, "Nmax"), (tv.n5, "N5"), (tv.n10, "N10")]:
+    plt.axhline(value, linestyle="--", label=f"{label} = {value:.1f} sone")
+plt.xlabel("Time [s]")
+plt.ylabel("Loudness N [sone]")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+Because $N_5$ is a percentage of the analysis window, lengthening or shortening
+the record moves it. Quote the measurement time beside $N_5$, keep it identical
+across the sounds being compared (clause 6.4 requires as much), and do not use
+$N_5$ for isolated impulses at all — that is exactly the case the trace above
+caricatures. `loudness_vs_time` and `time` carry the trace, so a record can be
+trimmed to the operating state of interest before the percentile is read, and
+the measurement interval belongs in `ReportMetadata`, since the fiche prints
+$N_5$ without one.
 
 ### ISO 532-1 report (`.report()`)
 
@@ -283,13 +411,16 @@ model-choice table that says when to prefer each, are
 
 ## What this guide covers
 
-**Covered.** ISO 532-1:2017 (Zwicker method): the stationary method of
-clause 5 and the time-varying method of clause 6, ported from the normative
-Annex A.4 reference program and validated against Annex B, with the
-`n5`/`n10` percentiles, via `loudness_zwicker()` and
-`loudness_zwicker_from_spectrum()`. ISO 226:2023: Formula (1), Formula (2)
-and the Table 1 contour parameters, via `equal_loudness_contour()`,
-`loudness_level()`, `hearing_threshold()` and `equal_loudness_contours()`.
+**Covered.** ISO 532-1:2017 (Zwicker method): the clause 4 input and
+instrumentation requirements, the stationary method of clause 5 and the
+time-varying method of clause 6 with the clause 6.4 percentile rules, ported
+from the normative Annex A.4 reference program and validated against Annex B,
+with the `n5`/`n10` percentiles, via `loudness_zwicker()` and
+`loudness_zwicker_from_spectrum()`; the clause 7 reporting list and the
+Annex D guidance for head-and-torso recordings. ISO 226:2023: Formula (1),
+Formula (2) and the Table 1 contour parameters, via
+`equal_loudness_contour()`, `loudness_level()`, `hearing_threshold()` and
+`equal_loudness_contours()`.
 
 **Not covered.** The Moore-Glasberg loudness of ISO 532-2, the time-varying
 ISO 532-3 method and the Sottek Hearing Model loudness of ECMA-418-2 have

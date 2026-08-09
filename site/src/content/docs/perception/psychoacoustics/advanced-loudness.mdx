@@ -65,7 +65,7 @@ auditory filters and their loudness summation.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%" />
 
 *The three models pass through approximately 1 sone at the 40 dB anchor
-(the Sottek front-end documents 0.984 sone_HMS there) and diverge with level:
+(the Sottek front-end returns 0.9845 sone_HMS there) and diverge with level:
 Zwicker doubles the sone value every +10 phon, while the Sottek model grows
 more slowly (about 1.65× per 10 dB), an intrinsic difference between the
 auditory summations, not a calibration error.*
@@ -119,9 +119,9 @@ $$
 \mathrm{ERB}_N = 24.7\,(4.37\,F + 1)\ \text{Hz},\qquad F \text{ in kHz}.
 $$
 
-Integrating $df/\mathrm{ERB}_N(f)$ turns that into a frequency scale whose unit
-is one auditory-filter width, the **ERB<sub>N</sub> number**, whose unit is
-called the **Cam** (after Cambridge):
+Integrating $df/\mathrm{ERB}_N(f)$ turns that into a frequency scale on which
+one step is one auditory-filter width. The scale is the **ERB<sub>N</sub>
+number** and its unit is the **Cam**, after Cambridge:
 
 $$
 \mathrm{ERB}_N\ \text{number} = 21.4 \log_{10}(4.37\,F + 1)\ \text{Cam}.
@@ -140,11 +140,10 @@ The library states the same fit with one more significant digit,
 $\mathrm{ERB}_N = 24.673\,(0.004368 f + 1)$ and
 $21.366 \log_{10}(0.004368 f + 1)$, the precision the ISO 532-2 implementation
 uses; the two forms agree to better than 0.2 % over the audible range, and the
-extra digits are what make `frequency_from_cam` an exact inverse. The functions
-are not a private helper of the loudness model: `loudness_moore_glasberg`
-imports these very functions, so the Cam grid of a
-`MooreGlasbergLoudness.erb_number` and a hand-built Cam axis cannot drift
-apart.
+extra digits are what make `frequency_from_cam` an exact inverse. These are not
+private helpers of the loudness model: `loudness_moore_glasberg` calls the same
+three functions, so a `MooreGlasbergLoudness.erb_number` grid and a Cam axis
+you build yourself cannot drift apart.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth.svg" alt="Auditory-filter bandwidth against centre frequency on log-log axes: the ERB_N line of Glasberg and Moore rising from about 30 Hz at 50 Hz to above 1 kHz at 16 kHz, the constant-percentage one-third-octave bandwidth crossing it near 500 Hz, the 1 kHz point annotated at 15.59 Cam, and a second top axis giving the Cam scale" width="85%" />
 
@@ -197,6 +196,47 @@ Each returns a float for a scalar input and an array otherwise. The three
 constants are exported as `ERB_C1`, `ERB_C2` and `CAM_C`.
 
 ## Moore-Glasberg loudness (ISO 532-2)
+
+### Which recording maps to which arguments
+
+`field` and `presentation` are not preferences: they are descriptions of how
+the sound reached the listener, and getting them wrong costs more than any
+difference between the models on this page. ISO 532-2 clause 7.2 lists the
+listening situations and the transfer function each needs, and clause 8.1
+fixes what the two ears do with the result.
+
+| How the sound was captured | `field=` | Why |
+| :--- | :--- | :--- |
+| One microphone at the centre of the position the absent listener's head would occupy, one frontal source | `'free'` | Table 1 column 2, the free-field transfer to the tympanic membrane |
+| The same microphone in a reverberant room or in situ | `'diffuse'` | Table 1 column 3, the diffuse-field transfer; also the right choice for diffuse-field earphones |
+| A probe microphone within 10 mm of the eardrum (5 mm when there are strong components above 3 kHz) | `'eardrum'` | Clause 7.2.4: the spectrum is already at the membrane, so no transfer function is applied |
+| A head-and-torso simulator | `'eardrum'`, but only if the simulator is an accurate acoustical model of an average adult | Clause 7.2.5; otherwise it needs its own correction file, which this API cannot express — equalize the recording to the free or diffuse field first and use the matching option |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mg_capture_routes.svg" alt="Four capture routes and the arguments each implies: a single microphone where the listener's head would be with one frontal source giving field free, the same microphone in a reverberant field giving field diffuse, a probe microphone within 10 mm of the tympanic membrane giving field eardrum with no transfer function, and a head-and-torso simulator giving field eardrum only if it is an accurate model of an average adult; a footer states that a diotic sound is about 1.5 times as loud as the same sound at one ear" width="92%" />
+
+*The four situations of clause 7.2, with the geometry that decides them. The
+distances in scene 3 are the standard's own: 10 mm from the tympanic membrane,
+5 mm when the sound has strong components above 3 kHz.*
+
+**The failure mode is silent and large.** Applying a free-field transfer to a
+signal that already contains the ear-canal resonance double-counts a gain of
+about 15 dB near 3 kHz: a 3 kHz tone at 70 dB reads 13.8 sone (78.0 phon) with
+`field="free"` and 5.0 sone (62.7 phon) with `field="eardrum"`, and nothing in
+the result says which of the two was appropriate. In the other direction, a
+free-field recording analysed as `'eardrum'` under-reads by the same amount.
+
+**`presentation` is the other factor of two.** `monaural` computes one ear with
+the other silent, `diotic` presents the identical signal to both ears — which
+is what a single free-field microphone recording represents, since both ears
+hear the same field — and `binaural` combines two independent ear signals
+through the standard's inhibition stage. The definitional 1 kHz tone at 40 dB
+is 1.000 sone diotically and 0.667 sone monaurally, the 1.5 ratio clause 8.1
+states, and the inhibition is why two ears give about one and a half times one
+ear rather than exactly twice. For a single-spectrum input `binaural` and
+`diotic` coincide, so the distinction only bites for the two-channel input of
+`loudness_moore_glasberg_time`. Note also that `loudness_ecma()` offers only
+`'free'` and `'diffuse'`, so eardrum-referenced material has to be corrected
+before it reaches the ECMA-418-2 model.
 
 Where Zwicker uses fixed critical bands on the Bark scale, Moore-Glasberg builds
 an **excitation pattern** with level-dependent rounded-exponential (roex)
@@ -261,16 +301,54 @@ plt.show()
 
 </details>
 
-### `loudness_moore_glasberg()` parameters
+### From a one-third-octave spectrum (clause 5.5)
 
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `x` | 1D array | Pa | non-empty | Calibrated pressure signal (signal wrapper) |
-| `components` | list of `(f, L)` | Hz, dB SPL | — | `_from_spectrum`: discrete sinusoidal components |
-| `band_levels` | 29-vector | dB SPL | 25 Hz .. 16 kHz | `_from_third_octave` input (IEC 61260-1 bands) |
-| `fs` | int | Hz | > 0 | Signal wrapper only |
-| `field` | str | — | `'free'` (default) / `'diffuse'` / `'eardrum'` | Outer-ear transfer |
-| `presentation` | str | — | `'binaural'` (default) / `'diotic'` / `'monaural'` | Binaural summation |
+The exact method wants sinusoidal components, but clause 5.5 defines the input
+a meter actually delivers: the levels of the 29 adjacent one-third-octave bands
+from 25 Hz to 16 kHz on the IEC 61260-1:2014 nominal centres. Each band is
+assumed flat and expanded internally into an equivalent set of components
+before the exact method runs. Two constraints are worth stating plainly:
+exactly 29 values, and a fixed grid — a meter that logs 20 Hz to 20 kHz has to
+be trimmed to it, and one that stops at 8 kHz cannot be used at all.
+
+```python
+# `psychoacoustics` is imported by the snippets above.
+# A ventilation spectrum as a sound level meter logs it: 29 one-third-octave
+# bands, 25 Hz to 16 kHz, in dB SPL.
+band_levels = [42.0, 45.0, 48.0, 51.0, 54.0, 56.0, 57.0, 57.0, 56.0, 55.0,
+               54.0, 53.0, 52.0, 51.0, 50.0, 49.0, 48.0, 47.0, 46.0, 45.0,
+               43.0, 41.0, 39.0, 37.0, 34.0, 31.0, 28.0, 25.0, 22.0]
+
+n_mg = psychoacoustics.loudness_moore_glasberg_from_third_octave(
+    band_levels, field="diffuse")
+print(f"{n_mg.loudness:.1f} sone  ({n_mg.loudness_level:.1f} phon)")  # 17.4 sone (81.3 phon)
+
+# The same measurement through ISO 532-1, which stops one band earlier:
+n_zw = psychoacoustics.loudness_zwicker_from_spectrum(
+    band_levels[:28], field="diffuse")
+print(f"{n_zw.loudness:.1f} sone  ({n_zw.loudness_level:.1f} phon)")  # 13.8 sone (77.9 phon)
+```
+
+The two standards do not even agree on where the spectrum ends: ISO 532-2 takes
+29 bands to 16 kHz, ISO 532-1 takes 28 to 12.5 kHz, which is why the slice is
+needed. The rest of the gap is the models: roex excitation and explicit
+binaural summation against the ISO 532-1 core loudness. Use `field="diffuse"`
+for a room measurement made with a free-field-corrected meter — the field
+argument is where band-level users most often go wrong.
+
+### `loudness_moore_glasberg()` and its `_from_spectrum` / `_from_third_octave` variants
+
+The three entry points differ only in how the spectrum is supplied and share
+`field` and `presentation`.
+
+| Parameter | Applies to | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `x` | `loudness_moore_glasberg` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | `loudness_moore_glasberg` | int | Hz | > 0 | |
+| `components` | `_from_spectrum` | list of `(f, L)` | Hz, dB SPL | — | Discrete sinusoidal components |
+| `band_levels` | `_from_third_octave` | 29-vector | dB SPL | 25 Hz .. 16 kHz | IEC 61260-1 nominal centres; exactly 29 |
+| `field` | all three | str | — | `'free'` (default) / `'diffuse'` / `'eardrum'` | Outer-ear transfer (clause 7.2) |
+| `presentation` | all three | str | — | `'binaural'` (default) / `'diotic'` / `'monaural'` | Binaural summation (clause 8.1) |
 
 Returns a `MooreGlasbergLoudness`: `loudness` ($N$, sone), `loudness_level`
 (phon), `specific` ($N'(i)$, 372 bins of 0.1 Cam), `erb_number`,
@@ -365,9 +443,17 @@ filtering, a 53-band gammatone-like filter bank on the Bark_HMS scale
 with $z = 0.5\ ..\ 26.5$, half-wave rectification, block RMS and a compressive
 nonlinearity, Formula 23) that is **shared** by its loudness, tonality and
 roughness metrics. The loudness $N$ is reported in **sone_HMS**, and the same
-1 kHz/40 dB anchor calibrates the front-end (our clean-room value 0.984,
-with the full Clause 6.2.3 band averaging; the residual's origin is
-documented in the module docstring).
+1 kHz/40 dB anchor calibrates the front-end. The clean-room implementation
+returns 0.9845 sone_HMS for that anchor rather than exactly 1: the 1.55 %
+residual comes from the mandated Clause 6.2.3 band averaging across the
+block-size-boundary bands excited by the tone's lower flank, near 800 to
+900 Hz — without any band averaging the chain reads 0.955, with averaging
+restricted to same-block-size neighbours 0.996, and with the full
+cross-group recomputation the standard requires 0.9845. The calibration
+constant $c_N$ is kept at its verbatim tabulated value rather than retuned,
+which is why the deviation is visible at all; the
+[`psychoacoustics.loudness.ecma` API reference](/phonometry/reference/api/psychoacoustics/ecma/)
+carries the full account.
 
 ```python
 import numpy as np
@@ -378,7 +464,7 @@ t = np.arange(int(1.2 * fs)) / fs
 x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
-print(f"N = {res.loudness:.3f} sone_HMS")   # 0.984 sone_HMS
+print(f"N = {res.loudness:.4f} sone_HMS")   # 0.9845 sone_HMS
 print(res.specific_loudness.shape)          # (53,) average specific loudness N'(z)
 
 res.plot()   # average specific loudness N'(z) + time-dependent N(l) at 187.5 Hz

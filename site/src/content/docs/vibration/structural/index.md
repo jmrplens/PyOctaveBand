@@ -27,7 +27,9 @@ Three pages then characterise the path elements.
 follows the power across the structure itself, with the wave-approach
 transmission coefficients for rigid X, T, L and in-line junctions, their
 diffuse-field angular average, and the coupling loss factor and vibration
-reduction index Kij they yield.
+reduction index Kij they yield — and, for joints no wave model describes,
+the experimental route that inverts the same coupling loss factors from
+measured subsystem energies.
 [Transfer stiffness of resilient elements (ISO 10846)](/phonometry/vibration/structural/transfer-stiffness/)
 measures the dynamic transfer stiffness of the isolators, mounts and hoses
 inserted precisely to break the transmission path, by the direct and indirect
@@ -53,7 +55,9 @@ which is where this section meets the
   the FRF family, conversions and the SDOF reference resonator.
 - [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](/phonometry/vibration/structural/junction-transmission/):
   the wave-approach transmission coefficients for rigid X, T, L and in-line
-  junctions, their angular average and the derived coupling loss factor and Kij.
+  junctions, their angular average and the derived coupling loss factor and Kij,
+  plus experimental SEA: coupling loss factors inverted from measured energies
+  by power injection, with the modal densities they need.
 - [Transfer stiffness of resilient elements (ISO 10846)](/phonometry/vibration/structural/transfer-stiffness/):
   dynamic transfer stiffness of isolators by the direct and indirect methods.
 

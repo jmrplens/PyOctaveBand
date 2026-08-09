@@ -42,11 +42,17 @@ from phonometry import load_anp_database
 
 db = load_anp_database()
 print(len(db.aircraft_ids))          # 155 aircraft types
-aircraft = db.aircraft("747100")
-print(aircraft.description)          # Boeing 747-100 / JT9DBD
-print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
-print(aircraft.power_parameter, aircraft.mounting)
+ac = db.aircraft("747100")
+print(ac.description)                # Boeing 747-100 / JT9DBD
+print(ac.engine_type, ac.num_engines, ac.weight_class)
+print(ac.power_parameter, ac.mounting)
 ```
+
+The sibling guides import the module as `aircraft` and call
+`aircraft.event_level(...)` on it; here `ac` is one **record** out of the
+database, and its `event_level` and `noise_contour` are those same functions
+with the NPD tables and the default profile already filled in. Keeping the two
+apart matters if you concatenate snippets from both pages.
 
 An `AnpAircraft` describes itself with the engine type and count and the ICAO
 wake weight class, and carries two fields you will use directly.
@@ -66,6 +72,43 @@ mountings differ by more than a decibel, propellers take none of that
 correction, and the shipped fleet splits 70 / 55 / 30 across the three. An
 identifier the database does not recognise falls back to `"wing"`.
 
+### Finding your aircraft
+
+The identifiers are the ANP database's own. They are close to an ICAO type
+designator but not the same thing, because a type appears once per engine
+variant: `A320-232` is the IAE-engined A320 and `747100` the JT9D-engined
+747-100. Search the descriptions to find yours rather than guessing the string:
+
+```python
+from phonometry import load_anp_database
+
+db = load_anp_database()
+for aid in db.aircraft_ids:
+    rec = db.aircraft(aid)
+    if "A320" in rec.description:
+        print(aid, "|", rec.description, "|", rec.engine_type, "|", rec.mounting)
+# A320-211 | Airbus A320-211 / CFM56-5A1 | Jet | wing
+# A320-232 | Airbus A320-232 / V2527-A5 | Jet | wing
+```
+
+Match the engine variant before anything else: it changes the NPD levels by more
+than any of the per-segment corrections.
+
+### When your aircraft is not in the database
+
+Every real movement list contains types the database does not hold, and the
+accepted remedy is **substitution** by an acoustically and operationally similar
+type, not invention. Match on engine type and count first, then on weight class
+and engine mounting, because those change the *shape* of the answer rather than
+shifting it; check that the substitute's `power_parameter` is the same quantity
+as the original's, since a table indexed by corrected net thrust in pounds
+cannot take power settings computed for one indexed by anything else. Record the
+substitution with the results — it is a modelling assumption, not a detail. The
+same reasoning applies one level down: a type whose NPD curves are tabulated but
+whose trajectory is not (see section 3) is usually better modelled with a
+substitute *trajectory* and its own NPD table than by substituting the whole
+aircraft.
+
 ## 2. The noise-power-distance curves
 
 `npd_curves` returns the tabulated NPD surface for one operation (`"D"` for
@@ -76,6 +119,12 @@ in power, which is what the curves below draw.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd.svg" alt="Noise-power-distance curves of a Boeing 747-100 for three tabulated thrust settings, each level falling with slant distance on a logarithmic axis, with markers on the tabulated nodes" width="82%" />
 
+*The three tabulated thrust settings are close to parallel: power mostly shifts
+the level, while distance sets the shape. The fall is close to the
+inverse-square rate at short range and steepens at long range as absorption
+accumulates, and the markers are the only distances at which the database
+asserts anything — everything between them is Doc 29 interpolation.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -83,14 +132,14 @@ in power, which is what the curves below draw.
 import matplotlib.pyplot as plt
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-curves = aircraft.npd_curves("D", "SEL")
+ac = load_anp_database().aircraft("747100")
+curves = ac.npd_curves("D", "SEL")
 
 fig, ax = plt.subplots(figsize=(10, 6))
 curves.plot(ax=ax)
-ax.set_title(f"ANP NPD Curves - {aircraft.description} (SEL, departure)")
+ax.set_title(f"ANP NPD Curves - {ac.description} (SEL, departure)")
 ax.text(0.02, 0.06,
-        f"power parameter: {aircraft.power_parameter}\n"
+        f"power parameter: {ac.power_parameter}\n"
         "markers: tabulated NPD nodes",
         transform=ax.transAxes, va="bottom", fontsize=9)
 plt.show()
@@ -115,6 +164,8 @@ print(curves.powers)                       # [10000. 14000. 19000. 23000.] lb
 print(curves.level(19000.0, [304.8, 1000.0, 3000.0]))
 ```
 
+The record's `power_parameter` names those units — never assume newtons.
+
 The distances are metres. The database tabulates them in feet, at the ten Doc 29
 nodes from 200 ft to 25000 ft, and this bridge converts on read so everything
 downstream stays in SI.
@@ -128,6 +179,12 @@ which segments are the takeoff ground roll or the landing rollout.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile.svg" alt="Default departure profile of a Boeing 747-100: altitude against along-track distance, rising from the runway through eleven fixed points, with the ground-roll points marked at zero altitude" width="82%" />
 
+*The first points sit at zero altitude and are the ground roll. What follows is
+the climb gradient, and it is the gradient rather than the level that decides
+the contour, because it fixes the slant distance at every receiver; the same
+aircraft at a longer stage length is heavier and climbs more slowly, so its
+footprint is longer and wider.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -135,12 +192,12 @@ which segments are the takeoff ground roll or the landing rollout.
 import matplotlib.pyplot as plt
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-profile = aircraft.profile("D", stage_length=1)
+ac = load_anp_database().aircraft("747100")
+profile = ac.profile("D", stage_length=1)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 profile.plot(ax=ax)
-ax.set_title(f"ANP Default Departure Profile - {aircraft.description}")
+ax.set_title(f"ANP Default Departure Profile - {ac.description}")
 ax.text(0.98, 0.06,
         f"stage length {profile.stage_length}, "
         f"{profile.path.shape[0]} fixed points",
@@ -158,27 +215,42 @@ load_anp_database().aircraft("747100").profile("D", stage_length=1).plot()
 
 The **stage length** selects the trip-distance bin: a longer stage means more
 fuel, more weight and a shallower climb, so the same aircraft has one profile
-per bin.
+per bin. Doc 29 Vol. 2 Appendix G3.5 defines the bins by trip length in nautical
+miles — 1 is 0-500, 2 is 500-1 000, 3 is 1 000-1 500, 4 is 1 500-2 500, 5 is
+2 500-3 500, 6 is 3 500-4 500, 7 is 4 500-5 500, and so on in 1 000 nmi steps to
+10 (7 500-8 500), with 11 for anything longer and "M" for maximum range at
+maximum take-off mass. The take-off weight of each profile is computed at the
+bin's representative range, defined as the minimum plus 70 % of the span, so
+bin 1 is weighed at 350 nmi and bin 4 at 2 200 nmi. Not every aircraft flies
+every bin, and the shipped fixed-point profiles cover stage lengths 1 to 7 for
+departures and 1 only for arrivals.
 
 Only the **fixed-point** profiles are read as ready-to-use trajectories. Most
 ANP entries describe their departures as procedural steps instead (climb at this
 rate to that altitude, accelerate, retract flaps), which have to be flown through
 a flight-mechanics performance model before they become a path. That model is
 outside this bridge, so of the 155 aircraft in the shipped database 13 have a
-fixed-point departure profile. Asking for one that does not exist raises a
-`KeyError` naming the stage lengths that do:
+fixed-point *departure* profile and 20 a fixed-point *arrival* profile. Asking
+for one that does not exist raises a `KeyError` naming the stage lengths that
+do, which is also how to discover the bins an aircraft actually ships:
 
 ```python
 from phonometry import load_anp_database
 
 db = load_anp_database()
-try:
-    db.profile("A320-232", "D", 1)
-except KeyError as exc:
-    print(exc)
+for identifier, operation, stage in (("A320-232", "D", 1), ("747100", "D", 9)):
+    try:
+        db.profile(identifier, operation, stage)
+    except KeyError as exc:
+        print(exc)
+# ... 'A320-232', operation 'D', stage length 1 (available stage lengths: [])
+# ... '747100', operation 'D', stage length 9 (available: [1, 2, 3, 4, 5, 6])
 ```
 
-NPD curves, on the other hand, are tabulated for every aircraft in the database.
+An empty list means the type has no fixed-point profile at all and needs a
+substitute trajectory; a non-empty one means you asked for a bin this aircraft
+does not fly. NPD curves, on the other hand, are tabulated for every aircraft in
+the database.
 
 ## 4. Straight to an event level or a contour
 
@@ -186,14 +258,6 @@ With both halves in the record, the aircraft can run the Doc 29 chain itself.
 `event_level` places one flyover at a receiver, and `noise_contour` sweeps it
 over a ground grid, each wiring the NPD curves and the default profile into the
 functions the airport-noise guide builds by hand.
-
-```python
-from phonometry import load_anp_database
-
-aircraft = load_anp_database().aircraft("747100")
-flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
-print(round(float(flyover.level), 1))     # SEL in dB at that receiver
-```
 
 The observer is `(x, y, z)` in metres in the **runway frame**, and the origin
 of that frame is not the airport boundary: $x$ runs along the runway centre
@@ -207,16 +271,39 @@ offset from the extended centre line, positive to starboard of the direction of
 travel; its sign is what selects the depression-angle branch of the
 banked-segment rule. $z$ is the receiver height above local ground, left at 0 in
 these examples where Doc 29 measures at 1.2 m, normally a difference under a
-decibel. The optional `temperature` and `pressure`
-arguments feed the Doc 29 atmospheric impedance adjustment and default to the
-15 °C and 101.325 kPa of the standard atmosphere.
+decibel.
+
+Three arguments decide the rest, and two of them are silent. The metric defaults
+to the sound exposure level, with `"LAmax"` available on request; the stage
+length defaults to 1, the shortest trip-distance bin and therefore the steepest
+climb and the smallest footprint; and the optional `temperature` and `pressure`
+re-reference the tabulated levels from the reference specific acoustic impedance
+to the air at the aerodrome, defaulting to the 15 °C and 101.325 kPa of the
+standard atmosphere. That last pair is a bookkeeping term and not a weather
+correction: at the standard atmosphere it is worth +0.07 dB, and it rarely
+exceeds a few tenths. The NPD levels still carry the absorption of the
+atmosphere they were reduced to, and the chain offers no humidity-dependent band
+correction, so a hot dry aerodrome is not modelled by passing its temperature.
+
+```python
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+flyover = ac.event_level([3000.0, 500.0, 0.0], "D")
+print(round(float(flyover.level), 1))     # 100.4 dB
+```
+
+That is the single-event sound exposure level of one 747-100 departure at a
+receiver 3 km down the track and 500 m to the side of it. Move the receiver out
+to 1 500 m lateral and it costs more than the extra distance alone, because the
+lateral attenuation switches on as the elevation angle falls below 50°.
 
 ```python
 import numpy as np
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-contour = aircraft.noise_contour(
+ac = load_anp_database().aircraft("747100")
+contour = ac.noise_contour(
     "D",
     x=np.linspace(-2000.0, 12000.0, 40),
     y=np.linspace(-3000.0, 3000.0, 30),
@@ -224,6 +311,49 @@ contour = aircraft.noise_contour(
 print(contour.level.shape)      # (30, 40): one SEL per grid point
 contour.plot()
 ```
+
+The grid is indexed `(y, x)`, which is why the shape is `(30, 40)` and not the
+other way round. The cheapest check that the grid and the path are in the same
+frame is that the maximum of the array agrees with an `event_level` call at the
+grid point where it occurs.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour.svg" alt="Single-event sound exposure level contour of a Boeing 747-100 departure computed from the shipped ANP database, over a grid 14 km along the track by 6 km across it. The take-off ground roll is drawn as a thick bar on the runway and the default ground track as a dashed line along y equals zero; the footprint is loudest over the ground roll and the first part of the climb and stretches downrange, reaching about 8 km at the 95 dB contour and 12 km at the outermost one, and the event_level receiver at 3 km along the track and 500 m to the side is marked with its 100.4 dB single-event level" width="90%" />
+
+*The real 747-100 footprint, from the database's own NPD tables and default
+departure profile: four lines of code, and nothing hand-written. It is narrower
+and far more elongated than the teaching contour of the airport-noise guide,
+because a real climb profile puts the aeroplane high quickly and the loud part
+of the event stays close to the runway. The marked receiver is the
+`event_level` call above, so the two halves of this section are the same
+calculation at one point and at 1 200 of them.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+profile = ac.profile("D", stage_length=1)
+x = np.linspace(-2000.0, 12000.0, 40)
+y = np.linspace(-3000.0, 3000.0, 30)
+
+fig, ax = plt.subplots(figsize=(10, 5.5))
+ac.noise_contour("D", x=x, y=y).plot(ax=ax)      # the plot works in kilometres
+inside = profile.path[:, 0] <= x.max()
+ax.plot(profile.path[inside, 0] / 1000.0, profile.path[inside, 1] / 1000.0,
+        "k--", lw=1.4, label="default ground track")
+ax.plot([3.0], [0.5], "o", ms=8,
+        label=f"event_level receiver: SEL {float(flyover.level):.1f} dB")
+ax.set_xlim(x.min() / 1000.0, x.max() / 1000.0)
+ax.set_ylim(y.min() / 1000.0, y.max() / 1000.0)
+ax.legend(loc="lower left", fontsize=8)
+plt.show()
+```
+
+</details>
 
 Everything these two return is the same result type the airport-noise guide
 uses, so the plotting, the contour extraction and the per-segment breakdown all
@@ -242,7 +372,8 @@ identifier through `event_level` and `noise_contour`.
 **Not covered.** The procedural-step profiles, which are how most ANP entries
 describe a departure: turning those into a flight path needs the ICAO Doc 9911
 flight-mechanics performance model, which this bridge does not implement, so
-only the 13 aircraft with fixed-point profiles have a ready-to-use trajectory.
+only the 13 aircraft with a fixed-point *departure* profile — and the 20 with a
+fixed-point *arrival* profile — have a ready-to-use trajectory.
 The database is also read, never written: phonometry ships version 2.3 and does
 not update it.
 

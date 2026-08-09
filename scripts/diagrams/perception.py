@@ -267,6 +267,300 @@ def _d_zwicker(s: SVG, th: Theme) -> None:
            "middle")
 
 
+def _d_loudness_capture(s: SVG, th: Theme) -> None:
+    """Where the microphone goes for an ISO 532-1 loudness measurement.
+
+    Definition 3.19 fixes the measurement point (the centre of the absent
+    listener's head, which is what makes the calculated loudness diotic) and
+    clause 4 makes the field type part of the result: NF for free field,
+    ND for diffuse. Annex D adds the head-and-torso route and its
+    equalization decision. The geometry drawn is the ECMA-74 / ISO 11201
+    bystander position, 1.00 m from the reference box at 1.50 m height,
+    since ISO 532-1 itself prescribes no distance.
+    """
+    # --- Panel A: free field ------------------------------------------------
+    ax0, pw = 26.0, 418.0
+    s.rect(ax0, 48, pw, 330, th.panel, th.muted, rx=12, sw=1.6)
+    s.text(ax0 + pw / 2, 76, "A — Free field  (NF)", 20, th.fg, bold=True)
+    s.text(ax0 + pw / 2, 98, "hemi-anechoic room, one frontal source", 15,
+           th.muted)
+
+    gy = 336.0
+    for k in range(11):
+        wx = ax0 + 20 + k * 36
+        s.path(f"M {wx} 110 L {wx + 30} 110 L {wx + 15} 134 Z",
+               fill=th.panel, stroke=th.muted, sw=1.2)
+    s.ground(gy, ax0 + 16, ax0 + pw - 16)
+
+    # Equipment under test inside its reference box.
+    s.rect(ax0 + 40, gy - 70, 78, 70, th.panel, th.primary, rx=6, sw=2)
+    s.text(ax0 + 79, gy - 30, "EUT", 19, th.primary, bold=True)
+    s.rect(ax0 + 32, gy - 80, 94, 80, "none", th.muted, rx=4, sw=1.4,
+           dash="5,4")
+    s.text(ax0 + 79, gy - 92, "reference box", 14, th.muted)
+
+    # Microphone at the point the listener's head would occupy.
+    mx = ax0 + 236.0
+    cap = gy - 165.0
+    s.circle(mx, cap + 6, 30, "none", th.secondary, 1.4)
+    s.mic(mx, cap, gy, 1.0)
+    s.text(mx + 44, cap - 26, "listener absent:", 14, th.secondary, "start")
+    s.text(mx + 44, cap - 8, "the result is diotic", 14, th.secondary, "start")
+    s.arrow(ax0 + 132, gy - 56, mx - 30, cap + 26, th.primary, 1.8)
+    s.text(ax0 + 36, gy - 118, "frontal incidence, 0°", 14, th.primary,
+           "start")
+
+    s.dim(ax0 + 126, gy - 80, mx, cap, "1.00 m", offset=64, size=17)
+    s.dim(mx + 122, gy, mx + 122, cap, "1.50 m", offset=0, size=17,
+          label_side="right")
+    s.line(mx + 6, cap, mx + 122, cap, th.muted, 0.9, dash="3,3")
+    s.text(ax0 + pw / 2, 366, 'field="free"  →  quote N as NF', 16,
+           th.primary, mono=True)
+
+    # --- Panel B: diffuse field --------------------------------------------
+    bx0 = 456.0
+    s.rect(bx0, 48, pw, 330, th.panel, th.muted, rx=12, sw=1.6)
+    s.text(bx0 + pw / 2, 76, "B — Diffuse field  (ND)", 20, th.fg, bold=True)
+    s.text(bx0 + pw / 2, 98, "reverberant or in-situ room", 15, th.muted)
+
+    rx0, ry0, rw, rh = bx0 + 26, 118.0, pw - 52, 196.0
+    s.rect(rx0, ry0, rw, rh, "none", th.fg, rx=4, sw=2.4)
+    s.rect(bx0 + 60, ry0 + rh - 58, 70, 58, th.panel, th.primary, rx=6, sw=2)
+    s.text(bx0 + 95, ry0 + rh - 22, "EUT", 18, th.primary, bold=True)
+    mxb = bx0 + 268.0
+    capb = ry0 + rh - 132.0
+    s.mic(mxb, capb, ry0 + rh, 1.0)
+    src = (bx0 + 130.0, ry0 + rh - 36.0)
+    for tx, ty in ((rx0 + 40, ry0 + 4), (rx0 + rw - 4, ry0 + 56),
+                   (rx0 + 120, ry0 + 4), (rx0 + rw - 4, ry0 + 128)):
+        s.line(src[0], src[1], tx, ty, th.accent, 1.2)
+        s.line(tx, ty, mxb - 8, capb + 16, th.accent, 1.2)
+    s.arrow(src[0], src[1], mxb - 14, capb + 30, th.secondary, 1.6)
+    s.text(bx0 + pw / 2, ry0 + rh + 26,
+           "direct sound plus the reflected field, from every direction", 14,
+           th.muted)
+    s.text(bx0 + pw / 2, 366, 'field="diffuse"  →  quote N as ND', 16,
+           th.primary, mono=True)
+
+    # --- Panel C: head-and-torso simulator (Annex D) ------------------------
+    s.rect(26, 396, 848, 228, th.panel, th.muted, rx=12, sw=1.6)
+    s.text(60, 424, "C — Head-and-torso simulator (Annex D)", 20, th.fg,
+           "start", bold=True)
+
+    hx, hy = 130.0, 486.0
+    s.path(f"M {hx - 44} {hy + 62} L {hx - 30} {hy + 14} "
+           f"L {hx + 30} {hy + 14} L {hx + 44} {hy + 62} Z",
+           fill=th.panel, stroke=th.fg, sw=2)
+    s.circle(hx, hy - 16, 30, th.panel, th.fg, 2)
+    s.ellipse(hx - 30, hy - 12, 6, 11, th.bg, th.secondary, 1.8)
+    s.ellipse(hx + 30, hy - 12, 6, 11, th.bg, th.secondary, 1.8)
+    s.text(hx - 52, hy - 30, "L", 16, th.secondary, "end", bold=True)
+    s.text(hx + 52, hy - 30, "R", 16, th.secondary, "start", bold=True)
+    s.text(hx, hy + 82, "at the listening position", 14, th.muted)
+
+    s.arrow(hx + 50, hy - 4, 240, hy - 4, th.fg, 1.8)
+    s.rect(240, hy - 44, 250, 80, th.bg, th.primary, rx=8, sw=2)
+    s.text(365, hy - 18, "Equalization matched", 15, th.fg, bold=True)
+    s.text(365, hy + 2, "to the room:", 15, th.fg)
+    s.text(365, hy + 24, "free-field / diffuse-field / ID", 14, th.primary,
+           mono=True)
+    for k, ear in enumerate(("left channel", "right channel")):
+        by = hy - 44 + k * 44
+        s.rect(552, by, 186, 36, th.bg, th.secondary, rx=8, sw=1.8)
+        s.text(645, by + 24, ear, 15, th.fg)
+        s.arrow(494, hy - 4, 548, by + 18, th.fg, 1.6)
+        s.arrow(742, by + 18, 784, hy - 4, th.fg, 1.6)
+    s.text(818, hy - 10, "NL, NR", 17, th.fg, bold=True)
+    s.text(818, hy + 12, "both reported", 14, th.muted)
+
+    s.text(450, 588, "free-field equalization only for one frontal source "
+           "beyond 1.5 m; diffuse-field in reflective rooms; ID in vehicles",
+           14, th.muted)
+    s.text(450, 610, "each channel is analysed separately: report NL and NR, "
+           "and quote the maximum or the mean as the single value", 14,
+           th.muted)
+
+
+def _d_mg_capture_routes(s: SVG, th: Theme) -> None:
+    """The ISO 532-2 clause 7.2 capture routes and the arguments they imply.
+
+    Four listening situations, each with its own transfer function to the
+    tympanic membrane: a single microphone where the listener's head would be
+    (free or diffuse field, Table 1), a probe microphone in the ear canal (no
+    transfer function at all), and a head-and-torso simulator (none either,
+    but only if it is an accurate model of an average adult).
+    """
+    import math
+
+    x0, w = 34.0, 832.0
+    rows = (76.0, 216.0, 356.0, 496.0)
+    for y in rows:
+        s.rect(x0, y, w, 128, th.panel, th.muted, rx=10, sw=1.6)
+        s.line(500, y + 10, 500, y + 118, th.muted, 1.0, dash="4,4")
+
+    def result(y: float, line1: str, line2: str, note: str) -> None:
+        s.arrow(456, y + 64, 496, y + 64, th.fg, 1.8)
+        s.text(520, y + 42, line1, 17, th.primary, "start", mono=True)
+        s.text(520, y + 66, line2, 15, th.muted, "start")
+        s.text(520, y + 92, note, 14, th.muted, "start")
+
+    # --- 1: single microphone at the absent head centre, one frontal source -
+    y = rows[0]
+    s.text(x0 + 16, y + 26, "1 — single microphone where the head would be, "
+           "one frontal source", 17, th.fg, "start", bold=True)
+    s.rect(70, y + 60, 34, 44, th.panel, th.secondary, rx=5, sw=2)
+    for k in range(3):
+        s.path(f"M {124 + k * 20} {y + 52} q 9 30 0 60", stroke=th.secondary,
+               sw=1.4)
+    s.circle(268, y + 80, 28, "none", th.muted, 1.2)
+    s.mic(268, y + 56, y + 114, 0.8)
+    s.text(316, y + 76, "listener absent", 14, th.muted, "start")
+    s.text(316, y + 96, "(diotic)", 14, th.muted, "start")
+    result(y, 'field="free"', "Table 1 free-field transfer",
+           "frontal incidence; the default")
+
+    # --- 2: the same microphone in a reverberant field ----------------------
+    y = rows[1]
+    s.text(x0 + 16, y + 26, "2 — the same microphone, reverberant or in-situ "
+           "field", 17, th.fg, "start", bold=True)
+    for ang in range(0, 360, 45):
+        a = math.radians(ang)
+        s.arrow(268 + 78 * math.cos(a), y + 80 + 34 * math.sin(a),
+                268 + 34 * math.cos(a), y + 80 + 15 * math.sin(a), th.accent,
+                1.3)
+    s.mic(268, y + 56, y + 114, 0.8)
+    result(y, 'field="diffuse"', "Table 1 diffuse-field transfer",
+           "also for diffuse-field earphones")
+
+    # --- 3: probe microphone in the ear canal -------------------------------
+    y = rows[2]
+    s.text(x0 + 16, y + 26, "3 — probe microphone in the ear canal", 17,
+           th.fg, "start", bold=True)
+    hx, hy = 168.0, y + 76.0
+    s.circle(hx, hy, 32, th.panel, th.fg, 2)
+    s.path(f"M {hx + 30} {hy - 9} L {hx + 96} {hy - 17} L {hx + 96} "
+           f"{hy + 17} L {hx + 30} {hy + 9} Z", fill=th.bg, stroke=th.fg,
+           sw=1.6)
+    s.line(hx + 30, hy - 9, hx + 30, hy + 9, th.secondary, 3.4)
+    s.line(hx + 30, hy - 9, hx + 42, hy - 34, th.secondary, 1.2)
+    s.text(hx + 46, hy - 38, "tympanic membrane", 13, th.secondary, "start")
+    s.circle(hx + 58, hy, 5, th.primary)
+    s.line(hx + 58, hy, hx + 132, hy + 12, th.primary, 1.6)
+    s.text(hx + 138, hy + 16, "probe microphone", 13, th.primary, "start")
+    s.dim(hx + 30, hy + 17, hx + 58, hy + 17,
+          "10 mm — 5 mm above 3 kHz", offset=32, size=14)
+    result(y, 'field="eardrum"', "no transfer function applied",
+           "the ear transfer is already in the signal")
+
+    # --- 4: head and torso simulator ----------------------------------------
+    y = rows[3]
+    s.text(x0 + 16, y + 26, "4 — head-and-torso simulator", 17, th.fg,
+           "start", bold=True)
+    hx, hy = 108.0, y + 82.0
+    s.path(f"M {hx - 32} {hy + 32} L {hx - 22} {hy + 4} L {hx + 22} {hy + 4} "
+           f"L {hx + 32} {hy + 32} Z", fill=th.panel, stroke=th.fg, sw=1.8)
+    s.circle(hx, hy - 16, 22, th.panel, th.fg, 1.8)
+    s.ellipse(hx - 22, hy - 14, 5, 9, th.bg, th.secondary, 1.6)
+    s.ellipse(hx + 22, hy - 14, 5, 9, th.bg, th.secondary, 1.6)
+    s.arrow(hx + 36, hy - 12, 152, hy - 12, th.fg, 1.6)
+    s.path(f"M 240 {hy - 42} L 326 {hy - 12} L 240 {hy + 18} L 154 "
+           f"{hy - 12} Z", fill=th.bg, stroke=th.primary, sw=1.8)
+    s.text(240, hy - 18, "accurate model of", 13, th.fg)
+    s.text(240, hy - 2, "an average adult?", 13, th.fg)
+    s.text(336, hy - 22, "yes: no correction", 13, th.accent, "start")
+    s.text(336, hy + 4, "no: correction file —", 13, th.secondary, "start")
+    s.text(336, hy + 22, "not implemented", 13, th.secondary, "start")
+    result(y, 'field="eardrum"  or  equalize', "clause 7.2.5",
+           "equalize to the free or diffuse field first")
+
+    s.text(450, 646, "presentation: monaural is one ear alone, diotic the "
+           "same signal at both ears, binaural two independent ear signals",
+           14, th.muted)
+    s.text(450, 666, "a diotic sound is about 1.5 times as loud as the same "
+           "sound at one ear (clause 8.1)", 14, th.muted)
+
+
+def _d_tone_audibility_acquisition(s: SVG, th: Theme) -> None:
+    """The two-level time structure ISO/PAS 20065 assessments are built on.
+
+    Clause 4.3 merges the analyser's sub-second basic spectra line by line
+    into spectra of about 3 s; clause 5.1 asks for at least 12 of those,
+    time-staggered so that every alternating operating state is covered, and
+    each yields one decisive audibility that Formula (20) energy-averages.
+    """
+    x0, x1 = 50.0, 850.0
+    span = x1 - x0
+    slots = 12
+    slot = span / slots
+
+    # --- 1: operating states over the record --------------------------------
+    s.text(x0, 66, "1 — the source runs through its operating states "
+           "(clause 5.1: all of them must be covered)", 16, th.fg, "start",
+           bold=True)
+    states = ((0.0, 0.25, "idle", th.primary), (0.25, 0.75, "full load",
+              th.secondary), (0.75, 1.0, "idle", th.primary))
+    for a, b, name, color in states:
+        s.rect(x0 + a * span, 80, (b - a) * span, 42, th.panel, color, rx=6,
+               sw=2)
+        s.text(x0 + (a + b) / 2 * span, 107, name, 16, th.fg)
+
+    s.line(x0, 140, x1, 140, th.muted, 1.4)
+    for k in range(7):
+        tx = x0 + span * k / 6.0
+        s.line(tx, 136, tx, 144, th.muted, 1.4)
+        s.text(tx, 162, f"{6 * k} s", 13, th.muted, mono=True)
+
+    # --- 2: basic spectra merged into ~3 s averaged spectra -----------------
+    s.text(x0, 196, "2 — the analyser's basic spectra (under 1 s each) are "
+           "merged line by line into 3 s spectra (clause 4.3)", 16, th.fg,
+           "start", bold=True)
+    for j in range(slots):
+        base = x0 + j * slot
+        for k in range(4):
+            tx = base + slot * (0.16 + 0.22 * k)
+            s.line(tx, 208, tx, 232, th.muted, 2.6)
+        s.rect(base + 3, 246, slot - 6, 46, th.panel, th.accent, rx=6, sw=1.8)
+        s.text(base + slot / 2, 268, f"{j + 1}", 15, th.fg, bold=True)
+        s.text(base + slot / 2, 285, "3 s", 12, th.muted)
+        s.line(base + slot / 2, 232, base + slot / 2, 244, th.muted, 1.2)
+
+    s.text(x0, 310, "3 — each merged spectrum gives one decisive audibility "
+           "ΔLj (clause 5.3.8)", 16, th.fg, "start", bold=True)
+
+    # --- 3: the energy mean of the decisive audibilities --------------------
+    s.path(f"M {x0} 326 L {x1} 326 L {x1 - 170} 358 L {x0 + 170} 358 Z",
+           fill=th.panel, stroke=th.muted, sw=1.4)
+    s.rect(x0 + 170, 356, span - 340, 52, "none", th.primary, rx=8, sw=2.2)
+    s.text(450, 379, "Energy mean of the J decisive audibilities", 16, th.fg,
+           bold=True)
+    s.text(450, 399, "Formula (20); an empty spectrum counts as −10 dB "
+           "(Formula 21)", 13, th.muted)
+    s.arrow(450, 408, 450, 432, th.fg, 1.8)
+    s.rect(x0 + 190, 432, span - 380, 50, "none", th.accent, rx=8, sw=2.4)
+    s.text(450, 453, "mean audibility ΔL  →  tonal adjustment Kt", 17, th.fg,
+           bold=True)
+    s.text(450, 473, "ISO 1996-2:2017 Annex J, Table J.1", 13, th.muted)
+
+    # --- The settings and acceptance rules ----------------------------------
+    s.rect(x0, 502, span, 92, th.panel, th.muted, rx=10, sw=1.6)
+    left = (
+        "class 1 chain (IEC 61672-1), lower limit ≤ 20 Hz",
+        "line spacing Δf between 1.9 Hz and 4.0 Hz",
+        "Hanning window, mandatory",
+    )
+    right = (
+        "amplitude resolution ≥ 0.1 dB, anti-aliasing filter",
+        "A-weighted spectrum (clause 5.3.2)",
+        "U ≤ 1.5 dB: below 12 spectra, U must be reported",
+    )
+    for k, txt in enumerate(left):
+        s.circle(x0 + 22, 528 + k * 22, 3.6, th.primary)
+        s.text(x0 + 36, 533 + k * 22, txt, 14, th.muted, "start")
+    for k, txt in enumerate(right):
+        s.circle(x0 + 424, 528 + k * 22, 3.6, th.primary)
+        s.text(x0 + 438, 533 + k * 22, txt, 14, th.muted, "start")
+
+
 def _d_dosimeter(s: SVG, th: Theme) -> None:
     """ISO 9612 occupational exposure: worn-dosimeter microphone position
     (Clause 12.3) and the three measurement strategies (Clauses 9-11)."""
@@ -584,3 +878,424 @@ def _d_objective_intelligibility(s: SVG, th: Theme) -> None:
            "1.9 kHz it reaches 0.90", 12, th.muted)
     s.arrow(292, 480, 390, 512, th.fg, 1.8)
     s.arrow(607, 480, 510, 512, th.fg, 1.8)
+
+
+# ---------------------------------------------------------------------------
+# Sound-field audiometry: what the ISO 389-7 reference zero is referenced to
+# (ISO 389-7:2005 clause 1 + ISO 8253-2:2009 clauses 3.3, 5.2, 5.3)
+# ---------------------------------------------------------------------------
+
+def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
+    """The three listening conditions behind the audiometric zero.
+
+    Panels A and B are the two ISO 389-7 columns, drawn to the ISO 8253-2
+    geometry that qualifies them; panel C is the earphone condition the
+    values are *not* referenced to, which is the mistake the guide warns
+    about.
+    """
+    gy = 400.0                       # common floor line
+    pw = 282.0                       # panel width
+    px0 = (24.0, 309.0, 594.0)       # panel left edges
+    scale = 112.0                    # px per metre
+    note_y = (424.0, 442.0, 460.0)   # the three note lines under each panel
+
+    def room(x: float, title: str, sub: str, color: str) -> None:
+        s.rect(x, 112, pw, gy - 112, "none", th.muted, rx=6, sw=1.4)
+        s.text(x + pw / 2, 66, title, 21, color, bold=True)
+        s.text(x + pw / 2, 90, sub, 14, th.muted)
+
+    def notes(x: float, color: str, *rows: str) -> None:
+        for y, row in zip(note_y, rows):
+            s.text(x + pw / 2, y, row, 13, color)
+
+    def ghost_subject(x: float) -> float:
+        """The listener who will sit there, drawn absent (5.2 b / 5.3).
+
+        Everything about the qualification is measured with the subject and
+        the chair out of the room, so both are dashed and the microphone that
+        replaces them is solid.
+        """
+        ref_y = gy - 190.0 + 22.0     # head centre = ear-canal midpoint
+        seat_y = gy - 78.0
+        d = "6,4"
+        s.line(x - 28, seat_y, x + 62, seat_y, th.muted, 2.0, dash=d)
+        s.line(x - 24, seat_y, x - 24, gy, th.muted, 2.0, dash=d)
+        s.line(x + 58, seat_y, x + 58, gy, th.muted, 2.0, dash=d)
+        s.line(x - 28, seat_y, x - 28, ref_y + 16, th.muted, 2.0, dash=d)
+        s.ellipse(x, ref_y, 22, 22, "none", th.muted, 2.0, dash=d)
+        s.line(x, ref_y + 22, x + 6, seat_y, th.muted, 2.0, dash=d)
+        s.line(x + 6, seat_y, x + 52, seat_y, th.muted, 2.0, dash=d)
+        s.line(x + 52, seat_y, x + 52, gy, th.muted, 2.0, dash=d)
+        q = 0.15 * scale
+        s.rect(x - q, ref_y - q, 2 * q, 2 * q, "none", th.accent, rx=3,
+               sw=1.4, dash="5,4")
+        s.circle(x, ref_y, 4.0, th.secondary)
+        return ref_y
+
+    def meas_mic(x: float, y: float) -> None:
+        """Boom-mounted measurement microphone, capsule tip at (x, y)."""
+        s.line(x - 64, y, x - 42, y, th.primary, 2.4)      # boom arm
+        s.rect(x - 42, y - 6, 36, 12, th.fg, rx=4)         # body
+        s.circle(x, y, 5.0, th.primary)                    # capsule tip
+        s.line(x - 64, y, x - 64, gy, th.fg, 2.2)          # stand
+        s.line(x - 78, gy, x - 50, gy, th.fg, 2.2)         # base
+
+    # ---------------- A - free sound field (ISO 8253-2, 5.2) --------------
+    xa = px0[0]
+    room(xa, "A · Free field", "pure tone · frontal · binaural", th.primary)
+    s.ground(gy, xa, xa + pw)
+    sx = xa + 96.0
+    ref_y = ghost_subject(sx)
+    lx = sx + scale                    # loudspeaker reference point
+    s.rect(lx - 20, ref_y - 42, 40, 84, th.panel, th.primary, rx=5, sw=2)
+    s.circle(lx, ref_y, 14, "none", th.primary, 2)
+    s.circle(lx, ref_y, 5, th.primary)
+    s.line(lx, ref_y + 42, lx, gy, th.fg, 2.2)
+    s.line(lx - 18, gy, lx + 18, gy, th.fg, 2.2)
+    s.line(sx + 36, ref_y, lx - 24, ref_y, th.primary, 1.2, dash="7,4")
+    s.dim(sx, ref_y - 40, lx, ref_y - 40, "≥ 1 m", offset=-52, size=17)
+    meas_mic(sx, ref_y)
+    s.text(xa + 104, 148, "level measured here,", 13, th.primary)
+    s.text(xa + 104, 166, "subject and chair absent", 13, th.primary)
+    notes(xa, th.accent, "on the reference axis, 0° azimuth",
+          "and elevation, ≥ 1 m  (5.2 a)",
+          "± 0.15 m: within ± 1 dB to 4 kHz  (5.2 b)")
+
+    # ---------------- B - diffuse sound field (ISO 8253-2, 5.3) -----------
+    xb = px0[1]
+    room(xb, "B · Diffuse field", "third-octave noise band · binaural",
+         th.accent)
+    s.ground(gy, xb, xb + pw)
+    sx = xb + pw / 2 + 20.0
+    ref_y = ghost_subject(sx)
+    for dx, dy in ((-112.0, -96.0), (108.0, -100.0), (104.0, 62.0),
+                   (-108.0, 58.0)):
+        bx, by = sx + dx, ref_y + dy
+        s.rect(bx - 16, by - 12, 32, 24, th.panel, th.accent, rx=4, sw=1.8)
+        s.arrow(bx - 0.16 * dx, by - 0.16 * dy,
+                sx - 0.34 * dx, ref_y - 0.34 * dy, th.accent, 1.2)
+    meas_mic(sx, ref_y)
+    s.text(xb + pw / 2, 148, "the same reference point,", 13, th.primary)
+    s.text(xb + pw / 2, 166, "the same absent subject", 13, th.primary)
+    notes(xb, th.accent, "several loudspeakers, non-coherent feeds",
+          "≥ 500 Hz: loudest and quietest directions",
+          "within 5 dB  (Table 1)")
+
+    # ---------------- C - the earphone condition, for contrast ------------
+    xc = px0[2]
+    room(xc, "C · Earphone — not this standard",
+         "supra-aural or insert · monaural", th.secondary)
+    s.ground(gy, xc, xc + pw)
+    sx = xc + 74.0
+    s.person(sx, gy, 190.0, seated=True)
+    ref_y = gy - 190.0 + 19.0
+    s.path(f"M {sx - 20:.0f} {ref_y - 8:.0f} Q {sx:.0f} {ref_y - 42:.0f} "
+           f"{sx + 20:.0f} {ref_y - 8:.0f}", stroke=th.secondary, sw=2.6)
+    s.rect(sx + 15, ref_y - 13, 13, 26, th.panel, th.secondary, rx=3, sw=2)
+    cx0 = sx + 96.0
+    s.rect(cx0, ref_y - 36, 104, 72, th.panel, th.secondary, rx=8, sw=2)
+    s.text(cx0 + 52, ref_y - 12, "IEC 60318-1", 14, th.fg, bold=True)
+    s.text(cx0 + 52, ref_y + 8, "coupler /", 13, th.muted)
+    s.text(cx0 + 52, ref_y + 26, "ear simulator", 13, th.muted)
+    s.arrow(sx + 32, ref_y, cx0 - 6, ref_y, th.secondary, 1.6)
+    s.text(xc + pw / 2, 148, "the level lives in the coupler,", 13,
+           th.secondary)
+    s.text(xc + pw / 2, 166, "not at a point in a room", 13, th.secondary)
+    notes(xc, th.secondary, "0 dB HL here is the RETSPL of the earphone",
+          "fitted (ISO 389-1 / -2 / -8), referred to a",
+          "coupler — never an ISO 389-7 value")
+
+    # ---------------- shared caption strip --------------------------------
+    s.rect(24, 486, 852, 68, "none", th.fg, rx=10, sw=1.4, dash="6,5")
+    s.text(450, 514, "Reference point: the midpoint of the line joining the "
+           "listener's ear-canal openings", 16, th.fg, bold=True)
+    s.text(450, 540, "the listener in the listening position; in A and B the "
+           "level is measured there with the subject and chair absent", 14,
+           th.muted)
+# ---------------------------------------------------------------------------
+# ISO 9612 Clause 12.4: the sound level meter geometry at a workstation
+# ---------------------------------------------------------------------------
+
+def _d_slm_workstation(s: SVG, th: Theme) -> None:
+    """The other half of the ISO 9612 microphone geometry.
+
+    ``diagram_dosimeter_iso9612`` draws the worn instrument of Clause 12.3;
+    the guide also offers class 1 and class 2 sound level meters, whose
+    placement is Clause 12.4 and is a different drawing entirely: worker
+    absent on the left, worker present on the right.
+    """
+    gy = 400.0
+    m = 130.0                        # px per metre
+    pw = 418.0
+    xa, xb = 24.0, 458.0
+    note_y = (424.0, 442.0, 460.0)
+
+    def panel(x: float, title: str, sub: str, color: str) -> None:
+        s.rect(x, 104, pw, gy - 104, "none", th.muted, rx=6, sw=1.4)
+        s.text(x + pw / 2, 66, title, 22, color, bold=True)
+        s.text(x + pw / 2, 90, sub, 15, th.muted)
+
+    def notes(x: float, color: str, *rows: str) -> None:
+        for y, row in zip(note_y, rows):
+            s.text(x + pw / 2, y, row, 14, color)
+
+    def machine(x: float) -> None:
+        s.rect(x, gy - 118, 88, 118, th.panel, th.fg, rx=6, sw=2)
+        s.text(x + 44, gy - 54, "machine", 15, th.fg)
+        for k in range(3):
+            s.path(f"M {x + 96 + k * 15:.0f} {gy - 100:.0f} "
+                   f"q 8 11 0 22 q -8 11 0 22", stroke=th.secondary, sw=1.6)
+
+    # ---------------- Left: worker absent ---------------------------------
+    panel(xa, "Worker absent", "the preferred Clause 12.4 placement",
+          th.primary)
+    s.ground(gy, xa, xa + pw)
+    machine(xa + 20)
+    mx = xa + 276.0
+    ref = gy - 1.55 * m              # 1.55 m: the standing head height
+    s.ellipse(mx, ref, 22, 26, "none", th.muted, 1.8, dash="6,4")
+    s.line(mx, ref + 26, mx, gy, th.muted, 1.8, dash="6,4")
+    s.mic(mx, ref, gy, 1.0)
+    s.arrow(mx - 26, ref, mx - 104, ref, th.primary, 2.0)
+    s.text(mx - 64, ref + 24, "axis ∥ line of sight", 14, th.primary)
+    s.dim(mx + 68, gy, mx + 68, ref, "1.55 m", offset=0, size=17,
+          label_side="right")
+    s.line(mx + 10, ref, mx + 68, ref, th.muted, 0.9, dash="3,3")
+    # Plan inset: the constant-speed sweep along an infinity-shaped path.
+    ix, iy = xa + 22.0, 126.0
+    s.rect(ix, iy, 148, 84, th.panel, th.accent, rx=8, sw=1.6)
+    s.text(ix + 74, iy + 20, "or sweep in plan:", 14, th.accent)
+    s.path(f"M {ix + 32:.0f} {iy + 54:.0f} c 10 -26 40 -26 50 0 "
+           f"c 10 26 40 26 50 0 c -10 -26 -40 -26 -50 0 "
+           f"c -10 26 -40 26 -50 0 z", stroke=th.accent, sw=2.2)
+    s.text(ix + 74, iy + 78, "at constant speed", 12, th.muted)
+    notes(xa, th.primary,
+          "capsule at the head position, on the eye line",
+          "standing 1.55 m ± 0.075 m; seated 0.80 m ± 0.05 m",
+          "above the middle of the seat plane")
+
+    # ---------------- Right: worker present -------------------------------
+    panel(xb, "Worker present", "hand-held meter, most-exposed ear",
+          th.secondary)
+    s.ground(gy, xb, xb + pw)
+    machine(xb + 18)
+    px = xb + 242.0
+    ph = 1.75 * m
+    s.person(px, gy, ph)
+    ear_x, ear_y = px + 0.10 * ph, gy - ph + 0.10 * ph
+    hx = ear_x + 0.25 * m            # 0.25 m: the middle of the allowed band
+    s.circle(hx, ear_y, 15, "none", th.secondary, 2.2)   # 60 mm windscreen
+    s.rect(hx - 5, ear_y + 13, 10, 28, th.panel, th.secondary, rx=3, sw=2)
+    s.line(hx, ear_y + 41, px + 0.18 * ph, gy - 0.50 * ph, th.secondary, 2.4)
+    s.dim(ear_x, ear_y - 34, hx, ear_y - 34, "0.1 m to 0.4 m", offset=-16,
+          size=16)
+    s.line(ear_x, ear_y - 12, ear_x, ear_y - 50, th.muted, 0.9, dash="3,3")
+    s.line(hx, ear_y - 17, hx, ear_y - 50, th.muted, 0.9, dash="3,3")
+    s.line(hx + 15, ear_y, xb + pw - 24, ear_y + 62, th.secondary, 1.0,
+           dash="4,3")
+    s.text(xb + pw - 20, ear_y + 68, "60 mm", 14, th.secondary, "end")
+    s.text(xb + pw - 20, ear_y + 86, "windscreen", 14, th.secondary,
+           "end")
+    notes(xb, th.secondary,
+          "held 0.1 m to 0.4 m from the ear-canal entrance",
+          "on the most exposed side, windscreen ≥ 60 mm (13.3)",
+          "beyond 0.4 m, use the worn instrument (12.3)")
+
+    # ---------------- footer ---------------------------------------------
+    s.rect(24, 486, 852, 66, "none", th.fg, rx=10, sw=1.4, dash="6,5")
+    s.text(450, 514, "A fixed microphone position under-reads a hand-held "
+           "tool close to the ear (13.1)", 16, th.fg, bold=True)
+    s.text(450, 540, "that is exactly when the worn personal exposure meter "
+           "of Clause 12.3 is the right instrument", 14, th.muted)
+# ---------------------------------------------------------------------------
+# IEC 60268-16 clause 7: the physical STI measurement (source, level, receiver)
+# ---------------------------------------------------------------------------
+
+def _d_sti_setup(s: SVG, th: Theme) -> None:
+    """What produces the signal the STI is computed from.
+
+    ``diagram_sti_chain`` draws the analysis; this draws the room. Panel A is
+    an unamplified talker (acoustical input, clause 7.2), panel B a sound
+    system driven electrically (clause 7.4), and both end on the clause 7.6.4
+    reduction rule for a set of positions.
+    """
+    gy = 400.0
+    m = 90.0                         # px per metre
+    pw = 418.0
+    xa, xb = 24.0, 458.0
+    note_y = (424.0, 442.0, 460.0)
+
+    def room(x: float, title: str, sub: str, color: str) -> None:
+        s.rect(x, gy - 3.0 * m, pw, 3.0 * m, "none", th.muted, rx=6, sw=1.4)
+        s.text(x + pw / 2, 66, title, 22, color, bold=True)
+        s.text(x + pw / 2, 90, sub, 15, th.muted)
+        s.ground(gy, x, x + pw)
+
+    def notes(x: float, color: str, *rows: str) -> None:
+        for y, row in zip(note_y, rows):
+            s.text(x + pw / 2, y, row, 14, color)
+
+    def receiver(x: float, *, ghost: bool = False) -> None:
+        """Measurement microphone at 1.2 m seated ear height."""
+        cap = gy - 1.2 * m
+        if ghost:
+            s.ellipse(x, cap + 24, 9, 26, "none", th.muted, 1.4, dash="5,4")
+            s.line(x, cap + 50, x, gy, th.muted, 1.4, dash="5,4")
+        else:
+            s.mic(x, cap, gy, 1.0)
+
+    # ---------------- A - unamplified talker (clause 7.2) -----------------
+    room(xa, "A · Unamplified talker", "acoustical input, clause 7.2",
+         th.primary)
+    tx = xa + 74.0
+    mouth = gy - 1.5 * m             # 1.5 m: a standing talker's mouth
+    # Artificial mouth on a stand, aimed along the speaking direction.
+    s.rect(tx - 16, mouth - 20, 32, 40, th.panel, th.primary, rx=6, sw=2)
+    s.path(f"M {tx + 16:.0f} {mouth - 14:.0f} L {tx + 40:.0f} {mouth - 24:.0f} "
+           f"L {tx + 40:.0f} {mouth + 24:.0f} L {tx + 16:.0f} {mouth + 14:.0f} Z",
+           fill=th.panel, stroke=th.primary, sw=2)
+    s.line(tx, mouth + 20, tx, gy, th.fg, 2.2)
+    s.line(tx - 16, gy, tx + 16, gy, th.fg, 2.2)
+    s.text(tx + 34, mouth - 52, "artificial mouth", 14, th.primary)
+    s.text(tx + 34, mouth - 36, "(ITU-T P.51 directivity)", 12, th.muted)
+    s.dim(tx - 44, gy, tx - 44, mouth, "1.5 m", offset=0, size=15)
+    s.line(tx - 18, mouth, tx - 44, mouth, th.muted, 0.9, dash="3,3")
+    # The 1 m reference point where the fallback level is defined.
+    s.line(tx + m, mouth - 34, tx + m, mouth + 34, th.secondary, 1.2,
+           dash="5,4")
+    s.dim(tx, mouth - 78, tx + m, mouth - 78, "1 m", offset=0, size=15)
+    s.line(tx + m, mouth - 34, tx + m, mouth - 78, th.muted, 0.9, dash="3,3")
+    s.text(tx + m + 8, mouth - 118, "60 dB(A) here, or the", 13, th.secondary,
+           "start")
+    s.text(tx + m + 8, mouth - 102, "Annex J operational level", 13,
+           th.secondary, "start")
+    # Receiver at the listener position, plus a second position further back.
+    rx1 = tx + 2.0 * m
+    receiver(rx1)
+    receiver(tx + 3.3 * m, ghost=True)
+    s.dim(tx, gy - 18, rx1, gy - 18, "2 m", offset=0, size=15)
+    s.dim(rx1 + 26, gy, rx1 + 26, gy - 1.2 * m, "1.2 m", offset=0, size=15,
+          label_side="right")
+    s.line(rx1 + 6, gy - 1.2 * m, rx1 + 26, gy - 1.2 * m, th.muted, 0.9,
+           dash="3,3")
+    notes(xa, th.primary,
+          "source response flat within ± 1 dB in a free field (7.2 b)",
+          "receiver: omnidirectional, diffuse-field, calibrated (7.3)",
+          "ambient noise measured at the same point, source off")
+
+    # ---------------- B - sound system (clause 7.4) -----------------------
+    room(xb, "B · Sound system", "electrical input, clause 7.4", th.accent)
+    ceil = gy - 3.0 * m
+    for k in range(3):
+        lx = xb + 110.0 + k * 106.0
+        s.rect(lx - 18, ceil + 4, 36, 20, th.panel, th.accent, rx=4, sw=2)
+        s.path(f"M {lx - 26:.0f} {ceil + 56:.0f} L {lx:.0f} {ceil + 24:.0f} "
+               f"L {lx + 26:.0f} {ceil + 56:.0f}", stroke=th.accent, sw=1.2,
+               dash="5,4")
+    s.text(xb + pw / 2, ceil + 42, "ceiling loudspeaker line", 14, th.accent)
+    # Electrical injection into the system input, down at the rack.
+    rack_y = gy - 104.0
+    s.rect(xb + 18, rack_y, 62, 48, th.panel, th.fg, rx=6, sw=2)
+    s.text(xb + 49, rack_y + 30, "amp", 14, th.fg)
+    s.arrow(xb + 2, rack_y + 24, xb + 16, rack_y + 24, th.secondary, 2.0)
+    s.text(xb + 6, rack_y + 68, "test signal in,", 12, th.secondary, "start")
+    s.text(xb + 6, rack_y + 84, "at the Annex J level", 12, th.secondary,
+           "start")
+    s.line(xb + 32, rack_y, xb + 32, ceil + 14, th.fg, 1.4, dash="5,4")
+    s.line(xb + 32, ceil + 14, xb + 92, ceil + 14, th.fg, 1.4, dash="5,4")
+    # Two coverage zones, plus the ambient-noise position.
+    for k, lx in enumerate((xb + 150.0, xb + 336.0)):
+        receiver(lx)
+        s.text(lx, gy - 1.2 * m - 30, f"zone {k + 1}", 13, th.accent)
+    amb = xb + 246.0
+    receiver(amb, ghost=True)
+    s.text(amb, gy - 1.2 * m - 30, "system off:", 13, th.muted)
+    s.text(amb, gy - 1.2 * m - 14, "ambient", 13, th.muted)
+    notes(xb, th.accent,
+          "injected near the normal input, so the whole chain is in (7.4)",
+          "one position per coverage zone, at listening height",
+          "spread over the served area, worst corners included")
+
+    # ---------------- footer ---------------------------------------------
+    s.rect(24, 486, 852, 66, "none", th.fg, rx=10, sw=1.4, dash="6,5")
+    s.text(450, 514, "The rating of the space is the mean of the positions "
+           "minus one standard deviation (7.6.4)", 16, th.fg, bold=True)
+    s.text(450, 540, "a plain mean over the positions overstates coverage; "
+           "better still, plot the whole distribution", 14, th.muted)
+# ---------------------------------------------------------------------------
+# STOI / ESTOI on a physical device: where the degraded signal comes from
+# ---------------------------------------------------------------------------
+
+def _d_stoi_bench(s: SVG, th: Theme) -> None:
+    """The bench behind an acoustically captured degraded signal.
+
+    ``diagram_objective_intelligibility`` draws the algorithm; this draws the
+    room and the cables, because once the pair is captured rather than
+    synthesised, four things become the caller's responsibility.
+    """
+    fy = 118.0                       # reference (upper) lane
+    ly = 288.0                       # degraded (lower) lane
+
+    def box(x: float, y: float, w: float, h: float, title: str, sub: str,
+            color: str) -> None:
+        s.rect(x, y, w, h, th.panel, color, rx=8, sw=2)
+        if sub:
+            s.text(x + w / 2, y + h / 2 - 4, title, 16, th.fg, bold=True)
+            s.text(x + w / 2, y + h / 2 + 17, sub, 13, th.muted)
+        else:
+            s.text(x + w / 2, y + h / 2 + 6, title, 16, th.fg, bold=True)
+
+    # --- the clean file, forking -----------------------------------------
+    s.rect(26, ly - 46, 96, 92, th.panel, th.fg, rx=8, sw=2)
+    s.text(74, ly - 8, "clean", 17, th.fg, bold=True)
+    s.text(74, ly + 14, "speech file", 15, th.muted)
+    s.path(f"M 122 {ly - 14:.0f} C 168 {ly - 14:.0f} 168 {fy + 26:.0f} "
+           f"212 {fy + 26:.0f}", stroke=th.primary, sw=2.2)
+    s.arrow(200, fy + 26, 214, fy + 26, th.primary, 2.2)
+    s.arrow(122, ly, 214, ly, th.secondary, 2.2)
+
+    # --- upper lane: the reference goes straight to the comparison --------
+    box(214, fy, 300, 56, "reference path",
+        "the original file, never a re-recording", th.primary)
+    s.arrow(514, fy + 28, 596, fy + 28, th.primary, 2.2)
+
+    # --- lower lane: playback, device under test, capture ------------------
+    box(214, ly - 26, 118, 52, "playback", "amp + loudspeaker", th.secondary)
+    s.arrow(332, ly, 356, ly, th.secondary, 2.2)
+    s.rect(356, ly - 74, 172, 148, "none", th.muted, rx=8, sw=1.6, dash="6,5")
+    s.text(442, ly - 84, "test box", 14, th.muted)
+    box(370, ly - 52, 144, 46, "device under test", "", th.secondary)
+    s.text(442, ly + 20, "hearing aid on an artificial ear,", 13, th.muted)
+    s.text(442, ly + 40, "or a headset on a torso simulator", 13, th.muted)
+    s.arrow(528, ly, 552, ly, th.secondary, 2.2)
+    box(552, ly - 26, 116, 52, "capture", "mic + preamp", th.secondary)
+    s.path(f"M 668 {ly:.0f} C 696 {ly:.0f} 696 {ly - 40:.0f} 696 "
+           f"{ly - 62:.0f}", stroke=th.secondary, sw=2.2)
+    s.arrow(696, ly - 50, 696, fy + 88, th.secondary, 2.2)
+
+    # --- the alignment gate both lanes pass through -----------------------
+    s.rect(596, fy - 6, 200, 88, th.panel, th.accent, rx=10, sw=2.4)
+    s.text(696, fy + 22, "align and trim", 18, th.fg, bold=True)
+    s.text(696, fy + 46, "cross-correlate the envelopes", 13, th.accent)
+    s.text(696, fy + 66, "equal length · one clock", 13, th.accent)
+    s.arrow(796, fy + 38, 814, fy + 38, th.accent, 2.2)
+    s.rect(816, fy - 6, 60, 88, th.panel, th.fg, rx=8, sw=2)
+    s.text(846, fy + 32, "STOI /", 15, th.fg, bold=True)
+    s.text(846, fy + 52, "ESTOI", 15, th.fg, bold=True)
+
+    # --- the bypass measurement ------------------------------------------
+    s.rect(214, 392, 454, 56, "none", th.primary, rx=10, sw=1.6, dash="6,5")
+    s.text(441, 416, "run it once with the device bypassed", 15, th.primary,
+           bold=True)
+    s.text(441, 438, "the loudspeaker, the box noise and the microphone "
+           "are scored as degradation too", 13, th.muted)
+    s.line(268, 392, 268, ly + 30, th.primary, 1.2, dash="5,4")
+    s.line(610, 392, 610, ly + 30, th.primary, 1.2, dash="5,4")
+
+    # --- footer ----------------------------------------------------------
+    s.rect(26, 468, 850, 62, "none", th.fg, rx=10, sw=1.4, dash="6,5")
+    s.text(450, 494, "Play at the device's operating level, and repeat the "
+           "capture", 16, th.fg, bold=True)
+    s.text(450, 518, "the index is invariant to level, the device is not; a "
+           "single capture carries the acoustic path's run-to-run spread", 13,
+           th.muted)

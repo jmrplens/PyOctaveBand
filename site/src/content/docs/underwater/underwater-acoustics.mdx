@@ -70,8 +70,17 @@ $$
 
 with $p_0 = 1\ \mu\text{Pa}$ and $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. The sound pressure level is the
 mean-square level (ISO 18406 Formula 7); the sound exposure level integrates the
-squared pressure over the record (Formulae 3–4); the peak level is the
-zero-to-peak value.
+squared pressure over the record (ISO 18406 Formulae 3-4); the peak level is the
+zero-to-peak value, the greatest magnitude of $p(t)$ over the pulse, of either
+sign (ISO 18406 Formula 5 with its Note 1).
+
+That convention is worth pinning down before any number is compared against a
+limit. Much of the pile-driving literature, and several older consent
+conditions, quote a **peak-to-peak** level instead, which for a symmetric pulse
+runs about 6 dB higher; the standard also lets the compressional and
+rarefactional peaks be reported separately (Clause 8.4.2). A computed
+`peak_sound_pressure_level` is zero-to-peak, so establish which convention an
+external threshold uses before subtracting one from the other.
 
 ```python
 from phonometry import underwater
@@ -106,9 +115,30 @@ $$
 \Delta L = -10\log_{10}\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-$\Delta L$ diverges at low $u$ (grazing / low frequency) and tends to
-$-10\log_{10}(2) = -3.01$ dB as $u \to \infty$. The reported source level is an *equivalent monopole
-broadside* value and must be quoted with its source depth.
+The correction exists because of the sea surface. To a receiver below, the
+surface is a pressure-release mirror, so the ship radiates as a source plus a
+phase-inverted image a distance $2 d_s$ above it — the dipole of ISO 17208-2
+Annex A. When the pair is shallow in wavelength terms the two nearly cancel, so
+the field measured below understates what an equivalent monopole would have to
+be; when it is deep in wavelength terms the two decorrelate over the
+measurement aperture and radiate twice the power of one alone.
+
+Read the limits as that statement. $\Delta L$ grows **without bound** as
+$u \to 0$ (the argument of the logarithm tends to $u^2$), which is low frequency
+or small draught: there the conversion is inverting a near-total cancellation,
+so a small error in the assumed source depth or sound speed becomes a large
+error in source level, and the low-frequency end of a reported source-level
+spectrum is the least trustworthy part of it. It crosses zero at $u \approx 1.03$
+— 59 Hz for the 4.2 m source depth of the example below — and tends to
+$-10\log_{10}(2) = -3.01$ dB as $u \to \infty$, where source and image add
+incoherently.
+
+The nominal source depth itself is a convention, not a located source:
+ISO 17208-2 Formula (1) fixes $d_s = 0.7\,D$ on the mean of the bow and stern
+draughts and its own Note 4 calls the choice "somewhat arbitrary", a compromise.
+The reported source level is therefore an *equivalent monopole broadside* value
+that means nothing on its own — Clause 6.2 requires the nominal source depth,
+the sound speed used and the conversion formula applied to be reported with it.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level.svg" alt="Ship radiated noise level and equivalent monopole source level versus frequency, with the Lloyd's-mirror surface correction on a twin axis showing its low-frequency divergence and its approach to −3 dB at high frequency" width="82%" loading="eager" />
 
@@ -159,6 +189,21 @@ level; only at the lowest bands, where $u$ is small, does it go the other way.
 15°/30°/45° depression angles, and `source_level_uncertainty` the tabulated
 expanded uncertainty (5 dB ≤100 Hz, 3 dB 125 Hz–16 kHz, 4 dB >16 kHz).
 
+Those tabulated figures are the uncertainty of the *radiated noise level*, and
+they are representative values rather than a budget for your survey. ISO 17208-2
+Clause 5 adds two more terms to the *source level*. The sound speed enters only
+through $k d_s$, so even a 10 % error in it costs under a decibel. The fitted
+correction departs from the full Lloyd's-mirror expression by less than 2 dB in
+nearly every decidecade band, with one exception: about 4 dB in the band where
+$k d_s \approx 13$, which for the 4.2 m source depth of the example above is
+739 Hz — worth computing for your own draught before reporting. The third term,
+the adequacy of describing a directional multi-mechanism radiator as a single
+monopole, the standard declines to quantify at all and leaves to the user. One
+validity condition sits underneath all of it: ISO 17208-1 Clause 6.2 requires
+the signal-plus-noise to noise level difference to be at least 3 dB in a band
+for that band's level to count, between 3 dB and 10 dB with the background
+correction applied and declared, and above 10 dB uncorrected.
+
 What turns these closed forms into a *comparable* number is the measurement
 discipline ISO 17208-1 wraps around them. The ship transits a straight course
 past a vertical string of three hydrophones at a closest point of approach of
@@ -169,13 +214,37 @@ runs while the ship crosses a window of length $2\,d_{CPA}\tan 30°$ (about
 1.15 CPA distances), centred on the beam aspect the radiated noise level is
 defined for (Clause 3, Figure 3). Four
 runs are required, two per side; each run's three hydrophone levels are
-power-averaged (Formula 8), the runs are then arithmetically averaged
-(Formula 9), and port and starboard are also reported separately, because a
-real ship does not radiate symmetrically (Clause 6.5). Background noise is
-measured at the start and end of each test period and the ISO 3744-style
-correction applied per band; the recommended wind limit is 20 kn for ships
-above 100 m (Clause 5.3). Skip any of this and the number you quote is a
-level, but not an ISO 17208 radiated noise level.
+power-averaged (ISO 17208-1 Formula 8), the runs are then arithmetically
+averaged (ISO 17208-1 Formula 9), and port and starboard are also reported
+separately, because a real ship does not radiate symmetrically (Clause 6.5).
+Background noise is measured at the start and end of each test period and the
+ISO 3744-style correction applied per band; the recommended wind limit is 20 kn
+for ships above 100 m (Clause 5.3).
+
+The instrument half is equally prescribed, and it is what the closed forms above
+assume. Three hydrophones, omnidirectional over 10 Hz to 20 kHz (to 50 kHz if a
+ship's noise criteria ask for it), with sensitivity and directivity known to
+within ±2 dB; all three channels acquired simultaneously and sample-accurately,
+with the tracking and time-stamp data recorded synchronously so the track can be
+reconstructed; decidecade processing to IEC 61260 Class 1, with linear
+frequency-domain averaging over one data-window period (Clauses 4.2, 4.3).
+Portable hydrophones are laboratory-calibrated to IEC 60565 every 12 months,
+fixed ones before installation and confirmed every 12 months against a
+calibrated source or reference hydrophone, and both get an insert-voltage field
+calibration daily during measurements (Table 1). The geometry has acceptance
+limits, not just a nominal value: ranging accurate to 10 % of the CPA distance,
+the actual CPA within −10 % to +25 % of nominal, and the hydrophone cable drift
+angle under 5° or else reduced or accounted for in the slant range (Clause 4.4).
+So does the run: COMEX and FINEX at least two data-window lengths either side of
+the CPA, constant speed, fixed machinery and minimum helm from one to the other,
+a reverse-course turn between runs, and background measured with the ship
+stopped at least 2 km away for at least 30 s. If the wind changes by more than
+5 kn, or sea state, traffic or precipitation change, the survey is suspended and
+the background re-measured (Clause 5.6). Finally there is a disposal rule, which
+is the one most often skipped: bands that stay background-limited after
+correction are flagged as background-limited or not presented at all
+(Clause 5.2). Skip any of this and the number you quote is a level, but not an
+ISO 17208 radiated noise level.
 
 All of that discipline fits in one picture: the transit geometry in section
 and the data window in plan.
@@ -192,6 +261,23 @@ $$
 \mathrm{SEL_{cum}} = 10\log_{10}\sum_{n} 10^{\mathrm{SEL}_n/10},
 \qquad\text{and for } N \text{ identical strikes } = \mathrm{SEL_{ss}} + 10\log_{10} N.
 $$
+
+The energy sum on the left is the definition; the $+10\log_{10} N$ form on the
+right is the special case in which every strike is the same, and a real drive is
+not. A soft start deliberately runs at reduced hammer energy, and the radiated
+level then grows as the pile embeds and the driving energy rises, so per-strike
+exposures across a single pile can span several decibels — which is exactly why
+ISO 18406 Clause 6.2 requires the monitoring station to record the whole
+sequence, and Clause 8.2 the per-blow hammer energy history including the soft
+start. Take the loudest strike as representative and the campaign is
+overestimated; take an early one and it is underestimated, and the error is
+largest for the long drives where the cumulative criterion binds. So: use
+`cumulative_sel` with the measured per-strike series whenever the record exists,
+keep `cumulative_sel_identical` for planning estimates, and when it is used,
+state which strike the single-strike value came from. Both forms also assume the
+receiver stays where it is, an assumption the
+[marine-mammal exposure](/phonometry/underwater/marine-mammal-exposure/) guide
+returns to.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving.svg" alt="A percussive pile-driving strike pressure waveform with its peak marked, and below it the cumulative sound exposure level growing as SEL_ss plus ten times the logarithm of the number of strikes" width="82%" />
 
@@ -226,21 +312,98 @@ res.plot()   # waveform + cumulative energy (needs matplotlib)
 level, the SPL/Leq and the 90 %-energy pulse duration for one recorded strike;
 `cumulative_sel` sums a sequence of differing per-strike SELs.
 
+Those last two quantities are integrated over different windows, and the
+difference matters. The single-strike SEL runs over the **whole** pulse, from
+the $t_0$ where the cumulative-energy curve starts to rise to the $t_{100}$
+where it levels off (Clause 6.4.2.1.2), while the reported *pulse duration* is
+the **90 %**-energy signal duration (Clause 3.1 Note 2 and Clause 6.4.2.3.1) —
+the window holding the central 90 % of the strike energy, which is what makes
+one recording comparable with another when the two include different amounts of
+silence around the pulse. It is also a diagnostic: a duration much longer than
+the direct pulse means the record is dominated by multipath and reverberation
+rather than by the strike, which is common in harbours and at long range, and
+Clause 6.4.2.1.2 caps the integration at the hammer repetition period when
+successive pulses overlap.
+
 These are the metrics that regulation is written in. ISO 18406 exists because
 offshore wind-farm, oil-and-gas and bridge foundations are consented under
 environmental impact frameworks that require the radiated sound to be
 monitored, and its scope is drawn accordingly: percussive driving in 4 to
-100 m of water, with vibro- and sheet-piling excluded (Clause 1). The minimum
-campaign is one measurement position **as close as possible to 750 m** from
-the pile, recording the entire driving sequence and reporting the actual
-range; the standard is explicit that 750 m is chosen for comparability with
-the large body of existing measurements, not because any regulator's limit
-lives there, and that a single-range level has no predictive value for other
-sites (Clause 6.1.2, Notes 1–2). Impact criteria for marine fauna are phrased
-in exactly the quantities of this section, a cap on the single-strike or
-cumulative SEL and on the peak level at a stated range, which is why
-`pile_strike_metrics` reports them together and `cumulative_sel` follows the
-strike-by-strike energy sum of Formulae 8–9.
+100 m of water, with vibro- and sheet-piling excluded (Clause 1).
+
+### Measuring a piling campaign
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pile_driving.svg" alt="ISO 18406 pile-driving survey geometry: a monopile driven by an impact hammer through 30 metres of water with an optional bubble curtain, a bottom-mounted recorder as close as possible to 750 metres carrying two hydrophones at half and three-quarters of the water depth inside the allowed band running from 2 metres above the seabed to half depth, the survey vessel with its engines and echo-sounder off, and a plan view showing the 750 metre circle, the exclusion radius at three times the water depth and further positions on a transect" width="92%" />
+
+**Where the hydrophone goes.** The minimum campaign is one measurement position
+**as close as possible to 750 m** from the pile, recording the entire driving
+sequence and reporting the actual range; the standard is explicit that 750 m is
+chosen for comparability with the large body of existing measurements, not
+because any regulator's limit lives there, and that a single-range level has no
+predictive value for other sites (Clause 6.1.2.1, Notes 1–2). Offshore, the
+hydrophone sits in the lower half of the water column, between 2 m above the sea
+floor and half the total depth measured from the surface, because the field is
+strongly depth-dependent in the upper part of the column (Clause 5.2.1);
+inshore, in harbours and estuaries, it is fixed at half the water depth
+(Clause 5.2.2). Two hydrophones are better than one — redundancy, two
+sensitivities to cover the dynamic range, and spatial averaging — placed at two
+depths in the lower half, ideally near ½ and ¾ of the total depth with the
+separation maximised (Clause 5.2.3). Additional positions are no closer than
+**three times the local water depth at the pile**, which is also the inshore
+rule when 750 m is impossible, because closer than that the level depends
+strongly on the measurement depth (Clauses 6.1.2.2 and 6.1.3.2). The range
+itself has to be known to 5 % or better (Clause 6.3).
+
+**What the instrument has to do.** The system frequency range extends from no
+more than 20 Hz to no less than 20 kHz; the hydrophone is omnidirectional to
+within 2 dB over that range, and the response flat to within about 2 dB or else
+calibrated across it (Clauses 4.2.2, 4.2.3). Signal-to-noise is at least 10 dB
+and the system self-noise at least 10 dB below the lowest level to be measured,
+which is a real constraint for background work: an ordinary recorder's
+self-noise approaches sea-state-zero levels near 63 Hz and 125 Hz
+(Clauses 4.2.4, 4.2.5). The dynamic range is chosen so the highest expected
+pressure is recorded without saturation, with over 60 dB preferred
+(Clause 4.2.6) — the peak level is a regulated metric and clipping destroys it
+silently while still returning a plausible number.
+
+**Calibration.** The full chain is calibrated over that frequency range —
+hydrophone, amplifiers, filters and the ADC's full-scale setting and calibration
+factor — traceable to national or international standards, with the hydrophone
+calibration conforming to IEC 60565; laboratory calibration preferably not more
+than two years apart, and a pistonphone field check before and after every major
+deployment (Clauses 4.3.1, 4.3.2). Analyse uncompressed data (Clause 4.4).
+
+**What silently ruins a record.** Flow noise below about 100 Hz, worst in tidal
+streams; cable strum when a current pulls a cable taut; surface heave, where a
+10 cm change in the water column above a surface-suspended hydrophone is a 1 kPa
+hydrostatic swing — 180 dB re 1 µPa — that eats the ADC's range; the measuring
+vessel's own engine, generator, inverter and echo-sounder, which are switched
+off, with the engine condition stated in the results; chains, shackles and
+cables rubbing; and electrical interference (Clause 5.3). Background noise is
+measured with the piling stopped, over the same averaging time as the signal,
+and the signal-to-noise ratio determined from it (Clause 6.1.4).
+
+**What the report has to carry.** Date and time, hydrophone depth, GPS positions
+of pile and hydrophones, seabed type with the classification scheme named, water
+depth and the tidal variation during piling, the measuring vessel's operating
+condition and the significant sources of uncertainty (Clause 8.1.2); pile
+dimensions and material, water depth at the pile, hammer model, the per-blow
+energy history including the soft start, penetration depth and any mitigation
+such as a bubble curtain (Clause 8.2); and the deployment configuration with its
+calibration certificates (Clause 8.3.1). Results are reported per hydrophone and
+per position: broadband and per-band single-strike SEL, the peak sound pressure
+level, and the signal-to-noise ratio (Clause 8.4.1). Without that record a
+single-range SEL says nothing about any other site — which is the point of Notes
+1–2 above.
+
+Impact criteria for marine fauna are phrased in exactly the quantities of this
+section, a cap on the single-strike or cumulative SEL and on the peak level at a
+stated range, which is why `pile_strike_metrics` reports them together and
+`cumulative_sel` follows the strike-by-strike energy sum of ISO 18406
+Formulae 8-9. Turning those numbers into an assessment — weighting the spectrum
+for a hearing group, accumulating it over the strikes and comparing it against
+the published onset criteria — is
+[Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/).
 
 ## What this guide covers
 
@@ -249,25 +412,36 @@ strike-by-strike energy sum of Formulae 8–9.
 ISO 17208-1:2016 and ISO 17208-2:2019 for the ship radiated noise level and the
 equivalent monopole source level: `radiated_noise_level` and
 `monopole_source_level`, with the Lloyd's-mirror surface correction
-(Formula 3) and the 0.7·draught source depth (Formula 1), the
-three-hydrophone geometry (`hydrophone_depths`) and the tabulated
-source-level uncertainty (`source_level_uncertainty`). ISO 18406:2017 for the
-pile-driving metrics of section 3: the single-strike SEL (Formulae 3-4), the
-mean-square SPL (Formula 7) and the cumulative SEL (Formulae 8-9), which
-`single_strike_sel`, `cumulative_sel`, `cumulative_sel_identical` and
-`pile_strike_metrics` compute.
+(ISO 17208-2 Formula 3) and the 0.7·draught source depth (ISO 17208-2
+Formula 1), the three-hydrophone geometry (`hydrophone_depths`) and the
+tabulated source-level uncertainty (`source_level_uncertainty`). ISO 18406:2017
+for the pile-driving metrics of section 3: the single-strike SEL (ISO 18406
+Formulae 3-4), the mean-square SPL (ISO 18406 Formula 7) and the cumulative SEL
+(ISO 18406 Formulae 8-9), which `single_strike_sel`, `cumulative_sel`,
+`cumulative_sel_identical` and `pile_strike_metrics` compute.
 
 **Not covered.** ISO 17208-1's measurement discipline itself is not
 implemented: the four-run, three-hydrophone power and arithmetic averaging
-(Formulae 8-9), the CPA and water-depth geometry checks, the ±30° data-window
-scoring and the ISO 3744-style background-noise correction described in
-section 2 above are left to the reader; the library only supplies the
-closed-form `radiated_noise_level` and `monopole_source_level` formulae. ISO
-18406 itself excludes vibro- and sheet-piling from its scope (Clause 1), so
-continuous pile-driving noise has no closed form here or elsewhere in
-phonometry.
+(ISO 17208-1 Formulae 8-9), the CPA and water-depth geometry checks, the ±30°
+data-window scoring and the ISO 3744-style background-noise correction described
+in section 2 above are left to the reader; the library only supplies the
+closed-form `radiated_noise_level` and `monopole_source_level` formulae. The
+same holds for the ISO 18406 survey of section 3: the deployment, instrument,
+calibration and reporting requirements are described here and enforced nowhere
+in code, and nothing checks that a strike handed to `pile_strike_metrics` came
+from a record that meets them. ISO 18406 itself excludes vibro- and sheet-piling
+from its scope, and piling in less than 4 m or more than 100 m of water
+(Clause 1), so continuous pile-driving noise has no closed form here or
+elsewhere in phonometry.
 
 ## See also
 
+- [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/):
+  the assessment the criteria named in section 3 are applied through — auditory
+  weighting, accumulation over the strikes and the margin against the published
+  onset criteria.
+- [Underwater sound propagation](/phonometry/underwater/underwater-propagation/):
+  the transmission loss that carries these source levels to a receiver, and the
+  sonar equation they feed.
 - API reference: [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.sources.ship_radiated_noise`](/phonometry/reference/api/underwater/ship-radiated-noise/).
 - General underwater propagation modelling (ray, normal mode, parabolic equation) is covered in [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/).
