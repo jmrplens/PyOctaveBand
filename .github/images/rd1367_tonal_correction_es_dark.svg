@@ -20,10 +20,10 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M -0 453.778299 
+   <path d="M 0 453.778299 
 L 782.728437 453.778299 
 L 782.728437 0 
-L -0 0 
+L 0 0 
 z
 "/>
   </g>
@@ -426,7 +426,7 @@ L 741.801094 50.667374
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="213.664775" transform="rotate(-90 14.798438 213.664775)">Band level [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="213.664775" transform="rotate(-90 14.798438 213.664775)">Nivel de banda [dB]</text>
     </g>
    </g>
    <g id="patch_14">
