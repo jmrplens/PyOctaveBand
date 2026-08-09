@@ -65,7 +65,7 @@ _ES_EXACT = {
         "alpha_spec, plataforma giratoria (T3, T4)",
     "alpha_s, static turntable (T1, T2)":
         "alpha_s, plataforma estática (T1, T2)",
-    "Absorption coefficient": "Coeficiente de absorcion",
+    "Absorption coefficient": "Coeficiente de absorción",
     "s = (alpha_spec - alpha_s) / (1 - alpha_s)   Eq. (5)":
         "s = (alpha_spec - alpha_s) / (1 - alpha_s)   Ec. (5)",
     "From three impulse responses to one level (ISO 17497-2, Clause 7.4)":
@@ -1456,6 +1456,50 @@ _ES_EXACT = {
     "Time [ms]": "Tiempo [ms]",
     "Pressure [Pa]": "Presión [Pa]",
     "FDTD probe pressure": "Presión en las sondas FDTD",
+    # Simulation: the one-way plane-wave launcher and the meshed panel.
+    "One-way plane-wave launch: flat front, absorbed back side":
+        "Lanzamiento de onda plana unidireccional: frente plano, dorso absorbido",
+    "Settled field, 1 kHz CW": "Campo estacionario, onda continua de 1 kHz",
+    "Cut across the front (row 80)": "Corte transversal del frente (fila 80)",
+    "What is left behind the line": "Lo que queda detrás de la línea",
+    "envelope over one period": "envolvente sobre un periodo",
+    "one snapshot": "una instantánea",
+    "injection line": "línea de inyección",
+    "sponge": "esponja",
+    "Row envelope [dB re the forward field]":
+        "Envolvente por fila [dB re el campo hacia delante]",
+    "largest difference between neighbouring columns:\n"
+    "0.0e+00 Pa — the row is bit-identical":
+        "mayor diferencia entre columnas contiguas:\n"
+        "0,0e+00 Pa — la fila es idéntica bit a bit",
+    "-38.4 dB of the field energy sits\n"
+    "in the 20 sponge rows behind the line":
+        "-38,4 dB de la energía del campo está\n"
+        "en las 20 filas de esponja tras la línea",
+    "What the transfer matrix homogenises: five slit resonators, each one "
+    "reflection coefficient":
+        "Lo que homogeneiza la matriz de transferencia: cinco resonadores de "
+        "ranura, cada uno un coeficiente de reflexión",
+    "What the solver steps on: the same panel as a boolean obstacle mask at "
+    "dx = 0.5 mm":
+        "Lo que integra el solver: el mismo panel como máscara booleana de "
+        "obstáculos con dx = 0,5 mm",
+    "The fifth cell magnified: the 3.2 mm neck is six cells wide, and it is "
+    "what sets dx":
+        "La quinta celda ampliada: el cuello de 3,2 mm ocupa seis celdas, y es "
+        "lo que fija dx",
+    "3.2 mm neck = 6 cells": "cuello de 3,2 mm = 6 celdas",
+    "20.3 mm slit": "ranura de 20,3 mm",
+    "3 mm rigid backing": "fondo rígido de 3 mm",
+    "Water over steel at normal incidence: the probe history res.plot() draws":
+        "Agua sobre acero con incidencia normal: el historial de sonda que "
+        "dibuja res.plot()",
+    "probe pressure, 7.5 m below the source":
+        "presión en la sonda, 7,5 m bajo la fuente",
+    "incident\n1.02 ms": "incidente\n1,02 ms",
+    "echo off the steel\n3.04 ms": "eco en el acero\n3,04 ms",
+    "echo / incident = 0.938\n(Z₂−Z₁)/(Z₂+Z₁) = 0.938":
+        "eco / incidente = 0,938\n(Z₂−Z₁)/(Z₂+Z₁) = 0,938",
     "Number of strikes N": "Número de golpes N",
     "Cumulative SEL [dB re 1 µPa²·s]": "SEL acumulado [dB re 1 µPa²·s]",
     "ICAO Aircraft Flyover — Effective Perceived Noise Level (Annex 16)":
@@ -2260,6 +2304,209 @@ _ES_EXACT = {
     "Ground speed $V_g$": "Velocidad respecto al suelo $V_g$",
     "Path angle $\\gamma$": "Ángulo de trayectoria $\\gamma$",
     "Bank angle $\\Phi$": "Ángulo de alabeo $\\Phi$",
+    # Levels: the sound-level-meter walkthrough, energy averaging, percentiles,
+    # peak detection, exposure and the C - A spectrum (signals/levels).
+    "Level [dB re 20 uPa]": "Nivel [dB re 20 uPa]",
+    "Band level [dB re 20 uPa]": "Nivel de banda [dB re 20 uPa]",
+    "Band level [dB]": "Nivel de banda [dB]",
+    "What step 4 reports, drawn on the recording it read":
+        "Lo que informa el paso 4, dibujado sobre la grabación que leyó",
+    "LAF(t), Fast A-weighted level": "LAF(t), nivel ponderado A con Fast",
+    "the 1 s event": "el evento de 1 s",
+    "One-third-octave spectrum of the same ten seconds":
+        "Espectro en tercios de octava de los mismos diez segundos",
+    "the 1 kHz band holds the event": "la banda de 1 kHz contiene el evento",
+    "pink background: equal energy per band":
+        "fondo rosa: la misma energía en cada banda",
+    "first half": "primera mitad",
+    "second half": "segunda mitad",
+    "Two equal periods, 60 dB and 80 dB": "Dos periodos iguales, 60 dB y 80 dB",
+    "The error of averaging decibels, and it never changes sign":
+        "El error de promediar decibelios, y nunca cambia de signo",
+    "Standard deviation of the levels [dB]":
+        "Desviación típica de los niveles [dB]",
+    "Leq minus the arithmetic dB mean [dB]":
+        "Leq menos la media aritmética en dB [dB]",
+    "Gaussian spread: 0.115 sigma^2": "dispersión gaussiana: 0,115 sigma^2",
+    "two levels, one sigma either side": "dos niveles, a una sigma a cada lado",
+    "levels spread over 10 dB": "niveles con una dispersión de 10 dB",
+    "Two noises with the same LAeq": "Dos ruidos con el mismo LAeq",
+    "steady noise": "ruido estacionario",
+    "quiet background, three events": "fondo silencioso, tres eventos",
+    "Their exceedance curves": "Sus curvas de excedencia",
+    "Percentage of the time exceeded [%]":
+        "Porcentaje del tiempo superado [%]",
+    "The crest falls between two samples": "La cresta cae entre dos muestras",
+    "the continuous 8 kHz tone": "el tono continuo de 8 kHz",
+    "its samples at 48 kHz (6 per cycle)": "sus muestras a 48 kHz (6 por ciclo)",
+    "true peak": "pico verdadero",
+    "Worst case over the phase of the tone": "Peor caso sobre la fase del tono",
+    "Samples per cycle": "Muestras por ciclo",
+    "Under-read of the peak [dB]": "Subestimación del pico [dB]",
+    "Equal-energy exchange: every point on a line is the same daily exposure":
+        "Canje de igual energía: todos los puntos de una línea son la misma "
+        "exposición diaria",
+    "Exposure duration [h]": "Duración de la exposición [h]",
+    "+3 dB for every halving of the duration":
+        "+3 dB por cada reducción a la mitad de la duración",
+    "90 dB(A) for 8 h = 3.20 Pa2h": "90 dB(A) durante 8 h = 3,20 Pa2h",
+    "Every detector under-reads every short event":
+        "Todo detector subestima todo evento corto",
+    "Toneburst duration [ms]": "Duración de la ráfaga tonal [ms]",
+    "Peak level re the steady reading [dB]":
+        "Nivel de pico respecto a la lectura estacionaria [dB]",
+    "IEC 61672-1 Table 4, Equation (7)": "IEC 61672-1 Tabla 4, Ecuación (7)",
+    # The detector names are the `mode=` literals of time_weighting, so only
+    # the parenthesis is translated.
+    "fast (measured)": "fast (medida)",
+    "slow (measured)": "slow (medida)",
+    "impulse (measured)": "impulse (medida)",
+    "A 50 Hz rumble under a light hiss":
+        "Un retumbo de 50 Hz bajo un siseo ligero",
+    "Broadband pink noise": "Ruido rosa de banda ancha",
+    "Z-weighted bands": "Bandas ponderadas Z",
+    "C-weighted bands": "Bandas ponderadas C",
+    "A-weighted bands": "Bandas ponderadas A",
+    # Filters: class masks, stop-band leakage, pole placement, architectures
+    # and the parametric EQ (signals/filters).
+    "The same 1 kHz octave band, order 6, on the IEC 61260-1 acceptance mask":
+        "La misma banda de octava de 1 kHz, orden 6, sobre la máscara de "
+        "aceptación de IEC 61260-1",
+    "Butterworth: passes   (overall_class = 1)":
+        "Butterworth: cumple   (overall_class = 1)",
+    # The four verdicts read as verb phrases in Spanish: it keeps them
+    # parallel, and the noun forms overrun the panel the layout sized in
+    # English (the figure is laid out before this table is applied).
+    "Chebyshev I: passband ripple   (overall_class = None)":
+        "Chebyshev I: riza la banda de paso   (overall_class = None)",
+    "Elliptic: ripple in both bands   (overall_class = None)":
+        "Elíptico: riza las dos bandas   (overall_class = None)",
+    "Bessel: roll-off too slow   (overall_class = None)":
+        "Bessel: cae demasiado despacio   (overall_class = None)",
+    # The corridor panels and the EQ cascade are drawn by the library
+    # renderer, so they are worded exactly as src/phonometry/_plot/filters.py
+    # translates them.
+    "Class 1 pass corridor": "Corredor de aceptación clase 1",
+    "Class 2 pass corridor": "Corredor de aceptación clase 2",
+    "Out of tolerance": "Fuera de tolerancia",
+    "Relative attenuation [dB]": "Atenuación relativa [dB]",
+    "Normalised frequency $f\\,/\\,f_m$": "Frecuencia normalizada $f\\,/\\,f_m$",
+    "Measured $\\Delta A$": "$\\Delta A$ medida",
+    "Parametric EQ response (Audio EQ Cookbook)":
+        "Respuesta del EQ paramétrico (Audio EQ Cookbook)",
+    "Cascade": "Cascada",
+    "lowshelf 100 Hz": "shelf de graves 100 Hz",
+    "peaking 1000 Hz": "campana 1000 Hz",
+    "highshelf 8000 Hz": "shelf de agudos 8000 Hz",
+    "A 1 kHz tone at 100 dB over a pink-noise floor":
+        "Un tono de 1 kHz a 100 dB sobre un fondo de ruido rosa",
+    "the noise actually present": "el ruido realmente presente",
+    "bands on the skirt are measuring\nthe filter, not the sound":
+        "las bandas de la falda miden\nel filtro, no el sonido",
+    "here the skirt has fallen below the noise:\n"
+    "these bands are measuring the sound":
+        "aquí la falda ya ha caído por debajo del ruido:\n"
+        "estas bandas sí miden el sonido",
+    "poles": "polos",
+    "zeros (at z = 0)": "ceros (en z = 0)",
+    "zoom at z = 1": "zoom en z = 1",
+    "Every band of the 1/3-octave bank": "Todo el banco de 1/3 de octava",
+    "1 - (largest pole radius)": "1 - (mayor radio de polo)",
+    "resample=False (one rate)": "resample=False (una sola frecuencia)",
+    "the default multirate bank": "el banco multitasa por defecto",
+    "Relative attenuation out of band": "Atenuación relativa fuera de banda",
+    "Group delay at the band mid frequency":
+        "Retardo de grupo en la frecuencia central de banda",
+    "The 1 kHz octave band at 48 kHz, order 6":
+        "La banda de octava de 1 kHz a 48 kHz, orden 6",
+    "at 2 f_m": "en 2 f_m",
+    "at 4 f_m": "en 4 f_m",
+    # Block processing and multichannel surveys (signals/filters).
+    "Eight 100 ms blocks of a level-stepping signal":
+        "Ocho bloques de 100 ms de una señal con escalones de nivel",
+    "one continuous pass": "una sola pasada continua",
+    "The settling ramp, magnified": "La rampa de asentamiento, ampliada",
+    "5 tau on Fast: 0.63 s": "5 tau en Fast: 0,63 s",
+    "A five-position room survey in one octave_filter call":
+        "Cinco posiciones de una sala en una sola llamada a octave_filter",
+    "the five positions": "las cinco posiciones",
+    "energy average (correct)": "promedio energético (correcto)",
+    "arithmetic mean of the dB values": "media aritmética de los valores en dB",
+    "Energy minus\ndB average [dB]":
+        "Promedio energético menos\npromedio en dB [dB]",
+    # Metrology: the calibrator take, the two level frames, data qualification
+    # and the two uncertainty methods (signals/metrology).
+    "Coupler signal-to-noise ratio [dB]":
+        "Relación señal-ruido en el acoplador [dB]",
+    "Sensitivity error $20\\log_{10}(S/S_\\mathrm{true})$ [dB]":
+        "Error de sensibilidad $20\\log_{10}(S/S_\\mathrm{true})$ [dB]",
+    "Broadband noise in the calibrator take biases every later level":
+        "El ruido de banda ancha en la toma del calibrador sesga todos los "
+        "niveles posteriores",
+    "IEC 60942 Table 2 class 1 acceptance limit (±0.25 dB)":
+        "Límite de aceptación de clase 1 de IEC 60942 Tabla 2 (±0,25 dB)",
+    "narrowband=False (full-band RMS)":
+        "narrowband=False (RMS de banda completa)",
+    "closed form $-10\\log_{10}(1 + 1/\\mathrm{SNR})$":
+        "forma cerrada $-10\\log_{10}(1 + 1/\\mathrm{SNR})$",
+    "Third-octave band level [dB]": "Nivel de banda de tercio de octava [dB]",
+    "dB SPL (factor from the calibrator)": "dB SPL (factor del calibrador)",
+    "Time [ms] (onset of a 40-cycle burst)":
+        "Tiempo [ms] (inicio de una ráfaga de 40 ciclos)",
+    "Band signal [digital units]": "Señal de banda [unidades digitales]",
+    "mode='peak' reads the filter's onset transient":
+        "mode='peak' lee el transitorio de ataque del filtro",
+    "1 kHz band signal": "señal de la banda de 1 kHz",
+    "instantaneous frequency": "frecuencia instantánea",
+    "Measured rates against each record's own Rice curve":
+        "Tasas medidas frente a la curva de Rice de cada registro",
+    "Gaussian reference": "Referencia gaussiana",
+    "hard-clipped at 2.5 σ": "recortado duro a 2,5 σ",
+    "Gaussian + sparse 6 σ spikes": "gaussiano + picos dispersos de 6 σ",
+    "spikes lift both tails above the curve":
+        "los picos elevan las dos colas por encima de la curva",
+    "clipping: no crossings past 2.5 σ":
+        "recorte: sin cruces más allá de 2,5 σ",
+    "Crossing level a / σ": "Nivel de cruce a / σ",
+    "Analysis upper cut-off [kHz]":
+        "Frecuencia de corte superior de análisis [kHz]",
+    "Irregularity factor $r$": "Factor de irregularidad $r$",
+    "A floor 50 dB down, and $m_4$ weighting by $f^4$":
+        "Un suelo 50 dB por debajo, y $m_4$ ponderando por $f^4$",
+    "ideal low-pass, $\\sqrt{5}/3$ = 0.745":
+        "paso bajo ideal, $\\sqrt{5}/3$ = 0,745",
+    "the physical band ends at 2 kHz": "la banda física acaba en 2 kHz",
+    "Correlation coefficient ρ between the two terms":
+        "Coeficiente de correlación ρ entre los dos términos",
+    "Combined standard uncertainty [dB]":
+        "Incertidumbre típica combinada [dB]",
+    "Two terms of 0.3 dB each": "Dos términos de 0,3 dB cada uno",
+    "sensitivities of the same sign": "sensibilidades del mismo signo",
+    "sensitivities of opposite sign": "sensibilidades de signo opuesto",
+    "The same budget, read two ways": "El mismo balance, leído de dos maneras",
+    "assumed\nindependent": "supuestos\nindependientes",
+    "traceable to the\nsame calibrator": "trazables al\nmismo calibrador",
+    "A dominant rectangular input": "Una entrada rectangular dominante",
+    "A non-linear model (energy sum)": "Un modelo no lineal (suma energética)",
+    "An output against a physical bound": "Una salida contra un límite físico",
+    "Correction [dB]": "Corrección [dB]",
+    "Combined level [dB]": "Nivel combinado [dB]",
+    "Monte Carlo (Supplement 1)": "Monte Carlo (Suplemento 1)",
+    "all the mass beyond the bound\npiles up on it":
+        "toda la masa más allá del límite\nse acumula en él",
+    # Spectral estimation: the Welch segment trade-off and the noise colours
+    # (signals/spectra/spectral-analysis).
+    "Segment length [samples]": "Longitud de segmento [muestras]",
+    "Bias falls, variance rises": "El sesgo baja, la varianza sube",
+    "resolution bias, $-10\\lg(1+\\varepsilon_b)$ [dB]":
+        "sesgo de resolución, $-10\\lg(1+\\varepsilon_b)$ [dB]",
+    "random error, $10\\lg(1+1/\\sqrt{n_d})$ [dB]":
+        "error aleatorio, $10\\lg(1+1/\\sqrt{n_d})$ [dB]",
+    "measured peak deficit [dB]": "déficit medido del pico [dB]",
+    "PSD re its own 1 kHz level [dB]":
+        "PSD respecto a su propio nivel en 1 kHz [dB]",
+    "The five colours of noise_signal, over three decades":
+        "Los cinco colores de noise_signal, en tres décadas",
 }
 
 _ES_PATTERNS = [
@@ -2703,6 +2950,84 @@ _ES_PATTERNS = [
       r"frame density (.+) kg/m³$"),
      ("Capa fibrosa blanda: porosidad \\1, resistividad al flujo \\2 kPa s/m², "
       "densidad del esqueleto \\3 kg/m³")),
+    # Levels: labels and annotations carrying computed values.
+    (r"^arithmetic mean of the dB values = (.+) dB$",
+     r"media aritmética de los valores en dB = \1 dB"),
+    (r"^Leq \(energy mean\) = (.+) dB$", r"Leq (media energética) = \1 dB"),
+    (r"^LAeq = (.+) dB \(both\)$", r"LAeq = \1 dB (ambos)"),
+    (r"^steady noise:  L10 - L90 = (.+) dB   \|   LAeq - L50 = (.+) dB$",
+     r"ruido estacionario:  L10 - L90 = \1 dB   |   LAeq - L50 = \2 dB"),
+    ((r"^quiet background, three events:  L10 - L90 = (.+) dB   \|   "
+      r"LAeq - L50 = (.+) dB$"),
+     ("fondo silencioso, tres eventos:  L10 - L90 = \\1 dB   |   "
+      "LAeq - L50 = \\2 dB")),
+    (r"^LAE = (.+) dB: the whole event energy in 1 s$",
+     r"LAE = \1 dB: toda la energía del evento en 1 s"),
+    (r"^Z \(unweighted\): bands sum to (.+) dB$",
+     r"Z (sin ponderar): las bandas suman \1 dB"),
+    (r"^A-weighted: bands sum to (.+) dB$",
+     r"Ponderación A: las bandas suman \1 dB"),
+    (r"^largest sample: (.+) dB low$", r"muestra mayor: \1 dB por debajo"),
+    (r"^at 100 ms, F reads (.+) dB above S$",
+     r"a 100 ms, F lee \1 dB por encima de S"),
+    (r"^even Impulse, with its 35 ms attack,\nloses (.+) dB on a 1 ms burst$",
+     r"incluso Impulse, con su ataque de 35 ms,\npierde \1 dB en una ráfaga de 1 ms"),
+    # Filters: bank order, pole radius and streaming seams (computed values).
+    (r"^measured band levels, order (\d+)$",
+     r"niveles de banda medidos, orden \1"),
+    (r"^Designed at (.+) kHz\n1 - r = (.+)$", r"Diseñada a \1 kHz\n1 - r = \2"),
+    (r"^As the bank realizes it, at (.+) Hz\n1 - r = (.+)$",
+     r"Tal como la realiza el banco, a \1 Hz\n1 - r = \2"),
+    ((r"^The (.+) Hz one-third-octave band, before and after decimation "
+      r"by (\d+)$"),
+     r"La banda de tercio de octava de \1 Hz, antes y después de diezmar por \2"),
+    (r"^stateful=True \(max error (.+) dB\)$",
+     r"stateful=True (error máximo \1 dB)"),
+    (r"^stateful=False \(up to (.+) dB at a seam\)$",
+     r"stateful=False (hasta \1 dB en una unión)"),
+    (r"^worst under-read (.+) dB at (.+) Hz$",
+     r"subestimación máxima de \1 dB a \2 Hz"),
+    # Metrology: calibration, the two level frames, data qualification and the
+    # GUM/Monte Carlo comparison (computed values).
+    ((r"^below (.+) dB SNR the estimator\nalone spends the whole class 1 "
+      r"limit$"),
+     ("por debajo de \\1 dB de SNR el estimador\nse gasta él solo todo el "
+      "límite de clase 1")),
+    (r"^Same shape, different origin: (.+) dB apart$",
+     r"La misma forma, distinto origen: \1 dB de diferencia"),
+    (r"^drive amplitude (.+)$", r"amplitud de excitación \1"),
+    (r"^band peak, \+(.+) dB over the steady tone$",
+     r"pico de banda, +\1 dB sobre el tono estacionario"),
+    (r"^\(a\) The record: a (.+) Hz to (.+) Hz glide at constant amplitude$",
+     r"(a) El registro: un barrido de \1 Hz a \2 Hz con amplitud constante"),
+    (r"^the (.+)-(.+) Hz band of panel \(c\)$",
+     r"la banda de \1-\2 Hz del panel (c)"),
+    (r"^segment values span (.+) to (.+)$",
+     r"los valores de segmento van de \1 a \2"),
+    ((r"^\(b\) Full band: A = (.+), inside \((.+), (.+)\] — accepted, "
+      r"and blind$"),
+     r"(b) Banda completa: A = \1, dentro de (\2, \3] — aceptado, y ciego"),
+    ((r"^\(c\) Band-limited (.+)-(.+) Hz: A = (.+), outside \((.+), (.+)\] "
+      r"— rejected$"),
+     ("(c) Limitado a la banda de \\1-\\2 Hz: A = \\3, fuera de (\\4, \\5] "
+      "— rechazado")),
+    (r"^quadrature value (.+) dB \(assumes ρ = 0\)$",
+     r"valor en cuadratura \1 dB (supone ρ = 0)"),
+    (r"^\+(.+) % understated$", r"+\1 % subestimado"),
+    (r"^MC 95 % interval \[(.+), (.+)\]$", r"Intervalo MC 95 % [\1, \2]"),
+    # Spectral estimation: the Welch segment trade-off and the noise-colour
+    # legend. The mathtext ($B_e$) makes the later decimal-comma pass skip the
+    # segment legend, so its decimal is converted here.
+    (r"^A (.+) Hz-wide resonance at (.+) Hz$",
+     r"Una resonancia de \1 Hz de ancho a \2 Hz"),
+    (r"^nperseg = (\d+), \$B_e\$ = (\d+)\.(\d+) Hz$",
+     r"nperseg = \1, $B_e$ = \2,\3 Hz"),
+    (r"^the two errors are equal\nnear nperseg = (.+)$",
+     r"los dos errores se igualan\ncerca de nperseg = \1"),
+    # The colour names are the `color=` literals of noise_signal, so only the
+    # measured/exact slope wording is translated.
+    (r"^(violet|blue|white|pink|red): measured (.+), exact (.+) dB/octave$",
+     r"\1: medida \2, exacta \3 dB/octava"),
 ]
 
 
@@ -2724,6 +3049,7 @@ def _translate_figure(fig: Any) -> None:
         return
     import re as _re2
 
+    from matplotlib.category import StrCategoryFormatter as _SCF
     from matplotlib.ticker import FixedFormatter as _FxF
     from matplotlib.ticker import FuncFormatter as _FF
     from matplotlib.ticker import ScalarFormatter as _SF
@@ -2753,6 +3079,16 @@ def _translate_figure(fig: Any) -> None:
             elif isinstance(fmt, _FF) and not getattr(fmt, "_phonometry_comma", False):
                 # Categorical labels (set_xticklabels installs a FuncFormatter)
                 # need the word lookups too; numeric labels are untouched.
+                wrapped = _FF(
+                    lambda v, pos, _f=fmt: _comma(_tr_words(str(_f(v, pos))))
+                )
+                wrapped._phonometry_comma = True  # type: ignore[attr-defined]
+                axis.set_major_formatter(wrapped)
+            elif isinstance(fmt, _SCF):
+                # A string-category axis (``ax.bar(["first half", ...], ...)``)
+                # rebuilds its labels from the unit registry at every draw, so
+                # rewriting the tick Text artists below would be undone by the
+                # savefig draw; wrap the formatter instead, as above.
                 wrapped = _FF(
                     lambda v, pos, _f=fmt: _comma(_tr_words(str(_f(v, pos))))
                 )

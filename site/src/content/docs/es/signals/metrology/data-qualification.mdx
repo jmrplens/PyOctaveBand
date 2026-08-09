@@ -52,6 +52,52 @@ región de la Tabla A.6 diga si se puede promediar.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_es.svg" alt="Diagrama de flujo de decisión de la cualificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
 
+## 0. Antes de los tests: validar el registro
+
+La Sección 10.3 de Bendat y Piersol cubre tres actividades y este módulo
+implementa una de ellas. La *cualificación*, los tests de más abajo, pregunta si
+un registro es estacionario. La *validación* pregunta si es siquiera un registro
+de aquello, y va primero, porque cada defecto de la lista siguiente o suspende el
+test de estacionariedad por el motivo equivocado o, peor, lo aprueba. La
+validación sigue siendo manual, tal como la describe el libro, pero son seis
+líneas de numpy y una decisión por cada una:
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(0)
+x = 0.15 * rng.standard_normal(1 << 16)   # tu registro, en unidades digitales
+
+full_scale = 1.0                          # 1.0 en audio float, 32768 en int16
+clipped = int(np.count_nonzero(np.abs(x) >= 0.999 * full_scale))
+dead = int(np.max(np.diff(np.flatnonzero(np.diff(x) != 0.0), prepend=0)))
+offset = float(np.mean(x) / np.std(x))
+spikes = int(np.count_nonzero(np.abs(x - np.mean(x)) > 5 * np.std(x)))
+kurtosis = float(np.mean((x - np.mean(x)) ** 4) / np.std(x) ** 4)
+print(clipped, dead, round(offset, 4), spikes, round(kurtosis, 2))
+```
+
+| Defecto | La comprobación | La decisión |
+| :--- | :--- | :--- |
+| Recorte | muestras iguales o superiores a 0,999 del fondo de escala | más de un puñado y el registro se edita o se rechaza: el recorte desinfla los cruces de nivel alto del §4 e infla todas las medias cuadráticas |
+| Caídas, canal muerto | la racha más larga de muestras consecutivas idénticas | cualquier racha de más de unos pocos milisegundos es un fallo de transmisión, no una señal |
+| Desplazamiento de continua, deriva infrasónica | la media del registro frente a su desviación típica, y la parte de la PSD por debajo de 20 Hz frente a la banda de interés | elimina la media y filtra en paso alto antes del §4, cuyas fórmulas suponen un proceso de media nula |
+| Picos, contaminación transitoria | muestras más allá de 5σ, o una curtosis muy por encima de 3 en un registro supuestamente gaussiano | edítalos y dilo, o cualifica el registro por trozos |
+| Zumbido de red | picos a 50 o 60 Hz y sus armónicos en una [PSD de Welch](/phonometry/es/signals/spectra/spectral-analysis/) | un fallo de la cadena, no de la fuente; arregla las masas, no los datos |
+
+El registro sintético de arriba imprime `0 1 0.0024 0 3.02`, que es el aspecto de
+lo limpio: ninguna muestra recortada, ninguna muestra repetida, un desplazamiento
+de 0,002σ, ni una sola excursión más allá de 5σ en 65 536 muestras gaussianas y
+una curtosis de 3,0, como debe tener un registro gaussiano.
+
+Junto a los números, los metadatos de adquisición tienen que viajar con el
+fichero o nada de esto se puede reconstruir después: frecuencia de muestreo,
+profundidad de bits, ajuste de ganancia, el
+[factor de calibración](/phonometry/es/signals/metrology/calibration/) y la toma de
+la que salió, micrófono y pantalla antiviento, y, en exteriores, velocidad del
+viento y temperatura. La regla es sencillamente que la validación precede a la
+cualificación: primero editar o rechazar, después probar la estacionariedad.
+
 ## 1. El test de inversiones de orden
 
 Dada una secuencia de $N$ observaciones $x_1, \dots, x_N$ - estimaciones de
@@ -71,7 +117,7 @@ baja), así que la hipótesis de *ausencia de tendencia* se acepta al nivel de
 significación $\alpha$ cuando $A$ cae dentro de una región bilateral - la
 Tabla A.6 de B&P, cuyas filas de $\alpha = 0{,}05$ reproduce exactamente
 `trend_test` y fija la batería de conformidad. El Ejemplo 4.4 del libro
-(veinte observaciones, $A = 86$, aceptado entre 64 y 125) corre tal cual:
+(veinte observaciones, $A = 86$, aceptado en $(64, 125]$) corre tal cual:
 
 ```python
 from phonometry import trend_test
@@ -80,7 +126,7 @@ values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
           5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
 
 res = trend_test(values)                  # B&P Ejemplo 4.4
-print(res.statistic, res.bounds)          # 86, (64, 125)
+print(res.statistic, res.bounds)          # 86, (64, 125] — semiabierto
 print(res.trend_free, round(res.p_value, 3))   # True, 0.586
 res.plot(language="es")
 ```
@@ -116,6 +162,11 @@ plt.show()
 
 </details>
 
+`bounds` es **semiabierto**: la hipótesis de ausencia de tendencia se acepta
+cuando `lower < A <= upper`, así que $A = 125$ pasa y $A = 64$ no. El test de
+rachas del §3 usa el mismo convenio, y el veredicto de estacionariedad del §2
+también.
+
 El valor p sale de la distribución nula exacta de $A$ (los conteos de
 inversiones de una permutación aleatoria), calculada hasta $N = 100$ - el
 alcance de la Tabla A.6 - y de la aproximación normal del libro más allá;
@@ -123,6 +174,22 @@ el veredicto sigue la región tabulada del libro. `.plot()` dibuja la
 secuencia analizada frente a su índice de muestra con el conteo, la región
 de aceptación y el veredicto en la leyenda (con `method="runs"` marca
 además la mediana de la secuencia que clasifica cada valor).
+
+**Cómo leer el veredicto.** Es un contraste de hipótesis, no una medida.
+`trend_free = True` significa que los datos *no dan indicio* de tendencia al
+nivel elegido, que es mucho más débil que decir «el registro es estacionario»;
+$p = 0{,}586$ dice que el conteo observado es de lo más corriente en una
+secuencia sin tendencia, y una $p$ apenas por encima de 0,05 no dice casi nada en
+ninguna dirección. La consecuencia que muerde en la práctica es la
+multiplicidad: con $\alpha = 0{,}05$, uno de cada veinte registros estacionarios
+se rechaza por construcción, así que cribar las 31 bandas de tercio de octava de
+un registro perfectamente estacionario produce uno o dos rechazos como resultado
+*esperado*. Una sola banda que falla no es, por tanto, indicio de nada; una racha
+de bandas contiguas que fallan, o un fallo del registro de banda ancha, sí lo es.
+El mando es `alpha=`: apriétalo cuando se criben muchas bandas, aflójalo cuando
+haya que cualificar un registro de forma conservadora, y las cotas de aceptación
+se mueven con él, porque salen de la distribución nula exacta y no de una
+consulta a una tabla.
 
 ## 2. Estacionariedad de un registro
 
@@ -188,11 +255,51 @@ plt.show()
 El resultado registra la secuencia por segmento (`segment_values`,
 `segment_times`), el conteo, los `bounds` de la Tabla A.6, el `p_value`
 exacto y el veredicto `stationary`; `.plot()` dibuja la secuencia con el
-veredicto en la leyenda. El valor por defecto de 20 segmentos coincide con
-los ejemplos resueltos del libro - más segmentos resuelven derivas más
-rápidas, pero cada intervalo debe seguir siendo largo frente a las
-frecuencias más bajas del registro para que los valores sean
-independientes.
+veredicto en la leyenda. Conviene fijarse en que el mismo conteo de inversiones
+responde a dos nombres de atributo distintos en las dos clases de resultado,
+porque solo una de ellas tiene una secuencia por segmento que llevar:
+
+| | `trend_test` → `TrendTestResult` | `stationarity_test` → `StationarityTestResult` |
+| :--- | :--- | :--- |
+| el conteo $A$ | `statistic` | `count` |
+| el veredicto | `trend_free` | `stationary` |
+| región de aceptación | `bounds` (semiabierta) | `bounds` (semiabierta) |
+| valor p exacto | `p_value` | `p_value` |
+| la secuencia | `values` | `segment_values`, `segment_times`, `n_segments` |
+
+El valor por defecto de 20 segmentos coincide con los ejemplos resueltos del
+libro - más segmentos resuelven derivas más rápidas, pero cada intervalo debe
+seguir siendo largo frente a las frecuencias más bajas del registro para que los
+valores sean independientes.
+
+**¿Qué deriva tan pequeña llega a ver?** Cada media cuadrática de segmento es
+ella misma una variable aleatoria: para una banda de anchura $B$ observada
+durante $T_\text{seg}$ segundos, su error aleatorio normalizado es
+$1/\sqrt{B\,T_\text{seg}}$. Toma los 20 segmentos por defecto sobre un registro
+de 10 s de la banda de tercio de octava de 1 kHz ($B = 231$ Hz,
+$T_\text{seg} = 0{,}5$ s): $BT = 116$, así que cada valor de segmento se dispersa
+alrededor de un 9 %, que son 0,4 dB. Una deriva mucho menor que eso no se puede
+separar de la dispersión, mientras que una deriva monótona de un par de
+desviaciones típicas de segmento a lo largo del registro se rechaza casi siempre.
+
+De ahí salen dos consecuencias de diseño, y apuntan en sentido contrario a la
+maniobra evidente. Para ver una deriva *más pequeña*, alarga el **registro**, no
+el número de segmentos: la dispersión cae como $1/\sqrt{T_\text{seg}}$ mientras
+la tendencia se queda donde está, así que trocear el mismo registro en más
+segmentos hace más ruidoso cada uno. Y mantén $T_\text{seg}$ muy por encima de
+$1/B$ (al menos $BT = 5$ por intervalo, y no menos de diez ciclos de la
+frecuencia más baja de interés), o los valores de segmento dejan de ser
+independientes y la región de aceptación tabulada ya no vale. Un test de 20
+segmentos sobre un registro limitado en banda a 20 Hz y por encima necesita, por
+tanto, intervalos de al menos 0,5 s, y con ello un registro de al menos 10 s.
+
+Hay una forma de no estacionariedad que se escapa de este test por construcción:
+una fuente que alterna entre dos regímenes estables, una máquina que carga y
+descarga, tráfico en pelotones, produce una secuencia de segmentos no monótona
+que el test de inversiones puede aceptar tan tranquilo mientras el registro es a
+todas luces no estacionario. Para eso está `method="runs"` en el §3, y la
+respuesta honesta suele ser trocear el registro por régimen (`segment_times`
+enseña dónde) y cualificar cada parte por separado.
 
 Merece la pena repetir dos salvedades del libro. Un registro puede ser no
 estacionario con media cuadrática estacionaria (un barrido de frecuencia,
@@ -200,6 +307,54 @@ por ejemplo), así que pasa `statistic="mean"` o prueba versiones
 filtradas por bandas cuando importe; y el test necesita que la *tendencia*
 sea lenta frente a la longitud del segmento, o se disuelve en la
 fluctuación aleatoria de los valores de segmento.
+
+La primera salvedad es la que le cuesta un resultado equivocado a quien lee,
+porque hace que el test *acepte* un registro que debería rechazar. Merece la pena
+verla:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_glide_blind_spot_es.svg" alt="Tres paneles apilados. Arriba: la frecuencia instantánea de un barrido de amplitud constante que sube linealmente de 200 Hz a 2 kHz en ocho segundos, con la banda de 200 a 400 Hz sombreada. En medio: las veinte medias cuadráticas de segmento del registro de banda completa, planas en 0,5 con un recuento de inversiones de 96 dentro de la región de aceptación, aceptado. Abajo: el mismo registro limitado a la banda de 200 a 400 Hz, cuyas medias cuadráticas de segmento se desploman a cero a partir del tercer segmento, dando un recuento de 173 por encima de la cota superior, rechazado" width="88%" />
+
+*Un barrido de amplitud constante de 200 Hz a 2 kHz es todo lo no estacionario
+que puede ser un registro, y la media cuadrática de banda completa no lo ve: los
+veinte valores de segmento van de 0,4998 a 0,5002 y el conteo $A = 96$ se queda
+cómodamente dentro de $(64, 125]$. Limita antes el mismo registro a 200-400 Hz y
+los valores de segmento se desploman en cuanto el barrido abandona la banda,
+dando $A = 173$, por encima de la cota superior, y rechazado. El remedio de la
+salvedad de arriba no es una formalidad: lo que el test ve depende por completo
+del estadístico y de la banda que se le entreguen.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+
+# stationarity_test es el que se importó en el §2 de arriba.
+fs = 8192.0
+t = np.arange(1 << 16) / fs
+glide = np.sin(2 * np.pi * (200 * t + (2000 - 200) / (2 * t[-1]) * t ** 2))
+sos = signal.butter(6, [200 / (fs / 2), 400 / (fs / 2)], btype="band",
+                    output="sos")
+
+full = stationarity_test(glide, fs)
+banded = stationarity_test(signal.sosfiltfilt(sos, glide), fs)
+print(full.count, full.stationary)       # 96 True   -- ciego
+print(banded.count, banded.stationary)   # 173 False -- lo pilla
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7))
+for ax, res, label in ((ax1, full, "banda completa"),
+                       (ax2, banded, "200-400 Hz")):
+    ax.plot(np.arange(1, res.n_segments + 1), res.segment_values, "o-")
+    ax.set_ylim(-0.03, 0.58)
+    ax.set_title(f"{label}: A = {res.count}, aceptación {res.bounds}")
+    ax.set_xlabel("Índice de segmento")
+    ax.set_ylabel("Media cuadrática por segmento")
+plt.show()
+```
+
+</details>
 
 ## 3. El test de rachas
 
@@ -256,9 +411,9 @@ for ax, seq in zip(axes, sequences):
     median = np.median(seq)
     above = seq > median
     ax.plot(idx, seq, "0.7", lw=0.7)
-    ax.scatter(idx[above], seq[above], label="sobre la mediana")
+    ax.scatter(idx[above], seq[above], label="Por encima de la mediana")
     ax.scatter(idx[~above], seq[~above], color="r",
-               label="bajo la mediana")
+               label="Por debajo de la mediana")
     ax.axhline(median, color="k", linestyle="--")
     lo, hi = res.bounds
     verdict = "sin tendencia" if res.trend_free else "rechazada"
@@ -350,6 +505,38 @@ aparece como cruces de nivel alto que faltan, la contaminación impulsiva
 como un exceso. Las tasas basadas en conteo necesitan el registro
 holgadamente sobremuestreado: un cruce entre dos muestras del mismo signo
 queda sin contar.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_nongaussian_screen_es.svg" alt="Izquierda: tasas de cruce por nivel de tres registros de la misma varianza y el mismo ancho de banda frente al nivel de cruce en unidades de sigma, cada uno con su propia curva de Rice. La referencia gaussiana cae sobre su curva, el registro recortado duro en 2,5 sigma no tiene ningún cruce más allá del nivel de recorte, y el registro con picos dispersos de seis sigma queda por encima de su curva en las dos colas. Derecha: el factor de irregularidad de un registro paso bajo de dos kilohercios con un suelo de ruido 50 decibelios por debajo, representado frente a la frecuencia de corte superior de análisis, plano en el valor de forma cerrada 0,745 cerca de la banda física y cayendo a 0,47 en 22 kilohercios" width="92%" />
+
+*Izquierda: el aspecto real del cribado. Tres registros con la misma varianza y
+la misma banda de 800-1200 Hz, cada uno dibujado con su propia curva de Rice para
+que la desviación sea un desajuste del modelo y no un artefacto de escala. La
+referencia gaussiana cae sobre la curva en todos los niveles. El recorte duro a
+2,5σ deja intactas las tasas por debajo del nivel de recorte y las elimina por
+completo por encima: la firma es un acantilado, no una pendiente. Los picos
+dispersos de 6σ levantan las dos colas por encima de la curva a partir de unos
+2,5σ sin apenas mover el centro. Derecha: el aviso complementario del §5, medido.
+Un registro que es ruido paso bajo ideal hasta 2 kHz más un suelo plano 50 dB por
+debajo mantiene $r$ en su valor de forma cerrada 0,745 mientras la banda de
+análisis se mantenga cerca de la física, y lo pierde conforme la banda se abre:
+0,74 a 6 kHz, 0,71 a 13 kHz y 0,47 a 22 kHz. Un suelo de ruido que nunca se
+notaría en una gráfica de espectro cuesta un tercio del factor de irregularidad
+en cuanto la banda de análisis es diez veces más ancha de la cuenta.*
+
+Por último, la mitad de baja frecuencia del mismo argumento, con la que abrió el
+§4 y a la que no volvió: **las fórmulas de Rice están escritas para un proceso de
+media nula**. Resta la media del registro y filtra en paso alto todo lo que quede
+por debajo de la banda con significado físico antes de contar: 20 Hz para un
+registro acústico de banda de audio, la propia frecuencia de corte inferior del
+transductor para un registro de vibración. El viento y el retumbo del edificio
+están casi por entero en $m_0$ y no aportan casi nada a $m_2$, así que inflan
+$\sigma_x$ dejando $\sigma_v$ intacta y sesgan a la baja $N_0$ y todas las tasas
+de cruce por nivel; una deriva lenta de continua puede suprimir por completo los
+cruces de los niveles bajos, y un registro que nunca vuelve a cero no tiene
+ningún cruce por cero. La regla es simétrica: limita la banda por los dos
+extremos, el bajo por $m_0$ y el alto por $m_4$, y declara la banda que usaste
+siempre que informes de una frecuencia aparente o de un factor de irregularidad,
+porque ninguno de los dos números significa nada sin ella.
 
 ## 5. Picos: tasas, factor de irregularidad y alturas
 
@@ -479,5 +666,9 @@ como los describe el libro, fuera de este módulo.
 
 ## Véase también
 
+- [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): el intervalo de confianza chi-cuadrado que da por supuesta la estacionariedad que esta página comprueba.
+- [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): la vista de corto plazo para los registros que suspenden el test, y para los barridos que su media cuadrática no ve.
+- [Incertidumbre GUM](/phonometry/es/signals/metrology/gum-uncertainty/): propagar el error aleatorio que le queda a un promedio ya cualificado.
+- [Niveles](/phonometry/es/signals/levels/levels/): el $L_{eq}$ cuya definición supone una única medición estacionaria.
 - Referencia de la API: [`metrology.data_qualification`](/phonometry/es/reference/api/metrology/data-qualification/).
 - Teoría: [Incertidumbre de medida (GUM)](/phonometry/es/reference/theory/signal-analysis/#incertidumbre-de-medida-isoiec-guide-98-3-gum-y-suplemento-1): el marco de incertidumbre que alimentan los criterios de cualificación de esta página.

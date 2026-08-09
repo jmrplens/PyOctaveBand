@@ -134,23 +134,150 @@ references:
     designation: "ISO 12999-1:2020"
     url: "https://www.iso.org/standard/73930.html"
     note: "Las situaciones de medición, las incertidumbres tabuladas y los factores de cobertura de la sección de incertidumbre."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
+    designation: "ISO 16283-2:2020"
+    url: "https://www.iso.org/standard/74987.html"
+    note: "La medición en campo del nivel de impactos que hay detrás de L'nT y L'n en la subsección de aislamiento a impactos."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 3: Façade sound insulation"
+    designation: "ISO 16283-3:2016"
+    url: "https://www.iso.org/standard/59748.html"
+    note: "La extensión a fachadas de la subsección de laboratorio frente a campo: la posición de referencia a 2 m y las correcciones por ángulo de incidencia."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
+    designation: "ISO 717-2:2020"
+    url: "https://www.iso.org/standard/76626.html"
+    note: "El índice global a impactos y el término de adaptación CI, con los ejemplos resueltos del Anexo C que reproduce la subsección de aislamiento a impactos."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 2: Measurement of airborne sound insulation"
+    designation: "ISO 10140-2:2021"
+    url: "https://www.iso.org/standard/79262.html"
+    note: "El índice de reducción acústica R de laboratorio de la subsección de laboratorio frente a campo."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 3: Measurement of impact sound insulation"
+    designation: "ISO 10140-3:2021"
+    url: "https://www.iso.org/standard/79263.html"
+    note: "El nivel de impactos normalizado Ln de laboratorio de esa misma subsección."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 4: Measurement procedures and requirements"
+    designation: "ISO 10140-4:2021"
+    url: "https://www.iso.org/standard/79264.html"
+    note: "El apartado 4.3, la corrección por ruido de fondo con sus márgenes de 6/15 dB y su tope de 1,3 dB, citada en la subsección de laboratorio frente a campo."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Acoustics — Laboratory measurement of sound insulation of building elements — Part 5: Requirements for test facilities and equipment"
+    designation: "ISO 10140-5:2021"
+    url: "https://www.iso.org/standard/79265.html"
+    note: "El conjunto de transmisión cualificado que dibuja la subsección de laboratorio frente a campo, y el límite de flancos que permite a un índice de laboratorio prescindir de la prima."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 1: Airborne sound insulation between rooms"
+    designation: "EN 12354-1:2000"
+    url: "https://standards.cencenelec.eu/dyn/www/f?p=205:110:0::::FSP_PROJECT:9214"
+    note: "El modelo simplificado de flancos de un solo número (Fórmulas 26-31), las regresiones de unión del Anexo E y el ejemplo resuelto del Anexo H.3 de la subsección de flancos."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 2: Impact sound insulation between rooms"
+    designation: "EN 12354-2:2000"
+    url: "https://standards.cencenelec.eu/dyn/www/f?p=205:110:0::::FSP_PROJECT:9215"
+    note: "La contrapartida a impactos de esa misma subsección: la Fórmula 21, el nivel equivalente del suelo desnudo del Anexo B y el ejemplo resuelto del Anexo E.3."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2018
+    title: "Engineering noise control"
+    edition: "5.ª ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "ISBN 978-1-138-30690-5. Las ecuaciones de ley de masas, coincidencia, pared doble y partición compuesta (7.3, 7.40, 7.44, 7.62, 7.64) de la subsección de predicción de paneles."
+  - type: book
+    authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
+    year: 2005
+    title: "Structure-borne sound: Structural vibrations and sound radiation at audio frequencies"
+    edition: "3.ª ed."
+    publisher: "Springer"
+    doi: "10.1007/b137728"
+    note: "ISBN 978-3-540-22696-3. La teoría de transmisión estructural y de radiación en la que se apoya la subsección de predicción de paneles, compartida con la página de teoría de vibración."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Esta página reúne la teoría de salas y edificación: la medición de respuestas al impulso y los parámetros de acústica de salas, los criterios de ruido de fondo, el aislamiento a ruido aéreo y a impactos con sus índices globales y su incertidumbre, y la predicción de flancos y de absorción. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/); la dispersión superficial y la caracterización de materiales acústicos están en [Materiales y superficies](/phonometry/es/reference/theory/materials-surfaces/).
 
+Cada sección conserva la notación de su propia norma, y cuatro letras llevan más
+de un significado entre ellas:
+
+| Símbolo | Significado | Dónde |
+| :--- | :--- | :--- |
+| $A$ | Área de absorción equivalente, m² ($A_0 = 10$ m² de referencia, $A_T$ de la probeta, $A_{obj}$, $A_{air}$) | en toda la página |
+| $m$ | Coeficiente de atenuación en potencia del aire, 1/m | ISO 354 y EN 12354-6 |
+| $m$ | Número de mediciones repetidas | solo en la incertidumbre de ISO 12999-1 |
+| $m'$ / $m''$ | Masa por unidad de superficie, kg/m²: EN 12354 escribe $m'$ y la literatura de predicción de paneles $m''$ | flancos y predicción de paneles |
+| $C$ | Claridad, dB (con subíndice 50 u 80) | parámetros de ISO 3382-1 |
+| $C$ | Curvatura del decaimiento, % | validez de ISO 3382-2 |
+| $C$, $C_{tr}$ | Términos de adaptación espectral, dB | índices de ISO 717 |
+| $T$ | Tiempo de reverberación, s ($T_s$ es el tiempo central) | en toda la página |
+
 ## Criterios de ruido de salas (ANSI S12.2)
 
-ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a familias de curvas por bandas de octava (16 Hz – 8 kHz). El **índice NC** sigue el procedimiento en dos pasos del apartado 5.2.2 sobre las curvas de la Tabla 1 (NC-15 a NC-70): el nivel de interferencia con el habla $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (apartado 3.2) selecciona la curva NC-(SIL) y, si ninguna banda la supera, el espectro se designa NC-(SIL); en caso contrario se aplica el método de tangencia (apartado 5.2.3): cada banda medida se interpola frente a los valores tabulados de las curvas, el índice es el mayor valor por banda y la banda que lo fija es la banda determinante; la interpolación hace el índice continuo (un NC-42,5 se informa como tal, sin ajustarlo a una curva). Los espectros por encima de NC-70 o por debajo de NC-15 quedan fuera de la familia y se marcan (>NC-70 con la banda de mayor exceso, o &lt;NC-15) en lugar de recibir un número fabricado. El contorno **RC Mark II** (Anexo D) es una recta pura de −5 dB/octava anclada a su valor a 1000 Hz con un suelo en baja frecuencia de $\max(\mathrm{RC} + 25,\ 55)$ dB a 16/31,5 Hz; el índice es la media aritmética de los niveles a 500/1000/2000 Hz redondeada a un entero (apartado D.4), y la etiqueta de calidad espectral compara el espectro con el contorno de referencia (apartado D.3): retumbo «R» cuando alguna banda a 500 Hz o por debajo lo supera en más de 5 dB, siseo «H» cuando alguna banda a 1 kHz o por encima lo supera en más de 3 dB (ambos a la vez, «RH»), y neutro «N» en otro caso, informado como p. ej. RC-35(N). Los contornos RC generados reproducen la Tabla D.1 dígito a dígito, y realimentar cualquier curva NC de la Tabla 1 devuelve su propio índice de tangencia. NCB, RNC (Anexo A) y el QAI (apartado D.5) quedan deliberadamente fuera de alcance.
+ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a familias de curvas por bandas de octava (16 Hz – 8 kHz). El **índice NC** parte del nivel de interferencia con el habla $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (apartado 3.2), que preselecciona la curva NC-(SIL): si ninguna banda la supera, el espectro se designa NC-(SIL) y el procedimiento acaba ahí (apartado 5.2.2). Por lo demás, las dos familias se diferencian en casi todo:
+
+| | NC | RC Mark II |
+| :--- | :--- | :--- |
+| Familia de curvas | Curvas NC-15 a NC-70 de la Tabla 1, 16 Hz – 8 kHz | Una recta pura de −5 dB/octava anclada a su valor a 1 kHz, con suelo en $\max(\mathrm{RC}+25,\ 55)$ dB a 16 y 31,5 Hz (Anexo D) |
+| Cómo se elige el índice | Tangencia (apartado 5.2.3): cada banda se interpola frente a las curvas tabuladas y gana el mayor valor por banda | Media aritmética de los niveles a 500/1000/2000 Hz, redondeada a un entero (D.4) |
+| Qué se informa | Un valor continuo más la banda que lo fijó: NC-42,5 a 250 Hz, sin ajustarlo a una curva | Un entero con una etiqueta de calidad espectral, p. ej. RC-35(N) |
+| Etiqueta de calidad | ninguna | Retumbo «R» cuando alguna banda ≤ 500 Hz supera el contorno en más de 5 dB, siseo «H» cuando alguna banda ≥ 1 kHz lo supera en más de 3 dB, «RH» si ambos, y «N» en otro caso (D.3) |
+| Fuera de la familia | Se marca: &gt;NC-70 con la banda de mayor exceso, o &lt;NC-15, en lugar de un número fabricado | — |
+
+Los contornos RC generados reproducen la Tabla D.1 dígito a dígito, y realimentar cualquier curva NC de la Tabla 1 devuelve su propio índice de tangencia. NCB, RNC (Anexo A) y el QAI (apartado D.5) quedan deliberadamente fuera de alcance.
+
+**Cómo se lee un índice.** Ninguno de los dos números es un veredicto por sí
+solo; el criterio sale del uso de la sala, y el Anexo C (informativo) es donde la
+norma lo pone. Su Tabla C.2 recomienda, por ejemplo, NC 25-30 para un aula o un
+auditorio pequeño, 30-35 para un despacho privado pequeño, 40-45 para una zona
+diáfana y 40-50 para circulaciones públicas, así que un índice de cuarenta y
+pocos no llama la atención en una oficina diáfana y es un suspenso claro en un
+aula. La etiqueta RC es un diagnóstico y no una nota: el contorno de referencia
+es una recta de −5 dB/octava porque esa es la pendiente que los ocupantes
+describen como insulsa, así que la **R** significa que el espectro lleva más
+energía de baja frecuencia de la que permite esa pendiente y apunta al ruido del
+ventilador y de los conductos o a una trayectoria estructural, mientras que la
+**H** apunta al elemento terminal: velocidad en la rejilla, turbulencia en la
+boca. Etiquetas distintas, remedios distintos. Y un índice calculado sobre un
+espectro cuyas bandas más bajas nunca se midieron de verdad no es comparable con
+otro en el que sí, porque esas bandas fijan tanto la etiqueta como, a menudo, el
+punto de tangencia.
 
 Consulta la [guía de criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
 
-*El mismo espectro valorado por las dos vías: tangencia NC en la banda dominante (izquierda) y la referencia RC Mark II con el exceso de retumbo (derecha).*
+*Un único espectro dominado por la ventilación, leído por los dos
+procedimientos. El índice NC lo fija la banda de 250 Hz, y no ninguna de las
+cuatro bandas del SIL, así que la banda determinante ya está contando la historia
+del diagnóstico, y un NC-42,5 pasaría en una zona diáfana y suspendería en un
+aula. El panel RC dice lo mismo en una sola letra: las bandas por debajo de
+500 Hz atraviesan la tolerancia de retumbo de +5 dB, así que la sala es RC-35(R)
+y el remedio está del lado de la baja frecuencia, en el ventilador y en el
+recorrido de conductos, no en la rejilla.*
 
-## Acústica de salas y edificación (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)
+## Respuesta al impulso y parámetros de acústica de salas (ISO 18233, ISO 3382-1/-2/-3)
 
 ### Respuesta al impulso por excitación determinista (ISO 18233)
 
@@ -161,6 +288,34 @@ $$
 $$
 
 Un tiempo por octava constante hace que el espectro del ESS sea rosa (−3 dB/octava). La deconvolución se realiza mediante división espectral **lineal** (no circular, con relleno de ceros) $H = Y\ \overline{X} / (|X|^2 + \varepsilon)$, donde el término de Tikhonov $\varepsilon$ (una fracción de $\max |X|^2$) evita la amplificación del ruido en los extremos de banda. Como un barrido de grave a agudo sitúa los productos de distorsión armónica en tiempos de llegada negativos, caen en la cola envuelta y se eliminan conservando la parte causal (Farina). El método MLS (Anexo A) explota en cambio que la autocorrelación circular de una secuencia de longitud máxima de longitud $2^N-1$ es una delta periódica, de modo que $h = \operatorname{xcorr}_{\text{circ}}(\text{recorded}, \text{mls}) / 2^N$; el promediado síncrono de $n$ periodos añade $10 \log_{10} n$ dB.
+
+**Cuánto tiene que durar el registro, y qué es lo primero que se rompe.** Las dos
+reglas que deciden si una respuesta al impulso deconvolucionada sirve están en el
+apartado 6.2, y difieren según el tipo de excitación. Una señal *repetitiva* como
+una MLS tiene que tener un periodo de repetición no menor que el tiempo de
+reverberación de la sala, $T_{REP} \ge T$ (Fórmula 10), o los modos no se excitan
+hasta el régimen estacionario y la respuesta se envuelve sobre sí misma. Un
+barrido *no repetitivo* puede tener la longitud que convenga, pero tiene que ir
+**seguido de silencio**, y la caída hay que registrarla durante al menos la mitad
+del tiempo de reverberación (6.2.2.3); en un barrido de grave a agudo, el
+silencio necesario lo fija el tiempo de reverberación de las frecuencias
+*altas*, que es donde hay que mantener el relleno libre de las llegadas armónicas
+envueltas. Un registro que se corta con el barrido pliega la cola sobre la
+cabecera y sesga todos los $T$ y todos los valores de claridad que salen de ahí,
+en silencio y siempre en el mismo sentido.
+
+La hipótesis que primero se rompe es la invariancia temporal, y el apartado 6.1
+es explícito al respecto: mover la fuente o un micrófono durante la medición no
+es aceptable, y tampoco lo es el movimiento del aire ni un cambio de la velocidad
+del sonido por temperatura, porque la longitud de camino cambia una fracción de
+longitud de onda entre el principio y el final de la excitación, y la
+deconvolución le carga ese desajuste al suelo de ruido. Esto es además lo que
+separa a los dos métodos en la práctica: la MLS descansa en la exactitud de la
+autocorrelación circular y se degrada tanto con la variación temporal como con la
+distorsión del altavoz, que reparte por toda la respuesta, mientras que el
+barrido empuja los productos de distorsión a tiempos negativos, donde se pueden
+recortar. El barrido es por tanto el valor por defecto, y la MLS se reserva para
+los casos en los que la excitación tiene que parecer ruido.
 
 ### Integración inversa de Schroeder (ISO 3382-1, 5.3.3)
 
@@ -179,6 +334,26 @@ es decir, una suma acumulada invertida en tiempo discreto. La integración inver
 ### Ventanas de regresión y validez (ISO 3382-2, apartado 6, Anexo B/C)
 
 El tiempo de reverberación es un ajuste por mínimos cuadrados $L = a + b t$ sobre una ventana, extrapolado a 60 dB mediante $T = -60/b$ (Anexo C): **EDT** de 0 a −10 dB, **T20** de −5 a −25 dB, **T30** de −5 a −35 dB. Un decaimiento de una sola pendiente da EDT = T20 = T30; una doble pendiente rápida al principio y lenta al final da EDT < T30. La validez se basa en la regla de rango dinámico de 5.3.3: el ruido debe situarse al menos 25 dB por debajo del pico de la respuesta al impulso para EDT (rango de evaluación + 15 dB), aumentado a 46 dB para T20 y 54 dB para T30 de modo que el sesgo de compensación de cola de un valor marcado como válido se mantenga dentro del 5 % del JND. La **curvatura** $C = 100\ (T_{30}/T_{20} - 1)$ % (Anexo B) señala un decaimiento no recto por encima del 10 %.
+
+La regresión es solo la mitad de lo que convierte a $T$ en una propiedad de la
+sala y no de un punto de ella; la otra mitad es el muestreo espacial, y la
+ISO 3382-2 gradúa el resultado según él (apartado 4.3, Tabla 1). El método de
+**control** necesita al menos una posición de fuente y dos combinaciones
+fuente-micrófono, con un decaimiento cada una, solo en bandas de octava, para una
+exactitud nominal mejor del 10 %. El método de **ingeniería** necesita al menos
+dos posiciones de fuente y **seis** combinaciones independientes con dos
+decaimientos cada una, y es el grado que piden las normas de aislamiento
+acústico (mejor del 5 % en octavas y del 10 % en tercios). El método de
+**precisión** necesita dos posiciones de fuente y **doce** combinaciones con tres
+decaimientos cada una (2,5 % y 5 %). La palabra que manda es *independientes*:
+las posiciones de micrófono deberían distar alrededor de media longitud de onda,
+en la práctica un mínimo de unos 2 m, quedar al menos a un cuarto de longitud de
+onda, aproximadamente 1 m, de cualquier superficie reflectante incluido el suelo,
+no ser nunca simétricas, y no acercarse a una fuente más de
+$d_{\min} = 2\sqrt{V/(c\,T)}$, para que el sonido directo no domine el
+decaimiento temprano. Las posiciones más juntas que eso no son las posiciones
+independientes que cuenta la Tabla 1, y un $T$ promediado sobre ellas no tiene
+grado ninguno.
 
 ### Claridad, definición y tiempo central (ISO 3382-1, Anexo A)
 
@@ -224,17 +399,53 @@ ajusta frente a $r$ mismo, de forma **lineal**, y se lee donde cruza 0,50 y
 0,20 para las distancias de distracción y de privacidad. Si ese segundo ajuste
 sale plano o creciente, las dos distancias no existen, no es que sean grandes.*
 
+## Aislamiento acústico y absorción, medidos (ISO 16283, ISO 10140, ISO 717, ISO 354)
+
 ### Aislamiento en campo e índice ponderado (ISO 16283-1, ISO 717-1)
 
 Por banda de tercio de octava, la diferencia de niveles $D = L_1 - L_2$ (promediada en energía sobre las posiciones de micrófono, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) se normaliza de dos formas: la diferencia de niveles estandarizada $D_{nT} = D + 10 \log_{10}(T/T_0)$ con $T_0 = 0{,}5$ s (de modo que $D_{nT} = D$ cuando $T = T_0$), y el índice de reducción acústica aparente $R' = D + 10 \log_{10}(S/A)$ con el área de absorción de Sabine $A = 0{,}16\ V / T$, por tanto $R' = D + 10 \log_{10}[S T / (0{,}16\ V)]$.
 
+En un recinto de menos de 25 m³, ese promedio por defecto **no** es el nivel que
+pide ISO 16283-1 en las tres bandas más bajas. El apartado 8 añade una medición
+en esquinas: los niveles tomados en las esquinas del recinto se promedian en
+energía (Fórmula 12) y se combinan con el promedio por defecto como
+$L_{LF} = 10 \log_{10}\left[(10^{0{,}1 L_{esquina}} + 2 \cdot 10^{0{,}1 L})/3\right]$
+(Fórmula 13), y ese $L_{LF}$ sustituye al nivel por defecto **solo en las bandas
+de 50, 63 y 80 Hz**, porque ahí las posiciones por defecto no muestrean el campo
+modal. La biblioteca consume niveles y no realiza esta combinación, así que hay
+que aplicarla antes de llamarla. Importa porque los términos de adaptación
+espectral extendidos $C_{50-3150}$ y $C_{tr,50-3150}$ están dominados justo por
+esas tres bandas: un índice de un recinto pequeño calculado sin el procedimiento
+de esquinas no es comparable con otro que sí lo usó.
+
 El índice de un solo número (ISO 717-1, apartado 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
+
+**Cómo se leen $C$ y $C_{tr}$.** El índice ponderado condensa una curva entera
+frente a una única curva de referencia fija, así que responde por la fuente de
+referencia y por ninguna otra. Los términos de adaptación devuelven la
+dependencia de la fuente volviendo a valorar esa misma curva medida frente a dos
+espectros normalizados: el n.º 1 para fuentes de espectro más o menos plano y
+dominado por medios y agudos (habla, televisión, actividad cotidiana) y el n.º 2
+para fuentes dominadas por bajas frecuencias, como el tráfico rodado urbano, las
+aeronaves lejanas y la música con mucho grave. Los dos términos son casi siempre
+negativos, y el valor son los decibelios que hay que *sumar* a $R_w$ para obtener
+la diferencia de niveles que esa fuente va a experimentar realmente, que es la
+razón por la que las reglamentaciones enuncian los requisitos como $R_w + C$ o
+$R_w + C_{tr}$ y no como $R_w$ a secas. Eso convierte a $C_{tr}$ en un
+diagnóstico: cerca de $-2$ es lo normal en un muro pesado homogéneo, mientras que
+valores que se acercan a $-8$ o peores señalan una construcción cuyo aislamiento
+se hunde en las bandas más bajas, típicamente una doble hoja ligera cerca de su
+resonancia masa-muelle-masa, o una ventana, así que dos particiones con el mismo
+$R_w$ pueden diferir en muchos decibelios bajo tráfico. Los términos se calculan
+sobre el mismo rango de bandas que el índice al que acompañan, así que un término
+de adaptación citado sobre 100–3150 Hz y otro extendido hasta 50 Hz no son
+magnitudes comparables.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
 *Un espectro R medido frente a la referencia de ISO 717-1 desplazada: el índice es la referencia desplazada leída a 500 Hz.*
 
-### Aislamiento a impactos y absorción (ISO 16283-2, ISO 717-2, ISO 354)
+### Aislamiento a impactos (ISO 16283-2, ISO 717-2)
 
 El aislamiento a impactos cambia la fuente aérea por una **máquina de impactos
 normalizada** y valora el nivel del recinto receptor, así que las convenciones
@@ -264,6 +475,8 @@ referencia desplazada en pasos de 1 dB hasta que la suma desfavorable es lo
 mayor posible sin pasar de 32,0 dB, y el índice leído en la referencia
 desplazada a 500 Hz.*
 
+### Absorción en cámara reverberante (ISO 354)
+
 La absorción acústica (ISO 354) mide el área de absorción equivalente a partir de
 la relación de Sabine aplicada a una cámara reverberante vacía y con la muestra:
 $A = 55{,}3\ V/(c\ T) - 4 V m$ (el término $4 V m$ es la absorción del aire, $m$ el
@@ -274,6 +487,37 @@ coeficiente de atenuación de ISO 9613-1 mediante $m = \alpha / (10 \log_{10} e)
 la difracción y la dispersión de borde interceptan más que el área plana de la
 muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (apartado 3.7
 NOTA 2).
+
+**Los dos tiempos de reverberación no son entradas libres.** Son la salida de una
+disposición muy especificada, y sin ella $\alpha_s$ no significa nada. La cámara
+tiene al menos 150 m³ (200 m³ muy recomendables si es nueva), su dimensión mayor
+se mantiene por debajo de $1{,}9\,V^{1/3}$, y lleva difusión fija o rotatoria
+suficiente para que los decaimientos sean exponenciales (apartado 6.1). La
+probeta plana cubre de 10 a 12 m², con el límite superior escalado por
+$(V/200)^{2/3}$ por encima de 200 m³, es rectangular con una relación
+anchura-longitud entre 0,7 y 1, queda al menos a 0,75 m de cualquier contorno de
+la cámara y preferiblemente tiene sus bordes no paralelos al borde de sala más
+próximo (6.2.1). Su **montaje forma parte del resultado** (Anexo B): un fondo
+rígido, una cámara de aire o unos bordes enmarcados cambian la respuesta, que es
+la razón por la que un $\alpha_s$ de catálogo sin su código de montaje no sirve, y
+por la que un mismo producto da curvas distintas en laboratorios distintos. Cada
+$T$ es el promedio de al menos 12 decaimientos espacialmente independientes,
+desde al menos 3 posiciones de micrófono y 2 de fuente, con los micrófonos
+separados al menos 1,5 m entre sí, a 2 m de cualquier fuente y a 1 m de cualquier
+superficie de la cámara y de la probeta (7.1.4, 7.1.3). Las dos mediciones se
+hacen entre el 30 % y el 90 % de humedad relativa y por encima de 15 °C, con un
+clima prácticamente igual (6.3.2).
+
+Esa última condición no es una cuestión de orden. El resultado es la *diferencia*
+de dos áreas de absorción grandes y casi iguales, así que todo lo que cambie
+entre la medición en vacío y la medición con carga acaba dentro: un cambio de
+temperatura o de humedad mueve tanto $c$ como el término de aire $4Vm$, que es la
+razón por la que los dos decaimientos van en la misma sesión y con el clima
+registrado. Y un $\alpha_s$ por encima de 1 no es un error, sino la firma de la
+difracción de borde interceptando más energía que el área proyectada plana, mayor
+cuanto más pequeña es la probeta y cuanto más baja la frecuencia, así que el
+valor pertenece a una probeta de *ese* tamaño, de esa relación de lados y con ese
+montaje, y no puede trasplantarse sin criterio a una superficie de otra forma.
 
 ### Normalización en laboratorio frente a campo (ISO 10140, ISO 16283)
 
@@ -288,7 +532,21 @@ aparente de campo $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1) son una
 laboratorio y con el $A = 0{,}16\ V/T$ medido del recinto receptor en campo. Lo
 que difiere en *qué se normaliza* no es laboratorio frente a campo, sino ruido
 aéreo frente a impactos: los índices a ruido aéreo escalan por la razón
-superficie-absorción $S/A$, y los niveles de impactos por $A/A_0$. El par a
+superficie-absorción $S/A$, y los niveles de impactos por $A/A_0$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_es.svg" alt="Planta de un conjunto de transmisión de laboratorio según ISO 10140: dos cámaras reverberantes, emisora y receptora, desacopladas estructuralmente y de unos 59 y 51 metros cúbicos, con el elemento de ensayo montado en el hueco de ensayo de 10 metros cuadrados entre ambas, un altavoz en una esquina de la cámara emisora y un micrófono en movimiento continuo con un radio de barrido de al menos 1 m en cada cámara" width="92%" />
+
+Lo que significa físicamente que «una instalación cualificada la suprime» está
+dibujado arriba: un conjunto según ISO 10140-5 son dos cámaras reverberantes
+*desacopladas estructuralmente* de entre 50 y 60 m³ que comparten un hueco de
+ensayo de unos 10 m², construidas de modo que la transmisión que rodea a la
+probeta quede muy por debajo de la que la atraviesa. La instalación mide su
+propio límite de flancos, y una probeta solo puede declararse hasta ese límite,
+que es la razón por la que un $R$ de laboratorio no lleva prima y por la que esa
+misma construcción levantada en un edificio da varios decibelios menos. La
+consecuencia práctica es un diagnóstico: cuando un $R'$ de campo se niega a subir
+después de mejorar el elemento, la medición ha topado con una trayectoria de
+flancos, no con el elemento. El par a
 impactos es el nivel normalizado de
 laboratorio $L_n = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) frente al $L'_n$ de
 campo (ISO 16283-2), ambos referidos a $A_0 = 10$ m². Antes de formar cualquiera
@@ -304,12 +562,25 @@ dB para el método del altavoz a 45° ($R'_{45°}$) y $-3$ dB para el método de
 tráfico rodado con todos los ángulos ($R'_{tr,s}$); los tres llevan el número
 único a ruido aéreo de ISO 717-1.
 
+## Aislamiento acústico y absorción, predichos (EN 12354-1/-2/-6, Bies, Cremer, Hopkins)
+
 ### Predicción de la transmisión por flancos (EN 12354-1/2)
 
 El índice aparente de campo es la suma energética de la trayectoria directa $Dd$ y, para
 cada elemento de flanco $F=f$ a través de su unión con el elemento separador, las
 tres trayectorias $Ff$, $Df$ y $Fd$ (EN 12354-1, modelo simplificado de un solo
 número, Fórmula 26):
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_es.svg" alt="La trayectoria directa Dd a través del elemento separador y las tres trayectorias por flancos Ff, Df y Fd a través de cada unión entre un elemento de flanco y el elemento separador" width="92%" />
+
+*Las cuatro etiquetas solo tienen sentido sobre este dibujo. La mayúscula es el
+lado emisor y la minúscula el lado receptor, así que $Dd$ atraviesa directamente
+el elemento separador, $Ff$ recorre un elemento de flanco a los dos lados de la
+unión, y $Df$ y $Fd$ cruzan de uno al otro. La unión que cruzan es donde viven
+$K_{ij}$ y la longitud de acoplamiento $\ell_f$ de la fórmula de abajo, y el
+elemento separador es donde se mide $S_s$. Cada unión aporta tres términos de
+flanco, así que un recinto con cuatro elementos de flanco suma trece
+trayectorias.*
 
 $$
 R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
@@ -342,9 +613,26 @@ $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, con el nivel equivalente del suelo
 desnudo $L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Anexo B), la mejora del
 revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
 Tabla 1. Los ejemplos resueltos del Anexo H.3 de EN 12354-1 ($R'_w = 52$ dB) y del
-Anexo E.3 de EN 12354-2 ($L'_{n,w} = 45$ dB) se reproducen exactamente; se
-declara que el modelo simplificado tiene una desviación típica de unos 2 dB
-(apartado 5).
+Anexo E.3 de EN 12354-2 ($L'_{n,w} = 45$ dB) se reproducen exactamente.
+
+**Dónde se aplica el modelo simplificado.** Supone elementos homogéneos cuya
+transmisión gobierna su masa por unidad de superficie, unidos rígidamente, de
+modo que la atenuación de la unión pueda depender solo de la relación de masas;
+las regresiones del Anexo E son ajustes empíricos a exactamente esa familia. No
+devuelven ninguna respuesta con sentido para construcciones ligeras entramadas,
+para uniones desacopladas elásticamente ni para elementos con un mecanismo
+interno de pérdidas fuerte: esos necesitan el modelo detallado banda a banda o
+valores de $K_{ij}$ medidos. El suelo $K_{ij,\min}$ existe para impedir que las
+regresiones produzcan atenuaciones de unión inverosímilmente altas en elementos
+pequeños, así que una trayectoria que aterriza en el suelo es una señal de que el
+ajuste por relación de masas está en el borde de su rango, no un resultado para
+declarar tal cual. Como las trayectorias se suman en energía, el índice aparente
+lo clava la trayectoria más fuerte: mejorar solo el elemento separador deja de
+pagar en cuanto domina una trayectoria de flanco, e identificar *esa* trayectoria
+es el principal valor práctico del modelo, mucho antes que el último decibelio
+del total. La desviación típica de 2 dB que declara la norma (apartado 5) es la
+dispersión del modelo simplificado frente a la medición **dentro de esa población
+prevista**, no una barra de error general.
 
 ### Absorción acústica en recintos (EN 12354-6)
 
@@ -386,51 +674,38 @@ mueven en sentidos opuestos y no de forma proporcional.*
 
 Consulta la [guía de absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/) para su uso.
 
-### Incertidumbre de medición (ISO 12999-1)
-
-ISO 12999-1 proporciona la incertidumbre de las magnitudes anteriores a partir de
-la reproducibilidad y la repetibilidad interlaboratorio (ISO 5725) en lugar de un
-modelo funcional GUM. Tres **situaciones de medición** fijan la incertidumbre
-típica $u$: la situación **A** (caracterización en laboratorio) usa la desviación
-típica de reproducibilidad $\sigma_R$; la situación **B** (misma ubicación,
-equipos distintos) la $\sigma_{situ}$ in situ; la situación **C** (misma
-ubicación, operador y equipo, repetida) la repetibilidad $\sigma_r$. Los valores
-por banda y de un solo número están tabulados para $R$/$R'$/$D_n$/$D_{nT}$ a
-ruido aéreo (Tablas 2/3), $L_n$/$L'_n$ a impactos (Tabla 4 por banda, solo
-situaciones B/C; la Tabla 5 de un solo número añade una estimación en situación
-A) y la reducción del revestimiento $\Delta L$ (Tablas 6/7, solo situación A).
-La incertidumbre expandida es $U = k\ u$ (Fórmula 2) con el factor de cobertura
-$k$ de la Tabla 8 (al 95 %, $k = 1{,}96$ bilateral, $k = 1{,}65$ unilateral; se impone
-un mínimo $k = 1$). Un intervalo bilateral $Y = y \pm U$ informa un valor
-(Fórmula 3); un factor unilateral declara conformidad, $y - U > $ requisito para
-un límite inferior (Fórmula 5) o $y + U <$ requisito para un límite superior
-(Fórmula 4). Los componentes no correlacionados se combinan en cuadratura
-$u_c = \sqrt{\sum u_i^2}$ (Fórmula C.2), $m$ mediciones independientes reducen $u$
-a $u/\sqrt{m}$ (Fórmula A.7), y la incertidumbre de un solo número no
-correlacionada es la suma en cuadratura ponderada en energía de las
-incertidumbres por banda (Fórmula B.2).
-
-Consulta las guías de [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y de
-[medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/) para su uso.
-
 ### Predicción del aislamiento de paneles (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
 Donde EN 12354 toma el $R$ de elemento como una medida, el índice de reducción
 acústica de un panel también se puede **predecir** a partir de sus propiedades
 físicas. Un panel flexible sigue la ley de masas
 $TL_0 = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Ec. 7.40), que sube 6 dB por
-octava y 6 dB por duplicar la masa superficial $m''$; el valor de campo resta
-5,5 dB (tercio de octava). La rigidez añade una **caída del aislamiento en la coincidencia**, en
+octava y 6 dB por duplicar la masa superficial $m''$ (la $m'$ de las subsecciones
+de EN 12354 anteriores); el valor de campo resta
+5,5 dB (tercio de octava). Esos 5,5 dB no se deducen: son el resultado de
+promediar la ley de masas a incidencia normal sobre los ángulos de incidencia
+hasta el ángulo límite que se observa en la práctica, en lugar de sobre todo el
+hemisferio, así que son un desplazamiento empírico fijo y no una función de nada.
+La rigidez añade una **caída del aislamiento en la coincidencia**, en
 $f_c = (c_0^2/2\pi)\sqrt{m''/B'}$ (Ec. 7.3), donde la longitud de onda de flexión
 libre iguala la de traza acústica. El método de Sharp mantiene la ley de masas
 hasta $f_c/2$, cae linealmente en $\log f$ hasta el valle
 $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$ y vuelve a subir por encima de $f_c$ con el
-factor de pérdidas $\eta$ (Ec. 7.44). Una **pared doble** es un sistema
+factor de pérdidas $\eta$ (Ec. 7.44); ese $-44$ es un ajuste empírico a caídas de
+coincidencia medidas, y el factor de pérdidas aparece explícitamente porque la
+profundidad de la caída la controla el amortiguamiento y no la masa. Una
+**pared doble** es un sistema
 masa-muelle-masa con la cámara como muelle: por debajo de
 $f_0 = 60\sqrt{(m_1+m_2)/(m_1 m_2 d)}$ (Ec. 7.62) sigue la ley de masas de la
 masa combinada, y por encima las leyes de masas de las dos hojas se suman más el
 término de cámara $20\log_{10}(2kd)$, saturando en +6 dB más allá de
-$f_l = c_0/(2\pi d)$ (Ec. 7.64); un relleno poroso baja $f_0$. Los pequeños
+$f_l = c_0/(2\pi d)$ (Ec. 7.64); un relleno poroso baja $f_0$. El 60 de $f_0$ es
+la constante numérica que queda al sustituir la rigidez de una capa de aire de
+espesor $d$ en la resonancia masa-muelle-masa, así que está fijada al aire en
+condiciones ordinarias y cambia con una cámara llena de gas o al vacío; y $f_l$
+marca dónde cabe media longitud de onda a lo ancho de la cámara, por encima de lo
+cual la cámara deja de comportarse como un muelle puro y las ondas estacionarias
+que hay dentro limitan lo que la construcción puede alcanzar. Los pequeños
 caminos de aire limitan cualquier construcción: el coeficiente de transmisión de
 una rendija recta (Gomperts, Hopkins Ec. 4.99, con resonancias en
 $d + 2e = z\lambda/2$) o de un orificio circular (Wilson y Soroka, Ec. 4.102) se
@@ -457,3 +732,30 @@ merece la pena enseñar a un cliente.*
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.
+
+## Incertidumbre de medición (ISO 12999-1)
+
+ISO 12999-1 proporciona la incertidumbre de las magnitudes anteriores a partir de
+la reproducibilidad y la repetibilidad interlaboratorio (ISO 5725) en lugar de un
+modelo funcional GUM. Tres **situaciones de medición** fijan la incertidumbre
+típica $u$: la situación **A** (caracterización en laboratorio) usa la desviación
+típica de reproducibilidad $\sigma_R$; la situación **B** (misma ubicación,
+equipos de trabajo distintos) la $\sigma_{situ}$ in situ; la situación **C** (misma
+ubicación, operador y equipo, repetida) la repetibilidad $\sigma_r$. Los valores
+por banda y de un solo número están tabulados para $R$/$R'$/$D_n$/$D_{nT}$ a
+ruido aéreo (Tablas 2/3), $L_n$/$L'_n$ a impactos (Tabla 4 por banda, solo
+situaciones B/C; la Tabla 5 de un solo número añade una estimación en situación
+A) y la reducción del revestimiento $\Delta L$ (Tablas 6/7, solo situación A).
+La incertidumbre expandida es $U = k\ u$ (Fórmula 2) con el factor de cobertura
+$k$ de la Tabla 8 (al 95 %, $k = 1{,}96$ bilateral, $k = 1{,}65$ unilateral; se impone
+un mínimo $k = 1$). Un intervalo bilateral $Y = y \pm U$ informa un valor
+(Fórmula 3); un factor unilateral declara conformidad, $y - U > $ requisito para
+un límite inferior (Fórmula 5) o $y + U <$ requisito para un límite superior
+(Fórmula 4). Los componentes no correlacionados se combinan en cuadratura
+$u_c = \sqrt{\sum u_i^2}$ (Fórmula C.2), $m$ mediciones independientes reducen $u$
+a $u/\sqrt{m}$ (Fórmula A.7), y la incertidumbre de un solo número no
+correlacionada es la suma en cuadratura ponderada en energía de las
+incertidumbres por banda (Fórmula B.2).
+
+Consulta las guías de [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y de
+[medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/) para su uso.

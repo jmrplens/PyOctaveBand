@@ -24,6 +24,20 @@ references:
     publisher: "Acoustical Society of America"
     url: "https://webstore.ansi.org/standards/asa/ansis1112004"
     note: "Sus límites de clase de la Tabla 1 son idénticos a los de IEC 61260:1995 y respaldan la misma máscara de clase 0."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 2: Pattern-evaluation tests"
+    designation: "IEC 61260-2:2016"
+    url: "https://webstore.iec.ch/en/publication/24560"
+    note: "El régimen de ensayo de tipo que un modelo de juego de filtros supera una sola vez: el recorrido completo de la máscara de la Tabla 1 sobre un equipo físico, que verify_filter_class no realiza."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 3: Periodic tests"
+    designation: "IEC 61260-3:2016"
+    url: "https://webstore.iec.ch/en/publication/24561"
+    note: "Los ensayos periódicos que recibe un analizador en servicio: atenuación relativa en el centro de banda de todos los filtros, ancho de banda efectivo, rango lineal de funcionamiento y su límite inferior, bajo condiciones ambientales declaradas."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -64,9 +78,30 @@ from phonometry import filters
 bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6)
 result = filters.verify_filter_class(bank)
 print(result["overall_class"])          # 1
+print(result["range_limited"])          # True en un banco diezmado
 print(result["bands"][0])
 # {'freq': 12.589254117941678, 'class': 1, 'checked_to_omega': 3.8127755266765493, 'margin_class1_db': 0.3999999999999595, 'margin_class2_db': 0.5999999999999595}
 ```
+
+**Hasta dónde de la máscara llega realmente el veredicto.**
+`checked_to_omega` es la frecuencia normalizada $\Omega = f/f_m$ más alta a la
+que se evaluó esa banda, y en un banco multitasa es el propio Nyquist diezmado
+de la banda, no el final de la máscara de la Tabla 1. En el banco de arriba va
+de 3,81 a 1,20, así que el requisito de banda atenuada lejana — al menos 70 dB
+para la clase 1 más allá de $\Omega = 4$ aproximadamente — no queda demostrado
+*sobre el filtro de banda* en absoluto. Se da por satisfecho gracias al paso
+bajo antialiasing que precede al diezmado, que eliminó esa energía antes de que
+la banda llegara a verla. `range_limited` es el indicador de que se ha usado
+ese argumento, y aquí vale `True`.
+
+Conviene decirlo tal cual en un informe: el veredicto acredita la máscara hasta
+`checked_to_omega`, y el resto es un argumento sobre la cadena de diezmado.
+Cuando un documento exija la máscara completa sobre el propio filtro de banda,
+diseña el mismo banco con `design=filters.FilterDesign(resample=False)`: sus
+bandas graves se evalúan entonces hasta $\Omega$ del orden de $10^3$ en vez de
+4. `range_limited` sigue valiendo `True` incluso así, porque el borde superior
+de la banda *más alta* sigue acercándose a Nyquist; esa banda es la que el
+indicador está advirtiendo una vez que el diezmado queda fuera de la escena.
 
 **Qué mide el margen.** Es el mínimo, sobre todas las frecuencias normalizadas
 en las que se evaluó la banda, de la distancia al límite más próximo de esa
@@ -137,11 +172,11 @@ plt.show()
 
 Con parámetros por defecto (orden 6), **Butterworth cumple clase 1**, y también
 lo hace **Chebyshev II**: su valor por defecto de `attenuation` es ahora `72` dB,
-superando el límite de clase 1 de 70 dB en la banda atenuada lejana (scipy fija el
-suelo equirrizado de cheby2 en exactamente `attenuation`, así que cualquier valor
-$\ge 70\ \text{dB}$ cumple; el valor por defecto de 72 dB mantiene el mismo
-margen de banda de paso de +0,400 dB que Butterworth). Chebyshev I, elíptico y
-Bessel no cumplen
+superando el límite de clase 1 de 70 dB en la banda atenuada lejana (scipy fija
+el suelo de rizado constante de cheby2 en exactamente `attenuation`, así que
+cualquier valor $\ge 70\ \text{dB}$ cumple; el valor por defecto de 72 dB
+mantiene el mismo margen de banda de paso de +0,400 dB que Butterworth).
+Chebyshev I, elíptico y Bessel no cumplen
 los límites de clase con orden 6: el rizado de banda de paso (cheby1/ellip) y la
 caída lenta (bessel) violan la máscara. La clase 1 es el veredicto más estricto
 que puede devolver esta edición; la clase 0, más estricta todavía, que el banco
@@ -218,9 +253,10 @@ valoraciones abstractas:
 
 - **En la banda de paso** el corredor acota cuánto puede desviarse la lectura
   del contenido dentro de banda: un banco de clase 1 lee un tono de centro de
-  banda a ±0,4 dB de su nivel verdadero y uno de clase 2 a ±0,6 dB (Tabla 1
-  de 2014; las máscaras de 1995, más estrictas, permitían ±0,3 dB para la
-  clase 1 y ±0,15 dB para la clase 0). Hacia los bordes el corredor se
+  banda a ±0,4 dB de su nivel verdadero y uno de clase 2 a ±0,6 dB (Tabla 1 de
+  IEC 61260-1:2014; las máscaras de la Tabla 1 de IEC 61260:1995, más
+  estrictas, permitían ±0,3 dB para la clase 1, ±0,5 dB para la clase 2 y
+  ±0,15 dB para la clase 0). Hacia los bordes el corredor se
   ensancha, lo que es la admisión honesta de que un tono situado exactamente
   en un borde es genuinamente ambiguo entre dos bandas (ambas lo leen unos
   3 dB por debajo).
@@ -233,6 +269,15 @@ valoraciones abstractas:
   por debajo de un tono dominante, la lectura toca fondo en la falda de fuga
   unos 70 dB por debajo, y una arquitectura más abrupta (o mayor orden) es la
   única forma de empujar ese suelo más abajo.
+
+  <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_leakage_floor_es.svg" alt="Niveles en tercios de octava de un tono de 1 kHz a 100 dB SPL sobre un fondo de ruido rosa cuyos niveles de banda rondan los 22 dB, analizados con bancos de orden 6 y de orden 10. La banda de 1 kHz lee 100 dB, las bandas vecinas caen bruscamente y por debajo de unos 500 Hz los niveles medidos se aplanan sobre una falda situada entre 65 y 70 dB por debajo del tono, muy por encima del nivel de fondo real dibujado con línea de puntos; por encima de unos 8 kHz la falda ya ha caído por debajo del ruido y los niveles medidos se juntan con él. El banco de orden 10 baja la falda de forma visible en el lado agudo del tono" width="88%" />
+
+  *Cómo se ve la última frase convertida en medida. Toda banda cuyo nivel se
+  apoya en la falda está informando del rechazo del filtro al tono de 1 kHz, no
+  del sonido presente en esa banda: la línea de puntos es lo que hay realmente.
+  La comprobación no tiene ningún misterio en cuanto la buscas: sube el orden y
+  las bandas que están midiendo el filtro se mueven, mientras que las bandas que
+  están midiendo el sonido no.*
 - **Para el balance de incertidumbre**, la clase es la contribución del filtro a la
   incertidumbre de la medición: un banco de clase 1 añade hasta unas décimas
   de dB a un nivel de banda, comparable a los demás términos de tolerancia de
@@ -268,11 +313,71 @@ Bajo la edición de 2014 esa misma ordenación se lee 1 / 1 / — / — / —:
 `cheby2` se junta con Butterworth en lo más alto porque ya no existe la clase 0
 para separarlos.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_architectures_es.svg" alt="Cuatro paneles, cada uno con la banda de octava de 1 kHz de un banco de orden 6 dibujada sobre el corredor de aceptación de IEC 61260-1, con las muestras fuera de tolerancia marcadas en rojo. Butterworth enhebra limpiamente el corredor de clase 1 e informa overall_class 1. Chebyshev I se sale del corredor en dos rachas cortas justo por dentro de cada borde de banda, donde está su rizado de banda de paso, e informa None. El elíptico hace lo mismo en los dos bordes e informa None. Bessel se sale del corredor a lo largo de toda la falda inferior porque cae demasiado despacio, e informa None" width="94%" />
+
+*Los veredictos de la tabla, dibujados. Chebyshev I y el elíptico asoman por
+encima del límite justo por dentro de los bordes de banda, donde vive su rizado;
+Bessel se sale a lo largo de la falda, porque nunca cae lo bastante rápido. Las
+muestras en rojo son las que `verify_filter_class` anotó en contra del diseño, y
+esto es exactamente lo que dibuja `filter_class_compliance(bank).plot()` para un
+banco tuyo. Ojo a un detalle: la gráfica sombrea el corredor de la clase a la
+que más se acercó cada diseño, así que los tres paneles que fallan muestran el
+corredor de clase 2.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `filters` es el import de los fragmentos anteriores.
+fs = 48000
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+for ax, ftype in zip(axes.ravel(), ("butter", "cheby1", "ellip", "bessel")):
+    bank = filters.OctaveFilterBank(
+        fs, fraction=1, order=6, limits=[800, 1200],
+        design=filters.FilterDesign(filter_type=ftype))
+    result = filters.filter_class_compliance(bank)
+    result.plot(ax=ax, language="es")
+    ax.set_title(f"{ftype}: overall_class = {result.overall_class}")
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
 Así que el valor por defecto sensato es el habitual (Butterworth de orden 6),
 mientras que las arquitecturas alternativas son opciones deliberadas cuyo
 propósito (caída más abrupta, fase lineal) va en contra de la máscara de clase.
 Fuera de estos ajustes (`fraction` muy alto o bandas cercanas a Nyquist), vuelve
 a ejecutar `verify_filter_class` para confirmar la clase que necesitas.
+
+## 3b. Verificar un instrumento, no un diseño
+
+`verify_filter_class` responde a una pregunta sobre un *diseño*: si esta función
+de transferencia cabe en la máscara. Un laboratorio responde a otra pregunta
+distinta, sobre un *equipo en una fecha*, y los dos veredictos no son
+intercambiables.
+
+El recorrido completo de la Tabla 1 pertenece al **ensayo de tipo**
+(IEC 61260-2:2016), que un modelo de juego de filtros supera una sola vez. Lo
+que recibe de verdad un instrumento en servicio es el **ensayo periódico** de
+IEC 61260-3:2016, y es más estrecho a propósito: se mide la atenuación relativa
+en la frecuencia central exacta de cada filtro del juego, por la entrada
+eléctrica y en el rango de nivel de referencia, junto con la desviación del
+ancho de banda efectivo obtenida en un ensayo con barrido de frecuencia, el
+rango lineal de funcionamiento con su control de rango de nivel y su
+comportamiento ante sobrecarga, y el límite inferior de ese rango, todo bajo
+condiciones ambientales declaradas y con equipos de ensayo trazables. Por eso un
+certificado lleva una fecha, una temperatura y una lista de números de serie, y
+por eso no dice nada de las partes de la máscara que no recorrió.
+
+Lo que sí se hereda merece constar en un informe: el veredicto de clase de esta
+página lo heredan todas las medidas hechas con los filtros de la biblioteca, y
+una cadena de hardware añade un veredicto propio. Nombra los dos. El régimen
+equivalente para los *sonómetros* — los ensayos periódicos de IEC 61672-3, y la
+IEC 60942 para el calibrador — está en
+[Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
 
 ## 4. La ficha de conformidad (`.report()`)
 
@@ -355,7 +460,10 @@ frente a `required_class`, en inglés y en español.
 físico (recuperación de sobrecarga, linealidad del filtro, influencias
 ambientales) se aplican a filtros analógicos y digitales de hardware y no
 están implementados: `verify_filter_class` comprueba la respuesta digital
-diseñada frente a la Tabla 1, no un instrumento. Cerca de Nyquist la
+diseñada frente a la Tabla 1, no un instrumento. Esos ensayos pertenecen a la
+IEC 61260-2:2016 (ensayo de tipo) y a la IEC 61260-3:2016 (ensayos
+periódicos), que el apartado 3b resume y que esta página no ejecuta. Cerca de
+Nyquist la
 transformada bilineal deforma el eje de frecuencia y el banco no lo corrige,
 así que la máscara de banda atenuada más allá del Nyquist de procesado se informa
 como `range_limited` en lugar de verificarse: mantén el borde de banda

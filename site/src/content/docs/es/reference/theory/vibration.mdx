@@ -1,6 +1,6 @@
 ---
 title: "Vibración"
-description: "Ponderaciones de vibración en humanos, métricas de cuerpo entero y mano-brazo y el modelo espinal de choques múltiples detrás de phonometry."
+description: "Ponderaciones y métricas de vibración en humanos, el modelo espinal de choques múltiples, y las movilidades puntuales y la eficiencia de radiación detrás de la cadena de ruido estructural."
 references:
   - type: book
     authors: ["Griffin, M. J."]
@@ -44,7 +44,7 @@ references:
     title: "Acoustics — Determination of airborne sound power levels emitted by machinery using vibration measurement — Part 1: Survey method using a fixed radiation factor"
     designation: "ISO/TS 7849-1:2009"
     url: "https://www.iso.org/standard/40537.html"
-    note: "El factor de radiación que coincide con la eficiencia de radiación, cerrando la cadena de potencia acústica a partir de la vibración de la sección de eficiencia de radiación (método de sondeo, factor de radiación fijo)."
+    note: "El factor de radiación que coincide con la eficiencia de radiación, cerrando la cadena de potencia acústica a partir de la vibración de la sección de eficiencia de radiación (método de control, factor de radiación fijo)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2009
@@ -56,7 +56,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Esta página reúne la teoría de la vibración en humanos: las ponderaciones frecuenciales de ISO 8041-1, las métricas de cuerpo entero y mano-brazo de ISO 2631-1 e ISO 5349, los valores de acción y límite de la Directiva 2002/44/CE, y el modelo espinal de choques múltiples de ISO 2631-5. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+Esta página reúne la teoría de la vibración en humanos: las ponderaciones frecuenciales de ISO 8041-1, las métricas de cuerpo entero y mano-brazo de ISO 2631-1 e ISO 5349, los valores de acción y límite de la Directiva 2002/44/CE, y el modelo espinal de choques múltiples de ISO 2631-5. Después pasa de las personas a las estructuras: las movilidades puntuales que gobiernan cuánta potencia inyecta una fuerza puntual en una placa, una viga o una barra, y la eficiencia de radiación que devuelve esa vibración a sonido aéreo, la pareja sobre la que se apoyan EN 12354-5 e ISO 7849. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Vibración en humanos (ISO 8041-1, ISO 2631-1/2, ISO 5349-1/2, Directiva 2002/44/CE)
 
@@ -68,35 +68,140 @@ etapas Butterworth de dos polos de limitación de banda paso alto y paso bajo
 (Fórmulas 1/2), una transición aceleración–velocidad (Fórmula 3, que porta la
 única ganancia no unitaria, $K = 1{,}024$ para Wb) y un escalón ascendente
 (Fórmula 4), con las frecuencias de esquina y los factores Q de la Tabla 3;
-una esquina en infinito colapsa su etapa a la unidad (NOTAs de la Tabla 3). Wk
-(cuerpo entero vertical) y Wd (horizontal) de ISO 2631-1, Wm (edificios,
-ISO 2631-2), Wb (ferrocarril, ISO 2631-4), Wc/We/Wj (respaldo, rotacional,
-cabeza) y Wh (mano-brazo, ISO 5349-1) más Wf (mareo) están implementadas desde
-la cascada exacta (el filtro se aplica como la respuesta compleja exacta vía
-FFT, magnitud *y* fase, no como una aproximación digital deformada por la
-bilineal) y las tablas de objetivos de diseño del Anexo B de ISO 8041-1
-(B.1–B.9) se reproducen al 0,1 %.
+una esquina en infinito colapsa su etapa a la unidad (NOTAs de la Tabla 3). Una
+sola cascada con nueve juegos de parámetros produce, por tanto, toda la familia,
+y elegir el miembro es la primera decisión que obliga a tomar una medida de
+vibración:
+
+| Ponderación | Qué pondera | Eje o punto de contacto | Norma | Rango nominal | Alimenta |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `Wk` | Cuerpo entero vertical | z, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_w$, VDV, $A(8)$ |
+| `Wd` | Cuerpo entero horizontal | x e y, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_w$, VDV, $A(8)$ |
+| `Wc` | Respaldo | x, respaldo | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
+| `We` | Rotacional | rx, ry, rz (por rad) | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
+| `Wj` | Tumbado, bajo la cabeza | z | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
+| `Wm` | Ocupantes de edificios | todos los ejes | ISO 2631-2 | 1–80 Hz | $a_w$ |
+| `Wb` | Confort de marcha ferroviaria | z | ISO 2631-4 | 0,5–80 Hz | $a_w$ |
+| `Wf` | Mareo | z | ISO 2631-1, apartado 9 | 0,1–0,5 Hz | MSDV |
+| `Wh` | Transmitida a la mano | los tres ejes de la mano | ISO 5349-1 | 8–1000 Hz | $a_{hv}$, $A(8)$ |
+
+Los rangos nominales son las columnas de la Tabla 1 de ISO 8041-1, no las
+esquinas de limitación de banda de la Tabla 3: `Wh` está limitada en banda a
+6,31 Hz y 1258,9 Hz pero tabulada de 8 Hz a 1 kHz, y el juego de cuerpo entero
+está limitado en banda a 0,4 Hz y 100 Hz y tabulado de 0,5 Hz a 80 Hz. Qué
+ponderación va en qué eje y con qué factor multiplicador es una cuestión de
+postura, que responde el mapa de posturas de las Tablas 1 y 2 de ISO 2631-1
+reproducido en la [guía de vibración en
+humanos](/phonometry/es/vibration/human/human-vibration/#qué-ponderación-en-qué-eje).
+Las nueve están implementadas desde la cascada exacta (el filtro se aplica como
+la respuesta compleja exacta vía FFT, magnitud *y* fase, no como una
+aproximación digital deformada por la bilineal) y las tablas de objetivos de
+diseño del Anexo B de ISO 8041-1 (B.1–B.9) se reproducen al 0,1 %.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family_es.svg" alt="Las nueve ponderaciones de vibración en humanos en decibelios de 0,05 Hz a 1,5 kHz sobre un eje de frecuencia logarítmico, agrupadas por color en las ponderaciones de cuerpo entero Wk, Wd y Wc, las ponderaciones rotacional y de tumbado We y Wj, las ponderaciones de edificios y ferrocarril Wm y Wb, la ponderación de mareo Wf con máximo en 0,17 Hz y la ponderación mano-brazo Wh con máximo cerca de 11 Hz; tres barras sobre las curvas marcan la banda en la que se tabula cada parte de la familia, de 0,1 a 0,5 Hz para Wf, de 0,5 a 80 Hz para las de cuerpo entero y de 6,3 a 1250 Hz para Wh" width="94%" />
+
+*La familia que produce la única cascada, un juego de parámetros de la Tabla 3
+por curva. `Wk`, la ponderación vertical de cuerpo entero que más se cita, es la
+curva de meseta con máximo cerca de 6 Hz y 21 dB por debajo a 100 Hz; `Wd` tiene
+su máximo dos octavas y media más abajo, porque el cuerpo es mucho más flexible
+en horizontal a baja frecuencia; `Wf` queda otro orden de magnitud más abajo en
+frecuencia; y `Wh` se extiende tres décadas por encima, que es la razón por la
+que los tres juegos se tabulan en las tres bandas distintas dibujadas sobre las
+curvas.*
+
+### Obtener bien la aceleración
+
+Nada de esto sobrevive a un transductor mal colocado. La vibración de cuerpo
+entero se mide en la interfaz por la que entra en el cuerpo (ISO 2631-1,
+5.3.1): en una persona sentada, la superficie del asiento bajo las
+tuberosidades isquiáticas, el respaldo en su zona principal de apoyo y los pies.
+Sobre una superficie elástica, el transductor se interpone entre la persona y la
+superficie en un soporte que no altere mucho la distribución de presiones
+(5.3.2), y el diseño habitual es el disco semirrígido de ISO 10326-1. Los tres
+transductores de traslación de una misma ubicación van ortogonales y tan juntos
+como sea posible, con una desalineación de hasta 15° tolerada cuando la
+alineación exacta es impracticable (5.2.2–5.2.3); la ubicación, la orientación
+de los ejes respecto a la gravedad y la duración de la medida se declaran todas
+(5.2.2, 5.3.1, 5.5).
+
+La vibración mano-brazo se mide en el centro de la zona de agarre cuando se
+puede llegar ahí y, si no, a ambos lados de la mano o en la parte inferior de la
+empuñadura junto a ella, promediando dos posiciones cuando la vibración cambia a
+lo ancho de la mano; las empuñaduras laterales de montaje flexible son el caso
+habitual (ISO 5349-2, 6.1.3 según la revisión de la Amd 1:2015). Una herramienta
+de percusión puede alcanzar de 20 000 a 50 000 m/s², casi todo fuera de la banda
+de evaluación de 6,3 Hz a 1250 Hz, y esa sobrecarga lleva a un transductor
+piezoeléctrico al **desplazamiento de continua** (DC-shift): una componente de
+baja frecuencia falsa, justo donde la ponderación tiene más ganancia (6.2.4). Un
+filtro mecánico lo evita (Anexo C); la comprobación de la norma consiste en
+convertir la aceleración eficaz sin ponderar de la banda en un desplazamiento
+$d = a/(40 f^2)$ y compararlo con el movimiento del transductor que se ve a
+simple vista; y un registro que muestra desplazamiento de continua se
+**descarta**, porque la distorsión contamina todo el espectro y borrar las
+bandas graves no lo rescata. Las magnitudes se promedian sobre operaciones o
+ciclos de trabajo completos, con al menos tres muestras por operación, un tiempo
+total de medida de al menos un minuto y evitando muestras de menos de unos 8 s
+(5.4.1). La [guía de vibración en
+humanos](/phonometry/es/vibration/human/human-vibration/#0-obtener-los-números)
+lleva las restricciones de masa, fijación y fuerza de agarre y el resto de la
+lista de fallos.
+
+### Métricas ponderadas y exposición diaria
 
 Las métricas ponderadas siguen ISO 2631-1:1997: rms móvil con integración
 lineal o exponencial (Ecs. 2/3), el **MTVV** como su máximo (Ec. 4), el
-**VDV** de cuarta potencia $= (\int a_w^4\, dt)^{1/4}$ en m/s^1,75 (Ec. 5), el
-factor de cresta con el método básico considerado adecuado hasta 9
-(apartado 6.2) y el valor total de vibración
-$a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ (Ec. 10). La exposición mano-brazo sigue
+**VDV** de cuarta potencia $= (\int a_w^4\, dt)^{1/4}$ en
+$\mathrm{m/s}^{1{,}75}$ (Ec. 5) y el valor total de vibración
+$a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ (Ec. 10), cuyos factores multiplicadores
+$k_j$ pertenecen a la postura y al eje y no a la métrica: en una persona sentada
+evaluada por salud, 1,4 sobre x e y ponderadas con `Wd` y 1,0 sobre z ponderada
+con `Wk` (apartado 7.2.3).
+
+**El factor de cresta decide cuál de ellas se declara.** Es el pico de la
+aceleración ponderada dividido por su valor eficaz en el mismo intervalo
+(apartado 6.2.1), así que mide cuánta parte de la exposición se concentra en
+sucesos breves: una vibración aleatoria estacionaria queda cerca de 3 o 4, y un
+valor que se acerca a 9 significa que el promedio lo están fijando transitorios
+que el valor eficaz subestima. El apartado 6.2.2 de ISO 2631-1 considera el
+método básico del valor eficaz normalmente suficiente mientras el factor de
+cresta se mantenga en 9 o por debajo, y manda a los métodos adicionales del
+apartado 6.3 todo lo que quede por encima, porque unos pocos picos altos aportan
+poco a un valor eficaz y muchísimo a una dosis de cuarta potencia. Dos cocientes
+deciden la misma cuestión sin fiarlo todo al factor de cresta (apartado 6.3.3):
+se declara además el valor adicional en cuanto $\mathrm{MTVV}/a_w$ supera 1,5 o
+$\mathrm{VDV}/(a_w T^{1/4})$ supera 1,75. Los dos se miden sobre el intervalo de
+evaluación real, así que trocear un registro en bloques cortos rebaja el factor
+de cresta artificialmente; y cuando se usa un método adicional, el valor básico
+se sigue declarando a su lado (apartado 5.6).
+
+La exposición mano-brazo sigue
 ISO 5349-1:2001: $a_{hv}$ (Ec. 1, todos los $k = 1$), exposición diaria
 $A(8) = a_{hv} \sqrt{T/T_0}$ con $T_0 = 8$ h (Ec. 2), exposiciones parciales
 combinadas en cuadratura (ISO 5349-2:2001, Ecs. 1–3), y el modelo de riesgo
 vascular del Anexo C, $D_y = 31{,}8\ A(8)^{-1{,}06}$, para los años hasta una
-prevalencia del 10 % de dedo blanco. Los valores de acción y límite de la
+prevalencia del 10 % de dedo blanco (sin relación con la dosis de aceleración
+$D_z$ de más abajo). Los valores de acción y límite de la
 Directiva 2002/44/CE están incorporados: mano-brazo $A(8)$ 2,5/5,0 m/s²,
-cuerpo entero $A(8)$ 0,5/1,15 m/s² o VDV 9,1/21,0 m/s^1,75 (Artículo 3).
+cuerpo entero $A(8)$ 0,5/1,15 m/s² o VDV 9,1/21,0
+$\mathrm{m/s}^{1{,}75}$ (Artículo 3), aplicándose la vía del VDV allí donde un
+Estado miembro la haya adoptado.
+
+**Los dos límites se evalúan sobre magnitudes construidas de forma distinta.**
+La exposición mano-brazo se evalúa sobre el total vectorial $a_{hv}$, con todos
+los $k = 1$. La exposición de cuerpo entero se evalúa sobre el *eje dominante
+único*, el mayor de $1{,}4a_{wx}$, $1{,}4a_{wy}$ y $a_{wz}$ (Anexo, parte B de
+la Directiva, con los factores del apartado 7.2.3; el apartado 7.2.2 de
+ISO 2631-1 evalúa cada eje por separado), y nunca sobre el total vectorial, que
+es la magnitud de confort del apartado 8. `vibration.wbv_exposure_basis`
+construye la base de cuerpo entero y `vibration.vibration_total_value` el total
+vectorial; meter el segundo en $A(8)$ es el error más común de una evaluación
+de exposición laboral y siempre infla la respuesta. Para los tres ejes 0,35, 0,28 y
+0,62 m/s², la base de la Directiva es 0,62 m/s² y el total vectorial ponderado
+por salud 0,88 m/s², una sobrestimación del 42 %.
+
 Los ejemplos resueltos de ISO 5349-2 se reproducen (E.2.1: 7,4 m/s² durante
 2,5 h → $A(8) = 4{,}1$ m/s²; E.3 forestal, tres herramientas → 3,6 m/s²),
 igual que las filas de duración de exposición de la Tabla C.1 de ISO 5349-1.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_es.svg" alt="La ponderación vertical de cuerpo entero Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" width="88%" />
-
-*La ponderación de cuerpo entero Wk obtenida de la cascada de ISO 8041-1.*
 
 ### Choques múltiples (ISO 2631-5)
 
@@ -141,6 +246,11 @@ Consulta la [guía de vibración en humanos](/phonometry/es/vibration/human/huma
 
 ## Movilidades puntuales y eficiencia de radiación (Cremer 5, Hopkins 2.9)
 
+Aquí la notación empieza de nuevo: $S$ es un área de sección transversal, $m'$
+una masa por unidad de longitud y $m''$ una masa por unidad de superficie, y
+ninguna de ellas son los símbolos de tensión y de dosis de las secciones de
+vibración en humanos de más arriba.
+
 La potencia vibratoria que una fuerza puntual inyecta en una estructura es
 $W = \tfrac12 |F|^2\,\mathrm{Re}\{Y\}$ (Cremer Ec. 5.23), así que la
 **movilidad** puntual $Y$ (la inversa de la impedancia) gobierna cuánta energía
@@ -149,18 +259,65 @@ Tabla 5.1): una placa delgada infinita es una resistencia pura
 $Z = 8\sqrt{B'\,m''}$ (real, independiente de la frecuencia, con $B'$ la rigidez
 a flexión por unidad de anchura y $m''$ la masa por unidad de superficie), una
 viga infinita tiene $Y = (1-\mathrm{j})/(4 m' c_B)$ (fase de 45 grados,
-decayendo como $\omega^{-1/2}$ a través de la velocidad de flexión $c_B$), y una
+decayendo como $\omega^{-1/2}$ a través de la velocidad de la onda de flexión
+$c_B$), y una
 barra longitudinal tiene $Z = \rho c_L S$. Aportan la movilidad de receptor que
 EN 12354-5 necesita cuando no hay medida, y son las contrapartes teóricas de las
-movilidades medidas de ISO 7626. La eficiencia con que una placa en flexión
-radia la potencia aérea es su **eficiencia de radiación** $\sigma$: por debajo de
-la frecuencia crítica radia poco (modos de borde y esquina), y por encima
-$\sigma \to (1 - f_c/f)^{-1/2} \to 1$ (Leppington/Maidanik, Hopkins
-Ec. 2.227-2.230). Como $\sigma$ es exactamente el factor de radiación
+movilidades medidas de ISO 7626.
+
+**Hasta dónde vale la sustitución.** Ninguna estructura real es infinita, y una
+finita no tiene una movilidad puntual suave: por debajo y alrededor de sus
+primeros modos, el $|Y|$ medido oscila decenas de decibelios entre resonancia y
+antirresonancia. La forma cerrada es la *media* en torno a la cual oscila, así
+que solo cobra sentido cuando ya caen varios modos dentro de la banda de
+análisis, que es la razón por la que se usa con entradas de octava o de tercio
+de octava y nunca se lee a una frecuencia única, y por la que es defendible en
+las bandas medias y altas, donde suelen hacerse las predicciones de potencia
+estructural, y poco fiable en las bandas más bajas de un elemento pequeño o poco
+amortiguado. Las formas cerradas suponen además una excitación lejos de
+cualquier contorno: excitar cerca de un borde o de una esquina sube la rigidez
+local y baja la movilidad, y excitar una placa nervada o inhomogénea de
+cualquier otra manera invalida el único $B'$ sobre el que se apoya la fórmula de
+la placa. La movilidad de receptor se toma de una medida cuando el elemento es
+pequeño, está poco amortiguado o se excita cerca de un contorno.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities_es.svg" alt="Dos paneles apilados frente a la frecuencia, de 0,5 Hz a 2 kHz en eje logarítmico. Arriba, el módulo de la movilidad de un resonador de un grado de libertad, que resuena, frente a tres formas cerradas de estructura infinita: una placa de hormigón de 140 mm, plana en unos 2,6 por diez elevado a menos seis metros por newton y segundo; una viga de acero de 100 por 200 mm que cae como la inversa de la raíz cuadrada de la frecuencia; y un puntal de acero en movimiento longitudinal, plano. Abajo, la fase de cada uno, cero para la placa y la barra y menos 45 grados para la viga" width="92%" />
+
+*Las tres formas cerradas dibujadas frente al resonador finito. La placa de
+hormigón de 140 mm es real e independiente de la frecuencia en
+$2{,}6 \times 10^{-6}$ m/(N·s); la viga de acero de 100 × 200 mm cae como
+$f^{-1/2}$, un factor 63 a lo largo de las doce octavas dibujadas, con un
+−45° constante; el puntal longitudinal es real y plano. Ninguna de ellas
+resuena, que es exactamente la diferencia con una estructura finita y la razón
+por la que las formas cerradas son sustitutas en media por banda y no
+predicciones frecuencia a frecuencia.*
+
+La eficiencia con que una placa en flexión radia la potencia aérea es su
+**eficiencia de radiación** $\sigma$: la razón entre la potencia que la placa
+radia realmente y la que radiaría al mismo semiespacio un pistón de la misma
+área vibrando con la misma velocidad cuadrática media promediada en el espacio.
+Así, $\sigma = 1$ es el caso plenamente acoplado, y un valor pequeño significa
+que la placa se está cortocircuitando a sí misma. Por debajo de la frecuencia
+crítica $f_c$, la frecuencia a la que la longitud de onda de flexión en la placa
+iguala a la del aire, la longitud de onda de flexión es la más corta de las dos,
+así que semiceldas contiguas de la placa se bombean aire la una a la otra y la
+radiación solo sobrevive allí donde esa cancelación se interrumpe, en los bordes
+y en las esquinas. La $\sigma$ subcrítica depende por tanto del perímetro y del
+área de la placa además de su material, y es pequeña: una placa de cartón-yeso
+de 12,5 mm y 4 × 3 m ($f_c \approx 2{,}6$ kHz) va de $\sigma = 0{,}0017$ a
+31,5 Hz hasta 0,080 a 2 kHz, mientras que una losa de hormigón de 100 mm del
+mismo tamaño ($f_c \approx 180$ Hz) ya está en 0,12 a 31,5 Hz. Por encima de
+$f_c$ se aplica el límite citado $\sigma \to (1 - f_c/f)^{-1/2} \to 1$
+(Leppington/Maidanik, Hopkins Ec. 2.227-2.230), pero es singular justo en
+$f = f_c$, así que la banda de coincidencia se evalúa con la expresión aparte
+en la coincidencia (Ec. 2.230) y el máximo justo por encima de $f_c$ es finito
+(1,89 para esa losa de hormigón) y lo fijan el tamaño y el amortiguamiento de la
+placa. Como $\sigma$ es exactamente el factor de radiación
 $\varepsilon$ de ISO 7849, predecirla cierra la cadena de potencia acústica a
 partir de la vibración sin una medida de potencia, y alimenta la trayectoria
-de transmisión resonante de la
-[teoría de aislamiento de paneles](/phonometry/es/reference/theory/rooms-buildings/).
+de transmisión resonante de la [teoría de aislamiento de
+paneles](/phonometry/es/reference/theory/rooms-buildings/#predicción-del-aislamiento-de-paneles-bies-72-hopkins-294310-cremer-5),
+donde se define la propia $f_c$.
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.

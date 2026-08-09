@@ -197,7 +197,7 @@ así que un coeficiente declarado para un producto adherido directamente al
 soporte no describe al mismo producto sobre un plenum de 200 mm. La ISO 354
 entrega datos en tercios de octava y un cálculo en bandas de octava toma la media
 aritmética de los tres tercios. La valoración de número único de una hoja de
-datos — $\alpha_w$, NRC, SAA — *no* sustituye a la tabla por bandas (ver la
+características — $\alpha_w$, NRC, SAA — *no* sustituye a la tabla por bandas (ver la
 [guía de la EN 12354-6](/phonometry/es/buildings/rooms/enclosed-space-absorption/#3-de-dónde-salen-los-datos-de-entrada),
 que enuncia la prohibición de forma normativa). El público y los asientos se
 valoran por metro cuadrado de la superficie de suelo que ocupan, no por persona.
@@ -294,7 +294,7 @@ Para una distribución **uniforme**, Eyring y Millington-Sette coinciden, y ambo
 quedan por debajo de Sabine; la sobrestimación de Sabine con absorción alta es
 la razón de ser de Eyring. Cuando $\alpha \to 0$, Eyring se reduce a Sabine. La
 absorción del aire entra en todos los modelos a través del coeficiente de
-atenuación de potencia (intensidad) $m$, en neper por metro:
+atenuación de potencia (intensidad) $m$, en neperios por metro:
 
 ```python
 from phonometry import environment, room
@@ -435,7 +435,7 @@ plt.show()
 
 </details>
 
-Sabine y Eyring son los dos caballos de batalla, y la separación entre ambos
+Sabine y Eyring son los dos modelos de cabecera, y la separación entre ambos
 por banda es en sí un diagnóstico. El diagrama pasa la sala de esta sección
 por los dos, con la frontera de validez que comparten todas las fórmulas
 estadísticas.
@@ -728,4 +728,4 @@ de una predicción estadística.
   qué hay por debajo de la frecuencia de Schroeder, donde no se aplica ninguna de
   estas cinco fórmulas.
 - Referencia de la API: [`room.reverberation_prediction`](/phonometry/es/reference/api/rooms/reverberation-prediction/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): la hipótesis de campo difuso que supone toda fórmula de la familia Sabine, y dónde deja de cumplirse.
+- Teoría: [Aislamiento acústico y absorción, predichos](/phonometry/es/reference/theory/rooms-buildings/#aislamiento-acústico-y-absorción-predichos-en-12354-1-2-6-bies-cremer-hopkins): la hipótesis de campo difuso que supone toda fórmula de la familia Sabine, y dónde deja de cumplirse.

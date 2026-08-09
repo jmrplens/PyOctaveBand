@@ -1,6 +1,6 @@
 ---
 title: "Multicanal y rendimiento"
-description: "Procesado por canal de grabaciones multicanal, la convención (canales, muestras) y la vectorización que lo sustenta."
+description: "Procesado por canal de grabaciones multicanal, la convención (canales, muestras), cómo se calibra un array cápsula a cápsula y dónde se va realmente el tiempo de cálculo."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -29,7 +29,7 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La mayoría de las sesiones de medición reales producen más de un canal: los
-dos oídos de una cabeza binaural, la pareja de micrófonos de una sonda de
+dos oídos de una cabeza artificial, la pareja de micrófonos de una sonda de
 intensidad, las varias posiciones de un muestreo de sala, las cápsulas de un
 array de conformación de haz. La convención para todos ellos es un único
 array con forma `(canales, muestras)` procesado en una sola llamada: cada
@@ -58,8 +58,11 @@ entradas de Bendat y Piersol.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_es.svg" alt="Análisis estéreo: ruido rosa y barrido logarítmico resueltos por canal en tercios de octava" width="80%" loading="eager" />
 
-*Análisis simultáneo de una señal estéreo: canal izquierdo (ruido rosa) vs canal
-derecho (barrido sinusoidal logarítmico).*
+*Una sola llamada a `octave_filter`, dos canales: ruido rosa a la izquierda,
+un barrido logarítmico a la derecha. Los dos vuelven planos en tercios de
+octava — el ruido rosa porque su espectro $1/f$ tiene energía constante por
+banda de fracción de octava, el barrido porque pasa un tiempo proporcionalmente
+igual en cada una — y ninguna de las dos filas se ve afectada por la otra.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -94,6 +97,19 @@ plt.show()
 
 </details>
 
+Lee la figura fila a fila antes de seguir. Las caídas en los dos extremos de la
+fila derecha son los límites propios del barrido, 50 Hz y 10 kHz, no un efecto
+del filtro. Y de esa planitud se siguen dos conclusiones. Un espectro plano en
+fracciones de octava corresponde a una densidad espectral de potencia $1/f$, así
+que el ruido *blanco* no se ve plano en esta representación: sube 3 dB por
+octava, porque cada banda es un 26 % más ancha que la de debajo. Y dos señales
+con estructuras temporales completamente distintas — un ruido estacionario y un
+barrido que en un instante está en 50 Hz y cinco segundos después en 10 kHz —
+dan el mismo espectro, y por eso los niveles de banda de esta página responden a
+«cuánta energía hay por banda» y nunca a «cuándo». El espectrograma de octava de
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/) es la
+herramienta que devuelve el eje del tiempo.
+
 La convención es uniforme en toda la biblioteca: el tiempo siempre es el
 **último eje**. Aplica a `octave_filter`, `OctaveFilterBank`, `weighting_filter`,
 `time_weighting`, `leq`, `laeq`, `ln_levels` y `spectrogram`.
@@ -125,10 +141,10 @@ spl, freq = filters.octave_filter(stereo, fs, fraction=3)
 | `(ch, n)` en `spectrogram` | STFT multicanal | `(ch, bands, frames)` |
 
 Todo se vectoriza a lo largo del eje inicial de canales: un único diseño de
-filtro se aplica a todos los canales en una sola llamada a SciPy, así que 8
-canales cuestan mucho menos que 8 ejecuciones separadas. Convención: **canales
-primero**, como la mayoría del código DSP (`soundfile` devuelve `(n, ch)`:
-transpón con `x.T`).
+filtro se aplica a todos los canales en una sola llamada a SciPy. Convención:
+**canales primero**, como la mayoría del código DSP (`soundfile` devuelve
+`(n, ch)`: transpón con `x.T`). Qué se gana con eso, y qué no, es el asunto de
+[Rendimiento](#rendimiento-vectorizacion-y-cache), más abajo.
 
 ## Semántica por canal
 
@@ -142,17 +158,112 @@ explicitar:
   energías tú mismo: `10 * np.log10(np.mean(10 ** (spl / 10), axis=0))`,
   nunca la media aritmética de los valores en dB (ver
   [Niveles](/phonometry/es/signals/levels/levels/) para el porqué).
-- **Un `calibration_factor` significa una sensibilidad.** El factor escalar
+- **Un factor de calibración significa una sensibilidad.** El factor escalar
+  (`calibration=LevelCalibration(factor=...)` en un banco de filtros,
+  `calibration_factor=` en `leq`, `laeq`, `ln_levels`, `lc_peak` y `sel`)
   multiplica todos los canales, lo que solo es correcto si todos comparten
   la misma sensibilidad. Para un array de micrófonos con calibraciones
-  individuales, escala primero las filas, `x * factors[:, None]`, y deja
-  `calibration_factor` en 1.
+  individuales, escala primero las filas, `x * factors[:, None]`, y deja el
+  factor en su valor por defecto, 1.0.
 - **Las clases con estado guardan un estado por canal.** En el procesado por
   bloques el array de estado se ajusta al número de canales y un cambio del
   número de canales lo reinicia; ver
   [Procesado por bloques](/phonometry/es/signals/filters/block-processing/).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_channel_average_es.svg" alt="Panel superior: cinco curvas finas grises de tercios de octava correspondientes a cinco posiciones de una misma sala, junto con un promedio energético azul grueso y un promedio aritmético de los valores en decibelios en rojo discontinuo. Por encima de unos 400 Hz las cinco posiciones coinciden dentro de un decibelio y los dos promedios se superponen; por debajo, en la región modal, las posiciones se dispersan hasta quince decibelios y el promedio rojo discontinuo queda por debajo del azul. Panel inferior: la diferencia entre ambos banda a banda, nula por encima de 400 Hz y creciente hasta una subestimación máxima de 3,8 dB a 40 Hz" width="88%" />
+
+*Las dos líneas de código, sobre un muestreo realista. Donde las posiciones
+coinciden, los dos promedios son el mismo número; donde discrepan — la región
+modal, que es justo el motivo por el que un muestreo de sala tiene varias
+posiciones — la media aritmética de los decibelios subestima hasta en 3,8 dB.
+El error nunca es negativo, así que no se compensa al añadir posiciones.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# Cinco posiciones de una sala, niveles de banda como array (5, bandas). Aquí
+# las posiciones se sintetizan; en campo son cinco filas de una captura.
+rng = np.random.default_rng(7)
+survey = np.stack([0.02 * (1 + 0.3 * rng.standard_normal())
+                   * rng.standard_normal(2 * fs) for _ in range(5)])
+survey_levels, _ = filters.octave_filter(survey, fs, fraction=3)
+
+energetic = 10 * np.log10(np.mean(10 ** (survey_levels / 10), axis=0))
+arithmetic = np.mean(survey_levels, axis=0)
+print(f"subestimación máxima {np.max(energetic - arithmetic):.2f} dB")
+# subestimación máxima 2.12 dB
+```
+
+</details>
+
+### Calibrar un array
+
+El vector de sensibilidades del punto anterior no es aritmética, es un
+procedimiento, y hay tres cosas que deciden si el resultado es correcto.
+
+```python
+# Una sensibilidad por cápsula, en Pa por unidad digital. Cada elemento sale de
+# metrology.sensitivity(cal_tone[i], target_spl=94.0, fs=fs) sobre una captura
+# de calibración en la que el calibrador estaba acoplado a la cápsula i y no se
+# tocó nada más.
+factors = np.array([0.01021, 0.00984, 0.01007, 0.00998])
+survey = np.stack([left, right, left, right])      # tu captura (4, n)
+calibrated = survey * factors[:, None]
+spl, freq = filters.octave_filter(calibrated, fs, fraction=3)
+```
+
+**Fija las ganancias antes del primer tono y no vuelvas a tocarlas**, porque
+cada factor solo vale para la ganancia con la que se midió. **Acopla el
+calibrador a cada cápsula, una a una**, en lugar de reutilizar un factor para
+todo el array: cápsulas del mismo modelo difieren en algunas décimas de
+decibelio, y esa diferencia se traslada directamente a un nivel promediado por
+posición. **Repite la pasada al final de la sesión** y toma la mayor diferencia
+por canal como cota de deriva del array. Y luego dos invariantes que ninguna
+comprobación posterior puede recuperar si están mal: todos los canales tienen
+que venir de **un único reloj de conversión** (dos interfaces son dos relojes, y
+una deriva relativa lenta arruina cualquier análisis entre canales), y **el mapa
+de fila a posición hay que anotarlo en el momento de la captura**, porque un par
+intercambiado produce niveles perfectamente válidos atribuidos a las posiciones
+equivocadas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_capture_es.svg" alt="Captura con un array de cuatro micrófonos. A la izquierda, cuatro micrófonos de medida sobre trípodes con la separación de un muestreo de sala, etiquetados de P1 a P4, con las cápsulas a 1,2 m del suelo y cada una rotulada con su propia sensibilidad en milivoltios por pascal; un calibrador acústico aparece acoplado a la cápsula P2 con una flecha discontinua que indica que va pasando de cápsula en cápsula. En el centro, un preamplificador de cuatro canales y una interfaz con una barra resaltada que abarca las cuatro entradas y dice reloj de muestreo único, fs igual a 48 kHz, y a su lado una segunda interfaz tachada con la leyenda dos interfaces son dos relojes, no un array. A la derecha, el array x dibujado como cuatro filas apiladas etiquetadas de ch0 igual a P1 hasta ch3 igual a P4, con la forma (4, N). Un pie repite los tres invariantes: un reloj, ganancias fijadas, mapa de fila a posición anotado" width="94%" />
+
+La tabla de formas de más arriba es la abstracción de ese dibujo: cada fila de
+`x` es un micrófono, y la correspondencia entre un índice de fila y una posición
+sobre el suelo solo existe en tus notas.
+
+<span id="rendimiento-vectorizacion-y-cache"></span>
+
 ## Rendimiento: vectorización y caché
+
+Empieza por lo que agrupar en lotes *no* te da. La aritmética escala
+linealmente con los canales, porque cada canal hay que filtrarlo con cada
+banda, así que ocho canales cuestan ocho canales se escriba como se escriba la
+llamada. Medido a 48 kHz sobre 5 s por canal con un mismo banco de tercios de
+octava reutilizado:
+
+| Canales | Una llamada [ms] | Bucle por canal [ms] | Cociente |
+| ---: | ---: | ---: | ---: |
+| 1 | 193 | 173 | 0,90 |
+| 2 | 337 | 352 | 1,04 |
+| 8 | 1394 | 1721 | 1,23 |
+| 32 | 5646 | 5208 | 0,92 |
+
+El cociente ronda la unidad, que es la respuesta honesta: lo que quita el lote
+es la sobrecarga de Python por llamada y la tentación de rediseñar el banco, y
+es el rediseño lo que de verdad cuesta: construir un banco de tercios de octava
+nuevo lleva unos 33 ms, un orden de magnitud más que una sola pasada de
+filtrado por banda sobre una trama corta.
+
+Así que el modelo de coste es sencillo. Domina una pasada de filtrado SOS por
+banda y por canal, lo que significa que el tiempo escala con el número de
+bandas (un banco de tercios de octava es el triple que uno de octava), con la
+duración del registro y con el número de canales, y con nada más. Las reglas
+prácticas que se siguen: **construye un `OctaveFilterBank` y reutilízalo**;
+pasa todos los canales en un array por claridad, no por velocidad; y cuando una
+ejecución sea demasiado lenta, tira de `fraction`, `limits` y la duración del
+registro, que son los tres términos del modelo.
 
 `OctaveFilterBank` es la herramienta para el análisis repetido o en
 streaming: un banco diseña sus filtros una vez y los aplica a cada trama, y

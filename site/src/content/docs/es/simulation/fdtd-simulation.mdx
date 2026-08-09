@@ -24,7 +24,7 @@ references:
     title: "Fourier acoustics: Sound radiation and nearfield acoustical holography"
     publisher: "Academic Press"
     doi: "10.1016/B978-0-12-753960-7.X5000-1"
-    note: "Capítulo 8: la ecuación integral de Helmholtz tras far_field_from_contour, con la función de Green de espacio libre saliente y el límite de campo lejano de la transformación de campo cercano a lejano de la sección 2b."
+    note: "Capítulo 8: la ecuación integral de Helmholtz tras far_field_from_contour, con la función de Green de espacio libre saliente y el límite de campo lejano de la transformación de campo cercano a lejano de la sección 4."
   - type: article
     authors: ["Jiménez, N.", "Cox, T. J.", "Romero-García, V.", "Groby, J.-P."]
     year: 2017
@@ -33,7 +33,7 @@ references:
     volume: "7"
     pages: "5389"
     doi: "10.1038/s41598-017-05710-5"
-    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este esquema, el contraste TMM frente a onda completa que documenta el artículo."
+    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 4 reproducen, con este esquema, el contraste TMM frente a onda completa que documenta el artículo."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -57,7 +57,7 @@ tiempo (Ecs. 4.11-4.12), la condición de estabilidad de Courant
 El esquema es **determinista por diseño**: aritmética float64, sin
 números aleatorios y avance numpy monohilo, de modo que las mismas entradas
 producen salidas idénticas bit a bit en la misma plataforma. Es el motor de
-las animaciones FDTD de esta documentación, promocionado a API pública con
+las animaciones FDTD de esta documentación, elevado a API pública con
 fuentes, sondas de presión, obstáculos rasterizados, condiciones de contorno
 por lado y un objeto de resultado congelado.
 
@@ -74,7 +74,7 @@ una sombra legible y rerradia con fuerza, que es la razón por la que la cola qu
 llena la sala está estructurada y no es ruido. Esa cola es dispersión múltiple
 determinista: es el aspecto que tiene un campo difuso *antes* de hacer ninguna
 hipótesis estadística sobre él. La malla es el ejemplo resuelto de la regla que
-deduce la [sección 4](#dispersion-numerica-y-precision): el hueco más
+deduce la [sección 6](#dispersion-numerica-y-precision): el hueco más
 estrecho de esta disposición es de 6,6 cm entre una columna y una pared, así que
 $\Delta x = \min(\text{apertura más pequeña}/4,\ \lambda/8)$ permite hasta
 1,6 cm, y el clip corre a 2,5 mm porque un banner necesita la definición.
@@ -123,9 +123,14 @@ $$
 $$
 
 y `fdtd_simulation` deriva el paso temporal del parámetro `cfl` (este
-$\mathrm{CN}$, por defecto 0,6) y de la mayor velocidad del sonido del mapa; los
-valores fuera de $(0, 1)$ se rechazan porque el esquema carece de sentido
-más allá del límite (Ec. 4.14). La sección 4 usa además un número de Courant
+$\mathrm{CN}$, por defecto 0,6) y de la mayor velocidad del sonido del mapa. El
+esquema solo es **condicionalmente estable**: con $\mathrm{CN} \le 1$ la
+actualización ni crea ni destruye energía, y por encima del límite todo modo
+de longitud de onda próxima a la escala de la malla crece exponencialmente,
+así que la ejecución llega a `inf` en unos pocos centenares de pasos en vez
+de degradarse con suavidad (Ec. 4.14). Por eso `fdtd_simulation` rechaza
+cualquier `cfl` fuera de $(0, 1)$ en lugar de dejar que la ejecución
+arranque. La sección 6 usa además un número de Courant
 *por eje*, $S = c\,\Delta t/\Delta x = \mathrm{CN}/\sqrt{2}$, en la relación de
 dispersión; los dos no son el mismo número, y el `cfl = 0.6` por defecto
 significa $S = 0{,}424$.
@@ -135,14 +140,21 @@ from phonometry import simulation
 
 # Un dominio de aire de 3.0 x 2.0 m: 300 x 200 celdas de 1 cm.
 res = simulation.fdtd_simulation(
-    343.0, 0.01, 2.0e-3, shape=(200, 300),
+    343.0,             # c: velocidad del sonido [m/s], escalar o mapa sobre la malla
+    0.01,              # dx: tamaño de celda cuadrada [m]
+    2.0e-3,            # duration: tiempo simulado [s] (dt se deriva, no se da)
+    shape=(200, 300),  # (ny, nx) celdas -> un dominio de 2.0 x 3.0 m
     sources=[simulation.GaussianPulse(ix=60, iy=100, width=3.0e-4)],
     probes=[(200, 100)],
 )
 print(res.size)                  # (3.0, 2.0)  metros
 print(round(res.dt * 1e6, 2))    # 12.37  microsegundos (CN = 0.6)
-res.plot()                       # historias de presión en las sondas (figura del §3)
+res.plot()                       # historias de presión en las sondas (figura de la sección 5)
 ```
+
+El paso temporal no es una entrada. Sale de `cfl` y de la mayor velocidad
+del sonido del mapa, y `res.dt` informa del valor que se usó: por eso la
+duración se da en segundos de tiempo simulado y nunca en pasos.
 
 La malla es de índices: la celda ``(ix, iy)`` tiene su centro en
 ``((ix + 0.5) * dx, (iy + 0.5) * dx)`` metros, con las filas dibujadas hacia
@@ -178,8 +190,7 @@ unidireccional por su propio mecanismo:
   excitan a la vez, de modo que el campo lanzado es plano en la
   transversal a precisión de máquina y lo que se dispersa hacia atrás
   cruza la línea intacto; con una esponja configurada detrás queda
-  absorbido (residuo de unos -38 dB para una CW en el montaje de arriba;
-  la cifra depende de la esponja).
+  absorbido.
 
 ```python
 from phonometry.simulation import FDTD2D, CWSource, PlaneWaveSource
@@ -192,21 +203,153 @@ sim.add_source(PlaneWaveSource("down", tone.value, offset=22))
 #                                              width=0.08, wavelength=0.34)
 ```
 
+Las dos afirmaciones cuantitativas de ese punto son medibles, y la figura de
+abajo las mide sobre exactamente esa escena. «Plano en la transversal a
+precisión de máquina» es literal: pasado el transitorio de llenado, cada
+columna del campo asentado lleva el *mismo* valor float64, así que la mayor
+diferencia a lo ancho de una fila es 0.0 y no simplemente pequeña.
+«Unidireccional» no lo es: la línea de inyección deja escapar un poco hacia
+atrás, y lo que queda detrás solo es pequeño porque ahí está la esponja para
+comérselo: 1,4 × 10⁻⁴ de la energía del campo, es decir −38,4 dB, se queda
+en las 20 filas de esponja de detrás de la línea, pero justo detrás de la
+línea la presión está apenas unos 26 dB por debajo de la onda que avanza.
+Aleja la línea de su esponja, u olvídate de la esponja, y esos 26 dB son lo
+que se te viene de vuelta.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_plane_wave_launch_es.webp" alt="Tres paneles de un lanzador unidireccional de onda plana. Izquierda: el campo de presión asentado de una onda continua de 1 kilohercio en un dominio de 0,8 por 1,6 metros, con la línea de inyección marcada cerca de la parte superior, bandas de esponja rayadas a lo largo de los bordes superior e inferior, y frentes de onda horizontales planos que llenan toda la región de avance. Centro: un corte transversal del frente, una línea perfectamente plana con la dispersión de pico a pico anotada como cero. Derecha: el nivel de cada fila respecto al campo que avanza, plano en 0 decibelios por delante de la línea, con una caída de unos 26 decibelios justo detrás de ella y por debajo de menos 60 decibelios al atravesar la esponja." width="94%" />
+
+*Qué aspecto tiene un lanzador unidireccional bien configurado: el frente es
+plano hasta el último bit de un float64 (centro), el campo que avanza
+mantiene amplitud unidad, y el residuo de detrás de la línea de inyección
+arranca 26 dB por debajo y queda enterrado por la esponja que lleva ese lado
+(derecha). La esponja no es un remate opcional: sin ella el residuo del
+reverso se refleja en el borde superior y vuelve a atravesar la medición.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# `FDTD2D`, `CWSource` y `PlaneWaveSource` son los nombres importados arriba.
+sim = FDTD2D(343.0, 0.01, shape=(160, 80), sponge_width=20,
+             sponge_sides=("top", "bottom"))
+sim.add_source(PlaneWaveSource(
+    "down", CWSource(0, 0, frequency=1000.0).value, offset=22))
+sim.run(700)                                   # rampa + llenado + unos periodos
+
+body = sim.p[60:140, :]
+print(float(np.abs(np.diff(body, axis=1)).max()))     # 0.0  exactamente plano
+back = float((sim.p[:20, :] ** 2).sum()) / float((sim.p ** 2).sum())
+print(round(10 * np.log10(back), 1))                  # -38.4  dB de energía
+
+rms = np.sqrt((sim.p ** 2).mean(axis=1))
+fig, (ax_f, ax_t, ax_l) = plt.subplots(1, 3, figsize=(13.5, 5.0))
+ax_f.imshow(sim.p, cmap="RdBu_r", vmin=-1.05, vmax=1.05)
+ax_t.plot(sim.p[80, :])                               # corte transversal
+ax_l.plot(20 * np.log10(rms / rms[60:140].mean()), np.arange(160))
+plt.show()
+```
+
+</details>
+
 La geometría se **rasteriza**: `obstacle_mask` marca celdas rígidas, y toda
 cara en contacto con una celda marcada se cierra (de nuevo la Ec. 4.32), así
-que paredes, barreras y difusores de cualquier forma son simples arrays
-booleanos. Cada lado del dominio puede llevar su propia condición de
-contorno:
+que paredes, barreras y dispersores de cualquier forma son simples arrays
+booleanos. Una cara está abierta o cerrada, sin nada intermedio, así que una
+superficie que corre a lo largo de un eje de la malla queda representada
+exactamente y cualquier otra se convierte en una **escalera** cuyos peldaños
+miden una celda. Esos peldaños dispersan energía que la superficie real no
+dispersa, desplazan la superficie efectiva hasta media celda y, como el error
+es una fracción fija de celda y no de longitud de onda, no se encoge al
+alargarse la onda. Es peor a incidencia rasante y en lo alto de la banda
+resuelta. La regla de trabajo es que un reflector inclinado o curvo necesita
+una malla más fina de la que pediría por sí sola la regla de dispersión de
+las diez celdas, con el mismo diagnóstico que para la dispersión: reduce
+$\Delta x$ a la mitad y confirma que el campo dispersado converge en vez de
+limitarse a cambiar. Por eso el panel mallado de la sección 4 corre a medio
+milímetro, mucho más fino de lo que exige su longitud de onda de 17 cm: allí
+la resolución la fija la geometría, no la longitud de onda.
+
+Cada lado del dominio puede llevar su propia condición de contorno:
 
 - ``"rigid"`` (por defecto): un reflector perfecto, $R = +1$.
 - ``"absorbing"``: una capa esponja de `absorbing_layer_cells` celdas cuya
   tasa de absorción crece cuadráticamente, emulando un contorno abierto (el
   precursor sencillo de las capas perfectamente adaptadas de la sección
-  4.2.3).
+  4.2.3 de Attenborough y Van Renterghem).
 - una **impedancia específica real** $Z$ en Pa·s/m (un escalar o un valor
   por celda de borde): el contorno de reacción local de las Ecs. 4.33-4.35,
   actualizado implícitamente, con coeficiente de reflexión a incidencia
   normal $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ es anecoico.
+
+**Las dos prestaciones no son intercambiables, y solo una de ellas es
+blanda.** Los cuatro *lados del dominio* pueden ser rígidos, esponja o una
+impedancia real de reacción local; todo lo dibujado en `obstacle_mask` es
+perfectamente rígido por construcción. Una sala modelada como paredes
+interiores dentro de un dominio mayor tiene, por tanto, paredes duras hagan
+lo que hagan los bordes, y no hay forma de darle a una superficie interior un
+coeficiente de absorción. Dos vías ablandan una superficie: ponerla en un
+borde del dominio y darle a ese borde una impedancia, o respaldarla con una
+región con pérdidas mediante el mapa `damping` de más abajo. Cuando basta con
+un borde, la conversión desde un coeficiente de absorción objetivo a
+incidencia normal son dos pasos: la magnitud de la reflexión es
+$|R| = \sqrt{1-\alpha}$, y para una impedancia real
+$Z = \rho c\,(1+R)/(1-R)$, así que $\alpha = 0{,}5$ pide
+$Z \approx 5{,}83\,\rho c$ y $\alpha = 0{,}9$ alrededor de $1{,}92\,\rho c$. La
+salvedad viene con ello: $R$ solo es exacto a incidencia normal, así que un
+borde de reacción local absorbe menos cuanto más oblicua es la incidencia, y
+una sala rodeada de bordes así decae más despacio de lo que sugiere su
+$\alpha$ nominal.
+
+**Pérdidas volumétricas: el mapa `damping`.** `damping` es una tasa de caída
+de amplitud $\sigma$ por celda, en s⁻¹, aplicada a la vez a la presión y a
+las dos componentes de la velocidad. Como ambos campos decaen juntos, una
+onda plana dentro de una región uniforme con pérdidas sigue
+$k = (\omega - j\sigma)/c$: la amplitud cae exponencialmente en el espacio a
+$\sigma/c$ neperios por metro mientras la impedancia característica se
+mantiene real en $\rho c$. Eso es un *fluido equivalente* (misma velocidad
+del sonido, misma densidad, pérdidas independientes de la frecuencia) y es
+la única pérdida volumétrica que tiene el esquema, de modo que también es la
+única manera de hacer que absorba una superficie *interior*. Dos vías para
+llegar a un valor. Como sustituto de la absorción de una sala,
+$\sigma = 6{,}91/T_{60}$ produce una caída reverberante de $T_{60}$ segundos,
+así que una caída de 0,5 s son $\sigma = 13{,}8$ s⁻¹. Como muestra, la pérdida
+por metro son $\sigma/c$ neperios ($8{,}69\,\sigma/c$ dB/m), y el valor se
+ajusta hasta que la muestra modelada reproduce una absorción medida. Los dos
+límites merecen decirse sin rodeos: como la pérdida es independiente de la
+frecuencia y la impedancia se mantiene real, esto **no** es un modelo de
+Delany-Bazley ni de Johnson-Champoux-Allard y no reproducirá la dependencia
+con la frecuencia de un absorbente real; y `FDTD2D` acepta un escalar *o* un
+mapa `(ny, nx)`, mientras que la función de conveniencia `fdtd_simulation`
+solo admite un escalar, así que un absorbente región a región hay que
+construirlo sobre el motor.
+
+```python
+import numpy as np
+
+# Un conducto con pérdidas de tres filas: la caída por metro es todo el
+# modelo. (`simulation` es el nombre que importó la sección 1.)
+sigma = 200.0                                     # tasa de caída de amplitud [1/s]
+lossy = simulation.FDTD2D(343.0, 0.01, shape=(3, 900), damping=sigma)
+x = (np.arange(900) + 0.5) * 0.01
+lossy.p[:] = np.exp(-(((x - 1.0) / 0.15) ** 2))[None, :]
+peaks = []
+for _ in range(round(0.020 / lossy.dt)):
+    lossy.step()
+    peaks.append((lossy.p[1, 200], lossy.p[1, 500]))
+peaks = np.abs(np.asarray(peaks))
+print(round(float(peaks[:, 1].max() / peaks[:, 0].max()), 3))  # 0.173
+print(round(float(np.exp(-sigma * 3.0 / 343.0)), 3))           # 0.174 exacto
+print(round(8.686 * sigma / 343.0, 2))         # 5.06 dB por metro
+print(round(6.91 / 13.82, 2))                  # 0.5 s de T60 con sigma = 13.82
+```
+
+La vía calibrada está al final de esta sección: la guía del tubo de
+impedancia excita este mismo esquema con un mapa `damping` y pasa el
+resultado por la reducción de ISO 10534-2, de modo que la absorción de la
+muestra modelada sale de una medición virtual y no del valor que entró.
 
 El motor de avance `FDTD2D` también es público: expone `step()`, `run()`,
 los arrays del campo y la energía, para quien necesite acceso fotograma a
@@ -240,14 +383,14 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 2))  # 0.5
 Antes de gastar un solo paso de tiempo, `sim.plot_geometry()` dibuja el
 dominio configurado: bordes, esponjas, obstáculos, fuentes y las sondas que
 piensas registrar. Pillar una esponja en el lado equivocado o una sonda mal
-colocada cuesta segundos aquí y una simulación entera después.
+colocada cuesta segundos aquí y una ejecución entera después.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_es.svg" alt="Dibujo de configuración de un dominio FDTD de 4,5 por 3 metros antes de cualquier paso de tiempo: capas de esponja azul pálido a lo largo de los bordes izquierdo y derecho, un borde de impedancia naranja a lo largo del borde superior, un obstáculo rectangular gris justo a la izquierda del centro, la estrella de la fuente en (0.5, 1.5) y dos círculos de sonda en (3, 1.5) y (4, 2), con una leyenda que nombra la capa de esponja, el borde de impedancia, el borde rígido, la fuente y la sonda" width="88%" />
 
 *Todo lo que la simulación verá, antes de correrla: las capas de esponja se
 comen los contornos izquierdo y derecho, el borde superior lleva la
-impedancia anecoica $\rho c$, el fondo sin tratar queda rígido, y las dos sondas
-quedan libres del obstáculo y de las esponjas.*
+impedancia anecoica $\rho c$, el borde inferior sin tratar queda rígido, y las
+dos sondas quedan libres del obstáculo y de las esponjas.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -271,6 +414,47 @@ plt.show()
 
 </details>
 
+### Comprobaciones de que una ejecución es utilizable
+
+`plot_geometry` pilla una escena mal construida. Estas seis pillan una
+ejecución mal *calculada*, y cada una de ellas es una línea o dos:
+
+1. **La energía no debe crecer con el tiempo.** `FDTD2D.energy()` devuelve la
+   energía total del campo en julios por metro de profundidad. Sube mientras
+   la fuente inyecta y luego se asienta en una meseta, con una fluctuación de
+   en torno al 1 % porque la presión y la velocidad están separadas medio
+   paso temporal; en un dominio cerrado sin pérdidas la meseta es plana, y con
+   una esponja o un mapa `damping` decae. Un total que sube después de apagar
+   la fuente es energía que se está creando, y la ejecución no sirve por
+   verosímil que parezca la instantánea.
+2. **`np.isfinite(sim.p).all()`** pilla una divergencia antes de que envenene
+   una FFT en silencio: en cuanto una sola celda es `inf`, todo espectro
+   sacado de ese registro es `nan` y el gráfico sale vacío en vez de salir
+   mal.
+3. **Ninguna sonda dentro de una esponja, de un obstáculo o de una celda de
+   fuente.** Las tres leen algo que no es el campo: una celda de obstáculo
+   vale exactamente 0.0 durante toda la ejecución, una celda de esponja lee
+   el campo ya atenuado camino de la salida, y una celda de fuente blanda lee
+   sobre todo la inyección; en la escena de la barrera de la sección 5, una
+   sonda sobre la celda de la fuente marca un pico 6,7 veces mayor que la
+   sonda A, a 0,4 m, y una sonda dentro de la barrera lee exactamente 0.0
+   durante toda la ejecución.
+4. **Aplica la regla de las diez celdas con la velocidad del sonido *más
+   baja* del mapa**, a la frecuencia más alta que el análisis vaya a usar de
+   verdad, no con el valor del aire ni con la frecuencia más alta que la
+   fuente excite por casualidad (la sección 3 dimensiona ambas).
+5. **Vuelve a ejecutar con la mitad de tamaño de celda y confirma que la
+   respuesta se mueve menos que la tolerancia que necesita tu afirmación.** El
+   esquema es de segundo orden, así que una magnitud limitada por la
+   dispersión debería moverse unas cuatro veces menos al partir por la mitad
+   el paso de malla; una magnitud que se mueve otro tanto está limitada por
+   otra cosa: el escalonado de arriba, o la longitud del registro.
+6. **En una escena que se pretende anecoica, ejecútala una vez sin el
+   dispersor** y comprueba que el residuo queda por debajo del nivel que
+   piensas dar. Esa resta es exactamente lo que automatiza
+   `ContourPhasors.subtract()` en la sección 4, y lo que hace la medición de
+   absorción in situ de ISO 13472-1 sobre una carretera real.
+
 Un dominio de tres filas con paredes rígidas es un tubo de onda plana, y con
 el mapa de `damping` por celda una muestra porosa se convierte en un fluido
 equivalente, lo que convierte a la propia simulación en una probeta medible: la
@@ -282,7 +466,105 @@ transmisión analíticas de la muestra modelada con las propias cadenas de
 reducción de la biblioteca (los contrastes de `tests/simulation` lo ejecutan
 en cada commit).
 
-## 2b. Del campo cercano al campo lejano
+## 3. Dimensionar una ejecución
+
+La sección 6 deduce la única regla que da la mayoría de los textos de FDTD
+(diez celdas por longitud de onda más corta) y esa regla decide solo
+$\Delta x$. Otros cuatro números deciden si la ejecución dice algo en
+absoluto: el **ancho de banda de la fuente**, la **duración de la
+ejecución**, el **grosor de la esponja** y, para una medición en régimen
+estacionario, el **transitorio** que se tira antes de la **ventana DFT** que
+se conserva. Cada uno tiene su regla, y cada uno falla en silencio cuando
+está mal.
+
+**Ancho de banda de la fuente.** Un `GaussianPulse` de semianchura `width`
+es $s(t) = A\,e^{-((t-t_0)/\text{width})^2}$, cuyo espectro de magnitud es
+$e^{-(\pi f\,\text{width})^2}$: queda 20 dB por debajo en
+$f = 0{,}483/\text{width}$ y 40 dB por debajo en $0{,}683/\text{width}$.
+Trabaja en la dirección del lector: elige $f_\text{max}$, saca de ahí
+$\Delta x$, y toma después $\text{width} \ge 0{,}5/f_\text{max}$; así el
+pulso está al menos 20 dB por debajo donde la malla deja de resolver. De
+forma equivalente, en términos de la malla,
+$\text{width} \ge 4{,}83\,\Delta x/c_\text{min}$, que con $\Delta x = 1$ cm
+en aire son $1{,}4 \times 10^{-4}$ s, y es la razón por la que los ejemplos
+de aquí usan $3 \times 10^{-4}$ s, excitando hasta unos 1,6 kHz dentro de
+los 3,4 kHz que la malla resuelve. La energía por encima de $f_\text{max}$
+no es un error en sí misma; simplemente viaja a la velocidad equivocada y
+vuelve como una cola de rizado detrás del pulso. La ejecución en caja rígida
+de la sección 6 lee un modo a 299 Hz sobre una malla cuyo límite de diez
+celdas está en 1,7 kHz, así que su pulso más estrecho de
+$2 \times 10^{-4}$ s no le cuesta nada. Para un estudio a una sola
+frecuencia, `CWSource` esquiva la cuestión por completo.
+
+**Duración.** La fijan tres cosas, y manda la mayor. *Geometría*: como
+mínimo el tiempo de cruce del dominio $\sqrt{L_x^2 + L_y^2}/c$, más un viaje
+de ida y vuelta al reflector por cada eco que importe. *Decaimiento*: lo
+bastante larga para que el rasgo se vea por encima de lo que aún resuena.
+*Espectro*: una FFT de sonda resuelve $1/T$, así que separar dos modos que
+distan 3 Hz cuesta un tercio de segundo de registro por fina que sea la
+malla, que es exactamente por lo que la ejecución de modos de sala de abajo
+dura 0,35 s y la de la barrera 9 ms.
+
+**Grosor de la esponja.** La capa hace crecer cuadráticamente una tasa de
+absorción $\sigma$ desde cero en su cara interior hasta un máximo en el
+borde exterior. Como $\sigma$ hace decaer a la vez la presión y la
+velocidad, la impedancia característica dentro de ella se mantiene en
+$\rho c$ y una región con pérdidas *uniforme* no reflejaría nada; todo lo
+que vuelve lo refleja el *gradiente*. Eso convierte la regla en una regla en
+**celdas**, no en longitudes de onda, y merece la pena ver la medición,
+tomada a incidencia normal sobre un conducto de onda plana:
+
+| `sponge_width` | 5 | 10 | 20 | 40 | 60 |
+|---|---|---|---|---|---|
+| eco/incidente a 1 kHz | −36 dB | −49 dB | −62 dB | −76 dB | −85 dB |
+| eco/incidente a 125 Hz | — | — | −61 dB | — | — |
+
+Una capa de 20 celdas devuelve −61 dB a 125 Hz, donde mide 0,07 longitudes
+de onda de grosor, y −64 dB a 2 kHz, donde mide 1,2 longitudes de onda: el
+residuo es plano dentro de 3 dB sobre un margen de frecuencias de 16:1.
+Veinte celdas son un buen suelo; cuarenta, generosas. `sponge_reflection`
+(por defecto $10^{-4}$) fija la amplitud de ida y vuelta para la que la
+rampa está *diseñada*, y no es una promesa: con 20 celdas el residuo medido
+es de −51 dB para $10^{-2}$, −62 dB para $10^{-4}$ y −59 dB para $10^{-6}$,
+porque un objetivo más agresivo hace la rampa más abrupta y una rampa más
+abrupta refleja más. El valor por defecto está cerca del óptimo, y la manera
+de comprar más es el grosor.
+
+Dos cosas que la esponja no hace. La primera, es mucho más débil a
+incidencia **oblicua y rasante**, donde una onda que corre a lo largo de la
+capa atraviesa muy pocas celdas de la rampa por longitud de onda recorrida.
+Toma esa misma capa de 20 celdas, pon una fuente de pulso 1 m por encima y
+mide lo que la capa añade a una sonda a la misma altura volviendo a ejecutar
+con la capa a 5 m y restando: lo que añade es −30 dB respecto a la llegada
+directa a 27° de la normal, −18 dB a 45°, −10 dB a 60° y −3 dB a 80°, frente
+a los −62 dB que esa misma capa da a incidencia normal. Un dominio largo y
+poco profundo forrado de esponjas es, por tanto, un conducto y no un campo
+libre. La prueba honesta es la que se acaba de describir: aleja el contorno
+y confirma que la traza de la sonda no cambia. La segunda, la esponja no es
+sitio para colocarse: sondas, fuentes y obstáculos van todos fuera de la
+capa (comprobación 3 de arriba).
+
+**Transitorio y ventana.** Una medición en régimen estacionario se ejecuta
+en dos partes: llenar el dominio, llamar a `probe.reset()` e integrar
+después sobre un número exacto de periodos de la fuente. El transitorio que
+se descarta es el tiempo de llenado del dominio $\sqrt{L_x^2+L_y^2}/c$, más
+una travesía por cada reflexión que todavía importe, más el arranque de la
+fuente (`ramp_cycles / frequency`, tres periodos por defecto), más el tiempo
+que tarde en cargarse cualquier geometría resonante, del orden de $Q$
+periodos, que es toda la razón por la que la ejecución del metadifusor de
+abajo espera 8 ms donde el monopolo desnudo espera 4,5 ms: sus cuellos y
+cavidades son resonadores y tienen que llenarse. La ventana que viene
+después debería abarcar un número entero de periodos de la fuente, para que
+la DFT al vuelo no vea truncamiento; con diez periodos sobra.
+
+En una línea: $\Delta x$ a partir de $f_\text{max}$ y $c_\text{min}$,
+$\Delta t$ a partir del número de Courant y $c_\text{max}$, `width` a partir
+de $\Delta x$, la esponja a partir del presupuesto de celdas, la duración a
+partir de la geometría y de la resolución espectral, el transitorio a partir
+del dominio y de sus resonancias, y la ventana a partir del periodo de la
+fuente.
+
+## 4. Del campo cercano al campo lejano
 
 Una respuesta polar o un coeficiente de difusión son magnitudes de campo
 lejano, pero una caja FDTD termina a un par de longitudes de onda del
@@ -293,8 +575,8 @@ rectángulo cerrado de caras de celda, en acumuladores complejos (una DFT al
 vuelo por punto y frecuencia, así que un régimen de onda continua no
 almacena historias temporales), y la integral propaga esos fasores hasta el
 infinito con la función de Green de espacio libre $-(j/4)\,H_0^{(2)}(kR)$, la
-misma construcción con la que los códigos FEM de onda completa
-publican patrones de dispersión desde el campo cercano. Dos propiedades
+misma construcción con la que los códigos FEM de onda completa obtienen los
+patrones de dispersión a partir del campo cercano. Dos propiedades
 sostienen el esquema: la malla escalonada ya guarda $v_n$ exactamente en
 las caras del contorno, y todo campo cuyas fuentes queden *fuera* del
 contorno integra a nada (extinción), de modo que los fasores del campo
@@ -303,6 +585,12 @@ campo lejano *dispersado*. En el esquema discreto esa cancelación deja
 un residuo de dispersión numérica de malla (por debajo de 0,01 dB en las
 escenas validadas aquí); `ContourPhasors.subtract()` lo elimina con una
 pasada de referencia sin dispersor cuando esa última fracción importa.
+
+Nada de eso se ve en la aritmética de índices que hacen los fragmentos, así
+que aquí está la escena que construye de verdad la ejecución del metadifusor
+de abajo, en su proporción real.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ntff_contour_es.svg" alt="Dibujo de configuración de una escena FDTD de dispersión con transformación de campo cercano a lejano, en proporciones reales: un dominio de 980 por 346 celdas a medio milímetro por celda, bandas de esponja rayadas de sesenta celdas de grosor en los cuatro lados, una línea de inyección de onda plana justo dentro de la esponja superior con flechas hacia abajo, el panel metadifusor de cinco celdas como un bloque gris que cruza el centro, un contorno de captura rojo que lo encierra con normales salientes en los cuatro lados y sus holguras acotadas en celdas, y un arco de campo lejano discontinuo dibujado fuera del dominio con rayos a menos sesenta, cero y más sesenta grados respecto a la normal del panel, en torno a un origen situado en el centro de la cara del panel" width="94%" />
 
 ```python
 import numpy as np
@@ -430,17 +718,69 @@ plt.show()
 
 </details>
 
-## 3. Cuándo usarlo, y los límites del 2D
+Por qué se desplazan los nulos es una pregunta sobre geometría, y merece la
+pena poner las dos geometrías una al lado de la otra: el panel que tasa el
+modelo y el panel sobre el que avanza el esquema.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_meshed_panel_es.webp" alt="Tres dibujos apilados del mismo panel metadifusor de cinco celdas. Arriba: la celda unidad idealizada sobre la que trabaja la matriz de transferencia, dibujada a escala con el paso de 70 milímetros, la profundidad de 20 milímetros y la anchura de panel de 350 milímetros acotados. En medio: ese mismo panel como la máscara booleana de obstáculos sobre la que avanza la ejecución FDTD a medio milímetro por celda, con la quinta celda recuadrada. Abajo: esa quinta celda ampliada, con la ranura de 20,3 milímetros, los dos resonadores escalonados, el fondo rígido de 3 milímetros y el cuello de 3,2 milímetros que abarca seis celdas, todos etiquetados" width="94%" />
+
+*Lo que homogeneiza la matriz de transferencia, frente a lo que ve de verdad
+el esquema. El modelo convierte cada celda de 70 mm en un único coeficiente
+de reflexión de reacción local; la máscara conserva cada ranura, cuello y
+cavidad, y el acoplamiento evanescente entre bocas vecinas sale gratis
+porque las bocas están realmente ahí. El cuello más estrecho mide 3,2 mm
+(seis celdas con $\Delta x = 0{,}5$ mm) y es él, y no la longitud de onda de
+17,2 cm, quien fuerza la malla. En esa diferencia está el origen de los
+nulos desplazados.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# La vista del modelo (panel superior) la dibuja la propia biblioteca, a
+# partir de los mismos `wells` que construyó el bloque de arriba:
+#     from phonometry.materials import plot_metadiffuser_panel_geometry
+#     plot_metadiffuser_panel_geometry(wells, depth=0.02, period=0.07)
+
+# La vista del esquema: la máscara booleana que malló el bloque de arriba, y
+# una celda suya ampliada.
+fig, (ax_all, ax_cell) = plt.subplots(2, 1, figsize=(11, 6))
+ax_all.imshow(mask[r_face - 40:r_face + slab + 20, lat - 20:lat + face + 20],
+              cmap="Greys", interpolation="nearest")
+cell = lat + round(4 * pitch / dx)
+ax_cell.imshow(mask[r_face - 40:r_face + slab + 20,
+                    cell:cell + round(pitch / dx)],
+               cmap="Greys", interpolation="nearest")
+plt.show()
+```
+
+</details>
+
+## 5. Cuándo merece la pena una simulación de ondas, y qué cambia el 2D
 
 FDTD amortiza su coste cuando la **geometría gobierna la física**: difracción
 en torno a una barrera o a través de una abertura, interferencia de caminos
 directo y reflejado, dispersión por obstáculos, comportamiento modal de
 recintos de forma irregular, refracción en un gradiente de velocidad del
 sonido. Una sola ejecución captura **todas las frecuencias a la vez** (un
-pulso excita toda la banda; una FFT de una sonda da el espectro), donde un
-método en el dominio de la frecuencia necesita una resolución por frecuencia.
+pulso excita toda la banda; una FFT de una sonda da el espectro), mientras
+que un método en el dominio de la frecuencia necesita resolver el sistema
+una vez por cada frecuencia.
+
+La ejecución de la barrera de abajo es el arquetipo. Nada en su entrada dice
+«difracción»: la barrera son cuatro columnas de un array booleano, la fuente
+es un pulso, y la llegada a la zona de sombra está ahí de todas formas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_simulation_es.webp" alt="Dos paneles. Izquierda: una instantánea del campo de presión en un dominio de 3 por 2 metros con una barrera rígida vertical delgada, mostrando el frente directo, la reflexión que vuelve hacia la fuente y la onda difractada en el borde de la barrera, con la fuente marcada con una estrella y dos sondas con puntos. Derecha: la historia de presión en ambas sondas; la sonda con visión directa muestra el pulso directo y la reflexión de la barrera, la sonda en sombra una llegada difractada más débil y retardada" width="96%" />
+
+*Una ejecución, dos vistas. La instantánea (izquierda, a los 6,5 ms) recoge
+el frente directo, la reflexión que vuelve pasando junto a la fuente y la
+onda que dobla el borde superior de la barrera. En las trazas (derecha), la
+sonda A, con visión directa, registra el pulso directo y después la
+reflexión de la barrera, mientras que la sonda B, en sombra, solo registra
+la llegada más débil y más tardía que vino rodeando el borde: una amplitud y
+un retardo que ninguna fórmula de divergencia más atenuación produce por sí
+sola.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -476,10 +816,94 @@ plt.show()
 
 A la inversa, cuando existe una forma cerrada validada (reverberación
 estadística, atenuación en exteriores de ISO 9613-2, fuentes imagen en una
-sala rectangular), la forma cerrada es miles de veces más barata: esta
-simulación es el contraste y el demostrador, no el sustituto. El oráculo
-funciona en ambos sentidos; una ejecución en caja rígida reproduce los modos
-analíticos de la sala:
+sala rectangular), esa forma cerrada es miles de veces más barata, y esta
+simulación es el contraste y el demostrador más que el sustituto. La sección
+6 muestra uno de esos contrastes reproduciendo los modos analíticos de la
+sala.
+
+**Lo que cuesta una ejecución.** El trabajo son celdas × pasos, y el avance
+monohilo en float64 hace del orden de $10^8$ actualizaciones de celda por
+segundo (medido: $8 \times 10^7$ en la máquina que renderiza estas figuras).
+La escena de la barrera de arriba son 200 × 300 celdas durante 728 pasos:
+$4{,}4 \times 10^7$ actualizaciones, medio segundo. La escena del
+metadifusor de la sección 4 se malla a 0,5 mm en 346 × 980 celdas y corre
+unos 14 000 pasos: $4{,}8 \times 10^9$ actualizaciones, alrededor de un
+minuto. El escalado entre esas dos es la parte que conviene recordar. En 2D,
+reducir $\Delta x$ a la mitad cuadruplica el número de celdas *y*, por la
+condición de Courant, duplica el número de pasos, así que el trabajo se
+multiplica **por ocho** a cambio de dividir entre cuatro el error de
+dispersión. La regla de las diez celdas es, por tanto, un suelo en el que
+asentarse y no un objetivo que batir.
+
+La memoria sigue la misma aritmética. El esquema guarda doce mapas
+`float64` (la presión, las dos componentes de la velocidad, la velocidad del
+sonido, la densidad, el módulo de compresibilidad, las densidades en las
+caras y los factores de caída): unos 96 bytes por celda, 113 con una máscara
+de obstáculos, así que la escena del metadifusor vive en unos 39 MB. Las
+instantáneas almacenadas son el mando que nadie nombra: cada una son otros 8
+bytes por celda, así que `snapshot_every=1` sobre esa escena pediría del
+orden de 38 GB. Elige la cadencia a partir del número de fotogramas que
+quieres de verdad; las animaciones de esta documentación usan unos
+centenares. Las historias de sonda cuestan un float por sonda y por paso,
+que no es nada. El orden práctico de trabajo es dimensionar la malla a
+partir de $f_\text{max}$, estimar el número de pasos a partir de la
+duración, y probar el conjunto una vez con el doble de tamaño de celda para
+comprobar la geometría y la colocación de las sondas antes de pagar la
+ejecución de verdad.
+
+El dominio es **bidimensional**, y eso cambia la física, no solo el coste.
+Una fuente puntual 2D es físicamente una **fuente lineal** infinita: su
+amplitud se expande cilíndricamente como $1/\sqrt{r}$ (3,0 dB por
+duplicación de distancia) en lugar del $1/r$ esférico (6,0 dB) de una
+fuente puntual 3D, y la respuesta impulsional 2D arrastra una estela tras el
+frente en vez de pasar limpiamente. Los *patrones* de interferencia y
+difracción son fieles; los niveles absolutos y las tasas de caída no son los
+de una sala 3D. Trata las ejecuciones 2D como secciones y demostraciones, y
+valida cualquier afirmación cuantitativa 3D contra una forma cerrada o un
+cálculo 3D.
+
+<span id="dispersion-numerica-y-precision"></span>
+
+## 6. Dispersión numérica y precisión
+
+La malla discreta propaga cada frecuencia a una velocidad ligeramente
+errónea: las longitudes de onda cortas se retrasan, así que un pulso agudo
+desarrolla una cola de rizado y las resonancias se desplazan un poco. Esta
+**dispersión numérica** es la contrapartida discreta de la Ec. 4.15; sobre
+los ejes de una malla cuadrada la relación de dispersión del esquema es
+
+$$
+\sin\!\left(\frac{\omega\,\Delta t}{2}\right)
+  = \frac{c\,\Delta t}{\Delta x}\,
+    \sin\!\left(\frac{k\,\Delta x}{2}\right),
+$$
+
+con un error relativo de frecuencia a primer orden de magnitud
+$(1 - S^2)\,(k\,\Delta x)^2 / 24$ sobre los ejes de la malla (la frecuencia
+modelada queda por debajo de la real, así que el error con signo es
+negativo), donde $S = c\,\Delta t / \Delta x$ es el número de Courant **por
+eje**, que con celdas cuadradas es el valor de `cfl` dividido por $\sqrt{2}$:
+el `cfl = 0.6` por defecto da $S = 0{,}424$ y $1 - S^2 = 0{,}82$; el error es
+máximo exactamente sobre un
+eje y se anula a lo largo de la diagonal de las celdas en el límite de
+Courant $\mathrm{CN} = 1$. La regla práctica es resolver **al menos 10 celdas por
+longitud de onda más corta**, $\Delta x \le c_\text{min} / (10 f_\text{max})$ con la velocidad
+de sonido más baja del dominio: con exactamente 10 celdas la cota de
+Courant pequeño $(k\,\Delta x)^2 / 24$ da alrededor del 1,6 %, que el factor
+$1 - S^2$ reduce a en torno al 1,4 % con el ``cfl = 0.6`` por defecto
+(en un dominio heterogéneo el paso temporal lo fijan las celdas más
+rápidas, así que las regiones lentas trabajan a un número de Courant local
+menor y quedan más cerca de la cota del 1,6 %), y toda componente mejor
+resuelta o fuera de eje es más precisa. Con
+$\Delta x = 1$ cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
+reducir $\Delta x$ a la mitad divide el error entre cuatro (el esquema es de
+segundo orden, y la batería de validación mide ese orden observado bajo
+refinamiento de malla).
+
+La verificación funciona en los dos sentidos: aquí la forma cerrada ancla el
+esquema, y una vez anclado es el esquema el que pone a prueba una forma
+cerrada fuera de sus propias hipótesis. Una ejecución en caja rígida
+reproduce los modos analíticos de la sala.
 
 ```python
 import numpy as np
@@ -493,6 +917,10 @@ res = simulation.fdtd_simulation(
     probes=[(nx - 4, ny - 3)],
 )
 p = res.pressures[0]
+# Enventana el registro (termina con los modos todavía resonando sin
+# amortiguar, y un truncamiento abrupto emborrona todos los picos) y
+# rellénalo con ceros por ocho, lo que interpola la posición del pico sin
+# añadir resolución real.
 spec = np.abs(np.fft.rfft(p * np.hanning(p.size), n=8 * p.size))
 freqs = np.fft.rfftfreq(8 * p.size, res.dt)
 sel = (freqs > 250) & (freqs < 350)
@@ -502,13 +930,15 @@ print(round(float(freqs[sel][np.argmax(spec[sel])]), 1))        # 298.9  medido
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes_es.svg" alt="Espectro de la presión en la sonda de una caja FDTD rígida de 1,0 por 0,7 metros entre 100 y 450 Hz: cinco picos agudos que caen sobre las frecuencias modales analíticas punteadas de los modos (1,0), (0,1), (1,1), (2,0) y (2,1)" width="88%" />
 
-*El espectro en la sonda del ensayo de caja rígida presenta sus picos
-exactamente sobre las frecuencias modales analíticas
+*El espectro en la sonda del ensayo de caja rígida presenta sus picos sobre
+las frecuencias modales analíticas
 $f = (c/2)\sqrt{(n_x/L_x)^2 + (n_y/L_y)^2}$ (Kuttruff 6.ª ed., cap. 3). El
-desplazamiento apenas visible hacia la izquierda de los picos más altos es
-la dispersión numérica del §4: las longitudes de onda cortas viajan
-ligeramente lentas en la malla, así que las resonancias modeladas leen por
-debajo en una fracción de porcentaje.*
+pico (1,1) cae un 0,05 % por debajo y la cota de arriba predice un 0,04 %,
+pero esa coincidencia hay que leerla con cuidado: con 0,35 s la separación
+de bins bruta es de 2,9 Hz y el relleno de ceros por ocho interpola hasta
+0,36 Hz, así que el desplazamiento de 0,15 Hz está en el límite de lo que el
+registro puede resolver. Establecer bien el error de dispersión pasa por
+refinar la malla, no por mirar un pico con más ganas.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -546,58 +976,11 @@ plt.show()
 
 </details>
 
-El dominio es **bidimensional**, y eso cambia la física, no solo el coste.
-Una fuente puntual 2D es físicamente una **fuente lineal** infinita: su
-amplitud se expande cilíndricamente como $1/\sqrt{r}$ (3,0 dB por
-duplicación de distancia) en lugar del $1/r$ esférico (6,0 dB) de una
-fuente puntual 3D, y la respuesta impulsional 2D arrastra una estela tras el
-frente en vez de pasar limpiamente. Los *patrones* de interferencia y
-difracción son fieles; los niveles absolutos y las tasas de caída no son los
-de una sala 3D. Trata las ejecuciones 2D como secciones y demostraciones, y
-valida cualquier afirmación cuantitativa 3D contra una forma cerrada o un
-cálculo 3D.
-
-<span id="dispersion-numerica-y-precision"></span>
-
-## 4. Dispersión numérica y precisión
-
-La malla discreta propaga cada frecuencia a una velocidad ligeramente
-errónea: las longitudes de onda cortas se retrasan, así que un pulso agudo
-desarrolla una cola de rizado y las resonancias se desplazan un poco. Esta
-**dispersión numérica** es la contrapartida discreta de la Ec. 4.15; sobre
-los ejes de una malla cuadrada la relación de dispersión del esquema es
-
-$$
-\sin\!\left(\frac{\omega\,\Delta t}{2}\right)
-  = \frac{c\,\Delta t}{\Delta x}\,
-    \sin\!\left(\frac{k\,\Delta x}{2}\right),
-$$
-
-con un error relativo de frecuencia a primer orden de magnitud
-$(1 - S^2)\,(k\,\Delta x)^2 / 24$ sobre los ejes de la malla (la frecuencia
-modelada queda por debajo de la real, así que el error con signo es
-negativo), donde $S = c\,\Delta t / \Delta x$ es el número de Courant **por
-eje**, que con celdas cuadradas es el valor de `cfl` dividido por $\sqrt{2}$:
-el `cfl = 0.6` por defecto da $S = 0{,}424$ y $1 - S^2 = 0{,}82$; el error es
-máximo exactamente sobre un
-eje y se anula a lo largo de la diagonal de las celdas en el límite de
-Courant $\mathrm{CN} = 1$. La regla práctica es resolver **al menos 10 celdas por
-longitud de onda más corta**, $\Delta x \le c_\text{min} / (10 f_\text{max})$ con la velocidad
-de sonido más baja del dominio: con exactamente 10 celdas la cota de
-Courant pequeño $(k\,\Delta x)^2 / 24$ da alrededor del 1,6 %, que el factor
-$1 - S^2$ reduce a en torno al 1,4 % con el ``cfl = 0.6`` por defecto
-(en un dominio heterogéneo el paso temporal lo fijan las celdas más
-rápidas, así que las regiones lentas trabajan a un número de Courant local
-menor y quedan más cerca de la cota del 1,6 %), y toda componente mejor
-resuelta o fuera de eje es más precisa. Con
-$\Delta x = 1$ cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
-reducir $\Delta x$ a la mitad divide el error entre cuatro (el esquema es de
-segundo orden, y la batería de validación mide ese orden observado bajo
-refinamiento de malla). Los tests anclan el esquema a oráculos
-analíticos: autofrecuencias de caja y de conducto, tiempos de llegada en
-campo libre y caída cilíndrica, el eco de la fuente imagen de una pared
-rígida, el coeficiente de reflexión de impedancia anterior y la propia
-relación de dispersión.
+Los tests anclan el esquema a oráculos analíticos de la misma manera:
+autofrecuencias de caja y de conducto, tiempos de llegada en campo libre y
+caída cilíndrica, el eco de la fuente imagen de una pared rígida, el
+coeficiente de reflexión de impedancia de la sección 2 y la propia relación
+de dispersión.
 
 El `FDTDResult` congelado lleva el eje temporal, las historias de presión por
 sonda, las posiciones de las sondas en metros, los metadatos de la malla, las
@@ -624,12 +1007,19 @@ Courant (Ecs. 4.13-4.14), el contorno rígido (Ec. 4.32) y el contorno de
 impedancia real independiente de la frecuencia (Ecs. 4.33-4.35), expuestos a
 través de `fdtd_simulation`/`FDTD2D` con las fuentes `GaussianPulse`,
 `CWSource` y `SignalSource`, sondas de presión y una `obstacle_mask`
-rasterizada. Validado contra oráculos en forma cerrada: los modos normales de
+rasterizada, con `damping` como única pérdida volumétrica. La sección 3
+deduce las cuatro reglas de dimensionado que la regla de resolución no
+cubre (el ancho de banda de la fuente, la duración de la ejecución, el
+grosor de la esponja en celdas, y el transitorio y la ventana DFT de una
+medición en régimen estacionario), y la sección 2 enumera las seis
+comprobaciones que dicen si una ejecución sirve.
+Validado contra oráculos en forma cerrada: los modos normales de
 sala rígida (Kuttruff cap. 3), los tiempos de llegada en campo libre y el
 decaimiento cilíndrico en 2D, el eco de imagen de pared rígida, el
-coeficiente de reflexión de impedancia y la relación de dispersión del §4,
-con el orden de convergencia medido coincidiendo con el diseño de segundo
-orden del esquema. La cadena de campo cercano a lejano del §2b: captura de
+coeficiente de reflexión de impedancia y la relación de dispersión de la
+sección 6, con el orden de convergencia medido coincidiendo con el diseño de
+segundo orden del esquema. La cadena de campo cercano a lejano de la
+sección 4: captura de
 fasores sobre contorno cerrado (`add_contour_probe`) y la integral de
 Kirchhoff-Helmholtz 2D (`far_field_from_contour`, Williams cap. 8),
 validada contra los campos exactos de las fuentes lineales monopolo y
@@ -637,7 +1027,12 @@ dipolo, la propiedad de extinción, y los paneles QRD y metadifusor
 mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
 la biblioteca.
 
-**No cubierto.** El esquema es solo bidimensional: modela una fuente
+**No cubierto.** La geometría interior es rígida por construcción: solo los
+cuatro lados del dominio aceptan una impedancia o una esponja, así que una
+superficie interior solo puede ablandarse respaldándola con una región
+`damping` con pérdidas, y esa región es un fluido equivalente independiente
+de la frecuencia y no un modelo poroso. El esquema es solo
+bidimensional: modela una fuente
 lineal en sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la
 propagación esférica $1/r$ de una fuente puntual 3D, así que los niveles
 absolutos y las tasas de decaimiento no son los de una sala 3D. El contorno
@@ -656,7 +1051,7 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
   el esquema compañero P-SV sobre la misma malla escalonada, con ondas
   de Rayleigh y de Scholte, conversión de modo y placas sumergidas.
 - [Informe de conformidad](/phonometry/es/reference/conformance/): dos de los anclajes
-  de validación en forma cerrada del §4 se ejecutan ahí.
+  de validación en forma cerrada de la sección 6 se ejecutan ahí.
 - Referencia de la API: [`simulation.fdtd`](/phonometry/es/reference/api/simulation/fdtd/),
   [`simulation.ntff`](/phonometry/es/reference/api/simulation/ntff/).
 
@@ -674,6 +1069,21 @@ $S = \mathrm{cfl}/\sqrt{2} = 0{,}424$, así que el factor $1 - S^2$ vale 0,82), 
 reducir $\Delta x$ a la mitad divide el error entre
 cuatro (el esquema es de segundo orden). Con $\Delta x = 1$ cm el punto de 10
 celdas en aire queda hacia los 3,4 kHz.
+
+### ¿Qué anchura deben tener el pulso de fuente y la esponja?
+
+El espectro del `GaussianPulse` es $e^{-(\pi f\,\text{width})^2}$, 20 dB por
+debajo en $f = 0{,}483/\text{width}$, así que con
+`width` $\ge 0{,}5/f_\text{max}$ la energía inyectada se mantiene dentro de
+la banda que la malla resuelve. La esponja es una regla en **celdas**, no en
+longitudes de onda: como su tasa de absorción actúa a la vez sobre la
+presión y sobre la velocidad, la capa conserva una impedancia real $\rho c$
+y solo refleja su *gradiente*. Veinte celdas devuelven unos −61 dB a
+incidencia normal, planos dentro de 3 dB de 125 Hz a 2 kHz; cuarenta celdas
+devuelven unos −76 dB. Apretar `sponge_reflection` más allá de su valor por
+defecto de 1e-4 hace la rampa más abrupta y empeora el residuo. La sección 3
+desarrolla todo esto, y con ello la duración de la ejecución y la ventana
+DFT.
 
 ### ¿Qué número de Courant mantiene estable una simulación FDTD?
 

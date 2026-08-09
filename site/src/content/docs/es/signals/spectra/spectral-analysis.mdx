@@ -78,6 +78,20 @@ absoluta se conserva: una señal en pascales da Pa²/Hz. Hay dos escalados:
 `'density'` (unidades²/Hz, integra a la potencia de la señal) y `'spectrum'`
 (unidades², lee directamente la potencia de tonos discretos).
 
+El precio de conservar la calibración es que cualquier desplazamiento de
+continua o deriva lenta se queda en el registro y se filtra. El desplazamiento
+cae en el bin de continua, y los lóbulos laterales de la ventana de Hann
+reparten una fracción de él por los primeros bins, así que un desplazamiento sin
+corregir aparece como una subida espuria en baja frecuencia que no elimina
+ninguna cantidad de promediado. Cuando importen los bins más bajos, resta la
+media o filtra el registro en paso alto explícitamente antes de la llamada (eso
+es un cambio en la *señal*, no un ajuste del estimador), y ten en cuenta que ese
+mismo desplazamiento es invisible en una representación en fracciones de octava,
+porque ninguna banda llega a continua. La misma condición reaparece en
+[Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/),
+cuyos estadísticos de cruce de nivel y de picos están escritos para un proceso de
+media nula.
+
 El estimador es una cadena fija: la ventana fija el ancho de banda de
 resolución, y los promedios efectivos se derivan de la longitud del registro
 (el número de segmentos brutos) junto con la ventana y el solape. Con ellos
@@ -110,7 +124,10 @@ proporcionalmente más ancho.
 ```python
 from phonometry import power_spectral_density
 
-res = power_spectral_density(signal, fs)          # Hann, solape 50 %, IC 95 %
+# record: un canal de una captura calibrada, en pascales (ver la guía de
+#   Calibración más abajo); trabajando en dBFS es el vector bruto en [-1, 1] y
+#   el resultado sale en FS^2/Hz. fs: su frecuencia de muestreo en Hz.
+res = power_spectral_density(record, fs)          # Hann, solape 50 %, IC 95 %
 print(res.n_averages, res.random_error)           # nd y 1/sqrt(nd)
 print(res.ci_lower[10], res.psd[10], res.ci_upper[10])
 res.plot()                                        # PSD en dB con la banda de IC
@@ -138,6 +155,75 @@ Un $B_e$ estrecho (segmentos largos) suprime el sesgo pero deja menos
 promedios y un error aleatorio mayor; los dos requisitos sobre la longitud
 de segmento tiran en direcciones opuestas, y ese es exactamente el
 compromiso que los números expuestos hacen visible.
+
+### Elegir la longitud del segmento, y después la del registro
+
+La fórmula del sesgo es más útil leída al revés. Mantener el sesgo del pico de
+una resonancia por debajo de 1 dB significa $\varepsilon_b \ge -0{,}2$, y por
+tanto $B_e \le 0{,}775\,B_r$; mantenerlo por debajo de una décima de decibelio
+significa $B_e \le 0{,}263\,B_r$. La regla empírica de siempre, tres o cuatro
+anchos de banda de análisis a lo ancho de la anchura a media potencia del rasgo
+más estrecho que importe, es exactamente esta fórmula, y ahora lleva un número
+al lado.
+
+Trabaja hacia delante desde la medición y no desde un `nperseg` de costumbre. Un
+modo a 100 Hz con $Q = 50$ tiene $B_r = f/Q = 2$ Hz. Mantener su sesgo por debajo
+del 2 % (0,09 dB) pide $B_e \le B_r\sqrt{3 \times 0{,}02} = 0{,}49$ Hz y, para la
+ventana de Hann, $B_e = 1{,}5\,f_s/\texttt{nperseg}$, así que a 48 kHz eso es
+`nperseg` $\ge 147\,000$, es decir, segmentos de al menos **3,1 s**. Pedir
+después un error aleatorio del 10 % necesita $n_d = 100$ promedios efectivos, lo
+que con un solape del 50 % significa un registro de unos **150 s**:
+
+```python
+target_bias = 0.02                     # 2 % sobre el pico, unos 0,09 dB
+b_r, q = 100.0 / 50.0, 100             # un modo de 100 Hz con Q = 50
+b_e = b_r * (3 * target_bias) ** 0.5   # el ancho de banda de análisis que permite
+nperseg = 1.5 * 48000 / b_e            # Hann: Be = 1,5 fs / nperseg
+record_s = q * 0.5 * nperseg / 48000   # nd = 100 promedios con solape del 50 %
+print(round(b_e, 2), int(nperseg), round(record_s))     # 0.49 146969 153
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_segment_tradeoff_es.svg" alt="Izquierda: la estimación de Welch de una resonancia de 25 hercios de ancho en 1 kilohercio calculada con longitudes de segmento de 512, 1024, 4096 y 16384 muestras; los segmentos cortos recortan y ensanchan el pico mientras que los largos lo resuelven. Derecha: el sesgo de resolución y el error aleatorio en decibelios frente a la longitud de segmento en eje logarítmico, con el sesgo cayendo abruptamente y el error aleatorio subiendo despacio, cruzándose cerca de 7400 muestras, y el déficit medido del pico siguiendo al sesgo" width="92%" />
+
+*La misma resonancia de 25 Hz de ancho vista con cuatro longitudes de segmento.
+Con `nperseg = 512` el ancho de banda de análisis es de 140,6 Hz, cinco veces la
+anchura de la resonancia, y el pico se lee unos 8 dB de menos y mucho más ancho de
+la cuenta; con 4096 el ancho de banda es de 17,6 Hz y el pico está esencialmente
+resuelto. El panel derecho pone los dos errores en un mismo eje: el sesgo cae
+como $B_e^2$ y el error aleatorio sube como $n_d^{-1/2}$, y se igualan cerca de
+`nperseg = 7400` para esta resonancia, que es la longitud de segmento a elegir si
+no hay razón para preferir un error sobre el otro.*
+
+Las dos decisiones son independientes: **la longitud del segmento la fija el
+rasgo más agudo que importe, y la del registro la precisión que quieras**.
+Alargar los segmentos sin alargar el registro cambia un error por el otro y no
+compra nada. Y 150 s de registro son 150 s durante los cuales el proceso tiene
+que mantenerse estacionario, lo cual es una afirmación y no una suposición, y es
+la que decide
+[Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/).
+Cuando el registro sencillamente no puede ser tan largo, la salida es el
+estimador multitaper del §7.
+
+### De unidades digitales a dB SPL
+
+`power_spectral_density` escala lo que se le dé y no aplica ninguna calibración
+propia, así que el factor de sensibilidad va sobre el *registro*, antes de la
+estimación:
+
+```python
+calibration_factor = 1.002             # Pa por unidad digital, del calibrador
+pressure = calibration_factor * record
+psd = power_spectral_density(pressure, fs)      # ahora en Pa^2/Hz
+```
+
+La ordenada es entonces $10\log_{10}(G_{xx}/p_0^2)$ dB re (20 µPa)²/Hz, y con
+`scaling="spectrum"` esa misma llamada lee directamente el nivel de un tono
+discreto como $10\log_{10}(P/p_0^2)$ dB. Para pasar de ahí al nivel de banda que
+contiene un informe acústico, integra la densidad en la banda (suma los bins y
+multiplica por la separación entre bins) y divide por $p_0^2$;
+`fractional_octave_smoothing` del §4 es un suavizador de representación y no un
+sustituto de esa integración, como detalla ese mismo apartado. El factor sale de
+[Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing_es.svg" alt="Densidad espectral de potencia de Welch de ruido rosa en dB por Hz entre 20 Hz y 20 kHz, con la banda de confianza chi-cuadrado del 95 por ciento sombreada alrededor de la estimación, la curva suavizada en 1/3 de octava encima y la ley de potencias exacta de -3,01 dB por octava como línea discontinua de referencia" width="82%" loading="eager" />
 
@@ -350,6 +436,46 @@ despreciable en cuanto $n_d$
 llega a unos cientos, y otra razón para promediar con generosidad antes de
 fiarse de una coherencia baja.
 
+## Dos canales en la práctica
+
+Los §2 y §3 parten los dos de una pareja de registros, y todo lo que informan
+vale lo que valga esa pareja. Dos mitades: cómo adquirirla y cómo leer una
+coherencia que vuelve por debajo de uno.
+
+**Adquisición.** Usa una sola interfaz con entradas de *muestreo simultáneo*, o
+mide el desfase entre canales y elimínalo. Un convertidor que secuencia sus
+canales mete un desfase fijo directamente en la fase del espectro cruzado y, por
+tanto, en todos los retardos de grupo que se lean de ella: una muestra de desfase
+a 48 kHz son 20,8 µs, que son 15° de fase a 2 kHz y un error plano de 20,8 µs en
+cualquier estimación de retardo. Fija las dos ganancias antes de la tirada y no
+las toques, porque el reparto de salida coherente del §3 supone que los dos
+canales comparten una escala fija. Valida la pareja una vez con una **tirada de
+base cero**: mete la misma señal en los dos canales (el generador partido
+hacia ambas entradas, o los dos micrófonos uno al lado del otro) y confirma que
+el retardo medido es una fracción pequeña de muestra y que la coherencia vale uno
+en toda la banda. Esa única tirada separa un problema de cadena de un problema de
+física para todas las mediciones que vengan después.
+
+**Leer una coherencia por debajo de uno.** No es automáticamente un problema de
+relación señal-ruido, y Bendat y Piersol nombran cinco causas con arreglos
+distintos:
+
+| Lo que ves | La causa | El arreglo |
+| :--- | :--- | :--- |
+| Coherencia plana en toda la banda, coherente con $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$ | ruido no correlacionado en alguno de los sensores, el caso modelado del §3 | promedia más, sube el nivel, acércate |
+| Coherencia que cae progresivamente con la frecuencia, peor cuanto más corto se segmenta el registro | un retardo global de propagación comparable con la longitud del segmento | alinea antes los registros, o sube `nperseg` muy por encima del retardo; ver [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/) |
+| Hundimientos abruptos justo en las resonancias | sesgo de resolución: el ancho de banda de análisis emborrona el pico de forma distinta en cada canal | alarga el segmento; la fórmula de $\varepsilon_b$ del §1 dice cuánto |
+| Baja en los armónicos de un tono fuerte mientras la coherencia de banda ancha sigue alta | no linealidad, un traqueteo o un canal recortado | arregla el camino, o trabaja por debajo del nivel al que aparece |
+| Baja en toda una banda sin estructura evidente | una segunda fuente no correlacionada está excitando también la salida | la [página de MISO](/phonometry/es/signals/spectra/miso-coherence/): una entrada no puede explicar dos fuentes |
+
+Dos advertencias de cierre. La estimación de coherencia está sesgada **al alza**
+en $(1-\gamma^2)^2/n_d$, así que una coherencia baja leída con un puñado de
+promedios es todavía más baja de lo que parece. Y, leído al revés, una coherencia
+cercana a uno *es* el criterio de aceptación que permite declarar toda la
+estimación: decláralo banda a banda junto a la función de transferencia, porque
+las bandas donde cae son exactamente las bandas donde los números de encima no
+significan nada.
+
 ## 4. Suavizado en fracciones de octava
 
 `fractional_octave_smoothing` promedia un espectro sobre una ventana
@@ -364,19 +490,60 @@ los niveles en dB se convierten ida y vuelta), así que se conserva la
 potencia de banda y no la amplitud, y un espectro plano pasa exactamente
 sin cambios.
 
+Los tres valores de `domain=` nombran qué *es* la ordenada que se le entrega,
+porque el promedio se hace siempre sobre potencia y la conversión de vuelta tiene
+que saber de dónde partió: una densidad o un espectro de potencia (`"power"`, el
+valor por defecto), una magnitud lineal como el $|H|$ de una respuesta en
+frecuencia (`"amplitude"`, que se eleva antes al cuadrado), o una curva ya en
+decibelios (`"db"`, que se convierte y se vuelve a convertir).
+
 ```python
 from phonometry import fractional_octave_smoothing
 
-smooth_psd = fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
-smooth_mag = fractional_octave_smoothing(freqs, np.abs(response), 6.0,
+freqs = res.frequencies                    # de la estimación del §1
+smooth_psd = fractional_octave_smoothing(freqs, res.psd, 3.0)
+magnitude = np.sqrt(res.psd)               # aquí valdría cualquier |H| lineal
+smooth_mag = fractional_octave_smoothing(freqs, magnitude, 6.0,
                                          domain="amplitude")  # una FRF |H|
-smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # curva en dB
+levels = 10.0 * np.log10(res.psd)          # aquí valdría cualquier curva en dB
+smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")
 ```
 
 Una sola línea espectral con ordenada de PSD $P$ (unidades²/Hz) en un bin de
 anchura $\Delta f$ se suaviza al nivel en forma cerrada
 $P\,\Delta f / (f_0(2^{1/2n} - 2^{-1/2n}))$ sobre una anchura de núcleo: el
 oráculo fijado en los tests.
+
+### Una densidad suavizada sigue siendo una densidad
+
+El suavizado cambia la *resolución* de la estimación, nunca sus unidades. La
+salida de `fractional_octave_smoothing` es una densidad en unidades²/Hz,
+exactamente como lo era la entrada (el ruido blanco plano se suaviza a la misma
+densidad plana), mientras que los **niveles de banda** de tercio de octava de ese
+mismo ruido blanco suben 3 dB por banda. Superpón una PSD suavizada sobre un
+espectro de banco de filtros sin convertir y las dos discreparán en 20 o 30 dB, y
+ninguna estará equivocada.
+
+La conversión es un solo término. Una banda de fracción de octava de frecuencia
+central $f_c$ tiene un ancho de banda $B_n = f_c\,(2^{1/2n} - 2^{-1/2n})$, es
+decir, $0{,}2316\,f_c$ en un tercio de octava y $0{,}7071\,f_c$ en una octava
+completa, así que
+
+$$
+L_\text{banda} = 10\log_{10}\!\left(\frac{G(f_c)\,B_n}{p_0^2}\right),
+$$
+
+que a 1 kHz en tercio de octava añade $10\log_{10}(0{,}2316 \times 1000) =
+23{,}65$ dB al nivel de densidad, y 3 dB más por cada octava hacia arriba. Sumar
+los bins de la PSD a lo ancho de la banda y multiplicar por la separación entre
+bins es la forma exacta; la expresión de arriba es su aproximación de banda
+plana.
+
+Qué representación va dónde: la **densidad suavizada** para comparar respuestas
+en magnitud de altavoces y salas, donde el ojo quiere una curva a resolución
+relativa constante; el **nivel de banda** para todo lo que se enfrente a un
+criterio, o que tenga que cuadrar con `octave_filter` y `OctaveFilterBank`; ver
+[Niveles](/phonometry/es/signals/levels/levels/).
 
 ## 5. Generadores de ruido de colores
 
@@ -411,6 +578,30 @@ Medida sobre tres décadas (20 Hz – 20 kHz) con el estimador de la sección 1,
 la pendiente de regresión de cada color cae a unas milésimas de dB/octava
 del valor exacto: la batería de conformidad fija la pendiente rosa en
 -3,0116 frente al exacto -3,0103.
+
+Esas pendientes son pendientes de densidad, y no son lo que muestra una
+representación en fracciones de octava de la misma señal. La anchura de una banda
+crece en proporción a su frecuencia central, así que un nivel de banda es la
+densidad más $10\log_{10} B_n$ con $B_n \propto f_c$: **todos los colores se leen
+3 dB por octava más altos en una representación por bandas de lo que sugiere su
+pendiente de densidad.** El ruido blanco, cuya densidad es plana, sube por tanto
+3 dB por octava a través de un banco de filtros de octava, y el ruido rosa, a
+−3 dB/octava, sale plano, que es por lo que el rosa es el estímulo de referencia
+en trabajo de salas y altavoces, y por lo que un espectro en bandas de octava de
+ruido blanco que sube no es ningún defecto. El ruido rojo cae 3 dB por octava en
+una representación por bandas y el azul sube 6. Los mismos +3 dB por octava valen
+para cualquier comparación de densidad frente a banda en esta biblioteca; el §4
+de arriba da la conversión exacta, y en
+[Niveles](/phonometry/es/signals/levels/levels/) vive el lado de las bandas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/noise_colors_es.svg" alt="Densidades espectrales de Welch de los cinco colores de ruido entre 20 hercios y 20 kilohercios, cada una normalizada a su propio nivel en 1 kilohercio de modo que las cinco rectas se abren en abanico desde un único punto: el violeta subiendo a 6 dB por octava, el azul a 3, el blanco plano, el rosa cayendo a 3 y el rojo a 6, cada uno con su ley de potencias exacta discontinua debajo y la pendiente de regresión medida en la leyenda" width="88%" />
+
+*Los cinco generadores a lo largo de tres décadas, cada uno normalizado a su
+propio nivel en 1 kHz para que las pendientes se abran en abanico desde un solo
+punto, con la ley de potencias exacta discontinua debajo. Las pendientes de
+regresión medidas caen a menos de cuatro milésimas de decibelio por octava de los
+valores exactos, y el residuo es el error aleatorio del *estimador*, no del
+generador: la misma semilla reproduce el registro bit a bit.*
 
 ## 6. Elegir la ventana
 
@@ -519,19 +710,20 @@ Como las ventanas son ortogonales, los autoespectros están casi
 no correlacionados, así que el promedio acarrea unos $2K$ grados de libertad
 chi-cuadrado de un único registro - la misma maquinaria estadística que el
 resultado de Welch (error aleatorio, intervalo de confianza chi-cuadrado),
-sin segmentar. El semiancho $W = NW\,f_s/N$ se fija mediante el producto
-duración x semiancho de banda $NW$ (4 por defecto). $2W$ es la resolución de
-la estimación (informada como `resolution_bandwidth`), y solo las ventanas
-por debajo del número de Shannon $2NW$ mantienen la energía de su ventana
+sin segmentar. El parámetro de diseño es el producto adimensional de duración
+por semiancho de banda $p = NW$ (4 por defecto), y para un registro de $N_r$
+muestras a $f_s$ fija el semiancho $W = p\,f_s/N_r$ en hercios. $2W$ es la
+resolución de la estimación (informada como `resolution_bandwidth`), y solo las
+ventanas por debajo del número de Shannon $2p$ mantienen la energía de su ventana
 espectral dentro de la banda de diseño - sus concentraciones $\lambda_k$ se
 informan como `eigenvalues`, y el número de ventanas por defecto es
-$K = 2NW - 1$, todas las de concentración casi unidad. Un $NW$ mayor
+$K = 2p - 1$, todas las de concentración casi unidad. Un $p$ mayor
 admite más ventanas (menos varianza) a costa de resolución.
 
 ```python
 from phonometry import multitaper_psd
 
-res = multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptativo
+res = multitaper_psd(record, fs)                 # p = NW = 4, K = 7, adaptativo
 print(res.degrees_of_freedom.mean())             # ~2K de un solo registro
 print(res.eigenvalues)                           # concentraciones
 res.plot(language="es")                          # densidad con la banda de IC
@@ -570,7 +762,19 @@ sus concentraciones reproducen la tabla en cuádruple precisión de Percival y
 Walden (tabla 382) hasta la precisión de máquina, que es el oráculo ancla de
 la batería de tests.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence_es.svg" alt="Densidad espectral multitaper de Thomson de un registro de ruido rosa de 171 milisegundos en dB por Hz entre 20 Hz y 20 kHz, con la banda de confianza chi-cuadrado del 95 por ciento alrededor de la estimación adaptativa de siete ventanas, la estimación de una sola ventana como línea gris dentada de contexto y la ley de potencias exacta de -3,01 dB por octava como referencia discontinua" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence_es.svg" alt="Izquierda: la densidad espectral multitaper de un registro de ruido rosa de 171 milisegundos con su banda de confianza del 95 por ciento, frente a una estimación de Welch con solo 6,7 promedios efectivos y una banda visiblemente más ancha, una estimación de una sola ventana como línea gris dentada y la ley exacta de menos 3,01 dB por octava discontinua. Derecha: un tono de 60 dB sobre un suelo rosa, donde la estimación de Welch con ventana de Hann deja una falda más ancha alrededor del tono que la multitaper adaptativa, y los grados de libertad equivalentes bajan de unos nueve a cinco allí donde los pesos adaptativos los gastan" width="94%" />
+
+*A la izquierda, el caso en el que el texto sostiene que gana la multitaper: un
+registro de 171 ms. Welch con un segmento de 2048 muestras solo mete
+$n_d = 6{,}7$ promedios efectivos dentro de él, así que su banda de confianza es
+visiblemente la más ancha de las dos y su curva la más rugosa, mientras que la
+estimación adaptativa de 7 ventanas acarrea 13,7 grados de libertad equivalentes
+del mismo registro. A la derecha, la otra razón para echar mano de ella: un tono
+de 60 dB sobre un suelo rosa. La ventana de Hann deja una falda más ancha
+alrededor del tono que los pesos adaptativos, y el precio está impreso en el eje
+derecho: los grados de libertad equivalentes caen allí donde los pesos compraron
+esa protección, que es exactamente lo que ensancha ahí el intervalo de
+confianza.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -611,12 +815,16 @@ Hann no puede dar; quédate con `power_spectral_density` para registros
 largos, donde promediar segmentos es más barato que $K$ FFT de longitud
 completa y ambos estimadores coinciden.
 
-## Relación con los estimadores H1/H2
+## Congruencia con los estimadores de respuesta en frecuencia y de intensidad
 
 Los [estimadores de respuesta en
-frecuencia](/phonometry/es/devices/electroacoustics/electroacoustics/)
-`transfer_function` y `coherence`, la sonda de
-[intensidad acústica](/phonometry/es/devices/emission/intensity/) de dos micrófonos y
+frecuencia](/phonometry/es/devices/electroacoustics/electroacoustics/) forman los
+mismos espectros cruzados en una función de transferencia ($H_1 = G_{xy}/G_{xx}$,
+insesgado cuando el ruido está en la salida, y $H_2 = G_{yy}/G_{yx}$, insesgado
+cuando está en la entrada), y la sonda de
+[intensidad acústica](/phonometry/es/devices/emission/intensity/) de dos micrófonos
+forma la parte imaginaria de $G_{xy}$. Esos estimadores,
+`transfer_function` y `coherence`, la sonda de intensidad y
 estos estimadores comparten un único núcleo de Welch (misma ventana, misma
 política de solape y calibración sin eliminación de tendencia), así que una
 PSD, una coherencia y una $H_1$ calculadas con la misma longitud de segmento
@@ -652,4 +860,10 @@ cumplimiento que comprobar.
 
 ## Véase también
 
+- [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/): la estacionariedad que da por supuesta todo intervalo chi-cuadrado de esta página.
+- [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): de dónde sale el factor que convierte las densidades de esta página en Pa²/Hz.
+- [Coherencia MISO](/phonometry/es/signals/spectra/miso-coherence/): la misma matriz de espectros cruzados con varias entradas correlacionadas.
+- [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): la misma segmentación de Welch representada en lugar de promediada.
+- [Niveles](/phonometry/es/signals/levels/levels/): el lado de los niveles de banda de la conversión densidad/banda del §4.
+- Referencia de la API: [`signals.spectra`](/phonometry/es/reference/api/signals/spectra/), [`signals.windows`](/phonometry/es/reference/api/signals/windows/) y [`signals.multitaper`](/phonometry/es/reference/api/signals/multitaper/).
 - Teoría: [Resolución frecuencial vs separación de bins FFT](/phonometry/es/reference/theory/signal-analysis/#resolución-frecuencial-vs-separación-de-bins-fft): por qué la separación de bins de una FFT no es la resolución de la estimación, y qué le hace la ventana a ambas.

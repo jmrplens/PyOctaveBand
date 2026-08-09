@@ -48,7 +48,6 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
-import ReportPreview from '../../../../components/ReportPreview.astro';
 
 phonometry supports several filter types, each with its own transfer function
 characteristic. Butterworth, Chebyshev II and Bessel place their **−3 dB points
@@ -58,6 +57,15 @@ as the *ripple* edge instead, which widens the band and biases every band level
 by a fixed few tenths of a decibel — see section 1, because the bias is
 systematic and does not average out.
 
+By the end of this page you can design a bank for any $1/b$ fraction, read
+every argument off one table, cascade RBJ EQ sections, pull out per-band time
+signals and filter with zero phase. Section 1 is the mathematics the design
+rests on; if you only want to call the function, start at section 2. How the
+five architectures differ is
+[Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/), and
+what "class 1" means for the result is
+[Filter Class Verification](/phonometry/signals/filters/filter-compliance/).
+
 ## 1. Fractional octave bands: the math
 
 IEC 61260-1:2014 builds every band from the base-10 octave ratio
@@ -65,7 +73,8 @@ $G = 10^{3/10} \approx 1.99526$ (so "one octave" is *not* exactly 2). For
 band fraction $1/b$, the mid frequencies and band edges follow (5.2-5.5):
 
 $$
-f_m = 1000 \cdot G^{x/b} \quad (b\ \text{odd}), \qquad
+f_m = 1000 \cdot G^{x/b}\ (b\ \text{odd}), \qquad
+f_m = 1000 \cdot G^{(2x+1)/2b}\ (b\ \text{even}), \qquad
 f_1 = f_m G^{-1/2b}, \quad f_2 = f_m G^{+1/2b}
 $$
 
@@ -74,6 +83,16 @@ ten bands per decade, which is why the nominal frequencies (25, 31.5, 40 …)
 repeat scaled by 10. phonometry designs each band as an SOS cascade on those
 edges, but where the −3 dB point ends up depends on what the architecture means
 by its design frequency, and only three of the five put it on $f_1$ and $f_2$.
+
+The two forms exist so that the reference frequency 1000 Hz is a band **mid**
+frequency when $b$ is odd and a band **edge** when $b$ is even. That is what
+keeps the odd fractions nested — each octave band is exactly three
+one-third-octave bands — while the even fractions split at the octave
+boundaries; the edge formulas are the same in both cases. The practical
+consequence is easy to trip over: a `fraction=2`, `12` or `24` spectrum has no
+1 kHz band at all, its nominal labels come from the Annex E.3 significant-figure
+rounding rather than from the ISO 266 preferred series, and comparing it band by
+band against a one-third-octave table is meaningless.
 
 ### Where each architecture's −3 dB point actually lands
 
@@ -129,6 +148,31 @@ its own coefficients, so rounding errors stay local instead of compounding
 through one high-order polynomial. The other half, the tiny $B / f_s$ ratio
 itself, is what decimation fixes.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pole_migration.svg" alt="Three panels for the 25 Hz one-third-octave band of a bank at 48 kHz. Left, the z-plane constellation of the band designed at the full rate: every pole is collapsed onto z = 1, with a zoom inset showing the six poles spread over less than a thousandth of the radius and the annotation 1 minus r equals 8.7e-05. Middle, the same band as the bank actually realizes it, at 96 Hz after decimating by 500: the poles are clearly separated around the unit circle, at 1 minus r equals 4.6e-02. Right, the largest pole radius of every band of the bank on log-log axes, the one-rate design rising steadily from 4e-05 at 12.5 Hz to 5e-02 at 20 kHz while the multirate bank stays pinned near 5e-02 across the whole range" width="94%" />
+
+*Selectivity is proximity, and the price is conditioning. At the full rate the
+25 Hz band's poles sit less than $10^{-4}$ from the unit circle and on top of
+each other; the same band realized at its decimated rate has them spread out
+and 500 times further away. The right panel is the design decision as one
+curve: the multirate bank keeps every band in the same well-conditioned
+region, whatever its centre frequency.*
+
+<details>
+<summary>How this figure was measured</summary>
+
+Both banks come from the parameter table of section 2, one with the default
+`design` and one with `design=FilterDesign(resample=False)`. The pole positions
+are read straight off the bank: `bank.sos[idx]` is the SOS cascade of band
+`idx` and `scipy.signal.sos2zpk` turns it into zeros, poles and gain, so the
+distance from the unit circle is `1 - abs(poles).max()`. For the 25.1 Hz band
+of a 48 kHz one-third-octave bank that distance is **8.73e-05** at the full
+rate and **4.62e-02** at the decimated rate the bank actually uses
+(`bank.factor[idx]` is 500, so the band runs at 96 Hz). SciPy raises
+`BadCoefficients` while reading the full-rate design — that warning is the
+argument of this section, printed by the library that hit it.
+
+</details>
+
 ### Multirate decimation
 
 A 25 Hz one-third-octave band at 48 kHz spans about 5.8 Hz, 0.024 %
@@ -164,6 +208,35 @@ capture chain delivered:
   `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
+### How long must the record be?
+
+A band level is not read off a signal, it is *estimated* from it, and the
+narrower the band the longer that takes. The bandwidth of a $1/b$-octave band
+is $B = f_m\,(G^{1/2b} - G^{-1/2b})$, which for one-third octaves is
+$0.231\,f_m$, and two consequences follow from it.
+
+The filter has to **settle**: a band rings for a few times $1/B$, so that much
+of the front of the record is transient rather than level and must be
+discarded — about a second in the 12.5 Hz band, twelve milliseconds at 1 kHz.
+And the estimate carries a **random error** of about $4.34/\sqrt{BT}$ dB on
+noise-like sound, so a standard deviation of 0.4 dB needs $BT = 100$:
+
+| Lowest band reported | $B$ [Hz] | $T$ for a 0.4 dB standard deviation |
+| :--- | ---: | ---: |
+| 12.5 Hz | 2.9 | 35 s |
+| 125 Hz | 29 | 3.5 s |
+| 1 kHz | 231 | 0.4 s |
+
+The rule that follows is one line: **the lowest band you intend to report sets
+the record length for the whole bank.** Analysing a 1 s clip down to 12.5 Hz
+and reporting the result to one decimal is not a measurement of that band, and
+neither `octave_filter` nor `OctaveFilterBank` warns you. The general
+$1/\sqrt{BT}$ law is derived in
+[Correlation, time delay and envelope](/phonometry/signals/spectra/correlation-delay/);
+the same arithmetic applied per frame instead of per record is the
+`window_time` note of
+[Integrated and Statistical Levels](/phonometry/signals/levels/levels/).
+
 The band mathematics above is shared by every architecture. How the
 architectures actually differ, the comparison at the −3 dB crossover, the
 full 1/1 and 1/3 octave response gallery and the usage examples per
@@ -172,10 +245,13 @@ architecture, up to the Linkwitz-Riley crossover, is
 
 ## 2. `octave_filter()` / `OctaveFilterBank` parameters
 
-The advanced options travel in four small frozen dataclasses, so the four
-everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
-(`calibration`), `BlockProcessing` (`block_processing`) and `ResponsePlot`
-(`response_plot`). The table names each option by its bundle.
+The everyday arguments come first and positionally — `x`, `fs`, `fraction`,
+`order`, `limits` — and everything else is grouped into four small frozen
+dataclasses passed by keyword: `design` (`FilterDesign`), `calibration`
+(`LevelCalibration`), `block_processing` (`BlockProcessing`) and
+`response_plot` (`ResponsePlot`). Being frozen, they are hashable, which is
+what lets equal option bundles hit the same design cache. The table below names
+each option by the bundle it travels in.
 
 Three call sites share this table, and they do not accept the same options, so
 the **Where** column names the one each option belongs to: `octave_filter()` is
@@ -226,6 +302,26 @@ arithmetic mean of decibels.
 Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
 margins.
 
+### What `order` buys, and where it stops buying
+
+`order` is the order of each band-pass section pair, so it sets how fast the
+skirts fall away and therefore how much of a neighbouring band leaks into a
+band level. Order 6 is the default because it clears the IEC 61260-1 mask with
+room to spare for Butterworth, and the arithmetic is worth seeing: at 48 kHz on
+a one-third-octave Butterworth bank, order 2 misses class 1 by 27.03 dB on the
+far stopband, while orders 4, 6, 8 and 10 all pass with a class 1 margin of
+exactly +0.40 dB.
+
+That identical margin is not a coincidence and it is the useful half of the
+rule. From order 4 upward the binding constraint has moved out of the stopband
+and into the passband, where a maximally flat design sits at 0 dB deviation and
+the class 1 corridor is ±0.4 dB — so raising the order further buys stopband
+depth but no class margin at all. It does cost: every extra pole pair lengthens
+the ringing (the group-delay peaks of section 4 grow with order), which is why
+transient work and short-window spectrograms prefer low orders. The margin
+arithmetic itself is
+[Filter Class Verification](/phonometry/signals/filters/filter-compliance/).
+
 ## 3. Parametric EQ (`ParametricEQ`)
 
 Biquad equalizer sections per the **RBJ Audio EQ Cookbook**
@@ -258,6 +354,12 @@ axes = res.plot()             # magnitude + phase of the cascade
 
 For block processing pass `stateful=True` (the same convention as
 `WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections)`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade.svg" alt="Two stacked panels drawn by the result object itself. Above, the magnitude of the three-section cascade of the snippet: plus 4 dB below 100 Hz from the low shelf, a one-octave-wide minus 6 dB bell at 1 kHz, and plus 3 dB above 8 kHz from the high shelf, with each individual section drawn in light grey underneath the thick cascade line. Below, the phase of the same cascade in degrees, swinging about twenty degrees either side of zero around the shelf and bell frequencies" width="88%" />
+
+*The three sections of the snippet (grey) and the cascade they sum to; the
+lower panel is the phase the magnitude costs. Any result in the library redraws
+itself this way — `res.plot()` above produced exactly this figure.*
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family.svg" alt="Magnitude responses of the RBJ Audio EQ Cookbook biquad family: peaking, shelves, low/high-pass, band-pass and notch" width="80%" />
 
@@ -299,11 +401,15 @@ decibels, is
 Table 1 acceptance mask, the stricter class 0 of the withdrawn 1995 edition,
 what a class buys in a measurement, and the accredited compliance fiche.
 
-## 4. Signal Decomposition and Stability
+## 4. Band signals and group delay
 
-By setting `sigbands=True`, you can retrieve the time-domain components of each
-band. This allows for advanced analysis or comparing how different architectures
-(e.g., Butterworth vs Chebyshev) affect the signal phase and transient response.
+`sigbands=True` returns the per-band time signals alongside the levels, which
+is what makes phase and transient behaviour visible — and what exposes the
+group delay each architecture pays for its selectivity. Stability itself is
+section 1's subject, under
+[Poles, zeros and stability](#poles-zeros-and-stability); what this section
+adds is the evidence, because a filter whose impulse response decays to zero is
+a stable filter.
 
 ```python
 import numpy as np
@@ -327,9 +433,11 @@ spl_c2, _, xb_cheby2 = filters.octave_filter(
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition.svg" alt="Time-domain band decomposition comparing Butterworth and Chebyshev II, including the impulse response" width="80%" />
 
-*The plot compares the **Butterworth** (solid blue) and **Chebyshev II** (dashed
-red) responses. The bottom plot shows the **Impulse Response**, highlighting the
-differences in stability and transient decay.*
+*The top panel is the input, the middle panels are its band signals under
+**Butterworth** (solid) and **Chebyshev II** (dashed), and the bottom panel is
+the impulse response of the 1 kHz band of each. Both impulse responses decay to
+zero — that is the stability check — but the Chebyshev II ring lasts visibly
+longer, which is the transient price of its steeper skirt.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -349,13 +457,27 @@ bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 200
 _, freq, xb_butter = bank_b.filter(y, sigbands=True)
 _, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
 
-fig, axes = plt.subplots(len(freq), 1, figsize=(9, 2 * len(freq)), sharex=True)
-for ax, fc, xb, xc in zip(axes, freq, xb_butter, xb_cheby2):
+# The published figure has two extra panels: the input on top and, at the
+# bottom, the 1 kHz band of a unit impulse through each bank.
+impulse = np.zeros_like(t)
+impulse[0] = 1.0
+_, _, imp_butter = bank_b.filter(impulse, sigbands=True)
+_, _, imp_cheby2 = bank_c.filter(impulse, sigbands=True)
+one_k = int(np.argmin(np.abs(np.asarray(freq) - 1000.0)))
+
+fig, axes = plt.subplots(len(freq) + 2, 1, figsize=(9, 2 * (len(freq) + 2)),
+                         sharex=True)
+axes[0].plot(t, y)
+axes[0].set_title("Original signal (250 Hz + 1000 Hz)")
+for ax, fc, xb, xc in zip(axes[1:-1], freq, xb_butter, xb_cheby2):
     ax.plot(t, xb, label="Butterworth")
     ax.plot(t, xc, "--", label="Chebyshev II")
     ax.set_title(f"{fc:.0f} Hz band")
-    ax.set_xlim(0, 0.04)
-axes[0].legend()
+axes[-1].plot(t, imp_butter[one_k], label="Butterworth")
+axes[-1].plot(t, imp_cheby2[one_k], "--", label="Chebyshev II")
+axes[-1].set_title("Impulse response, 1 kHz band")
+axes[1].legend()
+axes[0].set_xlim(0, 0.04)
 axes[-1].set_xlabel("Time [s]")
 plt.tight_layout()
 plt.show()
@@ -509,6 +631,8 @@ margin with `verify_filter_class`.
 
 IEC 61260-1:2014 (clauses 5.2-5.5) builds every band from the base-10
 octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
-2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ (for odd $b$) and the
-edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
+2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ for odd $b$ and
+$f_m = 1000 \cdot G^{(2x+1)/2b}$ for even $b$ — so 1 kHz is a band mid
+frequency in the odd fractions and a band *edge* in the even ones — and the
+edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$ in both cases; every
 one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.

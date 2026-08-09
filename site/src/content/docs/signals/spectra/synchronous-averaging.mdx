@@ -227,6 +227,69 @@ So a power-of-two number of averages, convenient as it is, is not in general
 the optimal choice: the interfering orders present in the machine should set
 $N$.
 
+## Where the period comes from, and how steady it must be
+
+Everything above takes $T$ as given. In a real measurement $T$ has to be
+*measured*, and the assumption hiding behind a scalar `period` is that the shaft
+holds that period for the whole record — which is the dominant failure mode of
+the technique and fails silently.
+
+**Getting the period.** Instrument the shaft with a once-per-revolution pulse: an
+optical sensor against a single strip of reflective tape, an inductive probe on
+a keyway, or the index output of an encoder. Record that channel simultaneously
+with the vibration, and take $T$ as the mean interval between pulses over the
+analysed span. Do not take it from the nameplate speed; a nameplate is a rating,
+not a measurement, and a machine under load is not on its nameplate.
+
+**How steady it must be.** The comb algebra of section 1 answers this exactly. A
+relative period error $\delta$ moves the $k$-th harmonic from the comb tooth at
+order $k$ to order $k(1+\delta)$, where the same Dirichlet kernel attenuates it
+by
+
+$$
+\left|\frac{\sin(\pi k N \delta)}{N \sin(\pi k \delta)}\right| ,
+$$
+
+so the loss grows with the harmonic number **and** with the number of averages —
+exactly the two things one wants large. Keeping that loss under 1 dB needs
+roughly $k N \delta < 0.25$. Averaging 40 revolutions and expecting the 10th
+harmonic intact therefore demands the period be right to better than
+$0.25/(10 \times 40) = 6.3 \times 10^{-4}$, that is **0.06 % speed stability**;
+the 20th order at $N = 40$ demands 0.03 %. A machine holding speed to 1 % loses
+everything above the first order or two, progressively, and the resulting
+waveform looks smooth — which reads as a healthy gear.
+
+**The remedies, in order.** Take the period from the tacho rather than from the
+nameplate; slice on the measured pulse intervals (one average per speed plateau
+if the speed steps); angularly resample the record against the tacho — order
+tracking — before averaging when the speed drifts continuously; and failing all
+three, average fewer revolutions and accept the $\sqrt{N}$ penalty, because a
+short average at the right period beats a long average at the wrong one.
+
+**The acceptance check.** `residual_rms` should fall as $1/\sqrt{N}$. If it
+stops falling, either the speed drifted or what is left is synchronous and no
+number of averages will remove it.
+
+### Setting up the measurement
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tsa_setup.svg" alt="Elevation of a single-stage gearbox drawn to scale: the input shaft at 1800 revolutions per minute carrying one strip of reflective tape with an optical tacho head aimed at it 20 mm away, a 37-tooth pinion driving an 89-tooth wheel, a stud-mounted accelerometer on the bearing housing nearest the pinion with its axis in the load direction, and both cables running to a two-channel front end on one clock at 25.6 kHz; an inset shows the tacho pulse train above the vibration record with the slice boundaries aligned" width="92%" />
+
+- **Transducer and mounting.** A stud- or adhesive-mounted accelerometer on the
+  bearing housing nearest the gear of interest, with its axis in the load
+  direction. A magnet base collapses the usable band to a couple of kilohertz
+  and hides the mesh harmonics the average exists to show.
+- **Sample rate from the content you want to keep.** A 37-tooth pinion at
+  1800 r/min meshes at $37 \times 30 = 1110$ Hz, so keeping five mesh harmonics
+  needs $f_s \ge 2.56 \times 5550 = 14.2$ kHz — 16 kHz in practice, 25.6 kHz on
+  an analyser that offers it.
+- **Record length of $N+1$ revolutions**, with $N$ chosen by the
+  interfering-order rule of section 3 rather than by habit.
+- **Both channels on one simultaneously sampling front end**, at a gain fixed
+  for the whole run: a channel skew shifts every block boundary and rotates the
+  averaged waveform.
+- **Record the operating point** — speed, load, oil temperature — because a TSA
+  waveform is comparable only with another taken at the same one.
+
 ## 4. Non-integer samples per period
 
 When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
@@ -280,6 +343,17 @@ subtract; the `residual` field is the record with the synchronous part
 removed, which is exactly what the envelope spectrum should be run on once
 the strong gear components no longer mask the modulation.
 
+What comes out of that chain is a set of *lines*, and the diagnosis is carried
+by their frequencies rather than by their amplitudes. The kinematic families of
+the machine — ball-pass frequency outer and inner race, ball spin, cage,
+gear-mesh frequency and its shaft-rate sidebands, blade passing, motor slip and
+pole pass — are computed from the geometry and the shaft speed and drawn onto
+the measured envelope spectrum at
+[machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/).
+Because those families are expressed in *orders of the shaft*, the same tacho
+signal that fixes the averaging period fixes the family frequencies too: a speed
+error corrupts the averaging and the identification together.
+
 ## What this guide covers
 
 **Covered.** McFadden's revised model for time domain averaging
@@ -306,4 +380,5 @@ so there is no compliance clause to check the implementation against.
 - [Cepstrum and echoes](/phonometry/signals/spectra/cepstrum-echoes/): reference-free detection of harmonic and sideband families, and the envelope spectrum.
 - [Correlation and delay](/phonometry/signals/spectra/correlation-delay/): the Hilbert envelope behind envelope analysis.
 - [Test signals](/phonometry/signals/spectra/test-signals/): the fractional-delay kernel the non-integer period alignment uses.
+- [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/): the bearing and gear families the residual's envelope spectrum is read against.
 - API reference: [`signals.synchronous_average`](/phonometry/reference/api/signals/synchronous-average/).

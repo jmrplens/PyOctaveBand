@@ -1,6 +1,6 @@
 ---
 title: "Procesado por bloques"
-description: "Flujos de streaming con estado de filtro conservado entre bloques."
+description: "Análisis en streaming con el estado del filtro conservado entre bloques: qué es el estado de una cascada SOS, por qué los bloques concatenados son idénticos bit a bit a una sola pasada, el estado por canal, las trampas del streaming, un bucle de sonómetro en tiempo real y las opciones que el modo con estado prohíbe."
 references:
   - type: book
     authors: ["Oppenheim, A. V.", "Schafer, R. W."]
@@ -36,16 +36,39 @@ comportarse exactamente como si hubieran visto la señal completa de una vez.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing_es.svg" alt="Dos carriles que comparan el procesado por bloques conservando el estado del filtro entre bloques, con una envolvente continua, frente a reiniciarlo en cada bloque, donde la envolvente arranca desde cero en cada unión" width="86%" loading="eager" />
 
-Las clases `OctaveFilterBank`, `WeightingFilter` (para ponderación A, C o Z) y
-`TimeWeighting` admiten procesado por bloques (streaming): el estado interno del
-filtro se conserva entre llamadas, de modo que las salidas concatenadas por
-bloques coinciden con una única pasada sobre la señal completa.
+Las clases `OctaveFilterBank`, `WeightingFilter` (cualquier curva de
+ponderación: A, C, Z y las especiales B, D, G y AU) y `TimeWeighting` admiten
+procesado por bloques (streaming): el estado interno del filtro se conserva
+entre llamadas, de modo que las salidas concatenadas por bloques coinciden con
+una única pasada sobre la señal completa. El streaming usa siempre el diseño
+bilineal clásico de las ponderaciones — la vía `high_accuracy`, sobremuestreada,
+remuestrea internamente y no se puede partir en bloques —, así que una
+ponderación A en streaming arrastra el error en altas frecuencias del diseño
+simple que describe
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/), y una
+ponderación G en streaming a una frecuencia de muestreo baja pierde el
+sobremuestreo interno que su diseño aplica normalmente (ver
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/)).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity_es.svg" alt="Procesado por bloques con estado igual al resultado continuo frente a bloques independientes que reinician el transitorio" width="80%" />
 
 *Con `stateful=True` las salidas concatenadas por bloques coinciden exactamente
 con el resultado continuo; sin estado, cada frontera de bloque reinicia el
 transitorio del filtro.*
+
+Un banco con estado es forzosamente un *banco distinto*, y el código de la
+propia figura lo dice dos veces: tanto el banco en streaming como el offline se
+construyen con `design=FilterDesign(resample=False)`. El diezmado no puede
+transportar estado entre bloques, así que todas las bandas de un banco en
+streaming corren a la frecuencia de entrada, y la pasada offline contra la que
+se compara hay que construirla igual. Compara un resultado en streaming con el
+`octave_filter(x, fs, fraction=3)` *por defecto* y verás un residuo: medido
+sobre 4 s de ruido rosa a 48 kHz, los dos diseños difieren como mucho en
+0,083 dB, con una mediana de 0,007 dB y las mayores diferencias en las bandas
+graves (0,083 dB a 50 Hz). Eso es lo esperado, no un fallo, y no cambia la
+clase; pero si estás validando una cadena en streaming, construye los dos lados
+igual o acabarás persiguiendo la diferencia de diseño en vez del transporte de
+estado.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -97,7 +120,7 @@ modo stateful se resumen en la
 [tabla de restricciones](#restricciones-del-modo-con-estado) al final de esta
 guía.
 
-## Ejemplo
+## Ejemplo: procesar un WAV bloque a bloque
 
 Este ejemplo procesa un WAV por bloques con [`soundfile`](https://pysoundfile.readthedocs.io/),
 una dependencia opcional (`pip install soundfile`). Sirve cualquier fuente de bloques:
@@ -126,6 +149,47 @@ for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
     # procesado posterior de la señal
     ...
 ```
+
+## Acumular un nivel entre bloques
+
+La tarea de streaming más común es justamente la que las trampas del streaming
+dan por fácil: el $L_{eq}$, o el espectro de bandas, de una grabación que no
+cabe en memoria. Y *es* fácil, y además es exacta y no aproximada, porque el
+$L_{eq}$ no tiene constante de tiempo ni detector: solo una suma de cuadrados y
+un recuento de muestras.
+
+```python
+total_square, n_samples = 0.0, 0
+
+for x in audio_stream(block):        # tu callback de captura
+    total_square += float(np.sum(np.square(x)))
+    n_samples += x.shape[-1]
+
+leq = 10 * np.log10(total_square / (n_samples * (2e-5) ** 2))
+```
+
+En esas cuatro líneas hay dos trampas. Ponderar todos los bloques por igual
+(promediar los cuadrados medios de cada bloque) solo es correcto si todos los
+bloques tienen la misma longitud, y el último casi nunca la tiene; acumula la
+suma y el recuento por separado, como arriba, y de eso se encarga la
+aritmética. Y nunca promedies las lecturas en *decibelios* de cada bloque: ese
+es el error de la media aritmética de
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), es
+unilateral y siempre subestima.
+
+La versión por bandas es el mismo acumulador con un vector a la izquierda:
+
+```python
+band_squares = np.zeros(bank.num_bands)   # de tu OctaveFilterBank con estado
+
+for x in audio_stream(block):
+    _, _, bands = bank.filter(x, sigbands=True, detrend=False,
+                              calculate_level=False)
+    band_squares += np.sum(np.square(bands), axis=-1)
+```
+
+Los percentiles no se acumulan así. Procesa la *envolvente* en streaming,
+guárdala y calcula los percentiles una sola vez sobre el resultado conjunto.
 
 ## Ponderación temporal entre bloques
 
@@ -183,17 +247,91 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
 - **No toda métrica admite streaming.** Las métricas de energía se acumulan
   limpiamente (un $L_{eq}$ acumulado es una suma de energía acumulada), pero
   los estadísticos de rango no: el $L_{90}$ de una grabación no es ninguna
-  combinación de los $L_{90}$ por bloque. Transmite la *envolvente* y
-  calcula los percentiles una vez, sobre el resultado conjunto.
+  combinación de los $L_{90}$ por bloque. Procesa la *envolvente* en
+  streaming y calcula los percentiles una vez, sobre el resultado conjunto.
 - **El primer bloque sigue llevando el transitorio de arranque.** El estado
   empieza en reposo, así que el filtro se asienta durante los primeros
-  instantes igual que en una sola pasada. Usa `steady_ic=True` para arrancar
-  en el estado estacionario de la respuesta al escalón, o descarta el tiempo
-  de asentamiento una vez (no una por bloque).
+  instantes igual que en una sola pasada. Cuánto dura se deduce del ancho de
+  banda: una banda se asienta en unas pocas veces $1/B$, y con
+  $B = 0{,}231\,f_m$ para tercios de octava eso es alrededor de un segundo a
+  12,5 Hz, una décima de segundo a 125 Hz y trece milisegundos a 1 kHz (la
+  regla de duración del registro de [Bancos de
+  filtros](/phonometry/es/signals/filters/filter-banks/#cuánto-tiene-que-durar-el-registro)).
+  Un detector exponencial suma encima sus propios $5\tau$: 0,6 s en Fast y 5 s
+  en Slow. `steady_ic=True` arranca las secciones en el régimen permanente de un
+  *escalón*, lo que elimina el transitorio ligado a la componente continua pero
+  no el arranque resonante de un paso banda, así que para las bandas graves el
+  remedio honesto sigue siendo descartar los primeros segundos del flujo una
+  vez (no una por bloque). En la práctica: arranca el registrador unos segundos
+  antes del intervalo que vayas a informar.
 - **Un flujo por objeto.** Una instancia con estado guarda la memoria de una
   señal; pasarle dos flujos intercalados corrompe ambos. Crea un objeto de
   filtro por flujo: el coste de diseño se paga una vez al construir, no por
   bloque.
+- **Un búfer perdido o repetido anula la garantía en silencio.** La exactitud
+  bit a bit da por hecho que los bloques eran realmente consecutivos. Cuenta los
+  bloques o compara las marcas de tiempo del dispositivo, y marca el hueco en la
+  salida en lugar de fingir que el flujo fue continuo.
+- **Diseña los filtros a la frecuencia con la que el dispositivo abrió de
+  verdad**, no a la que pediste. Lee la frecuencia de muestreo del flujo al
+  arrancar y compruébala una vez; un banco diseñado para 48 kHz al que se le dan
+  muestras a 44,1 kHz informa números plausibles de las bandas equivocadas.
+- **La saturación hay que detectarla bloque a bloque.** El bucle sustituye al
+  indicador de sobrecarga del instrumento, así que comprueba en cada bloque si
+  hay rachas a fondo de escala e informa un bloque marcado como no válido en
+  lugar de promediarlo con el resto.
+- **Un registrador desatendido necesita su propia contabilidad**: un tono de
+  calibrador al principio y al final del despliegue, y un intervalo fijo de
+  almacenamiento de niveles.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/streaming_level_seams_es.svg" alt="Dos paneles de nivel ponderado A con respuesta Fast frente al tiempo. A la izquierda, ocho bloques de 100 ms de un ruido con escalones de nivel: la traza continua de una sola pasada y la traza en streaming con estado se superponen exactamente, con un error máximo de 0 dB, mientras que la traza sin estado se desploma a 30 dB en cada frontera de bloque y vuelve a subir por la rampa del detector, hasta 64 dB por debajo del nivel real en una unión. A la derecha, esos mismos primeros 0,8 s ampliados con los primeros 0,63 segundos sombreados: la traza con steady_ic False sube desde 30 dB por la rampa de asentamiento mientras que la traza con steady_ic True arranca cerca de 64 dB, y ambas convergen cuando termina la rampa" width="94%" />
+
+*Las trampas anteriores, en el dominio que un lector en streaming mira de
+verdad. Conservar el estado no cuesta nada y lo gana todo: la traza azul es la
+gris. Reinicia en cada bloque y cada unión se convierte en una rampa nueva del
+detector, de decenas de decibelios, a un ritmo que fija la longitud del bloque y
+no el sonido. El panel derecho es la tercera trampa: los primeros $5\tau$ son
+del detector, `steady_ic=True` arranca en otro sitio en vez de en la verdad, y
+ninguno de los dos es el nivel hasta que la rampa acaba.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+fs, block = 48000, 4800                      # bloques de 100 ms
+rng = np.random.default_rng(17)
+x = np.concatenate([a * rng.standard_normal(block)
+                    for a in (0.02, 0.02, 0.08, 0.08, 0.02, 0.02, 0.05, 0.05)])
+n_blocks = x.size // block
+
+
+def to_db(env):
+    return 10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2)
+
+
+# La referencia tiene que usar el diseño que puede usar el streaming:
+# high_accuracy=False.
+reference = to_db(filters.time_weighting(
+    filters.weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
+    mode="fast"))
+
+aw = filters.WeightingFilter(fs, "A", stateful=True)
+tw = filters.TimeWeighting(fs, mode="fast")
+streamed = np.concatenate([to_db(tw.process(aw.filter(
+    x[i * block:(i + 1) * block]))) for i in range(n_blocks)])
+print(f"max |streamed - continuo| = {np.max(np.abs(streamed - reference)):.3g} dB")
+# max |streamed - continuo| = 0 dB
+
+plt.plot(np.arange(x.size) / fs, reference, linewidth=3, alpha=0.4)
+plt.plot(np.arange(x.size) / fs, streamed)
+plt.xlabel("Tiempo [s]")
+plt.ylabel("LAF [dB re 20 uPa]")
+plt.show()
+```
+
+</details>
 
 ## Patrón de sonómetro en tiempo real
 
@@ -208,19 +346,39 @@ fs, block = 48000, 4800  # bloques de 100 ms
 aw = filters.WeightingFilter(fs, "A", stateful=True)
 env = filters.TimeWeighting(fs, mode="fast")  # la clase es inherentemente stateful
 
+laf_max = -np.inf
+
 for x in audio_stream(block):            # tu callback de captura
     y = env.process(aw.filter(x))
     spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # LAF instantáneo
+    laf_max = max(laf_max, 10 * np.log10(y.max() / (2e-5) ** 2))
     display(spl)
 ```
 
-### Restricciones del modo con estado
+`y[..., -1]` es la salida del detector *en el instante en que acaba el bloque*,
+así que la longitud del bloque es el ritmo de refresco de la indicación y nada
+de lo que ocurre entre finales de bloque llega a observarse. Con la constante
+Fast de 125 ms, un bloque de 20 a 100 ms sigue la envolvente fielmente; bloques
+mucho más largos que $\tau$ convierten la indicación en un muestreo disperso de
+ella. El máximo acumulado de arriba existe por lo mismo: un pico que ocurra a
+mitad de bloque no aparece nunca en las muestras mostradas, así que el
+$L_{AFmax}$ hay que acumularlo como el máximo *dentro* de cada bloque. Y los
+primeros bloques contienen la propia rampa de ataque del detector ($5\tau$:
+0,6 s en Fast, 5 s en Slow), que hay que excluir de cualquier máximo o
+percentil.
+
+## Restricciones del modo con estado
+
+El streaming prohíbe todo lo que necesite la señal completa o lo que recalcule
+algo en cada bloque. Cada fila de la tabla se hace cumplir con una excepción, no
+se ignora en silencio, salvo `high_accuracy`, que se resuelve al diseño clásico
+a menos que pases `True` explícitamente.
 
 | Opción | Comportamiento con estado | Motivo |
 | :--- | :--- | :--- |
 | `detrend` | debe ser `False` | La eliminación de tendencia por bloque crea discontinuidades en las fronteras |
 | `resample` | debe ser `False` | El remuestreador no conserva estado |
-| `zero_phase` | no soportado | El filtrado bidireccional necesita la señal completa |
+| `zero_phase` | no admitido | El filtrado bidireccional necesita la señal completa |
 | `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |
 | `steady_ic` | opcional | Arranca los filtros en el régimen permanente de la respuesta al escalón |
 
@@ -239,7 +397,7 @@ sola pasada sobre la señal completa. Esta página no añade contenido
 normativo propio; solo demuestra y documenta esa equivalencia.
 
 **No cubierto.** El filtrado bidireccional `zero_phase` necesita la señal
-completa, así que no está soportado en modo con estado; usa la vía offline
+completa, así que no se admite en modo con estado; usa la vía offline
 de [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. El
 diseño `high_accuracy` de ponderación se resuelve al filtro bilineal
 clásico en modo con estado (pasar `True` explícitamente lanza
@@ -247,11 +405,15 @@ clásico en modo con estado (pasar `True` explícitamente lanza
 con bloques; consulta [Ponderación
 frecuencial](/phonometry/es/signals/levels/weighting/) para el diseño de alta
 precisión offline. Los estadísticos de rango como $L_{90}$ tampoco admiten
-streaming: transmite la envolvente y calcula los percentiles una vez sobre
-el resultado conjunto, como describe [Niveles integrados y
+streaming: procesa la envolvente en streaming y calcula los percentiles una
+vez sobre el resultado conjunto, como describe [Niveles integrados y
 estadísticos](/phonometry/es/signals/levels/levels/).
 
 ## Véase también
 
+- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): el banco offline que el streaming reproduce bit a bit, y el modo `zero_phase` que el streaming no puede usar.
+- [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): un estado por canal, y dónde se va realmente el tiempo de cálculo.
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/#6-procesado-por-bloques): la API funcional del detector, con el estado pasado a mano.
+- [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): qué métricas se acumulan entre bloques y cuáles hay que recalcular sobre la envolvente conjunta.
 - Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).
 - Teoría: [Diseño del banco y estabilidad numérica](/phonometry/es/reference/theory/signal-analysis/#diseño-del-banco-y-estabilidad-numérica): por qué un banco se diseña como secciones de segundo orden y se diezma por banda, que es lo que hace posible el estado en streaming.

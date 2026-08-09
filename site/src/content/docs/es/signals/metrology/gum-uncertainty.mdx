@@ -35,9 +35,12 @@ Todo resultado de medida está incompleto sin una declaración de su
 incertidumbre. La *Guía para la expresión de la incertidumbre de medida* ofrece
 dos formas de propagar las incertidumbres de las entradas de un modelo de
 medida $y = f(x_1, \dots, x_N)$ hacia la salida: la **ley de propagación de la
-incertidumbre** (**ISO/IEC Guide 98-3:2008**, la GUM, apartado 5) y el **método
-de Monte Carlo** (**ISO/IEC Guide 98-3-1:2008**, Suplemento 1, apartado 7). La
-primera combina las incertidumbres típicas analíticamente a través de los
+incertidumbre** (**JCGM 100:2008**, la GUM, publicada también como
+ISO/IEC Guide 98-3:2008, apartado 5) y el **método de Monte Carlo**
+(**JCGM 101:2008**, Suplemento 1, publicado también como
+ISO/IEC Guide 98-3-1:2008, apartado 7). Cuatro designaciones, dos documentos; el
+resto de esta página dice «la GUM» y «el Suplemento 1».
+La primera combina las incertidumbres típicas analíticamente a través de los
 coeficientes de sensibilidad; el segundo propaga numéricamente las
 distribuciones de probabilidad completas. Coinciden para modelos lineales y
 divergen, de forma reveladora, cuando el modelo es no lineal o las entradas se
@@ -57,11 +60,72 @@ u_c^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i
 $$
 
 `combine_uncertainty` evalúa las sensibilidades por diferencias centradas, de
-modo que funciona cualquier modelo invocable, sin derivadas parciales a mano.
-Las magnitudes de entrada se describen con una `Quantity` (mejor estimación,
-incertidumbre típica, PDF, grados de libertad). Las evaluaciones de Tipo B a
-partir de una semianchura $a$ se construyen con `rectangular` ($a/\sqrt{3}$),
-`triangular` ($a/\sqrt{6}$) y `u_shaped` ($a/\sqrt{2}$) (GUM, apartado 4.3).
+modo que funciona casi cualquier modelo invocable, sin derivadas parciales a
+mano. Las magnitudes de entrada se describen con una `Quantity` (mejor
+estimación, incertidumbre típica, PDF, grados de libertad).
+
+El paso de esa diferencia es la incertidumbre típica *propia* de la entrada, que
+es lo que recomienda la GUM (5.1.4, NOTA 2), así que el coeficiente es la
+pendiente media en el intervalo que la entrada explora de verdad y no la
+tangente en la estimación. Para un modelo suave, eso es una virtud. Se rompe con
+modelos que no son suaves en ese intervalo, y el fallo es silencioso: un
+`max()`, un `min()` o un umbral (una saturación en un límite físico, una
+corrección de apto o no apto) tiene una derivada a un lado y otra al otro; una
+consulta a una tabla o un intermedio redondeado pueden devolver una sensibilidad
+exactamente nula; y un modelo que genera sus propios números aleatorios devuelve
+ruido puro. Dos defensas: contrasta `result.sensitivities` con las parciales
+analíticas allí donde las conozcas, y echa mano de `monte_carlo` siempre que el
+modelo no sea suave, porque propagar distribuciones no necesita ninguna derivada.
+El tercer panel de la figura del §2 es exactamente uno de esos modelos.
+
+### Tipo A: incertidumbre a partir de observaciones repetidas
+
+La primera mitad de la GUM es la que la API de esta página hace más fácil
+saltarse. Dadas $n$ lecturas independientes de la misma magnitud con desviación
+típica experimental $s$, la mejor estimación es su media y la incertidumbre
+típica **de esa media** es
+
+$$
+u = \frac{s}{\sqrt{n}}, \qquad \nu = n - 1
+$$
+
+(GUM 4.2.3), exactamente el par que una `Quantity` toma como `uncertainty` y
+`dof`. La entrada de posición del balance de abajo es eso: diez medidas en
+posiciones de micrófono distintas que se dispersan con $s = 1{,}1$ dB dan
+$u = 1{,}1/\sqrt{10} = 0{,}35$ dB con `dof=9`.
+
+Dos consecuencias que conviene interiorizar. Primera, $s$ y $u$ describen cosas
+distintas: $s$ es una propiedad del campo sonoro y no encoge por medir en más
+posiciones, mientras que $u$ sí, de modo que *más posiciones* es la única palanca
+sobre este término, y es una palanca de $\sqrt{n}$. Segunda, una $n$ pequeña sale
+cara dos veces: una por el $\sqrt{n}$ y otra por el factor de cobertura, porque 9
+grados de libertad ya suben $k$ de 1,96 a 2,11 y 4 grados de libertad lo suben a
+2,78. Meter la $s$ bruta en lugar de $s/\sqrt{n}$, o dejar `dof` en su valor
+infinito por defecto, son las dos formas más frecuentes de equivocar este término,
+y tiran en sentidos opuestos.
+
+### Tipo B: incertidumbre a partir de una cota declarada
+
+Las evaluaciones de Tipo B parten de una semianchura $a$ (una tolerancia, una
+resolución, un límite de fabricante) y de una elección de distribución sobre ella
+(GUM, apartado 4.3):
+
+| Constructor | $u$ | Cuándo usarlo |
+| :--- | :---: | :--- |
+| `rectangular(x, a)` | $a/\sqrt{3}$ | solo se conocen las cotas y nada de lo que hay dentro: una tolerancia de clase, la resolución de un indicador, un límite declarado. El valor por defecto honesto |
+| `triangular(x, a)` | $a/\sqrt{6}$ | los valores cercanos al centro son demostrablemente más probables que los de los bordes: la suma de dos influencias rectangulares comparables, una magnitud que se centró con un ajuste |
+| `u_shaped(x, a)` | $a/\sqrt{2}$ | la influencia *recorre cíclicamente* su margen y pasa la mayor parte del tiempo en los extremos: una sala termostatada que oscila entre puntos de conmutación, un campo de onda estacionaria muestreado en una posición cualquiera |
+
+Las dos entradas de Tipo B del balance de abajo son cotas las dos, así que ambas
+son rectangulares: la semianchura de calibración de 0,20 dB es la tolerancia de
+clase del calibrador junto con la deriva anterior/posterior observada en la
+comprobación de campo, y la semianchura de instrumento de 0,30 dB es la
+tolerancia de clase del sonómetro a la frecuencia de referencia. La elección de
+distribución llega al resultado de la GUM *solo* a través de $u$, así que la misma
+semianchura leída como triangular se limitaría a dividir por $\sqrt{6}$; pero fija
+por completo la forma de la salida de Monte Carlo, que es por lo que los dos
+métodos coinciden en este balance y no coincidirían si lo dominara un solo término
+rectangular: el primer panel de la figura del §2.
 
 ```python
 from phonometry import metrology
@@ -85,31 +149,124 @@ k, U = result.expanded(0.95)
 print(round(k, 2), round(U, 2))               # 2.11 0.86  ->  Y = 74.0 ± 0.9 dB
 ```
 
+### Cómo se lee el balance que acabas de calcular
+
+Un balance es una ayuda a la decisión, no un certificado, y este dice algo muy
+concreto de un vistazo. El término de posición aporta 0,350 dB de los 0,407 dB
+totales, que es él solo el **74 % de la varianza**; instrumento y calibración
+juntos son el 26 % restante; y la lectura no aporta nada, porque en este modelo no
+lleva incertidumbre propia. La medición está limitada por *dónde estaba el
+micrófono*, no por el instrumento.
+
+La cuadratura vuelve esa lección cuantitativa y algo brutal. Eliminar por
+completo el término de calibración (un calibrador perfecto, sin deriva) mueve
+$u_c$ de 0,407 a 0,390 dB, una ganancia de 0,017 dB a cambio de un esfuerzo
+imposible. Reducir a la mitad el término de posición, que significa cuatro veces
+más posiciones, lo lleva a 0,272 dB. Los balances se mejoran por arriba del
+diagrama de barras y nunca por abajo, y el diagrama de barras está para decirte
+cuál es cada extremo.
+
+Por último, calibra tus expectativas sobre el número mismo. Una incertidumbre
+expandida cercana a 1 dB es el resultado corriente de una cadena de clase 1 y un
+puñado de posiciones. Los balances normalizados de mediciones ambientales y
+laborales caen entre 1 y 3 dB en cuanto entran los términos de fuente,
+meteorológicos y de muestreo. Cualquier cosa muy por debajo de medio decibelio
+debería llevar a buscar el término que se dejó fuera antes que a darse por
+satisfecho.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_sources_es.svg" alt="Una medición exterior de nivel ponderado A dibujada a escala: una fuente, un sonómetro sobre trípode con el micrófono a 1,5 m del suelo y a 4 m de una fachada, tres posiciones alternativas de micrófono con una llave de dispersión, el calibrador junto al sonómetro y una estación meteorológica; unas líneas de guía conectan cada elemento con las filas de una tabla de balance que nombran su tipo de evaluación, su distribución y sus grados de libertad, con el término del calibrador marcado como el que comparten los dos canales" width="92%" />
+
+Cada fila de un balance es una pieza de equipo o una decisión sobre la geometría,
+y los balances se equivocan por omisión mucho más a menudo que por aritmética: el
+término meteorológico olvidado, el término de montaje o de directividad olvidado,
+el término del calibrador contado dos veces como si los dos canales se hubieran
+calibrado por separado.
+
+### Factor de cobertura y grados de libertad efectivos
+
 La **incertidumbre expandida** $U = k\,u_c$ escala la incertidumbre combinada
 por un factor de cobertura $k = t_p(\nu_\text{ef})$ de la distribución $t$ con
 los **grados de libertad efectivos** dados por la fórmula de Welch–Satterthwaite
 (Anexo G.4). Aquí la única entrada de Tipo A (9 grados de libertad) hace bajar
-$\nu_\text{ef}$ hasta unos 16, de modo que $k = 2{,}11$ en lugar del 1,96 de
-gran muestra. Las entradas correlacionadas se tratan pasando una matriz de
-correlación; una suma totalmente correlacionada se suma entonces linealmente en
-vez de en cuadratura. La correlación es el error silencioso clásico de un
-balance: dos correcciones trazables al *mismo* calibrador, o dos canales que
-comparten un instrumento, no se promedian como lo harían términos
-independientes, y combinarlas en cuadratura como si no estuvieran
-correlacionadas suele subestimar $u_c$ (con sensibilidades de signo opuesto el
-sesgo puede apuntar al revés). Como la GUM define Welch–Satterthwaite solo
-para entradas *independientes*, un presupuesto correlacionado con grados de
-libertad finitos en sus entradas no tiene grados de libertad efectivos en
-absoluto: `effective_dof` es NaN, se emite un aviso y `expanded()` exige un
-`coverage_factor_override` explícito (p. ej. $k = 2$) en lugar de inventarse
-uno. Solo cuando todas las entradas son de Tipo B con grados de libertad
-infinitos un presupuesto correlacionado conserva $\nu_\text{ef} = \infty$ y
-usa el factor de cobertura de la distribución normal. Esta cadena reproduce de
-principio a fin los ejemplos resueltos de la propia GUM: el presupuesto del
-bloque patrón del anexo H.1 ($u_c = 31{,}7$ nm, $U_{99} = 92$ nm frente a los
-32/93 impresos) y la medida correlacionada de resistencia del anexo H.2
-($u_c(R) = 0{,}071\ \Omega$, $u_c(X) = 0{,}295\ \Omega$,
-$u_c(Z) = 0{,}236\ \Omega$ de la Tabla H.3).
+$\nu_\text{ef}$ hasta 16,5, de modo que $k = 2{,}11$ en lugar del 1,96 de gran
+muestra. Esta cadena reproduce de principio a fin los ejemplos resueltos de la
+propia GUM: el balance del bloque patrón del anexo H.1 ($u_c = 31{,}7$ nm,
+$U_{99} = 92$ nm frente a los 32/93 impresos) y la medida correlacionada de
+resistencia del anexo H.2 ($u_c(R) = 0{,}071\ \Omega$,
+$u_c(X) = 0{,}295\ \Omega$, $u_c(Z) = 0{,}236\ \Omega$ de la Tabla H.3).
+
+`expanded(0.95)` implementa la regla de la propia GUM: un intervalo bilateral con
+$k$ tomado de la distribución $t$ en $\nu_\text{ef}$. Las normas de acústica
+suelen fijar $k$ por convenio en su lugar: $k = 2$ para una declaración bilateral
+al 95 % cuando los grados de libertad son grandes, y $k = 1{,}65$ para la
+declaración **unilateral** al 95 % que se usa cuando un nivel se compara con un
+límite y solo importa el rebasamiento. La misma $u_c = 0{,}407$ dB da entonces
+tres incertidumbres expandidas distintas:
+
+| Convenio | $k$ | $U$ |
+| :--- | :---: | :---: |
+| GUM, bilateral, $t$ en $\nu_\text{ef} = 16{,}5$ | 2,11 | 0,86 dB |
+| Bilateral por convenio, gran muestra | 2 | 0,81 dB |
+| Unilateral, frente a un límite | 1,65 | 0,67 dB |
+
+Una decisión de conformidad puede depender solo de esa elección, así que el
+convenio va al lado de cada $U$ que se declare. `coverage_factor_override` es la
+forma de imponer el $k$ que prescriba una norma, y es también la única vía cuando
+el balance está correlacionado, por la razón de abajo.
+
+### Entradas correlacionadas
+
+Las entradas correlacionadas se tratan pasando una matriz de correlación; una
+suma totalmente correlacionada se suma entonces linealmente en vez de en
+cuadratura. La correlación es el error silencioso clásico de un balance: dos
+correcciones trazables al *mismo* calibrador, o dos canales que comparten un
+instrumento, no se promedian como lo harían términos independientes, y
+combinarlas en cuadratura como si no estuvieran correlacionadas suele subestimar
+$u_c$. Con sensibilidades de signo opuesto el sesgo apunta al revés, y una
+pareja totalmente correlacionada puede cancelarse por completo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_correlation_es.svg" alt="Izquierda: la incertidumbre típica combinada de dos términos de 0,3 dB frente a su coeficiente de correlación, subiendo desde cero en menos uno, pasando por el valor en cuadratura 0,424 en cero, hasta 0,600 en más uno para sensibilidades del mismo signo, y la curva reflejada para signos opuestos. Derecha: el mismo balance como dos barras, 0,424 dB suponiendo independencia frente a 0,600 dB con trazabilidad al mismo calibrador, anotado como un 41 por ciento subestimado" width="92%" />
+
+*Dos términos de 0,3 dB cada uno, combinados con `combine_uncertainty` y una
+matriz de correlación. Tratar como independiente una pareja totalmente
+correlacionada subestima $u_c$ en un 41 % (0,424 dB en lugar de 0,600 dB), y el
+error crece con el número de términos que comparten fuente. Leyendo la misma
+curva al revés: una pareja con $\rho = -1$ y sensibilidades del mismo signo se
+cancela hasta cero, que es lo que compra una medida diferencial hecha con un solo
+instrumento.*
+
+Como la GUM define Welch–Satterthwaite solo para entradas *independientes*, un
+balance correlacionado con grados de libertad finitos en sus entradas no tiene
+grados de libertad efectivos en absoluto. Qué hacer depende del balance:
+
+| El balance | `effective_dof` | Qué hacer |
+| :--- | :--- | :--- |
+| No correlacionado | el valor de Welch–Satterthwaite | nada: `expanded(p)` toma $k$ de la $t$ en $\nu_\text{ef}$ |
+| Correlacionado, todas las entradas de Tipo B con dof infinitos | $\infty$ | nada: $k$ sale de la distribución normal |
+| Correlacionado, alguna entrada con dof finitos | `nan`, con un aviso | pasa un $k$ explícito: `expanded(0.95, coverage_factor_override=2.0)` |
+
+```python
+# Las mismas cuatro entradas, ahora con los términos de calibración e
+# instrumento totalmente correlacionados porque ambos son trazables al mismo
+# calibrador.
+correlation = [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 1.0, 0.0],
+    [0.0, 1.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+]
+correlated = metrology.combine_uncertainty(  # avisa: aquí no hay Welch-Satterthwaite
+    lambda a, b, c, d: a + b + c + d, quantities, correlation=correlation)
+print(round(correlated.combined_uncertainty, 3))            # 0.454 dB (era 0.407)
+print(correlated.effective_dof)                             # nan
+print(round(correlated.expanded(0.95, coverage_factor_override=2.0)[1], 2))  # 0.91
+```
+
+Contar una sola vez el calibrador compartido, en lugar de dos, cuesta aquí
+0,047 dB, en un balance donde los dos términos de Tipo B son pequeños. En un
+balance donde dominen (una medida de intensidad de dos canales, una diferencia de
+nivel entre dos salas medida con un mismo sonómetro) el mismo error es el 41 % de
+la figura de arriba.
 
 ## 2. El método de Monte Carlo (Suplemento 1)
 
@@ -120,7 +277,7 @@ ensayos y da la media, la desviación típica y el **intervalo de cobertura
 simétrico en probabilidad** (igual probabilidad en cada cola, apartado 7.7).
 Las entradas se muestrean de forma independiente; la vía gaussiana
 multivariante del Suplemento para magnitudes no independientes (6.4.8) no está
-implementada, así que los presupuestos correlacionados corresponden a
+implementada, así que los balances correlacionados corresponden a
 `combine_uncertainty`. El número de ensayos es fijo (sin el procedimiento
 adaptativo de 7.9, mínimo 2 ensayos) y el intervalo es el simétrico, no el
 intervalo más corto de 5.3.4.
@@ -167,6 +324,27 @@ es la referencia: el propio Suplemento 1 (apartado 8) considera el marco de
 la GUM validado precisamente cuando coincide con el resultado de Monte Carlo,
 y superado por este cuando no coincide.
 
+Merece la pena ver esos tres regímenes en lugar de que se los cuenten a uno,
+porque quien nunca ha visto fallar un intervalo de la GUM no reconoce ese fallo
+en un balance propio:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_gum_vs_mc_es.svg" alt="Tres paneles apilados, cada uno con un histograma de Monte Carlo, la gaussiana de la GUM superpuesta, el intervalo de cobertura de Monte Carlo sombreado y el intervalo Y más o menos U de la GUM como líneas discontinuas. Arriba: una entrada rectangular dominante da una salida casi rectangular que el intervalo gaussiano sobrecubre. En medio: la suma energética de dos niveles da una distribución asimétrica cuya media queda desplazada respecto al valor de la GUM. Abajo: un coeficiente de absorción saturado en uno da un intervalo asimétrico que ninguna declaración simétrica puede representar" width="88%" />
+
+*Los tres regímenes, cada uno calculado con `combine_uncertainty` y
+`monte_carlo` sobre las mismas entradas. **Arriba**, un término rectangular
+dominante ($a = 1$ dB) junto a uno gaussiano pequeño: la salida es casi
+rectangular, y el intervalo de la GUM de $\pm 1{,}15$ dB sobrecubre en un 17 % el
+de Monte Carlo, $[-0{,}98,\ 0{,}98]$. **En medio**, la suma energética
+$10\log_{10}(10^{L_1/10} + 10^{L_2/10})$ de dos niveles con $u = 3$ dB cada uno:
+la distribución de Monte Carlo es asimétrica y su media, 73,48 dB, queda 0,47 dB
+por encima del valor que la GUM propaga por el modelo, 73,01 dB; el desarrollo de
+primer orden ha perdido un sesgo real. **Abajo**, un coeficiente de absorción de
+0,95 con $u = 0{,}06$ contra el límite físico en 1: el intervalo de la GUM llega
+a 1,06, que no existe, mientras que el de Monte Carlo, $[0{,}83,\ 1{,}00]$, es
+asimétrico y ninguna declaración $Y \pm U$ puede expresarlo. En los tres, el
+apartado 8 del Suplemento 1 dice que la referencia es el resultado de Monte
+Carlo.*
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre de la GUM, un diagrama de barras horizontales de la contribución de cada entrada a la incertidumbre combinada con una línea discontinua en uc de 0,407 dB. Derecha: el histograma de salida de Monte Carlo superpuesto con la gaussiana de la GUM y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
 
 <details>
@@ -209,7 +387,7 @@ samples = model(np.full(200_000, 74.0),
                 rng.uniform(-0.30, 0.30, 200_000),
                 rng.normal(0.0, 0.35, 200_000))
 ax2.hist(samples, bins=120, density=True, alpha=0.35, label="Monte Carlo")
-ax2.axvspan(*mc.interval, alpha=0.12, label="95 % coverage interval")
+ax2.axvspan(*mc.interval, alpha=0.12, label="Intervalo de cobertura 95 %")
 ax2.set_title(f"Y = {result.value:.2f} dB,  U = {U:.2f} dB (k = {k:.2f})")
 ax2.legend()
 plt.show()
@@ -227,7 +405,7 @@ con el intervalo de cobertura marcado (el panel derecho de arriba). La incertidu
 ISO 12999-1, que combina términos de reproducibilidad para una magnitud de
 número único, es un balance aparte, específico de ese dominio.
 
-Un presupuesto es tan honesto como el registro que hay detrás: toda entrada
+Un balance es tan honesto como el registro que hay detrás: toda entrada
 promediada supone estacionariedad, y
 [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/) trae los
 tests de Bendat y Piersol que lo comprueban antes de empezar la propagación.
@@ -241,9 +419,13 @@ siempre que tu modelo de medición no sea uno de esos casos normalizados:
 
 - **Calibración.** La tolerancia de clase del calibrador y la cota de
   deriva pre/post de [Calibración](/phonometry/es/signals/metrology/calibration/) son
-  entradas de tipo B de libro: propágalas
-  (`Quantity(..., "rectangular")`) a través del modelo del nivel en lugar
-  de citar la tolerancia sola.
+  entradas de tipo B de libro. Las dos se declaran como **semianchuras**, así que
+  constrúyelas con `rectangular`, que aplica por ti el divisor $a/\sqrt{3}$:
+  `metrology.rectangular(0.0, 0.4, name="Calibrator class 1")` para el límite de
+  tolerancia de IEC 60942, y `metrology.rectangular(0.0, d / 2, name="Drift")`
+  para una diferencia pre/post $d$. No le pases una semianchura a `Quantity`,
+  cuyo segundo argumento ya es una incertidumbre *típica*: eso exagera el término
+  en un factor 1,73 y nada aguas abajo se va a dar cuenta.
 - **Niveles ambientales.** La incertidumbre combinada de ISO 1996-2 de la
   página de [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/)
   es la Fórmula (2) de esa norma: la misma suma en cuadratura con los
@@ -260,6 +442,31 @@ siempre que tu modelo de medición no sea uno de esos casos normalizados:
   [mediciones laborales](/phonometry/es/perception/hearing/occupational-exposure/)
   contabiliza las contribuciones de muestreo, instrumento y posición
   exactamente de esta manera.
+
+## Qué cubre esta guía
+
+**Cubierto.** De la GUM: la ley de propagación del apartado 5 con los
+coeficientes de sensibilidad evaluados numéricamente, la evaluación de Tipo A del
+apartado 4.2 como el par `uncertainty`/`dof` de una `Quantity`, las evaluaciones
+de Tipo B del apartado 4.3 (`rectangular`, `triangular`, `u_shaped`), las
+entradas correlacionadas mediante una matriz de correlación, los grados de
+libertad efectivos de Welch–Satterthwaite del Anexo G.4 y el factor de cobertura
+del Anexo G, validado todo ello contra los balances del bloque patrón del anexo
+H.1 y de la resistencia del anexo H.2. Del Suplemento 1: la propagación de
+distribuciones por Monte Carlo con el intervalo de cobertura simétrico en
+probabilidad del apartado 7.7, comprobada contra los ejemplos resueltos del
+apartado 9.2.
+
+**No cubierto.** El procedimiento adaptativo de número de ensayos del apartado
+7.9 del Suplemento 1 (el número de ensayos es fijo, con un mínimo de 2), el
+intervalo de cobertura más corto del apartado 5.3.4 y el muestreo gaussiano
+multivariante del apartado 6.4.8, de modo que un balance correlacionado se queda
+con `combine_uncertainty`. El Suplemento 2 (varias magnitudes de salida) no está
+implementado en absoluto. La validación del marco de la GUM contra el resultado
+de Monte Carlo del apartado 8 es una comparación que se hace leyendo los dos
+resultados, no un veredicto automático. Los balances de dominio que prescriben
+las normas de acústica (ISO 1996-2, ISO 12999-1 y -2, ISO 9612) se implementan en
+sus propias páginas, listadas arriba, y no se derivan aquí.
 
 ## Véase también
 

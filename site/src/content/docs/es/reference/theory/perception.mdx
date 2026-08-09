@@ -66,6 +66,70 @@ references:
     note: "El modelo de banda crítica y los procedimientos TNR y PR de la sección de prominencia tonal. El PDF enlazado es la descarga gratuita."
   - type: standard
     organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Methods for calculating loudness — Part 1: Zwicker method"
+    designation: "ISO 532-1:2017"
+    url: "https://www.iso.org/standard/63077.html"
+    note: "La sección de sonoridad de Zwicker: el programa de referencia del Anexo A.4 del que la implementación es un port de sala limpia, sus Tablas A.1-A.7 y la cadena variable en el tiempo del apartado 6.3."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Methods for calculating loudness — Part 2: Moore-Glasberg method"
+    designation: "ISO 532-2:2017"
+    url: "https://www.iso.org/standard/63078.html"
+    note: "El modelo estacionario de Moore-Glasberg de la sección de sonoridad avanzada: los filtros auditivos roex, el patrón de excitación y la suma binaural."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2023
+    title: "Acoustics — Methods for calculating loudness — Part 3: Moore-Glasberg-Schlittenlacher method for time-varying signals"
+    designation: "ISO 532-3:2023"
+    url: "https://www.iso.org/standard/79362.html"
+    note: "La extensión variable en el tiempo de la Parte 2 (Fórmulas 2-5 y 7-9), con los suavizadores de sonoridad de corto y de largo plazo de esa misma sección."
+  - type: standard
+    organization: "Ecma International"
+    year: 2025
+    title: "Psychoacoustic metrics for ITT equipment — Part 2: Models based on human perception"
+    designation: "ECMA-418-2:2025 (4.ª ed.)"
+    url: "https://ecma-international.org/publications-and-standards/standards/ecma-418/"
+    note: "El modelo de Sottek: el front-end auditivo del apartado 5, la tonalidad del apartado 6, las Fórmulas 113-117 de aspereza y la entrada de agudeza del apartado 7.1.10. La página enlazada lleva el PDF gratuito."
+  - type: standard
+    organization: "Deutsches Institut für Normung"
+    year: 2009
+    title: "Measurement technique for the simulation of the auditory sensation of sharpness"
+    designation: "DIN 45692:2009"
+    url: "https://www.beuth.de/en/standard/din-45692/117537371"
+    note: "La sección de agudeza: la Ecuación (1), la ventana de calibración del apartado 5.2 y los valores objetivo de la Tabla A.2, con las funciones de ponderación del Anexo B."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2020
+    title: "Sound system equipment — Part 16: Objective rating of speech intelligibility by speech transmission index"
+    designation: "IEC 60268-16:2020 (Edición 5)"
+    url: "https://webstore.iec.ch/publication/26771"
+    note: "La sección del STI: las frecuencias de modulación del A.2.2, la conversión a índice del A.5.4/A.5.5, los pesos de banda de la Tabla A.1, los datos de enmascaramiento y de umbral de recepción de las Tablas A.2/A.3, el método STIPA del Anexo B y las bandas de calificación del Anexo F."
+  - type: standard
+    organization: "American National Standards Institute"
+    year: 1997
+    title: "Methods for calculation of the speech intelligibility index"
+    designation: "ANSI S3.5-1997 (R2020)"
+    publisher: "Acoustical Society of America"
+    url: "https://webstore.ansi.org/standards/asa/ansiasas31997r2020"
+    note: "La sección del SII: los niveles de espectro equivalentes de los apartados 3.11/3.55, la cadena de enmascaramiento y audibilidad de los apartados 5.4-5.8, la suma del apartado 6 y los procedimientos por bandas de las Tablas 1-4 con sus funciones de importancia."
+  - type: web
+    organization: "Google"
+    year: 2019
+    title: "speech_intelligibility_index"
+    siteName: "GitHub"
+    url: "https://github.com/google/speech_intelligibility_index"
+    note: "Una de las dos implementaciones públicas independientes contra las que se verificaron banda a banda los cuatro espectros de esfuerzo vocal. Solo se usa para verificación."
+  - type: web
+    authors: ["Warnes, G. R."]
+    year: 2018
+    title: "SII: Calculate ANSI S3.5-1997 Speech Intelligibility Index (version 1.0.3.1)"
+    siteName: "Archivo de CRAN"
+    url: "https://cran.r-project.org/src/contrib/Archive/SII/"
+    note: "La segunda implementación independiente empleada en esa misma verificación cruzada banda a banda de los espectros de esfuerzo vocal. Archivada en CRAN en 2022; se usa su última versión."
+  - type: standard
+    organization: "International Organization for Standardization"
     year: 2005
     title: "Acoustics — Reference zero for the calibration of audiometric equipment — Part 7: Reference threshold of hearing under free-field and diffuse-field listening conditions"
     designation: "ISO 389-7:2005"
@@ -90,6 +154,23 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Esta página reúne la teoría de la audición y la psicoacústica: las líneas isofónicas, los modelos de sonoridad de Zwicker, Moore-Glasberg y Sottek, las métricas de calidad sonora (tonalidad, aspereza y agudeza), la prominencia tonal, las métricas del habla STI y SII, y la estadística de los umbrales de audición y de la pérdida auditiva. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+
+Cada sección conserva la notación de la norma que describe, y cinco letras se
+reutilizan entre ellas. Donde dos chocan, la sección dice cuál se quiere decir,
+pero la tabla está aquí para quien vuelva atrás buscando una fórmula:
+
+| Símbolo | Significado | Sección |
+| :--- | :--- | :--- |
+| $N$ | Número de bins de la banda del tono | Prominencia tonal (ECMA-418-1) |
+| $N$ | Sonoridad total, en sonios | Sonoridad de Zwicker y avanzada (ISO 532) |
+| $N$ | Desplazamiento permanente del umbral inducido por ruido, en dB | Pérdida auditiva (ISO 1999) |
+| $S$ | Estado suavizado de la sonoridad | Moore-Glasberg variable en el tiempo (ISO 532-3) |
+| $S$ | Agudeza, en acum | Agudeza (DIN 45692) |
+| $T$ | $T_f$, umbral de audición en $f$, en dB | Líneas isofónicas (ISO 226) |
+| $T$ | Tonalidad, en tu$_\mathrm{HMS}$ | Modelo de Sottek (ECMA-418-2) |
+| $L_U$ | Magnitud de la función de transferencia lineal, normalizada en 1 kHz | Líneas isofónicas (ISO 226) |
+| $L_U$ | Nivel medio de la banda crítica contigua superior | Prominencia tonal, PR (ECMA-418-1) |
+| $L_N$ | Nivel de sonoridad, en fonios | Líneas isofónicas, Zwicker |
 
 ## Líneas isofónicas (ISO 226:2023)
 
@@ -122,39 +203,6 @@ Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudn
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
 
 *Las líneas isofónicas de ISO 226:2023 según la Fórmula (1), de 20 a 90 fonios, con el umbral de audición.*
-
-## Prominencia tonal: TNR y PR (ECMA-418-1)
-
-Ambos métodos operan sobre un espectro de potencia con ventana de Hann
-promediado en RMS (apartados 11.1 / 12.1) y usan el modelo de bandas críticas
-del apartado 10. El ancho de banda crítico centrado en un tono a $f$ es
-(Fórmula 2):
-
-$$
-\Delta f_c = 25{,}0 + 75{,}0 \left(1{,}0 + 1{,}4 \left(\tfrac{f}{1000}\right)^2\right)^{0{,}69} \ \text{Hz}
-$$
-
-Los bordes de banda se colocan **aritméticamente** para $f \le 500$ Hz (Fórmulas 4–5): $f_{1,2} = f \mp \Delta f_c / 2$, y **geométricamente** por encima (Fórmulas 7–8): $f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_c$.
-
-**TNR** (apartado 11). La banda del tono abarca los mínimos espectrales a ambos lados del pico dentro del 15 % de $\Delta f_c$ (apartado 11.2). A la potencia del tono se le resta la recta que conecta los bins de los bordes de banda (Fórmula 9): sobre los $N$ bins de la banda del tono, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. La potencia del ruido enmascarante es la potencia restante de la banda crítica reescalada al ancho de banda crítico completo (Fórmula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_c / \Delta f_{\text{band}}$, y $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Fórmula 11). El criterio de prominencia (Fórmulas 12–13) es
-
-$$
-\mathrm{TNR}_{\text{crit}} = \begin{cases} 8{,}0 + 8{,}33 \log_{10}(1000/f_t) \ \text{dB} & f_t < 1\ \text{kHz} \\ 8{,}0 \ \text{dB} & f_t \ge 1\ \text{kHz} \end{cases}
-$$
-
-**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_t \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_t \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_t)$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
-
-*El criterio de TNR dibujado en lugar de evaluado, sobre el rango de interés de
-89,1 Hz – 11,2 kHz, con un tono evaluado encima. Como el criterio vale
-$8{,}0 + 8{,}33\log_{10}(1000/f_t)$ por debajo de 1 kHz y es constante por
-encima, una misma relación tono-ruido se juzga contra un umbral distinto en
-cada frecuencia: el tono del ejemplo supera en 2,1 dB su umbral de 13,0 dB a
-250 Hz, mientras que un tono de 10 dB sería prominente en cualquier punto por
-encima de 1 kHz y no lo sería aquí.*
-
-Consulta la [guía de tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) para su uso.
 
 ## Sonoridad de Zwicker (ISO 532-1)
 
@@ -201,6 +249,24 @@ Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudn
 
 ISO 532-1 es uno de tres modelos de sonoridad; dos familias más recientes refinan el front-end auditivo y añaden las métricas de calidad sonora tonalidad y aspereza.
 
+Los tres están calibrados para que un tono de 1 kHz a 40 dB SPL valga 1 sonio,
+así que coinciden en ese anclaje y divergen al alejarse de él (lo más visible es
+la dependencia con el nivel, donde Zwicker duplica el valor en sonios cada 10 dB
+y el modelo de Sottek crece unas 1,65 veces) y también en cómo tratan las
+señales de banda estrecha frente a las de banda ancha. Por eso los valores en
+sonios de modelos distintos no son intercambiables: el modelo acompaña a cada
+número, y nunca deben mezclarse dos modelos en una misma comparación. El reparto
+de tareas es lo que suele zanjar la elección. **ISO 532-1** es el caballo de
+batalla estacionario que todavía nombran la mayoría de las reglamentaciones de
+ruido de producto, y es la sonoridad sobre la que se construye la definición de
+agudeza de más abajo. **ISO 532-2** refina los filtros auditivos y añade la suma
+binaural, todavía para señales estacionarias. **ISO 532-3** lleva esa cadena al
+dominio del tiempo para sonidos de hasta unos pocos segundos. **ECMA-418-2** es
+la vía que hay que tomar cuando la tonalidad y la aspereza tienen que salir del
+mismo front-end que la sonoridad. Cuando dos modelos discrepan, la pregunta útil
+es cuál nombra la norma que va a recibir el resultado, no cuál se acerca más a
+la verdad.
+
 ### Sonoridad de Moore-Glasberg (ISO 532-2:2017, ISO 532-3:2023)
 
 En lugar de las bandas críticas fijas de Zwicker, el modelo de Moore-Glasberg forma un **patrón de excitación** continuo sobre la escala del número ERB («Cam») usando filtros auditivos **exponenciales redondeados (roex)** dependientes del nivel. En función de la desviación de frecuencia normalizada $g = |f - f_c| / f_c$ respecto a un filtro centrado en $f_c$, la ponderación del filtro es
@@ -238,9 +304,23 @@ $$
 
 usando una constante de tiempo rápida en el ataque y una más lenta en la relajación. Esto produce la **sonoridad de corto plazo** $S'(t)$ (ataque/relajación en torno a 20–30 ms) y la **sonoridad de largo plazo** $S''(t)$ (en torno a 0,1–0,75 s); la sonoridad de largo plazo de pico $N_{\max} = \max_t S''(t)$ predice la sonoridad de sonidos de hasta unos 5 s.
 
+Consulta la [guía de sonoridad
+avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/) para su
+uso y la tabla de elección de modelo.
+
 ### Modelo de Sottek (ECMA-418-2:2025)
 
 ECMA-418-2 construye sus tres métricas sobre un único front-end auditivo (apartado 5): un filtro de oído externo/medio, un banco de 53 filtros paso banda solapados de tipo gammatone espaciados en la escala Bark_HMS ($z = 0{,}5$ a $26{,}5$), rectificación de media onda y un RMS de bloque corto $\tilde{p}(l, z)$ por banda $z$ y bloque temporal $l$. Una no linealidad compresiva (Fórmula 23) convierte el RMS de banda en la **sonoridad de base específica** $N'_{\mathrm{basis}}(l, z)$, cuya constante de calibración $c_N$ fija un tono de 1 kHz / 40 dB SPL en 1 sone_HMS. La sonoridad ensambla las sonoridades tonal y de ruido (abajo) sobre bandas y tiempo (Fórmulas 113–117); crece unas $1{,}65\times$ por cada 10 dB, más lentamente que el factor de 2 de Zwicker, una propiedad intrínseca de la suma de Sottek.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, los tres pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
+
+*La divergencia que se acaba de enunciar, dibujada sobre la única señal en la
+que están calibrados los tres modelos. Pasan juntos por 1 sonio aproximadamente
+a 40 dB (el front-end de Sottek devuelve ahí 0,9845 sonios$_\mathrm{HMS}$) y
+después se separan: la curva de Zwicker duplica cada 10 dB y la de Sottek sube
+unas 1,65 veces en ese mismo paso. Eso es una diferencia entre sumas auditivas,
+no un error de calibración, y es la razón por la que un valor en sonios sin su
+modelo al lado no se puede comparar con nada.*
 
 ### Tonalidad: autocorrelación de la señal de banda (ECMA-418-2)
 
@@ -250,13 +330,13 @@ $$
 \phi_z(m) = \frac{1}{M - m} \sum_{n=0}^{M - 1 - m} p_z(n)\ p_z(n + m)
 $$
 
-Una estimación espectral con ventana de $\phi_z$ separa una **sonoridad tonal** $N'_{\mathrm{tonal}}(l, z)$ de la **sonoridad de ruido** $N'_{\mathrm{noise}}(l, z)$ (Fórmulas 36–48). La tonalidad específica es la sonoridad tonal escalada por una compuerta suave de relación señal-ruido $q(l)$ (Fórmulas 49–51),
+Una estimación espectral con ventana de $\phi_z$ separa una **sonoridad tonal** $N'_{\mathrm{tonal}}(l, z)$ de la **sonoridad de ruido** $N'_{\mathrm{noise}}(l, z)$ (Fórmulas 36–48). La tonalidad específica es la sonoridad tonal escalada por una puerta suave de relación señal-ruido $q(l)$ (Fórmulas 49–51),
 
 $$
 T'(l, z) = c_T\ q(l)\ N'_{\mathrm{tonal}}(l, z)
 $$
 
-y el valor único $T$ (tu_HMS) es el promedio temporal con compuerta del máximo
+y el valor único $T$ (tu_HMS) es el promedio temporal con puerta del máximo
 por bloque sobre las bandas (Fórmulas 61–64). La constante $c_T$ fija el tono
 de 1 kHz / 40 dB a 1 tu_HMS, y la banda del pico de la ACF da la frecuencia
 tonal $f_{\mathrm{ton}}$.
@@ -303,11 +383,62 @@ cambia un valor de agudeza solo para sonidos con energía por encima del codo
 (de 15 a 15,8 Bark, unos 2,5 a 3 kHz) y deja intacto todo lo que queda por
 debajo.*
 
+**Para qué sirven estos tres números.** Cada unidad está anclada en un sonido de
+referencia (1 tu$_\mathrm{HMS}$ para un tono de 1 kHz a 40 dB, 1 asper para un
+tono modulado al 100 % a 70 Hz, 1 acum para el ruido de banda estrecha de
+920–1080 Hz a 60 dB) precisamente porque ninguna norma enuncia un criterio
+absoluto para ninguno de ellos. No existe una aspereza ni una tonalidad que «no
+cumpla». Se ganan el sueldo como *diferencias* entre variantes de diseño de un
+mismo producto, medidas igual y con el mismo modelo. Órdenes de magnitud para
+leer un resultado: un ventilador o un motor con un silbido audible suele caer en
+unas pocas décimas de tu$_\mathrm{HMS}$, que se declaran con su frecuencia tonal
+$f_{\mathrm{ton}}$ al lado, y un sonido de banda ancha sin componente periódica
+queda cerca de cero; una aspereza de unas pocas décimas de asper ya es un
+batido o un zumbido molesto, porque 1 asper es un tono modulado *al 100 %* en la
+peor tasa de modulación; una agudeza próxima o inferior a 1 acum no llama la
+atención, y los valores por encima de unos 2 acum se leen como chillones.
+Diferencias del orden del 10 % en cualquiera de los tres andan cerca de lo
+mínimo que un oyente distingue de forma fiable, así que citar más precisión que
+esa invita a sobreinterpretar.
+
 Consulta la [guía de métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) para su uso.
+
+## Prominencia tonal: TNR y PR (ECMA-418-1)
+
+Ambos métodos operan sobre un espectro de potencia con ventana de Hann
+promediado en RMS (apartados 11.1 / 12.1) y usan el modelo de bandas críticas
+del apartado 10. El ancho de banda crítico centrado en un tono a $f$ es
+(Fórmula 2):
+
+$$
+\Delta f_c = 25{,}0 + 75{,}0 \left(1{,}0 + 1{,}4 \left(\tfrac{f}{1000}\right)^2\right)^{0{,}69} \ \text{Hz}
+$$
+
+Los bordes de banda se colocan **aritméticamente** para $f \le 500$ Hz (Fórmulas 4–5): $f_{1,2} = f \mp \Delta f_c / 2$, y **geométricamente** por encima (Fórmulas 7–8): $f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_c$.
+
+**TNR** (apartado 11). La banda del tono abarca los mínimos espectrales a ambos lados del pico dentro del 15 % de $\Delta f_c$ (apartado 11.2). A la potencia del tono se le resta la recta que conecta los bins de los bordes de banda (Fórmula 9): sobre los $N$ bins de la banda del tono, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. La potencia del ruido enmascarante es la potencia restante de la banda crítica reescalada al ancho de banda crítico completo (Fórmula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_c / \Delta f_{\text{band}}$, y $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Fórmula 11). El criterio de prominencia (Fórmulas 12–13) es
+
+$$
+\mathrm{TNR}_{\text{crit}} = \begin{cases} 8{,}0 + 8{,}33 \log_{10}(1000/f_t) \ \text{dB} & f_t < 1\ \text{kHz} \\ 8{,}0 \ \text{dB} & f_t \ge 1\ \text{kHz} \end{cases}
+$$
+
+**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_t \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_t \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_t)$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
+
+*El criterio de TNR dibujado en lugar de evaluado, sobre el rango de interés de
+89,1 Hz – 11,2 kHz, con un tono evaluado encima. Como el criterio vale
+$8{,}0 + 8{,}33\log_{10}(1000/f_t)$ por debajo de 1 kHz y es constante por
+encima, una misma relación tono-ruido se juzga contra un umbral distinto en
+cada frecuencia: el tono del ejemplo supera en 2,1 dB su umbral de 13,0 dB a
+250 Hz, mientras que un tono de 10 dB sería prominente en cualquier punto por
+encima de 1 kHz y no lo sería aquí.*
+
+Consulta la [guía de tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) para su uso.
 
 ## Transferencia de modulación y STI (IEC 60268-16)
 
-La inteligibilidad del habla viaja en las modulaciones lentas de intensidad de la envolvente del habla. La **función de transferencia de modulación (MTF)** $m(F)$ de un canal de transmisión es la razón entre la profundidad de modulación recibida y la emitida de la envolvente de intensidad por banda de octava a la frecuencia de modulación $F$; el STI completo la evalúa en las 14 frecuencias de modulación en tercios de octava de 0,63 a 12,5 Hz en las siete bandas de octava de 125 Hz a 8 kHz (A.2.2). Desde una respuesta al impulso medida, la **forma cerrada de Schroeder** la da directamente (método indirecto):
+La inteligibilidad del habla viaja en las modulaciones lentas de intensidad de la envolvente del habla. Los números de apartado que siguen son los de IEC 60268-16 Ed. 5 (2020). La **función de transferencia de modulación (MTF)** $m(F)$ de un canal de transmisión es la razón entre la profundidad de modulación recibida y la emitida de la envolvente de intensidad por banda de octava a la frecuencia de modulación $F$; el STI completo la evalúa en las 14 frecuencias de modulación en tercios de octava de 0,63 a 12,5 Hz en las siete bandas de octava de 125 Hz a 8 kHz (A.2.2). Desde una respuesta al impulso medida, la **forma cerrada de Schroeder** la da directamente (método indirecto):
 
 $$
 m_k(f_m) = \frac{\left| \int_0^{\infty} h_k^2(t)\ e^{-j 2 \pi f_m t}\ dt \right|}{\int_0^{\infty} h_k^2(t)\ dt}
@@ -319,13 +450,13 @@ $$
 m'_k = m_k \cdot \frac{I_k}{I_k + I_{n,k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
 $$
 
-y cuando se conocen los niveles absolutos por banda, la corrección completa $m'_k = m_k I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})$ añade la intensidad de enmascaramiento auditivo $I_{am,k}$ (desde la banda de octava inmediatamente inferior, Tabla A.2) y el umbral absoluto de recepción $I_{rt,k}$ (Tabla A.3). Cada $m$ corregido se transforma en una **SNR efectiva**, recortada al rango de ±15 dB donde la inteligibilidad varía realmente, y después en un índice de transmisión (A.5.4/A.5.5):
+y cuando se conocen los niveles absolutos por banda, la corrección completa $m'_k = m_k I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})$ añade la intensidad de enmascaramiento auditivo $I_{am,k}$ (desde la banda de octava inmediatamente inferior, Tabla A.2) y el umbral absoluto de recepción $I_{rt,k}$ (Tabla A.3). Esos dos son términos de *nivel absoluto*, así que solo significan algo cuando la cadena está calibrada en dB SPL en la posición de escucha y la fuente se excita a un nivel de habla definido. Eso parte la medida en dos: una respuesta al impulso sin calibrar da $m$, y con un espectro de fondo medido aparte da además el término de ruido, pero los términos de enmascaramiento y de umbral de recepción se dejan fuera en lugar de adivinarlos; una medida calibrada con la fuente radiando el espectro de habla normalizado a la altura de la boca da la corrección completa. Es también la razón por la que una lectura STIPA directa de un sonómetro de mano y un STI indirecto obtenido de una respuesta al impulso de la misma sala pueden discrepar cuando nunca se fijó el nivel de la fuente. Cada $m$ corregido se transforma en una **SNR efectiva**, recortada al rango de ±15 dB donde la inteligibilidad varía realmente, y después en un índice de transmisión (A.5.4/A.5.5):
 
 $$
 \mathrm{SNR}_{\mathrm{eff}} = 10 \log_{10} \frac{m}{1 - m}\ \text{dB}, \qquad \mathrm{TI} = \frac{\mathrm{SNR}_{\mathrm{eff}} + 15}{30}
 $$
 
-El MTI de banda es la media de los TI sobre las frecuencias de modulación, y el STI pondera las bandas con los factores masculinos $\alpha_k$, $\beta_k$ de la Tabla A.1 de la Ed. 5 (A.5.6):
+El MTI de banda es la media de los TI sobre las frecuencias de modulación, y el STI pondera las bandas con los factores masculinos $\alpha_k$, $\beta_k$ de la Tabla A.1 (A.5.6):
 
 $$
 \mathrm{STI} = \sum_{k=1}^{7} \alpha_k\ \mathrm{MTI}_k - \sum_{k=1}^{6} \beta_k \sqrt{\mathrm{MTI}_k\ \mathrm{MTI}_{k+1}}
@@ -362,11 +493,59 @@ $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0{,}55}
 $$
 
-Consulta la [guía del índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) para su uso.
+**Cómo se lee el índice.** El STI se escala de 0 a 1 sobre el rango en el que la
+inteligibilidad varía de verdad, y las bandas de valoración informativas del
+Anexo F cortan ese rango en letras de 0,04 de ancho con bordes en 0,36, 0,40 …
+0,76, desde la U por debajo de 0,36 hasta la A+ en 0,76 y por encima;
+`STIResult.rating` devuelve la letra, y la Tabla G.1 del Anexo G da un uso de
+ejemplo para cada banda: la banda G (0,48-0,52) figura como el valor objetivo de
+los sistemas de megafonía de emergencia, que es de donde sale el conocido
+requisito de «STI ≥ 0,5», y la H (0,44-0,48) como el límite inferior habitual de
+esos sistemas. La letra viene con dos advertencias. Los Anexos F y G son
+informativos, y el propio objeto y campo de aplicación de la Edición 5 dice que
+el documento no proporciona criterios para certificar un canal de transmisión,
+así que un requisito de proyecto va en el contrato como un STI numérico y la
+letra se usa para declararlo. Y la anchura de 0,04 de cada banda la fija la
+propia incertidumbre típica de una medida directa, que para STIPA anda entre
+0,02 y 0,03, más ancha que la semianchura de 0,02 de una banda, así que un valor a
+menos de unos 0,02 de un borde puede calificarse legítimamente a un lado o al
+otro; el STI se cita junto a la letra y se promedia sobre varias posiciones en
+lugar de fiarlo a una sola.
+
+Consulta la [guía del índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) para su uso, la tabla de usos típicos del Anexo G y la regla de promediado entre posiciones.
 
 ## Índice de inteligibilidad del habla (ANSI S3.5)
 
-Mientras el STI caracteriza un canal de transmisión, el SII (ANSI S3.5-1997) predice la inteligibilidad a partir de lo que el oyente puede oír realmente: 18 bandas de tercio de octava de 160 Hz a 8 kHz, cada una con su importancia de banda $I_i$ (Tabla 3, $\sum I_i = 1$, con máximo cerca de 2 kHz). Todas las entradas son niveles espectrales equivalentes (apartados 3.11/3.55). El habla se enmascara a sí misma hacia arriba: el espectro de enmascaramiento de cada banda $Z_i$ (apartado 5.4) acumula las bandas inferiores con pendientes $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} f_i - 6{,}353)$ dB, y la perturbación es el **mayor** entre el enmascaramiento y el suelo auditivo, $D_i = \max(Z_i, X'_i)$ (apartado 5.6), con $X'_i = X_i + T'_i$ el espectro de ruido interno de referencia más el desplazamiento del umbral de audición del oyente (apartados 5.5/5.6). La audibilidad de banda recorta el margen habla-perturbación al intervalo $[0, 1]$ (apartado 5.8), un factor de distorsión de nivel descuenta la presentación excesivamente alta (apartado 5.7), y el índice suma (apartado 6):
+Mientras el STI caracteriza un canal de transmisión, el SII (ANSI S3.5-1997; los números de apartado que siguen son los de esa edición) predice la inteligibilidad a partir de lo que el oyente puede oír realmente: 18 bandas de tercio de octava de 160 Hz a 8 kHz, cada una con su importancia de banda $I_i$ (Tabla 3, $\sum I_i = 1$, con máximo cerca de 2 kHz).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_es.svg" alt="La función de importancia de banda de los cuatro procedimientos por bandas de ANSI S3.5-1997 superpuestos sobre un mismo eje logarítmico de frecuencia: las 21 bandas críticas, las 17 bandas críticas de contribución equitativa, las 18 bandas de tercio de octava y las 6 bandas de octava, cada una dibujada como un escalón entre sus propios límites de banda. Las cuatro trazan la misma subida hasta un máximo en torno a 2 kHz, y cuanto más anchas son las bandas más alto queda el escalón: la función de octava llega a 0,265 frente a 0,090 de la de tercio de octava" width="90%" />
+
+*La función de importancia dice dónde están las claves del habla, y los cuatro
+procedimientos por bandas de más abajo coinciden en ello: la misma subida hasta
+un máximo cerca de 2 kHz y el mismo total de 1,0 redistribuido sobre bandas más
+anchas o más estrechas, que es la razón por la que los escalones de octava están
+en 0,265 donde los de tercio de octava están en 0,090. Una banda perdida a 2 kHz
+cuesta varias veces lo que cuesta esa misma banda a 160 Hz.*
+
+Todas las entradas son **niveles espectrales equivalentes** (apartados
+3.11/3.55), es decir, magnitudes por hercio: un nivel de banda de tercio de
+octava medido no se convierte en $E'_i$ ni en $N'_i$ hasta que se le resta
+$10\log_{10}$ del ancho de banda en hercios de esa banda, unos 23,6 dB en la
+banda de 1 kHz y más de 30 dB en lo alto del rango, que es la razón por la que
+los espectros de habla normalizados quedan cerca de 25 dB a 1 kHz para una voz
+normal. Cada una de las tres entradas sale de una medida definida: la entrada de
+habla es o bien uno de los cuatro esfuerzos vocales incorporados, definidos a
+1 m delante del hablante, o bien un espectro de habla medido y referido a la
+posición del oyente; la entrada de ruido se mide en esa misma posición de
+oyente, con el hablante callado y sobre el mismo tiempo de integración; y la
+entrada de umbral es el audiograma del oyente en dB HL a esas mismas
+frecuencias, cero para audición normal. La comprobación que caza el error
+clásico es el valor de referencia de más abajo: un espectro de esfuerzo normal
+en silencio y con audición normal tiene que puntuar en torno a 0,996, así que un
+índice que se pega a 1,0 en una escena claramente ruidosa significa que se
+pasaron niveles de banda donde se esperaban niveles espectrales.
+
+El habla se enmascara a sí misma hacia arriba: el espectro de enmascaramiento de cada banda $Z_i$ (apartado 5.4) acumula las bandas inferiores con pendientes $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} f_i - 6{,}353)$ dB, y la perturbación es el **mayor** entre el enmascaramiento y el suelo auditivo, $D_i = \max(Z_i, X'_i)$ (apartado 5.6), con $X'_i = X_i + T'_i$ el espectro de ruido interno de referencia más el desplazamiento del umbral de audición del oyente (apartados 5.5/5.6). La audibilidad de banda recorta el margen habla-perturbación al intervalo $[0, 1]$ (apartado 5.8), un factor de distorsión de nivel descuenta la presentación excesivamente alta (apartado 5.7), y el índice suma (apartado 6):
 
 $$
 A_i = \operatorname{clip}\Big( \frac{E'_i - D_i + 15}{30},\ 0,\ 1 \Big), \qquad
@@ -374,7 +553,43 @@ L_i = \operatorname{clip}\Big( 1 - \frac{E'_i - U_i - 10}{160},\ 0,\ 1 \Big), \q
 \mathrm{SII} = \sum_{i=1}^{18} I_i\ L_i\ A_i .
 $$
 
-La misma cadena recorre las otras tres tablas de bandas de la norma, seleccionadas con `method=`: las 21 bandas críticas de la Tabla 1, las 17 bandas críticas de contribución equitativa de la Tabla 2 y las 6 bandas de octava de la Tabla 4. Esas tres expresan la pendiente de enmascaramiento mediante el ancho de banda tabulado, $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} W_i)$, que es la misma fórmula que el $10 \log_{10} f_i - 6{,}353$ de arriba abrevia para una banda de tercio de octava; el procedimiento por bandas de octava prescinde por completo de la propagación del enmascaramiento, ya que una banda de octava ya es más ancha que la propagación que se modela. Los espectros normalizados de habla de la Tabla 3 para los esfuerzos vocales normal, elevado, fuerte y grito están incorporados (25,01 / 33,86 / 42,16 / 51,31 dB a 1 kHz); el $U_i$ del factor de distorsión de nivel es siempre el espectro de esfuerzo normal. Los anclajes: el espectro de esfuerzo normal en silencio con audición normal puntúa SII ≈ 0,996, los valores de referencia del espectro de enmascaramiento se reproducen a $10^{-4}$, y los espectros por esfuerzo vocal están verificados de forma cruzada frente a las implementaciones de referencia de Google y CRAN.
+La misma cadena recorre las otras tres tablas de bandas de la norma, seleccionadas con `method=`: las 21 bandas críticas de la Tabla 1, las 17 bandas críticas de contribución equitativa de la Tabla 2 y las 6 bandas de octava de la Tabla 4. Esas tres expresan la pendiente de enmascaramiento mediante el ancho de banda tabulado, $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} W_i)$, que es la misma fórmula que el $10 \log_{10} f_i - 6{,}353$ de arriba abrevia para una banda de tercio de octava; el procedimiento por bandas de octava prescinde por completo de la propagación del enmascaramiento, ya que una banda de octava ya es más ancha que la propagación que se modela. Los espectros normalizados de habla de la Tabla 3 para los esfuerzos vocales normal, elevado, fuerte y grito están incorporados (25,01 / 33,86 / 42,16 / 51,31 dB a 1 kHz); el $U_i$ del factor de distorsión de nivel es siempre el espectro de esfuerzo normal.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum_es.svg" alt="Los cuatro espectros de habla normalizados de ANSI S3.5-1997 (normal, elevado, fuerte y grito) como una sola familia rotulada: el nivel del espectro de habla normalizado en dB SPL de 160 Hz a 8000 Hz, con cada esfuerzo mayor levantando el espectro entero" width="90%" />
+
+*Los cuatro esfuerzos vocales, en nivel espectral y no en nivel de banda, que es
+la razón por la que la curva de esfuerzo normal pasa por 25,01 dB a 1 kHz y no
+por los sesenta y pico dB que un hablante mide como nivel de banda a un metro.
+Subir el esfuerzo no levanta la familia de forma uniforme: gritar añade 27,6 dB
+a 2,5 kHz, 26,3 dB a 1 kHz y **−1,6 dB** a 160 Hz, así que el espectro se
+inclina además de subir, y el esfuerzo extra se gasta donde la función de
+importancia de arriba es mayor.*
+
+Valores de referencia: el espectro de esfuerzo normal en silencio con audición
+normal puntúa SII = 0,996; los valores de referencia de enmascaramiento de la
+Tabla 3 se reproducen dentro de $10^{-4}$ dB de nivel espectral; y los cuatro
+espectros por esfuerzo vocal están verificados banda a banda contra dos
+implementaciones públicas independientes, el `speech_intelligibility_index` de
+Google y el paquete `SII` de R (los dos en las referencias, usados solo para
+verificación).
+
+**Cómo se lee el índice.** El SII es una *fracción de audibilidad*, no una nota:
+dice qué proporción de las claves del habla ponderadas por importancia llega al
+oyente por encima del enmascaramiento y del umbral. ANSI S3.5 lo convierte en un
+porcentaje de palabras o de frases acertadas solo a través de funciones de
+transferencia propias del material de habla y de los oyentes, así que un mismo
+0,5 sostiene puntuaciones altas de frases y otras mucho más bajas de sílabas sin
+sentido, y un SII no debería citarse nunca como «X % de inteligibilidad» sin
+nombrar el material. Como referencias prácticas: por encima de unos 0,75 está el
+objetivo de diseño cuando hay que entender material desconocido, de 0,45 a 0,75
+es viable para material familiar en un contexto conocido, y por debajo de unos
+0,3 no se puede confiar en el habla conectada. Las diferencias de unas pocas
+centésimas caen dentro de la incertidumbre de los espectros de entrada y no
+significan nada. Cuál de las dos métricas del habla hay que tomar se deduce de
+lo que se pregunta: el **SII** responde preguntas sobre un *oyente*, porque es
+la única de las dos que toma como entrada un audiograma y un esfuerzo vocal; el
+**STI** responde preguntas sobre una *sala o un sistema*, porque toma una
+respuesta al impulso y un espectro de fondo y no dice nada sobre quién escucha.
 
 Consulta la [guía de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/) para su uso.
 
@@ -384,7 +599,25 @@ ISO 389-7:2005 Tabla 1 fija el umbral de audición de referencia de adultos
 jóvenes otológicamente normales: el SPL en campo libre y campo difuso que
 corresponde a 0 dB HL en las 11 frecuencias audiométricas de 125 Hz a 8 kHz
 (22,1 dB a 125 Hz en ambos campos, 2,4/0,8 dB libre/difuso a 1 kHz,
-divergiendo en alta frecuencia hasta 12,6 frente a 6,8 dB a 8 kHz). ISO
+divergiendo en alta frecuencia hasta 12,6 frente a 6,8 dB a 8 kHz).
+
+Las dos columnas se diferencian solo en cómo llega el sonido a la cabeza, y la
+norma es exacta al respecto (apartado 1). Las dos se aplican a la escucha
+**binaural** de personas otológicamente normales de 18 a 25 años, y las dos
+están referidas al nivel de presión acústica medido **sin el oyente presente**,
+en el punto donde estaría el centro de la cabeza. La columna de campo libre se
+aplica a tonos puros en una onda plana progresiva libre, con el sujeto de frente
+a la fuente (incidencia frontal); la columna de campo difuso se aplica a bandas
+de tercio de octava de ruido blanco o rosa en un campo difuso, y hasta 8 kHz
+también a cualquier banda de ruido más estrecha. Esa diferencia de geometría es
+justo la razón por la que las columnas coinciden por debajo de 1 kHz y se
+separan por encima: en alta frecuencia la ganancia de cabeza y pabellón a
+incidencia frontal supera al promedio de todas las direcciones, así que hace
+falta menos nivel de campo libre para el mismo umbral. Significa además que son
+referencias de calibración de un montaje audiométrico en campo sonoro
+(ISO 8253-2), no una curva contra la que comparar una medida de sala.
+
+ISO
 7029:2017 describe cómo se desplaza estadísticamente ese umbral con la edad:
 la desviación mediana respecto a los 18 años es (apartado 4.2, Tabla 1)
 
@@ -392,7 +625,7 @@ $$
 \Delta H_{md} = a\ (Y - 18)^b \ \text{dB},
 $$
 
-y cualquier fractil sigue un modelo gaussiano bilateral (apartado 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, usando la dispersión superior $s_u$ para $z \ge 0$ (peor que la mediana) y la inferior $s_l$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (apartado 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Anclajes: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
+y cualquier fractil sigue un modelo gaussiano bilateral (apartado 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, usando la dispersión superior $s_u$ para $z \ge 0$ (peor que la mediana) y la inferior $s_l$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (apartado 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Valores de referencia: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
 
 Consulta la [guía de umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/) para su uso.
 

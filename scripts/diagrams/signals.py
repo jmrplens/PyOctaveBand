@@ -55,6 +55,120 @@ def _d_calibration_chain(s: SVG, th: Theme) -> None:
 
 
 # ---------------------------------------------------------------------------
+# d1b - Coupling the calibrator on the capsule (IEC 60942 half-section)
+# ---------------------------------------------------------------------------
+
+def _d_calibration_coupling(s: SVG, th: Theme) -> None:
+    """Half-section through the coupler with the capsule inserted.
+
+    Drawn to the real proportions of a 1/2 inch measurement microphone
+    (12.7 mm nominal capsule diameter, 6.35 mm for the 1/4 inch adaptor
+    inset); the scale below is 14 drawing units per millimetre.
+    """
+    scale = 11.0                 # drawing units per millimetre
+    cx = 352.0                   # axis of the assembly
+    half = 12.7 / 2 * scale      # 1/2 inch capsule radius: 69.9 units
+    wall = 24.0                  # coupler wall thickness, drawn
+    ref_y = 300.0                # reference plane: contact microphone/coupler
+    dia_y = 236.0                # diaphragm, inside the cavity
+    cav_top = 148.0              # cavity roof, under the driver
+
+    # -- Coupler body, sectioned: two walls and a roof around the cavity ----
+    for x0 in (cx - half - wall, cx + half):
+        s.rect(x0, cav_top - 30, wall, ref_y - cav_top + 30, th.panel, th.fg,
+               sw=2)
+        y = cav_top - 24
+        while y < ref_y - 8:
+            s.line(x0 + 2, y + 12, x0 + wall - 2, y, th.muted, 0.9)
+            y += 12
+    s.rect(cx - half - wall, cav_top - 56, 2 * (half + wall), 26, th.panel,
+           th.fg, sw=2)
+    x = cx - half - wall + 6
+    while x < cx + half + wall - 6:
+        s.line(x, cav_top - 32, x + 12, cav_top - 54, th.muted, 0.9)
+        x += 12
+    s.text(cx, cav_top - 70, "Sound calibrator (class 1)", 20, th.fg, bold=True)
+
+    # Driver radiating down into the cavity.
+    s.rect(cx - 40, cav_top - 28, 80, 14, th.primary, th.fg, sw=1.4)
+    for r in (22, 34, 46):
+        s.path(f"M {cx - r:.0f} {cav_top + 4:.0f} Q {cx:.0f} "
+               f"{cav_top + 4 + r * 0.42:.0f} {cx + r:.0f} {cav_top + 4:.0f}",
+               stroke=th.accent, sw=1.4)
+    s.text(cx, cav_top + 56, "94.0 dB", 21, th.secondary, bold=True, mono=True)
+    s.text(cx, cav_top + 80, "1 kHz", 18, th.muted, mono=True)
+
+    # -- Effective load volume: cavity floor is the diaphragm ---------------
+    s.add(f'<rect x="{cx - half}" y="{dia_y}" width="{2 * half}" '
+          f'height="{ref_y - dia_y}" fill="{th.accent}" opacity="0.22"/>')
+    s.rect(cx - half, dia_y, 2 * half, ref_y - dia_y, "none", th.accent,
+           sw=1.6, dash="5,4")
+
+    # -- Microphone, inserted to the reference plane ------------------------
+    s.rect(cx - half, dia_y, 2 * half, 7, th.fg, rx=2)          # diaphragm
+    s.rect(cx - half, ref_y, 2 * half, 132, th.panel, th.primary, rx=6, sw=2)
+    s.line(cx - half - wall, ref_y, cx + half + wall, ref_y, th.secondary, 2.6)
+    s.text(cx, ref_y + 52, "1/2 in capsule", 19, th.fg, bold=True)
+    s.text(cx, ref_y + 76, "+ preamplifier", 19, th.muted)
+    s.line(cx, ref_y + 132, cx, 470, th.fg, 2.2)
+    s.dim(cx - half, ref_y + 104, cx + half, ref_y + 104, "12.7 mm", size=17)
+
+    # Annotations on the left.
+    s.line(cx - half - wall - 6, ref_y, 214, ref_y, th.secondary, 1.3,
+           dash="7,4,2,4")
+    s.text(210, ref_y - 8, "reference plane (3.12)", 17, th.secondary,
+           bold=True, anchor="end")
+    s.arrow(216, dia_y + 26, cx - half - 6, dia_y + 22, th.accent, 1.6)
+    s.text(212, dia_y + 10, "effective load", 17, th.accent, bold=True,
+           anchor="end")
+    s.text(212, dia_y + 32, "volume (3.13)", 17, th.accent, anchor="end")
+    s.text(212, ref_y + 30, "the generated level moves", 16, th.muted,
+           anchor="end")
+    s.text(212, ref_y + 50, "with that volume (6.3 k)", 16, th.muted,
+           anchor="end")
+
+    # -- Adaptor inset ------------------------------------------------------
+    s.rect(468, 104, 160, 214, "none", th.fg, rx=10, sw=1.6, dash="6,5")
+    s.text(548, 132, "1/4 in capsule", 18, th.fg, bold=True)
+    ax0, aq = 548.0, 6.35 / 2 * scale
+    s.rect(ax0 - 30, 150, 60, 24, th.panel, th.fg, sw=1.6)     # adaptor sleeve
+    s.rect(ax0 - aq, 174, 2 * aq, 66, th.panel, th.primary, rx=3, sw=1.8)
+    s.line(ax0 - 30, 150, ax0 + 30, 150, th.secondary, 2.2)
+    s.text(548, 266, "the adaptor is part of", 15, th.fg)
+    s.text(548, 288, "the calibrator (5.1.1)", 15, th.fg)
+
+    # -- Windscreen, off to one side ---------------------------------------
+    s.circle(548, 386, 28, th.panel, th.muted, sw=2)
+    for k in range(-2, 3):
+        s.line(524, 386 + k * 10, 572, 386 + k * 10, th.muted, 0.9)
+    s.text(548, 436, "windscreen: off for the", 15, th.muted)
+    s.text(548, 456, "check, back on to measure", 15, th.muted)
+
+    # -- Right panel: the background check ---------------------------------
+    s.rect(650, 104, 224, 340, "none", th.primary, rx=12, sw=1.8)
+    s.text(762, 134, "Before switching it on", 19, th.primary, bold=True)
+    s.rect(736, 158, 56, 52, th.panel, th.fg, rx=6, sw=1.8)
+    s.rect(750, 210, 28, 62, th.panel, th.primary, rx=4, sw=1.8)
+    s.text(764, 190, "OFF", 17, th.muted, bold=True, mono=True)
+    for r in (26, 40):
+        s.path(f"M {682 + r * 0.2:.0f} {224 - r * 0.5:.0f} A {r} {r} 0 0 1 "
+               f"{682 + r * 0.5:.0f} {224 + r * 0.3:.0f}", stroke=th.secondary,
+               sw=1.5)
+    s.arrow(700, 232, 730, 240, th.secondary, 1.6)
+    s.text(694, 282, "source in use", 14, th.secondary)
+    s.text(762, 324, "the coupled capsule must", 16, th.fg)
+    s.text(762, 346, "read ≥ 30 dB below the", 16, th.fg, bold=True)
+    s.text(762, 368, "calibrator level: under 64 dB", 16, th.fg)
+    s.text(762, 390, "for a 94 dB calibrator", 16, th.fg)
+    s.text(762, 418, "(B.4.2; 40 dB in A.5.3)", 16, th.muted)
+
+    s.text(450, 528, "The specified level is the level at the diaphragm of the "
+           "inserted microphone (5.3.1.2), and it holds for", 18, th.fg)
+    s.text(450, 552, "the microphone models and configurations listed in the "
+           "manual (5.3.1.3, 6.3 a) — IEC 60942:2017", 18, th.muted)
+
+
+# ---------------------------------------------------------------------------
 # d4 - Library signal chain
 # ---------------------------------------------------------------------------
 
@@ -169,6 +283,95 @@ def _d_uncertainty(s: SVG, th: Theme) -> None:
     s.rect(rxc - bw / 2, 434, bw, 58, "none", th.secondary, rx=10, sw=2.4)
     s.text(rxc, 462, "coverage interval", 22, th.fg, "middle", bold=True)
     s.text(rxc, 482, "[y_low, y_high]   (clause 7.7)", 14, th.muted, "middle")
+
+
+def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
+    """Where each row of an acoustic budget comes from physically.
+
+    One outdoor A-weighted level measurement drawn to scale at 60 units per
+    metre (microphone 1.5 m above the ground and 4 m from the facade, three
+    alternative positions 2 m apart), with a leader from each element to the
+    budget row it feeds.
+    """
+    gy = 442.0
+    s.ground(gy, 34, 520)
+    scale = 60.0                       # drawing units per metre
+
+    # -- Facade at the right of the scene ----------------------------------
+    s.rect(496, 168, 26, gy - 168, th.panel, th.fg, sw=2)
+    s.text(490, 200, "facade", 15, th.muted, anchor="end")
+
+    # -- Source ------------------------------------------------------------
+    s.rect(44, 372, 42, 52, th.panel, th.primary, rx=6, sw=2)
+    s.circle(65, 391, 9, th.primary)
+    s.circle(65, 391, 3.5, th.bg)
+    s.circle(65, 411, 5.5, th.primary)
+    s.text(65, 362, "source", 15, th.fg, bold=True)
+    for r in (20, 32, 44):
+        s.path(f"M {90 + r * 0.30:.0f} {398 - r * 0.55:.0f} "
+               f"A {r} {r} 0 0 1 {90 + r * 0.55:.0f} {398 + r * 0.30:.0f}",
+               stroke=th.accent, sw=1.3)
+
+    # -- Meter on a tripod, microphone 1.5 m up and 4 m from the facade ----
+    mic_x, mic_y = 256.0, gy - 1.5 * scale
+    s.mic(mic_x, mic_y, gy, 1.1)
+    s.rect(mic_x + 16, 372, 48, 64, th.panel, th.primary, rx=6, sw=1.8)
+    s.text(mic_x + 40, 410, "SLM", 15, th.fg, bold=True, mono=True)
+    s.dim(mic_x - 40, mic_y, mic_x - 40, gy, "1.5 m", size=15)
+    s.line(mic_x - 40, mic_y, mic_x - 6, mic_y, th.muted, 0.9, dash="3,3")
+    s.dim(mic_x, gy + 40, 496, gy + 40, "4 m", size=15)
+    s.line(mic_x, gy, mic_x, gy + 44, th.muted, 0.9, dash="3,3")
+    s.line(496, gy, 496, gy + 44, th.muted, 0.9, dash="3,3")
+
+    # Two alternative microphone positions, 2 m either side.
+    for dx in (-2.0 * scale, 2.0 * scale):
+        s.circle(mic_x + dx, mic_y, 6.5, "none", th.secondary, 2.0)
+        s.line(mic_x + dx, mic_y + 7, mic_x + dx, gy, th.secondary, 1.1,
+               dash="5,4")
+    s.dim(mic_x - 2 * scale, mic_y - 36, mic_x + 2 * scale, mic_y - 36,
+          "3 positions, 2 m apart", size=15)
+
+    # -- Calibrator lying beside the meter ---------------------------------
+    s.rect(340, gy - 52, 22, 48, th.panel, th.secondary, rx=5, sw=1.8)
+    s.text(351, 380, "calibrator", 15, th.secondary)
+
+    # -- Weather station, high on the facade side --------------------------
+    s.rect(300, 104, 154, 74, th.panel, th.fg, rx=8, sw=1.6)
+    s.text(377, 128, "weather", 16, th.fg, bold=True)
+    s.text(377, 150, "3 m/s  12 °C", 14, th.muted, mono=True)
+    s.text(377, 170, "68 % RH", 14, th.muted, mono=True)
+
+    # -- Budget table on the right, rows in the order the leaders run ------
+    bx, by, bw = 552.0, 96.0, 322.0
+    rows = (
+        ("Meteorology and ground", "Type B - from the propagation clause",
+         th.fg, (454.0, 140.0)),
+        ("Position scatter", "Type A - s/sqrt(n), v = n - 1", th.secondary,
+         (mic_x + 2 * scale + 8, mic_y)),
+        ("Instrument class tolerance", "Type B - rectangular, a = 0.3 dB",
+         th.primary, (mic_x + 64, 400.0)),
+        ("Calibrator class tolerance", "Type B - rectangular, a = 0.4 dB",
+         th.secondary, (362.0, gy - 30)),
+    )
+    s.rect(bx, by, bw, 252, "none", th.fg, rx=10, sw=1.8)
+    s.text(bx + bw / 2, by - 14, "The budget it feeds", 19, th.fg, bold=True)
+    for i, (name, kind, color, (from_x, from_y)) in enumerate(rows):
+        ry = by + 26 + i * 60
+        if i:
+            s.line(bx + 12, ry - 18, bx + bw - 12, ry - 18, th.muted, 0.8)
+        s.circle(bx + 20, ry + 4, 5, color)
+        s.text(bx + 34, ry + 10, name, 17, th.fg, anchor="start", bold=True)
+        s.text(bx + 34, ry + 32, kind, 14, th.muted, anchor="start")
+        s.line(from_x, from_y, bx - 6, ry + 4, color, 1.0, dash="4,4")
+
+    s.text(bx + bw / 2, by + 292, "one calibrator for two channels makes their",
+           15, th.secondary)
+    s.text(bx + bw / 2, by + 312, "calibration terms correlated, not two rows",
+           15, th.secondary)
+
+    s.text(450, 552, "Budgets fail by omission, not by arithmetic: every row "
+           "here is a piece of hardware or a decision about geometry", 17,
+           th.muted)
 
 
 def _d_time_weighting(s: SVG, th: Theme) -> None:
@@ -899,6 +1102,77 @@ def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
 # Time synchronous averaging (McFadden 1987)
 # ---------------------------------------------------------------------------
 
+def _d_echo_geometry(s: SVG, th: Theme) -> None:
+    """Where the quefrency of an echo comes from, drawn to scale.
+
+    Elevation at 150 units per metre: source and microphone 1.00 m apart at
+    1.20 m over a hard floor, the floor-reflected path built through the image
+    source, and a second panel for the side wall that gives the page's own
+    8 ms example.
+    """
+    scale = 110.0
+    c = 343.0
+
+    # ---- Panel A: the floor reflection --------------------------------
+    gy = 330.0
+    s.ground(gy, 50, 470)
+    sx = 130.0
+    mx = sx + 1.0 * scale
+    top = gy - 1.2 * scale
+    s.rect(sx - 20, top - 22, 40, 44, th.panel, th.primary, rx=5, sw=2)
+    s.circle(sx, top, 8, th.primary)
+    s.text(sx, top - 34, "source", 17, th.fg, bold=True)
+    s.mic(mx, top - 8, gy, 1.0)
+    s.text(mx + 30, top - 6, "microphone", 17, th.fg, bold=True, anchor="start")
+    s.line(sx + 22, top, mx - 8, top, th.primary, 2.4)
+    s.text((sx + mx) / 2 + 28, top - 14, "r_d = 1.00 m", 16, th.primary,
+           bold=True)
+
+    # Image source under the floor, and the reflected path through it.
+    iy = gy + 1.2 * scale
+    s.circle(sx, iy, 8, "none", th.muted, 1.6)
+    s.text(sx, iy + 24, "image source", 16, th.muted)
+    s.line(sx, top, sx, iy, th.muted, 1.0, dash="4,4")
+    bounce_x = sx + (mx - sx) / 2.0
+    s.line(sx, top, bounce_x, gy, th.secondary, 2.2)
+    s.line(bounce_x, gy, mx, top - 8, th.secondary, 2.2)
+    s.line(sx, iy, mx, top - 8, th.muted, 1.0, dash="4,4")
+    s.circle(bounce_x, gy, 4, th.secondary)
+    s.text(bounce_x - 70, gy - 46, "r_r = 2.60 m", 16, th.secondary,
+           bold=True)
+    s.dim(mx + 46, top, mx + 46, gy, "1.20 m", size=16, label_side="right")
+    s.line(mx, top - 8, mx + 46, top, th.muted, 0.9, dash="3,3")
+    s.dim(sx, gy + 44, mx, gy + 44, "1.00 m", size=16)
+
+    box_x = 500.0
+    s.rect(box_x, 120, 356, 150, "none", th.fg, rx=10, sw=1.6)
+    s.text(box_x + 178, 150, "Floor reflection", 20, th.fg, bold=True)
+    dd = 2.6 - 1.0
+    s.text(box_x + 178, 182, f"Delta d = r_r - r_d = {dd:.2f} m", 18, th.fg,
+           mono=True)
+    s.text(box_x + 178, 210, f"t0 = Delta d / c = {1000 * dd / c:.1f} ms",
+           18, th.secondary, mono=True, bold=True)
+    s.text(box_x + 178, 240, "a = R * r_d / r_r = 0.38 R", 18, th.fg, mono=True)
+
+    # ---- Panel B: the side wall that gives 8 ms ------------------------
+    s.rect(box_x, 292, 356, 168, "none", th.secondary, rx=10, sw=1.6)
+    s.text(box_x + 178, 322, "The 8 ms example of this page", 20, th.secondary,
+           bold=True)
+    s.text(box_x + 178, 352, "Delta d = c * 8 ms = 2.74 m", 18, th.fg,
+           mono=True)
+    s.text(box_x + 178, 380, "a side wall 1.37 m from the direct path", 17,
+           th.fg)
+    s.text(box_x + 178, 408, "R = a * r_r / r_d = 3.74 a  <= 1", 18, th.fg,
+           mono=True)
+    s.text(box_x + 178, 436, "so a > 0.27 is not one specular reflection", 16,
+           th.muted)
+
+    s.text(450, 512, "The reflection has to arrive before the record ends and "
+           "at least 10 dB above its noise floor;", 17, th.muted)
+    s.text(450, 534, "c moves about 0.6 m/s per kelvin, so convert the delay "
+           "with the temperature you measured", 17, th.muted)
+
+
 def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
     """Trigger train, sliced recording, coherent average and residual, with
     the guide's numbers: T = 1/32 s at 8192 Hz, N = 40 averages, 16 dB of
@@ -968,6 +1242,184 @@ def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
 # ---------------------------------------------------------------------------
 # Correlation-based time-delay estimation (Knapp & Carter)
 # ---------------------------------------------------------------------------
+
+def _d_miso_setup(s: SVG, th: Theme) -> None:
+    """Instrumenting a two-source MISO measurement, plan view.
+
+    A plant room drawn to scale at 55 units per metre: a fan and a compressor
+    3 m apart, one reference sensor each, the receiver microphone 4 m from
+    the fan, the airborne leakage that correlates the two references, and the
+    single simultaneously sampling front end every channel has to share.
+    """
+    import math
+
+    scale = 55.0                       # drawing units per metre
+    x0, y0 = 46.0, 92.0
+    room_w, room_h = 9.2 * scale, 5.2 * scale
+    s.rect(x0, y0, room_w, room_h, th.panel, th.fg, rx=4, sw=2.4)
+    s.text(x0 + 12, y0 + 24, "Plant room — plan", 17, th.muted, anchor="start")
+
+    # -- Machine A: a fan on resilient mounts ------------------------------
+    ax, ay = x0 + 1.6 * scale, y0 + 3.4 * scale
+    s.rect(ax - 40, ay - 40, 80, 80, th.bg, th.primary, rx=6, sw=2.2)
+    s.circle(ax, ay, 24, "none", th.primary, 1.6)
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        s.line(ax, ay, ax + 22 * math.cos(a), ay + 22 * math.sin(a),
+               th.primary, 1.6)
+    s.text(ax, ay - 52, "A — fan", 18, th.fg, bold=True)
+    for k in (-1, 1):
+        s.rect(ax + k * 26 - 8, ay + 40, 16, 9, th.muted, rx=2)
+    s.rect(ax + 26 - 7, ay + 26, 14, 14, th.secondary, th.fg, rx=2, sw=1.2)
+    s.text(ax + 6, ay + 74, "ref 1", 16, th.secondary, bold=True)
+
+    # -- Machine B: a compressor -------------------------------------------
+    bx, by = ax + 3.0 * scale, ay
+    s.rect(bx - 36, by - 36, 72, 72, th.bg, th.primary, rx=6, sw=2.2)
+    s.rect(bx - 20, by - 16, 40, 32, th.panel, th.primary, rx=3, sw=1.4)
+    s.text(bx, by - 48, "B — compressor", 18, th.fg, bold=True)
+    mic2_x = bx + 36 + 0.3 * scale
+    s.circle(mic2_x, by, 7, th.bg, th.secondary, 2.0)
+    s.dim(bx + 36, by + 52, mic2_x, by + 52, "0.3 m", size=15)
+    s.line(mic2_x, by + 10, mic2_x, by + 50, th.muted, 0.9, dash="3,3")
+    s.text(mic2_x + 20, by + 6, "ref 2", 16, th.secondary, bold=True,
+           anchor="start")
+    s.dim(ax, y0 + room_h - 22, bx, y0 + room_h - 22, "3.0 m", size=16)
+
+    # -- Receiver microphone at the operator position ----------------------
+    rx_, ry = x0 + 7.6 * scale, y0 + 1.0 * scale
+    s.circle(rx_, ry, 8, th.bg, th.accent, 2.4)
+    s.text(rx_, ry - 18, "receiver", 17, th.accent, bold=True)
+    s.text(rx_ - 16, ry + 6, "1.5 m high", 15, th.muted, anchor="end")
+    s.line(ax, ay, rx_, ry, th.accent, 1.2, dash="6,5")
+    s.line(bx, by, rx_, ry, th.accent, 1.2, dash="6,5")
+    s.dim(ax, ay - 74, rx_, ry - 40, "4.0 m", size=15)
+
+    # -- The leakage that correlates the two references --------------------
+    s.arrow(ax + 44, ay + 16, mic2_x - 11, by + 6, th.secondary, 1.8)
+    s.text((ax + mic2_x) / 2 + 10, ay + 40, "leakage", 15, th.secondary,
+           bold=True)
+
+    # -- Legend under the room ---------------------------------------------
+    ly = y0 + room_h + 26
+    s.circle(x0 + 8, ly - 5, 5, th.secondary)
+    s.text(x0 + 22, ly, "ref 1: accelerometer stud-mounted on the fan foot",
+           16, th.fg, anchor="start")
+    s.circle(x0 + 8, ly + 21, 5, th.secondary)
+    s.text(x0 + 22, ly + 26, "ref 2: microphone 0.3 m from the casing", 16,
+           th.fg, anchor="start")
+    s.circle(x0 + 8, ly + 47, 5, th.secondary)
+    s.text(x0 + 22, ly + 52, "the leakage is what correlates the two inputs",
+           16, th.secondary, anchor="start")
+
+    # -- Acquisition column -------------------------------------------------
+    cx = x0 + room_w + 88
+    s.rect(cx - 78, 100, 156, 172, "none", th.primary, rx=10, sw=1.8)
+    s.text(cx, 126, "One front end", 18, th.primary, bold=True)
+    for i, name in enumerate(("ref 1  x1", "ref 2  x2", "receiver  y")):
+        s.rect(cx - 62, 140 + i * 32, 124, 24, th.panel, th.fg, rx=4, sw=1.2)
+        s.text(cx, 157 + i * 32, name, 14, th.fg, mono=True)
+    s.text(cx, 258, "one clock, fixed gains", 14, th.muted)
+
+    s.rect(cx - 78, 292, 156, 128, "none", th.secondary, rx=10, sw=1.8)
+    s.text(cx, 318, "Before reading", 17, th.secondary, bold=True)
+    s.text(cx, 338, "the split", 17, th.secondary, bold=True)
+    s.text(cx, 364, "coherence between", 14, th.fg)
+    s.text(cx, 382, "x1 and x2 > 0.9", 14, th.fg, bold=True)
+    s.text(cx, 402, "⇒ do not attribute", 14, th.fg)
+
+    s.text(450, 552, "The conditioning separates only what the references "
+           "separate: one sensor per source, all sampled together", 17,
+           th.muted)
+
+
+def _d_tsa_setup(s: SVG, th: Theme) -> None:
+    """The two channels a time synchronous average needs, on a gearbox.
+
+    A single-stage gearbox in elevation: the input shaft at 1800 r/min with
+    one strip of reflective tape and an optical tacho head 20 mm away, a
+    37-tooth pinion driving an 89-tooth wheel, and a stud-mounted
+    accelerometer on the pedestal bearing of the input shaft.
+    """
+    import math
+
+    gy = 400.0
+    s.ground(gy, 40, 470)
+    s.rect(70, 140, 380, gy - 140, th.panel, th.fg, rx=6, sw=2.2)
+    s.text(80, 164, "Gearbox — elevation", 17, th.muted, anchor="start")
+
+    shaft_y = 252.0
+    px, pr = 214.0, 38.0
+    wx, wr = 330.0, 78.0
+    for cx, r, label, dy in ((px, pr, "pinion, 37 teeth", pr + 26),
+                             (wx, wr, "wheel, 89 teeth", wr + 26)):
+        s.circle(cx, shaft_y, r, th.bg, th.primary, 2.2)
+        s.circle(cx, shaft_y, 6, th.fg)
+        for k in range(24):
+            a = 2 * math.pi * k / 24
+            s.line(cx + r * math.cos(a), shaft_y + r * math.sin(a),
+                   cx + (r + 7) * math.cos(a), shaft_y + (r + 7) * math.sin(a),
+                   th.primary, 1.4)
+        s.text(cx, shaft_y + dy, label, 16, th.fg, bold=True)
+
+    # Input shaft, the reflective tape and the optical tacho head.
+    s.line(78, shaft_y, px, shaft_y, th.fg, 4.0)
+    s.rect(150, shaft_y - 9, 12, 18, th.secondary, rx=2)
+    s.text(156, shaft_y - 18, "tape", 15, th.secondary, bold=True)
+    s.rect(130, shaft_y - 86, 52, 32, th.panel, th.secondary, rx=5, sw=1.8)
+    s.text(156, shaft_y - 64, "tacho", 15, th.secondary, bold=True)
+    s.arrow(156, shaft_y - 52, 156, shaft_y - 16, th.secondary, 1.6)
+    s.dim(196, shaft_y - 52, 196, shaft_y - 14, "20 mm", size=14,
+          label_side="right")
+
+    # Pedestal bearing on the input shaft, with the accelerometer on its face.
+    s.rect(96, shaft_y + 10, 36, gy - shaft_y - 10, th.bg, th.fg, rx=3, sw=1.8)
+    s.text(114, gy - 12, "bearing", 14, th.muted)
+    s.rect(74, shaft_y + 46, 22, 26, th.primary, th.fg, rx=3, sw=1.4)
+    s.arrow(72, shaft_y + 59, 44, shaft_y + 59, th.primary, 1.8)
+    s.text(42, shaft_y + 96, "accel.", 15, th.fg, bold=True, anchor="start")
+    s.text(42, shaft_y + 114, "(stud)", 14, th.muted, anchor="start")
+    s.text(44, shaft_y + 44, "load direction", 15, th.primary, anchor="start")
+
+    s.text(260, 442, "1800 r/min  →  T = 33.3 ms per revolution", 17, th.fg,
+           bold=True, mono=True)
+    s.text(260, 468, "mesh frequency 37 × 30 = 1110 Hz; five mesh harmonics",
+           16, th.muted)
+    s.text(260, 490, "need fs ≥ 2.56 × 5550 = 14.2 kHz", 16, th.muted)
+
+    # -- Right column: the acquisition and the slicing --------------------
+    cx = 700.0
+    s.rect(cx - 160, 130, 320, 116, "none", th.primary, rx=10, sw=1.8)
+    s.text(cx, 158, "One front end, one clock", 18, th.primary, bold=True)
+    s.rect(cx - 140, 174, 130, 26, th.panel, th.fg, rx=4, sw=1.2)
+    s.text(cx - 75, 192, "tacho", 15, th.fg, mono=True)
+    s.rect(cx + 10, 174, 130, 26, th.panel, th.fg, rx=4, sw=1.2)
+    s.text(cx + 75, 192, "vibration", 15, th.fg, mono=True)
+    s.text(cx, 226, "fs = 25.6 kHz, gains fixed", 15, th.muted)
+
+    base = 330.0
+    s.line(cx - 160, base, cx + 160, base, th.fg, 1.4)
+    for k in range(5):
+        x = cx - 150 + k * 75
+        s.line(x, base, x, base - 34, th.secondary, 2.2)
+        s.line(x, base - 34, x + 8, base - 34, th.secondary, 2.2)
+        s.line(x + 8, base - 34, x + 8, base, th.secondary, 2.2)
+        if k < 4:
+            s.line(x, base + 12, x, base + 96, th.muted, 1.0, dash="5,4")
+    s.text(cx, base - 50, "one pulse per revolution", 16, th.secondary,
+           bold=True)
+    wave = "M " + " L ".join(
+        f"{cx - 150 + i * 3:.0f} "
+        f"{base + 56 + 22 * math.sin(i * 0.9) * math.cos(i * 0.21):.0f}"
+        for i in range(101))
+    s.path(wave, stroke=th.primary, sw=1.2)
+    s.text(cx, base + 122, "the pulse is the block boundary", 16, th.fg)
+    s.text(cx, base + 146, "record N + 1 revolutions", 16, th.muted)
+
+    s.text(450, 552, "A tacho pulse per revolution and an accelerometer in the "
+           "load direction: the period is measured, never assumed", 17,
+           th.muted)
+
 
 def _d_correlation_delay(s: SVG, th: Theme) -> None:
     """Two microphones, the extra path c*tau, and the correlogram where the
@@ -1272,3 +1724,220 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
     s.text(450, 654,
            "the decimated branch is interpolated back with resample_poly(M, 1)",
            14, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# d27 - The infrasound measurement chain (ISO 7196 Annex A)
+# ---------------------------------------------------------------------------
+
+_G_POLES_HZ: tuple[tuple[float, float], ...] = (
+    (-0.707, 0.707), (-0.707, -0.707), (-19.27, 5.16), (-19.27, -5.16),
+    (-14.11, 14.11), (-14.11, -14.11), (-5.16, 19.27), (-5.16, -19.27),
+)
+
+
+def _g_weight_db(f: float) -> float:
+    """ISO 7196:1995 G weighting from its Table 1 poles, 0 dB at 10 Hz."""
+    import math
+
+    def gain(x: float) -> float:
+        jw = 2j * math.pi * x
+        num = jw ** 4                       # four zeros at the origin
+        den = 1.0 + 0j
+        for re, im in _G_POLES_HZ:
+            den *= jw - 2 * math.pi * complex(re, im)
+        return abs(num / den)
+
+    return 20 * math.log10(gain(f) / gain(10.0))
+
+
+def _d_infrasound_chain(s: SVG, th: Theme) -> None:
+    """The chain that has to deliver 0,25 Hz, and where it usually does not.
+
+    Left: section through the ground board with the capsule at its centre,
+    the static-pressure equalisation vent called out, and the two windscreens.
+    Middle: the three electrical stages. Right: the G curve against the
+    chain's own high-pass corner, so the usable band is the overlap.
+    Geometry after ISO 7196:1995 Annex A (A.2 microphone, A.5 integrator).
+    """
+    import math
+
+    # -- Left: the capsule on the ground board ------------------------------
+    gy = 372.0
+    cx = 168.0
+    s.ground(gy, 34, 300)
+    s.rect(cx - 118, gy - 12, 236, 12, th.panel, th.fg, sw=2)   # hard board
+    s.text(cx, gy + 40, "hard board on the ground", 18, th.fg, bold=True)
+    s.text(cx, gy + 62, "capsule flush at its centre", 16, th.muted)
+
+    # Capsule, drawn flush with the board, plus its equalisation vent.
+    s.rect(cx - 26, gy - 40, 52, 28, th.panel, th.primary, rx=4, sw=2)
+    s.rect(cx - 26, gy - 44, 52, 6, th.fg, rx=2)                # diaphragm
+    s.circle(cx + 20, gy - 26, 4.5, th.secondary)               # vent
+    s.arrow(120, 244, cx + 20, gy - 30, th.secondary, 1.4)
+    s.text(38, 190, "static-pressure equalisation", 17, th.secondary,
+           bold=True, anchor="start")
+    s.text(38, 212, "vent: a first-order high-pass,", 17, th.secondary,
+           anchor="start")
+    s.text(38, 234, "and the chain's real corner", 17, th.secondary,
+           anchor="start")
+
+    # Primary and secondary windscreens over it.
+    s.path(f"M {cx - 62} {gy - 12} A 62 62 0 0 1 {cx + 62} {gy - 12}",
+           stroke=th.muted, sw=2.2)
+    s.path(f"M {cx - 104} {gy - 12} A 104 104 0 0 1 {cx + 104} {gy - 12}",
+           stroke=th.muted, sw=2.2, dash="8,5")
+    s.text(cx, gy + 88, "primary foam screen (solid)", 16, th.muted)
+    s.text(cx, gy + 108, "secondary in wind (dashed),", 16, th.muted)
+    s.text(cx, gy + 128, "with its loss corrected", 16, th.muted)
+    s.text(cx, 92, "Below 20 Hz the wind is louder", 19, th.fg, bold=True)
+    s.text(cx, 114, "than the source", 19, th.fg, bold=True)
+
+    # -- Middle: the electrical chain ---------------------------------------
+    bx, bw, bh = 336.0, 226.0, 92.0
+    stages = (
+        ("Preamplifier", "corner << 0,25 Hz", th.primary),
+        ("Recorder", "low-cut switch OFF", th.primary),
+        ("G weighting + integrator", "T >= 10 s (A.5)", th.accent),
+    )
+    y = 132.0
+    for title, detail, color in stages:
+        s.rect(bx, y, bw, bh, th.panel, color, rx=12, sw=2)
+        s.text(bx + bw / 2, y + 38, title, 20, th.fg, bold=True)
+        s.text(bx + bw / 2, y + 66, detail, 18, th.muted, mono=True)
+        if y > 140:
+            s.arrow(bx + bw / 2, y - 34, bx + bw / 2, y - 6, th.fg, 2)
+        y += bh + 34
+    s.arrow(cx + 120, gy - 6, bx - 8, 200, th.fg, 2)
+    s.text(bx + bw / 2, y + 4, "report LpG with the chain corner,", 17, th.fg)
+    s.text(bx + bw / 2, y + 26, "the screens and the averaging time", 17, th.fg)
+
+    # -- Right: the G curve against the chain's own corner ------------------
+    px, py, pw, ph = 604.0, 132.0, 268.0, 236.0
+    s.rect(px, py, pw, ph, "none", th.fg, rx=10, sw=1.6)
+    f_lo, f_hi, db_lo, db_hi = 0.1, 1000.0, -60.0, 10.0
+
+    def fx(f: float) -> float:
+        return px + pw * (math.log10(f) - math.log10(f_lo)) / (
+            math.log10(f_hi) - math.log10(f_lo))
+
+    def fy(db: float) -> float:
+        return py + ph * (db_hi - db) / (db_hi - db_lo)
+
+    # The 0,25 Hz - 315 Hz span ISO 7196 Annex A asks the microphone to cover.
+    s.add(f'<rect x="{fx(0.25):.1f}" y="{py + 2:.1f}" '
+          f'width="{fx(315.0) - fx(0.25):.1f}" height="{ph - 4:.1f}" '
+          f'fill="{th.accent}" opacity="0.14"/>')
+    # The G curve itself.
+    pts = []
+    f = f_lo
+    while f <= f_hi:
+        pts.append(f"{fx(f):.1f},{fy(max(db_lo, _g_weight_db(f))):.1f}")
+        f *= 1.06
+    s.add(f'<polyline points="{" ".join(pts)}" fill="none" '
+          f'stroke="{th.accent}" stroke-width="2.4"/>')
+    # A chain whose vent corner sits at 2 Hz: first-order high-pass.
+    corner = 2.0
+    pts = []
+    f = f_lo
+    while f <= f_hi:
+        db = 20 * math.log10(f / math.sqrt(f * f + corner * corner))
+        pts.append(f"{fx(f):.1f},{fy(max(db_lo, db)):.1f}")
+        f *= 1.06
+    s.add(f'<polyline points="{" ".join(pts)}" fill="none" '
+          f'stroke="{th.secondary}" stroke-width="2.2" stroke-dasharray="7,5"/>')
+    s.line(fx(corner), py + 2, fx(corner), py + ph - 2, th.secondary, 1.2,
+           dash="3,4")
+    s.text(px + pw / 2, py - 14, "What the chain lets through", 18, th.fg,
+           bold=True)
+    for f_tick, label in ((0.1, "0,1"), (1.0, "1"), (10.0, "10"),
+                          (100.0, "100"), (1000.0, "1k")):
+        s.text(fx(f_tick), py + ph + 22, label, 15, th.muted, mono=True)
+    s.text(px + pw / 2, py + ph + 46, "Frequency [Hz]", 16, th.muted)
+    s.text(fx(0.27), fy(-55.0), "A.2: 0,25 - 315 Hz", 15, th.accent,
+           bold=True, anchor="start")
+    s.arrow(fx(0.45), fy(-33.0), fx(0.45), fy(-16.0), th.secondary, 1.5)
+    s.text(fx(0.12), fy(-40.0), "lost", 15, th.secondary, bold=True,
+           anchor="start")
+    s.text(px + pw / 2, py + ph + 70, "green: the G weighting", 15, th.accent)
+    s.text(px + pw / 2, py + ph + 90,
+           "dashed: a chain with a 2 Hz vent corner", 15, th.secondary)
+    s.text(px + pw / 2, py + ph + 116, "usable band = the overlap of the two",
+           17, th.fg, bold=True)
+    s.text(px + pw / 2, py + ph + 138, "ISO 7196:1995, Annex A", 16, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# d28 - Capturing an array: one clock, locked gains, a written row map
+# ---------------------------------------------------------------------------
+
+def _d_multichannel_capture(s: SVG, th: Theme) -> None:
+    """Four microphones, one converter, and the map from row to position.
+
+    Room-survey spacing with the capsules at 1,2 m, the calibrator drawn
+    coupled onto one capsule and moved along the row, and the single-clock
+    requirement stated where it is decided: at the interface.
+    """
+    gy = 372.0
+    s.ground(gy, 30, 312)
+    s.text(172, 92, "Four positions, four sensitivities", 19, th.fg, bold=True)
+
+    xs = (66.0, 132.0, 198.0, 264.0)
+    sens = ("11,8", "12,3", "11,9", "12,1")
+    cap_y = gy - 120.0                       # capsule height, 1,2 m to scale
+    for i, (x, mv) in enumerate(zip(xs, sens)):
+        s.mic(x, cap_y, gy, 0.95)
+        s.text(x, gy + 24, f"P{i + 1}", 17, th.fg, bold=True)
+        s.text(x, gy + 44, mv, 14, th.muted, mono=True)
+    s.text(172, gy + 66, "mV/Pa, one per capsule", 14, th.muted)
+    s.dim(40, cap_y, 40, gy, "1,2 m", size=15, label_side="right")
+
+    # Calibrator coupled onto P2 and moved along the row.
+    s.rect(xs[1] - 22, cap_y - 56, 44, 56, th.panel, th.secondary, rx=6, sw=2)
+    s.text(xs[1], cap_y - 30, "94,0", 15, th.secondary, bold=True, mono=True)
+    s.text(xs[1], cap_y - 12, "dB", 13, th.muted, mono=True)
+    s.path(f"M {xs[0]:.0f} {cap_y - 78:.0f} Q {xs[1] + 34:.0f} "
+           f"{cap_y - 116:.0f} {xs[3]:.0f} {cap_y - 78:.0f}",
+           stroke=th.secondary, sw=1.6, dash="7,5")
+    s.text(172, cap_y - 128, "one capsule at a time,", 15, th.secondary)
+    s.text(172, cap_y - 110, "gains locked throughout", 15, th.secondary)
+
+    # -- Middle: one preamplifier, one interface, one clock -----------------
+    bx, bw = 352.0, 214.0
+    s.rect(bx, 150, bw, 82, th.panel, th.primary, rx=10, sw=2)
+    s.text(bx + bw / 2, 196, "4-channel preamplifier", 19, th.fg, bold=True)
+    for i, x in enumerate(xs):
+        s.arrow(x + 10, gy - 46, bx - 6, 168 + i * 16, th.muted, 1.2)
+
+    s.rect(bx, 268, bw, 96, th.panel, th.primary, rx=10, sw=2)
+    s.text(bx + bw / 2, 298, "audio interface", 19, th.fg, bold=True)
+    s.rect(bx + 14, 312, bw - 28, 34, th.panel, th.accent, rx=6, sw=2)
+    s.text(bx + bw / 2, 328, "single sample clock", 16, th.accent, bold=True)
+    s.text(bx + bw / 2, 344, "fs = 48 kHz", 15, th.accent, mono=True, )
+    s.arrow(bx + bw / 2, 236, bx + bw / 2, 262, th.fg, 2)
+
+    s.rect(bx + 24, 400, bw - 48, 60, th.panel, th.muted, rx=10, sw=2,
+           dash="6,5")
+    s.text(bx + bw / 2, 428, "a second interface", 15, th.muted)
+    s.text(bx + bw / 2, 448, "= two clocks, not one array", 15, th.muted)
+    s.line(bx + 24, 400, bx + bw - 24, 460, th.secondary, 2.4)
+    s.line(bx + 24, 460, bx + bw - 24, 400, th.secondary, 2.4)
+
+    # -- Right: the array, row by row --------------------------------------
+    ax0, row_h = 620.0, 44.0
+    s.text(748, 122, "x, the array you analyse", 19, th.fg, bold=True)
+    for i in range(4):
+        y = 150 + i * row_h
+        s.rect(ax0, y, 232, row_h - 8, th.panel, th.primary, rx=6, sw=1.8)
+        s.text(ax0 + 116, y + 24, f"ch{i} = P{i + 1}", 18, th.fg, mono=True)
+    s.text(748, 150 + 4 * row_h + 12, "shape (4, N)", 18, th.accent, bold=True,
+           mono=True)
+    s.arrow(bx + bw + 6, 300, ax0 - 8, 240, th.fg, 2)
+
+    s.rect(600, 372, 272, 96, "none", th.fg, rx=10, sw=1.8)
+    s.text(736, 398, "Write down, with the file:", 16, th.fg, bold=True)
+    s.text(736, 420, "one clock  |  locked gains", 15, th.fg)
+    s.text(736, 442, "the row-to-position map", 15, th.fg)
+    s.text(450, 520, "A swapped pair gives perfectly valid levels attributed "
+           "to the wrong positions,", 17, th.fg)
+    s.text(450, 542, "and no later check can detect it", 17, th.muted)

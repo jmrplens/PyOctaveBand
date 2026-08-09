@@ -23,6 +23,7 @@ from .common import (
     _new_axes_column,
     format_frequency_axis,
     theme_fill,
+    theme_line,
 )
 
 #: Spanish translations of the fixed strings rendered by the filters
@@ -239,7 +240,11 @@ def plot_parametric_eq(
         kwargs.setdefault("lw", 1.8)
         kwargs.setdefault("label", _t("Cascade", language))
         axm.semilogx(freqs, result.magnitude_db, color=color, **kwargs)
-        axm.axhline(0.0, color=_C_REFERENCE, linestyle=":", lw=0.8, alpha=0.5)
+        # Quiet by colour, not by opacity: half opacity on a 0.8 pt line
+        # composites to within a level or two of the dark page and the
+        # reference disappears, while reading fine on the white one.
+        axm.axhline(0.0, color=theme_line(_C_REFERENCE, axm, quiet=0.6),
+                    linestyle=":", lw=0.8)
         axm.set_ylabel(_t("Magnitude [dB]", language))
         axm.grid(True, which="both", alpha=0.3)
         axm.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")

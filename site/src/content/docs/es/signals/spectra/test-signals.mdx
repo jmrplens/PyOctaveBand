@@ -1,6 +1,6 @@
 ---
 title: "Señales de prueba y herramientas de muestreo"
-description: "La caja de señales del dominio de metrología: ráfagas tonales IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
+description: "La caja de estímulos y de muestreo de `phonometry.signals`: ráfagas tonales IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,7 @@ references:
     title: "Sound system equipment — Part 1: General"
     designation: "IEC 60268-1:1985"
     url: "https://webstore.iec.ch/en/publication/1180"
-    note: "Anexo A, apartado A2: ráfagas tonales que comienzan en el paso por cero del tono con un número entero de periodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
+    note: "Anexo A, apartado A2: ráfagas tonales que comienzan en el paso por cero del tono con un número entero de periodos completos (A2.1), trenes repetitivos de ráfagas tonales a una tasa de repetición dada (A2.2), y las duraciones de ráfaga tonal de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
@@ -23,39 +23,57 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una medición es tan fiable como su estímulo y su contabilidad de la
 frecuencia de muestreo. Esta página cubre la caja de señales de
-`phonometry.signals`: **ráfagas tonales** con la conmutación exacta que
-prescribe IEC 60268-1, los **generadores de ruido de colores** (detallados
-en la [guía de análisis
-espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores)),
+`phonometry.signals`, en el orden en que la recorren los apartados:
+**ráfagas tonales** con la conmutación exacta que prescribe IEC 60268-1,
 **remuestreo** cuyo rechazo de alias es una especificación declarada y
-verificable en lugar de un valor por defecto de la biblioteca, y **retardo
+verificable en lugar de un valor por defecto de la biblioteca, **retardo
 fraccionario** que desplaza un registro cualquier fracción de muestra con
-exactitud de banda limitada.
+exactitud de banda limitada, y los **generadores de ruido de colores**, cuya
+verificación espectral vive en la [guía de análisis
+espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores).
 
 Antes de los detalles, el retrato de familia: qué aspecto tiene cada
 estímulo en el tiempo y dónde se reparte su energía en frecuencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga tonal IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
 
-## 1. Ráfagas de tono (IEC 60268-1)
+Cinco estímulos, y qué los separa. El **ruido** excita todo a la vez y
+necesita promediado para vencer su propia aleatoriedad. Una **MLS** es
+determinista y periódica, así que una sola correlación cruzada circular
+entrega una respuesta al impulso en una única pasada. Un **barrido**
+concentra su energía en una frecuencia cada vez, que es lo que le compra a
+la vez su factor de cresta y la separación de la distorsión armónica hacia
+tiempos negativos. Una **ráfaga conmutada** sondea el comportamiento
+dinámico en lugar de la respuesta estacionaria.
 
-La salva sinusoidal conmutada es el estímulo estándar del comportamiento
+De los cinco solo dos se tratan aquí, así que este es el sitio donde viven
+los otros tres: los generadores de ruido y su verificación espectral, en
+[análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores);
+la MLS y el barrido exponencial, como la pareja de adquisición de ISO 18233
+en [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/); el
+barrido conformado y la pareja de Golay, en
+[medición de sistemas](/phonometry/es/signals/spectra/system-measurement/);
+y la ráfaga tonal, en el apartado siguiente.
+
+## 1. Ráfagas tonales (IEC 60268-1)
+
+La ráfaga tonal sinusoidal conmutada es el estímulo estándar del comportamiento
 dinámico: balística de sonómetros, medidores de cuasipico, potencia
 admisible de altavoces. IEC 60268-1:1985 (apartado A2.1) fija qué es una
-salva bien formada: «debe comenzar en el paso por cero del tono y constar de
+ráfaga tonal bien formada: «debe comenzar en el paso por cero del tono y constar de
 un número entero de periodos completos». `tone_burst` genera exactamente
-eso, como salva única o como el tren repetitivo del apartado A2.2 en el
-que cada salva ocupa un periodo de repetición completo:
+eso, como ráfaga tonal única o como el tren repetitivo del apartado A2.2 en
+el que cada ráfaga tonal ocupa un periodo de repetición completo:
 
 ```python
 from phonometry import tone_burst
 
-# Una salva de 5 ms de tono de 5 kHz (25 periodos completos), como en la
+# Una ráfaga tonal de 5 ms de tono de 5 kHz (25 periodos completos), como en la
 # tabla AII.
 single = tone_burst(48000, 5000, 25)
 print(single.burst_samples)         # 240 muestras = 5 ms a 48 kHz
 
-# apartado A2.2: salvas de 5 ms a 10 salvas por segundo.
+# Apartado A2.2: ráfagas tonales de 5 ms a 10 ráfagas por segundo.
 train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
 print(train.period_samples, train.duty_cycle)   # 4800, 0.05
 train.plot(language="es")           # forma de onda con la envolvente
@@ -66,10 +84,10 @@ conmutación y la contabilidad exacta de muestras (`burst_samples`,
 `onset_sample`, `period_samples`, `duty_cycle`), de modo que un informe de
 ensayo puede declarar su estímulo numéricamente. Como la puerta abarca un
 número entero de periodos completos empezando en un paso por cero, la
-energía de la salva tiene la forma cerrada exacta $A^2 N/2$, que es como se
+energía de la ráfaga tonal tiene la forma cerrada exacta $A^2 N/2$, que es como se
 verifica el generador.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Ráfagas de tono IEC 60268-1: una salva única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro salvas a 10 salvas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Ráfagas tonales IEC 60268-1: una ráfaga tonal única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro ráfagas tonales a 10 ráfagas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -105,11 +123,27 @@ plt.show()
 
 </details>
 
-Estas son las salvas que hay detrás de las respuestas de referencia de la
+Estas son las ráfagas tonales que hay detrás de las respuestas de referencia
+de la
 [balística Fast/Slow/Impulse](/phonometry/es/signals/levels/time-weighting/) (la
-tabla 4 de IEC 61672-1 usa salvas de 4 kHz de 200, 50 y 10 ms) y de los
-ensayos dinámicos de cuasipico de la propia IEC 60268-1 (salvas de 5 kHz de
-1 a 200 ms, tabla AII).
+tabla 4 de IEC 61672-1 usa ráfagas tonales de 4 kHz de 200, 50 y 10 ms) y de
+los ensayos dinámicos de cuasipico de la propia IEC 60268-1 (ráfagas tonales
+de 5 kHz de 1 a 200 ms, tabla AII).
+
+**Qué hace la conmutación en frecuencia, y qué cuesta en nivel el ciclo de
+trabajo.** Multiplicar un tono por un rectángulo convoluciona su raya con la
+transformada de la puerta, un sinc cuyos primeros ceros caen a
+$1/T_\text{ráfaga}$ a cada lado de la portadora: ±200 Hz para una ráfaga de
+5 ms, ±100 Hz para una de 10 ms. Así que es la *duración* de la ráfaga, y no
+la portadora, la que decide si el estímulo cabe dentro de un filtro de banda,
+y la razón de que una ráfaga corta a través de un filtro de fracción de octava
+muestre el establecimiento del propio filtro en lugar de la ráfaga. En nivel,
+el nivel continuo equivalente de un tren es el nivel de la ráfaga más
+$10\log_{10}(\text{ciclo de trabajo})$: el tren del 5 % de arriba queda por
+tanto exactamente **13,0 dB** por debajo del nivel de la propia ráfaga, que es
+la cantidad contra la que compara un ensayo de balística de detector. Las
+respuestas de referencia que alimentan esos números están en
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/).
 
 ## 2. Remuestreo con especificación antialias declarada
 
@@ -201,6 +235,23 @@ psicoacústica ECMA-418-2 a 48 kHz, STOI a 10 kHz); esta función es la
 contrapartida pública y documentada para preparar registros fuera de esas
 cadenas.
 
+Tres cosas que conviene decidir antes de remuestrear siquiera. **La
+especificación tiene un precio:** la anchura de transición del 5 % por defecto
+cede el 5 % superior de la menor de las dos bandas de Nyquist, así que una
+conversión de 44,1 a 48 kHz solo es plana hasta unos 21 kHz; un registro cuyo
+contenido llegue a Nyquist necesita un `transition_width` más estrecho (y los
+coeficientes de más que vienen con él) en lugar de un truncamiento silencioso.
+**El orden importa:** remuestrear es una operación de filtrado, así que los
+niveles basados en valor eficaz sobreviven a ella y los basados en pico no; la
+interpolación de banda limitada puede colocar una muestra reconstruida *por
+encima* del pico original (el efecto de pico entre muestras), de modo que
+`lc_peak` y cualquier factor de cresta van a la frecuencia original, o detrás
+de un sobremuestreo de pico verdadero explícito. **Y muchas veces la respuesta
+es no remuestrear:** los filtros de fracción de octava de la biblioteca se
+diseñan solos a la frecuencia que se les dé, así que convertir a una
+frecuencia «estándar» antes de analizar no suele comprar nada y cuesta el
+borde de banda.
+
 ## 3. Retardo fraccionario
 
 `fractional_delay` desplaza un registro cualquier número de muestras,
@@ -210,7 +261,7 @@ Dos convenciones de frontera cubren los dos casos de uso:
 
 - `mode="linear"` (por defecto) rellena el registro con ceros más allá del
   desplazamiento, de modo que las muestras que salen por un extremo caen en
-  el relleno en lugar de dar la vuelta. Úselo para transitorios y
+  el relleno en lugar de dar la vuelta. Úsalo para transitorios y
   respuestas al impulso; es bit a bit idéntico al núcleo de alineación de
   [`align_impulse_responses`](/phonometry/es/signals/spectra/correlation-delay/#3-retardo-y-alineación-de-respuestas-al-impulso).
   Un retardo entero se reduce a un desplazamiento exacto de muestras.
@@ -235,39 +286,37 @@ correctamente está limitada en banda por debajo de Nyquist, así que en la
 práctica la operación es exacta; para casos sintéticos extremos, las
 longitudes impares evitan el bin por completo.
 
-## 4. Ruido de colores
+## Dónde se usan estas herramientas
 
 Los generadores deterministas de ruido de colores (`noise_signal`: blanco,
-rosa, rojo, azul y violeta con pendiente exacta en ley de potencias y
-semillas reproducibles bit a bit) completan la caja; están documentados con
-su verificación espectral en la
+rosa, rojo, azul y violeta, con pendiente exacta en ley de potencias y
+semillas reproducibles bit a bit) redondean la caja y están documentados, con
+su verificación espectral y sus pendientes medidas, en la
 [guía de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores).
-
-## Dónde se usan estas herramientas
 
 Las [figuras de mérito de las ventanas](/phonometry/es/signals/spectra/spectral-analysis/#6-elegir-la-ventana)
 cuantifican la ventana sobre la que descansa toda estimación espectral de la
-biblioteca; el generador de salvas alimenta la balística y los ensayos de
+biblioteca; el generador de ráfagas tonales alimenta la balística y los ensayos de
 respuesta dinámica; y el remuestreador y el retardo fraccionario son la
 mitad de muestreo del
 [trabajo de correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/),
-donde la alineación submuestra es la diferencia entre promediar respuestas
+donde la alineación submuestral es la diferencia entre promediar respuestas
 al impulso y emborronarlas.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga de
-tono que «debe comenzar en el paso por cero del tono y constar de un
-número entero de periodos completos» (A2.1) y el tren repetitivo de salvas
+**Cubierto.** El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga
+tonal que «debe comenzar en el paso por cero del tono y constar de un
+número entero de periodos completos» (A2.1) y el tren repetitivo de ráfagas tonales
 de A2.2, implementados por `tone_burst` y comprobados a mano contra las
 duraciones de la tabla AII. El requisito antialias de la sección 10.2 de
 Bendat y Piersol, convertido en una especificación explícita y verificable
-por el rechazo de banda eliminada y la anchura de transición de
+por el rechazo en la banda atenuada y la anchura de transición de
 `resample_signal`.
 
 **No cubierto.** La IEC 60268-1:1985 es una norma general para equipos de
-sistemas de sonido. Aquí solo se implementan los apartados de ráfagas de
-tono del anexo A; el resto de sus partes (amplificadores, altavoces,
+sistemas de sonido. Aquí solo se implementan los apartados de ráfagas
+tonales del anexo A; el resto de sus partes (amplificadores, altavoces,
 conectores, etc.) quedan sin tocar. `fractional_delay` y los generadores
 de ruido de colores de `noise_signal` son herramientas de DSP de
 propósito general sin norma que las gobierne; sus afirmaciones de
@@ -279,4 +328,6 @@ exactitud son formas cerradas, no normativas.
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
 - [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de periodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
 - [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): las excitaciones de MLS y barrido exponencial del retrato de familia, tal como las usa ISO 18233.
+- [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/): la pareja de Golay y el barrido conformado, los otros dos miembros de la familia.
 - Referencia de la API: [`signals.test_signals`](/phonometry/es/reference/api/signals/test-signals/).

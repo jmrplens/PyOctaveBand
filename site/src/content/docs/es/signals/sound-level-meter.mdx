@@ -71,6 +71,44 @@ recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
 )
 ```
 
+## 1b. Grabar los dos ficheros
+
+Un sonómetro construido en software hereda todos los defectos del fichero que
+se le entrega, y hay tres ajustes del grabador que deciden si los números de
+abajo significan algo. **Fija la ganancia de entrada a mano y bloquéala.** El
+control automático de ganancia, la limitación y la supresión de ruido mueven
+todos ellos la sensibilidad que el paso siguiente mide una sola vez y que el
+paso 4 aplica luego a todas las muestras, así que cualquiera de los tres anula
+la calibración en silencio. **Graba PCM sin comprimir, a 24 bits y a 48 kHz o
+más.** Un códec con pérdida redistribuye la energía en alta frecuencia que
+informa la etapa de tercios de octava del paso 5, y un fichero a 44,1 kHz no
+deja banda alguna por encima de 22 kHz sobre la que sostener la ponderación A de
+clase 1 del paso 3 cerca de 16 kHz. **Elige la ganancia a partir del evento más
+ruidoso que la medida tenga que poder demostrar**, dejando unos 12 dB de margen
+por encima de su pico: el $L_{Cpeak}$ del paso 4 lee el verdadero pico entre
+muestras, y una sola racha saturada lo invalida, y con él el $L_{Aeq}$.
+
+Hay otras dos decisiones que son de la sesión y no del grabador. Graba el tono
+del calibrador por esa misma cadena bloqueada inmediatamente antes *y*
+inmediatamente después de la medición, para que el par acote la deriva que
+comprueba el paso 7; un factor medido otro día, o después de mover un control de
+ganancia, no es una calibración de este fichero. En exteriores, mantén el
+paravientos puesto y apunta el micrófono en la dirección de referencia que
+supone su calibración de campo libre.
+
+Una hoja de campo que merece copiarse:
+
+- Ganancia fijada a mano y anotada; AGC, limitador y supresión de ruido
+  desactivados.
+- PCM sin comprimir, 24 bits, $f_s \ge 48$ kHz, un canal por micrófono.
+- Margen de pico de unos 12 dB sobre el evento más ruidoso previsto.
+- Tono de calibrador antes y después, misma ganancia, misma cadena, misma
+  sesión.
+- Paravientos puesto, micrófono en trípode, dirección de referencia hacia la
+  fuente.
+- Frecuencia de muestreo, ajuste de ganancia e identificadores del micrófono y
+  del calibrador registrados.
+
 ## 2. Calibra: da significado físico a las muestras
 
 Las muestras digitales son adimensionales; el **factor de sensibilidad** las
@@ -172,10 +210,41 @@ la energía comprimida en un segundo. Los percentiles se leen al revés: el even
 ocupa exactamente el 10 % del registro, así que sube el $L_{10}$ a 78,0 dB y
 deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_level_track_es.svg" alt="Historial de nivel ponderado A con respuesta Fast de la grabación de diez segundos de esta página, que sube desde unos 55 dB de fondo rosa hasta 80 dB durante el evento de un segundo en el segundo cuatro, con líneas horizontales en LAeq 70,2 dB, L10 78,0 dB, L50 55,1 dB y L90 54,9 dB, el segundo del evento sombreado, y una anotación que dice LAE 80,2 dB, toda la energía del evento comprimida en un segundo" width="88%" />
+
+*Las lecturas de este paso dibujadas sobre la grabación que las produjo: el
+segundo del evento sube el $L_{Aeq}$ y el $L_{10}$, y deja el $L_{50}$ y el
+$L_{90}$ sobre el fondo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+t = np.arange(recording.size) / fs
+fig, ax = plt.subplots(figsize=(9, 4))
+ax.axvspan(4.0, 5.0, color="C1", alpha=0.15)
+ax.plot(t, laf_t, linewidth=0.8, label="$L_{AF}(t)$")
+for value, name, style in [(la_eq, "LAeq", "--"), (ln[10], "L10", ":"),
+                           (ln[50], "L50", "-."), (ln[90], "L90", (0, (5, 1)))]:
+    ax.axhline(value, linestyle=style, linewidth=1.0,
+               label=f"{name} = {value:.1f} dB")
+ax.annotate(f"LAE = {lae:.1f} dB: toda la energía del evento en 1 s",
+            xy=(4.5, lae), xytext=(5.6, lae + 2),
+            arrowprops={"arrowstyle": "->"})
+ax.set(xlabel="Tiempo [s]", ylabel="Nivel [dB re 20 µPa]", xlim=(0, 10))
+ax.legend(loc="lower right", ncols=2)
+plt.show()
+```
+
+</details>
+
 Guía de fondo:
-[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que añade
-dosis de ruido y espectrogramas de octava; el $L_{den}$ y los niveles de
-evaluación continúan en
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que
+añade el nivel máximo con ponderación temporal $L_{AFmax}$ que da esta misma
+traza `laf_t`, la dosis de ruido y los espectrogramas de octava; el $L_{den}$ y
+los niveles de evaluación continúan en
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
 ## 5. Filtra en bandas: la vista de espectro (IEC 61260-1)
@@ -195,6 +264,62 @@ spl, bands = filters.octave_filter(
 # La banda '1k' contiene el evento: ≈70 dB, con sus vecinas ≈25 dB por debajo.
 print(dict(zip(bands, np.round(spl, 1))))
 ```
+
+Estos son **niveles de banda sin ponderar (Z)**: `octave_filter` se ejecutó
+sobre `recording` y no sobre la señal `weighted` del paso 3, así que su suma
+energética reproduce el $L_{eq}$ sin ponderar y no el $L_{Aeq}$ del paso 4. Esa
+suma es la comprobación de coherencia que merece la pena hacer una vez en cada
+medición:
+
+```python
+print(f"suma de las bandas Z {10 * np.log10(np.sum(10 ** (spl / 10))):.1f} dB")
+print(f"Leq(Z)               {signals.leq(recording, calibration_factor=cal):.1f} dB")
+# suma de las bandas Z 70.3 dB
+# Leq(Z)               70.4 dB
+```
+
+La décima o dos de defecto es la energía que queda fuera del rango de análisis
+de 12,5 Hz a 20 kHz más la forma de los bordes de banda. Una discrepancia mayor
+que medio decibelio aproximadamente apunta a un error de calibración o de
+frecuencia de muestreo, no a los filtros.
+
+Para obtener un espectro *ponderado A*, filtra en bandas la señal ya ponderada
+del paso 3 en lugar de la grabación en bruto:
+
+```python
+spl_a, _ = filters.octave_filter(weighted, fs, fraction=3, nominal=True)
+print(f"suma de las bandas A {10 * np.log10(np.sum(10 ** (spl_a / 10))):.1f} dB")
+# suma de las bandas A 70.2 dB -> el LAeq del paso 4, con una centésima de decibelio
+```
+
+Esa identidad cierra el círculo entre las dos mitades del sonómetro: la etapa de
+ponderación y la etapa de filtrado miden la misma energía.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_third_octave_es.svg" alt="Treinta y tres niveles de banda de tercio de octava de la grabación de esta página en forma de gráfica escalonada de 12,5 Hz a 20 kHz, con las bandas sin ponderar planas en torno a 43 dB y la banda de 1 kHz resaltada en 70 dB, dibujadas junto al espectro ponderado A de la misma grabación, que cae por debajo de 500 Hz y por encima de 4 kHz" width="88%" />
+
+*La misma grabación leída en bandas, sin ponderar y con ponderación A. El ruido
+rosa da niveles de banda de fracción de octava casi constantes, así que el suelo
+plano es el fondo y la única barra que sobresale 27 dB por encima es el evento;
+la ponderación A inclina ese suelo sin tocar la banda de 1 kHz, donde la curva A
+vale 0 dB.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+_, centres = filters.octave_filter(recording, fs, fraction=3)  # centros exactos
+
+fig, ax = plt.subplots(figsize=(9, 4))
+ax.step(centres, spl, where="mid", label="Z (sin ponderar)")
+ax.step(centres, spl_a, where="mid", linestyle="--", label="Ponderación A")
+ax.axvspan(891.3, 1122.5, color="C1", alpha=0.15)   # la banda de 1 kHz
+ax.set(xscale="log", xlabel="Frecuencia central de banda [Hz]",
+       ylabel="Nivel de banda [dB re 20 µPa]")
+ax.legend(loc="lower center")
+plt.show()
+```
+
+</details>
 
 Guías de fondo: [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) para
 las arquitecturas de filtro y el modo de fase cero,
@@ -220,27 +345,62 @@ print(filters.verify_filter_class(bank)["overall_class"])    # 1
 ```
 
 Los veredictos también llegan por banda, de modo que puedes ver exactamente
-dónde un diseño se saldría de su pasillo de clase. Guías de fondo:
+dónde un diseño se saldría de su corredor de clase. Guías de fondo:
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) (sección de
 verificación de clase) y
 [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/)
 (la máscara de la Tabla 1, la clase 0 y la ficha de conformidad).
 
-## Adónde ir después
+## 7. ¿Es válida esta medición?
 
-El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
+El paso 6 verificó el *diseño* de las etapas de ponderación y de filtrado. No
+dice nada del fichero. Un sonómetro de hardware se niega a mostrar un nivel del
+que no puede responder: el apartado 5.11 de IEC 61672-1 hace obligatorio un
+indicador de sobrecarga (el 5.11.5 lo enclava siempre que se estén midiendo
+niveles promediados en el tiempo o de exposición), y el apartado 5.12 añade una
+indicación de rango inferior. Un sonómetro montado a base de funciones no tiene
+ninguno de los dos, así que tres comprobaciones sobre la grabación los
+sustituyen, y cada una de las tres da un número que debe figurar en el informe.
 
-- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
-  acompaña de una incertidumbre el $L_{Aeq}$ que acabas de calcular, término de
-  calibración incluido.
-- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/):
-  cuando las bandas se quedan cortas, la PSD de Welch con intervalos de
-  confianza.
-- [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
-  dos micrófonos en lugar de uno, y el retardo entre ellos.
-- [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): convierte
-  el sonómetro fuera de línea de esta página en uno en streaming con estado
-  de filtro arrastrado.
+```python
+# (a) Sobrecarga: cualquier racha de dos o más muestras clavadas a fondo de escala.
+at_full_scale = np.flatnonzero(np.abs(recording) >= 1.0 - 1e-6)
+runs = (np.split(at_full_scale, np.flatnonzero(np.diff(at_full_scale) > 1) + 1)
+        if at_full_scale.size else [])
+clipped_runs = sum(1 for run in runs if run.size >= 2)
+
+# (b) Rango inferior: la misma cadena capturando su propio ruido (cápsula ficticia).
+self_noise = signals.noise_signal(fs, 3.0, color="pink", rms=2e-4, seed=11)
+margin = la_eq - signals.laeq(self_noise, fs, calibration_factor=cal)
+
+# (c) Deriva: el tono del calibrador grabado otra vez tras la medición.
+calibrator_post = 0.985 * calibrator          # un 1,5 % más bajo en esta sesión
+cal_post = metrology.sensitivity(calibrator_post, target_spl=94.0, fs=fs)
+drift = abs(20 * np.log10(cal_post / cal))
+
+print(f"rachas saturadas {clipped_runs} | margen S/R {margin:.1f} dB "
+      f"| deriva {drift:.2f} dB")
+# rachas saturadas 0 | margen S/R 55.3 dB | deriva 0.13 dB
+```
+
+Rechaza el registro si existe cualquier racha saturada, exige al menos 10 dB de
+margen sobre el ruido propio de la cadena (por debajo de eso, el $L_{90}$ está
+leyendo el preamplificador y no el fondo), y mantén la diferencia de
+sensibilidad entre el antes y el después dentro del umbral de 0,5 dB de la
+[guía de calibración](/phonometry/es/signals/metrology/calibration/), que además
+explica por qué esa misma diferencia es el término de deriva del balance de
+incertidumbre.
+
+Aprende la huella del fallo que el nivel de banda ancha esconde. La saturación
+apenas mueve el $L_{Aeq}$ (recortar duramente un tono de 1 kHz al 80 % de su
+pico cuesta 0,9 dB) mientras inyecta una escalera de armónicos impares que sube
+la banda de tercio de octava de 3,15 kHz en 37 dB, la de 5 kHz en 37 dB y la de
+8 kHz en 25 dB. Un espectro de tercios de octava con picos regularmente
+espaciados por encima de lo que la fuente puede radiar de forma plausible es
+saturación mientras no se demuestre lo contrario. El fallo contrario no se le
+parece en nada: una señal muy por debajo del rango del convertidor da un
+espectro que apenas cambia cuando se apaga la fuente, que es lo que caza la
+comprobación (b).
 
 ## Qué cubre esta guía
 
@@ -256,16 +416,31 @@ fondo indica su propia cobertura en detalle.
 **No cubierto.** `verify_weighting_class` y `verify_filter_class` comprueban
 el diseño de respuesta en frecuencia de los filtros digitales frente a las
 tablas de las normas; no realizan los ensayos de evaluación de patrón de
-IEC 61672-3 que necesita un instrumento físico para su aprobación de tipo,
+IEC 61672-2:2013 que necesita un instrumento físico para su aprobación de tipo,
 como el ruido autogenerado, el rango de linealidad, la indicación de
-sobrecarga o la respuesta direccional. Un veredicto de clase de esta página
-describe el algoritmo, no un aparato construido. Los ensayos de conformidad
+sobrecarga o la respuesta direccional, ni los ensayos periódicos de
+IEC 61672-3:2013 que recibe un instrumento en servicio. Un veredicto de clase de
+esta página describe el algoritmo, no un aparato construido, y las tres
+comprobaciones del paso 7 criban la *grabación*, no el instrumento. Los ensayos de conformidad
 del calibrador de IEC 60942:2017 tampoco se ejecutan aquí; consulta la
 [guía de calibración](/phonometry/es/signals/metrology/calibration/) para lo que
 `sensitivity()` comprueba y lo que no.
 
 ## Véase también
 
+El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
+
+- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
+  acompaña de una incertidumbre el $L_{Aeq}$ que acabas de calcular, término de
+  calibración incluido.
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/):
+  cuando las bandas se quedan cortas, la PSD de Welch con intervalos de
+  confianza.
+- [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
+  dos micrófonos en lugar de uno, y el retardo entre ellos.
+- [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): convierte
+  el sonómetro offline de esta página en uno en streaming con estado de
+  filtro arrastrado.
 - Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/metrology/calibration/),
   [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/),
   [`signals.levels`](/phonometry/es/reference/api/signals/levels/),

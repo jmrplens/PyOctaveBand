@@ -1,6 +1,6 @@
 ---
 title: "Test signals and sample-rate tools"
-description: "The signal toolbox of the metrology domain: IEC 60268-1 tone bursts with exact gating, colored noise with an exact spectral slope, polyphase resampling behind an explicit anti-alias specification, and band-limited fractional delay with a linear or circular boundary."
+description: "The stimulus and sample-rate toolbox of `phonometry.signals`: IEC 60268-1 tone bursts with exact gating, colored noise with an exact spectral slope, polyphase resampling behind an explicit anti-alias specification, and band-limited fractional delay with a linear or circular boundary."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -22,18 +22,35 @@ references:
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A measurement is only as trustworthy as its stimulus and its sample-rate
-bookkeeping. This page covers the signal toolbox of `phonometry.signals`:
-**tone bursts** with the exact gating IEC 60268-1 prescribes, the
-**colored-noise generators** (detailed in the
-[spectral analysis guide](/phonometry/signals/spectra/spectral-analysis/#5-colored-noise-generators)),
-**resampling** whose anti-alias rejection is a stated, verifiable
-specification rather than a library default, and **fractional delay** that
-shifts a record by any sub-sample amount with band-limited exactness.
+bookkeeping. This page covers the signal toolbox of `phonometry.signals`, in
+the order the sections take it: **tone bursts** with the exact gating
+IEC 60268-1 prescribes, **resampling** whose anti-alias rejection is a stated,
+verifiable specification rather than a library default, **fractional delay**
+that shifts a record by any sub-sample amount with band-limited exactness, and
+the **colored-noise generators**, whose spectral verification lives in the
+[spectral analysis guide](/phonometry/signals/spectra/spectral-analysis/#5-colored-noise-generators).
 
 Before the details, the family portrait: what each stimulus looks like in
 time and where its energy sits over frequency.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals.svg" alt="Grid of five labelled test-signal miniatures: white noise with a jagged waveform and a flat power spectral density of 0 dB per octave, equal power per hertz; pink noise with a smoother waveform and a minus 3 dB per octave density, equal power per octave; an MLS binary chip stream of period 2 to the m minus 1 samples with a flat line spectrum; a time-frequency sketch where a linear sweep is a straight line while the exponential sweep hugs low frequencies and spends equal time per octave; and an IEC 60268-1 tone burst of whole periods starting at a zero crossing, 25 periods of 5 kHz lasting 5 ms" width="92%" />
+
+Five stimuli, and what separates them. **Noise** excites everything at once and
+needs averaging to beat its own randomness. An **MLS** is deterministic and
+periodic, so one circular cross-correlation gives an impulse response in a
+single pass. A **sweep** concentrates its energy at one frequency at a time,
+which is what buys both its crest factor and the separation of harmonic
+distortion into negative times. A **gated burst** probes dynamic behaviour
+rather than steady response.
+
+Only two of the five are covered here, so this is where the other three live:
+the noise generators and their spectral verification on
+[spectral analysis](/phonometry/signals/spectra/spectral-analysis/#5-colored-noise-generators);
+the MLS and the exponential sweep as the ISO 18233 acquisition pair of
+[room acoustics](/phonometry/buildings/rooms/room-acoustics/); the shaped sweep
+and the Golay pair on
+[system measurement](/phonometry/signals/spectra/system-measurement/); and the
+tone burst in the next section.
 
 ## 1. Tone bursts (IEC 60268-1)
 
@@ -106,6 +123,19 @@ These are the bursts behind the
 responses (IEC 61672-1 Table 4 uses 4 kHz tonebursts of 200, 50 and 10 ms)
 and the quasi-peak dynamic tests of IEC 60268-1 itself (5 kHz bursts of
 1 to 200 ms, Table AII).
+
+**What gating does in frequency, and what the duty cycle costs in level.**
+Multiplying a tone by a rectangle convolves its line with the gate's transform,
+a sinc whose first nulls sit $1/T_\text{burst}$ either side of the carrier —
+±200 Hz for a 5 ms burst, ±100 Hz for a 10 ms one. So it is the burst
+*duration*, not the carrier, that decides whether the stimulus fits inside a
+band filter, and why a short burst through a fractional-octave filter shows the
+filter's own settling rather than the burst. In level, a train's equivalent
+continuous level is the burst level plus $10\log_{10}(\text{duty cycle})$: the
+5 % train above therefore sits exactly **13.0 dB** below the burst's own level,
+which is the quantity a detector-ballistics test compares against. The reference
+responses those numbers feed are in
+[Time weighting](/phonometry/signals/levels/time-weighting/).
 
 ## 2. Resampling with a stated anti-alias specification
 
@@ -194,6 +224,20 @@ Several estimators resample internally at fixed rates (the ECMA-418-2
 psychoacoustics at 48 kHz, STOI at 10 kHz); this function is the public,
 documented counterpart for preparing records outside those chains.
 
+Three things worth deciding before resampling at all. **The specification has a
+price:** the default 5 % transition width gives up the top 5 % of the smaller
+Nyquist band, so a 44.1 → 48 kHz conversion is flat only to about 21 kHz; a
+record whose content reaches Nyquist needs a narrower `transition_width` (and
+the extra taps that come with it) rather than a silent truncation. **Order
+matters:** resampling is a filtering operation, so RMS-based levels survive it
+while peak-based ones do not — band-limited interpolation can place a
+reconstructed sample *above* the original peak (the intersample-peak effect), so
+`lc_peak` and any crest factor belong at the original rate, or behind an
+explicit true-peak oversampling. **And often the answer is not to resample:**
+the library's fractional-octave filters design themselves at whatever rate they
+are given, so converting to a "standard" rate before analysis usually buys
+nothing and costs the band edge.
+
 ## 3. Fractional delay
 
 `fractional_delay` shifts a record by any number of samples, including
@@ -226,15 +270,13 @@ its real part). Any properly sampled signal is band-limited below Nyquist,
 so in practice the operation is exact; for synthetic corner cases, odd
 lengths avoid the bin entirely.
 
-## 4. Colored noise
-
-The deterministic colored-noise generators (`noise_signal`: white, pink,
-red, blue, violet with an exact power-law slope and bit-reproducible seeds)
-complete the toolbox; they are documented with their spectral verification
-in the
-[spectral analysis guide](/phonometry/signals/spectra/spectral-analysis/#5-colored-noise-generators).
-
 ## Where these tools are used
+
+The deterministic colored-noise generators (`noise_signal`: white, pink, red,
+blue and violet, with an exact power-law slope and bit-reproducible seeds) round
+out the toolbox and are documented, with their spectral verification and their
+measured slopes, in the
+[spectral analysis guide](/phonometry/signals/spectra/spectral-analysis/#5-colored-noise-generators).
 
 The [window figures of merit](/phonometry/signals/spectra/spectral-analysis/#6-choosing-the-window)
 quantify the taper every spectral estimate in the library rests on; the
@@ -267,4 +309,6 @@ their own; their accuracy claims are closed-form, not normative.
 - [Correlation and delay](/phonometry/signals/spectra/correlation-delay/): the alignment work built on the fractional-delay kernel.
 - [Synchronous averaging](/phonometry/signals/spectra/synchronous-averaging/): period alignment with the same band-limited shift when $f_s T$ is not an integer.
 - [Spectral analysis](/phonometry/signals/spectra/spectral-analysis/): the colored-noise verification and the window metrics.
+- [Room acoustics](/phonometry/buildings/rooms/room-acoustics/): the MLS and exponential-sweep excitations of the family portrait, as ISO 18233 uses them.
+- [System measurement](/phonometry/signals/spectra/system-measurement/): the Golay pair and the shaped sweep, the other two members of the family.
 - API reference: [`signals.test_signals`](/phonometry/reference/api/signals/test-signals/).

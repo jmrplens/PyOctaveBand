@@ -103,23 +103,41 @@ sobre la misma disposición escalonada que el esquema acústico: los
 esfuerzos normales ``txx``/``tyy`` comparten los centros de celda donde
 vive la presión acústica, las velocidades ocupan las caras y el esfuerzo
 de cizalla ``txy`` las esquinas (la celda totalmente escalonada de
-Virieux, desplazada media celda). La API espeja `fdtd_simulation` pieza a
+Virieux, desplazada media celda). La API replica `fdtd_simulation` pieza a
 pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
 `ExplosionSource` (una inyección isótropa de esfuerzo) y `ForceSource`
 (una fuerza de cuerpo direccional) como fuentes, sondas que registran
 ``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
-`ElasticFDTDResult` congelado con el mismo `.plot()`. Lo que la simulación
+`ElasticFDTDResult` congelado con el mismo `.plot()`. Lo que la ejecución
 anota viaja en un `ElasticRecording` (las celdas de sonda y sus campos, la
 cadencia de instantáneas y su campo) y cómo terminan los bordes del dominio
-en un `ElasticBoundaries` (los lados y el grosor de la esponja). La cota de Courant
-depende solo de la $c_P$ más rápida del mapa (Virieux, Ecs. 6-7),
-mientras que la regla de resolución usa la velocidad de onda más lenta de
-todo el dominio: la $c_S$ no nula más lenta de las celdas sólidas o, si
-una región fluida lleva una $c_P$ aún más lenta, esa velocidad del
-fluido: $\Delta x \le c_\text{min} / (10 f)$ (en un mapa completamente sólido la
-longitud de onda S es siempre la más corta; en dominios mixtos la longitud
-de onda P del fluido puede ser más corta, como en agua a 1480 m/s sobre un
-sedimento con cizalla de 2000 m/s).
+en un `ElasticBoundaries` (los lados y el grosor de la esponja).
+
+Dos números gobiernan cada ejecución, y leen extremos opuestos de los mapas
+de material. **Estabilidad**: el paso temporal sigue a la onda *más rápida*
+del dominio, $c_P^{\max}$, exactamente igual que en el esquema acústico
+(Virieux, Ecs. 6-7). **Resolución**: el tamaño de celda sigue a la *más
+lenta*, $\Delta x \le c_\text{min}/(10 f)$, donde $c_\text{min}$ es la
+velocidad de cizalla no nula más lenta de entre las celdas sólidas, o una
+velocidad $P$ de fluido si alguna región fluida es todavía más lenta. En un
+mapa completamente sólido la longitud de onda de cizalla es siempre la más
+corta; en un mapa mixto no tiene por qué serlo, como con agua a 1480 m/s
+sobre un sedimento cuya velocidad de cizalla es de 2000 m/s.
+
+Esos dos extremos son lo que cuesta un dominio de contraste alto. Δx lo fija
+el medio más lento y Δt el más rápido, así que el número de pasos que hacen
+falta para cubrir un tiempo físico dado crece con la *razón* entre las dos
+velocidades: un dominio de agua sobre acero resuelto para la longitud de
+onda del agua sigue teniendo que avanzar a los 5900 m/s del acero,
+aproximadamente cuatro veces más pasos que ese mismo dominio lleno solo de
+agua. Las regiones lentas trabajan entonces a un número de Courant local
+mucho menor, donde el error de dispersión del esquema está más cerca de su
+cota en el peor caso, así que su resolución efectiva es peor de lo que
+sugiere el recuento de celdas: por eso la regla de las diez celdas es un
+suelo y no un objetivo en los problemas de contraste alto. Cuando solo uno
+de los medios lleva la física de interés, sustituir el otro por una
+condición de contorno (un borde de impedancia o una esponja) suele salir
+mucho más barato que mallar los dos.
 
 ```python
 import numpy as np
@@ -146,7 +164,14 @@ print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
 Poner ``c_s = 0`` marca una celda de **fluido**: el módulo de cizalla se
 anula, el sistema degenera en las ecuaciones acústicas y, con un mapa
 uniforme de ``c_s = 0``, el esquema elástico reproduce el acústico
-**bit a bit** (la batería de regresión afirma la igualdad exacta). Una
+**bit a bit** (la batería de regresión comprueba la igualdad exacta). Esa
+equivalencia es una garantía de corrección, no una recomendación: este
+esquema lleva tres campos de esfuerzo donde el acústico lleva una sola
+presión, así que aquí un problema enteramente fluido cuesta aproximadamente
+el doble de memoria y de tiempo de avance. Usa el esquema acústico salvo que
+alguna parte del dominio soporte cizalla.
+
+Una
 columna de agua sobre un semiespacio de acero son, por tanto, solo dos
 bandas de los mapas de material: con la densidad promediada
 aritméticamente a las caras y el módulo de cizalla armónicamente a las
@@ -156,10 +181,46 @@ mapas sin más. La batería de validación mide la reflexión a incidencia
 normal de una interfase agua-acero con un error inferior al 2 %
 (típicamente una fracción de punto porcentual) respecto a
 $(Z_2 - Z_1)/(Z_2 + Z_1)$ y recupera la ley de masas a incidencia normal de
-una chapa de acero de 3 mm sumergida con un error inferior a 0,3 dB
+una placa de acero de 3 mm sumergida con un error inferior a 0,3 dB
 respecto a `mass_law_transmission_loss`.
 
+**Dónde está realmente el contacto, y cómo comprobarlo.** Una región pintada
+desde la fila $i$ hacia abajo sitúa la interfase física en el plano de
+*caras* $y = i\,\Delta x$, porque es ahí donde la densidad se promedia a las
+caras y el módulo de cizalla a las esquinas. Las distancias que se citen
+«desde el contacto» hay que medirlas desde ese plano, y una sonda tiene que
+quedar varias celdas apartada de él para que nunca muestree las celdas
+promediadas. Comprueba un mapa pintado antes de ejecutarlo, con
+`plt.imshow(sim.c_s)` y los bordes de las regiones dibujados encima, o
+simplemente verificando el índice de fila de la primera fila sólida, porque un
+error de una fila desplaza todas las llegadas en $\Delta x / c$ y cuesta una
+ejecución entera. No hay contrapartida elástica de `FDTD2D.plot_geometry`,
+así que esta comprobación corre por cuenta del lector. Merece la pena
+conocer de antemano un fallo más: toda celda debe cumplir
+$c_P^2 \ge 2 c_S^2$, cosa que el constructor impone, y ese rechazo es lo
+primero que hay que mirar cuando un mapa de sedimento o de material
+compuesto no se deja construir.
+
 ## 3. Superficies libres y ondas de Rayleigh
+
+**Todos los lados son rígidos mientras no se declare otra cosa, y aquí
+rígido significa empotrado.** El contorno mantiene la velocidad de partícula
+a cero, así que refleja con la polaridad *opuesta* a la de una superficie
+libre y no soporta onda de superficie alguna. Ese es el modelo correcto para
+un cuerpo que continúa en algo mucho más rígido, y el equivocado para un
+cuerpo en aire o en vacío, que es lo que son la mayoría de los problemas
+estructurales. Una placa, un bloque o una viga que se pretendan libres
+tienen que llevar, por tanto, **todos** sus lados expuestos declarados
+libres, y el síntoma de olvidarlo es silencioso: los frentes de onda siguen
+pareciendo verosímiles, pero el tren de Rayleigh que la figura de abajo hace
+evidente sencillamente no está, las reflexiones vuelven invertidas y no
+encaja ninguna forma cerrada de placa libre. La tercera opción es
+`"absorbing"`, que termina un semiespacio para que el borde del dominio no
+se vea en absoluto; las tres se eligen por lado, que es exactamente cómo
+funciona el ejemplo del semiespacio: libre arriba y absorbente en los otros
+tres. Como no hay contrapartida elástica de `FDTD2D.plot_geometry`, vuelve a
+leer la especificación de contornos del objeto `ElasticBoundaries` antes de
+comprometerte con una ejecución larga.
 
 Un lado declarado ``"free"`` se convierte en superficie libre de tracción
 mediante la **imagen de esfuerzos** (Moczo et al., Ec. 9.9): el esfuerzo
@@ -171,7 +232,7 @@ Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
 rueda por la superficie a $c_R \approx 0{,}93\,c_S$, la raíz de la ecuación
 característica exacta de Rayleigh (Cremer, Heckl y Petersson, Ec. 3.149).
 Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
-y la onda de flexión de una franja delgada libre-libre a la dispersión de
+y la onda de flexión de una tira delgada libre-libre a la dispersión de
 placa de Kirchhoff $c_B \propto \sqrt{\omega}$ en su dominio de placa
 delgada. Las superficies libres siguen la regla de muestreo de Rayleigh:
 reserva 15-20 celdas por longitud de onda ahí, pues la superficie de
@@ -183,6 +244,25 @@ imagen de segundo orden es la parte más dispersiva del esquema.
 distancia que el frente S (arcos punteados en los radios exactos $c_P t$ y
 $c_S t$), y el movimiento más intenso viaja a lo largo de la superficie
 libre como la onda de Rayleigh, un pelo más lenta que S.*
+
+**La esponja es la herramienta equivocada allí donde vive la física de esta
+página.** Aquí no hay una capa elástica perfectamente adaptada, y la esponja
+absorbe una onda de Rayleigh o de Scholte rasante mucho peor que una onda de
+cuerpo, precisamente porque una onda guiada por la superficie corre *a lo
+largo* de la capa en vez de meterse en ella. Tres consecuencias sobre las
+que conviene actuar. Un lado no puede ser libre y absorbente a la vez, así
+que donde una superficie libre se encuentra con una esponja en una esquina
+los esfuerzos imagen y la rampa de absorción trabajan uno contra otro:
+mantén la fuente al menos a una longitud de onda de esa esquina y termina la
+ejecución antes de que la onda de superficie llegue a ella. Una onda de
+interfase o de superficie necesita una capa más gruesa que una onda de
+cuerpo: empieza por aproximadamente el doble del ancho que usarías para P y
+S, y verifícalo alargando la ejecución y vigilando si vuelve algo. Y cuando
+solo importan las primeras llegadas, unos lados rígidos sin más con una
+ejecución más corta que el primer eco de pared salen más limpios que
+cualquier esponja: es exactamente lo que hace la instantánea de arriba, a
+73 µs sobre un bloque de 0,6 m cuyo retorno P de la pared lateral más
+cercana llega a 95 µs y cuya onda de Rayleigh alcanza la esquina a 103 µs.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -240,8 +320,32 @@ Como el fluido es simplemente el límite ``c_s = 0`` del esquema elástico, un
 contacto agua-acero es **una sola simulación con dos bandas en los mapas de
 material**, y toda la física del acoplamiento fluido-sólido emerge de la misma
 actualización. Las constantes `Material` y `ElasticFDTD2D.from_regions`
-construyen esos mapas por capas sin cirugía manual de arrays: un material de
+construyen esos mapas por capas sin manipular los arrays a mano: un material de
 fondo y una lista de regiones pintadas.
+
+Un `Material` son tres números medibles (la velocidad de compresión, la
+velocidad de cizalla y la densidad), y una velocidad de cizalla nula marca
+un fluido. Se distribuyen cinco constantes, y de ellas sale cualquier otro
+número de esta página:
+
+| Constante | $c_P$ [m/s] | $c_S$ [m/s] | $\rho$ [kg/m³] |
+|---|---|---|---|
+| `AIR` | 343 | 0 | 1,2 |
+| `WATER` | 1480 | 0 | 1000 |
+| `CONCRETE` | 3800 | 2250 | 2400 |
+| `STEEL` | 5900 | 3200 | 7850 |
+| `ALUMINIUM` | 6320 | 3130 | 2700 |
+
+Son cifras redondas nominales, para documentación y validación, no datos
+certificados, así que una probeta real hay que introducirla a mano: por eso
+la sección 1 escribe los 6320 / 3130 / 2700 del bloque de aluminio en vez de
+importar `ALUMINIUM`. El constructor impone una sola cota,
+$c_P^2 \ge 2\,c_S^2$, que es la afirmación de que el primer parámetro de
+Lamé no es negativo o, equivalentemente, de que el coeficiente de Poisson no
+es negativo. Un trío rechazado suele significar una velocidad de cizalla
+introducida demasiado alta, o una velocidad de compresión medida sobre una
+barra delgada en vez de en el seno del material: la de barra delgada es la
+menor de las dos, y sustituir una por otra es un error frecuente.
 
 ```python
 import numpy as np
@@ -271,20 +375,111 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 3))   # 0.938
 # y el acero se comporta como un líquido de su rho y c_P (B&G Ec. 4.2.27)
 ```
 
+Ese 0,938 es una razón entre dos eventos de una misma traza, y la traza es
+donde se ve si la ejecución fue lo bastante limpia como para citarlo.
+`ElasticFDTDResult.plot()` dibuja exactamente esto por defecto: historias de
+sonda, no mapas de campo; las instantáneas de las secciones 3 y 6 son
+`.plot(kind="snapshot")`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_probe_traces_es.svg" alt="Historia de presión en una sonda dentro de una columna de agua de 12 metros sobre un semiespacio de acero, a lo largo de 3,4 milisegundos: un único pulso gaussiano limpio de amplitud unidad que pasa por la sonda a 1,02 milisegundos camino abajo, un tramo plano y silencioso, y un segundo pulso de la misma polaridad y 0,938 veces la amplitud a 3,04 milisegundos, la reflexión que vuelve del acero, con los dos instantes de llegada marcados y la razón anotada frente a la fórmula de impedancias en forma cerrada" width="92%" />
+
+*Toda la medición en un solo eje. La sonda está 7,5 m por debajo de la
+fuente y 7,5 m por encima del contacto, así que el pulso incidente pasa por
+ella a 1,02 ms y la reflexión vuelve a 3,04 ms: dos instantes fijados por la
+geometría y por los 1480 m/s del agua, y los dos merecen comprobarse antes
+de leer las amplitudes. Los dos eventos conservan la misma polaridad, que es
+lo que hace una reflexión en un medio *más duro*, y su razón es 0,938 frente
+al valor exacto $(Z_2-Z_1)/(Z_2+Z_1) = 0{,}938$. El tramo plano entre ambos
+es la prueba de que no está contribuyendo nada más del dominio.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# La ejecución de arriba, releída: `res.plot()` sobre un resultado congelado
+# dibuja esto directamente. Aquí la traza se acumuló a mano, así que se
+# dibuja a mano.
+plt.plot(t * 1e3, trace)
+plt.axvline((4.5025 - 3.0) / WATER.c_p * 1e3, ls=":")   # incidente, 1,02 ms
+plt.axvline((3.0 + 1.4975) / WATER.c_p * 1e3, ls=":")   # eco, 3,04 ms
+plt.xlabel("Tiempo [ms]")
+plt.ylabel("Presión [Pa]")
+plt.show()
+```
+
+</details>
+
 ## 5. Incidencia oblicua: conversión de modo
 
 Fuera de la incidencia normal el sólido deja de ser un líquido. El sonido
 incidente se refracta en **dos** ondas transmitidas, P y SV (**conversión
-de modo**), cada una con su propio ángulo crítico: para agua sobre acero,
-14,5° (P) y 27,5° (S). Entre ambos la P transmitida es evanescente y la
-onda de cizalla se lleva la potencia transmitida, así que la reflexión baja
-a $|V| = 0{,}918$ a 20° en vez de reflejar totalmente como haría un fondo
-fluido con el mismo $c_P$; más allá del ángulo crítico S la reflexión es
-total, $|V| = 1$ con fase. La batería de validación lanza haces con portadora
-oblicuos a 10° y 20° y reproduce el coeficiente de reflexión exacto de
-Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) dentro de una fracción de punto
-porcentual, conversión de modo incluida. Esta es exactamente la física de
-cizalla que el `reflection_coefficient` de fondo fluido del
+de modo**), y la refracción obedece la ley de Snell por separado para cada
+una de ellas, así que cada una tiene su propio ángulo crítico:
+$\arcsin(c_1/c_{P2})$ para la onda de compresión y $\arcsin(c_1/c_{S2})$
+para la de cizalla. Ambos salen solo de las velocidades de onda (la densidad
+entra únicamente en las amplitudes), así que son dos líneas de aritmética
+sobre las constantes de material de la sección 4.
+
+```python
+import numpy as np
+
+# Los dos ángulos críticos salen solo de las velocidades. Sustituye tu
+# propio par de Material y esas mismas dos líneas te lo responden.
+print(round(float(np.degrees(np.arcsin(WATER.c_p / STEEL.c_p))), 1))   # 14.5
+print(round(float(np.degrees(np.arcsin(WATER.c_p / STEEL.c_s))), 1))   # 27.5
+```
+
+El dibujo de abajo reúne las tres disposiciones que describen esta sección y
+las dos siguientes, sobre una misma línea de interfase y a tres incidencias,
+junto con aquello que un error de una fila estropea: dónde está físicamente
+el contacto sobre la malla escalonada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_elastic_fluid_solid_es.svg" alt="Tres paneles que comparten una misma línea horizontal de interfase fluido-sólido, con agua arriba y sólido rayado abajo. Panel a, incidencia normal: una flecha incidente hacia abajo, una flecha reflejada hacia arriba y una única flecha P transmitida, con el coeficiente de reflexión 0,938 indicado debajo. Panel b, incidencia oblicua: un rayo incidente formando ángulo con la normal, su rayo reflejado y dos rayos transmitidos etiquetados P y SV que salen con ángulos distintos, con una sonda dibujada sobre la normal 0,12 metros por encima del punto de impacto y los ángulos críticos de 14,5 y 27,5 grados indicados debajo. Panel c, el caso de Scholte: una explosión diez metros por encima de un contacto agua-sedimento y un tren oscilante pegado a la interfase a 1436 metros por segundo, con envolventes evanescentes discontinuas a ambos lados. Un detalle ampliado debajo muestra la última fila de fluido, la primera fila de sólido y el plano de caras entre ambas." width="94%" />
+
+Esos dos ángulos parten el rango en cuatro regímenes. La columna titulada
+*fluido equivalente* es esa misma interfase modelada como un fondo sin
+cizalla del mismo $c_P$ y $\rho$, el modelo que lleva el módulo submarino, y
+la diferencia entre las dos columnas es toda la razón de ser de este
+esquema.
+
+| Incidencia | Ondas transmitidas | \|V\| elástico | \|V\| fluido equivalente | Qué significa |
+|---|---|---|---|---|
+| 0° | solo P | 0,938 | 0,938 | no se excita cizalla, así que el acero es exactamente un líquido de su $\rho$ y su $c_P$ |
+| de 0° a 14,5° | P y SV | 0,938, que baja a 0,937 en 9° y luego sube hasta el ángulo crítico | 0,938, que sube hasta 1 | la cizalla ya se lleva su parte de la potencia transmitida, y el modelo fluido ya devuelve de más |
+| de 14,5° a 27,5° | solo SV, P evanescente | baja hasta 0,905 en 16,4°; 0,918 en 20° | 1 (reflexión total) | el modelo fluido sobrestima la energía devuelta en toda la fuga por cizalla |
+| más allá de 27,5° | ninguna se propaga | 1, con una fase | 1, con una fase *distinta* | reflexión total en ambos casos; la diferencia de fase es aquello a lo que se engancha una onda de Scholte |
+
+Lee dos veces la tercera fila: entre los ángulos críticos un fluido
+equivalente lo refleja todo, mientras que la interfase real deja escapar
+cerca de una décima parte de la amplitud en forma de onda de cizalla
+(|V| baja hasta 0,905 en 16,4°). La batería de validación lanza haces
+oblicuos con portadora a 10° y 20° y reproduce el coeficiente de reflexión
+exacto de Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) dentro de una fracción
+de punto porcentual, conversión de modo incluida, así que la columna
+elástica de arriba está medida y no solo calculada.
+
+**Cómo se hace esa medición**, porque es una técnica que merece la pena
+robar. Un haz inclinado con portadora gaussiana se escribe como condición
+inicial sobre `txx` y `tyy`, con la velocidad de partícula medio paso
+temporal atrás, consistente con el leapfrog, repartida entre `vx` y `vy` por
+$\sin\theta$ y $\cos\theta$: el mismo truco unidireccional que la sección 4
+usa a incidencia normal, girado. La escena se ejecuta después **dos veces**,
+una con el sólido pintado y otra con el fluido continuado de largo a través
+de él, y la ejecución de referencia se fuerza al mismo paso temporal
+escalando su número de Courant por $c_\text{agua}/c_\text{acero}$, de modo
+que las dos trazas se restan muestra a muestra. La diferencia es el campo
+reflejado a solas, artefactos de pared lateral incluidos: el análogo
+elástico de la técnica de sustracción de ISO 13472-1. La sonda está
+justo encima del punto donde el eje del haz corta la interfase, 0,12 m por
+encima, de manera que los centros de los haces incidente y reflejado la
+cruzan con desplazamientos transversales simétricos y la envolvente se
+cancela en la razón; $|V|$ es entonces la razón espectral ponderada por
+amplitud sobre la banda de la portadora, no una lectura de pico a pico.
+
+Esta es exactamente la física de cizalla que el `reflection_coefficient` de
+fondo fluido del
 [módulo submarino](/phonometry/es/underwater/underwater-propagation/) no puede
 representar, y la razón por la que un lecho marino con cizalla pierde más
 energía que su modelo de fluido equivalente.
@@ -307,6 +502,12 @@ seabed = Material(c_p=3500.0, c_s=2000.0, rho=2500.0)
 print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
 ```
 
+Los dos casos usan aguas distintas a propósito. `WATER` es la constante de
+la biblioteca, a 1480 m/s, mientras que el caso del sedimento sigue el
+benchmark de van Vossen, cuyo fluido va a 1500 m/s: así que los dos déficits
+de abajo, el 0,03 % y el 4 %, están medidos cada uno contra su propia agua,
+y 1436 m/s no debe compararse nunca con 1480 m/s.
+
 Esos dos números cuentan toda la historia. Sobre un lecho **rígido**
 (acero) la onda de Scholte se pega a la velocidad del agua (1480 m/s)
 hasta un 0,03 % y su cola evanescente alcanza ~7 longitudes de onda dentro
@@ -314,13 +515,13 @@ del agua: es en esencia una onda de agua rasante y no puede separarse por
 tiempo de vuelo en ningún dominio razonable (sobre contactos aire-sólido
 el déficit se desploma a ~$10^{-12}$ de $c$ y la onda es directamente
 inobservable). Sobre un sedimento **blando** la velocidad cae muy por
-debajo de la del agua y la onda se comprime a media longitud de onda del
-contacto, y por eso las ondas de interfase medidas en el lecho marino son
-una sonda estándar de la velocidad de cizalla del sedimento. La
-instantánea de abajo ejecuta ese caso blando: una explosión justo sobre el
-fondo, y el rasgo tardío más intenso es el tren de Scholte pegado a la
-interfase, cronometrado por la batería de tests a 1436 m/s dentro del 2 %
-entre dos sondas en el contacto.
+debajo de la del agua y la onda queda confinada a menos de media longitud
+de onda del contacto, y por eso las ondas de interfase medidas en el lecho
+marino son una herramienta estándar para sondear la velocidad de cizalla
+del sedimento. La instantánea de abajo ejecuta ese caso blando: una
+explosión justo sobre el fondo, y el rasgo tardío más intenso es el tren de
+Scholte pegado a la interfase, cronometrado por la batería de tests a
+1436 m/s dentro del 2 % entre dos sondas en el contacto.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave_es.webp" alt="Instantánea de la velocidad de partícula vertical en un dominio de 500 por 200 metros de agua sobre un semiespacio de sedimento blando, 0,2 segundos después de una explosión 10 metros por encima del contacto: el frente directo del agua se arquea hacia arriba y a la derecha, frentes oblicuos radian hacia el sedimento, y los lóbulos más intensos forman un tren compacto pegado a la línea punteada de la interfase, etiquetado como la onda de Scholte, evanescente a ambos lados" width="96%" />
 
@@ -380,9 +581,50 @@ reproduce toda la curva: 5,8 dB a 10 kHz (donde
 `mass_law_transmission_loss` con agua como fluido ambiente coincide con la
 forma exacta hasta 0,02 dB), 18,1 dB a 50 kHz, y un mínimo de pérdida de
 transmisión dentro del 0,1 % de la resonancia de 295 kHz. La misma batería
-somete a esfuerzo el contraste extremo de un contacto aire-acero (razón de
+lleva al límite el contraste extremo de un contacto aire-acero (razón de
 impedancias ~$10^5$:1): estable durante 10 000 pasos con la amplitud
 reflejada conservada al 0,5 %.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_immersed_plate_tl_es.svg" alt="Dibujo del montaje de la ejecución de transmisión con placa sumergida. A la izquierda, una tira vertical alta y estrecha dibujada a escala: 0,75 metros de agua con una placa de acero de 10 milímetros a 0,35 metros, un pulso plano unidireccional lanzado hacia abajo a 0,25 metros, la sonda A 30 milímetros por encima de la placa y la sonda B 50 milímetros por debajo, con una nota de que la tira tiene tres celdas de ancho, un problema unidimensional ejecutado en un esquema bidimensional a medio milímetro por celda. A la derecha, las dos trazas de sonda sobre un eje temporal común de 0 a 160 microsegundos: la sonda A muestra el pulso incidente a 47 microsegundos dentro de una puerta sombreada de 65 microsegundos y su reflexión en la placa a 88 microsegundos, ya fuera de ella; la sonda B muestra solo la cola transmitida. Debajo, la fórmula de la pérdida de transmisión y un esquema enmarcado del patrón estacionario de media onda dentro de la placa con su primera resonancia de 295 kilohercios." width="94%" />
+
+**La medición que hay detrás de esos tres números.** La escena es una tira
+de tres celdas de ancho y 0,75 m de alto con $\Delta x = 0,5$ mm (un
+problema unidimensional ejecutado en un esquema bidimensional) llena de
+`WATER`, con una región de `STEEL` de 10 mm pintada a 0,35 m mediante
+`from_regions`. Un pulso plano gaussiano de 1,5 mm de anchura se escribe
+unidireccional igual que en la sección 4, centrado en 0,25 m; esa anchura es
+la que lleva energía aprovechable hasta unos 340 kHz, que es lo que mete la
+resonancia de 295 kHz dentro de la banda medida. Una sonda está 30 mm por
+encima de la placa y otra 50 mm por debajo de su cara inferior, y la
+ejecución dura 0,45 ms.
+
+La medición en sí es una ventana temporal, y la geometría te la regala. La
+sonda superior ve el pulso incidente hacia los 47 µs (0,07 m de agua a
+1480 m/s) y su reflexión en la placa hacia los 88 µs (0,13 m); las dos
+llegadas duran unos 10 µs, así que una puerta de 65 µs aísla la incidente
+*exactamente*, no aproximadamente. La sonda inferior se mantiene libre de
+ecos durante todo el registro, así que no necesita puerta alguna. Después,
+$\mathrm{TL}(f) = 20\log_{10}|I(f)/T(f)|$ a partir de los dos espectros de
+magnitud. Dos comprobaciones que el lector puede hacer sobre su propia
+placa: el valor a 10 kHz frente a `mass_law_transmission_loss` con agua como
+fluido ambiente, y el mínimo frente a $f_n = n\,c_P/(2h)$. Esa misma lógica
+de ventana temporal es la que aplica una medición in situ de ISO 13472-1 con
+una ventana de Adrienne, así que el truco se traslada tal cual a un banco
+real.
+
+**Para qué sirve en realidad esa cifra de 295 kHz.** Está tres décadas por
+encima de la banda de la acústica de la edificación, así que un panel a
+frecuencias de audio está *siempre* en el límite de placa delgada, donde la
+transmisión de la capa se desploma sobre la ley de masas y la resonancia de
+espesor puede ignorarse por completo: por eso justamente las formas cerradas
+de la guía de aislamiento de paneles no la mencionan nunca. La resonancia se
+gana el sueldo en su propia banda: la transmisión total en el espesor de
+media onda es el principio en que se basan la medida ultrasónica de
+espesores y la elección de las capas de acoplamiento de los transductores, y
+por eso la validación lleva la placa a propósito hasta los centenares de
+kilohercios. La frecuencia donde se encuentran los dos regímenes es una
+divisoria válida para cualquier placa: $c_P/(2h)$, que vale 295 kHz para
+10 mm de acero y 59 kHz para 50 mm del mismo.
 
 A incidencia oblicua la física de la placa se enriquece, y el clip de abajo es
 este mismo esquema excitando la misma placa de acero de 10 mm, ahora tendida en
@@ -394,7 +636,7 @@ $m''$ y $B'$ usados más arriba. Todo lo demás (la placa, el ángulo, la malla 
 la escala de color) se mantiene fijo. Por debajo de $f_c$ la placa refleja casi
 todo y el nivel transmitido cae sobre la ley de masas oblicua; por encima, la
 longitud de onda de traza acústica coincide con la longitud de onda de flexión
-libre, la placa re-radia un haz a 45° que crece a lo largo del tramo iluminado y
+libre, la placa rerradia un haz a 45° que crece a lo largo del tramo iluminado y
 el nivel transmitido se mantiene en la cifra de baja frecuencia, justo donde la
 ley de masas exigía 12 dB más de bloqueo. El aire bajo la placa se dibuja en los
 dos paneles con la ganancia representada en ellos, que `_weak_field_gain` mide sobre
@@ -430,7 +672,7 @@ contra la ecuación característica exacta (Ec. 4.4.20) y por tiempo de vuelo
 en el benchmark de fondo blando de van Vossen (2002), la transmisión de la
 placa sumergida con su primera resonancia de espesor contra la forma
 cerrada de tres medios (Ecs. 2.4.14-2.4.19), la ley de masas del panel
-sumergido y el test de esfuerzo de contraste extremo aire-acero.
+sumergido y la prueba de robustez con el contraste extremo aire-acero.
 
 **No cubierto.** Todo lo que el esquema acústico 2D no puede hacer,
 este tampoco: el dominio es una sección transversal (propagación cilíndrica
@@ -438,7 +680,7 @@ $1/\sqrt{r}$, no $1/r$), así que los niveles absolutos y las tasas de
 decaimiento no son los de un problema 3D. El sólido es isótropo y puramente
 elástico: sin anisotropía ni amortiguamiento viscoelástico más allá de la
 tasa de decaimiento volumétrica, así que los factores de pérdidas del
-material no se modelan. No hay capa perfectamente adaptada elástica: la
+material no se modelan. No hay una capa elástica perfectamente adaptada: la
 esponja absorbe las ondas de Rayleigh rasantes peor que las ondas de
 cuerpo. La dispersión de ondas guiadas más allá del régimen de placa
 delgada de Kirchhoff (modos de Lamb completos) es observable en los campos

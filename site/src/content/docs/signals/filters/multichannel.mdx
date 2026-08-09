@@ -1,6 +1,6 @@
 ---
 title: "Multichannel and Performance"
-description: "Per-channel processing of multichannel recordings, the (channels, samples) convention, and the vectorization behind it."
+description: "Per-channel processing of multichannel recordings, the (channels, samples) convention, calibrating an array one capsule at a time, and where the computation time actually goes."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -58,8 +58,11 @@ multiple-input models.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel.svg" alt="Stereo analysis: pink noise and logarithmic sweep resolved per channel in one-third-octave bands" width="80%" loading="eager" />
 
-*Simultaneous analysis of a Stereo signal: Left Channel (Pink Noise) vs Right
-Channel (Log Sine Sweep).*
+*One `octave_filter` call, two channels: pink noise on the left, a logarithmic
+sweep on the right. Both come back flat in one-third-octave bands — pink noise
+because its $1/f$ spectrum has constant energy per fractional-octave band, the
+sweep because it spends proportionally equal time in each — and neither row is
+affected by the other.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -94,6 +97,19 @@ plt.show()
 
 </details>
 
+Read the figure row by row before moving on. The roll-offs at the two ends of
+the right row are the sweep's own 50 Hz and 10 kHz limits, not a filter effect.
+And two conclusions follow from the flatness. A flat fractional-octave spectrum
+corresponds to a $1/f$ power spectral density, so *white* noise does not look
+flat in this display: it rises at 3 dB per octave, because each band is 26 %
+wider than the one below. And two signals with completely different time
+structure — a stationary noise and a sweep that is at 50 Hz at one moment and
+10 kHz five seconds later — map to the same spectrum, which is why the band
+levels of this page answer "how much energy per band" and never "when". The
+octave spectrogram of
+[Integrated and Statistical Levels](/phonometry/signals/levels/levels/) is the
+tool that restores the time axis.
+
 The convention is consistent across the whole library: time is always the
 **last axis**. This applies to `octave_filter`, `OctaveFilterBank`,
 `weighting_filter`, `time_weighting`, `leq`, `laeq`, `ln_levels` and
@@ -126,9 +142,10 @@ spl, freq = filters.octave_filter(stereo, fs, fraction=3)
 | `(ch, n)` into `spectrogram` | multichannel STFT-style | `(ch, bands, frames)` |
 
 Everything vectorizes across the leading channel axis: one filter design is
-applied to all channels in a single SciPy call, so 8 channels cost far less
-than 8 separate runs. Convention: **channels first**, like most DSP code
-(`soundfile` returns `(n, ch)`: transpose with `x.T`).
+applied to all channels in a single SciPy call. Convention: **channels
+first**, like most DSP code (`soundfile` returns `(n, ch)`: transpose with
+`x.T`). What that buys, and what it does not, is the subject of
+[Performance](#performance-vectorization-and-caching) below.
 
 ## Per-channel semantics
 
@@ -142,16 +159,107 @@ spelling out:
   energies yourself: `10 * np.log10(np.mean(10 ** (spl / 10), axis=0))`,
   never the arithmetic mean of the dB values (see
   [Levels](/phonometry/signals/levels/levels/) for why).
-- **One `calibration_factor` means one sensitivity.** The scalar factor
+- **One calibration factor means one sensitivity.** The scalar factor —
+  `calibration=LevelCalibration(factor=...)` on a filter bank,
+  `calibration_factor=` on `leq`, `laeq`, `ln_levels`, `lc_peak` and `sel` —
   multiplies every channel, which is correct only if all channels share the
-  same sensitivity. For an array of microphones with individual
-  calibrations, scale the rows first, `x * factors[:, None]`, and leave
-  `calibration_factor` at 1.
+  same sensitivity. For an array of microphones with individual calibrations,
+  scale the rows first, `x * factors[:, None]`, and leave the factor at its
+  default 1.0.
 - **Stateful classes keep one state per channel.** In block processing the
   state array matches the channel count and a change of channel count
   resets it; see [Block Processing](/phonometry/signals/filters/block-processing/).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_channel_average.svg" alt="Upper panel: five thin grey one-third-octave curves from five positions in one room, together with a thick blue energy average and a dashed red arithmetic average of the decibel values. Above about 400 Hz the five positions agree within a decibel and the two averages coincide; below it, in the modal region, the positions scatter by up to fifteen decibels and the dashed red average runs below the blue one. Lower panel: the difference between them per band, zero above 400 Hz and rising to a worst under-read of 3.8 dB at 40 Hz" width="88%" />
+
+*The two lines of code, on a realistic survey. Where the positions agree the
+two averages are the same number; where they disagree — the modal region,
+which is exactly where a room survey has several positions in the first place
+— the arithmetic mean of the decibels under-reads by up to 3.8 dB. The error
+is never negative, so it does not wash out over more positions.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+# Five positions of one room, band levels as a (5, bands) array. Here the
+# positions are synthesized; in the field they are five rows of one capture.
+rng = np.random.default_rng(7)
+survey = np.stack([0.02 * (1 + 0.3 * rng.standard_normal())
+                   * rng.standard_normal(2 * fs) for _ in range(5)])
+survey_levels, _ = filters.octave_filter(survey, fs, fraction=3)
+
+energetic = 10 * np.log10(np.mean(10 ** (survey_levels / 10), axis=0))
+arithmetic = np.mean(survey_levels, axis=0)
+print(f"worst under-read {np.max(energetic - arithmetic):.2f} dB")
+# worst under-read 2.12 dB
+```
+
+</details>
+
+### Calibrating an array
+
+The sensitivity vector in the bullet above is not arithmetic, it is a
+procedure, and three things decide whether the result is right.
+
+```python
+# One sensitivity per capsule, in Pa per digital unit. Each element comes from
+# metrology.sensitivity(cal_tone[i], target_spl=94.0, fs=fs) on a calibration
+# capture in which the calibrator was coupled to capsule i and nothing else
+# was touched.
+factors = np.array([0.01021, 0.00984, 0.01007, 0.00998])
+survey = np.stack([left, right, left, right])      # your (4, n) capture
+calibrated = survey * factors[:, None]
+spl, freq = filters.octave_filter(calibrated, fs, fraction=3)
+```
+
+**Lock the gains before the first tone and do not touch them again**, because
+every factor is only valid for the gain it was measured at. **Couple the
+calibrator to each capsule in turn** rather than reusing one factor for the
+array: capsules of the same model differ by a few tenths of a decibel, and that
+difference lands directly in a position-averaged level. **Repeat the pass at
+the end of the session** and treat the largest per-channel difference as the
+array's drift bound. Then two invariants that no downstream check can recover
+if they are wrong: every channel must come from **one converter clock** (two
+interfaces are two clocks, and a slow relative drift destroys any
+between-channel analysis), and the **row-to-position map must be written down
+at capture time**, because a swapped pair produces perfectly valid levels
+attributed to the wrong positions.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_capture.svg" alt="A four-microphone array capture. On the left, four measurement microphones on tripods at room-survey spacing, labelled P1 to P4 with their capsules at 1.2 m above the floor and each stamped with its own sensitivity in millivolts per pascal; a sound calibrator is drawn coupled onto the P2 capsule with a dashed arrow showing it moved from capsule to capsule. In the middle, one four-channel preamplifier and one interface with a highlighted bar spanning all four inputs reading single sample clock, fs equals 48 kHz, and beside it a crossed-out second interface labelled two interfaces equals two clocks, not one array. On the right, the array x drawn as four stacked rows labelled ch0 equals P1 through ch3 equals P4 with the shape (4, N). A footer repeats the three invariants: one clock, locked gains, recorded row-to-position map" width="94%" />
+
+The shape table above is the abstraction of that picture: each row of `x` is
+one microphone, and the mapping from a row index back to a position on the
+floor exists only in your notes.
+
 ## Performance: Vectorization and caching
+
+Start with what batching does *not* buy. The arithmetic scales linearly with
+channels, because each channel has to be filtered by each band, so eight
+channels cost eight channels however the call is written. Measured at 48 kHz
+on 5 s per channel through one reused one-third-octave bank:
+
+| Channels | One call [ms] | Per-channel loop [ms] | Ratio |
+| ---: | ---: | ---: | ---: |
+| 1 | 193 | 173 | 0.90 |
+| 2 | 337 | 352 | 1.04 |
+| 8 | 1394 | 1721 | 1.23 |
+| 32 | 5646 | 5208 | 0.92 |
+
+The ratio hovers around one, which is the honest answer: what batching removes
+is per-call Python overhead and the temptation to redesign the bank, and it is
+the redesign that actually costs — building a fresh one-third-octave bank takes
+about 33 ms, an order of magnitude more than a single band-filtering pass over
+a short frame.
+
+So the cost model is simple. One SOS filtering pass per band per channel
+dominates, which means the time scales with the number of bands (a
+one-third-octave bank is three times a one-octave one), with the record length
+and with the channel count — and with nothing else. The actionable rules that
+follow: **build one `OctaveFilterBank` and reuse it**; pass all channels in one
+array for clarity rather than for speed; and when a run is too slow, reach for
+`fraction`, `limits` and record length, because those are the three terms in
+the model.
 
 `OctaveFilterBank` is the tool for repeated or streaming analysis: one bank
 designs its filters once and applies them to every frame, and NumPy

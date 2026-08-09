@@ -52,7 +52,7 @@ These six are partitioned by physics rather than by the ten guide areas, so a
 few subjects sit where a reader may not expect them: [sound power
 determination](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
 and [occupational
-exposure](/phonometry/reference/theory/environment-transport/#occupational-noise-exposure-and-uncertainty-iso-9612)
+exposure](/phonometry/reference/theory/environment-transport/#occupational-noise-exposure-iso-9612)
 are under Environment and transport, and [sound
 intensity](/phonometry/reference/theory/signal-analysis/#sound-intensity-iec-61043)
 under Signal analysis, because each is the same propagation and spectral

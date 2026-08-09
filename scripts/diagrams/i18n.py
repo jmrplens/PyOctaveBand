@@ -730,6 +730,150 @@ _ES: dict[str, str] = {
         "Estabilidad: |máx − media| y |mín − media| ≤ 0,07 dB",
     "(IEC 60942:2017 Table 2, class 1) — else CalibrationWarning":
         "(IEC 60942:2017 Tabla 2, clase 1) — si no, CalibrationWarning",
+    # Coupling the calibrator on the capsule (signals/metrology/calibration).
+    "Coupling the calibrator (IEC 60942:2017)":
+        "Acoplamiento del calibrador (IEC 60942:2017)",
+    "reference plane (3.12)": "plano de referencia (3.12)",
+    "effective load": "volumen de carga",
+    "volume (3.13)": "efectivo (3.13)",
+    "the generated level moves": "el nivel generado cambia",
+    "with that volume (6.3 k)": "con ese volumen (6.3 k)",
+    "1/2 in capsule": "cápsula de 1/2 in",
+    "+ preamplifier": "+ preamplificador",
+    "1/4 in capsule": "cápsula de 1/4 in",
+    "the adaptor is part of": "el adaptador forma parte",
+    "the calibrator (5.1.1)": "del calibrador (5.1.1)",
+    "windscreen: off for the": "pantalla antiviento: fuera en",
+    "check, back on to measure": "la verificación, puesta al medir",
+    "Before switching it on": "Antes de encenderlo",
+    "source in use": "fuente en marcha",
+    # Instrumenting a synchronous average (signals/spectra/synchronous-averaging).
+    "Instrumenting a synchronous average: tacho and accelerometer":
+        "Instrumentar un promediado síncrono: tacómetro y acelerómetro",
+    "Gearbox — elevation": "Reductora — alzado",
+    "pinion, 37 teeth": "piñón, 37 dientes",
+    "wheel, 89 teeth": "rueda, 89 dientes",
+    "tape": "cinta",
+    "tacho": "tacómetro",
+    "bearing": "cojinete",
+    "accel.": "acel.",
+    "(stud)": "(perno)",
+    "load direction": "dirección de carga",
+    "1800 r/min  →  T = 33.3 ms per revolution":
+        "1800 r/min  →  T = 33,3 ms por vuelta",
+    "mesh frequency 37 × 30 = 1110 Hz; five mesh harmonics":
+        "frecuencia de engrane 37 × 30 = 1110 Hz; cinco armónicos",
+    "need fs ≥ 2.56 × 5550 = 14.2 kHz":
+        "exigen fs ≥ 2,56 × 5550 = 14,2 kHz",
+    "One front end, one clock": "Un solo frontal, un solo reloj",
+    "vibration": "vibración",
+    "fs = 25.6 kHz, gains fixed": "fs = 25,6 kHz, ganancias fijas",
+    "one pulse per revolution": "un pulso por vuelta",
+    "the pulse is the block boundary": "el pulso marca el bloque",
+    "record N + 1 revolutions": "registra N + 1 vueltas",
+    "A tacho pulse per revolution and an accelerometer in the load direction: "
+    "the period is measured, never assumed":
+        "Un pulso de tacómetro por vuelta y un acelerómetro en la dirección de "
+        "carga: el periodo se mide, nunca se supone",
+    # The geometry behind an echo's quefrency (signals/spectra/cepstrum-echoes).
+    "Where the quefrency comes from: the geometry of one reflection":
+        "De dónde sale la quefrencia: la geometría de una reflexión",
+    # "image source" is already in the table further down; not repeated here.
+    "microphone": "micrófono",
+    "Floor reflection": "Reflexión en el suelo",
+    # The path lengths and the two closed forms carry decimals, so they are
+    # listed to get the Spanish comma; the symbols themselves are shared.
+    "r_d = 1.00 m": "r_d = 1,00 m",
+    "r_r = 2.60 m": "r_r = 2,60 m",
+    "Delta d = r_r - r_d = 1.60 m": "Delta d = r_r - r_d = 1,60 m",
+    "t0 = Delta d / c = 4.7 ms": "t0 = Delta d / c = 4,7 ms",
+    "a = R * r_d / r_r = 0.38 R": "a = R * r_d / r_r = 0,38 R",
+    "The 8 ms example of this page": "El ejemplo de 8 ms de esta página",
+    "Delta d = c * 8 ms = 2.74 m": "Delta d = c * 8 ms = 2,74 m",
+    "R = a * r_r / r_d = 3.74 a  <= 1": "R = a * r_r / r_d = 3,74 a  <= 1",
+    "a side wall 1.37 m from the direct path":
+        "una pared lateral a 1,37 m del camino directo",
+    "so a > 0.27 is not one specular reflection":
+        "así que a > 0,27 no es una sola reflexión especular",
+    "The reflection has to arrive before the record ends and at least 10 dB "
+    "above its noise floor;":
+        "La reflexión debe llegar antes de que acabe el registro y al menos "
+        "10 dB por encima de su ruido de fondo;",
+    "c moves about 0.6 m/s per kelvin, so convert the delay with the "
+    "temperature you measured":
+        "c cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
+        "temperatura medida",
+    # Instrumenting a MISO measurement (signals/spectra/miso-coherence).
+    "Instrumenting a MISO measurement: one reference per source":
+        "Instrumentar una medida MISO: una referencia por fuente",
+    "Plant room — plan": "Sala de máquinas — planta",
+    "A — fan": "A — ventilador",
+    "B — compressor": "B — compresor",
+    "receiver": "receptor",
+    "1.5 m high": "a 1,5 m de altura",
+    "ref 1": "ref 1",
+    "ref 2": "ref 2",
+    # "ref 1  x1" and "ref 2  x2" are channel identifiers and are shared.
+    "receiver  y": "receptor  y",
+    "leakage": "fuga",
+    "One front end": "Un solo frontal",
+    "one clock, fixed gains": "un reloj, ganancias fijas",
+    "Before reading": "Antes de leer",
+    "the split": "el reparto",
+    "coherence between": "coherencia entre",
+    "x1 and x2 > 0.9": "x1 y x2 > 0,9",
+    "⇒ do not attribute": "⇒ no atribuir",
+    "ref 1: accelerometer stud-mounted on the fan foot":
+        "ref 1: acelerómetro atornillado a la pata del ventilador",
+    "ref 2: microphone 0.3 m from the casing":
+        "ref 2: micrófono a 0,3 m de la carcasa",
+    "the leakage is what correlates the two inputs":
+        "la fuga es lo que correlaciona las dos entradas",
+    "0.3 m": "0,3 m",
+    "The conditioning separates only what the references separate: one sensor "
+    "per source, all sampled together":
+        "El condicionamiento solo separa lo que separan las referencias: un "
+        "sensor por fuente, todos muestreados a la vez",
+    # Where an acoustic budget's terms come from (signals/metrology/gum).
+    "Where an acoustic budget's terms come from":
+        "De dónde salen los términos de un balance acústico",
+    "facade": "fachada",
+    "calibrator": "calibrador",
+    "weather": "meteorología",
+    "3 positions, 2 m apart": "3 posiciones, separadas 2 m",
+    "The budget it feeds": "El balance que alimenta",
+    "Meteorology and ground": "Meteorología y suelo",
+    "Type B - from the propagation clause":
+        "Tipo B - del capítulo de propagación",
+    "Position scatter": "Dispersión entre posiciones",
+    "Type A - s/sqrt(n), v = n - 1": "Tipo A - s/sqrt(n), v = n - 1",
+    "Instrument class tolerance": "Tolerancia de clase del instrumento",
+    "Type B - rectangular, a = 0.3 dB": "Tipo B - rectangular, a = 0,3 dB",
+    "Calibrator class tolerance": "Tolerancia de clase del calibrador",
+    "Type B - rectangular, a = 0.4 dB": "Tipo B - rectangular, a = 0,4 dB",
+    "one calibrator for two channels makes their":
+        "un solo calibrador para dos canales correlaciona",
+    "calibration terms correlated, not two rows":
+        "sus términos de calibración: no son dos filas",
+    "Budgets fail by omission, not by arithmetic: every row here is a piece "
+    "of hardware or a decision about geometry":
+        "Los balances fallan por omisión, no por aritmética: cada fila es un "
+        "equipo o una decisión de geometría",
+    "3 m/s  12 °C": "3 m/s  12 °C",
+    "68 % RH": "68 % HR",
+    "the coupled capsule must": "la cápsula acoplada debe",
+    "read ≥ 30 dB below the": "leer ≥ 30 dB por debajo del",
+    "calibrator level: under 64 dB": "nivel del calibrador: < 64 dB",
+    "for a 94 dB calibrator": "para uno de 94 dB",
+    "(B.4.2; 40 dB in A.5.3)": "(B.4.2; 40 dB en A.5.3)",
+    "The specified level is the level at the diaphragm of the inserted "
+    "microphone (5.3.1.2), and it holds for":
+        "El nivel especificado es el nivel en el diafragma del micrófono "
+        "insertado (5.3.1.2), y vale para",
+    "the microphone models and configurations listed in the manual "
+    "(5.3.1.3, 6.3 a) — IEC 60942:2017":
+        "los modelos y configuraciones de micrófono que lista el manual "
+        "(5.3.1.3, 6.3 a) — IEC 60942:2017",
     "Environmental noise measurement positions (ISO 1996-2)":
         "Posiciones de medida de ruido ambiental (ISO 1996-2)",
     "Building façade": "Fachada del edificio",
@@ -3346,4 +3490,142 @@ _ES: dict[str, str] = {
         "Reproduzca al nivel de operación del equipo y repita la captura",
     "the index is invariant to level, the device is not; a single capture carries the acoustic path's run-to-run spread":
         "el índice es invariante al nivel, el equipo no; una sola captura arrastra la dispersión del camino acústico",
+    # Near-to-far-field capture geometry (simulation/fdtd-simulation).
+    "Near-to-far-field capture: contour, clearances and angle convention":
+        "Campo cercano a lejano: contorno, holguras y ángulos",
+    "far-field origin: the centre of the panel face":
+        "origen de campo lejano: el centro de la cara del panel",
+    "The far field is evaluated at r → ∞, and lives nowhere on the grid:":
+        "El campo lejano se evalúa en r → ∞ y no vive en ninguna celda:",
+    "far_field_from_contour propagates the captured phasors with the free-space Green function":
+        "far_field_from_contour propaga los fasores con la función de Green de campo libre",
+    "sponge, 60 cells": "esponja, 60 celdas",
+    "capture contour": "contorno de captura",
+    "plane-wave injection line": "línea de onda plana",
+    "Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz the grid holds 343 cells per wavelength":
+        "Dominio de 980 × 346 celdas con dx = 0,5 mm (490 × 173 mm); a 2 kHz, 343 celdas por longitud de onda",
+    "Panel: five 70 mm cells, 20 mm slits on a 3 mm backing; the 3.2 mm neck sets dx, not the wavelength":
+        "Panel: cinco celdas de 70 mm, ranuras de 20 mm sobre fondo de 3 mm; dx lo fija el cuello de 3,2 mm",
+    "Clearances in cells: 40 ahead of the panel, 20 behind and to the sides, 60 to every sponge":
+        "Holguras en celdas: 40 por delante del panel, 20 por detrás y a los lados, 60 hasta cada esponja",
+    "Sources outside the contour integrate to zero (extinction), so the total-field phasors give the scattered far field":
+        "Las fuentes fuera del contorno integran a cero (extinción): los fasores dan el campo lejano dispersado",
+    "Reference run: the identical scene without the panel → ContourPhasors.subtract() removes the grid-dispersion residual":
+        "Referencia: la misma escena sin panel → ContourPhasors.subtract() elimina el residuo numérico",
+    # Fluid-solid contact at three incidences (simulation/elastic-waves).
+    "A fluid-solid contact at three incidences, and where it sits on the grid":
+        "Un contacto fluido-sólido en tres incidencias, y dónde cae en la malla",
+    "(a) normal incidence": "(a) incidencia normal",
+    "(b) oblique: mode conversion": "(b) oblicua: conversión de modo",
+    "(c) beyond both critical angles": "(c) más allá de ambos críticos",
+    # "incident" and "reflected" are already in this table, above.
+    "P only": "solo P",
+    "probe on the normal,": "sonda en la normal,",
+    "0.12 m up": "0,12 m por encima",
+    "shot, 10 m up": "disparo, 10 m arriba",
+    "water 1480": "agua 1480",
+    "steel 5900 / 3200": "acero 5900 / 3200",
+    "water 1500": "agua 1500",
+    "sediment 3500 / 2000": "sedimento 3500 / 2000",
+    "evanescent both sides": "evanescente a ambos lados",
+    "last fluid row": "última fila de fluido",
+    "first solid row": "primera fila de sólido",
+    "A region painted from row i down puts the contact on the":
+        "Una región pintada desde la fila i hacia abajo sitúa el contacto en",
+    "face plane y = i·dx: density averaged arithmetically onto":
+        "el plano de caras y = i·dx: densidad promediada aritméticamente en",
+    "the faces, shear modulus harmonically onto the corners":
+        "las caras y módulo de cizalla armónicamente en las esquinas",
+    "Sponge bands line the outer edges of every panel; no side is both free and absorbing":
+        "Bandas de esponja recubren los bordes exteriores; ningún lado es a la vez libre y absorbente",
+    "no shear is excited, so the steel":
+        "no se excita cizalla, así que el acero",
+    "acts as a liquid of its ρ and c_P":
+        "actúa como un líquido de su ρ y c_P",
+    "critical angles 14.5° and 27.5°": "ángulos críticos 14,5° y 27,5°",
+    "between them P is evanescent and": "entre ellos P es evanescente y",
+    "the shear wave carries the power": "la onda de cizalla lleva la potencia",
+    "over steel the deficit is 0.03 %": "sobre acero el déficit es del 0,03 %",
+    "the tail reaches ~7 λ up, so no": "la cola llega a ~7 λ, así que ningún",
+    "time of flight can separate it": "tiempo de vuelo la separa",
+    # Immersed-plate transmission scene (simulation/elastic-waves).
+    "Immersed-plate transmission: the strip, the probes and the time gate":
+        "Transmisión de placa sumergida: tira, sondas y ventana",
+    "Three cells wide:": "Tres celdas de ancho:",
+    "a 1D problem in a 2D solver, dx = 0.5 mm":
+        "un problema 1D en un solver 2D, dx = 0,5 mm",
+    "65 µs gate: the incident pulse alone":
+        "ventana de 65 µs: solo el pulso incidente",
+    "incident, 47 µs": "incidente, 47 µs",
+    "reflection, 88 µs": "reflexión, 88 µs",
+    "transmitted ring-down;": "cola transmitida;",
+    "no echo in the record": "sin eco en el registro",
+    "time [µs]": "tiempo [µs]",
+    "I from the gated probe A, T from probe B":
+        "I de la sonda A enventanada, T de la sonda B",
+    "Inside the plate, at half-wave thickness":
+        "Dentro de la placa, a espesor de media onda",
+    "f_n = n c_P / (2h) = 295 kHz for 10 mm of steel":
+        "f_n = n c_P / (2h) = 295 kHz para 10 mm de acero",
+    "the plate goes transparent there, three decades above audio":
+        "allí la placa se vuelve transparente, tres décadas sobre el audio",
+    "1.5 mm plane pulse at 0.25 m": "pulso plano 1,5 mm en 0,25 m",
+    "one-way; usable to 340 kHz": "unidireccional; hasta 340 kHz",
+    "probe A, 30 mm above": "sonda A, 30 mm por encima",
+    "10 mm STEEL at y = 0.35 m": "STEEL de 10 mm en y = 0,35 m",
+    "painted into WATER": "pintado dentro de WATER",
+    "probe B, 50 mm below": "sonda B, 50 mm por debajo",
+    "probe A": "sonda A",
+    "probe B": "sonda B",
+    # Infrasound measurement chain (signals/levels/special-weightings).
+    "Measuring infrasound: the chain that must deliver 0,25 Hz":
+        "Medir infrasonido: la cadena que debe llegar a 0,25 Hz",
+    "Below 20 Hz the wind is louder": "Por debajo de 20 Hz el viento suena",
+    "than the source": "más que la fuente",
+    "static-pressure equalisation": "orificio de compensación de",
+    "vent: a first-order high-pass,": "presión estática: un paso alto de",
+    "and the chain's real corner":
+        "primer orden, la esquina real de la cadena",
+    "hard board on the ground": "tablero rígido sobre el suelo",
+    "capsule flush at its centre": "cápsula enrasada en su centro",
+    "primary foam screen (solid)": "pantalla primaria de espuma (continua)",
+    "secondary in wind (dashed),": "secundaria con viento (discontinua),",
+    "with its loss corrected": "con su pérdida corregida",
+    "corner << 0,25 Hz": "esquina << 0,25 Hz",
+    "Recorder": "Grabador",
+    "low-cut switch OFF": "corte de graves: OFF",
+    "G weighting + integrator": "ponderación G + integrador",
+    "report LpG with the chain corner,":
+        "informa LpG con la esquina de la cadena,",
+    "the screens and the averaging time":
+        "las pantallas y el tiempo de promediado",
+    "What the chain lets through": "Lo que deja pasar la cadena",
+    "A.2: 0,25 - 315 Hz": "A.2: 0,25 - 315 Hz",
+    "lost": "perdido",
+    "green: the G weighting": "verde: la ponderación G",
+    "dashed: a chain with a 2 Hz vent corner":
+        "discontinua: cadena con esquina de 2 Hz",
+    "usable band = the overlap of the two":
+        "banda utilizable = el solape de ambas",
+    "ISO 7196:1995, Annex A": "ISO 7196:1995, anexo A",
+    # Capturing a microphone array (signals/filters/multichannel).
+    "Capturing an array: one clock, locked gains, a written row map":
+        "Capturar un array: un reloj, ganancias fijas, mapa de filas escrito",
+    "Four positions, four sensitivities": "Cuatro posiciones, cuatro sensibilidades",
+    "mV/Pa, one per capsule": "mV/Pa, una por cápsula",
+    "one capsule at a time,": "una cápsula cada vez,",
+    "gains locked throughout": "con las ganancias fijas",
+    "4-channel preamplifier": "preamplificador de 4 canales",
+    "audio interface": "interfaz de audio",
+    "single sample clock": "un solo reloj",
+    "a second interface": "una segunda interfaz",
+    "= two clocks, not one array": "= dos relojes, no un array",
+    "x, the array you analyse": "x, el array que analizas",
+    "Write down, with the file:": "Anota, junto al archivo:",
+    "one clock  |  locked gains": "un reloj  |  ganancias fijas",
+    "the row-to-position map": "el mapa fila-posición",
+    "A swapped pair gives perfectly valid levels attributed to the wrong positions,":
+        "Intercambiar dos canales da niveles válidos atribuidos a posiciones equivocadas,",
+    "and no later check can detect it":
+        "y ninguna comprobación posterior lo detecta",
 }

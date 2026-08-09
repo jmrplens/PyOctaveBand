@@ -36,7 +36,7 @@ submuestral del pico** para retardos y alineación de respuestas al impulso; y
 la **envolvente de Hilbert** con fase y frecuencia instantáneas. Los
 estimadores GCC corren sobre el mismo núcleo de Welch que las densidades
 espectrales, así que ambas vistas de un par de señales son mutuamente
-consistentes bin a bin.
+congruentes bin a bin.
 
 ## 1. Estimaciones de correlación
 
@@ -126,11 +126,20 @@ $$
 
 `res.random_error(signal_bandwidth)` la evalúa por retardo con el
 coeficiente medido, y la función independiente `correlation_random_error`
-acepta un coeficiente explícito: con $\rho = S/\sqrt{(S+M)(S+N)} = 1/11$,
-$B = 100\ \text{Hz}$ y $T = 5\ \text{s}$ reproduce el
-$\varepsilon \approx 0{,}35$ del ejemplo 8.5 del libro, uno de los anclajes
-fijados de conformidad. Dos formas cerradas anclan el propio estimador en
-los tests: la autocorrelación de un seno, $(A^2/2)\cos(2\pi f_0\tau)$, y la
+acepta un coeficiente explícito. En el ejemplo 8.5 del libro, una señal común
+de potencia $S$ llega a dos sensores que llevan ruidos independientes de
+potencia $M$ y $N_2$, así que el coeficiente de correlación en el retardo es
+$\rho = S/\sqrt{(S+M)(S+N_2)}$; con ambos ruidos diez veces la señal eso vale
+$1/11$, y para $B = 100$ Hz durante $T = 5$ s la fórmula devuelve
+$\varepsilon \approx 0{,}35$, uno de los anclajes fijados de conformidad:
+`correlation_random_error(1/11, 100.0, 5.0)` imprime **0,349**, que es el
+ejemplo 8.5 entero en una sola llamada.
+
+(La $N$ de más arriba es la longitud del registro en muestras, tal como la usan
+las viñetas de normalización; la potencia de ruido del segundo sensor se escribe
+aquí $N_2$ para no confundirlas.) Dos formas cerradas anclan el propio
+estimador en los tests: la autocorrelación de un seno,
+$(A^2/2)\cos(2\pi f_0\tau)$, y la
 autocorrelación $\sin(2\pi B\tau)/(2\pi B\tau)$ del ruido blanco de
 banda limitada (ecuación 8.120).
 
@@ -161,6 +170,39 @@ estimación es localizar un pico en el eje de retardos.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay_es.svg" alt="Diagrama de la estimación de retardo por correlación: una fuente de altavoz radia hacia dos micrófonos en pie, el micrófono 1 captura x de t y el micrófono 2 captura y de t igual a alfa por x retardada tau 0 más ruido, con el frente de onda que pasa por el micrófono 1 dejando un camino extra de c por tau 0, unos 0,84 metros a 343 metros por segundo, y seno de theta igual a c tau 0 entre la separación d; debajo, un panel de correlograma muestra el correlador directo como una joroba ancha y GCC-PHAT con ponderación 1 entre el módulo de Gxy como un pico estrecho, ambos en tau 0 igual a 20 muestras entre 8192 hercios, 2,44 milisegundos; el pie anota el refinado a fracción de muestra por interpolación parabólica del pico con sobremuestreo local de 16 veces hasta por debajo de 0,002 muestras" width="92%" />
 
+### Del retardo a la geometría
+
+Un retardo casi nunca es la respuesta: es el paso intermedio. Multiplicado por
+la velocidad del sonido se convierte en una **diferencia de camino**, y para
+una onda plana que llega con un ángulo $\theta$ respecto de la normal a una
+pareja separada $d$,
+
+$$
+\sin\theta = \frac{c\,\tau_0}{d},
+$$
+
+de modo que los 2,44 ms del diagrama a 343 m/s son 0,84 m de camino extra, un
+número que solo tiene sentido para una pareja separada al menos esa distancia.
+Con ello vienen tres límites, y los tres son comprobables:
+
+- **$|c\tau_0| > d$ no es físico.** Si la estimación supera la separación, el
+  estimador se ha enganchado al pico equivocado o a una reflexión. Poner
+  `max_delay=d/c` mantiene la búsqueda dentro del margen que permite la
+  geometría, que es la salvaguarda más barata de la página.
+- **La forma de onda plana pide que la fuente esté en el campo lejano de la
+  pareja.** Más cerca, la curvatura del frente de onda sesga $\theta$, y los dos
+  micrófonos ven ángulos distintos del mismo frente.
+- **La resolución angular es la peor en el eje de la pareja.** Derivando,
+  $\mathrm{d}\theta = c\,\mathrm{d}\tau/(d\cos\theta)$, así que una
+  incertidumbre temporal fija se convierte en un error angular cada vez mayor
+  conforme $\theta$ se acerca a ±90°, donde $\cos\theta \to 0$. Una pareja es
+  precisa por el través y ciega por el eje, que es la razón de que la
+  localización de dirección use más de dos sensores.
+
+La separación $d$ fija por tanto a la vez el margen no ambiguo de la pareja y la
+resolución angular que puede ofrecer, y es el primer número que hay que elegir
+cuando el retardo va a convertirse en una dirección.
+
 Las ponderaciones de la Tabla I de Knapp y Carter, con las condiciones que
 el artículo asocia a cada una:
 
@@ -171,6 +213,29 @@ el artículo asocia a cada una:
 | `'scot'` | $1/\sqrt{G_{xx}\,G_{yy}}$ | Preblanquea ambos canales simétricamente; coincide con Roth cuando los sensores son iguales. |
 | `'phat'` | $1/\lvert G_{xy}\rvert$ | Idealmente una delta en el retardo para ruidos incorrelacionados (su ecuación 23), pero la ponderación ignora la relación señal-ruido, así que las bandas sin señal aportan fase aleatoria de magnitud unidad. Necesita potencia de señal en toda la banda de análisis. |
 | `'ml'` | $\gamma^2/(\lvert G_{xy}\rvert\,(1-\gamma^2))$ | El procesador de máxima verosimilitud de Hannan-Thomson: un PHAT atenuado por la varianza de fase que cada banda realmente soporta. Alcanza la cota de Cramér-Rao; la opción segura cuando la señal no llena la banda. |
+
+Las condiciones de Knapp y Carter están todas escritas para *ruido de sensor*:
+una pareja en anecoico con ruido independiente añadido en cada micrófono. La
+degradación con la que se topa un acústico en interiores es de otra naturaleza,
+porque una reflexión es una **copia coherente** de la señal y no ruido, y eso
+cambia la elección:
+
+- **Domina el ruido de sensor** (una sala silenciosa, una pareja al aire libre,
+  una base larga): `'ml'` es la óptima, porque atenúa cada banda según la
+  varianza de fase que esa banda realmente soporta.
+- **Domina la reverberación** (mala relación directo-reverberante): `'phat'` es
+  la opción habitual precisamente *porque* descarta la magnitud, así que una
+  reflexión fuerte no puede dominar el pico por ser intensa.
+- **No converge ninguna de las dos**: enventana el registro alrededor de la
+  llegada directa y correla solo los primeros milisegundos, que es la única
+  maniobra que elimina una reflexión en lugar de reponderarla.
+
+Conviene memorizar la firma del fallo, porque ningún número devuelto la delata:
+un correlograma cuyo pico principal no sobresale mucho de sus vecinos, o un
+retardo que salta entre segmentos del mismo registro, significa que el camino
+directo no es dominante y que el retardo que tienes es el de una reflexión.
+`delay_std` no te va a avisar: la ecuación 8.129 modela la dispersión de un
+único pico, no la elección entre dos.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay_es.svg" alt="Correlación cruzada normalizada de un par de señales coloreadas de dos sensores frente al retardo en milisegundos: el correlador directo muestra un pico ancho alrededor del retardo verdadero de 20 muestras mientras que la curva GCC-PHAT colapsa en una espiga afilada exactamente sobre la línea discontinua del retardo verdadero" width="82%" loading="eager" />
 
@@ -285,7 +350,7 @@ from phonometry import align_impulse_responses, fractional_delay
 fs = 48000.0
 t = np.arange(int(0.03 * fs)) / fs
 rng = np.random.default_rng(6)
-# Pulso de referencia de banda limitada: salva gaussiana de 2 kHz en 5 ms.
+# Pulso de referencia de banda limitada: ráfaga tonal gaussiana de 2 kHz en 5 ms.
 ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
 ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
 ir_b += 0.005 * rng.standard_normal(ir_a.size)
@@ -331,6 +396,29 @@ A(t) = \left[x^2(t) + \tilde{x}^2(t)\right]^{1/2}, \qquad
 \theta(t) = \arctan\frac{\tilde{x}(t)}{x(t)}, \qquad
 f(t) = \frac{1}{2\pi}\frac{d\theta}{dt} .
 $$
+
+Estas tres tienen sentido físico **solo si el registro es de verdad una
+portadora con una modulación lenta**: el ancho de banda de la modulación tiene
+que quedar por debajo de la frecuencia de portadora, para que los dos espectros
+no se solapen. Esa es la condición de banda estrecha (de Bedrosian), y es
+exactamente por lo que se cumple la identidad AM exacta de más abajo. Nada en la
+llamada la impone: `envelope` devuelve números para cualquier vector que le
+entregues.
+
+Una violación es fácil de reconocer una vez sabes qué buscar. La envolvente deja
+de ser suave y empieza a seguir los semiciclos individuales de la forma de onda,
+y la frecuencia instantánea da picos, se sale por completo de la banda de la
+señal y se vuelve negativa, algo que ocurre cada vez que la señal analítica pasa
+cerca del origen del plano complejo, y que es un artefacto geométrico y no una
+frecuencia física. Aplicadas a voz, a una respuesta al impulso de sala o a ruido
+de banda ancha, las tres magnitudes hacen esto. El arreglo es limitar antes el registro
+a banda estrecha: filtrar en paso banda alrededor de la componente que
+interesa, exactamente como hace el
+[espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/) con
+su parámetro `band=`, o leer la cresta de un
+[espectrograma](/phonometry/es/signals/spectra/time-frequency/) cuando coexisten
+varias componentes, porque la construcción de Hilbert no tiene forma de
+representar más de una a la vez.
 
 Para una portadora modulada en amplitud $u(t)\cos(2\pi f_0 t)$ la
 envolvente recupera $u(t)$ exactamente (ecuación 13.27): la batería de
@@ -432,10 +520,18 @@ instantáneas (capítulo 13).
 camino común entre exactamente dos sensores (el modelo
 $y(t) = \alpha\,x(t-\tau_0) + n(t)$ de la ecuación 5.21). Un registro con varias
 llegadas (multitrayecto, un camino directo más reflexiones) no se separa
-automáticamente: `time_delay` y el correlador directo solo informan el
-mayor pico, la misma limitación que `echo_detection` señala en el cepstrum
+automáticamente: `time_delay` y el correlador directo solo informan
+del mayor pico, la misma limitación que `echo_detection` señala en el cepstrum
 dentro de [Cepstrum, ecos y espectro de la
 envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/). Estimar retardos entre
-más de dos sensores, como haría una matriz o un beamformer, implica llamar
+más de dos sensores, como haría un array o un beamformer, implica llamar
 tú mismo a estas funciones por pares: no hay ninguna resolución de TDOA
 multisensor incorporada.
+
+## Véase también
+
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/): la vía sin referencia hasta un retardo, y la envolvente que construye esta página.
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/): el espectro cruzado con el que se construyen las ponderaciones GCC, y las reglas de adquisición de dos canales.
+- [Señales de prueba](/phonometry/es/signals/spectra/test-signals/): el núcleo de retardo fraccionario de banda limitada que hay detrás de la alineación submuestral.
+- [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/): la misma alineación aplicada por revolución.
+- Referencia de la API: [`signals.correlation`](/phonometry/es/reference/api/signals/correlation/) y [`signals.envelope`](/phonometry/es/reference/api/signals/envelope/).

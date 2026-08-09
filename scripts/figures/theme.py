@@ -174,6 +174,11 @@ _RASTER_FIGURES = frozenset(
         "atmospheric_refraction",
         "airport_contour",
         "fdtd_simulation",
+        # The launcher field and the rasterised metadiffuser mask are both
+        # imshow of a cell grid: hundreds of thousands of cells, so the SVG
+        # would be far heavier than the raster (as for fdtd_simulation).
+        "fdtd_plane_wave_launch",
+        "metadiffuser_meshed_panel",
         "elastic_halfspace_waves",
         "scholte_interface_wave",
         # Dense reflectogram: hundreds of image-source stems/markers make the

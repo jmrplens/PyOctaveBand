@@ -51,7 +51,7 @@ derivations.
 
 - [Octave Band Frequencies (ANSI S1.11 / IEC 61260)](/phonometry/reference/theory/signal-analysis/#octave-band-frequencies-ansi-s111--iec-61260)
 - [Frequency Resolution vs FFT Bin Spacing](/phonometry/reference/theory/signal-analysis/#frequency-resolution-vs-fft-bin-spacing)
-- [Magnitude Responses |H(jw)|](/phonometry/reference/theory/signal-analysis/#magnitude-responses-hjw)
+- [Magnitude Responses](/phonometry/reference/theory/signal-analysis/#magnitude-responses)
 - [Filter Bank Design & Numerical Stability](/phonometry/reference/theory/signal-analysis/#filter-bank-design--numerical-stability)
 - [Weighting Curves (IEC 61672-1)](/phonometry/reference/theory/signal-analysis/#weighting-curves-iec-61672-1)
 - [Time Integration](/phonometry/reference/theory/signal-analysis/#time-integration)
@@ -68,9 +68,9 @@ of the STI and the band-importance and audibility construction of the SII, then
 the hearing-threshold statistics and the damage model built on them.
 
 - [Equal-loudness contours (ISO 226:2023)](/phonometry/reference/theory/perception/#equal-loudness-contours-iso-2262023)
-- [Tone prominence: TNR and PR (ECMA-418-1)](/phonometry/reference/theory/perception/#tone-prominence-tnr-and-pr-ecma-418-1)
 - [Zwicker loudness (ISO 532-1)](/phonometry/reference/theory/perception/#zwicker-loudness-iso-532-1)
 - [Advanced loudness models & sound quality](/phonometry/reference/theory/perception/#advanced-loudness-models--sound-quality)
+- [Tone prominence: TNR and PR (ECMA-418-1)](/phonometry/reference/theory/perception/#tone-prominence-tnr-and-pr-ecma-418-1)
 - [Modulation transfer and STI (IEC 60268-16)](/phonometry/reference/theory/perception/#modulation-transfer-and-sti-iec-60268-16)
 - [Speech Intelligibility Index (ANSI S3.5)](/phonometry/reference/theory/perception/#speech-intelligibility-index-ansi-s35)
 - [Hearing thresholds and presbycusis (ISO 389-7, ISO 7029)](/phonometry/reference/theory/perception/#hearing-thresholds-and-presbycusis-iso-389-7-iso-7029)
@@ -78,12 +78,27 @@ the hearing-threshold statistics and the damage model built on them.
 
 ## [Rooms and Buildings](/phonometry/reference/theory/rooms-buildings/)
 
-Two long sections rather than many short ones: the ANSI S12.2 criterion curves,
-and one consolidated treatment of the room and building standards that share the
-same reverberation and reference-curve mathematics.
+Five groups: the ANSI S12.2 criterion curves, the impulse response and the
+parameters read off it, sound insulation and absorption as measured, the same
+quantities as predicted, and the uncertainty that qualifies either.
 
 - [Room noise criteria (ANSI S12.2)](/phonometry/reference/theory/rooms-buildings/#room-noise-criteria-ansi-s122)
-- [Room and building acoustics (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)](/phonometry/reference/theory/rooms-buildings/#room-and-building-acoustics-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354)
+- [Impulse response and room-acoustic parameters (ISO 18233, ISO 3382-1/-2/-3)](/phonometry/reference/theory/rooms-buildings/#impulse-response-and-room-acoustic-parameters-iso-18233-iso-3382-1-2-3)
+  - [Deterministic-excitation impulse response (ISO 18233)](/phonometry/reference/theory/rooms-buildings/#deterministic-excitation-impulse-response-iso-18233)
+  - [Schroeder backward integration (ISO 3382-1, 5.3.3)](/phonometry/reference/theory/rooms-buildings/#schroeder-backward-integration-iso-3382-1-533)
+  - [Regression windows and validity (ISO 3382-2, Clause 6, Annex B/C)](/phonometry/reference/theory/rooms-buildings/#regression-windows-and-validity-iso-3382-2-clause-6-annex-bc)
+  - [Clarity, definition and centre time (ISO 3382-1, Annex A)](/phonometry/reference/theory/rooms-buildings/#clarity-definition-and-centre-time-iso-3382-1-annex-a)
+  - [Open-plan spatial decay (ISO 3382-3, Clause 6)](/phonometry/reference/theory/rooms-buildings/#open-plan-spatial-decay-iso-3382-3-clause-6)
+- [Sound insulation and absorption, measured (ISO 16283, ISO 10140, ISO 717, ISO 354)](/phonometry/reference/theory/rooms-buildings/#sound-insulation-and-absorption-measured-iso-16283-iso-10140-iso-717-iso-354)
+  - [Field insulation and weighted rating (ISO 16283-1, ISO 717-1)](/phonometry/reference/theory/rooms-buildings/#field-insulation-and-weighted-rating-iso-16283-1-iso-717-1)
+  - [Impact insulation (ISO 16283-2, ISO 717-2)](/phonometry/reference/theory/rooms-buildings/#impact-insulation-iso-16283-2-iso-717-2)
+  - [Absorption in a reverberation room (ISO 354)](/phonometry/reference/theory/rooms-buildings/#absorption-in-a-reverberation-room-iso-354)
+  - [Laboratory vs field normalization (ISO 10140, ISO 16283)](/phonometry/reference/theory/rooms-buildings/#laboratory-vs-field-normalization-iso-10140-iso-16283)
+- [Sound insulation and absorption, predicted (EN 12354-1/-2/-6, Bies, Cremer, Hopkins)](/phonometry/reference/theory/rooms-buildings/#sound-insulation-and-absorption-predicted-en-12354-1-2-6-bies-cremer-hopkins)
+  - [Flanking transmission prediction (EN 12354-1/2)](/phonometry/reference/theory/rooms-buildings/#flanking-transmission-prediction-en-12354-12)
+  - [Absorption in enclosed spaces (EN 12354-6)](/phonometry/reference/theory/rooms-buildings/#absorption-in-enclosed-spaces-en-12354-6)
+  - [Predicted panel sound insulation (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)](/phonometry/reference/theory/rooms-buildings/#predicted-panel-sound-insulation-bies-72-hopkins-294310-cremer-5)
+- [Measurement uncertainty (ISO 12999-1)](/phonometry/reference/theory/rooms-buildings/#measurement-uncertainty-iso-12999-1)
 
 ## [Materials and Surfaces](/phonometry/reference/theory/materials-surfaces/)
 
@@ -95,6 +110,8 @@ quantities.
 
 - [Surface scattering and diffusion (ISO 17497-1, ISO 17497-2)](/phonometry/reference/theory/materials-surfaces/#surface-scattering-and-diffusion-iso-17497-1-iso-17497-2)
 - [In-situ road surface absorption (ISO 13472-1, ISO 13472-2)](/phonometry/reference/theory/materials-surfaces/#in-situ-road-surface-absorption-iso-13472-1-iso-13472-2)
+  - [Extended surface method (ISO 13472-1)](/phonometry/reference/theory/materials-surfaces/#extended-surface-method-iso-13472-1)
+  - [Spot method (ISO 13472-2)](/phonometry/reference/theory/materials-surfaces/#spot-method-iso-13472-2)
 - [Acoustic material characterisation (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)](/phonometry/reference/theory/materials-surfaces/#acoustic-material-characterisation-iso-11654-iso-9053-12-iso-10534-12-astm-e2611)
 
 ## [Environment and Transport](/phonometry/reference/theory/environment-transport/)
@@ -107,7 +124,8 @@ ISO 9612 occupational-exposure uncertainty.
 
 - [Environmental descriptors (ISO 1996-1)](/phonometry/reference/theory/environment-transport/#environmental-descriptors-iso-1996-1)
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/reference/theory/environment-transport/#impulsive-sound-prominence-nt-acou-112)
-- [Outdoor propagation and occupational exposure (ISO 9613-1/2, ISO 9612)](/phonometry/reference/theory/environment-transport/#outdoor-propagation-and-occupational-exposure-iso-9613-12-iso-9612)
+- [Outdoor propagation (ISO 9613-1/2)](/phonometry/reference/theory/environment-transport/#outdoor-propagation-iso-9613-12)
+- [Occupational noise exposure (ISO 9612)](/phonometry/reference/theory/environment-transport/#occupational-noise-exposure-iso-9612)
 - [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
 
 ## [Vibration](/phonometry/reference/theory/vibration/)
@@ -117,5 +135,7 @@ ISO 2631-5 spinal model, plus the point-mobility and radiation-efficiency
 results the structure-borne pages use.
 
 - [Human vibration (ISO 8041-1, ISO 2631-1/2, ISO 5349-1/2, Directive 2002/44/EC)](/phonometry/reference/theory/vibration/#human-vibration-iso-8041-1-iso-2631-12-iso-5349-12-directive-200244ec)
+  - [Getting the acceleration right](/phonometry/reference/theory/vibration/#getting-the-acceleration-right)
+  - [Weighted metrics and daily exposure](/phonometry/reference/theory/vibration/#weighted-metrics-and-daily-exposure)
 - [Multiple shocks (ISO 2631-5)](/phonometry/reference/theory/vibration/#multiple-shocks-iso-2631-5)
 - [Point mobilities and radiation efficiency (Cremer 5, Hopkins 2.9)](/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29)

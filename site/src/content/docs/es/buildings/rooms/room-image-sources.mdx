@@ -82,7 +82,7 @@ amplitud formada por la divergencia esférica $1/(4\pi r_n)$, el producto de los
 **factores de reflexión de presión** de pared $R_w = \sqrt{1 - \alpha_w}$ cada
 uno elevado al número de reflexiones $k_{w,n}$ que esa imagen hizo en la pared
 $w$, y la pérdida de presión del aire $e^{-m r_n/2}$ a lo largo del camino ($m$
-el coeficiente de atenuación de potencia (intensidad) en neper por metro, de modo
+el coeficiente de atenuación de potencia (intensidad) en neperios por metro, de modo
 que la intensidad cae como $e^{-m r}$ y la presión como $e^{-m r/2}$: el mismo $m$
 que las guías de
 [tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/)
@@ -264,7 +264,7 @@ for attenuation, style in ((0.0, "-"), (m, "--")):
         time, level = room.decay_curve(row, banded.fs)
         ax.plot(time, level, style, label=f"{f:g} Hz")
 ax.set_xlabel("Tiempo [s]")
-ax.set_ylabel("Nivel re régimen permanente [dB]")
+ax.set_ylabel("Nivel re estado estacionario [dB]")
 plt.show()
 ```
 
@@ -368,7 +368,7 @@ $$
 Un ajuste de T30 abarca 35 dB, unos $0{,}58\,T$ de decaimiento. La sala de
 7 × 5 × 3 m de arriba tiene $L_\text{min} = 3$ m y un tiempo de Eyring cercano a
 0,93 s, así que necesita $343 \times 0{,}54 / 3 \approx 60$. Por debajo de eso
-la cola sencillamente falta, y la T30 ajustada sale corta:
+la cola sencillamente falta, y el T30 ajustado sale corto:
 
 | `max_order` | imágenes audibles | T30 ajustada | tiempo de ejecución |
 | ---: | ---: | ---: | ---: |
@@ -383,7 +383,7 @@ queda corto por un factor de 3,3 y el 20 por defecto, por un factor de 2,1. La
 objeción del coste no vale: el orden 60 son 295 360 imágenes y se resuelve en
 dos décimas de segundo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_order_convergence_es.svg" alt="T30 y EDT ajustados de la sala de 7 por 5 por 3 metros frente al corte de orden de reflexión, de 8 a 60: ambos suben de forma pronunciada y casi lineal con el orden, y la T30 cruza la línea de Eyring de 0,93 segundos y su banda sombreada de más menos 10 por ciento hacia el orden 51 y sigue subiendo, mientras un segundo eje muestra el recuento de imágenes audibles creciendo de unas 800 a 295 mil" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_order_convergence_es.svg" alt="T30 y EDT ajustados de la sala de 7 por 5 por 3 metros frente al corte de orden de reflexión, de 8 a 60: ambos suben de forma pronunciada y casi lineal con el orden, y el T30 cruza la línea de Eyring de 0,93 segundos y su banda sombreada de más menos 10 por ciento hacia el orden 51 y sigue subiendo, mientras un segundo eje muestra el recuento de imágenes audibles creciendo de unas 800 a 295 mil" width="88%" />
 
 *T30 leída por `room_parameters` sobre la RIR sintética, frente al orden con el que
 se construyó la retícula. La subida es el truncamiento: cada orden extra añade una
@@ -391,9 +391,9 @@ capa de llegadas más tardías, así que la ventana de ajuste sigue encontrando 
 decaimiento que ajustar. La regla de completitud fija el **suelo** — por debajo del
 orden que cubre la ventana de ajuste el número está sencillamente mal, que es lo
 que cuantifica la tabla de arriba —, pero no es un criterio de convergencia. Pasado
-el cruce, la T30 especular sigue derivando por encima de Eyring, porque una sala de
+el cruce, el T30 especular sigue derivando por encima de Eyring, porque una sala de
 7 × 5 × 3 no es casi cúbica y su eje largo sostiene energía que la estimación de
-campo difuso ya ha gastado; la figura siguiente barre exactamente eso. Lee la T30
+campo difuso ya ha gastado; la figura siguiente barre exactamente eso. Lee el T30
 de este modelo como una magnitud especular dependiente del orden, no como una
 predicción de un tiempo de reverberación medido.*
 
@@ -444,7 +444,7 @@ Y por último, la frontera honesta: si el orden que hace falta para cubrir el
 tiempo de reverberación vuelve impracticable la ejecución — una sala grande con
 un $L_\text{min}$ pequeño, o una cola larga — al método de imágenes puro se le
 está pidiendo un trabajo que corresponde a un modelo híbrido con cola tardía
-estadística, o al
+estadística, o a la
 [simulación FDTD](/phonometry/es/simulation/fdtd-simulation/).
 
 ## 2. Campo estacionario de sala
@@ -658,7 +658,7 @@ se cumple. En salas límite conviene comprobar banda a banda.
 La constante 2000 está a un solo razonamiento del material que esta página ya
 lleva. El amortiguamiento da a cada modo una anchura de banda a media potencia de
 unos $2{,}2/T$ hercios, así que los modos de una sala que decae son resonancias
-solapadas y no rayas; el número de ellos por hercio es la **densidad modal** que
+solapadas y no líneas; el número de ellos por hercio es la **densidad modal** que
 se deriva en el §3, que crece con el cuadrado de la frecuencia, así que el
 solapamiento se vuelve inevitable por encima de cierta frecuencia. Pide
 aproximadamente tres modos dentro de una anchura de banda — impón
@@ -880,7 +880,7 @@ posiciones de medición en baja frecuencia se apartan de los planos medios por l
 misma razón. La fuente importa tanto como el receptor: una fuente situada en el
 plano nodal de un modo no puede excitarlo en absoluto. Lo que el modelo de paredes
 rígidas no puede decirte es con cuánta fuerza resuena cada resonancia, porque eso
-lo fija el amortiguamiento que omite: para eso, malla la sala y ejecuta el
+lo fija el amortiguamiento que omite: para eso, malla la sala y ejecuta la
 [simulación FDTD 2D](/phonometry/es/simulation/fdtd-simulation/).
 
 ## Validación
@@ -937,7 +937,7 @@ se diseñaron para corregir). La distancia de reverberación alternativa de
 Kuttruff (que usa el área de absorción de Sabine en lugar de la constante
 de sala) se cita como comparación pero no está implementada:
 `steady_state_field` y `critical_distance` usan siempre la formulación de
-Bies con la constante de sala. El calculador de modos supone paredes
+Bies con la constante de sala. El cálculo de modos supone paredes
 rígidas y planta rectangular: da las *frecuencias* propias, no la amplitud
 de presión en un punto de escucha, y no dice nada del amortiguamiento, la
 forma modal ni una geometría que no sea una caja. Para eso, mallar la sala
@@ -967,4 +967,4 @@ proporciones preferentes de Bolt se comentan pero no se tabulan.
   implementaciones.
 - Referencia de la API: [`room.image_source`](/phonometry/es/reference/api/rooms/image-source/)
   y [`room.steady_field`](/phonometry/es/reference/api/rooms/steady-field/).
-- Teoría: [Acústica de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/#acústica-de-salas-y-edificación-iso-18233-iso-3382-iso-16283-iso-10140-en-12354-iso-12999-iso-717-iso-354): el modelo geométrico que hay detrás del método de las imágenes y su relación con el estadístico.
+- Teoría: [Respuesta al impulso y parámetros de acústica de salas](/phonometry/es/reference/theory/rooms-buildings/#respuesta-al-impulso-y-parámetros-de-acústica-de-salas-iso-18233-iso-3382-1-2-3): el modelo geométrico que hay detrás del método de las imágenes y su relación con el estadístico.

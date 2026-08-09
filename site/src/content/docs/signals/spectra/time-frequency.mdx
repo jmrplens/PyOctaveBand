@@ -90,7 +90,64 @@ deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](/phonometry/signals/spectra/spectral-analysis/) is the low-variance
 tool for the stationary background.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram.webp" alt="Calibrated spectrogram in dB SPL of a synthetic four-second outdoor scene: a siren sweeping sinusoidally between 600 and 1200 hertz traces a bright oscillating ridge at 70 decibels, a broadband impact at two and a half seconds draws a vertical stripe, and a pink noise floor at 45 decibels fills the background, with the color bar reading absolute sound pressure level" width="82%" loading="eager" />
+Put a number on that. A single periodogram cell of random data is chi-square
+with two degrees of freedom, so its level has a standard deviation of about
+**5.6 dB** and a 90 % spread of roughly **17 dB** — the mottled texture of the
+noise floor in the figure below, and the reason a single bright cell means
+nothing at all. The reading rule follows: a feature is real when it **persists
+across neighbouring columns or bins**, because the cell-to-cell fluctuation is
+independent while structure is not, so the eye is doing the averaging the
+estimator refused to do. Both remedies cost something: averaging adjacent
+columns trades time resolution for variance and converges toward the Welch
+estimate, and smoothing across frequency with the fractional-octave kernel of
+the [spectral analysis page](/phonometry/signals/spectra/spectral-analysis/)
+trades frequency resolution for the same thing. Which is exactly why a noise
+floor should be *quantified* from a PSD and only *displayed* on a spectrogram.
+
+### Choosing the segment for the event
+
+The trade-off is fixed, so the choice has to come from the thing being measured.
+
+**For a transient**, keep $T_B$ below the decay you want to see. The 12 ms decay
+of the impact in the figure below asks for segments of a few milliseconds —
+about 256 samples at 48 kHz — and the frequency resolution then follows at about
+190 Hz, whether you wanted it or not.
+
+**For a component whose frequency moves** at a rate $r$ in Hz/s, the tone leaves
+its own resolution bandwidth inside a single segment unless $B_e \ge r\,T_B$.
+With $B_e = 1.5/T_B$ that gives an optimum $T_B = \sqrt{1.5/r}$. The siren below
+sweeps at up to about 950 Hz/s, so segments shorter than **40 ms** keep the ridge
+sharp — and the 1024-point choice at 16 kHz is 64 ms, already past it, which is
+why the ridge thickens at the steepest part of the sweep. A run-up sweeping a
+500 Hz order at 100 Hz/s wants segments of about 0.12 s and nothing longer.
+
+The two requirements routinely conflict, as they do in the figure's own scene.
+The honest recipe: choose $T_B$ from the fastest thing that must stay sharp,
+check the resulting $B_e$ against the closest two components that must stay
+separate, and when the two cannot both be met, say so in the caption instead of
+splitting the difference. `res.time_resolution` and `res.resolution_bandwidth`
+report the pair actually delivered, so the choice can be stated in a report.
+
+One acquisition note, because it is the failure that looks like a result:
+capture transients with a pre-trigger of at least one segment, fix the gain in
+advance and verify that no sample clips — a clipped impact draws a full-height
+stripe that looks exactly like a broadband event.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram.webp" alt="Calibrated spectrogram in dB SPL of a synthetic four-second outdoor scene: a siren sweeping sinusoidally between 600 and 1200 hertz traces a bright oscillating ridge at 70 decibels, a broadband impact at two and a half seconds draws a vertical stripe, and a pink noise background whose broadband level is 45 decibels fills the image at a much lower per-cell level, with the color bar reading absolute sound pressure level" width="82%" loading="eager" />
+
+*Reading it: the siren ridge really does read 70 dB SPL, because a tone puts all
+its power inside one resolution bandwidth and the `'spectrum'` cell is therefore
+its mean square. The pink background does **not** read 45 dB anywhere. That
+45 dB is its *broadband* level spread over the whole band, and each cell carries
+only the part inside one $B_e$ — some 25 dB lower here, for a 1024-point segment
+at 16 kHz. To recover a level from noise, convert cells to a density by
+subtracting $10\log_{10} B_e$ and integrate over the band of interest, or use
+`'density'` and integrate directly. And the impact's peak cell is not the
+impact's level either: a transient shorter than the segment spreads its energy
+over the whole column, so that reading depends on `nperseg`. The colour bar is an
+absolute scale for tonal structure and a bandwidth-dependent one for everything
+else; when absolute band levels over time are the goal, the band spectrogram of
+[Levels](/phonometry/signals/levels/levels/) is the right tool.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -174,6 +231,33 @@ untapered and $1.5/T_r$ for Hann — the same taper factor as section 1, applied
 here to the record duration $T_r$ rather than to a segment, because the zoom FFT
 transforms the whole record). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
+
+**Dynamic range is a separate question, and the zoom does not help with it.**
+The chirp-Z still evaluates the DFT of the *tapered whole record*, so a strong
+component outside the zoom band leaks into it through the taper's sidelobes
+exactly as it would in an ordinary FFT: the zoom band buys resolution of the
+grid, not rejection. Hann's first sidelobe is −31.5 dB, which is nowhere near
+enough to see a sideband 50 dB below a carrier a few hertz away. The control is
+the `window` argument (default `"hann"`): pass `window="blackman"`, or a Kaiser
+with a high beta, to trade main-lobe width for sidelobe rejection — remembering
+that the wider main lobe raises $B_e$ and therefore the closest spacing you can
+separate, so the two goals pull against each other. The
+[window figures of merit](/phonometry/signals/spectra/spectral-analysis/#6-choosing-the-window)
+put numbers on that trade. When even the best taper is not enough, pre-filter or
+notch the dominant component before zooming: no window substitutes for removing
+the energy.
+
+**And the machine has to hold still.** Separating two lines 3 Hz apart near
+1 kHz needs about a second of record, and over that second the shaft must hold
+its speed to better than 3 parts in 1000 — 0.3 % — or the rotor line alone smears
+wider than the separation you are trying to resolve, and no zoom recovers it. In
+general the speed stability required is the target resolution divided by the
+frequency of the line, which gets harsh fast: 0.5 Hz at 5 kHz is 0.01 %. Check
+it before you trust the zoom: run a spectrogram of the same record and confirm
+the line is horizontal across the analysis window, or read the shaft period from
+a tacho over the record. When the machine does drift, angularly resample against
+the tacho — order tracking — so the lines become stationary in order rather than
+in frequency.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="Zoom FFT of a one-second record containing tones at 997 and 1000 hertz: the coarse 1024-point FFT with 8 hertz bins shows a single broad lump, while the zoom FFT over 980 to 1016 hertz draws two separate mainlobes whose peaks sit exactly on the dotted true-tone frequencies" width="82%" loading="lazy" />
 

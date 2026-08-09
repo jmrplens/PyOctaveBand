@@ -57,7 +57,7 @@ que algunos asuntos quedan donde el lector puede no esperarlos: la
 [determinación de la potencia
 acústica](/phonometry/es/reference/theory/environment-transport/#determinación-de-la-potencia-acústica-iso-374437453746-iso-3741-iso-9614-23)
 y la [exposición al ruido en el
-trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-e-incertidumbre-iso-9612)
+trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-iso-9612)
 están en Medio ambiente y transporte, y la [intensidad
 acústica](/phonometry/es/reference/theory/signal-analysis/#intensidad-acústica-iec-61043)
 en Análisis de señal, porque cada una es la misma matemática de propagación y

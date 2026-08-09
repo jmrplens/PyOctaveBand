@@ -49,11 +49,14 @@ diezmado multitasa) y la referencia de parámetros viven en
 banco diseñado cumple una clase de prestaciones de IEC 61260-1 es
 [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
 
-## 1. Comparación de filtros y zoom
+## 1. Las cinco arquitecturas en los bordes de banda
 
-Usamos secciones de segundo orden (SOS) en todos los filtros para garantizar la
-estabilidad numérica. La siguiente gráfica compara las arquitecturas centrándose
-en el punto de cruce a −3 dB.
+Los cinco diseños se comparan sobre la misma banda de octava de 1 kHz a 48 kHz.
+Lee la figura dos veces: la vista amplia enseña con qué rapidez cae cada falda
+al alejarse de la banda, y el recuadro en torno a la línea de −3 dB enseña dónde
+se cruzan. Lo que cambia entre esas dos vistas es que Chebyshev I riza *dentro*
+de la banda, Chebyshev II riza *fuera*, el elíptico hace las dos cosas y es el
+que más rápido cae, y Bessel es el más suave y el más lento.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_es.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas para la banda de octava de 1 kHz, con zoom en el cruce a -3 dB" width="80%" />
 
@@ -77,6 +80,17 @@ for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     w, h = sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
     ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=ftype)
 ax.axhline(-3, color="gray", linestyle=":", label="-3 dB")
+
+# El recuadro que da nombre al apartado: las mismas curvas junto al cruce.
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+axins = inset_axes(ax, width="35%", height="45%", loc="upper left", borderpad=3)
+for line in ax.get_lines()[:-1]:
+    axins.semilogx(line.get_xdata(), line.get_ydata(), label=line.get_label())
+axins.axhline(-3, color="gray", linestyle=":")
+axins.set(xscale="log", xlim=(650, 1500), ylim=(-4, 0.5),
+          title="Zoom en -3 dB (escala log)")
+
 ax.set(xlim=(100, 8000), ylim=(-80, 5),
        xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]")
 ax.grid(True, which="both", alpha=0.3)
@@ -92,7 +106,71 @@ plt.show()
 | `cheby1` | **Chebyshev I** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby1', ripple=0.1))` | Caída más abrupta a costa de rizado. |
 | `cheby2` | **Chebyshev II** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby2'))` | Banda de paso plana con ceros en la banda atenuada. |
 | `ellip` | **Elíptico** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Máxima selectividad. |
-| `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preservar la forma de los transitorios. |
+| `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preservar la forma de los transitorios (ver la figura de retardo de grupo de [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/#el-retardo-de-grupo-cuantificado)). |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/architecture_tradeoff_es.svg" alt="Dos paneles para la banda de octava de 1 kHz a 48 kHz, orden 6. A la izquierda, barras agrupadas con la atenuación relativa una y dos octavas por encima de la frecuencia central de banda para cada una de las cinco arquitecturas: Bessel es la más suave, con menos 16 y menos 60 decibelios; Butterworth, menos 40 y menos 88; Chebyshev I, menos 50 y menos 102; Chebyshev II, menos 55 y menos 73; y el elíptico es el más abrupto, con menos 72 y menos 81. A la derecha, el retardo de grupo en la frecuencia central de banda en milisegundos: Bessel 1,22; Chebyshev II 1,58; Butterworth 1,74; elíptico 1,75 y Chebyshev I 1,97" width="92%" />
+
+*La elección, cuantificada. La selectividad y el retardo de grupo se mueven en
+sentidos contrarios, y la columna de clase de la tabla de abajo dice cuáles de
+las cinco puedes usar de verdad para una medida de banda conforme a norma.*
+
+| Arquitectura | Rizado en el centro de banda | En $2f_m$ | En $4f_m$ | Retardo de grupo en $f_m$ | Clase IEC 61260-1 (orden 6, 48 kHz) |
+| :--- | ---: | ---: | ---: | ---: | :---: |
+| `butter` | 0,00 dB | −39,6 dB | −88,2 dB | 1,74 ms | **1** |
+| `cheby1` | 0,10 dB | −50,2 dB | −101,6 dB | 1,97 ms | ninguna |
+| `cheby2` | 0,00 dB | −55,1 dB | −73,0 dB | 1,58 ms | **1** |
+| `ellip` | 0,10 dB | −72,1 dB | −80,8 dB | 1,75 ms | ninguna |
+| `bessel` | 0,21 dB | −16,4 dB | −60,2 dB | 1,22 ms | ninguna |
+
+Lee primero la última columna: **tres de las cinco no sirven en absoluto para
+una medida de banda conforme a norma** con los parámetros por defecto; las dos
+de rizado constante porque sus bordes de banda no son sus puntos de −3 dB (ver
+[Bancos de filtros](/phonometry/es/signals/filters/filter-banks/)), y Bessel
+porque cae demasiado despacio para la máscara. Eso es una restricción dura, no
+una preferencia, y va antes que cualquiera de las demás columnas. Entre las dos
+que sí pasan, la elección es un compromiso real: `cheby2` compra 15 dB más de
+rechazo a una octava de distancia y lo paga con una banda atenuada lejana 15 dB
+más somera, porque su suelo de rizado constante queda clavado en
+`attenuation`.
+
+Una cosa más que la tabla no puede enseñar: el rechazo solo importa cuando una
+vecina fuerte no debe contaminar una banda débil, y ahí el techo lo pone el
+parámetro `attenuation` (72 dB por defecto), no la arquitectura.
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+from scipy.signal import sosfreqz
+
+# `filters` es el import del fragmento anterior.
+fs = 48000
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    # resample=False para que la respuesta exista por encima del Nyquist diezmado
+    bank = filters.OctaveFilterBank(
+        fs, fraction=1, order=6, limits=[800, 1200],
+        design=filters.FilterDesign(filter_type=ftype, resample=False))
+    idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+    f_m = float(bank.freq[idx])
+    w, h = sosfreqz(bank.sos[idx], worN=1 << 17, fs=fs)
+    mag = 20 * np.log10(np.abs(h) + 1e-15)
+    mag -= mag.max()
+
+    grid = np.linspace(f_m * 0.95, f_m * 1.05, 4001)
+    _, h_c = sosfreqz(bank.sos[idx], worN=2 * np.pi * grid / fs)
+    delay = -np.gradient(np.unwrap(np.angle(h_c)), 2 * np.pi * grid)
+
+    banked = filters.OctaveFilterBank(
+        fs, fraction=1, order=6, limits=[800, 1200],
+        design=filters.FilterDesign(filter_type=ftype))
+    print(f"{ftype:8s} {mag[np.argmin(abs(w - 2 * f_m))]:7.1f} dB "
+          f"{mag[np.argmin(abs(w - 4 * f_m))]:7.1f} dB "
+          f"{delay[len(delay) // 2] * 1e3:5.2f} ms "
+          f"clase {filters.verify_filter_class(banked)['overall_class']}")
+```
+
+</details>
 
 ## 2. Galería de respuestas del banco
 
@@ -105,6 +183,14 @@ Vista espectral completa de los bancos para octava (1/1) y tercio de octava (1/3
 | **Chebyshev II** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="100%" /> |
 | **Elíptico** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="100%" /> |
 | **Bessel** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="100%" /> |
+
+*Compara las filas fijándote solo en dos cosas y las diferencias dejan de ser
+sutiles. **Las mesetas:** Chebyshev I pone su rizado *dentro* de cada banda,
+sobre la meseta; Chebyshev II lo pone *fuera*, como el tren de muescas entre
+bandas; el elíptico hace las dos cosas. **La profundidad de los valles:** cuánto
+cae la respuesta entre dos bandas contiguas es la fuga que un nivel de banda
+puede permitirse, y las faldas de Bessel se solapan mucho más que las de
+cualquiera de los demás; ese solapamiento es su caída lenta, dibujada.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -204,7 +290,13 @@ También llamado Chebyshev inverso, tiene **banda de paso plana** y rizado en la
 banda atenuada. Ofrece una caída más rápida que Butterworth sin afectar a la
 señal en la banda de paso. Los bordes de la banda atenuada se colocan
 automáticamente para que los puntos de −3 dB caigan en los bordes de banda
-(`attenuation` debe ser $> 3{,}01\ \text{dB}$).
+(`attenuation` debe ser $> 3{,}01\ \text{dB}$ para que exista siquiera un punto
+de −3 dB; por debajo de eso el diseño lanza `ValueError`). Conviene notar que el
+valor por defecto de 72 dB lo fija la conformidad y no la realizabilidad: SciPy
+clava el suelo de rizado constante en exactamente `attenuation`, y la clase 1 de
+IEC 61260-1 exige 70 dB lejos de la banda, así que una `attenuation` de, pongamos,
+6 dB es aritméticamente legal y pierde la clase en silencio; ver
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
 
 ```python
 import numpy as np
@@ -275,7 +367,14 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 Los filtros Bessel están optimizados para una **respuesta de fase lineal** y un
 retardo de grupo mínimo. Preservan la forma de las ondas filtradas (transitorios)
-mejor que ningún otro tipo, pero tienen la caída más lenta.
+mejor que ningún otro tipo, pero tienen la caída más lenta. Esa afirmación es
+temporal, así que la prueba también lo es, y vive en la página hermana: la
+figura de retardo de grupo de
+[Bancos de filtros](/phonometry/es/signals/filters/filter-banks/#el-retardo-de-grupo-cuantificado)
+enseña a Bessel manteniéndose casi plano en toda la banda de paso mientras
+Chebyshev I y el elíptico hacen pico en los bordes de banda, y la figura de
+descomposición por bandas de esa misma página enseña qué le hace a un
+transitorio una resonancia más larga.
 
 ```python
 import numpy as np
@@ -419,7 +518,7 @@ alcanza realmente cada una de estas arquitecturas, son
   la máscara de aceptación de la Tabla 1, la clase 0 y la ficha de
   conformidad de estas arquitecturas.
 - Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).
-- Teoría: [Respuestas en magnitud](/phonometry/es/reference/theory/signal-analysis/#respuestas-en-magnitud-hjw): qué es una respuesta en magnitud como función de transferencia compleja, y en qué se diferencian las cinco arquitecturas antes de filtrar ninguna banda.
+- Teoría: [Respuestas en magnitud](/phonometry/es/reference/theory/signal-analysis/#respuestas-en-magnitud): qué es una respuesta en magnitud como función de transferencia compleja, y en qué se diferencian las cinco arquitecturas antes de filtrar ninguna banda.
 
 ## Respuestas rápidas
 

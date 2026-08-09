@@ -175,13 +175,13 @@ tiende a ese suelo rígido; la incidencia rasante ($h_s, h_r \to 0$) da
 $R_p \to -1$; y el efecto suelo es recíproco al intercambiar las alturas de
 fuente y receptor.
 
-La onda de superficie se ve mejor llevando la geometría hacia la incidencia
+La onda de suelo se ve mejor llevando la geometría hacia la incidencia
 rasante y mirando cómo se separan $R_p$ y $Q$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_reflection_coefficient_es.svg" alt="Dos paneles frente a la altura de fuente y receptor bajando de 3 m a 0,02 m a 50 m de distancia y 500 Hz sobre pradera. Izquierda: el módulo del coeficiente de reflexión de onda plana Rp subiendo hacia 1 mientras su fase corre hacia 180 grados, y el módulo del coeficiente de onda esférica Q separándose de él hacia arriba y estabilizándose cerca de 1,26, con el módulo del factor de pérdida por frontera F(w) en un segundo eje. Derecha: la atenuación en exceso calculada con Q, que se aplana cerca de menos 12 dB, frente a la misma magnitud calculada solo con Rp, que cae pasando de menos 40 dB hacia el silencio que un modelo de onda plana predice en incidencia rasante" width="90%" />
 
 *A 3 m de altura los dos coeficientes coinciden dentro de un pequeño porcentaje y
-la onda de superficie es irrelevante. A 0,02 m, $R_p$ ya ha llegado a $-1$
+la onda de suelo es irrelevante. A 0,02 m, $R_p$ ya ha llegado a $-1$
 (módulo 0,993 a 179,6°) y un modelo de onda plana predice $-40,1$ dB, casi el
 silencio. El coeficiente esférico llega en cambio a $|Q| = 1,26$ y el campo se
 asienta en $-11,9$ dB. Esos 28 dB son lo que compra el término de Faddeeva
@@ -517,7 +517,7 @@ incertidumbre de todo lo demás de la cadena. El semiplano rígido exacto cuando
 importa el comportamiento junto a la frontera de sombra (ahí da 6 dB frente a los
 5 dB de Kurze-Anderson, y los 6 dB son el campo reducido a la mitad,
 físicamente correcto). El modelo coherente de cuatro caminos solo cuando la
-pregunta es la estructura de interferencia en banda estrecha, nunca en crudo como
+pregunta es la estructura de interferencia en banda estrecha, nunca en bruto como
 valor de diseño.
 
 **La curva coherente hay que promediarla antes de que signifique nada.** Es un
@@ -591,5 +591,5 @@ completa por elementos de contorno.
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/): los ajustes por bandas de octava de ISO 9613-2 bajo los que se sitúan estos modelos, y la regla que un obstáculo tiene que cumplir para ser barrera siquiera.
 - [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/): el gradiente vertical de velocidad del sonido que los dos modelos de aquí dan por inexistente.
 - [Absorbentes porosos](/phonometry/es/materials/absorbers/porous-absorbers/): los modelos de Delany-Bazley y de Miki que hay detrás de `flow_resistivity`, y su rango de ajuste.
-- Teoría: [Propagación en exteriores y exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-y-exposición-al-ruido-en-el-trabajo-iso-9613-12-iso-9612): los términos de suelo y de barrera de ISO 9613-2 en el contexto de toda la suma de atenuaciones.
+- Teoría: [Propagación en exteriores](/phonometry/es/reference/theory/environment-transport/#propagación-en-exteriores-iso-9613-12): los términos de suelo y de barrera de ISO 9613-2 en el contexto de toda la suma de atenuaciones.
 - Referencia de la API: [`environment.propagation.ground_barriers`](/phonometry/es/reference/api/environment/ground-barriers/).
