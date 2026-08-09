@@ -97,6 +97,65 @@ las fórmulas de reverberación, en 1/m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de panel simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
 
+*Los cuatro modelos de esta página como un mapa, cada panel una sección de más
+abajo. Arriba a la izquierda, la hoja simple: 6 dB por octava hasta que el
+modelo de Sharp hunde el aislamiento en la coincidencia, 11,9 dB por debajo de
+la ley de masas en la banda de 2,5 kHz. Arriba a la derecha, repartir los mismos
+24 kg/m² en dos: 3,4 dB **peor** que una sola hoja en la resonancia
+masa-muelle-masa de 89 Hz y 47,7 dB mejor a 5 kHz. Abajo a la izquierda, la
+eficiencia de radiación: 0,011 a 100 Hz, 2,61 en la coincidencia, y solo despacio
+de vuelta hacia 1. Abajo a la derecha, la fuga que zanja la discusión: un 1 % de
+la superficie abierto mantiene $R$ en 20,0 dB valga lo que valga la pared.*
+
+<details>
+<summary>Ver el código de la figura conceptual</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (
+    coincidence_frequency, composite_transmission_loss,
+    double_wall_transmission_loss, mass_law_transmission_loss,
+    mass_spring_mass_resonance, plate_bending_stiffness,
+    radiation_efficiency, single_panel_transmission_loss,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
+fig, ax = plt.subplots(2, 2, figsize=(12, 9))
+
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(15.0, bp)
+ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
+sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
+ax[0, 0].semilogx(bands, ml, "--", label="ley de masas de campo")
+ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="R de panel simple (Sharp)")
+ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Panel simple")
+
+dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
+ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="hoja simple")
+ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="pared doble")
+ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
+ax[0, 1].set_title("Pared doble")
+
+sig = radiation_efficiency(bands, 1.5, 1.25, fc)
+ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
+ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Eficiencia de radiación")
+
+wall = sp.transmission_loss
+comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
+ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="pared maciza")
+ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="pared + rendija 1 %")
+ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Compuesta con abertura")
+
+for a in ax.flat:
+    a.set_xlabel("Frecuencia [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
+fig.suptitle("Aislamiento acústico teórico de paneles")
+fig.tight_layout(); plt.show()
+```
+
+</details>
+
 ## Panel simple: ley de masas y coincidencia (Bies 7.2)
 
 Un panel flexible y poco rígido transmite el sonido al ser movido en bloque por
@@ -608,7 +667,10 @@ otra.
 *Izquierda: una llave blanda hace caer el acoplamiento estructural como
 $1/f^3$; una rígida se mantiene sobre el techo rígido dos octavas más.
 Derecha: esas mismas llaves suben la resonancia de 26 Hz a 50 Hz, prolongando
-la rama de masa combinada.*
+la rama de masa combinada. Los dos paneles salen de los dos fragmentos de código
+de esta sección: el de la derecha, de `double_wall_transmission_loss` con y sin
+`tie_stiffness_per_area`; el de la izquierda, de
+`wall_tie_coupling_loss_factor(...).plot()`.*
 
 **La llave como muelle (Hopkins Ec. 4.89).** Una llave se caracteriza por un
 único número, su rigidez dinámica $s_{X\,\text{mm}}$ para un ancho de cámara
@@ -903,68 +965,19 @@ w = injected_power(force=10.0, mobility=1.0 / z_plate)
 print(round(float(w) * 1e3, 3), "mW")                 # W = |F|^2 / (16 sqrt(B' m''))
 ```
 
-<details>
-<summary>Ver el código de la figura conceptual</summary>
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from phonometry import (
-    coincidence_frequency, composite_transmission_loss,
-    double_wall_transmission_loss, mass_law_transmission_loss,
-    mass_spring_mass_resonance, plate_bending_stiffness,
-    radiation_efficiency, single_panel_transmission_loss,
-)
-
-bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
-fig, ax = plt.subplots(2, 2, figsize=(12, 9))
-
-bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-fc = coincidence_frequency(15.0, bp)
-ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
-sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
-ax[0, 0].semilogx(bands, ml, "--", label="ley de masas de campo")
-ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="R de panel simple (Sharp)")
-ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Panel simple")
-
-dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
-ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="hoja simple")
-ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="pared doble")
-ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
-ax[0, 1].set_title("Pared doble")
-
-sig = radiation_efficiency(bands, 1.5, 1.25, fc)
-ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
-ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Eficiencia de radiación")
-
-wall = sp.transmission_loss
-comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
-ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="pared maciza")
-ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="pared + rendija 1 %")
-ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Compuesta con abertura")
-
-for a in ax.flat:
-    a.set_xlabel("Frecuencia [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
-fig.suptitle("Aislamiento acústico teórico de paneles")
-fig.tight_layout(); plt.show()
-```
-
-</details>
-
 ### Parámetros de las funciones
 
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `mass_per_area` | float | kg/m² | > 0 | Densidad superficial $m''$ |
 | `critical_frequency` / `bending_stiffness` | float | Hz / N·m | dar uno | Coincidencia $f_c$, o $B'$ para calcularla |
-| `loss_factor` | float | — | > 0, defecto `0.01` | Factor de pérdidas total $\eta$ |
+| `loss_factor` | float | — | > 0; defecto `0.01` en hoja simple, `0.1` en doble hoja | Factor de pérdidas total $\eta$ |
 | `band` | str | — | `'third'` (−5,5 dB) / `'octave'` (−4,0 dB) | Ancho de la corrección de campo |
 | `mass1` / `mass2` | float | kg/m² | > 0 | Densidades superficiales de las hojas |
 | `gap` | float | m | > 0 | Profundidad de cámara $d$ |
 | `cavity_medium` | `PorousMediumResult` | — | defecto `None` | Relleno poroso; baja $f_0$ |
-| `width` (rendija) | float | m | > 0 | Anchura $w$ de la rendija. Tercer argumento posicional de `slit_transmission_coefficient`, **segundo** de `slit_resonance_frequencies` |
-| `depth` (rendija) | float | m | > 0 | Fondo $d$ de la rendija (el espesor de la pared). Cuarto argumento posicional de `slit_transmission_coefficient`, **primero** de `slit_resonance_frequencies` |
+| `width` (rendija) | float | m | > 0 | Anchura $w$ de la rendija. **Segundo** argumento posicional tanto de `slit_transmission_coefficient` como de `slit_resonance_frequencies` |
+| `depth` (rendija) | float | m | > 0 | Fondo $d$ de la rendija (el espesor de la pared). **Tercer** argumento posicional de `slit_transmission_coefficient`, **primero** de `slit_resonance_frequencies`: las dos funciones toman el par en órdenes opuestos |
 | `field` / `position` (rendija) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Campo incidente y posición |
 | `radius` / `depth` (orificio) | float | m | > 0 | Radio $a$ / fondo $d$ del orificio |
 | `areas` / `reduction_indices` | seq | m² / dB | longitud $N$ | Elementos de la composición (1-D o (N, bandas)) |
@@ -987,7 +1000,7 @@ panel; la rendija sin viscosidad de Gomperts válida para $w < 0{,}3\lambda$;
 **Cubierto.** Las propias fórmulas fuente: la ley de masas del apartado
 7.2 de Bies y el método de coincidencia de Sharp (Ec. 7.40/7.42/7.44) para
 un panel simple, la resonancia masa-muelle-masa de la pared doble y su
-aumento de cámara que satura (Ec. 7.62-7.64), los coeficientes de
+ganancia de cámara que satura (Ec. 7.62-7.64), los coeficientes de
 transmisión de rendija de Gomperts y de orificio circular de Wilson y
 Soroka de Hopkins con la suma compuesta ponderada por área (Ec. 4.92), la
 eficiencia de radiación de placa de Leppington/Maidanik

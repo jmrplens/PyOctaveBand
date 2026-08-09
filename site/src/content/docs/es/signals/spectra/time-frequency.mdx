@@ -285,6 +285,15 @@ frecuencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution_es.svg" alt="FFT con zoom de un registro de un segundo con tonos a 997 y 1000 hercios: la FFT gruesa de 1024 puntos con bins de 8 hercios muestra un único bulto ancho, mientras que la FFT con zoom entre 980 y 1016 hercios dibuja dos lóbulos principales separados cuyos picos caen exactamente sobre las frecuencias verdaderas punteadas" width="82%" loading="lazy" />
 
+*Lo que separa los dos tonos es el segundo de registro, no el zoom. La vista
+gruesa usa 1024 de las 8192 muestras, así que sus bins de 8 Hz no pueden
+sostener dos rayas separadas 3 Hz y enseña un solo bulto en 1000 Hz. El zoom
+transforma el registro **entero**, cuyo ancho de banda de resolución con Hann es
+de 1,5 Hz, y le pone encima una malla de 0,25 Hz: los picos caen en 997,00 y
+1000,00 Hz con −1,94 y −6,02 dB, las amplitudes de los dos tonos. Una malla más
+fina sobre un registro de 1024 muestras no habría cambiado nada; esta es la
+distinción que hace el apartado entre densidad de muestreo y resolución.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 

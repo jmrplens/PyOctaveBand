@@ -86,11 +86,12 @@ excluida es todo lo que lleve una capa de uso rígida que reparta la carga del
 martillo sobre un área que acaba acotando el propio tamaño de la probeta:
 laminados, sistemas de clic y cualquier suelo flotante, cuya solera es
 precisamente una placa de reparto. La norma enuncia las consecuencias sin
-rodeos. Para revestimientos que no sean blandos y flexibles «pueden aparecer
-desviaciones mayores respecto de los resultados del método de la serie ISO 10140
-debido a la dependencia del tamaño de la probeta»; y **en caso de discrepancia
-con ISO 10140, se debe utilizar el resultado de la medición según ISO 10140**.
-La maqueta nunca se impone a la instalación a tamaño real.
+rodeos. Para revestimientos que no sean blandos y flexibles «se pueden producir
+desviaciones importantes con respecto a los resultados obtenidos con el método
+de la serie de normas ISO 10140, debido a la influencia del tamaño de la
+muestra»; y **en caso de existir diferencias con la Norma ISO 10140, se debe
+usar el resultado de la medición de la Norma ISO 10140**. La maqueta nunca se
+impone a la instalación a tamaño real.
 
 Del mismo apartado sale una regla de valoración. Cuando se ensaya más de una
 probeta del mismo producto, los $\Delta L$ por bandas de las probetas se
@@ -102,9 +103,9 @@ número distinto y no es lo que pide la norma.
 
 El anexo A es normativo y consta de dos planos de montaje. La placa mide
 (120 ± 5) cm × (80 ± 5) cm × (20 ± 1) cm, es homogénea y de espesor uniforme,
-plana dentro de ± 1 mm a lo largo de una línea horizontal de borde a borde y lo
-bastante dura para aguantar los martillos — se le puede añadir una capa de
-mortero para conseguir esa planeidad. Descansa sobre cuatro apoyos elásticos en
+plana con una tolerancia de ± 1 mm a lo largo de una línea horizontal de borde a
+borde y lo bastante dura para aguantar los martillos — se le puede añadir una
+solera para conseguir esa planeidad. Descansa sobre cuatro apoyos elásticos en
 las esquinas, ninguno mayor de 10 cm × 10 cm, y la resonancia vertical de la
 placa sobre esos apoyos debe quedar **por debajo de 20 Hz**. Se atornillan o
 pegan al menos cuatro posiciones de acelerómetro en la cara inferior,
@@ -183,14 +184,14 @@ la máquina de impactos las favorece —; un revestimiento con $C_{I,\Delta}$ ce
 de cero mejora todo el rango. Una ficha que solo imprime $\Delta L_w$ te ha
 contado la mejor mitad de la historia.
 
-El ejemplo siguiente es una medición real: la mejora de una moqueta textil sobre
-la maqueta pesada del CSTB, digitalizada de la Figura 4 de Foret, Chéné y
-Guigou-Carter, «A comparison of the reduction of transmitted impact noise by
-floor coverings measured using ISO 140-8 and ISO/CD 16251-1» (Forum Acusticum
-2011, Aalborg). Su mejora ponderada ISO 16251-1 publicada es
-$\Delta L_w = 29$ dB, reproducida exactamente por el motor de valoración.
-
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_es.svg" alt="Mejora a impacto de revestimientos de suelo ISO 16251-1: la mejora delta-L de una moqueta textil real creciendo con la frecuencia en bandas de tercio de octava de 100 Hz a 3150 Hz, con el área de mejora sombreada y el número único ponderado delta-Lw anotado" width="80%" />
+
+*Una moqueta textil real sobre la maqueta, y la forma es todo el argumento: 5 dB
+a 100 Hz frente a 71 dB a 3150 Hz, 66 dB de recorrido en el rango valorado. El
+revestimiento no hace casi nada contra el golpe de baja frecuencia y casi todo
+contra el chasquido de alta. $\Delta L_w$ = 29 dB solo lo registra de refilón, y
+por eso la figura se lee junto a $C_{I,\Delta} = -13$ dB y los 16 dB que ambos
+dan en la escala de respuesta plana.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -310,9 +311,9 @@ repositorio. Pulsa la vista previa para abrir el PDF:
 ## De la rigidez dinámica a la mejora: la estimación de ISO 12354-2
 
 La maqueta mide un *revestimiento* que ya existe; un **suelo flotante** (una
-losa vertida sobre una capa elástica) se proyecta al revés, a partir de dos
+solera vertida sobre una capa elástica) se proyecta al revés, a partir de dos
 números conocidos en fase de proyecto: la masa por unidad de superficie $m'$
-de la losa y la rigidez dinámica por unidad de superficie $s'$ de la capa
+de la solera y la rigidez dinámica por unidad de superficie $s'$ de la capa
 elástica, medida según EN 29052-1 como en la
 [guía de rigidez
 dinámica](/phonometry/es/materials/resilient/dynamic-stiffness/). Juntos fijan
@@ -326,15 +327,15 @@ $$
 
 donde 160 es el $1000/2\pi$ redondeado; `materials.natural_frequency` calcula
 la forma exacta $\tfrac{1}{2\pi}\sqrt{s'/m'}$. Por encima de la resonancia la
-losa se desacopla del forjado y el Anexo C estima la mejora como una recta
+solera se desacopla del forjado y el Anexo C estima la mejora como una recta
 según la Fórmula (C.1), con la Fórmula (C.3), más empinada, para las
 construcciones cuyas mayores pérdidas internas siguen la teoría de placa
 infinita:
 
 $$
-\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (losas de arena/cemento o sulfato de calcio)},
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (soleras de mortero de cemento o de sulfato de calcio)},
 \qquad
-\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asfalto, losas secas)}.
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asfalto, soleras secas)}.
 $$
 
 Las dos están escritas solo para $f > f_0$ y se toman como cero en la resonancia
@@ -349,8 +350,8 @@ espectro de abajo arranca limpio en 100 Hz.
 import numpy as np
 from phonometry import building, materials
 
-# El suelo flotante resuelto del Anexo G de ISO 12354-2:2017: una losa de 73,5 kg/m2 sobre
-# una capa elástica con s' = 8 MN/m3.
+# El suelo flotante resuelto del Anexo G de ISO 12354-2:2017: una solera de 73,5 kg/m2
+# sobre una capa elástica con s' = 8 MN/m3.
 f0 = 160.0 * np.sqrt(8.0 / 73.5)                                 # Fórmula (C.2)
 print(round(f0, 1))                                              # 52.8  Hz
 print(round(float(materials.natural_frequency(8.0e6, 73.5)), 1))  # 52.5  forma exacta 1/(2 pi)
@@ -368,10 +369,10 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 
 La estimación ponderada en forma cerrada de la Fórmula (C.4),
 $\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condensa la misma física
-en una línea: losas más pesadas y capas más blandas puntúan mejor. Ambas
+en una línea: soleras más pesadas y capas más blandas puntúan mejor. Ambas
 estimaciones son ayudas de proyecto deliberadamente del lado de la seguridad
 (la pendiente de 30 lg recorta la teoría de placa infinita de 40 lg allí
-donde los datos experimentales dicen que las losas reales se quedan cortas);
+donde los datos experimentales dicen que las soleras reales se quedan cortas);
 en cuanto existe un elemento de ensayo, la maqueta medida de esta página, o el forjado
 completo de ISO 10140-3, es la referencia, y la
 [predicción EN

@@ -8,14 +8,14 @@ references:
     title: "Wind turbines — Part 11: Acoustic noise measurement techniques"
     designation: "IEC 61400-11:2012+AMD1:2018 CSV"
     url: "https://webstore.iec.ch/en/publication/63367"
-    note: "La edición implementada: la geometría de medida, la clasificación por velocidades de viento y la cadena de audibilidad tonal (potencia acústica aparente Fórmula 26, banda crítica Fórmula 30, nivel de enmascaramiento Fórmula 31, tonalidad/audibilidad Fórmulas 32-34). El flujo completo de medición queda fuera del alcance aquí."
+    note: "La edición implementada: la geometría de medida, la clasificación en intervalos de velocidad de viento y la cadena de audibilidad tonal (potencia acústica aparente Fórmula 26, banda crítica Fórmula 30, nivel de enmascaramiento Fórmula 31, tonalidad/audibilidad Fórmulas 32-34). El flujo completo de medición queda fuera del alcance aquí."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2005
     title: "Wind turbines — Part 14: Declaration of apparent sound power level and tonality values"
     designation: "IEC TS 61400-14:2005"
     url: "https://webstore.iec.ch/en/publication/5432"
-    note: "Cómo un fabricante convierte las medidas IEC 61400-11 de un lote de aerogeneradores en valores declarados con su incertidumbre, el número que recibe realmente una autoridad de planificación."
+    note: "Cómo un fabricante convierte las medidas IEC 61400-11 de un lote de aerogeneradores en valores declarados con su incertidumbre, el número que recibe realmente la administración competente."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
@@ -119,20 +119,21 @@ altura que muestrearía un micrófono en trípode (véase
 [la fuente imagen que explica el efecto del
 suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
 
-### Clases de viento y condiciones estandarizadas
+### Intervalos de velocidad de viento y condiciones estandarizadas
 
 La emisión de ruido de un aerogenerador crece con la velocidad del viento
 hacia la potencia nominal, así que un número único no significaría nada sin
 su punto de operación: la IEC 61400-11 declara $L_{WA}$ *en función de la
 velocidad del viento*.
 
-**Cómo se llena una clase.** Sonido y viento se registran en promedios
-sincronizados de 10 s, y cada periodo se clasifica en una **clase de velocidad de
-viento de 0,5 m/s de ancho centrada en velocidades enteras y semienteras a altura
-de buje**, con al menos 10 periodos de ruido total y 10 de fondo (turbina parada)
-por clase. Dentro de cada clase los espectros se promedian, se interpolan al
-centro de la clase y se corrigen por fondo; un margen total-menos-fondo de 3 dB o
-menos anula la clase, y entre 3 y 6 dB la marca con un asterisco.
+**Cómo se llena un intervalo.** Sonido y viento se registran en promedios
+sincronizados de 10 s, y cada periodo se clasifica en un **intervalo de velocidad
+de viento de 0,5 m/s de ancho centrado en velocidades enteras y semienteras a
+altura de buje**, con al menos 10 periodos de ruido total y 10 de fondo (turbina
+parada) por intervalo. Dentro de cada intervalo los espectros se promedian, se
+interpolan al centro del intervalo y se corrigen por fondo; un margen
+total-menos-fondo de 3 dB o menos anula el intervalo, y entre 3 y 6 dB lo marca
+con un asterisco.
 
 **De dónde sale la velocidad del viento.** Preferiblemente no de un anemómetro:
 se deriva de la potencia eléctrica medida a través de la curva de potencia de la
@@ -149,22 +150,22 @@ rugosidad de referencia** $z_{0ref} = 0{,}05$ m (un perfil de viento
 logarítmico), dando $L_{WA,10m}$ a velocidades enteras a 10 m sea cual sea el
 terreno real del emplazamiento. La biblioteca implementa las magnitudes en forma
 cerrada de esta cadena (distancia oblicua, potencia aparente por banda,
-audibilidad tonal); la clasificación en clases, el promediado y la maquinaria de
-incertidumbre operan sobre campañas de medida completas y quedan fuera de
+audibilidad tonal); la clasificación en intervalos, el promediado y la maquinaria
+de incertidumbre operan sobre campañas de medida completas y quedan fuera de
 alcance.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_apparent_power_es.svg" alt="El nivel de potencia acústica aparente ponderado A de un aerogenerador de 80 m de buje y 100 m de rotor frente a la velocidad del viento a altura de buje, con un marcador por cada clase de 0,5 metros por segundo de 4 a 12 metros por segundo. La curva sube desde unos 98,6 dB a 4 metros por segundo, pasa por su tramo más pronunciado cerca de 7 metros por segundo y se aplana en torno a 110 dB por encima de 10 metros por segundo cuando la máquina alcanza la potencia nominal. Una clase baja aparece sombreada y tachada porque su margen total menos fondo es inferior a 3 dB, y una clase vecina lleva un asterisco porque su margen está entre 3 y 6 dB. Una abscisa gemela sobre la gráfica repite la misma serie frente a la velocidad del viento a 10 m de altura de la Fórmula 29 sobre la longitud de rugosidad de referencia de 0,05 m" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_apparent_power_es.svg" alt="El nivel de potencia acústica aparente ponderado A de un aerogenerador de 80 m de buje y 100 m de rotor frente a la velocidad del viento a altura de buje, con un marcador por cada intervalo de 0,5 metros por segundo de 4 a 12 metros por segundo. La curva sube desde unos 98,6 dB a 4 metros por segundo, pasa por su tramo más pronunciado cerca de 7 metros por segundo y se aplana en torno a 110 dB por encima de 10 metros por segundo cuando la máquina alcanza la potencia nominal. Un intervalo bajo aparece sombreado y tachado porque su margen total menos fondo es inferior a 3 dB, y un intervalo vecino lleva un asterisco porque su margen está entre 3 y 6 dB. Una abscisa gemela sobre la gráfica repite la misma serie frente a la velocidad del viento a 10 m de altura de la Fórmula 29 sobre la longitud de rugosidad de referencia de 0,05 m" width="88%" />
 
 *La magnitud que declara esta norma es una curva, no un número: la misma máquina
 da 98,6 dB(A) a 4 m/s y 109,9 dB(A) a 12 m/s. La forma es la estrategia de
 control de la máquina, más pronunciada donde el rotor acelera y plana una vez a
 potencia nominal, así que citar un $L_{WA}$ único sin su velocidad de viento no
-dice nada. La clase tachada y la marcada con asterisco son la propia
-contabilidad de la norma: por debajo de un margen total-menos-fondo de 3 dB la
-clase se anula, y entre 3 y 6 dB se declara con una marca. El eje superior es la
-misma serie frente a la velocidad de viento de referencia a 10 m de la Fórmula
-(29), que es en la que se suele redactar una condición de licencia y no es la
-velocidad que vio el rotor.*
+dice nada. El intervalo tachado y el marcado con asterisco son la propia
+contabilidad de la norma: por debajo de un margen total-menos-fondo de 3 dB el
+intervalo se anula, y entre 3 y 6 dB se declara con una marca. El eje superior
+es la misma serie frente a la velocidad de viento de referencia a 10 m de la
+Fórmula (29), que es en la que se suele redactar una condición de licencia y no
+es la velocidad que vio el rotor.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -174,8 +175,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # `environment` se importa en el fragmento de arriba. Los niveles de banda por
-# clase de aquí son sintéticos: una campaña real los aporta, corregidos de fondo
-# e interpolados al centro de la clase.
+# intervalo de aquí son sintéticos: una campaña real los aporta, corregidos de
+# fondo e interpolados al centro del intervalo.
 r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
 bins = np.arange(4.0, 12.5, 0.5)
 shape = np.array([-4.0, -1.5, 0.0, -1.0, -3.0])   # de 250 Hz a 1 kHz
@@ -264,6 +265,15 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />
+
+*Lo que el método compara de verdad. La línea de 200 Hz sobresale 22 dB sobre
+el fondo conformado, pero el veredicto no es ese número: dentro de la banda
+crítica de 102,9 Hz las líneas clasificadas como tono suman $L_{pt}$ = 62,2 dB
+y el ruido de enmascaramiento $L_{pn}$ = 55,6 dB, así que la tonalidad es
+6,6 dB. Solo al restar el criterio de audibilidad $L_a = -2{,}0$ dB a esta
+frecuencia aparece la magnitud declarable, $\Delta L_a$ = 8,6 dB, muy por
+encima de los 0 dB que hacen audible el tono. Lo que lo fija es la banda
+sombreada, no la altura de la línea.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -388,16 +398,17 @@ como las condiciones que esas fórmulas suponen, y las tolerancias de la posici�
 de medida están dibujadas.
 
 **No cubierto.** La propia campaña de medida: el promediado de 10 s, la
-clasificación en clases de viento de 0,5 m/s con sus 10 + 10 periodos, la
-corrección por fondo, la interpolación a los centros de clase, la conversión de
-la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de incertidumbre del
-apartado 9.3 operan todos sobre campañas completas y son cosa del usuario.
-Tampoco está implementada la vía de declaración de la IEC TS 61400-14, que
-convierte un lote de máquinas medidas en el número único que recibe una
-administración urbanística. Y dos cosas que un lector de aerogeneradores viene a
-buscar a menudo quedan fuera de la IEC 61400-11 por completo: la **modulación de
-amplitud** (el «silbido», que queda englobado en el $L_{WA}$ y que esta norma no
-valora en ningún sitio) y el **infrasonido**. Las dos figuran en el 7.2.1 como
+clasificación en intervalos de velocidad de viento de 0,5 m/s con sus 10 + 10
+periodos, la corrección por fondo, la interpolación a los centros de intervalo,
+la conversión de la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de
+incertidumbre del apartado 9.3 operan todos sobre campañas completas y son cosa
+del usuario. Tampoco está implementada la vía de declaración de la
+IEC TS 61400-14, que convierte un lote de máquinas medidas en el número único
+que recibe la administración competente. Y dos cosas que un lector interesado en
+aerogeneradores viene a buscar a menudo quedan fuera de la IEC 61400-11 por
+completo: la **modulación de amplitud** (el «silbido», que queda englobado en el
+$L_{WA}$ y que esta norma no valora en ningún sitio) y el **infrasonido**. Las
+dos figuran en el 7.2.1 como
 medidas *opcionales* sin método de valoración asociado, así que su evaluación
 recae en las guías nacionales; la vía psicoacústica hacia ellas empieza en
 [Intensidad de fluctuación y aspereza](/phonometry/es/perception/psychoacoustics/sound-quality/)

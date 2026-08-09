@@ -253,6 +253,15 @@ argumento explícito y viaja con el resultado:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/marine_mammal_weighting_es.svg" alt="Funciones de ponderación auditiva de los cinco grupos auditivos en agua de NMFS 2024: los cetáceos de baja frecuencia tienen su máximo cerca de 1,4 kHz, los de alta frecuencia cerca de 11 kHz, los de muy alta frecuencia cerca de 27 kHz, los pinnípedos fócidos cerca de 5,6 kHz y los otáridos cerca de 7,8 kHz, cayendo cada uno bruscamente fuera de su banda de paso" width="82%" loading="eager" />
 
+*Cinco filtros paso banda de la misma forma algebraica, y equivocarse de filtro
+cuesta más que el propio criterio. En 1 kHz, que es donde un hincado de pilotes
+o un buque ponen la mayor parte de su energía, el filtro LF está en −0,03 dB y
+el VHF en −33,84 dB, así que un mismo espectro medido da dos exposiciones
+ponderadas separadas por 34 dB antes de aplicar ningún umbral. Las bandas de
+paso a −6 dB apenas se solapan (96 Hz-15 kHz para LF frente a 5,9-113 kHz para
+VHF), y los umbrales AUD INJ de la leyenda van de 159 a 193 dB, así que el grupo
+y el criterio hay que citarlos juntos o el número no significa nada.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -399,7 +408,7 @@ ponderado publicado es siempre el $K + C$ redondeado, y en la tabla impulsiva de
 Southall los criterios de SEL van a TTS + 15 dB y los de pico a TTS + 6 dB, lo
 que la tabla de arriba cumple fila a fila.
 
-## Una evaluación trabajada de hincado de pilotes
+## Una evaluación resuelta de hincado de pilotes
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure_es.svg" alt="La configuración de la evaluación de exposición: un pilote hincado por un martillo de impacto, un hidrófono calibrado a la distancia de 750 metros de la ISO 18406 donde se mide el nivel de exposición sonora por bandas, el animal receptor más lejos a la distancia R con la pérdida por transmisión entre ambos, los tres pasos de proceso desde la exposición por bandas hasta la ponderación auditiva y la acumulación sobre los golpes, y una vista en planta con las dos isopletas de la métrica dual y la mayor gobernando" width="92%" />
 
