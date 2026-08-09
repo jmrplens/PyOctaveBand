@@ -56,6 +56,36 @@ el carácter del ruido. Cada una vale 0, 3 o 6 dB, y su suma está limitada a
 9 dB (anexo IV A.3.3), tope que expone `RD1367_MAX_CORRECTION`. Aunque el
 índice deriva de un nivel ponderado A, el reglamento lo expresa en dB.
 
+### La corrección por ruido de fondo que toda entrada da por hecha
+
+El $L_{Aeq,T}$ de arriba es el nivel de *la actividad sola*. Todo lo de esta
+página, las tres correcciones, los niveles de fase y el veredicto, está definido
+sobre un nivel corregido por ruido de fondo, y el reglamento lo dice antes que
+ninguna otra cosa. El procedimiento es la resta energética de siempre: se mide el
+residual con la actividad parada, en el mismo periodo de evaluación, y se resta
+del total,
+$L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$.
+
+Deja de tener sentido a medida que los dos convergen. Con la actividad 10 dB por
+encima del residual, la corrección vale 0,4 dB y el residual apenas importa; a
+3 dB la corrección vale 3 dB y la respuesta es tan incierta como las dos
+mediciones que la produjeron. La ISO 1996-2 traza ahí la raya y un informe de
+inspección debería hacer lo mismo: con un margen por debajo de 3 dB no se permite
+corrección alguna y lo honrado es declarar el nivel **sin corregir** como cota
+superior. `residual_sound_correction()` y el `gaussian_residual_level()` basado
+en percentiles de
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/)
+hacen la aritmética y llevan esa regla (`reportable_upper_bound`,
+`reliable=False`); el procedimiento propio del anexo IV del RD para la serie de
+mediciones (cuántas, de qué duración, qué las invalida) no está implementado
+aquí.
+
+Dos consecuencias en campo. El residual hay que capturarlo **en el mismo periodo
+de evaluación**, porque un residual de noche no es un residual de día. Y una fase
+con un margen demasiado pequeño tampoco puede sostener un veredicto de $K_t$,
+$K_f$ o $K_i$: los tres son diferencias de niveles corregidos por ruido de fondo,
+así que el mismo margen gobierna las correcciones de carácter y no solo el nivel.
+
 | Corrección | Magnitud de partida | Umbrales | Función |
 | :--- | :--- | :--- | :--- |
 | $K_t$, componentes tonales emergentes | Espectro **sin ponderar** en tercios de octava; $L_t = L_f - L_s$, con $L_s$ la media **aritmética** de las dos bandas adyacentes | 8/12 dB (20 a 125 Hz), 5/8 dB (160 a 400 Hz), 3/5 dB (500 Hz a 10 kHz) | `tonal_correction()` |
@@ -82,27 +112,115 @@ environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72,0 dB
 environment.total_correction(kt=6, kf=6, ki=3)               # 9,0 dB: el tope
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_tonal_correction_es.svg" alt="El espectro en tercios de octava del fragmento dibujado como barras de 100 Hz a 1 kHz, con la media aritmética de las dos vecinas de cada banda marcada encima, la banda de 250 Hz destacando 10,5 dB sobre la media de sus vecinas y señalada como banda determinante, y la fila de umbrales que le aplica impresa al lado" width="86%" />
+
+*La comprobación enfrenta una banda a la media **aritmética** de sus dos vecinas,
+no a un suelo ajustado ni al espectro entero. Solo la banda de 250 Hz
+supera su umbral, por 10,5 dB frente al par de 5 dB y 8 dB que rige entre 160 Hz
+y 400 Hz, así que gobierna y $K_t = 6$ dB. Las dos bandas de los extremos no
+tienen diferencia alguna, porque les falta una vecina.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `environment`, `freqs` y `levels` vienen del fragmento de arriba.
+environment.tonal_correction(levels, freqs).plot(language="es")
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_kf_ki_es.svg" alt="Las correcciones de baja frecuencia e impulsiva dibujadas como funciones escalonadas de la diferencia de nivel de 0 a 20 dB: las dos valen cero hasta 10 dB, saltan a 3 dB entre 10 y 15 dB y vuelven a saltar a 6 dB por encima de 15 dB, con los puntos del ejemplo resuelto marcados, Lf = 13 dB dando 3 dB y Li = 5 dB dando 0 dB" width="86%" />
+
+*$K_f$ y $K_i$ son la misma escalera de dos peldaños leída sobre dos diferencias
+distintas del sonómetro, y los peldaños son donde la aritmética se vuelve
+quebradiza: una diferencia de 15,0 dB puntúa 3 dB y una de 15,1 dB puntúa 6 dB,
+así que una décima de decibelio de incertidumbre de medida a un lado u otro de un
+peldaño vale 3 dB en el $L_{Keq}$.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment` se importa arriba.
+diffs = np.linspace(0.0, 20.0, 400)
+fig, ax = plt.subplots()
+ax.step(diffs, [environment.low_frequency_correction(lceq=63.0 + d, laeq=63.0)
+                for d in diffs], where="post", label="Kf (LCeq - LAeq)")
+ax.step(diffs, [environment.impulsive_correction(laieq=63.0 + d, laeq=63.0)
+                for d in diffs], where="post", ls="--", label="Ki (LAIeq - LAeq)")
+ax.plot([13.0], [3.0], "o", label="ejemplo resuelto: Lf = 13 dB")
+ax.plot([5.0], [0.0], "s", label="ejemplo resuelto: Li = 5 dB")
+ax.set(xlabel="Diferencia de nivel [dB]", ylabel="Corrección [dB]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
+
 ## Relación con los procedimientos de ISO 1996
 
 Las correcciones del reglamento se parecen a procedimientos de ISO 1996 que la
 biblioteca ya implementa, pero **no son intercambiables**, y por eso este
 módulo implementa las variantes propias del RD en lugar de delegar en aquellas:
 
-- `tonal_audibility()` / `tonal_adjustment()` son el método de ingeniería del
+- [`tonal_audibility()` / `tonal_adjustment()`](/phonometry/es/environment/assessment/environmental-levels/#ajuste-tonal-método-de-ingeniería-anexo-c-de-iso-1996-22007) son el método de ingeniería del
   anexo C de ISO 1996-2, basado en la audibilidad $\Delta L_{ta}$ dentro de la
   banda crítica del tono, y devuelven un $K_t$ **continuo** entre 0 y 6 dB. El
   RD trabaja sobre diferencias entre bandas de tercio de octava y solo produce
   0, 3 o 6 dB.
-- `tonal_seeking_survey()` (método de cribado, anexo K de ISO 1996-2:2017) es
+- [`tonal_seeking_survey()`](/phonometry/es/environment/assessment/environmental-levels/#ajuste-tonal-método-de-ingeniería-anexo-c-de-iso-1996-22007) (método de cribado, anexo K de ISO 1996-2:2017) es
   el pariente más cercano, porque también parte el espectro en 125 y 400 Hz,
   pero exige que la banda supere a **ambas** vecinas en 15/8/5 dB y solo
   devuelve un indicador de prominencia; el RD compara contra la **media** de
   las vecinas con umbrales 8/5/3 dB y gradúa el resultado.
-- `impulsive_sound_adjustment()` es el método de tasa de crecimiento de
+- [`impulsive_sound_adjustment()`](/phonometry/es/environment/assessment/impulsive-sound/) es el método de tasa de crecimiento de
   ISO/PAS 1996-3 sobre una señal calibrada. El $K_i$ del RD es la diferencia
   clásica $L_{AIeq} - L_{Aeq}$ leída en el sonómetro, no la misma magnitud.
 - $K_f$ no tiene ninguna contraparte en ISO 1996: la diferencia
   $L_{Ceq} - L_{Aeq}$ es propia del reglamento español.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_vs_iso_tonal_es.svg" alt="Dos espectros en tercios de octava dibujados como barras uno al lado del otro con tres filas de veredicto bajo cada uno. El espectro de la izquierda tiene una emergencia de 10,5 dB en 250 Hz y todos los métodos coinciden en que hay un tono. El de la derecha tiene una emergencia más suave elegida para que los veredictos se separen: la corrección tonal del RD 1367 la sigue graduando, mientras que el método de cribado de ISO 1996-2 no levanta ningún indicador porque la banda no supera a ambas vecinas en el margen exigido, y el método de ingeniería del anexo C de ISO devuelve un Kt continuo más pequeño" width="90%" />
+
+*Los dos procedimientos están lo bastante cerca como para confundirse y lo
+bastante lejos como para discrepar sobre un espectro real. Una banda de 250 Hz
+que sobresale 7,5 dB de la media aritmética de sus vecinas queda graduada con
+$K_t = 3$ dB por el reglamento y **no levanta ningún indicador** en el método de
+cribado de ISO, porque supera a cada vecina en menos de los 8 dB que ese método
+exige. Esa es exactamente la situación que un informe de inspección tiene que
+saber defender: el RD compara contra la **media** aritmética de las vecinas con
+umbrales 8/5/3 dB y gradúa el resultado en 0/3/6; el método de cribado exige que
+la banda supere a **ambas** vecinas en 15/8/5 dB y devuelve un indicador; el
+método de ingeniería del anexo C trabaja dentro de una banda crítica y devuelve
+un valor continuo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment`, `freqs` y `levels` vienen del fragmento de correcciones de arriba.
+shallow = list(levels)
+shallow[4] = 69.0                      # Lt = 7,5 dB en lugar de 10,5 dB
+
+for spectrum in (levels, shallow):
+    rd = environment.tonal_correction(spectrum, freqs)
+    flags = np.asarray(environment.tonal_seeking_survey(spectrum, freqs))
+    print(rd.correction, rd.governing_frequency, bool(flags[4]))
+# 6.0 250.0 True     <- los dos coinciden
+# 3.0 250.0 False    <- el RD lo gradúa, el método de cribado no lo marca
+plt.show()
+```
+
+</details>
 
 ## Periodos temporales de evaluación y fases de ruido
 
@@ -187,6 +305,8 @@ supere en más de 3 dB y que ningún $L_{Keq,Ti}$ medido en una fase de ruido lo
 supere en más de 5 dB. A efectos de la inspección de una actividad ya en
 funcionamiento, el artículo 25.2 aplica solo los dos últimos.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rd1367_chain_es.svg" alt="Cuatro etapas de izquierda a derecha. Primero una franja de 24 horas partida en los periodos día, tarde y noche del RD 1367 a las 07:00, 19:00 y 23:00, con la franja del día dividida en las tres fases del ejemplo resuelto de 2, 6 y 4 horas. Segundo, cada fase llevando LAeq,Ti más Kt más Kf más Ki hasta LKeq,Ti con el tope de 9 dB anotado. Tercero, la media energética ponderada por duración hasta el nivel del periodo LKeq,x con round_reported_level aplicado. Cuarto, la media anual ponderada por días de funcionamiento hasta LK,x, redondeada de nuevo, que alimenta tres cajas de comparación en paralelo: la fase peor frente al límite más 5 dB, el valor diario frente al límite más 3 dB y el valor anual frente al propio límite, con una nota de que el artículo 25.2 suprime la tercera para una actividad ya en funcionamiento" width="92%" />
+
 ## Ejemplo resuelto: una actividad nueva sobre suelo residencial
 
 Una actividad nueva situada sobre suelo residencial (área acústica de tipo a)
@@ -195,7 +315,7 @@ entre las 9 y las 15 h; el resto del horario los niveles son estables, y
 cuando la actividad está cerrada no emite ruido. Los niveles medidos en el
 exterior, ya corregidos por ruido de fondo, son:
 
-| Fase | $L_{Aeq,5s}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,5s}$ |
+| Fase | $L_{Aeq,T_i}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,T_i}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Con la máquina ruidosa | 50 dB | 6 | 3 | 0 | 9 | 59 dB |
 | Resto del horario | 48 dB | 3 | 3 | 0 | 6 | 54 dB |
@@ -253,13 +373,20 @@ plt.show()
 
 </details>
 
-El veredicto es el punto fino del ejemplo. Los $L_{Keq,Ti}$ medidos (59 y
+El veredicto es el matiz del ejemplo. Los $L_{Keq,Ti}$ medidos (59 y
 54 dB) quedan por debajo de 60 dB, y los diarios (57 y 51 dB) por debajo de
 58 dB, pero el promedio anual del periodo día, $L_{K,d} = 56$ dB, supera los
 55 dB de la tabla. Una actividad **nueva** no cumple. Una actividad que ya
 estuviera en funcionamiento, juzgada por el artículo 25.2, sí cumpliría, porque
-a ella solo se le exigen los valores por fase y los diarios; basta con
-construir el veredicto con `new_activity=False` para verlo.
+a ella solo se le exigen los valores por fase y los diarios:
+
+```python
+existing = environment.assess_activity(
+    {"day": day, "evening": evening}, limits, operating_days=303,
+    new_activity=False,
+)
+print(existing.complies)                 # True: el criterio anual no se aplica
+```
 
 ## Gráficos e informe de inspección
 
@@ -293,7 +420,7 @@ verdict.report("acta.pdf")           # acta de inspección acústica, en españo
 ```
 
 El acta de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="rd1367_activity_example"

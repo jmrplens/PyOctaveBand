@@ -38,6 +38,35 @@ qué trabajo, y las alternativas de presión e intensidad, se sopesan en
 
 ## 1. Cámara reverberante, grado de precisión (ISO 3741)
 
+Los dos métodos están definidos sobre las **bandas de tercio de octava de
+100 Hz a 10 kHz** (apartado 8.1). El Anexo E extiende ese rango hacia abajo
+hasta 50 Hz de forma informativa; nada lo extiende hacia arriba. El límite
+inferior lo fija la densidad modal de la cámara, que es la razón de que la
+Tabla 1 empareje la banda de interés más baja con un volumen mínimo —
+200 m³ a 100 Hz, 150 m³ a 125 Hz, 100 m³ a 160 Hz, 70 m³ de 200 Hz hacia
+arriba —
+y el límite superior lo fija la absorción del aire. La fuente en ensayo no debe
+ser mayor de aproximadamente el **2 % del volumen de la cámara** (apartado 1.2;
+hasta el 5 % solo cuando un código de ensayo de ruido dice lo que eso cuesta en
+incertidumbre), para que no cargue el campo en el que se la está midiendo, y
+debe ser estacionaria durante el intervalo de medida: la Ec. 20 promedia en
+energía y da un ritmo de flujo de energía, así que caracteriza a la máquina solo
+si la máquina es invariante en el tiempo mientras funciona. Un suceso aislado
+— una carrera de prensa, un portazo — se describe en cambio con el nivel de
+energía acústica $L_J$ del apartado 9.2, que aquí no está implementado.
+
+El fondo debe quedar al menos **6 dB** por debajo del nivel de fuente en las
+bandas de tercio de octava de 200 Hz y por debajo y de 6,3 kHz y por encima, y al
+menos **10 dB** por debajo entre 250 Hz y 5 kHz (apartado 5.4.1.1) — una pareja
+de criterios más estricta que los 6 dB planos de los métodos de superficie
+envolvente, que es lo que significa «el criterio ISO 3741 depende de la
+frecuencia» en la tabla de parámetros de abajo. Por debajo de esos márgenes
+`sound_power_reverberation` acota $K_1$ al valor que produce el propio criterio
+(1,26 dB y 0,46 dB respectivamente), avisa, y la banda pasa a ser una cota
+superior en lugar de una determinación. Una banda cuya contribución ponderada A
+corregida quede al menos 15 dB por debajo de la mayor puede en cambio retirarse
+por completo del rango de interés (apartado 5.4.1.2).
+
 En una **cámara reverberante** cualificada de paredes rígidas el campo es
 difuso, así que un puñado de micrófonos muestrea toda la energía radiada y el
 método alcanza el grado 1. La potencia acústica proviene del nivel medio de la
@@ -62,13 +91,25 @@ C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273{,}15 + \theta}{314}
 C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273{,}15 + \theta}{296},
 $$
 
-con la velocidad del sonido $c = 20{,}05\sqrt{273 + \theta}$. El **método de
-comparación** sustituye los términos de área de absorción, Waterhouse y $C_1$
-por una fuente sonora de referencia de potencia conocida $L_W(\text{RSS})$
-medida en la misma cámara, de modo que la cámara no necesita caracterizarse:
-$L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
+con la velocidad del sonido $c = 20{,}05\sqrt{273 + \theta}$.
 
-El panel derecho del clip de abajo es este método. La misma fuente suena en
+Dos de los cinco términos se suelen dejar sin explicar. Los **−6 dB** son la
+propia relación de campo difuso: en un campo difuso la potencia que una fuente
+inyecta en la cámara vale $\bar{p}^2 A/(4\rho c)$, y expresar eso frente a las
+dos magnitudes de referencia deja una constante que, con las referencias de
+estas normas, es −6 dB. El término **4,34 A/S** es la corrección de primer orden
+del área de absorción de Sabine hacia el valor de Eyring; 4,34 es $10\lg e$ y
+$A/S$ es el coeficiente de absorción medio de la cámara, así que el término es
+pequeño en una cámara rígida y crece a medida que la cámara se amortigua. En el
+ejemplo de abajo, $A = 16{,}1$ m² frente a $S = 220$ m², de modo que aporta
+**0,32 dB** en todas las bandas — despreciable aquí, y el primer término a
+vigilar cuando el tiempo de reverberación se acerca al suelo de cualificación.
+El término de Waterhouse va al revés, **1,68 dB a 100 Hz** y 0,02 dB a 10 kHz
+sobre esos mismos datos: las bandas graves las manda la energía de contorno que
+los micrófonos del interior no captan, y las agudas, el área de absorción.
+
+El panel derecho del clip de abajo es la cámara reverberante. La misma fuente
+suena en
 las dos salas; en la cámara anecoica de la izquierda los micrófonos solo ven
 lo que la fuente les envía, así que el nivel cae con la distancia y la vía de
 campo libre tiene que integrar sobre una superficie de medición, mientras que
@@ -84,9 +125,64 @@ y no de la sala en la que se mide.
   name="anim_power_two_rooms"
   width={2400}
   height={1350}
-  title="La misma fuente, dos salas, una sola potencia acústica"
-  description="La misma fuente en una cámara anecoica y en una cámara reverberante produce presiones distintas en los micrófonos, y las fórmulas de campo libre y de campo difuso convergen al mismo nivel de potencia acústica L_W."
+  title="La misma fuente, dos salas, una potencia acústica"
+  description="La misma fuente en una cámara anecoica y en una cámara reverberante produce presiones de micrófono distintas, y las fórmulas de campo libre y campo difuso convergen al mismo nivel de potencia acústica L_W."
 />
+
+### Dónde van los micrófonos y la fuente
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_power_es.svg" alt="Dos plantas de la misma cámara reverberante de ensayo de ISO 3741 con paredes rígidas no paralelas. A la izquierda el método directo: la fuente en ensayo sobre el suelo a más de 1,5 m de cada pared y colocada de forma asimétrica, seis posiciones de micrófono numeradas, cada una a más de 1,0 m de toda superficie de la sala y a más de d_min de la fuente, con una separación mutua de al menos media longitud de onda, un difusor colgado y un recorrido circular discontinuo que marca la alternativa de recorrido continuo. A la derecha el método de comparación: las mismas seis posiciones, la fuente en ensayo dejada en su sitio y la fuente sonora de referencia sobre el suelo a más de 1,5 m de las paredes y de la fuente en ensayo. Una franja al pie da d_min = D1 raíz de V entre T60 calculado para V = 200 metros cúbicos y T60 = 2 segundos, las cinco condiciones del recorrido, los tiempos de promediado y la regla del tiempo de reverberación" width="96%" />
+
+Todo lo que hace la Ec. 20 descansa en que el conjunto de micrófonos esté en la
+parte reverberante del campo, y la norma lo fija con una sola distancia. La
+fuente se sitúa **sobre el suelo, a más de 1,5 m de cualquier pared** y, en una
+sala rectangular, de forma asimétrica (apartado 7.3), para que no se acople
+preferentemente a una familia de modos. El micrófono más próximo debe entonces
+guardar
+
+$$
+d_{\min} = D_1 \sqrt{\frac{V}{T_{60}}}, \qquad D_1 = 0{,}08 ,
+$$
+
+con $D_1 = 0{,}16$ muy recomendado por debajo de 5 kHz (apartado 8.3, Ec. 8).
+Para la cámara del ejemplo de abajo, $V = 200$ m³ y $T_{60} = 2{,}0$ s, eso son
+$d_{\min} = 0{,}8$ m, o **1,6 m** con el $D_1$ recomendado — así que un
+micrófono a 1 m de la fuente ya está dentro del campo próximo que este método no
+está midiendo.
+
+Si la cámara no se ha cualificado para tonos discretos según el Anexo D, el
+conjunto son **seis posiciones discretas**, cada una a más de 1,0 m de cualquier
+superficie de la sala, a más de $d_{\min}$ de la fuente y separadas entre sí al
+menos media longitud de onda en la banda de interés más baja (1,7 m a 100 Hz).
+Un recorrido continuo puede sustituirlas para los niveles en sí, siempre que
+cada punto del recorrido guarde $d_{\min}$ respecto de la fuente y 1,0 m
+respecto de cualquier superficie de la sala, se mantenga a 0,5 m de todo
+difusor, no quede en un plano a menos de 10° de una superficie de la sala y
+recorra al menos $3\lambda$ o 10,3 m, lo que sea menor. Las seis posiciones
+discretas siguen haciendo falta para estimar las desviaciones típicas de abajo.
+
+Cada nivel se promedia en el tiempo al menos **30 s** en las bandas centradas en
+160 Hz y por debajo, y al menos **10 s** de 200 Hz hacia arriba (apartado 8.4.1)
+— las bandas graves necesitan el intervalo largo porque un campo difuso es un
+promedio modal, y ahí abajo hay pocos modos que promediar. Un micrófono en
+recorrido debe cubrir al menos dos recorridos completos. La lectura de fondo se
+toma inmediatamente antes o inmediatamente después de la lectura con la fuente,
+en las mismas posiciones y sobre el mismo intervalo; eso es `background_levels`,
+y un espectro medido otro día no lo es.
+
+El `SoundPowerWarning` con una dispersión entre posiciones de 1,5 dB es la
+entrada a la ampliación, no un defecto en sí mismo. El apartado 8.4.2.2 calcula
+la desviación típica $s_M$ de los seis niveles iniciales banda a banda (Ec. 10);
+por encima de 1,5 dB en alguna banda la fuente está radiando componentes
+discretas significativas para esa cámara, y la respuesta es *muestrear más*, no
+otra fórmula: o se cualifica la cámara según el Anexo D, o se lee el número de
+posiciones necesario en la Tabla 4 — seis siguen siendo seis hasta 160 Hz, pero
+de 400 Hz a 630 Hz pasan a 12 posiciones para $1{,}5 < s_M \le 3$ dB y a 24 por
+encima de 3 dB, y de 800 Hz hacia arriba a 15 y 30 — y se añaden posiciones de
+fuente según la Ec. 12 y la Tabla 5. Promediar más tiempo en seis posiciones no
+compra nada aquí, porque la dispersión es espacial. El número de posiciones, la
+geometría del recorrido y el intervalo de medida van todos en el informe de
+ensayo.
 
 ```python
 import numpy as np
@@ -172,6 +268,51 @@ o el número de micrófonos incumplen un criterio de cualificación de ISO 3741
 posiciones, o una dispersión entre posiciones superior a 1,5 dB), se emite un
 `SoundPowerWarning` de aviso y el resultado se devuelve igualmente.
 
+Los cinco términos de la Ec. 20 comentados arriba son todos campos de ese mismo
+`rev`, así que el equilibrio entre ellos se puede dibujar sin más:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/reverberation_correction_terms_es.svg" alt="Barras apiladas sobre las 21 bandas de tercio de octava de 100 Hz a 10 kHz que muestran lo que aporta cada término de la Ec. 20 de ISO 3741 a la diferencia entre el nivel de potencia acústica y el nivel medio de la cámara. El término de área de absorción es una constante de 12,1 dB, el término 4,34 A entre S una constante de 0,32 dB, el término de Waterhouse cae de 1,68 dB a 100 Hz hasta casi nada en 10 kHz, los términos meteorológicos son una fracción de decibelio y la constante de menos 6 dB se dibuja hacia abajo; una línea encima traza la diferencia resultante, de 7,9 dB a 100 Hz a 6,2 dB a 10 kHz" width="92%" />
+
+*Toda la Ec. 20, banda a banda, sobre el ejemplo de abajo. El área de absorción
+sostiene la determinación; el término de Waterhouse es el único con dependencia
+real de la frecuencia y vive por completo en las bandas graves; y la pareja
+meteorológica es una fracción de decibelio en condiciones normales — que es
+justo por lo que merece la pena decir que el término que todo el mundo omite,
+4,34 A/S, crece con la absorción de la cámara y no con la frecuencia.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# Cada término es un campo del resultado que devuelve el primer fragmento de
+# esta página.
+absorcion = 10.0 * np.log10(rev.absorption_area)
+eyring = 4.34 * rev.absorption_area / 220.0
+terminos = [("10 lg(A/A0)", absorcion), ("4,34 A/S", eyring),
+            ("Waterhouse", rev.waterhouse_correction),
+            ("C1 + C2", np.full(freqs.size, rev.c1 + rev.c2)),
+            ("-6 dB", np.full(freqs.size, -6.0))]
+
+x = np.arange(freqs.size)
+arriba = np.zeros(freqs.size)
+abajo = np.zeros(freqs.size)
+fig, ax = plt.subplots(figsize=(11, 5.6))
+for etiqueta, valores in terminos:
+    ax.bar(x, valores, bottom=np.where(valores >= 0.0, arriba, abajo),
+           width=0.72, label=etiqueta)
+    arriba = arriba + np.clip(valores, 0.0, None)
+    abajo = abajo + np.clip(valores, None, 0.0)
+ax.plot(x, rev.sound_power_level - lp, "o-", label="LW - Lp")
+ax.set_xticks(x, [f"{f:g}" for f in freqs], rotation=60)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Aportación a LW - Lp [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ### Parámetros de `sound_power_reverberation()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
@@ -185,6 +326,63 @@ posiciones, o una dispersión entre posiciones superior a 1,5 dB), se emite un
 | `temperature` | float | °C | por defecto `23.0` | Fija $c$, $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | por defecto `101.325` | Fija $C_1$, $C_2$ |
 
+Tanto esta función como el método de comparación de la sección 2 devuelven un
+`ReverberationSoundPowerResult`
+(`sound_power_level`, `mean_pressure_level`, `absorption_area`,
+`waterhouse_correction`, `background_correction`, `c1`, `c2`,
+`speed_of_sound`, `sound_power_level_a`, `method`).
+
+## 2. El método de comparación (Ec. 21)
+
+El método de comparación sustituye los términos de área de absorción, Waterhouse
+y $C_1$ por una **fuente sonora de referencia** de potencia conocida
+$L_W(\text{RSS})$ puesta en marcha en la misma cámara, de modo que la cámara
+nunca llega a caracterizarse:
+
+$$
+L_W = L_W(\text{RSS}) + \left( L_p(\text{ST}) - L_p(\text{RSS}) + C_2 \right).
+$$
+
+Una fuente sonora de referencia es una pequeña fuente aerodinámica de banda
+ancha y salida estable cuyo nivel de potencia acústica por bandas se ha
+calibrado según ISO 6926, y es esa calibración — no la cámara — la que ahora
+sostiene la determinación. El $L_W(\text{RSS})$ calibrado se declara para las
+condiciones meteorológicas de referencia, que es la razón de que $C_2$ sobreviva
+en la Ec. 21 mientras que $C_1$ y los términos de la cámara se cancelan.
+
+El procedimiento son dos mediciones y dos fondos. La fuente de ensayo se mide
+primero, en las seis posiciones o sobre el recorrido de la sección 1. La RSS se
+pone después en marcha **en la misma cámara, en las mismas posiciones de
+micrófono o sobre el mismo recorrido**, con la fuente en ensayo dejada donde
+estaba, y con su propia lectura de fondo (para eso está `background_levels_ref`).
+La RSS se sitúa sobre el suelo a más de 1,5 m de las paredes; la posición
+preferida es la que ocupa la fuente en ensayo, y cuando esta no se puede mover,
+la RSS se coloca lo más cerca de ella que resulte practicable, pero nunca a menos
+de 1,5 m (apartado 8.6.1). Basta una posición de RSS aunque la fuente en ensayo
+necesite varias. Las dos mediciones deben hacerse a la misma temperatura,
+presión y humedad (apartado 8.6.2).
+
+Como la RSS aporta la constante de la sala, la distancia mínima entre fuente y
+micrófono puede tomarse también de la propia lectura de la RSS (apartado 8.3,
+Ec. 9), $d_{\min} = D_2 \cdot 10^{0{,}05 (L_{Wr} - L_{pr})}$ con $D_2 = 0{,}4$ y
+0,8 recomendado por debajo de 5 kHz. En el ejemplo de abajo,
+$L_{Wr} - L_{pr} = 7$ dB en la banda de 100 Hz, así que
+$d_{\min} = 0{,}90$ m, o 1,8 m con el $D_2$ recomendado — lo bastante cerca de
+los 0,8/1,6 m de la Ec. 8 como para servir de contraste útil.
+
+Lo que compra y lo que cuesta: nada de $T_{60}$, nada de volumen, nada de
+superficie y nada de término de Waterhouse, así que una cámara que nunca se ha
+caracterizado puede aun así devolver una determinación — y, en correspondencia,
+`absorption_area`, `waterhouse_correction` y `c1` vuelven como `NaN`, porque el
+método no llega a calcularlos. Lo que cuesta es que el resultado hereda entera la
+calibración de la RSS, de modo que una fuente con el certificado ISO 6926
+caducado sesga en silencio todas las bandas, y la posición de la RSS tiene que
+muestrear la cámara como lo hace la fuente de ensayo o la diferencia
+$L_p(\text{ST}) - L_p(\text{RSS})$ estará midiendo las dos posiciones en lugar
+de las dos fuentes.
+
+### Parámetros de `sound_power_comparison()`
+
 `sound_power_comparison(levels, levels_ref, lw_ref, *, frequencies=None,
 background_levels=…, background_levels_ref=…, temperature=23.0,
 static_pressure=101.325)` toma los mismos niveles de cámara más los niveles de la
@@ -193,20 +391,16 @@ fuente de referencia y su potencia conocida.
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `levels_ref` | array 1D o 2D | dB | coincide con `levels` | SPL medio de cámara con la fuente de referencia (RSS) en marcha |
-| `lw_ref` | array 1D | dB | por banda | Potencia acústica conocida $L_W(\text{RSS})$ de la fuente de referencia |
+| `lw_ref` | array 1D | dB | por banda | Potencia acústica conocida $L_W(\text{RSS})$ de la fuente de referencia, de su calibración ISO 6926 |
 | `background_levels` | array 1D o 2D | dB | coincide con `levels` | Ruido de fondo de la fuente de ensayo; $K_1$ por banda sobre $L_p(\text{ST})$ |
 | `background_levels_ref` | array 1D o 2D | dB | coincide con `levels_ref` | Ruido de fondo de la fuente de **referencia**; $K_1$ por banda sobre $L_p(\text{RSS})$ |
 
 `background_levels_ref` corrige por ruido de fondo el nivel de cámara de la fuente
 de referencia $L_p(\text{RSS})$ igual que `background_levels` lo hace para la
 fuente de ensayo; ambos requieren `frequencies` (el criterio ISO 3741 depende de
-la frecuencia). Ambas devuelven un
-`ReverberationSoundPowerResult` (`sound_power_level`, `mean_pressure_level`,
-`absorption_area`, `waterhouse_correction`, `background_correction`, `c1`, `c2`,
-`speed_of_sound`, `sound_power_level_a`, `method`; los campos de
-absorción/Waterhouse/`c1` son `NaN` para el método de comparación).
+la frecuencia).
 
-## 2. El informe de medición (`.report()`)
+## 3. El informe de medición (`.report()`)
 
 El resultado en cámara reverberante (`ReverberationSoundPowerResult`, ISO 3741)
 escribe mediante su propio `.report()` una ficha PDF de una página con el
@@ -256,6 +450,15 @@ res.report(
 )   # LWA = 94,3 dB(A) re 1 pW -> límite declarado 96 dB(A): CUMPLE
 ```
 
+Un matiz sobre ese ejemplo: ejecuta la Ec. 20 sobre bandas de **octava** por
+compacidad, y eso no es una determinación ISO 3741 conforme. Los dos métodos
+están definidos sobre bandas de tercio de octava, y los resultados por octava se
+forman después sumando las potencias de banda de tercio de octava según el
+Anexo F (Ec. F.1), no metiendo niveles de octava en la Ec. 20 — los términos de
+Waterhouse y de absorción dependen de la frecuencia y quedarían entonces
+evaluados en la frecuencia central de la octava en vez de en cada tercio. El
+ejemplo de la sección 1, de 100 Hz a 10 kHz en tercios, es la forma conforme.
+
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
 el repositorio; pulsa la vista previa para abrir el PDF.
 
@@ -278,13 +481,18 @@ corrección de fondo por banda y el total ponderado A del Anexo F,
 presentados como ficha de potencia acústica de estilo acreditado mediante
 `.report()`.
 
-**No cubierto.** La propia cualificación de la cámara reverberante
+**No cubierto.** El nivel de energía acústica $L_J$ del apartado 9.2, la
+contrapartida para sucesos aislados de $L_W$ definida en los mismos apartados, no
+está implementado, así que una fuente impulsiva o de suceso aislado cae fuera de
+esta guía. Tampoco lo está la suma en bandas de octava del Anexo F, de modo que
+los resultados por octava hay que sumarlos a mano a partir de las potencias de
+banda de tercio de octava. La propia cualificación de la cámara reverberante
 (Anexo C/D, recuento de frecuencias propias o comparación con una fuente de
 referencia) se da por supuesta, no se ejecuta; la biblioteca solo avisa de
 los criterios orientativos que ISO 3741 declara explícitamente (el volumen
 mínimo de la Tabla 1, el suelo de reverberación $V/S$, menos de 6 posiciones,
 una dispersión entre posiciones superior a 1,5 dB). La elección entre las
-cinco vías, y la declaración ISO 4871 que un resultado alimenta, viven en
+seis vías, y la declaración ISO 4871 que un resultado alimenta, viven en
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 
 ## Véase también

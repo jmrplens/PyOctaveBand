@@ -49,11 +49,50 @@ dan cuenta de la duplicación de presión en la placa del suelo.
 ```python
 from phonometry import environment
 
-# Niveles de banda de tercio de octava ponderados A y corregidos de fondo L_p,i (dB).
-band_levels = [55.0, 58.0, 60.0, 57.0, 54.0]
+# Niveles de banda de tercio de octava ponderados A y corregidos de fondo L_p,i (dB),
+# aquí las bandas de 250 Hz a 1 kHz de una medida sobre placa a sotavento.
+band_levels = [55.0, 58.0, 60.0, 57.0, 54.0]          # 250, 400, 500, 800, 1000 Hz
 r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
+print(round(r1, 2))                                   # 152.64 m
 lwa = environment.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
+print(round(float(lwa), 2))                           # 112.98 dB(A) re 1 pW
 ```
+
+### La posición de medida en la práctica
+
+Los −6 dB de arriba solo son la duplicación de presión de la placa si la placa es
+de verdad una placa. La IEC 61400-11:2012+A1:2018 fija lo que eso significa, y un
+micrófono en trípode o una plancha pequeña dan una reflexión incoherente, lo que
+desvía la potencia acústica aparente en una cantidad desconocida en lugar de
+corregible.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_board_es.svg" alt="Dos paneles del montaje del micrófono sobre placa en el suelo de la IEC 61400-11. Planta: la placa circular con su diámetro mínimo de 1,0 m acotado, el micrófono en el centro con su eje apuntando al aerogenerador, y la línea de partición opcional dibujada fuera del eje central y paralela a ese eje, con su holgura máxima de 1 mm indicada. Sección: el borde de la placa con un cordón de tierra que nivela la holgura de debajo, el espesor de la placa anotado como al menos 12,0 mm para contrachapado o tablero duro de partículas y al menos 2,5 mm para metal, la cápsula con su diafragma en el plano de la placa y un diámetro de como mucho 13 mm, la pantalla antiviento principal dibujada como media esfera de espuma de célula abierta de unos 90 mm centrada en el diafragma, y una pantalla antiviento secundaria en trazo tenue etiquetada como utilizable solo con viento fuerte y solo si su pérdida por inserción está documentada y corregida banda a banda" width="92%" />
+
+| Requisito | Valor | Apartado |
+| :--- | :--- | :--- |
+| Cadena de medida | Clase 1 de IEC 61672; filtros de clase 1 de IEC 61260; 1/3 de octava de 20 Hz a 10 kHz determinados simultáneamente; banda estrecha de 20 Hz a 11 200 Hz | 6.1.2, 6.1.3, 6.1.4 |
+| Diafragma del micrófono | ≤ 13 mm, en un plano **normal a la placa**, con el eje apuntando al aerogenerador | 6.1.2, 6.1.5 |
+| Placa | Circular, diámetro ≥ 1,0 m, acústicamente dura: contrachapado o tablero duro de partículas ≥ 12,0 mm, o metal ≥ 2,5 mm | 6.1.5 |
+| Placa partida | Piezas niveladas en un mismo plano, holgura < 1 mm, partición fuera del eje central y **paralela** al eje del micrófono | 6.1.5 |
+| Asiento | Plana sobre el suelo, con bordes y holguras de debajo nivelados con tierra | 7.1 |
+| Pantalla antiviento | Principal: media esfera de espuma de célula abierta de ≈ 90 mm, centrada en el diafragma. Secundaria solo cuando un viento fuerte hace insuficiente la relación señal-ruido a baja frecuencia, y entonces hay que documentar su respuesta en frecuencia y **corregirla en bandas de 1/3 de octava** | 6.1.5, Anexo E |
+| Dirección | Dentro de ±15° de la dirección de sotavento en el momento de la medida | 7.1 |
+| Distancia | $R_0$ con ±20 %, como mucho ±30 m, medida con ±2 %, y lo más cerca posible de $R_0$; usar la tolerancia hay que justificarlo en el informe | 7.1 |
+| Inclinación | $\varphi$ entre 25° y 40°, ajustando la posición dentro de las tolerancias anteriores si hace falta | 7.1 |
+| Reflexiones | La influencia calculada de cualquier estructura reflectante < 0,2 dB | 7.1 |
+| Calibración | Calibrador de clase 1 según IEC 60942 sobre el micrófono inmediatamente **antes y después** de cada sesión, y de nuevo cada vez que se desconecta y se vuelve a conectar un micrófono | 6.1.6, 7.2.2 |
+| Verificación trazable | Calibrador acústico 12 meses; micrófono, sonómetro, grabador, anemómetro y transductores de potencia y temperatura 24 meses; analizador de espectro 36 meses | 6.3 |
+
+Merece la pena quedarse con la cadena causal. La placa es lo que hace coherente
+la reflexión, así que la placa decide si los −6 dB son una constante o una
+conjetura; la semiesfera de espuma es lo que impide que el viento que impulsa la
+emisión impulse además el ruido propio del micrófono; y la pantalla antiviento
+secundaria es la única pieza del montaje que cambia la respuesta sin cambiar el
+sonido, y por eso la norma convierte su pérdida por inserción en una corrección
+documentada y banda a banda en lugar de en una pérdida aceptada. Se exige una
+posición de medida y hay tres opcionales: la posición de referencia es a
+sotavento y las demás existen para documentar cómo varía la emisión alrededor de
+la máquina, no para promediarse con ella.
 
 ### Por qué «aparente»
 
@@ -85,30 +124,72 @@ suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
 La emisión de ruido de un aerogenerador crece con la velocidad del viento
 hacia la potencia nominal, así que un número único no significaría nada sin
 su punto de operación: la IEC 61400-11 declara $L_{WA}$ *en función de la
-velocidad del viento*. Sonido y viento se registran en promedios
-sincronizados de 10 s, y cada periodo se clasifica en una **clase de
-velocidad de viento de 0,5 m/s de ancho centrada en velocidades enteras y
-semienteras a altura de buje**, con al menos 10 periodos de ruido total y 10
-de fondo (turbina parada) por clase. La propia velocidad a altura de buje
-preferiblemente no es una lectura de anemómetro: se deriva de la potencia
-eléctrica medida a través de la curva de potencia de la turbina (apartado
-8.2.1), el sustituto más repetible del viento que el rotor ve de verdad, con
-el anemómetro de góndola y el mástil meteorológico como alternativas. El
-rango medido debe cubrir al menos de 0,8 a 1,3 veces la velocidad de viento
-al 85 % de la potencia máxima (aproximadamente de 6 a 10 m/s a 10 m de
-altura para una máquina grande). Dentro de cada clase los espectros se
-promedian, se interpolan al centro de la clase y se corrigen por fondo; un
-margen total-menos-fondo de 3 dB o menos anula la clase, y entre 3 y 6 dB
-la marca con un asterisco. Por comparabilidad con condiciones de licencia y
-ediciones anteriores, la Fórmula (29) también convierte cada resultado a la
-velocidad de viento a 10 m de altura sobre una **longitud de rugosidad de
-referencia** $z_{0ref} = 0{,}05$ m (un perfil de viento logarítmico), dando
-$L_{WA,10m}$ a velocidades enteras a 10 m sea cual sea el terreno real del
-emplazamiento. La biblioteca implementa las magnitudes en forma cerrada de
-esta cadena (distancia oblicua, potencia aparente por banda, audibilidad
-tonal); la clasificación en clases, el promediado y la maquinaria de
+velocidad del viento*.
+
+**Cómo se llena una clase.** Sonido y viento se registran en promedios
+sincronizados de 10 s, y cada periodo se clasifica en una **clase de velocidad de
+viento de 0,5 m/s de ancho centrada en velocidades enteras y semienteras a altura
+de buje**, con al menos 10 periodos de ruido total y 10 de fondo (turbina parada)
+por clase. Dentro de cada clase los espectros se promedian, se interpolan al
+centro de la clase y se corrigen por fondo; un margen total-menos-fondo de 3 dB o
+menos anula la clase, y entre 3 y 6 dB la marca con un asterisco.
+
+**De dónde sale la velocidad del viento.** Preferiblemente no de un anemómetro:
+se deriva de la potencia eléctrica medida a través de la curva de potencia de la
+turbina (apartado 8.2.1), el sustituto más repetible del viento que el rotor ve
+de verdad, con el anemómetro de góndola y el mástil meteorológico como
+alternativas. El rango medido debe cubrir al menos de 0,8 a 1,3 veces la
+velocidad de viento al 85 % de la potencia máxima (aproximadamente de 6 a 10 m/s
+a 10 m de altura para una máquina grande).
+
+**Por qué la abscisa se declara dos veces.** Por comparabilidad con condiciones
+de licencia y ediciones anteriores, la Fórmula (29) también convierte cada
+resultado a la velocidad de viento a 10 m de altura sobre una **longitud de
+rugosidad de referencia** $z_{0ref} = 0{,}05$ m (un perfil de viento
+logarítmico), dando $L_{WA,10m}$ a velocidades enteras a 10 m sea cual sea el
+terreno real del emplazamiento. La biblioteca implementa las magnitudes en forma
+cerrada de esta cadena (distancia oblicua, potencia aparente por banda,
+audibilidad tonal); la clasificación en clases, el promediado y la maquinaria de
 incertidumbre operan sobre campañas de medida completas y quedan fuera de
 alcance.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_apparent_power_es.svg" alt="El nivel de potencia acústica aparente ponderado A de un aerogenerador de 80 m de buje y 100 m de rotor frente a la velocidad del viento a altura de buje, con un marcador por cada clase de 0,5 metros por segundo de 4 a 12 metros por segundo. La curva sube desde unos 98,6 dB a 4 metros por segundo, pasa por su tramo más pronunciado cerca de 7 metros por segundo y se aplana en torno a 110 dB por encima de 10 metros por segundo cuando la máquina alcanza la potencia nominal. Una clase baja aparece sombreada y tachada porque su margen total menos fondo es inferior a 3 dB, y una clase vecina lleva un asterisco porque su margen está entre 3 y 6 dB. Una abscisa gemela sobre la gráfica repite la misma serie frente a la velocidad del viento a 10 m de altura de la Fórmula 29 sobre la longitud de rugosidad de referencia de 0,05 m" width="88%" />
+
+*La magnitud que declara esta norma es una curva, no un número: la misma máquina
+da 98,6 dB(A) a 4 m/s y 109,9 dB(A) a 12 m/s. La forma es la estrategia de
+control de la máquina, más pronunciada donde el rotor acelera y plana una vez a
+potencia nominal, así que citar un $L_{WA}$ único sin su velocidad de viento no
+dice nada. La clase tachada y la marcada con asterisco son la propia
+contabilidad de la norma: por debajo de un margen total-menos-fondo de 3 dB la
+clase se anula, y entre 3 y 6 dB se declara con una marca. El eje superior es la
+misma serie frente a la velocidad de viento de referencia a 10 m de la Fórmula
+(29), que es en la que se suele redactar una condición de licencia y no es la
+velocidad que vio el rotor.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment` se importa en el fragmento de arriba. Los niveles de banda por
+# clase de aquí son sintéticos: una campaña real los aporta, corregidos de fondo
+# e interpolados al centro de la clase.
+r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
+bins = np.arange(4.0, 12.5, 0.5)
+shape = np.array([-4.0, -1.5, 0.0, -1.0, -3.0])   # de 250 Hz a 1 kHz
+lwa = [float(environment.apparent_sound_power_level(
+    44.0 + 12.0 / (1.0 + np.exp(-(v - 7.0))) + shape, r1)) for v in bins]
+
+fig, ax = plt.subplots()
+ax.plot(bins, lwa, "o-")
+ax.set_xlabel("Velocidad del viento a altura de buje [m/s]")
+ax.set_ylabel("Nivel de potencia acústica aparente LWA [dB(A) re 1 pW]")
+plt.show()
+```
+
+</details>
 
 ## Audibilidad tonal
 
@@ -121,12 +202,66 @@ deben además quedar a menos de 10 dB de la línea *más alta* por encima del
 umbral, y esa línea más alta es la frecuencia del tono, apartados
 9.5.3/9.5.4). El propio candidato debe superar antes el cribado de *tono
 posible* de 9.5.2: un máximo local más de 6 dB por encima de la media
-energética de la banda excluyendo el máximo y sus líneas adyacentes. El nivel
+energética de la banda excluyendo el máximo y sus líneas adyacentes.
+
+Para un candidato entre **20 y 70 Hz** la expresión de Zwicker no tiene sentido,
+porque está en el extremo inferior del rango audible, y el apartado 9.5.3 la
+sustituye por la **banda absoluta fija de 20 a 120 Hz**. El
+`critical_bandwidth` devuelto vale entonces 100 Hz para todo candidato de ese
+tipo y la banda *no está centrada en el tono*, razón por la que un
+`WindTurbineTonalityResult` de baja frecuencia no cuadra con la
+fórmula impresa más arriba. Para un aerogenerador eso no es un caso raro: los
+armónicos del paso de pala y los tonos de multiplicadora a baja velocidad viven
+exactamente ahí. El nivel
 de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
 $\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
 $\Delta L_a = \Delta L_{tn} - L_a$ con
 $L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, declarada cuando
 $\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_audibility_criterion_es.svg" alt="Dos paneles frente a la frecuencia del tono en eje logarítmico de 20 Hz a 10 kHz. Izquierda: el ancho de banda crítico de la IEC 61400-11, plano cerca de 100 Hz en las bandas bajas y medias y abriéndose con fuerza por encima de 500 Hz hasta 2 kHz de ancho a 10 kHz, con la banda fija de baja frecuencia de 20 a 120 Hz del apartado 9.5.3 dibujada como un segmento plano aparte sobre el rango de candidatos de 20 a 70 Hz y el ancho de banda de la Tabla C.1 de ISO 1996-2 dibujado como línea escalonada a trazos para contrastar. Derecha: el criterio de audibilidad La, que baja de menos 2 dB a baja frecuencia hasta menos 4,5 dB a 5 kHz, redibujado como la tonalidad que un tono tiene que alcanzar para ser audible y para ser declarable, de modo que un tono de 100 Hz necesita alrededor de medio decibelio más de emergencia que uno de 1 kHz" width="88%" />
+
+*Izquierda: en esta página conviven dos anchos de banda crítica distintos. La
+banda de Zwicker de la IEC 61400-11 es la que declara
+`WindTurbineTonalityResult.critical_bandwidth` (117,3 Hz para el tono de 500 Hz
+de la ficha de abajo), mientras que `environment.critical_bandwidth` es la banda
+de la **Tabla C.1 de ISO 1996-2**, 100 Hz hasta 500 Hz y el 20 % de $f_c$ por
+encima, que usa la vía de audibilidad tonal de ISO en la página de niveles
+ambientales. No son intercambiables. Derecha: el criterio es casi plano por
+debajo de 500 Hz y luego se estrecha, así que un tono de baja frecuencia se juzga
+con casi la misma emergencia que uno de frecuencia media; la línea de declarable
+queda 3 dB por debajo de la de audible en todo el rango.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment` es el módulo que importan los fragmentos de arriba.
+fc = np.geomspace(20.0, 10000.0, 400)
+zwicker = 25.0 + 75.0 * (1.0 + 1.4 * (fc / 1000.0) ** 2) ** 0.69
+la = -2.0 - np.log10(1.0 + (fc / 502.0) ** 2.5)
+
+fig, (izq, der) = plt.subplots(1, 2, figsize=(12, 4.4))
+izq.loglog(fc, zwicker, label="Banda crítica IEC 61400-11 (Zwicker)")
+izq.loglog(fc, [environment.critical_bandwidth(float(f)) for f in fc], "--",
+           label="Tabla C.1 de ISO 1996-2")
+izq.plot([20.0, 70.0], [100.0, 100.0], lw=4,
+         label="9.5.3: banda fija de 20 a 120 Hz")
+izq.set(xlabel="Frecuencia del tono fc [Hz]", ylabel="Ancho de banda crítico [Hz]")
+izq.legend(fontsize="small")
+
+der.semilogx(fc, -la, label="Tonalidad necesaria para ser audible")
+der.semilogx(fc, -la - 3.0, "--", label="Tonalidad necesaria para ser declarable")
+der.set(xlabel="Frecuencia del tono [Hz]",
+        ylabel="Tonalidad exigida dLtn [dB]")
+der.legend(fontsize="small")
+plt.show()
+```
+
+</details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />
 
@@ -242,6 +377,36 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de audibilidad tonal de aerogenerador (WindTurbineTonalityResult.report), audibilidad tonal ΔL_a en dB con la decisión de audibilidad."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** Las magnitudes en forma cerrada de la IEC 61400-11:2012+A1:2018:
+`slant_distance` (Fórmulas 1 y 2), `apparent_sound_power_level` (Fórmula 26) y
+la cadena de audibilidad tonal de los apartados 9.5.2 a 9.5.8 mediante
+`wind_turbine_tonality`, con su ficha `.report()`. Los requisitos de
+instrumentación y de posición de los apartados 6 y 7 están documentados arriba
+como las condiciones que esas fórmulas suponen, y las tolerancias de la posición
+de medida están dibujadas.
+
+**No cubierto.** La propia campaña de medida: el promediado de 10 s, la
+clasificación en clases de viento de 0,5 m/s con sus 10 + 10 periodos, la
+corrección por fondo, la interpolación a los centros de clase, la conversión de
+la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de incertidumbre del
+apartado 9.3 operan todos sobre campañas completas y son cosa del usuario.
+Tampoco está implementada la vía de declaración de la IEC TS 61400-14, que
+convierte un lote de máquinas medidas en el número único que recibe una
+administración urbanística. Y dos cosas que un lector de aerogeneradores viene a
+buscar a menudo quedan fuera de la IEC 61400-11 por completo: la **modulación de
+amplitud** (el «silbido», que queda englobado en el $L_{WA}$ y que esta norma no
+valora en ningún sitio) y el **infrasonido**. Las dos figuran en el 7.2.1 como
+medidas *opcionales* sin método de valoración asociado, así que su evaluación
+recae en las guías nacionales; la vía psicoacústica hacia ellas empieza en
+[Intensidad de fluctuación y aspereza](/phonometry/es/perception/psychoacoustics/sound-quality/)
+y en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/)
+para el nivel de infrasonido con ponderación G.
+
 ## Véase también
 
+- [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): el ajuste del nivel de evaluación de ISO 1996-2 que alimenta el $\Delta L_a$ de esta página.
+- [Audibilidad de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/): la misma idea de audibilidad tonal fuera del contexto de los aerogeneradores.
+- [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/): la cadena que lleva el $L_{WA}$ del rotor hasta una vivienda.
 - Referencia de la API: [`environment.sources.wind_turbine`](/phonometry/es/reference/api/environment/wind-turbine/).

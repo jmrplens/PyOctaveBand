@@ -261,7 +261,59 @@ plt.show()
 
 Each device returns a `ReactiveSilencerResult` with `transmission_loss`,
 `insertion_loss` (when source/radiation impedances are given), the compound
-`transfer_matrix`, the tuning `resonances` and `.plot()`.
+`transfer_matrix`, the tuning `resonances`, the `plane_wave_limit` of its widest
+cross section and `.plot()`. That last one is the validity ceiling: above the
+first higher-order cut-on the computed peaks and troughs do not survive, and the
+result raises a `PlaneWaveWarning` when the analysis grid runs past it (890.8 Hz
+for the 0.04 m² chamber above).
+
+**Test-report fiche.** `ReactiveSilencerResult.report(path)` renders a one-page
+fiche in the layout of a silencer performance sheet: a metadata header, the
+octave-band transmission-loss table beside the same curve plotted against
+frequency, and the boxed mean transmission loss over the analysis bands together
+with the peak value and the device kind, plus an optional verdict against a
+declared minimum mean transmission loss. Rendering needs reportlab and, for the
+embedded figure, matplotlib (`pip install "phonometry[report,plot]"`), and
+`language="es"` renders a Spanish fiche.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, expansion_chamber
+
+# A 0.5 m chamber of area ratio m = 8, at the octave-band centres.
+freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res.report(
+    "silencer_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Simple expansion-chamber muffler (m = 8, design case)",
+        measurement_standard="Munjal Eq. (3.27) four-pole model",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=6.0,            # minimum acceptable mean transmission loss
+    ),
+)                                   # mean and peak transmission loss (dB)
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository:
+
+[![One-page reactive-silencer fiche: a metadata header with the client, the expansion-chamber muffler of area ratio m = 8 as the noise source, the duct-system design study and the test date, the octave-band transmission-loss table running 7.5, 11.4, 9.9, 12.1, 3.2, 7.0 and 11.1 dB from 63 Hz to 4 kHz beside the same curve plotted against frequency, the boxed mean transmission loss TL = 8.9 dB with the peak transmission loss of 12.1 dB and the device named as an expansion chamber, a PASS verdict against the required minimum of 6.0 dB, and the note that the result is a plane-wave prediction from the declared geometry and not a measurement.](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/reactive_silencer_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/reactive_silencer_example.pdf)
+
+**What that fiche is not.** The number in the box is a plane-wave prediction
+from the declared geometry. The figure a supplier publishes is an **insertion
+loss measured by substitution** to ISO 7235:2003: two series with everything
+else unchanged, one with the test object installed and one with a substitution
+duct in its place, differenced third octave by third octave as
+`D_i = L_pI - L_pII`. The rig carries its own requirements — a sealed, lined
+loudspeaker box driving at least 6 dB and preferably 10 dB above the background,
+a modal filter attenuating the fundamental by at least 3 dB and higher-order
+modes by at least 5 dB above cut-on, a substitution duct matched within 5 % in
+every linear dimension, a receiving side with a reflection coefficient no
+greater than 0.3, and at least three microphone positions on a line inclined to
+the duct axis — and every facility has a *limiting insertion loss* set by
+flanking along its own duct walls, which caps what it can report at all. A
+computed transmission loss and a catalogue insertion loss are therefore not the
+same quantity and must not be compared directly.
 
 
 ## 2. Reactive or dissipative?

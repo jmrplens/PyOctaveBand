@@ -56,6 +56,34 @@ character of the noise. Each is 0, 3 or 6 dB, and their sum is capped at 9 dB
 (Annex IV A.3.3), a cap exposed as `RD1367_MAX_CORRECTION`. Although the index
 derives from an A-weighted level, the regulation expresses it in dB.
 
+### The background correction every input assumes
+
+$L_{Aeq,T}$ above is the level of *the activity alone*. Everything on this page —
+the three corrections, the phase levels, the verdict — is defined on a
+background-corrected level, and the regulation says so before it says anything
+else. The procedure is the ordinary energy subtraction: measure the residual with
+the activity stopped, over the same evaluation period, and subtract it from the
+total,
+$L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$.
+
+It stops being meaningful as the two converge. With the activity 10 dB above the
+residual the correction is 0,4 dB and the residual hardly matters; at 3 dB the
+correction is 3 dB and the answer is as uncertain as the two measurements that
+made it. ISO 1996-2 draws the line there and so should an inspection report: with
+a margin below 3 dB no correction is allowed and the honest statement is the
+**uncorrected** level as an upper bound. `residual_sound_correction()` and the
+percentile-based `gaussian_residual_level()` on
+[Environmental noise levels](/phonometry/environment/assessment/environmental-levels/)
+do the arithmetic and carry that rule (`reportable_upper_bound`,
+`reliable=False`); the RD's own Annex IV procedure for the measurement series —
+how many measurements, how long, what invalidates them — is not implemented here.
+
+Two field consequences. The residual has to be captured **in the same evaluation
+period**, because a night residual is not a day residual. And a phase whose
+margin is too small cannot carry a $K_t$, $K_f$ or $K_i$ verdict either: all
+three are differences of background-corrected levels, so the same margin governs
+the character corrections and not only the level.
+
 | Correction | Input quantity | Thresholds | Function |
 | :--- | :--- | :--- | :--- |
 | $K_t$, emergent tonal components | **Unweighted** one-third-octave spectrum; $L_t = L_f - L_s$, with $L_s$ the **arithmetic** mean of the two adjacent bands | 8/12 dB (20 to 125 Hz), 5/8 dB (160 to 400 Hz), 3/5 dB (500 Hz to 10 kHz) | `tonal_correction()` |
@@ -82,27 +110,113 @@ environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
 environment.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_tonal_correction.svg" alt="The one-third-octave spectrum of the snippet drawn as bars from 100 Hz to 1 kHz, with the arithmetic mean of each band's two neighbours marked above it, the 250 Hz band standing 10.5 dB above its own neighbour mean and flagged as the governing band, and the threshold row that applies to it printed beside it" width="86%" />
+
+*The test is a band against the **arithmetic** mean of its two neighbours, not
+against a fitted floor and not against the whole spectrum. Only the 250 Hz band
+clears its threshold, by 10.5 dB against the 5 dB and 8 dB pair that applies in
+the 160 Hz to 400 Hz range, so it governs and $K_t = 6$ dB. The two edge bands
+have no difference at all, because a neighbour is missing.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `environment`, `freqs` and `levels` come from the snippet above.
+environment.tonal_correction(levels, freqs).plot()
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_kf_ki.svg" alt="The low-frequency and impulsive corrections drawn as step functions of the level difference from 0 to 20 dB: both are zero up to 10 dB, step to 3 dB between 10 and 15 dB and step again to 6 dB above 15 dB, with the worked example's points marked, Lf = 13 dB giving 3 dB and Li = 5 dB giving 0 dB" width="86%" />
+
+*$K_f$ and $K_i$ are the same two-step ladder read off two different meter
+differences, and the steps are where the arithmetic gets brittle: a difference of
+15.0 dB scores 3 dB and one of 15.1 dB scores 6 dB, so a tenth of a decibel of
+measurement uncertainty on either side of a step is worth 3 dB on $L_{Keq}$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment` is imported above.
+diffs = np.linspace(0.0, 20.0, 400)
+fig, ax = plt.subplots()
+ax.step(diffs, [environment.low_frequency_correction(lceq=63.0 + d, laeq=63.0)
+                for d in diffs], where="post", label="Kf (LCeq - LAeq)")
+ax.step(diffs, [environment.impulsive_correction(laieq=63.0 + d, laeq=63.0)
+                for d in diffs], where="post", ls="--", label="Ki (LAIeq - LAeq)")
+ax.plot([13.0], [3.0], "o", label="worked example: Lf = 13 dB")
+ax.plot([5.0], [0.0], "s", label="worked example: Li = 5 dB")
+ax.set(xlabel="Level difference [dB]", ylabel="Correction [dB]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
+
 ## Relationship with the ISO 1996 procedures
 
 The corrections of the regulation resemble ISO 1996 procedures the library
 already implements, but they are **not interchangeable**, which is why this
 module implements the RD's own variants instead of delegating to them:
 
-- `tonal_audibility()` / `tonal_adjustment()` are the engineering method of
+- [`tonal_audibility()` / `tonal_adjustment()`](/phonometry/environment/assessment/environmental-levels/#tonal-adjustment-engineering-method-iso-1996-22007-annex-c) are the engineering method of
   ISO 1996-2 Annex C, based on the audibility $\Delta L_{ta}$ within the
   critical band around the tone, and return a **continuous** $K_t$ between 0
   and 6 dB. The RD works on one-third-octave band differences and produces
   only 0, 3 or 6 dB.
-- `tonal_seeking_survey()` (survey method, ISO 1996-2:2017 Annex K) is the
+- [`tonal_seeking_survey()`](/phonometry/environment/assessment/environmental-levels/#tonal-adjustment-engineering-method-iso-1996-22007-annex-c) (survey method, ISO 1996-2:2017 Annex K) is the
   closest relative, because it also splits the spectrum at 125 and 400 Hz, but
   it requires the band to exceed **both** neighbours by 15/8/5 dB and only
   returns a prominence flag; the RD compares against the **mean** of the
   neighbours with 8/5/3 dB thresholds and grades the result.
-- `impulsive_sound_adjustment()` is the onset-rate method of ISO/PAS 1996-3 on
+- [`impulsive_sound_adjustment()`](/phonometry/environment/assessment/impulsive-sound/) is the onset-rate method of ISO/PAS 1996-3 on
   a calibrated signal. The RD's $K_i$ is the classic $L_{AIeq} - L_{Aeq}$
   difference read off a sound level meter, not the same quantity.
 - $K_f$ has no counterpart in ISO 1996 at all: the $L_{Ceq} - L_{Aeq}$
   difference is specific to the Spanish regulation.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_vs_iso_tonal.svg" alt="Two one-third-octave spectra drawn as bars side by side with three verdict rows under each. The left spectrum has a 10.5 dB emergence at 250 Hz and every method agrees a tone is there. The right spectrum has a shallower emergence chosen so the verdicts split: the RD 1367 tonal correction still grades it, while the ISO 1996-2 survey method raises no flag because the band does not exceed both neighbours by the required margin, and the ISO Annex C engineering method returns a smaller continuous Kt" width="90%" />
+
+*The two procedures are close enough to be confused and far enough apart to
+disagree on a real spectrum. A 250 Hz band 7.5 dB above the arithmetic mean
+of its neighbours is graded $K_t = 3$ dB by the regulation and raises **no flag
+at all** in the ISO survey method, because it beats each neighbour by less than
+the 8 dB that method requires. That is exactly the situation an inspection report
+has to be able to defend: the RD compares against the arithmetic **mean**
+of the neighbours with 8/5/3 dB thresholds and grades the result 0/3/6; the
+survey method requires the band to beat **both** neighbours by 15/8/5 dB and
+returns a flag; the Annex C engineering method works inside a critical band and
+returns a continuous value.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `environment`, `freqs` and `levels` come from the corrections snippet above.
+shallow = list(levels)
+shallow[4] = 69.0                      # Lt = 7.5 dB instead of 10.5 dB
+
+for spectrum in (levels, shallow):
+    rd = environment.tonal_correction(spectrum, freqs)
+    flags = np.asarray(environment.tonal_seeking_survey(spectrum, freqs))
+    print(rd.correction, rd.governing_frequency, bool(flags[4]))
+# 6.0 250.0 True     <- both agree
+# 3.0 250.0 False    <- the RD grades it, the survey method does not flag it
+plt.show()
+```
+
+</details>
 
 ## Evaluation periods and noise phases
 
@@ -186,6 +300,8 @@ $L_{Keq,x}$ more than 3 dB above it, and no $L_{Keq,Ti}$ measured in a noise
 phase more than 5 dB above it. For the inspection of an activity already in
 operation, Article 25.2 applies only the last two.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rd1367_chain.svg" alt="Four stages left to right. First a 24 hour strip split into the RD 1367 day, evening and night periods at 07:00, 19:00 and 23:00, with the day strip broken into the worked example's three phases of 2, 6 and 4 hours. Second, each phase carrying LAeq,Ti plus Kt plus Kf plus Ki to LKeq,Ti with the 9 dB cap noted. Third, the duration-weighted energy mean to the period level LKeq,x with round_reported_level applied. Fourth, the operating-day weighted annual mean to LK,x, rounded again, feeding three parallel comparison boxes: the worst phase against the limit plus 5 dB, the daily value against the limit plus 3 dB and the annual value against the limit itself, with a note that Article 25.2 drops the third for an activity already in operation" width="92%" />
+
 ## Worked example: a new activity on residential land
 
 A new activity on residential land (acoustic area type a) opens continuously
@@ -194,7 +310,7 @@ the opening hours the levels are steady, and while the activity is shut down it
 emits nothing. The levels measured outdoors, already corrected for background
 noise, are:
 
-| Phase | $L_{Aeq,5s}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,5s}$ |
+| Phase | $L_{Aeq,T_i}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,T_i}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | With the noisy machine | 50 dB | 6 | 3 | 0 | 9 | 59 dB |
 | Rest of the opening hours | 48 dB | 3 | 3 | 0 | 6 | 54 dB |
@@ -257,8 +373,15 @@ The verdict is the fine point of the example. The measured $L_{Keq,Ti}$ (59 and
 the annual average of the day period, $L_{K,d} = 56$ dB, exceeds the 55 dB of
 the table. A **new** activity does not comply. An activity already in
 operation, judged under Article 25.2, would comply, because only the phase and
-daily values are required of it; building the verdict with
-`new_activity=False` shows exactly that.
+daily values are required of it:
+
+```python
+existing = environment.assess_activity(
+    {"day": day, "evening": evening}, limits, operating_days=303,
+    new_activity=False,
+)
+print(existing.complies)                 # True: the annual criterion does not apply
+```
 
 ## Plots and the inspection report
 

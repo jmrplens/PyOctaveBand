@@ -38,13 +38,12 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 Una máquina funciona en un recinto, un muro separa ese recinto de otro
-ocupado, y alguien quiere saber qué oye el ocupante. Es una cadena corta, y
-cada eslabón ya existía en la biblioteca: el nivel reverberante que la
-máquina establece en el lado emisor, la pérdida por transmisión del muro, la
-absorción del recinto receptor y la curva de criterio frente a la que se
-juzga el resultado. Lo que faltaba era la unión, y la unión es justo el punto
-donde la aritmética sorprende: **la reducción de ruido no es la pérdida por
-transmisión del muro.**
+ocupado, y alguien quiere saber qué oye el ocupante. Es una cadena corta de
+cuatro eslabones — el nivel reverberante que la máquina establece en el lado
+emisor, la pérdida por transmisión del muro, la absorción del recinto receptor
+y el criterio frente al que se juzga el resultado — y la unión entre el segundo
+y el tercero es justo el punto donde la aritmética sorprende: **la reducción de
+ruido no es la pérdida por transmisión del muro.**
 
 `noise_control.room_to_room` es esa unión, y esta página recorre de principio
 a fin los problemas resueltos de Norton y Karczub. La referencia en todo el
@@ -54,6 +53,11 @@ capítulo 4: el apartado 4.6 para los modelos de potencia acústica, el 4.9
 para el balance entre recintos y el 4.10 para el cerramiento. Sus problemas
 4.16, 4.18 y 4.21 traen respuestas impresas por banda de octava, y los tres
 están fijados en el [informe de conformidad](/phonometry/es/reference/conformance/).
+
+Aquí está toda la página en un dibujo: el problema 4.18 de Norton en sección,
+con cada símbolo del balance en el sitio que le corresponde físicamente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_to_room_es.svg" alt="Sección de dos recintos que comparten un muro, dibujada a cincuenta píxeles por metro. A la izquierda, una sala de máquinas de 8 por 10 por 3 metros con el suelo desnudo y el techo absorbente, y un ventilador apoyado en el suelo contra una pared, con la cuña de cuarto de espacio de su posición Q = 4 sombreada y sus arcos de radiación dibujados. En el centro, el muro separador de 5 por 3 metros, rayado, con una flecha fina en sentido inverso para la potencia que devuelve al recinto emisor. A la derecha, una sala de control de 5 por 5 por 3 metros con moqueta, el mismo techo absorbente y un ocupante de pie. Un arco discontinuo remonta el muro por el plenum del falso techo para la trayectoria por flancos. Debajo, tres líneas dan las cifras del lado emisor, de la partición y del lado receptor a 125 Hz, y el pie imprime el balance con el cruce en el que el área de absorción del recinto receptor supera los 15 metros cuadrados del muro" width="92%" loading="eager" />
 
 De dónde sale *la partición misma* es otra pregunta, que responden
 [Aislamiento acústico de
@@ -76,11 +80,14 @@ $$
 $$
 
 con $\text{NR} = L_{p1} - L_{p2}$ la reducción de ruido entre los dos campos
-reverberantes, $\text{TL} = 10\log_{10}(1/\tau)$ la pérdida por transmisión de la
-partición — la magnitud que mide ISO 10140-2 y que ISO 717-1 valora como
-índice de reducción acústica $R$, de modo que el $R$ y el $R_w$ de un informe
-de ensayo de laboratorio entran directamente en esta ecuación —, $S_w$
-el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
+reverberantes, $\text{TL} = 10\log_{10}(1/\tau)$ la **pérdida por transmisión**
+de la partición — el nombre que Norton y Karczub, y la literatura
+norteamericana, dan a la magnitud que mide ISO 10140-2 y que ISO 717-1 valora
+como **índice de reducción acústica** $R$; son el mismo número, y su índice
+global es el $R_w$ que se usa más abajo, de modo que el $R$ y el $R_w$ de un
+informe de ensayo de laboratorio entran directamente en esta ecuación (véase
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/))
+—, $S_w$ el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
 equivalente del recinto receptor.
 
 Leyendo el logaritmo se entiende toda la página. Una **partición grande hacia
@@ -94,6 +101,30 @@ El término $\tau S_w$ es la potencia que la propia partición devuelve al
 recinto emisor. Con cualquier pérdida por transmisión realista vale unas
 centésimas de decibelio, así que está desactivado por omisión y
 `include_partition_transmission=True` lo activa.
+
+### Qué informa una medición de ese mismo par de recintos
+
+La $\text{NR}$ de esta ecuación es la **diferencia de niveles** $D$ en bruto que
+devuelve una medición en campo de los dos recintos. Las normas de medición no
+informan $D$ en bruto, y por la razón que este apartado acaba de explicar: $D$
+depende del recinto receptor. La normalizan, o bien a un tiempo de
+reverberación de referencia, $D_{nT} = D + 10\log_{10}(T/T_0)$ con
+$T_0 = 0{,}5$ s — la magnitud en la que está escrita la mayoría de la
+reglamentación residencial —, o bien a un área de absorción de referencia de
+10 m², $D_n = D - 10\log_{10}(A/10)$. La magnitud propia del muro es $R$, y su
+versión en campo, $R' = D + 10\log_{10}(S/A)$, incluye los flancos y por eso
+queda siempre por debajo del $R$ de laboratorio que supone este cálculo.
+
+La consecuencia merece decirse sin rodeos: una $\text{NR}$ calculada y un
+$D_{nT,w}$ certificado del mismo muro son números distintos por construcción, y
+compararlos sin renormalizar es la forma más habitual de concluir que el modelo
+está mal cuando no lo está. El tiempo de reverberación del recinto receptor hay
+que medirlo en la misma sesión, porque es lo que lleva la normalización.
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)
+tiene las posiciones de fuente y de micrófono, las separaciones mínimas y la
+corrección por ruido de fondo;
+[Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/)
+tiene de dónde sale un $R$ declarado.
 
 ## 2. Tres particiones, un mismo recinto receptor
 
@@ -146,6 +177,47 @@ juntas dan 74,6 m² y ese mismo muro de ladrillo vale 4,9 dB más que su
 pérdida por transmisión. Los mismos tres muros, ordenados igual, pero las
 cifras que citaría una especificación se mueven más de 5 dB según un recinto
 que el muro nunca toca.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_to_room_partitions_es.svg" alt="Dos paneles apilados por bandas de octava, de 125 Hz a 4 kHz. Arriba, la reducción de ruido menos la pérdida por transmisión de las tres particiones: las tres curvas caen exactamente una sobre otra, empiezan en más 0,5 dB a 125 Hz, bajan a menos 0,2 dB a 250 Hz y suben hasta más 4,9 dB a 4 kHz. Abajo, el área de absorción sonora equivalente del recinto receptor, que sube de 27 metros cuadrados a 125 Hz, pasa por un mínimo de 23 a 250 Hz y llega a 75 a 4 kHz, frente a los 24 metros cuadrados fijos de la partición dibujados como una línea horizontal discontinua, con la región por encima de la línea sombreada" width="88%" />
+
+*Resta a la reducción de ruido que entrega cada muro su propia pérdida por
+transmisión y las tres particiones se derrumban sobre una única curva, porque la
+diferencia, $-10\log_{10}[S_w/(S_2\alpha_2)]$, no contiene ninguna propiedad del
+muro. Es el panel inferior: la separación cambia de signo justo donde el área de
+absorción del recinto receptor cruza los 24 m² de la partición. Ordenar tres
+muros es seguro; citar los decibelios que «da» uno de ellos, no.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `bands`, `receiving` y `partitions`, tal como se construyeron arriba.
+
+# Una línea por muro: el RoomToRoomResult dibuja los dos espectros, la curva
+# de criterio y la reducción de ruido frente a la pérdida por transmisión.
+room_to_room_transmission(
+    bands, partitions["Ladrillo enfoscado de 125 mm"], 8.0 * 3.0, receiving,
+    source=SourceRoom(level=90.0),
+).plot(language="es")
+plt.show()
+
+# A mano: la separación que muestra cada muro, y el recinto que hay detrás.
+fig, (top, bottom) = plt.subplots(2, 1, sharex=True)
+for name, tl in partitions.items():
+    res = room_to_room_transmission(bands, tl, 8.0 * 3.0, receiving,
+                                    source=SourceRoom(level=90.0))
+    top.semilogx(bands, res.noise_reduction - np.asarray(tl, float),
+                 "o-", label=name)
+top.axhline(0.0)
+bottom.semilogx(bands, receiving, "o-", label="Absorción del recinto receptor")
+bottom.axhline(8.0 * 3.0, ls="--", label="Área de la partición")
+bottom.set_xlabel("Frecuencia [Hz]")
+plt.show()
+```
+
+</details>
 
 ## 3. La cadena, de principio a fin
 
@@ -210,6 +282,22 @@ for row in chain.table():
     print(f"{row['label']:<28} "
           f"{[round(float(v), 1) for v in row['values']]}")
 ```
+
+Dos funciones de nombre parecido hacen dos trabajos distintos en ese fragmento,
+y confundirlas es silencioso. $A = S\alpha$, `equivalent_absorption_area`, es la
+potencia que el recinto retira por unidad de presión cuadrática media, y es lo
+que aparece en el balance del recinto receptor de la Ecuación (4.101).
+$R = S\alpha/(1-\alpha)$, `room_constant`, es la constante de recinto de la
+relación de régimen estacionario, que además tiene en cuenta la energía que
+sobrevive a su primera reflexión y sigue alimentando el campo reverberante, y es
+lo que necesita $L_{p1} = L_W + 10\log_{10}(4/R)$ en el lado emisor. Las dos
+coinciden en un recinto muy reflectante y divergen a medida que $\alpha$ crece
+— se separan en $10\log_{10}[1/(1-\alpha)]$, 0,5 dB con $\alpha = 0{,}1$ y
+3,0 dB con $\alpha = 0{,}5$ — y usar el área de absorción donde va la constante
+de recinto sesga la respuesta hacia predecir *demasiada* reducción de ruido.
+`equivalent_absorption_area` admite además objetos discretos y un término de
+absorción del aire, que es por donde entran el mobiliario, las personas y, en un
+recinto grande, el propio aire en el lado receptor.
 
 ```text
 Source sound power level     [105.0, 103.0, 98.0, 108.0, 107.0, 109.0]
@@ -357,6 +445,47 @@ y el nivel que hay que perder es solo 5 dB, mientras que a 8 kHz el compresor
 ya se ha callado. Un panel elegido por su comportamiento entre 500 Hz y 2 kHz
 es el panel correcto aquí.
 
+`enclosure_required_transmission_loss` devuelve un `EnclosureResult`, así que
+`required.plot()` dibuja esa forma y sus dos causas en una línea:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_required_tl_es.svg" alt="Gráfico por bandas de octava de 63 Hz a 8 kHz del problema 4.16 de Norton. Las barras verdes dan la pérdida por inserción objetivo, que sube de 5 dB a 63 Hz hasta 37 dB entre 1 kHz y 4 kHz; las barras rojas dan la corrección interior, que baja de más 9,5 dB a 63 Hz, pasa por cero cerca de 400 Hz y llega a unos menos 2,4 dB por encima de 2 kHz; y la pérdida por transmisión de panel necesaria discurre como una curva con su máximo de 35,2 dB a 1 kHz que cae a 14,5 dB a 63 Hz y a 31,6 dB a 8 kHz, con las respuestas impresas de Norton marcadas sobre ella como rombos huecos y el modelo de Bies por omisión de la biblioteca dibujado discontinuo un decibelio o dos por encima a partir de 500 Hz" width="88%" />
+
+*La exigencia es la suma de las dos familias de barras, y sus máximos caen en
+sitios distintos: la pérdida por inserción objetivo sigue subiendo hasta 1 kHz
+mientras la corrección interior baja desde +9,5 dB a 63 Hz, donde una manta de
+50 mm es acústicamente delgada, hasta −2,4 dB por encima de 2 kHz, donde el
+revestimiento ha llevado la constante de recinto interior por encima del área
+radiante. La curva discontinua de Bies lleva el suelo de 0,3 del que se habla
+abajo y queda hasta 1,8 dB por encima del modelo de Norton en cuanto domina el
+revestimiento.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `required` es el EnclosureResult construido arriba.
+
+# Una línea: la IL objetivo, la corrección interior y la R de panel necesaria.
+required.plot(language="es")
+plt.show()
+
+# A mano, a partir de los campos por banda que lleva el resultado:
+fig, ax = plt.subplots()
+ax.semilogx(required.frequencies, required.insertion_loss, "s--",
+            label="IL objetivo")
+ax.semilogx(required.frequencies, required.correction, "^:",
+            label="Corrección interior")
+ax.semilogx(required.frequencies, required.panel_transmission_loss, "o-",
+            label="R de panel necesaria")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Nivel [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 Dos notas al pie sobre ese fragmento, las dos acerca de ser fiel a la fuente.
 `model="norton"` importa: el modelo de cerramiento por omisión de la
 biblioteca es la Ecuación (7.111) de Bies, Hansen y Howard, que lleva un
@@ -373,6 +502,22 @@ Y la columna NC-45 es la propia de Norton, tomada de su enunciado. Marca
 implementa `nc_curve`) marca 42 dB; coinciden en todas las demás bandas.
 Usar la columna impresa mantiene el oráculo en lo publicado.
 
+Hay una salvedad que viene del apartado 6 y que aquí muerde más fuerte. La
+pérdida por transmisión de panel necesaria es una cota superior exactamente
+igual que lo es la de la partición, y por razones más marcadas: un cerramiento
+es pequeño, así que la proporción entre sus aberturas inevitables — puerta de
+acceso, pasos de cables y tuberías, aberturas de refrigeración, ranuras de
+transportador — y su área total es mucho mayor que la de un muro, y una fracción
+abierta del uno por ciento limita la pérdida por inserción alcanzada a unos
+20 dB por muy de 35 dB que sea el panel que pide este cálculo. La máquina
+tampoco debe tocar el cerramiento ni compartir su base: un contacto atornillado
+radia la vibración de la máquina desde la piel exterior y sortea los paneles por
+completo. Mete las aberturas en el cálculo en vez de confiar en la suerte — la
+vía del compuesto y la construcción dibujada están en
+[Control de ruido industrial, apartado 2.1](/phonometry/es/devices/noise-control/noise-control/#21-lo-que-el-cerramiento-entrega-de-verdad-fugas-puertas-y-aberturas)
+— y usa el mismo `flanking_penalty` de abajo como el sitio honrado donde anotar
+lo que quede sin modelar.
+
 ## 6. Lo que la predicción no sabe
 
 La respuesta de Norton al problema 4.21 termina con la advertencia que
@@ -384,8 +529,8 @@ simplemente el muro que no llega al forjado, y la respuesta de la ecuación
 pasa a ser una cota superior.
 
 El clip de abajo dibuja lo que la ecuación deja fuera. La cadena del
-apartado 3 tarifa solo la trayectoria directa, la vía **Dd** a través de la
-partición; los otros tres pulsos salen del recinto emisor por los muros,
+apartado 3 solo pone precio a la trayectoria directa, la vía **Dd** a través
+de la partición; los otros tres pulsos salen del recinto emisor por los muros,
 el suelo o el techo de flanco — **Ff** de flanco a flanco, **Fd** de flanco a
 partición, **Df** de partición a flanco — y vuelven a radiar al otro lado sin
 haber pasado nunca por la pérdida por transmisión que usó el cálculo. Cada
@@ -419,18 +564,79 @@ print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      cada banda 3 dB peor
 ```
 
-Cuando las trayectorias por flancos *sí* se modelan en lugar de aprovisionarse, las
-herramientas correctas son los modelos de predicción de la EN 12354, y esos
-viven en
+Cuando las trayectorias por flancos *sí* se modelan en lugar de cubrirse con
+una provisión, las herramientas correctas son los modelos de predicción de la
+EN 12354, y esos viven en
 [Predicción del aislamiento acústico en
 edificios](/phonometry/es/buildings/design/insulation-prediction/)
 y en [Transmisión por flancos](/phonometry/es/buildings/insulation/flanking-lab/).
 
-La otra hipótesis es la difusividad. La Ecuación (4.101) es un balance de
-campo difuso en los dos recintos, así que no tiene nada que decir por debajo
-de la frecuencia de Schroeder de cada uno (`schroeder_frequency`), donde
-mandan los modos discretos. La sala de control de 5 m x 5 m x 3 m de arriba,
-75 m3, tiene para un tiempo de reverberación de medio segundo una frecuencia
-de Schroeder de 163 Hz, que es justo por lo que la banda de 125 Hz del
-problema 4.18, la banda que gobierna toda la respuesta, hay que leerla como
-una estimación y no como una cifra.
+La otra hipótesis es la difusividad, y falla en dos direcciones. En frecuencia:
+la Ecuación (4.101) es un balance de campo difuso en los dos recintos, así que
+no tiene nada que decir por debajo de la frecuencia de Schroeder de cada uno
+(`schroeder_frequency`), donde mandan los modos discretos. La sala de control de
+5 m × 5 m × 3 m de arriba, 75 m³, tiene una frecuencia de Schroeder de 163 Hz
+para un tiempo de reverberación de medio segundo, que es justo por lo que la
+banda de 125 Hz del problema 4.18 — la banda que gobierna toda la respuesta —
+hay que leerla como una estimación y no como una cifra. La llamada es
+`schroeder_frequency(0.5, 75.0)`, primero el tiempo de reverberación y después
+el volumen, y devuelve 163,3 Hz para ese recinto.
+
+En espacio: los dos niveles son **promedios espaciales del campo reverberante**.
+$L_{p2}$ es lo que informaría un micrófono paseado por el recinto receptor, no
+el nivel en la mesa arrimada a la medianera, donde el campo directo de la
+superficie radiante suma unos decibelios dentro de aproximadamente una longitud
+de onda. Lo mismo vale al revés en el lado emisor: $L_{p1}$ es el nivel
+reverberante que excita toda la partición, y una persona de pie junto a la
+máquina está en su campo directo y oye más, así que un nivel *medido* en el
+recinto emisor hay que tomarlo lejos tanto de la máquina como del muro para que
+sea la entrada correcta. Es la razón de que las normas de campo mantengan sus
+posiciones de micrófono a media longitud de onda de toda superficie, y la razón
+de que este cálculo no pueda responder dónde colocar el puesto de trabajo dentro
+del recinto receptor; cuando esa es la pregunta, la herramienta son los métodos
+de fuentes imagen y de rayos de
+[Fuentes imagen y campo estacionario](/phonometry/es/buildings/rooms/room-image-sources/).
+
+## Qué cubre esta guía
+
+**Cubierto.** El balance de potencia del apartado 4.9 de Norton y Karczub
+(Ec. 4.101) como `room_to_room_transmission`, con `SourceRoom`,
+`equivalent_absorption_area`, `mean_absorption` y `room_constant`; el nivel del
+recinto emisor a partir de un nivel de potencia acústica mediante los modelos de
+fuente de la Tabla 4.5 del apartado 4.6 (potencia constante, volumen constante,
+presión constante) y la directividad de la posición de la máquina;
+`DesignCriterion` con su objetivo, su provisión por flancos y su valoración
+según ANSI/ASA S12.2-2019, en la familia NC por omisión y en la familia RC
+Mark II con `DesignCriterion(family="RC")`; `.required_transmission_loss`,
+`.exceedance`, `.meets_target` y `.table()`; y la ecuación del cerramiento del
+apartado 4.10 (Ec. 4.115) mediante `enclosure_required_transmission_loss`, en
+los dos modelos de interior, el de Norton y el de Bies, que lista
+`ENCLOSURE_MODELS`.
+
+**No cubierto.** La pérdida por transmisión de la propia partición, que se mide
+o se predice en otra parte; los flancos como trayectoria modelada en lugar de
+como provisión a tanto alzado; las fugas y aberturas de un cerramiento, que
+necesitan el compuesto de la guía de control de ruido industrial; y todo lo que
+quede por debajo de la frecuencia de Schroeder de cada recinto, o más cerca de
+una superficie que media longitud de onda.
+
+## Véase también
+
+- [Aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
+  de dónde sale la pérdida por transmisión que consume esta página.
+- [Predicción del aislamiento acústico en edificios](/phonometry/es/buildings/design/insulation-prediction/)
+  y [Transmisión por flancos](/phonometry/es/buildings/insulation/flanking-lab/):
+  los modelos de la EN 12354 para las trayectorias por flancos que esta página
+  se limita a cargar en cuenta.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  cómo se mide ese mismo par de recintos, y el $D_{nT}$ y el $R'$ que devuelve
+  un informe de ensayo.
+- [Criterios de ruido en recintos](/phonometry/es/buildings/rooms/room-noise/): las
+  familias NC y RC Mark II en las que se escribe el veredicto.
+- [Control de ruido industrial](/phonometry/es/devices/noise-control/noise-control/):
+  el cerramiento del apartado 5 como construcción, con sus fugas y sus normas de
+  medición.
+- [Potencia acústica](/phonometry/es/devices/emission/sound-power/): la $L_W$ de
+  la máquina con la que arranca toda la cadena.
+- Referencia de la API:
+  [`noise_control.room_to_room`](/phonometry/es/reference/api/noise_control/room-to-room/).

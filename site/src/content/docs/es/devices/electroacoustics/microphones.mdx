@@ -51,7 +51,7 @@ altavoz tiene [su propia guía](/phonometry/es/devices/electroacoustics/loudspea
 
 ## 1. La sensibilidad y sus referencias (IEC 60268-4, apartado 11)
 
-**Micrófonos (IEC 60268-4, apartado 11).** La sensibilidad $M$ es la tensión
+La sensibilidad $M$ es la tensión
 de salida por unidad de presión acústica, expresada en mV/Pa; el *nivel* de
 sensibilidad es $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$ dB, negativo para todo
 micrófono real (un condensador de estudio de 50 mV/Pa queda en −26 dB re
@@ -78,6 +78,66 @@ de 1 kHz (apartado 11.3), sobre la carga nominal, y el tipo declarado
 (campo libre, campo difuso o presión) forma parte de la especificación, no es
 un detalle.
 
+### 1.1 Los tres tipos de sensibilidad, y cómo elegir uno
+
+Los tres tipos se diferencian solo en el **campo en el que se calibra la
+cápsula**, y existen porque un micrófono no es un punto. En las frecuencias en
+las que la cápsula deja de ser pequeña frente a la longitud de onda perturba el
+campo que está midiendo, y la presión sobre el diafragma sube por encima de la
+presión no perturbada para el sonido que llega por el eje de referencia: varios
+decibelios en una cápsula de media pulgada por encima de unos 5 kHz, y más
+todavía en una de un cuarto de pulgada. Las tres definiciones son tres maneras
+de tratar eso:
+
+- La **sensibilidad de presión** (11.2.4) es la razón entre la tensión de salida
+  y la presión acústica realmente presente en la entrada acústica. Es la que
+  realizan un acoplador, un pistófono o un actuador electrostático, y la que lee
+  una cápsula enrasada en una superficie límite.
+- La **sensibilidad de campo libre** (11.2.1) está referida a la presión *no
+  perturbada* de una onda plana progresiva que llega por el eje de referencia,
+  de modo que se corrige el refuerzo de presión propio de la cápsula.
+- La **sensibilidad de campo difuso** (11.2.2) está referida a sonido que llega
+  de todas las direcciones con fase aleatoria; la norma la define como el valor
+  eficaz de las sensibilidades de campo libre sobre todas las direcciones, de
+  modo que $L_{M,\text{diff}} = L_{M,\text{ff}} - D$ con $D$ el índice de
+  directividad de la sección 2.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_microphone_references_es.svg" alt="Tres paneles sobre un mismo dibujo de cápsula: campo libre, con una onda plana que llega por el eje de referencia y las dos reglas de admisibilidad r al menos d y r al menos d al cuadrado entre lambda; campo difuso, con rayos que llegan de todas las direcciones y la definición de la sensibilidad de campo difuso como el valor eficaz del patrón; y presión, con la cápsula cerrada en un acoplador cuya cavidad es pequeña frente a la longitud de onda. Debajo, el banco: la cámara anecoica y la regla de media longitud de onda para la onda plana, la calibración por sustitución contra un micrófono de referencia en el mismo punto, la variante de comparación simultánea con su condición de más menos 1 dB, y la exactitud global de más menos 2 dB o mejor" width="92%" />
+
+**La regla de elección.** Una cápsula de campo libre apuntada a una fuente
+conocida en campo libre o casi libre; una cápsula de incidencia aleatoria en una
+sala reverberante, y para un sonómetro de clase 1 según IEC 61672 usado en
+interiores; una cápsula de presión en un acoplador o enrasada en una superficie
+límite. Usar una cápsula de campo libre en incidencia rasante, o una de presión
+en el eje, cuesta varios decibelios en las dos octavas superiores y nada en
+absoluto por debajo de 1 kHz, que es la razón de que el error sobreviva a una
+comprobación de nivel ponderado A y solo aparezca en un espectro. El compromiso
+de tamaño va al revés: una cápsula más pequeña mantiene honesto su tipo de campo
+hasta una frecuencia más alta, y lo paga en sensibilidad y en ruido propio.
+
+**El banco que hay detrás del número.** El apartado 4.2.2 de IEC 60268-4 define
+las condiciones nominales de un micrófono: la carga resistiva especificada, la
+alimentación nominal, un campo libre (5.5.2) a cero grados respecto a la
+dirección de referencia y una presión acústica no perturbada de 1 Pa (94 dB) en
+el punto de referencia, a la frecuencia de medición de 1 kHz. El apartado 5.5.2
+fija la geometría: condiciones de campo libre realizadas al aire libre, en una
+cámara anecoica o en un conducto, con la referencia de onda esférica válida solo
+donde $r \ge d$ y $r \ge d^2/\lambda$ para un diámetro efectivo de fuente $d$ —
+preferiblemente más allá de tres veces la dimensión mayor de la superficie
+radiante — y con una onda esférica contada como plana solo a media longitud de
+onda o más de su centro de curvatura en la frecuencia medida más baja. El
+apartado 5.6.2 fija la calibración: el método de **sustitución**, en el que el
+micrófono bajo ensayo y una referencia calibrada ocupan el mismo punto uno
+después del otro, da la mayor exactitud; la comparación simultánea en dos puntos
+próximos solo puede usarse tras demostrar que concuerda con la sustitución
+dentro de ±1 dB. El apartado 5.7 pone el techo a todo: se obtendrá una exactitud
+global de ±2 dB o mejor. Todos los números de la ficha de la sección 4 heredan
+esa cota. Convertir una sensibilidad nominal en niveles calibrados sobre una
+cadena en uso es
+[Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
+
+<span id="patron-direccional"></span>
+
 ## 2. El patrón direccional y el índice de directividad (apartado 13)
 
 La respuesta direccional se declara como el patrón de sensibilidad frente
@@ -97,11 +157,70 @@ revolución). Un omni puntúa 0 dB; el cardioide ideal y la figura en ocho,
 ambos $10\log_{10} 3 = 4{,}8$ dB: en un campo difuso de sala, un cardioide
 capta tres veces menos potencia reverberante que un omni de igual
 sensibilidad axial, que es exactamente la relación que quiere un cálculo de
-distancia locutor-micrófono. Los patrones reales solo conservan su forma de
+distancia hablante-micrófono. Los patrones reales solo conservan su forma de
 libro de texto en el centro de la banda; en alta frecuencia el propio
 tamaño de la cápsula vuelve directivo a cualquier micrófono, y por eso
 divergen ahí las sensibilidades de campo libre y de campo difuso de una
 misma cápsula.
+
+La familia entera son seis valores de un mismo coeficiente. Los índices de
+directividad de abajo son los que devuelve `microphone_characteristics` para
+cada patrón mediante la integral del apartado 11.2.2 a) (el fragmento de la
+sección 4 imprime tres de ellos), y la eficiencia de energía aleatoria es la
+fracción de un campo difuso que la cápsula sigue captando:
+
+| Patrón | $b$ | $M(180°)$ | Nulo | Índice de directividad | Eficiencia de energía aleatoria | Factor de distancia |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Omnidireccional | 0 | +1,00 | — | 0,0 dB | 1,000 | 1,00 |
+| Subcardioide | 1/3 | +0,33 | — | 3,2 dB | 0,481 | 1,44 |
+| Cardioide | 1/2 | 0,00 | 180° | 4,8 dB | 0,333 | 1,73 |
+| Supercardioide | 0,63 | −0,26 | 126° | 5,7 dB | 0,269 | 1,93 |
+| Hipercardioide | 3/4 | −0,50 | 110° | 6,0 dB | 0,250 | 2,00 |
+| Figura en ocho | 1 | −1,00 | ±90° | 4,8 dB | 0,333 | 1,73 |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_patterns_es.svg" alt="Los seis miembros de la familia de primer orden sobre un mismo eje polar en un rango de 30 dB: omnidireccional, subcardioide, cardioide, supercardioide, hipercardioide y figura en ocho, cada uno etiquetado con el índice de directividad que la biblioteca calcula para él, 0,0, 3,2, 4,8, 5,7, 6,0 y 4,8 dB respectivamente" width="72%" />
+
+*El cardioide y la figura en ocho devuelven los mismos 4,8 dB desde geometrías
+opuestas: el índice dice cuánta potencia reverberante rechaza una cápsula, no
+desde dónde. Por eso un patrón y un índice se citan siempre juntos, y por eso el
+supercardioide y el hipercardioide — que cambian un lóbulo trasero por un nulo
+más profundo fuera del eje — les ganan a los dos en el número y suenan bastante
+distinto por detrás. El factor de distancia es la consecuencia práctica: un
+cardioide puede colocarse 1,73 veces más lejos de un hablante que una cápsula
+omnidireccional para la misma relación directo-reverberante.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Las formas de los patrones. El índice de directividad anotado en cada curva es
+# el que devuelve `microphone_characteristics(...).directivity_index_db` para
+# esos mismos datos polares, como en el fragmento de la sección 4.
+theta = np.radians(np.linspace(0.0, 360.0, 721))
+ax = plt.subplot(projection="polar")
+for b in (0.0, 1 / 3, 0.5, 0.63, 0.75, 1.0):
+    mag = np.maximum(np.abs((1.0 - b) + b * np.cos(theta)), 10 ** (-1.5))
+    ax.plot(theta, np.maximum(20 * np.log10(mag), -30.0))
+ax.set_ylim(-30.0, 0.0)
+plt.show()
+```
+
+</details>
+
+El término coseno es un término de **gradiente de presión**, y eso tiene una
+consecuencia que la fórmula esconde: cerca de una fuente el gradiente lleva una
+componente que crece como $1/r^2$ mientras el término de presión cae como $1/r$,
+así que cualquier cápsula con $b > 0$ realza las frecuencias graves al acercarse
+a la fuente. El **efecto de proximidad** es típicamente de 6 a 10 dB a 100 Hz y
+5 cm para un cardioide, y mayor para una figura en ocho. Se explota a propósito
+en el trabajo con voz, y es la razón de que un micrófono direccional no pueda
+usarse como aparato de medición cerca de una fuente: la respuesta depende de
+dónde se sostenga. Junto con la dependencia con la frecuencia de un patrón real,
+esa es la razón de que todo micrófono de medición de esta documentación sea una
+cápsula omnidireccional de presión.
 
 ## 3. Ruido propio: dB(A) y dB(468) (apartado 17)
 
@@ -126,6 +245,71 @@ ponderación BS.468 está expuesta como `itu_r_468_weighting` en el
 [conjunto de distorsión de
 electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
 donde también pondera la THD.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_weightings_es.svg" alt="Panel superior: un espectro de banda de ruido propio que decrece con la frecuencia, dibujado en bruto, ponderado A y ponderado ITU-R BS.468-4, de modo que se ve la curva 468 levantando las bandas de 2 a 10 kHz que la curva A ya ha empezado a atenuar. Panel inferior: los niveles sumados por bandas de las dos ponderaciones para esa cápsula y para otra más siseante cuyo ruido crece hacia 20 kHz, con la diferencia debida solo a la red anotada en cada caso, más 2,4 dB y más 8,3 dB respectivamente" width="82%" />
+
+*Cuánta parte de esa diferencia explica la red por sí sola depende de la forma
+del ruido de cada cápsula: 2,4 dB para el espectro 1/f decreciente del ejemplo y
+8,3 dB para una cápsula más siseante. El resto de los 10 dB de costumbre viene
+del **detector de cuasipico** de la ITU-R 468, que lee un ruido más alto que un
+detector de valor eficaz; `itu_r_468_weighting` es solo la red, así que un nivel
+calculado con ella y una suma en valor eficaz no es una cifra en dBqps y no se
+debe comparar con una de una hoja de características.*
+
+El espectro de banda que ahí se dibuja es el que el fragmento de la sección 4
+pasa como `MicrophoneNoise(spectrum=...)`, ponderado con `itu_r_468_weighting`
+del [módulo de electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/)
+y con ponderación A, y sumado después banda a banda.
+
+**Cómo se obtiene $U_N$** (apartado 17.2). El micrófono se aísla del sonido, del
+viento, de los golpes, de la vibración y de los campos eléctricos o magnéticos,
+pero tiene que permanecer en **modo de funcionamiento acústico**: la norma
+advierte explícitamente de que sustituir el elemento transductor por un circuito
+equivalente no mide el micrófono, porque el elemento aporta ruido propio. Un
+preamplificador de 40 a 60 dB mantiene dominante el ruido del propio micrófono,
+así que no hace falta corrección por la instrumentación. Llega entonces la
+comprobación que decide si el número sirve: sustituir el micrófono por una
+resistencia a temperatura ambiente igual a su impedancia nominal y exigir que la
+salida medida sea **menor que un tercio** del valor medido con el micrófono, de
+modo que la instrumentación y cualquier sonido externo residual inflen el
+resultado menos de un 10 %. Informa de qué ponderación y qué detector
+produjeron la cifra — valor eficaz ponderado A (IEC 60268-1 6.2.1), cuasipico
+ITU-R 468 (6.2.2) o tercios de octava sin ponderar (6.2.3) —, porque los tres
+difieren en unos 10 dB sobre la misma cápsula y el apartado pide que la medición
+de cuasipico esté entre ellos.
+
+### 3.1 Qué más acota el rango útil
+
+El **nivel de presión acústica de sobrecarga** (15.2) es la presión de una onda
+plana a la que la no linealidad de amplitud del micrófono alcanza un límite
+declarado, para cualquier frecuencia del rango efectivo y cualquier dirección de
+incidencia; la norma señala que no existe un límite común y que las hojas de
+características suelen declarar un 0,5 % o un 1 %. Producir el campo es la parte
+difícil de la medición: un nivel de 140 dB tiene que salir de algo cuya propia
+distorsión quede muy por debajo de la de la cápsula, en la práctica una cámara
+de presión pequeña o un motor de compresión sobre un acoplador, con la
+distorsión de la fuente caracterizada antes contra un micrófono de referencia.
+Si barres el nivel con un altavoz corriente, la curva que dibujas es la del
+altavoz. La salida que el propio apartado da al problema es usar en su lugar la
+medición por diferencia de frecuencias de 14.4.2, que al menos minimiza la
+influencia de la no linealidad de la fuente.
+
+Otros tres límites son características nominales por derecho propio, y los tres
+se declaran como **niveles de presión acústica equivalentes**, así que se pueden
+comparar banda a banda con el ruido propio de arriba:
+
+- **Vibración mecánica** (19.2): la presión acústica equivalente producida por
+  una aceleración eficaz declarada en la dirección de máxima influencia,
+  declarando también la dirección de mínima influencia, medida con frecuencia
+  deslizante hasta 250 Hz. Esto es el ruido de soporte y de manipulación, y es
+  la razón de que una suspensión elástica se especifique en vez de darse por
+  supuesta.
+- **Viento** (19.3): la presión acústica equivalente para una velocidad y una
+  dirección de viento declaradas, siendo el valor de referencia 10 m/s. Es la
+  magnitud contra la que se declara la eficacia de un paravientos.
+- **Efecto «pop» transitorio** (19.4): el golpe de aire de una oclusiva de un
+  hablante cercano, que se ataja con un filtro antipop o con un cambio de
+  distancia de trabajo.
 
 ## 4. Informe de características del micrófono (IEC 60268-4)
 
@@ -154,6 +338,24 @@ de solo repetirse:
   señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
   sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
   límite de THD declarado.
+
+Las cuatro curvas de entrada del fragmento de abajo son sintéticas, pero cada
+una representa una medición con nombre propio y conviene saber cuál antes de
+salir a tomar datos. La **respuesta de campo libre** sale de una calibración por
+sustitución contra un micrófono de referencia en cámara anecoica (5.6.2 a), o se
+sintetiza a partir de una respuesta de presión con actuador electrostático más
+la corrección de campo libre del fabricante, y se normaliza a 0 dB en la
+frecuencia de referencia de 1 kHz que marca el informe. Los **cortes polares**
+salen de girar el micrófono sobre un plato giratorio en esa misma cámara, un
+corte por cada frecuencia declarada, en un plano que contenga el eje de
+referencia y manteniendo constantes la distancia, la presión acústica y la
+frecuencia mientras se avanza en $\theta$ (13.1.2 a). El **espectro de ruido
+propio** es el desglose en tercios de octava de la medición del apartado 17.2,
+con el ancho de banda del analizador declarado, y el `voltage` único es el valor
+eficaz ponderado de esa misma medición. La **curva de distorsión frente a
+nivel** sale de ir subiendo la presión acústica de una fuente de nivel alto
+mientras se mide la distorsión a la salida (15.2.2), y el nivel de sobrecarga se
+lee en ella donde la curva cruza el límite declarado.
 
 ```python
 import numpy as np
@@ -191,11 +393,46 @@ result = microphone_characteristics(
 print(round(result.sensitivity_level_db, 1))            # -38.1 dB re 1 V/Pa
 print(tuple(round(x) for x in result.effective_range))  # Hz
 print(round(result.directivity_index_db, 1))            # 4.8 dB (cardioide)
-print(round(result.equivalent_noise_level_db, 1))       # dB(A)
+print(round(result.equivalent_noise_level_db, 1))       # 14.0 dB(A)
+print(round(result.signal_to_noise_ratio_db, 1))        # 80.0 dB re 1 Pa
+
+# Los tres patrones canónicos de la sección 2, por la misma integral de
+# 11.2.2 a): b = 1/2 y b = 1 devuelven el mismo índice desde formas opuestas.
+for b in (0.0, 0.5, 1.0):
+    polar = 20 * np.log10(
+        np.maximum(np.abs((1 - b) + b * np.cos(np.radians(angles))), 1e-3))
+    family = microphone_characteristics(
+        freqs, response, 12.5, tolerance_db=3.0,
+        directivity=MicrophoneDirectivity(polar=(angles, polar),
+                                          frequency=1000.0))
+    print(b, round(family.directivity_index_db, 1))     # 0.0 / 4.8 / 4.8 dB
 
 result.report("microfono.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-4"),
               language="es")
 ```
+
+El cuarto `print` cierra una cadena que la página ha dejado abierta dos veces.
+Una tensión de ruido propio de 1,25 µV a la salida de una cápsula de
+12,5 mV/Pa es una presión acústica de 100 µPa en su diafragma, que son
+$20\log_{10}(100/20) = 14{,}0$ dB por encima de la referencia de 20 µPa: este
+micrófono leería 14 dB(A) en una sala perfectamente silenciosa, y no puede medir
+nada más silencioso que unos 24 dB(A) sin contribuir al resultado. La relación
+señal-ruido que el resultado también lleva son simplemente 94 dB menos esa
+cifra — 80,0 dB —, porque la referencia de la norma es 1 Pa. Esa misma tensión
+leída a través de la ITU-R BS.468-4 con detector de cuasipico se informaría unos
+10 dB más alta para la misma cápsula, así que este número son 14 dB(A) y no debe
+ponerse nunca al lado de una cifra en dB(468) de otra hoja.
+
+Hay una trampa que la API reproduce y que la página tiene que cerrar:
+`MicrophoneNoise.voltage` es la tensión de ruido propio **medida a través de la
+red de ponderación**, no un valor eficaz de banda ancha en bruto, y `weighting=`
+registra qué red fue esa. Toma en silencio el valor por defecto `'A'`
+(IEC 60268-1 6.2.1). El campo es una *etiqueta, no un filtro*: la función no
+vuelve a ponderar nada, así que declarar `weighting="CCIR"` mientras se le pasa
+una tensión ponderada A produce un nivel correctamente calculado con el nombre
+equivocado encima, que es exactamente el error del que avisa la sección 3, ahora
+impreso en un informe. Dar las dos cifras de la misma cápsula es la forma
+honrada, porque son preguntas distintas y las dos son legítimas.
 
 `microphone_characteristics` devuelve un `MicrophoneCharacteristics` con el
 `sensitivity_level_db`, el `effective_range`, el `directivity_index_db`, el
@@ -224,6 +461,14 @@ result.plot(quantity="distortion")   # THD frente al nivel de presión acústica
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_response_es.svg" alt="Respuesta relativa de campo libre del micrófono con su banda de tolerancia sombreada, el marcador de la frecuencia de referencia y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
+*La banda sombreada es la tolerancia que declara quien lee (`tolerance_db`, 3 dB
+aquí) y los bordes del rango efectivo del apartado 12.2 son sus cruces
+interpolados, así que una tolerancia más estrecha acorta el rango declarado: dos
+micrófonos no se pueden comparar solo por el rango sin ella. La curva está
+normalizada a 0 dB en la frecuencia de referencia de 1 kHz del apartado 11.3,
+que es donde se cita la sensibilidad nominal, y el realce cercano a 9 kHz de
+aquí es un pico de presencia deliberado, no un defecto.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 
@@ -245,6 +490,14 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_directivity_es.svg" alt="Diagrama direccional cardioide del micrófono a 1000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
+
+*Dibujado sobre el círculo de referencia de 25 dB del apartado 3 de IEC 60263,
+así que el radio completo son 25 dB y cada anillo son 5 dB; el rechazo trasero
+del cardioide es la profundidad de su nulo a 180°. Este es un corte a una
+frecuencia: una cápsula real conserva la forma de libro de texto solo por el
+centro de su banda, que es la razón de que el apartado 13.1.2 a) pida los
+centros de octava de 125 Hz a 16 kHz. Es el panel a partir del cual se calcula
+el índice de directividad de 4,8 dB de la ficha.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -270,6 +523,13 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_es.svg" alt="Espectro de nivel de banda del ruido inherente del micrófono frente a la frecuencia" width="82%" />
+
+*El desglose por bandas que hay detrás de la cifra única de ruido equivalente, y
+atención a la ordenada: son niveles de banda de **presión acústica**
+equivalente, no de tensión. La subida en el extremo grave es el ruido 1/f del
+amplificador, que la ponderación A descuenta con dureza, y por eso el total
+ponderado A lo dominan las bandas medias y por eso la misma cápsula lee tan
+distinto a través de la red 468.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -297,6 +557,12 @@ plt.show()
 </details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
+
+*El codo es donde el movimiento de la cápsula deja de ser lineal, y el nivel de
+presión acústica de sobrecarga del apartado 15.2 no es más que la lectura de
+esta curva en el límite declarado, de modo que un «SPL máximo» citado al 0,5 % y
+otro citado al 3 % se diferencian en varios decibelios para el mismo micrófono,
+y ninguno significa nada sin su porcentaje.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -336,7 +602,12 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las características nominales de micrófono de
+**Cubierto.** Los tres tipos de sensibilidad y las condiciones nominales, la
+geometría, la calibración por sustitución y la cota de exactitud de ±2 dB que
+hay detrás de ellos (apartados 4.2.2, 5.5.2, 5.6.2, 5.7, 11.2), el
+procedimiento de ruido propio del apartado 17.2 con su comprobación del tercio
+residual, y los límites de 15.2 y 19.2-19.4. Las características nominales de
+micrófono de
 IEC 60268-4:2014 mediante `microphone_characteristics` y su `.report()`: el
 nivel de sensibilidad re 1 V/Pa (11.1/11.3), el rango de frecuencias
 efectivo frente a una tolerancia declarada (12.2), el índice de
@@ -347,10 +618,15 @@ las impedancias nominales y la alimentación (9/10), con los paneles de
 respuesta, polar, ruido y distorsión dibujados según las convenciones de
 escala de IEC 60263.
 
-**No cubierto.** Los procedimientos de medición que producen las curvas de
-entrada (la respuesta de campo libre, los cortes polares, el espectro de
-ruido, el barrido de distorsión frente a nivel) son del laboratorio; esta
-guía los reduce y los presenta. La edición implementada está congelada en
+**No cubierto.** La instrumentación propia del laboratorio: la cámara anecoica
+y su cualificación, el micrófono de referencia y su certificado de calibración,
+la fuente de nivel alto que produce un campo de 140 dB y el plato giratorio. Las
+*condiciones* que esos instrumentos tienen que cumplir están en las secciones
+1.1, 3 y 3.1, porque son lo que significan los números presentados; la
+adquisición en sí no está implementada aquí, ni tampoco el detector de cuasipico
+de la ITU-R 468, así que un nivel de ruido propio calculado con
+`itu_r_468_weighting` y una suma en valor eficaz no es una cifra en dBqps. La
+edición implementada está congelada en
 IEC 60268-4:2014; la revisión de 2018 que la sustituye no es la
 verificada. La calibración acústica de una cadena en uso, de la
 sensibilidad a pascales y dBFS, vive en

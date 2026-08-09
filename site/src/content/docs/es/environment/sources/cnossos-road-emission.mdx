@@ -44,7 +44,7 @@ references:
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Todo mapa estratégico de ruido trazado en la Unión Europea desde 2021 parte de
-los mismos dos números por banda de octava: cuánto ruido hace un vehículo y
+los mismos dos números: cuánto ruido hace un vehículo en cada banda de octava y
 cuántos pasan por hora. El **Anexo II de la Directiva 2002/49/CE**, sustituido
 por los métodos CNOSSOS-EU, los convierte en una **potencia acústica direccional
 por metro de línea fuente**, que la etapa de propagación lleva luego hasta el
@@ -95,10 +95,14 @@ $$
 L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
 $$
 
-La Tabla [2.2.a] fija cinco categorías modelizadas: **1** vehículos ligeros,
-**2** vehículos pesados medios, **3** vehículos pesados, **4a** ciclomotores y
-**4b** motocicletas. (Existe una sexta categoría «abierta» en el texto, pero no
-tiene coeficientes.)
+La Tabla [2.2.a] define cinco categorías de vehículo: **1** vehículos ligeros,
+**2** vehículos pesados medios, **3** vehículos pesados, **4** vehículos de dos
+ruedas a motor y **5** la categoría «abierta», reservada para tipos de vehículo
+todavía sin definir. La categoría 4 se divide en las subclases **4a**
+ciclomotores y **4b** motocicletas, que circulan en modos de conducción muy
+distintos, de modo que la base de coeficientes lleva cinco filas: 1, 2, 3, 4a y
+4b. Las cuatro primeras categorías son obligatorias y la 5 es opcional; no tiene
+coeficientes en el Apéndice F y aquí no se modeliza.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission_es.svg"
@@ -130,11 +134,59 @@ result = road_source_power(
     traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
     junction_distance=60.0, junction_type=JunctionType.CROSSING,
 )
+print(result.total_line_power.round(1))
+# [89.1 82.7 81.3 80.2 80.4 76.2 71.7 66. ]  dB re 1 pW por metro de línea
+print(round(float(result.a_weighted_line_power), 1))     # 84.2 dB(A) por metro
 result.plot()
 plt.show()
 ```
 
 </details>
+
+**Cuánto vale una fuente viaria.** Esta arteria urbana, 1 200 vehículos ligeros,
+90 pesados medios, 45 pesados y 60 motocicletas por hora a 50 km/h, sale a
+**84,2 dB(A) por metro de línea**; el enlace de autopista en circulación libre de
+la sección 6 (1 000 ligeros y 120 pesados por hora a 90 y 80 km/h) llega a
+**88,6 dB(A) por metro**. Esas son las dos magnitudes contra las que contrastar
+un resultado propio. La aritmética que hay detrás merece retenerse: duplicar el
+flujo suma exactamente 3 dB, mientras que reducir a la mitad la velocidad suma
+3 dB al término de flujo $10\log_{10}(Q/1000v)$ y resta del término de rodadura,
+de modo que ambos se cancelan en parte y un enlace urbano queda solo unos pocos
+decibelios por debajo de uno de autopista. El espectro dice qué mecanismo manda:
+la autopista tiene su máximo en 1 kHz porque lleva la rodadura, y la arteria tiene
+su máximo en 63 Hz y se mantiene más plana, porque a 50 km/h con vehículos pesados
+y un cruce a 60 m ha tomado el mando el término de propulsión. La comprobación
+que puede hacer cualquier lector sobre las dos: `a_weighted_line_power` tiene que
+coincidir con la suma energética ponderada A de los valores por banda impresos,
+usando la `CNOSSOS_A_WEIGHTING` por bandas de octava de la sección 6.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_road_es.svg" alt="Planta y sección de una arteria urbana de dos carriles modelizada con CNOSSOS-EU. En planta, una línea fuente recorre el centro de cada carril, una de las líneas está dividida en tramos de 20 m con el tramo central rotulado con su potencia de línea más diez log de la longitud del tramo y su fuente puntual equivalente marcada en el centro, un cruce regulado por semáforo queda con la distancia x de 60 m acotada hacia atrás a lo largo de la vía y un pequeño gráfico en línea del decaimiento max(1 menos x partido por 100, 0) al lado, y una fachada de vivienda se sitúa a 25 m del carril más próximo con el receptor marcado sobre ella. En sección, la fuente puntual queda a 0,05 m sobre el pavimento, el receptor a 4 m del suelo en la fachada, y la pendiente s de la vía está dibujada con las mitades ascendente y descendente de un flujo bidireccional rotuladas por separado" width="92%" />
+
+### De dónde sale cada dato de entrada
+
+Todos los argumentos de `road_source_power` son magnitudes *definidas* en el
+Anexo II, y equivocarse en uno es un error silencioso: la llamada funciona y el
+mapa queda desviado varios decibelios. De aquí se lee cada uno.
+
+| Argumento | Qué significa | De dónde se lee | La trampa |
+| :--- | :--- | :--- | :--- |
+| `RoadTraffic.flow_rate` ($Q_m$) | Vehículos de la categoría $m$ por hora | Promedio anual por hora, por periodo temporal (día / tarde / noche), por clase de vehículo y **por línea fuente**, a partir de aforos o de un modelo de tráfico (2.2.1) | Un aforo de hora punta. $Q$ es un promedio anual del periodo, que es lo que convierte el resultado en un ingrediente del $L_{den}$ |
+| `RoadTraffic.speed` ($v_m$) | Velocidad representativa de la categoría $m$ | En la mayoría de los casos, la **menor** entre el máximo legal del tramo de vía y el máximo legal de la categoría de vehículo; donde no haya datos de medida locales, el máximo legal de la categoría (2.2.1) | Suponer que hace falta una media medida. No hace falta: el valor por defecto de la norma *es* el límite legal, y los vehículos pesados suelen tener uno más bajo que el del tramo |
+| `temperature` ($\tau$) | Temperatura del aire | La temperatura del aire **promedio anual** del periodo, a partir de datos meteorológicos de largo plazo (2.2.10) | El valor del día de la campaña. Con $K_1 = 0{,}08$ dB/°C, una media anual de 12 °C frente a una tarde de 20 °C son 0,6 dB en el término de rodadura de los ligeros |
+| `RoadTraffic.studded_fraction`, `studded_months` ($Q_{\mathrm{stud,ratio}}$, $T_s$) | Cuota de flota y temporada | La proporción media de vehículos ligeros por hora con neumáticos con clavos **durante** los meses en que los llevan, y el número de esos meses; el propio método forma $p_s = Q_{\mathrm{stud,ratio}}\,T_s/12$ (2.2.7) | Pasar la cuota promediada al año, que aplica $T_s/12$ dos veces |
+| `junction_distance` ($x$) | Distancia al cruce | Medida a lo largo de la vía desde la fuente puntual hasta la **intersección más próxima de esta línea fuente con otra línea fuente** (2.2.5) | Medir hasta la línea de detención o hasta el bordillo. Es el cruce de líneas, y solo afectan los últimos 100 m |
+| `junction_type` ($k$) | 1 cruce con semáforo, 2 glorieta | La regulación del cruce, no su forma | Un cruce con prioridad no es ninguno de los dos: la corrección está definida para semáforos y glorietas |
+| `gradient` ($s$) | Pendiente longitudinal con signo, % | El modelo del terreno a lo largo de la línea fuente, saturando en ±12 % | Aplicar un solo signo a un flujo bidireccional. La norma exige partir el flujo por la mitad y corregir una mitad en subida y la otra en bajada |
+| `surface` | Tipo de pavimento | El inventario de firmes, emparejado con una fila de la Tabla F-4 **y su rango de velocidad declarado** | Usar una fila fuera de su rango de validez |
+| geometría | Línea fuente y receptor | Una línea por carril en el centro del carril (también se admite una línea por calzada, o una para una vía de doble sentido), con la fuente puntual a 0,05 m sobre el pavimento; los puntos receptores de la Directiva están a 4 m del suelo | Situar la fuente en el bordillo, o a la altura de la carrocería |
+
+Dos consecuencias que conviene enunciar sin rodeos. La primera, que la
+temperatura tiene que pertenecer al *mismo* periodo que $Q$ y $v$: un flujo de
+noche emparejado con una media anual de temperatura y una velocidad de noche es
+lo que convierte la potencia de línea resultante en un ingrediente del $L_{den}$
+y no en una instantánea de una tarde. La segunda, que la línea fuente es un
+objeto de modelado y no una marca vial: moverla del centro del carril al bordillo
+cambia todas las distancias de propagación aguas abajo.
 
 ## 3. Ruido de rodadura (2.2.4 a 2.2.10)
 
@@ -167,11 +219,76 @@ $$
 \Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
-Los **cruces** (2.2.17) suman $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, con $x$
-la distancia en metros al cruce más próximo y $k$ el tipo de cruce: 1 para un
-cruce regulado por semáforo y 2 para una glorieta. Los coeficientes de rodadura
-$C_R$ son *negativos* (el tráfico junto a un cruce va más despacio) y los de
-propulsión $C_P$ positivos (va acelerando). Ambos se anulan a partir de 100 m.
+Los **cruces** (2.2.17, 2.2.18) suman el mismo decaimiento lineal a los dos
+términos: $\Delta L_{WR,\mathrm{acc}} = C_{R,m,k}\cdot\max(1 - |x|/100,\ 0)$ para
+el ruido de rodadura y
+$\Delta L_{WP,\mathrm{acc}} = C_{P,m,k}\cdot\max(1 - |x|/100,\ 0)$ para el de
+propulsión, con $x$ la distancia en metros de la fuente puntual a la intersección
+más próxima de su línea fuente con otra línea fuente, y $k$ el tipo de cruce: 1
+para un cruce regulado por semáforo y 2 para una glorieta. Los dos se atribuyen
+por igual a todas las bandas de octava. Los coeficientes de rodadura $C_R$ son
+*negativos* (el tráfico junto a un cruce va más despacio) y los de propulsión
+$C_P$ positivos (va acelerando), y la norma declara explícitamente que los dos
+son nulos a partir de $|x| \ge 100$ m.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_corrections_es.svg" alt="Tres paneles que dan el cambio ponderado A de la potencia de línea fuente que produce cada corrección de la sección 3, todos calculados sobre un flujo de 1000 vehículos por hora. Izquierda: la temperatura del aire barrida de menos 10 a más 40 grados Celsius, una recta que vale unos 2,1 dB a menos 10 para los vehículos ligeros y unos 0,5 dB para los pesados, cruzando el cero en la referencia de 20 grados. Centro: la corrección por neumáticos con clavos frente a la velocidad para dos cuotas de flota, plana por debajo de 50 km/h, con máximo cerca de 50 km/h y plana otra vez por encima de 90 km/h. Derecha: la corrección por cruce frente a la distancia al cruce de 0 a 120 m, negativa tanto para un cruce con semáforo como para una glorieta, más profunda para la glorieta en el propio cruce, e idénticamente nula a partir de 100 m" width="92%" />
+
+*Las tres correcciones de esta sección, cada una dibujada como lo que de verdad
+le hace a la potencia de línea. El término de temperatura es el único exactamente
+lineal y el único que cambia de signo; el de clavos es una banda saturante entre
+50 y 90 km/h; y el de cruce no es monótono, porque el coeficiente negativo de
+rodadura y el positivo de propulsión decaen a la vez: en un cruce con semáforo la
+reducción más profunda está en torno a 50 m, no en el propio cruce.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `road_source_power`, `RoadTraffic`, `RoadVehicleCategory` y `JunctionType`
+# los importa el fragmento de la figura de arriba.
+def a_line(**kwargs):
+    return float(road_source_power(**kwargs).a_weighted_line_power)
+
+ligeros = [RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 50.0)]
+pesados = [RoadTraffic(RoadVehicleCategory.HEAVY, 1000.0, 50.0)]
+temps = np.linspace(-10.0, 40.0, 60)
+fig, (t_ax, s_ax, j_ax) = plt.subplots(1, 3, figsize=(13, 4.2))
+for flujo, name in [(ligeros, "Ligeros (1)"), (pesados, "Pesados (3)")]:
+    ref = a_line(traffic=flujo)
+    t_ax.plot(temps, [a_line(traffic=flujo, temperature=t) - ref for t in temps],
+              label=name)
+t_ax.set(xlabel="Temperatura del aire tau [°C]",
+         ylabel="Cambio en la potencia de línea [dB(A)]")
+t_ax.legend()
+
+velocidades = np.linspace(20.0, 130.0, 60)
+for share in (0.2, 0.5):
+    s_ax.plot(velocidades, [
+        a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, v,
+                                    studded_fraction=share)],
+               studded_months=4.0)
+        - a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, v)])
+        for v in velocidades], label=f"Qstud,ratio = {share:g}, Ts = 4 meses")
+s_ax.set(xlabel="Velocidad v [km/h]",
+         ylabel="Cambio en la potencia de línea [dB(A)]")
+s_ax.legend(fontsize="small")
+
+xs = np.linspace(0.0, 120.0, 60)
+ref = a_line(traffic=ligeros)
+for junction, name in [(JunctionType.CROSSING, "Cruce con semáforo"),
+                       (JunctionType.ROUNDABOUT, "Glorieta")]:
+    j_ax.plot(xs, [a_line(traffic=ligeros, junction_distance=float(x),
+                          junction_type=junction) - ref for x in xs], label=name)
+j_ax.set(xlabel="Distancia al cruce |x| [m]",
+         ylabel="Cambio en la potencia de línea [dB(A)]")
+j_ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
 
 ## 4. Ruido de propulsión (2.2.11 a 2.2.16)
 
@@ -246,6 +363,64 @@ La categoría 4 no lleva corrección por pendiente. La pendiente se satura en el
 de la carga, así que las dos ramas son positivas. Para un flujo bidireccional,
 divide el flujo en dos y corrige una mitad en subida y la otra en bajada.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_gradient_es.svg" alt="La corrección ponderada A por pendiente de la vía al ruido de propulsión frente a la pendiente con signo de menos 14 a más 14 por ciento, a 50 y 80 km/h, para las categorías de vehículo 1, 2 y 3. Cada curva es plana dentro de su propia banda muerta, sube con pendiente pronunciada por el lado de bajada y menos pronunciada por el de subida, y deja de cambiar más allá de más o menos 12 por ciento, donde la pendiente satura; la rama de bajada de los vehículos ligeros es la única que no se mueve con la velocidad" width="88%" />
+
+*La asimetría es una forma, no una errata. Cada categoría tiene su propia banda
+plana (de −6 % a +2 % para los ligeros, de −4 % a 0 % para las dos clases de
+pesados), cada una satura en ±12 %, y las dos ramas suben: en bajada el motor
+frena y en subida trabaja. A 80 km/h un descenso del 14 % vale 6,0 dB(A) a un
+vehículo ligero y 11,2 dB(A) a uno pesado, mientras que la misma subida vale 5,3
+y 12,0 dB(A), y la rama de bajada de los ligeros es la única de las seis que no
+escala con la velocidad.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `road_propulsion_noise` y `CNOSSOS_A_WEIGHTING` los importa el fragmento de la
+# figura de las leyes de velocidad de más arriba.
+weights = np.asarray(CNOSSOS_A_WEIGHTING)
+a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
+
+pendientes = np.linspace(-14.0, 14.0, 141)
+fig, ax = plt.subplots()
+for category in ("1", "2", "3"):
+    for speed, style in [(50.0, "--"), (80.0, "-")]:
+        plano = a_weighted(road_propulsion_noise(category, speed))
+        ax.plot(pendientes,
+                [a_weighted(road_propulsion_noise(category, speed, gradient=s)) - plano
+                 for s in pendientes], style, label=f"Categoría {category}, {speed:g} km/h")
+ax.set_xlabel("Pendiente de la vía s [%]")
+ax.set_ylabel("Corrección del ruido de propulsión [dB(A)]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
+
+**Por debajo de 20 km/h el vehículo deja de hacerse más silencioso.** El apartado
+2.2.1 declara, después tanto de la (2.2.2) como de la (2.2.3), que para
+velocidades inferiores a 20 km/h la potencia acústica toma su valor de 20 km/h:
+las regresiones tabuladas se ajustaron sobre tráfico en circulación libre y no se
+extrapolan a una cola. El término de flujo conserva la velocidad *real*, así que
+las dos mitades de la (2.2.1) tiran en sentidos opuestos y la potencia de línea
+tiene un mínimo. Para 1 000 vehículos ligeros por hora sobre el pavimento de
+referencia, `road_source_power` devuelve 81,5 dB(A) por metro a 50 km/h, **76,2 a
+20 km/h**, 79,2 a 10 km/h y 82,2 a 5 km/h: la misma vía se vuelve *más ruidosa*
+por metro a medida que la corriente se frena por debajo de ese mínimo,
+simplemente porque hay más vehículos en cada metro de ella. Un lector que no
+conozca ese mínimo no puede distinguir eso de un efecto de congestión
+modelizado.
+
+Conviene decir, por tanto, qué no representa el modelo: los ciclos de aceleración
+y frenado, el ralentí en una cola y el ruido de propulsión de la conducción de
+parada y arranque, para lo que la corrección por cruce sobre los últimos 100 m es
+un sustituto deliberadamente grosero. Los tramos congestionados se modelizan
+normalmente a su velocidad media de recorrido con esa corrección aplicada.
+
 ## 5. El pavimento (2.2.19, 2.2.20 y Tabla F-4)
 
 La Tabla F-4 da, para el pavimento de referencia y para cada uno de los catorce
@@ -273,6 +448,44 @@ row.speed_range          # (80.0, 130.0) km/h, el rango de validez impreso
 row.alpha["1"]           # alpha por banda de octava para vehículos ligeros
 row.beta["1"]            # -0.1, el coeficiente de velocidad
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_surfaces_es.svg" alt="Coeficiente de pavimento alpha por banda de octava para vehículos ligeros frente a la frecuencia, para cinco filas de la Tabla F-4 que cubren todo el rango, más el pavimento de referencia todo ceros dibujado como una línea plana en 0 dB. Las dos filas de mezcla bituminosa porosa de doble capa quedan varios decibelios por debajo de la referencia en las bandas medias y altas, las capas finas algo por debajo, y el pavimento de elementos rígidos bastante por encima, con el rango de velocidad declarado de cada curva impreso en la leyenda" width="88%" />
+
+*El pavimento de referencia es la línea cero, así que cada curva se lee
+directamente como «más ruidoso o más silencioso que la referencia de CNOSSOS»: la
+mezcla bituminosa porosa de doble capa queda 6,3 dB por debajo a 1 kHz, y los
+elementos rígidos no colocados en espina de pez quedan 31,4 dB por encima a
+63 Hz. El rango de velocidad declarado que aparece en la leyenda forma parte de
+la fila: una mezcla porosa validada de 80 a 130 km/h no es un juego de
+coeficientes para una calle de 30 km/h, la fila de referencia es la única sin
+rango, y el método no ofrece interpolación entre filas.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `RoadSurface` y `road_surface_coefficients` se importan justo arriba.
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+fig, ax = plt.subplots()
+for surface in (RoadSurface.REFERENCE, RoadSurface.TWO_LAYER_ZOAB_FINE,
+                RoadSurface.ONE_LAYER_ZOAB, RoadSurface.THIN_LAYER_A,
+                RoadSurface.SMA_NL8, RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE):
+    row = road_surface_coefficients(surface)
+    # La fila de referencia no lleva rango de velocidad: es válida por definición.
+    span = ("todas las velocidades" if row.speed_range is None
+            else "{:g}-{:g} km/h".format(*row.speed_range))
+    ax.semilogx(bands, row.alpha["1"], label=f"{surface.value} ({span})")
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xlabel("Frecuencia central de banda de octava [Hz]")
+ax.set_ylabel("Coeficiente de pavimento alpha, categoría 1 [dB]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
 
 El pavimento de referencia de la primera fila es todo ceros: es el promedio
 virtual de una mezcla bituminosa densa 0/11 y una mezcla bituminosa discontinua

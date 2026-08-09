@@ -26,6 +26,13 @@ references:
     publisher: "Wiley"
     doi: "10.1002/9780470172568"
     note: "The companion treatment of reactive and dissipative silencers."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2003
+    title: "Acoustics — Laboratory measurement procedures for ducted silencers and air-terminal units — Insertion loss, flow noise and total pressure loss"
+    designation: "ISO 7235:2003 (EN ISO 7235:2009)"
+    url: "https://www.iso.org/standard/28379.html"
+    note: "The substitution measurement of section 3: the source, modal filter, transition and substitution duct of Clause 5.2, the three receiving-side arrangements of 5.2.4, the two series of 6.2.1 with the Table 6 spread limits, and the limiting insertion loss of Clause 7.4 and Annex C."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -50,11 +57,10 @@ enclosures, lives in
 
 ## 1. Reactive silencers (four-pole method)
 
-A reactive silencer attenuates by *reflecting* sound with impedance
-discontinuities. Each acoustic element is a 2x2 **transfer matrix** relating the
-pressure $p$ and volume velocity $Su$ at its two ends, and a compound silencer
-is the ordered matrix product of its elements (Bies §8.9). A straight duct of
-length $L$ and area $S$ is
+Reflection is computed one element at a time. Each acoustic element is a
+2x2 **transfer matrix** relating the pressure $p$ and volume velocity $Su$ at
+its two ends, and a compound silencer is the ordered matrix product of its
+elements (Bies §8.9). A straight duct of length $L$ and area $S$ is
 
 $$
 \begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
@@ -120,6 +126,13 @@ only by the chamber length.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber.svg" alt="Expansion-chamber transmission loss against frequency for area ratios m = 2, 4, 8 and 16, showing periodic peaks rising with m at odd multiples of the quarter-wave frequency and troughs returning to 0 dB at every half-wavelength of the chamber length" width="88%" />
 
+*Two design levers, and only one of them is cheap. The peak,
+$10\log_{10}[1 + \tfrac14(m - 1/m)^2]$, grows only as the logarithm of the area
+ratio — $m = 2$ buys 1.9 dB and $m = 16$ buys 18.1 dB, so quadrupling the
+chamber cross-section is worth about 6 dB — while the trough frequencies
+$n\,c/2L$ never move at all, because they depend on the length alone. A chamber
+is lengthened to move the notch and widened to deepen the peak.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -130,10 +143,12 @@ from phonometry import expansion_chamber
 
 freqs = np.linspace(20.0, 2000.0, 2000)
 
-# One line for one chamber: TL vs frequency (with the insertion loss too if
-# source/radiation impedances are given).
+# One line for one chamber: TL vs frequency, plus the insertion loss when the
+# two acoustic impedances are given (Pa.s/m3 -- see the next subsection for
+# where they come from). With both set to rho c / S = 4.14e4 for this 0.01 m2
+# pipe the two curves coincide, which is what "anechoic ports" means.
 expansion_chamber(freqs, 0.3, 0.04, 0.01,
-                  source_impedance=4e4, radiation_impedance=5e3).plot()
+                  source_impedance=4.14e4, radiation_impedance=4.14e4).plot()
 plt.show()
 
 # By hand: the family of area ratios of the concept figure.
@@ -180,6 +195,95 @@ plt.show()
 ```
 
 </details>
+
+### Transmission loss, insertion loss, and which one a datasheet quotes
+
+Three quantities are in circulation and they are not interchangeable.
+**Transmission loss** compares the incident power entering the element with the
+power leaving it into a reflection-free termination, so it is a property of the
+element alone — which is exactly why it can be computed from geometry, and why
+the formula above sets $Z_1 = \rho c/S_\text{in}$ and $Z_n = \rho c/S_\text{out}$
+without asking what the silencer is connected to. **Insertion loss** compares
+the level at a fixed point with and without the element in place, so it depends
+on the source and on what the duct radiates into, and the same chamber shows a
+different insertion loss in two installations. **Noise reduction** is the plain
+level difference across the element, which is what a two-microphone measurement
+in a live duct returns.
+
+A reactive element is where they diverge most, because it works by sending
+energy back towards a source that may re-reflect it. Both impedances are
+acoustic, in Pa·s/m³ (pressure per volume velocity), and they have a scale:
+$\rho c/S$ for the 0.01 m² inlet pipe is $4.14 \times 10^{4}$, so a source far
+above that approximates a constant-volume-velocity machine such as a
+reciprocating engine and one far below it a constant-pressure source. The
+termination is not a free choice at all — for a duct discharging into a room it
+is the radiation impedance of the open end,
+$Z_r = (\rho c/S)(R_1 + jX_1)$, whose normalised $R_1$ and $X_1$ the
+[radiating piston](/phonometry/devices/electroacoustics/loudspeakers/#2-radiating-piston-radiation-impedance-and-directivity)
+of the electroacoustics domain returns as `radiating_piston(...).resistance` and
+`.reactance` (its `radiation_resistance` and `radiation_reactance` are the
+*mechanical* impedance $\rho c S(R_1 + jX_1)$ in N·s/m — a factor $S^2$ away,
+and an easy thing to feed in by mistake). The source impedance of a fan or an
+engine, by contrast, is rarely known and strongly frequency dependent, which is
+precisely why insertion loss is a *measured* quantity in practice.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss.svg" alt="Attenuation against frequency from 20 to 880 Hz for one 0.3 m expansion chamber of area ratio 4. A thick curve gives the transmission loss, a smooth hump between 0 and 6.5 dB with a zero at 572 Hz. Two thinner curves give the insertion loss of the same chamber discharging through the radiation impedance of its open end, one for a source matched to the pipe and one for a source twenty times stiffer: both dip far below zero near 180 Hz, to minus 9.3 and minus 22.6 dB, dip again near 645 Hz to minus 2.9 and minus 8.5 dB, and rejoin the transmission loss at the top of the band" width="88%" />
+
+*The same chamber, three answers. Transmission loss never goes below zero,
+because it is defined against a termination that reflects nothing. Insertion
+loss can: near 180 Hz this chamber and the open end it discharges through
+resonate together, and the installation is **louder** with the silencer in it
+than without — 9.3 dB louder for a source matched to the pipe and 22.6 dB for a
+stiff one, where the transmission loss reads a comfortable +5 dB. This is why a
+catalogue publishes a dynamic insertion loss measured with the design airflow in
+the design direction, and why a computed TL is a sizing tool rather than a
+specification.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import special          # expansion_chamber: imported in section 1
+
+freqs = np.linspace(20.0, 880.0, 1600)     # below the 890.8 Hz cut-on
+rho, c, pipe_area = 1.206, 343.0, 0.01
+z0 = rho * c / pipe_area                   # 41.4 kPa.s/m3
+
+# The open end, as the baffled piston: R1(2ka) and X1(2ka). The same two
+# numbers come out of radiating_piston(a, freqs).resistance / .reactance.
+a = np.sqrt(pipe_area / np.pi)
+x = 2.0 * (2.0 * np.pi * freqs / c) * a
+z_r = z0 * ((1.0 - 2.0 * special.j1(x) / x)
+            + 1j * (2.0 * special.struve(1, x) / x))
+
+# One line: the result draws the insertion loss beside the transmission loss
+# whenever both impedances are given.
+expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                  source_impedance=z0, radiation_impedance=z_r).plot()
+plt.show()
+
+# By hand: the two source impedances of the figure against the same outlet.
+fig, ax = plt.subplots()
+ax.plot(freqs, expansion_chamber(freqs, 0.3, 0.04, pipe_area).transmission_loss,
+        label="Transmission loss")
+for factor, label in ((20.0, "stiff source"), (1.0, "matched source")):
+    res = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                            source_impedance=factor * z0, radiation_impedance=z_r)
+    ax.plot(freqs, res.insertion_loss, label=f"Insertion loss, {label}")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Attenuation [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The rule that follows is short: **do not compare a computed transmission loss
+with a published insertion loss.** Write requirements against insertion loss
+with the termination stated, get the number from the supplier or from a test
+(section 3), and treat the transmission loss this page computes as the tool that
+tells you which geometry to ask for.
 
 The clip below runs an $m = 4$ chamber of the same 0.30 m length in a 2D FDTD
 duct at its two characteristic frequencies. At $kL = \pi$ the chamber is a
@@ -251,13 +355,97 @@ print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, not 285.8
 # An inlet extension of L/4 fills the first expansion-chamber trough.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
+print(round(float(et.transmission_loss[np.argmin(abs(f - 428.75))]), 1))
+# 5.1 dB where the plain chamber reads 0.0
 ```
+
+An extension is a quarter-wave stub buried inside the chamber, so it does its
+work where the chamber has none. The plain 0.4 m chamber is transparent at
+$c/2L = 429$ Hz; a 0.1 m inlet extension ($L/4$) puts 5.1 dB back there, and
+adding a 0.2 m outlet extension ($L/2$) turns the trough into a 74 dB spike.
+The trade is visible in the same figure: each extension is itself a resonator,
+so it opens a **new** trough of its own — at 355 Hz for the inlet extension
+alone and at 261 Hz for the pair.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube.svg" alt="Transmission loss from 20 to 880 Hz of a 0.4 m expansion chamber in three configurations: the plain chamber as a dashed hump reaching 6.5 dB and falling to zero at 429 Hz, the same chamber with a 0.10 m inlet extension which is worth 5.1 dB at 429 Hz but opens a new zero at 355 Hz, and the chamber with both a 0.10 m inlet and a 0.20 m outlet extension which spikes past 45 dB at 429 Hz and opens its own zero at 261 Hz" width="88%" />
+
+*What an internal extension buys, and what it costs. The plain chamber's 0 dB
+troughs at every half wavelength are its fatal defect; a quarter-wave extension
+fills the first one, and a second extension of half the length turns it into a
+short. Each extension then rings at its own length, which is why the troughs
+move rather than disappear and why an extended-tube chamber is designed against
+the source spectrum rather than in general.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `f`, and extended_tube_chamber / expansion_chamber, as in section 1.
+plain = expansion_chamber(f, 0.4, 0.04, 0.01)
+inlet = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)
+both = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                             outlet_extension=0.2)
+
+# One line for one device:
+inlet.plot()
+plt.show()
+
+fig, ax = plt.subplots()
+for res, label in ((plain, "Plain chamber"), (inlet, "Inlet L/4"),
+                   (both, "Inlet L/4 and outlet L/2")):
+    ax.plot(f, res.transmission_loss, label=label)
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
+ax.set_ylim(0.0, 46.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The extension is a real piece of pipe pushed into the chamber, and
+`.plot_geometry()` draws it to scale like every other device on this page.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_tube_geometry.svg" alt="To-scale cross-section of the extended-tube chamber: a 400 mm chamber of 225.7 mm equivalent diameter between inlet and outlet pipes of 112.8 mm equivalent diameter, with the inlet pipe pushed 100 mm into the chamber and the outlet pipe 200 mm, both dimensioned" width="88%" />
+
+*The same 0.4 m chamber as above, with the inlet tube pushed 100 mm in and the
+outlet 200 mm. Nothing is added on the outside: the two quarter-wave branches
+are the annular spaces the extensions create.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# One line: the dimensioned cross-section of the device just computed.
+extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                      outlet_extension=0.2).plot_geometry()
+plt.show()
+```
+
+</details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%" />
 
 *Each side branch shorts the duct at its own tuning frequency and is nearly
 transparent elsewhere: the narrow spike is why resonators are matched to a
 firing frequency or a fan blade-passing tone rather than used broadband.*
+
+**Do not read the height of that spike.** Both branch models default to
+`resistance=0.0`, so the branch is a perfect short at $f_0$ and the computed
+transmission loss diverges there; what the figure shows is where the frequency
+grid happened to land, which is why the by-hand code below has to clamp the axis
+at 50 dB. What limits the peak in metal is the viscous loss in the neck, the
+radiation from the cavity walls and any damping deliberately added. A well-made
+resonator delivers something like 15 to 25 dB at its tuning frequency, over a
+relative bandwidth set by its $Q$ and typically a few per cent — a fraction of
+an octave. `resistance=` is where a measured or estimated acoustic resistance
+goes, and adding it lowers and broadens the peak, which is the trade between
+depth and tolerance to a tuning error. Read that beside the end-correction
+warning above: a notch 22 % off its target is worth nothing, so the broader
+damped design is usually the safer one.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -367,9 +555,36 @@ plt.show()
 </details>
 
 Each returns a `ReactiveSilencerResult` with `transmission_loss`,
-`insertion_loss` (when impedances are given), the compound `transfer_matrix`
-and `.plot()`. Advanced layouts chain elements directly with `duct_matrix`,
-`shunt_matrix`, `cascade`, `transmission_loss` and `insertion_loss`.
+`insertion_loss` (when impedances are given), the compound `transfer_matrix`,
+the `plane_wave_limit` of its widest cross section and `.plot()`. Advanced
+layouts chain elements directly with `duct_matrix`, `shunt_matrix`, `cascade`,
+`transmission_loss` and `insertion_loss`.
+
+That `plane_wave_limit` is the validity ceiling of everything on this page.
+Above the first higher-order cut-on of the widest section several modes
+propagate, each with its own axial wavenumber, and the computed peaks and
+troughs do not survive; the result raises a `PlaneWaveWarning` when the analysis
+grid runs past it. For the 0.04 m² chamber of the figures above the limit is
+**890.8 Hz**, so the 2 kHz sweeps in the snippets are more than half outside the
+model and the second and third peaks of the $m$-family figure should be read as
+design shape rather than prediction. The cut-on analysis itself is on
+[Duct-Borne Noise](/phonometry/devices/noise-control/duct-path/#8-the-plane-wave-limit).
+
+Three things about the hardware are outside the algebra and decide whether a
+built device behaves like the curve. The **shell** of a chamber is a large
+thin-walled radiator: if its own transmission loss is below the silencer's, the
+sound leaves through the shell and the device delivers the shell's number, which
+is the field version of the limiting insertion loss of section 3. The two
+**area discontinuities carry end corrections**, exactly as a resonator neck
+does, so the acoustic length exceeds the geometric one and the measured troughs
+sit a little below the $c/2L$ printed here — cut-and-try tuning has to be
+verified rather than trusted. And the expansion **regenerates flow noise at its
+own outlet**, which puts a floor under the delivered spectrum that the
+transmission loss says nothing about; that quantity is
+`flow_noise_straight_duct` on the
+[industrial noise-control page](/phonometry/devices/noise-control/noise-control/)
+and `silencer_self_noise` on the
+[duct-path page](/phonometry/devices/noise-control/duct-path/#4-what-the-system-puts-back).
 
 `ReactiveSilencerResult` also files itself: `.report()` renders a one-page PDF
 in the layout of a silencer performance sheet, with the method-basis line
@@ -443,6 +658,49 @@ matters for selection:
   a silencer regenerates flow noise at its own outlet, and past a certain
   pressure drop the silencer becomes the noise source.
 
+Those are three frequency-dependent claims, so here they are on one axis, every
+curve computed from the shipped models rather than sketched.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_selection.svg" alt="Attenuation from 40 Hz to 8 kHz for five devices. In blue, the reactive family: the 0.3 m expansion chamber, a broad hump reaching 6.5 dB with a zero at 572 Hz, and a Helmholtz branch tuned to 100 Hz, a spike a few hertz wide reaching 18 dB and nothing elsewhere. In green, 1.5 m of lined 36 by 24 inch duct with 25 mm and with 50 mm of lining, both rising through the mid bands to 12.6 and 13.6 dB and falling slowly above. In red, a five-airway splitter unit, from 10.7 dB at 63 Hz to 40 dB at 500 Hz and back to 12.1 dB at 8 kHz. A dotted vertical line at 891 Hz marks the first duct cut-on, beyond which the blue four-pole curves are not drawn" width="88%" />
+
+*The selection rule, drawn. The resonator wins only where the tone is, and is
+transparent two semitones away. The chamber is worth a few decibels over a broad
+low band and nothing at all at its own half-wave troughs. A practical lining
+does almost nothing at 63 Hz — 1.2 dB for 25 mm over 1.5 m — and doubling the
+lining thickness buys 7 dB at 500 Hz and nothing above 1 kHz, because there the
+sound already beams down the open airway. Only the splitter, which narrows the
+airway and multiplies the lined perimeter, keeps 30 dB through the middle. The
+blue curves stop at 891 Hz because that is where their model does.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# The reactive side, drawn only as far as its own validity ceiling.
+chamber = expansion_chamber(f, 0.3, 0.04, 0.01)
+inside = f <= chamber.plane_wave_limit
+
+fig, ax = plt.subplots()
+ax.semilogx(f[inside], chamber.transmission_loss[inside],
+            label="Expansion chamber, m = 4")
+ax.semilogx(f[inside], hr.transmission_loss[inside],
+            "--", label="Helmholtz branch")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Attenuation [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The dissipative curves come from the installation models of the
+[HVAC methods](/phonometry/devices/noise-control/noise-control/), not from this
+module: `hvac.lined_rectangular_duct_attenuation(bands, 36 in, 24 in, 1.5 m, t,
+include_unlined=True)` for the two linings, and
+`hvac.splitter_silencer_insertion_loss(bands, 24 in, 5 ft, [4 in] * 5, 8 in)`
+for the splitter unit.
+
 phonometry models the reactive family in closed form on this page. The
 dissipative side enters through the installation data of the
 [HVAC methods](/phonometry/devices/noise-control/noise-control/): the lined-elbow
@@ -451,6 +709,69 @@ interpolated ASHRAE data rather than a liner model. The porous physics that
 a first-principles liner calculation needs, the equivalent-fluid models fed
 by the airflow resistivity, is the same material theory as
 [Porous and Multilayer Absorbers](/phonometry/materials/absorbers/porous-absorbers/).
+
+## 3. How a silencer is measured (ISO 7235)
+
+Everything above is computed from geometry. The figure a supplier publishes is
+not: it is an **insertion loss measured by substitution**, and ISO 7235:2003
+(published in Europe as EN ISO 7235:2009) is the method behind it. Reading the
+page's fiche without knowing that is how a computed 8.9 dB and a catalogue
+"25 dB" end up in the same sentence.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235.svg" alt="Two stacked runs on one duct axis. In the upper run, series one, a sealed and lined loudspeaker box feeds a modal filter, then a transition, then the test object, then a test duct with an anechoic wedge termination carrying three microphone positions on a line inclined to the duct axis. The lower run, series two, is identical except that the test object is replaced by an empty substitution duct. Dashed qualification planes are marked at the test object and at the receiving duct. Below, the insertion loss is given as the difference of the two receiving-side levels, third octave by third octave, with the modal-filter attenuation, the reflection-coefficient limit, the substitution-duct tolerance and the signal-to-background rule listed as the standard's own clause numbers" width="92%" />
+
+The rig has four parts and each of them carries a requirement. The **source**
+is a random-noise generator and amplifier driving loudspeakers in an
+acoustically sealed, absorbent-lined box, with pressure-equalisation openings
+for flow tests, powerful enough that every measurement point sits at least 6 dB
+and preferably 10 dB above the background (clause 5.2.2.2). A **modal filter**
+follows: a duct section with absorptive or reactive elements that attenuates the
+fundamental a little and higher-order modes a lot, at least 3 dB on the
+fundamental at the low-frequency end and at least 5 dB above the cut-on of
+higher-order modes, which also decouples the source from the test object
+(5.2.2.3). A rigid **transition element** joins them without radiating breakout
+noise (5.2.2.4). And the **substitution duct** is non-absorbent, ideally the
+empty housing of the test object itself, otherwise matched to its inlet and
+outlet within 5 % in every linear dimension (5.2.3).
+
+The receiving side is one of three (5.2.4). A **reverberation room** to
+ISO 3741, qualified at least down to the 125 Hz third octave, is the preferred
+arrangement. A **test duct with an anechoic termination** is the fallback: at
+least half a wavelength of the lowest band long and at least four times the
+maximum cross dimension, with a reflection coefficient no greater than 0.3, and
+microphones plus fixtures obstructing under 5 % of the duct area. **Essentially
+free-field conditions** at the open end are allowed when the direct sound
+exceeds the strongest reflection by 10 dB, which holds when the nearest
+reflecting surface is more than twice as far away as the microphone.
+
+The procedure is then two series with nothing else changed. $L_{pI}$ is
+determined with the test object installed, $L_{pII}$ with the substitution duct
+in its place, at identical points or paths and with an unchanged source
+spectrum, and the insertion loss is $D_i = L_{pI} - L_{pII}$ third octave by
+third octave (6.2.1). In a test duct the spatial average takes **at least three
+equally spaced positions** on a line inclined to the duct axis at about half its
+length, spanning at least a quarter wavelength of the lowest band, going to five
+when the spread between the three exceeds the Table 6 limits — 10 dB at 50 and
+63 Hz, 8 dB at 80 and 100 Hz, 7 dB at 125 Hz and 6 dB above 160 Hz. The chain is
+class 1 with IEC 61260 third-octave filters (5.2.4.6) and is verified with a
+class 1 calibrator to $\pm 0.3$ dB before and after each series (6.1).
+
+Two consequences travel with the number. First, what is reported is an
+**insertion loss against a substitution duct**, not a transmission loss, so it
+is not the quantity this page computes and the two must not be compared
+directly. Second, every facility has a **limiting insertion loss** — the ceiling
+set by flanking along its own duct walls, measured with the substitution duct
+acoustically blocked, and recorded as a function of frequency (7.4). A very
+large catalogue figure is a claim about the test arrangement as much as about
+the device, which is why the arrangement is reportable at all. For orientation
+on how repeatable any of this is, the standard's own reproducibility standard
+deviations for insertion loss are 1.5 dB from 50 to 100 Hz, 1 dB from 125 to
+500 Hz, 2 dB from 630 Hz to 1.25 kHz and 3 dB above (Table 7), with the expanded
+uncertainty twice those values.
+
+Two neighbouring standards complete the picture: **ISO 11691** is the survey-
+grade laboratory method without flow, and **ISO 11820** measures a silencer in
+situ, where the substitution trick is usually impossible.
 
 ## Cross-check against the FDTD solver
 
@@ -480,7 +801,9 @@ algebra does not.
 `shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building
 blocks for arbitrary element chains, each with its to-scale
 `.plot_geometry()` drawing, cross-checked against the independent FDTD
-solver.
+solver; the `plane_wave_limit` that bounds all of them; and, as prose rather
+than as code, the ISO 7235 substitution measurement that produces the
+insertion loss a supplier publishes.
 
 **Not covered.** Only reactive elements are computed: dissipative
 (absorptive, duct-lining) silencers are discussed for selection but not
@@ -488,7 +811,10 @@ modelled from the liner properties, and the lined-elbow and plenum data of
 the [HVAC methods](/phonometry/devices/noise-control/noise-control/) are interpolated
 installation tables, not a liner model. Mean-flow effects (convection,
 temperature gradients, flow-dependent impedance of perforates) are outside
-the no-flow element matrices used here.
+the no-flow element matrices used here. Nothing on this page is a
+measurement: no part of ISO 7235 is implemented, the shell breakout and the
+end corrections at the area jumps are not modelled, and the branch models are
+lossless unless a `resistance` is supplied.
 
 ## See also
 

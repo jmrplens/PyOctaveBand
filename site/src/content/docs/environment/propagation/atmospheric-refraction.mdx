@@ -15,8 +15,8 @@ references:
     title: "Predicting outdoor sound"
     edition: "2nd ed."
     publisher: "CRC Press"
-    doi: "10.1201/9780429470141"
-    note: "Chapter 11 (refraction by wind and temperature gradients, ray models and shadow zones). ISBN 978-1-138-30655-2."
+    doi: "10.1201/9780429470806"
+    note: "Chapter 11 (refraction by wind and temperature gradients, ray models and shadow zones). ISBN 978-1-4987-4007-4."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -55,213 +55,10 @@ away on each side, and the wind profile deciding which of them hears anything.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction.webp" alt="Two stacked panels for an upward-refracting atmosphere over grassland. Top: a fan of sound rays leaving a source 2 m above the ground curves upward, so beyond a dashed shadow-zone boundary near 110 m no ray stays close to the ground. Bottom: the GFPE relative-level field over range and height shows red interference lobes near the source and a deep blue acoustic shadow spreading up and to the right, its edge tracking the same boundary." width="88%" loading="eager" />
 
-## 1. Effective sound-speed profile
-
-A moving (windy) atmosphere is well approximated by a non-moving one with the
-**effective sound speed** $c_\text{eff}(z) = c(z) + u(z)$, the adiabatic sound
-speed
-plus the component of the wind in the propagation direction (Salomons Eq. 4.4).
-Two profile shapes cover most surface-layer cases:
-
-- a **linear** profile $c_\text{eff}(z) = c_0 + g\,z$
-  (`linear_sound_speed_profile`), the simplest refracting atmosphere and the
-  one with exact ray geometry;
-- the realistic **logarithmic** surface-layer profile
-  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
-  Salomons Eq. 4.5), with $b \approx +1\ \text{m/s}$ for a typical
-  downward-refracting atmosphere, $b \approx -1\ \text{m/s}$ for an
-  upward-refracting one, and $z_0$ the roughness length
-  (about 0.1 m for grassland).
-
-A positive gradient (sound speed increasing upward) bends rays **down** toward
-the receiver (favourable propagation); a negative gradient bends them **up** and
-opens an acoustic **shadow** near the ground.
-
-```python
-from phonometry import log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
-profile.speed_at(10.0)   # effective sound speed 10 m above the ground
-profile.plot()           # c_eff(z) with height on the vertical axis
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles.svg" alt="Two logarithmic effective sound-speed profiles over the first 60 metres of atmosphere, height on the vertical axis: the downward-refracting profile (b = +1 m/s) bends right of the 340 m/s ground value and the upward-refracting one (b = -1 m/s) bends left, both with their steepest change concentrated in the first few metres above the roughness length" width="62%" />
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import log_linear_sound_speed_profile
-
-# The two canonical surface layers of Salomons Eq. 4.5 over grassland.
-down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
-up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
-ax = down.plot(color="#1f77b4")
-up.plot(ax=ax, color="#d62728")
-plt.show()
-```
-
-</details>
-
-## 2. Ray model
-
-In geometrical acoustics a sound ray obeys Snell's law
-$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
-it with a fourth-order Runge-Kutta scheme, marching in range and reflecting
-specularly at the ground, and returns the curved paths, the turning points, the
-travel times and the number of ground reflections.
-
-```python
-import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0)
-rays.turning_points      # turning points per ray
-rays.plot()              # the curved ray fan (needs matplotlib)
-```
-
-The page-top figure shows this upward-refracting fan opening its shadow. The
-favourable case is its mirror image: under **downward** refraction ($b = +1$)
-the shallow rays are bent back to the ground, bounce, and carry energy along
-the surface instead of losing it upward.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan.svg" alt="A fan of sound rays traced from a source 2 m above the ground through a downward-refracting logarithmic atmosphere: the shallow launch angles curve back down, reflect off the ground and arch onward in repeated hops out to 600 m, while the steepest rays climb out of the 40 m frame" width="88%" />
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
-
-# Downward refraction: the favourable-propagation mirror of the shadow case.
-profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0, n_steps=600)
-rays.plot()   # shallow rays return to the ground and bounce on down-range
-plt.show()
-```
-
-</details>
-
-### Closed-form geometry (linear gradient)
-
-For a **linear** profile every ray is an exact **circular arc** of radius of
-curvature (Salomons Sec. 4.4; Attenborough Ch. 11):
-
-$$
-R_c = \frac{c_0}{|g|\cos\theta_0},
-$$
-
-exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
-downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
-**upward-refracting**
-linear profile the ground-grazing ray bounds a region beyond which no direct or
-once-reflected ray arrives, at the closed-form **shadow-zone distance**
-(`shadow_zone_distance`):
-
-$$
-x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|}.
-$$
-
-These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers $R_c$ to machine precision.
-
-## 3. Parabolic equation (Green's Function PE)
-
-The **parabolic equation** is the reference method for refraction and shadow
-zones at long range. It replaces the wave equation with a one-way (outgoing)
-equation valid within a limiting elevation angle, and marches it in range on a
-range-height grid. `atmospheric_parabolic_equation` implements the **Green's
-Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
-split-step Fourier family as the ocean
-[`parabolic_equation`](/phonometry/underwater/underwater-solvers/). Each range
-step transforms the field to the vertical-wavenumber domain, applies the
-free-space propagator together with the finite-impedance ground reflection
-$R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons Eq. H.28), transforms back,
-adds the surface-wave residue of the reflection pole (the third term of
-Eq. H.49) and applies the refraction phase screen
-$\exp(i\,\Delta r\,(k(z) - k_a))$ (Eq. H.58). The source is a **Gaussian
-starter** with its ground image (Eqs. G.64, G.76) and an **absorbing layer**
-at the top of the grid suppresses top-boundary reflections. The result is the
-**relative sound level** $\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re
-free field) over the whole range-height plane.
-
-```python
-from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
-pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                    flow_resistivity=200e3,  # grassland
-                                    max_range=600.0, max_height=40.0)
-pe.level_at_height(2.0)   # relative level vs range at 2 m
-pe.plot()                 # the range-height relative-level field (needs matplotlib)
-```
-
-Cut the field at the receiver height and the whole story of this page is one
-figure: with everything else identical, the sign of the gradient alone moves
-the 400 Hz level at 600 m by more than 30 dB.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range.svg" alt="GFPE relative sound level against range at a 2 m receiver height over grassland at 400 Hz for three atmospheres. The downward-refracting curve recovers from the ground dip back toward 0 dB re free field, the homogeneous dashed curve decays gently to about minus 27 dB at 600 m, and the upward-refracting curve plunges past minus 40 dB beyond the dotted closed-form shadow-zone boundary near 110 m" width="88%" />
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import warnings
-
-import matplotlib.pyplot as plt
-
-from phonometry import (
-    atmospheric_parabolic_equation,
-    linear_sound_speed_profile,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
-)
-
-cases = [
-    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Downward (b = +1 m/s)"),
-    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogeneous (b = 0)"),
-    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Upward (b = -1 m/s)"),
-]
-fig, ax = plt.subplots(figsize=(11, 6.2))
-with warnings.catch_warnings():
-    # The PorousAbsorberWarning: a 200 kPa.s/m2 ground runs the one-parameter
-    # impedance model below its published fit range, as every outdoor ground
-    # does (see "Choosing the ground impedance" in the ground-effect guide).
-    warnings.simplefilter("ignore")
-    for profile, label in cases:
-        pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                            flow_resistivity=200e3,
-                                            max_range=600.0, max_height=40.0)
-        ax.plot(pe.ranges, pe.level_at_height(2.0), label=label)
-# The closed-form boundary of the equivalent linear upward gradient (its
-# 10 m mean), the dotted line of the figure.
-up = cases[2][0]
-grad = float(up.speed_at(10.0) - 340.0) / 10.0
-ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
-           color="k", ls=":", label="Shadow-zone boundary")
-ax.set(xlabel="Range [m]", ylabel="Level re free field [dB]", ylim=(-40, 10))
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The ground impedance is supplied directly (`impedance=`, a normalized complex
-value in the $e^{-i\omega t}$ convention of Salomons, with
-$\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
-or from an effective `flow_resistivity` via
-the [porous models](/phonometry/materials/absorbers/porous-absorbers/) of the materials
-domain; the porous models work in the opposite $e^{+j\omega t}$ convention, so
-their impedance is conjugated internally.
+*The two halves of the same atmosphere. The ray fan says **where** the shadow
+starts — every ray has left the ground by about 110 m — and the GFPE field says
+**how deep** it is once you are inside it. Neither picture exists in an
+octave-band engineering method: this is what $C_{met}$ replaces with one number.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -317,6 +114,306 @@ plt.show()
 
 </details>
 
+## 1. Effective sound-speed profile
+
+A moving (windy) atmosphere is well approximated by a non-moving one with the
+**effective sound speed** $c_\text{eff}(z) = c(z) + u(z)$, the adiabatic sound
+speed
+plus the component of the wind in the propagation direction (Salomons Eq. 4.4).
+Two profile shapes cover most surface-layer cases:
+
+- a **linear** profile $c_\text{eff}(z) = c_0 + g\,z$
+  (`linear_sound_speed_profile`), the simplest refracting atmosphere and the
+  one with exact ray geometry;
+- the realistic **logarithmic** surface-layer profile
+  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
+  Salomons Eq. 4.5), with $b \approx +1\ \text{m/s}$ for a typical
+  downward-refracting atmosphere, $b \approx -1\ \text{m/s}$ for an
+  upward-refracting one, and $z_0$ the roughness length
+  (about 0.1 m for grassland).
+
+A positive gradient (sound speed increasing upward) bends rays **down** toward
+the receiver (favourable propagation); a negative gradient bends them **up** and
+opens an acoustic **shadow** near the ground.
+
+### Setting `b` and `z0` from a site
+
+$b$ is not a taste setting. The effective profile is
+$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_{SR}(z)$
+(Attenborough & Van Renterghem 2021, Eq. 1.18), so the coefficient of the
+logarithmic term follows from a wind speed measured at a stated height once
+$z_0$ is fixed: matching the profile at that height gives
+$b = u_{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. A 10 m mast reading of 4 m/s blowing
+straight down the propagation path over grassland ($z_0 = 0.1$ m) therefore
+gives $b = 4 / \ln(101) = 0.87$ m/s — close to the "+1 m/s typical" above, and
+`log_linear_sound_speed_profile(0.867)` duly returns 344.0 m/s at 10 m.
+
+Only the **component along the propagation direction** enters $c_\text{eff}$:
+$u_{SR}(z) = u(z)\cos(\pi - \alpha)$ with $\alpha$ the angle between the
+meteorological wind direction (the direction the wind blows *from*) and the
+direction the sound travels (Eq. 1.19). The same 4 m/s at 60° to the path is
+worth 2 m/s along it, so $b = 0.43$ m/s downwind and $-0.43$ m/s upwind — one
+wind, two atmospheres, which is the whole upwind/downwind asymmetry in one line
+of arithmetic. It is also the physics behind the ISO 9613-2 favourable-condition
+window (wind within ±45° of the source-receiver line at 1 to 5 m/s measured 3 to
+11 m above ground), quoted in full on
+[Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/#what-favourable-propagation-conditions-means).
+
+Temperature has no direction, which is why a clear calm night refracts downward
+in *every* direction. Near 10 °C the sound speed changes by about 0.6 m/s per
+kelvin, so a 2 K inversion between the ground and 10 m contributes
+$b_T \approx 1.2 / \ln(101) = 0.26$ m/s with no wind at all. Wind and
+temperature add: a light downwind breeze on an inversion night is the classic
+complaint condition.
+
+$z_0$ is a property of the cover, not of the weather. Attenborough &
+Van Renterghem quote a range from 0.0002 m for still water to about 0.1 m for
+grass (§1.4), use 0.02 m for the worked profiles of their Figure 1.20, and
+estimate 0.1 m for the meteorological tower whose year of data they fit with
+this profile shape; rougher covers — crops with scattered obstacles,
+hedgerows, scrub, suburban terrain — run from a few tenths of a metre to about
+1 m and are best taken from the Davenport roughness classification. The default
+`roughness_length=0.1` of `log_linear_sound_speed_profile` is the grassland
+value, so it is the one argument to change first when the site is not a field.
+
+```python
+from phonometry import log_linear_sound_speed_profile
+
+profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
+profile.speed_at(10.0)   # effective sound speed 10 m above the ground
+profile.plot()           # c_eff(z) with height on the vertical axis
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles.svg" alt="Two logarithmic effective sound-speed profiles over the first 60 metres of atmosphere, height on the vertical axis: the downward-refracting profile (b = +1 m/s) bends right of the 340 m/s ground value and the upward-refracting one (b = -1 m/s) bends left, both with their steepest change concentrated in the first few metres above the roughness length" width="62%" />
+
+*Almost all of the refraction is decided in the first few metres: over
+grassland the logarithmic profile spends half its 60 m change below about 1 m,
+which is why the source and receiver heights matter so much more outdoors than
+the distance between them suggests.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import log_linear_sound_speed_profile
+
+# The two canonical surface layers of Salomons Eq. 4.5 over grassland.
+down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
+up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
+ax = down.plot(color="#1f77b4")
+up.plot(ax=ax, color="#d62728")
+plt.show()
+```
+
+</details>
+
+## 2. Ray model
+
+In geometrical acoustics a sound ray obeys Snell's law
+$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
+it with a fourth-order Runge-Kutta scheme, marching in range and reflecting
+specularly at the ground, and returns the curved paths, the turning points, the
+travel times and the number of ground reflections.
+
+```python
+import numpy as np
+from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+
+profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
+rays = atmospheric_ray_paths(profile, source_height=2.0,
+                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                             max_range=600.0)
+rays.turning_points      # turning points per ray
+rays.plot()              # the curved ray fan (needs matplotlib)
+```
+
+The page-top figure shows this upward-refracting fan opening its shadow. The
+favourable case is its mirror image: under **downward** refraction ($b = +1$)
+the shallow rays are bent back to the ground, bounce, and carry energy along
+the surface instead of losing it upward.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan.svg" alt="A fan of sound rays traced from a source 2 m above the ground through a downward-refracting logarithmic atmosphere: the shallow launch angles curve back down, reflect off the ground and arch onward in repeated hops out to 600 m, while the steepest rays climb out of the 40 m frame" width="88%" />
+
+*The favourable case, and the reason a downwind measurement is repeatable and
+an upwind one is not: the shallow rays are returned to the ground and keep
+hopping, so there is no shadow to fall into and no boundary whose position
+depends on a gradient nobody measured.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+
+# Downward refraction: the favourable-propagation mirror of the shadow case.
+profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
+rays = atmospheric_ray_paths(profile, source_height=2.0,
+                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                             max_range=600.0, n_steps=600)
+rays.plot()   # shallow rays return to the ground and bounce on down-range
+plt.show()
+```
+
+</details>
+
+### Closed-form geometry (linear gradient)
+
+For a **linear** profile every ray is an exact **circular arc** of radius of
+curvature (Salomons Sec. 4.4; Attenborough Ch. 11):
+
+$$
+R_c = \frac{c_0}{|g|\cos\theta_0},
+$$
+
+exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
+downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
+**upward-refracting**
+linear profile the ground-grazing ray bounds a region beyond which no direct or
+once-reflected ray arrives, at the closed-form **shadow-zone distance**
+(`shadow_zone_distance`):
+
+$$
+x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
+\qquad R_c = \frac{c_0}{|g|},
+$$
+
+where this second $R_c$ is the grazing ($\theta_0 = 0$) special case of the
+expression above, since the bounding ray leaves the source horizontally.
+
+These closed forms are the exact oracle for the ray tracer: a circle fit of a
+traced ray recovers $R_c$ to machine precision. They are also the cheapest
+answer to the question the whole page turns on — *is my range long enough for
+refraction to matter?*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shadow_zone_map.svg" alt="The closed-form shadow-zone distance on a logarithmic ordinate against the magnitude of an upward sound-speed gradient from 0.02 to 0.4 per second, for three source and receiver height pairs of 0.5 and 1.5 m, 2 and 2 m, and 2 and 10 m. All three curves fall as the gradient steepens; a marker on the middle curve at the representative gradient of 0.1 per second sits near 233 m, and a second marker gives the page's own 110 m case at the equivalent linear gradient of the b = minus 1 logarithmic profile. A secondary axis converts the gradient into the radius of curvature Rc = c0 over the gradient, running from 17 km down to 850 m" width="88%" />
+
+*Read it as a screening test. At the representative $-0.1\ \text{s}^{-1}$ the
+shadow behind two 2 m stations starts at 233 m, so a 100 m measurement over a
+field never leaves the lit region and the homogeneous models on the neighbouring
+pages are the right tool. Raise the receiver and the boundary runs away fast —
+2 m to 10 m pushes it from 233 m to 377 m — which is why a first-floor window
+hears a source a ground-floor microphone cannot.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `shadow_zone_distance` is imported by the page-top figure block.
+gradients = np.geomspace(0.02, 0.4, 60)
+fig, ax = plt.subplots()
+for hs, hr, label in [(0.5, 1.5, "0.5 / 1.5 m"), (2.0, 2.0, "2 / 2 m"),
+                      (2.0, 10.0, "2 / 10 m")]:
+    ax.loglog(gradients,
+              [shadow_zone_distance(-g, hs, hr, ground_speed=340.0)
+               for g in gradients], label=label)
+ax.set_xlabel("Upward gradient |g| [1/s]")
+ax.set_ylabel("Shadow-zone distance [m]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 3. Parabolic equation (Green's Function PE)
+
+The **parabolic equation** is the reference method for refraction and shadow
+zones at long range. It replaces the wave equation with a one-way (outgoing)
+equation valid within a limiting elevation angle, and marches it in range on a
+range-height grid. `atmospheric_parabolic_equation` implements the **Green's
+Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
+split-step Fourier family as the ocean
+[`parabolic_equation`](/phonometry/underwater/underwater-solvers/). Each range
+step transforms the field to the vertical-wavenumber domain, applies the
+free-space propagator together with the finite-impedance ground reflection
+$R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons Eq. H.28), transforms back,
+adds the surface-wave residue of the reflection pole (the third term of
+Eq. H.49) and applies the refraction phase screen
+$\exp(i\,\Delta r\,(k(z) - k_a))$ (Eq. H.58). The source is a **Gaussian
+starter** with its ground image (Eqs. G.64, G.76) and an **absorbing layer**
+at the top of the grid suppresses top-boundary reflections. The result is the
+**relative sound level** $\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re
+free field) over the whole range-height plane.
+
+```python
+from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
+
+profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
+pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
+                                    flow_resistivity=200e3,  # grassland
+                                    max_range=600.0, max_height=40.0)
+pe.level_at_height(2.0)   # relative level vs range at 2 m
+pe.plot()                 # the range-height relative-level field (needs matplotlib)
+```
+
+Cut the field at the receiver height and the whole story of this page is one
+figure: with everything else identical, the sign of the gradient alone moves
+the 400 Hz level at 600 m by more than 30 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range.svg" alt="GFPE relative sound level against range at a 2 m receiver height over grassland at 400 Hz for three atmospheres. The downward-refracting curve recovers from the ground dip back toward 0 dB re free field, the homogeneous dashed curve decays gently to about minus 27 dB at 600 m, and the upward-refracting curve plunges past minus 40 dB beyond the dotted closed-form shadow-zone boundary near 110 m" width="88%" />
+
+*One source, one distance, one ground, three atmospheres: at 600 m the sign of
+the gradient alone is worth more than 30 dB. Any single-number meteorological
+correction — $C_{met}$ included — is an average over this spread, not a
+prediction of where on it a given night sits.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import warnings
+
+import matplotlib.pyplot as plt
+
+from phonometry import (
+    atmospheric_parabolic_equation,
+    linear_sound_speed_profile,
+    log_linear_sound_speed_profile,
+    shadow_zone_distance,
+)
+
+cases = [
+    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Downward (b = +1 m/s)"),
+    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogeneous (b = 0)"),
+    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Upward (b = -1 m/s)"),
+]
+fig, ax = plt.subplots(figsize=(11, 6.2))
+with warnings.catch_warnings():
+    # The PorousAbsorberWarning: a 200 kPa.s/m2 ground runs the one-parameter
+    # impedance model below its published fit range, as every outdoor ground
+    # does (see "Choosing the ground impedance" in the ground-effect guide).
+    warnings.simplefilter("ignore")
+    for profile, label in cases:
+        pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
+                                            flow_resistivity=200e3,
+                                            max_range=600.0, max_height=40.0)
+        ax.plot(pe.ranges, pe.level_at_height(2.0), label=label)
+# The closed-form boundary of the equivalent linear upward gradient (its
+# 10 m mean), the dotted line of the figure.
+up = cases[2][0]
+grad = float(up.speed_at(10.0) - 340.0) / 10.0
+ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
+           color="k", ls=":", label="Shadow-zone boundary")
+ax.set(xlabel="Range [m]", ylabel="Level re free field [dB]", ylim=(-40, 10))
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The ground impedance is supplied directly (`impedance=`, a normalized complex
+value in the $e^{-i\omega t}$ convention of Salomons, with
+$\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
+or from an effective `flow_resistivity` via
+the [porous models](/phonometry/materials/absorbers/porous-absorbers/) of the materials
+domain; the porous models work in the opposite $e^{+j\omega t}$ convention, so
+their impedance is conjugated internally.
+
 The clip below runs the full wave physics through both signs of the
 logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
 slice, with the library's ray fans traced through the same $c(z)$ profiles laid
@@ -345,9 +442,62 @@ refraction"):
   **+6 dB** two-ray enhancement over a rigid ground.
 - **Exact ray geometry.** For a linear profile the traced ray is a circular arc
   whose fitted radius matches `ray_curvature_radius` to machine precision.
-- **Reciprocity.** Swapping the source and receiver heights leaves the PE level.
+- **Reciprocity.** Swapping the source and receiver heights leaves the PE level
+  unchanged.
 - **Shadow zone.** Over an upward-refracting profile the PE level collapses far
   inside the closed-form shadow distance.
+
+The first two are worth seeing rather than trusting, because they are what
+licenses every other number the solver produces.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/refraction_homogeneous_check.svg" alt="Two stacked panels against range to 520 m for a 500 Hz source and receiver both 2 m above a rigid ground with the sound-speed gradient switched off. Top: the GFPE relative level drawn on top of the coherent two-ray closed form, the two curves following the same interference pattern through a deep null near 45 m and settling together on the plus 6 dB coherent sum by 500 m. Bottom: the residual between solver and closed form, inside 0.6 dB everywhere beyond the null and reaching 17 dB inside it, where the closed form itself passes through minus 31 dB" width="88%" />
+
+*With the gradient switched off the PE has nothing left to do but reproduce the
+closed form, and beyond the last interference null it does: the residual stays
+inside **0.6 dB** and both curves settle on the coherent +6 dB (PE 5.59 dB
+against 6.00 dB at 500 m, the pair pinned in the conformance report). Inside the
+null the residual reaches 17 dB, which is not a solver failure but what a
+−31 dB null does to any comparison expressed in decibels — the same trap as a
+narrowband barrier curve.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import warnings
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `atmospheric_parabolic_equation` and `linear_sound_speed_profile` are
+# imported by the snippets above. A rigid ground needs no porous model, so
+# this case raises no warning at all.
+c0, freq, zs = 343.0, 500.0, 2.0
+flat = linear_sound_speed_profile(1e-12, ground_speed=c0, max_height=200.0)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    pe = atmospheric_parabolic_equation(freq, flat, source_height=zs,
+                                        impedance=1e6 + 0j, max_range=520.0,
+                                        max_height=150.0)
+ranges = np.asarray(pe.ranges)
+solver = np.asarray(pe.level_at_height(zs))
+k = 2.0 * np.pi * freq / c0
+r1 = np.hypot(ranges, 0.0)
+r2 = np.hypot(ranges, 2.0 * zs)
+two_ray = 20.0 * np.log10(np.abs(1.0 + (r1 / r2) * np.exp(1j * k * (r2 - r1))))
+
+fig, (top, bottom) = plt.subplots(2, 1, sharex=True)
+top.plot(ranges, solver, label="GFPE, zero gradient")
+top.plot(ranges, two_ray, "--", label="Coherent two-ray closed form")
+top.axhline(6.0, ls=":", label="+6 dB")
+top.set_ylabel("Level re free field [dB]")
+top.legend()
+bottom.plot(ranges, solver - two_ray)
+bottom.set(xlabel="Range [m]", ylabel="Residual [dB]")
+plt.show()
+```
+
+</details>
 
 ## What this guide covers
 

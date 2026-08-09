@@ -48,14 +48,12 @@ encaja con qué trabajo se sopesa en
 
 ## 1. Barrido de intensidad (ISO 9614-2)
 
-La **intensidad** acústica es el flujo neto de energía, así que distingue la
-energía que *sale* de la fuente de la energía estacionaria que solo atraviesa
-la superficie; por eso el método de intensidad tolera el ruido de fondo que
-derrotaría a los métodos de presión. Una sonda p-p (véase la
-[guía de Intensidad acústica](/phonometry/es/devices/emission/intensity/)) se barre de forma
-continua sobre cada uno de los $N$ segmentos de una superficie que encierra la
-fuente, informando de la intensidad normal con signo promediada por segmento
-$\langle I_{n,i} \rangle$.
+Una sonda p-p (véase la
+[guía de Intensidad acústica](/phonometry/es/devices/emission/intensity/)) se
+barre de forma continua sobre cada uno de los $N$ segmentos de una superficie
+que encierra la fuente, informando de la intensidad normal con signo promediada
+por segmento $\langle I_{n,i} \rangle$ — una fila por segmento, una columna por
+banda.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un espaciador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
 
@@ -74,26 +72,96 @@ $$
   description="Una sonda p-p recorre el barrido en serpentina sobre la cara superior de la caja de medición mientras aparecen detrás las flechas de intensidad normal, y las potencias parciales de las cinco caras se acumulan en el nivel de potencia acústica L_W."
 />
 
-Una banda en la que $P < 0$ (flujo neto entrante, de una fuente más fuerte
-fuera de la superficie) es **no determinable** y se informa como `NaN`. Dos
-indicadores de campo normativos cualifican cada banda. El **indicador
-superficial presión-intensidad** $F_{pI}$ mide cuán reactivo es el campo, y el
-**indicador de potencia parcial negativa** $F_{+/-}$ mide cuánta energía
-circula hacia dentro y hacia fuera:
+### Ejecutar el barrido
+
+Todo lo anterior llega en forma de array; aquí es de donde sale. La superficie
+de medición se divide en **al menos cuatro segmentos** (apartado 8.2), elegidos
+en lo posible de modo que una zona de flujo neto entrante no se promedie junto a
+una de flujo saliente, y de modo que cada segmento mire a un componente de la
+máquina. Su distancia media a la superficie de la fuente es de al menos
+**200 mm** para una superficie vibrante extensa, reducible a 100 mm para una
+fuente pequeña y compacta — momento en el cual la acción a) de la Tabla B.1,
+«alejar la superficie», deja de estar a tu alcance.
+
+El barrido en sí es un recorrido, no un conjunto de puntos. Su elemento básico
+es una línea recta; el recorrido debe cubrir el segmento de manera uniforme y a
+velocidad uniforme, con las líneas contiguas igualmente separadas, y sobre la
+superficie de medición inicial **la separación media entre líneas no debe
+superar la distancia media del segmento a la fuente** (apartado 8.1). La
+velocidad de barrido es de 0,1 m/s a 0,5 m/s a mano y de 0 m/s a 1 m/s de forma
+mecánica; cada segmento lleva **al menos 20 s**, arrancando y parando la
+promediación temporal en los límites del segmento para que el
+$\langle I_{n,i} \rangle$ declarado pertenezca a ese segmento y a nada más. El
+eje de la sonda se mantiene normal a la superficie durante todo el recorrido, y
+quien mide se coloca al lado del segmento que está barriendo, no delante.
+
+Para el grado de ingeniería cada segmento se barre **dos veces, y los dos
+recorridos deben ser ortogonales** — el segundo barrido girado 90° siempre que
+sea posible (apartado 8.3.1). Eso es `normal_intensity_2`: no una repetición del
+mismo barrido, sino el girado. El criterio 3 existe precisamente para cazar un
+campo que no se repite, y repetir un recorrido idéntico lo supera en una
+determinación que un recorrido girado suspendería. La nota 10 de ese mismo
+apartado añade la consecuencia práctica: por encima de
+$F_{pI} = 10\ \text{dB}$, es probable que las velocidades de barrido superiores
+a 0,25 m/s incumplan el criterio 3 sea cual sea la estabilidad del campo.
+
+### Los indicadores de campo y sus criterios
+
+Una banda cuya potencia neta **no es positiva** ($P \le 0$: entra por la
+superficie más energía de la que sale, procedente de una fuente más fuerte de
+fuera) es **no determinable** y se informa como `NaN` (apartado 9.2). Dos
+indicadores de campo normativos cualifican las bandas que sí lo son. El
+**indicador superficial presión-intensidad** $F_{pI}$ mide cuán reactivo o cuán
+contaminado está el campo, y el **indicador de potencia parcial negativa**
+$F_{+/-}$ mide cuánta energía circula hacia dentro y hacia fuera a través de la
+superficie:
 
 $$
-F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
-F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
+F_{pI} = \overline{L_p} - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
+F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} ,
 $$
+
+donde $\overline{L_p}$ es el nivel de presión de superficie ponderado por áreas
+sobre los segmentos. Estos son los nombres de ISO 9614-2 para los dos
+indicadores del Anexo A de ISO 9614-1 que la
+[guía de intensidad](/phonometry/es/devices/emission/intensity/) llama $F_2$ y
+$F_3$: $F_{pI} \equiv F_3$ y $F_{+/-} \equiv F_3 - F_2$ con segmentos de áreas
+iguales, así que los indicadores de campo de allí y los criterios de
+cualificación de aquí son los mismos dos números con las notaciones de dos
+normas.
 
 La **capacidad dinámica** de la sonda $L_d = \delta_{pI0} - K$ (índice de
 intensidad residual de presión menos el factor de sesgo $K$, 10 dB para el
 grado 2 y 7 dB para el grado 3) debe superar $F_{pI}$ (criterio 1);
 $F_{+/-} \le 3\ \text{dB}$ es el criterio 2 (obligatorio para el grado 2); y
-los dos barridos repetidos deben coincidir dentro del límite $s$ de la Tabla 2
+los dos barridos girados deben coincidir dentro del límite $s$ de la Tabla 2
 por segmento (criterio 3). Una banda es de
 grado **ingeniería** cuando se cumplen los criterios 1, 2 y 3, de **inspección**
 cuando se cumplen 1 y 3, y en caso contrario `none`.
+
+### Leer los indicadores
+
+Ninguno de los dos indicadores es un booleano, y los dos llevan escala. $F_{pI}$
+se queda cerca de cero cuando todo lo que encierra la superficie radia hacia
+fuera y no le llega nada más; unos pocos decibelios es lo normal en trabajo in
+situ; y el apartado 8.3.2 pide que se haga todo lo posible por mantenerlo **por
+debajo de 10 dB** mediante la elección de la superficie. Un $F_{pI}$ grande tiene
+dos causas con arreglos opuestos: un campo próximo reactivo, que se resuelve
+alejando la superficie, y una fuente externa fuerte, que se resuelve acercando la
+superficie a la máquina o apantallándola. $F_{+/-}$ se lee de otra manera: cero
+cuando todos los segmentos radian hacia fuera, y 3 dB cuando las potencias
+parciales entrante y saliente ya son comparables a la neta, así que por encima de
+3 dB la superficie está a caballo entre dos fuentes y el arreglo es volver a
+recortarla — promediar más tiempo no ayuda, porque el problema es dónde está la
+superficie, no lo ruidosa que sea la estimación.
+
+Cuando falla el criterio 1, los remedios son baratos antes que caros: agrandar la
+superficie alejándola del campo próximo, apantallar o retirar la fuente extraña,
+montar un **espaciador mayor** para subir $\delta_{pI0}$ (véase
+[Elegir la sonda](/phonometry/es/devices/emission/intensity/#elegir-la-sonda)),
+y solo después plantearse mejor equipo. Rebajar la pretensión de grado de
+ingeniería a inspección da por sí sola 3 dB de $L_d$, porque $K$ pasa de 10 dB a
+7 dB — a costa del grado.
 
 ```python
 import numpy as np
@@ -173,13 +241,87 @@ plt.show()
 
 </details>
 
-Suministrar `normal_intensity_2` (el segundo barrido) promedia ambos para las
+Suministrar `normal_intensity_2` (el segundo barrido, el girado) promedia ambos
+para las
 potencias parciales y evalúa el criterio 3; `pressure_levels` habilita
 $F_{pI}$; `pressure_residual_index` ($\delta_{pI0}$) más un segundo barrido
 habilita el grado
 alcanzado por banda. La intensidad por diferencias finitas de la sonda tiene un
 sesgo dependiente de la frecuencia que se trata en la
 [guía de intensidad](/phonometry/es/devices/emission/intensity/).
+
+### Dónde pierde bandas el total ponderado A
+
+`sound_power_level_a` no es una suma sobre todas las bandas, y la diferencia
+importa para cualquier cosa que vaya a compararse con un límite. Dos cosas dejan
+una banda fuera, por razones distintas:
+
+- una banda cuya potencia neta no es positiva **no es determinable en absoluto**
+  (apartado 9.2) y vuelve como `NaN`; `negative_band` la señala;
+- una banda que *sí* es determinable pero incumple el criterio 1, o el
+  criterio 2 en grado de ingeniería, es un número perfectamente bueno que el
+  **apartado 10.6 b) prohíbe incluir** en una determinación ponderada A salvo
+  que su contribución sea despreciable según el apartado 4.3;
+  `a_weighting_omitted_bands` registra exactamente cuáles.
+
+El apartado 10.6 b) hace además que declarar esa omisión forme parte de la
+determinación: un $L_{WA}$ informado sin decir qué bandas se descartaron no es
+conforme. La consecuencia va en un solo sentido — el total es una
+**subestimación**, y quien lee puede acotarlo sumando las bandas omitidas a su
+nivel calculado y devolviéndolas. Ojo también al modo de fallo del propio
+cribado: sin `pressure_levels` ni `pressure_residual_index` los criterios no se
+pueden evaluar, así que se suman todas las bandas determinables y un
+`SoundPowerWarning` lo advierte. Un total silencioso no es lo mismo que un total
+cribado.
+
+### El criterio 3 no es del todo una barrera dura
+
+El criterio 3 se evalúa por segmento y por banda, que es la razón de que
+`repeatability` vuelva por segmento en lugar de como un veredicto único. Un
+segmento que falla no anula automáticamente su banda: el apartado 8.3.1 permite
+que la determinación se sostenga cuando las potencias parciales sumadas de los
+segmentos que fallan quedan **más de 10 dB por debajo** de la potencia de fuente
+obtenida de los que pasan, siendo entonces despreciable su contribución. Lo que
+no permite es el silencio: las bandas en las que no se cumplió el criterio 3
+deben llevar en el informe una declaración de que su incertidumbre supera el
+valor de la Tabla 2 para el grado pretendido.
+
+El valor por defecto de `repeatability_limit` merece el mismo cuidado. La
+Tabla 2 tabula $s$ por banda solo para el grado de **ingeniería**; para el grado
+de inspección da un único valor ponderado A de 4 dB, y esta implementación
+reutiliza esos 4 dB como límite por banda de inspección. Es una extrapolación
+deliberada, no un valor normativo, y es más laxa que cualquier límite de grado 2
+de la tabla — así que superar el criterio 3 en grado de inspección no es prueba
+de repetibilidad de grado 2. La Tabla 2 está además acotada: `_table2_s` lanza un
+error fuera de las bandas de octava de 63 Hz a 4 kHz y de las de tercio de octava
+de 50 Hz a 6,3 kHz, de modo que una octava de 8 kHz es una excepción, no un
+límite ancho.
+
+### El instrumento y el entorno
+
+El `"Sonda de intensidad p-p clase 1 (IEC 61043)"` de la ficha es una afirmación
+con apartados detrás. El instrumento **incluida su sonda** debe cumplir la
+IEC 61043, verificado en laboratorio al menos una vez al año — o al menos cada
+dos años si se aplica un calibrador de intensidad antes de cada determinación de
+potencia (apartado 6.2). Antes de cada serie, un calibrador IEC 60942 de clase 0
+o de clase 1 pasa por cada micrófono de la sonda (apartado 6.2.1), y el ensayo de
+inversión de la sonda del apartado 6.2.2 confirma in situ que la cadena está de
+acuerdo sobre cuál es el sentido saliente; los dos procedimientos, y lo que
+significan sus fallos, están en
+[Intensidad acústica](/phonometry/es/devices/emission/intensity/#medir-el-índice-residual-y-comprobar-la-sonda).
+El apartado 10.5 hace que declarar ambos forme parte del entregable.
+
+El entorno también tiene límites. La velocidad media del aire sobre la superficie
+de medición debe quedar por debajo de **4 m/s**, o hay que usar un paravientos
+(apartado 6.1); la presión estática y la temperatura se miden porque fijan la
+densidad y la velocidad del sonido con las que se calcula la intensidad.
+
+Cuando falla un criterio, la Tabla B.1 del Anexo B enumera qué cambiar en lugar
+de dejarlo en un `False`: aumentar la promediación o el tiempo de barrido, mover
+la superficie de medición, duplicar la densidad de líneas de barrido, subdividir
+la superficie en más segmentos, o apantallar la fuente extraña. Los códigos de
+acción están ligados a qué criterio falló, que es la razón de que el resultado
+informe de los criterios por separado en lugar de con un único booleano.
 
 ### Parámetros de `sound_power_intensity()`
 
@@ -190,17 +332,73 @@ sesgo dependiente de la frecuencia que se trata en la
 | `normal_intensity_2` | array 2D | W/m² | misma forma | Segundo barrido → criterio 3 y promediado |
 | `pressure_levels` | array 2D | dB | misma forma | SPL por segmento $L_{pi}$ → $F_{pI}$ |
 | `pressure_residual_index` | float o array 1D | dB | — | $\delta_{pI0}$ → $L_d$ / criterio 1 |
-| `frequencies` | array 1D | Hz | centros nominales | $L_{WA}$ y límites de la Tabla 2 |
+| `frequencies` | array 1D | Hz | octava 63 Hz-4 kHz, tercio 50 Hz-6,3 kHz | $L_{WA}$ y límites de la Tabla 2; fuera de ese rango la Tabla 2 no tiene $s$ y la llamada lanza un error |
 | `band_type` | str | — | `'third'` (por defecto) / `'octave'` | Consulta de la Tabla 2 |
 | `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | Selecciona $K$ |
-| `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 | Sobrescribe $s$ del criterio 3 |
+| `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 (inspección: los 4 dB ponderados A reutilizados por banda) | Sobrescribe $s$ del criterio 3 |
 
 Devuelve un `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
 por segmento y banda, `sound_power`/`sound_power_level` (total de banda, `NaN`
-donde `negative_band`), `surface_pressure_intensity_index` ($F_{pI}$),
+donde `negative_band`), `negative_band` (las bandas no determinables),
+`surface_pressure_intensity_index` ($F_{pI}$),
 `negative_partial_power_index` ($F_{+/-}$), `repeatability`,
-`dynamic_capability_index` ($L_d$), `achieved_grade`, `surface_area`,
-`sound_power_level_a` y `grade`.
+`dynamic_capability_index` ($L_d$), `achieved_grade`,
+`a_weighting_omitted_bands` (las bandas que el apartado 10.6 b) dejó fuera de
+$L_{WA}$), `surface_area`, `sound_power_level_a` y `grade`.
+
+`partial_power_level` es el campo que paga todo el método. Una determinación por
+presión devuelve un número por banda; un barrido de intensidad devuelve uno por
+segmento *y* banda, con signo, de modo que el resultado dice **por dónde** sale
+la potencia de la máquina y por dónde vuelve a entrar:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/partial_power_map_es.svg" alt="Las cinco caras de una caja de medición desplegadas en plano como un desarrollo, cada una teselada en cuatro segmentos y sombreada según su nivel de potencia parcial en decibelios re 1 pW. La cara frontal es la más sonora, con 73 a 74 dB, los laterales cerca de 68 dB, y un segmento de la cara trasera aparece rayado y con signo negativo porque su potencia neta fluye hacia dentro. Debajo, un gráfico de barras con los totales de las cinco caras frente al nivel de potencia acústica de banda" width="92%" />
+
+*La caja de medición desplegada, una tesela por segmento. La cara frontal se
+lleva la mayor parte de la emisión; el segmento rayado de la cara a la sombra da
+un neto **entrante**, que es lo normal junto a un vecino más ruidoso y es
+exactamente lo que cuenta $F_{+/-}$. Un espectro de $L_W$ sumado en bandas no
+puede enseñar nada de esto, y es el mapa, no el espectro, el que te dice qué
+panel hay que tratar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Una máquina de 1,2 x 0,8 x 1,0 m encajonada a d = 0,25 m: cinco caras, cuatro
+# segmentos cada una, y uno de ellos recibiendo flujo neto de un vecino más
+# ruidoso.
+area_cara = np.array([1.7 * 1.5, 1.3 * 1.5, 1.7 * 1.5, 1.3 * 1.5, 1.7 * 1.3])
+area_seg = np.repeat(area_cara / 4.0, 4)
+reparto = np.array([2.6, 2.2, 2.0, 1.8, 0.9, 0.8, 0.7, 0.7,
+                    0.5, 0.4, -0.35, 0.3, 0.8, 0.7, 0.6, 0.6,
+                    1.1, 1.0, 0.9, 0.8])
+res = emission.sound_power_intensity(
+    (reparto * 1.0e-5 / area_seg)[:, None], area_seg,
+    frequencies=np.array([500.0]))
+nivel, con_signo = res.partial_power_level[:, 0], res.partial_power[:, 0]
+
+# El desarrollo: las cuatro caras laterales en fila y la superior sobre la frontal.
+origen = ((0, 0), (1.7, 0), (3.0, 0), (4.7, 0), (0, 1.5))
+tamano = ((1.7, 1.5), (1.3, 1.5), (1.7, 1.5), (1.3, 1.5), (1.7, 1.3))
+fig, ax = plt.subplots(figsize=(11, 5))
+for f, ((ox, oy), (w, h)) in enumerate(zip(origen, tamano, strict=True)):
+    for k in range(4):
+        valor = nivel[4 * f + k]
+        ax.add_patch(mpatches.Rectangle(
+            (ox + (k % 2) * w / 2, oy + (1 - k // 2) * h / 2), w / 2, h / 2,
+            facecolor=plt.get_cmap("viridis")(
+                (valor - nivel.min()) / (nivel.max() - nivel.min())),
+            edgecolor="black",
+            hatch="//" if con_signo[4 * f + k] < 0 else None))
+ax.set(xlim=(-0.2, 6.2), ylim=(-0.4, 3.0), aspect="equal")
+plt.show()
+```
+
+</details>
 
 ## 2. Barrido de intensidad de precisión (ISO 9614-3)
 
@@ -213,8 +411,8 @@ incertidumbre explícito.
 
 **Potencia y nivel (apartado 7).** La potencia parcial de cada segmento es
 $P_i = I_{n,i}\,S_i$; el total $P = \sum_i P_i$ da
-$L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. Una banda cuya intensidad neta es
-negativa (más potencia entrando que saliendo) se marca no aplicable en lugar de
+$L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. Una banda cuya potencia neta no
+es positiva ($P \le 0$) se marca no aplicable en lugar de
 registrarse. Los indicadores de campo (variabilidad temporal $F_T$, los
 indicadores presión-intensidad con y sin signo, y la no uniformidad $F_S$)
 gobiernan los cinco criterios de aceptación.
@@ -309,6 +507,68 @@ plt.show()
 
 </details>
 
+### Cualificar el barrido (Anexo C)
+
+`sound_power_intensity_precision` devuelve una potencia, no un grado: nada en ese
+resultado dice si la determinación es de grado 1. La barrera de aceptación es un
+par de llamadas aparte, y sin ella la mitad de precisión de esta página es un
+cálculo con los criterios quitados.
+
+`precision_field_indicators` calcula los indicadores del Anexo B a partir de los
+mismos arrays por segmento — los indicadores presión-intensidad con y sin signo
+$F_{pI_n}$, la no uniformidad del campo $F_S$ y la variabilidad temporal $F_T$
+cuando se aporta una intensidad por ventana temporal. `precision_qualification`
+evalúa después los cinco criterios del Anexo C por banda:
+
+1. **repetibilidad del barrido**,
+   $\lvert L_{I_n}(1) - L_{I_n}(2) \rvert \le s/2$ con $s$ de la Tabla 1
+   (Ec. C.1) — la mitad de la tolerancia que admite la ISO 9614-2, que es casi
+   todo lo que cuesta la «precisión»;
+2. **suficiencia de la capacidad dinámica**,
+   $L_d \ge F_{pI_n}^{\text{con signo}}$ con $L_d = \delta_{pI0} - K$ y
+   $K = 10$ dB (Ec. C.2);
+3. $F_{pI_n}^{\text{con signo}} - F_{pI_n}^{\text{sin signo}} \le 3$ dB
+   (Ec. C.3), la contrapartida de precisión del límite de $F_{+/-}$ de la
+   ISO 9614-2;
+4. **no uniformidad del campo**, $F_S \le 2$ (Ec. C.4);
+5. **convergencia con la densidad de barrido**,
+   $0{,}83 \le F_S(1)/F_S(2) \le 1{,}2$ entre la densidad inicial y una doblada
+   (Ec. C.5).
+
+La conjunción es `qualified`, y lleva un matiz que conviene conocer antes de
+volver a barrer una máquina: el apartado C.1.6.2 acepta como resultado final una
+banda que cumple el criterio 5 **aunque no cumpla el criterio 4**. Un campo no
+uniforme que deja de cambiar cuando se dobla la densidad de barrido está
+muestreado adecuadamente; lo que invalida es el cambio con la densidad, no la no
+uniformidad en sí.
+
+```python
+# Los mismos cuatro segmentos y cinco bandas, ahora con sus niveles de presión
+# de superficie y un segundo barrido (girado 90°, de densidad doblada):
+# suficiente para el Anexo C.
+segment_pressure = np.full((4, 5), 74.0)
+ind = emission.precision_field_indicators(partial_intensity, segment_pressure)
+print(np.round(ind.f_pi_signed, 1))            # [12.2  4.9  0.9  3.9  9.2]
+
+scan1 = 10.0 * np.log10(np.abs(partial_intensity.mean(axis=0)) / 1e-12)
+scan2 = scan1 + np.array([0.9, 0.2, 0.1, 0.3, 0.4])
+crit = emission.precision_qualification(
+    ind, scan_intensity_level_1=scan1, scan_intensity_level_2=scan2,
+    pressure_residual_index=15.0,              # Ld = 15 - 10 = 5 dB
+    field_nonuniformity_1=ind.fs, field_nonuniformity_2=0.95 * ind.fs,
+    frequencies=freqs,
+)
+print(crit.criterion_2.tolist())   # [False, True, True, True, False]
+print(crit.qualified.tolist())     # [False, True, True, True, False]
+```
+
+Aquí fallan dos bandas, y fallan por la razón que dicen los números: a 250 Hz y a
+4 kHz el indicador con signo (12,2 dB y 9,2 dB) supera la $L_d = 5$ dB de la
+sonda, así que el instrumento no puede resolver el flujo neto frente a su propio
+índice residual. Eso es el criterio 2, y la respuesta es una sonda mejor, un
+espaciador mayor o una superficie alejada del campo próximo reactivo, no un
+barrido más largo.
+
 ## 3. El informe de medición (`.report()`)
 
 El resultado de barrido por intensidad (`SoundPowerIntensityResult`,
@@ -377,9 +637,12 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 campo $F_{pI}$ (presión-intensidad superficial) y $F_{+/-}$ (potencia parcial
 negativa), la capacidad dinámica $L_d$, el criterio de repetibilidad, el
 grado alcanzado por banda y el marcado de no aplicable del apartado 9.2
-para bandas con flujo neto entrante. La determinación de precisión de
+para bandas con flujo neto entrante, con el cribado del apartado 10.6 b) del
+total ponderado A (`a_weighting_omitted_bands`). La determinación de precisión de
 ISO 9614-3 (`sound_power_intensity_precision`) con su propio marcado de no
-aplicable. Ambos resultados presentan la ficha de potencia acústica de
+aplicable, sus indicadores de campo del Anexo B (`precision_field_indicators`) y
+los cinco criterios de aceptación del Anexo C (`precision_qualification`). Ambos
+resultados presentan la ficha de potencia acústica de
 estilo acreditado mediante `.report()`.
 
 **No cubierto.** ISO 9614-1, el método de intensidad de puntos fijos
@@ -390,7 +653,7 @@ no está implementada en absoluto; la
 sonda y los indicadores de campo del Anexo A que ambas partes comparten. El sesgo
 por diferencias finitas de la sonda y el índice de intensidad residual de
 presión son propiedades medidas del instrumento, cubiertas en la misma
-guía. La elección entre las cinco vías, y la declaración ISO 4871 que un
+guía. La elección entre las seis vías, y la declaración ISO 4871 que un
 resultado alimenta, viven en
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 

@@ -977,9 +977,10 @@ and Pierce as the exact wedge solution it approximates.
   Cited by [Wind-turbine noise](/phonometry/environment/sources/wind-turbine-noise/).
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
   (2nd ed.). CRC Press.
-  [doi:10.1201/9780429470141](https://doi.org/10.1201/9780429470141). Chapter
-  11 (refraction by wind and temperature gradients, ray models and shadow
-  zones). ISBN 978-1-138-30655-2. Cited by
+  [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806). Chapters
+  2 and 9 (spherical-wave ground reflection; outdoor barriers) and Chapter 11
+  (refraction by wind and temperature gradients, ray models and shadow
+  zones). ISBN 978-1-4987-4007-4 (hbk), 978-0-429-47080-6 (ebk). Cited by
   [Atmospheric refraction: rays and the GFPE](/phonometry/environment/propagation/atmospheric-refraction/)
   and
   [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/).

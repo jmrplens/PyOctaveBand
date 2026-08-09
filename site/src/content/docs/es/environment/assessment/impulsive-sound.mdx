@@ -137,6 +137,13 @@ impulsos marcados. El método es un complemento a la medida de ruido ambiental d
   width="96%"
 />
 
+*Las dos entradas importan, pero no por igual: a tasa de crecimiento fija, pasar
+de una diferencia de nivel de 5 dB a una de 30 dB mueve la prominencia mucho
+menos de lo que la mueve un orden de magnitud de tasa de crecimiento. Por debajo
+de P = 5 el ajuste es idénticamente cero, así que un impulso que no se cualifica
+no cuesta nada en absoluto, y por eso el ensayo de cualificación es la parte del
+método que hay que acertar.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -193,6 +200,21 @@ print(round(onset.onset_rate), round(onset.level_difference))  # 100 30
 print(round(onset.prominence, 2))                              # 8.95
 ```
 
+**Qué tiene que ser la grabación.** La cadena lee un historial de nivel, así que
+las condiciones que hacen válido uno son las condiciones de todo el método: una
+cadena de medida de clase 1 calibrada antes y después de la sesión, y una señal
+en pascales, porque aunque el ajuste en sí es insensible a la calibración (se
+construye con *diferencias* de nivel), el $L_{Aeq}$ declarado y el ajustado no lo
+son. El historial de nivel tiene que muestrearse lo bastante rápido como para
+resolver la subida (el método trabaja sobre una rejilla de 10 ms a 25 ms, que es
+el argumento `dt` de abajo) y el impulso determinante es el de mayor $P$ dentro
+de un periodo de evaluación de **30 minutos**. Tres cosas invalidan un periodo en
+vez de bajarle la puntuación: que no se cualifique ningún arranque con el
+gradiente de 10 dB/s (el ajuste es entonces 0 dB y el periodo no dice nada de la
+fuente), que los eventos se solapen de modo que un impulso arranque sobre la cola
+de decaimiento del anterior, y un historial de nivel que se saturara o recortara
+en cualquiera de los dos extremos del rango.
+
 Desde una señal temporal calibrada (en pascales) la cadena completa se ejecuta
 de principio a fin:
 
@@ -202,14 +224,38 @@ print(result.category)                  # p. ej. 'highly impulsive'
 print(round(result.adjustment, 1))      # KI en dB (de 0,0 a unos 9 dB en casos típicos)
 print(round(result.adjusted_laeq, 1))   # LAeq + KI
 
-result.plot()   # la historia de LpAF con los inicios detectados (necesita matplotlib)
+result.plot()   # el historial de LpAF con los arranques detectados (necesita matplotlib)
 ```
+
+Tres argumentos con nombre de esa llamada deciden si el número es defendible, y
+ninguno es opcional en la práctica:
+
+| Argumento | Por defecto | Qué hace |
+| :--- | :--- | :--- |
+| `dt` | `0.02` s | El intervalo de registro del historial de nivel. El método necesita de 10 ms a 25 ms; una rejilla más gruesa aplana la tasa de crecimiento ajustada y subestima $P$, que es la advertencia de dos párrafos más abajo hecha configurable |
+| `calibration_offset` | `0.0` dB | Se suma al historial de nivel para tender un puente entre una escala digital y una calibrada: la diferencia entre el nivel conocido del calibrador y el nivel que este mismo procesado declara para la grabación de calibración. Mueve el $L_{Aeq}$ y el $L_{Aeq}$ ajustado, y deja $K_I$ en paz |
+| `laeq` | `None` | Pasa el $L_{Aeq}$ medido sobre el periodo de evaluación en vez de dejar que se calcule a partir del extracto, que es lo que hace un informe real |
+| `reference_pressure` | `2e-05` Pa | Solo se cambia para un medio distinto del aire |
+| `onset_rate_method` | `'least_squares'` | El ajuste sobre la subida detectada |
+
+`environment.sound_pressure_level_history(signal, fs, *, dt=..., calibration_offset=...)`
+es ese mismo paso del apartado 4 por separado (ponderación A, ponderación
+temporal F y remuestreo a la rejilla de 10-25 ms) para quien quiera el historial
+sin el ajuste. Arranca en caliente el integrador de F con el valor cuadrático
+medio de la primera ventana, para que el comienzo de un registro no se detecte
+como un arranque del propio procesado.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_es.svg"
-  alt="Historia de nivel con ponderación A y constante F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube de unos 52 dB a 89 dB, se marcan los puntos de inicio y fin del crecimiento detectado con la recta de mínimos cuadrados, se anota la diferencia de nivel determinante de 36,8 dB y el título indica una prominencia de 11,34 con un ajuste de 11,42 dB, categoría altamente impulsiva"
+  alt="Historial de nivel con ponderación A y constante F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube de unos 52 dB a 89 dB, se marcan los puntos de inicio y fin del crecimiento detectado con la recta de mínimos cuadrados, se anota la diferencia de nivel determinante de 36,8 dB y el título indica una prominencia de 11,34 con un ajuste de 11,42 dB, categoría altamente impulsiva"
   width="90%"
 />
+
+*Los tres golpes están deliberadamente bien separados, 1,6 s entre ellos frente a
+un decaimiento de 0,08 s, para que cada arranque parta del mismo fondo y cada
+ajuste tenga toda la subida para sí. Ese es el caso fácil: los dos errores de
+campo que se describen más abajo se manifiestan los dos como una recta ajustada
+más tendida sobre un flanco visiblemente empinado.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -237,7 +283,7 @@ res = environment.impulsive_sound_adjustment(signal, fs)
 print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
 # highly impulsive 11.34 11.42
 
-# En una línea: la historia de nivel con los inicios, las rectas ajustadas y
+# En una línea: el historial de nivel con los arranques, las rectas ajustadas y
 # la diferencia de nivel determinante.
 res.plot(language="es")
 plt.show()
@@ -245,11 +291,11 @@ plt.show()
 
 </details>
 
-De la figura conviene leer dos cosas. Las rectas de inicio son ajustes por
+De la figura conviene leer dos cosas. Las rectas de arranque son ajustes por
 mínimos cuadrados sobre el crecimiento detectado, así que un ajuste tendido
-sobre un flanco visiblemente abrupto indica que la historia de nivel se
+sobre un flanco visiblemente abrupto indica que el historial de nivel se
 registró con demasiada poca resolución. Y la diferencia de nivel se mide desde
-el nivel *justo antes* del inicio, no desde el fondo a largo plazo, por lo que
+el nivel *justo antes* del arranque, no desde el fondo a largo plazo, por lo que
 un segundo golpe que llega sobre la cola del anterior puntúa un $L_D$ menor del
 que aparenta merecer.
 
@@ -277,11 +323,11 @@ después a la ISO/PAS 1996-3:2022, que la usa para decidir *objetivamente* si
 una fuente cuenta como impulsiva regular o altamente impulsiva en la
 evaluación de la ISO 1996-1.
 
-Dos advertencias prácticas al aplicarlo. El arranque se lee de la historia de
-nivel ponderada A con ponderación temporal F, y la propia constante de tiempo
+Dos advertencias prácticas al aplicarlo. El arranque se lee del historial de
+nivel ponderado A con ponderación temporal F, y la propia constante de tiempo
 de 125 ms de la ponderación F limita la velocidad a la que puede subir un
 nivel registrado: los impulsos muy cortos llegan ya suavizados, así que la
-historia de nivel debe registrarse a la cadencia máxima del sonómetro (no en
+historial de nivel debe registrarse a la cadencia máxima del sonómetro (no en
 intervalos gruesos); de lo contrario, la tasa de crecimiento, y con ella $P$,
 se subestima. Y
 el método evalúa la *prominencia* de los impulsos, no su energía: $K_I$ se
@@ -289,14 +335,26 @@ añade sobre el $L_{Aeq}$ medido en el nivel de evaluación, nunca lo sustituye.
 
 ## 5. Informe de evaluación (`.report()`)
 
+Un informe de evaluación tiene que llevar más de lo que la ficha calcula. Hay que
+declarar la norma aplicada y su edición; la fuente y la situación; la posición de
+medida y el periodo de evaluación; el impulso determinante con su tasa de
+crecimiento y su diferencia de nivel; la prominencia $P$ y el ajuste $K_I$; la
+categoría de fuente en la que el resultado sitúa a la fuente; y el $L_{Aeq}$
+sobre el que cabalga el ajuste, con la instrumentación y la calibración que hay
+detrás. La ficha de abajo rellena sola la mitad calculada (la tabla por impulso,
+la $P$ determinante, $K_I$ y la categoría) y toma el resto de `ReportMetadata`,
+y por eso el bloque de metadatos no es decoración: sin él la hoja documenta un
+resultado aritmético y no una medición.
+
+
 `ImpulseProminenceResult.report(path)` genera una ficha PDF de una página con el
 formato de un informe de evaluación de sonidos impulsivos de un laboratorio de
 ruido ambiental, siguiendo la **NT ACOU 112:2002** (recogida en la
 ISO/PAS 1996-3:2022): la línea de base normativa, un bloque de metadatos
 opcional (fuente/situación, cliente, posición de medición, instrumentación y
 fecha, con el periodo de evaluación de 30 minutos siempre visible), una tabla a
-todo ancho por impulso (tasa de inicio, diferencia de nivel, prominencia
-prevista $P$ y si el inicio se cualifica como impulso) sobre el gráfico de la
+todo ancho por impulso (tasa de crecimiento, diferencia de nivel, prominencia
+prevista $P$ y si el arranque se cualifica como impulso) sobre el gráfico de la
 curva de ajuste $K_I(P)$ con los impulsos candidatos marcados, la
 prominencia rectora $P$ enmarcada junto con el ajuste de $L_{Aeq}$
 derivado $K_I$ (Fórmula 2), una fila de veredicto CUMPLE/NO CUMPLE opcional
@@ -316,12 +374,12 @@ genera en inglés por defecto; pasa `language="es"` para una ficha en español
 ```python
 from phonometry import environment, ReportMetadata
 
-# El conjunto de tres impulsos de hincado del §1 (tasa de inicio dB/s, LD dB).
+# El conjunto de tres impulsos de hinca del §1 (tasa de crecimiento dB/s, LD dB).
 res = environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
 res.report(
     "impulse_fiche.pdf",
     metadata=ReportMetadata(
-        specimen="Obra de hincado de pilotes, martilleo intermitente",
+        specimen="Obra de hinca de pilotes, martilleo intermitente",
         measurement_standard="ISO 1996-2",
         laboratory="Laboratorio de referencia Phonometry",
         requirement=10.0,           # prominencia rectora P máxima admisible
@@ -331,12 +389,12 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="ntacou112_impulse_prominence_example"
 	title="Informe de ejemplo de prominencia de sonidos impulsivos NT ACOU 112 (PDF)"
-	description="Ficha de evaluación de sonidos impulsivos de una página: un encabezado de metadatos, una tabla por impulso con la tasa de inicio, la diferencia de nivel y la prominencia prevista P, el gráfico de la curva de ajuste KI(P) con los impulsos candidatos marcados, la prominencia rectora P = 12,25 enmarcada con el ajuste de LAeq KI = 13,0 dB (NT ACOU 112:2002 Fórmula 2) y un veredicto NO CUMPLE frente a una prominencia rectora máxima de 10."
+	description="Ficha de evaluación de sonidos impulsivos de una página: un encabezado de metadatos, una tabla por impulso con la tasa de crecimiento, la diferencia de nivel y la prominencia prevista P, el gráfico de la curva de ajuste KI(P) con los impulsos candidatos marcados, la prominencia rectora P = 12,25 enmarcada con el ajuste de LAeq KI = 13,0 dB (NT ACOU 112:2002 Fórmula 2) y un veredicto NO CUMPLE frente a una prominencia rectora máxima de 10."
 	caption="Ficha de prominencia de sonidos impulsivos (ImpulseProminenceResult.report), prominencia rectora P con el ajuste de LAeq KI."
 />
 

@@ -75,7 +75,7 @@ es la suma ponderada por canal de las potencias cuadráticas medias $z_i$
 (Fórmula 2):
 
 $$
-L_K = -0.691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
+L_K = -0{,}691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
 $$
 
 donde la constante cancela la ganancia de la ponderación K a 997 Hz y $G_i$
@@ -105,7 +105,7 @@ print(round(broadcast.integrated_loudness(np.vstack([mono, mono]), fs), 2))  # 0
 La Fórmula 2 suma $G_i z_i$ sobre los canales, así que el número de canales
 forma parte de la medida: la misma forma de onda llevada en dos canales es
 exactamente $10\log_{10} 2 = 3,01$ LU más sonora que en uno. El anclaje de
-arriba lo enseña — ese seno de 997 Hz a plena escala marca −3,01 LKFS en un
+arriba lo enseña — esa sinusoide de 997 Hz a plena escala marca −3,01 LKFS en un
 solo canal y 0,00 LKFS como mono dual, que es lo que imprimen las dos últimas
 líneas del fragmento anterior.
 
@@ -149,6 +149,13 @@ del paso alto RLB:
   width="96%"
 />
 
+*Las dos etapas, y toda la dependencia con la frecuencia que hay en BS.1770. El
+paso alto RLB elimina la energía por debajo de 100 Hz que el oído no integra en
+la sonoridad, y el realce de cabeza esférica de +4 dB por encima de unos 2 kHz
+hace las veces de la ganancia por difracción de una cabeza en un campo sonoro.
+La constante de −0,691 de $L_K$ es lo que hace que las dos juntas marquen
+exactamente −3,01 LKFS con una sinusoide de 997 Hz a plena escala.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -161,6 +168,22 @@ plt.show()
 ```
 
 </details>
+
+Ese es todo el modelo: dos biquads y una media cuadrática. Conviene decir con
+claridad qué no puede hacer una medida así, porque la pregunta con la que llega
+el lector suele ser «¿es esta *la* sonoridad?». La cadena es lineal e
+independiente del nivel por construcción — duplicar la ganancia de un programa
+suma exactamente 6 dB a $L_K$, que es justo lo que convierte la normalización en
+una sola multiplicación, y justo lo que un oído real no hace. No hay
+enmascaramiento, ni suma por bandas críticas, ni curvas isofónicas, ni suma
+binaural en ninguna parte. Así que BS.1770 ordena con fiabilidad material
+*parecido*, que es lo que necesita la entrega en radiodifusión, y se sabe que es
+menos fiable entre espectros muy distintos — música con mucho grave frente a
+diálogo es el ejemplo de manual, y la razón de que exista el paso alto RLB.
+Cuando la pregunta es de verdad la magnitud percibida y no el nivel de entrega,
+los modelos psicoacústicos están en
+[Sonoridad (ISO 532)](/phonometry/es/perception/psychoacoustics/loudness/), que da sonios y
+un patrón de sonoridad específica en lugar de un único número con puertas.
 
 ## 2. Las puertas y la sonoridad de programa
 
@@ -194,8 +217,22 @@ puertas son lo que hace que los programas de gran rango de sonoridad casen
 en antena. EBU R 128 normaliza este valor integrado a **−23,0 LUFS**; cuando
 el objetivo no es alcanzable en la práctica (programas en directo, por
 ejemplo) se permite una tolerancia de ±1,0 LU, y los flujos de control de
-calidad admiten ±0,2 LU por error de medida. La figura hace visible la puerta
-sobre un programa de ruido conformado con una cola silenciosa larga:
+calidad admiten ±0,2 LU por error de medida.
+
+Las puertas fijan además un suelo por debajo del cual no hay nada que medir. La
+sonoridad integrada necesita **al menos un bloque de puerta de 400 ms por encima
+de la puerta absoluta de −70 LUFS**; por debajo de eso — un elemento más corto
+que un bloque, o silencio digital de principio a fin — `integrated_loudness`
+devuelve `-inf`, que es una respuesta de *medida inexistente* y no un programa
+muy silencioso. Justo por encima de ese suelo la respuesta es débil, no
+inexistente: un elemento de unos pocos segundos deja apenas un puñado de bloques
+supervivientes, así que el valor integrado hereda su dispersión, y por eso las
+especificaciones de entrega de piezas breves suelen normalizar por el máximo
+momentáneo o de corto plazo en vez de por I. (Las muestras no finitas se
+rechazan directamente, no se filtran con las puertas).
+
+La figura hace visible la puerta sobre un programa de ruido conformado con una
+cola silenciosa larga:
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating_es.svg"
@@ -283,6 +320,14 @@ la traza de sonoridad del programa:
   width="96%"
   loading="eager"
 />
+
+*Un mismo programa sintético a través de las tres escalas temporales: ambiente
+silencioso, después diálogo, después música y un fundido de salida. La traza
+momentánea (400 ms) respira con cada sílaba; la de corto plazo (3 s) es la que
+sigue un operador, y se separa de M allí donde el material es denso o transitorio
+en lugar de estacionario. La línea integrada es plana por definición — es un solo
+número para todo el programa — y la banda sombreada es la separación entre P10 y
+P95 que declara el rango de sonoridad.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -388,9 +433,12 @@ demasiado pocas ventanas de 3 s.
 
 Los picos por muestra engañan: el máximo verdadero de la forma de onda
 reconstruida cae en general *entre* muestras, y un medidor de pico por
-muestra infravalora 3 dB un tono a $f_s/4$ con la fase desafortunada (peor
-caso $20\log_{10}\cos(\pi f_{\mathrm{norm}}/n)$ para una razón de
-sobremuestreo $n$). Por eso el Anexo 2 de BS.1770-5 mide el **pico
+muestra infravalora 3 dB un tono a $f_s/4$ con la fase desafortunada. El peor
+caso está acotado por $20\log_{10}\cos(\pi f_{\mathrm{norm}}/n)$, donde $n$ es
+la razón de sobremuestreo y $f_{\mathrm{norm}} = f/f_s$ es la frecuencia del tono
+normalizada a la de muestreo — que es exactamente por lo que $f_s/4$ es el peor
+caso, ya que $f_{\mathrm{norm}} = 1/4$ maximiza la cota en la banda de audio.
+Por eso el Anexo 2 de BS.1770-5 mide el **pico
 verdadero** sobre la señal sobremuestreada hasta al menos 192 kHz (4× a
 48 kHz), en **dBTP** (dB respecto al 100 % de la escala completa):
 
@@ -409,7 +457,51 @@ print(round(float(broadcast.true_peak_level(x, fs)), 2))                #  0.12
 El interpolador recupera la excursión entre muestras que la rejilla de
 muestreo perdió (el residuo de +0,12 dB es rizado de interpolación de los
 bordes abruptos del tono, dentro de la tolerancia de +0,2/−0,4 dB que deben
-cumplir los medidores en modo EBU). EBU R 128 limita la producción a
+cumplir los medidores en modo EBU).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/true_peak_intersample_es.svg" alt="Dos paneles. A la izquierda, doce muestras del tono de 12 kHz a plena escala con un desfase de un cuarto de ciclo: cada punto de muestra se sitúa en 0,707 de la escala completa sobre la línea discontinua de pico muestral en menos 3,01 dBFS, mientras que la reconstrucción de banda limitada trazada a través de ellos toca más y menos uno, y la rejilla sobremuestreada 4 veces se marca en la parte inferior. A la derecha, la infravaloración de peor caso 20 log cos de pi f_norm entre n frente a la frecuencia normalizada para razones de sobremuestreo de 1, 2, 4 y 8, con el mínimo de 4 que pide BS.1770 marcado en f_norm igual a un cuarto, donde quedan menos 0,17 decibelios" width="92%" />
+
+*Izquierda: el mecanismo. Muestrear un tono a $f_s/4$ a plena escala con la fase
+equivocada deja **todas** las muestras en $1/\sqrt{2}$, así que un medidor de
+pico por muestra marca −3,01 dBFS mientras que la forma de onda que de verdad
+saldrá de un convertidor alcanza la escala completa. Derecha: la cota, frente a
+la razón de sobremuestreo. Con el 4× que pide BS.1770 aún se pierden 0,17 dB de
+la excursión en la frecuencia más desfavorable — que es parte de por qué el techo
+es −1 dBTP y no 0.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# La propia señal de la página, medida entera y dibujada de doce en doce muestras.
+pico_muestral = float(broadcast.true_peak_level(x, fs, oversample=1))
+pico_verdadero = float(broadcast.true_peak_level(x, fs))
+t_fino = np.linspace(0.0, 11 / fs, 2000)
+fino = np.sin(2 * np.pi * (fs / 4) * t_fino + np.pi / 4)
+
+fig, (axi, axd) = plt.subplots(1, 2, figsize=(12, 5))
+axi.plot(t_fino * 1000.0, fino, label="reconstrucción de banda limitada")
+axi.plot(np.arange(12) / fs * 1000.0, x[:12], "o", label="muestras a 48 kHz")
+axi.axhline(np.abs(x[:12]).max(), linestyle="--")   # pico muestral, -3,01 dBFS
+axi.axhline(1.0, linestyle="--")                    # la excursión verdadera
+axi.set(xlabel="Tiempo [ms]", ylabel="Amplitud [FS]")
+axi.legend()
+
+f_norm = np.linspace(0.0, 0.5, 400)
+for razon in (1, 2, 4, 8):
+    axd.plot(f_norm, 20.0 * np.log10(np.cos(np.pi * f_norm / razon)),
+             label=f"n = {razon}")
+axd.set(xlabel="Frecuencia del tono / frecuencia de muestreo",
+        ylabel="Infravaloración [dB]", ylim=(-7.0, 0.4))
+axd.legend()
+plt.show()
+```
+
+</details>
+
+EBU R 128 limita la producción a
 **−1 dBTP**; los códecs de distribución suelen necesitar más margen. Es la
 misma maquinaria de pico sobremuestreado que sostiene el `lc_peak` ponderado
 C de [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/).
@@ -434,11 +526,109 @@ pesos = broadcast.channel_weight([0, 30, -30, 90, -90], [0, 0, 0, 0, 0])
 # -> [1. 1. 1. 1.41 1.41]; se pasa como program_loudness(..., weights=pesos)
 ```
 
+Son dos desigualdades que describen un dibujo, y el dibujo responde a la pregunta
+que se hace de verdad quien monta la sala: qué altavoces de *esta* disposición
+caen dentro de la zona:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/channel_weight_map_es.svg" alt="Un mapa de la ponderación de canal del Anexo 3 de BS.1770 sobre el acimut de menos 180 a 180 grados y la elevación de menos 90 a 90 grados. Dos rectángulos sombreados entre 60 y 120 grados de acimut a cada lado y dentro de más menos 30 grados de elevación llevan la ponderación 1,41, más 1,5 decibelios; todo lo demás vale 1,0. Los altavoces L, R y C de un 5.1 quedan en la ponderación 1,00, Ls y Rs a 110 grados caen dentro de las zonas sombreadas en 1,41, y el altavoz de la capa superior U más 110 a 45 grados de elevación queda fuera, en 1,00" width="92%" />
+
+*La ponderación es una propiedad de la **posición** del altavoz, no del nombre
+del canal. Ls y Rs de una disposición 5.1 caen dentro de la zona lateral de la
+capa media y se llevan +1,5 dB; el mismo acimut elevado a la capa superior, no.
+Por eso la Tabla 3 y el Anexo 3 coinciden en 5.1 y se separan en 22.2.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# El mapa es la propia función, evaluada sobre la esfera.
+acimut, elevacion = np.meshgrid(np.linspace(-180.0, 180.0, 361),
+                                np.linspace(-90.0, 90.0, 181))
+ponderacion = broadcast.channel_weight(acimut, elevacion)
+
+fig, ax = plt.subplots(figsize=(11, 5.6))
+ax.contourf(acimut, elevacion, ponderacion, levels=[1.2, 2.0])
+ax.contour(acimut, elevacion, ponderacion, levels=[1.2])
+for nombre, a, e in (("L", -30.0, 0.0), ("R", 30.0, 0.0), ("C", 0.0, 0.0),
+                     ("Ls", -110.0, 0.0), ("Rs", 110.0, 0.0),
+                     ("U+110", 110.0, 45.0)):
+    ax.plot([a], [e], "o")
+    ax.annotate(f"{nombre}  ({broadcast.channel_weight(a, e):.2f})", (a, e))
+ax.set(xlabel="Acimut [°]", ylabel="Elevación [°]")
+plt.show()
+```
+
+</details>
+
 El audio basado en objetos (Anexo 4) se mide renderizando primero a una
 configuración de altavoces y midiendo el renderizado; el renderizado en sí queda
 fuera de este alcance.
 
-## Informe de EBU R 128 (`.report()`)
+## 7. Normalizar al objetivo
+
+Medir es la mitad de R 128; la otra mitad es la única ganancia que viene
+después, y el orden de las operaciones importa más que la aritmética.
+
+Lo primero, qué espera `program_loudness`: un array `[canales, muestras]` en
+unidades de escala completa, donde 1,0 es 0 dBFS. Un `soundfile.read` devuelve
+`(muestras, canales)`, así que hay que transponerlo, y el PCM entero hay que
+escalarlo antes a ±1. Lo segundo, *qué* se mide: el programa **tal como se
+entrega**. El tono de ajuste, la claqueta, la cuenta atrás y el negro forman
+parte del fichero y no del programa, así que se recortan antes de medir — un tono
+de ajuste de 1 kHz a −18 dBFS atraviesa la puerta absoluta sin problema y arrastra
+consigo el valor integrado. Y se mide el programa entero, no un extracto, porque
+la puerta relativa se calcula a partir de los propios supervivientes del programa.
+
+Y luego la ganancia. La normalización es una **única ganancia estática** de
+(objetivo − I) dB aplicada a todo el programa:
+
+```python
+from scipy import signal
+
+# Un programa estéreo terminado, en lugar del máster entregado: tres secciones
+# de ruido conformado separadas 13 LU. En la práctica esto es
+#   datos, fs = soundfile.read(ruta)     # (muestras, canales), -1,0 a 1,0
+#   programa = datos.T                   # program_loudness quiere [canales, muestras]
+rng = np.random.default_rng(128)
+sos = signal.butter(2, 2000.0, fs=fs, output="sos")
+secciones = []
+for nivel_dbfs, segundos in [(-31.0, 12.0), (-24.0, 12.0), (-37.0, 12.0)]:
+    ruido = signal.sosfilt(sos, rng.standard_normal(int(segundos * fs)))
+    secciones.append(10 ** (nivel_dbfs / 20) * ruido / np.sqrt(np.mean(ruido ** 2)))
+programa = np.concatenate(secciones)
+
+res = broadcast.program_loudness(np.vstack([programa, programa]), fs)
+ganancia_db = -23.0 - res.integrated
+print(round(res.integrated, 2), round(ganancia_db, 2))    # -23.86  0.86
+
+normalizado = programa * 10 ** (ganancia_db / 20)
+despues = broadcast.program_loudness(np.vstack([normalizado, normalizado]), fs)
+print(round(despues.integrated, 2), round(despues.loudness_range, 2))  # -23.0 13.02
+print(round(despues.true_peak, 2))                    # -9.96, antes -10.82
+print(despues.true_peak <= -1.0)                      # el techo de R 128: True
+```
+
+Como la ganancia es lineal y se aplica a todo, desplaza M, S e I exactamente esos
+decibelios y deja el **LRA intacto** — el rango de sonoridad es una diferencia de
+percentiles, y un desplazamiento constante se cancela en ella. Qué bloques
+sobreviven a las puertas tampoco cambia, por la misma razón.
+
+El pico verdadero, en cambio, se mueve con la ganancia, y ese es el único
+conflicto que R 128 deja sin resolver. Un programa silencioso y de gran rango que
+necesite +8 LU y cuyo pico verdadero máximo ya esté en −6 dBTP acaba en +2 dBTP:
+bien normalizado y por encima del techo. El orden es *normalizar y después
+comprobar* — nunca reducir la ganancia para que quepa el pico, porque eso rompe
+el nivel de entrega del que depende todo lo demás. Las dos salidas legítimas son
+un limitador de pico verdadero aplicado a los momentos más sonoros (que baja algo
+el LRA, y hay que declararlo) o renegociar el objetivo de esa entrega.
+
+El registro de entrega son tres números, no uno: la sonoridad integrada **I**, el
+rango de sonoridad **LRA** y el pico verdadero máximo **TP máx**. Son exactamente
+los tres que enmarca la ficha de abajo.
+
+## 8. Informe de EBU R 128 (`.report()`)
 
 `ProgramLoudnessResult.report(path)` renderiza una ficha PDF de una página con
 el formato de una hoja de conformidad de entrega para radiodifusión: la línea
@@ -458,23 +648,30 @@ del cuerpo estrecho de dos paneles de las demás fichas porque la tabla de
 conformidad necesita cuatro columnas y la traza de sonoridad frente al tiempo
 es apaisada. Usa el mismo contenedor `ReportMetadata` y el mismo motor de
 renderizado que la
-[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
-un `requirement` proporcionado se interpreta como la sonoridad de programa
-objetivo en LUFS (por defecto los −23,0 LUFS de EBU R 128), y la ficha cumple
-cuando la sonoridad integrada está dentro de la tolerancia de R 128
-seleccionada y el pico verdadero es igual o inferior a −1,0 dBTP. La
-tolerancia sigue el argumento `tolerance`: el valor por defecto `"qc"` aplica
-el margen de ±0,2 LU por errores de medida del punto i) de R 128 (flujos de
-trabajo de sonoridad como el control de calidad), y `"live"` aplica la
-tolerancia de ±1,0 LU del punto h), permitida solo cuando el nivel objetivo no
-es alcanzable en la práctica (por ejemplo, programas en directo); la regla
-aplicada y su punto de R 128 se imprimen en la ficha. El veredicto se evalúa
-sobre la sonoridad redondeada a los 0,1 LU mostrados, de modo que los números
-impresos nunca pueden contradecirlo. El renderizado necesita reportlab y, para
-la figura que incrusta la ficha, matplotlib (`pip install
-"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
-genera en inglés por defecto; pasa `language="es"` para una ficha en español
-(cadenas fijas traducidas y coma como separador decimal), p. ej.
+[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report).
+
+**Qué determina el veredicto.** Un `requirement` proporcionado se interpreta como
+la sonoridad de programa objetivo en LUFS (por defecto los −23,0 LUFS de
+EBU R 128), y la ficha cumple cuando la sonoridad integrada está dentro de la
+tolerancia de R 128 seleccionada *y* el pico verdadero es igual o inferior a
+−1,0 dBTP. Nada más vota.
+
+**El selector de tolerancia**, que es el único ajuste que cambia si una entrega
+cumple o no. Sigue el argumento `tolerance`: el valor por defecto `"qc"` aplica
+el margen de **±0,2 LU** por errores de medida del punto i) de R 128, para flujos
+de trabajo de sonoridad como el control de calidad, y `"live"` aplica la
+tolerancia de **±1,0 LU** del punto h), permitida solo cuando el nivel objetivo
+no es alcanzable en la práctica — un programa en directo, típicamente. La regla
+aplicada y su punto de R 128 se imprimen en la ficha, de modo que el lector
+siempre puede ver cuál se usó. El veredicto se evalúa después sobre la sonoridad
+*redondeada a los 0,1 LU mostrados*, de modo que los números impresos nunca
+pueden contradecir al veredicto que tienen al lado.
+
+**Cuestiones prácticas.** El renderizado necesita reportlab y, para la figura que
+incrusta la ficha, matplotlib (`pip install "phonometry[report,plot]"`); solo se
+admite `engine="reportlab"`. La ficha se genera en inglés por defecto; pasa
+`language="es"` para una ficha en español (cadenas fijas traducidas y coma como
+separador decimal), p. ej.
 `res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python
@@ -502,7 +699,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de conformidad de sonoridad de programa (ProgramLoudnessResult.report), I en LUFS con LRA en LU y pico verdadero en dBTP."
 />
 
-## 7. Validación
+## 9. Validación
 
 Cada señal sintetizable de «requisitos mínimos» de EBU Tech 3341 (casos 1-6
 y 9-23) y de Tech 3342 (casos 1-4) se ejecuta en la batería de tests con su
@@ -515,7 +712,7 @@ de la EBU (descargado de la propia EBU, cuya licencia cubre solo pruebas
 técnicas, así que el audio nunca se incorpora al repositorio) y los cuatro
 pasan dentro de tolerancia; las series de sonoridad por bloques medidas de
 esos ficheros se incorporan como datos simples, de modo que las etapas de
-gating y LRA de estos casos se ejecutan también en todas partes sin el
+puerta y de LRA de estos casos se ejecutan también en todas partes sin el
 audio. El medidor independiente
 [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) es un contraste útil
 con grabaciones reales; no se usó como fuente de esta implementación.
@@ -539,4 +736,25 @@ fuera de alcance. La guía señala que el renderizado a una disposición de
 altavoces debe ocurrir antes, y phonometry no implementa ningún renderizador
 de audio espacial para ese paso. EBU Tech 3343 se cita solo como práctica de
 producción alrededor de estos números: es orientación, no un algoritmo, y
-nada aquí lo ejecuta.
+nada aquí lo ejecuta. Tampoco hay un *ayudante* de normalización: la sección 7
+enseña la ganancia única, y aplicarla es una multiplicación. Y nada de esta
+página es un **modelo** de sonoridad — la ponderación K es un filtro lineal fijo,
+así que el enmascaramiento, la dependencia con el nivel, las bandas críticas y la
+suma binaural quedan fuera por construcción; eso vive en
+[Sonoridad (ISO 532)](/phonometry/es/perception/psychoacoustics/loudness/).
+
+## Véase también
+
+- [Sonoridad (ISO 532)](/phonometry/es/perception/psychoacoustics/loudness/): los modelos
+  psicoacústicos, en sonios y sonoridad específica, que responden a la pregunta
+  por la magnitud percibida que los LUFS con puertas de esta página
+  deliberadamente no responden.
+- [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/):
+  $L_{eq}$, $L_{Ceq}$ y la misma maquinaria de pico sobremuestreado que sostiene
+  `lc_peak`.
+- [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/): A, C y Z
+  frente a la ponderación K de esta página.
+- [Electroacústica (IEC 60268-3)](/phonometry/es/devices/electroacoustics/electroacoustics/):
+  la cadena que transporta el programa una vez normalizado.
+- [Radiodifusión](/phonometry/es/devices/broadcast/): el resumen de la sección.
+- Referencia de la API: [`broadcast`](/phonometry/es/reference/api/broadcast/program-loudness/).

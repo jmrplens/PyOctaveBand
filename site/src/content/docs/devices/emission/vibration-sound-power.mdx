@@ -99,43 +99,6 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band, comparing the ISO/TS 7849-1 upper limit (radiation factor of one) with the ISO/TS 7849-2 engineering value (measured radiation factor)" width="82%" />
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import emission
-
-# Surface velocity levels and a measured radiation factor per octave band.
-bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-lv = np.array([78.0, 82.0, 85.0, 83.0, 79.0, 74.0])
-eps = np.array([0.20, 0.45, 0.75, 0.95, 1.00, 1.00])
-
-lw_max = emission.radiated_sound_power_level(lv, 1.6)  # Part 1, eps = 1
-lw_eng = emission.radiated_sound_power_level(lv, 1.6, radiation_factor=eps)  # Part 2
-
-# One line — the LW(f) spectrum of one determination as a result object:
-res = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps,
-                                          frequencies=bands)
-res.plot()
-plt.show()
-
-# By hand, comparing the two parts:
-x = np.arange(bands.size)
-fig, ax = plt.subplots()
-ax.bar(x - 0.2, lw_max, width=0.4, label="Part 1 upper limit ($\\varepsilon$ = 1)")
-ax.bar(x + 0.2, lw_eng, width=0.4, label="Part 2 engineering ($\\varepsilon$ measured)")
-ax.set_xticks(x, [f"{b:g}" for b in bands])
-ax.set(xlabel="Frequency [Hz]", ylabel="Sound power level $L_W$ [dB re 1 pW]")
-ax.legend()
-plt.show()
-```
-
-</details>
-
 ## 1. The two parts
 
 The two parts differ only in the radiation factor. **Part 1 (survey)** assumes
@@ -170,6 +133,52 @@ $10\lg\sum_j 10^{0.1 L_{W,j}}$, while `sound_power_level_a` is the A-weighted
 total that the fiche boxes and that a noise declaration quotes. They differ by
 the A-weighting of the spectrum — 2.0 dB on this casing, several decibels more
 on a low-frequency-heavy one.
+
+Set the two parts side by side on one casing and the price of Part 1's
+assumption is a picture rather than an argument:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band, comparing the ISO/TS 7849-1 upper limit (radiation factor of one) with the ISO/TS 7849-2 engineering value (measured radiation factor)" width="82%" />
+
+*Paired bars per band for a 1.6 m² casing: Part 1's upper limit against Part 2's
+engineering value. The gap **is** $-10\log_{10}\varepsilon_j$ — 7.0 dB at
+125 Hz, 3.5 dB at 250 Hz, 1.2 dB at 500 Hz and nothing from 2 kHz up — so the
+error Part 1 makes is largest in the low bands, exactly where a large thin
+casing radiates worst.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# Surface velocity levels and a measured radiation factor per octave band.
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+lv = np.array([78.0, 82.0, 85.0, 83.0, 79.0, 74.0])
+eps = np.array([0.20, 0.45, 0.75, 0.95, 1.00, 1.00])
+
+lw_max = emission.radiated_sound_power_level(lv, 1.6)  # Part 1, eps = 1
+lw_eng = emission.radiated_sound_power_level(lv, 1.6, radiation_factor=eps)  # Part 2
+
+# The figure above: the two parts band by band.
+x = np.arange(bands.size)
+fig, ax = plt.subplots()
+ax.bar(x - 0.2, lw_max, width=0.4, label="Part 1 upper limit ($\\varepsilon$ = 1)")
+ax.bar(x + 0.2, lw_eng, width=0.4, label="Part 2 engineering ($\\varepsilon$ measured)")
+ax.set_xticks(x, [f"{b:g}" for b in bands])
+ax.set(xlabel="Frequency [Hz]", ylabel="Sound power level $L_W$ [dB re 1 pW]")
+ax.legend()
+plt.show()
+
+# A single determination is a result object that draws its own spectrum:
+res = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps,
+                                          frequencies=bands)
+res.plot()
+plt.show()
+```
+
+</details>
 
 ## 2. Velocity level, calibration and the radiation factor
 
@@ -211,6 +220,47 @@ velocity level must sit at least 3 dB below the machine's, and
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into ten equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the Table 1 initial number of measurement positions (5 below 1 square metre, 10 from 1 to 10, S over S0 above) and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%" />
 
+The Table 2 ladder is one call on a measured difference:
+
+```python
+# With the machine stopped and the surrounding plant running, the mean
+# extraneous velocity level is 5.4 dB below the operating one.
+k1a = emission.extraneous_velocity_correction(5.4)
+print(k1a)                                        # 2.0 dB, subtracted from Lv
+print(round(float(np.mean(lv)) - k1a, 1))         # 80.2 dB after the correction
+```
+
+### Mounting the transducer
+
+Everything above assumes $L_v$ is the surface's own normal velocity. Whether it
+is depends on the transducer and on how it is attached, and both have a
+frequency limit that is easy to exceed without any warning in the data.
+
+Use a piezoelectric accelerometer light enough not to mass-load the panel, and
+only over the flat part of its response: the usable upper limit is about **one
+third of the transducer's own mounted resonance**, which keeps the reading
+within roughly 1 dB. A 30 kHz-resonance miniature accelerometer is therefore
+good to about 10 kHz; a heavy 6 kHz one only to 2 kHz. Mount it per ISO 5348
+with its sensitive axis **normal to the surface**, because the method needs the
+normal component and nothing else, and fix the cable to the machine close to the
+transducer so that cable motion does not drive the charge amplifier.
+
+The attachment is the part that silently costs bandwidth:
+
+| Attachment | Usable to | Notes |
+| :--- | :--- | :--- |
+| Stud (threaded) | the transducer's own limit | The reference mounting; needs a drilled and faced boss |
+| Adhesive, or a thin layer of adhesive wax | about 10 kHz | Wax not on hot surfaces (it softens well below 40 °C) |
+| Clamping magnet | about 2,5 kHz | Smooth flat steel only; a 110 g magnet plus a 30 g transducer also caps the measurable acceleration, and paint or roughness destroys the adhering force |
+| Hand-held probe | low bands only | For a quick survey, never for a determination |
+
+That table has a direct consequence for the examples on this page, which run
+octave bands out to **4 kHz**: a magnet mount loses the top band outright, and
+loses it quietly — the level simply reads low rather than failing a check. A
+scanning laser vibrometer avoids the mass loading and the mounting limit
+altogether, provided the beam stays perpendicular to the surface, since it too
+measures only the component along the beam.
+
 ## 3. When the radiation-factor assumption breaks
 
 The whole method stands on one substitution: replacing the acoustic
@@ -236,12 +286,79 @@ to violate in the field:
   invisible to a velocity survey; the method characterises the
   structure-borne part only.
 
+### Estimating the radiation factor before you measure it
+
+None of that has to be taken on trust: the library predicts $\varepsilon$ for a
+plate, and it is the same `radiation_efficiency` model that drew the plate at
+the top of this page. The **critical frequency** follows from the surface mass
+and the bending stiffness — a 3 mm steel panel puts it near 4 kHz — and it is
+where bending waves travel at the speed of sound and the plate begins to
+radiate like a piston. Everything below it is the acoustic short circuit.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_sigma.svg" alt="The radiation efficiency sigma of the 1.5 by 1.25 metre plate on log-log axes from 50 Hz to 5 kHz, rising from about 0.003 at 63 Hz to a peak just above the critical frequency of 4073 Hz. The whole region below the sigma equals one line is shaded and labelled as the range where ISO/TS 7849-1 assumes epsilon equals one, with the radiation index marked at minus 23.4 dB at 125 Hz and minus 17.6 dB at 1 kHz" width="88%" />
+
+*The shaded area is the assumption Part 1 makes. For this plate it is worth
+25 dB at 63 Hz and 14 dB at 2 kHz, and it closes only at coincidence — which is
+the "10 dB and more" of the paragraph above, drawn.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# The same 1.5 x 1.25 m plate, now as a 3 mm steel panel so the coincidence
+# frequency comes from the material rather than being assumed.
+f = np.geomspace(50.0, 5000.0, 400)
+stiffness = vibration.plate_bending_stiffness(2.0e11, 0.003, 0.30)
+fc = vibration.coincidence_frequency(7800.0 * 0.003, stiffness)
+print(round(fc, 0))                                   # 4073.0 Hz
+sigma = vibration.radiation_efficiency(f, 1.5, 1.25, fc)
+print(round(float(np.interp(1000.0, f, sigma.radiation_index)), 1))    # -17.6 dB
+
+sigma.plot()          # sigma(f) with the sigma = 1 line and fc marked
+plt.show()
+```
+
+</details>
+
+A predicted $\varepsilon$ feeds straight back into the determination:
+`sound_power_from_vibration(lv, area=…, radiation_factor=sigma.radiation_efficiency,
+frequencies=bands)` turns a Part 1 survey into a first estimate of the Part 2
+value. Take it for what it is — a *baffled flat plate with a known boundary
+condition* is not a machine casing with ribs, apertures and a gearbox bolted to
+it — but it is enough to know whether the Part 1 number is 1 dB or 15 dB
+pessimistic before committing to an intensity measurement. The same
+$\varepsilon$ appears as $\sigma$, the radiation efficiency, in
+[Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/):
+the emission standards write it $\varepsilon$ and the building-prediction
+standards write it $\sigma$, and it is the same quantity computed by the same
+function.
+
 Part 2 exists exactly for the radiation-factor problem: it replaces the
 fixed $\varepsilon = 1$
 with a band-by-band $\varepsilon_j$ determined from one reference measurement
 of the
 radiated power (ISO 9614 intensity), after which the velocity survey can be
 repeated cheaply on nominally identical machines.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_radiation_factor.svg" alt="The ISO/TS 7849-2 determination of the radiation factor: the same machine casing carrying its ten-cell accelerometer grid with the mean square velocity measured on the surface, enclosed by an ISO 9614 measurement surface offset 0.25 m from it over which a p-p probe traces a serpentine sweep, the band power P_j leaving that surface, and the relation epsilon_j equals P_j divided by the characteristic impedance times the mean square velocity times the area, taken on one machine in one operating mode" width="92%" />
+
+That pairing is the whole of Part 2, and it is where the transferability has to
+be qualified. Clause 4.4.3 is explicit that $\varepsilon_j$ is determined not
+only by the geometry and the mechanical properties of the structure but **also
+by the distribution and manner of the excitation and by the internal loss
+factor**, so a factor measured at idle does not carry to full load, and one
+measured on a soft mount does not carry to a bolted installation: the operating
+and mounting condition is part of the $\varepsilon$, exactly as it is part of
+every other emission value in this section. Clause 4.2 adds the modal caveat —
+in bands where only a very few modes are excited, $\varepsilon_j$ is set by
+*which* modes happen to be excited rather than by the surface's average
+radiating behaviour, so it is unstable from run to run and from machine to
+machine. That makes the low bands the least transferable part of the spectrum,
+and they are also where the Part 1 upper limit is worst. The practical rule:
+reuse an $\varepsilon$ only across the same machine family, the same operating
+mode and the same mounting, and re-verify it on a sample.
 
 ## 4. The measurement report (`.report()`)
 
@@ -328,19 +445,39 @@ single-machine Formula 8, converting an independently measured sound power
 into $\varepsilon$.
 
 **Not covered.** The measurement clauses of both parts (instrumentation,
-source installation, the number and mounting of measurement positions,
-environmental conditions: clauses 5 to 7) and their measurement-uncertainty
-clauses and informative annexes are not implemented: they are laboratory
-practice this guide assumes. Part 2's clause 8 also asks for the radiation
+source installation, environmental conditions: clauses 5 to 7) are not
+*implemented* as code, and neither are their measurement-uncertainty clauses and
+informative annexes: they are laboratory practice, and this guide states the
+rules of it that decide whether the inputs are valid at all — the Table 1
+position counts, the Table 2 extraneous-vibration ladder and the transducer
+mounting limits above. Part 2's clause 8 also asks for the radiation
 factor of a machine batch or family, averaging $\varepsilon_j$ over several
 machines and its standard deviation (Formulae 9, 10); only the single-machine
 Formula 8 is implemented, so pass an already-averaged $\varepsilon$ for a
 family determination. The
-sound power that feeds `radiation_factor` must come from an ISO 9614
-intensity measurement, covered separately in the
-[sound intensity guide](/phonometry/devices/emission/intensity/).
+sound power that feeds `radiation_factor` must come from an ISO 9614 intensity
+*determination*, which is
+[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/)
+(`sound_power_intensity`, or `sound_power_intensity_precision` for grade 1) —
+the [sound intensity guide](/phonometry/devices/emission/intensity/) covers the
+probe and the field indicators behind it but computes no power.
 
 ## See also
 
+- [Sound Power](/phonometry/devices/emission/sound-power/): the route chooser
+  this method is the sixth entry of, the accuracy grades and the ISO 4871
+  declaration a result feeds.
+- [Sound Power by Intensity Scanning (ISO 9614)](/phonometry/devices/emission/sound-power-intensity/):
+  the determination that produces the $P_j$ behind a Part 2 radiation factor.
+- [Sound Intensity (p-p)](/phonometry/devices/emission/intensity/): the probe,
+  its residual index and the field indicators that qualify that measurement.
+- [Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/):
+  the same radiation-efficiency model, written $\sigma$ instead of
+  $\varepsilon$, and the coincidence physics behind it.
+- [Structure-borne source characterisation](/phonometry/buildings/design/structure-borne-power/):
+  ISO 9611, EN 15657 and EN 12354-5, the standards that consume this kind of
+  result.
+- [Mechanical mobility (ISO 7626)](/phonometry/vibration/structural/mechanical-mobility/):
+  the transducer practice behind a measured surface velocity.
 - API reference: [`emission.vibration_sound_power`](/phonometry/reference/api/power/vibration-sound-power/).
 - Theory: [Point mobilities and radiation efficiency](/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the radiation efficiency that turns a surface velocity into a radiated power.

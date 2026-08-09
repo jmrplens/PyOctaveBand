@@ -13,6 +13,110 @@ from __future__ import annotations
 # Spanish variants of every user-visible string. Strings not in the table
 # (numbers, unit-only labels, code identifiers) are shared between languages.
 _ES: dict[str, str] = {
+    # ISO 9613-2 ground regions (environment/propagation/outdoor-propagation).
+    "G is the porous fraction of its region":
+        "G es la fracción porosa de su región",
+    "grass, G = 1": "hierba, G = 1",
+    "asphalt, G = 0": "asfalto, G = 0",
+    "source region  30 hs = 45 m": "región de la fuente  30 hs = 45 m",
+    "middle region  110 m": "región intermedia  110 m",
+    "receiver region  30 hr = 45 m": "región del receptor  30 hr = 45 m",
+    "dp = 60 m: the regions overlap, so there is no middle region":
+        "dp = 60 m: las regiones se solapan y no hay región intermedia",
+    "below 30(hs + hr) = 90 m: q = 0, Am = 0":
+        "por debajo de 30(hs + hr) = 90 m: q = 0, Am = 0",
+    "and ground_middle is ignored entirely":
+        "y ground_middle se ignora por completo",
+    # The four diffracted paths (environment/propagation/ground-barriers).
+    "Four coherent routes over one edge":
+        "Cuatro recorridos coherentes sobre un borde",
+    "0 bounces": "0 reflexiones",
+    "1 bounce, source side": "1 reflexión, lado fuente",
+    "1 bounce, receiver side": "1 reflexión, lado receptor",
+    "2 bounces": "2 reflexiones",
+    "4 m screen": "pantalla de 4 m",
+    "image receiver": "receptor imagen",
+    "Thick barrier: two edges": "Barrera gruesa: dos bordes",
+    # CNOSSOS-EU road source line geometry (environment/sources).
+    "Plan — two-lane urban arterial": "Planta — vía urbana de dos carriles",
+    "source line,": "línea fuente,",
+    "one per lane centre": "una por eje de carril",
+    "each segment carries L'W,eq,line,i + 10 lg(dL)":
+        "cada segmento lleva L'W,eq,line,i + 10 lg(dL)",
+    "signal-controlled junction": "intersección semaforizada",
+    "max(1 − |x|/100, 0)": "max(1 − |x|/100, 0)",
+    "dwelling façade": "fachada de vivienda",
+    "road surface": "pavimento",
+    "equivalent point source": "fuente puntual equivalente",
+    "gradient s: the flow is split": "pendiente s: el flujo se divide",
+    "and corrected uphill and downhill": "y se corrige en subida y en bajada",
+    "receiver point": "punto receptor",
+    # CNOSSOS-EU railway source lines (environment/sources).
+    "datum: the plane tangent to the two rail heads":
+        "referencia: el plano tangente a las dos cabezas de carril",
+    "A — rolling, impact, squeal,": "A — rodadura, impacto, chirrido,",
+    "bridge, low traction": "puente, tracción baja",
+    "B — exhausts, roof apparatus,": "B — escapes, equipos de techo,",
+    "pantograph recess": "hueco del pantógrafo",
+    "receiver, 4 m": "receptor, 4 m",
+    "ψ > 0": "ψ > 0",
+    "ψ ≤ 0: the vertical correction of A is zero":
+        "ψ ≤ 0: la corrección vertical de A es nula",
+    "track axis": "eje de la vía",
+    "0 dB broadside": "0 dB en perpendicular",
+    "−20 dB along the track": "−20 dB en el eje de la vía",
+    "receiver bearing": "dirección al receptor",
+    "Impact noise applies from 50 m": "El ruido de impacto se aplica desde 50 m",
+    "before a joint to 50 m after it": "antes de una junta hasta 50 m después",
+    "Curve squeal needs ≥ 50 m": "El chirrido en curva exige ≥ 50 m",
+    "of continuous curve": "de curva continua",
+    # IEC 61400-11 ground board (environment/sources/wind-turbine-noise).
+    "split (if any): off centre, parallel, gap < 1 mm":
+        "junta (si la hay): descentrada, paralela, holgura < 1 mm",
+    "to the turbine": "hacia el aerogenerador",
+    "diameter ≥ 1,0 m": "diámetro ≥ 1,0 m",
+    "plywood ≥ 12,0 mm  ·  metal ≥ 2,5 mm":
+        "contrachapado ≥ 12,0 mm  ·  metal ≥ 2,5 mm",
+    "soil fillet": "recrecido de tierra",
+    "capsule diaphragm in the board plane, ≤ 13 mm":
+        "diafragma de la cápsula en el plano del tablero, ≤ 13 mm",
+    "primary windscreen ≈ 90 mm": "pantalla antiviento primaria ≈ 90 mm",
+    "secondary: high wind only —": "secundaria: solo con viento fuerte —",
+    "document and correct its insertion loss":
+        "documentar y corregir su pérdida por inserción",
+    "Position (clause 7.1)": "Posición (capítulo 7.1)",
+    "within ±15° of downwind": "dentro de ±15° de la dirección a sotavento",
+    "R0 to ±20 %, max ±30 m, measured to ±2 %":
+        "R0 con ±20 %, máx. ±30 m, medida con ±2 %",
+    "board inclination φ between 25° and 40°":
+        "inclinación del tablero φ entre 25° y 40°",
+    "reflections from structures < 0,2 dB":
+        "reflexiones de estructuras < 0,2 dB",
+    # RD 1367/2007 chain (environment/assessment/spanish-noise-regulation).
+    "1 — the day, split into evaluation periods (Annex I A.1)":
+        "1 — el día, dividido en períodos de evaluación (Anexo I A.2)",
+    "night 23-07": "noche 23-07",
+    "day 07-19": "día 07-19",
+    "evening 19-23": "tarde 19-23",
+    "2 h shut": "2 h cerrada",
+    "6 h, machine": "6 h, máquina",
+    "4 h, rest": "4 h, resto",
+    "noise phases Ti of uniformly perceived level":
+        "fases de ruido Ti de nivel percibido uniforme",
+    "2 — each phase, corrected": "2 — cada fase, corregida",
+    "Kt + Kf + Ki ≤ 9 dB (Annex IV A.3.3)":
+        "Kt + Kf + Ki ≤ 9 dB (Anexo IV A.3.3)",
+    "3 — the period level": "3 — el nivel del período",
+    "round_reported_level → 57 dB": "round_reported_level → 57 dB",
+    "4 — the annual value": "4 — el valor anual",
+    "LK,x over the operating days": "LK,x sobre los días de actividad",
+    "303 open / 62 closed → 56 dB": "303 abierta / 62 cerrada → 56 dB",
+    "worst phase ≤ limit + 5 dB": "peor fase ≤ límite + 5 dB",
+    "daily LKeq,x ≤ limit + 3 dB": "LKeq,x diario ≤ límite + 3 dB",
+    "annual LK,x ≤ limit": "LK,x anual ≤ límite",
+    "Article 25.2 drops the third criterion for an ":
+        "El artículo 25.2 suprime el tercer criterio para una ",
+    "activity already in operation": "actividad ya en funcionamiento",
     # Facade sound insulation setup (buildings/insulation/facade-insulation).
     "Facade sound insulation setup (ISO 16283-3)":
         "Montaje de aislamiento acustico de fachada (ISO 16283-3)",
@@ -634,8 +738,22 @@ _ES: dict[str, str] = {
     "Sound intensity · scanning": "Intensidad acústica · barrido de intensidad",
     "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)":
         "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)",
-    "V ≥ 200 m³ , qualified room": "V ≥ 200 m³ , cámara cualificada",
-    "no negative-power bands": "sin bandas de potencia negativa",
+    "V ≥ 200 m³ , source ≤ 2 % of V": "V ≥ 200 m³ , fuente ≤ 2 % de V",
+    "no non-positive bands · FpI < Ld": "sin bandas no positivas · FpI < Ld",
+    "Qualified anechoic / hemi-anechoic room":
+        "Cámara anecoica o semianecoica cualificada",
+    "Sound pressure · fixed 20 / 40 array":
+        "Presión acústica · malla fija de 20 / 40",
+    "r ≥ 2 d₀ , qualified free field": "r ≥ 2 d₀ , campo libre cualificado",
+    "Sound intensity · scanning, tighter":
+        "Intensidad acústica · barrido, más exigente",
+    "five Annex C criteria per band":
+        "cinco criterios del anexo C por banda",
+    "Any — no acoustic measurement": "Cualquiera — sin medida acústica",
+    "Upper limit (ε = 1) / engineering": "Límite superior (ε = 1) / peritaje",
+    "Surface velocity · accelerometers":
+        "Velocidad superficial · acelerómetros",
+    "ε assumed (-1) or measured (-2)": "ε supuesto (-1) o medido (-2)",
     "Method": "Método",
     "Environment": "Entorno",
     "Accuracy": "Exactitud",
@@ -2291,4 +2409,212 @@ _ES: dict[str, str] = {
         "la biblioteca avisa en 46 dB y 54 dB, donde el sesgo positivo del ajuste cruza el 5 %",
     "short of range? T20 instead of T30 -> a longer sweep or more averages -> EDT; never a fit into the noise":
         "¿falta rango? T20 en vez de T30 -> un barrido más largo o más promedios -> EDT; nunca un ajuste metido en el ruido",
+    # --- ISO 3741 reverberation test room (devices/emission) ---
+    "ISO 3741 reverberation test room": "Sala reverberante de ensayo ISO 3741",
+    "Direct method (Eq. 20)": "Método directo (Ec. 20)",
+    "Comparison method (Eq. 21)": "Método de comparación (Ec. 21)",
+    "or one continuous traverse": "o un recorrido continuo",
+    "Source under test": "Fuente bajo ensayo",
+    "source under test, left in place":
+        "la fuente bajo ensayo permanece en la sala",
+    "Reference sound": "Fuente sonora de",
+    "source (ISO 6926)": "referencia (ISO 6926)",
+    "d_min = D₁ √(V / T₆₀) ,  D₁ = 0,08  (0,16 recommended below 5 kHz)":
+        "d_min = D₁ √(V / T₆₀) ,  D₁ = 0,08  (0,16 recomendado por debajo de 5 kHz)",
+    "V = 200 m³ · T₆₀ = 2,0 s  →  d_min = 0,8 m,  or 1,6 m at the recommended D₁":
+        "V = 200 m³ · T₆₀ = 2,0 s  →  d_min = 0,8 m,  o 1,6 m con el D₁ recomendado",
+    "six positions: > 1,0 m from every room surface · > d_min from the source · spacing ≥ λ/2 (1,7 m at 100 Hz)":
+        "seis posiciones: > 1,0 m de toda superficie de la sala · > d_min de la fuente · separación ≥ λ/2 (1,7 m a 100 Hz)",
+    "traverse instead: ≥ d_min from the source · ≥ 1,0 m from any surface · ≥ 0,5 m from a diffuser":
+        "recorrido continuo: ≥ d_min de la fuente · ≥ 1,0 m de cualquier superficie · ≥ 0,5 m de un difusor",
+    "· not within 10° of a room surface · length ≥ 3λ or 10,3 m, whichever is smaller":
+        "· fuera de todo plano a menos de 10° de una superficie · longitud ≥ 3λ o 10,3 m, la menor",
+    "comparison method: the same six positions, and no A, no V, no S, no Waterhouse and no C₁ in Eq. 21":
+        "método de comparación: las mismas seis posiciones, y sin A, sin V, sin S, sin Waterhouse y sin C₁ en la Ec. 21",
+    "averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · background at the same positions, just before or after":
+        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · ruido de fondo en las mismas posiciones, justo antes o después",
+    "hard walls, α < 0,06 within one wavelength of the source · T₆₀ per ISO 3382-2 from the first 10 dB or 15 dB only":
+        "paredes duras, α < 0,06 a menos de una longitud de onda de la fuente · T₆₀ según ISO 3382-2, solo los primeros 10 dB o 15 dB",
+    # --- ISO 3744 parallelepiped measurement surface ---
+    "ISO 3744 parallelepiped measurement surface":
+        "Superficie de medición paralelepipédica ISO 3744",
+    "Top view": "Vista en planta",
+    "reference box": "paralelepípedo de referencia",
+    "normal to the face": "normal a la cara",
+    "at a corner: aimed at O": "en una esquina: apuntando a O",
+    "S = 4(ab + bc + ca) = 36,3 m²   for l₁ × l₂ × l₃ = 1,4 × 0,9 × 1,1 m at d = 1 m":
+        "S = 4(ab + bc + ca) = 36,3 m²   para l₁ × l₂ × l₃ = 1,4 × 0,9 × 1,1 m con d = 1 m",
+    "each of the five planes is split on its own into equal partial areas of side ≤ 3d (clause C.1)":
+        "cada uno de los cinco planos se divide por separado en áreas parciales iguales de lado ≤ 3d (apartado C.1)",
+    "key positions: the centre of every partial area, plus its corners except those in the reflecting plane":
+        "posiciones fundamentales: el centro de cada área parcial y sus esquinas, salvo las del plano reflectante",
+    "nine is the minimum, for one partial area per plane; here 2a > 3d, so the long faces split and the array grows":
+        "nueve es el mínimo, con un área parcial por plano; aquí 2a > 3d, así que las caras largas se dividen y la malla crece",
+    "the survey method (ISO 3746) keeps only the partial-area centres":
+        "el método de control (ISO 3746) conserva solo los centros de las áreas parciales",
+    # --- ISO/TS 7849-2 radiation factor ---
+    "Determining the radiation factor (ISO/TS 7849-2)":
+        "Determinación del factor de radiación (ISO/TS 7849-2)",
+    "⟨v_j²⟩ on the casing": "⟨v_j²⟩ en la carcasa",
+    "ISO 9614 measurement surface": "Superficie de medición ISO 9614",
+    "Determining ε_j (Part 2)": "Determinación de ε_j (Parte 2)",
+    "P_j : ISO 9614 band power": "P_j : potencia de banda ISO 9614",
+    "⟨v_j²⟩ : surface-averaged": "⟨v_j²⟩ : velocidad normal promediada",
+    "normal velocity, same bands": "en la superficie, mismas bandas",
+    "one machine, one run:": "una máquina, un ensayo:",
+    "the same operating mode,": "el mismo modo de funcionamiento,",
+    "the same mounting, the same bands.": "el mismo montaje, las mismas bandas.",
+    "ε_j is a property of the structure": "ε_j es una propiedad de la estructura",
+    "and its excitation together.": "y de su excitación conjuntamente.",
+    "determined once, then the velocity survey alone serves the rest of the family":
+        "se determina una vez y luego el muestreo de velocidad basta para el resto de la familia",
+    "mean segment-to-source distance ≥ 200 mm (ISO 9614-2, clause 8.2)":
+        "distancia media del segmento a la fuente ≥ 200 mm (ISO 9614-2, apartado 8.2)",
+    "Part 1 skips this measurement and sets ε = 1, which is why it returns an upper limit":
+        "La Parte 1 omite esta medición y toma ε = 1, por eso devuelve un límite superior",
+    # --- Residual-intensity test and the before-use probe check ---
+    "Residual-intensity test and the before-use probe check":
+        "Ensayo de intensidad residual y comprobación previa de la sonda",
+    "1 · Residual-intensity test": "1 · Ensayo de intensidad residual",
+    "2 · Pressure check": "2 · Comprobación de presión",
+    "3 · Probe reversal, in situ": "3 · Inversión de la sonda, in situ",
+    "pink or white noise, 45 Hz to 7,1 kHz":
+        "ruido rosa o blanco, de 45 Hz a 7,1 kHz",
+    "both capsules within ± 0,1 dB": "ambas cápsulas dentro de ± 0,1 dB",
+    "IEC 60942 calibrator, class 0 or 1": "calibrador IEC 60942, clase 0 o 1",
+    "on each microphone in turn": "en cada micrófono por separado",
+    "adjust to ± 0,1 dB": "ajustar a ± 0,1 dB",
+    "in both channels": "en ambos canales",
+    "energy leaving the source": "energía que sale de la fuente",
+    "measurement surface": "superficie de medición",
+    "acoustic centre held in place": "el centro acústico no se mueve",
+    "accepted when the two readings have opposite signs and differ by less than 1,5 dB":
+        "se acepta cuando las dos lecturas tienen signos opuestos y difieren en menos de 1,5 dB",
+    "in the band of maximum level (ISO 9614-2, clause 6.2.2)":
+        "en la banda de nivel máximo (ISO 9614-2, apartado 6.2.2)",
+    "same signs → the two channels are swapped, or one is inverted":
+        "mismos signos → los dos canales están intercambiados, o uno está invertido",
+    "more than 1,5 dB apart → the probe disturbs its own field, or the channels are not matched":
+        "más de 1,5 dB de diferencia → la sonda perturba su propio campo, o los canales no están emparejados",
+    "δpI0 belongs to the probe, its spacer and the analyser together — not to the microphones":
+        "δpI0 pertenece al conjunto sonda, separador y analizador, no a los micrófonos",
+    # Long's Table 14.9 installation (devices/noise-control/duct-path).
+    "Long's Table 14.9 installation: every row of the sheet as a place":
+        "La instalación de la Tabla 14.9 de Long: cada fila de la hoja, en su sitio",
+    "Plant room": "Sala de máquinas",
+    "Office, 20 × 20 × 8 ft": "Oficina, 20 × 20 × 8 ft",
+    "drywall and carpet, NC 30": "cartón-yeso y moqueta, NC 30",
+    "1 · Fan, 5000 cfm, 2 in w.g.": "1 · Ventilador, 5000 cfm, 2 in c.a.",
+    "same L_W into both runs": "el mismo L_W en ambos ramales",
+    "elbow": "codo",
+    "silencer": "silenc.",
+    "lined duct": "revestido",
+    "branch": "deriv.",
+    "flex duct": "flexible",
+    "elbow, lined": "codo rev.",
+    "plenum": "plenum",
+    "8 · diffuser 24 × 24 in": "8 · difusor 24 × 24 in",
+    "6 · grille": "6 · rejilla",
+    "r = 1.83 m": "r = 1,83 m",
+    "Q = 2, flush in the ceiling": "Q = 2, enrasado en el techo",
+    "blue: the supply path — red: the return path — each box is one row of the sheet, stamped with its code":
+        "azul: ramal de impulsión; rojo: ramal de retorno; cada caja es una fila de la hoja con su código",
+    "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — attenuates and regenerates: 2, 3 — self-noise only: 8 and the return grille":
+        "solo atenúan: 4, 5, 6 (impulsión) y 4, 5 (retorno); atenúan y regeneran: 2, 3; solo ruido propio: 8 y la rejilla",
+    "the return wins above 1 kHz: its silencer floors the room near 25 dB, and no amount of supply attenuation moves that":
+        "por encima de 1 kHz manda el retorno: su silenciador deja un suelo de 25 dB que la impulsión no puede bajar",
+    # ISO 7235 silencer measurement (devices/noise-control/silencers).
+    "How a silencer is measured: the ISO 7235 substitution method":
+        "Cómo se mide un silenciador: el método de sustitución de la ISO 7235",
+    "Series I — test object installed": "Serie I: con el objeto de ensayo",
+    "Series II — substitution duct": "Serie II: con el conducto de sustitución",
+    "test object": "objeto de ensayo",
+    "substitution duct": "conducto de sustitución",
+    "sealed, lined loudspeaker box": "caja de altavoces estanca",
+    "modal filter": "filtro modal",
+    "transition": "transición",
+    "test duct, anechoic termination": "conducto de ensayo, terminación anecoica",
+    "three positions on a line inclined to the axis, at mid-length":
+        "tres posiciones en una línea inclinada respecto al eje, a media longitud",
+    "r ≤ 0.3 planes": "planos r ≤ 0,3",
+    "D_i = L_pI − L_pII, one third octave at a time":
+        "D_i = L_pI − L_pII, tercio de octava a tercio de octava",
+    "modal filter: ≥ 3 dB on the fundamental at the low-frequency end,":
+        "filtro modal: ≥ 3 dB sobre el modo fundamental en el extremo grave,",
+    "≥ 5 dB above the cut-on of higher-order modes (5.2.2.3)":
+        "≥ 5 dB por encima del corte de los modos superiores (5.2.2.3)",
+    "substitution duct: the empty housing where possible, otherwise":
+        "conducto de sustitución: la carcasa vacía si es posible; si no,",
+    "matched within 5 % in every linear dimension (5.2.3)":
+        "ajustado al 5 % en cada dimensión lineal (5.2.3)",
+    "reflection coefficient r ≤ 0.3 at the source and receiving":
+        "coeficiente de reflexión r ≤ 0,3 en los planos de calificación",
+    "qualification planes (5.2.2.5, 5.2.4.3)":
+        "emisor y receptor (5.2.2.5, 5.2.4.3)",
+    "signal ≥ 6 dB and preferably ≥ 10 dB above the background":
+        "señal ≥ 6 dB y preferiblemente ≥ 10 dB sobre el ruido de fondo",
+    "(5.2.2.2); IEC 61260 third octaves, class 1 chain (5.2.4.6)":
+        "(5.2.2.2); tercios de octava IEC 61260, cadena clase 1 (5.2.4.6)",
+    "the reported figure is an insertion loss against a substitution duct, not a transmission loss":
+        "lo que se declara es una pérdida por inserción frente a un conducto de sustitución, no por transmisión",
+    "and the facility's own limiting insertion loss — flanking along the duct walls — caps what it can report at all":
+        "y la pérdida por inserción límite de la instalación, por flancos en las paredes del conducto, acota lo que puede declarar",
+    # Room-to-room chain in section (devices/noise-control/room-to-room).
+    "Plant room to operator room: every symbol of the balance, in section":
+        "De sala de máquinas a sala de control: cada símbolo del balance, en sección",
+    "Plant room 8 × 10 × 3 m": "Sala de máquinas 8 × 10 × 3 m",
+    "bare floor, absorbent ceiling": "suelo desnudo, techo absorbente",
+    "Operator room 5 × 5 × 3 m": "Sala de control 5 × 5 × 3 m",
+    "carpet, same ceiling": "moqueta, mismo techo",
+    "flanking over the ceiling void: an allowance, not a model":
+        "flancos por el plenum del techo: una reserva, no un modelo",
+    "8 m": "8 m",
+    "5 m": "5 m",
+    "3 m": "3 m",
+    "source side — blower on the floor at a wall mid-point: L_W = 105 dB at 125 Hz, Q = 4 adds 6.0 dB, L_p1 = 107.0 dB":
+        "lado emisor: soplante en el suelo en el centro de una pared, L_W = 105 dB a 125 Hz, Q = 4 suma 6,0 dB, L_p1 = 107,0 dB",
+    "partition — 5 m × 3 m = 15 m², TL = 39 dB at 125 Hz; the τ S_w returned to the source room is off by default":
+        "separación: 5 m × 3 m = 15 m², TL = 39 dB a 125 Hz; el τ S_w devuelto al recinto emisor está desactivado por defecto",
+    "receiving side — S₂α₂ = 5.5 m² at 125 Hz rising to 39.2 m² at 4 kHz; L_p2 = 72.4 dB against 60 dB for NC 45":
+        "lado receptor: S₂α₂ = 5,5 m² a 125 Hz y 39,2 m² a 4 kHz; L_p2 = 72,4 dB frente a los 60 dB de NC 45",
+    "NR = TL − 10 log10[S_w / (S₂α₂ + τ S_w)]":
+        "NR = TL − 10 log10[S_w / (S₂α₂ + τ S_w)]",
+    "S₂α₂ passes the 15 m² of the wall between 250 and 500 Hz: below it the wall delivers less than its TL":
+        "S₂α₂ supera los 15 m² del muro entre 250 y 500 Hz: por debajo, el muro entrega menos que su TL",
+    "both levels are reverberant-field spatial averages, and the balance says nothing below 163 Hz (Schroeder, 75 m³)":
+        "ambos niveles son promedios espaciales del campo reverberante; el balance calla por debajo de 163 Hz (Schroeder, 75 m³)",
+    # Machine enclosure in section (devices/noise-control/noise-control).
+    "Machine enclosure in section: what IL = R − C really depends on":
+        "Encapsulamiento de máquina en sección: de qué depende IL = R − C",
+    "S_E = 24 m² of exposed shell — a 3.0 × 2.0 × 1.8 m box, five faces":
+        "S_E = 24 m² de envolvente expuesta: una caja de 3,0 × 2,0 × 1,8 m, cinco caras",
+    "lined cooling outlet": "salida de refrigeración revestida",
+    "a short lined duct, never a bare hole":
+        "un conducto corto revestido, nunca un agujero desnudo",
+    "cable and pipe entry, sealed sleeve":
+        "paso de cables y tuberías con manguito estanco",
+    "S_i = 30 m², ᾱ_i = 0.30  →  R_i = 12.9 m²":
+        "S_i = 30 m², ᾱ_i = 0,30  →  R_i = 12,9 m²",
+    "wall build-up: sheet-steel mass, absorbent lining, perforated facing":
+        "cerramiento: chapa como masa, absorbente y chapa perforada",
+    "machine on vibration isolators": "máquina sobre aisladores de vibración",
+    "no rigid contact with the shell or with its slab":
+        "sin contacto rígido con la envolvente ni con su solera",
+    "access door": "puerta de acceso",
+    "1.28 m², R = 15 dB": "1,28 m², R = 15 dB",
+    "compression seal": "junta de compresión",
+    "unsealed gap at the foot": "rendija sin sellar al pie",
+    "0.24 m² = 1 % of S_E": "0,24 m² = 1 % de S_E",
+    "lined cooling inlet": "entrada revestida",
+    "cooling air needs a path": "el aire debe poder circular",
+    "IL = R − C,   C = 10 log10(0.3 + S_E/R_i) = 3.4 dB":
+        "IL = R − C,   C = 10 log10(0,3 + S_E/R_i) = 3,4 dB",
+    "sealed shell (mean R = 32.3 dB): mean IL = 28.9 dB":
+        "envolvente sellada (R medio = 32,3 dB): IL medio = 28,9 dB",
+    "with the door: 21.4 dB — with the 1 % gap as well: 15.1 dB, against the 10 log10(S_E/S_a) = 20 dB cap":
+        "con la puerta: 21,4 dB; con la rendija del 1 % además: 15,1 dB, frente al techo 10 log10(S_E/S_a) = 20 dB",
+    "3.0 m": "3,0 m",
+    "1.8 m": "1,8 m",
+    "an enclosure delivers its worst element, not its panels":
+        "un encapsulamiento entrega su peor elemento, no sus paneles",
 }

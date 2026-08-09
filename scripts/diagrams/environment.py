@@ -523,3 +523,472 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
     s.text(80, 476,
            "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",
            17, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# ISO 9613-2 ground regions and the ground factor G (7.3.1, Table 3 note 2)
+# ---------------------------------------------------------------------------
+
+def _d_ground_regions(s: SVG, th: Theme) -> None:
+    gy = 250.0
+    x0, x1 = 70.0, 830.0                  # 0 m and 200 m of the path
+    scale = (x1 - x0) / 200.0             # px per metre
+
+    # The three regions, shaded along the ground.
+    src_end = x0 + 45.0 * scale
+    rec_start = x1 - 45.0 * scale
+    band = 34.0
+    s.rect(x0, gy - band, src_end - x0, band, th.panel, th.primary, sw=2.0)
+    s.rect(src_end, gy - band, rec_start - src_end, band, th.panel, th.accent,
+           sw=2.0)
+    s.rect(rec_start, gy - band, x1 - rec_start, band, th.panel, th.primary,
+           sw=2.0)
+
+    # Mixed cover inside the middle region: 70 m grass then 40 m asphalt.
+    grass_end = src_end + 70.0 * scale
+    s.rect(grass_end, gy - band, rec_start - grass_end, band, th.muted,
+           th.accent, sw=2.0)
+    s.text((src_end + grass_end) / 2, gy - band - 12, "grass, G = 1", 17, th.fg)
+    s.text((grass_end + rec_start) / 2, gy - band - 12, "asphalt, G = 0", 17,
+           th.fg)
+
+    s.ground(gy, 50.0, 850.0)
+
+    # Source and receiver, both 1,5 m high (drawn out of scale for legibility).
+    hs = 86.0
+    s.circle(x0, gy - hs, 9, th.secondary)
+    s.line(x0, gy - hs, x0, gy, th.fg, 2.0)
+    s.text(x0 + 12, gy - hs - 40, "Source", 20, th.fg, anchor="start",
+           bold=True)
+    s.text(x0 + 12, gy - hs - 18, "hs = 1,5 m", 17, th.muted, anchor="start")
+    s.mic(x1, gy - hs, gy, 1.0)
+    s.text(x1 - 12, gy - hs - 40, "Receiver", 20, th.fg, anchor="end",
+           bold=True)
+    s.text(x1 - 12, gy - hs - 18, "hr = 1,5 m", 17, th.muted, anchor="end")
+    s.line(x0, gy - hs, x1, gy - hs, th.muted, 1.4, dash="7,5")
+
+    # Region dimensions along the ground.
+    s.dim(x0, gy + 44, src_end, gy + 44, "source region  30 hs = 45 m", 0, 18)
+    s.dim(src_end, gy + 80, rec_start, gy + 80, "middle region  110 m", 0, 18)
+    s.dim(rec_start, gy + 44, x1, gy + 44, "receiver region  30 hr = 45 m", 0, 18)
+    for xv in (x0, src_end, rec_start, x1):
+        s.line(xv, gy + 28, xv, gy + 92, th.muted, 0.9, dash="3,3")
+    s.dim(x0, gy + 118, x1, gy + 118, "dp = 200 m", 0, 19)
+
+    # Inset: the same path at 60 m, regions overlapping, no middle region.
+    iy = gy + 190.0
+    ix0, ix1 = 260.0, 640.0
+    s.rect(ix0, iy - 26, ix1 - ix0, 26, th.panel, th.primary, sw=2.0)
+    s.line(ix0 - 40, iy, ix1 + 40, iy, th.fg, 1.8)
+    s.circle(ix0, iy - 46, 6, th.secondary)
+    s.circle(ix1, iy - 46, 6, th.primary)
+    s.dim(ix0, iy + 48, ix1, iy + 48,
+          "dp = 60 m: the regions overlap, so there is no middle region", 0, 18)
+
+    # The two reading boxes, on one row under the drawing.
+    by = 500.0
+    s.rect(70.0, by, 380, 100, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(84.0, by + 28, "G is the porous fraction of its region", 19, th.fg,
+           anchor="start", bold=True)
+    s.text(84.0, by + 54, "Gs = 25/45 = 0,55", 18, th.fg, anchor="start",
+           mono=True)
+    s.text(84.0, by + 78, "Gm = 70/110 = 0,64   Gr = 1,00", 18, th.fg,
+           anchor="start", mono=True)
+
+    s.rect(470.0, by, 380, 100, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(484.0, by + 28, "q = 1 − 30(hs + hr)/dp = 0,55", 19, th.fg,
+           anchor="start", mono=True)
+    s.text(484.0, by + 54, "below 30(hs + hr) = 90 m: q = 0, Am = 0", 18,
+           th.secondary, anchor="start")
+    s.text(484.0, by + 78, "and ground_middle is ignored entirely", 18, th.fg,
+           anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# The four diffracted paths of a barrier on finite-impedance ground
+# ---------------------------------------------------------------------------
+
+def _d_barrier_four_paths(s: SVG, th: Theme) -> None:
+    gy = 260.0
+    x0, x1 = 110.0, 800.0
+    sx, sy = x0, gy - 60.0                # source, 1 m high (out of scale)
+    rx, ry = x1, gy - 90.0                # receiver, 1,5 m high
+    ex = x0 + (x1 - x0) * 0.5             # barrier at 50 m of 100 m
+    ey = gy - 200.0                       # 4 m screen (out of scale)
+
+    s.ground(gy, 60.0, 850.0)
+    # Mirror images below the ground plane.
+    sy_i = gy + (gy - sy)
+    ry_i = gy + (gy - ry)
+
+    # The screen.
+    s.rect(ex - 7, ey, 14, gy - ey, th.panel, th.fg, sw=2)
+    s.text(ex + 14, gy - 16, "4 m screen", 19, th.fg, anchor="start",
+           bold=True)
+
+    # Four routes, each one a source (or its image) over the edge to the
+    # receiver (or its image).
+    routes = (
+        (sy, ry, th.primary, "0 bounces", "none"),
+        (sy_i, ry, th.secondary, "1 bounce, source side", "6,4"),
+        (sy, ry_i, th.accent, "1 bounce, receiver side", "2,4"),
+        (sy_i, ry_i, "#9467bd", "2 bounces", "10,5"),
+    )
+    # Fanned by a few pixels at the edge so four coincident legs stay legible.
+    for i, (y_src, y_rec, color, label, dash) in enumerate(routes):
+        eyy = ey + (i - 1.5) * 5.0
+        s.path(f"M {sx:.1f} {y_src:.1f} L {ex:.1f} {eyy:.1f} "
+               f"L {rx:.1f} {y_rec:.1f}",
+               stroke=color, sw=2.0, dash="" if dash == "none" else dash)
+
+    # Q at each ground reflection (the specular points of the image paths).
+    for qx in (sx + (ex - sx) * 0.5, ex + (rx - ex) * 0.5):
+        s.circle(qx, gy, 7, th.bg, th.fg, sw=1.8)
+        s.text(qx, gy - 12, "Q", 18, th.fg, bold=True, mono=True)
+
+    # Source, receiver and their images.
+    s.circle(sx, sy, 9, th.secondary)
+    s.text(sx, sy - 20, "Source", 19, th.fg, bold=True)
+    s.mic(rx, ry, gy, 0.9)
+    s.text(rx, ry - 20, "Receiver", 19, th.fg, bold=True)
+    s.circle(sx, sy_i, 8, th.secondary, th.bg, sw=1.4)
+    s.text(sx, sy_i + 26, "image source", 17, th.muted)
+    s.circle(rx, ry_i, 8, th.primary, th.bg, sw=1.4)
+    s.text(rx, ry_i + 26, "image receiver", 17, th.muted)
+    s.line(sx, sy, sx, sy_i, th.muted, 1.0, dash="3,3")
+    s.line(rx, ry, rx, ry_i, th.muted, 1.0, dash="3,3")
+
+    # Legend of the four routes.
+    lx, ly = 96.0, 430.0
+    s.rect(lx, ly, 430, 128, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(lx + 14, ly + 26, "Four coherent routes over one edge", 19, th.fg,
+           anchor="start", bold=True)
+    for i, (_, _, color, label, dash) in enumerate(routes):
+        yy = ly + 52 + i * 24
+        s.line(lx + 16, yy - 5, lx + 56, yy - 5, color, 2.4,
+               dash="" if dash == "none" else dash)
+        s.text(lx + 66, yy, label, 17, th.fg, anchor="start")
+
+    # Inset: the two-edge (thick) case.
+    tx, ty = 580.0, 430.0
+    s.rect(tx, ty, 250, 128, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(tx + 14, ty + 26, "Thick barrier: two edges", 19, th.fg,
+           anchor="start", bold=True)
+    bx0, bx1, by0 = tx + 60, tx + 130, ty + 96
+    s.rect(bx0, ty + 56, bx1 - bx0, by0 - ty - 56, th.bg, th.fg, sw=1.6)
+    s.path(f"M {tx + 20} {ty + 84} L {bx0} {ty + 56} L {bx1} {ty + 56} "
+           f"L {tx + 226} {ty + 88}", stroke=th.primary, sw=2.0)
+    s.dim(bx0, ty + 46, bx1, ty + 46, "e", 0, 17)
+
+
+# ---------------------------------------------------------------------------
+# CNOSSOS-EU road source line geometry (2.2)
+# ---------------------------------------------------------------------------
+
+def _d_cnossos_road(s: SVG, th: Theme) -> None:
+    # --- plan ------------------------------------------------------------
+    py = 150.0
+    rx0, rx1 = 70.0, 700.0
+    lane = 44.0
+    s.text(rx0, 70.0, "Plan — two-lane urban arterial", 20, th.fg,
+           anchor="start", bold=True)
+    s.rect(rx0, py - lane, rx1 - rx0, 2 * lane, th.panel, th.muted, sw=1.2)
+    s.line(rx0, py, rx1, py, th.muted, 1.6, dash="14,10")
+
+    # A source line on each lane centre.
+    for cy in (py - lane / 2, py + lane / 2):
+        s.line(rx0, cy, rx1, cy, th.secondary, 2.2, dash="9,6")
+    s.text(rx1 + 10, py - lane / 2 + 6, "source line,", 17, th.secondary,
+           anchor="start")
+    s.text(rx1 + 10, py + lane / 2 + 6, "one per lane centre", 17, th.secondary,
+           anchor="start")
+
+    # dL = 20 m segments on the near lane, one with its point source.
+    seg = (rx1 - rx0) / 12.0
+    cy = py + lane / 2
+    for i in range(13):
+        s.line(rx0 + i * seg, cy - 9, rx0 + i * seg, cy + 9, th.muted, 1.2)
+    hx = rx0 + 5.5 * seg
+    s.circle(hx, cy, 8, th.secondary)
+    s.dim(rx0 + 5 * seg, cy + 30, rx0 + 6 * seg, cy + 30, "dL = 20 m", 0, 17)
+    s.text(rx0, cy + 62, "each segment carries L'W,eq,line,i + 10 lg(dL)", 18,
+           th.fg, anchor="start", mono=False)
+
+    # The junction and its taper.
+    jx = rx0 + 9.0 * seg
+    s.line(jx, py - lane - 20, jx, py + lane + 20, th.primary, 2.4)
+    s.text(jx + 8, py - lane - 26, "signal-controlled junction", 17, th.primary,
+           anchor="start")
+    s.dim(hx, py - lane - 44, jx, py - lane - 44, "x = 60 m", 0, 17)
+    s.line(hx, py - lane - 52, hx, py - lane - 4, th.muted, 0.9, dash="3,3")
+
+    # A small inline graph of the taper, clear of the road.
+    gx0, gx1, gy0 = 720.0, 850.0, 300.0
+    s.rect(gx0 - 16, gy0 - 74, (gx1 - gx0) + 46, 106, th.panel, th.muted, rx=6,
+           sw=1.1)
+    s.line(gx0, gy0, gx1, gy0, th.muted, 1.4)
+    s.line(gx0, gy0, gx0, gy0 - 48, th.muted, 1.4)
+    s.path(f"M {gx0} {gy0 - 48} L {gx1} {gy0}", stroke=th.primary, sw=2.0)
+    s.text(gx0 - 12, gy0 - 56, "max(1 − |x|/100, 0)", 15, th.fg, anchor="start")
+    s.text(gx1, gy0 + 22, "100 m", 15, th.muted)
+
+    # The receiving facade, in plan.
+    fy = py + lane + 118.0
+    s.rect(220.0, fy, 300.0, 30, th.panel, th.fg, sw=1.8)
+    s.text(370.0, fy + 22, "dwelling façade", 18, th.fg)
+    s.dim(560.0, cy, 560.0, fy, "25 m", 0, 17, label_side="right")
+    s.line(520.0, fy + 15, 560.0, fy + 15, th.muted, 0.9, dash="3,3")
+    s.line(rx0 + 6 * seg, cy, 560.0, cy, th.muted, 0.9, dash="3,3")
+
+    # --- section ---------------------------------------------------------
+    sy = 500.0
+    s.text(70.0, 392.0, "Section", 20, th.fg, anchor="start", bold=True)
+    s.ground(sy, 60.0, 860.0)
+    s.rect(120.0, sy - 8, 300.0, 8, th.muted)
+    s.text(240.0, sy + 34, "road surface", 18, th.muted)
+    s.circle(300.0, sy - 22, 8, th.secondary)
+    s.dim(300.0, sy, 300.0, sy - 22, "0,05 m", 40, 17, label_side="right")
+    s.text(300.0, sy - 44, "equivalent point source", 18, th.fg, bold=True)
+
+    # The gradient, with the two halves of a bidirectional flow.
+    s.path(f"M 120 {sy - 6} L 420 {sy - 40}", stroke=th.primary, sw=2.2)
+    s.arrow(150.0, sy - 66, 250.0, sy - 78, th.primary, 1.8)
+    s.arrow(390.0, sy - 90, 290.0, sy - 78, th.secondary, 1.8)
+    s.text(430.0, sy - 118, "gradient s: the flow is split", 17, th.primary)
+    s.text(430.0, sy - 98, "and corrected uphill and downhill", 17, th.primary)
+
+    rxr = 700.0
+    s.rect(rxr - 40, sy - 150, 120, 150, th.panel, th.fg, sw=1.8)
+    s.mic(rxr - 90, sy - 120, sy, 0.9)
+    s.dim(rxr - 90, sy, rxr - 90, sy - 120, "4 m", -46, 17)
+    s.text(rxr - 46, sy - 162, "receiver point", 18, th.fg, anchor="start",
+           bold=True)
+
+
+# ---------------------------------------------------------------------------
+# CNOSSOS-EU railway source lines and directivity angles (2.3)
+# ---------------------------------------------------------------------------
+
+def _d_cnossos_rail(s: SVG, th: Theme) -> None:
+    import math
+
+    # --- section ---------------------------------------------------------
+    gy = 400.0
+    s.text(70.0, 74.0, "Section", 20, th.fg, anchor="start", bold=True)
+    s.ground(gy, 190.0, 470.0)
+    cx = 330.0                             # track centre
+    gauge = 92.0                           # 1,435 m, out of scale
+    s.path(f"M {cx - 130} {gy} L {cx - 96} {gy - 30} L {cx + 96} {gy - 30} "
+           f"L {cx + 130} {gy} Z", fill=th.panel, stroke=th.muted, sw=1.4)
+    s.rect(cx - 86, gy - 42, 172, 12, th.muted)
+    for dx in (-gauge / 2, gauge / 2):
+        s.rect(cx + dx - 7, gy - 62, 14, 20, th.fg)
+    datum = gy - 62.0
+    s.line(cx - 120, datum, cx + 150, datum, th.secondary, 2.0, dash="9,5")
+    s.text(cx + 158, datum + 26,
+           "datum: the plane tangent to the two rail heads", 17, th.secondary,
+           anchor="start")
+    s.dim(cx - gauge / 2, gy - 76, cx + gauge / 2, gy - 76, "1,435 m", 0, 17)
+
+    # Source A and source B on the track centre.
+    ay = datum - 60.0
+    by = datum - 250.0
+    s.circle(cx, ay, 9, th.primary)
+    s.circle(cx, by, 9, th.accent)
+    s.dim(cx, datum, cx, ay, "0,5 m", 60, 17, label_side="right")
+    s.dim(cx, datum, cx, by, "4,0 m", 120, 17, label_side="right")
+    s.text(cx - 26, ay - 6, "A — rolling, impact, squeal,", 16, th.fg,
+           anchor="end")
+    s.text(cx - 26, ay + 16, "bridge, low traction", 16, th.fg, anchor="end")
+    s.text(cx - 26, by + 16, "B — exhausts, roof apparatus,", 16, th.fg,
+           anchor="end")
+    s.text(cx - 26, by + 38, "pantograph recess", 16, th.fg, anchor="end")
+
+    # The receiver, with the line of sight to each source and psi.
+    rx = 800.0
+    ry = gy - 150.0
+    s.mic(rx, ry, gy, 0.9)
+    s.line(cx, ay, rx, ry, th.primary, 1.8)
+    s.line(cx, by, rx, ry, th.accent, 1.8)
+    s.line(cx, ay, rx + 10, ay, th.muted, 1.2, dash="5,4")
+    s.text(cx + 250, ay - 14, "ψ > 0", 19, th.primary)
+    s.text(cx + 340, ay + 34, "ψ ≤ 0: the vertical correction of A is zero",
+           17, th.secondary)
+    s.text(rx, ry - 24, "receiver, 4 m", 18, th.fg, bold=True)
+
+    s.circle(cx - 12, ay, 0.1, th.primary)
+
+    # --- plan ------------------------------------------------------------
+    py = 610.0
+    s.text(70.0, 512.0, "Plan", 20, th.fg, anchor="start", bold=True)
+    s.line(90.0, py, 520.0, py, th.muted, 2.0, dash="12,8")
+    s.text(96.0, py - 14, "track axis", 18, th.muted, anchor="start")
+    ox = 300.0
+    s.circle(ox, py, 7, th.fg)
+    pts = []
+    for deg in range(0, 361, 4):
+        a = math.radians(deg)
+        lvl = 10.0 * math.log10(0.01 + 0.99 * math.sin(a) ** 2)
+        r = max(76.0 * (1.0 + lvl / 24.0), 4.0)
+        pts.append(f"{ox + r * math.cos(a):.1f} {py - r * math.sin(a):.1f}")
+    s.path("M " + " L ".join(pts) + " Z", stroke=th.accent, sw=2.0)
+    s.text(ox, py - 92, "0 dB broadside", 17, th.accent)
+    s.text(ox - 96, py + 26, "−20 dB along the track", 17, th.accent,
+           anchor="end")
+    s.arrow(ox, py, ox + 140, py - 78, th.primary, 1.8)
+    s.text(ox + 148, py - 82, "receiver bearing", 17, th.primary,
+           anchor="start")
+    s.text(ox + 56, py - 18, "φ", 20, th.primary, bold=True)
+    s.rect(600.0, py - 140, 280, 112, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(614.0, py - 110, "Impact noise applies from 50 m", 16, th.fg,
+           anchor="start")
+    s.text(614.0, py - 90, "before a joint to 50 m after it", 16, th.fg,
+           anchor="start")
+    s.text(614.0, py - 60, "Curve squeal needs ≥ 50 m", 16, th.fg,
+           anchor="start")
+    s.text(614.0, py - 40, "of continuous curve", 16, th.fg, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# IEC 61400-11 ground-board microphone mounting (6.1.5, 7.1)
+# ---------------------------------------------------------------------------
+
+def _d_wind_turbine_board(s: SVG, th: Theme) -> None:
+    # --- plan ------------------------------------------------------------
+    cx, cy, r = 250.0, 210.0, 130.0
+    s.circle(cx, cy, r, th.panel, th.fg, sw=2.2)
+    s.dim(cx - r, cy + r + 34, cx + r, cy + r + 34, "diameter ≥ 1,0 m", 0, 18)
+    s.circle(cx, cy, 9, th.fg)
+    s.arrow(cx, cy, cx + r + 46, cy, th.secondary, 2.0)
+    s.text(cx + r + 54, cy + 6, "to the turbine", 17, th.secondary,
+           anchor="start")
+    # The optional split, off the centre line and parallel to the axis.
+    s.line(cx - r * 0.86, cy - 46, cx + r * 0.86, cy - 46, th.primary, 2.0,
+           dash="8,5")
+    s.text(cx, cy - 58, "split (if any): off centre, parallel, gap < 1 mm", 16,
+           th.primary)
+    s.text(cx, cy - r - 24, "Plan", 20, th.fg, bold=True)
+
+    # --- section ---------------------------------------------------------
+    gy = 470.0
+    bx0, bx1 = 470.0, 830.0
+    s.ground(gy, 440.0, 860.0)
+    s.rect(bx0, gy - 12, bx1 - bx0, 12, th.panel, th.fg, sw=2.0)
+    s.text((bx0 + bx1) / 2, gy + 86,
+           "plywood ≥ 12,0 mm  ·  metal ≥ 2,5 mm", 17, th.fg)
+    # Soil fillet at the edges.
+    s.path(f"M {bx0 - 34} {gy} L {bx0} {gy - 12} L {bx0} {gy} Z",
+           fill=th.muted)
+    s.path(f"M {bx1 + 34} {gy} L {bx1} {gy - 12} L {bx1} {gy} Z",
+           fill=th.muted)
+    s.text(bx0 + 6, gy + 30, "soil fillet", 16, th.muted, anchor="start")
+
+    # Capsule with its diaphragm in the plane of the board.
+    mcx = (bx0 + bx1) / 2
+    s.rect(mcx - 22, gy - 12, 44, 10, th.fg, rx=3)
+    s.text(mcx, gy + 58, "capsule diaphragm in the board plane, ≤ 13 mm", 16,
+           th.fg)
+    # Primary windscreen: a foam half-sphere ~90 mm across.
+    s.path(f"M {mcx - 68} {gy - 12} A 68 68 0 0 1 {mcx + 68} {gy - 12} Z",
+           fill=th.accent, stroke=th.fg, sw=1.6)
+    s.text(mcx, gy - 96, "primary windscreen ≈ 90 mm", 17, th.fg)
+    # Ghosted secondary windscreen.
+    s.path(f"M {mcx - 116} {gy - 12} A 116 116 0 0 1 {mcx + 116} {gy - 12}",
+           stroke=th.muted, sw=1.8, dash="8,6")
+    s.text(mcx, gy - 186, "secondary: high wind only —", 16, th.muted)
+    s.text(mcx, gy - 166, "document and correct its insertion loss", 16,
+           th.muted)
+    s.text(bx0 - 20, 330.0, "Section", 20, th.fg, anchor="start", bold=True)
+
+    # Tolerance box.
+    s.rect(70.0, 400.0, 340.0, 156.0, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(84.0, 430.0, "Position (clause 7.1)", 19, th.fg, anchor="start",
+           bold=True)
+    for i, line in enumerate((
+        "within ±15° of downwind",
+        "R0 to ±20 %, max ±30 m, measured to ±2 %",
+        "board inclination φ between 25° and 40°",
+        "reflections from structures < 0,2 dB",
+    )):
+        s.text(84.0, 458.0 + i * 24.0, line, 17, th.fg, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# RD 1367/2007: phase to period to year, and the three criteria
+# ---------------------------------------------------------------------------
+
+def _d_rd1367_chain(s: SVG, th: Theme) -> None:
+    # Stage 1: the 24 h clock.
+    y0 = 90.0
+    x0, x1 = 70.0, 830.0
+    w = x1 - x0
+    s.text(x0, y0 - 12, "1 — the day, split into evaluation periods (Annex I A.1)",
+           19, th.fg, anchor="start", bold=True)
+    bounds = ((0.0, 7.0, th.primary, "night 23-07"),
+              (7.0, 19.0, th.accent, "day 07-19"),
+              (19.0, 23.0, "#e8a838", "evening 19-23"),
+              (23.0, 24.0, th.primary, ""))
+    for a, b, color, label in bounds:
+        s.rect(x0 + w * a / 24.0, y0, w * (b - a) / 24.0, 42, th.panel,
+               color, sw=2.0)
+        if label:
+            s.text(x0 + w * (a + b) / 48.0, y0 + 28, label, 17, th.fg)
+    # The day, broken into the worked example's three phases.
+    py = y0 + 62.0
+    phases = ((7.0, 9.0, "2 h shut"), (9.0, 15.0, "6 h, machine"),
+              (15.0, 19.0, "4 h, rest"))
+    for a, b, label in phases:
+        s.rect(x0 + w * a / 24.0, py, w * (b - a) / 24.0, 34, th.panel,
+               th.muted, sw=1.2)
+        s.text(x0 + w * (a + b) / 48.0, py + 23, label, 16, th.fg)
+    s.text(x0, py + 58, "noise phases Ti of uniformly perceived level", 17,
+           th.muted, anchor="start")
+
+    # Stage 2: the phase corrections.
+    y1 = 250.0
+    s.rect(x0, y1, 360, 108, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(x0 + 14, y1 + 28, "2 — each phase, corrected", 19, th.fg,
+           anchor="start", bold=True)
+    s.text(x0 + 14, y1 + 56, "LKeq,Ti = LAeq,Ti + Kt + Kf + Ki", 17, th.fg,
+           anchor="start", mono=True)
+    s.text(x0 + 14, y1 + 82, "Kt + Kf + Ki ≤ 9 dB (Annex IV A.3.3)", 17,
+           th.secondary, anchor="start")
+
+    # Stage 3: the duration-weighted mean.
+    s.arrow(x0 + 372, y1 + 54, x0 + 424, y1 + 54, th.muted, 1.8)
+    s.rect(x0 + 436, y1, 324, 124, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(x0 + 450, y1 + 28, "3 — the period level", 19, th.fg, anchor="start",
+           bold=True)
+    s.text(x0 + 450, y1 + 54, "LKeq,x = 10 lg[ (1/T) Σ Ti", 16, th.fg,
+           anchor="start", mono=True)
+    s.text(x0 + 450, y1 + 74, "                10^(LKeq,Ti/10) ]", 16, th.fg,
+           anchor="start", mono=True)
+    s.text(x0 + 450, y1 + 98, "round_reported_level → 57 dB", 17, th.accent,
+           anchor="start", mono=True)
+
+    # Stage 4: the annual mean.
+    y2 = 400.0
+    s.rect(x0, y2, 360, 96, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(x0 + 14, y2 + 28, "4 — the annual value", 19, th.fg, anchor="start",
+           bold=True)
+    s.text(x0 + 14, y2 + 56, "LK,x over the operating days", 18, th.fg,
+           anchor="start", mono=True)
+    s.text(x0 + 14, y2 + 82, "303 open / 62 closed → 56 dB", 17, th.accent,
+           anchor="start", mono=True)
+    s.arrow(x0 + 180, y1 + 118, x0 + 180, y2 - 8, th.muted, 1.8)
+
+    # The three criteria.
+    s.arrow(x0 + 372, y2 + 46, x0 + 424, y2 + 46, th.muted, 1.8)
+    cx = x0 + 436
+    for i, (label, value) in enumerate((
+        ("worst phase ≤ limit + 5 dB", "59 ≤ 60 ✓"),
+        ("daily LKeq,x ≤ limit + 3 dB", "57 ≤ 58 ✓"),
+        ("annual LK,x ≤ limit", "56 > 55 ✗"),
+    )):
+        yy = y2 + i * 40
+        color = th.secondary if i == 2 else th.accent
+        s.rect(cx, yy, 324, 32, th.bg, color, rx=6, sw=1.8)
+        s.text(cx + 12, yy + 22, label, 16, th.fg, anchor="start")
+        s.text(cx + 312, yy + 22, value, 16, color, anchor="end", mono=True)
+    s.text(x0, y2 + 146, "Article 25.2 drops the third criterion for an "
+           "activity already in operation", 16, th.muted, anchor="start")

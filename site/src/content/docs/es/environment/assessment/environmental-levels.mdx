@@ -28,16 +28,19 @@ references:
     title: "Description and measurement of environmental noise — Guide to quantities and procedures"
     designation: "BS 7445-1:2003"
     url: "https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures"
-    note: "El compañero de práctica de medición de ISO 1996-1: qué familia de descriptores encaja con cada pregunta de evaluación, y los procedimientos de medición a su alrededor (BS 7445-2:1991 cubre la adquisición de datos para usos del suelo)."
+    note: "El complemento de práctica de medición de ISO 1996-1: qué familia de descriptores encaja con cada pregunta de evaluación, y los procedimientos de medición a su alrededor (BS 7445-2:1991 cubre la adquisición de datos para usos del suelo)."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una comunidad no oye un único $L_{Aeq}$: oye un día cuyas tardes y noches pesan
 más, una fuente cuyos tonos o impulsos molestan más allá de su energía, y
-una medición tomada sobre un fondo residual con una confianza finita. Esta
+una medición tomada sobre un fondo residual con una confianza finita. La mitad
+tonal de esa frase es esta página; la mitad impulsiva pertenece a
+[Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/),
+que mide el ajuste que la Tabla A.1 de ISO 1996-1 solo tabula. Esta
 página es la cadena de evaluación regulatoria construida sobre los niveles
-por periodo medidos: los descriptores de día completo $L_{den}$/$L_{dn}$ y
+por periodo medidos: los descriptores de jornada completa $L_{den}$/$L_{dn}$ y
 los niveles de evaluación compuestos de ISO 1996-1, y los procedimientos de
 determinación de ISO 1996-2 que hacen defendible el número declarado: el
 ajuste tonal, la corrección de ruido residual y el balance de incertidumbre
@@ -63,13 +66,42 @@ impulsivo, +3 a +6 dB tonos prominentes):
 ```python
 from phonometry import environment
 
-l = environment.lden(63.2, 58.1, 51.4)                      # desde LAeq por periodo
-r = environment.composite_rating_level([(63.2, 12, 0.0),    # día
-                            (58.1, 4, 5.0),     # tarde (+5)
-                            (51.4, 8, 10.0)])   # noche (+10) == environment.lden
+l = environment.lden(63.2, 58.1, 51.4)                # desde LAeq por periodo
+r = environment.composite_rating_level([
+    (63.2, 12, 0.0),                                  # día
+    (58.1, 4, 5.0),                                   # tarde (+5)
+    (51.4, 8, 10.0),                                  # noche (+10)
+])
+print(round(l, 2), round(r, 2))                       # 62.66 62.66
 ```
 
+Los dos coinciden hasta el último dígito, que es lo que quiere enseñar el
+fragmento: `lden` *es* `composite_rating_level` con los tres periodos de
+ISO 1996-1 y sus ajustes por franja horaria ya rellenados.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
+
+*El mismo día ponderado de tres maneras: la banda de tarde se eleva 5 dB y la de
+noche 10 dB antes del promedio energético 12/4/8 h, y por eso un $L_{den}$ de
+64,3 dB queda por encima de cualquier nivel horario de la noche.*
+
+**Qué significan esos 64,3 dB.** Conviene llevar la escala encima: una noche
+rural se queda en cuarenta y tantos dB, una calle residencial tranquila a mitad
+de los cincuenta, una fachada en una arteria urbana con tráfico en la parte alta
+de los sesenta, y la
+Directiva de ruido ambiental publica los mapas estratégicos en bandas de
+$L_{den}$ de 5 dB a partir de 55 dB. Las ponderaciones de +5 y +10 dB son el
+precio de la exposición a las horas en que la gente está en casa y durmiendo, así
+que una fuente de tarde o de noche mueve el $L_{den}$ mucho más de lo que sugiere
+su cuota de energía: en el perfil de arriba la tarde es 1,8 dB *más silenciosa*
+que el día y dura un tercio, y aun así la ponderación de +5 dB le da el 36 % de
+la energía que compone los 64,3 dB frente al 51 % del día. Dos límites al
+leerlo. El indicador declarado es un promedio a **largo plazo**: ISO 1996-1
+define sus periodos sobre un intervalo de tiempo de largo plazo, normalmente un
+año, así que el día resuelto aquí es una muestra de un $L_{den}$ y no un
+$L_{den}$. Y el número es una exposición, no una respuesta; ISO 1996-1 lleva
+anexos que traducen un $L_{den}$ o un $L_{dn}$ ajustado en un porcentaje estimado
+de población altamente molesta, que es informativo y no está implementado aquí.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -117,9 +149,41 @@ plt.show()
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB noche (3.6.5) |
 | `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)`; horas positivas, finitas y sumando 24 | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
 
-Dónde pones el micrófono cambia el número: ISO 1996-2 fija las posiciones del receptor y sus correcciones de fachada. El diagrama es contexto de medida; aplica las correcciones a tus niveles antes del análisis:
+Dónde pones el micrófono cambia el número: ISO 1996-2 fija las posiciones del
+receptor y sus correcciones de fachada. El diagrama es contexto de medida;
+aplica las correcciones a tus niveles **antes** de nada de lo que hay en esta
+página:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_es.svg" alt="Posiciones de medida de ruido ambiental según ISO 1996-2: campo libre, a 2 m de la fachada y enrasado, con sus correcciones" width="92%" />
+
+| Posición del micrófono | Corrección para llegar a la referencia incidente (campo libre) | La condición bajo la que se cumple |
+| :--- | :--- | :--- |
+| Campo sonoro incidente | 0 dB, esta **es** la condición de referencia | Ninguna superficie reflectante salvo el suelo lo bastante cerca como para importar |
+| Enrasado en la fachada | Restar hasta **6 dB**; exactamente **5,7 dB** cuando se cumplen las condiciones del Anexo B | Plano de fachada dentro de ±0,05 m en 1 m alrededor del micrófono, y a más de 1 m de cualquier borde del muro |
+| De 0,5 m a 2 m por delante de la fachada | Restar hasta **3 dB**; exactamente **3 dB** cuando se cumplen las condiciones del Anexo B | Una situación por lo demás abierta. **No se recomienda con incidencia casi rasante**, y un cañón urbano o una manzana densa pueden agrandar mucho la diferencia real |
+
+(ISO 1996-2:2017, 9.2.1 y Anexo B. Para cartografía general en zonas
+residenciales de varias plantas, ese mismo apartado fija la altura del micrófono
+en (4,0 ± 0,2) m.)
+
+La razón de que las dos correcciones no sean sin más 6 y 3 dB es la
+interferencia. Enrasado, la onda directa y la reflejada están en fase en toda la
+superficie, así que la duplicación es coherente y de banda ancha, y por eso el
+Anexo B recomienda esta posición, y no la de 3 dB, para fuentes estacionarias y
+bajas frecuencias. A dos metros, la diferencia de camino es finita y depende de
+la frecuencia, así que los 3 dB son un promedio de caso ideal que rompe un cañón
+urbano o un edificio próximo; la Tabla B.1 sitúa la incertidumbre típica de la
+corrección en 0,4 dB para cualquiera de las dos posiciones con ruido de tráfico
+desde todos los ángulos, pero en **2,0 dB para la posición de 5,7 dB y 1,0 dB
+para la de 3 dB con incidencia predominantemente rasante**.
+
+Dos consecuencias para todo lo que sigue. `lden`, `ldn` y
+`composite_rating_level` consumen el nivel **corregido**, así que aplicar la
+corrección es un paso del lector y ninguna función de esta página lo hará. Y el
+nivel declarado siempre tiene que nombrar su posición y decir si se aplicó
+corrección, regla que la norma enuncia en ese mismo apartado y razón por la que
+un indicador de fachada de la Directiva de ruido ambiental, que está *definido*
+para incluir la reflexión, no debe corregirse en absoluto.
 
 Combínalo con `laeq()` por periodo para ir de grabaciones a $L_{den}$. El propio
 ajuste tonal se justifica por la vía de audibilidad tonal de la sección
@@ -133,11 +197,59 @@ cribado de emisión complementario, no la base del $K_t$.
 
 ISO 1996-2:2017 es la parte de **determinación**: cómo el nivel medido se
 convierte en nivel de evaluación y se declara con su incertidumbre. La *suma* del
-nivel de evaluación y las penalizaciones por periodo están en ISO 1996-1 (arriba);
+nivel de evaluación y las penalizaciones por franja horaria están en ISO 1996-1 (arriba);
 ISO 1996-2 aporta el ajuste tonal, la corrección de ruido residual y el
 balance de incertidumbre.
 
-**Ajuste tonal (método de ingeniería, Anexo C de ISO 1996-2:2007).** La edición
+### La medición que hay detrás de los números (apartado 5)
+
+Todo lo de esta página supone un nivel obtenido como exige ISO 1996-2, y los
+requisitos son lo bastante breves como para enunciarlos enteros.
+
+**Toda la cadena** (micrófonos, cables, pantallas antiviento, equipos de
+grabación y cualquier otro accesorio) cumple la clase 1 de IEC 61672-1, para
+aplicación en campo libre o en incidencia aleatoria según corresponda, y los
+filtros cumplen la clase 1 de IEC 61260 (5.1). En exteriores **se usa siempre
+pantalla antiviento**, y no hace desaparecer el ruido de viento: la propia
+estimación de la norma para un micrófono de 13 mm dentro de una pantalla
+antiviento de 90 mm es un nivel de ruido de viento con ponderación A de en torno
+a $-18 + 70\log_{10} v$ dB con el viento normal al diafragma y
+$-32 + 83\log_{10} v$ dB con el viento paralelo, $v$ en m/s, o sea 31 dB(A) a
+5 m/s y 52 dB(A) a 10 m/s, es decir por encima del residual de una noche rural
+tranquila mucho antes de que el viento se acerque a un temporal. Los propios
+límites de tolerancia de la clase 1 solo se aplican entre −10 °C y +50 °C.
+
+La **calibración** (5.2) es una comprobación al principio *y* al final de cada
+medición con un calibrador acústico de clase 1 según IEC 60942. El criterio de
+aceptación es explícito: sin reajuste alguno, las dos comprobaciones
+consecutivas deben diferir en **≤ 0,5 dB**, y si no lo hacen se *descarta todo lo
+medido desde la última comprobación satisfactoria*. Esa es la regla que más a
+menudo le cuesta un día a una campaña, y por eso la comprobación de cierre no es
+opcional. Para vigilancia de varios días o más, toma el relevo ISO 20906.
+
+La **verificación** (5.3) es un certificado válido de conformidad frente a
+IEC 61672-3, IEC 61260 e IEC 60942, emitido por un laboratorio que cumpla
+ISO/IEC 17025 con trazabilidad a patrones nacionales; el intervalo recomendado
+es de una vez al año y el **intervalo máximo admisible es de dos años**.
+
+Los sensores **meteorológicos** llevan sus propios errores máximos permitidos
+(5.4), y son lo que el balance de incertidumbre de más abajo presupone tácitamente:
+±0,5 K en temperatura, ±5,0 % en humedad relativa, ±0,5 hPa en presión
+barométrica, ±0,5 m/s en velocidad de viento y ±5° en dirección del viento.
+
+Por último, un nivel ambiental medido solo es declarable con su contexto. El
+apartado 13 enumera lo que hay que registrar: la hora, el día y el lugar; la
+instrumentación y cómo se calibró; los niveles medidos **y corregidos**; los
+niveles percentiles con la base sobre la que se calcularon; la incertidumbre
+expandida estimada **con su probabilidad de cobertura**; los niveles de sonido
+residual durante la medición; los intervalos de tiempo; una descripción del
+emplazamiento que incluya la cubierta del suelo y las alturas del micrófono y de
+la fuente sobre él; y las condiciones de funcionamiento de la fuente, incluidos
+cuántos sucesos de cada categoría se capturaron.
+
+### Ajuste tonal (método de ingeniería, Anexo C de ISO 1996-2:2007)
+
+La edición
 de 2017 abandonó el algoritmo autocontenido y remite en su lugar a ISO/PAS 20065
 ([Audibilidad objetiva de tonos en ruido](/phonometry/es/perception/psychoacoustics/tone-audibility/));
 lo que conserva es la tabla del Anexo J que convierte una audibilidad *media* en
@@ -154,7 +266,22 @@ marca una banda que supera a ambas vecinas en 15/8/5 dB (baja/media/alta), y
 `tonal_adjustment_from_mean_audibility` mapea la audibilidad media de ISO/PAS 20065
 a $K_t$ (Tabla J.1).
 
+La cadena son tres funciones, no una: `tonal_audibility(Lpt, Lpn, fc)` devuelve
+$\Delta L_{ta}$ a partir de la Fórmula (C.3), `tonal_adjustment(dLta)` lo lleva a
+$K_t$ por las Fórmulas (C.4)-(C.6), y `assess_tonal_audibility(...)` combina las
+dos con `critical_bandwidth` en el resultado representable que usan los
+fragmentos de abajo. Las dos funciones de nivel más bajo son las que la
+[guía de la normativa española](/phonometry/es/environment/assessment/spanish-noise-regulation/)
+y la [guía de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/)
+citan por su nombre, así que merece la pena llamarlas directamente cuando solo
+se quiere un paso.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility_es.svg" alt="Ajuste tonal Kt de ISO 1996-2 como función a tramos de la audibilidad tonal: cero por debajo de 4 dB, creciendo linealmente hasta 6 dB entre 4 y 10 dB, y 6 dB por encima, con los cuatro ejemplos resueltos del Anexo C.5 y un tono de rango medio marcados" width="80%" />
+
+*El ajuste satura por los dos extremos: por debajo de 4 dB de audibilidad un tono
+no cuesta nada y por encima de 10 dB no cuesta más de 6 dB, así que toda la
+decisión vive en una ventana de 6 dB de $\Delta L_{ta}$. Los cuatro ejemplos del
+Anexo C.5 caen dentro de esa ventana o por encima de ella.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -163,6 +290,9 @@ a $K_t$ (Tabla J.1).
 import matplotlib.pyplot as plt
 from phonometry import environment
 
+# El ejemplo resuelto es el Ejemplo 2 del Anexo C.5 de ISO 1996-2:2007 (dos
+# tonos cerca de 400 Hz): la edición de 2017 abandonó el algoritmo y con él sus
+# ejemplos, así que los números de abajo vienen de la edición que lleva el método.
 # ISO 1996-2:2007 Anexo C.5, Ejemplo 2 (dos tonos cerca de 400 Hz):
 res = environment.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
                               centre_frequency=430.0)
@@ -172,7 +302,9 @@ plt.show()
 ```
 </details>
 
-**Corrección de ruido residual (apartado 10.4).** `residual_sound_correction()`
+### Corrección de ruido residual (apartado 10.4)
+
+`residual_sound_correction()`
 aplica $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
 residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
 valor declarable es entonces el nivel medido *sin corregir* $L'$, como cota
@@ -181,7 +313,8 @@ superior del sonido específico (expuesto como `reportable_upper_bound`, con
 niveles percentiles (Anexo I) y rechaza ordenaciones de percentiles
 invertidas.
 
-**Incertidumbre de medición (apartado 4, Anexo F).**
+### Incertidumbre de medición (apartado 4, Anexo F)
+
 `combined_standard_uncertainty()` forma $u = \sqrt{\sum (c_j u_j)^2}$ (Fórmula (2))
 y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1{,}3$ (80 %);
 `residual_correction_uncertainty()` lleva la sensibilidad de la corrección residual
@@ -190,7 +323,7 @@ incertidumbre típica de mediciones repetidas: la vía primaria en el dominio
 de energía (Fórmulas (17)+(19)), con el sustituto en niveles de la Nota 2
 (Fórmula (20)) declarado al lado como `approximate_uncertainty` y un aviso
 cuando los niveles se dispersan más de 3 dB, donde el sustituto se infla
-groseramente.
+desmesuradamente.
 
 ```python
 from phonometry import environment
@@ -199,9 +332,42 @@ tonal = environment.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmen
 kt = tonal.adjustment                                             # 6 dB
 tonal.plot()   # esta audibilidad sobre la curva de Kt, como en la figura de arriba
 corr = environment.residual_sound_correction(measured_level=58.0, residual_level=50.0)
-u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2,18 dB (G.2)
-environment.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
+
+# Tabla G.2: una hora junto a una carretera en condiciones favorables. Las cinco
+# contribuciones son el nivel medido (0,5 dB escalado por la sensibilidad de F.7),
+# las condiciones de funcionamiento de la fuente (1000 vehículos contados,
+# 10/sqrt(1000)), la meteorología, la corrección por posición del micrófono y el residual.
+u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])
+print(round(u, 2))                                             # 2.18 dB (G.2)
+print(round(environment.expanded_uncertainty(u), 2))           # 4.36 dB (k = 2)
 ```
+
+La lista no son cinco números anónimos. Es el balance de la Tabla G.2 de
+ISO 1996-2:2017 y cada entrada tiene nombre, origen y tamaño:
+
+| Contribución | De dónde sale | $c_j u_j$ |
+| :--- | :--- | :--- |
+| Nivel medido $L_{eq,1h}$ | $u = 0{,}5$ dB, que ya absorbe los 0,5 dB por defecto del propio sonómetro de clase 1, multiplicado por la sensibilidad $c_{L'}$ de la corrección residual de la Fórmula (F.7) | 0,59 dB |
+| Condiciones de funcionamiento de la fuente | 1 000 vehículos contados, $10/\sqrt{1000}$ (Fórmula (8)) | 0,30 dB |
+| **Meteorología** | condiciones favorables, Fórmula (12) | **2,00 dB** |
+| Posición del micrófono | la corrección de +5,7 dB de enrasado en fachada del Anexo B | 0,40 dB |
+| Sonido residual | $L_{res} = 50$ dB con $u = 2$ dB, a través de la sensibilidad $c_{res}$ de la Fórmula (F.8) | 0,38 dB |
+
+`combined_standard_uncertainty` también acepta **pares** $(u_j, c_j)$, así que no
+hace falta premultiplicar a mano los coeficientes de sensibilidad, y
+`residual_correction_uncertainty` proporciona exactamente los dos coeficientes de
+las Fórmulas (F.7)/(F.8), que crecen sin límite a medida que el residual se
+acerca al nivel medido, que es el mismo precipicio de 3 dB de antes visto desde
+el lado de la incertidumbre.
+
+Ahora lee la columna. El término meteorológico vale por sí solo 2,0 dB y decide
+la respuesta: quítalo y la incertidumbre combinada cae de 2,18 dB a 0,86 dB. El
+instrumento no está ni de lejos en lo alto de la lista. **Un sonómetro de clase 1
+no hace exacta una medición ambiental**: lo que lo decide es cuán
+representativas fueron las condiciones de propagación y el funcionamiento de la
+fuente durante esa hora, y por eso la forma más barata de encoger $u$ es medir
+más a menudo, que es para lo que está
+`uncertainty_from_repeated_measurements`.
 
 ## Qué cubre esta guía
 
@@ -222,6 +388,8 @@ aplicados.
 ## Véase también
 
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): los niveles $L_{eq}$/$L_{Aeq}$, percentiles y de suceso con los que se componen los indicadores de esta página.
+- [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/): el ajuste por impulsividad medido $K_I$, y `rating_level`, que combina subintervalos ya ajustados por impulso sobre un tiempo de referencia, la contraparte subdiaria del `composite_rating_level` de aquí, que combina periodos completos con sus ajustes por franja horaria y por carácter (apartado 6.5 de ISO 1996-1).
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/): una aplicación nacional de exactamente esta cadena, con sus propias correcciones tonal, de baja frecuencia e impulsiva.
 - [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste $K_t$ (Tabla J.1).
 - [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/): los veredictos de relación tono-ruido y de prominencia de ECMA-418-1, cribado de emisión complementario para la cuestión tonal.
 - [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su balance de incertidumbre.

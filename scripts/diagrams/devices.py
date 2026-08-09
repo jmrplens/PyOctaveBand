@@ -13,7 +13,7 @@ from __future__ import annotations
 import itertools
 
 from .canvas import SVG, Theme
-from .parts import _accel, _box_solid, _box_wire, _motion_arrows
+from .parts import _accel, _box_solid, _box_wire, _motion_arrows, _rot_arrow
 
 # ---------------------------------------------------------------------------
 # d6 - Two-microphone (p-p) intensity probe (IEC 61043)
@@ -121,78 +121,117 @@ def _d_surfaces(s: SVG, th: Theme) -> None:
 # ---------------------------------------------------------------------------
 
 def _d_methods(s: SVG, th: Theme) -> None:
+    """All six determination routes, two rows of three.
+
+    Every cell carries the same five attributes -- environment, grade, measured
+    quantity, headline relation and the limit that binds it -- so the columns
+    can be read across. The sixth is ISO/TS 7849, the only route that takes no
+    acoustic measurement at all.
+    """
     cols = [
         ("ISO 3744 / 3746", "Free field over a reflecting plane",
          "Grade 2 / 3 (engineering / survey)",
          "Sound pressure · enveloping surface",
-         "LW = L̄p + 10 log10(S/S₀) − K1 − K2",
+         "LW = L̄'p + 10 log10(S/S₀) − K1 − K2",
          "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)", th.primary, "hemi"),
+        ("ISO 3745", "Qualified anechoic / hemi-anechoic room",
+         "Grade 1 (precision)",
+         "Sound pressure · fixed 20 / 40 array",
+         "LW = L̄p + 10 log10(S/S₀) + C₁+C₂+C₃",
+         "r ≥ 2 d₀ , qualified free field", th.primary, "anech"),
         ("ISO 3741", "Reverberation test room",
          "Grade 1 (precision)",
          "Sound pressure · diffuse field",
-         "LW ← L̄p , T , V",
-         "V ≥ 200 m³ , qualified room", th.accent, "reverb"),
+         "LW ← L̄p , A , V , S , f",
+         "V ≥ 200 m³ , source ≤ 2 % of V", th.accent, "reverb"),
         ("ISO 9614-2", "In situ — any environment",
          "Grade 2 / 3 (engineering / survey)",
          "Sound intensity · scanning",
          "LW = 10 log10 |Σ IᵢSᵢ| / W₀",
-         "no negative-power bands", th.secondary, "probe"),
+         "no non-positive bands · FpI < Ld", th.secondary, "probe"),
+        ("ISO 9614-3", "In situ — any environment",
+         "Grade 1 (precision)",
+         "Sound intensity · scanning, tighter",
+         "LW = 10 log10 |Σ IᵢSᵢ| / W₀",
+         "five Annex C criteria per band", th.secondary, "probe"),
+        ("ISO/TS 7849-1 / -2", "Any — no acoustic measurement",
+         "Upper limit (ε = 1) / engineering",
+         "Surface velocity · accelerometers",
+         "LWA = LvA + 10 lg(S/S₀) + 10 lg ε",
+         "ε assumed (-1) or measured (-2)", th.fg, "accel"),
     ]
-    cw, gap = 270.0, 15.0
+    cw, ch, gap = 286.0, 300.0, 12.0
     x0 = (900 - (3 * cw + 2 * gap)) / 2
-    ctop, cbot = 66.0, 540.0
     for i, (name, env, grade, method, formula, note, col, pic) in enumerate(cols):
-        x = x0 + i * (cw + gap)
-        cxc = x + cw / 2
-        s.rect(x, ctop, cw, cbot - ctop, th.panel, col, rx=14, sw=2.4)
-        s.rect(x, ctop, cw, 44, col, col, rx=14, sw=0)
-        s.rect(x, ctop + 22, cw, 22, col, "none")  # square off header bottom
-        s.text(cxc, ctop + 30, name, 22, th.bg, bold=True)
+        x = x0 + (i % 3) * (cw + gap)
+        ctop = 56.0 + (i // 3) * (ch + 20.0)
+        cxc, cbot = x + cw / 2, ctop + ch
+        s.rect(x, ctop, cw, ch, th.panel, col, rx=12, sw=2.2)
+        s.rect(x, ctop, cw, 38, col, col, rx=12, sw=0)
+        s.rect(x, ctop + 19, cw, 19, col, "none")  # square off header bottom
+        s.text(cxc, ctop + 27, name, 19, th.bg, bold=True)
 
-        # Mini-pictogram band.
-        py = ctop + 120.0
+        # Mini-pictogram band, centred on py.
+        py = ctop + 92.0
         if pic == "hemi":
-            R = 58.0
-            s.ellipse(cxc, py + 30, R, R * 0.3, "none", th.muted, 1.2, dash="4,3")
-            s.path(f"M {cxc - R} {py + 30} A {R} {R} 0 0 1 {cxc + R} {py + 30}",
+            R = 44.0
+            s.ellipse(cxc, py + 22, R, R * 0.3, "none", th.muted, 1.2, dash="4,3")
+            s.path(f"M {cxc - R} {py + 22} A {R} {R} 0 0 1 {cxc + R} {py + 22}",
                    stroke=col, sw=2.2)
-            s.line(cxc - R, py + 30, cxc + R, py + 30, th.muted, 1.4)
-            _box_solid(s, th, cxc, py + 30, 12, 10, 16, stroke=col)
+            s.line(cxc - R, py + 22, cxc + R, py + 22, th.muted, 1.4)
+            _box_solid(s, th, cxc, py + 22, 10, 8, 13, stroke=col)
             for ang in (35, 90, 145):
                 import math
                 a = math.radians(ang)
-                s.circle(cxc + R * math.cos(a), py + 30 - R * math.sin(a), 4.5,
+                s.circle(cxc + R * math.cos(a), py + 22 - R * math.sin(a), 4.0,
+                         th.secondary)
+        elif pic == "anech":
+            s.rect(cxc - 56, py - 24, 112, 68, th.bg, th.fg, rx=4, sw=1.8)
+            for k in range(6):
+                wx = cxc - 56 + k * 19
+                s.path(f"M {wx} {py - 24} L {wx + 19} {py - 24} "
+                       f"L {wx + 9.5} {py - 12} Z", fill=th.muted, stroke="none")
+            s.line(cxc - 56, py + 44, cxc + 56, py + 44, th.fg, 2.0)
+            _box_solid(s, th, cxc, py + 44, 10, 8, 13, stroke=col)
+            for ang in (30, 90, 150):
+                import math
+                a = math.radians(ang)
+                s.circle(cxc + 42 * math.cos(a), py + 44 - 42 * math.sin(a), 4.0,
                          th.secondary)
         elif pic == "reverb":
-            s.rect(cxc - 58, py - 26, 116, 84, "none", col, rx=6, sw=2.2)
+            s.rect(cxc - 50, py - 22, 100, 68, "none", col, rx=6, sw=2.2)
             for k in range(3):
-                yy = py - 12 + k * 22
-                s.path(f"M {cxc - 44} {yy} q 12 -12 24 0 q 12 12 24 0 q 12 -12 24 0",
-                       stroke=th.muted, sw=1.6)
-            s.circle(cxc - 40, py + 44, 6, th.secondary)   # RSS / source
+                yy = py - 10 + k * 18
+                s.path(f"M {cxc - 38} {yy} q 10 -10 20 0 q 10 10 20 0 q 10 -10 20 0",
+                       stroke=th.muted, sw=1.5)
+            s.circle(cxc - 34, py + 36, 5, th.secondary)
+        elif pic == "accel":
+            s.rect(cxc - 50, py + 6, 100, 34, th.panel, col, rx=3, sw=2.0)
+            _accel(s, cxc + 18, py + 6)
+            _motion_arrows(s, cxc - 20, py - 4, 12, th.secondary)
+            for r in (18, 30):
+                s.path(f"M {cxc + 44 + r * 0.3:.1f} {py + 6 - r:.1f} "
+                       f"A {r} {r} 0 0 1 {cxc + 44 + r:.1f} {py + 6 - r * 0.3:.1f}",
+                       stroke=th.accent, sw=1.5)
         else:  # probe scanning a surface
-            s.rect(cxc - 56, py - 30, 112, 92, "none", col, rx=6, sw=2.0, )
-            # serpentine scan path
-            s.path(f"M {cxc - 44} {py - 16} L {cxc + 40} {py - 16} "
-                   f"L {cxc + 40} {py + 4} L {cxc - 44} {py + 4} "
-                   f"L {cxc - 44} {py + 24} L {cxc + 40} {py + 24}",
+            s.rect(cxc - 46, py - 26, 92, 76, "none", col, rx=6, sw=2.0)
+            s.path(f"M {cxc - 36} {py - 14} L {cxc + 32} {py - 14} "
+                   f"L {cxc + 32} {py + 2} L {cxc - 36} {py + 2} "
+                   f"L {cxc - 36} {py + 18} L {cxc + 32} {py + 18}",
                    stroke=th.accent, sw=1.7)
-            s.circle(cxc + 40, py + 24, 5, th.secondary)
-            s.text(cxc, py + 54, "I⊥", 17, col, bold=True, mono=True)
+            s.circle(cxc + 32, py + 18, 5, th.secondary)
+            s.text(cxc, py + 44, "I⊥", 16, col, bold=True, mono=True)
 
         # Attribute rows.
-        rows = [(py + 96, env, th.fg, False),
-                (py + 128, grade, col, True),
-                (py + 160, method, th.muted, False)]
-        for yy, txt, cc, bold in rows:
-            s.text(cxc, yy, txt, 14, cc, bold=bold)
+        for yy, txt, cc, bold in ((py + 78, env, th.fg, False),
+                                  (py + 100, grade, col, True),
+                                  (py + 122, method, th.muted, False)):
+            s.text(cxc, yy, txt, 13, cc, bold=bold)
 
-        # Headline formula in a boxed footer. The ISO 3744 expression is the
-        # longest of the three, so the shared face is the one that keeps it
-        # inside its box with a margin left over.
-        s.rect(x + 6, cbot - 96, cw - 12, 46, "none", col, rx=8, dash="5,4")
-        s.text(cxc, cbot - 67, formula, 12, th.fg, bold=True, mono=True)
-        s.text(cxc, cbot - 26, note, 14, th.muted)
+        # Headline relation in a boxed footer, then the binding limit.
+        s.rect(x + 6, cbot - 66, cw - 12, 36, "none", col, rx=8, dash="5,4")
+        s.text(cxc, cbot - 43, formula, 11, th.fg, bold=True, mono=True)
+        s.text(cxc, cbot - 12, note, 13, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -312,6 +351,397 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
          th.muted, False),
     ):
         s.text(450, y, txt, 19 if bold else 18, col, bold=bold)
+
+
+# ---------------------------------------------------------------------------
+# ISO 3741 reverberation test room: the direct and the comparison methods
+# ---------------------------------------------------------------------------
+
+_REV_MICS = ((3.6, 1.4), (6.0, 1.8), (6.4, 4.2), (4.8, 5.0), (2.8, 4.6),
+             (1.2, 3.6))  #: six positions, in metres on the room floor plan
+_REV_SOURCE = (1.7, 1.7)  #: source under test, asymmetric and 1,7 m off both walls
+
+
+def _d_reverberation_power(s: SVG, th: Theme) -> None:
+    """ISO 3741 reverberation test room drawn in plan, both methods.
+
+    Left, the direct method (Eq. 20): the source on the floor at least 1,5 m
+    from every wall and six microphone positions carrying the three clause 8.3
+    clearances. Right, the comparison method (Eq. 21): the reference sound
+    source run at the *same* six positions with the source under test left in
+    the room. The room is the guide's own example, V = 200 m3, S = 220 m2,
+    T60 = 2,0 s, so d_min = 0,08 sqrt(200/2) = 0,8 m (1,6 m recommended below
+    5 kHz) and half a wavelength at 100 Hz is 1,7 m.
+    """
+    sc, base = 45.0, 352.0   # 45 px per metre; y of the plan origin
+
+    def mp(x0: float, x: float, y: float) -> tuple[float, float]:
+        return x0 + x * sc, base - y * sc
+
+    def shell(x0: float, header: str) -> None:
+        s.text(x0 + 180, 58, header, 20, th.fg, bold=True)
+        # Hard walls, deliberately not parallel (the room's own skew).
+        s.path(f"M {x0 - 6} {base + 10} L {x0 + 364} {base + 2} "
+               f"L {x0 + 372} {base - 276} L {x0 + 2} {base - 268} Z",
+               fill=th.panel, stroke=th.fg, sw=3.0)
+
+    def mic(px: float, py: float, n: str = "") -> None:
+        s.circle(px, py, 6.5, th.secondary)
+        s.circle(px, py, 2.2, th.bg)
+        if n:
+            s.text(px, py - 12, n, 15, th.fg, bold=True)
+
+    # ===== Left panel: the direct method =====
+    ax = 60.0
+    shell(ax, "Direct method (Eq. 20)")
+
+    # One hung diffuser, well clear of every fixed position.
+    dpx, dpy = mp(ax, 0.9, 5.2)
+    s.path(f"M {dpx - 24} {dpy - 12} L {dpx + 18} {dpy - 22} "
+           f"L {dpx + 24} {dpy + 10} L {dpx - 18} {dpy + 20} Z",
+           fill=th.bg, stroke=th.muted, sw=1.6)
+    s.text(dpx, dpy + 42, "diffuser", 14, th.muted)
+
+    # Alternative continuous traverse, drawn under the fixed positions.
+    s.ellipse(ax + 176, base - 140, 118.0, 86.0, "none", th.accent, 1.6,
+              dash="7,5")
+    s.arrow(ax + 292, base - 152, ax + 290, base - 128, th.accent, 1.6)
+    s.text(ax + 176, base - 136, "or one continuous traverse", 14, th.accent)
+
+    sx, sy = mp(ax, *_REV_SOURCE)
+    for i, (mx, my) in enumerate(_REV_MICS, start=1):
+        mic(*mp(ax, mx, my), str(i))
+    # The three clearances, each measured on the position that binds it.
+    m4x, m4y = mp(ax, *_REV_MICS[3])
+    s.line(m4x, m4y, m4x, base - 272, th.muted, 1.0, dash="4,3")
+    s.text(m4x + 8, (m4y + base - 272) / 2, "> 1,0 m", 15, th.fg,
+           anchor="start")
+    m1x, m1y = mp(ax, *_REV_MICS[0])
+    s.line(sx, sy, m1x, m1y, th.primary, 1.4, dash="6,4")
+    s.text((sx + m1x) / 2, sy - 10, "> d_min", 15, th.primary, bold=True)
+    m5x, m5y = mp(ax, *_REV_MICS[4])
+    m6x, m6y = mp(ax, *_REV_MICS[5])
+    s.line(m5x, m5y, m6x, m6y, th.secondary, 1.4, dash="6,4")
+    lx_, ly_ = (m5x + m6x) / 2, (m5y + m6y) / 2
+    s.line(lx_, ly_, lx_, ly_ - 34, th.secondary, 1.0)
+    s.text(lx_, ly_ - 40, "≥ λ/2", 15, th.secondary, bold=True)
+
+    s.rect(sx - 16, sy - 13, 32, 26, th.fg, rx=3)
+    s.text(sx - 22, sy + 34, "Source under test", 15, th.fg, bold=True,
+           anchor="start")
+
+    # ===== Right panel: the comparison method =====
+    bx = 480.0
+    shell(bx, "Comparison method (Eq. 21)")
+    sx2, sy2 = mp(bx, *_REV_SOURCE)
+    s.rect(sx2 - 16, sy2 - 13, 32, 26, th.panel, th.muted, rx=3, sw=1.6)
+    s.text(sx2 - 22, sy2 + 34, "source under test, left in place", 14,
+           th.muted, anchor="start")
+    for mx, my in _REV_MICS:
+        mic(*mp(bx, mx, my))
+    rx_, ry_ = mp(bx, 4.2, 3.2)
+    s.circle(rx_, ry_, 15.0, th.accent)
+    s.circle(rx_, ry_, 6.0, th.bg)
+    s.text(rx_ + 24, ry_ - 6, "Reference sound", 15, th.accent, bold=True,
+           anchor="start")
+    s.text(rx_ + 24, ry_ + 12, "source (ISO 6926)", 15, th.accent, bold=True,
+           anchor="start")
+    s.line(sx2, sy2, rx_, ry_, th.muted, 1.2, dash="5,4")
+    s.text((sx2 + rx_) / 2 + 6, (sy2 + ry_) / 2 + 22, "≥ 1,5 m", 15, th.fg)
+
+    # ===== Footer: the rules the drawing cannot dimension =====
+    s.line(50, 386, 850, 386, th.muted, 1.0)
+    for k, (txt, col, bold) in enumerate((
+        ("d_min = D₁ √(V / T₆₀) ,  D₁ = 0,08  (0,16 recommended below 5 kHz)",
+         th.primary, True),
+        (("V = 200 m³ · T₆₀ = 2,0 s  →  d_min = 0,8 m,  or 1,6 m at the "
+          "recommended D₁"), th.primary, True),
+        (("six positions: > 1,0 m from every room surface · > d_min from the "
+          "source · spacing ≥ λ/2 (1,7 m at 100 Hz)"), th.fg, False),
+        (("traverse instead: ≥ d_min from the source · ≥ 1,0 m from any "
+          "surface · ≥ 0,5 m from a diffuser"), th.fg, False),
+        (("· not within 10° of a room surface · length ≥ 3λ or 10,3 m, "
+          "whichever is smaller"), th.fg, False),
+        (("comparison method: the same six positions, and no A, no V, no S, "
+          "no Waterhouse and no C₁ in Eq. 21"), th.accent, True),
+        (("averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · "
+          "background at the same positions, just before or after"),
+         th.secondary, True),
+        (("hard walls, α < 0,06 within one wavelength of the source · T₆₀ per "
+          "ISO 3382-2 from the first 10 dB or 15 dB only"), th.muted, False),
+    )):
+        s.text(58, 412 + k * 23, txt, 15, col, anchor="start", bold=bold)
+
+
+# ---------------------------------------------------------------------------
+# ISO 3744 parallelepiped measurement surface and its microphone array
+# ---------------------------------------------------------------------------
+
+def _d_box_array(s: SVG, th: Theme) -> None:
+    """ISO 3744 Annex C array on a box surface, in two orthographic views.
+
+    The reference box is the guide's own 1,4 x 0,9 x 1,1 m machine and the
+    measurement distance is d = 1 m, so a = 1,7 m, b = 1,45 m, c = 2,1 m and
+    S = 4(ab + bc + ca) = 36,3 m2. The 3,4 m long faces exceed the clause C.1
+    limit of 3d on a partial-area side, so they split in two and the array
+    grows past the nine-position minimum.
+    """
+    sc = 70.0  # pixels per metre, shared by both views
+
+    def key(px: float, py: float, normal: tuple[float, float] | None) -> None:
+        if normal is not None:
+            s.arrow(px, py, px + normal[0], py + normal[1], th.secondary, 1.4)
+        s.circle(px, py, 6.0, th.secondary)
+        s.circle(px, py, 2.0, th.bg)
+
+    # ===== Left: top view =====
+    tx, ty = 68.0, 92.0                 # top-left corner of the measurement box
+    tw, td = 3.4 * sc, 2.9 * sc         # 2a x 2b
+    s.text(tx + tw / 2, 68, "Top view", 20, th.fg, bold=True)
+    s.rect(tx, ty, tw, td, th.bg, th.accent, sw=2.2, dash="7,5")
+    rw, rd = 1.4 * sc, 0.9 * sc         # reference box, in plan
+    s.rect(tx + (tw - rw) / 2, ty + (td - rd) / 2, rw, rd, th.panel, th.fg,
+           sw=2.0)
+    s.text(tx + tw / 2, ty + (td + rd) / 2 + 20, "reference box", 15, th.fg)
+    # The partial-area split of the top face and its key positions.
+    s.line(tx + tw / 2, ty, tx + tw / 2, ty + td, th.muted, 1.4, dash="4,4")
+    for px, py in ((tx, ty), (tx + tw / 2, ty), (tx + tw, ty),
+                   (tx, ty + td), (tx + tw / 2, ty + td), (tx + tw, ty + td),
+                   (tx + tw / 4, ty + td / 2), (tx + 3 * tw / 4, ty + td / 2)):
+        key(px, py, None)
+    s.dim(tx + tw / 2, ty + td + 30, tx + tw, ty + td + 30, "≤ 3d", offset=0,
+          size=16)
+    s.dim(tx, ty + 34, tx + (tw - rw) / 2, ty + 34, "d = 1 m", offset=0,
+          size=16)
+    s.text(tx + tw / 2, ty + td + 74, "2a = l₁ + 2d = 3,4 m   ·   2b = 2,9 m",
+           16, th.accent, mono=True)
+
+    # ===== Right: side view =====
+    ex, gy = 512.0, 336.0               # left edge and the reflecting plane
+    ew, eh = 3.4 * sc, 2.1 * sc         # 2a x c
+    s.text(ex + ew / 2, 68, "Side view", 20, th.fg, bold=True)
+    s.ground(gy, ex - 44, ex + ew + 44)
+    s.text(ex - 40, gy + 30, "Reflecting plane", 15, th.muted, anchor="start")
+    s.rect(ex, gy - eh, ew, eh, th.bg, th.accent, sw=2.2, dash="7,5")
+    rwe, rhe = 1.4 * sc, 1.1 * sc       # reference box, in elevation
+    s.rect(ex + (ew - rwe) / 2, gy - rhe, rwe, rhe, th.panel, th.fg, sw=2.0)
+    s.text(ex + ew / 2, gy - rhe / 2 + 6, "source", 15, th.fg)
+    s.line(ex + ew / 2, gy - eh, ex + ew / 2, gy - rhe, th.muted, 1.4,
+           dash="4,4")
+    ox, oy = ex + ew / 2, gy
+    for px, py in ((ex + ew / 4, gy - eh / 2), (ex + 3 * ew / 4, gy - eh / 2),
+                   (ex + ew, gy - eh)):
+        key(px, py, None)
+    # One position of each kind carries its reference direction: the top-face
+    # centre normal to its face, the corner aimed at the origin O.
+    key(ex + ew / 2, gy - eh, (0.0, 34.0))
+    s.text(ex + ew / 2 + 10, gy - eh + 24, "normal to the face", 14, th.muted,
+           anchor="start")
+    dx_, dy_ = ox - ex, oy - (gy - eh)
+    n = (dx_ ** 2 + dy_ ** 2) ** 0.5
+    key(ex, gy - eh, (44 * dx_ / n, 44 * dy_ / n))
+    s.text(ex + 6, gy - eh - 12, "at a corner: aimed at O", 14, th.muted,
+           anchor="start")
+    s.circle(ox, oy, 3.8, th.fg)
+    s.text(ox + 10, oy - 8, "O", 16, th.fg, bold=True, anchor="start")
+    s.dim(ex + ew, gy, ex + ew, gy - eh, "c = 2,1 m", offset=36, size=16,
+          label_side="right")
+
+    # ===== Footer =====
+    s.line(50, 418, 850, 418, th.muted, 1.0)
+    for k, (txt, col, bold) in enumerate((
+        (("S = 4(ab + bc + ca) = 36,3 m²   for l₁ × l₂ × l₃ = "
+          "1,4 × 0,9 × 1,1 m at d = 1 m"), th.accent, True),
+        (("each of the five planes is split on its own into equal partial "
+          "areas of side ≤ 3d (clause C.1)"), th.fg, False),
+        (("key positions: the centre of every partial area, plus its corners "
+          "except those in the reflecting plane"), th.fg, False),
+        (("nine is the minimum, for one partial area per plane; here 2a > 3d, "
+          "so the long faces split and the array grows"), th.muted, False),
+        ("the survey method (ISO 3746) keeps only the partial-area centres",
+         th.muted, False),
+    )):
+        s.text(60, 446 + k * 25, txt, 15, col, anchor="start", bold=bold)
+
+
+# ---------------------------------------------------------------------------
+# ISO/TS 7849-2 determination of the radiation factor
+# ---------------------------------------------------------------------------
+
+def _d_radiation_factor(s: SVG, th: Theme) -> None:
+    """The second, paired measurement Part 2 needs: an ISO 9614 intensity scan
+    over a surface offset from the casing, taken on the same machine in the
+    same operating mode as the velocity survey that runs on the casing."""
+    gy = 400.0
+    s.ground(gy, 60.0, 560.0)
+
+    bx, hw, dp, ht = 280.0, 140.0, 108.0, 150.0
+    _box_solid(s, th, bx, gy, hw, dp, ht)
+    fx0, fx1, fy = bx - hw, bx + hw, gy - ht
+    dxo, dyo = dp * 0.72, dp * 0.55
+
+    # The Table 1 grid of the velocity survey: 5 x 2 cells on the 4 m2 face.
+    for i in range(1, 5):
+        gx = fx0 + i * (2 * hw) / 5
+        s.line(gx, fy, gx + dxo, fy - dyo, th.muted, 1.0)
+    s.line(fx0 + dxo * 0.5, fy - dyo * 0.5, fx1 + dxo * 0.5, fy - dyo * 0.5,
+           th.muted, 1.0)
+    cells = []
+    for r_ in (0.25, 0.75):
+        for i in range(5):
+            u = (i + 0.5) / 5
+            cells.append((fx0 + u * 2 * hw + r_ * dxo, fy - r_ * dyo))
+    for cxp, cyp in cells:
+        s.circle(cxp, cyp, 4.0, th.secondary)
+        s.circle(cxp, cyp, 1.5, th.bg)
+    _accel(s, cells[5][0], cells[5][1] - 4)
+    _motion_arrows(s, cells[5][0], cells[5][1] - 46, 14, th.secondary)
+    s.text(bx - 40, 120, "⟨v_j²⟩ on the casing", 17, th.secondary, bold=True,
+           mono=True)
+    s.line(bx - 10, 130, bx - 44, 196, th.muted, 1.0)
+
+    # The ISO 9614 measurement surface, offset 0,25 m from the casing.
+    off = 44.0
+    _box_wire(s, th, bx, gy, hw + off, dp + off * 0.8, ht + off, th.primary)
+    s.dim(fx1, fy - 26, fx1 + off, fy - 26, "0,25 m", offset=-30, size=16)
+    s.text(bx, 84, "ISO 9614 measurement surface", 18, th.primary, bold=True)
+
+    # A serpentine sweep over the front segment of that surface, with a probe.
+    sl, sr = fx0 - off + 22, fx1 + off - 22
+    for k, yy in enumerate((fy + 26, fy + 76, fy + 126)):
+        s.line(sl, yy, sr, yy, th.accent, 1.8, dash="2,3")
+        if k < 2:
+            xx = sr if k % 2 == 0 else sl
+            s.line(xx, yy, xx, yy + 50, th.accent, 1.8, dash="2,3")
+    s.arrow(sr - 60, fy + 126, sr, fy + 126, th.accent, 1.8)
+    ppx, ppy = bx + 10, fy + 76
+    s.line(ppx, ppy, ppx + 42, ppy - 24, th.fg, 2.2)
+    s.circle(ppx, ppy - 6, 5, th.fg)
+    s.circle(ppx, ppy + 6, 5, th.fg)
+    s.text(ppx + 48, ppy - 28, "p-p probe", 15, th.fg, anchor="start")
+
+    # Radiated power leaving the surface.
+    for yy in (fy + 26, fy + 76, fy + 126):
+        s.arrow(fx0 - off, yy, fx0 - off - 34, yy + 8, th.primary, 2.0)
+    s.text(fx0 - off - 44, fy + 82, "P_j", 18, th.primary, bold=True,
+           mono=True, anchor="end")
+
+    # Relation strip.
+    lx = 590.0
+    s.text(lx, 120, "Determining ε_j (Part 2)", 19, th.fg, bold=True,
+           anchor="start")
+    for y, txt, col, bold in (
+        (154, "ε_j = P_j / (Z_c,n ⟨v_j²⟩ S)", th.primary, True),
+        (186, "P_j : ISO 9614 band power", th.muted, False),
+        (212, "⟨v_j²⟩ : surface-averaged", th.muted, False),
+        (238, "normal velocity, same bands", th.muted, False),
+    ):
+        s.text(lx, y, txt, 16 if bold else 15, col, anchor="start", bold=bold,
+               mono=bold)
+    s.rect(lx - 10, 268, 260, 118, th.panel, th.secondary, rx=10, sw=2.0)
+    for k, txt in enumerate((
+        "one machine, one run:", "the same operating mode,",
+        "the same mounting, the same bands.",
+        "ε_j is a property of the structure",
+        "and its excitation together.",
+    )):
+        s.text(lx, 292 + k * 22, txt, 15, th.fg, anchor="start",
+               bold=(k == 0))
+    s.text(450, 450, "determined once, then the velocity survey alone serves "
+           "the rest of the family", 17, th.fg, bold=True)
+    s.text(450, 478, "mean segment-to-source distance ≥ 200 mm (ISO 9614-2, "
+           "clause 8.2)", 16, th.muted)
+    s.text(450, 506, "Part 1 skips this measurement and sets ε = 1, which is "
+           "why it returns an upper limit", 16, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# The residual-intensity test and the before-use probe check
+# ---------------------------------------------------------------------------
+
+def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
+    """What δpI0 is measured with, and the two checks that precede a series.
+
+    Panel 1 is the IEC 61043 clause 10.2 residual-intensity testing device;
+    panel 2 the clause 14 b) pressure calibration of both channels; panel 3
+    the ISO 9614-2 clause 6.2.2 probe-reversal test in situ.
+    """
+    tops, w = (46.0, 322.0, 598.0), 256.0
+    heads = ("1 · Residual-intensity test", "2 · Pressure check",
+             "3 · Probe reversal, in situ")
+    for x0, head in zip(tops, heads, strict=True):
+        s.rect(x0, 62, w, 300, th.panel, th.muted, rx=12, sw=1.6)
+        s.text(x0 + w / 2, 90, head, 17, th.fg, bold=True)
+
+    def capsules(cx: float, cy: float, col: str) -> None:
+        for dx in (-30.0, 30.0):
+            s.rect(cx + dx - 13, cy - 24, 26, 48, th.panel, col, rx=6, sw=2.0)
+            s.rect(cx + dx - 8, cy - 30, 16, 8, th.fg, rx=2)
+        s.rect(cx - 12, cy - 5, 24, 10, th.panel, th.muted, rx=3, sw=1.2)
+
+    # --- 1: the coupler, both capsules in one identical pressure field ------
+    x0 = tops[0]
+    cx, cy = x0 + w / 2, 186.0
+    s.rect(cx - 78, cy - 62, 156, 124, th.bg, th.fg, rx=10, sw=2.4)
+    for k in range(3):
+        s.path(f"M {cx - 60} {cy - 40 + k * 34} q 20 -14 40 0 q 20 14 40 0",
+               stroke=th.primary, sw=1.6)
+    capsules(cx, cy, th.secondary)
+    s.text(cx, cy + 84, "pink or white noise, 45 Hz to 7,1 kHz", 14, th.muted)
+    s.text(cx, cy + 106, "both capsules within ± 0,1 dB", 14, th.muted)
+    s.text(cx, cy + 134, "δpI0 = L_p − L_I0", 18, th.primary, bold=True,
+           mono=True)
+
+    # --- 2: the sound calibrator on one capsule at a time -------------------
+    x1 = tops[1]
+    cx, cy = x1 + w / 2, 186.0
+    s.rect(cx - 74, cy - 40, 62, 80, th.bg, th.accent, rx=8, sw=2.2)
+    s.text(cx - 43, cy + 4, "94,0", 15, th.accent, bold=True, mono=True)
+    s.text(cx - 43, cy + 22, "dB", 14, th.accent, mono=True)
+    s.rect(cx - 12, cy - 14, 22, 28, th.panel, th.secondary, rx=5, sw=2.0)
+    s.rect(cx + 10, cy - 8, 44, 16, th.panel, th.muted, rx=4, sw=1.4)
+    s.rect(cx + 54, cy - 14, 22, 28, th.panel, th.secondary, rx=5, sw=2.0)
+    s.text(cx, cy + 66, "IEC 60942 calibrator, class 0 or 1", 14, th.muted)
+    s.text(cx, cy + 88, "on each microphone in turn", 14, th.muted)
+    s.text(cx, cy + 120, "adjust to ± 0,1 dB", 18, th.accent, bold=True)
+    s.text(cx, cy + 144, "in both channels", 15, th.muted)
+
+    # --- 3: the probe reversal on the measurement surface -------------------
+    x2 = tops[2]
+    cx, cy = x2 + w / 2, 196.0
+    sxl = cx - 100
+    s.line(sxl, cy - 78, sxl, cy + 78, th.fg, 2.6)
+    for k in range(7):
+        s.line(sxl, cy - 76 + k * 24, sxl - 9, cy - 67 + k * 24, th.muted, 1.1)
+    s.text(cx, cy + 100, "measurement surface", 14, th.muted)
+    s.arrow(sxl + 12, cy - 74, sxl + 92, cy - 74, th.muted, 2.0)
+    s.text(sxl + 52, cy - 82, "energy leaving the source", 13, th.muted)
+    for yy, col, lab, sgn in ((cy - 36, th.secondary, "+ I_n", 1.0),
+                              (cy + 36, th.primary, "− I_n", -1.0)):
+        s.line(cx - 34, yy, cx + 34, yy, th.fg, 2.0)
+        s.circle(cx - 14, yy, 5.5, th.fg)
+        s.circle(cx + 14, yy, 5.5, th.fg)
+        s.arrow(cx, yy - 20, cx + sgn * 38, yy - 20, col, 2.0)
+        s.text(cx + 50, yy + 5, lab, 15, col, bold=True, mono=True,
+               anchor="start")
+    _rot_arrow(s, cx, cy, 46.0, 250.0, 470.0, th.muted, 1.8)
+    s.text(cx - 52, cy + 5, "180°", 15, th.muted, anchor="end")
+    s.text(cx, cy + 124, "acoustic centre held in place", 14, th.muted)
+
+    # --- verdict strip ------------------------------------------------------
+    s.rect(46, 390, 808, 62, th.panel, th.secondary, rx=10, sw=2.0)
+    s.text(450, 416, "accepted when the two readings have opposite signs and "
+           "differ by less than 1,5 dB", 17, th.fg, bold=True)
+    s.text(450, 440, "in the band of maximum level (ISO 9614-2, clause 6.2.2)",
+           15, th.muted)
+    for k, txt in enumerate((
+        "same signs → the two channels are swapped, or one is inverted",
+        ("more than 1,5 dB apart → the probe disturbs its own field, or the "
+         "channels are not matched"),
+        ("δpI0 belongs to the probe, its spacer and the analyser together — "
+         "not to the microphones"),
+    )):
+        s.text(60, 482 + k * 24, txt, 15, th.muted, anchor="start")
 
 
 def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:
@@ -674,3 +1104,774 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     s.text(80, 596,
            "reactive silencer: TL = 10 log10[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength",
            15, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# IEC 60268-3 electrical distortion bench
+# ---------------------------------------------------------------------------
+
+def _d_duct_path(s: SVG, th: Theme) -> None:
+    """Long's Table 14.9 installation as a place, not as a thirteen-row table.
+
+    Every box carries the sheet code the snippet stamps on its
+    ``DuctElement``, so the two paths of ``duct_path_cascade.svg`` become
+    readable as positions in a building. The stamps under each box are the
+    element's own two spectra at 63 Hz: what it takes out, and what its
+    airflow puts back.
+    """
+    s.add('<g transform="translate(0,-28)">')
+    plant_x, room_x = 60.0, 596.0
+    ceil_y, floor_y = 300.0, 470.0
+
+    # --- the two spaces ----------------------------------------------------
+    s.ground(floor_y, 40.0, 860.0)
+    s.rect(plant_x, 150.0, 250.0, floor_y - 150.0, th.panel, th.fg, sw=2.4)
+    s.rect(room_x, ceil_y, 244.0, floor_y - ceil_y, th.panel, th.fg, sw=2.4)
+    s.text(plant_x + 10, 172, "Plant room", 16, th.fg, bold=True, anchor="start")
+    s.text(room_x + 12, 322, "Office, 20 × 20 × 8 ft", 16, th.fg, bold=True,
+           anchor="start")
+    s.text(room_x + 12, 342, "drywall and carpet, NC 30", 13, th.muted,
+           anchor="start")
+    s.line(room_x, ceil_y, room_x + 244.0, ceil_y, th.fg, 2.4)
+
+    # --- the fan, radiating both ways --------------------------------------
+    s.rect(plant_x + 66, 356, 116, 94, th.bg, th.fg, rx=6, sw=2.4)
+    s.circle(plant_x + 124, 403, 26, "none", th.primary, sw=2.6)
+    s.circle(plant_x + 124, 403, 7, th.primary)
+    s.text(plant_x + 124, 342, "1 · Fan, 5000 cfm, 2 in w.g.", 14, th.primary,
+           bold=True)
+    s.text(plant_x + 124, 466, "same L_W into both runs", 13, th.muted,
+           mono=True)
+
+    # --- the supply run, left to right, above the office ceiling -----------
+    supply = (
+        ("2", "elbow", "36×24 in", 246.0, 62.0),
+        ("3", "silencer", "3 ft", 320.0, 66.0),
+        ("4", "lined duct", "5 ft", 396.0, 70.0),
+        ("5", "branch", "25 %", 478.0, 56.0),
+        ("6", "lined duct", "18×12 in", 546.0, 74.0),
+        ("7", "flex duct", "12 in, 6 ft", 632.0, 72.0),
+    )
+    y = 224.0
+    s.line(plant_x + 182, 240.0, 246.0, 240.0, th.fg, 2.2)
+    for code, name, size, x, w in supply:
+        s.rect(x, y, w, 34.0, th.bg, th.primary, rx=3, sw=2.0)
+        s.text(x + w / 2, y + 23, code, 15, th.primary, bold=True)
+        s.text(x + w / 2, y - 8, name, 12, th.fg)
+        s.text(x + w / 2, y + 50, size, 11, th.muted, mono=True)
+    for a, b in ((308.0, 320.0), (386.0, 396.0), (466.0, 478.0),
+                 (534.0, 546.0), (620.0, 632.0)):
+        s.line(a, y + 17, b, y + 17, th.fg, 2.2)
+    s.line(704.0, y + 17, 780.0, y + 17, th.fg, 2.2)
+    s.line(780.0, y + 17, 780.0, ceil_y - 8, th.fg, 2.2)
+    s.rect(760.0, ceil_y - 8, 40.0, 12.0, th.bg, th.primary, sw=2.0)
+    s.text(752.0, 296.0, "8 · diffuser 24 × 24 in", 13, th.primary,
+           anchor="end")
+
+    # --- the return run, below the supply, back to the plant room ----------
+    ret = (
+        ("2", "elbow", 246.0, 62.0),
+        ("3", "silencer", 320.0, 74.0),
+        ("4", "elbow, lined", 404.0, 74.0),
+        ("5", "plenum", 488.0, 82.0),
+    )
+    yr = 140.0
+    for code, name, x, w in ret:
+        s.rect(x, yr, w, 30.0, th.bg, th.secondary, rx=3, sw=2.0)
+        s.text(x + w / 2, yr + 21, code, 14, th.secondary, bold=True)
+        s.text(x + w / 2, yr - 8, name, 12, th.fg)
+    for a, b in ((308.0, 320.0), (394.0, 404.0), (478.0, 488.0)):
+        s.line(a, yr + 15, b, yr + 15, th.fg, 2.2)
+    s.line(570.0, yr + 15, 806.0, yr + 15, th.fg, 2.2)
+    s.line(806.0, yr + 15, 806.0, 196.0, th.fg, 2.2)
+    s.text(824.0, yr + 20, "6 · grille", 13, th.secondary, anchor="start")
+    s.line(plant_x + 182, yr + 15, 246.0, yr + 15, th.fg, 2.2)
+    s.arrow(246.0, yr + 15, plant_x + 190, yr + 15, th.secondary, 2.0)
+
+    # --- the receiver ------------------------------------------------------
+    s.person(room_x + 214, floor_y, 82, seated=True)
+    s.dim(780.0, ceil_y + 6, 780.0, floor_y - 68, "r = 1.83 m", size=13)
+    s.text(room_x + 12, 392, "Q = 2, flush in the ceiling", 13, th.muted,
+           anchor="start")
+
+    # --- the legend --------------------------------------------------------
+    s.text(60, 520, "blue: the supply path — red: the return path — each box "
+                    "is one row of the sheet, stamped with its code", 15,
+           th.fg, anchor="start")
+    s.text(60, 546, "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — "
+                    "attenuates and regenerates: 2, 3 — self-noise only: "
+                    "8 and the return grille", 14, th.muted, anchor="start")
+    s.text(60, 574, "the return wins above 1 kHz: its silencer floors the room "
+                    "near 25 dB, and no amount of supply attenuation moves that",
+           14, th.muted, anchor="start")
+    s.add("</g>")
+
+
+def _d_silencer_iso7235(s: SVG, th: Theme) -> None:
+    """The ISO 7235 substitution measurement, both series on one duct axis.
+
+    Series I carries the test object, series II the substitution duct, and
+    the insertion loss is the difference of the two spatially energy-averaged
+    receiving-side levels. The annotations are the standard's own
+    qualification numbers: the modal filter's >= 3 dB / >= 5 dB longitudinal
+    attenuation (5.2.2.3), r <= 0.3 at both qualification planes (5.2.2.5,
+    5.2.4.3), the 5 % linear tolerance on the substitution duct (5.2.3), the
+    >= 6 dB and preferably >= 10 dB signal-to-background rule (5.2.2.2), and
+    the three microphone positions of 6.2.1.
+    """
+    x_box, w_box = 60.0, 105.0
+    x_mf, w_mf = 190.0, 80.0
+    x_tr, w_tr = 285.0, 70.0
+    x_ob, w_ob = 375.0, 150.0
+    x_rd, w_rd = 545.0, 285.0
+    duct_h = 56.0
+
+    for row, (y, title, obj, colour) in enumerate((
+        (150.0, "Series I — test object installed", "test object", th.primary),
+        (330.0, "Series II — substitution duct", "substitution duct",
+         th.secondary),
+    )):
+        ax = y + duct_h / 2
+        s.text(60, y - 24, title, 17, colour, bold=True, anchor="start")
+
+        s.rect(x_box, y - 16, w_box, duct_h + 32, th.panel, th.fg, rx=5, sw=2.2)
+        s.rect(x_box + 6, y - 10, w_box - 12, duct_h + 20, "none", th.accent,
+               rx=3, sw=1.2, dash="4,3")
+        s.circle(x_box + w_box / 2, ax, 15, th.fg)
+        s.circle(x_box + w_box / 2, ax, 6, th.bg)
+
+        s.rect(x_mf, y, w_mf, duct_h, th.panel, th.fg, sw=2.0)
+        for k in range(3):
+            s.line(x_mf + 14 + 26 * k, y + 4, x_mf + 14 + 26 * k,
+                   y + duct_h - 4, th.accent, 3.0)
+        s.path(f"M {x_tr} {y - 6} L {x_tr + w_tr} {y + 6} "
+               f"L {x_tr + w_tr} {y + duct_h - 6} L {x_tr} {y + duct_h + 6} Z",
+               fill=th.panel, stroke=th.fg, sw=2.0)
+        s.rect(x_ob, y - 10, w_ob, duct_h + 20, th.panel, colour, rx=4, sw=2.6)
+        if row == 0:
+            for k in range(4):
+                s.line(x_ob + 18 + 32 * k, y - 4, x_ob + 18 + 32 * k,
+                       y + duct_h + 4, colour, 2.4)
+        s.text(x_ob + w_ob / 2, y + duct_h + 40, obj, 14, colour, bold=True)
+
+        s.rect(x_rd, y, w_rd, duct_h, th.panel, th.fg, sw=2.0)
+        for k in range(3):
+            s.path(f"M {x_rd + w_rd - 10 - 24 * k} {y + 2} "
+                   f"L {x_rd + w_rd - 34 - 24 * k} {ax} "
+                   f"L {x_rd + w_rd - 10 - 24 * k} {y + duct_h - 2} Z",
+                   fill="none", stroke=th.muted, sw=1.3)
+        s.line(x_rd + 44, ax - 21, x_rd + 128, ax + 17, th.muted, 1.1,
+               dash="4,3")
+        for k in range(3):
+            s.circle(x_rd + 50 + 36 * k, ax - 18 + 17 * k, 6, th.fg)
+
+        s.arrow(x_box + w_box, ax, x_mf, ax, th.fg, 2.0)
+        s.arrow(x_mf + w_mf, ax, x_tr, ax, th.fg, 2.0)
+        s.arrow(x_ob + w_ob, ax, x_rd, ax, th.fg, 2.0)
+        s.line(x_ob - 12, y - 24, x_ob - 12, y + duct_h + 24, th.muted, 1.2,
+               dash="3,3")
+        s.line(x_rd - 8, y - 24, x_rd - 8, y + duct_h + 24, th.muted, 1.2,
+               dash="3,3")
+        s.text(x_rd + w_rd, y - 10, "L_pI" if row == 0 else "L_pII", 15,
+               colour, anchor="end", mono=True)
+
+    # --- what each element is ----------------------------------------------
+    for x, label in ((x_box + w_box / 2, "sealed, lined loudspeaker box"),
+                     (x_mf + w_mf / 2, "modal filter"),
+                     (x_tr + w_tr / 2, "transition"),
+                     (x_rd + w_rd / 2, "test duct, anechoic termination")):
+        s.text(x, 468, label, 12, th.muted)
+    s.text(x_rd + w_rd / 2, 488,
+           "three positions on a line inclined to the axis, at mid-length",
+           12, th.muted)
+    s.text(x_ob + w_ob / 2, 488, "r ≤ 0.3 planes", 12, th.muted)
+
+    # --- the quantity and its qualification rules ---------------------------
+    s.text(60, 532, "D_i = L_pI − L_pII, one third octave at a time", 17,
+           th.fg, anchor="start")
+    left = (
+        "modal filter: ≥ 3 dB on the fundamental at the low-frequency end,",
+        "≥ 5 dB above the cut-on of higher-order modes (5.2.2.3)",
+        "substitution duct: the empty housing where possible, otherwise",
+        "matched within 5 % in every linear dimension (5.2.3)",
+    )
+    right = (
+        "reflection coefficient r ≤ 0.3 at the source and receiving",
+        "qualification planes (5.2.2.5, 5.2.4.3)",
+        "signal ≥ 6 dB and preferably ≥ 10 dB above the background",
+        "(5.2.2.2); IEC 61260 third octaves, class 1 chain (5.2.4.6)",
+    )
+    for k, line in enumerate(left):
+        s.text(60, 562 + 20 * k, line, 12, th.muted, anchor="start")
+    for k, line in enumerate(right):
+        s.text(468, 562 + 20 * k, line, 12, th.muted, anchor="start")
+
+    s.text(60, 668, "the reported figure is an insertion loss against a "
+                    "substitution duct, not a transmission loss", 16, th.fg,
+           anchor="start")
+    s.text(60, 692, "and the facility's own limiting insertion loss — flanking "
+                    "along the duct walls — caps what it can report at all",
+           15, th.muted, anchor="start")
+
+
+def _d_room_to_room(s: SVG, th: Theme) -> None:
+    """Section through Norton problem 4.18, drawn at 50 px per metre.
+
+    Every symbol of Equation (4.101) is a piece of this drawing: the blower
+    in the floor-wall intersection that makes Q = 4 worth 6.0 dB, the
+    reverberant L_p1 that drives the whole partition, the 5 x 3 m separating
+    wall, the receiving room whose absorption area overtakes that wall
+    between 250 and 500 Hz, and the receiver against NC 45. The annotations
+    sit outside the rooms because 3 m of room is 150 px of drawing.
+    """
+    cl, fl = 262.0, 412.0                  # ceiling and floor: 3 m at 50 px/m
+    xa, xb = 130.0, 530.0                  # plant room, 8 m
+    xc, xd = 542.0, 792.0                  # operator room, 5 m
+
+    # The scene is laid out on its own grid and lifted clear of the title.
+    s.add('<g transform="translate(0,-44)">')
+    s.ground(fl, 90.0, 830.0)
+    for x0, x1 in ((xa, xb), (xc, xd)):
+        s.rect(x0, cl, x1 - x0, fl - cl, th.panel, th.fg, sw=2.4)
+        s.line(x0 + 4, cl + 7, x1 - 4, cl + 7, th.accent, 2.4, dash="6,4")
+    s.rect(xb, cl, xc - xb, fl - cl, th.secondary, th.fg, sw=2.0)
+    s.line(xc + 4, fl - 5, xd - 4, fl - 5, th.accent, 2.4, dash="2,4")
+
+    s.text(xa + 10, 288, "Plant room 8 × 10 × 3 m", 16, th.fg, bold=True,
+           anchor="start")
+    s.text(xa + 10, 306, "bare floor, absorbent ceiling", 13, th.muted,
+           anchor="start")
+    s.text(xd - 10, 288, "Operator room 5 × 5 × 3 m", 16, th.fg, bold=True,
+           anchor="end")
+    s.text(xd - 10, 306, "carpet, same ceiling", 13, th.muted, anchor="end")
+    s.text(xb + 6, 250, "S_w", 15, th.secondary, bold=True)
+
+    # --- the blower in the floor-wall intersection: Q = 4 ------------------
+    s.path(f"M {xa} {fl} L {xa + 104} {fl} A 104 104 0 0 0 {xa} {fl - 104} Z",
+           fill=th.panel, stroke=th.primary, sw=1.4)
+    s.rect(xa + 2, fl - 42, 58, 42, th.bg, th.fg, rx=4, sw=2.2)
+    s.circle(xa + 31, fl - 21, 11, th.primary)
+    s.circle(xa + 31, fl - 21, 4, th.bg)
+    for r in (58, 84):
+        s.path(f"M {xa + 31 + r * 0.30:.0f} {fl - 21 - r:.0f} "
+               f"A {r} {r} 0 0 1 {xa + 31 + r:.0f} {fl - 21 - r * 0.30:.0f}",
+               stroke=th.muted, sw=1.1)
+    s.text(xa + 118, fl - 84, "Q = 4", 15, th.primary, anchor="start",
+           bold=True)
+
+    # --- the path across the partition -------------------------------------
+    s.arrow(xa + 250, 350, xb - 6, 350, th.primary, 2.2)
+    s.text(xa + 250, 340, "L_p1", 14, th.primary, anchor="start", mono=True)
+    s.arrow(xc + 6, 350, xd - 78, 350, th.primary, 2.2)
+    s.text(xd - 86, 340, "L_p2", 14, th.primary, anchor="end", mono=True)
+    s.arrow(xc + 6, 380, xb - 6, 380, th.muted, 1.0)
+    s.text(xc + 14, 376, "τ S_w", 12, th.muted, anchor="start", mono=True)
+    s.person(xd - 40, fl, 78)
+
+    # --- the flanking route the equation does not price --------------------
+    s.path(f"M {xb - 120} {cl - 4} Q {xb + 6} {186} {xc + 120} {cl - 4}",
+           stroke=th.secondary, sw=2.0, dash="7,5")
+    s.text(xb + 6, 172, "flanking over the ceiling void: an allowance, "
+                        "not a model", 13, th.secondary)
+
+    # --- dimensions ---------------------------------------------------------
+    s.dim(xa, fl + 30, xb, fl + 30, "8 m", size=15)
+    s.dim(xc, fl + 30, xd, fl + 30, "5 m", size=15)
+    s.dim(xa - 46, cl, xa - 46, fl, "3 m", size=15)
+
+    # --- the numbers, outside the rooms -------------------------------------
+    s.text(50, 480, "source side — blower on the floor at a wall mid-point: "
+                    "L_W = 105 dB at 125 Hz, Q = 4 adds 6.0 dB, L_p1 = 107.0 dB",
+           14, th.fg, anchor="start")
+    s.text(50, 502, "partition — 5 m × 3 m = 15 m², TL = 39 dB at 125 Hz; "
+                    "the τ S_w returned to the source room is off by default",
+           14, th.fg, anchor="start")
+    s.text(50, 524, "receiving side — S₂α₂ = 5.5 m² at 125 Hz rising to "
+                    "39.2 m² at 4 kHz; L_p2 = 72.4 dB against 60 dB for NC 45",
+           14, th.fg, anchor="start")
+
+    # --- the equation and where it turns over -------------------------------
+    s.text(50, 558, "NR = TL − 10 log10[S_w / (S₂α₂ + τ S_w)]", 17, th.fg,
+           anchor="start")
+    s.text(50, 584, "S₂α₂ passes the 15 m² of the wall between 250 and "
+                    "500 Hz: below it the wall delivers less than its TL",
+           15, th.primary, anchor="start")
+    s.text(50, 608, "both levels are reverberant-field spatial averages, and "
+                    "the balance says nothing below 163 Hz (Schroeder, 75 m³)",
+           15, th.muted, anchor="start")
+    s.add("</g>")
+
+
+def _d_machine_enclosure(s: SVG, th: Theme) -> None:
+    """Section through the close-fitting enclosure of this page's own fiche.
+
+    The fiche case is S_E = 24 m2 of exposed shell (a 3.0 x 2.0 x 1.8 m box,
+    five faces), S_i = 30 m2 of interior surface and a mean interior
+    absorption of 0.30, so R_i = 12.9 m2 and C = 3.4 dB. Every element the
+    insertion loss actually depends on is drawn: the three wall layers, the
+    isolated machine, the sealed door, the sleeved penetration, the lined
+    cooling ducts, and the one unsealed gap that caps the result.
+    """
+    gy, yt = 470.0, 200.0
+    x0, x1 = 230.0, 680.0          # 3.0 m of shell at 150 px/m
+    t = 12.0                       # drawn wall thickness
+
+    s.ground(gy, 40.0, 700.0)
+    s.text(455, 92, "S_E = 24 m² of exposed shell — a 3.0 × 2.0 × 1.8 m box, "
+                    "five faces", 16, th.primary, bold=True)
+
+    # --- roof: the lined cooling outlet and the sleeved service entry ------
+    s.rect(520, 128, 56, yt - 128, "none", th.fg, sw=2.2)
+    s.line(530, 128, 530, yt, th.accent, 2.0, dash="5,4")
+    s.line(566, 128, 566, yt, th.accent, 2.0, dash="5,4")
+    s.arrow(548, yt - 10, 548, 136, th.primary, 2.0)
+    s.text(592, 156, "lined cooling outlet", 14, th.fg, anchor="start")
+    s.text(592, 176, "a short lined duct, never a bare hole", 12, th.muted,
+           anchor="start")
+    s.line(310, yt, 310, 156, th.fg, 3.0)
+    s.circle(310, yt - 6, 9, "none", th.accent, sw=2.0)
+    s.text(310, 142, "cable and pipe entry, sealed sleeve", 13, th.fg)
+
+    # --- the shell, drawn as its three layers ------------------------------
+    s.rect(x0, yt, x1 - x0, gy - yt, "none", th.fg, sw=2.6)
+    s.rect(x0 + t * 0.5, yt + t * 0.5, x1 - x0 - t, gy - yt - t * 0.5,
+           "none", th.accent, sw=2.0, dash="6,4")
+    s.rect(x0 + t, yt + t, x1 - x0 - 2 * t, gy - yt - t, "none", th.muted,
+           sw=1.4, dash="2,4")
+    s.text(455, 240, "S_i = 30 m², ᾱ_i = 0.30  →  R_i = 12.9 m²", 15, th.fg)
+    s.text(455, 262, "wall build-up: sheet-steel mass, absorbent lining, "
+                     "perforated facing", 13, th.muted)
+
+    # --- the machine, isolated from the shell and from the slab ------------
+    s.rect(330, 356, 260, 88, th.panel, th.fg, rx=6, sw=2.2)
+    s.circle(460, 400, 17, th.primary)
+    s.circle(460, 400, 6, th.bg)
+    for mx in (352, 412, 508, 568):
+        s.path(f"M {mx} 444 q 8 7 0 13 q -8 7 0 13", stroke=th.secondary,
+               sw=2.0)
+    s.text(460, 342, "machine on vibration isolators", 15, th.fg, bold=True)
+    s.text(455, 496, "no rigid contact with the shell or with its slab", 14,
+           th.secondary)
+
+    # --- access door with its seal, and the gap at its foot ----------------
+    s.rect(218, 262, 24, 190, th.panel, th.fg, sw=2.0)
+    for dy in (268, 446):
+        s.line(218, dy, 242, dy, th.accent, 2.6)
+    s.rect(218, 452, 24, gy - 452, th.secondary, th.secondary, sw=1.0)
+    s.text(206, 252, "access door", 15, th.fg, anchor="end")
+    s.text(202, 272, "1.28 m², R = 15 dB", 13, th.muted, anchor="end",
+           mono=True)
+    s.text(206, 312, "compression seal", 13, th.accent, anchor="end")
+    s.line(208, 308, 216, 274, th.muted, 1.0)
+    s.text(206, 420, "unsealed gap at the foot", 13, th.secondary, anchor="end")
+    s.text(206, 440, "0.24 m² = 1 % of S_E", 13, th.secondary, anchor="end",
+           mono=True)
+    s.line(208, 446, 216, 460, th.muted, 1.0)
+
+    # --- the lined cooling inlet -------------------------------------------
+    s.rect(x1, 384, 96, 56, "none", th.fg, sw=2.2)
+    s.line(x1, 394, x1 + 96, 394, th.accent, 2.0, dash="5,4")
+    s.line(x1, 430, x1 + 96, 430, th.accent, 2.0, dash="5,4")
+    s.arrow(x1 + 88, 412, x1 + 12, 412, th.primary, 2.0)
+    s.text(700, 300, "lined cooling inlet", 14, th.fg, anchor="start")
+    s.text(700, 320, "cooling air needs a path", 12, th.muted,
+           anchor="start")
+
+    # --- dimensions --------------------------------------------------------
+    s.dim(x0, gy + 58, x1, gy + 58, "3.0 m", size=15)
+    s.dim(858, yt, 858, gy, "1.8 m", size=15)
+
+    # --- the equation and the two results ----------------------------------
+    s.text(40, 560, "IL = R − C,   C = 10 log10(0.3 + S_E/R_i) = 3.4 dB",
+           17, th.fg, anchor="start")
+    s.text(40, 586, "sealed shell (mean R = 32.3 dB): mean IL = 28.9 dB",
+           15, th.primary, anchor="start")
+    s.text(40, 610, "with the door: 21.4 dB — with the 1 % gap as well: "
+                    "15.1 dB, against the 10 log10(S_E/S_a) = 20 dB cap",
+           15, th.secondary, anchor="start")
+    s.text(40, 634, "an enclosure delivers its worst element, not its panels",
+           15, th.muted, anchor="start")
+
+
+def _d_distortion_bench(s: SVG, th: Theme) -> None:
+    """The bench every IEC 60268-3 distortion figure is defined on.
+
+    Clause 3.1.2 fixes the chain (source e.m.f. through the rated source
+    impedance, output terminals on the rated load impedance) and 3.1.3 the
+    operating point (rated conditions with the drive dropped 10 dB). The
+    lower band carries the three acceptance rules of 14.12.3.2 and 14.12.4.1,
+    which decide whether a reading may be believed at all.
+    """
+    ay = 196.0  # signal axis
+
+    def box(x: float, w: float, head: str, sub: str, col: str) -> None:
+        s.rect(x, ay - 44, w, 88, th.panel, col, rx=10, sw=2.2)
+        s.text(x + w / 2, ay - 8, head, 18, th.fg, bold=True)
+        s.text(x + w / 2, ay + 18, sub, 15, th.muted, mono=True)
+
+    # Generator -> rated source impedance -> amplifier under test.
+    box(46, 186, "Signal generator", "1 kHz sine", th.primary)
+    s.line(232, ay, 268, ay, th.fg, 2.0)
+    s.rect(268, ay - 15, 66, 30, th.bg, th.fg, rx=3, sw=2.0)
+    s.text(301, 154, "rated source", 14, th.muted)
+    s.text(301, 170, "impedance", 14, th.muted)
+    s.line(334, ay, 372, ay, th.fg, 2.0)
+    box(372, 206, "Amplifier under test", "Class A / B / D", th.secondary)
+
+    # Output terminals across the rated load, drawn to ground.
+    s.line(578, ay, 640, ay, th.fg, 2.0)
+    s.circle(640, ay, 5.0, th.bg, th.fg, 2.0)
+    s.line(640, ay, 640, ay + 74, th.fg, 2.0)
+    s.rect(618, ay + 74, 44, 62, th.bg, th.accent, rx=3, sw=2.2)
+    s.line(640, ay + 136, 640, ay + 162, th.fg, 2.0)
+    for k, hw in enumerate((22.0, 14.0, 7.0)):
+        s.line(640 - hw, ay + 162 + k * 7, 640 + hw, ay + 162 + k * 7, th.fg, 2.0)
+    s.text(676, ay + 96, "Rated load impedance", 15, th.accent, anchor="start",
+           bold=True)
+    s.text(676, ay + 116, "8 Ω non-inductive resistor,", 14, th.muted,
+           anchor="start")
+    s.text(676, ay + 134, "never a loudspeaker", 14, th.muted, anchor="start")
+
+    # Class D branch: the IEC 61606-1 analogue low-pass before the analyser.
+    s.line(640, ay, 700, ay, th.fg, 2.0)
+    s.rect(700, ay - 34, 152, 68, th.bg, th.muted, rx=8, sw=1.8, dash="7,5")
+    s.text(776, ay - 10, "Class D only:", 14, th.muted)
+    s.text(776, ay + 10, "IEC 61606-1", 14, th.muted, mono=True)
+    s.text(776, ay + 28, "analogue low-pass", 13, th.muted)
+
+    # Analyser tap, above the load and after the optional Class D filter.
+    s.line(776, ay - 34, 776, 116, th.fg, 2.0)
+    s.rect(596, 46, 256, 70, th.panel, th.primary, rx=10, sw=2.2)
+    s.text(724, 74, "Analyser / ADC", 18, th.fg, bold=True)
+    s.text(724, 98, "≥ 10 dB headroom", 14, th.muted)
+
+    # The operating point, called out on the generator side.
+    s.rect(46, 46, 400, 62, th.panel, th.secondary, rx=10, sw=2.0)
+    s.text(246, 70, "Standard measuring conditions (3.1.3)", 17, th.fg,
+           bold=True)
+    s.text(246, 94, "rated conditions (3.1.2) with the source e.m.f. −10 dB",
+           15, th.muted)
+    s.line(246, 108, 246, ay - 44, th.muted, 1.4, dash="6,5")
+
+    # Pre-conditioning and the reportable set.
+    s.text(46, 402, "Clause 9: hold the amplifier at that operating point for "
+           "1 h before the first reading.", 16, th.fg, anchor="start")
+
+    # The three acceptance rules the clauses make part of the method.
+    s.rect(46, 424, 806, 132, th.panel, th.accent, rx=12, sw=2.0)
+    s.text(66, 452, "Three checks, from the method itself", 17, th.fg,
+           anchor="start", bold=True)
+    checks = (
+        ("source THD ≥ 10 dB below the lowest distortion to be measured "
+         "(14.12.3.2 a)"),
+        ("generator muted: residual < 1/3 of the distortion voltage, or the "
+         "result is discarded (14.12.3.2 d)"),
+        ("highest significant harmonic inside the band: f₁ ≤ f_limit / n "
+         "(14.12.4.1 — 30 kHz and n = 5 give 6 kHz)"),
+    )
+    for k, txt in enumerate(checks):
+        s.circle(76, 476 + k * 24, 4.0, th.accent)
+        s.text(92, 481 + k * 24, txt, 15, th.muted, anchor="start")
+    s.text(852, 452, "AES17 band 20 Hz – 20 kHz", 15, th.primary, anchor="end",
+           mono=True)
+
+
+# ---------------------------------------------------------------------------
+# Swept-sine distortion: the two benches and the time budget
+# ---------------------------------------------------------------------------
+
+def _d_sweep_bench(s: SVG, th: Theme) -> None:
+    """What plays and records a sweep, electrically and acoustically.
+
+    Panel (a) is the electrical case, where a loopback channel fixes t = 0;
+    panel (b) the acoustic one, where the reflection-free time bounds what
+    may be called a free-field response. The strip below is the same time
+    axis the harmonic pre-arrivals live on, drawn for the page's own sweep.
+    """
+    # ---- panel (a): electrical, with the loopback reference ---------------
+    s.rect(40, 56, 386, 214, th.panel, th.muted, rx=12, sw=1.6)
+    s.text(233, 84, "(a) Electrical device under test", 18, th.fg, bold=True)
+
+    s.rect(64, 112, 118, 60, th.bg, th.primary, rx=8, sw=2.0)
+    s.text(123, 138, "Audio", 16, th.fg, bold=True)
+    s.text(123, 158, "interface", 16, th.fg, bold=True)
+    s.rect(268, 112, 132, 60, th.bg, th.secondary, rx=8, sw=2.0)
+    s.text(334, 138, "Device", 16, th.fg, bold=True)
+    s.text(334, 158, "under test", 16, th.fg, bold=True)
+    s.arrow(182, 128, 268, 128, th.fg, 1.8)
+    s.text(225, 120, "out", 13, th.muted)
+    s.arrow(400, 156, 400, 200, th.fg, 1.8)
+    s.line(400, 200, 123, 200, th.fg, 1.8)
+    s.arrow(160, 200, 123, 200, th.fg, 1.8)
+    s.text(262, 194, "in — channel 1", 13, th.muted)
+    s.line(182, 148, 216, 148, th.accent, 1.8, dash="7,4")
+    s.line(216, 148, 216, 232, th.accent, 1.8, dash="7,4")
+    s.line(216, 232, 123, 232, th.accent, 1.8, dash="7,4")
+    s.arrow(160, 232, 123, 232, th.accent, 1.8)
+    s.text(233, 252, "loopback — channel 2 fixes t = 0", 14, th.accent)
+
+    # ---- panel (b): acoustic, with the first reflection --------------------
+    s.rect(444, 56, 416, 214, th.panel, th.muted, rx=12, sw=1.6)
+    s.text(652, 82, "(b) Loudspeaker in a room", 18, th.fg, bold=True)
+    s.text(652, 104, "source and microphone at 1.20 m over a hard floor", 14,
+           th.muted)
+    gy = 250.0
+    s.ground(gy, 474.0, 834.0, hatch=18)
+
+    sx, mx, hy = 546.0, 762.0, 178.0
+    s.line(sx, hy + 24, sx, gy, th.fg, 2.0)
+    s.rect(sx - 24, hy - 28, 48, 52, th.bg, th.primary, rx=5, sw=2.0)
+    s.circle(sx, hy, 10, th.primary)
+    s.line(mx, hy + 6, mx, gy, th.fg, 2.0)
+    s.rect(mx - 20, hy - 6, 32, 12, th.primary, rx=4)
+    s.rect(mx + 12, hy - 4, 10, 8, th.fg, rx=2)
+
+    s.line(sx + 24, hy, mx - 20, hy, th.fg, 2.0)
+    s.dim(sx, hy, mx, hy, "d = 1.00 m", offset=-38, size=15)
+    fx = (sx + mx) / 2
+    s.line(sx, hy, fx, gy, th.secondary, 1.8, dash="8,5")
+    s.line(fx, gy, mx, hy, th.secondary, 1.8, dash="8,5")
+    s.text(fx, gy - 10, "reflected path 2.60 m", 14, th.secondary)
+
+    # ---- what the room costs, under both panels ---------------------------
+    s.text(450, 296, "Reflection-free time t_g = (2.60 − 1.00) m / (343 m/s) "
+           "= 4.7 ms: past that the record is the room, not the loudspeaker.",
+           16, th.fg)
+
+    # ---- the shared time budget of the harmonic arrivals -------------------
+    x0, x1, ty = 90.0, 830.0, 412.0
+    s.text(450, 336, "The recording, on the sweep's own time axis: "
+           "f₁ = 20 Hz, f₂ = 6 kHz, T = 4 s, so L = T / ln(f₂/f₁) = 0.70 s",
+           17, th.fg, bold=True)
+    s.line(x0, ty, x1, ty, th.fg, 2.0)
+    s.arrow(x1 - 30, ty, x1, ty, th.fg, 2.0)
+
+    def tx(t: float) -> float:
+        """Map an arrival time in seconds onto the strip (−1.0 s … +0.3 s)."""
+        return x0 + (t + 1.0) / 1.3 * (x1 - 40 - x0)
+
+    for t, lab, col, h in ((0.0, "h₁ (linear)", th.primary, 46.0),
+                           (-0.486, "h₂  −0.49 s", th.secondary, 34.0),
+                           (-0.770, "h₃  −0.77 s", th.accent, 26.0)):
+        s.line(tx(t), ty, tx(t), ty - h, col, 3.0)
+        s.text(tx(t), ty - h - 9, lab, 15, col, bold=True)
+    s.text(tx(0.0), ty + 22, "t = 0", 14, th.muted)
+
+    # The per-order window against the closest spacing.
+    s.rect(tx(-0.486), ty + 14, tx(-0.202) - tx(-0.486), 26,
+           th.panel, th.muted, rx=5, sw=1.4)
+    s.text((tx(-0.486) + tx(-0.202)) / 2, ty + 62,
+           "per-order window: 8192 samples = 0.17 s at 48 kHz", 14, th.muted)
+    s.dim(tx(-0.770), ty + 104, tx(-0.486), ty + 104,
+          "L ln(3/2) = 0.28 s: the closest pair of arrivals", offset=0,
+          size=15)
+
+    s.text(40, ty + 144, "Record until the decay has died, or the pre-arrivals "
+           "wrap round the circular deconvolution into the end of h₁.",
+           16, th.fg, anchor="start")
+    s.text(40, ty + 168, "State the drive amplitude and the fade with the "
+           "result, and pass the same fade to the analysis.",
+           16, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# IEC 60268-5 polar measurement
+# ---------------------------------------------------------------------------
+
+def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
+    """How a polar cut is taken (IEC 60268-5 23.1.2), in plan.
+
+    The loudspeaker turns and the microphone does not: the reference point
+    sits on the rotation axis so the measuring distance never changes, and
+    the drive is retrimmed per band so that the on-axis pressure is held
+    constant. The inset is the same cut on the IEC 60263 reference circle.
+    """
+    import math
+
+    cx, cy, r = 292.0, 300.0, 176.0
+
+    # Anechoic boundary.
+    s.rect(40, 62, 512, 438, th.bg, th.fg, sw=2.4)
+    for wx in range(44, 532, 40):
+        s.path(f"M {wx} {62} L {wx + 40} {62} L {wx + 20} {88} Z",
+               fill=th.panel, stroke=th.muted, sw=1.0)
+        s.path(f"M {wx} {500} L {wx + 40} {500} L {wx + 20} {474} Z",
+               fill=th.panel, stroke=th.muted, sw=1.0)
+    for wy in range(90, 466, 40):
+        s.path(f"M {40} {wy} L {40} {wy + 40} L {66} {wy + 20} Z",
+               fill=th.panel, stroke=th.muted, sw=1.0)
+        s.path(f"M {552} {wy} L {552} {wy + 40} L {526} {wy + 20} Z",
+               fill=th.panel, stroke=th.muted, sw=1.0)
+    s.text(58, 110, "Anechoic room, plan view", 15, th.muted, anchor="start")
+
+    # The measuring arc the microphone is stepped along.
+    s.path(f"M {cx + r:.1f} {cy:.1f} A {r} {r} 0 0 0 {cx - r:.1f} {cy:.1f}",
+           stroke=th.accent, sw=1.8, dash="6,6")
+    for ang in (30, 60, 90, 120, 150):
+        a = math.radians(ang)
+        s.circle(cx + r * math.cos(a), cy - r * math.sin(a), 3.6, th.accent)
+    s.text(cx - r + 4, cy - 14, "180°", 14, th.accent)
+    s.text(cx, cy - r - 14, "90°", 14, th.accent)
+    s.text(cx + 122, cy - 116, "θ stepped by 10° or 15°", 14, th.accent)
+
+    # Turntable, with the reference point over the rotation axis.
+    s.ellipse(cx, cy, 70, 28, th.panel, th.muted, sw=1.8)
+    s.circle(cx, cy, 4.0, th.fg)
+
+    # Cabinet, seen from above, radiating along the reference axis.
+    s.rect(cx - 32, cy - 24, 28, 48, th.panel, th.primary, rx=4, sw=2.0)
+    s.line(cx - 4, cy - 24, cx - 4, cy + 24, th.primary, 2.4)
+
+    # Reference axis at 0 degrees, out to the fixed microphone.
+    s.line(cx, cy, cx + r + 40, cy, th.muted, 1.6, dash="8,5")
+    s.text(cx + 96, cy - 14, "reference axis  0°", 15, th.muted)
+    mx = cx + r
+    s.rect(mx - 2, cy - 8, 38, 16, th.primary, rx=5)
+    s.rect(mx - 16, cy - 5, 14, 10, th.fg, rx=3)
+    s.text(mx + 16, cy + 32, "measuring microphone", 14, th.fg)
+
+    # The two facts the geometry exists to guarantee.
+    s.line(cx - 30, cy + 22, cx - 116, cy + 78, th.muted, 1.2, dash="4,4")
+    s.text(60, cy + 116, "reference point on the rotation axis:", 14,
+           th.muted, anchor="start")
+    s.text(60, cy + 134, "r never changes as θ is swept", 14,
+           th.muted, anchor="start")
+    s.dim(cx, cy, mx - 16, cy, "r = 2 m", offset=150, size=16)
+
+    # The drive rule that makes the cut a pattern rather than a response.
+    s.rect(596, 62, 264, 128, th.panel, th.secondary, rx=10, sw=2.0)
+    s.text(728, 90, "Drive condition (23.1.2.3)", 16, th.fg, bold=True)
+    s.text(728, 114, "input voltage retrimmed at each", 14, th.muted)
+    s.text(728, 132, "frequency or band so that L_p on", 14, th.muted)
+    s.text(728, 150, "the reference axis stays constant", 14, th.muted)
+    s.text(728, 176, "500 Hz · 1 k · 2 k · 4 k · 8 k", 15, th.secondary)
+
+    # Inset: the same cut on the IEC 60263 25 dB reference circle.
+    ix, iy, ir = 728.0, 344.0, 108.0
+    s.text(728, 216, "The cut, on the IEC 60263 circle", 16, th.fg, bold=True)
+    for k, frac in enumerate((1.0, 0.8, 0.6, 0.4, 0.2)):
+        s.circle(ix, iy, ir * frac, "none", th.muted, 1.0)
+        if k:
+            s.text(ix + 5, iy - ir * frac + 13, f"−{k * 5}", 12, th.muted,
+                   anchor="start")
+    s.line(ix - ir - 12, iy, ix + ir + 12, iy, th.muted, 1.0)
+    s.line(ix, iy - ir - 12, ix, iy + ir + 12, th.muted, 1.0)
+    pts = []
+    for ang in range(-180, 181, 5):
+        a = math.radians(ang)
+        # A first-order cut, drawn on the clause-3 convention: the full
+        # radius is 25 dB and the reference-axis level is the outer ring.
+        mag = max(abs((1.0 + math.cos(a)) / 2.0), 1e-3)
+        lev = max(-25.0, 20.0 * math.log10(mag))
+        rad = ir * (25.0 + lev) / 25.0
+        pts.append(f"{ix + rad * math.sin(a):.1f} {iy - rad * math.cos(a):.1f}")
+    s.path("M " + " L ".join(pts) + " Z", stroke=th.primary, sw=2.2)
+    s.text(728, iy + ir + 38, "outer ring = the reference-axis level,", 14,
+           th.muted)
+    s.text(728, iy + ir + 56, "full radius = 25 dB (clause 3)", 14, th.muted)
+
+    s.text(450, 542, "Directivity index: free field on axis against a "
+           "reverberation room, D_i = L_ax − L_p + 10 lg(T/T₀) − 10 lg(V/V₀) "
+           "+ 25 dB (23.3.2.1),", 16, th.fg)
+    s.text(450, 566, "or by integrating these polar curves over the sphere "
+           "(23.3.2.2).", 16, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# IEC 60268-4: the three fields a microphone sensitivity can be defined in
+# ---------------------------------------------------------------------------
+
+def _d_microphone_references(s: SVG, th: Theme) -> None:
+    """Free field, diffuse field and pressure, on one capsule.
+
+    The same capsule in three sound fields defines three different
+    sensitivities (11.2.1, 11.2.2, 11.2.4). They agree while the capsule is
+    small against the wavelength and separate once it is not, which is the
+    whole reason the *type* has to be quoted with the number.
+    """
+    import math
+
+    tops, w = (34.0, 320.0, 606.0), 260.0
+    heads = ("Free field (11.2.1)", "Diffuse field (11.2.2)",
+             "Pressure (11.2.4)")
+    for x0, head in zip(tops, heads, strict=True):
+        s.rect(x0, 54, w, 306, th.panel, th.muted, rx=12, sw=1.6)
+        s.text(x0 + w / 2, 80, head, 18, th.fg, bold=True)
+
+    def capsule(cx: float, cy: float) -> None:
+        """One capsule glyph, diaphragm facing left along its reference axis."""
+        s.rect(cx - 4, cy - 15, 54, 30, th.panel, th.primary, rx=6, sw=2.0)
+        s.rect(cx - 18, cy - 12, 14, 24, th.fg, rx=3)
+        s.line(cx - 18, cy - 12, cx - 18, cy + 12, th.secondary, 2.6)
+
+    # --- 1: free field, plane wave on the reference axis --------------------
+    x0 = tops[0]
+    cx, cy = x0 + 168.0, 176.0
+    for k in range(4):
+        s.path(f"M {x0 + 40 + k * 22} {cy - 52} q 10 52 0 104",
+               stroke=th.primary, sw=1.6)
+    s.arrow(x0 + 118, cy, x0 + 140, cy, th.primary, 1.8)
+    capsule(cx, cy)
+    s.line(cx - 18, cy, x0 + 246, cy, th.muted, 1.2, dash="7,5")
+    s.text(x0 + w / 2, cy + 78, "one source on the reference axis,", 14,
+           th.muted)
+    s.text(x0 + w / 2, cy + 96, "far enough that r ≥ d,", 14, th.muted)
+    s.text(x0 + w / 2, cy + 114, "r ≥ d²/λ and r ≥ 3 × the source", 14,
+           th.muted)
+    s.text(x0 + w / 2, cy + 144, "M_ff : the undisturbed", 16, th.primary,
+           bold=True)
+    s.text(x0 + w / 2, cy + 164, "pressure of the plane wave", 15, th.muted)
+
+    # --- 2: diffuse field, rays from every direction ------------------------
+    x1 = tops[1]
+    cx, cy = x1 + 130.0, 176.0
+    for ang in range(0, 360, 30):
+        a = math.radians(ang)
+        s.arrow(cx + 96 * math.cos(a), cy + 96 * math.sin(a),
+                cx + 40 * math.cos(a), cy + 40 * math.sin(a), th.accent, 1.4)
+    capsule(cx - 22, cy)
+    s.text(x1 + w / 2, cy + 78, "sound from every direction,", 14, th.muted)
+    s.text(x1 + w / 2, cy + 96, "with equal probability", 14, th.muted)
+    s.text(x1 + w / 2, cy + 114, "(a reverberation room)", 14, th.muted)
+    s.text(x1 + w / 2, cy + 144, "M_diff : the r.m.s. of M(θ)", 16, th.accent,
+           bold=True)
+    s.text(x1 + w / 2, cy + 164, "D = 20 lg(M₀ / M_diff)", 15, th.muted)
+
+    # --- 3: pressure, the capsule closed into a coupler ---------------------
+    x2 = tops[2]
+    cx, cy = x2 + 150.0, 176.0
+    s.rect(cx - 118, cy - 48, 122, 96, th.bg, th.secondary, rx=8, sw=2.2)
+    s.circle(cx - 92, cy, 16, th.panel, th.muted, 1.6)
+    s.arrow(cx - 92, cy + 30, cx - 92, cy - 30, th.secondary, 1.6)
+    capsule(cx, cy)
+    s.text(cx - 56, cy - 62, "cavity small against λ", 14, th.muted)
+    s.text(x2 + w / 2, cy + 78, "a coupler or a calibrator:", 14, th.muted)
+    s.text(x2 + w / 2, cy + 96, "the pressure the capsule", 14, th.muted)
+    s.text(x2 + w / 2, cy + 114, "itself replaces", 14, th.muted)
+    s.text(x2 + w / 2, cy + 144, "M_p : pressure at", 16, th.secondary,
+           bold=True)
+    s.text(x2 + w / 2, cy + 164, "the acoustic entry", 15, th.muted)
+
+    # --- the bench the first two are realised on ----------------------------
+    s.rect(34, 380, 832, 116, th.panel, th.primary, rx=12, sw=2.0)
+    s.text(54, 408, "The bench (clauses 5.5.2, 5.6.2, 5.7)", 17, th.fg,
+           anchor="start", bold=True)
+    rules = (
+        ("anechoic room; the spherical wave counts as plane at least λ/2 from "
+         "the centre of curvature at the lowest frequency"),
+        ("substitution: the microphone under test and a calibrated reference "
+         "at the same point, one after the other (highest accuracy)"),
+        ("simultaneous comparison at two nearby points only after showing it "
+         "agrees with substitution within ± 1 dB"),
+    )
+    for k, txt in enumerate(rules):
+        s.circle(64, 432 + k * 22, 4.0, th.primary)
+        s.text(80, 437 + k * 22, txt, 14, th.muted, anchor="start")
+    s.text(846, 408, "overall accuracy ± 2 dB or better", 15, th.primary,
+           anchor="end", mono=True)
+
+    s.text(450, 528, "Polar cuts (13.1.2 a): distance, sound pressure and "
+           "frequency held constant while θ is stepped, preferably by 10° or "
+           "15°,", 16, th.fg)
+    s.text(450, 552, "at the octave centres 125 Hz to 16 kHz, with the "
+           "reference axis as 0° of the polar diagram.", 16, th.muted)

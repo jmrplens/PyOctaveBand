@@ -15,8 +15,8 @@ references:
     title: "Predicting outdoor sound"
     edition: "2.ª ed."
     publisher: "CRC Press"
-    doi: "10.1201/9780429470141"
-    note: "Capítulo 11 (refracción por gradientes de viento y temperatura, modelos de rayos y zonas de sombra). ISBN 978-1-138-30655-2."
+    doi: "10.1201/9780429470806"
+    note: "Capítulo 11 (refracción por gradientes de viento y temperatura, modelos de rayos y zonas de sombra). ISBN 978-1-4987-4007-4."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -57,224 +57,13 @@ dos oye algo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_es.svg" alt="Escena de refracción atmosférica: una fuente a 2 m del suelo con un receptor a 350 m por cada lado, flechas de viento que crecen con la altura y un recuadro con los perfiles de velocidad efectiva c_eff(z) = c(z) + u(z); a favor del viento los rayos se curvan de vuelta al suelo y el receptor recibe la llegada directa más una rebotada en el suelo, y contra el viento todos los rayos se curvan hacia arriba y se abre una sombra acústica en el suelo a partir de unos 220 m que engulle al receptor situado dentro" width="92%" />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction_es.webp" alt="Dos paneles apilados para una atmósfera con refracción hacia arriba sobre pradera. Arriba: un abanico de rayos sonoros que sale de una fuente a 2 m del suelo se curva hacia arriba, de modo que más allá de un límite de zona de sombra a punteado cerca de 110 m ningún rayo permanece próximo al suelo. Abajo: el campo de nivel relativo GFPE sobre distancia y altura muestra lóbulos de interferencia rojos cerca de la fuente y una sombra acústica azul profunda que se extiende hacia arriba y a la derecha, con su borde siguiendo el mismo límite." width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction_es.webp" alt="Dos paneles apilados para una atmósfera con refracción hacia arriba sobre pradera. Arriba: un abanico de rayos sonoros que sale de una fuente a 2 m del suelo se curva hacia arriba, de modo que más allá de un límite punteado de zona de sombra cerca de 110 m ningún rayo permanece próximo al suelo. Abajo: el campo de nivel relativo GFPE sobre distancia y altura muestra lóbulos de interferencia rojos cerca de la fuente y una sombra acústica azul profunda que se extiende hacia arriba y a la derecha, con su borde siguiendo el mismo límite." width="88%" loading="eager" />
 
-## 1. Perfil de velocidad efectiva del sonido
-
-Una atmósfera en movimiento (con viento) se aproxima bien por una en reposo con
-la **velocidad efectiva del sonido** $c_\text{eff}(z) = c(z) + u(z)$, la
-velocidad
-adiabática más la componente del viento en la dirección de propagación
-(Salomons Ec. 4.4). Dos formas de perfil cubren la mayoría de los casos de la
-capa superficial:
-
-- un perfil **lineal** $c_\text{eff}(z) = c_0 + g\,z$
-  (`linear_sound_speed_profile`), la atmósfera refractante más sencilla y la
-  de geometría de rayos exacta;
-- el perfil **logarítmico** realista de la capa superficial
-  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
-  Salomons Ec. 4.5), con $b \approx +1\ \text{m/s}$ para una atmósfera típica
-  con refracción hacia abajo, $b \approx -1\ \text{m/s}$ para una con
-  refracción hacia arriba, y $z_0$ la longitud
-  de rugosidad (unos 0,1 m para pradera).
-
-Un gradiente positivo (velocidad del sonido creciente con la altura) curva los
-rayos **hacia abajo**, hacia el receptor (propagación favorable); un gradiente
-negativo los curva **hacia arriba** y abre una **sombra** acústica cerca del
-suelo.
-
-```python
-from phonometry import log_linear_sound_speed_profile
-
-perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # hacia arriba
-perfil.speed_at(10.0)   # velocidad efectiva del sonido a 10 m del suelo
-perfil.plot()           # c_eff(z) con la altura en el eje vertical
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles_es.svg" alt="Dos perfiles logarítmicos de velocidad efectiva del sonido en los primeros 60 metros de atmósfera, con la altura en el eje vertical: el perfil con refracción hacia abajo (b = +1 m/s) se curva a la derecha del valor de 340 m/s en el suelo y el de refracción hacia arriba (b = -1 m/s) se curva a la izquierda, ambos con su cambio más brusco concentrado en los primeros metros sobre la longitud de rugosidad" width="62%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import log_linear_sound_speed_profile
-
-# Las dos capas superficiales canónicas de la Ec. 4.5 de Salomons sobre pradera.
-bajada = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
-subida = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
-ax = bajada.plot(color="#1f77b4", language="es")
-subida.plot(ax=ax, color="#d62728", language="es")
-plt.show()
-```
-
-</details>
-
-## 2. Modelo de rayos
-
-En acústica geométrica un rayo sonoro cumple la ley de Snell
-$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Ec. 4.3). `atmospheric_ray_paths` la integra
-con un esquema Runge-Kutta de cuarto orden, marchando en distancia y reflejando
-especularmente en el suelo, y devuelve los caminos curvos, los puntos de
-inflexión, los tiempos de propagación y el número de reflexiones en el suelo.
-
-```python
-import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
-
-perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
-rayos = atmospheric_ray_paths(perfil, source_height=2.0,
-                              launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                              max_range=600.0)
-rayos.turning_points      # puntos de inflexión por rayo
-rayos.plot()              # el abanico de rayos curvados (necesita matplotlib)
-```
-
-La figura de cabecera de la página muestra este abanico con refracción hacia
-arriba abriendo su sombra. El caso favorable es su imagen especular: con
-refracción **hacia abajo** ($b = +1$) los rayos rasantes se curvan de vuelta
-al suelo, rebotan y transportan la energía a lo largo de la superficie en vez
-de perderla hacia arriba.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan_es.svg" alt="Un abanico de rayos sonoros trazados desde una fuente a 2 m del suelo a través de una atmósfera logarítmica con refracción hacia abajo: los ángulos de lanzamiento rasantes se curvan de vuelta hacia abajo, se reflejan en el suelo y avanzan en saltos repetidos hasta 600 m, mientras los rayos más empinados se salen del marco de 40 m" width="88%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
-
-# Refracción hacia abajo: el espejo favorable del caso con sombra.
-perfil = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
-rayos = atmospheric_ray_paths(perfil, source_height=2.0,
-                              launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                              max_range=600.0, n_steps=600)
-rayos.plot(language="es")   # los rayos rasantes vuelven al suelo y rebotan a lo largo
-plt.show()
-```
-
-</details>
-
-### Geometría en forma cerrada (gradiente lineal)
-
-Para un perfil **lineal** cada rayo es un **arco de círculo** exacto de radio de
-curvatura (Salomons Sec. 4.4; Attenborough Cap. 11):
-
-$$
-R_c = \frac{c_0}{|g|\cos\theta_0},
-$$
-
-expuesto como `ray_curvature_radius`. Un rayo lanzado con ángulo $\theta_0$ en
-refracción hacia abajo alcanza su punto de inflexión a la altura
-$R_c(1 - \cos\theta_0)$. Para un perfil lineal con **refracción hacia arriba**
-el rayo
-que roza el suelo delimita una región más allá de la cual no llega ningún rayo
-directo ni reflejado una vez, a la **distancia de zona de sombra** en forma
-cerrada (`shadow_zone_distance`):
-
-$$
-x_\text{sombra} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|}.
-$$
-
-Estas formas cerradas son el oráculo exacto del trazador de rayos: un ajuste de
-círculo a un rayo trazado recupera $R_c$ con precisión de máquina.
-
-## 3. Ecuación parabólica (PE de la función de Green)
-
-La **ecuación parabólica** es el método de referencia para la refracción y las
-zonas de sombra a larga distancia. Sustituye la ecuación de ondas por una
-ecuación unidireccional (saliente) válida dentro de un ángulo de elevación
-límite, y la marcha en distancia sobre una malla distancia-altura.
-`atmospheric_parabolic_equation` implementa la **PE de la función de Green**
-(GFPE, Salomons apéndice H), el miembro atmosférico de la misma familia
-split-step de Fourier que la
-[`parabolic_equation`](/phonometry/es/underwater/underwater-solvers/) oceánica.
-Cada paso en distancia transforma el campo al dominio del número de onda
-vertical, aplica el propagador de espacio libre junto con la reflexión del suelo
-de impedancia finita $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons
-Ec. H.28), transforma de vuelta, añade el residuo de onda de superficie del
-polo de la reflexión (el tercer término de la Ec. H.49) y aplica la pantalla
-de fase de refracción $\exp(i\,\Delta r\,(k(z) - k_a))$ (Ec. H.58). La fuente
-es un **arranque gaussiano** con su imagen en el suelo (Ecs. G.64, G.76) y una
-**capa absorbente** en la parte superior de la malla suprime las reflexiones
-del contorno superior. El resultado es el **nivel sonoro relativo**
-$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB respecto al campo
-libre) en todo el plano distancia-altura.
-
-```python
-from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
-
-perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # hacia arriba
-pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
-                                    flow_resistivity=200e3,  # pradera
-                                    max_range=600.0, max_height=40.0)
-pe.level_at_height(2.0)   # nivel relativo frente a distancia a 2 m
-pe.plot()                 # el campo de nivel relativo distancia-altura (necesita matplotlib)
-```
-
-Basta cortar el campo a la altura del receptor para que toda la historia de
-esta página quepa en una figura: con todo lo demás idéntico, solo el signo del
-gradiente mueve el nivel de 400 Hz a 600 m en más de 30 dB.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range_es.svg" alt="Nivel sonoro relativo GFPE frente a la distancia a un receptor a 2 m de altura sobre pradera a 400 Hz para tres atmósferas. La curva con refracción hacia abajo se recupera del valle del efecto suelo y vuelve hacia 0 dB respecto al campo libre, la curva homogénea a trazos decae suavemente hasta unos -27 dB a 600 m, y la curva con refracción hacia arriba se hunde por debajo de -40 dB más allá del límite punteado de la zona de sombra en forma cerrada cerca de 110 m" width="88%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import warnings
-
-import matplotlib.pyplot as plt
-
-from phonometry import (
-    atmospheric_parabolic_equation,
-    linear_sound_speed_profile,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
-)
-
-casos = [
-    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Hacia abajo (b = +1 m/s)"),
-    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogénea (b = 0)"),
-    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Hacia arriba (b = -1 m/s)"),
-]
-fig, ax = plt.subplots(figsize=(11, 6.2))
-with warnings.catch_warnings():
-    # El PorousAbsorberWarning: un suelo de 200 kPa.s/m2 hace trabajar al
-    # modelo de impedancia de un parámetro por debajo de su rango de ajuste
-    # publicado, como todo suelo exterior (ver «Elección de la impedancia del
-    # suelo» en la guía de efecto suelo).
-    warnings.simplefilter("ignore")
-    for perfil, etiqueta in casos:
-        pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
-                                            flow_resistivity=200e3,
-                                            max_range=600.0, max_height=40.0)
-        ax.plot(pe.ranges, pe.level_at_height(2.0), label=etiqueta)
-# El límite en forma cerrada del gradiente lineal equivalente hacia arriba
-# (su media a 10 m), la línea punteada de la figura.
-subida = casos[2][0]
-grad = float(subida.speed_at(10.0) - 340.0) / 10.0
-ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
-           color="k", ls=":", label="Límite de la zona de sombra")
-ax.set(xlabel="Distancia [m]", ylabel="Nivel respecto al campo libre [dB]",
-       ylim=(-40, 10))
-ax.legend()
-plt.show()
-```
-
-</details>
-
-La impedancia del suelo se proporciona directamente (`impedance=`, un valor
-complejo normalizado en el convenio $e^{-i\omega t}$ de Salomons, con
-$\operatorname{Im}(Z) > 0$ para un suelo pasivo), como un
-`PorousMediumResult`, o a partir de una
-`flow_resistivity` efectiva mediante los
-[modelos porosos](/phonometry/es/materials/absorbers/porous-absorbers/) del dominio de
-materiales; los modelos porosos trabajan en el convenio opuesto
-$e^{+j\omega t}$, así que su impedancia se conjuga internamente.
+*Las dos mitades de la misma atmósfera. El abanico de rayos dice **dónde**
+empieza la sombra (todos los rayos han abandonado el suelo hacia los 110 m) y el
+campo GFPE dice **cuán profunda** es una vez dentro. Ninguna de las dos imágenes
+existe en un método de ingeniería por bandas de octava: esto es lo que $C_{met}$
+sustituye por un solo número.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -331,6 +120,320 @@ plt.show()
 
 </details>
 
+## 1. Perfil de velocidad efectiva del sonido
+
+Una atmósfera en movimiento (con viento) se aproxima bien por una en reposo con
+la **velocidad efectiva del sonido** $c_\text{eff}(z) = c(z) + u(z)$, la
+velocidad
+adiabática más la componente del viento en la dirección de propagación
+(Salomons Ec. 4.4). Dos formas de perfil cubren la mayoría de los casos de la
+capa superficial:
+
+- un perfil **lineal** $c_\text{eff}(z) = c_0 + g\,z$
+  (`linear_sound_speed_profile`), la atmósfera refractante más sencilla y la
+  de geometría de rayos exacta;
+- el perfil **logarítmico** realista de la capa superficial
+  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
+  Salomons Ec. 4.5), con $b \approx +1\ \text{m/s}$ para una atmósfera típica
+  con refracción hacia abajo, $b \approx -1\ \text{m/s}$ para una con
+  refracción hacia arriba, y $z_0$ la longitud
+  de rugosidad (unos 0,1 m para pradera).
+
+Un gradiente positivo (velocidad del sonido creciente con la altura) curva los
+rayos **hacia abajo**, hacia el receptor (propagación favorable); un gradiente
+negativo los curva **hacia arriba** y abre una **sombra** acústica cerca del
+suelo.
+
+### Fijar `b` y `z0` a partir del emplazamiento
+
+$b$ no es un ajuste al gusto. El perfil efectivo es
+$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_{SR}(z)$
+(Attenborough y Van Renterghem 2021, Ec. 1.18), así que el coeficiente del
+término logarítmico sale de una velocidad de viento medida a una altura
+declarada en cuanto se fija $z_0$: igualar el perfil a esa altura da
+$b = u_{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. Una lectura de 4 m/s en un mástil de
+10 m soplando justo a lo largo de la trayectoria de propagación sobre pradera
+($z_0 = 0,1$ m) da por tanto $b = 4 / \ln(101) = 0,87$ m/s, cerca del «+1 m/s
+típico» de arriba, y `log_linear_sound_speed_profile(0.867)` devuelve
+efectivamente 344,0 m/s a 10 m.
+
+En $c_\text{eff}$ solo entra la **componente en la dirección de propagación**:
+$u_{SR}(z) = u(z)\cos(\pi - \alpha)$ con $\alpha$ el ángulo entre la dirección
+meteorológica del viento (la dirección *desde* la que sopla) y la dirección en
+que viaja el sonido (Ec. 1.19). Esos mismos 4 m/s a 60° de la trayectoria valen
+2 m/s a lo largo de ella, así que $b = 0,43$ m/s a favor del viento y
+$-0,43$ m/s en contra: un viento, dos atmósferas, que es toda la asimetría a
+favor / en contra en una línea de aritmética. Es también la física que hay
+detrás de la ventana de condiciones favorables de ISO 9613-2 (viento dentro de
+±45° de la línea fuente-receptor, de 1 a 5 m/s medidos entre 3 y 11 m sobre el
+suelo), citada entera en
+[Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/#qué-significan-las-condiciones-favorables-a-la-propagación).
+
+La temperatura no tiene dirección, y por eso una noche despejada y en calma
+refracta hacia abajo en *todas* las direcciones. Cerca de 10 °C la velocidad del
+sonido cambia unos 0,6 m/s por kelvin, así que una inversión de 2 K entre el
+suelo y los 10 m aporta $b_T \approx 1,2 / \ln(101) = 0,26$ m/s sin viento
+alguno. Viento y temperatura se suman: una brisa suave a favor en una noche de
+inversión es la condición clásica de queja.
+
+$z_0$ es una propiedad de la cubierta del terreno, no del tiempo. Attenborough y
+Van Renterghem citan un rango que va de 0,0002 m para agua en calma a unos 0,1 m
+para hierba (§1.4), usan 0,02 m para los perfiles resueltos de su Figura 1.20 y
+estiman 0,1 m para la torre meteorológica cuyo año de datos ajustan con esta
+forma de perfil; las cubiertas más rugosas (cultivos con obstáculos dispersos,
+setos, matorral, terreno suburbano) van de unas décimas de metro a cerca de 1 m
+y conviene tomarlas de la clasificación de rugosidad de Davenport. El
+`roughness_length=0.1` por defecto de `log_linear_sound_speed_profile` es el
+valor de pradera, así que es el primer argumento que hay que cambiar cuando el
+emplazamiento no es un campo.
+
+```python
+from phonometry import log_linear_sound_speed_profile
+
+perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # hacia arriba
+perfil.speed_at(10.0)   # velocidad efectiva del sonido a 10 m del suelo
+perfil.plot()           # c_eff(z) con la altura en el eje vertical
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles_es.svg" alt="Dos perfiles logarítmicos de velocidad efectiva del sonido en los primeros 60 metros de atmósfera, con la altura en el eje vertical: el perfil con refracción hacia abajo (b = +1 m/s) se curva a la derecha del valor de 340 m/s en el suelo y el de refracción hacia arriba (b = -1 m/s) se curva a la izquierda, ambos con su cambio más brusco concentrado en los primeros metros sobre la longitud de rugosidad" width="62%" />
+
+*Casi toda la refracción se decide en los primeros metros: sobre pradera, el
+perfil logarítmico gasta la mitad de su variación de 60 m por debajo de en torno
+a 1 m, y por eso las alturas de fuente y receptor importan mucho más en
+exteriores de lo que sugiere la distancia entre ellas.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import log_linear_sound_speed_profile
+
+# Las dos capas superficiales canónicas de la Ec. 4.5 de Salomons sobre pradera.
+bajada = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
+subida = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
+ax = bajada.plot(color="#1f77b4", language="es")
+subida.plot(ax=ax, color="#d62728", language="es")
+plt.show()
+```
+
+</details>
+
+## 2. Modelo de rayos
+
+En acústica geométrica un rayo sonoro cumple la ley de Snell
+$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Ec. 4.3). `atmospheric_ray_paths` la integra
+con un esquema Runge-Kutta de cuarto orden, marchando en distancia y reflejando
+especularmente en el suelo, y devuelve los caminos curvos, los puntos de
+retorno, los tiempos de propagación y el número de reflexiones en el suelo.
+
+```python
+import numpy as np
+from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+
+perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
+rayos = atmospheric_ray_paths(perfil, source_height=2.0,
+                              launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                              max_range=600.0)
+rayos.turning_points      # puntos de retorno por rayo
+rayos.plot()              # el abanico de rayos curvados (necesita matplotlib)
+```
+
+La figura de cabecera de la página muestra este abanico con refracción hacia
+arriba abriendo su sombra. El caso favorable es su imagen especular: con
+refracción **hacia abajo** ($b = +1$) los rayos rasantes se curvan de vuelta
+al suelo, rebotan y transportan la energía a lo largo de la superficie en vez
+de perderla hacia arriba.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan_es.svg" alt="Un abanico de rayos sonoros trazados desde una fuente a 2 m del suelo a través de una atmósfera logarítmica con refracción hacia abajo: los ángulos de lanzamiento rasantes se curvan de vuelta hacia abajo, se reflejan en el suelo y avanzan en saltos repetidos hasta 600 m, mientras los rayos más empinados se salen del marco de 40 m" width="88%" />
+
+*El caso favorable, y la razón de que una medida a favor del viento sea
+repetible y una en contra no lo sea: los rayos rasantes vuelven al suelo y siguen
+saltando, así que no hay sombra en la que caer ni frontera cuya posición dependa
+de un gradiente que nadie midió.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+
+# Refracción hacia abajo: el espejo favorable del caso con sombra.
+perfil = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
+rayos = atmospheric_ray_paths(perfil, source_height=2.0,
+                              launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                              max_range=600.0, n_steps=600)
+rayos.plot(language="es")   # los rayos rasantes vuelven al suelo y rebotan a lo largo
+plt.show()
+```
+
+</details>
+
+### Geometría en forma cerrada (gradiente lineal)
+
+Para un perfil **lineal** cada rayo es un **arco de círculo** exacto de radio de
+curvatura (Salomons Sec. 4.4; Attenborough Cap. 11):
+
+$$
+R_c = \frac{c_0}{|g|\cos\theta_0},
+$$
+
+expuesto como `ray_curvature_radius`. Un rayo lanzado con ángulo $\theta_0$ en
+refracción hacia abajo alcanza su punto de retorno a la altura
+$R_c(1 - \cos\theta_0)$. Para un perfil lineal con **refracción hacia arriba**
+el rayo
+que roza el suelo delimita una región más allá de la cual no llega ningún rayo
+directo ni reflejado una vez, a la **distancia de zona de sombra** en forma
+cerrada (`shadow_zone_distance`):
+
+$$
+x_\text{sombra} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
+\qquad R_c = \frac{c_0}{|g|},
+$$
+
+donde este segundo $R_c$ es el caso particular rasante ($\theta_0 = 0$) de la
+expresión de arriba, ya que el rayo que delimita la zona sale de la fuente en
+horizontal.
+
+Estas formas cerradas son el oráculo exacto del trazador de rayos: un ajuste de
+círculo a un rayo trazado recupera $R_c$ con precisión de máquina. Son además la
+respuesta más barata a la pregunta sobre la que gira toda la página: *¿es mi
+distancia lo bastante larga como para que la refracción importe?*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shadow_zone_map_es.svg" alt="La distancia de zona de sombra en forma cerrada, con ordenada logarítmica, frente al módulo de un gradiente de velocidad del sonido hacia arriba de 0,02 a 0,4 por segundo, para tres pares de alturas de fuente y receptor de 0,5 y 1,5 m, 2 y 2 m, y 2 y 10 m. Las tres curvas caen a medida que el gradiente se hace más pronunciado; un marcador sobre la curva central en el gradiente representativo de 0,1 por segundo queda cerca de 233 m, y un segundo marcador da el caso de 110 m de la propia página en el gradiente lineal equivalente del perfil logarítmico b = menos 1. Un eje secundario convierte el gradiente en el radio de curvatura Rc = c0 partido por el gradiente, que va de 17 km hasta 850 m" width="88%" />
+
+*Léela como un ensayo de cribado. Con el $-0,1\ \text{s}^{-1}$ representativo, la
+sombra detrás de dos estaciones a 2 m empieza a 233 m, así que una medida de
+100 m sobre un campo nunca sale de la región iluminada y los modelos homogéneos
+de las páginas vecinas son la herramienta correcta. Sube el receptor y la
+frontera se aleja deprisa (de 2 m a 10 m la lleva de 233 m a 377 m), y por eso
+una ventana de la primera planta oye una fuente que un micrófono a ras de suelo
+no oye.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `shadow_zone_distance` lo importa el bloque de la figura de cabecera.
+gradientes = np.geomspace(0.02, 0.4, 60)
+fig, ax = plt.subplots()
+for hs, hr, etiqueta in [(0.5, 1.5, "0,5 / 1,5 m"), (2.0, 2.0, "2 / 2 m"),
+                         (2.0, 10.0, "2 / 10 m")]:
+    ax.loglog(gradientes,
+              [shadow_zone_distance(-g, hs, hr, ground_speed=340.0)
+               for g in gradientes], label=etiqueta)
+ax.set_xlabel("Gradiente hacia arriba |g| [1/s]")
+ax.set_ylabel("Distancia de zona de sombra [m]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 3. Ecuación parabólica (PE de la función de Green)
+
+La **ecuación parabólica** es el método de referencia para la refracción y las
+zonas de sombra a larga distancia. Sustituye la ecuación de ondas por una
+ecuación unidireccional (saliente) válida dentro de un ángulo de elevación
+límite, y la marcha en distancia sobre una malla distancia-altura.
+`atmospheric_parabolic_equation` implementa la **PE de la función de Green**
+(GFPE, Salomons apéndice H), el miembro atmosférico de la misma familia
+split-step de Fourier que la
+[`parabolic_equation`](/phonometry/es/underwater/underwater-solvers/) oceánica.
+Cada paso en distancia transforma el campo al dominio del número de onda
+vertical, aplica el propagador de espacio libre junto con la reflexión del suelo
+de impedancia finita $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons
+Ec. H.28), transforma de vuelta, añade el residuo de onda de superficie del
+polo de la reflexión (el tercer término de la Ec. H.49) y aplica la pantalla
+de fase de refracción $\exp(i\,\Delta r\,(k(z) - k_a))$ (Ec. H.58). La fuente
+es un **arranque gaussiano** con su imagen en el suelo (Ecs. G.64, G.76) y una
+**capa absorbente** en la parte superior de la malla suprime las reflexiones
+del contorno superior. El resultado es el **nivel sonoro relativo**
+$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB respecto al campo
+libre) en todo el plano distancia-altura.
+
+```python
+from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
+
+perfil = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # hacia arriba
+pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
+                                    flow_resistivity=200e3,  # pradera
+                                    max_range=600.0, max_height=40.0)
+pe.level_at_height(2.0)   # nivel relativo frente a distancia a 2 m
+pe.plot()                 # el campo de nivel relativo distancia-altura (necesita matplotlib)
+```
+
+Basta cortar el campo a la altura del receptor para que toda la historia de
+esta página quepa en una figura: con todo lo demás idéntico, solo el signo del
+gradiente mueve el nivel de 400 Hz a 600 m en más de 30 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range_es.svg" alt="Nivel sonoro relativo GFPE frente a la distancia a un receptor a 2 m de altura sobre pradera a 400 Hz para tres atmósferas. La curva con refracción hacia abajo se recupera del valle del efecto suelo y vuelve hacia 0 dB respecto al campo libre, la curva homogénea a trazos decae suavemente hasta unos -27 dB a 600 m, y la curva con refracción hacia arriba se hunde por debajo de -40 dB más allá del límite punteado de la zona de sombra en forma cerrada cerca de 110 m" width="88%" />
+
+*Una fuente, una distancia, un suelo, tres atmósferas: a 600 m el signo del
+gradiente vale por sí solo más de 30 dB. Cualquier corrección meteorológica de
+un solo número, $C_{met}$ incluido, es un promedio sobre esa dispersión, no una
+predicción de en qué punto de ella cae una noche dada.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import warnings
+
+import matplotlib.pyplot as plt
+
+from phonometry import (
+    atmospheric_parabolic_equation,
+    linear_sound_speed_profile,
+    log_linear_sound_speed_profile,
+    shadow_zone_distance,
+)
+
+casos = [
+    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Hacia abajo (b = +1 m/s)"),
+    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogénea (b = 0)"),
+    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Hacia arriba (b = -1 m/s)"),
+]
+fig, ax = plt.subplots(figsize=(11, 6.2))
+with warnings.catch_warnings():
+    # El PorousAbsorberWarning: un suelo de 200 kPa.s/m2 hace trabajar al
+    # modelo de impedancia de un parámetro por debajo de su rango de ajuste
+    # publicado, como todo suelo exterior (ver «Elección de la impedancia del
+    # suelo» en la guía de efecto suelo).
+    warnings.simplefilter("ignore")
+    for perfil, etiqueta in casos:
+        pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
+                                            flow_resistivity=200e3,
+                                            max_range=600.0, max_height=40.0)
+        ax.plot(pe.ranges, pe.level_at_height(2.0), label=etiqueta)
+# El límite en forma cerrada del gradiente lineal equivalente hacia arriba
+# (su media a 10 m), la línea punteada de la figura.
+subida = casos[2][0]
+grad = float(subida.speed_at(10.0) - 340.0) / 10.0
+ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
+           color="k", ls=":", label="Límite de la zona de sombra")
+ax.set(xlabel="Distancia [m]", ylabel="Nivel respecto al campo libre [dB]",
+       ylim=(-40, 10))
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La impedancia del suelo se proporciona directamente (`impedance=`, un valor
+complejo normalizado en el convenio $e^{-i\omega t}$ de Salomons, con
+$\operatorname{Im}(Z) > 0$ para un suelo pasivo), como un
+`PorousMediumResult`, o a partir de una
+`flow_resistivity` efectiva mediante los
+[modelos porosos](/phonometry/es/materials/absorbers/porous-absorbers/) del dominio de
+materiales; los modelos porosos trabajan en el convenio opuesto
+$e^{+j\omega t}$, así que su impedancia se conjuga internamente.
+
 El clip de abajo ejecuta la física ondulatoria completa con los dos signos
 del perfil logarítmico: una fuente estacionaria de 50 Hz a 2 m sobre suelo
 rígido en un corte FDTD 2D, con los abanicos de rayos de la biblioteca
@@ -366,6 +469,59 @@ el [informe de conformidad](/phonometry/es/reference/conformance/) (sección
 - **Zona de sombra.** Sobre un perfil con refracción hacia arriba el nivel de la
   PE se desploma bien dentro de la distancia de sombra en forma cerrada.
 
+Las dos primeras merecen verse en vez de creerse, porque son las que autorizan
+todos los demás números que produce el método.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/refraction_homogeneous_check_es.svg" alt="Dos paneles apilados frente a la distancia hasta 520 m para una fuente de 500 Hz y un receptor ambos a 2 m sobre suelo rígido con el gradiente de velocidad del sonido desactivado. Arriba: el nivel relativo GFPE dibujado sobre la forma cerrada coherente de dos rayos, con las dos curvas siguiendo el mismo patrón de interferencia a través de un cero profundo cerca de 45 m y asentándose juntas en la suma coherente de más 6 dB hacia los 500 m. Abajo: el residuo entre el método y la forma cerrada, dentro de 0,6 dB en todas partes más allá del cero y llegando a 17 dB dentro de él, donde la propia forma cerrada pasa por menos 31 dB" width="88%" />
+
+*Con el gradiente desactivado, a la PE no le queda nada que hacer salvo
+reproducir la forma cerrada, y más allá del último cero de interferencia lo
+hace: el residuo se mantiene dentro de **0,6 dB** y las dos curvas se asientan en
+los +6 dB coherentes (5,59 dB de la PE frente a 6,00 dB a 500 m, el par fijado en
+el informe de conformidad). Dentro del cero el residuo llega a 17 dB, que no es
+un fallo del método sino lo que un cero de −31 dB le hace a cualquier comparación
+expresada en decibelios: la misma trampa que una curva de barrera en banda
+estrecha.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import warnings
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `atmospheric_parabolic_equation` y `linear_sound_speed_profile` los importan
+# los fragmentos de arriba. Un suelo rígido no necesita modelo poroso, así que
+# este caso no levanta ningún aviso.
+c0, freq, zs = 343.0, 500.0, 2.0
+plano = linear_sound_speed_profile(1e-12, ground_speed=c0, max_height=200.0)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    pe = atmospheric_parabolic_equation(freq, plano, source_height=zs,
+                                        impedance=1e6 + 0j, max_range=520.0,
+                                        max_height=150.0)
+distancias = np.asarray(pe.ranges)
+metodo = np.asarray(pe.level_at_height(zs))
+k = 2.0 * np.pi * freq / c0
+r1 = np.hypot(distancias, 0.0)
+r2 = np.hypot(distancias, 2.0 * zs)
+dos_rayos = 20.0 * np.log10(np.abs(1.0 + (r1 / r2) * np.exp(1j * k * (r2 - r1))))
+
+fig, (arriba, abajo) = plt.subplots(2, 1, sharex=True)
+arriba.plot(distancias, metodo, label="GFPE, gradiente nulo")
+arriba.plot(distancias, dos_rayos, "--", label="Forma cerrada coherente de dos rayos")
+arriba.axhline(6.0, ls=":", label="+6 dB")
+arriba.set_ylabel("Nivel respecto al campo libre [dB]")
+arriba.legend()
+abajo.plot(distancias, metodo - dos_rayos)
+abajo.set(xlabel="Distancia [m]", ylabel="Residuo [dB]")
+plt.show()
+```
+
+</details>
+
 ## Qué cubre esta guía
 
 **Cubierto.** El modelo de rayos (integración de la ley de Snell por
@@ -385,7 +541,7 @@ del sonido que varía solo con la altura, no con la distancia: una atmósfera
 horizontalmente no homogénea (un gradiente que cambia a lo largo de la
 trayectoria) queda fuera de esta formulación independiente de la distancia,
 descrita en el módulo como la contrapartida de los «métodos oceánicos
-independientes del alcance» a los que refleja. Ambos suponen además un suelo
+independientes de la distancia» de los que es el reflejo. Ambos suponen además un suelo
 plano en $z = 0$; ninguno admite un perfil de elevación del terreno.
 
 ## Véase también

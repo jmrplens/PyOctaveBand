@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica"
-description: "El nivel de potencia acústica LW como descriptor de emisión independiente del dispositivo: la elección entre las cinco vías de determinación normalizadas (ISO 3744/3746, ISO 3741, ISO 9614-2, ISO 3745, ISO 9614-3), qué prometen los grados de precisión, y la declaración de emisión sonora de ISO 4871 con sus formas de número doble y único y su verificación."
+description: "El nivel de potencia acústica LW como descriptor de emisión independiente del dispositivo: la elección entre las seis vías de determinación normalizadas (ISO 3744/3746, ISO 3745, ISO 3741, ISO 9614-2, ISO 9614-3, ISO/TS 7849), qué prometen los grados de precisión, y la declaración de emisión sonora de ISO 4871 con sus formas de número doble y único y su verificación."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -34,8 +34,8 @@ la **potencia** acústica no. El nivel de potencia acústica $L_W$ es la energí
 acústica total por segundo que radia una fuente, referida a $P_0 = 1\ \text{pW}$, y es
 el descriptor de **emisión** independiente del dispositivo que figura en una
 hoja de características, alimenta una predicción de sala (EN 12354) o se contrasta con
-un límite de emisión de ruido. phonometry implementa cinco vías normalizadas
-para obtenerlo, repartidas en tres guías de método: una superficie
+un límite de emisión de ruido. phonometry implementa seis vías normalizadas
+para obtenerlo, repartidas en cuatro guías de método: una superficie
 envolvente de *presión* en campo (ISO 3744/3746) y el grado de precisión en
 *cámara anecoica* (ISO 3745), cubiertas en
 [Potencia acústica por métodos de
@@ -43,10 +43,14 @@ presión](/phonometry/es/devices/emission/sound-power-pressure/);
 el campo difuso de una *cámara reverberante* (ISO 3741), cubierto en
 [Potencia acústica en cámara
 reverberante](/phonometry/es/devices/emission/sound-power-reverberation/);
-y el *barrido* de intensidad sobre una superficie (ISO 9614-2), con su
+el *barrido* de intensidad sobre una superficie (ISO 9614-2), con su
 homólogo de precisión (ISO 9614-3), cubierto en
 [Potencia acústica por barrido de
-intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/);
+y la *velocidad superficial* de la propia carcasa de la máquina (ISO/TS 7849-1
+y -2), la única vía que no necesita medición acústica alguna, cubierta en
+[Potencia acústica a partir de la
+vibración](/phonometry/es/devices/emission/vibration-sound-power/).
 Esta página es la puerta de entrada: cómo elegir entre ellas, qué prometen
 realmente los grados de precisión y cómo un $L_W$ medido se convierte en la
 declaración de emisión sonora ISO 4871 que imprime una hoja de características.
@@ -72,18 +76,40 @@ prácticas distintos.
 | Barrido de intensidad | **ISO 9614-2** | Intensidad acústica normal barrida sobre una superficie | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 2 / 3 (a partir de los indicadores de campo por banda) | In situ con ruido de fondo, o una máquina entre muchas |
 | Cámara anecoica | **ISO 3745** | Presión acústica sobre un conjunto fijo de micrófonos | Cámara anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
 | Barrido de intensidad de precisión | **ISO 9614-3** | Intensidad normal barrida, con criterios más estrictos | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 1 (precisión) | Precisión in situ, con las comprobaciones de indicadores de campo de ISO 9614-3 |
+| Vibración superficial | **ISO/TS 7849-1** (inspección) / **-2** (ingeniería) | Nivel de velocidad promediado sobre la superficie y un factor de radiación | Cualquiera; sin medición acústica | Límite superior ($\varepsilon = 1$) / ingeniería | La máquina no se puede silenciar, encerrar ni abordar con un micrófono |
 
 Los métodos de presión corrigen el nivel superficial por la sala ($K_2$) y por
 el ruido de fondo ($K_1$); el método en cámara reverberante necesita que la cámara esté
 *cualificada* pero alcanza el grado de precisión; la intensidad rechaza la
 energía de fondo estacionaria a costa de una sonda de dos micrófonos y una
-comprobación de validez por banda. Cada guía de método recorre sus vías por
-turno.
+comprobación de validez por banda; la vía de velocidad superficial renuncia del
+todo al micrófono y lo paga con un factor de radiación. Cada guía de método
+recorre sus vías por turno.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" width="92%" loading="eager" />
+**Dos miembros de la familia ISO 3740 faltan en esa tabla a propósito.** La
+ISO 3743-1 y la ISO 3743-2 alcanzan el grado de ingeniería con fuentes
+*pequeñas y móviles* en una sala de ensayo de paredes rígidas o especialmente
+reverberante — la vía que piden la mayoría de los códigos de ensayo de ruido de
+electrodomésticos — y la ISO 3747 determina la potencia acústica de una máquina
+grande y fija in situ por comparación con una fuente sonora de referencia
+calibrada en un campo reverberante. Ninguna está implementada aquí. En la
+práctica: para un electrodoméstico pequeño, la ISO 3744 sobre una semiesfera en
+esa misma sala suele estar disponible con el mismo grado; para el caso de la
+comparación in situ, la fórmula de comparación de la
+[página de ISO 3741](/phonometry/es/devices/emission/sound-power-reverberation/#2-el-método-de-comparación-ec-21)
+es el mismo álgebra, aplicado a una cámara cualificada en lugar de a una
+cualquiera.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las seis vías de potencia acústica en dos filas de tres, cada celda con los mismos cinco atributos. Fila superior: la superficie envolvente de presión de ISO 3744/3746 sobre un plano reflectante, el conjunto fijo de micrófonos de ISO 3745 en una cámara anecoica revestida de cuñas y el campo difuso de una cámara reverberante de ISO 3741. Fila inferior: el barrido serpenteante de intensidad de ISO 9614-2, el barrido de precisión más estricto de ISO 9614-3 y la retícula de acelerómetros de ISO/TS 7849 sobre una carcasa radiante, sin micrófono alguno" width="92%" loading="eager" />
+
+Las seis dan la misma magnitud, y la última llega sin micrófono. Que
+*coincidan* es comprobable, y merece comprobarse una vez: el bloque de abajo
+lleva una misma fuente sintética por tres de las vías y compara sus espectros.
+No es una reproducción del diagrama de arriba — un esquema de montaje no tiene
+equivalente en matplotlib — sino un contraste que puedes ejecutar.
 
 <details>
-<summary>Mostrar el código de esta figura</summary>
+<summary>Mostrar tres vías calculadas sobre una misma fuente</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -118,6 +144,35 @@ plt.show()
 ```
 
 </details>
+
+### Antes del método: las condiciones de funcionamiento y de montaje
+
+Elegir una vía es la segunda decisión. La primera es qué se está midiendo
+exactamente — y para la mayoría de las familias de máquinas ya está tomada. Un
+**código de ensayo de ruido** es la norma de tipo C de una familia de máquinas:
+fija la norma básica de determinación, la disposición de micrófonos, el montaje
+y el modo de funcionamiento, y prevalece sobre las especificaciones generales de
+la ISO 3744 o la ISO 3741 allí donde discrepen. Las mismas condiciones de
+instalación, montaje y funcionamiento deben usarse después para el nivel de
+potencia acústica *y* para el nivel de presión acústica de emisión que lo
+acompaña en una declaración, o los dos números describen dos máquinas distintas.
+
+Dos reglas del apartado 6 de la ISO 3744 deciden si una determinación es
+repetible siquiera. El **equipo auxiliar** debe quedar fuera del entorno de
+ensayo si es posible; lo que no se pueda retirar ni silenciar lo suficiente
+cuenta como *parte de la fuente*, y la caja de referencia crece hasta
+englobarlo. Y el **montaje** debe ser el típico, real o simulado — apoyos
+elásticos solo si la máquina va montada elásticamente en campo, porque una
+máquina pequeña que por sí sola radia mal en baja frecuencia se vuelve un buen
+radiador a través del panel grande al que va atornillada.
+
+De ahí sale también $\sigma_\text{omc}$. No es un valor de tabla: se estima a
+partir de determinaciones repetidas sobre la misma fuente en el mismo
+emplazamiento, con los mismos operadores, los mismos instrumentos y las mismas
+posiciones, **reajustando el montaje y restableciendo las condiciones de
+funcionamiento antes de cada una**. El Anexo H de la ISO 3744 apunta 0,5 dB
+para una instalación bien definida, y valores mucho mayores donde domina el
+flujo de material o la variabilidad del proceso.
 
 ### Una ruta de decisión
 
@@ -157,6 +212,19 @@ primera coincidencia nombra la norma.
    *por encima* de la fuente, porque solo cuenta el flujo neto de energía a
    través de la superficie; los indicadores de campo por banda deciden
    después el grado realmente alcanzado.
+5. **¿Se puede siquiera poner ahí un micrófono?** Una máquina que no se puede
+   parar, un entorno que destroza una cápsula, un recinto sin sitio para una
+   superficie: cuando no cabe ninguna medición acústica, la vía de velocidad
+   superficial estima la misma magnitud a partir de acelerómetros sobre la
+   carcasa (ISO/TS 7849-1 y -2). Responde a una pregunta sutilmente distinta
+   — caracteriza lo que radia la *estructura*, y queda ciega al sonido que
+   escapa por aberturas, tomas y rendijas — y cuesta un factor de radiación que
+   hay que suponer (Parte 1, un límite superior) o medir una vez (Parte 2).
+6. **¿Cómo de repetible es la propia máquina?** Nada de lo anterior acota
+   $\sigma_\text{omc}$, y en una máquina de proceso puede pesar más que toda la
+   elección de grado: una instalación de grado 1 alrededor de una fuente cuyas
+   propias condiciones de funcionamiento dispersan 2 dB compra una
+   $\sigma_\text{tot}$ que no mejora el grado 2. Estímala antes de pagar la sala.
 
 ### Qué significan los grados de precisión
 
@@ -167,7 +235,7 @@ típicos son $\sigma_{R0} \approx 0{,}5\ \text{dB}$ para el grado 1 (ISO 3741), 
 grado 2 (ISO 3744, ISO 9614-2) y 3 dB o más para el grado 3 (aún mayores
 cuando $K_2$ es grande o el espectro es tonal). Los valores
 por banda son mayores en los extremos del espectro. El campo `uncertainty`
-de los resultados de los métodos de presión (superficie envolvente y sala
+de los resultados de los métodos de presión (superficie envolvente y cámara
 anecoica) es la incertidumbre expandida $U = 2\sigma_\text{tot}$ (95 % de
 cobertura), donde $\sigma_\text{tot} = \sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$
 incorpora además la inestabilidad
@@ -178,7 +246,59 @@ En la práctica: un $L_{WA}$ de grado 2 de 92,4 dB lleva $U \approx 3\ \text{dB}
 resultados de grado 2 separados 2 dB son estadísticamente indistinguibles, y
 contrastar esa misma fuente con un límite de 93 dB es cara o cruz. Elige el
 grado por la decisión que el número debe sostener, no por la instalación que
-esté libre.
+esté libre. Y al hacerlo no dejes $\sigma_\text{omc}$ en su valor por defecto de
+cero: `emission.sound_power_pressure(..., omc_uncertainty=2.0)` en una máquina
+cuya instalación dispersa de verdad 2 dB convierte una $U$ de 3,0 dB en 5,0 dB,
+y el número honesto es el que la declaración tiene que absorber.
+
+**Todas estas vías describen una fuente estacionaria.** Cada fórmula promedia en
+energía sobre un intervalo y da un *ritmo* de flujo de energía, así que
+caracteriza a la máquina solo si la máquina es invariante en el tiempo durante
+ese intervalo. Una máquina cíclica es admisible cuando el tiempo de promediado
+abarca un número entero de ciclos, y el ciclo pasa entonces a formar parte de la
+condición de funcionamiento declarada. Para un suceso aislado — una carrera de
+prensa, un portazo — el descriptor no es $L_W$ sino el **nivel de energía
+acústica $L_J$**, la misma integral de superficie tomada sobre el suceso en vez
+de por segundo, definido en los mismos apartados de la ISO 3741, la ISO 3744, la
+ISO 3745 y la ISO 3746 y *no implementado aquí*. La prueba práctica: si el nivel
+ponderado A en un micrófono fijo se mueve más de unos pocos decibelios durante
+el tiempo de promediado, la fuente no es estacionaria para estos métodos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_grades_declaration_es.svg" alt="Dos paneles. A la izquierda, un mismo nivel de potencia acústica ponderado A medido de 92,4 dB dibujado tres veces con la incertidumbre expandida de cada grado de precisión, 1,0 dB en grado 1, 3,0 dB en grado 2 y 6,0 dB en grado 3, frente a un límite declarado discontinuo de 93 dB(A) que solo el intervalo de grado 1 supera con holgura. A la derecha, el ejemplo del anexo B de ISO 4871 como dos barras apiladas: el modo de funcionamiento 1 a 88 dB más 2 dB de incertidumbre que dan un valor declarado de 90 dB, verificado por un nivel de 89 dB, y el modo de funcionamiento 2 a 95 más 2 que dan 97 dB, no verificado por un nivel de 98 dB" width="92%" />
+
+*Lo que compra el grado y lo que tiene que absorber la declaración. La barra de
+la izquierda es la anchura que aporta el método; el panel derecho es esa misma
+anchura convertida en $K_{WA}$ y sumada al valor medido, que es la razón de que
+un grado ancho produzca un límite declarado alto y una máquina fácil de
+declarar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# El intervalo que cada grado pone alrededor de un LWA medido, con la propia
+# combinación de incertidumbres de la biblioteca; después la declaración del
+# anexo B de ISO 4871.
+fig, (axi, axd) = plt.subplots(1, 2, figsize=(12, 5.2))
+for k, (nombre, sigma_r0) in enumerate([("Grado 1", 0.5), ("Grado 2", 1.5),
+                                        ("Grado 3", 3.0)]):
+    u = float(emission.precision_uncertainty(sigma_r0, 0.0, 2.0))
+    axi.errorbar([k], [92.4], yerr=[[u], [u]], fmt="o", capsize=10)
+axi.axhline(93.0, linestyle="--")
+axi.set(ylabel="LWA [dB re 1 pW]", ylim=(84.0, 101.0))
+
+for k, (nivel, k_wa, l1) in enumerate([(88.0, 2.0, 89.0), (95.0, 2.0, 98.0)]):
+    axd.bar([k], [nivel], width=0.5)
+    axd.bar([k], [k_wa], width=0.5, bottom=nivel)
+    axd.plot([k], [l1], "D", markersize=10)
+axd.set(ylabel="Nivel de potencia acústica ponderado A [dB]", ylim=(80.0, 106.0))
+plt.show()
+```
+
+</details>
 
 ## Declarar la emisión sonora (ISO 4871)
 
@@ -199,7 +319,9 @@ Una declaración adopta una de dos formas alternativas (apartado 4):
 
 $K_{WA}$ combina la incertidumbre de medición (reproducibilidad) y, para un lote,
 la dispersión de producción; para una sola máquina $K = 1{,}645\,\sigma_R$
-(anexo A.2.2). Un
+(anexo A.2.2), donde 1,645 es el cuantil unilateral del 95 % de la distribución
+normal — el valor declarado es un límite superior, así que solo se está cubriendo
+una cola. Un
 [`NoiseEmissionDeclaration`](/phonometry/es/reference/api/power/sound-power/)
 contiene una o varias declaraciones por modo de funcionamiento y genera la
 ficha ISO 4871 mediante `.report()`. La vía más rápida es `declare()`
@@ -249,6 +371,48 @@ ph.NoiseEmissionDeclaration(
 ).report("iso4871.pdf", language="es")
 ```
 
+### Verificar un valor declarado
+
+La verificación es una medición aparte, hecha por otro. Se mide una máquina del
+tipo declarado, lo que da un único nivel $L_1$, y la declaración se sostiene
+cuando $L_1$ no supera el valor declarado (apartado 6.2). Eso es el argumento
+`verification_level`: un número que el fabricante no aporta.
+
+Lo que hace admisible esa medición es el apartado 6.1, y es la parte que más se
+salta: la verificación debe seguir el **mismo código de ensayo de ruido** que la
+declaración o, si no existe ninguno, una norma básica de determinación de grado
+de precisión al menos igual al que respalda el valor declarado, con
+**condiciones de funcionamiento y de montaje idénticas**. Solo cabe usar un
+grado inferior por acuerdo entre fabricante y usuario, y contabilizando la
+diferencia de precisión. Sin eso, la comparación mide el procedimiento y no la
+máquina.
+
+El redondeo es una trampa aparte. Una declaración de **número único** se
+verifica frente a $L_{WAd}$, la suma sin redondear $L_{WA} + K_{WA}$ redondeada
+una sola vez; una declaración de **número doble** se verifica frente a
+$\mathrm{redondeo}(L_{WA}) + \mathrm{redondeo}(K_{WA})$, que puede diferir en un
+decibelio entero. La biblioteca expone los dos veredictos por separado
+— `verified` para la regla de número único y `verified_dual` para la de número
+doble —, de modo que una declaración de número doble hay que leerla del segundo,
+no del primero.
+
+Un matiz sobre el primer fragmento de arriba: pasa
+`verification_level=result.sound_power_level_a`, que verifica la declaración
+contra el mismísimo valor con el que se construyó. Eso siempre cumple, y es una
+ilustración de la fontanería, no de una verificación.
+
+Los otros dos argumentos merecen su procedencia. `emission_pressure_level` es el
+**nivel de presión acústica de emisión** ponderado A $L_{pA}$ en el puesto de
+trabajo, determinado según la ISO 11201 (campo esencialmente libre), la
+ISO 11202 (inspección, con una corrección ambiental) o la ISO 11204 (con
+correcciones locales) — ninguna de las cuales está implementada aquí, así que
+llega como valor medido de fuera, tomado bajo las mismas condiciones de
+instalación y funcionamiento que la potencia acústica. `basic_standards` nombra
+las normas de determinación que hay detrás de esos dos números, y el **código de
+ensayo de ruido** de la nota al pie de la ficha es la norma de tipo C de la
+familia de máquinas que fijó de entrada las condiciones de funcionamiento y de
+montaje y las posiciones del puesto de trabajo.
+
 La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
 el repositorio; pulsa la vista previa para abrir el PDF.
 
@@ -263,24 +427,34 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 ## Qué cubre esta guía
 
 **Cubierto.** La guía de decisión de ISO 3740 condensada en la tabla de
-métodos y la ruta de decisión, qué afirma cada grado de precisión sobre la
+métodos y la ruta de decisión, las condiciones de funcionamiento y de montaje
+que la preceden, qué afirma cada grado de precisión sobre la
 reproducibilidad, y la declaración de emisión sonora de ISO 4871
 (`NoiseEmissionDeclaration`, `OperatingModeDeclaration`, `declare()`): las
 formas de número doble y de número único, $L_{WAd} = L_{WA} + K_{WA}$ y la
-verificación del apartado 6.2, presentadas como ficha de declaración
-mediante `.report()`.
+verificación del apartado 6.2 con sus dos reglas de redondeo (`verified`,
+`verified_dual`), presentadas como ficha de declaración mediante `.report()`.
 
-**No cubierto.** Las cinco determinaciones viven en sus guías de método: la
+**No cubierto.** Las seis determinaciones viven en sus guías de método: la
 superficie envolvente y la malla anecoica en
 [Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/),
 el método de campo difuso en
-[Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/)
-y los dos métodos de barrido en
-[Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
+[Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/),
+los dos métodos de barrido en
+[Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
+y la vía de velocidad superficial en
+[Potencia acústica a partir de la vibración](/phonometry/es/devices/emission/vibration-sound-power/).
 La suma de potencia por puntos discretos de la propia ISO 9614-1 no está
 implementada en absoluto; solo lo están sus indicadores de campo, en
 [Intensidad acústica](/phonometry/es/devices/emission/intensity/).
-La estadística de lote de ISO 4871 más allá del caso de máquina única
+La ISO 3743-1, la ISO 3743-2 y la ISO 3747, los miembros restantes de la
+familia ISO 3740, tampoco están implementadas, ni lo está el nivel de *energía*
+acústica $L_J$ para sucesos aislados. El nivel de presión acústica de emisión
+$L_{pA}$ que acompaña a $L_{WA}$ en una declaración se consume, no se determina:
+la ISO 11201, la ISO 11202 y la ISO 11204 quedan fuera de la biblioteca. Los
+criterios de lote del apartado 6.3 de ISO 4871 no se evalúan — solo la
+verificación de máquina única del apartado 6.2 — y su estadística de lote más
+allá del caso de máquina única
 $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
 
 ## Véase también
@@ -294,6 +468,8 @@ $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
 - [Potencia acústica por barrido de intensidad (ISO 9614-2 / ISO 9614-3)](/phonometry/es/devices/emission/sound-power-intensity/):
   las vías que toleran el ruido de fondo estacionario, cualificadas por sus
   indicadores de campo.
+- [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+  la sexta vía, para una máquina a la que no puede acercarse un micrófono.
 - [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): la sonda de
   dos micrófonos detrás de los métodos de barrido.
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): el tiempo de
