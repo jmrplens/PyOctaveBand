@@ -1,6 +1,6 @@
 ---
 title: "Índice de inteligibilidad del habla"
-description: "El índice de inteligibilidad del habla (SII) de ANSI S3.5-1997 en sus cuatro procedimientos por bandas (bandas críticas, contribución equitativa, tercio de octava, octava): niveles espectrales equivalentes de habla/ruido/umbral, las funciones de importancia de banda, la autoenmascaramiento del habla y la propagación ascendente del enmascaramiento, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
+description: "El índice de inteligibilidad del habla (SII) de ANSI S3.5-1997 en sus cuatro procedimientos por bandas (bandas críticas, contribución equitativa, tercio de octava, octava): niveles espectrales equivalentes de habla/ruido/umbral, las funciones de importancia de banda, el autoenmascaramiento del habla y la propagación ascendente del enmascaramiento, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
 references:
   - type: standard
     organization: "American National Standards Institute"
@@ -75,7 +75,7 @@ result.plot()   # audibilidad por banda y su contribución ponderada (necesita m
 
 Sin ruido y con un umbral de audición normal, el espectro de habla estándar es casi
 totalmente audible, por lo que el índice se acerca a uno; el pequeño déficit es
-la propia **autoenmascaramiento del habla** del oyente.
+el propio **autoenmascaramiento del habla** del oyente.
 
 La función de importancia es donde vive el conocimiento perceptivo de la
 norma. Desciende de los experimentos de articulación que sustentan el índice de
@@ -92,6 +92,77 @@ Anexo B de la norma tabula funciones de importancia alternativas para
 materiales de ensayo concretos (sílabas sin sentido, listas de palabras
 monosílabas, pasajes cortos), que desplazan el peso según la redundancia del
 material.
+
+### Los niveles de banda no son niveles espectrales
+
+Esta es la trampa que arruina en silencio un SII calculado a partir de datos
+medidos. Un *nivel espectral equivalente* es el nivel que tendría la banda si su
+energía se repartiera sobre 1 Hz, así que un nivel de **banda** de tercio de
+octava $L_i$ salido de un analizador se convierte en nivel espectral restándole
+diez veces el logaritmo del ancho de banda en hercios:
+
+$$
+N_i' = L_i - 10\log_{10} W_i .
+$$
+
+No hace falta memorizar los anchos: cada objeto de procedimiento lleva sus
+propios bordes de banda, así que la conversión son dos líneas para cualquiera de
+los cuatro métodos.
+
+```python
+import numpy as np
+
+# `speech` es la importación del primer fragmento de esta página.
+proc = speech.sii_procedure("one-third-octave")
+widths = np.diff(proc.band_edges)                  # hercios, banda a banda
+print(np.round(10 * np.log10(widths), 1)[[0, 8, 17]])   # [15.5 23.5 32.7]
+
+band_levels = np.full(18, 55.0)                    # lo que declara un analizador
+spectrum_levels = band_levels - 10 * np.log10(widths)
+print(round(float(spectrum_levels[8]), 1))         # 31.5 dB a 1 kHz
+```
+
+Así que la corrección va de **15,5 dB a 160 Hz a 32,7 dB a 8 kHz** en el
+procedimiento de tercio de octava, y vale 28,5 dB a 1 kHz en el de octava: es
+decir, un nivel de banda medido de 55 dB a 1 kHz es un nivel espectral de
+31,5 dB, no de 55 dB. Mete niveles de banda directamente y tanto el habla como el
+ruido quedan de 15 a 33 dB demasiado altos, banda a banda, y el fallo es
+silencioso: el índice sigue dentro de $[0, 1]$ y la gráfica de audibilidad sigue
+pareciendo plausible.
+
+De ahí siguen dos cosas. La entrada de **umbral** *no* se convierte: es un nivel
+de umbral de audición en dB HL, una diferencia de niveles y no una magnitud por
+hercio. Y hay una comprobación barata: como un nivel espectral es por hercio, un
+ruido blanco tiene el *mismo* nivel espectral de ruido equivalente en todas las
+bandas de todos los procedimientos, mientras que sus niveles de banda suben 3 dB
+por octava. Si un SII sale exactamente 0 para un ruido de oficina corriente, o
+exactamente 1 con ruido presente, sospecha de niveles de banda introducidos como
+niveles espectrales; una comprobación rápida es que el propio espectro de habla
+de esfuerzo normal de la norma tiene su máximo en 34,8 dB cerca de 250 Hz, así
+que cualquier entrada de habla más de unos 15 dB por encima de eso es un nivel de
+banda.
+
+### De dónde salen los tres espectros
+
+La razón de que los tres datos de entrada puedan combinarse siquiera es que
+describen el mismo punto del espacio. ANSI S3.5-1997 define los niveles
+espectrales equivalentes de habla y de ruido en la posición correspondiente al
+**centro de la cabeza del oyente, a media distancia entre los oídos y con el
+oyente ausente**: ambos son magnitudes de campo en una posición de escucha
+desocupada. Es decir: el ruido se mide ahí con el hablante o la fuente de interés
+en silencio, y el habla se mide ahí con el hablante a la distancia y el esfuerzo
+vocal reales.
+
+Tres consecuencias que merecen constar en un informe. Los espectros tabulados
+por esfuerzo vocal de la sección 4 son el habla de *referencia* de la norma,
+excelente para diseñar y comparar, pero no sustituyen a un $E_i'$ medido cuando
+la condición de escucha real está a otra distancia o en un espacio reverberante.
+Los niveles registrados en el tímpano, en un acoplador o bajo auriculares **no**
+son niveles equivalentes de campo libre y hay que transformarlos antes de
+poder usarlos. Y `threshold=` es el nivel de umbral de audición en tonos puros
+del oyente en dB HL en los 18 centros de banda y pertenece a **un solo oído**,
+así que hay que decir cuál es y cómo se llevó el audiograma a esos centros, a lo
+que vuelve la sección 3.2.
 
 ## 2. Enmascaramiento y la función de audibilidad de banda
 
@@ -120,7 +191,54 @@ A niveles de habla muy por encima del esfuerzo normal, un **factor de distorsió
 de nivel** del apartado 5.7 (la unidad para los espectros estándar usados en
 esta página) reduce aún más $A_i$; phonometry lo aplica automáticamente.
 
+Todos los arrays de esa cadena están en el resultado, así que puede dibujarse el
+apartado 5 entero para un caso donde el trabajo lo hace la propagación del
+enmascaramiento: un ventilador o un conducto que pone toda su energía por debajo
+de 450 Hz:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_masking_chain_es.svg"
+  alt="La cadena del apartado 5 de ANSI S3.5 sobre las 18 bandas de tercio de octava para el habla estándar de esfuerzo normal en un enmascarador cuyo nivel espectral de 60 dB queda confinado por debajo de 450 Hz. El ruido externo cae a nada por encima de 400 Hz, pero el nivel espectral de enmascaramiento equivalente decae en cambio de forma gradual, y sigue valiendo 23 dB a 1 kHz, donde no hay ruido ninguno; la perturbación equivalente lo sigue, la ventana sombreada de 30 dB de D menos 15 a D más 15 dB se dibuja a su alrededor, y la audibilidad de banda del eje derecho sube de cero a 500 Hz hasta uno a 2000 Hz a medida que la curva del habla sale de esa ventana. El índice vale 0,60"
+  width="92%"
+/>
+
+*La audibilidad de banda $A_i$ es una posición dentro de una ventana de 30 dB:
+en el borde inferior la banda está totalmente enmascarada, en el superior es
+totalmente audible, y entre ambos hay una recta. La ventana está centrada en
+$D_i$, y $D_i$ sigue a $Z_i$, que es el sentido de la figura: **no hay ruido
+ninguno** por encima de 400 Hz y, aun así, el enmascaramiento a 1 kHz vale 23 dB,
+propagado hacia arriba desde las bandas graves. Esa falda ascendente es lo que
+hace del SII algo más que una relación señal-ruido banda a banda, y es el término
+que el procedimiento de octava de la sección 5 se deja por el camino.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `np` y `speech` vienen de los fragmentos de arriba.
+freqs = speech.sii_procedure("one-third-octave").frequencies
+noise = np.where(freqs <= 450.0, 60.0, 0.0)     # toda la energía por debajo de 450 Hz
+res = speech.speech_intelligibility_index("normal", noise)
+print(round(res.sii, 2), round(float(res.masking[8]), 1))   # 0.6 23.2
+
+pos = np.arange(freqs.size)
+fig, ax = plt.subplots(figsize=(10.4, 6.0))
+ax.fill_between(pos, res.disturbance - 15, res.disturbance + 15, alpha=0.25)
+ax.plot(pos, res.speech_spectrum, "o-", label="habla Ei'")
+ax.plot(pos, noise, "s--", label="ruido externo Ni'")
+ax.plot(pos, res.masking, "^-", label="enmascaramiento equivalente Zi")
+ax.twinx().plot(pos, res.band_audibility)       # la audibilidad, a la derecha
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ## 3. El índice en ruido
+
+### 3.1 En ruido
 
 El índice de inteligibilidad del habla es la suma de las audibilidades de banda
 ponderada por la importancia de banda (ANSI S3.5-1997, apartado 6):
@@ -186,8 +304,29 @@ plt.show()
 
 </details>
 
+**Cómo leer el número.** El SII es la *fracción del espectro de habla que
+resulta audible* ponderada por importancia, así que 0,46 significa que llega
+más o menos la mitad de lo que transporta la inteligibilidad. Es una proporción
+de audibilidad, no de palabras: ANSI S3.5 lleva el índice a inteligibilidad solo
+a través de funciones de transferencia propias del material de habla y de los
+oyentes, y por eso un mismo 0,5 sostiene aciertos altos en frases y bastante más
+bajos en sílabas sin sentido. Nunca cites un SII como «X % de inteligibilidad»
+sin nombrar el material. Como anclas prácticas, por encima de 0,75 está el
+objetivo de diseño cuando hay que entender material desconocido, la misma escala
+que hace de `requirement=0.75` un valor razonable en la ficha de la sección 7;
+de 0,45 a 0,75 se trabaja con material familiar en un contexto conocido; por
+debajo de 0,3 aproximadamente no se puede confiar en la comunicación hablada. Y
+atención a la resolución: las entradas son espectros medidos con su propia
+incertidumbre, así que las diferencias de unas centésimas son ruido. Cuando dos
+condiciones puntúan parecido, el perfil de audibilidad por banda, y no el
+escalar, es la parte que dice qué hay que arreglar.
+
+### 3.2 Con un umbral de audición elevado
+
 Un umbral de audición elevado (`threshold=`) sube el ruido interno equivalente y
-reduce el índice, igual que lo hace añadir ruido de enmascaramiento. El
+reduce el índice, igual que lo hace añadir ruido de enmascaramiento. La entrada
+es el nivel de umbral de audición en tonos puros en dB HL en los 18 centros de
+banda, de un solo oído. El
 `SIIResult` también lleva el enmascaramiento por banda $Z_i$, la perturbación
 $D_i$, la audibilidad $A_i$ y la importancia $I_i$, y su `.plot()` dibuja la
 figura de arriba.
@@ -231,9 +370,27 @@ La pérdida elimina las bandas que llevan las claves consonánticas, y por eso e
 es el uso práctico del SII en audiología y en control de ruido de espacios
 ocupados: un índice objetivo se puede alcanzar bajando el ruido o devolviendo
 audibilidad (amplificando), y el perfil por bandas dice en qué bandas hay que
-poner el esfuerzo. Los umbrales por edad de ISO 7029 son una entrada
-poblacional cómoda, véase la
-[guía del umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
+poner el esfuerzo.
+
+**Cómo llevar un array de umbrales a la rejilla del SII.** Los umbrales por edad
+de [ISO 7029](/phonometry/es/perception/hearing/hearing-threshold/) son una
+entrada poblacional cómoda, pero las dos normas están tabuladas en rejillas
+distintas y el traslado es una decisión de quien llama, no algo automático. La
+ISO 7029 devuelve **once frecuencias audiométricas** (de 125 a 8000 Hz) mientras
+que el procedimiento de tercio de octava del SII necesita **dieciocho** valores
+de 160 Hz a 8000 Hz, y ANSI S3.5 no define ninguna interpolación: el bloque «No
+cubierto» de esta misma página dice que no se ofrece remuestreo entre conjuntos
+de bandas. Así que hay que explicitar la elección: interpolar los umbrales
+audiométricos sobre un eje logarítmico de frecuencia hasta los centros de banda
+del SII, o tomar para cada banda la frecuencia audiométrica más próxima, y decir
+cuál de las dos en el informe. Hay un segundo desajuste: `age_threshold` devuelve
+la *desviación* respecto a la mediana de los 18 años, que es un nivel de umbral
+de audición en dB HL solo si esa línea de base se toma como 0 dB HL, una
+suposición que merece declararse y que conviene abandonar en cuanto exista un
+audiograma real, porque los valores medidos en dB HL pueden introducirse
+directamente. Y por último, atención al sentido del error: una interpolación
+gruesa alisa la muesca de 3 kHz a 6 kHz que lleva un audiograma expuesto a ruido,
+y esas son bandas con mucho peso de importancia, así que el SII sale optimista.
 
 ## 4. Esfuerzo vocal
 
@@ -284,13 +441,15 @@ plt.show()
 # A mano, reproduciendo lo que dibuja StandardSpeechSpectrum.plot():
 res = speech.standard_speech_spectra()
 pos = np.arange(res.frequencies.size)
+nombres = {"normal": "Normal", "raised": "Elevada",
+           "loud": "Fuerte", "shout": "Grito"}
 fig, ax = plt.subplots()
 for effort, levels in zip(res.vocal_efforts, res.levels):
-    ax.plot(pos, levels, "o-", label=effort.capitalize())
+    ax.plot(pos, levels, "o-", label=nombres[effort])
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in res.frequencies], rotation=45, ha="right")
 ax.set_xlabel("Banda de tercio de octava [Hz]")
-ax.set_ylabel("Nivel espectral del habla [dB SPL]")
+ax.set_ylabel("Nivel del espectro de voz [dB SPL]")
 ax.legend()
 plt.show()
 ```
@@ -334,7 +493,7 @@ ax_s.set_xticks(list(freqs))
 ax_s.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax_s.xaxis.set_minor_formatter(NullFormatter())
 ax_s.set_xlabel("Banda de tercio de octava [Hz]")
-ax_s.set_ylabel("Nivel espectral del habla [dB SPL]")
+ax_s.set_ylabel("Nivel del espectro de voz [dB SPL]")
 ax_s.legend()
 
 # Derecha: el SII que alcanza cada espectro en el ruido fijo.
@@ -362,7 +521,7 @@ y en cómo se expresa la propagación ascendente del enmascaramiento, y `method=
 elige uno. El valor por omisión es el procedimiento por tercios de octava usado
 arriba.
 
-| `method=` | Bandas | Centros de banda | Límites de banda | Constantes | Propagación de la máscara |
+| `method=` | Bandas | Centros de banda | Límites de banda | Constantes | Propagación del enmascaramiento |
 | :--- | ---: | :--- | :--- | :--- | :--- |
 | `"critical-band"` | 21 | 150 Hz a 8500 Hz | 100 Hz a 9500 Hz | Tabla 1 | entre los límites de banda tabulados |
 | `"equally-contributing"` | 17 | 350 Hz a 5800 Hz | 300 Hz a 6400 Hz | Tabla 2 | entre los límites de banda tabulados |
@@ -373,7 +532,7 @@ Las dos columnas son `sii_procedure(method).frequencies` y `.band_edges`; solo
 los límites de tercio de octava se calculan a partir de los centros en vez de
 estar tabulados.
 
-Todos los procedimientos recorren la misma cadena del apartado 2: la autoenmascaramiento
+Todos los procedimientos recorren la misma cadena del apartado 2: el autoenmascaramiento
 del habla, la propagación ascendente del enmascaramiento, el ruido interno
 equivalente y la perturbación, el factor de distorsión de nivel y la función de
 audibilidad de banda, ponderada por la función de importancia de banda propia de
@@ -456,6 +615,41 @@ escucha. El de octava es el que lee más alto porque prescinde de la propagació
 del enmascaramiento, que es justo el riesgo que arrastra: si se le da un ruido
 fuerte en baja frecuencia, no verá ese ruido alcanzando las bandas que portan el
 habla.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_octave_masking_blindness_es.svg"
+  alt="El SII calculado por los cuatro procedimientos de bandas frente al nivel espectral de un ruido de baja frecuencia confinado por debajo de 450 Hz, barrido de 45 a 80 dB. Las curvas de banda crítica, de contribución equitativa y de tercio de octava caen juntas desde unos 0,75 hasta por debajo de 0,07, mientras que la de octava se mantiene plana en 0,87 en todo el recorrido; en el punto más ruidoso se anota que ambas están separadas por 0,81 unidades de índice"
+  width="88%"
+/>
+
+*La coincidencia anterior es una propiedad del estímulo, no de los
+procedimientos. Sobre ruido blanco los cuatro se siguen entre sí; sobre un
+enmascarador que vive por debajo de 450 Hz, los tres procedimientos que llevan la
+propagación ascendente del enmascaramiento se desploman juntos mientras que el de
+octava no se mueve en absoluto, **0,81 unidades de índice de separación** en el
+punto más ruidoso, que es casi toda la escala. Un SII en bandas de octava bajo un
+ruido dominado por la baja frecuencia es una cota superior, no una estimación.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+levels = np.arange(45.0, 80.1, 1.0)
+for method in ("critical-band", "equally-contributing", "one-third-octave",
+               "octave"):
+    proc = speech.sii_procedure(method)
+    curve = [speech.speech_intelligibility_index(
+        proc.speech_spectrum,
+        np.where(np.asarray(proc.frequencies) <= 450.0, x, 0.0),
+        method=method).sii for x in levels]
+    print(method, round(curve[0], 3), round(curve[-1], 3))
+# critical-band 0.736 0.03
+# equally-contributing 0.753 0.026
+# one-third-octave 0.777 0.067
+# octave 0.882 0.872
+```
+
+</details>
 
 **Qué procedimiento usar.**
 
@@ -590,7 +784,7 @@ contribución equitativa (17 bandas, Tabla 2), el de bandas de tercio de octava
 (18 bandas, Tabla 3, el valor por omisión) y el de bandas de octava (6 bandas,
 Tabla 4). Para cada uno: los niveles espectrales equivalentes de habla, ruido y
 umbral de audición, la función de importancia de banda y el nivel espectral de
-voz estándar, la autoenmascaramiento del habla, la propagación ascendente del
+voz estándar, el autoenmascaramiento del habla, la propagación ascendente del
 enmascaramiento,
 el factor de distorsión de nivel y la función de audibilidad de banda del
 apartado 5, y el índice del apartado 6. `speech_intelligibility_index` (con
@@ -652,8 +846,8 @@ críticas (21 bandas, centros de 150 Hz a 8500 Hz), bandas críticas de
 contribución equitativa (17 bandas, centros de 350 Hz a 5800 Hz), tercio de
 octava (18 bandas, centros de 160 Hz a 8000 Hz) y octava (6 bandas, centros de
 250 Hz a 8000 Hz). Usa `method="one-third-octave"` por omisión: es la resolución más
-fina y el único procedimiento cuya tabla trae los espectros de voz elevado, alto
-y de grito. Usa `method="critical-band"` para alinear el índice con un modelo de
+fina y el único procedimiento cuya tabla trae los espectros de voz elevado,
+fuerte y de grito. Usa `method="critical-band"` para alinear el índice con un modelo de
 enmascaramiento o sonoridad por bandas críticas (Bark),
 `method="equally-contributing"` cuando el índice deba leerse como la fracción de
 bandas igualmente importantes que son audibles, y `method="octave"` cuando solo

@@ -41,7 +41,19 @@ añade el lado de medición: la estimación de FRF a partir de señales medidas 
 sus criterios de aceptación. Esta base de FRF sustenta las normas de fuente y
 transmisión de ruido estructural: ISO 9611, ISO 10846, EN 15657 y EN 12354-5.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es.svg" alt="Magnitudes normalizadas de receptancia, movilidad y acelerancia de un resonador de un grado de libertad en un eje de frecuencia log-log, todas con máximo en la resonancia" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es.svg" alt="Magnitudes de receptancia, movilidad y acelerancia del mismo resonador de un grado de libertad en un eje de frecuencia log-log, cada una multiplicada por una constante para que las tres compartan un mismo eje y alcancen el máximo a la misma altura, en torno a veinticinco. Las tres alcanzan el máximo a la misma frecuencia y difieren en pendiente a uno y otro lado de él en una potencia de la frecuencia: la receptancia es plana por debajo de la resonancia y cae con pendiente pronunciada por encima, la acelerancia sube con pendiente pronunciada por debajo y se aplana por encima, y la movilidad queda entre ambas con pendiente más uno y menos uno." width="82%" loading="eager" />
+
+*Toda la familia de la Tabla 1 en una sola figura. Las tres curvas alcanzan el
+máximo a la misma frecuencia porque describen el mismo resonador; lo que las
+distingue es la **pendiente** a uno y otro lado de él, que difiere en una
+potencia de $\omega$ de una fila de la tabla a la siguiente. Por eso la
+receptancia realza el extremo de baja frecuencia, controlado por la rigidez, la
+acelerancia el de alta frecuencia, controlado por la masa, y la movilidad queda
+entre ambas; y por eso la movilidad es la moneda del flujo de potencia
+(sección 1). Cada curva va escalada por la constante que se imprime en su
+entrada de la leyenda ($k$, $k/\omega_0$ y $k/\omega_0^2$) para que las tres
+alcancen el máximo a la misma altura y sus formas sean comparables; los niveles
+absolutos difieren en órdenes de magnitud.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -52,15 +64,22 @@ import numpy as np
 from phonometry import vibration
 
 m, k, c = 2.0, 8000.0, 5.0
-f = np.logspace(np.log10(0.5), np.log10(200.0), 500)
-w = 2.0 * np.pi * f
+f0 = vibration.resonance_frequency(m, k)
+f = np.logspace(np.log10(f0 / 20.0), np.log10(f0 * 20.0), 600)
+w0 = 2.0 * np.pi * f0
 h = vibration.sdof_receptance(f, m, k, c)
-for label, frf in (("receptancia |H|", np.abs(h)),
-                   ("movilidad |Y|", np.abs(1j * w * h)),
-                   ("acelerancia |A|", np.abs(-(w**2) * h))):
-    plt.loglog(f, frf / frf.max(), label=label)
-plt.axvline(vibration.resonance_frequency(m, k), ls="--", color="0.6")
-plt.xlabel("Frecuencia [Hz]"); plt.ylabel("Magnitud normalizada")
+y = vibration.convert_frf(h, f, "receptance", "mobility")
+a = vibration.convert_frf(h, f, "receptance", "accelerance")
+
+# Escaladas por una constante cada una, no normalizadas por su propio máximo:
+# la gracia está en que las tres difieren en pendiente, y dividir por el
+# máximo lo oculta.
+for label, frf in (("receptancia |H| x k", np.abs(h) * k),
+                   ("movilidad |Y| x k/w0", np.abs(y) * k / w0),
+                   ("acelerancia |A| x k/w0^2", np.abs(a) * k / w0**2)):
+    plt.loglog(f, frf, label=label)
+plt.axvline(f0, ls="--", color="0.6")
+plt.xlabel("Frecuencia [Hz]"); plt.ylabel("Magnitud de FRF escalada")
 plt.legend(); plt.show()
 ```
 
@@ -78,6 +97,10 @@ tiene una recíproca fuerza-por-movimiento:
 | desplazamiento | receptancia $H = x/F$ | m/N | rigidez dinámica $1/H$ | N/m |
 | velocidad | movilidad $Y = j\omega H$ | m/(N·s) | impedancia $1/Y$ | N·s/m |
 | aceleración | acelerancia $A = -\omega^2 H$ | 1/kg | masa aparente $1/A$ | kg |
+
+La figura del principio de esta página es esa tabla dibujada: el mismo resonador
+visto por sus tres filas, con una potencia de $\omega$ de diferencia entre cada
+una.
 
 `convert_frf` pasa entre cualquiera de las seis FRF, usando la receptancia como
 pivote. Una FRF de **punto de excitación** tiene la respuesta y la fuerza en el
@@ -104,15 +127,44 @@ acelerómetros; la movilidad es la moneda natural de las normas de potencia
 estructural (la potencia es fuerza por velocidad, de modo que
 $P = \tfrac{1}{2}\operatorname{Re}\{Y\}\,|F|^2$ en un contacto); las
 recíprocas aparecen cuando una fuente
-se describe por lo que impone y no por cómo responde. Leer una movilidad de
-punto de excitación es en sí un diagnóstico estructural: por debajo de una
-resonancia la magnitud sube proporcional a la frecuencia por una **línea de
-rigidez** ($|Y| \approx \omega/k$), por encima cae por una **línea de masa**
-($|Y| \approx 1/(\omega m)$), y la altura del pico entre ambas refleja el
-amortiguamiento: vale $1/c$ para el resonador aislado con amortiguamiento
-viscoso de la siguiente sección, mientras que en estructuras reales con
-modos solapados el amortiguamiento se estima con ajuste modal o con el
-ancho de banda de media potencia.
+se describe por lo que impone y no por cómo responde. Una movilidad en el punto
+de excitación se lee como tres regímenes, una línea de rigidez, un pico y una
+línea de masa, que la sección 4 muestra sobre la gráfica.
+
+<span id="por-que-la-potencia-la-deciden-dos-movilidades"></span>
+
+### Por qué la potencia la deciden dos movilidades
+
+Que $P = \tfrac{1}{2}\operatorname{Re}\{Y\}|F|^2$ es solo la mitad de la
+historia, porque la fuerza en un contacto no viene dada: es lo que acuerdan las
+dos estructuras. Acopla una fuente de velocidad libre $v_f$ y movilidad
+$Y_\text{fuente}$ a un receptor de movilidad $Y_\text{receptor}$ y la fuerza de
+contacto es
+
+$$
+F = \frac{v_f}{Y_\text{fuente} + Y_\text{receptor}},
+$$
+
+de modo que la potencia que cruza depende de **ambas** movilidades a través de
+su suma. De ahí salen dos límites, y cada norma posterior está construida sobre
+uno de ellos.
+
+- Cuando $|Y_\text{fuente}| \gg |Y_\text{receptor}|$ la fuente se comporta como
+  una **fuente de velocidad**: entrega su velocidad libre haga lo que haga el
+  receptor, y es la movilidad del receptor la que fija la fuerza.
+- Cuando $|Y_\text{fuente}| \ll |Y_\text{receptor}|$ se comporta como una
+  **fuente de fuerza** y entrega su **fuerza bloqueada**. Esa es la
+  idealización en torno a la que están escritas la ISO 10846 y la EN 15657, y
+  es la razón de que la
+  [rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/)
+  pueda caracterizar un aislador por una fuerza de bloqueo.
+- La transferencia máxima de potencia queda entre ambos, con movilidades
+  adaptadas. Y esa es la manera útil de leer un soporte elástico: funciona
+  haciendo el lado de la fuente *más* móvil que el receptor, no absorbiendo
+  nada.
+
+Todo lo que mide el resto de esta página existe para poner número a una de esas
+dos movilidades.
 
 ## 2. El resonador SDOF de referencia (forma cerrada)
 
@@ -128,7 +180,17 @@ $$
 En la resonancia $\omega_0$ la movilidad en el punto de excitación es
 **puramente real** e igual a $1/c$ (el máximo de movilidad mide el
 amortiguamiento) mientras que la receptancia estática ($\omega \to 0$) es la
-flexibilidad $1/k$:
+flexibilidad $1/k$. «Puramente real» es una afirmación sobre la fase, y se
+generaliza: la fase de una movilidad *en el punto de excitación* va de $+90°$
+en la línea de rigidez a $-90°$ en la línea de masa pasando por $0°$ en cada
+resonancia, y nunca sale de esa banda, sea cual sea la estructura
+(ISO 7626-2, A.4). Una FRF medida en el punto de excitación cuya fase se salga
+de $\pm 90°$ no es una FRF de punto de excitación: el acelerómetro y el
+transductor de fuerza no están en el mismo punto, o la fijación es flexible.
+Una FRF de transferencia, en cambio, puede caer en cualquier cuadrante. El
+mismo apartado añade una segunda comprobación que sale gratis: una FRF de punto
+de excitación presenta una antirresonancia entre cada par de resonancias, y que
+falte una indica un desplazamiento entre los dos transductores.
 
 ```python
 import numpy as np
@@ -145,10 +207,9 @@ print(round(complex(vibration.sdof_receptance(1e-6, m, k, c)).real, 7))  # 0.000
 ## 3. FRF medidas y sus criterios de aceptación (ISO 7626-2)
 
 En la disposición habitual de ISO 7626-2 la estructura cuelga de una
-suspensión lo bastante blanda para que sus modos de sólido rígido queden muy
-por debajo de la primera resonancia elástica (la norma admite estructuras
-suspendidas libremente o ancladas; el apartado 5 pide un apoyo
-representativo de la aplicación prevista), un excitador ataca un punto a
+suspensión flexible (la norma admite estructuras suspendidas libremente o
+ancladas; el apartado 5.2 pide que un apoyo anclado sea representativo de la
+aplicación prevista), un excitador ataca un punto a
 través de una
 **cabeza de impedancia** (una pila de transductores que mide fuerza y
 aceleración en el mismo punto, lo que da al montaje con excitador acoplado su
@@ -160,7 +221,140 @@ martillo instrumentado: cambia el espectro controlado del excitador acoplado
 por rapidez, con un espectro de excitación fijado por la masa del impactador
 y la rigidez de la punta.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_es.svg" alt="Medición de movilidad ISO 7626: una viga libre-libre en suspensión blanda excitada por un excitador a través de una cabeza de impedancia en el punto de excitación, un acelerómetro en un punto de transferencia y un martillo de impacto como excitación alternativa" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_es.svg" alt="Medición de movilidad ISO 7626: una viga libre-libre en suspensión blanda excitada por un excitador a través de una varilla de arrastre y una cabeza de impedancia en el punto de excitación, un acelerómetro en un punto de transferencia y un martillo de impacto como excitación alternativa. Debajo, un recuadro de tres paneles muestra el acelerómetro conectado a través de la varilla de arrastre marcado como no válido, el transductor de fuerza en la estructura marcado como válido y el transductor de fuerza en el extremo del excitador marcado con precaución, con los criterios de movilidad de diez veces para el acoplo del excitador y para la suspensión enunciados debajo." width="92%" />
+
+### Qué tiene que hacer la suspensión (apartado 5.3)
+
+«Lo bastante blanda» no es el criterio; el apartado 5.3 de la ISO 7626-2 da
+tres números, y el primero de ellos es un criterio de *movilidad*, comprobable
+con las funciones que esta página ya ha presentado.
+
+- **La movilidad en el punto de excitación de la suspensión** en cada punto de
+  sujeción debería ser al menos **diez veces** la de la estructura en ese mismo
+  punto, en todo el rango de frecuencias de interés. Este es el requisito que
+  importa, porque es el que mantiene la suspensión fuera de la respuesta.
+- Como requisito **mínimo**, toda resonancia de sólido rígido de la estructura
+  suspendida debe quedar **por debajo de la mitad de la frecuencia más baja de
+  interés**: la frecuencia más baja de *interés*, no el primer modo elástico.
+- Las masas de los componentes de la suspensión próximos a la estructura
+  (ganchos, tensores) deben ser **menores que una décima parte** de la masa
+  efectiva libre de la estructura en cada frecuencia de interés.
+
+Y cuatro reglas prácticas que las acompañan: sujetar cerca de los puntos
+nodales, localizados con ensayos previos, para que la suspensión interfiera lo
+menos posible; llevar los cables perpendiculares a la dirección de excitación
+cuando sea viable, contando con que aun así las vibraciones transversales de los
+cables afectarán a los datos; mantener las resonancias de la suspensión bien
+lejos de las frecuencias modales de la estructura, porque los cordones elásticos
+y las almohadillas de espuma aportan masa pero poco amortiguamiento; y vigilar el
+amortiguamiento que añade la propia suspensión, que el apartado señala como
+PRECAUCIÓN. La suspensión empleada debe describirse en el informe de ensayo.
+
+La regla del 10× merece ejecutarse, no citarse. Para el resonador de la
+sección 2 el caso peor es su propio pico, donde la estructura es lo más móvil
+que llega a ser:
+
+```python
+# `vibration` lo importa el bloque de la figura de más arriba; los bloques de
+# una página se ejecutan en orden de lectura.
+f0 = vibration.resonance_frequency(2.0, 8000.0)                   # 10.07 Hz
+y_structure = abs(complex(vibration.sdof_mobility(f0, 2.0, 8000.0, 5.0)))
+print(round(y_structure, 3))                                      # 0.2 = 1/c
+
+# La suspensión vista en el mismo punto, desconectada de la estructura:
+# un cordón elástico de 31,6 N/m, cuya movilidad propia es omega / k.
+y_suspension = abs(complex(
+    vibration.convert_frf(31.6, f0, "dynamic_stiffness", "mobility")))
+print(round(y_suspension / y_structure, 1))       # 10.0 -> apartado 5.3 cumplido
+```
+
+Ese cordón deja el rebote de sólido rígido de la estructura de 2 kg en 0,63 Hz,
+así que el requisito mínimo se cumple con holgura para cualquier frecuencia más
+baja de interés por encima de 1,3 Hz. La regla de movilidad es la que ata, y es
+el mismo criterio, en las mismas unidades, que la regla de acoplo del excitador
+de más abajo: **todo lo que se fije a la estructura debe ser al menos diez veces
+más móvil que la estructura misma**.
+
+### Fijar el excitador (apartado 6.4.4)
+
+La ISO 7626-2 llama al acoplo del excitador «a menudo el problema más difícil
+que aparece al usar excitadores de vibración fijos para medir la movilidad de
+estructuras ligeras», y le dedica un criterio y un diseño.
+
+- **El criterio de sujeción.** Con el excitador y sus accesorios
+  *desconectados* de la estructura, las movilidades laterales y rotacionales en
+  el punto de excitación del acoplo deben ser al menos diez veces mayores, en
+  todas las frecuencias de interés, que los elementos correspondientes de la
+  matriz de movilidad en el punto de excitación de la estructura. Un excitador
+  que no lo cumpla sujeta la estructura lateral y rotacionalmente, y los
+  primeros modos son las primeras víctimas.
+- **La varilla de arrastre.** Rigidez alta a lo largo del eje de excitación y
+  flexibilidad suficiente en todas las demás direcciones: lo habitual son
+  varillas esbeltas y cortas, pero pueden dar mejor resultado varillas gruesas
+  con tramos delgados y flexibles cerca de cada extremo. Alinea el excitador y
+  la varilla con el eje del transductor de fuerza. Dos cosas que vigilar: los
+  modos de flexión de la propia varilla dentro del rango de frecuencias pueden
+  interferir en la medición, y la flexión del sistema móvil del excitador puede
+  inyectar momentos que el transductor de fuerza nunca llega a ver.
+- **Dónde van los dos transductores**, que es donde se decide la validez y lo
+  que dibuja el recuadro de la figura anterior. Con una varilla de arrastre
+  flexible, el acelerómetro debe fijarse **directamente a la estructura**, nunca
+  a través de la varilla, cuya flexibilidad axial invalida la medida de la
+  respuesta. El transductor de fuerza debe medir la fuerza transmitida **de la
+  varilla a la estructura**; ponerlo en el extremo del excitador se admite «solo
+  con extrema precaución», y entonces hay que comprobar la flexibilidad de la
+  varilla según la ISO 7626-1 y compensar su masa con el procedimiento de
+  cancelación de masa de más abajo.
+- **Los conos reductores de área** pueden hacer falta para aproximar una fuerza
+  puntual, y ellos mismos pueden introducir un momento espurio si se usan sin
+  cuidado.
+
+### Qué le hacen los transductores a la respuesta (apartados 6.4.2, 6.4.3 y 7.3)
+
+Todo transductor que se fija añade masa, y la fuerza espuria necesaria para
+acelerar esa masa se mide como si la hubiera producido la estructura. Lo dañino
+es la consecuencia: una carga de inercia sin compensar **desplaza las
+frecuencias de los picos de respuesta**, y una resonancia medida en el sitio
+equivocado la hereda todo lo que viene después: el ajuste modal, el
+amortiguamiento por el ancho de banda de media potencia, la lectura
+$|Y| = 1/c$ de la sección 2. La inercia rotacional hace lo mismo con los
+momentos (6.4.3), y las cabezas de impedancia son las peores, porque su momento
+de inercia respecto del punto de montaje puede ser grande.
+
+La secuencia de la norma es: elegir la menor masa y la menor inercia
+compatibles con la sensibilidad; y si eso no basta, compensar.
+
+- **Cuándo actuar.** Debe considerarse la compensación electrónica cuando la
+  magnitud de la movilidad en el punto de excitación de la estructura supere
+  $0{,}01/(f\,m_t)$ en todas las frecuencias de interés, siendo $m_t$ la masa
+  efectiva total de los accesorios de acoplo más la masa de extremo efectiva
+  del transductor de fuerza o de la cabeza de impedancia (y la de un
+  acelerómetro independiente en el punto de excitación, si se monta uno).
+- **En qué consiste.** «Cancelación de masa»: multiplicar la aceleración en el
+  punto de excitación por $m_t$ y restar el producto de la señal de fuerza, en
+  analógico o digitalmente. Una medición de movilidad *de transferencia*
+  necesita por tanto un acelerómetro aparte en el punto de excitación que
+  suministre esa señal.
+- **Qué no puede hacer.** Compensa solo la inercia de traslación en el punto de
+  excitación y en la dirección de excitación, nunca la inercia rotacional. La
+  norma **recomienda encarecidamente** reconsiderar la selección de
+  transductores y rediseñar los accesorios de acoplo antes que recurrir a ella,
+  y la confina al rango en que la razón entre la masa efectiva del acoplo y los
+  transductores y la masa efectiva libre de la estructura en el punto de
+  excitación queda entre **0,05 y 0,5**.
+- El apartado 7.2 añade la regla que hace repetible todo lo anterior: los
+  transductores montados con espárrago se aprietan al par que recomienda el
+  fabricante, y la flexibilidad de la fijación se comprueba según la
+  ISO 7626-1.
+
+Para el resonador de la sección 2 el umbral es fácil de situar. Su movilidad en
+el punto de excitación alcanza $1/c = 0,2$ m/(N·s) a 10,07 Hz; con una cabeza de
+impedancia y accesorios de 20 g ($m_t = 0,02$ kg) el umbral $0{,}01/(f\,m_t)$
+vale allí 0,050 m/(N·s), así que en su pico la estructura está cuatro veces por
+encima. Toma en su lugar una cabeza de 2 g y el umbral sube a 0,50 m/(N·s), por
+encima del pico. El umbral baja cuando sube la masa añadida, que es justo su
+razón de ser: la misma estructura necesita compensación con un transductor
+pesado y no la necesita con uno ligero.
 
 El procesado de registros medidos con excitación aleatoria según la
 ISO 7626-2, 8.1.3 (el estimador H1,
@@ -169,7 +363,45 @@ y la coherencia ordinaria $\gamma^2 = |G_{xy}|^2/(G_{xx}\,G_{yy})$ de sus
 comprobaciones de calidad son los estimadores
 espectrales ya existentes de la biblioteca, [`transfer_function` y
 `coherence`](/phonometry/es/devices/electroacoustics/electroacoustics/) (H1 es su valor por
-defecto). Sobre ellos se ofrecen dos criterios de aceptación de la ISO 7626-2:
+defecto).
+
+### Leer la coherencia, y el único sesgo que tiene H1 (Anexo A.1)
+
+El Anexo A.1 es una tabla de diagnóstico, y es la página de la norma de la que
+más partido se saca de inmediato. Una coherencia bastante por debajo de 1 dice algo
+concreto según *dónde* cae.
+
+- **Muescas en las resonancias y antirresonancias** significan resolución en
+  frecuencia insuficiente (que además sesga la FRF calculada), ponderación
+  temporal insuficiente, una estructura no lineal o un amplificador saturado,
+  más de una fuerza de entrada, o ruido de digitalización y ruido electrónico
+  por una fuerza de excitación insuficiente.
+- **Muescas en las resonancias en concreto** pueden significar además que la
+  fuerza del excitador cae ahí, algo inherente cuando un excitador ataca una
+  estructura poco amortiguada. De ahí sale el sesgo que conviene conocer antes
+  de recomendar H1: si la señal de fuerza cae por debajo del suelo de ruido, la
+  estimación H1, el espectro cruzado dividido por el autoespectro de *fuerza*,
+  sale **demasiado baja**, justo en el pico de resonancia del que se está
+  enseñando a leer el amortiguamiento. H2 (autoespectro de respuesta en el
+  denominador) tiene el sesgo contrario, y es al que hay que recurrir cuando el
+  ruido está en la fuerza; Hv queda entre ambos. `transfer_function` da H1 por
+  defecto.
+- **Una caída suave en todo el rango** es una relación señal-ruido pobre, casi
+  siempre por rango dinámico insuficiente: conforma el espectro de excitación,
+  o usa promediado síncrono en el dominio del tiempo.
+- **Una coherencia baja en cualquier sitio** puede ser sencillamente no
+  linealidad.
+
+Dos avisos pillan a los principiantes. Una coherencia calculada a partir de un
+*único* registro vale siempre un ficticio 1,0, así que no significa nada
+mientras no haya varios promedios. Y una coherencia alta no demuestra que los
+datos sean válidos: puede indicar igualmente diafonía entre los canales de
+fuerza y de respuesta.
+
+### Los criterios de aceptación
+
+Además de los estimadores, se ofrecen dos criterios de aceptación de la
+ISO 7626-2:
 
 * **Calibración operacional con masa rígida (7.5.2).** La FRF medida de un
   bloque rígido de masa conocida, suspendido libremente, debe coincidir dentro
@@ -193,8 +425,71 @@ print(res.passed, res.within_tolerance.tolist())   # True [True, True, True]
 print(round(float(vibration.random_error_percent(0.8, 75)), 2))   # 4.08  %
 ```
 
+El criterio de error aleatorio es una decisión que se toma *antes* de medir, no
+una comprobación posterior, y cuántos promedios cuesta depende mucho de la
+coherencia que se espere:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_random_error_es.svg" alt="Error aleatorio normalizado frente al número de espectros promediados en ejes logarítmicos, con una recta descendente por cada valor de coherencia de 0,5 a 0,95. Una línea horizontal de trazos marca el criterio del cinco por ciento, y donde la cruza cada curva se señala el número de promedios que esa coherencia necesita para alcanzarlo: once promedios con una coherencia de 0,95, veintidós con 0,9, cincuenta con 0,8, ochenta y seis con 0,7 y doscientos con 0,5. Una estrella marca el propio ejemplo resuelto de la norma, una coherencia de 0,8 con setenta y cinco promedios que da 4,08 por ciento." width="82%" />
+
+*Lo que cuesta el criterio, en función de lo buena que ya sea la medición.
+Llegar al 5 % cuesta 11 promedios con $\gamma^2 = 0,95$ y 200 con
+$\gamma^2 = 0,5$: un factor veinte por un factor dos en coherencia. Ese es el
+argumento para arreglar la medición, con el diagnóstico del Anexo A.1 de más
+arriba, en lugar de promediar para taparla.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+averages = np.unique(np.round(np.logspace(np.log10(2.0), np.log10(1000.0), 260)))
+for coherence in (0.5, 0.7, 0.8, 0.9, 0.95):
+    error = [float(vibration.random_error_percent(coherence, int(n)))
+             for n in averages]
+    plt.loglog(averages, error, label=f"coherencia {coherence}")
+    # El n con el que esta coherencia alcanza el criterio del 5 %.
+    print(coherence, round((1.0 - coherence) / (2.0 * coherence * 0.05**2)))
+plt.axhline(5.0, ls="--", color="0.4")
+plt.xlabel("Número de espectros promediados"); plt.ylabel("Error aleatorio [%]")
+plt.legend(); plt.show()
+```
+
+</details>
+
+### Tres ensayos más que pide la norma y que esta página no ejecuta
+
+El apartado 10 es explícito en que el procedimiento de promediado del Anexo A.1
+se aplica a la excitación aleatoria, y en que «en A.2 a A.4 se describen ensayos
+adicionales, aplicables a **todos** los tipos de excitación». Esos tres no están
+implementados aquí, pero son baratos, y una medición que solo ha pasado los dos
+criterios anteriores todavía no está validada.
+
+- **A.2, linealidad.** Las uniones atornilladas, las holguras de los apoyos y
+  detalles parecidos hacen no lineales las estructuras reales. Mide la FRF y
+  repítela con la amplitud de excitación bastante aumentada y bastante
+  disminuida; si los resultados no coinciden, la causa exige un análisis más
+  detenido. El apartado lo pide en el transcurso de *cada* serie de ensayos, y
+  es la comprobación que atrapa lo que una muesca de coherencia solo insinúa.
+- **A.3, reciprocidad.** Para una estructura elástica lineal
+  $Y_{ij}(f) = Y_{ji}(f)$: intercambia el excitador y el acelerómetro de
+  respuesta y la movilidad de transferencia debe salir igual. Es un ensayo
+  potente de extremo a extremo de toda la cadena, sujeciones incluidas, y cuesta
+  una medición más. (Algunos elementos, los cojinetes hidrodinámicos entre
+  ellos, no son recíprocos de verdad; entre un elemento así y el punto de
+  excitación el ensayo no se aplica.)
+- **A.4, punto de excitación frente a transferencia.** Las comprobaciones de
+  fase y de antirresonancia de la sección 2: una FRF de punto de excitación se
+  queda dentro de $\pm 90°$ y presenta una antirresonancia entre cada par de
+  resonancias.
+
+Conviene mantener la distinción: A.1 es un criterio de **precisión**, que
+responde a cuántos promedios cuesta un error aleatorio dado, mientras que A.2 a
+A.4 son criterios de **validez** que ningún promediado arregla.
+
 La verificación de calibración devuelve un `RigidMassCalibrationResult` con la
-desviación por frecuencia y los indicadores de aprobación, y un `.plot()`: la
+desviación por frecuencia y los indicadores de cumplimiento, y un `.plot()`: la
 magnitud de la FRF medida frente a la recta de masa rígida con su banda de
 tolerancia de ±5 % (panel superior) y la desviación relativa frente a la misma
 banda (panel inferior, donde una tolerancia de pocos por ciento es realmente
@@ -270,11 +565,16 @@ res.plot()   # |Y(f)| con la resonancia marcada (requiere matplotlib)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_es.svg" alt="Magnitud de la movilidad en el punto de excitación de un resonador de un grado de libertad en ejes log-log, subiendo por la línea de rigidez por debajo de la resonancia, bajando por la línea de masa por encima y con el pico en uno partido por el coeficiente de amortiguamiento en la resonancia" width="82%" />
 
-*Leer una movilidad en el punto de excitación es un diagnóstico estructural:
-por debajo de la resonancia la magnitud sube por la **línea de rigidez**
+*Leer una movilidad en el punto de excitación es un diagnóstico estructural.
+Por debajo de la resonancia la magnitud sube por la **línea de rigidez**
 $\omega/k$, por encima baja por la **línea de masa** $1/(\omega m)$, y la
-altura del pico entre ambas es $1/c$, una lectura directa del
-amortiguamiento (Sección 1).*
+altura del pico entre ambas es $1/c$, una lectura directa del amortiguamiento
+para este resonador aislado; en una estructura real con modos solapados, el
+amortiguamiento se estima en cambio con ajuste modal o con el ancho de banda de
+media potencia. El panel inferior es esa misma afirmación en fase: $+90°$ en la
+línea de rigidez, $-90°$ en la línea de masa y exactamente $0°$ en la
+resonancia, que es lo que significa «puramente real» y por qué el pico vale
+$1/c$.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -308,10 +608,80 @@ plt.show()
 
 </details>
 
+## 5. Movilidades de referencia cuando no se ha medido nada
+
+El SDOF es una referencia para las *definiciones*, no un modelo de nada que
+tenga en sus manos un acústico de la edificación. En una placa grande o una viga
+larga, excitadas lejos de sus bordes, las ondas reflejadas que hacen resonar a
+una estructura real se han extinguido antes de volver, y la movilidad en el
+punto de excitación toma la forma cerrada de la estructura **infinita**
+equivalente, que es exactamente el sustituto que quiere la EN 12354-5 para una
+movilidad de receptor cuando no hay medida. Tres personajes, de la Tabla 5.1 de
+Cremer, Heckl y Petersson:
+
+- la **placa infinita** es una resistencia real pura, $Y = 1/(8\sqrt{B'm''})$,
+  independiente de la frecuencia: absorbe igual a todas las frecuencias y no
+  tiene pico del que leer un amortiguamiento;
+- la **viga infinita** es $Y = (1-\mathrm{j})/(4m'c_B)$, es decir, $-45°$ de
+  fase a toda frecuencia y una magnitud que cae como $\omega^{-1/2}$, porque la
+  propia velocidad de la onda de flexión $c_B$ crece como $\sqrt{\omega}$;
+- una **barra en movimiento longitudinal** es $Y = 1/(\rho c_L S)$, otra vez
+  real y plana: el análogo mecánico de una línea de transmisión adaptada.
+
+```python
+import numpy as np
+
+f = np.array([50.0, 500.0])
+
+# Una losa de hormigón de 140 mm: E = 30 GPa, nu = 0,2, rho = 2400 kg/m3.
+b_plate = vibration.plate_bending_stiffness(3.0e10, 0.14, 0.2)
+plate = vibration.infinite_plate_point_mobility(f, b_plate, 336.0)
+print(f"{float(plate.magnitude[0]):.3e}", round(float(np.degrees(plate.phase[0]))))
+#  2.551e-06 0     -> real, y lo mismo a 500 Hz
+
+# Una viga de acero de 100 x 200 mm, excitada en un punto lejos de sus extremos.
+b_beam = 2.1e11 * 0.1 * 0.2**3 / 12.0
+beam = vibration.infinite_beam_point_mobility(f, b_beam, 7800.0 * 0.02)
+print(f"{float(beam.magnitude[0]):.3e}", round(float(np.degrees(beam.phase[0]))))
+#  7.388e-06 -45
+print(np.round(vibration.beam_bending_wave_speed(f, b_beam, 7800.0 * 0.02), 1))
+#  [306.8 970.1]  -> c_B crece como sqrt(f), así que |Y| cae como 1/sqrt(f)
+```
+
+Ambos constructores devuelven un `MobilityResult`, así que se representan, se
+convierten con `.to()` y se informan exactamente igual que el SDOF de más
+arriba. Otros dos cubren los grados de libertad que ese par deja fuera:
+`infinite_beam_moment_mobility` es la movilidad rotacional que necesitan una
+línea de unión o un soporte atornillado por dos puntos, en rad/(N·m·s), para
+cuando la excitación es un momento y no una fuerza; y
+`longitudinal_rod_mobility` (con su recíproca `longitudinal_rod_impedance`)
+cubre un puntal o un tramo de tubería cargados a lo largo de su eje.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities_es.svg" alt="Dos paneles que comparten un eje logarítmico de frecuencia. El panel superior es la magnitud de la movilidad en el punto de excitación de cuatro estructuras: el resonador de un grado de libertad con su pico agudo dibujado a trazos, una línea horizontal para la placa infinita de hormigón, una recta descendente de pendiente menos un medio para la viga infinita de acero y una segunda línea horizontal para el puntal de acero en movimiento longitudinal. El panel inferior es la fase de cada una: el resonador barre desde más noventa grados hasta menos noventa pasando por cero en su resonancia, mientras que la placa y la barra se quedan en cero y la viga se queda en menos cuarenta y cinco grados a toda frecuencia." width="82%" />
+
+*El contraste al que va toda la sección. Una estructura infinita no devuelve
+nunca nada reflejado, así que no tiene resonancia ni pico: la placa y la barra
+son reales y planas, la viga cae como $f^{-1/2}$ con un $-45°$ constante. Leer
+una gráfica de movilidad como «línea de rigidez, pico, línea de masa» es una
+afirmación sobre estructuras finitas; una placa grande es el caso en que no
+aparece ninguna de las tres.*
+
+```python
+# Una línea cada una, sobre los mismos ejes que el SDOF de la sección 4.
+plate.plot(language="es")
+beam.plot(language="es")
+```
+
+¿A dónde van estos números? Al
+[aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
+que usa las mismas funciones para poner precio a la radiación de un panel, y a
+la movilidad de receptor de EN 12354-5 del
+[ruido estructural instalado](/phonometry/es/buildings/design/installed-structure-borne/).
+
 ### Ficha de informe
 
-`MobilityResult.report(path)` genera un informe de medición de movilidad mecánica
-de una página (definiciones de FRF de la ISO 7626-1:2011, medición según la
+`MobilityResult.report(path)` genera un informe de una página con la medición de
+movilidad mecánica (definiciones de FRF de la ISO 7626-1:2011, medición según la
 ISO 7626-2:2015). La movilidad es una función de respuesta en frecuencia
 continua, no una magnitud por bandas de octava, de modo que la ficha la presenta
 con honestidad como el espectro de magnitud $|Y(f)|$ más una tabla compacta de
@@ -320,7 +690,7 @@ transferencia, el rango de frecuencias, la frecuencia del máximo, la movilidad
 máxima y la fase allí), y una movilidad máxima $|Y|$ enmarcada a la frecuencia en
 que ocurre (para una FRF en punto de excitación, una resonancia donde
 $|Y| = 1/c$ mide el amortiguamiento). Es una caracterización, así que no hay
-veredicto de aprobado/no aprobado; `language="es"` genera la ficha en español. La
+veredicto de cumple/no cumple; `language="es"` genera la ficha en español. La
 ficha siempre incrusta el espectro $|Y(f)|$, por lo que necesita los extras de
 informe y de gráficos (`pip install "phonometry[report,plot]"`).
 
@@ -352,7 +722,12 @@ movilidad y acelerancia, con sus recíprocas fuerza-por-movimiento, que se
 convierten entre sí con `convert_frf`. También se cubren la distinción entre
 punto de excitación y transferencia, y el resonador SDOF en forma cerrada
 usado como referencia (`sdof_receptance`, `sdof_mobility`,
-`sdof_accelerance`, `resonance_frequency`, `sdof_mobility_result`). En el
+`sdof_accelerance`, `resonance_frequency`, `sdof_mobility_result`), y las
+movilidades puntuales de estructura infinita que hacen de sustituto de una
+placa, una viga o un puntal reales (`infinite_plate_point_mobility`,
+`infinite_beam_point_mobility`, `infinite_beam_moment_mobility`,
+`longitudinal_rod_mobility` y sus recíprocas de impedancia, con
+`plate_bending_stiffness` y `beam_bending_wave_speed`). En el
 lado de medición también se cubre el procesado H1 de excitación aleatoria de
 la ISO 7626-2:2015 (`transfer_function`, `coherence`, compartidos con la
 guía de electroacústica), junto con dos criterios de aceptación: la
@@ -367,9 +742,29 @@ Las magnitudes matriciales *bloqueadas* de la Tabla 1, necesarias para
 sistemas de varias coordenadas, tampoco están implementadas. `convert_frf`
 devuelve solo las recíprocas *libres* elemento a elemento de la ISO 7626-1,
 3.1.4, correctas para el punto de excitación o para una sola vía, pero no
-para una matriz de FRF completa.
+para una matriz de FRF completa. Del procedimiento de aceptación solo se
+calculan los dos criterios anteriores: las reglas de suspensión del apartado
+5.3, el criterio de acoplo del excitador del 6.4.4, el umbral de cancelación de
+masa del 7.3 y los ensayos de linealidad, reciprocidad y punto de excitación de
+A.2 a A.4 se describen aquí y se dejan al operador, igual que la Desigualdad 3
+de la ISO 10846 se describe pero no se calcula en la
+[página de rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/).
 
 ## Véase también
 
+- [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/):
+  el límite de fuerza bloqueada de la sección 1, aplicado a caracterizar un
+  aislador.
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
+  donde la movilidad y la velocidad libre de una fuente se convierten en una
+  potencia instalada.
+- [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
+  la predicción que consume una movilidad de receptor, medida o tomada de la
+  sección 5.
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
+  en qué se convierten en una unión entre dos de ellas las movilidades de placa
+  de la sección 5.
+- [Respuesta en frecuencia y coherencia](/phonometry/es/devices/electroacoustics/electroacoustics/):
+  los estimadores `transfer_function` y `coherence` que ejecuta la sección 3.
 - Referencia de la API: [`vibration.structural.mechanical_mobility`](/phonometry/es/reference/api/vibration/mechanical-mobility/).
 - Teoría: [Movilidades puntuales y eficiencia de radiación](/phonometry/es/reference/theory/vibration/#movilidades-puntuales-y-eficiencia-de-radiación-cremer-5-hopkins-29): las movilidades puntuales de estructura infinita y la eficiencia de radiación, y por qué son promedios en torno a los que oscila una estructura finita.

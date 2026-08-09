@@ -1,6 +1,6 @@
 ---
 title: "Molestia psicoacústica e intensidad de fluctuación"
-description: "La molestia psicoacústica de Fastl y Zwicker PA = N5·(1 + √(wS² + wFR²)) a partir de sonoridad, agudeza, aspereza e intensidad de fluctuación (Ecs 16.2–16.4), la forma cerrada para ruido de banda ancha AM (Ec. 10.2) y el modelo de señal de intensidad de fluctuación de Osses 2016."
+description: "La molestia psicoacústica de Fastl y Zwicker PA = N5·(1 + √(wS² + wFR²)) a partir de sonoridad, agudeza, aspereza e intensidad de fluctuación (Ecs. 16.2–16.4), la forma cerrada para ruido de banda ancha AM (Ec. 10.2) y el modelo de señal de intensidad de fluctuación de Osses 2016."
 references:
   - type: book
     authors: ["Fastl, H.", "Zwicker, E."]
@@ -9,7 +9,7 @@ references:
     edition: "3.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-3-540-68888-4"
-    note: "La fuente del modelo de molestia psicoacústica de la sección 2 (Ecs 16.2-16.4, capítulo 16; origen Widmann 1992) y de la forma cerrada de la intensidad de fluctuación para ruido de banda ancha AM de la sección 3.1 (Ec. 10.2, capítulo 10)."
+    note: "La fuente del modelo de molestia psicoacústica de la sección 2 (Ecs. 16.2-16.4, capítulo 16; origen Widmann 1992) y de la forma cerrada de la intensidad de fluctuación para ruido de banda ancha AM de la sección 3.1 (Ec. 10.2, capítulo 10)."
   - type: article
     authors: ["Osses Vecchi, A.", "García León, R.", "Kohlrausch, A."]
     year: 2016
@@ -37,7 +37,7 @@ sensaciones psicoacústicas (**sonoridad**, **agudeza**, **aspereza** e
 **intensidad de fluctuación**) en una única **molestia psicoacústica** $PA$, un
 escalar que crece con la sonoridad y se eleva aún más cuando el sonido es agudo,
 áspero o fluctúa lentamente. Esta página cubre el modelo exacto de $PA$
-(Ecs 16.2–16.4), la **intensidad de fluctuación** que consume, tanto la forma
+(Ecs. 16.2–16.4), la **intensidad de fluctuación** que consume, tanto la forma
 cerrada para ruido de banda ancha modulado en amplitud (Ec. 10.2) como el modelo
 de señal de Osses et al. (2016), y la utilidad que deriva las cuatro sensaciones
 a partir de una grabación.
@@ -79,7 +79,7 @@ La molestia psicoacústica se apoya en cuatro sensaciones auditivas, cada una co
 su propio modelo y unidad en la biblioteca:
 
 - **Sonoridad**: la sonoridad percentil $N_5$ (la sonoridad superada el 5 % del
-  tiempo), en **sonios**, del modelo Zwicker variable en el tiempo de la ISO
+  tiempo), en **sonios**, del modelo de Zwicker variable en el tiempo de la ISO
   532-1 (`loudness_zwicker`, véase [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/)).
 - **Agudeza** $S$, en **acum**: el balance espectral hacia las altas
   frecuencias, DIN 45692 (`sharpness_din`).
@@ -88,7 +88,7 @@ su propio modelo y unidad en la biblioteca:
 - **Intensidad de fluctuación** $F$, en **vacil**: la sensación de fluctuación
   lenta (~4 Hz) de la sonoridad (§3 más abajo).
 
-## 2. Molestia psicoacústica (Ecs 16.2–16.4)
+## 2. Molestia psicoacústica (Ecs. 16.2–16.4)
 
 El modelo exacto (Fastl y Zwicker Ec. 16.2; origen Widmann 1992) escala $N_5$
 por un factor que crece con la ponderación de agudeza $w_S$ y la ponderación
@@ -103,7 +103,46 @@ $$
 $w_S$ es cero para $S \le 1{,}75\ \text{acum}$ (la agudeza solo añade molestia
 por encima de
 ese umbral); $w_{FR}$ pondera la aspereza con más peso que la intensidad de
-fluctuación (0,6 frente a 0,4). `psychoacoustic_annoyance` toma las cuatro
+fluctuación (0,6 frente a 0,4). Esas dos elecciones son todo el juicio de
+modelado que hay en la fórmula, y cuesta menos fiarse de ellas una vez vistas:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/annoyance_weightings_es.svg" alt="A la izquierda, la ponderación de agudeza wS frente a la agudeza de 1 a 5 acum para sonoridades percentiles de 10, 30 y 60 sonios, plana en cero por debajo de 1,75 acum y abriéndose en abanico por encima. A la derecha, la molestia psicoacústica frente a una magnitud de sensación gastada por entero en aspereza o por entero en intensidad de fluctuación, con la sonoridad fija en 30 sonios y la agudeza en 2 acum, con la curva de aspereza subiendo hasta 45,4 frente a 40,5 de la intensidad de fluctuación para una magnitud de 1,5" width="94%" />
+
+*Un sonido tiene que ser más agudo que la referencia de 1,75 acum antes de que
+la agudeza cueste nada en absoluto, y el abanico por encima de ese punto es la
+dependencia de $w_S$ con la sonoridad. A la derecha, la misma magnitud de
+sensación compra alrededor de la mitad más de molestia cuando llega como
+aspereza que cuando llega como intensidad de fluctuación.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `psychoacoustics` lo importa el fragmento de arriba.
+sharpness = np.linspace(1.0, 5.0, 200)
+for n5 in (10.0, 30.0, 60.0):
+    w_s = [psychoacoustics.psychoacoustic_annoyance(n5, float(s), 0.0, 0.0).w_s
+           for s in sharpness]
+    plt.plot(sharpness, w_s, label=f"N5 = {n5:g} sonios")
+plt.axvline(1.75, linestyle="--")
+plt.xlabel("Agudeza S [acum]")
+plt.ylabel("Ponderación de agudeza wS")
+plt.legend()
+plt.show()
+
+# La misma magnitud gastada en aspereza o en intensidad de fluctuación, con
+# N5 = 30 sonios y S = 2.0 acum fijos:
+rough = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.0, 1.5).annoyance
+fluct = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 1.5, 0.0).annoyance
+print(round(rough, 1), round(fluct, 1))   # 45.4 40.5
+```
+
+</details>
+
+`psychoacoustic_annoyance` toma las cuatro
 magnitudes directamente y devuelve la molestia junto con las dos ponderaciones
 intermedias:
 
@@ -111,11 +150,32 @@ intermedias:
 from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
-print(round(res.annoyance, 4))   # 37.0478
+print(round(res.annoyance, 4))   # 37.0477
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
 
 res.plot()   # PA junto a sus ponderaciones wS y wFR (necesita matplotlib)
 ```
+
+**Qué significa ese número.** $PA$ no lleva unidad ni criterio. Está construido
+de modo que un sonido neutro — agudeza igual o menor que 1,75 acum, sin
+aspereza y sin fluctuación — tenga un $PA$ igual a su $N_5$ en sonios, y toda
+cualidad aguda, áspera o fluctuante solo puede empujarlo *por encima* de ese
+suelo. Así que lee $PA$ como «la sonoridad que vale este sonido una vez tenido
+en cuenta su carácter»: el 37,05 del ejemplo resuelto frente a un $N_5$ de
+30 sonios dice que el carácter cuesta un 23 %. El objetivo es comparar —
+ordenar dos diseños del mismo producto, o cuantificar lo que ha comprado un
+arreglo — y no existe ningún límite contra el que citarlo.
+
+:::caution
+**Esta no es la molestia de la evaluación de ruido ambiental.** La molestia
+psicoacústica es un escalado de laboratorio de un solo sonido. No dice nada de
+la exposición a largo plazo, la franja horaria, la actitud de la población
+hacia la fuente ni el porcentaje de altamente molestos, que es asunto de los
+niveles de evaluación y de las relaciones exposición-respuesta de
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
+Un $PA$ de 37 no es «un 37 % de altamente molestos», y las dos magnitudes no
+son convertibles.
+:::
 
 La figura de arriba barre $PA$ frente a $N_5$ para tres perfiles: una base
 neutra ($S = 1{,}75\ \text{acum}$, $F = R = 0$, de modo que $PA = N_5$), un
@@ -127,25 +187,57 @@ El modelo es tan compacto que cabe entero en un dibujo: dos ponderaciones y
 una combinación. El diagrama recorre con él el ejemplo resuelto, sensación a
 sensación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, agudeza de 2,0 acum, sonoridad percentil N5 de 30 sone, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la de la agudeza wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, agudeza de 2,0 acum, sonoridad percentil N5 de 30 sonios, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la de la agudeza wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
 
 ### 2.1 A partir de una señal (estimación de ingeniería)
 
 `psychoacoustic_annoyance_from_signal` es una utilidad que deriva las cuatro
 sensaciones a partir de una señal de presión calibrada y las combina: $N_5$ de
-la sonoridad Zwicker variable en el tiempo de la ISO 532-1, $S$ de la agudeza
+la sonoridad de Zwicker variable en el tiempo de la ISO 532-1, $S$ de la agudeza
 DIN 45692, $R$ de la aspereza de Sottek ECMA-418-2 y $F$ del modelo de señal
 de
 intensidad de fluctuación.
 
+La utilidad vale lo que valga el registro que se le dé, y ninguno de los dos
+puntos de entrada de esta página admite un argumento de calibración, así que
+`x` tiene que venir ya como **presión calibrada en pascales**; de dónde sale
+ese factor está en
+[Medir la entrada](/phonometry/es/perception/psychoacoustics/loudness/#medir-la-entrada-apartado-4),
+en la página de sonoridad. Más allá de la calibración: sin ponderar; un único
+estado de funcionamiento declarado, no una subida de régimen; lo bastante largo
+como para que $N_5$ sea el percentil de algo y para que el análisis de
+fluctuación de ~4 Hz tenga suficientes periodos de modulación, lo que en la
+práctica significa varios segundos y la misma duración para todos los diseños
+que se comparen; y un `field=` acorde con cómo se captó el sonido. Un fragmento
+de dos segundos da un $N_5$ que es casi $N_\text{max}$ y una $F$ sesgada a la
+baja. Una grabación binaural o con cabeza artificial se analiza un oído cada
+vez, ya ecualizada a campo libre o a campo difuso, y lo habitual es informar
+del canal más sonoro.
+
 ```python
+import numpy as np
 from phonometry import psychoacoustics
 
+# Una grabación en bruto y su calibración para que la guía funcione por sí
+# sola. Aquí no hay argumento calibration_factor, así que x tiene que estar ya
+# en pascales.
+fs = 48000
+t = np.arange(int(5.0 * fs)) / fs
+x = (1.0 + 0.8 * np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (70 / 20) / np.sqrt(np.mean(x**2))   # calibrada a 70 dB SPL
+
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
-print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+print(f"PA = {res.annoyance:.1f}  (N5 = {res.n5:.1f} sonios, S = {res.sharpness:.2f} acum,"
+      f" R = {res.roughness:.2f} asper, F = {res.fluctuation_strength:.2f} vacil)")
 
 res.plot()   # la misma vista PA / wS / wFR, ahora con las cuatro sensaciones derivadas
 ```
+
+Las cuatro sensaciones tienen que salir del *mismo* registro y del mismo estado
+de funcionamiento: PA es una regla de combinación, no una medición por derecho
+propio, así que calcular $N_5$ sobre un minuto y $R$ sobre dos segundos de ese
+minuto mezcla en silencio dos sonidos distintos. Cita cada sensación con el
+modelo que la produjo.
 
 :::caution
 **Advertencia sobre la mezcla de modelos.** Este compuesto mezcla familias de
@@ -165,12 +257,24 @@ de banda de la frecuencia de modulación, pero su máximo se sitúa aproximadame
 un orden de magnitud más abajo, en $f_{mod} \approx 4\ \text{Hz}$ en lugar del
 máximo de la
 aspereza en ~70 Hz. Por definición, un tono de 1 kHz a 60 dB, modulado en
-amplitud al 100 % a 4 Hz, produce 1 vacil. Esta página cubre los modelos de
-Fastl y Zwicker; la intensidad de fluctuación normativa del modelo de Sottek
-(apartado 9 de ECMA-418-2) está en
-[Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
+amplitud al 100 % a 4 Hz, produce 1 vacil. Esta página cubre dos de los tres
+modelos de intensidad de fluctuación de la biblioteca: la forma cerrada de
+Fastl y Zwicker para ruido de banda ancha modulado en amplitud (§3.1) y el
+modelo de señal de Osses et al. (2016) para señales arbitrarias (§3.2). La
+intensidad de fluctuación normativa del modelo de Sottek (apartado 9 de
+ECMA-418-2), en vacil_HMS, está en
+[Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/):
+ojo con que la unidad de esta página es el vacil y la de aquella el vacil_HMS,
+así que las dos no son el mismo número para el mismo sonido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="Intensidad de fluctuación frente a la frecuencia de modulación en un eje logarítmico: la curva de forma cerrada para ruido de banda ancha AM y el barrido del modelo de señal para tono AM muestran ambos una característica de paso de banda con máximo a 4 Hz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="A la izquierda, la intensidad de fluctuación de forma cerrada y la del modelo de señal para el mismo ruido de banda ancha modulado en amplitud a 60 dB frente a la frecuencia de modulación, ambas de paso de banda en torno a 4 Hz, con el modelo de señal alcanzando 5,5 vacil frente a los 3,7 de la forma cerrada, un exceso de factor 1,5 a 4 Hz. A la derecha, el modelo de señal sobre el tono de 1 kHz a 70 dB modulado en amplitud para el que se calibró, con máximo de 1,09 vacil a 4 Hz" width="88%" />
+
+*Los dos modelos sobre el mismo estímulo, que es la comparación que el aviso de
+abajo convierte en regla. Los dos son pasos de banda centrados cerca de 4 Hz,
+pero sobre ruido de banda ancha AM el modelo de señal supera a la forma
+cerrada en alrededor de la mitad, porque acumula la modulación banda a banda a
+lo largo de todo el eje de Bark. Sobre el tono AM para el que se calibró, a la
+derecha, se porta bien.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -180,31 +284,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# Forma cerrada exacta (Ec. 10.2), ruido de banda ancha AM a 60 dB, modulación 100 %:
+# Panel izquierdo, los dos modelos sobre el mismo estímulo: ruido de banda
+# ancha AM a 60 dB, modulación 100 %.
 fmod = np.logspace(np.log10(0.5), np.log10(32.0), 240)
 f_bbn = [psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod]
 
-# Modelo de señal de Osses 2016 sobre un tono AM de 1 kHz / 70 dB en el mismo barrido:
-fs = 48000
-t = np.arange(int(2.0 * fs)) / fs
-carrier = np.sin(2 * np.pi * 1000 * t)
-fm_tone = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
-f_tone = []
-for fm in fm_tone:
-    am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
-    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
-    f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+rng = np.random.default_rng(3)
+tn = np.arange(int(4.0 * fs)) / fs
+noise = rng.standard_normal(tn.size)
+fm_noise = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+f_noise = []
+for fm in fm_noise:
+    am = (1.0 + np.sin(2 * np.pi * fm * tn)) * noise
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (60 / 20)
+    f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
 fig, ax = plt.subplots()
-ax.semilogx(fmod, f_bbn, label="Ruido de banda ancha AM (forma cerrada)")
-ax2 = ax.twinx()
-ax2.plot(fm_tone, f_tone, "s--", color="tab:green", label="Tono AM (modelo de señal)")
+ax.semilogx(fmod, f_bbn, label="forma cerrada, Ec. 10.2")
+ax.semilogx(fm_noise, f_noise, "s--", label="modelo de señal de Osses 2016")
 ax.axvline(4.0, ls="--", color="0.4")
 ax.set_xlabel("Frecuencia de modulación f_mod [Hz]")
 ax.set_ylabel("Intensidad de fluctuación F [vacil]")
-h1, l1 = ax.get_legend_handles_labels()
-h2, l2 = ax2.get_legend_handles_labels()
-ax.legend(h1 + h2, l1 + l2, loc="upper right")
+ax.legend(loc="upper right")
 plt.show()
 ```
 
@@ -246,7 +348,7 @@ eje de Bark y la traza dependiente del tiempo.
 from phonometry import psychoacoustics
 
 res = psychoacoustics.fluctuation_strength(x, fs)
-print(res.fluctuation_strength)   # vacil
+print(round(res.fluctuation_strength, 2))   # 0.65 vacil para la señal de arriba
 res.plot()   # intensidad de fluctuación específica F′(z) sobre el eje de Bark (requiere matplotlib)
 ```
 
@@ -296,10 +398,11 @@ que admite la forma cerrada única.
 
 :::note
 **Sin norma numérica.** La intensidad de fluctuación no tiene norma ISO/IEC. Esta
-es una implementación sala limpia a partir del artículo de Osses 2016, calibrada
-para que el tono AM de 1 kHz / 60 dB / $m = 1$ / 4 Hz marque 1,00 vacil por
-construcción, y contrastada con los valores de la literatura de la Tabla 1 de
-Osses 2016 y con la referencia abierta SQAT (usada solo como oráculo numérico).
+es una implementación de sala limpia a partir del artículo de Osses 2016,
+calibrada para que el tono AM de 1 kHz / 60 dB / $m = 1$ / 4 Hz marque
+1,00 vacil por construcción, y contrastada con los valores de la literatura de
+la Tabla 1 de Osses 2016 y con la referencia abierta SQAT (usada solo como
+oráculo numérico).
 En el barrido de tono AM a 70 dB
 $f_{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ da
 `[0,40, 0,79, 1,09, 1,05, 0,17, 0,09]` vacil frente a la literatura
@@ -314,7 +417,7 @@ Para **ruido de banda ancha AM** el modelo de señal sobreestima el nivel absolu
 ## Qué cubre esta guía
 
 **Cubierto.** Fastl y Zwicker, en *Psychoacoustics: Facts and Models*, dan el
-modelo exacto de $PA$, Ecs 16.2-16.4 (origen Widmann 1992), que ejecuta
+modelo exacto de $PA$, Ecs. 16.2-16.4 (origen Widmann 1992), que ejecuta
 `psychoacoustic_annoyance`. También dan la forma cerrada para ruido de banda
 ancha AM, Ec. 10.2, que ejecuta `fluctuation_strength_am_noise`. El modelo de
 señal de Osses et al. (2016) para la intensidad de fluctuación se ejecuta
@@ -337,5 +440,19 @@ página: está en
 
 ## Véase también
 
-- Referencia de la API: [`psychoacoustics.quality.annoyance`](/phonometry/es/reference/api/psychoacoustics/annoyance/) y [`psychoacoustics.quality.fluctuation_strength`](/phonometry/es/reference/api/psychoacoustics/fluctuation-strength/).
+- [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/): la sonoridad
+  percentil $N_5$ de ISO 532-1 que este modelo toma como primer argumento, y las
+  reglas de captación que la grabación tiene que cumplir antes de que nada de
+  esto sirva.
+- [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/):
+  la agudeza $S$ de DIN 45692, la aspereza $R$ de ECMA-418-2 y la intensidad de
+  fluctuación normativa en vacil_HMS de la misma sensación que esta página
+  modela en vacil.
+- [Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/):
+  los modelos de sonoridad alternativos, y por qué mezclar familias hace del
+  compuesto una estimación de ingeniería.
+- [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/):
+  la molestia de la comunidad, la otra cosa que significa la palabra, y los
+  niveles de evaluación con los que se valora.
 - Teoría: [Modelos avanzados de sonoridad y calidad sonora](/phonometry/es/reference/theory/perception/#modelos-avanzados-de-sonoridad-y-calidad-sonora): las métricas de sonoridad y de calidad sonora que combina el modelo de molestia, deducidas una a una.
+- Referencia de la API: [`psychoacoustics.quality.annoyance`](/phonometry/es/reference/api/psychoacoustics/annoyance/) y [`psychoacoustics.quality.fluctuation_strength`](/phonometry/es/reference/api/psychoacoustics/fluctuation-strength/).

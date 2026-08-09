@@ -886,9 +886,13 @@ estructura. Para estructuras infinitas son formas cerradas: una placa delgada
 infinita es una resistencia pura $Z = 8\sqrt{B'\,m''}$ (real, independiente de
 la frecuencia), mientras que una viga infinita tiene
 $Y = (1-\mathrm{j})/(4 m' c_B)$ (45 grados, decayendo como $\omega^{-1/2}$).
-Aportan la movilidad de receptor que EN 12354-5 necesita cuando no hay medida, y
-se empaquetan como un [`MobilityResult`](/phonometry/es/vibration/structural/mechanical-mobility/)
-de ISO 7626.
+Aportan la movilidad de receptor que EN 12354-5 necesita cuando no hay medida.
+`infinite_plate_point_mobility` e `infinite_beam_point_mobility` devuelven esas
+mismas magnitudes empaquetadas como un `MobilityResult` de ISO 7626, así que se
+representan, se convierten y se informan igual que cualquier FRF medida; la
+[guía de movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/#5-movilidades-de-referencia-cuando-no-se-ha-medido-nada)
+las lee frente al resonador SDOF y añade los casos de momento y de barra
+longitudinal.
 
 ```python
 from phonometry import infinite_plate_impedance, infinite_beam_mobility, injected_power

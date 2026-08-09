@@ -25,8 +25,9 @@ la **distribución estadística del umbral de audición con la edad** para una
 población otológicamente normal: la pérdida lenta y primero en altas
 frecuencias conocida como presbiacusia. **ISO 389-7:2005** fija el **umbral de
 referencia de la audición**, el cero audiométrico (0 dB HL) expresado como nivel
-de presión acústica en escucha de campo libre y campo difuso. Ambas se definen
-sobre las frecuencias audiométricas de 125 Hz a 8000 Hz.
+de presión acústica en escucha de campo libre y campo difuso. Aquí ambas se
+devuelven sobre las mismas once frecuencias audiométricas, de 125 Hz a 8000 Hz,
+de modo que se combinan banda a banda.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_hearing_threshold_es.svg"
@@ -71,6 +72,22 @@ audiograma descendente clásico de la presbiacusia. Hombres y mujeres siguen
 coeficientes distintos (el argumento `sex`), y puede pedirse un subconjunto de
 las frecuencias audiométricas con `frequencies=`.
 
+**Hasta dónde llega el modelo.** ISO 7029:2017 especifica sus coeficientes para
+edades de **18 a 80 años** sobre las frecuencias audiométricas de 125 Hz a
+8000 Hz (apartado 4.1), y añade una advertencia propia: de 3000 Hz a 8000 Hz los
+valores por encima de 70 años son solo informativos, porque a esas frecuencias
+el umbral de muchos de los sujetos de más edad no pudo medirse en absoluto (se
+salía de la escala del audiómetro), así que la dispersión ajustada descansa ahí
+sobre una muestra truncada. La ley de potencias está anclada en los 18 años,
+donde la desviación mediana es cero por construcción, y una edad inferior se
+rechaza sin más, porque la magnitud está definida *como* una desviación respecto
+a los 18. Por arriba, en cambio, nada la detiene: `age_threshold(90, "male")`
+devuelve 106,7 dB a 8 kHz, en silencio, y eso es una extrapolación que la norma
+no respalda. Un valor así se cita como extrapolación o se para en el límite. El
+fractil hereda la misma debilidad: describe una población cribada de tamaño
+finito, así que las colas lejanas son las que menos respaldo tienen justo donde
+están las edades lejanas.
+
 **Quién cuenta como «otológicamente normal».** La población de la ISO 7029 no
 es la población general: son personas cribadas para estar en un estado normal
 de salud, libres de signos o síntomas de enfermedad del oído y de obstrucción
@@ -88,15 +105,61 @@ predicción para una persona: `fractile=0.9` devuelve el umbral *por debajo del
 cual* oye el 90 % de las personas otológicamente normales de esa edad y sexo
 (solo lo supera el décimo que peor oye), y `fractile=0.5` la mediana: mitad por
 encima, mitad por debajo. La dispersión es deliberadamente asimétrica (dos
-semi-gaussianas, $s_u > s_l$): el envejecimiento arrastra a una minoría muy
-abajo mientras la mitad que mejor oye se mantiene agrupada cerca de la
-mediana, así que los percentiles extremos del lado malo se mueven con la edad
-mucho más deprisa de lo que el lado bueno llega a mejorar. Un audiograma
-individual puede caer en cualquier punto de ese abanico; el modelo te dice
-cuán *sorprendente* es, no cuál debería ser.
+semi-gaussianas, con $s_u > s_l$ en la mayor parte del rango): el
+envejecimiento arrastra a una minoría muy abajo mientras la mitad que mejor oye
+se mantiene agrupada cerca de la mediana, así que los percentiles extremos del
+lado malo se mueven con la edad mucho más deprisa de lo que el lado bueno llega
+a mejorar. Un audiograma individual puede caer en cualquier punto de ese
+abanico; el modelo te dice cuán *sorprendente* es, no cuál debería ser.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_sex_and_spread_es.svg"
+  alt="Dos paneles a 4000 Hz frente a la edad, de 18 a 80 años. Izquierda: la desviación mediana de ISO 7029 para hombres y para mujeres, que suben ambas desde cero a los 18 años hasta 50,0 dB y 43,2 dB a los 80, con la separación sombreada entre ellas ensanchándose desde 4,9 dB a los 60 años hasta 6,8 dB a los 80. Derecha: las dispersiones superior e inferior de los hombres, con la superior subiendo hasta un máximo de 18,8 dB a los 64 años y cayendo después hasta cruzar por debajo de la inferior a los 75 años, con las edades por encima de 70 sombreadas y marcadas como solo informativas"
+  width="96%"
+/>
+
+*Las dos afirmaciones del párrafo anterior, dibujadas a 4 kHz. Izquierda:
+hombres y mujeres siguen coeficientes distintos, y la separación crece con la
+edad, 4,9 dB a los 60 años y 6,8 dB a los 80, así que un enunciado sobre
+fractiles sin un sexo asociado no significa nada. Derecha: la asimetría es real
+pero no permanente. $s_u$ se separa de $s_l$ hasta los 64 años
+aproximadamente, luego retrocede y cruza por debajo de ella a los 75. Esa
+inversión es un artefacto con nombre: a partir de 3 kHz el umbral de muchos de
+los sujetos de más edad no pudo medirse en absoluto, y por eso el apartado 4.1
+de ISO 7029 marca como solo informativo todo lo que queda por encima de 70 años
+a esas frecuencias.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `hearing` es la importación del primer fragmento de esta página.
+ages = np.arange(18.0, 81.0)
+i = 8   # 4000 Hz, la novena frecuencia audiométrica
+
+fig, (ax_sex, ax_spread) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+for sex, style in (("male", "-"), ("female", "--")):
+    med = [hearing.age_threshold(a, sex, 0.5).median[i] for a in ages]
+    ax_sex.plot(ages, med, style, label=sex)
+ax_sex.legend()
+
+res = [hearing.age_threshold(a, "male", 0.5) for a in ages]
+su = np.array([r.spread_upper[i] for r in res])
+sl = np.array([r.spread_lower[i] for r in res])
+ax_spread.plot(ages, su, "-", label="s_u")
+ax_spread.plot(ages, sl, "--", label="s_l")
+ax_spread.axvline(70.0, linestyle=":")      # solo informativo por encima de aquí
+ax_spread.legend()
+plt.show()
+```
+
+</details>
 
 `AgeThresholdResult.plot()` dibuja ese abanico directamente: la mediana, el
-fractil pedido y la banda del 10 % al 90 % entre ambos, sobre un eje de
+fractil pedido y la banda de fractiles del 10 % al 90 %, sobre un eje de
 audiograma.
 
 <ThemeImage
@@ -150,7 +213,12 @@ retoma la cadena en ese punto.
 El cero audiométrico no es un nivel de presión acústica fijo: depende de cómo
 llega el sonido al oyente. La Tabla 1 de ISO 389-7:2005 da el umbral de
 referencia para escucha de **campo libre** (incidencia frontal) y **campo
-difuso**.
+difuso**. Esa tabla es una tabla en tercios de octava de 38 filas que va de
+20 Hz a 18 000 Hz; `reference_threshold` lleva solo las once filas
+audiométricas que también usa ISO 7029, de manera que ambas funciones quedan
+alineadas banda a banda y pueden sumarse sin remuestrear. Cualquier otra
+frecuencia da error en lugar de interpolar, porque la norma tabula el umbral y
+no define ninguna interpolación entre sus filas.
 
 ```python
 from phonometry import hearing
@@ -160,10 +228,81 @@ print(hearing.reference_threshold("free-field"))
 print(hearing.reference_threshold("diffuse-field")[4])   # 0.8 dB a 1000 Hz
 ```
 
+### A qué está referido el cero de referencia
+
+Estos valores calibran la audiometría **en campo sonoro**, los métodos de ensayo
+con altavoz de ISO 8253-2, y no la audiometría con auriculares. Valen bajo las
+cuatro condiciones que enumera el apartado 1 de ISO 389-7, y solo bajo esas:
+
+- **El campo.** Con el oyente ausente, el campo es una onda plana progresiva
+  libre con la fuente justo enfrente (incidencia frontal), o un campo difuso
+  cualificado como especifica ISO 8253-2.
+- **La señal.** Un tono puro en campo libre; una banda de tercio de octava de
+  ruido blanco o rosa en campo difuso. Hasta 8 kHz cualquiera de las dos
+  columnas vale también para cualquier otra banda de ruido más estrecha que la
+  banda crítica.
+- **El punto de medida.** El nivel de presión acústica se mide *con el oyente
+  ausente*, en el punto que ocupará el centro de su cabeza, no en el oído ni con
+  el sujeto sentado en la silla.
+- **Los oídos.** La escucha es binaural.
+
+Los valores llevan además un *procedimiento*. La definición 3.1 señala que toda
+la serie ISO 389 descansa en el procedimiento de determinación del umbral de
+ISO 8253-1, y que cabe esperar que un procedimiento de ensayo con otras
+características dé umbrales que difieran en promedio hasta varios decibelios.
+Un estudio deja constancia, por tanto, del procedimiento que usó, no solo de los
+niveles que obtuvo.
+
+La trampa es el audiograma clínico. El 0 dB HL de un audiómetro es el nivel de
+presión acústica umbral equivalente de referencia de ISO 389-1 (auriculares
+supraaurales), ISO 389-2 (auriculares de inserción) o ISO 389-8 (auriculares
+circumaurales) para el auricular realmente colocado, referido a un acoplador
+acústico o a un simulador de oído, y obtenido de forma monoaural. El apartado 1
+de ISO 389-7 declara sin rodeos que sus datos difieren de aquellos y que una
+comparación directa no es apropiada. `reference_threshold("free-field")` es el
+cero de un ensayo con altavoz; nunca es un factor de conversión para un
+audiograma con auriculares.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_soundfield_audiometry_es.svg"
+  alt="Tres paneles con las condiciones de escucha que hay detrás de la Tabla 1 de ISO 389-7. A, campo libre: un altavoz sobre el eje de referencia al menos a 1 m del punto de referencia, con acimut y elevación de cero grados, un micrófono de medida montado en pértiga con la cápsula exactamente en ese punto, y el oyente y la silla dibujados a trazos porque ambos están ausentes mientras se mide el nivel; un cuadrado a trazos marca el volumen de más menos 0,15 metros que debe mantenerse dentro de más menos 1 dB hasta 4 kHz. B, campo difuso: cuatro altavoces alrededor del mismo oyente ausente con señales no coherentes y rayos que llegan desde todas las direcciones, con el mismo punto de referencia y el mismo micrófono. C, por contraste: un oyente presente, con un auricular supraaural cuyo nivel está referido a un acoplador IEC 60318-1, etiquetado como el cero de referencia de ISO 389-1, -2 o -8 y nunca como un valor de ISO 389-7"
+  width="96%"
+/>
+
 Ambos campos coinciden en baja frecuencia y divergen por encima de 1 kHz
 aproximadamente, donde la resonancia del conducto auditivo y la difracción
 de la cabeza hacen del campo libre frontal la condición más sensible (un umbral más
 bajo) en torno a 3–4 kHz.
+
+**De un umbral en dB HL a un nivel de presión acústica.** El cero audiométrico
+*es* el nivel de presión acústica del umbral de referencia, así que un umbral en
+dB HL se convierte en un nivel físico sumándole el valor de ISO 389-7 para la
+misma frecuencia y la misma condición de escucha, $L_p = \mathrm{HL} + T_f$:
+
+```python
+hl = hearing.age_threshold(65, "male", 0.5).median      # dB HL, la mediana del §1
+free = hl + hearing.reference_threshold("free-field")
+diffuse = hl + hearing.reference_threshold("diffuse-field")
+print(hl[8].round(1), free[8].round(1), diffuse[8].round(1))  # 26.2 20.8 22.4
+```
+
+La mediana de 26,2 dB HL a 4 kHz del hombre de 65 años es un nivel de presión
+acústica de 20,8 dB en escucha de campo libre frontal y de 22,4 dB en campo
+difuso: ese mismo oído necesita 1,6 dB menos de presión en campo libre, porque
+la difracción de la cabeza y la resonancia del conducto auditivo le dan allí más
+ganancia. Tres cosas legitiman esa suma, y las tres deben constar en el informe.
+La salida de ISO 7029 es una *desviación* respecto a la mediana de los 18 años, y
+es un nivel de umbral de audición en dB HL solo en la medida en que el cero de
+referencia sea esa misma mediana: el apartado 1 de ISO 7029 dice exactamente
+esto, y su NOTA 2 advierte de que ambos no siempre coinciden, porque los ceros de
+referencia se establecieron con sujetos de hasta 25 o 30 años, cuya audición es
+en promedio algo peor. Las dos normas describen además condiciones de escucha
+distintas (ISO 7029 monoaural con auriculares, ISO 389-7 binaural en campo
+sonoro), así que la suma estima el nivel de campo que necesitaría ese oído en
+lugar de reproducir una medida. Y el campo es una *condición* de escucha, no una
+opción de medida: se elige la que corresponde a cómo llega realmente el sonido al
+oyente, y nunca se mezcla un umbral de campo difuso con un espectro de habla de
+campo libre en el mismo cálculo.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_es.svg"
@@ -187,11 +326,11 @@ plt.show()
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 for age in (20, 40, 60, 80):
     r = hearing.age_threshold(age, "male", 0.5)
-    ax1.plot(f, r.median, "o-", label=f"{age} yr")
+    ax1.plot(f, r.median, "o-", label=f"{age} años")
 ax1.set_xscale("log"); ax1.invert_yaxis(); ax1.legend()
 
-ax2.plot(f, hearing.reference_threshold("free-field"), "o-", label="Free-field")
-ax2.plot(f, hearing.reference_threshold("diffuse-field"), "s--", label="Diffuse-field")
+ax2.plot(f, hearing.reference_threshold("free-field"), "o-", label="Campo libre")
+ax2.plot(f, hearing.reference_threshold("diffuse-field"), "s--", label="Campo difuso")
 ax2.set_xscale("log"); ax2.legend()
 plt.show()
 ```
@@ -212,17 +351,24 @@ ley de potencias desde los 18 años (apartado 4.2, Tabla 1), las dispersiones
 asimétricas semi-gaussianas $s_u$ y $s_l$ (apartado 4.3, Tablas 2–5), y el
 cálculo del fractil poblacional del apartado 4.4, todo implementado por
 `age_threshold(age, sex, fractile)`. El umbral de referencia de la audición
-en campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005, devuelto por
-`reference_threshold(field)`.
+en campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005 en las once
+frecuencias audiométricas, devuelto por `reference_threshold(field)`, junto con
+las condiciones de escucha del apartado 1 que lo definen.
 
 **No cubierto.** La Fórmula (1) del apartado 6.1 de ISO 1999:2013 combina
 este umbral por edad con un desplazamiento inducido por ruido en un
-audiograma real. Esa componente de ruido no está implementada aquí: es el
-tema de la guía de
-[pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/).
-De ISO 389-7:2005 este módulo implementa solo los valores de la Tabla 1; el
-resto de la norma, incluyendo cómo se establecieron esos valores, no está
-implementado.
+audiograma real. Esa combinación *sí* está implementada, en `htlan`, pero se
+documenta en la guía de
+[pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/)
+y no aquí; esta página se detiene en la componente de edad. De ISO 389-7:2005
+este módulo devuelve solo las once filas audiométricas de la Tabla 1. Las otras
+27, los tercios de octava de 20 Hz a 100 Hz, los tercios de octava intermedios
+entre los puntos audiométricos y las altas frecuencias extendidas de 9 kHz a
+18 kHz, no se llevan, y tampoco la Modificación 1:2016, así que el trabajo en
+baja frecuencia y en altas frecuencias extendidas tiene que acudir a la tabla
+misma. Los ceros de referencia con auriculares de ISO 389-1/-2/-8, el
+procedimiento audiométrico en campo sonoro de ISO 8253-2 y cómo se establecieron
+los valores de ISO 389-7 no están implementados.
 
 ## Véase también
 

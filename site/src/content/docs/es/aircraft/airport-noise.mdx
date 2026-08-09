@@ -97,19 +97,274 @@ aircraft.npd_curve(powers, distances, levels, power=20000.0).plot()
 
 Es el motor NPD que sustenta el método.
 
+Un nivel NPD tabulado no es una medida que se sostenga sola. Es el nivel de
+evento de ese avión en vuelo recto y estabilizado a lo largo de una trayectoria
+**infinita**, en una condición de referencia fija (§2.5): presión al nivel del
+mar, las tasas medias de atenuación atmosférica de la Tabla D-1 del Apéndice D,
+sin precipitación, viento por debajo de 8 m/s, una velocidad respecto al suelo
+de 160 kn para los niveles de exposición, y suelo llano y acústicamente blando
+con el micrófono a 1,2 m sobre él. Esas tasas de atenuación son medias
+aritméticas sobre campañas de certificación europeas y americanas, así que el
+día de referencia es una atmósfera teórica, que la Doc 29 llama *atmósfera
+AIR-1845*, y no una temperatura y una humedad que se puedan citar como tales.
+Cada corrección de la sección 2 existe para deshacer una de esas hipótesis.
+
+Las tablas pueden usarse tal como están tabuladas mientras la media del
+emplazamiento se mantenga dentro de la envolvente del §2.5: temperatura del aire
+por debajo de 30 °C, producto de la temperatura en grados Celsius por la humedad
+relativa en por ciento superior a 500, y viento por debajo de 8 m/s. Fuera de
+ella hay que convertir *las propias tablas* con el procedimiento del Apéndice D,
+cosa que esta cadena no hace: `impedance_adjustment` solo reescala los niveles
+por la impedancia acústica específica del aire, y no hay ningún argumento de
+humedad en toda la cadena.
+
+Las curvas se leen en consecuencia. Entre los marcadores el nivel cae casi
+linealmente frente al logaritmo de la distancia y se empina a gran distancia a
+medida que se acumula la absorción; los marcadores son las únicas distancias
+sobre las que la tabla afirma algo, todo lo que queda entre ellos es la
+interpolación de la Ec. 4-4, y todo lo que queda más allá del último nodo es una
+extrapolación en línea recta de la pendiente final. No consultes por debajo de la
+cota inferior recomendada de 30 m, donde un avión entero deja de comportarse como
+una fuente puntual. Hay una restricción que corre por debajo de todo esto: la
+atenuación lateral de SAE AIR 5662, y con ella la cadena de evento único que la
+usa, está deducida para suelo acústicamente blando y con hierba, así que un
+contorno trazado sobre agua, sobre una plataforma o sobre superficies urbanas
+densas queda fuera del método tal como está publicado.
+
 ## 2. El cálculo de evento único
 
-El cálculo de evento único trocea la trayectoria en segmentos y corrige el nivel
-base NPD por segmento (§4.3-4.5): `impedance_adjustment` ($T$, $p$),
-`lateral_attenuation` ($\beta$,$\ell$), `engine_installation_correction`
-($\varphi$, montaje), `duration_correction`, la fracción de segmento finito
-`noise_fraction` y, detrás de los segmentos de rodaje de despegue,
-`start_of_roll_directivity` ($\Delta_{\text{SOR}}$).
-`event_level` los ensambla y suma en `SEL`/$L_{Amax}$, y `noise_contour` lo evalúa
-sobre una malla en tierra (marca los segmentos de rodaje con una máscara
-`ground_roll`).
+El vuelo llega como una trayectoria de puntos, y el método la trocea en
+segmentos. `path` es un array $(N, 5)$:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_es.webp" alt="Contorno SEL de un despegue: huella alargada a lo largo de la trayectoria, más intensa cerca del rodaje" width="90%" />
+| Columna | Magnitud | Unidades |
+|---|---|---|
+| 0 | $x$, a lo largo del eje de la pista | m |
+| 1 | $y$, transversal, positiva hacia estribor | m |
+| 2 | $z$, altura sobre el aeródromo | m |
+| 3 | potencia, el parámetro de potencia NPD | lo que indexe la tabla |
+| 4 | velocidad verdadera | m/s |
+
+$N$ puntos hacen $N-1$ segmentos, así que toda máscara por segmento lleva $N-1$
+entradas, que es la razón por la que las máscaras del recorrido de despegue de
+más abajo dicen `xs[:-1] < 1500.0` y no `xs < 1500.0`. Dos valores por defecto
+deciden más de lo
+que parece. La columna de velocidad entra en la corrección por duración respecto
+a `reference_speed`, cuyo valor por defecto es 82,31 m/s, la referencia de
+160 kn de la Doc 29, así que una trayectoria volada exactamente a esa velocidad
+no lleva corrección por duración ninguna, que es lo que ocurre en todos los
+ejemplos de esta página; variar esa columna es la forma de ver el término en
+acción. Y `mounting=` vale `"wing"` por defecto: eso es una propiedad del avión
+y no una preferencia de modelado, así que conviene pasar `"fuselage"` o
+`"propeller"` de forma explícita, porque una hélice no lleva corrección de
+instalación ninguna y dejar el valor por defecto le regala una directividad que
+no tiene. De dónde salen el montaje y las unidades de potencia de un tipo real
+es [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/).
+
+Cada segmento arranca de un nivel base leído en la tabla NPD a la potencia y a
+la distancia de ese segmento, y se corrige término a término:
+
+| Función | Símbolo | Doc 29 | De qué da cuenta |
+|---|---|---|---|
+| `impedance_adjustment` | $\Delta_{\text{imp}}$ | §4.2.1 | el aire del aeródromo frente a la impedancia de referencia de 409,81 N·s/m³ de las tablas |
+| `duration_correction` | $\Delta_V$ | §4.5.1 | la velocidad del segmento frente a la velocidad de referencia NPD (solo niveles de exposición) |
+| `engine_installation_correction` | $\Delta_I(\varphi)$ | §4.5.3 | dónde van montados los motores, a través del ángulo de depresión |
+| `lateral_attenuation` | $\Lambda(\beta, \ell)$ | §4.5.4 | el efecto suelo y la refracción para un receptor apartado a un lado |
+| `noise_fraction` | $\Delta_F$ | §4.5.6 | la parte de la energía de la trayectoria infinita que aporta un segmento finito (solo niveles de exposición) |
+| `start_of_roll_directivity` | $\Delta_{\text{SOR}}(\psi)$ | §4.5.7 | el lóbulo trasero de chorro detrás de un segmento del recorrido de despegue |
+
+$\beta$ es el ángulo de elevación de la trayectoria de propagación sobre la
+línea del suelo en el receptor y $\ell$ la distancia perpendicular del receptor
+a la traza en tierra; $\varepsilon$ es el ángulo de alabeo, positivo con el ala
+de estribor arriba, y $\varphi = \beta \pm \varepsilon$ el ángulo de depresión
+en los ejes de la aeronave, con signo más para observadores a estribor y menos
+para los de babor (§4.5.2). A lo largo de la traza, $\lambda$ es la longitud del
+segmento, $q$ la distancia del inicio del segmento al pie de la perpendicular
+(negativa por detrás del segmento), $d_p$ la distancia perpendicular al segmento
+prolongado y $d_s$ la distancia más corta al segmento en sí (§4.4.1). $\psi$ es
+el acimut desde el morro del que depende el lóbulo de inicio del recorrido.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_doc29_segment_es.svg" alt="Cuatro paneles de la geometría de segmentos de trayectoria de ECAC Doc 29 dibujados a escala. Panel a, observador al costado de un segmento en ascenso de 464 m: la trayectoria de vuelo infinita a trazos con el segmento finito en trazo grueso entre S1 y S2, el pie de la perpendicular Sp, q = 214 m desde S1, la distancia oblicua mínima dp = 526 m hasta el observador O y las distancias d1 = 568 m y d2 = 582 m a los extremos del segmento; una nota dice que con q entre 0 y la longitud del segmento la consulta NPD para un nivel de exposición usa dp. Panel b, observador detrás del segmento con q = -300 m: el pie de la perpendicular cae en la prolongación por delante del observador, dp = 520 m va a trazos y la distancia más corta ds coincide con d1 = 600 m, con una nota de que la consulta usa ds detrás de un recorrido de despegue y dp en los demás casos. Panel c, el plano normal a la trayectoria de vuelo: la aeronave con el plano de las alas alabeado 15 grados, la trayectoria de propagación bajando hasta un receptor a 1,2 m sobre la línea del suelo, el ángulo de elevación beta de 18 grados en el receptor y el ángulo de depresión phi igual a beta más epsilon, 33 grados, en la aeronave. Panel d, vista en planta detrás del recorrido de despegue: la pista con un reactor en el inicio del recorrido, arcos traseros a trazos, el acimut psi de 120 grados medido desde el morro y el observador a la distancia dSOR. El pie indica que phi es beta más epsilon a estribor y beta menos epsilon a babor, que psi va de 90 grados al través a 180 grados por la popa con el lóbulo de chorro máximo cerca de 120 grados, y que la consulta NPD usa dp para niveles de exposición y ds para niveles máximos, con una cota inferior de 30 m, y que el término de inicio del recorrido se escala por 762 m entre dSOR más allá de 762 m" width="92%" />
+
+Se ensamblan en un nivel de exposición de segmento como
+
+$$
+L_{E,\text{seg}} = \bigl[L_{E\infty}(P, d) + \Delta_{\text{imp}}\bigr]
+ + \Delta_V + \Delta_I(\varphi) - \Lambda(\beta, \ell)
+ + \Delta_F + \Delta_{\text{SOR}}
+$$
+
+donde el corchete es la línea base NPD ajustada en impedancia del §4.2.1 y el
+resto es la Ec. 4-8b (la Ec. 4-9b detrás de un recorrido de despegue), y el
+nivel de evento es la suma energética sobre los segmentos,
+$L_E = 10\lg\sum 10^{L_{E,\text{seg}}/10}$ (Ec. 4-11). Un nivel máximo toma en su
+lugar el mayor valor de segmento (Ec. 4-10) y prescinde de los dos términos que
+solo existen para la exposición, $\Delta_V$ y $\Delta_F$.
+
+Conviene llevar encima sus magnitudes, porque son las que deciden qué término
+importa para un receptor dado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_segment_corrections_es.svg" alt="Cuatro paneles de las correcciones por segmento de ECAC Doc 29. Panel a, la corrección por instalación del motor frente al ángulo de depresión de 0 a 180 grados: la curva de montaje en ala va de -1,5 dB en 0 grados hasta +0,4 dB cerca de 50 grados y vuelve, la curva de montaje en fuselaje va de -3,0 dB en 0 grados a 0 dB en 90 grados, y la curva de hélice es plana en cero. Panel b, la atenuación lateral que se resta, frente al ángulo de elevación para separaciones laterales de 100, 300 y 914 metros: la curva de 914 m arranca en 10,9 dB a incidencia rasante y las tres caen a cero exacto por encima de 50 grados. Panel c, la fracción de ruido en decibelios frente a q partido por lambda para un segmento de 464 m y otro de 2000 m a una distancia escalada de 132 m, con la región en la que el observador queda al costado del segmento sombreada y la corrección siempre negativa. Panel d, la corrección por duración frente a la velocidad del segmento, que cruza el cero en la referencia de 82,3 metros por segundo y llega a unos más 1,4 dB en 60 y menos 0,9 dB en 100 metros por segundo, con un recuadro que da el ajuste de impedancia a 15 grados Celsius y 101,3 kilopascales como más 0,07 dB, a 30 grados como menos 0,04 dB y a 95 kilopascales como menos 0,21 dB" width="92%" />
+
+*La atenuación lateral es el término grande y el único que puede llegar a dos
+cifras: $\Lambda$ vale 10,86 dB a incidencia rasante y es idénticamente nula por
+encima de un ángulo de elevación de 50°, mientras que el factor de distancia
+$\Gamma(\ell)$ sube desde cero sobre la traza en tierra hasta la unidad en
+914 m, así que un receptor bajo la traza no recibe nada de ella y uno a 900 m
+del costado y a baja elevación la recibe entera. El término de instalación vale
+1,5 dB entre un montaje en ala y uno en fuselaje con $\varphi = 0$, y nada en
+absoluto para una hélice. La corrección por duración es
+$10\lg(V_{\text{ref}}/V_{\text{seg}})$, así que un despegue volado a 100 m/s
+pierde 0,85 dB de exposición por segmento. La fracción de ruido es siempre
+negativa y solo se anula para un segmento infinito. El ajuste de impedancia vale
++0,07 dB en la atmósfera estándar y rara vez se aparta unas décimas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+fig, ((ax_i, ax_l), (ax_f, ax_v)) = plt.subplots(2, 2, figsize=(11, 8))
+phi = np.linspace(0.0, 180.0, 361)
+for mounting in ("wing", "fuselage", "propeller"):
+    ax_i.plot(phi, [aircraft.engine_installation_correction(p, mounting)
+                    for p in phi], label=mounting)
+beta = np.linspace(0.0, 90.0, 361)
+for ell in (100.0, 300.0, 914.0):
+    ax_l.plot(beta, [aircraft.lateral_attenuation(b, ell) for b in beta],
+              label=f"l = {ell:.0f} m")
+# La distancia escalada de la Ec. 4-20 para esta tabla NPD con dp = 526 m.
+powers, distances = [8000.0, 12000.0], [60.0, 240.0, 960.0, 3840.0]
+sel = [[98.0, 86.0, 74.0, 62.0], [104.0, 92.0, 80.0, 68.0]]
+lmax = [[94.0, 82.0, 70.0, 58.0], [100.0, 88.0, 76.0, 64.0]]
+base = float(aircraft.npd_level(powers, distances, sel, 12000.0, 526.0)[0])
+peak = float(aircraft.npd_level(powers, distances, lmax, 12000.0, 526.0)[0])
+d_lambda = (2 / np.pi) * 82.3 * 10 ** ((base - peak) / 10)
+frac = np.linspace(-1.0, 2.0, 601)
+for length in (464.0, 2000.0):
+    ax_f.plot(frac, [aircraft.noise_fraction(f * length, length, d_lambda)
+                     for f in frac], label=f"segmento {length:.0f} m")
+speeds = np.linspace(50.0, 130.0, 401)
+ax_v.plot(speeds, [aircraft.duration_correction(82.31104, s) for s in speeds])
+for ax in (ax_i, ax_l, ax_f, ax_v):
+    ax.grid(True, alpha=0.3)
+for ax in (ax_i, ax_l, ax_f):
+    ax.legend(fontsize=8)
+plt.show()
+```
+
+</details>
+
+### Un evento único, segmento a segmento
+
+`event_level` hace el ensamblado. Pon un receptor 3 km traza abajo, 500 m al
+costado de un despegue y 1,2 m sobre el suelo, y pídele su nivel de exposición
+sonora:
+
+```python
+import numpy as np
+from phonometry import aircraft
+
+powers = [8000.0, 12000.0]
+distances = [60.0, 120.0, 240.0, 480.0, 960.0, 1920.0, 3840.0, 7680.0]
+sel = [[98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0, 56.0],
+       [104.0, 98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0]]
+lmax = [[94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0, 52.0],
+        [100.0, 94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0]]
+
+xs = np.linspace(0.0, 18000.0, 40)                  # recorrido y después ascenso
+z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
+power = np.where(xs < 3000.0, 12000.0, 10000.0)
+path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
+ground_roll = xs[:-1] < 1500.0                      # una entrada por segmento
+
+flyover = aircraft.event_level(
+    path, [3000.0, 500.0, 1.2], powers, distances, sel, lmax,
+    segments=aircraft.FlightSegmentState(ground_roll=ground_roll))
+seg = flyover.segment_levels
+top = int(np.argmax(seg))
+print(round(float(flyover.level), 1))               # 82.3 dB: el SEL del evento
+print(top, round(float(seg[top]), 1))               # 6 82.1: el segmento más próximo
+flyover.plot()   # aportaciones por segmento (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_segment_breakdown_es.svg" alt="Diagrama de barras del nivel de exposición sonora que aporta cada segmento de la trayectoria en un receptor, frente al índice de segmento. Las cuatro primeras barras, rayadas, son el recorrido de despegue y aportan entre 26 y 43 dB; las barras suben después con fuerza hasta 82,1 dB en el segmento 6, el segmento cuyo punto de máxima aproximación queda más cerca del receptor, y decaen hasta unos pocos decibelios en el segmento 38. Una línea a trazos marca el total sumado en energía de 82,3 dB, apenas por encima de la barra más alta, y una nota recoge que el segmento más cercano lleva por sí solo el 94 por ciento de la energía" width="82%" />
+
+*Treinta y nueve segmentos, y uno de ellos es la respuesta: el segmento 6 aporta
+82,1 dB frente a un total de 82,3 dB, que es el 94 % de la energía. Eso es lo que
+hace la fracción de ruido, que la aportación se desploma a un par de segmentos
+del punto de máxima aproximación, y es la razón por la que un contorno nunca vale
+más que la trayectoria de vuelo cerca de cada receptor. Los segmentos del
+recorrido de despegue van rayados: aquí están 40 dB por debajo, pero mueve el
+receptor detrás de la pista y el término de inicio del recorrido los devuelve.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+ax = flyover.plot(language="es")
+for i, patch in enumerate(ax.patches[:len(seg)]):
+    if ground_roll[i]:
+        patch.set_hatch("///")
+ax.set_ylim(0.0, float(max(seg)) + 12.0)
+plt.show()
+```
+
+</details>
+
+Los 82,1 dB de ese segmento son la tabla más las cinco correcciones, y nada más:
+
+```python
+s1, s2 = path[top, :3], path[top + 1, :3]
+observer = np.array([3000.0, 500.0, 1.2])
+u = (s2 - s1) / np.linalg.norm(s2 - s1)
+length = float(np.linalg.norm(s2 - s1))               # 464 m de segmento
+q = float((observer - s1) @ u)                        # 214 m a lo largo de él
+dp = float(np.linalg.norm(observer - (s1 + q * u)))   # 526 m, distancia oblicua mínima
+beta = float(np.degrees(np.arccos(500.0 / dp)))       # 18.0 grados (§4.5.5)
+p_seg = float(np.sqrt(power[top] ** 2
+                      + (q / length) * (power[top + 1] ** 2 - power[top] ** 2)))
+base = float(aircraft.npd_level(powers, distances, sel, p_seg, dp)[0])
+peak = float(aircraft.npd_level(powers, distances, lmax, p_seg, dp)[0])
+d_lambda = (2 / np.pi) * 82.3 * 10 ** ((base - peak) / 10)   # Ec. 4-20
+terms = {
+    "impedancia": aircraft.impedance_adjustment(),
+    "duración": aircraft.duration_correction(82.3, 82.3),
+    "instalación": aircraft.engine_installation_correction(beta),
+    "lateral": -aircraft.lateral_attenuation(beta, 500.0),
+    "fracción de ruido": aircraft.noise_fraction(q, length, d_lambda),
+}
+print(round(base, 2), {k: round(v, 2) for k, v in terms.items()})
+# 83.89 {'impedancia': 0.07, 'duración': 0.0, 'instalación': -0.43,
+#        'lateral': -1.2, 'fracción de ruido': -0.25}
+print(round(base + sum(terms.values()), 2))           # 82.08, la barra de arriba
+```
+
+La corrección por duración es exactamente cero porque la trayectoria se voló a la
+velocidad de referencia; la atenuación lateral es de solo 1,2 dB porque el
+segmento sigue 18° por encima del horizonte visto desde este receptor; con la
+misma separación de 500 m pero con el avión en pista, a incidencia rasante,
+serían 8,8 dB. `noise_contour` repite este cálculo en cada punto de una malla en
+tierra, así que un contorno vale exactamente lo que valga este único número.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_es.webp" alt="Contorno SEL de un despegue: huella alargada a lo largo de la trayectoria, más intensa cerca del recorrido de despegue" width="90%" />
+
+*La huella se estira a lo largo de la traza porque todos los segmentos aportan a
+todos los receptores, y es más ancha donde el avión va más bajo y sus distancias
+oblicuas son más cortas. Los niveles laterales caen más deprisa que por la ley
+del inverso del cuadrado sola, porque la atenuación lateral se enciende a medida
+que el ángulo de elevación baja de 50°, y el lóbulo que hay detrás del umbral de
+pista es la directividad de inicio del recorrido del chorro de escape, que es la
+razón por la que el contorno no cierra simétricamente en el extremo de la pista.
+Los
+contornos más exteriores son los menos fiables: los fijan los segmentos a mayor
+distancia oblicua, donde la tabla NPD se está extrapolando. Esto es un
+movimiento, no un estudio: un contorno de planeamiento acumula muchos sucesos así
+en un índice tipo $L_{den}$, que es el «No cubierto» de esta página.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -127,12 +382,12 @@ sel = [[98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0, 56.0],
 lmax = [[94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0, 52.0],
         [100.0, 94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0]]
 
-# Despegue: rodaje a lo largo de +x y después un ascenso constante.
+# Despegue: recorrido a lo largo de +x y después un ascenso constante.
 xs = np.linspace(0.0, 18000.0, 40)
 z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
 power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
-ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
+ground_roll = xs[:-1] < 1500.0   # recorrido de despegue: segmentos en pista
 
 segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
@@ -201,7 +456,7 @@ lmax = [[94.0, 82.0, 70.0, 58.0], [100.0, 88.0, 76.0, 64.0]]
 xs = np.linspace(0.0, 18000.0, 40)
 path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs-1500)*0.11, 0, 2500),
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
-ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
+ground_roll = xs[:-1] < 1500.0   # recorrido de despegue: segmentos en pista
 aircraft.noise_contour(path, powers, distances, sel, lmax,
                  segments=aircraft.FlightSegmentState(ground_roll=ground_roll),
                  x=np.linspace(-2500, 20000, 60),
@@ -215,16 +470,22 @@ fracción de ruido y la directividad de inicio del recorrido de despegue
 reproducen los valores de referencia con $< 0{,}01\ \text{dB}$, y la suma
 energética de segmentos coincide con el `SEL` de referencia.
 
-El modelo cubre también el rodaje de aterrizaje (la máscara `landing_roll` del
-`FlightSegmentState`: fracción de ruido reducida Ec. 4-21b, geometría al
-extremo más cercano, sin término de directividad), el ángulo de alabeo por
-segmento (su `bank`, positivo con el ala de estribor arriba; el ángulo de depresión es
-$\varphi = \beta + \varepsilon$ para observadores a estribor de la traza y
-$\varphi = \beta - \varepsilon$ para observadores a babor,
-§4.5.2), la geometría lateral §4.5.5 al extremo más cercano detrás
-del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y la
-cota inferior recomendada de 30 m en las consultas NPD. Siete eventos de receptor del
-workbook de referencia se reproducen end-to-end en la suite de tests.
+Hay otras cuatro piezas del método en su sitio. El **recorrido de aterrizaje**
+es la máscara `landing_roll` del `FlightSegmentState`: por delante de ella la
+fracción de ruido toma su forma reducida (Ec. 4-21b) y se aplica la geometría
+al extremo más cercano, sin término de directividad, porque la Doc 29 supone
+allí una directividad horizontal semicircular. El **ángulo de alabeo por
+segmento** es su
+`bank`, positivo con el ala de estribor arriba, y elige la rama de
+$\varphi = \beta \pm \varepsilon$ según de qué lado de la traza esté el
+receptor (§4.5.2). **Detrás de un recorrido de despegue**, la geometría lateral
+al extremo más cercano del §4.5.5 sustituye a la de la trayectoria de nivel
+equivalente, que es el mismo cambio que hace que la consulta NPD use allí $d_s$.
+Y un **segmento de pista** toma la media Ec. 4-13b de las velocidades de sus
+extremos en lugar de la interpolación cuadrática que usa un segmento en el aire,
+mientras que toda consulta NPD lleva una cota inferior en los 30 m recomendados.
+Siete eventos de receptor que cubren las ramas del workbook de referencia se
+reproducen de extremo a extremo en la batería de tests.
 
 ## Qué cubre esta guía
 
@@ -234,7 +495,7 @@ correcciones por segmento `impedance_adjustment`, `lateral_attenuation`
 (suelo blando de SAE AIR 5662), `engine_installation_correction`,
 `duration_correction`, `noise_fraction` y `start_of_roll_directivity`, su
 ensamblado en `SEL`/$L_{Amax}$ por `event_level` y el contorno en malla de
-tierra `noise_contour`, incluidos el rodaje de aterrizaje, el ángulo de
+tierra `noise_contour`, incluidos el recorrido de aterrizaje, el ángulo de
 alabeo por segmento y la geometría lateral de extremo más próximo. Validada
 por debajo de 0,01 dB contra el workbook de referencia de la Parte 1 del
 Vol. 3 de la Doc 29 5.ª ed.
@@ -245,13 +506,29 @@ programa de vuelos completo) que un estudio de contornos Doc 29 completo
 necesita por encima de estos niveles de evento único. Las propias tablas NPD
 son un dato de entrada, no una predicción: la biblioteca interpola las tablas
 que se le aportan para un tipo de avión, no las sintetiza a partir de datos
-de motor.
+de motor. La base de datos ANP de EASA/EUROCONTROL de tablas medidas para tipos
+reales sí viene con phonometry y la lee [La base de datos ANP de
+flota](/phonometry/es/aircraft/anp-fleet/), que la enchufa directamente a las
+funciones de esta página. Convertir datos NPD a un emplazamiento fuera de la
+envolvente del §2.5 (el recálculo del Apéndice D) no está implementado, y
+tampoco lo está el suelo acústicamente duro que SAE AIR 5662 excluye: la
+atenuación lateral, y con ella toda la cadena de evento único, supone suelo
+blando con hierba.
 
 ## Véase también
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/):
   la métrica de certificación del Anexo 16 de la OACI detrás de los datos del
   avión.
+- [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las tablas
+  NPD y las trayectorias por defecto que vienen incluidas para tipos de avión
+  reales, y que ejecutan esta cadena sin una tabla escrita a mano.
+- [Ruido de helicópteros: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
+  el método de contornos de ECAC Doc 32, donde un hemisferio de ruido hace el
+  papel que aquí hace la tabla NPD. Ojo con los símbolos al cruzar: la Doc 32 usa
+  $\varphi$ para el acimut del hemisferio y escribe el ángulo de alabeo $\Phi$,
+  mientras que la Doc 29 usa $\varphi$ para el ángulo de depresión y
+  $\varepsilon$ para el alabeo. Cada una es la notación de su propia norma.
 - [Propagación exterior](/phonometry/es/environment/propagation/outdoor-propagation/): los
   términos de atenuación de ISO 9613-2 y el efecto suelo que la atenuación
   lateral condensa en una sola curva.

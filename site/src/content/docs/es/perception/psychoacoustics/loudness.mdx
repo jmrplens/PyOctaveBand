@@ -62,8 +62,10 @@ Llama a `psychoacoustics.loudness_zwicker(x, fs, calibration_factor=sens)`
 sobre una grabación calibrada. Si solo tienes el espectro, usa
 `loudness_zwicker_from_spectrum(levels_28)` con los 28 niveles de banda de
 tercio de octava de 25 Hz a 12,5 kHz. Cualquiera de los dos resultados lleva
-`loudness` en sonios, `loudness_level` en fonios y, para señales variables en el
-tiempo, los percentiles `n5` y `n10`.
+`loudness_level` en fonios y `loudness` en sonios — el $N$ estacionario único
+con `stationary=True`, y si no el máximo $N_\text{max}$ de la traza de
+sonoridad — más los percentiles de informe `n5` y `n10` cuando el análisis es
+variable en el tiempo.
 
 ## Sonoridad en sonios (ISO 532-1, Zwicker)
 
@@ -92,6 +94,79 @@ sonoridad total en sonios.
   description="El patrón de sonoridad específica de una banda estrecha de 1 kHz se construye sobre el eje de Bark mientras el nivel de banda sube de 45 a 85 dB, y el área bajo el patrón se integra en la sonoridad total en sonios."
 />
 
+### Medir la entrada (apartado 4)
+
+La sonoridad es una magnitud de nivel absoluto: en ella no se cancela nada, así
+que una grabación sin calibrar o ponderada A produce un número verosímil que
+sencillamente está mal, y el resultado no lleva ninguna señal de ello. Por eso
+ISO 532-1 especifica la entrada antes de especificar el modelo.
+
+**La cadena.** Un micrófono, un preamplificador y un amplificador que cumplan
+la clase 1 de IEC 61672-1:2013, y una calibración de campo que convierta las
+unidades digitales en pascales: ese factor es lo que espera
+`calibration_factor`, y sale de la
+[calibración](/phonometry/es/signals/metrology/calibration/). El apartado 4
+fija la frecuencia de muestreo de la implementación de referencia en 48 kHz;
+las demás se remuestrean a ella, cosa que la biblioteca hace internamente. Para
+la entrada por niveles de banda, los 28 niveles de tercio de octava deben salir
+de filtros conformes con la clase 1 de IEC 61260-1:2014, con frecuencias
+centrales de 25 Hz a 12,5 kHz.
+
+**Dos reglas sobre las propias muestras.** Ninguna ponderación frecuencial de
+ningún tipo: la Nota 1 de la definición 3.2 establece que las ponderaciones
+como la A no deben usarse para el cálculo de sonoridad, porque el modelo aplica
+internamente la ponderación propia del oído y una entrada ponderada A la
+pondera dos veces. Y presión acústica verdadera, no datos normalizados ni
+escalados a pico (apartado 4, «valores correctos de presión acústica, sin datos
+normalizados»). El `sens = 1.0` de los fragmentos de abajo es un marcador de
+posición que mantiene ejecutable esta página, no un valor por defecto que
+merezca conservarse: equivócate en 10 dB al calibrar y la sonoridad que se
+informa se duplica o se reduce a la mitad (13,1 sonios pasan a 26,6 o a 6,5 en
+la señal de ejemplo), lo que empequeñece cualquier diferencia entre los modelos
+de la página siguiente.
+
+**Dónde va el micrófono.** La Nota 2 de la definición 3.19 lo sitúa en el punto
+donde estaría el centro de la cabeza de quien escucha, con esa persona ausente;
+eso es lo que hace que la sonoridad calculada sea la de una presentación
+*diótica*, el mismo sonido en ambos oídos. La geometría dibujada abajo es la
+posición de observador de ECMA-74 — 1,00 m desde la caja de referencia, 1,50 m
+sobre el plano reflectante — porque ISO 532-1 no prescribe distancia propia y
+la toma de la norma de emisión que corresponda.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudness_capture_es.svg" alt="Tres disposiciones de captación para una medición de sonoridad ISO 532-1: el panel A, una cámara semianecoica con el equipo en ensayo en su caja de referencia y un micrófono 1,00 m por delante a 1,50 m de altura, donde estaría la cabeza de la persona ausente; el panel B, el mismo equipo en una sala reverberante con el campo reflejado llegando al micrófono en la posición de escucha; el panel C, un simulador de cabeza y torso cuyos dos canales pasan por una ecualización de campo libre, de campo difuso o ID antes de dos cadenas de Zwicker independientes" width="92%" />
+
+*Las tres vías hacia una entrada válida. El panel A da $N_F$ y el panel B
+$N_D$; el tipo de campo forma parte del resultado, no es una preferencia.*
+
+**Qué campo, y por qué hay que declararlo.** `field="free"` aplica la función
+de transferencia de campo libre frontal de la cabeza y el oído externo y encaja
+con un campo directo — cámara anecoica, cerca de una fuente, al aire libre;
+`field="diffuse"` aplica la de incidencia aleatoria y encaja con una sala
+reverberante o con una medición in situ. La corrección es una forma espectral
+fija que se aplica a los niveles de banda antes de la etapa de bandas críticas,
+máxima por encima de 1 kHz, donde más difieren la difracción en la cabeza y la
+resonancia del canal auditivo: sobre un espectro plano de 60 dB el resultado en
+campo difuso es de 33,9 sonios frente a 31,9 sonios en campo libre, un 6 % —
+poco al lado de un error de calibración, bastante cuando se están comparando
+dos productos. El apartado 4 exige especificar el tipo de campo y el apartado 7
+lo mete en el informe, así que «N = 13,1 sonios» está incompleto: escribe $N_F$
+o $N_D$, o pon «campo libre» al lado del número.
+
+**Grabaciones con cabeza artificial.** El Anexo D gobierna la vía del simulador
+de cabeza y torso: la grabación debe llevar ya una ecualización acorde con el
+entorno de medida — de campo libre solo para una única fuente frontal a más de
+1,5 m, de campo difuso en entornos reflectantes, ecualización ID en vehículos —
+y cada canal de oído se analiza por separado, informando de los dos y citando
+el máximo o la media como valor único.
+
+**Qué tiene que contener el informe** (apartado 7): el sonido evaluado, una
+referencia a ISO 532-1, qué método se usó (el estacionario del apartado 5 o el
+variable en el tiempo del apartado 6), el campo sonoro F o D, el tipo de datos
+de entrada (niveles de banda o señal temporal), la sonoridad en sonios y — en
+un análisis variable en el tiempo — la función temporal de sonoridad, con
+$N_\text{max}$ y $N_5$ cuando se requieran. `ZwickerLoudness.report()` imprime
+la mitad acústica de esa lista; el resto llega por `ReportMetadata`.
+
 ```python
 import numpy as np
 from phonometry import psychoacoustics
@@ -104,12 +179,23 @@ levels_28 = np.full(28, 60.0)                             # 28 niveles de tercio
 
 # Desde una grabación sin calibrar: calibration_factor convierte unidades digitales en Pa
 res = psychoacoustics.loudness_zwicker(x, fs, field="free", calibration_factor=sens)
-print(f"N = {res.loudness:.1f} sone  ({res.loudness_level:.0f} phon)")   # 13.1 sone (77 phon)
+print(f"N = {res.loudness:.1f} sonios  ({res.loudness_level:.0f} fonios)")   # 13.1 sonios (77 fonios)
 
 # Señales variables en el tiempo: la sonoridad percentil N5 es el
-# estándar para informes
-res = psychoacoustics.loudness_zwicker(x, fs)          # stationary=False (por defecto)
-print(f"{res.n5:.1f} {res.n10:.1f} {res.loudness:.1f}")   # 13.1 13.1 13.1 — N5, N10, Nmax
+# estándar para informes.
+# Un tren de 4,4 s de ráfagas tonales de 1 kHz que suben de 45 a 85 dB,
+# la más sonora breve.
+segments = []
+for level, seconds in [(45.0, 0.6), (55.0, 0.6), (65.0, 0.6), (75.0, 0.6), (85.0, 0.25)]:
+    n = int(seconds * fs)
+    k = np.arange(n)
+    env = np.minimum(1.0, np.minimum(k, n - 1 - k) / (0.02 * fs))   # rampas de 20 ms
+    p = np.sqrt(2) * 2e-5 * 10 ** (level / 20)                      # amplitud de pico (Pa)
+    segments += [p * np.sin(2 * np.pi * 1000 * k / fs) * env, np.zeros(int(0.35 * fs))]
+bursts = np.concatenate(segments)
+
+tv = psychoacoustics.loudness_zwicker(bursts, fs)      # stationary=False (por defecto)
+print(f"{tv.n5:.1f} {tv.n10:.1f} {tv.loudness:.1f}")   # 14.5 11.4 22.5 — N5, N10, Nmax
 
 # Desde 28 niveles de tercio de octava (25 Hz .. 12.5 kHz)
 res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
@@ -147,13 +233,13 @@ broad = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
 z = np.arange(1, narrow.specific.size + 1) * 0.1          # eje Bark
 fig, ax = plt.subplots()
 for r, color, label in [
-    (broad, "#d62728", f"Banda ancha plana 60 dB - N = {broad.loudness:.1f} sone"),
-    (narrow, "#1f77b4", f"Banda estrecha 1 kHz - N = {narrow.loudness:.1f} sone"),
+    (broad, "#d62728", f"Banda ancha plana a 60 dB - N = {broad.loudness:.1f} sonios"),
+    (narrow, "#1f77b4", f"Banda estrecha de 1 kHz - N = {narrow.loudness:.1f} sonios"),
 ]:
     ax.fill_between(z, r.specific, color=color, alpha=0.3)
     ax.plot(z, r.specific, color=color, label=label)
-ax.set_xlabel("Tasa de banda crítica z [Bark]")
-ax.set_ylabel("Sonoridad específica N' [sone/Bark]")
+ax.set_xlabel("Razón de banda crítica z [Bark]")
+ax.set_ylabel("Sonoridad específica N' [sonios/Bark]")
 ax.legend()
 plt.show()
 ```
@@ -177,10 +263,59 @@ dentro de la banda de tolerancia del 5 % por muestra que fija la norma.
 | `stationary` | bool | — | por defecto `False` | `True`: un único $N$ a partir del espectro promediado |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
 
-Devuelve un dataclass `ZwickerLoudness`: `loudness` ($N$, sonios),
-`loudness_level` (fonios), `specific` ($N'(z)$, 240 bins de 0,1 Bark) y, para los
-análisis variables en el tiempo, `n5`, `n10`, `time`, `loudness_vs_time`
-(traza a 500 Hz).
+Devuelve un dataclass `ZwickerLoudness`: `loudness_level` (fonios), `specific`
+($N'(z)$, 240 bins de 0,1 Bark) y, para los análisis variables en el tiempo,
+`n5`, `n10`, `time` y `loudness_vs_time` (traza a 500 Hz). `loudness` ($N$,
+sonios) cambia de significado con `stationary`: con `stationary=True` es el $N$
+estacionario único del apartado 5, y con el valor por defecto
+`stationary=False` es el máximo $N_\text{max}$ de la traza de sonoridad frente
+al tiempo del apartado 6, que es la razón de que el primer fragmento de arriba,
+ejecutado sobre un tono estable, ya informe de un máximo.
+
+### Leer un resultado variable en el tiempo (apartado 6.4)
+
+Un sonido fluctuante no tiene una sonoridad única, así que el apartado 6.4 de
+ISO 532-1 informa de un percentil: $N_5$, la sonoridad superada el 5 % del
+tiempo de análisis, porque la media aritmética de $N(t)$ queda
+sistemáticamente por debajo de lo que juzga quien escucha; en el tren de
+ráfagas de arriba la media es de 4,1 sonios frente a $N_5 = 14,5$. $N_{10}$ es
+el compañero más benévolo para sonidos con picos breves, y `res.loudness` es
+$N_\text{max}$: la magnitud correcta para buscar el peor instante, y la
+equivocada para citarla como «la sonoridad».
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zwicker_time_varying_es.svg" alt="A la izquierda, la traza de sonoridad frente al tiempo de ISO 532-1 de cinco ráfagas de 1 kHz que suben de 45 a 85 dB, con líneas horizontales en Nmax 22,5 sonios, N5 14,5 sonios, N10 11,4 sonios y la media aritmética 4,1 sonios. A la derecha, el mismo registro como curva de excedencia de la sonoridad frente al porcentaje de tiempo superado, con N5 y N10 marcados en el 5 % y el 10 %" width="92%" />
+
+*Qué es un percentil de una traza de sonoridad. La ráfaga breve de 85 dB fija
+$N_\text{max}$ y casi nada más: ocupa menos del 6 % del registro, así que $N_5$
+queda 8 sonios por debajo. El mismo registro analizado con `stationary=True`
+devuelve 10,0 sonios, otra magnitud más, la quinta.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `bursts` y `tv` vienen del fragmento de arriba.
+plt.plot(tv.time, tv.loudness_vs_time, label="N(t)")
+for value, label in [(tv.loudness, "Nmax"), (tv.n5, "N5"), (tv.n10, "N10")]:
+    plt.axhline(value, linestyle="--", label=f"{label} = {value:.1f} sonios")
+plt.xlabel("Tiempo [s]")
+plt.ylabel("Sonoridad N [sonios]")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+Como $N_5$ es un porcentaje de la ventana de análisis, alargar o acortar el
+registro lo mueve. Cita el tiempo de medición junto a $N_5$, mantenlo idéntico
+entre los sonidos que se comparan (el apartado 6.4 lo exige) y no uses $N_5$
+para impulsos aislados, que es exactamente el caso que caricaturiza la traza de
+arriba. `loudness_vs_time` y `time` llevan la traza, así que un registro se
+puede recortar al estado de funcionamiento de interés antes de leer el
+percentil, y el intervalo de medición va en `ReportMetadata`, ya que la ficha
+imprime $N_5$ sin él.
 
 ### Informe de ISO 532-1 (`.report()`)
 
@@ -225,7 +360,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso532_loudness_example"
 	title="Informe de ejemplo de sonoridad ISO 532-1 (PDF)"
-	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la tasa de banda crítica, el resultado de un solo número N = 8,2 sonios (LN = 70,4 fonios) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonios."
+	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la razón de banda crítica, el resultado de un solo número N = 8,2 sonios (LN = 70,4 fonios) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonios."
 	caption="Ficha de sonoridad de Zwicker (ZwickerLoudness.report), N en sonios con LN en fonios."
 />
 
@@ -299,14 +434,16 @@ la tabla de elección de modelo que dice cuándo preferir cada uno, están en
 
 ## Qué cubre esta guía
 
-**Cubierto.** ISO 532-1:2017 (método de Zwicker): el método estacionario del
-apartado 5 y el método variable en el tiempo del apartado 6, portado del
-programa de referencia normativo del Anexo A.4 y validado frente al Anexo B,
-con los percentiles `n5`/`n10`, mediante `loudness_zwicker()` y
-`loudness_zwicker_from_spectrum()`. ISO 226:2023: la Fórmula (1), la
-Fórmula (2) y los parámetros de curva de la Tabla 1, mediante
-`equal_loudness_contour()`, `loudness_level()`, `hearing_threshold()` y
-`equal_loudness_contours()`.
+**Cubierto.** ISO 532-1:2017 (método de Zwicker): los requisitos de entrada e
+instrumentación del apartado 4, el método estacionario del apartado 5 y el
+método variable en el tiempo del apartado 6 con las reglas de percentiles del
+apartado 6.4, portado del programa de referencia normativo del Anexo A.4 y
+validado frente al Anexo B, con los percentiles `n5`/`n10`, mediante
+`loudness_zwicker()` y `loudness_zwicker_from_spectrum()`; la lista de
+contenidos del informe del apartado 7 y las indicaciones del Anexo D para
+grabaciones con cabeza y torso. ISO 226:2023: la Fórmula (1), la Fórmula (2) y
+los parámetros de curva de la Tabla 1, mediante `equal_loudness_contour()`,
+`loudness_level()`, `hearing_threshold()` y `equal_loudness_contours()`.
 
 **No cubierto.** La sonoridad de Moore-Glasberg de ISO 532-2, el método
 variable en el tiempo de ISO 532-3 y la sonoridad del modelo de Sottek de

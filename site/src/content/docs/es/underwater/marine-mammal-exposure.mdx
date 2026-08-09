@@ -57,11 +57,14 @@ references:
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Un mamífero marino no oye todas las frecuencias por igual, así que una
-evaluación de ruido submarino no puede comparar un nivel de banda ancha contra
-un único número. La práctica regulatoria **pondera** el espectro con un filtro
+evaluación de ruido submarino no puede comparar un nivel de banda ancha con un
+único número. La práctica regulatoria **pondera** el espectro con un filtro
 con la forma de la sensibilidad del grupo auditivo, suma la energía ponderada,
 la acumula sobre toda la actividad y compara el resultado con un criterio de
-inicio publicado. Esta página cubre las tres piezas que la biblioteca aporta
+inicio publicado: la exposición a la que empieza un **desplazamiento temporal
+del umbral (TTS)** de sensibilidad auditiva, y la más alta a la que ese
+desplazamiento se vuelve permanente, históricamente **PTS** y, desde la guía de
+2024, **lesión auditiva (AUD INJ)**. Esta página cubre las tres piezas que la biblioteca aporta
 para esa cadena: las curvas de audición, las funciones de ponderación y los
 criterios de la guía vigente, y la evaluación de extremo a extremo de una
 campaña de hincado.
@@ -137,6 +140,48 @@ print(underwater.AUDIOGRAM_GROUPS)
 # ('HF', 'VHF', 'SI', 'PCW', 'OCW', 'PCA', 'OCA')
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/marine_mammal_audiograms_es.svg" alt="A la izquierda, el umbral de audición frente a la frecuencia de 100 hercios a 200 kilohercios para los siete grupos de audiograma de Southall 2019, los grupos en agua con trazo continuo y los dos grupos de carnívoros en aire con trazo discontinuo, cada uno con su punto de mejor sensibilidad marcado y una nota de que no hay ajuste publicado para los cetáceos de baja frecuencia; a la derecha, el audiograma de orca de tres tramos entre 0,5 y 80 kilohercios con los cortes entre tramos marcados, su mínimo de 39 decibelios a 22,4 kilohercios, los 51,2 decibelios que da el tercer tramo a 50 kilohercios y los 50,5 decibelios que habría dado allí el segundo tramo" width="92%" />
+
+*Los grupos distan decenas de decibelios y más de una década de mejor
+frecuencia entre sí: una marsopa oye mejor cerca de 109 kHz con 48 dB re 1 µPa,
+un sirenio cerca de 14 kHz con 60 dB. El hueco de la izquierda del panel es el
+ajuste LF que falta, y es la razón de que la sección de ponderación de más abajo
+tenga un grupo que la de audiogramas no tiene. A la derecha, los dos marcadores
+a 50 kHz distan 0,7 dB, y en eso consiste toda la trampa de los tramos. Un
+`AudiogramResult` se dibuja a sí mismo con `audiogram.plot()`.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+fig, (ax_g, ax_o) = plt.subplots(1, 2, figsize=(13.5, 5.6))
+f_all = np.logspace(2.0, np.log10(200e3), 700)
+for group in underwater.AUDIOGRAM_GROUPS:
+    res = underwater.group_audiogram(f_all, group)
+    ax_g.semilogx(res.frequencies, res.threshold,
+                  "--" if res.in_air else "-", label=group)
+    ax_g.plot([res.best_frequency], [res.best_threshold], "o")
+ax_g.set_ylim(-20.0, 170.0)
+ax_g.set(xlabel="Frecuencia [Hz]", ylabel="Umbral [dB re 1 uPa]")
+ax_g.legend(ncols=2)
+
+f_orca = np.logspace(np.log10(500.0), np.log10(80e3), 600)
+orca = underwater.orca_audiogram(f_orca)
+ax_o.semilogx(orca.frequencies, orca.threshold, label="orca_audiogram")
+ax_o.plot([orca.best_frequency], [orca.best_threshold], "o")
+ax_o.plot([50e3], [underwater.orca_audiogram(50e3).threshold[0]], "s")
+# Lo que habría devuelto el segundo tramo a 50 kHz, a partir del ajuste impreso.
+ax_o.plot([50e3], [242.9 * 50.0 ** -0.7578 + 0.5643 * 50.0**1.076],
+          "o", markerfacecolor="none")
+ax_o.set(xlabel="Frecuencia [Hz]", ylabel="Umbral [dB re 1 uPa]")
+ax_o.legend()
+plt.show()
+```
+
+</details>
+
 Para una especie en vez de un grupo, `orca_audiogram` implementa la curva de
 orca de Wensveen y Van Roij (2007) tal como la imprime Ainslie (2010),
 Ecuación (11.159), una ley de potencias de tres tramos entre 0,5 y 80 kHz. Su
@@ -150,12 +195,35 @@ from phonometry import underwater
 print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 ```
 
-Ese valor es el umbral de audición del ejemplo de orca frente a salmón de
-Ainslie: con un nivel de fuente de 198,2 dB re 1 µPa²·m² y una fuerza de blanco
-del salmón de −29,0 dB re m², la figura de mérito limitada por audición es
-$(SL + TS - HT)/2 = 59{,}0$ dB re m².
+Ese valor es el umbral de audición $HT$ del ejemplo de orca frente a salmón de
+Ainslie. Una orca que ecolocaliza es un sonar activo: paga la pérdida por
+transmisión dos veces, así que con un nivel de fuente
+$SL = 198{,}2$ dB re 1 µPa²m², una fuerza de blanco del salmón
+$TS = -29{,}0$ dB re m² y su propio umbral de audición en lugar de un umbral de
+detección, la figura de mérito limitada por audición es
+$(SL + TS - HT)/2 = 59{,}0$ dB re m²: la máxima pérdida *de ida* que puede
+permitirse. La
+[ecuación del sonar](/phonometry/es/underwater/underwater-propagation/#ecuacion-del-sonar)
+de la que salen esos términos, y `detection_range`, convierten esa figura en una
+distancia.
 
 ## Ponderación auditiva y funciones de exposición
+
+Un audiograma y una función de ponderación se parecen y responden a preguntas
+distintas, y sustituir uno por la otra es un error frecuente en las
+evaluaciones. Un **audiograma** es un umbral de detección, medido por conducta o
+por potenciales evocados; responde a preguntas de audibilidad, enmascaramiento y
+distancia de detección, y la figura de mérito de la orca frente al salmón de
+arriba es exactamente una pregunta de esas. Una **función de ponderación** está
+ajustada a datos de *susceptibilidad*, la dependencia con la frecuencia del
+desplazamiento temporal del umbral, y es la única de las dos que puede aplicarse
+a una exposición antes de compararla con un criterio de TTS o de lesión. Las dos
+curvas no tienen la misma forma, porque la frecuencia a la que un animal oye
+mejor no siempre es aquella a la que se daña con más facilidad, y un audiograma
+invertido no es una función de ponderación legítima. Esa distinción resuelve
+además la asimetría entre estas dos secciones: los cetáceos LF tienen función de
+ponderación, derivada de susceptibilidad modelada, y no tienen audiograma
+ajustado, porque no existen datos audiométricos de ballenas barbadas.
 
 Los tres conjuntos de criterios vigentes usan el mismo filtro paso banda
 genérico (NMFS 2018 Ecuación 1, Southall et al. Ecuación 2):
@@ -230,12 +298,73 @@ los valores corregidos son los implementados. Ambas quedan registradas en
 [Erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
 :::
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/marine_mammal_exposure_functions_es.svg" alt="Arriba a la izquierda, la función de exposición E(f) de los cinco grupos auditivos en agua frente a la frecuencia, cada una con su mínimo marcado como el inicio de TTS ponderado de ese grupo; arriba a la derecha, la función de ponderación de los cetáceos de baja frecuencia bajo las guías de 2024 y de 2018, que muestra la falda de alta frecuencia más pronunciada que produce b igual a cinco; abajo, los criterios de inicio impulsivos de los cinco grupos como barras agrupadas, con la exposición sonora ponderada y el pico sin ponderar uno junto a otro" width="92%" />
+
+*La función de exposición es aquello con lo que se compara de verdad un
+nivel de banda medido: un espectro de umbral cuyo mínimo es el inicio de TTS
+ponderado del grupo, $T_w = K + C$. La revisión de 2024 fijó $b = 5$ para
+todos los grupos, lo que empina la falda de alta frecuencia de 40 a
+100 dB/década y por tanto *descuenta* la energía por encima de $f_2$ mucho
+más de lo que la descontaban las tablas de 2018. Las barras enseñan por qué
+el grupo importa más que ninguna otra cosa de la cadena: el inicio de TTS
+ponderado del grupo de las marsopas queda 24 dB por debajo del de los
+cetáceos de baja frecuencia, y su criterio de pico, 20 dB por debajo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+f_w = np.logspace(1.0, np.log10(400e3), 800)
+groups = ("LF", "HF", "VHF", "PW", "OW")
+fig = plt.figure(figsize=(13.5, 9.6))
+gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.9], hspace=0.32, wspace=0.24)
+ax_e, ax_w, ax_c = (fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1]),
+                    fig.add_subplot(gs[1, :]))
+
+for group in groups:
+    res = underwater.auditory_weighting(f_w, group, guidance="nmfs-2024")
+    exposure = np.asarray(res.exposure_function)
+    ax_e.semilogx(res.frequencies, exposure, label=group)
+    ax_e.plot([res.frequencies[int(np.argmin(exposure))]], [exposure.min()], "o")
+ax_e.set_ylim(135.0, 265.0)
+ax_e.set(xlabel="Frecuencia [Hz]",
+         ylabel="E(f) = K + C - W(f) [dB re 1 uPa^2 s]")
+ax_e.legend(ncols=5)
+
+for guidance in ("nmfs-2024", "nmfs-2018"):
+    res = underwater.auditory_weighting(f_w, "LF", guidance=guidance)
+    ax_w.semilogx(res.frequencies, res.weighting,
+                  label=f"{guidance} (b = {res.parameters.b:g})")
+ax_w.set_ylim(-60.0, 5.0)
+ax_w.set(xlabel="Frecuencia [Hz]", ylabel="Ponderación W(f) [dB]")
+ax_w.legend()
+
+idx = np.arange(len(groups), dtype=float)
+for offset, attr in ((-1.5, "tts_sel"), (-0.5, "injury_sel"),
+                     (0.5, "tts_peak_spl"), (1.5, "injury_peak_spl")):
+    ax_c.bar(idx + offset * 0.2,
+             [getattr(underwater.exposure_criteria(g, guidance="nmfs-2024",
+                                                   impulsive=True), attr)
+              for g in groups], 0.2, label=attr)
+ax_c.set_xticks(idx, groups)
+ax_c.set_ylim(120.0, 245.0)
+ax_c.set(xlabel="Grupo auditivo", ylabel="Criterio de inicio [dB]")
+ax_c.legend(ncols=4)
+plt.show()
+```
+
+</details>
+
 ## Criterios de inicio
 
 `exposure_criteria` devuelve los criterios publicados de inicio de TTS y de
 lesión de un grupo. El ruido impulsivo lleva una **métrica dual**: un nivel de
 exposición sonora ponderado *y* un nivel de pico sin ponderar («plano»), y
-gobierna el criterio que produzca la isopleta mayor.
+gobierna el criterio que produzca la **isopleta** mayor; la isopleta es el
+contorno sobre el que el criterio se cumple exactamente, así que la métrica que
+la empuja más lejos de la fuente es la que fija la zona de mitigación.
 
 ```python
 from phonometry import underwater
@@ -247,12 +376,32 @@ print(crit.tts_peak_spl, crit.injury_peak_spl)  # 196, 202 dB re 1 uPa (plano)
 print(crit.source)
 ```
 
+Los criterios impulsivos de los cinco grupos en agua, con la guía por defecto,
+son los números por los que la mayoría de lectores llega hasta aquí:
+
+| Grupo | SEL de TTS (ponderado) | SEL de AUD INJ (ponderado) | Pico de TTS (plano) | Pico de AUD INJ (plano) |
+|---|---:|---:|---:|---:|
+| LF | 168 | 183 | 216 | 222 |
+| HF | 178 | 193 | 224 | 230 |
+| VHF | 144 | 159 | 196 | 202 |
+| PW | 168 | 183 | 217 | 223 |
+| OW | 170 | 185 | 224 | 230 |
+
+Las columnas de SEL van en dB re 1 µPa²·s y las de pico en dB re 1 µPa; los
+grupos en aire PA y OA salen de la misma llamada y usan referencias de 20 µPa.
+Los criterios no impulsivos prescinden por completo de las columnas de pico y se
+apoyan en sus propios valores de TTS más 20 dB (LF 177 → 197, VHF 161 → 181),
+así que no son los números impulsivos con una columna quitada.
+
 Las tablas son internamente consistentes de maneras que la biblioteca fija como
 tests: el nivel de lesión no impulsivo es siempre TTS + 20 dB, el inicio de TTS
 ponderado publicado es siempre el $K + C$ redondeado, y en la tabla impulsiva de
-Southall los criterios de SEL van a TTS + 15 dB y los de pico a TTS + 6 dB.
+Southall los criterios de SEL van a TTS + 15 dB y los de pico a TTS + 6 dB, lo
+que la tabla de arriba cumple fila a fila.
 
 ## Una evaluación trabajada de hincado de pilotes
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure_es.svg" alt="La configuración de la evaluación de exposición: un pilote hincado por un martillo de impacto, un hidrófono calibrado a la distancia de 750 metros de la ISO 18406 donde se mide el nivel de exposición sonora por bandas, el animal receptor más lejos a la distancia R con la pérdida por transmisión entre ambos, los tres pasos de proceso desde la exposición por bandas hasta la ponderación auditiva y la acumulación sobre los golpes, y una vista en planta con las dos isopletas de la métrica dual y la mayor gobernando" width="92%" />
 
 El hincado percusivo de pilotes es el caso impulsivo canónico. La cadena va del
 golpe registrado al veredicto:
@@ -260,7 +409,7 @@ golpe registrado al veredicto:
 1. `strike_sel_spectrum` reparte la exposición sonora de un golpe del registro
    en bandas de fracción de octava (las energías por banda vuelven a sumar el
    `single_strike_sel` de banda ancha de
-   [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/), por
+   [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/#3-sonido-del-hincado-de-pilotes-iso-18406), por
    Parseval);
 2. `weighted_exposure` aplica $W(f)$ banda a banda, suma la energía ponderada,
    la acumula sobre el número de golpes (el $+10\log_{10} N$ de la ISO 18406) y
@@ -309,11 +458,146 @@ print(res.exceeds_injury, res.exceeds_tts)
 res.plot(language="es")   # espectro ponderado frente a los criterios
 ```
 
-Un martillo de 200 Hz cae dentro de la banda de paso de los cetáceos de baja
-frecuencia y muy fuera de la de muy alta frecuencia, así que la misma campaña
-pondera decenas de decibelios más bajo para una marsopa que para una ballena
-barbada: justo el sentido de ponderar, y la razón por la que un único SEL
-acumulado sin ponderar no es una evaluación.
+Lee esos seis números en orden, porque cada uno es un paso. La exposición por
+golpe sin ponderar del registro es de **135,7 dB re 1 µPa²·s**; la ponderación
+LF la deja en **133,5 dB**, apenas 2 dB de coste, porque un martillo de 200 Hz
+cae dentro de la banda de paso de los cetáceos de baja frecuencia. Acumular
+3000 golpes añade $10\log_{10}3000 = 34{,}8$ dB y da **168,3 dB**; ese término,
+y no la ponderación, es el que suele decidir el desenlace. Después se leen los
+márgenes frente a los criterios: `sel_margin` = **−14,7 dB** frente al criterio
+de lesión auditiva de 183 dB, así que `exceeds_injury` es `False`, pero el nivel
+acumulado supera el inicio de TTS de 168 dB por tres décimas de decibelio, así
+que `exceeds_tts` es `True`. El pico plano de este registro es de
+153,8 dB re 1 µPa, `peak_margin` = **−68,2 dB**, ni de lejos el criterio de pico
+de 222 dB.
+
+Esos son los órdenes de magnitud de un golpe *sintético*, y son bajos. El
+hincado percusivo medido en la posición estándar de 750 m llega a niveles de
+pico del orden de 200 dB re 1 µPa y a exposiciones por golpe del orden de
+175-180 dB re 1 µPa²·s, así que un pilote real se acerca al criterio de lesión
+de baja frecuencia de 183 dB, quedándose muy por debajo de él en cuanto se
+aplica la ponderación VHF. Un resultado muy fuera de esos rangos es un error de
+unidades o de calibración, y no un pilote insólito.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/marine_mammal_assessment_es.svg" alt="A la izquierda, el nivel de exposición sonora por golpe del golpe registrado en bandas de tercio de octava, con máximo en 200 hercios; en el centro y a la derecha, la misma campaña de 3000 golpes evaluada para cetáceos de baja frecuencia y para cetáceos de muy alta frecuencia, cada una con las exposiciones por banda sin ponderar y ponderadas, las líneas de criterio de TTS y de lesión auditiva y el nivel acumulado, con márgenes de menos 14,7 y menos 49,7 decibelios" width="92%" />
+
+*La misma campaña, juzgada dos veces. Para una ballena barbada la ponderación
+cuesta 2 dB y el nivel acumulado cae entre los dos criterios; para una marsopa
+la ponderación cuesta 59 dB y el mismo hincado queda 50 dB por debajo de su
+criterio de lesión. En eso consiste ponderar, y esa es la razón por la que un
+único SEL acumulado sin ponderar no es una evaluación. `res.plot()` dibuja
+cualquiera de los dos paneles.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 3, figsize=(16.5, 5.4))
+spectrum.plot(ax=axes[0], language="es")
+for ax, group in zip(axes[1:], ("LF", "VHF"), strict=True):
+    verdict = underwater.weighted_exposure(
+        spectrum.frequencies, spectrum.band_sel, group,
+        guidance="nmfs-2024", impulsive=True, n_events=3000, peak_spl=peak)
+    verdict.plot(ax=ax, language="es")
+    ax.set_title(f"{group}: acumulado {verdict.cumulative_sel:.1f} dB, "
+                 f"margen {verdict.sel_margin:+.1f} dB")
+plt.show()
+```
+
+</details>
+
+La pregunta operativa que hace una campaña no es «¿3000 golpes superan el
+criterio?», sino «¿cuántos golpes se pueden hincar, y qué grupo aprieta
+primero?». Eso es un bucle sobre `weighted_exposure` con un `n_events`
+creciente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piling_campaign_accumulation_es.svg" alt="Nivel de exposición sonora acumulado ponderado frente al número de golpes de uno a diez mil en eje logarítmico, una línea por grupo auditivo, con los criterios de TTS y de lesión auditiva de cada grupo dibujados como rectas horizontales punteadas y discontinuas del color correspondiente, y la curva de los cetáceos de baja frecuencia cruzando su inicio de TTS a los 2820 golpes" width="92%" />
+
+*Todas las curvas son rectas en un eje log-N, porque la acumulación añade
+$10\log_{10}N$ y nada más: el grupo decide la ordenada en el origen y el número
+de golpes hace el resto. Para este martillo de 200 Hz solo el grupo de baja
+frecuencia llega a alcanzar un criterio, a los 2820 golpes, y ningún grupo
+alcanza su criterio de lesión dentro de los 10 000. La curva es un caso peor de
+receptor estático: la biblioteca no mueve al animal.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+counts = np.unique(np.round(np.logspace(0.0, 4.0, 90)).astype(int))
+fig, ax = plt.subplots(figsize=(11.5, 6.4))
+for group in ("LF", "HF", "VHF", "PW", "OW"):
+    curve = [underwater.weighted_exposure(
+        spectrum.frequencies, spectrum.band_sel, group, guidance="nmfs-2024",
+        impulsive=True, n_events=int(n)).cumulative_sel for n in counts]
+    line, = ax.semilogx(counts, curve, label=group)
+    crit = underwater.exposure_criteria(group, guidance="nmfs-2024",
+                                        impulsive=True)
+    ax.axhline(crit.tts_sel, color=line.get_color(), linestyle=":")
+    ax.axhline(crit.injury_sel, color=line.get_color(), linestyle="--")
+ax.set(xlabel="Número de golpes N",
+       ylabel="SEL acumulado ponderado [dB re 1 uPa^2 s]")
+ax.legend(ncols=5)
+plt.show()
+```
+
+</details>
+
+### De un criterio a una isopleta
+
+Un margen no es la salida regulatoria; una **distancia** sí. Una isopleta es el
+lugar geométrico sobre el que un criterio se cumple exactamente, así que la
+respuesta que debe una evaluación es un radio: la distancia más allá de la cual
+el SEL ponderado acumulado deja de superar su criterio y, por separado, la
+distancia más allá de la cual el pico plano deja de superar el suyo, gobernando
+la mayor de las dos.
+
+El puente de esta página a ese radio pasa por la guía de propagación. Toma el
+SEL por bandas a la distancia a la que se midió (750 m, según la ISO 18406),
+propágalo a una distancia de prueba con `transmission_loss` en cada frecuencia
+central de banda, vuelve a ejecutar `weighted_exposure` sobre el espectro
+propagado con el número de golpes de la campaña y lee la distancia en la que
+`sel_margin` cruza el cero. Después repítelo para el pico plano, donde solo se
+aplica la pérdida de ida.
+
+```python
+def band_loss(r):
+    """Pérdida por transmisión por bandas a la distancia r, en 30 m de agua."""
+    return np.array([float(underwater.transmission_loss(
+        r, float(f), law="practical", transition_range=30.0).tl[0])
+        for f in spectrum.frequencies])
+
+reference = band_loss(750.0)          # la distancia a la que se midió el golpe
+for r in (750.0, 800.0, 1000.0, 3000.0):
+    out = underwater.weighted_exposure(
+        spectrum.frequencies, spectrum.band_sel - (band_loss(r) - reference),
+        "LF", guidance="nmfs-2024", impulsive=True, n_events=3000,
+        peak_spl=peak)
+    print(int(r), round(out.cumulative_sel, 1), round(out.tts_margin, 2))
+# 750 168.3 0.27   <- superado
+# 800 168.0 -0.01  <- la isopleta de TTS está aquí
+# 1000 167.0 -0.98
+# 3000 162.2 -5.76
+```
+
+Para esta campaña la isopleta de TTS de baja frecuencia queda hacia los
+**800 m**, y no hay isopleta de lesión ninguna: el nivel acumulado está 14,7 dB
+por debajo del criterio de 183 dB incluso a la distancia de medida. La isopleta
+de pico tampoco existe, por la misma razón, que es exactamente el caso en el que
+la regla de la isopleta *mayor* no tiene entre qué elegir y la evaluación se
+reduce a un solo radio.
+
+De ahí se siguen dos consecuencias, y las dos van en el informe. La métrica que
+gobierna puede **cambiar con la distancia**, porque el SEL acumulado lleva el
+término $+10\log_{10}N$ y el pico no, así que las dos isopletas encogen a ritmos
+distintos. Y un número acumulado no significa nada sin dos datos al lado: la
+distancia a la que se midió o se modeló el golpe, y la **ventana de
+acumulación**; 3000 golpes significa un pilote hincado dentro de esa ventana,
+por convención 24 horas en la guía regulatoria, y no una campaña entera.
 
 ## Qué cubre esta guía
 

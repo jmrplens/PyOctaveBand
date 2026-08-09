@@ -42,11 +42,17 @@ from phonometry import load_anp_database
 
 db = load_anp_database()
 print(len(db.aircraft_ids))          # 155 tipos de aeronave
-aircraft = db.aircraft("747100")
-print(aircraft.description)          # Boeing 747-100 / JT9DBD
-print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
-print(aircraft.power_parameter, aircraft.mounting)
+ac = db.aircraft("747100")
+print(ac.description)                # Boeing 747-100 / JT9DBD
+print(ac.engine_type, ac.num_engines, ac.weight_class)
+print(ac.power_parameter, ac.mounting)
 ```
+
+Las guías hermanas importan el módulo como `aircraft` y llaman a
+`aircraft.event_level(...)` sobre él; aquí `ac` es un **registro** de la base de
+datos, y sus `event_level` y `noise_contour` son esas mismas funciones con las
+tablas NPD y el perfil por defecto ya rellenados. Mantener los dos separados
+importa si encadenas snippets de las dos páginas.
 
 Un `AnpAircraft` se describe con el tipo y número de motores y la clase de
 estela OACI, y lleva dos campos que usarás directamente.
@@ -66,6 +72,44 @@ en ala y en fuselaje difieren en más de un decibelio, las hélices no reciben
 esa corrección, y la flota distribuida se reparte 70 / 55 / 30 entre los tres.
 Un identificador que la base no reconoce recae en `"wing"`.
 
+### Encontrar tu aeronave
+
+Los identificadores son los de la propia base ANP. Se parecen a un designador de
+tipo de la OACI, pero no son lo mismo, porque un tipo aparece una vez por
+variante de motor: `A320-232` es el A320 con motores IAE y `747100` el 747-100
+con JT9D. Busca en las descripciones para encontrar la tuya en lugar de adivinar
+la cadena:
+
+```python
+from phonometry import load_anp_database
+
+db = load_anp_database()
+for aid in db.aircraft_ids:
+    rec = db.aircraft(aid)
+    if "A320" in rec.description:
+        print(aid, "|", rec.description, "|", rec.engine_type, "|", rec.mounting)
+# A320-211 | Airbus A320-211 / CFM56-5A1 | Jet | wing
+# A320-232 | Airbus A320-232 / V2527-A5 | Jet | wing
+```
+
+Casa la variante de motor antes que ninguna otra cosa: cambia los niveles NPD más
+que cualquiera de las correcciones por segmento.
+
+### Cuando tu aeronave no está en la base
+
+Toda lista real de movimientos contiene tipos que la base no tiene, y el remedio
+aceptado es la **sustitución** por un tipo acústica y operativamente parecido, no
+la invención. Casa primero el tipo y el número de motores, y después la clase de
+peso y el montaje de motores, porque esos cambian la *forma* de la respuesta en
+lugar de desplazarla; comprueba que el `power_parameter` del sustituto es la
+misma magnitud que el del original, ya que una tabla indexada por empuje neto
+corregido en libras no admite reglajes de potencia calculados para otra indexada
+por cualquier otra cosa. Registra la sustitución junto con los resultados: es una
+hipótesis de modelado, no un detalle. El mismo razonamiento vale un nivel más
+abajo: un tipo cuyas curvas NPD están tabuladas pero cuya trayectoria no lo está
+(véase la sección 3) suele modelarse mejor con una *trayectoria* sustituta y su
+propia tabla NPD que sustituyendo la aeronave entera.
+
 ## 2. Las curvas nivel-potencia-distancia
 
 `npd_curves` devuelve la superficie NPD tabulada para una operación (`"D"` de
@@ -76,6 +120,13 @@ potencia, que es lo que dibujan las curvas de abajo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_es.svg" alt="Curvas nivel-potencia-distancia de un Boeing 747-100 para tres reglajes de empuje tabulados, con el nivel cayendo con la distancia oblicua en eje logarítmico y marcadores en los nodos tabulados" width="82%" />
 
+*Los tres reglajes de empuje tabulados van casi paralelos: la potencia sobre todo
+desplaza el nivel, mientras que la distancia fija la forma. La caída es cercana a
+la del inverso del cuadrado a corta distancia y se empina a gran distancia a
+medida que se acumula la absorción, y los marcadores son las únicas distancias
+sobre las que la base afirma algo: todo lo que queda entre ellos es interpolación
+de la Doc 29.*
+
 <details>
 <summary>Ver el código de esta figura</summary>
 
@@ -83,14 +134,14 @@ potencia, que es lo que dibujan las curvas de abajo.
 import matplotlib.pyplot as plt
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-curves = aircraft.npd_curves("D", "SEL")
+ac = load_anp_database().aircraft("747100")
+curves = ac.npd_curves("D", "SEL")
 
 fig, ax = plt.subplots(figsize=(10, 6))
 curves.plot(ax=ax, language="es")
-ax.set_title(f"Curvas NPD ANP - {aircraft.description} (SEL, despegue)")
+ax.set_title(f"Curvas NPD ANP - {ac.description} (SEL, despegue)")
 ax.text(0.02, 0.06,
-        f"parámetro de potencia: {aircraft.power_parameter}\n"
+        f"parámetro de potencia: {ac.power_parameter}\n"
         "marcadores: nodos NPD tabulados",
         transform=ax.transAxes, va="bottom", fontsize=9)
 plt.show()
@@ -115,6 +166,8 @@ print(curves.powers)                       # [10000. 14000. 19000. 23000.] lb
 print(curves.level(19000.0, [304.8, 1000.0, 3000.0]))
 ```
 
+El `power_parameter` del registro nombra esas unidades: nunca supongas newtons.
+
 Las distancias están en metros. La base las tabula en pies, en los diez nodos de
 Doc 29 de 200 ft a 25000 ft, y este puente convierte al leer para que todo lo de
 aguas abajo siga en SI.
@@ -124,10 +177,17 @@ aguas abajo siga en SI.
 El registro de una aeronave lleva además trayectorias por defecto. `profile`
 devuelve una como trayectoria de Doc 29: un array `(N, 5)` de posición sobre la
 ruta, lateral y vertical más el reglaje de potencia y la velocidad verdadera,
-con máscaras booleanas que marcan qué segmentos son el rodaje de despegue o el
-de aterrizaje.
+con máscaras booleanas que marcan qué segmentos son el recorrido de despegue o
+el de aterrizaje.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile_es.svg" alt="Perfil de despegue por defecto de un Boeing 747-100: altitud frente a distancia sobre la ruta, subiendo desde la pista a lo largo de once puntos fijos, con los puntos de rodaje marcados a altitud cero" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile_es.svg" alt="Perfil de despegue por defecto de un Boeing 747-100: altitud frente a distancia sobre la ruta, subiendo desde la pista a lo largo de once puntos fijos, con los puntos del recorrido de despegue marcados a altitud cero" width="82%" />
+
+*Los primeros puntos están a altitud cero y son el recorrido de despegue. Lo que
+sigue es el gradiente de subida, y es el gradiente, y no el nivel, lo que decide
+el contorno,
+porque fija la distancia oblicua en cada receptor; la misma aeronave con una
+etapa más larga va más pesada y sube más despacio, así que su huella es más larga
+y más ancha.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -136,12 +196,12 @@ de aterrizaje.
 import matplotlib.pyplot as plt
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-profile = aircraft.profile("D", stage_length=1)
+ac = load_anp_database().aircraft("747100")
+profile = ac.profile("D", stage_length=1)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 profile.plot(ax=ax, language="es")
-ax.set_title(f"Perfil de despegue por defecto ANP - {aircraft.description}")
+ax.set_title(f"Perfil de despegue por defecto ANP - {ac.description}")
 ax.text(0.98, 0.06,
         f"etapa {profile.stage_length}, "
         f"{profile.path.shape[0]} puntos fijos",
@@ -159,27 +219,44 @@ load_anp_database().aircraft("747100").profile("D", stage_length=1).plot(languag
 
 La **longitud de etapa** selecciona el tramo de distancia de viaje: una etapa más
 larga significa más combustible, más peso y una subida más tendida, así que la
-misma aeronave tiene un perfil por tramo.
+misma aeronave tiene un perfil por tramo. El Apéndice G3.5 del Vol. 2 de la
+Doc 29 define los tramos por longitud de viaje en millas náuticas: el 1 es 0-500,
+el 2 es 500-1 000, el 3 es 1 000-1 500, el 4 es 1 500-2 500, el 5 es 2 500-3 500,
+el 6 es 3 500-4 500, el 7 es 4 500-5 500, y así en pasos de 1 000 nmi hasta el 10
+(7 500-8 500), con el 11 para cualquier cosa más larga y «M» para el alcance
+máximo con la masa máxima de despegue. El peso de despegue de cada perfil se
+calcula al alcance representativo del tramo, definido como el mínimo más el 70 %
+de la horquilla, así que el tramo 1 se pesa a 350 nmi y el tramo 4 a 2 200 nmi.
+No todas las aeronaves vuelan todos los tramos, y los perfiles de punto fijo que
+se distribuyen cubren las etapas 1 a 7 para despegues y solo la 1 para llegadas.
 
 Solo se leen como trayectorias listas para usar los perfiles de **punto fijo**.
 La mayoría de las entradas ANP describen sus despegues como pasos
 de procedimiento (sube a este régimen hasta tal altitud, acelera, repliega
 flaps), que hay que volar a través de un modelo de mecánica del vuelo antes de
 que sean una trayectoria. Ese modelo queda fuera de este puente, así que de las
-155 aeronaves de la base distribuida 13 tienen perfil de despegue de punto fijo.
-Pedir uno que no existe lanza un `KeyError` que nombra las etapas que sí:
+155 aeronaves de la base distribuida 13 tienen perfil de *despegue* de punto fijo
+y 20 perfil de *llegada* de punto fijo. Pedir uno que no existe lanza un `KeyError`
+que nombra las etapas que sí, que es además la forma de descubrir los tramos que
+una aeronave trae de verdad:
 
 ```python
 from phonometry import load_anp_database
 
 db = load_anp_database()
-try:
-    db.profile("A320-232", "D", 1)
-except KeyError as exc:
-    print(exc)
+for identifier, operation, stage in (("A320-232", "D", 1), ("747100", "D", 9)):
+    try:
+        db.profile(identifier, operation, stage)
+    except KeyError as exc:
+        print(exc)
+# ... 'A320-232', operation 'D', stage length 1 (available stage lengths: [])
+# ... '747100', operation 'D', stage length 9 (available: [1, 2, 3, 4, 5, 6])
 ```
 
-Las curvas NPD, en cambio, están tabuladas para todas las aeronaves de la base.
+Una lista vacía significa que el tipo no tiene ningún perfil de punto fijo y
+necesita una trayectoria sustituta; una no vacía significa que has pedido un
+tramo que esa aeronave no vuela. Las curvas NPD, en cambio, están tabuladas para
+todas las aeronaves de la base.
 
 ## 4. Directo a un nivel de evento o un contorno
 
@@ -188,14 +265,6 @@ cadena de Doc 29. `event_level` coloca un sobrevuelo en un receptor y
 `noise_contour` lo barre sobre una malla de tierra, cableando cada uno las
 curvas NPD y el perfil por defecto en las funciones que la guía de ruido de
 aeropuertos construye a mano.
-
-```python
-from phonometry import load_anp_database
-
-aircraft = load_anp_database().aircraft("747100")
-flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
-print(round(float(flyover.level), 1))     # SEL en dB en ese receptor
-```
 
 El observador es `(x, y, z)` en metros en el **sistema de la pista**, y el
 origen de ese sistema no es el límite del aeropuerto: $x$ corre a lo largo del
@@ -210,17 +279,41 @@ $y$ es el desplazamiento lateral respecto al eje de pista prolongado, positivo
 a estribor del sentido de la marcha; su signo es lo que elige la rama de ángulo
 de depresión de la regla de segmento en viraje. $z$ es la altura del receptor
 sobre el terreno local, dejada en 0 en estos ejemplos, donde Doc 29 mide a
-1,2 m, normalmente una diferencia por debajo del decibelio. Los argumentos
-opcionales `temperature` y
-`pressure` alimentan el ajuste de impedancia atmosférica de Doc 29 y valen por
-defecto los 15 °C y 101,325 kPa de la atmósfera estándar.
+1,2 m, normalmente una diferencia por debajo del decibelio.
+
+Tres argumentos deciden el resto, y dos de ellos son silenciosos. La métrica vale
+por defecto el nivel de exposición sonora, con `"LAmax"` disponible si se pide;
+la longitud de etapa vale por defecto 1, el tramo de distancia de viaje más corto
+y por tanto la subida más empinada y la huella más pequeña; y los opcionales
+`temperature` y `pressure` vuelven a referir los niveles tabulados desde la
+impedancia acústica específica de referencia al aire del aeródromo, y valen por
+defecto los 15 °C y 101,325 kPa de la atmósfera estándar. Ese último par es un
+término de contabilidad y no una corrección meteorológica: en la atmósfera
+estándar vale +0,07 dB, y rara vez pasa de unas décimas. Los niveles NPD siguen
+llevando dentro la absorción de la atmósfera a la que se redujeron, y la cadena
+no ofrece ninguna corrección de banda dependiente de la humedad, así que un
+aeródromo caluroso y seco no se modela pasándole su temperatura.
+
+```python
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+flyover = ac.event_level([3000.0, 500.0, 0.0], "D")
+print(round(float(flyover.level), 1))     # 100.4 dB
+```
+
+Ese es el nivel de exposición sonora de evento único de un despegue de 747-100 en
+un receptor a 3 km traza abajo y 500 m a un costado de ella. Aparta el receptor
+hasta 1 500 m de separación lateral y cuesta más que la distancia añadida sola,
+porque la atenuación lateral se enciende a medida que el ángulo de elevación cae
+por debajo de 50°.
 
 ```python
 import numpy as np
 from phonometry import load_anp_database
 
-aircraft = load_anp_database().aircraft("747100")
-contour = aircraft.noise_contour(
+ac = load_anp_database().aircraft("747100")
+contour = ac.noise_contour(
     "D",
     x=np.linspace(-2000.0, 12000.0, 40),
     y=np.linspace(-3000.0, 3000.0, 30),
@@ -228,6 +321,49 @@ contour = aircraft.noise_contour(
 print(contour.level.shape)      # (30, 40): un SEL por punto de la malla
 contour.plot(language="es")
 ```
+
+La malla se indexa `(y, x)`, que es la razón por la que la forma es `(30, 40)` y
+no al revés. La comprobación más barata de que la malla y la trayectoria están en
+el mismo sistema es que el máximo del array coincida con una llamada a
+`event_level` en el punto de malla donde ocurre.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour_es.svg" alt="Contorno de nivel de exposición sonora de evento único de un despegue de Boeing 747-100 calculado a partir de la base ANP distribuida, sobre una malla de 14 km a lo largo de la traza por 6 km de ancho. El recorrido de despegue se dibuja como una barra gruesa sobre la pista y la traza en tierra por defecto como una línea a trazos a lo largo de y igual a cero; la huella es más intensa sobre el recorrido y la primera parte de la subida y se estira traza abajo, hasta unos 8 km en el contorno de 95 dB y 12 km en el más exterior, y el receptor de event_level a 3 km a lo largo de la traza y 500 m a un costado está marcado con su nivel de evento único de 100,4 dB" width="90%" />
+
+*La huella real del 747-100, a partir de las propias tablas NPD y del perfil de
+despegue por defecto de la base: cuatro líneas de código y nada escrito a mano.
+Es más estrecha y mucho más alargada que el contorno didáctico de la guía de
+ruido de aeropuertos, porque un perfil de subida real pone el avión arriba
+enseguida y la parte ruidosa del suceso se queda cerca de la pista. El receptor
+marcado es la llamada a `event_level` de arriba, así que las dos mitades de esta
+sección son el mismo cálculo en un punto y en 1 200 de ellos.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import load_anp_database
+
+ac = load_anp_database().aircraft("747100")
+profile = ac.profile("D", stage_length=1)
+x = np.linspace(-2000.0, 12000.0, 40)
+y = np.linspace(-3000.0, 3000.0, 30)
+
+fig, ax = plt.subplots(figsize=(10, 5.5))
+ac.noise_contour("D", x=x, y=y).plot(ax=ax, language="es")   # la gráfica va en kilómetros
+inside = profile.path[:, 0] <= x.max()
+ax.plot(profile.path[inside, 0] / 1000.0, profile.path[inside, 1] / 1000.0,
+        "k--", lw=1.4, label="traza en tierra por defecto")
+ax.plot([3.0], [0.5], "o", ms=8,
+        label=f"receptor de event_level: SEL {float(flyover.level):.1f} dB")
+ax.set_xlim(x.min() / 1000.0, x.max() / 1000.0)
+ax.set_ylim(y.min() / 1000.0, y.max() / 1000.0)
+ax.legend(loc="lower left", fontsize=8)
+plt.show()
+```
+
+</details>
 
 Todo lo que devuelven estos dos es el mismo tipo de resultado que usa la guía de
 ruido de aeropuertos, así que el dibujo, la extracción de contornos y el
@@ -247,7 +383,8 @@ en malla de Doc 29 desde un identificador de aeronave con `event_level` y
 **No cubierto.** Los perfiles de pasos de procedimiento, que es como describen
 su despegue la mayoría de las entradas ANP: convertirlos en una trayectoria
 exige el modelo de mecánica del vuelo de Doc 9911 de la OACI, que este puente no
-implementa, así que solo las 13 aeronaves con perfil de punto fijo tienen
+implementa, así que solo las 13 aeronaves con perfil de *despegue* de punto fijo,
+y las 20 con perfil de *llegada* de punto fijo, tienen
 trayectoria lista para usar. La base además solo se lee, nunca se escribe:
 phonometry distribuye la versión 2.3 y no la actualiza.
 

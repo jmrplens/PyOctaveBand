@@ -1,6 +1,6 @@
 ---
 title: "Fuentes de ruido estructural"
-description: "La cadena desde una máquina vibrante hasta el ruido oído varias salas más allá: la familia de FRF de ISO 7626, la rigidez de transferencia de aisladores de ISO 10846, la potencia radiada desde vibración de ISO/TS 7849, la placa de recepción de EN 15657 y la predicción de instalación de EN 12354-5."
+description: "La cadena desde una máquina vibrante hasta el ruido oído varias salas más allá: la familia de FRF de ISO 7626, la rigidez de transferencia de aisladores de ISO 10846, la potencia radiada a partir de la vibración de ISO/TS 7849, la placa de recepción de EN 15657 y la predicción de instalación de EN 12354-5."
 ---
 
 Una máquina fijada a un edificio radia sonido dos veces: directamente desde
@@ -31,13 +31,15 @@ sigue la potencia a través de la propia estructura, con los coeficientes de
 transmisión del enfoque ondulatorio para uniones rígidas en X, T, L y en
 línea, su media angular de campo difuso, y el factor de pérdidas por
 acoplamiento y el índice de reducción vibratoria Kij que se derivan de
-ellos.
+ellos, y, para las uniones que ningún modelo ondulatorio describe, la vía
+experimental que invierte esos mismos factores de pérdidas por acoplamiento
+a partir de las energías medidas de los subsistemas.
 [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/)
 mide la rigidez de transferencia dinámica de los aisladores, soportes y
 mangueras que se insertan precisamente para romper la trayectoria de transmisión,
 por los métodos directo e indirecto (transmisibilidad).
 [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
-se ocupa de la radiación directa: la potencia aérea estimada desde la
+se ocupa de la radiación directa: la potencia aérea estimada a partir de la
 velocidad superficial y un factor de radiación, sin medición acústica
 alguna.
 
@@ -59,7 +61,10 @@ receptor, que es donde esta sección se encuentra con los modelos de
   grado de libertad.
 - [Transmisión de onda de flexión en uniones de placas (Cremer/Craik/Hopkins)](/phonometry/es/vibration/structural/junction-transmission/):
   los coeficientes del enfoque ondulatorio para uniones rígidas en X, T, L y en
-  línea, su media angular y el factor de pérdidas por acoplamiento y el Kij.
+  línea, su media angular y el factor de pérdidas por acoplamiento y el Kij,
+  más la SEA experimental: factores de pérdidas por acoplamiento invertidos a
+  partir de energías medidas por inyección de potencia, con las densidades
+  modales que necesitan.
 - [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/):
   rigidez de transferencia dinámica de aisladores por los métodos directo e
   indirecto.
@@ -69,7 +74,7 @@ receptor, que es donde esta sección se encuentra con los modelos de
 Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 - [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
-  potencia aérea radiada desde la velocidad superficial y un factor de
+  potencia aérea radiada a partir de la velocidad superficial y un factor de
   radiación.
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   el método de la placa de recepción y las magnitudes de fuente

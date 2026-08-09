@@ -106,6 +106,87 @@ con la estrategia por tareas cuando puedas, recurre a la basada en la función
 para trabajo irregular y usa la jornada completa cuando el patrón desafíe toda
 descripción o se quiera una comprobación independiente de todo el turno.
 
+### 1.1 Tomar las muestras
+
+Todo lo que hay debajo de esta línea ocurre antes de que un solo número llegue a
+una `Task`, y aquí viven las tres formas más habituales de invalidar una
+campaña.
+
+**Cuánto dura cada muestra (apartado 9.3).** La medición de una tarea debe durar
+al menos 5 min; si la propia tarea dura menos de 5 min, la medición dura lo que
+dure la tarea. Solo puede acortarse cuando se comprueba que el nivel es
+constante o repetible, o cuando la tarea aporta poco a la exposición total. El
+ruido cíclico se muestrea sobre **al menos tres ciclos bien definidos**, con un
+mínimo de 5 min, y siempre sobre un número entero de ciclos: un ciclo a medias
+sesga el nivel de la tarea en la parte del ciclo que sobremuestrea. El ruido de
+fluctuación aleatoria se muestrea el tiempo suficiente para ser representativo,
+lo que es un juicio que el informe tiene que dejar por escrito.
+
+**Cuántas, y tomadas cuándo (apartado 9.3).** Al menos tres mediciones por
+tarea, y la norma recomienda tomarlas en momentos distintos de la tarea o sobre
+distintos trabajadores del grupo, para que la dispersión que alimenta $u_{1a}$
+sea variabilidad real y no un minuto afortunado. La jornada del anexo D del
+fragmento de abajo es exactamente esa regla en acción: la soldadura se queda con
+sus tres muestras, mientras que el corte/amolado tiene seis, porque las tres
+primeras abarcaban más de 3 dB. Y hay que ver qué se compra con ello: la
+Ec. C.6 divide la dispersión entre $I(I-1)$, así que lo que encoge el término de
+muestreo es el *número* de muestras, no su duración.
+
+**Dónde va el micrófono.** Dos configuraciones, y el diagrama de apertura de la
+guía dibuja solo la primera:
+
+- **Instrumento portado (apartado 12.3).** Sobre lo alto del hombro, a al menos
+  0,1 m de la entrada del conducto auditivo externo del lado más expuesto, unos
+  0,04 m por encima del hombro, con el micrófono y el cable sujetos de modo que
+  la ropa no pueda taparlos ni rozarlos. El apantallamiento del cuerpo y las
+  reflexiones que eso introduce son justo lo que paga el término
+  $u_3 = 1{,}0$ dB del balance del anexo C; cuando el oído está cerca de una
+  fuente pequeña, la NOTA 1 sugiere medir a ambos lados de la cabeza para
+  averiguar cuál es de verdad el oído más expuesto.
+- **Sonómetro (apartado 12.4).** Con el trabajador ausente, el micrófono va en
+  la posición de su cabeza, preferiblemente en el plano medio de la cabeza, en
+  línea con los ojos y con el eje paralelo a su línea de visión; cuando la
+  posición de la cabeza no está bien definida, a 1,55 m ± 0,075 m sobre el suelo
+  para un trabajador de pie y a 0,80 m ± 0,05 m sobre el centro del plano del
+  asiento para uno sentado. El promedio del puesto puede obtenerse en su lugar
+  barriendo a velocidad constante una trayectoria en forma de signo de infinito.
+  Con el trabajador presente, el micrófono se sostiene entre 0,1 m y 0,4 m de la
+  entrada del conducto auditivo del lado más expuesto, y si el trabajo hace
+  imposible mantener los 0,4 m la norma recomienda pasarse al instrumento
+  portado.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_workstation_iso9612_es.svg"
+  alt="Dos paneles de la geometría del sonómetro del apartado 12.4 de la ISO 9612. Izquierda, trabajador ausente: un micrófono sobre trípode en la posición de la cabeza del trabajador delante de una máquina, con la cápsula en la línea de los ojos y el eje paralelo a la línea de visión, acotado a 1,55 m más menos 0,075 m sobre el suelo para un trabajador de pie, con un recuadro que da 0,80 m más menos 0,05 m sobre el centro del plano del asiento para uno sentado, y una vista en planta del barrido a velocidad constante por una trayectoria en forma de signo de infinito. Derecha, trabajador presente: el mismo puesto con un sonómetro de mano sostenido entre 0,1 m y 0,4 m de la entrada del conducto auditivo externo más expuesto, con una pantalla antiviento de al menos 60 mm de diámetro, y una nota de que una posición fija infravalora una herramienta de mano próxima al oído"
+  width="94%"
+/>
+
+**Las dos comprobaciones que deciden si los datos sobreviven.** Una calibración
+de campo con ajuste antes de cada serie y al comienzo de cada serie diaria, y
+una calibración de campo *sin* ajuste al final de cada una; si ambas lecturas
+difieren en más de **0,5 dB** a cualquier frecuencia, los resultados de esa
+serie deben descartarse (apartado 12.2). Eso es lo que afirman las
+«verificaciones de campo dentro de 0,3 dB» de la ficha de ejemplo. Después, y
+antes de dar la jornada por buena, se compara el registro de nivel frente al
+tiempo con las notas de observación: un dosímetro registra un golpe o un roce en
+el micrófono como un suceso genuino de nivel alto (apartado 13.2), y un solo
+artefacto de esos puede mover el $L_{EX,8h}$ de la jornada; todo pico
+inexplicado debe investigarse y la medición repetirse si el resultado queda
+afectado de forma significativa, y con un instrumento sin registro, repetirse
+sin más.
+
+**Y el resto de las reglas de rechazo.** Hay que evitar los flujos de aire
+elevados y equipar los sonómetros de mano con una pantalla antiviento de al
+menos 60 mm de diámetro (apartado 13.3; una pantalla de 60 mm evita que un flujo
+de hasta unos 10 m/s afecte de forma significativa a un nivel de 80 dB). Hay que
+observar al trabajador, o reconstruir las actividades a partir de entrevistas y
+registros de trabajo y declarar que se hizo así (apartado 9.3). El ruido de
+radio, voz y alarmas cuenta como relevante si el análisis del trabajo dice que
+forma parte de las condiciones normales de trabajo; excluirlo está permitido,
+pero es una *decisión declarable*, no una edición silenciosa, y el
+comportamiento no típico durante la medición hay que evaluarlo y, si importa,
+volver a medir (apartado 13.4).
+
 ```python
 from phonometry import hearing
 
@@ -130,7 +211,7 @@ for t in res.tasks:
 #   cutting/grinding Lp,A,eqT =  90.1   aporta  82.8 dB
 
 # La misma jornada medida basada en la función (anexo E) y de jornada completa
-# (anexo F): ambas usan el presupuesto de muestreo Ec C.9 / Tabla C.4 con
+# (anexo F): ambas usan el balance de muestreo Ec C.9 / Tabla C.4 con
 # k = 1.65 (unilateral 95 %).
 job = hearing.job_based_exposure([88.1, 86.1, 89.7, 86.5, 91.1, 86.7], effective_duration_hours=7.5)
 full = hearing.full_day_exposure([88.0, 91.9, 87.6, 90.4, 89.0, 88.4], effective_duration_hours=9.25)
@@ -141,6 +222,23 @@ print(f"jornada completa LEX,8h = {full.lex_8h:.1f} dB   U = {full.expanded_unce
 
 res.plot()   # la figura de abajo: contribuciones por tarea con LEX,8h y LEX,8h + U
 ```
+
+**Cómo leer los números por función y de jornada completa.** El caso por tareas
+tiene su desglose por tarea; los otros dos merecen el mismo repaso, porque en
+ambos la respuesta la mueve un término que no es un nivel medido. $T_e$ es la
+**duración efectiva de la jornada laboral** que establece el análisis del
+trabajo: el tiempo que el trabajador está realmente expuesto, con las pausas
+fuera del ruido excluidas y las que transcurren dentro de él incluidas. Las seis
+muestras por función promedian en energía 88,4 dB, y con $T_e = 7{,}5$ h la
+normalización $10\log_{10}(7{,}5/8)$ resta 0,3 dB, así que $L_{EX,8h}$ = 88,2 dB,
+*por debajo* del promedio muestreado. Las seis muestras de jornada completa
+promedian en energía 89,5 dB, pero ese turno dura 9,25 h, así que el mismo
+término suma $10\log_{10}(9{,}25/8)$ = 0,6 dB y $L_{EX,8h}$ = 90,1 dB, que es más
+alto que cuatro de las seis muestras individuales. Eso no es un error:
+normalizar un turno largo a una jornada nominal de ocho horas *debe*
+penalizarlo. Equivócate en $T_e$ por un factor y todo el resultado se mueve en
+su $10\log_{10}$, y por eso la estrategia por tareas lleva un término aparte de
+incertidumbre de duración $u_{1b}$ para exactamente esa magnitud.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_es.svg"
@@ -173,6 +271,50 @@ plt.show()
 
 </details>
 
+### 1.2 Planificar la campaña
+
+La ISO 9612 es tanto una norma de planificación como de cálculo, y las dos
+preguntas que se hace un higienista *antes* de ir a la instalación están a una
+llamada de distancia. ¿Cuántas horas tiene que cubrir la campaña para un grupo
+de este tamaño? La Tabla 1 fija la duración acumulada mínima de medición para un
+grupo de exposición homogéneo en función de su tamaño, y
+`minimum_cumulative_duration_hours` la lee:
+
+```python
+for n in (4, 10, 25, 50):
+    print(n, hearing.minimum_cumulative_duration_hours(n))
+# 4 5.0
+# 10 7.5
+# 25 12.5
+# 50 17.0
+```
+
+Tres regímenes y un techo: 5 h hasta cinco trabajadores, después media hora por
+trabajador adicional hasta quince, después un cuarto de hora por trabajador
+hasta cuarenta, y después 17 h fijas; más allá de cuarenta el consejo de la
+norma es dividir el grupo en lugar de medir más tiempo. Pasa las cifras
+previstas como `n_workers=` y `sample_duration_hours=` a `job_based_exposure` y
+el resultado lanza el aviso cuando la cobertura se queda corta.
+
+La segunda pregunta es cuántas muestras necesita el término de muestreo.
+`table_c4_contribution(n_samples, u1)` interpola la Tabla C.4, así que la
+respuesta puede elegirse contra un objetivo en lugar de descubrirse después:
+
+```python
+print([round(hearing.table_c4_contribution(n, 3.0), 1) for n in (3, 5, 10, 20, 30)])
+# [11.5, 3.3, 1.5, 0.9, 0.7]
+```
+
+Para una dispersión de muestras de 3 dB, la contribución $c_1 u_1$ se desploma
+de 11,5 dB con tres muestras a 3,3 dB con cinco y 1,5 dB con diez, y luego se
+aplana: pasar de cinco a diez muestras compra 1,8 dB, y pasar de veinte a
+treinta compra 0,2 dB. Ahí está el umbral de aviso de 3,5 dB del apartado 10.4
+(una campaña por función sobre un grupo con 3 dB de dispersión lo cruza por
+debajo de las cinco muestras), y es la forma cuantitativa de la regla «más
+muestras, no mejor instrumento» del apartado 2. Ojo a que las filas $N = 3$ y
+$N = 4$ de la Tabla C.4 se aplican solo a mediciones de jornada completa
+(Tabla C.4, NOTA 1).
+
 ## 2. El balance de incertidumbre del anexo C
 
 Conviene detallar dos sutilezas. Primero, el factor de cobertura es $k = 1{,}65$
@@ -192,32 +334,93 @@ muestras. (El $L_{EX,8h}$ por función impreso es $88{,}2$ dB donde el anexo E
 declara $88{,}1$: la norma redondea el nivel de jornada efectiva a $88{,}4$ antes
 de la normalización de la duración; la biblioteca lo mantiene sin redondear.)
 
-**Qué domina el presupuesto.** El anexo C combina cuatro fuentes en cuadratura
+**Qué domina el balance.** El anexo C combina cuatro fuentes en cuadratura
 (Tabla C.1): la incertidumbre de **muestreo** ($u_{1a}$/$u_1$), la de
 **duración** ($u_{1b}$, solo por tareas), la del **instrumento** ($u_2$,
 Tabla C.5) y la de la **posición del micrófono** ($u_3$, apartado C.6). Las dos
 últimas son pequeñas y aproximadamente fijas ($u_2 = 0{,}7$ dB para un
 sonómetro de clase 1, 1,5 dB para uno de clase 2 o un exposímetro personal, y
-$u_3 = 1{,}0$ dB por defecto), así que en la práctica **casi siempre domina el
-término de muestreo**: escala con la dispersión de los niveles medidos, que en
-un puesto real alcanza con facilidad varios decibelios y, entrando en
-cuadratura, arrasa con los términos subdecibélicos de instrumento y posición.
-La consecuencia práctica: un presupuesto en cuadratura
-lo fija su término mayor, así que subir de clase de instrumento
-aporta poco una vez que la dispersión de muestreo es grande; la jugada
-productiva son *más muestras* (el error típico cae como $1/\sqrt{I}$ o
-$1/\sqrt{N}$), que es exactamente hacia donde empujan los avisos de los
-apartados 9.3 / 10.4. Como el pico $L_{p,Cpeak}$ no tiene modelo de muestreo en
-el anexo C (Tabla C.5, Nota 1), se declara sin incertidumbre, no con una
-incertidumbre nula.
+$u_3 = 1{,}0$ dB por defecto), lo que las convierte en un **suelo** por debajo
+del cual no baja ningún diseño de campaña: con un exposímetro personal,
+$U = 1{,}65\sqrt{1{,}5^2 + 1{,}0^2} = 3{,}0$ dB aunque todas las muestras
+hubieran salido idénticas. Todo lo que hay por encima de ese suelo son los
+términos de muestreo y de duración, que son además los dos únicos que controla
+quien mide.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_budget_es.svg"
+  alt="Dos paneles. Izquierda: la jornada del anexo D de la ISO 9612 como barras apiladas de varianza, una por tarea más una de la jornada entera, repartidas entre los términos de muestreo, duración, instrumento y posición; la tarea de planificación no aporta nada visible, la soldadura una pila pequeña y el corte/amolado 3,5 del total de 3,85 dB al cuadrado, anotado como 1,5 horas de la jornada y el 91 por ciento de la varianza, con la barra de la jornada entera etiquetada u = 1,96 dB que da U = 3,2 dB. Derecha: la incertidumbre expandida frente al número de muestras para una dispersión de muestras fija de 3 dB, con la curva por tareas cayendo desde 4,1 dB con tres muestras hacia el suelo y la curva por función de la Tabla C.4 arrancando mucho más arriba, en 19 dB, y convergiendo hacia las veinte muestras, con suelos horizontales punteados en 3,0 dB para un exposímetro personal o un sonómetro de clase 2 y en 2,0 dB para uno de clase 1"
+  width="96%"
+/>
+
+*Dos cosas que dice la figura y que no dicen las fórmulas.* Primera: cada
+término va ponderado por $c_{1a}$, la parte de la energía diaria que le
+corresponde a la tarea, así que el balance sigue la dosis y no el reloj: el
+corte y amolado son 1,5 h de las ocho y se lleva el **91 %** de la varianza, las
+cinco horas de soldadura se llevan el 9 % y la tarea tranquila de planificación
+no se lleva nada medible. Segunda: «domina el término de muestreo» es una regla
+aproximada, no una identidad. Con el exposímetro personal por defecto, el
+término de muestreo de la tarea solo adelanta al del instrumento cuando la
+desviación típica muestral supera $1{,}5\sqrt{I}$, unos 3,7 dB con seis
+muestras, y en esta jornada del anexo D no lo hace: el corte y amolado dispersa
+3,0 dB sobre seis muestras, así que $u_{1a} = 1{,}2$ dB frente a
+$u_2 = 1{,}5$ dB. El mayor segmento suelto de aquí es en realidad la
+**duración** de esa tarea corta y ruidosa, porque
+$c_{1b} = 4{,}34\,c_{1a}/\bar{T}_m$ crece a medida que la tarea se acorta, así
+que una incertidumbre de $\pm 0{,}5$ h sobre una tarea de 1,5 h cuesta más que
+el término de muestreo o el del instrumento.
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `hearing` y `res` (la jornada del anexo D, con incertidumbre de duración)
+# vienen de los fragmentos de arriba; aquí se reconstruye con el término de
+# duración incluido.
+res_d = hearing.task_based_exposure(tasks, warn=False)
+for t in res_d.tasks:
+    print(f"{t.label:<16} muestreo {(t.c1a * t.u1a) ** 2:5.3f}  "
+          f"duración {(t.c1b * t.u1b) ** 2:5.3f}  "
+          f"instrumento {(t.c1a * t.u2) ** 2:5.3f}  "
+          f"posición {(t.c1a * t.u3) ** 2:5.3f}")
+
+counts = np.arange(3, 31)
+u2, u3, scatter = 1.5, 1.0, 3.0
+expanded = lambda term: 1.65 * np.sqrt(np.asarray(term) ** 2 + u2**2 + u3**2)
+fig, ax = plt.subplots()
+ax.plot(counts, expanded(scatter / np.sqrt(counts)), label="por tareas")
+ax.plot(counts, expanded([hearing.table_c4_contribution(int(n), scatter)
+                          for n in counts]), "--", label="por función")
+ax.axhline(expanded(0.0))            # el suelo de instrumento + posición
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La consecuencia práctica sigue en pie, y el panel derecho le da forma: un
+balance en cuadratura lo fija su término mayor, así que subir de clase de
+instrumento no aporta nada mientras el término de muestreo esté por encima del
+suelo, y la jugada productiva son más muestras, con un rendimiento que decae
+deprisa. Con una dispersión de 3 dB, la $U$ por tareas pasa por 4,1 dB con tres
+muestras, 3,4 dB con diez y 3,1 dB con treinta, mientras que la estrategia por
+función paga una penalización mucho más dura por una $N$ pequeña (19,2 dB con
+tres, 6,2 dB con cinco, 3,9 dB con diez), porque la Tabla C.4 no divide sin más
+entre $\sqrt{N}$. Esa diferencia es la penalización que la norma lleva
+incorporada para un muestreo más grueso y con menos muestras, y es contra lo que
+empujan los avisos de los apartados 9.3 / 10.4. Como el pico $L_{p,Cpeak}$ no
+tiene modelo de muestreo en el anexo C (Tabla C.5, Nota 1), se declara sin
+incertidumbre, no con una incertidumbre nula.
 
 Cuando las muestras de una tarea abarcan **3 dB o más** (apartado 9.3), o la
 contribución por función $c_1 u_1$ supera 3,5 dB (apartado 10.4), o se cubren
 demasiado pocos trabajadores (duración acumulada de la Tabla 1), el resultado fija
-`sampling_advisory=True` y, con `warn=True`, emite una `OccupationalExposureWarning` que
-recomienda más mediciones. Los niveles de pico $L_{p,Cpeak}$ se declaran **sin**
-incertidumbre (el anexo C no da método para ellos, Tabla C.5, Nota 1), así que
-la incertidumbre de pico queda fuera del alcance. Los tres ejemplos resueltos de
+`sampling_advisory=True` y, con `warn=True`, emite una
+`OccupationalExposureWarning` que recomienda más mediciones. Los tres ejemplos
+resueltos de
 los anexos D/E/F anteriores se reproducen con la precisión impresa de la norma
 (el redondeo final del anexo E se explica más arriba), y la teoría se deriva
 en la página de [Teoría](/phonometry/es/reference/theory/environment-transport/).
@@ -256,7 +459,7 @@ trabajo, y la instrumentación y la trazabilidad de calibración del
 apartado 15 c), el análisis del trabajo (la tabla por tareas con duraciones,
 niveles $L_{p,A,eqT,m}$ y contribuciones $L_{EX,8h,m}$ para un resultado por
 tareas (con su gráfica de contribuciones), o el resumen del muestreo con el
-presupuesto de la fórmula C.9 para los resultados por función o de jornada
+balance de la fórmula C.9 para los resultados por función o de jornada
 completa) y el $L_{EX,8h}$ en caja con $U$, $k$ y el límite superior
 unilateral al 95 %.
 
@@ -306,13 +509,40 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de exposición al ruido en el trabajo (ExposureResult.report), la jornada por tareas del anexo D de ISO 9612 con el análisis del trabajo del apartado 15 y la evaluación de la Directiva 2003/10/CE."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** Las tres estrategias de medición de los apartados 9-11 de la
+ISO 9612:2009, `task_based_exposure`, `job_based_exposure` y
+`full_day_exposure`, con las reglas de muestreo del apartado 9.3 y la geometría
+del micrófono de los apartados 12.3 / 12.4 enunciadas aquí como el procedimiento
+que produce sus entradas; el balance de incertidumbre del anexo C (Ecuaciones
+C.6, C.9 y C.12 con las Tablas C.4 y C.5, y $u_3$ del apartado C.6); el factor
+de cobertura unilateral $k = 1{,}65$ del apartado 14; los avisos de los
+apartados 9.3 / 10.4 y de la Tabla 1, alcanzables antes de la campaña mediante
+`minimum_cumulative_duration_hours` y `table_c4_contribution`; y el informe de
+medición del apartado 15 a través de `ExposureResult.report()`, con la
+evaluación de la Directiva 2003/10/CE encima. Se reproducen los tres ejemplos
+resueltos de los anexos D, E y F.
+
+**No cubierto.** El análisis del trabajo del apartado 7 y la colocación del
+micrófono de los apartados 12.3 / 12.4 son procedimientos, no cálculos: quedan
+en manos de quien mide, y esta guía los documenta para que los números que se le
+dan a una `Task` signifiquen algo. La Tabla B.1 se reproduce como orientación y
+es quien llama el que elige la estrategia; aquí no se aplica ninguna. La
+atenuación de los protectores auditivos (la serie ISO 4869) no se aplica, así
+que el $L_{EX,8h}$ que se calcula aquí, y la comparación con el valor límite que
+la ficha imprime sobre él, son la exposición **sin protección**, que es además
+la que quiere el modelo de pérdida auditiva de la ISO 1999. Y el anexo C no
+ofrece modelo de incertidumbre para $L_{p,Cpeak}$ (Tabla C.5, Nota 1), y por eso
+el pico se declara sin ella en lugar de con una incertidumbre nula.
+
 ## Véase también
 
 - [Niveles](/phonometry/es/signals/levels/levels/): las primitivas de dosis `lex_8h` /
-  `sound_exposure` (IEC 61252) y el $L_{Cpeak}$ que estas estrategias declaran al
+  `sound_exposure` (IEC 61252) y el $L_{p,Cpeak}$ que estas estrategias declaran al
   lado.
 - [Incertidumbre de medición](/phonometry/es/signals/metrology/gum-uncertainty/): la
   maquinaria GUM que sustenta las incertidumbres combinadas y expandidas.
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): la derivación de las fórmulas de
-  las estrategias y del presupuesto del anexo C.
+  las estrategias y del balance del anexo C.
 - Referencia de la API: [`hearing.occupational_exposure`](/phonometry/es/reference/api/hearing/occupational-exposure/).

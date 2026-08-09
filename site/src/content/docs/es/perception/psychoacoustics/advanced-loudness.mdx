@@ -67,7 +67,7 @@ modelos difieren en sus filtros auditivos y en su suma de sonoridad.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, todos pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
 
 *Los tres modelos pasan por aproximadamente 1 sonio en el ancla de 40 dB (el
-front-end de Sottek documenta 0,984 sone_HMS ahí) y divergen con el nivel:
+front-end de Sottek devuelve ahí 0,9845 sone_HMS) y divergen con el nivel:
 Zwicker duplica el valor en sonios cada +10 fonios, mientras que el modelo
 de Sottek crece más lentamente (alrededor de 1,65× por cada 10 dB), una
 diferencia intrínseca entre las sumas auditivas, no un error de calibración.*
@@ -121,9 +121,9 @@ $$
 \mathrm{ERB}_N = 24{,}7\,(4{,}37\,F + 1)\ \text{Hz},\qquad F \text{ en kHz}.
 $$
 
-Integrar $df/\mathrm{ERB}_N(f)$ convierte eso en una escala de frecuencia cuya
-unidad es una anchura de filtro auditivo, el **número ERB<sub>N</sub>**, cuya
-unidad se llama **Cam** (por Cambridge):
+Integrar $df/\mathrm{ERB}_N(f)$ convierte eso en una escala de frecuencia en la
+que un paso es una anchura de filtro auditivo. La escala es el **número
+ERB<sub>N</sub>** y su unidad es el **Cam**, por Cambridge:
 
 $$
 \mathrm{ERB}_N\ \text{número} = 21{,}4 \log_{10}(4{,}37\,F + 1)\ \text{Cam}.
@@ -141,12 +141,12 @@ print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000.0 Hz
 La biblioteca expresa el mismo ajuste con una cifra significativa más,
 $\mathrm{ERB}_N = 24{,}673\,(0{,}004368 f + 1)$ y
 $21{,}366 \log_{10}(0{,}004368 f + 1)$, la precisión que emplea la implementación
-de ISO 532-2; ambas formas concuerdan mejor del 0,2 % en todo el margen
+de ISO 532-2; ambas formas concuerdan dentro del 0,2 % en todo el margen
 audible, y esas cifras de más son las que hacen de `frequency_from_cam` una
-inversa exacta. Las funciones no son un auxiliar privado del modelo de
-sonoridad: `loudness_moore_glasberg` importa exactamente estas funciones, de
-modo que la rejilla Cam de un `MooreGlasbergLoudness.erb_number` y un eje Cam
-construido a mano no pueden separarse.
+inversa exacta. No son auxiliares privados del modelo de sonoridad:
+`loudness_moore_glasberg` llama a esas mismas tres funciones, de modo que una
+rejilla `MooreGlasbergLoudness.erb_number` y un eje Cam construido por ti no
+pueden separarse.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth_es.svg" alt="Ancho de banda del filtro auditivo frente a la frecuencia central en ejes log-log: la recta ERB_N de Glasberg y Moore desde unos 30 Hz a 50 Hz hasta más de 1 kHz a 16 kHz, el ancho de banda de tercio de octava a porcentaje constante cruzándola cerca de 500 Hz, el punto de 1 kHz anotado en 15,59 Cam y un segundo eje superior con la escala Cam" width="85%" />
 
@@ -201,6 +201,50 @@ Las tres constantes se exportan como `ERB_C1`, `ERB_C2` y `CAM_C`.
 
 ## Sonoridad de Moore-Glasberg (ISO 532-2)
 
+### Qué grabación corresponde a qué argumentos
+
+`field` y `presentation` no son preferencias: son descripciones de cómo llegó
+el sonido a quien escucha, y equivocarlos cuesta más que cualquier diferencia
+entre los modelos de esta página. El apartado 7.2 de ISO 532-2 lista las
+situaciones de escucha y la función de transferencia que necesita cada una, y
+el apartado 8.1 fija qué hacen con el resultado los dos oídos.
+
+| Cómo se captó el sonido | `field=` | Por qué |
+| :--- | :--- | :--- |
+| Un micrófono en el centro de la posición que ocuparía la cabeza de quien escucha, ausente, con una única fuente frontal | `'free'` | Columna 2 de la Tabla 1, la transferencia de campo libre hasta la membrana timpánica |
+| El mismo micrófono en una sala reverberante o in situ | `'diffuse'` | Columna 3 de la Tabla 1, la transferencia de campo difuso; también es la opción correcta para auriculares de campo difuso |
+| Un micrófono de sonda a menos de 10 mm del tímpano (5 mm cuando hay componentes fuertes por encima de 3 kHz) | `'eardrum'` | Apartado 7.2.4: el espectro ya está en la membrana, así que no se aplica ninguna función de transferencia |
+| Un simulador de cabeza y torso | `'eardrum'`, pero solo si el simulador es un modelo acústico fiel de un adulto medio | Apartado 7.2.5; si no, necesita su propio fichero de corrección, que esta API no sabe expresar — ecualiza antes la grabación a campo libre o a campo difuso y usa la opción que corresponda |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mg_capture_routes_es.svg" alt="Cuatro vías de captación y los argumentos que implica cada una: un único micrófono donde estaría la cabeza de quien escucha con una sola fuente frontal, que da field free; el mismo micrófono en un campo reverberante, que da field diffuse; un micrófono de sonda a menos de 10 mm de la membrana timpánica, que da field eardrum sin ninguna función de transferencia; y un simulador de cabeza y torso, que da field eardrum solo si es un modelo fiel de un adulto medio; un pie indica que un sonido diótico suena alrededor de 1,5 veces más sonoro que el mismo sonido en un solo oído" width="92%" />
+
+*Las cuatro situaciones del apartado 7.2, con la geometría que las decide. Las
+distancias de la escena 3 son las de la propia norma: 10 mm desde la membrana
+timpánica, 5 mm cuando el sonido tiene componentes fuertes por encima de
+3 kHz.*
+
+**El modo de fallo es silencioso y grande.** Aplicar una transferencia de campo
+libre a una señal que ya contiene la resonancia del canal auditivo cuenta dos
+veces una ganancia de unos 15 dB cerca de 3 kHz: un tono de 3 kHz a 70 dB da
+13,8 sonios (78,0 fonios) con `field="free"` y 5,0 sonios (62,7 fonios) con
+`field="eardrum"`, y nada en el resultado dice cuál de las dos era la
+apropiada. En el otro sentido, una grabación de campo libre analizada como
+`'eardrum'` se queda corta en la misma medida.
+
+**`presentation` es el otro factor dos.** `monaural` calcula un oído con el
+otro en silencio, `diotic` presenta la señal idéntica a los dos oídos — que es
+lo que representa la grabación de un único micrófono en campo libre, ya que
+ambos oídos escuchan el mismo campo — y `binaural` combina dos señales de oído
+independientes a través de la etapa de inhibición de la norma. El tono
+definitorio de 1 kHz a 40 dB es 1,000 sonios diótico y 0,667 sonios monoaural,
+la razón 1,5 que enuncia el apartado 8.1, y la inhibición es la razón de que
+dos oídos den alrededor de vez y media lo de un solo oído en vez de exactamente
+el doble. Con una entrada de un solo espectro, `binaural` y `diotic` coinciden,
+así que la distinción solo tiene efecto con la entrada de dos canales de
+`loudness_moore_glasberg_time`. Ojo además con que `loudness_ecma()` solo
+ofrece `'free'` y `'diffuse'`, así que el material referido al tímpano hay que
+corregirlo antes de que llegue al modelo de ECMA-418-2.
+
 Donde Zwicker usa bandas críticas fijas sobre la escala Bark, Moore-Glasberg
 construye un **patrón de excitación** con filtros auditivos exponenciales
 redondeados (roex) dependientes del nivel sobre la escala del número ERB
@@ -218,7 +262,7 @@ from phonometry import psychoacoustics
 # El ancla definitoria: una componente sinusoidal de 1 kHz a 40 dB SPL,
 # campo libre, binaural -> 1 sonio / 40 fonios por construcción del sonio.
 res = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)], field="free")
-print(f"N = {res.loudness:.3f} sone  ({res.loudness_level:.1f} phon)")   # 1.000 sonio (40.0 fonios)
+print(f"N = {res.loudness:.3f} sonios  ({res.loudness_level:.1f} fonios)")   # 1.000 sonios (40.0 fonios)
 
 # Desde una grabación calibrada: se forma el espectro de líneas de banda
 # estrecha (FFT, normalización que preserva la potencia) y se alimenta al
@@ -261,22 +305,62 @@ fig, ax = plt.subplots()
 ax.fill_between(res.erb_number, res.specific, alpha=0.3)
 ax.plot(res.erb_number, res.specific)
 ax.set_xlabel("Número ERB [Cam]")
-ax.set_ylabel("Sonoridad específica N' [sone/Cam]")
+ax.set_ylabel("Sonoridad específica N' [sonios/Cam]")
 plt.show()
 ```
 
 </details>
 
-### Parámetros de `loudness_moore_glasberg()`
+### Desde un espectro de tercio de octava (apartado 5.5)
 
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `x` | array 1D | Pa | no vacío | Señal de presión calibrada (envoltorio de señal) |
-| `components` | lista de `(f, L)` | Hz, dB SPL | — | `_from_spectrum`: componentes sinusoidales discretas |
-| `band_levels` | vector de 29 | dB SPL | 25 Hz .. 16 kHz | Entrada de `_from_third_octave` (bandas IEC 61260-1) |
-| `fs` | int | Hz | > 0 | Solo en el envoltorio de señal |
-| `field` | str | — | `'free'` (por defecto) / `'diffuse'` / `'eardrum'` | Transferencia del oído externo |
-| `presentation` | str | — | `'binaural'` (por defecto) / `'diotic'` / `'monaural'` | Suma binaural |
+El método exacto quiere componentes sinusoidales, pero el apartado 5.5 define
+la entrada que un sonómetro entrega de verdad: los niveles de las 29 bandas de
+tercio de octava contiguas de 25 Hz a 16 kHz sobre los centros nominales de
+IEC 61260-1:2014. Cada banda se supone plana y se expande internamente en un
+conjunto equivalente de componentes antes de que corra el método exacto. Hay
+dos restricciones que conviene decir sin rodeos: exactamente 29 valores y una
+rejilla fija — un sonómetro que registre de 20 Hz a 20 kHz hay que recortarlo a
+ella, y uno que se detenga en 8 kHz no sirve en absoluto.
+
+```python
+# `psychoacoustics` lo importan los fragmentos de arriba.
+# Un espectro de ventilación tal como lo registra un sonómetro: 29 bandas de
+# tercio de octava, de 25 Hz a 16 kHz, en dB SPL.
+band_levels = [42.0, 45.0, 48.0, 51.0, 54.0, 56.0, 57.0, 57.0, 56.0, 55.0,
+               54.0, 53.0, 52.0, 51.0, 50.0, 49.0, 48.0, 47.0, 46.0, 45.0,
+               43.0, 41.0, 39.0, 37.0, 34.0, 31.0, 28.0, 25.0, 22.0]
+
+n_mg = psychoacoustics.loudness_moore_glasberg_from_third_octave(
+    band_levels, field="diffuse")
+print(f"{n_mg.loudness:.1f} sonios  ({n_mg.loudness_level:.1f} fonios)")  # 17.4 sonios (81.3 fonios)
+
+# La misma medición pasada por ISO 532-1, que se detiene una banda antes:
+n_zw = psychoacoustics.loudness_zwicker_from_spectrum(
+    band_levels[:28], field="diffuse")
+print(f"{n_zw.loudness:.1f} sonios  ({n_zw.loudness_level:.1f} fonios)")  # 13.8 sonios (77.9 fonios)
+```
+
+Las dos normas ni siquiera coinciden en dónde termina el espectro: ISO 532-2
+toma 29 bandas hasta 16 kHz e ISO 532-1 toma 28 hasta 12,5 kHz, que es la razón
+del recorte. El resto de la diferencia son los modelos: excitación roex y suma
+binaural explícita frente a la sonoridad de núcleo de ISO 532-1. Usa
+`field="diffuse"` para una medición en sala hecha con un sonómetro corregido a
+campo libre — el argumento de campo es donde más se equivoca quien entra por
+niveles de banda.
+
+### `loudness_moore_glasberg()` y sus variantes `_from_spectrum` / `_from_third_octave`
+
+Los tres puntos de entrada solo se diferencian en cómo se aporta el espectro, y
+comparten `field` y `presentation`.
+
+| Parámetro | Se aplica a | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `x` | `loudness_moore_glasberg` | array 1D | Pa | no vacío | Señal de presión calibrada |
+| `fs` | `loudness_moore_glasberg` | int | Hz | > 0 | |
+| `components` | `_from_spectrum` | lista de `(f, L)` | Hz, dB SPL | — | Componentes sinusoidales discretas |
+| `band_levels` | `_from_third_octave` | vector de 29 | dB SPL | 25 Hz .. 16 kHz | Centros nominales de IEC 61260-1; exactamente 29 |
+| `field` | las tres | str | — | `'free'` (por defecto) / `'diffuse'` / `'eardrum'` | Transferencia del oído externo (apartado 7.2) |
+| `presentation` | las tres | str | — | `'binaural'` (por defecto) / `'diotic'` / `'monaural'` | Suma binaural (apartado 8.1) |
 
 Devuelve un `MooreGlasbergLoudness`: `loudness` ($N$, sonios), `loudness_level`
 (fonios), `specific` ($N'(i)$, 372 bins de 0,1 Cam), `erb_number`,
@@ -300,8 +384,8 @@ t = np.arange(int(1.3 * fs)) / fs
 x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 
 res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
-print(f"N_max = {res.n_max:.3f} sone  ({res.loudness_level_max:.0f} phon)")   # 1.000 sonio (40 fonios)
-print(f"sonoridad de largo plazo superada el 5% del tiempo: {res.percentiles[5.0]:.3f} sone")   # 0.999 sone
+print(f"N_max = {res.n_max:.3f} sonios  ({res.loudness_level_max:.0f} fonios)")   # 1.000 sonios (40 fonios)
+print(f"sonoridad de largo plazo superada el 5% del tiempo: {res.percentiles[5.0]:.3f} sonios")   # 0.999 sonios
 
 res.plot()   # sonoridad de corto plazo S'(t) y de largo plazo S''(t) frente al tiempo
 ```
@@ -319,11 +403,11 @@ un percentil de la sonoridad de largo plazo (típicamente el valor al 5 %) es el
 estadístico estable, mientras que $N_\text{max}$ lo fijaría el único peor
 instante.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_es.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de 200 ms a 1 kHz y 60 dB SPL dentro de un registro de 0,8 s: la traza de corto plazo sube hasta un máximo de 4,8 sone dentro de la ventana sombreada del pulso y se relaja deprisa, mientras la de largo plazo integra hasta 3,6 sone y decae lentamente tras el final del pulso" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_es.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de 200 ms a 1 kHz y 60 dB SPL dentro de un registro de 0,8 s: la traza de corto plazo sube hasta un máximo de 4,8 sonios dentro de la ventana sombreada del pulso y se relaja deprisa, mientras la de largo plazo integra hasta 3,6 sonios y decae lentamente tras el final del pulso" width="80%" />
 
 *Un pulso de 200 ms a 1 kHz y 60 dB SPL: la sonoridad de corto plazo alcanza
-4,8 sone en unas pocas decenas de milisegundos y se relaja deprisa, mientras la
-de largo plazo integra hasta 3,6 sone y decae lentamente tras el final del
+4,8 sonios en unas pocas decenas de milisegundos y se relaja deprisa, mientras
+la de largo plazo integra hasta 3,6 sonios y decae lentamente tras el final del
 pulso; el par de constantes de tiempo que definen los apartados 7.8/7.9 de
 ISO 532-3.*
 
@@ -373,10 +457,19 @@ ECMA-418-2:2025 especifica un único front-end auditivo (filtrado del oído
 externo/medio, un banco de 53 filtros de tipo gammatone sobre la escala Bark_HMS
 con $z = 0{,}5\ ..\ 26{,}5$, rectificación de media onda, RMS de bloque y una no
 linealidad compresiva, Fórmula 23) que **comparten** sus métricas de
-sonoridad, tonalidad y aspereza. La sonoridad $N$ se expresa en **sone_HMS**, y el
-misma ancla de 1 kHz/40 dB calibra el front-end (nuestro valor de sala limpia
-0,984, con el promediado completo de bandas del apartado 6.2.3; el origen
-del residuo está documentado en el docstring del módulo).
+sonoridad, tonalidad y aspereza. La sonoridad $N$ se expresa en **sone_HMS**, y
+la misma ancla de 1 kHz/40 dB calibra el front-end. La implementación de sala
+limpia devuelve 0,9845 sone_HMS para esa ancla en lugar de exactamente 1: el
+residuo del 1,55 % viene del promediado de bandas que impone el apartado 6.2.3
+sobre las bandas que caen en la frontera entre tamaños de bloque y que excita
+el flanco inferior del tono, cerca de 800 a 900 Hz — sin ningún promediado de
+bandas la cadena da 0,955; con el promediado restringido a las vecinas del
+mismo tamaño de bloque, 0,996; y con el recálculo completo entre grupos que
+exige la norma, 0,9845. La constante de calibración $c_N$ se conserva en su
+valor tabulado literal en vez de reajustarse, que es la razón de que la
+desviación se vea siquiera; la
+[referencia de la API de `psychoacoustics.loudness.ecma`](/phonometry/es/reference/api/psychoacoustics/ecma/)
+lleva la explicación completa.
 
 ```python
 import numpy as np
@@ -387,7 +480,7 @@ t = np.arange(int(1.2 * fs)) / fs
 x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
-print(f"N = {res.loudness:.3f} sone_HMS")   # 0.984 sone_HMS
+print(f"N = {res.loudness:.4f} sone_HMS")   # 0.9845 sone_HMS
 print(res.specific_loudness.shape)          # (53,) sonoridad específica media N'(z)
 
 res.plot()   # sonoridad específica media N'(z) + N(l) dependiente del tiempo a 187.5 Hz
@@ -419,11 +512,11 @@ print(f"N = {res.loudness:.1f} sone_HMS")   # 2.8 sone_HMS
 res.plot(language="es")
 plt.show()
 
-# O dibuja N'(z) a mano frente a la escala de tasa de banda crítica:
+# O dibuja N'(z) a mano frente a la escala de razón de banda crítica:
 fig, ax = plt.subplots()
 ax.fill_between(res.bark, res.specific_loudness, alpha=0.3)
 ax.plot(res.bark, res.specific_loudness)
-ax.set_xlabel("Tasa de banda crítica z [Bark_HMS]")
+ax.set_xlabel("Razón de banda crítica z [Bark_HMS]")
 ax.set_ylabel("Sonoridad específica N' [sone_HMS/Bark_HMS]")
 plt.show()
 ```

@@ -81,46 +81,175 @@ convierte cada $m$ en una relación señal-ruido efectiva acotada a ±15 dB y
 combina los resultados, ponderados por banda, en el índice: el STI es una SNR
 efectiva de la *envolvente*, llevada a $[0, 1]$.
 
+Las dos degradaciones no se parecen en nada sobre esa curva, y por eso el índice
+necesita la $m(F)$ entera y no un solo número:
+
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg"
-  alt="STI frente al tiempo de reverberación con las bandas de valoración del Anexo F de IEC 60268-16 sombreadas"
-  width="80%"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_mtf_curves_es.svg"
+  alt="Dos paneles de la función de transferencia de modulación en la banda de octava de 1 kHz, m frente a las catorce frecuencias de modulación de 0,63 a 12,5 Hz sobre un eje logarítmico. Izquierda: tiempos de reverberación de 0,3, 0,9 y 2,5 segundos dan tres curvas paso bajo cuyo codo baja en frecuencia a medida que se alarga el decaimiento, cada una acompañada de la predicción de Schroeder en forma cerrada a trazos, con las dos frecuencias de modulación STIPA de esta banda marcadas en 2 y 10 Hz. Derecha: con un tiempo de reverberación fijo de 0,9 segundos, relaciones señal-ruido de habla de 20, 10 y 0 dB escalan la misma curva sin ruido por un factor que no depende de la frecuencia de modulación, con la curva de 0 dB situada en torno a la mitad de la curva sin ruido"
+  width="96%"
   loading="eager"
 />
+
+*La reverberación y el ruido degradan la misma magnitud de dos maneras
+distinguibles. Un decaimiento es un filtro paso bajo sobre la envolvente, y
+alargarlo baja el codo (las líneas a trazos son la forma cerrada de arriba, que
+los puntos medidos siguen de cerca). El ruido estacionario, en cambio,
+multiplica toda la curva por $1/(1 + 10^{-\mathrm{SNR}/10})$, que es plano en
+$F$: a 0 dB ese factor vale exactamente un medio. Una sola frecuencia de
+modulación no puede distinguir una cosa de la otra, y por eso el método completo
+sondea catorce y el STIPA sigue sondeando dos por banda (marcadas en el panel
+izquierdo para esta banda).*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from phonometry import speech
 
 fs = 48000
-
-# STI frente al tiempo de reverberación: barre speech.sti_from_impulse_response sobre
-# decaimientos exponenciales sintéticos (ruido blanco x exp(-6.9077 t / T60))
-# en una rejilla de T60, exactamente la física de la curva de arriba:
 rng = np.random.default_rng(0)
-t60_grid = np.array([0.3, 0.5, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0, 4.0, 5.0])
-sti_values = []
-for t60 in t60_grid:
-    t = np.arange(int(2 * t60 * fs)) / fs
-    ir = rng.standard_normal(t.size) * np.exp(-6.9077 * t / t60)
-    sti_values.append(speech.sti_from_impulse_response(ir, fs).sti)
 
-fig, ax = plt.subplots()
-ax.semilogx(t60_grid, sti_values, "o-")
+# Las 14 frecuencias de modulación del STI completo (0,63 Hz a 12,5 Hz, tercio de octava).
+MOD_FREQS = np.array([0.63, 0.80, 1.00, 1.25, 1.60, 2.00, 2.50,
+                      3.15, 4.00, 5.00, 6.30, 8.00, 10.0, 12.5])
+
+
+def decay(t60):
+    n = np.arange(int(2.5 * t60 * fs))
+    return rng.standard_normal(n.size) * np.exp(-6.9078 * n / fs / t60)
+
+
+fig, (ax_t, ax_n) = plt.subplots(1, 2, figsize=(12.6, 5.2))
+for t60 in (0.3, 0.9, 2.5):
+    mtf = speech.sti_from_impulse_response(decay(t60), fs).mtf[3]   # 1 kHz
+    ax_t.semilogx(MOD_FREQS, mtf, "o-", label=f"T60 = {t60} s")
+    closed = 1 / np.sqrt(1 + (2 * np.pi * MOD_FREQS * t60 / 13.8) ** 2)
+    ax_t.semilogx(MOD_FREQS, closed, "--")
+
+ir = decay(0.9)
+for snr in (20.0, 10.0, 0.0):
+    mtf = speech.sti_from_impulse_response(ir, fs, snr=snr).mtf[3]
+    ax_n.semilogx(MOD_FREQS, mtf, "o-", label=f"SNR = {snr:g} dB")
+ax_t.legend(); ax_n.legend()
+plt.show()
+```
+
+</details>
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg"
+  alt="STI frente al tiempo de reverberación con las bandas de valoración del Anexo F de IEC 60268-16 sombreadas"
+  width="80%"
+/>
+
+*Los marcadores son ejecuciones completas de `sti_from_impulse_response` sobre
+decaimientos sintetizados; la línea a trazos es la predicción analítica de
+Schroeder, así que su acuerdo es la comprobación de coherencia del propio método
+indirecto. La escalera sombreada del margen derecho es la escala de valoración
+del Anexo F, de U a A+, la letra de `rating` que devuelve el resultado, de modo
+que la curva se lee directamente como la clase que puede alcanzar una sala con
+ese tiempo de reverberación.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# Las dos cosas que muestra la figura: los puntos medidos frente a la forma
+# cerrada, y la escalera del Anexo F contra la que se leen.
+t60_points = [0.3, 0.5, 0.8, 1.2, 2.0, 3.0, 5.0]
+alpha = np.array([0.085, 0.127, 0.230, 0.233, 0.309, 0.224, 0.173])  # Ed.5 masculina
+beta = np.array([0.085, 0.078, 0.065, 0.011, 0.047, 0.095])
+
+
+def analytic_sti(t60):
+    m = 1 / np.sqrt(1 + (2 * np.pi * MOD_FREQS * t60 / 13.8) ** 2)
+    snr_eff = np.clip(10 * np.log10(m / (1 - m)), -15.0, 15.0)  # el recorte a ±15 dB
+    mti = np.full(7, ((snr_eff + 15.0) / 30.0).mean())
+    return float(alpha @ mti - beta @ np.sqrt(mti[:-1] * mti[1:]))
+
+
+measured = [speech.sti_from_impulse_response(decay(t), fs).sti
+            for t in t60_points]
+print(np.round(measured, 3))     # [0.827 0.731 0.641 0.555 0.437 0.368 0.269]
+
+fig, ax = plt.subplots(figsize=(10, 6))
+edges = [0.36, 0.40, 0.44, 0.48, 0.52, 0.56, 0.60, 0.64, 0.68, 0.72, 0.76]
+letters = ["U", "J", "I", "H", "G", "F", "E", "D", "C", "B", "A", "A+"]
+for lo, hi, letter in zip([0.15, *edges], [*edges, 0.95], letters):
+    ax.axhspan(lo, hi, color=plt.get_cmap("RdYlGn")(letters.index(letter) / 11),
+               alpha=0.18, lw=0, zorder=0)
+    ax.text(1.005, (lo + hi) / 2, letter, transform=ax.get_yaxis_transform(),
+            va="center", fontsize=8)
+dense = np.logspace(np.log10(0.25), np.log10(6.0), 200)
+ax.semilogx(dense, [analytic_sti(t) for t in dense], "--")
+ax.semilogx(t60_points, measured, "o")
 ax.set_xlabel("Tiempo de reverberación T60 [s]")
 ax.set_ylabel("STI")
-ax.set_ylim(0.0, 1.0)
-ax.grid(True, which="both", alpha=0.3)
+ax.set_ylim(0.15, 0.95)
 plt.show()
 ```
 
 </details>
 
 ## 2. Medición indirecta y directa (STIPA)
+
+### Preparar la medición
+
+Las dos vías de abajo parten de una señal que recorrió un camino real, y el
+apartado 7 es preciso sobre lo que la produce. La página cubre dos mediciones
+físicamente distintas, un hablante sin amplificar en una sala y un sistema de
+sonido excitado eléctricamente, y el montaje se diferencia sobre todo en por
+dónde entra la señal.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sti_setup_es.svg"
+  alt="Dos paneles de la medición física del STI. Panel A, un hablante sin amplificar: una sección de la sala con una boca artificial sobre soporte a 1,5 m de altura de boca apuntando en la dirección de habla, una llamada de nivel de 60 dB(A) a 1 m por delante de la boca como recurso cuando el nivel de habla de operación no se ajusta con el método del Anexo J, un micrófono de medida a 1,2 m de altura de oído sentado con una cota de separación libre respecto a la superficie reflectante más próxima, una segunda posición de recepción en trazo tenue más atrás, y un recuadro en planta con varias posiciones de recepción repartidas por el aforo. Panel B, un sistema de sonido: la misma sala con una línea de altavoces de techo, una flecha de inyección eléctrica en la entrada del sistema etiquetada como nivel ajustado al del habla según el Anexo J, micrófonos a la altura de escucha en dos zonas de cobertura, y un micrófono de ruido ambiente con el sistema apagado. Ambos paneles etiquetan el receptor como omnidireccional, de tipo campo difuso y calibrado, y una franja al pie dice: la valoración del espacio es la media de las posiciones menos una desviación típica"
+  width="94%"
+/>
+
+**La fuente.** Para un hablante sin amplificar se usa una boca artificial o
+simulador de boca con directividad de cabeza y boca (la norma remite a la
+ITU-T P.51), porque en un espacio de escucha la inteligibilidad depende de la
+directividad de la fuente. A falta de ella puede usarse un altavoz de fuente
+única, de alta calidad y con un diámetro de cono no mayor de 100 mm, y *debe*
+describirse junto con los resultados. Hay que verificar que la respuesta en
+frecuencia de la fuente en tercios de octava queda dentro de ±1 dB en el rango
+que necesita la señal elegida, de 88 Hz a 11,3 kHz para una señal de STI
+completo o de respuesta al impulso, o banda de octava a banda de octava de
+125 Hz a 8 kHz para STIPA, medida en campo libre, y ecualizarla si no lo está.
+Después se coloca en el eje del micrófono, en la posición y a la distancia
+reales del hablante, apuntando en la dirección normal de habla (apartado 7.2 a
+a c).
+
+**El nivel.** El nivel de habla de operación se ajusta con el procedimiento del
+Anexo J. Cuando ese ajuste no está disponible, el recurso de la norma es un
+nivel equivalente de **60 dB(A) a 1 m por delante** de la boca artificial o del
+altavoz de ensayo. Esto no es un detalle que pueda adivinarse a partir de la
+sala: un micrófono de proximidad ve un nivel de habla de unos 86 dB(A) a
+94 dB(A) a entre 5 cm y 2 cm, y uno de cuello de cisne de unos 80 dB(A) a
+86 dB(A) a entre 10 cm y 5 cm (apartado 7.2 d). Para un sistema de sonido la
+señal se inyecta eléctricamente, lo más cerca posible de la entrada normal para
+que queden incluidos todos los ecualizadores, retardos y procesadores de la
+cadena, y se ajusta al nivel del habla en ese punto con el mismo método del
+Anexo J (apartado 7.4).
+
+**El receptor.** El dispositivo de medida, micrófono, oído artificial o
+simulador de cabeza, debe estar calibrado acústicamente en sensibilidad *y* en
+respuesta en frecuencia, y la medición se hace en la posición normal del oyente
+y a la altura de escucha (unos 1,2 m sentado y 1,6 m de pie). Un micrófono único
+debe ser omnidireccional y de tipo campo difuso; un micrófono direccional da
+resultados que no se correlacionan con el modelo del STI y no se recomienda
+(apartados 4.1 y 7.3). Para auriculares se usa un micrófono intraaural o un oído
+artificial. El ruido ambiente se mide en el mismo punto con la fuente apagada,
+para poder introducirlo con `ambient=` o como `snr=`.
+
+**Antes de culpar a la sala**, verifica la integridad de la señal de ensayo con
+una medida en bucle cerrado: eso caza un archivo corrupto o sobrecomprimido, y
+la norma desaconseja los formatos con compresión digital, señalando que se ha
+comprobado que funcionan los esquemas de al menos 128 kbit/s (apartado 7.2 a).
 
 ```python
 import numpy as np
@@ -132,7 +261,7 @@ ir = np.random.default_rng(0).standard_normal(fs) * np.exp(-6.9 * np.arange(fs) 
 
 # Método indirecto: desde una respuesta al impulso medida en la sala
 res = speech.sti_from_impulse_response(ir, fs, snr=25.0)
-print(f"STI = {res.sti:.2f}  ({res.rating})")   # p. ej. 0.62 (D)
+print(f"STI = {res.sti:.2f}  ({res.rating})")   # 0.73 (A)
 
 # Medición STIPA directa: reproduce speech.stipa_signal() en la sala y grábala
 test = speech.stipa_signal(fs, seconds=18.0, level_db=80.0)
@@ -140,6 +269,23 @@ recording = test                       # en la práctica, la señal del micrófo
 res = speech.stipa(recording, fs)
 res.plot()   # barras del índice de transferencia de modulación (MTI) por banda; STI y valoración en el título
 ```
+
+**De dónde sale `snr=`.** Es la segunda entrada del método indirecto y lleva
+toda la degradación por ruido, así que su procedencia importa tanto como la de
+la respuesta al impulso. Para cada banda de octava es el nivel de banda de la
+señal de habla en la posición del oyente menos el nivel de banda del ruido
+ambiente medido en esa misma posición con la fuente apagada, y por eso el
+argumento admite un vector de 7: el ruido ambiente real rara vez es plano, y un
+ruido de climatización concentrado en 125 Hz y 250 Hz cuesta a las bandas graves
+mucho más de lo que sugiere una única cifra de banda ancha. Con `snr=None` el
+cálculo supone un canal sin ruido, así que el resultado es el límite propio de la
+sala y una *cota superior* de lo que experimentará cualquier oyente; citarlo como
+un STI medido es exactamente lo que hace que una sala parezca aceptable sobre el
+papel. Mide una vez el espectro ambiente, mide o estima el espectro del habla en
+la posición y pasa la diferencia banda a banda; o, cuando importan los niveles
+absolutos porque entran en juego el enmascaramiento auditivo y el umbral de
+recepción, pasa `level=` y `ambient=` en su lugar para que se apliquen las etapas
+dependientes del nivel de la norma en vez de un cociente puro.
 
 Venga de donde venga, conviene leer el resultado banda a banda antes de citar
 el número único: el STI es una combinación ponderada de siete índices de
@@ -210,7 +356,7 @@ modulación por banda que produce el índice.
 `stipa` emite un `UserWarning` cuando la grabación es más corta que los 15 s
 recomendados (práctica STIPA de IEC 60268-16, de 15 s a 25 s): por debajo de eso
 las componentes de modulación lentas se promedian sobre muy pocos periodos y el
-STI queda sesgado a la baja (un lazo ideal da STI ≈ 0,956 a 5 s frente a
+STI queda sesgado a la baja (un bucle cerrado ideal da STI ≈ 0,956 a 5 s frente a
 ≈ 0,998 a 18 s).
 
 La implementación sigue la **Edición 5 (2020)**: el PDF normativo de la
@@ -236,6 +382,66 @@ con las funciones dependientes del nivel desactivadas, como prescribe el banco.
 Los 49 WAV certificados permanecen en local (datos de terceros, no
 versionados); CI reconstruye las mismas señales de forma sintética en la serie
 de conformidad.
+
+### Leer el resultado: las bandas del Anexo F
+
+Todos los ejemplos de esta página terminan en una letra, y la letra es la parte
+que lee el cliente. El Anexo F divide la escala en bandas con bordes en 0,36,
+0,40, 0,44… 0,76, y la Tabla G.1 del Anexo G da un ejemplo de para qué se usa
+cada banda. `STIResult.rating` devuelve la letra; el valor nominal de STI de la
+tabla de abajo es el centro de la banda:
+
+| Valoración | Rango de STI | Nominal | Uso típico (Anexo G, Tabla G.1) |
+| :--- | :--- | :--- | :--- |
+| `A+` | ≥ 0,76 | — | Estudios de grabación; excelente pero rara vez alcanzable |
+| `A` | 0,72–0,76 | 0,74 | Teatros, auditorios de palabra, parlamentos, juzgados, sistemas de ayuda a la audición |
+| `B` | 0,68–0,72 | 0,70 | Teatros, auditorios de palabra, teleconferencia |
+| `C` | 0,64–0,68 | 0,66 | Mensajes complejos con palabras desconocidas |
+| `D` | 0,60–0,64 | 0,62 | Aulas magnas, aulas, salas de conciertos |
+| `E` | 0,56–0,60 | 0,58 | Salas de conciertos, iglesias modernas; megafonía de alta calidad |
+| `F` | 0,52–0,56 | 0,54 | Megafonía en centros comerciales y edificios públicos, sistemas de alarma por voz, catedrales |
+| `G` | 0,48–0,52 | 0,50 | **Valor objetivo de los sistemas de alarma por voz** |
+| `H` | 0,44–0,48 | 0,46 | Alarma por voz y megafonía en entornos acústicos difíciles; límite inferior normal para alarma por voz |
+| `I` | 0,40–0,44 | 0,42 | Alarma por voz y megafonía en espacios muy difíciles |
+| `J` | 0,36–0,40 | 0,38 | No apto para sistemas de megafonía |
+| `U` | < 0,36 | — | No apto para sistemas de megafonía |
+
+De ahí siguen tres cosas. El conocido requisito «STI ≥ 0,5» del trabajo de
+alarma por voz es la banda **G**, cuyo comentario en la Tabla G.1 es literalmente
+«valor objetivo de los sistemas de alarma por voz»; la propia NOTA 1 de la
+Tabla G.1 añade que sus valores son objetivos mínimos. La escala es
+deliberadamente gruesa, una banda por cada 0,04 de STI, porque ese paso «se basa
+en la incertidumbre típica de las mediciones directas de STI», así que una banda
+de diferencia es lo mínimo por lo que merece la pena discutir y citar tres
+decimales de STI es falsa precisión. Y 0,04 es *más fino* que la dispersión entre
+repeticiones de ≈ 0,03 de una medición STIPA que se señala más abajo, así que una
+letra puede moverse entre repeticiones sin que el STI haya cambiado en sustancia.
+Los anexos F y G son informativos, y el objeto y campo de aplicación de la
+Edición 5 dice sin rodeos que el documento no da criterios para certificar un
+canal de transmisión, así que un requisito de proyecto se escribe como un STI
+numérico y la letra se usa para declararlo.
+
+### De las posiciones a una valoración del espacio
+
+El STI es una propiedad de un único camino de fuente a oyente, así que verificar
+una sala o una instalación de alarma por voz es un *conjunto* de mediciones, no
+una sola. Coloca el micrófono a la altura de oído de la postura prevista (unos
+1,2 m sentado y 1,6 m de pie), reparte las posiciones por la zona atendida
+incluyendo los rincones acústicamente peores y no los cómodos, y mantén al menos
+una posición en cada zona de cobertura de altavoz de un sistema distribuido: el
+apartado 7.6.4 pide «un número representativo de emplazamientos».
+
+La regla de reducción es la parte que se equivoca con facilidad. El apartado
+7.6.4 dice que tomar la media simple de los resultados **puede inducir a error**,
+y que una cifra única mejor, que tiene en cuenta la variación espacial, es la
+**media menos una desviación típica**, a veces llamada *valoración del espacio*,
+y el valor que una posición dada tiene alrededor de un 84 % de probabilidad de
+alcanzar si los resultados son gaussianos. Mejor todavía es representar la
+distribución estadística completa. La consecuencia práctica para una ficha:
+cuando se fija un `requirement`, hay que decir si el número enmarcado es una
+posición, la peor posición o la media menos una desviación típica, porque son
+tres veredictos distintos contra el mismo límite; y las bandas de 0,04 de ancho
+del Anexo F son la resolución natural a la que resumir la dispersión.
 
 ### ¿Directo o indirecto? Cómo elegir
 
@@ -267,6 +473,50 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
   incluso en condiciones estacionarias (y más en ruido fluctuante); repite y
   compara en lugar de fiarte de una sola pasada, y respeta la duración mínima
   que señala el `UserWarning` de arriba.
+
+De esos cuatro, la dependencia del nivel es el que se descarta con más facilidad,
+así que merece la pena ver de qué tamaño es:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_level_dependence_es.svg"
+  alt="El STI de una única respuesta al impulso fija con un tiempo de reverberación de 0,9 segundos, representado frente al nivel global de habla en el oyente de 40 a 100 dB SPL con un espectro de ruido ambiente fijo. Con nivel y ambiente indicados, la curva sube con fuerza desde 0,25 a 40 dB, alcanza un máximo ancho de unos 0,60 cerca de 72 dB y vuelve a caer hasta 0,55 a 100 dB; sin ellos el resultado es una línea a trazos plana en 0,609. El umbral de recepción está anotado en el extremo bajo y el enmascaramiento auditivo en el alto, y está marcado el nivel de recurso de la norma de 60 dB(A) a 1 m"
+  width="82%"
+/>
+
+*La misma sala, la misma respuesta al impulso, y un número que cambia en más de
+un tercio de la escala. Por debajo de unos 55 dB el habla apenas se despega del
+ruido propio de la sala y muerde el umbral de recepción de la Tabla A.3; por
+encima de unos 80 dB el enmascaramiento auditivo de la Tabla A.2 deja que las
+bandas graves fuertes enmascaren a las agudas. Entre medias hay una meseta
+ancha, y por eso medir al nivel de operación no es una manía: una respuesta al
+impulso medida a nivel alto y reescalada después se queda en la línea a trazos
+plana y solo vale para un nivel que nadie anotó.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# `ir` y `fs` son la sala reverberante de esta sección.
+ambient = np.array([45.0, 40.0, 35.0, 30.0, 28.0, 25.0, 22.0])   # dB SPL
+# El espectro de habla masculina de la Ed.5, apartado A.6.1, relativo a la banda de 500 Hz.
+shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+shape_total = 10 * np.log10(np.sum(10 ** (shape / 10)))
+
+totals = np.arange(40.0, 100.5, 2.5)
+curve = [speech.sti_from_impulse_response(
+    ir, fs, level=shape - shape_total + t, ambient=ambient).sti for t in totals]
+print(round(min(curve), 3), round(max(curve), 3))          # 0.246 0.604
+print(round(speech.sti_from_impulse_response(ir, fs).sti, 3))   # 0.609
+
+fig, ax = plt.subplots()
+ax.plot(totals, curve)
+ax.axhline(speech.sti_from_impulse_response(ir, fs).sti, linestyle="--")
+ax.set_xlabel("Nivel global de habla en el oyente [dB SPL]")
+ax.set_ylabel("STI")
+plt.show()
+```
+
+</details>
 
 ### Parámetros de `sti_from_impulse_response()` / `stipa()`
 
