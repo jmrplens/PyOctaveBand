@@ -58,15 +58,94 @@ atmospheric conditions. Placing that source at a receiver adds the
 propagation adjustment
 $\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$.
 
-The EPNL this page computes is the same quantity certification asks for: ICAO
-Annex 16 Chapter 8 flies the helicopter level at 150 m over a centre
-microphone, with two more 150 m to each side.
+The EPNL this page computes is the same quantity fixed-wing certification asks
+for; only the source description differs. ICAO Annex 16 Chapter 8 flies the
+helicopter level at 150 m over a centre microphone, with two more 150 m to each
+side.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification.svg" alt="Helicopter overflight noise certification of ICAO Annex 16 Chapter 8: a side view of a helicopter in level flight at 150 m, 492 ft, directly above a centre microphone on the ground, with the reference speed rule of 0.9 VH, and a plan-view inset where the flight track crosses a line of three microphones, one on the track and two 150 m to each side; notes state at least six overflights split equally between headwind and tailwind, EPNL in EPNdB at the three points, microphones 1.2 m above ground and the 45 degree elevation with about 212 m slant range to the sideline pair at the overhead moment" width="92%" />
+
+## Where a hemisphere comes from
+
+The library implements the method, not the data: **no hemisphere database ships
+with phonometry**, and there is no NORAH file reader, so the arrays below have
+to be assembled by the reader. There are two places they come from. One is a
+flight-test campaign: the rotorcraft is flown over a ground microphone array,
+each emission direction's spectrum is de-propagated back to a 60 m reference
+sphere under ICAO noise-certification reference conditions (101 325 Pa,
+298.15 K, 70 % relative humidity), and the measurement follows the Annex 16
+Vol. I practice Doc 32 §4.2 points at. The other is the NORAH2 reference
+database, which covers eleven rotorcraft types.
+
+A usable hemisphere carries more than levels. The NORAH file format
+(Doc 32 Appendix A) records the reference distance `POLDIST`, whether
+atmospheric absorption is included, the no-value indicator, the hemisphere's own
+atmosphere (`TAMB`, `RELHUM`, `PAMB`), and then the *conditions the data was
+acquired at*: the measurement temperature, humidity and pressure at 10 m, the
+rotor speed, the indicated airspeed, the path angle, the pitch and roll
+attitudes and the wind components. The airspeed and the path angle are not
+metadata: they are the key the flight-condition interpolation below looks the
+hemisphere up by, so a hemisphere without them cannot be placed in a database.
+
+What a ground array can see is limited, and that is why real hemispheres arrive
+with holes. Doc 32 requires coverage of at least $-60° \le \varphi \le 60°$
+and the polar angles between the two 10 dB-down instants; measuring wider
+lateral angles, or polar angles approaching 0° and 180°, needs a more elaborate
+setup. The gap-filling of Eq. 6/7 is the direct consequence of that limit, not
+an implementation detail — outside the measured patch the level is the nearest
+filled bin's, and the energetic average of them where several are equally near.
+
+The condition matrix a database should span is fixed by Doc 32 §4.1: hemispheres
+at descent angles at intervals of at least 3° and four different airspeeds, to
+cover the descent region where blade-vortex interaction lives; climb angles at
+the best rate-of-climb speed $V_y$ or a typical take-off speed, including the
+maximum climb angle stated in the flight manual; and level flight at 0.9 $V_H$
+with $+10$ kt (or $V_H$, whichever is smaller), $-15$ kt and $-30$ kt
+increments. Outside the hull those conditions span, the interpolation degrades
+to nearest-neighbour, silently.
+
+When a class has no hemisphere at all, Doc 32 §3.2 gives the substitution rule:
+group the type temporarily with a class that does have one, choosing a class
+whose certification noise levels are lower than or within the range of the
+target's; where certification levels are unavailable or several classes qualify,
+weight becomes the governing parameter and the best-matching class *below* the
+type's weight is taken, with the level offset $\Delta\mathrm{EPNL}$ set to zero
+so the estimate stays conservative. Within a class, the offset is the difference
+in registered certification levels — take-off, overflight and approach levels
+correcting the climb, level and descent conditions respectively — and it enters
+here as `level_offset`.
 
 ## The noise hemisphere
 
 A `RotorcraftHemisphere` holds the band levels on the azimuth/polar grid.
+
+| Field | Shape | Units and convention |
+|---|---|---|
+| `frequencies` | `(F,)` | one-third-octave band centres in Hz; the NORAH format carries 31 bands from 10 Hz to 10 kHz |
+| `azimuth` $\varphi$ | `(A,)` | degrees about the nose axis: $0$ straight down, $+90$ starboard, $-90$ port; 19 values at 10° |
+| `polar` $\theta$ | `(P,)` | degrees from the nose: $0$ forward, $90$ across the aircraft, $180$ rearward; 19 values at 10° |
+| `levels` | `(A, P, F)` | band sound pressure levels in dB at the reference distance; `NaN` in bins the measurement did not cover |
+| `distance` | scalar | reference distance in metres, 60 by default |
+
+The two angles are the spherical coordinates of Doc 32 Eq. 3,
+$x = r\cos\theta$, $y = r\sin\theta\sin\varphi$, $z = r\sin\theta\cos\varphi$
+in body axes with $z$ down, so $\theta$ is measured from the nose and
+$\varphi$ rotates about the nose axis starting from **straight down**.
+`hemisphere_source_level(h, azimuth_deg, polar_deg)` takes the angles in that
+order and returns one level per band: `hemisphere_source_level(h, 0.0, 90.0)` is
+the level radiated vertically downwards, which is what a microphone directly
+under a level flyover hears, while a receiver 500 m to the side of the same
+overflight at 150 m is addressed at roughly $(\varphi, \theta) = (73°, 90°)$.
+Getting the sign of $\varphi$ backwards mirrors the aircraft; treating $\theta$
+as an angle from the vertical transposes the array and gives a plausible but
+wrong directivity. `NaN` and 0 dB are not interchangeable: unmeasured bins must
+be `NaN`, because they are gap-filled from the angularly nearest filled bin
+before the bilinear lookup, and a stored 0 dB would be taken as data.
+`h.mirrored()` implements the rotor-sense relation of Eq. 2 by reversing the
+azimuth sign.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_hemisphere.svg" alt="The rotorcraft noise hemisphere of ECAC Doc 32 and its two angles, in three panels. Panel a is the vertical centre plane at azimuth zero: a helicopter with a half-circle of 60 m radius below it, the polar angle theta running from 0 at the nose through 90 straight beneath to 180 at the tail, and the measured polar band between the two 10 dB-down instants picked out on the arc. Panel b is the same hemisphere seen from astern: the azimuth phi is 0 straight beneath, plus 90 to starboard and minus 90 to port, with the measured lateral band from minus 60 to plus 60 degrees picked out and a note that outside it the bins are gap-filled. Panel c places the 60 m sphere on a flight path: the helicopter on a dashed track with its bank angle marked, the slant range r drawn down to a receiver 1.2 m above the ground. The footer gives the three propagation adjustments and the array contract: levels indexed by azimuth, polar angle and band in dB at 60 m under the ICAO reference atmosphere of 25 degrees Celsius, 70 per cent relative humidity and 101.325 kilopascals, 19 azimuths by 19 polar angles at 10 degrees and 31 one-third-octave bands from 10 Hz to 10 kHz, unmeasured bins NaN and never 0 dB, and mirrored-rotor class members reading the same data at minus phi" width="92%" />
+
 `hemisphere_source_level` reads the level at an arbitrary emission direction:
 the grid is first gap-filled from the angularly-nearest filled bins (Eq. 14/15,
 cached), then the lookup is bilinear in the energy domain over the four
@@ -77,9 +156,59 @@ their measured corners.
 from phonometry import aircraft
 
 h = aircraft.RotorcraftHemisphere(frequencies=freqs, azimuth=phi, polar=theta, levels=levels)
-lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # source level per band at 60 m
+lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # straight down, per band, at 60 m
 h.plot()                                          # fore-aft directivity
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hemisphere.svg" alt="Two panels of a synthetic rotorcraft noise hemisphere. On the left, the fore-aft section at azimuth zero: source level at 60 m against polar angle from 0 forward to 180 rearward, for the 100 Hz, 631 Hz and 3981 Hz bands, with the measured polar band between 40 and 140 degrees shaded and the curves flat outside it where the values are gap-filled. On the right, the 631 Hz band over the whole azimuth-polar grid as a filled contour, showing a strong lobe near 140 degrees polar and zero azimuth, with the measured coverage outlined by a dashed rectangle from 40 to 140 degrees polar and minus 60 to plus 60 degrees azimuth, and a note that 9.4 dB separate the loudest and quietest measured cell" width="92%" />
+
+*Why the method needs a hemisphere at all: in the most directive band, 9.4 dB
+separate the loudest measured direction from the quietest, and the lobe sits at
+$\theta \approx 140°$, well aft of the vertical. The three sections on the left show that the directivity is
+frequency-dependent — the low band is nearly flat, the mid band carries the
+lobe, the high band is quiet everywhere — so a single source level cannot stand
+in for it. Note also what the curves do outside the shaded band: they go flat.
+That is the gap-filling, not measurement.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+# A synthetic hemisphere on the Doc 32 grid: 31 bands, 19 x 19 angles, with a
+# mid-frequency lobe behind abeam and the cells a ground array cannot see left
+# as NaN.
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)
+az, po = np.arange(-90.0, 91.0, 10.0), np.arange(0.0, 181.0, 10.0)
+spectrum = 88.0 - 12.0 * np.log10(freqs / 100.0) ** 2
+band = np.exp(-((np.log10(freqs) - np.log10(630.0)) ** 2) / 0.08)
+levels = (spectrum[None, None, :]
+          - 0.030 * np.abs(po - 110.0)[None, :, None]
+          - 0.020 * np.abs(az)[:, None, None]
+          + 7.0 * np.exp(-((po - 140.0) ** 2) / (2 * 16.0 ** 2))[None, :, None]
+          * np.exp(-(az ** 2) / (2 * 34.0 ** 2))[:, None, None]
+          * band[None, None, :])
+unseen = (np.abs(az)[:, None] > 60.0) | (po[None, :] < 40.0) | (po[None, :] > 140.0)
+h = aircraft.RotorcraftHemisphere(freqs, az, po, np.where(unseen[:, :, None],
+                                                          np.nan, levels))
+
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.4))
+for f in (100.0, 630.0, 4000.0):
+    h.plot(ax=ax, band=f)
+ax.axvspan(40.0, 140.0, color="0.85", zorder=0)
+idx = int(np.nanargmax(np.nanmax(levels, axis=(0, 1)) - np.nanmin(levels, axis=(0, 1))))
+filled = np.array([[aircraft.hemisphere_source_level(h, a, p)[idx] for p in po]
+                   for a in az])
+cs = ax2.contourf(po, az, filled, levels=12)
+ax2.plot([40, 140, 140, 40, 40], [-60, -60, 60, 60, -60], "k--")
+fig.colorbar(cs, ax=ax2, label="Source level at 60 m [dB]")
+plt.show()
+```
+
+</details>
 
 ## Propagation adjustments
 
@@ -138,6 +267,51 @@ The standard database is recorded at 60 m, the default. If a hemisphere uses a
 different polar distance (`h.distance`, e.g. 70 m hover rings), pass it to both
 distance-dependent adjustments as `reference_distance=h.distance`.
 
+Read the ground curve as three regions. At low frequency the direct ray and its
+ground reflection arrive almost in phase, so the level approaches 6 dB above
+free field — 5.3 dB at 50 Hz over hard ground in the figure, rising to 5.8 dB.
+The first cancellation sits where the path difference is half a wavelength,
+which for this geometry — the source 150 m up, the microphone 1.5 m and 500 m
+of horizontal offset — falls at 200 Hz and is 13.7 dB deep; it marches upward as
+the aircraft passes overhead, so the adjustment is a moving comb rather than a
+fixed spectrum shape. Over grass the finite impedance rotates the phase of the
+reflected wave and absorbs part of it, so the reinforcement is a little smaller
+(4.7 dB at 50 Hz) and, more importantly, the cancellation is far less complete:
+the first minimum is 7.8 dB rather than 13.7 dB. At high frequency the two paths
+decorrelate towards an incoherent sum, which is where the soft curve settles
+near 1 dB while the hard one is still ringing at 2.4 dB at 5 kHz. All of it is
+coherent by construction, so a level averaged over a whole event shows far less
+structure than any single frozen spectrum here.
+
+Three site parameters decide the ground term, and the default is not the one a
+grass site wants:
+
+| Field | Default | What to set it to |
+|---|---|---|
+| `receiver_height` | 1.2 m | the Annex 16 microphone height; the figure above uses 1.5 m to make the dip visible |
+| `ground_elevation` | 0.0 m | per receiver on uneven sites, or one value per grid point |
+| `flow_resistivity` | `"G"` | **hard ground.** A grass or pasture site must pass `"C"` or `"D"` |
+
+The letters are the CNOSSOS-EU classes of Doc 32 Table 3, in Pa·s/m²: `"A"`
+very soft (snow, moss) at 12.5·10³, `"B"` soft forest floor at 31.5·10³, `"C"`
+uncompacted loose ground — turf, grass, loose soil — at 80·10³, `"D"` normal
+uncompacted ground such as pasture at 200·10³, `"E"` compacted field and gravel
+at 500·10³, `"F"` compacted dense ground such as a gravel road or car park at
+2·10⁶, `"G"` hard surfaces, most normal asphalt and concrete, at 20·10⁶, and
+`"H"` very hard and dense surfaces including water at 200·10⁶. A numeric σ in
+Pa·s/m² is accepted in place of a letter, and so is an array with one value per
+grid point.
+
+The atmosphere is silent in the same way. The hemisphere is defined under the
+ICAO reference conditions and already contains the absorption of the first 60 m,
+which is why only the excess path is corrected; the coefficient for that excess
+path defaults to those same reference conditions (25 °C, 70 % RH, 101.325 kPa)
+unless a `RotorcraftAtmosphere` is passed. The difference is largest exactly
+where a helicopter spectrum still carries energy — the upper third-octave bands
+over long slant paths — so a cold, dry or high-altitude site needs the argument.
+`atmospheric_method` selects `"iso9613"` (the default) or `"sae"`; the two agree
+to about 0.05 dB below 3.15 kHz.
+
 ## Flight conditions: interpolating between hemispheres
 
 A database records one hemisphere per flight condition (airspeed $V$, path
@@ -163,13 +337,58 @@ lv = aircraft.interpolated_source_level(
 ```
 
 The airspeed, not the ground speed, selects the hemisphere; the weights are
-unit-invariant as long as the query matches the database units. A database
-lookup triangulation can be passed as `triangles` (the NORAH database ships one
-per type; the shipped tables triangulate the raw $(V, \gamma)$ plane, so
-passing them reproduces the reference implementation bin for bin).
-Mirrored-rotor class members substitute `h.mirrored()`
-(Eq. 2, $\varphi \to -\varphi$) and certification-level
-offsets enter as `level_offset`.
+unit-invariant as long as the query matches the database units. Mirrored-rotor
+class members substitute `h.mirrored()` (Eq. 2, $\varphi \to -\varphi$) and
+certification-level offsets enter as `level_offset`.
+
+**Two triangulations are in play, and they do not agree.** By default the
+library triangulates the normalised
+$(V/\Delta V,\ F_\text{fc}\gamma/\Delta\gamma)$ plane, which keeps the two
+axes comparable for an arbitrary database. The NORAH tables instead ship a
+triangulation of the raw $(V, \gamma)$ plane, and it must be passed as
+`triangles` whenever you are reproducing a NORAH result — because the two
+disagree about which simplex encloses a query, and therefore about the blend
+weights.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flight_conditions.svg" alt="Two panels of the flight-condition plane. On the left the raw airspeed against path angle plane for a database of twenty-two conditions, sixteen of them a four-by-four descent grid with climb and level-flight points around it, with its Delaunay triangulation drawn; a query at 38 metres per second and minus 7 degrees falls inside one triangle whose three vertices carry inverse-distance weights of 0.42, 0.23 and 0.36, and a query at 60 metres per second and minus 11 degrees falls outside the convex hull with a dotted line to the nearest condition that is adopted unblended. On the right the same points and queries in the normalised plane the library uses by default: the same query now falls in the other half of the quadrilateral, so it blends conditions 5, 9 and 10 with weights 0.42, 0.36 and 0.22 instead of conditions 5, 6 and 9" width="92%" />
+
+*The same query, two triangulations, two different triples of hemispheres
+blended. The diagonal of the quadrilateral around it flips between the raw and
+the normalised plane, so the raw triangulation blends conditions 5, 6 and 9 and
+the normalised one blends 5, 9 and 10. Both are defensible; only one reproduces
+NORAH. Outside the hull neither blends at all, and the nearest condition is
+adopted whole — which changes the answer without raising anything, and is the
+trap worth knowing about.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial import Delaunay
+from phonometry import aircraft
+
+# A Doc 32 4.1 condition matrix: descent at 3 deg steps and four airspeeds,
+# climb at Vy, and level flight at 0.9 VH with the recommended increments.
+speeds = list(np.repeat([30.9, 36.0, 41.2, 46.3], 4)) + [33.4, 33.4, 64.8, 70.0, 57.1, 49.4]
+angles = list(np.tile([-3.0, -6.0, -9.0, -12.0], 4)) + [6.0, 9.0, 0.0, 0.0, 0.0, 0.0]
+v, g = np.asarray(speeds), np.asarray(angles)
+raw_tri = Delaunay(np.column_stack([v, g])).simplices
+
+print(aircraft.flight_condition_weights(v, g, 38.0, -7.0))
+print(aircraft.flight_condition_weights(v, g, 38.0, -7.0, triangles=raw_tri))
+# [(5, 0.42), (9, 0.36), (10, 0.22)]  and  [(5, 0.42), (6, 0.23), (9, 0.36)]
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.triplot(v, g, raw_tri, color="0.6", lw=0.9)
+ax.plot(v, g, "o", ms=5)
+ax.plot([38.0], [-7.0], "*", ms=15)
+ax.set(xlabel="Airspeed V [m/s]", ylabel="Path angle γ [°]")
+plt.show()
+```
+
+</details>
 
 ## Flight-path kinematics
 
@@ -187,6 +406,47 @@ kin.airspeed, kin.path_angle          # select the hemisphere per point
 kin.bank_angle                        # tilts the hemisphere in turns
 kin.plot()                            # speed and angle profiles
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_kinematics.svg" alt="Two panels of flight-path kinematics derived from the same track. On the left, a raw radar track at 1 second cadence with a few metres of position noise: the airspeed and ground speed traces swing between 25 and 45 metres per second, the path angle swings by tens of degrees and the derived bank angle is unusable noise peaking at 41 degrees. On the right, the same track resampled with a smoothing spline to 0.5 second cadence: the speeds settle within half a metre per second of 31, the path angle is smooth, and the bank angle shows a single clean trough through the turn, peaking at 10 degrees against the 9.2 degrees the 600 metre radius turn actually asks for" width="92%" />
+
+*The same track, differentiated twice. The bank angle is derived from the
+curvature, which is a second derivative of position, so a few metres of radar
+noise at a 1 s cadence turn a 9.2° turn into 41° of nonsense — and the emission
+frame is tilted by that angle, so the error goes straight into the source level.
+After spline resampling to 0.5 s the trace shows one clean trough through the
+turn, peaking at 10° against the 9.2° the geometry asks for. Smooth before you
+differentiate.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import UnivariateSpline
+from phonometry import aircraft
+
+rng = np.random.default_rng(20260808)
+t_true = np.arange(0.0, 120.001, 0.1)
+speed, radius, sigma = 30.87, 600.0, 4.0          # 60 kt, a 600 m turn, 4 m noise
+turn = np.clip((t_true - 40.0) / (radius / speed), 0.0, np.pi / 2)
+xy = np.column_stack([np.cumsum(np.cos(turn)), np.cumsum(np.sin(turn))]) * speed * 0.1
+t_radar = np.arange(0.0, 120.001, 1.0)
+raw = np.column_stack([np.interp(t_radar, t_true, xy[:, 0]),
+                       np.interp(t_radar, t_true, xy[:, 1]),
+                       300.0 - 1.2 * t_radar]) + rng.normal(0.0, sigma, (121, 3))
+t_fine = np.arange(0.0, 120.001, 0.5)
+smooth = np.column_stack([
+    UnivariateSpline(t_radar, raw[:, k], s=t_radar.size * sigma ** 2)(t_fine)
+    for k in range(3)])
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5.4))
+for ax, times, pos in ((axes[0], t_radar, raw), (axes[1], t_fine, smooth)):
+    aircraft.flight_path_kinematics(times, pos).plot(ax=ax)
+plt.show()
+```
+
+</details>
 
 ## The single event: SEL, LASmax and EPNL
 
@@ -209,6 +469,30 @@ res = aircraft.rotorcraft_event_level(
 res.la_max, res.sel, res.epnl         # LASmax, SEL, EPNL
 res.plot()                            # the LA(t) time history
 ```
+
+Three numbers of the same event, and they are not interchangeable. **LASmax** is
+one instant: the largest A-weighted level of the history, and nothing about how
+long the event lasted. **SEL** integrates the whole history and normalises it to
+one second, so it exceeds LASmax by an amount that grows with slant distance and
+falls with speed — for the level flyover below, 60 kt at 150 m over a 120 m
+sideline, the gap is 10.3 dB; halve the speed and it grows to 12.2 dB, double
+the height and it grows to 12.5 dB. **EPNL** is a different animal: it is built
+from noy-weighted spectra with a tone correction over the 10 dB-down window
+(Doc 32 Eq. 28, running the [Annex 16 Appendix 2
+chain](/phonometry/aircraft/aircraft-noise/)), so it is not comparable with
+either — for the same event it reads 91.2 EPNdB against a SEL of 88.8 dB(A).
+Use LASmax and SEL for contour and annoyance work, and EPNL only against
+certification levels.
+
+The shape of the history is worth reading too. Each emission is stamped at
+recorded time $t_r = t_e + r/c$, and $r$ is largest far from the closest point
+of approach and smallest at it, so the received history is compressed on the way
+in and stretched on the way out — the curve is asymmetric before any directivity
+is involved. Where LASmax actually falls then depends on the hemisphere: with
+the mildly forward-lobed one below it arrives about a second *before* the sound
+emitted at the closest point of approach, because the loudest emission direction
+is reached slightly before abeam. That is the reason the method carries a
+hemisphere rather than a source level.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event.svg" alt="A-weighted level versus recorded time for a level rotorcraft flyover: a smooth rise to LASmax over the 10 dB-down window and a slower decay, annotated with the SEL and EPNL of the event" width="82%" />
 
@@ -271,25 +555,115 @@ The ground may vary across the receivers without a full elevation model: the
 value per grid point (shape `(len(y), len(x))`), and each receiver's two-ray
 model then uses its local values.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_contour.svg" alt="Two filled sound-exposure-level contour maps of the same level rotorcraft flyover over a 3 km by 4 km grid, the track running north-south through the origin and the event receiver marked 120 m to the side. On the left, uniform pasture of CNOSSOS class D: the contours are smooth bands parallel to the track, widening from about 300 m at the 95 dB level to the full grid at 65 dB. On the right, the same run with a 600 m hard strip crossing the track at right angles supplied as a per-grid-point flow resistivity map: inside the strip, marked by two dotted lines, every contour steps outward by a few hundred metres, so the footprint bulges where the ground is reflective" width="92%" />
+
+*The deliverable of the whole method, and what the ground does to it. Over
+uniform pasture the footprint is a band along the track, its width set by the
+hemisphere and the slant distance. Give the same run a 600 m hard strip across
+the track — an apron, a runway, a lake — and every contour steps outward inside
+it, because the reflection stops being absorbed. That step is the per-receiver
+`flow_resistivity` map doing its work; a study that leaves the default `"G"` in
+place is drawing the right-hand picture everywhere.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+x = np.linspace(-1500.0, 1500.0, 61)
+y = np.linspace(-2000.0, 2000.0, 81)
+sigma = np.where(np.abs(y)[:, None] < 300.0, 20.0e6,        # the hard strip
+                 np.full((y.size, x.size), 200.0e3))        # pasture elsewhere
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 6.4))
+for ax, ground in ((axes[0], aircraft.RotorcraftGround(flow_resistivity="D")),
+                   (axes[1], aircraft.RotorcraftGround(flow_resistivity=sigma))):
+    res = aircraft.rotorcraft_noise_contour(
+        [h], [speed], [0.0], times, positions, x=x, y=y,
+        metric="exposure", ground=ground)
+    res.plot(ax=ax)                      # the plot works in kilometres
+    ax.plot(positions[:, 0] / 1000.0, positions[:, 1] / 1000.0, "k--", lw=1.4)
+plt.show()
+```
+
+</details>
+
 ## Terrain: the mean ground plane and screening
 
-Doc 32, 1st ed., assumes flat terrain; its guidance adds the machinery for
-real sites. A varying vertical section is represented by its **mean ground
-plane** (Eq. 36-40), the least-squares line through the terrain polyline
-computed in closed form; source and receiver enter the flat-ground equations
-with their **equivalent heights**, measured orthogonally to that plane and
-floored at 0.1 m. Ground that changes type along the path averages its flow
+Doc 32, 1st ed. assumes flat terrain. The EASA NORAH2 modelling guidance
+(Olsen et al. 2024), which the rest of this page follows at equation level, adds
+the machinery for real sites. A varying vertical section is represented by its
+**mean ground plane** (Eq. 36-40), the least-squares line through the terrain
+polyline computed in closed form; source and receiver enter the flat-ground
+equations with their **equivalent heights**, measured orthogonally to that plane
+and floored at 0.1 m. Ground that changes type along the path averages its flow
 resistivity by the logarithm, weighted by segment length (Eq. 41).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_mean_ground_plane.svg" alt="Two stacked panels. The upper one is a terrain section 800 m long rising about 30 m with two undulations, with the least-squares mean ground plane drawn as a dashed line of slope 0.034 through it; a helicopter source 60 m above the section origin and a receiver 1.2 m above the terrain at the far end are marked, and for each the true vertical height is drawn as a dotted drop line to the terrain and the equivalent height as a solid perpendicular to the fitted plane, labelled 58 m for the source and 5.1 m for the receiver. The lower panel compares the resulting ground-effect adjustment against one-third-octave frequency: computed from the true heights of 60 m and 1.2 m, the comb has its first deep minimum near 250 Hz, while computed from the equivalent heights of 58 m and 5.1 m the minimum moves down to about 125 Hz and the whole interference pattern shifts, differing from the true-height curve by several decibels across the middle of the range" width="92%" />
+
+*Why the construction exists. The receiver stands 1.2 m above the terrain, but
+the terrain under it is 4 m above the plane the section fits, so its equivalent
+height is 5.1 m — and the ground effect is a function of the equivalent heights,
+not the true ones. Four metres of local relief move the first interference
+minimum by an octave. The 0.1 m floor exists for the opposite case, a receiver
+in a hollow that the fitted plane passes above.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+d = np.linspace(0.0, 800.0, 33)
+z = 0.035 * d + 6.0 * np.sin(d / 90.0) + 2.5 * np.sin(d / 31.0)
+plane = aircraft.mean_ground_plane(d, z)
+m, c = float(plane.slope), float(plane.intercept)
+
+def equivalent(point):
+    """Height measured orthogonally to the fitted plane, floored at 0.1 m."""
+    return max(abs(point[1] - m * point[0] - c) / np.hypot(1.0, m), 0.1)
+
+src, rcv = (0.0, 60.0), (800.0, float(z[-1]) + 1.2)
+freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)
+fig, (ax, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+plane.plot(ax=ax)
+for heights, style in (((src[1] - z[0], 1.2), "--"),
+                       ((equivalent(src), equivalent(rcv)), "-")):
+    ax2.semilogx(freqs, aircraft.ground_effect_adjustment(
+        freqs, heights[0], heights[1], rcv[0], flow_resistivity="D"), style)
+plt.show()
+```
+
+</details>
+
 When terrain blocks the line of sight, the sound follows the shortest convex
-path over it (the guidance's rubber band) and every touched vertex is a
+path over it (the NORAH2 guidance calls it the rubber band) and every touched
+vertex is a
 **diffraction edge**. The attenuation combines the pure diffraction of the
 path difference $\delta$ (Eq. 42-44,
 $10 C_h \log_{10}\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, capped at
 25 dB) with the source-side and receiver-side ground effects, each over its
 own mean ground plane and weighted by its image-path diffraction (Eq. 45-47,
-the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
+the CNOSSOS-EU scheme the NORAH2 guidance adopts). The ground effect is not
 evaluated separately in that regime.
+
+Whether any of that is worth paying for is a question about wavelengths.
+Screening is governed by the path difference over the obstacle measured in
+wavelengths — the attenuation grows with $\delta/\lambda$ and is capped at
+25 dB — so a metre of path difference is worth little at 100 Hz and a great deal
+at 4 kHz. For a rotorcraft the geometry rarely arises at all: the source is
+normally hundreds of metres up, so the line of sight is broken only for
+receivers far to the side or behind ridges, which is precisely where the levels
+are already low. Near the track, terrain acts through the mean plane and the
+equivalent heights above, not by screening. The practical rule is to run one
+section with `terrain_screening_adjustment` at the worst-looking receiver first,
+and only pay for a full elevation model if that section turns out to be
+screened.
 
 `mean_ground_plane`, `mean_flow_resistivity` and `diffraction_attenuation`
 expose the pieces; `terrain_screening_adjustment` runs the whole section:
@@ -347,8 +721,8 @@ The event and contour run over real sites by passing a digital elevation
 model in the `RotorcraftGround`: `terrain=(x, y, z)` on the track frame. Every
 emission-receiver pair then samples its own vertical section at
 `terrain_resolution` (default: the model's cell size) and evaluates it with the
-machinery above; the receiver ground comes from the model. The cost grows with track points times grid
-points, so keep contour grids modest with terrain.
+machinery above; the receiver ground comes from the model. The cost grows with
+track points times grid points, so keep contour grids modest with terrain.
 
 ```python
 res = aircraft.rotorcraft_event_level(
@@ -359,22 +733,38 @@ res = aircraft.rotorcraft_event_level(
 
 ## Validation
 
-Validated against the NORAH2 guidance Table 4 (all 31 bands), the closed-form
-inverse-square spreading, the analytic rigid-ground and grazing limits of the
-ground effect, off-node bilinear lookups on the reference hemispheres of all
-eleven rotorcraft types, hand-checked interpolation simplices, closed-form
-kinematics and the Lorentzian $\mathrm{SEL} - L_{ASmax}$ flyover integral, and end to end
-against the NORAH2 prototype's ARP verification cases: emission angles to
-0.01°, retarded times to 0.02 s, every step level of the hard-ground events to
-0.08 dB(A) out to 18 km, `LASmax` to 0.03 dB, `SEL` to 0.05 dB over hard ground
-(0.4 dB over soft ground), the 187-microphone contour grid to 0.7 dB
-worst-case, `PNLTM` to 0.1 dB and `EPNL` to about 1.3 dB (the prototype's
-sub-noy-floor perceived-noisiness policy differs from the published Annex 16
-law). One documented divergence remains: at far range over
-soft ground the prototype damps the coherent two-ray interference of guidance
-Eq. 30 towards the incoherent sum (up to 4.9 dB on individual low-level steps
-beyond 7 km); neither Doc 32 nor the guidance contains such a term, and this
-implementation follows the published equations.
+The implementation is anchored on the NORAH2 guidance Table 4 (all 31 bands),
+the closed-form inverse-square spreading, the analytic rigid-ground and grazing
+limits of the ground effect, off-node bilinear lookups on the reference
+hemispheres of all eleven rotorcraft types, hand-checked interpolation
+simplices, closed-form kinematics and the Lorentzian
+$\mathrm{SEL} - L_{ASmax}$ flyover integral. End to end it reproduces the
+NORAH2 prototype's ARP verification cases:
+
+| Quantity | Oracle | Agreement |
+|---|---|---|
+| Band levels, 31 bands | NORAH2 guidance Table 4 | exact |
+| Emission angles | NORAH2 prototype, ARP cases | 0.01° |
+| Retarded time | same | 0.02 s |
+| Per-step level, hard ground, to 18 km | same | 0.08 dB(A) |
+| $L_{ASmax}$ | same | 0.03 dB |
+| `SEL` | same | 0.05 dB hard ground, 0.4 dB soft |
+| Contour grid, 187 microphones | ARP Case 3 | 0.7 dB worst case |
+| $\mathrm{PNLTM}$ | same | 0.1 dB |
+| `EPNL` | same | ≈ 1.3 dB (see below) |
+
+:::note[Two caveats, not rounding]
+The **EPNL** agreement is an order of magnitude looser than everything else
+because the prototype applies a sub-noy-floor perceived-noisiness policy that
+differs from the published Annex 16 law; the divergence is in the reference, not
+in the chain.
+
+At far range over **soft ground** the prototype damps the coherent two-ray
+interference of guidance Eq. 30 towards the incoherent sum, which reaches 4.9 dB
+on individual low-level steps beyond 7 km. Neither Doc 32 nor the NORAH2
+guidance contains such a term, so this implementation follows the published
+equations and does not reproduce it.
+:::
 
 The terrain machinery is anchored in closed form: the mean ground plane is
 exact on linear and symmetric profiles, a flat section reproduces the
@@ -409,8 +799,22 @@ end to end against the NORAH2 prototype's ARP verification cases.
 
 **Not covered.** Hover, idle and taxi source handling (guidance §A.3.5)
 remains outside the implementation: the hemisphere source model assumes a
-flyover, not a stationary or ground-idling rotorcraft.
+flyover, not a stationary or ground-idling rotorcraft. **No hemisphere database
+ships with phonometry, and there is no NORAH file reader**: the method is
+implemented, the data is not, so the arrays come from a measurement campaign or
+from the NORAH2 reference database and are assembled by the reader. Refraction
+by atmospheric gradients is outside Doc 32 itself, as is the flight-condition
+interpolation, which follows the NORAH2 guidance instead.
 
 ## See also
 
+- [Aircraft noise: Effective Perceived Noise Level](/phonometry/aircraft/aircraft-noise/):
+  the ICAO Annex 16 Appendix 2 chain this page's Doc 32 Eq. 28 term calls, and
+  the measurement practice a hemisphere campaign follows.
+- [Airport Noise (ECAC Doc 29)](/phonometry/aircraft/airport-noise/): the
+  fixed-wing contour method, where a noise-power-distance table plays the role
+  the noise hemisphere plays here.
+- [Outdoor sound propagation](/phonometry/environment/propagation/outdoor-propagation/):
+  the ISO 9613-2 ground effect and the CNOSSOS ground classes this two-ray
+  adjustment shares.
 - API reference: [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/).

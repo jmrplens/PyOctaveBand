@@ -32,6 +32,10 @@ LABEL_LEVEL_DB = "Level [dB]"
 COLOR_PRIMARY = "#1f77b4"
 COLOR_SECONDARY = "#d62728"
 COLOR_TERTIARY = "#2ca02c"
+# The fourth series colour, the same purple the library palette carries as
+# ``_C_QUATERNARY``. Named here because the CSS "purple" (#800080) that a
+# figure reaches for instead is too dark to draw a line on the dark page.
+COLOR_QUATERNARY = "#9467bd"
 COLOR_GRID = "#e0e0e0"
 # Neutral for de-emphasised *data* (a context bar, a reference series): mid
 # grey reads on both pages, unlike COLOR_GRID, which is tuned to disappear
@@ -63,6 +67,18 @@ CMAP_FIELD = "RdBu_r"
 FIELD_INK = "black"
 FIELD_STROKE = "white"
 
+# Where a sequential colormap is read for a *family of curves*, per theme. A
+# ramp like viridis runs from a near-black purple to a near-white yellow, so
+# neither end can be drawn on both pages: sampled from 0.05, the first two
+# curves of a six-curve family were within a level and a half of the dark
+# page. Each theme therefore reads the stretch of the ramp its own page leaves
+# room for, and both stretches keep every entry clear of the page it is drawn
+# on. This is not the wave-field colormap above: that one maps a *signed
+# field* onto a page, this one picks apart curves that share an axis.
+_SERIES_SPAN_LIGHT = (0.05, 0.85)
+_SERIES_SPAN_DARK = (0.32, 1.0)
+_SERIES_SPAN = _SERIES_SPAN_LIGHT
+
 # Global matplotlib configuration
 plt.rcParams.update(
     {
@@ -77,10 +93,26 @@ plt.rcParams.update(
 )
 
 
+def series_colors(count: int, cmap: str = "viridis") -> np.ndarray:
+    """``count`` colours off ``cmap``, over the span the current page allows.
+
+    The one call every family of curves that shares an axis should use:
+    ``ax.plot(..., color=colour)`` for each of ``series_colors(len(curves))``.
+    Sampling the colormap directly picks up both of its unusable ends, and the
+    unusable end is a different one on each theme.
+
+    :param count: Number of curves in the family.
+    :param cmap: Any sequential matplotlib colormap name.
+    :return: An ``(count, 4)`` RGBA array, dark-to-light along the ramp.
+    """
+    lo, hi = _SERIES_SPAN
+    return np.asarray(plt.get_cmap(cmap)(np.linspace(lo, hi, count)))
+
+
 def set_theme(dark: bool) -> None:
     """Switch between the light (default) and dark documentation themes."""
     global COLOR_FG, COLOR_GRID, COLOR_PANEL, _FILENAME_SUFFIX
-    global CMAP_FIELD, FIELD_INK, FIELD_STROKE
+    global CMAP_FIELD, FIELD_INK, FIELD_STROKE, _SERIES_SPAN
     if dark:
         plt.style.use("dark_background")
         COLOR_FG = "white"
@@ -90,6 +122,7 @@ def set_theme(dark: bool) -> None:
         CMAP_FIELD = "phonometry_field_dark"
         FIELD_INK = "white"
         FIELD_STROKE = "black"
+        _SERIES_SPAN = _SERIES_SPAN_DARK
     else:
         plt.style.use("default")
         COLOR_FG = "black"
@@ -99,6 +132,7 @@ def set_theme(dark: bool) -> None:
         CMAP_FIELD = "RdBu_r"
         FIELD_INK = "black"
         FIELD_STROKE = "white"
+        _SERIES_SPAN = _SERIES_SPAN_LIGHT
     _publish(COLOR_FG=COLOR_FG, COLOR_GRID=COLOR_GRID, COLOR_PANEL=COLOR_PANEL,
              _FILENAME_SUFFIX=_FILENAME_SUFFIX, CMAP_FIELD=CMAP_FIELD,
              FIELD_INK=FIELD_INK, FIELD_STROKE=FIELD_STROKE)

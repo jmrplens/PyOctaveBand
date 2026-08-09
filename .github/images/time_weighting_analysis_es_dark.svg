@@ -1351,7 +1351,7 @@ L 567.17724 308.306822
 L 593.423906 310.905547 
 L 602.310573 311.736737 
 L 602.310573 311.736737 
-" clip-path="url(#p2048454fae)" style="fill: none; stroke-dasharray: 9.6,2.4,1.5,2.4; stroke-dashoffset: 0; stroke: #800080; stroke-width: 1.5"/>
+" clip-path="url(#p2048454fae)" style="fill: none; stroke-dasharray: 9.6,2.4,1.5,2.4; stroke-dashoffset: 0; stroke: #9467bd; stroke-width: 1.5"/>
    </g>
    <g id="patch_3">
     <path d="M 44.103906 355.438125 
@@ -1421,7 +1421,7 @@ L 419.486719 66.298125
      <path d="M 399.486719 81.298906 
 L 409.486719 81.298906 
 L 419.486719 81.298906 
-" style="fill: none; stroke-dasharray: 9.6,2.4,1.5,2.4; stroke-dashoffset: 0; stroke: #800080; stroke-width: 1.5"/>
+" style="fill: none; stroke-dasharray: 9.6,2.4,1.5,2.4; stroke-dashoffset: 0; stroke: #9467bd; stroke-width: 1.5"/>
     </g>
     <g id="text_19">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="427.486719" y="84.798906" transform="rotate(-0 427.486719 84.798906)">Impulse (35 ms/1,5 s)</text>

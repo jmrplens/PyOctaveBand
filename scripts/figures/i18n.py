@@ -993,6 +993,111 @@ _ES_EXACT = {
     "Age (HTLA, ISO 7029)": "Edad (HTLA, ISO 7029)",
     "Noise (NIPTS)": "Ruido (NIPTS)",
     "Age + noise (HTLAN)": "Edad + ruido (HTLAN)",
+    # Perception / hearing + speech (B15b)
+    "ISO 7029 median at 4 kHz — men against women":
+        "Mediana de ISO 7029 a 4 kHz: hombres frente a mujeres",
+    "The spread around the median (male)":
+        "La dispersión en torno a la mediana (hombres)",
+    "Male": "Hombres",
+    "Female": "Mujeres",
+    "Age [years]": "Edad [años]",
+    "Median deviation from age 18 [dB]":
+        "Desviación mediana respecto a los 18 años [dB]",
+    "Standard deviation at 4 kHz [dB]": "Desviación típica a 4 kHz [dB]",
+    "$s_u$ (worse than the median)": "$s_u$ (peor que la mediana)",
+    "$s_l$ (better than the median)": "$s_l$ (mejor que la mediana)",
+    "$s_u - s_l$: the asymmetry": "$s_u - s_l$: la asimetría",
+    "above 70 yr:\ninformative only\n(clause 4.1, f ≥ 3 kHz)":
+        "por encima de 70 años:\nsolo informativo\n(capítulo 4.1, f ≥ 3 kHz)",
+    "The frames the 40 dB rule drops (shaded), and the segment scores under them":
+        "Las tramas que descarta la regla de 40 dB (sombreadas) y las "
+        "puntuaciones por segmento debajo",
+    "Clean reference": "Referencia limpia",
+    "Segment score": "Puntuación por segmento",
+    "dropout": "corte",
+    "the 30 dB window: Di − 15 to Di + 15":
+        "la ventana de 30 dB: de Di − 15 a Di + 15",
+    "speech Ei'": "voz Ei'",
+    "external noise Ni'": "ruido externo Ni'",
+    "equivalent masking Zi": "enmascaramiento equivalente Zi",
+    "equivalent disturbance Di": "perturbación equivalente Di",
+    "Band audibility Ai": "Audibilidad de banda Ai",
+    "Equivalent spectrum level [dB]": "Nivel de espectro equivalente [dB]",
+    "The octave procedure carries no spread of masking":
+        "El procedimiento por octavas no incluye la extensión del enmascaramiento",
+    "Spectrum level of the low-frequency noise below 450 Hz [dB]":
+        "Nivel de espectro del ruido de baja frecuencia por debajo de 450 Hz [dB]",
+    "critical-band": "por bandas críticas",
+    "equally-contributing": "de contribución igual",
+    "one-third-octave": "por tercios de octava",
+    "octave": "por octavas",
+    "Reverberation: a low-pass corner that moves":
+        "Reverberación: una frecuencia de corte que se desplaza",
+    "Steady noise: the same curve, scaled down":
+        "Ruido estacionario: la misma curva, escalada",
+    "Modulation frequency F [Hz]": "Frecuencia de modulación F [Hz]",
+    "Modulation transfer m (1 kHz band)":
+        "Transferencia de modulación m (banda de 1 kHz)",
+    "STIPA probes only these two F in this band":
+        "STIPA solo sondea estas dos F en esta banda",
+    "noise-free (T60 = 0.9 s)": "sin ruido (T60 = 0,9 s)",
+    r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$":
+        r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: constante en $F$",
+    "One impulse response against the level it is played at":
+        "Una misma respuesta al impulso frente al nivel de reproducción",
+    "Overall speech level at the listener [dB SPL]":
+        "Nivel global de voz en el oyente [dB SPL]",
+    "with level= and ambient= (Tables A.2/A.3)":
+        "con level= y ambient= (tablas A.2/A.3)",
+    "reception threshold:\nthe speech is barely above\nthe room's own noise":
+        "umbral de recepción:\nla voz apenas supera\nel ruido propio de la sala",
+    "auditory masking:\nloud low bands mask\nthe high ones":
+        "enmascaramiento auditivo:\nlas bandas graves intensas\nenmascaran las agudas",
+    "the standard's fallback level:\n60 dB(A) at 1 m from the source":
+        "el nivel por defecto de la norma:\n60 dB(A) a 1 m de la fuente",
+    "ISO 9612 Annex D: the Annex C budget, term by term":
+        "Anexo D de ISO 9612: el presupuesto del anexo C, término a término",
+    "Contribution to $u^2$ [dB²]": "Contribución a $u^2$ [dB²]",
+    "sampling  $(c_{1a}u_{1a})^2$": "muestreo  $(c_{1a}u_{1a})^2$",
+    "duration  $(c_{1b}u_{1b})^2$": "duración  $(c_{1b}u_{1b})^2$",
+    "instrument  $(c_{1a}u_2)^2$": "instrumento  $(c_{1a}u_2)^2$",
+    "position  $(c_{1a}u_3)^2$": "posición  $(c_{1a}u_3)^2$",
+    "planning/\nbreaks": "planificación/\ndescansos",
+    "cutting/\ngrinding": "corte/\namolado",
+    "whole day": "jornada completa",
+    "1.5 h of the day,\n91 % of the variance":
+        "1,5 h de la jornada,\nel 91 % de la varianza",
+    "A 3 dB sample scatter: what more samples buy":
+        "Con 3 dB de dispersión: lo que aportan más muestras",
+    "Samples per task ($I$) or per group ($N$)":
+        "Muestras por tarea ($I$) o por grupo ($N$)",
+    "Expanded uncertainty $U$ [dB]": "Incertidumbre expandida $U$ [dB]",
+    "task-based, $u_{1a}$ (Eq. C.6)": "por tareas, $u_{1a}$ (ec. C.6)",
+    "job-based, $c_1u_1$ (Table C.4)": "por puestos, $c_1u_1$ (tabla C.4)",
+    "floor with a personal exposimeter or class 2 meter":
+        "suelo con exposímetro personal o sonómetro de clase 2",
+    "floor with a class 1 meter": "suelo con sonómetro de clase 1",
+    "ISO 1999 median NIPTS against level (40 years)":
+        "NIPTS mediana de ISO 1999 frente al nivel (40 años)",
+    "Median NIPTS $N_{50}$ [dB]": "NIPTS mediana $N_{50}$ [dB]",
+    r"$L_{EX,8h}$ [dB(A)]": r"$L_{EX,8h}$ [dB(A)]",
+    "each dot is that band's cut-off $L_0$\n(93, 89, 80, 77, 75, 77 dB)":
+        "cada punto es el nivel de corte $L_0$ de esa banda\n"
+        "(93, 89, 80, 77, 75, 77 dB)",
+    "The same 3 dB is worth more the louder the job":
+        "Los mismos 3 dB valen más cuanto más ruidoso es el puesto",
+    "Median NIPTS at 4 kHz [dB]": "NIPTS mediana a 4 kHz [dB]",
+    "ISO 1999 Formula (1): what the compression term removes":
+        "Fórmula (1) de ISO 1999: lo que resta el término de compresión",
+    "Decibels removed by $HN/120$": "Decibelios que resta $HN/120$",
+    "$H + N$ = 40 dB": "$H + N$ = 40 dB",
+    "Age component $H$ (HTLA) [dB]": "Componente de edad $H$ (HTLA) [dB]",
+    "Noise component $N$ (NIPTS) [dB]":
+        "Componente de ruido $N$ (NIPTS) [dB]",
+    "the worked case: H = 20.2, N = 24.8\n45.0 dB sum → 40.8 dB HTLAN, "
+    "4.2 dB removed":
+        "el caso del ejemplo: H = 20,2, N = 24,8\n"
+        "suma de 45,0 dB → 40,8 dB de HTLAN, 4,2 dB restados",
     "GUM uncertainty budget": "Presupuesto de incertidumbre (GUM)",
     "Contribution to combined uncertainty [dB]":
         "Contribución a la incertidumbre combinada [dB]",
@@ -2095,9 +2200,113 @@ _ES_EXACT = {
     "markers reproduce the printed Table I.8 columns":
         "Cisterna del anexo I.3 de la EN 12354-5, contacto en el muro\n"
         "los marcadores reproducen las columnas impresas de la tabla I.8",
+    # Aircraft: the ECAC Doc 29 single event and its per-segment corrections.
+    "Doc 29 Segment Contributions at One Receiver":
+        "Aportación de cada segmento en un receptor (Doc 29)",
+    "(a) Engine installation (Eq. 4-15/4-16)":
+        "(a) Instalación de motores (ec. 4-15/4-16)",
+    "(b) Lateral attenuation (Eq. 4-18/4-19)":
+        "(b) Atenuación lateral (ec. 4-18/4-19)",
+    "(d) Duration correction (Eq. 4-14)": "(d) Corrección de duración (ec. 4-14)",
+    "Depression angle φ [°]": "Ángulo de depresión φ [°]",
+    "Elevation angle β [°]": "Ángulo de elevación β [°]",
+    "Λ(β, ℓ) subtracted [dB]": "Λ(β, ℓ) restada [dB]",
+    "Segment speed Vseg [m/s]": "Velocidad del segmento Vseg [m/s]",
+    "Wing-mounted": "En ala",
+    "Fuselage-mounted": "En fuselaje",
+    "Propeller": "Hélice",
+    "Λ = 0 above 50°": "Λ = 0 por encima de 50°",
+    "observer alongside": "observador junto al segmento",
+    "Vref = 82.3 m/s (160 kn)": "Vref = 82,3 m/s (160 kn)",
+    "take-off ground roll": "carrera de despegue",
+    "default ground track": "traza en tierra por defecto",
+    # Rotorcraft: the ECAC Doc 32 hemisphere, its interpolation and its terrain.
+    "Fore-aft section (φ = 0°)": "Sección proa-popa (φ = 0°)",
+    "measured polar band": "banda polar medida",
+    "measured coverage": "cobertura medida",
+    "Polar angle θ [°]": "Ángulo polar θ [°]",
+    "Azimuth φ [°]": "Acimut φ [°]",
+    "Uniform pasture (class D)": "Pastizal uniforme (clase D)",
+    "A 600 m hard strip across it": "Una franja dura de 600 m que lo cruza",
+    "track": "trayectoria",
+    "the event receiver": "el receptor del evento",
+    "Mean Ground Plane and Equivalent Heights (ECAC Doc 32 / NORAH2)":
+        "Plano medio del terreno y alturas equivalentes (ECAC Doc 32 / NORAH2)",
+    "receiver": "receptor",
+    "Raw (V, γ) plane — pass it as triangles=":
+        "Plano (V, γ) sin normalizar: se pasa como triangles=",
+    "Normalised plane — the library default":
+        "Plano normalizado: el comportamiento por defecto",
+    "Airspeed V [m/s]": "Velocidad aerodinámica V [m/s]",
+    "Path angle γ [°]": "Ángulo de trayectoria γ [°]",
+    "Ffc · γ / Δγ": "Ffc · γ / Δγ",
+    "database conditions": "condiciones de la base de datos",
+    "query inside the hull": "consulta dentro de la envolvente",
+    "query outside: nearest, unblended":
+        "consulta fuera: la más próxima, sin mezclar",
+    "Raw radar track, 1 s cadence": "Traza radar sin tratar, cadencia de 1 s",
+    "Smoothing spline resampled to 0.5 s":
+        "Spline de suavizado remuestreado a 0,5 s",
+    # Labels the aircraft result objects draw themselves.
+    "Segment SEL [dB]": "SEL del segmento [dB]",
+    "Polar angle θ [°]  (0° forward → 180° rearward)":
+        "Ángulo polar θ [°]  (0° hacia proa → 180° hacia popa)",
+    "Source level at 60 m [dB]": "Nivel de fuente a 60 m [dB]",
+    "SEL [dB]": "SEL [dB]",
+    "SEL [dB(A)]": "SEL [dB(A)]",
+    "Speed [m/s]": "Velocidad [m/s]",
+    "Angle [°]": "Ángulo [°]",
+    "Airspeed $V_A$": "Velocidad aerodinámica $V_A$",
+    "Ground speed $V_g$": "Velocidad respecto al suelo $V_g$",
+    "Path angle $\\gamma$": "Ángulo de trayectoria $\\gamma$",
+    "Bank angle $\\Phi$": "Ángulo de alabeo $\\Phi$",
 }
 
 _ES_PATTERNS = [
+    # Aircraft: labels and annotations carrying computed values.
+    (r"^closest segment: (.+) dB$", r"segmento más próximo: \1 dB"),
+    ((r"^receiver 3 000 m along track, 500 m to the side, 1\.2 m up\.\n"
+      r"total SEL (.+) dB; the closest segment alone\n"
+      r"carries (.+) % of the energy\. Hatched: the take-off ground roll\.$"),
+     ("receptor a 3 000 m en la traza, 500 m al lado y 1,2 m de altura.\n"
+      r"SEL total \1 dB; el segmento más próximo aporta por sí solo"
+      "\n"
+      r"el \2 % de la energía. Rayado: la carrera de despegue.")),
+    (r"^ℓ = (.+) m$", r"ℓ = \1 m"),
+    (r"^λ = (.+) m$", r"λ = \1 m"),
+    (r"^\(c\) Noise fraction, dλ = (.+) m \(Eq\. 4-20\)$",
+     r"(c) Fracción de ruido, dλ = \1 m (ec. 4-20)"),
+    ((r"^impedance adjustment \(Eq\. 4-6/4-7\), for scale:\n"
+      r"15 °C, 101\.3 kPa: (.+) dB\n30 °C, 101\.3 kPa: (.+) dB\n"
+      r"15 °C, 95\.0 kPa: (.+) dB$"),
+     ("ajuste de impedancia (ec. 4-6/4-7), para dar escala:\n"
+      r"15 °C, 101,3 kPa: \1 dB" "\n" r"30 °C, 101,3 kPa: \2 dB" "\n"
+      r"15 °C, 95,0 kPa: \3 dB")),
+    (r"^ANP Departure SEL Contour - (.+)$", r"Curvas SEL de salida ANP - \1"),
+    (r"^stage length (.+), (.+) fixed points, (.+) m at the last one$",
+     r"etapa \1, \2 puntos fijos, \3 m en el último"),
+    (r"^event_level receiver: SEL (.+) dB$",
+     r"receptor de event_level: SEL \1 dB"),
+    (r"^(.+) Hz band, the most directive one$",
+     r"banda de \1 Hz, la más directiva"),
+    ((r"^(.+) dB between the loudest and quietest measured cell;\n"
+      r"outside the dashed patch the field is gap-filled, not measured$"),
+     (r"\1 dB entre la celda medida más y menos ruidosa;" "\n"
+      "fuera del recinto discontinuo el campo está rellenado, no medido")),
+    (r"^hs = (.+) m$", r"hs = \1 m"),
+    (r"^hr = (.+) m$", r"hr = \1 m"),
+    (r"^true heights \((.+) m, (.+) m\)$", r"alturas reales (\1 m, \2 m)"),
+    (r"^equivalent heights \((.+) m, (.+) m\)$",
+     r"alturas equivalentes (\1 m, \2 m)"),
+    ((r"^V = (.+) m/s, γ = (.+)°: the two\n"
+      r"triangulations blend (.+) and (.+)$"),
+     (r"V = \1 m/s, γ = \2°: las dos triangulaciones" "\n"
+      r"mezclan \3 y \4")),
+    (r"^peak \|Φ\| = (.+)°  ·  the turn asks for (.+)°$",
+     r"|Φ| máximo = \1°  ·  el viraje pide \2°"),
+    (r"^Total SEL = (.+) dB$", r"SEL total = \1 dB"),
+    (r"^Mean ground plane \(a = (.+)\)$", r"Plano medio del terreno (a = \1)"),
+    (r"^(.+) Hz \(φ = 0°\)$", r"\1 Hz (φ = 0°)"),
     # coupling_term_regimes annotations (baked-in computed values).
     (r"^elastic support Yk = (.+) m/\(N s\)  \(19e\)$",
      r"apoyo elástico Yk = \1 m/(N s)  (19e)"),
@@ -2176,6 +2385,29 @@ _ES_PATTERNS = [
      "f = 10 kHz, α = \\1 dB/km\\nensanchamiento práctico (R₀ = 1000 m)"),
     (r"^f = 250 Hz, H = 50 m, medium sand\nψc = (.+)°, η = (.+) Np/rad, (.+) modes$",
      "f = 250 Hz, H = 50 m, arena media\\nψc = \\1°, η = \\2 Np/rad, \\3 modos"),
+    # stoi_segment_scores legend and annotation (baked-in values).
+    (r"^steady noise at 0 dB \(STOI = (\d)\.(\d+)\)$",
+     r"ruido estacionario a 0 dB (STOI = \1,\2)"),
+    (r"^a (\d)\.(\d+) s dropout \(STOI = (\d)\.(\d+)\)$",
+     r"un corte de \1,\2 s (STOI = \3,\4)"),
+    (r"^(\d+) of (\d+) frames fall 40 dB below the loudest and are discarded$",
+     r"\1 de \2 tramas quedan 40 dB por debajo de la más intensa y se descartan"),
+    # sii_masking_chain / sii_octave_masking_blindness (baked-in values).
+    ((r"^The clause 5 chain under a low-frequency masker \(SII = (\d)\.(\d+)\)$"),
+     r"La cadena del capítulo 5 con un enmascarante grave (SII = \1,\2)"),
+    ((r"^at 1 kHz there is no noise in this band,\nyet Zi = (\d+) dB: the "
+      r"masking is spread up\nfrom the low bands, not made here$"),
+     ("a 1 kHz no hay ruido en esta banda,\ny sin embargo Zi = \\1 dB: el "
+      "enmascaramiento\nsube desde las bandas graves, no se genera aquí")),
+    (r"^(\d)\.(\d+) index units apart$", r"\1,\2 unidades de índice de diferencia"),
+    # sti_level_dependence legend (baked-in uncorrected STI).
+    (r"^without them: a flat (\d)\.(\d+)$", r"sin ellas: un \1,\2 constante"),
+    (r"^T60 = (.+) s$", r"T60 = \1 s"),
+    (r"^SNR = (.+) dB$", r"SNR = \1 dB"),
+    # age_threshold_sex_and_spread annotations (baked-in ISO 7029 values).
+    (r"^\$s_u\$ peaks at (\d+) yr \((\d+)\.(\d+) dB\)$",
+     r"$s_u$ alcanza su máximo a los \1 años (\2,\3 dB)"),
+    (r"^they cross at (\d+) yr$", r"se cruzan a los \1 años"),
     (r"^Low-frequency cetaceans \(AUD INJ (.+) dB\)$",
      r"Cetáceos de baja frecuencia (AUD INJ \1 dB)"),
     (r"^High-frequency cetaceans \(AUD INJ (.+) dB\)$",

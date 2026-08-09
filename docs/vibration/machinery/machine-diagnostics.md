@@ -16,7 +16,7 @@ already provides - the [envelope spectrum and cepstrum](../../signals/spectra/ce
 The working view is the two put together: the envelope spectrum of a
 band-passed vibration record with the predicted lines drawn on top and named.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted ball spin frequency at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted rolling-element rotational frequency BSF at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear" width="92%"></picture>
 
 *The four tall lines land on BPFO and its harmonics; nothing appears on BPFI or
 BSF. That is the diagnosis: a spall on the outer race.*
@@ -218,13 +218,17 @@ from phonometry import (
     gear_mesh_frequencies,
 )
 
-# A gearbox bearing carries its own lines, the mesh family of the gear it
-# supports, and the shaft harmonics. Put them all on one axes.
-bearing = bearing_fault_frequencies(1500.0, 9, 7.94, 39.0)
-gear = gear_mesh_frequencies(1500.0, 28, harmonics=2, sidebands=1)
+record, fs = x, 20000.0          # the housing record and its sample rate
+shaft_rpm = 2000.0               # from the tacho, not from the nameplate
+
+# The bearing's own lines, the mesh family of the pinion it supports, and the
+# shaft harmonics. Put them all on one axes.
+bearing = bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+gear = gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
 lines = combine_fault_lines(bearing, gear)
 
-spectrum = envelope_spectrum(record, fs, band=(2500.0, 5000.0))
+spectrum = envelope_spectrum(record, fs, band=(2000.0, 4000.0))
 lines.within(1.0, 1600.0).plot(spectrum=spectrum)
 ```
 

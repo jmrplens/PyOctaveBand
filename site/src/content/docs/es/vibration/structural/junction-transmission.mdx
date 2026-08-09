@@ -1,6 +1,6 @@
 ---
-title: "Transmisión de onda de flexión en uniones de placas"
-description: "Los coeficientes de transmisión de onda de flexión independientes de la frecuencia del enfoque ondulatorio para uniones rígidas de placas en X, T, L y en línea (Cremer et al. 1973; Craik 1981/1996; Hopkins 2007, Sección 5.2.1.3): los parámetros de onda chi y psi, los coeficientes de esquina y de tramo recto tau12(theta) y tau13(theta), su media angular en campo difuso, y el factor de pérdidas por acoplamiento SEA y el índice de reducción vibratoria Kij derivados."
+title: "Uniones de placas: enfoque ondulatorio y SEA experimental"
+description: "Dos vías hasta el factor de pérdidas por acoplamiento de una unión. Los coeficientes de transmisión de onda de flexión independientes de la frecuencia del enfoque ondulatorio para uniones rígidas de placas en X, T, L y en línea (Cremer et al. 1973; Craik 1981/1996; Hopkins 2007, Sección 5.2.1.3): los parámetros de onda chi y psi, los coeficientes de esquina y de tramo recto tau12(theta) y tau13(theta), su media angular en campo difuso, y el factor de pérdidas por acoplamiento y el índice de reducción vibratoria Kij derivados. Después, SEA experimental (Norton y Karczub 2003, capítulo 6): el balance de potencia de dos subsistemas invertido a partir de energías medidas con una sola excitación y por inyección de potencia, las densidades modales de barras, vigas, placas y envolventes cilíndricas, y las formas cerradas de unión en ángulo recto y de conexión puntual."
 references:
   - type: book
     authors: ["Cremer, L.", "Heckl, M.", "Ungar, E. E."]
@@ -51,6 +51,23 @@ estadístico de energía (SEA) y para el modelo de transmisión por flancos de l
 EN 12354, donde alimentan el factor de pérdidas por acoplamiento $\eta_{ij}$ y
 el índice de reducción vibratoria $K_{ij}$.
 
+Esa conveniencia tiene un precio, y conviene conocerlo antes de usar el número
+como si estuviera medido. El $K_{ij}$ de una unión *real* **sí** depende de la
+frecuencia, que es la razón de que la ISO 10848 lo declare por bandas y de que
+el Anexo E de la EN 12354-1 tabule valores dependientes de la banda. El enfoque
+ondulatorio necesita placas delgadas frente a la longitud de onda de flexión, y
+modos suficientes en la banda para que la media angular en campo difuso de la
+sección 3 signifique algo, así que se degrada en baja frecuencia y en elementos
+pequeños. La conversión a ondas en el plano que descarta crece con la frecuencia
+y con la complejidad de la unión, de modo que la forma cerrada favorece a las
+uniones pesadas, rígidas y complicadas: el clip de la sección 2 enseña justo el
+precursor que se está despreciando. Y una viga articulada sin masa es un mal
+modelo de una unión que en realidad tiene masa y rigidez rotacional. La
+sección 5 entrega un único número independiente de la frecuencia directamente
+al modelo de EN 12354 en lugar de uno dependiente de la banda; cuando eso
+importe, la contraparte medida es la
+[guía de transmisión por flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/).
+
 Primero el objeto en sí: una unión en T donde un forjado de hormigón de 140 mm
 muere contra un muro continuo de 200 mm. Un resultado de `junction_transmission`
 retiene sus placas, así que `res.plot_geometry()` dibuja la unión a escala con
@@ -77,7 +94,14 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_es.svg" alt="Coeficiente de transmisión frente al ángulo de incidencia para una unión rígida en X de una placa de hormigón de 100 mm y otra de 200 mm, mostrando el coeficiente de esquina tau12 y el coeficiente de tramo recto tau13 cayendo desde sus valores a incidencia normal hasta cero en incidencia rasante, con sus medias angulares en campo difuso marcadas como líneas horizontales" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_es.svg" alt="Coeficiente de transmisión frente al ángulo de incidencia para una unión rígida en X de una placa de hormigón de 100 mm y otra de 200 mm. El coeficiente de esquina tau12 cae desde 0,064 en incidencia normal hasta exactamente cero en el ángulo de corte de 45 grados y ahí se queda, y la región más allá del corte está sombreada; el coeficiente de tramo recto tau13 cae desde 0,011 y sigue con suavidad hasta la incidencia rasante. Las dos medias angulares en campo difuso están marcadas como líneas horizontales." width="82%" />
+
+*El rasgo más marcado de esta figura es el corte. Más allá de
+$\theta_\text{co} = \arcsin\chi = 45°$ la placa receptora, más pesada, no tiene
+onda de flexión propagante que alimentar por el camino de esquina, así que
+$\tau_{12}$ es exactamente cero y ahí se queda, mientras que el camino recto
+sigue hasta la incidencia rasante. Por eso es $\chi$, una razón de números de
+onda, y no $\psi$, quien fija la forma de la curva.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -136,14 +160,64 @@ coeficiente de esquina es cero más allá del ángulo de corte,
 $\tau_{12}(\theta) = 0$ para $\chi < \sin\theta$.
 Las constantes de unión $J_1$, $J_2$, $J_3$ seleccionan la geometría:
 
-| Unión | $J_1$ | $J_2$ | $J_3$ |
-|---|---|---|---|
-| X | 1 | 1 | 1 |
-| T (1) | 2 | 0,5 | 0,5 |
-| T (2) | 2 | 2 | — |
-| L | 4 | 1 | — |
+Una unión en T tiene tres placas, y **cuál de ellas lleva la onda incidente** es
+toda la distinción entre sus dos casos. En la **unión en T (1)** la onda llega
+por uno de los dos miembros colineales, así que puede seguir de largo hacia la
+placa colineal *y* doblar la esquina hacia el ramal. En la **unión en T (2)**
+llega por el ramal, el pie de la T, de modo que los dos caminos disponibles son
+esquinas y no hay tramo recto ninguno. La figura que abre esta página es una T2
+justo por eso: el forjado de 140 mm es el ramal, y el muro de 200 mm pasa de
+largo.
+
+| Unión | Cadena de la API | $J_1$ | $J_2$ | $J_3$ |
+|---|---|---|---|---|
+| X | `"X"` | 1 | 1 | 1 |
+| T (1) | `"T1"` | 2 | 0,5 | 0,5 |
+| T (2) | `"T2"` | 2 | 2 | — |
+| L | `"L"` | 4 | 1 | — |
+| en línea | — | \* | \* | \* |
+
+\* La unión en línea no tiene constantes $J$: es un cambio de sección, no una
+esquina, así que la geometría es unidimensional. Véase más abajo.
 
 El tramo recto no está definido para la unión en T (2) ni para la unión en L.
+
+Dos placas parametrizan todo esto porque las formas cerradas describen una unión
+**simétrica**, en la que las placas opuestas son idénticas: en la X, la placa 3
+es copia de la 1 y la placa 4 copia de la 2; en la T (1), la placa 3 es copia de
+la 1; en la T (2), la placa 4 es copia de la 2. El propio ejemplo de unión en X
+de esta página es, por tanto, un cruce de dos placas de 100 mm y dos de 200 mm,
+no de cuatro placas distintas. Eso es una restricción real en un edificio real:
+un forjado que cambia por encima y por debajo de una unión, o un muro que
+continúa con otro espesor, no tiene forma cerrada aquí. Acótalo con los dos
+casos simétricos, o acude al $K_{ij}$ empírico del Anexo E de la EN 12354-1, o
+mídelo. La unión en L no necesita esa advertencia porque de verdad tiene dos
+placas, y tampoco la necesita, por otra razón, la unión en línea.
+
+### La unión en línea: un cambio de sección
+
+La unión en línea es el único caso de esta página en que las dos placas son
+colineales, así que no hay esquina y el aparato de $J_1/J_2/J_3$ no se aplica.
+Una losa de 100 mm que continúa como losa de 200 mm es una situación habitual
+en edificación, y tiene su propia forma cerrada a incidencia normal (Hopkins
+Ec. 5.14, según Cremer et al. 1973):
+
+$$
+\tau_{12}(0°) = \left[\frac{2(1+\chi)(1+\psi)\sqrt{\chi\psi}}
+{\chi(1+\psi)^2 + 2\psi(1+\chi^2)}\right]^2
+$$
+
+Solo está definida a incidencia normal, por la razón geométrica anterior; el
+módulo advierte de que el valor queda dentro de 1 dB de la media angular
+siempre que $\chi \ge 1$.
+
+`inline_transmission_coefficient(chi, psi)` la evalúa. Para el mismo par de
+hormigón de 100 mm / 200 mm de la figura anterior, con $\chi = 0{,}707$ y
+$\psi = 4{,}0$ de `junction_wave_parameters`, devuelve **0,936**, frente a
+exactamente 1 para placas idénticas. Duplicar el espesor de una losa que
+continúa deja pasar todavía el 94 % de la potencia incidente. Esa es la forma
+cuantitativa de «una placa continua transmite por completo», y es la razón de
+que un cambio de sección sea mal sitio donde buscar aislamiento.
 
 ```python
 import numpy as np
@@ -188,7 +262,8 @@ que sirven de oráculo desde primeros principios de la biblioteca:
 - esquina de la unión en L: $\tau_{ij}(\theta) = \cos^2\theta / 2$, luego
   $\bar{\tau}_{ij} = 1/3$;
 - unión en línea: $\tau_{12}(0°) = 1$ (una placa continua transmite por
-  completo).
+  completo; para un cambio de sección se aplica el
+  `inline_transmission_coefficient` de la sección 2).
 
 ```python
 from phonometry import angular_average_transmission_coefficient
@@ -294,8 +369,8 @@ flancos de EN 12354-1. Toma la unión en X de hormigón de 100 mm / 200 mm de la
 figura de $\tau(\theta)$ del apartado 2: su camino de esquina da
 $K_{12} = 9{,}8\ \text{dB}$.
 Entregarlo a
-`flanking_element` en lugar de un valor tabulado del Anexo E valora los tres
-trayectorias por flancos de la unión y su efecto sobre el índice aparente:
+`flanking_element` en lugar de un valor tabulado del Anexo E pone precio a las
+tres trayectorias por flancos de la unión y su efecto sobre el índice aparente:
 
 ```python
 from phonometry import building, junction_transmission
@@ -323,32 +398,6 @@ La contraparte de $K_{ij}$ medida según la EN 12354 (a partir de la diferencia
 de niveles de velocidad promediada en dirección) es el
 `vibration_reduction_index` separado de la transmisión por flancos; esta
 página es el valor *predicho* en forma cerrada del enfoque ondulatorio.
-
-## Qué cubre esta guía
-
-**Cubierto.** Los coeficientes de transmisión de unión rígida,
-independientes de la frecuencia, de Cremer, Heckl y Ungar (1973),
-tabulados por Craik (1981/1996) y recogidos en Hopkins (2007, apartado
-5.2.1.3), para las uniones X, T, L y en línea de placas delgadas,
-homogéneas e isótropas: los parámetros de onda $\chi$/$\psi$, los
-coeficientes de esquina y de tramo recto
-$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso,
-el factor de pérdidas por acoplamiento SEA y el índice de reducción
-vibratoria $K_{ij}$ del enfoque ondulatorio, mediante
-`junction_wave_parameters`, `corner_transmission_coefficient`,
-`straight_transmission_coefficient`,
-`angular_average_transmission_coefficient`, `coupling_loss_factor`,
-`wave_vibration_reduction_index` y `junction_transmission`.
-
-**No cubierto.** Este $K_{ij}$ predicho es una idealización en forma
-cerrada para una unión rígida y simplemente apoyada, no una medición: el
-$K_{ij}$ medido y empírico a partir de una diferencia de niveles de
-velocidad promediada en dirección (ISO 10848) es el
-`vibration_reduction_index` separado de la
-[guía de Transmisión por flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/).
-El coeficiente de tramo recto $\tau_{13}$ no está definido para las
-geometrías de unión T (2) y L, que no tienen una tercera placa colineal,
-así que ahí solo se aplica el camino de esquina.
 
 ## 6. SEA experimental: factores de acoplamiento a partir de energías medidas
 
@@ -384,8 +433,58 @@ $$
 
 La potencia inyectada se reduce a la potencia total disipada, como debe ser en
 régimen estacionario: sustituir la Ec. (6.11) en la Ec. (6.10) cancela
-exactamente los dos términos de acoplamiento, lo que es una comprobación
-gratuita de cualquier medida.
+exactamente los dos términos de acoplamiento, lo que es una comprobación que
+sale gratis en cualquier medida, y de las que hay que ejecutar sobre datos
+reales, no solo sobre el papel.
+
+### La medición que hay detrás de esos símbolos
+
+$E_i$ y $\Pi_\text{in}$ son magnitudes medidas, y la inversión vale lo que
+valgan ellas. La sección 6.6.4 de Norton describe el experimento; los requisitos
+de abajo son los que deciden si hay resultado o no.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_power_injection_rig_es.svg" alt="Dos estados del mismo experimento, uno al lado del otro. En cada uno hay dos placas unidas por un borde, una horizontal y otra vertical, con la línea de unión resaltada y varios acelerómetros repartidos por ambas placas lejos de los bordes y lejos del punto de excitación. En el primero, un excitador ataca la placa horizontal a través de una cabeza de impedancia, de modo que la potencia inyectada se mide en el subsistema uno y es nula en el subsistema dos; en el segundo, el excitador se ha trasladado a la placa vertical. Los dos estados llevan las energías en banda como la masa por la velocidad cuadrática media promediada en el espacio. Debajo se da la potencia inyectada como un medio de la parte real de la fuerza por la velocidad conjugada en el punto de excitación, la regla de promediado espacial de las velocidades, la afirmación de que un solo ensayo invierte únicamente si los factores de pérdidas internos se conocen por una medición de decaimiento mientras que dos ensayos resuelven los cuatro, y la exigencia de que las bandas contengan varios modos de cada subsistema." width="92%" />
+
+- **Mide la potencia inyectada, no la deduzcas.** Excita a través de un
+  transductor de fuerza o de una cabeza de impedancia para que
+  $\Pi_\text{in} = \tfrac{1}{2}\operatorname{Re}\{F v^*\}$ se forme en el punto
+  de excitación (Norton Ec. 6.50). Tomada del espectro cruzado de las señales de
+  fuerza y de velocidad es un promedio temporal y se porta bien con excitación
+  aleatoria de banda ancha; tomada de $\operatorname{Re}\{Z\}$ no, porque la
+  impedancia es pequeña justo en una resonancia y la estimación del factor de
+  pérdidas hereda entonces un error grande.
+- **Promedia las velocidades en el espacio.** $\langle v_i^2 \rangle$ es un
+  promedio espacial *y* temporal, así que exige varias posiciones de
+  acelerómetro por subsistema, lejos de los bordes y lejos del punto de
+  excitación, y repetir la excitación en varios puntos elegidos al azar para que
+  la excitación en un solo punto cumpla la hipótesis de independencia
+  estadística sobre la que se apoya el modelo.
+- **Elige bandas que contengan varios modos.** El balance SEA es un promedio
+  sobre los modos de una banda, así que la banda debe contener los suficientes,
+  que es para lo que sirven las densidades modales que calcula esta sección, y
+  la razón de que las calcule.
+- **Consigue $\eta_1$ y $\eta_2$ por separado, o excita dos veces.** La
+  inversión con una sola excitación de la Ec. (6.15) toma los factores de
+  pérdidas internos como *datos de entrada*. Salen de un experimento aparte
+  sobre los subsistemas desacoplados: una medición de decaimiento reverberante,
+  o la técnica de flujo de energía en régimen estacionario de Norton 6.5.3
+  ($\eta = \Pi_\text{in}/(\omega E)$, que necesita otra vez la misma medición de
+  potencia de entrada). Si no hay ninguna de las dos, excita cada subsistema por
+  turnos: es el esquema de dos excitaciones de más abajo, que no necesita ningún
+  valor previo.
+- **Deja fuera las pérdidas por los contornos.** El modelo de dos subsistemas
+  supone que la energía que sale del par por sus contornos lejanos es
+  despreciable: apoyos puntuales de hilo fino o almohadillas de espuma que
+  aproximen condiciones libre-libre es lo que usa la literatura. La carga de
+  masa, el amortiguamiento de contacto y la realimentación entre excitador y
+  estructura en el punto de excitación son los mismos errores que cuantifica la
+  [sección de transductores](/phonometry/es/vibration/structural/mechanical-mobility/)
+  de la guía de movilidad, y aquí se aplican sin cambios.
+- **Lee el acoplamiento contra el amortiguamiento.** El criterio de aceptación
+  de la propia figura: los factores de pérdidas por acoplamiento deben quedar al
+  menos un orden de magnitud por debajo de los factores de pérdidas internos, o
+  los subsistemas no están débilmente acoplados y el modelo no se sostiene.
+  `PowerInjectionResult.coupling_strength` da esa razón.
 
 `power_injection_clf` realiza esa inversión, y junto a ella están las
 densidades modales de la sección 6.4.1 de Norton:
@@ -479,9 +578,19 @@ intercambiables a lo largo del espectro.
 Cuando no se dispone de un valor independiente de los factores de pérdidas
 internos, la inversión con una sola excitación queda indeterminada, y el
 **método clásico de inyección de potencia** excita cada subsistema por turnos
-midiendo ambas energías en cada caso. Eso da cuatro ecuaciones para $\eta_1$,
+midiendo ambas energías en cada caso: los dos estados que dibuja el esquema de
+más arriba. Eso da cuatro ecuaciones para $\eta_1$,
 $\eta_2$, $\eta_{12}$ y $\eta_{21}$ sin ninguna hipótesis previa, que
-`power_injection_matrix` resuelve banda a banda. La reciprocidad pasa entonces a
+`power_injection_matrix` resuelve banda a banda, tomando los dos pares de
+energías y las dos potencias inyectadas y sin necesitar ninguna densidad modal.
+Cuesta una tanda más y elimina la medición que suele ser la más difícil de
+conseguir (el decaimiento desacoplado), que es la razón de que sea la forma
+clásica. Aplicado al ejemplo de plataforma y cilindro de la figura anterior
+devuelve un `modal_density_ratio` de 0,919, frente a un cociente geométrico
+`flat_plate_modal_density / cylindrical_shell_modal_density` de 0,919 para las
+mismas estructuras: que coincidan es la comprobación.
+
+La reciprocidad pasa entonces a
 ser una *comprobación* de la medida en lugar de un dato de entrada:
 `PowerInjectionResult.modal_density_ratio` es una propiedad, no una función, y
 devuelve únicamente el $n_1/n_2$ que *implican* los factores de pérdidas por
@@ -492,6 +601,48 @@ significa que las fronteras de los subsistemas se trazaron en el sitio
 equivocado. `coupling_strength` es el otro diagnóstico del mismo resultado, y
 dice si la hipótesis de acoplamiento débil sobre la que se apoya la inversión
 se sostiene siquiera.
+
+## Qué cubre esta guía
+
+**Cubierto.** Los coeficientes de transmisión de unión rígida,
+independientes de la frecuencia, de Cremer, Heckl y Ungar (1973),
+tabulados por Craik (1981/1996) y recogidos en Hopkins (2007, apartado
+5.2.1.3), para las uniones X, T, L y en línea de placas delgadas,
+homogéneas e isótropas: los parámetros de onda $\chi$/$\psi$, los
+coeficientes de esquina y de tramo recto
+$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso,
+el factor de pérdidas por acoplamiento SEA y el índice de reducción
+vibratoria $K_{ij}$ del enfoque ondulatorio, mediante
+`junction_wave_parameters`, `corner_transmission_coefficient`,
+`straight_transmission_coefficient`,
+`angular_average_transmission_coefficient`, `inline_transmission_coefficient`,
+`coupling_loss_factor`, `wave_vibration_reduction_index` y
+`junction_transmission`.
+
+La sección 6 cubre la vía **experimental** del capítulo 6 de Norton y Karczub:
+el balance de potencia de dos subsistemas y su inversión in situ
+(`power_injection_clf`, `power_injection_matrix`), las densidades modales de
+barras, vigas, placas planas y envolventes cilíndricas de pared delgada con la
+`ring_frequency` en torno a la que se reparten (`bar_modal_density`,
+`beam_modal_density`, `flat_plate_modal_density`,
+`cylindrical_shell_modal_density`), y las dos formas cerradas que quedan entre
+ambas vías (`right_angle_transmission_coefficient`,
+`point_connection_coupling_loss_factor`).
+
+**No cubierto.** Este $K_{ij}$ predicho es una idealización en forma
+cerrada para una unión rígida y simplemente apoyada, no una medición: el
+$K_{ij}$ medido y empírico a partir de una diferencia de niveles de
+velocidad promediada en dirección (ISO 10848) es el
+`vibration_reduction_index` separado de la
+[guía de Transmisión por flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/).
+El coeficiente de tramo recto $\tau_{13}$ no está definido para las
+geometrías de unión T (2) y L, que no tienen una tercera placa colineal,
+así que ahí solo se aplica el camino de esquina. Los coeficientes tabulados
+suponen además una unión *simétrica* (placas opuestas idénticas), y aquí no hay
+forma cerrada para una que no lo sea. Del lado experimental, la inversión de la
+sección 6 está escrita solo para **dos** subsistemas, y
+`PowerInjectionResult.modal_density_ratio` es una comprobación de coherencia que
+hace el lector, no una que automatice la biblioteca.
 
 ## Véase también
 

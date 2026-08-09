@@ -15,7 +15,7 @@ references:
     title: "Environmental technical manual — Volume I: Procedures for the noise certification of aircraft"
     designation: "Doc 9501, 3.ª ed."
     url: "https://store.icao.int/en/environmental-technical-manual-volume-1-procedures-for-the-noise-certification-of-aircraft-doc-9501-1"
-    note: "Los ejemplos trabajados (corrección tonal de la Tabla 3-7, EPNL por el método integrado de la Tabla 4-4) usados como oráculos numéricos."
+    note: "Los ejemplos resueltos (corrección tonal de la Tabla 3-7, EPNL por el método integrado de la Tabla 4-4) usados como oráculos numéricos."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 1995
@@ -48,7 +48,7 @@ espectral de tercio de octava (cada medio segundo) de un sobrevuelo en un único
 número, en EPNdB, mediante cinco pasos del **Anexo 16 de la OACI, Vol. I,
 Apéndice 2**. Esta página cubre las cuatro primitivas que construyen la métrica
 y el verificador de sistema de medida IEC 61265. Cada magnitud se valida contra
-los ejemplos trabajados del Manual Técnico Ambiental (ETM) Vol. I, Doc
+los ejemplos resueltos del Manual Técnico Ambiental (ETM) Vol. I, Doc
 9501 de la OACI.
 
 Cada nivel de certificación de esta página se exige en uno de los tres puntos
@@ -57,6 +57,25 @@ verlos antes que las matemáticas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification_es.svg" alt="Los tres puntos de certificación de ruido del Capítulo 3 del Anexo 16 de la OACI, en planta y alzado con la misma escala de distancias: una línea lateral de referencia paralela a la pista a 450 m donde el ruido de despegue es máximo, con un punto simétrico al otro lado; el punto de sobrevuelo sobre la prolongación del eje a 6 500 m del inicio del recorrido de despegue, bajo la subida inicial; y el punto de aproximación a 2 000 m del umbral, 120 m bajo la senda de 3 grados que corta el suelo 300 m más allá del umbral; los micrófonos van a 1,2 m del suelo y la métrica en los tres puntos es el EPNL en EPNdB" width="92%" />
 
+Tres puntos, porque un avión de transporte es ruidoso de tres maneras
+distintas. El punto **lateral**, sobre una línea a 450 m del costado de la pista
+y situado donde el ruido de despegue es máximo (§3.3.1 a), recoge el empuje de
+despegue completo con un ángulo de elevación bajo, que es donde más pesan el
+efecto suelo y la instalación de los motores. El punto de **sobrevuelo**, a
+6,5 km del inicio del recorrido de despegue sobre la prolongación del eje,
+recoge el avión después de la reducción de empuje, que es el caso de la
+población. El punto de **aproximación**, 2 000 m antes del umbral y 120 m por
+debajo de la senda de 3°, recoge una condición a baja potencia dominada por la
+estructura del avión y por el ventilador. Los tres se puntúan con el EPNL de
+esta página, pero los límites son distintos y no son números sueltos: el
+Capítulo 3 §3.4 los fija como rectas que crecen con la masa máxima de despegue
+certificada, 101 EPNdB en sobrevuelo para un bimotor de 385 000 kg o más, 104
+para un trirreactor y 106 para cuatro motores o más, frente a 103 en lateral y
+105 en aproximación en lo alto de sus propios intervalos de masa, así que un
+mismo EPNL puede cumplir en un punto e incumplir en otro. El micrófono va a
+1,2 m del suelo en todos los puntos, que es la razón por la que la sección de
+medida de más abajo se preocupa tanto de la incidencia rasante.
+
 ## Ruidosidad percibida y PNL
 
 Cada uno de los 24 niveles de banda de tercio de octava (50 Hz–10 kHz) se
@@ -64,6 +83,25 @@ convierte en una **ruidosidad** percibida en noys mediante la ley analítica a
 trozos de la Tabla A2-3, y se combinan en la ruidosidad total
 $N = 0{,}85\,n_{\max} + 0{,}15\sum n$ y el nivel de ruido percibido
 $\mathrm{PNL} = 40 + (10/\log_{10} 2)\,\log_{10} N$.
+
+El noy es una escala lineal de ruidosidad percibida: dos noys pretenden ser el
+doble de ruidosos que uno, y eso es lo que permite combinar las bandas
+aritméticamente en lugar de energéticamente. La conversión por banda es lineal a
+trozos en nivel, con pendientes que cambian de banda a banda, así que los mismos
+70 dB valen muchos más noys en 3 kHz que en 63 Hz: la ley lleva dentro la
+sensibilidad del oído igual que lo hace una línea isofónica, pero calibrada
+sobre juicios de *ruidosidad* y no de sonoridad. La regla de combinación es un
+enunciado de enmascaramiento, no una suma energética: la banda más ruidosa por
+sí sola se lleva el 85 % del total y todo lo demás junto se acredita con el
+15 %, que es la razón por la que un solo tono de ventilador puede dominar un
+espectro que sobre el papel es de banda ancha. El logaritmo consigue después una
+magnitud con aspecto de nivel: con $\mathrm{PNL} = 40 + 33{,}22\lg N$, un noy
+son 40 PNdB y cada duplicación de la ruidosidad total suma exactamente 10 PNdB.
+Trae consigo dos límites. La ley solo está tabulada para las 24 bandas de 50 Hz
+a 10 kHz, así que la energía fuera de ese intervalo es invisible para el EPNL
+por construcción; y los sobrevuelos típicos de transporte en los puntos de
+certificación caen entre unos 90 y 110 PNdB, que es la escala contra la que hay
+que leer un PNL impreso.
 
 ```python
 from phonometry import aircraft
@@ -74,7 +112,7 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 
 ## Corrección tonal
 
-Un tono puro se juzga mucho más molesto que la misma energía repartida por su
+Un tono puro se juzga mucho más ruidoso que la misma energía repartida por su
 banda de tercio de octava, así que las irregularidades espectrales (tonos de
 ventilador y de turbina) se penalizan con una **corrección tonal** $C$. El
 método de pendientes («encircling») reconstruye qué aspecto tendría el espectro
@@ -89,10 +127,10 @@ Tabla A2-2, y se toma el máximo sobre las bandas:
 | 50 Hz-400 Hz y 6,3-10 kHz | $F/3 - 0{,}5$ | $F/6$ | $3\tfrac{1}{3}$ dB |
 | 500 Hz-5 kHz | $2F/3 - 1$ | $F/3$ | $6\tfrac{2}{3}$ dB |
 
-La rama de frecuencias medias penaliza un tono el doble de duro, que es la razón
-por la que un tono de ventilador de 2500 Hz domina la corrección de un espectro
+La rama de frecuencias medias penaliza el doble un tono, que es la razón por la
+que un tono de ventilador de 2500 Hz domina la corrección de un espectro
 de turbofán. La implementación reproduce exactamente el ejemplo del turbofán de
-la Tabla 3-7 del ETM Vol. I de Doc 9501 de la OACI
+la Tabla 3-7 del ETM Vol. I del Doc 9501 de la OACI
 ($C = 2{,}0\ \text{dB}$ en 2500 Hz).
 
 El método trae dos trampas. Un espectro rizado pero sin tonos puede producir una
@@ -112,13 +150,81 @@ c = aircraft.tone_correction(spl)              # dB; se suma al PNL para dar PNL
 # en effective_perceived_noise_level más abajo.
 ```
 
+## Medir el sobrevuelo
+
+Lo que entra en la cadena es una historia temporal de **niveles de presión
+acústica de tercio de octava sin ponderar**: 24 bandas con frecuencias centrales
+nominales de 50 Hz a 10 kHz, un espectro cada 500 ms ± 5 ms (Ap. 2 §3.7.2). Esa
+cadencia está prescrita, y la duración de referencia de 10 s de la métrica de
+más abajo se fija con independencia de ella, que es de donde sale la constante
+de 13 dB del caso uniforme. Quien llegue con datos ponderados A, o con una
+cadencia de 1 s, obtiene un número de aspecto verosímil que no es un EPNL.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_noise_station_es.svg" alt="Una estación de medida para la certificación de ruido del Apéndice 2 del Anexo 16 de la OACI. El alzado del emplazamiento muestra la aeronave sobre su trayectoria de vuelo de referencia con el trayecto oblicuo dibujado hasta un micrófono, un cono libre de obstáculos de 80 grados de semiángulo en torno a la vertical dibujado como dos rayos discontinuos, con un árbol fuera de él y otro más alto que lo invade marcado como emplazamiento rechazado, un sensor de seguimiento independiente que apunta a la aeronave, y un mástil meteorológico de 10 metros con un anemómetro y un sensor de temperatura y humedad, anotado como situado a menos de 2000 m de la estación. Un detalle a mayor escala dibuja el propio micrófono: el elemento sensor a 1,2 m sobre el suelo local dentro de una pantalla antiviento cuya pérdida por inserción se mantiene dentro de más menos 1,5 dB y se corrige, con el rayo que llega. Una vista en planta muestra el eje de la cápsula perpendicular al plano de la trayectoria de vuelo, de modo que todo rayo llega a 90 grados, rasante, junto a un recuadro que dice 24 bandas de tercio de octava de 50 Hz a 10 kHz, una muestra cada 500 ms más menos 5 ms. El pie da la ventana de ensayo del avión: sin precipitación, de menos 10 a 35 grados Celsius y del 20 al 95 por ciento de humedad relativa sobre el trayecto por encima de 10 m, atenuación en 8 kHz no mayor de 12 dB por cada 100 m, viento no mayor de 6,2 metros por segundo de media y 7,7 de pico, viento cruzado no mayor de 3,6 y 5,1; la ventana del helicóptero de 5,1 y 2,6 metros por segundo; y al menos seis pasadas válidas por punto de medida con un límite de confianza del 90 por ciento que no supere más menos 1,5 EPNdB" width="92%" />
+
+La estación que produce esos espectros está fijada apartado por apartado.
+
+- **El micrófono.** El elemento sensor va a 1,2 m sobre el suelo local y se
+  orienta a incidencia rasante, con el elemento sustancialmente en el plano que
+  definen la trayectoria de vuelo de referencia prevista y la estación (§3.5.2);
+  en la práctica el eje de la cápsula apunta cruzando la traza, de modo que el
+  sonido llega a 90° de él durante todo el sobrevuelo. Su nivel de sensibilidad
+  en campo libre debe mantenerse dentro de ±1,0 dB del valor a la frecuencia de
+  comprobación de la calibración entre 50 Hz y 5 kHz, y dentro de ±2,0 dB en
+  6,3, 8 y 10 kHz (§3.5.3), y su respuesta direccional debe cumplir la
+  Tabla A2-1 (§3.5.4). La pérdida por inserción de la pantalla antiviento debe
+  quedar dentro de ±1,5 dB en ese mismo intervalo a incidencia rasante (§3.4) y
+  se corrige.
+- **El emplazamiento.** Terreno relativamente llano y sin absorción acústica
+  excesiva, es decir, sin hierba espesa, apelmazada o alta, ni matorral ni
+  arbolado, y sin ningún obstáculo que influya de forma apreciable en el campo
+  sonoro dentro de un cono de 80° de semiángulo en torno a la vertical que pasa
+  por el micrófono (§2.2.1). Quienes toman la medida cuentan como obstáculos.
+- **La ventana.** Para aviones: sin precipitación; de −10 °C a 35 °C y del 20 %
+  al 95 % de humedad relativa sobre el trayecto de propagación entre 10 m y la
+  aeronave; el coeficiente de atenuación en 8 kHz no mayor de 12 dB/100 m sobre
+  ese trayecto; viento medio a 10 m no mayor de 6,2 m/s con un máximo de 7,7 m/s,
+  y viento cruzado medio no mayor de 3,6 m/s con un máximo de 5,1 m/s
+  (§2.2.2.4.1). Para helicópteros los límites de viento se aprietan a 5,1 m/s y
+  2,6 m/s, y los límites de temperatura y humedad se aplican solo a 10 m. La
+  temperatura, la humedad, la velocidad y la dirección del viento se miden a
+  10 m sobre el suelo y a menos de 2 000 m del punto de medida de ruido
+  (§2.2.2.2).
+- **El seguimiento.** La posición de la aeronave se determina mediante un método
+  independiente de la instrumentación de vuelo de cabina y sincronizado en el
+  tiempo con el registro acústico al menos durante el intervalo en que el ruido
+  está a menos de 10 dB del $\mathrm{PNLTM}$ (§2.3.1-2.3.2), que es la ventana
+  sobre la que integra la métrica.
+- **La repetición.** Al menos seis pasadas válidas por punto de medida, y la
+  muestra debe ser lo bastante grande como para que el límite de confianza del
+  90 % sobre la media no supere ±1,5 EPNdB (§5.4.2).
+
 ## EPNL
 
-Sobre el sobrevuelo, $\mathrm{PNLT} = \mathrm{PNL} + C$, su máximo es
-$\mathrm{PNLTM}$, y la métrica integra $\mathrm{PNLT}$ sobre la ventana de
-10 dB por debajo (los registros más cercanos a $\mathrm{PNLTM} - 10$ a cada
-lado) normalizada a 10 s, de modo que $\mathrm{EPNL} = \mathrm{PNLTM} + D$ con
-la corrección por duración $D$.
+Sobre el sobrevuelo, $\mathrm{PNLT} = \mathrm{PNL} + C$ y su máximo es
+$\mathrm{PNLTM}$. La métrica convierte el nivel corregido por tonos de vuelta a
+energía, la suma sobre los registros comprendidos entre los dos puntos de 10 dB
+por debajo y la divide por una duración de referencia fija
+$t_0 = 10\ \text{s}$ (Ap. 2 §4.6),
+
+$$
+\mathrm{EPNL} = 10\lg\!\left[\frac{1}{t_0}\sum_k 10^{\mathrm{PNLT}(k)/10}\,
+\Delta t_k\right],
+$$
+
+de modo que el EPNL es el nivel de una exposición hipotética de 10 s que lleva la
+misma energía ponderada por ruidosidad que el suceso real. Para la cadencia
+uniforme de medio segundo esto se reduce a
+$10\lg\sum 10^{\mathrm{PNLT}(k)/10} - 13$, donde los 13 dB son
+$-10\lg(0{,}5/10)$. La duración de referencia fija es lo que hace de
+$D = \mathrm{EPNL} - \mathrm{PNLTM}$ una *corrección* y no una integral: un
+sobrevuelo que se queda cerca de su máximo mucho más de 10 s puntúa por encima
+del $\mathrm{PNLTM}$, y uno que pasa de largo puntúa por debajo. En el ejemplo de
+la Tabla 4-4 del ETM Vol. I el máximo es $\mathrm{PNLTM} = 97{,}40$ PNdB, la
+ventana de 10 dB por debajo va del registro 4 al 28 de 31 y abarca 10,2 s de
+incrementos, y el resultado es $D = -4{,}78$ dB y
+$\mathrm{EPNL} = 92{,}62$ EPNdB, un pelo por debajo del $\mathrm{PNLTM}$ porque
+la ventana es apenas más larga que la duración de referencia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_es.svg" alt="Historia temporal del nivel de ruido percibido de un sobrevuelo de aeronave: PNL y el PNLT corregido por tonos en función del tiempo, con el máximo PNLTM marcado y la ventana de integración de 10 dB por debajo sombreada, anotada con el EPNL resultante y la corrección por duración" width="82%" loading="eager" />
 
@@ -135,10 +241,13 @@ res.plot()   # historia temporal PNL/PNLT (requiere matplotlib)
 registro, la `tone_correction`, el `pnlt`, el máximo `pnltm`, el
 `bandsharing_adjustment`, la `duration_correction`, el `epnl` y los
 `band_limits` de 10 dB por debajo. Su argumento `procedure=` arranca el análisis
-en 80 Hz para un avión (el valor por defecto) y en 50 Hz para un helicóptero. El
-ejemplo del método integrado en condiciones de referencia de la Tabla 4-4 del
-ETM Vol. I, que es otra historia temporal de certificación distinta y real, se
-reproduce como $\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
+en 80 Hz para un avión (el valor por defecto) y en 50 Hz para un helicóptero, y
+`dt` puede ser un array por registro en lugar de un escalar, que es por donde
+entran los incrementos variables del método integrado. El ejemplo del método
+integrado en condiciones de referencia de la Tabla 4-4 del ETM Vol. I, que es
+otra historia temporal de certificación distinta y real, con incrementos de
+entre 0,395 s y 0,431 s, se reproduce como
+$\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -218,13 +327,94 @@ ficha informa de 114,0 EPNdB y de un NO CUMPLE frente a ese mismo límite de
 	caption="Ficha de certificación EPNL del Anexo 16 de la OACI (EPNLResult.report), EPNL en EPNdB con PNLTM y la corrección por duración D."
 />
 
+## De un sobrevuelo medido a un nivel de certificación
+
+Lo que ha calculado la sección anterior es el EPNL del vuelo *tal como se voló,
+el día en que se voló*. Un nivel de certificación es esa misma magnitud
+trasladada a un día de referencia fijo, con presión al nivel del mar de
+1 013,25 hPa, 25 °C al nivel del mar con el gradiente de la Atmósfera Estándar
+de la OACI, 70 % de humedad relativa y viento nulo (Capítulo 3 §3.6.1.5), y a
+una trayectoria de vuelo de referencia fija. El §8 del Apéndice 2 es ese
+traslado, y es la mitad que falta de la cadena.
+
+En el método simplificado (§8.3) cada banda del espectro de $\mathrm{PNLTM}$ se
+lleva al día de referencia con
+
+$$
+\mathrm{SPL}_R(i) = \mathrm{SPL}(i)
+ + 0{,}01\,[\alpha(i) - \alpha_R(i)]\,QK
+ + 0{,}01\,\alpha_R(i)\,(QK - Q_rK_r)
+ + 20\lg\frac{QK}{Q_rK_r},
+$$
+
+que cambia el coeficiente de absorción del día de ensayo por el de referencia
+sobre el trayecto medido, reabsorbe sobre la longitud de trayecto corregida y
+aplica un término de inverso del cuadrado por el cambio de longitud de trayecto
+(§8.3.2.1). El espectro ajustado se vuelve a pasar por la ley de noys y por la
+corrección tonal, se devuelve el ajuste por reparto de bandas del día de ensayo,
+y la diferencia $\Delta_1 = \mathrm{PNLTM}_R - \mathrm{PNLTM}$ es uno de los
+cuatro términos que se suman al EPNL medido:
+
+$$
+\mathrm{EPNL}_R = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
+ + \Delta_2 + \Delta_3
+$$
+
+(§8.3.6). $\Delta_{\text{peak}}$ se ocupa de un máximo secundario que quede a
+menos de 2 dB del $\mathrm{PNLTM}$ y que adelante al máximo ajustado (§8.3.3);
+$\Delta_2 = -7{,}5\lg(QK/Q_rK_r) + 10\lg(V_G/V_{GR})$ es el cambio de duración por
+la longitud de trayecto y la velocidad respecto al suelo (§8.3.4); y $\Delta_3$
+corrige la diferencia entre los parámetros operacionales de propulsión del vuelo
+de ensayo y los especificados para la condición de referencia, a partir de las
+curvas de sensibilidad del fabricante (§8.3.5). El §8.2.3 fija cuándo el
+método simplificado no basta y hay que usar en su lugar el método integrado: una
+discrepancia en sobrevuelo por encima de 8 EPNdB, una discrepancia en
+aproximación por encima de 4 EPNdB, o un resultado a menos de 1 EPNdB del límite
+del Capítulo 3.
+
+La biblioteca aporta los ingredientes y no la contabilidad. `air_attenuation` y
+`sae_band_attenuation`, más abajo, son exactamente los $\alpha(i)$ y
+$\alpha_R(i)$ de los dos primeros términos, y la maquinaria del EPNL vuelve a
+pasar un espectro ajustado con la misma facilidad que uno medido; la geometría de
+la trayectoria $QK/Q_rK_r$ y los cuatro términos $\Delta$ en sí no están
+implementados. Primero se ajusta y luego se informa: el EPNL que devuelve esta
+página es un valor del día de ensayo, y un veredicto de `requirement` solo es un
+veredicto de certificación una vez aplicado el §8.
+
 ## Verificación del sistema de medida (IEC 61265)
 
 `verify_aircraft_noise_system` comprueba el rendimiento medido contra las
 tolerancias de la IEC 61265:1995: los límites de respuesta direccional del
-micrófono (Tabla 1) y los límites escalares de respuesta en frecuencia,
-linealidad y resolución. El filtrado de tercio de octava lo cubre la
-verificación de clase 2 de filtros IEC 61260 de la biblioteca.
+micrófono (Tabla 1, idéntica a la Tabla A2-1 del Anexo 16) y los límites
+escalares de respuesta en frecuencia, linealidad y resolución.
+
+Los argumentos son datos medidos, no parámetros de configuración. La clave
+exterior de `directional` es una frecuencia central de tercio de octava en
+hercios; la clave interior es el
+ángulo de incidencia del sonido en grados respecto al eje principal del
+micrófono; y el valor es la **diferencia de nivel de sensibilidad en campo libre
+en decibelios respecto a 0°, incidencia normal**, medida con ondas sinusoidales
+en campo libre. En 4 kHz los límites son 0,5 / 1,0 / 2,0 / 2,5 / 2,5 dB en 30 /
+60 / 90 / 120 / 150°, así que el ejemplo de abajo cumple con margen. Esa
+comprobación importa porque el avión barre un intervalo amplio de ángulos de
+incidencia mientras el micrófono se queda quieto, y toda la estación está
+construida en torno a un sonido que llega a pocos grados de la rasante. Los
+valores de `frequency_response` son desviaciones en decibelios respecto al nivel
+a la frecuencia de comprobación de la calibración, en la dirección de referencia.
+
+Los datos salen de un giro del micrófono en campo libre anecoico con su pantalla
+antiviento puesta, o de una respuesta por actuador más las correcciones de campo
+libre del suministrador; la mitad eléctrica sale de inyectar una sinusoide de
+baja distorsión a menos de 5 dB del nivel de calibración e ir escalonándola en
+intervalos de 5 dB, afinados a 1 dB alrededor de los extremos del margen lineal y
+del punto de sobrecarga. El ensayo periódico se hace y se informa en un entorno
+controlado (19-25 °C, 100-102 kPa, 40-70 % de humedad relativa) con un calibrador
+trazable a patrones nacionales. `report["passed"]` se lee como un veredicto sobre
+los datos que has aportado: una comprobación fallida invalida los datos de
+certificación, no es una corrección que aplicar. La conformidad de los filtros de
+banda es asunto aparte: el §3.7.3 del Anexo 16 exige clase 1 de IEC 61260, y la
+clase 2 solo se admite si la autoridad certificadora lo permite, y la
+verificación de filtros de la propia biblioteca es donde eso se comprueba.
 
 ```python
 from phonometry import aircraft
@@ -247,6 +437,19 @@ $\delta_t = \alpha\,s$ a la atenuación de banda $\delta_B$, consistente con el
 método exacto mucho más allá del límite de 50 dB del método aproximado.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_es.svg" alt="Absorción atmosférica aeronáutica frente a la frecuencia para dos distancias; la atenuación de banda del método SAE queda por debajo del valor de tono puro medio de banda a alta absorción" width="82%" />
+
+Una banda de tercio de octava no es un tono. El coeficiente de absorción sube con
+fuerza con la frecuencia, así que el borde inferior de una banda se atenúa mucho
+menos que su frecuencia central, y a medida que el trayecto se alarga la energía
+de banda que sobrevive la lleva casi entera esa mitad inferior. La atenuación de
+banda se va quedando por tanto cada vez más atrás del valor de tono puro, que es
+lo que muestran las dos curvas: a 1 km son indistinguibles por debajo de unos
+pocos kilohercios y solo se separan en lo alto del intervalo, mientras que a
+7 620 m la diferencia en alta frecuencia es grande, que es justo el régimen que
+el antiguo método aproximado de ARP 866B, limitado a 50 dB, no podía seguir. La
+consecuencia para el §8 es directa: corregir un sobrevuelo a condiciones de
+referencia con el coeficiente de tono puro exagera la corrección en alta
+frecuencia, y con ella el EPNL del día de referencia.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -284,7 +487,14 @@ att = aircraft.sae_band_attenuation(freqs, path_length=7620.0,
 att.plot()   # banda frente a tono puro medio de banda (requiere matplotlib)
 ```
 
-Válido ~6–32 °C, 20–95 % HR (ventana 14 CFR Part 36), hasta 7620 m, recíproco.
+La regresión se ajustó para aproximadamente 6-32 °C y 20-95 % de humedad
+relativa, la ventana de ensayo de 14 CFR Part 36, y para longitudes de trayecto
+de hasta 7 620 m (25 000 ft); los valores por defecto de la función, 25 °C y
+70 % de HR, son el punto de referencia de ARP 5534 y el día de referencia del
+Anexo 16. La aplicación es recíproca, así que la misma llamada sirve para las
+dos direcciones del ajuste a condiciones de referencia: quitar la absorción del
+día de ensayo de un registro medido, y volver a aplicarle la absorción del día
+de referencia.
 
 La cadena de certificación termina aquí. Convertir estos aviones en ruido
 alrededor de un aeropuerto, las tablas nivel-potencia-distancia, las
@@ -304,7 +514,11 @@ sistema de medida de la IEC 61265:1995 mediante `verify_aircraft_noise_system`.
 La absorción atmosférica en banda de la SAE ARP 5534 mediante
 `sae_band_attenuation`.
 
-**No cubierto.** `verify_aircraft_noise_system` comprueba las tolerancias de
+**No cubierto.** El ajuste del §8 del Apéndice 2 de un EPNL medido a condiciones
+de referencia no está implementado, ni en su forma simplificada ni en la
+integrada: el EPNL que se devuelve es el valor tal cual se ha medido, así que
+primero se ajusta y luego se informa frente a un límite.
+`verify_aircraft_noise_system` comprueba las tolerancias de
 la IEC 61265:1995, no la edición sucesora de 2018. La cadena de ruido de
 aeropuerto de ECAC Doc 29 se ha trasladado a
 [Ruido de aeropuertos](/phonometry/es/aircraft/airport-noise/).
@@ -314,4 +528,11 @@ aeropuerto de ECAC Doc 29 se ha trasladado a
 - [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/aircraft/airport-noise/):
   el motor NPD y la cadena de contornos de evento único alrededor de un
   aeropuerto.
+- [Ruido de helicópteros: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
+  el método de ECAC Doc 32, cuyo EPNL de evento único es esta misma cadena del
+  Apéndice 2 alimentada por un hemisferio de ruido en lugar de por un sobrevuelo
+  de certificación.
+- [La base de datos de flota ANP](/phonometry/es/aircraft/anp-fleet/): las tablas
+  nivel-potencia-distancia medidas para tipos reales, que es donde acaban los
+  datos de certificación para el trabajo de modelado.
 - Referencia de la API: [`aircraft.certification`](/phonometry/es/reference/api/aeroacoustics/certification/) y [`aircraft.atmospheric_absorption`](/phonometry/es/reference/api/aeroacoustics/atmospheric-absorption/).

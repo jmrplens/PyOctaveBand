@@ -7,9 +7,9 @@ read that as the middle of a sentence: it reads it as a list item, a block
 quote or an ordered list, and it ends the paragraph there. The author sees a
 paragraph; the reader gets two blocks, or worse.
 
-Three checks. The first two are the same defect seen twice, and they are not
-equally visible; the third is a different one with the same shape, a source
-that looks right and renders wrong.
+Four checks. The first two are the same defect seen twice, and they are not
+equally visible; the third and fourth are different ones with the same shape,
+a source that looks right and renders wrong.
 
 1. **Unclosed inline maths.** An inline ``$...$`` that wraps onto a block
    marker never closes: the marker ends the paragraph first. The maths is then
@@ -38,8 +38,22 @@ that looks right and renders wrong.
    so five of the six the corpus had went unreported. The fix the corpus
    already used in two places is an ASCII ``<span id=...>`` above the heading.
 
-Display maths (``$$``) is exempt: it is a block of its own and the delimiters
-are on their own lines.
+4. **An opening ``$$`` with the formula on the same line.** Display maths is a
+   fence, and like a code fence everything after the opening delimiter is read
+   as *meta*, not as content. So ``$$\\tau = ...`` opens a block that only ends
+   at the next line that is exactly ``$$``, and a trailing ``$$`` at the end of
+   the second line does not close it. The block then swallows the document
+   until the next display block, which becomes its terminator: two hundred
+   lines of prose vanished into a maths node, and the first ``{`` past the
+   stolen terminator was handed to MDX as JavaScript. The build failed with
+   ``Could not parse expression with acorn`` pointing two hundred lines away
+   from the cause, and took five later checks down with it, each reporting a
+   half-built site rather than the defect. If the tail does close on the same
+   line the failure is silent instead: it parses as *inline* maths, so a
+   centred display equation ships as a small one in the run of text.
+
+Only that opening form is a hazard: a ``$$`` alone on its line is exactly what
+the convention wants, opening and closing.
 
 Usage::
 
@@ -80,6 +94,10 @@ _PROSE = re.compile(r"^\s{0,3}[^\s\-*+>#|<:0-9]")
 #: percent-encode on the way out.
 _ANCHOR = re.compile(r"\]\(#([^)]+)\)")
 
+#: An opening display-maths fence with the formula on the same line. The tail
+#: is the fence's meta, so the block does not end where the author thinks.
+_MATH_META = re.compile(r"^\$\$\s*\S")
+
 
 def _unescaped_dollars(line: str) -> int:
     """Inline ``$`` delimiters on a line, ignoring ``\\$`` and ``$$``."""
@@ -119,6 +137,21 @@ def _check(path: pathlib.Path) -> list[str]:
                     f"dangling anchor. Put <span id=\"ascii-slug\"></span> above the heading "
                     f"and link to that, as the pages that already hit this do."
                 )
+
+        if _MATH_META.match(line):
+            closes_here = line.rstrip().endswith("$$")
+            problems.append(
+                f"{rel}:{number}: {line.strip()[:40]!r} puts the formula on the opening "
+                f"'$$', where it is read as the fence's meta, not as maths. "
+                + (
+                    "It closes on this line, so it ships as inline maths instead of a "
+                    "centred display block."
+                    if closes_here
+                    else "Nothing closes it until a line that is exactly '$$', so it "
+                    "swallows the prose in between and breaks the build far from here."
+                )
+                + " Put '$$' alone on its own line, above and below."
+            )
 
         if number > 1 and _QUOTE.match(line) and _PROSE.match(lines[number - 2]):
             problems.append(

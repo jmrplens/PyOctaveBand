@@ -172,7 +172,16 @@ def _showfilter(
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2)
-    ax.axhline(-3, color="#d62728", linestyle="--", alpha=0.5, linewidth=1, label="-3 dB")
+    # The -3 dB line is a reference, so it is drawn quieter than the responses
+    # it is read against -- but quieter by *colour*, not by opacity. Half
+    # opacity of this red is a soft pink over the white page and lands within
+    # a few levels of the dark one, so the same call reads on one theme and
+    # vanishes on the other; theme_line keeps the softness where there is room
+    # for it and raises the colour where there is not.
+    from .._plot.common import theme_line
+
+    ax.axhline(-3, color=theme_line("#d62728", ax, quiet=0.5), linestyle="--",
+               linewidth=1, label="-3 dB")
 
     ax.set_title("Filter Bank Frequency Response", fontweight="bold", pad=15)
     ax.set_xlabel("Frequency [Hz]")

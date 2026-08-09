@@ -177,6 +177,15 @@ _FILL_DELTA_E: Final = 12.0
 #: colour-difference evaluation walk into a different final weight).
 _FILL_WEIGHT_STEPS: Final = 512
 
+#: Contrast ratio a de-emphasised *stroke* keeps against the page it is drawn
+#: on.  3:1 is the WCAG 2.2 non-text minimum, written for exactly this: a
+#: graphical object whose shape carries the meaning.  A fill is measured
+#: perceptually instead (:data:`_FILL_DELTA_E`) because a wash covers enough
+#: area for hue and chroma to register; a line is one or two pixels wide, so
+#: only the luminance step against the page survives, and that is what the
+#: WCAG ratio measures.
+_LINE_CONTRAST_MIN: Final = 3.0
+
 
 def _srgb_to_lab(rgb: tuple[float, float, float]) -> tuple[float, float, float]:
     """CIE L*a*b* (D65, 2 degree observer) of a 0-1 sRGB triple."""
@@ -386,6 +395,107 @@ def _fill_weight(
             p + weight * (h - p) for p, h in zip(page, hue, strict=True)
         )
         if delta_e_2000((red, green, blue), page) >= delta_e:
+            return weight
+    return 1.0
+
+
+def relative_luminance(color: tuple[float, float, float]) -> float:
+    """WCAG 2.2 relative luminance of a 0-1 sRGB triple."""
+    linear = [
+        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+        for c in color
+    ]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+
+def contrast_ratio(
+    first: tuple[float, float, float], second: tuple[float, float, float]
+) -> float:
+    """WCAG 2.2 contrast ratio between two 0-1 sRGB triples, 1 to 21."""
+    light, dark = sorted(
+        (relative_luminance(first), relative_luminance(second)), reverse=True
+    )
+    return (light + 0.05) / (dark + 0.05)
+
+
+def theme_line(
+    color: ColorType,
+    ax: Axes | None = None,
+    *,
+    quiet: float,
+    background: str | None = None,
+    ratio: float = _LINE_CONTRAST_MIN,
+) -> tuple[float, float, float]:
+    """De-emphasised *stroke* colour that still reads on the page it sits on.
+
+    The line counterpart of :func:`theme_fill`, and the answer to the same
+    mistake: ``alpha`` is not a dimming knob, it is a mix with whatever is
+    behind.  A companion curve drawn at ``alpha=0.55`` of a hue composites
+    *towards the page*, so one call reads as a soft tint of the hue on the
+    white page and lands within a couple of levels of the near-black one --
+    the ISO 3745 microphone hemisphere shipped invisible exactly that way.  A
+    stroke has no area for hue to register either, so what is left on a dark
+    page is nothing at all.
+
+    ``quiet`` is the emphasis the author wanted, on the scale the ``alpha`` it
+    replaces used: 0 is the page and 1 is the hue at full strength.  The
+    colour returned is that mix made opaque -- identical on the light page,
+    where the mix was legible all along -- *raised* towards the hue on any
+    page where it would not clear ``ratio``.  So the light theme keeps the
+    tint it had, the dark theme gets a colour that can be seen, and the
+    hierarchy the author drew (this line is quieter than that one) survives
+    on both.
+
+    Being opaque, it also stops the line dulling the gridlines it crosses and
+    survives the fiche PDF pipeline, which drops alpha::
+
+        ax.plot(f, companion, color=theme_line(_C_PRIMARY, ax, quiet=0.55))
+
+    :param color: Base hue, any matplotlib colour specification.  Pass the
+        page's own ink (``ax.xaxis.label.get_color()``) for a neutral line:
+        mixing the page towards its ink darkens on white and lightens on
+        black, which is the grey that was wanted on both.
+    :param ax: Axes whose patch colour is the page; ``None`` reads the current
+        ``axes.facecolor`` setting.
+    :param quiet: Emphasis in 0-1, read as the ``alpha`` it replaces.
+    :param background: Explicit page colour, overriding ``ax``.
+    :param ratio: Minimum WCAG contrast against the page; the default is the
+        2.2 non-text minimum of 3:1.
+    :return: The stroke colour as an ``(r, g, b)`` triple in 0-1 sRGB.
+    """
+    from matplotlib.colors import to_rgb
+
+    if not 0.0 <= quiet <= 1.0:
+        raise ValueError("'quiet' must be in 0-1.")
+    hue = to_rgb(color)
+    page = _page_color(ax, background)
+    weight = max(quiet, _line_weight(hue, page, ratio))
+    red, green, blue = (
+        p + weight * (h - p) for p, h in zip(page, hue, strict=True)
+    )
+    return (red, green, blue)
+
+
+@lru_cache(maxsize=256)
+def _line_weight(
+    hue: tuple[float, float, float],
+    page: tuple[float, float, float],
+    ratio: float,
+) -> float:
+    """Smallest grid weight mixing ``page`` towards ``hue`` to reach ``ratio``.
+
+    The same fixed grid as :func:`_fill_weight`, for the same reason: the
+    weight has to be a quantised function of its inputs or the committed
+    figure bytes drift.  A hue too close to the page to reach ``ratio`` at all
+    (a pale tint asked to carry a line over white) returns the hue itself,
+    which is the strongest the caller offered.
+    """
+    for step in range(1, _FILL_WEIGHT_STEPS + 1):
+        weight = step / _FILL_WEIGHT_STEPS
+        red, green, blue = (
+            p + weight * (h - p) for p, h in zip(page, hue, strict=True)
+        )
+        if contrast_ratio((red, green, blue), page) >= ratio:
             return weight
     return 1.0
 

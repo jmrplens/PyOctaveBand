@@ -536,17 +536,17 @@ L 603.800781 190.075344
    <g id="line2d_54">
     <path d="M 45.800781 312.199738 
 L 603.800781 312.199738 
-" clip-path="url(#p0f0d135f91)" style="fill: none; stroke: #ffffff; stroke-opacity: 0.15; stroke-linecap: square"/>
+" clip-path="url(#p0f0d135f91)" style="fill: none; stroke: #595959; stroke-linecap: square"/>
    </g>
    <g id="line2d_55">
     <path d="M 413.150781 388.678125 
 L 413.150781 28.318125 
-" clip-path="url(#p0f0d135f91)" style="fill: none; stroke-dasharray: 1,1.65; stroke-dashoffset: 0; stroke: #1f77b4; stroke-opacity: 0.5"/>
+" clip-path="url(#p0f0d135f91)" style="fill: none; stroke-dasharray: 1,1.65; stroke-dashoffset: 0; stroke: #185d8d"/>
    </g>
    <g id="line2d_56">
     <path d="M 394.550781 388.678125 
 L 394.550781 28.318125 
-" clip-path="url(#p0f0d135f91)" style="fill: none; stroke-dasharray: 1,1.65; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.5"/>
+" clip-path="url(#p0f0d135f91)" style="fill: none; stroke-dasharray: 1,1.65; stroke-dashoffset: 0; stroke: #1c671c"/>
    </g>
    <g id="patch_3">
     <path d="M 45.800781 388.678125 

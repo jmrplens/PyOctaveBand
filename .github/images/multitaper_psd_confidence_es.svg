@@ -9625,7 +9625,7 @@ L 700.638437 236.842846
 L 700.66629 224.46225 
 L 700.721973 191.074355 
 L 700.721973 191.074355 
-" clip-path="url(#pcb5f8e5bf3)" style="fill: none; stroke: #808080; stroke-opacity: 0.45; stroke-width: 0.7; stroke-linecap: square"/>
+" clip-path="url(#pcb5f8e5bf3)" style="fill: none; stroke: #959595; stroke-width: 0.7; stroke-linecap: square"/>
    </g>
    <g id="line2d_78">
     <path d="M 59.600174 65.293533 
@@ -11757,7 +11757,7 @@ z
      <path d="M 52.633594 346.557813 
 L 61.633594 346.557813 
 L 70.633594 346.557813 
-" style="fill: none; stroke: #808080; stroke-opacity: 0.45; stroke-width: 0.7; stroke-linecap: square"/>
+" style="fill: none; stroke: #959595; stroke-width: 0.7; stroke-linecap: square"/>
     </g>
     <g id="text_22">
      <!-- Un solo taper de Slepian ($K$ = 1, $\nu$ = 2) -->

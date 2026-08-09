@@ -59,7 +59,8 @@ STOI/ESTOI cuando dispongas de un par antes/después.
 `pystoi` (una reimplementación pública del MATLAB de los autores) se usa solo
 como contraste externo en la batería de pruebas. phonometry reimplementa ambas
 medidas a partir de los dos artículos y nunca importa `pystoi` en tiempo de
-ejecución; ambas coinciden muy por debajo de `1e-3` sobre entradas comunes.
+ejecución; ambas coinciden con diferencias muy por debajo de `1e-3` sobre
+entradas comunes.
 :::
 
 ## 1. El procesado inicial común
@@ -74,12 +75,39 @@ bandas de tercio de octava** de las magnitudes DFT desde un centro mínimo de
 comparación. La frecuencia de muestreo de las entradas es libre, la biblioteca
 remuestrea internamente.
 
+Ambas medidas están definidas para **habla continua**, y el procesado inicial es
+donde muerde esa suposición: la regla de los 40 dB se apoya en el margen dinámico
+de la señal *limpia*, así que existe para impedir que las pausas entre palabras
+dominen la correlación. Una señal sin pausas, ruido estacionario, un tono
+sostenido o música sin huecos, no pierde nada por ella y el índice pierde su
+sentido; una grabación que es casi toda silencio lo pierde casi todo y la llamada
+da error en lugar de devolver un número. Tienen que sobrevivir al menos unos
+**0,4 s de habla activa**.
+
 ```python
+import numpy as np
 from phonometry import stoi
 
-d = stoi(clean, degraded, fs)          # STOI, remuestreado a 10 kHz por dentro
-print(round(d.value, 3))               # un escalar en torno a [0, 1]
-print(stoi(clean, clean, fs).value)    # 1.0  (una señal contra sí misma)
+fs = 10000
+rng = np.random.default_rng(11)
+n = 4 * fs
+t = np.arange(n) / fs
+
+# Material tipo habla: ruido de banda limitada bajo una envolvente silábica de
+# 3,5 Hz, para que la regla de tramas silenciosas tenga pausas sobre las que
+# actuar.
+spectrum = np.fft.rfft(rng.standard_normal(n))
+spectrum[(np.fft.rfftfreq(n, 1 / fs) < 200) | (np.fft.rfftfreq(n, 1 / fs) > 4000)] = 0
+carrier = np.fft.irfft(spectrum, n)
+clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
+
+noise = rng.standard_normal(n)
+noise *= np.sqrt(np.mean(clean ** 2) / np.mean(noise ** 2))   # SNR de 0 dB
+degraded = clean + noise
+
+d = stoi(clean, degraded, fs)               # STOI, remuestreado a 10 kHz por dentro
+print(round(d.value, 3))                    # 0.708
+print(round(stoi(clean, clean, fs).value, 6))   # 1.0  (una señal contra sí misma)
 ```
 
 Todo hasta los segmentos de 384 ms es común; las dos medidas solo se separan
@@ -87,6 +115,67 @@ en la correlación. El diagrama despliega la cadena con los números del
 ejemplo del enmascarador plano.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility_es.svg" alt="Diagrama de bloques de la cadena de procesado de STOI y ESTOI: una referencia limpia y una versión degradada, en el ejemplo de la guía material tipo habla en un enmascarador plano a 0 dB de relación señal-ruido, se remuestrean a 10 kilohercios descartando las tramas silenciosas, pasan por una DFT de corto plazo de tramas Hann de 256 muestras con 50 por ciento de solape agrupada en 15 bandas de tercio de octava desde 150 hercios, y se comparan en segmentos de 384 milisegundos; la cadena se divide después en la correlación de envolventes con recorte de STOI y la correlación espectral normalizada por filas y columnas de ESTOI, y el ejemplo da STOI igual a 0,727, con la banda más baja conservando 0,27 de la correlación y las bandas por encima de 1,9 kilohercios llegando a 0,90" width="92%" />
+
+### Conseguir un par válido
+
+Los dos argumentos no son «dos señales» sin más. Tienen que ser la **misma
+locución**, con la **misma longitud** y **alineadas con precisión de muestra**, y
+esto último es el fallo que más puntuaciones cuesta en la práctica, porque nada
+en el resultado lo distingue de una degradación genuina. Ambas medidas
+correlacionan envolventes de corto plazo dentro de segmentos de 384 ms, así que
+un retardo constante las descorrelaciona directamente. Sobre el par de arriba,
+desplazar la señal degradada 20 ms lleva la puntuación de 0,708 a 0,329; sobre un
+par *perfecto*, esos mismos 20 ms llevan el 1,0 a 0,459 y 50 ms lo vuelven
+negativo. Media sílaba basta para convertir un buen realce en uno malo sobre el
+papel.
+
+La biblioteca impone la igualdad de longitud y nada más: no alinea, así que es
+quien llama el que compensa antes cualquier latencia algorítmica. Correlaciona
+las envolventes de banda ancha (o antepón un chirp corto de marca), desplaza y
+recorta luego ambas al tramo común. Si las dos señales pasaron por relojes de
+reproducción y de captura distintos, vigila además la *deriva*: un desplazamiento
+fijo no puede corregir una diferencia de frecuencia de muestreo, así que
+remuestrea al reloj de referencia o graba a través de un solo equipo. La
+comprobación que merece la pena hacer una vez en cualquier cadena nueva es el par
+de líneas de arriba: `stoi(x, x, fs).value` vale 1.0, y
+`stoi(x, np.roll(x, k), fs)` se desploma deprisa con `k`.
+
+Lo que *no* hace falta igualar es el nivel: la normalización por segmento hace a
+ambas medidas invariantes a la ganancia de la señal degradada. Lo que hay que
+acertar es la alineación; la ganancia, no.
+
+Tres condiciones dan error en lugar de devolver un valor, y conviene
+reconocerlas: longitudes distintas, muestras no finitas y que sobrevivan menos de
+30 tramas de corto plazo a la eliminación de tramas silenciosas, que son los
+~0,4 s de habla activa mencionados arriba.
+
+### Capturar la señal degradada a través de un equipo real
+
+Todo lo anterior supone que la señal degradada se produjo numéricamente. En
+cuanto se captura acústicamente, un audífono sobre un oído artificial en una caja
+de ensayo, unos auriculares o un bucle de altavoz y micrófono, cuatro cosas pasan
+a ser responsabilidad de quien mide:
+
+- **La referencia limpia sigue siendo el archivo original.** Volver a grabarla
+  por la misma cadena elimina justo la distorsión que se está evaluando, y
+  además rompe la selección de tramas silenciosas, que se deriva solo de la señal
+  limpia.
+- **La cadena de captura se puntúa como degradación.** La respuesta del altavoz,
+  el ruido de fondo de la caja de ensayo y el ruido propio del micrófono entran
+  todos en el índice medido, así que mide el bucle una vez con el equipo puenteado
+  y declara ese número como el suelo de la comparación.
+- **Reproduce al nivel de trabajo del equipo.** El *índice* es invariante al
+  nivel; el *equipo* no lo es: un compresor o un reductor de ruido se comportan
+  de otra manera a otro nivel de entrada.
+- **Repite.** Una sola captura arrastra la variabilidad entre repeticiones del
+  camino acústico; declara la dispersión sobre varias capturas, no un solo
+  número.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_stoi_bench_es.svg"
+  alt="El banco para un par capturado acústicamente. Un archivo de habla limpia se bifurca en dos caminos: el superior va directo a la comparación, etiquetado como el archivo original y nunca una regrabación; el inferior pasa por un amplificador y un altavoz de reproducción calibrados hasta una caja de ensayo que aloja el equipo bajo ensayo, un audífono sobre un oído artificial o unos auriculares sobre un simulador de torso, y sale por un micrófono de captura y su preamplificador. Ambos caminos se encuentran en un bloque de alinear y recortar cuyas llamadas dicen correlacionar las envolventes, igual longitud y un solo reloj, y solo entonces entran en la cadena de STOI y ESTOI. Una llamada a trazos bajo el camino inferior dice que hay que recorrerlo una vez con el equipo puenteado, porque el altavoz, el ruido de la caja y el micrófono se puntúan también como degradación, y un pie dice que hay que reproducir al nivel de trabajo del equipo y repetir la captura"
+  width="94%"
+/>
 
 ## 2. STOI: correlación de envolventes con recorte
 
@@ -101,22 +190,33 @@ d_{j,m} = \frac{\sum_n (x_j(n) - \bar{x}_j)\,(\bar{y}_j(n) - \bar{\bar{y}}_j)}
                {\lVert x_j - \bar{x}_j \rVert\,\lVert \bar{y}_j - \bar{\bar{y}}_j \rVert}.
 $$
 
+donde $x_j(n)$ es la envolvente temporal de corto plazo limpia de la banda $j$ en
+la trama $n$ dentro del segmento $m$ de 30 tramas; $\bar{y}_j(n)$ es la
+envolvente *degradada* después de la normalización de ganancia por segmento y del
+recorte a $\beta = -15$ dB, de modo que ese acento marca el procesado y no una
+media; una barra sobre una magnitud completa ($\bar{x}_j$, $\bar{\bar{y}}_j$) es
+su media sobre el segmento; y $\lVert\cdot\rVert$ es la norma euclídea sobre esas
+mismas 30 tramas. Así que $d_{j,m}$ es una correlación de Pearson corriente en
+$[-1, 1]$.
+
 El índice es el promedio de esas correlaciones intermedias sobre todas las
-bandas $j$ y segmentos $m$ (Ec. 6). Como la normalización divide una ganancia por
+bandas $j$ y segmentos $m$ (Ec. 6), y las dos marginales de ese promedio son lo
+que exponen `band_scores` y `segment_scores`. Como la normalización divide una ganancia por
 segmento, STOI es **invariante al nivel de reproducción** de la señal degradada,
 y a mayor SNR corresponde una puntuación monótonamente mayor.
 
 ```python
-import numpy as np
 from phonometry import stoi
 
-fs = 10000
-rng = np.random.default_rng(1)
-clean = rng.standard_normal(3 * fs)
+# La señal `clean` tipo habla de la sección 1, degradada con cuatro relaciones
+# señal-ruido. Conviene que la referencia siga siendo tipo habla: una referencia
+# gaussiana plana no tiene pausas, así que la regla de los 40 dB no elimina nada
+# y el índice pierde su sentido.
 for snr_db in (-10, 0, 10, 20):
     g = 10.0 ** (-snr_db / 20.0)
     noisy = clean + g * rng.standard_normal(clean.size)
     print(snr_db, round(stoi(clean, noisy, fs).value, 3))
+# -10 0.083 | 0 0.484 | 10 0.858 | 20 0.956
 ```
 
 El `STOIResult` incluye la correlación media por banda (`band_scores`) y las
@@ -167,6 +267,53 @@ ax.set_xlabel("Banda de tercio de octava [Hz]")
 ax.set_ylabel("Correlación intermedia media")
 ax.set_title(f"STOI = {res.value:.3f}")
 plt.show()
+```
+
+</details>
+
+El perfil por bandas es una de las marginales del promedio; la otra es el tiempo,
+y responde a una pregunta que la vista por bandas no puede responder:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_segment_scores_es.svg"
+  alt="Dos paneles apilados sobre cuatro segundos. Arriba: la forma de onda de la referencia limpia con pausas silábicas, tres de sus 311 tramas de corto plazo sombreadas porque caen más de 40 dB por debajo de la trama más intensa y se descartan, y una región de corte de señal de 0,35 segundos marcada. Abajo: las puntuaciones de STOI por segmento para dos degradaciones de la misma referencia. El ruido estacionario a 0 dB da una serie plana en torno a 0,77 para un STOI de 0,772; un corte de señal de 0,35 segundos deja la serie en 1,0 en todas partes salvo un hundimiento profundo por debajo de cero a lo largo del corte, y aun así promedia un STOI mayor, de 0,874"
+  width="94%"
+/>
+
+*Dos degradaciones de la misma referencia, y el escalar las ordena al revés: el
+corte de señal puntúa **0,874** frente al **0,772** del enmascarador
+estacionario, porque una catástrofe corta se diluye en el promedio y una
+degradación leve en todas partes no. La marginal temporal las separa de
+inmediato: una serie es plana y la otra es perfecta salvo en un puñado de
+segmentos. Ese es el diagnóstico al que hay que recurrir
+cuando un STOI bajo no tiene causa evidente: un transitorio, un corte o un
+artefacto de procesado aparecen aquí y en ningún otro sitio. Las tramas
+sombreadas de arriba son las que descarta la regla de los 40 dB, que es lo que
+significa en concreto que «la entrada tiene que tener dinámica de habla».*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# El mismo material de la sección 1 pero con silencio entre las palabras, para
+# que algunas tramas caigan de verdad 40 dB por debajo de la más intensa.
+fig_rng = np.random.default_rng(11)
+freq = np.fft.rfftfreq(n, 1 / fs)
+spec = np.fft.rfft(fig_rng.standard_normal(n))
+spec[(freq < 200) | (freq > 4000)] = 0
+env = np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2
+ref = np.fft.irfft(spec, n) * np.where(env < 0.08, 0.0, env)
+
+masker = fig_rng.standard_normal(n)
+masker *= np.sqrt(np.mean(ref ** 2) / np.mean(masker ** 2))
+steady = stoi(ref, ref + masker, fs)
+
+hole = np.ones(n)
+hole[int(1.6 * fs):int(1.95 * fs)] = 0.0        # un corte de 0,35 s
+dropout = stoi(ref, ref * hole, fs)
+
+print(round(steady.value, 3), round(dropout.value, 3))   # 0.772 0.874
+print(round(float(dropout.segment_scores.min()), 3))     # -0.078
 ```
 
 </details>
@@ -233,6 +380,40 @@ plt.show()
 ```
 
 </details>
+
+### Parámetros de `stoi()`
+
+| Parámetro | Tipo | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `clean` | array 1D | cualquiera | no vacío | La referencia limpia; la medida es invariante al nivel, así que la calibración da igual |
+| `degraded` | array 1D | cualquiera | misma longitud que `clean` | Misma locución, misma frecuencia de muestreo, alineada muestra a muestra |
+| `fs` | int | Hz | > 0 | Frecuencia de muestreo de *ambas* señales; se remuestrea a 10 kHz por dentro |
+| `extended` | bool | — | def. `False` | `True` selecciona ESTOI |
+
+Devuelve un `STOIResult`: `value`, `band_scores` (15), `segment_scores`,
+`band_frequencies` y `extended`. Da error con longitudes distintas, con entradas
+no finitas y cuando sobreviven menos de 30 tramas de corto plazo a la eliminación
+de tramas silenciosas.
+
+### Cómo leer el valor
+
+El índice bruto no tiene interpretación absoluta, y tampoco pretende tenerla. El
+paso de $d$ a un porcentaje de palabras entendidas es una logística ajustada a un
+corpus y a un grupo de oyentes concretos, que la biblioteca deliberadamente no
+implementa, así que un mismo $d$ predice puntuaciones distintas para materiales
+distintos, y citar «STOI = 0,73» como una inteligibilidad es un error de
+categoría.
+
+De ahí sale la práctica de trabajo. Mantén fijos el material, los hablantes, la
+alineación y la duración de análisis, y declara la **diferencia** entre
+condiciones (el ΔSTOI entre un procesador y su entrada sin procesar) junto con el
+número de locuciones sobre el que se promedió, porque los valores de una sola
+locución dispersan. Atiende también a la forma: el índice satura cerca de 1 para
+las degradaciones leves y se aplana por el extremo bajo, así que una mejora de
+0,85 a 0,90 vale mucho más en inteligibilidad que una de 0,35 a 0,40; monótono no
+significa lineal. Y cuando dos condiciones puntúan parecido, las vistas por banda
+y por segmento son los diagnósticos que dicen si llegaron ahí por el mismo
+camino.
 
 ## 4. Qué medida usar y cuándo
 

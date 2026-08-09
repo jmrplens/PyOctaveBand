@@ -13,7 +13,7 @@ a regulation quotes. Everything here is embedded by a page under
 import matplotlib.pyplot as plt
 import numpy as np
 
-from phonometry._plot.common import theme_fill
+from phonometry._plot.common import theme_fill, theme_line
 
 from .i18n import _LANG
 from .theme import (
@@ -189,11 +189,13 @@ def generate_facade_prediction(output_dir: str) -> None:
 
     x = np.arange(len(bands))
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    # Per-element partial indices Rp: thin, faded; they set the transmission floor.
+    # Per-element partial indices Rp: thin and held back, because they set the
+    # transmission floor rather than being the answer. Held back by shade, not
+    # by opacity: a faded blue or red is a faded page on the dark theme.
     el_colors = [COLOR_PRIMARY, COLOR_SECONDARY, "#9467bd", "#ff7f0e"]
     for (name, rp), colour in zip(result.element_r.items(), el_colors):
-        ax.plot(x, rp, "--", color=colour, linewidth=1.1, alpha=0.65,
-                marker=".", markersize=6, label=f"Rp — {name}")
+        ax.plot(x, rp, "--", color=theme_line(colour, ax, quiet=0.65),
+                linewidth=1.1, marker=".", markersize=6, label=f"Rp — {name}")
     # Façade apparent reduction R' and standardized level difference D2m,nT.
     ax.plot(x, result.r_prime, "-", color=COLOR_FG, linewidth=2.6, marker="o",
             markersize=6, zorder=5, label="R′ (façade)")
@@ -1308,8 +1310,11 @@ def generate_composite_facade_weak_element(output_dir: str) -> None:
                    for w in window]
         ax.plot(window, overall, "-", color=colour, linewidth=2.4, zorder=4,
                 label=f"blind part RA = {blind:g} dBA")
-        ax.axhline(blind, color=colour, linewidth=1.0, linestyle=":",
-                   alpha=0.6, zorder=2)
+        # The asymptote belongs to its own curve, so it keeps the colour and
+        # steps back in shade. Stepping back in opacity would step it back
+        # into the dark page, where the blue and the red both disappeared.
+        ax.axhline(blind, color=theme_line(colour, ax, quiet=0.6),
+                   linewidth=1.0, linestyle=":", zorder=2)
 
     marks = ((26.0, 40.0, -4.6, -2.0), (26.0, 50.0, -4.6, 1.4),
              (31.0, 40.0, -3.6, 1.4))

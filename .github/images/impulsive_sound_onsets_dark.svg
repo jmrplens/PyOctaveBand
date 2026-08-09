@@ -415,7 +415,7 @@ L 671.191665 348.621184
 L 673.210151 349.217128 
 L 675.228636 349.498751 
 L 675.228636 349.498751 
-" clip-path="url(#pb699398c5a)" style="fill: none; stroke: #4c4c4c; stroke-width: 1.2; stroke-linecap: square"/>
+" clip-path="url(#pb699398c5a)" style="fill: none; stroke: #b2b2b2; stroke-width: 1.2; stroke-linecap: square"/>
    </g>
    <g id="line2d_26">
     <defs>
@@ -541,7 +541,7 @@ z
      <path d="M 649.205 51.021016 
 L 659.205 51.021016 
 L 669.205 51.021016 
-" style="fill: none; stroke: #4c4c4c; stroke-width: 1.2; stroke-linecap: square"/>
+" style="fill: none; stroke: #b2b2b2; stroke-width: 1.2; stroke-linecap: square"/>
     </g>
     <g id="text_17">
      <!-- $L_{pAF}$ -->

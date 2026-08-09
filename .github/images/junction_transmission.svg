@@ -36,6 +36,14 @@ L 50.467969 28.318125
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="patch_3">
+    <path d="M 374.966797 400.915781 
+L 699.465625 400.915781 
+L 699.465625 28.318125 
+L 374.966797 28.318125 
+z
+" clip-path="url(#p5011d223a8)" style="fill: #f9dede; stroke: #f9dede; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -539,71 +547,117 @@ L 699.465625 216.851061
 L 699.465625 361.107409 
 " clip-path="url(#p5011d223a8)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.3"/>
    </g>
-   <g id="patch_3">
+   <g id="line2d_39">
+    <path d="M 374.966797 400.915781 
+L 374.966797 28.318125 
+" clip-path="url(#p5011d223a8)" style="fill: none; stroke-dasharray: 8.96,2.24,1.4,2.24; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.4"/>
+   </g>
+   <g id="patch_4">
     <path d="M 50.467969 400.915781 
 L 50.467969 28.318125 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="patch_4">
+   <g id="patch_5">
     <path d="M 699.465625 400.915781 
 L 699.465625 28.318125 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="patch_5">
+   <g id="patch_6">
     <path d="M 50.467969 400.915781 
 L 699.465625 400.915781 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="patch_6">
+   <g id="patch_7">
     <path d="M 50.467969 28.318125 
 L 699.465625 28.318125 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
+   <g id="patch_8">
+    <path d="M 473.825332 129.790163 
+Q 425.121634 175.951549 377.229402 221.343828 
+" style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
+    <path d="M 381.294456 220.108783 
+L 377.229402 221.343828 
+L 378.680398 217.350758 
+" style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
+   </g>
    <g id="text_20">
-    <g id="patch_7">
-     <path d="M 60.202934 92.506211 
-L 256.782621 92.506211 
-Q 261.782621 92.506211 261.782621 87.506211 
-L 261.782621 39.496055 
-Q 261.782621 34.496055 256.782621 34.496055 
-L 60.202934 34.496055 
-Q 55.202934 34.496055 55.202934 39.496055 
-L 55.202934 87.506211 
-Q 55.202934 92.506211 60.202934 92.506211 
+    <!-- $\theta_\mathrm{co} = 45°$: $\tau_{12} = 0$ beyond it -->
+    <g transform="translate(418.233307 124.128951)">
+     <text>
+      <tspan x="0" y="-0.703125" style="font-style: oblique; font-size: 9.5px; font-family: sans-serif">θ</tspan>
+      <tspan x="48.517261" y="-0.703125" style="font-style: oblique; font-size: 9.5px; font-family: sans-serif">τ</tspan>
+      <tspan x="5.812256" y="0.72187" style="font-size: 6.65px; font-family: sans-serif">c</tspan>
+      <tspan x="9.468457" y="0.72187" style="font-size: 6.65px; font-family: sans-serif">o</tspan>
+      <tspan x="54.236743" y="0.72187" style="font-size: 6.65px; font-family: sans-serif">1</tspan>
+      <tspan x="58.467676" y="0.72187" style="font-size: 6.65px; font-family: sans-serif">2</tspan>
+      <tspan x="15.647632" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">=</tspan>
+      <tspan x="25.458423" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">4</tspan>
+      <tspan x="31.502612" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">5</tspan>
+      <tspan x="37.546802" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">°</tspan>
+      <tspan x="42.296802" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">:</tspan>
+      <tspan x="45.497485" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif"> </tspan>
+      <tspan x="64.809204" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">=</tspan>
+      <tspan x="74.619995" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">0</tspan>
+      <tspan x="80.664185" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif"> </tspan>
+      <tspan x="83.68396" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">b</tspan>
+      <tspan x="89.714233" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">e</tspan>
+      <tspan x="95.55896" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">y</tspan>
+      <tspan x="101.18103" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">o</tspan>
+      <tspan x="106.993286" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">n</tspan>
+      <tspan x="113.014282" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">d</tspan>
+      <tspan x="119.044556" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif"> </tspan>
+      <tspan x="122.064331" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">i</tspan>
+      <tspan x="124.703735" y="-0.703125" style="font-size: 9.5px; font-family: sans-serif">t</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_21">
+    <g id="patch_9">
+     <path d="M 60.202934 242.370078 
+L 256.782621 242.370078 
+Q 261.782621 242.370078 261.782621 237.370078 
+L 261.782621 177.357188 
+Q 261.782621 172.357188 256.782621 172.357188 
+L 60.202934 172.357188 
+Q 55.202934 172.357188 55.202934 177.357188 
+L 55.202934 237.370078 
+Q 55.202934 242.370078 60.202934 242.370078 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 48.095469)">X-junction: 100 mm / 200 mm concrete</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 60.098203)">chi = 0.707,  psi = 4.000</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 72.100156)">corner avg = 0.0331</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 84.102891)">straight avg = 0.0072</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 185.956602)">X-junction: 100 mm / 200 mm concrete</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 197.959336)">chi = 0.707,  psi = 4.000</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 209.96207)">theta_co = arcsin(chi) = 45.0 deg</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 221.964023)">corner avg = 0.0331</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.202934 233.966758)">straight avg = 0.0072</text>
    </g>
-   <g id="text_21">
+   <g id="text_22">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="374.966797" y="16.318125" transform="rotate(-0 374.966797 16.318125)">Bending-wave transmission at a rigid X-junction (Hopkins 5.2.1.3)</text>
    </g>
    <g id="legend_1">
-    <g id="patch_8">
-     <path d="M 589.780938 89.70375 
-L 693.165625 89.70375 
-Q 694.965625 89.70375 694.965625 87.90375 
+    <g id="patch_10">
+     <path d="M 574.185625 103.295859 
+L 693.165625 103.295859 
+Q 694.965625 103.295859 694.965625 101.495859 
 L 694.965625 34.618125 
 Q 694.965625 32.818125 693.165625 32.818125 
-L 589.780938 32.818125 
-Q 587.980938 32.818125 587.980938 34.618125 
-L 587.980938 87.90375 
-Q 587.980938 89.70375 589.780938 89.70375 
+L 574.185625 32.818125 
+Q 572.385625 32.818125 572.385625 34.618125 
+L 572.385625 101.495859 
+Q 572.385625 103.295859 574.185625 103.295859 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
-    <g id="line2d_39">
-     <path d="M 591.580938 40.198125 
-L 600.580938 40.198125 
-L 609.580938 40.198125 
+    <g id="line2d_40">
+     <path d="M 575.985625 40.198125 
+L 584.985625 40.198125 
+L 593.985625 40.198125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
-    <g id="text_22">
+    <g id="text_23">
      <!-- corner $\tau_{12}(\theta)$ -->
-     <g transform="translate(616.780938 43.348125)">
+     <g transform="translate(601.185625 43.348125)">
       <text>
        <tspan x="0" y="-0.09375" style="font-size: 9px; font-family: sans-serif">c</tspan>
        <tspan x="4.948242" y="-0.09375" style="font-size: 9px; font-family: sans-serif">o</tspan>
@@ -621,15 +675,15 @@ L 609.580938 40.198125
       </text>
      </g>
     </g>
-    <g id="line2d_40">
-     <path d="M 591.580938 53.790234 
-L 600.580938 53.790234 
-L 609.580938 53.790234 
+    <g id="line2d_41">
+     <path d="M 575.985625 53.790234 
+L 584.985625 53.790234 
+L 593.985625 53.790234 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
-    <g id="text_23">
+    <g id="text_24">
      <!-- straight $\tau_{13}(\theta)$ -->
-     <g transform="translate(616.780938 56.940234)">
+     <g transform="translate(601.185625 56.940234)">
       <text>
        <tspan x="0" y="-0.09375" style="font-size: 9px; font-family: sans-serif">s</tspan>
        <tspan x="4.688965" y="-0.09375" style="font-size: 9px; font-family: sans-serif">t</tspan>
@@ -649,23 +703,55 @@ L 609.580938 53.790234
       </text>
      </g>
     </g>
-    <g id="line2d_41">
-     <path d="M 591.580938 67.290937 
-L 600.580938 67.290937 
-L 609.580938 67.290937 
+    <g id="line2d_42">
+     <path d="M 575.985625 67.290937 
+L 584.985625 67.290937 
+L 593.985625 67.290937 
 " style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.3"/>
     </g>
-    <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="616.780938" y="70.440937" transform="rotate(-0 616.780938 70.440937)">corner average</text>
+    <g id="text_25">
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="601.185625" y="70.440937" transform="rotate(-0 601.185625 70.440937)">corner average</text>
     </g>
-    <g id="line2d_42">
-     <path d="M 591.580938 80.791641 
-L 600.580938 80.791641 
-L 609.580938 80.791641 
+    <g id="line2d_43">
+     <path d="M 575.985625 80.791641 
+L 584.985625 80.791641 
+L 593.985625 80.791641 
 " style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.3"/>
     </g>
-    <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="616.780938" y="83.941641" transform="rotate(-0 616.780938 83.941641)">straight average</text>
+    <g id="text_26">
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="601.185625" y="83.941641" transform="rotate(-0 601.185625 83.941641)">straight average</text>
+    </g>
+    <g id="line2d_44">
+     <path d="M 575.985625 94.38375 
+L 584.985625 94.38375 
+L 593.985625 94.38375 
+" style="fill: none; stroke-dasharray: 8.96,2.24,1.4,2.24; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.4"/>
+    </g>
+    <g id="text_27">
+     <!-- cut-off $\theta_\mathrm{co} = \arcsin\chi$ -->
+     <g transform="translate(601.185625 97.53375)">
+      <text>
+       <tspan x="0" y="-0.09375" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="4.948242" y="-0.09375" style="font-size: 9px; font-family: sans-serif">u</tspan>
+       <tspan x="10.652344" y="-0.09375" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="14.181152" y="-0.09375" style="font-size: 9px; font-family: sans-serif">-</tspan>
+       <tspan x="17.428711" y="-0.09375" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="22.935059" y="-0.09375" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="26.103516" y="-0.09375" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="29.271973" y="-0.09375" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="46.956885" y="-0.09375" style="font-size: 9px; font-family: sans-serif">=</tspan>
+       <tspan x="56.251318" y="-0.09375" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="61.766455" y="-0.09375" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="65.46665" y="-0.09375" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="70.414893" y="-0.09375" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="75.103857" y="-0.09375" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="77.604346" y="-0.09375" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="32.132812" y="-0.09375" style="font-style: oblique; font-size: 9px; font-family: sans-serif">θ</tspan>
+       <tspan x="84.769658" y="-0.09375" style="font-style: oblique; font-size: 9px; font-family: sans-serif">χ</tspan>
+       <tspan x="37.63916" y="1.256246" style="font-size: 6.3px; font-family: sans-serif">c</tspan>
+       <tspan x="41.10293" y="1.256246" style="font-size: 6.3px; font-family: sans-serif">o</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

@@ -156,19 +156,44 @@ references:
     title: "Principles of Sonar Performance Modelling"
     publisher: "Springer/Praxis"
     doi: "10.1007/978-3-540-87662-5"
-    note: "The Weston shallow-water propagation regimes (section 9.1.1.2, Equations 9.42 to 9.61 and Table 9.1), the Medwin sound-speed formula (Equation 1.2) and the seven numeric sonar worked examples of chapters 3 and 11 that pin the sonar-equation section."
+    note: "Los regímenes de propagación en aguas someras de Weston (sección 9.1.1.2, Ecuaciones 9.42 a 9.61 y Tabla 9.1), la fórmula de velocidad del sonido de Medwin (Ecuación 1.2) y los siete ejemplos numéricos de sonar resueltos de los capítulos 3 y 11 que fijan la sección de la ecuación del sonar."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
-Propagación submarina de forma cerrada, complemento de los niveles de referencia
-de la página de [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/):
-la **pérdida por transmisión**, la **velocidad del sonido** en agua de mar, la
-**ecuación del sonar**, la **pérdida por reflexión en el fondo** y el espectro de
-**ruido ambiental oceánico**.
+Esta página calcula en forma cerrada lo que el mar le hace a un nivel sonoro,
+sin simular ningún campo. Al terminarla sabrás poner un número a la pérdida por
+transmisión de un trayecto, elegir los modelos de absorción y de velocidad del
+sonido que le convienen a tu agua, seguir los cuatro regímenes de aguas someras
+de Weston conforme el lecho marino le va quitando el mando a la geometría,
+equilibrar una ecuación del sonar pasiva o activa e invertirla para obtener un
+alcance de detección, evaluar la pérdida por reflexión en el fondo que fija esos
+regímenes y construir un espectro de ruido ambiental con los términos de viento,
+térmico y de tráfico marítimo. Los niveles de referencia en que se expresa cada
+resultado están en la página de
+[Acústica submarina](/phonometry/es/underwater/underwater-acoustics/); cuando la
+refracción y los contornos deciden la respuesta, toman el relevo los
+[métodos numéricos](/phonometry/es/underwater/underwater-solvers/).
+
+<span id="perdida-por-transmision"></span>
 
 ## Pérdida por transmisión
+
+**Son dos magnitudes, y la ISO 18405 las mantiene separadas.** La *pérdida por
+transmisión* es la reducción de un nivel especificado entre dos puntos
+especificados; la *pérdida por propagación* es la diferencia entre el nivel de
+fuente y el nivel de presión acústica cuadrático medio en una posición,
+referida a 1 m². La ecuación del sonar necesita la magnitud referida a la
+fuente, así que lo que esta página calcula en realidad es una pérdida por
+propagación, y la norma desaconseja usar cualquiera de los dos nombres como
+sinónimo del otro, aunque la literatura y el propio nombre de función
+`transmission_loss` sigan el uso antiguo. Cualquiera de las dos magnitudes hay
+que declararla con el tiempo de promediado y el margen de frecuencia a los que
+se aplica. En las geometrías de esta página ambas son numéricamente
+intercambiables, porque la distancia de referencia es 1 m en las dos, y por eso
+la pérdida por propagación de Weston de más abajo se dibuja en el mismo eje que
+la pérdida por transmisión de aquí.
 
 La pérdida por transmisión es
 
@@ -227,6 +252,61 @@ for model in ("ainslie-mccolm", "thorp"):
 tl.plot()   # TL frente a distancia con la separación divergencia/absorción
 ```
 
+Dos argumentos de esa llamada deciden más de lo que parece. `depth` es solo la
+profundidad a la que se evalúa el coeficiente de absorción (una profundidad
+representativa del trayecto, porque $\alpha$ cae con la presión) y **no** es la
+profundidad del agua ni fija la ley de divergencia. $R_0$ es la distancia a la
+que el frente de onda ha llenado el conducto, así que es del orden de la
+profundidad del agua en una guía somera, o del espesor del canal en un conducto
+SOFAR: un canal de 100 m pide un $R_0$ cercano a 100 m, no los 1 km usados
+arriba, que corresponden a un trayecto de aguas profundas. La elección no es
+cosmética. Frente a la figura de mérito de 87 dB que se trabaja más abajo, la
+divergencia solo esférica sitúa la detección en 8,7 km y la ley práctica con
+$R_0 = 1000$ m en 15,8 km: el mismo océano, siete kilómetros de diferencia.
+
+El modelo de absorción importa menos, y vale la pena ver cuánto menos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seawater_absorption_es.svg" alt="A la izquierda, el coeficiente de absorción de volumen de 10 hercios a 1 megahercio para los modelos de Francois-Garrison, Ainslie-McColm y Thorp a 10 grados Celsius, 35 partes por mil y 100 metros, con las regiones de relajación del ácido bórico, del sulfato de magnesio y del agua pura anotadas sobre la curva de referencia; a la derecha, la desviación de los otros dos modelos respecto a Francois-Garrison en tanto por ciento, con una banda sombreada de más menos diez por ciento" width="92%" />
+
+*Ainslie-McColm se queda dentro del ±10 % de la referencia de
+Francois-Garrison en toda la banda, que es lo que lo hace un sustituto legítimo.
+Thorp no: va un 20 % alto por debajo de unos pocos cientos de hercios y se
+desploma por encima de ~60 kHz, porque es un ajuste solo en frecuencia con agua
+a 4 °C cerca de 1000 m cocido dentro y sin temperatura, salinidad ni
+profundidad que darle.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+freqs = np.logspace(1.0, 6.0, 500)
+env = {"temperature": 10.0, "salinity": 35.0, "depth": 100.0}
+alpha = {m: np.asarray(underwater.seawater_absorption(freqs, model=m, **env))
+         for m in ("francois-garrison", "ainslie-mccolm", "thorp")}
+
+fig, (ax_a, ax_r) = plt.subplots(1, 2, figsize=(13.5, 5.4))
+for name, style in (("francois-garrison", "-"), ("ainslie-mccolm", "--"),
+                    ("thorp", ":")):
+    ax_a.loglog(freqs, alpha[name], style, label=name)
+    if name != "francois-garrison":
+        ax_r.semilogx(freqs, 100.0 * (alpha[name] / alpha["francois-garrison"] - 1.0),
+                      style, label=name)
+ax_a.set(xlabel="Frecuencia [Hz]", ylabel="alpha [dB/km]")
+ax_r.set(xlabel="Frecuencia [Hz]", ylabel="Desviación respecto a Francois-Garrison [%]",
+         ylim=(-70, 90))
+for ax in (ax_a, ax_r):
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend()
+plt.show()
+```
+
+</details>
+
+<span id="regimenes-de-aguas-someras-de-weston"></span>
+
 ### Regímenes de aguas someras de Weston
 
 Fijar a mano la ley de divergencia funciona en mar abierto, pero en aguas
@@ -242,14 +322,26 @@ a partir de la reflectividad del fondo:
 | Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
 | Modo único | Ec. (9.54), exponencial | más pronunciada que $15 \log_{10} r$ | — |
 
-$\psi_c = \arccos(c_w/c_{sed})$ es el ángulo rasante crítico, $\eta$ el
-**gradiente de pérdida por reflexión** en neperios por radián ($|R(\theta)|
-\approx e^{-\eta\theta}$) y $H_e$ la profundidad efectiva de Weston, el nivel
-poco por debajo del fondo real en el que parece situarse un contorno de presión
-nula. `weston_propagation_loss` compone la pérdida $PL = -10 \log_{10} F$ y devuelve
-además la ley propia de cada régimen; el campo `boundaries` lleva las tres
-distancias de transición junto con la frecuencia de corte de la guía de ondas y
-el número de modos propagantes.
+Aquí $r$ es la distancia, $H$ la profundidad del agua, $k = 2\pi f/c_1$ el
+número de onda acústico en la columna de agua, $\psi_c = \arccos(c_1/c_2)$ el
+ángulo rasante crítico que fijan las velocidades del sonido del agua y del
+sedimento, $\eta$ el **gradiente de pérdida por reflexión** en neperios por
+radián ($|R(\theta)| \approx e^{-\eta\theta}$) y $H_e$ la **profundidad efectiva
+de Weston**: el nivel poco *por debajo* del fondo real en el que parece situarse
+un contorno de presión nula, de modo que $H_e > H$ y las dos letras no son
+intercambiables (que es todo el contenido de la nota de errata de más abajo).
+
+`weston_propagation_loss` compone la pérdida y devuelve además la ley propia de
+cada régimen; el campo `boundaries` lleva las tres distancias de transición
+junto con la frecuencia de corte de la guía de ondas y el número de modos
+propagantes. Lo que devuelve es una **pérdida por propagación**
+$PL = -10\log_{10} F$: el cociente incoherente, promediado en distancia, entre
+las presiones cuadráticas medias recibida y de fuente, con el término de
+absorción sumado aparte. Para las geometrías de esta página es directamente
+comparable con la pérdida por transmisión de arriba y con el resultado modal
+promediado en profundidad (la diferencia entre las dos magnitudes de la
+ISO 18405 es la convención de distancia de referencia, no la física), y por eso
+ambas se dibujan en el mismo eje.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
 
@@ -283,9 +375,8 @@ print(underwater.reflection_loss_gradient("sand"))   # 0.278 Np/rad
 ```
 
 Al ser un resultado *incoherente*, el flujo describe el campo promediado en
-distancia, y eso es justo lo que lo convierte en referencia para los métodos numéricos
-numéricos de
-[Métodos numéricos de propagación
+distancia, y eso es justo lo que lo convierte en referencia para los
+[métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/).
 Con el ángulo crítico a 90° y el gradiente de pérdida a cero, la rama cilíndrica
 se reduce a $F = \pi/(rH)$, el límite exacto de muchos modos de una guía ideal;
@@ -308,11 +399,17 @@ Chen-Millero** (`model="unesco"`, el valor por defecto, en la forma Wong & Zhu
 contrario que en los modelos de absorción de arriba, con guion), **Mackenzie**
 (`"mackenzie"`) o **Medwin** (`"medwin"`), todas de 1974-1981. La profundidad se
 convierte a
-presión con Leroy & Parthiot (1998). Las cuatro coinciden en ~2,5 m/s; el valor de
-verificación canónico de Mackenzie es 1550,744 m/s a 25 °C, 35 ‰, 1000 m. La
-forma de seis términos de Medwin es la más basta de la familia y la que está
-detrás de las reglas clásicas $\partial c/\partial T \approx 4.6 - 0.110\,T$ m/s
-por °C y $\partial c/\partial z \approx 0.016$ m/s por metro.
+presión con Leroy & Parthiot (1998). **Dentro del dominio que comparten las
+cuatro coinciden en torno a 1 m/s**: 0,98 m/s a 25 °C, 35 ‰ y 1000 m, y
+0,52 m/s en todo el kilómetro superior del perfil dibujado más abajo, así que la
+elección va de rango de validez, no de exactitud. El valor de verificación
+canónico de Mackenzie es 1550,744 m/s a 25 °C, 35 ‰, 1000 m. La forma de seis
+términos de Medwin es la más basta de la familia y la que está detrás de las
+reglas clásicas $\partial c/\partial T \approx 4.6 - 0.110\,T$ m/s por °C y
+$\partial c/\partial z \approx 0.016$ m/s por metro; está ajustada hasta unos
+1000 m en aguas someras y cálidas, y llevada a 5000 m se separa de las otras
+casi 6 m/s, que es el único desacuerdo grande de la familia y es por entero
+cuestión de usarla fuera de su dominio.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed_es.svg" alt="Perfil de velocidad del sonido en agua de mar con la ecuación UNESCO: capa de mezcla cálida, termoclina, eje del canal sonoro en el mínimo y la velocidad creciendo con la presión en profundidad" width="60%" />
 
@@ -345,6 +442,72 @@ profile = underwater.sound_speed_profile(depths, temps, 35.0, model="unesco")
 profile.plot()   # velocidad del sonido frente a profundidad
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_speed_models_es.svg" alt="A la izquierda, el perfil de velocidad del sonido calculado con las ecuaciones UNESCO, Del Grosso, Mackenzie y Medwin sobre el mismo perfil de temperatura y salinidad desde la superficie hasta 5000 metros, con las cuatro curvas indistinguibles a esa escala; a la derecha, la diferencia de cada una respecto a UNESCO frente a la profundidad en un eje de más menos siete metros por segundo, con las profundidades más allá del límite de validez de mil metros de Medwin sombreadas y con Medwin apartándose casi seis metros por segundo a 5000 metros" width="92%" />
+
+*A la escala del perfil las cuatro ecuaciones son una sola curva. El panel de
+diferencias es el útil: Del Grosso y Mackenzie se quedan dentro de 0,85 m/s de
+UNESCO en toda la columna, y las cuatro dentro de 0,52 m/s hasta 1000 m. La
+única desviación grande es la de Medwin por debajo de su propio límite de
+validez, que es un error de dominio y no un desacuerdo entre modelos.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+depths = np.linspace(0.0, 5000.0, 251)
+temps = 4.0 + 14.0 / (1.0 + (np.maximum(depths - 80.0, 0.0) / 250.0) ** 2)
+models = ("unesco", "del_grosso", "mackenzie", "medwin")
+profiles = {m: np.asarray(underwater.sound_speed_profile(
+    depths, temps, 35.0, model=m).sound_speed) for m in models}
+
+fig, (ax_c, ax_d) = plt.subplots(1, 2, figsize=(13.0, 6.2))
+for m in models:
+    ax_c.plot(profiles[m], depths, label=m)
+    if m != "unesco":
+        ax_d.plot(profiles[m] - profiles["unesco"], depths, label=m)
+ax_d.axhspan(1000.0, 5000.0, color="0.9", zorder=0)   # Medwin fuera de dominio
+for ax in (ax_c, ax_d):
+    ax.invert_yaxis()
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+ax_c.set(xlabel="Velocidad del sonido c [m/s]", ylabel="Profundidad [m]")
+ax_d.set(xlabel="Diferencia respecto a UNESCO [m/s]", ylabel="Profundidad [m]",
+         xlim=(-7, 7))
+plt.show()
+```
+
+</details>
+
+### De dónde salen los números
+
+Cada fragmento de código de esta página lleva su océano escrito a mano, y una
+campaña no. La temperatura, la salinidad y la profundidad que consumen
+`sea_water_sound_speed` y `sound_speed_profile` salen de un **lance de CTD**
+tomado cerca de la campaña tanto en el tiempo como en el espacio; el sustituto
+habitual es un XBT con una salinidad supuesta, y el apartado 8.1.3 de la
+ISO 18406 incluye el perfil de velocidad del sonido entre los datos auxiliares
+que registra una campaña precisamente por esto. Qué modelo le conviene a qué
+sensor se deduce de ahí: Mackenzie toma la profundidad directamente, así que le
+va bien una profundidad de ecosonda, mientras que UNESCO y Del Grosso convierten
+por dentro la profundidad a presión mediante Leroy & Parthiot.
+
+Los parámetros del fondo tampoco son constantes libres. La clase de `seabed` de
+los regímenes de Weston y la $\rho_2$, $c_2$ de la reflexión de Rayleigh salen
+de una muestra por draga o de una campaña de sísmica somera, y el esquema de
+clasificación empleado hay que declararlo con el resultado (Folk o similar, como
+exige la norma de hincado). El término de viento de Wenz espera una velocidad de
+viento **con su altura de medida y su periodo de promediado registrados**, no una
+lectura suelta del puente; y un espectro ambiental medido solo sustituye a la
+curva de Wenz donde queda claramente por encima del ruido propio del sistema de
+registro, que en un sistema corriente se acerca a los niveles de estado de la
+mar cero cerca de 63 Hz y 125 Hz. Por último, $NL$, $DI$ y $DT$ son propiedades
+del array receptor y del detector, no del mar: vienen de la especificación del
+array y de la estadística de detección, y ninguna medida oceanográfica los va a
+producir.
+
 El mínimo de $c(z)$ actúa como una guía de ondas (el canal SOFAR): los frentes
 de onda que se apartan del eje se refractan de vuelta hacia él, mientras que
 el sonido generado fuera del canal se fuga hacia el fondo, como muestra la
@@ -365,6 +528,8 @@ largo de decenas de kilómetros.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sofar_channel_es.svg" alt="El canal SOFAR: un perfil de velocidad del sonido del Atlántico Norte con 1524 m/s en superficie, un mínimo cercano a 1492 m/s en el eje del canal a 1200 m y 1527 m/s en el fondo a 4800 m, junto a trayectorias de rayos de una fuente en el eje que oscilan en torno al mínimo de velocidad y quedan atrapadas sin tocar la superficie ni el fondo" width="92%" />
 
+<span id="ecuacion-del-sonar"></span>
+
 ## Ecuación del sonar
 
 La ecuación del sonar da el **exceso de señal** $SE$ (detección cuando
@@ -376,10 +541,20 @@ SE = SL - TL - (NL - DI) - DT \ \ \text{(pasiva)},
 $$
 
 $$
-SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(activa, monostática)},
+SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(activa, monoestática)},
 $$
 
 o limitada por reverberación con $RL$ en lugar de $NL - DI$.
+
+Esas dos formas son dos geometrías. En el caso pasivo el blanco radia y el
+sonido viaja en un solo sentido; en el activo radia el sonar, el blanco
+retrodispersa hacia él una fracción de lo que le llega, y la pérdida se paga dos
+veces, que es la razón de que $TL$ aparezca duplicada y de que exista siquiera
+el término $TS$. La reverberación no es ruido ambiental: es la propia emisión
+del sonar dispersada de vuelta por la superficie, el volumen y el fondo, así
+que escala con el nivel emitido y sustituye a $NL - DI$ en vez de sumarse a él.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation_es.svg" alt="Las dos geometrías del sonar: la pasiva, con un blanco que radia, una pérdida por transmisión de ida, un campo de ruido ambiental isótropo, un array receptor con su índice de directividad y un detector con su umbral de detección; y la activa monoestática, con emisor y receptor en un mismo punto, pérdidas por transmisión de ida y de vuelta, una fuerza del blanco dibujada como un lóbulo retrodispersado, y dispersión en la superficie, el volumen y el fondo que alimenta un nivel de reverberación que sustituye al término de ruido" width="92%" />
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_es.svg" alt="Ecuación del sonar pasivo: el exceso de señal cae con la pérdida por transmisión y cruza el cero, el límite de detección, en la figura de mérito" width="82%" />
 
@@ -464,13 +639,69 @@ print(res.detection_range)          # metros
 res.plot(language="es")             # TL frente a FOM con el cruce marcado
 ```
 
+Esa llamada arrastra cuatro valores por defecto implícitos: `law="spherical"`,
+10 °C, 35 ‰ y profundidad de superficie, con absorción de Francois-Garrison.
+Solo el supuesto de divergencia mueve la respuesta casi un factor dos, así que
+es una elección que hay que tomar a propósito y no una que se hereda; y a
+50 kHz, donde manda la absorción, la temperatura y la profundidad que se le
+pasan tampoco son decorativas. Echa mano de `detection_range_from_curve` siempre
+que la pérdida venga de un método numérico en vez de una ley.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detection_range_es.svg" alt="A la izquierda, la pérdida por transmisión en forma cerrada del ejemplo activo de 50 kilohercios de Ainslie cruzando una sola vez una figura de mérito de 82,7 decibelios, a 1319 metros; a la derecha, una pérdida por transmisión de modos normales a 30 hercios en una guía de 100 metros cruzando ocho veces una figura de mérito de 60 decibelios entre 1 y 6 kilómetros, con el primer cruce y el último marcados" width="92%" />
+
+*La pérdida en forma cerrada crece monótonamente, así que el cruce es único y
+`detection_range` puede devolverlo. La pérdida de una guía real oscila: aquí la
+misma figura de mérito se cruza ocho veces entre 4 y 6 km, y
+`detection_range_from_curve` devuelve por defecto el **primero** de ellos,
+4,4 km. La pérdida vuelve a caer por debajo de la figura de mérito hasta tan
+lejos como 5,9 km, así que citar 4,4 km como «el» alcance de detección es una
+convención y no un hecho, y hay que decirlo en el informe.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig, (ax_c, ax_m) = plt.subplots(1, 2, figsize=(13.5, 5.4))
+underwater.detection_range(82.7, 50e3).plot(ax=ax_c, language="es")
+
+ranges = np.linspace(200.0, 6000.0, 1200)
+modes = underwater.normal_modes(30.0, [0.0, 100.0], [1500.0, 1500.0],
+                                source_depth=25.0, receiver_depth=60.0,
+                                ranges_m=ranges, n_depth_points=800)
+tl = np.asarray(modes.transmission_loss)
+ax_m.plot(ranges / 1000.0, tl, label="TL de modos normales (30 Hz, 100 m)")
+ax_m.axhline(60.0, linestyle="--", label="Figura de mérito = 60 dB")
+print(underwater.detection_range_from_curve(60.0, ranges, tl))   # primer cruce
+ax_m.invert_yaxis()
+ax_m.set(xlabel="Distancia [km]", ylabel="Pérdida por transmisión [dB]")
+ax_m.legend()
+plt.show()
+```
+
+</details>
+
 ## Pérdida por reflexión en el fondo
 
 Una onda plana que incide en el fondo se refleja con el **coeficiente de
-reflexión de Rayleigh** fluido–fluido (Medwin & Clay). Para un fondo más rápido ($c_2 > c_1$)
-existe un **ángulo rasante crítico** $\varphi_c = \arccos(c_1/c_2)$, por
-debajo del cual la onda se refleja totalmente ($|R| = 1$, pérdida nula). La
-pérdida es $BL = -20 \log_{10} |R|$.
+reflexión de Rayleigh** fluido–fluido (Medwin & Clay). Para un fondo más rápido
+($c_2 > c_1$) existe un **ángulo rasante crítico**
+$\psi_c = \arccos(c_1/c_2)$, el mismo $\psi_c$ que fija las fronteras de los
+regímenes de Weston de arriba, por debajo del cual la onda se refleja totalmente
+($|R| = 1$, pérdida nula). La pérdida es $BL = -20 \log_{10} |R|$.
+
+La reflexión total por debajo de $\psi_c$ es una propiedad de la idealización
+fluido-fluido **sin pérdidas**, no de ningún fondo marino real. Un sedimento
+real absorbe, así que $|R|$ queda un poco por debajo de la unidad a cualquier
+ángulo, y en aguas someras esa pequeña diferencia es toda la respuesta: un rayo
+solo llega a larga distancia después de muchos rebotes, así que unas centésimas
+de decibelio por reflexión se acumulan hasta ser la dependencia dominante con la
+distancia. Esa cantidad acumulada es exactamente lo que parametriza el gradiente
+de pérdida por reflexión $\eta$ de Weston. Lee las dos cosas juntas: la curva de
+Rayleigh para localizar el ángulo crítico y la forma de la pérdida por encima de
+él, y el gradiente de Weston cuando la pregunta es hasta dónde llega el sonido.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_es.svg" alt="Pérdida por reflexión en el fondo frente al ángulo rasante para un fondo arenoso rápido: pérdida nula por debajo del ángulo rasante crítico, creciendo bruscamente por encima" width="82%" />
 
@@ -483,8 +714,8 @@ import numpy as np
 from phonometry import underwater
 
 # Reflexión de Rayleigh fluido-fluido: agua sobre un fondo arenoso rápido.
-phi = np.linspace(0.0, 90.0, 361)
-bl = underwater.bottom_reflection_loss(phi, rho1=1000.0, c1=1500.0,
+psi = np.linspace(0.0, 90.0, 361)
+bl = underwater.bottom_reflection_loss(psi, rho1=1000.0, c1=1500.0,
                                        rho2=1900.0, c2=1650.0)
 print(f"ángulo crítico = {bl.critical_angle:.1f} deg")   # ángulo crítico = 24.6 deg
 bl.plot(language="es")   # pérdida en el fondo frente al ángulo rasante
@@ -497,8 +728,8 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-phi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
-bl = underwater.bottom_reflection_loss(phi, rho1=1000.0, c1=1500.0,   # agua
+psi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
+bl = underwater.bottom_reflection_loss(psi, rho1=1000.0, c1=1500.0,   # agua
                                rho2=1900.0, c2=1650.0)          # arena
 print(bl.critical_angle)            # 24.6°
 bl.plot()   # pérdida por reflexión frente al ángulo rasante
@@ -521,8 +752,8 @@ import numpy as np
 from phonometry import underwater
 
 # Módulo del coeficiente de reflexión de Rayleigh: agua sobre un fondo arenoso rápido.
-phi = np.linspace(0.0, 90.0, 361)
-sr = underwater.seabed_reflection(phi, rho1=1000.0, c1=1500.0,
+psi = np.linspace(0.0, 90.0, 361)
+sr = underwater.seabed_reflection(psi, rho1=1000.0, c1=1500.0,
                                   rho2=1900.0, c2=1650.0)
 print(f"|R| en incidencia normal = {sr.magnitude[-1]:.3f}")  # 0.353
 sr.plot(language="es")   # módulo del coeficiente de reflexión frente al ángulo rasante
@@ -535,8 +766,8 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-phi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
-sr = underwater.seabed_reflection(phi, rho1=1000.0, c1=1500.0,   # agua
+psi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
+sr = underwater.seabed_reflection(psi, rho1=1000.0, c1=1500.0,   # agua
                           rho2=1900.0, c2=1650.0)          # arena
 print(sr.magnitude[-1])             # 0.353 = |R| en incidencia normal
 sr.plot()   # |R| frente al ángulo rasante (necesita matplotlib)
@@ -551,6 +782,23 @@ re 1 µPa; válida en ~500 Hz–5 kHz) y el ruido **térmico de
 Mellen** (dominante por encima de ~50 kHz). El rango amplio del ejemplo mantiene
 la curva de viento más allá de ~5 kHz solo como extrapolación para mostrar el
 cruce con el térmico. El espectro de **tráfico** lo aporta quien llama.
+
+La «regla de los cincos» es una regla mnemotécnica que conviene desmenuzar,
+porque de ella sale toda la rama de viento: una caída de unos 5 dB por octava,
+anclada en un viento de 5 nudos y 1 kHz, donde la cifra histórica es 25 dB re
+20 µPa, de ahí que `ocean_ambient_noise` devuelva ahí **51 dB re 1 µPa²/Hz**.
+Lee el espectro en tres bandas. Por debajo de un par de cientos de hercios, un
+emplazamiento real lo domina normalmente el tráfico marítimo, que este modelo
+deja a quien llama, así que ahí la curva de viento es un suelo y no una
+predicción. Entre unos cientos de hercios y unos pocos kilohercios el ruido de
+viento manda de verdad y el modelo se gana el sueldo: a 1 kHz da 51 dB con
+5 nudos frente a 64 dB en un temporal de 30 nudos, así que la velocidad del
+viento es el único mando y mueve la banda media más de una década de estado de
+la mar. Por encima de decenas de kilohercios no hay quien le gane al ruido
+térmico de Mellen, que fija el suelo absoluto de cualquier medida con hidrófono:
+25 dB re 1 µPa²/Hz a 100 kHz, haya viento o no. Un total compuesto fuera de
+aproximadamente 30-100 dB re 1 µPa²/Hz entre 100 Hz y 100 kHz es un error de
+entrada y no un océano insólito.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise_es.svg" alt="Niveles espectrales de ruido ambiental de Wenz para dos velocidades de viento, con el ruido de viento cayendo 5 dB por octava y el ruido térmico creciendo por encima de unos 50 kHz" width="82%" />
 
@@ -655,8 +903,8 @@ Todas las formas cerradas anteriores dejan de bastar cuando la refracción y
 los contornos deciden la respuesta: un mínimo de velocidad del sonido que
 atrapa energía, reflexiones en la superficie y el fondo en aguas someras, o
 una distancia de detección que oscila con la elección de la ley de
-divergencia. En ese punto el campo hay que calcularlo, y los métodos numéricos de
-modos normales, trazado de rayos y ecuación parabólica del módulo, junto
+divergencia. En ese punto el campo hay que calcularlo, y los métodos numéricos
+del módulo (modos normales, trazado de rayos y ecuación parabólica), junto
 con la guía para elegir entre ellos y estas formas cerradas, tienen su
 propia guía:
 [Métodos numéricos de propagación
@@ -676,7 +924,7 @@ profundidad a presión de Leroy y Parthiot (1998). `weston_propagation_loss` y
 `weston_regime_boundaries` implementan los cuatro regímenes de flujo de energía
 de Weston y sus distancias de transición (Ainslie sección 9.1.1.2, Tabla 9.1).
 `passive_sonar_equation` y `active_sonar_equation` implementan las ecuaciones
-del sonar pasivo y activo monostático (Urick, vía Etter 2003), y
+del sonar pasivo y activo monoestático (Urick, vía Etter 2003), y
 `detection_range` / `detection_range_from_curve` invierten una pérdida por
 transmisión en la figura de mérito. `seabed_reflection` y
 `bottom_reflection_loss` implementan el coeficiente de reflexión de Rayleigh
@@ -687,7 +935,7 @@ JOMOPANS-ECHO (por defecto), RANDI 3.1 y Wales & Heitmeyer (2002).
 
 **No cubierto.** El modelo de fondo es solo reflexión de Rayleigh
 fluido-fluido sin pérdidas, así que la atenuación del sedimento queda fuera
-de alcance. `active_sonar_equation` es solo monostática: no hay geometría
+de alcance. `active_sonar_equation` es solo monoestática: no hay geometría
 biestática. `ocean_ambient_noise` deja fuera la banda de turbulencia de baja
 frecuencia y cualquier modelo integrado de tráfico marítimo lejano; hay que
 aportar un espectro de tráfico propio, por ejemplo con

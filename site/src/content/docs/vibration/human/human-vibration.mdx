@@ -36,7 +36,14 @@ references:
     title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 2: Vibration in buildings (1 Hz to 80 Hz)"
     designation: "ISO 2631-2:2003"
     url: "https://www.iso.org/standard/23012.html"
-    note: "Vibration in buildings: the Wm weighting."
+    note: "Vibration in buildings: the Wm weighting applied irrespective of direction (4.4), the highest-axis evaluation (4.5.1), the source categories (4.5.2) and the deliberate absence of acceptable magnitudes."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Mechanical vibration — Laboratory method for evaluating vehicle seat vibration — Part 1: Basic requirements"
+    designation: "ISO 10326-1:2016"
+    url: "https://www.iso.org/standard/63149.html"
+    note: "The semi-rigid accelerometer mounting disc ISO 2631-1 clause 5.3.2 points at for measurements on a seat cushion: its diameter, height, hardness and the metal disc that carries the transducers (5.2.3)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2001
@@ -88,6 +95,135 @@ chain.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Whole-body vibration measurement chain: a triaxial accelerometer at the seat/body interface of a seated person measures the x, y and z acceleration; each axis is band-limited and frequency-weighted (Wk vertical, Wd horizontal) per ISO 8041-1, reduced to a weighted r.m.s. a_w and VDV per ISO 2631-1, and the highest frequency-weighted axis value max(1.4 a_wx, 1.4 a_wy, a_wz) is normalised to the daily exposure A(8) and assessed against the EAV and ELV of Directive 2002/44/EC" width="94%" loading="eager" />
 
+## 0. Getting the numbers
+
+Every magnitude on this page is a measured one, and the two halves of the
+subject are instrumented differently: the whole-body chain measures the surface
+a person sits, stands or lies on, the hand-arm chain measures the handle of a
+tool while it is being used.
+
+### Whole body: at the interface, and nowhere else (ISO 2631-1, 5.2–5.3)
+
+The transducer goes where the vibration enters the body, on the surface between
+the body and that surface (5.3.1). For a seated person that means three
+principal contact areas: the **seat surface beneath the ischial tuberosities**,
+the **seat back at the principal area of support**, and the **feet on the
+surface they rest on**; for a recumbent person, under the pelvis, the back and
+the head. A rigid surface may be measured close to the contact area instead,
+usually within 10 cm of its centre; a seat back that cannot be reached may be
+measured on the frame behind the cushion and then corrected for the
+transmissibility of the cushion. Every measurement location must be reported.
+
+On a **resilient** surface — a seat cushion, a couch — the transducer is
+interposed between the person and the surface in a suitably formed mount that
+does not greatly alter the pressure distribution (5.3.2); the commonly used
+design for that mount is the semi-rigid disc of **ISO 10326-1**, drawn to size
+on [Multiple Shock Vibration](/phonometry/vibration/human/multiple-shock-vibration/).
+The person adopts the posture that is normal for the environment.
+
+The three translational transducers at one location are positioned orthogonally
+and as close together as practicable (5.2.3). Where perfect alignment with the
+basicentric axes is impracticable, up to 15° of deviation is allowed, and the
+orientation of the axes relative to gravity is recorded (5.2.2) — on an inclined
+seat the z axis is *not* vertical. The duration of measurement must be long
+enough for reasonable statistical precision and typical of the exposure being
+assessed, and it is reported with the result (5.5).
+
+### Hand-arm: on the handle, in the gripping zone (ISO 5349-2, 6.1)
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_hand_arm_vibration.svg" alt="Left: a chain-saw front handle of 30 mm diameter gripped by a hand over a gripping zone of about 100 mm, with three numbered accelerometer positions — under the hand at the middle of the gripping zone, either side of the hand, and on the underside of the handle next to the hand — the cable taped to the handle near the transducer, the grip force, and the basicentric x_h y_h z_h frame rotated so y_h lies along the handle axis. Right: the evaluation chain from the three Wh-weighted axis magnitudes to the vibration total value a_hv, the partial exposures A_i(8) over the contact times, and A(8) against the exposure action value 2.5 and exposure limit value 5 m/s^2 of Directive 2002/44/EC, with a box giving the mass, averaging, sampling and range rules" width="94%" />
+
+The accelerometer belongs at or near the surface of the hand where the vibration
+enters the body, preferably at the **middle of the gripping zone** — halfway
+along the width of the hand on the handle (6.1.3). That position usually needs a
+mounting adaptor that fits under the hand or between the fingers, so in practice
+the transducers go either side of the hand or on the underside of the handle
+adjacent to the middle of the hand. Where the vibration differs across the width
+of the hand — flexibly mounted side handles on angle grinders are the standard
+case — two positions either side of the hand are used and **averaged**. The
+measurement is made for each gripping zone the operator actually uses, and the
+locations and orientations are reported with a sketch and dimensions (clause 9).
+
+Three constraints decide whether the mounting is acceptable:
+
+- **Mass (6.1.5).** Accelerometer plus mount below 5 % of the mass of the tool,
+  handle or workpiece it is fixed to; practical triaxial systems under 30 g have
+  been achieved. If in doubt, repeat the measurement with an equal added mass
+  beside the transducer: a markedly different magnitude means a lighter mount.
+- **Attachment (6.1.4).** Rigid, flat in frequency response over the measured
+  band, checked before and after, and not obstructing the tool's controls. A
+  soft handle coating is either removed under the transducer or fully compressed
+  by the fixing; a thick resilient layer that may itself be reducing exposure
+  needs an adaptor held in place by the operator's own grip.
+- **Posture and force (7.1).** Mounting a transducer changes how the tool is
+  held and how much grip and push force is applied, and the standard lists that
+  change among the dominant uncertainty contributions — larger, it notes, than
+  instrumentation or calibration. The grip and feed forces belong in the report.
+
+### What the magnitude is an average of (ISO 5349-2, 5.4 and 6.1.11)
+
+Every $a_{hv}$ fed to the exposure calculation below is an average, and the
+averaging rule is normative: magnitudes are averaged over periods of normal use
+of the tool or of contact with the workpiece, using **linear** averaging over one
+or more complete operations or work cycles (6.1.11). Exponential averaging is
+admitted only where the instrument cannot do linear averaging and the signal is
+steady enough to give a reliable average. Clause 5.4.1 fixes the sampling:
+at least **three samples per operation**, a **total measuring time of at least
+one minute**, several short samples in preference to one long one, and samples
+shorter than about **8 s** avoided because they do not evaluate the
+low-frequency components reliably. Where the user selects the instrument's input
+range, trial measurements set it to the lowest range that does not overload
+(6.1.10).
+
+### When the number is wrong (ISO 5349-2, 6.2 and 6.3)
+
+The characteristic faults of hand-arm measurement all produce a *plausible*
+number rather than an obvious failure:
+
+- **Cable and connector faults (6.2.1)**, the most common problem of all. A
+  total loss of connection reads as no vibration; an intermittent one reads as
+  DC offsets with a normal-looking signal between them. Faulty screening lets
+  mains frequencies in, which on an electric tool is nearly undetectable because
+  the dominant vibration frequency is usually harmonically related to the mains.
+- **Electromagnetic interference (6.2.2)**: screened, twisted cables, the screen
+  earthed at one end only, no runs parallel to power cables, and electrical
+  insulation between the accelerometer and the vibrating surface.
+- **Triboelectric signal (6.2.3)**: a cable under high-amplitude vibrational
+  stress generates charge by deformation, so it is secured to the vibrating
+  surface close to the accelerometer — taped to the handle, or clipped along the
+  air line on a pneumatic tool.
+- **DC-shift (6.2.4)**, the one that inflates a result rather than destroying
+  it. Very high accelerations at high frequency — percussive tools with no
+  damping system — mechanically overload a piezoelectric transducer and add a
+  false low-frequency component, exactly where the weighting has most gain. It
+  shows in a frequency analysis as unrealistically high low-frequency values,
+  and the standard's check is to convert the unweighted band r.m.s. acceleration
+  to a displacement, $d = a/(40f^2)$, and compare it with the motion of the
+  transducer you can actually see:
+
+```python
+import numpy as np
+
+# Unweighted one-third-octave r.m.s. acceleration on a chipping hammer,
+# low-frequency bands only (m/s^2), and the displacement they imply (mm).
+bands = np.array([8.0, 10.0, 12.5, 16.0, 20.0])
+accel = np.array([9.0, 14.0, 6.0, 3.0, 2.0])
+print((1000.0 * accel / (40.0 * bands**2)).round(2))   # [3.52 3.5  0.96 0.29 0.12]
+```
+
+A handle visibly moving a millimetre cannot be moving 3.5; a factor of two or
+more between the computed and the observed motion means DC-shift is likely. A
+mechanical filter is the countermeasure, and a record showing DC-shift is
+discarded — the distortion affects the whole spectrum, so deleting the
+low-frequency bands does not rescue it.
+
+Finally, the chain is checked with a **vibration calibrator before and after
+every sequence of measurements** (6.3.1), and the whole system is verified
+against the ISO 8041 tolerances on a regular basis, typically every two years
+and always after rough handling; the results of those verification checks are
+recorded (6.3.2). That record is what the fiche's `calibration` field of
+section 5 exists to carry.
+
 ## 1. Frequency weightings (ISO 8041-1)
 
 Every human-vibration weighting is the product of four analog stages evaluated
@@ -121,6 +257,10 @@ significant figures: `Wk` plateaus near −6 dB below 2 Hz, peaks at +0.46 dB ne
 6.3 Hz and rolls off above.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting.svg" alt="The whole-body vertical weighting Wk in decibels over 0.4 to 100 Hz: a plateau near -6 dB below 2 Hz, a small +0.5 dB peak near 6 Hz and a roll-off to about -21 dB at 100 Hz" width="88%" />
+
+*The one feature to read is the small peak just above 6 Hz: that is the vertical
+whole-body resonance of a seated person, and it is the reason the weighting
+exists. Everything else is the band limiting on either side of it.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -175,10 +315,50 @@ value of section 3:
 
 ¹ The health assessment of clause 7 is defined on the seat surface; the
 backrest x measurement with `Wc`, $k = 0.8$ is encouraged but excluded
-from the Annex B severity assessment (7.2.3). The remaining weightings live in the companion parts:
-`Wm` for building occupants on all axes (ISO 2631-2), `Wb` for vertical rail
-ride comfort (ISO 2631-4), and `Wh` for hand-transmitted vibration on all
-three hand axes with every $k = 1$ (ISO 5349-1).
+from the Annex B severity assessment (7.2.3).
+
+The remaining three weightings belong to the companion parts rather than to
+ISO 2631-1's posture map: `Wm` for building occupants on all axes (ISO 2631-2),
+`Wb` for vertical rail ride comfort (ISO 2631-4), and `Wh` for
+hand-transmitted vibration on all three hand axes with every $k = 1$
+(ISO 5349-1) — which is why the hand-arm total of section 3 is a plain vector
+sum with no multiplying factors in it.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family.svg" alt="All nine human-vibration weightings in decibels from 0.05 Hz to 1.5 kHz on a log frequency axis, colour-grouped into the whole-body weightings Wk, Wd and Wc, the rotational and recumbent weightings We and Wj, the building and rail weightings Wm and Wb, the motion-sickness weighting Wf peaking at 0.17 Hz, and the hand-arm weighting Wh peaking near 11 Hz; three bars above the curves mark the band each part of the family is tabulated over, 0.1 to 0.5 Hz for Wf, 0.5 to 80 Hz for the whole-body weightings and 6.3 to 1250 Hz for Wh" width="94%" />
+
+*Three families on one axis. `Wf` peaks at 0.17 Hz because motion sickness is a
+sub-hertz phenomenon; the whole-body weightings peak between 1 and 6 Hz, `Wd`
+two and a half octaves below `Wk` because the body is far more compliant
+horizontally at low frequency; and `Wh` is still 37 dB down at 1 kHz where `Wk`
+is 78 dB down, because the hand follows tool frequencies the torso cannot. The
+bars above the curves are the bands the ISO tables cover: 0.1–0.5 Hz for `Wf`,
+0.5–80 Hz for the whole-body set (band-limited at 0.4 and 100 Hz, ISO 2631-1
+6.4.1.1) and 6.3–1250 Hz for `Wh` (band-limited at 6.31 and 1258.9 Hz,
+ISO 5349-1 Table A.1).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+# `vibration` is the namespace imported in the snippet of section 1.
+
+freqs = np.geomspace(0.05, 1500.0, 900)
+
+fig, ax = plt.subplots(figsize=(11, 6.8))
+for name in vibration.WEIGHTING_NAMES:
+    factors = np.asarray(vibration.weighting_factors(name, freqs))
+    ax.semilogx(freqs, 20.0 * np.log10(np.maximum(factors, 1e-9)), label=name)
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Weighting factor [dB]")
+ax.set_xlim(0.05, 1500.0)
+ax.set_ylim(-70.0, 16.0)
+ax.legend(loc="lower left", ncol=2, fontsize=8.5)
+plt.show()
+```
+
+</details>
 
 ## 2. Weighted acceleration and dose measures (ISO 2631-1)
 
@@ -213,6 +393,10 @@ result = vibration.weighted_acceleration(accel, freqs, "Wk")
 print(round(result.overall, 3))          # 1.026  m/s^2 (a_w)
 print(result.weighted.round(3))          # W_i * a_i per band
 
+# The W_i themselves, at the true centres of the nominal 6.3 and 16 Hz bands:
+# these are the numbers the ISO tables print, and what the sum multiplies by.
+print(vibration.weighting_factors("Wk", [6.3096, 15.849]).round(3))   # [1.054 0.774]
+
 result.plot()   # unweighted vs weighted bands, as in the figure below (needs matplotlib)
 ```
 
@@ -223,6 +407,11 @@ printed table, not about a broadband r.m.s., where the two agree to three
 figures.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration.svg" alt="A measured vehicle-seat acceleration spectrum (grey) and its Wk-weighted contribution (blue) over the one-third octaves from 1 to 80 Hz: the weighting attenuates the low and high bands but leaves the 4 to 8 Hz range nearly unchanged, giving a weighted r.m.s. a_w of about 1.03 m/s^2" width="90%" />
+
+*The weighting leaves the 4–8 Hz bands almost untouched and throws away
+everything above 20 Hz, so $a_w$ = 1.026 m/s² is set by three bands out of
+nineteen. A vehicle seat is judged on the part of its spectrum it was least
+able to isolate.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -262,25 +451,154 @@ plt.show()
 
 When the r.m.s. value understates an intermittent or shock-laden exposure,
 ISO 2631-1 adds dose measures computed on the weighted time signal: the
-**running r.m.s.** and its maximum, the **maximum transient vibration value**
-`MTVV` (Eq. (4), a 1 s running r.m.s.); the fourth-power **vibration dose
-value** $\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
-sickness dose value** $\text{MSDV} = \left(\int a_w^2\,dt\right)^{1/2}$; and the
-**crest factor** (peak / r.m.s.), whose value above 9 signals that the basic
-method is inadequate.
+**running r.m.s.** $a_w(t_0)$ (Eqs. (2)/(3)) and its maximum, the **maximum
+transient vibration value** `MTVV` (Eq. (4), the maximum of the running r.m.s.
+with a 1 s integration time); the fourth-power **vibration dose value**
+$\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
+sickness dose value** $\text{MSDV} = \left(\int a_w^2\,dt\right)^{1/2}$
+(Annex D, on the `Wf`-weighted vertical axis, not `Wk`); and the **crest
+factor** (peak / r.m.s.), whose value above 9 signals that the basic method is
+inadequate.
+
+### Deciding whether the basic method is enough (clause 6.3.3)
+
+The crest factor is the weaker of the two available tests, and the standard says
+so twice: clause 6.2.2 notes that the basic method may underestimate severity
+even when the crest factor is not greater than 9, and the notes to Annexes B and
+C call it "an uncertain method" of deciding whether the r.m.s. may be used. The
+criteria that actually decide are two ratios, and either one exceeded means the
+additional method matters for the judgement:
+
+$$
+\frac{\text{MTVV}}{a_w} = 1{,}5, \qquad
+\frac{\text{VDV}}{a_w\,T^{1/4}} = 1{,}75 .
+$$
+
+$\text{MTVV}/a_w$ asks whether any single second of the record is much worse
+than the record as a whole; $\text{VDV}/(a_w T^{1/4})$ asks whether the fourth
+power finds peaks that the second power averaged away. Whichever is used,
+clause 6.1 requires **both** the basic value and the additional value to be
+reported, and clause 5.6 adds the measurement period of the crest factor.
+
+Gaussian noise is the case in which nothing goes wrong, and computing the two
+ratios for it is how you learn to read them:
 
 ```python
 import numpy as np
 from phonometry import vibration
 
 fs = 1000.0
-raw = np.random.default_rng(0).standard_normal(int(60 * fs))   # 60 s record
-a_w = vibration.apply_weighting(raw, fs, "Wk")                        # weighted signal
+duration = 60.0
+raw = np.random.default_rng(0).standard_normal(int(duration * fs))   # 60 s record
+a_w = vibration.apply_weighting(raw, fs, "Wk")                       # weighted signal
+rms = float(np.sqrt(np.mean(np.asarray(a_w) ** 2)))
 
-print(round(vibration.vibration_dose_value(a_w, fs), 3))   # 0.744  VDV [m/s^1.75]
-print(round(vibration.mtvv(a_w, fs), 3))                   # 0.265  MTVV [m/s^2]
-print(round(vibration.crest_factor(a_w), 2))               # 3.74   crest factor
+vdv = vibration.vibration_dose_value(a_w, fs)
+mtvv = vibration.mtvv(a_w, fs)
+print(round(rms, 3), round(vdv, 3), round(mtvv, 3))   # 0.204  0.744  0.265
+print(round(vibration.crest_factor(a_w), 2))          # 3.74   crest factor
+print(round(mtvv / rms, 2))                           # 1.3   < 1.5
+print(round(vdv / (rms * duration**0.25), 2))         # 1.31  < 1.75
+
+# running_rms returns the whole a_w(t_0) series MTVV is only the maximum of:
+# it is what you plot to find *where* in a shift the transient happened.
+running = vibration.running_rms(a_w, fs, integration_time=1.0)
+print(round(float(np.max(running)), 3))               # 0.265, the MTVV above
 ```
+
+Every criterion passes, which is the point: the example proves the rule is not
+being triggered, not that the exposure is severe. A record with shocks in it
+behaves differently — five impacts on a 4.5 Hz ride oscillation, the ordinary
+content of an off-road seat:
+
+```python
+fs_shock, duration_shock = 200.0, 20.0
+time = np.arange(int(duration_shock * fs_shock)) / fs_shock
+rng = np.random.default_rng(3)
+seat = 0.35 * np.sin(2 * np.pi * 4.5 * time) + 0.10 * rng.standard_normal(time.size)
+for start, amplitude in ((2.6, 9.0), (6.1, 14.0), (9.4, 6.0), (13.8, 18.0), (17.2, 11.0)):
+    hit = time >= start
+    seat[hit] += amplitude * np.exp(-28.0 * (time[hit] - start)) * np.sin(
+        2 * np.pi * 8.0 * (time[hit] - start))
+
+a_ws = np.asarray(vibration.apply_weighting(seat, fs_shock, "Wk"))
+rms_s = float(np.sqrt(np.mean(a_ws**2)))
+mtvv_s = vibration.mtvv(a_ws, fs_shock)
+vdv_s = vibration.vibration_dose_value(a_ws, fs_shock)
+print(round(rms_s, 3), round(mtvv_s, 3), round(vdv_s, 3))   # 0.529  1.432  3.011
+print(round(vibration.crest_factor(a_ws), 2))               # 13.49  > 9
+print(round(mtvv_s / rms_s, 2))                             # 2.71   > 1.5
+print(round(vdv_s / (rms_s * duration_shock**0.25), 2))     # 2.69   > 1.75
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shock_dose_measures.svg" alt="Three stacked panels over the same 20 s seated off-road record. Top: the unweighted acceleration and its Wk-weighted version, a 4.5 Hz ride oscillation with five impacts. Middle: the 1 s running r.m.s., flat near 0.25 m/s^2 between impacts and rising to plateaus at each of them, with the overall weighted r.m.s. of 0.53 drawn as a horizontal line and the maximum marked as MTVV = 1.43, a ratio of 2.71 against the 1.5 criterion. Bottom: the running fourth-power accumulation climbing in steps at each impact to a final VDV of 3.01, against the smooth a_w times t to the one quarter curve the basic method would predict, a ratio of 2.69 against the 1.75 criterion" width="94%" />
+
+*The same twenty seconds judged three ways. The r.m.s. barely notices the five
+impacts, the running r.m.s. finds them one at a time, and the fourth-power
+accumulation climbs in a step at each of them — which is why the two ratios of
+clause 6.3.3 are 2.71 and 2.69 here and 1.3 and 1.31 on the Gaussian record
+above. Any of the three criteria would have sent this record to the additional
+methods; the crest factor is simply the one that catches it last.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# `seat`, `a_ws`, `rms_s`, `fs_shock` and `time` come from the snippet above.
+running = np.asarray(vibration.running_rms(a_ws, fs_shock, integration_time=1.0))
+fourth = (np.cumsum(a_ws**4) / fs_shock) ** 0.25
+
+fig, (ax_t, ax_r, ax_v) = plt.subplots(3, 1, sharex=True, figsize=(11, 9.2))
+ax_t.plot(time, seat, lw=0.7, color="#9e9e9e", label="$a_z(t)$, unweighted")
+ax_t.plot(time, a_ws, lw=1.0, color="#1f77b4", label="$a_w(t)$, Wk-weighted")
+ax_r.plot(time, running, lw=1.4, color="#1f77b4", label="running r.m.s., 1 s")
+ax_r.axhline(rms_s, ls="--", color="#9e9e9e", label=f"$a_w$ = {rms_s:.2f}")
+ax_v.plot(time, fourth, lw=1.6, color="#1f77b4", label=r"$(\int a_w^4)^{1/4}$")
+ax_v.plot(time, rms_s * time**0.25, ls="--", color="#9e9e9e",
+          label=r"$a_w t^{1/4}$")
+for axis in (ax_t, ax_r, ax_v):
+    axis.legend(loc="upper left", fontsize=9)
+ax_v.set_xlabel("Time [s]")
+plt.show()
+```
+
+</details>
+
+### Motion sickness: the one dose measure with a published reading
+
+MSDV is the only measure on this page that converts directly into an expected
+number of people. It is computed on the **`Wf`**-weighted z-axis acceleration
+over the whole period during which motion could occur (Annex D, method (a)); for
+a continuous motion of roughly constant magnitude it may instead be estimated
+from a short-period r.m.s. as $\text{MSDV}_z = a_w T_0^{1/2}$ (method (b)), whose
+measurement period should not normally be less than **240 s**. The reading is
+that the percentage of people who may vomit is approximately
+$K_m\,\text{MSDV}_z$, with $K_m = 1/3$ for a mixed population of unadapted male
+and female adults, over exposures from about 20 min to about 6 h and prevalences
+up to about 70 %; the estimate can be exceeded when $a_w$ is above 0.5 m/s².
+Females are more prone than males, and prevalence declines with age.
+
+```python
+# A 240 s sample of ship heave at 0.2 Hz, the band Wf is built for.
+fs_ms = 20.0
+t_ms = np.arange(int(240 * fs_ms)) / fs_ms
+heave = 0.45 * np.sin(2 * np.pi * 0.2 * t_ms)
+a_wf = np.asarray(vibration.apply_weighting(heave, fs_ms, "Wf"))
+
+msdv = vibration.motion_sickness_dose_value(a_wf, fs_ms)
+print(round(msdv, 1), round(msdv / 3.0, 1))    # 4.9 m/s^1.5 -> 1.6 % over 240 s
+
+# Method (b): the same magnitude sustained for a four-hour crossing.
+sustained = float(np.sqrt(np.mean(a_wf**2))) * (4 * 3600.0) ** 0.5
+print(round(sustained, 1), round(sustained / 3.0, 1))   # 37.9 -> 12.6 %
+```
+
+Note the weighting: an MSDV computed from the `Wk`-weighted signal used
+everywhere else on this page would be meaningless, because `Wk` is 18.3 dB down
+at 0.2 Hz where `Wf` is 0.1 dB down.
 
 ## 3. Vibration total value and daily exposure `A(8)`
 
@@ -310,12 +628,50 @@ inside which caution is indicated and above which risks are likely; Directive
 values used below. The *comfort* assessment of clause 8 instead combines all
 axes (and, where relevant, backrest, feet and rotation) into the vibration
 total value $a_v$ with its own $k$ set and reads it on the Annex C scale for
-public transport, whose deliberately overlapping bands run from "not
-uncomfortable" below 0.315 m/s² to "extremely uncomfortable" above 2 m/s²; the
-standard defines no comfort limit, since acceptable magnitudes depend on trip
-duration and what the passengers are trying to do. For orientation, the median
-perception threshold of a `Wk`-weighted vibration is about 0.015 m/s² peak
-(Annex C).
+public transport.
+
+| Overall vibration total value $a_v$ | Likely reaction |
+| :--- | :--- |
+| less than 0.315 m/s² | not uncomfortable |
+| 0.315 m/s² to 0.63 m/s² | a little uncomfortable |
+| 0.5 m/s² to 1 m/s² | fairly uncomfortable |
+| 0.8 m/s² to 1.6 m/s² | uncomfortable |
+| 1.25 m/s² to 2.5 m/s² | very uncomfortable |
+| greater than 2 m/s² | extremely uncomfortable |
+
+The bands overlap on purpose, and the overlap is the whole message: 0.5 m/s² is
+simultaneously "a little uncomfortable" and "fairly uncomfortable", because the
+scale describes a distribution of reactions rather than a classification. That
+is also why ISO 2631-1 defines **no comfort limit** — acceptable magnitudes
+depend on trip duration and on what the passengers are trying to do (reading,
+eating, writing), on noise and on temperature. Quote the band, not a verdict.
+For orientation at the other end of the scale, the median perception threshold
+of a `Wk`-weighted vibration is about 0.015 m/s² peak, with an interquartile
+range from about 0.01 to 0.02 m/s² (Annex C.3).
+
+### Vibration in buildings (ISO 2631-2)
+
+Building vibration is a third reading of the same measurement, and it breaks the
+"which weighting on which axis" table above. ISO 2631-2:2003 recommends the
+combined weighting `Wm` **irrespective of the measurement direction** (4.4); the
+ISO 2631-1 weightings may be used instead only where the occupant's posture is
+defined. The evaluation identifies the axis with the highest frequency-weighted
+magnitude and uses that direction (4.5.1), and unweighted time histories over
+1 Hz to 80 Hz should be recorded so that a future re-evaluation remains
+possible. Sources are categorised as continuous or semi-continuous (industry),
+permanent intermittent (traffic) or of limited duration (construction), because
+different magnitudes may be acceptable for each (4.5.2).
+
+What the 2003 edition deliberately does **not** give is a set of acceptable
+magnitudes: clause 1 states that they are not given, and the Foreword records
+that the guidance values of the 1989 edition were dropped because their possible
+range is too widespread to be reproduced in an International Standard. A reader
+who goes looking for a building limit in ISO 2631-2 will not find one. What
+clause 5 gives instead is
+the number that matters in practice: adverse comment in residential situations
+arises when magnitudes are only *slightly above the perception threshold* — the
+0.015 m/s² above — and complaints often come from the secondary effect of
+re-radiated noise rather than from the motion itself.
 
 The **daily exposure** normalises the exposure magnitude $a$ to a reference
 8-hour day ($T_0 = 28\,800$ s). For a single operation $A(8) = a\,\sqrt{T/T_0}$;
@@ -344,21 +700,28 @@ m/s² (or a VDV of 9.1 / 21 m/s¹·⁷⁵):
 ```python
 from phonometry import vibration
 
-# ISO 5349-2 Annex E.3: a forestry worker's three chain-saw tasks.
+# ISO 5349-2 Annex E.3: a forestry worker's three chain-saw tasks. The times
+# are *contact* times: 2 h of continuous brush-saw work, then 30 trees felled
+# at 2 min each (1 h) and stripped at 4 min each (2 h).
 result = vibration.daily_vibration_exposure(
     total_values=[4.6, 6.0, 3.6],                 # a_hv per task, m/s^2
-    durations_s=[2 * 3600, 1 * 3600, 2 * 3600],   # exposure time per task
+    durations_s=[2 * 3600, 1 * 3600, 2 * 3600],   # total contact time per day
     kind="hav",
     labels=["brush-saw", "felling", "stripping"],
 )
 print(result.partials.round(2))            # [2.3  2.12 1.8 ]  A_i(8)
-print(round(result.a8, 2))                 # 3.61  m/s^2
+print(round(result.a8, 2))                 # 3.61  m/s^2 (report it as 3.6)
 print(result.assessment.zone)             # 'action'  (2.5 <= A(8) < 5.0)
 
 result.plot()   # partial exposures and A(8) against the EAV/ELV, as in the figure below (needs matplotlib)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure.svg" alt="A bar chart of the three partial hand-arm exposures (about 2.3, 2.1 and 1.8 m/s^2) and the combined A(8) of 3.61 m/s^2, with the Directive 2002/44/EC exposure action value at 2.5 and exposure limit value at 5.0 m/s^2 marked as horizontal lines; the daily exposure sits in the action zone between them" width="82%" />
+
+*The shortest task is not the smallest contributor. Felling runs for one hour
+against two for the brush-saw, and still lands within 8 % of it, because
+$A_i(8)$ goes as $\sqrt{T_i}$ while it goes as $a_{hv}$ directly: halving the
+time costs 29 %, raising the magnitude from 4.6 to 6.0 m/s² buys 30 %.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -395,6 +758,38 @@ plt.show()
 
 </details>
 
+### How long, and whose hand (ISO 5349-2, 5.5 and clause 8)
+
+Three things about $A(8)$ are stated by the standard and get left out of most
+assessments, and each of them is a documented way to be wrong.
+
+**$T_i$ is contact time, not task time.** Where the magnitude was averaged over
+a complete work cycle, $T_i$ is the cycle duration times the number of cycles
+per day; where the measurement was made while the hand was in contact with the
+vibrating surface, $T_i$ is the *total contact time per day* (5.5). The clause
+then carries an explicit Warning: asked about their typical daily tool usage,
+operators normally **overestimate**, because they report the period over which
+the tool is in use *including* the pauses — changing a nut, preparing the next
+workpiece. Since $A_i(8) \propto \sqrt{T_i}$, a two-fold overestimate of contact
+time inflates $A(8)$ by 41 %, which is more than enough to move a day across the
+exposure action value. A stopwatch, a tool-mounted data logger, video analysis
+or activity sampling are what the clause offers instead of asking.
+
+**Both hands, separately.** Clause 8 requires $A(8)$ to be evaluated separately
+for each of the operator's two hands. The fiche of section 5 names its subject
+"Forestry worker (right hand)" for that reason: the left hand on a chain saw is
+a different exposure and gets its own assessment.
+
+**Two significant figures.** Clause 8 also states that the uncertainties
+associated with $A(8)$ are often 20 % to 40 %, and that $A(8)$ should not
+normally be presented with more than **two** significant figures. The worked
+example above computes 3.61 m/s²; ISO 5349-2 Annex E.3 itself prints the same
+result as 3.6 m/s², and that is the number to report.
+
+```python
+print(f"{result.a8:.2g}")     # 3.6  m/s^2, the reportable value
+```
+
 ## 4. Exposure–response guidance
 
 For hand-transmitted vibration, ISO 5349-1 Annex C relates the daily exposure to
@@ -404,13 +799,68 @@ the group-mean lifetime $D_y$ (in years) that produces vibration-white-finger in
 ```python
 from phonometry import vibration
 
-print(round(vibration.hav_vwf_lifetime_years(7.0), 1))   # 4.0 years (Table C.1)
+# The four points of Table C.1 the relation interpolates between.
+for a8 in (26.0, 14.0, 7.0, 3.7):
+    print(a8, round(vibration.hav_vwf_lifetime_years(a8), 1))   # 1.0 / 1.9 / 4.0 / 7.9 years
+
+# And the two values the Directive fixes, read on the same curve.
+print(round(vibration.hav_vwf_lifetime_years(2.5), 1))   # 12.0 years at the EAV
+print(round(vibration.hav_vwf_lifetime_years(5.0), 1))   # 5.8 years at the ELV
 ```
 
-The standards deliberately define no safe limit; $A(8)$ and the directive's
-action and limit values are the basis for any exposure criterion. For whole-body
-exposure, `energy_equivalent_acceleration` gives the ISO 2631-1 Eq. (B.3)
-energy-equivalent magnitude across periods of different magnitude and duration.
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hav_vwf_lifetime.svg" alt="Group-mean exposure duration in years against daily exposure A(8) in metres per second squared, on log-log axes: a straight line from about 30 years at 1 m/s^2 down to 0.7 years at 40 m/s^2, with the four ISO 5349-1 Table C.1 points at 26, 14, 7 and 3.7 m/s^2 marked on it, vertical dashed lines at the exposure action value 2.5 m/s^2 (12.0 years) and the exposure limit value 5.0 m/s^2 (5.8 years), and the regions above 8 years and below 1 year shaded as extrapolation beyond Table C.1" width="88%" />
+
+*Because the exponent is −1.06, the relation is close to inverse-proportional:
+halving the daily exposure roughly doubles the group-mean years to a 10 %
+prevalence. That is the most useful thing it says, and it is why a control
+measure that takes a tool from 5 to 2.5 m/s² buys about six years.*
+
+**What bounds this curve.** ISO 5349-1 offers Eq. (C.1) as an *interpolation*
+rule between the four tabulated points of Table C.1, so the shaded regions of
+the figure are extrapolation. Four further limits come with it, all of them from
+the Annex C notes:
+
+- The vascular guidance rests on epidemiological studies of tools whose
+  vibration is predominantly **above 30 Hz to 50 Hz** — chain saws, grinders,
+  rock drills. Measurements dominated by weighted acceleration at lower
+  frequencies, particularly below about 20 Hz, should be treated with caution
+  (NOTE 2).
+- It is a **group-mean** statement. It does not predict the risk of finger
+  blanching for any particular individual within a group (NOTE 3).
+- The underlying groups were exposed to magnitudes up to 30 m/s² for up to 25
+  years, in near-daily work with one type of tool or process, and the
+  acceleration values come from studies reporting the dominant single-axis
+  component (NOTE 4).
+- Deviations occur where the ratio of the vibration total value to the greatest
+  single-axis component departs from typical, and where work-related or
+  environmental factors differ from those of similar occupations (NOTE 5).
+
+Above the curve, "a greater prevalence of finger blanching may be expected" is
+as far as the standard will go: the 2001 edition deliberately restricted the
+guidance to the 10 % line to limit the potential for inappropriate use of the
+relationship. The standards define no safe limit; $A(8)$ and the directive's
+action and limit values are the basis for any exposure criterion.
+
+**The whole-body counterpart.** `energy_equivalent_acceleration` gives the
+ISO 2631-1 Eq. (B.3) energy-equivalent magnitude across periods of different
+magnitude and duration,
+
+$$
+a_{w,e} = \sqrt{\frac{\sum_i a_{wi}^2\,T_i}{\sum_i T_i}},
+$$
+
+which answers a different question from $A(8)$ on the same inputs: it is a
+duration-weighted energy *average*, with no normalisation to an eight-hour day,
+so it says what a single magnitude would have to be to do the same damage over
+the same total time, not over a standard day.
+
+```python
+# Two hours on rough ground at 0.62 m/s^2, four hours on a haul road at 0.31.
+print(round(vibration.energy_equivalent_acceleration([0.62, 0.31], [2 * 3600.0, 4 * 3600.0]), 3))
+# 0.438  m/s^2 over the six hours worked ...
+print(round(vibration.daily_vibration_exposure([0.62, 0.31], [2 * 3600.0, 4 * 3600.0], kind="wbv").a8, 3))
+# ... against A(8) = 0.38 m/s^2, the same energy spread over eight hours
+```
 
 ## 5. The exposure assessment report
 
@@ -444,6 +894,14 @@ whose relevant fields for a vibration exposure report are `client` (the
 company), `specimen` (the operator or worker whose exposure was determined),
 `test_room` (the workplace), `test_date`, `instrumentation`, `calibration`, and
 the footer identity `laboratory`, `operator`, `report_id` and `notes`.
+
+Two of those fields are what ISO 5349-2 clause 9 f) asks for, and they are not
+free text: `instrumentation` carries the instrument detail — make, model, serial
+number and its conformity to ISO 8041-1 — together with the transducer locations
+and orientations and the mass of the transducer and mount; `calibration` carries
+the calibration traceability, the date of the most recent verification test and
+the result of the before-and-after functionality check of clause 6.3.1. A fiche
+whose `calibration` field is empty is not a reportable assessment.
 
 ```python
 from phonometry import vibration, ReportMetadata
@@ -487,7 +945,10 @@ the Table 3 cascade of analog stages (Formulae (1)-(5)) that
 reproducing the Annex B design-goal tables. ISO 2631-1:1997 for whole-body
 vibration, covering the weighted r.m.s. $a_w$ and vibration total value $a_v$
 (`weighted_acceleration`, `vibration_total_value`), the MTVV, VDV, MSDV and
-crest-factor dose measures, and the Annex B energy-equivalent magnitude
+crest-factor dose measures, the clause 6.3.3 comparison ratios, the Annex C
+comfort scale and the Annex D motion-sickness reading
+(`running_rms`, `motion_sickness_dose_value`), and the Annex B
+energy-equivalent magnitude
 (`energy_equivalent_acceleration`). ISO 2631-2:2003 (`Wm`), ISO 2631-4:2001
 (`Wb`) and ISO 5349-1/-2:2001 for hand-transmitted vibration, whose vector
 total, daily exposure $A(8)$ (`daily_vibration_exposure`,
@@ -507,5 +968,8 @@ this page do not substitute for.
 
 ## See also
 
+- [Multiple Shock Vibration](/phonometry/vibration/human/multiple-shock-vibration/): where a record goes once its crest factor and its clause 6.3.3 ratios say the r.m.s. cannot describe it — the ISO 2631-5 spinal-response model, and the seat-pad acquisition this page's whole-body half points at.
+- [Sound power from surface vibration](/phonometry/devices/emission/vibration-sound-power/): the other thing a surface acceleration is used for, when the question is what the machine radiates rather than what the operator receives.
+- [Calibration](/phonometry/signals/metrology/calibration/): the before-and-after check of clause 6.3.1 and the traceability the fiche's `calibration` field records.
 - API reference: [`vibration.human.exposure`](/phonometry/reference/api/vibration/exposure/).
 - Theory: [Human vibration](/phonometry/reference/theory/vibration/#human-vibration-iso-8041-1-iso-2631-12-iso-5349-12-directive-200244ec): the frequency weightings of ISO 2631-1 and ISO 5349-1, and the running r.m.s., VDV and MTVV definitions.

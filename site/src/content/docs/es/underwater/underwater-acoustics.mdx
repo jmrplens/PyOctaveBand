@@ -1,6 +1,6 @@
 ---
 title: "Acústica submarina: ruido radiado e hincado de pilotes"
-description: "Niveles de referencia ISO 18405 (SPL, SEL, pico) re 1 µPa, el nivel de ruido radiado de buques y el nivel de fuente monopolar equivalente de la ISO 17208 mediante la corrección de Espejo de Lloyd, y la exposición sonora por golpe, de pico y acumulada del hincado de pilotes de la ISO 18406."
+description: "Niveles de referencia ISO 18405 (SPL, SEL, pico) re 1 µPa, el nivel de ruido radiado de buques y el nivel de fuente monopolar equivalente de la ISO 17208 mediante la corrección de espejo de Lloyd, y la exposición sonora por golpe, de pico y acumulada del hincado de pilotes de la ISO 18406."
 references:
   - type: book
     authors: ["Urick, R. J."]
@@ -36,7 +36,7 @@ references:
     title: "Underwater acoustics — Quantities and procedures for description and measurement of underwater sound from ships — Part 2: Determination of source levels from deep water measurements"
     designation: "ISO 17208-2:2019"
     url: "https://www.iso.org/standard/62409.html"
-    note: "El nivel de fuente monopolar equivalente mediante la corrección de superficie de Espejo de Lloyd (Fórmula 3) para una profundidad de fuente de 0,7·calado."
+    note: "El nivel de fuente monopolar equivalente mediante la corrección de superficie de espejo de Lloyd (Fórmula 3) para una profundidad de fuente de 0,7·calado."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
@@ -58,10 +58,10 @@ exacta, verificada analíticamente.
 
 ## 1. Niveles de referencia (ISO 18405)
 
-Tres primitivos, referidos a 1 µPa, se calculan desde una señal de presión
-capturada. **Todo argumento de presión de esta página está en pascales** (salida
-de hidrófono calibrada, sin ponderación aplicada) y todo nivel sale re 1 µPa (o
-re 1 µPa²·s):
+Tres primitivos, referidos a 1 µPa, se calculan a partir de una señal de
+presión capturada. **Todo argumento de presión de esta página está en
+pascales** (salida de hidrófono calibrada, sin ponderación aplicada) y todo
+nivel sale re 1 µPa (o re 1 µPa²·s):
 
 $$
 \mathrm{SPL} = 10\log_{10}\frac{\langle p^2\rangle}{p_0^2}, \qquad
@@ -71,8 +71,18 @@ $$
 
 con $p_0 = 1\ \mu\text{Pa}$ y $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. El nivel de presión acústica es el nivel
 cuadrático medio (ISO 18406 Fórmula 7); el nivel de exposición sonora integra la
-presión al cuadrado sobre el registro (Fórmulas 3–4); el nivel de pico es el
-valor de cero a pico.
+presión al cuadrado sobre el registro (ISO 18406 Fórmulas 3-4); el nivel de pico
+es el valor de cero a pico, la mayor magnitud de $p(t)$ a lo largo del pulso,
+sea cual sea su signo (ISO 18406 Fórmula 5 con su nota 1).
+
+Conviene fijar esa convención antes de comparar ningún número con un
+límite. Buena parte de la literatura de hincado de pilotes, y varias
+condiciones de autorización antiguas, citan en su lugar un nivel **de pico a
+pico**, que para un pulso simétrico sale unos 6 dB más alto; la norma admite
+además declarar por separado los picos de compresión y de rarefacción
+(apartado 8.4.2). Un `peak_sound_pressure_level` calculado es de cero a pico,
+así que averigua qué convención usa un umbral externo antes de restar uno del
+otro.
 
 ```python
 from phonometry import underwater
@@ -100,7 +110,7 @@ L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{
 L_s = L_{\mathrm{RN}} + \Delta L,
 $$
 
-donde la corrección de superficie de Espejo de Lloyd (ISO 17208-2 Fórmula 3) para
+donde la corrección de superficie de espejo de Lloyd (ISO 17208-2 Fórmula 3) para
 una profundidad de fuente nominal $d_s = 0{,}7\,D$ ($D$ = calado medio) y $u = k\,d_s$,
 $k = 2\pi f/c$, es
 
@@ -108,12 +118,35 @@ $$
 \Delta L = -10\log_{10}\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-$\Delta L$ diverge a $u$ bajo (rasante / baja frecuencia) y tiende a
-$-10\log_{10}(2) = -3{,}01$ dB cuando $u \to \infty$. El nivel de fuente
-declarado es un valor *monopolar
-equivalente de través* y debe indicarse junto con su profundidad de fuente.
+La corrección existe por la superficie del mar. Para un receptor
+situado debajo, la superficie es un espejo de presión nula, así que el buque
+radia como una fuente más una imagen en oposición de fase a una distancia
+$2 d_s$ por encima de ella: el dipolo del anexo A de la ISO 17208-2. Cuando el
+par queda somero en términos de longitud de onda, ambos casi se cancelan, y el
+campo medido debajo subestima lo que tendría que valer un monopolo equivalente;
+cuando queda profundo en términos de longitud de onda, ambos se descorrelacionan
+sobre la apertura de medida y radian el doble de potencia que uno solo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de Espejo de Lloyd en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
+Lee los límites como esa misma afirmación. $\Delta L$ crece **sin cota** cuando
+$u \to 0$ (el argumento del logaritmo tiende a $u^2$), es decir, a baja
+frecuencia o con calado pequeño: ahí la conversión está invirtiendo una
+cancelación casi total, así que un error pequeño en la profundidad de fuente
+supuesta o en la velocidad del sonido se convierte en un error grande de nivel
+de fuente, y el extremo de baja frecuencia de un espectro de nivel de fuente
+declarado es su parte menos fiable. Cruza el cero en $u \approx 1{,}03$ (59 Hz
+para la profundidad de fuente de 4,2 m del ejemplo de abajo) y tiende a
+$-10\log_{10}(2) = -3{,}01$ dB cuando $u \to \infty$, donde fuente e imagen se
+suman de forma incoherente.
+
+La propia profundidad de fuente nominal es una convención, no una fuente
+localizada: la Fórmula (1) de la ISO 17208-2 fija $d_s = 0{,}7\,D$ sobre la
+media de los calados de proa y de popa, y su propia nota 4 califica la elección
+de «algo arbitraria», un compromiso. El nivel de fuente declarado es por tanto
+un valor *monopolar equivalente de través* que no significa nada por sí solo:
+el apartado 6.2 exige declarar junto a él la profundidad de fuente nominal, la
+velocidad del sonido empleada y la fórmula de conversión aplicada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de espejo de Lloyd en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -155,7 +188,7 @@ Lee los órdenes de magnitud antes de seguir. Un buque mercante vive en un nivel
 de ruido radiado de aproximadamente 160-180 dB re 1 µPa·m, frente a niveles
 espectrales de ruido ambiente oceánico de 60-100 dB, así que un resultado muy
 fuera de ese rango es un error de unidades y no un buque silencioso. Por encima
-del primer cero del Espejo de Lloyd la corrección se asienta hacia $-3$ dB y el
+del primer cero del espejo de Lloyd la corrección se asienta hacia $-3$ dB y el
 nivel monopolar equivalente queda justo *por debajo* del nivel de ruido radiado;
 solo en las bandas más bajas, donde $u$ es pequeño, va al revés.
 
@@ -164,8 +197,25 @@ partir de los ángulos de depresión 15°/30°/45°, y `source_level_uncertainty
 incertidumbre expandida tabulada (5 dB ≤100 Hz, 3 dB 125 Hz–16 kHz,
 4 dB >16 kHz).
 
+Esas cifras tabuladas son la incertidumbre del *nivel de ruido radiado*, y son
+valores representativos más que un balance de incertidumbre de tu campaña. El
+apartado 5 de la ISO 17208-2 añade dos términos más al *nivel de fuente*. La
+velocidad del sonido entra solo a través de $k d_s$, así que hasta un error del
+10 % en ella cuesta menos de un decibelio. La corrección ajustada se aparta de
+la expresión completa del espejo de Lloyd en menos de 2 dB en casi todas las
+bandas de decidécada, con una excepción: unos 4 dB en la banda donde
+$k d_s \approx 13$, que para la profundidad de fuente de 4,2 m del ejemplo
+anterior son 739 Hz, y conviene calcularla para tu propio calado antes de
+declarar nada. El tercer término, hasta qué punto es adecuado describir un
+radiador direccional con varios mecanismos como un único monopolo, la norma
+renuncia a cuantificarlo y lo deja al usuario. Debajo de todo ello hay una
+condición de validez: el apartado 6.2 de la ISO 17208-1 exige que la diferencia
+entre el nivel de señal más ruido y el de ruido sea de al menos 3 dB en una
+banda para que el nivel de esa banda cuente, aplicando y declarando la
+corrección de fondo entre 3 dB y 10 dB, y sin corregir por encima de 10 dB.
+
 Lo que convierte estas formas cerradas en un número *comparable* es la
-disciplina de medida con que la ISO 17208-1 las envuelve. El buque recorre un
+disciplina de medida con que la ISO 17208-1 las envuelve. El buque sigue un
 rumbo recto frente a una línea vertical de tres hidrófonos con un punto de
 máxima aproximación de 100 m o una eslora, lo que sea mayor, en aguas de al
 menos 150 m o 1,5 esloras de profundidad para que el fondo quede fuera de la
@@ -175,14 +225,41 @@ longitud $2\,d_{CPA}\tan 30°$ (aproximadamente 1,15 distancias de CPA),
 centrada en el aspecto de través para el que se define el nivel de ruido
 radiado (apartado 3, figura 3). Se exigen cuatro pasadas, dos por cada costado
 del buque; los
-tres niveles de hidrófono de cada pasada se promedian en potencia (fórmula 8),
-las pasadas se promedian después aritméticamente (fórmula 9), y babor y
-estribor se declaran también por separado, porque un buque real no radia de
-forma simétrica (apartado 6.5). El ruido de fondo se mide al principio y al
-final de cada periodo de ensayo y se aplica por banda la corrección al estilo
-de la ISO 3744; el límite de viento recomendado es de 20 kn para buques de más
-de 100 m (apartado 5.3). Si se omite algo de esto, el número que se cita es un
-nivel, pero no un nivel de ruido radiado ISO 17208.
+tres niveles de hidrófono de cada pasada se promedian en potencia (ISO 17208-1
+Fórmula 8), las pasadas se promedian después aritméticamente (ISO 17208-1
+Fórmula 9), y babor y estribor se declaran también por separado, porque un
+buque real no radia de forma simétrica (apartado 6.5). El ruido de fondo se
+mide al principio y al final de cada periodo de ensayo y se aplica por banda la
+corrección al estilo de la ISO 3744; el límite de viento recomendado es de
+20 kn para buques de más de 100 m (apartado 5.3).
+
+La mitad instrumental está igual de prescrita, y es lo que dan por supuesto las
+formas cerradas de arriba. Tres hidrófonos, omnidireccionales de 10 Hz a 20 kHz
+(hasta 50 kHz si los criterios de ruido del buque lo piden), con sensibilidad y
+directividad conocidas dentro de ±2 dB; los tres canales adquiridos a la vez y
+con exactitud de muestra, con los datos de seguimiento y de marca de tiempo
+registrados de forma síncrona para poder reconstruir la derrota; procesado en
+decidécadas conforme a la clase 1 de la IEC 61260, con promediado lineal en el
+dominio de la frecuencia sobre un periodo de ventana de datos (apartados 4.2,
+4.3). Los hidrófonos portátiles se calibran en laboratorio conforme a la
+IEC 60565 cada 12 meses; los fijos, antes de instalarlos, y se confirman cada
+12 meses contra una fuente calibrada o un hidrófono de referencia; y ambos
+reciben a diario, mientras duran las medidas, una calibración de campo por
+tensión insertada (tabla 1). La geometría tiene límites de aceptación, no solo
+un valor nominal: la distancia determinada con una exactitud del 10 % de la
+distancia de CPA, el CPA real entre el −10 % y el +25 % del nominal, y el
+ángulo de deriva del cable del hidrófono por debajo de 5°, o bien reducido o
+tenido en cuenta en la distancia oblicua (apartado 4.4). Y la pasada, otro
+tanto: COMEX y FINEX al menos a dos longitudes de ventana de datos a cada lado
+del CPA, velocidad constante, maquinaria fija y timón mínimo de una a otra, un
+viraje de rumbo inverso entre pasadas, y el fondo medido con el buque parado a
+2 km como mínimo y durante 30 s al menos. Si el viento cambia más de 5 kn, o
+cambian el estado de la mar, el tráfico o la precipitación, la campaña se
+suspende y se vuelve a medir el fondo (apartado 5.6). Por último hay una regla
+de descarte, que es la que más se salta: las bandas que siguen limitadas por el
+ruido de fondo tras la corrección se marcan como limitadas por el ruido de
+fondo, o no se presentan en absoluto (apartado 5.2). Si se omite algo de esto,
+el número que se cita es un nivel, pero no un nivel de ruido radiado ISO 17208.
 
 Toda esa disciplina cabe en una imagen: la geometría del tránsito en sección
 y la ventana de datos en planta.
@@ -200,6 +277,24 @@ $$
 \mathrm{SEL_{cum}} = 10\log_{10}\sum_{n} 10^{\mathrm{SEL}_n/10},
 \qquad\text{y para } N \text{ golpes idénticos } = \mathrm{SEL_{ss}} + 10\log_{10} N.
 $$
+
+La suma energética de la izquierda es la definición; la forma
+$+10\log_{10} N$ de la derecha es el caso particular en que todos los golpes son
+iguales, y un hincado real no lo es. El arranque suave trabaja a propósito con
+energía de martillo reducida, y el nivel radiado crece después conforme el
+pilote se empotra y sube la energía de hincado, así que las exposiciones por
+golpe de un mismo pilote pueden abarcar varios decibelios; que es exactamente
+por lo que el apartado 6.2 de la ISO 18406 exige a la estación de vigilancia
+registrar la secuencia completa, y el apartado 8.2, el historial de energía de
+martillo golpe a golpe incluido el arranque suave. Si se toma el golpe más
+fuerte como representativo, la campaña queda sobrestimada; si se toma uno
+temprano, queda subestimada, y el error es mayor en los hincados largos, que son
+donde aprieta el criterio acumulado. Así que: usa `cumulative_sel` con la serie
+medida golpe a golpe siempre que exista el registro, deja
+`cumulative_sel_identical` para las estimaciones de planificación y, cuando la
+uses, declara de qué golpe salió el valor por golpe. Ambas formas suponen además
+que el receptor se queda donde está, un supuesto sobre el que vuelve la guía de
+[exposición de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving_es.svg" alt="Forma de onda de presión de un golpe de hincado de pilotes por percusión con su pico marcado, y debajo el nivel de exposición sonora acumulado creciendo como SEL_ss más diez veces el logaritmo del número de golpes" width="82%" />
 
@@ -234,22 +329,108 @@ res.plot()   # forma de onda + energía acumulada (necesita matplotlib)
 duración de pulso al 90 % de energía de un golpe registrado; `cumulative_sel`
 suma una secuencia de SEL por golpe distintos.
 
+Esas dos últimas magnitudes se integran sobre ventanas distintas, y la
+diferencia importa. El SEL por golpe recorre el pulso **entero**, desde el $t_0$
+en que la curva de energía acumulada empieza a subir hasta el $t_{100}$ en que
+se aplana (apartado 6.4.2.1.2), mientras que la *duración de pulso* declarada es
+la duración de señal al **90 %** de energía (apartado 3.1, nota 2, y apartado
+6.4.2.3.1): la ventana que contiene el 90 % central de la energía del golpe, que
+es lo que hace comparable un registro con otro cuando ambos incluyen cantidades
+distintas de silencio alrededor del pulso. Es además un diagnóstico: una
+duración mucho mayor que la del pulso directo significa que el registro lo
+dominan el multitrayecto y la reverberación en vez del golpe, algo habitual en
+puertos y a larga distancia, y el apartado 6.4.2.1.2 limita la integración al
+periodo de repetición del martillo cuando los pulsos sucesivos se solapan.
+
 Estas son las métricas en que está escrita la regulación. La ISO 18406 existe
 porque las cimentaciones de parques eólicos marinos, de plataformas de
 hidrocarburos y de puentes se autorizan bajo marcos de evaluación de impacto
 ambiental que exigen monitorizar el sonido radiado, y su alcance se dibuja en
 consecuencia: hincado percusivo en aguas de 4 a 100 m, con el vibrohincado y
-las tablestacas excluidos (apartado 1). La campaña mínima es una posición de
-medida **lo más cerca posible de 750 m** del pilote, registrando la secuencia
-de hincado completa y declarando la distancia real; la norma es explícita
-en que los 750 m se eligen por comparabilidad con el gran cuerpo de medidas
-existente, no porque el límite de ningún regulador viva ahí, y en que un nivel
-a una sola distancia no tiene valor predictivo para otros emplazamientos
-(apartado 6.1.2, notas 1-2). Los criterios de impacto sobre la fauna marina se
-formulan exactamente en las magnitudes de esta sección, un tope al SEL por
-golpe o acumulado y al nivel de pico a una distancia declarada, y por eso
-`pile_strike_metrics` los da juntos y `cumulative_sel` sigue la suma
-energética golpe a golpe de las fórmulas 8-9.
+las tablestacas excluidos (apartado 1).
+
+### Medir una campaña de hincado
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pile_driving_es.svg" alt="Geometría de campaña de hincado de pilotes de la ISO 18406: un monopilote hincado por un martillo de impacto a través de 30 metros de agua con una cortina de burbujas opcional, un registrador fondeado lo más cerca posible de 750 metros que lleva dos hidrófonos a la mitad y a tres cuartos de la profundidad del agua dentro de la franja admitida que va desde 2 metros por encima del lecho marino hasta la mitad de la profundidad, el buque de medida con sus motores y su ecosonda apagados, y una vista en planta con el círculo de 750 metros, el radio de exclusión de tres veces la profundidad del agua y más posiciones sobre un transecto" width="92%" />
+
+**Dónde va el hidrófono.** La campaña mínima es una posición de medida **lo más
+cerca posible de 750 m** del pilote, registrando la secuencia de hincado
+completa y declarando la distancia real; la norma es explícita en que los 750 m
+se eligen por comparabilidad con el gran cuerpo de medidas existente, no porque
+el límite de ningún regulador viva ahí, y en que un nivel a una sola distancia
+no tiene valor predictivo para otros emplazamientos (apartado 6.1.2.1,
+notas 1-2). Mar adentro, el hidrófono se sitúa en la mitad inferior de la
+columna de agua, entre 2 m por encima del lecho marino y la mitad de la
+profundidad total medida desde la superficie, porque el campo depende mucho de
+la profundidad en la parte alta de la columna (apartado 5.2.1); en aguas
+interiores, en puertos y estuarios, se fija a la mitad de la profundidad del
+agua (apartado 5.2.2). Dos hidrófonos son mejor que uno (redundancia, dos
+sensibilidades para cubrir el margen dinámico y promediado espacial), colocados
+a dos profundidades de la mitad inferior, idealmente cerca de ½ y ¾ de la
+profundidad total y con la separación maximizada (apartado 5.2.3). Las
+posiciones adicionales no se acercan más de **tres veces la profundidad local
+del agua en el pilote**, que es también la regla en aguas interiores cuando los
+750 m son imposibles, porque más cerca que eso el nivel depende mucho de la
+profundidad de medida (apartados 6.1.2.2 y 6.1.3.2). La distancia misma tiene
+que conocerse con un 5 % o mejor (apartado 6.3).
+
+**Qué tiene que hacer el instrumento.** El margen de frecuencia del sistema va
+desde no más de 20 Hz hasta no menos de 20 kHz; el hidrófono es omnidireccional
+dentro de 2 dB en ese margen, y la respuesta plana dentro de unos 2 dB o bien
+calibrada a lo largo de él (apartados 4.2.2, 4.2.3). La relación señal/ruido es
+de al menos 10 dB y el ruido propio del sistema queda al menos 10 dB por debajo
+del nivel más bajo que se vaya a medir, lo que es una restricción real para el
+trabajo de fondo: el ruido propio de un registrador corriente se acerca a los
+niveles de estado de la mar cero cerca de 63 Hz y 125 Hz (apartados 4.2.4,
+4.2.5). El margen dinámico se elige para que la presión máxima esperada se
+registre sin saturación, y se prefieren más de 60 dB (apartado 4.2.6): el nivel
+de pico es una métrica regulada y el recorte lo destruye en silencio mientras
+sigue devolviendo un número plausible.
+
+**Calibración.** Toda la cadena se calibra en ese margen de frecuencia
+(hidrófono, amplificadores, filtros y el ajuste de fondo de escala y el factor
+de calibración del convertidor A/D) con trazabilidad a patrones nacionales o
+internacionales, y con la calibración del hidrófono conforme a la IEC 60565; la
+calibración de laboratorio, preferiblemente con no más de dos años entre una y
+otra, y una comprobación de campo con pistófono antes y después de cada
+despliegue importante (apartados 4.3.1, 4.3.2). Analiza datos sin comprimir
+(apartado 4.4).
+
+**Lo que arruina un registro sin avisar.** El ruido de flujo por debajo de unos
+100 Hz, peor en corrientes de marea; la vibración del cable cuando una corriente
+lo pone en tensión; el oleaje en superficie, donde un cambio de 10 cm en la
+columna de agua sobre un hidrófono suspendido desde la superficie es una
+oscilación hidrostática de 1 kPa (180 dB re 1 µPa) que se come el margen del
+convertidor A/D; el motor, el generador, el inversor y la ecosonda del propio
+buque de medida, que se apagan, declarando en los resultados el estado del
+motor; cadenas, grilletes y cables rozando; e interferencias eléctricas
+(apartado 5.3). El ruido de fondo se mide con el hincado parado, sobre el mismo
+tiempo de promediado que la señal, y de él se determina la relación señal/ruido
+(apartado 6.1.4).
+
+**Qué tiene que llevar el informe.** Fecha y hora, profundidad del hidrófono,
+posiciones GPS del pilote y de los hidrófonos, tipo de lecho marino con el
+esquema de clasificación nombrado, profundidad del agua y la variación de marea
+durante el hincado, el estado operativo del buque de medida y las fuentes de
+incertidumbre significativas (apartado 8.1.2); dimensiones y material del
+pilote, profundidad del agua en el pilote, modelo de martillo, el historial de
+energía golpe a golpe incluido el arranque suave, la profundidad de penetración
+y cualquier mitigación como una cortina de burbujas (apartado 8.2); y la
+configuración de despliegue con sus certificados de calibración
+(apartado 8.3.1). Los resultados se declaran por hidrófono y por posición: SEL
+por golpe en banda ancha y por bandas, el nivel de pico y la relación
+señal/ruido (apartado 8.4.1). Sin ese registro, un SEL a una sola distancia no
+dice nada de ningún otro emplazamiento, que es el sentido de las notas 1-2 de
+arriba.
+
+Los criterios de impacto sobre la fauna marina se formulan exactamente en las
+magnitudes de esta sección, un tope al SEL por golpe o acumulado y al nivel de
+pico a una distancia declarada, y por eso `pile_strike_metrics` los da juntos y
+`cumulative_sel` sigue la suma energética golpe a golpe de las Fórmulas 8-9 de
+la ISO 18406. Convertir esos números en una evaluación (ponderar el espectro
+para un grupo auditivo, acumularlo sobre los golpes y compararlo con los
+criterios de inicio publicados) es
+[Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/).
 
 ## Qué cubre esta guía
 
@@ -258,27 +439,38 @@ energética golpe a golpe de las fórmulas 8-9.
 `peak_sound_pressure_level`. Las ISO 17208-1:2016 e ISO 17208-2:2019 para el
 nivel de ruido radiado del buque y el nivel de fuente monopolar equivalente:
 `radiated_noise_level` y `monopole_source_level`, con la corrección de
-superficie de Espejo de Lloyd (fórmula 3) y la profundidad de fuente de
-0,7·calado (fórmula 1), la geometría de tres hidrófonos
+superficie de espejo de Lloyd (ISO 17208-2 Fórmula 3) y la profundidad de
+fuente de 0,7·calado (ISO 17208-2 Fórmula 1), la geometría de tres hidrófonos
 (`hydrophone_depths`) y la incertidumbre tabulada del nivel de fuente
 (`source_level_uncertainty`). La ISO 18406:2017 para las métricas de hincado
-de pilotes de la sección 3: la exposición sonora por golpe (fórmulas 3-4), el
-SPL cuadrático medio (fórmula 7) y la exposición sonora acumulada (fórmulas
-8-9), que calculan `single_strike_sel`, `cumulative_sel`,
-`cumulative_sel_identical` y `pile_strike_metrics`.
+de pilotes de la sección 3: la exposición sonora por golpe (ISO 18406
+Fórmulas 3-4), el SPL cuadrático medio (ISO 18406 Fórmula 7) y la exposición
+sonora acumulada (ISO 18406 Fórmulas 8-9), que calculan `single_strike_sel`,
+`cumulative_sel`, `cumulative_sel_identical` y `pile_strike_metrics`.
 
 **No cubierto.** La disciplina de medida de la ISO 17208-1 en sí no está
 implementada: el promediado en potencia y aritmético de cuatro pasadas y tres
-hidrófonos (fórmulas 8-9), las comprobaciones de geometría de CPA y
+hidrófonos (ISO 17208-1 Fórmulas 8-9), las comprobaciones de geometría de CPA y
 profundidad de agua, la puntuación de la ventana de datos de ±30° y la
 corrección de ruido de fondo al estilo ISO 3744 descrita en la sección 2
 anterior quedan a cargo del lector; la biblioteca solo aporta las fórmulas
-cerradas `radiated_noise_level` y `monopole_source_level`. La propia ISO
-18406 excluye el vibrohincado y las tablestacas de su alcance (apartado 1),
-así que el ruido del hincado continuo no tiene forma cerrada aquí ni en
-ningún otro lugar de phonometry.
+cerradas `radiated_noise_level` y `monopole_source_level`. Lo mismo vale para
+la campaña de la ISO 18406 de la sección 3: los requisitos de despliegue,
+instrumento, calibración e informe se describen aquí y no se hacen cumplir en
+ningún sitio del código, y nada comprueba que un golpe entregado a
+`pile_strike_metrics` venga de un registro que los cumpla. La propia ISO 18406
+excluye de su alcance el vibrohincado y las tablestacas, y el hincado en menos
+de 4 m o más de 100 m de agua (apartado 1), así que el ruido del hincado
+continuo no tiene forma cerrada aquí ni en ningún otro lugar de phonometry.
 
 ## Véase también
 
+- [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
+  la evaluación a través de la cual se aplican los criterios nombrados en la
+  sección 3, con la ponderación auditiva, la acumulación sobre los golpes y el
+  margen frente a los criterios de inicio publicados.
+- [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
+  la pérdida por transmisión que lleva estos niveles de fuente hasta un
+  receptor, y la ecuación del sonar que alimentan.
 - Referencia de la API: [`underwater.acoustics`](/phonometry/es/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](/phonometry/es/reference/api/underwater/pile-driving-noise/) y [`underwater.sources.ship_radiated_noise`](/phonometry/es/reference/api/underwater/ship-radiated-noise/).
 - El modelado general de propagación submarina (rayos, modos normales, ecuación parabólica) se cubre en [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).

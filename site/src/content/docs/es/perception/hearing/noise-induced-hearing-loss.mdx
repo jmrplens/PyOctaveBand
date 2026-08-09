@@ -94,6 +94,64 @@ $L_0 = 89$ dB, a 90 dB) el ruido no produce desplazamiento permanente. Para
 duraciones menores de 10 años la mediana se extrapola del valor a 10 años
 (Fórmula 3); puede pedirse un subconjunto de frecuencias con `frequencies=`.
 
+**Qué tiene que ser $L_{EX,8h}$.** El primer argumento es el nivel de exposición
+al ruido ponderado A normalizado a una jornada nominal de ocho horas, en la
+práctica el resultado de un
+[estudio según ISO 9612](/phonometry/es/perception/hearing/occupational-exposure/)
+del grupo de exposición homogénea, que es la norma que la ISO 1999 cita
+normativamente para ello. Es el nivel **en el oído sin protección**: el objeto y
+campo de aplicación dice con todas las letras que ninguno de sus niveles tiene
+en cuenta los protectores auditivos, que reducirían la exposición efectiva y
+además cambiarían el espectro en el oído, así que meter un nivel atenuado o
+«efectivo» no es un atajo conservador sino otra magnitud. El protector se
+declara aparte. El modelo trata además el nivel como constante durante toda la
+duración, así que una carrera con cambios de puesto se parte en tramos y cada
+uno se predice con su propio nivel en vez de promediar primero: la Fórmula (2)
+es cuadrática en el exceso sobre $L_0$, de modo que promediar antes de elevar al
+cuadrado infravalora. Y la duración son años de *exposición*, no la edad ni los
+años de contrato.
+
+El nivel es además la variable sobre la que actúa una decisión de conservación
+auditiva, y es la que fijan las dos figuras de esta página:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_level_growth_es.svg"
+  alt="Dos paneles. Izquierda: el NIPTS mediano tras 40 años frente al nivel de exposición normalizado a 8 h de 75 a 100 dB(A), una curva por frecuencia audiométrica; cada curva arranca de cero en su propio nivel de corte L0 de 93, 89, 80, 77, 75 y 77 dB, marcado con un punto, y crece después de forma cuadrática, con la curva de 4000 Hz llegando a unos 41 dB a 100 dB(A). Derecha: solo la curva de 4000 Hz para 10, 20, 30 y 40 años, con dos flechas que muestran que un escalón de 3 dB de 85 a 88 dB(A) añade 4,5 dB de desplazamiento mientras que el mismo escalón de 95 a 98 dB(A) añade 8,4 dB"
+  width="96%"
+/>
+
+*Por debajo de su corte $L_0$ el modelo devuelve exactamente cero, y por encima
+el desplazamiento es cuadrático en el exceso, así que reducciones iguales en
+decibelios valen progresivamente más cuanto más ruidoso es el puesto. A la
+derecha, a 4 kHz y sobre una carrera de 40 años, quitar 3 dB a un puesto de
+88 dB(A) recupera 4,5 dB de desplazamiento mediano, mientras que quitar esos
+mismos 3 dB a un puesto de 98 dB(A) recupera 8,4 dB. Esa asimetría, y no la
+forma de la muesca, es lo que se compra con una medida de control.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `hearing` y el resultado `r` vienen del primer fragmento de esta página.
+levels = np.arange(75.0, 100.5, 0.5)
+fig, (ax_f, ax_t) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+for k, f in enumerate(r.frequencies):
+    ax_f.plot(levels, [hearing.nipts(x, 40.0, 0.5).median[k] for x in levels],
+              label=f"{f:g} Hz")
+ax_f.legend()
+
+for years in (10, 20, 30, 40):
+    ax_t.plot(levels, [hearing.nipts(x, years, 0.5).median[4] for x in levels],
+              label=f"{years} años")   # el índice 4 es 4000 Hz
+ax_t.legend()
+plt.show()
+```
+
+</details>
+
 Una carrera más larga y más ruidosa hace inconfundible la forma:
 
 <ThemeImage
@@ -127,6 +185,37 @@ frecuencias. Sale del modelo en lugar de imponérsele: el nivel de corte $L_0$
 y los coeficientes $u$, $v$ de la Tabla 1 son mínimos donde el oído es más
 vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
 4 kHz que a 500 Hz.
+
+### Dónde vale el modelo
+
+La Fórmula (2) es una cuadrática sin cota superior, así que sigue devolviendo
+números de aspecto plausible mucho más allá de los datos que la ajustaron.
+Importan cuatro límites, y la biblioteca lo dice en tres de ellos lanzando
+`NoiseInducedHearingLossWarning`:
+
+- **La duración.** La mediana está especificada de 10 a 40 años, con la Fórmula
+  (3) extrapolando hacia abajo hasta 1 año. Una exposición de seis meses o una
+  carrera de cincuenta años quedan fuera del rango ajustado y avisan.
+- **El nivel.** Los ejemplos resueltos del Anexo D abarcan de 85 dB a 100 dB, y
+  la NOTA 4 del objeto y campo de aplicación restringe la validez a los rangos
+  de niveles declarados; por encima de 100 dB la guía avisa, y el propio objeto
+  y campo de aplicación reconoce como extrapolación el uso por encima de 200 Pa
+  (140 dB).
+- **El fractil.** El apartado 6.3.2 califica de poco fiables las colas por
+  debajo de $Q$ = 5 % y por encima del 95 % y dice que no deberían estimarse,
+  así que el par 0,9 / 0,1 usado en los ejemplos de arriba ya se sitúa cerca del
+  borde práctico, y cualquier cosa más allá avisa.
+- **El carácter del ruido.** Este límite es silencioso, porque no lo lleva
+  ningún argumento. La NOTA 3 del objeto y campo de aplicación dice que el
+  método de predicción se basa sobre todo en datos recogidos con ruido
+  esencialmente **de banda ancha, estacionario y no tonal**, y el objeto y
+  campo de aplicación cubre el ruido por debajo de unos 10 kHz que sea
+  estacionario, intermitente, fluctuante o irregular. Una exposición impulsiva
+  o marcadamente tonal es por tanto un uso fuera de la evidencia, no un error
+  de cálculo, y la Introducción aparta explícitamente el ruido de explosión y
+  el de alto impulso. La NOTA 4 añade un segundo límite silencioso: las
+  simplificaciones que hay detrás de los datos suponen una duración de
+  exposición diaria no mayor de 12 h.
 
 ### Informe de NIPTS (`.report()`)
 
@@ -166,7 +255,7 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso1999_nipts_example"
@@ -224,13 +313,13 @@ plt.show()
 # A mano, ambos paneles:
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 for yr in (10, 20, 30, 40):
-    ax1.plot(f, hearing.nipts(95.0, yr, 0.5).median, "o-", label=f"{yr} yr")
+    ax1.plot(f, hearing.nipts(95.0, yr, 0.5).median, "o-", label=f"{yr} años")
 ax1.set_xscale("log"); ax1.invert_yaxis(); ax1.legend()
 
 h = hearing.htlan(60, "male", 95.0, 30.0, 0.5)
-ax2.plot(f, h.htla, "o-", label="Age (HTLA)")
-ax2.plot(f, h.nipts, "^-", label="Noise (NIPTS)")
-ax2.plot(f, h.threshold, "s--", label="Age + noise (HTLAN)")
+ax2.plot(f, h.htla, "o-", label="Edad (HTLA)")
+ax2.plot(f, h.nipts, "^-", label="Ruido (NIPTS)")
+ax2.plot(f, h.threshold, "s--", label="Edad + ruido (HTLAN)")
 ax2.set_xscale("log"); ax2.invert_yaxis(); ax2.legend()
 plt.show()
 ```
@@ -261,6 +350,87 @@ $H + N$ está por debajo de 40 dB; 40 dB es solo un marcador aproximado de dónd
 el efecto se vuelve apreciable, no una frontera estricta, y la corrección crece
 de forma sostenida en el régimen de una exposición larga y ruidosa donde ambos
 términos son grandes.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/htlan_compression_es.svg"
+  alt="Un mapa de contornos rellenos de los decibelios que quita el término HN/120 sobre el plano de la componente de edad H de 0 a 60 dB frente a la componente de ruido N de 0 a 60 dB. La cantidad retirada es una familia hiperbólica que crece desde 0 en la esquina inferior izquierda hasta unos 30 dB en H = N = 60 dB. La línea a trazos donde H + N vale 40 dB cruza contornos de entre unos 2 y 3 dB en lugar de seguir uno solo, y está marcado el caso resuelto en H = 20,2 y N = 24,8 dB, donde se retiran 4,2 dB de la suma de 45,0 dB"
+  width="72%"
+/>
+
+*La corrección es un producto, así que no tiene umbral: la línea a trazos
+$H + N = 40$ dB corta los contornos en lugar de seguir uno. Una componente de
+edad grande hace que se comprima una componente de ruido modesta, y al revés:
+en el caso resuelto ya se han ido 4,2 dB, y un trabajador con 40 dB de cada
+causa pierde 13,3 dB de la suma.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `hearing` es la importación del primer fragmento de esta página.
+grid = np.linspace(0.0, 60.0, 121)
+h, n = np.meshgrid(grid, grid)
+removed = h + n - hearing.combine_age_and_noise(h, n)
+print(round(float(removed[-1, -1]), 1))          # 30.0 dB en H = N = 60
+
+fig, ax = plt.subplots(figsize=(8.2, 6.4))
+cs = ax.contourf(h, n, removed, levels=np.arange(0.0, 31.0, 2.0), cmap="YlOrRd")
+fig.colorbar(cs, ax=ax)
+ax.plot([0.0, 40.0], [40.0, 0.0], "--")          # H + N = 40 dB
+plt.show()
+```
+
+</details>
+
+### Comparar con un audiograma medido
+
+El HTLAN solo es comparable con un audiograma obtenido igual que se obtuvieron
+las bases de datos que lo sustentan, y la ISO 1999 hace de la técnica parte de
+la comparación en lugar de un detalle de implementación: el apartado 6.2.3
+establece que, como las técnicas de medida audiométrica afectan a las medidas
+del umbral, debería usarse para establecer la base de datos HTLA la misma
+técnica que se use para obtener o verificar el umbral de la población expuesta
+al ruido. Cambia el auricular o el procedimiento de determinación del umbral y
+se mueve el desfase entre lo medido y lo predicho. En la práctica eso significa:
+
+- **Tonos puros por vía aérea.** El apartado A.1 dice que la base de datos A
+  *es* la distribución de ISO 7029 del umbral normal de audición por vía aérea,
+  así que un umbral por vía ósea no es la magnitud que se está prediciendo.
+- **Un auricular declarado y calibrado.** El dB HL depende del transductor: el
+  0 dB HL es el nivel de presión acústica umbral equivalente de referencia de
+  ISO 389-1 (supraaural), ISO 389-2 (de inserción) o ISO 389-8 (circumaural)
+  para el auricular realmente colocado. Se deja constancia de cuál, y de su
+  calibración.
+- **Un procedimiento de umbral declarado.** El apartado 6.2.3 de
+  ISO 8253-1:2010 especifica dos procedimientos manuales, el ascendente y el de
+  horquillado, que difieren solo en la secuencia de presentaciones y que, bien
+  ejecutados, dan umbrales sustancialmente iguales. Se deja constancia de cuál,
+  y de que un procedimiento ajeno a ese apartado puede mover el umbral varios
+  decibelios en promedio.
+- **Las mismas seis frecuencias.** `nipts` y `htlan` devuelven 500, 1000, 2000,
+  3000, 4000 y 6000 Hz. Un audiograma que se salte 3 kHz o 6 kHz no puede
+  compararse donde vive la muesca del ruido.
+- **Un criterio de oído fijo.** El oído peor, el oído mejor o la media de los
+  dos son tres comparaciones distintas contra la misma predicción, y la
+  ISO 1999 deja la elección al usuario, así que corresponde al informe y no a
+  la cabeza del analista.
+- **Un intervalo sin ruido antes del ensayo.** El NIPTS es desplazamiento
+  *permanente*, y le precede un desplazamiento temporal del umbral reversible;
+  el apartado 5.1 de ISO 8253-1 dice que debe evitarse una exposición al ruido
+  significativa antes de la audiometría o, en su defecto, dejarla anotada. Un
+  audiograma tomado a media recuperación mide el TTS sobre la pérdida
+  permanente y superará el HTLAN previsto por un motivo que el modelo no
+  describe. Se anota el tiempo transcurrido desde la última exposición.
+
+Una cautela que se aplica a toda la comparación: el objeto y campo de
+aplicación establece que la norma se basa en datos estadísticos y no puede
+aplicarse a la predicción o evaluación de la pérdida auditiva de un individuo
+salvo en términos de probabilidades estadísticas. Un único audiograma por
+encima de la mediana no es prueba de nada; una *distribución* de audiogramas
+por encima de los fractiles predichos sí lo es.
 
 **Cautelas con el umbral de compensación (*fence*).** La ISO 1999 da umbrales
 y su distribución; *no* define una «discapacidad auditiva» ni un umbral
@@ -317,7 +487,7 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; Pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF.
 
 <ReportPreview
 	name="iso1999_htlan_example"
@@ -349,5 +519,14 @@ aportarla y comprobarla uno mismo.
 
 ## Véase también
 
+- [Exposición laboral al ruido](/phonometry/es/perception/hearing/occupational-exposure/): el
+  estudio según ISO 9612 que produce el $L_{EX,8h}$ que consume este modelo, y
+  la incertidumbre que lo acompaña.
+- [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/): la componente
+  de edad $H$ de ISO 7029 a la que este modelo suma la componente de ruido, y el
+  cero de ISO 389-7 al que está referida la escala dB HL.
+- [Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/): lo
+  que cuesta un umbral desplazado en audibilidad del habla, que es la
+  consecuencia que el trabajador nota de verdad.
 - Referencia de la API: [`hearing.noise_induced_hearing_loss`](/phonometry/es/reference/api/hearing/noise-induced-hearing-loss/).
 - Teoría: [Pérdida auditiva inducida por ruido (ISO 1999)](/phonometry/es/reference/theory/perception/#pérdida-auditiva-inducida-por-ruido-iso-1999): el modelo de desplazamiento del umbral de ISO 1999, su mediana y su dispersión por fractiles.

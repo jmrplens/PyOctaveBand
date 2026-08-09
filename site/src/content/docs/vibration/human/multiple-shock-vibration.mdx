@@ -15,7 +15,14 @@ references:
     title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 5: Method for evaluation of vibration containing multiple shocks"
     designation: "ISO 2631-5:2018"
     url: "https://www.iso.org/standard/50905.html"
-    note: "The seat-to-spine transfer function (clause 5.2, Formula 1), the acceleration and daily dose (clause 5.3, Formulae 3-5) and the Annex C assessment of adverse health effects (Formulae C.1, C.3-C.5, Tables C.1/C.2)."
+    note: "The acquisition and conditioning of the record (clauses 5.1.2 to 5.1.4), the seat-to-spine transfer function (clause 5.2, Formula 1), the acceleration and daily dose (clause 5.3, Formulae 3-5) and the Annex C assessment of adverse health effects (Formulae C.1, C.3-C.5, Tables C.1/C.2)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Mechanical vibration — Laboratory method for evaluating vehicle seat vibration — Part 1: Basic requirements"
+    designation: "ISO 10326-1:2016"
+    url: "https://www.iso.org/standard/63149.html"
+    note: "The accelerometer disc on the seat pad that clause 5.1.2 requires: its diameter, height and hardness, and the metal disc that carries the transducers (5.2.3)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -45,21 +52,112 @@ is quantitative: when the band-limited vertical peak acceleration exceeds
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5.svg" alt="Flow from the vertical seat acceleration az(t), conditioned as clause 5.1.3 requires with a second-order 0.01 Hz high pass and a fourth-order 80 Hz low pass and not with the ISO 2631-1 0.4 to 100 Hz filters, through the spinal response, the acceleration dose Dz and daily dose Dzd, the compressive stress Sd, the age-cumulated stress variable R, and the Weibull probability of lumbar injury" width="86%" loading="eager" />
 
-## 1. Spinal response (clause 5.2)
+## 1. Getting the record (clauses 5.1.2 and 5.1.4)
+
+Everything below starts from a measured $a_z(t)$, and ISO 2631-5 adds four
+acquisition requirements on top of the ISO 2631-1 ones, each of them specific to
+shock exposure.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup.svg" alt="Left: the seat pan in section with a seated occupant's ischial tuberosities resting on the ISO 10326-1 semi-rigid mounting disc of 250 plus or minus 50 mm diameter and at most 12 mm height, carrying a 75 plus or minus 5 mm by 1.5 mm metal disc for the accelerometers, taped to the cushion, with a contact switch beside it and the z axis positive to cranial, on a suspension seat. Right: a recorded acceleration with two shaded windows where contact is lost, excluded from the exposure, splitting the record into three contact segments that are conditioned separately. Below: the hardware requirements of clause 5.1.2 and the duration requirement of clause 5.1.4" width="94%" />
+
+**Where (5.1.2).** $a_z(t)$ is measured at the interface between the seat and
+the **ischial tuberosities**. The measurement location on the seat and the
+design of the accelerometer disc on the seat pad follow **ISO 10326-1**: a
+semi-rigid moulded disc of 250 ± 50 mm diameter and at most 12 mm height, 80 to
+90 durometer (A-scale), with a centre cavity holding a 75 ± 5 mm diameter,
+1.5 mm thick metal disc that the accelerometers are attached to, taped to the
+cushion so that the transducers sit midway between the tuberosities (5.2.3 of
+that standard). The subject stays seated throughout data collection and does not
+rise from the seat.
+
+**Loss of contact (5.1.2).** Contact switches, video recordings or another
+method detect loss of contact between the subject and the seat surface.
+Accelerations measured while contact is lost **shall not be counted as
+exposure**, and the loss of contact shall be detected and reported; the impact
+on landing after a free fall — the motion of the person *and* of the seat —
+shall be fully taken into account. This is the instrumentation that the
+*severe* regime of clause 4 above actually requires, and it is what makes an
+ISO 2631-5 record different from an ISO 2631-1 one.
+
+**The chain (5.1.2).** The accelerometers and measuring equipment shall be
+appropriate for the highest amplitudes anticipated over the measurement period.
+The digitised record should have a flat acceleration response from 0.01 Hz to at
+least 80 Hz, and a sampling rate of 256 samples per second or greater can be
+necessary depending on the anti-aliasing method used — which is where the
+`fs = 256.0` of the worked example below comes from. Details of the measurement
+equipment, including the calibration method used, shall be provided.
+
+**How long (5.1.4).** The record shall be long enough for the measured multiple
+shocks to be typical of the exposure being assessed. Shock events may be
+infrequent, so the duration has to be estimated from how variable the impacts
+are: where a few severe shocks sit among many small ones, a longer record is
+needed to have a reasonable probability of capturing them. A complete work cycle
+is representative for a repeatable task such as a mine haul truck; for
+non-repeatable ones — off-road travel, military transport — the sufficient
+duration depends on the variability of the terrain. Trials that expose people to
+repeated shock need their own risk assessment, and shorter measurements first.
+
+## 2. Conditioning the record (clause 5.1.3)
+
+The conditioning is six ordered steps, and two of them contradict the advice a
+reader would otherwise give themselves.
+
+1. **Check the sign.** The whole method is about *compressive* spinal loading,
+   so the z axis must be positive to cranial: upward positive, in the
+   basicentric system for seated persons. A sign error inverts which peaks are
+   counted.
+2. **Cut out the parts with no contact** between the accelerometer disc on the
+   seat pad and the subject. This splits the record into separate parts, and the
+   remaining steps are applied to each part **separately**.
+3. **Check the anti-aliasing** if the data were resampled after acquisition.
+   NOTE 1 warns that common data-processing packages apply suitable filters
+   automatically, but that it is important to verify that they did.
+4. **Offset-correct** so that the recorded acceleration reads (0 ± 0.1) m/s²
+   with the accelerometer at rest. The clause then adds the warning: subtraction
+   of the mean **may not be appropriate** if the recorded acceleration is
+   asymmetric — and a shock record is asymmetric by construction, which is
+   exactly the case a mean subtraction gets wrong.
+5. **Taper** — a cosine taper over several seconds, for instance — if the
+   accelerometer was in motion at the start or the end of the recording, before
+   the band limiting.
+6. **Band-limit** with a second-order Butterworth high pass at 0.01 Hz and a
+   fourth-order Butterworth low pass at 80 Hz. The band-limiting and weighting
+   filters of ISO 2631-1 shall **not** be applied.
+
+The last step is where the number is won or lost. NOTE 2 gives the reason in
+numbers: free-fall periods above 0.5 s have been observed on fast naval craft,
+and a 0.5 Hz high pass drags the −1 g of the free fall back to zero before the
+impact arrives, so the impact peak is offset by up to +1 g and the calculated
+dose is wrong by of order 10 %. Abrupt changes in terrain contour can do the
+same. The 0.01 Hz corner exists to keep the free fall in the record.
+
+```python
+import numpy as np
+from scipy.signal import butter, filtfilt
+
+# The clause 5.1.3 band limiting, on a record already offset-corrected and
+# split at the loss-of-contact boundaries.
+fs = 256.0
+high = butter(2, 0.01, "high", fs=fs, output="sos")   # 2nd order, 0.01 Hz
+low = butter(4, 80.0, "low", fs=fs, output="sos")     # 4th order, 80 Hz
+print(high.shape, low.shape)                          # (1, 6) (2, 6)
+```
+
+## 3. Spinal response (clause 5.2)
 
 A seat-to-spine transfer function $H(f)$ (one complex zero and six complex
 poles, unity transmissibility at 0 Hz and a resonance near 5 Hz) maps the
-measured seat acceleration to the vertical spinal response $A_z(t)$
+conditioned seat acceleration to the vertical spinal response $A_z(t)$
 (Formula 1/2):
 
 $$
 A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
 $$
 
-The input record must be **conditioned (DC-removed)**: because $H$ is unity at
-0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
-accelerometer) passes straight into $A_z(t)$ and corrupts the positive
-response peaks of the dose. Subtract the mean (or high-pass) before processing.
+The conditioning of section 2 is not optional here: because $H$ is unity at
+0 Hz by design, a DC offset — the 1 g gravity component of a DC-coupled
+accelerometer, say — passes straight into $A_z(t)$ and corrupts the positive
+response peaks the dose is built from.
 
 ```python
 from phonometry import vibration
@@ -69,7 +167,7 @@ print(round(abs(vibration.seat_to_spine_transfer([2.0])[0]), 2))  # 1.06
 print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 ```
 
-## 2. Acceleration dose (clause 5.3)
+## 4. Acceleration dose (clause 5.3)
 
 The **acceleration dose** combines the positive response peaks $A_{z,i}$
 (each the maximum between two consecutive zero crossings) with a sixth-power
@@ -79,8 +177,18 @@ $$
 D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
 $$
 
+The 1.07 is not a calibration fudge: NOTE 1 to clause 5.3 says that Formula (1)
+represents the frequency response of the spine as a filter, and that the spine
+also has an *amplitude* response function, which is what the 1.07 carries. Only
+positive peaks are counted, and the sixth power has an operational corollary the
+standard states outright: acceleration peaks lower than the highest by a factor
+of three or more do not contribute significantly to Formula (3). A day's dose is
+therefore decided by a handful of impacts, which is also why the peak count is
+robust to how the zero-crossing rule treats the small stuff.
+
 A daily dose scales the measured dose to the daily exposure time $t_d$ over
-the measurement time $t_m$ (Formula 4): $D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
+the measurement time $t_m$ (Formula 4): $D_{zd} = D_z\,(t_d/t_m)^{1/6}$. To
+compare different exposures the standard recommends $t_d$ = 8 h.
 
 ```python
 from phonometry import vibration
@@ -89,7 +197,53 @@ from phonometry import vibration
 print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 ```
 
-## 3. Injury risk (Annex C)
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spinal_response_peaks.svg" alt="Two stacked panels over the same 8 s off-road seat record at 256 samples per second. Top: the conditioned seat acceleration and the spinal response overlaid, with each impact turned into a ringing response, and a 0.4 s free fall clamped at minus 9.81 metres per second squared before the largest impact. Bottom: the same spinal response with its 28 counted positive peaks marked, a dashed line at a third of the largest peak, and the three largest peaks annotated with their share of the sixth-power sum: 30.3 gives 98.6 percent, 14.7 gives 1.3 percent and 9.2 gives 0.1 percent, for an acceleration dose of 32.5 metres per second squared" width="94%" />
+
+*What clause 5 does to a record, in the domain it does it in. The seat-to-spine
+filter is resonant, so a sharp seat impact becomes a ringing spinal response
+whose peak arrives later and looks nothing like the input; the zero-crossing
+rule then counts 28 positive peaks; and the sixth power hands 98.6 % of the dose
+to one of them. Everything below a third of the largest peak — the dashed line —
+is contributing hundredths of a percent, which is the rule of clause 5.3 made
+visible. `MultipleShockResult.peaks` holds exactly the marked values.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+# `vibration` is the namespace imported in the snippet of section 3.
+
+fs_rec, duration = 256.0, 8.0
+time = np.arange(int(duration * fs_rec)) / fs_rec
+rng = np.random.default_rng(11)
+seat = 1.5 * np.sin(2 * np.pi * 3.6 * time) + 0.45 * rng.standard_normal(time.size)
+for start, amplitude in ((1.15, 26.0), (3.05, 8.0), (5.60, 55.0), (6.95, 15.0)):
+    hit = time >= start
+    seat[hit] += amplitude * np.exp(-20.0 * (time[hit] - start)) * np.sin(
+        2 * np.pi * 5.5 * (time[hit] - start))
+seat[(time >= 5.18) & (time < 5.58)] = -9.81      # 0.4 s of free fall
+
+response = np.asarray(vibration.spinal_response(seat, fs_rec))
+peaks = np.asarray(vibration.response_peaks(response))
+shares = 100.0 * peaks**6 / float(np.sum(peaks**6))
+print(peaks.size, round(float(peaks.max()), 1), round(float(shares.max()), 1))
+# 28 30.3 98.6
+
+fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
+ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_z(t)$")
+ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_z(t)$")
+ax_p.plot(time, response, lw=1.2, color="#1f77b4")
+ax_p.axhline(peaks.max() / 3.0, ls="--", color="#2ca02c")
+ax_t.legend(loc="upper left")
+ax_p.set_xlabel("Time [s]")
+plt.show()
+```
+
+</details>
+
+## 5. Injury risk (Annex C)
 
 The daily dose becomes a daily **compressive stress** $S_d = m_z\,D_{zd}$
 (Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
@@ -132,6 +286,47 @@ r = vibration.injury_risk(sd, start_age=20, years=20, days_per_year=120)
 print(round(r, 2))                               # 1.22
 print(round(100 * vibration.injury_probability(r)))     # 37  % risk of injury
 ```
+
+### Reading $R$ (Table C.2)
+
+$R$ has no units and no meaning until it is put on the Table C.2 scale, which
+gives the value associated with a 10 %, 50 % and 90 % risk of injury for each
+sex:
+
+| Risk of injury | 10 % | 50 % | 90 % |
+| :--- | :--- | :--- | :--- |
+| Male | 0.72 | 1.42 | 2.17 |
+| Female | 0.52 | 0.87 | 1.20 |
+
+The four bands those thresholds cut out are the ones the fiche of section 6
+prints: below the 10 % value a **low** probability of an adverse health effect,
+between 10 % and 50 % a **moderate** one, between 50 % and 90 % a **high** one,
+and above the 90 % value a **very high** one. The male example above, $R$ = 1.22,
+sits in the moderate band, which is what the standard's own worked example
+concludes.
+
+**The default matters.** `compression_dose` takes `mz` and `injury_risk` takes
+`sex`, and both default to the male values. Running the *same exposure* for a
+64 kg female subject does not merely change the number, it changes the verdict:
+
+```python
+for sex, mz in (("male", 0.029), ("female", 0.025)):
+    sd_sex = vibration.compression_dose(dz, mz=mz)
+    r_sex = vibration.injury_risk(sd_sex, start_age=20, years=20,
+                                  days_per_year=120, sex=sex)
+    print(sex, round(sd_sex, 2), round(r_sex, 2),
+          round(100 * float(vibration.injury_probability(r_sex, sex=sex))))
+# male   1.62 1.22 37   -> moderate  (10 % < risk < 50 %)
+# female 1.40 0.96 64   -> high      (50 % < risk < 90 %)
+```
+
+The lower compressive stress lands in the higher band, because the female
+thresholds of Table C.2 are lower still. NOTE 5 of Annex C records the same
+result for this exposure and quotes $R$ = 0.97 against the 0.96 computed here,
+a rounding of its own printed $S_d$; the band, and therefore the verdict, is the
+same. The $\alpha$ and $\beta$ coefficients of Formula (C.5) and the Table C.2
+thresholds for female subjects rest on a smaller data set, as the standard
+footnotes both tables.
 
 From a measured time history the whole chain is one call:
 
@@ -215,7 +410,7 @@ so horizontal whole-body exposure is assessed instead with the r.m.s.,
 running-r.m.s./MTVV and VDV metrics of
 [Human Vibration](/phonometry/vibration/human/human-vibration/) (ISO 2631-1).
 
-## 4. The health-risk report
+## 6. The health-risk report
 
 The dose chain exists to be written down and read against the Annex C guidance.
 `MultipleShockResult.report()` writes a one-page PDF health-risk assessment
@@ -290,7 +485,33 @@ repository; click the preview to open the PDF.
 	caption="Whole-body multiple-shock health-risk fiche (MultipleShockResult.report), the ISO 2631-5:2018 Annex C worked example with the dose-and-stress analysis and the Table C.2 risk classification."
 />
 
+## What this guide covers
+
+**Covered.** ISO 2631-5:2018 clause 5 and Annex C. The acquisition and
+conditioning requirements of clauses 5.1.2 to 5.1.4 as guidance; the clause 5.2
+seat-to-spine transfer function (`seat_to_spine_transfer`, `spinal_response`,
+`response_peaks`); the clause 5.3 acceleration dose and the Formula 4 daily dose
+(`dose_from_peaks`, `acceleration_dose`, `daily_dose`, and the
+`measurement_time` / `exposure_time` pair of `multiple_shock_assessment`); and
+the Annex C compressive stress, cumulative stress variable and Weibull
+probability with their Table C.1 coefficients and Table C.2 thresholds
+(`compression_dose`, `static_stress`, `ultimate_strength`, `injury_risk`,
+`injury_probability`, `multiple_shock_assessment`, `MultipleShockResult.report`).
+
+**Not covered.** The Annex A / Annex E finite-element model for the *less
+severe* exposures of clause 4 — occupants who stay seated throughout, which is
+most agricultural and earth-moving work — is distributed by ISO as separate
+software and is not implemented here; a record from that regime has no route
+through this page. Neither is the horizontal spinal model of the withdrawn 2004
+edition, so horizontal whole-body exposure goes to the r.m.s.,
+running-r.m.s./MTVV and VDV metrics of
+[Human Vibration](/phonometry/vibration/human/human-vibration/). The conditioning
+chain of section 2 is the caller's: `spinal_response` assumes a record that has
+already been sign-checked, split at the loss-of-contact boundaries,
+offset-corrected, tapered and band-limited.
+
 ## See also
 
+- [Human Vibration](/phonometry/vibration/human/human-vibration/): the ISO 2631-1 chain this page hands back to for the horizontal axes, and the crest factor and clause 6.3.3 ratios that decide whether a record belongs here at all.
 - API reference: [`vibration.human.multiple_shock`](/phonometry/reference/api/vibration/multiple-shock/).
 - Theory: [Multiple shocks (ISO 2631-5)](/phonometry/reference/theory/vibration/#multiple-shocks-iso-2631-5): the ISO 2631-5 response model, the acceleration dose and the Weibull risk law.

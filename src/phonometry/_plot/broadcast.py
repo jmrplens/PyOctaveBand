@@ -17,6 +17,7 @@ from .common import (
     _new_axes,
     format_frequency_axis,
     theme_fill,
+    theme_line,
 )
 
 if TYPE_CHECKING:
@@ -165,8 +166,12 @@ def plot_k_weighting_response(
     kwargs.setdefault("linewidth", 2.0)
     kwargs.setdefault("label", _t("K-weighting (combined)", language))
     ax.plot(freqs, np.asarray(result.magnitude_db, dtype=np.float64), **kwargs)
-    # The +4 dB shelf plateau is the reference the whole response is read against.
-    ax.axhline(4.0, color=_C_REFERENCE, linestyle="-", linewidth=0.8, alpha=0.6)
+    # The +4 dB shelf plateau is the reference the whole response is read
+    # against, so it sits behind the curves -- held back by colour rather than
+    # by opacity, which on a dark page holds a line back all the way to
+    # invisible.
+    ax.axhline(4.0, color=theme_line(_C_REFERENCE, ax, quiet=0.6),
+               linestyle="-", linewidth=0.8)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.set_xlabel(_t("Frequency [Hz]", language))
     ax.set_ylabel(_t("Magnitude [dB]", language))

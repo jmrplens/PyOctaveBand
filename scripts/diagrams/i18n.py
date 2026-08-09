@@ -612,6 +612,114 @@ _ES: dict[str, str] = {
     "(ISO 2631-1)": "(ISO 2631-1)",
     "assessed vs EAV / ELV (Directive 2002/44/EC)":
         "evaluada frente a EAV / ELV (Directiva 2002/44/CE)",
+    # Hand-transmitted vibration setup (ISO 5349-1/-2, Directive 2002/44/EC)
+    "Hand-transmitted vibration: where the accelerometer goes":
+        "Vibración mano-brazo: dónde va el acelerómetro",
+    "On the tool (ISO 5349-2, 6.1.3)":
+        "En la herramienta (ISO 5349-2, 6.1.3)",
+    "gripping zone ≈ 100 mm": "zona de agarre ≈ 100 mm",
+    "chain-saw front handle,": "empuñadura delantera",
+    "Ø 30 mm tube": "de motosierra, tubo Ø 30 mm",
+    "cable taped to the handle near the transducer (6.2.3)":
+        "cable fijado a la empuñadura junto al transductor (6.2.3)",
+    "grip force": "fuerza de agarre",
+    "1  middle of the gripping zone, under the hand":
+        "1  centro de la zona de agarre, bajo la mano",
+    "the most representative location; needs an adaptor":
+        "la ubicación más representativa; exige un adaptador",
+    "2  either side of the hand — usual practice":
+        "2  a ambos lados de la mano — práctica habitual",
+    "on a side handle, average the two positions":
+        "en empuñadura lateral, se promedian las dos",
+    "3  underside of the handle, next to the hand":
+        "3  bajo la empuñadura, junto a la mano",
+    "grip and push force change the reading: report the":
+        "las fuerzas de agarre y empuje alteran la lectura:",
+    "posture and the applied forces (7.1, clause 9 g))":
+        "documéntense postura y fuerzas (7.1, capítulo 9 g))",
+    "basicentric frame (ISO 5349-1 Fig. 1):":
+        "sistema basicéntrico (ISO 5349-1 Fig. 1):",
+    "rotated so that y_h lies along the":
+        "girado para que y_h siga el eje de",
+    "handle axis. All three axes are":
+        "la empuñadura. Se miden los tres",
+    "measured, and every k = 1.": "ejes, y todo k = 1.",
+    "Wh-weighted, one per axis (ISO 5349-1 A.1)":
+        "ponderada Wh, una por eje (ISO 5349-1 A.1)",
+    "vibration total value (Eq. (1))":
+        "valor total de vibración (Ec. (1))",
+    "T_i is total contact time per day (5.5)":
+        "T_i es el tiempo total de contacto diario (5.5)",
+    "one per hand, two significant figures (clause 8)":
+        "una por mano, dos cifras significativas (capítulo 8)",
+    "EAV 2.5 m/s²   ·   ELV 5 m/s²": "EAV 2,5 m/s²   ·   ELV 5 m/s²",
+    "Directive 2002/44/EC, Article 3":
+        "Directiva 2002/44/CE, artículo 3",
+    "transducer and mount below 5 % of the":
+        "transductor y montaje por debajo del",
+    "mass they are fixed to (6.1.5)":
+        "5 % de la masa sobre la que van (6.1.5)",
+    "linear averaging over complete work":
+        "promediado lineal sobre ciclos de",
+    "cycles (6.1.11)": "trabajo completos (6.1.11)",
+    "three samples per operation, a minute":
+        "tres muestras por operación, un minuto",
+    "of record, none under 8 s (5.4.1)":
+        "de registro, ninguna bajo 8 s (5.4.1)",
+    "the lowest input range that does not":
+        "el menor rango de entrada que no",
+    "overload, found by trial (6.1.10)":
+        "sature, hallado por tanteo (6.1.10)",
+    # Getting the ISO 2631-5 record (clauses 5.1.2 to 5.1.4)
+    "Getting the record (ISO 2631-5, clauses 5.1.2 and 5.1.4)":
+        "Obtención del registro (ISO 2631-5, capítulos 5.1.2 y 5.1.4)",
+    "The seat pan, in section": "El asiento, en sección",
+    "suspension travel": "recorrido de la suspensión",
+    "semi-rigid mounting disc Ø 250 ± 50 mm, height ≤ 12 mm,":
+        "disco de montaje semirrígido Ø 250 ± 50 mm, altura ≤ 12 mm,",
+    "80-90 durometer (A), carrying a Ø 75 ± 5 mm × 1.5 mm":
+        "80-90 durómetros (A), con un disco metálico de",
+    "metal disc for the accelerometers (ISO 10326-1, 5.2.3)":
+        "Ø 75 ± 5 mm × 1,5 mm para los acelerómetros (ISO 10326-1)",
+    "taped to the cushion so the accelerometers sit midway":
+        "pegado al cojín para que los acelerómetros queden",
+    "between the ischial tuberosities (5.1.2)":
+        "entre las tuberosidades isquiáticas (5.1.2)",
+    "z is positive to cranial: the method is about":
+        "z es positivo hacia craneal: el método trata de",
+    "compressive spinal loading (5.1.3, first step)":
+        "la carga de compresión espinal (5.1.3, primer paso)",
+    "a contact switch or video detects loss of contact,":
+        "un contacto o un vídeo detectan la pérdida de contacto,",
+    "which is reported and excluded from the exposure":
+        "que se documenta y se excluye de la exposición",
+    "The record, split where contact is lost":
+        "El registro, partido donde se pierde el contacto",
+    "accelerations recorded while contact is lost":
+        "las aceleraciones registradas sin contacto no",
+    "shall not be counted as exposure, and the":
+        "cuentan como exposición, y el impacto al caer",
+    "landing impact after a free fall shall be (5.1.2)":
+        "tras una caída libre sí cuenta (5.1.2)",
+    "no contact": "sin contacto",
+    "az(t), conditioned per 5.1.3": "az(t), acondicionada según 5.1.3",
+    "segment 1": "segmento 1",
+    "segment 2": "segmento 2",
+    "segment 3": "segmento 3",
+    "each segment is conditioned separately (5.1.3, second step)":
+        "cada segmento se acondiciona por separado (5.1.3, 2.º paso)",
+    "flat acceleration response from 0.01 Hz to at least 80 Hz, and "
+    "256 samples per second or more (5.1.2)":
+        "respuesta plana en aceleración de 0,01 Hz a 80 Hz como mínimo, "
+        "y 256 muestras por segundo o más (5.1.2)",
+    "equipment adequate for the highest amplitude anticipated; "
+    "equipment and calibration method reported (5.1.2)":
+        "equipo apto para la mayor amplitud prevista; se documentan el "
+        "equipo y su calibración (5.1.2)",
+    "long enough to be representative: a complete work cycle for a "
+    "repeatable task, longer where the terrain varies (5.1.4)":
+        "duración representativa: un ciclo de trabajo completo si la tarea "
+        "se repite, más si el terreno varía (5.1.4)",
     "Sound calibrator": "Calibrador acústico",
     "Microphone +": "Micrófono +",
     "preamplifier": "preamplificador",
@@ -637,6 +745,122 @@ _ES: dict[str, str] = {
     "0.25 m": "0,25 m",
     "1.20 m": "1,20 m",
     "1.00 m": "1,00 m",
+    # Loudness capture geometry (perception/psychoacoustics/loudness).
+    "Where the microphone goes for a loudness measurement (ISO 532-1)":
+        "Dónde va el micrófono en una medida de sonoridad (ISO 532-1)",
+    "A — Free field  (NF)": "A — Campo libre  (NF)",
+    "hemi-anechoic room, one frontal source":
+        "sala semianecoica, una sola fuente frontal",
+    "listener absent:": "sin oyente:",
+    "the result is diotic": "el resultado es diótico",
+    "frontal incidence, 0°": "incidencia frontal, 0°",
+    "1.50 m": "1,50 m",
+    'field="free"  →  quote N as NF':
+        'field="free"  →  cita N como NF',
+    "B — Diffuse field  (ND)": "B — Campo difuso  (ND)",
+    "reverberant or in-situ room": "sala reverberante o in situ",
+    "direct sound plus the reflected field, from every direction":
+        "sonido directo más el campo reflejado, desde todas las direcciones",
+    'field="diffuse"  →  quote N as ND':
+        'field="diffuse"  →  cita N como ND',
+    "C — Head-and-torso simulator (Annex D)":
+        "C — Simulador de cabeza y torso (Anexo D)",
+    "at the listening position": "en la posición de escucha",
+    "Equalization matched": "Ecualización acorde",
+    "to the room:": "con la sala:",
+    "free-field / diffuse-field / ID": "campo libre / campo difuso / ID",
+    "left channel": "canal izquierdo",
+    "right channel": "canal derecho",
+    "both reported": "se informan ambos",
+    "free-field equalization only for one frontal source beyond 1.5 m; "
+    "diffuse-field in reflective rooms; ID in vehicles":
+        "ecualización de campo libre solo con una fuente frontal a más de "
+        "1,5 m; de campo difuso en salas reflectantes; ID en vehículos",
+    "each channel is analysed separately: report NL and NR, and quote the "
+    "maximum or the mean as the single value":
+        "cada canal se analiza por separado: se informan NL y NR y se cita "
+        "el máximo o la media como valor único",
+    # The spectra behind an ISO/PAS 20065 assessment
+    # (perception/psychoacoustics/tone-audibility).
+    "The spectra an ISO/PAS 20065 assessment is built on":
+        "Los espectros de una evaluación ISO/PAS 20065",
+    "1 — the source runs through its operating states (clause 5.1: all of "
+    "them must be covered)":
+        "1 — la fuente recorre sus estados de funcionamiento (capítulo 5.1: "
+        "hay que cubrirlos todos)",
+    "idle": "ralentí",
+    "full load": "plena carga",
+    "2 — the analyser's basic spectra (under 1 s each) are merged line by "
+    "line into 3 s spectra (clause 4.3)":
+        "2 — los espectros básicos (menos de 1 s) se combinan línea a línea "
+        "en espectros de 3 s (capítulo 4.3)",
+    "3 — each merged spectrum gives one decisive audibility ΔLj "
+    "(clause 5.3.8)":
+        "3 — cada espectro combinado da una audibilidad decisiva ΔLj "
+        "(capítulo 5.3.8)",
+    "Energy mean of the J decisive audibilities":
+        "Media energética de las J audibilidades decisivas",
+    "Formula (20); an empty spectrum counts as −10 dB (Formula 21)":
+        "Fórmula (20); un espectro sin tono cuenta como −10 dB (Fórmula 21)",
+    "mean audibility ΔL  →  tonal adjustment Kt":
+        "audibilidad media ΔL  →  ajuste tonal Kt",
+    "ISO 1996-2:2017 Annex J, Table J.1":
+        "ISO 1996-2:2017 Anexo J, Tabla J.1",
+    "class 1 chain (IEC 61672-1), lower limit ≤ 20 Hz":
+        "cadena de clase 1 (IEC 61672-1), límite inferior ≤ 20 Hz",
+    "line spacing Δf between 1.9 Hz and 4.0 Hz":
+        "espaciado de líneas Δf entre 1,9 Hz y 4,0 Hz",
+    "Hanning window, mandatory": "ventana de Hanning, obligatoria",
+    "amplitude resolution ≥ 0.1 dB, anti-aliasing filter":
+        "resolución de amplitud ≥ 0,1 dB, filtro antialias",
+    "A-weighted spectrum (clause 5.3.2)":
+        "espectro ponderado A (capítulo 5.3.2)",
+    "U ≤ 1.5 dB: below 12 spectra, U must be reported":
+        "U ≤ 1,5 dB: con menos de 12 espectros, informar U",
+    # ISO 532-2 capture routes (perception/psychoacoustics/advanced-loudness).
+    "Which recording maps to which arguments (ISO 532-2 clause 7.2)":
+        "Qué grabación corresponde a qué argumentos (ISO 532-2, cap. 7.2)",
+    "1 — single microphone where the head would be, one frontal source":
+        "1 — un micrófono donde estaría la cabeza, una fuente frontal",
+    "listener absent": "sin oyente",
+    "(diotic)": "(diótico)",
+    "Table 1 free-field transfer":
+        "función de transferencia de campo libre (Tabla 1)",
+    "frontal incidence; the default": "incidencia frontal; es el valor por "
+        "defecto",
+    "2 — the same microphone, reverberant or in-situ field":
+        "2 — el mismo micrófono, campo reverberante o in situ",
+    "Table 1 diffuse-field transfer":
+        "función de transferencia de campo difuso (Tabla 1)",
+    "also for diffuse-field earphones":
+        "también para auriculares de campo difuso",
+    "3 — probe microphone in the ear canal":
+        "3 — micrófono de sonda en el canal auditivo",
+    "tympanic membrane": "membrana timpánica",
+    "probe microphone": "micrófono de sonda",
+    "10 mm — 5 mm above 3 kHz": "10 mm — 5 mm por encima de 3 kHz",
+    "no transfer function applied":
+        "no se aplica función de transferencia",
+    "the ear transfer is already in the signal":
+        "la transferencia del oído ya está en la señal",
+    "4 — head-and-torso simulator": "4 — simulador de cabeza y torso",
+    "accurate model of": "¿modelo fiel de un",
+    "an average adult?": "adulto medio?",
+    "yes: no correction": "sí: sin corrección",
+    "no: correction file —": "no: archivo de corrección —",
+    "not implemented": "no implementado",
+    'field="eardrum"  or  equalize': 'field="eardrum"  o  ecualizar',
+    "clause 7.2.5": "capítulo 7.2.5",
+    "equalize to the free or diffuse field first":
+        "ecualiza antes al campo libre o difuso",
+    "presentation: monaural is one ear alone, diotic the same signal at both "
+    "ears, binaural two independent ear signals":
+        "presentation: monaural es un solo oído, diotic la misma señal en "
+        "ambos, binaural dos señales independientes",
+    "a diotic sound is about 1.5 times as loud as the same sound at one ear "
+    "(clause 8.1)":
+        "un sonido diótico suena unas 1,5 veces más fuerte que el mismo "
+        "sonido en un solo oído (capítulo 8.1)",
     "phonometry processing chain": "Cadena de procesado de phonometry",
     "Signal": "Señal",
     "Calibrate": "Calibrar",
@@ -1303,6 +1527,166 @@ _ES: dict[str, str] = {
     "the blocking force approximates the force delivered to a stiff receiver (Part 1, Eq. 7)":
         "la fuerza de bloqueo aproxima la fuerza entregada a un receptor "
         "rígido (Parte 1, Ec. 7)",
+    "a′₁: unwanted transverse input,": "a′₁: entrada transversal no deseada,",
+    "≥ 15 dB below a₁ (Inequality 3)": "≥ 15 dB por debajo de a₁ (Desigualdad 3)",
+    "The two ways the static preload is applied (ISO 10846-1, 6.3.3.1)":
+        "Las dos formas de aplicar la precarga estática (ISO 10846-1, 6.3.3.1)",
+    "a) gravity: the output-side mass is the preload":
+        "a) gravedad: la masa de salida es la precarga",
+    "load mass": "masa de carga",
+    "W = load": "W = carga",
+    "simple, but unstable for large isolators at high loads":
+        "sencillo, pero inestable con precargas altas",
+    "b) frame and actuator, with decoupling springs":
+        "b) bastidor y actuador, con muelles de desacoplo",
+    "actuator: 100 % of the": "actuador: 100 % de la",
+    "permissible static load": "carga estática admisible",
+    "auxiliary springs decouple m₂ from the frame":
+        "los muelles auxiliares desacoplan m₂ del bastidor",
+    "Transverse translations are standardised too (ISO 10846-2, 5.2)":
+        "Las traslaciones transversales también están normalizadas "
+        "(ISO 10846-2, 5.2)",
+    "force-distribution plate": "placa de reparto de fuerza",
+    "test element in shear": "elemento a cortante",
+    "roller bearings, or two symmetrical": "los rodamientos, o dos elementos",
+    "elements, suppress the unwanted input":
+        "simétricos, suprimen la entrada no deseada",
+    "output shear force summed from two": "fuerza cortante de salida sumada",
+    "transducers,  F₂ = F₂′ + F₂″": "de dos transductores,  F₂ = F₂′ + F₂″",
+    "a mount is loaded in shear as well as in compression, and the transverse "
+    "stiffness is usually the smaller of the two":
+        "un apoyo trabaja a cortante además de a compresión, y la rigidez "
+        "transversal suele ser la menor de las dos",
+    # Mobility rig: the drive rod and the ISO 7626-2 Figure 4 decision
+    "drive rod: stiff axially,": "varilla de arrastre: rígida axialmente,",
+    "flexible in every other": "y flexible en todas las demás",
+    "direction (6.4.4)": "direcciones (6.4.4)",
+    "Where the accelerometer and the force transducer go (clause 6.4.4)":
+        "Dónde van el acelerómetro y el transductor de fuerza (capítulo 6.4.4)",
+    "accelerometer through the rod": "acelerómetro a través de la varilla",
+    "force transducer at the structure": "transductor en la estructura",
+    "force transducer at the exciter": "transductor en el excitador",
+    "INVALID": "NO VÁLIDO",
+    "VALID": "VÁLIDO",
+    "WITH CAUTION": "CON PRECAUCIÓN",
+    "the exciter attachment must be at least 10× more mobile, laterally and "
+    "rotationally, than the structure (6.4.4)":
+        "el acoplo del excitador debe ser al menos 10 veces más móvil, "
+        "lateral y rotacionalmente, que la estructura (6.4.4)",
+    "and the suspension at least 10× more mobile than the structure at each "
+    "attachment point (5.3)":
+        "y la suspensión al menos 10 veces más móvil que la estructura en "
+        "cada punto de sujeción (5.3)",
+    # Power injection (Norton & Karczub 6.6.4)
+    "Power injection: coupling loss factors from measured energies":
+        "Inyección de potencia: factores de pérdida por acoplo a partir de "
+        "energías medidas",
+    "Run 1: drive subsystem 1": "Ensayo 1: se excita el subsistema 1",
+    "Run 2: drive subsystem 2": "Ensayo 2: se excita el subsistema 2",
+    "subsystem 1": "subsistema 1",
+    "subsystem 2": "subsistema 2",
+    "impedance head": "cabeza de impedancia",
+    "shaker": "excitador",
+    "Πin = ½ Re{F v*} at the drive point, from an impedance head — not the "
+    "amplifier setting":
+        "Πin = ½ Re{F v*} en el punto de excitación, con cabeza de impedancia "
+        "y no con el ajuste del amplificador",
+    "⟨v²⟩ space-averaged over several positions per subsystem, away from the "
+    "edges and from the drive point":
+        "⟨v²⟩ promediada en el espacio sobre varias posiciones por subsistema, "
+        "lejos de los bordes y del punto de excitación",
+    "one run inverts to η₁₂ only if η₁ and η₂ are known from a decay "
+    "measurement; two runs solve all four":
+        "un ensayo despeja η₁₂ solo si η₁ y η₂ se conocen por medición de "
+        "decaimiento; dos ensayos resuelven los cuatro",
+    "bands wide enough to hold several modes of each subsystem: the modal "
+    "densities decide how wide":
+        "bandas anchas para contener varios modos de cada subsistema: las "
+        "densidades modales deciden cuánto",
+    # Machine fault kinematics (Norton & Karczub Section 8.4)
+    "Where the fault frequencies come from: bearing, gear pair, ducted fan":
+        "Origen de las frecuencias de fallo: rodamiento, engranaje, "
+        "ventilador",
+    "1. Bearing: end section": "1. Rodamiento: sección frontal",
+    "2. Bearing: axial half-section": "2. Rodamiento: media sección axial",
+    "3. Gear pair": "3. Par de engranajes",
+    "4. Ducted axial fan": "4. Ventilador axial en conducto",
+    "spall on the outer race": "descascarillado en la pista exterior",
+    "BPFO = 207.0 Hz: one impact per pass":
+        "BPFO = 207,0 Hz: un impacto por paso",
+    "D = 34 mm (pitch)": "D = 34 mm (primitivo)",
+    "d = 6 mm": "d = 6 mm",
+    "inner race turns at fs = 33.33 Hz,": "la pista interior gira a fs = 33,33 Hz,",
+    "outer race stationary": "la exterior está fija",
+    "cage FTF = 13.8 Hz = 0.41 fs": "jaula FTF = 13,8 Hz = 0,41 fs",
+    "bearing axis": "eje del rodamiento",
+    "outer ring": "aro exterior",
+    "inner ring": "aro interior",
+    "radial plane": "plano radial",
+    "contact line,  φ = 12.96°": "línea de contacto,  φ = 12,96°",
+    "the contact angle exists only in this view: it is measured":
+        "el ángulo de contacto solo existe en esta vista: se mide",
+    "from the radial plane, so φ = 0 for a deep-groove ball bearing":
+        "desde el plano radial: φ = 0 en un rodamiento de bolas",
+    "and φ > 0 for angular-contact and tapered-roller types":
+        "y φ > 0 en los de contacto angular y de rodillos cónicos",
+    "chipped tooth": "diente desconchado",
+    "28-tooth pinion on a": "piñón de 28 dientes sobre un",
+    "1500 r/min shaft:": "eje a 1500 r/min:",
+    "fs = 25 Hz": "fs = 25 Hz",
+    "6 blades (solid), 4 vanes (dashed)":
+        "6 álabes (continuos), 4 directrices (a trazos)",
+    "GMF = N fs = 28 × 25 = 700 Hz, and a chipped tooth modulates it once "
+    "per revolution: sidebands at ± fs":
+        "GMF = N fs = 28 × 25 = 700 Hz, y un diente desconchado la modula una "
+        "vez por vuelta: bandas laterales a ± fs",
+    "mL = nN ± kV = 6 ± 4 → 2 or 10 lobes, turning at nNfs/mL = 175 or 35 Hz: "
+    "the faster pattern radiates far more strongly":
+        "mL = nN ± kV = 6 ± 4 → 2 o 10 lóbulos, que giran a nNfs/mL = 175 o "
+        "35 Hz: el patrón más rápido radia mucho más",
+    # Condition monitoring on a machine train (Norton & Karczub Section 8.4)
+    "Condition monitoring on a motor-gearbox train (Norton Section 8.4)":
+        "Monitorización de estado en un tren motor-reductora (Norton 8.4)",
+    "motor": "motor",
+    "gearbox": "reductora",
+    "coupling": "acoplamiento",
+    "axial": "axial",
+    "radial, in the load zone, on the housing itself: no joint between the "
+    "bearing and the sensor":
+        "radial, en la zona de carga y sobre el propio soporte: sin junta "
+        "entre el rodamiento y el sensor",
+    "once-per-revolution": "captador de una",
+    "pickup on a mark": "marca por vuelta",
+    "Analyser": "Analizador",
+    "ch 1: acceleration": "canal 1: aceleración",
+    "ch 2: tacho pulse": "canal 2: pulso de tacómetro",
+    "band-pass → envelope → spectrum": "paso de banda → envolvente → espectro",
+    "Mounting sets the usable upper frequency":
+        "El montaje fija la frecuencia máxima utilizable",
+    "stud into a prepared flat": "espárrago sobre plano",
+    "tens of kHz": "decenas de kHz",
+    "adhesive / thin cyanoacrylate": "adhesivo / cianoacrilato fino",
+    "~10 kHz": "~10 kHz",
+    "magnet base": "base magnética",
+    "a few kHz": "unos pocos kHz",
+    "hand-held probe": "punta manual",
+    "~1 kHz": "~1 kHz",
+    "this page band-passes 2-4 kHz, so a magnet base is":
+        "esta página filtra de 2 a 4 kHz: una base magnética",
+    "marginal there and a hand-held probe is useless":
+        "queda justa y una punta manual no sirve",
+    "Acquisition": "Adquisición",
+    "fs = 20 kHz clears the 3 kHz housing resonance":
+        "fs = 20 kHz supera la resonancia de 3 kHz del soporte",
+    "T = 2 s at 2000 r/min = 67 revolutions":
+        "T = 2 s a 2000 r/min = 67 vueltas",
+    "Δf = 1/T = 0.5 Hz, against fs = 33.3 Hz":
+        "Δf = 1/T = 0,5 Hz, frente a fs = 33,3 Hz",
+    "enough to resolve the ± fs sidebands, which are":
+        "suficiente para resolver las bandas laterales a ± fs, que son",
+    "what separates an inner-race defect from an":
+        "lo que distingue un defecto de pista interior de uno",
+    "outer-race one": "de pista exterior",
     # Reception plate (EN 15657)
     "Reception-plate measurement of structure-borne power (EN 15657)":
         "Medición en placa receptora de la potencia estructural (EN 15657)",
@@ -1490,6 +1874,13 @@ _ES: dict[str, str] = {
     "Hydrophone depths from the 15°, 30° and 45° depression angles at r = dCPA; L = ship length":
         "Profundidades de hidrófono según los ángulos de depresión de 15°, "
         "30° y 45° a r = dCPA; L = eslora",
+    "Run schedule (not to scale)": "Secuencia de pasada (sin escala)",
+    "reverse course; 4 runs, 2 per side":
+        "vuelta en redondo; 4 pasadas, 2 por banda",
+    "background: ship stopped, ≥ 2 km, ≥ 30 s,":
+        "fondo: buque parado, ≥ 2 km, ≥ 30 s,",
+    "at the start and end of each test period":
+        "al inicio y al final de cada periodo",
     # SOFAR channel (deep sound channel)
     "The SOFAR channel: a deep-ocean sound waveguide":
         "El canal SOFAR: una guía de ondas del océano profundo",
@@ -1506,6 +1897,121 @@ _ES: dict[str, str] = {
     "rays launched within about ±12° of the axis stay trapped and can cross entire oceans":
         "los rayos lanzados a menos de unos ±12° del eje quedan atrapados "
         "y pueden cruzar océanos enteros",
+    # Percussive pile-driving survey geometry (ISO 18406)
+    "Percussive pile-driving survey geometry (ISO 18406)":
+        "Geometría de medición del hincado percusivo de pilotes (ISO 18406)",
+    "Section: the minimum campaign": "Sección: la campaña mínima",
+    "Plan: where else to measure": "Planta: dónde medir además",
+    "impact hammer": "martillo de impacto",
+    "monopile": "monopilote",
+    "penetration": "penetración",
+    "bubble curtain, if used": "cortina de burbujas, si se usa",
+    "as close as possible to 750 m": "lo más cerca posible de 750 m",
+    "lower half of the water column:": "mitad inferior de la columna de agua:",
+    "2 m above the bed to ½ depth": "de 2 m sobre el fondo a ½ profundidad",
+    "½ depth": "½ prof.",
+    "¾ depth": "¾ prof.",
+    "bottom-mounted recorder": "registrador fondeado",
+    "engines, generator and echo-sounder off;":
+        "motores, generador y ecosonda apagados;",
+    "flow noise, cable strum and surface heave":
+        "ruido de flujo, cable y balanceo",
+    "all read as signal": "se leen como señal",
+    "seabed": "fondo marino",
+    "pile": "pilote",
+    "3 × water depth = 90 m:": "3 × profundidad = 90 m:",
+    "nothing inside": "sin posiciones",
+    "further positions on a transect,": "más posiciones en un transecto,",
+    "clear of banks and trenches": "libre de bancos y fosas",
+    "(radii not to scale)": "(radios sin escala)",
+    "Percussive driving only, in 4 m to 100 m of water: vibro- and sheet-piling are out of scope":
+        "Solo hincado percusivo, en 4 m a 100 m de agua: vibrohincado y "
+        "tablestacas quedan fuera del alcance",
+    "750 m is a comparability convention, not a regulatory limit; the actual range is reported, to 5 %":
+        "750 m es un convenio de comparabilidad, no un límite normativo; se "
+        "informa la distancia real, con un 5 %",
+    "The station records the entire driving sequence, soft start included, at one fixed range":
+        "La estación registra toda la secuencia de hincado, arranque suave "
+        "incluido, a una distancia fija",
+    "Record hydrophone depth, GPS, water depth and tide, seabed class and the hammer energy per blow":
+        "Anota profundidad del hidrófono, GPS, profundidad y marea, clase de "
+        "fondo y la energía por golpe",
+    # Sonar equation geometry (underwater/underwater-propagation)
+    "Sonar equation geometry: passive and active (ISO 18405)":
+        "Geometría de la ecuación del sonar: pasiva y activa (ISO 18405)",
+    "Passive: the target radiates, one way":
+        "Pasivo: el blanco radia, un solo trayecto",
+    "Active, monostatic: out and back": "Activo monoestático: ida y vuelta",
+    "ambient noise field NL": "campo de ruido ambiente NL",
+    "source level": "nivel de fuente",
+    "one-way transmission loss": "pérdida de transmisión de ida",
+    "array gain": "ganancia de array",
+    "detector": "detector",
+    "transmit and": "emite y",
+    "receive here": "recibe aquí",
+    "TL out": "TL ida",
+    "TL back": "TL vuelta",
+    "target strength": "índice de blanco",
+    "RL: surface, volume and bottom scattering":
+        "RL: dispersión superficie/volumen/fondo",
+    "replaces NL − DI when reverberation-limited":
+        "sustituye a NL − DI si domina la reverberación",
+    "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²":
+        "Niveles de campo re 1 µPa; un nivel de fuente lleva el metro "
+        "cuadrado de su distancia, re 1 µPa²m²",
+    "Every term refers to the same bandwidth; the figure of merit is the TL that drives SE to zero, quoted re m²":
+        "Todos los términos al mismo ancho de banda; la figura de mérito es "
+        "la TL que anula SE, re m²",
+    # The waveguide the three numerical solvers share
+    "The range-independent waveguide the three solvers share":
+        "La guía de ondas que comparten los tres solucionadores",
+    "channel axis": "eje del canal",
+    "sea surface: pressure release, p = 0":
+        "superficie: presión nula, p = 0",
+    "bottom: Ψ(D) = 0 (pressure release) or dΨ/dz = 0 (rigid)":
+        "fondo: Ψ(D) = 0 (presión nula) o dΨ/dz = 0 (rígido)",
+    "source, z_s": "fuente, z_s",
+    "receiver, z": "receptor, z",
+    "turning depth z_t:  c(z_t) = c(z_s)/cos θ₀":
+        "profundidad de retorno z_t:  c(z_t) = c(z_s)/cos θ₀",
+    "modes:": "modos:",
+    "rays:": "rayos:",
+    "standing waves in z, travelling as exp(i k_rm r)":
+        "ondas estacionarias en z, que viajan como exp(i k_rm r)",
+    "trajectories, travel times, convergence zones":
+        "trayectorias, tiempos de viaje, zonas de convergencia",
+    "the envelope marched in r, one step Δr at a time":
+        "la envolvente avanzada en r, un paso Δr cada vez",
+    "All three take the same range-independent c(z): no sediment attenuation, no bathymetry":
+        "Los tres toman el mismo c(z) independiente de la distancia: sin "
+        "atenuación del sedimento ni batimetría",
+    # Marine-mammal exposure assessment
+    "Marine-mammal exposure: measured here, assessed there":
+        "Exposición de mamíferos marinos: se mide aquí, se evalúa allí",
+    "Section: pile, hydrophone, animal": "Sección: pilote, hidrófono, animal",
+    "Plan: the two isopleths": "Planta: las dos isopletas",
+    "calibrated hydrophone": "hidrófono calibrado",
+    "band SEL measured here": "SEL por bandas medido aquí",
+    "range R": "distancia R",
+    "the criterion applies here": "el criterio se aplica aquí",
+    "per-band SEL": "SEL por bandas",
+    "weighted cumulative SEL  vs  AUD INJ / TTS":
+        "SEL acumulado ponderado  frente a  AUD INJ / TTS",
+    "unweighted peak SPL  vs  the flat criterion":
+        "nivel de pico sin ponderar  frente al criterio plano",
+    "peak SPL isopleth": "isopleta del nivel de pico",
+    "weighted cumulative SEL isopleth":
+        "isopleta del SEL acumulado ponderado",
+    "the larger isopleth governs": "manda la isopleta mayor",
+    "VHF, impulsive, NMFS 2024:": "VHF, impulsivo, NMFS 2024:",
+    "144 / 159 dB re 1 µPa²·s weighted": "144 / 159 dB re 1 µPa²·s ponderado",
+    "196 / 202 dB re 1 µPa flat": "196 / 202 dB re 1 µPa plano",
+    "An isopleth is the contour on which a criterion is exactly met, so the answer is a radius, not a verdict":
+        "Una isopleta es la curva donde el criterio se cumple justo: la "
+        "respuesta es un radio, no un veredicto",
+    "A cumulative level means nothing without its range and the window the strikes were counted over":
+        "Un nivel acumulado no dice nada sin su distancia y la ventana en la "
+        "que se contaron los golpes",
     # Atmospheric refraction (Salomons / Attenborough & Van Renterghem)
     "Atmospheric refraction: downwind multipath and the upwind shadow":
         "Refracción atmosférica: multitrayecto y sombra por el viento",
@@ -2617,4 +3123,227 @@ _ES: dict[str, str] = {
     "1.8 m": "1,8 m",
     "an enclosure delivers its worst element, not its panels":
         "un encapsulamiento entrega su peor elemento, no sus paneles",
+    # ECAC Doc 29 flight-path segment geometry (aircraft/airport-noise).
+    "Flight-path segment geometry (ECAC Doc 29, Chapter 4)":
+        "Geometría del segmento de trayectoria (ECAC Doc 29, capítulo 4)",
+    "(a) Observer alongside the segment": "(a) Observador junto al segmento",
+    "(b) Observer behind the segment": "(b) Observador detrás del segmento",
+    "(c) In the plane normal to the flight path":
+        "(c) En el plano normal a la trayectoria",
+    "(d) Behind the take-off roll, in plan":
+        "(d) Detrás de la carrera de despegue, en planta",
+    "dp = 526 m": "dp = 526 m",
+    "d1 = 568 m": "d1 = 568 m",
+    "d2 = 582 m": "d2 = 582 m",
+    "q = 214 m": "q = 214 m",
+    "q = −300 m": "q = −300 m",
+    "ds = d1 = 600 m": "ds = d1 = 600 m",
+    "0 ≤ q ≤ λ:  ds = dp, and the NPD lookup for an":
+        "0 ≤ q ≤ λ:  ds = dp, y la consulta NPD de un",
+    "exposure level uses dp (§4.4.1)": "nivel de exposición usa dp (§4.4.1)",
+    "q < 0:  the NPD lookup uses ds behind a take-off":
+        "q < 0:  la consulta NPD usa ds detrás de una carrera de",
+    "ground roll, and dp everywhere else": "despegue, y dp en todos los demás casos",
+    "receiver, 1.2 m": "receptor, 1,2 m",
+    "wing plane": "plano alar",
+    "β elevation of the path over the ground line · ε bank, positive with the starboard wing up":
+        "β elevación del rayo sobre la línea de tierra · ε alabeo, positivo con el ala de estribor arriba",
+    "φ = β + ε to starboard, β − ε to port; Λ(β, ℓ) uses β and ℓ, ΔI(φ) uses φ":
+        "φ = β + ε a estribor y β − ε a babor; Λ(β, ℓ) usa β y ℓ, ΔI(φ) usa φ",
+    "0° nose": "0° morro",
+    "ψ = arccos(q/dSOR), 90° abeam to 180° astern; the jet lobe peaks near 120°":
+        "ψ = arccos(q/dSOR), de 90° por el través a 180° por la popa; el lóbulo del reactor culmina cerca de 120°",
+    "ΔSOR is scaled by dSOR,0/dSOR beyond dSOR,0 = 762 m (2 500 ft)":
+        "ΔSOR se escala por dSOR,0/dSOR más allá de dSOR,0 = 762 m (2 500 ft)",
+    # ICAO Annex 16 certification measurement station (aircraft/aircraft-noise).
+    "A noise certification measurement station (ICAO Annex 16, App. 2)":
+        "Estación de medición para certificación acústica (OACI Anexo 16, ap. 2)",
+    "Plan: capsule orientation": "Planta: orientación de la cápsula",
+    "capsule axis ⟂ the flight-path plane:":
+        "eje de la cápsula ⟂ al plano de la trayectoria:",
+    "every ray arrives at 90°, grazing": "todo rayo llega a 90°, incidencia rasante",
+    "reference flight path": "trayectoria de referencia",
+    "slant path": "recorrido oblicuo",
+    "80° half-angle: no obstruction inside":
+        "semiángulo de 80°: sin obstrucciones dentro",
+    "inside: site rejected": "dentro: emplazamiento rechazado",
+    "windscreen, ±1.5 dB": "pantalla antiviento, ±1,5 dB",
+    "tracking": "seguimiento",
+    "24 bands, 50 Hz-10 kHz": "24 bandas, 50 Hz-10 kHz",
+    "one sample every 500 ms ± 5 ms": "una muestra cada 500 ms ± 5 ms",
+    "T, RH": "T, HR",
+    "met mast, within 2 000 m of the station":
+        "torre meteorológica, a menos de 2 000 m de la estación",
+    "Test window (aeroplanes): no precipitation; −10 to 35 °C and 20 to 95 % RH over the path above 10 m;":
+        "Ventana de ensayo (aviones): sin precipitación; de −10 a 35 °C y de 20 a 95 % HR en el recorrido por encima de 10 m;",
+    "8 kHz attenuation ≤ 12 dB/100 m; wind ≤ 6.2 m/s average and 7.7 m/s peak, crosswind ≤ 3.6 and 5.1 m/s":
+        "atenuación a 8 kHz ≤ 12 dB/100 m; viento ≤ 6,2 m/s medio y 7,7 m/s máximo, viento cruzado ≤ 3,6 y 5,1 m/s",
+    "Helicopters: average wind ≤ 5.1 m/s and crosswind ≤ 2.6 m/s, the temperature and humidity limits at 10 m only":
+        "Helicópteros: viento medio ≤ 5,1 m/s y viento cruzado ≤ 2,6 m/s, con los límites de temperatura y humedad solo a 10 m",
+    "At least six valid runs per measurement point, with a 90 % confidence limit not exceeding ±1.5 EPNdB":
+        "Al menos seis pasadas válidas por punto de medición, con un límite de confianza del 90 % que no exceda ±1,5 EPNdB",
+    # ECAC Doc 32 noise hemisphere (aircraft/rotorcraft-noise).
+    "The rotorcraft noise hemisphere and its angles (ECAC Doc 32)":
+        "El hemisferio de ruido del giroavión y sus ángulos (ECAC Doc 32)",
+    "(a) Polar angle θ, centre plane φ = 0":
+        "(a) Ángulo polar θ, plano central φ = 0",
+    "(b) Azimuth φ, seen from astern": "(b) Acimut φ, visto desde popa",
+    "(c) The 60 m sphere on a flight path":
+        "(c) La esfera de 60 m sobre una trayectoria",
+    "θ = 0 nose": "θ = 0 morro",
+    "θ = 90 beneath": "θ = 90 debajo",
+    "θ = 180 tail": "θ = 180 cola",
+    "measured band": "banda medida",
+    "θt1 … θt2, the 10 dB-down instants": "θt1 … θt2, los instantes a 10 dB del máximo",
+    "rh = 60 m": "rh = 60 m",
+    "φ = +90 starboard": "φ = +90 estribor",
+    "φ = 0 beneath": "φ = 0 debajo",
+    "φ = −90 port": "φ = −90 babor",
+    "outside ±60° the bins are gap-filled from the nearest":
+        "fuera de ±60° las celdas se rellenan desde la más próxima",
+    "slant range r": "distancia oblicua r",
+    "banked by Φ in turns": "alabeado Φ en los virajes",
+    "levels[a, p, f] in dB at 60 m under the ICAO reference atmosphere (25 °C, 70 % RH, 101.325 kPa):":
+        "levels[a, p, f] en dB a 60 m bajo la atmósfera de referencia OACI (25 °C, 70 % HR, 101,325 kPa):",
+    "19 azimuths × 19 polar angles at 10°, 31 one-third-octave bands from 10 Hz to 10 kHz":
+        "19 acimutes × 19 ángulos polares cada 10°, 31 bandas de tercio de octava de 10 Hz a 10 kHz",
+    "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at −φ":
+        "las celdas no medidas son NaN, nunca 0 dB; los miembros de clase con rotor espejado leen los mismos datos en −φ",
+    # Sound-field audiometry (ISO 389-7 / ISO 8253-2) — B15b
+    "Sound-field audiometry and the ISO 389-7 reference zero":
+        "Audiometría en campo sonoro y el cero de referencia de ISO 389-7",
+    "A · Free field": "A · Campo libre",
+    "pure tone · frontal · binaural": "tono puro · frontal · biaural",
+    "B · Diffuse field": "B · Campo difuso",
+    "third-octave noise band · binaural":
+        "banda de ruido de tercio de octava · biaural",
+    "C · Earphone — not this standard": "C · Auricular: no es esta norma",
+    "supra-aural or insert · monaural": "supraaural o de inserción · monoaural",
+    "level measured here,": "el nivel se mide aquí,",
+    "subject and chair absent": "sin el sujeto ni la silla",
+    "on the reference axis, 0° azimuth": "sobre el eje de referencia, 0° de acimut",
+    "and elevation, ≥ 1 m  (5.2 a)": "y de elevación, ≥ 1 m  (5.2 a)",
+    "± 0.15 m: within ± 1 dB to 4 kHz  (5.2 b)":
+        "± 0,15 m: dentro de ± 1 dB hasta 4 kHz  (5.2 b)",
+    "the same reference point,": "el mismo punto de referencia,",
+    "the same absent subject": "el mismo sujeto ausente",
+    "several loudspeakers, non-coherent feeds":
+        "varios altavoces, con señales no coherentes",
+    "≥ 500 Hz: loudest and quietest directions":
+        "≥ 500 Hz: las direcciones de nivel máximo y mínimo",
+    "within 5 dB  (Table 1)": "dentro de 5 dB  (tabla 1)",
+    "the level lives in the coupler,": "el nivel vive en el acoplador,",
+    "not at a point in a room": "no en un punto de una sala",
+    "coupler /": "acoplador /",
+    "ear simulator": "simulador de oído",
+    "0 dB HL here is the RETSPL of the earphone":
+        "0 dB HL aquí es el RETSPL del auricular",
+    "fitted (ISO 389-1 / -2 / -8), referred to a":
+        "colocado (ISO 389-1 / -2 / -8), referido a un",
+    "coupler — never an ISO 389-7 value":
+        "acoplador, nunca un valor de ISO 389-7",
+    "Reference point: the midpoint of the line joining the listener's ear-canal openings":
+        "Punto de referencia: el punto medio entre las entradas de los conductos auditivos",
+    "the listener in the listening position; in A and B the level is measured there with the subject and chair absent":
+        "el oyente en la posición de escucha; en A y B el nivel se mide ahí sin el sujeto ni la silla",
+    # ISO 9612 Clause 12.4 sound level meter geometry — B15b
+    "Sound level meter at a workstation (ISO 9612, Clause 12.4)":
+        "Sonómetro en un puesto de trabajo (ISO 9612, capítulo 12.4)",
+    "Worker absent": "Sin el trabajador",
+    "the preferred Clause 12.4 placement":
+        "la colocación preferente del capítulo 12.4",
+    "Worker present": "Con el trabajador",
+    "hand-held meter, most-exposed ear":
+        "sonómetro de mano, oído más expuesto",
+    "machine": "máquina",
+    "axis ∥ line of sight": "eje ∥ línea de visión",
+    "1.55 m": "1,55 m",
+    "or sweep in plan:": "o barrido en planta:",
+    "at constant speed": "a velocidad constante",
+    "capsule at the head position, on the eye line":
+        "cápsula en la posición de la cabeza, a la altura de los ojos",
+    "standing 1.55 m ± 0.075 m; seated 0.80 m ± 0.05 m":
+        "de pie 1,55 m ± 0,075 m; sentado 0,80 m ± 0,05 m",
+    "above the middle of the seat plane":
+        "sobre el centro del plano del asiento",
+    "0.1 m to 0.4 m": "de 0,1 m a 0,4 m",
+    "60 mm": "60 mm",
+    "windscreen": "pantalla antiviento",
+    "held 0.1 m to 0.4 m from the ear-canal entrance":
+        "sostenido de 0,1 m a 0,4 m de la entrada del conducto auditivo",
+    "on the most exposed side, windscreen ≥ 60 mm (13.3)":
+        "en el lado más expuesto, pantalla antiviento ≥ 60 mm (13.3)",
+    "beyond 0.4 m, use the worn instrument (12.3)":
+        "más allá de 0,4 m, usar el instrumento portado (12.3)",
+    "A fixed microphone position under-reads a hand-held tool close to the ear (13.1)":
+        "Una posición fija de micrófono subestima una herramienta de mano próxima al oído (13.1)",
+    "that is exactly when the worn personal exposure meter of Clause 12.3 is the right instrument":
+        "es justo cuando el exposímetro personal portado del capítulo 12.3 es el instrumento adecuado",
+    # IEC 60268-16 clause 7 STI setup — B15b
+    "Setting up an STI measurement (IEC 60268-16, clause 7)":
+        "Montaje de una medida de STI (IEC 60268-16, capítulo 7)",
+    "A · Unamplified talker": "A · Hablante sin amplificar",
+    "acoustical input, clause 7.2": "entrada acústica, capítulo 7.2",
+    "B · Sound system": "B · Sistema de megafonía",
+    "electrical input, clause 7.4": "entrada eléctrica, capítulo 7.4",
+    "artificial mouth": "boca artificial",
+    "(ITU-T P.51 directivity)": "(directividad ITU-T P.51)",
+    "1 m": "1 m",
+    "2 m": "2 m",
+    "60 dB(A) here, or the": "60 dB(A) aquí, o el",
+    "Annex J operational level": "nivel de operación del anexo J",
+    "source response flat within ± 1 dB in a free field (7.2 b)":
+        "respuesta de la fuente plana ± 1 dB en campo libre (7.2 b)",
+    "receiver: omnidirectional, diffuse-field, calibrated (7.3)":
+        "receptor: omnidireccional, de campo difuso, calibrado (7.3)",
+    "ambient noise measured at the same point, source off":
+        "ruido de fondo medido en el mismo punto, con la fuente apagada",
+    "ceiling loudspeaker line": "línea de altavoces de techo",
+    "amp": "amplif.",
+    "test signal in,": "entrada de la señal",
+    "at the Annex J level": "de ensayo, nivel del anexo J",
+    "zone 1": "zona 1",
+    "zone 2": "zona 2",
+    "system off:": "sistema apagado:",
+    "ambient": "ruido de fondo",
+    "injected near the normal input, so the whole chain is in (7.4)":
+        "inyectada junto a la entrada normal, para incluir toda la cadena (7.4)",
+    "one position per coverage zone, at listening height":
+        "una posición por zona de cobertura, a la altura de escucha",
+    "spread over the served area, worst corners included":
+        "repartidas por el área servida, incluidos los peores rincones",
+    "The rating of the space is the mean of the positions minus one standard deviation (7.6.4)":
+        "La calificación del espacio es la media de las posiciones menos una desviación típica (7.6.4)",
+    "a plain mean over the positions overstates coverage; better still, plot the whole distribution":
+        "la media simple de las posiciones sobrestima la cobertura; mejor aún, represente toda la distribución",
+    # STOI/ESTOI capture bench — B15b
+    "Capturing a STOI pair through a real device":
+        "Captura de un par para STOI a través de un dispositivo real",
+    "clean": "señal",
+    "speech file": "de voz limpia",
+    "reference path": "camino de referencia",
+    "the original file, never a re-recording":
+        "el archivo original, nunca una regrabación",
+    "playback": "reproducción",
+    "amp + loudspeaker": "amplificador + altavoz",
+    "test box": "caja de ensayo",
+    "device under test": "equipo bajo ensayo",
+    "hearing aid on an artificial ear,": "audífono sobre oído artificial,",
+    "or a headset on a torso simulator":
+        "o auriculares sobre un simulador de torso",
+    "capture": "captura",
+    "mic + preamp": "micrófono + preamplificador",
+    "align and trim": "alinear y recortar",
+    "cross-correlate the envelopes": "correlacionar las envolventes",
+    "equal length · one clock": "misma longitud · un solo reloj",
+    "STOI /": "STOI /",
+    "ESTOI": "ESTOI",
+    "run it once with the device bypassed":
+        "hágalo una vez con el equipo puenteado",
+    "the loudspeaker, the box noise and the microphone are scored as degradation too":
+        "el altavoz, el ruido de la caja y el micrófono también se puntúan como degradación",
+    "Play at the device's operating level, and repeat the capture":
+        "Reproduzca al nivel de operación del equipo y repita la captura",
+    "the index is invariant to level, the device is not; a single capture carries the acoustic path's run-to-run spread":
+        "el índice es invariante al nivel, el equipo no; una sola captura arrastra la dispersión del camino acústico",
 }

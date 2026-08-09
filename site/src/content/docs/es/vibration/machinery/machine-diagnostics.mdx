@@ -77,10 +77,43 @@ plt.show()
 
 </details>
 
+## Símbolos de esta página
+
+Norton conserva la notación de sus fuentes, y una misma letra carga con cuatro
+significados distintos a lo largo de las cuatro secciones. La tabla de abajo es
+la clave; la que hay que vigilar es $N$, que es una *velocidad* en la sección 1
+y un *recuento* en las secciones 2 y 4.
+
+| Símbolo | Significado | Unidad | Sección |
+|---|---|---|---|
+| $N$ | velocidad del eje (el primer argumento posicional de la API) | r/min | 1 |
+| $f_s$ | frecuencia de giro del eje, $f_s = N/60$ | Hz | todas |
+| $Z$ | número de elementos rodantes del rodamiento | — | 1 |
+| $d$, $D$ | diámetro del elemento rodante, diámetro primitivo | la misma para ambos | 1 |
+| $\phi$ | ángulo de contacto, desde el plano radial | grados | 1 |
+| $g$ | el factor común $g = (d/D)\cos\phi$ | — | 1 |
+| $N$ | número de dientes de la rueda (Ec. 8.3 de Norton) | — | 2 |
+| $R$, $p$ | barras de rotor, polos magnéticos (no pares de polos) | — | 3 |
+| $s$, $f_e$ | deslizamiento (una fracción, no un porcentaje), frecuencia de alimentación | —, Hz | 3 |
+| $N$, $V$ | número de palas del rotor, número de álabes del estátor | — | 4 |
+| $N$ | número de eventos de bombeo por vuelta | — | 4 |
+| $n$ | índice de armónico (de ranura de rotor en la sección 3, de pala en la 4) | — | 3, 4 |
+| $m_L$ | número de lóbulos de un patrón rotativo de interacción | — | 4 |
+
+Nada en la biblioteca reutiliza el nombre: `bearing_fault_frequencies`,
+`gear_mesh_frequencies` y `blade_pass_frequencies` toman todas la velocidad del
+eje en r/min primero y el recuento después, así que la colisión vive solo en las
+fórmulas impresas. Aun así merece la pena comprobarlo, porque un recuento puesto
+donde va una velocidad es un error de factor 60 que no levanta ninguna
+excepción.
+
 ## 1. Rodamientos de contacto rodante
 
-Norton reproduce las once frecuencias discretas recopiladas por Shahan y
-Kamperman (Ecs. 8.4 a 8.14). Con la velocidad del eje $N$ en r/min, $Z$
+Norton reproduce las once ecuaciones recopiladas por Shahan y
+Kamperman (Ecs. 8.4 a 8.14). Se reducen a **siete frecuencias distintas**,
+porque cuatro de las once son las contrapartes con pista interior giratoria de
+filas que ya están en la tabla: o idénticas a ellas dos a dos, o alcanzables
+mediante el argumento `rotating_race`. Con la velocidad del eje $N$ en r/min, $Z$
 elementos rodantes de diámetro $d$ sobre un diámetro primitivo $D$, un
 ángulo de contacto $\phi$, y escribiendo $g = (d/D)\cos\phi$ y
 $f_s = N/60$:
@@ -94,6 +127,23 @@ $f_s = N/60$:
 | `BDF` | frecuencia de giro del elemento rodante | $2\,\text{BSF}$ | (8.10) |
 | `BPFO` | frecuencia de paso por la pista exterior | $Z(f_s/2)(1 - g)$ | (8.8) |
 | `BPFI` | frecuencia de paso por la pista interior | $Z(f_s/2)(1 + g)$ | (8.9) |
+
+Esas tres magnitudes geométricas cargan con toda la familia, y dos de ellas se
+confunden a menudo. El diámetro **primitivo** se mide entre los centros de los
+elementos rodantes, ni en el agujero ni en el diámetro exterior. El **ángulo de
+contacto** se mide desde el plano radial, así que no aparece en una vista
+frontal: vale cero en un rodamiento rígido de bolas y no vale cero en los de
+contacto angular y los de rodillos cónicos, que es la única razón de que
+$g = (d/D)\cos\phi$ lleve un coseno.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fault_kinematics_es.svg" alt="Cuatro paneles. Un rodamiento de contacto rodante en sección frontal, dibujado con la geometría del ejemplo, con quince elementos sobre una circunferencia primitiva de 34 mm acotada entre centros de elementos, un elemento de 6 mm acotado, un descascarillado dibujado en la pista exterior fija y la pista interior marcada girando a 33,33 hercios con la frecuencia de la jaula al lado. Una semisección axial del mismo rodamiento con el anillo exterior, un elemento y el anillo interior, con el plano radial dibujado como vertical discontinua y la línea de contacto bola-pista inclinada respecto de ella el ángulo de contacto de 12,96 grados. Un par de engranajes en alzado, un piñón de 28 dientes engranando con una rueda mayor, con un diente marcado como astillado. Un ventilador axial entubado visto según el eje del conducto, con seis palas de rotor en trazo lleno, cuatro álabes de estátor discontinuos detrás y una flecha de giro, anotado con los recuentos de lóbulos que producen los números de palas y de álabes." width="92%" />
+
+Las dos identidades exactas en las que se apoya la sección son afirmaciones
+geométricas que esta figura hace evidentes: todo elemento rodante pasa o por el
+defecto de la pista exterior o por el de la interior, así que
+$\text{BPFO} + \text{BPFI} = Z f_s$; y con la pista exterior quieta la jaula
+lleva los $Z$ elementos por delante del defecto una vez por vuelta de jaula, así
+que $\text{BPFO} = Z \times \text{FTF}$.
 
 Tres de ellas llevan el diagnóstico: `BPFO` para un defecto en la pista
 exterior, `BPFI` para un defecto en la pista interior y `BDF` para un elemento
@@ -110,6 +160,32 @@ exactas y detectan al instante los errores de introducción de datos:
 $\text{BPFO} + \text{BPFI} = Z f_s$ siempre, y
 $\text{BPFO} = Z \times \text{FTF}$ siempre que la pista exterior esté
 quieta.
+
+La presencia y la ausencia son la forma débil del diagnóstico, y aquí funciona
+solo porque la BPFO (207 Hz) y la BPFI (293 Hz) de este rodamiento quedan muy
+separadas y el registro está limpio. La forma fuerte es la **modulación**, y se
+deduce de la misma geometría:
+
+- un defecto en la **pista exterior** ocupa una posición angular fija dentro de
+  la zona de carga, así que todos los elementos rodantes lo golpean con la misma
+  carga. El tren de impactos no está modulado, y la BPFO aparece como una serie
+  armónica limpia, con poca o ninguna estructura de bandas laterales;
+- un defecto en la **pista interior** gira con el eje, así que entra y sale de
+  la zona de carga una vez por vuelta. El tren de impactos está modulado en
+  amplitud a la frecuencia del eje, y la BPFI lleva bandas laterales a
+  $\pm f_s$ alrededor de la línea y de cada armónico, a menudo más visibles que
+  la propia portadora;
+- un defecto en un **elemento rodante** golpea las dos pistas alternativamente
+  mientras viaja con la jaula, así que está modulado a la frecuencia de la
+  jaula: la BDF lleva bandas laterales a $\pm\text{FTF}$. Para eso están en la
+  tabla `FTF` y `FTF_rel`.
+
+El *espaciado* de las bandas laterales es por tanto el criterio de desempate
+siempre que dos familias previstas caigan cerca, y es el mismo argumento que
+hace el párrafo de bandas laterales de engrane de la sección 2 para otro
+componente. Resolver una banda lateral a $\pm f_s$ cuesta longitud de registro,
+que es la razón de que la adquisición de la sección 5 importe aquí, y no solo
+en principio.
 
 ```python
 from phonometry import bearing_fault_frequencies
@@ -132,6 +208,41 @@ previsión en un uno o un dos por ciento; eso es normal y es la razón por la qu
 la superposición se lee como «el pico está sobre la línea» y no como «el pico
 está en la línea».
 
+### La velocidad es toda la previsión
+
+Todas las frecuencias de esta página son estrictamente proporcionales a
+$f_s = N/60$: las siete líneas del rodamiento, el engrane y sus bandas
+laterales, el `1x`, el `2x` y la familia de ranura de rotor del motor, las
+líneas de paso de pala. Un error de velocidad se propaga por tanto uno a uno a
+todas las líneas previstas, y la velocidad del eje es el único dato de entrada
+que la aritmética no puede comprobar.
+
+- **De dónde sale.** De la placa de características no: esa es la velocidad
+  síncrona o a plena carga, y una máquina de inducción cargada gira por debajo.
+  Lo que hace falta aquí es la velocidad de giro en el momento del registro:
+  de un tacómetro, de un encóder de eje, de un captador óptico o magnético de
+  una marca por vuelta, o del propio pico `1x` medido en el espectro. Lo último
+  es lo habitual en campo y es circular si no se hace a propósito: primero se
+  localiza el pico `1x` y desde él se sitúa todo lo demás.
+- **Qué hace la deriva.** Si la velocidad se mueve durante el registro, todas
+  las líneas previstas se emborronan en proporción a su orden. Una variación del
+  1 % emborrona $4\times\text{BPFO}$, 828 Hz en el rodamiento anterior, en unos
+  8 Hz, que basta para fundir un armónico con sus vecinos y destruir la
+  evidencia que busca la superposición. La figura que abre esta página depende
+  de que cuatro armónicos de BPFO se sostengan separados, así que depende de
+  una velocidad estable.
+- **Qué hacer al respecto.** El seguimiento de órdenes, o un
+  [promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
+  remuestreado con el tacómetro, remuestrea el registro sobre el ángulo del eje
+  y devuelve los órdenes emborronados a líneas únicas.
+
+El error de tacómetro y el deslizamiento del rodamiento son fallos distintos y
+se comportan de forma distinta. Una velocidad equivocada desplaza *todas* las
+líneas de forma coherente y en la misma fracción; el deslizamiento desplaza solo
+las líneas del rodamiento, un uno o un dos por ciento, y no de forma
+determinista, que es además la razón de que la evidencia de rodamiento
+sobreviva al promediado síncrono y la de engranaje no.
+
 ## 2. Engranajes
 
 La frecuencia de engrane (paso de dientes) de una rueda de $N$ dientes es
@@ -153,14 +264,18 @@ print(res.harmonics("GMF", 3))         # [ 700. 1400. 2100.]
 ```
 
 Con `sideband_rate` se modula a la velocidad de giro de la rueda *conjugada*,
-que es lo que produce un fallo en la otra rueda del par.
+que es lo que produce un fallo en la otra rueda del par. Los dos primeros
+paneles de la figura del final de la sección 4 dibujan las dos firmas una al
+lado de la otra, así que lo anterior es algo que se comprueba mirando en vez de
+creerlo sin más.
 
 ## 3. Motores de inducción
 
-En la señal de un rodamiento de motor siempre hay tres líneas: `1x`
-(desequilibrio mecánico), `2x` (desalineación con la carga accionada) y `2fe`
-(entrehierro no uniforme, pulsos de par y los fallos eléctricos de devanado y
-de barras del rotor). Los defectos de rotor que producen excentricidad
+En la señal de vibración de un motor medida en el soporte del rodamiento siempre
+hay tres líneas: `1x` (desequilibrio mecánico), `2x` (desalineación con la carga
+accionada) y `2fe` (entrehierro no uniforme, pulsos de par y los fallos
+eléctricos de devanado y de barras del rotor). Son propiedades de la máquina, no
+del rodamiento. Los defectos de rotor que producen excentricidad
 estática o dinámica del entrehierro se leen sobre los **armónicos de ranura del
 rotor** de la Ec. (8.20),
 
@@ -169,37 +284,52 @@ f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
 $$
 
 con $R$ barras de rotor, $p$ polos magnéticos (no pares de polos),
-deslizamiento unitario $s$ y $n = 1, 2, \ldots$. La excentricidad dinámica
+deslizamiento $s$ (una fracción adimensional, cercana a cero en una máquina poco
+cargada) y $n = 1, 2, \ldots$. La excentricidad dinámica
 viste el armónico de ranura dominante con bandas laterales a $\pm$ la
 frecuencia de giro del eje y a $\pm$ la frecuencia de deslizamiento.
 
 ```python
 from phonometry import induction_motor_frequencies
 
-# Sesenta barras de rotor, seis polos magnéticos, 3600 r/min, sin deslizamiento.
+# Sesenta barras de rotor, seis polos magnéticos, 3600 r/min, sin deslizamiento:
+# una máquina de seis polos a esa velocidad va con un variador a 180 Hz, no con
+# la red.
 res = induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
+print(round(res["fe"]))                         # 180  la alimentación que implica
 print(round(res["1x"]), round(res["2x"]),
       round(res["2fe"]), round(res["fsh"]))     # 60 120 360 3600
 ```
+
+Lee la frecuencia de alimentación antes que las líneas de fallo. `2fe` sigue a
+la *alimentación*, no a la red, así que con un variador de frecuencia se mueve
+con el ajuste del variador: los 360 Hz de arriba son el doble de 180 Hz, y una
+máquina de seis polos con red de 50 Hz giraría cerca de 1000 r/min con `2fe` en
+100 Hz. El `fsh` = 3600 Hz impreso es la comprobación por la que aboga el
+párrafo siguiente: con deslizamiento nulo, la Ec. (8.20) debe reducirse a la
+frecuencia física de paso de barras $R f_s = 60 \times 60$ Hz.
 
 El deslizamiento se da directamente, o se da la frecuencia de red
 `supply_frequency` y el deslizamiento se deduce de ella y de la velocidad medida
 del eje. La frecuencia de alimentación se toma como
 $f_e = f_s\,p / (2(1 - s))$; la Ec. (8.19) de Norton escribe
-`fe = fs p / 2`, que es la misma expresión con deslizamiento nulo pero no
+$f_e = f_s\,p/2$, que es la misma expresión con deslizamiento nulo pero no
 reduce la Ec. (8.20) a la frecuencia física de paso de barras $R f_s$
 cuando la máquina está cargada. Con carga, el resultado incluye además la
 frecuencia de deslizamiento y la línea de paso de polos
 $\text{FP} = p \times f_\text{slip}$, el espaciado de bandas laterales que
-una barra de rotor rota coloca alrededor de `1x`.
+una barra de rotor rota coloca alrededor de `1x`. El tercer panel de la figura
+del final de la sección 4 dibuja esta familia en un eje de amplitud logarítmico,
+que es la única forma de ver el `1x` y el armónico de ranura de rotor en la
+misma imagen: están a tres décadas de distancia.
 
 ## 4. Ventiladores, soplantes y bombas
 
 La frecuencia de paso de pala de un rodete de $N$ palas es $f_b = n N f_s$
-(Ec. 8.15); las pulsaciones hidráulicas de una bomba siguen la misma forma
-con $N$ eventos de bombeo por vuelta (Ec. 8.18), y una soplante
-volumétrica rotativa repite cuatro veces por vuelta, lo que se trata
-pasando $4 \times \text{r/min}$ con una sola «pala»:
+(Ec. 8.15). Las pulsaciones hidráulicas de una bomba siguen la misma forma, con
+el recuento de palas sustituido por el número de eventos de bombeo por vuelta
+(Ec. 8.18). Y una soplante volumétrica rotativa repite cuatro veces por vuelta,
+lo que se trata pasando $4 \times \text{r/min}$ con una sola «pala»:
 
 ```python
 from phonometry import blade_pass_frequencies
@@ -220,23 +350,122 @@ evidencia de rodamiento.
 En un **ventilador axial entubado** las palas interaccionan además con los
 álabes del estátor y establecen patrones de presión rotativos con
 $m_L = nN \pm kV$ lóbulos para $V$ álabes (Ec. 8.16), que giran a
-$n N f_s / m_L$ (Ec. 8.17). Un patrón que gira más rápido que las propias palas radia mucho más
-fuerte, y por eso importa la elección de $N$ y $V$, y por eso esas velocidades
-son las que hay que contrastar con las frecuencias de corte del conducto. Cada
-línea se llama `lobe n=<n> m=<mL>`: el armónico de pala forma parte del nombre
-porque la Ec. (8.17) lleva $n$, de modo que el mismo número de lóbulos
-alcanzado desde otro armónico es otro patrón, que gira a otra velocidad.
+$n N f_s / m_L$ (Ec. 8.17). Un patrón que gira más rápido que las propias palas
+radia con mucha más fuerza, y por eso importa la elección de $N$ y $V$, y por
+eso esas velocidades son las que hay que contrastar con las frecuencias de corte
+del conducto. Cada línea se llama `lobe n=<n> m=<mL>`: el armónico de pala forma
+parte del nombre porque la Ec. (8.17) lleva $n$, de modo que el mismo número de
+lóbulos alcanzado desde otro armónico es otro patrón, que gira a otra velocidad.
 
 ```python
 # Seis palas, cuatro álabes, 3500 r/min (blade_pass_frequencies importado arriba).
 res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
+print(round(res.shaft_rate, 1))   # 58.3 Hz, el eje mismo
 print(round(res["BPF"]))          # 350
 print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
 ```
 
+Esos dos números son el principio, resuelto. Los dos patrones salen del *mismo*
+armónico de pala del *mismo* ventilador; la única diferencia es el signo de $k$
+en $m_L = nN \pm kV$, que es la razón de que el recuento de lóbulos tenga que
+formar parte del nombre de la línea. El patrón de $m_L = 2$ gira a
+$nNf_s/m_L = 6 \times 58{,}3/2 = 175$ Hz, tres veces la velocidad del eje, así
+que es el que radia con fuerza y la línea que hay que contrastar con la
+frecuencia de corte del conducto. El patrón de $m_L = 10$ gira a 35 Hz, por
+debajo de la velocidad del eje, así que radia poco. Seis palas contra cuatro
+álabes es una decisión de diseño, y esto es lo que decide.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_fault_families_es.svg" alt="Cuatro espectros con las líneas previstas por la biblioteca dibujadas sobre cada uno. Arriba a la izquierda, un espectro de engrane con un diente astillado: líneas altas en 700, 1400 y 2100 hercios con bandas laterales bajas y planas espaciadas 25 hercios a uno y otro lado, y armónicos de engrane que caen deprisa. Arriba a la derecha, el mismo par de engranajes con desgaste distribuido: las bandas laterales se convierten en grupos altos y el segundo y el tercer armónico de engrane se mantienen altos. Abajo a la izquierda, un espectro de motor de inducción en eje de amplitud logarítmico con el 1x en 60 hercios, el 2x en 120 y el doble de la frecuencia de alimentación en 360, con el armónico de ranura de rotor tres décadas por debajo en 3600 hercios flanqueado por bandas laterales a una frecuencia de eje. Abajo a la derecha, un espectro de ventilador entubado con la línea del eje en 58 hercios, la línea de paso de pala en 350, el patrón de interacción de dos lóbulos en 175 hercios dibujado alto y el de diez lóbulos en 35 hercios dibujado pequeño." width="92%" />
+
+*Una familia de fallos se reconoce por su patrón, no por un solo número. Los dos
+paneles de engranaje son el mismo piñón de 28 dientes a 1500 r/min con dos
+fallos distintos: un diente astillado da bandas laterales bajas y planas a
+$\pm f_s$ y armónicos que caen; un desgaste distribuido da grupos altos de
+bandas laterales y levanta los armónicos superiores. El panel del motor abarca
+tres décadas de amplitud, que es la razón de que el armónico de ranura de rotor
+y sus bandas laterales a $\pm f_s$ necesiten un eje logarítmico para verse
+siquiera al lado del `1x`. El panel del ventilador pone los dos patrones
+lobulados junto a la frecuencia de pala de la que salen.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# La biblioteca prevé las líneas; los espectros de debajo se sintetizan
+# exactamente a esas frecuencias, así que la figura y los valores impresos
+# concuerdan.
+gear = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+freq = np.linspace(0.0, 2400.0, 4800)
+amp = np.full_like(freq, 0.004)
+for order, height in enumerate((1.0, 0.40, 0.16), start=1):
+    for centre, level in (
+        (order * gear["GMF"], height),
+        (order * gear["GMF"] - gear.shaft_rate, 0.13 * height),
+        (order * gear["GMF"] + gear.shaft_rate, 0.13 * height),
+    ):
+        amp += level * np.exp(-0.5 * ((freq - centre) / 2.2) ** 2)
+
+spectrum = type("S", (), {"frequencies": freq, "amplitude": amp})()
+gear.within(1.0, 2400.0).plot(spectrum=spectrum, language="es")
+plt.show()
+```
+
+</details>
+
 ## 5. Del registro bruto a una línea con nombre
 
 La cinemática responde a *dónde mirar*; la cadena de señal responde a *qué hay*.
+Antes que ninguna de las dos, algo tiene que registrar la máquina, y el análisis
+de envolvente es inusualmente sensible a cómo se haga eso.
+
+### Paso 0. Conseguir el registro
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_machine_diagnostics_es.svg" alt="Medición de mantenimiento predictivo sobre un tren motor-acoplamiento-reductora: acelerómetros en los dos soportes de rodamiento, uno radial en la zona de carga y otro axial, un captador óptico de una marca por vuelta en el eje que alimenta al analizador junto al canal de vibración, un panel de métodos de fijación con la frecuencia superior utilizable de las fijaciones por espárrago, adhesivo, imán y sonda de mano, y los ajustes de adquisición con la longitud de registro y la frecuencia de muestreo que se deducen de ellos" width="92%" />
+
+**Dónde se pone el transductor.** En el soporte del rodamiento, en la zona de
+carga, tan cerca de la pista exterior como permita la geometría y con el camino
+estructural más corto posible hasta ella. Una medida tomada al otro lado de una
+unión atornillada, sobre un resguardo o sobre chapa pierde la energía de impacto
+de alta frecuencia sobre la que se sostiene todo el método. Las posiciones
+radial y axial responden a preguntas distintas: la radial (horizontal, o
+vertical donde lo pida la dirección de la carga) para las familias de rodamiento
+y de desequilibrio, la axial para la desalineación y para los engranes
+helicoidales o cónicos.
+
+**Cómo se fija.** La resonancia de la fijación fija la frecuencia superior
+utilizable, y este método necesita kilohercios. Una fijación por espárrago sobre
+una cara preparada llega a decenas de kilohercios; una unión con adhesivo o con
+una capa fina de cianoacrilato, algo menos; una base magnética, típicamente unos
+pocos kilohercios; una sonda de mano, apenas uno. La banda que se usa más abajo
+es de 2 a 4 kHz, que para una base magnética está en el límite y para una sonda
+de mano queda fuera de alcance: esta es, con diferencia, la razón más frecuente
+de que un análisis de envolvente no encuentre nada en un rodamiento que sí está
+descascarillado.
+
+**Qué se adquiere.** La frecuencia de muestreo debe dejar margen por encima de
+la resonancia que suena: 20 kHz para una resonancia de soporte de 3 kHz deja
+sitio para que trabajen el filtro de banda y el detector. El registro debe
+contener vueltas suficientes para que el espectro de envolvente resuelva la
+frecuencia del eje, porque la resolución que se obtiene es $1/T$ y el espaciado
+de bandas laterales que hay que resolver es el propio $f_s$. Dos segundos a
+2000 r/min son 67 vueltas y 0,5 Hz de resolución frente a una frecuencia de eje
+de 33 Hz, que es la razón de que la línea del eje y las bandas laterales a
+$\pm f_s$ de la sección 1 sean separables siquiera. Registra más tiempo si la
+velocidad es baja o si las bandas laterales son el diagnóstico; registra menos
+solo si la velocidad no se va a mantener quieta (véase *La velocidad es toda la
+previsión* más arriba).
+
+**Qué transductor.** Un acelerómetro piezoeléctrico corriente cubre las bandas
+de kilohercios que se usan aquí. Un sensor de emisión acústica o uno específico
+de alta frecuencia sube la banda útil un orden de magnitud, lo que cambia la
+banda que debe aislar el paso 1; si la máquina está instrumentada así, localiza
+la resonancia antes de elegirla.
+
+### Los tres pasos de tratamiento de señal
+
 Para un rodamiento, la ruta clásica tiene tres pasos, y la biblioteca tiene una
 función para cada uno:
 
@@ -245,7 +474,18 @@ función para cada uno:
    los armónicos del eje y del engrane. Se pasa su banda como
    `band=(low, high)` a `envelope_spectrum`, que filtra el registro con un
    filtro de fase nula antes del detector, de modo que la fase de la modulación
-   queda intacta.
+   queda intacta. Elegir esa banda es el único juicio de toda la cadena: mira en
+   el espectro bruto la joroba de banda ancha que excitan los impactos, golpea
+   el soporte y observa qué resuena, o barre el centro y el ancho de banda
+   buscando aquella cuya envolvente es más impulsiva (el kurtograma). La banda
+   debe quedar **por encima** de los armónicos del eje, del engrane y sus bandas
+   laterales y de cualquier línea eléctrica, o esos tonos sobreviven al filtro y
+   aparecen como líneas propias en el espectro de envolvente, donde un pico de
+   engrane se confunde fácilmente con un armónico de rodamiento. Debe ser lo
+   bastante ancha para dejar pasar el repique del impacto sin truncarlo y lo
+   bastante estrecha para que el suelo de ruido no lo entierre. Los 2 a 4 kHz
+   que se usan en esta página se eligen porque estos impactos hacen sonar una
+   resonancia de soporte de 3 kHz.
 2. **Detectar y transformar la envolvente.** La cadencia de repetición de los
    impactos es una modulación de amplitud de esa resonancia, así que se
    convierte en una *línea* del espectro de envolvente, a la frecuencia de fallo
@@ -257,6 +497,47 @@ función para cada uno:
    líneas previstas, coloreadas por familia para que los armónicos del eje nunca
    se lean como prueba de un fallo de rodamiento.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_chain_steps_es.svg" alt="Cuatro paneles apilados sobre el mismo registro de rodamiento. El panel superior es la aceleración bruta, dominada por ruido de banda ancha y una ondulación lenta a la frecuencia del eje, sin impactos visibles. El segundo es el mismo registro filtrado en banda de 2 a 4 kilohercios, donde destaca un tren regular de impactos que se amortiguan, con el intervalo entre dos de ellos acotado como uno partido por la frecuencia de paso de elementos rodantes por la pista exterior, 4,8 milisegundos. El tercero es la envolvente de Hilbert de esa señal filtrada, un tren de pulsos positivos con el mismo espaciado. El cuarto es el espectro de esa envolvente, donde el espaciado se ha convertido en un peine de líneas en la frecuencia de paso por la pista exterior y sus armónicos, con las frecuencias de la pista interior y del elemento rodante marcadas y vacías." width="92%" />
+
+*Los tres pasos hechos visibles sobre un mismo registro. Los impactos son
+invisibles en la señal bruta, evidentes en cuanto se aísla la banda de 2 a
+4 kHz, rectificados en un tren de pulsos por el detector de envolvente y, por
+fin, leídos como una línea en 207 Hz y sus armónicos: el periodo del panel 2
+convertido en la frecuencia del panel 4.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from scipy import signal as sp_signal
+
+# El registro x, su frecuencia de muestreo fs, su base de tiempos t y la BPFO
+# prevista son los que se construyeron para la figura que abre la página.
+band = (2000.0, 4000.0)
+spec = envelope_spectrum(x, fs, band=band)     # lleva .envelope y .times
+
+# El mismo filtro paso banda Butterworth de cuarto orden y fase nula que aplica la
+# llamada internamente, ejecutado aquí para poder dibujar el registro intermedio.
+sos = sp_signal.butter(4, band, btype="bandpass", fs=fs, output="sos")
+narrow = sp_signal.sosfiltfilt(sos, x)
+
+fig, axes = plt.subplots(4, 1, figsize=(10, 10))
+window = slice(0, int(0.05 * fs))                       # los primeros 50 ms
+axes[0].plot(t[window], x[window]); axes[0].set_ylabel("a bruta")
+axes[1].plot(t[window], narrow[window]); axes[1].set_ylabel("2-4 kHz")
+axes[2].plot(spec.times[window], spec.envelope[window])
+axes[2].set_ylabel("envolvente"); axes[2].set_xlabel("Tiempo [s]")
+keep = spec.frequencies <= 4.6 * bpfo
+axes[3].plot(spec.frequencies[keep], spec.amplitude[keep])
+for order in range(1, 5):
+    axes[3].axvline(order * bpfo, ls="--", color="C1")
+axes[3].set_xlabel("Frecuencia [Hz]"); axes[3].set_ylabel("espectro de envolvente")
+plt.show()
+```
+
+</details>
+
 Hay otras dos herramientas que ayudan cuando el registro está cargado. El
 [promediado síncrono en el
 tiempo](/phonometry/es/signals/spectra/synchronous-averaging/)
@@ -267,6 +548,13 @@ armónicos o de bandas laterales en una única espiga de quefrencia, que es la
 forma más rápida de saber *qué* periodicidad domina cuando hay varias
 superpuestas.
 
+Junta las dos sobre una misma máquina. El registro de abajo es del que salen las
+figuras de esta página: dos segundos a 20 kHz de un acelerómetro fijado con
+espárrago en el soporte del rodamiento, radial y en la zona de carga, con la
+velocidad del eje tomada del captador de una marca por vuelta en ese mismo
+momento. El rodamiento soporta un piñón de 28 dientes, así que el soporte lleva
+tres familias a la vez.
+
 ```python
 from phonometry import (
     bearing_fault_frequencies,
@@ -275,19 +563,24 @@ from phonometry import (
     gear_mesh_frequencies,
 )
 
-# El rodamiento de una caja de engranajes lleva sus propias líneas, la familia
-# de engrane de la rueda que soporta y los armónicos del eje. Todos en unos ejes.
-bearing = bearing_fault_frequencies(1500.0, 9, 7.94, 39.0)
-gear = gear_mesh_frequencies(1500.0, 28, harmonics=2, sidebands=1)
+record, fs = x, 20000.0          # el registro del soporte y su muestreo
+shaft_rpm = 2000.0               # del tacómetro, no de la placa de características
+
+# Las líneas propias del rodamiento, la familia de engrane del piñón que soporta
+# y los armónicos del eje. Todos en unos ejes.
+bearing = bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+gear = gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
 lines = combine_fault_lines(bearing, gear)
 
-spectrum = envelope_spectrum(record, fs, band=(2500.0, 5000.0))
+spectrum = envelope_spectrum(record, fs, band=(2000.0, 4000.0))
 lines.within(1.0, 1600.0).plot(spectrum=spectrum, language="es")
 ```
 
 `within(low, high)` recorta la familia al tramo que el análisis cubre
-realmente, lo que importa porque el armónico de engrane más alto suele quedar
-muy por encima de la parte útil de un espectro de envolvente.
+realmente, lo que importa porque aquí el armónico de engrane más alto
+(`2xGMF+1x`, 1900 Hz) queda por encima de la parte útil de este espectro de
+envolvente.
 
 ## Qué cubre y qué no
 

@@ -1998,6 +1998,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Twenty-nine documentation figures drew a line the dark theme could not
+  show. The contrast gate measures filled regions, and a stroke is not a
+  fill, so nothing had ever looked at one: the ISO 3745 microphone array
+  drew its hemisphere in a half-opacity mid grey on a 0.4 pt line, which
+  composites to 1.3:1 against the dark page. It was in the SVG, it passed
+  every gate, and a reader could not see it. `scripts/check_stroke_contrast.py`
+  measures strokes now and runs in CI, and the corpus it found divided into
+  four causes. Most of it was opacity used as a dimming knob: a companion
+  curve at `alpha=0.55` of its own hue is a soft tint over the white page and
+  lands within a couple of levels of the near-black one, so the same call
+  reads on one theme and disappears on the other. That is what `theme_line`
+  in `phonometry._plot.common` replaces it with, the line counterpart of
+  `theme_fill`: the emphasis the author asked for, expressed as a colour
+  rather than an opacity, and raised on whichever page it would otherwise
+  fall below the WCAG 2.2 non-text minimum of 3:1. It is opaque, so it also
+  stops the line dulling the gridlines it crosses. The three renderers the
+  library exposes are fixed with it, so a caller of `.plot()` gets the
+  correction too: the `-3 dB` line of the filter bank response, the `+4 dB`
+  shelf reference of the K-weighting response, and the `L_pAF` history of
+  the ISO/PAS 1996-3 impulsive-sound plot, which was drawn in a fixed
+  `"0.3"` grey that can only be neutral on one of the two pages. The second
+  cause was a fixed dark literal chosen against the white page alone: the
+  CSS `purple` of the time-weighting ballistics, dark enough to read on
+  white and not on black, now the palette's own purple. The third was a
+  colormap read from end to end: a family of curves sampled from viridis at
+  0.05 starts in a near-black violet, so the first two of six were invisible
+  on the dark page, and `series_colors` in the figures' theme now reads the
+  stretch of the ramp the current page leaves room for. The fourth was the
+  3-D drawing itself, whose panes keep their light default under the dark
+  style and composite into a mid-grey slab that the wireframe was then drawn
+  on, competing with the slab instead of with the page; the panes are
+  cleared, the grid is derived from the page so the scaffolding cannot
+  outshine the surface it locates, and each microphone number is a chip in
+  its own point's colour, above the markers, because a 3-D artist is ordered
+  by depth and a point in front of its own label was clipping the digits.
+  Three figures are deliberately left as they were: the ISO 1999 compression
+  contours and the two Doc 29 / Doc 32 noise contours draw their level lines
+  on an opaque field of their own, YlOrRd in one case and viridis in the
+  other two, so the page is not what is behind those lines and the gate
+  measures them against the field instead.
+
 - The committed example `.report()` fiches were not checked against the code
   that writes them, and two of them had fallen behind it. `iso1999_nipts` and
   `iso1996_tone_audibility` still carried the shaded regions as they were

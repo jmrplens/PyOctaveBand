@@ -644,7 +644,7 @@ L 684.542314 181.610493
 L 699.065461 193.06978 
 L 700.721973 194.679714 
 L 700.721973 194.679714 
-" clip-path="url(#p68419b205f)" style="fill: none; stroke: #ffffff; stroke-opacity: 0.18; stroke-width: 4; stroke-linecap: square"/>
+" clip-path="url(#p68419b205f)" style="fill: none; stroke: #595959; stroke-width: 4; stroke-linecap: square"/>
    </g>
    <g id="line2d_78">
     <path d="M 44.533594 324.904329 
@@ -750,7 +750,7 @@ z
      <path d="M 521.056094 346.019922 
 L 530.056094 346.019922 
 L 539.056094 346.019922 
-" style="fill: none; stroke: #ffffff; stroke-opacity: 0.18; stroke-width: 4; stroke-linecap: square"/>
+" style="fill: none; stroke: #595959; stroke-width: 4; stroke-linecap: square"/>
     </g>
     <g id="text_25">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="546.256094" y="349.169922" transform="rotate(-0 546.256094 349.169922)">A-weighting (reference)</text>

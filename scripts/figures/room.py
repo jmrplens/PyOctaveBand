@@ -26,6 +26,7 @@ from .theme import (
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
     save_figure,
+    series_colors,
 )
 
 
@@ -1350,7 +1351,7 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.6, 5.4))
 
     still = enclosed_space_reverberation([(hall_area, soft)], hall_volume)
-    colours = plt.get_cmap("viridis")(np.linspace(0.05, 0.9, len(AIR_ATTENUATION)))
+    colours = series_colors(len(AIR_ATTENUATION))
     for colour, name in zip(colours, AIR_ATTENUATION):
         humid = enclosed_space_reverberation(
             [(hall_area, soft)], hall_volume, air_condition=name)
@@ -1664,7 +1665,7 @@ def generate_image_source_bands(output_dir: str) -> None:
     m = air_attenuation_m(freqs, 20.0, 50.0)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    colours = plt.get_cmap("viridis")(np.linspace(0.05, 0.85, len(freqs)))
+    colours = series_colors(len(freqs))
     for attenuation, dash, tag in ((0.0, "-", ""), (m, "--", " (with air)")):
         banded = image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
                                   (5.2, 3.4, 1.7), alpha, fs=48000,
@@ -1779,7 +1780,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
     grid = np.logspace(-1.0, 1.3, 240)
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.6, 5.6), sharey=True)
 
-    colours = plt.get_cmap("viridis")(np.linspace(0.05, 0.85, 4))
+    colours = series_colors(4)
     for colour, q in zip(colours, (1.0, 2.0, 4.0, 8.0)):
         field = steady_state_field(sound_power_level=90.0, surface_area=352.0,
                                    mean_absorption=0.15, distances=grid,

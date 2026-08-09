@@ -821,7 +821,15 @@ def _plot_impulsive_sound(
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(result.times, result.levels, color="0.3", lw=1.2, label=labels["level"], **kwargs)
+    # The level history is drawn neutral so the coloured onset marks read on
+    # top of it, but a fixed grey can only be neutral on one page: "0.3" is a
+    # dark grey on the white theme and all but gone on the dark one. Mix the
+    # page towards its own ink instead, which darkens on white and lightens on
+    # black and keeps the same distance from the page on both.
+    from ..._plot.common import theme_line
+
+    ink = theme_line(ax.xaxis.label.get_color(), ax, quiet=0.7)
+    ax.plot(result.times, result.levels, color=ink, lw=1.2, label=labels["level"], **kwargs)
 
     for onset in result.onsets:
         color = "tab:red" if onset.qualifies else "tab:orange"

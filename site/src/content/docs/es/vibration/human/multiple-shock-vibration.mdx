@@ -15,7 +15,14 @@ references:
     title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 5: Method for evaluation of vibration containing multiple shocks"
     designation: "ISO 2631-5:2018"
     url: "https://www.iso.org/standard/50905.html"
-    note: "La función de transferencia asiento-columna (apartado 5.2, Fórmula 1), la dosis de aceleración y diaria (apartado 5.3, Fórmulas 3-5) y la evaluación de efectos sobre la salud del Anexo C (Fórmulas C.1, C.3-C.5, Tablas C.1/C.2)."
+    note: "La adquisición y el acondicionamiento del registro (apartados 5.1.2 a 5.1.4), la función de transferencia asiento-columna (apartado 5.2, Fórmula 1), la dosis de aceleración y diaria (apartado 5.3, Fórmulas 3-5) y la evaluación de efectos sobre la salud del Anexo C (Fórmulas C.1, C.3-C.5, Tablas C.1/C.2)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Mechanical vibration — Laboratory method for evaluating vehicle seat vibration — Part 1: Basic requirements"
+    designation: "ISO 10326-1:2016"
+    url: "https://www.iso.org/standard/63149.html"
+    note: "El disco de acelerómetros sobre la almohadilla de asiento que exige el apartado 5.1.2: su diámetro, su altura y su dureza, y el disco metálico que sostiene los transductores (5.2.3)."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -26,7 +33,7 @@ embarcaciones rápidas, maquinaria de movimiento de tierras) carga la columna
 lumbar mucho más de lo que sugiere su nivel eficaz equivalente. **ISO
 2631-5:2018** predice la respuesta espinal resultante y el riesgo de lesión
 lumbar a partir de la aceleración vertical medida en el asiento. phonometry
-implementa el modelo normativo de respuesta espinal de la **apartado 5** y la
+implementa el modelo normativo de respuesta espinal del **apartado 5** y la
 evaluación de efectos sobre la salud del **Anexo C**. (El modelo de elementos
 finitos de los Anexos A / E lo distribuye ISO como software aparte y queda fuera
 de alcance aquí.)
@@ -48,23 +55,118 @@ libre), se aplican el apartado 5 y el Anexo C.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_es.svg" alt="Flujo desde la aceleración vertical del asiento az(t), acondicionada como exige el apartado 5.1.3 con un paso alto de 0,01 Hz de segundo orden y un paso bajo de 80 Hz de cuarto orden, y no con los filtros de 0,4 a 100 Hz de ISO 2631-1, hasta la respuesta espinal, la dosis de aceleración Dz y la dosis diaria Dzd, la tensión compresiva Sd, la variable de tensión R acumulada con la edad, y la probabilidad de lesión lumbar de Weibull" width="86%" loading="eager" />
 
-## 1. Respuesta espinal (apartado 5.2)
+## 1. Conseguir el registro (apartados 5.1.2 y 5.1.4)
+
+Todo lo que viene después parte de un $a_z(t)$ medido, y la ISO 2631-5 añade
+cuatro requisitos de adquisición sobre los de la ISO 2631-1, cada uno propio de
+la exposición a choques.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup_es.svg" alt="Izquierda: la banqueta del asiento en sección con las tuberosidades isquiáticas de un ocupante sentado apoyadas sobre el disco de montaje semirrígido de ISO 10326-1 de 250 más menos 50 mm de diámetro y 12 mm de altura como máximo, que sostiene un disco metálico de 75 más menos 5 mm por 1,5 mm para los acelerómetros, fijado con cinta al cojín, con un interruptor de contacto al lado y el eje z positivo hacia craneal, sobre un asiento con suspensión. Derecha: una aceleración registrada con dos ventanas sombreadas en las que se pierde el contacto, excluidas de la exposición, que parten el registro en tres tramos de contacto que se acondicionan por separado. Debajo: los requisitos de equipo del apartado 5.1.2 y el requisito de duración del apartado 5.1.4" width="94%" />
+
+**Dónde (5.1.2).** $a_z(t)$ se mide en la interfaz entre el asiento y las
+**tuberosidades isquiáticas**. La ubicación de medida sobre el asiento y el
+diseño del disco de acelerómetros sobre la almohadilla siguen la
+**ISO 10326-1**: un disco semirrígido moldeado de 250 ± 50 mm de diámetro y
+12 mm de altura como máximo, de dureza Shore A entre 80 y 90, con una cavidad
+central que aloja un disco metálico de 75 ± 5 mm de diámetro y 1,5 mm de espesor
+al que se fijan los acelerómetros, pegado con cinta al cojín de modo que los
+transductores queden a medio camino entre las tuberosidades (5.2.3 de esa
+norma). El sujeto permanece sentado durante toda la toma de datos y no se
+levanta del asiento.
+
+**Pérdida de contacto (5.1.2).** Interruptores de contacto, grabaciones de vídeo
+u otro método detectan la pérdida de contacto entre el sujeto y la superficie del
+asiento. Las aceleraciones medidas mientras se ha perdido el contacto **no deben
+contabilizarse como exposición**, y la pérdida de contacto debe detectarse y
+declararse; el impacto al aterrizar tras una caída libre, el movimiento de la
+persona *y* el del asiento, debe tenerse plenamente en cuenta. Esta es la
+instrumentación que de verdad exige el régimen *severo* del apartado 4 anterior,
+y es lo que hace que un registro de ISO 2631-5 sea distinto de uno de
+ISO 2631-1.
+
+**La cadena (5.1.2).** Los acelerómetros y el equipo de medida deben ser
+adecuados para las amplitudes máximas previstas durante el periodo de medida. El
+registro digitalizado debería tener una respuesta plana en aceleración de
+0,01 Hz hasta al menos 80 Hz, y puede hacer falta una frecuencia de muestreo de
+256 muestras por segundo o mayor según el método antialiasing empleado, que es
+de donde sale el `fs = 256.0` del ejemplo resuelto de más abajo. Deben aportarse
+los detalles del equipo de medida, incluido el método de calibración utilizado.
+
+**Cuánto tiempo (5.1.4).** El registro debe ser lo bastante largo para que los
+choques múltiples medidos sean representativos de la exposición que se evalúa.
+Los sucesos de choque pueden ser poco frecuentes, así que la duración hay que
+estimarla a partir de lo variables que sean los impactos: cuando unos pocos
+choques severos conviven con muchos pequeños, hace falta un registro más largo
+para tener una probabilidad razonable de capturarlos. Un ciclo de trabajo
+completo es representativo en una tarea repetible, como la de un dúmper de mina;
+en las no repetibles (marcha campo a través, transporte militar) la duración
+suficiente depende de la variabilidad del terreno. Los ensayos que exponen a
+personas a choques repetidos necesitan su propia evaluación de riesgos, y
+medidas más cortas primero.
+
+## 2. Acondicionar el registro (apartado 5.1.3)
+
+El acondicionamiento son seis pasos ordenados, y dos de ellos contradicen el
+consejo que un lector se daría a sí mismo.
+
+1. **Comprueba el signo.** Todo el método va de carga *compresiva* de la
+   columna, así que el eje z debe ser positivo hacia craneal: positivo hacia
+   arriba, en el sistema basicéntrico para personas sentadas. Un error de signo
+   invierte qué picos se cuentan.
+2. **Recorta las partes sin contacto** entre el disco de acelerómetros de la
+   almohadilla y el sujeto. Eso parte el registro en tramos separados, y los
+   pasos restantes se aplican a cada tramo **por separado**.
+3. **Comprueba el antialiasing** si los datos se remuestrearon después de
+   adquirirlos. La NOTA 1 advierte de que los paquetes habituales de tratamiento
+   de datos aplican filtros adecuados de forma automática, pero de que es
+   importante verificar que lo hicieron.
+4. **Corrige el offset** para que la aceleración registrada marque
+   (0 ± 0,1) m/s² con el acelerómetro en reposo. El apartado añade después la
+   advertencia: restar la media **puede no ser apropiado** si la aceleración
+   registrada es asimétrica, y un registro de choques es asimétrico por
+   construcción, que es justo el caso en el que restar la media se equivoca.
+5. **Aplica una ventana de entrada y salida** (una ventana coseno de varios
+   segundos, por ejemplo) si el acelerómetro estaba en movimiento al principio o
+   al final de la grabación, antes de limitar la banda.
+6. **Limita la banda** con un paso alto Butterworth de segundo orden a 0,01 Hz y
+   un paso bajo Butterworth de cuarto orden a 80 Hz. Los filtros de limitación de
+   banda y de ponderación de la ISO 2631-1 **no** deben aplicarse.
+
+El último paso es donde se gana o se pierde el número. La NOTA 2 da la razón con
+números: se han observado periodos de caída libre de más de 0,5 s en
+embarcaciones rápidas de guerra, y un paso alto de 0,5 Hz arrastra los −1 g de la
+caída libre de vuelta a cero antes de que llegue el impacto, de modo que el pico
+del impacto queda desplazado hasta +1 g y la dosis calculada se equivoca del
+orden de un 10 %. Los cambios bruscos de perfil del terreno pueden hacer lo
+mismo. El corte de 0,01 Hz existe para conservar la caída libre en el registro.
+
+```python
+import numpy as np
+from scipy.signal import butter, filtfilt
+
+# La limitación de banda del apartado 5.1.3, sobre un registro ya corregido de
+# offset y partido en las fronteras de pérdida de contacto.
+fs = 256.0
+high = butter(2, 0.01, "high", fs=fs, output="sos")   # segundo orden, 0,01 Hz
+low = butter(4, 80.0, "low", fs=fs, output="sos")     # cuarto orden, 80 Hz
+print(high.shape, low.shape)                          # (1, 6) (2, 6)
+```
+
+## 3. Respuesta espinal (apartado 5.2)
 
 Una función de transferencia asiento-columna $H(f)$ (un cero complejo y seis
 polos complejos, transmisibilidad unidad a 0 Hz y una resonancia cerca de 5 Hz)
-transforma la aceleración medida del asiento en la respuesta espinal vertical
-$A_z(t)$ (Fórmula 1/2):
+transforma la aceleración acondicionada del asiento en la respuesta espinal
+vertical $A_z(t)$ (Fórmula 1/2):
 
 $$
 A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
 $$
 
-El registro de entrada debe estar **acondicionado (sin componente continua)**:
-como $H$ es unidad a 0 Hz por diseño, un offset de continua (por ejemplo, la
-componente de gravedad de 1 g de un acelerómetro acoplado en continua) pasa
-directamente a $A_z(t)$ y corrompe los picos positivos de respuesta de la
-dosis.
-Resta la media (o aplica un paso alto) antes de procesar.
+El acondicionamiento de la sección 2 no es opcional aquí: como $H$ es unidad a
+0 Hz por diseño, un offset de continua (la componente de gravedad de 1 g de un
+acelerómetro acoplado en continua, por ejemplo) pasa directamente a $A_z(t)$ y
+corrompe los picos positivos de respuesta con los que se construye la dosis.
 
 ```python
 from phonometry import vibration
@@ -74,7 +176,7 @@ print(round(abs(vibration.seat_to_spine_transfer([2.0])[0]), 2))  # 1.06
 print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 ```
 
-## 2. Dosis de aceleración (apartado 5.3)
+## 4. Dosis de aceleración (apartado 5.3)
 
 La **dosis de aceleración** combina los picos positivos de la respuesta
 $A_{z,i}$ (cada uno el máximo entre dos cruces por cero consecutivos) con una
@@ -84,9 +186,20 @@ $$
 D_z = 1{,}07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
 $$
 
+El 1,07 no es un apaño de calibración: la NOTA 1 al apartado 5.3 dice que la
+Fórmula (1) representa la respuesta en frecuencia de la columna como filtro, y
+que la columna tiene además una función de respuesta en *amplitud*, que es lo que
+lleva el 1,07. Solo se cuentan los picos positivos, y la sexta potencia tiene un
+corolario operativo que la norma declara sin rodeos: los picos de aceleración
+inferiores al mayor en un factor de tres o más no contribuyen de forma
+significativa a la Fórmula (3). La dosis de una jornada la deciden por tanto un
+puñado de impactos, que es también la razón de que el recuento de picos sea
+robusto frente a cómo trate la regla de cruces por cero a los pequeños.
+
 Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_d$
 sobre el tiempo de medida $t_m$ (Fórmula 4):
-$D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
+$D_{zd} = D_z\,(t_d/t_m)^{1/6}$. Para comparar exposiciones distintas, la norma
+recomienda $t_d$ = 8 h.
 
 ```python
 from phonometry import vibration
@@ -95,7 +208,55 @@ from phonometry import vibration
 print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 ```
 
-## 3. Riesgo de lesión (Anexo C)
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spinal_response_peaks_es.svg" alt="Dos paneles apilados sobre el mismo registro de 8 s de asiento todoterreno a 256 muestras por segundo. Arriba: la aceleración acondicionada del asiento y la respuesta espinal superpuestas, con cada impacto convertido en una respuesta que resuena, y una caída libre de 0,4 s fijada en menos 9,81 metros por segundo al cuadrado antes del impacto mayor. Abajo: la misma respuesta espinal con sus 28 picos positivos contabilizados marcados, una línea discontinua en un tercio del pico mayor, y los tres picos mayores anotados con su parte de la suma de sextas potencias: 30,3 aporta el 98,6 por ciento, 14,7 el 1,3 por ciento y 9,2 el 0,1 por ciento, para una dosis de aceleración de 32,5 metros por segundo al cuadrado" width="94%" />
+
+*Lo que el apartado 5 le hace a un registro, y en el dominio en el que se lo
+hace. El filtro asiento-columna es resonante, así que un impacto seco del asiento
+se convierte en una respuesta espinal que resuena, cuyo pico llega más tarde y no
+se parece en nada a la entrada; la regla de cruces por cero cuenta después 28
+picos positivos; y la sexta potencia entrega el 98,6 % de la dosis a uno solo de
+ellos. Todo lo que queda por debajo de un tercio del pico mayor, la línea
+discontinua, aporta centésimas de punto porcentual, que es la regla del apartado
+5.3 hecha visible. `MultipleShockResult.peaks` contiene exactamente los valores
+marcados.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+# `vibration` es el espacio de nombres importado en el fragmento de la sección 3.
+
+fs_rec, duration = 256.0, 8.0
+time = np.arange(int(duration * fs_rec)) / fs_rec
+rng = np.random.default_rng(11)
+seat = 1.5 * np.sin(2 * np.pi * 3.6 * time) + 0.45 * rng.standard_normal(time.size)
+for start, amplitude in ((1.15, 26.0), (3.05, 8.0), (5.60, 55.0), (6.95, 15.0)):
+    hit = time >= start
+    seat[hit] += amplitude * np.exp(-20.0 * (time[hit] - start)) * np.sin(
+        2 * np.pi * 5.5 * (time[hit] - start))
+seat[(time >= 5.18) & (time < 5.58)] = -9.81      # 0,4 s de caída libre
+
+response = np.asarray(vibration.spinal_response(seat, fs_rec))
+peaks = np.asarray(vibration.response_peaks(response))
+shares = 100.0 * peaks**6 / float(np.sum(peaks**6))
+print(peaks.size, round(float(peaks.max()), 1), round(float(shares.max()), 1))
+# 28 30.3 98.6
+
+fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
+ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_z(t)$")
+ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_z(t)$")
+ax_p.plot(time, response, lw=1.2, color="#1f77b4")
+ax_p.axhline(peaks.max() / 3.0, ls="--", color="#2ca02c")
+ax_t.legend(loc="upper left")
+ax_p.set_xlabel("Tiempo [s]")
+plt.show()
+```
+
+</details>
+
+## 5. Riesgo de lesión (Anexo C)
 
 La dosis diaria se convierte en una **tensión compresiva** diaria
 $S_d = m_z\,D_{zd}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
@@ -140,6 +301,48 @@ r = vibration.injury_risk(sd, start_age=20, years=20, days_per_year=120)
 print(round(r, 2))                               # 1.22
 print(round(100 * vibration.injury_probability(r)))     # 37  % de riesgo de lesión
 ```
+
+### Leer $R$ (Tabla C.2)
+
+$R$ no tiene unidades ni significado hasta que se pone en la escala de la
+Tabla C.2, que da el valor asociado a un riesgo de lesión del 10 %, del 50 % y
+del 90 % para cada sexo:
+
+| Riesgo de lesión | 10 % | 50 % | 90 % |
+| :--- | :--- | :--- | :--- |
+| Hombre | 0,72 | 1,42 | 2,17 |
+| Mujer | 0,52 | 0,87 | 1,20 |
+
+Las cuatro bandas que recortan esos umbrales son las que imprime la ficha de la
+sección 6: por debajo del valor del 10 %, probabilidad **baja** de un efecto
+adverso para la salud; entre el 10 % y el 50 %, **moderada**; entre el 50 % y el
+90 %, **alta**; y por encima del valor del 90 %, **muy alta**. El ejemplo
+masculino de arriba, $R$ = 1,22, cae en la banda moderada, que es lo que concluye
+el propio ejemplo resuelto de la norma.
+
+**El valor por defecto importa.** `compression_dose` toma `mz` e `injury_risk`
+toma `sex`, y ambos usan por defecto los valores masculinos. Ejecutar la *misma
+exposición* para una mujer de 64 kg no solo cambia el número: cambia el
+veredicto.
+
+```python
+for sex, mz in (("male", 0.029), ("female", 0.025)):
+    sd_sex = vibration.compression_dose(dz, mz=mz)
+    r_sex = vibration.injury_risk(sd_sex, start_age=20, years=20,
+                                  days_per_year=120, sex=sex)
+    print(sex, round(sd_sex, 2), round(r_sex, 2),
+          round(100 * float(vibration.injury_probability(r_sex, sex=sex))))
+# male   1.62 1.22 37   -> moderada  (10 % < riesgo < 50 %)
+# female 1.40 0.96 64   -> alta      (50 % < riesgo < 90 %)
+```
+
+La tensión compresiva más baja cae en la banda más alta, porque los umbrales
+femeninos de la Tabla C.2 son todavía más bajos. La NOTA 5 del Anexo C recoge el
+mismo resultado para esta exposición y cita $R$ = 0,97 frente al 0,96 calculado
+aquí, un redondeo de su propio $S_d$ impreso; la banda, y por tanto el veredicto,
+es la misma. Los coeficientes $\alpha$ y $\beta$ de la Fórmula (C.5) y los
+umbrales de la Tabla C.2 para sujetos femeninos se apoyan en un conjunto de datos
+más pequeño, como anota la norma al pie de ambas tablas.
 
 Desde un registro temporal medido, toda la cadena es una sola llamada:
 
@@ -225,7 +428,7 @@ retirada, no se restablece, de modo que la exposición horizontal de cuerpo
 entero se evalúa con las métricas eficaz, eficaz móvil/MTVV y VDV de
 [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) (ISO 2631-1).
 
-## 4. El informe de riesgo para la salud
+## 6. El informe de riesgo para la salud
 
 La cadena de dosis existe para ponerla por escrito y leerla frente a la
 orientación del anexo C. `MultipleShockResult.report()` escribe una hoja de
@@ -305,7 +508,36 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de riesgo para la salud por choques múltiples (MultipleShockResult.report), el ejemplo resuelto del anexo C de la ISO 2631-5:2018 con el análisis de dosis y tensión y la clasificación del riesgo de la Tabla C.2."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El apartado 5 y el Anexo C de la ISO 2631-5:2018. Los requisitos
+de adquisición y acondicionamiento de los apartados 5.1.2 a 5.1.4 como
+orientación; la función de transferencia asiento-columna del apartado 5.2
+(`seat_to_spine_transfer`, `spinal_response`, `response_peaks`); la dosis de
+aceleración del apartado 5.3 y la dosis diaria de la Fórmula 4
+(`dose_from_peaks`, `acceleration_dose`, `daily_dose`, y el par
+`measurement_time` / `exposure_time` de `multiple_shock_assessment`); y la
+tensión compresiva, la variable de tensión acumulada y la probabilidad de
+Weibull del Anexo C con sus coeficientes de la Tabla C.1 y sus umbrales de la
+Tabla C.2 (`compression_dose`, `static_stress`, `ultimate_strength`,
+`injury_risk`, `injury_probability`, `multiple_shock_assessment`,
+`MultipleShockResult.report`).
+
+**No cubierto.** El modelo de elementos finitos de los Anexos A / E para las
+exposiciones *menos severas* del apartado 4 (ocupantes que permanecen sentados
+en todo momento, que es la mayor parte del trabajo agrícola y de movimiento de
+tierras) lo distribuye ISO como software aparte y no está implementado aquí; un
+registro de ese régimen no tiene recorrido por esta página. Tampoco lo está el
+modelo espinal horizontal de la edición retirada de 2004, así que la exposición
+horizontal de cuerpo entero va a las métricas eficaz, eficaz móvil/MTVV y VDV de
+[Vibración en humanos](/phonometry/es/vibration/human/human-vibration/). La
+cadena de acondicionamiento de la sección 2 es cosa de quien llama:
+`spinal_response` da por supuesto un registro al que ya se le ha comprobado el
+signo, se ha partido en las fronteras de pérdida de contacto, se le ha corregido
+el offset, se le ha aplicado la ventana y se le ha limitado la banda.
+
 ## Véase también
 
+- [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/): la cadena de ISO 2631-1 a la que esta página devuelve los ejes horizontales, y el factor de cresta y los cocientes del apartado 6.3.3 que deciden si un registro pertenece aquí siquiera.
 - Referencia de la API: [`vibration.human.multiple_shock`](/phonometry/es/reference/api/vibration/multiple-shock/).
 - Teoría: [Choques múltiples (ISO 2631-5)](/phonometry/es/reference/theory/vibration/#choques-múltiples-iso-2631-5): el modelo de respuesta de la ISO 2631-5, la dosis de aceleración y la ley de riesgo de Weibull.

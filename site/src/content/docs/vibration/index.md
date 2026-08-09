@@ -50,7 +50,8 @@ From FRF vocabulary to the predicted level in a receiving room.
 - [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](/phonometry/vibration/structural/junction-transmission/):
   the frequency-independent wave-approach coefficients for rigid X, T, L and
   in-line junctions, their angular average and the derived coupling loss factor
-  and Kij.
+  and Kij, and the experimental route that measures the same coupling loss
+  factors by power injection.
 - [Transfer stiffness of resilient elements (ISO 10846)](/phonometry/vibration/structural/transfer-stiffness/):
   the dynamic transfer stiffness of vibration isolators by the direct and
   indirect methods.

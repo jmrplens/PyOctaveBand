@@ -1,6 +1,6 @@
 ---
 title: "Vibración y ruido estructural"
-description: "La vibración como fuente de ruido en edificios, como exposición humana y como diagnóstico de la propia máquina: el vocabulario de FRF (ISO 7626), la transmisión de onda de flexión en uniones, la rigidez de transferencia de aisladores (ISO 10846), la Potencia acústica a partir de la vibración (ISO/TS 7849), la cadena de equipos EN 15657 y EN 12354-5, las métricas de vibración en humanos de ISO 2631 e ISO 5349, y las frecuencias cinemáticas de fallo de la maquinaria rotativa."
+description: "La vibración como fuente de ruido en edificios, como exposición humana y como diagnóstico de la propia máquina: el vocabulario de FRF (ISO 7626), la transmisión de onda de flexión en uniones, la rigidez de transferencia de aisladores (ISO 10846), la potencia acústica a partir de la vibración (ISO/TS 7849), la cadena de equipos EN 15657 y EN 12354-5, las métricas de vibración en humanos de ISO 2631 e ISO 5349, y las frecuencias cinemáticas de fallo de la maquinaria rotativa."
 ---
 
 La vibración importa a la acústica tres veces. Primero como **fuente de
@@ -54,7 +54,8 @@ Del vocabulario de FRF al nivel predicho en el recinto receptor.
 - [Transmisión de onda de flexión en uniones de placas (Cremer/Craik/Hopkins)](/phonometry/es/vibration/structural/junction-transmission/):
   los coeficientes del enfoque ondulatorio independientes de la frecuencia para
   uniones rígidas en X, T, L y en línea, su media angular y el factor de
-  pérdidas por acoplamiento y el Kij derivados.
+  pérdidas por acoplamiento y el Kij derivados, y la vía experimental que mide
+  esos mismos factores de pérdidas por acoplamiento por inyección de potencia.
 - [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/):
   la rigidez de transferencia dinámica de aisladores de vibración por los
   métodos directo e indirecto.
@@ -65,7 +66,7 @@ Del vocabulario de FRF al nivel predicho en el recinto receptor.
   el método de la placa de recepción y las magnitudes de fuente
   independientes de la placa.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
-  el nivel de presión acústica en el recinto receptor predicho desde las
+  el nivel de presión acústica en el recinto receptor predicho a partir de las
   movilidades de fuente y receptor.
 
 ## [Vibración en humanos](/phonometry/es/vibration/human/)
@@ -123,7 +124,7 @@ procesado de excitación por martillo de impacto (ISO 7626-5) y sin magnitudes
 matriciales bloqueadas. En la página de aisladores, las Partes 4 y 5 de la
 ISO 10846 no están implementadas, y dos de las comprobaciones de validez de la
 norma (la desigualdad de masa de bloqueo y el criterio de linealidad del
-apartado 7.6) se describen pero no se calculan por ti.
+apartado 7.6) se describen, pero la biblioteca no las calcula por ti.
 
 ## Antes y después de estas páginas
 

@@ -22,12 +22,20 @@ from .aircraft import (
     generate_aircraft_atmospheric_absorption,
     generate_airport_contour,
     generate_airport_noise,
+    generate_airport_segment_breakdown,
+    generate_airport_segment_corrections,
     generate_airport_sor,
+    generate_anp_contour,
     generate_anp_npd,
     generate_anp_profile,
     generate_epnl,
+    generate_rotorcraft_contour,
+    generate_rotorcraft_flight_conditions,
     generate_rotorcraft_flyover_event,
     generate_rotorcraft_ground_effect,
+    generate_rotorcraft_hemisphere,
+    generate_rotorcraft_kinematics,
+    generate_rotorcraft_mean_ground_plane,
     generate_rotorcraft_terrain_screening,
 )
 from .building import (
@@ -303,37 +311,54 @@ from .metrology import (
 )
 from .perception import (
     generate_age_threshold_fractiles,
+    generate_age_threshold_sex_and_spread,
+    generate_annoyance_weightings,
     generate_equal_loudness_contours,
     generate_erb_bandwidth,
+    generate_exposure_budget,
     generate_exposure_uncertainty,
     generate_fluctuation_strength,
     generate_fluctuation_strength_specific,
     generate_hearing_threshold,
     generate_hms_modulation_bandpass,
+    generate_htlan_compression,
     generate_loudness_models_comparison,
     generate_loudness_pattern,
     generate_moore_glasberg_specific_loudness,
     generate_moore_glasberg_time_loudness,
     generate_nipts_audiogram,
+    generate_nipts_level_growth,
     generate_noise_induced_hearing_loss,
     generate_psychoacoustic_annoyance,
+    generate_sharpness_pair_and_targets,
     generate_sharpness_weighting,
     generate_sii_band_procedures,
     generate_sii_hearing_loss,
+    generate_sii_masking_chain,
+    generate_sii_octave_masking_blindness,
     generate_sii_vocal_efforts,
+    generate_sottek_specific_fluctuation,
     generate_sottek_specific_loudness,
+    generate_sottek_specific_roughness,
     generate_sottek_specific_tonality,
     generate_speech_intelligibility,
     generate_standard_speech_spectrum,
     generate_sti_band_mti,
     generate_sti_curve,
+    generate_sti_level_dependence,
+    generate_sti_mtf_curves,
     generate_stoi_band_scores,
     generate_stoi_intelligibility,
+    generate_stoi_segment_scores,
+    generate_tnr_pr_comparison,
     generate_tonality_roughness_demo,
     generate_tonality_spectrum,
     generate_tone_audibility,
     generate_tone_audibility_levels,
+    generate_tone_audibility_uncertainty,
     generate_tone_prominence_assessment,
+    generate_two_tone_separation,
+    generate_zwicker_time_varying,
 )
 from .room import (
     generate_absorption_per_table,
@@ -433,15 +458,26 @@ from .system_measurement import (
 )
 from .theme import set_theme
 from .underwater import (
+    generate_detection_range,
+    generate_marine_mammal_assessment,
+    generate_marine_mammal_audiograms,
+    generate_marine_mammal_exposure_functions,
     generate_marine_mammal_weighting,
+    generate_normal_modes,
     generate_numerical_propagation,
     generate_ocean_ambient_noise,
+    generate_pe_paraxial_error,
     generate_pile_driving,
+    generate_piling_campaign_accumulation,
+    generate_ray_turning_point,
     generate_seabed_reflection,
     generate_seabed_reflection_coefficient,
+    generate_seawater_absorption,
     generate_ship_source_level,
     generate_ship_traffic_noise,
+    generate_sonar_budget,
     generate_sonar_equation,
+    generate_sound_speed_models,
     generate_underwater_sound_speed,
     generate_underwater_transmission_loss,
     generate_weston_regimes,
@@ -449,16 +485,24 @@ from .underwater import (
 from .vibration import (
     generate_bearing_fault_envelope,
     generate_daily_vibration_exposure,
+    generate_envelope_chain_steps,
     generate_experimental_sea_clf,
+    generate_hav_vwf_lifetime,
+    generate_infinite_mobilities,
     generate_junction_kij_thickness,
     generate_junction_plate_geometry,
     generate_junction_transmission,
+    generate_machine_fault_families,
     generate_mechanical_mobility,
+    generate_mobility_random_error,
     generate_mobility_result_lines,
     generate_multiple_shock,
     generate_rigid_mass_calibration,
+    generate_shock_dose_measures,
+    generate_spinal_response_peaks,
     generate_transfer_stiffness,
     generate_vibration_weighting,
+    generate_vibration_weighting_family,
     generate_weighted_acceleration,
 )
 
@@ -495,6 +539,13 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_tonality_spectrum,
     # Psychoacoustics / intensity plots (loudness, STI, p-p intensity)
     generate_loudness_pattern,
+    generate_zwicker_time_varying,
+    generate_tone_audibility_uncertainty,
+    generate_two_tone_separation,
+    generate_tnr_pr_comparison,
+    generate_sharpness_pair_and_targets,
+    generate_sottek_specific_roughness,
+    generate_sottek_specific_fluctuation,
     generate_sti_curve,
     generate_intensity_demo,
     # Room / building acoustics plots (ISO 18233 excitations + IR, Schroeder
@@ -552,6 +603,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_mechanical_mobility,
     generate_junction_transmission,
     generate_bearing_fault_envelope,
+    # Machine diagnostics (Norton & Karczub 8.4): the gear, motor and fan
+    # families as patterns, and the three steps of the envelope route.
+    generate_machine_fault_families,
+    generate_envelope_chain_steps,
     generate_experimental_sea_clf,
     generate_plateau_transmission_loss,
     generate_orthotropic_transmission_loss,
@@ -596,6 +651,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_cnossos_rail_components,
     generate_cnossos_rail_directivity,
     generate_exposure_uncertainty,
+    generate_exposure_budget,
     # Materials: absorption rating, airflow resistance, impedance tube
     # (ISO 11654, ISO 9053-1/-2, ISO 10534-1/-2, ASTM E2611)
     generate_absorption_rating,
@@ -646,13 +702,18 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Human vibration (ISO 8041-1, ISO 2631-1/-2/-4, ISO 5349-1/-2,
     # Directive 2002/44/EC): frequency weighting, weighted a_w, daily A(8)
     generate_vibration_weighting,
+    generate_vibration_weighting_family,
     generate_weighted_acceleration,
+    generate_shock_dose_measures,
     generate_daily_vibration_exposure,
+    generate_hav_vwf_lifetime,
     # Speech intelligibility (ANSI S3.5-1997): band audibility and the SII.
     generate_speech_intelligibility,
     generate_sii_vocal_efforts,
     generate_standard_speech_spectrum,
     generate_sii_band_procedures,
+    generate_sii_masking_chain,
+    generate_sii_octave_masking_blindness,
     generate_impulse_prominence,
     # Room-noise criteria (ANSI S12.2-2019): NC tangency and RC Mark II,
     # and the pair of rooms the NC number cannot tell apart.
@@ -660,11 +721,15 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_nc_blind_spot,
     # Hearing threshold (ISO 7029 age-related, ISO 389-7 reference).
     generate_hearing_threshold,
+    generate_age_threshold_sex_and_spread,
     # Noise-induced hearing loss (ISO 1999 NIPTS and HTLAN).
     generate_noise_induced_hearing_loss,
+    generate_nipts_level_growth,
+    generate_htlan_compression,
     # Multiple-shock whole-body vibration (ISO 2631-5 Clause 5 + Annex C).
     generate_tonal_audibility,
     generate_multiple_shock,
+    generate_spinal_response_peaks,
     # Sound absorption in enclosed spaces (EN 12354-6 Clause 4).
     generate_enclosed_space_absorption,
     # Measurement uncertainty (GUM Guide 98-3 + Supplement 1 Monte Carlo).
@@ -695,6 +760,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # and psychoacoustic annoyance (Fastl & Zwicker Eqs 16.2-16.4).
     generate_fluctuation_strength,
     generate_psychoacoustic_annoyance,
+    generate_annoyance_weightings,
     # Electroacoustics: distortion metrics (IEC 60268-3) and
     # frequency-response / coherence estimators (Bendat & Piersol).
     generate_distortion,
@@ -799,17 +865,40 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_ship_traffic_noise,
     # Underwater propagation: numerical solvers (modes/rays/PE).
     generate_numerical_propagation,
+    generate_normal_modes,
+    generate_ray_turning_point,
+    generate_pe_paraxial_error,
+    # Underwater propagation: the model choices and the budget they feed.
+    generate_seawater_absorption,
+    generate_sound_speed_models,
+    generate_detection_range,
+    generate_sonar_budget,
+    # Underwater fauna: audiograms, exposure functions and the assessment.
+    generate_marine_mammal_audiograms,
+    generate_marine_mammal_exposure_functions,
+    generate_marine_mammal_assessment,
+    generate_piling_campaign_accumulation,
     # Aircraft atmospheric absorption: SAE ARP 5534 band method.
     generate_aircraft_atmospheric_absorption,
-    # Airport noise: ECAC Doc 29 noise-power-distance curves.
+    # Airport noise: ECAC Doc 29 noise-power-distance curves, the per-segment
+    # corrections and the single event they assemble into.
     generate_airport_noise,
     generate_airport_contour,
     generate_airport_sor,
+    generate_airport_segment_breakdown,
+    generate_airport_segment_corrections,
     # The EASA ANP fleet database that feeds that chain for a real aircraft.
     generate_anp_npd,
     generate_anp_profile,
+    generate_anp_contour,
+    # Rotorcraft: the ECAC Doc 32 hemisphere source and its propagation.
+    generate_rotorcraft_hemisphere,
     generate_rotorcraft_ground_effect,
     generate_rotorcraft_flyover_event,
+    generate_rotorcraft_contour,
+    generate_rotorcraft_flight_conditions,
+    generate_rotorcraft_kinematics,
+    generate_rotorcraft_mean_ground_plane,
     generate_rotorcraft_terrain_screening,
     # 2D FDTD wave simulation (public API concept figure).
     generate_fdtd_simulation,
@@ -859,6 +948,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_single_panel_rating,
     generate_junction_kij_thickness,
     generate_mobility_result_lines,
+    # ISO 7626: the reference mobilities of infinite structures and the
+    # Annex A averaging cost of the random-error criterion.
+    generate_infinite_mobilities,
+    generate_mobility_random_error,
     # Perception, hearing and speech: single-concept result figures drawn by
     # the results' own .plot() (ECMA-418-1 tone prominence, ISO/PAS 20065 tone
     # levels, ISO/PAS 1996-3 onsets, ISO 532-2 and ECMA-418-2 patterns, the
@@ -874,7 +967,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_age_threshold_fractiles,
     generate_nipts_audiogram,
     generate_stoi_band_scores,
+    generate_stoi_segment_scores,
     generate_sti_band_mti,
+    generate_sti_mtf_curves,
+    generate_sti_level_dependence,
     # Atmospheric refraction (profiles, ray fan, GFPE range cut) and
     # wave-theoretic barrier insertion loss.
     generate_atmospheric_sound_speed_profiles,

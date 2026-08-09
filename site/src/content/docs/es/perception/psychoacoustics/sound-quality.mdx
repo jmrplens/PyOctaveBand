@@ -46,6 +46,59 @@ objetivo de 1).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality_es.svg" alt="Diagrama de bloques de la familia de métricas de calidad sonora: una señal calibrada en pascales alimenta dos etapas auditivas, el patrón de sonoridad específica de Zwicker sobre 24 Bark y el modelo de Sottek de ECMA-418-2 con 53 bandas auditivas; la primera lleva a la agudeza de DIN 45692, cuya referencia de ruido de una banda crítica a 1 kHz y 60 dB vale 1,00 acum, y la segunda a la tonalidad, la aspereza y la intensidad de fluctuación, cuyas referencias, un tono de 1 kHz a 40 dB y portadoras de 1 kHz totalmente moduladas en amplitud a 70 Hz y a 4 Hz a 60 dB, valen 1,000 tu_HMS, 0,9999 asper y 0,9957 vacil_HMS; una nota final indica que N5, agudeza, aspereza y fluctuación alimentan la molestia psicoacústica de Fastl y Zwicker" width="92%" />
 
+## Grabar la señal que estas métricas necesitan
+
+ECMA-418-2 es un cálculo que se aplica a una grabación, y su apartado 2 hace de
+la grabación parte de la conformidad: una medición solo es conforme si se toma
+conforme a ECMA-74 y se realiza a 48 kHz, o se remuestrea a esa frecuencia. Eso
+arrastra un entorno de ensayo cualificado al grado de exactitud 2 de ISO 11201,
+un modo de funcionamiento declarado y el micrófono en las posiciones de
+ECMA-74 — la posición de operador a 0,25 m de la caja de referencia y a 1,20 m
+sentado o 1,50 m de pie, o al menos cuatro posiciones de observador a 1,00 m de
+distancia y 1,50 m de altura —, con el ruido de fondo medido con el equipo
+apagado y un calibrador aplicado antes y después. Las posiciones son las mismas
+de las que parte la
+[guía de tonos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/),
+que las enuncia enteras:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tonality_positions_es.svg"
+  alt="Posiciones de medida de emisión ECMA-74: micrófono del operador sentado a 0,25 m y 1,20 m, y las cuatro posiciones de observador a 1 m"
+  width="92%"
+/>
+
+**Cuánto tiene que durar el registro** es la pregunta que las tres métricas de
+ECMA contestan de forma distinta, y que ningún fragmento de esta página te
+diría: el intervalo de medición debe cubrir al menos tres ciclos de
+funcionamiento, o la secuencia completa en equipos que varían, y encima de eso
+cada métrica tiene su propio tiempo de establecimiento. La tonalidad se
+establece en torno a un segundo con un tono estable, porque la autocorrelación
+trabaja dentro de cada bloque. La aspereza necesita un par de segundos: su
+valor único es el percentil 90 de $R(l_{50})$ sobre los bloques que sobreviven
+al transitorio inicial, y la traza que se dibuja más abajo tarda unos 0,5 s en
+alcanzar su meseta. La intensidad de fluctuación es la que más registro
+necesita, del orden de diez segundos, porque resuelve tasas de modulación
+cercanas a 4 Hz: su traza sigue subiendo a los 3 s y solo se asienta hacia los
+4 s, así que un extracto de dos segundos contiene un puñado de periodos de
+modulación y se queda corto.
+
+Saca las consecuencias: los valores calculados sobre fragmentos cortos quedan
+sesgados a la baja para $R$ y $F$, así que compara solo valores calculados
+sobre duraciones comparables, y toma por costumbre indicar la longitud de
+análisis junto al valor. Los fragmentos de abajo usan 1,2 s, 2,0 s y 8,0 s
+justo por esto.
+
+:::caution
+Una grabación binaural o con cabeza artificial debe venir ya ecualizada a campo
+libre o a campo difuso antes de llegar a `tonality_ecma`, `roughness_ecma` o
+`fluctuation_strength_ecma`. El apartado 5.1.3 lo da por supuesto: en un campo
+ideal, los dos canales ecualizados corresponden a un micrófono en el centro de
+la cabeza artificial, ya ausente, que es para lo que está hecho el filtro de
+`field=`. Meter una grabación de maniquí sin ecualizar aplica dos veces el
+filtro del oído externo. Cada canal se analiza por separado, ya que las
+combinaciones binaurales no están implementadas.
+:::
+
 ## Agudeza en acum (DIN 45692)
 
 Dos sonidos pueden ser igual de sonoros y aun así uno se percibe más
@@ -60,7 +113,7 @@ $$
 con $g(z) = 1$ hasta 15,8 Bark y creciendo exponencialmente a partir de ahí, y
 $k$ normalizada para que el sonido de referencia (ruido de ancho de banda
 crítico a 1 kHz, 60 dB) sea exactamente **1,00 acum** (DIN 45692 apartado 6;
-la $k = 0{,}108$ derivada queda dentro de la ventana normativa 0,105–0,115).
+la $k = 0{,}108$ resultante queda dentro de la ventana normativa 0,105–0,115).
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_es.svg"
@@ -68,6 +121,11 @@ la $k = 0{,}108$ derivada queda dentro de la ventana normativa 0,105–0,115).
   width="80%"
   loading="eager"
 />
+
+*Las tres ponderaciones. Todas son planas hasta unos 15 Bark y crecen
+exponencialmente por encima, que es lo que hace que la sonoridad de alta
+frecuencia cuente más; la curva de Aures, a diferencia de las otras dos, se
+mueve con la sonoridad total.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -106,12 +164,95 @@ x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)   # cualquier grabación
 sens = 1.0                                                # calibration_factor a pascales
 
 s = psychoacoustics.sharpness_din(x, fs, calibration_factor=sens)      # acum
-s_aures = psychoacoustics.sharpness_din(x, fs, method="aures")          # variante del Anexo B
+s_aures = psychoacoustics.sharpness_din(x, fs, method="aures")        # variante del Anexo B
+print(f"S = {s:.2f} acum  (Aures {s_aures:.2f} acum)")                # 1.03 acum (Aures 1.23)
 ```
 
 CI verifica los valores objetivo de la Tabla A.2 (desde 0,38 acum a 250 Hz
 hasta 2,82 acum a 4 kHz) dentro de la tolerancia del 5 % / 0,05 acum de la
 norma.
+
+**La agudeza es una posición, no un nivel.** Tanto el numerador como el
+denominador de $S$ contienen $N'(z)$, así que el nivel se cancela: lo que
+responde el cociente es *dónde se sitúa sobre el eje de Bark la sonoridad de
+este sonido*. Por eso el apartado 6 de DIN 45692 fija el sonido de referencia y
+todas y cada una de sus señales de verificación a la misma sonoridad, 4 sonios,
+y por eso comparar la agudeza de dos sonidos de sonoridad muy distinta casi no
+significa nada. Conviene memorizar el margen: una banda crítica de ruido a
+250 Hz vale unos 0,4 acum, la referencia de 1 kHz exactamente 1 acum, una banda
+crítica a 4 kHz unos 2,8 acum, y el ruido de banda ancha de un producto suele
+caer entre 1 y 3 acum, con los sonidos dominados por el siseo que los clientes
+llaman chillones por encima de 2 acum.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_pair_and_targets_es.svg"
+  alt="A la izquierda, dos patrones de sonoridad específica de Zwicker con la misma sonoridad total: una banda crítica de ruido de 250 Hz centrada en 3,4 Bark que vale 0,37 acum y una banda crítica de 4 kHz centrada en 18,1 Bark que vale 2,75 acum. A la derecha, el barrido de verificación de la Tabla A.2 de DIN 45692 de 250 Hz a 4 kHz, con la curva de agudeza calculada pasando por los objetivos tabulados de los ensayos de audición dentro de una banda sombreada del 5 por ciento o 0,05 acum"
+  width="94%"
+/>
+
+*La misma sonoridad, siete veces la agudeza. Los dos patrones integran 4 sonios;
+lo que cambia es dónde se sitúan, y eso es todo el contenido de la métrica. A
+la derecha, el mismo cálculo frente a los objetivos de los ensayos de audición
+de la propia norma, con todos los puntos dentro de la desviación permitida.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+from scipy import signal as sp_signal
+
+# `psychoacoustics` lo importan los fragmentos de arriba.
+# Una banda crítica de ruido de la Tabla A.1 de DIN 45692, a un nivel de banda dado.
+def critical_band_noise(f_low, f_high, level_db):
+    rng = np.random.default_rng(7)
+    sos = sp_signal.butter(8, [f_low, f_high], btype="band", fs=48000, output="sos")
+    band = sp_signal.sosfilt(sos, rng.standard_normal(48000 * 2))
+    band /= np.sqrt(np.mean(band**2))
+    return band * 2e-5 * 10 ** (level_db / 20)
+
+# La Tabla A.2 compara señales de igual sonoridad, así que cada banda se ajusta a 4 sonios.
+def level_for_four_sone(f_low, f_high):
+    low, high = 30.0, 95.0
+    for _ in range(14):
+        mid = (low + high) / 2
+        loud = psychoacoustics.loudness_zwicker(
+            critical_band_noise(f_low, f_high, mid), 48000, stationary=True).loudness
+        low, high = (mid, high) if loud < 4.0 else (low, mid)
+    return (low + high) / 2
+
+for centre, f_low, f_high, target in [(250.0, 200.0, 300.0, 0.38),
+                                      (4000.0, 3700.0, 4400.0, 2.82)]:
+    band = critical_band_noise(f_low, f_high, level_for_four_sone(f_low, f_high))
+    print(centre, round(float(psychoacoustics.sharpness_din(band, 48000)), 2), target)
+#   250.0 0.37 0.38
+#   4000.0 2.75 2.82
+```
+
+</details>
+
+**Qué variante.** La ponderación DIN es independiente de la sonoridad, una
+buena aproximación cerca de los 4 sonios a los que se calibró, pero se queda
+corta frente a la agudeza que declaran los oyentes con sonidos muy silenciosos;
+la ponderación informativa de Aures escala con la sonoridad total y es por
+tanto la variante a la que recurrir cuando los sonidos que se comparan difieren
+mucho en sonoridad. La de von Bismarck es la curva histórica, con su codo en
+15 Bark, y se conserva por continuidad con datos antiguos. Para un sonido cuyo
+espectro se mueve, el apartado 6 de DIN 45692 recomienda citar el percentil
+$S_{50}$ sobre el análisis en lugar de un único valor instantáneo.
+
+### Parámetros de `sharpness_din()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | array 1D | Pa (tras calibración) | no vacío | La señal de la que se calcula el patrón de sonoridad específica |
+| `fs` | int | Hz | > 0 | |
+| `field` | str | — | `'free'` (por defecto) / `'diffuse'` | La corrección de campo sonoro de ISO 532-1, heredada de la etapa de sonoridad |
+| `method` | str | — | `'din'` (por defecto, apartado 6) / `'bismarck'` / `'aures'` | La ponderación $g(z)$; las dos últimas son del Anexo B |
+| `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
+
+A diferencia de las tres métricas de ECMA de abajo, `sharpness_din()` devuelve
+un float pelado en acum, no un objeto de resultado con su propio `.plot()`.
 
 ## Tonalidad (ECMA-418-2)
 
@@ -145,6 +286,11 @@ res.plot()   # tonalidad específica media T'(z) + T(l) dependiente del tiempo
   alt="Tonalidad específica media de ECMA-418-2 sobre las 53 bandas Bark_HMS para un tono de 1 kHz a 40 dB SPL: la tonalidad se concentra en un único pico en la banda crítica del tono, hacia 9 Bark_HMS, y cae casi a cero en el resto, integrando T = 1,00 tu_HMS"
   width="80%"
 />
+
+*El ancla de calibración vista banda a banda: un tono de 1 kHz a 40 dB pone
+toda su tonalidad en una sola banda crítica, que es lo que hace que ahí la
+relación entre sonoridad tonal y de ruido sea grande y despreciable en todas
+las demás.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -183,6 +329,18 @@ de pala y su serie armónica muestra varios picos así; un siseo muestra un
 patrón plano y bajo. Llamar a `.plot()` sin ejes añade el panel de $T(l)$
 dependiente del tiempo, que es donde aparece un tono intermitente.
 
+**Cómo se lee una tonalidad.** El apartado 6.3 de ECMA-418-2 ata su criterio de
+prominencia al *patrón*, no al valor único: una componente tonal en la banda
+$z_\text{tonal}$ cuenta como prominente cuando la tonalidad específica
+$T'(z_\text{tonal})$ supera 0,4 tu_HMS, es un máximo local a lo largo de $z$ y
+lleva una frecuencia tonal comprendida entre los centros de las bandas vecinas.
+Así que una afirmación de prominencia se lee de `specific_tonality` y
+`tonal_frequencies`, nunca de $T$ a secas. La norma no fija ningún límite a la
+$T$ global, lo que la convierte en una magnitud para comparar diseños y no en
+un ensayo de cumple/no cumple; el ensayo es la relación tono-ruido y la
+relación de prominencia de ECMA-418-1 de
+[Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/).
+
 ### Parámetros de `tonality_ecma()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
@@ -199,12 +357,12 @@ Devuelve un `EcmaTonality`: `tonality` ($T$, tu_HMS), `specific_tonality`
 `tonal_frequency_vs_time`,
 `field`.
 
-## Aspereza (ECMA-418-2): nueva capacidad
+## Aspereza en asper (ECMA-418-2)
 
 La aspereza es la sensación áspera y zumbante de una modulación de amplitud
 rápida (aproximadamente 20–300 Hz, con máximo cerca de 70 Hz): la cualidad de
-un ralentí diésel o de un altavoz distorsionado. Es una **métrica nueva** en
-phonometry. ECMA-418-2 extrae la envolvente de cada banda, pondera su espectro
+un ralentí diésel o de un altavoz distorsionado.
+ECMA-418-2 extrae la envolvente de cada banda, pondera su espectro
 de modulación por la tasa y la profundidad de modulación, y correlaciona la
 modulación entre bandas; el resultado $R$ se da en **asper**. El sonido de
 referencia (portadora de 1 kHz, modulada en amplitud al 100 % a 70 Hz, nivel
@@ -283,6 +441,45 @@ plt.show()
 
 </details>
 
+**Cómo se lee una aspereza.** El apartado 7.2 da el criterio que la sección de
+tonalidad se guarda: una señal tiene una aspereza *prominente* cuando el valor
+único $R$ — el percentil 90 de la $R(l_{50})$ dependiente del tiempo, no su
+media — supera 0,2 asper. El percentil importa: las rachas breves de dureza no
+se promedian hasta desaparecer, lo que también significa que el registro tiene
+que ser lo bastante largo como para que ese percentil se asiente. La figura de
+abajo es el sonido de referencia visto de las dos maneras en que lo lleva el
+objeto de resultado.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_roughness_es.svg"
+  alt="A la izquierda, la aspereza específica media de ECMA-418-2 del sonido de referencia sobre las 53 bandas Bark_HMS, un único pico de 0,37 asper por Bark_HMS en la banda de la portadora, a 9 Bark_HMS. A la derecha, la aspereza dependiente del tiempo de la misma señal subiendo desde cero y alcanzando su meseta al cabo de medio segundo, con el percentil 90 de 0,9999 asper trazado de lado a lado"
+  width="94%"
+/>
+
+*El sonido de referencia, banda a banda e instante a instante. El valor único
+es la línea discontinua: un percentil de la traza de la derecha, integrada a
+partir del patrón de la izquierda. Ese medio segundo de arranque es la razón de
+que dos segundos de registro sean el mínimo práctico.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `res` es el resultado de aspereza del fragmento de arriba.
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(12, 4.8))
+ax0.plot(res.bark, res.specific_roughness)
+ax0.set(xlabel="Razón de banda crítica z [Bark_HMS]",
+        ylabel="Aspereza específica R'(z) [asper/Bark_HMS]")
+ax1.plot(res.time, res.roughness_vs_time)
+ax1.axhline(res.roughness, linestyle="--")     # el percentil 90
+ax1.set(xlabel="Tiempo [s]", ylabel="Aspereza R [asper]")
+plt.show()
+```
+
+</details>
+
 ### Parámetros de `roughness_ecma()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
@@ -296,7 +493,7 @@ $R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bandas), `bark`,
 `centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
 `specific_roughness_vs_time` (array de (n_times, 53)), `field`.
 
-## Intensidad de fluctuación (ECMA-418-2): nueva capacidad
+## Intensidad de fluctuación en vacil_HMS (ECMA-418-2)
 
 La intensidad de fluctuación es la sensación lenta y ondulante de la
 modulación de amplitud o de frecuencia por debajo de unos 20 Hz: una
@@ -339,6 +536,22 @@ res.plot()   # F(l50) temporal + mapa de calor de la específica
   alt="Percepción de modulación lenta vs rápida de ECMA-418-2: la intensidad de fluctuación forma un paso de banda sobre la frecuencia de modulación con máximo cerca de 4 a 6 Hz mientras que la aspereza de los mismos tonos de 1 kHz modulados en amplitud tiene su máximo cerca de 70 Hz"
   width="80%"
 />
+
+*Dos pasos de banda sobre la misma envolvente. La misma portadora modulada se
+oye como fluctuación por debajo de unos 20 Hz y como aspereza por encima, que
+es la razón de que las dos métricas se repartan el eje de modulación en vez de
+competir en él.*
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_fluctuation_es.svg"
+  alt="A la izquierda, la intensidad de fluctuación específica media de ECMA-418-2 del sonido de referencia sobre las 53 bandas Bark_HMS, un único pico de 0,38 vacil_HMS por Bark_HMS en la banda de la portadora, a 9 Bark_HMS. A la derecha, la intensidad de fluctuación dependiente del tiempo de la misma señal subiendo durante unos cuatro segundos antes de asentarse, con el percentil 90 de 0,9957 vacil_HMS trazado de lado a lado"
+  width="94%"
+/>
+
+*Las mismas dos vistas para la sensación lenta, y la razón de que esta métrica
+sea la que más registro necesita de la página: la traza sigue subiendo a los
+3 s. Un extracto de dos segundos de este mismísimo sonido de referencia daría
+bastante por debajo de 1 vacil_HMS.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

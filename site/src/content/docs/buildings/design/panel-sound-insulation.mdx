@@ -864,8 +864,13 @@ impedance) sets how much energy a structure absorbs. For infinite structures
 these are closed forms: an infinite thin plate is a pure resistance
 $Z = 8\sqrt{B'\,m''}$ (real, frequency independent), while an infinite beam has
 $Y = (1-\mathrm{j})/(4 m' c_B)$ (45 degrees, falling as $\omega^{-1/2}$). They
-supply the receiver mobility EN 12354-5 needs when no measurement exists, and
-bundle as an ISO 7626 [`MobilityResult`](/phonometry/vibration/structural/mechanical-mobility/).
+supply the receiver mobility EN 12354-5 needs when no measurement exists.
+`infinite_plate_point_mobility` and `infinite_beam_point_mobility` return the
+same quantities bundled as an ISO 7626 `MobilityResult`, so they plot, convert
+and report like any measured FRF; the
+[mechanical mobility guide](/phonometry/vibration/structural/mechanical-mobility/#5-reference-mobilities-when-nothing-has-been-measured)
+reads them against the SDOF resonator and adds the moment and longitudinal-rod
+cases.
 
 ```python
 from phonometry import infinite_plate_impedance, infinite_beam_mobility, injected_power

@@ -56,12 +56,46 @@ before the mathematics.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification.svg" alt="The three aircraft noise certification points of ICAO Annex 16 Chapter 3, in plan and side view sharing the same distance scale: a lateral reference line parallel to the runway at 450 m where take-off noise is greatest, with a symmetric point on the other side; the flyover reference point on the extended centre line 6 500 m from the start of roll, under the climb-out; and the approach reference point 2 000 m from the threshold, 120 m below the 3 degree glide path that meets the ground 300 m beyond the threshold; microphones sit 1.2 m above the ground and the metric at all three points is EPNL in EPNdB" width="92%" />
 
+Three points, because a transport aeroplane is loud in three different ways.
+The **lateral** point, on a line 450 m to the side of the runway and placed
+where the take-off noise is greatest (§3.3.1 a), catches full take-off thrust at
+a shallow elevation angle, where ground effect and engine installation matter
+most. The **flyover** point, 6.5 km from the start of roll on the extended
+centre line, catches the aeroplane after thrust cutback, which is the community
+case. The **approach** point, 2 000 m before the threshold and 120 m below the
+3° path, catches an airframe- and fan-dominated condition at low power. All
+three are scored with the EPNL of this page, but the limits differ and are not
+single numbers: Chapter 3 §3.4 sets them as lines rising with maximum
+certificated take-off mass — 101 EPNdB at flyover for a twin at 385 000 kg and
+above, 104 for a trijet and 106 for four engines or more, against 103 lateral
+and 105 on approach at the top of their own mass ranges — so the same EPNL can
+pass at one point and fail at another. The microphone is 1.2 m above the ground
+at every point, which is why the measurement section below cares so much about
+grazing incidence.
+
 ## Perceived noisiness and PNL
 
 Each of the 24 one-third-octave-band levels (50 Hz–10 kHz) is converted to a
 perceived **noisiness** in noys by the analytic piecewise law of Table A2-3,
 then combined into the total noisiness $N = 0.85\,n_{\max} + 0.15\sum n$ and
 the perceived noise level $\mathrm{PNL} = 40 + (10/\log_{10} 2)\,\log_{10} N$.
+
+A noy is a linear scale of perceived noisiness: two noys are meant to be twice
+as noisy as one, which is what lets the bands be combined arithmetically instead
+of energetically. The per-band conversion is piecewise-linear in level with
+slopes that differ from band to band, so the same 70 dB is worth far more noys
+at 3 kHz than at 63 Hz — the law carries the ear's sensitivity in the same way
+an equal-loudness contour does, but calibrated on judgements of *noisiness*
+rather than loudness. The combination rule is a masking statement, not an energy
+sum: the loudest band alone accounts for 85 % of the total, and everything else
+together is credited with 15 %, which is why a single fan tone can dominate a
+spectrum that is broadband on paper. The logarithm then buys a level-like
+quantity: with $\mathrm{PNL} = 40 + 33.22\lg N$, one noy is 40 PNdB and every
+doubling of total noisiness adds exactly 10 PNdB. Two limits come with it. The
+law is tabulated only for the 24 bands from 50 Hz to 10 kHz, so energy outside
+that range is invisible to EPNL by construction; and typical transport flyovers
+at the certification points land between about 90 and 110 PNdB, which is the
+scale a printed PNL should be read against.
 
 ```python
 from phonometry import aircraft
@@ -108,13 +142,75 @@ c = aircraft.tone_correction(spl)              # dB; added to PNL to give PNLT
 # effective_perceived_noise_level below.
 ```
 
+## Measuring the flyover
+
+What goes into the chain is a time history of **unweighted one-third-octave
+band sound pressure levels**: 24 bands with nominal midband frequencies from
+50 Hz to 10 kHz, one spectrum every 500 ms ± 5 ms (App. 2 §3.7.2). That cadence
+is prescribed, and the 10 s reference duration of the metric below is fixed
+independently of it, which is where the 13 dB constant of the uniform case comes
+from. A reader arriving with A-weighted data, or with a 1 s cadence, gets a
+plausible-looking number that is not an EPNL.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_noise_station.svg" alt="A noise certification measurement station of ICAO Annex 16 Appendix 2. The site elevation shows the aircraft on its reference flight path with the slant path drawn down to a microphone, an obstruction-free cone of 80 degree half-angle about the vertical drawn as two dashed rays with one tree clear of it and a taller one breaking into it marked site rejected, an independent tracking sensor sighting the aircraft, and a 10 metre meteorological mast carrying an anemometer and a temperature and humidity sensor, noted as within 2000 m of the station. A larger-scale detail draws the microphone itself: the sensing element 1.2 m above local ground inside a windscreen whose insertion loss stays within plus or minus 1.5 dB and is corrected for, with the arriving ray. A plan inset shows the capsule axis perpendicular to the plane of the flight path so every ray arrives at 90 degrees, grazing, beside a box reading 24 one-third-octave bands from 50 Hz to 10 kHz, one sample every 500 ms plus or minus 5 ms. The footer gives the aeroplane test window: no precipitation, minus 10 to 35 degrees Celsius and 20 to 95 per cent relative humidity over the path above 10 m, 8 kHz attenuation not more than 12 dB per 100 m, wind not more than 6.2 metres per second average and 7.7 peak, crosswind not more than 3.6 and 5.1; the helicopter window of 5.1 and 2.6 metres per second; and at least six valid runs per measurement point with a 90 per cent confidence limit not exceeding plus or minus 1.5 EPNdB" width="92%" />
+
+The station that produces those spectra is fixed clause by clause.
+
+- **The microphone.** The sensing element sits 1.2 m above the local ground and
+  is oriented for grazing incidence, with the element substantially in the plane
+  defined by the predicted reference flight path and the station (§3.5.2) — in
+  practice the capsule axis points across the track, so sound arrives at 90° to
+  it throughout the flyover. Its free-field sensitivity level must stay within
+  ±1.0 dB of the calibration-check frequency from 50 Hz to 5 kHz and within
+  ±2.0 dB at 6.3, 8 and 10 kHz (§3.5.3), and its directional response must meet
+  Table A2-1 (§3.5.4). The windscreen's insertion loss must stay inside ±1.5 dB
+  over the same range at grazing incidence (§3.4) and is corrected for.
+- **The site.** Relatively flat terrain with no excessive sound absorption —
+  no thick, matted or tall grass, shrubs or wooded areas — and no obstruction
+  that significantly influences the sound field inside a cone of 80° half-angle
+  about the vertical through the microphone (§2.2.1). The people taking the
+  measurement count as obstructions.
+- **The window.** For aeroplanes: no precipitation; −10 °C to 35 °C and 20 % to
+  95 % relative humidity over the propagation path between 10 m and the
+  aircraft; the 8 kHz attenuation coefficient no more than 12 dB/100 m over that
+  path; average wind at 10 m no more than 6.2 m/s with a maximum of 7.7 m/s, and
+  average crosswind no more than 3.6 m/s with a maximum of 5.1 m/s (§2.2.2.4.1).
+  For helicopters the wind limits tighten to 5.1 m/s and 2.6 m/s and the
+  temperature and humidity limits apply at 10 m only. Temperature, humidity,
+  wind speed and direction are measured at 10 m above the ground within 2 000 m
+  of the noise measurement point (§2.2.2.2).
+- **The tracking.** Aircraft position is determined by a method independent of
+  the cockpit flight instrumentation and time-synchronised with the acoustic
+  record over at least the interval in which the noise is within 10 dB of
+  $\mathrm{PNLTM}$ (§2.3.1-2.3.2) — the window the metric integrates over.
+- **The repetition.** At least six valid runs per measurement point, and the
+  sample must be large enough that the 90 % confidence limit on the average does
+  not exceed ±1.5 EPNdB (§5.4.2).
+
 ## EPNL
 
-Over the flyover, $\mathrm{PNLT} = \mathrm{PNL} + C$, its maximum is
-$\mathrm{PNLTM}$, and the metric integrates $\mathrm{PNLT}$ over the 10 dB-down
-window (the records nearest to $\mathrm{PNLTM} - 10$ on each side) normalised
-to 10 s, so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration
-correction $D$.
+Over the flyover, $\mathrm{PNLT} = \mathrm{PNL} + C$ and its maximum is
+$\mathrm{PNLTM}$. The metric converts the tone-corrected level back to energy,
+sums it over the records between the two 10 dB-down points and divides by a
+fixed reference duration $t_0 = 10\ \text{s}$ (App. 2 §4.6),
+
+$$
+\mathrm{EPNL} = 10\lg\!\left[\frac{1}{t_0}\sum_k 10^{\mathrm{PNLT}(k)/10}\,
+\Delta t_k\right],
+$$
+
+so EPNL is the level of a hypothetical 10 s exposure carrying the same
+noisiness-weighted energy as the real event. For the uniform half-second cadence
+this collapses to $10\lg\sum 10^{\mathrm{PNLT}(k)/10} - 13$, the 13 dB being
+$-10\lg(0.5/10)$. The fixed reference duration is what makes
+$D = \mathrm{EPNL} - \mathrm{PNLTM}$ a *correction* rather than an integral: a
+flyover that lingers near its peak for much longer than 10 s scores above
+$\mathrm{PNLTM}$, and one that sweeps past scores below it. In the ETM Vol. I
+Table 4-4 example the peak is $\mathrm{PNLTM} = 97.40$ PNdB, the 10 dB-down
+window runs from record 4 to record 28 of 31 and spans 10.2 s of increments, and
+the result is $D = -4.78$ dB and $\mathrm{EPNL} = 92.62$ EPNdB — a hair below
+$\mathrm{PNLTM}$ because the window is barely longer than the reference
+duration.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl.svg" alt="Aircraft-flyover perceived-noise-level time history: PNL and the tone-corrected PNLT versus time, with the maximum PNLTM marked and the 10 dB-down integration window shaded, annotated with the resulting EPNL and duration correction" width="82%" loading="eager" />
 
@@ -131,9 +227,11 @@ res.plot()   # PNL/PNLT time history (needs matplotlib)
 `pnl`, `tone_correction`, `pnlt`, the peak `pnltm`, the `bandsharing_adjustment`,
 the `duration_correction`, the `epnl` and the 10 dB-down `band_limits`. Its
 `procedure=` argument starts the analysis at 80 Hz for an aeroplane (the
-default) and at 50 Hz for a helicopter. The reference-condition
-integrated-method example of ETM Vol. I Table 4-4 — a different, real
-certification time history — is reproduced as
+default) and at 50 Hz for a helicopter, and `dt` may be a per-record array
+rather than a scalar — which is how the variable increments of the integrated
+method enter. The reference-condition integrated-method example of ETM Vol. I
+Table 4-4 — a different, real certification time history, with increments
+between 0.395 s and 0.431 s — is reproduced as
 $\mathrm{EPNL} = 92.6\ \text{EPNdB}$.
 
 <details>
@@ -210,13 +308,88 @@ FAIL against the same 101 EPNdB limit, which is the verdict row doing its job.
 	caption="ICAO Annex 16 EPNL certification fiche (EPNLResult.report), EPNL in EPNdB with PNLTM and the duration correction D."
 />
 
+## From a measured flyover to a certification level
+
+What the section above computed is the EPNL of the flight *as flown, on the day
+it was flown*. A certification level is the same quantity transported to a fixed
+reference day — sea-level pressure of 1 013.25 hPa, 25 °C at sea level with the
+ICAO Standard Atmosphere lapse rate, 70 % relative humidity, zero wind
+(Chapter 3 §3.6.1.5) — and to a fixed reference flight path. Appendix 2 §8 is
+that transport, and it is the missing half of the chain.
+
+In the simplified method (§8.3) each band of the $\mathrm{PNLTM}$ spectrum is
+moved to the reference day by
+
+$$
+\mathrm{SPL}_R(i) = \mathrm{SPL}(i)
+ + 0.01\,[\alpha(i) - \alpha_R(i)]\,QK
+ + 0.01\,\alpha_R(i)\,(QK - Q_rK_r)
+ + 20\lg\frac{QK}{Q_rK_r},
+$$
+
+which swaps the test-day absorption coefficient for the reference one over the
+measured path, re-absorbs over the corrected path length, and applies an
+inverse-square term for the change in path length (§8.3.2.1). The adjusted
+spectrum is re-run through the noy law and the tone correction, the bandsharing
+adjustment of the test day is added back, and the difference
+$\Delta_1 = \mathrm{PNLTM}_R - \mathrm{PNLTM}$ is one of four terms added to the
+measured EPNL:
+
+$$
+\mathrm{EPNL}_R = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
+ + \Delta_2 + \Delta_3
+$$
+
+(§8.3.6). $\Delta_{\text{peak}}$ handles a secondary peak within 2 dB of
+$\mathrm{PNLTM}$ that overtakes the adjusted maximum (§8.3.3);
+$\Delta_2 = -7.5\lg(QK/Q_rK_r) + 10\lg(V_G/V_{GR})$ is the change in duration
+from the path length and the ground speed (§8.3.4); and $\Delta_3$ corrects for
+the difference between the propulsion operating parameters flown and those
+specified for the reference condition, from manufacturer sensitivity curves
+(§8.3.5). §8.2.3 fixes when the simplified method is not enough and the
+integrated method must be used instead: a flyover disagreement above 8 EPNdB, an
+approach disagreement above 4 EPNdB, or a result within 1 EPNdB of the Chapter 3
+limit.
+
+The library supplies the ingredients and not the bookkeeping. `air_attenuation`
+and `sae_band_attenuation` below are exactly the $\alpha(i)$ and $\alpha_R(i)$
+of the first two terms, and the EPNL machinery re-runs an adjusted spectrum as
+readily as a measured one; the flight-path geometry $QK/Q_rK_r$ and the four
+$\Delta$ terms themselves are not implemented. Adjust first, then report: the
+EPNL this page returns is a test-day value, and a `requirement` verdict is only
+a certification verdict once §8 has been applied.
+
 ## Measurement-system verification (IEC 61265)
 
 `verify_aircraft_noise_system` checks measured performance against the
-IEC 61265:1995 tolerances: the microphone directional-response limits (Table 1)
-and the scalar frequency-response, linearity and resolution limits. The
-one-third-octave filtering is covered by the library's IEC 61260 class-2 filter
-verification.
+IEC 61265:1995 tolerances: the microphone directional-response limits (Table 1,
+identical to Annex 16 Table A2-1) and the scalar frequency-response, linearity
+and resolution limits.
+
+The arguments are measured data, not settings. The outer key of `directional`
+is a one-third-octave midband frequency in hertz; the inner key is the sound
+incidence angle in degrees from the microphone's principal axis; and the value
+is the measured **free-field sensitivity-level difference in decibels relative
+to 0°, normal incidence**, for sinusoidal waves in a free field. At 4 kHz the
+limits are 0.5 / 1.0 / 2.0 / 2.5 / 2.5 dB at 30 / 60 / 90 / 120 / 150°, so the
+example below passes with margin. That check matters because the aeroplane
+sweeps through a wide range of incidence angles while the microphone stays
+fixed, and the whole station is built around sound arriving within a few degrees
+of grazing. `frequency_response` values are deviations in decibels from the
+level at the calibration-check frequency, in the reference direction.
+
+The data comes from an anechoic free-field turn of the microphone with its
+windscreen fitted, or from an actuator response plus the supplier's free-field
+corrections; the electrical half comes from inserting a low-distortion sinusoid
+within 5 dB of the calibration level and stepping it in 5 dB intervals, refined
+to 1 dB around the ends of the linear range and the overload point. Run and
+report the periodic test in a controlled environment (19-25 °C, 100-102 kPa,
+40-70 % relative humidity) with a calibrator traceable to national standards.
+Read `report["passed"]` as a verdict on data you supplied: a failed check
+invalidates the certification data, it is not a correction to apply. Band-filter
+conformance is a separate matter — Annex 16 §3.7.3 requires IEC 61260 class 1,
+with class 2 admissible only if the certificating authority allows it, and the
+library's own filter verification is the place that is checked.
 
 ```python
 from phonometry import aircraft
@@ -239,6 +412,18 @@ attenuation $\delta_B$, consistent with the Exact Method well beyond the 50 dB
 Approximate-Method limit.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption.svg" alt="Aircraft atmospheric absorption versus frequency for two path lengths; the SAE-Method band attenuation stays below the pure-tone mid-band value at high absorption" width="82%" />
+
+A third-octave band is not a tone. The absorption coefficient rises steeply with
+frequency, so the low edge of a band is attenuated far less than its midband
+frequency, and as the path lengthens the surviving band energy is carried almost
+entirely by that lower half. The band attenuation therefore falls progressively
+behind the pure-tone value, which is what the two curves show: at 1 km they are
+indistinguishable below a few kilohertz and separate only at the top of the
+range, while at 7 620 m the gap at high frequency is large — exactly the regime
+the older 50 dB-limited Approximate Method of ARP 866B could not follow. The
+consequence for §8 is direct: correcting a flyover to reference conditions with
+the pure-tone coefficient overstates the high-frequency correction, and with it
+the reference-day EPNL.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -276,7 +461,13 @@ att = aircraft.sae_band_attenuation(freqs, path_length=7620.0,
 att.plot()   # band vs pure-tone mid-band (needs matplotlib)
 ```
 
-Valid roughly 6–32 °C, 20–95 % RH (14 CFR Part 36 window), to 7620 m, reciprocal.
+The regression was fitted for roughly 6-32 °C and 20-95 % relative humidity —
+the 14 CFR Part 36 test window — and for path lengths up to 7 620 m
+(25 000 ft); the function's defaults, 25 °C and 70 % RH, are the ARP 5534
+reference point and the Annex 16 reference day. The mapping is reciprocal, so
+the same call serves both directions of the reference-condition adjustment:
+removing the test-day absorption from a measured record, and re-applying the
+reference-day absorption to it.
 
 The certification chain ends here. Turning these aeroplanes into noise
 around an airport, the noise-power-distance tables, the per-segment
@@ -294,7 +485,10 @@ matching the ETM Vol. I Table 4-4 example). IEC 61265:1995 measurement-system
 tolerances via `verify_aircraft_noise_system`. SAE ARP 5534 band atmospheric
 absorption via `sae_band_attenuation`.
 
-**Not covered.** `verify_aircraft_noise_system` checks the IEC 61265:1995
+**Not covered.** The Appendix 2 §8 adjustment of a measured EPNL to reference
+conditions is not implemented, in either the simplified or the integrated form:
+the returned EPNL is the as-measured value, so adjust first and then report
+against a limit. `verify_aircraft_noise_system` checks the IEC 61265:1995
 tolerances, not the superseding 2018 edition. The ECAC Doc 29 airport-noise
 chain has moved to [Airport noise](/phonometry/aircraft/airport-noise/).
 
@@ -302,4 +496,10 @@ chain has moved to [Airport noise](/phonometry/aircraft/airport-noise/).
 
 - [Airport noise (ECAC Doc 29)](/phonometry/aircraft/airport-noise/): the NPD
   engine and the single-event contour chain around an airport.
+- [Rotorcraft noise: the hemisphere method](/phonometry/aircraft/rotorcraft-noise/):
+  the ECAC Doc 32 method, whose single-event EPNL is this same Appendix 2 chain
+  driven by a noise hemisphere instead of a certification flyover.
+- [The ANP fleet database](/phonometry/aircraft/anp-fleet/): the measured
+  noise-power-distance tables for real types, which is where the certification
+  data ends up for modelling work.
 - API reference: [`aircraft.certification`](/phonometry/reference/api/aeroacoustics/certification/) and [`aircraft.atmospheric_absorption`](/phonometry/reference/api/aeroacoustics/atmospheric-absorption/).

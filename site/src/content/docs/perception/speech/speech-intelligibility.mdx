@@ -89,6 +89,71 @@ tabulates alternative importance functions for specific test materials
 (nonsense syllables, monosyllabic word lists, short passages), which shift
 weight according to how much redundancy the material offers.
 
+### Band levels are not spectrum levels
+
+This is the trap that silently ruins an SII computed from measured data. An
+*equivalent spectrum level* is the level the band would have if its energy were
+spread over 1 Hz, so a one-third-octave **band** level $L_i$ from an analyser
+becomes a spectrum level by subtracting ten times the logarithm of the band
+width in hertz:
+
+$$
+N_i' = L_i - 10\log_{10} W_i .
+$$
+
+The widths need not be memorised: every procedure object carries its own band
+edges, so the conversion is two lines for any of the four methods.
+
+```python
+import numpy as np
+
+# `speech` is the import of the first snippet on this page.
+proc = speech.sii_procedure("one-third-octave")
+widths = np.diff(proc.band_edges)                  # hertz, band by band
+print(np.round(10 * np.log10(widths), 1)[[0, 8, 17]])   # [15.5 23.5 32.7]
+
+band_levels = np.full(18, 55.0)                    # what an analyser reports
+spectrum_levels = band_levels - 10 * np.log10(widths)
+print(round(float(spectrum_levels[8]), 1))         # 31.5 dB at 1 kHz
+```
+
+So the correction runs from **15.5 dB at 160 Hz to 32.7 dB at 8 kHz** for the
+one-third-octave procedure, and is 28.5 dB at 1 kHz for the octave procedure —
+that is, a measured 55 dB band level at 1 kHz is a 31.5 dB spectrum level, not
+a 55 dB one. Feed band levels straight in and both the speech and the noise are
+15 to 33 dB too high, band by band, and the failure is silent: the index stays
+inside $[0, 1]$ and the audibility plot still looks plausible.
+
+Two things follow. The **threshold** input is *not* converted: it is a hearing
+threshold level in dB HL, a level difference rather than a per-hertz quantity.
+And there is a cheap sanity check: because a spectrum level is per hertz, a
+white noise has the *same* equivalent noise spectrum level in every band of
+every procedure, whereas its band levels rise by 3 dB per octave. If an SII
+comes out exactly 0 for ordinary office noise, or exactly 1 with noise present,
+suspect band levels entered as spectrum levels; a quick check is that the
+standard's own normal-effort speech spectrum peaks at 34.8 dB near 250 Hz, so
+any speech input more than about 15 dB above that is a band level.
+
+### Where the three spectra come from
+
+The reason the three inputs can be combined at all is that they describe the
+same point in space. ANSI S3.5-1997 defines the equivalent speech and noise
+spectrum levels at the position corresponding to the **centre of the listener's
+head, midway between the ears, with the listener absent** — both are field
+quantities at an unoccupied listening position. So: measure the noise there
+with the talker or source of interest silent, and the speech there with the
+talker at the real distance and vocal effort.
+
+Three consequences worth writing into a report. The tabulated vocal-effort
+spectra of section 4 are the standard's *reference* speech, excellent for
+design and comparison but not a substitute for a measured $E_i'$ when the real
+listening condition is at another distance or in a reverberant space. Levels
+recorded at the eardrum, in a coupler or under headphones are **not** equivalent
+free-field levels and have to be transformed back before they can be used.
+And `threshold=` is the listener's pure-tone hearing threshold level in dB HL
+at the 18 band centres and belongs to **one ear**, so state which ear it is and
+how the audiogram was put onto those centres, which section 3.2 returns to.
+
 ## 2. Masking and the band-audibility function
 
 The procedure (ANSI S3.5-1997 clause 5) turns the inputs into a per-band
@@ -115,7 +180,52 @@ At speech levels well above normal effort a **level-distortion factor** of
 clause 5.7 (unity for the standard spectra used on this page) reduces $A_i$
 further; phonometry applies it automatically.
 
+Every array in that chain is on the result, so the whole of clause 5 can be
+drawn for a case where the spread of masking does the work — a fan or a duct
+that puts all its energy below 450 Hz:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_masking_chain.svg"
+  alt="The ANSI S3.5 clause 5 chain over the 18 one-third-octave bands for the standard normal-effort speech in a masker whose 60 dB spectrum level is confined below 450 Hz. The external noise drops to nothing above 400 Hz, but the equivalent masking spectrum level decays gradually instead, still 23 dB at 1 kHz where there is no noise at all; the equivalent disturbance follows it, the shaded 30 dB window from D minus 15 to D plus 15 dB is drawn around it, and the band audibility on the right-hand axis rises from zero at 500 Hz to one by 2000 Hz as the speech curve climbs out of that window. The index is 0.60"
+  width="92%"
+/>
+
+*The band audibility $A_i$ is a position inside a 30 dB window: at the bottom
+edge the band is fully masked, at the top fully audible, and in between it is a
+straight line. The window is centred on $D_i$, and $D_i$ follows $Z_i$, which is
+the point of the figure — there is **no noise at all** above 400 Hz, yet the
+masking at 1 kHz is 23 dB, spread upward from the low bands. That upward skirt
+is what makes the SII more than a band-by-band signal-to-noise ratio, and it is
+the term the octave procedure of section 5 drops.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `np` and `speech` come from the snippets above.
+freqs = speech.sii_procedure("one-third-octave").frequencies
+noise = np.where(freqs <= 450.0, 60.0, 0.0)     # all the energy below 450 Hz
+res = speech.speech_intelligibility_index("normal", noise)
+print(round(res.sii, 2), round(float(res.masking[8]), 1))   # 0.6 23.2
+
+pos = np.arange(freqs.size)
+fig, ax = plt.subplots(figsize=(10.4, 6.0))
+ax.fill_between(pos, res.disturbance - 15, res.disturbance + 15, alpha=0.25)
+ax.plot(pos, res.speech_spectrum, "o-", label="speech Ei'")
+ax.plot(pos, noise, "s--", label="external noise Ni'")
+ax.plot(pos, res.masking, "^-", label="equivalent masking Zi")
+ax.twinx().plot(pos, res.band_audibility)       # the audibility on the right
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ## 3. The index in noise
+
+### 3.1 In noise
 
 The Speech Intelligibility Index is the band-importance-weighted sum of the band
 audibilities (ANSI S3.5-1997 clause 6):
@@ -181,8 +291,28 @@ plt.show()
 
 </details>
 
+**Reading the number.** The SII is the importance-weighted *fraction of the
+speech spectrum that is audible*, so 0.46 means that roughly half of what
+carries intelligibility is getting through. It is a proportion of audibility,
+not of words: ANSI S3.5 maps the index to intelligibility only through transfer
+functions specific to the speech material and the listeners, which is why the
+same 0.5 supports high sentence scores and much lower nonsense-syllable scores.
+Never quote an SII as "X % intelligible" without naming the material. As
+practical anchors, above about 0.75 is the design target where unfamiliar
+material must be understood — the same ladder that makes `requirement=0.75` a
+reasonable value in the fiche of section 7; 0.45 to 0.75 is workable for
+familiar material in a known context; below about 0.3 speech communication
+cannot be relied on. And mind the resolution: the inputs are measured spectra
+with their own uncertainty, so differences of a few hundredths are noise. When
+two conditions score alike, the per-band audibility profile — not the scalar —
+is the part that tells you what to fix.
+
+### 3.2 With a raised hearing threshold
+
 A raised hearing threshold (`threshold=`) lifts the equivalent internal noise
-and lowers the index, exactly as added masking noise does. The `SIIResult` also
+and lowers the index, exactly as added masking noise does. The input is a
+pure-tone hearing threshold level in dB HL at the 18 band centres, for one ear.
+The `SIIResult` also
 carries the per-band masking $Z_i$, disturbance $D_i$, audibility $A_i$ and
 importance $I_i$, and its `.plot()` renders the figure above.
 
@@ -225,9 +355,26 @@ index falls by a fifth while the *level* of the speech has not changed at all.
 This is the practical use of the SII in audiology and in noise control for
 occupied spaces: a target index can be met either by lowering the noise or by
 restoring audibility (amplification), and the band profile says which bands
-the effort has to go into. The age-related thresholds of ISO 7029 make a
-convenient population input, see the
-[hearing-threshold guide](/phonometry/perception/hearing/hearing-threshold/).
+the effort has to go into.
+
+**Getting a threshold array onto the SII grid.** The age-related thresholds of
+[ISO 7029](/phonometry/perception/hearing/hearing-threshold/) are a convenient
+population input, but the two standards are tabulated on different grids and
+the transfer is the caller's decision, not an automatic one. ISO 7029 returns
+**eleven audiometric frequencies** (125 to 8000 Hz) while the one-third-octave
+SII procedure needs **eighteen** values at 160 Hz to 8000 Hz, and ANSI S3.5
+defines no interpolation — the page's own "Not covered" block says no
+resampling between band sets is provided. So make the choice explicit:
+interpolate the audiometric thresholds on a logarithmic frequency axis onto the
+SII band centres, or take the nearest audiometric frequency for each band, and
+say which in the report. There is a second mismatch: `age_threshold` returns
+the *deviation* from the median 18-year-old, which is a hearing threshold level
+in dB HL only if that baseline is taken as 0 dB HL — an assumption worth
+stating, and one to drop entirely when a real audiogram exists, since measured
+dB HL values can be fed directly. Finally, mind the direction of the error: a
+coarse interpolation smooths away the 3 kHz to 6 kHz notch that a noise-exposed
+audiogram carries, and those are bands with high importance weight, so the SII
+comes out optimistic.
 
 ## 4. Vocal effort
 
@@ -441,6 +588,40 @@ The four agree to within about 0.04 on the same listening situation. The octave
 procedure reads highest because it drops the spread of masking, which is
 exactly the risk it carries: feed it a strong low-frequency noise and it will
 not see that noise reaching up into the speech-bearing bands.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_octave_masking_blindness.svg"
+  alt="SII computed by all four band procedures against the spectrum level of a low-frequency noise confined below 450 Hz, swept from 45 to 80 dB. The critical-band, equally-contributing and one-third-octave curves fall together from about 0.75 to below 0.07, while the octave curve stays flat at 0.87 throughout; at the loudest point the two are annotated as 0.81 index units apart"
+  width="88%"
+/>
+
+*The agreement above is a property of the stimulus, not of the procedures. On
+white noise all four track each other; on a masker that lives below 450 Hz the
+three procedures that carry the upward spread of masking collapse together
+while the octave procedure does not move at all — **0.81 index units apart** at
+the loudest point, which is most of the scale. An octave-band SII under
+low-frequency-dominated noise is an upper bound, not an estimate.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+levels = np.arange(45.0, 80.1, 1.0)
+for method in ("critical-band", "equally-contributing", "one-third-octave",
+               "octave"):
+    proc = speech.sii_procedure(method)
+    curve = [speech.speech_intelligibility_index(
+        proc.speech_spectrum,
+        np.where(np.asarray(proc.frequencies) <= 450.0, x, 0.0),
+        method=method).sii for x in levels]
+    print(method, round(curve[0], 3), round(curve[-1], 3))
+# critical-band 0.736 0.03
+# equally-contributing 0.753 0.026
+# one-third-octave 0.777 0.067
+# octave 0.882 0.872
+```
+
+</details>
 
 **Which procedure to use.**
 

@@ -1,6 +1,6 @@
 ---
 title: "Tonos discretos prominentes (ECMA-418-1)"
-description: "La relación tono-ruido y la relación de prominencia de ECMA-418-1: veredictos FFT de prominencia para tonos discretos frente a criterios dependientes de la frecuencia, con las posiciones de medida de ECMA-74."
+description: "La relación tono-ruido y la relación de prominencia de ECMA-418-1: veredictos FFT de prominencia para tonos discretos frente a criterios dependientes de la frecuencia, con las posiciones de medida de ECMA-74 y la tabla de decisión para elegir entre las cuatro métricas de tonalidad de la biblioteca."
 references:
   - type: standard
     organization: "Ecma International"
@@ -41,10 +41,21 @@ t = np.arange(fs) / fs
 x = np.sin(2 * np.pi * 1000 * t) + 0.05 * rng.standard_normal(fs)  # tono de 1 kHz en ruido
 tnr = psychoacoustics.tone_to_noise_ratio(x, fs)            # pico más alto, o tone_freq=...
 pr = psychoacoustics.prominence_ratio(x, fs, tone_freq=1000.0)
-print(tnr.ratio_db, tnr.criterion_db, tnr.prominent)
+print(round(tnr.ratio_db, 1), round(tnr.criterion_db, 1), tnr.prominent)  # 45.6 8.0 True
+print(round(pr.ratio_db, 1), round(pr.criterion_db, 1), pr.prominent)     # 45.7 9.0 True
 
 tnr.plot()   # el tono frente a su criterio de prominencia (necesita matplotlib)
 ```
+
+Tres números, en ese orden: la relación es cuántos decibelios supera el tono al
+ruido que lo enmascara, el criterio es la línea dependiente de la frecuencia
+que tiene que superar, y `prominent` es la comparación de ambos. Da el
+resultado como «TNR = 45,6 dB frente a un criterio de 8,0 dB a 1 kHz,
+prominente por 37,6 dB», nunca como un booleano pelado: el margen es lo que le
+dice a quien revisa si el veredicto sobrevive a la incertidumbre de medida.
+(Este tono sintético es absurdamente prominente; el tono de ventilador de
+250 Hz de más abajo supera su criterio por 2,1 dB, que es el caso
+interesante.)
 
 Los métodos se apoyan en la **banda crítica**, el ancho de banda de análisis
 del oído, $\Delta f_c = 25 + 75\ [1 + 1{,}4(f/1000)^2]^{0{,}69}$ Hz (162 Hz a
@@ -168,16 +179,83 @@ ruido, así que se degrada cuando esa separación es ambigua: un tono montado
 sobre una pendiente abrupta de ruido, o componentes muy juntos cuyas faldas se
 solapan. El PR no necesita separación alguna, lo que lo convierte en la opción
 robusta y automatizable cuando **varios tonos comparten la banda crítica**
-(todos caen en $W_M$); a cambio lee de menos cuando una banda *vecina* también
+(todos caen en $W_M$); a cambio se queda corto cuando una banda *vecina* también
 lleva un tono (las bandas laterales dejan de ser ruido) y se sesga en espectros
 de pendiente pronunciada, donde las dos bandas laterales ya no estiman el
 enmascaramiento en el tono. En la práctica: prefiere el TNR para un tono limpio
 y aislado, el PR para complejos multitono que comparten banda, y presenta ambos
 cuando ronden sus criterios.
 
-## 2. Dónde medir (ECMA-74) y práctica
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tnr_pr_comparison_es.svg"
+  alt="A la izquierda, los criterios de tono-ruido y de prominencia de ECMA-418-1 sobre el rango de interés de 89,1 Hz a 11,2 kHz, con el tono de ventilador de 250 Hz marcado en 15,1 dB por encima de su criterio TNR de 13,0 dB y en 14,9 dB justo por debajo de su criterio PR de 15,0 dB. A la derecha, la relación tono-ruido y la relación de prominencia de un tono de 1 kHz mientras crece un segundo tono en la banda crítica inmediatamente superior, con el TNR plano en unos 9,2 dB mientras el PR cae desde 9,9 dB, atraviesa su criterio de 9 dB y baja por debajo de menos 8 dB"
+  width="94%"
+/>
 
-ECMA-74 (que delega la evaluación tonal en ECMA-418-1) también fija dónde medir alrededor de un equipo (solo contexto): phonometry implementa las evaluaciones de ECMA-418-1, no el procedimiento de medida del Anexo D de ECMA-74:
+*Dos criterios, dos modos de fallo. A la izquierda: el criterio del PR queda
+entre 1 y 2 dB por encima del criterio del TNR por debajo de 1 kHz, lo bastante
+para que el mismo tono de ventilador de 250 Hz sea prominente por TNR (15,1 dB
+frente a 13,0 dB) y no prominente por PR (14,9 dB frente a 15,0 dB). A la
+derecha: un tono en la banda crítica vecina deja el TNR intacto y destroza el
+PR, porque las bandas laterales que este trata como ruido han dejado de ser
+ruido.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+
+# `psychoacoustics` lo importan los fragmentos de arriba.
+fs = 48000
+rng = np.random.default_rng(7)
+t = np.arange(8 * fs) / fs
+
+# Un tono de 1 kHz en ruido de banda ancha, más un segundo tono a 1160 Hz:
+# fuera de la banda crítica de 162 Hz en torno a 1 kHz, o sea dentro de la
+# banda contigua superior que la relación de prominencia usa como estimación
+# del ruido.
+primary = np.sqrt(2) * 0.012 * np.sin(2 * np.pi * 1000.0 * t)
+noise = 0.05 * rng.standard_normal(t.size)
+for relative_db in (-24.0, -12.0, 0.0, 12.0):
+    second = np.sqrt(2) * 0.012 * 10 ** (relative_db / 20)
+    y = primary + second * np.sin(2 * np.pi * 1160.0 * t) + noise
+    tnr_y = psychoacoustics.tone_to_noise_ratio(y, fs, tone_freq=1000.0)
+    pr_y = psychoacoustics.prominence_ratio(y, fs, tone_freq=1000.0)
+    print(relative_db, round(tnr_y.ratio_db, 1), round(pr_y.ratio_db, 1))
+#   -24.0 9.2  9.8
+#   -12.0 9.2  8.7
+#     0.0 9.2  2.5
+#    12.0 9.2 -8.6
+```
+
+</details>
+
+**Un tono que no se está quieto.** Los dos métodos suponen que el tono se
+mantiene en una frecuencia durante todo el promedio. Un ventilador o una bomba
+cuya velocidad deriva emborrona el tono entre muchos bins: la banda del tono se
+ensancha, parte del tono se cuenta como ruido enmascarante y el TNR se queda
+corto, mientras que al PR le afecta menos, pero sigue viendo una banda
+emborronada. El apartado 11.2 da el diagnóstico en lugar de dejarlo al criterio
+de cada cual: si la banda del tono es más ancha que el 15 % del ancho de banda
+crítico, se repite el análisis con una resolución más fina, y una banda de tono
+que *sigue* siendo más ancha que ese 15 % tras esa iteración indica un tono de
+frecuencia variable en el tiempo u otro fenómeno. Llegados ahí, la evaluación
+no es que sea incierta: es inválida. Los remedios están aguas arriba:
+estabilizar el punto de funcionamiento del equipo en ensayo, acortar cada
+promedio y promediar las relaciones en vez de los espectros, o hacer
+seguimiento de órdenes de la fuente giratoria. Los complejos armónicos merecen
+el mismo cuidado componente a componente con `tone_freq=`, ya que la deriva de
+un fundamental se multiplica proporcionalmente en cada armónico.
+
+## 2. Dónde medir (ECMA-74), y qué necesitan las relaciones
+
+ECMA-74 es la norma de emisión que delega su evaluación de tonos en
+ECMA-418-1, y también fija dónde va el micrófono alrededor de un equipo: una
+posición de operador y cuatro de observador. phonometry implementa las
+evaluaciones de ECMA-418-1, no el procedimiento de medida de ECMA-74, así que
+el diagrama de abajo es contexto para leer una declaración de emisión, no algo
+que haga la biblioteca.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tonality_positions_es.svg"
@@ -185,10 +263,59 @@ ECMA-74 (que delega la evaluación tonal en ECMA-418-1) también fija dónde med
   width="92%"
 />
 
+**De qué posición se informan los números.** El apartado 6 de ECMA-418-1 es
+explícito. Si el equipo tiene posición de operador, se mide ahí, y en la más
+sonora de ellas cuando hay más de una, juzgada por el nivel ponderado A. Si no
+tiene ninguna, se mide en la posición de observador con el nivel ponderado A
+más alto *y* en todas las demás posiciones de observador que queden dentro de
+0,5 dB de ella. La geometría viene del apartado 8.6 de ECMA-74:2025: el
+micrófono de operador a 0,25 m ± 0,03 m en horizontal desde la caja de
+referencia y a 1,20 m ± 0,03 m sentado o 1,50 m ± 0,03 m de pie (0,50 m para
+equipos de sobremesa ensayados sin su teclado desmontable, y 0,125 m a 1,0 m
+para equipos de mano); al menos cuatro posiciones de observador a
+1,00 m ± 0,03 m de los lados de la caja de referencia y a 1,50 m ± 0,03 m sobre
+el suelo, añadiendo más a intervalos de 1,0 m cuando un lado supera los 2,0 m.
+Cuando se miden varias posiciones, el apartado 6 exige informar del TNR y el PR
+*más altos* junto con la posición de la que sale cada uno.
+
+**Con qué.** Una cadena de micrófono de clase 1 según IEC 61672-1 hacia un
+analizador FFT con promediado RMS lineal (no exponencial) y ventana de Hanning,
+calibrado directamente en dB re 20 µPa; el micrófono orientado de modo que el
+ángulo de incidencia sea aquel para el que su respuesta es más plana, que el
+apartado 8.6.4 de ECMA-74 toma como 30° o 45° por debajo de la horizontal en la
+mayoría de los casos prácticos. El intervalo de medición debe cubrir al menos
+tres ciclos de funcionamiento, o la secuencia completa en equipos que recorren
+una secuencia de ciclos variables (apartado 7.7.2 de ECMA-74 a través del
+8.7.2), y el ruido de fondo se corrige como exige el grado de exactitud 2 de
+ISO 11201.
+
+**La resolución, en términos prácticos.** El apartado 7 pide una resolución
+FFT por debajo del 1 % de la frecuencia del tono, y recomienda un 0,25 % o
+mejor para la relación tono-ruido, porque la experiencia ha demostrado que el
+1 % a veces no resuelve el tono. A 250 Hz eso son 0,63 Hz, o sea registros de
+un segundo o más por promedio; el valor por defecto de 1 Hz de la biblioteca
+cumple por tanto la recomendación solo por encima de unos 400 Hz y es demasiado
+grueso por debajo. El apartado 11.2 añade la comprobación que importa en ese
+extremo: la banda del tono no debe superar el 15 % del ancho de banda crítico
+y, si lo supera, el análisis se repite más fino.
+
+**La trampa de la ponderación.** El apartado 7 prohíbe cualquier ponderación
+frecuencial a la entrada del analizador, la A incluida. Las dos relaciones
+comparan niveles dentro de bandas críticas y entre ellas, así que una curva de
+ponderación inclina la comparación: inofensivo para un TNR a 1 kHz, y varias
+décimas de decibelio para un PR en baja frecuencia, donde la curva A cae con
+fuerza a lo largo de tres bandas críticas consecutivas. Las relaciones son
+indiferentes a la calibración *absoluta*, pero no a la forma espectral, que es
+la razón de que «la calibración se cancela» sea solo media verdad: el
+analizador debería estar calibrado en absoluto de todos modos, porque el filtro
+de umbral de los apartados 8 y 9 que viene después necesita niveles de presión
+acústica reales.
+
 Los tonos secundarios próximos en la misma banda crítica se combinan según el
 apartado 11.6; para complejos armónicos evalúa cada componente (`tone_freq=`).
 Ambos métodos trabajan sobre espectros promediados RMS con ventana Hann y no
-necesitan calibración absoluta (ambas relaciones son diferencias de nivel).
+necesitan calibración absoluta para la relación en sí (ambas relaciones son
+diferencias de nivel).
 
 ### Parámetros de `tone_to_noise_ratio()` / `prominence_ratio()`
 
@@ -246,7 +373,10 @@ tono-ruido (apartado 11, Fórmulas 9 a 12) y relación de prominencia
 Hann, el modelo de banda crítica del apartado 10, los criterios de
 prominencia dependientes de la frecuencia y la combinación de tonos
 secundarios que comparten banda del apartado 11.6, todo a través de
-`tone_to_noise_ratio()` y `prominence_ratio()`.
+`tone_to_noise_ratio()` y `prominence_ratio()`. Las posiciones de micrófono del
+apartado 6 y los requisitos de instrumentación del apartado 7 están
+documentados en el §2 como las condiciones bajo las que quedan definidas las
+dos relaciones.
 
 **No cubierto.** El veredicto `prominent` que devuelven estas funciones es
 solo el criterio numérico. La norma exige además que un tono prominente se
