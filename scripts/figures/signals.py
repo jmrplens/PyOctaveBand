@@ -27,6 +27,7 @@ from .theme import (
     COLOR_MUTED,
     COLOR_PANEL,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
@@ -524,7 +525,11 @@ def generate_time_weighting_plot(output_dir: str) -> None:
     ax.plot(t, x_sq, color="#9e9e9e", alpha=0.6, label="Input Burst (Normalized)")
     ax.plot(t, fast, color=COLOR_PRIMARY, label="Fast (125ms)")
     ax.plot(t, slow, color=COLOR_SECONDARY, label="Slow (1000ms)")
-    ax.plot(t, impulse, color="purple", linestyle="-.", linewidth=1.5, label="Impulse (35ms/1.5s)")
+    # The CSS "purple" is #800080, dark enough to be read against the white
+    # page and not against the dark one; the palette's own purple is the same
+    # hue with the luminance to carry a line on either.
+    ax.plot(t, impulse, color=COLOR_QUATERNARY, linestyle="-.", linewidth=1.5,
+            label="Impulse (35ms/1.5s)")
     
     ax.set_title("Time Weighting Ballistics (IEC 61672-1)", fontweight="bold")
     ax.set_xlabel("Time [s]")

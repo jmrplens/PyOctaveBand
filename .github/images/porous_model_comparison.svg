@@ -849,7 +849,7 @@ L 413.825931 186.613526
     <path d="M 68.946324 44.085241 
 L 413.825931 340.701568 
 L 413.825931 340.701568 
-" clip-path="url(#p1c593f934e)" style="fill: none; stroke: #d62728; stroke-opacity: 0.55; stroke-width: 1.2; stroke-linecap: square"/>
+" clip-path="url(#p1c593f934e)" style="fill: none; stroke: #e47373; stroke-width: 1.2; stroke-linecap: square"/>
    </g>
    <g id="line2d_113">
     <path d="M 68.946324 79.568588 
@@ -889,7 +889,7 @@ L 413.825931 185.484913
     <path d="M 68.946324 64.461129 
 L 413.825931 320.5561 
 L 413.825931 320.5561 
-" clip-path="url(#p1c593f934e)" style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #1f77b4; stroke-opacity: 0.55; stroke-width: 1.2"/>
+" clip-path="url(#p1c593f934e)" style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #5b9bc8; stroke-width: 1.2"/>
    </g>
    <g id="line2d_115">
     <path d="M 68.946324 75.481447 
@@ -954,7 +954,7 @@ L 396.538733 342.947529
 L 405.182332 349.694816 
 L 413.825931 356.190071 
 L 413.825931 356.190071 
-" clip-path="url(#p1c593f934e)" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.55; stroke-width: 1.2"/>
+" clip-path="url(#p1c593f934e)" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #41a941; stroke-width: 1.2"/>
    </g>
    <g id="patch_4">
     <path d="M 51.702344 371.795312 
@@ -1054,7 +1054,7 @@ L 259.825458 39.613672
      <path d="M 242.825458 52.364336 
 L 251.325458 52.364336 
 L 259.825458 52.364336 
-" style="fill: none; stroke: #d62728; stroke-opacity: 0.55; stroke-width: 1.2; stroke-linecap: square"/>
+" style="fill: none; stroke: #e47373; stroke-width: 1.2; stroke-linecap: square"/>
     </g>
     <g id="text_19">
      <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="266.625458" y="55.339336" transform="rotate(-0 266.625458 55.339336)">Delany-Bazley, -Im</text>
@@ -1072,7 +1072,7 @@ L 259.825458 65.115
      <path d="M 363.384677 39.613672 
 L 371.884677 39.613672 
 L 380.384677 39.613672 
-" style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #1f77b4; stroke-opacity: 0.55; stroke-width: 1.2"/>
+" style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #5b9bc8; stroke-width: 1.2"/>
     </g>
     <g id="text_21">
      <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="387.184677" y="42.588672" transform="rotate(-0 387.184677 42.588672)">Miki, -Im</text>
@@ -1090,7 +1090,7 @@ L 380.384677 52.364336
      <path d="M 363.384677 65.115 
 L 371.884677 65.115 
 L 380.384677 65.115 
-" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.55; stroke-width: 1.2"/>
+" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #41a941; stroke-width: 1.2"/>
     </g>
     <g id="text_23">
      <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="387.184677" y="68.09" transform="rotate(-0 387.184677 68.09)">JCA, -Im</text>

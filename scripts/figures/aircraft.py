@@ -16,6 +16,7 @@ from phonometry._plot.common import (
     format_frequency_axis,
     theme_fill,
     theme_fill_alpha,
+    theme_line,
 )
 
 from .theme import (
@@ -84,8 +85,12 @@ def generate_aircraft_atmospheric_absorption(output_dir: str) -> None:
         res = sae_band_attenuation(freqs, s, temperature=25.0, relative_humidity=70.0)
         ax.plot(res.frequency, res.band_attenuation, color=color, linewidth=2.0,
                 marker="o", markersize=3, label=f"SAE band ({s:.0f} m)")
-        ax.plot(res.frequency, res.midband_attenuation, color=color, linewidth=1.0,
-                linestyle="--", alpha=0.6)
+        # The pure-tone mid-band curve belongs to the band curve above it, so
+        # it keeps the colour and gives up weight -- as a shade, not as an
+        # opacity, which on the dark page gives up the line as well.
+        ax.plot(res.frequency, res.midband_attenuation,
+                color=theme_line(color, ax, quiet=0.6), linewidth=1.0,
+                linestyle="--")
     ax.set_xscale("log")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Attenuation [dB]")

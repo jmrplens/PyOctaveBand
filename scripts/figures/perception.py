@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 
-from phonometry._plot.common import format_frequency_axis, theme_fill
+from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
 from .i18n import _LANG
 from .theme import (
@@ -743,9 +743,14 @@ def generate_sharpness_weighting(output_dir: str) -> None:
                 linestyle="-.", label=f"Aures (Annex B, N = {total_n:.0f} sone)")
 
     # DIN weighting is flat (g = 1) up to 15.8 Bark, von Bismarck up to 15.
-    ax.axhline(1.0, color=COLOR_FG, linestyle="-", alpha=0.15, linewidth=1)
-    ax.axvline(15.8, color=COLOR_PRIMARY, linestyle=":", alpha=0.5, linewidth=1)
-    ax.axvline(15.0, color=COLOR_TERTIARY, linestyle=":", alpha=0.5, linewidth=1)
+    # The three guides sit behind the curves, held back by shade: held back by
+    # opacity, the g = 1 line and the DIN knee were a shade of the dark page.
+    ax.axhline(1.0, color=theme_line(COLOR_FG, ax, quiet=0.15), linestyle="-",
+               linewidth=1)
+    ax.axvline(15.8, color=theme_line(COLOR_PRIMARY, ax, quiet=0.5),
+               linestyle=":", linewidth=1)
+    ax.axvline(15.0, color=theme_line(COLOR_TERTIARY, ax, quiet=0.5),
+               linestyle=":", linewidth=1)
     ax.annotate("DIN knee\n15.8 Bark", xy=(15.8, 1.0), xytext=(10.2, 2.3),
                 fontsize=9, color=COLOR_PRIMARY, ha="center",
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_PRIMARY})
@@ -2025,8 +2030,8 @@ def generate_exposure_budget(output_dir: str) -> None:
               color=COLOR_PRIMARY, linewidth=2.0,
               label="task-based, $u_{1a}$ (Eq. C.6)")
     ax_n.plot(counts,
-              expanded([hearing.table_c4_contribution(int(n), scatter)
-                        for n in counts]),
+              expanded(np.asarray([hearing.table_c4_contribution(int(n), scatter)
+                                   for n in counts])),
               "--", color=COLOR_SECONDARY, linewidth=2.0,
               label="job-based, $c_1u_1$ (Table C.4)")
     ax_n.axhline(float(expanded(0.0)), color=COLOR_TERTIARY, linewidth=1.4,

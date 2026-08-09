@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib.colors import Normalize
 from scipy import signal as scipy_signal
 
-from phonometry._plot.common import format_frequency_axis, theme_fill
+from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
 from .i18n import _LANG
 from .theme import (
@@ -2163,8 +2163,12 @@ def generate_fan_sound_power(output_dir: str) -> None:
                           f"(+{fan_efficiency_correction(efficiency):.0f} dB)")
     tone = fan_sound_power(volume_flow, static_pressure, fan_type=fan_type,
                            relative_efficiency=80.0, blade_frequency=2000.0)
+    # The same fan again, so the same colour: what changed is the blade tone,
+    # not the fan. A shade back rather than an opacity back, which on the dark
+    # page took the whole curve back to the page.
     ax.semilogx(np.asarray(tone.frequencies), np.asarray(tone.values), "-",
-                color=COLOR_PRIMARY, lw=1.0, alpha=0.55, marker="^", ms=4,
+                color=theme_line(COLOR_PRIMARY, ax, quiet=0.55), lw=1.0,
+                marker="^", ms=4,
                 label="the same fan with its blade tone at 2 kHz")
     casing = fan_casing_attenuation()
     ax.semilogx(np.asarray(casing.frequencies), np.asarray(casing.values), "-.",
@@ -2701,8 +2705,12 @@ def generate_itu_r_468_weighting(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     fa, wa = measure_weighting_response(48000, "A")
     sel = (fa >= 20.0) & (fa <= 20000.0)
-    ax.semilogx(fa[sel], wa[sel], color=COLOR_FG, linewidth=4.0, alpha=0.18,
-                label="A-weighting (reference)")
+    # A wide band of the page's own ink, laid behind the networks as the
+    # reference everybody knows. It is a colour, not an opacity: 18 % of the
+    # ink is a pale grey on the white page and a shade of the dark page on the
+    # dark one, which is where the reference used to disappear.
+    ax.semilogx(fa[sel], wa[sel], color=theme_line(COLOR_FG, ax, quiet=0.18),
+                linewidth=4.0, label="A-weighting (reference)")
     ax.semilogx(freqs, w468, color=COLOR_PRIMARY, linewidth=2.2,
                 label="ITU-R BS.468-4 (0 dB at 1 kHz)")
     ax.semilogx(freqs, ccir, color=COLOR_SECONDARY, linewidth=1.8,

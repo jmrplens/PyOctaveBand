@@ -615,7 +615,7 @@ L 675.675959 167.298331
     <path d="M 79.132635 73.670665 
 L 675.675959 242.692028 
 L 675.675959 242.692028 
-" clip-path="url(#p1230aae8d1)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d62728; stroke-opacity: 0.6"/>
+" clip-path="url(#p1230aae8d1)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #e47373"/>
    </g>
    <g id="line2d_81">
     <path d="M 79.132635 370.155469 
@@ -653,7 +653,7 @@ L 675.675959 167.015867
     <path d="M 79.132635 44.596094 
 L 675.675959 213.617457 
 L 675.675959 213.617457 
-" clip-path="url(#p1230aae8d1)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #1f77b4; stroke-opacity: 0.6"/>
+" clip-path="url(#p1230aae8d1)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #5b9bc8"/>
    </g>
    <g id="line2d_84">
     <path d="M 79.132635 370.155469 
@@ -711,7 +711,7 @@ L 634.072656 40.106719
      <path d="M 616.072656 53.607422 
 L 625.072656 53.607422 
 L 634.072656 53.607422 
-" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d62728; stroke-opacity: 0.6"/>
+" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #e47373"/>
     </g>
     <g id="text_23">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="641.272656" y="56.757422" transform="rotate(-0 641.272656 56.757422)">Wind</text>

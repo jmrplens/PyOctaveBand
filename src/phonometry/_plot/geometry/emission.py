@@ -14,9 +14,11 @@ leaf never imports domain code at module level.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from matplotlib.colors import to_rgb
 from numpy.typing import ArrayLike
 
 from ..common import (
@@ -26,6 +28,8 @@ from ..common import (
     _C_SECONDARY_LIGHT,
     _import_pyplot,
     _new_axes,
+    _page_color,
+    theme_fill,
     theme_fill_alpha,
 )
 from ._draft import (
@@ -106,6 +110,33 @@ def plot_microphone_positions(
         plt = _import_pyplot()
         _fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     full_sphere = bool(np.any(pts[:, 2] < -1e-9))
+    # Matplotlib's 3-D panes keep their light default under the dark style, and
+    # at half opacity they composite into a mid-grey slab that the mesh is then
+    # drawn on top of: the wireframe ends up competing with the panes rather
+    # than with the page, which is why it read on the white theme and vanished
+    # on the dark one. Clear them and keep the grid lines, which carry the
+    # depth cue on their own.
+    # The page's own ink, so the mesh is the brightest line on either theme.
+    # Read off the axes rather than the rcParams: pyplot is only imported
+    # here when this function creates the axes, and callers pass their own.
+    foreground = ax.xaxis.label.get_color()
+    for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+        axis.set_pane_color((0.0, 0.0, 0.0, 0.0))
+        # The scaffolding must not outshine the subject. Under the dark style
+        # the 3-D grid is drawn in the foreground colour at full width, which
+        # left it brighter and thicker than the measurement surface it exists
+        # to locate; the surface then read as part of the grid. `_axinfo` is
+        # the only way matplotlib exposes the 3-D grid style, so a version that
+        # moves it must not take the whole figure down with it.
+        # `_axinfo["grid"]` takes colour, width and style and nothing else: an
+        # `alpha` key here is silently fatal. The colour is the page mixed the
+        # least it can be towards the ink, which recedes on either theme.
+        try:
+            axis._axinfo["grid"].update(
+                color=theme_fill(foreground, ax, delta_e=24.0), linewidth=0.5)
+        except (AttributeError, KeyError, TypeError):
+            pass
+
     theta_max = np.pi if full_sphere else 0.5 * np.pi
     theta = np.linspace(0.0, theta_max, 13)
     phi = np.linspace(0.0, 2.0 * np.pi, 25)
@@ -114,7 +145,12 @@ def plot_microphone_positions(
         r * np.sin(t_grid) * np.cos(p_grid),
         r * np.sin(t_grid) * np.sin(p_grid),
         r * np.cos(t_grid),
-        color=_C_MUTED, linewidth=0.4, alpha=0.5,
+        # Opaque, not alpha: half opacity of a mid grey composites to within a
+        # few levels of the page it sits on, so the mesh reads on the white
+        # page and vanishes on the dark one. A 0.4 pt line has no opacity to
+        # spare. The contrast checker never caught it because it measures
+        # filled regions, and this is a stroke.
+        color=foreground, linewidth=0.7, alpha=0.9,
     )
     if not full_sphere:
         # Reflecting plane disc at z = 0.
@@ -126,17 +162,36 @@ def plot_microphone_positions(
         ax.plot_surface(
             d_grid * np.cos(a_grid), d_grid * np.sin(a_grid),
             np.zeros_like(d_grid), color=_C_SECONDARY_LIGHT, linewidth=0.0,
-            alpha=theme_fill_alpha(_C_SECONDARY_LIGHT, ax), shade=False,
+            alpha=min(1.0, 2.2 * theme_fill_alpha(_C_SECONDARY_LIGHT, ax)), shade=False,
         )
         ax.text(
             1.1 * r, 0.0, 0.0, _t("Reflecting plane", language), fontsize=8,
+            bbox={"boxstyle": "round,pad=0.12", "facecolor": _page_color(ax, None),
+             "edgecolor": "none", "alpha": 0.72},
         )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("s", 30)
     kwargs.setdefault("depthshade", False)
-    ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], **kwargs)
-    for index, (x, y, z) in enumerate(pts, start=1):
-        ax.text(x, y, z, f" {index}", fontsize=7)
+    ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], zorder=2, **kwargs)
+
+    # The number is a chip in its own point's colour, so it carries the series
+    # as well as the index and never has to compete with the mesh underneath.
+    # Its ink is whichever of black or white the chip can actually carry.
+    colours = kwargs["color"]
+    if isinstance(colours, str) or not isinstance(colours, Sequence):
+        colours = [colours] * len(pts)
+    for index, ((x, y, z), chip) in enumerate(zip(pts, colours, strict=True), start=1):
+        red, green, blue = to_rgb(chip)
+        ink = "black" if 0.299 * red + 0.587 * green + 0.114 * blue > 0.6 else "white"
+        # Explicit and above the markers: matplotlib orders 3-D artists by
+        # depth, so without this a point in front of its own label clips the
+        # digits, which is what the numbers looked like before.
+        ax.text(
+            x, y, z, f"{index}", fontsize=7, color=ink, zorder=5,
+            ha="center", va="center",
+            bbox={"boxstyle": "round,pad=0.18", "facecolor": chip,
+                  "edgecolor": "none"},
+        )
     ax.set_xlabel(_t(_AXIS_X, language))
     ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_zlabel(_t(_AXIS_Z, language))

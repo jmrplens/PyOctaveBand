@@ -18,6 +18,7 @@ from phonometry._plot.common import (
     format_frequency_axis,
     theme_fill,
     theme_fill_alpha,
+    theme_line,
 )
 
 from .i18n import _LANG
@@ -2385,8 +2386,12 @@ def generate_porous_model_comparison(output_dir: str) -> None:
         z = medium.normalized_impedance
         ax_z.loglog(freq, z.real, color=color, linestyle=style, linewidth=2.0,
                     label=f"{label}, Re")
-        ax_z.loglog(freq, -z.imag, color=color, linestyle=style, linewidth=1.2,
-                    alpha=0.55, label=f"{label}, -Im")
+        # The imaginary part is the companion of its own real part, so it is
+        # drawn in a quieter shade of the same colour rather than at a lower
+        # opacity: half opacity of the red and the blue composites to within a
+        # couple of levels of the dark page and only the green survived.
+        ax_z.loglog(freq, -z.imag, color=theme_line(color, ax_z, quiet=0.55),
+                    linestyle=style, linewidth=1.2, label=f"{label}, -Im")
     # The Delany-Bazley fit window in its own variable, X = rho0 f / sigma.
     x_lo, x_hi = 0.01 * sigma / 1.205, 1.0 * sigma / 1.205
     ax_z.axvspan(x_lo, x_hi, color=theme_fill(COLOR_PRIMARY, ax_z), zorder=0)

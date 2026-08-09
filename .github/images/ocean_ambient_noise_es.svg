@@ -615,7 +615,7 @@ L 670.904084 167.778331
     <path d="M 74.36076 74.150665 
 L 670.904084 243.172028 
 L 670.904084 243.172028 
-" clip-path="url(#p4b65e9c42e)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d62728; stroke-opacity: 0.6"/>
+" clip-path="url(#p4b65e9c42e)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #e47373"/>
    </g>
    <g id="line2d_81">
     <path d="M 74.36076 370.635469 
@@ -653,7 +653,7 @@ L 670.904084 167.495867
     <path d="M 74.36076 45.076094 
 L 670.904084 214.097457 
 L 670.904084 214.097457 
-" clip-path="url(#p4b65e9c42e)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #1f77b4; stroke-opacity: 0.6"/>
+" clip-path="url(#p4b65e9c42e)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #5b9bc8"/>
    </g>
    <g id="line2d_84">
     <path d="M 74.36076 370.635469 
@@ -711,7 +711,7 @@ L 629.300781 40.586719
      <path d="M 611.300781 54.087422 
 L 620.300781 54.087422 
 L 629.300781 54.087422 
-" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d62728; stroke-opacity: 0.6"/>
+" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #e47373"/>
     </g>
     <g id="text_23">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="636.500781" y="57.237422" transform="rotate(-0 636.500781 57.237422)">Viento</text>

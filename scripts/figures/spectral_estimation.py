@@ -12,7 +12,11 @@ input. Everything here is embedded by a page under ``signals/spectra/``.
 import matplotlib.pyplot as plt
 import numpy as np
 
-from phonometry._plot.common import format_frequency_axis, theme_fill_alpha
+from phonometry._plot.common import (
+    format_frequency_axis,
+    theme_fill_alpha,
+    theme_line,
+)
 
 from .theme import (
     COLOR_FG,
@@ -93,8 +97,11 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
     ref_db = level_1k - 10.0 * np.log10(freqs / 1000.0)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    ax.semilogx(freqs, 10.0 * np.log10(single.psd[band]), color="gray",
-                alpha=0.45, linewidth=0.7,
+    # The single-taper estimate is the noisy thing the multitaper estimate is
+    # being compared against, so it is drawn back: as a grey chosen against
+    # the page, not as a grey diluted into it.
+    ax.semilogx(freqs, 10.0 * np.log10(single.psd[band]),
+                color=theme_line("gray", ax, quiet=0.45), linewidth=0.7,
                 label="Single Slepian taper ($K$ = 1, $\\nu$ = 2)")
     ax.fill_between(
         freqs,

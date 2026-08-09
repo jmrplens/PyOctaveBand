@@ -10,7 +10,7 @@ Everything here is embedded by a page under ``underwater/``.
 import matplotlib.pyplot as plt
 import numpy as np
 
-from phonometry._plot.common import format_frequency_axis, theme_fill
+from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
 from .theme import (
     COLOR_FG,
@@ -192,7 +192,11 @@ def generate_weston_regimes(output_dir: str) -> None:
         (bounds.cylindrical_to_mode_stripping, "r_CS"),
         (bounds.mode_stripping_to_single_mode, "r_MS"),
     ):
-        ax.axvline(boundary, color=COLOR_SECONDARY, linestyle="--", linewidth=0.9, alpha=0.6)
+        # The regime boundary is scaffolding for the curves, so it is drawn
+        # back a step -- in shade, since a step back in opacity on the dark
+        # page is a step into it.
+        ax.axvline(boundary, color=theme_line(COLOR_SECONDARY, ax, quiet=0.6),
+                   linestyle="--", linewidth=0.9)
         ax.annotate(name, xy=(boundary, 22.0), xytext=(4, 0), textcoords="offset points",
                     fontsize=9, color=COLOR_SECONDARY)
     ax.set_xlabel("Range [m]")
@@ -397,7 +401,10 @@ def _plot_ambient_curve(res: object, wind_speed: float, color: str,
     ax = plt.gca()
     ax.plot(res.frequency, res.spectrum_level, color=color, linewidth=2.0,  # type: ignore[attr-defined]
             label=f"Total ({wind_speed:.0f} kn)")
-    ax.plot(res.frequency, res.wind, color=color, linewidth=1.0, linestyle="--", alpha=0.6,  # type: ignore[attr-defined]
+    # The wind component is a part of the total drawn above it: same colour,
+    # one shade back. Opacity would take the red component off the dark page.
+    ax.plot(res.frequency, res.wind, color=theme_line(color, ax, quiet=0.6),  # type: ignore[attr-defined]
+            linewidth=1.0, linestyle="--",
             label="Wind" if label_components else None)
     ax.plot(res.frequency, res.thermal, color="#8c8c8c", linewidth=1.0, linestyle=":", alpha=0.8,  # type: ignore[attr-defined]
             label="Thermal" if label_components else None)
@@ -903,10 +910,14 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
     fig, (ax_tl, ax_ang) = plt.subplots(
         1, 2, figsize=(13.5, 5.6), gridspec_kw={"width_ratios": [2.0, 1.0]})
 
-    ax_tl.plot(ranges / 1000.0, nm, color=COLOR_PRIMARY, linewidth=0.7,
-               alpha=0.35)
-    ax_tl.plot(ranges / 1000.0, pe, color=COLOR_SECONDARY, linewidth=0.7,
-               alpha=0.35)
+    # The unsmoothed traces are the interference pattern the range average is
+    # taken over: they belong behind their own smoothed curve, which is a
+    # matter of shade and width, not of opacity. At a third of the opacity
+    # both of these landed within half a level of the dark page.
+    ax_tl.plot(ranges / 1000.0, nm,
+               color=theme_line(COLOR_PRIMARY, ax_tl, quiet=0.35), linewidth=0.7)
+    ax_tl.plot(ranges / 1000.0, pe,
+               color=theme_line(COLOR_SECONDARY, ax_tl, quiet=0.35), linewidth=0.7)
     ax_tl.plot(ranges[inner] / 1000.0, sm_nm[inner], color=COLOR_PRIMARY,
                linewidth=2.2, label="Normal modes, range-averaged (reference)")
     ax_tl.plot(ranges[inner] / 1000.0, sm_pe[inner], color=COLOR_SECONDARY,
