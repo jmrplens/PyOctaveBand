@@ -779,8 +779,18 @@ _ES: dict[str, str] = {
     "Where the quefrency comes from: the geometry of one reflection":
         "De dónde sale la quefrencia: la geometría de una reflexión",
     # "image source" is already in the table further down; not repeated here.
+    "microphone": "micrófono",
     "Floor reflection": "Reflexión en el suelo",
+    # The path lengths and the two closed forms carry decimals, so they are
+    # listed to get the Spanish comma; the symbols themselves are shared.
+    "r_d = 1.00 m": "r_d = 1,00 m",
+    "r_r = 2.60 m": "r_r = 2,60 m",
+    "Delta d = r_r - r_d = 1.60 m": "Delta d = r_r - r_d = 1,60 m",
+    "t0 = Delta d / c = 4.7 ms": "t0 = Delta d / c = 4,7 ms",
+    "a = R * r_d / r_r = 0.38 R": "a = R * r_d / r_r = 0,38 R",
     "The 8 ms example of this page": "El ejemplo de 8 ms de esta página",
+    "Delta d = c * 8 ms = 2.74 m": "Delta d = c * 8 ms = 2,74 m",
+    "R = a * r_r / r_d = 3.74 a  <= 1": "R = a * r_r / r_d = 3,74 a  <= 1",
     "a side wall 1.37 m from the direct path":
         "una pared lateral a 1,37 m del camino directo",
     "so a > 0.27 is not one specular reflection":
@@ -803,6 +813,8 @@ _ES: dict[str, str] = {
     "1.5 m high": "a 1,5 m de altura",
     "ref 1": "ref 1",
     "ref 2": "ref 2",
+    # "ref 1  x1" and "ref 2  x2" are channel identifiers and are shared.
+    "receiver  y": "receptor  y",
     "leakage": "fuga",
     "One front end": "Un solo frontal",
     "one clock, fixed gains": "un reloj, ganancias fijas",

@@ -20,10 +20,10 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M -0 352.635 
+   <path d="M 0 352.635 
 L 856.963437 352.635 
 L 856.963437 0 
-L -0 0 
+L 0 0 
 z
 "/>
   </g>
@@ -622,7 +622,7 @@ L 438.194609 34.895489
      </g>
     </g>
     <g id="text_22">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="171.375781" transform="rotate(-90 14.798438 171.375781)">Band level [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="171.375781" transform="rotate(-90 14.798438 171.375781)">Nivel de banda [dB]</text>
     </g>
    </g>
    <g id="line2d_85">
@@ -772,48 +772,48 @@ z
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(52.843846 300.127672)">C - A = 23,2 dB</text>
    </g>
    <g id="text_24">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="239.560195" y="16.318125" transform="rotate(-0 239.560195 16.318125)">A 50 Hz rumble under a light hiss</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="239.560195" y="16.318125" transform="rotate(-0 239.560195 16.318125)">Un retumbo de 50 Hz bajo un siseo ligero</text>
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 321.772578 76.020234 
+     <path d="M 304.470078 76.020234 
 L 431.894609 76.020234 
 Q 433.694609 76.020234 433.694609 74.220234 
 L 433.694609 34.618125 
 Q 433.694609 32.818125 431.894609 32.818125 
-L 321.772578 32.818125 
-Q 319.972578 32.818125 319.972578 34.618125 
-L 319.972578 74.220234 
-Q 319.972578 76.020234 321.772578 76.020234 
+L 304.470078 32.818125 
+Q 302.670078 32.818125 302.670078 34.618125 
+L 302.670078 74.220234 
+Q 302.670078 76.020234 304.470078 76.020234 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_88">
-     <path d="M 323.572578 40.106719 
-L 332.572578 40.106719 
-L 341.572578 40.106719 
+     <path d="M 306.270078 40.106719 
+L 315.270078 40.106719 
+L 324.270078 40.106719 
 " style="fill: none; stroke: #9e9e9e; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="348.772578" y="43.256719" transform="rotate(-0 348.772578 43.256719)">Z-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="331.470078" y="43.256719" transform="rotate(-0 331.470078 43.256719)">Bandas ponderadas Z</text>
     </g>
     <g id="line2d_89">
-     <path d="M 323.572578 53.607422 
-L 332.572578 53.607422 
-L 341.572578 53.607422 
+     <path d="M 306.270078 53.607422 
+L 315.270078 53.607422 
+L 324.270078 53.607422 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.8"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="348.772578" y="56.757422" transform="rotate(-0 348.772578 56.757422)">C-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="331.470078" y="56.757422" transform="rotate(-0 331.470078 56.757422)">Bandas ponderadas C</text>
     </g>
     <g id="line2d_90">
-     <path d="M 323.572578 67.108125 
-L 332.572578 67.108125 
-L 341.572578 67.108125 
+     <path d="M 306.270078 67.108125 
+L 315.270078 67.108125 
+L 324.270078 67.108125 
 " style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="348.772578" y="70.258125" transform="rotate(-0 348.772578 70.258125)">A-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="331.470078" y="70.258125" transform="rotate(-0 331.470078 70.258125)">Bandas ponderadas A</text>
     </g>
    </g>
   </g>
@@ -1517,48 +1517,48 @@ z
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(464.412674 300.127672)">C - A = 1,8 dB</text>
    </g>
    <g id="text_41">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="651.129023" y="16.318125" transform="rotate(-0 651.129023 16.318125)">Broadband pink noise</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="651.129023" y="16.318125" transform="rotate(-0 651.129023 16.318125)">Ruido rosa de banda ancha</text>
    </g>
    <g id="legend_2">
     <g id="patch_15">
-     <path d="M 733.341406 76.020234 
+     <path d="M 716.038906 76.020234 
 L 843.463437 76.020234 
 Q 845.263437 76.020234 845.263437 74.220234 
 L 845.263437 34.618125 
 Q 845.263437 32.818125 843.463437 32.818125 
-L 733.341406 32.818125 
-Q 731.541406 32.818125 731.541406 34.618125 
-L 731.541406 74.220234 
-Q 731.541406 76.020234 733.341406 76.020234 
+L 716.038906 32.818125 
+Q 714.238906 32.818125 714.238906 34.618125 
+L 714.238906 74.220234 
+Q 714.238906 76.020234 716.038906 76.020234 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_178">
-     <path d="M 735.141406 40.106719 
-L 744.141406 40.106719 
-L 753.141406 40.106719 
+     <path d="M 717.838906 40.106719 
+L 726.838906 40.106719 
+L 735.838906 40.106719 
 " style="fill: none; stroke: #9e9e9e; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_42">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="760.341406" y="43.256719" transform="rotate(-0 760.341406 43.256719)">Z-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="743.038906" y="43.256719" transform="rotate(-0 743.038906 43.256719)">Bandas ponderadas Z</text>
     </g>
     <g id="line2d_179">
-     <path d="M 735.141406 53.607422 
-L 744.141406 53.607422 
-L 753.141406 53.607422 
+     <path d="M 717.838906 53.607422 
+L 726.838906 53.607422 
+L 735.838906 53.607422 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.8"/>
     </g>
     <g id="text_43">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="760.341406" y="56.757422" transform="rotate(-0 760.341406 56.757422)">C-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="743.038906" y="56.757422" transform="rotate(-0 743.038906 56.757422)">Bandas ponderadas C</text>
     </g>
     <g id="line2d_180">
-     <path d="M 735.141406 67.108125 
-L 744.141406 67.108125 
-L 753.141406 67.108125 
+     <path d="M 717.838906 67.108125 
+L 726.838906 67.108125 
+L 735.838906 67.108125 
 " style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_44">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="760.341406" y="70.258125" transform="rotate(-0 760.341406 70.258125)">A-weighted bands</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="743.038906" y="70.258125" transform="rotate(-0 743.038906 70.258125)">Bandas ponderadas A</text>
     </g>
    </g>
   </g>

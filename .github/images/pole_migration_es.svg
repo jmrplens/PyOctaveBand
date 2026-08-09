@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="854.228125pt" height="370.348875pt" viewBox="0 0 854.228125 370.348875" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="851.830937pt" height="370.348875pt" viewBox="0 0 851.830937 370.348875" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 370.348875 
-L 854.228125 370.348875 
-L 854.228125 0 
+L 851.830937 370.348875 
+L 851.830937 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -404,7 +404,7 @@ L 275.830937 78.231063
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_13">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(96.12625 53.828719)">Designed at 48 kHz</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(99.260312 53.828719)">Diseñada a 48 kHz</text>
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(113.227187 68.231063)">1 - r = 8,7e-05</text>
    </g>
    <g id="patch_7">
@@ -627,16 +627,16 @@ L 266.706137 87.355863
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="216.519737" y="81.355863" transform="rotate(-0 216.519737 81.355863)">zoom at z = 1</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="216.519737" y="81.355863" transform="rotate(-0 216.519737 81.355863)">zoom en z = 1</text>
     </g>
    </g>
    <g id="legend_1">
     <g id="patch_13">
      <path d="M 53.310938 302.351063 
-L 140.650937 302.351063 
-Q 142.250937 302.351063 142.250937 300.751062 
-L 142.250937 277.549813 
-Q 142.250937 275.949813 140.650937 275.949813 
+L 142.804688 302.351063 
+Q 144.404687 302.351063 144.404687 300.751062 
+L 144.404687 277.549813 
+Q 144.404687 275.949813 142.804688 275.949813 
 L 53.310938 275.949813 
 Q 51.710938 275.949813 51.710938 277.549813 
 L 51.710938 300.751062 
@@ -650,7 +650,7 @@ z
      </g>
     </g>
     <g id="text_24">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="77.310937" y="285.228563" transform="rotate(-0 77.310937 285.228563)">poles</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="77.310937" y="285.228563" transform="rotate(-0 77.310937 285.228563)">polos</text>
     </g>
     <g id="line2d_45">
      <g>
@@ -658,7 +658,7 @@ z
      </g>
     </g>
     <g id="text_25">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="77.310937" y="297.229188" transform="rotate(-0 77.310937 297.229188)">zeros (at z = 0)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="77.310937" y="297.229188" transform="rotate(-0 77.310937 297.229188)">ceros (en z = 0)</text>
     </g>
    </g>
   </g>
@@ -1009,16 +1009,16 @@ L 560.230937 78.231063
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_38">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(338.214063 53.828719)">As the bank realizes it, at 96 Hz</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(323.531875 53.828719)">Tal como la realiza el banco, a 96 Hz</text>
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif" transform="translate(397.627188 68.231063)">1 - r = 4,6e-02</text>
    </g>
    <g id="legend_2">
     <g id="patch_19">
      <path d="M 337.710938 302.351063 
-L 425.050937 302.351063 
-Q 426.650937 302.351063 426.650937 300.751062 
-L 426.650937 277.549812 
-Q 426.650937 275.949813 425.050937 275.949813 
+L 427.204687 302.351063 
+Q 428.804688 302.351063 428.804688 300.751062 
+L 428.804688 277.549812 
+Q 428.804688 275.949813 427.204687 275.949813 
 L 337.710938 275.949813 
 Q 336.110938 275.949813 336.110938 277.549812 
 L 336.110938 300.751062 
@@ -1032,7 +1032,7 @@ z
      </g>
     </g>
     <g id="text_39">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="361.710938" y="285.228562" transform="rotate(-0 361.710938 285.228562)">poles</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="361.710938" y="285.228562" transform="rotate(-0 361.710938 285.228562)">polos</text>
     </g>
     <g id="line2d_70">
      <g>
@@ -1040,7 +1040,7 @@ z
      </g>
     </g>
     <g id="text_40">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="361.710938" y="297.229187" transform="rotate(-0 361.710938 297.229187)">zeros (at z = 0)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="361.710938" y="297.229187" transform="rotate(-0 361.710938 297.229187)">ceros (en z = 0)</text>
     </g>
    </g>
   </g>
@@ -1635,7 +1635,7 @@ L 844.630938 53.361411
      </g>
     </g>
     <g id="text_56">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="579.608594" y="192.291063" transform="rotate(-90 579.608594 192.291063)">1 - (largest pole radius)</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="579.608594" y="192.291063" transform="rotate(-90 579.608594 192.291063)">1 - (mayor radio de polo)</text>
     </g>
    </g>
    <g id="line2d_155">
@@ -1822,50 +1822,50 @@ L 844.630938 52.434813
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_57">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="730.570938" y="42.434813" transform="rotate(-0 730.570938 42.434813)">Every band of the 1/3-octave bank</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="730.570938" y="42.434813" transform="rotate(-0 730.570938 42.434813)">Todo el banco de 1/3 de octava</text>
    </g>
    <g id="legend_3">
     <g id="patch_25">
-     <path d="M 707.058438 328.147312 
+     <path d="M 662.587188 328.147312 
 L 839.030938 328.147312 
 Q 840.630938 328.147312 840.630938 326.547313 
 L 840.630938 303.346063 
 Q 840.630938 301.746062 839.030938 301.746062 
-L 707.058438 301.746062 
-Q 705.458438 301.746062 705.458438 303.346063 
-L 705.458438 326.547313 
-Q 705.458438 328.147312 707.058438 328.147312 
+L 662.587188 301.746062 
+Q 660.987188 301.746062 660.987188 303.346063 
+L 660.987188 326.547313 
+Q 660.987188 328.147312 662.587188 328.147312 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_157">
-     <path d="M 708.658438 308.224813 
-L 716.658438 308.224813 
-L 724.658438 308.224813 
+     <path d="M 664.187188 308.224813 
+L 672.187188 308.224813 
+L 680.187188 308.224813 
 " style="fill: none; stroke: #d62728; stroke-width: 1.6; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m1b7f8bbf56" x="716.658438" y="308.224813" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1b7f8bbf56" x="672.187188" y="308.224813" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_58">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="731.058438" y="311.024813" transform="rotate(-0 731.058438 311.024813)">resample=False (one rate)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="686.587188" y="311.024813" transform="rotate(-0 686.587188 311.024813)">resample=False (una sola frecuencia)</text>
     </g>
     <g id="line2d_158">
-     <path d="M 708.658438 320.225437 
-L 716.658438 320.225437 
-L 724.658438 320.225437 
+     <path d="M 664.187188 320.225437 
+L 672.187188 320.225437 
+L 680.187188 320.225437 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mbcdb3bf696" x="716.658438" y="320.225437" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
+      <use xlink:href="#mbcdb3bf696" x="672.187188" y="320.225437" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_59">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="731.058438" y="323.025438" transform="rotate(-0 731.058438 323.025438)">the default multirate bank</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="686.587188" y="323.025438" transform="rotate(-0 686.587188 323.025438)">el banco multitasa por defecto</text>
     </g>
    </g>
   </g>
   <g id="text_60">
-   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="423.430937" y="16.318125" transform="rotate(-0 423.430937 16.318125)">The 25 Hz one-third-octave band, before and after decimation by 500</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="423.430937" y="16.798125" transform="rotate(-0 423.430937 16.798125)">La banda de tercio de octava de 25 Hz, antes y después de diezmar por 500</text>
   </g>
  </g>
  <defs>

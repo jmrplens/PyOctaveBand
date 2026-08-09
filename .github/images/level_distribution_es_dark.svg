@@ -5599,15 +5599,15 @@ L 392.868551 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_17">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="216.897166" y="16.318125" transform="rotate(-0 216.897166 16.318125)">Two noises with the same LAeq</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="216.897166" y="16.318125" transform="rotate(-0 216.897166 16.318125)">Dos ruidos con el mismo LAeq</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
      <path d="M 46.525781 58.719375 
-L 326.212031 58.719375 
-Q 327.812031 58.719375 327.812031 57.119375 
-L 327.812031 33.918125 
-Q 327.812031 32.318125 326.212031 32.318125 
+L 328.129531 58.719375 
+Q 329.729531 58.719375 329.729531 57.119375 
+L 329.729531 33.918125 
+Q 329.729531 32.318125 328.129531 32.318125 
 L 46.525781 32.318125 
 Q 44.925781 32.318125 44.925781 33.918125 
 L 44.925781 57.119375 
@@ -5622,7 +5622,7 @@ L 64.125781 38.796875
 " style="fill: none; stroke: #1f77b4; stroke-width: 0.7; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="70.525781" y="41.596875" transform="rotate(-0 70.525781 41.596875)">steady noise</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="70.525781" y="41.596875" transform="rotate(-0 70.525781 41.596875)">ruido estacionario</text>
     </g>
     <g id="line2d_33">
      <path d="M 48.125781 50.7975 
@@ -5631,16 +5631,16 @@ L 64.125781 50.7975
 " style="fill: none; stroke: #d62728; stroke-width: 0.7; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="70.525781" y="53.5975" transform="rotate(-0 70.525781 53.5975)">quiet background, three events</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="70.525781" y="53.5975" transform="rotate(-0 70.525781 53.5975)">fondo silencioso, tres eventos</text>
     </g>
     <g id="line2d_34">
-     <path d="M 212.560781 38.796875 
-L 220.560781 38.796875 
-L 228.560781 38.796875 
+     <path d="M 205.822031 38.796875 
+L 213.822031 38.796875 
+L 221.822031 38.796875 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #ffffff; stroke-width: 1.6"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="234.960781" y="41.596875" transform="rotate(-0 234.960781 41.596875)">LAeq = 61,0 dB (both)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="228.222031" y="41.596875" transform="rotate(-0 228.222031 41.596875)">LAeq = 61,0 dB (ambos)</text>
     </g>
    </g>
   </g>
@@ -5745,7 +5745,7 @@ L 795.413665 28.318125
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="619.44228" y="328.714219" transform="rotate(-0 619.44228 328.714219)">Percentage of the time exceeded [%]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="619.44228" y="328.714219" transform="rotate(-0 619.44228 328.714219)">Porcentaje del tiempo superado [%]</text>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -6172,45 +6172,45 @@ L 795.413665 28.318125
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="764.219388" y="232.246747" transform="rotate(-0 764.219388 232.246747)">L90</text>
    </g>
    <g id="text_43">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #1f77b4" x="454.029178" y="270.218039" transform="rotate(-0 454.029178 270.218039)">steady noise:  L10 - L90 = 8,0 dB   |   LAeq - L50 = 1,7 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #1f77b4" x="454.029178" y="270.218039" transform="rotate(-0 454.029178 270.218039)">ruido estacionario:  L10 - L90 = 8,0 dB   |   LAeq - L50 = 1,7 dB</text>
    </g>
    <g id="text_44">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="454.029178" y="289.243875" transform="rotate(-0 454.029178 289.243875)">quiet background, three events:  L10 - L90 = 0,5 dB   |   LAeq - L50 = 7,6 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="454.029178" y="289.243875" transform="rotate(-0 454.029178 289.243875)">fondo silencioso, tres eventos:  L10 - L90 = 0,5 dB   |   LAeq - L50 = 7,6 dB</text>
    </g>
    <g id="text_45">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="619.44228" y="16.318125" transform="rotate(-0 619.44228 16.318125)">Their exceedance curves</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="619.44228" y="16.318125" transform="rotate(-0 619.44228 16.318125)">Sus curvas de excedencia</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 618.52429 62.519531 
+     <path d="M 626.105384 62.519531 
 L 789.113665 62.519531 
 Q 790.913665 62.519531 790.913665 60.719531 
 L 790.913665 34.618125 
 Q 790.913665 32.818125 789.113665 32.818125 
-L 618.52429 32.818125 
-Q 616.72429 32.818125 616.72429 34.618125 
-L 616.72429 60.719531 
-Q 616.72429 62.519531 618.52429 62.519531 
+L 626.105384 32.818125 
+Q 624.305384 32.818125 624.305384 34.618125 
+L 624.305384 60.719531 
+Q 624.305384 62.519531 626.105384 62.519531 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_71">
-     <path d="M 620.32429 40.106719 
-L 629.32429 40.106719 
-L 638.32429 40.106719 
+     <path d="M 627.905384 40.106719 
+L 636.905384 40.106719 
+L 645.905384 40.106719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_46">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="645.52429" y="43.256719" transform="rotate(-0 645.52429 43.256719)">steady noise</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="653.105384" y="43.256719" transform="rotate(-0 653.105384 43.256719)">ruido estacionario</text>
     </g>
     <g id="line2d_72">
-     <path d="M 620.32429 53.607422 
-L 629.32429 53.607422 
-L 638.32429 53.607422 
+     <path d="M 627.905384 53.607422 
+L 636.905384 53.607422 
+L 645.905384 53.607422 
 " style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_47">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="645.52429" y="56.757422" transform="rotate(-0 645.52429 56.757422)">quiet background, three events</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="653.105384" y="56.757422" transform="rotate(-0 653.105384 56.757422)">fondo silencioso, tres eventos</text>
     </g>
    </g>
   </g>

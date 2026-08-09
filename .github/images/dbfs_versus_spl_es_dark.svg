@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="893.085937pt" height="381.435pt" viewBox="0 0 893.085937 381.435" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="893.085937pt" height="381.834219pt" viewBox="0 0 893.085937 381.834219" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 381.435 
-L 893.085937 381.435 
+   <path d="M 0 381.834219 
+L 893.085937 381.834219 
 L 893.085937 0 
 L 0 0 
 z
@@ -514,7 +514,7 @@ L 432.043438 33.078845
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="184.775781" transform="rotate(-90 14.798438 184.775781)">Third-octave band level [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="184.775781" transform="rotate(-90 14.798438 184.775781)">Nivel de banda de tercio de octava [dB]</text>
     </g>
    </g>
    <g id="line2d_69">
@@ -646,18 +646,18 @@ L 432.043438 26.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="236.484609" y="16.318125" transform="rotate(-0 236.484609 16.318125)">Same shape, different origin: 106,04 dB apart</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="236.484609" y="16.318125" transform="rotate(-0 236.484609 16.318125)">La misma forma, distinto origen: 106,04 dB de diferencia</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
      <path d="M 47.225781 338.733437 
-L 230.602187 338.733437 
-Q 232.402187 338.733437 232.402187 336.933438 
-L 232.402187 310.832031 
-Q 232.402187 309.032031 230.602187 309.032031 
+L 207.965781 338.733437 
+Q 209.765781 338.733437 209.765781 336.933437 
+L 209.765781 310.832031 
+Q 209.765781 309.032031 207.965781 309.032031 
 L 47.225781 309.032031 
 Q 45.425781 309.032031 45.425781 310.832031 
-L 45.425781 336.933438 
+L 45.425781 336.933437 
 Q 45.425781 338.733437 47.225781 338.733437 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
@@ -672,7 +672,7 @@ L 67.025781 316.320625
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="319.470625" transform="rotate(-0 74.225781 319.470625)">dB SPL (factor from the calibrator)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="319.470625" transform="rotate(-0 74.225781 319.470625)">dB SPL (factor del calibrador)</text>
     </g>
     <g id="line2d_72">
      <path d="M 49.025781 329.821328 
@@ -801,7 +801,7 @@ L 879.523438 26.318125
      </g>
     </g>
     <g id="text_29">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="683.964609" y="371.831875" transform="rotate(-0 683.964609 371.831875)">Time [ms] (onset of a 40-cycle burst)</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="683.964609" y="372.231875" transform="rotate(-0 683.964609 372.231875)">Tiempo [ms] (inicio de una ráfaga de 40 ciclos)</text>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -911,7 +911,7 @@ L 879.523438 36.179175
      </g>
     </g>
     <g id="text_37">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="455.4925" y="184.775781" transform="rotate(-90 455.4925 184.775781)">Band signal [digital units]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="455.4925" y="184.775781" transform="rotate(-90 455.4925 184.775781)">Señal de banda [unidades digitales]</text>
     </g>
    </g>
    <g id="line2d_101">
@@ -1276,12 +1276,12 @@ L 879.523438 40.723366
 " clip-path="url(#p925911a6f9)" style="fill: none; stroke: #d62728; stroke-width: 1.4; stroke-linecap: square"/>
    </g>
    <g id="patch_9">
-    <path d="M 488.405781 343.233438 
+    <path d="M 488.405781 343.233437 
 L 488.405781 26.318125 
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_10">
-    <path d="M 879.523438 343.233438 
+    <path d="M 879.523438 343.233437 
 L 879.523438 26.318125 
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
@@ -1296,48 +1296,48 @@ L 879.523438 26.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_38">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="683.964609" y="16.318125" transform="rotate(-0 683.964609 16.318125)">mode='peak' reads the filter's onset transient</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="683.964609" y="16.318125" transform="rotate(-0 683.964609 16.318125)">mode='peak' lee el transitorio de ataque del filtro</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 652.018906 338.733438 
-L 873.223438 338.733438 
-Q 875.023438 338.733438 875.023438 336.933438 
-L 875.023438 297.331328 
-Q 875.023438 295.531328 873.223438 295.531328 
-L 652.018906 295.531328 
-Q 650.218906 295.531328 650.218906 297.331328 
-L 650.218906 336.933438 
-Q 650.218906 338.733438 652.018906 338.733438 
+     <path d="M 612.745156 338.733437 
+L 873.223438 338.733437 
+Q 875.023438 338.733437 875.023438 336.933437 
+L 875.023438 296.818047 
+Q 875.023438 295.018047 873.223438 295.018047 
+L 612.745156 295.018047 
+Q 610.945156 295.018047 610.945156 296.818047 
+L 610.945156 336.933437 
+Q 610.945156 338.733437 612.745156 338.733437 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_104">
-     <path d="M 653.818906 302.819922 
-L 662.818906 302.819922 
-L 671.818906 302.819922 
+     <path d="M 614.545156 302.459922 
+L 623.545156 302.459922 
+L 632.545156 302.459922 
 " style="fill: none; stroke: #9e9e9e; stroke-width: 0.8; stroke-linecap: square"/>
     </g>
     <g id="text_39">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="679.018906" y="305.969922" transform="rotate(-0 679.018906 305.969922)">1 kHz band signal</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="639.745156" y="305.609922" transform="rotate(-0 639.745156 305.609922)">señal de la banda de 1 kHz</text>
     </g>
     <g id="line2d_105">
-     <path d="M 653.818906 316.320625 
-L 662.818906 316.320625 
-L 671.818906 316.320625 
+     <path d="M 614.545156 316.320625 
+L 623.545156 316.320625 
+L 632.545156 316.320625 
 " style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #ffffff; stroke-width: 1.2"/>
     </g>
     <g id="text_40">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="679.018906" y="319.470625" transform="rotate(-0 679.018906 319.470625)">drive amplitude 0,5</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="639.745156" y="319.470625" transform="rotate(-0 639.745156 319.470625)">amplitud de excitación 0,5</text>
     </g>
     <g id="line2d_106">
-     <path d="M 653.818906 329.821328 
-L 662.818906 329.821328 
-L 671.818906 329.821328 
+     <path d="M 614.545156 329.821328 
+L 623.545156 329.821328 
+L 632.545156 329.821328 
 " style="fill: none; stroke: #d62728; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="679.018906" y="332.971328" transform="rotate(-0 679.018906 332.971328)">band peak, +1,32 dB over the steady tone</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="639.745156" y="332.971328" transform="rotate(-0 639.745156 332.971328)">pico de banda, +1,32 dB sobre el tono estacionario</text>
     </g>
    </g>
   </g>

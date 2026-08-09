@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="613.284566pt" height="365.895688pt" viewBox="0 0 613.284566 365.895688" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="639.143941pt" height="365.895688pt" viewBox="0 0 639.143941 365.895688" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 365.895688 
-L 613.284566 365.895688 
-L 613.284566 0 
+L 639.143941 365.895688 
+L 639.143941 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -562,7 +562,7 @@ L 605.288281 51.57063
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="178.006125" transform="rotate(-90 14.798438 178.006125)">Band level [dB re 20 uPa]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="178.006125" transform="rotate(-90 14.798438 178.006125)">Nivel de banda [dB re 20 uPa]</text>
     </g>
    </g>
    <g id="line2d_77">
@@ -694,74 +694,74 @@ L 605.288281 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_7">
-    <path d="M 236.949334 180.204506 
-Q 280.722102 211.226508 323.673905 241.666688 
+    <path d="M 227.929255 180.129875 
+Q 276.186556 211.225199 323.598018 241.775493 
 " style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
-    <path d="M 321.566819 237.722047 
-L 323.673905 241.666688 
-L 319.253941 240.985572 
+    <path d="M 321.318921 237.927674 
+L 323.598018 241.775493 
+L 319.152304 241.290079 
 " style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
    </g>
    <g id="text_19">
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(132.434207 161.643546)">bands on the skirt are measuring</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(132.434207 173.64628)">the filter, not the sound</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(132.434207 161.643546)">las bandas de la falda miden</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(132.434207 173.64628)">el filtro, no el sonido</text>
    </g>
    <g id="patch_8">
-    <path d="M 523.166487 289.316614 
-Q 530.264849 283.693346 536.574483 278.694904 
+    <path d="M 529.743201 288.202071 
+Q 533.707263 283.294497 537.039048 279.169691 
 " style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
-    <path d="M 532.197189 279.611038 
-L 536.574483 278.694904 
-L 534.681014 282.746419 
+    <path d="M 532.96976 281.024655 
+L 537.039048 279.169691 
+L 536.081447 283.5381 
 " style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
    </g>
    <g id="text_20">
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(401.759566 301.158575)">here the skirt has fallen below the noise:</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(401.759566 313.161309)">these bands are measuring the sound</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(401.759566 300.758575)">aquí la falda ya ha caído por debajo del ruido:</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(401.759566 313.161309)">estas bandas sí miden el sonido</text>
    </g>
    <g id="text_21">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="326.288281" y="16.318125" transform="rotate(-0 326.288281 16.318125)">A 1 kHz tone at 100 dB over a pink-noise floor</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="326.288281" y="16.318125" transform="rotate(-0 326.288281 16.318125)">Un tono de 1 kHz a 100 dB sobre un fondo de ruido rosa</text>
    </g>
    <g id="legend_1">
     <g id="patch_9">
-     <path d="M 426.731094 76.020234 
+     <path d="M 405.934063 76.020234 
 L 598.988281 76.020234 
 Q 600.788281 76.020234 600.788281 74.220234 
 L 600.788281 34.618125 
 Q 600.788281 32.818125 598.988281 32.818125 
-L 426.731094 32.818125 
-Q 424.931094 32.818125 424.931094 34.618125 
-L 424.931094 74.220234 
-Q 424.931094 76.020234 426.731094 76.020234 
+L 405.934063 32.818125 
+Q 404.134063 32.818125 404.134063 34.618125 
+L 404.134063 74.220234 
+Q 404.134063 76.020234 405.934063 76.020234 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_80">
-     <path d="M 428.531094 40.106719 
-L 437.531094 40.106719 
-L 446.531094 40.106719 
+     <path d="M 407.734063 40.106719 
+L 416.734063 40.106719 
+L 425.734063 40.106719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="453.731094" y="43.256719" transform="rotate(-0 453.731094 43.256719)">measured band levels, order 6</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="432.934063" y="43.256719" transform="rotate(-0 432.934063 43.256719)">niveles de banda medidos, orden 6</text>
     </g>
     <g id="line2d_81">
-     <path d="M 428.531094 53.607422 
-L 437.531094 53.607422 
-L 446.531094 53.607422 
+     <path d="M 407.734063 53.607422 
+L 416.734063 53.607422 
+L 425.734063 53.607422 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.8"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="453.731094" y="56.757422" transform="rotate(-0 453.731094 56.757422)">measured band levels, order 10</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="432.934063" y="56.757422" transform="rotate(-0 432.934063 56.757422)">niveles de banda medidos, orden 10</text>
     </g>
     <g id="line2d_82">
-     <path d="M 428.531094 67.108125 
-L 437.531094 67.108125 
-L 446.531094 67.108125 
+     <path d="M 407.734063 67.108125 
+L 416.734063 67.108125 
+L 425.734063 67.108125 
 " style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="453.731094" y="70.258125" transform="rotate(-0 453.731094 70.258125)">the noise actually present</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="432.934063" y="70.258125" transform="rotate(-0 432.934063 70.258125)">el ruido realmente presente</text>
     </g>
    </g>
   </g>

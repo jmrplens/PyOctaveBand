@@ -471,56 +471,56 @@ L 422.269375 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_15">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="234.990547" y="16.318125" transform="rotate(-0 234.990547 16.318125)">The crest falls between two samples</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="234.990547" y="16.318125" transform="rotate(-0 234.990547 16.318125)">La cresta cae entre dos muestras</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 252.125625 296.115781 
+     <path d="M 245.279375 296.115781 
 L 416.669375 296.115781 
 Q 418.269375 296.115781 418.269375 294.515781 
 L 418.269375 247.313281 
 Q 418.269375 245.713281 416.669375 245.713281 
-L 252.125625 245.713281 
-Q 250.525625 245.713281 250.525625 247.313281 
-L 250.525625 294.515781 
-Q 250.525625 296.115781 252.125625 296.115781 
+L 245.279375 245.713281 
+Q 243.679375 245.713281 243.679375 247.313281 
+L 243.679375 294.515781 
+Q 243.679375 296.115781 245.279375 296.115781 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_29">
-     <path d="M 253.725625 252.192031 
-L 261.725625 252.192031 
-L 269.725625 252.192031 
+     <path d="M 246.879375 252.192031 
+L 254.879375 252.192031 
+L 262.879375 252.192031 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_16">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="276.125625" y="254.992031" transform="rotate(-0 276.125625 254.992031)">the continuous 8 kHz tone</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="269.279375" y="254.992031" transform="rotate(-0 269.279375 254.992031)">el tono continuo de 8 kHz</text>
     </g>
     <g id="line2d_30">
      <g>
-      <use xlink:href="#mc99916e8d1" x="261.725625" y="264.192656" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#mc99916e8d1" x="254.879375" y="264.192656" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_17">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="276.125625" y="266.992656" transform="rotate(-0 276.125625 266.992656)">its samples at 48 kHz (6 per cycle)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="269.279375" y="266.992656" transform="rotate(-0 269.279375 266.992656)">sus muestras a 48 kHz (6 por ciclo)</text>
     </g>
     <g id="line2d_31">
-     <path d="M 253.725625 276.193281 
-L 261.725625 276.193281 
-L 269.725625 276.193281 
+     <path d="M 246.879375 276.193281 
+L 254.879375 276.193281 
+L 262.879375 276.193281 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.2"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="276.125625" y="278.993281" transform="rotate(-0 276.125625 278.993281)">true peak</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="269.279375" y="278.993281" transform="rotate(-0 269.279375 278.993281)">pico verdadero</text>
     </g>
     <g id="line2d_32">
-     <path d="M 253.725625 288.193906 
-L 261.725625 288.193906 
-L 269.725625 288.193906 
+     <path d="M 246.879375 288.193906 
+L 254.879375 288.193906 
+L 262.879375 288.193906 
 " style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="276.125625" y="290.993906" transform="rotate(-0 276.125625 290.993906)">largest sample: -1,25 dB low</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="269.279375" y="290.993906" transform="rotate(-0 269.279375 290.993906)">muestra mayor: -1,25 dB por debajo</text>
     </g>
    </g>
   </g>
@@ -640,7 +640,7 @@ L 827.524027 28.318125
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="657.270547" y="328.714219" transform="rotate(-0 657.270547 328.714219)">Samples per cycle</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="657.270547" y="328.714219" transform="rotate(-0 657.270547 328.714219)">Muestras por ciclo</text>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -750,7 +750,7 @@ L 844.549375 45.305479
      </g>
     </g>
     <g id="text_35">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="440.68625" y="164.216953" transform="rotate(-90 440.68625 164.216953)">Under-read of the peak [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="440.68625" y="164.216953" transform="rotate(-90 440.68625 164.216953)">Subestimación del pico [dB]</text>
     </g>
    </g>
    <g id="line2d_61">
@@ -897,7 +897,7 @@ L 844.549375 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #9e9e9e" x="769.801976" y="286.525898" transform="rotate(-0 769.801976 286.525898)">0,1 dB</text>
    </g>
    <g id="text_37">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="657.270547" y="16.318125" transform="rotate(-0 657.270547 16.318125)">Worst case over the phase of the tone</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="657.270547" y="16.318125" transform="rotate(-0 657.270547 16.318125)">Peor caso sobre la fase del tono</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
