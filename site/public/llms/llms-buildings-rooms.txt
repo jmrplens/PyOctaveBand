@@ -1685,6 +1685,56 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
   same room at 1 kHz (Equation (8.46)), plus the mode count matched against
   the exact enumeration and the degeneracy of a cubic room.
 
+## What this guide covers
+
+**Covered.** Kuttruff's image-source construction (§4.1), the Eyring formula
+used for the near-cubic check and the Schroeder frequency of §3.6; Vorländer's
+mirror-source model with its reflection-factor and delay expressions
+(Chapter 11); and the Allen & Berkley reflection-order decomposition — all in
+`image_source_rir`. The Bies §6.4 steady-state field (room constant,
+directivity $Q$, critical distance) in `steady_state_field`, `room_constant`,
+`critical_distance`, `steady_state_spl` and `schroeder_frequency`. Long's
+Chapter 8 rectangular-room eigenfrequencies (Eq. 8.43) with their
+axial/tangential/oblique classification and the Morse/Pierce mode count and
+modal density (Eqs. 8.45, 8.46) in `room_modes`, `room_mode_frequency`,
+`room_mode_count` and `room_modal_density`.
+
+**Not covered.** Specular reflection only: no diffraction, no diffuse
+scattering. An elongated room therefore decays more slowly than the Eyring
+estimate the model is checked against — the anisotropy the Fitzroy and
+Arau-Puchades models of
+[reverberation-time prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/) exist to correct.
+Kuttruff's reverberation distance, which uses the Sabine absorption area rather
+than the room constant, is quoted for comparison and not implemented:
+`steady_state_field` and `critical_distance` are always the Bies room-constant
+form. The mode calculator assumes rigid walls and a rectangular plan and
+returns eigen*frequencies* only — no amplitude at a listening position, no
+damping, no mode shape, no other geometry; for those, mesh the room and run the
+[2D FDTD solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/). Bolt's preferred
+dimension ratios are discussed, not tabulated.
+
+## See also
+
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the *measured* impulse
+  response (ISO 18233) and the ISO 3382 parameters the synthetic RIR feeds.
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/):
+  the statistical decay rate the image-source model reproduces, and the
+  anisotropy models beyond it.
+- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the equivalent absorption area behind the mean absorption `alpha_bar`.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the `Lw` that drives the
+  steady-state level.
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the
+  independent wave solver used to cross-check the rigid-wall echo and the decay.
+- [Theory: Rooms and buildings](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/):
+  the image-lattice and steady-state derivations.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the closed forms and worked anchors these implementations are validated
+  against.
+- API reference: [`room.image_source`](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
+  and [`room.steady_field`](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/).
+- Theory: [Image-source room impulse response](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/#image-source-room-impulse-response-kuttruff-41-vorländer-11): the geometrical model behind the image method and its relation to the statistical one.
+
 ## References
 
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
@@ -1967,6 +2017,25 @@ repository. Click a preview to open the PDF:
 [![Room Criteria example report: metadata header, the octave-band level table beside the measured spectrum over the reference RC Mark II curve with the rumble and hiss tolerance bands shaded, and the boxed RC-35(R) rating with the mid-frequency average LMF and a rumble spectral quality](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ansi_s12_2_room_criteria_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ansi_s12_2_room_criteria_example.pdf)
 
 *Room Criteria fiche (`RCResult.report`), the RC rating and its spectral tag.*
+
+## See also
+
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 3382
+  decay parameters of the same room, measured from an impulse response.
+- [Reverberation-time prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
+  and
+  [Sound absorption in enclosed spaces](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the absorption that lowers a whole spectrum once the tag says the character
+  is right.
+- [Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/):
+  the intelligibility that both criterion families were built to protect.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/) and
+  [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/): the octave-band
+  measurement that produces the input spectrum.
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  when the source is next door rather than overhead.
+- API reference: [`room.noise_criteria`](https://jmrplens.github.io/phonometry/reference/api/rooms/noise-criteria/).
+- Theory: [Room noise criteria (ANSI S12.2)](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/#room-noise-criteria-ansi-s122): how the NC, RC Mark II and NR families are constructed and what each was designed to penalise.
 
 ## References
 
@@ -2328,6 +2397,21 @@ repository. Click the preview to open the PDF:
 
 *Reverberation-time prediction fiche (`ReverberationModelResult.report`), the five-model table and the boxed $T_\text{mid}$.*
 
+## See also
+
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
+  the ISO 354 measurement every $\alpha_s$ on this page comes from, its mounting
+  dependence, and the ISO 11654 rating that must *not* be substituted for the
+  per-band table (§0).
+- [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/#how-much-decay-range-do-i-need-for-a-valid-t20-or-t30):
+  the measured counterpart, and the curvature diagnostic that tells you a
+  prediction's diffuse-field assumption has failed.
+- [Modes of a rectangular room](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/#3-modes-of-a-rectangular-room):
+  what is below the Schroeder frequency, where none of these five formulae
+  applies.
+- API reference: [`room.reverberation_prediction`](https://jmrplens.github.io/phonometry/reference/api/rooms/reverberation-prediction/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
+- Theory: [Steady-state room field](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/#steady-state-room-field-bies-64-kuttruff-56): the diffuse-field assumption every Sabine-family formula makes, and where it stops holding.
+
 ## References
 
 - Sabine, W. C. (1922). *Collected papers on acoustics*. Harvard University
@@ -2613,6 +2697,24 @@ repository. Click the preview to open the PDF:
 [![EN 12354-6 enclosed-space example report: a metadata header with the room volume and object fraction, the octave-band table of the equivalent sound absorption area A and the reverberation time T from 125 Hz to 8 kHz beside the reverberation-time plot, and the boxed mid-frequency reverberation time with the mid-frequency absorption area alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.pdf)
 
 *Enclosed-space fiche (`ReverberationResult.report`), the per-band $A$/$T$ table and the boxed $T_\text{mid}$.*
+
+## See also
+
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/):
+  the classical family, and the models to reach for when the clause 4.6 limits
+  fail.
+- [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/):
+  the measured counterpart of the reverberation time predicted here.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
+  where the $\alpha_s$ come from (ISO 354) and where $\alpha_w$ is defined
+  (ISO 11654) — the rating §3 forbids as an input.
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
+  the family member that consumes the $A$ computed here, through
+  $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the three Annex E cases these implementations are checked against.
+- API reference: [`room.enclosed_space_absorption`](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/).
+- Theory: [Absorption in enclosed spaces](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/#absorption-in-enclosed-spaces-en-12354-6): the equivalent-absorption-area definition the EN 12354-6 procedure computes.
 
 ## References
 

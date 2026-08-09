@@ -142,6 +142,14 @@ the sound speed used and the conversion formula applied to be reported with it.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level.svg" alt="Ship radiated noise level and equivalent monopole source level versus frequency, with the Lloyd's-mirror surface correction on a twin axis showing its low-frequency divergence and its approach to −3 dB at high frequency" width="82%" loading="eager" />
 
+*The gap between the two curves is the surface correction, and it changes sign.
+For this 6 m draught ($d_s$ = 4.2 m) it adds 9.08 dB at 20 Hz, crosses zero
+near 59 Hz, overshoots to −4.07 dB at 160 Hz and only then settles on the
+$-10\lg 2 = -3.01$ dB of an incoherent source-plus-image pair, which it reaches
+by 4 kHz. Everything left of the crossing is the inversion of a near-total
+cancellation: that is the part of a published source-level spectrum that moves
+most when the assumed source depth is wrong.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -280,6 +288,14 @@ receiver stays where it is, an assumption the
 returns to.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving.svg" alt="A percussive pile-driving strike pressure waveform with its peak marked, and below it the cumulative sound exposure level growing as SEL_ss plus ten times the logarithm of the number of strikes" width="82%" />
+
+*The three numbers a single strike yields are not interchangeable, and the
+figure shows how far apart they sit: this synthetic strike has a peak of
+197.9 dB re 1 µPa, a single-strike SEL of 178.7 dB re 1 µPa²·s and a 90 %-energy
+pulse duration of 60 ms. The lower panel is a straight line on a log-N axis by
+construction, so a 2000-blow pile adds $10\lg 2000$ = 33.0 dB and reaches
+211.7 dB — an injury criterion written on cumulative SEL is met by the count as
+much as by the hammer.*
 
 <details>
 <summary>Show the code for this figure</summary>

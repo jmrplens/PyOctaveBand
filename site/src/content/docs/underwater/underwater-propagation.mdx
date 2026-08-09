@@ -205,6 +205,14 @@ the reference), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) or **Thorp**
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%" loading="eager" />
 
+*The two terms trade places with range, which is why they are drawn apart. Out
+to the 1 km transition the loss is spreading and almost nothing else: 61.0 dB
+total against 60.1 dB of spreading. Past it the spreading law halves to
+$10\lg R$ and the $\alpha R$ term takes over the growth — at 20 km, 92.0 dB
+total is 73.0 dB of spreading plus 19.0 dB of absorption at 0.95 dB/km. At
+10 kHz absorption never overtakes spreading over this range; at 100 kHz it
+would have done so inside the first kilometre.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -333,6 +341,14 @@ on the same axis.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Weston's four shallow-water propagation regimes at 250 Hz over medium sand in 50 m of water: the composite propagation loss follows spherical spreading to about 43 m, cylindrical spreading to 412 m, the 15 lg r mode-stripping law to about 20 km and then the exponential single-mode decay, with each individual law drawn for comparison" width="82%" />
 
+*Nothing here was chosen: the three hand-overs at 42.7 m, 411.8 m and 20.1 km
+come out of the seabed alone, through the 33.6° critical angle and the
+0.278 Np/rad reflection-loss gradient of medium sand in 50 m of water. The
+composite is the lower envelope of the four dashed laws, so the loss steepens
+in stages — 32.6 dB at the first boundary, 42.4 dB at the second, 67.7 dB at
+the third. Sand is the reason the middle two regimes exist at all: a harder
+seabed pushes the hand-overs out and a softer one strips the modes sooner.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -398,6 +414,14 @@ nearly 6 m/s, which is the one large disagreement in the family and is entirely
 a matter of using it out of domain.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed.svg" alt="A sea-water sound-speed profile from the UNESCO equation: warm mixed layer, thermocline, a sound-channel axis at the minimum, and the speed rising with pressure at depth" width="60%" />
+
+*Temperature wins above the axis and pressure below it, and the turning point is
+the sound channel. On this profile the speed falls from 1515.79 m/s at the
+surface to a minimum of 1486.05 m/s at 775 m — where the water has already
+reached its deep temperature — and then climbs back to 1517.85 m/s at 3000 m on
+pressure alone, in isothermal water. The whole excursion is 32 m/s, about 2 %,
+which is why refraction and not absorption decides where sound goes in the deep
+ocean.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -538,6 +562,14 @@ $NL - DI$ rather than adding to it.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation.svg" alt="The two sonar geometries: passive, with a radiating target, a one-way transmission loss, an isotropic ambient noise field, a receiving array with its directivity index and a detector with its detection threshold; and active monostatic, with the transmitter and receiver at one point, outbound and return transmission losses, a target strength drawn as a backscattered lobe, and surface, volume and bottom scattering feeding a reverberation level that replaces the noise term" width="92%" />
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with transmission loss and crossing zero, the detection limit, at the figure of merit" width="82%" />
+
+*A straight line of slope −1, and its intercept is the whole design. Signal
+excess falls decibel for decibel with transmission loss and crosses zero at
+$FOM = SL - (NL - DI) - DT$ = 140 − (60 − 15) − 8 = 87.0 dB, so the sonar
+detects wherever the channel loses less than 87 dB and nowhere else. Every term
+moves the line vertically and none of them changes its slope: 6 dB more array
+gain buys exactly 6 dB more allowable loss, which the propagation curve then
+converts into a range.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -682,6 +714,14 @@ gradient when the question is how far sound gets.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection.svg" alt="Bottom reflection loss versus grazing angle for a fast sandy seabed: zero loss below the critical grazing angle, rising sharply above it" width="82%" />
 
+*A ray that stays shallow pays nothing, and a steep one pays almost everything.
+For this water-over-sand pair the critical angle is 24.62°: below it the loss is
+identically zero, and one degree above it the curve is already climbing, through
+5.21 dB at 30°, 7.89 dB at 45° and 9.05 dB at normal incidence. That step is
+what makes shallow-water propagation an angle-filtering problem — after a few
+bounces only the sub-critical rays survive, which is the mode stripping the
+Weston regimes describe.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -719,6 +759,13 @@ $|R|$ directly (unity below the critical angle, dropping to the normal-incidence
 value at $90°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_coefficient.svg" alt="Seabed reflection-coefficient magnitude versus grazing angle for a fast sandy seabed: total reflection below the critical grazing angle, falling to the normal-incidence value above it" width="82%" />
+
+*The same interface as the loss above, read as an amplitude. $|R|$ is exactly 1
+out to 24.62°, then falls fast — 0.403 at 45° and 0.353 at normal incidence, the
+plane-wave impedance ratio of the two media. The lossless idealisation is what
+makes the sub-critical part flat: a real absorbing sediment pulls it a few
+hundredths below one, which is invisible on this axis and is the dominant term
+after fifty bounces.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -777,6 +824,14 @@ an input error rather than an unusual ocean.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise.svg" alt="Wenz ambient-noise spectrum levels for two wind speeds, with wind noise falling at 5 dB per octave and thermal noise rising above about 50 kHz" width="82%" />
 
+*The rule of fives, measured: between 500 Hz and 5 kHz the wind branch falls
+5.02 dB per octave, and going from 5 to 20 knots lifts it by 10.03 dB at 1 kHz —
+51.1 dB against 61.1 dB. The two mechanisms then run in opposite directions, so
+the total has a minimum: thermal noise reaches 25.3 dB at 100 kHz and at 5 knots
+is already within 0.7 dB of the total there, while at 20 knots the wind still
+wins. Nothing on this figure is a floor a quieter hydrophone could get below —
+the thermal branch is the water itself.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -817,6 +872,14 @@ When no measured spectrum is available, a ship's source level can be
 **RANDI 3.1** or **Wales & Heitmeyer** (2002).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_traffic_noise.svg" alt="JOMOPANS-ECHO predicted source-level spectra for a container ship, a cruise ship and a tug, with cargo vessels showing a low-frequency hump below 100 Hz" width="82%" />
+
+*Class, speed and length are the only inputs, and they span 45 dB. The
+containership peaks at 174.3 dB re 1 µPa²/Hz at 31.6 Hz, the cruise ship at
+158.7 dB at 25.1 Hz, and the tug — slow and short — at 129.5 dB and up at
+125.9 Hz. Two things follow: the fleet's energy is below 100 Hz, which is where
+the wind model of the previous section is weakest, and a single number for
+"shipping noise" is meaningless without the class. These are **source** levels
+at 1 m; the snippet below shows what forgetting that costs.*
 
 <details>
 <summary>Show the code for this figure</summary>

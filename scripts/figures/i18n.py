@@ -11,9 +11,22 @@ The table is the module -- it is data, not code, and it is kept here so a
 translation fix never means touching a figure.
 """
 
+import os
+import sys
 from typing import Any
 
 from . import _publish
+
+# The miss recorder sits at the top of ``scripts/``, next to the checker that
+# reads what it writes; the figures package is a subdirectory of the same
+# place. Guard the path the way the other cross-imports in ``scripts/`` do
+# (see check_figures.py), so an editor importing a single figure module also
+# resolves it.
+_SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _SCRIPTS not in sys.path:
+    sys.path.insert(0, _SCRIPTS)
+
+import figure_language_audit as _audit
 
 # ---------------------------------------------------------------------------
 # Language support: every figure is also generated in Spanish ("_es" suffix).
@@ -3039,6 +3052,73 @@ def set_lang(lang: str) -> None:
     _publish(_LANG=_LANG, _LANG_SUFFIX=_LANG_SUFFIX)
 
 
+def audit_figure(stem: str) -> None:
+    """Name the asset the following lookups belong to, and the pass running.
+
+    Called by the savers just before they translate, so every string
+    :func:`lookup` cannot translate is attributed to the file it ships in.
+    """
+    _audit.visit(stem, _LANG)
+
+
+def lookup(s: str) -> str:
+    """Translate one whole string: the exact table, then the pattern list.
+
+    The single place where "the tables had nothing for this" is known, which
+    is why the miss is reported from here rather than from each caller: a
+    string that translates to itself (``"2 dB: normal"``, ``"Bessel"``) is a
+    deliberate table entry, and comparing input with output cannot tell it
+    apart from a string that was never in the table at all.
+    """
+    import re as _re
+
+    if s in _ES_EXACT:
+        return _ES_EXACT[s]
+    for pat, repl in _ES_PATTERNS:
+        new, n = _re.subn(pat, repl, s)
+        if n:
+            return new
+    _audit.untranslated(s)
+    return s
+
+
+def _audit_english(fig: Any) -> None:
+    """Report what the tables cannot translate, on the English pass.
+
+    The English figure is correct by construction, so this walk exists only
+    to say which of its strings the tables have no entry for. Intersected
+    with the Spanish pass by ``scripts/check_figure_language.py``, that is
+    what separates a genuine miss from a label the library renderer already
+    translated on its own (see :mod:`figure_language_audit`).
+
+    It reads and never writes: the English SVG is committed and byte-compared
+    by ``scripts/check_figures.py``, so this must not be able to perturb it.
+    Where the Spanish pass replaces a formatter to reach labels built at draw
+    time, this one calls the formatter at the tick locations instead and
+    throws the answer away.
+    """
+    if _audit.audit_dir() is None:
+        return
+
+    import matplotlib.text as _mtext
+    from matplotlib.category import StrCategoryFormatter as _SCF
+    from matplotlib.ticker import FixedFormatter as _FxF
+    from matplotlib.ticker import FuncFormatter as _FF
+
+    for ax in fig.get_axes():
+        for axis in (ax.xaxis, ax.yaxis):
+            fmt = axis.get_major_formatter()
+            if isinstance(fmt, _FxF):
+                for label in fmt.seq:
+                    lookup(label)
+            elif isinstance(fmt, _FF | _SCF):
+                for pos, loc in enumerate(axis.get_majorticklocs()):
+                    lookup(str(fmt(loc, pos)))
+    for artist in fig.findobj(_mtext.Text):
+        if artist.get_text():
+            lookup(artist.get_text())
+
+
 def _translate_figure(fig: Any) -> None:
     """Rewrite every Text artist of *fig* into the active language."""
     import re as _re
@@ -3046,6 +3126,7 @@ def _translate_figure(fig: Any) -> None:
     import matplotlib.text as _mtext
 
     if _LANG == "en":
+        _audit_english(fig)
         return
     import re as _re2
 
@@ -3059,15 +3140,7 @@ def _translate_figure(fig: Any) -> None:
         # (e.g. "S3.5"), not a decimal - leave those untouched.
         return _re2.sub(r"(?<![\d.A-Za-z])(\d+)\.(\d+)(?![.\d])", r"\1,\2", s)
 
-    def _tr_words(s: str) -> str:
-        """Apply the exact / pattern lookups (no decimal comma) to *s*."""
-        if s in _ES_EXACT:
-            return _ES_EXACT[s]
-        for pat, repl in _ES_PATTERNS:
-            new, n = _re.subn(pat, repl, s)
-            if n:
-                return new
-        return s
+    _tr_words = lookup  # the exact / pattern lookups, no decimal comma
 
     for ax in fig.get_axes():
         for axis in (ax.xaxis, ax.yaxis):
@@ -3101,14 +3174,9 @@ def _translate_figure(fig: Any) -> None:
         s = artist.get_text()
         if not s:
             continue
-        if s in _ES_EXACT:
-            artist.set_text(_ES_EXACT[s])
-        else:
-            for pat, repl in _ES_PATTERNS:
-                new, n = _re.subn(pat, repl, s)
-                if n:
-                    artist.set_text(new)
-                    break
+        translated = lookup(s)
+        if translated != s:
+            artist.set_text(translated)
         # Spanish decimal comma, applied uniformly to every text artist
         # (tick labels included) except mathtext. The substitution itself is
         # conservative -- it only rewrites a bare ``digit.digit`` not adjacent

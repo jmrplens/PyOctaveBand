@@ -530,6 +530,19 @@ examples H.3 and E.3). The façade and outdoor-radiation predictions of
 EN 12354-3:2000 and EN 12354-4:2000 have their own page, and the absorption
 member of the family is EN 12354-6.
 
+**Not covered.** The *detailed* per-band models of both parts are a separate
+page, [Detailed per-band prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/): the
+same standard run band by band, with the laboratory element and junction data
+converted to their in-situ values before the paths are formed. Use the
+simplified model here when only the weighted element ratings are known and the
+question is whether the room passes; use the detailed one when the element
+spectra exist and the question is which path sets which band. The element
+inputs themselves — $R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area —
+are taken as given, from laboratory data or from the mass-law estimates of
+[Predicting panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/). **EN 12354-5**
+(service equipment) is in
+[Installed structure-borne sound](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/).
+
 ## See also
 
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the EN 12354-3 and
@@ -923,6 +936,28 @@ $R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation an
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
+
+```python
+res.report("airborne-prediction.pdf")   # R'w, thirteen paths
+imp.report("impact-prediction.pdf")     # L'n,w, five paths
+```
+
+The example fiches, regenerated with `make reports`, are kept rendered in the
+repository; click a preview to open the PDF. Both show the Annex L building of
+this page — the same elements, junctions and floating floor the tables above
+are built from — so the share-of-energy table is the answer to the question
+this whole page exists for: which path carries the sound.
+
+[![ISO 12354-1 detailed airborne prediction example report: an identification header with the 20 m2 separating floor and the two 50 m3 dwellings, the share-of-energy table of all thirteen paths (the 2d flanking path largest at 18.0 %, the direct Dd path 6.3 %), the per-band figure stacking each path's contribution under the apparent sound reduction index curve from 50 Hz to 5 kHz, the boxed predicted R'w = 57 dB, the detailed model's 1.5 dB to 2.5 dB standard deviation, and a PASS against a requirement of 52 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_airborne_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_airborne_example.pdf)
+
+*Detailed airborne prediction fiche (`DetailedAirborneResult.report`), the
+thirteen paths of the Annex L building and their energy shares.*
+
+[![ISO 12354-2 detailed impact prediction example report for the same building in the impact direction: the identification header, the share-of-energy table of the direct path and the four flanking paths (Dd 65.6 %, Df2 13.2 %), the per-band figure of each path's contribution under the apparent normalized impact sound pressure level curve, and the boxed predicted L'n,w = 41 dB with the detailed model's standard deviation and a PASS against a requirement of 50 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_impact_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_detailed_impact_example.pdf)
+
+*Detailed impact prediction fiche (`DetailedImpactResult.report`), the same
+building excited by the tapping machine: the floor itself carries two thirds
+of the energy, and the four flanking paths the rest.*
 
 ## References
 
@@ -1712,6 +1747,83 @@ fig.tight_layout(); plt.show()
 
 </details>
 
+## Function parameters
+
+Every argument of this page in one place, with its units and its admissible
+range:
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `mass_per_area` | float | kg/m² | > 0 | Surface density $m''$ |
+| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | give one | Coincidence $f_c$, or $B'$ to compute it |
+| `loss_factor` | float | — | > 0; default `0.01` single panel, `0.1` double wall | Total loss factor $\eta$ |
+| `band` | str | — | `'third'` (−5.5 dB) / `'octave'` (−4.0 dB) | Field-incidence correction width |
+| `mass1` / `mass2` | float | kg/m² | > 0 | Double-wall leaf surface densities |
+| `gap` | float | m | > 0 | Cavity depth $d$ |
+| `cavity_medium` | `PorousMediumResult` | — | default `None` | Porous fill; lowers $f_0$ |
+| `width` (slit) | float | m | > 0 | Slit width $w$. **Second** positional argument of both `slit_transmission_coefficient` and `slit_resonance_frequencies` |
+| `depth` (slit) | float | m | > 0 | Slit depth $d$ (the wall thickness). **Third** positional argument of `slit_transmission_coefficient`, **first** of `slit_resonance_frequencies` — the two functions take the pair in opposite orders |
+| `field` / `position` (slit) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Incident field and slit location |
+| `radius` / `depth` (hole) | float | m | > 0 | Circular-aperture radius $a$ / depth $d$ |
+| `areas` / `reduction_indices` | seq | m² / dB | length $N$ | Composite elements (1-D or (N, bands)) |
+| `length_x` / `length_y` | float | m | > 0 | Plate dimensions (radiation efficiency) |
+| `boundary` / `baffle` | str | — | `'simply_supported'`/`'clamped'`, `'infinite'`/`'perpendicular'` | Plate edge and baffle constants |
+
+`single_panel_transmission_loss` and `double_wall_transmission_loss` return a
+`SoundReductionResult` (`transmission_loss`, `transmission_coefficient`,
+`critical_frequency` / `resonance_frequency`, `.rating()`, `.plot()`); the slit
+and hole functions return an `ApertureTransmissionResult`
+(`transmission_coefficient`, `transmission_loss`, `.plot()`);
+`radiation_efficiency` a `RadiationEfficiencyResult` (`radiation_efficiency`,
+`radiation_index`, `.plot()`).
+
+**Where the closed forms stop being valid.** Nothing in the code refuses an
+argument outside these ranges, so the three bounds below are the reader's to
+enforce. Sharp's coincidence method is stated for frequencies above
+$1.5\times$ the first panel resonance. Gomperts' slit is inviscid and holds
+for $w < 0.3\lambda$; a narrower slit at a higher frequency leaves the model
+behind. The plate radiation efficiency is Leppington's "method no. 1", one
+of several in that paper and not interchangeable with the others.
+
+## What this guide covers
+
+**Covered.** The closed forms themselves, not the measurements behind them:
+Bies' §7.2 mass law and Sharp's coincidence method (Eqs 7.40/7.42/7.44) for a
+single panel; the double-wall mass-spring-mass resonance with its saturating
+cavity boost (Eqs 7.62-7.64); Hopkins' Gomperts slit and the Wilson & Soroka
+circular hole with the area-weighted composite sum (Eq. 4.92); the
+Leppington/Maidanik plate radiation efficiency (Eqs 2.227-2.230); and the
+Cremer Table 5.1 point impedances and mobilities of infinite plates and beams
+with the injected-power relation — through `single_panel_transmission_loss`,
+`double_wall_transmission_loss`, `slit_transmission_coefficient`,
+`composite_transmission_loss`, `radiation_efficiency`,
+`infinite_plate_impedance`, `infinite_beam_mobility` and `injected_power`.
+Vigran's orthotropic chapter joins them: the coincidence *range* of a ribbed or
+corrugated panel and its flattened $R$ by the diffuse-field integral or Heckl's
+closed form (Eqs 6.107-6.113), the Timoshenko equivalent stiffnesses of a
+sinusoidal corrugation (Eq. 3.115) and the orthotropic plate eigenfrequency
+(Eq. 3.113). Masonry cavity walls add Hopkins' wall-tie bridge
+(Sections 3.11.3.2 and 4.3.5.4.1): the Table A4 dynamic stiffnesses, the tie
+array in parallel with the cavity air (Eq. 4.89, through the
+`tie_stiffness_per_area` keyword) and the point-connection coupling loss factor
+with a linear-spring connector (Eqs 4.87, 4.88).
+
+**Not covered.** Every prediction stops where its source stops, and the three
+numerical bounds are stated in [Function parameters](#function-parameters)
+above: Sharp below $1.5\times$ the first panel resonance, Gomperts above
+$w = 0.3\lambda$, and Leppington's other formulations. The orthotropic models
+are infinite-panel models: below about $0.7 f_{c1}$ Heckl's branch
+underestimates $R$ on small panels, and the 2 kHz to 4 kHz dip real corrugated
+cladding shows comes from resonances of the sections between the ribs, which
+neither route predicts. Only the sinusoidal corrugation has equivalent
+stiffnesses here; trapezoidal cladding needs its own, from the literature
+Vigran cites. On the wall-tie side the inputs are printed data but no published
+$R$ of a bridged masonry cavity wall is tabulated, so the per-band penalty the
+ties cause has **no numeric oracle** — only the resonance shift is anchored
+(Hopkins Fig. 4.35, 26 Hz to 50 Hz). The coupling loss factor is not fed into a
+full statistical energy analysis: combining it with the airborne path would
+need the whole room-plate-cavity-plate-room chain.
+
 ## References
 
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering Noise
@@ -1999,6 +2111,17 @@ $C_{I,\Delta}$ adaptation term; and ISO 12354-2:2017 Annex C (informative),
 whose floating-floor estimate this page reproduces from the EN 29052-1
 dynamic stiffness, with the worked floor of its Annex G (context for design,
 not a measurement).
+
+**Not covered.** The mock-up facility itself — the plate dimensions, the
+resilient supports, the tapping-machine positions of Clause 5 — is not checked:
+the functions consume measured acceleration levels wherever they came from. The
+ISO 12354-2:2017 Annex C floating-floor formulae are quoted here as design aids
+and evaluated inline; the helpers that wrap them, the tapping-machine force
+model behind a soft covering's improvement and the **ISO 12354-1** Annex D
+rating of a wall lining belong to
+[Predicting resilient-layer performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/). The superseded
+full-size ISO 140-8 method survives only as the comparison axis of the
+Foret et al. (2011) worked example.
 
 ## See also
 
@@ -2680,6 +2803,11 @@ repository. Click the preview to open the PDF:
 
 *Structure-borne sound power fiche (`StructureBornePowerResult.report`), an
 EN 15657 reception-plate characterization with the boxed total L_Ws.*
+
+## See also
+
+- API reference: [`building.measurement.structure_borne_power`](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/).
+- Theory: [Point mobilities and radiation efficiency](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the point mobility, the source-receiver mismatch and the injected power they define.
 
 ## References
 

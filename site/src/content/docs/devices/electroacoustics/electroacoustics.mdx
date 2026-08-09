@@ -569,16 +569,48 @@ from phonometry import electroacoustics
 fs = 48000
 n = 400000
 rng = np.random.default_rng(7)
-x = rng.standard_normal(n)
+clean_x = rng.standard_normal(n)
 b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # device under test
-y = sp.lfilter(b, a, x)
-y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # output noise
+clean_y = sp.lfilter(b, a, clean_x)
 
-# The left column of the figure: the same record, both estimators.
-h1 = electroacoustics.transfer_function(x, y, fs, estimator="H1")
-h2 = electroacoustics.transfer_function(x, y, fs, estimator="H2")
-plt.semilogx(h1.frequencies, h1.magnitude_db, label="H1")
-plt.semilogx(h2.frequencies, h2.magnitude_db, label="H2")
+# Both columns: the same path, the noise moved from one channel to the other.
+# 5 % on the output; 50 % on the input, because an input-noise bias is uniform
+# across the band and a 5 % one would be invisible at this scale.
+out_noise, in_noise = 0.05, 0.5
+y_out = clean_y + rng.standard_normal(n) * np.sqrt(np.mean(clean_y ** 2)) * out_noise
+x_in = clean_x + rng.standard_normal(n) * np.sqrt(np.mean(clean_x ** 2)) * in_noise
+cases = (("Noise on the output - H1 is unbiased", clean_x, y_out),
+         ("Noise on the input - H2 is unbiased", x_in, clean_y))
+
+fig, axes = plt.subplots(2, 2, figsize=(11.4, 7.6), sharex=True,
+                         gridspec_kw={"height_ratios": [2.0, 1.0]})
+for col, (title, xx, yy) in enumerate(cases):
+    h1 = electroacoustics.transfer_function(xx, yy, fs, estimator="H1")
+    h2 = electroacoustics.transfer_function(xx, yy, fs, estimator="H2")
+    _, h_true = sp.freqz(b, a, worN=h1.frequencies, fs=fs)
+    pos = h1.frequencies > 0.0
+    freqs = h1.frequencies[pos]
+
+    ax_mag, ax_coh = axes[0][col], axes[1][col]
+    ax_mag.semilogx(freqs, 20 * np.log10(np.abs(h_true[pos])), "--", label="True |H|")
+    ax_mag.semilogx(freqs, h1.magnitude_db[pos], label="H1 = Gxy / Gxx")
+    ax_mag.semilogx(freqs, h2.magnitude_db[pos], "-.", label="H2 = Gyy / Gyx")
+    ax_mag.set(ylim=(-80.0, 12.0), title=title)
+    ax_mag.legend(fontsize=8)
+
+    # The coherence floor the section states, from the local SNR.
+    if col == 0:   # output noise: the SNR follows |H|, so the floor collapses
+        snr = (np.abs(h_true[pos]) ** 2 * np.mean(clean_x ** 2)
+               / (np.mean(clean_y ** 2) * out_noise ** 2))
+    else:          # input noise: the same ratio in every band
+        snr = np.full_like(freqs, 1.0 / in_noise ** 2)
+    ax_coh.semilogx(freqs, h1.coherence[pos], label="measured")
+    ax_coh.semilogx(freqs, snr / (1.0 + snr), ":", label="SNR / (1 + SNR)")
+    ax_coh.axhline(0.9, ls="--", lw=1.0)
+    ax_coh.set(xlabel="Frequency [Hz]", ylim=(0.0, 1.05), xlim=(20.0, fs / 2))
+    ax_coh.legend(fontsize=8)
+axes[0][0].set_ylabel("Magnitude [dB]")
+axes[1][0].set_ylabel("Coherence")
 plt.show()
 ```
 

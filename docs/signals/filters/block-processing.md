@@ -194,6 +194,15 @@ for x in audio_stream(block):            # your capture callback
 | `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](../levels/weighting.md)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
+## See also
+
+- [Filter Banks](filter-banks.md): the offline bank streaming reproduces bit for bit, and the `zero_phase` mode streaming cannot use.
+- [Multichannel and Performance](multichannel.md): one state per channel, and where the computation time actually goes.
+- [Time Weighting](../levels/time-weighting.md#6-block-processing): the functional detector API with the state passed by hand.
+- [Integrated and Statistical Levels](../levels/levels.md): which metrics accumulate across blocks and which must be recomputed on the pooled envelope.
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.core`](https://jmrplens.github.io/phonometry/reference/api/filters/core/).
+- Theory: [Filter Bank Design and Numerical Stability](../../reference/theory/signal-analysis.md#filter-bank-design--numerical-stability): why a bank is designed as second-order sections and decimated per band, which is what makes streaming state possible at all.
+
 ## References
 
 - Oppenheim, A. V., & Schafer, R. W. (2010). *Discrete-time signal processing*

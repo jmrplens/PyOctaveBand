@@ -264,6 +264,17 @@ verdict.plot()                       # the three criteria per period
 verdict.report("acta.pdf")           # acoustic inspection fiche, in Spanish
 ```
 
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![RD 1367/2007 activity assessment example report, rendered in Spanish: an identification header, the noise-phase table of the five phases with their Kt, Kf and Ki corrections and the resulting LKeq,Ti (59,0 dB with the noisy machine running, 54,0 dB for the rest of the sources), the per-period assessment against the 55 dB of Annex III Table B1 (day 59/60, 57/58 and 56/55, evening 54/60, 51/58 and 50/55), the bar plot of each period's levels against its three criteria, and the boxed verdict that the activity exceeds the RD 1367/2007 immission limit values, with the day as the governing period, LKeq,x = 57 dB against a limit of 55 dB and LK,x = 56 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/rd1367_activity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/rd1367_activity_example.pdf)
+
+*Acoustic inspection fiche (`ActivityAssessment.report`), the three per-period
+criteria of RD 1367/2007 and the boxed verdict. The day period clears the
+phase criterion (59 against 60) and the daily one (57 against 58) and fails
+only the annual $L_{K,x}$ (56 against 55) — which is why the fiche prints all
+three: any one of them is enough to fail.*
+
 ## What this guide covers
 
 **Covered.** The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$

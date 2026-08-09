@@ -274,6 +274,45 @@ grids.
   `minimum_phase` alone also accepts a plain magnitude array, e.g. a
   design target for equalization.
 
+## What this guide covers
+
+**Covered.** Farina's exponential-sweep deconvolution (AES preprint 5093, 2000)
+and the phase-coherent synchronized swept sine of Novak, Lotton & Simon (2015):
+the harmonic separation, the closed-form inverse-filter spectrum and the
+fractional-sample de-skewing, through `swept_sine_distortion` and
+`synchronized_sweep_signal`. With them, the acquisition conditions the answer
+depends on — the drive level and its `amplitude` reference, the `fade` that has
+to reach both calls, the clipping and tail requirements, the time-variance and
+impulsive-noise failure modes, and the sizing rules relating $T$, $N$ and
+$f_2$. The phase utilities `minimum_phase`, `group_delay`, `excess_phase` and
+`phase_decomposition` implement the Hilbert relation of Bendat & Piersol
+Section 13.1.4 through the real cepstrum.
+
+**Not covered.** Intermodulation and dynamic intermodulation
+(IEC 60268-3 clauses 14.12.7-10) come from steady tones on the
+[electroacoustics](electroacoustics.md) page, not from a sweep; this page
+separates harmonic orders and nothing else. Müller & Massarani is cited for
+practice — fades, inverse-filter technique — not for an implemented formula.
+Under `method="farina"` the harmonic phases of $H_2 \dots H_N$ are returned but
+should be ignored: the plain exponential sweep breaks the time-shift/harmonic
+equivalence the synchronized method depends on. And nothing here polices the
+acquisition conditions: the functions take the arrays they are handed, so the
+drive level, the absence of clipping and the length of the tail are the
+operator's to keep and to report.
+
+## See also
+
+- [Electroacoustics](electroacoustics.md): the
+  steady-tone $\mathrm{THD}$, THD+N and intermodulation set of IEC 60268-3
+  that this sweep complements, and the operating point they are all defined at.
+- [Loudspeaker Characterisation (IEC 60268-5)](loudspeakers.md):
+  the THD(f) curve produced here is the distortion panel of that
+  rated-characteristics report.
+- [Room acoustics](../../buildings/rooms/room-acoustics.md): `impulse_response`,
+  which is the linear half of the same recording.
+- API reference: [`electroacoustics.swept_sine`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
+  and [`signals.phase`](https://jmrplens.github.io/phonometry/reference/api/signals/phase/).
+
 ## References
 
 - Farina, A. (2000). Simultaneous measurement of impulse response and

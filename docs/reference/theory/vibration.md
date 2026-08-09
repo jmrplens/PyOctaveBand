@@ -22,6 +22,16 @@ as the exact complex response via FFT, magnitude *and* phase, not a
 bilinear-warped digital approximation) and the ISO 8041-1 Annex B design-goal
 tables (B.1–B.9) are reproduced to 0.1 %.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family.svg" alt="All nine human-vibration weightings in decibels from 0.05 Hz to 1.5 kHz on a log frequency axis, colour-grouped into the whole-body weightings Wk, Wd and Wc, the rotational and recumbent weightings We and Wj, the building and rail weightings Wm and Wb, the motion-sickness weighting Wf peaking at 0.17 Hz, and the hand-arm weighting Wh peaking near 11 Hz; three bars above the curves mark the band each part of the family is tabulated over, 0.1 to 0.5 Hz for Wf, 0.5 to 80 Hz for the whole-body weightings and 6.3 to 1250 Hz for Wh" width="94%"></picture>
+
+*The family the one cascade produces, a Table 3 parameter set per curve. `Wk`,
+the vertical whole-body weighting quoted most often, is the flat-topped curve
+peaking near 6 Hz and 21 dB down at 100 Hz; `Wd` peaks two and a half octaves
+below it, because the body is far more compliant horizontally at low frequency;
+`Wf` sits an order of magnitude lower in frequency again; and `Wh` extends three
+decades above, which is why the three sets are tabulated over the three
+different bands drawn above the curves.*
+
 The weighted metrics follow ISO 2631-1:1997: running rms with linear or
 exponential integration (Eqs. 2/3), **MTVV** as its maximum (Eq. 4), the
 fourth-power **VDV** $= (\int a_w^4\, dt)^{1/4}$ in m/s^1.75 (Eq. 5), the crest
@@ -105,6 +115,16 @@ from Cremer, Heckl & Petersson (2005) and Hopkins (2007).
 
 See the [Predicting Panel Sound Insulation guide](../../buildings/design/panel-sound-insulation.md) for
 usage.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities.svg" alt="Two stacked panels against frequency from 0.5 Hz to 2 kHz on a log axis. Top: mobility magnitude for a single-degree-of-freedom resonator, which resonates, against three infinite-structure closed forms — a 140 mm concrete plate, flat at about 2.6 times ten to the minus six metres per newton-second; a 100 by 200 mm steel beam falling as the inverse square root of frequency; and a steel strut in longitudinal motion, flat. Bottom: the phase of each, zero for the plate and the rod, minus 45 degrees for the beam" width="92%"></picture>
+
+*The three closed forms drawn against the finite resonator. The 140 mm concrete
+plate is real and frequency-independent at $2.6 \times 10^{-6}$ m/(N·s); the
+100 × 200 mm steel beam falls as $f^{-1/2}$ — a factor 63 over the twelve
+octaves shown — at a constant −45°; the longitudinal strut is real and flat.
+None of them resonates, which is exactly the difference from a finite structure
+and the reason the closed forms are band-average substitutes rather than
+point-by-point predictions.*
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance" width="82%"></picture>
 

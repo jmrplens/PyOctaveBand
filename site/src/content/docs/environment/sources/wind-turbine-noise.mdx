@@ -253,6 +253,14 @@ plt.show()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality.svg" alt="A wind-turbine narrowband spectrum with a discrete tone near 200 Hz standing above a shaped broadband floor, the critical band about the tone shaded, the masking-noise level drawn as a horizontal line, and the tonal audibility annotated" width="82%" />
 
+*What the method actually compares. The 200 Hz line stands 22 dB above the
+shaped floor, but the verdict is not that number: inside the 102.9 Hz critical
+band the classified tone lines sum to $L_{pt}$ = 62.2 dB and the masking noise
+to $L_{pn}$ = 55.6 dB, so the tonality is 6.6 dB. Only after subtracting the
+audibility criterion $L_a = -2.0$ dB at this frequency does the reportable
+quantity appear, $\Delta L_a$ = 8.6 dB, well over the 0 dB that makes the tone
+audible. The shaded band, not the line height, is what sets it.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

@@ -216,6 +216,11 @@ repository. Click the preview to open the PDF:
 *Structure-borne sound power fiche (`StructureBornePowerResult.report`), an
 EN 15657 reception-plate characterization with the boxed total L_Ws.*
 
+## See also
+
+- API reference: [`building.measurement.structure_borne_power`](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/).
+- Theory: [Point mobilities and radiation efficiency](../../reference/theory/vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the point mobility, the source-receiver mismatch and the injected power they define.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne

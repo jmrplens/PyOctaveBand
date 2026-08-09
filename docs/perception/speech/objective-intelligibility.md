@@ -239,6 +239,22 @@ hearing threshold. When more than one is available, they answer different
 questions rather than confirming each other: a processor can raise STOI while
 the room keeps the STI poor.
 
+## What this guide covers
+
+**Covered.** Taal et al. (2011) for STOI and Jensen & Taal (2016) for ESTOI,
+both behind `stoi()`: the shared front end of 10 kHz resampling, 256-sample
+Hann frames, 15 one-third-octave bands, 384 ms segments and 40 dB silent-frame
+removal (2011, Eqs. 1-4); the per-band envelope correlation and the averaged
+index (Eqs. 5-6); and, with `extended=True`, the row and column normalisation
+of the spectrogram and the spectral-correlation index (2016, Eqs. 4-8).
+
+**Not covered.** Taal et al. also fit a logistic mapping from the index $d$ to
+a predicted percentage of words understood, calibrated on particular
+listening-test corpora. `stoi()` returns $d$ alone, as `STOIResult.value`;
+there is no percent-correct output and no fitted coefficients in the API. The
+2010 ICASSP paper is cited as the short conference version of the same
+algorithm and adds nothing implemented beyond the equations above.
+
 ## See also
 
 - [Speech Transmission Index](speech-transmission.md): rates a transmission
@@ -247,3 +263,31 @@ the room keeps the STI poor.
   intelligibility from speech, noise and hearing-threshold spectra.
 - [Filter banks](../../signals/filters/filter-banks.md): the one-third-octave bands the front end
   groups the DFT into.
+
+## References
+
+Neither measure is standardised: both are journal algorithms, and the papers
+below are the normative text for them.
+
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An algorithm
+  for intelligibility prediction of time-frequency weighted noisy speech.
+  *IEEE Transactions on Audio, Speech, and Language Processing*, 19(7),
+  2125-2136.
+  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
+  STOI itself: the shared front end (10 kHz, 256-sample Hann frames, 15
+  one-third-octave bands, 384 ms segments), the normalisation and the
+  signal-to-distortion clipping of Equations 1 to 4, the per-band envelope
+  correlation of Equation 5 and the averaged index of Equation 6.
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A short-time
+  objective intelligibility measure for time-frequency weighted noisy speech.
+  *2010 IEEE International Conference on Acoustics, Speech and Signal
+  Processing (ICASSP)*, 4214-4217.
+  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
+  The conference version of STOI, shorter and easier to read first.
+- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
+  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
+  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
+  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
+  ESTOI: the row and column mean- and variance-normalisation of the short-time
+  spectrogram (Equations 4 to 7) and the spectral-correlation intermediate
+  index of Equation 8.

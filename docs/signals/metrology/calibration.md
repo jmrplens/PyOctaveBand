@@ -272,6 +272,14 @@ Derive the sensitivity before each measurement series and check it again at the 
 
 You can, but the tolerances chain: a class 1 measurement requires a class 1 (or LS) calibrator per IEC 60942 and a class 1 meter, so a class 2 calibrator silently downgrades every derived level to class 2 accuracy, because its wider level tolerance enters the sensitivity factor $S$ directly. For reference, the class 1 tolerance is ±0.4 dB between 160 Hz and 1.25 kHz (IEC 60942 Table 1).
 
+## See also
+
+- [Build a sound level meter](../sound-level-meter.md): the walkthrough that starts from this calibration step and ends at a class-checked instrument.
+- [Levels](../levels/levels.md): every metric that consumes the `calibration_factor` derived here.
+- [Multichannel and Performance](../filters/multichannel.md): one sensitivity per channel when the channels differ.
+- [GUM uncertainty](gum-uncertainty.md): propagating the calibrator tolerance and drift bound into a level's uncertainty.
+- API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/) and [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/).
+
 ## References
 
 - International Electrotechnical Commission. (2017). *Electroacoustics —

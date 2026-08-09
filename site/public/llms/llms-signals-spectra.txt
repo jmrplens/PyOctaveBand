@@ -711,6 +711,36 @@ matrix underlies [multiple and partial coherence](https://jmrplens.github.io/pho
 extends the ordinary coherence to several correlated inputs and one
 output.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol's Welch estimators (*Random Data*, 4th ed., 2010,
+Sections 5.2, 8.5, 9.1-9.2 and 11.5): `power_spectral_density` and
+`cross_spectral_density` with the effective number of averages, the chi-square
+confidence intervals and the resolution-bias error; the coherent output
+spectrum and the spectral SNR; the Harris (1978) window figures of merit in
+`window_metrics`; and the Thomson (1982) multitaper estimator of
+`multitaper_psd`, following Percival & Walden Chapters 7-8.
+`fractional_octave_smoothing` and `noise_signal` complete the toolbox.
+
+**Not covered.** The frequency-response estimators `transfer_function` and
+`coherence`, and the sound-intensity probe, share this page's Welch core but
+are documented on
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) and
+[Sound intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/). So is multiple and
+partial coherence, on [MISO coherence](https://jmrplens.github.io/phonometry/signals/spectra/miso-coherence/). And these are a
+textbook's estimators, not a certification standard, so there is no clause
+number and no compliance limit to check the page against.
+
+## See also
+
+- [Data qualification](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/): the stationarity every chi-square interval on this page assumes.
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): where the factor that turns this page's densities into Pa²/Hz comes from.
+- [MISO coherence](https://jmrplens.github.io/phonometry/signals/spectra/miso-coherence/): the same cross-spectral matrix with several correlated inputs.
+- [Time-frequency analysis](https://jmrplens.github.io/phonometry/signals/spectra/time-frequency/): the same Welch segmentation displayed instead of averaged.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): the band-level side of the density/band conversion of section 4.
+- API reference: [`signals.spectra`](https://jmrplens.github.io/phonometry/reference/api/signals/spectra/), [`signals.windows`](https://jmrplens.github.io/phonometry/reference/api/signals/windows/) and [`signals.multitaper`](https://jmrplens.github.io/phonometry/reference/api/signals/multitaper/).
+- Theory: [Frequency Resolution vs FFT Bin Spacing](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#frequency-resolution-vs-fft-bin-spacing): why the bin spacing of an FFT is not the resolution of the estimate, and what the window does to both.
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and
@@ -933,6 +963,23 @@ The estimators share the Welch core of the
 coherence and a `power_spectral_density` computed with the same segment length
 are consistent bin by bin.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol Chapter 7's ordinary, multiple and partial
+coherence functions (Eqs. 7.109, 7.35, 7.87), the Gaussian-elimination
+conditioning recursion (Eq. 7.94), the partial coherent output spectra and
+their exact decomposition of the output (Eqs. 7.86/7.116/7.121), and the
+Section 9.3 random errors of the multiple and conditioned estimates
+(Eqs. 9.98-9.101) — all exposed by `miso_coherence` and `MISOCoherenceResult`.
+
+**Not covered.** The chapter's multiple-input frequency-response estimates (the
+gain factors $L_{iy}$), the linear model that predicts the output from the
+conditioned inputs, are computed internally to build the coherent output
+spectra but are not returned: the result object exposes the coherence and the
+spectral decomposition, not a fitted multi-input transfer function. The method
+is also single-output; a system with several correlated outputs needs one
+`miso_coherence` call per output.
+
 ## See also
 
 - [Spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): the single-input coherent
@@ -1154,6 +1201,25 @@ counterpart with sound-level-meter ballistics; and for tracking a single
 component's frequency in time, the
 [Hilbert instantaneous frequency](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/) of
 `envelope` complements the STFT ridge.
+
+## What this guide covers
+
+**Covered.** Bendat & Piersol's calibrated spectrogram (Section 12.6.4.2):
+tapered, overlapped STFT segments kept as separate time columns instead of
+averaged, in `spectrogram`, with the exact Welch-module scaling and the
+Eq. 8.158 random error of an unaveraged cell. The zoom FFT of Section 11.5.4
+(Eqs. 11.122-11.130): band-limited, arbitrarily fine-grid spectra computed as
+the chirp-Z equivalent of the book's demodulate-decimate-DFT chain, in
+`zoom_fft`. Both share the Harris (1978) window catalogue behind the segment
+taper.
+
+**Not covered.** The constant-bandwidth, STFT family only. Its
+constant-percentage-bandwidth counterpart, the one a sound level meter draws,
+is `OctaveFilterBank.spectrogram` on [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/). Tracking a
+single component's instantaneous frequency over time is the Hilbert `envelope`
+of [Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/). As on the
+spectral-analysis page, these are a textbook's estimators and not a
+certification standard.
 
 ## See also
 
@@ -1583,6 +1649,32 @@ natural pre-analysis before the dedicated
 metrics: the envelope spectrum tells you *whether and at what rate* a signal
 is modulated, the domain metrics quantify it normatively.
 
+## What this guide covers
+
+**Covered.** The three cepstrum variants and liftering of Havelock, Kuwano &
+Vorländer's *Handbook of Signal Processing in Acoustics* (`cepstrum`, `lifter`;
+Chapters 27 and 87), the single-echo delay and reflection coefficient read off
+the power cepstrum (`echo_detection`), the invertible complex cepstrum and its
+homomorphic round trip (`CepstrumResult.invert`), and the Bendat & Piersol
+Chapter 13 envelope spectrum (`envelope_spectrum`) with its closed-form AM tone
+lines.
+
+**Not covered.** `echo_detection` picks the single largest cepstral peak in the
+band it is given, so a response carrying several overlapping echoes needs
+manual peak-picking or repeated calls on narrowed bands: it is not a multi-echo
+separator. There is no mel-warped or MFCC-style cepstrum for perceptual audio
+features either — `cepstrum` and `lifter` work on the plain linear-frequency
+log spectrum only.
+
+## See also
+
+- [Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/): the Hilbert envelope this page transforms into a spectrum.
+- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): the log spectrum the cepstrum starts from.
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signals/spectra/synchronous-averaging/): removing the synchronous part before running an envelope spectrum on the residual.
+- [Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/): the bearing and gear families read off exactly this envelope spectrum.
+- [Swept-sine distortion](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/): the minimum-phase folding that shares this page's core.
+- API reference: [`signals.cepstrum`](https://jmrplens.github.io/phonometry/reference/api/signals/cepstrum/).
+
 ## References
 
 - Havelock, D., Kuwano, S., & Vorländer, M. (Eds.) (2008). *Handbook of
@@ -1872,6 +1964,25 @@ The composition is standard practice: average synchronously first, then
 subtract; the `residual` field is the record with the synchronous part
 removed, which is exactly what the envelope spectrum should be run on once
 the strong gear components no longer mask the modulation.
+
+## What this guide covers
+
+**Covered.** McFadden's revised model for time domain averaging (*Mechanical
+Systems and Signal Processing*, 1987): the comb-filter description of the
+average (Eq. 8, magnitude Eq. 9) in `comb_filter_response`, the square-root
+noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
+and the choice of $N$ that places a comb node on an interfering order,
+following the paper's own 32.05-order example. `time_synchronous_average` also
+implements the band-limited fractional-delay alignment used when $f_s T$ is not
+an integer.
+
+**Not covered.** Synchronous averaging needs a period it is given. Finding that
+period, or detecting periodic families without one, is the job of the
+[cepstrum](https://jmrplens.github.io/phonometry/signals/spectra/cepstrum-echoes/), and locating amplitude-modulation
+periodicities such as bearing faults is the
+[envelope spectrum](https://jmrplens.github.io/phonometry/signals/spectra/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines);
+neither is on this page. McFadden's paper is not a certification standard, so
+there is no compliance clause to check the implementation against.
 
 ## See also
 
@@ -2276,6 +2387,34 @@ as discrete lines in frequency; and the sub-sample alignment shares its
 band-limited kernel with the public
 [fractional-delay and resampling tools](https://jmrplens.github.io/phonometry/signals/spectra/test-signals/).
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol Chapter 5, Section 8.4 and Chapter 13:
+`correlation` with the biased, unbiased and coefficient normalizations and
+their random-error formulas (Eqs. 8.109/8.112); `time_delay` with the direct,
+phase-slope and Knapp & Carter (1976) generalized cross-correlation methods,
+including the Roth, SCOT, PHAT and maximum-likelihood weightings of their
+Table I; the peak-location uncertainty of Eq. 8.129; `impulse_response_delay`
+and `align_impulse_responses`; and the Hilbert `envelope` with instantaneous
+phase and frequency (Chapter 13).
+
+**Not covered.** `correlation` and `time_delay` model one common-path delay
+between exactly two sensors — the $y(t) = \alpha\,x(t-\tau_0) + n(t)$ model of
+Eq. 5.21. A record with several arrivals, a direct path plus reflections, is
+not separated: the direct correlator reports the single largest peak, the same
+limitation `echo_detection` carries on the
+[cepstrum](https://jmrplens.github.io/phonometry/signals/spectra/cepstrum-echoes/). Estimating delays across more than two sensors,
+as an array or a beamformer would, means calling these functions pairwise;
+there is no multi-sensor TDOA solver.
+
+## See also
+
+- [Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signals/spectra/cepstrum-echoes/): the reference-free route to a delay, and the envelope this page constructs.
+- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): the cross-spectrum the GCC weightings are built from, and the two-channel acquisition rules.
+- [Test signals](https://jmrplens.github.io/phonometry/signals/spectra/test-signals/): the band-limited fractional-delay kernel behind the sub-sample alignment.
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signals/spectra/synchronous-averaging/): the same alignment applied per revolution.
+- API reference: [`signals.correlation`](https://jmrplens.github.io/phonometry/reference/api/signals/correlation/) and [`signals.envelope`](https://jmrplens.github.io/phonometry/reference/api/signals/envelope/).
+
 ## References
 
 - Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and
@@ -2520,6 +2659,22 @@ resampler and fractional delay are the sample-rate half of
 [correlation and delay work](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/), where sub-sample
 alignment is the difference between averaging impulse responses and
 smearing them.
+
+## What this guide covers
+
+**Covered.** IEC 60268-1:1985 Annex A, Clause A2: the tone burst that starts at
+a zero crossing of the tone and consists of an integral number of full periods
+(A2.1) and the repetitive burst train of A2.2, implemented by `tone_burst` and
+hand-checked against the Table AII durations. Bendat & Piersol Section 10.2's
+anti-alias requirement, turned into an explicit, checkable specification by
+`resample_signal`'s stopband attenuation and transition width.
+
+**Not covered.** IEC 60268-1:1985 is a general standard for sound system
+equipment, and only its Annex A tone-burst clauses are implemented; amplifiers,
+loudspeakers, connectors and the rest are untouched. `fractional_delay` and the
+coloured-noise generators of `noise_signal` are general-purpose DSP tools with
+no governing standard of their own, and their accuracy claims are closed-form,
+not normative.
 
 ## See also
 
@@ -2936,6 +3091,32 @@ machinery used to verify the shaped sweep is the
 [calibrated spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/) page,
 and the equalized responses feed the same downstream chain as every
 [impulse response](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/).
+
+## What this guide covers
+
+**Covered.** The complementary Golay pair (Golay 1961; Havelock, Kuwano &
+Vorländer eds., 2008, Part I Ch. 6 by Xiang): the append recursion, the exact
+complementary-autocorrelation identity and the summed-correlation recovery, in
+`golay_pair` and `golay_impulse_response`. The group-delay sweep synthesis of
+Müller & Massarani (2001, Secs. 4.2-4.3), in `shaped_sweep_signal`. The
+frequency-dependent Tikhonov regularization of Kirkeby & Nelson (1999, Eq. 17
+and Sec. 2.4), in `regularized_inverse_filter`.
+
+**Not covered.** These are measurement-engineering methods from the
+transfer-function literature rather than a certification standard, so no
+compliance clause exists to check them against. Kirkeby & Nelson's original
+inversion targets multi-loudspeaker reproduction, with a matrix regularization
+for crosstalk cancellation between channels; `regularized_inverse_filter`
+implements the single-channel, scalar case of their Eq. 17 and nothing else.
+
+## See also
+
+- [Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 18233 sweep and MLS excitations the Golay pair sits beside.
+- [Swept-sine distortion](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/): reading the harmonic packets a sweep separates out.
+- [Loudspeakers](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/): the reference axis, distance and free-field conditions the measured response needs.
+- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): the Welch machinery that verifies the shaped sweep, and the smoothing the inversion wants first.
+- [Correlation and delay](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/): the loopback measurement that aligns the two Golay records.
+- API reference: [`signals.inversion`](https://jmrplens.github.io/phonometry/reference/api/signals/inversion/).
 
 ## References
 

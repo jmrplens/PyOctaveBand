@@ -1247,7 +1247,12 @@ models of decreasing scope rather than three alternatives.
 These are the works behind emission rather than immission. Munjal is the
 reference for ducts and mufflers and the source of the transfer-matrix
 formulation; Fahy is the one to open for intensity, where the finite-difference
-approximation and its errors are derived rather than asserted.
+approximation and its errors are derived rather than asserted. The last six
+entries are the broadcast-loudness chain, which is a normative stack of its own:
+ITU-R BS.1770 defines the algorithms, EBU R 128 fixes the target level and the
+ceiling, and the three EBU Tech documents supply the meter behaviour, the
+loudness range and the production practice — together with the test signals the
+implementation is validated against.
 
 - Fahy, F. J. (1995). *Sound intensity* (2nd ed.). E&FN Spon.
   ISBN 978-0-419-19810-9.
@@ -1320,6 +1325,46 @@ approximation and its errors are derived rather than asserted.
   closed-form inverse-filter spectrum used for the deconvolution and the
   fractional-sample separation. Cited by
   [Swept-sine distortion and phase utilities](/phonometry/devices/electroacoustics/swept-sine-distortion/).
+- International Telecommunication Union. (2023). *Algorithms to measure audio
+  programme loudness and true-peak audio level*
+  (Recommendation ITU-R BS.1770-5 (11/2023)).
+  [ITU-R publication](https://www.itu.int/rec/R-REC-BS.1770).
+  The K-weighting pre-filter (Annex 1, Tables 1-2), the channel-weighted
+  loudness and its two-stage gating (Annex 1, Formulae 1-7 and Table 3), the
+  true-peak estimation guidelines (Annex 2) and the position-dependent channel
+  weights for advanced sound systems (Annex 3, Tables 4-5).
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness normalisation and permitted
+  maximum level of audio signals* (EBU R 128).
+  [tech.ebu.ch/publications/r128](https://tech.ebu.ch/publications/r128).
+  The −23.0 LUFS target level, the −1 dBTP ceiling and the normalisation
+  practice built on them.
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness metering: 'EBU Mode' metering
+  to supplement loudness normalisation* (EBU Tech 3341).
+  [tech.ebu.ch/publications/tech3341](https://tech.ebu.ch/publications/tech3341).
+  The momentary, short-term and integrated time scales, and the Table 1
+  minimum-requirements test signals with their tolerances, which are
+  synthesizable and are what the implementation is checked against.
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Loudness range: A measure to supplement
+  loudness normalisation* (EBU Tech 3342).
+  [tech.ebu.ch/publications/tech3342](https://tech.ebu.ch/publications/tech3342).
+  The loudness range algorithm, its reference implementation and its Table 1
+  test signals, matched to ±1 LU.
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
+- European Broadcasting Union. (2023). *Guidelines for production of programmes
+  in accordance with EBU R 128* (EBU Tech 3343).
+  [tech.ebu.ch/publications/tech3343](https://tech.ebu.ch/publications/tech3343).
+  The production practice behind the numbers: what to normalise, when, and what
+  a loudness target does and does not constrain.
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
+- Steinmetz, C. J., & Reiss, J. D. (2021). pyloudnorm: A simple yet flexible
+  loudness meter in Python. *150th AES Convention*.
+  [github.com/csteinmetz1/pyloudnorm](https://github.com/csteinmetz1/pyloudnorm).
+  An independent BS.1770 implementation, useful as a cross-check on a
+  gated-loudness result.
+  Cited by [Programme Loudness & True Peak](/phonometry/devices/broadcast/program-loudness/).
 
 ## Wave simulation
 

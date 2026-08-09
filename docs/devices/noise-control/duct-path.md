@@ -685,6 +685,36 @@ where the plane-wave assumption is structural rather than statistical, and
 where the peaks and troughs of a computed transmission loss simply do not
 survive past cut-on.
 
+## What this guide covers
+
+**Covered.** The fan source (`fan_sound_power`, `fan_efficiency_correction`,
+`blade_passing_frequency`, `fan_casing_attenuation`; Long Eq. 13.1 with
+Tables 13.5-13.8); the run attenuations (lined and unlined rectangular and
+circular ducts, `flexible_duct_insertion_loss`, `elbow_insertion_loss`,
+`split_loss`, `end_reflection_loss` in both published methods,
+`splitter_silencer_insertion_loss`, `plenum_attenuation`); the regenerated
+noise (`silencer_self_noise`, `flow_noise_straight_duct`, `flow_noise_bend`,
+`diffuser_sound_power`, and the ASHRAE Chapter 49 screening rules
+`air_terminal_velocity_limit` and `air_terminal_damper_correction`);
+`room_effect` and the criterion machinery; the cascade itself (`duct_path`,
+`combine_duct_paths`, `.table()`, `.report()`); and the `duct_modes` cut-on
+analysis.
+
+**Not covered.** Nothing is predicted where the manufacturer publishes it: the
+sheet expects the published fan and terminal figures. There is no dissipative
+liner model — the splitter estimate is a lined-duct regression and the plenum
+is Wells' closed form — and above the first cut-on the element models rest on
+their empirical fit alone. Four paths of a real installation sit outside the
+calculation entirely, which is usually why a passing sheet meets a failing
+room: **duct breakout** from a trunk radiating through its own walls into a
+space it merely crosses; **break-in and crosstalk** between two rooms served by
+the same run, whatever the partition between them; **structure-borne
+transmission** of fan vibration through hangers, plinths and slab, whose
+dynamic transfer stiffness belongs to
+[Transfer stiffness (ISO 10846)](../../vibration/structural/transfer-stiffness.md);
+and the **octave resolution itself**, which averages a blade-passing tone into
+its band and so understates how a pure tone will be judged.
+
 ## See also
 
 - [Silencers](silencers.md): the reactive four-pole elements (expansion

@@ -266,6 +266,25 @@ subtract; the `residual` field is the record with the synchronous part
 removed, which is exactly what the envelope spectrum should be run on once
 the strong gear components no longer mask the modulation.
 
+## What this guide covers
+
+**Covered.** McFadden's revised model for time domain averaging (*Mechanical
+Systems and Signal Processing*, 1987): the comb-filter description of the
+average (Eq. 8, magnitude Eq. 9) in `comb_filter_response`, the square-root
+noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
+and the choice of $N$ that places a comb node on an interfering order,
+following the paper's own 32.05-order example. `time_synchronous_average` also
+implements the band-limited fractional-delay alignment used when $f_s T$ is not
+an integer.
+
+**Not covered.** Synchronous averaging needs a period it is given. Finding that
+period, or detecting periodic families without one, is the job of the
+[cepstrum](cepstrum-echoes.md), and locating amplitude-modulation
+periodicities such as bearing faults is the
+[envelope spectrum](cepstrum-echoes.md#5-the-envelope-spectrum-modulations-as-lines);
+neither is on this page. McFadden's paper is not a certification standard, so
+there is no compliance clause to check the implementation against.
+
 ## See also
 
 - [Cepstrum and echoes](cepstrum-echoes.md): reference-free detection of

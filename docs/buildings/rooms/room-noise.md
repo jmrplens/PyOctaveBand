@@ -248,6 +248,25 @@ repository. Click a preview to open the PDF:
 
 *Room Criteria fiche (`RCResult.report`), the RC rating and its spectral tag.*
 
+## See also
+
+- [Room Acoustics](room-acoustics.md): the ISO 3382
+  decay parameters of the same room, measured from an impulse response.
+- [Reverberation-time prediction](reverberation-prediction.md)
+  and
+  [Sound absorption in enclosed spaces](enclosed-space-absorption.md):
+  the absorption that lowers a whole spectrum once the tag says the character
+  is right.
+- [Speech Transmission Index](../../perception/speech/speech-transmission.md):
+  the intelligibility that both criterion families were built to protect.
+- [Levels](../../signals/levels/levels.md) and
+  [Filter Banks](../../signals/filters/filter-banks.md): the octave-band
+  measurement that produces the input spectrum.
+- [Field Insulation Measurement (ISO 16283)](../insulation/insulation-field.md):
+  when the source is next door rather than overhead.
+- API reference: [`room.noise_criteria`](https://jmrplens.github.io/phonometry/reference/api/rooms/noise-criteria/).
+- Theory: [Room noise criteria (ANSI S12.2)](../../reference/theory/rooms-buildings.md#room-noise-criteria-ansi-s122): how the NC, RC Mark II and NR families are constructed and what each was designed to penalise.
+
 ## References
 
 - Beranek, L. L. (1957). Revised criteria for noise in buildings. *Noise

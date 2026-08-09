@@ -183,6 +183,14 @@ res.plot()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo.svg" alt="Power cepstrum of an impulse response with one reflection against quefrency in milliseconds: a sharp positive spike at exactly 8 milliseconds marked as the detected echo, a smaller negative second rahmonic at 16 milliseconds, the low-quefrency source envelope outside the shaded searched band, and a dashed line at the true delay" width="82%" loading="eager" />
 
+*The cepstrum reads the echo off the axis rather than off the waveform: the
+detected peak lands at 8.000 ms and stands 0.488 high against the true
+$a = 0.5$. The confirmation is the small **negative** spike at 16.0 ms, −0.126
+against the series' $-a^2/2 = -0.125$: an unrelated spectral periodicity has no
+reason to produce an alternating rahmonic train, so the second spike is what
+separates an echo from a coincidence. Everything left of the shaded band is the
+source's own envelope, which is why the search starts above it.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -449,6 +457,14 @@ res.plot()
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum.svg" alt="Envelope spectrum of an amplitude-modulated one kilohertz tone in noise against frequency up to one hundred hertz: a single sharp line at the twenty-five hertz modulation frequency reaching exactly the dotted reference at amplitude zero point four, with a flat noise floor elsewhere" width="82%" loading="eager" />
+
+*The line is not proportional to the modulation, it **is** the modulation: with
+$f_m$ on an analysis bin the magnitude detector reads 0.3996 against the closed
+form $A_0 m = 0.4$, and `mean_level` reads 1.001 against $A_0 = 1$. That is the
+point of the scaling by the taper's coherent gain — the ordinate is a modulation
+depth, not an arbitrary level. Around it the floor sits near 5×10⁻⁴, so the
+line stands about 58 dB clear even with white noise at 3 % of the carrier, which
+is why the chain finds bearing defects that the carrier's own spectrum hides.*
 
 <details>
 <summary>Show the code for this figure</summary>

@@ -210,6 +210,21 @@ installed floor's $f_0$ from Formula 2: the floating floor only improves
 insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
 heavy slab) is the design goal.
 
+## See also
+
+- [Predicting Resilient-Layer Performance](../../buildings/design/resilient-layers.md):
+  what the design side does with $s'$, from the mass-spring resonance to the
+  improvement laws above it and their weighted single number.
+- [Predicting Sound Insulation (EN 12354)](../../buildings/design/insulation-prediction.md):
+  the floating-floor term this measurement feeds.
+- [Airflow Resistance](../absorbers/airflow-resistance.md): the
+  ISO 9053 determination of the lateral resistivity $r$ that clause 8.2 needs,
+  reported there as $\sigma$ in Pa·s/m².
+- [Resilient layers overview](index.md): where this
+  measurement sits among the materials guides.
+- API reference: [`materials.resilient.dynamic_stiffness`](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/).
+- Theory: [Point mobilities and radiation efficiency](../../reference/theory/vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29): the mass-spring resonance the EN 29052-1 rig measures, seen as a mobility.
+
 ## References
 
 - Vigran, T. E. (2008). *Building acoustics*. CRC Press.

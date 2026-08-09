@@ -272,6 +272,19 @@ ISO 10140-2:2010, ISO 10140-3:2010 and ISO 10140-4:2010, which provide the
 laboratory $R$ and $L_n$ with the background-noise correction and the measurement
 procedures behind them.
 
+**Not covered.** The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and
+**ISO 10140-5:2010** facility and mounting requirements are documented above
+and implemented nowhere: nothing checks the position counts, the separations,
+the averaging times, the band range, the test-opening geometry or the
+loss-factor requirement. The mounting condition survives only as free text in
+the report metadata — which is what ISO 10140-1 asks for, since it requires a
+mounting to be *described* rather than picked from a list. Nothing estimates
+the suite's $R'_\text{max}$ either, so a result approaching the facility's
+ceiling is produced without complaint; that qualification comes from the
+laboratory's own Annex A tests. The neighbouring laboratory measurements have
+their own pages: intensity (ISO 15186), the floor-covering improvement
+(ISO 16251-1) and flanking transmission (ISO 10848).
+
 ## See also
 
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md):

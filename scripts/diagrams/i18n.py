@@ -10,6 +10,18 @@ both languages and are shared.
 
 from __future__ import annotations
 
+import os
+import sys
+
+# The miss recorder sits at the top of ``scripts/``, next to the checker that
+# reads what it writes; guard the path the way the other cross-imports in
+# ``scripts/`` do (see check_figures.py).
+_SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _SCRIPTS not in sys.path:
+    sys.path.insert(0, _SCRIPTS)
+
+import figure_language_audit as _audit
+
 # Spanish variants of every user-visible string. Strings not in the table
 # (numbers, unit-only labels, code identifiers) are shared between languages.
 _ES: dict[str, str] = {
@@ -3629,3 +3641,24 @@ _ES: dict[str, str] = {
     "and no later check can detect it":
         "y ninguna comprobación posterior lo detecta",
 }
+
+
+def visit(name: str, lang: str) -> None:
+    """Name the plate and the pass the following lookups belong to."""
+    _audit.visit(name, lang)
+
+
+def lookup(s: str, *, translate: bool) -> str:
+    """The Spanish rendering of *s* when *translate*, otherwise *s* itself.
+
+    Both passes come through here, and the one that does not translate still
+    reports: this is the only place that knows the table had no entry for a
+    string, and a plate label that never reached :data:`_ES` is drawn in
+    English inside ``*_es.svg`` with nothing downstream able to tell that
+    from a label that reads the same in both languages. See
+    ``scripts/figure_language_audit.py``.
+    """
+    if s in _ES:
+        return _ES[s] if translate else s
+    _audit.untranslated(s)
+    return s

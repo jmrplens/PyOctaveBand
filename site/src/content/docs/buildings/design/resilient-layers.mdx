@@ -195,6 +195,15 @@ carries the nulls where they belong.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/soft_covering_prediction.svg" alt="Predicted improvement of impact sound insulation of two soft floor coverings on a 140 mm concrete slab: a stiff PVC covering whose cut-off frequency of 2318 Hz leaves it useless across the building acoustics range, and a resiliently backed covering whose 100 Hz cut-off gives 70 dB by 5 kHz, each against its two-line 12 dB per octave estimate" width="80%" />
 
+*Two 5 mm coverings on the same slab, differing only in modulus, and the whole
+distance between them is $f_\text{co}$. The stiff PVC puts it at 2318 Hz, above
+most of the rating range, so it is still worth 3.4 dB at 3150 Hz and buys
+nothing where footfall lives; the resiliently backed one at 100 Hz is already
+worth 17.0 dB at 250 Hz and reaches 69.6 dB at 5 kHz. Above $f_\text{co}$ both
+climb at 12 dB per octave, and the dotted two-line construction tracks the band
+values within about 3 dB except around the transform's nulls, where the 315 Hz
+band runs 7.8 dB high.*
+
 <details>
 <summary>Show the code for this figure</summary>
 
@@ -281,6 +290,13 @@ optimistic in precisely the band that decides the rating. Check where $f_0$
 lands before trusting the number.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Improvement of impact sound insulation of a 35 mm floating screed of 73.5 kg per square metre on an 8 meganewton per cubic metre resilient layer: nothing below the 52.8 Hz mass-spring resonance, then the 30 lg law of EN 12354-2 reaching 59 dB at 5 kHz against the steeper 40 lg law of Cremer and the 18 dB per octave branch that includes the tapping-machine hammer impedance" width="80%" />
+
+*Identical $s'$ and $m'$, identical 52.8 Hz resonance, nothing below it — and
+three answers that part company immediately above: at 1 kHz 38.3, 51.1 and
+57.8 dB, at 5 kHz 59.3, 79.1 and 98.7 dB. Choosing the branch is choosing the
+answer, and the choice is a statement about the screed's internal damping and
+the walking surface's impedance, not about the resilient layer, which is the
+same in all three.*
 
 <details>
 <summary>Show the code for this figure</summary>

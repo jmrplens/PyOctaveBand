@@ -531,6 +531,13 @@ module, together with the guidance for choosing between them and these
 closed forms, have their own guide:
 [Underwater propagation solvers](underwater-solvers.md).
 
+## See also
+
+- [Underwater propagation solvers](underwater-solvers.md):
+  the normal-mode, ray-tracing and parabolic-equation solvers for the cases
+  where these closed forms are not enough, and the model-selection guidance.
+- API reference: [`underwater.propagation.closed_form`](https://jmrplens.github.io/phonometry/reference/api/underwater/closed-form/) and [`underwater.propagation.sound_speed`](https://jmrplens.github.io/phonometry/reference/api/underwater/sound-speed/).
+
 ## References
 
 - Francois, R. E., & Garrison, G. R. (1982). Sound absorption based on ocean

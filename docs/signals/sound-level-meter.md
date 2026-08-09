@@ -186,6 +186,28 @@ The meter built here is the trunk; the rest of the core grows from it.
 - [Block Processing](filters/block-processing.md): turn this page's
   offline meter into a streaming one with carried filter state.
 
+## What this guide covers
+
+**Covered.** This page composes stages implemented elsewhere into the pipeline
+IEC 61672-1:2013 describes: the A frequency weighting and the Fast exponential
+detector, $L_{Aeq}$, the percentile levels, the sound exposure level and the
+C-weighted peak, the IEC 61260-1:2014 octave filters of `octave_filter`, and
+the Table 3 (weighting) and Table 1 (filter) class acceptance limits checked by
+`verify_weighting_class` and `verify_filter_class`. Each stage's own guide
+states its coverage in detail.
+
+**Not covered.** `verify_weighting_class` and `verify_filter_class` check the
+frequency-response *design* of the digital filters against the standards'
+tables. They do not run the IEC 61672-2:2013 pattern-evaluation tests a
+physical instrument needs for type approval — self-generated noise, linearity
+range, overload indication, directional response — nor the IEC 61672-3:2013
+periodic tests a working instrument receives. A class verdict from this page
+describes an algorithm, not a built device, and the screening checks of the
+last section screen the *recording*, not the instrument. The IEC 60942:2017
+calibrator conformance tests are not run here either; see
+[Calibration and dBFS](metrology/calibration.md) for exactly what
+`sensitivity()` does and does not check.
+
 ## See also
 
 - API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/),

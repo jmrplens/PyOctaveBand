@@ -39,6 +39,13 @@ DOCS = ROOT / "docs"
 #: these prefixes are generated or site-only, so a relative link would dangle.
 SITE_ONLY_PREFIXES = ("reference/api",)
 
+#: Site routes whose mirror counterpart is not a file of the same name. The
+#: guides index is the clearest case: on the site it is ``start/guides``, in the
+#: mirror it is ``docs/README.md`` itself, so the generated overviews used to
+#: send a GitHub reader off to the website for a page sitting one directory up
+#: in the same repository.
+ROUTE_ALIASES = {"start/guides": "README.md"}
+
 SITE_BASE = "https://jmrplens.github.io/phonometry"
 
 
@@ -85,6 +92,13 @@ PLANNED: set[Path] = set()
 def _relative_link(from_route: str, to_route: str) -> str | None:
     """The mirror-relative path from one route's index to another page, if
     that page has, or will have, a mirror file."""
+    alias = ROUTE_ALIASES.get(to_route)
+    if alias is not None:
+        target = DOCS / alias
+        if not target.exists():
+            return None
+        here = (DOCS / from_route / "index.md").parent
+        return os.path.relpath(target, here).replace(os.sep, "/")
     target = DOCS / f"{to_route}.md"
     if not target.exists():
         target = DOCS / to_route / "index.md"
@@ -121,6 +135,49 @@ def render(page: Path) -> tuple[Path, str]:
     return _mirror_path(route), head + body
 
 
+#: Mirror files that legitimately do not open with the index backlink: the
+#: README is the index, and the other two are generated elsewhere and start
+#: with an HTML comment.
+_NO_BACKLINK = {"README.md", "CONFORMANCE.md", "ERRATA.md"}
+
+_BACKLINK = "← [Documentation index]("
+
+
+def _readme_links_every_overview() -> list[str]:
+    """Overview mirrors ``docs/README.md`` does not link.
+
+    ``generate_llms.py::_check_readme_covers_the_mirror`` exempts the index
+    files "because the README's section structure is its own index of the
+    folders". That rationale was false for as long as the README was one flat
+    list of guides and linked none of the 35 generated overviews; this is the
+    assertion that makes it true.
+    """
+    readme = (DOCS / "README.md").read_text(encoding="utf-8")
+    return [
+        path.relative_to(DOCS).as_posix()
+        for path in sorted(PLANNED)
+        if f"({path.relative_to(DOCS).as_posix()})" not in readme
+    ]
+
+
+def _pages_without_the_index_backlink() -> list[str]:
+    """Mirror pages whose first line is not the documentation-index backlink.
+
+    It is the mirror's only upward navigation — the guides do not link their
+    section overview — so a page without it strands a reader who arrived from a
+    search result. One page lost it and nothing noticed.
+    """
+    missing: list[str] = []
+    for path in sorted(DOCS.rglob("*.md")):
+        rel = path.relative_to(DOCS)
+        if rel.parts[0] == "superpowers" or rel.as_posix() in _NO_BACKLINK:
+            continue
+        first = path.read_text(encoding="utf-8").split("\n", 1)[0]
+        if not first.startswith(_BACKLINK):
+            missing.append(rel.as_posix())
+    return missing
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="fail on drift instead of writing")
@@ -145,6 +202,22 @@ def main() -> int:
             print(
                 f"{len(stale)} stale overview mirror(s): {', '.join(stale)}. "
                 "Run `python scripts/mirror_overviews.py`.",
+                file=sys.stderr,
+            )
+            return 1
+        unlinked = _readme_links_every_overview()
+        if unlinked:
+            print(
+                "docs/README.md links none of these overview pages: "
+                + ", ".join(unlinked),
+                file=sys.stderr,
+            )
+            return 1
+        stranded = _pages_without_the_index_backlink()
+        if stranded:
+            print(
+                "mirror pages without the documentation-index backlink: "
+                + ", ".join(stranded),
                 file=sys.stderr,
             )
             return 1

@@ -94,6 +94,64 @@ the air power-attenuation coefficient of the reverberation formulae, in 1/m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%" loading="eager" />
 
+*The four models of this page as a map, each panel a section below. Top left,
+the single leaf: 6 dB per octave until Sharp's coincidence dip, 11.9 dB under
+the mass law in the 2.5 kHz band. Top right, splitting the same 24 kg/m² in
+two: 3.4 dB **worse** than one leaf at the 89 Hz mass-spring resonance and
+47.7 dB better at 5 kHz. Bottom left, radiation efficiency: 0.011 at 100 Hz,
+2.61 at coincidence, and only slowly back towards 1. Bottom right, the leak
+that ends the argument — 1 % of the area left open holds $R$ at 20.0 dB no
+matter what the wall is worth.*
+
+<details>
+<summary>Show the code for the concept figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (
+    coincidence_frequency, composite_transmission_loss,
+    double_wall_transmission_loss, mass_law_transmission_loss,
+    mass_spring_mass_resonance, plate_bending_stiffness,
+    radiation_efficiency, single_panel_transmission_loss,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
+fig, ax = plt.subplots(2, 2, figsize=(12, 9))
+
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(15.0, bp)
+ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
+sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
+ax[0, 0].semilogx(bands, ml, "--", label="field-incidence mass law")
+ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="single panel R (Sharp)")
+ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Single panel")
+
+dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
+ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="single leaf")
+ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="double wall")
+ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
+ax[0, 1].set_title("Double wall")
+
+sig = radiation_efficiency(bands, 1.5, 1.25, fc)
+ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
+ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Radiation efficiency")
+
+wall = sp.transmission_loss
+comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
+ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="solid wall")
+ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="wall + 1 % slit")
+ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Composite with aperture")
+
+for a in ax.flat:
+    a.set_xlabel("Frequency [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
+fig.suptitle("Theoretical panel sound insulation")
+fig.tight_layout(); plt.show()
+```
+
+</details>
+
 ## Single panel: the mass law and coincidence (Bies 7.2)
 
 A limp, non-stiff panel transmits sound by being driven bodily by the incident
@@ -593,7 +651,10 @@ up, and they open a structure-borne path from one leaf to the other.
 
 *Left: a soft tie rolls the structure-borne coupling off as $1/f^3$, a stiff
 one stays on the rigid ceiling for another two octaves. Right: the same ties
-lift the resonance from 26 Hz to 50 Hz, extending the combined-mass branch.*
+lift the resonance from 26 Hz to 50 Hz, extending the combined-mass branch.
+Both panels are built by the two snippets of this section: the right one by
+`double_wall_transmission_loss` with and without `tie_stiffness_per_area`, the
+left one by `wall_tie_coupling_loss_factor(...).plot()`.*
 
 **The tie as a spring (Hopkins Eq. 4.89).** A tie is characterised by a single
 number, its dynamic stiffness $s_{X\,\text{mm}}$ at a cavity width $X$,
@@ -881,68 +942,19 @@ w = injected_power(force=10.0, mobility=1.0 / z_plate)
 print(round(float(w) * 1e3, 3), "mW")                 # W = |F|^2 / (16 sqrt(B' m''))
 ```
 
-<details>
-<summary>Show the code for the concept figure</summary>
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from phonometry import (
-    coincidence_frequency, composite_transmission_loss,
-    double_wall_transmission_loss, mass_law_transmission_loss,
-    mass_spring_mass_resonance, plate_bending_stiffness,
-    radiation_efficiency, single_panel_transmission_loss,
-)
-
-bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
-fig, ax = plt.subplots(2, 2, figsize=(12, 9))
-
-bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-fc = coincidence_frequency(15.0, bp)
-ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
-sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
-ax[0, 0].semilogx(bands, ml, "--", label="field-incidence mass law")
-ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="single panel R (Sharp)")
-ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Single panel")
-
-dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
-ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="single leaf")
-ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="double wall")
-ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
-ax[0, 1].set_title("Double wall")
-
-sig = radiation_efficiency(bands, 1.5, 1.25, fc)
-ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
-ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Radiation efficiency")
-
-wall = sp.transmission_loss
-comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
-ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="solid wall")
-ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="wall + 1 % slit")
-ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Composite with aperture")
-
-for a in ax.flat:
-    a.set_xlabel("Frequency [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
-fig.suptitle("Theoretical panel sound insulation")
-fig.tight_layout(); plt.show()
-```
-
-</details>
-
 ### Function parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `mass_per_area` | float | kg/m² | > 0 | Surface density $m''$ |
 | `critical_frequency` / `bending_stiffness` | float | Hz / N·m | give one | Coincidence $f_c$, or $B'$ to compute it |
-| `loss_factor` | float | — | > 0, default `0.01` | Total loss factor $\eta$ |
+| `loss_factor` | float | — | > 0; default `0.01` single panel, `0.1` double wall | Total loss factor $\eta$ |
 | `band` | str | — | `'third'` (−5.5 dB) / `'octave'` (−4.0 dB) | Field-incidence correction width |
 | `mass1` / `mass2` | float | kg/m² | > 0 | Double-wall leaf surface densities |
 | `gap` | float | m | > 0 | Cavity depth $d$ |
 | `cavity_medium` | `PorousMediumResult` | — | default `None` | Porous fill; lowers $f_0$ |
-| `width` (slit) | float | m | > 0 | Slit width $w$. Third positional argument of `slit_transmission_coefficient`, **second** of `slit_resonance_frequencies` |
-| `depth` (slit) | float | m | > 0 | Slit depth $d$ (the wall thickness). Fourth positional argument of `slit_transmission_coefficient`, **first** of `slit_resonance_frequencies` |
+| `width` (slit) | float | m | > 0 | Slit width $w$. **Second** positional argument of both `slit_transmission_coefficient` and `slit_resonance_frequencies` |
+| `depth` (slit) | float | m | > 0 | Slit depth $d$ (the wall thickness). **Third** positional argument of `slit_transmission_coefficient`, **first** of `slit_resonance_frequencies` — the two functions take the pair in opposite orders |
 | `field` / `position` (slit) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Incident field and slit location |
 | `radius` / `depth` (hole) | float | m | > 0 | Circular-aperture radius $a$ / depth $d$ |
 | `areas` / `reduction_indices` | seq | m² / dB | length $N$ | Composite elements (1-D or (N, bands)) |

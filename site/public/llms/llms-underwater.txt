@@ -127,7 +127,7 @@ above, where the quantity system of ISO 18405 is introduced with them.
 
 If you arrived here from a search and want the shape of the whole library,
 [What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
-and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+and [All guides](https://jmrplens.github.io/phonometry/) lists every page with a line on
 each.
 
 ---
@@ -371,6 +371,16 @@ The natural companion is the sonar-equation chapter of
 merit machinery that gives a sonar detection range gives the range at which a
 piling campaign's weighted exposure falls below a criterion.
 
+## See also
+
+- [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/):
+  the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
+  feed this page.
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
+  the transmission loss and figure-of-merit machinery that turns a criterion
+  into a range.
+- API reference: [`underwater.bioacoustics.weighting`](https://jmrplens.github.io/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](https://jmrplens.github.io/phonometry/reference/api/underwater/audiograms/).
+
 ## References
 
 - National Marine Fisheries Service (2018). *2018 Revision to: Technical
@@ -602,6 +612,18 @@ in exactly the quantities of this section, a cap on the single-strike or
 cumulative SEL and on the peak level at a stated range, which is why
 `pile_strike_metrics` reports them together and `cumulative_sel` follows the
 strike-by-strike energy sum of Formulae 8–9.
+
+## See also
+
+- [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/):
+  the assessment the criteria named in section 3 are applied through — auditory
+  weighting, accumulation over the strikes and the margin against the published
+  onset criteria.
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
+  the transmission loss that carries these source levels to a receiver, and the
+  sonar equation they feed.
+- API reference: [`underwater.acoustics`](https://jmrplens.github.io/phonometry/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.sources.ship_radiated_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/ship-radiated-noise/).
+- General underwater propagation modelling (ray, normal mode, parabolic equation) is covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 
 ## References
 
@@ -1171,6 +1193,13 @@ and the normal-mode, ray-tracing and parabolic-equation solvers of the
 module, together with the guidance for choosing between them and these
 closed forms, have their own guide:
 [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
+
+## See also
+
+- [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
+  the normal-mode, ray-tracing and parabolic-equation solvers for the cases
+  where these closed forms are not enough, and the model-selection guidance.
+- API reference: [`underwater.propagation.closed_form`](https://jmrplens.github.io/phonometry/reference/api/underwater/closed-form/) and [`underwater.propagation.sound_speed`](https://jmrplens.github.io/phonometry/reference/api/underwater/sound-speed/).
 
 ## References
 

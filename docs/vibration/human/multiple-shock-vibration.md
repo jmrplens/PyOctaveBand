@@ -230,6 +230,12 @@ repository. Click the preview to open the PDF:
 *Whole-body multiple-shock health-risk fiche (`MultipleShockResult.report`), the
 ISO 2631-5:2018 Annex C worked example with the Table C.2 risk classification.*
 
+## See also
+
+- [Human Vibration](human-vibration.md): the ISO 2631-1 chain this page hands back to for the horizontal axes, and the crest factor and clause 6.3.3 ratios that decide whether a record belongs here at all.
+- API reference: [`vibration.human.multiple_shock`](https://jmrplens.github.io/phonometry/reference/api/vibration/multiple-shock/).
+- Theory: [Multiple shocks (ISO 2631-5)](../../reference/theory/vibration.md#multiple-shocks-iso-2631-5): the ISO 2631-5 response model, the acceleration dose and the Weibull risk law.
+
 ## References
 
 - Griffin, M. J. (1996). *Handbook of human vibration*. Academic Press.

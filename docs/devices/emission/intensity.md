@@ -493,6 +493,16 @@ the microphones alone.
 See [Theory](../../reference/theory/signal-analysis.md) for the derivations and [Calibration](../../signals/metrology/calibration.md)
 for absolute scaling of the two channels.
 
+## See also
+
+- [Sound Power by Intensity Scanning](sound-power-intensity.md) — the ISO 9614-2/-3 routes that consume $\delta_{pI}$, the field indicators and the dynamic capability.
+- [Sound Power](sound-power.md) — choosing between the intensity, pressure and reverberation-room routes.
+- [Sound power from surface vibration](vibration-sound-power.md) — the ISO/TS 7849-2 radiation factor needs an intensity-measured power.
+- [Calibration](../../signals/metrology/calibration.md) — the absolute scaling of the two channels the estimator assumes.
+- [Theory: signal analysis](../../reference/theory/signal-analysis.md) — the cross-spectral derivation behind $I(f) = -\mathrm{Im}\{G_{12}\}/(2\pi f \rho_0 \Delta r)$.
+- API reference: [`emission.intensity`](https://jmrplens.github.io/phonometry/reference/api/power/intensity/).
+- Theory: [Sound intensity (IEC 61043)](../../reference/theory/signal-analysis.md#sound-intensity-iec-61043): the finite-difference approximation behind a p-p probe and the errors it commits.
+
 ## References
 
 - Fahy, F. J. (1995). *Sound intensity* (2nd ed.). E&FN Spon.
@@ -535,3 +545,16 @@ field indicators $F_1$ (equations (A.1)–(A.2), evaluated in the initial test
 of clause 8.2 and again per Annex B, B.1.4), $F_2$, $F_3$ and $F_4$, the
 Table B.3
 temporal-variability limit and the dynamic-capability criterion (Annex B).
+
+**Not covered.** ISO 9614-1's own sound-power determination, clauses 8 and 9,
+which sums the partial powers $I_i S_i$ over the discrete points into $L_W$, is
+not implemented: `sound_intensity` and `field_indicators` report intensity and
+field quality, not a summed power. The scanning routes that do compute $L_W$
+from intensity, ISO 9614-2 and **ISO 9614-3**, are in
+[Sound power by intensity scanning](sound-power-intensity.md). The residual-
+intensity *test* of IEC 61043 is not performed here either: $\delta_{pI0}$ is a
+value the caller measures on their own probe-and-analyser chain, with the
+spacer that will be fitted, and supplies — what the library does with the
+number is grade it against Table 2. The before-use check of clause 14 and the
+ISO 9614-2 probe-reversal test are procedures, not functions.
+

@@ -283,6 +283,19 @@ jobs:
       # holds hairlines to 3:1 and thicker lines to 2:1, with the grid and axis
       # furniture exempt because they are drawn to recede.
       run: python scripts/check_stroke_contrast.py
+    - name: Check the Spanish figures are in Spanish
+      # The Spanish variant of a figure is the English one with its strings
+      # looked up in a table at save time, so a string nobody added to the
+      # table ships in English inside `X_es.svg` while every other gate stays
+      # green: the page is Spanish, the i18n parity gate sees a translated
+      # page, this job sees a figure that matches its generator, and the
+      # figure is in English. That is how roughly two hundred of them reached
+      # the tree. The lookup itself writes down what it could not translate,
+      # during the `make graphs` above (no second render, and it cannot change
+      # a rendered byte), and this fails on any untranslated string the
+      # committed baseline does not already record -- and on a baseline line
+      # that has been paid off and not deleted.
+      run: python scripts/check_figure_language.py
 
   # The Python snippets printed in the guides must run. They are the first
   # thing a reader copies, and nothing executed them until this job existed:

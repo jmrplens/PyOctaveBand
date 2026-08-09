@@ -99,6 +99,17 @@ $m = \alpha/(10 \log_{10} e)$, exposed as `air_attenuation_m`.
 
 *The ISO 9613-1 coefficient for the 20 °C, 50 % relative-humidity reference atmosphere: the $f^2$ rise spans two decades from 50 Hz to 10 kHz.*
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha.svg" alt="ISO 9613-1 atmospheric absorption coefficient in decibels per kilometre against frequency from 50 Hz to 10 kHz on log-log axes, drawn for four atmospheres: 20 degrees Celsius at 50 percent relative humidity, 20 degrees Celsius at 10 percent, 0 degrees Celsius at 70 percent and 30 degrees Celsius at 80 percent, the dry warm curve lying well above the others through the mid frequencies and the curves converging at the top of the band" width="88%"></picture>
+
+*The humidity claim of the paragraph above, drawn: four atmospheres, and a
+spread far wider than the $\pm 10$ % claimed for any one of them. At 2 kHz the
+coefficient is 9.9 dB/km at the 20 °C / 50 % reference and **45.5 dB/km** at the
+same temperature and 10 % humidity — a factor 4.6 from humidity alone, worth
+36 dB over a kilometre. Note which way it goes: drying the air *increases* the
+mid-band attenuation, because the oxygen relaxation frequency falls with
+humidity and drags its peak down into the band. Temperature moves the curves far
+less: 0 °C at 70 % and 20 °C at 50 % differ by 0.02 dB/km at 1 kHz.*
+
 ### Outdoor propagation, general method (ISO 9613-2)
 
 ISO 9613-2:1996 predicts the octave-band level at a receiver **downwind** of a
@@ -170,6 +181,8 @@ homogeneous exposure group (Eq. 11) and normalises the effective-day duration
 (Eq. 12); the *full-day* method (Clause 11) does the same arithmetic on whole-day
 measurements (Eq. 13).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dosimeter_iso9612_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dosimeter_iso9612.svg" alt="Left: a worker wearing a personal sound exposure meter (IEC 61252), its microphone mounted about 0.04 m above the shoulder and at least 0.1 m from the entrance of the most-exposed ear canal, per ISO 9612 Clause 12.3. Right: the three measurement strategies drawn as timelines over an eight-hour working day, task-based (the day split into labelled tasks, at least three samples plus a duration each), job-based (five or more random samples spread over the homogeneous exposure group) and full-day (the whole shift measured at least three times), all feeding the LEX,8h and its Annex C uncertainty, chosen by work pattern from Table B.1" width="92%"></picture>
+
 The **Annex C** uncertainty budget is normative. The combined standard
 uncertainty is $u^2 = \sum c_i^2 u_i^2$ (C.1) and the expanded uncertainty is
 $U = k\ u$ with $k = 1.65$ for a **one-sided** 95 % interval (Clause 14), so the
@@ -190,6 +203,14 @@ $88.1$ dB, $3.8$ dB) and F (full-day, $90.1$ dB, $3.4$ dB) are reproduced to
 the standard's printed precision: every intermediate of Annex E is digit-exact,
 and its final level differs only by the standard's own pre-rounding of the
 effective-day level (see the [Occupational Noise Exposure guide](../../perception/hearing/occupational-exposure.md)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty.svg" alt="ISO 9612 Annex D task-based exposure: the three task LEX,8h contributions as bars, the energy-summed daily LEX,8h line and the one-sided 95 % upper limit LEX,8h + U band above it" width="80%"></picture>
+
+*What the budget buys: the Annex D worked day, its three task contributions, the
+energy-summed $L_{EX,8h}$ and the band up to $L_{EX,8h} + U$ that the one-sided
+95 % interval adds on top. The reported result is the pair, not the line — and
+with $U = 2.7$ dB the upper limit sits 2.7 dB above the number, which is enough
+to cross an action value on its own.*
 
 See the [Outdoor Propagation guide](../../environment/propagation/outdoor-propagation.md) and the
 [Occupational Noise Exposure guide](../../perception/hearing/occupational-exposure.md) for usage.
@@ -280,6 +301,18 @@ $F_{+/-} = 10 \log_{10}(\sum_i \lvert P_i \rvert / \lvert \sum_i P_i \rvert)$
 $L_d = \delta_{pI0} - K$ ($K = 10$ dB grade 2, 7 dB grade 3), which must exceed
 $F_{pI}$. A band earns the engineering grade when $L_d > F_{pI}$, $F_{+/-} \le 3$ dB
 and the two repeated sweeps agree within the Table 2 limit.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan.svg" alt="ISO 9614-3 precision sound intensity scanning: a source enclosed by a measurement surface divided into segments, a two-microphone intensity probe scanned along a serpentine path over each segment, and the sound power formed by summing the normal intensity times segment area, subject to the field-indicator acceptance criteria" width="92%"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="ISO 9614-1 field indicators of a ten-position scan over six octave bands: F2 and F3 climb towards low frequency as the field turns reactive, crossing the dashed dynamic-capability line Ld at 125 Hz where F3 also rises above F2, with the field non-uniformity F4 drawn as bars on a twin axis" width="88%"></picture>
+
+*The gate as a picture rather than an inequality — drawn here in the ISO 9614-1
+naming, $F_2$ for what Part 2 calls $F_{pI}$. The reactivity indicator climbs
+towards low frequency and crosses the dynamic-capability line at 125 Hz: that
+band fails, and no amount of averaging will rescue it, because the cause is the
+field near the surface and not the analyser. $F_3$ rising above $F_2$ in the same
+band reveals inward-flowing partial intensity, and the $F_4$ bars set how many
+positions the surface needs.*
 
 ### Precision intensity scanning (ISO 9614-3)
 

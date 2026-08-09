@@ -26,6 +26,14 @@ FIGURE_ENV = OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 	NUMEXPR_NUM_THREADS=1 NUMBA_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \
 	PYTHONHASHSEED=0
 
+# Where the generators write down what the Spanish tables could not translate,
+# for `make figure-language` to read afterwards (see
+# scripts/figure_language_audit.py). Recording only happens when this is set,
+# it costs nothing measurable, and it cannot change a rendered byte; the
+# directory is under build/, which is gitignored.
+FIGURE_LANGUAGE_DIR = build/figure-language
+FIGURE_LANGUAGE_ENV = PHONOMETRY_FIGURE_LANGUAGE_AUDIT=$(FIGURE_LANGUAGE_DIR)
+
 install:
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt
@@ -58,8 +66,12 @@ graphs:
 	# Animations (*.gif/*.webm) come from the separate `animations` target and
 	# are deliberately preserved.
 	find .github/images -maxdepth 1 -type f \( -name '*.svg' -o -name '*.png' -o -name '*.webp' \) -delete
-	$(FIGURE_ENV) $(PYTHON) scripts/generate_graphs.py
-	$(FIGURE_ENV) $(PYTHON) scripts/generate_diagrams.py
+	# The language recording is per run, and the fragments accumulate: empty
+	# the directory here so `make figure-language` cannot be answered by an
+	# older, partial run.
+	rm -rf $(FIGURE_LANGUAGE_DIR)
+	$(FIGURE_ENV) $(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_graphs.py
+	$(FIGURE_ENV) $(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_diagrams.py
 
 # Every shaded region has to be visible against the page it is drawn on, on
 # both themes; the staleness check cannot see that. Deliberately a target of
@@ -71,6 +83,16 @@ graphs:
 figure-contrast:
 	$(PYTHON) scripts/check_figure_contrast.py
 
+# The Spanish variant of a figure is the English one with its strings looked
+# up in a table at save time, so a string nobody added to the table ships in
+# English inside `X_es.svg` and every other gate stays green: the page is
+# Spanish, the figure in it is not. This reads what the generation run above
+# wrote down and fails on any untranslated string the committed baseline does
+# not already record -- and on a baseline line that is no longer true. Needs a
+# `make graphs` first; it is answering about that run, not about the tree.
+figure-language:
+	$(PYTHON) scripts/check_figure_language.py --audit $(FIGURE_LANGUAGE_DIR)
+
 # What to run locally before committing a figure change: regenerate, then
 # verify legibility and staleness the way CI does, each as its own step.
 # Recipe lines rather than prerequisites: prerequisites are free to run
@@ -79,13 +101,17 @@ figure-contrast:
 figures:
 	$(MAKE) graphs
 	$(MAKE) figure-contrast
+	$(MAKE) figure-language
 	$(PYTHON) scripts/check_figures.py
 
 # Regenerate the Tier-1 documentation animations (WebM for the site, GIF for
 # the GitHub docs). Kept out of `graphs`/CI because the ffmpeg encoding is slow
 # and video is not byte-reproducible across platforms; run manually to refresh.
 animations:
-	$(PYTHON) scripts/generate_graphs.py --animations
+	# Records into the same directory as `make graphs`, adding the clips to
+	# whatever that run left there, so `make figure-language` afterwards sees
+	# figures, plates and clips at once.
+	$(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_graphs.py --animations
 
 # Re-extract only the deferred-loading poster stills (anim_*_poster.jpg) from
 # the committed animation WebMs, without the slow clip re-encode. Posters are
@@ -216,7 +242,7 @@ coverage:
 
 check: lint security test
 
-.PHONY: install lint format security snyk sonar graphs figure-contrast figures reports \
+.PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
 	animations posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
 	snippets snippets-static

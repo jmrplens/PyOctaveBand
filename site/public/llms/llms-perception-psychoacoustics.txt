@@ -1137,6 +1137,11 @@ See [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/perception/
 prominence verdicts, [Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) for
 STI/STIPA, and [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/) for the underlying math.
 
+## See also
+
+- API reference: [`psychoacoustics.quality.sharpness`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/sharpness/), [`psychoacoustics.quality.tonality_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/), [`psychoacoustics.quality.roughness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/roughness-ecma/) and [`psychoacoustics.quality.fluctuation_strength_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/).
+- Theory: [Advanced loudness models and sound quality](https://jmrplens.github.io/phonometry/reference/theory/perception/#advanced-loudness-models--sound-quality): the specific-loudness pattern the sharpness, roughness and fluctuation-strength metrics are all built on.
+
 ## References
 
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
@@ -1767,6 +1772,22 @@ repository; click the preview to open the PDF.
 
 *Tonal audibility fiche (`ToneAudibilityResult.report`), decisive $\Delta L_{ta}$ in dB with the tonal adjustment $K$.*
 
+## See also
+
+- [Environmental noise measurement](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/):
+  the ISO 1996-1 rating level this audibility feeds, and the simpler ISO 1996-2
+  Annex C route for a single spectrum.
+- [Tone prominence: TNR and PR](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/):
+  the ECMA-418-1 prominence question asked of product noise, with the table
+  that picks between the library's four tonality metrics.
+- [Wind turbine noise](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/):
+  the IEC 61400-11 per-bin audibility, the same formula applied to a
+  bin-by-bin wind-speed campaign.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/#tone-prominence-tnr-and-pr-ecma-418-1):
+  the neighbouring family of tone metrics, TNR and PR, derived from the same
+  critical-band picture.
+- API reference: [`psychoacoustics.quality.tone_audibility`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/).
+
 ## References
 
 - International Organization for Standardization. (2016). *Acoustics —
@@ -1805,6 +1826,16 @@ the Annex E combustion-engine worked example (Tables E.1/E.2/E.3): $L_S$ and
 $L_T$ from the spectrum, tone detection and the `FG` combined level, the
 per-tone audibility, the masking index and the mean audibility of the five
 spectra.
+
+**Not covered.** Building the narrow-band FFT spectrum from a raw recording is
+no part of this module: every function takes an already-computed spectrum of
+levels and frequencies, and the opening section states what that spectrum has
+to be — including the clause 5.3.2 A-weighting, which the caller applies
+because the module is weighting agnostic. Where the two documents disagree, the
+distinctness edge-steepness test follows the **DIN 45681:2005-03** reading and
+its executable reference program rather than the asymmetric formulae printed in
+ISO/PAS 20065, which contradict it; the defect is registered in
+[Errata](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ---
 
@@ -2077,6 +2108,24 @@ accumulates more of it than the single closed form allows.
 > explicitly not pursued. For **AM broadband noise** the signal model overshoots
 > the absolute level (it spreads the modulated energy across bands); quote the
 > closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.
+
+## See also
+
+- [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/): the ISO 532-1
+  percentile loudness $N_5$ this model takes as its first argument, and the
+  acquisition rules the recording has to satisfy before any of it applies.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/):
+  the DIN 45692 sharpness $S$, the ECMA-418-2 roughness $R$ and the normative
+  vacil_HMS fluctuation strength of the same sensation this page models in
+  vacil.
+- [Advanced Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/):
+  the alternative loudness models, and why mixing families makes the composite
+  an engineering estimate.
+- [Environmental Levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/):
+  community annoyance, the other thing the word means, and the rating levels it
+  is assessed with.
+- Theory: [Advanced loudness models and sound quality](https://jmrplens.github.io/phonometry/reference/theory/perception/#advanced-loudness-models--sound-quality): the loudness and sound-quality metrics the annoyance model combines, derived one at a time.
+- API reference: [`psychoacoustics.quality.annoyance`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/annoyance/) and [`psychoacoustics.quality.fluctuation_strength`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength/).
 
 ## References
 

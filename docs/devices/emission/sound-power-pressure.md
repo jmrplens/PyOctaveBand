@@ -441,6 +441,32 @@ repository. Click the preview to open the PDF:
 engineering-grade hemisphere measurement with the $K_1$/$K_2$ corrections and
 the boxed $L_{WA}$.*
 
+The precision result writes the same sheet from the ISO 3745 side, with the
+meteorological corrections on its basis strip in place of the $K_1$/$K_2$ pair.
+This is the 40-position hemisphere measurement of section 2, the one whose
+spectrum is plotted above:
+
+```python
+from phonometry import ReportMetadata
+
+result.report(
+    "precision-sound-power.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Mid-frequency-peaked machine",
+        test_room="Qualified anechoic room, 40-position hemisphere array",
+        measurement_standard="ISO 3745",
+    ),
+)   # LWA = 89.3 dB(A) re 1 pW, U = 4.1 dB
+```
+
+[![ISO 3745 precision sound power determination example report: a header with the client, the noise source and the qualified anechoic room with its 40-position hemisphere array, the octave-band table from 125 Hz to 8 kHz of surface sound-pressure levels Lp and band sound-power levels LW (78.0, 79.0, 82.6, 85.8, 82.6, 78.7 and 78.0 dB), the LW spectrum peaking at 1 kHz, and the boxed A-weighted sound power level LWA = 89.3 dB(A) re 1 pW with the total LW = 90.1 dB, the expanded uncertainty U = 4.1 dB and the measurement surface S = 6.28 m2, over a basis strip stating the applied meteorological corrections C1 = -0.13 dB, C2 = 0.00 dB and C3 = 0.0 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3745_precision_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3745_precision_power_example.pdf)
+
+*Precision sound power fiche (`PrecisionSoundPowerResult.report`), the ISO 3745
+anechoic determination: no $K_2$ at all, a 6.28 m² hemisphere instead of a
+100 m² one, and $U$ = 4.1 dB because the operating-and-mounting term dominates
+the reproducibility one.*
+
 
 ## See also
 
@@ -500,3 +526,14 @@ criteria. ISO 3745:2012, *… Precision methods for anechoic rooms and
 hemi-anechoic rooms*: the Clause 8 power level, the per-position background
 correction (Eq. 11), the meteorological corrections and the standardized
 microphone arrays of section 2.
+
+**Not covered.** Neither method performs the facility qualification it assumes:
+ISO 3745's free-field qualification of the anechoic or hemi-anechoic
+environment is taken for granted, and ISO 3744's $K_2$ validity only warns.
+ISO 3744 **Annex G**, the correction to reference meteorological conditions
+required above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied
+either: `sound_power_pressure` takes no temperature or pressure argument. The
+$C_3$ meteorological correction of ISO 3745 needs an air-absorption coefficient
+the caller supplies through `air_absorption_coefficient=`; this module does not
+compute it from **ISO 9613-1** itself.
+

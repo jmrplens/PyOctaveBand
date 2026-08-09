@@ -148,7 +148,7 @@ two guides above.
 
 If you arrived here from a search and want the shape of the whole library,
 [What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
-and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+and [All guides](https://jmrplens.github.io/phonometry/) lists every page with a line on
 each.
 
 ---
@@ -1165,6 +1165,16 @@ instead of the spherical $1/r$ (6.0 dB per doubling) of a 3D point source.
 Interference and diffraction patterns are faithful, but absolute levels and
 decay rates are not those of a 3D room; validate any 3D-quantitative claim
 against a closed form or a 3D solver.
+
+## See also
+
+- [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/):
+  the P-SV companion solver on the same staggered grid, with Rayleigh and
+  Scholte waves, mode conversion and immersed plates.
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): two of the closed-form
+  validation anchors of section 6 run there.
+- API reference: [`simulation.fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/),
+  [`simulation.ntff`](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/).
 
 ## References
 

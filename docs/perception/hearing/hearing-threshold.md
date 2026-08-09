@@ -201,3 +201,17 @@ around the median (clause 4.3, Tables 2–5) and its application (clause 4.4).
 ISO 389-7:2005, *Reference zero for the calibration of audiometric equipment —
 Reference threshold of hearing under free-field and diffuse-field listening
 conditions* (Table 1).
+
+**Not covered.** This page stops at the age component. Combining it with a
+noise-induced shift into a real audiogram is **ISO 1999**:2013 clause 6.1
+Formula (1); that combination is implemented, as `htlan`, but it is documented
+in [Noise-induced hearing loss](noise-induced-hearing-loss.md). Of
+ISO 389-7:2005 only the eleven audiometric rows of Table 1 are carried: the
+other 27 — the third octaves from 20 Hz to 100 Hz, the intermediate third
+octaves between the audiometric points and the extended high frequencies from
+9 kHz to 18 kHz — are not, and neither is Amendment 1:2016, so low-frequency
+and extended-high-frequency work must read the table itself. The earphone
+reference zeros of **ISO 389-1**/-2/-8, the sound-field audiometric procedure
+of **ISO 8253-2**, and how the ISO 389-7 values were established are all
+outside this module.
+

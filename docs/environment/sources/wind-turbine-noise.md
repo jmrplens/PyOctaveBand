@@ -159,6 +159,54 @@ specific to IEC 61400-11 is the determination of the tone and masking levels
 and the Zwicker critical band from the spectrum. For a rating adjustment
 $K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
 
+### Assessment report (`.report()`)
+
+Tonal audibility is the part of a wind-turbine assessment that ends in a
+document handed to a regulator, so the result renders one.
+`WindTurbineTonalityResult.report(path)` writes a one-page fiche following
+IEC 61400-11:2012+A1:2018 subclauses 9.5.2 to 9.5.8: a standard-basis line, an
+optional metadata header (source/situation, client, measurement position,
+instrumentation, date), the critical-band analysis table — tone frequency,
+critical bandwidth, tone level $L_{pt}$, masking-noise level $L_{pn}$, tonality
+$\Delta L_{tn}$, audibility criterion $L_a$ and tonal audibility $\Delta L_a$ —
+beside the narrowband spectrum with the critical band, the masking level and
+the tone marked, then the boxed $\Delta L_a$ with the tone frequency and the
+audibility decision, an optional PASS/FAIL row, a note on how $\Delta L_a$ is
+built, and the fixed disclaimer in the footer.
+
+A supplied `requirement` is the **maximum acceptable** tonal audibility in dB,
+so a *less* audible tone passes. Rendering needs reportlab and, for the
+embedded figure, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported, and `language="es"` renders a Spanish fiche.
+
+```python
+from phonometry import ReportMetadata
+
+# The 500 Hz gearbox tone over the flat 30 dB floor of the snippet above.
+res.report(
+    "tonality_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Horizontal-axis wind turbine, gearbox tone",
+        measurement_standard="IEC 61400-11",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=6.0,            # maximum acceptable tonal audibility (dB)
+    ),
+)                                   # tonal audibility (dB) and the decision
+```
+
+[![IEC 61400-11 wind-turbine tonal audibility example report: a metadata header, a critical-band analysis table (tone frequency 500.0 Hz, critical bandwidth 117.3 Hz, tone level Lpt = 60.0 dB, masking-noise level Lpn = 45.9 dB, tonality dLtn = 14.1 dB, audibility criterion La = -2.3 dB) beside the narrowband-spectrum plot with the critical band shaded and the masking level drawn, the boxed tonal audibility dLa = 16.4 dB at the 500.0 Hz tone with the decision that the tone is audible, and a FAIL verdict against a maximum acceptable audibility of 6.0 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61400_wind_turbine_tonality_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61400_wind_turbine_tonality_example.pdf)
+
+*Wind-turbine tonal-audibility fiche (`WindTurbineTonalityResult.report`): a
+30 dB masking floor under a 60 dB tone leaves $\Delta L_a$ = 16.4 dB, far past
+the 0 dB audibility line and past a 6 dB acceptance requirement.*
+
+## See also
+
+- [Environmental noise levels](../assessment/environmental-levels.md): the ISO 1996-2 rating adjustment this page's $\Delta L_a$ feeds.
+- [Tone audibility](../../perception/psychoacoustics/tone-audibility.md): the same tonal-audibility idea outside the wind-turbine context.
+- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the chain that carries $L_{WA}$ from the rotor to a dwelling.
+- API reference: [`environment.sources.wind_turbine`](https://jmrplens.github.io/phonometry/reference/api/environment/wind-turbine/).
+
 ## References
 
 - International Electrotechnical Commission. (2018). *Wind turbines —

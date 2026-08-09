@@ -744,6 +744,83 @@ fig.tight_layout(); plt.show()
 
 </details>
 
+## Function parameters
+
+Every argument of this page in one place, with its units and its admissible
+range:
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `mass_per_area` | float | kg/m² | > 0 | Surface density $m''$ |
+| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | give one | Coincidence $f_c$, or $B'$ to compute it |
+| `loss_factor` | float | — | > 0; default `0.01` single panel, `0.1` double wall | Total loss factor $\eta$ |
+| `band` | str | — | `'third'` (−5.5 dB) / `'octave'` (−4.0 dB) | Field-incidence correction width |
+| `mass1` / `mass2` | float | kg/m² | > 0 | Double-wall leaf surface densities |
+| `gap` | float | m | > 0 | Cavity depth $d$ |
+| `cavity_medium` | `PorousMediumResult` | — | default `None` | Porous fill; lowers $f_0$ |
+| `width` (slit) | float | m | > 0 | Slit width $w$. **Second** positional argument of both `slit_transmission_coefficient` and `slit_resonance_frequencies` |
+| `depth` (slit) | float | m | > 0 | Slit depth $d$ (the wall thickness). **Third** positional argument of `slit_transmission_coefficient`, **first** of `slit_resonance_frequencies` — the two functions take the pair in opposite orders |
+| `field` / `position` (slit) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Incident field and slit location |
+| `radius` / `depth` (hole) | float | m | > 0 | Circular-aperture radius $a$ / depth $d$ |
+| `areas` / `reduction_indices` | seq | m² / dB | length $N$ | Composite elements (1-D or (N, bands)) |
+| `length_x` / `length_y` | float | m | > 0 | Plate dimensions (radiation efficiency) |
+| `boundary` / `baffle` | str | — | `'simply_supported'`/`'clamped'`, `'infinite'`/`'perpendicular'` | Plate edge and baffle constants |
+
+`single_panel_transmission_loss` and `double_wall_transmission_loss` return a
+`SoundReductionResult` (`transmission_loss`, `transmission_coefficient`,
+`critical_frequency` / `resonance_frequency`, `.rating()`, `.plot()`); the slit
+and hole functions return an `ApertureTransmissionResult`
+(`transmission_coefficient`, `transmission_loss`, `.plot()`);
+`radiation_efficiency` a `RadiationEfficiencyResult` (`radiation_efficiency`,
+`radiation_index`, `.plot()`).
+
+**Where the closed forms stop being valid.** Nothing in the code refuses an
+argument outside these ranges, so the three bounds below are the reader's to
+enforce. Sharp's coincidence method is stated for frequencies above
+$1.5\times$ the first panel resonance. Gomperts' slit is inviscid and holds
+for $w < 0.3\lambda$; a narrower slit at a higher frequency leaves the model
+behind. The plate radiation efficiency is Leppington's "method no. 1", one
+of several in that paper and not interchangeable with the others.
+
+## What this guide covers
+
+**Covered.** The closed forms themselves, not the measurements behind them:
+Bies' §7.2 mass law and Sharp's coincidence method (Eqs 7.40/7.42/7.44) for a
+single panel; the double-wall mass-spring-mass resonance with its saturating
+cavity boost (Eqs 7.62-7.64); Hopkins' Gomperts slit and the Wilson & Soroka
+circular hole with the area-weighted composite sum (Eq. 4.92); the
+Leppington/Maidanik plate radiation efficiency (Eqs 2.227-2.230); and the
+Cremer Table 5.1 point impedances and mobilities of infinite plates and beams
+with the injected-power relation — through `single_panel_transmission_loss`,
+`double_wall_transmission_loss`, `slit_transmission_coefficient`,
+`composite_transmission_loss`, `radiation_efficiency`,
+`infinite_plate_impedance`, `infinite_beam_mobility` and `injected_power`.
+Vigran's orthotropic chapter joins them: the coincidence *range* of a ribbed or
+corrugated panel and its flattened $R$ by the diffuse-field integral or Heckl's
+closed form (Eqs 6.107-6.113), the Timoshenko equivalent stiffnesses of a
+sinusoidal corrugation (Eq. 3.115) and the orthotropic plate eigenfrequency
+(Eq. 3.113). Masonry cavity walls add Hopkins' wall-tie bridge
+(Sections 3.11.3.2 and 4.3.5.4.1): the Table A4 dynamic stiffnesses, the tie
+array in parallel with the cavity air (Eq. 4.89, through the
+`tie_stiffness_per_area` keyword) and the point-connection coupling loss factor
+with a linear-spring connector (Eqs 4.87, 4.88).
+
+**Not covered.** Every prediction stops where its source stops, and the three
+numerical bounds are stated in [Function parameters](#function-parameters)
+above: Sharp below $1.5\times$ the first panel resonance, Gomperts above
+$w = 0.3\lambda$, and Leppington's other formulations. The orthotropic models
+are infinite-panel models: below about $0.7 f_{c1}$ Heckl's branch
+underestimates $R$ on small panels, and the 2 kHz to 4 kHz dip real corrugated
+cladding shows comes from resonances of the sections between the ribs, which
+neither route predicts. Only the sinusoidal corrugation has equivalent
+stiffnesses here; trapezoidal cladding needs its own, from the literature
+Vigran cites. On the wall-tie side the inputs are printed data but no published
+$R$ of a bridged masonry cavity wall is tabulated, so the per-band penalty the
+ties cause has **no numeric oracle** — only the resonance shift is anchored
+(Hopkins Fig. 4.35, 26 Hz to 50 Hz). The coupling loss factor is not fed into a
+full statistical energy analysis: combining it with the airborne path would
+need the whole room-plate-cavity-plate-room chain.
+
 ## References
 
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering Noise

@@ -567,6 +567,16 @@ Interference and diffraction patterns are faithful, but absolute levels and
 decay rates are not those of a 3D room; validate any 3D-quantitative claim
 against a closed form or a 3D solver.
 
+## See also
+
+- [Elastic waves and fluid-solid coupling](elastic-waves.md):
+  the P-SV companion solver on the same staggered grid, with Rayleigh and
+  Scholte waves, mode conversion and immersed plates.
+- [Conformance report](../CONFORMANCE.md): two of the closed-form
+  validation anchors of section 6 run there.
+- API reference: [`simulation.fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/),
+  [`simulation.ntff`](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/).
+
 ## References
 
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*

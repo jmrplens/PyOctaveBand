@@ -360,6 +360,22 @@ repository; click the preview to open the PDF.
 
 *Tonal audibility fiche (`ToneAudibilityResult.report`), decisive $\Delta L_{ta}$ in dB with the tonal adjustment $K$.*
 
+## See also
+
+- [Environmental noise measurement](../../environment/assessment/environmental-levels.md):
+  the ISO 1996-1 rating level this audibility feeds, and the simpler ISO 1996-2
+  Annex C route for a single spectrum.
+- [Tone prominence: TNR and PR](tone-prominence.md):
+  the ECMA-418-1 prominence question asked of product noise, with the table
+  that picks between the library's four tonality metrics.
+- [Wind turbine noise](../../environment/sources/wind-turbine-noise.md):
+  the IEC 61400-11 per-bin audibility, the same formula applied to a
+  bin-by-bin wind-speed campaign.
+- [Theory](../../reference/theory/perception.md#tone-prominence-tnr-and-pr-ecma-418-1):
+  the neighbouring family of tone metrics, TNR and PR, derived from the same
+  critical-band picture.
+- API reference: [`psychoacoustics.quality.tone_audibility`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/).
+
 ## References
 
 - International Organization for Standardization. (2016). *Acoustics —
@@ -398,3 +414,14 @@ the Annex E combustion-engine worked example (Tables E.1/E.2/E.3): $L_S$ and
 $L_T$ from the spectrum, tone detection and the `FG` combined level, the
 per-tone audibility, the masking index and the mean audibility of the five
 spectra.
+
+**Not covered.** Building the narrow-band FFT spectrum from a raw recording is
+no part of this module: every function takes an already-computed spectrum of
+levels and frequencies, and the opening section states what that spectrum has
+to be — including the clause 5.3.2 A-weighting, which the caller applies
+because the module is weighting agnostic. Where the two documents disagree, the
+distinctness edge-steepness test follows the **DIN 45681:2005-03** reading and
+its executable reference program rather than the asymmetric formulae printed in
+ISO/PAS 20065, which contradict it; the defect is registered in
+[Errata](../../ERRATA.md).
+

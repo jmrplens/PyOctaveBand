@@ -438,3 +438,39 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](../assessment/environmental-levels.md): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
+
+## References
+
+- Kephalopoulos, S., Paviotti, M., & Anfosso-Lédée, F. (2012). *Common noise
+  assessment methods in Europe (CNOSSOS-EU)* (EUR 25379 EN). Publications
+  Office of the European Union.
+  [doi:10.2788/31776](https://doi.org/10.2788/31776).
+  The Joint Research Centre reference report the Directive text descends from,
+  with the IMAGINE measurement campaigns behind the Appendix G coefficients.
+- International Organization for Standardization. (1996). *Acoustics —
+  Attenuation of sound during propagation outdoors — Part 2: General method of
+  calculation* (ISO 9613-2:1996).
+  [iso.org catalogue](https://www.iso.org/standard/20649.html).
+  The propagation model this library uses to carry the emission to a receiver.
+  CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which
+  is not ISO 9613-2.
+
+## Standards
+
+Directive 2002/49/EC, Annex II, section 2.3 with the coefficient database of
+Appendix G, in the consolidated text — three instruments read together:
+
+- Commission Directive (EU) 2015/996
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2015/996/oj)),
+  which replaced Annex II with the CNOSSOS-EU methods. The implemented railway
+  source is section 2.3, formulae 2.3.1 to 2.3.18.
+- Its corrigendum of 10 January 2018, OJ L 5, p. 35
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01))),
+  which replaces the whole of Appendix G and corrects the roughness
+  conversion, where the published text read km/h for a speed that has to be in
+  metres per second.
+- Commission Delegated Directive (EU) 2021/1226
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj)),
+  in force since 31 December 2021, which replaces Tables G-1b, G-2, G-3a, G-4
+  and G-7, substitutes a new curve-squeal rule and a new bridge model, and
+  rewrites the vertical directivity of source A.

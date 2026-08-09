@@ -136,6 +136,16 @@ using a fast time constant on the attack and a slower one on the release. This y
 
 ECMA-418-2 builds all three of its metrics on one auditory front-end (Clause 5): an outer/middle-ear filter, a bank of 53 overlapping gammatone-like band-pass filters spaced on the Bark_HMS scale ($z = 0.5$ to $26.5$), half-wave rectification, and a short-block RMS $\tilde{p}(l, z)$ per band $z$ and time block $l$. A compressive nonlinearity (Formula 23) turns the band RMS into the **specific basis loudness** $N'_{\mathrm{basis}}(l, z)$, whose calibration constant $c_N$ fixes a 1 kHz / 40 dB SPL tone at 1 sone_HMS. The loudness assembles the tonal and noise loudness (below) over bands and time (Formulae 113–117); it grows about $1.65\times$ per 10 dB, more slowly than Zwicker's factor of 2, an intrinsic property of the Sottek summation.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%"></picture>
+
+*The divergence stated above, drawn on the one signal all three models are
+calibrated on. They pass together through about 1 sone at 40 dB (the Sottek
+front end returns 0.9845 sone$_\mathrm{HMS}$ there) and then separate: Zwicker's
+curve doubles every 10 dB, the Sottek curve rises by about 1.65× over the same
+step. That is a difference between auditory summations, not a calibration error,
+and it is why a sone value without its model attached cannot be compared with
+anything.*
+
 ### Tonality: autocorrelation of the band signal (ECMA-418-2)
 
 A tonal component is periodic, so it survives in the **autocorrelation function** (ACF) of a band's rectified signal while broadband noise decorrelates. For each band the unbiased ACF of the block is
@@ -247,6 +257,14 @@ See the [Speech Transmission Index guide](../../perception/speech/speech-transmi
 
 Where the STI characterizes a transmission channel, the SII (ANSI S3.5-1997) predicts intelligibility from what the listener can actually hear: 18 one-third-octave bands 160 Hz – 8 kHz, each contributing its band importance $I_i$ (Table 3, $\sum I_i = 1$, peaking near 2 kHz). All inputs are equivalent spectrum levels (clauses 3.11/3.55). Speech masks itself upward: each band's masking spectrum $Z_i$ (clause 5.4) accumulates the lower bands along slopes $C_i = -80 + 0.6\,(B_i + 10 \log_{10} f_i - 6.353)$ dB, and the disturbance is the **larger** of masking and hearing floor, $D_i = \max(Z_i, X'_i)$ (clause 5.6), with $X'_i = X_i + T'_i$ the reference internal noise spectrum plus the listener's hearing-threshold shift (clauses 5.5/5.6). The band audibility clips the speech-to-disturbance margin into $[0, 1]$ (clause 5.8), a level-distortion factor discounts overly loud presentation (clause 5.7), and the index sums (clause 6):
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures.svg" alt="The band-importance function of the four ANSI S3.5-1997 band procedures overlaid on one logarithmic frequency axis: the 21 critical bands, the 17 equally-contributing critical bands, the 18 one-third-octave bands and the 6 octave bands, each drawn as a step across its own band limits. All four trace the same rise to a maximum around 2 kHz, and the wider the bands the higher the step, the octave function peaking at 0.265 against 0.090 for the one-third-octave function" width="90%"></picture>
+
+*The importance function is where the speech cues are, and all four band
+procedures below agree about it: the same rise to a maximum near 2 kHz, the same
+total of 1.0 redistributed over wider or narrower bands — which is why the
+octave steps stand at 0.265 where the one-third-octave steps stand at 0.090. A
+band lost at 2 kHz costs several times what the same band costs at 160 Hz.*
+
 $$
 A_i = \operatorname{clip}\Big( \frac{E'_i - D_i + 15}{30},\ 0,\ 1 \Big), \qquad
 L_i = \operatorname{clip}\Big( 1 - \frac{E'_i - U_i - 10}{160},\ 0,\ 1 \Big), \qquad
@@ -254,6 +272,15 @@ L_i = \operatorname{clip}\Big( 1 - \frac{E'_i - U_i - 10}{160},\ 0,\ 1 \Big), \q
 $$
 
 The same chain runs over the standard's other three band tables, selected with `method=`: the 21 critical bands of Table 1, the 17 equally-contributing critical bands of Table 2 and the 6 octave bands of Table 4. Those three express the masking slope through the tabulated band width, $C_i = -80 + 0.6\,(B_i + 10 \log_{10} W_i)$, which is the same formula the $10 \log_{10} f_i - 6.353$ above abbreviates for a one-third-octave band; the octave-band procedure omits the spread of masking altogether, since an octave band is already wider than the spread being modelled. The Table 3 standard speech spectra for the normal, raised, loud and shout vocal efforts are built in (25.01 / 33.86 / 42.16 / 51.31 dB at 1 kHz); $U_i$ in the level-distortion factor is always the normal-effort spectrum. The anchor values: the normal-effort spectrum in quiet with normal hearing scores SII ≈ 0.996, the masking-spectrum reference values are matched to $10^{-4}$, and the vocal-effort spectra are cross-verified against the Google and CRAN reference implementations.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum.svg" alt="The four ANSI S3.5-1997 standard speech spectra (normal, raised, loud, shout) as one labelled family: the standard speech spectrum level in dB SPL over 160 Hz to 8000 Hz, each higher effort lifting the whole spectrum" width="90%"></picture>
+
+*The four vocal efforts, in spectrum level rather than band level — which is why
+the normal-effort curve passes through 25.01 dB at 1 kHz rather than through the
+60-odd dB a talker measures as a band level at a metre. Raising the effort does
+not lift the family uniformly: shouting adds 27.6 dB at 2.5 kHz, 26.3 dB at
+1 kHz and **−1.6 dB** at 160 Hz, so the spectrum tilts as well as rises, and the
+extra effort is spent where the importance function above is largest.*
 
 See the [Speech Intelligibility guide](../../perception/speech/speech-intelligibility.md) for usage.
 

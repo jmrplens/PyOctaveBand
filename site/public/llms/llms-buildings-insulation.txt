@@ -409,6 +409,19 @@ ISO 10140-2:2010, ISO 10140-3:2010 and ISO 10140-4:2010, which provide the
 laboratory $R$ and $L_n$ with the background-noise correction and the measurement
 procedures behind them.
 
+**Not covered.** The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and
+**ISO 10140-5:2010** facility and mounting requirements are documented above
+and implemented nowhere: nothing checks the position counts, the separations,
+the averaging times, the band range, the test-opening geometry or the
+loss-factor requirement. The mounting condition survives only as free text in
+the report metadata — which is what ISO 10140-1 asks for, since it requires a
+mounting to be *described* rather than picked from a list. Nothing estimates
+the suite's $R'_\text{max}$ either, so a result approaching the facility's
+ceiling is produced without complaint; that qualification comes from the
+laboratory's own Annex A tests. The neighbouring laboratory measurements have
+their own pages: intensity (ISO 15186), the floor-covering improvement
+(ISO 16251-1) and flanking transmission (ISO 10848).
+
 ## See also
 
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
@@ -1623,6 +1636,21 @@ ISO 5725 (context, not implemented directly). The single-number ratings quoted
 here are those of ISO 717-1 and ISO 717-2, and the façade part of the same
 ISO 16283 family (ISO 16283-3:2016) has its own page.
 
+**Not covered.** Every field function takes levels the caller has already
+corrected for background noise (ISO 16283-1 Clause 9.2). Measuring the
+background level — source off, same positions, same averaging — is the
+operator's job, and nothing here verifies that the 6 dB floor was met.
+(`background_correction` is the **ISO 10140-4** *laboratory* variant and does
+not match the field thresholds.) The position counts, distances and averaging
+of ISO 16283-1/-2, and the corner measurements of the low-frequency procedure,
+are documented above and checked nowhere: energy averaging happens once
+positions are supplied, but nothing verifies how many were taken, where, or
+that the 25 m³ trigger was even tested for. The Formula (12)/(13) combination
+of the low-frequency procedure is two lines of NumPy, not a library function.
+The other members of the family have their own pages: the façade part
+(ISO 16283-3), the survey method (ISO 10052), the rating engines (ISO 717-1/-2)
+and the sound-intensity route (**ISO 15186-1**/-2).
+
 ## See also
 
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
@@ -2583,6 +2611,17 @@ ISO 10140 (laboratory), ISO 15186 (intensity), ISO 10052 (survey) and
 ISO 10848 (flanking); conformance is anchored on the standards' own Annex C
 worked examples.
 
+**Not covered.** Nothing here measures: every function takes an
+already-measured or predicted band spectrum from the field, laboratory,
+intensity, survey or flanking guides. The façade single number of
+**ISO 16283-3** Annex F and the flanking $D_{n,f,w}$ reuse these engines from
+their own pages rather than duplicating them. One member of the family is
+deliberately absent: the A-weighted maximum impact level of **ISO 717-2:2020
+Annex D**, which rates the rubber ball and the bang machine. It shifts no curve
+at all — it is an energy sum of A-weighted band levels — so it belongs with the
+sources it rates, in
+[Heavy and soft impact sources](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/).
+
 ## See also
 
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
@@ -3170,6 +3209,19 @@ term (Annex F worked example); and EN 12354-4:2000, which predicts the sound
 power radiated outwards by a building side and its exterior level (Annex G
 worked example). The single-number ratings come from ISO 717-1 (Annex F of
 ISO 16283-3 and EN ISO 717-1 for the prediction).
+
+**Not covered.** The band levels handed to `facade_insulation` are assumed
+already corrected for background noise, and ISO 16283-3's procedural
+requirements are documented but never checked: nothing verifies the 45° ± 5°
+incidence, the 5 m / 7 m slant distances, the 3 → 10 microphone escalation and
+its recess special case, the 50 pass-bys and the simultaneity of a traffic
+measurement, or that the method chosen matches the question asked. The
+low-frequency corner procedure of Clause 7 — the façade counterpart of the
+**ISO 16283-1** procedure, triggered by the same 25 m³ receiving-room threshold
+— is not implemented, and neither are the railway and aircraft methods of
+Annex E. The EN 12354-3 and EN 12354-4 worked examples of the 2000 editions
+carry small internal rounding inconsistencies in the higher octave bands; the
+implementation follows the formulae rather than the printed rows.
 
 ## See also
 

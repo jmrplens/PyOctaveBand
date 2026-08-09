@@ -122,7 +122,7 @@ motivates them.
 
 If you arrived here from a search and want the shape of the whole library,
 [What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
-and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+and [All guides](https://jmrplens.github.io/phonometry/) lists every page with a line on
 each.
 
 ---
@@ -373,6 +373,18 @@ The certification chain ends here. Turning these aeroplanes into noise
 around an airport, the noise-power-distance tables, the per-segment
 corrections of a flight path and the ground contour of a single event, is
 the ECAC Doc 29 method of [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/).
+
+## See also
+
+- [Airport noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/): the NPD
+  engine and the single-event contour chain around an airport.
+- [Rotorcraft noise: the hemisphere method](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/):
+  the ECAC Doc 32 method, whose single-event EPNL is this same Appendix 2 chain
+  driven by a noise hemisphere instead of a certification flyover.
+- [The ANP fleet database](https://jmrplens.github.io/phonometry/aircraft/anp-fleet/): the measured
+  noise-power-distance tables for real types, which is where the certification
+  data ends up for modelling work.
+- API reference: [`aircraft.certification`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/certification/) and [`aircraft.atmospheric_absorption`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/atmospheric-absorption/).
 
 ## References
 
@@ -922,6 +934,34 @@ Everything these two return is the same result type the airport-noise page uses,
 so the plotting, the contour extraction and the per-segment breakdown all work
 unchanged.
 
+## What this guide covers
+
+**Covered.** Opening the shipped EASA ANP database, or another ANP CSV export,
+with `load_anp_database`; what one aircraft record holds, including the power
+parameter its NPD table is indexed by and the engine mounting the Doc 29 chain
+reads; reading and interpolating the NPD surface with `npd_curves` and `level`;
+the default fixed-point trajectories and their stage-length bins; and driving
+the Doc 29 single-event level and ground-grid contour from an aircraft
+identifier with `event_level` and `noise_contour`.
+
+**Not covered.** The procedural-step profiles, which is how most ANP entries
+describe a departure. Turning those into a flight path needs the ICAO Doc 9911
+flight-mechanics performance model, which this bridge does not implement, so
+only the 13 types with a fixed-point *departure* profile and the 20 with a
+fixed-point *arrival* profile come with a trajectory ready to fly. The database
+is read and never written: version 2.3 ships with the package and the package
+does not update it.
+
+## See also
+Pages elsewhere on the site that this section leans on:
+
+- [Airport Noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/): the method
+  itself, built from a hand-written NPD table and flight path.
+- [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/):
+  the certification metric, which is measured rather than tabulated.
+- API reference:
+  [`aircraft.anp_fleet`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/anp-fleet/).
+
 ## References
 
 - EASA and EUROCONTROL, *Aircraft Noise and Performance (ANP) database*, version
@@ -1310,6 +1350,19 @@ a single per-receiver-resistivity call. The prototype's public release does
 not include a reconstructible screening case (the frame of its terrain model
 could not be pinned to the published outputs), so the diffraction chain
 itself rests on the closed-form anchors and its CNOSSOS-EU lineage.
+
+## See also
+
+- [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/):
+  the ICAO Annex 16 Appendix 2 chain this page's Doc 32 Eq. 28 term calls, and
+  the measurement practice a hemisphere campaign follows.
+- [Airport Noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/): the
+  fixed-wing contour method, where a noise-power-distance table plays the role
+  the noise hemisphere plays here.
+- [Outdoor sound propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/):
+  the ISO 9613-2 ground effect and the CNOSSOS ground classes this two-ray
+  adjustment shares.
+- API reference: [`aircraft.rotorcraft_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/).
 
 ## References
 

@@ -375,6 +375,29 @@ higher-order modes propagate: the two-dimensional solver keeps working there
 and the plane-wave algebra does not.
 
 
+## What this guide covers
+
+**Covered.** Reactive silencers by the four-pole transfer-matrix method
+(Bies §8.8-8.9, Munjal Eq. (3.27)): the closed-form `expansion_chamber`
+(Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46),
+(8.44)), `extended_tube_chamber`, and the `duct_matrix` / `shunt_matrix` /
+`cascade` / `transmission_loss` / `insertion_loss` blocks for arbitrary chains,
+each with its to-scale `.plot_geometry()` and cross-checked against the
+independent FDTD solver; the `plane_wave_limit` that bounds all of them; and,
+as prose rather than code, the ISO 7235 substitution measurement that produces
+the insertion loss a supplier publishes.
+
+**Not covered.** Reactive elements only. Dissipative (absorptive, duct-lining)
+silencers are discussed for selection but never modelled from liner properties,
+and the lined-elbow and plenum data of the
+[HVAC methods](noise-control.md) are interpolated installation tables, not a
+liner model. Mean-flow effects — convection, temperature gradients, the
+flow-dependent impedance of perforates — are outside the no-flow element
+matrices used here. Nothing on this page is a measurement: no part of ISO 7235
+is implemented, shell breakout and the end corrections at the area jumps are
+not modelled, and the branch models are lossless unless a `resistance` is
+supplied.
+
 ## See also
 
 - [Duct-borne noise: fan to room](duct-path.md): the end-to-end fan-to-room

@@ -84,6 +84,14 @@ the generator is verified.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="IEC 60268-1 tone bursts: a single 5 ms burst of 5 kHz tone starting at a zero crossing with its rectangular gating envelope, and a repetitive train of four bursts at 10 bursts per second with a 5 percent duty cycle" width="82%" loading="eager" />
 
+*Every number in the picture is exact rather than nominal, which is the point of
+Clause A2.1. The burst is 240 samples, 25 full periods of 5 kHz at 48 kHz, and
+the first sample of the gate falls on a zero of the tone, so its energy is
+$A^2N/2 = 120$ to the last digit. In the train below, the period is 4800 samples
+and the duty cycle 0.05 exactly — the burst occupies one twentieth of each
+repetition, which is what makes the train usable for meter ballistics where the
+off time has to be as well defined as the on time.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

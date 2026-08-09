@@ -228,6 +228,14 @@ you — Eq. 8.129 models the scatter of a single peak, not the choice between tw
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay.svg" alt="Normalized cross-correlation of a colored two-sensor signal pair against lag in milliseconds: the direct correlator shows a broad peak around the true 20-sample delay while the GCC-PHAT curve collapses to a sharp spike exactly on the dashed true-delay line" width="82%" loading="eager" />
 
+*Both estimators land on the 2.441 ms delay — 2.4413 ms direct, 2.4418 ms
+PHAT — so the argument is not about accuracy on a clean pair but about how much
+the peak can be trusted. Prewhitening narrows the main lobe from 0.73 ms at
+half height to 0.24 ms, two samples at 8192 Hz, because the direct correlator
+convolves the delta with the autocorrelation of a signal that is band-limited
+to 800 Hz while PHAT throws that magnitude away. Read the width, not the
+position: it is what says whether a reflection could be sitting under the peak.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

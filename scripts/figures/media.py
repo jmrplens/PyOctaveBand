@@ -19,11 +19,11 @@ from typing import Any, cast
 import matplotlib.pyplot as plt
 
 from .i18n import (
-    _ES_EXACT,
-    _ES_PATTERNS,
     _LANG,
     _LANG_SUFFIX,
     _translate_figure,
+    audit_figure,
+    lookup,
 )
 from .theme import _FILENAME_SUFFIX
 
@@ -105,15 +105,7 @@ def _translate_str(s: str) -> str:
 
     if _LANG == "en" or not s:
         return s
-    if s in _ES_EXACT:
-        out = _ES_EXACT[s]
-    else:
-        out = s
-        for pat, repl in _ES_PATTERNS:
-            new, n = _re.subn(pat, repl, s)
-            if n:
-                out = new
-                break
+    out = lookup(s)
     if "$" not in out and _re.search(r"\d\.\d", out):
         out = _re.sub(r"(?<![\d.A-Za-z])(\d+)\.(\d+)(?![.\d])", r"\1,\2", out)
     return out
@@ -143,6 +135,7 @@ def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
     """
     from matplotlib.animation import FuncAnimation
 
+    audit_figure(stem)
     _translate_figure(fig)
     n_frames = _ANIM_FRAMES if frames is None else frames
     rate = _ANIM_FPS if fps is None else fps

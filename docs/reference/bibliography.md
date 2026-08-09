@@ -251,6 +251,14 @@ it; the list grows as guides gain their References sections.
   [iso.org catalogue](https://www.iso.org/standard/45362.html).
   The precision anechoic-room method.
   Cited by [Sound power by pressure methods](../devices/emission/sound-power-pressure.md).
+- International Organization for Standardization. (1996). *Acoustics —
+  Declaration and verification of noise emission values of machinery and
+  equipment* (ISO 4871:1996).
+  [iso.org catalogue](https://www.iso.org/standard/10868.html).
+  What a manufacturer publishes once the power level is measured: the dual
+  and single-number declaration forms, the declared value
+  $L_{WAd} = L_{WA} + K_{WA}$ and the clause 6.2 verification procedure.
+  Cited by [Sound Power](../devices/emission/sound-power.md).
 - International Organization for Standardization. (1993). *Acoustics —
   Determination of sound power levels of noise sources using sound
   intensity — Part 1: Measurement at discrete points* (ISO 9614-1:1993).

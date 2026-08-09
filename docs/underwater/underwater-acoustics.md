@@ -176,6 +176,18 @@ cumulative SEL and on the peak level at a stated range, which is why
 `pile_strike_metrics` reports them together and `cumulative_sel` follows the
 strike-by-strike energy sum of Formulae 8–9.
 
+## See also
+
+- [Marine-mammal noise exposure](marine-mammal-exposure.md):
+  the assessment the criteria named in section 3 are applied through — auditory
+  weighting, accumulation over the strikes and the margin against the published
+  onset criteria.
+- [Underwater sound propagation](underwater-propagation.md):
+  the transmission loss that carries these source levels to a receiver, and the
+  sonar equation they feed.
+- API reference: [`underwater.acoustics`](https://jmrplens.github.io/phonometry/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.sources.ship_radiated_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/ship-radiated-noise/).
+- General underwater propagation modelling (ray, normal mode, parabolic equation) is covered in [Underwater propagation solvers](underwater-solvers.md).
+
 ## References
 
 - Urick, R. J. (1983). *Principles of underwater sound* (3rd ed.).

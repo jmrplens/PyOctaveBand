@@ -348,6 +348,14 @@ Use C-weighting for peak sound pressure and high-level noise, and use the differ
 
 Not with a plain bilinear design: at $f_s = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
 
+## See also
+
+- [Special Weightings (G, B, D, AU)](special-weightings.md):
+  the infrasound G curve, the historical B and D, and AU for audible sound
+  in the presence of ultrasound.
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+- Theory: [Weighting Curves (IEC 61672-1)](../../reference/theory/signal-analysis.md#weighting-curves-iec-61672-1): the pole-zero definition of the A, C and Z curves and the bilinear design the oversampling repairs.
+
 ## References
 
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement

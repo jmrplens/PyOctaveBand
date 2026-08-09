@@ -430,6 +430,44 @@ split into point sources is declared out of scope by the method itself.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
 
+## References
+
+- Kephalopoulos, S., Paviotti, M., & Anfosso-Lédée, F. (2012). *Common noise
+  assessment methods in Europe (CNOSSOS-EU)* (EUR 25379 EN). Publications
+  Office of the European Union.
+  [doi:10.2788/31776](https://doi.org/10.2788/31776).
+  The Joint Research Centre reference report the Directive text descends from,
+  and the only place the measurement campaigns behind the Appendix F
+  coefficients are described.
+- International Organization for Standardization. (1996). *Acoustics —
+  Attenuation of sound during propagation outdoors — Part 2: General method of
+  calculation* (ISO 9613-2:1996).
+  [iso.org catalogue](https://www.iso.org/standard/20649.html).
+  The propagation model this library uses to carry the emission to a receiver.
+  CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which
+  is not ISO 9613-2.
+
+## Standards
+
+Directive 2002/49/EC, Annex II, section 2.2 with the coefficient database of
+Appendix F, in the consolidated text — which is three instruments read
+together, and reading only one of them is the easiest way to ship a wrong
+table:
+
+- Commission Directive (EU) 2015/996
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2015/996/oj)),
+  which replaced Annex II with the CNOSSOS-EU methods. The implemented road
+  source is section 2.2, formulae 2.2.1 to 2.2.20.
+- Its corrigendum of 10 January 2018, OJ L 5, p. 35
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01))),
+  which sets the octave-band range of the road source to 63 Hz - 8 kHz and
+  replaces the whole of Appendix G.
+- Commission Delegated Directive (EU) 2021/1226
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj)),
+  in force since 31 December 2021, which replaces Tables F-1 and F-4 in their
+  entirety and prints the octave-band A-weighting used to sum the source
+  spectrum.
+
 ---
 
 
@@ -875,6 +913,42 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
 
+## References
+
+- Kephalopoulos, S., Paviotti, M., & Anfosso-Lédée, F. (2012). *Common noise
+  assessment methods in Europe (CNOSSOS-EU)* (EUR 25379 EN). Publications
+  Office of the European Union.
+  [doi:10.2788/31776](https://doi.org/10.2788/31776).
+  The Joint Research Centre reference report the Directive text descends from,
+  with the IMAGINE measurement campaigns behind the Appendix G coefficients.
+- International Organization for Standardization. (1996). *Acoustics —
+  Attenuation of sound during propagation outdoors — Part 2: General method of
+  calculation* (ISO 9613-2:1996).
+  [iso.org catalogue](https://www.iso.org/standard/20649.html).
+  The propagation model this library uses to carry the emission to a receiver.
+  CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which
+  is not ISO 9613-2.
+
+## Standards
+
+Directive 2002/49/EC, Annex II, section 2.3 with the coefficient database of
+Appendix G, in the consolidated text — three instruments read together:
+
+- Commission Directive (EU) 2015/996
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2015/996/oj)),
+  which replaced Annex II with the CNOSSOS-EU methods. The implemented railway
+  source is section 2.3, formulae 2.3.1 to 2.3.18.
+- Its corrigendum of 10 January 2018, OJ L 5, p. 35
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01))),
+  which replaces the whole of Appendix G and corrects the roughness
+  conversion, where the published text read km/h for a speed that has to be in
+  metres per second.
+- Commission Delegated Directive (EU) 2021/1226
+  ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj)),
+  in force since 31 December 2021, which replaces Tables G-1b, G-2, G-3a, G-4
+  and G-7, substitutes a new curve-squeal rule and a new bridge model, and
+  rewrites the vertical directivity of source A.
+
 ---
 
 
@@ -1039,6 +1113,54 @@ candidate. The audibility formula is the ISO 1996-2 Annex C one; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
 and the Zwicker critical band from the spectrum. For a rating adjustment
 $K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+
+### Assessment report (`.report()`)
+
+Tonal audibility is the part of a wind-turbine assessment that ends in a
+document handed to a regulator, so the result renders one.
+`WindTurbineTonalityResult.report(path)` writes a one-page fiche following
+IEC 61400-11:2012+A1:2018 subclauses 9.5.2 to 9.5.8: a standard-basis line, an
+optional metadata header (source/situation, client, measurement position,
+instrumentation, date), the critical-band analysis table — tone frequency,
+critical bandwidth, tone level $L_{pt}$, masking-noise level $L_{pn}$, tonality
+$\Delta L_{tn}$, audibility criterion $L_a$ and tonal audibility $\Delta L_a$ —
+beside the narrowband spectrum with the critical band, the masking level and
+the tone marked, then the boxed $\Delta L_a$ with the tone frequency and the
+audibility decision, an optional PASS/FAIL row, a note on how $\Delta L_a$ is
+built, and the fixed disclaimer in the footer.
+
+A supplied `requirement` is the **maximum acceptable** tonal audibility in dB,
+so a *less* audible tone passes. Rendering needs reportlab and, for the
+embedded figure, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported, and `language="es"` renders a Spanish fiche.
+
+```python
+from phonometry import ReportMetadata
+
+# The 500 Hz gearbox tone over the flat 30 dB floor of the snippet above.
+res.report(
+    "tonality_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Horizontal-axis wind turbine, gearbox tone",
+        measurement_standard="IEC 61400-11",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=6.0,            # maximum acceptable tonal audibility (dB)
+    ),
+)                                   # tonal audibility (dB) and the decision
+```
+
+[![IEC 61400-11 wind-turbine tonal audibility example report: a metadata header, a critical-band analysis table (tone frequency 500.0 Hz, critical bandwidth 117.3 Hz, tone level Lpt = 60.0 dB, masking-noise level Lpn = 45.9 dB, tonality dLtn = 14.1 dB, audibility criterion La = -2.3 dB) beside the narrowband-spectrum plot with the critical band shaded and the masking level drawn, the boxed tonal audibility dLa = 16.4 dB at the 500.0 Hz tone with the decision that the tone is audible, and a FAIL verdict against a maximum acceptable audibility of 6.0 dB](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61400_wind_turbine_tonality_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61400_wind_turbine_tonality_example.pdf)
+
+*Wind-turbine tonal-audibility fiche (`WindTurbineTonalityResult.report`): a
+30 dB masking floor under a 60 dB tone leaves $\Delta L_a$ = 16.4 dB, far past
+the 0 dB audibility line and past a 6 dB acceptance requirement.*
+
+## See also
+
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the ISO 1996-2 rating adjustment this page's $\Delta L_a$ feeds.
+- [Tone audibility](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/): the same tonal-audibility idea outside the wind-turbine context.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the chain that carries $L_{WA}$ from the rotor to a dwelling.
+- API reference: [`environment.sources.wind_turbine`](https://jmrplens.github.io/phonometry/reference/api/environment/wind-turbine/).
 
 ## References
 

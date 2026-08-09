@@ -470,6 +470,56 @@ own numeric anchors (see [CONFORMANCE.md](../../CONFORMANCE.md)):
   same room at 1 kHz (Equation (8.46)), plus the mode count matched against
   the exact enumeration and the degeneracy of a cubic room.
 
+## What this guide covers
+
+**Covered.** Kuttruff's image-source construction (§4.1), the Eyring formula
+used for the near-cubic check and the Schroeder frequency of §3.6; Vorländer's
+mirror-source model with its reflection-factor and delay expressions
+(Chapter 11); and the Allen & Berkley reflection-order decomposition — all in
+`image_source_rir`. The Bies §6.4 steady-state field (room constant,
+directivity $Q$, critical distance) in `steady_state_field`, `room_constant`,
+`critical_distance`, `steady_state_spl` and `schroeder_frequency`. Long's
+Chapter 8 rectangular-room eigenfrequencies (Eq. 8.43) with their
+axial/tangential/oblique classification and the Morse/Pierce mode count and
+modal density (Eqs. 8.45, 8.46) in `room_modes`, `room_mode_frequency`,
+`room_mode_count` and `room_modal_density`.
+
+**Not covered.** Specular reflection only: no diffraction, no diffuse
+scattering. An elongated room therefore decays more slowly than the Eyring
+estimate the model is checked against — the anisotropy the Fitzroy and
+Arau-Puchades models of
+[reverberation-time prediction](reverberation-prediction.md) exist to correct.
+Kuttruff's reverberation distance, which uses the Sabine absorption area rather
+than the room constant, is quoted for comparison and not implemented:
+`steady_state_field` and `critical_distance` are always the Bies room-constant
+form. The mode calculator assumes rigid walls and a rectangular plan and
+returns eigen*frequencies* only — no amplitude at a listening position, no
+damping, no mode shape, no other geometry; for those, mesh the room and run the
+[2D FDTD solver](../../simulation/fdtd-simulation.md). Bolt's preferred
+dimension ratios are discussed, not tabulated.
+
+## See also
+
+- [Room Acoustics](room-acoustics.md): the *measured* impulse
+  response (ISO 18233) and the ISO 3382 parameters the synthetic RIR feeds.
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](reverberation-prediction.md):
+  the statistical decay rate the image-source model reproduces, and the
+  anisotropy models beyond it.
+- [Sound absorption in enclosed spaces (EN 12354-6)](enclosed-space-absorption.md):
+  the equivalent absorption area behind the mean absorption `alpha_bar`.
+- [Sound Power](../../devices/emission/sound-power.md): the `Lw` that drives the
+  steady-state level.
+- [2D FDTD wave simulation](../../simulation/fdtd-simulation.md): the
+  independent wave solver used to cross-check the rigid-wall echo and the decay.
+- [Theory: Rooms and buildings](../../reference/theory/rooms-buildings.md):
+  the image-lattice and steady-state derivations.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the closed forms and worked anchors these implementations are validated
+  against.
+- API reference: [`room.image_source`](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
+  and [`room.steady_field`](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/).
+- Theory: [Image-source room impulse response](../../reference/theory/rooms-buildings.md#image-source-room-impulse-response-kuttruff-41-vorländer-11): the geometrical model behind the image method and its relation to the statistical one.
+
 ## References
 
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.

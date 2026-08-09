@@ -46,6 +46,8 @@ ISO 17497-2:2012 measures, in the free field, how uniformly a surface spreads
 its reflected polar response over $n$ microphones. The autocorrelation-based
 coefficient (clause 8.1, Formula 5) is
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer.svg" alt="ISO 17497-2 free-field diffusion goniometer: a test sample on a turntable, a fixed loudspeaker source, and a semicircular arc of receiver microphones sampling the reflected polar response, from which the autocorrelation diffusion coefficient is computed" width="92%"></picture>
+
 $$
 d_\theta = \frac{\left( \sum_i p_i \right)^2 - \sum_i p_i^2}{(n - 1) \sum_i p_i^2},
 \qquad p_i = 10^{L_i/10},
@@ -65,6 +67,17 @@ flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
 predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="A polar plot of the predicted reflected sound-pressure level of a six-period N=7 quadratic-residue diffuser over 37 receivers from -90 to 90 degrees, the energy concentrated in a fan of discrete grating lobes, giving an autocorrelation diffusion coefficient d of about 0.11" width="72%"></picture>
+
+*The object the coefficient is computed from, in the presentation clause 8.5
+prescribes: one polar response per one-third-octave band and source position,
+on a semicircular plot with a decibel radial axis. This is the six-period
+$N = 7$ quadratic-residue diffuser of the anchor below, at 1 kHz. Its energy
+sits in a fan of discrete grating lobes rather than in one specular lobe, which
+is why $d_\theta$ is 0.11 where the flat reference of the same size scores
+0.005 — and why it is still nowhere near 1: the numerator rewards an even
+response, and a comb of lobes is not even.*
 
 See the [Diffusers guide](../../materials/diffusers/diffusers.md) for usage.
 
@@ -95,6 +108,8 @@ clauses 4/5.7/6.6); the implementation reuses that module, adding the Part 2
 geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
 $0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
 
 See the [In-situ Road-Surface Absorption guide](../../materials/surfaces/road-absorption.md) for usage.
 
@@ -134,6 +149,14 @@ the zero-velocity specific resistance, reported at the reference velocity
 $u = 0.5$ mm/s. ISO 9053-2:2020 (alternating method) replaces the flowmeter
 with a ~2 Hz piston and a microphone in a closed cavity (clause 8.7,
 Formula 2):
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance.svg" alt="ISO 9053-1 static-method airflow resistance: the measured pressure drop against linear airflow velocity, fitted with a through-origin quadratic, with the specific airflow resistance evaluated at the 0.5 mm/s reference velocity" width="80%"></picture>
+
+*The fit, and the single abscissa it is read at. The curve is slightly
+super-linear because the $b\,u^2$ term is real, but the reported quantity is the
+linear coefficient $a$ — the fit extrapolated back to zero velocity — evaluated
+at the 0.5 mm/s reference velocity, which is why the reference velocity has to
+be stated with any resistivity that is quoted.*
 
 $$
 R = \kappa'\ \frac{p_s}{2 \pi f V}\ \frac{h_t}{h_s}\ 10^{(L_{ps} - L_{pt})/20}

@@ -452,6 +452,14 @@ Use C-weighting for peak sound pressure and high-level noise, and use the differ
 
 Not with a plain bilinear design: at $f_s = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
 
+## See also
+
+- [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/):
+  the infrasound G curve, the historical B and D, and AU for audible sound
+  in the presence of ultrasound.
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+- Theory: [Weighting Curves (IEC 61672-1)](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#weighting-curves-iec-61672-1): the pole-zero definition of the A, C and Z curves and the bilinear design the oversampling repairs.
+
 ## References
 
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
@@ -1019,6 +1027,18 @@ See [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/sign
 built on these envelopes, and [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/) for the IEC
 61672-1 tone-burst verification.
 
+## See also
+
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): the percentile levels defined on the detector's output, and the integrated metrics that bypass it.
+- [Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/): the complete IEC 61672-1 instrument chain around this detector.
+- [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/): the A/C/Z filters applied before the detector.
+- [Block Processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/): streaming the detector over frames without state discontinuities.
+- [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/): the onset-based rating of impulses that the international standards moved to.
+- [Spanish Noise Regulation](https://jmrplens.github.io/phonometry/environment/assessment/spanish-noise-regulation/): a rating in force that still requires the I weighting, through the $L_{AIeq} - L_{Aeq}$ impulsive correction $K_i$.
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): the IEC 61672-3 periodic tests, in which these ballistics are spot-checked against the class limits on a real instrument.
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/).
+- Theory: [Time Integration](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#time-integration): the first-order equation the exponential detectors solve, and what integrating it over a fixed block instead would change.
+
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -1499,6 +1519,16 @@ to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
 over 8 h. Half the dose is -3 dB, and double duration at the same level is
 +3 dB.
 
+## See also
+
+- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_{den}$/$L_{dn}$ indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
+- [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/): the Fast/Slow/Impulse detector the percentile levels are defined on.
+- [Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): the sensitivity factor that turns digital units into the pascals every level here assumes.
+- [Occupational exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/): the workplace measurement strategies the dose measures feed.
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signals/filters/multichannel/): per-channel levels and how to combine them energetically.
+- API reference: [`signals.levels`](https://jmrplens.github.io/phonometry/reference/api/signals/levels/).
+- Theory: [Event and dose metrics](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#event-and-dose-metrics): the energy definitions behind Leq, SEL and the exposure quantities, and how the percentile levels relate to them.
+
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -1528,6 +1558,12 @@ IEC 61252, *Electroacoustics — Specifications for personal sound exposure
 meters*: the sound exposure E in Pa²h and the normalized 8 h level LEX,8h
 (≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. The ISO 1996-1/-2
 environmental indicators and determination procedures are covered in
+[Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/).
+
+**Not covered.** **IEC 61252 was revised in 2025; only the formulae of the
+implemented first edition (1993) are here**, not the newer one. The ISO 1996-1
+whole-day indicators ($L_{den}$, $L_{dn}$, the rating levels) and the
+ISO 1996-2 determination procedures are not on this page either — they are in
 [Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/).
 
 ---

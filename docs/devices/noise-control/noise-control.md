@@ -289,6 +289,49 @@ What has to be recorded includes the **leak ratio** (open area over interior
 surface area, with the openings described) and the **fill ratio** (source volume
 over interior volume) — the two numbers a prediction never captures.
 
+## What this guide covers
+
+**Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods —
+`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
+tables), `hvac.plenum_attenuation` (Wells' closed form) and
+`hvac.flow_noise_straight_duct` / `flow_noise_bend` (VDI 2081) — and the
+machine-enclosure insertion loss of Bies §7.4, Eqs. (7.103) and (7.111),
+through `enclosure_insertion_loss`, which combines a supplied panel
+transmission loss with the interior room-constant correction, together with the
+`composite_transmission_loss` of panels, doors and openings that feeds it.
+
+**Not covered.** The reactive elements — expansion chambers, side branches,
+extended tubes — live in [Silencers](silencers.md). Dissipative duct-lining
+silencers are modelled from liner properties nowhere in the library; the lined
+elbow and the plenum here are interpolated installation tables. Nothing on this
+page is a measurement: the ISO 11546 procedure of section 2 is described so a
+declared figure can be read, not implemented. Structure-borne transmission from
+a machine into its enclosure or its slab is outside every model here.
+
+## See also
+
+- [Silencers](silencers.md): the reactive four-pole
+  elements and the reactive-versus-dissipative selection.
+- [Duct-Borne Noise: Fan to Room](duct-path.md): the
+  end-to-end calculation that chains these element models from the fan to the
+  room criterion.
+- [Loudspeaker Characterisation (IEC 60268-5)](../electroacoustics/loudspeakers.md):
+  the radiating piston (radiation impedance and directivity), the companion
+  radiator model.
+- [Sound Power](../emission/sound-power.md): the source $L_W$ that feeds a
+  duct or an enclosure.
+- [Room image sources and steady field](../../buildings/rooms/room-image-sources.md):
+  the `room_constant` reused by the enclosure interior correction.
+- [Panel sound insulation](../../buildings/design/panel-sound-insulation.md):
+  the panel transmission loss this page asks you to supply, and the slit and
+  circular-aperture models behind the composite of section 2.1.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the closed forms and worked anchors these implementations are validated
+  against.
+- API reference:
+  [`noise_control.hvac`](https://jmrplens.github.io/phonometry/reference/api/noise_control/hvac/) and
+  [`noise_control.enclosures`](https://jmrplens.github.io/phonometry/reference/api/noise_control/enclosures/).
+
 ## References
 
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise

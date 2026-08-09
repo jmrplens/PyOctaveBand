@@ -287,6 +287,11 @@ repository; click the preview to open the PDF.
 *Impulsive-sound prominence fiche (`ImpulseProminenceResult.report`), governing
 prominence $P$ with the $L_{Aeq}$ adjustment $K_I$.*
 
+## See also
+
+- API reference: [`environment.assessment.impulsive_sound`](https://jmrplens.github.io/phonometry/reference/api/environment/impulsive-sound/).
+- Theory: [Impulsive-sound prominence (NT ACOU 112)](../../reference/theory/environment-transport.md#impulsive-sound-prominence-nt-acou-112): the NT ACOU 112 prominence derivation and the onset criterion it rests on.
+
 ## References
 
 - Nordtest. (2002). *Acoustics: Prominence of impulsive sounds and for
@@ -312,3 +317,13 @@ NT ACOU 112:2002 (Nordtest), *Prominence of impulsive sounds and
 for adjustment of LAeq*: the predicted prominence (clause 7, Formula 1), the
 adjustment to $L_{Aeq}$ (clause 8, Formula 2) and the rating level (clause 8,
 Note 1), with the onset defined in clauses 4.5-4.7.
+
+**Not covered.** Only the graduated $K_I$ of Formula 2 is implemented. NT ACOU
+112's Note 4 to clause 7 records an older Nordic guideline — a flat 5 dB
+adjustment from subjective judgement, recommended when $K_I > 3$ for noise
+characteristic of working operations and offered where the graduated method
+cannot be applied — and that fallback is not implemented. **ISO 1996-1**
+Table A.1's category adjustments (5 dB regular, 12 dB highly impulsive) appear
+here only as the assessor's-judgement baseline this measurement replaces, not
+as a function of their own.
+

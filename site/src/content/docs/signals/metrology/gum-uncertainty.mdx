@@ -332,6 +332,16 @@ In all three, Supplement 1 clause 8 says the Monte Carlo result is the reference
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left: the GUM uncertainty budget, a horizontal bar chart of each input's contribution to the combined uncertainty with a dashed line at uc of 0.407 dB. Right: the Monte Carlo output histogram overlaid with the GUM Gaussian and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%" />
 
+*Left is where the money goes: the ten positions carry 73.9 % of the variance
+on their own, the instrument 18.1 % and the calibrator 8.0 %, so $u_c$ =
+0.407 dB is a statement about the survey design and not about the meter.
+Halving the instrument term would move $u_c$ by 0.02 dB; three more positions
+move it by ten times that. Right is the same budget resampled a million times:
+the Monte Carlo standard uncertainty is 0.4073 dB against the GUM's 0.4072, and
+its 95 % interval $[73.20, 74.80]$ matches $Y \pm U$ = 74.00 ± 0.86 dB with
+$k = 2.115$ at $\nu_\text{eff}$ = 16.5 — this is the near-linear case where the
+two methods agree, and the panel above shows the three where they do not.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

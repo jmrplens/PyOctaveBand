@@ -397,6 +397,32 @@ natural pre-analysis before the dedicated
 metrics: the envelope spectrum tells you *whether and at what rate* a signal
 is modulated, the domain metrics quantify it normatively.
 
+## What this guide covers
+
+**Covered.** The three cepstrum variants and liftering of Havelock, Kuwano &
+Vorländer's *Handbook of Signal Processing in Acoustics* (`cepstrum`, `lifter`;
+Chapters 27 and 87), the single-echo delay and reflection coefficient read off
+the power cepstrum (`echo_detection`), the invertible complex cepstrum and its
+homomorphic round trip (`CepstrumResult.invert`), and the Bendat & Piersol
+Chapter 13 envelope spectrum (`envelope_spectrum`) with its closed-form AM tone
+lines.
+
+**Not covered.** `echo_detection` picks the single largest cepstral peak in the
+band it is given, so a response carrying several overlapping echoes needs
+manual peak-picking or repeated calls on narrowed bands: it is not a multi-echo
+separator. There is no mel-warped or MFCC-style cepstrum for perceptual audio
+features either — `cepstrum` and `lifter` work on the plain linear-frequency
+log spectrum only.
+
+## See also
+
+- [Correlation, time delay and envelope](correlation-delay.md): the Hilbert envelope this page transforms into a spectrum.
+- [Calibrated spectral analysis](spectral-analysis.md): the log spectrum the cepstrum starts from.
+- [Time synchronous averaging](synchronous-averaging.md): removing the synchronous part before running an envelope spectrum on the residual.
+- [Machine fault frequencies](../../vibration/machinery/machine-diagnostics.md): the bearing and gear families read off exactly this envelope spectrum.
+- [Swept-sine distortion](../../devices/electroacoustics/swept-sine-distortion.md): the minimum-phase folding that shares this page's core.
+- API reference: [`signals.cepstrum`](https://jmrplens.github.io/phonometry/reference/api/signals/cepstrum/).
+
 ## References
 
 - Havelock, D., Kuwano, S., & Vorländer, M. (Eds.) (2008). *Handbook of

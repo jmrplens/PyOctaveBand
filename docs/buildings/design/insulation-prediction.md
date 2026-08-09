@@ -343,6 +343,19 @@ examples H.3 and E.3). The façade and outdoor-radiation predictions of
 EN 12354-3:2000 and EN 12354-4:2000 have their own page, and the absorption
 member of the family is EN 12354-6.
 
+**Not covered.** The *detailed* per-band models of both parts are a separate
+page, [Detailed per-band prediction (ISO 12354)](detailed-prediction.md): the
+same standard run band by band, with the laboratory element and junction data
+converted to their in-situ values before the paths are formed. Use the
+simplified model here when only the weighted element ratings are known and the
+question is whether the room passes; use the detailed one when the element
+spectra exist and the question is which path sets which band. The element
+inputs themselves — $R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area —
+are taken as given, from laboratory data or from the mass-law estimates of
+[Predicting panel sound insulation](panel-sound-insulation.md). **EN 12354-5**
+(service equipment) is in
+[Installed structure-borne sound](installed-structure-borne.md).
+
 ## See also
 
 - [Façade Sound Insulation](../insulation/facade-insulation.md): the EN 12354-3 and

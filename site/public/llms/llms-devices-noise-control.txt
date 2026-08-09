@@ -791,6 +791,36 @@ where the plane-wave assumption is structural rather than statistical, and
 where the peaks and troughs of a computed transmission loss simply do not
 survive past cut-on.
 
+## What this guide covers
+
+**Covered.** The fan source (`fan_sound_power`, `fan_efficiency_correction`,
+`blade_passing_frequency`, `fan_casing_attenuation`; Long Eq. 13.1 with
+Tables 13.5-13.8); the run attenuations (lined and unlined rectangular and
+circular ducts, `flexible_duct_insertion_loss`, `elbow_insertion_loss`,
+`split_loss`, `end_reflection_loss` in both published methods,
+`splitter_silencer_insertion_loss`, `plenum_attenuation`); the regenerated
+noise (`silencer_self_noise`, `flow_noise_straight_duct`, `flow_noise_bend`,
+`diffuser_sound_power`, and the ASHRAE Chapter 49 screening rules
+`air_terminal_velocity_limit` and `air_terminal_damper_correction`);
+`room_effect` and the criterion machinery; the cascade itself (`duct_path`,
+`combine_duct_paths`, `.table()`, `.report()`); and the `duct_modes` cut-on
+analysis.
+
+**Not covered.** Nothing is predicted where the manufacturer publishes it: the
+sheet expects the published fan and terminal figures. There is no dissipative
+liner model — the splitter estimate is a lined-duct regression and the plenum
+is Wells' closed form — and above the first cut-on the element models rest on
+their empirical fit alone. Four paths of a real installation sit outside the
+calculation entirely, which is usually why a passing sheet meets a failing
+room: **duct breakout** from a trunk radiating through its own walls into a
+space it merely crosses; **break-in and crosstalk** between two rooms served by
+the same run, whatever the partition between them; **structure-borne
+transmission** of fan vibration through hangers, plinths and slab, whose
+dynamic transfer stiffness belongs to
+[Transfer stiffness (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/);
+and the **octave resolution itself**, which averages a blade-passing tone into
+its band and so understates how a pure tone will be judged.
+
 ## See also
 
 - [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): the reactive four-pole elements (expansion
@@ -1226,6 +1256,48 @@ half-second reverberation time a Schroeder frequency of 163 Hz, which is
 exactly why the 125 Hz band of problem 4.18 - the band that governs the
 whole answer - should be read as an estimate and not as a number.
 
+## What this guide covers
+
+**Covered.** The Norton & Karczub §4.9 power balance (Eq. 4.101) as
+`room_to_room_transmission`, with `SourceRoom`, `equivalent_absorption_area`,
+`mean_absorption` and `room_constant`; the source-room level from a sound power
+level through the §4.6 Table 4.5 source models — constant power, constant
+volume, constant pressure — and the directivity of the machine's position;
+`DesignCriterion` with its target, its flanking allowance and its ANSI/ASA
+S12.2-2019 rating, NC by default and RC Mark II with
+`DesignCriterion(family="RC")`, plus `.required_transmission_loss`,
+`.exceedance`, `.meets_target` and `.table()`; and the §4.10 enclosure equation
+(Eq. 4.115) through `enclosure_required_transmission_loss` in both interior
+models listed by `ENCLOSURE_MODELS`.
+
+**Not covered.** The transmission loss of the partition itself, which is
+measured or predicted elsewhere; flanking as a modelled path rather than the
+flat allowance used here; and the leaks and openings of an enclosure, which
+need the composite of
+[Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/). The whole chain is a diffuse-field
+argument, so it says nothing below either room's Schroeder frequency, or closer
+to a surface than roughly half a wavelength.
+
+## See also
+
+- [Panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  where the transmission loss this page consumes comes from.
+- [Building sound insulation prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
+  and [Flanking transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
+  the EN 12354 models for the flanking paths this page only debits.
+- [Field sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  how the same room pair is measured, and the $D_{nT}$ and $R'$ a test report
+  hands back.
+- [Room-noise criteria](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/): the NC and
+  RC Mark II families the verdict is written in.
+- [Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/):
+  the enclosure of section 5 as a construction, with its leaks and its
+  measurement standards.
+- [Sound power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the machine $L_W$
+  the whole chain starts from.
+- API reference:
+  [`noise_control.room_to_room`](https://jmrplens.github.io/phonometry/reference/api/noise_control/room-to-room/).
+
 ## References
 
 - Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and
@@ -1630,6 +1702,29 @@ higher-order modes propagate: the two-dimensional solver keeps working there
 and the plane-wave algebra does not.
 
 
+## What this guide covers
+
+**Covered.** Reactive silencers by the four-pole transfer-matrix method
+(Bies §8.8-8.9, Munjal Eq. (3.27)): the closed-form `expansion_chamber`
+(Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46),
+(8.44)), `extended_tube_chamber`, and the `duct_matrix` / `shunt_matrix` /
+`cascade` / `transmission_loss` / `insertion_loss` blocks for arbitrary chains,
+each with its to-scale `.plot_geometry()` and cross-checked against the
+independent FDTD solver; the `plane_wave_limit` that bounds all of them; and,
+as prose rather than code, the ISO 7235 substitution measurement that produces
+the insertion loss a supplier publishes.
+
+**Not covered.** Reactive elements only. Dissipative (absorptive, duct-lining)
+silencers are discussed for selection but never modelled from liner properties,
+and the lined-elbow and plenum data of the
+[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) are interpolated installation tables, not a
+liner model. Mean-flow effects — convection, temperature gradients, the
+flow-dependent impedance of perforates — are outside the no-flow element
+matrices used here. Nothing on this page is a measurement: no part of ISO 7235
+is implemented, shell breakout and the end corrections at the area jumps are
+not modelled, and the branch models are lossless unless a `resistance` is
+supplied.
+
 ## See also
 
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the end-to-end fan-to-room
@@ -1957,6 +2052,49 @@ is reported band by band over at least 100 Hz to 5 kHz in third octaves.
 What has to be recorded includes the **leak ratio** (open area over interior
 surface area, with the openings described) and the **fill ratio** (source volume
 over interior volume) — the two numbers a prediction never captures.
+
+## What this guide covers
+
+**Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods —
+`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
+tables), `hvac.plenum_attenuation` (Wells' closed form) and
+`hvac.flow_noise_straight_duct` / `flow_noise_bend` (VDI 2081) — and the
+machine-enclosure insertion loss of Bies §7.4, Eqs. (7.103) and (7.111),
+through `enclosure_insertion_loss`, which combines a supplied panel
+transmission loss with the interior room-constant correction, together with the
+`composite_transmission_loss` of panels, doors and openings that feeds it.
+
+**Not covered.** The reactive elements — expansion chambers, side branches,
+extended tubes — live in [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/). Dissipative duct-lining
+silencers are modelled from liner properties nowhere in the library; the lined
+elbow and the plenum here are interpolated installation tables. Nothing on this
+page is a measurement: the ISO 11546 procedure of section 2 is described so a
+declared figure can be read, not implemented. Structure-borne transmission from
+a machine into its enclosure or its slab is outside every model here.
+
+## See also
+
+- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): the reactive four-pole
+  elements and the reactive-versus-dissipative selection.
+- [Duct-Borne Noise: Fan to Room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the
+  end-to-end calculation that chains these element models from the fan to the
+  room criterion.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the radiating piston (radiation impedance and directivity), the companion
+  radiator model.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the source $L_W$ that feeds a
+  duct or an enclosure.
+- [Room image sources and steady field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
+  the `room_constant` reused by the enclosure interior correction.
+- [Panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  the panel transmission loss this page asks you to supply, and the slit and
+  circular-aperture models behind the composite of section 2.1.
+- [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
+  the closed forms and worked anchors these implementations are validated
+  against.
+- API reference:
+  [`noise_control.hvac`](https://jmrplens.github.io/phonometry/reference/api/noise_control/hvac/) and
+  [`noise_control.enclosures`](https://jmrplens.github.io/phonometry/reference/api/noise_control/enclosures/).
 
 ## References
 

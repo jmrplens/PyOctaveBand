@@ -175,6 +175,15 @@ and have no −3 dB point there. Two cases need special handling:
 - **Bessel**: designed with `norm="mag"`, which defines the −3 dB point exactly
   at `Wn` (the `phase` norm would shift the edges to roughly −10 dB).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Magnitude response comparison of the five filter architectures for the 1 kHz octave band, with a zoom at the -3 dB crossover" width="88%"></picture>
+
+*The same 1 kHz octave band designed five ways. Look at three things: the
+flatness of the passband top (Butterworth and Chebyshev II flat, Chebyshev I and
+elliptic rippling by the design ripple), the steepness of the skirt just outside
+the edges, and the shape of the deep stopband. The zoom at the crossover is where
+the band-edge rule below becomes visible — the two equiripple designs are not at
+−3 dB there, because that is not where their edge is defined.*
+
 ## Filter Bank Design & Numerical Stability
 
 To ensure **100% stability** across the entire audible spectrum (even at low
@@ -330,6 +339,8 @@ $$
 $$
 
 IEC 61043 clause 7.3 specifies the probe intensity response with exactly this argument and Table 3 tabulates it (e.g. −10.5 dB at 6.3 kHz for a 25 mm spacer). Below $f = 0.1 c / \Delta r$ (i.e. $k \Delta r$ under 0.63) the bias stays within about 0.3 dB; `bias_correction` provides the reciprocal factor per band and `max_valid_frequency` the bound.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="A two-microphone p-p sound intensity probe: two pressure microphones separated by a spacer, from which the pressure gradient and hence the normal intensity are estimated" width="88%"></picture>
 
 The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
 

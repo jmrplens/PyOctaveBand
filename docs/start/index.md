@@ -31,7 +31,7 @@ against a building code, rate a machine's sound power, decide whether a worker
 is over the exposure limit.
 
 **Where is the thing I came for?**
-[All guides](https://jmrplens.github.io/phonometry/start/guides/) is the map: every guide in the library,
+[All guides](../README.md) is the map: every guide in the library,
 grouped by the topic it belongs to, with a line on each.
 
 **Should I trust the number?**
@@ -40,7 +40,7 @@ is for and how it is validated against the standards it implements, with the
 tone-burst check worked through against the acceptance limits.
 
 **Who is answerable for it, and how do I cite it?**
-[About](https://jmrplens.github.io/phonometry/start/about/) states who maintains it, how to cite it and
+[About](about.md) states who maintains it, how to cite it and
 under what licence.
 
 ## Two things to settle before any guide works
@@ -74,7 +74,7 @@ part written most bluntly.
 ## If you already know what you need
 
 - A first measurement carried end to end: [Build a sound level meter](../signals/sound-level-meter.md).
-- The whole inventory, by topic: [All guides](https://jmrplens.github.io/phonometry/start/guides/).
+- The whole inventory, by topic: [All guides](../README.md).
 - A symbol you have but cannot name: the [glossary](../reference/glossary.md), with its unit, its defining clause and the guide that computes it.
 - Evidence that a number is defensible: the [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/), which prints each standard's own expected value beside the computed one.
 - A printed expected value that disagrees with the library: the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/), which says which of the two is wrong and why.
