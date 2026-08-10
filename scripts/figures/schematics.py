@@ -13,6 +13,7 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.collections import LineCollection
 
 from .i18n import _LANG
 from .media import (
@@ -27,7 +28,9 @@ from .theme import (
     _FILENAME_SUFFIX,
     COLOR_FG,
     COLOR_GRID,
+    COLOR_MUTED,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
 )
@@ -1894,3 +1897,969 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
                 state_txt, drive_txt)
 
     _render_clip(fig, update, output_dir, "anim_dynamic_stiffness_sweep")
+
+
+# --- the modulation transfer function, drawn on the envelope --------------
+#
+# The clip that shows what ``sti_vs_t60.svg`` and ``sti_mtf_curves.svg``
+# summarise: an intensity envelope losing its depth. Everything drawn is the
+# measurement itself -- the received envelope is the 100 % modulated probe
+# convolved with the band-filtered h_k^2(t) the standard integrates, so the
+# depth (max - min)/(max + min) a reader measures off the trace is the same
+# number IEC 60268-16's Schroeder integral returns (checked to four decimals
+# against ``STIResult.mtf`` at T60 = 0.3, 1.0 and 2.5 s).
+
+#: The 14 modulation frequencies of the full method (Ed.5 A.2.2), in Hz.
+_MTF_MOD_FREQS = np.array([0.63, 0.80, 1.00, 1.25, 1.60, 2.00, 2.50,
+                           3.15, 4.00, 5.00, 6.30, 8.00, 10.0, 12.5])
+#: The 1 kHz octave band of the seven, and the syllable-rate probe drawn in
+#: it (4 Hz is index 8 of the fourteen).
+_MTF_BAND = 3
+_MTF_PROBE_INDEX = 8
+_MTF_BAND_LABELS = ("125", "250", "500", "1k", "2k", "4k", "8k")
+#: The two sweeps, coarse enough to stay cheap and fine enough that neither
+#: the m(F) curve nor the STI needle steps visibly at 20 fps.
+_MTF_T60S = tuple(round(v, 2) for v in np.arange(0.30, 2.501, 0.05))
+_MTF_SNRS = tuple(round(v, 1) for v in np.arange(25.0, -0.001, -0.5))
+#: The reverberation time act 2 freezes at while the noise rises.
+_MTF_ACT2_T60 = 1.0
+#: Envelope drawing grid: 1 ms bins (energy preserving) over a 1.5 s window,
+#: six full cycles of the 4 Hz probe.
+_MTF_ENV_HZ = 1000
+_MTF_WINDOW_S = 1.5
+
+
+def _modulation_transfer_data() -> dict[str, Any]:
+    """Envelopes, MTF rows, band MTIs and STI for both sweeps of the clip.
+
+    Cached because the four language x theme variants render one after
+    another in the same process (this clip registers no field builder), and
+    the octave-bank filtering plus the 96 STI runs would otherwise be paid
+    four times over.
+    """
+    from functools import lru_cache
+
+    @lru_cache(maxsize=1)
+    def build() -> dict[str, Any]:
+        from phonometry import OctaveFilterBank, speech
+
+        fs = 48000
+        # One fixed noise carrier for every decay, so the sweep moves
+        # smoothly instead of jittering on a fresh realisation per frame.
+        rng = np.random.default_rng(60268)
+        carrier = rng.standard_normal(int(2.5 * max(_MTF_T60S) * fs))
+        bank = OctaveFilterBank(fs=fs, fraction=1, order=6,
+                               limits=[125.0, 8000.0])
+        step = fs // _MTF_ENV_HZ
+        n_win = int(_MTF_WINDOW_S * _MTF_ENV_HZ)
+        f_probe = float(_MTF_MOD_FREQS[_MTF_PROBE_INDEX])
+
+        def channel(t60: float) -> tuple[Any, Any, Any]:
+            n = int(2.5 * t60 * fs)
+            h = carrier[:n] * np.exp(-6.9078 * np.arange(n) / fs / t60)
+            bands = np.asarray(bank.filter(
+                h, sigbands=True, detrend=False, calculate_level=False,
+                zero_phase=True)[2])
+            h2 = bands[_MTF_BAND] ** 2
+            nb = h2.size // step
+            h2b = h2[:nb * step].reshape(nb, step).sum(axis=1)
+            h2b /= h2b.sum()
+            # A 100 % modulated intensity envelope through h_k^2: the lead-in
+            # is the impulse-response length, so the drawn window is in
+            # steady state and keeps the true modulation delay.
+            drive = 1.0 + np.cos(
+                2 * np.pi * f_probe * np.arange(nb + n_win) / _MTF_ENV_HZ)
+            rx = np.convolve(drive, h2b)[nb - 1: nb - 1 + n_win]
+            return h, drive[nb - 1: nb - 1 + n_win], rx
+
+        rev: list[dict[str, Any]] = []
+        for t60 in _MTF_T60S:
+            h, tx, rx = channel(t60)
+            res = speech.sti_from_impulse_response(h, fs)
+            rev.append({"t60": t60, "rx": rx, "floor": 0.0,
+                        "mtf": res.mtf[_MTF_BAND], "mti": res.mti,
+                        "sti": float(res.sti), "rating": res.rating})
+        h, tx, rx = channel(_MTF_ACT2_T60)
+        noise: list[dict[str, Any]] = []
+        for snr in _MTF_SNRS:
+            res = speech.sti_from_impulse_response(h, fs, snr=float(snr))
+            # Signal and noise are drawn at a *constant received mean*, which
+            # is the point of the act: an ordinary level meter reads the same
+            # number throughout while m collapses. Splitting the unit mean as
+            # (I_rx + N) / (1 + N) reproduces the standard's noise factor
+            # 1/(1 + 10^(-SNR/10)) exactly, and N/(1 + N) is the floor.
+            n = 10 ** (-snr / 10)
+            noise.append({"snr": snr, "rx": (rx + n) / (1.0 + n),
+                          "floor": n / (1.0 + n),
+                          "mtf": res.mtf[_MTF_BAND], "mti": res.mti,
+                          "sti": float(res.sti), "rating": res.rating})
+        return {"t": np.arange(n_win) / _MTF_ENV_HZ, "tx": tx,
+                "reverb": rev, "noise": noise}
+
+    return build()
+
+
+def animate_modulation_transfer(output_dir: str) -> None:
+    """The IEC 60268-16 modulation transfer function drawn where it lives:
+    on a speech-rate intensity envelope. Reverberation shrinks the envelope
+    about its mean; steady noise lifts a floor under it. Both shrink m, the
+    m(F) curve and the band MTIs follow, and the STI falls with them."""
+    T = _translate_str
+
+    data = _modulation_transfer_data()
+    t_env = data["t"]
+    tx = data["tx"]
+    rev, noi = data["reverb"], data["noise"]
+    f_probe = float(_MTF_MOD_FREQS[_MTF_PROBE_INDEX])
+
+    fig = _anim_figure()
+    fig.suptitle(T("The modulation transfer function on the envelope "
+                   "(IEC 60268-16)"), fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.55, 1.0],
+                          height_ratios=[1.0, 1.0])
+
+    # --- left: the envelope itself, the picture the page never carries ---
+    ax_e = fig.add_subplot(gs[:, 0])
+    _grid_axes(ax_e)
+    ax_e.set_xlim(0.0, float(_MTF_WINDOW_S))
+    ax_e.set_ylim(0.0, 2.6)
+    ax_e.set_xlabel(T("Time [s]"), fontsize=9)
+    ax_e.set_ylabel(T("Intensity envelope, received mean = 1"), fontsize=9)
+    ax_e.plot(t_env, tx, color=COLOR_MUTED, lw=1.2, ls="--",
+              label=T("transmitted, m = 1"))
+    (rx_line,) = ax_e.plot([], [], color=COLOR_PRIMARY, lw=2.4,
+                           label=T("received"))
+    ax_e.axhline(1.0, color=COLOR_FG, lw=0.9, ls="-.", alpha=0.55)
+    ax_e.text(float(_MTF_WINDOW_S) - 0.02, 1.03,
+              T("mean, the same in every frame"), ha="right", va="bottom",
+              color=COLOR_FG, fontsize=7.5,
+              bbox={"boxstyle": "round,pad=0.2",
+                    "facecolor": plt.rcParams["figure.facecolor"],
+                    "edgecolor": "none", "alpha": 0.8})
+    floor_fill = {"art": None}
+    peak_line = ax_e.axhline(0.0, color=COLOR_SECONDARY, lw=1.0, ls=":")
+    dip_line = ax_e.axhline(0.0, color=COLOR_SECONDARY, lw=1.0, ls=":")
+    depth = _make_arrow(ax_e, COLOR_SECONDARY, scale=9.0)
+    depth.set_arrowstyle("<|-|>", head_length=0.55, head_width=0.32)
+    m_txt = ax_e.text(0.03, 0.975, "", transform=ax_e.transAxes, ha="left",
+                      va="top", color=COLOR_FG, fontsize=9.5,
+                      family="monospace")
+    ax_e.legend(loc="upper right", fontsize=7.5, framealpha=0.9)
+
+    # --- top right: m over the fourteen modulation frequencies -----------
+    ax_m = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_m)
+    ax_m.set_xscale("log")
+    ax_m.set_xlim(0.55, 14.5)
+    ax_m.set_ylim(0.0, 1.05)
+    ax_m.set_xticks([1.0, 10.0])
+    ax_m.set_xticklabels(["1", "10"])
+    ax_m.set_xlabel(T("Modulation frequency F [Hz]"), fontsize=8.5)
+    ax_m.set_ylabel(T("m"), fontsize=8.5)
+    ax_m.tick_params(labelsize=8)
+    (m_line,) = ax_m.plot([], [], color=COLOR_PRIMARY, lw=1.8, marker="o",
+                          ms=3.4)
+    (m_dot,) = ax_m.plot([], [], color=COLOR_SECONDARY, marker="o", ms=8.0,
+                         ls="none")
+    ax_m.axvline(f_probe, color=COLOR_SECONDARY, lw=0.9, ls=":", alpha=0.7)
+    ax_m.text(0.03, 0.06, T("the red point is the 4 Hz probe on the left"),
+              transform=ax_m.transAxes, ha="left", va="bottom",
+              color=COLOR_FG, fontsize=7.5)
+
+    # --- bottom right: the seven band MTIs and the index they weight into -
+    ax_b = fig.add_subplot(gs[1, 1])
+    _grid_axes(ax_b)
+    ax_b.set_ylim(0.0, 1.0)
+    ax_b.set_ylabel(T("Band MTI"), fontsize=8.5)
+    ax_b.set_xlabel(T("Octave band [Hz]"), fontsize=8.5)
+    ax_b.tick_params(labelsize=8)
+    xs = np.arange(7)
+    bars = ax_b.bar(xs, np.zeros(7), width=0.66, color=COLOR_PRIMARY,
+                    alpha=0.85)
+    ax_b.set_xticks(xs)
+    ax_b.set_xticklabels(list(_MTF_BAND_LABELS))
+    sti_txt = ax_b.set_title("", fontsize=10.5, fontweight="bold",
+                             family="monospace", color=COLOR_FG)
+
+    # Act timing over the 10 s sweep (the last 2 s of the clip are the hold).
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    a1_end = int(0.60 * sweep)          # reverberation act
+    a2_start = int(0.66 * sweep)        # noise act, after a short beat
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        if k < a1_end:
+            frac = np.clip((k - 0.07 * sweep) / (0.43 * sweep), 0.0, 1.0)
+            state = rev[round(frac * (len(rev) - 1))]
+            head = T(f"T60 = {state['t60']:.2f} s") + T("  no noise")
+            # Short enough that the Spanish fits too: the longer wording ran
+            # 50 px off the left edge of the figure once translated. The
+            # "does not move" point is made by the labelled mean line itself.
+            act = T("Reverberation shrinks the envelope about a fixed mean")
+        elif k < a2_start:
+            state = noi[0]
+            head = (T(f"T60 = {_MTF_ACT2_T60:.2f} s")
+                    + T(f"  SNR = {state['snr']:.0f} dB"))
+            act = T("Now hold the room and let noise take part of the level")
+        else:
+            frac = np.clip((k - a2_start) / (0.28 * sweep), 0.0, 1.0)
+            state = noi[round(frac * (len(noi) - 1))]
+            head = (T(f"T60 = {_MTF_ACT2_T60:.2f} s")
+                    + T(f"  SNR = {state['snr']:.0f} dB"))
+            act = T("Noise raises a floor under the same mean: m falls again")
+        rx = state["rx"]
+        rx_line.set_data(t_env, rx)
+        hi, lo = float(rx.max()), float(rx.min())
+        peak_line.set_ydata([hi, hi])
+        dip_line.set_ydata([lo, lo])
+        depth.set_positions((1.40, lo), (1.40, hi))
+        if floor_fill["art"] is not None:
+            floor_fill["art"].remove()
+            floor_fill["art"] = None
+        if state["floor"] > 0.01:
+            floor_fill["art"] = ax_e.fill_between(
+                t_env, 0.0, state["floor"], color=COLOR_TERTIARY, alpha=0.30,
+                lw=0)
+        m_drawn = (hi - lo) / (hi + lo)
+        m_txt.set_text(head + "\n" + T(f"m({f_probe:.0f} Hz) = {m_drawn:.2f}"))
+        ax_e.set_title(act, fontsize=9.5, fontstyle="italic", color=COLOR_FG)
+        m_line.set_data(_MTF_MOD_FREQS, state["mtf"])
+        m_dot.set_data([f_probe], [state["mtf"][_MTF_PROBE_INDEX]])
+        for bar, value in zip(bars, state["mti"], strict=True):
+            bar.set_height(float(value))
+        sti_txt.set_text(T(f"STI = {state['sti']:.2f}")
+                         + f"  ({state['rating']})")
+        arts: list[Any] = [rx_line, peak_line, dip_line, depth, m_txt,
+                           ax_e.title, m_line, m_dot, sti_txt, *bars]
+        if floor_fill["art"] is not None:
+            arts.append(floor_fill["art"])
+        return tuple(arts)
+
+    _render_clip(fig, update, output_dir, "anim_modulation_transfer")
+
+
+# --- the two-pass EBU R 128 gate, watched while it decides ----------------
+#
+# The gating blocks are the momentary series at a 100 ms hop: a 400 ms window
+# every 100 ms is the 75 % overlap of BS.1770-5 Formula (3), so
+# ``ProgramLoudnessResult.momentary`` with ``momentary_step = 0.1`` *is* the
+# block loudness l_j. Their energy mean is the gated loudness of a block set
+# (the -0.691 offset of Formula (2) cancels in the mean), so the two passes
+# are two energy means: over the blocks above -70 LUFS, then over those of
+# them above that mean minus 10 LU. Checked against the library on the
+# programme below: relative threshold -34.279 LUFS and integrated
+# -23.0 LUFS, both to three decimals.
+
+#: The section-3 programme of the page: five shaped-noise sections with a
+#: 0.9 Hz and 2.83 Hz wobble, normalised to the -23.0 LUFS target.
+_GATE_SECTIONS = ((-38.0, 8.0), (-23.0, 16.0), (-17.0, 12.0),
+                  (-25.0, 16.0), (-45.0, 8.0))
+_GATE_ABSOLUTE = -70.0      # BS.1770-5 Formula (4), the absolute gate
+_GATE_RELATIVE = -10.0      # Formula (5), the integrated relative gate
+_LRA_RELATIVE = -20.0       # EBU Tech 3342, the deeper loudness-range gate
+
+
+def _energy_mean_lufs(values: Any) -> float:
+    """Energy (not arithmetic) mean of block loudness values, in LUFS."""
+    return float(10.0 * np.log10(np.mean(10.0 ** (np.asarray(values) / 10.0))))
+
+
+def _loudness_gating_data() -> dict[str, Any]:
+    """The page's five-section programme, metered into gating blocks.
+
+    Cached: the four language x theme variants render in the same process
+    and the K-weighting of a minute of 48 kHz stereo is the whole cost.
+    """
+    from functools import lru_cache
+
+    @lru_cache(maxsize=1)
+    def build() -> dict[str, Any]:
+        from scipy import signal as sp
+
+        from phonometry import broadcast
+
+        fs = 48000
+        rng = np.random.default_rng(1770)
+        sos = sp.butter(2, 2000.0, fs=fs, output="sos")
+        chunks = []
+        for level, seconds in _GATE_SECTIONS:
+            noise = sp.sosfilt(sos, rng.standard_normal(int(seconds * fs)))
+            noise /= np.sqrt(np.mean(noise ** 2))
+            t = np.arange(noise.size) / fs
+            wobble = (1 + 0.22 * np.sin(2 * np.pi * 0.9 * t)
+                      + 0.14 * np.sin(2 * np.pi * 2.83 * t + 1.0))
+            chunks.append(10 ** (level / 20) * noise * wobble)
+        x = np.concatenate(chunks)
+        stereo = np.vstack([x, x])
+        x *= 10 ** ((-23.0 - broadcast.integrated_loudness(stereo, fs)) / 20)
+        res = broadcast.program_loudness(np.vstack([x, x]), fs,
+                                         momentary_step=0.1)
+        blocks = np.asarray(res.momentary, dtype=float)
+        finite = np.isfinite(blocks)
+        return {
+            "block_t": np.asarray(res.momentary_time, dtype=float)[finite],
+            "block_l": blocks[finite],
+            "st_t": np.asarray(res.short_term_time, dtype=float)[
+                np.isfinite(res.short_term)],
+            "st_l": np.asarray(res.short_term, dtype=float)[
+                np.isfinite(res.short_term)],
+            "integrated": float(res.integrated),
+            "relative_threshold": float(res.relative_threshold),
+            "lra": float(res.loudness_range),
+            "lra_low": float(res.lra_low),
+            "lra_high": float(res.lra_high),
+            "duration": float(sum(s for _, s in _GATE_SECTIONS)),
+        }
+
+    return build()
+
+
+def animate_loudness_gating(output_dir: str) -> None:
+    """The BS.1770-5 double gate deciding, block by block: the relative
+    threshold is recomputed from the survivors of the first pass, so it
+    slides as the programme plays and retroactively drops blocks that were
+    passing. Then the deeper -20 LU gate of the loudness range."""
+    T = _translate_str
+
+    data = _loudness_gating_data()
+    bt, bl = data["block_t"], data["block_l"]
+    st_t, st_l = data["st_t"], data["st_l"]
+    duration = data["duration"]
+    edges = np.arange(-72.0, -7.9, 1.0)
+    centres = 0.5 * (edges[:-1] + edges[1:])
+    max_count = int(np.histogram(bl, bins=edges)[0].max())
+
+    fig = _anim_figure()
+    fig.suptitle(T("The two passes of the EBU R 128 gate (BS.1770-5)"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[3.05, 1.0],
+                          height_ratios=[2.5, 1.0])
+
+    # --- top left: the programme, block by block -------------------------
+    ax_t = fig.add_subplot(gs[0, 0])
+    _grid_axes(ax_t)
+    ax_t.set_xlim(0.0, duration)
+    ax_t.set_ylim(-72.0, -8.0)
+    ax_t.set_xlabel(T("Time [s]"), fontsize=9)
+    ax_t.set_ylabel(T("Loudness [LUFS]"), fontsize=9)
+    ax_t.tick_params(labelsize=8)
+    (kept,) = ax_t.plot([], [], ls="none", marker="s", ms=2.6,
+                        color=COLOR_PRIMARY, label=T("block, counted"))
+    (dropped,) = ax_t.plot([], [], ls="none", marker="s", ms=2.6,
+                           markerfacecolor="none", markeredgewidth=0.7,
+                           color=COLOR_MUTED, label=T("block, gated out"))
+    (short,) = ax_t.plot([], [], color=COLOR_QUATERNARY, lw=1.4,
+                         label=T("short-term (3 s)"))
+    ax_t.axhline(_GATE_ABSOLUTE, color=COLOR_FG, lw=1.0, ls=":",
+                 alpha=0.8)
+    ax_t.text(0.4, _GATE_ABSOLUTE + 0.8, T("absolute gate, -70 LUFS"),
+              ha="left", va="bottom", color=COLOR_FG, fontsize=7.5)
+    rel_line = ax_t.axhline(-70.0, color=COLOR_SECONDARY, lw=1.6, ls="--")
+    # The threshold labels ride over the block scatter, so they carry the
+    # figure's own background: a block square landing behind a digit is the
+    # one thing that would make the number unreadable.
+    _label_bbox = {"boxstyle": "round,pad=0.2",
+                   "facecolor": plt.rcParams["figure.facecolor"],
+                   "edgecolor": "none", "alpha": 0.85}
+    rel_txt = ax_t.text(duration - 0.4, -70.0, "", ha="right", va="bottom",
+                        color=COLOR_SECONDARY, fontsize=8, bbox=_label_bbox)
+    int_line = ax_t.axhline(-70.0, color=COLOR_TERTIARY, lw=1.6)
+    (head,) = ax_t.plot([], [], color=COLOR_FG, lw=1.0, alpha=0.55)
+    lra_gate = ax_t.axhline(-70.0, color=COLOR_QUATERNARY, lw=1.2, ls="--",
+                            visible=False)
+    lra_gate_txt = ax_t.text(duration - 0.4, -70.0, "", ha="right",
+                             va="bottom", color=COLOR_QUATERNARY, fontsize=8,
+                             visible=False, bbox=_label_bbox)
+    lra_band = {"art": None}
+    ax_t.legend(loc="lower right", fontsize=7.5, framealpha=0.9)
+
+    # --- top right: the distribution the second pass is computed from ----
+    ax_h = fig.add_subplot(gs[0, 1], sharey=ax_t)
+    _grid_axes(ax_h)
+    ax_h.set_xlim(0.0, max_count * 1.12)
+    ax_h.set_xlabel(T("Blocks per LU"), fontsize=8.5)
+    ax_h.tick_params(labelsize=8, labelleft=False)
+    hbars = ax_h.barh(centres, np.zeros(centres.size), height=0.92,
+                      color=COLOR_PRIMARY, alpha=0.85)
+    ax_h.axhline(_GATE_ABSOLUTE, color=COLOR_FG, lw=1.0, ls=":", alpha=0.8)
+    rel_line_h = ax_h.axhline(-70.0, color=COLOR_SECONDARY, lw=1.6, ls="--")
+    p10 = ax_h.axhline(-70.0, color=COLOR_QUATERNARY, lw=1.4, ls="-.",
+                       visible=False)
+    p95 = ax_h.axhline(-70.0, color=COLOR_QUATERNARY, lw=1.4, ls="-.",
+                       visible=False)
+    lra_gate_h = ax_h.axhline(-70.0, color=COLOR_QUATERNARY, lw=1.2, ls="--",
+                              visible=False)
+
+    # --- bottom: what the two passes have produced so far ----------------
+    ax_v = fig.add_subplot(gs[1, :])
+    _schematic_axes(ax_v, (0.0, 12.0), (0.0, 1.6))
+    boxes = [
+        _flow_box(ax_v, 1.6, 0.8, 2.9, 1.15, T("Integrated I (gated)")),
+        _flow_box(ax_v, 4.7, 0.8, 2.9, 1.15, T("Ungated energy mean")),
+        _flow_box(ax_v, 7.8, 0.8, 2.9, 1.15, T("What the gate is worth")),
+        _flow_box(ax_v, 10.7, 0.8, 2.5, 1.15, T("Blocks gated out")),
+    ]
+    # The loudness-range act replaces the third box in place, because its
+    # title has to change with its value and a flow box carries a fixed one.
+    # Slightly wider than the box it replaces: this is the one title that
+    # carries a standard number, and at 2.9 the English had 11 px of margin
+    # and the Spanish overflowed its own border by 27 px on each side.
+    lra_box = _flow_box(ax_v, 7.8, 0.8, 3.05, 1.15,
+                        T("Loudness range (Tech 3342)"))
+    for key in ("box", "title", "value"):
+        lra_box[key].set_visible(False)
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    play_end = int(0.70 * sweep)        # the programme has finished playing
+    lra_start = int(0.78 * sweep)       # the loudness-range act begins
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        played = duration * min(k / play_end, 1.0)
+        seen = bt <= played
+        l_seen = bl[seen]
+        arts: list[Any] = []
+        if l_seen.size == 0:
+            l_seen = bl[:1]
+            seen = bt <= bt[0]
+        above_abs = l_seen > _GATE_ABSOLUTE
+        gamma = _energy_mean_lufs(l_seen[above_abs]) + _GATE_RELATIVE
+        passing = above_abs & (l_seen > gamma)
+        integrated = _energy_mean_lufs(l_seen[passing])
+        ungated = _energy_mean_lufs(l_seen)
+        kept.set_data(bt[seen][passing], l_seen[passing])
+        dropped.set_data(bt[seen][~passing], l_seen[~passing])
+        st_seen = st_t <= played
+        short.set_data(st_t[st_seen], st_l[st_seen])
+        rel_line.set_ydata([gamma, gamma])
+        rel_line_h.set_ydata([gamma, gamma])
+        rel_txt.set_position((duration - 0.4, gamma + 0.6))
+        rel_txt.set_text(T(f"relative gate {gamma:.1f} LUFS"))
+        int_line.set_ydata([integrated, integrated])
+        head.set_data([played, played], [-72.0, -8.0])
+        counts = np.histogram(l_seen, bins=edges)[0]
+        for bar, count, centre in zip(hbars, counts, centres, strict=True):
+            bar.set_width(float(count))
+            bar.set_color(COLOR_PRIMARY if centre > gamma else COLOR_MUTED)
+        arts += [kept, dropped, short, rel_line, rel_line_h, rel_txt,
+                 int_line, head, *hbars]
+
+        lra_on = k >= lra_start
+        for key in ("box", "title", "value"):
+            lra_box[key].set_visible(lra_on)
+            boxes[2][key].set_visible(not lra_on)
+        arts += [lra_box["box"], lra_box["title"], lra_box["value"]]
+        if lra_on:
+            frac = np.clip((k - lra_start) / (sweep - lra_start), 0.0, 1.0)
+            mid = 0.5 * (data["lra_low"] + data["lra_high"])
+            lo = mid + frac * (data["lra_low"] - mid)
+            hi = mid + frac * (data["lra_high"] - mid)
+            p10.set_ydata([lo, lo])
+            p95.set_ydata([hi, hi])
+            p10.set_visible(True)
+            p95.set_visible(True)
+            if lra_band["art"] is not None:
+                lra_band["art"].remove()
+            lra_band["art"] = ax_t.axhspan(lo, hi, color=COLOR_QUATERNARY,
+                                           alpha=0.14, lw=0)
+            st_above = st_l[st_l > _GATE_ABSOLUTE]
+            gate_lra = _energy_mean_lufs(st_above) + _LRA_RELATIVE
+            for line in (lra_gate, lra_gate_h):
+                line.set_ydata([gate_lra, gate_lra])
+                line.set_visible(True)
+            lra_gate_txt.set_position((duration - 0.4, gate_lra + 0.6))
+            lra_gate_txt.set_text(T(f"short-term gate {gate_lra:.1f} LUFS"))
+            lra_gate_txt.set_visible(True)
+            arts += [p10, p95, lra_band["art"], lra_gate, lra_gate_h,
+                     lra_gate_txt]
+            act = T("The loudness range gates 10 LU deeper and reads the "
+                    "10th to 95th percentile spread")
+        elif k >= play_end:
+            act = T("154 of the 597 blocks never counted: the quiet opening "
+                    "and the fade-out")
+        elif played < 9.0:
+            act = T("Nothing loud has played yet, so the relative gate sits "
+                    "low and every block counts")
+        else:
+            act = T("Louder material raises the relative gate, and blocks "
+                    "that were counted stop counting")
+        ax_t.set_title(act, fontsize=9.5, fontstyle="italic", color=COLOR_FG)
+
+        values = [
+            T(f"{integrated:.1f} LUFS"),
+            T(f"{ungated:.1f} LUFS"),
+            T(f"{integrated - ungated:+.2f} LU"),
+            T(f"{int((~passing).sum())} of {l_seen.size}"),
+        ]
+        colors = [COLOR_TERTIARY, COLOR_FG, COLOR_SECONDARY, COLOR_FG]
+        for box, value, color in zip(boxes, values, colors, strict=True):
+            _light_box(box, value, color, fill=color is COLOR_TERTIARY)
+            arts += [box["box"], box["title"], box["value"]]
+        if lra_on:
+            _light_box(lra_box, T(f"{data['lra']:.1f} LU"),
+                       COLOR_QUATERNARY, fill=True)
+        arts.append(ax_t.title)
+        return tuple(arts)
+
+    _render_clip(fig, update, output_dir, "anim_loudness_gating")
+
+
+# --- EPNL, record by record ------------------------------------------------
+#
+# The certification metric is sequential and the page's figure is its end
+# state: a spectrum arrives every half second, the slope ("encircling")
+# method fits a background SPL'' to it and the tone excess F over that
+# background sets C, PNLT = PNL + C rises and falls, and only once the peak
+# PNLTM is known can the 10 dB-down window be located and the duration
+# correction D exist. The clip runs that order. The synthetic flyover is the
+# page's own (41 records at dt = 0.5 s, a Gaussian gain envelope and a
+# 2500 Hz fan tone), and reproduces its printed numbers: PNLTM = 120.57
+# PNdB, C = 3.97 dB at the peak, window records 16 to 24, D = -6.56 dB,
+# EPNL = 114.01 EPNdB.
+
+_EPNL_RECORDS = 41
+_EPNL_DT = 0.5
+_EPNL_TONE_BAND = 17            # 2500 Hz, the fan tone of the page's flyover
+
+
+def _epnl_flyover_data() -> dict[str, Any]:
+    """The page's synthetic flyover, with the per-record tone-correction fit."""
+    from functools import lru_cache
+
+    @lru_cache(maxsize=1)
+    def build() -> dict[str, Any]:
+        from phonometry import aircraft
+        from phonometry.aircraft.certification import (
+            _tone_background,
+            _tone_factor,
+        )
+
+        idx = np.arange(_EPNL_RECORDS)
+        shape = 15.0 * np.exp(
+            -((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+        gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0 ** 2)) - 5.0
+        spectra = (55.0 + shape)[None, :] + gain[:, None]
+        # The 2500 Hz fan tone that grows and fades with the pass-by.
+        spectra[:, _EPNL_TONE_BAND] += 12.0 * np.exp(
+            -((idx - 20.0) ** 2) / (2 * 6.0 ** 2))
+        res = aircraft.effective_perceived_noise_level(spectra, _EPNL_DT)
+        backgrounds = np.empty_like(spectra)
+        winners = np.zeros(_EPNL_RECORDS, dtype=int)
+        excess = np.zeros(_EPNL_RECORDS)
+        for j in range(_EPNL_RECORDS):
+            bg, exc = _tone_background(spectra[j])
+            factors = [_tone_factor(float(exc[i]),
+                                    float(aircraft.NOY_BANDS[i]))
+                       for i in range(24)]
+            backgrounds[j] = bg
+            winners[j] = int(np.argmax(factors))
+            excess[j] = float(exc[winners[j]])
+        return {
+            "bands": np.asarray(aircraft.NOY_BANDS, dtype=float),
+            "spectra": spectra, "background": backgrounds,
+            "winner": winners, "excess": excess,
+            "times": np.asarray(res.times, dtype=float),
+            "pnl": np.asarray(res.pnl, dtype=float),
+            "pnlt": np.asarray(res.pnlt, dtype=float),
+            "c": np.asarray(res.tone_correction, dtype=float),
+            "pnltm": float(res.pnltm), "epnl": float(res.epnl),
+            "duration_correction": float(res.duration_correction),
+            "limits": tuple(int(v) for v in res.band_limits),
+        }
+
+    return build()
+
+
+def animate_epnl_flyover(output_dir: str) -> None:
+    """EPNL built in the order the standard builds it: a spectrum every
+    half second, a background fitted under its fan tone, PNLT rising over
+    PNL by that correction, and only at the end -- once the peak is known --
+    the 10 dB-down window, the duration correction and the EPNL."""
+    from matplotlib.patches import Polygon
+
+    T = _translate_str
+
+    d = _epnl_flyover_data()
+    bands, spectra, background = d["bands"], d["spectra"], d["background"]
+    times, pnl, pnlt = d["times"], d["pnl"], d["pnlt"]
+    k_first, k_last = d["limits"]
+    threshold = d["pnltm"] - 10.0
+    duration = float(times[-1])
+
+    fig = _anim_figure()
+    fig.suptitle(T("EPNL, record by record (ICAO Annex 16 Appendix 2)"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
+                          height_ratios=[1.45, 1.0])
+
+    # --- left: the spectrum of the current record and its fitted background
+    ax_s = fig.add_subplot(gs[:, 0])
+    _grid_axes(ax_s)
+    xs = np.arange(24)
+    ax_s.set_xlim(-0.7, 23.7)
+    # Headroom on purpose: the fan tone reaches 96.2 dB at the peak record,
+    # which on a 40-105 axis lands exactly under the legend and the tone
+    # readout. 115 keeps the top of the panel free for both.
+    ax_s.set_ylim(40.0, 115.0)
+    ax_s.set_xlabel(T("One-third-octave band [Hz]"), fontsize=8.5)
+    ax_s.set_ylabel(T("Band level [dB]"), fontsize=9)
+    ax_s.set_xticks([0, 5, 10, 15, 20, 23])
+    ax_s.set_xticklabels(["50", "160", "500", "1.6k", "5k", "10k"])
+    ax_s.tick_params(labelsize=8)
+    bars = ax_s.bar(xs, np.zeros(24), width=0.78, color=COLOR_PRIMARY,
+                    alpha=0.85)
+    (bg_line,) = ax_s.plot([], [], color=COLOR_SECONDARY, lw=1.8, ls="--",
+                           label=T("fitted background SPL''"))
+    excess_arrow = _make_arrow(ax_s, COLOR_SECONDARY, scale=9.0)
+    excess_arrow.set_arrowstyle("<|-|>", head_length=0.55, head_width=0.32)
+    # Anchored in axes coordinates, in the empty band above the spectrum:
+    # the tone can sit anywhere from 50 Hz to 10 kHz, and a readout that
+    # follows it would leave the axes as soon as the winner moved right.
+    exc_txt = ax_s.text(0.97, 0.88, "", transform=ax_s.transAxes,
+                        ha="right", va="top", color=COLOR_SECONDARY,
+                        fontsize=8.5,
+                        bbox={"boxstyle": "round,pad=0.2",
+                              "facecolor": plt.rcParams["figure.facecolor"],
+                              "edgecolor": "none", "alpha": 0.85})
+    ax_s.legend(loc="upper left", fontsize=7.5, framealpha=0.9)
+
+    # --- top right: the two level histories being written ----------------
+    ax_h = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_h)
+    ax_h.set_xlim(0.0, duration)
+    ax_h.set_ylim(75.0, 128.0)
+    ax_h.set_xlabel(T("Time [s]"), fontsize=8.5)
+    ax_h.set_ylabel(T("Level [PNdB]"), fontsize=8.5)
+    ax_h.tick_params(labelsize=8)
+    (pnl_line,) = ax_h.plot([], [], color=COLOR_MUTED, lw=1.6, marker="o",
+                            ms=2.4, label=T("PNL"))
+    (pnlt_line,) = ax_h.plot([], [], color=COLOR_PRIMARY, lw=2.0, marker="o",
+                             ms=2.4, label=T("PNLT = PNL + C"))
+    gap = {"art": None, "win": None}
+    thr_line = ax_h.axhline(threshold, color=COLOR_SECONDARY, lw=1.2,
+                            ls=":", visible=False)
+    thr_txt = ax_h.text(0.3, threshold + 0.8, T("PNLTM - 10 dB"), ha="left",
+                        va="bottom", color=COLOR_SECONDARY, fontsize=8,
+                        visible=False)
+    (peak_dot,) = ax_h.plot([], [], ls="none", marker="v", ms=8.0,
+                            color=COLOR_SECONDARY)
+    ax_h.legend(loc="upper right", fontsize=7.5, framealpha=0.9)
+
+    # --- bottom right: where the aircraft is, and what exists yet --------
+    # The elevation lives on the left of the strip and the three results
+    # stack on the right, so nothing is ever drawn over anything else.
+    ax_v = fig.add_subplot(gs[1, 1])
+    _schematic_axes(ax_v, (0.0, 12.0), (0.0, 4.4))
+    ax_v.plot([0.15, 4.6], [0.30, 0.30], color=COLOR_FG, lw=1.2)
+    ax_v.plot([0.15, 4.6], [3.55, 3.55], color=COLOR_GRID, lw=1.0, ls="--")
+    ax_v.plot([2.35, 2.35], [0.30, 0.95], color=COLOR_FG, lw=1.2)
+    ax_v.plot([2.35], [1.02], marker="o", ms=5.0, color=COLOR_FG, ls="none")
+    ax_v.text(2.35, 0.05, T("microphone"), ha="center", va="bottom",
+              color=COLOR_FG, fontsize=7.5)
+    plane = Polygon([[0, 0]], closed=True, facecolor=COLOR_PRIMARY,
+                    edgecolor=COLOR_FG, lw=0.8)
+    ax_v.add_patch(plane)
+    (slant,) = ax_v.plot([], [], color=COLOR_PRIMARY, lw=1.0, ls=":")
+    boxes = [
+        _flow_box(ax_v, 8.7, 3.55, 6.4, 1.10, T("Peak PNLTM")),
+        _flow_box(ax_v, 8.7, 2.15, 6.4, 1.10, T("Duration correction D")),
+        _flow_box(ax_v, 8.7, 0.75, 6.4, 1.10, T("EPNL")),
+    ]
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    fly_end = int(0.74 * sweep)       # the last record has arrived
+    peak_at = int(0.80 * sweep)       # PNLTM is known, the threshold drawn
+    win_at = int(0.86 * sweep)        # the 10 dB-down window opens
+    epnl_at = int(0.96 * sweep)       # the duration correction and the EPNL
+
+    def plane_shape(x: float, y: float) -> Any:
+        s_x, s_y = 0.42, 0.30
+        return np.array([
+            [x + 1.30 * s_x, y], [x + 0.10 * s_x, y + 0.28 * s_y],
+            [x - 0.15 * s_x, y + 1.15 * s_y], [x - 0.55 * s_x, y + 1.15 * s_y],
+            [x - 0.50 * s_x, y + 0.25 * s_y], [x - 1.35 * s_x, y + 0.20 * s_y],
+            [x - 1.55 * s_x, y + 0.85 * s_y], [x - 1.85 * s_x, y + 0.85 * s_y],
+            [x - 1.80 * s_x, y - 0.05 * s_y], [x - 1.55 * s_x, y - 0.85 * s_y],
+            [x - 1.85 * s_x, y - 0.85 * s_y], [x - 1.35 * s_x, y - 0.20 * s_y],
+            [x - 0.50 * s_x, y - 0.25 * s_y],
+            [x - 0.15 * s_x, y - 1.15 * s_y], [x - 0.55 * s_x, y - 1.15 * s_y],
+            [x + 0.10 * s_x, y - 0.28 * s_y],
+        ])
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        j = min(int(k / fly_end * (_EPNL_RECORDS - 1)), _EPNL_RECORDS - 1)
+        for bar, level in zip(bars, spectra[j], strict=True):
+            bar.set_height(float(level))
+        bg_line.set_data(xs[2:], background[j][2:])
+        w = int(d["winner"][j])
+        f_exc = float(d["excess"][j])
+        arts: list[Any] = [*bars, bg_line, excess_arrow, exc_txt]
+        if f_exc >= 1.5:
+            excess_arrow.set_visible(True)
+            excess_arrow.set_positions((float(w), float(background[j][w])),
+                                       (float(w), float(spectra[j][w])))
+            exc_txt.set_visible(True)
+            exc_txt.set_text(T(f"F = {f_exc:.1f} dB at {bands[w]:.0f} Hz")
+                             + "\n" + T(f"C = {d['c'][j]:.2f} dB"))
+        else:
+            excess_arrow.set_visible(False)
+            exc_txt.set_visible(False)
+
+        pnl_line.set_data(times[:j + 1], pnl[:j + 1])
+        pnlt_line.set_data(times[:j + 1], pnlt[:j + 1])
+        if gap["art"] is not None:
+            gap["art"].remove()
+        gap["art"] = ax_h.fill_between(times[:j + 1], pnl[:j + 1],
+                                       pnlt[:j + 1], color=COLOR_SECONDARY,
+                                       alpha=0.22, lw=0)
+        arts += [pnl_line, pnlt_line, gap["art"]]
+
+        # The flight path, drawn so the aircraft is overhead at the peak.
+        x_plane = 0.45 + 3.90 * (j / (_EPNL_RECORDS - 1))
+        plane.set_xy(plane_shape(x_plane, 3.55))
+        slant.set_data([x_plane, 2.35], [3.55, 1.02])
+        arts += [plane, slant]
+
+        known_peak = k >= peak_at
+        thr_line.set_visible(known_peak)
+        thr_txt.set_visible(known_peak)
+        peak_dot.set_data([times[int(np.argmax(pnlt))]] if known_peak else [],
+                          [d["pnltm"] + 2.5] if known_peak else [])
+        arts += [thr_line, thr_txt, peak_dot]
+
+        if k >= win_at:
+            frac = np.clip((k - win_at) / max(epnl_at - win_at, 1), 0.0, 1.0)
+            k_end = k_first + round(frac * (k_last - k_first))
+            sel = slice(k_first, k_end + 1)
+            if gap["win"] is not None:
+                gap["win"].remove()
+            gap["win"] = ax_h.fill_between(
+                times[sel], threshold, pnlt[sel], color=COLOR_TERTIARY,
+                alpha=0.30, lw=0)
+            arts.append(gap["win"])
+
+        if k < fly_end:
+            # Kept short on purpose: at 9 pt the longer wording overflowed
+            # the 2400 px figure by 87 px in English and 137 in Spanish.
+            # "add C to PNL" is already on screen twice, in the panel legend
+            # and in the C readout beside the tone.
+            stage_text = T("Each record: fit the background, measure the "
+                           "tone excess")
+        elif k < peak_at:
+            stage_text = T("The pass is over; only now is the peak PNLTM known")
+        elif k < win_at:
+            stage_text = T("The 10 dB-down window is located from that peak")
+        elif k < epnl_at:
+            stage_text = T("Sum the energy inside the window, records "
+                           f"{k_first} to {k_last}")
+        else:
+            stage_text = T("Divide by the fixed 10 s reference: D, then EPNL")
+        ax_h.set_title(stage_text, fontsize=9.0, fontstyle="italic",
+                       color=COLOR_FG)
+
+        for box in boxes:
+            _dim_box(box)
+        if known_peak:
+            _light_box(boxes[0], T(f"{d['pnltm']:.2f} PNdB"), COLOR_SECONDARY)
+        if k >= epnl_at:
+            _light_box(boxes[1], T(f"{d['duration_correction']:.2f} dB"),
+                       COLOR_TERTIARY)
+            _light_box(boxes[2], T(f"{d['epnl']:.2f} EPNdB"), COLOR_PRIMARY,
+                       fill=True)
+        for box in boxes:
+            arts += [box["box"], box["title"], box["value"]]
+        arts.append(ax_h.title)
+        return tuple(arts)
+
+    _render_clip(fig, update, output_dir, "anim_epnl_flyover")
+
+
+# --- the image lattice being swept ----------------------------------------
+#
+# The reflectogram is not a decaying signal, it is a lattice read off by an
+# expanding sphere: every image at distance r_n contributes one arrival at
+# r_n / c. Drawn that way the reflection density stops being a quoted
+# formula and becomes a rate the viewer watches. The run stops at 60 ms,
+# where the counted arrivals (344) and the analytic
+# N = (4 pi / 3)(c t)^3 / V (347.7) still agree to 1 %; past about 80 ms the
+# order-10 cut-off truncates the lattice and the two part company, which is
+# the page's own "choosing max_order" argument.
+
+_IS_ROOM = (7.0, 5.0, 3.0)
+_IS_SOURCE = (2.0, 1.6, 1.5)
+_IS_RECEIVER = (5.2, 3.4, 1.7)
+_IS_ABSORPTION = 0.12
+_IS_MAX_ORDER = 10
+_IS_RUN_MS = 60.0
+
+
+def _image_source_data() -> dict[str, Any]:
+    """The page's 7 x 5 x 3 m room, its images and its reflectogram."""
+    from functools import lru_cache
+
+    @lru_cache(maxsize=1)
+    def build() -> dict[str, Any]:
+        from phonometry import room
+
+        res = room.image_source_rir(
+            dimensions=_IS_ROOM, source=_IS_SOURCE, receiver=_IS_RECEIVER,
+            absorption=_IS_ABSORPTION, fs=48000, max_order=_IS_MAX_ORDER)
+        t_ms = np.asarray(res.times, dtype=float) * 1e3
+        amp = np.abs(np.asarray(res.amplitudes, dtype=float))
+        level = 20.0 * np.log10(amp / amp.max())
+        order = np.asarray(res.orders, dtype=int)
+        pos = np.asarray(res.image_positions, dtype=float)
+        keep = t_ms <= _IS_RUN_MS
+        # The plan draws the images that share the source's own height, the
+        # set ``plot_geometry()`` draws: every other image projects onto one
+        # of the same plan positions, so plotting them only overprints.
+        plane = keep & np.isclose(pos[:, 2], _IS_SOURCE[2])
+        return {
+            "t_ms": t_ms[keep], "level": level[keep], "order": order[keep],
+            "plan_xy": pos[plane][:, :2], "plan_t": t_ms[plane],
+            "plan_order": order[plane],
+            "c": float(res.speed_of_sound),
+            "direct_ms": float(np.min(t_ms)),
+        }
+
+    return build()
+
+
+def animate_image_source_buildup(output_dir: str) -> None:
+    """A circle expanding from the receiver at c t sweeps the mirror-room
+    lattice; every image it reaches writes its arrival into the
+    reflectogram, and the running count follows the (4 pi / 3)(c t)^3 / V
+    law whose derivative is the reflection density of the guide."""
+    from matplotlib.patches import Circle, Rectangle
+
+    from .theme import series_colors
+
+    T = _translate_str
+
+    d = _image_source_data()
+    c = d["c"]
+    t_ms, level, order = d["t_ms"], d["level"], d["order"]
+    plan_xy, plan_t = d["plan_xy"], d["plan_t"]
+    volume = float(np.prod(_IS_ROOM))
+    n_orders = int(order.max()) + 1
+    palette = series_colors(n_orders)
+
+    fig = _anim_figure()
+    fig.suptitle(T("The reflectogram is a lattice being swept "
+                   "(image-source method)"), fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.12, 1.0],
+                          height_ratios=[1.5, 1.0])
+
+    # --- left: the mirror-room plan the circle sweeps --------------------
+    ax_p = fig.add_subplot(gs[:, 0])
+    _schematic_axes(ax_p, (-17.0, 27.0), (-18.0, 25.0), equal=True)
+    lx, ly = _IS_ROOM[0], _IS_ROOM[1]
+    for i in range(-3, 5):
+        ax_p.plot([i * lx, i * lx], [-18.0, 25.0], color=COLOR_GRID, lw=0.7,
+                  ls="--")
+    for j in range(-4, 6):
+        ax_p.plot([-17.0, 27.0], [j * ly, j * ly], color=COLOR_GRID, lw=0.7,
+                  ls="--")
+    ax_p.add_patch(Rectangle((0.0, 0.0), lx, ly, facecolor="none",
+                             edgecolor=COLOR_FG, lw=2.0))
+    ax_p.plot([_IS_SOURCE[0]], [_IS_SOURCE[1]], marker="*", ms=13,
+              color=COLOR_SECONDARY, ls="none")
+    ax_p.plot([_IS_RECEIVER[0]], [_IS_RECEIVER[1]], marker="v", ms=9,
+              color=COLOR_PRIMARY, ls="none")
+    ax_p.text(_IS_SOURCE[0], _IS_SOURCE[1] - 1.6, T("source"), ha="center",
+              va="top", color=COLOR_FG, fontsize=8)
+    ax_p.text(_IS_RECEIVER[0] + 1.0, _IS_RECEIVER[1] + 0.6, T("receiver"),
+              ha="left", va="bottom", color=COLOR_FG, fontsize=8)
+    ax_p.plot(plan_xy[:, 0], plan_xy[:, 1], ls="none", marker="o", ms=2.6,
+              color=COLOR_MUTED, alpha=0.55)
+    lit = ax_p.scatter([], [], s=30.0, zorder=4)
+    rays = LineCollection([], colors=COLOR_PRIMARY, linewidths=0.5,
+                          alpha=0.45)
+    ax_p.add_collection(rays)
+    front = Circle((_IS_RECEIVER[0], _IS_RECEIVER[1]), 0.01, facecolor="none",
+                   edgecolor=COLOR_SECONDARY, lw=2.0, zorder=5)
+    ax_p.add_patch(front)
+    # Two lines, not one: on a single line this caption started 303 px off
+    # the left edge of the 2400 px figure, and the Spanish is longer still.
+    ax_p.set_title(T("the plan draws only the images at the source's own "
+                     "height;\nthe floor and ceiling families arrive between "
+                     "them"), fontsize=8, color=COLOR_FG)
+    radius_txt = ax_p.text(-16.0, -17.0, "", ha="left", va="bottom",
+                           color=COLOR_SECONDARY, fontsize=9,
+                           family="monospace")
+
+    # --- top right: the reflectogram being written -----------------------
+    ax_r = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_r)
+    ax_r.set_xlim(0.0, _IS_RUN_MS)
+    ax_r.set_ylim(-26.0, 3.0)
+    ax_r.set_xlabel(T("Arrival time [ms]"), fontsize=8.5)
+    ax_r.set_ylabel(T("Level re direct [dB]"), fontsize=8.5)
+    ax_r.tick_params(labelsize=8)
+    stems = LineCollection([], colors=COLOR_GRID, linewidths=0.7)
+    ax_r.add_collection(stems)
+    dots = ax_r.scatter([], [], s=9.0, zorder=3)
+    t_env = np.linspace(d["direct_ms"], _IS_RUN_MS, 200)
+    ax_r.plot(t_env, 20.0 * np.log10(d["direct_ms"] / t_env),
+              color=COLOR_SECONDARY, lw=1.2, ls="--",
+              label=T("1/r spreading"))
+    ax_r.legend(loc="upper right", fontsize=7.5, framealpha=0.9)
+
+    # --- bottom right: the count, against the analytic law ---------------
+    ax_n = fig.add_subplot(gs[1, 1])
+    _grid_axes(ax_n)
+    ax_n.set_xlim(0.0, _IS_RUN_MS)
+    ax_n.set_ylim(0.0, 400.0)
+    ax_n.set_xlabel(T("Time [ms]"), fontsize=8.5)
+    ax_n.set_ylabel(T("Arrivals so far"), fontsize=8.5)
+    ax_n.tick_params(labelsize=8)
+    t_law = np.linspace(0.0, _IS_RUN_MS, 200)
+    ax_n.plot(t_law, 4.0 * np.pi / 3.0 * (c * t_law / 1e3) ** 3 / volume,
+              color=COLOR_SECONDARY, lw=1.4, ls="--",
+              label=T("(4 pi / 3)(c t)^3 / V"))
+    (count_line,) = ax_n.plot([], [], color=COLOR_PRIMARY, lw=2.0,
+                              label=T("counted"))
+    count_txt = ax_n.text(0.03, 0.95, "", transform=ax_n.transAxes,
+                          ha="left", va="top", color=COLOR_FG, fontsize=9,
+                          family="monospace")
+    ax_n.legend(loc="lower right", fontsize=7.5, framealpha=0.9)
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    lead = int(0.05 * sweep)
+    grid_t = np.linspace(0.0, _IS_RUN_MS, 240)
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        now = _IS_RUN_MS * np.clip((k - lead) / (sweep - lead), 0.0, 1.0)
+        radius = c * now / 1e3
+        front.set_radius(max(radius, 0.01))
+        radius_txt.set_text(T(f"t = {now:4.1f} ms") + "\n"
+                            + T(f"c t = {radius:5.1f} m"))
+
+        reached = plan_t <= now
+        pts = plan_xy[reached]
+        lit.set_offsets(pts if pts.size else np.empty((0, 2)))
+        lit.set_facecolors([palette[o] for o in d["plan_order"][reached]])
+        rays.set_segments([
+            [(float(x), float(y)),
+             (float(_IS_RECEIVER[0]), float(_IS_RECEIVER[1]))]
+            for x, y in pts])
+
+        arrived = t_ms <= now
+        n = int(arrived.sum())
+        xy = np.column_stack([t_ms[arrived], level[arrived]])
+        dots.set_offsets(xy if n else np.empty((0, 2)))
+        dots.set_facecolors([palette[o] for o in order[arrived]])
+        stems.set_segments([[(float(a), -26.0), (float(a), float(b))]
+                            for a, b in xy])
+
+        shown = grid_t <= now
+        counts = np.array([int((t_ms <= g).sum()) for g in grid_t[shown]])
+        count_line.set_data(grid_t[shown], counts)
+        law = 4.0 * np.pi / 3.0 * (radius ** 3) / volume
+        count_txt.set_text(T(f"counted {n}") + "\n" + T(f"law {law:.0f}"))
+        return (front, radius_txt, lit, rays, dots, stems, count_line,
+                count_txt)
+
+    _render_clip(fig, update, output_dir, "anim_image_source_buildup")

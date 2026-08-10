@@ -41,6 +41,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Video from '../../../../components/Video.astro';
 
 El **nivel efectivo de ruido percibido (EPNL)** es la métrica de certificación
 acústica de las aeronaves de transporte. Condensa una historia temporal
@@ -53,7 +54,7 @@ los ejemplos resueltos del Manual Técnico Ambiental (ETM) Vol. I, Doc
 
 Cada nivel de certificación de esta página se exige en uno de los tres puntos
 de referencia que el Anexo 16 fija alrededor de la pista, así que conviene
-verlos antes que las matemáticas.
+verlos antes de las matemáticas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification_es.svg" alt="Los tres puntos de certificación de ruido del Capítulo 3 del Anexo 16 de la OACI, en planta y alzado con la misma escala de distancias: una línea lateral de referencia paralela a la pista a 450 m donde el ruido de despegue es máximo, con un punto simétrico al otro lado; el punto de sobrevuelo sobre la prolongación del eje a 6 500 m del inicio del recorrido de despegue, bajo la subida inicial; y el punto de aproximación a 2 000 m del umbral, 120 m bajo la senda de 3 grados que corta el suelo 300 m más allá del umbral; los micrófonos van a 1,2 m del suelo y la métrica en los tres puntos es el EPNL en EPNdB" width="92%" />
 
@@ -92,7 +93,7 @@ trozos en nivel, con pendientes que cambian de banda a banda, así que los mismo
 sensibilidad del oído igual que lo hace una línea isofónica, pero calibrada
 sobre juicios de *ruidosidad* y no de sonoridad. La regla de combinación es un
 enunciado de enmascaramiento, no una suma energética: la banda más ruidosa por
-sí sola se lleva el 85 % del total y todo lo demás junto se acredita con el
+sí sola se lleva el 85 % del total y a todo lo demás junto se le atribuye el
 15 %, que es la razón por la que un solo tono de ventilador puede dominar un
 espectro que sobre el papel es de banda ancha. El logaritmo consigue después una
 magnitud con aspecto de nivel: con $\mathrm{PNL} = 40 + 33{,}22\lg N$, un noy
@@ -137,7 +138,7 @@ El método trae dos trampas. Un espectro rizado pero sin tonos puede producir un
 corrección, que la propia norma permite rechazar tras un reanálisis en banda
 estrecha (§4.3.1, paso 10). Y un tono que cae entre dos bandas reparte su
 exceso, de modo que la corrección en bruto sale demasiado pequeña; el **ajuste por
-reparto de bandas** $\Delta_B$, el defecto de $C$ en el registro de
+compartición de banda** $\Delta_B$, el defecto de $C$ en el registro de
 $\mathrm{PNLTM}$ frente a la media de los registros que quedan a menos de un
 segundo de él, lo devuelve antes de localizar la ventana de 10 dB por debajo.
 
@@ -201,7 +202,7 @@ La estación que produce esos espectros está fijada apartado por apartado.
 
 ## EPNL
 
-Sobre el sobrevuelo, $\mathrm{PNLT} = \mathrm{PNL} + C$ y su máximo es
+A lo largo del sobrevuelo, $\mathrm{PNLT} = \mathrm{PNL} + C$ y su máximo es
 $\mathrm{PNLTM}$. La métrica convierte el nivel corregido por tonos de vuelta a
 energía, la suma sobre los registros comprendidos entre los dos puntos de 10 dB
 por debajo y la divide por una duración de referencia fija
@@ -225,6 +226,23 @@ ventana de 10 dB por debajo va del registro 4 al 28 de 31 y abarca 10,2 s de
 incrementos, y el resultado es $D = -4{,}78$ dB y
 $\mathrm{EPNL} = 92{,}62$ EPNdB, un pelo por debajo del $\mathrm{PNLTM}$ porque
 la ventana es apenas más larga que la duración de referencia.
+
+Esa cadena tiene un orden, y el orden es justo lo que una historia temporal ya
+terminada no puede enseñar. La corrección tonal se mide sobre cada espectro
+según llega, un registro cada vez, ajustando un fondo bajo el espectro y
+leyendo el exceso del tono sobre él; la ventana de 10 dB por debajo, en cambio,
+no se puede situar hasta que la pasada entera ha terminado, porque sus dos
+bordes se definen respecto a un máximo que no se conoce hasta haber tomado el
+último registro. El clip recorre un sobrevuelo sintético en ese orden:
+
+<Video
+  name="anim_epnl_flyover"
+  width={2400}
+  height={1350}
+  title="Un sobrevuelo de certificación montado registro a registro, de los espectros a un único EPNL"
+  description="Cuarenta y un espectros de tercio de octava llegan a intervalos de medio segundo mientras una aeronave pasa sobre un micrófono. Sobre cada espectro se ajusta un fondo discontinuo bajo el tono de ventilador de 2500 hercios y una flecha doble mide el exceso del tono sobre él, que en el máximo llega a una corrección de 3,97 decibelios. Al lado se escriben punto a punto dos historias temporales de nivel: el nivel de ruido percibido y, sombreado por encima, el nivel corregido por tonos que lo supera en esa corrección, subiendo hasta un máximo de 120,57 PNdB cuando la aeronave alcanza el micrófono. Solo una vez terminada la pasada se conoce el máximo; entonces aparece una línea de puntos 10 decibelios por debajo de él, la ventana de integración se rellena entre los registros 16 y 24, y la corrección por duración de -6,56 decibelios y el EPNL final de 114,01 EPNdB son lo último que aparece."
+  caption="El EPNL no es un nivel máximo, y no se calcula en el orden en que se escribe. La corrección tonal es una medida por registro que se hace mientras la aeronave todavía está pasando, pero la ventana de 10 dB por debajo es retrospectiva: sus bordes se definen a partir de un máximo que solo existe una vez terminado el suceso, y por eso un resultado de certificación no se puede leer de un instrumento en tiempo real."
+/>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_es.svg" alt="Historia temporal del nivel de ruido percibido de un sobrevuelo de aeronave: PNL y el PNLT corregido por tonos en función del tiempo, con el máximo PNLTM marcado y la ventana de integración de 10 dB por debajo sombreada, anotada con el EPNL resultante y la corrección por duración" width="82%" loading="eager" />
 
@@ -286,7 +304,7 @@ cabecera al estilo TCDSN (aeronave, fabricante / titular del certificado de tipo
 solicitante, punto de medida), una tabla de métricas de las magnitudes
 intermedias informativas (el máximo $\mathrm{PNLTM}$, la corrección por
 duración $D$, la ventana de registros de 10 dB por debajo y, cuando no es cero,
-el ajuste por reparto de bandas) sobre la gráfica apaisada a todo el ancho de
+el ajuste por compartición de banda) sobre la gráfica apaisada a todo el ancho de
 $\mathrm{PNLT}$ frente al tiempo (el propio `.plot()` del resultado), el número
 único $\mathrm{EPNL} = X\ \text{EPNdB}$ en
 caja, una fila de veredicto Nivel | Límite | Margen cuando se aporta un límite de
@@ -361,7 +379,7 @@ que cambia el coeficiente de absorción del día de ensayo por el de referencia
 sobre el trayecto medido, reabsorbe sobre la longitud de trayecto corregida y
 aplica un término de inverso del cuadrado por el cambio de longitud de trayecto
 (§8.3.2.1). El espectro ajustado se vuelve a pasar por la ley de noys y por la
-corrección tonal, se devuelve el ajuste por reparto de bandas del día de ensayo,
+corrección tonal, se devuelve el ajuste por compartición de banda del día de ensayo,
 y la diferencia $\Delta_1 = \mathrm{PNLTM}_R - \mathrm{PNLTM}$ es uno de los
 cuatro términos que se suman al EPNL medido:
 
@@ -370,8 +388,8 @@ $$
  + \Delta_2 + \Delta_3
 $$
 
-(§8.3.6). $\Delta_{\text{peak}}$ se ocupa de un máximo secundario que quede a
-menos de 2 dB del $\mathrm{PNLTM}$ y que adelante al máximo ajustado (§8.3.3);
+(§8.3.6). $\Delta_{\text{peak}}$ se ocupa de una cresta secundaria que quede a
+menos de 2 dB del $\mathrm{PNLTM}$ y que exceda el máximo ajustado (§8.3.3);
 $\Delta_2 = -7{,}5\lg(QK/Q_rK_r) + 10\lg(V_G/V_{GR})$ es el cambio de duración por
 la longitud de trayecto y la velocidad respecto al suelo (§8.3.4); y $\Delta_3$
 corrige la diferencia entre los parámetros operacionales de propulsión del vuelo

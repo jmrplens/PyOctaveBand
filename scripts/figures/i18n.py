@@ -1053,6 +1053,28 @@ _ES_EXACT = {
         "Transferencia de modulación m (banda de 1 kHz)",
     "STIPA probes only these two F in this band":
         "STIPA solo sondea estas dos F en esta banda",
+    # anim_modulation_transfer: the envelope clip of speech-transmission.
+    "The modulation transfer function on the envelope (IEC 60268-16)":
+        "La función de transferencia de modulación sobre la envolvente "
+        "(IEC 60268-16)",
+    "Intensity envelope, received mean = 1":
+        "Envolvente de intensidad, media recibida = 1",
+    "mean, the same in every frame":
+        "la media, la misma en todos los fotogramas",
+    "m": "m",
+    "the red point is the 4 Hz probe on the left":
+        "el punto rojo es la sonda de 4 Hz de la izquierda",
+    "Band MTI": "MTI de banda",
+    "Octave band [Hz]": "Banda de octava [Hz]",
+    "transmitted, m = 1": "transmitida, m = 1",
+    "received": "recibida",
+    "Reverberation shrinks the envelope about a fixed mean":
+        "La reverberación encoge la envolvente en torno a una media fija",
+    "  no noise": "  sin ruido",
+    "Now hold the room and let noise take part of the level":
+        "Ahora se fija la sala y el ruido se lleva parte del nivel",
+    "Noise raises a floor under the same mean: m falls again":
+        "El ruido levanta un suelo bajo la misma media: m vuelve a caer",
     "noise-free (T60 = 0.9 s)": "sin ruido (T60 = 0,9 s)",
     r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$":
         r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: constante en $F$",
@@ -1452,6 +1474,19 @@ _ES_EXACT = {
     r"$1/r$ spreading envelope": r"Envolvente de divergencia $1/r$",
     "Reflections (image sources)": "Reflexiones (fuentes imagen)",
     "Direct sound (order 0)": "Sonido directo (orden 0)",
+    # anim_image_source_buildup: the expanding sphere sweeping the lattice.
+    "The reflectogram is a lattice being swept (image-source method)":
+        "El reflectograma es una retícula que se barre (método de las "
+        "fuentes imagen)",
+    "the plan draws only the images at the source's own height;\nthe floor "
+    "and ceiling families arrive between them":
+        "la planta dibuja solo las imágenes a la altura de la fuente;\nlas "
+        "familias de suelo y techo llegan entre ellas",
+    "Level re direct [dB]": "Nivel rel. directo [dB]",
+    "Arrivals so far": "Llegadas hasta ahora",
+    "1/r spreading": "divergencia 1/r",
+    "(4 pi / 3)(c t)^3 / V": "(4 pi / 3)(c t)^3 / V",
+    "counted": "contadas",
     "each reflection is a mirror image of the source;\n"
     "amplitude = product of wall reflection factors / (4 pi r)":
         "cada reflexión es una imagen especular de la fuente;\n"
@@ -1519,6 +1554,25 @@ _ES_EXACT = {
         "Sobrevuelo de aeronave ICAO — Nivel efectivo de ruido percibido (Anexo 16)",
     "Level [PNdB]": "Nivel [PNdB]",
     "10 dB-down window": "Ventana 10 dB por debajo",
+    # anim_epnl_flyover: EPNL assembled in the order the standard builds it.
+    "EPNL, record by record (ICAO Annex 16 Appendix 2)":
+        "EPNL, registro a registro (OACI Anexo 16 Apéndice 2)",
+    "PNLTM - 10 dB": "PNLTM - 10 dB",
+    "microphone": "micrófono",
+    "fitted background SPL''": "SPL'' de fondo ajustado",
+    "PNL": "PNL",
+    "PNLT = PNL + C": "PNLT = PNL + C",
+    "Peak PNLTM": "Máximo PNLTM",
+    "Duration correction D": "Corrección de duración D",
+    "EPNL": "EPNL",
+    "Each record: fit the background, measure the tone excess":
+        "Cada registro: se ajusta el fondo y se mide el exceso tonal",
+    "The pass is over; only now is the peak PNLTM known":
+        "La pasada ha terminado; solo ahora se conoce el máximo PNLTM",
+    "The 10 dB-down window is located from that peak":
+        "La ventana 10 dB por debajo se sitúa a partir de ese máximo",
+    "Divide by the fixed 10 s reference: D, then EPNL":
+        "Se divide por la referencia fija de 10 s: D y después EPNL",
     "Wind-Turbine Tonal Audibility (IEC 61400-11)":
         "Audibilidad tonal de aerogenerador (IEC 61400-11)",
     "Narrowband spectrum": "Espectro de banda estrecha",
@@ -1895,6 +1949,34 @@ _ES_EXACT = {
     "Loudness [LUFS]": "Sonoridad [LUFS]",
     "Momentary M (400 ms)": "Momentánea M (400 ms)",
     "Short-term S (3 s)": "Corto plazo S (3 s)",
+    # anim_loudness_gating: the double gate deciding block by block.
+    "The two passes of the EBU R 128 gate (BS.1770-5)":
+        "Las dos pasadas de la puerta de EBU R 128 (BS.1770-5)",
+    "absolute gate, -70 LUFS": "puerta absoluta, -70 LUFS",
+    "Blocks per LU": "Bloques por LU",
+    "Loudness range (Tech 3342)": "Rango de sonoridad (3342)",
+    "block, counted": "bloque, contado",
+    "block, gated out": "bloque, excluido por la puerta",
+    "short-term (3 s)": "corto plazo (3 s)",
+    "Integrated I (gated)": "Integrada I (con puerta)",
+    "Ungated energy mean": "Media energética",
+    "What the gate is worth": "Lo que aporta la puerta",
+    "Blocks gated out": "Bloques excluidos",
+    "The loudness range gates 10 LU deeper and reads the 10th to 95th "
+    "percentile spread":
+        "El rango de sonoridad usa una puerta 10 LU más profunda: "
+        "percentiles 10 a 95",
+    "154 of the 597 blocks never counted: the quiet opening and the fade-out":
+        "154 de los 597 bloques no cuentan nunca: la entrada silenciosa y "
+        "el desvanecimiento",
+    "Nothing loud has played yet, so the relative gate sits low and every "
+    "block counts":
+        "Aún no ha sonado nada fuerte: la puerta relativa está baja y todo "
+        "cuenta",
+    "Louder material raises the relative gate, and blocks that were counted "
+    "stop counting":
+        "El material más fuerte sube la puerta relativa, y bloques que "
+        "contaban dejan de contar",
     "ambience": "ambiente",
     "dialogue": "diálogo",
     "music": "música",
@@ -2520,6 +2602,49 @@ _ES_EXACT = {
         "PSD respecto a su propio nivel en 1 kHz [dB]",
     "The five colours of noise_signal, over three decades":
         "Los cinco colores de noise_signal, en tres décadas",
+    # Duct cut-on clip (devices/noise-control/duct-path).
+    "Duct cut-on: is one pressure enough? (2D FDTD)":
+        "Corte del conducto: ¿basta una sola presión? (FDTD 2D)",
+    "Distance along the duct [m]": "Distancia a lo largo del conducto [m]",
+    "p across the section": "p en la sección",
+    "p / plane mode": "p / modo plano",
+    # Lamb's problem clip (simulation/elastic-waves).
+    "Lamb's problem: P, S and the surface wave (elastic 2D FDTD)":
+        "Problema de Lamb: P, S y la onda de superficie (FDTD elástico 2D)",
+    "Free top surface: a Rayleigh train rides it":
+        "Superficie superior libre: la recorre un tren de Rayleigh",
+    "Rigid top surface: same block, no surface wave":
+        "Superficie superior rígida: el mismo bloque, sin onda de superficie",
+    "only P and S: a clamped wall carries no surface wave":
+        "solo P y S: una pared empotrada no sostiene onda de superficie",
+    "each field panel on its own colour scale; the probe traces share one":
+        "cada panel de campo con su propia escala de color; las trazas de "
+        "sonda comparten una",
+    "depth [m]": "profundidad [m]",
+    "distance from the impact [m]": "distancia al impacto [m]",
+    "surface v_y at 0.15 and 0.30 m":
+        "v_y en la superficie a 0,15 y 0,30 m",
+    # Mode-conversion clip (simulation/elastic-waves).
+    "Mode conversion: water on steel, three incidences (elastic 2D FDTD)":
+        "Conversión de modo: agua sobre acero, tres incidencias "
+        "(FDTD elástico 2D)",
+    "depth from the contact [mm]": "profundidad desde el contacto [mm]",
+    "water": "agua",
+    "steel": "acero",
+    "critical angles: 14.5° (P), 27.5° (SV). Dashed: the Snell direction of "
+    "each transmitted wave":
+        "ángulos críticos: 14,5° (P), 27,5° (SV). Discontinua: la dirección "
+        "de Snell de cada onda transmitida",
+    # Radiation-efficiency clip (devices/emission/vibration-sound-power).
+    "Radiation efficiency: a driven plate below and above f_c":
+        "Eficiencia de radiación: una placa excitada bajo y sobre f_c",
+    "colour: air pressure / the pressure a piston of the same surface "
+    "velocity would make":
+        "color: presión del aire / la que haría un pistón con la misma "
+        "velocidad superficial",
+    "height above the plate [m]": "altura sobre la placa [m]",
+    "distance along the plate [m]": "distancia a lo largo de la placa [m]",
+    "the whole plate is driven": "se excita la placa entera",
 }
 
 _ES_PATTERNS = [
@@ -2919,6 +3044,17 @@ _ES_PATTERNS = [
     # Programme-loudness .plot() legend lines (loudness_gating/loudness_range).
     (r"^Integrated (.+) LUFS$", r"Integrada \1 LUFS"),
     (r"^Ungated mean (.+) LUFS$", r"Media sin puerta \1 LUFS"),
+    # anim_loudness_gating: the readouts rewritten every frame.
+    (r"^relative gate (.+) LUFS$", r"puerta relativa \1 LUFS"),
+    (r"^short-term gate (.+) LUFS$", r"puerta de corto plazo \1 LUFS"),
+    (r"^(\d+) of (\d+)$", r"\1 de \2"),
+    # anim_epnl_flyover: the per-record tone readout and the window caption.
+    (r"^F = (.+) dB at (\d+) Hz$", r"F = \1 dB a \2 Hz"),
+    (r"^Sum the energy inside the window, records (\d+) to (\d+)$",
+     r"Se suma la energía dentro de la ventana, registros \1 a \2"),
+    # anim_image_source_buildup: the running counter and its analytic law.
+    (r"^counted (\d+)$", r"contadas \1"),
+    (r"^law (\d+)$", r"ley \1"),
     # Core-metrology figures: dynamic verdict / error strings
     (r"^r = (\d+) runs, accept \((\d+), (\d+)\]: trend-free$",
      r"r = \1 rachas, aceptación (\2, \3]: sin tendencia"),
@@ -3041,6 +3177,58 @@ _ES_PATTERNS = [
     # measured/exact slope wording is translated.
     (r"^(violet|blue|white|pink|red): measured (.+), exact (.+) dB/octave$",
      r"\1: medida \2, exacta \3 dB/octava"),
+    # Duct cut-on clip: panel titles, verdicts and footer (computed values).
+    (r"^(.+) Hz: below the (.+) Hz cut-on$",
+     r"\1 Hz: por debajo del corte de \2 Hz"),
+    (r"^(.+) Hz: above it$", r"\1 Hz: por encima de él"),
+    (r"^one pressure, to within (.+) %$",
+     r"una sola presión, con un margen del \1 %"),
+    (r"^(.+) % of the section's energy is not the plane mode$",
+     r"el \1 % de la energía de la sección no está en el modo plano"),
+    (r"^section at x = (.+) m$", r"sección en x = \1 m"),
+    ((r"^rectangular_duct_cut_on: first cut-on (.+) Hz "
+      r"\((.+) × (.+) m duct\)$"),
+     r"rectangular_duct_cut_on: primer corte a \1 Hz (conducto de \2 × \3 m)"),
+    ((r"^dashed: the section average · vertical scale ×(.+) · each strip on "
+      r"its own colour scale$"),
+     ("discontinua: la media en la sección · escala vertical ×\\1 · cada "
+      "banda con su propia escala")),
+    # Lamb's problem clip: the measured Rayleigh speed and the material line.
+    (r"^surface train: (.+) m/s measured, (.+) m/s exact$",
+     r"tren de superficie: \1 m/s medido, \2 m/s exacto"),
+    ((r"^aluminium: \$c_P\$ = (.+), \$c_S\$ = (.+), \$c_R\$ = (.+) m/s "
+      r"\(C&H Eq\. 3\.149\)$"),
+     r"aluminio: $c_P$ = \1, $c_S$ = \2, $c_R$ = \3 m/s (C&H ec. 3.149)"),
+    # Mode-conversion clip: the display gain and the measured reflection.
+    (r"^steel drawn ×(\d+) \(\+(\d+) dB\)$",
+     r"acero dibujado ×\1 (+\2 dB)"),
+    (r"^P and SV both propagate\n\|V\| = (.+)$",
+     "P y SV se propagan las dos\n|V| = \\1"),
+    (r"^P evanescent, SV alone crosses\n\|V\| = (.+)$",
+     "P evanescente, solo SV atraviesa\n|V| = \\1"),
+    (r"^both evanescent\n\|V\| = (.+), with a phase$",
+     "las dos evanescentes\n|V| = \\1, con una fase"),
+    # Radiation-efficiency clip: panel titles, verdicts and footer.
+    ((r"^f = f_c/2 = (.+) Hz, below coincidence: the plate wave is slower "
+      r"than sound$"),
+     ("f = f_c/2 = \\1 Hz, bajo coincidencia: la onda de la placa es más "
+      "lenta que el sonido")),
+    ((r"^f = 2 f_c = (.+) Hz, above coincidence: the plate wave is faster "
+      r"than sound$"),
+     ("f = 2 f_c = \\1 Hz, sobre coincidencia: la onda de la placa es más "
+      "rápida que el sonido")),
+    ((r"^λ_B = (.+) m is shorter than λ = (.+) m in air\n"
+      r"no angle solves sin θ = λ/λ_B: the skin dies in (.+) m$"),
+     ("λ_B = \\1 m es menor que λ = \\2 m en el aire\n"
+      "ningún ángulo cumple sen θ = λ/λ_B: la piel se apaga en \\3 m")),
+    ((r"^λ_B = (.+) m is longer than λ = (.+) m in air\n"
+      r"the trace match sends a beam out at (.+)°$"),
+     ("λ_B = \\1 m es mayor que λ = \\2 m en el aire\n"
+      "la coincidencia de traza lanza un haz a \\3°")),
+    ((r"^elastic 2D FDTD, 10 mm steel plate, f_c = (.+) Hz · overlaid "
+      r"line: its deflection, exaggerated$"),
+     ("FDTD elástico 2D, placa de acero de 10 mm, f_c = \\1 Hz · línea "
+      "superpuesta: su deformación, exagerada")),
 ]
 
 

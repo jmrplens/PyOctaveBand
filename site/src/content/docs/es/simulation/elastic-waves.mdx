@@ -291,7 +291,52 @@ plt.show()
 
 </details>
 
-Esa onda de flexión merece verse en movimiento. El clip de abajo es este mismo
+La instantánea se detiene a 73 µs porque unos lados rígidos y una ejecución
+corta eran la manera más barata de conseguir un fotograma limpio, y un
+fotograma basta para las dos velocidades de cuerpo: los arcos punteados están
+dibujados en los radios exactos $c_P t$ y $c_S t$, así que son una medición y
+no una etiqueta. Lo que un solo fotograma no puede zanjar es la **tercera**
+onda. Para ella no se dibuja nada analítico, su velocidad se separa un 7 % de
+la del frente de cizalla, y su propiedad definitoria, que se queda en la
+superficie mientras los frentes de cuerpo se marchan, es una afirmación sobre
+lo que pasa después.
+
+Así que ejecuta el mismo golpe durante 163 µs, con esponjas en los otros tres
+lados y el dominio ensanchado hasta que la esquina donde una esponja se
+encuentra con la superficie libre quede fuera del encuadre, y ejecútalo dos
+veces: una con el lado superior declarado `"free"` y otra dejándolo en el valor
+por defecto del esquema, la pared rígida empotrada. El mismo aluminio, el mismo
+golpe, los mismos dos frentes de cuerpo, y ningún tren de superficie en la
+segunda. Eso es lo que afirma esta sección, dibujado: la onda de Rayleigh la
+hace la condición de contorno, no el material.
+
+<Video
+  name="anim_elastic_halfspace_waves"
+  width={2400}
+  height={1350}
+  title="El problema de Lamb con la superficie superior libre y con ella rígida"
+  description="Un golpe vertical sobre un semiespacio de aluminio emite un frente de compresión y un frente de cizalla más lento, ambos dibujados con arcos punteados en sus radios analíticos exactos, que se mantienen pegados a ellos mientras se expanden y salen del encuadre. En el panel de superficie libre un tren de lóbulos intensos se queda atrás sobre la superficie mucho después de que los frentes de cuerpo se hayan ido, y las dos trazas de sonda de debajo se separan en el tiempo de vuelo de Rayleigh. En el panel de superficie rígida aparecen esos mismos dos frentes y no los sigue ningún tren de superficie."
+/>
+
+Fíjate en lo que hacen los frentes al final. Los dos arcos de cuerpo se salen
+del encuadre y siguen su camino; los lóbulos de superficie no van a ninguna
+parte salvo a lo largo de la superficie, a su propia velocidad más lenta, y
+siguen ahí cuando las ondas de cuerpo ya se han marchado. El recuadro traza dos
+sondas de superficie separadas 0,15 m, y el retardo entre sus picos es la
+medición: el $c_R$ simulado frente a 2921 m/s, la raíz de la ecuación
+característica exacta de Rayleigh citada arriba, que los tests fijan dentro
+del 2 %.
+
+Los dos paneles de campo están dibujados con **escalas de color propias**, y el
+clip así lo indica, porque una fuerza vertical aplicada *sobre* una superficie
+empotrada casi se cancela contra su propia imagen y esa ejecución radia mucho
+menos que la libre. Las trazas de sonda de debajo conservan una única escala
+compartida, que es donde la comparación sigue siendo cuantitativa: la llegada
+de superficie que falta es un pico que falta, no un pico reescalado.
+
+La otra onda que una superficie libre hace posible, la onda de **flexión** de
+una tira delgada libre-libre, la que arriba queda fijada a la dispersión de
+Kirchhoff, también merece verse en movimiento. El clip de abajo es este mismo
 esquema lanzando un paquete de flexión de 4 kHz por una placa de acero de
 10 mm: en el panel de control la placa sigue recta y el paquete simplemente se
 marcha, y en el panel de la unión una placa perpendicular del mismo espesor
@@ -478,6 +523,57 @@ cruzan con desplazamientos transversales simétricos y la envolvente se
 cancela en la razón; $|V|$ es entonces la razón espectral ponderada por
 amplitud sobre la banda de la portadora, no una lectura de pico a pico.
 
+El dibujo de arriba es un diagrama de **rayos**: dice adónde va cada onda. Lo
+que un rayo no puede decir es qué aspecto tiene una «P evanescente», y en eso
+consiste entera la tercera fila de la tabla. El clip de abajo ejecuta la escena
+tres veces, con una incidencia de cada uno de los tres primeros regímenes (10°,
+por debajo de ambos ángulos críticos; 20°, entre ellos; 35°, pasado el de
+cizalla), sobre el mismo semiespacio de `WATER` y `STEEL`, lanzando contra el
+contacto un haz sostenido con gradiente de fase. Léelo como un **retrato de los
+regímenes**, no como una segunda medición: cada panel lleva anotado el $|V|$ en
+forma cerrada de la tabla de arriba, porque el haz que cabe en un panel de
+90 mm mide seis longitudes de onda de ancho, y con ese ancho la sonda queda en
+el campo próximo de la fuente en lugar de en un haz ya formado. Ensancharlo
+hasta que la lectura fuese de fiar exigiría un panel cuatro veces más ancho, en
+el que las franjas de interferencia serían demasiado finas para verse. La
+columna medida de la tabla sale, en cambio, de la batería de validación, que sí
+tiene sitio para hacerlo como es debido.
+
+<Video
+  name="anim_elastic_mode_conversion"
+  width={2400}
+  height={1350}
+  title="Conversión de modo en un contacto agua-acero a tres incidencias"
+  description="Un haz oblicuo sostenido en agua incide sobre un semiespacio de acero a diez, veinte y treinta y cinco grados. A diez grados salen dos haces hacia el acero por las direcciones de Snell dibujadas a trazos, el de cizalla hundiéndose cerca de la normal y el de compresión abriéndose mucho más. A veinte grados no sale nada por el ángulo de compresión y solo queda una fina piel pegada al contacto, mientras que el haz de cizalla se lleva él solo la potencia. A treinta y cinco grados no sale ninguno de los dos y el agua de arriba se asienta en un patrón de interferencia estacionario entre el haz incidente y el haz totalmente reflejado."
+/>
+
+A 10° salen del contacto dos haces por las direcciones de Snell dibujadas a
+trazos, y salen con ángulos distintos porque viajan a velocidades distintas: la
+onda de cizalla, más lenta, se hunde a 22,1° de la normal, y la de compresión,
+más rápida, se abre mucho más, hasta 43,8°. A 20° el haz P no es un haz más
+rasante: *ha desaparecido*. Lo que ocupa su lugar es una piel pegada al contacto
+que muere en menos de una longitud de onda y no lleva nada hacia abajo, mientras
+el haz de cizalla se lleva él solo lo que cruza; y esa fuga por cizalla es la
+razón de que la reflexión se quede en 0,918 en lugar del 1,000 que devolvería
+un fluido equivalente. A 35° los dos son evanescentes y nada se propaga
+*alejándose* por el acero: lo que llena el sólido ahí es una onda inhomogénea
+que corre **a lo largo** del contacto y muere con la profundidad, brillante y
+sin ir a ninguna parte. Encima del contacto, mientras tanto, el haz incidente y
+una reflexión total en amplitud pero desplazada en fase se resuelven en un
+patrón estacionario. De esa fase construye la sección siguiente una onda de
+Scholte.
+
+Cada panel dibuja su mitad de acero con **su propia** ganancia de
+representación, anotada, y la razón merece conocerse: el agua excita el acero
+a través de un salto de impedancia de treinta veces, así que el campo
+transmitido lleva una velocidad de partícula pequeña incluso allí donde lleva
+potencia real, y los tres paneles se diferencian entre sí de un modo que
+ninguna ganancia única abarca. A 10° la energía transmitida se marcha en dos
+haces, así que la amplitud es pequeña en cualquier punto; a 35° no se marcha
+nada y el campo evanescente se amontona contra el contacto, brillante y sin ir
+a ninguna parte. El brillo en el acero, por tanto, no es potencia. Para eso,
+lee el $|V|$ impreso y el factor de ganancia de cada panel.
+
 Esta es exactamente la física de cizalla que el `reflection_coefficient` de
 fondo fluido del
 [módulo submarino](/phonometry/es/underwater/underwater-propagation/) no puede
@@ -639,7 +735,7 @@ longitud de onda de traza acústica coincide con la longitud de onda de flexión
 libre, la placa rerradia un haz a 45° que crece a lo largo del tramo iluminado y
 el nivel transmitido se mantiene en la cifra de baja frecuencia, justo donde la
 ley de masas exigía 12 dB más de bloqueo. El aire bajo la placa se dibuja en los
-dos paneles con la ganancia representada en ellos, que `_weak_field_gain` mide sobre
+dos paneles con la ganancia de representación que `_weak_field_gain` mide sobre
 el campo asentado de las dos ejecuciones juntas (×150, es decir, +44 dB) y que
 se imprime en el lienzo: lee las *anotaciones* para los niveles, no el brillo.
 La
@@ -652,7 +748,7 @@ desmonta esa misma ejecución frente al método de la meseta y a la ley de masas
   width={2400}
   height={1350}
   title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
-  description="Dos campos FDTD elásticos en paralelo de la misma placa de acero de 10 mm tendida en aire mientras una onda plana sostenida llega a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi totalmente y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica coincide con la longitud de onda de flexión libre y bajo la placa crece un haz transmitido a 45 grados que mantiene el mismo nivel que el panel de baja frecuencia, allí donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia representada en ellos, anotada, de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la biblioteca y los niveles medido y de ley de masas anotados."
+  description="Dos campos FDTD elásticos en paralelo de la misma placa de acero de 10 mm tendida en aire mientras una onda plana sostenida llega a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi totalmente y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica coincide con la longitud de onda de flexión libre y bajo la placa crece un haz transmitido a 45 grados que mantiene el mismo nivel que el panel de baja frecuencia, allí donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la biblioteca y los niveles medido y de ley de masas anotados."
 />
 
 ## Qué cubre esta guía

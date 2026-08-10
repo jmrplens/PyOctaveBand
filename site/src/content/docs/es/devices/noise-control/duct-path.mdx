@@ -42,6 +42,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 El ruido de la climatización no se predice, se *contabiliza*. Se parte de la
 potencia acústica que el ventilador introduce en el conducto, se recorre el
@@ -1004,6 +1005,40 @@ print(round(plane_wave_limit(diameter=12 * IN), 1))                # 659.5 Hz
 Esas cifras de ventilación son contundentes: en ese conducto las ondas planas
 lo explican todo solo hasta la octava de 250 Hz, y un tronco de impulsión de
 36 x 24 in se rinde a 188 Hz.
+
+Lo que un número no puede decir es que el corte es un **interruptor**, no una
+pendiente. El clip de abajo simula la dimensión de 0,65 m de ese mismo conducto
+como una rebanada 2D, con paredes rígidas, y lo excita dos veces con una única
+fuente descentrada que alimenta a la vez el modo plano y el primer modo
+transversal: una a 180 Hz, por debajo de los 263,8 Hz que el fragmento acaba de
+imprimir, y otra a 400 Hz por encima. Nada más cambia. Por debajo del corte el
+modo transversal es *evanescente*: decae como $e^{-\alpha x}$ con
+$1/\alpha = 0{,}28$ m, lo que lo deja 20 dB por debajo a 0,65 m de la fuente
+(el ancho de un conducto), así que el campo próximo irregular muere ahí y todos
+los frentes de onda posteriores cruzan la sección planos. Por encima del corte
+se propaga, los dos modos viajan con números de onda axiales distintos
+($k_x = 5{,}51$ frente a $k = 7{,}33$ rad/m a 400 Hz) y su batido se repite
+cada 3,45 m a lo largo del conducto, y el perfil a lo ancho de la sección no se
+asienta nunca. El panel que hay junto a cada franja dibuja ese perfil en una
+estación fija 5 m aguas abajo frente a su propia media de sección, que es la
+única presión que llevan los modelos unidimensionales de más arriba, de modo
+que «una sola presión acústica describe toda la sección transversal» o es
+cierto en pantalla o es visiblemente falso.
+
+<Video
+  name="anim_fdtd_duct_cut_on"
+  width={2400}
+  height={1350}
+  title="Un conducto rígido excitado por debajo y por encima de su primera frecuencia de corte"
+  description="El mismo conducto rígido de 0,65 metros se excita a 180 Hz y a 400 Hz con una única fuente descentrada. En la franja de 180 Hz el campo irregular cercano a la fuente se aplana en menos de medio ancho de conducto y todos los frentes de onda posteriores cruzan la sección como una línea recta, y el panel de perfil que hay al lado colapsa sobre su propia media. En la franja de 400 Hz el campo sigue siendo irregular en toda la longitud del conducto, los dos modos que se propagan producen un batido a lo largo de él y el panel de perfil se aparta mucho de la media en cada ciclo."
+/>
+
+Por eso un modelo de silenciador por matriz de transferencia tiene una
+**frecuencia techo** y no un margen de exactitud: por debajo del corte el
+segundo modo no es pequeño, es que no está, y por encima el modelo describe una
+de varias ondas que están todas ahí. El álgebra de cuatro polos de
+[Silenciadores](/phonometry/es/devices/noise-control/silencers/) hereda el mismo
+límite.
 
 A 15 m/s la corrección por flujo es invisible: $M = 0{,}044$ da
 $\sqrt{1 - M^2} = 0{,}999$, que desplaza el primer corte 0,2 Hz. Se gana el

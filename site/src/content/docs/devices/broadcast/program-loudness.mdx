@@ -48,6 +48,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Video from '../../../../components/Video.astro';
 
 **ITU-R BS.1770-5** defines how broadcast and streaming measure the loudness
 of a programme: **K-weighting**, mean-square power in **gated 400 ms blocks**
@@ -223,6 +224,24 @@ surviving blocks, so the integrated value inherits their scatter, which is why
 short-form delivery specifications normally normalise on the momentary or
 short-term maximum instead of on I. (Non-finite samples are rejected outright
 rather than gated.)
+
+The order of those two passes is what makes the gate hard to picture from a
+finished trace. The relative threshold is not a constant the meter knows in
+advance: it is computed from the blocks that survived the absolute gate, so it
+only exists once there is material to compute it from, and it keeps moving
+while the programme plays. A block that was counted early can therefore stop
+counting later, without anything about that block having changed. The clip
+runs the decision block by block on a louder, five-section programme, so the
+threshold can be watched sliding:
+
+<Video
+  name="anim_loudness_gating"
+  width={2400}
+  height={1350}
+  title="The relative loudness threshold sliding as a programme plays, and blocks dropping out behind it"
+  description="Sixty seconds of a five-section programme are metered into 597 gating blocks, each drawn as a square that is solid while it counts and hollow once it is gated out. The dashed relative threshold is recomputed from the survivors after every block: it starts low, so every block counts, and climbs as louder material arrives until it settles at -34.3 LUFS, at which point blocks that were counted earlier have gone hollow behind it. The histogram beside the trace counts the same blocks into loudness bins, its bars greying below the sliding threshold. Four readouts settle at an integrated loudness of -23.0 LUFS against an ungated energy mean of -24.3 LUFS, a difference of 1.28 LU, and 154 of the 597 blocks never counted. A closing act applies the deeper loudness-range gate at -44.1 LUFS and slides the 10th and 95th percentile edges onto -36.8 and -19.1 LUFS for a loudness range of 17.7 LU."
+  caption="The gate is a decision taken per block, not a filter over the signal. Because the relative threshold is derived from the survivors of the first pass, it is data-dependent and retroactive: the quiet opening and the fade-out end up excluded not because they fell below a fixed level, but because the rest of the programme turned out to be loud enough to raise the threshold above them."
+/>
 
 The figure makes the gate visible on a shaped-noise programme with a
 long quiet tail:

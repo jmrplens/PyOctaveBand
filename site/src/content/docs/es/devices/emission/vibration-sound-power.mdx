@@ -28,6 +28,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 La potencia acústica aérea que una máquina radia a través de la vibración
 estructural de su superficie exterior puede estimarse a partir de la velocidad
@@ -295,6 +296,69 @@ dos hipótesis son fáciles de violar en campo:
   aberturas, tomas o fuentes internas que esquiva la carcasa medida es
   invisible para una medición de velocidad; el método caracteriza solo la
   parte estructural.
+
+### Qué aspecto tiene la cancelación
+
+«Zonas adyacentes se mueven en contrafase y su radiación se cancela en gran
+medida» es la frase sobre la que descansa toda la advertencia, y es una
+afirmación sobre la relación de fase entre una onda estructural que viaja y el
+aire que tiene encima — que es justo lo que un espectro no puede dibujar. El
+clip de abajo excita una placa de acero de 10 mm en aire **a lo largo de toda
+su longitud**, con una fuerza sobre la placa y no con una onda que llega a
+ella, porque ese es el caso de emisión del que trata este método — y porque una
+placa excitada solo en un parche radia desde el parche, que por debajo de la
+coincidencia sería lo único que habría en el aire y enseñaría lo contrario de
+la verdad. Después ejecuta la misma escena dos veces, a $f_c/2$ y a $2f_c$, sin
+más diferencia entre los paneles que la frecuencia de excitación.
+
+<Video
+  name="anim_elastic_radiation_efficiency"
+  width={2400}
+  height={1350}
+  title="Una placa de acero excitada por debajo y por encima de su frecuencia de coincidencia"
+  description="Una onda de flexión recorre hacia la derecha una placa de acero con aire encima. En el panel de frecuencia más baja la placa ondula con una longitud de onda más corta que la del sonido y la presión que hay sobre ella forma lóbulos alternos que se pegan a la placa y se apagan en unos pocos centímetros, así que no sale nada. En el panel de frecuencia más alta la placa ondula con una longitud de onda más larga y un haz plano de presión se marcha a cuarenta y cinco grados a lo largo de todo el tramo excitado, creciendo a medida que avanza."
+/>
+
+Por debajo de la coincidencia la longitud de onda de flexión es **más corta**
+que la acústica. Semiondas adyacentes de la placa empujan y tiran del mismo
+aire en contrafase, y lo que el aire enseña es una piel de lóbulos alternos que
+se pega a la placa y muere en una fracción de longitud de onda. La presión en
+la superficie es del mismo orden que en el otro panel; simplemente va un cuarto
+de ciclo desfasada respecto de la velocidad, así que no se lleva potencia
+alguna — que es lo que $\varepsilon \ll 1$ *significa*. Por encima de la
+coincidencia la onda de flexión adelanta al sonido, la traza acústica iguala la
+longitud de onda de flexión y un haz plano se marcha a
+$\arcsin(c_0/c_B) = 45°$.
+
+Cada panel lleva anotadas las formas cerradas que obedece su régimen, sacadas
+de las propias constantes de la placa: por debajo de la coincidencia, que
+$\lambda_B = 0{,}40$ m es *más corta* que los 0,57 m del sonido en aire, así que
+$\sin\theta = \lambda/\lambda_B$ no tiene solución — no hay ángulo por el que el
+sonido pueda salir — y la piel que ocupa su lugar decae con una altura de
+$1/\sqrt{k_B^2 - k_0^2} = 0{,}091$ m; por encima de la coincidencia, que
+$\lambda_B = 0{,}20$ m es *más larga* que los 0,14 m en aire, así que la traza
+acústica iguala la longitud de onda de flexión y lanza un haz a 45°. No
+se mide nada sobre la escena misma. Se probaron dos magnitudes y las dos las
+estropearon los extremos de la placa — una capa amortiguadora refleja
+parcialmente una onda de flexión, de modo que el aire lleva un haz hacia la
+izquierda encima del que va hacia la derecha, y la lectura es la diferencia de
+los dos y no uno cualquiera de ellos. Terminar una onda de flexión lo bastante
+bien como para leerle un número exige un dominio mucho más ancho del que cabe
+en una imagen de esto.
+
+Dos cautelas al leerlo. La escena es una placa en aire efectivamente
+**infinita**, así que lo que demuestra es la cancelación por debajo de la
+coincidencia, no el cortocircuito acústico alrededor de un panel sin bafle: son
+la misma cancelación a dos escalas distintas, y la segunda necesita una fuente
+finita con un camino que rodee su borde. Y el clip a propósito *no* imprime un
+factor de radiación. Un $\varepsilon$ leído sobre una escena así sería un
+artefacto de la excitación: toda apertura de excitación finita tiene un espectro
+de número de onda lo bastante ancho como para meter parte de sí mismo dentro de
+la región radiante, y por debajo de la coincidencia esa radiación de apertura
+sería lo único que cruzaría una línea de intensidad, ya que la onda subsónica
+que viaja no aporta exactamente nada. El número pertenece a la curva en forma
+cerrada del apartado siguiente; el clip está aquí por el mecanismo que hay
+detrás.
 
 ### Estimar el factor de radiación antes de medirlo
 

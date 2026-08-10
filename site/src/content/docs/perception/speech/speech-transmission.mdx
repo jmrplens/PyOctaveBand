@@ -23,6 +23,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Video from '../../../../components/Video.astro';
 
 A public-address system, an intercom, a reverberant lecture hall: each is a
 *transmission channel* between a talker's mouth and a listener's ear, and each
@@ -77,6 +78,25 @@ steps) in each of the 7 octave bands from 125 Hz to 8 kHz, converts each $m$ to
 an effective signal-to-noise ratio clipped to ±15 dB, and combines the
 results, band-weighted, into the index: the STI is an effective SNR of the
 *envelope*, mapped onto $[0, 1]$.
+
+That is a claim about a waveform, so it is worth watching on one. The clip
+below sends a fully modulated 4 Hz envelope — one syllable-rate burst and gap
+per quarter second — through the 1 kHz octave band of a room, and lets first
+the reverberation time and then the noise take it apart. The received trace is
+the probe convolved with the very $h_k^2(t)$ the Schroeder integral above runs
+on, so the depth $(\max - \min)/(\max + \min)$ you can measure off the screen
+*is* the $m$ the library returns. Both halves are drawn at a constant received
+mean, which is the whole point: a sound level meter pointed at any frame of
+this clip reads the same number, and the index does not.
+
+<Video
+  name="anim_modulation_transfer"
+  width={2400}
+  height={1350}
+  title="Reverberation and noise taking apart a speech-rate envelope"
+  description="A fully modulated four-hertz intensity envelope is received through the one-kilohertz octave band of a room. As the reverberation time sweeps from 0.30 to 2.50 seconds the peaks fall and the valleys fill toward a mean line that never moves, and the measured modulation depth falls from 0.90 to 0.26; the modulation transfer curve beside it drops at every one of the fourteen modulation frequencies, the seven band modulation transfer indices fall with it and the speech transmission index walks from 0.84 down to 0.40. Then, at a fixed one-second reverberation time, the speech-to-noise ratio sweeps from 25 to 0 decibels: a shaded noise floor rises under the trace instead, the mean still does not move, and the depth falls again to 0.28 for a speech transmission index of 0.36."
+  caption="Two mechanisms, one quantity. Reverberation smears energy across the gaps, so the envelope shrinks about its mean; steady noise fills the gaps from below, so a floor rises under it. Neither changes the average level, and both destroy the contrast a listener segments syllables by."
+/>
 
 The two degradations look nothing alike on that curve, which is why the index
 needs the whole $m(F)$ rather than one number:

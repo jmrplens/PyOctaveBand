@@ -269,7 +269,48 @@ plt.show()
 
 </details>
 
-That flexural wave is worth watching in motion. The clip below is this same
+The snapshot stops at 73 µs because rigid sides and a short run were the
+cheapest way to get one clean frame, and one frame is enough for the two body
+speeds: the dotted arcs are drawn at the exact $c_P t$ and $c_S t$ radii, so
+they are a measurement and not a label. What one frame cannot settle is the
+**third** wave. Nothing analytic is drawn for it, its speed differs from the
+shear front's by 7 %, and its defining property — it stays on the surface
+while the body fronts leave — is a statement about what happens next.
+
+So run the same hit for 163 µs instead, with sponges on the other three sides
+and the domain widened until the corner where a sponge meets the free surface
+is outside the frame, and run it twice: once with the top declared `"free"`
+and once with it left at the solver default, the clamped rigid wall. Same
+aluminium, same hit, same two body fronts — and no surface train at all in the
+second. That is the claim of this section, drawn: the boundary condition makes
+the Rayleigh wave, not the material.
+
+<Video
+  name="anim_elastic_halfspace_waves"
+  width={2400}
+  height={1350}
+  title="Lamb's problem with a free and with a rigid top surface"
+  description="A vertical hit on an aluminium half-space sends out a compressional front and a slower shear front, both drawn with dotted arcs at their exact analytic radii that stay locked to them as they expand and leave the frame. On the free-surface panel a train of strong lobes stays behind on the surface long after the body fronts have gone, and the two probe traces below it separate by the Rayleigh time of flight. On the rigid-surface panel the same two fronts appear and no surface train follows them."
+/>
+
+Watch what the fronts do at the end. Both body arcs run out of the frame and
+keep going; the surface lobes do not go anywhere but along the surface, at
+their own slower speed, and they are still there when the body waves have
+left. The inset traces two surface probes 0.15 m apart, and the delay between
+their peaks is the measurement: the simulated $c_R$ against 2921 m/s, the root
+of the exact Rayleigh characteristic equation quoted above, which the tests
+pin to within 2 %.
+
+The two field panels are drawn on **their own colour scales**, and the clip
+says so, because a vertical force applied *on* a clamped surface nearly
+cancels against its own image and that run radiates far less than the free
+one. The probe traces below them keep a single shared scale, which is where
+the comparison stays quantitative: the missing surface arrival is a missing
+peak, not a rescaled one.
+
+The other wave a free surface makes possible — the **flexural** wave of a
+thin free-free strip, the one pinned to the Kirchhoff dispersion above — is
+worth watching in motion too. The clip below is this same
 solver launching a 4 kHz bending packet along a 10 mm steel plate: on the
 control panel the plate runs straight and the packet simply leaves, and on the
 junction panel a perpendicular plate of the same thickness turns the corner
@@ -443,6 +484,54 @@ where the beam axis meets the interface, 0.12 m up, so the incident and
 reflected beam centres cross it at symmetric transverse offsets and the
 envelope cancels in the ratio; $|V|$ is then the amplitude-weighted spectral
 ratio over the carrier band, not a peak-to-peak reading.
+
+The drawing above is a **ray** diagram: it says where each wave goes. What a
+ray cannot say is what "P evanescent" looks like, and that is the whole of the
+third row of the table. The clip below runs the scene three times, at one
+incidence from each of the first three regimes — 10°, below both critical
+angles; 20°, between them; 35°, past the shear one — on the same `WATER` and
+`STEEL` half-space, driving a sustained phase-graded beam onto the contact.
+Read it as a **picture of the regimes**, not as a second measurement: each
+panel is annotated with the closed-form $|V|$ from the table above, because
+the beam a 90 mm panel can hold is six wavelengths wide, and at that width the
+probe sits in
+the source's near field rather than in a formed beam. Widening it until a
+reading is trustworthy would take a panel four times as wide, in which the
+fringes are too fine to see. The measured column of the table comes from the
+validation suite instead, which has the room to do it properly.
+
+<Video
+  name="anim_elastic_mode_conversion"
+  width={2400}
+  height={1350}
+  title="Mode conversion at a water-steel contact at three incidences"
+  description="A sustained oblique beam in water strikes a steel half-space at ten, twenty and thirty-five degrees. At ten degrees two beams leave into the steel along the dashed Snell directions, the shear one plunging near the normal and the compressional one swinging much further out. At twenty degrees nothing departs at the compressional angle and only a thin skin clings to the contact, while the shear beam alone carries power away. At thirty-five degrees neither beam departs and the water above settles into a standing interference pattern between the incident and the totally reflected beam."
+/>
+
+At 10° two beams leave the contact along the dashed Snell directions, and they
+leave at different angles because they travel at different speeds — the slower
+shear wave plunging at 22.1° from the normal, the faster compressional wave
+bent much further out, to 43.8°. At 20° the P beam is not a shallower beam: it
+is *gone*. What stands in its place is a skin that clings to the contact and
+dies within a wavelength, carrying nothing downward, while the shear beam
+alone takes what crosses — and that shear leak is why the reflection settles
+at 0.918 rather than the 1.000 an equivalent fluid would return. At 35° both
+are evanescent and nothing propagates *away* into the steel: what fills the
+solid there is an inhomogeneous wave running **along** the contact and dying
+with depth, bright and going nowhere. Above the contact, meanwhile, the
+incident beam and a reflection that is total in amplitude but shifted in phase
+resolve into a standing pattern. That phase is what the next section builds a
+Scholte wave out of.
+
+Each panel draws its steel half with its **own** annotated display gain, and
+the reason is worth knowing: water drives steel through a thirtyfold impedance
+step, so the transmitted field carries a small particle velocity even where it
+carries real power — and the three panels are unlike each other in a way no
+single gain spans. At 10° the transmitted energy leaves in two beams, so the
+amplitude anywhere is small; at 35° nothing leaves at all and the evanescent
+field piles up against the contact, bright and going nowhere. Brightness in
+the steel is therefore not power. Read the printed $|V|$, and the gain factor
+on each panel, for that.
 
 This is exactly the shear physics that the
 fluid-bottom `reflection_coefficient` of the

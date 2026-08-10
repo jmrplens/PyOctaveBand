@@ -47,6 +47,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Two classical models predict the sound field in a rectangular room before it is
 ever built. The **image-source** model gives the deterministic early reflection
@@ -135,6 +136,25 @@ while the **exact** sub-sample reflection table stays in `times`, `distances`,
 `orders`, `amplitudes` and `image_positions` — so the geometry is exact
 regardless of the sample rate. The direct sound and the individual early
 reflections are geometric quantities good to machine precision.
+
+Read as a list of arrivals, that table hides what the method actually is. Each
+image sits at a fixed distance $r_n$ from the receiver and contributes one
+arrival at $r_n/c$, so the echogram is not a signal that decays — it is a
+static lattice of points being read off by a sphere expanding from the receiver
+at the speed of sound. That view turns the reflection density into something
+watchable: the sphere's volume grows as $t^3$, the lattice has one image per
+room volume $V$, and the count it has swept must therefore follow
+$N(t) = \frac{4\pi}{3}(ct)^3/V$, whose derivative is the $4\pi c^3t^2/V$
+reflection density quoted below. The clip sweeps it:
+
+<Video
+  name="anim_image_source_buildup"
+  width={2400}
+  height={1350}
+  title="A sphere expanding from the receiver sweeping the mirror-room lattice"
+  description="On the left, the 7 by 5 metre room sits at the centre of its grid of dashed mirror rooms, with the source as a star and the receiver as a triangle. A circle expands from the receiver at the speed of sound; as it reaches each image source that image lights up in its reflection-order colour and draws a straight line back to the receiver. On the right, the reflectogram fills in at the same instant: each image the circle reaches writes one stem at its arrival time and its level relative to the direct sound, under the dashed one-over-r spreading envelope. Below it a running count of arrivals climbs alongside the dashed analytic law, the two staying together as the count passes 44 at 30 milliseconds, 108 at 40, 202 at 50 and 344 at 60, where the law reads 348."
+  caption="The echogram is a lattice being swept, not a decaying signal. Because the expanding sphere gains volume as the cube of time while the images are spaced one per room volume, arrivals accumulate as the cube of time and their rate grows as its square — the early discrete reflections and the late diffuse tail are the same construction read at two densities."
+/>
 
 The reflectogram below shows the whole pattern: the direct sound at 0 dB, then
 the reflection cloud coloured by reflection order decaying under the $1/r$

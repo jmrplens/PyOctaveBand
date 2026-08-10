@@ -1795,6 +1795,41 @@ to violate in the field:
   invisible to a velocity survey; the method characterises the
   structure-borne part only.
 
+"Adjacent zones move in antiphase and their radiation largely cancels" is a
+statement about a phase relationship between a travelling structural wave and
+the air on top of it, which no spectrum can draw. The clip below drives a
+10 mm steel plate in air along its whole length — a force on the plate, not a
+wave arriving at it, and over the whole plate rather than a patch, because a
+patch radiates from the patch and below coincidence that would be the only
+thing in the air — and runs the same scene twice, at $f_c/2$ and at
+$2f_c$, with nothing differing between the panels but the drive frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency.gif" alt="Animation: a bending wave running along a steel plate in air, with alternating pressure lobes that cling to the plate and fade out within centimetres in the lower-frequency panel, and a plane beam departing at forty-five degrees in the higher-frequency panel" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency.webm)
+
+Below coincidence the bending wavelength is **shorter** than the acoustic
+one. Adjacent half-waves push and pull the same air in antiphase, and what
+the air shows is a skin of alternating lobes that clings to the plate and
+dies within a fraction of a wavelength: the pressure at the surface is of the
+same order as in the other panel, but a quarter-cycle out of step with the
+velocity, so it carries no power away — which is what $\varepsilon \ll 1$
+*means*. Above coincidence the bending wave outruns sound, the trace match is
+satisfied, and a plane beam leaves at $\arcsin(c_0/c_B) = 45°$. Each panel
+is annotated with the closed forms its regime obeys, from the plate's own
+constants: below coincidence $\lambda_B = 0.40$ m is shorter than the 0.57 m of
+sound in air, so $\sin\theta = \lambda/\lambda_B$ has no solution and the skin
+that stands in its place decays over $1/\sqrt{k_B^2 - k_0^2} = 0.091$ m; above
+it $\lambda_B = 0.20$ m is longer than the 0.14 m in air and the trace match
+sends a beam out at 45°. Nothing is measured off the scene: the ends of the
+plate reflect the bending wave partially, so the air carries a leftward beam on
+top of the rightward one and any reading is the difference of the two. Two cautions: the scene is an effectively infinite plate, so
+it shows below-coincidence cancellation and not the short circuit around an
+unbaffled panel (the same cancellation at another scale), and the clip prints
+no radiation factor, because any finite driving aperture radiates a little on
+its own and below coincidence that would be the only thing an intensity line
+saw. The factor belongs to the closed-form model below.
+
 Part 2 exists exactly for the radiation-factor problem: it replaces the
 fixed $\varepsilon = 1$
 with a band-by-band $\varepsilon_j$ determined from one reference measurement

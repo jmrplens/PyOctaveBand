@@ -305,7 +305,36 @@ plt.show()
 
 </details>
 
-That flexural wave is worth watching in motion. The clip below is this same
+One frame is enough for the two body speeds — the dotted arcs are drawn at
+the exact $c_P t$ and $c_S t$ radii, so they measure rather than label. It is
+not enough for the third wave, whose speed differs from the shear front's by
+7 % and whose defining property is that it stays on the surface while the
+body fronts leave. Run the same hit for 163 µs, with sponges on the other
+three sides and the corner between a sponge and the free surface pushed
+outside the frame, and run it twice: top declared `"free"`, then top left at
+the solver default, the clamped rigid wall. Same aluminium, same hit, same
+two body fronts, no surface train at all in the second.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_halfspace_waves_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_halfspace_waves.gif" alt="Animation: a vertical hit on an aluminium half-space, with dotted analytic arcs tracking the compressional and shear fronts as they expand and leave the frame, a train of surface lobes staying behind on the free-surface panel, and no surface train on the rigid-surface panel" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_halfspace_waves.webm)
+
+Both body arcs run out of the frame and keep going. The surface lobes do not
+go anywhere but along the surface, and they are still there when the body
+waves have left — which is the whole of "a Rayleigh wave". The inset traces
+two surface probes 0.15 m apart, and the delay between their peaks is the
+measurement: the simulated $c_R$ against 2921 m/s, the root of the exact
+characteristic equation, which the tests pin to within 2 %.
+
+The two field panels carry their own colour scales, and say so: a vertical
+force applied *on* a clamped surface nearly cancels against its own image, so
+that run radiates far less than the free one. The probe traces share a single
+scale, which is where the comparison stays quantitative — the missing surface
+arrival is a missing peak, not a rescaled one.
+
+The other wave a free surface makes possible — the **flexural** wave of a
+thin free-free strip, the one pinned to the Kirchhoff dispersion above — is
+worth watching in motion too. The clip below is this same
 solver launching a 4 kHz bending packet along a 10 mm steel plate: on the
 control panel the plate runs straight and the packet simply leaves, and on
 the junction panel a perpendicular plate of the same thickness turns the
@@ -370,7 +399,38 @@ same $c_P$ would; beyond the S critical angle the reflection is total,
 $|V| = 1$ with a phase. The validation suite launches oblique carrier beams
 at 10° and 20° and matches the exact reflection coefficient of
 Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
-mode conversion included. This is exactly the shear physics that the
+mode conversion included.
+
+The regimes are worth watching rather than tabulating, because "the
+transmitted P is evanescent" is not a shallower beam but the absence of one.
+The clip runs the scene at 10°, 20° and 35°, one incidence from each of the
+first three regimes, driving a sustained phase-graded beam onto the contact.
+Read it as a picture of the regimes, not as a second measurement: each panel
+carries the closed-form $|V|$, because the beam a 90 mm panel can hold is six
+wavelengths wide and at that width a probe sits in the source's near field
+rather than in a formed beam. The measured column above comes from the
+validation suite, which has the room to do it properly.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_mode_conversion_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_mode_conversion.gif" alt="Animation: a sustained oblique beam in water hitting a steel half-space at three incidences, with two transmitted beams at ten degrees, only a shear beam at twenty degrees, and total reflection at thirty-five degrees" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_mode_conversion.webm)
+
+At 10° two beams leave along the dashed Snell directions, at different angles
+because they travel at different speeds: the slower shear wave at 22.1° from
+the normal, the faster compressional wave bent much further out, to 43.8°. At
+20° nothing departs at the compressional angle; a skin clings to the contact
+instead, and the shear beam alone carries what crosses. At 35° both are
+evanescent and nothing propagates *away* into the steel — what fills the solid
+there runs along the contact and dies with depth — while the water above
+settles into the interference of the incident
+beam with a reflection that is total in amplitude and shifted in phase. Each
+panel draws its steel half with its own annotated display gain: at 10° the
+transmitted energy leaves in two beams and the amplitude anywhere is small,
+while at 35° nothing leaves and the evanescent field piles up against the
+contact, bright and going nowhere. Brightness in the steel is not power — read
+the printed $|V|$ and the gain factor for that.
+
+This is exactly the shear physics that the
 fluid-bottom `reflection_coefficient` of the
 [underwater module](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) cannot represent, and the
 reason a shear-supporting seabed loses more energy than its

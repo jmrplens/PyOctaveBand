@@ -27,6 +27,7 @@ language globals each of them holds.
 from .aperture import _aperture_fields, animate_fdtd_aperture_slit
 from .barrier import _barrier_fields, animate_fdtd_barrier
 from .diffusion import _diffusion_fields, animate_fdtd_diffusion
+from .duct_modes import _duct_cut_on_fields, animate_fdtd_duct_cut_on
 from .ducting import _ducting_fields, animate_fdtd_ducting
 from .elastic import (
     _coincidence_fields,
@@ -39,15 +40,24 @@ from .expansion_chamber import (
     animate_fdtd_expansion_chamber,
 )
 from .ground_effect import _ground_effect_fields, animate_fdtd_ground_effect
+from .halfspace import _halfspace_fields, animate_elastic_halfspace_waves
 from .metadiffuser import (
     _meshed_metadiffuser_ntff_levels,
     _metadiffuser_fields,
     animate_fdtd_metadiffuser,
 )
+from .mode_conversion import (
+    _mode_conversion_fields,
+    animate_elastic_mode_conversion,
+)
 from .pillar_hall import (
     _pillar_fields,
     _poster_ss_for,
     animate_fdtd_pillar_hall,
+)
+from .radiation_efficiency import (
+    _radiation_efficiency_fields,
+    animate_elastic_radiation_efficiency,
 )
 from .refraction import _refraction_fields, animate_fdtd_refraction
 from .room_modes import _room_mode_fields, animate_fdtd_room_modes
@@ -65,24 +75,32 @@ __all__ = [
     "_barrier_fields",
     "_coincidence_fields",
     "_diffusion_fields",
+    "_duct_cut_on_fields",
     "_ducting_fields",
     "_expansion_chamber_fields",
     "_ground_effect_fields",
+    "_halfspace_fields",
     "_impedance_tube_fields",
     "_meshed_metadiffuser_ntff_levels",
     "_metadiffuser_fields",
+    "_mode_conversion_fields",
     "_pillar_fields",
     "_plate_junction_fields",
     "_poster_ss_for",
+    "_radiation_efficiency_fields",
     "_refraction_fields",
     "_room_mode_fields",
     "_slit_absorber_fields",
     "_transmission_tube_fields",
     "animate_elastic_coincidence",
+    "animate_elastic_halfspace_waves",
+    "animate_elastic_mode_conversion",
     "animate_elastic_plate_junction",
+    "animate_elastic_radiation_efficiency",
     "animate_fdtd_aperture_slit",
     "animate_fdtd_barrier",
     "animate_fdtd_diffusion",
+    "animate_fdtd_duct_cut_on",
     "animate_fdtd_ducting",
     "animate_fdtd_expansion_chamber",
     "animate_fdtd_ground_effect",

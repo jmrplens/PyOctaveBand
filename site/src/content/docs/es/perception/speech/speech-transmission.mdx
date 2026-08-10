@@ -23,6 +23,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 Un sistema de megafonía, un interfono, un aula reverberante: cada uno es un
 *canal de transmisión* entre la boca de quien habla y el oído de quien escucha,
@@ -81,7 +82,28 @@ convierte cada $m$ en una relación señal-ruido efectiva acotada a ±15 dB y
 combina los resultados, ponderados por banda, en el índice: el STI es una SNR
 efectiva de la *envolvente*, llevada a $[0, 1]$.
 
-Las dos degradaciones no se parecen en nada sobre esa curva, y por eso el índice
+Eso es una afirmación sobre una forma de onda, así que merece la pena verla
+sobre una. El clip de abajo envía una envolvente de 4 Hz con modulación plena
+— una ráfaga y un hueco al ritmo de las sílabas por cada cuarto de segundo — a
+través de la banda de octava de 1 kHz de una sala, y deja que primero el tiempo
+de reverberación y después el ruido la desmonten. La traza recibida es la sonda
+convolucionada con la misma $h_k^2(t)$ sobre la que corre la integral de
+Schroeder de arriba, así que la profundidad $(\max - \min)/(\max + \min)$ que
+puedes medir en la pantalla *es* la $m$ que devuelve la biblioteca. Las dos
+mitades están dibujadas con la media recibida constante, que es justo de lo que
+se trata: un sonómetro apuntado a cualquier fotograma de este clip lee el mismo
+número, y el índice no.
+
+<Video
+  name="anim_modulation_transfer"
+  width={2400}
+  height={1350}
+  title="La reverberación y el ruido desmontando una envolvente al ritmo del habla"
+  description="Una envolvente de intensidad de cuatro hercios con modulación plena se recibe a través de la banda de octava de un kilohercio de una sala. Mientras el tiempo de reverberación barre de 0,30 a 2,50 segundos los picos bajan y los valles se rellenan hacia una línea media que no se mueve, y la profundidad de modulación medida cae de 0,90 a 0,26; la curva de transferencia de modulación de al lado baja en cada una de las catorce frecuencias de modulación, los siete índices de transferencia de modulación por banda caen con ella y el índice de transmisión del habla recorre desde 0,84 hasta 0,40. Después, con un tiempo de reverberación fijo de un segundo, la relación señal-ruido de habla barre de 25 a 0 decibelios: en su lugar sube un suelo de ruido sombreado bajo la traza, la media sigue sin moverse y la profundidad vuelve a caer, hasta 0,28, para un índice de transmisión del habla de 0,36."
+  caption="Dos mecanismos, una sola magnitud. La reverberación esparce energía por los huecos, así que la envolvente se encoge en torno a su media; el ruido estacionario rellena los huecos desde abajo, así que sube un suelo por debajo. Ninguno de los dos cambia el nivel medio, y los dos destruyen el contraste con el que quien escucha segmenta las sílabas."
+/>
+
+Las dos degradaciones no se parecen en nada en esa curva, y por eso el índice
 necesita la $m(F)$ entera y no un solo número:
 
 <ThemeImage
@@ -199,14 +221,14 @@ plt.show()
 ### Preparar la medición
 
 Las dos vías de abajo parten de una señal que recorrió un camino real, y el
-apartado 7 es preciso sobre lo que la produce. La página cubre dos mediciones
-físicamente distintas, un hablante sin amplificar en una sala y un sistema de
-sonido excitado eléctricamente, y el montaje se diferencia sobre todo en por
-dónde entra la señal.
+apartado 7 concreta qué la produce. La página cubre dos mediciones físicamente
+distintas, un hablante sin amplificar en una sala y un sistema de sonido
+excitado eléctricamente, y el montaje se diferencia sobre todo en por dónde
+entra la señal.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sti_setup_es.svg"
-  alt="Dos paneles de la medición física del STI. Panel A, un hablante sin amplificar: una sección de la sala con una boca artificial sobre soporte a 1,5 m de altura de boca apuntando en la dirección de habla, una llamada de nivel de 60 dB(A) a 1 m por delante de la boca como recurso cuando el nivel de habla de operación no se ajusta con el método del Anexo J, un micrófono de medida a 1,2 m de altura de oído sentado con una cota de separación libre respecto a la superficie reflectante más próxima, una segunda posición de recepción en trazo tenue más atrás, y un recuadro en planta con varias posiciones de recepción repartidas por el aforo. Panel B, un sistema de sonido: la misma sala con una línea de altavoces de techo, una flecha de inyección eléctrica en la entrada del sistema etiquetada como nivel ajustado al del habla según el Anexo J, micrófonos a la altura de escucha en dos zonas de cobertura, y un micrófono de ruido ambiente con el sistema apagado. Ambos paneles etiquetan el receptor como omnidireccional, de tipo campo difuso y calibrado, y una franja al pie dice: la valoración del espacio es la media de las posiciones menos una desviación típica"
+  alt="Dos paneles de la medición física del STI. Panel A, un hablante sin amplificar: una sección de la sala con una boca artificial sobre soporte a 1,5 m de altura de boca apuntando en la dirección de habla, una llamada de nivel de 60 dB(A) a 1 m por delante de la boca como recurso cuando el nivel de habla de operación no se ajusta con el método del Anexo J, un micrófono de medida a 1,2 m de altura de oído sentado con una cota de separación libre respecto a la superficie reflectante más próxima, una segunda posición de recepción en trazo tenue más atrás, y un recuadro en planta con varias posiciones de recepción repartidas por la zona de público. Panel B, un sistema de sonido: la misma sala con una línea de altavoces de techo, una flecha de inyección eléctrica en la entrada del sistema etiquetada como nivel ajustado al del habla según el Anexo J, micrófonos a la altura de escucha en dos zonas de cobertura, y un micrófono de ruido ambiente con el sistema apagado. Ambos paneles etiquetan el receptor como omnidireccional, de tipo campo difuso y calibrado, y una franja al pie dice: la valoración del espacio es la media de las posiciones menos una desviación típica"
   width="94%"
 />
 
@@ -228,7 +250,7 @@ a c).
 Anexo J. Cuando ese ajuste no está disponible, el recurso de la norma es un
 nivel equivalente de **60 dB(A) a 1 m por delante** de la boca artificial o del
 altavoz de ensayo. Esto no es un detalle que pueda adivinarse a partir de la
-sala: un micrófono de proximidad ve un nivel de habla de unos 86 dB(A) a
+sala: un micrófono de proximidad capta un nivel de habla de unos 86 dB(A) a
 94 dB(A) a entre 5 cm y 2 cm, y uno de cuello de cisne de unos 80 dB(A) a
 86 dB(A) a entre 10 cm y 5 cm (apartado 7.2 d). Para un sistema de sonido la
 señal se inyecta eléctricamente, lo más cerca posible de la entrada normal para
@@ -247,7 +269,7 @@ artificial. El ruido ambiente se mide en el mismo punto con la fuente apagada,
 para poder introducirlo con `ambient=` o como `snr=`.
 
 **Antes de culpar a la sala**, verifica la integridad de la señal de ensayo con
-una medida en bucle cerrado: eso caza un archivo corrupto o sobrecomprimido, y
+una medida de retorno: eso caza un archivo corrupto o sobrecomprimido, y
 la norma desaconseja los formatos con compresión digital, señalando que se ha
 comprobado que funcionan los esquemas de al menos 128 kbit/s (apartado 7.2 a).
 
@@ -306,7 +328,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from phonometry import speech
 
-# Una cámara reverberante (T60 = 0,9 s) medida con una relación señal-ruido de
+# Una sala reverberante (T60 = 0,9 s) medida con una relación señal-ruido de
 # habla de 15 dB: una caída exponencial sintetizada hace de respuesta al
 # impulso medida.
 fs = 48000
@@ -356,8 +378,8 @@ modulación por banda que produce el índice.
 `stipa` emite un `UserWarning` cuando la grabación es más corta que los 15 s
 recomendados (práctica STIPA de IEC 60268-16, de 15 s a 25 s): por debajo de eso
 las componentes de modulación lentas se promedian sobre muy pocos periodos y el
-STI queda sesgado a la baja (un bucle cerrado ideal da STI ≈ 0,956 a 5 s frente a
-≈ 0,998 a 18 s).
+STI queda sesgado a la baja (un bucle de retorno ideal da STI ≈ 0,956 a 5 s
+frente a ≈ 0,998 a 18 s).
 
 La implementación sigue la **Edición 5 (2020)**: el PDF normativo de la
 Edición 4 es la base y cada cambio de la Ed. 5 está atribuido a su fuente en el
@@ -406,7 +428,7 @@ tabla de abajo es el centro de la banda:
 | `J` | 0,36–0,40 | 0,38 | No apto para sistemas de megafonía |
 | `U` | < 0,36 | — | No apto para sistemas de megafonía |
 
-De ahí siguen tres cosas. El conocido requisito «STI ≥ 0,5» del trabajo de
+De ahí se siguen tres cosas. El conocido requisito «STI ≥ 0,5» del trabajo de
 alarma por voz es la banda **G**, cuyo comentario en la Tabla G.1 es literalmente
 «valor objetivo de los sistemas de alarma por voz»; la propia NOTA 1 de la
 Tabla G.1 añade que sus valores son objetivos mínimos. La escala es
@@ -431,7 +453,7 @@ incluyendo los rincones acústicamente peores y no los cómodos, y mantén al me
 una posición en cada zona de cobertura de altavoz de un sistema distribuido: el
 apartado 7.6.4 pide «un número representativo de emplazamientos».
 
-La regla de reducción es la parte que se equivoca con facilidad. El apartado
+La regla de reducción es la parte en la que es fácil equivocarse. El apartado
 7.6.4 dice que tomar la media simple de los resultados **puede inducir a error**,
 y que una cifra única mejor, que tiene en cuenta la variación espacial, es la
 **media menos una desviación típica**, a veces llamada *valoración del espacio*,
@@ -451,9 +473,9 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
   un canal lineal e invariante en el tiempo: una respuesta al impulso no puede
   representar el recorte, los compresores, el control automático de ganancia
   ni un vocoder. Para un sistema de sonido con procesado no lineal en la
-  cadena, mide en directo: la señal STIPA al menos atraviesa la cadena real, y
-  la señal del STI completo es la opción fiable cuando la distorsión es severa
-  (IEC 60268-16, apartado 6.3 y Tabla 3).
+  cadena, usa el método directo: la señal STIPA al menos atraviesa la cadena
+  real, y la señal del STI completo es la opción fiable cuando la distorsión es
+  severa (IEC 60268-16, apartado 6.3 y Tabla 3).
 - **Efectos dependientes del nivel.** El STI no es invariante con el nivel: el
   enmascaramiento auditivo y el umbral de recepción actúan sobre los niveles
   de banda *absolutos* en el oyente. Reproduce la señal de ensayo al nivel de
@@ -474,7 +496,7 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
   compara en lugar de fiarte de una sola pasada, y respeta la duración mínima
   que señala el `UserWarning` de arriba.
 
-De esos cuatro, la dependencia del nivel es el que se descarta con más facilidad,
+De esos cuatro, la dependencia del nivel es la que se descarta con más facilidad,
 así que merece la pena ver de qué tamaño es:
 
 <ThemeImage
@@ -485,12 +507,12 @@ así que merece la pena ver de qué tamaño es:
 
 *La misma sala, la misma respuesta al impulso, y un número que cambia en más de
 un tercio de la escala. Por debajo de unos 55 dB el habla apenas se despega del
-ruido propio de la sala y muerde el umbral de recepción de la Tabla A.3; por
-encima de unos 80 dB el enmascaramiento auditivo de la Tabla A.2 deja que las
-bandas graves fuertes enmascaren a las agudas. Entre medias hay una meseta
-ancha, y por eso medir al nivel de operación no es una manía: una respuesta al
-impulso medida a nivel alto y reescalada después se queda en la línea a trazos
-plana y solo vale para un nivel que nadie anotó.*
+ruido propio de la sala y el umbral de recepción de la Tabla A.3 empieza a
+morder; por encima de unos 80 dB el enmascaramiento auditivo de la Tabla A.2
+deja que las bandas graves fuertes enmascaren a las agudas. Entre medias hay
+una meseta ancha, y por eso medir al nivel de operación no es una manía: una
+respuesta al impulso medida a nivel alto y reescalada después se queda en la
+línea a trazos plana y solo vale para un nivel que nadie anotó.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
