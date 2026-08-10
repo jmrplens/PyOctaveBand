@@ -47,6 +47,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Dos modelos clásicos predicen el campo sonoro de una sala rectangular antes de
 construirla. El modelo de **fuentes imagen** da el patrón determinista de
@@ -138,7 +139,27 @@ banda), mientras que la tabla **exacta** de reflexiones a resolución submuestra
 se guarda en `times`, `distances`, `orders`, `amplitudes` e `image_positions`,
 de modo que la geometría es exacta con independencia de la frecuencia de
 muestreo. El sonido directo y las reflexiones tempranas individuales son
-magnitudes geométricas buenas a precisión de máquina.
+magnitudes geométricas exactas con precisión de máquina.
+
+Leída como una lista de llegadas, esa tabla esconde lo que el método es en
+realidad. Cada imagen está a una distancia fija $r_n$ del receptor y aporta una
+única llegada en $r_n/c$, así que el reflectograma no es una señal que decae:
+es una retícula estática de puntos que una esfera va leyendo según se expande
+desde el receptor a la velocidad del sonido. Esa mirada convierte la densidad de
+reflexiones en algo que se puede ver: el volumen de la esfera crece como $t^3$,
+la retícula tiene una imagen por cada volumen de sala $V$, y el recuento de las
+que ha barrido tiene que seguir por tanto $N(t) = \frac{4\pi}{3}(ct)^3/V$, cuya
+derivada es la densidad de reflexiones $4\pi c^3t^2/V$ que se cita más abajo.
+El clip hace ese barrido:
+
+<Video
+  name="anim_image_source_buildup"
+  width={2400}
+  height={1350}
+  title="Una esfera que se expande desde el receptor barriendo la retícula de salas espejo"
+  description="A la izquierda, la sala de 7 por 5 metros ocupa el centro de su retícula de salas espejo a trazos, con la fuente como estrella y el receptor como triángulo. Un círculo se expande desde el receptor a la velocidad del sonido; según alcanza cada fuente imagen, esa imagen se enciende con el color de su orden de reflexión y traza una línea recta de vuelta al receptor. A la derecha, el reflectograma se rellena en el mismo instante: cada imagen que el círculo alcanza escribe un vástago en su tiempo de llegada y en su nivel relativo al sonido directo, bajo la envolvente de divergencia uno partido por r a trazos. Debajo, un recuento de llegadas sube en paralelo a la ley analítica a trazos, y los dos se mantienen juntos mientras el recuento pasa por 44 a los 30 milisegundos, 108 a los 40, 202 a los 50 y 344 a los 60, donde la ley marca 348."
+  caption="El reflectograma es una retícula que se barre, no una señal que decae. Como la esfera que se expande gana volumen con el cubo del tiempo mientras las imágenes están espaciadas a una por volumen de sala, las llegadas se acumulan con el cubo del tiempo y su ritmo crece con su cuadrado: las reflexiones tempranas discretas y la cola difusa tardía son la misma construcción leída a dos densidades."
+/>
 
 El reflectograma inferior muestra todo el patrón: el sonido directo a 0 dB y
 luego la nube de reflexiones coloreada por orden de reflexión decayendo bajo la
@@ -273,10 +294,11 @@ plt.show()
 **Reproducir el decaimiento estadístico.** La tasa de decaimiento inicial de la
 RIR sintética reproduce el tiempo de reverberación de **Eyring**
 $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$, porque la tasa media de
-reflexiones $cS/4V$ es igual a $\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$. El acuerdo
-solo es estrecho en el límite casi cúbico: una sala alargada sostiene la energía
-a lo largo de su eje largo, así que su decaimiento *especular* puro es más lento
-que la estimación difusa de Eyring — exactamente la anisotropía que los
+reflexiones $cS/4V$ es igual a $\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$. La
+coincidencia solo es estrecha en el límite casi cúbico: una sala alargada
+sostiene la energía a lo largo de su eje largo, así que su decaimiento
+*especular* puro es más lento que la estimación difusa de Eyring — exactamente
+la anisotropía que los
 [modelos de Fitzroy y Arau-Puchades](/phonometry/es/buildings/rooms/reverberation-prediction/)
 se construyeron para corregir. El modelo capta solo reflexiones especulares (sin
 difracción ni difusión) y es exacto para factores de reflexión de pared reales e
@@ -370,7 +392,7 @@ Un ajuste de T30 abarca 35 dB, unos $0{,}58\,T$ de decaimiento. La sala de
 0,93 s, así que necesita $343 \times 0{,}54 / 3 \approx 60$. Por debajo de eso
 la cola sencillamente falta, y el T30 ajustado sale corto:
 
-| `max_order` | imágenes audibles | T30 ajustada | tiempo de ejecución |
+| `max_order` | imágenes audibles | T30 ajustado | tiempo de ejecución |
 | ---: | ---: | ---: | ---: |
 | 12 | 2 624 | 0,28 s | < 0,1 s |
 | 20 (por defecto) | 11 520 | 0,43 s | < 0,1 s |
@@ -385,7 +407,7 @@ dos décimas de segundo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_order_convergence_es.svg" alt="T30 y EDT ajustados de la sala de 7 por 5 por 3 metros frente al corte de orden de reflexión, de 8 a 60: ambos suben de forma pronunciada y casi lineal con el orden, y el T30 cruza la línea de Eyring de 0,93 segundos y su banda sombreada de más menos 10 por ciento hacia el orden 51 y sigue subiendo, mientras un segundo eje muestra el recuento de imágenes audibles creciendo de unas 800 a 295 mil" width="88%" />
 
-*T30 leída por `room_parameters` sobre la RIR sintética, frente al orden con el que
+*T30 leído por `room_parameters` sobre la RIR sintética, frente al orden con el que
 se construyó la retícula. La subida es el truncamiento: cada orden extra añade una
 capa de llegadas más tardías, así que la ventana de ajuste sigue encontrando más
 decaimiento que ajustar. La regla de completitud fija el **suelo** — por debajo del
@@ -504,7 +526,7 @@ print(round(field.critical_distance, 2))       # 0.71 m
 field.plot()                                    # directo / reverberante / total vs distancia
 ```
 
-Sobre una sala que merece dibujarse — un taller de 12 × 8 × 4 m, $S$ = 352 m²,
+Para una sala que merece dibujarse — un taller de 12 × 8 × 4 m, $S$ = 352 m²,
 $\bar\alpha$ = 0,15, así que $R$ = 62 m² —, `SteadyFieldResult.plot()` dibuja los
 niveles directo, reverberante y total frente a la distancia con la distancia
 crítica marcada: la curva total sigue el campo directo $1/r^2$ cerca de la fuente
@@ -593,8 +615,8 @@ plt.show()
 
 </details>
 
-Los bloques se exponen por separado, de modo que una medición
-de emisión fluye directa a una predicción de nivel:
+Las piezas se exponen por separado, de modo que una medición
+de emisión puede pasar directa a una predicción de nivel:
 
 ```python
 from phonometry import room
@@ -625,8 +647,8 @@ print([round(float(room.steady_state_spl(90.0, 5.0, R, directivity=8.0,
 ```
 
 Dieciocho decibelios entre las cotas, para una sola máquina montada en esquina.
-Las normas dejan la elección al ingeniero, así que declara qué modelo supone un
-nivel previsto en cualquier informe que lo lleve.
+Las normas dejan la elección al ingeniero, así que, en cualquier informe que
+lleve un nivel previsto, declara qué modelo se ha supuesto.
 
 **Cuánto vale la meseta reverberante.** Como la meseta es $L_W + 10\lg(4/R)$,
 añadir absorción la cambia en $10\lg(R_2/R_1)$: duplicar la constante de sala
@@ -710,7 +732,7 @@ $$
 
 con órdenes enteros no negativos que cuentan los planos nodales de cada eje.
 Cuántos de los tres órdenes son distintos de cero da nombre a la familia:
-**axial** (uno, una onda que rebota entre un par de paredes, la más audible),
+**axial** (uno, una onda que rebota entre un par de paredes, la más intensa),
 **tangencial** (dos, que roza cuatro paredes, unos 3 dB más débil) y **oblicuo**
 (tres, que involucra las seis, aún más débil).
 
@@ -872,8 +894,8 @@ $\cos(n_x\pi x/l_x)\cos(n_y\pi y/l_y)\cos(n_z\pi z/l_z)$, y dos consecuencias de
 esa única fórmula valen más que toda la lista de frecuencias. Todos los modos
 tienen un **antinodo de presión en cada esquina**, porque ahí todos los cosenos
 valen $\pm 1$, que es la razón de que un subwoofer y una trampa de graves vayan
-los dos en una esquina, y de que un micrófono situado en una lea de más en las
-bandas bajas. Y un eje cuyo orden sea impar tiene un **nodo en su punto medio**,
+los dos en una esquina, y de que un micrófono situado en una esquina lea de más
+en las bandas bajas. Y un eje cuyo orden sea impar tiene un **nodo en su punto medio**,
 así que una posición de escucha situada exactamente a la mitad de una dimensión de
 la sala queda en un nulo de todos los modos axiales impares de ese eje; las
 posiciones de medición en baja frecuencia se apartan de los planos medios por la
@@ -940,8 +962,8 @@ de sala) se cita como comparación pero no está implementada:
 Bies con la constante de sala. El cálculo de modos supone paredes
 rígidas y planta rectangular: da las *frecuencias* propias, no la amplitud
 de presión en un punto de escucha, y no dice nada del amortiguamiento, la
-forma modal ni una geometría que no sea una caja. Para eso, mallar la sala
-y ejecutar el
+forma modal ni una geometría que no sea una caja. Para eso, malla la sala
+y ejecuta el
 [esquema FDTD 2D](/phonometry/es/simulation/fdtd-simulation/). Las
 proporciones preferentes de Bolt se comentan pero no se tabulan.
 

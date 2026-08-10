@@ -48,6 +48,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 La **Rec. UIT-R BS.1770-5** define cómo miden la sonoridad de un programa la
 radiodifusión y el streaming: **ponderación K**, potencia cuadrática media en
@@ -120,11 +121,11 @@ fragmentos siguientes es exactamente esto — mono dual, la entrega estéreo de
 una fuente mono — y es la razón de que marquen 3,01 LU por encima del valor
 de un solo canal de la misma forma de onda.
 
-Los coeficientes de los biquads están tabulados a 48 kHz (Tablas 1-2) y a
-esa frecuencia se devuelven literalmente; cualquier otra frecuencia los
-rederiva a través del prototipo analógico para que la respuesta coincida con
-la especificación (dentro de 0,02 dB a 32 kHz y por encima; las frecuencias
-por debajo de 16 kHz se rechazan):
+Los coeficientes de los biquads están tabulados a 48 kHz (Tablas 1-2) y a esa
+frecuencia de muestreo se devuelven literalmente; a cualquier otra se rederivan
+a través del prototipo analógico para que la respuesta coincida con la
+especificación (dentro de 0,02 dB a 32 kHz y por encima; las frecuencias de
+muestreo por debajo de 16 kHz se rechazan):
 
 ```python
 import numpy as np
@@ -212,7 +213,7 @@ print(round(res.relative_threshold, 1))    # -39.0  LUFS
 res.plot()   # la traza de sonoridad: la línea integrada ignora la cola (necesita matplotlib)
 ```
 
-Una media sin puertas sobre los mismos 40 s quedaría cerca de −29 LUFS: las
+Una media sin puerta sobre los mismos 40 s quedaría cerca de −29 LUFS: las
 puertas son lo que hace que los programas de gran rango de sonoridad casen
 en antena. EBU R 128 normaliza este valor integrado a **−23,0 LUFS**; cuando
 el objetivo no es alcanzable en la práctica (programas en directo, por
@@ -230,6 +231,25 @@ supervivientes, así que el valor integrado hereda su dispersión, y por eso las
 especificaciones de entrega de piezas breves suelen normalizar por el máximo
 momentáneo o de corto plazo en vez de por I. (Las muestras no finitas se
 rechazan directamente, no se filtran con las puertas).
+
+El orden de esas dos pasadas es lo que hace difícil imaginarse la puerta a
+partir de una traza ya terminada. El umbral relativo no es una constante que el
+medidor conozca de antemano: se calcula con los bloques que han sobrevivido a
+la puerta absoluta, así que solo existe cuando hay material con el que
+calcularlo, y sigue moviéndose mientras suena el programa. Un bloque que
+contaba al principio puede, por tanto, dejar de contar más adelante sin que
+nada de ese bloque haya cambiado. El clip ejecuta la decisión bloque a bloque
+sobre un programa más fuerte, de cinco secciones, para poder ver deslizarse el
+umbral:
+
+<Video
+  name="anim_loudness_gating"
+  width={2400}
+  height={1350}
+  title="El umbral relativo de sonoridad deslizándose mientras suena un programa, y los bloques que se caen detrás"
+  description="Sesenta segundos de un programa de cinco secciones se miden en 597 bloques de puerta, cada uno dibujado como un cuadrado macizo mientras cuenta y hueco en cuanto la puerta lo excluye. El umbral relativo a trazos se recalcula con los supervivientes después de cada bloque: empieza bajo, así que cuentan todos los bloques, y sube a medida que llega material más fuerte hasta asentarse en -34,3 LUFS, momento en el que bloques que contaban antes se han quedado huecos por detrás. El histograma que acompaña a la traza reparte esos mismos bloques en intervalos de sonoridad, y sus barras se vuelven grises por debajo del umbral deslizante. Cuatro lecturas se asientan: una sonoridad integrada de -23,0 LUFS frente a una media energética sin puerta de -24,3 LUFS, una diferencia de 1,28 LU, y 154 de los 597 bloques que no cuentan nunca. Un tramo final aplica la puerta más profunda del rango de sonoridad en -44,1 LUFS y desliza los bordes de los percentiles 10 y 95 hasta -36,8 y -19,1 LUFS, para un rango de sonoridad de 17,7 LU."
+  caption="La puerta es una decisión que se toma bloque a bloque, no un filtro sobre la señal. Como el umbral relativo se deriva de los supervivientes de la primera pasada, depende de los datos y es retroactivo: la entrada silenciosa y el desvanecimiento acaban excluidos no porque cayeran por debajo de un nivel fijo, sino porque el resto del programa resultó ser lo bastante fuerte como para subir el umbral por encima de ellos."
+/>
 
 La figura hace visible la puerta sobre un programa de ruido conformado con una
 cola silenciosa larga:
@@ -395,11 +415,10 @@ res.plot()   # la banda sombreada de LRA abarca la separación P10-P95 (necesita
 
 *En el caso de referencia de Tech 3342 la distribución de corto plazo tiene
 dos mesetas separadas 10 LU, y la banda sombreada entre los percentiles 10 y
-95 lee exactamente $\mathrm{LRA} = 10{,}0\ \text{LU}$; la sonoridad
-integrada se asienta entre
-las mesetas. En programas reales, la misma banda distingue de un vistazo un
-drama normalizado por diálogo (LRA en torno a 10-20 LU) de un anuncio
-comprimido (unos pocos LU).*
+95 marca exactamente $\mathrm{LRA} = 10{,}0\ \text{LU}$; la sonoridad integrada
+se asienta entre las mesetas. En programas reales, la misma banda distingue de
+un vistazo un drama normalizado al diálogo (LRA en torno a 10-20 LU) de un
+anuncio comprimido (unos pocos LU).*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -564,7 +583,7 @@ plt.show()
 
 El audio basado en objetos (Anexo 4) se mide renderizando primero a una
 configuración de altavoces y midiendo el renderizado; el renderizado en sí queda
-fuera de este alcance.
+fuera del alcance de esta página.
 
 ## 7. Normalizar al objetivo
 
@@ -620,9 +639,9 @@ conflicto que R 128 deja sin resolver. Un programa silencioso y de gran rango qu
 necesite +8 LU y cuyo pico verdadero máximo ya esté en −6 dBTP acaba en +2 dBTP:
 bien normalizado y por encima del techo. El orden es *normalizar y después
 comprobar* — nunca reducir la ganancia para que quepa el pico, porque eso rompe
-el nivel de entrega del que depende todo lo demás. Las dos salidas legítimas son
-un limitador de pico verdadero aplicado a los momentos más sonoros (que baja algo
-el LRA, y hay que declararlo) o renegociar el objetivo de esa entrega.
+el nivel de entrega del que depende todo lo demás. Las dos soluciones legítimas
+son un limitador de pico verdadero aplicado a los momentos más sonoros (que baja
+algo el LRA, y hay que declararlo) o renegociar el objetivo de esa entrega.
 
 El registro de entrega son tres números, no uno: la sonoridad integrada **I**, el
 rango de sonoridad **LRA** y el pico verdadero máximo **TP máx**. Son exactamente
@@ -736,11 +755,11 @@ fuera de alcance. La guía señala que el renderizado a una disposición de
 altavoces debe ocurrir antes, y phonometry no implementa ningún renderizador
 de audio espacial para ese paso. EBU Tech 3343 se cita solo como práctica de
 producción alrededor de estos números: es orientación, no un algoritmo, y
-nada aquí lo ejecuta. Tampoco hay un *ayudante* de normalización: la sección 7
-enseña la ganancia única, y aplicarla es una multiplicación. Y nada de esta
-página es un **modelo** de sonoridad — la ponderación K es un filtro lineal fijo,
-así que el enmascaramiento, la dependencia con el nivel, las bandas críticas y la
-suma binaural quedan fuera por construcción; eso vive en
+nada aquí lo ejecuta. Tampoco hay una *función auxiliar* de normalización: la
+sección 7 enseña la ganancia única, y aplicarla es una multiplicación. Y nada
+de esta página es un **modelo** de sonoridad — la ponderación K es un filtro
+lineal fijo, así que el enmascaramiento, la dependencia con el nivel, las bandas
+críticas y la suma binaural quedan fuera por construcción; eso vive en
 [Sonoridad (ISO 532)](/phonometry/es/perception/psychoacoustics/loudness/).
 
 ## Véase también
