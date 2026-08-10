@@ -595,6 +595,30 @@ Those ventilation numbers are blunt: in that duct plane waves are the whole
 story only up to the 250 Hz octave, and a 36 x 24 in supply trunk gives up at
 188 Hz.
 
+What a number cannot say is that cut-on is a **switch**, not a slope. The
+clip below simulates the 0.65 m dimension of that same duct as a 2D slice
+with rigid walls, and drives it twice with one off-axis source that excites
+the plane mode and the first transverse mode together: at 180 Hz, below the
+263.8 Hz just printed, and at 400 Hz above it. Below cut-on the transverse
+mode is evanescent, decaying as $e^{-\alpha x}$ with $1/\alpha = 0.28$ m,
+which puts it 20 dB down one duct width from the source, so the lumpy near
+field dies there and every later
+wavefront crosses the section flat. Above cut-on it propagates, the two modes
+run at different axial wavenumbers ($k_x = 5.51$ against $k = 7.33$ rad/m)
+and beat along the duct every 3.45 m, and the profile across the section
+never settles.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_duct_cut_on_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_duct_cut_on.gif" alt="Animation: the same rigid duct driven at 180 Hz and at 400 Hz, with wavefronts that flatten across the section within half a duct width in the lower-frequency strip and a field that stays lumpy the whole length of the duct in the higher-frequency one" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_duct_cut_on.webm)
+
+The panel beside each strip draws the instantaneous profile across the
+section at a station 5 m downstream against its own section average, which is
+the single pressure a one-dimensional model carries. That is why a
+transfer-matrix silencer model has a **ceiling frequency** rather than an
+accuracy budget: below cut-on the second mode is not small, it is absent, and
+above it the model describes one of several waves that are all there.
+
 At 15 m/s the flow correction is invisible: $M = 0.044$ gives
 $\sqrt{1 - M^2} = 0.999$, which moves the first cut-on by 0.2 Hz. It earns
 its place in high-speed pipework instead. Norton's problem 7.1 is that

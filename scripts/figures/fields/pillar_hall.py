@@ -20,16 +20,27 @@ from ..theme import _FILENAME_SUFFIX, CMAP_FIELD, COLOR_FG, COLOR_GRID
 def _poster_ss_for(webm: str) -> float | None:
     """Per-clip poster-time override; None keeps the end-of-hold default.
 
-    The pillar-hall banner poster is grabbed mid-flight (simulation time
-    6 ms, the front threading the middle of the hall) instead of the
-    settled last frame, which for a single travelling packet is an almost
-    empty field.
+    The end-of-hold default is right for a clip that settles into a steady
+    state, and wrong for one whose subject is a wave passing through: by the
+    last frame the wave has gone and the poster is an empty field. The clips
+    listed here are grabbed mid-flight instead.
+
+    * the pillar-hall banner at simulation time 6 ms, the front threading the
+      middle of the hall;
+    * Lamb's problem at 95 us, where the Rayleigh train is still 22 mm inside
+      the right edge (it leaves the 0.30 m view at 103 us) and both body
+      fronts are drawn against their analytic arcs.
     """
-    if _PILLAR_STEM in os.path.basename(webm):
+    name = os.path.basename(webm)
+    if _PILLAR_STEM in name:
         import fdtd2d
         dt = fdtd2d.FDTD2D(343.0, _PILLAR_DX, shape=(3, 8)).dt
         dt_frame = _PILLAR_EVERY * dt
         return float((6.0e-3 / dt_frame - _PILLAR_WARM) / _PILLAR_FPS)
+    if "anim_elastic_halfspace_waves" in name:
+        from .halfspace import _HS_CP, _HS_DX, _HS_FPS
+        dt = 0.6 * _HS_DX / (_HS_CP * float(np.sqrt(2.0)))
+        return float((95.0e-6 / (5.0 * dt)) / _HS_FPS)
     return None
 
 

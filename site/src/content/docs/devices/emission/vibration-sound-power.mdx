@@ -28,6 +28,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Video from '../../../../components/Video.astro';
 
 The airborne sound power a machine radiates through the structure-borne
 vibration of its outer surface can be estimated from the surface vibratory
@@ -285,6 +286,64 @@ to violate in the field:
   openings, intakes or internal sources that bypasses the measured casing is
   invisible to a velocity survey; the method characterises the
   structure-borne part only.
+
+### What the cancellation looks like
+
+"Adjacent zones move in antiphase and their radiation largely cancels" is the
+sentence the whole caveat rests on, and it is a statement about a phase
+relationship between a travelling structural wave and the air on top of it —
+which a spectrum cannot draw. The clip below drives a 10 mm steel plate in air
+**along its whole length**, with a force on the plate rather than a wave
+arriving at it, because that is the emission case this method is about — and
+because a plate driven only over a patch radiates from the patch, which below
+coincidence would be the only thing in the air and would teach the opposite of
+the truth. It then runs the same scene twice, at $f_c/2$ and at $2f_c$, with
+nothing differing between the panels but the drive frequency.
+
+<Video
+  name="anim_elastic_radiation_efficiency"
+  width={2400}
+  height={1350}
+  title="A steel plate driven below and above its coincidence frequency"
+  description="A bending wave runs to the right along a steel plate with air above it. In the lower-frequency panel the plate ripples with a wavelength shorter than the sound wavelength and the pressure above it forms alternating lobes that cling to the plate and fade out within a few centimetres, so nothing leaves. In the higher-frequency panel the plate ripples with a longer wavelength and a plane beam of pressure departs at forty-five degrees along the whole driven span, growing as it goes."
+/>
+
+Below coincidence the bending wavelength is **shorter** than the acoustic one.
+Adjacent half-waves of the plate push and pull the same air in antiphase, and
+what the air shows is a skin of alternating lobes that clings to the plate and
+dies within a fraction of a wavelength. The pressure at the surface is of the
+same order as in the other panel; it is simply a quarter-cycle out of step
+with the velocity, so it carries no power away — which is what
+$\varepsilon \ll 1$ *means*. Above coincidence the bending wave outruns sound,
+the trace match is satisfied, and a plane beam leaves at
+$\arcsin(c_0/c_B) = 45°$.
+
+Each panel is annotated with the closed forms its regime obeys, taken from the
+plate's own constants: below coincidence, that $\lambda_B = 0.40$ m is *shorter*
+than the 0.57 m of sound in air, so $\sin\theta = \lambda/\lambda_B$ has no
+solution — there is no angle for the sound to leave at — and the skin that
+stands in its place decays with a height of $1/\sqrt{k_B^2 - k_0^2} = 0.091$ m;
+above coincidence, that $\lambda_B = 0.20$ m is *longer* than the 0.14 m in air,
+so the trace match is satisfied and sends a beam out at 45°. Nothing is
+measured off the scene itself. Two quantities were tried and both were spoiled
+by the ends of the plate — a damping layer reflects a bending wave partially,
+so the air carries a leftward beam on top of the rightward one, and the reading
+is the difference of the two rather than either. Terminating a bending wave
+well enough to read a number off it needs a much wider domain than a picture of
+this can hold.
+
+Two cautions on reading it. The scene is an effectively **infinite** plate in
+air, so what it demonstrates is below-coincidence cancellation, not the
+acoustic short circuit around an unbaffled panel: those are the same
+cancellation at two different scales, and the second one needs a finite source
+with a path around its edge. And the clip deliberately does *not* print a
+radiation factor. A $\varepsilon$ read off a scene like this would be an
+artefact of the drive: any finite driving aperture has a wavenumber spectrum
+broad enough to put some of itself inside the radiating region, and below
+coincidence that aperture radiation would be the only thing crossing an
+intensity line, since the travelling subsonic wave contributes exactly
+nothing. The number belongs to the closed-form curve in the next subsection;
+the clip is here for the mechanism behind it.
 
 ### Estimating the radiation factor before you measure it
 

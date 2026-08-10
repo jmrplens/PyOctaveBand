@@ -41,6 +41,7 @@ references:
 
 import ThemeImage from '../../../components/ThemeImage.astro';
 import ReportPreview from '../../../components/ReportPreview.astro';
+import Video from '../../../components/Video.astro';
 
 The **Effective Perceived Noise Level (EPNL)** is the noise-certification metric
 for transport-category aircraft. It condenses a half-second one-third-octave
@@ -211,6 +212,23 @@ window runs from record 4 to record 28 of 31 and spans 10.2 s of increments, and
 the result is $D = -4.78$ dB and $\mathrm{EPNL} = 92.62$ EPNdB — a hair below
 $\mathrm{PNLTM}$ because the window is barely longer than the reference
 duration.
+
+That chain has an order to it, and the order is the part a finished time
+history cannot show. The tone correction is measured on each spectrum as it
+arrives, one record at a time, by fitting a background under the spectrum and
+reading the excess of the tone over it; the 10 dB-down window, by contrast,
+cannot be placed until the whole pass is over, because its two edges are
+defined relative to a peak that is not known until the last record has been
+taken. The clip runs a synthetic flyover in that order:
+
+<Video
+  name="anim_epnl_flyover"
+  width={2400}
+  height={1350}
+  title="A certification flyover assembled record by record, from spectra to a single EPNL"
+  description="Forty-one one-third-octave spectra arrive at half-second intervals as an aircraft passes a microphone. On each spectrum a dashed background is fitted under the 2500 hertz fan tone and a double arrow measures the tone's excess over it, which at the peak reaches a correction of 3.97 decibels. Beside it two level histories are written point by point: the perceived noise level and, shaded above it, the tone-corrected level that exceeds it by that correction, rising to a peak of 120.57 PNdB as the aircraft reaches the microphone. Only once the pass has ended is the peak known; a dotted line then appears 10 decibels below it, the integration window fills between records 16 and 24, and the duration correction of -6.56 decibels and the final EPNL of 114.01 EPNdB appear last."
+  caption="EPNL is not a maximum level, and it is not computed in the order it is written. The tone correction is a per-record measurement made while the aircraft is still passing, but the 10 dB-down window is retrospective: its edges are defined from a peak that only exists once the event is over, which is why a certification result cannot be read off a meter in real time."
+/>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl.svg" alt="Aircraft-flyover perceived-noise-level time history: PNL and the tone-corrected PNLT versus time, with the maximum PNLTM marked and the 10 dB-down integration window shaded, annotated with the resulting EPNL and duration correction" width="82%" loading="eager" />
 
