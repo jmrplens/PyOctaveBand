@@ -27,6 +27,7 @@ language globals each of them holds.
 from .aperture import _aperture_fields, animate_fdtd_aperture_slit
 from .barrier import _barrier_fields, animate_fdtd_barrier
 from .diffusion import _diffusion_fields, animate_fdtd_diffusion
+from .dispersion import _dispersion_fields, animate_fdtd_dispersion
 from .duct_modes import _duct_cut_on_fields, animate_fdtd_duct_cut_on
 from .ducting import _ducting_fields, animate_fdtd_ducting
 from .elastic import (
@@ -61,6 +62,7 @@ from .radiation_efficiency import (
 )
 from .refraction import _refraction_fields, animate_fdtd_refraction
 from .room_modes import _room_mode_fields, animate_fdtd_room_modes
+from .seabed import _seabed_fields, animate_fdtd_critical_angle
 from .slit_absorber import _slit_absorber_fields, animate_fdtd_slit_absorber
 from .tubes import (
     _impedance_tube_fields,
@@ -75,6 +77,7 @@ __all__ = [
     "_barrier_fields",
     "_coincidence_fields",
     "_diffusion_fields",
+    "_dispersion_fields",
     "_duct_cut_on_fields",
     "_ducting_fields",
     "_expansion_chamber_fields",
@@ -90,6 +93,7 @@ __all__ = [
     "_radiation_efficiency_fields",
     "_refraction_fields",
     "_room_mode_fields",
+    "_seabed_fields",
     "_slit_absorber_fields",
     "_transmission_tube_fields",
     "animate_elastic_coincidence",
@@ -99,7 +103,9 @@ __all__ = [
     "animate_elastic_radiation_efficiency",
     "animate_fdtd_aperture_slit",
     "animate_fdtd_barrier",
+    "animate_fdtd_critical_angle",
     "animate_fdtd_diffusion",
+    "animate_fdtd_dispersion",
     "animate_fdtd_duct_cut_on",
     "animate_fdtd_ducting",
     "animate_fdtd_expansion_chamber",

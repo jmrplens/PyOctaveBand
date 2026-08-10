@@ -1184,6 +1184,71 @@ _ES_EXACT = {
         "Curva de referencia desplazada (ISO 717-2)",
     "Unfavourable deviations (measured above reference)":
         "Desviaciones desfavorables (medido por encima de la referencia)",
+    # --- anim_iso717_shift: the fit walked step by step ---
+    "Fitting the ISO 717 reference curve, one step at a time":
+        "El ajuste de la curva de referencia ISO 717, paso a paso",
+    "ISO 717-1: the curve steps down toward the measurement;\n"
+    "an unfavourable deviation is a band that falls below it":
+        "ISO 717-1: la curva baja hacia la medida;\n"
+        "una desviación desfavorable es una banda por debajo de ella",
+    "ISO 717-2: the same rule with the sign reversed;\n"
+    "the curve steps up, and a band above it is unfavourable":
+        "ISO 717-2: la misma regla con el signo cambiado;\n"
+        "la curva sube y la banda por encima es la desfavorable",
+    "Sum of unfavourable\ndeviations [dB]":
+        "Suma de desviaciones\ndesfavorables [dB]",
+    "Reference curve read at 500 Hz [dB]":
+        "Curva de referencia leída a 500 Hz [dB]",
+    "cap 32.0 dB = 2.0 dB per band": "límite 32,0 dB = 2,0 dB por banda",
+    "measured spectrum": "espectro medido",
+    "reference curve, as shifted": "curva de referencia, ya desplazada",
+    # ("unfavourable deviations" is already in this table, further down.)
+    "Normalized impact level L'nT [dB]":
+        "Nivel de impactos normalizado L'nT [dB]",
+    "over the cap: shift again": "pasa del límite: desplazar otra vez",
+    "largest sum still under the cap": "la mayor suma bajo el límite",
+    "legal, but the sum is smaller:": "válido, pero la suma es menor:",
+    "this is one step too far": "esto es un paso de más",
+    "Rw": "Rw",
+    "L'nT,w": "L'nT,w",
+    # --- anim_block_vs_exponential: the alignment the block detector needs ---
+    "One burst, two detectors, and the block grid underneath":
+        "Una ráfaga, dos detectores y la rejilla de bloques debajo",
+    "Sound pressure": "Presión acústica",
+    "the shaded strips are the 125 ms blocks":
+        "las franjas sombreadas son los bloques de 125 ms",
+    "Level re steady tone [dB]": "Nivel re tono estacionario [dB]",
+    "exponential Fast envelope": "envolvente exponencial Fast",
+    "block Leq, 125 ms slices": "Leq por bloques de 125 ms",
+    "IEC 61672-1 Table 4 target": "objetivo de la Tabla 4 de IEC 61672-1",
+    "Burst start within the block [ms]":
+        "Inicio de la ráfaga dentro del bloque [ms]",
+    "Reading [dB]": "Lectura [dB]",
+    "the block reading leaves the corridor":
+        "la lectura por bloques sale del corredor",
+    # --- anim_feedback_howl: the loop as a geometric series ---
+    "Gain before feedback is a convergence condition":
+        "La ganancia antes del acople es una condición de convergencia",
+    "talker,\n0.3 m from the microphone":
+        "hablante,\na 0,3 m del micrófono",
+    "listener,\n12 m away": "oyente,\na 12 m",
+    "microphone, mixer, amplifier": "micrófono, mesa, amplificador",
+    "the feedback path": "el camino de realimentación",
+    "Round trip number": "Número de vuelta",
+    "Copy level re direct [dB]": "Nivel de la copia re directo [dB]",
+    "Round trips summed": "Vueltas sumadas",
+    "Total re direct [dB]": "Total re directo [dB]",
+    "10 dB margin": "margen de 10 dB",
+    "four microphones": "cuatro micrófonos",
+    "loop at unity": "lazo en la unidad",
+    "Long's 10 dB margin: each copy is a third of the last":
+        "Margen de 10 dB de Long: cada copia es un tercio de la anterior",
+    "Four open microphones add 10 lg 4 = 6 dB to the loop":
+        "Cuatro micrófonos abiertos suman 10 lg 4 = 6 dB al lazo",
+    "Four more decibels of system gain: the loop reaches unity":
+        "Cuatro decibelios más de ganancia: el lazo llega a la unidad",
+    "the sum does not converge: this is the howl":
+        "la suma no converge: esto es el acople",
     "Open-Plan Spatial Decay of Speech (ISO 3382-3)":
         "Decaimiento espacial del habla en oficina abierta (ISO 3382-3)",
     "Distance from the talker r [m]": "Distancia al hablante r [m]",
@@ -2230,6 +2295,30 @@ _ES_EXACT = {
     "Wide slit (detuned): the reflection returns":
         "Rendija ancha (desintonizada): la reflexión vuelve",
     "inside the cell": "dentro de la celda",
+    # anim_fdtd_dispersion
+    "Numerical dispersion: one pulse, three grids (2D FDTD)":
+        "Dispersión numérica: un pulso, tres mallas (FDTD 2D)",
+    "The closed form": "La forma cerrada",
+    "Cells per wavelength": "Celdas por longitud de onda",
+    "Speed error [%]": "Error de velocidad [%]",
+    "group (a pulse)": "grupo (un pulso)",
+    "phase (the rule)": "fase (la regla)",
+    # anim_fdtd_critical_angle
+    "The critical grazing angle: a fast seabed and a slow one (2D FDTD)":
+        "El ángulo rasante crítico: un fondo rápido y uno lento (FDTD 2D)",
+    "Into the bed": "Hacia el fondo",
+    "sand": "arena",
+    "mud": "fango",
+    "an evanescent skin: bright, and it carries nothing away":
+        "una piel evanescente: brilla y no se lleva nada",
+    "no critical angle: every angle leaks":
+        "sin ángulo crítico: se fuga en todos los ángulos",
+    ("Solid: the flux measured into the bed; dashed: "
+     "(1 \u2212 |R|\u00b2) sin\u00b2\u03c8. Each curve on its own maximum; "
+     "the field compensated for spreading."):
+        ("Continuo: el flujo medido hacia el fondo; discontinuo: "
+         "(1 \u2212 |R|\u00b2) sin\u00b2\u03c8. Cada curva con su máximo; "
+         "campo compensado del ensanchamiento."),
     # anim_fdtd_expansion_chamber
     # Kept short: the canvas clips a suptitle much beyond ~80 characters.
     "Expansion-chamber silencer: pass band vs stop band (2D FDTD)":
@@ -2648,6 +2737,37 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # anim_fdtd_critical_angle: labels and readouts with computed values.
+    (r"^critical ray, ψ = (.+)°$", r"rayo crítico, ψ = \1°"),
+    (r"^sand: c₂ = (.+) m/s, ρ₂ = (.+) kg/m³$",
+     r"arena: c₂ = \1 m/s, ρ₂ = \2 kg/m³"),
+    (r"^mud: c₂ = (.+) m/s, ρ₂ = (.+) kg/m³$",
+     r"fango: c₂ = \1 m/s, ρ₂ = \2 kg/m³"),
+    (r"^ψ = (\d+\.\d+)°$", r"ψ = \1°"),
+    (r"^\|R\| = (.+): nothing enters$", r"|R| = \1: no entra nada"),
+    (r"^\|R\| = (\d+\.\d+)$", r"|R| = \1"),
+    ((r"^beyond (.+) m the net is (.+) % of what entered inside "
+      r"\(theory (.+) %\)$"),
+     ("más allá de \\1 m el neto es el \\2 % de lo que entró dentro "
+      "(teoría \\3 %)")),
+    (r"^ · the front meets the bed at ψ = (.+)°$",
+     r" · el frente llega al fondo con ψ = \1°"),
+    # anim_fdtd_dispersion: labels and readouts carrying computed values.
+    (r"^finish line, (.+) m$", r"línea de meta, \1 m"),
+    (r"^(\d+) cells per wavelength · Δx = (.+) mm$",
+     r"\1 celdas por longitud de onda · Δx = \2 mm"),
+    (r"^(.+) m behind \(theory (.+) m\)$",
+     r"\1 m por detrás (teoría \2 m)"),
+    (r"^crossed at (.+) ms, \+(.+) ms$",
+     r"la cruza a \1 ms, +\2 ms"),
+    (r"^(.+) % slow \(theory (.+) %\)$",
+     r"\1 % más lenta (teoría \2 %)"),
+    ((r"^Air at (.+) m/s, a (.+) Hz burst, per-axis Courant number "
+      r"S = (.+); grey is the exact continuous wave, dots are the "
+      r"grid cells$"),
+     ("Aire a \\1 m/s, ráfaga de \\2 Hz, número de Courant por eje "
+      "S = \\3; en gris la onda continua exacta, los puntos son las "
+      "celdas de la malla")),
     # Aircraft: labels and annotations carrying computed values.
     (r"^closest segment: (.+) dB$", r"segmento más próximo: \1 dB"),
     ((r"^receiver 3 000 m along track, 500 m to the side, 1\.2 m up\.\n"
@@ -2871,6 +2991,32 @@ _ES_PATTERNS = [
      r"Curva de referencia desplazada \1 dB"),
     (r"^Sum of unfavourable deviations = (.+) dB  \(limit 32\.0 dB\)$",
      "Suma de desviaciones desfavorables = \\1 dB  (l\u00edmite 32,0 dB)"),
+    # --- anim_iso717_shift: readouts rewritten on every frame ---
+    (r"^(\d+) dB at 500 Hz$", r"\1 dB a 500 Hz"),
+    (r"^step (\d+) of (\d+)$", r"paso \1 de \2"),
+    (r"^sum = (.+) dB$", r"suma = \1 dB"),
+    (r"^C = ([-+]\d+) dB, Ctr = ([-+]\d+) dB$",
+     r"C = \1 dB, Ctr = \2 dB"),
+    (r"^CI = ([-+]\d+) dB$", r"CI = \1 dB"),
+    # --- anim_block_vs_exponential: readouts rewritten on every frame ---
+    (r"^4 kHz burst, (\d+) ms$", r"ráfaga de 4 kHz, \1 ms"),
+    (r"^class 1 is (.+) dB about (.+) dB$",
+     r"la clase 1 es \1 dB en torno a \2 dB"),
+    (r"^burst (\d+) ms, IEC target (.+) dB$",
+     r"ráfaga de \1 ms, objetivo IEC \2 dB"),
+    (r"^exponential  (.+) dB \((.+)\)$", r"exponencial  \1 dB (\2)"),
+    (r"^block Leq    (.+) dB \((.+)\)$", r"Leq bloques  \1 dB (\2)"),
+    (r"^spread so far, exponential: (.+) dB$",
+     r"dispersión, exponencial: \1 dB"),
+    (r"^spread so far, block Leq:   (.+) dB$",
+     r"dispersión, Leq bloques: \1 dB"),
+    # --- anim_feedback_howl: readouts rewritten on every frame ---
+    (r"^Zs = (.+) dB, (\d+) open microphone\(s\)$",
+     r"Zs = \1 dB, \2 micrófono(s) abierto(s)"),
+    (r"^loop gain Zs \+ Gs = (.+) dB$",
+     r"ganancia de lazo Zs + Gs = \1 dB"),
+    (r"^each round trip is x (.+)$", r"cada vuelta es x \1"),
+    (r"^sum converges to (.+) dB$", r"la suma converge a \1 dB"),
     (r"^Aures \(Annex B, N = (.+) sone\)$",
      r"Aures (Anexo B, N = \1 sonios)"),
     (r"^Spatial decay D2,S = (.+) dB$",

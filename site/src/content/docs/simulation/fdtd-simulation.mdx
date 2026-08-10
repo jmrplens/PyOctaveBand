@@ -846,6 +846,44 @@ accurate. With $\Delta x = 1$ cm the 10-cell point in air sits at roughly
 order, and the validation suite measures that observed order under grid
 refinement).
 
+**A pulse pays three times that.** The error above is a *phase* speed error:
+it says a steady tone at wavenumber $k$ travels slightly slow. A pulse
+travels at the **group** speed, and differentiating the same dispersion
+relation gives
+$v_g/c = \cos\theta / \sqrt{1 - S^2\sin^2\theta}$ with
+$\theta = k\,\Delta x / 2$, whose expansion is
+$1 - (1 - S^2)(k\,\Delta x)^2/8$ — the same law with 8 in place of 24, so a
+wavepacket arrives three times later than the phase rule suggests. At 10
+cells per wavelength and the default `cfl` that is 4.1 %, not 1.4 %. And
+because it is a speed error, it is paid **per metre travelled**: the same
+grid that is 4 % slow costs a centimetre over a metre and a metre over
+twenty-five.
+
+The clip below measures both statements. One 500 Hz tone burst is launched
+down three plane tubes that are identical in every respect except
+$\Delta x$ — 137.2, 68.6 and 34.3 mm, which is 5, 10 and 20 cells per
+wavelength — and the exact continuous answer travels behind each trace in
+grey, so the numerical packet's lag is a gap on screen rather than a number
+in a table.
+
+<Video
+  name="anim_fdtd_dispersion"
+  width={2400}
+  height={1350}
+  title="Numerical dispersion measured on three grids (2D FDTD)"
+  description="A 500 Hz tone burst travels down three otherwise identical plane FDTD tubes meshed at 5, 10 and 20 cells per wavelength, with the exact continuous wave drawn behind each trace in grey. By the end of the run the coarse packet has fallen two wavelengths behind and grown a long ripple tail, the ten-cell packet lags by half a wavelength, and the twenty-cell packet still sits on the exact wave. Each panel prints its running lag in metres and, once the packet has crossed the 6.6 metre finish line, the crossing time and the measured speed deficit against the closed form. A side panel carries the phase-speed and group-speed error laws with the three grids marked."
+/>
+
+*Read three things off it. First, the lag grows: it is 0.14 m at 2.4 ms and
+1.35 m by the end, because a speed error accumulates with distance. Second,
+the coarse tube grows a **ripple tail behind** the packet, not a reflection
+in front of it — the short components inside the burst travel slowest, so
+they arrive last. Third, the measured deficits are 17.2 %, 4.3 % and 1.1 %
+against 17.3 %, 4.3 % and 1.1 % from the closed form evaluated over the
+burst's own spectrum, and the packets cross the finish line 3.3, 0.7 and
+0.2 ms after the exact wave does. Halving $\Delta x$ quarters the error, in
+both laws and in the measurement.*
+
 The verification runs in both directions: the closed form pins the solver
 here, and once pinned the solver is what tests a closed form outside its own
 assumptions. A rigid-box run reproduces the analytic room modes.
@@ -1002,7 +1040,10 @@ reduced to about 1.4 % at the default ``cfl = 0.6`` (the per-axis Courant
 number is then $S = \mathrm{cfl}/\sqrt{2} = 0.424$, so the $1 - S^2$ factor is
 0.82), and halving $\Delta x$
 quarters the error (the scheme is second order). With $\Delta x = 1$ cm the
-10-cell point in air sits at roughly 3.4 kHz.
+10-cell point in air sits at roughly 3.4 kHz. That bound is a *phase* speed
+error; a pulse travels at the group speed and is three times slower still —
+4.1 % at ten cells — and pays it per metre travelled, which
+[section 6 measures on three grids](#6-numerical-dispersion-and-accuracy).
 
 ### How wide should the source pulse and the sponge be?
 

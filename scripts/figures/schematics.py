@@ -9,6 +9,7 @@ clips that use them, ahead of the wave-field clips of :mod:`figures.fields`,
 which borrow the same vocabulary to annotate a simulated field.
 """
 
+from functools import lru_cache
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -2863,3 +2864,732 @@ def animate_image_source_buildup(output_dir: str) -> None:
                 count_txt)
 
     _render_clip(fig, update, output_dir, "anim_image_source_buildup")
+
+
+# --- ISO 717 reference-curve fit ------------------------------------------
+#
+# Every static figure of the ratings guide shows the curve where it came to
+# rest. The rule that put it there is iterative: shift in 1 dB steps toward
+# the measurement until the sum of unfavourable deviations is as large as it
+# can be without passing 32.0 dB (ISO 717-1:2020, 4.4; ISO 717-2:2020,
+# 4.3.1). The clip walks the steps, including the one that is rejected for
+# overshooting and the one past the answer that is legal but not maximal.
+
+#: Airborne example: the 16 one-third-octave R values of the ratings guide.
+_R717_AIRBORNE = (20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+                  28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5)
+#: Impact example: the ISO 717-2 Annex C L'nT spectrum of the same guide.
+_R717_IMPACT = (62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
+                73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2)
+_R717_BANDS = (100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+               1000, 1250, 1600, 2000, 2500, 3150)
+#: The cap is one rule for both engines: 2.0 dB per band over 16 bands.
+_R717_CAP = 32.0
+
+
+def _iso717_track(measured: tuple[float, ...], *, impact: bool,
+                  first: int, last: int) -> dict[str, Any]:
+    """Every curve position the fit visits, with its unfavourable sum.
+
+    ``first``/``last`` are readings of the reference curve at 500 Hz, walked
+    in the direction the standard shifts (down toward an airborne
+    measurement, up toward an impact one). The accepted position is the one
+    with the largest sum not exceeding 32.0 dB, which is what the library
+    returns; the walk is built so the frame before it is a rejection.
+    """
+    from phonometry import building
+
+    y = np.asarray(measured, dtype=float)
+    res: Any = (building.weighted_impact_rating(y) if impact
+                else building.weighted_rating(y))
+    rating = int(res.rating)
+    shifted = np.asarray(res.shifted_reference, dtype=float)
+    # The unshifted reference is the returned curve moved back by the shift
+    # that was applied; its 500 Hz value is the standard's Table 3 anchor.
+    base = shifted - (shifted[7] - float(rating))
+    step = 1 if impact else -1
+    readings = list(range(first, last + step, step))
+    frames = []
+    for read in readings:
+        curve = base + (read - float(rating))
+        dev = (y - curve) if impact else (curve - y)
+        dev = np.clip(dev, 0.0, None)
+        total = float(np.round(dev.sum(), 1))
+        frames.append({"read": read, "curve": curve, "sum": total,
+                       "ok": total <= _R717_CAP})
+    accepted = next(i for i, f in enumerate(frames) if f["read"] == rating)
+    return {"measured": y, "frames": frames, "accepted": accepted,
+            "rating": rating, "result": res}
+
+
+def animate_iso717_shift(output_dir: str) -> None:
+    """The reference curve stepping toward the measurement until the sum of
+    unfavourable deviations is as large as it can be without passing 32.0 dB
+    -- the iterative fit behind every single number on the ratings page,
+    run once for the airborne engine and once for the impact engine, where
+    the same rule holds with the deviation's sign reversed."""
+    from matplotlib.patches import Patch
+
+    T = _translate_str
+
+    # Each walk starts well clear of the measurement and stops one step past
+    # the answer, so the frame after the accepted one shows what "as large as
+    # possible" rules out: a legal fit whose sum is needlessly small.
+    air = _iso717_track(_R717_AIRBORNE, impact=False, first=36, last=29)
+    imp = _iso717_track(_R717_IMPACT, impact=True, first=75, last=80)
+    x = np.arange(16)
+
+    fig = _anim_figure()
+    fig.suptitle(T("Fitting the ISO 717 reference curve, one step at a time"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.45, 1.0],
+                          height_ratios=[1.0, 1.0])
+
+    # --- left: the spectrum, the curve and the shaded deviations ---------
+    ax_s = fig.add_subplot(gs[:, 0])
+    _grid_axes(ax_s)
+    ax_s.set_xlim(-0.6, 15.6)
+    ax_s.set_xticks(x)
+    # Nominal band numbers, not the 1k/2k axis convention: the rating is a
+    # band-by-band comparison and the reader counts bands here.
+    ax_s.set_xticklabels([f"{b:g}" for b in _R717_BANDS], rotation=45,
+                         fontsize=7.5)
+    ax_s.tick_params(labelsize=8)
+    ax_s.set_xlabel(T("One-third-octave band [Hz]"), fontsize=9)
+    (meas_line,) = ax_s.plot([], [], color=COLOR_PRIMARY, lw=2.2, marker="o",
+                             ms=4.0, zorder=4, label=T("measured spectrum"))
+    (ref_line,) = ax_s.plot([], [], color=COLOR_FG, lw=1.8, ls="--",
+                            marker="s", ms=3.4, zorder=3,
+                            label=T("reference curve, as shifted"))
+    shade = {"art": None}
+    (read_dot,) = ax_s.plot([], [], color=COLOR_TERTIARY, marker="o",
+                            ms=11.0, ls="none", zorder=5)
+    read_txt = ax_s.text(0.0, 0.0, "", ha="left", va="center",
+                         color=COLOR_TERTIARY, fontsize=9.5,
+                         family="monospace", zorder=6,
+                         bbox={"boxstyle": "round,pad=0.25",
+                               "facecolor": plt.rcParams["figure.facecolor"],
+                               "edgecolor": "none", "alpha": 0.85})
+    act_txt = ax_s.set_title("", fontsize=9.0, color=COLOR_FG)
+
+    # --- top right: the sum against curve position, with the 32.0 dB cap -
+    ax_c = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_c)
+    ax_c.set_ylabel(T("Sum of unfavourable\ndeviations [dB]"), fontsize=8.5)
+    ax_c.set_xlabel(T("Reference curve read at 500 Hz [dB]"), fontsize=8.5)
+    ax_c.tick_params(labelsize=8)
+    ax_c.axhline(_R717_CAP, color=COLOR_FG, lw=1.6, ls="--",
+                 zorder=3, label=T("cap 32.0 dB = 2.0 dB per band"))
+    n_bars = max(len(air["frames"]), len(imp["frames"]))
+    cap_bars = ax_c.bar(np.arange(n_bars), np.zeros(n_bars), width=0.66,
+                        color=COLOR_MUTED, alpha=0.9)
+    ax_c.legend(loc="upper right", fontsize=7.5, framealpha=0.9)
+
+    # --- bottom right: what the fit has decided so far -------------------
+    ax_v = fig.add_subplot(gs[1, 1])
+    _schematic_axes(ax_v, (0.0, 10.0), (0.0, 10.0))
+    # The key lives here rather than over the spectrum: the two curves swap
+    # places between the airborne and impact acts, so any in-panel legend
+    # position that is clear in one is covered in the other.
+    ax_v.legend(handles=[meas_line, ref_line,
+                         Patch(facecolor=COLOR_SECONDARY, alpha=0.30,
+                               label=T("unfavourable deviations"))],
+                loc="upper left", fontsize=8.0, framealpha=0.0,
+                handlelength=2.4, borderpad=0.0)
+    verdict_txt = ax_v.text(0.2, 6.2, "", ha="left", va="top", color=COLOR_FG,
+                            fontsize=10.0, family="monospace",
+                            linespacing=1.7)
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    a1_end = int(0.52 * sweep)
+    a2_start = int(0.58 * sweep)
+
+    def schedule(track: dict[str, Any], n_frames: int) -> np.ndarray:
+        """Frame -> step index, dwelling on the steps that decide it.
+
+        The last rejected step and the accepted one carry the whole
+        argument, so they get several times the screen time of a step that
+        is merely on the way. The walk then takes one step past the answer,
+        to show what "as large as possible" rules out, and **returns to the
+        accepted position**, so the act settles on the fit rather than on
+        the counter-example.
+        """
+        acc = track["accepted"]
+        n = len(track["frames"])
+        visits = list(range(n))
+        weights = [1.0] * n
+        weights[max(acc - 1, 0)] = 3.0
+        weights[acc] = 3.5
+        if acc + 1 < n:
+            weights[acc + 1] = 2.5
+            visits.append(acc)
+            weights.append(3.0)
+        w = np.asarray(weights, dtype=float)
+        edges = np.cumsum(w) / w.sum()
+        pos = np.searchsorted(
+            edges, np.linspace(0.0, 1.0, n_frames, endpoint=False),
+            side="right").clip(0, len(visits) - 1)
+        return np.asarray([visits[int(p)] for p in pos], dtype=int)
+
+    air_sched = schedule(air, a1_end)
+    imp_sched = schedule(imp, sweep - a2_start)
+    # Bars stay on screen once a position has been tried, so stepping back
+    # to the accepted fit does not erase the counter-example beside it.
+    air_shown = np.maximum.accumulate(air_sched)
+    imp_shown = np.maximum.accumulate(imp_sched)
+
+    def draw(track: dict[str, Any], idx: int, shown: int, *, impact: bool,
+             act: str) -> None:
+        y = track["measured"]
+        st = track["frames"][idx]
+        curve = st["curve"]
+        meas_line.set_data(x, y)
+        ref_line.set_data(x, curve)
+        if shade["art"] is not None:
+            shade["art"].remove()
+        hi, lo = (y, curve) if impact else (curve, y)
+        # One colour throughout: the shading means "unfavourable", not
+        # "rejected". Whether the position is accepted is the bar chart's
+        # job, and mixing the two would make the left panel's key move.
+        shade["art"] = ax_s.fill_between(
+            x, lo, hi, where=hi > lo, interpolate=True, zorder=2,
+            color=COLOR_SECONDARY, alpha=0.30)
+        read_dot.set_data([7.0], [curve[7]])
+        read_txt.set_position((7.6, curve[7]))
+        read_txt.set_text(T(f"{st['read']:.0f} dB at 500 Hz"))
+        lo_y, hi_y = float(min(y.min(), curve.min())), float(
+            max(y.max(), curve.max()))
+        pad = 0.18 * (hi_y - lo_y)
+        ax_s.set_ylim(lo_y - pad, hi_y + pad)
+        ax_s.set_ylabel(T("Normalized impact level L'nT [dB]") if impact
+                        else T("Sound reduction index R [dB]"), fontsize=9)
+        act_txt.set_text(act)
+
+        reads = [f["read"] for f in track["frames"]]
+        ax_c.set_xlim(-0.7, len(reads) - 0.3)
+        ax_c.set_xticks(np.arange(len(reads)))
+        ax_c.set_xticklabels([f"{r:d}" for r in reads], fontsize=7.5)
+        ax_c.set_ylim(0.0, max(f["sum"] for f in track["frames"]) * 1.15)
+        for j, bar in enumerate(cap_bars):
+            if j > shown or j >= len(track["frames"]):
+                bar.set_height(0.0)
+                continue
+            f = track["frames"][j]
+            bar.set_height(f["sum"])
+            if j == track["accepted"] and shown >= track["accepted"]:
+                bar.set_color(COLOR_TERTIARY)
+            elif f["ok"]:
+                bar.set_color(COLOR_MUTED)
+            else:
+                bar.set_color(COLOR_SECONDARY)
+
+    def verdict(track: dict[str, Any], idx: int, *, impact: bool) -> None:
+        st = track["frames"][idx]
+        res = track["result"]
+        lines = [T(f"step {idx + 1} of {len(track['frames'])}"),
+                 T(f"sum = {st['sum']:.1f} dB")]
+        if not st["ok"]:
+            lines.append(T("over the cap: shift again"))
+        elif idx == track["accepted"]:
+            name = T("L'nT,w") if impact else T("Rw")
+            lines.append(T("largest sum still under the cap"))
+            lines.append(f"{name} = {track['rating']:d} dB")
+            if impact:
+                lines.append(T(f"CI = {int(res.ci):+d} dB"))
+            else:
+                lines.append(T(f"C = {int(res.c):+d} dB, "
+                               f"Ctr = {int(res.ctr):+d} dB"))
+        else:
+            lines.append(T("legal, but the sum is smaller:"))
+            lines.append(T("this is one step too far"))
+        verdict_txt.set_text("\n".join(lines))
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        # Two lines, measured rather than eyeballed: on one line the Spanish
+        # ran 143 px off the left edge of the 2400 px canvas and the English
+        # 43 px off the right.
+        act1 = T("ISO 717-1: the curve steps down toward the measurement;\n"
+                 "an unfavourable deviation is a band that falls below it")
+        if k < a1_end:
+            idx, shown = int(air_sched[k]), int(air_shown[k])
+            draw(air, idx, shown, impact=False, act=act1)
+            verdict(air, idx, impact=False)
+        elif k < a2_start:
+            draw(air, air["accepted"], len(air["frames"]) - 1, impact=False,
+                 act=act1)
+            verdict(air, air["accepted"], impact=False)
+        else:
+            j = min(k - a2_start, len(imp_sched) - 1)
+            idx, shown = int(imp_sched[j]), int(imp_shown[j])
+            draw(imp, idx, shown, impact=True,
+                 act=T("ISO 717-2: the same rule with the sign reversed;\n"
+                       "the curve steps up, and a band above it is "
+                       "unfavourable"))
+            verdict(imp, idx, impact=True)
+        return (meas_line, ref_line, read_dot, read_txt, verdict_txt)
+
+    _render_clip(fig, update, output_dir, "anim_iso717_shift")
+
+
+# --- block integrator against exponential detector -------------------------
+#
+# The case study of start/why-phonometry.mdx turns on one sentence: a block
+# integrator "can only be right where the burst happens to fill a block". The
+# page shows the exponential detector landing on the IEC 61672-1 Table 4
+# values and nothing about the alignment the other detector depends on. That
+# dependence is a one-parameter sweep over where the burst falls in the block
+# grid, so it is the clip and not the figure.
+
+_BVE_FS = 48_000
+_BVE_FREQ = 4_000.0          # the Table 4 excitation
+_BVE_BLOCK = 0.125           # the block grid, numerically tau_F
+_BVE_SPAN = 0.75             # seconds of record drawn (six blocks)
+_BVE_BURST_T0 = 0.25         # earliest burst start, on a block boundary
+_BVE_OFFSETS = 64            # alignments sampled across one block period
+#: (burst duration, IEC 61672-1 Table 4 target, class 1 tolerance).
+_BVE_ACTS = ((0.050, -4.8, 1.0), (0.200, -1.0, 0.5))
+
+
+def _block_vs_exponential_data() -> dict[str, Any]:
+    """Both detectors' readings at every alignment, for both bursts.
+
+    The reference is the steady Fast level of the same continuous 4 kHz
+    tone, averaged over its last half second, exactly as the guide's
+    procedure section defines it -- so the readings below are the
+    standard's L_AFmax - L_A and are directly comparable with Table 4.
+    """
+    from phonometry import time_weighting
+
+    fs = _BVE_FS
+    n_span = round(_BVE_SPAN * fs)
+    n_block = round(_BVE_BLOCK * fs)
+    t_steady = np.arange(3 * fs) / fs
+    steady = np.sin(2.0 * np.pi * _BVE_FREQ * t_steady)
+    ref = float(np.mean(time_weighting(steady, fs, mode="fast")
+                        [int(2.5 * fs):]))
+
+    t = np.arange(n_span) / fs
+    offsets = np.linspace(0.0, _BVE_BLOCK, _BVE_OFFSETS, endpoint=False)
+    acts = []
+    for seconds, target, limit in _BVE_ACTS:
+        n_burst = round(seconds * fs)
+        env_db, blk_db, exp_db, top_db = [], [], [], []
+        for off in offsets:
+            start = round((_BVE_BURST_T0 + off) * fs)
+            x = np.zeros(n_span)
+            x[start:start + n_burst] = np.sin(
+                2.0 * np.pi * _BVE_FREQ * t[start:start + n_burst])
+            env = time_weighting(x, fs, mode="fast")
+            env_db.append(10.0 * np.log10(np.maximum(env, 1e-12) / ref))
+            n_full = n_span // n_block
+            per = (x[:n_full * n_block].reshape(n_full, n_block) ** 2).mean(
+                axis=1)
+            blk_db.append(10.0 * np.log10(np.maximum(per, 1e-12) / ref))
+            exp_db.append(float(env_db[-1].max()))
+            top_db.append(float(blk_db[-1].max()))
+        acts.append({
+            "seconds": seconds, "target": target, "limit": limit,
+            "n_burst": n_burst,
+            "env": np.asarray(env_db), "blocks": np.asarray(blk_db),
+            "exp": np.asarray(exp_db), "blk": np.asarray(top_db),
+        })
+    return {"t": t, "offsets": offsets, "n_block": n_block, "acts": acts,
+            "n_span": n_span}
+
+
+@lru_cache(maxsize=1)
+def _bve_cached() -> dict[str, Any]:
+    """One data build per process: 128 Fast-envelope runs are paid once,
+    not once per language x theme variant."""
+    return _block_vs_exponential_data()
+
+
+def animate_block_vs_exponential(output_dir: str) -> None:
+    """The same tone burst slid across a 125 ms block boundary. The
+    exponential Fast detector answers the same number at every alignment
+    because the burst duration is in its differential equation; the block
+    integrator's answer swings by nearly 3 dB, because the alignment is all
+    it has. The case study's central claim, measured."""
+    T = _translate_str
+
+    d = _bve_cached()
+    t, offsets = d["t"], d["offsets"]
+    n_span = d["n_span"]
+
+    fig = _anim_figure()
+    fig.suptitle(T("One burst, two detectors, and the block grid underneath"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.28, 1.0],
+                          height_ratios=[1.0, 1.15])
+
+    # --- top left: the record, the burst and the 125 ms block grid -------
+    ax_r = fig.add_subplot(gs[0, 0])
+    _grid_axes(ax_r)
+    ax_r.set_xlim(0.0, _BVE_SPAN)
+    ax_r.set_ylim(-1.35, 1.35)
+    ax_r.set_ylabel(T("Sound pressure"), fontsize=8.5)
+    ax_r.tick_params(labelsize=8, labelbottom=False)
+    for k in range(int(_BVE_SPAN / _BVE_BLOCK) + 1):
+        ax_r.axvline(k * _BVE_BLOCK, color=COLOR_MUTED, lw=1.0, ls=":")
+    for k in range(0, int(_BVE_SPAN / _BVE_BLOCK), 2):
+        ax_r.axvspan(k * _BVE_BLOCK, (k + 1) * _BVE_BLOCK,
+                     color=COLOR_GRID, alpha=0.45, zorder=0)
+    (wave,) = ax_r.plot([], [], color=COLOR_PRIMARY, lw=0.7)
+    ax_r.set_title(T("the shaded strips are the 125 ms blocks"),
+                   fontsize=8.5, color=COLOR_FG)
+    burst_txt = ax_r.text(0.0, 1.16, "", ha="center", va="bottom",
+                          color=COLOR_FG, fontsize=8.5)
+    burst_arrow = _make_arrow(ax_r, COLOR_FG, scale=8.0)
+    burst_arrow.set_arrowstyle("<|-|>", head_length=0.5, head_width=0.28)
+
+    # --- bottom left: what each detector makes of it ---------------------
+    ax_d = fig.add_subplot(gs[1, 0])
+    _grid_axes(ax_d)
+    ax_d.set_xlim(0.0, _BVE_SPAN)
+    ax_d.set_xlabel(T("Time [s]"), fontsize=8.5)
+    ax_d.set_ylabel(T("Level re steady tone [dB]"), fontsize=8.5)
+    ax_d.tick_params(labelsize=8)
+    (env_line,) = ax_d.plot([], [], color=COLOR_PRIMARY, lw=2.0,
+                            label=T("exponential Fast envelope"))
+    (blk_line,) = ax_d.plot([], [], color=COLOR_TERTIARY, lw=2.0,
+                            drawstyle="steps-post",
+                            label=T("block Leq, 125 ms slices"))
+    target_line = ax_d.axhline(0.0, color=COLOR_FG, lw=1.3, ls="--",
+                               label=T("IEC 61672-1 Table 4 target"))
+    (env_peak,) = ax_d.plot([], [], color=COLOR_PRIMARY, marker="o", ms=7.0,
+                            ls="none", zorder=5)
+    (blk_peak,) = ax_d.plot([], [], color=COLOR_TERTIARY, marker="s", ms=7.0,
+                            ls="none", zorder=5)
+    # Lower left: nothing is drawn before the burst starts at 0.25 s in
+    # either act, and lower right is where the exponential tail decays.
+    ax_d.legend(loc="lower left", fontsize=7.5, framealpha=0.9)
+
+    # --- top right: the reading against alignment, built up --------------
+    ax_a = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_a)
+    ax_a.set_xlim(0.0, _BVE_BLOCK * 1e3)
+    ax_a.set_xticks([0.0, 25.0, 50.0, 75.0, 100.0, 125.0])
+    ax_a.set_xlabel(T("Burst start within the block [ms]"), fontsize=8.5)
+    ax_a.set_ylabel(T("Reading [dB]"), fontsize=8.5)
+    ax_a.tick_params(labelsize=8)
+    corridor = {"art": None}
+    (exp_trace,) = ax_a.plot([], [], color=COLOR_PRIMARY, lw=2.4)
+    (blk_trace,) = ax_a.plot([], [], color=COLOR_TERTIARY, lw=2.4)
+    (now_dot,) = ax_a.plot([], [], color=COLOR_SECONDARY, marker="o",
+                           ms=7.0, ls="none", zorder=5)
+
+    # --- bottom right: the two answers, and the spread so far ------------
+    ax_v = fig.add_subplot(gs[1, 1])
+    _schematic_axes(ax_v, (0.0, 10.0), (0.0, 10.0))
+    # 9.2 pt, measured: at 10 pt the English readout ran 13 px and the
+    # Spanish 29 px off the right edge of the 2400 px canvas.
+    verdict_txt = ax_v.text(0.1, 9.6, "", ha="left", va="top", color=COLOR_FG,
+                            fontsize=9.2, family="monospace",
+                            linespacing=1.65)
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    a1_end = int(0.54 * sweep)
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep)
+        if k < a1_end:
+            act, frac = d["acts"][0], k / max(a1_end - 1.0, 1.0)
+        else:
+            act = d["acts"][1]
+            frac = (k - a1_end) / max(sweep - a1_end - 1.0, 1.0)
+        i = int(np.clip(round(frac * (len(offsets) - 1)), 0,
+                        len(offsets) - 1))
+        target, limit = act["target"], act["limit"]
+
+        start = round(float(_BVE_BURST_T0 + offsets[i]) * _BVE_FS)
+        x = np.zeros(n_span)
+        x[start:start + act["n_burst"]] = np.sin(
+            2.0 * np.pi * _BVE_FREQ * t[start:start + act["n_burst"]])
+        wave.set_data(t, x)
+        t0 = _BVE_BURST_T0 + float(offsets[i])
+        t1 = t0 + act["seconds"]
+        burst_arrow.set_positions((t0, 1.12), (t1, 1.12))
+        burst_txt.set_position(((t0 + t1) / 2.0, 1.16))
+        burst_txt.set_text(T(f"4 kHz burst, {act['seconds'] * 1e3:.0f} ms"))
+
+        env_line.set_data(t, act["env"][i])
+        edges = np.arange(len(act["blocks"][i]) + 1) * _BVE_BLOCK
+        blk_line.set_data(edges, np.append(act["blocks"][i],
+                                           act["blocks"][i][-1]))
+        j_env = int(np.argmax(act["env"][i]))
+        env_peak.set_data([t[j_env]], [act["env"][i][j_env]])
+        j_blk = int(np.argmax(act["blocks"][i]))
+        blk_peak.set_data([(j_blk + 0.5) * _BVE_BLOCK],
+                          [act["blocks"][i][j_blk]])
+        target_line.set_ydata([target, target])
+        ax_d.set_ylim(target - 14.0, 4.0)
+
+        ax_a.set_ylim(target - 3.6, target + 2.2)
+        if corridor["art"] is not None:
+            corridor["art"].remove()
+        corridor["art"] = ax_a.axhspan(
+            target - limit, target + limit, color=COLOR_MUTED, alpha=0.28,
+            zorder=0)
+        ms = offsets[:i + 1] * 1e3
+        exp_trace.set_data(ms, act["exp"][:i + 1])
+        blk_trace.set_data(ms, act["blk"][:i + 1])
+        now_dot.set_data([offsets[i] * 1e3], [act["blk"][i]])
+        ax_a.set_title(
+            T(f"class 1 is {limit:.1f} dB about {target:.1f} dB"),
+            fontsize=8.5, color=COLOR_FG)
+
+        seen_b = act["blk"][:i + 1]
+        seen_e = act["exp"][:i + 1]
+        lines = [
+            T(f"burst {act['seconds'] * 1e3:.0f} ms, "
+              f"IEC target {target:.1f} dB"),
+            T(f"exponential  {act['exp'][i]:6.2f} dB "
+              f"({act['exp'][i] - target:+.2f})"),
+            T(f"block Leq    {act['blk'][i]:6.2f} dB "
+              f"({act['blk'][i] - target:+.2f})"),
+            T(f"spread so far, exponential: "
+              f"{float(seen_e.max() - seen_e.min()):.2f} dB"),
+            T(f"spread so far, block Leq:   "
+              f"{float(seen_b.max() - seen_b.min()):.2f} dB"),
+        ]
+        if abs(act["blk"][i] - target) > limit:
+            lines.append(T("the block reading leaves the corridor"))
+        verdict_txt.set_text("\n".join(lines))
+        return (wave, burst_txt, burst_arrow, env_line, blk_line, env_peak,
+                blk_peak, exp_trace, blk_trace, now_dot, verdict_txt)
+
+    _render_clip(fig, update, output_dir, "anim_block_vs_exponential")
+
+
+# --- gain before feedback, round trip by round trip ------------------------
+#
+# The criterion Z_S + G_S = 0 (Long, Architectural Acoustics 2e, Eq. (18.16))
+# is a convergence condition on a geometric series, and the page's figures are
+# a level-bookkeeping bar stack. What no static figure can show is the series
+# itself: whether successive round trips shrink or hold their size. Three
+# cases, all of them the page's own auditorium.
+
+_FBH_ROUND_TRIPS = 14
+#: (open-loop gain Z_S, open microphones, caption key). L(H-M) = 76 dB and
+#: L(H-L) = 80 dB throughout, which is the guide's worked auditorium.
+_FBH_CASES = ((-6.0, 1), (-6.0, 4), (-2.0, 4))
+_FBH_LHM, _FBH_LHL = 76.0, 80.0
+
+
+def _feedback_howl_data() -> list[dict[str, Any]]:
+    """Copy amplitudes and running totals for the three loop gains."""
+    from phonometry import electroacoustics as ea
+
+    n = np.arange(_FBH_ROUND_TRIPS + 1)
+    out = []
+    for zs, mics in _FBH_CASES:
+        res = ea.feedback_stability(zs, _FBH_LHM, _FBH_LHL,
+                                    open_microphones=mics)
+        loop = float(res.loop_gain)
+        g = 10.0 ** (loop / 20.0)
+        copies = g ** n
+        totals = np.cumsum(copies)
+        out.append({
+            "zs": zs, "mics": mics, "loop": loop, "g": g,
+            "copies_db": 20.0 * np.log10(copies),
+            "totals_db": 20.0 * np.log10(totals),
+            "limit": (1.0 / (1.0 - g)) if g < 1.0 else float("inf"),
+            "stable": bool(res.is_stable),
+            "headroom": float(res.headroom),
+        })
+    return out
+
+
+@lru_cache(maxsize=1)
+def _fbh_cached() -> list[dict[str, Any]]:
+    """One data build per process."""
+    return _feedback_howl_data()
+
+
+def animate_feedback_howl(output_dir: str) -> None:
+    """One burst goes round the reinforcement loop again and again. With
+    Long's 10 dB margin each copy is a third of the last and the sum settles
+    3.3 dB above the direct sound; four open microphones cost 6 dB and the
+    same loop takes far longer to settle 8.7 dB up; 4 dB more system gain
+    puts the loop gain at unity and the copies stop shrinking, which is the
+    howl. Gain before feedback is a convergence condition, not a level."""
+    from matplotlib.patches import Circle
+
+    T = _translate_str
+
+    cases = _fbh_cached()
+    n_rt = _FBH_ROUND_TRIPS
+    idx = np.arange(n_rt + 1)
+
+    fig = _anim_figure()
+    fig.suptitle(T("Gain before feedback is a convergence condition"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.1, 1.0],
+                          height_ratios=[1.0, 1.0])
+
+    # --- left: the loop, with one copy travelling the feedback path ------
+    ax_g = fig.add_subplot(gs[:, 0])
+    # The limits span the same 12.2 units on both axes and the cell is very
+    # nearly square, so the capsule stays round without an explicit equal
+    # aspect -- which fought constrained_layout and squeezed the right
+    # column until its legend ran off the canvas.
+    _schematic_axes(ax_g, (-1.4, 10.8), (-7.4, 4.8))
+    talker, mic = (0.5, 0.0), (2.6, 0.0)
+    spk, listener = (5.6, 3.0), (9.8, 0.0)
+    _draw_mic(ax_g, mic[0], mic[1], direction=-1, size=0.85)
+    _draw_speaker(ax_g, spk[0], spk[1], size=1.4, direction=1)
+    ax_g.plot([talker[0]], [talker[1]], marker="o", ms=13,
+              color=COLOR_SECONDARY, ls="none")
+    ax_g.plot([listener[0]], [listener[1]], marker="o", ms=13,
+              color=COLOR_TERTIARY, ls="none")
+    # Nothing is labelled above the microphone: the feedback path arrives
+    # there from the upper right and any label in that wedge crosses it.
+    ax_g.text(talker[0], talker[1] - 0.5,
+              T("talker,\n0.3 m from the microphone"), ha="center",
+              va="top", color=COLOR_FG, fontsize=9)
+    ax_g.text(mic[0] + 0.55, mic[1] - 0.55, T("microphone"), ha="left",
+              va="top", color=COLOR_FG, fontsize=9)
+    ax_g.text(listener[0], listener[1] - 0.5, T("listener,\n12 m away"),
+              ha="center", va="top", color=COLOR_FG, fontsize=9)
+    ax_g.text(spk[0] + 0.9, spk[1] + 0.1, T("loudspeaker"), ha="left",
+              va="center", color=COLOR_FG, fontsize=9)
+    # The electrical leg is a cable, drawn round the outside, so it does not
+    # lie on top of the acoustic feedback path it closes.
+    ax_g.plot([mic[0], mic[0], spk[0], spk[0]],
+              [mic[1] - 0.45, -2.0, -2.0, spk[1] - 0.55],
+              color=COLOR_MUTED, lw=1.4)
+    ax_g.text((mic[0] + spk[0]) / 2.0 + 0.3, -2.2,
+              T("microphone, mixer, amplifier"), ha="center", va="top",
+              color=COLOR_FG, fontsize=9)
+    ax_g.plot([spk[0] + 0.5, listener[0]], [spk[1] - 0.3, listener[1] + 0.4],
+              color=COLOR_MUTED, lw=1.4)
+    fb_a = (spk[0] - 0.3, spk[1] - 0.6)
+    fb_b = (mic[0] + 0.25, mic[1] + 0.35)
+    ax_g.plot([fb_a[0], fb_b[0]], [fb_a[1], fb_b[1]], color=COLOR_PRIMARY,
+              lw=1.6, ls="--")
+    ang = float(np.degrees(np.arctan2(fb_a[1] - fb_b[1], fb_a[0] - fb_b[0])))
+    # rotation_mode="anchor" so the offset below the line is exact: without
+    # it matplotlib aligns before rotating and the label swings across the
+    # cable underneath.
+    # Short, because the path is short: the longer wording ran onto the
+    # microphone at one end and the loudspeaker at the other, and the
+    # sentence it came from belongs in the prose beside the clip.
+    perp = np.deg2rad(ang)
+    ax_g.text((fb_a[0] + fb_b[0]) / 2.0 + 0.34 * float(np.sin(perp)),
+              (fb_a[1] + fb_b[1]) / 2.0 - 0.34 * float(np.cos(perp)),
+              T("the feedback path"), ha="center", va="top",
+              rotation_mode="anchor", color=COLOR_PRIMARY, fontsize=9,
+              rotation=ang)
+    copy_dot = Circle(spk, 0.18, facecolor=COLOR_PRIMARY, edgecolor="none",
+                      alpha=0.85, zorder=6)
+    ax_g.add_patch(copy_dot)
+    case_txt = ax_g.text(-1.2, -3.4, "", ha="left", va="top", color=COLOR_FG,
+                         fontsize=10.0, family="monospace", linespacing=1.7)
+    # The act caption lives inside this panel, not as its title: equal aspect
+    # shrinks the axes box to a square, and a title centred on it ran 311 px
+    # off the left edge of the figure.
+    act_txt = ax_g.text(-1.3, 4.7, "", ha="left", va="top", color=COLOR_FG,
+                        fontsize=9.5, fontstyle="italic")
+
+    # --- top right: the copies, one stem per round trip ------------------
+    ax_c = fig.add_subplot(gs[0, 1])
+    _grid_axes(ax_c)
+    ax_c.set_xlim(-0.7, n_rt + 0.7)
+    ax_c.set_xticks(np.arange(0, n_rt + 1, 2))
+    ax_c.set_ylim(-46.0, 6.0)
+    ax_c.set_xlabel(T("Round trip number"), fontsize=8.5)
+    ax_c.set_ylabel(T("Copy level re direct [dB]"), fontsize=8.5)
+    ax_c.tick_params(labelsize=8)
+    stems = LineCollection([], colors=COLOR_PRIMARY, linewidths=2.4)
+    ax_c.add_collection(stems)
+    heads = ax_c.scatter([], [], s=22.0, color=COLOR_PRIMARY, zorder=4)
+    ax_c.axhline(0.0, color=COLOR_FG, lw=1.0, ls="-.", alpha=0.6)
+
+    # --- bottom right: the sum, with the earlier cases left on screen ----
+    ax_t = fig.add_subplot(gs[1, 1])
+    _grid_axes(ax_t)
+    ax_t.set_xlim(-0.7, n_rt + 0.7)
+    ax_t.set_xticks(np.arange(0, n_rt + 1, 2))
+    ax_t.set_ylim(-1.0, 26.0)
+    ax_t.set_xlabel(T("Round trips summed"), fontsize=8.5)
+    ax_t.set_ylabel(T("Total re direct [dB]"), fontsize=8.5)
+    ax_t.tick_params(labelsize=8)
+    colors = (COLOR_TERTIARY, COLOR_QUATERNARY, COLOR_SECONDARY)
+    labels = (T("10 dB margin"), T("four microphones"), T("loop at unity"))
+    total_lines = []
+    for c, lab in zip(colors, labels, strict=True):
+        (ln,) = ax_t.plot([], [], color=c, lw=2.2, marker="o", ms=3.2,
+                          label=lab)
+        total_lines.append(ln)
+    # One column: the three-across form did not fit the Spanish, and the
+    # upper left of this panel is empty in all three cases.
+    ax_t.legend(loc="upper left", fontsize=7.5, framealpha=0.9,
+                handlelength=1.4)
+    limit_lines = []
+    for c in colors[:2]:
+        limit_lines.append(ax_t.axhline(0.0, color=c, lw=1.1, ls=":",
+                                        visible=False))
+
+    sweep = _ANIM_FRAMES - _ANIM_HOLD
+    per_act = sweep // 3
+
+    def update(kf: int) -> tuple[Any, ...]:
+        k = min(kf, sweep - 1)
+        a = min(k // per_act, 2)
+        within = (k - a * per_act) / max(per_act - 1.0, 1.0)
+        case = cases[a]
+        pos = float(np.clip(within, 0.0, 1.0)) * n_rt
+        n_done = int(np.floor(pos))
+        frac = pos - n_done
+
+        # one copy in flight along the dashed feedback path
+        amp = case["g"] ** max(n_done, 0)
+        # The copy travels the middle of the path only, and stays small: at
+        # unity the amplitude never decays, so a marker sized for the whole
+        # path sat on the microphone symbol for a third of the act.
+        span = 0.10 + 0.78 * frac
+        px = fb_a[0] + (fb_b[0] - fb_a[0]) * span
+        py = fb_a[1] + (fb_b[1] - fb_a[1]) * span
+        copy_dot.set_center((px, py))
+        copy_dot.set_radius(0.07 + 0.20 * float(np.clip(amp, 0.0, 1.4)))
+
+        seen = idx[:n_done + 1]
+        cdb = np.maximum(case["copies_db"][:n_done + 1], -46.0)
+        stems.set_segments([[(float(i), -46.0), (float(i), float(v))]
+                            for i, v in zip(seen, cdb, strict=True)])
+        heads.set_offsets(np.column_stack([seen, cdb]))
+        for j, ln in enumerate(total_lines):
+            if j < a:
+                ln.set_data(idx, case_totals[j])
+                ln.set_alpha(0.45)
+            elif j == a:
+                ln.set_data(seen, case["totals_db"][:n_done + 1])
+                ln.set_alpha(1.0)
+            else:
+                ln.set_data([], [])
+        for j, ll in enumerate(limit_lines):
+            if j <= a and np.isfinite(cases[j]["limit"]):
+                ll.set_ydata([20.0 * np.log10(cases[j]["limit"])] * 2)
+                ll.set_visible(True)
+
+        mics = case["mics"]
+        act = (T("Long's 10 dB margin: each copy is a third of the last")
+               if a == 0 else
+               T("Four open microphones add 10 lg 4 = 6 dB to the loop")
+               if a == 1 else
+               T("Four more decibels of system gain: the loop reaches unity"))
+        act_txt.set_text(act)
+        lines = [T(f"Zs = {case['zs']:.0f} dB, {mics:d} open microphone(s)"),
+                 T(f"loop gain Zs + Gs = {case['loop']:+.1f} dB"),
+                 T(f"each round trip is x {case['g']:.3f}")]
+        if np.isfinite(case["limit"]):
+            lines.append(T(f"sum converges to "
+                           f"{20.0 * np.log10(case['limit']):+.2f} dB"))
+        else:
+            lines.append(T("the sum does not converge: this is the howl"))
+        case_txt.set_text("\n".join(lines))
+        return (copy_dot, stems, heads, case_txt, *total_lines)
+
+    case_totals = [c["totals_db"] for c in cases]
+    _render_clip(fig, update, output_dir, "anim_feedback_howl")

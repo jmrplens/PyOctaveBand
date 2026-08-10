@@ -34,6 +34,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
 A loudspeaker datasheet is a bundle of conventions, and IEC 60268-5 is the
@@ -675,6 +676,31 @@ print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
 
 res.plot()      # the gain structure against the oscillation and margin lines
 ```
+
+The bar stack below is the bookkeeping, and it is a level. What it cannot show
+is why the threshold sits at unity rather than anywhere else, because that is a
+statement about a sequence: the talker's burst reaches the microphone, goes out
+of the loudspeaker, comes back to the microphone reduced by the loop gain, and
+does it again. Successive round trips either shrink, in which case the sum of
+all of them is finite, or they do not, in which case there is no sum. Watching
+the copies is the whole argument.
+
+<Video
+  name="anim_feedback_howl"
+  width={2400}
+  height={1350}
+  title="One burst going round the reinforcement loop, three times over"
+  description="A burst circulates the loudspeaker-to-microphone path while each returning copy is drawn as a stem and the running total of all copies so far is plotted. With Long's 10 dB margin each copy is 0.316 of the last and the total settles 3.30 dB above the direct sound; four open microphones add 6 dB and the same loop takes far longer to settle, 8.69 dB up; four more decibels of system gain put the loop gain at unity, the copies stop shrinking and the total climbs without limit."
+/>
+
+*Three runs of the same auditorium, all from `feedback_stability` with
+$L_{H\text{-}M} = 76$ dB and $L_{H\text{-}L} = 80$ dB. The loop gains are
+$-10.0$, $-3.98$ and $+0.02$ dB, so each round trip multiplies the last by
+0.316, 0.632 and 1.002; the first two sums converge to $1/(1-g)$ and the third
+does not converge at all. That is why gain before feedback is not a level
+limit: 6 dB more amplifier moves every copy up together and changes nothing
+about whether the series converges, while 6 dB more **loop** gain is the
+difference between a system and a howl.*
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/feedback_stability.svg" alt="Two stacked bar charts of the same auditorium case. In the upper one, with a single open microphone, the open-loop gain of minus 6 dB and the feedback-loop gain of minus 4 dB accumulate to a total loop gain of minus 10 dB, exactly on the dashed 10 dB stability limit, for a headroom of zero. In the lower one, four open microphones add a plus 6 dB correction and the total rises to minus 4 dB, six decibels above the limit and therefore unstable" width="82%" />
 

@@ -4,6 +4,7 @@ description: "The conformance-first design philosophy: an IEC 61672-1 time-weigh
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 import { totalChecks, domains, standards, errataEntries } from '../../../data/conformance-stats.mjs';
 
 phonometry is a standards-based acoustic measurement toolkit. Its
@@ -126,6 +127,31 @@ The generator behind this figure is
 described above with three of the Table 4 rows: it prints
 `env_db.max() - target`, which is the Error column of the first table, so the
 phonometry rows can be reproduced directly.
+
+The figure fixes the burst at one place in time, which is the one thing the
+block integrator's answer depends on and the exponential detector's does not.
+Slide the same burst across a 125 ms block boundary and the two behave quite
+differently: the exponential reading is pinned at −4.82 dB whatever the
+alignment, a spread of 0.001 dB, while the block reading swings over 2.94 dB
+and spends 12 % of the alignments outside the class 1 corridor. At 200 ms,
+where Table 4 tightens to ±0.5 dB, the block integrator is outside the
+corridor for 81 % of them, because a 200 ms burst always fills at least part
+of a block and often fills one completely, and a full block reads the steady
+level, 1.0 dB above the target.
+
+<Video
+  name="anim_block_vs_exponential"
+  width={2400}
+  height={1350}
+  title="The same tone burst slid across a 125 ms block boundary"
+  description="A 4 kHz tone burst slides across the boundary between two 125 ms integration blocks. The exponential Fast envelope peaks at the same level at every alignment because the burst duration enters its differential equation, while the block Leq staircase rises and falls with where the burst happens to land, and the reading-against-alignment panel builds up both traces against the shaded class 1 corridor. The second act repeats it for a 200 ms burst, where the corridor is half as wide."
+/>
+
+*The exponential trace is flat because $10\lg(1-e^{-T_b/\tau})$ contains
+$T_b$ and nothing about the clock; the block trace is a picture of the
+alignment and nothing else. Both readings are computed here with
+`time_weighting(x, fs, mode="fast")` and with `leq` over consecutive 125 ms
+slices, against the same steady-tone reference the procedure above defines.*
 
 ## What this means in practice
 

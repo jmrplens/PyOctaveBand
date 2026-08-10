@@ -797,6 +797,47 @@ print(sr.magnitude[-1])             # 0.353 = |R| at normal incidence
 sr.plot()   # |R| vs grazing angle (needs matplotlib)
 ```
 
+### The same interface, as a field
+
+Both curves above are read at *one* angle at a time, and the seabed is never
+struck at one angle: a source radiates every angle at once, and which of them
+strikes where is geometry. The clip below builds that geometry from a single
+100 Hz burst 36 m above the bed. Its expanding front touches the seabed
+directly beneath the source at $\psi = 90°$ and the contact point then runs
+outward, sweeping the grazing angle down through 24.62° and on to a few
+degrees at the edge of the frame — so the whole $|R|(\psi)$ curve is
+traversed once, in order, in a single shot. The scene is then run twice,
+changing nothing but the two numbers that describe the sediment.
+
+<Video
+  name="anim_fdtd_critical_angle"
+  width={2400}
+  height={1350}
+  title="The critical grazing angle over a fast and a slow seabed (2D FDTD)"
+  description="A 100 Hz burst 36 metres above a flat seabed, simulated twice: over the fast sand of the figures above and over a slow mud. As the expanding front's contact with the bed sweeps outward the grazing angle falls, and over the sand the beam entering the sediment switches off where the 24.62 degree critical ray meets the bed, leaving only a bright evanescent skin that carries nothing away; over the mud sound enters at every angle right to the edge of the frame. A lower axis fills in the measured net energy flux through the seabed behind the contact point and lands on the closed form."
+/>
+
+*Over the sand, transmission ends at the critical ray and what is left in the
+sediment is an evanescent skin: bright, and carrying nothing away. Measured on
+the interface itself — the net $\int p\,v_z\,\mathrm{d}t$ per metre of seabed,
+which an evanescent field contributes nothing to — the sand's net beyond the
+critical ray is **−4.9 %** of what entered inside it, against 0 % from the
+closed form, and the sign is not a rounding error: past the critical range the
+net flux **reverses**, because the lateral wave born at the critical point
+runs along the interface inside the sediment and radiates back up into the
+water. The mud takes **+28.3 %** beyond that same range against **+29.7 %**
+predicted, and its curve simply carries on falling off the right of the panel.
+That difference, paid again at every bounce, is what the Weston reflection
+loss gradient $\eta$ accumulates.*
+
+Two things the clip deliberately does not show. There is no sea surface in
+it: with one interface the picture has one family of rays and one critical
+range, whereas a real waveguide adds a surface-reflected family whose image
+sits higher and whose own critical range is further out. And it is a single
+bounce, so the angle *filtering* is visible but the accumulation over many
+bounces — the mode stripping of the Weston table — is not; that is the
+quantity $\eta$ stands in for.
+
 ## Ocean ambient noise
 
 The ambient-noise spectrum level is the energy sum of the physically grounded
