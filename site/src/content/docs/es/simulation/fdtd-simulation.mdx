@@ -315,7 +315,7 @@ la única pérdida volumétrica que tiene el esquema, de modo que también es la
 única manera de hacer que absorba una superficie *interior*. Dos vías para
 llegar a un valor. Como sustituto de la absorción de una sala,
 $\sigma = 6{,}91/T_{60}$ produce una caída reverberante de $T_{60}$ segundos,
-así que una caída de 0,5 s son $\sigma = 13{,}8$ s⁻¹. Como muestra, la pérdida
+así que una caída de 0,5 s son $\sigma = 13{,}8$ s⁻¹. Como probeta, la pérdida
 por metro son $\sigma/c$ neperios ($8{,}69\,\sigma/c$ dB/m), y el valor se
 ajusta hasta que la muestra modelada reproduce una absorción medida. Los dos
 límites merecen decirse sin rodeos: como la pérdida es independiente de la
@@ -550,7 +550,7 @@ después sobre un número exacto de periodos de la fuente. El transitorio que
 se descarta es el tiempo de llenado del dominio $\sqrt{L_x^2+L_y^2}/c$, más
 una travesía por cada reflexión que todavía importe, más el arranque de la
 fuente (`ramp_cycles / frequency`, tres periodos por defecto), más el tiempo
-que tarde en cargarse cualquier geometría resonante, del orden de $Q$
+que tarde en excitarse cualquier geometría resonante, del orden de $Q$
 periodos, que es toda la razón por la que la ejecución del metadifusor de
 abajo espera 8 ms donde el monopolo desnudo espera 4,5 ms: sus cuellos y
 cavidades son resonadores y tienen que llenarse. La ventana que viene
@@ -719,8 +719,8 @@ plt.show()
 </details>
 
 Por qué se desplazan los nulos es una pregunta sobre geometría, y merece la
-pena poner las dos geometrías una al lado de la otra: el panel que tasa el
-modelo y el panel sobre el que avanza el esquema.
+pena poner las dos geometrías una al lado de la otra: el panel que el modelo
+tasa y el panel sobre el que avanza el esquema.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_meshed_panel_es.webp" alt="Tres dibujos apilados del mismo panel metadifusor de cinco celdas. Arriba: la celda unidad idealizada sobre la que trabaja la matriz de transferencia, dibujada a escala con el paso de 70 milímetros, la profundidad de 20 milímetros y la anchura de panel de 350 milímetros acotados. En medio: ese mismo panel como la máscara booleana de obstáculos sobre la que avanza la ejecución FDTD a medio milímetro por celda, con la quinta celda recuadrada. Abajo: esa quinta celda ampliada, con la ranura de 20,3 milímetros, los dos resonadores escalonados, el fondo rígido de 3 milímetros y el cuello de 3,2 milímetros que abarca seis celdas, todos etiquetados" width="94%" />
 
@@ -888,9 +888,10 @@ máximo exactamente sobre un
 eje y se anula a lo largo de la diagonal de las celdas en el límite de
 Courant $\mathrm{CN} = 1$. La regla práctica es resolver **al menos 10 celdas por
 longitud de onda más corta**, $\Delta x \le c_\text{min} / (10 f_\text{max})$ con la velocidad
-de sonido más baja del dominio: con exactamente 10 celdas la cota de
-Courant pequeño $(k\,\Delta x)^2 / 24$ da alrededor del 1,6 %, que el factor
-$1 - S^2$ reduce a en torno al 1,4 % con el ``cfl = 0.6`` por defecto
+de sonido más baja del dominio: con exactamente 10 celdas la cota
+$(k\,\Delta x)^2 / 24$ para números de Courant pequeños da alrededor del
+1,6 %, que el factor $1 - S^2$ reduce a en torno al 1,4 % con el
+``cfl = 0.6`` por defecto
 (en un dominio heterogéneo el paso temporal lo fijan las celdas más
 rápidas, así que las regiones lentas trabajan a un número de Courant local
 menor y quedan más cerca de la cota del 1,6 %), y toda componente mejor
@@ -899,6 +900,45 @@ $\Delta x = 1$ cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
 reducir $\Delta x$ a la mitad divide el error entre cuatro (el esquema es de
 segundo orden, y la batería de validación mide ese orden observado bajo
 refinamiento de malla).
+
+**Un pulso paga el triple.** El error de arriba es un error de velocidad de
+*fase*: dice que un tono estacionario de número de onda $k$ viaja un poco
+lento. Un pulso viaja a la velocidad de **grupo**, y derivar esa misma
+relación de dispersión da
+$v_g/c = \cos\theta / \sqrt{1 - S^2\sin^2\theta}$ con
+$\theta = k\,\Delta x / 2$, cuyo desarrollo es
+$1 - (1 - S^2)(k\,\Delta x)^2/8$: la misma ley con un 8 en lugar de un 24,
+así que un paquete de ondas llega tres veces más tarde de lo que sugiere la
+regla de la fase. Con 10 celdas por longitud de onda y el `cfl` por defecto
+eso es el 4,1 %, no el 1,4 %. Y como es un error de velocidad, se paga **por
+metro recorrido**: la misma malla que va un 4 % lenta cuesta un centímetro
+en un metro y un metro en veinticinco.
+
+El clip de abajo mide las dos afirmaciones. Se lanza una sola ráfaga tonal
+de 500 Hz por tres tubos planos idénticos en todo salvo en $\Delta x$
+(137,2, 68,6 y 34,3 mm, es decir, 5, 10 y 20 celdas por longitud de onda), y
+la respuesta continua exacta viaja en gris detrás de cada traza, así que el
+retraso del paquete numérico es un hueco en pantalla y no un número en una
+tabla.
+
+<Video
+  name="anim_fdtd_dispersion"
+  width={2400}
+  height={1350}
+  title="Dispersión numérica medida en tres mallas (FDTD 2D)"
+  description="Una ráfaga tonal de 500 Hz recorre tres tubos planos FDTD idénticos salvo por el mallado, de 5, 10 y 20 celdas por longitud de onda, con la onda continua exacta dibujada en gris detrás de cada traza. Al final de la ejecución el paquete de la malla gruesa se ha quedado dos longitudes de onda atrás y le ha crecido una larga cola de rizado, el paquete de diez celdas va media longitud de onda por detrás y el de veinte celdas sigue montado sobre la onda exacta. Cada panel imprime su retraso instantáneo en metros y, en cuanto el paquete cruza la línea de meta de 6,6 metros, el instante del cruce y el déficit de velocidad medido frente a la forma cerrada. Un panel lateral lleva las leyes de error de la velocidad de fase y de la velocidad de grupo con las tres mallas marcadas."
+/>
+
+*Aquí se leen tres cosas. Primera, el retraso crece: es de 0,14 m a los
+2,4 ms y de 1,35 m al final, porque un error de velocidad se acumula con la
+distancia. Segunda, al tubo de malla más gruesa le crece una **cola de
+rizado por detrás** del paquete, no una reflexión por delante: las
+componentes cortas de dentro de la ráfaga son las más lentas, así que llegan
+las últimas. Tercera, los déficits medidos son del 17,2 %, 4,3 % y 1,1 %
+frente al 17,3 %, 4,3 % y 1,1 % de la forma cerrada evaluada sobre el propio
+espectro de la ráfaga, y los paquetes cruzan la línea de meta 3,3, 0,7 y
+0,2 ms después que la onda exacta. Reducir $\Delta x$ a la mitad divide el
+error entre cuatro, en las dos leyes y en la medición.*
 
 La verificación funciona en los dos sentidos: aquí la forma cerrada ancla el
 esquema, y una vez anclado es el esquema el que pone a prueba una forma
@@ -935,7 +975,7 @@ las frecuencias modales analíticas
 $f = (c/2)\sqrt{(n_x/L_x)^2 + (n_y/L_y)^2}$ (Kuttruff 6.ª ed., cap. 3). El
 pico (1,1) cae un 0,05 % por debajo y la cota de arriba predice un 0,04 %,
 pero esa coincidencia hay que leerla con cuidado: con 0,35 s la separación
-de bins bruta es de 2,9 Hz y el relleno de ceros por ocho interpola hasta
+bruta de bins es de 2,9 Hz y el relleno de ceros por ocho interpola hasta
 0,36 Hz, así que el desplazamiento de 0,15 Hz está en el límite de lo que el
 registro puede resolver. Establecer bien el error de dispersión pasa por
 refinar la malla, no por mirar un pico con más ganas.*
@@ -1068,7 +1108,10 @@ eje es alrededor del 1,6 %, reducida a en torno al 1,4 % con el
 $S = \mathrm{cfl}/\sqrt{2} = 0{,}424$, así que el factor $1 - S^2$ vale 0,82), y
 reducir $\Delta x$ a la mitad divide el error entre
 cuatro (el esquema es de segundo orden). Con $\Delta x = 1$ cm el punto de 10
-celdas en aire queda hacia los 3,4 kHz.
+celdas en aire queda hacia los 3,4 kHz. Esa cota es un error de velocidad de
+*fase*; un pulso viaja a la velocidad de grupo y va tres veces más lento
+todavía, el 4,1 % con diez celdas, y lo paga por metro recorrido, que es lo
+que [la sección 6 mide en tres mallas](#dispersion-numerica-y-precision).
 
 ### ¿Qué anchura deben tener el pulso de fuente y la esponja?
 

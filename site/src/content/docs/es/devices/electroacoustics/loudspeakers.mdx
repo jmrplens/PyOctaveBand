@@ -34,6 +34,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 La hoja de características de un altavoz es un paquete de convenciones, e IEC 60268-5
@@ -60,8 +61,9 @@ micrófono tiene [su propia guía](/phonometry/es/devices/electroacoustics/micro
 
 Las cifras de distorsión y de respuesta solo son comparables entre
 dispositivos cuando coinciden las convenciones de *sensibilidad* que hay
-detrás, y la del altavoz es la que hace tropezar: una normalización de potencia
-y distancia con dos trampas independientes en una sola frase del apartado 20.3.
+detrás, y la del altavoz es la que hace tropezar a cualquiera: una normalización
+de potencia y distancia con dos trampas independientes en una sola frase del
+apartado 20.3.
 (La trampa del micrófono es el *valor de referencia*, y tiene
 [su propia sección](/phonometry/es/devices/electroacoustics/microphones/#1-la-sensibilidad-y-sus-referencias-iec-60268-4-apartado-11).)
 
@@ -258,8 +260,8 @@ Cada palabra de «pistón circular rígido en pantalla infinita» es una hipóte
 que un altavoz real incumple, y cada una tiene su fallo conocido. Una caja es
 una pantalla **finita**, así que por debajo de la frecuencia cuya longitud de
 onda supera la anchura de la pantalla la radiación se carga en $4\pi$ en vez de
-en $2\pi$ y la respuesta cae hasta 6 dB — el escalón de la pantalla —, con la
-difracción en los cantos añadiendo unos decibelios de rizado alrededor; nada de
+en $2\pi$ y la respuesta cae hasta 6 dB — el escalón de la pantalla —, y a su
+alrededor la difracción en los cantos añade unos decibelios de rizado; nada de
 eso está en este modelo. Un cono deja de moverse **como una sola pieza** por
 encima de su primer modo de ruptura, típicamente unas cuantas veces la
 frecuencia de $ka = 1$ para un cono de papel, y a partir de ahí la directividad
@@ -269,7 +271,7 @@ respuesta polar lleva lóbulos de interferencia que un solo pistón no puede
 mostrar, y por eso el panel polar de la ficha se declara a una frecuencia. El
 modelo es exacto en el uso que se le da aquí: como impedancia de radiación de
 una superficie rígida pequeña, como directividad en baja frecuencia de un solo
-altavoz sobre una pantalla grande, y como caso de referencia contra el que se
+altavoz sobre una pantalla grande, y como caso de referencia frente al que se
 lee una directividad medida.
 :::
 
@@ -339,8 +341,8 @@ plt.show()
 
 `plot_piston_geometry(radius, angles=..., directivity=..., lobe_label=...)`
 dibuja la misma imagen a partir de un radio pelado, sin ningún
-`RadiatingPistonResult`, que es la forma a la que echar mano cuando se
-dimensiona un cono o se mete la pantalla en una transparencia.
+`RadiatingPistonResult`, que es la forma de la que echar mano cuando se
+dimensiona un cono o se mete la pantalla en una diapositiva.
 
 </details>
 
@@ -386,8 +388,9 @@ aplica. Lo que le importa a quien compra el altavoz es el módulo mínimo, no el
 nominal: una caja de «8 Ω» que baja a 3,2 Ω solo es legal si esa caída queda
 fuera del rango nominal, y un amplificador elegido por la cifra de la placa de
 características puede entrar allí en limitación de corriente. Esa misma regla
-del 80 % es la razón de que las especificaciones nominales de 4 y 8 Ω sobrevivan
-sobre un módulo que varía en un orden de magnitud a lo largo de la banda.
+del 80 % es la razón de que las especificaciones nominales de 4 y 8 Ω se
+sostengan sobre un módulo que varía en un orden de magnitud a lo largo de la
+banda.
 
 El apartado 16.2.2 fija cómo se toma la curva: el altavoz en condiciones
 normales de medición, excitado a tensión constante o a corriente constante — lo
@@ -481,11 +484,11 @@ result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 d
 frecuencia por cada 25 dB, que es lo que hace comparables a ojo dos hojas de
 características. La banda sombreada es la tolerancia $\pm$ que declara quien
 llama (`tolerance_db`, 3 dB aquí) y los marcadores son los bordes del rango
-efectivo del apartado 21.2, leídos contra la línea de $-10$ dB referida a la
+efectivo del apartado 21.2, leídos frente a la línea de $-10$ dB referida a la
 octava de máxima sensibilidad, no a la media de toda la curva.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -514,7 +517,7 @@ La línea del 80 % es el límite de aceptación del apartado 16.1, y el módulo
 mínimo, no el nominal, es la carga que ve realmente el amplificador.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -537,15 +540,15 @@ plt.show()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd_es.svg" alt="Distorsión armónica total del altavoz en porcentaje frente a la frecuencia" width="82%" />
 
-*Se lee contra la respuesta de encima: un pico de distorsión que coincide con un
-pico de respuesta es una resonancia excitada con fuerza, y una subida hacia baja
-frecuencia es el cono quedándose sin excursión. La distorsión se cita a una
-excitación declarada, así que una curva de THD sin su tensión de entrada y sin
-el nivel de presión acústica que produjo a 1 m es ininterpretable (apartado
-24.1.2.7).*
+*Se lee frente a la respuesta de encima: un pico de distorsión que coincide con
+un pico de respuesta es una resonancia excitada con fuerza, y una subida hacia
+baja frecuencia es el cono, que se está quedando sin excursión. La distorsión se
+cita a una excitación declarada, así que una curva de THD sin su tensión de
+entrada y sin el nivel de presión acústica que produjo a 1 m es ininterpretable
+(apartado 24.1.2.7).*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -599,7 +602,7 @@ cuadrado de estas curvas polares. `LoudspeakerDirectivity` acepta o un `index_db
 ya calculado, o los datos polares que necesita la segunda vía.
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -702,6 +705,32 @@ print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
 res.plot()      # la estructura de ganancias frente a la oscilación y el margen
 ```
 
+La pila de barras de abajo es la contabilidad, y es un nivel. Lo que no puede
+enseñar es por qué el umbral está en la unidad y no en cualquier otro sitio,
+porque eso es una afirmación sobre una sucesión: la ráfaga del hablante llega
+al micrófono, sale por el altavoz, vuelve al micrófono reducida por la ganancia
+de lazo y lo vuelve a hacer. Las vueltas sucesivas o menguan, y entonces la
+suma de todas ellas es finita, o no menguan, y entonces no hay suma. Mirar las
+copias es todo el argumento.
+
+<Video
+  name="anim_feedback_howl"
+  width={2400}
+  height={1350}
+  title="Una ráfaga dando vueltas al lazo de refuerzo sonoro, tres veces seguidas"
+  description="Una ráfaga circula por el camino del altavoz al micrófono mientras cada copia que vuelve se dibuja como una línea vertical y se traza el total acumulado de todas las copias hasta ese momento. Con el margen de 10 dB de Long cada copia es 0,316 de la anterior y el total se asienta 3,30 dB por encima del sonido directo; cuatro micrófonos abiertos añaden 6 dB y el mismo lazo tarda muchísimo más en asentarse, 8,69 dB arriba; cuatro decibelios más de ganancia del sistema ponen la ganancia de lazo en la unidad, las copias dejan de menguar y el total sube sin límite."
+/>
+
+*Tres ejecuciones del mismo auditorio, todas salidas de `feedback_stability`
+con $L_{H\text{-}M} = 76$ dB y $L_{H\text{-}L} = 80$ dB. Las ganancias de lazo
+son $-10{,}0$, $-3{,}98$ y $+0{,}02$ dB, así que cada vuelta multiplica a la
+anterior por 0,316, 0,632 y 1,002; las dos primeras sumas convergen a
+$1/(1-g)$ y la tercera no converge en absoluto. Por eso la ganancia antes de
+la realimentación no es un límite de nivel: 6 dB más de amplificador suben
+todas las copias a la vez y no cambian en nada que la serie converja o no,
+mientras que 6 dB más de ganancia **de lazo** son la diferencia entre un
+sistema y un acoplo.*
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/feedback_stability_es.svg" alt="Dos diagramas de barras apilados del mismo caso de auditorio. En el de arriba, con un solo micrófono abierto, la ganancia en lazo abierto de menos 6 dB y la ganancia del lazo de realimentación de menos 4 dB se acumulan hasta una ganancia de lazo total de menos 10 dB, justo sobre el límite de estabilidad discontinuo de 10 dB, con un margen de cero. En el de abajo, cuatro micrófonos abiertos añaden una corrección de más 6 dB y el total sube a menos 4 dB, seis decibelios por encima del límite y por tanto inestable" width="82%" />
 
 *El tipo de altavoz, su número y su potencia no aparecen por ninguna parte de la
@@ -738,10 +767,9 @@ mediciones, no suposiciones. Tómalos en este orden.
    pero el ajuste no puede cambiar entre una y otra.
 2. **Excita con ruido rosa** y lee el nivel en la posición del micrófono con el
    micrófono físicamente en su sitio y su orientación de trabajo: su presencia y
-   hacia dónde apunta forman parte del lazo. Eso es $L_{H\text{-}M}$. Mover la
-   cápsula 0,3 m hacia el altavoz o alejándola de él lo cambia en varios
-   decibelios, y es el arreglo más barato que hay cuando el criterio no se
-   cumple.
+   hacia dónde apunta forman parte del lazo. Eso es $L_{H\text{-}M}$. Acercar o
+   alejar la cápsula 0,3 m del altavoz lo cambia en varios decibelios, y es el
+   arreglo más barato que hay cuando el criterio no se cumple.
 3. **Lee $L_{H\text{-}L}$** con el mismo ajuste, promediado sobre tres a cinco
    butacas representativas.
 4. **Mide $L_{T\text{-}M}$** con un hablante o una boca artificial a la
@@ -777,14 +805,14 @@ Long. El defecto queda recogido en el
 
 ### Parámetros de `feedback_stability()`
 
-| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `open_loop_gain` | float | dB | finito | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; unos -6 dB en un auditorio |
 | `level_loudspeaker_at_microphone` | float | dB | finito | $L_{H\text{-}M}$ |
 | `level_loudspeaker_at_listener` | float | dB | finito | $L_{H\text{-}L}$ |
-| `microphone_directivity` | float | dB | defecto 0 | $D_M(\theta)$, 0 omni, unos -2 cardioide |
-| `open_microphones` | int | — | ≥ 1, defecto 1 | $N_m$ |
-| `stability_margin` | float | dB | ≥ 0, defecto 10 | Margen de Long para sistema ecualizado |
+| `microphone_directivity` | float | dB | por defecto 0 | $D_M(\theta)$, 0 omni, unos -2 cardioide |
+| `open_microphones` | int | — | ≥ 1, por defecto 1 | $N_m$ |
+| `stability_margin` | float | dB | ≥ 0, por defecto 10 | Margen de Long para sistema ecualizado |
 
 Devuelve un `FeedbackStabilityResult` (`open_loop_gain`,
 `feedback_loop_gain`, `nom_correction`, `loop_gain`, `margin`, `headroom`,
@@ -818,12 +846,12 @@ antes de la realimentación del capítulo 18 de *Architectural Acoustics*
 `feedback_loop_gain`, `open_microphone_correction` y
 `plot_sound_reinforcement_geometry`.
 
-**No cubierto.** Ninguna de las condiciones de arriba la comprueban las
-funciones: reducen y presentan las curvas que se les entregan, así que el
+**No cubierto.** Las funciones no comprueban ninguna de las condiciones de
+arriba: reducen y presentan las curvas que se les entregan, así que el
 montaje, la excitación, el enventanado y la condición de campo quedan a cargo
 de quien opera, que además tiene que declararlos junto al resultado. Los
 valores eléctricos y mecánicos que la norma define
-alrededor de la potencia admisible (potencia de ruido nominal, tensiones
+en torno a la potencia admisible (potencia de ruido nominal, tensiones
 máximas de entrada de corta y larga duración, apartado 17) los declara el
 fabricante, no se calculan aquí. La extracción de parámetros de
 Thiele-Small de la curva de impedancia no está implementada: el panel de

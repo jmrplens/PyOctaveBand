@@ -1,6 +1,6 @@
 ---
 title: "Índices globales de aislamiento (ISO 717)"
-description: "Los motores de número único de la acústica de la edificación: los índices de curva de referencia aéreo de ISO 717-1 y de impactos de ISO 717-2 con sus términos de adaptación espectral C, Ctr y CI, las variantes de rango ampliado y con un decimal, y la ficha ISO 717."
+description: "Los motores de número único de la acústica de la edificación: el índice de curva de referencia aéreo de ISO 717-1 y el de impactos de ISO 717-2 con sus términos de adaptación espectral C, Ctr y CI, las variantes de rango ampliado y con un decimal, y la ficha ISO 717."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -27,6 +27,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 Toda magnitud de aislamiento acústico de esta documentación termina su viaje
 igual: entra un espectro por bandas y sale un número único. Sea el espectro
@@ -62,8 +63,8 @@ misma llamada valora $R'$, $D_n$ y $D_{nT}$.
 El espectro por bandas se reduce a un número mediante el **método de la curva
 de referencia** de ISO 717-1: una curva de referencia fija se desplaza en
 pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones
-*desfavorables* (donde la medición cae por debajo de la referencia) es lo más
-grande posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
+*desfavorables* (donde la medición cae por debajo de la referencia) sea lo
+mayor posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
 10,0 dB (5 bandas de octava). Los dos topes son una sola regla, no dos
 constantes: $32{,}0 = 2{,}0 \times 16$ y $10{,}0 = 2{,}0 \times 5$, así que lo
 que el método permite en realidad es **una desviación desfavorable media de
@@ -197,10 +198,33 @@ plt.show()
 
 </details>
 
+Cada figura de un índice de esta página muestra la curva donde se detuvo. La
+regla que la puso ahí es iterativa, y las dos posiciones que deciden la
+respuesta son justo las que una figura terminada ya ha descartado: el último
+desplazamiento cuya suma desfavorable todavía se pasaba de 32,0 dB y el
+desplazamiento siguiente a la respuesta, que es válido pero desaprovecha el
+margen. El clip recorre esos pasos con los dos motores sobre los dos espectros
+resueltos de esta página.
+
+<Video
+  name="anim_iso717_shift"
+  width={2400}
+  height={1350}
+  title="Desplazar la curva de referencia ISO 717 hasta que encaja justo"
+  description="La curva de referencia avanza en pasos de 1 dB hacia el espectro medido mientras las desviaciones desfavorables se sombrean banda a banda y su suma se acerca al tope de 32,0 dB. El motor aéreo se detiene en 31,8 dB para Rw = 30 dB, un paso antes de la posición que desaprovecharía el margen; el motor de impactos ejecuta después la misma regla con el signo de la desviación invertido, con la curva subiendo paso a paso y deteniéndose en 28,0 dB para L'nT,w = 79 dB."
+/>
+
+*Los dos recorridos se detienen donde manda la norma: en la mayor suma
+desfavorable que no pasa de 32,0 dB. El paso anterior se rechaza por pasarse
+del tope, y el siguiente es válido pero lee un decibelio menos sin motivo, que
+es lo que excluye el «lo mayor posible» del apartado 4.4 de
+ISO 717-1:2020 y del 4.3.1 de ISO 717-2:2020.*
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
 *La referencia desplazada se ha detenido donde el área desfavorable sombreada
-suma 31,8 dB: un paso más de 1 dB hacia abajo se pasaría del tope de 32,0 dB.
+suma 31,8 dB: un paso hacia atrás se pasaría del tope, con 44,1 dB, y un paso
+más hacia abajo desaprovecharía el margen, con 20,6 dB.
 El índice se lee después sobre esa curva a 500 Hz, no sobre la medición: el
 espectro medido toca ahí 26,6 dB, y $R_w$ es 30 dB.*
 
@@ -268,21 +292,22 @@ en 5 dB. El término de adaptación espectral $C_I = L_{n,\text{sum}} - 15 - L_{
 usa la suma energética sobre 100–2500 Hz (los primeros 15 tercios, excluyendo
 3150 Hz) o 125–2000 Hz (octavas).
 
-Los $-15$ dB son un desplazamiento de normalización, no física: se eligen para
-que $C_I$ salga **en torno a cero** en un forjado másico con un revestimiento
-eficaz, ligeramente positivo en un forjado de viguetas de madera cuyos picos de
-baja frecuencia dominan, y hasta $-15$ dB en un forjado de hormigón desnudo o
-mal revestido (A.1). Leído así, el $C_I = -11$ dB del ejemplo de más abajo dice
-que el espectro medido es mucho más plano y está mucho más cargado hacia la
-alta frecuencia que la curva de referencia, es decir, una losa desnuda y no un
-forjado con revestimiento, así que el forjado es mejor en las bajas frecuencias
-que excitan las pisadas de lo que sugiere por sí solo $L'_{nT,w} = 79$ dB. El
-corolario es una trampa de diseño: un revestimiento blando actúa donde la curva
-de referencia es más exigente, así que mejora el número único más de lo que
-mejora lo que oye el vecino. La suma sin ponderar sobre la que se construye
-$C_I$ existe precisamente porque se correlaciona mejor con el ruido de pisadas
-ponderado A que la valoración por curva de referencia, y por eso los requisitos
-se escriben a veces sobre $L'_{n,w} + C_I$ en lugar de sobre $L'_{n,w}$.
+Los $-15$ dB son un desplazamiento de normalización, no un hecho físico: se
+eligen para que $C_I$ salga **en torno a cero** en un forjado macizo con un
+revestimiento eficaz, ligeramente positivo en un forjado de viguetas de madera
+cuyos picos de baja frecuencia dominan, y hasta $-15$ dB en un forjado de
+hormigón desnudo o mal revestido (A.1). Leído así, el $C_I = -11$ dB del
+ejemplo de más abajo dice que el espectro medido es mucho más plano y está
+mucho más cargado hacia la alta frecuencia que la curva de referencia, es
+decir, una losa desnuda y no un forjado con revestimiento, así que el forjado
+es mejor en las bajas frecuencias que excitan las pisadas de lo que sugiere por
+sí solo $L'_{nT,w} = 79$ dB. El corolario es una trampa de diseño: un
+revestimiento blando actúa donde la curva de referencia es más exigente, así
+que mejora el número único más de lo que mejora lo que oye el vecino. La suma
+sin ponderar sobre la que se construye $C_I$ existe precisamente porque se
+correlaciona mejor con el ruido de pisadas ponderado A que la valoración por
+curva de referencia, y por eso los requisitos se escriben a veces sobre
+$L'_{n,w} + C_I$ en lugar de sobre $L'_{n,w}$.
 
 Para mediciones ampliadas hasta 50 Hz,
 `weighted_impact_rating_extended` devuelve además el término de rango ampliado
@@ -356,7 +381,7 @@ plt.show()
 
 </details>
 
-Alimentar el espectro estandarizado a `weighted_impact_rating` reproduce los
+Pasar el espectro estandarizado a `weighted_impact_rating` reproduce los
 valores del Anexo C de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$;
 octavas 54, $C_I = 0$).
 
@@ -455,11 +480,11 @@ plt.show()
 
 ## Informe de ISO 717 (`.report()`)
 
-Ambos resultados de valoración generan en PDF una ficha de una sola página con
-el formato de un informe de ensayo de laboratorio acreditado mediante el método
-`report(path)`: la línea de base normativa (norma de medición más la parte de
-valoración de ISO 717), un bloque de encabezado de metadatos opcional, la
-tabla de tercios de octava junto a la gráfica de la curva medida frente a la
+Ambos resultados de valoración generan, mediante el método `report(path)`, una
+ficha en PDF de una sola página con el formato de un informe de ensayo de
+laboratorio acreditado: la línea de base normativa (norma de medición más la
+parte de valoración de ISO 717), un bloque de encabezado de metadatos opcional,
+la tabla de tercios de octava junto a la gráfica de la curva medida frente a la
 referencia desplazada (el propio `.plot()` del resultado), el número único en
 un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 `WeightedRatingResult.report()` etiqueta la ficha aérea de ISO 717-1
@@ -469,7 +494,8 @@ un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 una utilidad que valora el $R(f)$ predicho y escribe su ficha en una sola
 llamada; ese resultado sale de los modelos de panel EN 12354 de
 [Aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
-así que es el único punto de entrada de aquí cuya entrada nunca se midió.
+así que es el único punto de entrada de aquí cuyo espectro de partida nunca se
+midió.
 
 Los metadatos del informe se pasan como una dataclase congelada `ReportMetadata`
 (todos los campos opcionales; solo se representan los suministrados y los campos
