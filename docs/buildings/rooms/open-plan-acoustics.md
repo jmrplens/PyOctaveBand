@@ -335,7 +335,8 @@ absorption or where in the room a given table sits.
 
 - International Organization for Standardization. (2012). *Acoustics —
   Measurement of room acoustic parameters — Part 3: Open plan offices*
-  (ISO 3382-3:2012).
+  (ISO 3382-3:2012; since revised as
+  [ISO 3382-3:2022](https://www.iso.org/standard/77437.html)).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan speech-privacy quantities this page implements.
 - Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
@@ -347,7 +348,11 @@ absorption or where in the room a given table sits.
 ISO 3382-3:2012 (open-plan office speech metrics: the spatial decay rate
 $D_{2,S}$, the A-weighted speech level at 4 m, and the distraction and
 privacy distances from STI). Validated against the standard's own quantity
-definitions in the [conformance report](../../CONFORMANCE.md).
+definitions in the [conformance report](../../CONFORMANCE.md). The
+implemented edition is frozen at ISO 3382-3:2012; the superseding
+ISO 3382-3:2022 revision removes the privacy distance $r_P$, adds the
+comfort distance $r_C$ and moves the per-position STI to the indirect
+IEC 60268-16 method, and is not the one checked here.
 
 ## See also
 

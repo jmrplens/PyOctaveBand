@@ -416,7 +416,8 @@ usage.
   validity section.
 - International Organization for Standardization. (2012). *Acoustics —
   Measurement of room acoustic parameters — Part 3: Open plan offices*
-  (ISO 3382-3:2012).
+  (ISO 3382-3:2012; since revised as
+  [ISO 3382-3:2022](https://www.iso.org/standard/77437.html)).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan spatial decay and the distraction and privacy distances.
 - International Organization for Standardization. (2014). *Acoustics — Field

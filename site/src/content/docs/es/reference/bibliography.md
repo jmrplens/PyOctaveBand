@@ -526,7 +526,8 @@ se reparte la absorción, que es justo donde discrepan los cinco.
   Citado por [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/).
 - International Organization for Standardization. (2012). *Acoustics —
   Measurement of room acoustic parameters — Part 3: Open plan offices*
-  (ISO 3382-3:2012).
+  (ISO 3382-3:2012; revisada después como
+  [ISO 3382-3:2022](https://www.iso.org/standard/77437.html)).
   [Catálogo iso.org](https://www.iso.org/standard/46520.html).
   Las magnitudes de privacidad del habla en oficinas diáfanas.
   Citado por [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/).
