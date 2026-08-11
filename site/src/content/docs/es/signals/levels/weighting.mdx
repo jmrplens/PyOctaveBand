@@ -373,8 +373,11 @@ plt.show()
 </details>
 
 - `high_accuracy=False` restaura el comportamiento bilineal clásico.
-- Con `'G'` el indicador se ignora en silencio: su rango de 0,25–315 Hz ya es
-  exacto con el diseño simple.
+- Con `'G'` el indicador funciona como en las demás: el diseño por defecto se
+  sobremuestrea hacia 48 kHz, que es lo que mantiene exactas las tasas de
+  infrasonido; `high_accuracy=False` ejecuta el diseño simple a la tasa de
+  entrada, que cuesta en torno a un decibelio en 315 Hz a fs = 2000 y nada en
+  la referencia de 10 Hz.
 - El **procesado por bloques (stateful)** usa siempre el diseño clásico: el
   remuestreo FIR interno es incompatible con la continuidad entre bloques. Pasar
   `high_accuracy=True` junto con `stateful=True` lanza un `ValueError`.

@@ -362,8 +362,10 @@ plt.show()
 </details>
 
 - `high_accuracy=False` restores the legacy plain-bilinear behavior.
-- For `'G'` the flag is silently ignored: its 0.25–315 Hz range is already
-  exact with the plain design.
+- For `'G'` the flag works like the others': the default design is
+  oversampled toward 48 kHz, which is what keeps infrasound rates accurate;
+  `high_accuracy=False` runs the plain design at the input rate, costing about
+  a decibel at 315 Hz at fs = 2000 and nothing at the 10 Hz reference.
 - **Stateful (block) processing** always uses the legacy design: the internal
   FIR resampling is incompatible with block continuity. Passing
   `high_accuracy=True` together with `stateful=True` raises a `ValueError`.

@@ -181,7 +181,15 @@ class WeightingFilter:
             # infrasound recordings, however, 315 Hz approaches Nyquist and
             # the warping grows quadratically; oversample the design toward
             # 48 kHz so the response stays within ~0.05 dB regardless of fs.
-            self._oversample = min(8, max(1, math.ceil(48000 / self.fs)))
+            # Guarded like AU's target doubling below: only the high-accuracy
+            # path resamples around the filter, so only it may design above
+            # the input rate. Stateful mode filters block by block at self.fs,
+            # and an SOS designed for a higher rate applied at the input rate
+            # read -36 dB at G's own 10 Hz reference at fs = 2000. Stateful
+            # therefore runs the plain design at the input rate, which is
+            # what its documentation always said it did.
+            if self.high_accuracy:
+                self._oversample = min(8, max(1, math.ceil(48000 / self.fs)))
         elif self.curve in ("A", "AU"):
             f2 = 107.65265
             f3 = 737.86223
