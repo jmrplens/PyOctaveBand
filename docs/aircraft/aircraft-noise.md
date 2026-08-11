@@ -238,6 +238,15 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).
 
+The adjustment those attenuations feed — Appendix 2 §8, which transports a
+measured EPNL to the reference day and the reference flight path — is not
+implemented, in either its simplified or its integrated form:
+`air_attenuation` and `sae_band_attenuation` are exactly the test-day and
+reference-day coefficients of its first terms, but the flight-path geometry
+and the four $\Delta$ terms are left to the reader. The EPNL of section 3 is
+therefore the as-measured, test-day value; adjust it first, and only then
+report it against a certification limit.
+
 The certification chain ends here. Turning these aeroplanes into noise
 around an airport, the noise-power-distance tables, the per-segment
 corrections of a flight path and the ground contour of a single event, is

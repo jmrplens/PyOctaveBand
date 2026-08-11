@@ -240,4 +240,5 @@ standard's own Annex I worked examples: the whirlpool bath of I.2
 (Tables I.8/I.9: source conversion, all four transmission paths, the
 Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of
 the printed one-decimal intermediates. $D_{sa}$ and $R_{ij,\mathrm{ref}}$ are inputs (from
-measurement / EN 12354-1 / Annexes D and F).
+measurement / EN 12354-1 / Annexes D and F). Only the 2009 edition is
+implemented, not the EN 12354-5:2023 revision.

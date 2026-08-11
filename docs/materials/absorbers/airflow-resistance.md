@@ -219,7 +219,8 @@ $$
 that is, a specific flow resistance of one to four times the characteristic
 impedance of air ($\rho_0 c_0 \approx 410$ Pa·s/m). A 50 mm blanket therefore
 wants a resistivity of roughly 8 kPa·s/m² to 33 kPa·s/m², which is exactly
-where commercial absorber products cluster.
+where commercial absorber products cluster. The window is absorber-design
+practice from the literature, not a requirement of either part of ISO 9053.
 
 Typical orders of magnitude, for orientation rather than design: glass wools
 run from a few kPa·s/m² in light thermal grades to some tens of kPa·s/m² in

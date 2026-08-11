@@ -152,6 +152,14 @@ carry its own boundary condition:
   implicitly, with the normal-incidence reflection coefficient
   $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ is anechoic.
 
+Two limits of that machinery are worth naming. Interior geometry is rigid by
+construction: only the four domain sides accept an impedance or a sponge, so
+an interior surface can be softened only by backing it with a lossy `damping`
+region — and that region is a frequency-independent equivalent fluid rather
+than a porous model. And the governing equations assume a non-moving medium:
+wind or flow advection is not modelled, and the only impedance boundary is
+the frequency-independent real one of Eqs. 4.33-4.35.
+
 The stepping engine `FDTD2D` is public too: it exposes `step()`, `run()`,
 the field arrays and the energy, for callers that need frame-by-frame access
 (the documentation animations use it directly). A plane pulse launched down

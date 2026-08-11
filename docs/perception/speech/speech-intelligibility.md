@@ -304,7 +304,9 @@ the first argument to `speech_intelligibility_index`.
 The standard's own title is plural, and so is the standard: ANSI S3.5-1997
 defines **four** band procedures. They differ only in the band table and in how
 the upward spread of masking is expressed, and `method=` selects one. The
-default is the one-third-octave procedure used above.
+default is the one-third-octave procedure used above. No resampling between
+the four band sets is provided: each procedure expects its speech, noise and
+threshold spectra sampled on its own bands.
 
 | `method=` | Bands | Range | Constants | Spread of masking |
 | :--- | ---: | :--- | :--- | :--- |

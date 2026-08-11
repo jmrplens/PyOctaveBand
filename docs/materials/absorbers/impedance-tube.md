@@ -98,7 +98,13 @@ $f\,s < 0.40\,c$ (6.5.4) and a laxer low end at 1 % of the wavelength
 `wave_decomposition` or the `transfer_matrix_*` solvers turns the matching
 check into an advisory warning, and for the Annex A attenuation estimate of a
 rectangular tube `hydraulic_diameter(width, height)` supplies the $4A/P$
-diameter that `tube_attenuation_constant` expects.
+diameter that `tube_attenuation_constant` expects. That function implements
+only the Eq. (A.18) estimate, which the standard itself calls a lower limit;
+the measured determination of Eqs. (A.13)/(A.14) from the empty tube is not
+implemented. The frequency-range check is also the only condition the library
+verifies: the near-field distances of Clause 4.3, the position tolerances of
+Clause 4.5, the signal-to-noise floor of Clause 7.3 and the warm-up of
+Clause 5 are the operator's, and nothing here checks that any of them was met.
 
 The whole tube, sample included, can also be simulated: section 5 runs this
 exact measurement virtually inside the FDTD solver and recovers the analytic
@@ -207,7 +213,9 @@ Two practical cautions from the standard's own text. The minima far from the
 sample are shallower than the theory above says, because the travelling waves
 decay along the tube (viscous and thermal losses at the wall); ISO 10534-1
 has the operator read the minimum **nearest** the sample and, for precision
-work, extrapolate the minimum levels to the sample face. And the method
+work, extrapolate the minimum levels to the sample face — that extrapolation,
+like the standard's probe-body corrections, stays with the operator: the
+closed forms here consume the levels as read. And the method
 leans on the purity of the tone: any harmonic distortion from a hard-driven
 loudspeaker puts energy at frequencies whose minima sit elsewhere, partially
 filling the notch being measured, so the analyser must be narrowband around

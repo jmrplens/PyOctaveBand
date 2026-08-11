@@ -230,6 +230,12 @@ The impedance modulus (with the 80 %-of-rated line), the total-harmonic-distorti
 curve and the directivity feed the secondary panels, reusing the radiating
 piston directivity of section 2 and a
 [swept-sine THD](swept-sine-distortion.md) result for the distortion curve.
+None of the standard's measuring conditions is checked here: the functions
+reduce and report the curves they are handed, so the mounting, the
+excitation, the gate and the field condition are the operator's to keep and
+to state with the result. Thiele-Small parameter extraction from the
+impedance curve is not implemented either: the impedance panel reports the
+measured modulus against the rated-impedance lines.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report

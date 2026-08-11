@@ -83,7 +83,9 @@ derived from the same equivalent noise level, and the overload sound
 pressure level (clause 15.2) bounds the usable range from above. The
 BS.468 weighting curve itself is exposed as `itu_r_468_weighting` in the
 [electroacoustics distortion set](electroacoustics.md), where it also
-weights THD.
+weights THD. The quasi-peak detector itself is not implemented: an
+inherent-noise level computed from `itu_r_468_weighting` and an r.m.s. sum
+is not a dBqps figure.
 
 ## 4. Microphone characteristics report (IEC 60268-4)
 
@@ -161,7 +163,12 @@ proportion (one frequency decade equal to 25 dB), and the directional pattern
 on the IEC 60263 25 dB reference circle; the inherent-noise spectrum and the
 distortion-against-level curve (with the THD limit and the overload level
 marked) feed the secondary panels. A `requirement` in the metadata is checked
-as a maximum permitted equivalent noise level.
+as a maximum permitted equivalent noise level. What the fiche cannot supply
+is the laboratory behind the numbers: the anechoic room and its
+qualification, the reference microphone and its calibration certificate, the
+high-level source that produces a 140 dB field and the turntable are what
+the reported numbers mean, and the acquisition itself is not implemented
+here — the functions reduce the curves they are handed.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report

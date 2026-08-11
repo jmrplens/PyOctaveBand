@@ -208,7 +208,11 @@ are most alike, at the low-frequency end.
 
 A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
-still returns.
+still returns. That advisory pair is the only check made: the rest of the
+Clause 6 / Annex A room qualification — the room-shape rule, the ceiling on the
+empty room's absorption area $A_1$, the diffusivity qualification and the
+microphone and loudspeaker counts — is the laboratory's to verify, and nothing
+here checks any of it.
 
 ### `absorption_area()` / `absorption_coefficient()` parameters
 
@@ -466,7 +470,9 @@ $\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
 **Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
 standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
 single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
-($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$).
+($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$). That uncertainty
+formula is all this page takes from EN 1793-1: the standard's own in-situ
+measurement method for road-traffic noise-reducing devices is not implemented.
 
 **Reporting (Clause 8).** The expanded uncertainty is $U = k\,u$ (Formula (10))
 with the Table 3 coverage factor $k$ ($k = 2.0$ at 95 %, Gaussian). The reported

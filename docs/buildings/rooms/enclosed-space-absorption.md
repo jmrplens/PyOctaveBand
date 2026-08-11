@@ -161,8 +161,10 @@ surface pairs whose coefficients differ by less than a factor of 3 (unless
 scattering objects are present) and an object fraction below 0.2. Outside
 those limits the field is not diffuse and the model errs on the optimistic
 side: the standard's own accuracy clause records measured reverberation
-times up to twice the prediction in low-diffusivity rooms. The classical
-alternatives for those cases live in
+times up to twice the prediction in low-diffusivity rooms. The standard's own
+scope goes further: very large or irregularly shaped spaces — concert halls,
+theatres, factories — are excluded from the model itself, not just from this
+implementation. The classical alternatives for those cases live in
 [Reverberation-time prediction](reverberation-prediction.md).
 
 ## 4. Enclosed-space report (`.report()`)

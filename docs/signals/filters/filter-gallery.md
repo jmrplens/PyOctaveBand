@@ -4,11 +4,15 @@
 
 Choosing a filter architecture is a trade-off: selectivity, passband ripple
 and phase behaviour cannot all be optimal at once, and each of the five
-architectures phonometry offers resolves the trade-off differently. Because
-every one of them places its **−3 dB points on the ANSI S1.11 band edges**,
-the choice changes how a band rejects its neighbours and how it treats
-transients, not where the band sits. This page puts the architectures side
-by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
+architectures phonometry offers resolves the trade-off differently. Three of
+them — Butterworth, Chebyshev II and Bessel — place their **−3 dB points on
+the ANSI S1.11 band edges**, so for those three the choice changes how a band
+rejects its neighbours and how it treats transients, not where the band sits.
+The two equiripple designs are the exception: `cheby1` and `ellip` treat the
+band edges as their ripple edge, so their bands are effectively wider and
+every band level reads a few tenths of a decibel high (the size of the bias
+is measured in [Filter Banks](filter-banks.md)). This page puts the
+architectures side by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
 response gallery, usage examples per architecture, and the Linkwitz-Riley
 crossover for when the goal is splitting a signal rather than measuring
 bands.
@@ -62,6 +66,14 @@ plt.show()
 | `cheby2` | **Chebyshev II** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby2'))` | Flat passband with stopband zeros. |
 | `ellip` | **Elliptic** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Maximum selectivity. |
 | `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preserving transient waveform shapes. |
+
+One constraint comes before any preference in that table: with the default
+parameters (order 6, 48 kHz), **three of the five cannot be used for a
+standards-compliant band measurement at all**. Only Butterworth and
+Chebyshev II reach IEC 61260-1 class 1 — the equiripple pair fails because
+its band edges are not its −3 dB points, and Bessel because it rolls off too
+slowly for the mask. See
+[Filter class verification](filter-compliance.md) for the per-band margins.
 
 ## 2. Gallery of Filter Bank Responses
 
@@ -173,7 +185,12 @@ Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
 stopband. It provides faster roll-off than Butterworth without affecting the
 signal in the passband. The stopband edges are placed automatically so that the
 −3 dB points land on the band edges (`attenuation` must be
-$> 3.01\ \text{dB}$).
+$> 3.01\ \text{dB}$ for a −3 dB point to exist at all; below that the design
+raises `ValueError`). Note that the default of 72 dB is set by conformance and
+not by realizability: SciPy pins the equiripple floor at exactly `attenuation`,
+and IEC 61260-1 class 1 demands 70 dB far from the band, so an `attenuation`
+of, say, 6 dB is arithmetically legal and silently loses the class — see
+[Filter class verification](filter-compliance.md).
 
 ```python
 import numpy as np
@@ -276,10 +293,16 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 ### 6. Linkwitz-Riley (`linkwitz_riley`)
 
-Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically
-4th order, but any even order is supported) allow splitting a signal into bands
-that, when summed, result in a perfectly flat magnitude response and zero phase
-difference between bands at the crossover.
+Specifically designed for **audio crossovers**: it does not build an IEC band,
+it splits one signal into two branches that recombine flat. Each branch is a
+Butterworth of order `order/2` applied twice, so each is exactly **−6 dB at
+the crossover frequency** (not −3 dB as in the bands above): the branches add
+to unity in *amplitude*, not in power. Which recombination is flat depends on
+the parity of `order/2` — `low + high` when it is even (orders 4, 8), but at
+orders 2 and 6 the branches are in antiphase at the crossover and the naive
+sum collapses into a deep notch there; the flat recombination is then
+`low - high`. Even in the flat cases the sum is **all-pass**, not phase-free:
+its magnitude is flat while its phase turns a full 360° through the crossover.
 
 ```python
 import numpy as np
@@ -290,8 +313,10 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Split the recording into Low and High bands at 1000 Hz
-low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Recombined, low + high has a flat magnitude response (allpass sum)
+order = 4
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
+# Flat recombination: sum for order/2 even, difference for order/2 odd
+recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -338,8 +363,12 @@ roll-off at the cost of passband ripple; Chebyshev II keeps the passband
 flat and puts the ripple in the stopband instead; Elliptic offers maximum
 selectivity, with ripple in both bands; and Bessel preserves transient
 waveform shapes thanks to its linear phase response, but has the slowest
-roll-off. Linkwitz-Riley is for audio crossovers: its bands sum to a
-perfectly flat response.
+roll-off. Note that Chebyshev I and Elliptic take the band edges as their
+*ripple* edge rather than their −3 dB point, so their band levels sit a few
+tenths of a decibel above the other three and must not be mixed with them in
+one spectrum. Linkwitz-Riley is for audio crossovers: its two branches
+recombine flat by `low + high` when `order/2` is even and by `low - high`
+when it is odd.
 
 ## See also
 

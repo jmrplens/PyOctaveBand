@@ -218,6 +218,12 @@ two cascaded temporal integrators: the fast **short-term loudness** $S'(t)$
 and the slower **long-term loudness** $S''(t)$. The peak long-term loudness
 $N_\text{max}$ predicts the loudness of sounds up to about 5 s.
 
+One documented deviation: Clause 5 prescribes resampling the input to 32 kHz
+before the running FFT analysis, and this implementation processes at the
+native sampling rate instead. The difference stays inside the standard's
+expanded uncertainty; resample to 32 kHz first if strict clause-by-clause
+conformance matters.
+
 ```python
 import numpy as np
 from phonometry import psychoacoustics
@@ -287,7 +293,9 @@ nonlinearity, Formula 23) that is **shared** by its loudness, tonality and
 roughness metrics. The loudness $N$ is reported in **sone_HMS**, and the same
 1 kHz/40 dB anchor calibrates the front-end (our clean-room value 0.984,
 with the full Clause 6.2.3 band averaging; the residual's origin is
-documented in the module docstring).
+documented in the module docstring). `loudness_ecma` is monaural: the
+binaural combination of Formula 118 (Clause 8.1.5) is not implemented, so
+analyse each ear channel separately.
 
 ```python
 import numpy as np

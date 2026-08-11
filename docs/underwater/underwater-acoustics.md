@@ -110,6 +110,10 @@ reported separately, because a real ship does not radiate symmetrically
 period and the ISO 3744-style correction applied per band; the recommended
 wind limit is 20 kn for ships above 100 m (Clause 5.3). Skip any of this and
 the number you quote is a level, but not an ISO 17208 radiated noise level.
+None of that discipline is implemented in code: the library supplies the
+closed-form `radiated_noise_level` and `monopole_source_level`, and the runs,
+the Formulae 8-9 averaging, the geometry checks, the ±30° window scoring and
+the per-band application of the background correction are the reader's.
 
 All of that discipline fits in one picture: the transit geometry in section
 and the data window in plan.
@@ -175,6 +179,13 @@ in exactly the quantities of this section, a cap on the single-strike or
 cumulative SEL and on the peak level at a stated range, which is why
 `pile_strike_metrics` reports them together and `cumulative_sel` follows the
 strike-by-strike energy sum of Formulae 8–9.
+
+The survey discipline itself — deployment, instrumentation, calibration and
+reporting — is described here and enforced nowhere in code: nothing checks
+that a strike handed to `pile_strike_metrics` came from a record that meets
+it. And because vibro- and sheet-piling sit outside the ISO 18406 scope,
+continuous pile-driving noise has no closed form here or anywhere else in
+phonometry.
 
 ## See also
 

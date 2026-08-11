@@ -78,6 +78,12 @@ $\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
 worked numeric example, conformance is anchored on closed-form identities
 (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
 
+Those checks are the only enforcement there is. The acquisition itself —
+shielding the other elements, a shield meeting $\Delta R_\text{min}$, the
+position counts and separations, the accelerometer mass-loading inequality,
+$T_s$ measured on the elements in their installed state rather than assumed —
+is the operator's responsibility, and nothing here checks any of it.
+
 ```python
 import numpy as np
 from phonometry import building
@@ -383,9 +389,13 @@ ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
 which cover the laboratory measurement of flanking transmission: the
 vibration reduction index $K_{ij}$, the equivalent absorption length, the
 normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
-validity checks that feed the EN 12354 prediction. Because ISO 10848
-contains no worked numeric example, conformance is anchored on closed-form
-identities (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+validity checks that feed the EN 12354 prediction. Parts 2, 3 and 4 differ in
+which junction and specimen types they apply to; phonometry implements only
+the Part 1 formulae generically, plus the Part 4 modal-overlap validity
+check, not the facility-specific test setups the other parts describe.
+Because ISO 10848 contains no worked numeric example, conformance is
+anchored on closed-form identities (simplified $K_{ij}$, $a_j$ at
+$f_\text{ref}$, $\eta$).
 
 
 The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
@@ -397,7 +407,8 @@ it is anchored on its closed forms and on structural properties a wrong
 reading breaks: monotonicity in the plenum damping, the bound
 $\tau_{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
 $D_{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
-laboratory reports.
+laboratory reports. The plenum propagation constant $k'$ of a lined duct is an
+input here, not a prediction.
 
 ## See also
 

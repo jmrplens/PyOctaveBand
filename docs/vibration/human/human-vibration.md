@@ -15,7 +15,9 @@ The weightings themselves are defined once, in **ISO 8041-1:2017**, as a cascade
 of analog filters; **ISO 2631-1** applies them to whole-body vibration,
 **ISO 2631-2** to vibration in buildings, **ISO 2631-4** to rail ride comfort,
 and **ISO 5349-1/-2** to hand-transmitted vibration. This page covers the whole
-chain.
+chain. Only the weighting definitions are taken from ISO 8041-1: its own
+subject, the design and type-testing of general purpose vibration meters, is
+not implemented.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Whole-body vibration measurement chain: a triaxial accelerometer at the seat/body interface of a seated person measures the x, y and z acceleration; each axis is band-limited and frequency-weighted (Wk vertical, Wd horizontal) per ISO 8041-1, reduced to a weighted r.m.s. a_w and VDV per ISO 2631-1, and the highest frequency-weighted axis value max(1.4 a_wx, 1.4 a_wy, a_wz) is normalised to the daily exposure A(8) and assessed against the EAV and ELV of Directive 2002/44/EC" width="94%"></picture>
 

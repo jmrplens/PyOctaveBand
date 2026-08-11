@@ -179,9 +179,10 @@ $d_n = s_n \lambda_0/(2N)$ and hence the target reflection phases
 $\varphi_n = -2 k d_n$ at the evaluation frequency. Second, tune each slit
 (its height, and the neck and cavity of its resonators) until the chain
 reproduces that phase from the fixed panel depth $L$. The per-well reflection
-returned by `metadiffuser_reflection` is the quantity to match; for the
-published design at 2 kHz the five slits land within a few degrees of the QRD
-targets while keeping $|R_n|$ near one:
+returned by `metadiffuser_reflection` is the quantity to match — the inverse
+problem is not automated, so the matching is done by evaluating candidate
+geometries; for the published design at 2 kHz the five slits land within a
+few degrees of the QRD targets while keeping $|R_n|$ near one:
 
 ```python
 import numpy as np
@@ -225,6 +226,11 @@ The reduction to a graded coefficient is then identical to the classical
 workflow: `metadiffuser_polar_response` for one frequency,
 `metadiffuser_diffusion_spectrum` for the band-by-band normalised coefficient,
 both against the same-footprint flat reference of ISO 17497-2 Formula (7).
+The model is locally reacting — wells do not couple internally — and the
+reduction inherits the Fraunhofer limits of the
+[classical page](diffusers.md): accuracy falls at low frequency, at grazing
+angles and where edge diffraction matters, so the chain grades candidate
+designs rather than replacing an ISO 17497-2 measurement.
 
 ## See also
 

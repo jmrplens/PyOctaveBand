@@ -3,8 +3,11 @@
 # Filter Banks
 
 phonometry supports several filter types, each with its own transfer function
-characteristic. All banks place their **−3 dB points on the ANSI S1.11 band
-edges**, so band levels are comparable across architectures.
+characteristic. Butterworth, Chebyshev II and Bessel place their **−3 dB points
+on the ANSI S1.11 band edges**, so their band levels are directly comparable.
+The two equiripple designs (Chebyshev I, Elliptic) do not: they take those
+edges as the *ripple* edge instead, which widens the band and biases every band
+level by a fixed few tenths of a decibel — see section 1.
 
 ## 1. Fractional octave bands: the math
 
@@ -19,10 +22,20 @@ $$
 
 so every 1/3-octave band spans $G^{1/3} \approx 1.2589 \approx 10^{1/10}$:
 ten bands per decade, which is why the nominal frequencies (25, 31.5, 40 …)
-repeat scaled by 10. phonometry designs each band as an SOS cascade whose
-−3 dB points land exactly on $f_1$ and $f_2$ for every architecture; for
-Chebyshev II, Elliptic and Bessel that requires pre-warping the analytic
-band-edge mapping rather than trusting SciPy's default parametrization.
+repeat scaled by 10. phonometry designs each band as an SOS cascade on those
+edges, but only three of the five architectures put their −3 dB points on
+$f_1$ and $f_2$. Butterworth's SciPy design frequency *is* its −3 dB point;
+Chebyshev II is designed through its stopband edges, mapped back from the band
+edges analytically, and Bessel is normalized with `norm="mag"` — both
+corrections exist so that their −3 dB points land on the edges too. Chebyshev I
+and Elliptic are handed the band edges directly, and SciPy reads them as the
+*equiripple passband* edge: at the default `ripple=0.1` the response there is
+−0.10 dB rather than −3 dB, the band is effectively wider, and every band
+level carries a systematic offset — median +0.33 dB (`cheby1`) and +0.25 dB
+(`ellip`) against Butterworth over a one-third-octave bank analysing 20 s of
+white noise. That offset is a *bias*, not scatter: it does not shrink with
+averaging time and it moves every band at once, so choose one architecture per
+campaign and never mix architectures inside one spectrum.
 
 ### Poles, zeros and stability
 
@@ -79,6 +92,22 @@ capture chain delivered:
   `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
+### How long must the record be?
+
+A band level is not read off a signal, it is *estimated* from it, and the
+narrower the band the longer that takes. The bandwidth of a $1/b$-octave band
+is $B = f_m\,(G^{1/2b} - G^{-1/2b})$ — $0.231\,f_m$ for one-third octaves —
+and two consequences follow. The filter has to **settle**: a band rings for a
+few times $1/B$, so that much of the front of the record is transient rather
+than level (about a second in the 12.5 Hz band, twelve milliseconds at 1 kHz).
+And the estimate carries a **random error** of about $4.34/\sqrt{BT}$ dB on
+noise-like sound, so a 0.4 dB standard deviation needs $BT = 100$: 35 s of
+record for the 12.5 Hz band, 3.5 s for 125 Hz, 0.4 s for 1 kHz. The rule is
+one line: the lowest band you intend to report sets the record length for the
+whole bank. Analysing a 1 s clip down to 12.5 Hz and reporting the result to
+one decimal is not a measurement of that band, and neither `octave_filter` nor
+`OctaveFilterBank` warns you.
+
 The band mathematics above is shared by every architecture. How the
 architectures actually differ, the comparison at the −3 dB crossover, the
 full 1/1 and 1/3 octave response gallery and the usage examples per
@@ -104,7 +133,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `design.resample` | bool | — | default `True` | Filter each band on a decimated rate (multirate) |
 | `response_plot.show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
-| `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
+| `mode` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
 | `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
 | `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
 | `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
@@ -112,6 +141,15 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline) |
 | `block_processing.stateful` / `.steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](block-processing.md) |
+
+`mode` has exactly two values. `'rms'` reports the energy-mean level of the
+band over the whole record, which is what every standard means by "band level".
+`'peak'` reports $20\log_{10}$ of the largest absolute sample inside the band:
+an instantaneous, band-limited, unweighted peak — not the C-weighted
+$L_{C\text{peak}}$ of the [Levels](../levels/levels.md) guide — and on
+impulsive signals it is dominated by the filter's own ringing. There is no
+`'sum'` mode: a total across bands is an energy sum the caller performs,
+`10*np.log10(np.sum(10**(spl/10)))`, never an arithmetic mean of decibels.
 
 `verify_filter_class(bank)` checks the designed bank against the IEC 61260-1
 Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
@@ -302,9 +340,12 @@ plt.show()
 
 ## 5. Zero-phase filtering
 
-For offline analysis you can eliminate group delay entirely: `zero_phase=True`
-filters each band forward-backward (`scipy.signal.sosfiltfilt`), keeping band
-signals time-aligned with the input. The effective attenuation doubles and the
+For offline analysis you can eliminate group delay entirely:
+`OctaveFilterBank.filter(…, zero_phase=True)` filters each band
+forward-backward (`scipy.signal.sosfiltfilt`), keeping band signals
+time-aligned with the input. It is a per-call option on the bank, not an
+argument of the one-shot `octave_filter()`, which rejects it with a
+`TypeError`. The effective attenuation doubles and the
 effective passband narrows, lowering the measured broadband band level by
 ~0.2 to 0.3 dB per band (a pure in-band tone is unaffected); prefer forward
 filtering when the absolute band SPL must match single-pass conventions, and

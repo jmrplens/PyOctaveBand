@@ -75,6 +75,17 @@ curve = aircraft.npd_curve(powers, distances, levels, power=20000.0)
 curve.plot()   # NPD curve with the tabulated nodes (needs matplotlib)
 ```
 
+The tables may be used as tabulated while the aerodrome's average conditions
+stay inside the Doc 29 §2.5 envelope: air temperature below 30 °C, the product
+of temperature (°C) and relative humidity (%) above 500, and wind below 8 m/s.
+Outside it the *tables themselves* have to be converted by the Appendix D
+procedure, which this chain does not implement — `impedance_adjustment` takes
+only temperature and pressure, and no humidity argument enters the chain
+anywhere. One restriction runs under all of it: the SAE AIR 5662 lateral
+attenuation, and with it the whole single-event chain that uses it, is derived
+for acoustically soft, grassy ground, so a contour drawn over water, an apron
+or dense hard surfaces is outside the method as published.
+
 ## 2. The single-event calculation
 
 The full ECAC Doc 29 single-event calculation places a flight path's noise at a

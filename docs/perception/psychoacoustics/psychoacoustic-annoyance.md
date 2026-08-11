@@ -262,7 +262,13 @@ accumulates more of it than the single closed form allows.
 > `[0.40, 0.79, 1.09, 1.05, 0.17, 0.09]` vacil against the literature
 > `[0.39, 0.84, 1.25, 1.30, 0.36, 0.06]`
 > (Pearson $r = 0.98$, correct 4 Hz peak, within ~2.1×). FM-tone accuracy is
-> explicitly not pursued. For **AM broadband noise** the signal model overshoots
+> explicitly not pursued; only AM stimuli are validated. The front-end also
+> departs from the paper's exact framing (the paper's 2 s frames with 90 %
+> overlap and absolute-threshold screening become 50 % overlap, a Hann window
+> and relative floors here), so perfectly steady signals do not read exactly
+> zero: a steady 1 kHz tone comes out near 0.09 vacil and steady broadband
+> noise a few tenths of a vacil, partly the physical level fluctuation of the
+> noise itself. For **AM broadband noise** the signal model overshoots
 > the absolute level (it spreads the modulated energy across bands); quote the
 > closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.
 

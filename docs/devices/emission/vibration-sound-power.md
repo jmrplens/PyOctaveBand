@@ -150,6 +150,17 @@ into $N$ equal cells and puts one accelerometer at the centre of each. The
 area table gives the initial $N$; a strongly non-uniform vibration field can
 call for more positions or a redistribution.
 
+What is implemented is the calculation, not the laboratory practice: the
+measurement clauses of both parts (instrumentation, source installation,
+environmental conditions — clauses 5 to 7), their measurement-uncertainty
+clauses and the informative annexes are not code, so the position counts and
+the Table 2 ladder are rules the reader keeps, not checks the functions run.
+Part 2's clause 8 also defines the radiation factor of a machine batch or
+family, averaging $\varepsilon_j$ over several machines with its standard
+deviation (Formulae 9 and 10); only the single-machine Formula 8 is
+implemented, so pass an already-averaged $\varepsilon$ for a family
+determination.
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
 
 ## 3. When the radiation-factor assumption breaks

@@ -393,6 +393,19 @@ same run apart against the plateau method and the mass law.
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
+## What this solver does not do
+
+Everything the 2D acoustic solver cannot do, this one cannot either: the
+domain is a cross-section, so a source is a line source with cylindrical
+$1/\sqrt{r}$ spreading rather than the $1/r$ of a 3D point source, and
+absolute levels and decay rates are not those of a 3D problem. The solid is
+isotropic and purely elastic: no anisotropy, and no viscoelastic damping
+beyond the bulk `damping` decay rate, so material loss factors are not
+modelled. There is no elastic perfectly matched layer — the sponge absorbs
+grazing Rayleigh waves less effectively than body waves. And guided-wave
+dispersion beyond the thin-plate Kirchhoff regime (full Lamb modes) is
+observable in the fields but has no dedicated closed-form oracle here.
+
 ## Quick answers
 
 ### When do I need the elastic solver instead of the acoustic one?

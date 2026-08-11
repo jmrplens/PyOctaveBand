@@ -118,6 +118,20 @@ plt.show()
 `survey_service_equipment_level()` a `SurveyServiceEquipmentResult` (`l_xy`,
 `l_xy_nt`, `l_xy_n`).
 
+What the functions do not do is police the survey. They consume band levels
+wherever they came from: nothing verifies the sweep, the source corner, the
+tapping-machine positions or the one-corner-plus-two-central
+service-equipment recipe, and nothing checks the 6 dB signal-to-background
+floor of Clause 6.2.1 — nor applies a correction when it was not met, which
+is the method's own rule (record the level, and note that the result was
+affected by an unknown amount). The ± 2 dB agreement with the engineering
+method is the standard's own estimate (Clause 6.6 NOTE), not something the
+library models or propagates: no survey result carries an uncertainty, and
+when the stakes rise the step up is
+[Field Insulation Measurement (ISO 16283)](insulation-field.md), whose
+ISO 12999-1 machinery does produce one. Annex A's report form and Annex B's
+operating cycles for service equipment are outside the library too.
+
 ## ISO 10052 survey reports (`.report()`)
 
 The airborne, impact and façade survey results each carry a `.report(path)` that

@@ -84,7 +84,11 @@ field.plot()  # TL field over range x depth (needs matplotlib)
 `transmission_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` per
 ray); `parabolic_equation` a `ParabolicEquationResult` (the `transmission_loss`
 field). All assume a range-independent water column with a pressure-release
-surface.
+surface, and the bottom is pressure-release too (or, for the modes, optionally
+rigid): there is no absorbing or elastic bottom, no sediment attenuation and
+no real bathymetry, so range-dependent problems are out of scope. For the
+elastic seabed physics these fluid solvers leave out, see
+[Elastic waves and fluid-solid coupling](../simulation/elastic-waves.md).
 
 ## 2. Normal modes: the waveguide as a sum of standing waves
 

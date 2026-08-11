@@ -90,7 +90,8 @@ The inputs are sampled independently; the Supplement's multivariate-Gaussian
 path for non-independent quantities (6.4.8) is not implemented, so correlated
 budgets belong to `combine_uncertainty`. The number of trials is fixed (no
 adaptive 7.9 procedure, at least 2 trials) and the interval is the symmetric
-one, not the 5.3.4 shortest interval.
+one, not the 5.3.4 shortest interval. Supplement 2 — models with multiple
+output quantities — is not implemented at all.
 
 ```python
 from phonometry import metrology
@@ -131,7 +132,8 @@ the true coverage interval is asymmetric and no $Y \pm U$ statement can
 represent it. In those regimes the Monte Carlo interval is the reference:
 Supplement 1 (clause 8) treats the GUM framework as validated precisely when
 it agrees with the Monte Carlo result, and as superseded by it when it does
-not.
+not. That clause 8 validation is a comparison you make by reading the two
+results side by side; the library does not automate the verdict.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left, the GUM uncertainty budget: a horizontal bar chart of the contribution of each input to the combined uncertainty (Reading contributes nothing, Calibration and Instrument the rectangular corrections, and the Position Type A term the most), with a dashed line marking the combined uncertainty uc of 0.407 dB. Right, the Monte Carlo output distribution as a histogram, overlaid with the GUM Gaussian of the same mean and standard deviation, and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%"></picture>
 
