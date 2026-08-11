@@ -16,6 +16,13 @@ references:
     designation: "ISO 354:2003"
     url: "https://www.iso.org/standard/34545.html"
     note: "The laboratory measurement the surface and array coefficients come from."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1993
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 1: Calculation of the absorption of sound by the atmosphere"
+    designation: "ISO 9613-1:1993"
+    url: "https://www.iso.org/standard/17426.html"
+    note: "Only the six climate-condition power attenuation coefficients of EN 12354-6 Table 1, derived from this standard for the 125 Hz-8 kHz octave bands; the full atmospheric-absorption model for arbitrary conditions and frequencies lives in the Outdoor Sound Propagation guide."
   - type: book
     authors: ["Kuttruff, H."]
     year: 2016
@@ -584,5 +591,9 @@ only.
   $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
 - [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   the three Annex E cases these implementations are checked against.
+- [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/):
+  the full ISO 9613-1 atmospheric-absorption model, for conditions or
+  frequencies the six built-in climate profiles do not cover, via
+  `environment.propagation.air_absorption`.
 - API reference: [`room.enclosed_space_absorption`](/phonometry/reference/api/rooms/enclosed-space-absorption/).
 - Theory: [Sound insulation and absorption, predicted](/phonometry/reference/theory/rooms-buildings/#sound-insulation-and-absorption-predicted-en-12354-1-2-6-bies-cremer-hopkins): the equivalent-absorption-area definition the EN 12354-6 procedure computes.

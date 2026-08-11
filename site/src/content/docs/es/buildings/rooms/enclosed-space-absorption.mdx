@@ -16,6 +16,13 @@ references:
     designation: "ISO 354:2003"
     url: "https://www.iso.org/standard/34545.html"
     note: "La medición de laboratorio de la que salen los coeficientes de superficies y conjuntos."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1993
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 1: Calculation of the absorption of sound by the atmosphere"
+    designation: "ISO 9613-1:1993"
+    url: "https://www.iso.org/standard/17426.html"
+    note: "Solo los seis coeficientes de atenuación de potencia por condición climática de la Tabla 1 de la EN 12354-6, derivados de esta norma para las bandas de octava de 125 Hz a 8 kHz; el modelo completo de absorción atmosférica para condiciones y frecuencias arbitrarias está en la guía de propagación del sonido en exteriores."
   - type: book
     authors: ["Kuttruff, H."]
     year: 2016
@@ -607,5 +614,9 @@ como línea de referencia.
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   los tres casos del Anexo E frente a los que se comprueban estas
   implementaciones.
+- [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
+  el modelo completo de absorción atmosférica de ISO 9613-1, para
+  condiciones o frecuencias que los seis perfiles climáticos integrados no
+  cubren, mediante `environment.propagation.air_absorption`.
 - Referencia de la API: [`room.enclosed_space_absorption`](/phonometry/es/reference/api/rooms/enclosed-space-absorption/).
 - Teoría: [Aislamiento acústico y absorción, predichos](/phonometry/es/reference/theory/rooms-buildings/#aislamiento-acústico-y-absorción-predichos-en-12354-1-2-6-bies-cremer-hopkins): la definición de área de absorción equivalente que calcula el procedimiento de EN 12354-6.
