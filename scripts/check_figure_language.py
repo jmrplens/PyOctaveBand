@@ -109,6 +109,94 @@ ENGLISH_BY_DESIGN: dict[str, str] = {
         "a numpy attribute and its value, as the reader sees it printed",
     "OctaveFilterBank":
         "a class name; translating it would name a class that does not exist",
+    "francois-garrison":
+        "the model= literal of seawater_absorption, quoted as the reader "
+        "would type it",
+    "ainslie-mccolm":
+        "the model= literal of seawater_absorption, quoted as the reader "
+        "would type it",
+    "thorp":
+        "the model= literal of seawater_absorption, quoted as the reader "
+        "would type it",
+    "unesco":
+        "the model= literal of sound_speed_profile, quoted as the reader "
+        "would type it",
+    "mackenzie":
+        "the model= literal of sound_speed_profile, quoted as the reader "
+        "would type it",
+    "medwin":
+        "the model= literal of sound_speed_profile, quoted as the reader "
+        "would type it",
+    "surfaces = [":
+        "the opening line of the surfaces input list the EN 12354-6 take-off "
+        "plate prints, code the reader types",
+    "objects = hard_object_absorption(volumes)":
+        "the API call the EN 12354-6 take-off plate documents, quoted as the "
+        "reader would type it",
+    "psi = object_fraction(volumes, 29.75)":
+        "the API call the EN 12354-6 take-off plate documents, quoted as the "
+        "reader would type it",
+    "'rigid_cross', 'through' / 'corner'":
+        "the junction_type= and path= literals of junction_vibration_reduction, "
+        "quoted as the reader would type them",
+    "'rigid_t', 'through' / 'corner'":
+        "the junction_type= and path= literals of junction_vibration_reduction, "
+        "quoted as the reader would type them",
+    "'flexible_t', 'through' / 'corner'":
+        "the junction_type= and path= literals of junction_vibration_reduction, "
+        "quoted as the reader would type them",
+    "'corner', 'corner'":
+        "the junction_type= and path= literals of junction_vibration_reduction, "
+        "quoted as the reader would type them",
+    "'thickness_change', 'through'":
+        "the junction_type= and path= literals of junction_vibration_reduction, "
+        "quoted as the reader would type them",
+    # The machine-fault line names drawn by FaultFrequencyResult.plot() are
+    # the keys of the result the figure documents (res["2xGMF+1x"],
+    # res["lobe n=1 m=2"]...), and the library draws line.name verbatim even
+    # for language="es": the label is what the reader indexes, in either
+    # language, so translating one would name a key that does not exist.
+    "2xGMF": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "2xGMF+1x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "2xGMF+2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "2xGMF-1x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "2xGMF-2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "3xGMF": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "3xGMF+1x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "3xGMF+2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "3xGMF-1x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "3xGMF-2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
+    "fsh":
+        "the rotor-slot key of induction_motor_frequencies, drawn as the "
+        "reader indexes it",
+    "lobe n=1 m=2":
+        "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
+        "indexes it",
+    "lobe n=1 m=10":
+        "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
+        "indexes it",
+    "butter":
+        "the filter_type= literal of FilterDesign, quoted as the reader "
+        "would type it (architecture_tradeoff tick labels)",
+    "cheby1":
+        "the filter_type= literal of FilterDesign, quoted as the reader "
+        "would type it (architecture_tradeoff tick labels)",
+    "cheby2":
+        "the filter_type= literal of FilterDesign, quoted as the reader "
+        "would type it (architecture_tradeoff tick labels)",
+    "ellip":
+        "the filter_type= literal of FilterDesign, quoted as the reader "
+        "would type it (architecture_tradeoff tick labels)",
+    "bessel":
+        "the filter_type= literal of FilterDesign, quoted as the reader "
+        "would type it (architecture_tradeoff tick labels)",
+    "octave_filter · leq · laeq · sel · ln_levels · lc_peak · "
+    "OctaveFilterBank":
+        "the level functions and the bank class of the API, listed as the "
+        "reader would type them (calibration data-flow plate)",
+    "laeq · sel · lc_peak":
+        "the level functions of the API, listed as the reader would type "
+        "them (sound-level-meter pipeline plate)",
 }
 
 # A run of at least three letters, in any alphabet: shorter runs are unit and

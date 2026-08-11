@@ -557,51 +557,51 @@ z
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(41.959756 348.302989)">    / [(fmod/5)^2 + 4/fmod + 1,5]  vacil</text>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="268.179112" y="41.858813" transform="rotate(-0 268.179112 41.858813)">Both models on AM broadband noise, 60 dB</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="268.179112" y="41.858813" transform="rotate(-0 268.179112 41.858813)">Los dos modelos sobre ruido de banda ancha AM, 60 dB</text>
    </g>
    <g id="legend_1">
     <g id="patch_9">
-     <path d="M 275.950567 99.560922 
-L 495.094942 99.560922 
-Q 496.894942 99.560922 496.894942 97.760922 
+     <path d="M 239.320567 100.280922 
+L 495.094942 100.280922 
+Q 496.894942 100.280922 496.894942 98.480922 
 L 496.894942 58.158813 
 Q 496.894942 56.358813 495.094942 56.358813 
-L 275.950567 56.358813 
-Q 274.150567 56.358813 274.150567 58.158813 
-L 274.150567 97.760922 
-Q 274.150567 99.560922 275.950567 99.560922 
+L 239.320567 56.358813 
+Q 237.520567 56.358813 237.520567 58.158813 
+L 237.520567 98.480922 
+Q 237.520567 100.280922 239.320567 100.280922 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_54">
-     <path d="M 277.750567 63.647406 
-L 286.750567 63.647406 
-L 295.750567 63.647406 
+     <path d="M 241.120567 64.007406 
+L 250.120567 64.007406 
+L 259.120567 64.007406 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="302.950567" y="66.797406" transform="rotate(-0 302.950567 66.797406)">closed form, Eq. 10,2 — peak 3,7 vacil</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="266.320567" y="67.157406" transform="rotate(-0 266.320567 67.157406)">forma cerrada, Ec. 10,2: máximo 3,7 vacil</text>
     </g>
     <g id="line2d_55">
-     <path d="M 277.750567 77.148109 
-L 286.750567 77.148109 
-L 295.750567 77.148109 
+     <path d="M 241.120567 77.868109 
+L 250.120567 77.868109 
+L 259.120567 77.868109 
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 2"/>
      <g>
-      <use xlink:href="#ma6aa65faaf" x="286.750567" y="77.148109" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
+      <use xlink:href="#ma6aa65faaf" x="250.120567" y="77.868109" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="302.950567" y="80.298109" transform="rotate(-0 302.950567 80.298109)">Osses 2016 signal model — peak 5,5 vacil</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="266.320567" y="81.018109" transform="rotate(-0 266.320567 81.018109)">modelo de señal de Osses 2016: máximo 5,5 vacil</text>
     </g>
     <g id="line2d_56">
-     <path d="M 277.750567 90.648813 
-L 286.750567 90.648813 
-L 295.750567 90.648813 
+     <path d="M 241.120567 91.368813 
+L 250.120567 91.368813 
+L 259.120567 91.368813 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #000000; stroke-opacity: 0.7"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="302.950567" y="93.798813" transform="rotate(-0 302.950567 93.798813)">referencia 4 Hz</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="266.320567" y="94.518813" transform="rotate(-0 266.320567 94.518813)">referencia 4 Hz</text>
     </g>
    </g>
    <g id="line2d_57">
@@ -984,38 +984,38 @@ L 850.040937 51.858813
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_38">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="699.579112" y="41.858813" transform="rotate(-0 699.579112 41.858813)">Signal model on the AM tone, 70 dB</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="699.579112" y="41.858813" transform="rotate(-0 699.579112 41.858813)">El modelo de señal sobre el tono AM, 70 dB</text>
    </g>
    <g id="legend_2">
     <g id="patch_15">
-     <path d="M 711.568906 72.559516 
-L 843.740937 72.559516 
-Q 845.540937 72.559516 845.540937 70.759516 
-L 845.540937 58.158813 
-Q 845.540937 56.358813 843.740937 56.358813 
-L 711.568906 56.358813 
-Q 709.768906 56.358813 709.768906 58.158813 
-L 709.768906 70.759516 
-Q 709.768906 72.559516 711.568906 72.559516 
+     <path d="M 686.58125 72.919516 
+L 843.740938 72.919516 
+Q 845.540938 72.919516 845.540938 71.119516 
+L 845.540938 58.158813 
+Q 845.540938 56.358812 843.740938 56.358812 
+L 686.58125 56.358812 
+Q 684.78125 56.358812 684.78125 58.158813 
+L 684.78125 71.119516 
+Q 684.78125 72.919516 686.58125 72.919516 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_102">
-     <path d="M 713.368906 63.647406 
-L 722.368906 63.647406 
-L 731.368906 63.647406 
+     <path d="M 688.38125 64.007406 
+L 697.38125 64.007406 
+L 706.38125 64.007406 
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 2"/>
      <g>
-      <use xlink:href="#md78b316311" x="722.368906" y="63.647406" style="fill: #2ca02c; stroke: #2ca02c; stroke-linejoin: miter"/>
+      <use xlink:href="#md78b316311" x="697.38125" y="64.007406" style="fill: #2ca02c; stroke: #2ca02c; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_39">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="738.568906" y="66.797406" transform="rotate(-0 738.568906 66.797406)">peak 1,09 vacil at 4 Hz</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="713.58125" y="67.157406" transform="rotate(-0 713.58125 67.157406)">máximo de 1,09 vacil a 4 Hz</text>
     </g>
    </g>
   </g>
   <g id="text_40">
-   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="428.840937" y="16.318125" transform="rotate(-0 428.840937 16.318125)">Fluctuation Strength — the 4 Hz Band-Pass, and Which Model to Quote</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="428.840937" y="16.798125" transform="rotate(-0 428.840937 16.798125)">Intensidad de fluctuación: el paso de banda a 4 Hz y qué modelo citar</text>
   </g>
  </g>
  <defs>

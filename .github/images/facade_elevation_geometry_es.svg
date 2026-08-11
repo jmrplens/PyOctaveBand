@@ -53,7 +53,7 @@ z
 " clip-path="url(#p9affbae2dc)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="262.112159" y="222.276563" transform="rotate(-0 262.112159 222.276563)">Masonry wall</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="262.112159" y="222.436563" transform="rotate(-0 262.112159 222.436563)">Muro de fábrica</text>
    </g>
    <g id="text_2">
     <!-- 6 m$^2$ -->
@@ -67,7 +67,7 @@ z
     </g>
    </g>
    <g id="text_3">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="504.978164" y="222.276563" transform="rotate(-0 504.978164 222.276563)">Window</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="504.978164" y="222.27625" transform="rotate(-0 504.978164 222.27625)">Ventana</text>
    </g>
    <g id="text_4">
     <!-- 1,5 m$^2$ -->
@@ -83,7 +83,7 @@ z
     </g>
    </g>
    <g id="text_5">
-    <text style="font-size: 8px; font-family: sans-serif" transform="translate(565.344442 255.743125) rotate(-90)">Roller shutter box</text>
+    <text style="font-size: 8px; font-family: sans-serif" transform="translate(565.504442 256.356875) rotate(-90)">Cajón de persiana</text>
    </g>
    <g id="text_6">
     <!-- 0,3 m$^2$ -->

@@ -519,19 +519,19 @@ L 705.981562 28.798125
    </g>
    <g id="text_29">
     <g id="patch_7">
-     <path d="M 499.850335 385.444631 
+     <path d="M 499.877835 385.444631 
 L 696.059398 385.444631 
 Q 701.559398 385.444631 701.559398 379.944631 
 L 701.559398 353.538615 
 Q 701.559398 348.038615 696.059398 348.038615 
-L 499.850335 348.038615 
-Q 494.350335 348.038615 494.350335 353.538615 
-L 494.350335 379.944631 
-Q 494.350335 385.444631 499.850335 385.444631 
+L 499.877835 348.038615 
+Q 494.377835 348.038615 494.377835 353.538615 
+L 494.377835 379.944631 
+Q 494.377835 385.444631 499.877835 385.444631 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(499.850335 362.99797)">sigma_R = m alpha_s + n  (Table 1)</text>
+    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(499.877835 362.99797)">sigma_R = m alpha_s + n  (Tabla 1)</text>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(571.376116 376.200978)">U = k u,  k = 2  (95 %)</text>
    </g>
    <g id="text_30">

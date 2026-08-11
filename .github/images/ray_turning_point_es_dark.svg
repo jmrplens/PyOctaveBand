@@ -278,7 +278,7 @@ L 238.08608 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_16">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="145.86843" y="16.318125" transform="rotate(-0 145.86843 16.318125)">Linear Gradient</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="145.86843" y="16.318125" transform="rotate(-0 145.86843 16.318125)">Gradiente lineal</text>
    </g>
   </g>
   <g id="axes_2">
@@ -1117,36 +1117,36 @@ L 922.008437 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_12">
-    <path d="M 538.110097 195.60193 
-Q 512.229081 176.493602 487.247512 158.049349 
+    <path d="M 539.336538 195.287447 
+Q 512.854089 176.326858 487.280698 158.017125 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 488.973035 161.436468 
-L 487.247512 158.049349 
-L 490.99252 158.701202 
+    <path d="M 489.055546 161.378659 
+L 487.280698 158.017125 
+L 491.034835 158.614167 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_34">
     <g id="patch_13">
      <path d="M 510.742208 224.492469 
-L 606.891817 224.492469 
-Q 610.291817 224.492469 610.291817 221.092469 
-L 610.291817 200.68782 
-Q 610.291817 197.28782 606.891817 197.28782 
-L 510.742208 197.28782 
-Q 507.342208 197.28782 507.342208 200.68782 
+L 611.04088 224.492469 
+Q 614.44088 224.492469 614.44088 221.092469 
+L 614.44088 200.34782 
+Q 614.44088 196.94782 611.04088 196.94782 
+L 510.742208 196.94782 
+Q 507.342208 196.94782 507.342208 200.34782 
 L 507.342208 221.092469 
 Q 507.342208 224.492469 510.742208 224.492469 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(510.742208 207.997322)">analytic z_t = 583,3 m</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(510.742208 218.199646)">traced      = 583,7 m</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(510.742208 207.997322)">z_t analítica = 583,3 m</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(510.742208 218.199646)">z_t trazada   = 583,7 m</text>
    </g>
    <g id="text_35">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="330.55797" y="52.589442" transform="rotate(-0 330.55797 52.589442)">source, 100 m</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="330.55797" y="52.589442" transform="rotate(-0 330.55797 52.589442)">fuente, 100 m</text>
    </g>
    <g id="text_36">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="608.46843" y="16.318125" transform="rotate(-0 608.46843 16.318125)">Every Ray Turns Where c(z_t) = c(z_s)/cos(theta_0)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="608.46843" y="16.318125" transform="rotate(-0 608.46843 16.318125)">Cada rayo gira donde c(z_t) = c(z_s)/cos(theta_0)</text>
    </g>
    <g id="line2d_65">
     <defs>
@@ -1210,71 +1210,71 @@ L 4.5 4.5
    </g>
    <g id="legend_1">
     <g id="patch_14">
-     <path d="M 449.218274 382.265781 
-L 767.718587 382.265781 
-Q 769.418587 382.265781 769.418587 380.565781 
-L 769.418587 355.914453 
-Q 769.418587 354.214453 767.718587 354.214453 
-L 449.218274 354.214453 
-Q 447.518274 354.214453 447.518274 355.914453 
-L 447.518274 380.565781 
-Q 447.518274 382.265781 449.218274 382.265781 
+     <path d="M 458.491243 382.265781 
+L 758.445618 382.265781 
+Q 760.145618 382.265781 760.145618 380.565781 
+L 760.145618 355.914453 
+Q 760.145618 354.214453 758.445618 354.214453 
+L 458.491243 354.214453 
+Q 456.791243 354.214453 456.791243 355.914453 
+L 456.791243 380.565781 
+Q 456.791243 382.265781 458.491243 382.265781 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_70">
-     <path d="M 450.918274 361.098125 
-L 459.418274 361.098125 
-L 467.918274 361.098125 
+     <path d="M 460.191243 361.098125 
+L 468.691243 361.098125 
+L 477.191243 361.098125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_37">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="474.718274" y="364.073125" transform="rotate(-0 474.718274 364.073125)">2 deg</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="483.991243" y="364.073125" transform="rotate(-0 483.991243 364.073125)">2°</text>
     </g>
     <g id="line2d_71">
-     <path d="M 450.918274 373.848789 
-L 459.418274 373.848789 
-L 467.918274 373.848789 
+     <path d="M 460.191243 373.848789 
+L 468.691243 373.848789 
+L 477.191243 373.848789 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="474.718274" y="376.823789" transform="rotate(-0 474.718274 376.823789)">4 deg</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="483.991243" y="376.823789" transform="rotate(-0 483.991243 376.823789)">4°</text>
     </g>
     <g id="line2d_72">
-     <path d="M 515.850305 361.098125 
-L 524.350305 361.098125 
-L 532.850305 361.098125 
+     <path d="M 510.649368 361.098125 
+L 519.149368 361.098125 
+L 527.649368 361.098125 
 " style="fill: none; stroke: #d62728; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_39">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="539.650305" y="364.073125" transform="rotate(-0 539.650305 364.073125)">6 deg</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="534.449368" y="364.073125" transform="rotate(-0 534.449368 364.073125)">6°</text>
     </g>
     <g id="line2d_73">
-     <path d="M 515.850305 373.848789 
-L 524.350305 373.848789 
-L 532.850305 373.848789 
+     <path d="M 510.649368 373.848789 
+L 519.149368 373.848789 
+L 527.649368 373.848789 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 1.2"/>
     </g>
     <g id="text_40">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="539.650305" y="376.823789" transform="rotate(-0 539.650305 376.823789)">exact circular arc, R = c0/(g cos th0)</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="534.449368" y="376.823789" transform="rotate(-0 534.449368 376.823789)">arco circular exacto, R = c0/(g cos th0)</text>
     </g>
     <g id="line2d_74">
-     <path d="M 712.67843 361.098125 
-L 721.17843 361.098125 
-L 729.67843 361.098125 
+     <path d="M 717.879368 361.098125 
+L 726.379368 361.098125 
+L 734.879368 361.098125 
 " style="fill: none; stroke: #8c8c8c; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="736.47843" y="364.073125" transform="rotate(-0 736.47843 364.073125)">8 deg</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="741.679368" y="364.073125" transform="rotate(-0 741.679368 364.073125)">8°</text>
     </g>
     <g id="line2d_75">
-     <path d="M 712.67843 373.848789 
-L 721.17843 373.848789 
-L 729.67843 373.848789 
+     <path d="M 717.879368 373.848789 
+L 726.379368 373.848789 
+L 734.879368 373.848789 
 " style="fill: none; stroke: #7b5ea7; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_42">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="736.47843" y="376.823789" transform="rotate(-0 736.47843 376.823789)">10 deg</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="741.679368" y="376.823789" transform="rotate(-0 741.679368 376.823789)">10°</text>
     </g>
    </g>
   </g>

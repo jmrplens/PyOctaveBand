@@ -185,7 +185,7 @@ L 733.064063 92.184584
      </g>
     </g>
     <g id="text_10">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="27.09375" y="126.446205" transform="rotate(-90 27.09375 126.446205)">raw record</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="27.09375" y="126.446205" transform="rotate(-90 27.09375 126.446205)">registro bruto</text>
     </g>
    </g>
    <g id="line2d_19">
@@ -1180,7 +1180,7 @@ L 733.064063 69.592469
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_11">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="61.592469" transform="rotate(-0 391.765234 61.592469)">1. As recorded: noise and unbalance, no visible impacts</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="61.592469" transform="rotate(-0 391.765234 61.592469)">1. Tal como se registra: ruido y desequilibrio, sin impactos visibles</text>
    </g>
   </g>
   <g id="axes_2">
@@ -1386,7 +1386,7 @@ L 733.064063 258.957935
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="17.553125" y="298.393443" transform="rotate(-90 17.553125 298.393443)">2-4 kHz band</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="17.553125" y="298.393443" transform="rotate(-90 17.553125 298.393443)">banda 2-4 kHz</text>
     </g>
    </g>
    <g id="line2d_49">
@@ -2316,7 +2316,7 @@ L 268.654403 251.752732
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: middle; fill: #d62728" x="291.542938" y="250.383622" transform="rotate(-0 291.542938 250.383622)">1/BPFO = 4,83 ms</text>
    </g>
    <g id="text_23">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="233.539707" transform="rotate(-0 391.765234 233.539707)">2. Band-passed on the 3 kHz housing resonance: the impact train</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="233.539707" transform="rotate(-0 391.765234 233.539707)">2. Filtrado en la banda de la resonancia del soporte de 3 kHz: el tren de impactos</text>
    </g>
   </g>
   <g id="axes_3">
@@ -2485,7 +2485,7 @@ L 733.064063 421.096578
      </g>
     </g>
     <g id="text_35">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="21.160938" y="470.340682" transform="rotate(-90 21.160938 470.340682)">envelope</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="21.160938" y="470.340682" transform="rotate(-90 21.160938 470.340682)">envolvente</text>
     </g>
    </g>
    <g id="line2d_70">
@@ -3217,7 +3217,7 @@ L 733.064063 413.486945
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_36">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="405.486945" transform="rotate(-0 391.765234 405.486945)">3. Hilbert envelope: one pulse per impact</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="405.486945" transform="rotate(-0 391.765234 405.486945)">3. Envolvente de Hilbert: un pulso por impacto</text>
    </g>
   </g>
   <g id="axes_4">
@@ -3386,7 +3386,7 @@ L 733.064063 601.920446
      </g>
     </g>
     <g id="text_48">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="642.28792" transform="rotate(-90 14.798438 642.28792)">envelope spectrum</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="642.28792" transform="rotate(-90 14.798438 642.28792)">espectro de envolvente</text>
     </g>
    </g>
    <g id="line2d_91">
@@ -5167,7 +5167,7 @@ L 733.064063 585.434184
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_49">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="577.434184" transform="rotate(-0 391.765234 577.434184)">4. Its spectrum: the period has become a line at BPFO</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="391.765234" y="577.434184" transform="rotate(-0 391.765234 577.434184)">4. Su espectro: el periodo se ha convertido en una línea en la BPFO</text>
    </g>
    <g id="legend_1">
     <g id="patch_23">
@@ -5213,7 +5213,7 @@ L 587.625078 622.409184
    </g>
   </g>
   <g id="text_53">
-   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle" x="365.864062" y="17.077969" transform="rotate(-0 365.864062 17.077969)">What Each Step of the Envelope Route Does to the Signal</text>
+   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle" x="365.864062" y="17.597969" transform="rotate(-0 365.864062 17.597969)">Qué le hace cada paso de la ruta de la envolvente a la señal</text>
   </g>
  </g>
  <defs>

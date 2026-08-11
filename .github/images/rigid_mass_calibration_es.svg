@@ -1457,22 +1457,22 @@ L 705.928125 28.798125
    </g>
    <g id="text_7">
     <g id="patch_7">
-     <path d="M 539.766598 270.812853 
+     <path d="M 519.54941 270.812853 
 L 696.19316 270.812853 
 Q 701.19316 270.812853 701.19316 265.812853 
-L 701.19316 217.758166 
-Q 701.19316 212.758166 696.19316 212.758166 
-L 539.766598 212.758166 
-Q 534.766598 212.758166 534.766598 217.758166 
-L 534.766598 265.812853 
-Q 534.766598 270.812853 539.766598 270.812853 
+L 701.19316 216.958166 
+Q 701.19316 211.958166 696.19316 211.958166 
+L 519.54941 211.958166 
+Q 514.54941 211.958166 514.54941 216.958166 
+L 514.54941 265.812853 
+Q 514.54941 270.812853 519.54941 270.812853 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(557.858785 226.35758)">calibration block m = 10 kg</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(540.391598 238.404064)">|A| = 1/m = 0,100 1/kg  (7.5.2)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(544.904098 250.406798)">criterion: agree within +/- 5 %</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(539.766598 262.409533)">high-f drift -&gt; attachment error</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(533.050973 225.95758)">bloque de calibración m = 10 kg</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(540.391598 238.004064)">|A| = 1/m = 0,100 1/kg  (7.5.2)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(519.54941 250.006798)">criterio: coincidir dentro de +/- 5 %</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(522.907223 262.409533)">deriva en alta f -&gt; error de fijación</text>
    </g>
    <g id="text_8">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="381.429297" y="16.798125" transform="rotate(-0 381.429297 16.798125)">Verificación de calibración con masa rígida ISO 7626-2</text>

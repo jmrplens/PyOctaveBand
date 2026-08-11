@@ -982,10 +982,10 @@ L 685.25375 20.798437
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #d62728" x="645.606396" y="112.144877" transform="rotate(-0 645.606396 112.144877)">2f2-f1</text>
    </g>
    <g id="text_11">
-    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="217.308778" transform="rotate(-0 675.738385 217.308778)">denominator: a(f1) + a(f2)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="217.308778" transform="rotate(-0 675.738385 217.308778)">denominador: a(f1) + a(f2)</text>
    </g>
    <g id="text_12">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="14.798437" transform="rotate(-0 368.074922 14.798437)">(a) Difference frequency, 13 / 14 kHz — d(d,2) = 1,24 %</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="14.798437" transform="rotate(-0 368.074922 14.798437)">(a) Diferencia de frecuencias, 13 / 14 kHz — d(d,2) = 1,24 %</text>
    </g>
    <g id="line2d_32">
     <defs>
@@ -1817,10 +1817,10 @@ L 685.25375 260.004323
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #d62728" x="211.467875" y="339.350763" transform="rotate(-0 211.467875 339.350763)">f0+delta</text>
    </g>
    <g id="text_22">
-    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="456.514663" transform="rotate(-0 675.738385 456.514663)">only the two in-band products count</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="456.514663" transform="rotate(-0 675.738385 456.514663)">solo cuentan los dos productos en banda</text>
    </g>
    <g id="text_23">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="254.004323" transform="rotate(-0 368.074922 254.004323)">(b) Total difference frequency, 8 / 11,95 kHz — d(TDFD) = 1,25 %</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="254.004323" transform="rotate(-0 368.074922 254.004323)">(b) Diferencia total de frecuencias, 8 / 11,95 kHz — d(TDFD) = 1,25 %</text>
    </g>
    <g id="line2d_66">
     <g clip-path="url(#p0fa059822f)">
@@ -2224,10 +2224,10 @@ L 685.25375 499.210208
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #d62728" x="80.631609" y="601.376763" transform="rotate(-0 80.631609 601.376763)">k=5</text>
    </g>
    <g id="text_46">
-    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="695.720548" transform="rotate(-0 675.738385 695.720548)">denominator: the 15 kHz sine alone</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="675.738385" y="695.720548" transform="rotate(-0 675.738385 695.720548)">denominador: solo la sinusoide de 15 kHz</text>
    </g>
    <g id="text_47">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="493.210208" transform="rotate(-0 368.074922 493.210208)">(c) Dynamic intermodulation, 15 kHz + 3,15 kHz square — DIM = 5,31 %</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="368.074922" y="493.210208" transform="rotate(-0 368.074922 493.210208)">(c) Intermodulación dinámica, 15 kHz + cuadrada de 3,15 kHz — DIM = 5,31 %</text>
    </g>
    <g id="line2d_99">
     <g clip-path="url(#p3150eca467)">

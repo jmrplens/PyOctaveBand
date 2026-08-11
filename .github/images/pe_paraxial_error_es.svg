@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="965.363437pt" height="395.916562pt" viewBox="0 0 965.363437 395.916562" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="965.363437pt" height="397.591562pt" viewBox="0 0 965.363437 397.591562" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 395.916562 
-L 965.363437 395.916562 
+   <path d="M 0 397.591562 
+L 965.363437 397.591562 
 L 965.363437 0 
 L 0 0 
 z
@@ -1039,8 +1039,8 @@ L 138.872659 112.925944
 L 139.62913 102.626011 
 L 140.3856 111.607557 
 L 141.142071 174.957385 
-L 141.948505 396.916562 
-M 142.808887 396.916562 
+L 141.972487 398.591562 
+M 142.803664 398.591562 
 L 143.411482 203.671064 
 L 144.167953 147.423268 
 L 144.924424 144.338676 
@@ -1143,8 +1143,8 @@ L 218.302067 172.540827
 L 219.058538 155.005599 
 L 219.815008 190.919817 
 L 220.571479 264.302168 
-L 220.932818 396.916562 
-M 221.720347 396.916562 
+L 220.937382 398.591562 
+M 221.715815 398.591562 
 L 222.08442 262.367756 
 L 222.84089 149.509814 
 L 223.597361 120.311503 
@@ -1244,8 +1244,8 @@ L 296.975005 150.375591
 L 297.731475 152.893206 
 L 298.487946 169.597846 
 L 299.244416 236.97137 
-L 299.491613 396.916562 
-M 301.128032 396.916562 
+L 299.494201 398.591562 
+M 301.124504 398.591562 
 L 301.513828 213.751493 
 L 302.270299 164.886003 
 L 303.026769 151.615158 
@@ -1348,8 +1348,8 @@ L 376.404413 137.052175
 L 377.160883 137.859058 
 L 377.917354 180.092637 
 L 378.673824 326.472433 
-L 378.896552 396.916562 
-M 379.83841 396.916562 
+L 378.901848 398.591562 
+M 379.83436 398.591562 
 L 380.186766 252.82325 
 L 380.943236 195.888911 
 L 381.699707 172.012589 
@@ -1450,8 +1450,8 @@ L 455.07735 203.46643
 L 455.833821 177.492509 
 L 456.590291 193.096469 
 L 457.346762 255.705015 
-L 457.727461 396.916562 
-M 458.668661 396.916562 
+L 457.731977 398.591562 
+M 458.661866 398.591562 
 L 458.859703 349.82285 
 L 459.616174 193.594801 
 L 460.372644 144.833784 
@@ -1552,8 +1552,8 @@ L 533.750288 167.495835
 L 534.506758 166.386999 
 L 535.263229 178.315617 
 L 536.019699 223.991938 
-L 536.440211 396.916562 
-M 538.113133 396.916562 
+L 536.444284 398.591562 
+M 538.110796 398.591562 
 L 538.289111 270.823709 
 L 539.045582 188.889349 
 L 539.802052 169.884488 
@@ -2642,55 +2642,55 @@ L 622.97599 28.318125
    <g id="text_17">
     <g id="patch_7">
      <path d="M 58.775288 344.61491 
-L 253.106381 344.61491 
-Q 256.706381 344.61491 256.706381 341.01491 
-L 256.706381 308.607527 
-Q 256.706381 305.007527 253.106381 305.007527 
-L 58.775288 305.007527 
-Q 55.175288 305.007527 55.175288 308.607527 
+L 282.027319 344.61491 
+Q 285.627319 344.61491 285.627319 341.01491 
+L 285.627319 307.887527 
+Q 285.627319 304.287527 282.027319 304.287527 
+L 58.775288 304.287527 
+Q 55.175288 304.287527 55.175288 307.887527 
 L 55.175288 341.01491 
 Q 55.175288 344.61491 58.775288 344.61491 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 316.347)">the PE loses 1,6 dB of level at every range,</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 327.149461)">and the offset does not shrink: an ideal</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 337.951922)">waveguide strips nothing away</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 315.627)">la PE pierde 1,6 dB de nivel a cualquier distancia,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 326.789461)">y el sesgo no se diluye: una guía ideal</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(58.775288 337.951922)">no descama ningún modo</text>
    </g>
    <g id="text_18">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="332.150885" y="16.318125" transform="rotate(-0 332.150885 16.318125)">50 Hz in 100 m of Water, Receiver at 60 m</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="332.150885" y="16.318125" transform="rotate(-0 332.150885 16.318125)">50 Hz en 100 m de agua, receptor a 60 m</text>
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 391.681615 353.215781 
+     <path d="M 336.77599 353.215781 
 L 616.67599 353.215781 
 Q 618.47599 353.215781 618.47599 351.415781 
-L 618.47599 325.314375 
-Q 618.47599 323.514375 616.67599 323.514375 
-L 391.681615 323.514375 
-Q 389.881615 323.514375 389.881615 325.314375 
-L 389.881615 351.415781 
-Q 389.881615 353.215781 391.681615 353.215781 
+L 618.47599 324.954375 
+Q 618.47599 323.154375 616.67599 323.154375 
+L 336.77599 323.154375 
+Q 334.97599 323.154375 334.97599 324.954375 
+L 334.97599 351.415781 
+Q 334.97599 353.215781 336.77599 353.215781 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_33">
-     <path d="M 393.481615 330.802969 
-L 402.481615 330.802969 
-L 411.481615 330.802969 
+     <path d="M 338.57599 330.442969 
+L 347.57599 330.442969 
+L 356.57599 330.442969 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="418.681615" y="333.952969" transform="rotate(-0 418.681615 333.952969)">Normal modes, range-averaged (reference)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="363.77599" y="333.592969" transform="rotate(-0 363.77599 333.592969)">Modos normales, promediados en distancia (referencia)</text>
     </g>
     <g id="line2d_34">
-     <path d="M 393.481615 344.303672 
-L 402.481615 344.303672 
-L 411.481615 344.303672 
+     <path d="M 338.57599 344.303672 
+L 347.57599 344.303672 
+L 356.57599 344.303672 
 " style="fill: none; stroke: #d62728; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="418.681615" y="347.453672" transform="rotate(-0 418.681615 347.453672)">Parabolic equation, range-averaged</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="363.77599" y="347.453672" transform="rotate(-0 363.77599 347.453672)">Ecuación parabólica, promediada en distancia</text>
     </g>
    </g>
   </g>
@@ -2803,7 +2803,7 @@ L 926.710566 28.318125
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="812.750885" y="386.314219" transform="rotate(-0 812.750885 386.314219)">Mode index m</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="812.750885" y="387.989219" transform="rotate(-0 812.750885 387.989219)">Índice de modo m</text>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -2913,7 +2913,7 @@ L 958.163437 64.322778
      </g>
     </g>
     <g id="text_35">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="641.21099" y="193.016953" transform="rotate(-90 641.21099 193.016953)">Modal grazing angle arccos(k_rm/k) [deg]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="641.21099" y="193.016953" transform="rotate(-90 641.21099 193.016953)">Ángulo rasante modal arccos(k_rm/k) [°]</text>
     </g>
    </g>
    <g id="patch_11">
@@ -2990,19 +2990,19 @@ L 958.163438 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_36">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="812.750885" y="16.318125" transform="rotate(-0 812.750885 16.318125)">4 of 6 Modes Are Outside It</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="812.750885" y="16.318125" transform="rotate(-0 812.750885 16.318125)">4 de 6 modos quedan fuera</text>
    </g>
    <g id="legend_2">
     <g id="patch_21">
-     <path d="M 673.638333 62.519531 
-L 812.018958 62.519531 
-Q 813.818958 62.519531 813.818958 60.719531 
-L 813.818958 34.618125 
-Q 813.818958 32.818125 812.018958 32.818125 
+     <path d="M 673.638333 62.879531 
+L 827.086927 62.879531 
+Q 828.886927 62.879531 828.886927 61.079531 
+L 828.886927 34.618125 
+Q 828.886927 32.818125 827.086927 32.818125 
 L 673.638333 32.818125 
 Q 671.838333 32.818125 671.838333 34.618125 
-L 671.838333 60.719531 
-Q 671.838333 62.519531 673.638333 62.519531 
+L 671.838333 61.079531 
+Q 671.838333 62.879531 673.638333 62.879531 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -3015,18 +3015,18 @@ z
 " style="fill: #1f77b4"/>
     </g>
     <g id="text_37">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="700.638333" y="43.256719" transform="rotate(-0 700.638333 43.256719)">within the paraxial band</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="700.638333" y="43.256719" transform="rotate(-0 700.638333 43.256719)">dentro de la banda paraxial</text>
     </g>
     <g id="patch_23">
-     <path d="M 675.438333 56.757422 
-L 693.438333 56.757422 
-L 693.438333 50.457422 
-L 675.438333 50.457422 
+     <path d="M 675.438333 57.117422 
+L 693.438333 57.117422 
+L 693.438333 50.817422 
+L 675.438333 50.817422 
 z
 " style="fill: #d62728"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="700.638333" y="56.757422" transform="rotate(-0 700.638333 56.757422)">steeper than 20 deg</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="700.638333" y="57.117422" transform="rotate(-0 700.638333 57.117422)">más inclinados que 20°</text>
     </g>
    </g>
   </g>

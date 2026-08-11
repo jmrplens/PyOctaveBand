@@ -632,19 +632,19 @@ L 445.004609 24.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_17">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="243.165195" y="16.318125" transform="rotate(-0 243.165195 16.318125)">(a) 36 × 24 in run, 5 ft</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="243.165195" y="16.318125" transform="rotate(-0 243.165195 16.318125)">(a) Tramo de 36 × 24 in, 5 ft</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 46.183781 71.512294 
-L 164.520541 71.512294 
-Q 165.908541 71.512294 165.908541 70.124294 
-L 165.908541 29.176125 
-Q 165.908541 27.788125 164.520541 27.788125 
+     <path d="M 46.183781 71.789894 
+L 233.811019 71.789894 
+Q 235.199019 71.789894 235.199019 70.401894 
+L 235.199019 29.176125 
+Q 235.199019 27.788125 233.811019 27.788125 
 L 46.183781 27.788125 
 Q 44.795781 27.788125 44.795781 29.176125 
-L 44.795781 70.124294 
-Q 44.795781 71.512294 46.183781 71.512294 
+L 44.795781 70.401894 
+Q 44.795781 71.789894 46.183781 71.789894 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -658,7 +658,7 @@ L 61.451781 33.408441
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="35.837441" transform="rotate(-0 67.003781 35.837441)">Bare</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="35.837441" transform="rotate(-0 67.003781 35.837441)">Desnudo</text>
     </g>
     <g id="line2d_68">
      <path d="M 47.571781 43.818983 
@@ -670,31 +670,31 @@ L 61.451781 43.818983
      </g>
     </g>
     <g id="text_19">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="46.247983" transform="rotate(-0 67.003781 46.247983)">Externally wrapped</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="46.247983" transform="rotate(-0 67.003781 46.247983)">Con manta exterior</text>
     </g>
     <g id="line2d_69">
-     <path d="M 47.571781 54.229525 
-L 54.511781 54.229525 
-L 61.451781 54.229525 
+     <path d="M 47.571781 54.507125 
+L 54.511781 54.507125 
+L 61.451781 54.507125 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
      <g>
-      <use xlink:href="#m1b7f8bbf56" x="54.511781" y="54.229525" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1b7f8bbf56" x="54.511781" y="54.507125" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="56.658525" transform="rotate(-0 67.003781 56.658525)">25 mm lining, insertion loss</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="56.936125" transform="rotate(-0 67.003781 56.936125)">Revestimiento de 25 mm, pérdida por inserción</text>
     </g>
     <g id="line2d_70">
-     <path d="M 47.571781 64.640067 
-L 54.511781 64.640067 
-L 61.451781 64.640067 
+     <path d="M 47.571781 64.917667 
+L 54.511781 64.917667 
+L 61.451781 64.917667 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mc6338cc71e" x="54.511781" y="64.640067" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#mc6338cc71e" x="54.511781" y="64.917667" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="67.069067" transform="rotate(-0 67.003781 67.069067)">25 mm lining + side walls</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="67.003781" y="67.346667" transform="rotate(-0 67.003781 67.346667)">Revestimiento de 25 mm + paredes laterales</text>
     </g>
    </g>
   </g>
@@ -1226,15 +1226,15 @@ L 878.963438 24.318125
     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="676.354401" y="245.910187" transform="rotate(-0 676.354401 245.910187)">W/λ = 1</text>
    </g>
    <g id="text_37">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="677.124023" y="16.318125" transform="rotate(-0 677.124023 16.318125)">(b) One bend, W = 24 in</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="677.124023" y="16.318125" transform="rotate(-0 677.124023 16.318125)">(b) Un codo, W = 24 in</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
      <path d="M 480.142609 71.512294 
-L 551.839316 71.512294 
-Q 553.227316 71.512294 553.227316 70.124294 
-L 553.227316 29.176125 
-Q 553.227316 27.788125 551.839316 27.788125 
+L 593.77535 71.512294 
+Q 595.16335 71.512294 595.16335 70.124294 
+L 595.16335 29.176125 
+Q 595.16335 27.788125 593.77535 27.788125 
 L 480.142609 27.788125 
 Q 478.754609 27.788125 478.754609 29.176125 
 L 478.754609 70.124294 
@@ -1252,7 +1252,7 @@ L 495.410609 33.408441
      </g>
     </g>
     <g id="text_38">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="35.837441" transform="rotate(-0 500.962609 35.837441)">Square, lined</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="35.837441" transform="rotate(-0 500.962609 35.837441)">Cuadrado, revestido</text>
     </g>
     <g id="line2d_137">
      <path d="M 481.530609 43.818983 
@@ -1264,7 +1264,7 @@ L 495.410609 43.818983
      </g>
     </g>
     <g id="text_39">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="46.247983" transform="rotate(-0 500.962609 46.247983)">Square, bare</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="46.247983" transform="rotate(-0 500.962609 46.247983)">Cuadrado, desnudo</text>
     </g>
     <g id="line2d_138">
      <path d="M 481.530609 54.229525 
@@ -1276,7 +1276,7 @@ L 495.410609 54.229525
      </g>
     </g>
     <g id="text_40">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="56.658525" transform="rotate(-0 500.962609 56.658525)">Square, vanes</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="56.658525" transform="rotate(-0 500.962609 56.658525)">Cuadrado, con deflectores</text>
     </g>
     <g id="line2d_139">
      <path d="M 481.530609 64.640067 
@@ -1288,7 +1288,7 @@ L 495.410609 64.640067
      </g>
     </g>
     <g id="text_41">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="67.069067" transform="rotate(-0 500.962609 67.069067)">Round, bare</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="67.069067" transform="rotate(-0 500.962609 67.069067)">Circular, desnudo</text>
     </g>
    </g>
   </g>
@@ -1783,7 +1783,7 @@ L 445.004609 321.476953
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_59">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="243.165195" y="313.476953" transform="rotate(-0 243.165195 313.476953)">(c) Open end, 300 mm flush</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="243.165195" y="313.476953" transform="rotate(-0 243.165195 313.476953)">(c) Extremo abierto, 300 mm enrasado</text>
    </g>
    <g id="legend_3">
     <g id="patch_19">
@@ -2329,54 +2329,54 @@ L 878.963438 321.476953
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_25">
-    <path d="M 587.261203 518.958987 
-Q 542.820777 507.996731 499.465848 497.302238 
+    <path d="M 592.696229 518.984126 
+Q 545.540611 507.996564 499.473859 497.262716 
 " style="fill: none; stroke: #d62728; stroke-linecap: round"/>
-    <path d="M 502.301881 499.717749 
-L 499.465848 497.302238 
-L 503.099877 496.482717 
+    <path d="M 502.340871 499.641375 
+L 499.473859 497.262716 
+L 503.096994 496.396302 
 " style="fill: none; stroke: #d62728; stroke-linecap: round"/>
    </g>
    <g id="text_79">
-    <text style="font-size: 8.33px; font-family: sans-serif; fill: #d62728" transform="translate(558.987885 528.599595)">10,2 dB and 12,4 dB of low-frequency</text>
-    <text style="font-size: 8.33px; font-family: sans-serif; fill: #d62728" transform="translate(558.987885 538.597873)">performance the model cannot see</text>
+    <text style="font-size: 8.33px; font-family: sans-serif; fill: #d62728" transform="translate(558.987885 528.599595)">10,2 dB y 12,4 dB de rendimiento en baja</text>
+    <text style="font-size: 8.33px; font-family: sans-serif; fill: #d62728" transform="translate(558.987885 538.597873)">frecuencia que el modelo no puede ver</text>
    </g>
    <g id="text_80">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="677.124023" y="313.476953" transform="rotate(-0 677.124023 313.476953)">(d) Splitter silencer</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="677.124023" y="313.476953" transform="rotate(-0 677.124023 313.476953)">(d) Silenciador de bafles</text>
    </g>
    <g id="legend_4">
     <g id="patch_26">
-     <path d="M 480.142609 347.850037 
-L 631.756669 347.850037 
-Q 633.144669 347.850037 633.144669 346.462037 
-L 633.144669 326.334953 
-Q 633.144669 324.946953 631.756669 324.946953 
+     <path d="M 480.142609 348.127637 
+L 643.997094 348.127637 
+Q 645.385094 348.127637 645.385094 346.739637 
+L 645.385094 326.334953 
+Q 645.385094 324.946953 643.997094 324.946953 
 L 480.142609 324.946953 
 Q 478.754609 324.946953 478.754609 326.334953 
-L 478.754609 346.462037 
-Q 478.754609 347.850037 480.142609 347.850037 
+L 478.754609 346.739637 
+Q 478.754609 348.127637 480.142609 348.127637 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_272">
-     <path d="M 481.530609 330.567269 
-L 488.470609 330.567269 
-L 495.410609 330.567269 
+     <path d="M 481.530609 330.844869 
+L 488.470609 330.844869 
+L 495.410609 330.844869 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mc6338cc71e" x="488.470609" y="330.567269" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#mc6338cc71e" x="488.470609" y="330.844869" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_81">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="332.996269" transform="rotate(-0 500.962609 332.996269)">Geometry-only model, 5 ft, 5 airways</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="333.273869" transform="rotate(-0 500.962609 333.273869)">Modelo solo geométrico, 5 ft, 5 pasos</text>
     </g>
     <g id="line2d_273">
      <g>
-      <use xlink:href="#mca2bd419e8" x="488.470609" y="340.977811" style="fill-opacity: 0; stroke: #d62728; stroke-width: 2; stroke-linejoin: miter"/>
+      <use xlink:href="#mca2bd419e8" x="488.470609" y="341.255411" style="fill-opacity: 0; stroke: #d62728; stroke-width: 2; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_82">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="343.406811" transform="rotate(-0 500.962609 343.406811)">The unit Long's sheet specifies</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="500.962609" y="343.684411" transform="rotate(-0 500.962609 343.684411)">La unidad que especifica la hoja de Long</text>
     </g>
    </g>
   </g>

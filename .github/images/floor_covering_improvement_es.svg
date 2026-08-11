@@ -481,20 +481,20 @@ L 705.763438 28.318125
    </g>
    <g id="text_27">
     <g id="patch_7">
-     <path d="M 443.68806 384.964631 
+     <path d="M 438.18806 384.964631 
 L 695.790873 384.964631 
 Q 701.290873 384.964631 701.290873 379.464631 
 L 701.290873 353.058615 
 Q 701.290873 347.558615 695.790873 347.558615 
-L 443.68806 347.558615 
-Q 438.18806 347.558615 438.18806 353.058615 
-L 438.18806 379.464631 
-Q 438.18806 384.964631 443.68806 384.964631 
+L 438.18806 347.558615 
+Q 432.68806 347.558615 432.68806 353.058615 
+L 432.68806 379.464631 
+Q 432.68806 384.964631 438.18806 384.964631 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 11px; font-family: sans-serif" transform="translate(530.680873 362.51797)">delta-Lw = 29 dB  (ISO 717-2)</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(443.68806 375.720978)">one-third octave, mock-up (a0 = 1e-6 m/s^2)</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(438.18806 375.720978)">tercios de octava, maqueta (a0 = 1e-6 m/s^2)</text>
    </g>
    <g id="text_28">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">Mejora a impacto de revestimientos de suelo (ISO 16251-1)</text>

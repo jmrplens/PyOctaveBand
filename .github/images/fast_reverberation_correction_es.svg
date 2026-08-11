@@ -1131,17 +1131,17 @@ L 269.015916 203.540225
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="294.42701" y="251.915219" transform="rotate(-0 294.42701 251.915219)">T = 1,7275 s: C = 1, g = 1/e</text>
    </g>
    <g id="patch_9">
-    <path d="M 536.837102 87.598497 
-Q 635.595511 122.355692 733.299296 156.74172 
+    <path d="M 549.672601 87.637593 
+Q 642.022831 122.356161 733.326538 156.681294 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 730.501033 153.848672 
-L 733.299296 156.74172 
-L 729.3059 157.244501 
+    <path d="M 730.590218 153.729591 
+L 733.326538 156.681294 
+L 729.323383 157.099328 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(381.341717 71.067557)">at T = 5 s the energy average has grown to 10,0 dB</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(381.341717 81.870018)">while the Fast term has saturated at 5,1 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(381.341717 70.707557)">a T = 5 s el promedio energético ha crecido hasta 10,0 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(381.341717 81.870018)">mientras el término Fast se ha saturado en 5,1 dB</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="388.584609" y="16.318125" transform="rotate(-0 388.584609 16.318125)">Un detector Fast no puede seguir una caida larga</text>

@@ -651,7 +651,7 @@ L 696.621562 28.798125
     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: end" x="686.839798" y="388.175859" transform="rotate(-0 686.839798 388.175859)">Incidencia normal, respaldo rígido, profundidad del panel L = lambda/38</text>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="370.562734" y="16.798125" transform="rotate(-0 370.562734 16.798125)">Absorción perfecta por acoplo crítico (panel de sonido lento)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="370.562734" y="16.798125" transform="rotate(-0 370.562734 16.798125)">Absorción perfecta por acoplamiento crítico (panel de sonido lento)</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
@@ -674,7 +674,7 @@ L 70.603906 40.946719
 " style="fill: none; stroke: #d62728; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="44.096719" transform="rotate(-0 77.803906 44.096719)">Acoplo crítico (perfecto)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="44.096719" transform="rotate(-0 77.803906 44.096719)">Acoplamiento crítico (perfecto)</text>
     </g>
     <g id="line2d_34">
      <path d="M 52.603906 54.447422 

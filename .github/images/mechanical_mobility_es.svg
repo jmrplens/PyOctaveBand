@@ -1160,7 +1160,7 @@ z
     </g>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(474.882098 48.575469)">SDOF: m = 2 kg, k = 8000 N/m, c = 5 N.s/m</text>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(566.760223 60.578203)">H = 1/(k - w^2 m + j w c)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(528.938348 72.580938)">Y = j w H,   A = -w^2 H  (Table 1)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(528.963348 72.580938)">Y = j w H,   A = -w^2 H  (Tabla 1)</text>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(562.828973 84.627422)">f0 = 10,1 Hz,  |Y(f0)| = 1/c</text>
    </g>
    <g id="text_16">

@@ -467,8 +467,8 @@ L 394.205684 356.410014
 " clip-path="url(#paecb935b57)" style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(157.60201 147.144918)">this peak is the whole measurement</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(157.60201 157.947379)">(Formula 4), extrapolated to F -&gt; 0</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(157.60201 147.504918)">este pico es toda la medición</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(157.60201 158.667379)">(Fórmula 4), extrapolado a F -&gt; 0</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="219.569639" y="16.318125" transform="rotate(-0 219.569639 16.318125)">En el banco: leer fr</text>
@@ -1061,12 +1061,12 @@ z
     </g>
    </g>
    <g id="text_40">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(477.863385 346.239709)">amplification below</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(477.863385 357.04217)">sqrt(2) f0 = 67 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(477.863385 346.599709)">amplificación por debajo de</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(477.863385 357.40217)">sqrt(2) f0 = 67 Hz</text>
    </g>
    <g id="text_41">
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(669.003114 237.256805)">30 lg(f/f0): 30,8 dB</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(669.003114 248.059266)">against 35,6 dB at 500 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(669.003114 248.059266)">frente a 35,6 dB a 500 Hz</text>
    </g>
    <g id="text_42">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="628.084072" y="16.318125" transform="rotate(-0 628.084072 16.318125)">Instalado: solo muy por encima de f0</text>

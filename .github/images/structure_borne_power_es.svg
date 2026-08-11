@@ -468,18 +468,18 @@ L 705.765 28.798125
      <path d="M 50.899909 398.443828 
 L 283.886002 398.443828 
 Q 288.386002 398.443828 288.386002 393.943828 
-L 288.386002 361.44082 
-Q 288.386002 356.94082 283.886002 356.94082 
-L 50.899909 356.94082 
-Q 46.399909 356.94082 46.399909 361.44082 
+L 288.386002 361.128633 
+Q 288.386002 356.628633 283.886002 356.628633 
+L 50.899909 356.628633 
+Q 46.399909 356.628633 46.399909 361.128633 
 L 46.399909 393.943828 
 Q 46.399909 398.443828 50.899909 398.443828 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 369.228105)">LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 380.030566)">eta = 2,2/(f Ts),  v0 = 1 nm/s</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 390.88084)">reception-plate method (clause 7)</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 368.915918)">LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 379.718379)">eta = 2,2/(f Ts),  v0 = 1 nm/s</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 390.88084)">método de la placa receptora (apartado 7)</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.346172" y="16.798125" transform="rotate(-0 373.346172 16.798125)">Potencia acústica estructural en placa receptora EN 15657</text>

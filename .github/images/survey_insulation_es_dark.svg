@@ -249,20 +249,20 @@ L 705.763438 28.798125
    </g>
    <g id="text_13">
     <g id="patch_7">
-     <path d="M 558.136185 395.717852 
+     <path d="M 534.175091 395.717852 
 L 695.790873 395.717852 
 Q 701.290873 395.717852 701.290873 390.217852 
 L 701.290873 363.811836 
 Q 701.290873 358.311836 695.790873 358.311836 
-L 558.136185 358.311836 
-Q 552.636185 358.311836 552.636185 363.811836 
-L 552.636185 390.217852 
-Q 552.636185 395.717852 558.136185 395.717852 
+L 534.175091 358.311836 
+Q 528.675091 358.311836 528.675091 363.811836 
+L 528.675091 390.217852 
+Q 528.675091 395.717852 534.175091 395.717852 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(562.472591 373.271191)">DnT,w = 49 dB  (C = -1)</text>
-    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(558.136185 386.474199)">octave bands, T0 = 0,5 s</text>
+    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(534.175091 386.474199)">bandas de octava, T0 = 0,5 s</text>
    </g>
    <g id="text_14">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="373.344609" y="16.798125" transform="rotate(-0 373.344609 16.798125)">Método de control ISO 10052: corrección por índice de reverberación</text>

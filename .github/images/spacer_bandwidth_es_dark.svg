@@ -502,7 +502,7 @@ L 697.848153 63.198939
      </g>
     </g>
     <g id="text_6">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="28.803125" y="165.349896" transform="rotate(-90 28.803125 165.349896)">Finite-difference bias [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="28.803125" y="165.349896" transform="rotate(-90 28.803125 165.349896)">Sesgo de diferencias finitas [dB]</text>
     </g>
    </g>
    <g id="line2d_73">
@@ -639,10 +639,10 @@ L 697.848153 28.318125
     <text style="font-size: 9px; font-family: sans-serif; fill: #2ca02c" transform="translate(405.776046 252.551932) rotate(-90)">0,69 kHz</text>
    </g>
    <g id="text_10">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="107.198017" y="87.117212" transform="rotate(-0 107.198017 87.117212)">−0,3 dB: the bound f_max is quoted against</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="107.198017" y="87.117212" transform="rotate(-0 107.198017 87.117212)">−0,3 dB: el sesgo contra el que se cita la cota f_max</text>
    </g>
    <g id="text_11">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.78228" y="16.318125" transform="rotate(-0 379.78228 16.318125)">High end: the finite-difference bias, and f_max = 0,1 c/Δr</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.78228" y="16.318125" transform="rotate(-0 379.78228 16.318125)">Extremo alto: el sesgo de diferencias finitas, y f_max = 0,1 c/Δr</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
@@ -1183,7 +1183,7 @@ L 697.848153 358.640295
      </g>
     </g>
     <g id="text_32">
-     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(15.799414 436.019896) rotate(-90)">δpI0 margin,</text>
+     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(15.799414 444.99099) rotate(-90)">Margen de δpI0,</text>
      <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(27.802148 440.71599) rotate(-90)">re 25 mm [dB]</text>
     </g>
    </g>
@@ -1318,10 +1318,10 @@ L 697.848153 335.801667
     <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #2ca02c" x="656.828537" y="349.827848" transform="rotate(-0 656.828537 349.827848)">+3,0 dB</text>
    </g>
    <g id="text_36">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="107.198017" y="382.566477" transform="rotate(-0 107.198017 382.566477)">25 mm: the separation Table 2 is written for</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="107.198017" y="382.566477" transform="rotate(-0 107.198017 382.566477)">25 mm: la separación para la que está escrita la Tabla 2</text>
    </g>
    <g id="text_37">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.78228" y="325.801667" transform="rotate(-0 379.78228 325.801667)">Low end: doubling the spacer is worth 3 dB of margin</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.78228" y="325.801667" transform="rotate(-0 379.78228 325.801667)">Extremo bajo: doblar el espaciador vale 3 dB de margen</text>
    </g>
   </g>
  </g>

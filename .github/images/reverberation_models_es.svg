@@ -292,21 +292,21 @@ L 705.983125 28.798125
    <g id="text_15">
     <g id="patch_7">
      <path d="M 54.427634 395.717852 
-L 250.911696 395.717852 
-Q 256.411696 395.717852 256.411696 390.217852 
-L 256.411696 337.407539 
-Q 256.411696 331.907539 250.911696 331.907539 
-L 54.427634 331.907539 
-Q 48.927634 331.907539 48.927634 337.407539 
+L 265.232321 395.717852 
+Q 270.732321 395.717852 270.732321 390.217852 
+L 270.732321 336.96668 
+Q 270.732321 331.46668 265.232321 331.46668 
+L 54.427634 331.46668 
+Q 48.927634 331.46668 48.927634 336.96668 
 L 48.927634 390.217852 
 Q 48.927634 395.717852 54.427634 395.717852 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 346.866035)">room 10 x 7 x 3,5 m</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 360.068184)">V = 245 m^3, S = 259 m^2</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 373.271191)">anisotropic: absorptive floor/ceiling</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 386.474199)">c0 = 343 m/s, air at 20 C / 50 % RH</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 346.426035)">sala de 10 x 7 x 3,5 m</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 359.628184)">V = 245 m^3, S = 259 m^2</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 373.271191)">anisótropa: suelo y techo absorbentes</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.427634 386.474199)">c0 = 343 m/s, aire a 20 °C / 50 % HR</text>
    </g>
    <g id="text_16">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="375.244297" y="16.798125" transform="rotate(-0 375.244297 16.798125)">Modelos de predicción del tiempo de reverberación</text>

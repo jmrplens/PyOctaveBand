@@ -1075,25 +1075,25 @@ L 701.37625 28.798125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 560.104375 49.498828 
+     <path d="M 563.290937 49.498828 
 L 695.07625 49.498828 
 Q 696.87625 49.498828 696.87625 47.698828 
 L 696.87625 35.098125 
 Q 696.87625 33.298125 695.07625 33.298125 
-L 560.104375 33.298125 
-Q 558.304375 33.298125 558.304375 35.098125 
-L 558.304375 47.698828 
-Q 558.304375 49.498828 560.104375 49.498828 
+L 563.290937 33.298125 
+Q 561.490937 33.298125 561.490937 35.098125 
+L 561.490937 47.698828 
+Q 561.490937 49.498828 563.290937 49.498828 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_35">
      <g>
-      <use xlink:href="#m1607f2d75f" x="570.904375" y="40.586719" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1607f2d75f" x="574.090937" y="40.586719" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="587.104375" y="43.736719" transform="rotate(-0 587.104375 43.736719)">Peak = 198 dB re 1 µPa</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="590.290937" y="43.736719" transform="rotate(-0 590.290937 43.736719)">Pico = 198 dB re 1 µPa</text>
     </g>
    </g>
   </g>

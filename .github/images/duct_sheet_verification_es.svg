@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="929.085938pt" height="539.755312pt" viewBox="0 0 929.085938 539.755312" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="938.094245pt" height="539.755312pt" viewBox="0 0 938.094245 539.755312" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 539.755312 
-L 929.085938 539.755312 
-L 929.085938 0 
+L 938.094245 539.755312 
+L 938.094245 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -589,38 +589,38 @@ L 312.234167 21.798437
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.761224" y="14.798437" transform="rotate(-0 179.761224 14.798437)">Fan, Eq. 13,1  (worst Δ 13 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.761224" y="14.798437" transform="rotate(-0 179.761224 14.798437)">Ventilador, Ec. 13,1  (peor Δ 13 dB)</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 220.834367 48.171522 
+     <path d="M 204.269454 48.171522 
 L 307.376167 48.171522 
 Q 308.764167 48.171522 308.764167 46.783522 
 L 308.764167 26.656438 
 Q 308.764167 25.268438 307.376167 25.268438 
-L 220.834367 25.268438 
-Q 219.446367 25.268438 219.446367 26.656438 
-L 219.446367 46.783522 
-Q 219.446367 48.171522 220.834367 48.171522 
+L 204.269454 25.268438 
+Q 202.881454 25.268438 202.881454 26.656438 
+L 202.881454 46.783522 
+Q 202.881454 48.171522 204.269454 48.171522 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_69">
      <g>
-      <use xlink:href="#mbe9f13f45c" x="229.162367" y="30.888753" style="stroke: #000000"/>
+      <use xlink:href="#mbe9f13f45c" x="212.597454" y="30.888753" style="stroke: #000000"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="241.654367" y="33.317753" transform="rotate(-0 241.654367 33.317753)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="225.089454" y="33.317753" transform="rotate(-0 225.089454 33.317753)">La fila impresa de Long</text>
     </g>
     <g id="line2d_70">
-     <path d="M 222.222367 41.299295 
-L 229.162367 41.299295 
-L 236.102367 41.299295 
+     <path d="M 205.657454 41.299295 
+L 212.597454 41.299295 
+L 219.537454 41.299295 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="241.654367" y="43.728295" transform="rotate(-0 241.654367 43.728295)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="225.089454" y="43.728295" transform="rotate(-0 225.089454 43.728295)">la biblioteca</text>
     </g>
    </g>
   </g>
@@ -1151,15 +1151,15 @@ L 617.060052 21.798437
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_39">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="484.587109" y="14.798437" transform="rotate(-0 484.587109 14.798437)">Flexible duct, 12 in × 6 ft  (worst Δ 11 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="484.587109" y="14.798437" transform="rotate(-0 484.587109 14.798437)">Conducto flexible, 12 in × 6 ft  (peor Δ 11 dB)</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
      <path d="M 356.972167 48.171522 
-L 443.513967 48.171522 
-Q 444.901967 48.171522 444.901967 46.783522 
-L 444.901967 26.656438 
-Q 444.901967 25.268438 443.513967 25.268438 
+L 460.078879 48.171522 
+Q 461.466879 48.171522 461.466879 46.783522 
+L 461.466879 26.656438 
+Q 461.466879 25.268438 460.078879 25.268438 
 L 356.972167 25.268438 
 Q 355.584167 25.268438 355.584167 26.656438 
 L 355.584167 46.783522 
@@ -1173,7 +1173,7 @@ z
      </g>
     </g>
     <g id="text_40">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="377.792167" y="33.317753" transform="rotate(-0 377.792167 33.317753)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="377.792167" y="33.317753" transform="rotate(-0 377.792167 33.317753)">La fila impresa de Long</text>
     </g>
     <g id="line2d_140">
      <path d="M 358.360167 41.299295 
@@ -1182,7 +1182,7 @@ L 372.240167 41.299295
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="377.792167" y="43.728295" transform="rotate(-0 377.792167 43.728295)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="377.792167" y="43.728295" transform="rotate(-0 377.792167 43.728295)">la biblioteca</text>
     </g>
    </g>
   </g>
@@ -1657,38 +1657,38 @@ L 921.885938 21.798437
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_55">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="789.412995" y="14.798437" transform="rotate(-0 789.412995 14.798437)">Lined duct, 18 × 12 in, 6 ft  (worst Δ 2 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="789.412995" y="14.798437" transform="rotate(-0 789.412995 14.798437)">Conducto revestido, 18 × 12 in, 6 ft  (peor Δ 2 dB)</text>
    </g>
    <g id="legend_3">
     <g id="patch_19">
-     <path d="M 830.486138 48.171522 
-L 917.027938 48.171522 
-Q 918.415938 48.171522 918.415938 46.783522 
-L 918.415938 26.656438 
-Q 918.415938 25.268438 917.027938 25.268438 
-L 830.486138 25.268438 
-Q 829.098138 25.268438 829.098138 26.656438 
-L 829.098138 46.783522 
-Q 829.098138 48.171522 830.486138 48.171522 
+     <path d="M 661.798052 48.171522 
+L 764.904765 48.171522 
+Q 766.292765 48.171522 766.292765 46.783522 
+L 766.292765 26.656438 
+Q 766.292765 25.268438 764.904765 25.268438 
+L 661.798052 25.268438 
+Q 660.410052 25.268438 660.410052 26.656438 
+L 660.410052 46.783522 
+Q 660.410052 48.171522 661.798052 48.171522 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_201">
      <g>
-      <use xlink:href="#mbe9f13f45c" x="838.814138" y="30.888753" style="stroke: #000000"/>
+      <use xlink:href="#mbe9f13f45c" x="670.126052" y="30.888753" style="stroke: #000000"/>
      </g>
     </g>
     <g id="text_56">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="851.306138" y="33.317753" transform="rotate(-0 851.306138 33.317753)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="682.618052" y="33.317753" transform="rotate(-0 682.618052 33.317753)">La fila impresa de Long</text>
     </g>
     <g id="line2d_202">
-     <path d="M 831.874138 41.299295 
-L 838.814138 41.299295 
-L 845.754138 41.299295 
+     <path d="M 663.186052 41.299295 
+L 670.126052 41.299295 
+L 677.066052 41.299295 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_57">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="851.306138" y="43.728295" transform="rotate(-0 851.306138 43.728295)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="682.618052" y="43.728295" transform="rotate(-0 682.618052 43.728295)">la biblioteca</text>
     </g>
    </g>
   </g>
@@ -2199,38 +2199,38 @@ L 312.234167 282.957266
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_75">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.761224" y="275.957266" transform="rotate(-0 179.761224 275.957266)">Lined duct, 36 × 24 in, 5 ft  (worst Δ 2 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.761224" y="275.957266" transform="rotate(-0 179.761224 275.957266)">Conducto revestido, 36 × 24 in, 5 ft  (peor Δ 2 dB)</text>
    </g>
    <g id="legend_4">
     <g id="patch_25">
-     <path d="M 220.834367 309.33035 
-L 307.376167 309.33035 
-Q 308.764167 309.33035 308.764167 307.94235 
-L 308.764167 287.815266 
-Q 308.764167 286.427266 307.376167 286.427266 
-L 220.834367 286.427266 
-Q 219.446367 286.427266 219.446367 287.815266 
-L 219.446367 307.94235 
-Q 219.446367 309.33035 220.834367 309.33035 
+     <path d="M 52.146281 309.33035 
+L 155.252994 309.33035 
+Q 156.640994 309.33035 156.640994 307.94235 
+L 156.640994 287.815266 
+Q 156.640994 286.427266 155.252994 286.427266 
+L 52.146281 286.427266 
+Q 50.758281 286.427266 50.758281 287.815266 
+L 50.758281 307.94235 
+Q 50.758281 309.33035 52.146281 309.33035 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_267">
      <g>
-      <use xlink:href="#mbe9f13f45c" x="229.162367" y="292.047581" style="stroke: #000000"/>
+      <use xlink:href="#mbe9f13f45c" x="60.474281" y="292.047581" style="stroke: #000000"/>
      </g>
     </g>
     <g id="text_76">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="241.654367" y="294.476581" transform="rotate(-0 241.654367 294.476581)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="72.966281" y="294.476581" transform="rotate(-0 72.966281 294.476581)">La fila impresa de Long</text>
     </g>
     <g id="line2d_268">
-     <path d="M 222.222367 302.458123 
-L 229.162367 302.458123 
-L 236.102367 302.458123 
+     <path d="M 53.534281 302.458123 
+L 60.474281 302.458123 
+L 67.414281 302.458123 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_77">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="241.654367" y="304.887123" transform="rotate(-0 241.654367 304.887123)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="72.966281" y="304.887123" transform="rotate(-0 72.966281 304.887123)">la biblioteca</text>
     </g>
    </g>
   </g>
@@ -2723,38 +2723,38 @@ L 617.060052 282.957266
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_93">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="484.587109" y="275.957266" transform="rotate(-0 484.587109 275.957266)">Supply diffuser, 312 cfm  (worst Δ 2 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="484.587109" y="275.957266" transform="rotate(-0 484.587109 275.957266)">Difusor de impulsión, 312 cfm  (peor Δ 2 dB)</text>
    </g>
    <g id="legend_5">
     <g id="patch_31">
-     <path d="M 525.660252 309.33035 
+     <path d="M 509.09534 309.33035 
 L 612.202052 309.33035 
 Q 613.590052 309.33035 613.590052 307.94235 
 L 613.590052 287.815266 
 Q 613.590052 286.427266 612.202052 286.427266 
-L 525.660252 286.427266 
-Q 524.272252 286.427266 524.272252 287.815266 
-L 524.272252 307.94235 
-Q 524.272252 309.33035 525.660252 309.33035 
+L 509.09534 286.427266 
+Q 507.70734 286.427266 507.70734 287.815266 
+L 507.70734 307.94235 
+Q 507.70734 309.33035 509.09534 309.33035 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_331">
      <g>
-      <use xlink:href="#mbe9f13f45c" x="533.988252" y="292.047581" style="stroke: #000000"/>
+      <use xlink:href="#mbe9f13f45c" x="517.42334" y="292.047581" style="stroke: #000000"/>
      </g>
     </g>
     <g id="text_94">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="546.480252" y="294.476581" transform="rotate(-0 546.480252 294.476581)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="529.91534" y="294.476581" transform="rotate(-0 529.91534 294.476581)">La fila impresa de Long</text>
     </g>
     <g id="line2d_332">
-     <path d="M 527.048252 302.458123 
-L 533.988252 302.458123 
-L 540.928252 302.458123 
+     <path d="M 510.48334 302.458123 
+L 517.42334 302.458123 
+L 524.36334 302.458123 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_95">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="546.480252" y="304.887123" transform="rotate(-0 546.480252 304.887123)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="529.91534" y="304.887123" transform="rotate(-0 529.91534 304.887123)">la biblioteca</text>
     </g>
    </g>
   </g>
@@ -3247,38 +3247,38 @@ L 921.885938 282.957266
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_111">
-    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="789.412995" y="275.957266" transform="rotate(-0 789.412995 275.957266)">NC 30 curve  (worst Δ 1 dB)</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle" x="789.412995" y="275.957266" transform="rotate(-0 789.412995 275.957266)">Curva NC 30  (peor Δ 1 dB)</text>
    </g>
    <g id="legend_6">
     <g id="patch_37">
-     <path d="M 830.486138 309.33035 
+     <path d="M 813.921225 309.33035 
 L 917.027938 309.33035 
 Q 918.415938 309.33035 918.415938 307.94235 
 L 918.415938 287.815266 
 Q 918.415938 286.427266 917.027938 286.427266 
-L 830.486138 286.427266 
-Q 829.098138 286.427266 829.098138 287.815266 
-L 829.098138 307.94235 
-Q 829.098138 309.33035 830.486138 309.33035 
+L 813.921225 286.427266 
+Q 812.533225 286.427266 812.533225 287.815266 
+L 812.533225 307.94235 
+Q 812.533225 309.33035 813.921225 309.33035 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_395">
      <g>
-      <use xlink:href="#mbe9f13f45c" x="838.814138" y="292.047581" style="stroke: #000000"/>
+      <use xlink:href="#mbe9f13f45c" x="822.249225" y="292.047581" style="stroke: #000000"/>
      </g>
     </g>
     <g id="text_112">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="851.306138" y="294.476581" transform="rotate(-0 851.306138 294.476581)">Long's printed row</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="834.741225" y="294.476581" transform="rotate(-0 834.741225 294.476581)">La fila impresa de Long</text>
     </g>
     <g id="line2d_396">
-     <path d="M 831.874138 302.458123 
-L 838.814138 302.458123 
-L 845.754138 302.458123 
+     <path d="M 815.309225 302.458123 
+L 822.249225 302.458123 
+L 829.189225 302.458123 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_113">
-     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="851.306138" y="304.887123" transform="rotate(-0 851.306138 304.887123)">the library</text>
+     <text style="font-size: 6.94px; font-family: sans-serif; text-anchor: start" x="834.741225" y="304.887123" transform="rotate(-0 834.741225 304.887123)">la biblioteca</text>
     </g>
    </g>
   </g>

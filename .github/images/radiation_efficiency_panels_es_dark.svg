@@ -923,7 +923,7 @@ z
 " clip-path="url(#p9dda0c8180)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="text_15">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="707.149023" y="22.798125" transform="rotate(-0 707.149023 22.798125)">Baffled plate (simply_supported)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="707.149023" y="22.798125" transform="rotate(-0 707.149023 22.798125)">Placa con bafle (simply_supported)</text>
    </g>
    <g id="patch_12">
     <path d="M 599.530795 80.394305 

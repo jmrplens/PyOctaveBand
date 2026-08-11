@@ -468,22 +468,22 @@ L 707.379062 30.328125
    </g>
    <g id="text_29">
     <g id="patch_7">
-     <path d="M 495.633466 386.974631 
+     <path d="M 491.040966 386.974631 
 L 697.550498 386.974631 
 Q 703.050498 386.974631 703.050498 381.474631 
-L 703.050498 328.662599 
-Q 703.050498 323.162599 697.550498 323.162599 
-L 495.633466 323.162599 
-Q 490.133466 323.162599 490.133466 328.662599 
-L 490.133466 381.474631 
-Q 490.133466 386.974631 495.633466 386.974631 
+L 703.050498 327.782599 
+Q 703.050498 322.282599 697.550498 322.282599 
+L 491.040966 322.282599 
+Q 485.540966 322.282599 485.540966 327.782599 
+L 485.540966 381.474631 
+Q 485.540966 386.974631 491.040966 386.974631 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(520.555341 338.121955)">rigid T-junction, two heavy walls</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(495.633466 351.324963)">lij = 4 m, Si = 12 m^2, Sj = 10 m^2</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(529.305498 364.52797)">Formula (13), one-third octave</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(597.80456 377.730978)">mean Kij = 9,5 dB</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(491.040966 337.681955)">unión en T rígida, dos muros pesados</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(495.633466 350.884963)">lij = 4 m, Si = 12 m^2, Sj = 10 m^2</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(525.250966 364.52797)">Fórmula (13), tercios de octava</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(594.746904 377.730978)">Kij medio = 9,5 dB</text>
    </g>
    <g id="text_30">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="379.760234" y="18.328125" transform="rotate(-0 379.760234 18.328125)">Índice de reducción de vibraciones de unión (ISO 10848)</text>

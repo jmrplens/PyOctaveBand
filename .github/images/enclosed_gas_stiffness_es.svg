@@ -428,16 +428,16 @@ L 672.601094 351.152142
      <path d="M 50.794911 400.945898 
 L 440.911161 400.945898 
 Q 445.411161 400.945898 445.411161 396.445898 
-L 445.411161 363.631406 
-Q 445.411161 359.131406 440.911161 359.131406 
-L 50.794911 359.131406 
-Q 46.294911 359.131406 46.294911 363.631406 
+L 445.411161 363.991406 
+Q 445.411161 359.491406 440.911161 359.491406 
+L 50.794911 359.491406 
+Q 46.294911 359.491406 46.294911 363.991406 
 L 46.294911 396.445898 
 Q 46.294911 400.945898 50.794911 400.945898 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.794911 371.730879)">capítulo 8,2:  r &gt;= 100 kPa.s/m2 -&gt; s' = s't</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.794911 371.730879)">apartado 8,2:  r &gt;= 100 kPa.s/m2 -&gt; s' = s't</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.794911 382.532637)">               10 &lt;= r &lt; 100     -&gt; s' = s't + s'a</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.794911 393.38291)">               r &lt; 10            -&gt; s' = s't solo si s'a es despreciable</text>
    </g>
@@ -476,15 +476,15 @@ L 672.601094 214.89587
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 449.385625 77.580234 
-L 666.301094 77.580234 
-Q 668.101094 77.580234 668.101094 75.780234 
+     <path d="M 449.385625 77.220234 
+L 666.301094 77.220234 
+Q 668.101094 77.220234 668.101094 75.420234 
 L 668.101094 35.098125 
 Q 668.101094 33.298125 666.301094 33.298125 
 L 449.385625 33.298125 
 Q 447.585625 33.298125 447.585625 35.098125 
-L 447.585625 75.780234 
-Q 447.585625 77.580234 449.385625 77.580234 
+L 447.585625 75.420234 
+Q 447.585625 77.220234 449.385625 77.220234 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -507,13 +507,13 @@ L 469.185625 54.807422
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="476.385625" y="57.957422" transform="rotate(-0 476.385625 57.957422)">s'a, aire encerrado (Fórmula 7, eps = 0,9)</text>
     </g>
     <g id="line2d_54">
-     <path d="M 451.185625 68.668125 
-L 460.185625 68.668125 
-L 469.185625 68.668125 
+     <path d="M 451.185625 68.308125 
+L 460.185625 68.308125 
+L 469.185625 68.308125 
 " style="fill: none; stroke: #d62728; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="476.385625" y="71.818125" transform="rotate(-0 476.385625 71.818125)">s' instalada = s't + s'a (capítulo 8,2)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="476.385625" y="71.458125" transform="rotate(-0 476.385625 71.458125)">s' instalada = s't + s'a (apartado 8,2)</text>
     </g>
    </g>
    <g id="PathCollection_1">

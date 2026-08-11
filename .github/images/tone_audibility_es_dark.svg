@@ -414,18 +414,18 @@ L 705.6425 28.318125
      <path d="M 44.631009 376.635324 
 L 356.784212 376.635324 
 Q 361.034212 376.635324 361.034212 372.385324 
-L 361.034212 341.733195 
-Q 361.034212 337.483195 356.784212 337.483195 
-L 44.631009 337.483195 
-Q 40.381009 337.483195 40.381009 341.733195 
+L 361.034212 341.393195 
+Q 361.034212 337.143195 356.784212 337.143195 
+L 44.631009 337.143195 
+Q 40.381009 337.143195 40.381009 341.393195 
 L 40.381009 372.385324 
 Q 40.381009 376.635324 44.631009 376.635324 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 349.042697)">dfc = 25 + 75 (1 + 1,4 (fT/1000)^2)^0,69</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 359.290177)">LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2,5)</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 369.492501)">dL = LT - LG - av  (combustion engine, Annex E)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 348.702697)">dfc = 25 + 75 (1 + 1,4 (fT/1000)^2)^0,69</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 358.950177)">LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2,5)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(44.631009 369.492501)">dL = LT - LG - av  (motor de combustión, Anexo E)</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="370.103672" y="16.318125" transform="rotate(-0 370.103672 16.318125)">Audibilidad tonal ISO/PAS 20065</text>
