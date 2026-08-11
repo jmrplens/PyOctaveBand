@@ -43,7 +43,7 @@ references:
     title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 3: Periodic tests"
     designation: "IEC 61260-3:2016"
     url: "https://webstore.iec.ch/en/publication/24561"
-    note: "Los ensayos periódicos de un analizador en servicio: atenuación relativa en el centro de banda o desviación del ancho de banda efectivo, el rango lineal de funcionamiento con su control de rango de nivel e indicador de sobrecarga, y el límite inferior de ese rango."
+    note: "Los ensayos periódicos de un analizador en servicio: atenuación relativa en el centro de banda o desviación del ancho de banda efectivo, el rango lineal de funcionamiento con su control de rango de nivel e indicador de sobrecarga, el límite inferior de ese rango, y el ensayo de atenuación relativa del apartado 13 en las frecuencias normalizadas de la Tabla 1 sobre tres filtros seleccionados."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 1993
@@ -276,9 +276,10 @@ Tres hábitos lo vuelven útil en lugar de decorativo:
   sometió la implementación, que es exactamente la cita que necesita un
   informe.
 - **Fíjate en la configuración de las filas de clase.** La sección de
-  filtros y ponderaciones recorre las cinco arquitecturas de filtro y las
-  curvas de ponderación con los mismos verificadores que documenta esta
-  página, en una configuración anclada: orden 6, tercio de octava, 100 Hz a
+  filtros y ponderaciones recorre las
+  [cinco arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/)
+  y las curvas de ponderación con los mismos verificadores que documenta
+  esta página, en una configuración anclada: orden 6, tercio de octava, 100 Hz a
   10 kHz, 48 kHz. El informe demuestra la implementación; para cualquier
   otra fracción, orden o frecuencia de muestreo, la sección 2 es cómo se
   traslada la afirmación a *tu* banco.
@@ -319,16 +320,19 @@ sobrecarga (IEC 61672-2:2013, apartados 7 a 9; IEC 61260-2:2016, apartados
 7 a 9).
 
 Los **ensayos periódicos** (IEC 61672-3:2013, IEC 61260-3:2016) son lo que
-recibe en laboratorio un *instrumento en servicio* cada año o dos. Su
+recibe en laboratorio un *instrumento en servicio*, normalmente cada año o
+dos. Su
 alcance es deliberadamente lo contrario de exhaustivo: un conjunto limitado
 de ensayos clave, válido para las condiciones ambientales del día,
 «restringido al mínimo considerado necesario» (IEC 61672-3:2013, apartado 1;
 IEC 61260-3:2016, apartados 1.2 y 1.3). Para un juego de filtros eso
 significa la atenuación relativa en la frecuencia central de cada filtro o
 la desviación del ancho de banda efectivo, el rango lineal de funcionamiento
-con su control de rango de nivel e indicador de sobrecarga, y el límite
-inferior de ese rango (IEC 61260-3:2016, apartados 10 a 12); para un
-sonómetro, la comprobación con calibrador, el ruido autogenerado, las
+con su control de rango de nivel e indicador de sobrecarga, el límite
+inferior de ese rango, y un ensayo de atenuación relativa en las frecuencias
+normalizadas de la propia Tabla 1 de la norma sobre los tres filtros
+seleccionados para los ensayos de linealidad (IEC 61260-3:2016, apartados
+10 a 13); para un sonómetro, la comprobación con calibrador, el ruido autogenerado, las
 ponderaciones con señales acústicas y eléctricas, la linealidad, las ráfagas
 tonales, el pico con ponderación C y la sobrecarga (IEC 61672-3:2013,
 apartados 9 a 21). Los dos alcances de la Parte 3 terminan con la misma

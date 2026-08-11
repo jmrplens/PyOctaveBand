@@ -43,7 +43,7 @@ references:
     title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 3: Periodic tests"
     designation: "IEC 61260-3:2016"
     url: "https://webstore.iec.ch/en/publication/24561"
-    note: "The periodic tests of a working analyser: midband relative attenuation or effective bandwidth deviation, the linear operating range with its level range control and overload indicator, and the lower limit of that range."
+    note: "The periodic tests of a working analyser: midband relative attenuation or effective bandwidth deviation, the linear operating range with its level range control and overload indicator, the lower limit of that range, and the clause 13 relative-attenuation test at the Table 1 normalized frequencies on three selected filters."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 1993
@@ -255,8 +255,10 @@ Three habits make it useful rather than decorative:
   rely on tells you which clause of which edition the implementation was held
   to, which is exactly the citation a report needs.
 - **Note the configuration of the class rows.** The filters-and-weightings
-  section walks the five filter architectures and the weighting curves
-  through the same verifiers this page documents, in one pinned
+  section walks the
+  [five filter architectures](/phonometry/signals/filters/filter-gallery/) and
+  the weighting curves through the same verifiers this page documents, in one
+  pinned
   configuration: order 6, one-third-octave, 100 Hz to 10 kHz, 48 kHz. The
   report proves the implementation; for any other fraction, order or sample
   rate, section 2 is how the claim transfers to *your* bank.
@@ -294,15 +296,18 @@ self-generated noise, toneburst response, overload behaviour
 (IEC 61672-2:2013, clauses 7 to 9; IEC 61260-2:2016, clauses 7 to 9).
 
 **Periodic tests** (IEC 61672-3:2013, IEC 61260-3:2016) are what a *working
-instrument* receives in the laboratory every year or two. Their scope is
+instrument* receives in the laboratory, typically every year or two. Their
+scope is
 deliberately the opposite of exhaustive: a limited set of key tests, valid
 for the environmental conditions of the day, "restricted to the minimum
 considered necessary" (IEC 61672-3:2013, clause 1; IEC 61260-3:2016,
 subclauses 1.2 and 1.3). For a filter set that means the relative attenuation
 at the midband frequency of every filter or the effective bandwidth
 deviation, the linear operating range with its level range control and
-overload indicator, and the lower limit of that range (IEC 61260-3:2016,
-clauses 10 to 12); for a meter, the calibrator check, self-generated noise,
+overload indicator, the lower limit of that range, and a
+relative-attenuation test at the normalized frequencies of the standard's
+own Table 1 on the three filters selected for the linearity tests
+(IEC 61260-3:2016, clauses 10 to 13); for a meter, the calibrator check, self-generated noise,
 weightings by acoustical and electrical signals, linearity, tonebursts,
 C-weighted peak and overload (IEC 61672-3:2013, clauses 9 to 21). Both Part 3
 scopes end with the same caveat: because the extent is limited, passing every
