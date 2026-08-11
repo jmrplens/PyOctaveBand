@@ -70,7 +70,10 @@ REPO_URL = "https://github.com/jmrplens/phonometry"
 DOI = "10.5281/zenodo.21215280"
 
 #: Shard budget. Comfortably under the truncation limit of the AI fetch tools
-#: that cap response size, with room for a page to grow.
+#: that cap response size, with room for a page to grow. Enforced: main() exits
+#: non-zero if a shard is over it (see :func:`_check_shard_budget`). A shard
+#: exactly at the limit passes; only strictly over fails, both here and in the
+#: message it raises.
 SHARD_LIMIT_BYTES = 200_000
 
 #: Markdown files under docs/ that are not documentation pages.
@@ -806,6 +809,33 @@ def _check_readme_covers_the_mirror() -> None:
         )
 
 
+def _check_shard_budget(sizes: dict[str, int]) -> None:
+    """Fail the run if any shard exceeds :data:`SHARD_LIMIT_BYTES`.
+
+    This used to be a printed note with exit 0, so llms-start.txt and
+    llms-buildings-insulation.txt sat over budget for weeks with a green CI: a
+    client that truncates at a few hundred kilobytes read a partial shard and
+    nothing here ever said so. The budget is not negotiable (see its own
+    docstring); the only fix for an oversized shard is a narrower split, never
+    a higher SHARD_LIMIT_BYTES.
+    """
+    oversized = sorted(
+        (slug, size) for slug, size in sizes.items() if size > SHARD_LIMIT_BYTES
+    )
+    if not oversized:
+        return
+    detail = "\n".join(
+        f"  llms-{slug}.txt is {size:,} bytes, {size - SHARD_LIMIT_BYTES:,} over "
+        f"the {SHARD_LIMIT_BYTES:,} byte budget"
+        for slug, size in oversized
+    )
+    raise SystemExit(
+        "generate_llms.py: shard(s) exceed the fetch budget:\n"
+        + detail
+        + "\nSplit the area into a narrower shard; do not raise SHARD_LIMIT_BYTES."
+    )
+
+
 def main() -> None:
     _check_areas_cover_the_tree()
     _check_readme_covers_the_mirror()
@@ -831,22 +861,16 @@ def main() -> None:
             path.unlink()
             print(f"  removed stale shard {path.name}")
 
-    oversized: list[tuple[str, int]] = []
+    sizes: dict[str, int] = {}
     for slug, text in shards.items():
         (SHARDS_DIR / f"llms-{slug}.txt").write_text(text, encoding="utf-8")
-        size = len(text.encode("utf-8"))
-        if size > SHARD_LIMIT_BYTES:
-            oversized.append((slug, size))
+        sizes[slug] = len(text.encode("utf-8"))
 
     print(
         f"llms.txt regenerated (v{version}): {len(_routes())} pages, "
         f"{len(_api_routes())} API pages listed as optional."
     )
-    for slug, size in oversized:
-        print(
-            f"  note: llms-{slug}.txt is {size / 1000:.0f} kB, over the "
-            f"{SHARD_LIMIT_BYTES / 1000:.0f} kB budget; consider splitting the area."
-        )
+    _check_shard_budget(sizes)
 
 
 if __name__ == "__main__":
