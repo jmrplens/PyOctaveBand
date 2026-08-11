@@ -399,10 +399,13 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     # constant -- the 63 Hz curve, whose Ch = 0.63, crosses at 3.0 dB.
     grazing = 10.0 * np.log10(3.0)
     grazing_63 = 10.0 * min(63.0 * h0 / 250.0, 1.0) * np.log10(3.0)
+    # Set low, in the empty wedge under the 63 Hz curve: at the range this
+    # figure now plots, higher up (where it used to sit) the 250 Hz curve
+    # cuts straight through the text.
     ax.annotate(
         f"10 Ch lg 3 at grazing incidence (δ = 0):\n"
         f"{grazing:.1f} dB where Ch = 1, {grazing_63:.1f} dB at 63 Hz",
-        xy=(0.0, grazing), xytext=(0.32, grazing + 6.0),
+        xy=(0.0, grazing), xytext=(0.45, 1.6),
         fontsize=9, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     ax.set_xlabel("Path difference δ [m]")

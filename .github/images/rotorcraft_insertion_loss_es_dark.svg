@@ -510,17 +510,17 @@ L 675.943544 45.079837
 " clip-path="url(#pa5a0efe6e7)" style="fill: none; stroke: #fde725; stroke-width: 2; stroke-linecap: square"/>
    </g>
    <g id="patch_8">
-    <path d="M 361.41959 236.291868 
-Q 281.01792 272.023171 201.637935 307.300427 
+    <path d="M 341.947881 329.048614 
+Q 271.357165 318.949511 201.873214 309.008748 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 205.6587 307.483306 
-L 201.637935 307.300427 
-L 204.196697 304.193542 
+    <path d="M 205.182006 311.30045 
+L 201.873214 309.008748 
+L 205.691851 307.736736 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_17">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(300.580657 219.612587)">10 Ch lg 3 en incidencia rasante (δ = 0):</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(300.580657 230.415048)">4,8 dB donde Ch = 1, 3,0 dB en 63 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(341.934195 339.071018)">10 Ch lg 3 en incidencia rasante (δ = 0):</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(341.934195 349.873479)">4,8 dB donde Ch = 1, 3,0 dB en 63 Hz</text>
    </g>
    <g id="text_18">
     <g id="patch_9">
