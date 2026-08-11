@@ -280,6 +280,52 @@ own mean ground plane and weighted by its image-path diffraction (Eq. 45-47,
 the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
 evaluated separately in that regime.
 
+```python
+from phonometry import diffraction_attenuation
+
+bands = [63.0, 250.0, 1000.0, 4000.0]
+diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
+diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss.svg" alt="Diffraction attenuation against path difference for four bands from 63 Hz to 4 kHz, over a 2.5 m edge: every curve is zero left of its own band-dependent threshold near the line of sight, crosses about 4.8 dB at grazing incidence, and the two highest bands flatten at the 25 dB cap while the 250 Hz and 63 Hz curves keep climbing" width="82%">
+</picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import diffraction_attenuation
+
+bands = np.array([63.0, 250.0, 1000.0, 4000.0])
+delta = np.linspace(-0.4, 4.0, 441)
+ld = np.array([diffraction_attenuation(bands, float(d), edge_height=2.5)
+              for d in delta])
+
+fig, ax = plt.subplots(figsize=(9, 6))
+for i, label in enumerate(["63 Hz", "250 Hz", "1 kHz", "4 kHz"]):
+    ax.plot(delta, ld[:, i], label=label)
+ax.axvline(0.0, color="0.5", linestyle="--")
+ax.axhline(25.0, color="0.5", linestyle=":", label="25 dB cap")
+ax.set(xlabel="Path difference δ [m]",
+       ylabel="Diffraction attenuation ΔLd [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Every curve is flat at zero left of its own threshold (the guidance's
+$(40/\lambda)\,C''\,\delta \ge -2$, so a longer wavelength still shows
+attenuation further below the line of sight), all four pass through the
+classical $10\log_{10}3 \approx 4.8$ dB at grazing incidence, and only the
+bands whose wavelength is short enough reach the 25 dB cap within a few
+metres of path difference.
+
 `mean_ground_plane`, `mean_flow_resistivity` and `diffraction_attenuation`
 expose the pieces; `terrain_screening_adjustment` runs the whole section:
 
