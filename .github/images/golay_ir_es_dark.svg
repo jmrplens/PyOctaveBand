@@ -441,20 +441,20 @@ L 700.671875 28.798125
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 542.077754 372.685898 
+     <path d="M 508.170254 372.685898 
 L 690.97291 372.685898 
 Q 694.57291 372.685898 694.57291 369.085898 
-L 694.57291 347.441602 
-Q 694.57291 343.841602 690.97291 343.841602 
-L 542.077754 343.841602 
-Q 538.477754 343.841602 538.477754 347.441602 
-L 538.477754 369.085898 
-Q 538.477754 372.685898 542.077754 372.685898 
+L 694.57291 347.120977 
+Q 694.57291 343.520977 690.97291 343.520977 
+L 508.170254 343.520977 
+Q 504.570254 343.520977 504.570254 347.120977 
+L 504.570254 369.085898 
+Q 504.570254 372.685898 508.170254 372.685898 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(542.077754 355.220449)">max |recovered - true| = 2,1e-14</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(552.85666 366.02291)">noise-free closed-form identity</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(508.170254 355.220449)">máx |recuperada - verdadera| = 2,1e-14</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(573.733848 366.02291)">identidad exacta sin ruido</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="377.373047" y="16.798125" transform="rotate(-0 377.373047 16.798125)">Respuesta al impulso con par de Golay: recuperación complementaria exacta</text>

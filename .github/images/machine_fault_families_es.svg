@@ -233,7 +233,7 @@ L 448.338438 80.962977
      </g>
     </g>
     <g id="text_14">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="22.395313" y="178.787824" transform="rotate(-90 22.395313 178.787824)">Spectrum amplitude</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="22.395313" y="178.787824" transform="rotate(-90 22.395313 178.787824)">Amplitud del espectro</text>
     </g>
    </g>
    <g id="line2d_25">
@@ -3644,7 +3644,7 @@ L 448.338438 72.456469
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_15">
-    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(63.105739 110.999818) rotate(-90)">shaft</text>
+    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(63.105739 110.999818) rotate(-90)">eje</text>
    </g>
    <g id="text_16">
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #2ca02c" transform="translate(185.001583 110.999818) rotate(-90)">GMF</text>
@@ -3692,61 +3692,61 @@ L 448.338438 72.456469
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #2ca02c" transform="translate(434.978879 110.999818) rotate(-90)">3xGMF+2x</text>
    </g>
    <g id="patch_7">
-    <path d="M 248.183706 155.485476 
-Q 212.628534 190.675844 177.867998 225.07973 
+    <path d="M 258.911867 155.387193 
+Q 218.03689 190.67839 178.008169 225.238936 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 181.692887 223.826644 
-L 177.867998 225.07973 
-L 179.160463 221.267967 
+    <path d="M 181.909385 224.248728 
+L 178.008169 225.238936 
+L 179.556732 221.523839 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_31">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(202.092559 138.212584)">sidebands at ± fs = 25 Hz:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(202.092559 149.015045)">low and flat</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(202.092559 138.212584)">bandas laterales a ± fs = 25 Hz:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(202.092559 149.015045)">bajas y planas</text>
    </g>
    <g id="text_32">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="250.019609" y="62.456469" transform="rotate(-0 250.019609 62.456469)">Localised fault: one chipped tooth</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="250.019609" y="62.456469" transform="rotate(-0 250.019609 62.456469)">Fallo localizado: un solo diente astillado</text>
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 334.492891 117.508461 
-L 442.388438 117.508461 
-Q 444.088438 117.508461 444.088438 115.808461 
+     <path d="M 323.246328 117.848461 
+L 442.388438 117.848461 
+Q 444.088438 117.848461 444.088438 116.148461 
 L 444.088438 78.406469 
 Q 444.088438 76.706469 442.388438 76.706469 
-L 334.492891 76.706469 
-Q 332.792891 76.706469 332.792891 78.406469 
-L 332.792891 115.808461 
-Q 332.792891 117.508461 334.492891 117.508461 
+L 323.246328 76.706469 
+Q 321.546328 76.706469 321.546328 78.406469 
+L 321.546328 116.148461 
+Q 321.546328 117.848461 323.246328 117.848461 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_42">
-     <path d="M 336.192891 83.590141 
-L 344.692891 83.590141 
-L 353.192891 83.590141 
+     <path d="M 324.946328 83.930141 
+L 333.446328 83.930141 
+L 341.946328 83.930141 
 " style="fill: none; stroke: #1f77b4; stroke-linecap: square"/>
     </g>
     <g id="text_33">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="86.565141" transform="rotate(-0 359.992891 86.565141)">vibration spectrum</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="86.905141" transform="rotate(-0 348.746328 86.905141)">espectro de vibración</text>
     </g>
     <g id="line2d_43">
-     <path d="M 336.192891 96.340805 
-L 344.692891 96.340805 
-L 353.192891 96.340805 
+     <path d="M 324.946328 96.680805 
+L 333.446328 96.680805 
+L 341.946328 96.680805 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-opacity: 0.85"/>
     </g>
     <g id="text_34">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="99.315805" transform="rotate(-0 359.992891 99.315805)">shaft</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="99.655805" transform="rotate(-0 348.746328 99.655805)">eje</text>
     </g>
     <g id="line2d_44">
-     <path d="M 336.192891 109.091469 
-L 344.692891 109.091469 
-L 353.192891 109.091469 
+     <path d="M 324.946328 109.431469 
+L 333.446328 109.431469 
+L 341.946328 109.431469 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.85"/>
     </g>
     <g id="text_35">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="112.066469" transform="rotate(-0 359.992891 112.066469)">gear</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="112.406469" transform="rotate(-0 348.746328 112.406469)">engranaje</text>
     </g>
    </g>
   </g>
@@ -3946,7 +3946,7 @@ L 892.698437 80.962977
      </g>
     </g>
     <g id="text_49">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="466.755313" y="178.787824" transform="rotate(-90 466.755313 178.787824)">Spectrum amplitude</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="466.755313" y="178.787824" transform="rotate(-90 466.755313 178.787824)">Amplitud del espectro</text>
     </g>
    </g>
    <g id="line2d_69">
@@ -7310,7 +7310,7 @@ L 892.698437 72.456469
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_50">
-    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(507.465739 110.999818) rotate(-90)">shaft</text>
+    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(507.465739 110.999818) rotate(-90)">eje</text>
    </g>
    <g id="text_51">
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #2ca02c" transform="translate(629.361583 110.999818) rotate(-90)">GMF</text>
@@ -7358,62 +7358,62 @@ L 892.698437 72.456469
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #2ca02c" transform="translate(879.338879 110.999818) rotate(-90)">3xGMF+2x</text>
    </g>
    <g id="patch_14">
-    <path d="M 668.973607 154.977108 
-Q 645.383894 166.858486 622.792713 178.236937 
+    <path d="M 676.116313 154.885582 
+Q 648.979223 166.85789 622.86504 178.378913 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 626.817618 178.225144 
-L 622.792713 178.236937 
-L 625.198222 175.009937 
+    <path d="M 626.885297 178.572653 
+L 622.86504 178.378913 
+L 625.432186 175.278952 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_66">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 127.410123)">sidebands at ± fs = 25 Hz:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 138.212584)">tall groups, and the</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 149.015045)">higher harmonics lift</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 127.050123)">bandas laterales a ± fs = 25 Hz:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 138.212584)">grupos altos, y los armónicos</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(646.452559 149.015045)">superiores se levantan</text>
    </g>
    <g id="text_67">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="694.379609" y="62.456469" transform="rotate(-0 694.379609 62.456469)">Distributed wear: every tooth</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="694.379609" y="62.456469" transform="rotate(-0 694.379609 62.456469)">Desgaste distribuido: todos los dientes</text>
    </g>
    <g id="legend_2">
     <g id="patch_15">
-     <path d="M 778.852891 117.508461 
-L 886.748437 117.508461 
-Q 888.448437 117.508461 888.448437 115.808461 
+     <path d="M 767.606328 117.848461 
+L 886.748437 117.848461 
+Q 888.448437 117.848461 888.448437 116.148461 
 L 888.448437 78.406469 
 Q 888.448437 76.706469 886.748437 76.706469 
-L 778.852891 76.706469 
-Q 777.152891 76.706469 777.152891 78.406469 
-L 777.152891 115.808461 
-Q 777.152891 117.508461 778.852891 117.508461 
+L 767.606328 76.706469 
+Q 765.906328 76.706469 765.906328 78.406469 
+L 765.906328 116.148461 
+Q 765.906328 117.848461 767.606328 117.848461 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_86">
-     <path d="M 780.552891 83.590141 
-L 789.052891 83.590141 
-L 797.552891 83.590141 
+     <path d="M 769.306328 83.930141 
+L 777.806328 83.930141 
+L 786.306328 83.930141 
 " style="fill: none; stroke: #1f77b4; stroke-linecap: square"/>
     </g>
     <g id="text_68">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="86.565141" transform="rotate(-0 804.352891 86.565141)">vibration spectrum</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="86.905141" transform="rotate(-0 793.106328 86.905141)">espectro de vibración</text>
     </g>
     <g id="line2d_87">
-     <path d="M 780.552891 96.340805 
-L 789.052891 96.340805 
-L 797.552891 96.340805 
+     <path d="M 769.306328 96.680805 
+L 777.806328 96.680805 
+L 786.306328 96.680805 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-opacity: 0.85"/>
     </g>
     <g id="text_69">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="99.315805" transform="rotate(-0 804.352891 99.315805)">shaft</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="99.655805" transform="rotate(-0 793.106328 99.655805)">eje</text>
     </g>
     <g id="line2d_88">
-     <path d="M 780.552891 109.091469 
-L 789.052891 109.091469 
-L 797.552891 109.091469 
+     <path d="M 769.306328 109.431469 
+L 777.806328 109.431469 
+L 786.306328 109.431469 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.85"/>
     </g>
     <g id="text_70">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="112.066469" transform="rotate(-0 804.352891 112.066469)">gear</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="112.406469" transform="rotate(-0 793.106328 112.406469)">engranaje</text>
     </g>
    </g>
   </g>
@@ -7989,7 +7989,7 @@ L -2 0
      </g>
     </g>
     <g id="text_86">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="451.690301" transform="rotate(-90 14.798438 451.690301)">Spectrum amplitude</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="451.690301" transform="rotate(-90 14.798438 451.690301)">Amplitud del espectro</text>
     </g>
    </g>
    <g id="line2d_159">
@@ -13360,62 +13360,62 @@ L 448.338438 345.358945
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #9467bd" transform="translate(425.101164 363.550269) rotate(-90)">fsh</text>
    </g>
    <g id="patch_21">
-    <path d="M 331.795421 435.698211 
-Q 373.891397 453.676724 414.959184 471.216114 
+    <path d="M 335.601166 435.72863 
+Q 375.802355 453.677694 414.982645 471.170945 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 412.355455 468.146814 
-L 414.959184 471.216114 
-L 410.941507 471.457517 
+    <path d="M 412.429256 468.059642 
+L 414.982645 471.170945 
+L 410.96157 471.346875 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_92">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 408.246122)">rotor-slot harmonic</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 419.048582)">with ± fs sidebands:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 429.851043)">the spacing is the diagnosis</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 407.886122)">armónico de ranura de rotor</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 418.688582)">con bandas laterales a ± fs:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(224.594119 429.851043)">el espaciado es el diagnóstico</text>
    </g>
    <g id="text_93">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="250.019609" y="335.358945" transform="rotate(-0 250.019609 335.358945)">Induction motor: 1x, 2x, 2fe and the rotor-slot family</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="250.019609" y="335.358945" transform="rotate(-0 250.019609 335.358945)">Motor de inducción: 1x, 2x, 2fe y la familia de ranura de rotor</text>
    </g>
    <g id="legend_3">
     <g id="patch_22">
-     <path d="M 334.492891 390.410938 
-L 442.388438 390.410938 
-Q 444.088438 390.410938 444.088438 388.710938 
+     <path d="M 323.246328 390.750938 
+L 442.388438 390.750938 
+Q 444.088438 390.750938 444.088438 389.050938 
 L 444.088438 351.308945 
 Q 444.088438 349.608945 442.388438 349.608945 
-L 334.492891 349.608945 
-Q 332.792891 349.608945 332.792891 351.308945 
-L 332.792891 388.710938 
-Q 332.792891 390.410938 334.492891 390.410938 
+L 323.246328 349.608945 
+Q 321.546328 349.608945 321.546328 351.308945 
+L 321.546328 389.050938 
+Q 321.546328 390.750938 323.246328 390.750938 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_165">
-     <path d="M 336.192891 356.492617 
-L 344.692891 356.492617 
-L 353.192891 356.492617 
+     <path d="M 324.946328 356.832617 
+L 333.446328 356.832617 
+L 341.946328 356.832617 
 " style="fill: none; stroke: #1f77b4; stroke-linecap: square"/>
     </g>
     <g id="text_94">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="359.467617" transform="rotate(-0 359.992891 359.467617)">vibration spectrum</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="359.807617" transform="rotate(-0 348.746328 359.807617)">espectro de vibración</text>
     </g>
     <g id="line2d_166">
-     <path d="M 336.192891 369.243281 
-L 344.692891 369.243281 
-L 353.192891 369.243281 
+     <path d="M 324.946328 369.583281 
+L 333.446328 369.583281 
+L 341.946328 369.583281 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-opacity: 0.85"/>
     </g>
     <g id="text_95">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="372.218281" transform="rotate(-0 359.992891 372.218281)">shaft</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="372.558281" transform="rotate(-0 348.746328 372.558281)">eje</text>
     </g>
     <g id="line2d_167">
-     <path d="M 336.192891 381.993945 
-L 344.692891 381.993945 
-L 353.192891 381.993945 
+     <path d="M 324.946328 382.333945 
+L 333.446328 382.333945 
+L 341.946328 382.333945 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #9467bd; stroke-opacity: 0.85"/>
     </g>
     <g id="text_96">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="359.992891" y="384.968945" transform="rotate(-0 359.992891 384.968945)">motor</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="348.746328" y="385.308945" transform="rotate(-0 348.746328 385.308945)">motor</text>
     </g>
    </g>
   </g>
@@ -13675,7 +13675,7 @@ L 892.698437 361.717615
      </g>
     </g>
     <g id="text_114">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="466.755313" y="451.690301" transform="rotate(-90 466.755313 451.690301)">Spectrum amplitude</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="466.755313" y="451.690301" transform="rotate(-90 466.755313 451.690301)">Amplitud del espectro</text>
     </g>
    </g>
    <g id="line2d_200">
@@ -16139,7 +16139,7 @@ L 892.698437 345.358945
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_115">
-    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(558.42266 390.212161) rotate(-90)">shaft</text>
+    <text style="font-size: 6.94px; font-family: sans-serif; fill: #9e9e9e" transform="translate(558.42266 390.212161) rotate(-90)">eje</text>
    </g>
    <g id="text_116">
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #ff7f0e" transform="translate(833.864935 390.212161) rotate(-90)">BPF</text>
@@ -16151,79 +16151,79 @@ L 892.698437 345.358945
     <text style="font-size: 6.94px; font-family: sans-serif; fill: #ff7f0e" transform="translate(536.387235 390.212161) rotate(-90)">lobe n=1 m=10</text>
    </g>
    <g id="patch_28">
-    <path d="M 599.421515 446.888315 
-Q 564.876 491.848125 531.011679 535.921382 
+    <path d="M 599.83095 446.885879 
+Q 565.08426 491.846885 531.021239 535.923247 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 534.632404 534.163444 
-L 531.011679 535.921382 
-L 531.777763 531.970039 
+    <path d="M 534.646862 534.175434 
+L 531.021239 535.923247 
+L 531.798362 531.97406 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_119">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(556.500805 429.436771)">mL = 10 turns at 35 Hz,</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(556.500805 440.239232)">below the shaft: weak</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(556.500805 429.076771)">mL = 10 gira a 35 Hz,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(556.500805 440.239232)">por debajo del eje: débil</text>
    </g>
    <g id="patch_29">
-    <path d="M 719.871358 407.163277 
-Q 691.426133 426.41318 663.906843 445.03647 
+    <path d="M 734.67101 406.995169 
+Q 698.877272 426.412353 664.066281 445.296423 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 667.897124 444.50954 
-L 663.906843 445.03647 
-L 665.879468 441.528087 
+    <path d="M 668.088958 445.162018 
+L 664.066281 445.296423 
+L 666.372363 441.997638 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_120">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(681.158354 390.175963)">mL = 2 turns at 175 Hz,</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(681.158354 400.978424)">3x the shaft speed: strong</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(681.158354 390.175963)">mL = 2 gira a 175 Hz,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(681.158354 400.978424)">3 veces la velocidad del eje: fuerte</text>
    </g>
    <g id="text_121">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="694.379609" y="335.358945" transform="rotate(-0 694.379609 335.358945)">Ducted fan: the blade rate and its rotating lobe patterns</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="694.379609" y="335.358945" transform="rotate(-0 694.379609 335.358945)">Ventilador entubado: el paso de pala y sus patrones lobulados</text>
    </g>
    <g id="legend_4">
     <g id="patch_30">
-     <path d="M 778.852891 390.410938 
-L 886.748437 390.410938 
-Q 888.448437 390.410938 888.448437 388.710938 
+     <path d="M 767.606328 391.090938 
+L 886.748437 391.090938 
+Q 888.448437 391.090938 888.448437 389.390938 
 L 888.448437 351.308945 
 Q 888.448437 349.608945 886.748437 349.608945 
-L 778.852891 349.608945 
-Q 777.152891 349.608945 777.152891 351.308945 
-L 777.152891 388.710938 
-Q 777.152891 390.410938 778.852891 390.410938 
+L 767.606328 349.608945 
+Q 765.906328 349.608945 765.906328 351.308945 
+L 765.906328 389.390938 
+Q 765.906328 391.090938 767.606328 391.090938 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_205">
-     <path d="M 780.552891 356.492617 
-L 789.052891 356.492617 
-L 797.552891 356.492617 
+     <path d="M 769.306328 356.832617 
+L 777.806328 356.832617 
+L 786.306328 356.832617 
 " style="fill: none; stroke: #1f77b4; stroke-linecap: square"/>
     </g>
     <g id="text_122">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="359.467617" transform="rotate(-0 804.352891 359.467617)">vibration spectrum</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="359.807617" transform="rotate(-0 793.106328 359.807617)">espectro de vibración</text>
     </g>
     <g id="line2d_206">
-     <path d="M 780.552891 369.243281 
-L 789.052891 369.243281 
-L 797.552891 369.243281 
+     <path d="M 769.306328 369.583281 
+L 777.806328 369.583281 
+L 786.306328 369.583281 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-opacity: 0.85"/>
     </g>
     <g id="text_123">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="372.218281" transform="rotate(-0 804.352891 372.218281)">shaft</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="372.558281" transform="rotate(-0 793.106328 372.558281)">eje</text>
     </g>
     <g id="line2d_207">
-     <path d="M 780.552891 381.993945 
-L 789.052891 381.993945 
-L 797.552891 381.993945 
+     <path d="M 769.306328 382.673945 
+L 777.806328 382.673945 
+L 786.306328 382.673945 
 " style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #ff7f0e; stroke-opacity: 0.85"/>
     </g>
     <g id="text_124">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="804.352891" y="384.968945" transform="rotate(-0 804.352891 384.968945)">blade</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="793.106328" y="385.648945" transform="rotate(-0 793.106328 385.648945)">álabe</text>
     </g>
    </g>
   </g>
   <g id="text_125">
-   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle" x="449.898438" y="17.077969" transform="rotate(-0 449.898438 17.077969)">Fault Families Are Recognised by Their Pattern</text>
+   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle" x="449.898438" y="17.597969" transform="rotate(-0 449.898438 17.597969)">Las familias de fallos se reconocen por su patrón</text>
   </g>
  </g>
  <defs>

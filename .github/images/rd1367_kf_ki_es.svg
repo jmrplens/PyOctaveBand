@@ -342,7 +342,7 @@ L 778.040937 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_20">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="406.502109" y="16.318125" transform="rotate(-0 406.502109 16.318125)">RD 1367/2007: the Low-Frequency and Impulsive Corrections</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="406.502109" y="16.318125" transform="rotate(-0 406.502109 16.318125)">RD 1367/2007: las correcciones de baja frecuencia e impulsiva</text>
    </g>
    <g id="line2d_37">
     <path d="M 68.739538 371.500177 
@@ -398,10 +398,10 @@ z
    <g id="legend_1">
     <g id="patch_7">
      <path d="M 41.263281 89.520937 
-L 253.9825 89.520937 
-Q 255.7825 89.520937 255.7825 87.720937 
-L 255.7825 34.618125 
-Q 255.7825 32.818125 253.9825 32.818125 
+L 255.100469 89.520937 
+Q 256.900469 89.520937 256.900469 87.720937 
+L 256.900469 34.618125 
+Q 256.900469 32.818125 255.100469 32.818125 
 L 41.263281 32.818125 
 Q 39.463281 32.818125 39.463281 34.618125 
 L 39.463281 87.720937 
@@ -418,7 +418,7 @@ L 61.063281 40.106719
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="43.256719" transform="rotate(-0 68.263281 43.256719)">Kf, from LCeq,Ti − LAeq,Ti</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="43.256719" transform="rotate(-0 68.263281 43.256719)">Kf, a partir de LCeq,Ti − LAeq,Ti</text>
     </g>
     <g id="line2d_42">
      <path d="M 43.063281 53.607422 
@@ -429,7 +429,7 @@ L 61.063281 53.607422
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 2"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="56.757422" transform="rotate(-0 68.263281 56.757422)">Ki, from LAIeq,Ti − LAeq,Ti</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="56.757422" transform="rotate(-0 68.263281 56.757422)">Ki, a partir de LAIeq,Ti − LAeq,Ti</text>
     </g>
     <g id="line2d_43">
      <g>
@@ -437,7 +437,7 @@ L 61.063281 53.607422
      </g>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="70.258125" transform="rotate(-0 68.263281 70.258125)">worked example: Lf = 13 dB → Kf = 3 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="70.258125" transform="rotate(-0 68.263281 70.258125)">ejemplo resuelto: Lf = 13 dB → Kf = 3 dB</text>
     </g>
     <g id="line2d_44">
      <g>
@@ -445,7 +445,7 @@ L 61.063281 53.607422
      </g>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="83.758828" transform="rotate(-0 68.263281 83.758828)">worked example: Li = 5 dB → Ki = 0 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="68.263281" y="83.758828" transform="rotate(-0 68.263281 83.758828)">ejemplo resuelto: Li = 5 dB → Ki = 0 dB</text>
     </g>
    </g>
   </g>

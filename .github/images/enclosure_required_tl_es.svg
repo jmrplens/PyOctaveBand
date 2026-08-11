@@ -470,145 +470,147 @@ L 705.763438 26.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_23">
-    <path d="M 496.857976 200.06713 
-Q 455.510295 149.260006 414.868325 99.320045 
+    <path d="M 512.805256 199.845961 
+Q 463.54902 149.091208 415.07142 99.13878 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 415.679336 102.955982 
-L 414.868325 99.320045 
-L 418.263682 100.852799 
+    <path d="M 416.19638 102.690152 
+L 415.07142 99.13878 
+L 418.587494 100.369636 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="text_16">
-    <text style="font-size: 8.33px; font-family: sans-serif" transform="translate(444.543311 210.782116)">the peak: the lining works and</text>
-    <text style="font-size: 8.33px; font-family: sans-serif" transform="translate(444.543311 220.780394)">the compressor is still loud</text>
+    <text style="font-size: 8.33px; font-family: sans-serif" transform="translate(444.543311 210.782116)">el máximo: el revestimiento funciona y</text>
+    <text style="font-size: 8.33px; font-family: sans-serif" transform="translate(444.543311 220.780394)">el compresor sigue siendo ruidoso</text>
    </g>
    <g id="text_17">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">What the enclosure panels have to be: Norton problem 4,16</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">Lo que tienen que ser los paneles del encapsulado: problema 4,16 de Norton</text>
    </g>
    <g id="legend_1">
     <g id="patch_24">
-     <path d="M 46.756781 70.469077 
-L 366.550687 70.469077 
-Q 368.216687 70.469077 368.216687 68.803077 
-L 368.216687 32.149125 
-Q 368.216687 30.483125 366.550687 30.483125 
+     <path d="M 46.756781 70.803579 
+L 410.012463 70.803579 
+Q 411.678463 70.803579 411.678463 69.137579 
+L 411.678463 32.149125 
+Q 411.678463 30.483125 410.012463 30.483125 
 L 46.756781 30.483125 
 Q 45.090781 30.483125 45.090781 32.149125 
-L 45.090781 68.803077 
-Q 45.090781 70.469077 46.756781 70.469077 
+L 45.090781 69.137579 
+Q 45.090781 70.803579 46.756781 70.803579 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_31">
-     <path d="M 48.422781 37.229123 
-L 56.752781 37.229123 
-L 65.082781 37.229123 
+     <path d="M 48.422781 37.230425 
+L 56.752781 37.230425 
+L 65.082781 37.230425 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m49466b02c9" x="56.752781" y="37.229123" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#m49466b02c9" x="56.752781" y="37.230425" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="40.144623" transform="rotate(-0 71.746781 40.144623)">Required panel R (Norton)</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="40.145925" transform="rotate(-0 71.746781 40.145925)">R necesaria del panel (Norton)</text>
     </g>
     <g id="line2d_32">
-     <path d="M 48.422781 49.724774 
-L 56.752781 49.724774 
-L 65.082781 49.724774 
+     <path d="M 48.422781 50.059276 
+L 56.752781 50.059276 
+L 65.082781 50.059276 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.6"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="52.640274" transform="rotate(-0 71.746781 52.640274)">Required panel R (Bies default)</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="52.974776" transform="rotate(-0 71.746781 52.974776)">R necesaria del panel (Bies, por omisión)</text>
     </g>
     <g id="line2d_33">
      <g>
-      <use xlink:href="#m00a0a56ee8" x="56.752781" y="62.220425" style="fill-opacity: 0; stroke: #1f77b4; stroke-linejoin: miter"/>
+      <use xlink:href="#m00a0a56ee8" x="56.752781" y="62.554927" style="fill-opacity: 0; stroke: #1f77b4; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="65.135925" transform="rotate(-0 71.746781 65.135925)">Norton's printed answer</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="71.746781" y="65.470427" transform="rotate(-0 71.746781 65.470427)">La respuesta impresa de Norton</text>
     </g>
     <g id="patch_25">
-     <path d="M 218.276688 40.144623 
-L 234.936688 40.144623 
-L 234.936688 34.313623 
-L 218.276688 34.313623 
+     <path d="M 259.322763 40.145925 
+L 275.982763 40.145925 
+L 275.982763 34.314925 
+L 259.322763 34.314925 
 z
 " style="fill: #def0de; stroke: #2ca02c; stroke-linejoin: miter"/>
     </g>
     <g id="text_21">
-     <!-- Target IL = $L_{p1}$ − NC 45 -->
-     <g transform="translate(241.600688 40.144623)">
+     <!-- IL objetivo = $L_{p1}$ − NC 45 -->
+     <g transform="translate(282.646763 40.145925)">
       <text>
-       <tspan x="0" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">T</tspan>
-       <tspan x="5.087158" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">a</tspan>
-       <tspan x="10.190582" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
-       <tspan x="13.614548" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">g</tspan>
-       <tspan x="18.900955" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
-       <tspan x="24.024704" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
-       <tspan x="27.290085" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="29.937363" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">I</tspan>
-       <tspan x="32.393509" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">L</tspan>
-       <tspan x="37.033356" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="39.680634" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">=</tspan>
-       <tspan x="46.658691" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="61.583105" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="64.230383" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">−</tspan>
-       <tspan x="71.208441" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="73.855718" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">N</tspan>
-       <tspan x="80.085546" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">C</tspan>
-       <tspan x="85.900594" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="88.547872" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">4</tspan>
-       <tspan x="93.846487" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif">5</tspan>
-       <tspan x="49.305969" y="-0.8125" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">L</tspan>
-       <tspan x="53.945816" y="0.436996" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">p</tspan>
-       <tspan x="57.646301" y="0.436996" style="font-size: 5.831px; font-family: sans-serif">1</tspan>
+       <tspan x="0" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">I</tspan>
+       <tspan x="2.456146" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">L</tspan>
+       <tspan x="7.095993" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="9.743271" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
+       <tspan x="14.838562" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">b</tspan>
+       <tspan x="20.124969" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">j</tspan>
+       <tspan x="22.438797" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="27.562546" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
+       <tspan x="30.827927" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="33.141754" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">v</tspan>
+       <tspan x="38.070312" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
+       <tspan x="43.165604" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="45.812881" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">=</tspan>
+       <tspan x="52.790939" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="67.715353" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="70.362631" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">−</tspan>
+       <tspan x="77.340688" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="79.987966" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">N</tspan>
+       <tspan x="86.217794" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">C</tspan>
+       <tspan x="92.032842" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="94.68012" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">4</tspan>
+       <tspan x="99.978735" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">5</tspan>
+       <tspan x="55.438217" y="-0.671875" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">L</tspan>
+       <tspan x="60.078064" y="0.577621" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">p</tspan>
+       <tspan x="63.778549" y="0.577621" style="font-size: 5.831px; font-family: sans-serif">1</tspan>
       </text>
      </g>
     </g>
     <g id="patch_26">
-     <path d="M 218.276688 53.139423 
-L 234.936688 53.139423 
-L 234.936688 47.308423 
-L 218.276688 47.308423 
+     <path d="M 259.322763 53.473925 
+L 275.982763 53.473925 
+L 275.982763 47.642925 
+L 259.322763 47.642925 
 z
 " style="fill: #f9dede; stroke: #d62728; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
-     <!-- Interior correction $10\,\lg(S_E/R_i)$ -->
-     <g transform="translate(241.600688 53.139423)">
+     <!-- Corrección interior $10\,\lg(S_E/R_i)$ -->
+     <g transform="translate(282.646763 53.473925)">
       <text>
-       <tspan x="0" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">I</tspan>
-       <tspan x="2.456146" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
-       <tspan x="7.734421" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
-       <tspan x="10.999802" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
-       <tspan x="16.12355" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
-       <tspan x="19.547516" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
-       <tspan x="21.861343" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
-       <tspan x="26.956635" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
-       <tspan x="30.3806" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="33.027878" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
-       <tspan x="37.60672" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
-       <tspan x="42.702011" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
-       <tspan x="46.125977" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
-       <tspan x="49.549942" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
-       <tspan x="54.673691" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
-       <tspan x="59.252533" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
-       <tspan x="62.517914" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
-       <tspan x="64.831741" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
-       <tspan x="69.927032" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
-       <tspan x="75.205307" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
-       <tspan x="77.852585" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">1</tspan>
-       <tspan x="83.151199" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">0</tspan>
-       <tspan x="89.801943" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">l</tspan>
-       <tspan x="92.11577" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">g</tspan>
-       <tspan x="97.402178" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">(</tspan>
-       <tspan x="109.848879" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">/</tspan>
-       <tspan x="120.288785" y="-0.671875" style="font-size: 8.33px; font-family: sans-serif">)</tspan>
-       <tspan x="100.651293" y="-0.671875" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">S</tspan>
-       <tspan x="112.654742" y="-0.671875" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">R</tspan>
-       <tspan x="105.9377" y="0.577621" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">E</tspan>
-       <tspan x="118.441332" y="0.577621" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">i</tspan>
+       <tspan x="0" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">C</tspan>
+       <tspan x="5.815048" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
+       <tspan x="10.910339" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
+       <tspan x="14.334305" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
+       <tspan x="17.75827" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="22.882019" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
+       <tspan x="27.460861" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
+       <tspan x="32.039703" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="34.353531" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">ó</tspan>
+       <tspan x="39.448822" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
+       <tspan x="44.727097" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="47.374374" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="49.688202" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
+       <tspan x="54.966476" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
+       <tspan x="58.231857" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="63.355606" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
+       <tspan x="66.779572" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="69.093399" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
+       <tspan x="74.18869" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
+       <tspan x="77.612656" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="80.259933" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">1</tspan>
+       <tspan x="85.558548" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">0</tspan>
+       <tspan x="92.209291" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">l</tspan>
+       <tspan x="94.523119" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">g</tspan>
+       <tspan x="99.809526" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">(</tspan>
+       <tspan x="112.256228" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">/</tspan>
+       <tspan x="122.696134" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">)</tspan>
+       <tspan x="103.058641" y="-0.34375" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">S</tspan>
+       <tspan x="115.062091" y="-0.34375" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">R</tspan>
+       <tspan x="108.345049" y="0.905746" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">E</tspan>
+       <tspan x="120.848681" y="0.905746" style="font-style: oblique; font-size: 5.831px; font-family: sans-serif">i</tspan>
       </text>
      </g>
     </g>

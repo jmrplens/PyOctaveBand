@@ -118,7 +118,7 @@ L 374.721665 28.798125
      </g>
     </g>
     <g id="text_6">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="220.709488" y="388.469219" transform="rotate(-0 220.709488 388.469219)">Índice de rendija n</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="220.709488" y="388.469219" transform="rotate(-0 220.709488 388.469219)">Índice de ranura n</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
@@ -854,10 +854,10 @@ L 796.77375 244.058907
    <g id="legend_2">
     <g id="patch_14">
      <path d="M 464.246962 353.695781 
-L 644.85868 353.695781 
-Q 646.65868 353.695781 646.65868 351.895781 
-L 646.65868 325.794375 
-Q 646.65868 323.994375 644.85868 323.994375 
+L 694.720087 353.695781 
+Q 696.520087 353.695781 696.520087 351.895781 
+L 696.520087 325.794375 
+Q 696.520087 323.994375 694.720087 323.994375 
 L 464.246962 323.994375 
 Q 462.446962 323.994375 462.446962 325.794375 
 L 462.446962 351.895781 
@@ -872,7 +872,7 @@ L 484.046962 331.282969
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_40">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="491.246962" y="334.432969" transform="rotate(-0 491.246962 334.432969)">slit 1</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="491.246962" y="334.432969" transform="rotate(-0 491.246962 334.432969)">ranura 1</text>
     </g>
     <g id="line2d_62">
      <path d="M 466.046962 344.783672 
@@ -881,34 +881,34 @@ L 484.046962 344.783672
 " style="fill: none; stroke: #9467bd; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="491.246962" y="347.933672" transform="rotate(-0 491.246962 347.933672)">slit 2</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="491.246962" y="347.933672" transform="rotate(-0 491.246962 347.933672)">ranura 2</text>
     </g>
     <g id="line2d_63">
-     <path d="M 531.050868 331.282969 
-L 540.050868 331.282969 
-L 549.050868 331.282969 
+     <path d="M 547.671337 331.282969 
+L 556.671337 331.282969 
+L 565.671337 331.282969 
 " style="fill: none; stroke: #8c564b; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_42">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="556.250868" y="334.432969" transform="rotate(-0 556.250868 334.432969)">slit 3</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="572.871337" y="334.432969" transform="rotate(-0 572.871337 334.432969)">ranura 3</text>
     </g>
     <g id="line2d_64">
-     <path d="M 531.050868 344.783672 
-L 540.050868 344.783672 
-L 549.050868 344.783672 
+     <path d="M 547.671337 344.783672 
+L 556.671337 344.783672 
+L 565.671337 344.783672 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_43">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="556.250868" y="347.933672" transform="rotate(-0 556.250868 347.933672)">slit 4</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="572.871337" y="347.933672" transform="rotate(-0 572.871337 347.933672)">ranura 4</text>
     </g>
     <g id="line2d_65">
-     <path d="M 596.054774 331.282969 
-L 605.054774 331.282969 
-L 614.054774 331.282969 
+     <path d="M 629.295712 331.282969 
+L 638.295712 331.282969 
+L 647.295712 331.282969 
 " style="fill: none; stroke: #e8a838; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_44">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="621.254774" y="334.432969" transform="rotate(-0 621.254774 334.432969)">slit 5</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="654.495712" y="334.432969" transform="rotate(-0 654.495712 334.432969)">ranura 5</text>
     </g>
    </g>
   </g>

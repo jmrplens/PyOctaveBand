@@ -731,44 +731,44 @@ L 705.885938 28.798125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 539.897812 76.500234 
+     <path d="M 515.769375 76.500234 
 L 699.585938 76.500234 
 Q 701.385938 76.500234 701.385938 74.700234 
 L 701.385938 35.098125 
 Q 701.385938 33.298125 699.585938 33.298125 
-L 539.897812 33.298125 
-Q 538.097813 33.298125 538.097813 35.098125 
-L 538.097813 74.700234 
-Q 538.097813 76.500234 539.897812 76.500234 
+L 515.769375 33.298125 
+Q 513.969375 33.298125 513.969375 35.098125 
+L 513.969375 74.700234 
+Q 513.969375 76.500234 515.769375 76.500234 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_84">
-     <path d="M 541.697813 40.586719 
-L 550.697813 40.586719 
-L 559.697813 40.586719 
+     <path d="M 517.569375 40.586719 
+L 526.569375 40.586719 
+L 535.569375 40.586719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="566.897813" y="43.736719" transform="rotate(-0 566.897813 43.736719)">containership (18 kn, 300 m)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="542.769375" y="43.736719" transform="rotate(-0 542.769375 43.736719)">portacontenedores (18 kn, 300 m)</text>
     </g>
     <g id="line2d_85">
-     <path d="M 541.697813 54.087422 
-L 550.697813 54.087422 
-L 559.697813 54.087422 
+     <path d="M 517.569375 54.087422 
+L 526.569375 54.087422 
+L 535.569375 54.087422 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="566.897813" y="57.237422" transform="rotate(-0 566.897813 57.237422)">cruise (17 kn, 250 m)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="542.769375" y="57.237422" transform="rotate(-0 542.769375 57.237422)">crucero (17 kn, 250 m)</text>
     </g>
     <g id="line2d_86">
-     <path d="M 541.697813 67.588125 
-L 550.697813 67.588125 
-L 559.697813 67.588125 
+     <path d="M 517.569375 67.588125 
+L 526.569375 67.588125 
+L 535.569375 67.588125 
 " style="fill: none; stroke: #8c8c8c; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="566.897813" y="70.738125" transform="rotate(-0 566.897813 70.738125)">tug (4 kn, 30 m)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="542.769375" y="70.738125" transform="rotate(-0 542.769375 70.738125)">remolcador (4 kn, 30 m)</text>
     </g>
    </g>
   </g>

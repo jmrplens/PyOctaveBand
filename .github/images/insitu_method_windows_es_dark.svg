@@ -239,8 +239,8 @@ z
 " clip-path="url(#pd8403d6fb3)" style="fill: #d62728; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="text_6">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(155.141056 53.020736)">315-1600 Hz: the interval in which</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(155.141056 63.823197)">Part 2 expects the two to agree</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(155.141056 53.020736)">315-1600 Hz: el intervalo en el que</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(155.141056 63.823197)">la Parte 2 espera que ambos coincidan</text>
    </g>
    <g id="text_7">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.829609" y="16.798125" transform="rotate(-0 379.829609 16.798125)">Dos métodos in situ, dos bandas declaradas</text>
@@ -465,12 +465,12 @@ L 415.854249 236.038594
 " clip-path="url(#p76023043f0)" style="fill: none; stroke-dasharray: 1.6,2.64; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.6"/>
    </g>
    <g id="text_22">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(360.25888 375.088139)">the 100 mm bore of the worked</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(360.25888 385.8906)">example: 1989 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(360.25888 375.088139)">el diámetro de 100 mm del</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(360.25888 385.8906)">ejemplo resuelto: 1989 Hz</text>
    </g>
    <g id="text_23">
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(60.174358 420.371814)">1800 Hz, the top edge of the 1600 Hz band:</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(60.174358 431.174275)">a bore above 111 mm no longer covers it</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(60.174358 420.371814)">1800 Hz, el borde superior de la banda de 1600 Hz:</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(60.174358 431.534275)">un diámetro de más de 111 mm ya no la cubre</text>
    </g>
    <g id="text_24">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.829609" y="224.038594" transform="rotate(-0 379.829609 224.038594)">El diámetro que sella es el que limita la banda</text>
@@ -525,26 +525,26 @@ L 706.008437 455.975295
    </g>
    <g id="legend_1">
     <g id="patch_16">
-     <path d="M 533.260469 257.099297 
-L 699.708438 257.099297 
-Q 701.508438 257.099297 701.508438 255.299297 
+     <path d="M 528.469375 256.739297 
+L 699.708438 256.739297 
+Q 701.508438 256.739297 701.508438 254.939297 
 L 701.508438 242.338594 
 Q 701.508438 240.538594 699.708438 240.538594 
-L 533.260469 240.538594 
-Q 531.460469 240.538594 531.460469 242.338594 
-L 531.460469 255.299297 
-Q 531.460469 257.099297 533.260469 257.099297 
+L 528.469375 240.538594 
+Q 526.669375 240.538594 526.669375 242.338594 
+L 526.669375 254.939297 
+Q 526.669375 256.739297 528.469375 256.739297 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_44">
-     <path d="M 535.060469 248.187187 
-L 544.060469 248.187187 
-L 553.060469 248.187187 
+     <path d="M 530.269375 247.827187 
+L 539.269375 247.827187 
+L 548.269375 247.827187 
 " style="fill: none; stroke: #d62728; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="560.260469" y="251.337187" transform="rotate(-0 560.260469 251.337187)">f_u = 0,58 c0 / d (capítulo 5,4)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="555.469375" y="250.977187" transform="rotate(-0 555.469375 250.977187)">f_u = 0,58 c0 / d (apartado 5,4)</text>
     </g>
    </g>
    <g id="PathCollection_1">

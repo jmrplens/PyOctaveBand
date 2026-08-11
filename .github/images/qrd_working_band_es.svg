@@ -348,22 +348,22 @@ L 693.501562 408.307687
 " clip-path="url(#p94f956a500)" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.4"/>
    </g>
    <g id="patch_8">
-    <path d="M 306.621373 208.174832 
-Q 359.649339 290.282638 412.070743 371.451251 
+    <path d="M 294.213159 208.118579 
+Q 353.402533 290.282081 411.938405 371.538425 
 " style="fill: none; stroke: #d62728; stroke-linecap: round"/>
-    <path d="M 411.629722 367.450563 
-L 412.070743 371.451251 
-L 408.605581 369.403655 
+    <path d="M 411.294662 367.565316 
+L 411.938405 371.538425 
+L 408.373672 369.669554 
 " style="fill: none; stroke: #d62728; stroke-linecap: round"/>
    </g>
    <g id="text_15">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(236.725151 190.630962)">N f0 = 3500 Hz: every well</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(247.099057 201.433423)">back in phase, flat again</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(213.413745 190.630962)">N f0 = 3500 Hz: todos los pozos</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(209.83062 201.433423)">de nuevo en fase, plano otra vez</text>
    </g>
    <g id="text_16">
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(228.573069 140.118777)">f_max = c/(2w) = 1715 Hz:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(228.573069 150.921238)">the well stops being</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(228.573069 161.723699)">a single-mode waveguide</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(228.573069 150.921238)">el pozo deja de ser una</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(228.573069 162.083699)">guía de onda de un solo modo</text>
    </g>
    <g id="text_17">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="88.143404" y="70.163778" transform="rotate(-0 88.143404 70.163778)">f0 = 500 Hz</text>

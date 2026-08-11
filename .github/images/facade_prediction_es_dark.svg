@@ -340,21 +340,21 @@ L 707.438438 28.798125
    </g>
    <g id="text_13">
     <g id="patch_7">
-     <path d="M 541.334623 395.717852 
+     <path d="M 469.697123 395.717852 
 L 697.465873 395.717852 
 Q 702.965873 395.717852 702.965873 390.217852 
 L 702.965873 350.608828 
 Q 702.965873 345.108828 697.465873 345.108828 
-L 541.334623 345.108828 
-Q 535.834623 345.108828 535.834623 350.608828 
-L 535.834623 390.217852 
-Q 535.834623 395.717852 541.334623 395.717852 
+L 469.697123 345.108828 
+Q 464.197123 345.108828 464.197123 350.608828 
+L 464.197123 390.217852 
+Q 464.197123 395.717852 469.697123 395.717852 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(545.775873 360.068184)">R′tr,s,w = 31 dB   (Ctr = -3)</text>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(593.371498 373.271191)">D2m,nT,w = 33 dB</text>
-    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(541.334623 386.474199)">air inlet limits the low bands</text>
+    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(469.697123 386.474199)">la entrada de aire limita las bandas bajas</text>
    </g>
    <g id="text_14">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="375.019609" y="16.798125" transform="rotate(-0 375.019609 16.798125)">Aislamiento acústico de fachada EN 12354-3 (ejemplo del Anexo F)</text>

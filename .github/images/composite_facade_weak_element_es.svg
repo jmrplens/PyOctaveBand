@@ -473,10 +473,10 @@ L 735.523438 76.198402
    <g id="legend_1">
     <g id="patch_9">
      <path d="M 47.225781 89.624687 
-L 180.001094 89.624687 
-Q 181.801094 89.624687 181.801094 87.824687 
-L 181.801094 48.222578 
-Q 181.801094 46.422578 180.001094 46.422578 
+L 187.622969 89.624687 
+Q 189.422969 89.624687 189.422969 87.824687 
+L 189.422969 48.222578 
+Q 189.422969 46.422578 187.622969 46.422578 
 L 47.225781 46.422578 
 Q 45.425781 46.422578 45.425781 48.222578 
 L 45.425781 87.824687 
@@ -491,7 +491,7 @@ L 67.025781 53.711172
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="56.861172" transform="rotate(-0 74.225781 56.861172)">blind part RA = 40 dBA</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="56.861172" transform="rotate(-0 74.225781 56.861172)">parte ciega RA = 40 dBA</text>
     </g>
     <g id="line2d_40">
      <path d="M 49.025781 67.211875 
@@ -500,7 +500,7 @@ L 67.025781 67.211875
 " style="fill: none; stroke: #2ca02c; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="70.361875" transform="rotate(-0 74.225781 70.361875)">blind part RA = 50 dBA</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="70.361875" transform="rotate(-0 74.225781 70.361875)">parte ciega RA = 50 dBA</text>
     </g>
     <g id="line2d_41">
      <path d="M 49.025781 80.712578 
@@ -509,7 +509,7 @@ L 67.025781 80.712578
 " style="fill: none; stroke: #d62728; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="83.862578" transform="rotate(-0 74.225781 83.862578)">blind part RA = 60 dBA</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="83.862578" transform="rotate(-0 74.225781 83.862578)">parte ciega RA = 60 dBA</text>
     </g>
    </g>
    <g id="line2d_42">

@@ -2766,20 +2766,20 @@ L 802.49125 28.798125
      <path d="M 693.893838 366.531852 
 L 791.121885 366.531852 
 Q 795.371885 366.531852 795.371885 362.281852 
-L 795.371885 311.272887 
-Q 795.371885 307.022887 791.121885 307.022887 
-L 693.893838 307.022887 
-Q 689.643838 307.022887 689.643838 311.272887 
+L 795.371885 310.251559 
+Q 795.371885 306.001559 791.121885 306.001559 
+L 693.893838 306.001559 
+Q 689.643838 306.001559 689.643838 310.251559 
 L 689.643838 362.281852 
 Q 689.643838 366.531852 693.893838 366.531852 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 318.581725)">I     =  -23,0 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(704.12837 328.783385)">LRA   =   17,7 LU</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 338.985045)">max M =  -17,7 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 349.186705)">max S =  -19,0 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 359.389029)">TPmax =   -8,6 dBTP</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 317.560396)">I     =  -23,0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(704.12837 327.762057)">LRA   =   17,7 LU</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 338.304381)">máx M =  -17,7 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 348.846705)">máx S =  -19,0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(693.893838 359.389029)">TPmáx =   -8,6 dBTP</text>
    </g>
    <g id="text_21">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="423.512422" y="16.798125" transform="rotate(-0 423.512422 16.798125)">Medición de sonoridad de programa (EBU R 128)</text>

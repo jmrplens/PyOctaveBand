@@ -543,12 +543,12 @@ Q 54.397246 407.955852 58.647246 407.955852
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(58.647246 380.409045)">SL = 140 dB re 1 uPa^2/Hz at 10 kHz</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(58.647246 380.409045)">SL = 140 dB re 1 uPa^2/Hz a 10 kHz</text>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(58.647246 390.611369)">NL = 60 dB,  DI = 15 dB,  DT = 8 dB</text>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(58.647246 400.813029)">FOM = SL - (NL - DI) - DT</text>
    </g>
    <g id="text_26">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="412.987109" y="16.318125" transform="rotate(-0 412.987109 16.318125)">A Passive Sonar Budget, End to End</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="412.987109" y="16.318125" transform="rotate(-0 412.987109 16.318125)">Un balance de sonar pasivo, de punta a punta</text>
    </g>
    <g id="line2d_44">
     <defs>
@@ -621,62 +621,62 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 616.911719 410.815781 
+     <path d="M 600.326406 410.815781 
 L 771.985937 410.815781 
 Q 773.785937 410.815781 773.785937 409.015781 
-L 773.785937 342.412266 
-Q 773.785937 340.612266 771.985937 340.612266 
-L 616.911719 340.612266 
-Q 615.111719 340.612266 615.111719 342.412266 
-L 615.111719 409.015781 
-Q 615.111719 410.815781 616.911719 410.815781 
+L 773.785937 341.332266 
+Q 773.785937 339.532266 771.985937 339.532266 
+L 600.326406 339.532266 
+Q 598.526406 339.532266 598.526406 341.332266 
+L 598.526406 409.015781 
+Q 598.526406 410.815781 600.326406 410.815781 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_50">
-     <path d="M 618.711719 347.900859 
-L 627.711719 347.900859 
-L 636.711719 347.900859 
+     <path d="M 602.126406 347.180859 
+L 611.126406 347.180859 
+L 620.126406 347.180859 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="643.911719" y="351.050859" transform="rotate(-0 643.911719 351.050859)">10 kHz, spherical only</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="627.326406" y="350.330859" transform="rotate(-0 627.326406 350.330859)">10 kHz, solo esférica</text>
     </g>
     <g id="line2d_51">
-     <path d="M 618.711719 361.401563 
-L 627.711719 361.401563 
-L 636.711719 361.401563 
+     <path d="M 602.126406 361.041563 
+L 611.126406 361.041563 
+L 620.126406 361.041563 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_28">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="643.911719" y="364.551563" transform="rotate(-0 643.911719 364.551563)">10 kHz, practical R0 = 1 km</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="627.326406" y="364.191563" transform="rotate(-0 627.326406 364.191563)">10 kHz, ley práctica, R0 = 1 km</text>
     </g>
     <g id="line2d_52">
-     <path d="M 618.711719 374.902266 
-L 627.711719 374.902266 
-L 636.711719 374.902266 
+     <path d="M 602.126406 374.902266 
+L 611.126406 374.902266 
+L 620.126406 374.902266 
 " style="fill: none; stroke-dasharray: 7.03,3.04; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.9"/>
     </g>
     <g id="text_29">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="643.911719" y="378.052266" transform="rotate(-0 643.911719 378.052266)">20 kHz, practical R0 = 1 km</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="627.326406" y="378.052266" transform="rotate(-0 627.326406 378.052266)">20 kHz, ley práctica, R0 = 1 km</text>
     </g>
     <g id="line2d_53">
-     <path d="M 618.711719 388.402969 
-L 627.711719 388.402969 
-L 636.711719 388.402969 
+     <path d="M 602.126406 388.402969 
+L 611.126406 388.402969 
+L 620.126406 388.402969 
 " style="fill: none; stroke: #ffffff; stroke-opacity: 0.8; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_30">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="643.911719" y="391.552969" transform="rotate(-0 643.911719 391.552969)">FOM = 87,0 dB (DI 15)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="627.326406" y="391.552969" transform="rotate(-0 627.326406 391.552969)">FOM = 87,0 dB (DI 15)</text>
     </g>
     <g id="line2d_54">
-     <path d="M 618.711719 401.903672 
-L 627.711719 401.903672 
-L 636.711719 401.903672 
+     <path d="M 602.126406 401.903672 
+L 611.126406 401.903672 
+L 620.126406 401.903672 
 " style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.8; stroke-width: 1.4"/>
     </g>
     <g id="text_31">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="643.911719" y="405.053672" transform="rotate(-0 643.911719 405.053672)">FOM = 79,5 dB (DI 7,5)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="627.326406" y="405.053672" transform="rotate(-0 627.326406 405.053672)">FOM = 79,5 dB (DI 7,5)</text>
     </g>
    </g>
   </g>

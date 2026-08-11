@@ -507,8 +507,8 @@ L 693.501563 398.01286
 " clip-path="url(#p94f956a500)" style="fill: none; stroke: #e8a838; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(214.865791 253.56483)">design frequency:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(214.865791 264.367291)">face average 0,032</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(214.865791 253.718111)">frecuencia de diseño:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(214.865791 264.520572)">media en la cara 0,032</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="369.002734" y="16.798125" transform="rotate(-0 369.002734 16.798125)">La absorción que un metadifusor paga por sus fases</text>
@@ -584,10 +584,10 @@ L 693.501563 399.841317
    <g id="legend_1">
     <g id="patch_7">
      <path d="M 50.803906 76.500234 
-L 387.432031 76.500234 
-Q 389.232031 76.500234 389.232031 74.700234 
-L 389.232031 35.098125 
-Q 389.232031 33.298125 387.432031 33.298125 
+L 404.0525 76.500234 
+Q 405.8525 76.500234 405.8525 74.700234 
+L 405.8525 35.098125 
+Q 405.8525 33.298125 404.0525 33.298125 
 L 50.803906 33.298125 
 Q 49.003906 33.298125 49.003906 35.098125 
 L 49.003906 74.700234 
@@ -602,7 +602,7 @@ L 70.603906 40.586719
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="43.736719" transform="rotate(-0 77.803906 43.736719)">slit 1</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="43.736719" transform="rotate(-0 77.803906 43.736719)">ranura 1</text>
     </g>
     <g id="line2d_39">
      <path d="M 52.603906 54.087422 
@@ -611,7 +611,7 @@ L 70.603906 54.087422
 " style="fill: none; stroke: #9467bd; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="57.237422" transform="rotate(-0 77.803906 57.237422)">slit 2</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="57.237422" transform="rotate(-0 77.803906 57.237422)">ranura 2</text>
     </g>
     <g id="line2d_40">
      <path d="M 52.603906 67.588125 
@@ -620,34 +620,34 @@ L 70.603906 67.588125
 " style="fill: none; stroke: #8c564b; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="70.738125" transform="rotate(-0 77.803906 70.738125)">slit 3</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="70.738125" transform="rotate(-0 77.803906 70.738125)">ranura 3</text>
     </g>
     <g id="line2d_41">
-     <path d="M 117.607813 40.586719 
-L 126.607813 40.586719 
-L 135.607813 40.586719 
+     <path d="M 134.228281 40.586719 
+L 143.228281 40.586719 
+L 152.228281 40.586719 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="142.807813" y="43.736719" transform="rotate(-0 142.807813 43.736719)">slit 4</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="159.428281" y="43.736719" transform="rotate(-0 159.428281 43.736719)">ranura 4</text>
     </g>
     <g id="line2d_42">
-     <path d="M 117.607813 54.087422 
-L 126.607813 54.087422 
-L 135.607813 54.087422 
+     <path d="M 134.228281 54.087422 
+L 143.228281 54.087422 
+L 152.228281 54.087422 
 " style="fill: none; stroke: #e8a838; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="142.807813" y="57.237422" transform="rotate(-0 142.807813 57.237422)">slit 5</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="159.428281" y="57.237422" transform="rotate(-0 159.428281 57.237422)">ranura 5</text>
     </g>
     <g id="line2d_43">
-     <path d="M 117.607813 67.588125 
-L 126.607813 67.588125 
-L 135.607813 67.588125 
+     <path d="M 134.228281 67.588125 
+L 143.228281 67.588125 
+L 152.228281 67.588125 
 " style="fill: none; stroke: #d62728; stroke-width: 2.6; stroke-linecap: square"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="142.807813" y="70.738125" transform="rotate(-0 142.807813 70.738125)">media en la cara (lo que consume un modelo de sala)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="159.428281" y="70.738125" transform="rotate(-0 159.428281 70.738125)">media en la cara (lo que consume un modelo de sala)</text>
     </g>
    </g>
   </g>

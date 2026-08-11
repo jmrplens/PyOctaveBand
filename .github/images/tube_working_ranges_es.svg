@@ -458,7 +458,7 @@ L 777.6 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="536.486267" y="74.791058" transform="rotate(-0 536.486267 74.791058)">1544 Hz</text>
    </g>
    <g id="text_13">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="390.060399" y="49.680804" transform="rotate(-0 390.060399 49.680804)">100 mm bore, s = 100 mm   ·   top end: spacing 0,45 c/s</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="390.060399" y="49.680804" transform="rotate(-0 390.060399 49.680804)">tubo de 100 mm, s = 100 mm   ·   techo: separación 0,45 c/s</text>
    </g>
    <g id="text_14">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: end" x="330.909347" y="142.691122" transform="rotate(-0 330.909347 142.691122)">343</text>
@@ -467,7 +467,7 @@ L 777.6 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="568.60714" y="142.691122" transform="rotate(-0 568.60714 142.691122)">1991 Hz</text>
    </g>
    <g id="text_16">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="449.986479" y="117.580868" transform="rotate(-0 449.986479 117.580868)">100 mm bore, s = 50 mm   ·   top end: cut-on 0,58 c/d</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="449.986479" y="117.580868" transform="rotate(-0 449.986479 117.580868)">tubo de 100 mm, s = 50 mm   ·   techo: corte 0,58 c/d</text>
    </g>
    <g id="text_17">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: end" x="446.883802" y="210.591186" transform="rotate(-0 446.883802 210.591186)">858</text>
@@ -476,7 +476,7 @@ L 777.6 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="725.284271" y="210.591186" transform="rotate(-0 725.284271 210.591186)">6864 Hz</text>
    </g>
    <g id="text_19">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="586.312273" y="185.480933" transform="rotate(-0 586.312273 185.480933)">29 mm bore, s = 20 mm   ·   top end: cut-on 0,58 c/d</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="586.312273" y="185.480933" transform="rotate(-0 586.312273 185.480933)">tubo de 29 mm, s = 20 mm   ·   techo: corte 0,58 c/d</text>
    </g>
    <g id="text_20">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: end" x="39.472316" y="278.491251" transform="rotate(-0 39.472316 278.491251)">34</text>
@@ -485,14 +485,14 @@ L 777.6 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="521.578528" y="278.491251" transform="rotate(-0 521.578528 278.491251)">1373 Hz</text>
    </g>
    <g id="text_22">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="280.753658" y="253.380997" transform="rotate(-0 280.753658 253.380997)">100 mm bore, s = 100 mm (ASTM E2611)   ·   top end: spacing 0,40 c/s</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="280.753658" y="253.380997" transform="rotate(-0 280.753658 253.380997)">tubo de 100 mm, s = 100 mm (ASTM E2611)   ·   techo: separación 0,40 c/s</text>
    </g>
    <g id="text_23">
-    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(464.787802 323.845254)">splice band</text>
-    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(426.841239 335.247852)">(the two tubes must agree)</text>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(452.543193 323.845254)">banda de solape</text>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(418.848622 335.247852)">(los dos tubos deben coincidir)</text>
    </g>
    <g id="text_24">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="392.4" y="16.318125" transform="rotate(-0 392.4 16.318125)">Plane-Wave Working Range of an Impedance Tube</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="392.4" y="16.318125" transform="rotate(-0 392.4 16.318125)">Rango de trabajo de onda plana de un tubo de impedancia</text>
    </g>
   </g>
  </g>

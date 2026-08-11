@@ -5632,7 +5632,7 @@ L 403.572422 49.416469
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_7">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="224.053008" y="39.416469" transform="rotate(-0 224.053008 39.416469)">Noise on the output — H1 is unbiased</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="224.053008" y="39.416469" transform="rotate(-0 224.053008 39.416469)">Ruido en la salida — H1 es el insesgado</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
@@ -12335,7 +12335,7 @@ L 801.53125 49.416469
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_16">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="622.011836" y="39.416469" transform="rotate(-0 622.011836 39.416469)">Noise on the input — H2 is unbiased</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="622.011836" y="39.416469" transform="rotate(-0 622.011836 39.416469)">Ruido en la entrada — H2 es el insesgado</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
@@ -15075,7 +15075,7 @@ L 196.779883 477.568812
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="203.179883" y="480.368812" transform="rotate(-0 203.179883 480.368812)">measured</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="203.179883" y="480.368812" transform="rotate(-0 203.179883 480.368812)">medida</text>
     </g>
     <g id="line2d_235">
      <path d="M 180.779883 489.569437 
@@ -18723,7 +18723,7 @@ L 594.738711 477.568812
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_57">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="601.138711" y="480.368812" transform="rotate(-0 601.138711 480.368812)">measured</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="601.138711" y="480.368812" transform="rotate(-0 601.138711 480.368812)">medida</text>
     </g>
     <g id="line2d_314">
      <path d="M 578.738711 489.569437 
@@ -18737,7 +18737,7 @@ L 594.738711 489.569437
    </g>
   </g>
   <g id="text_59">
-   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="401.93125" y="17.077969" transform="rotate(-0 401.93125 17.077969)">Choosing Between H1 and H2 (Bendat &amp; Piersol)</text>
+   <text style="font-weight: 700; font-size: 13px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="401.93125" y="17.077969" transform="rotate(-0 401.93125 17.077969)">Elegir entre H1 y H2 (Bendat y Piersol)</text>
   </g>
  </g>
  <defs>

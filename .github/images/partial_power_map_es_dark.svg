@@ -20,10 +20,10 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M -0 508.877318 
+   <path d="M 0 508.877318 
 L 784.963437 508.877318 
 L 784.963437 0 
-L -0 0 
+L 0 0 
 z
 "/>
   </g>
@@ -309,7 +309,7 @@ z
     <text style="font-weight: 700; font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="137.635724" y="29.126252" transform="rotate(-0 137.635724 29.126252)">superior</text>
    </g>
    <g id="text_26">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="335.660844" y="16.318125" transform="rotate(-0 335.660844 16.318125)">Partial power level per segment [dB re 1 pW], the box unfolded</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="335.660844" y="16.318125" transform="rotate(-0 335.660844 16.318125)">Nivel de potencia parcial por segmento [dB re 1 pW], la caja desplegada</text>
    </g>
   </g>
   <g id="axes_2">
@@ -540,7 +540,7 @@ L 777.763437 371.087045
      </g>
     </g>
     <g id="text_38">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="423.794955" transform="rotate(-90 14.798438 423.794955)">Face total [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="423.794955" transform="rotate(-90 14.798438 423.794955)">Total por cara [dB]</text>
     </g>
    </g>
    <g id="line2d_23">

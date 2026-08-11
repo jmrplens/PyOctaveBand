@@ -1027,9 +1027,9 @@ L 160.4838 386.270126
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: middle" x="179.778234" y="400.190155" transform="rotate(-0 179.778234 400.190155)">2 dm / c = 1,47 ms</text>
    </g>
    <g id="text_38">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(469.06832 393.243918)">parasitic arrival, just outside</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(458.937695 404.046379)">the gate: lengthen the window</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(465.444414 414.84884)">and it comes in with the road</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(459.401758 393.243918)">llegada parásita justo fuera de</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(445.987539 404.046379)">la puerta: si se alarga la ventana,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(492.45707 414.84884)">entra con el pavimento</text>
    </g>
    <g id="line2d_67">
     <path d="M 47.711719 337.455781 
@@ -1176,7 +1176,7 @@ L 426.602969 287.320677
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="433.802969" y="290.470677" transform="rotate(-0 433.802969 290.470677)">Adrienne window: 0,5 + 5 + 5 ms = 10,5 ms</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="433.802969" y="290.470677" transform="rotate(-0 433.802969 290.470677)">Ventana de Adrienne: 0,5 + 5 + 5 ms = 10,5 ms</text>
     </g>
    </g>
   </g>
@@ -1557,12 +1557,12 @@ L 664.918572 571.455234
 " clip-path="url(#p6da805aea6)" style="fill: none; stroke: #d62728; stroke-width: 1.6; stroke-linecap: square"/>
    </g>
    <g id="text_55">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 550.305444)">1/T = 95 Hz:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 561.107905)">the window's own</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 571.910366)">low-frequency limit</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 549.945444)">1/T = 95 Hz:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 561.107905)">el límite en baja frecuencia</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(78.952186 571.910366)">de la propia ventana</text>
    </g>
    <g id="text_56">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.998137" y="633.280316" transform="rotate(-0 82.998137 633.280316)">below the reported 250 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.998137" y="633.280316" transform="rotate(-0 82.998137 633.280316)">por debajo de los 250 Hz declarados</text>
    </g>
    <g id="legend_3">
     <g id="patch_21">

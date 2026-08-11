@@ -580,7 +580,7 @@ L 477.285938 62.982895
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="192.975781" transform="rotate(-90 14.798438 192.975781)">Threshold [dB re 1 uPa; in-air groups re 20 uPa]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="192.975781" transform="rotate(-90 14.798438 192.975781)">Umbral [dB re 1 uPa; grupos en aire re 20 uPa]</text>
     </g>
    </g>
    <g id="line2d_79">
@@ -1034,21 +1034,21 @@ L 477.285938 28.318125
    <g id="text_21">
     <g id="patch_7">
      <path d="M 55.888234 343.636628 
-L 202.862453 343.636628 
-Q 206.462453 343.636628 206.462453 340.036628 
-L 206.462453 331.035925 
-Q 206.462453 327.435925 202.862453 327.435925 
-L 55.888234 327.435925 
-Q 52.288234 327.435925 52.288234 331.035925 
+L 240.774953 343.636628 
+Q 244.374953 343.636628 244.374953 340.036628 
+L 244.374953 330.675925 
+Q 244.374953 327.075925 240.774953 327.075925 
+L 55.888234 327.075925 
+Q 52.288234 327.075925 52.288234 330.675925 
 L 52.288234 340.036628 
 Q 52.288234 343.636628 55.888234 343.636628 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="55.888234" y="337.874519" transform="rotate(-0 55.888234 337.874519)">no published fit for LF cetaceans</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="55.888234" y="337.874519" transform="rotate(-0 55.888234 337.874519)">sin ajuste publicado para los cetáceos LF</text>
    </g>
    <g id="text_22">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="262.287109" y="16.318125" transform="rotate(-0 262.287109 16.318125)">Southall et al. (2019) Group Audiograms</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="262.287109" y="16.318125" transform="rotate(-0 262.287109 16.318125)">Audiogramas de grupo de Southall et al. (2019)</text>
    </g>
    <g id="line2d_86">
     <defs>
@@ -1178,80 +1178,80 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 334.581563 86.120781 
+     <path d="M 326.669922 86.120781 
 L 471.335938 86.120781 
 Q 473.035938 86.120781 473.035938 84.420781 
 L 473.035938 34.268125 
 Q 473.035938 32.568125 471.335938 32.568125 
-L 334.581563 32.568125 
-Q 332.881563 32.568125 332.881563 34.268125 
-L 332.881563 84.420781 
-Q 332.881563 86.120781 334.581563 86.120781 
+L 326.669922 32.568125 
+Q 324.969922 32.568125 324.969922 34.268125 
+L 324.969922 84.420781 
+Q 324.969922 86.120781 326.669922 86.120781 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_93">
-     <path d="M 336.281563 39.451797 
-L 344.781563 39.451797 
-L 353.281563 39.451797 
+     <path d="M 328.369922 39.451797 
+L 336.869922 39.451797 
+L 345.369922 39.451797 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="360.081563" y="42.426797" transform="rotate(-0 360.081563 42.426797)">HF</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="352.169922" y="42.426797" transform="rotate(-0 352.169922 42.426797)">HF</text>
     </g>
     <g id="line2d_94">
-     <path d="M 336.281563 52.202461 
-L 344.781563 52.202461 
-L 353.281563 52.202461 
+     <path d="M 328.369922 52.202461 
+L 336.869922 52.202461 
+L 345.369922 52.202461 
 " style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="360.081563" y="55.177461" transform="rotate(-0 360.081563 55.177461)">VHF</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="352.169922" y="55.177461" transform="rotate(-0 352.169922 55.177461)">VHF</text>
     </g>
     <g id="line2d_95">
-     <path d="M 336.281563 64.953125 
-L 344.781563 64.953125 
-L 353.281563 64.953125 
+     <path d="M 328.369922 64.953125 
+L 336.869922 64.953125 
+L 345.369922 64.953125 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="360.081563" y="67.928125" transform="rotate(-0 360.081563 67.928125)">SI</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="352.169922" y="67.928125" transform="rotate(-0 352.169922 67.928125)">SI</text>
     </g>
     <g id="line2d_96">
-     <path d="M 336.281563 77.703789 
-L 344.781563 77.703789 
-L 353.281563 77.703789 
+     <path d="M 328.369922 77.703789 
+L 336.869922 77.703789 
+L 345.369922 77.703789 
 " style="fill: none; stroke: #8c8c8c; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="360.081563" y="80.678789" transform="rotate(-0 360.081563 80.678789)">PCW</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="352.169922" y="80.678789" transform="rotate(-0 352.169922 80.678789)">PCW</text>
     </g>
     <g id="line2d_97">
-     <path d="M 396.546562 39.451797 
-L 405.046562 39.451797 
-L 413.546562 39.451797 
+     <path d="M 388.634922 39.451797 
+L 397.134922 39.451797 
+L 405.634922 39.451797 
 " style="fill: none; stroke: #7b5ea7; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="420.346563" y="42.426797" transform="rotate(-0 420.346563 42.426797)">OCW</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="412.434922" y="42.426797" transform="rotate(-0 412.434922 42.426797)">OCW</text>
     </g>
     <g id="line2d_98">
-     <path d="M 396.546562 52.202461 
-L 405.046562 52.202461 
-L 413.546562 52.202461 
+     <path d="M 388.634922 52.202461 
+L 397.134922 52.202461 
+L 405.634922 52.202461 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #c07a2c; stroke-width: 1.8"/>
     </g>
     <g id="text_28">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="420.346563" y="55.177461" transform="rotate(-0 420.346563 55.177461)">PCA (in air)</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="412.434922" y="55.177461" transform="rotate(-0 412.434922 55.177461)">PCA (en aire)</text>
     </g>
     <g id="line2d_99">
-     <path d="M 396.546562 64.953125 
-L 405.046562 64.953125 
-L 413.546562 64.953125 
+     <path d="M 388.634922 64.953125 
+L 397.134922 64.953125 
+L 405.634922 64.953125 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #2c8c8c; stroke-width: 1.8"/>
     </g>
     <g id="text_29">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="420.346563" y="67.928125" transform="rotate(-0 420.346563 67.928125)">OCA (in air)</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="412.434922" y="67.928125" transform="rotate(-0 412.434922 67.928125)">OCA (en aire)</text>
     </g>
    </g>
   </g>
@@ -1706,7 +1706,7 @@ L 957.885938 35.248283
      </g>
     </g>
     <g id="text_48">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="495.398438" y="192.975781" transform="rotate(-90 495.398438 192.975781)">Threshold [dB re 1 uPa]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="495.398438" y="192.975781" transform="rotate(-90 495.398438 192.975781)">Umbral [dB re 1 uPa]</text>
     </g>
    </g>
    <g id="line2d_164">
@@ -1799,21 +1799,21 @@ L 957.885938 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_14">
-    <path d="M 757.605379 282.969637 
-Q 828.877713 290.91295 899.038892 298.732426 
+    <path d="M 725.02766 280.555594 
+Q 812.587619 289.712633 899.03561 298.753382 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 895.848113 296.666287 
-L 899.038892 298.732426 
-L 895.471514 300.045366 
+    <path d="M 895.830873 296.708959 
+L 899.03561 298.753382 
+L 895.477229 300.090517 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_49">
     <g id="patch_15">
      <path d="M 553.688141 284.890585 
-L 751.897516 284.890585 
-Q 755.297516 284.890585 755.297516 281.490585 
-L 755.297516 261.085936 
-Q 755.297516 257.685936 751.897516 257.685936 
+L 719.137984 284.890585 
+Q 722.537984 284.890585 722.537984 281.490585 
+L 722.537984 261.085936 
+Q 722.537984 257.685936 719.137984 257.685936 
 L 553.688141 257.685936 
 Q 550.288141 257.685936 550.288141 261.085936 
 L 550.288141 281.490585 
@@ -1821,11 +1821,11 @@ Q 550.288141 284.890585 553.688141 284.890585
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(553.688141 268.395438)">the third branch starts at 46,2 kHz;</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(553.688141 278.597762)">reading the second one at 50 kHz loses 0,7 dB</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(553.688141 268.395438)">el tercer tramo empieza en 46,2 kHz;</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(553.688141 278.597762)">leer el segundo a 50 kHz pierde 0,7 dB</text>
    </g>
    <g id="text_50">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="742.887109" y="16.318125" transform="rotate(-0 742.887109 16.318125)">Killer Whale (Ainslie 2010, Eq. 11,159)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="742.887109" y="16.318125" transform="rotate(-0 742.887109 16.318125)">Orca (Ainslie 2010, ec. 11,159)</text>
    </g>
    <g id="line2d_167">
     <defs>
@@ -1878,50 +1878,50 @@ z
    </g>
    <g id="legend_2">
     <g id="patch_16">
-     <path d="M 658.136797 86.120781 
-L 827.637422 86.120781 
-Q 829.337422 86.120781 829.337422 84.420781 
-L 829.337422 34.268125 
-Q 829.337422 32.568125 827.637422 32.568125 
-L 658.136797 32.568125 
-Q 656.436797 32.568125 656.436797 34.268125 
-L 656.436797 84.420781 
-Q 656.436797 86.120781 658.136797 86.120781 
+     <path d="M 663.382227 86.800781 
+L 822.391992 86.800781 
+Q 824.091992 86.800781 824.091992 85.100781 
+L 824.091992 34.268125 
+Q 824.091992 32.568125 822.391992 32.568125 
+L 663.382227 32.568125 
+Q 661.682227 32.568125 661.682227 34.268125 
+L 661.682227 85.100781 
+Q 661.682227 86.800781 663.382227 86.800781 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_170">
-     <path d="M 659.836797 39.451797 
-L 668.336797 39.451797 
-L 676.836797 39.451797 
+     <path d="M 665.082227 39.451797 
+L 673.582227 39.451797 
+L 682.082227 39.451797 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_51">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="683.636797" y="42.426797" transform="rotate(-0 683.636797 42.426797)">orca_audiogram (three branches)</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="688.882227" y="42.426797" transform="rotate(-0 688.882227 42.426797)">orca_audiogram (tres tramos)</text>
     </g>
     <g id="line2d_171">
      <g>
-      <use xlink:href="#m1c3dccf219" x="668.336797" y="52.202461" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1c3dccf219" x="673.582227" y="52.542461" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_52">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="683.636797" y="55.177461" transform="rotate(-0 683.636797 55.177461)">minimum 39,0 dB at 22,6 kHz</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="688.882227" y="55.517461" transform="rotate(-0 688.882227 55.517461)">mínimo de 39,0 dB a 22,6 kHz</text>
     </g>
     <g id="line2d_172">
      <g>
-      <use xlink:href="#md78b316311" x="668.336797" y="64.953125" style="fill: #2ca02c; stroke: #2ca02c; stroke-linejoin: miter"/>
+      <use xlink:href="#md78b316311" x="673.582227" y="65.293125" style="fill: #2ca02c; stroke: #2ca02c; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_53">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="683.636797" y="67.928125" transform="rotate(-0 683.636797 67.928125)">third branch at 50 kHz: 51,2 dB</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="688.882227" y="68.268125" transform="rotate(-0 688.882227 68.268125)">tercer tramo a 50 kHz: 51,2 dB</text>
     </g>
     <g id="line2d_173">
      <g>
-      <use xlink:href="#m3366ea9d61" x="668.336797" y="77.703789" style="fill-opacity: 0; stroke: #d62728; stroke-width: 1.8"/>
+      <use xlink:href="#m3366ea9d61" x="673.582227" y="78.383789" style="fill-opacity: 0; stroke: #d62728; stroke-width: 1.8"/>
      </g>
     </g>
     <g id="text_54">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="683.636797" y="80.678789" transform="rotate(-0 683.636797 80.678789)">second branch there: 50,5 dB</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="688.882227" y="81.358789" transform="rotate(-0 688.882227 81.358789)">el segundo tramo allí: 50,5 dB</text>
     </g>
    </g>
   </g>

@@ -336,35 +336,35 @@ L 332.780064 292.104609
    </g>
    <g id="legend_1">
     <g id="patch_6">
-     <path d="M 99.3775 431.965041 
-L 308.070625 431.965041 
-Q 309.870625 431.965041 309.870625 430.165041 
-L 309.870625 404.063634 
-Q 309.870625 402.263634 308.070625 402.263634 
-L 99.3775 402.263634 
-Q 97.5775 402.263634 97.5775 404.063634 
-L 97.5775 430.165041 
-Q 97.5775 431.965041 99.3775 431.965041 
+     <path d="M 98.419141 431.965041 
+L 309.028984 431.965041 
+Q 310.828984 431.965041 310.828984 430.165041 
+L 310.828984 403.703634 
+Q 310.828984 401.903634 309.028984 401.903634 
+L 98.419141 401.903634 
+Q 96.619141 401.903634 96.619141 403.703634 
+L 96.619141 430.165041 
+Q 96.619141 431.965041 98.419141 431.965041 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_19">
-     <path d="M 101.1775 409.552228 
-L 110.1775 409.552228 
-L 119.1775 409.552228 
+     <path d="M 100.219141 409.552228 
+L 109.219141 409.552228 
+L 118.219141 409.552228 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="126.3775" y="412.702228" transform="rotate(-0 126.3775 412.702228)">Periodic, 6 x N = 7  (d = 0,22)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="125.419141" y="412.702228" transform="rotate(-0 125.419141 412.702228)">Periódico, 6 x N = 7  (d = 0,22)</text>
     </g>
     <g id="line2d_20">
-     <path d="M 101.1775 423.052931 
-L 110.1775 423.052931 
-L 119.1775 423.052931 
+     <path d="M 100.219141 423.052931 
+L 109.219141 423.052931 
+L 118.219141 423.052931 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="126.3775" y="426.202931" transform="rotate(-0 126.3775 426.202931)">Modulated, period + inverse  (d = 0,32)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="125.419141" y="426.202931" transform="rotate(-0 125.419141 426.202931)">Modulado, periodo + inverso  (d = 0,32)</text>
     </g>
    </g>
   </g>
@@ -751,8 +751,8 @@ z
     </g>
    </g>
    <g id="text_36">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(588.531008 107.534963)">f0: the one band the</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(588.531008 118.337424)">periodic array wins</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(588.531008 107.174963)">f0: la única banda en la que</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(588.531008 118.337424)">gana la disposición periódica</text>
    </g>
    <g id="text_37">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="632.945234" y="22.318125" transform="rotate(-0 632.945234 22.318125)">Banda a banda, el mismo panel de 4,2 m</text>

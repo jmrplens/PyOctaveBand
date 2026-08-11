@@ -592,37 +592,37 @@ L 705.8875 28.318125
    </g>
    <g id="text_11">
     <g id="patch_7">
-     <path d="M 483.447598 392.329978 
+     <path d="M 483.702285 392.329978 
 L 696.008535 392.329978 
 Q 701.008535 392.329978 701.008535 387.329978 
-L 701.008535 339.319041 
-Q 701.008535 334.319041 696.008535 334.319041 
-L 483.447598 334.319041 
-Q 478.447598 334.319041 478.447598 339.319041 
-L 478.447598 387.329978 
-Q 478.447598 392.329978 483.447598 392.329978 
+L 701.008535 338.519041 
+Q 701.008535 333.519041 696.008535 333.519041 
+L 483.702285 333.519041 
+Q 478.702285 333.519041 478.702285 338.519041 
+L 478.702285 387.329978 
+Q 478.702285 392.329978 483.702285 392.329978 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(519.846035 347.918455)">f0 = (1/2pi) sqrt(s'/m')  (Formula 2)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(564.091348 359.921189)">s'  = s't + s'a  (clause 8,2)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(526.71166 371.923923)">s't = 4 pi^2 m't fr^2  (Formula 4)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(483.447598 383.926658)">s'a = p0/(d eps) ~ 111/d MN/m^3  (NOTE)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(519.846035 347.518455)">f0 = (1/2pi) sqrt(s'/m')  (Fórmula 2)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(550.964785 359.521189)">s'  = s't + s'a  (apartado 8,2)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(526.71166 371.923923)">s't = 4 pi^2 m't fr^2  (Fórmula 4)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(483.702285 383.926658)">s'a = p0/(d eps) ~ 111/d MN/m^3  (NOTA)</text>
    </g>
    <g id="text_12">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="376.588672" y="16.318125" transform="rotate(-0 376.588672 16.318125)">Resonancia de suelo flotante EN 29052-1</text>
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 54.289844 81.320469 
-L 254.019531 81.320469 
-Q 256.019531 81.320469 256.019531 79.320469 
-L 256.019531 35.318125 
-Q 256.019531 33.318125 254.019531 33.318125 
+     <path d="M 54.289844 81.490781 
+L 273.028906 81.490781 
+Q 275.028906 81.490781 275.028906 79.490781 
+L 275.028906 35.318125 
+Q 275.028906 33.318125 273.028906 33.318125 
 L 54.289844 33.318125 
 Q 52.289844 33.318125 52.289844 35.318125 
-L 52.289844 79.320469 
-Q 52.289844 81.320469 54.289844 81.320469 
+L 52.289844 79.490781 
+Q 52.289844 81.490781 54.289844 81.490781 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -659,11 +659,11 @@ z
 " style="stroke: #2ca02c"/>
      </defs>
      <g>
-      <use xlink:href="#m221fa3c9a5" x="66.289844" y="72.293125" style="fill: #2ca02c; stroke: #2ca02c"/>
+      <use xlink:href="#m221fa3c9a5" x="66.289844" y="72.463437" style="fill: #2ca02c; stroke: #2ca02c"/>
      </g>
     </g>
     <g id="text_15">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="84.289844" y="74.918125" transform="rotate(-0 84.289844 74.918125)">design point (10 MN/m^3, 46 Hz)</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="84.289844" y="75.088437" transform="rotate(-0 84.289844 75.088437)">punto de diseño (10 MN/m^3, 46 Hz)</text>
     </g>
    </g>
    <g id="PathCollection_2">

@@ -394,13 +394,13 @@ z
     </g>
    </g>
    <g id="text_17">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(457.354853 112.00066)">tuned here:</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(457.354853 122.803121)">0,32 against 0,32</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(457.354853 112.36066)">sintonizado aquí:</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(457.354853 123.163121)">0,32 frente a 0,32</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 112.00066)">below c/L = 980 Hz no grating</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 122.803121)">lobe exists: neither panel can</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 133.605582)">beat the flat reference</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 112.00066)">por debajo de c/L = 980 Hz no hay</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 123.163121)">lóbulo de red: ningún panel puede</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(93.862324 133.965582)">superar la referencia plana</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="378.485234" y="16.318125" transform="rotate(-0 378.485234 16.318125)">El ancho de banda real del truco</text>

@@ -556,7 +556,7 @@ z
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="257.710361" y="278.657937" transform="rotate(-0 257.710361 278.657937)">Plano reflectante</text>
    </g>
    <g id="text_21">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="171.838594" y="42.146812" transform="rotate(-0 171.838594 42.146812)">Hemisphere, 40 positions (Table E.1)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="171.838594" y="42.146812" transform="rotate(-0 171.838594 42.146812)">Semiesfera, 40 posiciones (Tabla E.1)</text>
    </g>
    <g id="Path3DCollection_1">
     <defs>
@@ -2025,15 +2025,15 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_47">
-     <path d="M 12.8 78.548062 
-L 158.62875 78.548062 
-Q 160.22875 78.548062 160.22875 76.948062 
-L 160.22875 53.746812 
-Q 160.22875 52.146812 158.62875 52.146812 
+     <path d="M 12.8 78.868062 
+L 177.37625 78.868062 
+Q 178.97625 78.868062 178.97625 77.268062 
+L 178.97625 53.746812 
+Q 178.97625 52.146812 177.37625 52.146812 
 L 12.8 52.146812 
 Q 11.2 52.146812 11.2 53.746812 
-L 11.2 76.948062 
-Q 11.2 78.548062 12.8 78.548062 
+L 11.2 77.268062 
+Q 11.2 78.868062 12.8 78.868062 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -2056,7 +2056,7 @@ z
      </g>
     </g>
     <g id="text_62">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="36.8" y="61.425562" transform="rotate(-0 36.8 61.425562)">positions 1-20: always</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="36.8" y="61.425562" transform="rotate(-0 36.8 61.425562)">posiciones 1-20: siempre</text>
     </g>
     <g id="line2d_37">
      <defs>
@@ -2073,11 +2073,11 @@ z
 " style="stroke: #1f77b4"/>
      </defs>
      <g>
-      <use xlink:href="#m49466b02c9" x="22.4" y="70.626187" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#m49466b02c9" x="22.4" y="70.946187" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_63">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="36.8" y="73.426187" transform="rotate(-0 36.8 73.426187)">positions 21-40: on escalation</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="36.8" y="73.746187" transform="rotate(-0 36.8 73.746187)">posiciones 21-40: en la ampliación</text>
     </g>
    </g>
   </g>
@@ -2683,7 +2683,7 @@ z
     </g>
    </g>
    <g id="text_94">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="595.944776" y="42.146812" transform="rotate(-0 595.944776 42.146812)">Sphere, 20 positions (Table D.1)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="595.944776" y="42.146812" transform="rotate(-0 595.944776 42.146812)">Esfera, 20 posiciones (Tabla D.1)</text>
    </g>
    <g id="Line3DCollection_8">
     <path d="M 600.394467 132.510482 
@@ -3697,7 +3697,7 @@ z
    </g>
   </g>
   <g id="text_115">
-   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="383.891685" y="16.318125" transform="rotate(-0 383.891685 16.318125)">ISO 3745 precision microphone arrays</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="383.891685" y="16.798125" transform="rotate(-0 383.891685 16.798125)">Conjuntos de micrófonos de precisión de ISO 3745</text>
   </g>
  </g>
  <defs>

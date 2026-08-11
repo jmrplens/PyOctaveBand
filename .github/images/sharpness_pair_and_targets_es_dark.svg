@@ -1353,39 +1353,39 @@ L 420.261563 51.858813
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="338.856053" y="335.098777" transform="rotate(-0 338.856053 335.098777)">⟨z⟩ = 18,1 Bark</text>
    </g>
    <g id="text_20">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="232.382734" y="41.858813" transform="rotate(-0 232.382734 41.858813)">Equally loud, seven times as sharp</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="232.382734" y="41.858813" transform="rotate(-0 232.382734 41.858813)">Igual de sonoras, siete veces más agudas</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 143.539688 86.060219 
-L 413.961563 86.060219 
-Q 415.761563 86.060219 415.761563 84.260219 
+     <path d="M 127.622344 86.780219 
+L 413.961563 86.780219 
+Q 415.761563 86.780219 415.761563 84.980219 
 L 415.761563 58.158813 
 Q 415.761563 56.358813 413.961563 56.358813 
-L 143.539688 56.358813 
-Q 141.739688 56.358813 141.739688 58.158813 
-L 141.739688 84.260219 
-Q 141.739688 86.060219 143.539688 86.060219 
+L 127.622344 56.358813 
+Q 125.822344 56.358813 125.822344 58.158813 
+L 125.822344 84.980219 
+Q 125.822344 86.780219 127.622344 86.780219 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_35">
-     <path d="M 145.339688 63.647406 
-L 154.339688 63.647406 
-L 163.339688 63.647406 
+     <path d="M 129.422344 64.007406 
+L 138.422344 64.007406 
+L 147.422344 64.007406 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="170.539688" y="66.797406" transform="rotate(-0 170.539688 66.797406)">250 Hz critical band — N = 4,0 sone, S = 0,37 acum</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="154.622344" y="67.157406" transform="rotate(-0 154.622344 67.157406)">Banda crítica de 250 Hz: N = 4,0 sonios, S = 0,37 acum</text>
     </g>
     <g id="line2d_36">
-     <path d="M 145.339688 77.148109 
-L 154.339688 77.148109 
-L 163.339688 77.148109 
+     <path d="M 129.422344 77.868109 
+L 138.422344 77.868109 
+L 147.422344 77.868109 
 " style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="170.539688" y="80.298109" transform="rotate(-0 170.539688 80.298109)">4000 Hz critical band — N = 4,0 sone, S = 2,75 acum</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="154.622344" y="81.018109" transform="rotate(-0 154.622344 81.018109)">Banda crítica de 4000 Hz: N = 4,0 sonios, S = 2,75 acum</text>
     </g>
    </g>
   </g>
@@ -1686,7 +1686,7 @@ L 849.981563 88.154401
      </g>
     </g>
     <g id="text_36">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="444.918438" y="206.115062" transform="rotate(-90 444.918438 206.115062)">Sharpness S [acum]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="444.918438" y="206.115062" transform="rotate(-90 444.918438 206.115062)">Agudeza S [acum]</text>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_3">
@@ -1805,54 +1805,54 @@ L 849.981563 51.858813
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_37">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="662.102734" y="41.858813" transform="rotate(-0 662.102734 41.858813)">DIN 45692 Table A.2, 250 Hz to 4 kHz</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="662.102734" y="41.858813" transform="rotate(-0 662.102734 41.858813)">Tabla A.2 de DIN 45692, de 250 Hz a 4 kHz</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 480.523906 99.560922 
-L 702.188281 99.560922 
-Q 703.988281 99.560922 703.988281 97.760922 
-L 703.988281 58.158813 
-Q 703.988281 56.358813 702.188281 56.358813 
+     <path d="M 480.523906 100.280922 
+L 729.096875 100.280922 
+Q 730.896875 100.280922 730.896875 98.480922 
+L 730.896875 58.158813 
+Q 730.896875 56.358813 729.096875 56.358813 
 L 480.523906 56.358813 
 Q 478.723906 56.358813 478.723906 58.158813 
-L 478.723906 97.760922 
-Q 478.723906 99.560922 480.523906 99.560922 
+L 478.723906 98.480922 
+Q 478.723906 100.280922 480.523906 100.280922 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_14">
-     <path d="M 482.323906 66.797406 
-L 500.323906 66.797406 
-L 500.323906 60.497406 
-L 482.323906 60.497406 
+     <path d="M 482.323906 67.157406 
+L 500.323906 67.157406 
+L 500.323906 60.857406 
+L 482.323906 60.857406 
 z
 " style="fill: #071807; stroke: #071807; stroke-linejoin: miter"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="66.797406" transform="rotate(-0 507.523906 66.797406)">permitted deviation: 5 % or 0,05 acum</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="67.157406" transform="rotate(-0 507.523906 67.157406)">desviación permitida: 5 % o 0,05 acum</text>
     </g>
     <g id="line2d_79">
-     <path d="M 482.323906 77.148109 
-L 491.323906 77.148109 
-L 500.323906 77.148109 
+     <path d="M 482.323906 77.508109 
+L 491.323906 77.508109 
+L 500.323906 77.508109 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_39">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="80.298109" transform="rotate(-0 507.523906 80.298109)">sharpness_din(), each band set to 4 sonios</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="80.658109" transform="rotate(-0 507.523906 80.658109)">sharpness_din(), cada banda ajustada a 4 sonios</text>
     </g>
     <g id="line2d_80">
      <g>
-      <use xlink:href="#m0124a2d90b" x="491.323906" y="90.648813" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.6"/>
+      <use xlink:href="#m0124a2d90b" x="491.323906" y="91.368813" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.6"/>
      </g>
     </g>
     <g id="text_40">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="93.798813" transform="rotate(-0 507.523906 93.798813)">Table A.2 hearing-test targets</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="507.523906" y="94.518813" transform="rotate(-0 507.523906 94.518813)">objetivos de los ensayos de audición (Tabla A.2)</text>
     </g>
    </g>
   </g>
   <g id="text_41">
-   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="428.781563" y="16.318125" transform="rotate(-0 428.781563 16.318125)">Sharpness: Where the Loudness Sits, Not How Much There Is</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="428.781563" y="16.798125" transform="rotate(-0 428.781563 16.798125)">Agudeza: dónde se sitúa la sonoridad, no cuánta hay</text>
   </g>
  </g>
  <defs>
