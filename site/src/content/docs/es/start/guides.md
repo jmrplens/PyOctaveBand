@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 105 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 106 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -97,7 +97,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento cinco guías repartidas en diez temas, y cada
+Esta página es el mapa. Ciento seis guías repartidas en diez temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -230,6 +230,9 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): calibración SPL
   física a partir de un tono de calibrador o de una sensibilidad conocida, y el
   modo digital de escala completa.
+- [Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/):
+  qué afirma una clase de prestaciones, los verificadores por etapa, el
+  informe de conformidad, y el alcance de los ensayos de tipo y periódicos.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo, con
   incertidumbre expandida e intervalos de cobertura.

@@ -1,13 +1,16 @@
 ---
 title: "Calibration and uncertainty"
-description: "The three disciplines that make a computed level a defensible measurement: physical SPL calibration against digital dBFS analysis, the GUM and Monte Carlo propagation of measurement uncertainty, and the stationarity and peak statistics that qualify a record before any of it is averaged."
+description: "The disciplines that make a computed level a defensible measurement: physical SPL calibration against digital dBFS analysis, the GUM and Monte Carlo propagation of measurement uncertainty, the stationarity and peak statistics that qualify a record before any of it is averaged, and the class verifiers with the conformance report behind every number."
 ---
 
 A level printed by software is not yet a measurement. Three things separate
 the one from the other: knowing that the record deserves to be **averaged at
 all**, knowing what the digital samples mean **physically**, and knowing how
 much the result could reasonably be **wrong**. This section covers all three,
-and they apply transversally to every other page of the documentation.
+and they apply transversally to every other page of the documentation. A
+fourth page maps the evidence that backs the numbers: what a performance
+**class** asserts, the verifiers that grade a chain, and the published
+conformance report.
 
 [Calibration and dBFS](/phonometry/signals/metrology/calibration/) handles the
 physical meaning. phonometry works in two reference frames: physical **dB
@@ -27,6 +30,15 @@ propagates whole probability distributions numerically and yields coverage
 intervals that stay honest when the model is non-linear or the inputs are far
 from Gaussian. The page shows both on the same models, including where they
 diverge and why.
+
+[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+carries the evidence story: what a performance class actually claims in
+IEC 61672-1 and IEC 61260-1 (same design goals, different acceptance limits),
+which public verifier grades each stage of a measurement chain against its
+tolerance tables, how to read and cite the numerical conformance report the
+site publishes, and the honest boundary against the pattern-evaluation and
+periodic tests of IEC 61672-2/-3 and IEC 61260-2/-3, which need an
+instrument in a laboratory rather than a library.
 
 [Data qualification](/phonometry/signals/metrology/data-qualification/) guards the gate
 in front of both: every average - a Leq, a Welch PSD, every averaged input
@@ -53,6 +65,10 @@ budgets that are specialisations of the GUM machinery described here.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone, the stability check it applies to that
   recording, and the digital full-scale mode.
+- [Compliance and Verification](/phonometry/signals/metrology/compliance-verification/):
+  what a performance class asserts, the verifiers that grade weightings,
+  filter banks and intensity spectra against their tolerance tables, the
+  conformance report, and the scope of IEC 61672-2/-3 and IEC 61260-2/-3.
 - [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method, expanded
   uncertainty and coverage intervals.
@@ -66,7 +82,9 @@ Nothing here checks an instrument or a calibrator. The IEC 60942 conformance
 tests of the calibrator itself — generated level, frequency, distortion, and
 the corrections for static pressure and temperature — are not implemented, so
 pass an already corrected `target_spl` when the manual asks for one, and the
-IEC 61672-3 periodic tests are cited as laboratory practice rather than run.
+IEC 61672-3 periodic tests are cited as laboratory practice rather than run;
+[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+draws that boundary precisely, part by part.
 The dBFS half of the calibration page sits outside any standard and makes no
 physical claim: it is a reference frame, not a measurement. Data qualification
 implements the quantitative core of Bendat & Piersol's section 10.3 only —

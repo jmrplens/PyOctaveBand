@@ -155,6 +155,10 @@ What the numbers mean and how much to trust them.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone (IEC 60942), the stability check it applies
   to that recording, and the digital dBFS mode.
+- [Compliance and Verification](/phonometry/signals/metrology/compliance-verification/):
+  what a performance class asserts, the verifiers that grade each stage
+  against its tolerance tables, how to read the conformance report, and the
+  scope of IEC 61672-2/-3 and IEC 61260-2/-3.
 - [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method of
   ISO/IEC Guide 98-3, with expanded uncertainty and coverage intervals.
@@ -168,9 +172,12 @@ Four things a reader reasonably expects here are absent, and each guide says so
 in its own "Not covered" block. **No instrument is verified.**
 `verify_filter_class` and `verify_weighting_class` check a designed digital
 response against the tolerance tables of IEC 61260-1 and IEC 61672-1; the
-IEC 61672-3 pattern-evaluation tests a physical meter needs for type approval,
-and the IEC 60942 conformance tests of the calibrator itself, are not run, so a
-class verdict here describes the algorithm and not a built device. **No file is
+IEC 61672-2 pattern-evaluation tests a physical meter needs for type approval,
+the IEC 61672-3 periodic tests it receives in service, and the IEC 60942
+conformance tests of the calibrator itself, are not run, so a class verdict
+here describes the algorithm and not a built device;
+[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+draws that boundary part by part. **No file is
 opened.** Nothing in the library decodes WAV, FLAC or any other container:
 every function takes an array you have already read, which is why `fs` is
 always an argument. **No array processing.** Correlation and time delay model

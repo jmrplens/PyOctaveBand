@@ -1,0 +1,406 @@
+---
+title: "Compliance and Verification"
+description: "What a performance class claims under IEC 61672-1 and IEC 61260-1, the public verifiers that grade a designed chain against the tolerance tables, how to read the published conformance report, and the honest boundary drawn by the pattern-evaluation and periodic-test parts that only a laboratory can run."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "The two performance categories of clause 1 (same design goals, different acceptance limits and operational temperature range) and the Table 3 frequency-weighting acceptance limits checked by verify_weighting_class."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 2: Pattern evaluation tests"
+    designation: "IEC 61672-2:2013"
+    url: "https://webstore.iec.ch/en/publication/5709"
+    note: "The full type-approval regime for a physical sound level meter: every mandatory specification of Part 1, including the environmental, electrostatic and radio-frequency influence tests, exercised on submitted specimens. Nothing on this page performs it."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 3: Periodic tests"
+    designation: "IEC 61672-3:2013"
+    url: "https://webstore.iec.ch/en/publication/5710"
+    note: "The deliberately restricted set of key tests a working meter receives in the laboratory, and the clause 1 caveat that periodic results alone support no general conformance conclusion. Cited here as the model for what a class verdict does not say."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/en/publication/5063"
+    note: "The class 1 / class 2 relative-attenuation acceptance limits of Table 1 checked by verify_filter_class, and the subclause 1.2 statement of what separates the two classes."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 2: Pattern-evaluation tests"
+    designation: "IEC 61260-2:2016"
+    url: "https://webstore.iec.ch/en/publication/24560"
+    note: "The pattern-evaluation regime for a physical filter set: at least three submitted specimens, the full Table 1 walk, linearity, electromagnetic compatibility and climate sensitivity. Nothing on this page performs it."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 3: Periodic tests"
+    designation: "IEC 61260-3:2016"
+    url: "https://webstore.iec.ch/en/publication/24561"
+    note: "The periodic tests of a working analyser: midband relative attenuation or effective bandwidth deviation, the linear operating range with its level range control and overload indicator, and the lower limit of that range."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1993
+    title: "Electroacoustics — Instruments for the measurement of sound intensity — Measurements with pairs of pressure sensing microphones"
+    designation: "IEC 61043:1993"
+    url: "https://webstore.iec.ch/en/publication/4353"
+    note: "The class limits on the pressure-residual intensity index behind verify_intensity_class, the third verifier family this page inventories."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+import { totalChecks, domains, standards } from '../../../../data/conformance-stats.mjs';
+
+Three kinds of evidence back a number computed with this library, and they
+live on different pages. The **verifiers** are public functions that grade a
+filter or weighting you configured against the acceptance limits of its
+governing standard. The **conformance report** is the published table of
+{totalChecks} checks that pins the shipped implementation to the standards'
+own expected values, regenerated on every change. And the **scope notes** on
+each guide say where the software's claim ends and a laboratory's begins.
+This page is the map of the three: what a performance class actually asserts,
+which function verifies what, how to read the report, and exactly which parts
+of the IEC 61672 and IEC 61260 series a library can and cannot claim.
+
+## 1. What a performance class asserts
+
+IEC 61672-1:2013 (sound level meters) and IEC 61260-1:2014 (octave-band and
+fractional-octave-band filters) both specify **two performance categories,
+class 1 and class 2**, and both define them the same way: class 1 and class 2
+share the *same design goals* and differ mainly in the **acceptance limits**
+around those goals and in the range of operational temperature; class 2
+limits are greater than or equal to class 1 limits everywhere (IEC 61672-1:2013,
+clause 1; IEC 61260-1:2014, subclause 1.2).
+
+So a class is not a quality grade of the reading. It is a **worst-case error
+bound under stated conditions**: a class 1 A-weighting may deviate from the
+design-goal response at 1 kHz by at most ±0.7 dB, a class 2 one by ±1.0 dB,
+and every band of a class 1 one-third-octave filter reads a mid-band tone
+within ±0.4 dB of its true level. The bound is what chains: a class 1
+measurement needs every stage to hold class 1, from the
+[calibrator](/phonometry/signals/metrology/calibration/) through the weighting to the
+band filter, because each stage's tolerance enters the level it hands on. One
+class 2 stage bounds the chain at class 2, whatever the rest attests.
+
+Two edges of the vocabulary are worth pinning down before verifying anything:
+
+- **Class 0 is not a 2014 class.** The strictest filter class belongs to the
+  withdrawn IEC 61260:1995 / ANSI S1.11-2004 masks; IEC 61260-1:2014 defines
+  classes 1 and 2 only. The verifiers keep the old mask alive behind
+  `edition="1995"`, and [Filter Class Verification](/phonometry/signals/filters/filter-compliance/#2-class-0-iec-612601995--ansi-s111-2004)
+  covers when a class 0 claim is honest and how to cite it.
+- **A class belongs to a specification, not to a number.** "Class 1" written
+  alone says nothing; the claim is "class 1 per IEC 61672-1:2013 Table 3" or
+  "class 1 per IEC 61260-1:2014 Table 1", and the two masks are different
+  objects checked by different functions, which is the next section.
+
+## 2. The verifiers: which function proves what
+
+The library exposes one verifier per instrument stage. Each checks a design
+you configured, band by band or frequency by frequency, against the
+acceptance limits transcribed from the governing standard, and each returns
+the same verdict vocabulary: an `overall_class` (the strictest class met, or
+`None`), per-band margins in decibels to the nearest limit, and a
+`range_limited` flag when part of the standard's frequency range could not be
+demonstrated at your sample rate.
+
+| Stage | Verifier | Acceptance limits | Deep dive |
+| :--- | :--- | :--- | :--- |
+| Frequency weighting (A, C, Z) | `verify_weighting_class` | IEC 61672-1:2013 Table 3 | [Frequency Weighting, section 6](/phonometry/signals/levels/weighting/#6-verifying-against-the-tolerance-tables-iec-61672-1) |
+| Weightings B and AU | `verify_weighting_class` | ANSI S1.4-1983 Tables IV/V; IEC 61012:1990 Table 1 | [Special Weightings](/phonometry/signals/levels/special-weightings/) |
+| Fractional-octave filter bank | `verify_filter_class` | IEC 61260-1:2014 Table 1 (1995 mask via `edition="1995"`) | [Filter Class Verification](/phonometry/signals/filters/filter-compliance/) |
+| Intensity instrument spectrum | `verify_intensity_class` | IEC 61043:1993 Table 2 | [Sound Intensity](/phonometry/devices/emission/intensity/) |
+
+The masks themselves are public too: `weighting_class_limits(1)` returns the
+34 nominal frequencies of Table 3 with the class 1 deviation limits, and
+`class_limits(fraction, filter_class, omega)` returns the Table 1
+relative-attenuation corridor, so a report can draw the same limits the
+verdict was judged against.
+
+Verifying a whole measurement chain is two calls. The configuration below is
+the one the conformance suite itself pins, a 48 kHz chain with the default
+order-6 Butterworth bank over 100 Hz to 10 kHz:
+
+```python
+from phonometry import filters
+
+wf = filters.WeightingFilter(48000, "A")
+weighting = filters.verify_weighting_class(wf)
+print(weighting["overall_class"])       # 1
+print(weighting["range_limited"])       # False
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6,
+                                limits=[100, 10000])
+bands = filters.verify_filter_class(bank)
+print(bands["overall_class"])           # 1
+print(bands["range_limited"])           # True for a decimated bank
+```
+
+Read the flags, not just the class. `range_limited` on the bank is `True`
+because a decimated band cannot be evaluated beyond its own processing
+Nyquist, so the far stopband rests on the anti-alias argument rather than on
+the band filter itself; the weighting at 48 kHz checks all 34 nominal
+frequencies and reports `False`. The margins say how close the verdict came:
+
+```python
+worst = min(bands["bands"], key=lambda b: b["margin_class1_db"])
+print(round(worst["margin_class1_db"], 3))   # 0.4
+print(weighting["bands"][20])
+# {'freq': 1000.0, 'class': 1, 'deviation_db': 0.0, 'margin_class1_db': 0.7, 'margin_class2_db': 1.0}
+```
+
+A margin of +0.400 dB on a passing Butterworth bank is the passband
+half-corridor itself, the best a compliant design can report, not a result to
+improve; [Filter Class Verification](/phonometry/signals/filters/filter-compliance/#1-verifying-the-class-against-iec-61260-12014)
+explains which constraint binds and why raising the order stops helping the
+moment the verdict turns positive.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask.svg" alt="A and C weighting deviations at 48 kHz threading within the IEC 61672-1 Table 3 class 1 acceptance corridor, with the wider class 2 limits dotted" width="80%" />
+
+*What a verifier actually checks, drawn for the weightings: the deviation of
+the designed response from the design goal (markers) must stay inside the
+class 1 corridor (shaded) at every nominal frequency. The filter-bank
+equivalent, a relative-attenuation corridor around each mid-band frequency,
+is drawn in [Filter Class Verification](/phonometry/signals/filters/filter-compliance/).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+freqs, lower1, upper1 = filters.weighting_class_limits(1)
+_, lower2, upper2 = filters.weighting_class_limits(2)
+lo1, lo2 = np.clip(lower1, -7, 7), np.clip(lower2, -7, 7)
+
+fig, ax = plt.subplots(figsize=(10, 6.5))
+ax.fill_between(freqs, lo1, upper1, step="mid", alpha=0.10,
+                label="Class 1 acceptance region")
+ax.plot(freqs, upper1, drawstyle="steps-mid", label="Class 1 upper/lower limit")
+ax.plot(freqs, lo1, drawstyle="steps-mid", color="C1")
+ax.plot(freqs, upper2, ":", drawstyle="steps-mid", label="Class 2 upper/lower limit")
+ax.plot(freqs, lo2, ":", drawstyle="steps-mid", color="C2")
+
+for curve, marker in (("A", "o"), ("C", "s")):
+    verdict = filters.verify_weighting_class(filters.WeightingFilter(48000, curve))
+    f = [b["freq"] for b in verdict["bands"]]
+    dev = [b["deviation_db"] for b in verdict["bands"]]
+    ax.plot(f, dev, marker=marker, label=f"{curve} weighting deviation (48 kHz)")
+
+ax.set(xscale="log", xlim=(10, 20000), ylim=(-7, 7),
+       xlabel="Frequency [Hz]", ylabel="Deviation from design goal [dB]")
+ax.legend(fontsize=8, ncol=2)
+plt.show()
+```
+
+</details>
+
+When the verdict has to leave the console, `filter_class_compliance` wraps
+the same verification as a result object with `.plot()` (the worst-margin
+band drawn on its class corridor) and `.report()`, the one-page accredited
+fiche with an optional PASS/FAIL row against a required class:
+
+```python
+from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+
+bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filter_class_compliance(bank)   # result.overall_class == 1
+result.report(
+    "iec61260.pdf",
+    metadata=ReportMetadata(
+        specimen="1/1-octave filter bank",
+        measurement_standard="IEC 61260-1:2014",
+        required_class=1,
+    ),
+)                                        # -> Class 1 - COMPLIES, PASS
+```
+
+<ReportPreview
+	name="iec61260_filter_example"
+	title="IEC 61260-1 filter class compliance example report (PDF)"
+	description="One-page filter-class-compliance fiche: a metadata header, a per-band classification table listing each octave band's achieved class and binding margin, the worst-margin band's measured relative attenuation overlaid on the green class-1 acceptance corridor, the boxed Class 1 - COMPLIES (margin +0.40 dB) result and a PASS verdict against the required class 1."
+	caption="The verdict as a document: the fiche states the achieved class per band, the binding margin and the corridor it was judged against, which is everything section 4 says a design-level claim may assert."
+/>
+
+The intensity verifier follows the same pattern one domain over:
+`verify_intensity_class` grades a measured pressure-residual intensity index
+spectrum against the IEC 61043 class limits, and `intensity_class_compliance`
+wraps it with `.plot()` and its own fiche, with the residual-index physics
+explained in [Sound Intensity](/phonometry/devices/emission/intensity/).
+
+## 3. Reading the conformance report
+
+The verifiers grade *your* configuration. The
+[conformance report](/phonometry/reference/conformance/) is the complementary
+evidence: {totalChecks} numerical checks across {domains} domains and
+{standards} standards, each row pinning one implemented quantity to the
+governing standard's own expected value, with the computed value, the signed
+delta and a pass/fail verdict beside it. It is regenerated on every pull
+request and the build fails if it drifts from the code, so the published
+table always describes the library as shipped.
+
+Three habits make it useful rather than decorative:
+
+- **Find the row before trusting the feature.** Every table is
+  `Standard | Quantity | Expected | Computed | Delta | Status`, grouped by
+  domain, and the expected value is the standard's worked example or
+  tolerance-table entry, not a regression baseline. The row for a metric you
+  rely on tells you which clause of which edition the implementation was held
+  to, which is exactly the citation a report needs.
+- **Note the configuration of the class rows.** The filters-and-weightings
+  section walks the five filter architectures and the weighting curves
+  through the same verifiers this page documents, in one pinned
+  configuration: order 6, one-third-octave, 100 Hz to 10 kHz, 48 kHz. The
+  report proves the implementation; for any other fraction, order or sample
+  rate, section 2 is how the claim transfers to *your* bank.
+- **Cite the version that ran.** The report describes the exact library
+  version that generated it, so a defensible citation pins the version and
+  quotes the report of that version, as
+  [About this project](/phonometry/start/about/) spells out.
+
+Where re-deriving a standard this closely has exposed defects in the
+published documents themselves, the evidence lives in the
+[errata registry](/phonometry/reference/errata/), which the report links row
+by row where it applies.
+
+## 4. What only a laboratory can attest
+
+Both instrument series continue past their Part 1 with two test regimes, and
+neither regime is something a software library can run on itself. The
+delimitation below is verified against the four documents; the one-line
+summary is that **the library checks designs against Part 1 acceptance
+limits, while Parts 2 and 3 check physical instruments** — and the two claims
+are not interchangeable.
+
+**Pattern evaluation** (IEC 61672-2:2013 for meters, IEC 61260-2:2016 for
+filters) is the type-approval regime a *model* passes once. Its stated scope
+is the tests necessary to verify conformance to **all mandatory
+specifications** of the Part 1 (IEC 61672-2:2013, clause 1; IEC 61260-2:2016,
+subclause 1.1), on physical specimens: IEC 61260-2 requires at least three
+specimens of the pattern submitted for testing (subclause 4.1). That includes
+everything a transfer function does not have: the influence of static
+pressure, air temperature and relative humidity, immunity to electrostatic
+discharge and to power-frequency and radio-frequency fields, directional
+response and the acoustical tests of the frequency weightings with the
+microphone in the sound field, level linearity of the real electronics,
+self-generated noise, toneburst response, overload behaviour
+(IEC 61672-2:2013, clauses 7 to 9; IEC 61260-2:2016, clauses 7 to 9).
+
+**Periodic tests** (IEC 61672-3:2013, IEC 61260-3:2016) are what a *working
+instrument* receives in the laboratory every year or two. Their scope is
+deliberately the opposite of exhaustive: a limited set of key tests, valid
+for the environmental conditions of the day, "restricted to the minimum
+considered necessary" (IEC 61672-3:2013, clause 1; IEC 61260-3:2016,
+subclauses 1.2 and 1.3). For a filter set that means the relative attenuation
+at the midband frequency of every filter or the effective bandwidth
+deviation, the linear operating range with its level range control and
+overload indicator, and the lower limit of that range (IEC 61260-3:2016,
+clauses 10 to 12); for a meter, the calibrator check, self-generated noise,
+weightings by acoustical and electrical signals, linearity, tonebursts,
+C-weighted peak and overload (IEC 61672-3:2013, clauses 9 to 21). Both Part 3
+scopes end with the same caveat: because the extent is limited, passing every
+periodic test supports **no general conclusion of conformance** to the Part 1
+unless the model's pattern approval is on record (IEC 61672-3:2013, clause 1;
+IEC 61260-3:2016, subclause 1.5).
+
+The same honesty applies to this library, in both directions:
+
+- **What a verifier verdict is.** A statement about a *design*: the digital
+  transfer function you configured fits the Part 1 acceptance mask, with the
+  reported margins, over the checked frequency range. Every measurement made
+  wholly in software inherits it, which is why the
+  [sound level meter walkthrough](/phonometry/signals/sound-level-meter/) ends by
+  running the verifiers on the chain it just built.
+- **What it is not.** A pattern evaluation, a periodic test, or a certificate
+  for any physical device. Nothing here has a microphone, a temperature or a
+  serial number; the influence-quantity, immunity and acoustical tests above
+  are not implemented, and no green verdict from section 2 says anything
+  about the hardware that recorded your samples. A real front end brings its
+  own paper: the meter's periodic test per IEC 61672-3 and the calibrator's
+  conformance per IEC 60942, both discussed with the field ritual in
+  [Calibration and dBFS](/phonometry/signals/metrology/calibration/).
+- **Name both verdicts in a report.** "Band levels computed with filters
+  verified class 1 per IEC 61260-1:2014 Table 1 (library version X, see its
+  conformance report); acquisition chain periodically tested per
+  IEC 61672-3:2013 on date Y" is a claim a reviewer can check end to end.
+  Either half alone quietly borrows the other's authority.
+
+## What this guide covers
+
+**Covered.** What a performance class asserts in IEC 61672-1:2013 and
+IEC 61260-1:2014 and how the claim chains through a measurement; the public
+verifiers (`verify_weighting_class`, `verify_filter_class`,
+`verify_intensity_class`, with `weighting_class_limits` and `class_limits`
+publishing the masks, and `filter_class_compliance` /
+`intensity_class_compliance` adding `.plot()` and the accredited fiche); how
+to read and cite the published conformance report; and the verified scope of
+the pattern-evaluation and periodic-test parts.
+
+**Not covered.** The verification mathematics of each stage, which belongs
+to the stage's own guide ([Frequency Weighting](/phonometry/signals/levels/weighting/),
+[Special Weightings](/phonometry/signals/levels/special-weightings/),
+[Filter Class Verification](/phonometry/signals/filters/filter-compliance/),
+[Sound Intensity](/phonometry/devices/emission/intensity/)); and every test of
+Parts 2 and 3 themselves, which this page delimits but the library does not
+perform: no environmental, immunity, acoustical or linearity test is run,
+and no physical instrument is assigned a class.
+
+## See also
+
+- [Frequency Weighting](/phonometry/signals/levels/weighting/): the A/C/Z
+  curves and the section 6 verification against IEC 61672-1 Table 3.
+- [Filter Class Verification](/phonometry/signals/filters/filter-compliance/):
+  the IEC 61260-1 mask band by band, class 0, and the compliance fiche in
+  detail.
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the whole
+  chain assembled and then class-checked with the verifiers of this page.
+- [Calibration and dBFS](/phonometry/signals/metrology/calibration/): the calibrator
+  side of the class chain, and the IEC 60942 / IEC 61672-3 laboratory
+  practice around it.
+- [Conformance report](/phonometry/reference/conformance/): the published table
+  this page teaches how to read.
+- API reference: [`filters.compliance`](/phonometry/reference/api/filters/compliance/),
+  [`filters.weighting_compliance`](/phonometry/reference/api/filters/weighting-compliance/)
+  and [`emission.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/).
+
+## Quick answers
+
+### Can phonometry certify my sound level meter or analyser as class 1?
+
+No. The verifiers grade the digital design they are given against the
+IEC 61672-1:2013 Table 3 or IEC 61260-1:2014 Table 1 acceptance limits; a
+class for a physical instrument comes from pattern evaluation
+(IEC 61672-2:2013 / IEC 61260-2:2016) and stays credible through periodic
+tests (IEC 61672-3:2013 / IEC 61260-3:2016), all of which need the device in
+a laboratory. A measurement made with a hardware front end carries two
+verdicts, the library's design verdict and the instrument's test record, and
+a defensible report names both.
+
+### What is the difference between pattern evaluation and periodic tests?
+
+Pattern evaluation (Part 2 of each series) verifies a *model* against every
+mandatory specification of Part 1 once, on submitted specimens, including
+environmental and electromagnetic influence tests. Periodic tests (Part 3)
+re-check a *working instrument* on a limited, deliberately minimal set of key
+tests, valid for the conditions of the day; both Part 3 scopes state that
+passing them supports no general conformance conclusion unless the model's
+pattern approval is on record.
+
+### Which functions check standards compliance in phonometry?
+
+`verify_weighting_class` checks a frequency weighting against
+IEC 61672-1:2013 Table 3 (B and AU against ANSI S1.4-1983 and
+IEC 61012:1990), `verify_filter_class` checks a fractional-octave bank
+against IEC 61260-1:2014 Table 1 (the 1995 class 0 mask via
+`edition="1995"`), and `verify_intensity_class` checks an intensity
+instrument's residual-index spectrum against IEC 61043:1993. All three report
+a per-band class with margins in dB, and `filter_class_compliance` /
+`intensity_class_compliance` package the verdict with `.plot()` and an
+accredited `.report()` fiche.

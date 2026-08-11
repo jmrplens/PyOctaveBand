@@ -113,6 +113,7 @@ export const topics = [
         items: [
           { slug: 'signals/metrology', label: 'Overview', translations: { es: 'Resumen' } },
           'signals/metrology/calibration',
+          'signals/metrology/compliance-verification',
           'signals/metrology/gum-uncertainty',
           'signals/metrology/data-qualification',
         ],
