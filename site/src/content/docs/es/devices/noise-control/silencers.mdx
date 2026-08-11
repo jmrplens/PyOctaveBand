@@ -32,7 +32,7 @@ references:
     title: "Acoustics — Laboratory measurement procedures for ducted silencers and air-terminal units — Insertion loss, flow noise and total pressure loss"
     designation: "ISO 7235:2003 (EN ISO 7235:2009)"
     url: "https://www.iso.org/standard/28379.html"
-    note: "La medición por sustitución del apartado 3: la fuente, el filtro modal, la transición y el conducto de sustitución del apartado 5.2, las tres disposiciones del lado receptor del 5.2.4, las dos series del 6.2.1 con los límites de dispersión de la Tabla 6, y la pérdida de inserción límite del apartado 7.4 y el Anexo C."
+    note: "La medición por sustitución del apartado 3: la fuente, el filtro modal, la transición y el conducto de sustitución del apartado 5.2, las tres disposiciones del lado receptor del 5.2.4, las dos series del 6.2.1 con los límites de dispersión de la Tabla 6, y la pérdida por inserción límite del apartado 7.4 y el Anexo C."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -92,7 +92,7 @@ $$
 \qquad Z_c = \frac{\rho c}{S},
 $$
 
-y la **pérdida de inserción** para una impedancia de fuente $Z_s$ y una de
+y la **pérdida por inserción** para una impedancia de fuente $Z_s$ y una de
 radiación $Z_r$ es la atenuación adicional frente a una conexión directa.
 
 ### Cámara de expansión
@@ -122,7 +122,7 @@ print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
 ```
 
 Una sola línea, `res.plot()`, dibuja la pérdida de transmisión de la cámara (y
-su pérdida de inserción cuando se dan las impedancias de fuente y radiación).
+su pérdida por inserción cuando se dan las impedancias de fuente y radiación).
 La figura de abajo barre en cambio la relación de áreas: un desajuste $m$ mayor
 eleva todos los máximos, pero las caídas permanecen en 0 dB y los máximos
 permanecen en las mismas frecuencias, fijadas solo por la longitud de la
@@ -148,7 +148,7 @@ from phonometry import expansion_chamber
 
 freqs = np.linspace(20.0, 2000.0, 2000)
 
-# Una línea para una cámara: TL vs frecuencia, más la pérdida de inserción
+# Una línea para una cámara: TL vs frecuencia, más la pérdida por inserción
 # cuando se dan las dos impedancias acústicas (Pa.s/m3; de dónde salen, en el
 # subapartado siguiente). Con las dos puestas a rho c / S = 4.14e4 para este
 # tubo de 0.01 m2 las dos curvas coinciden, que es lo que significa «puertos
@@ -204,7 +204,7 @@ plt.show()
 
 </details>
 
-### Pérdida de transmisión, pérdida de inserción y cuál cita una hoja de características
+### Pérdida de transmisión, pérdida por inserción y cuál cita una hoja de características
 
 Circulan tres magnitudes y no son intercambiables. La **pérdida de transmisión**
 compara la potencia incidente que entra en el elemento con la que sale de él
@@ -212,9 +212,9 @@ hacia una terminación sin reflexiones, así que es una propiedad del elemento
 por sí solo, que es justo lo que permite calcularla a partir de la geometría y la razón
 de que la fórmula de arriba fije $Z_1 = \rho c/S_\text{in}$ y
 $Z_n = \rho c/S_\text{out}$ sin preguntar a qué está conectado el silenciador. La
-**pérdida de inserción** compara el nivel en un punto fijo con y sin el elemento
+**pérdida por inserción** compara el nivel en un punto fijo con y sin el elemento
 puesto, así que depende de la fuente y de aquello a lo que el conducto radia, y
-una misma cámara presenta pérdidas de inserción distintas en dos instalaciones.
+una misma cámara presenta pérdidas por inserción distintas en dos instalaciones.
 La **reducción de ruido** es la diferencia de niveles a secas a través del
 elemento, que es lo que devuelve una medición con dos micrófonos en un conducto
 en servicio.
@@ -235,20 +235,20 @@ del dominio de electroacústica como `radiating_piston(...).resistance` y
 impedancia *mecánica* $\rho c S(R_1 + jX_1)$ en N·s/m, a un factor $S^2$ de
 distancia, y es fácil meterlas por equivocación). La impedancia de la fuente de
 un ventilador o de un motor, en cambio, rara vez se conoce y depende mucho de la
-frecuencia, que es precisamente por lo que en la práctica la pérdida de
+frecuencia, que es precisamente por lo que en la práctica la pérdida por
 inserción es una magnitud *medida*.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss_es.svg" alt="Atenuación frente a la frecuencia de 20 a 880 Hz de una cámara de expansión de 0,3 m y relación de áreas 4. Una curva gruesa da la pérdida de transmisión, una joroba suave entre 0 y 6,5 dB con un cero en 572 Hz. Dos curvas más finas dan la pérdida de inserción de esa misma cámara descargando por la impedancia de radiación de su extremo abierto, una para una fuente adaptada al tubo y otra para una fuente veinte veces más rígida: las dos bajan muy por debajo de cero cerca de 180 Hz, hasta menos 9,3 y menos 22,6 dB, vuelven a bajar cerca de 645 Hz hasta menos 2,9 y menos 8,5 dB, y se reencuentran con la pérdida de transmisión en la parte alta de la banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss_es.svg" alt="Atenuación frente a la frecuencia de 20 a 880 Hz de una cámara de expansión de 0,3 m y relación de áreas 4. Una curva gruesa da la pérdida de transmisión, una joroba suave entre 0 y 6,5 dB con un cero en 572 Hz. Dos curvas más finas dan la pérdida por inserción de esa misma cámara descargando por la impedancia de radiación de su extremo abierto, una para una fuente adaptada al tubo y otra para una fuente veinte veces más rígida: las dos bajan muy por debajo de cero cerca de 180 Hz, hasta menos 9,3 y menos 22,6 dB, vuelven a bajar cerca de 645 Hz hasta menos 2,9 y menos 8,5 dB, y se reencuentran con la pérdida de transmisión en la parte alta de la banda" width="88%" />
 
 *La misma cámara, tres respuestas. La pérdida de transmisión nunca baja de cero,
-porque está definida contra una terminación que no refleja nada. La de inserción
-sí puede: cerca de 180 Hz esta cámara y el extremo abierto por el que descarga
-resuenan juntos, y la instalación es **más ruidosa** con el silenciador puesto
-que sin él — 9,3 dB más para una fuente adaptada al tubo y 22,6 dB para una
-rígida —, allí donde la pérdida de transmisión marca unos cómodos +5 dB. Por eso
-un catálogo publica una pérdida de inserción dinámica medida con el caudal de
-diseño y en el sentido de diseño, y por eso una TL calculada es una herramienta
-de dimensionado y no una especificación.*
+porque está definida contra una terminación que no refleja nada. La pérdida
+por inserción sí puede: cerca de 180 Hz esta cámara y el extremo abierto por el
+que descarga resuenan juntos, y la instalación es **más ruidosa** con el
+silenciador puesto que sin él — 9,3 dB más para una fuente adaptada al tubo y
+22,6 dB para una rígida —, allí donde la pérdida de transmisión marca unos
+cómodos +5 dB. Por eso un catálogo publica una pérdida por inserción dinámica
+medida con el caudal de diseño y en el sentido de diseño, y por eso una TL
+calculada es una herramienta de dimensionado y no una especificación.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -269,7 +269,7 @@ x = 2.0 * (2.0 * np.pi * freqs / c) * a
 z_r = z0 * ((1.0 - 2.0 * special.j1(x) / x)
             + 1j * (2.0 * special.struve(1, x) / x))
 
-# Una línea: el resultado dibuja la pérdida de inserción junto a la de
+# Una línea: el resultado dibuja la pérdida por inserción junto a la de
 # transmisión siempre que se den las dos impedancias.
 expansion_chamber(freqs, 0.3, 0.04, pipe_area,
                   source_impedance=z0, radiation_impedance=z_r).plot(language="es")
@@ -282,7 +282,7 @@ ax.plot(freqs, expansion_chamber(freqs, 0.3, 0.04, pipe_area).transmission_loss,
 for factor, label in ((20.0, "fuente rígida"), (1.0, "fuente adaptada")):
     res = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
                             source_impedance=factor * z0, radiation_impedance=z_r)
-    ax.plot(freqs, res.insertion_loss, label=f"Pérdida de inserción, {label}")
+    ax.plot(freqs, res.insertion_loss, label=f"Pérdida por inserción, {label}")
 ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Atenuación [dB]")
 ax.legend()
 plt.show()
@@ -291,8 +291,8 @@ plt.show()
 </details>
 
 La regla que se sigue de ahí es corta: **no compares una pérdida de transmisión
-calculada con una pérdida de inserción publicada.** Escribe los requisitos en
-pérdida de inserción con la terminación declarada, toma la cifra del
+calculada con una pérdida por inserción publicada.** Escribe los requisitos en
+pérdida por inserción con la terminación declarada, toma la cifra del
 suministrador o de un ensayo (apartado 3), y trata la pérdida de transmisión que
 calcula esta página como la herramienta que dice qué geometría hay que pedir.
 
@@ -577,7 +577,7 @@ $c(T) = 343\sqrt{T/293}$ con $T$ en kelvin, así que un escape a 500 °C
 para 285,8 Hz con valores de aire frío canta a 464 Hz en cuanto el tubo se
 calienta. Hay que pasar los valores de trabajo — `speed_of_sound=` y
 `density=`, porque la densidad escala toda impedancia característica y por
-tanto la pérdida de inserción. La llamada con `speed_of_sound=557.0` del
+tanto la pérdida por inserción. La llamada con `speed_of_sound=557.0` del
 fragmento del apartado 1 es ese reajuste, y devuelve 464,2 Hz para el mismo
 tubo de 0,3 m.
 
@@ -629,7 +629,7 @@ dispositivo construido se comporta como la curva. La **envolvente** de una
 cámara es un radiador grande de pared delgada: si su propia pérdida de
 transmisión queda por debajo de la del silenciador, el sonido se marcha por la
 envolvente y el dispositivo entrega la cifra de la envolvente, que es la versión
-en obra de la pérdida de inserción límite del apartado 3. Los dos **saltos de
+en obra de la pérdida por inserción límite del apartado 3. Los dos **saltos de
 área llevan correcciones de extremo**, igual que el cuello de un resonador, así
 que la longitud acústica supera a la geométrica y las caídas medidas quedan un
 poco por debajo del $c/2L$ que aquí se imprime: una sintonía de tanteo hay que
@@ -645,9 +645,10 @@ una página con la disposición de una hoja de prestaciones de silenciador, con
 la línea de base metodológica que nombra el método de cuatro polos de onda
 plana (Munjal Ec. (3.27); Bies §8.8-8.9), una cabecera de metadatos opcional
 (cliente, dispositivo, entorno de ensayo, instrumentación, clima, fecha), la
-tabla por bandas de la pérdida de transmisión (y de la de inserción cuando se
-dieron las impedancias) junto a esas mismas curvas, la pérdida de transmisión
-media sobre las bandas de análisis en su recuadro con el valor de pico y el
+tabla por bandas de la pérdida de transmisión (y de la pérdida por inserción
+cuando se dieron las impedancias) junto a esas mismas curvas, la pérdida de
+transmisión media sobre las bandas de análisis en su recuadro con el valor de
+pico y el
 tipo de dispositivo, y un veredicto opcional frente a una pérdida de
 transmisión media mínima declarada. El renderizado necesita reportlab y, para
 la figura que incrusta la ficha, matplotlib (`pip install
@@ -765,7 +766,7 @@ para la unidad de bafles.
 
 phonometry modela la familia reactiva en forma cerrada en esta página. El
 lado disipativo entra por los datos de instalación de los
-[métodos HVAC](/phonometry/es/devices/noise-control/noise-control/): la pérdida de inserción
+[métodos HVAC](/phonometry/es/devices/noise-control/noise-control/): la pérdida por inserción
 del codo revestido y la atenuación del plenum revestido del método de Wells,
 ambas a partir de datos ASHRAE interpolados y no de un modelo de
 revestimiento. La física porosa que necesitaría un cálculo de revestimiento
@@ -778,12 +779,12 @@ la resistividad al flujo de aire, es la misma teoría de materiales que
 ## 3. Cómo se mide un silenciador (ISO 7235)
 
 Todo lo anterior se calcula a partir de la geometría. La cifra que publica un
-suministrador, no: es una **pérdida de inserción medida por sustitución**, y la
+suministrador, no: es una **pérdida por inserción medida por sustitución**, y la
 ISO 7235:2003 (publicada en Europa como EN ISO 7235:2009) es el método que hay
 detrás. Leer la ficha de esta página sin saberlo es la forma de acabar poniendo
 en la misma frase unos 8,9 dB calculados y los «25 dB» de un catálogo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235_es.svg" alt="Dos montajes apilados sobre un mismo eje de conducto. En el de arriba, la serie uno: una caja de altavoces estanca y revestida alimenta un filtro modal, después una transición, después el objeto de ensayo, y después un conducto de ensayo con terminación anecoica de cuñas que lleva tres posiciones de micrófono sobre una recta inclinada respecto al eje del conducto. El montaje de abajo, la serie dos, es idéntico salvo que el objeto de ensayo se sustituye por un conducto de sustitución vacío. Se marcan con trazo discontinuo los planos de cualificación en el objeto de ensayo y en el conducto receptor. Debajo, la pérdida de inserción se da como la diferencia de los dos niveles del lado receptor, tercio de octava a tercio de octava, con la atenuación del filtro modal, el límite del coeficiente de reflexión, la tolerancia del conducto de sustitución y la regla de relación señal-ruido de fondo enumerados con los números de apartado de la propia norma" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235_es.svg" alt="Dos montajes apilados sobre un mismo eje de conducto. En el de arriba, la serie uno: una caja de altavoces estanca y revestida alimenta un filtro modal, después una transición, después el objeto de ensayo, y después un conducto de ensayo con terminación anecoica de cuñas que lleva tres posiciones de micrófono sobre una recta inclinada respecto al eje del conducto. El montaje de abajo, la serie dos, es idéntico salvo que el objeto de ensayo se sustituye por un conducto de sustitución vacío. Se marcan con trazo discontinuo los planos de cualificación en el objeto de ensayo y en el conducto receptor. Debajo, la pérdida por inserción se da como la diferencia de los dos niveles del lado receptor, tercio de octava a tercio de octava, con la atenuación del filtro modal, el límite del coeficiente de reflexión, la tolerancia del conducto de sustitución y la regla de relación señal-ruido de fondo enumerados con los números de apartado de la propia norma" width="92%" />
 
 El banco tiene cuatro partes y cada una lleva su requisito. La **fuente** es un
 generador de ruido aleatorio y un amplificador que atacan unos altavoces
@@ -815,7 +816,7 @@ próxima está a más del doble de distancia que el micrófono.
 El procedimiento son luego dos series sin cambiar nada más. Se determina
 $L_{pI}$ con el objeto de ensayo instalado y $L_{pII}$ con el conducto de
 sustitución en su lugar, en puntos o recorridos idénticos y con un espectro de
-fuente inalterado, y la pérdida de inserción es $D_i = L_{pI} - L_{pII}$ tercio
+fuente inalterado, y la pérdida por inserción es $D_i = L_{pII} - L_{pI}$ tercio
 de octava a tercio de octava (6.2.1). En un conducto de ensayo el promedio
 espacial toma **al menos tres posiciones equiespaciadas** sobre una recta
 inclinada respecto al eje del conducto, a la mitad de su longitud
@@ -827,17 +828,17 @@ conformes a IEC 61260 (5.2.4.6) y se verifica con un calibrador de clase 1 con
 $\pm 0{,}3$ dB antes y después de cada serie (6.1).
 
 La cifra lleva aparejadas dos consecuencias. La primera, que lo que se declara es una
-**pérdida de inserción frente a un conducto de sustitución**, no una pérdida de
+**pérdida por inserción frente a un conducto de sustitución**, no una pérdida de
 transmisión, así que no es la magnitud que calcula esta página y las dos no
 deben compararse directamente. La segunda, que toda instalación tiene una
-**pérdida de inserción límite**: el techo que le impone la transmisión por flancos
+**pérdida por inserción límite**: el techo que le impone la transmisión por flancos
 a través de las paredes de su propio conducto, medido con el conducto de sustitución bloqueado
 acústicamente y registrado en función de la frecuencia (7.4). Una cifra de
 catálogo muy grande dice tanto de la disposición de ensayo como del
 dispositivo, que es la razón de que la disposición tenga que constar en el
 informe. Para hacerse una idea de lo repetible que es todo esto, las
 desviaciones típicas de reproducibilidad que da la propia norma para la
-pérdida de inserción son 1,5 dB de 50 a 100 Hz, 1 dB de 125 a 500 Hz, 2 dB de
+pérdida por inserción son 1,5 dB de 50 a 100 Hz, 1 dB de 125 a 500 Hz, 2 dB de
 630 Hz a 1,25 kHz y 3 dB por encima (Tabla 7), con la incertidumbre expandida
 al doble de esos valores.
 
@@ -876,7 +877,7 @@ los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
 dibujo a escala `.plot_geometry()`, contrastados con la simulación FDTD
 independiente; el `plane_wave_limit` que acota a todos ellos; y, como prosa y
 no como código, la medición por sustitución de ISO 7235 que produce la pérdida
-de inserción que publica un suministrador.
+por inserción que publica un suministrador.
 
 **No cubierto.** Solo se calculan elementos reactivos: los silenciadores
 disipativos (absorbentes, con revestimiento interior) se discuten para la

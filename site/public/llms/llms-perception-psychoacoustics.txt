@@ -2132,7 +2132,7 @@ accumulates more of it than the single closed form allows.
 > overlap and absolute-threshold screening become 50 % overlap, a Hann window
 > and relative floors here), so perfectly steady signals do not read exactly
 > zero: a steady 1 kHz tone comes out near 0.09 vacil and steady broadband
-> noise a few tenths of a vacil, partly the physical level fluctuation of the
+> noise about 0.15-0.19 vacil, partly the physical level fluctuation of the
 > noise itself. For **AM broadband noise** the signal model overshoots
 > the absolute level (it spreads the modulated energy across bands); quote the
 > closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.

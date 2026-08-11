@@ -2945,7 +2945,7 @@ L 77.800781 359.722969
 " style="fill: none; stroke: #d62728; stroke-width: 1.7; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="85.000781" y="362.872969" transform="rotate(-0 85.000781 362.872969)">Mezcla de Rice con r = 0,746 (Ec. 5,223)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="85.000781" y="362.872969" transform="rotate(-0 85.000781 362.872969)">Mezcla de Rice con r = 0,746 (Ec. 5.223)</text>
     </g>
     <g id="line2d_74">
      <path d="M 59.800781 373.583672 

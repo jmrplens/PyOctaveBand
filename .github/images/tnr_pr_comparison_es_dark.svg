@@ -517,7 +517,7 @@ L 277.186875 63.647406
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="284.386875" y="66.797406" transform="rotate(-0 284.386875 66.797406)">criterio TNR (apartado 11,5)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="284.386875" y="66.797406" transform="rotate(-0 284.386875 66.797406)">criterio TNR (apartado 11.5)</text>
     </g>
     <g id="line2d_60">
      <path d="M 259.186875 77.148109 
@@ -526,7 +526,7 @@ L 277.186875 77.148109
 " style="fill: none; stroke-dasharray: 8.14,3.52; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 2.2"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="284.386875" y="80.298109" transform="rotate(-0 284.386875 80.298109)">criterio PR (apartado 12,5)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="284.386875" y="80.298109" transform="rotate(-0 284.386875 80.298109)">criterio PR (apartado 12.5)</text>
     </g>
    </g>
    <g id="line2d_61">

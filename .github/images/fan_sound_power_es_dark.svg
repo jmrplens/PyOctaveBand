@@ -657,7 +657,7 @@ L 501.248962 151.556894
     <text style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff" transform="translate(231.456426 260.147312)">× 24 álabes, 2 kHz si el ventilador se elige más rápido</text>
    </g>
    <g id="text_18">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="376.587109" y="16.798125" transform="rotate(-0 376.587109 16.798125)">La fila del ventilador: 5000 cfm a 2 in c.a., álabes curvados hacia delante (Long Ec. 13,1)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="376.587109" y="16.798125" transform="rotate(-0 376.587109 16.798125)">La fila del ventilador: 5000 cfm a 2 in c.a., álabes curvados hacia delante (Long Ec. 13.1)</text>
    </g>
    <g id="axes_2">
     <g id="patch_8">
@@ -967,7 +967,7 @@ L 475.521089 89.357727
      </g>
     </g>
     <g id="text_36">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="482.185089" y="92.273227" transform="rotate(-0 482.185089 92.273227)">Atenuación de la carcasa (Tabla 13,8)</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="482.185089" y="92.273227" transform="rotate(-0 482.185089 92.273227)">Atenuación de la carcasa (Tabla 13.8)</text>
     </g>
    </g>
   </g>
