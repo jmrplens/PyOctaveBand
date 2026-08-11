@@ -299,7 +299,11 @@ are most alike, at the low-frequency end.
 
 A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
-still returns.
+still returns. That advisory pair is the only check made: the rest of the
+Clause 6 / Annex A room qualification — the room-shape rule, the ceiling on the
+empty room's absorption area $A_1$, the diffusivity qualification and the
+microphone and loudspeaker counts — is the laboratory's to verify, and nothing
+here checks any of it.
 
 ### `absorption_area()` / `absorption_coefficient()` parameters
 
@@ -557,7 +561,9 @@ $\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
 **Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
 standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
 single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
-($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$).
+($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$). That uncertainty
+formula is all this page takes from EN 1793-1: the standard's own in-situ
+measurement method for road-traffic noise-reducing devices is not implemented.
 
 **Reporting (Clause 8).** The expanded uncertainty is $U = k\,u$ (Formula (10))
 with the Table 3 coverage factor $k$ ($k = 2.0$ at 95 %, Gaussian). The reported
@@ -878,7 +884,8 @@ $$
 that is, a specific flow resistance of one to four times the characteristic
 impedance of air ($\rho_0 c_0 \approx 410$ Pa·s/m). A 50 mm blanket therefore
 wants a resistivity of roughly 8 kPa·s/m² to 33 kPa·s/m², which is exactly
-where commercial absorber products cluster.
+where commercial absorber products cluster. The window is absorber-design
+practice from the literature, not a requirement of either part of ISO 9053.
 
 Typical orders of magnitude, for orientation rather than design: glass wools
 run from a few kPa·s/m² in light thermal grades to some tens of kPa·s/m² in
@@ -1044,7 +1051,13 @@ $f\,s < 0.40\,c$ (6.5.4) and a laxer low end at 1 % of the wavelength
 `wave_decomposition` or the `transfer_matrix_*` solvers turns the matching
 check into an advisory warning, and for the Annex A attenuation estimate of a
 rectangular tube `hydraulic_diameter(width, height)` supplies the $4A/P$
-diameter that `tube_attenuation_constant` expects.
+diameter that `tube_attenuation_constant` expects. That function implements
+only the Eq. (A.18) estimate, which the standard itself calls a lower limit;
+the measured determination of Eqs. (A.13)/(A.14) from the empty tube is not
+implemented. The frequency-range check is also the only condition the library
+verifies: the near-field distances of Clause 4.3, the position tolerances of
+Clause 4.5, the signal-to-noise floor of Clause 7.3 and the warm-up of
+Clause 5 are the operator's, and nothing here checks that any of them was met.
 
 The whole tube, sample included, can also be simulated: section 5 runs this
 exact measurement virtually inside the FDTD solver and recovers the analytic
@@ -1153,7 +1166,9 @@ Two practical cautions from the standard's own text. The minima far from the
 sample are shallower than the theory above says, because the travelling waves
 decay along the tube (viscous and thermal losses at the wall); ISO 10534-1
 has the operator read the minimum **nearest** the sample and, for precision
-work, extrapolate the minimum levels to the sample face. And the method
+work, extrapolate the minimum levels to the sample face — that extrapolation,
+like the standard's probe-body corrections, stays with the operator: the
+closed forms here consume the levels as read. And the method
 leans on the purity of the tone: any harmonic distortion from a hard-driven
 loudspeaker puts energy at frequencies whose minima sit elsewhere, partially
 filling the notch being measured, so the analyser must be narrowband around
@@ -2314,6 +2329,14 @@ cross-check of the meshed cell.
 
 ## Practical notes
 
+**Parameters are inputs.** Nothing on this page measures anything: the five
+JCA parameters, the frame's shear modulus and Poisson coefficient and the
+sheet geometries all enter as numbers the caller supplies. Of their
+characterisation methods only the flow resistivity has a guide
+([Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/)); an inverse fit of the remaining
+parameters against a measured impedance is a `scipy.optimize` exercise, not a
+library function.
+
 **Fit ranges.** Delany–Bazley warns (and extrapolates) outside
 $0.01 < X < 1$ and Miki outside $0.01 < f/\sigma < 1$; treat sub-range
 values as qualitative. JCA needs four extra
@@ -2337,6 +2360,9 @@ refracts and travels inside the layers). `statistical_absorption` assumes
 local reaction, a good approximation for high flow resistivity, partitioned
 cavities or thin resonant facings; for thick, light porous layers integrate
 the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
+Either way the prediction is for a laterally infinite sample: the finite-size
+edge effect that lets a measured ISO 354 $\alpha_s$ exceed the predicted
+$\alpha_{dif}$, and even exceed 1.0, is not modelled here.
 
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
@@ -2358,6 +2384,9 @@ found in the sources during this work are recorded in the
 - [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/): the
   slow-sound slit panels and the critical-coupling condition that push
   perfect absorption into the deep-subwavelength regime.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the diffuser
+  half of Cox & D'Antonio, implemented separately — this guide covers only
+  the absorber half of the book.
 - Theory: [Acoustic material characterisation](https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/#acoustic-material-characterisation-iso-11654-iso-9053-12-iso-10534-12-astm-e2611): the characterisation quantities the empirical and phenomenological models take as input.
 
 ## References
@@ -2711,7 +2740,10 @@ principle hiding inside the classical resonant absorbers of the
   the flexural loss of a limp sheet; the same loss-versus-leakage balance
   governs their peak, and adding masses to the membrane (the decorated
   membrane of the metamaterials literature) tunes the resonance downward the
-  way the loading resonators tune the slit.
+  way the loading resonators tune the slit. They appear here as context only:
+  the classical membrane layer is implemented in the
+  [multilayer solver](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/), and the decorated membrane is not
+  implemented in the library.
 - **The design question is always the same.** Pick the resonance with the
   geometry, then match the loss to the leakage. The porous-layer models ask
   "how thick"; the resonant family asks "how lossy", and
@@ -2789,7 +2821,10 @@ resistivities $12\eta/h^2$ and $28.454\eta/w^2$ as $\omega \to 0$, and the
 effective parameters tend to $\rho_0$, $\kappa_0$ as the boundary layers
 vanish. A built panel would be measured in the
 [impedance tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) (ISO 10534-2) or the
-[reverberation room](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) (ISO 354); misprints found in
+[reverberation room](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) (ISO 354) — nothing here
+performs any of that verification, and the roughness of a printed slit, the
+frame, the mounting and the finite panel size are all outside the model.
+Misprints found in
 the source papers during this work are recorded in the
 [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 

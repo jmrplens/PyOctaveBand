@@ -128,6 +128,12 @@ sensitivity conventions and the baffled-piston radiation model, and
 [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/), with the
 directional patterns and the inherent-noise weightings.
 
+One thing this page never does is police the bench. The functions take a
+captured array and compute the ratio the clause defines, so the rated and
+standard measuring conditions the ratios are defined at (IEC 60268-3 clauses
+3.1.2/3.1.3, with the 1 h pre-conditioning of clause 9), the operating point
+and the 14.12.3.2/14.12.4.1 acceptance checks are the reader's to keep.
+
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
 A non-linear device fed a pure sine at $f_1$ returns the fundamental plus
@@ -447,12 +453,16 @@ THD+N ratio via the standard notch filter and the standard measurement
 bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
 nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
 Measurement Procedures* (4th ed., Wiley): the $H_1$ and $H_2$ frequency-response
-estimators and the ordinary coherence $\gamma^2$. The rated-characteristics
+estimators and the ordinary coherence $\gamma^2$. The implemented edition is
+frozen at AES17-2015; the superseding AES17-2020 revision is not the one
+checked. The rated-characteristics
 standards of the transducer guides, IEC 60268-5:2003+A1:2007
 (loudspeakers), IEC 60268-4:2014 (microphones) and IEC 60263:1982 (scales
 for the characteristic graphs), are covered in
 [Loudspeaker Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/) and
-[Microphone Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/). All
+[Microphone Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/); the Part 16 speech
+transmission index is a perception quantity with its own guide,
+[Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/). All
 quantities are verified against exact analytic oracles (synthetic signals with
 known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
 full DIM test-signal synthesis, and a known LTI path).
@@ -693,6 +703,12 @@ The impedance modulus (with the 80 %-of-rated line), the total-harmonic-distorti
 curve and the directivity feed the secondary panels, reusing the radiating
 piston directivity of section 2 and a
 [swept-sine THD](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/) result for the distortion curve.
+None of the standard's measuring conditions is checked here: the functions
+reduce and report the curves they are handed, so the mounting, the
+excitation, the gate and the field condition are the operator's to keep and
+to state with the result. Thiele-Small parameter extraction from the
+impedance curve is not implemented either: the impedance panel reports the
+measured modulus against the rated-impedance lines.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report
@@ -1049,7 +1065,9 @@ derived from the same equivalent noise level, and the overload sound
 pressure level (clause 15.2) bounds the usable range from above. The
 BS.468 weighting curve itself is exposed as `itu_r_468_weighting` in the
 [electroacoustics distortion set](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/), where it also
-weights THD.
+weights THD. The quasi-peak detector itself is not implemented: an
+inherent-noise level computed from `itu_r_468_weighting` and an r.m.s. sum
+is not a dBqps figure.
 
 ## 4. Microphone characteristics report (IEC 60268-4)
 
@@ -1127,7 +1145,12 @@ proportion (one frequency decade equal to 25 dB), and the directional pattern
 on the IEC 60263 25 dB reference circle; the inherent-noise spectrum and the
 distortion-against-level curve (with the THD limit and the overload level
 marked) feed the secondary panels. A `requirement` in the metadata is checked
-as a maximum permitted equivalent noise level.
+as a maximum permitted equivalent noise level. What the fiche cannot supply
+is the laboratory behind the numbers: the anechoic room and its
+qualification, the reference microphone and its calibration certificate, the
+high-level source that produces a 140 dB field and the turntable are what
+the reported numbers mean, and the acquisition itself is not implemented
+here — the functions reduce the curves they are handed.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report

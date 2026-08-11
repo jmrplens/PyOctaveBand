@@ -274,6 +274,9 @@ biased low (an ideal loopback gives STI ≈ 0.956 at 5 s vs ≈ 0.998 at 18 s).
 The implementation follows **Edition 5 (2020)**: Edition 4's normative PDF
 is the base and every Ed. 5 change is source-attributed in the code; the
 only numeric delta is the revised male speech spectrum of clause A.6.1.
+That male spectrum is the only one there is: Edition 5 removed the female
+speech option (foreword, item d), so its absence here is the standard's,
+not the library's.
 CI checks the standard's own verification vectors: the six weighting-factor
 band pairs to ±0.001 STI, the $m$ ↔ STI mapping table, the level-dependent
 masking control points, and Schroeder-form decays at four $T_{60}$ values.
@@ -300,7 +303,10 @@ Each route has failure modes the standard is explicit about:
   system with non-linear processing in the chain, measure directly: the STIPA
   signal at least travels through the real chain, and the FULL STI signal is
   the reliable choice where the distortion is severe (IEC 60268-16 clause 6.3
-  and Table 3).
+  and Table 3). That 14-modulation-frequency direct test signal is not
+  implemented here, though: the library provides the STIPA direct signal
+  (`stipa_signal`/`stipa`) and the indirect full-STI computation from an
+  impulse response only.
 - **Level-dependent effects.** The STI is not level-invariant: auditory
   masking and the reception threshold act on the *absolute* band levels at the
   listener. Play the test signal at the system's operating level (the
@@ -716,7 +722,9 @@ the first argument to `speech_intelligibility_index`.
 The standard's own title is plural, and so is the standard: ANSI S3.5-1997
 defines **four** band procedures. They differ only in the band table and in how
 the upward spread of masking is expressed, and `method=` selects one. The
-default is the one-third-octave procedure used above.
+default is the one-third-octave procedure used above. No resampling between
+the four band sets is provided: each procedure expects its speech, noise and
+threshold spectra sampled on its own bands.
 
 | `method=` | Bands | Range | Constants | Spread of masking |
 | :--- | ---: | :--- | :--- | :--- |

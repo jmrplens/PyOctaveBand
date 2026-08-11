@@ -389,6 +389,15 @@ mistakes bias the mean itself:
   of the 63-125 Hz bands across positions is structurally larger; the cure
   is more positions, not a longer excitation.
 
+Three practical limits close the chain. Playback and recording themselves —
+sound-card I/O, level calibration of the chain — are outside the library,
+which starts at the recorded array. ISO 18233's time-variance and distortion
+diagnostics are not implemented either: the sweep separates distortion, but
+no helper here quantifies it (that reading lives in the
+[swept-sine distortion guide](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)).
+And the position rules above are guidance prose: nothing checks how many
+positions were measured or where.
+
 ## From the impulse response onward
 
 The IR leaves this page in several directions. Band-filtered and
@@ -710,6 +719,11 @@ $C = 100\ (T_{30}/T_{20} - 1)$ % (values above 10 % flag a non-straight
 decay). `decay_curve(ir, fs, band=None, fraction=1, zero_phase=False)` returns
 just the `(time, level)` curve for one band or the broadband response.
 
+ISO 3382-1 Annex A defines more parameters than this: the sound strength $G$
+and the binaural/spatial parameters LF, LFC and IACC are not implemented —
+phonometry computes only the reverberance and clarity family above (EDT,
+T20, T30, C50, C80, D50, Ts).
+
 ### ISO 3382 report (`.report()`)
 
 `RoomAcousticsResult.report(path)` renders a one-page PDF fiche laid out like a
@@ -1013,6 +1027,15 @@ fields and marks `rd` / `rp`.
 `rd`/`rp` are `nan` when STI does not decrease with distance. The per-position
 STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/).
+
+Two things stay outside the function. The fourth required single number, the
+average A-weighted background noise $L_{p,A,B}$, is not computed here — it is
+the energetic A-weighted average of the per-position octave-band background
+levels, and it belongs in the report alongside the quantities this page
+produces. And nothing checks the measurement conditions of clauses 5.1 and
+5.2: the function consumes distances, levels and STI values wherever they
+came from, so the source directivity, the furnished-and-unoccupied state and
+the background capture are the operator's responsibility, not the library's.
 
 ## ISO 3382-3 report (`.report()`)
 
@@ -1827,6 +1850,19 @@ NC-15 curve) therefore gets `rating = nan` and an `out_of_range` flag of
 `"above"` / `"below"`, with `nc.label` reading `'>NC-70 (63 Hz)'` (the band
 with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 `NC-14` style numbers are ever fabricated.
+
+Both single-spectrum ratings assume a **steady** sound field, and clause
+5.3.2 makes that a test the reader must perform: it is not implemented here.
+Surging is screened aurally and/or visually in the 16, 31.5 and 63 Hz octave
+bands with the meter on fast response and Z ("flat") weighting (5.3.2.1);
+large random fluctuations are screened from the differences
+$L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ and $L_{10} - L_{\mathrm{EQ}}$ on fast
+against Table 3 (7 dB and 3.5 dB for the combined 16, 31.5 and 63 Hz bands,
+6 dB and 3 dB at 125 Hz) (5.3.2.2). A field that fails either screen belongs
+to the RNC method of clause 5.3, which needs a time series rather than a
+single spectrum, so `noise_criterion` and `room_criterion` would return a
+number that is not the standard's answer for that room. Both functions
+assume the screen has passed.
 
 ## 2. Room Criteria Mark II: rating and spectral tag
 
@@ -2649,8 +2685,10 @@ surface pairs whose coefficients differ by less than a factor of 3 (unless
 scattering objects are present) and an object fraction below 0.2. Outside
 those limits the field is not diffuse and the model errs on the optimistic
 side: the standard's own accuracy clause records measured reverberation
-times up to twice the prediction in low-diffusivity rooms. The classical
-alternatives for those cases live in
+times up to twice the prediction in low-diffusivity rooms. The standard's own
+scope goes further: very large or irregularly shaped spaces — concert halls,
+theatres, factories — are excluded from the model itself, not just from this
+implementation. The classical alternatives for those cases live in
 [Reverberation-time prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/).
 
 ## 4. Enclosed-space report (`.report()`)

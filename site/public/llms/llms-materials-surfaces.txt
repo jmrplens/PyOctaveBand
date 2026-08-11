@@ -338,6 +338,11 @@ Annex A additionally subtracts the internal losses of the system (measured
 once against a rigid plate) so the tube's own dissipation is not billed to
 the road; that correction is `spot_internal_loss_correction`.
 
+Nothing in code enforces the acquisition around either method: the averaging,
+the free-field reference, the signal-to-noise checks, the seal verification
+and the weather limits are the operator's, and the library only sees the two
+impulse responses (or the transfer function) that come out of them.
+
 ## Subtraction or spot?
 
 The two parts of ISO 13472 are complements, not competitors, and Part 2's own

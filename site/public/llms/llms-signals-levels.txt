@@ -153,7 +153,13 @@ plt.show()
 
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
-* **Z-Weighting (`Z`):** Zero weighting, completely flat response.
+* **Z-Weighting (`Z`):** flat by specification, not by omission.
+  IEC 61672-1 defines Z as a nominally flat response from 10 Hz to
+  20 kHz with the same Table 3 tolerances as A and C, which is why
+  `verify_weighting_class` can grade it at all. The library implements it
+  as a bypass, so the *effective* bandwidth of a Z-weighted level is
+  whatever your capture chain delivered: remove DC (`detrend`) and
+  high-pass the wind noise yourself if the recording extends below 10 Hz.
 
 The `curve` argument also accepts the four special weightings, charted and
 documented in [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/): `'G'` for
@@ -176,8 +182,9 @@ $$
 
 C is a band-pass with double poles at $f_1$ and $f_4$ (2 zeros at the origin);
 A adds the $f_2$ and $f_3$ poles (4 zeros), which is why it keeps falling
-through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z is the
-absence of weighting. The full pole/zero derivation is in the
+through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z applies
+no shaping inside the specified band; its design goal is 0 dB everywhere from
+10 Hz to 20 kHz. The full pole/zero derivation is in the
 [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) page.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Equal-loudness contours per ISO 226 on the left, with the 40-phon contour highlighted; on the right the A-weighting curve overlaid on the inverted 40-phon contour, showing that A is the flipped contour frozen into a realizable filter" width="92%"></picture>
@@ -342,8 +349,9 @@ plt.show()
 </details>
 
 - `high_accuracy=False` restores the legacy plain-bilinear behavior.
-- For `'G'` the flag is silently ignored: its 0.25–315 Hz range is already
-  exact with the plain design.
+- For `'G'` the flag is silently ignored: the G design always oversamples
+  internally toward 48 kHz on its own, so its 0.25–315 Hz range stays accurate
+  whatever the input rate (see [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/)).
 - **Stateful (block) processing** always uses the legacy design: the internal
   FIR resampling is incompatible with block continuity. Passing
   `high_accuracy=True` together with `stateful=True` raises a `ValueError`.
@@ -506,9 +514,14 @@ G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
 applicable, multichannel and stateful block processing), and B, D and AU also
-take the `high_accuracy` oversampling; G ignores that flag, because its
-0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
-A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
+take the `high_accuracy` oversampling. G ignores that flag, but not because
+oversampling is unnecessary: **the G design always oversamples internally**,
+toward 48 kHz, so its 0.25 Hz to 315 Hz range stays within about 0.05 dB
+whatever the input rate. That matters exactly where G is used — infrasound is
+often recorded at 1 kHz or 2 kHz, where 315 Hz sits close to Nyquist and the
+bilinear warping grows quadratically; at audio rates the correction is
+negligible. As with A/C/Z, `high_accuracy` cannot be combined with stateful
+processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
 Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
@@ -566,8 +579,11 @@ plt.show()
 The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C. Levels measured with the G curve are reported as
-$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+processing as A/C — but stateful mode cannot carry the internal oversampling
+across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
+verify the response before trusting the level. Levels measured with the G
+curve are reported as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over
+time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
 
@@ -779,7 +795,7 @@ reaches the readout, the squared, frequency-weighted pressure passes
 through an exponential detector whose time constant sets how quickly the
 level follows the signal. This page is that detector, implemented as a
 sample-exact recursive filter: the Fast and Slow characteristics of
-IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+IEC 61672-1:2013 (clause 5.8), the legacy asymmetric Impulse ballistics,
 streaming state for block processing, and the toneburst verification
 against the standard's Table 4.
 
@@ -884,6 +900,11 @@ y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
 \alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
 $$
 
+The asymmetry has a consequence worth stating: unlike F and S, Impulse is not a
+filter. Its coefficient depends on the signal, so an I-weighted level is not
+additive — the I-weighted level of two sources running together cannot be
+derived from the two measured separately, while their $L_{eq}$ values can.
+
 ### Choosing F, S or I
 
 - **Fast** is the default of nearly every modern method: percentile levels,
@@ -892,7 +913,7 @@ $$
   integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
-  the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
+  the price of missing short events (a 100 ms burst peaks 7.6 dB lower
   on S than on F). Some legacy methods prescribe it outright, most famously
   aircraft-certification levels, which are built from Slow-weighted samples.
 - **Impulse** is legacy, and deprecated for rating. It was a 1960s attempt
@@ -963,10 +984,22 @@ plt.show()
 
 ## 5. Initial state
 
-By default, the exponential integrator starts from rest (`y[-1] = 0`). Passing
-`initial_state=None` leaves this default unspecified, while `initial_state='zero'`
-requests the same zero state explicitly. If the recorded segment begins after a
-steady signal is already present, you can start from the first sample energy instead:
+By default, the exponential integrator starts from rest (`y[-1] = 0`);
+`initial_state=None` and `initial_state='zero'` are the same thing. Passing
+`'first'` seeds the integrator with the square of the very first sample,
+$x[0]^2$ — an unbiased but extremely noisy estimate of the mean square (one
+degree of freedom), and for a tone it depends entirely on the phase at the
+cut: a sine starting at a zero crossing makes `'first'` bit-identical to
+`'zero'`. A float resumes a state you saved yourself (which is what block
+processing does in section 6), and an array broadcastable to the input shape
+without the time axis does the same per channel.
+
+If the recorded segment is a continuation of a signal already running, seed
+the integrator with something robust — the mean square of the first half
+second is a far better estimate than a single sample. If the record is the
+*start* of the event, do not seed at all: let it start from rest and discard
+the first $5\tau$ (0.6 s Fast, 5 s Slow), which is exactly what `ln_levels`
+does internally before computing percentiles.
 
 ```python
 import numpy as np
@@ -976,7 +1009,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+# Robust seed: the mean square of the first half second, not one sample.
+energy_envelope = filters.time_weighting(
+    recording, fs, mode='fast',
+    initial_state=float(np.mean(recording[:fs // 2] ** 2)))
 ```
 
 ## 6. Block processing
@@ -1064,7 +1100,7 @@ built on these envelopes, and [Why phonometry](https://jmrplens.github.io/phonom
 
 IEC 61672-1:2013, *Electroacoustics — Sound level meters —
 Part 1: Specifications*: the exponential time-weighting detector (clause 3.8)
-with the F and S time constants (clause 5.7), and the 4 kHz toneburst reference
+with the F and S design-goal time constants (clause 5.8.1), and the 4 kHz toneburst reference
 responses of Table 4 (class 1 acceptance limits) used to verify the ballistics
 in CI.
 

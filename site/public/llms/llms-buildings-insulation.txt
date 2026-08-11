@@ -560,6 +560,14 @@ plt.show()
 
 </details>
 
+Both levels are already-measured inputs: the scanning probe, the
+two-microphone acquisition and the phase-mismatch calibration behind $L_{p1}$
+and $L_{In}$ are not implemented, and nothing here enforces the Clause 6.4
+acquisition either — the 0.1 m to 0.3 m measurement distance, the 0.1 m/s to
+0.3 m/s scan speed, the 90°-rotated second scan with its 1.0 dB validity
+test, the 10 dB background margin — so a single scan will produce a number
+just as readily as a qualified pair.
+
 ### `intensity_sound_reduction()` / `adaptation_term_kc()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -729,6 +737,9 @@ a leaky junction) carries the transmitted power, which no pressure-based
 field method can resolve. Qualify each scan with the same
 pressure-intensity indicator, and expect the probe's own limits (the
 [spacer phase error](https://jmrplens.github.io/phonometry/devices/emission/intensity/)) to set the usable low-frequency range.
+Part 2's own field procedure (the loudspeaker positions, the façade cases) and
+the low-frequency Part 3 variant are not implemented: the formulas here apply
+unchanged to field data, but nothing checks how that data was acquired.
 
 ## References
 
@@ -854,6 +865,12 @@ are flagged in `result.bracketed` and excluded from the single-number
 $\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
 worked numeric example, conformance is anchored on closed-form identities
 (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+
+Those checks are the only enforcement there is. The acquisition itself —
+shielding the other elements, a shield meeting $\Delta R_\text{min}$, the
+position counts and separations, the accelerometer mass-loading inequality,
+$T_s$ measured on the elements in their installed state rather than assumed —
+is the operator's responsibility, and nothing here checks any of it.
 
 ```python
 import numpy as np
@@ -1160,9 +1177,13 @@ ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
 which cover the laboratory measurement of flanking transmission: the
 vibration reduction index $K_{ij}$, the equivalent absorption length, the
 normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
-validity checks that feed the EN 12354 prediction. Because ISO 10848
-contains no worked numeric example, conformance is anchored on closed-form
-identities (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+validity checks that feed the EN 12354 prediction. Parts 2, 3 and 4 differ in
+which junction and specimen types they apply to; phonometry implements only
+the Part 1 formulae generically, plus the Part 4 modal-overlap validity
+check, not the facility-specific test setups the other parts describe.
+Because ISO 10848 contains no worked numeric example, conformance is
+anchored on closed-form identities (simplified $K_{ij}$, $a_j$ at
+$f_\text{ref}$, $\eta$).
 
 
 The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
@@ -1174,7 +1195,8 @@ it is anchored on its closed forms and on structural properties a wrong
 reading breaks: monotonicity in the plenum damping, the bound
 $\tau_{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
 $D_{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
-laboratory reports.
+laboratory reports. The plenum propagation constant $k'$ of a lined duct is an
+input here, not a prediction.
 
 ## See also
 
@@ -2071,6 +2093,20 @@ plt.show()
 `survey_facade_insulation()` a `SurveyFacadeResult`;
 `survey_service_equipment_level()` a `SurveyServiceEquipmentResult` (`l_xy`,
 `l_xy_nt`, `l_xy_n`).
+
+What the functions do not do is police the survey. They consume band levels
+wherever they came from: nothing verifies the sweep, the source corner, the
+tapping-machine positions or the one-corner-plus-two-central
+service-equipment recipe, and nothing checks the 6 dB signal-to-background
+floor of Clause 6.2.1 — nor applies a correction when it was not met, which
+is the method's own rule (record the level, and note that the result was
+affected by an unknown amount). The ± 2 dB agreement with the engineering
+method is the standard's own estimate (Clause 6.6 NOTE), not something the
+library models or propagates: no survey result carries an uncertainty, and
+when the stakes rise the step up is
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/), whose
+ISO 12999-1 machinery does produce one. Annex A's report form and Annex B's
+operating cycles for service equipment are outside the library too.
 
 ## ISO 10052 survey reports (`.report()`)
 
