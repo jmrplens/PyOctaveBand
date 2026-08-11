@@ -42,7 +42,7 @@ excitation level > max - 60 dB), with $k = 1$ at the filter-bank
 edges.
 Measured consequences: a steady 1 kHz tone returns ~0.09 vacil instead of ~0
 (analysis-window envelope leakage through the 2 Hz high-pass) and steady
-broadband noise returns ~0.4 vacil (partly physical level fluctuation of the
+broadband noise returns ~0.15-0.19 vacil (partly physical level fluctuation of the
 noise itself).
 
 ECMA-418-2:2025 (4th ed.) introduced a normative hearing-model fluctuation

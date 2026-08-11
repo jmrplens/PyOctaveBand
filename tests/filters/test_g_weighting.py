@@ -85,6 +85,28 @@ def test_g_multichannel_and_stateful() -> None:
     np.testing.assert_allclose(y_blocks, y_ref, atol=1e-12)
 
 
+def test_g_stateful_holds_its_reference_at_low_fs() -> None:
+    """Stateful G at infrasound rates must keep 0 dB at 10 Hz (ISO 7196
+    clause 4). The design once oversampled toward 48 kHz unconditionally
+    while stateful filtering ran at the input rate, so an SOS built for
+    fs * 24 was applied at fs = 2000 and the reference read -36 dB. The
+    existing stateful test could not see it: at 48 kHz the oversample
+    factor is one and both paths coincide."""
+    fs = 2000
+    t = np.arange(fs * 8) / fs
+    x = np.sin(2 * np.pi * 10.0 * t)
+    wf = WeightingFilter(fs, "G", stateful=True)
+    blocks = [wf.filter(x[i : i + 500]) for i in range(0, fs * 8, 500)]
+    y = np.concatenate(blocks)
+    s = slice(fs * 2, fs * 7)
+    gain = 20 * np.log10(np.std(y[s]) / np.std(x[s]))
+    assert gain == pytest.approx(0.0, abs=0.1)
+
+    # And block processing still matches the one-shot plain design exactly.
+    y_ref = WeightingFilter(fs, "G", high_accuracy=False).filter(x)
+    np.testing.assert_allclose(y, y_ref, atol=1e-12)
+
+
 def test_invalid_curve_message_mentions_g() -> None:
     with pytest.raises(ValueError, match="G"):
         WeightingFilter(FS, "Q")

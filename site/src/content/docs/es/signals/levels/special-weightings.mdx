@@ -52,10 +52,12 @@ lectura de exposición audible.
 
 Las cuatro comparten la maquinaria de las curvas de IEC 61672-1 (0 dB a
 1 kHz donde aplica, procesado multicanal y por bloques con estado), y B, D y
-AU toman además el sobremuestreo `high_accuracy`. La G ignora ese indicador,
-pero no porque sobremuestrear sea innecesario: **el diseño de G sobremuestrea
-siempre internamente**, hacia 48 kHz, de modo que su rango de 0,25 Hz a 315 Hz
-se mantiene dentro de unos 0,05 dB sea cual sea la frecuencia de entrada. Y eso
+AU toman además el sobremuestreo `high_accuracy`, y la G también: **el diseño
+por defecto de G se sobremuestrea hacia 48 kHz**, de modo que su rango de
+0,25 Hz a 315 Hz se mantiene dentro de unos 0,05 dB sea cual sea la frecuencia
+de entrada, mientras que el procesado por bloques con estado ejecuta el diseño
+simple a la tasa de entrada, en torno a un decibelio por debajo en 315 Hz a
+fs = 2000 y exactamente en la referencia de 0 dB a 10 Hz. Y eso
 importa justo donde se usa la G: el infrasonido se graba a menudo a 1 kHz o
 2 kHz, donde 315 Hz queda cerca de Nyquist y la deformación bilineal crece de
 forma cuadrática; a frecuencias de audio la corrección es despreciable. Como con
