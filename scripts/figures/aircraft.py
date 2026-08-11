@@ -371,11 +371,14 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
 
     # A single low ridge edge, shallow enough that Ch < 1 still bites on the
     # lowest band (Eq. 43: Ch = min(f h0/250, 1)) while the three higher
-    # bands already saturate at Ch = 1.
+    # bands already saturate at Ch = 1. The range stays inside what a 2.5 m
+    # edge can plausibly deliver (a knife-edge geometry with a source and
+    # receiver both a few edge-heights away tops out around 1 m of path
+    # difference): only the 4 kHz band actually reaches the 25 dB cap here.
     h0 = 2.5
     bands = np.array([63.0, 250.0, 1000.0, 4000.0])
     band_labels = ["63 Hz", "250 Hz", "1 kHz", "4 kHz"]
-    delta = np.linspace(-0.4, 4.0, 441)
+    delta = np.linspace(-0.4, 1.5, 441)
     ld = np.array([diffraction_attenuation(bands, float(d), edge_height=h0)
                    for d in delta])   # (len(delta), len(bands))
 
@@ -387,22 +390,30 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
         ax.plot(delta, values, color=colour, linewidth=2.0, label=label,
                 zorder=3)
     ax.axvline(0.0, color=COLOR_FG, linewidth=1.0, linestyle="--", alpha=0.6)
-    ax.axhline(25.0, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
-               label="25 dB cap (§A.4.5)", zorder=2)
+    # Above the band curves (zorder=3): otherwise the flat 25 dB plateau of
+    # the 4 kHz curve, drawn at the same height, paints over the cap line.
+    ax.axhline(25.0, color=COLOR_FG, linewidth=1.2, linestyle=":", alpha=0.9,
+               label="25 dB cap (§A.4.5)", zorder=4)
+    # Grazing incidence is 10*Ch*lg(3): the classical 4.8 dB only where
+    # Ch = 1 (250 Hz, 1 kHz, 4 kHz here), not a frequency-independent
+    # constant -- the 63 Hz curve, whose Ch = 0.63, crosses at 3.0 dB.
     grazing = 10.0 * np.log10(3.0)
-    ax.annotate("10 lg 3 ≈ 4.8 dB\ngrazing incidence (δ = 0)",
-                xy=(0.0, grazing), xytext=(0.55, grazing + 5.0),
-                fontsize=9, color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    grazing_63 = 10.0 * min(63.0 * h0 / 250.0, 1.0) * np.log10(3.0)
+    ax.annotate(
+        f"10 Ch lg 3 at grazing incidence (δ = 0):\n"
+        f"{grazing:.1f} dB where Ch = 1, {grazing_63:.1f} dB at 63 Hz",
+        xy=(0.0, grazing), xytext=(0.32, grazing + 6.0),
+        fontsize=9, color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     ax.set_xlabel("Path difference δ [m]")
     ax.set_ylabel("Diffraction attenuation ΔLd [dB]")
-    ax.set_title("Rotorcraft Diffraction Insertion Loss vs Path Difference "
+    ax.set_title("Rotorcraft Diffraction Attenuation vs Path Difference "
                  "(ECAC Doc 32 / NORAH2)", fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
-    ax.legend(loc="center right", bbox_to_anchor=(0.99, 0.58), fontsize=9)
-    ax.text(0.02, 0.95, f"edge height h0 = {h0:.1f} m, single edge",
-            transform=ax.transAxes, va="top", fontsize=9,
+    ax.legend(loc="upper left", fontsize=9)
+    ax.text(0.98, 0.05, f"edge height h0 = {h0:.1f} m, single edge",
+            transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
     save_figure(output_dir, "rotorcraft_insertion_loss.svg")

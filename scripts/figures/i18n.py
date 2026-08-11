@@ -578,16 +578,18 @@ _ES_EXACT = {
     "Flat ground (no hill)": "Suelo plano (sin colina)",
     "Screened by the hill (Eq. 45-47)": "Apantallado por la colina (Ec. 45-47)",
     "Ground and screening adjustment [dB]": "Ajuste de suelo y apantallamiento [dB]",
-    "Rotorcraft Diffraction Insertion Loss vs Path Difference "
+    "Rotorcraft Diffraction Attenuation vs Path Difference "
     "(ECAC Doc 32 / NORAH2)":
-        "Pérdida por inserción por difracción de rotorcraft frente a la "
-        "diferencia de camino (ECAC Doc 32 / NORAH2)",
+        "Atenuación por difracción de rotorcraft frente a la diferencia de "
+        "camino (ECAC Doc 32 / NORAH2)",
     "Below line of sight": "Por debajo de la línea de visión",
     "25 dB cap (§A.4.5)": "tope de 25 dB (§A.4.5)",
     "Diffraction attenuation ΔLd [dB]": "Atenuación por difracción ΔLd [dB]",
     "Path difference δ [m]": "Diferencia de camino δ [m]",
-    "10 lg 3 ≈ 4.8 dB\ngrazing incidence (δ = 0)":
-        "10 lg 3 ≈ 4,8 dB\nincidencia rasante (δ = 0)",
+    "10 Ch lg 3 at grazing incidence (δ = 0):\n"
+    "4.8 dB where Ch = 1, 3.0 dB at 63 Hz":
+        "10 Ch lg 3 en incidencia rasante (δ = 0):\n"
+        "4,8 dB donde Ch = 1, 3,0 dB en 63 Hz",
     "A-weighted sound pressure level [dB(A)]":
         "Nivel de presión acústica ponderado A [dB(A)]",
     "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
