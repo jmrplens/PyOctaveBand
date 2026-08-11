@@ -34,6 +34,7 @@ from .aircraft import (
     generate_rotorcraft_flyover_event,
     generate_rotorcraft_ground_effect,
     generate_rotorcraft_hemisphere,
+    generate_rotorcraft_insertion_loss,
     generate_rotorcraft_kinematics,
     generate_rotorcraft_mean_ground_plane,
     generate_rotorcraft_terrain_screening,
@@ -977,6 +978,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_rotorcraft_flight_conditions,
     generate_rotorcraft_kinematics,
     generate_rotorcraft_mean_ground_plane,
+    generate_rotorcraft_insertion_loss,
     generate_rotorcraft_terrain_screening,
     # 2D FDTD wave simulation (public API concept figure), the one-way
     # plane-wave launcher measured on its own scene, and the meshed

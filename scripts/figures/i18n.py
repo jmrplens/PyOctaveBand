@@ -578,6 +578,16 @@ _ES_EXACT = {
     "Flat ground (no hill)": "Suelo plano (sin colina)",
     "Screened by the hill (Eq. 45-47)": "Apantallado por la colina (Ec. 45-47)",
     "Ground and screening adjustment [dB]": "Ajuste de suelo y apantallamiento [dB]",
+    "Rotorcraft Diffraction Insertion Loss vs Path Difference "
+    "(ECAC Doc 32 / NORAH2)":
+        "Pérdida por inserción por difracción de rotorcraft frente a la "
+        "diferencia de camino (ECAC Doc 32 / NORAH2)",
+    "Below line of sight": "Por debajo de la línea de visión",
+    "25 dB cap (§A.4.5)": "tope de 25 dB (§A.4.5)",
+    "Diffraction attenuation ΔLd [dB]": "Atenuación por difracción ΔLd [dB]",
+    "Path difference δ [m]": "Diferencia de camino δ [m]",
+    "10 lg 3 ≈ 4.8 dB\ngrazing incidence (δ = 0)":
+        "10 lg 3 ≈ 4,8 dB\nincidencia rasante (δ = 0)",
     "A-weighted sound pressure level [dB(A)]":
         "Nivel de presión acústica ponderado A [dB(A)]",
     "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
@@ -4358,6 +4368,8 @@ _ES_PATTERNS = [
     (r"^Total SEL = (.+) dB$", r"SEL total = \1 dB"),
     (r"^Mean ground plane \(a = (.+)\)$", r"Plano medio del terreno (a = \1)"),
     (r"^(.+) Hz \(φ = 0°\)$", r"\1 Hz (φ = 0°)"),
+    (r"^edge height h0 = (.+) m, single edge$",
+     r"altura de arista h0 = \1 m, arista única"),
     # coupling_term_regimes annotations (baked-in computed values).
     (r"^elastic support Yk = (.+) m/\(N s\)  \(19e\)$",
      r"apoyo elástico Yk = \1 m/(N s)  (19e)"),
@@ -4749,7 +4761,7 @@ _ES_PATTERNS = [
       "el \\3 % de la energía medida es de la sala")),
     # A bare "value kHz" marker reads the same in Spanish (the decimal
     # comma is applied by the save-time pass).
-    (r"^(\d+\.\d+) kHz$", r"\1 kHz"),
+    (r"^(\d+(?:\.\d+)?) kHz$", r"\1 kHz"),
     # Noise-control figures: legends and titles carrying computed values
     # (duct_sheet_verification, duct_regenerated_noise, fan_sound_power,
     # hvac_elbow_flow_noise, silencer_selection, silencer_extended_tube,

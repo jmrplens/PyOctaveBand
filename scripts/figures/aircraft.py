@@ -27,6 +27,7 @@ from .theme import (
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     save_figure,
+    series_colors,
 )
 
 
@@ -360,6 +361,51 @@ def generate_rotorcraft_terrain_screening(output_dir: str) -> None:
     ax2.legend(loc="lower left", fontsize=9)
     plt.tight_layout()
     save_figure(output_dir, "rotorcraft_terrain_screening.svg")
+    plt.close()
+
+
+def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
+    """Pure diffraction attenuation ΔLd against path difference δ (Eq. 42-44)."""
+    print("Generating rotorcraft_insertion_loss...")
+    from phonometry import diffraction_attenuation
+
+    # A single low ridge edge, shallow enough that Ch < 1 still bites on the
+    # lowest band (Eq. 43: Ch = min(f h0/250, 1)) while the three higher
+    # bands already saturate at Ch = 1.
+    h0 = 2.5
+    bands = np.array([63.0, 250.0, 1000.0, 4000.0])
+    band_labels = ["63 Hz", "250 Hz", "1 kHz", "4 kHz"]
+    delta = np.linspace(-0.4, 4.0, 441)
+    ld = np.array([diffraction_attenuation(bands, float(d), edge_height=h0)
+                   for d in delta])   # (len(delta), len(bands))
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.axvspan(float(delta.min()), 0.0, color=theme_fill(COLOR_MUTED, ax),
+               zorder=0, label="Below line of sight")
+    colours = series_colors(len(bands))
+    for colour, label, values in zip(colours, band_labels, ld.T, strict=True):
+        ax.plot(delta, values, color=colour, linewidth=2.0, label=label,
+                zorder=3)
+    ax.axvline(0.0, color=COLOR_FG, linewidth=1.0, linestyle="--", alpha=0.6)
+    ax.axhline(25.0, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
+               label="25 dB cap (§A.4.5)", zorder=2)
+    grazing = 10.0 * np.log10(3.0)
+    ax.annotate("10 lg 3 ≈ 4.8 dB\ngrazing incidence (δ = 0)",
+                xy=(0.0, grazing), xytext=(0.55, grazing + 5.0),
+                fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+    ax.set_xlabel("Path difference δ [m]")
+    ax.set_ylabel("Diffraction attenuation ΔLd [dB]")
+    ax.set_title("Rotorcraft Diffraction Insertion Loss vs Path Difference "
+                 "(ECAC Doc 32 / NORAH2)", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="center right", bbox_to_anchor=(0.99, 0.58), fontsize=9)
+    ax.text(0.02, 0.95, f"edge height h0 = {h0:.1f} m, single edge",
+            transform=ax.transAxes, va="top", fontsize=9,
+            bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
+    plt.tight_layout()
+    save_figure(output_dir, "rotorcraft_insertion_loss.svg")
     plt.close()
 
 
