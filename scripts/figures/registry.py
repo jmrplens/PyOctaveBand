@@ -215,6 +215,7 @@ from .fields import (
     _barrier_fields,
     _coincidence_fields,
     _diffusion_fields,
+    _dispersion_fields,
     _duct_cut_on_fields,
     _ducting_fields,
     _expansion_chamber_fields,
@@ -229,6 +230,7 @@ from .fields import (
     _radiation_efficiency_fields,
     _refraction_fields,
     _room_mode_fields,
+    _seabed_fields,
     _slit_absorber_fields,
     _transmission_tube_fields,
     animate_elastic_coincidence,
@@ -238,7 +240,9 @@ from .fields import (
     animate_elastic_radiation_efficiency,
     animate_fdtd_aperture_slit,
     animate_fdtd_barrier,
+    animate_fdtd_critical_angle,
     animate_fdtd_diffusion,
+    animate_fdtd_dispersion,
     animate_fdtd_duct_cut_on,
     animate_fdtd_ducting,
     animate_fdtd_expansion_chamber,
@@ -409,13 +413,16 @@ from .room import (
     generate_sweep_distortion_separation,
 )
 from .schematics import (
+    animate_block_vs_exponential,
     animate_comb_filtering,
     animate_dynamic_stiffness_sweep,
     animate_epnl_flyover,
+    animate_feedback_howl,
     animate_flanking_paths,
     animate_image_source_buildup,
     animate_instantaneous_intensity,
     animate_intensity_scan_power,
+    animate_iso717_shift,
     animate_loudness_gating,
     animate_modulation_transfer,
     animate_onset_detection,
@@ -1153,9 +1160,11 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
     "anim_schroeder": animate_schroeder,
     "anim_fdtd_room_modes": animate_fdtd_room_modes,
     "anim_fdtd_barrier": animate_fdtd_barrier,
+    "anim_fdtd_critical_angle": animate_fdtd_critical_angle,
     "anim_fdtd_ground_effect": animate_fdtd_ground_effect,
     "anim_fdtd_ducting": animate_fdtd_ducting,
     "anim_fdtd_diffusion": animate_fdtd_diffusion,
+    "anim_fdtd_dispersion": animate_fdtd_dispersion,
     "anim_fdtd_duct_cut_on": animate_fdtd_duct_cut_on,
     "anim_fdtd_metadiffuser": animate_fdtd_metadiffuser,
     "anim_fdtd_pillar_hall": animate_fdtd_pillar_hall,
@@ -1182,6 +1191,9 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
     "anim_loudness_gating": animate_loudness_gating,
     "anim_epnl_flyover": animate_epnl_flyover,
     "anim_image_source_buildup": animate_image_source_buildup,
+    "anim_iso717_shift": animate_iso717_shift,
+    "anim_block_vs_exponential": animate_block_vs_exponential,
+    "anim_feedback_howl": animate_feedback_howl,
 }
 
 
@@ -1194,9 +1206,11 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
 _ANIM_FIELDS: dict[str, Callable[[], Any]] = {
     "anim_fdtd_room_modes": _room_mode_fields,
     "anim_fdtd_barrier": _barrier_fields,
+    "anim_fdtd_critical_angle": _seabed_fields,
     "anim_fdtd_ground_effect": _ground_effect_fields,
     "anim_fdtd_ducting": _ducting_fields,
     "anim_fdtd_diffusion": _diffusion_fields,
+    "anim_fdtd_dispersion": _dispersion_fields,
     "anim_fdtd_duct_cut_on": _duct_cut_on_fields,
     "anim_fdtd_metadiffuser": _metadiffuser_fields,
     "anim_fdtd_impedance_tube": _impedance_tube_fields,
@@ -1477,9 +1491,11 @@ def _generate_figures_parallel(
 _ANIM_WEIGHTS: dict[str, float] = {
     "anim_fdtd_room_modes": 1500.0,
     "anim_fdtd_barrier": 1000.0,
+    "anim_fdtd_critical_angle": 1200.0,
     "anim_fdtd_ground_effect": 700.0,
     "anim_fdtd_ducting": 1600.0,
     "anim_fdtd_diffusion": 750.0,
+    "anim_fdtd_dispersion": 480.0,
     "anim_fdtd_metadiffuser": 540.0,
     "anim_fdtd_pillar_hall": 200.0,
     "anim_standing_wave_tube": 130.0,
@@ -1510,6 +1526,9 @@ _ANIM_WEIGHTS: dict[str, float] = {
     "anim_loudness_gating": 90.0,
     "anim_epnl_flyover": 85.0,
     "anim_image_source_buildup": 110.0,
+    "anim_iso717_shift": 60.0,
+    "anim_block_vs_exponential": 75.0,
+    "anim_feedback_howl": 65.0,
 }
 
 # A clip rename must not silently drop its scheduling weight; fail fast.

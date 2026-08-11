@@ -27,6 +27,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Video from '../../../../components/Video.astro';
 
 Every sound-insulation quantity in this documentation ends its journey the
 same way: a band spectrum walks in, a single number walks out. Whether the
@@ -189,10 +190,32 @@ plt.show()
 
 </details>
 
+Every figure of a rating on this page shows the curve where it came to rest.
+The rule that put it there is iterative, and the two positions that decide the
+answer are the ones a finished figure has already discarded: the last shift
+whose unfavourable sum still exceeded 32.0 dB, and the next shift after the
+answer, which is legal but wastes the allowance. The clip walks both engines
+through those steps on the two worked spectra of this page.
+
+<Video
+  name="anim_iso717_shift"
+  width={2400}
+  height={1350}
+  title="Shifting the ISO 717 reference curve until it just fits"
+  description="The reference curve steps in 1 dB increments toward the measured spectrum while the unfavourable deviations shade in band by band and their sum falls toward the 32.0 dB cap. The airborne engine stops at 31.8 dB for Rw = 30 dB, one step before the position that would waste the allowance; the impact engine then runs the same rule with the deviation's sign reversed, the curve stepping upward and stopping at 28.0 dB for L'nT,w = 79 dB."
+/>
+
+*Both walks stop where the standard says: at the largest unfavourable sum that
+does not exceed 32.0 dB. The step before it is rejected for overshooting the
+cap, and the step after it is legal but reads a decibel lower for no reason,
+which is what "as large as possible" in ISO 717-1:2020, 4.4 and
+ISO 717-2:2020, 4.3.1 excludes.*
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Measured one-third-octave sound reduction index with the shifted ISO 717-1 reference curve and the resulting weighted rating at 500 Hz" width="80%" />
 
 *The shifted reference has come to rest where the shaded unfavourable area
-totals 31.8 dB — one more 1 dB step down would overshoot the 32.0 dB cap. The
+totals 31.8 dB: one step back would overshoot the cap at 44.1 dB, and one more
+step down would waste the allowance at 20.6 dB. The
 rating is then read off that curve at 500 Hz, not off the measurement: the
 measured spectrum touches 26.6 dB there, and $R_w$ is 30 dB.*
 

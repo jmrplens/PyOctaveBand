@@ -1070,6 +1070,28 @@ print(sr.magnitude[-1])             # 0.353 = |R| at normal incidence
 sr.plot()                           # |R| vs grazing angle (needs matplotlib)
 ```
 
+### The same interface, as a field
+
+Both curves are read one angle at a time, and a seabed is never struck at one
+angle. In the clip a 100 Hz burst 36 m above the bed sends an expanding front
+whose contact with the seabed starts directly beneath the source at
+$\psi = 90°$ and runs outward, sweeping the grazing angle down through 24.62°
+and on to a few degrees — the whole $|R|(\psi)$ curve traversed once, in
+order. The scene is run twice, changing only the sediment. Over the sand the
+beam entering the bottom switches off at the critical ray, leaving a bright
+evanescent skin that carries nothing away; over a slow mud, which has no
+critical angle, sound enters at every angle to the edge of the frame. Measured
+on the interface itself as the net $\int p\,v_z\,\mathrm{d}t$ per metre of
+seabed, the sand's net beyond the critical ray is **−4.9 %** of what entered
+inside it (0 % from the closed form; the sign is the lateral wave giving
+energy back), and the mud's **+28.3 %** against **+29.7 %** predicted. That
+difference, paid again at every bounce, is what the Weston loss gradient
+$\eta$ accumulates.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_critical_angle_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_critical_angle.gif" alt="Animation: a 100 Hz burst above a flat seabed simulated twice, over fast sand and over slow mud; as the expanding front's contact with the bed sweeps outward the grazing angle falls, and over the sand transmission into the sediment switches off at the critical ray while over the mud it continues at every angle" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_critical_angle.webm)
+
 ## 5. Ocean ambient noise
 
 The ambient-noise spectrum level (dB re 1 µPa²/Hz) is the energy sum of the two

@@ -1177,7 +1177,26 @@ slower regions run at a lower local Courant number and sit nearer the
 accurate. With $\Delta x = 1$ cm the 10-cell point in air sits at roughly
 3.4 kHz, and halving $\Delta x$ quarters the error (the scheme is second
 order, and the validation suite measures that observed order under grid
-refinement). The tests pin the
+refinement).
+
+That bound is a *phase* speed error. A pulse travels at the **group** speed,
+and differentiating the same dispersion relation gives
+$v_g/c = \cos\theta/\sqrt{1 - S^2\sin^2\theta}$ with $\theta = k\Delta x/2$,
+i.e. $1 - (1 - S^2)(k\,\Delta x)^2/8$ — the same law with 8 in place of 24,
+so a wavepacket arrives three times later than the phase rule suggests: 4.1 %
+at ten cells per wavelength, not 1.4 %. Being a speed error, it is paid per
+metre travelled. The clip runs one 500 Hz burst down three plane tubes that
+differ only in $\Delta x$ (137.2, 68.6 and 34.3 mm, i.e. 5, 10 and 20 cells
+per wavelength) with the exact continuous wave drawn behind each trace: the
+measured deficits are 17.2 %, 4.3 % and 1.1 % against 17.3 %, 4.3 % and 1.1 %
+from the closed form, and the three packets cross a 6.6 m finish line 3.3,
+0.7 and 0.2 ms after the exact wave does.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_dispersion_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_dispersion.gif" alt="Animation: a 500 Hz tone burst travelling down three FDTD tubes meshed at 5, 10 and 20 cells per wavelength, with the exact continuous wave drawn behind each trace in grey; by the end the coarse packet has fallen two wavelengths behind and grown a ripple tail while the finest one still sits on the exact wave" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_dispersion.webm)
+
+The tests pin the
 solver to analytic oracles: box and duct eigenfrequencies, free-field
 arrival times and cylindrical decay, the rigid-wall image echo, the
 impedance reflection coefficient above and the dispersion relation itself.

@@ -206,8 +206,8 @@ o esférico hasta una distancia de transición $R_0$ y cilíndrico más allá
 de esta (`"practical"`). El coeficiente de absorción de volumen $\alpha$ (dB/km)
 procede de **Francois-Garrison** (`model="francois-garrison"`, 1982, el valor
 por defecto y la referencia), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) o
-**Thorp** (`"thorp"`, 1967, solo frecuencia); los dos primeros coinciden en
-~10 % entre 100 Hz y 1 MHz.
+**Thorp** (`"thorp"`, 1967, solo frecuencia); los dos primeros coinciden
+dentro de un ~10 % entre 100 Hz y 1 MHz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_es.svg" alt="Pérdida por transmisión submarina frente a la distancia a 10 kHz, con las contribuciones de divergencia geométrica y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
 
@@ -215,9 +215,9 @@ por defecto y la referencia), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) o
 dibujan aparte. Hasta la transición de 1 km la pérdida es divergencia y casi
 nada más: 61,0 dB en total frente a 60,1 dB de divergencia. Pasada la
 transición, la ley de divergencia se reduce a la mitad, $10\lg R$, y el término
-$\alpha R$ toma el relevo del crecimiento: en 20 km, los 92,0 dB totales son
-73,0 dB de divergencia más 19,0 dB de absorción a 0,95 dB/km. En 10 kHz la
-absorción no llega a superar a la divergencia en todo este intervalo; en 100 kHz
+$\alpha R$ toma el relevo del crecimiento: a 20 km, los 92,0 dB totales son
+73,0 dB de divergencia más 19,0 dB de absorción a 0,95 dB/km. A 10 kHz la
+absorción no llega a superar a la divergencia en todo este intervalo; a 100 kHz
 lo habría hecho dentro del primer kilómetro.*
 
 <details>
@@ -418,7 +418,7 @@ contrario que en los modelos de absorción de arriba, con guion), **Mackenzie**
 (`"mackenzie"`) o **Medwin** (`"medwin"`), todas de 1974-1981. La profundidad se
 convierte a
 presión con Leroy & Parthiot (1998). **Dentro del dominio que comparten las
-cuatro coinciden en torno a 1 m/s**: 0,98 m/s a 25 °C, 35 ‰ y 1000 m, y
+cuatro, coinciden dentro de 1 m/s**: 0,98 m/s a 25 °C, 35 ‰ y 1000 m, y
 0,52 m/s en todo el kilómetro superior del perfil dibujado más abajo, así que la
 elección va de rango de validez, no de exactitud. El valor de verificación
 canónico de Mackenzie es 1550,744 m/s a 25 °C, 35 ‰, 1000 m. La forma de seis
@@ -638,7 +638,7 @@ escribe re 1 µPa²m² (equivalentemente, «dB re 1 µPa a 1 m»).
 
 **Todos los términos tienen que referirse al mismo ancho de banda.** La ecuación
 del sonar es un balance de niveles, así que mezclar un nivel de fuente de banda
-ancha con un nivel *espectral* de ruido ambiental se equivoca en
+ancha con un nivel *espectral* de ruido ambiental introduce un error de
 $10\log_{10} B$, decenas de decibelios con cualquier ancho de banda útil, y la
 función no puede detectarlo porque recibe decibelios pelados. Como los modelos
 de ambiental y de tráfico marítimo de aquí son por hercio, la disciplina más
@@ -659,10 +659,10 @@ mérito re 1 m².
 Como la figura de mérito *es* la pérdida por transmisión máxima admisible,
 invertir una ley de pérdida en $TL = FOM$ da el **alcance de detección**, la
 distancia a la que la probabilidad de detección es del 50 %. `detection_range`
-invierte la pérdida en forma cerrada anterior, que crece monótonamente con la
-distancia y por tanto tiene un único cruce; `detection_range_from_curve` lee el
-cruce sobre cualquier curva calculada, incluida la pérdida oscilante de una
-guía real, donde puede haber varios.
+invierte la pérdida en forma cerrada de más arriba, que crece monótonamente
+con la distancia y por tanto tiene un único cruce; `detection_range_from_curve`
+lee el cruce sobre cualquier curva calculada, incluida la pérdida oscilante de
+una guía real, donde puede haber varios.
 
 ```python
 from phonometry import underwater
@@ -742,7 +742,7 @@ Rayleigh para localizar el ángulo crítico y la forma de la pérdida por encima
 *Un rayo que se mantiene rasante no paga nada, y uno empinado lo paga casi todo.
 Para este par de agua sobre arena el ángulo crítico es de 24,62°: por debajo la
 pérdida es idénticamente nula, y un grado por encima la curva ya está subiendo,
-pasando por 5,21 dB en 30°, 7,89 dB en 45° y 9,05 dB en incidencia normal. Ese
+pasando por 5,21 dB a 30°, 7,89 dB a 45° y 9,05 dB en incidencia normal. Ese
 escalón es lo que convierte la propagación en aguas someras en un problema de
 filtrado angular: tras unos pocos rebotes solo sobreviven los rayos
 subcríticos, que es el descamado de modos que describen los regímenes de Weston.*
@@ -786,7 +786,7 @@ valor de incidencia normal a $90°$).
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_coefficient_es.svg" alt="Módulo del coeficiente de reflexión del fondo frente al ángulo rasante para un fondo arenoso rápido: reflexión total por debajo del ángulo rasante crítico, decreciendo hasta el valor de incidencia normal por encima" width="82%" />
 
 *La misma interfase que la pérdida de arriba, leída como amplitud. $|R|$ vale
-exactamente 1 hasta 24,62° y a partir de ahí cae deprisa: 0,403 en 45° y 0,353
+exactamente 1 hasta 24,62° y a partir de ahí cae deprisa: 0,403 a 45° y 0,353
 en incidencia normal, la razón de impedancias de onda plana de los dos medios.
 La idealización sin pérdidas es lo que deja plana la parte subcrítica; un
 sedimento real, que absorbe, la baja unas centésimas por debajo de la unidad,
@@ -822,15 +822,59 @@ print(sr.magnitude[-1])             # 0.353 = |R| en incidencia normal
 sr.plot()   # |R| frente al ángulo rasante (necesita matplotlib)
 ```
 
+### La misma interfase, como campo
+
+Las dos curvas de arriba se leen a *un* ángulo cada vez, y al lecho marino no
+se le llega nunca con un solo ángulo: una fuente radia todos los ángulos a la
+vez, y cuál de ellos incide dónde es cuestión de geometría. El clip de abajo
+construye esa geometría a partir de una sola ráfaga de 100 Hz a 36 m por
+encima del fondo. Su frente en expansión toca el lecho justo debajo de la
+fuente con $\psi = 90°$ y el punto de contacto corre después hacia fuera,
+barriendo el ángulo rasante hacia abajo, a través de los 24,62° y hasta unos
+pocos grados en el borde del encuadre: así se recorre entera la curva
+$|R|(\psi)$, una vez, en orden y de una sola tirada. La escena se ejecuta
+luego dos veces, sin cambiar nada más que los dos números que describen el
+sedimento.
+
+<Video
+  name="anim_fdtd_critical_angle"
+  width={2400}
+  height={1350}
+  title="El ángulo rasante crítico sobre un fondo rápido y uno lento (FDTD 2D)"
+  description="Una ráfaga de 100 Hz a 36 metros por encima de un fondo marino plano, simulada dos veces: sobre la arena rápida de las figuras de arriba y sobre un fango lento. A medida que el contacto del frente en expansión con el fondo barre hacia fuera, el ángulo rasante va cayendo, y sobre la arena el haz que entra en el sedimento se apaga justo donde el rayo crítico de 24,62 grados llega al fondo, y no queda más que una piel evanescente brillante que no se lleva nada; sobre el fango el sonido entra en todos los ángulos hasta el borde mismo del encuadre. Un eje inferior va rellenando el flujo neto de energía medido a través del fondo por detrás del punto de contacto y aterriza sobre la forma cerrada."
+/>
+
+*Sobre la arena la transmisión termina en el rayo crítico y lo que queda en el
+sedimento es una piel evanescente: brilla y no se lleva nada. Medido sobre la
+propia interfase (el neto de $\int p\,v_z\,\mathrm{d}t$ por metro de lecho
+marino, al que un campo evanescente no aporta nada), el neto de la arena más
+allá del rayo crítico es el **−4,9 %** de lo que entró dentro de él, frente al
+0 % de la forma cerrada, y el signo no es un error de redondeo: pasado el
+alcance crítico el flujo neto **se invierte**, porque la onda lateral que nace
+en el punto crítico corre a lo largo de la interfase por dentro del sedimento
+y vuelve a radiar hacia arriba, al agua. El fango se lleva el **+28,3 %** más
+allá de ese mismo alcance frente al **+29,7 %** previsto, y su curva
+sencillamente sigue cayendo por la derecha del panel. Esa diferencia, pagada
+otra vez en cada rebote, es lo que acumula el gradiente de pérdida por
+reflexión $\eta$ de Weston.*
+
+Dos cosas que el clip a propósito *no* enseña. En él no hay superficie del
+mar: con una sola interfase la imagen tiene una familia de rayos y un solo
+alcance crítico, mientras que una guía de ondas real añade una familia
+reflejada en la superficie cuya imagen queda más alta y cuyo alcance crítico
+propio cae más lejos. Y es un único rebote, así que el *filtrado* angular se
+ve, pero la acumulación a lo largo de muchos rebotes, el descamado de modos de
+la tabla de Weston, no; esa es la magnitud que $\eta$ viene a sustituir.
+
 ## Ruido ambiental oceánico
 
 El nivel espectral de ruido ambiental es la suma energética de las componentes
 físicas de Wenz: el ruido de **viento / superficie** por la «regla de los cincos»
 (el ancla histórica de 25 dB a 1 kHz con 5 nudos es re 20 µPa, es decir ~51 dB
-re 1 µPa; válida en ~500 Hz–5 kHz) y el ruido **térmico de
+re 1 µPa; estrictamente válida en ~500 Hz–5 kHz) y el ruido **térmico de
 Mellen** (dominante por encima de ~50 kHz). El rango amplio del ejemplo mantiene
 la curva de viento más allá de ~5 kHz solo como extrapolación para mostrar el
-cruce con el térmico. El espectro de **tráfico** lo aporta quien llama.
+cruce con el térmico. El espectro de **tráfico** puede aportarlo quien llama.
 
 La «regla de los cincos» es una regla mnemotécnica que conviene desmenuzar,
 porque de ella sale toda la rama de viento: una caída de unos 5 dB por octava,
@@ -852,9 +896,9 @@ entrada y no un océano insólito.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise_es.svg" alt="Niveles espectrales de ruido ambiental de Wenz para dos velocidades de viento, con el ruido de viento cayendo 5 dB por octava y el ruido térmico creciendo por encima de unos 50 kHz" width="82%" />
 
 *La regla de los cincos, medida: entre 500 Hz y 5 kHz la rama de viento cae
-5,02 dB por octava, y pasar de 5 a 20 nudos la levanta 10,03 dB en 1 kHz, de
+5,02 dB por octava, y pasar de 5 a 20 nudos la levanta 10,03 dB a 1 kHz, de
 51,1 dB a 61,1 dB. Los dos mecanismos van luego en sentidos opuestos, así que el
-total tiene un mínimo: el ruido térmico llega a 25,3 dB en 100 kHz y con 5 nudos
+total tiene un mínimo: el ruido térmico llega a 25,3 dB a 100 kHz y con 5 nudos
 está ya a menos de 0,7 dB del total ahí, mientras que con 20 nudos sigue ganando
 el viento. Nada de lo que hay en esta figura es un suelo por debajo del cual
 pudiera bajar un hidrófono más silencioso: la rama térmica es el agua misma.*
@@ -901,9 +945,9 @@ Cuando no hay espectro medido, el nivel de fuente de un buque puede
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_traffic_noise_es.svg" alt="Espectros de nivel de fuente predichos por JOMOPANS-ECHO para un portacontenedores, un crucero y un remolcador, con los buques de carga mostrando una joroba de baja frecuencia por debajo de 100 Hz" width="82%" />
 
 *La clase, la velocidad y la eslora son las únicas entradas, y abarcan 45 dB. El
-portacontenedores alcanza su máximo de 174,3 dB re 1 µPa²/Hz en 31,6 Hz, el
-crucero 158,7 dB en 25,1 Hz, y el remolcador, lento y corto, 129,5 dB y más
-arriba, en 125,9 Hz. De ahí salen dos cosas: la energía de la flota está por
+portacontenedores alcanza su máximo de 174,3 dB re 1 µPa²/Hz a 31,6 Hz, el
+crucero 158,7 dB a 25,1 Hz, y el remolcador, lento y corto, 129,5 dB y más
+arriba, a 125,9 Hz. De ahí salen dos cosas: la energía de la flota está por
 debajo de 100 Hz, que es justo donde el modelo de viento del apartado anterior
 es más flojo, y un número único de «ruido de tráfico marítimo» no significa nada
 sin la clase. Estos son niveles de **fuente** a 1 m; el fragmento de más abajo
