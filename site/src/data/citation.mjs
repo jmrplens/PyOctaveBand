@@ -5,16 +5,28 @@
  * `CITATION.cff` in the repository root is the authoritative metadata: it is
  * what GitHub's "Cite this repository" widget renders and what Zenodo reads
  * when a release is archived. So the author, the title, the DOI, the URL and
- * the licence are read from it rather than restated here, and the version is
- * read from the root `VERSION` file, which is the single source astro.config
- * already uses and the file whose change drives a release.
+ * the licence are read from it rather than restated here, and the version
+ * cited on the site is read from the root `VERSION` file, which is the single
+ * source astro.config already uses and the file whose change drives a
+ * release.
  *
- * That leaves the year, which neither file carries: `CITATION.cff` deliberately
- * omits `version` and `date-released` because Zenodo stamps those per release
- * from the tag, and adding them here would be a second version of the truth to
- * keep in step by hand. The release date of the version in `VERSION` is already
- * written down once, in the `CHANGELOG.md` heading for that version, so that is
- * where the year comes from.
+ * `CITATION.cff` also carries its own `version` and `date-released`, mostly
+ * for tools that read the file directly instead of building the site (a JOSS
+ * review checklist, GitHub's own widget, Zenodo). That is a second copy of
+ * the version and release date, which is exactly what drifts if a release
+ * bumps `VERSION` and `CHANGELOG.md` without also touching the CFF, so this
+ * module does not take it on faith: it asserts `cff.version` equals `VERSION`
+ * and that `cff['date-released']` is not later than the `CHANGELOG.md`
+ * heading for that version, and fails the build with a clear message the
+ * moment either stops holding. The site's own citation keeps reading
+ * `VERSION` and `CHANGELOG.md` rather than the CFF fields regardless, so a
+ * stale CFF cannot stamp the site itself with the wrong version, on top of
+ * the assertion below stopping the build for it.
+ *
+ * That leaves the year, which `VERSION` does not carry. The release date of
+ * the version in `VERSION` is already written down once, in the
+ * `CHANGELOG.md` heading for that version, so that is where the year comes
+ * from rather than from `CITATION.cff`'s `date-released`.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -104,13 +116,25 @@ const unquote = (value) => value.trim().replace(/^(["'])(.*)\1$/, '$2');
 
 const cff = readCitationFile(readFileSync(root('CITATION.cff'), 'utf8'));
 
-for (const field of ['title', 'doi', 'url', 'license', 'authors']) {
+for (const field of ['title', 'doi', 'url', 'license', 'authors', 'version', 'date-released']) {
   if (!cff[field]?.length) {
     throw new Error(`CITATION.cff: missing "${field}", which the citation needs.`);
   }
 }
 
 export const version = readFileSync(root('VERSION'), 'utf8').trim();
+
+/**
+ * `CITATION.cff`'s own `version` is a second copy of this value, kept for
+ * tools that read the CFF directly. Assert it agrees with `VERSION` rather
+ * than let the two drift unnoticed until someone reads the file by hand.
+ */
+if (cff.version !== version) {
+  throw new Error(
+    `CITATION.cff: version "${cff.version}" does not match VERSION "${version}". ` +
+      'Bump both together on release.',
+  );
+}
 
 /**
  * The Zenodo *concept* DOI, which resolves to the newest archived release.
@@ -127,25 +151,54 @@ export const doi = cff.doi;
 export const doiUrl = `https://doi.org/${doi}`;
 
 /**
- * The year of the release named by `VERSION`, taken from its changelog heading
- * (`## [3.3.0] - 2026-07-27`). Between releases those always agree, because the
- * commit that bumps `VERSION` is the one that dates the heading. If they ever
- * do not, the newest dated heading is used and the build says so, rather than
- * stamping the citation with whatever day the site happened to be rebuilt.
+ * Every dated release heading in `CHANGELOG.md` (`## [3.3.0] - 2026-07-27`),
+ * in file order (newest first). Parsed once and shared by the release year
+ * below and by the `date-released` consistency check that follows it, so
+ * both read the same headings rather than two independent regexes that could
+ * disagree about what a heading says.
+ */
+const changelogHeadings = (() => {
+  const changelog = readFileSync(root('CHANGELOG.md'), 'utf8');
+  return [...changelog.matchAll(/^## \[([^\]]+)\] - (\d{4}-\d{2}-\d{2})$/gm)].map(
+    ([, headingVersion, date]) => ({ version: headingVersion, date }),
+  );
+})();
+
+/** The heading for the version named by `VERSION`, if `CHANGELOG.md` has one. */
+const changelogEntry = changelogHeadings.find((heading) => heading.version === version);
+
+/**
+ * The year of the release named by `VERSION`, taken from its changelog heading.
+ * Between releases those always agree, because the commit that bumps `VERSION`
+ * is the one that dates the heading. If they ever do not, the newest dated
+ * heading is used and the build says so, rather than stamping the citation
+ * with whatever day the site happened to be rebuilt.
  */
 const releaseYear = (() => {
-  const changelog = readFileSync(root('CHANGELOG.md'), 'utf8');
-  const headings = [...changelog.matchAll(/^## \[([^\]]+)\] - (\d{4})-\d{2}-\d{2}$/gm)];
-  const exact = headings.find(([, released]) => released === version);
-  if (exact) return exact[2];
-  const [newest] = headings;
+  if (changelogEntry) return changelogEntry.date.slice(0, 4);
+  const [newest] = changelogHeadings;
   if (!newest) throw new Error('CHANGELOG.md: no dated release heading to take the year from.');
   console.warn(
     `\n⚠ [citation] CHANGELOG.md has no dated heading for version ${version};` +
-      ` citing the year of ${newest[1]} (${newest[2]}) instead.\n`,
+      ` citing the year of ${newest.version} (${newest.date.slice(0, 4)}) instead.\n`,
   );
-  return newest[2];
+  return newest.date.slice(0, 4);
 })();
+
+/**
+ * `CITATION.cff`'s `date-released` should not claim the release happened
+ * later than `CHANGELOG.md` says it did; equal or earlier is fine (the
+ * changelog entry can be written before the tag that dates the CFF, the same
+ * day). Checked only when `CHANGELOG.md` actually carries a dated heading for
+ * this version — when it does not, the warning above already flags that gap,
+ * and there is nothing to compare `date-released` against.
+ */
+if (changelogEntry && cff['date-released'] > changelogEntry.date) {
+  throw new Error(
+    `CITATION.cff: date-released "${cff['date-released']}" is later than ` +
+      `the CHANGELOG.md date for ${version} (${changelogEntry.date}).`,
+  );
+}
 
 /**
  * Latin-1 letters carrying an accent, written as BibTeX writes them.
