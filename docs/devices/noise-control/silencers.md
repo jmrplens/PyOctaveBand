@@ -320,7 +320,7 @@ from the declared geometry. The figure a supplier publishes is an **insertion
 loss measured by substitution** to ISO 7235:2003: two series with everything
 else unchanged, one with the test object installed and one with a substitution
 duct in its place, differenced third octave by third octave as
-`D_i = L_pI - L_pII`. The rig carries its own requirements — a sealed, lined
+`D_i = L_pII - L_pI`. The rig carries its own requirements — a sealed, lined
 loudspeaker box driving at least 6 dB and preferably 10 dB above the background,
 a modal filter attenuating the fundamental by at least 3 dB and higher-order
 modes by at least 5 dB above cut-on, a substitution duct matched within 5 % in
