@@ -41,9 +41,10 @@ into the test suite as oracles: the IEC 61672-1 weighting tolerances
 [@iec61672], the IEC 61260-1 filter class limits [@iec61260], the ISO 532-1
 loudness test signals [@iso532], the ISO 717 rating examples [@iso717], and
 hundreds more. At the time of writing, continuous integration enforces 533
-numerical conformance checks against 362 referenced standards on every change,
-and the per-check report (standard and clause, normative expected value,
-computed value, delta, verdict) is published with the documentation
+numerical conformance checks across 57 domains against 362 referenced
+standards on every change, and the per-check report (standard and clause,
+normative expected value, computed value, delta, verdict) is published with
+the documentation
 (<https://jmrplens.github.io/phonometry/reference/conformance/>), alongside a
 bibliography of every source the guides cite, standards included with their
 catalogue records
