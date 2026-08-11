@@ -681,6 +681,51 @@ section with `terrain_screening_adjustment` at the worst-looking receiver first,
 and only pay for a full elevation model if that section turns out to be
 screened.
 
+```python
+from phonometry import diffraction_attenuation
+
+bands = [63.0, 250.0, 1000.0, 4000.0]
+diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
+diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss.svg" alt="Diffraction attenuation against path difference for four bands from 63 Hz to 4 kHz, over a 2.5 m edge: every curve is zero left of its own band-dependent threshold near the line of sight, the three bands with C_h = 1 cross about 4.8 dB at grazing incidence while 63 Hz crosses at 3.0 dB, and only the 4 kHz curve reaches the 25 dB cap within the plotted range" width="82%" />
+
+*A single number tells the whole story only when both the wavelength and
+$C_h$ are fixed: the 4 kHz curve is already at the 25 dB cap by $\delta$ =
+0.68 m, the 1 kHz curve is still climbing at $\delta$ = 1.5 m (22.5 dB, short
+of the cap), and the 63 Hz curve reaches only 7.2 dB there, held back by its
+own $C_h$ = 0.63 (Eq. 43, $h_0$ = 2.5 m) on top of the longer wavelength. At
+grazing incidence the three bands whose $C_h$ = 1 cross 4.8 dB, but 63 Hz
+crosses at 3.0 dB instead, because that value scales with $C_h$ too, not
+with wavelength alone.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import diffraction_attenuation
+
+bands = np.array([63.0, 250.0, 1000.0, 4000.0])
+delta = np.linspace(-0.4, 1.5, 441)
+ld = np.array([diffraction_attenuation(bands, float(d), edge_height=2.5)
+              for d in delta])
+
+fig, ax = plt.subplots(figsize=(9, 6))
+for i, label in enumerate(["63 Hz", "250 Hz", "1 kHz", "4 kHz"]):
+    ax.plot(delta, ld[:, i], label=label)
+ax.axvline(0.0, color="0.5", linestyle="--")
+ax.axhline(25.0, color="0.5", linestyle=":", label="25 dB cap")
+ax.set(xlabel="Path difference δ [m]",
+       ylabel="Diffraction attenuation ΔLd [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 `mean_ground_plane`, `mean_flow_resistivity` and `diffraction_attenuation`
 expose the pieces; `terrain_screening_adjustment` runs the whole section:
 
