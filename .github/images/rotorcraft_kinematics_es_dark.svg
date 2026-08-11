@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="847.288438pt" height="381.516563pt" viewBox="0 0 847.288438 381.516563" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="852.060313pt" height="381.516563pt" viewBox="0 0 852.060313 381.516563" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 381.516563 
-L 847.288438 381.516563 
-L 847.288438 0 
+L 852.060313 381.516563 
+L 852.060313 0 
 L 0 0 
 z
 "/>
@@ -1508,7 +1508,7 @@ L 3.5 0
       </g>
      </g>
      <g id="text_44">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="330.013707" transform="rotate(-0 383.101719 330.013707)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="330.013707" transform="rotate(-0 383.101719 330.013707)">−40</text>
      </g>
     </g>
     <g id="ytick_15">
@@ -1523,7 +1523,7 @@ L 376.101719 286.527698
       </g>
      </g>
      <g id="text_45">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="290.326526" transform="rotate(-0 383.101719 290.326526)">-30</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="290.326526" transform="rotate(-0 383.101719 290.326526)">−30</text>
      </g>
     </g>
     <g id="ytick_16">
@@ -1538,7 +1538,7 @@ L 376.101719 246.840517
       </g>
      </g>
      <g id="text_46">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="250.639346" transform="rotate(-0 383.101719 250.639346)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="250.639346" transform="rotate(-0 383.101719 250.639346)">−20</text>
      </g>
     </g>
     <g id="ytick_17">
@@ -1553,7 +1553,7 @@ L 376.101719 207.153337
       </g>
      </g>
      <g id="text_47">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="210.952165" transform="rotate(-0 383.101719 210.952165)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.101719" y="210.952165" transform="rotate(-0 383.101719 210.952165)">−10</text>
      </g>
     </g>
     <g id="ytick_18">
@@ -1617,7 +1617,7 @@ L 376.101719 48.404614
      </g>
     </g>
     <g id="text_52">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="412.707969" y="184.816953" transform="rotate(-90 412.707969 184.816953)">Ángulo [°]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="417.479844" y="184.816953" transform="rotate(-90 417.479844 184.816953)">Ángulo [°]</text>
     </g>
    </g>
    <g id="line2d_83">
@@ -1903,7 +1903,7 @@ L 797.901719 329.236898
       </g>
      </g>
      <g id="text_53">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="333.035726" transform="rotate(-0 804.901719 333.035726)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="333.035726" transform="rotate(-0 804.901719 333.035726)">−10</text>
      </g>
     </g>
     <g id="ytick_23">
@@ -1918,7 +1918,7 @@ L 797.901719 287.520518
       </g>
      </g>
      <g id="text_54">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="291.319346" transform="rotate(-0 804.901719 291.319346)">-7,5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="291.319346" transform="rotate(-0 804.901719 291.319346)">−7,5</text>
      </g>
     </g>
     <g id="ytick_24">
@@ -1933,7 +1933,7 @@ L 797.901719 245.804138
       </g>
      </g>
      <g id="text_55">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="249.602966" transform="rotate(-0 804.901719 249.602966)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="249.602966" transform="rotate(-0 804.901719 249.602966)">−5</text>
      </g>
     </g>
     <g id="ytick_25">
@@ -1948,7 +1948,7 @@ L 797.901719 204.087758
       </g>
      </g>
      <g id="text_56">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="207.886586" transform="rotate(-0 804.901719 207.886586)">-2,5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="804.901719" y="207.886586" transform="rotate(-0 804.901719 207.886586)">−2,5</text>
      </g>
     </g>
     <g id="ytick_26">
@@ -2012,7 +2012,7 @@ L 797.901719 37.222237
      </g>
     </g>
     <g id="text_61">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="837.686094" y="184.816953" transform="rotate(-90 837.686094 184.816953)">Ángulo [°]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="842.457969" y="184.816953" transform="rotate(-90 842.457969 184.816953)">Ángulo [°]</text>
     </g>
    </g>
    <g id="line2d_101">

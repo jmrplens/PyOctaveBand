@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="707.810312pt" height="727.515pt" viewBox="0 0 707.810312 727.515" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.582187pt" height="727.515pt" viewBox="0 0 712.582187 727.515" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 727.515 
-L 707.810312 727.515 
-L 707.810312 0 
+L 712.582187 727.515 
+L 712.582187 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -1325,7 +1325,7 @@ L 3.5 0
       </g>
      </g>
      <g id="text_30">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="515.92323" transform="rotate(-0 676.637656 515.92323)">-6</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="515.92323" transform="rotate(-0 676.637656 515.92323)">−6</text>
      </g>
     </g>
     <g id="ytick_13">
@@ -1340,7 +1340,7 @@ L 669.637656 481.201448
       </g>
      </g>
      <g id="text_31">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="485.000276" transform="rotate(-0 676.637656 485.000276)">-4</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="485.000276" transform="rotate(-0 676.637656 485.000276)">−4</text>
      </g>
     </g>
     <g id="ytick_14">
@@ -1355,7 +1355,7 @@ L 669.637656 450.278495
       </g>
      </g>
      <g id="text_32">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="454.077323" transform="rotate(-0 676.637656 454.077323)">-2</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #2ca02c" x="676.637656" y="454.077323" transform="rotate(-0 676.637656 454.077323)">−2</text>
      </g>
     </g>
     <g id="ytick_15">
@@ -1420,7 +1420,7 @@ L 669.637656 326.58668
     </g>
     <g id="text_37">
      <!-- $L_{k,\mathrm{ind}} - L_{k,\mathrm{real}}$ [dB] -->
-     <g style="fill: #2ca02c" transform="translate(698.207969 463.155541) rotate(-90)">
+     <g style="fill: #2ca02c" transform="translate(702.979844 463.155541) rotate(-90)">
       <text>
        <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #2ca02c">L</tspan>
        <tspan x="36.587402" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #2ca02c">L</tspan>

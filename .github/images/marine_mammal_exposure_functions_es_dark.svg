@@ -1737,7 +1737,7 @@ L 800.988281 276.375628
       </g>
      </g>
      <g id="text_46">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="280.174456" transform="rotate(-0 457.693638 280.174456)">-60</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="280.174456" transform="rotate(-0 457.693638 280.174456)">−60</text>
      </g>
     </g>
     <g id="ytick_9">
@@ -1752,7 +1752,7 @@ L 800.988281 239.224714
       </g>
      </g>
      <g id="text_47">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="243.023542" transform="rotate(-0 457.693638 243.023542)">-50</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="243.023542" transform="rotate(-0 457.693638 243.023542)">−50</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -1767,7 +1767,7 @@ L 800.988281 202.073799
       </g>
      </g>
      <g id="text_48">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="205.872627" transform="rotate(-0 457.693638 205.872627)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="205.872627" transform="rotate(-0 457.693638 205.872627)">−40</text>
      </g>
     </g>
     <g id="ytick_11">
@@ -1782,7 +1782,7 @@ L 800.988281 164.922885
       </g>
      </g>
      <g id="text_49">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="168.721713" transform="rotate(-0 457.693638 168.721713)">-30</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="168.721713" transform="rotate(-0 457.693638 168.721713)">−30</text>
      </g>
     </g>
     <g id="ytick_12">
@@ -1797,7 +1797,7 @@ L 800.988281 127.77197
       </g>
      </g>
      <g id="text_50">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="131.570799" transform="rotate(-0 457.693638 131.570799)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="131.570799" transform="rotate(-0 457.693638 131.570799)">−20</text>
      </g>
     </g>
     <g id="ytick_13">
@@ -1812,7 +1812,7 @@ L 800.988281 90.621056
       </g>
      </g>
      <g id="text_51">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="94.419884" transform="rotate(-0 457.693638 94.419884)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="457.693638" y="94.419884" transform="rotate(-0 457.693638 94.419884)">−10</text>
      </g>
     </g>
     <g id="ytick_14">
@@ -1831,7 +1831,7 @@ L 800.988281 53.470142
      </g>
     </g>
     <g id="text_53">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="434.958482" y="155.635156" transform="rotate(-90 434.958482 155.635156)">Ponderación W(f) [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="430.186607" y="155.635156" transform="rotate(-90 430.186607 155.635156)">Ponderación W(f) [dB]</text>
     </g>
    </g>
    <g id="line2d_212">

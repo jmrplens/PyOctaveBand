@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.collections import LineCollection
 
+from phonometry._plot.common import format_frequency_axis
+
 from .i18n import _LANG
 from .media import (
     _ANIM_FPS,
@@ -34,7 +36,57 @@ from .theme import (
     COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
+    FIELD_STROKE,
 )
+
+
+def _halo(linewidth: float = 2.4) -> list[Any]:
+    """A background-coloured outline for text a moving artist crosses.
+
+    The clips draw over their own captions: a magnifier handle, a reflection
+    ray, a phase curve. Ordering the text above the artist keeps the glyphs
+    whole but still lets a line of the same ink run through the word, so the
+    labels at risk carry this halo as well, in whichever colour the theme
+    paints the page.
+    """
+    from matplotlib import patheffects
+
+    return [patheffects.withStroke(linewidth=linewidth, foreground=FIELD_STROKE)]
+
+
+def _pending_ink(color: str) -> tuple[float, float, float]:
+    """The colour a label waits in until the thing it names happens.
+
+    Dimming by alpha alone only works on the light page: 35 % of a saturated
+    ink over white is a readable pastel, while the same 35 % over black is
+    near-black and the entry disappears (1.4:1 measured, against 2.0:1 for
+    its light-theme twin). On the dark page the ink is washed toward the page
+    text instead, which keeps the waiting entry a clear step below the lit one
+    and still above 3:1.
+    """
+    from matplotlib.colors import to_rgb
+
+    r, g, b = to_rgb(color)
+    if _FILENAME_SUFFIX:
+        return (0.33 * r + 0.27, 0.33 * g + 0.27, 0.33 * b + 0.27)
+    return (0.35 * r + 0.65, 0.35 * g + 0.65, 0.35 * b + 0.65)
+
+
+def _half_width(fig: Any, ax: Any, artist: Any) -> float:
+    """Half the rendered width of *artist*, in x data units of *ax*.
+
+    Several clips centre a readout on a moving glyph, or anchor an annotation
+    at a fixed data coordinate: both overflow the axes as soon as the Spanish
+    string is longer than the English one it was placed for. Measuring the
+    string that is actually about to be drawn is what lets them clamp to the
+    panel instead of to a number that only holds in one language.
+    """
+    fig.canvas.draw()
+    inv = ax.transData.inverted()
+    (x0, _), (x1, _) = inv.transform(
+        [(0.0, 0.0), (artist.get_window_extent().width, 0.0)]
+    )
+    return float(abs(x1 - x0)) / 2.0
 
 
 def _grid_axes(ax: Any) -> None:
@@ -192,11 +244,15 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
         ax.plot([cx + 0.86 * r * np.cos(a), cx + r * np.cos(a)],
                 [cy + 0.86 * r * np.sin(a), cy + r * np.sin(a)],
                 color=COLOR_FG, lw=0.8)
+    # Hung a little under the arc ends: at full scale the needle lies flat
+    # along cy, and an endpoint label whose text is wide for the dial (the
+    # Spanish "20 sonios" against the English "20 sone") otherwise reaches
+    # back under the needle tip with a couple of pixels to spare.
     if lo:
-        ax.text(cx - 1.12 * r, cy - 0.02 * r, lo, ha="center", va="top",
+        ax.text(cx - 1.12 * r, cy - 0.12 * r, lo, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     if hi:
-        ax.text(cx + 1.12 * r, cy - 0.02 * r, hi, ha="center", va="top",
+        ax.text(cx + 1.12 * r, cy - 0.12 * r, hi, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     (needle,) = ax.plot([cx, cx - 0.78 * r], [cy, cy], color=color, lw=2.4,
                         solid_capstyle="round")
@@ -499,9 +555,13 @@ def animate_onset_detection(output_dir: str) -> None:
     (tangent,) = ax.plot([], [], color=COLOR_FG, lw=1.6, ls="--", zorder=6)
     lens_txt = ax.text(0.7, ls, "", ha="center", va="bottom", color=COLOR_FG,
                        fontsize=9, zorder=6)
+    # The magnifier sweeps the panel in data coordinates and its handle dips
+    # into the bottom-left corner where this caption is anchored, so the
+    # caption is drawn above it and haloed: the handle is the same ink as the
+    # text, and crossing it whole reads as a struck-through word.
     ax.text(0.02, 0.05, T("detector: onset when dL/dt > 10 dB/s"),
             transform=ax.transAxes, ha="left", va="bottom", color=COLOR_FG,
-            fontsize=9)
+            fontsize=9, zorder=8, path_effects=_halo(3.0))
     ax.set_title(T("Impulse onset detection (NT ACOU 112)"), fontweight="bold")
     ax.set_xlabel(T("Time [s]"))
     ax.set_ylabel(T("A-weighted level L_AF [dB]"), fontsize=9)
@@ -522,6 +582,12 @@ def animate_onset_detection(output_dir: str) -> None:
     values = (f"OR = {onset_rate:.0f} dB/s", f"LD = {level_diff:.0f} dB",
               f"P = {prom:.1f}", f"KI = {ki:.1f} dB")
 
+    # How far the readout reaches either side of the lens it is centred on,
+    # measured on the widest gradient the sweep ever shows.
+    lens_txt.set_text(T(f"dL/dt = {onset_rate:.0f} dB/s"))
+    txt_half = _half_width(fig, ax, lens_txt)
+    lens_txt.set_text("")
+
     # Nonuniform sweep: slow motion while the magnifier crosses the onset.
     # The sweep ends _ANIM_HOLD frames early; np.interp clamps past the last
     # knot, so the lit OR -> LD -> P -> KI chain and the verdict hold ~2 s.
@@ -531,11 +597,13 @@ def animate_onset_detection(output_dir: str) -> None:
 
     def update(k: int) -> tuple[Any, ...]:
         tc = float(np.interp(k, knots_k, knots_t))
-        # Park the magnifier just short of the right edge so its lens and
-        # handle stay fully inside the panel during the closing hold (tc
-        # reaches 3.0 s, the xlim). The decision chain below still keys off
+        # Park the magnifier just short of either edge so its lens and handle
+        # stay fully inside the panel at both ends of the sweep (tc runs from
+        # the left xlim to 3.0 s, the right one). The handle reaches
+        # ``rx * 1.9`` past the centre and the lens ``rx``, so the margins are
+        # a fraction wider than that. The decision chain below still keys off
         # the true tc, so only the glyph position is clamped.
-        tc_view = min(max(tc, 0.55 + rx), 3.0 - rx * 1.9)
+        tc_view = min(max(tc, 0.55 + rx * 1.15), 3.0 - rx * 2.15)
         i = max(0, min(t.size - 1, round(tc_view * fs)))
         y0, g = float(laf[i]), float(grad[i])
         detecting = g > 10.0
@@ -550,8 +618,12 @@ def animate_onset_detection(output_dir: str) -> None:
         tangent.set_color(color)
         handle.set_data([tc_view + rx * 0.75, tc_view + rx * 1.9],
                         [y0 - ry * 0.75, y0 - ry * 1.9])
-        lens_txt.set_position((tc_view, y0 + ry * 1.35))
-        lens_txt.set_text(T(f"dL/dt = {g:.0f} dB/s"))
+        # Centred on the lens, but never far enough left to have the spine and
+        # the y tick labels run through it.
+        x_txt = min(max(tc_view, 0.55 + txt_half + 0.02), 3.0 - txt_half - 0.02)
+        lens_txt.set_position((x_txt, y0 + ry * 1.35))
+        # A gradient of -0.3 dB/s rounds to "-0", a sign in front of a zero.
+        lens_txt.set_text(T(f"dL/dt = {g if round(g) else 0.0:.0f} dB/s"))
         lens_txt.set_color(color)
         hot_m = (t <= tc) & is_onset
         hot.set_data(t[hot_m], laf[hot_m])
@@ -642,8 +714,12 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
         u_sig = np.cos(w * t - phi)
         ax_tr.plot(t, p_sig, color=COLOR_PRIMARY, alpha=0.55, lw=1.1,
                    label=T("pressure p"))
-        ax_tr.plot(t, u_sig, color=COLOR_TERTIARY, alpha=0.55, lw=1.1,
-                   label=T("velocity u"))
+        # Dashed, because in the progressive panel p and u are the same
+        # normalised curve: drawn solid, the velocity covers the pressure
+        # pixel for pixel and the legend announces a blue trace that is
+        # nowhere on the page.
+        ax_tr.plot(t, u_sig, color=COLOR_TERTIARY, alpha=0.55, lw=1.3,
+                   ls=(0, (5, 3)), label=T("velocity u"))
         (iline,) = ax_tr.plot([], [], color=COLOR_SECONDARY, lw=2.0,
                               label=T("intensity p·u"))
         mline = ax_tr.axhline(0.0, color=COLOR_FG, ls="--", lw=1.1, alpha=0.7)
@@ -653,7 +729,10 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
         ax_tr.set_xlabel(T("Time [s]"))
         if col == 0:
             ax_tr.set_ylabel(T("amplitude (normalized)"), fontsize=9)
-        ax_tr.legend(loc="upper right", fontsize=7.5)
+        # The traces reach the corner the legend sits in, and the running mean
+        # draws a dashed rule straight across it: at the default frame alpha
+        # both bleed through and streak the rows they cross.
+        ax_tr.legend(loc="upper right", fontsize=7.5, framealpha=1.0)
         panels.append({"ax": ax_tr, "phi": phi, "I": p_sig * u_sig,
                        "p_ph": p_ph, "u_ph": u_ph, "i_arrow": i_arrow,
                        "mean_marker": mean_marker, "mean_lab": mean_lab,
@@ -939,8 +1018,8 @@ def animate_flanking_paths(output_dir: str) -> None:
     for j, pn in enumerate(paths):
         yt = 5.6 - 0.55 * j
         lab = ax.text(lab_x, yt, f"{pn['key']} — {pn['desc']}", ha="left",
-                      va="center", color=pn["color"], fontsize=8.5,
-                      fontweight="bold", alpha=0.35)
+                      va="center", color=_pending_ink(pn["color"]),
+                      fontsize=8.5, fontweight="bold")
         labels.append(lab)
     verdict = ax.text(7.05, 0.35, "", ha="center", va="center",
                       color=COLOR_FG, fontsize=10, fontweight="bold")
@@ -984,7 +1063,7 @@ def animate_flanking_paths(output_dir: str) -> None:
                 radii = [0.55 * (age - 0.35 * i) for i in range(3)]
                 _set_wavefronts(pn["arcs"], radii, 1.8,
                                 alpha=0.4 + 0.5 * pn["arrive"])
-                lab.set_alpha(1.0)
+                lab.set_color(pn["color"])
             arts += [pn["pulse"], pn["trail"], *pn["arcs"], lab]
         verdict.set_text(
             T("R'w sums all paths — always below the wall alone")
@@ -1044,19 +1123,25 @@ def animate_intensity_scan_power(output_dir: str) -> None:
             proj(base[2][0], base[2][1], 0.0),
             proj(base[2][0], base[2][1], m_h),
             proj(base[1][0], base[1][1], m_h)]
-    # Opaque theme-blended face tints so the box edges behind the machine
-    # do not show through it (or through its label).
+    # Opaque theme-blended face tints so the box edges behind the machine do
+    # not show through it (or through its label). The tint alone does not do
+    # that: a patch is drawn below a line at matplotlib's default zorder, so
+    # the box's rear-bottom edge ran straight through the machine and
+    # underlined "source" along its baseline. Order the faces above the
+    # wireframe, and the wavefronts above the faces they leave from.
     from matplotlib.colors import to_rgb
     bg = np.asarray(to_rgb(plt.rcParams["figure.facecolor"]))
     grid_rgb = np.asarray(to_rgb(COLOR_GRID))
     for poly, al in ((front, 0.75), (side, 0.55), (top, 0.9)):
         tint = tuple(al * grid_rgb + (1.0 - al) * bg)
         ax.add_patch(Polygon(poly, closed=True, facecolor=tint,
-                             edgecolor=COLOR_FG, lw=1.0))
+                             edgecolor=COLOR_FG, lw=1.0, zorder=2.2))
     ax.text(*proj(mx, md, 0.45), T("source"), ha="center", va="center",
             color=COLOR_FG, fontsize=8.5)
     src_arcs = _make_wavefronts(ax, *proj(mx, md, m_h), COLOR_TERTIARY,
                                 n=3, theta1=15.0, theta2=165.0, lw=1.2)
+    for arc in src_arcs:
+        arc.set_zorder(2.4)
 
     # Serpentine scan over the TOP face: passes along u at stepped v.
     n_pass = 4
@@ -1112,8 +1197,13 @@ def animate_intensity_scan_power(output_dir: str) -> None:
     boxes = {}
     for j, (key, lab, _share) in enumerate(faces):
         boxes[key] = _flow_box(ax_m, 1.1, 5.35 - 0.95 * j, 1.9, 0.8, lab)
+    # The dial starts below the level the first scanned strip already carries
+    # (66 dB one frame in), so the needle is never parked against the left
+    # stop while the readout under it prints a number the scale does not
+    # reach; the settled 92.0 dB still lands near the top of the arc.
+    gauge_lo, gauge_hi = 65.0, 95.0
     gauge = _make_gauge(ax_m, 3.3, 1.1, 0.85, "$L_W$", COLOR_SECONDARY,
-                        lo="80", hi="95")
+                        lo=f"{gauge_lo:.0f}", hi=f"{gauge_hi:.0f}")
     ax_m.text(3.3, 2.75, r"$P = \sum_i \int I{\cdot}n\ dS_i$", ha="center",
               va="bottom", color=COLOR_FG, fontsize=10)
     # verdict rides under the box drawing, where the full width is free
@@ -1176,7 +1266,8 @@ def animate_intensity_scan_power(output_dir: str) -> None:
             arts += [b["box"], b["title"], b["value"]]
         if acc > 0.0:
             lw_now = 10.0 * np.log10(acc * p_total / 1e-12)
-            arts += _set_gauge(gauge, (lw_now - 80.0) / 15.0,
+            arts += _set_gauge(gauge,
+                               (lw_now - gauge_lo) / (gauge_hi - gauge_lo),
                                T(f"{lw_now:.1f} dB"))
         verdict.set_text(
             T("any enclosing surface gives the same P") if acc >= 0.999
@@ -1228,7 +1319,10 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
                  fontweight="bold")
     gs = fig.add_gridspec(2, 2, height_ratios=[0.85, 1.15])
     ax_r = fig.add_subplot(gs[0, :])
-    _schematic_axes(ax_r, (0.0, 18.0), (0.0, 3.4), equal=True)
+    # The band below zero is the caption's: at the drawn scale an 8 pt line is
+    # taller than the 0.3 units between the room's floor and the old axes
+    # bottom, so the caption sat on the floor line and lost its ascenders.
+    _schematic_axes(ax_r, (0.0, 18.0), (-0.35, 3.4), equal=True)
     room_box = Rectangle((1.0, 0.3), 16.0, 2.8, facecolor="none",
                          edgecolor=COLOR_FG, lw=1.4)
     ax_r.add_patch(room_box)
@@ -1240,14 +1334,20 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
     for ry in (0.3, 3.1):
         ax_r.plot([2.8, 8.3, 13.9], [1.7, ry, 1.75], color=COLOR_FG,
                   lw=0.9, ls=":", alpha=0.45)
-    ax_r.text(8.3, 0.05, T("direct + reflections"), ha="center", va="bottom",
+    ax_r.text(8.3, -0.30, T("direct + reflections"), ha="center", va="bottom",
               color=COLOR_FG, fontsize=8)
     arcs = _make_wavefronts(ax_r, 2.8, 1.7, COLOR_PRIMARY, n=4,
                             theta1=-75.0, theta2=75.0)
     for arc in arcs:            # wavefronts stay inside the drawn room
         arc.set_clip_path(room_box)
+    # The wavefronts are clipped to the room and sweep every part of it, this
+    # corner included, so the readout carries the page under it and the arc
+    # passes behind the pill instead of through the digits.
     freq_txt = ax_r.text(2.0, 2.55, "", ha="left", va="bottom",
-                         color=COLOR_FG, fontsize=9, family="monospace")
+                         color=COLOR_FG, fontsize=9, family="monospace",
+                         bbox={"boxstyle": "round,pad=0.3",
+                               "facecolor": plt.rcParams["figure.facecolor"],
+                               "edgecolor": "none", "alpha": 0.92})
     note = ax_r.text(9.0, 0.8, "", ha="center", va="center",
                      color=COLOR_FG, fontsize=9.5, fontstyle="italic",
                      visible=False,
@@ -1379,8 +1479,13 @@ def animate_specific_loudness(output_dir: str) -> None:
     ax.axvline(8.5, color=COLOR_FG, lw=0.9, ls=":", alpha=0.6)
     ax.text(8.75, 5.85, T("1 kHz ≈ 8.5 Bark"), ha="left", va="top",
             color=COLOR_FG, fontsize=8)
+    # Anchored by its right edge, a short step inside the right spine: placed
+    # by its left edge, the Spanish string ran 380 px past the axes, and since
+    # a text artist counts toward the axes' tight bounding box, the frame it
+    # appeared on also shrank the whole plot column by 16 %.
     spread = ax.annotate(T("upward spread of masking"), xy=(13.0, 1.1),
-                         xytext=(16.0, 3.2), fontsize=8.5, color=COLOR_FG,
+                         xytext=(23.6, 3.2), ha="right", fontsize=8.5,
+                         color=COLOR_FG,
                          arrowprops={"arrowstyle": "->", "color": COLOR_FG,
                                      "lw": 1.0}, visible=False)
     level_txt = ax.text(0.02, 0.965, "", transform=ax.transAxes, ha="left",
@@ -1450,7 +1555,10 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     T = _translate_str
     lw_true = 92.0
-    r_mic = 2.05                   # projected mic-ring radius (anechoic)
+    # Projected mic-ring radius (anechoic). Drawn a touch smaller than it once
+    # was: at 2.05 the two lowest dots of the ring sat on the top of the
+    # caption below it, and the dot at 75 deg touched the reading above it.
+    r_mic = 1.95
     lp_free = 77.5                 # L_W - 10 log10(4 pi 1.5^2)
     lp_diff = 86.0                 # L_W - 10 log10 V + 10 log10 T + 14
 
@@ -1502,7 +1610,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
     arcs_a = _make_wavefronts(ax_a, *ca, COLOR_TERTIARY, n=4)
     note_a = ax_a.text(4.0, 0.92, T("direct sound only — no reflections"),
                        ha="center", va="bottom", color=COLOR_FG, fontsize=8,
-                       alpha=0.0)
+                       alpha=0.0, path_effects=_halo())
     lp_a = ax_a.text(6.9, 5.5, "", ha="right", va="top", color=COLOR_FG,
                      fontsize=9, family="monospace")
 
@@ -1529,12 +1637,14 @@ def animate_power_two_rooms(output_dir: str) -> None:
                           edgecolor=COLOR_PRIMARY, lw=0.9, ls="--",
                           alpha=0.8))
     (mic_dot,) = ax_r.plot([], [], marker="o", ms=6, color=COLOR_PRIMARY)
+    # Both captions sit in the path of the bouncing rays, which fold across
+    # the whole room, so they are haloed rather than merely drawn above them.
     ax_r.text(mic_path_c[0], mic_path_c[1] - mic_path_r - 0.28,
               T("rotating microphone"), ha="center", va="top",
-              color=COLOR_PRIMARY, fontsize=8)
+              color=COLOR_PRIMARY, fontsize=8, path_effects=_halo())
     note_r = ax_r.text(4.0, 0.62, T("reflections build a diffuse field"),
                        ha="center", va="bottom", color=COLOR_FG, fontsize=8,
-                       alpha=0.0)
+                       alpha=0.0, path_effects=_halo())
     lp_r = ax_r.text(6.9, 5.5, "", ha="right", va="top", color=COLOR_FG,
                      fontsize=9, family="monospace")
 
@@ -1556,6 +1666,12 @@ def animate_power_two_rooms(output_dir: str) -> None:
     verdict = ax_b.text(8.0, 0.12, "", ha="center", va="bottom",
                         color=COLOR_SECONDARY, fontsize=10,
                         fontweight="bold")
+
+    # Centred in the room, the longer Spanish caption reaches back into the
+    # loudspeaker cone; slide it right by whatever its own width demands.
+    # Measured with the figure complete, so the axes is at its final size.
+    note_r.set_position(
+        (max(4.0, 2.05 + _half_width(fig, ax_r, note_r)), 0.62))
 
     sweep_s = (_ANIM_FRAMES - _ANIM_HOLD) / _ANIM_FPS
     t_meter, t_form, t_conv = 4.5, 7.0, 9.4
@@ -1689,8 +1805,11 @@ def animate_comb_filtering(output_dir: str) -> None:
     ax_f = fig.add_subplot(gs[1, 1])
     _grid_axes(ax_f)
     f = np.logspace(np.log10(50.0), np.log10(8000.0), 500)
-    ax_f.set_xscale("log")
     ax_f.set_xlim(50.0, 8000.0)
+    # Band centres (63, 125, ... 8k) instead of the log formatter's 10^2 /
+    # 10^3, which left two labels across the whole span the notches are
+    # counted in. The helper switches the axis to log itself.
+    format_frequency_axis(ax_f, 50.0, 8000.0)
     ax_f.set_ylim(-16.0, 8.0)
     ax_f.set_xlabel(T("Frequency [Hz]"), fontsize=8)
     ax_f.set_ylabel(T("response [dB]"), fontsize=8)
@@ -1831,7 +1950,12 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     _grid_axes(ax_m)
     ax_m.plot(freqs, mag, color=COLOR_PRIMARY, lw=2.0)
     ax_m.axvline(f_r, color=COLOR_FG, lw=0.9, ls=":", alpha=0.7)
-    ax_m.set_xlim(f_lo, f_hi)
+    # A margin either side of the swept span: the marker is 8 pt across and
+    # the sweep starts and parks on the limits themselves, so with the axes
+    # ending at f_lo / f_hi the spine cut the disc in half for the whole
+    # closing hold (and in every poster taken from it).
+    f_pad = 1.5
+    ax_m.set_xlim(f_lo - f_pad, f_hi + f_pad)
     ax_m.set_ylim(0.0, float(mag.max()) * 1.18)
     ax_m.set_ylabel(T("Response magnitude"), fontsize=9)
     ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T("fr = 25 Hz"), ha="left",
@@ -1843,13 +1967,16 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     ax_p.plot(freqs, phase, color=COLOR_PRIMARY, lw=2.0)
     ax_p.axvline(f_r, color=COLOR_FG, lw=0.9, ls=":", alpha=0.7)
     ax_p.axhline(-90.0, color=COLOR_SECONDARY, lw=1.0, ls="--", alpha=0.8)
-    ax_p.set_xlim(f_lo, f_hi)
+    ax_p.set_xlim(f_lo - f_pad, f_hi + f_pad)
     ax_p.set_ylim(-190.0, 10.0)
     ax_p.set_yticks([0, -90, -180])
     ax_p.set_xlabel(T("Excitation frequency [Hz]"))
     ax_p.set_ylabel(T("Phase [deg]"), fontsize=9)
+    # Haloed: the Spanish string reaches as far as the phase flank, and the
+    # trace was filling the counter of its last letter.
     ax_p.text(f_lo + 1.0, -83.0, T("-90 deg: resonance"), ha="left",
-              va="bottom", color=COLOR_SECONDARY, fontsize=8.5)
+              va="bottom", color=COLOR_SECONDARY, fontsize=8.5,
+              path_effects=_halo())
     (dot_p,) = ax_p.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
 
     sweep_s = (_ANIM_FRAMES - _ANIM_HOLD) / _ANIM_FPS
@@ -1892,8 +2019,11 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
         else:
             state = T("above fr: the plate moves against the force")
         state_txt.set_text(state)
-        drive_txt.set_text(f"f = {f:4.1f} Hz    "
-                           + T("phase") + f" = {deg:6.1f}\u00b0")
+        # Translated whole, values included: assembled from an f-string and a
+        # lone T("phase"), the readout kept the English decimal point through
+        # the entire Spanish variant.
+        drive_txt.set_text(
+            T(f"f = {f:4.1f} Hz    phase = {deg:6.1f}\u00b0"))
         return (plate, plate_lbl, spec, spec_lbl, force, motion, dot_m, dot_p,
                 state_txt, drive_txt)
 

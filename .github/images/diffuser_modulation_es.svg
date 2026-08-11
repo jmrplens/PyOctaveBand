@@ -125,7 +125,7 @@ C 206.90719 290.255581 207.282334 291.161259 207.282334 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_8">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="200.165791" y="306.702266" transform="rotate(-0 200.165791 306.702266)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="200.165791" y="306.702266" transform="rotate(-0 200.165791 306.702266)">−40</text>
      </g>
     </g>
     <g id="ytick_2">
@@ -138,7 +138,7 @@ C 225.726663 279.323645 228.319757 285.583927 228.319757 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_9">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.128368" y="306.702266" transform="rotate(-0 179.128368 306.702266)">-35</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="179.128368" y="306.702266" transform="rotate(-0 179.128368 306.702266)">−35</text>
      </g>
     </g>
     <g id="ytick_3">
@@ -151,7 +151,7 @@ C 244.546137 268.39171 249.35718 280.006596 249.35718 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_10">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="158.090945" y="306.702266" transform="rotate(-0 158.090945 306.702266)">-30</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="158.090945" y="306.702266" transform="rotate(-0 158.090945 306.702266)">−30</text>
      </g>
     </g>
     <g id="ytick_4">
@@ -164,7 +164,7 @@ C 263.36561 257.459774 270.394603 274.429264 270.394603 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_11">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="137.053522" y="306.702266" transform="rotate(-0 137.053522 306.702266)">-25</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="137.053522" y="306.702266" transform="rotate(-0 137.053522 306.702266)">−25</text>
      </g>
     </g>
     <g id="ytick_5">
@@ -177,7 +177,7 @@ C 282.185084 246.527839 291.432026 268.851932 291.432026 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_12">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="116.016099" y="306.702266" transform="rotate(-0 116.016099 306.702266)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="116.016099" y="306.702266" transform="rotate(-0 116.016099 306.702266)">−20</text>
      </g>
     </g>
     <g id="ytick_6">
@@ -190,7 +190,7 @@ C 301.004558 235.595903 312.469449 263.274601 312.469449 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_13">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="94.978676" y="306.702266" transform="rotate(-0 94.978676 306.702266)">-15</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="94.978676" y="306.702266" transform="rotate(-0 94.978676 306.702266)">−15</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -203,7 +203,7 @@ C 319.824031 224.663968 333.506873 257.697269 333.506873 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_14">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="73.941252" y="306.702266" transform="rotate(-0 73.941252 306.702266)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="73.941252" y="306.702266" transform="rotate(-0 73.941252 306.702266)">−10</text>
      </g>
     </g>
     <g id="ytick_8">
@@ -216,7 +216,7 @@ C 338.643505 213.732032 354.544296 252.119937 354.544296 292.104609
 " clip-path="url(#p67a423445b)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #b0b0b0; stroke-opacity: 0.5; stroke-width: 0.8"/>
      </g>
      <g id="text_15">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="52.903829" y="306.702266" transform="rotate(-0 52.903829 306.702266)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="52.903829" y="306.702266" transform="rotate(-0 52.903829 306.702266)">−5</text>
      </g>
     </g>
     <g id="ytick_9">

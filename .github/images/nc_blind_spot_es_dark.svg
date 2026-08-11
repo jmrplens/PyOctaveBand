@@ -1206,7 +1206,7 @@ L 886.163438 324.847257
       </g>
      </g>
      <g id="text_48">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="328.646086" transform="rotate(-0 483.245781 328.646086)">-15</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="328.646086" transform="rotate(-0 483.245781 328.646086)">−15</text>
      </g>
     </g>
     <g id="ytick_11">
@@ -1221,7 +1221,7 @@ L 886.163438 278.27708
       </g>
      </g>
      <g id="text_49">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="282.075909" transform="rotate(-0 483.245781 282.075909)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="282.075909" transform="rotate(-0 483.245781 282.075909)">−10</text>
      </g>
     </g>
     <g id="ytick_12">
@@ -1236,7 +1236,7 @@ L 886.163438 231.706904
       </g>
      </g>
      <g id="text_50">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="235.505732" transform="rotate(-0 483.245781 235.505732)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="483.245781" y="235.505732" transform="rotate(-0 483.245781 235.505732)">−5</text>
      </g>
     </g>
     <g id="ytick_13">
@@ -1300,7 +1300,7 @@ L 886.163438 45.426196
      </g>
     </g>
     <g id="text_55">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="460.510625" y="185.136727" transform="rotate(-90 460.510625 185.136727)">Nivel menos la curva RC propia de la sala [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="455.73875" y="185.136727" transform="rotate(-90 455.73875 185.136727)">Nivel menos la curva RC propia de la sala [dB]</text>
     </g>
    </g>
    <g id="line2d_131">

@@ -2028,7 +2028,7 @@ L 1173.885937 335.649088
       </g>
      </g>
      <g id="text_63">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="826.688281" y="339.447917" transform="rotate(-0 826.688281 339.447917)">-25</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="826.688281" y="339.447917" transform="rotate(-0 826.688281 339.447917)">−25</text>
      </g>
     </g>
     <g id="ytick_17">
@@ -2137,7 +2137,7 @@ L 1173.885937 57.421314
      </g>
     </g>
     <g id="text_71">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="801.198438" y="186.255781" transform="rotate(-90 801.198438 186.255781)">SEL por banda [dB re 1 µPa²·s]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="799.18125" y="186.255781" transform="rotate(-90 799.18125 186.255781)">SEL por banda [dB re 1 µPa²·s]</text>
     </g>
    </g>
    <g id="line2d_259">

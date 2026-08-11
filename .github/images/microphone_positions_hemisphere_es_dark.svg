@@ -167,7 +167,7 @@ L 59.005188 367.360849
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linecap: square"/>
     </g>
     <g id="text_1">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="53.735359" y="386.688503" transform="rotate(-0 53.735359 386.688503)">-2</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="53.735359" y="386.688503" transform="rotate(-0 53.735359 386.688503)">−2</text>
     </g>
    </g>
    <g id="xtick_2">
@@ -181,7 +181,7 @@ L 110.209759 383.952025
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linecap: square"/>
     </g>
     <g id="text_2">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="104.95317" y="403.425777" transform="rotate(-0 104.95317 403.425777)">-1</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="104.95317" y="403.425777" transform="rotate(-0 104.95317 403.425777)">−1</text>
     </g>
    </g>
    <g id="xtick_3">
@@ -247,7 +247,7 @@ L 332.372625 426.525849
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linecap: square"/>
     </g>
     <g id="text_7">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="341.388741" y="444.225737" transform="rotate(-0 341.388741 444.225737)">-2</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="341.388741" y="444.225737" transform="rotate(-0 341.388741 444.225737)">−2</text>
     </g>
    </g>
    <g id="xtick_7">
@@ -261,7 +261,7 @@ L 361.748277 396.474386
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linecap: square"/>
     </g>
     <g id="text_8">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="370.600578" y="413.986281" transform="rotate(-0 370.600578 413.986281)">-1</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="370.600578" y="413.986281" transform="rotate(-0 370.600578 413.986281)">−1</text>
     </g>
    </g>
    <g id="xtick_8">

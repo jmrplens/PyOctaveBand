@@ -878,7 +878,7 @@ L 878.243438 365.239763
       </g>
      </g>
      <g id="text_29">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.965781" y="369.038591" transform="rotate(-0 480.965781 369.038591)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.965781" y="369.038591" transform="rotate(-0 480.965781 369.038591)">−5</text>
      </g>
     </g>
     <g id="ytick_9">
@@ -893,7 +893,7 @@ L 878.243438 320.320172
       </g>
      </g>
      <g id="text_30">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.965781" y="324.119" transform="rotate(-0 480.965781 324.119)">-2,5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.965781" y="324.119" transform="rotate(-0 480.965781 324.119)">−2,5</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -987,7 +987,7 @@ L 878.243438 50.802626
      </g>
     </g>
     <g id="text_37">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="452.297812" y="199.696953" transform="rotate(-90 452.297812 199.696953)">Anchura de la ventana factible de A_tab [m²]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="450.280625" y="199.696953" transform="rotate(-90 450.280625 199.696953)">Anchura de la ventana factible de A_tab [m²]</text>
     </g>
    </g>
    <g id="line2d_63">

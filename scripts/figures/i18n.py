@@ -3106,9 +3106,14 @@ _ES_EXACT = {
         "4r/(1+r)² = 0,96",
     # --- Tier-1 animation labels ---
     "tone burst": "ráfaga de tono",
-    "Fast (125 ms)": "Rápida (125 ms)",
-    "Slow (1000 ms)": "Lenta (1000 ms)",
-    "Impulse (35 ms / 1.5 s)": "Impulso (35 ms / 1,5 s)",
+    # The detector names stay English, as everywhere else in these tables
+    # ("Nivel Fast", "envolvente exponencial Fast", "Impulse (35 ms/1,5 s)"):
+    # the same frame captions the capacitor with "se muestra Fast" and labels
+    # the dials F / S / I, so translating them here gave one weighting two
+    # names a few pixels apart.
+    "Fast (125 ms)": "Fast (125 ms)",
+    "Slow (1000 ms)": "Slow (1000 ms)",
+    "Impulse (35 ms / 1.5 s)": "Impulse (35 ms / 1,5 s)",
     "Time-weighting ballistics (IEC 61672-1)":
         "Balística de la ponderación temporal (IEC 61672-1)",
     "Mean-square response (normalized)":
@@ -4589,6 +4594,11 @@ _ES_PATTERNS = [
     (r"^C = ([-+]\d+) dB, Ctr = ([-+]\d+) dB$",
      r"C = \1 dB, Ctr = \2 dB"),
     (r"^CI = ([-+]\d+) dB$", r"CI = \1 dB"),
+    # --- anim_dynamic_stiffness_sweep: the drive readout, every frame. The
+    # padding inside the captures is what keeps the monospace columns still
+    # while the numbers change width.
+    (r"^f = ( *[\d.]+) Hz    phase = ( *-?[\d.]+)°$",
+     r"f = \1 Hz    fase = \2°"),
     # --- anim_block_vs_exponential: readouts rewritten on every frame ---
     (r"^4 kHz burst, (\d+) ms$", r"ráfaga de 4 kHz, \1 ms"),
     (r"^class 1 is (.+) dB about (.+) dB$",
@@ -5328,7 +5338,14 @@ def _translate_figure(fig: Any) -> None:
                 wrapped._phonometry_comma = True  # type: ignore[attr-defined]
                 axis.set_major_formatter(wrapped)
             elif type(fmt) is _SF and axis.get_scale() == "linear":
-                wrapped = _FF(lambda v, pos: _comma(f"{v:g}"))
+                # ``f"{v:g}"`` writes an ASCII hyphen, while the formatter it
+                # replaces runs every label through ``fix_minus`` and ships the
+                # typographic U+2212 the English figure shows. Keep that pass,
+                # or the same axis is drawn with a different minus sign in each
+                # language.
+                wrapped = _FF(
+                    lambda v, pos, _f=fmt: _f.fix_minus(_comma(f"{v:g}"))
+                )
                 axis.set_major_formatter(wrapped)
     for artist in fig.findobj(_mtext.Text):
         s = artist.get_text()
