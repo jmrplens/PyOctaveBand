@@ -817,7 +817,7 @@ L 879.523438 342.142971
       </g>
      </g>
      <g id="text_30">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="345.941799" transform="rotate(-0 481.405781 345.941799)">-0,6</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="345.941799" transform="rotate(-0 481.405781 345.941799)">−0,6</text>
      </g>
     </g>
     <g id="ytick_9">
@@ -832,7 +832,7 @@ L 879.523438 291.149005
       </g>
      </g>
      <g id="text_31">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="294.947833" transform="rotate(-0 481.405781 294.947833)">-0,4</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="294.947833" transform="rotate(-0 481.405781 294.947833)">−0,4</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -847,7 +847,7 @@ L 879.523438 240.155039
       </g>
      </g>
      <g id="text_32">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="243.953867" transform="rotate(-0 481.405781 243.953867)">-0,2</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="481.405781" y="243.953867" transform="rotate(-0 481.405781 243.953867)">−0,2</text>
      </g>
     </g>
     <g id="ytick_11">
@@ -911,7 +911,7 @@ L 879.523438 36.179175
      </g>
     </g>
     <g id="text_37">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="455.4925" y="184.775781" transform="rotate(-90 455.4925 184.775781)">Señal de banda [unidades digitales]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="450.720625" y="184.775781" transform="rotate(-90 450.720625 184.775781)">Señal de banda [unidades digitales]</text>
     </g>
    </g>
    <g id="line2d_101">

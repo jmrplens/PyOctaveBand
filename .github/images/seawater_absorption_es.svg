@@ -2456,7 +2456,7 @@ L 957.898437 324.03123
       </g>
      </g>
      <g id="text_47">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="327.830059" transform="rotate(-0 524.500781 327.830059)">-60</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="327.830059" transform="rotate(-0 524.500781 327.830059)">−60</text>
      </g>
     </g>
     <g id="ytick_79">
@@ -2471,7 +2471,7 @@ L 957.898437 284.666816
       </g>
      </g>
      <g id="text_48">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="288.465645" transform="rotate(-0 524.500781 288.465645)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="288.465645" transform="rotate(-0 524.500781 288.465645)">−40</text>
      </g>
     </g>
     <g id="ytick_80">
@@ -2486,7 +2486,7 @@ L 957.898437 245.302402
       </g>
      </g>
      <g id="text_49">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="249.10123" transform="rotate(-0 524.500781 249.10123)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="524.500781" y="249.10123" transform="rotate(-0 524.500781 249.10123)">−20</text>
      </g>
     </g>
     <g id="ytick_81">
@@ -2565,7 +2565,7 @@ L 957.898437 48.480332
      </g>
     </g>
     <g id="text_55">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="501.765625" y="186.255781" transform="rotate(-90 501.765625 186.255781)">Desviación respecto a Francois-Garrison [%]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="496.99375" y="186.255781" transform="rotate(-90 496.99375 186.255781)">Desviación respecto a Francois-Garrison [%]</text>
     </g>
    </g>
    <g id="line2d_345">

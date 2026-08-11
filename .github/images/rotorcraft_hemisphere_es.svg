@@ -1320,7 +1320,7 @@ L 762.950968 326.1848
       </g>
      </g>
      <g id="text_34">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="329.983628" transform="rotate(-0 458.607482 329.983628)">-80</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="329.983628" transform="rotate(-0 458.607482 329.983628)">−80</text>
      </g>
     </g>
     <g id="ytick_9">
@@ -1335,7 +1335,7 @@ L 762.950968 290.962839
       </g>
      </g>
      <g id="text_35">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="294.761667" transform="rotate(-0 458.607482 294.761667)">-60</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="294.761667" transform="rotate(-0 458.607482 294.761667)">−60</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -1350,7 +1350,7 @@ L 762.950968 255.740877
       </g>
      </g>
      <g id="text_36">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="259.539705" transform="rotate(-0 458.607482 259.539705)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="259.539705" transform="rotate(-0 458.607482 259.539705)">−40</text>
      </g>
     </g>
     <g id="ytick_11">
@@ -1365,7 +1365,7 @@ L 762.950968 220.518915
       </g>
      </g>
      <g id="text_37">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="224.317743" transform="rotate(-0 458.607482 224.317743)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="458.607482" y="224.317743" transform="rotate(-0 458.607482 224.317743)">−20</text>
      </g>
     </g>
     <g id="ytick_12">
@@ -1444,7 +1444,7 @@ L 762.950968 44.409106
      </g>
     </g>
     <g id="text_43">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="435.872326" y="185.296953" transform="rotate(-90 435.872326 185.296953)">Acimut φ [°]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="431.100451" y="185.296953" transform="rotate(-90 431.100451 185.296953)">Acimut φ [°]</text>
     </g>
    </g>
    <g id="line2d_75">

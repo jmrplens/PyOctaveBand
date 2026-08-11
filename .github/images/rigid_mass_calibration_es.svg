@@ -1913,7 +1913,7 @@ L 705.928125 451.353159
       </g>
      </g>
      <g id="text_22">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="49.930469" y="455.151987" transform="rotate(-0 49.930469 455.151987)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="49.930469" y="455.151987" transform="rotate(-0 49.930469 455.151987)">−5</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -1977,7 +1977,7 @@ L 705.928125 323.084823
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="30.803125" y="375.750375" transform="rotate(-90 30.803125 375.750375)">Desviación [%]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="28.785938" y="375.750375" transform="rotate(-90 28.785938 375.750375)">Desviación [%]</text>
     </g>
    </g>
    <g id="line2d_119">

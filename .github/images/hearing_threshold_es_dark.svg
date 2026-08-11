@@ -1069,7 +1069,7 @@ L 886.163438 320.826046
       </g>
      </g>
      <g id="text_40">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.125781" y="324.624874" transform="rotate(-0 480.125781 324.624874)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="480.125781" y="324.624874" transform="rotate(-0 480.125781 324.624874)">−5</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -1148,7 +1148,7 @@ L 886.163438 62.86156
      </g>
     </g>
     <g id="text_46">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="460.998437" y="185.136727" transform="rotate(-90 460.998437 185.136727)">Umbral de referencia [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="458.98125" y="185.136727" transform="rotate(-90 458.98125 185.136727)">Umbral de referencia [dB]</text>
     </g>
    </g>
    <g id="line2d_121">

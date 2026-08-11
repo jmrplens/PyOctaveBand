@@ -201,7 +201,7 @@ L -3.5 0
       </g>
      </g>
      <g id="text_1">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="200.340157" transform="rotate(-0 37.503906 200.340157)">-3</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="200.340157" transform="rotate(-0 37.503906 200.340157)">−3</text>
      </g>
     </g>
     <g id="ytick_2">
@@ -216,7 +216,7 @@ L 778.063906 170.132885
       </g>
      </g>
      <g id="text_2">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="173.931713" transform="rotate(-0 37.503906 173.931713)">-2</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="173.931713" transform="rotate(-0 37.503906 173.931713)">−2</text>
      </g>
     </g>
     <g id="ytick_3">
@@ -231,7 +231,7 @@ L 778.063906 143.724442
       </g>
      </g>
      <g id="text_3">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="147.52327" transform="rotate(-0 37.503906 147.52327)">-1</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="37.503906" y="147.52327" transform="rotate(-0 37.503906 147.52327)">−1</text>
      </g>
     </g>
     <g id="ytick_4">
@@ -295,7 +295,7 @@ L 778.063906 38.090668
      </g>
     </g>
     <g id="text_8">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="21.13125" y="114.749411" transform="rotate(-90 21.13125 114.749411)">Referencia limpia</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="16.359375" y="114.749411" transform="rotate(-90 16.359375 114.749411)">Referencia limpia</text>
     </g>
    </g>
    <g id="line2d_33">

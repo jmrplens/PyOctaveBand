@@ -588,7 +588,7 @@ L 479.880481 51.858812
       </g>
      </g>
      <g id="text_20">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="479.880481" y="374.968969" transform="rotate(-0 479.880481 374.968969)">-25</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="479.880481" y="374.968969" transform="rotate(-0 479.880481 374.968969)">−25</text>
      </g>
     </g>
     <g id="xtick_25">
@@ -603,7 +603,7 @@ L 527.597357 51.858812
       </g>
      </g>
      <g id="text_21">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="527.597357" y="374.968969" transform="rotate(-0 527.597357 374.968969)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="527.597357" y="374.968969" transform="rotate(-0 527.597357 374.968969)">−20</text>
      </g>
     </g>
     <g id="xtick_26">
@@ -618,7 +618,7 @@ L 575.314233 51.858812
       </g>
      </g>
      <g id="text_22">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="575.314233" y="374.968969" transform="rotate(-0 575.314233 374.968969)">-15</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="575.314233" y="374.968969" transform="rotate(-0 575.314233 374.968969)">−15</text>
      </g>
     </g>
     <g id="xtick_27">
@@ -633,7 +633,7 @@ L 623.031109 51.858812
       </g>
      </g>
      <g id="text_23">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="623.031109" y="374.968969" transform="rotate(-0 623.031109 374.968969)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="623.031109" y="374.968969" transform="rotate(-0 623.031109 374.968969)">−10</text>
      </g>
     </g>
     <g id="xtick_28">
@@ -648,7 +648,7 @@ L 670.747985 51.858812
       </g>
      </g>
      <g id="text_24">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="670.747985" y="374.968969" transform="rotate(-0 670.747985 374.968969)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="670.747985" y="374.968969" transform="rotate(-0 670.747985 374.968969)">−5</text>
      </g>
     </g>
     <g id="xtick_29">
@@ -713,7 +713,7 @@ L 850.163438 347.243121
       </g>
      </g>
      <g id="text_29">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="465.245781" y="351.041949" transform="rotate(-0 465.245781 351.041949)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="465.245781" y="351.041949" transform="rotate(-0 465.245781 351.041949)">−10</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -728,7 +728,7 @@ L 850.163438 281.602164
       </g>
      </g>
      <g id="text_30">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="465.245781" y="285.400992" transform="rotate(-0 465.245781 285.400992)">-5</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="465.245781" y="285.400992" transform="rotate(-0 465.245781 285.400992)">−5</text>
      </g>
     </g>
     <g id="ytick_8">
@@ -777,7 +777,7 @@ L 850.163438 84.679291
      </g>
     </g>
     <g id="text_34">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="442.510625" y="206.115062" transform="rotate(-90 442.510625 206.115062)">Relación [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="437.73875" y="206.115062" transform="rotate(-90 437.73875 206.115062)">Relación [dB]</text>
     </g>
    </g>
    <g id="line2d_89">

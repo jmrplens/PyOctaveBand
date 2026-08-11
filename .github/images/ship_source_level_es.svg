@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="708.494688pt" height="424.635pt" viewBox="0 0 708.494688 424.635" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="713.266563pt" height="424.635pt" viewBox="0 0 713.266563 424.635" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 424.635 
-L 708.494688 424.635 
-L 708.494688 0 
+L 713.266563 424.635 
+L 713.266563 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -802,7 +802,7 @@ L 3.5 0
       </g>
      </g>
      <g id="text_23">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="676.923594" y="372.203327" transform="rotate(-0 676.923594 372.203327)">-4</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="676.923594" y="372.203327" transform="rotate(-0 676.923594 372.203327)">−4</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -817,7 +817,7 @@ L 669.923594 318.882332
       </g>
      </g>
      <g id="text_24">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="676.923594" y="322.68116" transform="rotate(-0 676.923594 322.68116)">-2</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="676.923594" y="322.68116" transform="rotate(-0 676.923594 322.68116)">−2</text>
      </g>
     </g>
     <g id="ytick_8">
@@ -896,7 +896,7 @@ L 669.923594 71.271499
      </g>
     </g>
     <g id="text_30">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="698.892344" y="207.375781" transform="rotate(-90 698.892344 207.375781)">Corrección de superficie ΔL [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="703.664219" y="207.375781" transform="rotate(-90 703.664219 207.375781)">Corrección de superficie ΔL [dB]</text>
     </g>
    </g>
    <g id="line2d_92">

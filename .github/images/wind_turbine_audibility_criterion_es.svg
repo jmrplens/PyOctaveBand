@@ -1108,7 +1108,7 @@ L 885.758437 315.568797
       </g>
      </g>
      <g id="text_28">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="482.360781" y="319.367625" transform="rotate(-0 482.360781 319.367625)">-1</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="482.360781" y="319.367625" transform="rotate(-0 482.360781 319.367625)">−1</text>
      </g>
     </g>
     <g id="ytick_14">
@@ -1202,7 +1202,7 @@ L 885.758437 51.485642
      </g>
     </g>
     <g id="text_35">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="465.988125" y="178.055781" transform="rotate(-90 465.988125 178.055781)">Tonalidad exigida ΔLtn [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="461.21625" y="178.055781" transform="rotate(-90 461.21625 178.055781)">Tonalidad exigida ΔLtn [dB]</text>
     </g>
    </g>
    <g id="line2d_157">

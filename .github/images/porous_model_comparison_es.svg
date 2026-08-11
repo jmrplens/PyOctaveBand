@@ -1535,7 +1535,7 @@ L 857.199822 371.795312
       </g>
      </g>
      <g id="text_35">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="375.594141" transform="rotate(-0 470.832255 375.594141)">-8</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="375.594141" transform="rotate(-0 470.832255 375.594141)">−8</text>
      </g>
     </g>
     <g id="ytick_26">
@@ -1550,7 +1550,7 @@ L 857.199822 328.880898
       </g>
      </g>
      <g id="text_36">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="332.679727" transform="rotate(-0 470.832255 332.679727)">-6</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="332.679727" transform="rotate(-0 470.832255 332.679727)">−6</text>
      </g>
     </g>
     <g id="ytick_27">
@@ -1565,7 +1565,7 @@ L 857.199822 285.966484
       </g>
      </g>
      <g id="text_37">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="289.765312" transform="rotate(-0 470.832255 289.765312)">-4</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="289.765312" transform="rotate(-0 470.832255 289.765312)">−4</text>
      </g>
     </g>
     <g id="ytick_28">
@@ -1580,7 +1580,7 @@ L 857.199822 243.05207
       </g>
      </g>
      <g id="text_38">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="246.850898" transform="rotate(-0 470.832255 246.850898)">-2</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end" x="470.832255" y="246.850898" transform="rotate(-0 470.832255 246.850898)">−2</text>
      </g>
     </g>
     <g id="ytick_29">
@@ -1660,7 +1660,7 @@ L 857.199822 28.48
     </g>
     <g id="text_44">
      <!-- Re$(Z_s)/(\rho_0 c_0)$,  capa de 50 mm con respaldo rígido -->
-     <g transform="translate(454.459599 325.437656) rotate(-90)">
+     <g transform="translate(449.687724 325.437656) rotate(-90)">
       <text>
        <tspan x="0" y="-0" style="font-size: 10px; font-family: sans-serif">R</tspan>
        <tspan x="6.948242" y="-0" style="font-size: 10px; font-family: sans-serif">e</tspan>

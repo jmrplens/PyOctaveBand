@@ -1033,7 +1033,7 @@ L 885.981562 326.097537
       </g>
      </g>
      <g id="text_19">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="329.896365" transform="rotate(-0 484.743906 329.896365)">-40</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="329.896365" transform="rotate(-0 484.743906 329.896365)">−40</text>
      </g>
     </g>
     <g id="ytick_10">
@@ -1048,7 +1048,7 @@ L 885.981562 259.027599
       </g>
      </g>
      <g id="text_20">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="262.826427" transform="rotate(-0 484.743906 262.826427)">-30</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="262.826427" transform="rotate(-0 484.743906 262.826427)">−30</text>
      </g>
     </g>
     <g id="ytick_11">
@@ -1063,7 +1063,7 @@ L 885.981562 191.957662
       </g>
      </g>
      <g id="text_21">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="195.75649" transform="rotate(-0 484.743906 195.75649)">-20</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="195.75649" transform="rotate(-0 484.743906 195.75649)">−20</text>
      </g>
     </g>
     <g id="ytick_12">
@@ -1078,7 +1078,7 @@ L 885.981562 124.887724
       </g>
      </g>
      <g id="text_22">
-      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="128.686552" transform="rotate(-0 484.743906 128.686552)">-10</text>
+      <text style="font-size: 10px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="484.743906" y="128.686552" transform="rotate(-0 484.743906 128.686552)">−10</text>
      </g>
     </g>
     <g id="ytick_13">
@@ -1097,7 +1097,7 @@ L 885.981562 57.817786
      </g>
     </g>
     <g id="text_24">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="462.00875" y="183.815781" transform="rotate(-90 462.00875 183.815781)">Nivel respecto al campo libre [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="457.236875" y="183.815781" transform="rotate(-90 457.236875 183.815781)">Nivel respecto al campo libre [dB]</text>
     </g>
    </g>
    <g id="line2d_111">
