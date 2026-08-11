@@ -278,7 +278,10 @@ principle hiding inside the classical resonant absorbers of the
   the flexural loss of a limp sheet; the same loss-versus-leakage balance
   governs their peak, and adding masses to the membrane (the decorated
   membrane of the metamaterials literature) tunes the resonance downward the
-  way the loading resonators tune the slit.
+  way the loading resonators tune the slit. They appear here as context only:
+  the classical membrane layer is implemented in the
+  [multilayer solver](porous-absorbers.md), and the decorated membrane is not
+  implemented in the library.
 - **The design question is always the same.** Pick the resonance with the
   geometry, then match the loss to the leakage. The porous-layer models ask
   "how thick"; the resonant family asks "how lossy", and
@@ -356,6 +359,9 @@ resistivities $12\eta/h^2$ and $28.454\eta/w^2$ as $\omega \to 0$, and the
 effective parameters tend to $\rho_0$, $\kappa_0$ as the boundary layers
 vanish. A built panel would be measured in the
 [impedance tube](impedance-tube.md) (ISO 10534-2) or the
-[reverberation room](absorption-measurement.md) (ISO 354); misprints found in
+[reverberation room](absorption-measurement.md) (ISO 354) — nothing here
+performs any of that verification, and the roughness of a printed slit, the
+frame, the mounting and the finite panel size are all outside the model.
+Misprints found in
 the source papers during this work are recorded in the
 [errata registry](../../ERRATA.md).

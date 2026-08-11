@@ -12,9 +12,14 @@ G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
 applicable, multichannel and stateful block processing), and B, D and AU also
-take the `high_accuracy` oversampling; G ignores that flag, because its
-0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
-A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
+take the `high_accuracy` oversampling. G ignores that flag, but not because
+oversampling is unnecessary: **the G design always oversamples internally**,
+toward 48 kHz, so its 0.25 Hz to 315 Hz range stays within about 0.05 dB
+whatever the input rate. That matters exactly where G is used — infrasound is
+often recorded at 1 kHz or 2 kHz, where 315 Hz sits close to Nyquist and the
+bilinear warping grows quadratically; at audio rates the correction is
+negligible. As with A/C/Z, `high_accuracy` cannot be combined with stateful
+processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
 Table 3 are the subject of [Frequency Weighting](weighting.md).
 
@@ -72,8 +77,11 @@ plt.show()
 The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C. Levels measured with the G curve are reported as
-$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+processing as A/C — but stateful mode cannot carry the internal oversampling
+across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
+verify the response before trusting the level. Levels measured with the G
+curve are reported as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over
+time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
 

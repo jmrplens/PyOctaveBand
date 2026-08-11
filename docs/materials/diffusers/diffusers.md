@@ -453,7 +453,9 @@ A handful of design rules follow directly from the geometry:
 
 `qrd_well_depths` evaluates the depth sequence and
 `predict_diffuser_polar_response` grades the design before anything is built,
-which is the subject of the next section.
+which is the subject of the next section. Only the quadratic-residue sequence
+has a dedicated helper: a primitive-root, modulated or otherwise custom
+profile enters through the explicit `depths` or `reflection` arguments.
 
 ### Predicting diffusion from a diffuser design
 

@@ -734,6 +734,14 @@ cross-check of the meshed cell.
 
 ## Practical notes
 
+**Parameters are inputs.** Nothing on this page measures anything: the five
+JCA parameters, the frame's shear modulus and Poisson coefficient and the
+sheet geometries all enter as numbers the caller supplies. Of their
+characterisation methods only the flow resistivity has a guide
+([Airflow Resistance](airflow-resistance.md)); an inverse fit of the remaining
+parameters against a measured impedance is a `scipy.optimize` exercise, not a
+library function.
+
 **Fit ranges.** Delany–Bazley warns (and extrapolates) outside
 $0.01 < X < 1$ and Miki outside $0.01 < f/\sigma < 1$; treat sub-range
 values as qualitative. JCA needs four extra
@@ -757,6 +765,9 @@ refracts and travels inside the layers). `statistical_absorption` assumes
 local reaction, a good approximation for high flow resistivity, partitioned
 cavities or thin resonant facings; for thick, light porous layers integrate
 the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
+Either way the prediction is for a laterally infinite sample: the finite-size
+edge effect that lets a measured ISO 354 $\alpha_s$ exceed the predicted
+$\alpha_{dif}$, and even exceed 1.0, is not modelled here.
 
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
@@ -778,6 +789,9 @@ found in the sources during this work are recorded in the
 - [Metamaterial Absorbers](metamaterial-absorbers.md): the
   slow-sound slit panels and the critical-coupling condition that push
   perfect absorption into the deep-subwavelength regime.
+- [Diffusers and Their Coefficients](../diffusers/diffusers.md): the diffuser
+  half of Cox & D'Antonio, implemented separately — this guide covers only
+  the absorber half of the book.
 - Theory: [Acoustic material characterisation](../../reference/theory/materials-surfaces.md#acoustic-material-characterisation-iso-11654-iso-9053-12-iso-10534-12-astm-e2611): the characterisation quantities the empirical and phenomenological models take as input.
 
 ## References

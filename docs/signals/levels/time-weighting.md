@@ -7,7 +7,7 @@ reaches the readout, the squared, frequency-weighted pressure passes
 through an exponential detector whose time constant sets how quickly the
 level follows the signal. This page is that detector, implemented as a
 sample-exact recursive filter: the Fast and Slow characteristics of
-IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+IEC 61672-1:2013 (clause 5.8), the legacy asymmetric Impulse ballistics,
 streaming state for block processing, and the toneburst verification
 against the standard's Table 4.
 
@@ -112,6 +112,11 @@ y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
 \alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
 $$
 
+The asymmetry has a consequence worth stating: unlike F and S, Impulse is not a
+filter. Its coefficient depends on the signal, so an I-weighted level is not
+additive — the I-weighted level of two sources running together cannot be
+derived from the two measured separately, while their $L_{eq}$ values can.
+
 ### Choosing F, S or I
 
 - **Fast** is the default of nearly every modern method: percentile levels,
@@ -120,7 +125,7 @@ $$
   integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
-  the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
+  the price of missing short events (a 100 ms burst peaks 7.6 dB lower
   on S than on F). Some legacy methods prescribe it outright, most famously
   aircraft-certification levels, which are built from Slow-weighted samples.
 - **Impulse** is legacy, and deprecated for rating. It was a 1960s attempt
@@ -191,10 +196,22 @@ plt.show()
 
 ## 5. Initial state
 
-By default, the exponential integrator starts from rest (`y[-1] = 0`). Passing
-`initial_state=None` leaves this default unspecified, while `initial_state='zero'`
-requests the same zero state explicitly. If the recorded segment begins after a
-steady signal is already present, you can start from the first sample energy instead:
+By default, the exponential integrator starts from rest (`y[-1] = 0`);
+`initial_state=None` and `initial_state='zero'` are the same thing. Passing
+`'first'` seeds the integrator with the square of the very first sample,
+$x[0]^2$ — an unbiased but extremely noisy estimate of the mean square (one
+degree of freedom), and for a tone it depends entirely on the phase at the
+cut: a sine starting at a zero crossing makes `'first'` bit-identical to
+`'zero'`. A float resumes a state you saved yourself (which is what block
+processing does in section 6), and an array broadcastable to the input shape
+without the time axis does the same per channel.
+
+If the recorded segment is a continuation of a signal already running, seed
+the integrator with something robust — the mean square of the first half
+second is a far better estimate than a single sample. If the record is the
+*start* of the event, do not seed at all: let it start from rest and discard
+the first $5\tau$ (0.6 s Fast, 5 s Slow), which is exactly what `ln_levels`
+does internally before computing percentiles.
 
 ```python
 import numpy as np
@@ -204,7 +221,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+# Robust seed: the mean square of the first half second, not one sample.
+energy_envelope = filters.time_weighting(
+    recording, fs, mode='fast',
+    initial_state=float(np.mean(recording[:fs // 2] ** 2)))
 ```
 
 ## 6. Block processing
@@ -292,6 +312,6 @@ built on these envelopes, and [Why phonometry](../../start/why-phonometry.md) fo
 
 IEC 61672-1:2013, *Electroacoustics — Sound level meters —
 Part 1: Specifications*: the exponential time-weighting detector (clause 3.8)
-with the F and S time constants (clause 5.7), and the 4 kHz toneburst reference
+with the F and S design-goal time constants (clause 5.8.1), and the 4 kHz toneburst reference
 responses of Table 4 (class 1 acceptance limits) used to verify the ballistics
 in CI.

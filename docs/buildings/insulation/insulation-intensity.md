@@ -113,6 +113,14 @@ plt.show()
 
 </details>
 
+Both levels are already-measured inputs: the scanning probe, the
+two-microphone acquisition and the phase-mismatch calibration behind $L_{p1}$
+and $L_{In}$ are not implemented, and nothing here enforces the Clause 6.4
+acquisition either — the 0.1 m to 0.3 m measurement distance, the 0.1 m/s to
+0.3 m/s scan speed, the 90°-rotated second scan with its 1.0 dB validity
+test, the 10 dB background margin — so a single scan will produce a number
+just as readily as a qualified pair.
+
 ### `intensity_sound_reduction()` / `adaptation_term_kc()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -282,6 +290,9 @@ a leaky junction) carries the transmitted power, which no pressure-based
 field method can resolve. Qualify each scan with the same
 pressure-intensity indicator, and expect the probe's own limits (the
 [spacer phase error](../../devices/emission/intensity.md)) to set the usable low-frequency range.
+Part 2's own field procedure (the loudspeaker positions, the façade cases) and
+the low-frequency Part 3 variant are not implemented: the formulas here apply
+unchanged to field data, but nothing checks how that data was acquired.
 
 ## References
 

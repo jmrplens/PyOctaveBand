@@ -143,7 +143,12 @@ positions. When the room volume, its reverberation time or the microphone
 count fail an ISO 3741 qualification criterion (Table 1 minimum volume, the
 $V/S$ reverberation floor, fewer than 6 positions, or an inter-position
 spread above 1.5 dB), an advisory `SoundPowerWarning` is emitted and the
-result still returns.
+result still returns. Those coarse advisory criteria are the only checks
+made: the reverberation-room qualification itself (Annex C/D,
+eigenfrequency counting or a reference-source comparison) is assumed, not
+performed. The sound energy level $L_J$ of clause 9.2, the single-event
+counterpart of $L_W$ defined in the same clauses, is not implemented
+either, so an impulsive or single-event source falls outside this guide.
 
 ### `sound_power_reverberation()` parameters
 
@@ -225,6 +230,16 @@ res.report(
     ),
 )   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
 ```
+
+One caveat on that example: it runs Eq. 20 on **octave** bands for
+compactness, and that is not a conforming ISO 3741 determination. Both
+methods are defined on one-third-octave bands, and octave-band results are
+formed afterwards by summing the one-third-octave band powers per Annex F
+(Eq. F.1) — a summation not implemented here, so it has to be done by hand —
+not by feeding octave levels into Eq. 20, whose Waterhouse and absorption
+terms would then be evaluated at the octave mid-frequency instead of at each
+third. Section 1's example, 100 Hz to 10 kHz in thirds, is the conforming
+shape.
 
 The example fiche, regenerated with `make reports`, is kept rendered in the
 repository. Click the preview to open the PDF:

@@ -252,6 +252,11 @@ $C = 100\ (T_{30}/T_{20} - 1)$ % (values above 10 % flag a non-straight
 decay). `decay_curve(ir, fs, band=None, fraction=1, zero_phase=False)` returns
 just the `(time, level)` curve for one band or the broadband response.
 
+ISO 3382-1 Annex A defines more parameters than this: the sound strength $G$
+and the binaural/spatial parameters LF, LFC and IACC are not implemented —
+phonometry computes only the reverberance and clarity family above (EDT,
+T20, T30, C50, C80, D50, Ts).
+
 ### ISO 3382 report (`.report()`)
 
 `RoomAcousticsResult.report(path)` renders a one-page PDF fiche laid out like a

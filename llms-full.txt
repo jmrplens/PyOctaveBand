@@ -770,6 +770,15 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).
 
+The adjustment those attenuations feed — Appendix 2 §8, which transports a
+measured EPNL to the reference day and the reference flight path — is not
+implemented, in either its simplified or its integrated form:
+`air_attenuation` and `sae_band_attenuation` are exactly the test-day and
+reference-day coefficients of its first terms, but the flight-path geometry
+and the four $\Delta$ terms are left to the reader. The EPNL of section 3 is
+therefore the as-measured, test-day value; adjust it first, and only then
+report it against a certification limit.
+
 The certification chain ends here. Turning these aeroplanes into noise
 around an airport, the noise-power-distance tables, the per-segment
 corrections of a flight path and the ground contour of a single event, is
@@ -912,6 +921,17 @@ aircraft.npd_level(powers, distances, levels, power=16000.0, distance=1500.0)
 curve = aircraft.npd_curve(powers, distances, levels, power=20000.0)
 curve.plot()   # NPD curve with the tabulated nodes (needs matplotlib)
 ```
+
+The tables may be used as tabulated while the aerodrome's average conditions
+stay inside the Doc 29 §2.5 envelope: air temperature below 30 °C, the product
+of temperature (°C) and relative humidity (%) above 500, and wind below 8 m/s.
+Outside it the *tables themselves* have to be converted by the Appendix D
+procedure, which this chain does not implement — `impedance_adjustment` takes
+only temperature and pressure, and no humidity argument enters the chain
+anywhere. One restriction runs under all of it: the SAE AIR 5662 lateral
+attenuation, and with it the whole single-event chain that uses it, is derived
+for acoustically soft, grassy ground, so a contour drawn over water, an apron
+or dense hard surfaces is outside the method as published.
 
 ## 2. The single-event calculation
 
@@ -1511,9 +1531,9 @@ conditions. Placing that source at a receiver adds the propagation adjustment
 $\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
 
 This page covers the source and propagation primitives, the flight-condition
-interpolation across a hemisphere database, the flight-path kinematics, and the
-single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours;
-terrain shielding follows in later work.
+interpolation across a hemisphere database, the flight-path kinematics, the
+single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours, and
+the terrain mean-ground-plane and screening machinery.
 
 The EPNL this page computes is the same quantity certification asks for: ICAO
 Annex 16 Chapter 8 flies the helicopter level at 150 m over a centre
@@ -1522,6 +1542,12 @@ microphone, with two more 150 m to each side.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification.svg" alt="Helicopter overflight noise certification of ICAO Annex 16 Chapter 8: a side view of a helicopter in level flight at 150 m, 492 ft, directly above a centre microphone on the ground, with the reference speed rule of 0.9 VH, and a plan-view inset where the flight track crosses a line of three microphones, one on the track and two 150 m to each side; notes state at least six overflights split equally between headwind and tailwind, EPNL in EPNdB at the three points, microphones 1.2 m above ground and the 45 degree elevation with about 212 m slant range to the sideline pair at the overhead moment" width="92%"></picture>
 
 ## 1. The noise hemisphere
+
+The library implements the method, not the data: **no hemisphere database
+ships with phonometry, and there is no NORAH file reader**, so the arrays
+below are assembled by the reader — from a flight-test campaign that
+de-propagates each emission direction back to the 60 m reference sphere, or
+from the NORAH2 reference database, which covers eleven rotorcraft types.
 
 A `RotorcraftHemisphere` holds the band levels on the azimuth/polar grid (with
 missing bins marked `NaN`). `hemisphere_source_level` reads the source level at an
@@ -1610,7 +1636,9 @@ The standard database is recorded at 60 m, the default. If a hemisphere uses a
 different polar distance (`h.distance`, e.g. 70 m hover rings), pass it to both
 distance-dependent adjustments:
 `spherical_spreading_adjustment(r, reference_distance=h.distance)` and
-`atmospheric_adjustment(freqs, r, reference_distance=h.distance)`.
+`atmospheric_adjustment(freqs, r, reference_distance=h.distance)`. The three
+adjustments assume straight rays: refraction by atmospheric gradients is
+outside Doc 32 itself and is not modelled.
 
 ## 3. Flight conditions: interpolating between hemispheres
 
@@ -1978,7 +2006,11 @@ with the radiation factor for free bending waves $\sigma$ (Formulae B.4-B.6),
 the radiation factor for forced waves $\sigma_f$ (Formula B.3) below $f_c$,
 and a third branch for the band that straddles $f_c$. Above about 1 kHz a
 thick element stops improving, and Formula (B.10) floors the transmission
-factor at a plateau set by $\rho c_L$.
+factor at a plateau set by $\rho c_L$. Only homogeneous elements are
+calculated this way: the spectrum of a lightweight, double or composite
+element enters the chain as an input, from
+[Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) or from a test
+report.
 
 **2. In-situ conversion.** The element radiates and is damped differently in
 the building than in the test frame. The total loss factor in situ is
@@ -2267,6 +2299,11 @@ ln_13 = flanking_impact_level_from_flanking_level(
     lnf_13, area=20.0, laboratory_area=10.0,
     coupling_length=4.0, laboratory_coupling_length=4.5)
 ```
+
+One transmission route stays outside the model altogether: airborne
+transmission through cavity walls and suspended ceilings is not carried at
+all, and clause 3.3.4 Note 1 warns that there it "can contribute to or even
+dominate" the transmission.
 
 ## Checks the standard gives you
 
@@ -3072,7 +3109,8 @@ standard's own Annex I worked examples: the whirlpool bath of I.2
 (Tables I.8/I.9: source conversion, all four transmission paths, the
 Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of
 the printed one-decimal intermediates. $D_{sa}$ and $R_{ij,\mathrm{ref}}$ are inputs (from
-measurement / EN 12354-1 / Annexes D and F).
+measurement / EN 12354-1 / Annexes D and F). Only the 2009 edition is
+implemented, not the EN 12354-5:2023 revision.
 
 ---
 
@@ -4931,6 +4969,19 @@ lvf = building.equivalent_free_velocity_level(70.0, 1.0e-2)
 print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| in m/(N·s)
 ```
 
+Two pieces of the standard stay on the operator's side of the line. Formula 16
+— the equivalent point mobility of the plate as the arithmetic mean of
+$\mathrm{Re}\{Y\}$ over its contact points — is not implemented: the functions
+above take an already-known plate mobility rather than deriving it from
+per-point measurements. The Annex C power-substitution method is not
+implemented either; the library takes an already-averaged $L_v$, so a
+substitution determination must be reduced to a plate power level by hand
+(Formulae C.1/C.2) first. And nothing here checks the facility: the plate's
+dimensions, density, aspect ratio and loss factor, the position count and
+clearances, the background correction and the operating conditions are the
+operator's responsibility, and a value computed from a non-conforming plate is
+returned without complaint.
+
 The direct source-side counterpart is the ISO 9611 free velocity level (re
 $v_0 = 5\times10^{-8}\ \text{m/s}$) measured at the contact points of
 resiliently mounted
@@ -5866,6 +5917,12 @@ $\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
 worked numeric example, conformance is anchored on closed-form identities
 (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
 
+Those checks are the only enforcement there is. The acquisition itself —
+shielding the other elements, a shield meeting $\Delta R_\text{min}$, the
+position counts and separations, the accelerometer mass-loading inequality,
+$T_s$ measured on the elements in their installed state rather than assumed —
+is the operator's responsibility, and nothing here checks any of it.
+
 ```python
 import numpy as np
 from phonometry import building
@@ -6171,9 +6228,13 @@ ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
 which cover the laboratory measurement of flanking transmission: the
 vibration reduction index $K_{ij}$, the equivalent absorption length, the
 normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
-validity checks that feed the EN 12354 prediction. Because ISO 10848
-contains no worked numeric example, conformance is anchored on closed-form
-identities (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+validity checks that feed the EN 12354 prediction. Parts 2, 3 and 4 differ in
+which junction and specimen types they apply to; phonometry implements only
+the Part 1 formulae generically, plus the Part 4 modal-overlap validity
+check, not the facility-specific test setups the other parts describe.
+Because ISO 10848 contains no worked numeric example, conformance is
+anchored on closed-form identities (simplified $K_{ij}$, $a_j$ at
+$f_\text{ref}$, $\eta$).
 
 
 The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
@@ -6185,7 +6246,8 @@ it is anchored on its closed forms and on structural properties a wrong
 reading breaks: monotonicity in the plenum damping, the bound
 $\tau_{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
 $D_{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
-laboratory reports.
+laboratory reports. The plenum propagation constant $k'$ of a lined duct is an
+input here, not a prediction.
 
 ## See also
 
@@ -7208,6 +7270,14 @@ plt.show()
 
 </details>
 
+Both levels are already-measured inputs: the scanning probe, the
+two-microphone acquisition and the phase-mismatch calibration behind $L_{p1}$
+and $L_{In}$ are not implemented, and nothing here enforces the Clause 6.4
+acquisition either — the 0.1 m to 0.3 m measurement distance, the 0.1 m/s to
+0.3 m/s scan speed, the 90°-rotated second scan with its 1.0 dB validity
+test, the 10 dB background margin — so a single scan will produce a number
+just as readily as a qualified pair.
+
 ### `intensity_sound_reduction()` / `adaptation_term_kc()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -7377,6 +7447,9 @@ a leaky junction) carries the transmitted power, which no pressure-based
 field method can resolve. Qualify each scan with the same
 pressure-intensity indicator, and expect the probe's own limits (the
 [spacer phase error](https://jmrplens.github.io/phonometry/devices/emission/intensity/)) to set the usable low-frequency range.
+Part 2's own field procedure (the loudspeaker positions, the façade cases) and
+the low-frequency Part 3 variant are not implemented: the formulas here apply
+unchanged to field data, but nothing checks how that data was acquired.
 
 ## References
 
@@ -8302,6 +8375,20 @@ plt.show()
 `survey_service_equipment_level()` a `SurveyServiceEquipmentResult` (`l_xy`,
 `l_xy_nt`, `l_xy_n`).
 
+What the functions do not do is police the survey. They consume band levels
+wherever they came from: nothing verifies the sweep, the source corner, the
+tapping-machine positions or the one-corner-plus-two-central
+service-equipment recipe, and nothing checks the 6 dB signal-to-background
+floor of Clause 6.2.1 — nor applies a correction when it was not met, which
+is the method's own rule (record the level, and note that the result was
+affected by an unknown amount). The ± 2 dB agreement with the engineering
+method is the standard's own estimate (Clause 6.6 NOTE), not something the
+library models or propagates: no survey result carries an uncertainty, and
+when the stakes rise the step up is
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/), whose
+ISO 12999-1 machinery does produce one. Annex A's report form and Annex B's
+operating cycles for service equipment are outside the library too.
+
 ## ISO 10052 survey reports (`.report()`)
 
 The airborne, impact and façade survey results each carry a `.report(path)` that
@@ -8925,8 +9012,10 @@ surface pairs whose coefficients differ by less than a factor of 3 (unless
 scattering objects are present) and an object fraction below 0.2. Outside
 those limits the field is not diffuse and the model errs on the optimistic
 side: the standard's own accuracy clause records measured reverberation
-times up to twice the prediction in low-diffusivity rooms. The classical
-alternatives for those cases live in
+times up to twice the prediction in low-diffusivity rooms. The standard's own
+scope goes further: very large or irregularly shaped spaces — concert halls,
+theatres, factories — are excluded from the model itself, not just from this
+implementation. The classical alternatives for those cases live in
 [Reverberation-time prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/).
 
 ## 4. Enclosed-space report (`.report()`)
@@ -9325,6 +9414,15 @@ fields and marks `rd` / `rp`.
 `rd`/`rp` are `nan` when STI does not decrease with distance. The per-position
 STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/).
+
+Two things stay outside the function. The fourth required single number, the
+average A-weighted background noise $L_{p,A,B}$, is not computed here — it is
+the energetic A-weighted average of the per-position octave-band background
+levels, and it belongs in the report alongside the quantities this page
+produces. And nothing checks the measurement conditions of clauses 5.1 and
+5.2: the function consumes distances, levels and STI values wherever they
+came from, so the source directivity, the furnished-and-unoccupied state and
+the background capture are the operator's responsibility, not the library's.
 
 ## ISO 3382-3 report (`.report()`)
 
@@ -10191,6 +10289,11 @@ stays within the 5 % JND) and `curvature`
 $C = 100\ (T_{30}/T_{20} - 1)$ % (values above 10 % flag a non-straight
 decay). `decay_curve(ir, fs, band=None, fraction=1, zero_phase=False)` returns
 just the `(time, level)` curve for one band or the broadband response.
+
+ISO 3382-1 Annex A defines more parameters than this: the sound strength $G$
+and the binaural/spatial parameters LF, LFC and IACC are not implemented —
+phonometry computes only the reverberance and clarity family above (EDT,
+T20, T30, C50, C80, D50, Ts).
 
 ### ISO 3382 report (`.report()`)
 
@@ -11144,6 +11247,15 @@ mistakes bias the mean itself:
   of the 63-125 Hz bands across positions is structurally larger; the cure
   is more positions, not a longer excitation.
 
+Three practical limits close the chain. Playback and recording themselves —
+sound-card I/O, level calibration of the chain — are outside the library,
+which starts at the recorded array. ISO 18233's time-variance and distortion
+diagnostics are not implemented either: the sweep separates distortion, but
+no helper here quantifies it (that reading lives in the
+[swept-sine distortion guide](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)).
+And the position rules above are guidance prose: nothing checks how many
+positions were measured or where.
+
 ## From the impulse response onward
 
 The IR leaves this page in several directions. Band-filtered and
@@ -11270,6 +11382,19 @@ NC-15 curve) therefore gets `rating = nan` and an `out_of_range` flag of
 `"above"` / `"below"`, with `nc.label` reading `'>NC-70 (63 Hz)'` (the band
 with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 `NC-14` style numbers are ever fabricated.
+
+Both single-spectrum ratings assume a **steady** sound field, and clause
+5.3.2 makes that a test the reader must perform: it is not implemented here.
+Surging is screened aurally and/or visually in the 16, 31.5 and 63 Hz octave
+bands with the meter on fast response and Z ("flat") weighting (5.3.2.1);
+large random fluctuations are screened from the differences
+$L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ and $L_{10} - L_{\mathrm{EQ}}$ on fast
+against Table 3 (7 dB and 3.5 dB for the combined 16, 31.5 and 63 Hz bands,
+6 dB and 3 dB at 125 Hz) (5.3.2.2). A field that fails either screen belongs
+to the RNC method of clause 5.3, which needs a time series rather than a
+single spectrum, so `noise_criterion` and `room_criterion` would return a
+number that is not the standard's answer for that room. Both functions
+assume the screen has passed.
 
 ## 2. Room Criteria Mark II: rating and spectral tag
 
@@ -12085,6 +12210,12 @@ sensitivity conventions and the baffled-piston radiation model, and
 [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/), with the
 directional patterns and the inherent-noise weightings.
 
+One thing this page never does is police the bench. The functions take a
+captured array and compute the ratio the clause defines, so the rated and
+standard measuring conditions the ratios are defined at (IEC 60268-3 clauses
+3.1.2/3.1.3, with the 1 h pre-conditioning of clause 9), the operating point
+and the 14.12.3.2/14.12.4.1 acceptance checks are the reader's to keep.
+
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
 A non-linear device fed a pure sine at $f_1$ returns the fundamental plus
@@ -12404,12 +12535,16 @@ THD+N ratio via the standard notch filter and the standard measurement
 bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
 nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
 Measurement Procedures* (4th ed., Wiley): the $H_1$ and $H_2$ frequency-response
-estimators and the ordinary coherence $\gamma^2$. The rated-characteristics
+estimators and the ordinary coherence $\gamma^2$. The implemented edition is
+frozen at AES17-2015; the superseding AES17-2020 revision is not the one
+checked. The rated-characteristics
 standards of the transducer guides, IEC 60268-5:2003+A1:2007
 (loudspeakers), IEC 60268-4:2014 (microphones) and IEC 60263:1982 (scales
 for the characteristic graphs), are covered in
 [Loudspeaker Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/) and
-[Microphone Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/). All
+[Microphone Characterisation](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/); the Part 16 speech
+transmission index is a perception quantity with its own guide,
+[Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/). All
 quantities are verified against exact analytic oracles (synthetic signals with
 known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
 full DIM test-signal synthesis, and a known LTI path).
@@ -12754,6 +12889,12 @@ The impedance modulus (with the 80 %-of-rated line), the total-harmonic-distorti
 curve and the directivity feed the secondary panels, reusing the radiating
 piston directivity of section 2 and a
 [swept-sine THD](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/) result for the distortion curve.
+None of the standard's measuring conditions is checked here: the functions
+reduce and report the curves they are handed, so the mounting, the
+excitation, the gate and the field condition are the operator's to keep and
+to state with the result. Thiele-Small parameter extraction from the
+impedance curve is not implemented either: the impedance panel reports the
+measured modulus against the rated-impedance lines.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report
@@ -13110,7 +13251,9 @@ derived from the same equivalent noise level, and the overload sound
 pressure level (clause 15.2) bounds the usable range from above. The
 BS.468 weighting curve itself is exposed as `itu_r_468_weighting` in the
 [electroacoustics distortion set](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/), where it also
-weights THD.
+weights THD. The quasi-peak detector itself is not implemented: an
+inherent-noise level computed from `itu_r_468_weighting` and an r.m.s. sum
+is not a dBqps figure.
 
 ## 4. Microphone characteristics report (IEC 60268-4)
 
@@ -13188,7 +13331,12 @@ proportion (one frequency decade equal to 25 dB), and the directional pattern
 on the IEC 60263 25 dB reference circle; the inherent-noise spectrum and the
 distortion-against-level curve (with the THD limit and the overload level
 marked) feed the secondary panels. A `requirement` in the metadata is checked
-as a maximum permitted equivalent noise level.
+as a maximum permitted equivalent noise level. What the fiche cannot supply
+is the laboratory behind the numbers: the anechoic room and its
+qualification, the reference microphone and its calibration certificate, the
+high-level source that produces a 140 dB field and the turntable are what
+the reported numbers mean, and the acquisition itself is not implemented
+here — the functions reduce the curves they are handed.
 
 The rated characteristics are also available interactively through `.plot()`,
 which draws **one concept per figure** with the same panel code the report
@@ -14375,9 +14523,11 @@ extraneous noise that would defeat any pressure method. This guide covers
 the two of them: the ISO 9614-2 engineering/survey determination with its
 field indicators and per-band achieved grade, the ISO 9614-3 precision
 (grade 1) scan with its tighter criteria, and the accredited-style test
-fiche. The probe itself, its finite-difference bias and the ISO 9614-1
-discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/); which
-route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
+fiche. ISO 9614-1, the discrete fixed-point method, is not one of the routes
+here: its power determination is not implemented at all, and only its field
+indicators are reused. The probe itself, its finite-difference bias and
+those ISO 9614-1 indicators live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
+which route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
 ## 1. Intensity scanning (ISO 9614-2)
 
@@ -15430,7 +15580,12 @@ positions. When the room volume, its reverberation time or the microphone
 count fail an ISO 3741 qualification criterion (Table 1 minimum volume, the
 $V/S$ reverberation floor, fewer than 6 positions, or an inter-position
 spread above 1.5 dB), an advisory `SoundPowerWarning` is emitted and the
-result still returns.
+result still returns. Those coarse advisory criteria are the only checks
+made: the reverberation-room qualification itself (Annex C/D,
+eigenfrequency counting or a reference-source comparison) is assumed, not
+performed. The sound energy level $L_J$ of clause 9.2, the single-event
+counterpart of $L_W$ defined in the same clauses, is not implemented
+either, so an impulsive or single-event source falls outside this guide.
 
 ### `sound_power_reverberation()` parameters
 
@@ -15512,6 +15667,16 @@ res.report(
     ),
 )   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
 ```
+
+One caveat on that example: it runs Eq. 20 on **octave** bands for
+compactness, and that is not a conforming ISO 3741 determination. Both
+methods are defined on one-third-octave bands, and octave-band results are
+formed afterwards by summing the one-third-octave band powers per Annex F
+(Eq. F.1) — a summation not implemented here, so it has to be done by hand —
+not by feeding octave levels into Eq. 20, whose Waterhouse and absorption
+terms would then be evaluated at the octave mid-frequency instead of at each
+third. Section 1's example, 100 Hz to 10 kHz in thirds, is the conforming
+shape.
 
 The example fiche, regenerated with `make reports`, is kept rendered in the
 repository. Click the preview to open the PDF:
@@ -16030,6 +16195,17 @@ Those positions are not free: the standard divides the radiating surface $S$
 into $N$ equal cells and puts one accelerometer at the centre of each. The
 area table gives the initial $N$; a strongly non-uniform vibration field can
 call for more positions or a redistribution.
+
+What is implemented is the calculation, not the laboratory practice: the
+measurement clauses of both parts (instrumentation, source installation,
+environmental conditions — clauses 5 to 7), their measurement-uncertainty
+clauses and the informative annexes are not code, so the position counts and
+the Table 2 ladder are rules the reader keeps, not checks the functions run.
+Part 2's clause 8 also defines the radiation factor of a machine batch or
+family, averaging $\varepsilon_j$ over several machines with its standard
+deviation (Formulae 9 and 10); only the single-machine Formula 8 is
+implemented, so pass an already-averaged $\varepsilon$ for a family
+determination.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
 
@@ -18588,6 +18764,13 @@ plt.show()
 
 </details>
 
+Two caveats travel with the result. ISO 1996-1 defines these descriptors over a
+long-term interval, normally a whole year, so one measured day yields a sample
+of $L_{den}$ rather than the indicator itself. And $L_{den}$ is exposure, not
+response: the informative ISO 1996-1 annexes that estimate the percentage of a
+population highly annoyed from an adjusted $L_{den}$ or $L_{dn}$ have no
+counterpart in the library.
+
 ### `lden()` / `ldn()` / `composite_rating_level()` parameters
 
 | Function | Key parameters | Notes |
@@ -18596,7 +18779,7 @@ plt.show()
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
 | `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
 
-Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context; apply the corrections to your levels before analysis:
+Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context, not something the library computes — those position and correction procedures are not implemented, so apply the corrections to your levels yourself before any function on this page consumes them:
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
@@ -22170,7 +22353,13 @@ $L_{WA,10m}$ at integer 10 m wind speeds regardless of the site's actual
 terrain. The library implements the closed-form quantities of this pipeline
 (slant distance, per-band apparent power, tonal audibility); the binning,
 averaging and uncertainty machinery operates on whole measurement campaigns
-and stays out of scope.
+and stays out of scope. So does the IEC TS 61400-14 declaration route, which
+turns a batch of measured machines into the declared value a planning authority
+receives. And two things a wind-turbine reader often arrives looking for sit
+outside IEC 61400-11 altogether: **amplitude modulation** (the swish, folded
+into $L_{WA}$ and rated nowhere in this standard) and **infrasound** — optional
+measurements under 7.2.1 with no rating method attached, so their assessment
+falls to national guidance.
 
 ## 2. Tonal audibility
 
@@ -22196,6 +22385,13 @@ $$
 
 reported when $\Delta L_a \ge -3\ \text{dB}$; a tone is audible when
 $\Delta L_a > 0$.
+
+For a candidate between 20 and 70 Hz the Zwicker band above is not what the
+standard uses: subclause 9.5.3 substitutes the fixed absolute 20–120 Hz band,
+so `critical_bandwidth` comes back as 100 Hz for every such candidate and the
+band is *not centred on the tone* — a low-frequency result cannot be reconciled
+with the CBW formula printed above. Blade-passing harmonics and low-speed
+gearbox tones live exactly there, so for a wind turbine this is no corner case.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_dark.svg">
@@ -22244,8 +22440,13 @@ the 9.5.1 energy averaging of $\Delta L_a$ over the spectra of a wind-speed bin
 $L_a$ criterion anchor to the highest classified tone line, not the probed
 candidate. The audibility formula is the ISO 1996-2 Annex C one; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
-and the Zwicker critical band from the spectrum. For a rating adjustment
-$K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+and the Zwicker critical band from the spectrum. IEC 61400-11 itself stops at
+$\Delta L_a$ and prescribes no rating adjustment. The 9.5.1 energy average over
+the spectra of a wind-speed bin is a *mean* audibility, the quantity
+ISO 1996-2:2017 Table J.1 was written for
+(`tonal_adjustment_from_mean_audibility`, integer 0–6 dB); the piecewise
+(C.4)–(C.6) law of `tonal_adjustment` applies to a single spectrum's
+$\Delta L_{ta}$, and the two differ by 1 to 2 dB on the same input.
 
 ### Assessment report (`.report()`)
 
@@ -22315,8 +22516,8 @@ the 0 dB audibility line and past a 6 dB acceptance requirement.*
   [iso.org catalogue](https://www.iso.org/standard/59766.html).
   The tonal-audibility criterion the IEC method reuses comes from the
   Annex C of its 2007 edition (the 2017 edition carries the tonal methods
-  in Annexes J and K), and its `tonal_adjustment` consumes the mean
-  audibility.
+  in Annexes J and K), and its Table J.1 mapping,
+  `tonal_adjustment_from_mean_audibility`, consumes the bin-mean audibility.
 
 ## Standards
 
@@ -22542,7 +22743,11 @@ are most alike, at the low-frequency end.
 
 A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
-still returns.
+still returns. That advisory pair is the only check made: the rest of the
+Clause 6 / Annex A room qualification — the room-shape rule, the ceiling on the
+empty room's absorption area $A_1$, the diffusivity qualification and the
+microphone and loudspeaker counts — is the laboratory's to verify, and nothing
+here checks any of it.
 
 ### `absorption_area()` / `absorption_coefficient()` parameters
 
@@ -22800,7 +23005,9 @@ $\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
 **Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
 standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
 single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
-($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$).
+($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$). That uncertainty
+formula is all this page takes from EN 1793-1: the standard's own in-situ
+measurement method for road-traffic noise-reducing devices is not implemented.
 
 **Reporting (Clause 8).** The expanded uncertainty is $U = k\,u$ (Formula (10))
 with the Table 3 coverage factor $k$ ($k = 2.0$ at 95 %, Gaussian). The reported
@@ -23121,7 +23328,8 @@ $$
 that is, a specific flow resistance of one to four times the characteristic
 impedance of air ($\rho_0 c_0 \approx 410$ Pa·s/m). A 50 mm blanket therefore
 wants a resistivity of roughly 8 kPa·s/m² to 33 kPa·s/m², which is exactly
-where commercial absorber products cluster.
+where commercial absorber products cluster. The window is absorber-design
+practice from the literature, not a requirement of either part of ISO 9053.
 
 Typical orders of magnitude, for orientation rather than design: glass wools
 run from a few kPa·s/m² in light thermal grades to some tens of kPa·s/m² in
@@ -23287,7 +23495,13 @@ $f\,s < 0.40\,c$ (6.5.4) and a laxer low end at 1 % of the wavelength
 `wave_decomposition` or the `transfer_matrix_*` solvers turns the matching
 check into an advisory warning, and for the Annex A attenuation estimate of a
 rectangular tube `hydraulic_diameter(width, height)` supplies the $4A/P$
-diameter that `tube_attenuation_constant` expects.
+diameter that `tube_attenuation_constant` expects. That function implements
+only the Eq. (A.18) estimate, which the standard itself calls a lower limit;
+the measured determination of Eqs. (A.13)/(A.14) from the empty tube is not
+implemented. The frequency-range check is also the only condition the library
+verifies: the near-field distances of Clause 4.3, the position tolerances of
+Clause 4.5, the signal-to-noise floor of Clause 7.3 and the warm-up of
+Clause 5 are the operator's, and nothing here checks that any of them was met.
 
 The whole tube, sample included, can also be simulated: section 5 runs this
 exact measurement virtually inside the FDTD solver and recovers the analytic
@@ -23396,7 +23610,9 @@ Two practical cautions from the standard's own text. The minima far from the
 sample are shallower than the theory above says, because the travelling waves
 decay along the tube (viscous and thermal losses at the wall); ISO 10534-1
 has the operator read the minimum **nearest** the sample and, for precision
-work, extrapolate the minimum levels to the sample face. And the method
+work, extrapolate the minimum levels to the sample face — that extrapolation,
+like the standard's probe-body corrections, stays with the operator: the
+closed forms here consume the levels as read. And the method
 leans on the purity of the tone: any harmonic distortion from a hard-driven
 loudspeaker puts energy at frequencies whose minima sit elsewhere, partially
 filling the notch being measured, so the analyser must be narrowband around
@@ -24185,7 +24401,10 @@ principle hiding inside the classical resonant absorbers of the
   the flexural loss of a limp sheet; the same loss-versus-leakage balance
   governs their peak, and adding masses to the membrane (the decorated
   membrane of the metamaterials literature) tunes the resonance downward the
-  way the loading resonators tune the slit.
+  way the loading resonators tune the slit. They appear here as context only:
+  the classical membrane layer is implemented in the
+  [multilayer solver](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/), and the decorated membrane is not
+  implemented in the library.
 - **The design question is always the same.** Pick the resonance with the
   geometry, then match the loss to the leakage. The porous-layer models ask
   "how thick"; the resonant family asks "how lossy", and
@@ -24263,7 +24482,10 @@ resistivities $12\eta/h^2$ and $28.454\eta/w^2$ as $\omega \to 0$, and the
 effective parameters tend to $\rho_0$, $\kappa_0$ as the boundary layers
 vanish. A built panel would be measured in the
 [impedance tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) (ISO 10534-2) or the
-[reverberation room](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) (ISO 354); misprints found in
+[reverberation room](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) (ISO 354) — nothing here
+performs any of that verification, and the roughness of a printed slit, the
+frame, the mounting and the finite panel size are all outside the model.
+Misprints found in
 the source papers during this work are recorded in the
 [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
@@ -25007,6 +25229,14 @@ cross-check of the meshed cell.
 
 ## Practical notes
 
+**Parameters are inputs.** Nothing on this page measures anything: the five
+JCA parameters, the frame's shear modulus and Poisson coefficient and the
+sheet geometries all enter as numbers the caller supplies. Of their
+characterisation methods only the flow resistivity has a guide
+([Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/)); an inverse fit of the remaining
+parameters against a measured impedance is a `scipy.optimize` exercise, not a
+library function.
+
 **Fit ranges.** Delany–Bazley warns (and extrapolates) outside
 $0.01 < X < 1$ and Miki outside $0.01 < f/\sigma < 1$; treat sub-range
 values as qualitative. JCA needs four extra
@@ -25030,6 +25260,9 @@ refracts and travels inside the layers). `statistical_absorption` assumes
 local reaction, a good approximation for high flow resistivity, partitioned
 cavities or thin resonant facings; for thick, light porous layers integrate
 the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
+Either way the prediction is for a laterally infinite sample: the finite-size
+edge effect that lets a measured ISO 354 $\alpha_s$ exceed the predicted
+$\alpha_{dif}$, and even exceed 1.0, is not modelled here.
 
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
@@ -25051,6 +25284,9 @@ found in the sources during this work are recorded in the
 - [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/): the
   slow-sound slit panels and the critical-coupling condition that push
   perfect absorption into the deep-subwavelength regime.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the diffuser
+  half of Cox & D'Antonio, implemented separately — this guide covers only
+  the absorber half of the book.
 - Theory: [Acoustic material characterisation](https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/#acoustic-material-characterisation-iso-11654-iso-9053-12-iso-10534-12-astm-e2611): the characterisation quantities the empirical and phenomenological models take as input.
 
 ## References
@@ -25579,7 +25815,9 @@ A handful of design rules follow directly from the geometry:
 
 `qrd_well_depths` evaluates the depth sequence and
 `predict_diffuser_polar_response` grades the design before anything is built,
-which is the subject of the next section.
+which is the subject of the next section. Only the quadratic-residue sequence
+has a dedicated helper: a primitive-root, modulated or otherwise custom
+profile enters through the explicit `depths` or `reflection` arguments.
 
 ### Predicting diffusion from a diffuser design
 
@@ -26050,9 +26288,10 @@ $d_n = s_n \lambda_0/(2N)$ and hence the target reflection phases
 $\varphi_n = -2 k d_n$ at the evaluation frequency. Second, tune each slit
 (its height, and the neck and cavity of its resonators) until the chain
 reproduces that phase from the fixed panel depth $L$. The per-well reflection
-returned by `metadiffuser_reflection` is the quantity to match; for the
-published design at 2 kHz the five slits land within a few degrees of the QRD
-targets while keeping $|R_n|$ near one:
+returned by `metadiffuser_reflection` is the quantity to match — the inverse
+problem is not automated, so the matching is done by evaluating candidate
+geometries; for the published design at 2 kHz the five slits land within a
+few degrees of the QRD targets while keeping $|R_n|$ near one:
 
 ```python
 import numpy as np
@@ -26096,6 +26335,11 @@ The reduction to a graded coefficient is then identical to the classical
 workflow: `metadiffuser_polar_response` for one frequency,
 `metadiffuser_diffusion_spectrum` for the band-by-band normalised coefficient,
 both against the same-footprint flat reference of ISO 17497-2 Formula (7).
+The model is locally reacting — wells do not couple internally — and the
+reduction inherits the Fraunhofer limits of the
+[classical page](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): accuracy falls at low frequency, at grazing
+angles and where edge diffraction matters, so the chain grades candidate
+designs rather than replacing an ISO 17497-2 measurement.
 
 ## See also
 
@@ -26406,7 +26650,11 @@ load plate whose total mass per unit area, plate plus added load, is
 preload of a typical floating floor, about 2 kPa. A vertical exciter drives
 the plate, an accelerometer picks up its response, and the fundamental
 vertical resonance $f_r$ of the plate-on-specimen system is read from the
-response peak; Formula 4 turns it into $s'_t$.
+response peak; Formula 4 turns it into $s'_t$. That extraction is the
+laboratory's: the Clause 7 procedures for reading $f_r$ from the raw
+excitation-response signal — sinusoidal, white-noise or pulse excitation,
+with the extrapolation to zero force amplitude — are not implemented, and
+`apparent_dynamic_stiffness` expects the already-extrapolated $f_r$.
 
 ```python
 from phonometry import materials
@@ -26496,7 +26744,10 @@ $f_0$ of Formula 2) beside the $f_0(s')$ design curve, and a boxed apparent
 dynamic stiffness $s'_t$ (no pass/fail). Clause 9 rounds every stiffness to the
 nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
 embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
-(`pip install "phonometry[report,plot]"`).
+(`pip install "phonometry[report,plot]"`). Clause 6's specimen selection — at
+least three 200 mm × 200 mm specimens — is not enforced, and neither is the
+Clause 9 report content: the fiche carries the excitation arrangement and the
+signal type only when the metadata supplies them.
 
 ```python
 from phonometry import ReportMetadata, materials
@@ -26556,7 +26807,8 @@ heavy slab) is the design goal.
   the floating-floor term this measurement feeds.
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/): the
   ISO 9053 determination of the lateral resistivity $r$ that clause 8.2 needs,
-  reported there as $\sigma$ in Pa·s/m².
+  reported there as $\sigma$ in Pa·s/m², while this page's
+  `airflow_resistivity` argument is in kPa·s/m².
 - [Resilient layers overview](https://jmrplens.github.io/phonometry/materials/resilient/): where this
   measurement sits among the materials guides.
 - API reference: [`materials.resilient.dynamic_stiffness`](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/).
@@ -26992,6 +27244,11 @@ microphones separates incident and reflected waves, and the standard's
 Annex A additionally subtracts the internal losses of the system (measured
 once against a rigid plate) so the tube's own dissipation is not billed to
 the road; that correction is `spot_internal_loss_correction`.
+
+Nothing in code enforces the acquisition around either method: the averaging,
+the free-field reference, the signal-to-noise checks, the seal verification
+and the weather limits are the operator's, and the library only sees the two
+impulse responses (or the transfer function) that come out of them.
 
 ## Subtraction or spot?
 
@@ -27610,6 +27867,13 @@ The `NiptsResult` carries the `median` ($N_{50}$), the
 and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
 alone is the subject of the [hearing-threshold](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/) guide.
+
+One substitution the standard allows is not implemented: clauses 6.2.3 and
+6.2.4 let a **database B**, an age threshold measured on a national control
+population, replace database A. Only database A exists here, so `htlan`
+always draws its age component from ISO 7029:2017. For a database-B
+assessment, `combine_age_and_noise(htla, nipts_value)` runs Formula (1) on an
+externally supplied HTLA array; computing database B itself is out of scope.
 
 **Test-report fiche.** `HtlanResult.report(path)` renders the companion fiche
 for the combined threshold, following ISO 1999:2013 clause 6.1. It carries the
@@ -28354,6 +28618,12 @@ two cascaded temporal integrators: the fast **short-term loudness** $S'(t)$
 and the slower **long-term loudness** $S''(t)$. The peak long-term loudness
 $N_\text{max}$ predicts the loudness of sounds up to about 5 s.
 
+One documented deviation: Clause 5 prescribes resampling the input to 32 kHz
+before the running FFT analysis, and this implementation processes at the
+native sampling rate instead. The difference stays inside the standard's
+expanded uncertainty; resample to 32 kHz first if strict clause-by-clause
+conformance matters.
+
 ```python
 import numpy as np
 from phonometry import psychoacoustics
@@ -28423,7 +28693,9 @@ nonlinearity, Formula 23) that is **shared** by its loudness, tonality and
 roughness metrics. The loudness $N$ is reported in **sone_HMS**, and the same
 1 kHz/40 dB anchor calibrates the front-end (our clean-room value 0.984,
 with the full Clause 6.2.3 band averaging; the residual's origin is
-documented in the module docstring).
+documented in the module docstring). `loudness_ecma` is monaural: the
+binaural combination of Formula 118 (Clause 8.1.5) is not implemented, so
+analyse each ear channel separately.
 
 ```python
 import numpy as np
@@ -28870,10 +29142,12 @@ plt.show()
 </details>
 
 Validity per clause 4.1: 20-90 phon (80 phon above 4 kHz); the implementation
-is verified against the Annex B tables in CI. Note this is the loudness of
-*pure tones*; the loudness of arbitrary signals in sones is what the ISO 532
-models compute, the Zwicker method above and the newer families of
-[Advanced loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/).
+is verified against the Annex B tables in CI. The standard defines no
+interpolation between the 29 tabulated frequencies, so `loudness_level()`
+expects one of the Table 1 frequencies and rejects anything else. Note this
+is the loudness of *pure tones*; the loudness of arbitrary signals in sones
+is what the ISO 532 models compute, the Zwicker method above and the newer
+families of [Advanced loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/).
 
 Zwicker is the reference model, not the only one. The **Moore-Glasberg**
 loudness of ISO 532-2, its time-varying ISO 532-3 extension and the
@@ -29197,7 +29471,13 @@ accumulates more of it than the single closed form allows.
 > `[0.40, 0.79, 1.09, 1.05, 0.17, 0.09]` vacil against the literature
 > `[0.39, 0.84, 1.25, 1.30, 0.36, 0.06]`
 > (Pearson $r = 0.98$, correct 4 Hz peak, within ~2.1×). FM-tone accuracy is
-> explicitly not pursued. For **AM broadband noise** the signal model overshoots
+> explicitly not pursued; only AM stimuli are validated. The front-end also
+> departs from the paper's exact framing (the paper's 2 s frames with 90 %
+> overlap and absolute-threshold screening become 50 % overlap, a Hann window
+> and relative floors here), so perfectly steady signals do not read exactly
+> zero: a steady 1 kHz tone comes out near 0.09 vacil and steady broadband
+> noise a few tenths of a vacil, partly the physical level fluctuation of the
+> noise itself. For **AM broadband noise** the signal model overshoots
 > the absolute level (it spreads the modulated energy across bands); quote the
 > closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.
 
@@ -29499,6 +29779,12 @@ $R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bands), `bark`,
 `centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
 `specific_roughness_vs_time` ((n_times, 53) array), `field`.
 
+All three ECMA-418-2 entry points on this page are monaural — the binaural
+quadratic-mean combinations of Formula 112 (clause 7.1.11) and Formula 170
+(clause 9.1.15) are not implemented — so analyse each ear channel separately.
+The optional entropy weighting of clause 7.1.6, which needs an external
+rotational-speed signal, is also left out.
+
 ## Fluctuation strength (ECMA-418-2): new capability
 
 Fluctuation strength is the slow, wobbling sensation of amplitude or
@@ -29515,8 +29801,8 @@ with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
 by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
-**without** reverse-fitting to the target (the 8 s example below prints
-0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
+**without** reverse-fitting to the target and without the ±0.25 % adjustment
+that footnote 47 permits (the 8 s example below prints 0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).
 
 ```python
@@ -30218,6 +30504,12 @@ calibration (the ratios are level differences).
 | `resolution_hz` | float | Hz | > 0; default `1.0` | Tone band must stay within 15 % of the critical band (clause 11.2) |
 
 Both return a `ToneAssessment(frequency, ratio_db, criterion_db, prominent)`.
+
+The `prominent` verdict is the numeric criterion only. The standard also
+requires a prominent tone to be confirmed by aural examination (clauses
+11.8/12.8) and to pass the clause 8/9 lower-threshold-of-hearing screen —
+which, unlike the ratios, does need calibrated absolute levels. Both checks
+are left to the caller.
 
 ## 3. Which tonality metric, and when
 
@@ -31001,7 +31293,9 @@ the first argument to `speech_intelligibility_index`.
 The standard's own title is plural, and so is the standard: ANSI S3.5-1997
 defines **four** band procedures. They differ only in the band table and in how
 the upward spread of masking is expressed, and `method=` selects one. The
-default is the one-third-octave procedure used above.
+default is the one-third-octave procedure used above. No resampling between
+the four band sets is provided: each procedure expects its speech, noise and
+threshold spectra sampled on its own bands.
 
 | `method=` | Bands | Range | Constants | Spread of masking |
 | :--- | ---: | :--- | :--- | :--- |
@@ -31446,6 +31740,9 @@ biased low (an ideal loopback gives STI ≈ 0.956 at 5 s vs ≈ 0.998 at 18 s).
 The implementation follows **Edition 5 (2020)**: Edition 4's normative PDF
 is the base and every Ed. 5 change is source-attributed in the code; the
 only numeric delta is the revised male speech spectrum of clause A.6.1.
+That male spectrum is the only one there is: Edition 5 removed the female
+speech option (foreword, item d), so its absence here is the standard's,
+not the library's.
 CI checks the standard's own verification vectors: the six weighting-factor
 band pairs to ±0.001 STI, the $m$ ↔ STI mapping table, the level-dependent
 masking control points, and Schroeder-form decays at four $T_{60}$ values.
@@ -31472,7 +31769,10 @@ Each route has failure modes the standard is explicit about:
   system with non-linear processing in the chain, measure directly: the STIPA
   signal at least travels through the real chain, and the FULL STI signal is
   the reliable choice where the distortion is severe (IEC 60268-16 clause 6.3
-  and Table 3).
+  and Table 3). That 14-modulation-frequency direct test signal is not
+  implemented here, though: the library provides the STIPA direct signal
+  (`stipa_signal`/`stipa`) and the indirect full-STI computation from an
+  impulse response only.
 - **Level-dependent effects.** The STI is not level-invariant: auditory
   masking and the reception threshold act on the *absolute* band levels at the
   listener. Play the test signal at the system's operating level (the
@@ -37026,8 +37326,11 @@ Source: https://jmrplens.github.io/phonometry/signals/filters/filter-banks/
 # Filter Banks
 
 phonometry supports several filter types, each with its own transfer function
-characteristic. All banks place their **−3 dB points on the ANSI S1.11 band
-edges**, so band levels are comparable across architectures.
+characteristic. Butterworth, Chebyshev II and Bessel place their **−3 dB points
+on the ANSI S1.11 band edges**, so their band levels are directly comparable.
+The two equiripple designs (Chebyshev I, Elliptic) do not: they take those
+edges as the *ripple* edge instead, which widens the band and biases every band
+level by a fixed few tenths of a decibel — see section 1.
 
 ## 1. Fractional octave bands: the math
 
@@ -37042,10 +37345,20 @@ $$
 
 so every 1/3-octave band spans $G^{1/3} \approx 1.2589 \approx 10^{1/10}$:
 ten bands per decade, which is why the nominal frequencies (25, 31.5, 40 …)
-repeat scaled by 10. phonometry designs each band as an SOS cascade whose
-−3 dB points land exactly on $f_1$ and $f_2$ for every architecture; for
-Chebyshev II, Elliptic and Bessel that requires pre-warping the analytic
-band-edge mapping rather than trusting SciPy's default parametrization.
+repeat scaled by 10. phonometry designs each band as an SOS cascade on those
+edges, but only three of the five architectures put their −3 dB points on
+$f_1$ and $f_2$. Butterworth's SciPy design frequency *is* its −3 dB point;
+Chebyshev II is designed through its stopband edges, mapped back from the band
+edges analytically, and Bessel is normalized with `norm="mag"` — both
+corrections exist so that their −3 dB points land on the edges too. Chebyshev I
+and Elliptic are handed the band edges directly, and SciPy reads them as the
+*equiripple passband* edge: at the default `ripple=0.1` the response there is
+−0.10 dB rather than −3 dB, the band is effectively wider, and every band
+level carries a systematic offset — median +0.33 dB (`cheby1`) and +0.25 dB
+(`ellip`) against Butterworth over a one-third-octave bank analysing 20 s of
+white noise. That offset is a *bias*, not scatter: it does not shrink with
+averaging time and it moves every band at once, so choose one architecture per
+campaign and never mix architectures inside one spectrum.
 
 ### Poles, zeros and stability
 
@@ -37102,6 +37415,22 @@ capture chain delivered:
   `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
+### How long must the record be?
+
+A band level is not read off a signal, it is *estimated* from it, and the
+narrower the band the longer that takes. The bandwidth of a $1/b$-octave band
+is $B = f_m\,(G^{1/2b} - G^{-1/2b})$ — $0.231\,f_m$ for one-third octaves —
+and two consequences follow. The filter has to **settle**: a band rings for a
+few times $1/B$, so that much of the front of the record is transient rather
+than level (about a second in the 12.5 Hz band, twelve milliseconds at 1 kHz).
+And the estimate carries a **random error** of about $4.34/\sqrt{BT}$ dB on
+noise-like sound, so a 0.4 dB standard deviation needs $BT = 100$: 35 s of
+record for the 12.5 Hz band, 3.5 s for 125 Hz, 0.4 s for 1 kHz. The rule is
+one line: the lowest band you intend to report sets the record length for the
+whole bank. Analysing a 1 s clip down to 12.5 Hz and reporting the result to
+one decimal is not a measurement of that band, and neither `octave_filter` nor
+`OctaveFilterBank` warns you.
+
 The band mathematics above is shared by every architecture. How the
 architectures actually differ, the comparison at the −3 dB crossover, the
 full 1/1 and 1/3 octave response gallery and the usage examples per
@@ -37127,7 +37456,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `design.resample` | bool | — | default `True` | Filter each band on a decimated rate (multirate) |
 | `response_plot.show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
-| `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
+| `mode` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
 | `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
 | `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
 | `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
@@ -37135,6 +37464,15 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline) |
 | `block_processing.stateful` / `.steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/) |
+
+`mode` has exactly two values. `'rms'` reports the energy-mean level of the
+band over the whole record, which is what every standard means by "band level".
+`'peak'` reports $20\log_{10}$ of the largest absolute sample inside the band:
+an instantaneous, band-limited, unweighted peak — not the C-weighted
+$L_{C\text{peak}}$ of the [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/) guide — and on
+impulsive signals it is dominated by the filter's own ringing. There is no
+`'sum'` mode: a total across bands is an energy sum the caller performs,
+`10*np.log10(np.sum(10**(spl/10)))`, never an arithmetic mean of decibels.
 
 `verify_filter_class(bank)` checks the designed bank against the IEC 61260-1
 Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
@@ -37325,9 +37663,12 @@ plt.show()
 
 ## 5. Zero-phase filtering
 
-For offline analysis you can eliminate group delay entirely: `zero_phase=True`
-filters each band forward-backward (`scipy.signal.sosfiltfilt`), keeping band
-signals time-aligned with the input. The effective attenuation doubles and the
+For offline analysis you can eliminate group delay entirely:
+`OctaveFilterBank.filter(…, zero_phase=True)` filters each band
+forward-backward (`scipy.signal.sosfiltfilt`), keeping band signals
+time-aligned with the input. It is a per-call option on the bank, not an
+argument of the one-shot `octave_filter()`, which rejects it with a
+`TypeError`. The effective attenuation doubles and the
 effective passband narrows, lowering the measured broadband band level by
 ~0.2 to 0.3 dB per band (a pure in-band tone is unaffected); prefer forward
 filtering when the absolute band SPL must match single-pass conventions, and
@@ -37795,11 +38136,15 @@ Source: https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/
 
 Choosing a filter architecture is a trade-off: selectivity, passband ripple
 and phase behaviour cannot all be optimal at once, and each of the five
-architectures phonometry offers resolves the trade-off differently. Because
-every one of them places its **−3 dB points on the ANSI S1.11 band edges**,
-the choice changes how a band rejects its neighbours and how it treats
-transients, not where the band sits. This page puts the architectures side
-by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
+architectures phonometry offers resolves the trade-off differently. Three of
+them — Butterworth, Chebyshev II and Bessel — place their **−3 dB points on
+the ANSI S1.11 band edges**, so for those three the choice changes how a band
+rejects its neighbours and how it treats transients, not where the band sits.
+The two equiripple designs are the exception: `cheby1` and `ellip` treat the
+band edges as their ripple edge, so their bands are effectively wider and
+every band level reads a few tenths of a decibel high (the size of the bias
+is measured in [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/)). This page puts the
+architectures side by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
 response gallery, usage examples per architecture, and the Linkwitz-Riley
 crossover for when the goal is splitting a signal rather than measuring
 bands.
@@ -37853,6 +38198,14 @@ plt.show()
 | `cheby2` | **Chebyshev II** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby2'))` | Flat passband with stopband zeros. |
 | `ellip` | **Elliptic** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Maximum selectivity. |
 | `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preserving transient waveform shapes. |
+
+One constraint comes before any preference in that table: with the default
+parameters (order 6, 48 kHz), **three of the five cannot be used for a
+standards-compliant band measurement at all**. Only Butterworth and
+Chebyshev II reach IEC 61260-1 class 1 — the equiripple pair fails because
+its band edges are not its −3 dB points, and Bessel because it rolls off too
+slowly for the mask. See
+[Filter class verification](https://jmrplens.github.io/phonometry/signals/filters/filter-compliance/) for the per-band margins.
 
 ## 2. Gallery of Filter Bank Responses
 
@@ -37964,7 +38317,12 @@ Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
 stopband. It provides faster roll-off than Butterworth without affecting the
 signal in the passband. The stopband edges are placed automatically so that the
 −3 dB points land on the band edges (`attenuation` must be
-$> 3.01\ \text{dB}$).
+$> 3.01\ \text{dB}$ for a −3 dB point to exist at all; below that the design
+raises `ValueError`). Note that the default of 72 dB is set by conformance and
+not by realizability: SciPy pins the equiripple floor at exactly `attenuation`,
+and IEC 61260-1 class 1 demands 70 dB far from the band, so an `attenuation`
+of, say, 6 dB is arithmetically legal and silently loses the class — see
+[Filter class verification](https://jmrplens.github.io/phonometry/signals/filters/filter-compliance/).
 
 ```python
 import numpy as np
@@ -38067,10 +38425,16 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 ### 6. Linkwitz-Riley (`linkwitz_riley`)
 
-Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically
-4th order, but any even order is supported) allow splitting a signal into bands
-that, when summed, result in a perfectly flat magnitude response and zero phase
-difference between bands at the crossover.
+Specifically designed for **audio crossovers**: it does not build an IEC band,
+it splits one signal into two branches that recombine flat. Each branch is a
+Butterworth of order `order/2` applied twice, so each is exactly **−6 dB at
+the crossover frequency** (not −3 dB as in the bands above): the branches add
+to unity in *amplitude*, not in power. Which recombination is flat depends on
+the parity of `order/2` — `low + high` when it is even (orders 4, 8), but at
+orders 2 and 6 the branches are in antiphase at the crossover and the naive
+sum collapses into a deep notch there; the flat recombination is then
+`low - high`. Even in the flat cases the sum is **all-pass**, not phase-free:
+its magnitude is flat while its phase turns a full 360° through the crossover.
 
 ```python
 import numpy as np
@@ -38081,8 +38445,10 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Split the recording into Low and High bands at 1000 Hz
-low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Recombined, low + high has a flat magnitude response (allpass sum)
+order = 4
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
+# Flat recombination: sum for order/2 even, difference for order/2 odd
+recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -38129,8 +38495,12 @@ roll-off at the cost of passband ripple; Chebyshev II keeps the passband
 flat and puts the ripple in the stopband instead; Elliptic offers maximum
 selectivity, with ripple in both bands; and Bessel preserves transient
 waveform shapes thanks to its linear phase response, but has the slowest
-roll-off. Linkwitz-Riley is for audio crossovers: its bands sum to a
-perfectly flat response.
+roll-off. Note that Chebyshev I and Elliptic take the band edges as their
+*ripple* edge rather than their −3 dB point, so their band levels sit a few
+tenths of a decibel above the other three and must not be mixed with them in
+one spectrum. Linkwitz-Riley is for audio crossovers: its two branches
+recombine flat by `low + high` when `order/2` is even and by `low - high`
+when it is odd.
 
 ## See also
 
@@ -38363,9 +38733,15 @@ spl, freq = filters.octave_filter(stereo, fs, fraction=3)
 | `(ch, n)` into `spectrogram` | multichannel STFT-style | `(ch, bands, frames)` |
 
 Everything vectorizes across the leading channel axis: one filter design is
-applied to all channels in a single SciPy call, so 8 channels cost far less
-than 8 separate runs. Convention: **channels first**, like most DSP code
-(`soundfile` returns `(n, ch)`: transpose with `x.T`).
+applied to all channels in a single SciPy call. What batching does *not* buy
+is arithmetic: the filtering cost scales linearly with the channel count,
+because each channel has to be filtered by each band, so eight channels cost
+eight channels however the call is written. What it removes is per-call
+Python overhead and the temptation to redesign the bank — and it is the
+redesign that actually costs, about 33 ms for a fresh one-third-octave bank,
+an order of magnitude more than one band-filtering pass over a short frame.
+Convention: **channels first**, like most DSP code (`soundfile` returns
+`(n, ch)`: transpose with `x.T`).
 
 ## Per-channel semantics
 
@@ -39286,9 +39662,14 @@ G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
 applicable, multichannel and stateful block processing), and B, D and AU also
-take the `high_accuracy` oversampling; G ignores that flag, because its
-0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
-A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
+take the `high_accuracy` oversampling. G ignores that flag, but not because
+oversampling is unnecessary: **the G design always oversamples internally**,
+toward 48 kHz, so its 0.25 Hz to 315 Hz range stays within about 0.05 dB
+whatever the input rate. That matters exactly where G is used — infrasound is
+often recorded at 1 kHz or 2 kHz, where 315 Hz sits close to Nyquist and the
+bilinear warping grows quadratically; at audio rates the correction is
+negligible. As with A/C/Z, `high_accuracy` cannot be combined with stateful
+processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
 Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
@@ -39346,8 +39727,11 @@ plt.show()
 The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C. Levels measured with the G curve are reported as
-$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+processing as A/C — but stateful mode cannot carry the internal oversampling
+across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
+verify the response before trusting the level. Levels measured with the G
+curve are reported as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over
+time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
 
@@ -39559,7 +39943,7 @@ reaches the readout, the squared, frequency-weighted pressure passes
 through an exponential detector whose time constant sets how quickly the
 level follows the signal. This page is that detector, implemented as a
 sample-exact recursive filter: the Fast and Slow characteristics of
-IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+IEC 61672-1:2013 (clause 5.8), the legacy asymmetric Impulse ballistics,
 streaming state for block processing, and the toneburst verification
 against the standard's Table 4.
 
@@ -39664,6 +40048,11 @@ y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
 \alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
 $$
 
+The asymmetry has a consequence worth stating: unlike F and S, Impulse is not a
+filter. Its coefficient depends on the signal, so an I-weighted level is not
+additive — the I-weighted level of two sources running together cannot be
+derived from the two measured separately, while their $L_{eq}$ values can.
+
 ### Choosing F, S or I
 
 - **Fast** is the default of nearly every modern method: percentile levels,
@@ -39672,7 +40061,7 @@ $$
   integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
-  the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
+  the price of missing short events (a 100 ms burst peaks 7.6 dB lower
   on S than on F). Some legacy methods prescribe it outright, most famously
   aircraft-certification levels, which are built from Slow-weighted samples.
 - **Impulse** is legacy, and deprecated for rating. It was a 1960s attempt
@@ -39743,10 +40132,22 @@ plt.show()
 
 ## 5. Initial state
 
-By default, the exponential integrator starts from rest (`y[-1] = 0`). Passing
-`initial_state=None` leaves this default unspecified, while `initial_state='zero'`
-requests the same zero state explicitly. If the recorded segment begins after a
-steady signal is already present, you can start from the first sample energy instead:
+By default, the exponential integrator starts from rest (`y[-1] = 0`);
+`initial_state=None` and `initial_state='zero'` are the same thing. Passing
+`'first'` seeds the integrator with the square of the very first sample,
+$x[0]^2$ — an unbiased but extremely noisy estimate of the mean square (one
+degree of freedom), and for a tone it depends entirely on the phase at the
+cut: a sine starting at a zero crossing makes `'first'` bit-identical to
+`'zero'`. A float resumes a state you saved yourself (which is what block
+processing does in section 6), and an array broadcastable to the input shape
+without the time axis does the same per channel.
+
+If the recorded segment is a continuation of a signal already running, seed
+the integrator with something robust — the mean square of the first half
+second is a far better estimate than a single sample. If the record is the
+*start* of the event, do not seed at all: let it start from rest and discard
+the first $5\tau$ (0.6 s Fast, 5 s Slow), which is exactly what `ln_levels`
+does internally before computing percentiles.
 
 ```python
 import numpy as np
@@ -39756,7 +40157,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+# Robust seed: the mean square of the first half second, not one sample.
+energy_envelope = filters.time_weighting(
+    recording, fs, mode='fast',
+    initial_state=float(np.mean(recording[:fs // 2] ** 2)))
 ```
 
 ## 6. Block processing
@@ -39844,7 +40248,7 @@ built on these envelopes, and [Why phonometry](https://jmrplens.github.io/phonom
 
 IEC 61672-1:2013, *Electroacoustics — Sound level meters —
 Part 1: Specifications*: the exponential time-weighting detector (clause 3.8)
-with the F and S time constants (clause 5.7), and the 4 kHz toneburst reference
+with the F and S design-goal time constants (clause 5.8.1), and the 4 kHz toneburst reference
 responses of Table 4 (class 1 acceptance limits) used to verify the ballistics
 in CI.
 
@@ -39903,7 +40307,13 @@ plt.show()
 
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
-* **Z-Weighting (`Z`):** Zero weighting, completely flat response.
+* **Z-Weighting (`Z`):** flat by specification, not by omission.
+  IEC 61672-1 defines Z as a nominally flat response from 10 Hz to
+  20 kHz with the same Table 3 tolerances as A and C, which is why
+  `verify_weighting_class` can grade it at all. The library implements it
+  as a bypass, so the *effective* bandwidth of a Z-weighted level is
+  whatever your capture chain delivered: remove DC (`detrend`) and
+  high-pass the wind noise yourself if the recording extends below 10 Hz.
 
 The `curve` argument also accepts the four special weightings, charted and
 documented in [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/): `'G'` for
@@ -39926,8 +40336,9 @@ $$
 
 C is a band-pass with double poles at $f_1$ and $f_4$ (2 zeros at the origin);
 A adds the $f_2$ and $f_3$ poles (4 zeros), which is why it keeps falling
-through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z is the
-absence of weighting. The full pole/zero derivation is in the
+through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z applies
+no shaping inside the specified band; its design goal is 0 dB everywhere from
+10 Hz to 20 kHz. The full pole/zero derivation is in the
 [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) page.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Equal-loudness contours per ISO 226 on the left, with the 40-phon contour highlighted; on the right the A-weighting curve overlaid on the inverted 40-phon contour, showing that A is the flipped contour frozen into a realizable filter" width="92%"></picture>
@@ -40092,8 +40503,9 @@ plt.show()
 </details>
 
 - `high_accuracy=False` restores the legacy plain-bilinear behavior.
-- For `'G'` the flag is silently ignored: its 0.25–315 Hz range is already
-  exact with the plain design.
+- For `'G'` the flag is silently ignored: the G design always oversamples
+  internally toward 48 kHz on its own, so its 0.25–315 Hz range stays accurate
+  whatever the input rate (see [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/)).
 - **Stateful (block) processing** always uses the legacy design: the internal
   FIR resampling is incompatible with block continuity. Passing
   `high_accuracy=True` together with `stateful=True` raises a `ValueError`.
@@ -40339,6 +40751,12 @@ calibrator as specified by **IEC 60942** (classes LS, 1 and 2):
 - IEC 60942 specifies the generated level as a 20 s average: record a few
   seconds of *stable* tone (excluding handling noise at the start/end) for the
   RMS estimate to converge.
+
+The conformance tests of the calibrator itself — generated level, frequency,
+distortion, and the environmental corrections for static pressure and
+temperature — are not implemented: when the calibrator's manual asks for a
+pressure or temperature correction, apply it yourself and pass the corrected
+value as `target_spl`.
 
 ### Automatic stability validation
 
@@ -41110,7 +41528,8 @@ The inputs are sampled independently; the Supplement's multivariate-Gaussian
 path for non-independent quantities (6.4.8) is not implemented, so correlated
 budgets belong to `combine_uncertainty`. The number of trials is fixed (no
 adaptive 7.9 procedure, at least 2 trials) and the interval is the symmetric
-one, not the 5.3.4 shortest interval.
+one, not the 5.3.4 shortest interval. Supplement 2 — models with multiple
+output quantities — is not implemented at all.
 
 ```python
 from phonometry import metrology
@@ -41151,7 +41570,8 @@ the true coverage interval is asymmetric and no $Y \pm U$ statement can
 represent it. In those regimes the Monte Carlo interval is the reference:
 Supplement 1 (clause 8) treats the GUM framework as validated precisely when
 it agrees with the Monte Carlo result, and as superseded by it when it does
-not.
+not. That clause 8 validation is a comparison you make by reading the two
+results side by side; the library does not automate the verdict.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left, the GUM uncertainty budget: a horizontal bar chart of the contribution of each input to the combined uncertainty (Reading contributes nothing, Calibration and Instrument the rectangular corrections, and the Position Type A term the most), with a dashed line marking the combined uncertainty uc of 0.407 dB. Right, the Monte Carlo output distribution as a histogram, overlaid with the GUM Gaussian of the same mean and standard deviation, and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%"></picture>
 
@@ -45151,6 +45571,19 @@ same run apart against the plateau method and the mass law.
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
+## What this solver does not do
+
+Everything the 2D acoustic solver cannot do, this one cannot either: the
+domain is a cross-section, so a source is a line source with cylindrical
+$1/\sqrt{r}$ spreading rather than the $1/r$ of a 3D point source, and
+absolute levels and decay rates are not those of a 3D problem. The solid is
+isotropic and purely elastic: no anisotropy, and no viscoelastic damping
+beyond the bulk `damping` decay rate, so material loss factors are not
+modelled. There is no elastic perfectly matched layer — the sponge absorbs
+grazing Rayleigh waves less effectively than body waves. And guided-wave
+dispersion beyond the thin-plate Kirchhoff regime (full Lamb modes) is
+observable in the fields but has no dedicated closed-form oracle here.
+
 ## Quick answers
 
 ### When do I need the elastic solver instead of the acoustic one?
@@ -45411,6 +45844,14 @@ carry its own boundary condition:
   edge cell): the locally reacting boundary of Eqs. 4.33-4.35, updated
   implicitly, with the normal-incidence reflection coefficient
   $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ is anechoic.
+
+Two limits of that machinery are worth naming. Interior geometry is rigid by
+construction: only the four domain sides accept an impedance or a sponge, so
+an interior surface can be softened only by backing it with a lossy `damping`
+region — and that region is a frequency-independent equivalent fluid rather
+than a porous model. And the governing equations assume a non-moving medium:
+wind or flow advection is not modelled, and the only impedance boundary is
+the frequency-independent real one of Eqs. 4.33-4.35.
 
 The stepping engine `FDTD2D` is public too: it exposes `step()`, `run()`,
 the field arrays and the energy, for callers that need frame-by-frame access
@@ -47042,6 +47483,10 @@ non-impulsive injury level is always TTS + 20 dB, the published weighted TTS
 onset is always the rounded $K + C$, and in Southall's impulsive table the SEL
 criteria run TTS + 15 dB and the peak criteria TTS + 6 dB.
 
+Only the auditory-effect criteria are implemented: the behavioural-disturbance
+thresholds (the step-function and dose-response criteria used for harassment
+take estimates) are out of scope.
+
 ## 5. A worked pile-driving assessment
 
 Percussive pile driving is the canonical impulsive case. The chain runs from
@@ -47082,6 +47527,14 @@ the very high-frequency one, so the same campaign weights tens of decibels
 lower for a porpoise than for a baleen whale, which is the whole point of
 weighting, and the reason a single unweighted cumulative SEL is not an
 assessment.
+
+Three things the chain leaves to you. The library does not choose a hearing
+group or an accumulation period: both are assessment decisions, made per
+species and per activity. It does not model the animal's movement relative to
+the source, so the cumulative SEL it reports is the stationary-receiver worst
+case. And it does not check that the supplied spectrum spans the group's
+passband: a record that stops short of $f_2$ is weighted as given and
+under-reports the exposure.
 
 The natural companion is the sonar-equation chapter of
 [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/): the same figure of
@@ -47264,6 +47717,10 @@ reported separately, because a real ship does not radiate symmetrically
 period and the ISO 3744-style correction applied per band; the recommended
 wind limit is 20 kn for ships above 100 m (Clause 5.3). Skip any of this and
 the number you quote is a level, but not an ISO 17208 radiated noise level.
+None of that discipline is implemented in code: the library supplies the
+closed-form `radiated_noise_level` and `monopole_source_level`, and the runs,
+the Formulae 8-9 averaging, the geometry checks, the ±30° window scoring and
+the per-band application of the background correction are the reader's.
 
 All of that discipline fits in one picture: the transit geometry in section
 and the data window in plan.
@@ -47329,6 +47786,13 @@ in exactly the quantities of this section, a cap on the single-strike or
 cumulative SEL and on the peak level at a stated range, which is why
 `pile_strike_metrics` reports them together and `cumulative_sel` follows the
 strike-by-strike energy sum of Formulae 8–9.
+
+The survey discipline itself — deployment, instrumentation, calibration and
+reporting — is described here and enforced nowhere in code: nothing checks
+that a strike handed to `pile_strike_metrics` came from a record that meets
+it. And because vibro- and sheet-piling sit outside the ISO 18406 scope,
+continuous pile-driving noise has no closed form here or anywhere else in
+phonometry.
 
 ## See also
 
@@ -48143,7 +48607,11 @@ field.plot()  # TL field over range x depth (needs matplotlib)
 `transmission_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` per
 ray); `parabolic_equation` a `ParabolicEquationResult` (the `transmission_loss`
 field). All assume a range-independent water column with a pressure-release
-surface.
+surface, and the bottom is pressure-release too (or, for the modes, optionally
+rigid): there is no absorbing or elastic bottom, no sediment attenuation and
+no real bathymetry, so range-dependent problems are out of scope. For the
+elastic seabed physics these fluid solvers leave out, see
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
 ## 2. Normal modes: the waveguide as a sum of standing waves
 
@@ -48459,7 +48927,9 @@ The weightings themselves are defined once, in **ISO 8041-1:2017**, as a cascade
 of analog filters; **ISO 2631-1** applies them to whole-body vibration,
 **ISO 2631-2** to vibration in buildings, **ISO 2631-4** to rail ride comfort,
 and **ISO 5349-1/-2** to hand-transmitted vibration. This page covers the whole
-chain.
+chain. Only the weighting definitions are taken from ISO 8041-1: its own
+subject, the design and type-testing of general purpose vibration meters, is
+not implemented.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Whole-body vibration measurement chain: a triaxial accelerometer at the seat/body interface of a seated person measures the x, y and z acceleration; each axis is band-limited and frequency-weighted (Wk vertical, Wd horizontal) per ISO 8041-1, reduced to a weighted r.m.s. a_w and VDV per ISO 2631-1, and the highest frequency-weighted axis value max(1.4 a_wx, 1.4 a_wy, a_wz) is normalised to the daily exposure A(8) and assessed against the EAV and ELV of Directive 2002/44/EC" width="94%"></picture>
 
@@ -48992,6 +49462,9 @@ The input record must be **conditioned (DC-removed)**: because $H$ is unity at
 0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
 accelerometer) passes straight into $A_z(t)$ and corrupts the positive
 response peaks of the dose. Subtract the mean (or high-pass) before processing.
+The rest of the conditioning chain is the caller's too: `spinal_response`
+assumes a record that has already been sign-checked, split at the
+loss-of-contact boundaries, offset-corrected, tapered and band-limited.
 
 ```python
 from phonometry import vibration
@@ -50424,7 +50897,8 @@ elsewhere for the transfer FRFs. ISO 7626-5 covers the alternative of impact
 excitation with an exciter that is not attached to the structure, in
 practice usually an instrumented hammer: it trades the attached exciter's
 controlled spectrum for speed, with an excitation spectrum set by the
-impactor mass and tip stiffness.
+impactor mass and tip stiffness. It is named here for context only: no
+function synthesizes or processes an impact-excitation spectrum.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig.svg" alt="ISO 7626 mobility measurement: a free-free beam on soft suspension driven by an exciter through an impedance head at the driving point, an accelerometer at a transfer point, and an impact hammer as the alternative excitation" width="92%"></picture>
 
@@ -50813,7 +51287,9 @@ own resonances intrude (typically a few hundred hertz for large elements); the
 indirect method only becomes valid well above the blocking-mass/spring
 resonance, where the transmissibility is small, and extends the
 characterisation into the kilohertz range. A full isolator dataset is
-usually the two spliced together.
+usually the two spliced together. Hydraulic mounts are outside the
+single-spectrum description altogether: their stiffness is
+amplitude-dependent by design, so one $L_k(f)$ does not characterise them.
 
 ## 3. Validity of the indirect method
 
@@ -50833,6 +51309,10 @@ frequency range on both sides:
   $10\log_{10}(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
 * **Linearity (clause 7.6).** Two input spectra 10 dB apart must give
   transfer-stiffness levels within 1.5 dB.
+
+Of the three, only Inequality 2 is computed: the rigid-blocking-mass check of
+Inequality 3 and the clause 7.6 linearity criterion are described here and
+left to the operator.
 
 The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
 for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
@@ -50953,7 +51433,8 @@ validity
 conditions (Part 3, clause 6: Inequalities 2 and 3; clause 7.6 linearity) and
 the blocking-force approximation (Part 1, Eqs. 6/7). Parts 4 and 5 extend the
 same quantities to elements other than supports and to the driving-point
-low-frequency method. Conformance is anchored on the standard's closed-form
+low-frequency method; neither part is implemented here. Conformance is
+anchored on the standard's closed-form
 definitions: the level of a decade of stiffness, the indirect inertia relation,
 the Table-A.2 identity $k = j\omega Z$, the
 $|T| = 0.1 \leftrightarrow \Delta L_{1,2} = 20\ \text{dB}$ validity

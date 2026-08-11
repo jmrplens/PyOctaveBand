@@ -17,6 +17,12 @@ sensitivity conventions and the baffled-piston radiation model, and
 [Microphone Characterisation (IEC 60268-4)](microphones.md), with the
 directional patterns and the inherent-noise weightings.
 
+One thing this page never does is police the bench. The functions take a
+captured array and compute the ratio the clause defines, so the rated and
+standard measuring conditions the ratios are defined at (IEC 60268-3 clauses
+3.1.2/3.1.3, with the 1 h pre-conditioning of clause 9), the operating point
+and the 14.12.3.2/14.12.4.1 acceptance checks are the reader's to keep.
+
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
 A non-linear device fed a pure sine at $f_1$ returns the fundamental plus
@@ -336,12 +342,16 @@ THD+N ratio via the standard notch filter and the standard measurement
 bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
 nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
 Measurement Procedures* (4th ed., Wiley): the $H_1$ and $H_2$ frequency-response
-estimators and the ordinary coherence $\gamma^2$. The rated-characteristics
+estimators and the ordinary coherence $\gamma^2$. The implemented edition is
+frozen at AES17-2015; the superseding AES17-2020 revision is not the one
+checked. The rated-characteristics
 standards of the transducer guides, IEC 60268-5:2003+A1:2007
 (loudspeakers), IEC 60268-4:2014 (microphones) and IEC 60263:1982 (scales
 for the characteristic graphs), are covered in
 [Loudspeaker Characterisation](loudspeakers.md) and
-[Microphone Characterisation](microphones.md). All
+[Microphone Characterisation](microphones.md); the Part 16 speech
+transmission index is a perception quantity with its own guide,
+[Speech Transmission Index](../../perception/speech/speech-transmission.md). All
 quantities are verified against exact analytic oracles (synthetic signals with
 known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
 full DIM test-signal synthesis, and a known LTI path).

@@ -158,6 +158,15 @@ fields and marks `rd` / `rp`.
 STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](../../perception/speech/speech-transmission.md).
 
+Two things stay outside the function. The fourth required single number, the
+average A-weighted background noise $L_{p,A,B}$, is not computed here — it is
+the energetic A-weighted average of the per-position octave-band background
+levels, and it belongs in the report alongside the quantities this page
+produces. And nothing checks the measurement conditions of clauses 5.1 and
+5.2: the function consumes distances, levels and STI values wherever they
+came from, so the source directivity, the furnished-and-unoccupied state and
+the background capture are the operator's responsibility, not the library's.
+
 ## ISO 3382-3 report (`.report()`)
 
 `OpenPlanResult.report(path)` renders a one-page PDF fiche laid out like an

@@ -10,9 +10,9 @@ conditions. Placing that source at a receiver adds the propagation adjustment
 $\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
 
 This page covers the source and propagation primitives, the flight-condition
-interpolation across a hemisphere database, the flight-path kinematics, and the
-single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours;
-terrain shielding follows in later work.
+interpolation across a hemisphere database, the flight-path kinematics, the
+single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours, and
+the terrain mean-ground-plane and screening machinery.
 
 The EPNL this page computes is the same quantity certification asks for: ICAO
 Annex 16 Chapter 8 flies the helicopter level at 150 m over a centre
@@ -21,6 +21,12 @@ microphone, with two more 150 m to each side.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification.svg" alt="Helicopter overflight noise certification of ICAO Annex 16 Chapter 8: a side view of a helicopter in level flight at 150 m, 492 ft, directly above a centre microphone on the ground, with the reference speed rule of 0.9 VH, and a plan-view inset where the flight track crosses a line of three microphones, one on the track and two 150 m to each side; notes state at least six overflights split equally between headwind and tailwind, EPNL in EPNdB at the three points, microphones 1.2 m above ground and the 45 degree elevation with about 212 m slant range to the sideline pair at the overhead moment" width="92%"></picture>
 
 ## 1. The noise hemisphere
+
+The library implements the method, not the data: **no hemisphere database
+ships with phonometry, and there is no NORAH file reader**, so the arrays
+below are assembled by the reader — from a flight-test campaign that
+de-propagates each emission direction back to the 60 m reference sphere, or
+from the NORAH2 reference database, which covers eleven rotorcraft types.
 
 A `RotorcraftHemisphere` holds the band levels on the azimuth/polar grid (with
 missing bins marked `NaN`). `hemisphere_source_level` reads the source level at an
@@ -109,7 +115,9 @@ The standard database is recorded at 60 m, the default. If a hemisphere uses a
 different polar distance (`h.distance`, e.g. 70 m hover rings), pass it to both
 distance-dependent adjustments:
 `spherical_spreading_adjustment(r, reference_distance=h.distance)` and
-`atmospheric_adjustment(freqs, r, reference_distance=h.distance)`.
+`atmospheric_adjustment(freqs, r, reference_distance=h.distance)`. The three
+adjustments assume straight rays: refraction by atmospheric gradients is
+outside Doc 32 itself and is not modelled.
 
 ## 3. Flight conditions: interpolating between hemispheres
 

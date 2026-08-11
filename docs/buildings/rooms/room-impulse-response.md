@@ -251,6 +251,15 @@ mistakes bias the mean itself:
   of the 63-125 Hz bands across positions is structurally larger; the cure
   is more positions, not a longer excitation.
 
+Three practical limits close the chain. Playback and recording themselves —
+sound-card I/O, level calibration of the chain — are outside the library,
+which starts at the recorded array. ISO 18233's time-variance and distortion
+diagnostics are not implemented either: the sweep separates distortion, but
+no helper here quantifies it (that reading lives in the
+[swept-sine distortion guide](../../devices/electroacoustics/swept-sine-distortion.md)).
+And the position rules above are guidance prose: nothing checks how many
+positions were measured or where.
+
 ## From the impulse response onward
 
 The IR leaves this page in several directions. Band-filtered and

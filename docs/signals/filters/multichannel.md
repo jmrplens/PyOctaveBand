@@ -99,9 +99,15 @@ spl, freq = filters.octave_filter(stereo, fs, fraction=3)
 | `(ch, n)` into `spectrogram` | multichannel STFT-style | `(ch, bands, frames)` |
 
 Everything vectorizes across the leading channel axis: one filter design is
-applied to all channels in a single SciPy call, so 8 channels cost far less
-than 8 separate runs. Convention: **channels first**, like most DSP code
-(`soundfile` returns `(n, ch)`: transpose with `x.T`).
+applied to all channels in a single SciPy call. What batching does *not* buy
+is arithmetic: the filtering cost scales linearly with the channel count,
+because each channel has to be filtered by each band, so eight channels cost
+eight channels however the call is written. What it removes is per-call
+Python overhead and the temptation to redesign the bank — and it is the
+redesign that actually costs, about 33 ms for a fresh one-third-octave bank,
+an order of magnitude more than one band-filtering pass over a short frame.
+Convention: **channels first**, like most DSP code (`soundfile` returns
+`(n, ch)`: transpose with `x.T`).
 
 ## Per-channel semantics
 

@@ -82,7 +82,13 @@ $L_{WA,10m}$ at integer 10 m wind speeds regardless of the site's actual
 terrain. The library implements the closed-form quantities of this pipeline
 (slant distance, per-band apparent power, tonal audibility); the binning,
 averaging and uncertainty machinery operates on whole measurement campaigns
-and stays out of scope.
+and stays out of scope. So does the IEC TS 61400-14 declaration route, which
+turns a batch of measured machines into the declared value a planning authority
+receives. And two things a wind-turbine reader often arrives looking for sit
+outside IEC 61400-11 altogether: **amplitude modulation** (the swish, folded
+into $L_{WA}$ and rated nowhere in this standard) and **infrasound** — optional
+measurements under 7.2.1 with no rating method attached, so their assessment
+falls to national guidance.
 
 ## 2. Tonal audibility
 
@@ -108,6 +114,13 @@ $$
 
 reported when $\Delta L_a \ge -3\ \text{dB}$; a tone is audible when
 $\Delta L_a > 0$.
+
+For a candidate between 20 and 70 Hz the Zwicker band above is not what the
+standard uses: subclause 9.5.3 substitutes the fixed absolute 20–120 Hz band,
+so `critical_bandwidth` comes back as 100 Hz for every such candidate and the
+band is *not centred on the tone* — a low-frequency result cannot be reconciled
+with the CBW formula printed above. Blade-passing harmonics and low-speed
+gearbox tones live exactly there, so for a wind turbine this is no corner case.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_dark.svg">
@@ -156,8 +169,13 @@ the 9.5.1 energy averaging of $\Delta L_a$ over the spectra of a wind-speed bin
 $L_a$ criterion anchor to the highest classified tone line, not the probed
 candidate. The audibility formula is the ISO 1996-2 Annex C one; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
-and the Zwicker critical band from the spectrum. For a rating adjustment
-$K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+and the Zwicker critical band from the spectrum. IEC 61400-11 itself stops at
+$\Delta L_a$ and prescribes no rating adjustment. The 9.5.1 energy average over
+the spectra of a wind-speed bin is a *mean* audibility, the quantity
+ISO 1996-2:2017 Table J.1 was written for
+(`tonal_adjustment_from_mean_audibility`, integer 0–6 dB); the piecewise
+(C.4)–(C.6) law of `tonal_adjustment` applies to a single spectrum's
+$\Delta L_{ta}$, and the two differ by 1 to 2 dB on the same input.
 
 ### Assessment report (`.report()`)
 
@@ -227,8 +245,8 @@ the 0 dB audibility line and past a 6 dB acceptance requirement.*
   [iso.org catalogue](https://www.iso.org/standard/59766.html).
   The tonal-audibility criterion the IEC method reuses comes from the
   Annex C of its 2007 edition (the 2017 edition carries the tonal methods
-  in Annexes J and K), and its `tonal_adjustment` consumes the mean
-  audibility.
+  in Annexes J and K), and its Table J.1 mapping,
+  `tonal_adjustment_from_mean_audibility`, consumes the bin-mean audibility.
 
 ## Standards
 

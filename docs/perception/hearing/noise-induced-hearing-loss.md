@@ -220,6 +220,13 @@ and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
 alone is the subject of the [hearing-threshold](hearing-threshold.md) guide.
 
+One substitution the standard allows is not implemented: clauses 6.2.3 and
+6.2.4 let a **database B**, an age threshold measured on a national control
+population, replace database A. Only database A exists here, so `htlan`
+always draws its age component from ISO 7029:2017. For a database-B
+assessment, `combine_age_and_noise(htla, nipts_value)` runs Formula (1) on an
+externally supplied HTLA array; computing database B itself is out of scope.
+
 **Test-report fiche.** `HtlanResult.report(path)` renders the companion fiche
 for the combined threshold, following ISO 1999:2013 clause 6.1. It carries the
 same prediction-basis line and metadata header as the NIPTS fiche, but its

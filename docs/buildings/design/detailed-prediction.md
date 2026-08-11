@@ -34,7 +34,11 @@ with the radiation factor for free bending waves $\sigma$ (Formulae B.4-B.6),
 the radiation factor for forced waves $\sigma_f$ (Formula B.3) below $f_c$,
 and a third branch for the band that straddles $f_c$. Above about 1 kHz a
 thick element stops improving, and Formula (B.10) floors the transmission
-factor at a plateau set by $\rho c_L$.
+factor at a plateau set by $\rho c_L$. Only homogeneous elements are
+calculated this way: the spectrum of a lightweight, double or composite
+element enters the chain as an input, from
+[Predicting Panel Sound Insulation](panel-sound-insulation.md) or from a test
+report.
 
 **2. In-situ conversion.** The element radiates and is damped differently in
 the building than in the test frame. The total loss factor in situ is
@@ -323,6 +327,11 @@ ln_13 = flanking_impact_level_from_flanking_level(
     lnf_13, area=20.0, laboratory_area=10.0,
     coupling_length=4.0, laboratory_coupling_length=4.5)
 ```
+
+One transmission route stays outside the model altogether: airborne
+transmission through cavity walls and suspended ceilings is not carried at
+all, and clause 3.3.4 Note 1 warns that there it "can contribute to or even
+dominate" the transmission.
 
 ## Checks the standard gives you
 

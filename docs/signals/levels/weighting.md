@@ -49,7 +49,13 @@ plt.show()
 
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
-* **Z-Weighting (`Z`):** Zero weighting, completely flat response.
+* **Z-Weighting (`Z`):** flat by specification, not by omission.
+  IEC 61672-1 defines Z as a nominally flat response from 10 Hz to
+  20 kHz with the same Table 3 tolerances as A and C, which is why
+  `verify_weighting_class` can grade it at all. The library implements it
+  as a bypass, so the *effective* bandwidth of a Z-weighted level is
+  whatever your capture chain delivered: remove DC (`detrend`) and
+  high-pass the wind noise yourself if the recording extends below 10 Hz.
 
 The `curve` argument also accepts the four special weightings, charted and
 documented in [Special Weightings](special-weightings.md): `'G'` for
@@ -72,8 +78,9 @@ $$
 
 C is a band-pass with double poles at $f_1$ and $f_4$ (2 zeros at the origin);
 A adds the $f_2$ and $f_3$ poles (4 zeros), which is why it keeps falling
-through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z is the
-absence of weighting. The full pole/zero derivation is in the
+through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z applies
+no shaping inside the specified band; its design goal is 0 dB everywhere from
+10 Hz to 20 kHz. The full pole/zero derivation is in the
 [Theory](../../reference/theory/signal-analysis.md) page.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Equal-loudness contours per ISO 226 on the left, with the 40-phon contour highlighted; on the right the A-weighting curve overlaid on the inverted 40-phon contour, showing that A is the flipped contour frozen into a realizable filter" width="92%"></picture>
@@ -238,8 +245,9 @@ plt.show()
 </details>
 
 - `high_accuracy=False` restores the legacy plain-bilinear behavior.
-- For `'G'` the flag is silently ignored: its 0.25–315 Hz range is already
-  exact with the plain design.
+- For `'G'` the flag is silently ignored: the G design always oversamples
+  internally toward 48 kHz on its own, so its 0.25–315 Hz range stays accurate
+  whatever the input rate (see [Special Weightings](special-weightings.md)).
 - **Stateful (block) processing** always uses the legacy design: the internal
   FIR resampling is incompatible with block continuity. Passing
   `high_accuracy=True` together with `stateful=True` raises a `ValueError`.

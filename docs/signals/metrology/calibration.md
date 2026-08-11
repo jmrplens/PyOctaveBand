@@ -96,6 +96,12 @@ calibrator as specified by **IEC 60942** (classes LS, 1 and 2):
   seconds of *stable* tone (excluding handling noise at the start/end) for the
   RMS estimate to converge.
 
+The conformance tests of the calibrator itself — generated level, frequency,
+distortion, and the environmental corrections for static pressure and
+temperature — are not implemented: when the calibrator's manual asks for a
+pressure or temperature correction, apply it yourself and pass the corrected
+value as `target_spl`.
+
 ### Automatic stability validation
 
 When you pass the sample rate (and `validate=True`, the default),

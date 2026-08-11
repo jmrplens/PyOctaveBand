@@ -182,6 +182,13 @@ plt.show()
 
 </details>
 
+Two caveats travel with the result. ISO 1996-1 defines these descriptors over a
+long-term interval, normally a whole year, so one measured day yields a sample
+of $L_{den}$ rather than the indicator itself. And $L_{den}$ is exposure, not
+response: the informative ISO 1996-1 annexes that estimate the percentage of a
+population highly annoyed from an adjusted $L_{den}$ or $L_{dn}$ have no
+counterpart in the library.
+
 ### `lden()` / `ldn()` / `composite_rating_level()` parameters
 
 | Function | Key parameters | Notes |
@@ -190,7 +197,7 @@ plt.show()
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
 | `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
 
-Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context; apply the corrections to your levels before analysis:
+Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context, not something the library computes — those position and correction procedures are not implemented, so apply the corrections to your levels yourself before any function on this page consumes them:
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 

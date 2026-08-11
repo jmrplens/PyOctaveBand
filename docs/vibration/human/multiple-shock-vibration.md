@@ -41,6 +41,9 @@ The input record must be **conditioned (DC-removed)**: because $H$ is unity at
 0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
 accelerometer) passes straight into $A_z(t)$ and corrupts the positive
 response peaks of the dose. Subtract the mean (or high-pass) before processing.
+The rest of the conditioning chain is the caller's too: `spinal_response`
+assumes a record that has already been sign-checked, split at the
+loss-of-contact boundaries, offset-corrected, tapered and band-limited.
 
 ```python
 from phonometry import vibration

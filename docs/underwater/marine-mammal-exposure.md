@@ -189,6 +189,10 @@ non-impulsive injury level is always TTS + 20 dB, the published weighted TTS
 onset is always the rounded $K + C$, and in Southall's impulsive table the SEL
 criteria run TTS + 15 dB and the peak criteria TTS + 6 dB.
 
+Only the auditory-effect criteria are implemented: the behavioural-disturbance
+thresholds (the step-function and dose-response criteria used for harassment
+take estimates) are out of scope.
+
 ## 5. A worked pile-driving assessment
 
 Percussive pile driving is the canonical impulsive case. The chain runs from
@@ -229,6 +233,14 @@ the very high-frequency one, so the same campaign weights tens of decibels
 lower for a porpoise than for a baleen whale, which is the whole point of
 weighting, and the reason a single unweighted cumulative SEL is not an
 assessment.
+
+Three things the chain leaves to you. The library does not choose a hearing
+group or an accumulation period: both are assessment decisions, made per
+species and per activity. It does not model the animal's movement relative to
+the source, so the cumulative SEL it reports is the stationary-receiver worst
+case. And it does not check that the supplied spectrum spans the group's
+passband: a record that stops short of $f_2$ is weighted as given and
+under-reports the exposure.
 
 The natural companion is the sonar-equation chapter of
 [Underwater sound propagation](underwater-propagation.md): the same figure of

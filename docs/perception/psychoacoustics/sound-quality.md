@@ -238,6 +238,12 @@ $R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bands), `bark`,
 `centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
 `specific_roughness_vs_time` ((n_times, 53) array), `field`.
 
+All three ECMA-418-2 entry points on this page are monaural — the binaural
+quadratic-mean combinations of Formula 112 (clause 7.1.11) and Formula 170
+(clause 9.1.15) are not implemented — so analyse each ear channel separately.
+The optional entropy weighting of clause 7.1.6, which needs an external
+rotational-speed signal, is also left out.
+
 ## Fluctuation strength (ECMA-418-2): new capability
 
 Fluctuation strength is the slow, wobbling sensation of amplitude or
@@ -254,8 +260,8 @@ with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
 by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
-**without** reverse-fitting to the target (the 8 s example below prints
-0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
+**without** reverse-fitting to the target and without the ±0.25 % adjustment
+that footnote 47 permits (the 8 s example below prints 0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).
 
 ```python

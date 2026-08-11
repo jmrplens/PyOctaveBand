@@ -151,7 +151,9 @@ own resonances intrude (typically a few hundred hertz for large elements); the
 indirect method only becomes valid well above the blocking-mass/spring
 resonance, where the transmissibility is small, and extends the
 characterisation into the kilohertz range. A full isolator dataset is
-usually the two spliced together.
+usually the two spliced together. Hydraulic mounts are outside the
+single-spectrum description altogether: their stiffness is
+amplitude-dependent by design, so one $L_k(f)$ does not characterise them.
 
 ## 3. Validity of the indirect method
 
@@ -171,6 +173,10 @@ frequency range on both sides:
   $10\log_{10}(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
 * **Linearity (clause 7.6).** Two input spectra 10 dB apart must give
   transfer-stiffness levels within 1.5 dB.
+
+Of the three, only Inequality 2 is computed: the rigid-blocking-mass check of
+Inequality 3 and the clause 7.6 linearity criterion are described here and
+left to the operator.
 
 The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
 for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
@@ -291,7 +297,8 @@ validity
 conditions (Part 3, clause 6: Inequalities 2 and 3; clause 7.6 linearity) and
 the blocking-force approximation (Part 1, Eqs. 6/7). Parts 4 and 5 extend the
 same quantities to elements other than supports and to the driving-point
-low-frequency method. Conformance is anchored on the standard's closed-form
+low-frequency method; neither part is implemented here. Conformance is
+anchored on the standard's closed-form
 definitions: the level of a decade of stiffness, the indirect inertia relation,
 the Table-A.2 identity $k = j\omega Z$, the
 $|T| = 0.1 \leftrightarrow \Delta L_{1,2} = 20\ \text{dB}$ validity

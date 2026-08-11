@@ -217,10 +217,12 @@ plt.show()
 </details>
 
 Validity per clause 4.1: 20-90 phon (80 phon above 4 kHz); the implementation
-is verified against the Annex B tables in CI. Note this is the loudness of
-*pure tones*; the loudness of arbitrary signals in sones is what the ISO 532
-models compute, the Zwicker method above and the newer families of
-[Advanced loudness](advanced-loudness.md).
+is verified against the Annex B tables in CI. The standard defines no
+interpolation between the 29 tabulated frequencies, so `loudness_level()`
+expects one of the Table 1 frequencies and rejects anything else. Note this
+is the loudness of *pure tones*; the loudness of arbitrary signals in sones
+is what the ISO 532 models compute, the Zwicker method above and the newer
+families of [Advanced loudness](advanced-loudness.md).
 
 Zwicker is the reference model, not the only one. The **Moore-Glasberg**
 loudness of ISO 532-2, its time-varying ISO 532-3 extension and the

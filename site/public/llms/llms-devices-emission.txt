@@ -1099,7 +1099,12 @@ positions. When the room volume, its reverberation time or the microphone
 count fail an ISO 3741 qualification criterion (Table 1 minimum volume, the
 $V/S$ reverberation floor, fewer than 6 positions, or an inter-position
 spread above 1.5 dB), an advisory `SoundPowerWarning` is emitted and the
-result still returns.
+result still returns. Those coarse advisory criteria are the only checks
+made: the reverberation-room qualification itself (Annex C/D,
+eigenfrequency counting or a reference-source comparison) is assumed, not
+performed. The sound energy level $L_J$ of clause 9.2, the single-event
+counterpart of $L_W$ defined in the same clauses, is not implemented
+either, so an impulsive or single-event source falls outside this guide.
 
 ### `sound_power_reverberation()` parameters
 
@@ -1182,6 +1187,16 @@ res.report(
 )   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
 ```
 
+One caveat on that example: it runs Eq. 20 on **octave** bands for
+compactness, and that is not a conforming ISO 3741 determination. Both
+methods are defined on one-third-octave bands, and octave-band results are
+formed afterwards by summing the one-third-octave band powers per Annex F
+(Eq. F.1) — a summation not implemented here, so it has to be done by hand —
+not by feeding octave levels into Eq. 20, whose Waterhouse and absorption
+terms would then be evaluated at the octave mid-frequency instead of at each
+third. Section 1's example, 100 Hz to 10 kHz in thirds, is the conforming
+shape.
+
 The example fiche, regenerated with `make reports`, is kept rendered in the
 repository. Click the preview to open the PDF:
 
@@ -1249,9 +1264,11 @@ extraneous noise that would defeat any pressure method. This guide covers
 the two of them: the ISO 9614-2 engineering/survey determination with its
 field indicators and per-band achieved grade, the ISO 9614-3 precision
 (grade 1) scan with its tighter criteria, and the accredited-style test
-fiche. The probe itself, its finite-difference bias and the ISO 9614-1
-discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/); which
-route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
+fiche. ISO 9614-1, the discrete fixed-point method, is not one of the routes
+here: its power determination is not implemented at all, and only its field
+indicators are reused. The probe itself, its finite-difference bias and
+those ISO 9614-1 indicators live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
+which route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
 ## 1. Intensity scanning (ISO 9614-2)
 
@@ -1767,6 +1784,17 @@ Those positions are not free: the standard divides the radiating surface $S$
 into $N$ equal cells and puts one accelerometer at the centre of each. The
 area table gives the initial $N$; a strongly non-uniform vibration field can
 call for more positions or a redistribution.
+
+What is implemented is the calculation, not the laboratory practice: the
+measurement clauses of both parts (instrumentation, source installation,
+environmental conditions — clauses 5 to 7), their measurement-uncertainty
+clauses and the informative annexes are not code, so the position counts and
+the Table 2 ladder are rules the reader keeps, not checks the functions run.
+Part 2's clause 8 also defines the radiation factor of a machine batch or
+family, averaging $\varepsilon_j$ over several machines with its standard
+deviation (Formulae 9 and 10); only the single-machine Formula 8 is
+implemented, so pass an already-averaged $\varepsilon$ for a family
+determination.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
 

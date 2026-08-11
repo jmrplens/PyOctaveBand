@@ -147,7 +147,11 @@ load plate whose total mass per unit area, plate plus added load, is
 preload of a typical floating floor, about 2 kPa. A vertical exciter drives
 the plate, an accelerometer picks up its response, and the fundamental
 vertical resonance $f_r$ of the plate-on-specimen system is read from the
-response peak; Formula 4 turns it into $s'_t$.
+response peak; Formula 4 turns it into $s'_t$. That extraction is the
+laboratory's: the Clause 7 procedures for reading $f_r$ from the raw
+excitation-response signal — sinusoidal, white-noise or pulse excitation,
+with the extrapolation to zero force amplitude — are not implemented, and
+`apparent_dynamic_stiffness` expects the already-extrapolated $f_r$.
 
 ```python
 from phonometry import materials
@@ -237,7 +241,10 @@ $f_0$ of Formula 2) beside the $f_0(s')$ design curve, and a boxed apparent
 dynamic stiffness $s'_t$ (no pass/fail). Clause 9 rounds every stiffness to the
 nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
 embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
-(`pip install "phonometry[report,plot]"`).
+(`pip install "phonometry[report,plot]"`). Clause 6's specimen selection — at
+least three 200 mm × 200 mm specimens — is not enforced, and neither is the
+Clause 9 report content: the fiche carries the excitation arrangement and the
+signal type only when the metadata supplies them.
 
 ```python
 from phonometry import ReportMetadata, materials
@@ -297,7 +304,8 @@ heavy slab) is the design goal.
   the floating-floor term this measurement feeds.
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/): the
   ISO 9053 determination of the lateral resistivity $r$ that clause 8.2 needs,
-  reported there as $\sigma$ in Pa·s/m².
+  reported there as $\sigma$ in Pa·s/m², while this page's
+  `airflow_resistivity` argument is in kPa·s/m².
 - [Resilient layers overview](https://jmrplens.github.io/phonometry/materials/resilient/): where this
   measurement sits among the materials guides.
 - API reference: [`materials.resilient.dynamic_stiffness`](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/).

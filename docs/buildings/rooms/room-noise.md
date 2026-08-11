@@ -58,6 +58,19 @@ NC-15 curve) therefore gets `rating = nan` and an `out_of_range` flag of
 with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 `NC-14` style numbers are ever fabricated.
 
+Both single-spectrum ratings assume a **steady** sound field, and clause
+5.3.2 makes that a test the reader must perform: it is not implemented here.
+Surging is screened aurally and/or visually in the 16, 31.5 and 63 Hz octave
+bands with the meter on fast response and Z ("flat") weighting (5.3.2.1);
+large random fluctuations are screened from the differences
+$L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ and $L_{10} - L_{\mathrm{EQ}}$ on fast
+against Table 3 (7 dB and 3.5 dB for the combined 16, 31.5 and 63 Hz bands,
+6 dB and 3 dB at 125 Hz) (5.3.2.2). A field that fails either screen belongs
+to the RNC method of clause 5.3, which needs a time series rather than a
+single spectrum, so `noise_criterion` and `room_criterion` would return a
+number that is not the standard's answer for that room. Both functions
+assume the screen has passed.
+
 ## 2. Room Criteria Mark II: rating and spectral tag
 
 The **RC Mark II** curves (ANSI/ASA S12.2-2019 Annex D, Table D.1) have a

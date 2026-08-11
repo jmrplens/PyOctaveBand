@@ -166,6 +166,12 @@ calibration (the ratios are level differences).
 
 Both return a `ToneAssessment(frequency, ratio_db, criterion_db, prominent)`.
 
+The `prominent` verdict is the numeric criterion only. The standard also
+requires a prominent tone to be confirmed by aural examination (clauses
+11.8/12.8) and to pass the clause 8/9 lower-threshold-of-hearing screen —
+which, unlike the ratios, does need calibrated absolute levels. Both checks
+are left to the caller.
+
 ## 3. Which tonality metric, and when
 
 The library implements four tonality assessments, and they are not

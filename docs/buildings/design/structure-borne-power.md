@@ -158,6 +158,19 @@ lvf = building.equivalent_free_velocity_level(70.0, 1.0e-2)
 print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| in m/(N·s)
 ```
 
+Two pieces of the standard stay on the operator's side of the line. Formula 16
+— the equivalent point mobility of the plate as the arithmetic mean of
+$\mathrm{Re}\{Y\}$ over its contact points — is not implemented: the functions
+above take an already-known plate mobility rather than deriving it from
+per-point measurements. The Annex C power-substitution method is not
+implemented either; the library takes an already-averaged $L_v$, so a
+substitution determination must be reduced to a plate power level by hand
+(Formulae C.1/C.2) first. And nothing here checks the facility: the plate's
+dimensions, density, aspect ratio and loss factor, the position count and
+clearances, the background correction and the operating conditions are the
+operator's responsibility, and a value computed from a non-conforming plate is
+returned without complaint.
+
 The direct source-side counterpart is the ISO 9611 free velocity level (re
 $v_0 = 5\times10^{-8}\ \text{m/s}$) measured at the contact points of
 resiliently mounted
