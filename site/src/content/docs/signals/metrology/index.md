@@ -31,7 +31,7 @@ intervals that stay honest when the model is non-linear or the inputs are far
 from Gaussian. The page shows both on the same models, including where they
 diverge and why.
 
-[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](/phonometry/signals/metrology/compliance-verification/)
 carries the evidence story: what a performance class actually claims in
 IEC 61672-1 and IEC 61260-1 (same design goals, different acceptance limits),
 which public verifier grades each stage of a measurement chain against its
@@ -65,7 +65,7 @@ budgets that are specialisations of the GUM machinery described here.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone, the stability check it applies to that
   recording, and the digital full-scale mode.
-- [Compliance and Verification](/phonometry/signals/metrology/compliance-verification/):
+- [Compliance and verification](/phonometry/signals/metrology/compliance-verification/):
   what a performance class asserts, the verifiers that grade weightings,
   filter banks and intensity spectra against their tolerance tables, the
   conformance report, and the scope of IEC 61672-2/-3 and IEC 61260-2/-3.
@@ -83,7 +83,7 @@ tests of the calibrator itself — generated level, frequency, distortion, and
 the corrections for static pressure and temperature — are not implemented, so
 pass an already corrected `target_spl` when the manual asks for one, and the
 IEC 61672-3 periodic tests are cited as laboratory practice rather than run;
-[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](/phonometry/signals/metrology/compliance-verification/)
 draws that boundary precisely, part by part.
 The dBFS half of the calibration page sits outside any standard and makes no
 physical claim: it is a reference frame, not a measurement. Data qualification

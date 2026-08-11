@@ -155,7 +155,7 @@ What the numbers mean and how much to trust them.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone (IEC 60942), the stability check it applies
   to that recording, and the digital dBFS mode.
-- [Compliance and Verification](/phonometry/signals/metrology/compliance-verification/):
+- [Compliance and verification](/phonometry/signals/metrology/compliance-verification/):
   what a performance class asserts, the verifiers that grade each stage
   against its tolerance tables, how to read the conformance report, and the
   scope of IEC 61672-2/-3 and IEC 61260-2/-3.
@@ -176,7 +176,7 @@ IEC 61672-2 pattern-evaluation tests a physical meter needs for type approval,
 the IEC 61672-3 periodic tests it receives in service, and the IEC 60942
 conformance tests of the calibrator itself, are not run, so a class verdict
 here describes the algorithm and not a built device;
-[Compliance and Verification](/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](/phonometry/signals/metrology/compliance-verification/)
 draws that boundary part by part. **No file is
 opened.** Nothing in the library decodes WAV, FLAC or any other container:
 every function takes an array you have already read, which is why `fs` is

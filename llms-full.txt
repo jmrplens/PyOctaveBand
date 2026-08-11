@@ -39032,7 +39032,7 @@ What the numbers mean and how much to trust them.
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone (IEC 60942), the stability check it applies
   to that recording, and the digital dBFS mode.
-- [Compliance and Verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/):
+- [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/):
   what a performance class asserts, the verifiers that grade each stage
   against its tolerance tables, how to read the conformance report, and the
   scope of IEC 61672-2/-3 and IEC 61260-2/-3.
@@ -39053,7 +39053,7 @@ IEC 61672-2 pattern-evaluation tests a physical meter needs for type approval,
 the IEC 61672-3 periodic tests it receives in service, and the IEC 60942
 conformance tests of the calibrator itself, are not run, so a class verdict
 here describes the algorithm and not a built device;
-[Compliance and Verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 draws that boundary part by part. **No file is
 opened.** Nothing in the library decodes WAV, FLAC or any other container:
 every function takes an array you have already read, which is why `fs` is
@@ -41957,7 +41957,7 @@ intervals that stay honest when the model is non-linear or the inputs are far
 from Gaussian. The page shows both on the same models, including where they
 diverge and why.
 
-[Compliance and Verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 carries the evidence story: what a performance class actually claims in
 IEC 61672-1 and IEC 61260-1 (same design goals, different acceptance limits),
 which public verifier grades each stage of a measurement chain against its
@@ -41991,7 +41991,7 @@ budgets that are specialisations of the GUM machinery described here.
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone, the stability check it applies to that
   recording, and the digital full-scale mode.
-- [Compliance and Verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/):
+- [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/):
   what a performance class asserts, the verifiers that grade weightings,
   filter banks and intensity spectra against their tolerance tables, the
   conformance report, and the scope of IEC 61672-2/-3 and IEC 61260-2/-3.
@@ -42009,7 +42009,7 @@ tests of the calibrator itself — generated level, frequency, distortion, and
 the corrections for static pressure and temperature — are not implemented, so
 pass an already corrected `target_spl` when the manual asks for one, and the
 IEC 61672-3 periodic tests are cited as laboratory practice rather than run;
-[Compliance and Verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
+[Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 draws that boundary precisely, part by part.
 The dBFS half of the calibration page sits outside any standard and makes no
 physical claim: it is a reference frame, not a measurement. Data qualification

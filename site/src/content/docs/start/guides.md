@@ -219,7 +219,7 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone or a known sensitivity, and the digital
   full-scale mode.
-- [Compliance and Verification](/phonometry/signals/metrology/compliance-verification/):
+- [Compliance and verification](/phonometry/signals/metrology/compliance-verification/):
   what a performance class asserts, the verifiers per stage, the conformance
   report, and the scope of the pattern-evaluation and periodic-test parts.
 - [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
