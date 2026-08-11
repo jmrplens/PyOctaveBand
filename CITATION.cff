@@ -10,6 +10,8 @@ authors:
 repository-code: "https://github.com/jmrplens/phonometry"
 url: "https://jmrplens.github.io/phonometry/"
 doi: "10.5281/zenodo.21215280"
+version: 3.3.0
+date-released: "2026-07-27"
 license: MIT
 keywords:
   - acoustics

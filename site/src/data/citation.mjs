@@ -5,16 +5,18 @@
  * `CITATION.cff` in the repository root is the authoritative metadata: it is
  * what GitHub's "Cite this repository" widget renders and what Zenodo reads
  * when a release is archived. So the author, the title, the DOI, the URL and
- * the licence are read from it rather than restated here, and the version is
- * read from the root `VERSION` file, which is the single source astro.config
- * already uses and the file whose change drives a release.
+ * the licence are read from it rather than restated here, and the version
+ * cited on the site is read from the root `VERSION` file, which is the single
+ * source astro.config already uses and the file whose change drives a
+ * release: `CITATION.cff` also carries `version` and `date-released` now (a
+ * JOSS review checklist reads them directly from the file), but this module
+ * still prefers `VERSION` so a forgotten CFF bump on release day cannot stamp
+ * the site with a stale version.
  *
- * That leaves the year, which neither file carries: `CITATION.cff` deliberately
- * omits `version` and `date-released` because Zenodo stamps those per release
- * from the tag, and adding them here would be a second version of the truth to
- * keep in step by hand. The release date of the version in `VERSION` is already
- * written down once, in the `CHANGELOG.md` heading for that version, so that is
- * where the year comes from.
+ * That leaves the year, which `VERSION` does not carry. The release date of
+ * the version in `VERSION` is already written down once, in the
+ * `CHANGELOG.md` heading for that version, so that is where the year comes
+ * from rather than from `CITATION.cff`'s `date-released`.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
