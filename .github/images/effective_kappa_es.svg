@@ -148,7 +148,7 @@ L 678.403281 28.798125
      </g>
     </g>
     <g id="text_8">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="364.685625" y="430.394219" transform="rotate(-0 364.685625 430.394219)">Frecuencia del pistón f [Hz]  (ISO 9053-2, apartado 6,2: de 1 a 4 Hz)</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="364.685625" y="430.394219" transform="rotate(-0 364.685625 430.394219)">Frecuencia del pistón f [Hz]  (ISO 9053-2, apartado 6.2: de 1 a 4 Hz)</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">

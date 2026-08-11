@@ -629,7 +629,7 @@ L 440.843437 26.798125
     <text style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff" transform="translate(299.947435 310.787171)">(W = 0,30 m, 1143 Hz)</text>
    </g>
    <g id="text_18">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="241.084609" y="16.798125" transform="rotate(-0 241.084609 16.798125)">Pérdida por inserción del codo (ASHRAE Tabla 8,11)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="241.084609" y="16.798125" transform="rotate(-0 241.084609 16.798125)">Pérdida por inserción del codo (ASHRAE Tabla 8.11)</text>
    </g>
    <g id="legend_1">
     <g id="patch_7">
@@ -1303,7 +1303,7 @@ L 569.090254 61.039155
     <text style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff" transform="translate(633.819243 165.931677)">por debajo de 500 Hz</text>
    </g>
    <g id="text_42">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="693.604609" y="16.798125" transform="rotate(-0 693.604609 16.798125)">Potencia acústica del flujo (VDI 2081, Bies Ec. 8,252)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="693.604609" y="16.798125" transform="rotate(-0 693.604609 16.798125)">Potencia acústica del flujo (VDI 2081, Bies Ec. 8.252)</text>
    </g>
    <g id="legend_2">
     <g id="patch_14">

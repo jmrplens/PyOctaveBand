@@ -94,7 +94,7 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
   transmisión que necesita una partición o un cerramiento para cumplir un
   criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
-  atenuación en conductos, ruido de flujo y pérdida de inserción de
+  atenuación en conductos, ruido de flujo y pérdida por inserción de
   cerramientos de máquina.
 
 ## Qué no cubre esta sección

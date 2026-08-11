@@ -605,7 +605,7 @@ z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(519.846035 347.518455)">f0 = (1/2pi) sqrt(s'/m')  (Fórmula 2)</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(550.964785 359.521189)">s'  = s't + s'a  (apartado 8,2)</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(550.964785 359.521189)">s'  = s't + s'a  (apartado 8.2)</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(526.71166 371.923923)">s't = 4 pi^2 m't fr^2  (Fórmula 4)</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(483.702285 383.926658)">s'a = p0/(d eps) ~ 111/d MN/m^3  (NOTA)</text>
    </g>

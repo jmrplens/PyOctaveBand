@@ -12,6 +12,7 @@ translation fix never means touching a figure.
 """
 
 import os
+import re
 import sys
 from typing import Any
 
@@ -5154,6 +5155,46 @@ _ES_PATTERNS = [
       "sobre f2 a 20b = \\2 dB/década")),
 ]
 
+# The Spanish decimal comma, with the numbers that are NOT decimals carved
+# out. A number introduced by a clause/equation/table/annex token ("apartado
+# 7.4", "Ec. 8.252", "Tabla 13.8") is a reference into a standard or a book,
+# and the Spanish pages keep its dot; a plural token ("Ecs. 8.44, 8.46",
+# "apartados 6.2 y 6.3") extends that reading over its whole list, and a
+# dash-joined range ("Ecs. 13.27-13.33", "apartado 4.1-4.3") is
+# reference-to-reference after either. The carve-out is deliberately no wider:
+# after a singular token only the first number binds, so a genuine decimal in
+# the same breath ("Ec. 10.2: máximo 3.7 vacil", "Fórmula 7, eps = 0.9",
+# "Tabla 2 -0.5 dB") still takes its comma, and the dash of a range must sit
+# digit-to-digit so a spaced negative value is never read as a range.
+_REF_NUM = r"\d+(?:\.\d+)*(?:[-–−]\d+(?:\.\d+)*)*"
+_CLAUSE_REF_RE = re.compile(
+    r"\b(?:apartados|cap[ií]tulos|cl[aá]usulas|anexos|tablas|f[oó]rmulas"
+    r"|ecs\.)\s*" + _REF_NUM + r"(?:(?:\s*,\s*|\s+y\s+)" + _REF_NUM + r")*"
+    r"|(?:\b(?:apartado|cap[ií]tulo|cl[aá]usula|anexo|tabla|f[oó]rmula"
+    r"|f[oó]rm\.|ec\.)|§)\s*" + _REF_NUM,
+    re.IGNORECASE,
+)
+# A letter immediately before the number marks a standard designation
+# (e.g. "S3.5"), not a decimal; a further digit or dot on either side marks
+# a three-part clause/version number ("7.4.3"). Both keep their dots.
+_DECIMAL_RE = re.compile(r"(?<![\d.A-Za-z])(\d+)\.(\d+)(?![.\d])")
+
+
+def _decimal_comma(s: str) -> str:
+    """Rewrite the decimal dots of *s* into Spanish commas.
+
+    Reference numbers matched by :data:`_CLAUSE_REF_RE` are passed through
+    untouched; everything between them gets :data:`_DECIMAL_RE` applied.
+    """
+    out: list[str] = []
+    last = 0
+    for m in _CLAUSE_REF_RE.finditer(s):
+        out.append(_DECIMAL_RE.sub(r"\1,\2", s[last:m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(_DECIMAL_RE.sub(r"\1,\2", s[last:]))
+    return "".join(out)
+
 
 def set_lang(lang: str) -> None:
     """Switch the output language ('en' or 'es')."""
@@ -5239,18 +5280,12 @@ def _translate_figure(fig: Any) -> None:
     if _LANG == "en":
         _audit_english(fig)
         return
-    import re as _re2
-
     from matplotlib.category import StrCategoryFormatter as _SCF
     from matplotlib.ticker import FixedFormatter as _FxF
     from matplotlib.ticker import FuncFormatter as _FF
     from matplotlib.ticker import ScalarFormatter as _SF
 
-    def _comma(s: str) -> str:
-        # A letter immediately before the number marks a standard designation
-        # (e.g. "S3.5"), not a decimal - leave those untouched.
-        return _re2.sub(r"(?<![\d.A-Za-z])(\d+)\.(\d+)(?![.\d])", r"\1,\2", s)
-
+    _comma = _decimal_comma  # the guarded decimal-comma pass, defined above
     _tr_words = lookup  # the exact / pattern lookups, no decimal comma
 
     for ax in fig.get_axes():
@@ -5296,8 +5331,6 @@ def _translate_figure(fig: Any) -> None:
         # decimals in the same label (e.g. ``8.0 sone_HMS``) still get commas.
         s = artist.get_text()
         if s and "$" not in s and _re.search(r"\d\.\d", s):
-            # Clause/version numbers like 5.3.3 and standard designations like
-            # "S3.5" (a letter immediately before the number) keep their dots.
-            artist.set_text(
-                _re.sub(r"(?<![\d.A-Za-z])(\d+)\.(\d+)(?![.\d])", r"\1,\2", s)
-            )
+            # Clause/version numbers like 5.3.3, standard designations like
+            # "S3.5" and guarded references ("apartado 7.4") keep their dots.
+            artist.set_text(_decimal_comma(s))

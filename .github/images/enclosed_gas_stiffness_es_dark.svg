@@ -437,7 +437,7 @@ Q 46.294911 400.945898 50.794911 400.945898
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.794911 371.730879)">apartado 8,2:  r &gt;= 100 kPa.s/m2 -&gt; s' = s't</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.794911 371.730879)">apartado 8.2:  r &gt;= 100 kPa.s/m2 -&gt; s' = s't</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.794911 382.532637)">               10 &lt;= r &lt; 100     -&gt; s' = s't + s'a</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.794911 393.38291)">               r &lt; 10            -&gt; s' = s't solo si s'a es despreciable</text>
    </g>
@@ -513,7 +513,7 @@ L 469.185625 68.308125
 " style="fill: none; stroke: #d62728; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="476.385625" y="71.458125" transform="rotate(-0 476.385625 71.458125)">s' instalada = s't + s'a (apartado 8,2)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="476.385625" y="71.458125" transform="rotate(-0 476.385625 71.458125)">s' instalada = s't + s'a (apartado 8.2)</text>
     </g>
    </g>
    <g id="PathCollection_1">

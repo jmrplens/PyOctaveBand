@@ -693,7 +693,7 @@ L 168.887203 123.224855
     <text style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff" transform="translate(199.257499 237.913083)">duplicación, en cada banda</text>
    </g>
    <g id="text_20">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="242.636167" y="16.798125" transform="rotate(-0 242.636167 16.798125)">Ruido propio del silenciador (Long Ec. 14,31)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="242.636167" y="16.798125" transform="rotate(-0 242.636167 16.798125)">Ruido propio del silenciador (Long Ec. 14.31)</text>
    </g>
    <g id="legend_1">
     <g id="patch_8">
@@ -1293,7 +1293,7 @@ L 612.146761 45.936915
     <text style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff" transform="translate(629.220838 160.325186)">ASHRAE limita el cuello de una salida de impulsión RC 30 a 2,2 m/s</text>
    </g>
    <g id="text_42">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="684.973813" y="16.798125" transform="rotate(-0 684.973813 16.798125)">Potencia acústica del difusor (Long Ecs. 13,27-13,33)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="684.973813" y="16.798125" transform="rotate(-0 684.973813 16.798125)">Potencia acústica del difusor (Long Ecs. 13.27-13.33)</text>
    </g>
    <g id="legend_2">
     <g id="patch_15">

@@ -1,6 +1,6 @@
 ---
 title: "Control de ruido"
-description: "Control de ruido industrial en el camino: el cálculo completo del ventilador a la sala y la cadena entre recintos frente a un criterio de diseño, más los modelos de elemento a los que llaman: silenciadores reactivos de cuatro polos, atenuación y ruido de flujo en conductos HVAC, y pérdida de inserción de cerramientos de máquina."
+description: "Control de ruido industrial en el camino: el cálculo completo del ventilador a la sala y la cadena entre recintos frente a un criterio de diseño, más los modelos de elemento a los que llaman: silenciadores reactivos de cuatro polos, atenuación y ruido de flujo en conductos HVAC, y pérdida por inserción de cerramientos de máquina."
 ---
 
 Un problema de control de ruido es un **presupuesto**, no una elección de
@@ -15,13 +15,13 @@ salida frente a un criterio.
 Todo lo de aquí es una **predicción** a partir de una geometría declarada y de
 unos datos de material declarados. Eso importa cuando hay un catálogo abierto al
 lado de la pantalla: la cifra que publica un proveedor para el mismo dispositivo
-es una pérdida de inserción *medida*, obtenida en las condiciones de una norma
+es una pérdida por inserción *medida*, obtenida en las condiciones de una norma
 de medición — la ISO 7235 para un silenciador de conducto sobre un banco de
 laboratorio con y sin flujo de aire, que da además el ruido de flujo regenerado
 y la pérdida de carga, la ISO 11691 para el método de control sin flujo, la
 ISO 11820 para un silenciador in situ, y la ISO 11546-1 y -2 para un
 cerramiento en laboratorio y in situ. Una pérdida por transmisión calculada
-y una pérdida de inserción de catálogo no son la misma magnitud. Ninguna de las
+y una pérdida por inserción de catálogo no son la misma magnitud. Ninguna de las
 dos está mal; responden a preguntas distintas, y un diseño que las mezcla sin
 decirlo no es defendible.
 
@@ -50,7 +50,7 @@ cuarto de onda y de tubo extendido) con su pérdida de transmisión y de
 inserción, y la elección entre reflexión y disipación, mientras que
 [Control de ruido industrial](/phonometry/es/devices/noise-control/noise-control/) se queda
 con la atenuación y el ruido de flujo de los conductos HVAC de una
-instalación y con la pérdida de inserción de un cerramiento de máquina.
+instalación y con la pérdida por inserción de un cerramiento de máquina.
 
 Si el ruido viaja por un conducto, empieza por
 [Ruido por conductos](/phonometry/es/devices/noise-control/duct-path/); si viaja a
@@ -81,7 +81,7 @@ límite laboral que corresponda, en [Exposición al ruido en el trabajo
   transmisión que necesita una partición o un cerramiento para cumplir un
   criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
-  atenuación en conductos, ruido de flujo y pérdida de inserción de
+  atenuación en conductos, ruido de flujo y pérdida por inserción de
   cerramientos de máquina.
 
 ## Qué no cubre esta sección

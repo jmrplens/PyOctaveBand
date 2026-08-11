@@ -684,8 +684,8 @@ plt.show()
 | `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
 
 `lex_8h` valora *una* grabación; componer una jornada laboral completa a
-partir de muestras por tarea o por función, con el presupuesto normativo de
-incertidumbre de la ISO 9612, continúa en
+partir de muestras por tarea o por función, con el balance de incertidumbre
+normativo de la ISO 9612, continúa en
 [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
 
 Convertir estos niveles en los indicadores regulatorios día-tarde-noche y
@@ -694,7 +694,7 @@ declararlos con garantías es
 descriptores $L_{den}$ y $L_{dn}$, los niveles de evaluación compuestos de
 ISO 1996-1
 con sus ajustes por carácter, y la cadena de determinación de ISO 1996-2 con
-el ajuste tonal, la corrección de ruido residual y el presupuesto de
+el ajuste tonal, la corrección de ruido residual y el balance de
 incertidumbre de medida.
 
 ## Espectrograma de octavas (niveles vs tiempo)
@@ -715,10 +715,10 @@ levels, freq, times = bank.spectrogram(recording, window_time=0.125, overlap=0.5
 # levels: (bandas, ventanas) — listo para pcolormesh(times, freq, levels)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spectrogram_example_es.webp" alt="Espectrograma en doceavos de octava de un barrido logarítmico con dos ráfagas tonales" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spectrogram_example_es.webp" alt="Espectrograma en bandas de 1/12 de octava de un barrido logarítmico con dos ráfagas tonales" width="80%" />
 
 *Un barrido logarítmico y dos ráfagas tonales, resueltos en el tiempo y en
-bandas normalizadas de doceavo de octava.*
+bandas normalizadas de 1/12 de octava.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
