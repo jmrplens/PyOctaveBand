@@ -111,16 +111,25 @@ def _relative_link(from_route: str, to_route: str) -> str | None:
 
 
 def _rewrite_links(body: str, route: str) -> str:
-    """Site-absolute links to mirror-relative ones, where a mirror page exists."""
+    """Site-absolute links to mirror-relative ones, where a mirror page exists.
+
+    A link can carry a ``#fragment`` onto a heading of the target page — a
+    See-also block pointing at one theory section rather than the whole page.
+    The fragment has to survive onto whichever form the target link takes,
+    mirror-relative or the absolute site URL, or it is silently dropped and
+    the site-absolute path is left in the mirror file verbatim: neither a
+    working mirror-relative link nor a working external one.
+    """
 
     def swap(match: re.Match[str]) -> str:
         target = match.group(1).strip("/")
+        fragment = match.group(2) or ""
         if target.startswith(SITE_ONLY_PREFIXES) or target.startswith("es/"):
-            return f"({SITE_BASE}/{target}/)"
+            return f"({SITE_BASE}/{target}/{fragment})"
         rel = _relative_link(route, target)
-        return f"({rel})" if rel else f"({SITE_BASE}/{target}/)"
+        return f"({rel}{fragment})" if rel else f"({SITE_BASE}/{target}/{fragment})"
 
-    return re.sub(r"\(/phonometry/([^)#]+?)/?\)", swap, body)
+    return re.sub(r"\(/phonometry/([^)#]+?)/?(#[^)]*)?\)", swap, body)
 
 
 def render(page: Path) -> tuple[Path, str]:
@@ -178,6 +187,215 @@ def _pages_without_the_index_backlink() -> list[str]:
     return missing
 
 
+#: Punctuation GitHub strips before turning a heading into its automatic
+#: anchor, mirrored from the character classes and literals ``github-slugger``
+#: removes. This is what actually renders the ``#...`` next to a heading on
+#: github.com, not a guess at one — validated against every fragment link
+#: already in the mirror before this was wired into ``--check``. Built only
+#: from ``chr()`` code points and ``re.escape()`` of a literal string, so
+#: this is one flat character class with no alternation or repetition for a
+#: ReDoS scanner to flag.
+_SLUG_PUNCTUATION = re.compile(
+    "["
+    + chr(0x2000)
+    + "-"
+    + chr(0x206F)
+    + chr(0x2E00)
+    + "-"
+    + chr(0x2E7F)
+    + re.escape("""\'!"#$%&()*+,./:;<=>?@[]^`{|}~""")
+    + "]"
+)
+
+_ATX_HEADING = re.compile(r"^#{1,6}(?:\s+(.*?))?\s*#*\s*$")
+_LINK_LABEL = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+_EXTERNAL_SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
+_LINK_TITLE = re.compile(r"""\s+(?:"[^"]*"|'[^']*')\s*$""")
+
+
+def _slug(heading: str) -> str:
+    """The anchor GitHub assigns ``heading``, before duplicate-numbering.
+
+    A heading that is itself a link — the generated overviews' subsections are
+    written that way — anchors on its label, not its target:
+    ``[Absorbers](i.md)`` slugs to ``absorbers``. Inline code needs no
+    separate unwrapping: the backticks are in the punctuation class above and
+    fall out either way, which is why ``Report metadata (`ReportMetadata`)``,
+    the heading every report-fiche page's See-also block points at, slugs to
+    ``report-metadata-reportmetadata`` rather than something that keeps the
+    backticks.
+    """
+    text = _LINK_LABEL.sub(r"\1", heading).lower()
+    text = _SLUG_PUNCTUATION.sub("", text)
+    return text.replace(" ", "-")
+
+
+def _unfenced_lines(text: str) -> list[tuple[int, str]]:
+    """The ``(lineno, line)`` pairs of ``text`` outside fenced code blocks.
+
+    A fence can hold anything that merely looks like markdown: a Python
+    comment that starts a line with ``#``, as several reproduction blocks do,
+    or a snippet demonstrating link syntax a guide is teaching rather than
+    using. Shared by the heading scan and the anchor scan so both agree on
+    what counts as fenced.
+    """
+    lines: list[tuple[int, str]] = []
+    fence = ""
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped[:3] in ("```", "~~~"):
+            if fence and stripped.startswith(fence):
+                fence = ""
+            elif not fence:
+                fence = stripped[:3]
+            continue
+        if fence:
+            continue
+        lines.append((lineno, line))
+    return lines
+
+
+def _headings(path: Path) -> list[str]:
+    """The ATX heading text of a markdown file, in document order.
+
+    Skips fenced code blocks (see ``_unfenced_lines``), so a Python comment
+    that starts a line with ``#`` inside a reproduction block is not mistaken
+    for one.
+    """
+    headings: list[str] = []
+    for _, line in _unfenced_lines(path.read_text(encoding="utf-8")):
+        match = _ATX_HEADING.match(line)
+        if match and match.group(1):
+            headings.append(match.group(1))
+    return headings
+
+
+def _fragments(path: Path) -> set[str]:
+    """The anchors ``path`` answers for.
+
+    Includes the ``-1``, ``-2`` GitHub appends when the same slug recurs
+    later on the page, in appearance order — the second "References" heading
+    on a page is not the same anchor as the first.
+    """
+    seen: dict[str, int] = {}
+    fragments: set[str] = set()
+    for heading in _headings(path):
+        slug = _slug(heading)
+        n = seen.get(slug, 0)
+        seen[slug] = n + 1
+        fragments.add(slug if n == 0 else f"{slug}-{n}")
+    return fragments
+
+
+def _link_bodies(line: str) -> list[str]:
+    """The raw text inside each markdown link's ``(...)`` on ``line``.
+
+    Finds the closing parenthesis by tracking depth rather than stopping at
+    the first ``)``: a link target can contain one, as some URLs do
+    (``[x](url_(a))``). A quoted title can contain one too
+    (``[x](f.md "t)")``), so parentheses inside an open quote do not count.
+    """
+    bodies: list[str] = []
+    i = 0
+    while True:
+        start = line.find("](", i)
+        if start == -1:
+            break
+        depth = 1
+        quote = ""
+        j = start + 2
+        while j < len(line) and depth:
+            char = line[j]
+            if quote:
+                if char == quote:
+                    quote = ""
+            elif char in "\"'":
+                quote = char
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+            j += 1
+        if depth != 0:
+            break  # unterminated; nothing further on this line is reliable
+        bodies.append(line[start + 2 : j - 1])
+        i = j
+    return bodies
+
+
+def _link_target(body: str) -> str:
+    """The destination inside a link body, an optional quoted title
+    (``url "title"`` or ``url 'title'``) stripped off the end.
+
+    Without this, a title's own punctuation — ``[x](f.md "See #3")`` — could
+    be mistaken for a fragment, or a ``)`` inside it could have been mistaken
+    for the link's closing parenthesis before ``_link_bodies`` balanced them.
+    """
+    title = _LINK_TITLE.search(body)
+    return body[: title.start()] if title else body
+
+
+def _broken_intra_mirror_anchors() -> list[str]:
+    """Fragment links in the mirror whose target heading does not exist.
+
+    A See-also block copied from the site carries the site's anchor with it.
+    When a theory page's heading structure moved and the mirror's hand-kept
+    copy of that heading did not move with it, seven such anchors pointed at
+    text that no longer existed there and were repaired by hand, one at a
+    time, because nothing else would have caught the next one.
+    """
+    broken: list[str] = []
+    cache: dict[Path, set[str]] = {}
+
+    def fragments_of(dest: Path) -> set[str]:
+        if dest not in cache:
+            cache[dest] = _fragments(dest)
+        return cache[dest]
+
+    for path in sorted(DOCS.rglob("*.md")):
+        if path.relative_to(DOCS).parts[0] == "superpowers":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for lineno, line in _unfenced_lines(text):
+            for body in _link_bodies(line):
+                target_part, sep, fragment = _link_target(body).partition("#")
+                if not sep or not fragment:
+                    continue
+                where = f"{path.relative_to(ROOT)}:{lineno}"
+                if _EXTERNAL_SCHEME.match(target_part):
+                    continue
+                if target_part.startswith("/"):
+                    # A site-absolute path with a fragment: ``_rewrite_links``
+                    # is the only producer of these, and it always resolves
+                    # them to a mirror-relative link or a full site URL, so
+                    # one reaching here is not a link this repository serves.
+                    broken.append(
+                        f"{where}: #{fragment} -> {target_part} "
+                        "(site-absolute path, not a mirror-relative link)"
+                    )
+                    continue
+                dest = (
+                    path if not target_part else (path.parent / target_part).resolve()
+                )
+                try:
+                    shown = dest.relative_to(ROOT)
+                except ValueError:
+                    shown = dest
+                if not dest.exists():
+                    broken.append(f"{where}: #{fragment} -> {shown} (file not found)")
+                    continue
+                if dest.suffix != ".md":
+                    # A line anchor into a non-markdown file, such as
+                    # GitHub's own ``script.py#L42``, is not a heading slug
+                    # this check knows how to validate.
+                    continue
+                if fragment not in fragments_of(dest):
+                    broken.append(
+                        f"{where}: #{fragment} -> {shown} (heading not found)"
+                    )
+    return broken
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="fail on drift instead of writing")
@@ -218,6 +436,13 @@ def main() -> int:
             print(
                 "mirror pages without the documentation-index backlink: "
                 + ", ".join(stranded),
+                file=sys.stderr,
+            )
+            return 1
+        broken_anchors = _broken_intra_mirror_anchors()
+        if broken_anchors:
+            print(
+                "broken intra-mirror anchors:\n  " + "\n  ".join(broken_anchors),
                 file=sys.stderr,
             )
             return 1

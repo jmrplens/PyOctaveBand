@@ -127,8 +127,8 @@ pair, so the calibration, weighting and filtering behind them are in [Signal
 analysis](../signals/index.md), and [Build a sound level
 meter](../signals/sound-level-meter.md) runs that chain end to end on
 one runnable page. The derivations are split by physics rather than by topic:
-[sound power determination](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
-is under Environment and transport, and [sound intensity](/phonometry/reference/theory/signal-analysis/#sound-intensity-iec-61043)
+[sound power determination](../reference/theory/environment-transport.md#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+is under Environment and transport, and [sound intensity](../reference/theory/signal-analysis.md#sound-intensity-iec-61043)
 under Signal analysis. The electroacoustics and noise-control pages carry their
 derivations inline.
 
