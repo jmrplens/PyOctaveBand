@@ -2771,6 +2771,9 @@ repository. Click the preview to open the PDF:
   $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
 - [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   the three Annex E cases these implementations are checked against.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the full ISO 9613-1
+  atmospheric-absorption model, for conditions or frequencies the six
+  built-in climate profiles do not cover.
 - API reference: [`room.enclosed_space_absorption`](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/).
 - Theory: [Absorption in enclosed spaces](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/#absorption-in-enclosed-spaces-en-12354-6): the equivalent-absorption-area definition the EN 12354-6 procedure computes.
 
@@ -2796,6 +2799,10 @@ EN 12354-6:2003, *Building acoustics — Estimation of acoustic
 performance of buildings from the performance of elements — Part 6: Sound
 absorption in enclosed spaces*: the total equivalent absorption area
 (clause 4.3, Formulae 1-4, Table 1) and the reverberation time (clause 4.4,
-Formula 5), validated against the three worked cases of Annex E.
+Formula 5), validated against the three worked cases of Annex E. The Table 1
+climate-condition power attenuation coefficients (125 Hz-8 kHz octave bands)
+are derived from ISO 9613-1:1993; the full atmospheric-absorption model for
+arbitrary conditions and frequencies is covered in [Outdoor Sound
+Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/).
 
 ---
