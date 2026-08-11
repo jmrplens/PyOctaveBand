@@ -136,6 +136,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
 - [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
 - [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/)
+
+### Insulation ratings and the envelope
+
+- [Overview](https://jmrplens.github.io/phonometry/buildings/insulation/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation-ratings.txt)
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/)
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/)
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/)
@@ -286,7 +290,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 ## Theory and reference
 
-The theory pages travel in the Start shard (https://jmrplens.github.io/phonometry/llms/llms-start.txt); the rest of the reference in https://jmrplens.github.io/phonometry/llms/llms-reference.txt.
+The theory pages travel in their own shard (https://jmrplens.github.io/phonometry/llms/llms-theory.txt); the rest of the reference in https://jmrplens.github.io/phonometry/llms/llms-reference.txt.
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/)
@@ -320,6 +324,7 @@ The theory pages travel in the Start shard (https://jmrplens.github.io/phonometr
 One file per area, each small enough to fetch whole. `llms-full.txt` is the complete concatenation and is far too large for a single fetch in most clients.
 
 - [Start here](https://jmrplens.github.io/phonometry/llms/llms-start.txt)
+- [Theory and reference](https://jmrplens.github.io/phonometry/llms/llms-theory.txt)
 - [Signal analysis](https://jmrplens.github.io/phonometry/llms/llms-signals.txt)
 - [Octave filtering](https://jmrplens.github.io/phonometry/llms/llms-signals-filters.txt)
 - [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
@@ -332,6 +337,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Rooms and buildings](https://jmrplens.github.io/phonometry/llms/llms-buildings.txt)
 - [Room acoustics](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
 - [Sound insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
+- [Insulation ratings and the envelope](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation-ratings.txt)
 - [Insulation design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
 - [Materials and surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials.txt)
 - [Absorbers](https://jmrplens.github.io/phonometry/llms/llms-materials-absorbers.txt)

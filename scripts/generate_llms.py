@@ -70,7 +70,10 @@ REPO_URL = "https://github.com/jmrplens/phonometry"
 DOI = "10.5281/zenodo.21215280"
 
 #: Shard budget. Comfortably under the truncation limit of the AI fetch tools
-#: that cap response size, with room for a page to grow.
+#: that cap response size, with room for a page to grow. Enforced: main() exits
+#: non-zero if a shard is over it (see :func:`_check_shard_budget`). A shard
+#: exactly at the limit passes; only strictly over fails, both here and in the
+#: message it raises.
 SHARD_LIMIT_BYTES = 200_000
 
 #: Markdown files under docs/ that are not documentation pages.
@@ -293,6 +296,26 @@ def _area_members() -> dict[str, list[str]]:
     return members
 
 
+#: Manual carve-outs from a folder's own shard, for a folder whose guides are
+#: still over the fetch budget after subgroup splitting. Today that is only
+#: ``buildings/insulation``: ten guides and no further folder to divide by,
+#: since it has no subgroups of its own (unlike ``buildings/rooms`` or
+#: ``buildings/design``, which already get a shard each above). The split
+#: follows how the folder's own overview already groups its pages by hand
+#: (``docs/buildings/insulation/index.md``: "Laboratory.", "Field.", "Ratings
+#: and the envelope."); the leaf names are its guide filenames and the label
+#: mirrors that heading. The carved-out shard has no page of its own, so its
+#: Overview link still resolves to the parent folder (see _shard_folders and
+#: _shard_label below).
+MANUAL_SPLITS: dict[str, tuple[str, str, tuple[str, ...]]] = {
+    "buildings/insulation": (
+        "buildings-insulation-ratings",
+        "Insulation ratings and the envelope",
+        ("insulation-ratings", "facade-insulation", "spanish-building-code"),
+    ),
+}
+
+
 @functools.cache
 def _shard_folders() -> dict[str, str]:
     """Shard slug -> the content folder it names.
@@ -309,6 +332,8 @@ def _shard_folders() -> dict[str, str]:
             if path.parent != CONTENT / topic:
                 folder = path.parent.relative_to(CONTENT).as_posix()
                 folders[folder.replace("/", "-")] = folder
+    for folder, (slug, _label, _leaves) in MANUAL_SPLITS.items():
+        folders[slug] = folder
     return folders
 
 
@@ -356,6 +381,21 @@ def _shard_members() -> dict[str, list[str]]:
         if not found:
             continue
         claimed.update(found)
+        split = MANUAL_SPLITS.get(folder)
+        if split is not None:
+            split_slug, _label, leaves = split
+            split_routes = {f"{folder}/{leaf}" for leaf in leaves}
+            missing = sorted(split_routes - set(found))
+            if missing:
+                raise SystemExit(
+                    f"generate_llms.py: MANUAL_SPLITS for {folder} names "
+                    "route(s) not among its guides: " + ", ".join(missing)
+                )
+            # Order follows found (the overview's own reading order), not the
+            # tuple above: MANUAL_SPLITS just names which guides move, not the
+            # order to read them in.
+            shards[split_slug] = [route for route in found if route in split_routes]
+            found = [route for route in found if route not in split_routes]
         shards[slug_of(folder)] = found
     for topic, _label in AREAS:
         found = [
@@ -393,6 +433,11 @@ def _shard_label(slug: str) -> str:
     labels = dict(AREAS)
     if slug in labels:
         return labels[slug]
+    split_labels = {
+        split_slug: label for _folder, (split_slug, label, _leaves) in MANUAL_SPLITS.items()
+    }
+    if slug in split_labels:
+        return split_labels[slug]
     folder = _shard_folders().get(slug, slug)
     index = DOCS / folder / "index.md"
     if index.exists():
@@ -554,8 +599,8 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
         "## Theory and reference",
         "",
         (
-            "The theory pages travel in the Start shard "
-            f"({SITE_URL}/llms/llms-start.txt); the rest of the reference in "
+            "The theory pages travel in their own shard "
+            f"({SITE_URL}/llms/llms-theory.txt); the rest of the reference in "
             f"{SITE_URL}/llms/llms-reference.txt."
         ),
         "",
@@ -604,11 +649,15 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
         "",
         f"- [Start here]({SITE_URL}/llms/llms-start.txt)",
     ]
+    if "theory" in shard_slugs:
+        lines.append(f"- [Theory and reference]({SITE_URL}/llms/llms-theory.txt)")
     # Grouped by topic in the order the site lists them, the topic's own shard
     # first, so the list reads like the navigation rather than like a sort key.
     # The slugs are the shards actually built this run: a hand-kept list here
     # published a link to a shard that a content move could stop producing.
-    listed: set[str] = {"start"}
+    # "theory" is listed by hand just above, next to "start": neither is a
+    # topic, so the loop below would otherwise never place them.
+    listed: set[str] = {"start", "theory"}
     folders = _shard_folders()
     for topic, _label in AREAS:
         # Subgroups in the order the topic overview teaches them, matching the
@@ -735,19 +784,30 @@ def build_shards() -> dict[str, str]:
             parts.append(_body(name, route, pages))
         return "\n".join(parts)
 
-    theory = [route for route in pages.values() if route.startswith("reference/theory")]
+    # Theory used to travel inside the start shard: six mirror pages with
+    # eighteen figures pushed llms-start.txt itself over budget. It gets its
+    # own shard instead of a cut, since a client after the getting-started
+    # page has no reason to also fetch the physics.
+    theory = sorted(
+        route for route in pages.values() if route.startswith("reference/theory")
+    )
     start_overview = ["start"] if "start" in route_to_file else []
-    shards = {
-        "start": emit("start here", [*start_overview, *START_ROUTES, *sorted(theory)])
-    }
+    shards = {"start": emit("start here", [*start_overview, *START_ROUTES])}
+    if theory:
+        shards["theory"] = emit("Theory and reference", theory)
+
+    manual_split_slugs = {slug for _folder, (slug, _label, _leaves) in MANUAL_SPLITS.items()}
     for slug, routes in members.items():
         overview = _shard_folders().get(slug, slug)
+        # A carved-out shard (see MANUAL_SPLITS) has no overview page of its
+        # own; the folder it names already opened its primary shard above.
+        include_overview = overview in route_to_file and slug not in manual_split_slugs
         shards[slug] = emit(
             _shard_label(slug),
-            ([overview] if overview in route_to_file else []) + routes,
+            ([overview] if include_overview else []) + routes,
         )
 
-    # The reference pages that are neither theory (in the start shard) nor a
+    # The reference pages that are neither theory (its own shard) nor a
     # topic's: today that is the bibliography, which was indexed in llms.txt
     # while its text sat in no shard at all.
     # The API index stays out: llms.txt lists the whole generated reference as
@@ -806,6 +866,33 @@ def _check_readme_covers_the_mirror() -> None:
         )
 
 
+def _check_shard_budget(sizes: dict[str, int]) -> None:
+    """Fail the run if any shard exceeds :data:`SHARD_LIMIT_BYTES`.
+
+    This used to be a printed note with exit 0, so llms-start.txt and
+    llms-buildings-insulation.txt sat over budget for weeks with a green CI: a
+    client that truncates at a few hundred kilobytes read a partial shard and
+    nothing here ever said so. The budget is not negotiable (see its own
+    docstring); the only fix for an oversized shard is a narrower split, never
+    a higher SHARD_LIMIT_BYTES.
+    """
+    oversized = sorted(
+        (slug, size) for slug, size in sizes.items() if size > SHARD_LIMIT_BYTES
+    )
+    if not oversized:
+        return
+    detail = "\n".join(
+        f"  llms-{slug}.txt is {size:,} bytes, {size - SHARD_LIMIT_BYTES:,} over "
+        f"the {SHARD_LIMIT_BYTES:,} byte budget"
+        for slug, size in oversized
+    )
+    raise SystemExit(
+        "generate_llms.py: shard(s) exceed the fetch budget:\n"
+        + detail
+        + "\nSplit the area into a narrower shard; do not raise SHARD_LIMIT_BYTES."
+    )
+
+
 def main() -> None:
     _check_areas_cover_the_tree()
     _check_readme_covers_the_mirror()
@@ -831,22 +918,16 @@ def main() -> None:
             path.unlink()
             print(f"  removed stale shard {path.name}")
 
-    oversized: list[tuple[str, int]] = []
+    sizes: dict[str, int] = {}
     for slug, text in shards.items():
         (SHARDS_DIR / f"llms-{slug}.txt").write_text(text, encoding="utf-8")
-        size = len(text.encode("utf-8"))
-        if size > SHARD_LIMIT_BYTES:
-            oversized.append((slug, size))
+        sizes[slug] = len(text.encode("utf-8"))
 
     print(
         f"llms.txt regenerated (v{version}): {len(_routes())} pages, "
         f"{len(_api_routes())} API pages listed as optional."
     )
-    for slug, size in oversized:
-        print(
-            f"  note: llms-{slug}.txt is {size / 1000:.0f} kB, over the "
-            f"{SHARD_LIMIT_BYTES / 1000:.0f} kB budget; consider splitting the area."
-        )
+    _check_shard_budget(sizes)
 
 
 if __name__ == "__main__":
