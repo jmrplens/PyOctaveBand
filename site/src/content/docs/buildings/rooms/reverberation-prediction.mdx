@@ -376,6 +376,30 @@ the Fitzroy time; Fitzroy is known to over-predict when one wall pair is very
 reflective, which is why Arau-Puchades recommends the geometric mean. Both
 reduce exactly to Eyring for a uniform absorption distribution.
 
+The misrepresentation these two models exist for can be run as an
+experiment, and the clip below does. One flat 8 × 2.5 m section is
+simulated twice with the same **total** statistical absorption: spread over
+all four edges, or concentrated on the floor-and-ceiling pair (the carpeted
+floor and acoustic ceiling of this page's own example, α ≈ 0.79) between
+hard ends. Any formula built on a single mean $\bar\alpha$ sees the same
+number in both rooms, so the Sabine and Eyring predictions — evaluated for
+the two-dimensional section, whose mean free path is $\pi S/P$ — form one
+band shared by both. The spread room decays inside it, a straight line at
+T = 160 ms against Sabine's 201. The concentrated room's decay has no
+single slope, 183 ms early and 236 ms late, and it finishes 10 dB above its
+twin; the surviving field is visible in the RMS panel as a standing pattern
+between the hard ends, nearly uniform from floor to ceiling — sound running
+parallel to the absorber, brushing it at grazing incidence instead of
+striking it, which is the field §4 describes in disproportionate rooms.
+
+<Video
+  name="anim_fdtd_absorption_placement"
+  width={2400}
+  height={1350}
+  title="Same total absorption, two decays: placement in a flat room (2D FDTD)"
+  description="A 2D FDTD simulation of a flat 8 by 2.5 metre section run twice with the same total statistical absorption, spread over all four edges or concentrated on the floor and ceiling between hard ends. A lower axis races the two measured energy decays through the shared Sabine-Eyring band: the spread room decays inside the band at 160 ms, the concentrated room shows two slopes of 183 and 236 ms and finishes 10 dB louder, and its RMS map keeps a striped grazing field running parallel to the absorbing pair."
+/>
+
 ## 3. Comparing the five models per band
 
 `reverberation_time_models` builds the six boundary surfaces of a rectangular
@@ -546,6 +570,8 @@ point, that stays diffuse while it decays. The common breakages:
   up to twice any statistical prediction, the practical experience recorded
   in EN 12354-6 (see
   [Sound absorption in enclosed spaces](/phonometry/buildings/rooms/enclosed-space-absorption/)).
+  That grazing field is the striped survivor of the §2 clip, which measures
+  it outliving the whole Sabine-Eyring band of its own section.
 - **Focusing geometries** (domes, curved rear walls) concentrate late
   energy instead of mixing it, producing position-dependent decays no
   single-number formula can represent.

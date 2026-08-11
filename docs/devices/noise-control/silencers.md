@@ -201,6 +201,22 @@ plt.show()
 
 </details>
 
+Why is the spike only a few hertz wide? Because a resonator takes time to
+work: it has to **charge**. The clip below drives the 0.30 m stub above in
+a 2D FDTD duct at its 285.8 Hz tuning frequency and at 150 Hz side by
+side. On tune the closed-end pressure ratchets up over about six periods
+to 8.2 times the incident wave (the lossless branch at exact resonance
+would reach ten); off tune it settles at 1.5 times immediately and never
+charges — the charge has the percent-wide bandwidth $f/Q$, while the
+lossless TL spike is hertz-wide. The clip also reports the trim procedure
+once on screen: built at the drilled 300 mm, the simulated device rings at
+272.9 Hz, an effective length $c/4f = 314$ mm, the junction end correction
+made visible.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch.gif" alt="Animation: a 2D FDTD duct carrying a 0.30 m closed quarter-wave stub, driven at the 285.8 Hz tuning frequency and at 150 Hz side by side, with the closed-end pressure of both runs traced below; on tune the pressure inside the stub ratchets up over about six periods to 8.2 times the incident wave, off tune it settles at 1.5 times immediately, and an annotation reports that the built 300 mm stub rings at 272.9 Hz, an effective length of 314 mm" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch.webm)
+
 Both branches are small hardware, and `.plot_geometry()` shows just how
 small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²
 neck only 2 cm long.

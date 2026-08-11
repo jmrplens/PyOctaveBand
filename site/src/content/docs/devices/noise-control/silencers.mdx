@@ -478,6 +478,33 @@ plt.show()
 
 </details>
 
+Why is the notch only a few hertz wide at all? Because a resonator takes
+time to work, and the clip below shows it doing so, on this page's own
+0.30 m stub in a 2D FDTD duct. A side branch does not block the duct the
+instant the tone arrives: it has to **charge**. Driven at the tuning
+frequency, the pressure at the stub's closed end ratchets up over about six
+periods to 8.2 times the incident wave (the lossless branch at exact
+resonance would reach ten, twice the duct-to-branch area ratio); driven at
+150 Hz the same stub settles at 1.5 times within a couple of periods and
+never charges, which is the whole notch mechanism seen once — the charge
+has the percent-wide bandwidth $f/Q$, while the lossless TL spike is
+hertz-wide. The clip also
+runs the trim procedure of the end-correction warning above on screen:
+built at exactly the drilled 300 mm, the simulated device rings at
+272.9 Hz rather than 285.8, an effective length $c/4f = 314$ mm, and it
+still charges fully because the 4.7 % detuning sits inside the 13 % charge
+bandwidth. No transmission loss is annotated anywhere on it: at the tuning
+frequency the lossless model's TL is infinite, so a finite number there
+would only be restating the frequency grid.
+
+<Video
+  name="anim_fdtd_side_branch"
+  width={2400}
+  height={1350}
+  title="A quarter-wave side branch charging, on and off tune (2D FDTD)"
+  description="A 2D FDTD duct carrying the guide's 0.30 m closed quarter-wave stub, driven at the 285.8 Hz tuning frequency and at 150 Hz side by side, with the closed-end pressure of both runs traced below. On tune the pressure inside the stub ratchets up over about six periods to 8.2 times the incident wave; off tune it settles at 1.5 times immediately and never charges. An annotation reports that the built 300 mm stub rings at 272.9 Hz, an effective length of 314 mm, so a built device would be trimmed to tune."
+/>
+
 Both branches are small hardware, and `.plot_geometry()` shows just how
 small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²
 neck only 2 cm long.
