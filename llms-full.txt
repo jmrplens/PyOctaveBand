@@ -8109,7 +8109,8 @@ $R(f)$ and writes its fiche in one call.
 
 The report metadata is supplied as a `ReportMetadata` frozen dataclass (every
 field optional; only the supplied fields are rendered, and the numeric fields
-must be finite and positive). Passing `metadata=None` produces a lightweight
+must satisfy their field-specific physical ranges, detailed in the table
+below). Passing `metadata=None` produces a lightweight
 prediction fiche (body, result and disclaimer only). When
 `metadata.requirement` is set, a verdict row is added: an airborne rating passes
 when it is at or above the requirement, an impact rating when it is at or below
@@ -8182,7 +8183,7 @@ numeric fields are validated on construction by physical range.
 | `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Per-room climate when source and receiving rooms are reported separately (same ranges as above) |
 | `test_room`, `mounting`, `measurement_standard`, `test_date` | `str` | Facility, mounting condition, the measurement standard (forms the standard-basis line) and the test date |
 | `laboratory`, `operator`, `report_id`, `notes` | `str` | Footer: institute, operator signature line, report number and free-form remarks |
-| `requirement` | `float > 0` | Target single number; adds the verdict row (airborne passes at or above it, impact at or below it) |
+| `requirement` | `float` | Target single number; adds the verdict row (airborne passes at or above it, impact at or below it) |
 
 ## Quick answers
 
