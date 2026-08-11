@@ -1,6 +1,6 @@
 ---
 title: "Calibración e incertidumbre"
-description: "Las tres disciplinas que convierten un nivel calculado en una medición defendible: calibración SPL física frente a análisis digital en dBFS, la propagación de la incertidumbre de medida por GUM y Monte Carlo, y las estadísticas de estacionariedad y de picos que cualifican un registro antes de promediar nada de él."
+description: "Las disciplinas que convierten un nivel calculado en una medición defendible: calibración SPL física frente a análisis digital en dBFS, la propagación de la incertidumbre de medida por GUM y Monte Carlo, las estadísticas de estacionariedad y de picos que cualifican un registro antes de promediar nada de él, y los verificadores de clase con el informe de conformidad detrás de cada número."
 ---
 
 Un nivel impreso por un programa no es todavía una medición. Tres cosas
@@ -8,7 +8,10 @@ separan lo uno de lo otro: saber que el registro merece **promediarse
 siquiera**, saber qué significan **físicamente** las muestras digitales, y
 saber cuánto podría razonablemente **equivocarse** el resultado. Esta sección
 cubre las tres, y las tres se aplican transversalmente a todas las demás
-páginas de la documentación.
+páginas de la documentación. Una cuarta página traza el mapa de la evidencia
+que respalda los números: qué afirma una **clase** de prestaciones, los
+verificadores que califican una cadena, y el informe de conformidad
+publicado.
 
 [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) se ocupa del
 significado físico. phonometry trabaja en dos marcos de referencia: los
@@ -29,6 +32,16 @@ distribuciones de probabilidad completas y produce intervalos de cobertura
 que siguen siendo honestos cuando el modelo es no lineal o las entradas
 distan de ser gaussianas. La página muestra ambas sobre los mismos modelos,
 incluyendo dónde divergen y por qué.
+
+[Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/)
+lleva el relato de la evidencia: qué afirma de verdad una clase de
+prestaciones en IEC 61672-1 e IEC 61260-1 (mismos objetivos de diseño,
+distintos límites de aceptación), qué verificador público califica cada
+etapa de una cadena de medición frente a sus tablas de tolerancias, cómo
+leer y citar el informe numérico de conformidad que publica el sitio, y la
+frontera honesta frente a los ensayos de tipo y periódicos de
+IEC 61672-2/-3 e IEC 61260-2/-3, que necesitan un instrumento en un
+laboratorio y no una biblioteca.
 
 [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/) guarda la
 puerta delante de ambas: todo promedio - un Leq, una PSD de Welch, toda
@@ -59,6 +72,11 @@ la maquinaria GUM descrita aquí.
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): calibración SPL
   física desde un tono de calibrador, la comprobación de estabilidad que
   aplica a esa grabación, y el modo digital de fondo de escala.
+- [Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/):
+  qué afirma una clase de prestaciones, los verificadores que califican
+  ponderaciones, bancos de filtros y espectros de intensidad frente a sus
+  tablas de tolerancias, el informe de conformidad, y el alcance de
+  IEC 61672-2/-3 e IEC 61260-2/-3.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo,
   incertidumbre expandida e intervalos de cobertura.
@@ -74,7 +92,9 @@ conformidad de IEC 60942 sobre el propio calibrador (nivel generado,
 frecuencia, distorsión y las correcciones por presión estática y temperatura)
 no están implementados, así que pasa un `target_spl` ya corregido cuando el
 manual lo pida, y los ensayos periódicos de IEC 61672-3 se citan como práctica
-de laboratorio, no se ejecutan. La parte de dBFS de la página de calibración
+de laboratorio, no se ejecutan;
+[Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/)
+traza esa frontera con precisión, parte por parte. La parte de dBFS de la página de calibración
 queda fuera de cualquier norma y no hace ninguna afirmación física: es un
 marco de referencia, no una medición. La cualificación de datos implementa solo
 el núcleo cuantitativo del apartado 10.3 de Bendat y Piersol: clasificar el

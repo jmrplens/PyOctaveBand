@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 105 guides of phonometry, grouped into the ten topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 106 guides of phonometry, grouped into the ten topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -96,7 +96,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and five guides sit in ten topics, and each topic has its
+This page is the map. A hundred and six guides sit in ten topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -219,6 +219,9 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone or a known sensitivity, and the digital
   full-scale mode.
+- [Compliance and verification](/phonometry/signals/metrology/compliance-verification/):
+  what a performance class asserts, the verifiers per stage, the conformance
+  report, and the scope of the pattern-evaluation and periodic-test parts.
 - [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method, with
   expanded uncertainty and coverage intervals.

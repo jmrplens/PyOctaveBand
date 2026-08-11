@@ -167,6 +167,10 @@ Qué significan los números y cuánto fiarse de ellos.
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): calibración SPL
   física a partir de un tono de calibrador (IEC 60942), la comprobación de
   estabilidad que aplica a esa grabación, y el modo digital dBFS.
+- [Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/):
+  qué afirma una clase de prestaciones, los verificadores que califican cada
+  etapa frente a sus tablas de tolerancias, cómo leer el informe de
+  conformidad, y el alcance de IEC 61672-2/-3 e IEC 61260-2/-3.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo de
   ISO/IEC Guide 98-3, con incertidumbre expandida e intervalos de cobertura.
@@ -181,10 +185,13 @@ Faltan cuatro cosas que un lector espera razonablemente encontrar aquí, y cada
 guía lo dice en su propio bloque «No cubierto». **Aquí no se verifica ningún
 instrumento.** `verify_filter_class` y `verify_weighting_class` comprueban una
 respuesta digital diseñada frente a las tablas de tolerancias de IEC 61260-1 y
-de IEC 61672-1; los ensayos de evaluación de patrón de IEC 61672-3 que un
-sonómetro físico necesita para su aprobación de tipo, y los ensayos de
-conformidad del propio calibrador de IEC 60942, no se ejecutan, así que un
-veredicto de clase de aquí describe el algoritmo y no un aparato construido.
+de IEC 61672-1; los ensayos de tipo de IEC 61672-2 que un sonómetro físico
+necesita para su aprobación de tipo, los ensayos periódicos de IEC 61672-3
+que recibe en servicio, y los ensayos de conformidad del propio calibrador de
+IEC 60942, no se ejecutan, así que un veredicto de clase de aquí describe el
+algoritmo y no un aparato construido;
+[Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/)
+traza esa frontera parte por parte.
 **Aquí no se abre ningún archivo.** Nada en la biblioteca decodifica WAV, FLAC
 ni ningún otro contenedor: toda función toma un array que ya has leído, que es
 la razón de que `fs` sea siempre un argumento. **Aquí no hay procesado de

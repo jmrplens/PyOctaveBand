@@ -82,6 +82,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Overview](https://jmrplens.github.io/phonometry/signals/metrology/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/)
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/)
+- [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 - [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/)
 
 ## Hearing and perception

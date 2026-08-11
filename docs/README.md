@@ -52,6 +52,7 @@ Every other section consumes it.
 **[Calibration and uncertainty](signals/metrology/index.md)**
 
 - [Calibration and dBFS](signals/metrology/calibration.md): physical SPL and digital analysis
+- [Compliance and verification](signals/metrology/compliance-verification.md): what a performance class asserts in IEC 61672-1 and IEC 61260-1, the public verifiers that grade weightings, filter banks and intensity spectra against their tolerance tables, how to read the numerical conformance report, and the verified scope of the pattern-evaluation and periodic-test parts (IEC 61672-2/-3, IEC 61260-2/-3) that only a laboratory can run
 - [Measurement uncertainty](signals/metrology/gum-uncertainty.md): the GUM law of propagation of uncertainty and the Monte Carlo method (ISO/IEC Guide 98-3:2008 and Supplement 1): combined and expanded uncertainty, Welch–Satterthwaite effective degrees of freedom, and probabilistically symmetric coverage intervals
 - [Data qualification](signals/metrology/data-qualification.md): the Bendat & Piersol stationarity tests (reverse arrangements with the Table A.6 acceptance regions, runs about the median with the exact Wald-Wolfowitz distribution) on segment mean squares, and the Rice statistics of level crossings, apparent frequency, peak rates and the irregularity factor that places the peak-height distribution between Rayleigh and Gaussian
 

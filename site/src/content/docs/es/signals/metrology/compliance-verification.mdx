@@ -1,0 +1,446 @@
+---
+title: "Conformidad y verificación"
+description: "Qué afirma una clase de prestaciones según IEC 61672-1 e IEC 61260-1, los verificadores públicos que califican una cadena diseñada frente a las tablas de tolerancias, cómo leer el informe de conformidad publicado, y la frontera honesta que trazan las partes de ensayo de tipo y de ensayos periódicos que solo un laboratorio puede ejecutar."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "Las dos categorías de prestaciones del apartado 1 (mismos objetivos de diseño, distintos límites de aceptación y rango de temperatura de funcionamiento) y los límites de aceptación de las ponderaciones frecuenciales de la Tabla 3 que comprueba verify_weighting_class."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 2: Pattern evaluation tests"
+    designation: "IEC 61672-2:2013"
+    url: "https://webstore.iec.ch/en/publication/5709"
+    note: "El régimen completo de aprobación de tipo de un sonómetro físico: todas las especificaciones obligatorias de la Parte 1, incluidos los ensayos de influencia ambiental, electrostática y de radiofrecuencia, ejercidos sobre especímenes presentados. Nada de esta página lo realiza."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 3: Periodic tests"
+    designation: "IEC 61672-3:2013"
+    url: "https://webstore.iec.ch/en/publication/5710"
+    note: "El conjunto deliberadamente restringido de ensayos clave que recibe en laboratorio un sonómetro en servicio, y la salvedad del apartado 1: los resultados periódicos por sí solos no sostienen ninguna conclusión general de conformidad. Se cita aquí como modelo de lo que un veredicto de clase no dice."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/en/publication/5063"
+    note: "Los límites de aceptación de atenuación relativa de clase 1 / clase 2 de la Tabla 1 que comprueba verify_filter_class, y la declaración del apartado 1.2 de qué separa las dos clases."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 2: Pattern-evaluation tests"
+    designation: "IEC 61260-2:2016"
+    url: "https://webstore.iec.ch/en/publication/24560"
+    note: "El régimen de ensayo de tipo de un juego de filtros físico: al menos tres especímenes presentados, el recorrido completo de la Tabla 1, linealidad, compatibilidad electromagnética y sensibilidad climática. Nada de esta página lo realiza."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2016
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 3: Periodic tests"
+    designation: "IEC 61260-3:2016"
+    url: "https://webstore.iec.ch/en/publication/24561"
+    note: "Los ensayos periódicos de un analizador en servicio: atenuación relativa en el centro de banda o desviación del ancho de banda efectivo, el rango lineal de funcionamiento con su control de rango de nivel e indicador de sobrecarga, el límite inferior de ese rango, y el ensayo de atenuación relativa del apartado 13 en las frecuencias normalizadas de la Tabla 1 sobre tres filtros seleccionados."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1993
+    title: "Electroacoustics — Instruments for the measurement of sound intensity — Measurements with pairs of pressure sensing microphones"
+    designation: "IEC 61043:1993"
+    url: "https://webstore.iec.ch/en/publication/4353"
+    note: "Los límites de clase sobre el índice de intensidad residual de presión detrás de verify_intensity_class, la tercera familia de verificadores que inventaría esta página."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+import { totalChecks, domains, standards } from '../../../../../data/conformance-stats.mjs';
+
+Tres clases de evidencia respaldan un número calculado con esta biblioteca, y
+viven en páginas distintas. Los **verificadores** son funciones públicas que
+califican un filtro o una ponderación que tú configuraste frente a los
+límites de aceptación de su norma de referencia. El **informe de
+conformidad** es la tabla publicada de {totalChecks} comprobaciones que ancla
+la implementación distribuida a los valores esperados de las propias normas,
+regenerada con cada cambio. Y las **notas de alcance** de cada guía dicen
+dónde termina la afirmación del software y dónde empieza la del laboratorio.
+Esta página es el mapa de las tres: qué afirma realmente una clase de
+prestaciones, qué función verifica qué, cómo leer el informe, y exactamente
+qué partes de las series IEC 61672 e IEC 61260 puede y no puede reclamar una
+biblioteca.
+
+## 1. Qué afirma una clase de prestaciones
+
+IEC 61672-1:2013 (sonómetros) e IEC 61260-1:2014 (filtros de banda de octava
+y de fracción de octava) especifican ambas **dos categorías de prestaciones,
+clase 1 y clase 2**, y ambas las definen igual: la clase 1 y la clase 2
+comparten los *mismos objetivos de diseño* y difieren sobre todo en los
+**límites de aceptación** alrededor de esos objetivos y en el rango de
+temperatura de funcionamiento; los límites de clase 2 son mayores o iguales
+que los de clase 1 en todas partes (IEC 61672-1:2013, apartado 1;
+IEC 61260-1:2014, apartado 1.2).
+
+Así que una clase no es una nota de calidad de la lectura. Es una **cota de
+error de peor caso bajo condiciones declaradas**: una ponderación A de
+clase 1 puede desviarse de la respuesta objetivo en 1 kHz como mucho
+±0,7 dB, una de clase 2 ±1,0 dB, y cada banda de un filtro de tercio de
+octava de clase 1 lee un tono centrado en la banda a menos de ±0,4 dB de su
+nivel verdadero. La cota es lo que se encadena: una medición de clase 1
+necesita que todas las etapas sostengan la clase 1, desde el
+[calibrador](/phonometry/es/signals/metrology/calibration/) pasando por la
+ponderación hasta el filtro de banda, porque la tolerancia de cada etapa
+entra en el nivel que entrega a la siguiente. Una sola etapa de clase 2
+acota la cadena en clase 2, atestigüe lo que atestigüe el resto.
+
+Dos bordes del vocabulario conviene fijarlos antes de verificar nada:
+
+- **La clase 0 no es una clase de 2014.** La clase de filtro más estricta
+  pertenece a las máscaras retiradas de IEC 61260:1995 / ANSI S1.11-2004;
+  IEC 61260-1:2014 define solo las clases 1 y 2. Los verificadores mantienen
+  viva la máscara antigua tras `edition="1995"`, y
+  [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/#2-clase-0-iec-612601995--ansi-s111-2004)
+  cubre cuándo es honesta una afirmación de clase 0 y cómo citarla.
+- **Una clase pertenece a una especificación, no a un número.** «Clase 1» a
+  secas no dice nada; la afirmación es «clase 1 según la Tabla 3 de
+  IEC 61672-1:2013» o «clase 1 según la Tabla 1 de IEC 61260-1:2014», y las
+  dos máscaras son objetos distintos comprobados por funciones distintas,
+  que es la sección siguiente.
+
+## 2. Los verificadores: qué función demuestra qué
+
+La biblioteca expone un verificador por etapa de instrumento. Cada uno
+comprueba un diseño que tú configuraste, banda a banda o frecuencia a
+frecuencia, frente a los límites de aceptación transcritos de la norma de
+referencia, y cada uno devuelve el mismo vocabulario de veredicto: un
+`overall_class` (la clase más estricta cumplida, o `None`), márgenes por
+banda en decibelios hasta el límite más cercano, y una bandera
+`range_limited` cuando parte del rango de frecuencias de la norma no pudo
+demostrarse a tu frecuencia de muestreo.
+
+| Etapa | Verificador | Límites de aceptación | En detalle |
+| :--- | :--- | :--- | :--- |
+| Ponderación frecuencial (A, C, Z) | `verify_weighting_class` | IEC 61672-1:2013, Tabla 3 | [Ponderación frecuencial, sección 6](/phonometry/es/signals/levels/weighting/#6-verificación-frente-a-las-tablas-de-tolerancias-iec-61672-1) |
+| Ponderaciones B y AU | `verify_weighting_class` | ANSI S1.4-1983, Tablas IV/V; IEC 61012:1990, Tabla 1 | [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) |
+| Banco de filtros de fracción de octava | `verify_filter_class` | IEC 61260-1:2014, Tabla 1 (máscara de 1995 vía `edition="1995"`) | [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/) |
+| Espectro de instrumento de intensidad | `verify_intensity_class` | IEC 61043:1993, Tabla 2 | [Intensidad acústica](/phonometry/es/devices/emission/intensity/) |
+
+Las propias máscaras también son públicas: `weighting_class_limits(1)`
+devuelve las 34 frecuencias nominales de la Tabla 3 con los límites de
+desviación de clase 1, y `class_limits(fraction, filter_class, omega)`
+devuelve el corredor de atenuación relativa de la Tabla 1, de modo que un
+informe puede dibujar los mismos límites con los que se juzgó el veredicto.
+
+Verificar una cadena de medición completa son dos llamadas. La configuración
+de abajo es la que ancla el propio banco de conformidad, una cadena a
+48 kHz con el banco Butterworth de orden 6 por defecto entre 100 Hz y
+10 kHz:
+
+```python
+from phonometry import filters
+
+wf = filters.WeightingFilter(48000, "A")
+weighting = filters.verify_weighting_class(wf)
+print(weighting["overall_class"])       # 1
+print(weighting["range_limited"])       # False
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6,
+                                limits=[100, 10000])
+bands = filters.verify_filter_class(bank)
+print(bands["overall_class"])           # 1
+print(bands["range_limited"])           # True en un banco diezmado
+```
+
+Lee las banderas, no solo la clase. `range_limited` en el banco es `True`
+porque una banda diezmada no puede evaluarse más allá de su propio Nyquist
+de proceso, así que la banda atenuada lejana descansa en el argumento del
+antialias y no en el propio filtro de banda; la ponderación a 48 kHz
+comprueba las 34 frecuencias nominales e informa `False`. Los márgenes dicen
+cuánto le faltó al veredicto:
+
+```python
+worst = min(bands["bands"], key=lambda b: b["margin_class1_db"])
+print(round(worst["margin_class1_db"], 3))   # 0.4
+print(weighting["bands"][20])
+# {'freq': 1000.0, 'class': 1, 'deviation_db': 0.0, 'margin_class1_db': 0.7, 'margin_class2_db': 1.0}
+```
+
+Un margen de +0,400 dB en un banco Butterworth que cumple es la propia
+semianchura del corredor de banda de paso, lo mejor que puede informar un
+diseño conforme, no un resultado que mejorar;
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/#1-verificar-la-clase-frente-a-iec-61260-12014)
+explica qué restricción manda y por qué subir el orden deja de ayudar en
+cuanto el veredicto se vuelve positivo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_es.svg" alt="Desviaciones de las ponderaciones A y C a 48 kHz dentro del corredor de aceptación de clase 1 de la Tabla 3 de IEC 61672-1, con los límites más amplios de clase 2 punteados" width="80%" />
+
+*Lo que comprueba de verdad un verificador, dibujado para las ponderaciones:
+la desviación de la respuesta diseñada respecto del objetivo de diseño
+(marcadores) debe quedarse dentro del corredor de clase 1 (sombreado) en
+cada frecuencia nominal. El equivalente para bancos de filtros, un corredor
+de atenuación relativa alrededor de cada frecuencia central, está dibujado
+en [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).*
+
+<details>
+<summary>Muestra el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+freqs, lower1, upper1 = filters.weighting_class_limits(1)
+_, lower2, upper2 = filters.weighting_class_limits(2)
+lo1, lo2 = np.clip(lower1, -7, 7), np.clip(lower2, -7, 7)
+
+fig, ax = plt.subplots(figsize=(10, 6.5))
+ax.fill_between(freqs, lo1, upper1, step="mid", alpha=0.10,
+                label="Región de aceptación de clase 1")
+ax.plot(freqs, upper1, drawstyle="steps-mid",
+        label="Límite superior/inferior de clase 1")
+ax.plot(freqs, lo1, drawstyle="steps-mid", color="C1")
+ax.plot(freqs, upper2, ":", drawstyle="steps-mid",
+        label="Límite superior/inferior de clase 2")
+ax.plot(freqs, lo2, ":", drawstyle="steps-mid", color="C2")
+
+for curve, marker in (("A", "o"), ("C", "s")):
+    verdict = filters.verify_weighting_class(filters.WeightingFilter(48000, curve))
+    f = [b["freq"] for b in verdict["bands"]]
+    dev = [b["deviation_db"] for b in verdict["bands"]]
+    ax.plot(f, dev, marker=marker,
+            label=f"Desviación de la ponderación {curve} (48 kHz)")
+
+ax.set(xscale="log", xlim=(10, 20000), ylim=(-7, 7),
+       xlabel="Frecuencia [Hz]",
+       ylabel="Desviación respecto del objetivo [dB]")
+ax.legend(fontsize=8, ncol=2)
+plt.show()
+```
+
+</details>
+
+Cuando el veredicto tiene que salir de la consola, `filter_class_compliance`
+envuelve la misma verificación en un objeto resultado con `.plot()` (la
+banda de peor margen dibujada sobre su corredor de clase) y `.report()`, la
+ficha acreditada de una página con una fila opcional de CUMPLE/NO CUMPLE
+frente a una clase exigida:
+
+```python
+from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+
+bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filter_class_compliance(bank)   # result.overall_class == 1
+result.report(
+    "iec61260_es.pdf",
+    metadata=ReportMetadata(
+        specimen="Banco de filtros de 1/1 de octava",
+        measurement_standard="IEC 61260-1:2014",
+        required_class=1,
+    ),
+    language="es",
+)                                        # -> Clase 1 - CUMPLE
+```
+
+<ReportPreview
+	name="iec61260_filter_example"
+	title="Informe de ejemplo de conformidad de clase de filtro IEC 61260-1 (PDF)"
+	description="Ficha de conformidad de clase de filtro de una página: una cabecera de metadatos, una tabla de clasificación por bandas con la clase alcanzada y el margen vinculante de cada banda de octava, la atenuación relativa medida de la banda de peor margen superpuesta sobre el corredor de aceptación verde de clase 1, el resultado encuadrado Class 1 - COMPLIES (margin +0.40 dB) y un veredicto CUMPLE frente a la clase 1 exigida."
+	caption="El veredicto como documento: la ficha declara la clase alcanzada por banda, el margen vinculante y el corredor con el que se juzgó, que es todo lo que la sección 4 dice que puede afirmar una declaración a nivel de diseño."
+/>
+
+El verificador de intensidad sigue el mismo patrón un dominio más allá:
+`verify_intensity_class` califica un espectro medido del índice de
+intensidad residual de presión frente a los límites de clase de IEC 61043, y
+`intensity_class_compliance` lo envuelve con `.plot()` y su propia ficha,
+con la física del índice residual explicada en
+[Intensidad acústica](/phonometry/es/devices/emission/intensity/).
+
+## 3. Leer el informe de conformidad
+
+Los verificadores califican *tu* configuración. El
+[informe de conformidad](/phonometry/es/reference/conformance/) es la
+evidencia complementaria: {totalChecks} comprobaciones numéricas a través de
+{domains} dominios y {standards} normas, cada fila anclando una magnitud
+implementada al valor esperado de la propia norma de referencia, con el
+valor calculado, la diferencia con signo y un veredicto de pasa/falla al
+lado. Se regenera con cada pull request y la construcción falla si deriva
+respecto del código, así que la tabla publicada siempre describe la
+biblioteca tal como se distribuye.
+
+Tres hábitos lo vuelven útil en lugar de decorativo:
+
+- **Encuentra la fila antes de fiarte de la función.** Cada tabla es
+  `Standard | Quantity | Expected | Computed | Delta | Status`, agrupada por
+  dominio, y el valor esperado es el ejemplo resuelto o la entrada de la
+  tabla de tolerancias de la norma, no una línea base de regresión. La fila
+  de una métrica de la que dependes te dice a qué apartado de qué edición se
+  sometió la implementación, que es exactamente la cita que necesita un
+  informe.
+- **Fíjate en la configuración de las filas de clase.** La sección de
+  filtros y ponderaciones recorre las
+  [cinco arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/)
+  y las curvas de ponderación con los mismos verificadores que documenta
+  esta página, en una configuración anclada: orden 6, tercio de octava, 100 Hz a
+  10 kHz, 48 kHz. El informe demuestra la implementación; para cualquier
+  otra fracción, orden o frecuencia de muestreo, la sección 2 es cómo se
+  traslada la afirmación a *tu* banco.
+- **Cita la versión que se ejecutó.** El informe describe la versión exacta
+  de la biblioteca que lo generó, así que una cita defendible fija la
+  versión y cita el informe de esa versión, como detalla
+  [Sobre este proyecto](/phonometry/es/start/about/).
+
+Donde rederivar una norma tan de cerca ha destapado defectos en los propios
+documentos publicados, la evidencia vive en el
+[registro de erratas](/phonometry/es/reference/errata/), que el informe
+enlaza fila a fila donde aplica.
+
+## 4. Qué solo puede atestiguar un laboratorio
+
+Las dos series de instrumentos continúan más allá de su Parte 1 con dos
+regímenes de ensayo, y ninguno de los dos es algo que una biblioteca de
+software pueda ejecutar sobre sí misma. La delimitación de abajo está
+verificada contra los cuatro documentos; el resumen de una línea es que **la
+biblioteca comprueba diseños frente a los límites de aceptación de la
+Parte 1, mientras que las Partes 2 y 3 comprueban instrumentos físicos** — y
+las dos afirmaciones no son intercambiables.
+
+El **ensayo de tipo** (IEC 61672-2:2013 para sonómetros, IEC 61260-2:2016
+para filtros) es el régimen de aprobación de tipo que un *modelo* supera una
+sola vez. Su alcance declarado son los ensayos necesarios para verificar la
+conformidad con **todas las especificaciones obligatorias** de la Parte 1
+(IEC 61672-2:2013, apartado 1; IEC 61260-2:2016, apartado 1.1), sobre
+especímenes físicos: IEC 61260-2 exige presentar al menos tres especímenes
+del modelo a ensayo (apartado 4.1). Eso incluye todo lo que una función de
+transferencia no tiene: la influencia de la presión estática, la temperatura
+del aire y la humedad relativa, la inmunidad a descargas electrostáticas y a
+campos de frecuencia de red y de radiofrecuencia, la respuesta direccional y
+los ensayos acústicos de las ponderaciones con el micrófono en el campo
+sonoro, la linealidad de nivel de la electrónica real, el ruido
+autogenerado, la respuesta a ráfagas tonales, el comportamiento ante
+sobrecarga (IEC 61672-2:2013, apartados 7 a 9; IEC 61260-2:2016, apartados
+7 a 9).
+
+Los **ensayos periódicos** (IEC 61672-3:2013, IEC 61260-3:2016) son lo que
+recibe en laboratorio un *instrumento en servicio*, normalmente cada año o
+dos. Su
+alcance es deliberadamente lo contrario de exhaustivo: un conjunto limitado
+de ensayos clave, válido para las condiciones ambientales del día,
+«restringido al mínimo considerado necesario» (IEC 61672-3:2013, apartado 1;
+IEC 61260-3:2016, apartados 1.2 y 1.3). Para un juego de filtros eso
+significa la atenuación relativa en la frecuencia central de cada filtro o
+la desviación del ancho de banda efectivo, el rango lineal de funcionamiento
+con su control de rango de nivel e indicador de sobrecarga, el límite
+inferior de ese rango, y un ensayo de atenuación relativa en las frecuencias
+normalizadas de la propia Tabla 1 de la norma sobre los tres filtros
+seleccionados para los ensayos de linealidad (IEC 61260-3:2016, apartados
+10 a 13); para un sonómetro, la comprobación con calibrador, el ruido autogenerado, las
+ponderaciones con señales acústicas y eléctricas, la linealidad, las ráfagas
+tonales, el pico con ponderación C y la sobrecarga (IEC 61672-3:2013,
+apartados 9 a 21). Los dos alcances de la Parte 3 terminan con la misma
+salvedad: como el alcance es limitado, superar todos los ensayos periódicos
+no sostiene **ninguna conclusión general de conformidad** con la Parte 1
+salvo que conste la aprobación de tipo del modelo (IEC 61672-3:2013,
+apartado 1; IEC 61260-3:2016, apartado 1.5).
+
+La misma honestidad se aplica a esta biblioteca, en las dos direcciones:
+
+- **Qué es un veredicto de verificador.** Una afirmación sobre un *diseño*:
+  la función de transferencia digital que configuraste cabe en la máscara de
+  aceptación de la Parte 1, con los márgenes informados, sobre el rango de
+  frecuencias comprobado. Toda medición hecha íntegramente en software lo
+  hereda, y por eso el
+  [recorrido del sonómetro](/phonometry/es/signals/sound-level-meter/)
+  termina ejecutando los verificadores sobre la cadena que acaba de montar.
+- **Qué no es.** Un ensayo de tipo, un ensayo periódico ni un certificado de
+  ningún equipo físico. Nada aquí tiene un micrófono, una temperatura ni un
+  número de serie; los ensayos de magnitudes de influencia, de inmunidad y
+  acústicos de arriba no están implementados, y ningún veredicto verde de la
+  sección 2 dice nada del hardware que grabó tus muestras. Un front-end real
+  trae su propio papel: el ensayo periódico del sonómetro según IEC 61672-3
+  y la conformidad del calibrador según IEC 60942, ambos tratados con el
+  ritual de campo en
+  [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
+- **Nombra los dos veredictos en un informe.** «Niveles de banda calculados
+  con filtros verificados clase 1 según la Tabla 1 de IEC 61260-1:2014
+  (versión X de la biblioteca, véase su informe de conformidad); cadena de
+  adquisición con ensayo periódico según IEC 61672-3:2013 en fecha Y» es una
+  afirmación que un revisor puede comprobar de punta a punta. Cada mitad por
+  separado toma prestada en silencio la autoridad de la otra.
+
+## Qué cubre esta guía
+
+**Cubierto.** Qué afirma una clase de prestaciones en IEC 61672-1:2013 e
+IEC 61260-1:2014 y cómo la afirmación se encadena a través de una medición;
+los verificadores públicos (`verify_weighting_class`, `verify_filter_class`,
+`verify_intensity_class`, con `weighting_class_limits` y `class_limits`
+publicando las máscaras, y `filter_class_compliance` /
+`intensity_class_compliance` añadiendo `.plot()` y la ficha acreditada);
+cómo leer y citar el informe de conformidad publicado; y el alcance
+verificado de las partes de ensayo de tipo y de ensayos periódicos.
+
+**No cubierto.** Las matemáticas de verificación de cada etapa, que
+pertenecen a la guía de esa etapa
+([Ponderación frecuencial](/phonometry/es/signals/levels/weighting/),
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/),
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/),
+[Intensidad acústica](/phonometry/es/devices/emission/intensity/)); y todos los
+ensayos de las propias Partes 2 y 3, que esta página delimita pero la
+biblioteca no realiza: no se ejecuta ningún ensayo ambiental, de inmunidad,
+acústico ni de linealidad, y a ningún instrumento físico se le asigna una
+clase.
+
+## Véase también
+
+- [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/): las
+  curvas A/C/Z y la verificación de la sección 6 frente a la Tabla 3 de
+  IEC 61672-1.
+- [Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/):
+  la máscara de IEC 61260-1 banda a banda, la clase 0 y la ficha de
+  conformidad en detalle.
+- [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/): la cadena
+  completa montada y después verificada en clase con los verificadores de
+  esta página.
+- [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): el lado
+  del calibrador en la cadena de clase, y la práctica de laboratorio
+  IEC 60942 / IEC 61672-3 a su alrededor.
+- [Informe de conformidad](/phonometry/es/reference/conformance/): la tabla
+  publicada que esta página enseña a leer.
+- Referencia de la API:
+  [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/),
+  [`filters.weighting_compliance`](/phonometry/es/reference/api/filters/weighting-compliance/)
+  y [`emission.intensity_compliance`](/phonometry/es/reference/api/power/intensity-compliance/).
+
+## Respuestas rápidas
+
+### ¿Puede phonometry certificar mi sonómetro o analizador como clase 1?
+
+No. Los verificadores califican el diseño digital que se les da frente a los
+límites de aceptación de la Tabla 3 de IEC 61672-1:2013 o de la Tabla 1 de
+IEC 61260-1:2014; la clase de un instrumento físico sale del ensayo de tipo
+(IEC 61672-2:2013 / IEC 61260-2:2016) y se mantiene creíble mediante los
+ensayos periódicos (IEC 61672-3:2013 / IEC 61260-3:2016), y todos necesitan
+el equipo en un laboratorio. Una medición hecha con un front-end de hardware
+lleva dos veredictos, el veredicto de diseño de la biblioteca y el registro
+de ensayos del instrumento, y un informe defendible nombra los dos.
+
+### ¿Qué diferencia hay entre el ensayo de tipo y los ensayos periódicos?
+
+El ensayo de tipo (Parte 2 de cada serie) verifica un *modelo* frente a
+todas las especificaciones obligatorias de la Parte 1 una sola vez, sobre
+especímenes presentados, incluidos los ensayos de influencia ambiental y
+electromagnética. Los ensayos periódicos (Parte 3) recomprueban un
+*instrumento en servicio* con un conjunto limitado y deliberadamente mínimo
+de ensayos clave, válido para las condiciones del día; los dos alcances de
+la Parte 3 declaran que superarlos no sostiene ninguna conclusión general de
+conformidad salvo que conste la aprobación de tipo del modelo.
+
+### ¿Qué funciones comprueban la conformidad con normas en phonometry?
+
+`verify_weighting_class` comprueba una ponderación frecuencial frente a la
+Tabla 3 de IEC 61672-1:2013 (B y AU frente a ANSI S1.4-1983 e
+IEC 61012:1990), `verify_filter_class` comprueba un banco de fracción de
+octava frente a la Tabla 1 de IEC 61260-1:2014 (la máscara de clase 0 de
+1995 vía `edition="1995"`), y `verify_intensity_class` comprueba el espectro
+del índice residual de un instrumento de intensidad frente a IEC 61043:1993.
+Las tres informan una clase por banda con márgenes en dB, y
+`filter_class_compliance` / `intensity_class_compliance` empaquetan el
+veredicto con `.plot()` y una ficha acreditada `.report()`.
