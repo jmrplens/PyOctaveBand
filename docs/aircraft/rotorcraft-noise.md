@@ -290,7 +290,7 @@ diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss.svg" alt="Diffraction attenuation against path difference for four bands from 63 Hz to 4 kHz, over a 2.5 m edge: every curve is zero left of its own band-dependent threshold near the line of sight, crosses about 4.8 dB at grazing incidence, and the two highest bands flatten at the 25 dB cap while the 250 Hz and 63 Hz curves keep climbing" width="82%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss.svg" alt="Diffraction attenuation against path difference for four bands from 63 Hz to 4 kHz, over a 2.5 m edge: every curve is zero left of its own band-dependent threshold near the line of sight, the three bands with Ch = 1 cross about 4.8 dB at grazing incidence while 63 Hz crosses at 3.0 dB, and only the 4 kHz curve reaches the 25 dB cap within the plotted range" width="82%">
 </picture>
 
 <details>
@@ -302,7 +302,7 @@ import numpy as np
 from phonometry import diffraction_attenuation
 
 bands = np.array([63.0, 250.0, 1000.0, 4000.0])
-delta = np.linspace(-0.4, 4.0, 441)
+delta = np.linspace(-0.4, 1.5, 441)
 ld = np.array([diffraction_attenuation(bands, float(d), edge_height=2.5)
               for d in delta])
 
@@ -321,10 +321,12 @@ plt.show()
 
 Every curve is flat at zero left of its own threshold (the guidance's
 $(40/\lambda)\,C''\,\delta \ge -2$, so a longer wavelength still shows
-attenuation further below the line of sight), all four pass through the
-classical $10\log_{10}3 \approx 4.8$ dB at grazing incidence, and only the
-bands whose wavelength is short enough reach the 25 dB cap within a few
-metres of path difference.
+attenuation further below the line of sight). Grazing incidence is
+$10\,C_h\log_{10}3$, not a fixed value: the three bands whose frequency
+already saturates $C_h$ at 1 (Eq. 43, $h_0$ = 2.5 m) cross the classical
+$\approx 4.8$ dB, while 63 Hz, with $C_h = 0.63$ there, crosses at 3.0 dB
+instead. Only the 4 kHz band is short enough to reach the 25 dB cap within
+this range, at $\delta \approx 0.68$ m.
 
 `mean_ground_plane`, `mean_flow_resistivity` and `diffraction_attenuation`
 expose the pieces; `terrain_screening_adjustment` runs the whole section:

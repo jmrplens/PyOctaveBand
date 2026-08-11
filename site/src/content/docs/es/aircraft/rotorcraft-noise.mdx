@@ -710,14 +710,16 @@ diffraction_attenuation(bandas, 0.0, edge_height=2.5)   # incidencia rasante
 diffraction_attenuation(bandas, 1.0, edge_height=2.5)   # 1 m dentro de la sombra
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss_es.svg" alt="Atenuación por difracción frente a la diferencia de camino para cuatro bandas de 63 Hz a 4 kHz, sobre una arista de 2,5 m: cada curva vale cero a la izquierda de su propio umbral dependiente de la banda cerca de la línea de visión, cruza unos 4,8 dB en incidencia rasante, y las dos bandas más altas se aplanan en el tope de 25 dB mientras las curvas de 250 Hz y 63 Hz siguen subiendo" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss_es.svg" alt="Atenuación por difracción frente a la diferencia de camino para cuatro bandas de 63 Hz a 4 kHz, sobre una arista de 2,5 m: cada curva vale cero a la izquierda de su propio umbral dependiente de la banda cerca de la línea de visión, las tres bandas con Ch = 1 cruzan unos 4,8 dB en incidencia rasante mientras que la de 63 Hz cruza en 3,0 dB, y solo la curva de 4 kHz alcanza el tope de 25 dB dentro del rango representado" width="82%" />
 
-*Un único número cuenta toda la historia solo cuando la longitud de onda es
-fija: la curva de 4 kHz ya está en el tope de 25 dB en $\delta$ = 0,68 m, la de
-1 kHz no lo alcanza hasta $\delta$ = 2,7 m, y la de 63 Hz sigue por debajo de
-10 dB en $\delta$ = 4 m, frenada por su propio $C_h$ = 0,63 (Ec. 43,
-$h_0$ = 2,5 m) además de la longitud de onda mayor. Las cuatro cruzan igualmente
-4,8 dB en incidencia rasante, porque ese valor nunca depende de la frecuencia.*
+*Un único número cuenta toda la historia solo cuando la longitud de onda y
+$C_h$ están fijos a la vez: la curva de 4 kHz ya está en el tope de 25 dB en
+$\delta$ = 0,68 m, la de 1 kHz todavía sigue subiendo en $\delta$ = 1,5 m
+(22,5 dB, por debajo del tope), y la de 63 Hz solo llega a 7,2 dB ahí, frenada
+por su propio $C_h$ = 0,63 (Ec. 43, $h_0$ = 2,5 m) además de la longitud de
+onda mayor. En incidencia rasante las tres bandas con $C_h$ = 1 cruzan
+4,8 dB, pero la de 63 Hz cruza en 3,0 dB, porque ese valor también depende
+de $C_h$, no solo de la longitud de onda.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -728,7 +730,7 @@ import numpy as np
 from phonometry import diffraction_attenuation
 
 bandas = np.array([63.0, 250.0, 1000.0, 4000.0])
-delta = np.linspace(-0.4, 4.0, 441)
+delta = np.linspace(-0.4, 1.5, 441)
 ld = np.array([diffraction_attenuation(bandas, float(d), edge_height=2.5)
               for d in delta])
 
