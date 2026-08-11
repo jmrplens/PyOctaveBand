@@ -132,6 +132,21 @@ the Fitzroy time; Fitzroy is known to over-predict when one wall pair is very
 reflective, which is why Arau-Puchades recommends the geometric mean. Both
 reduce exactly to Eyring for a uniform absorption distribution.
 
+The misrepresentation these two models exist for can be watched. The clip
+below simulates one flat 8 × 2.5 m section twice with the same **total**
+statistical absorption — spread over all four edges, or concentrated on the
+floor-and-ceiling pair (α ≈ 0.79) between hard ends — and races both
+measured energy decays through the one Sabine-Eyring band the two rooms
+share. The spread room decays inside the band, a straight line at
+T = 160 ms against Sabine's 201; the concentrated room's decay has no
+single slope, 183 ms early and 236 ms late, and finishes 10 dB above its
+twin, its surviving field a grazing pattern running parallel to the
+absorber.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement.gif" alt="Animation: a 2D FDTD simulation of a flat 8 by 2.5 metre section run twice with the same total statistical absorption, spread over all four edges or concentrated on the floor and ceiling between hard ends; a lower axis races the two measured energy decays through the shared Sabine-Eyring band, the spread room decaying inside the band at 160 ms while the concentrated room shows two slopes of 183 and 236 ms and finishes 10 dB louder, its RMS map keeping a striped grazing field parallel to the absorbing pair" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement.webm)
+
 ## 3. Comparing the five models per band
 
 `reverberation_time_models` builds the six boundary surfaces of a rectangular

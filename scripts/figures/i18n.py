@@ -3799,6 +3799,34 @@ _ES_EXACT = {
     "the mismatch reflects the wave back up the pipe":
         "el desajuste refleja la onda de vuelta por el conducto",
     "Position along the duct [m]": "Posición a lo largo del conducto [m]",
+    # anim_fdtd_side_branch
+    "The quarter-wave side branch, on and off tune (2D FDTD)":
+        "La rama lateral de cuarto de onda, en sintonía y fuera (FDTD 2D)",
+    "closed stub, built ℓ = 300 mm":
+        "tubo cerrado, construido con ℓ = 300 mm",
+    "on tune": "en sintonía",
+    "off tune": "fuera de sintonía",
+    "closed-end\npressure [Pa]": "presión en el\nextremo cerrado [Pa]",
+    "Rigid walls, anechoic ends, incident amplitude 1; the charge "
+    "bandwidth f/Q is percent-wide, the lossless notch hertz-wide.":
+        "Paredes rígidas, extremos anecoicos, amplitud incidente 1; el "
+        "ancho de carga f/Q es porcentual; la muesca sin pérdidas, de "
+        "hercios.",
+    # anim_fdtd_absorption_placement
+    "Where the absorption sits: same total, two decays (2D FDTD)":
+        "Dónde se coloca la absorción: mismo total, dos decaimientos "
+        "(FDTD 2D)",
+    "Absorption spread over all four edges":
+        "Absorción repartida por los cuatro bordes",
+    "The same total, floor and ceiling only":
+        "El mismo total, solo en suelo y techo",
+    "what survives runs parallel to the absorber":
+        "lo que sobrevive corre paralelo al absorbente",
+    "each frame on its own scale, 25 dB":
+        "cada fotograma con su propia escala, 25 dB",
+    "all four edges": "los cuatro bordes",
+    "floor + ceiling": "suelo + techo",
+    "Total energy [dB]": "Energía total [dB]",
     # anim_fdtd_aperture_slit
     "Sound through a wall aperture (2D FDTD)":
         "Sonido a través de una abertura en un muro (FDTD 2D)",
@@ -4260,6 +4288,31 @@ _ES_PATTERNS = [
      ("Aire a \\1 m/s, ráfaga de \\2 Hz, número de Courant por eje "
       "S = \\3; en gris la onda continua exacta, los puntos son las "
       "celdas de la malla")),
+    # anim_fdtd_side_branch: titles and readouts carrying computed values.
+    (r"^On the tuning frequency: (\d+\.\d) Hz$",
+     r"En la frecuencia de sintonía: \1 Hz"),
+    (r"^Off tune: (\d+) Hz$", r"Fuera de sintonía: \1 Hz"),
+    (r"^×(\d+\.\d) the incident wave, in ≈(\d+) periods$",
+     r"×\1 la onda incidente, en ≈\2 periodos"),
+    (r"^×(\d+\.\d) at once: it never charges$",
+     r"×\1 al instante: nunca se carga"),
+    ((r"^the stub rings at (\d+\.\d) Hz, not (\d+\.\d):\n"
+      r"ℓ_eff = c/4f = (\d+) mm, so trim it to tune$"),
+     ("el tubo resuena a \\1 Hz, no a \\2:\nℓ_ef = c/4f = \\3 mm: se "
+      "recorta para afinarlo")),
+    # anim_fdtd_absorption_placement: readouts carrying measured values.
+    (r"^measured T = (\d+) ms: inside the band$",
+     r"T medida = \1 ms: dentro de la banda"),
+    (r"^early (\d+) ms, tail (\d+) ms: no single T$",
+     r"inicial \1 ms, cola \2 ms: sin una única T"),
+    (r"^Sabine, T = (\d+) ms$", r"Sabine, T = \1 ms"),
+    (r"^Eyring, T = (\d+) ms$", r"Eyring, T = \1 ms"),
+    ((r"^Locally reacting resistive edges; both rooms hold (\d+\.\d) m of "
+      r"statistical absorption \(α_st = (\d+\.\d\d) on 21 m vs (\d+\.\d\d) "
+      r"on 16 m\); 250 Hz burst\.$"),
+     (r"Bordes resistivos de reacción local; ambas salas tienen \1 m de "
+      r"absorción estadística (α_st = \2 en 21 m frente a \3 en 16 m); "
+      r"ráfaga de 250 Hz.")),
     # Aircraft: labels and annotations carrying computed values.
     (r"^closest segment: (.+) dB$", r"segmento más próximo: \1 dB"),
     ((r"^receiver 3 000 m along track, 500 m to the side, 1\.2 m up\.\n"

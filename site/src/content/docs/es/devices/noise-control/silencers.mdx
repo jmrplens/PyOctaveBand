@@ -43,7 +43,7 @@ Un silenciador se gana el sueldo dentro de un conducto: entre un motor y su
 escape, entre un ventilador y la sala a la que sirve. Dos principios de
 funcionamiento reparten el campo. Un silenciador **reactivo** atenúa
 *reflejando* el sonido con discontinuidades de impedancia (cámaras, ramas
-laterales) y domina en baja frecuencia, donde puede apuntarse con precisión
+laterales) y domina en baja frecuencia, donde puede sintonizarse con precisión
 al tono de encendido de un motor o al paso de álabes de un ventilador; un
 silenciador **disipativo** *absorbe* el sonido en un revestimiento poroso y
 domina en banda ancha, en media y alta frecuencia. Esta guía cubre la familia
@@ -121,7 +121,7 @@ print(round(res.transmission_loss.max(), 2))   # máximo 6.55 dB (m = 4)
 print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
 ```
 
-La línea única `res.plot()` dibuja la pérdida de transmisión de la cámara (y
+Una sola línea, `res.plot()`, dibuja la pérdida de transmisión de la cámara (y
 su pérdida de inserción cuando se dan las impedancias de fuente y radiación).
 La figura de abajo barre en cambio la relación de áreas: un desajuste $m$ mayor
 eleva todos los máximos, pero las caídas permanecen en 0 dB y los máximos
@@ -209,7 +209,7 @@ plt.show()
 Circulan tres magnitudes y no son intercambiables. La **pérdida de transmisión**
 compara la potencia incidente que entra en el elemento con la que sale de él
 hacia una terminación sin reflexiones, así que es una propiedad del elemento
-solo, que es justo lo que permite calcularla a partir de la geometría y la razón
+por sí solo, que es justo lo que permite calcularla a partir de la geometría y la razón
 de que la fórmula de arriba fije $Z_1 = \rho c/S_\text{in}$ y
 $Z_n = \rho c/S_\text{out}$ sin preguntar a qué está conectado el silenciador. La
 **pérdida de inserción** compara el nivel en un punto fijo con y sin el elemento
@@ -219,7 +219,7 @@ La **reducción de ruido** es la diferencia de niveles a secas a través del
 elemento, que es lo que devuelve una medición con dos micrófonos en un conducto
 en servicio.
 
-Un elemento reactivo es donde más divergen, porque funciona devolviendo energía
+Donde más divergen las tres es en un elemento reactivo, porque funciona devolviendo energía
 hacia una fuente que puede volver a reflejarla. Las dos impedancias son
 acústicas, en Pa·s/m³ (presión por velocidad de volumen), y tienen una escala:
 $\rho c/S$ para el tubo de entrada de 0,01 m² vale $4{,}14 \times 10^{4}$, así
@@ -296,7 +296,7 @@ pérdida de inserción con la terminación declarada, toma la cifra del
 suministrador o de un ensayo (apartado 3), y trata la pérdida de transmisión que
 calcula esta página como la herramienta que dice qué geometría hay que pedir.
 
-El clip de abajo ejecuta una cámara con $m = 4$ y la misma longitud de 0,30 m
+El clip de abajo simula una cámara con $m = 4$ y la misma longitud de 0,30 m
 en un conducto FDTD 2D a sus dos frecuencias características. En $kL = \pi$ la
 cámara es un resonador de media onda y el tono la cruza como si no
 existiera; en $kL = \pi/2$ los dos saltos de área reflejan en fase y devuelven
@@ -323,7 +323,7 @@ cuarto de onda dentro de una cámara de expansión para rellenar sus caídas.
 Las dos longitudes son longitudes **efectivas**, y las dos funciones las
 toman así (`neck_length` y `length` están documentadas como $l_e$, con las
 correcciones de extremo incluidas). El aire del cuello no deja de moverse en
-la boca: arrastra consigo un tapón de aire a cada lado, así que la masa que
+la boca: arrastra consigo una porción de aire a cada lado, así que la masa que
 resuena contra la cavidad pertenece a un tubo más largo que el que se
 taladró. Hay que añadir unos $0{,}85a$ por extremo embridado y unos $0{,}61a$
 por extremo libre, para un cuello de radio $a$, en los dos extremos de un
@@ -336,7 +336,7 @@ una muesca que la figura de abajo enseña que solo tiene unos pocos hercios de
 ancho. Cuanto más corto y más ancho el cuello, mayor es la corrección en
 términos relativos, que es justo el régimen en el que vive un resonador
 compacto, así que el procedimiento práctico es calcular una longitud nominal,
-construirlo largo y recortarlo contra una medición.
+construirlo largo y recortarlo guiándose por una medición.
 
 ```python
 import numpy as np
@@ -383,7 +383,7 @@ la extensión de entrada sola y en 261 Hz con las dos.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube_es.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como joroba discontinua que llega a 6,5 dB y cae a cero en 429 Hz, esa misma cámara con una extensión de entrada de 0,10 m que aporta 5,1 dB en 429 Hz pero abre un cero nuevo en 355 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se dispara por encima de 45 dB en 429 Hz y abre su propio cero en 261 Hz" width="88%" />
 
-*Lo que compra una extensión interior, y lo que cuesta. Las caídas a 0 dB de la
+*Lo que aporta una extensión interior, y lo que cuesta. Las caídas a 0 dB de la
 cámara simple en cada media longitud de onda son su defecto fatal; una extensión
 de cuarto de onda rellena la primera, y una segunda extensión de la mitad de
 longitud la convierte en un cortocircuito. Cada extensión pasa entonces a
@@ -453,11 +453,11 @@ paso de álabes de un ventilador en lugar de usarse en banda ancha.*
 `resistance=0.0` por omisión, así que la rama es un cortocircuito perfecto en
 $f_0$ y la pérdida de transmisión calculada diverge ahí; lo que muestra la
 figura es dónde cayó la malla de frecuencias, y por eso el código a mano de
-abajo tiene que recortar el eje en 50 dB. Lo que limita el pico en un metal real
-es la pérdida viscosa del cuello, la radiación de las paredes de la cavidad y el
+abajo tiene que recortar el eje en 50 dB. Lo que limita el pico en un dispositivo
+construido es la pérdida viscosa del cuello, la radiación de las paredes de la cavidad y el
 amortiguamiento que se añada a propósito. Un resonador bien hecho entrega del
 orden de 15 a 25 dB en su frecuencia de sintonía, sobre un ancho de banda
-relativo que fija su $Q$ y que suele ser de unos pocos por ciento, una fracción
+relativo que fija su $Q$ y que suele ser de un pequeño porcentaje, una fracción
 de octava. `resistance=` es donde va una resistencia acústica medida o estimada,
 y añadirla baja y ensancha el pico, que es el compromiso entre profundidad y
 tolerancia a un error de sintonía. Léelo junto a la advertencia sobre las
@@ -496,13 +496,43 @@ plt.show()
 
 </details>
 
-Las dos ramas son hardware pequeño, y `.plot_geometry()` enseña cuánto: el
+¿Y por qué, de entrada, la muesca tiene solo unos pocos hercios de ancho?
+Porque un resonador tarda en actuar, y el clip de abajo lo enseña
+actuando, sobre el propio tubo de 0,30 m de esta página en un conducto
+FDTD 2D. Una rama lateral no bloquea el conducto en el instante en que
+llega el tono: tiene que **cargarse**. Excitado en la frecuencia de
+sintonía, el tubo va acumulando presión en su extremo cerrado, escalón a
+escalón durante unos seis periodos, hasta 8,2 veces la onda incidente (la
+rama sin pérdidas en resonancia exacta llegaría a diez, el doble de la
+relación de áreas entre conducto y rama); excitado a 150 Hz, el mismo tubo
+se asienta en 1,5 veces en un par de periodos y nunca se carga, que es el
+mecanismo entero de la muesca visto de una sola vez: la carga tiene el
+ancho de banda porcentual $f/Q$, mientras que el pico de TL sin pérdidas es
+de hercios de ancho. El clip también ejecuta en pantalla el procedimiento
+de recorte de la advertencia sobre las correcciones de extremo de más
+arriba: construido exactamente con los 300 mm taladrados, el dispositivo
+simulado resuena a 272,9 Hz en lugar de a 285,8, una longitud efectiva
+$c/4f = 314$ mm, y aun así se carga del todo porque el desajuste de sintonía del
+4,7 % cae dentro del ancho de carga del 13 %. No hay ninguna pérdida de
+transmisión anotada en ninguna parte del clip: en la frecuencia de sintonía
+la TL del modelo sin pérdidas es infinita, así que un número finito ahí
+solo volvería a decir dónde cayó la malla de frecuencias.
+
+<Video
+  name="anim_fdtd_side_branch"
+  width={2400}
+  height={1350}
+  title="Una rama lateral de cuarto de onda cargándose, en sintonía y fuera (FDTD 2D)"
+  description="Un conducto FDTD 2D que lleva el tubo cerrado de cuarto de onda de 0,30 m de la guía, excitado a la frecuencia de sintonía de 285,8 Hz y a 150 Hz en paralelo, con la presión del extremo cerrado de las dos ejecuciones trazada debajo. En sintonía, la presión dentro del tubo sube escalón a escalón durante unos seis periodos hasta 8,2 veces la onda incidente; fuera de sintonía se asienta en 1,5 veces de inmediato y nunca se carga. Una anotación informa de que el tubo construido de 300 mm resuena a 272,9 Hz, una longitud efectiva de 314 mm, así que un dispositivo construido se recortaría para afinarlo."
+/>
+
+Las dos ramas son piezas pequeñas, y `.plot_geometry()` enseña hasta qué punto: el
 resonador del pico de 120 Hz es una cavidad de 1 L alimentada por un cuello
 de 1 cm² de solo 2 cm de longitud.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz en rama lateral: un conducto de 112,8 mm de diámetro equivalente con un cuello estrecho de 11,3 mm y 20 mm de longitud que se abre a una cavidad de 1 litro dibujada como su cubo de igual volumen sobre el conducto, con el diámetro del cuello, la longitud del cuello y el diámetro del conducto acotados" width="88%" />
 
-*Todo el valle de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
+*Toda la muesca de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
 cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
 $\sqrt{S_n/(l_e V)}$, así que pequeños errores en estas dimensiones desplazan
 el pico de su objetivo.*
@@ -588,13 +618,13 @@ propagan varios modos, cada uno con su propio número de onda axial, y los
 máximos y mínimos calculados no sobreviven; el resultado lanza un
 `PlaneWaveWarning` cuando la malla de análisis rebasa esa frecuencia. Para la
 cámara de 0,04 m² de las figuras de arriba el límite son **890,8 Hz**, así que
-los barridos hasta 2 kHz de los fragmentos se salen del modelo en más de la
-mitad y el segundo y el tercer máximo de la figura de la familia $m$ hay que
+más de la mitad de cada barrido hasta 2 kHz de los fragmentos queda fuera del
+modelo y el segundo y el tercer máximo de la figura de la familia $m$ hay que
 leerlos como forma de diseño y no como predicción. El análisis de corte en sí
 está en
 [Ruido por conductos](/phonometry/es/devices/noise-control/duct-path/#el-limite-de-onda-plana).
 
-Hay tres cosas del hardware que quedan fuera del álgebra y que deciden si un
+Hay tres cosas del silenciador real que quedan fuera del álgebra y que deciden si un
 dispositivo construido se comporta como la curva. La **envolvente** de una
 cámara es un radiador grande de pared delgada: si su propia pérdida de
 transmisión queda por debajo de la del silenciador, el sonido se marcha por la
@@ -676,7 +706,7 @@ para elegir:
 - **Tipo de espectro.** Una fuente tonal, un armónico de encendido de un motor
   o una frecuencia de paso de álabes, es la presa natural de un resonador; el
   ruido de ventilador o de flujo, de banda ancha, pide la banda disipativa.
-  Los silenciadores de escape de serie combinan de forma rutinaria ambas
+  Los silenciadores de escape de serie combinan habitualmente ambas
   cosas, rellenando de fibra una cámara de expansión para que las caídas
   por reflexión de la cámara se cubran por absorción.
 - **El medio.** Un revestimiento poroso en un escape caliente, con hollín o
@@ -768,15 +798,15 @@ corte de los modos de orden superior, y que además desacopla la fuente del
 objeto de ensayo (5.2.2.3). Un **elemento de transición** rígido los une sin
 radiar ruido por sus paredes (5.2.2.4). Y el **conducto de sustitución** no es
 absorbente, idealmente es la propia envolvente vacía del objeto de ensayo y, si
-no, se ajusta a su entrada y a su salida con un 5 % en cada dimensión lineal
+no, se ajusta a su entrada y a su salida dentro de un 5 % en cada dimensión lineal
 (5.2.3).
 
-El lado receptor es uno de tres (5.2.4). Una **cámara reverberante** conforme a
+Para el lado receptor hay tres montajes (5.2.4). Una **cámara reverberante** conforme a
 ISO 3741, cualificada al menos hasta el tercio de octava de 125 Hz, es la
-disposición preferente. Un **conducto de ensayo con terminación anecoica** es el
-recurso siguiente: de al menos media longitud de onda de la banda más baja y al
+disposición preferente. Un **conducto de ensayo con terminación anecoica** es la
+alternativa: de al menos media longitud de onda de la banda más baja y al
 menos cuatro veces la dimensión transversal máxima, con un coeficiente de
-reflexión no mayor que 0,3, y con los micrófonos y sus soportes obstruyendo
+reflexión no mayor que 0,3, y con unos micrófonos y soportes que obstruyan
 menos del 5 % del área del conducto. Se admiten **condiciones esencialmente de
 campo libre** en el extremo abierto cuando el sonido directo supera en 10 dB a
 la reflexión más fuerte, lo que se cumple si la superficie reflectante más
@@ -796,14 +826,14 @@ encima de 160 Hz. La cadena es de clase 1 con filtros de tercio de octava
 conformes a IEC 61260 (5.2.4.6) y se verifica con un calibrador de clase 1 con
 $\pm 0{,}3$ dB antes y después de cada serie (6.1).
 
-Con la cifra viajan dos consecuencias. La primera, que lo que se informa es una
-**pérdida de inserción contra un conducto de sustitución**, no una pérdida de
+La cifra lleva aparejadas dos consecuencias. La primera, que lo que se declara es una
+**pérdida de inserción frente a un conducto de sustitución**, no una pérdida de
 transmisión, así que no es la magnitud que calcula esta página y las dos no
 deben compararse directamente. La segunda, que toda instalación tiene una
-**pérdida de inserción límite**: el techo que le imponen los flancos por las
-paredes de su propio conducto, medido con el conducto de sustitución bloqueado
+**pérdida de inserción límite**: el techo que le impone la transmisión por flancos
+a través de las paredes de su propio conducto, medido con el conducto de sustitución bloqueado
 acústicamente y registrado en función de la frecuencia (7.4). Una cifra de
-catálogo muy grande afirma tanto sobre la disposición de ensayo como sobre el
+catálogo muy grande dice tanto de la disposición de ensayo como del
 dispositivo, que es la razón de que la disposición tenga que constar en el
 informe. Para hacerse una idea de lo repetible que es todo esto, las
 desviaciones típicas de reproducibilidad que da la propia norma para la
@@ -828,8 +858,8 @@ $m = 4$ y vuelve a estrecharse transmite mucho menos en el máximo de TL de
 cuatro polos ($kL = \pi/2$, aquí 286 Hz) que en la caída transparente
 ($kL = \pi$, 572 Hz). La razón de amplitudes medida aguas abajo en el campo es
 la pérdida de transmisión anotada en el clip, 6,5 dB a 286 Hz y 0,0 dB a
-572 Hz, frente a los 6,55 dB que da la forma cerrada para $m = 4$. Un acuerdo
-tan estrecho descarta un error de álgebra en cualquiera de los dos lados. Los
+572 Hz, frente a los 6,55 dB que da la forma cerrada para $m = 4$. Una concordancia
+tan estrecha descarta un error de álgebra en cualquiera de los dos lados. Los
 dos tienen que separarse tarde o temprano por encima de la primera frecuencia
 de corte del conducto, donde se propagan modos de orden superior: el
 esquema bidimensional sigue funcionando ahí y el álgebra de onda plana
@@ -843,7 +873,7 @@ cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
 `quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
 los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
 `insertion_loss` para encadenar elementos arbitrarios, cada uno con su
-dibujo a escala `.plot_geometry()`, contrastados contra la simulación FDTD
+dibujo a escala `.plot_geometry()`, contrastados con la simulación FDTD
 independiente; el `plane_wave_limit` que acota a todos ellos; y, como prosa y
 no como código, la medición por sustitución de ISO 7235 que produce la pérdida
 de inserción que publica un suministrador.
@@ -859,7 +889,7 @@ perforados dependiente del flujo) quedan fuera de las matrices de elemento
 sin flujo que se usan aquí. Nada de lo que hay en esta página es una medición:
 no se implementa ninguna parte de la ISO 7235, no se modelan ni la radiación por
 la envolvente ni las correcciones de extremo de los saltos de área, y los
-modelos de rama son sin pérdidas salvo que se dé una `resistance`.
+modelos de rama no tienen pérdidas salvo que se dé una `resistance`.
 
 ## Véase también
 

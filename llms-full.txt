@@ -9659,6 +9659,21 @@ the Fitzroy time; Fitzroy is known to over-predict when one wall pair is very
 reflective, which is why Arau-Puchades recommends the geometric mean. Both
 reduce exactly to Eyring for a uniform absorption distribution.
 
+The misrepresentation these two models exist for can be watched. The clip
+below simulates one flat 8 × 2.5 m section twice with the same **total**
+statistical absorption — spread over all four edges, or concentrated on the
+floor-and-ceiling pair (α ≈ 0.79) between hard ends — and races both
+measured energy decays through the one Sabine-Eyring band the two rooms
+share. The spread room decays inside the band, a straight line at
+T = 160 ms against Sabine's 201; the concentrated room's decay has no
+single slope, 183 ms early and 236 ms late, and finishes 10 dB above its
+twin, its surviving field a grazing pattern running parallel to the
+absorber.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement.gif" alt="Animation: a 2D FDTD simulation of a flat 8 by 2.5 metre section run twice with the same total statistical absorption, spread over all four edges or concentrated on the floor and ceiling between hard ends; a lower axis races the two measured energy decays through the shared Sabine-Eyring band, the spread room decaying inside the band at 160 ms while the concentrated room shows two slopes of 183 and 236 ms and finishes 10 dB louder, its RMS map keeping a striped grazing field parallel to the absorbing pair" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_absorption_placement.webm)
+
 ## 3. Comparing the five models per band
 
 `reverberation_time_models` builds the six boundary surfaces of a rectangular
@@ -18242,6 +18257,22 @@ plt.show()
 ```
 
 </details>
+
+Why is the spike only a few hertz wide? Because a resonator takes time to
+work: it has to **charge**. The clip below drives the 0.30 m stub above in
+a 2D FDTD duct at its 285.8 Hz tuning frequency and at 150 Hz side by
+side. On tune the closed-end pressure ratchets up over about six periods
+to 8.2 times the incident wave (the lossless branch at exact resonance
+would reach ten); off tune it settles at 1.5 times immediately and never
+charges — the charge has the percent-wide bandwidth $f/Q$, while the
+lossless TL spike is hertz-wide. The clip also reports the trim procedure
+once on screen: built at the drilled 300 mm, the simulated device rings at
+272.9 Hz, an effective length $c/4f = 314$ mm, the junction end correction
+made visible.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch.gif" alt="Animation: a 2D FDTD duct carrying a 0.30 m closed quarter-wave stub, driven at the 285.8 Hz tuning frequency and at 150 Hz side by side, with the closed-end pressure of both runs traced below; on tune the pressure inside the stub ratchets up over about six periods to 8.2 times the incident wave, off tune it settles at 1.5 times immediately, and an annotation reports that the built 300 mm stub rings at 272.9 Hz, an effective length of 314 mm" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_side_branch.webm)
 
 Both branches are small hardware, and `.plot_geometry()` shows just how
 small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²

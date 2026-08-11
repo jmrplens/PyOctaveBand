@@ -24,6 +24,10 @@ theme and language switches of :func:`figures._publish` reach the palette and
 language globals each of them holds.
 """
 
+from .absorption_placement import (
+    _absorption_placement_fields,
+    animate_fdtd_absorption_placement,
+)
 from .aperture import _aperture_fields, animate_fdtd_aperture_slit
 from .barrier import _barrier_fields, animate_fdtd_barrier
 from .diffusion import _diffusion_fields, animate_fdtd_diffusion
@@ -63,6 +67,7 @@ from .radiation_efficiency import (
 from .refraction import _refraction_fields, animate_fdtd_refraction
 from .room_modes import _room_mode_fields, animate_fdtd_room_modes
 from .seabed import _seabed_fields, animate_fdtd_critical_angle
+from .side_branch import _side_branch_fields, animate_fdtd_side_branch
 from .slit_absorber import _slit_absorber_fields, animate_fdtd_slit_absorber
 from .tubes import (
     _impedance_tube_fields,
@@ -73,6 +78,7 @@ from .tubes import (
 )
 
 __all__ = [
+    "_absorption_placement_fields",
     "_aperture_fields",
     "_barrier_fields",
     "_coincidence_fields",
@@ -94,6 +100,7 @@ __all__ = [
     "_refraction_fields",
     "_room_mode_fields",
     "_seabed_fields",
+    "_side_branch_fields",
     "_slit_absorber_fields",
     "_transmission_tube_fields",
     "animate_elastic_coincidence",
@@ -101,6 +108,7 @@ __all__ = [
     "animate_elastic_mode_conversion",
     "animate_elastic_plate_junction",
     "animate_elastic_radiation_efficiency",
+    "animate_fdtd_absorption_placement",
     "animate_fdtd_aperture_slit",
     "animate_fdtd_barrier",
     "animate_fdtd_critical_angle",
@@ -115,6 +123,7 @@ __all__ = [
     "animate_fdtd_pillar_hall",
     "animate_fdtd_refraction",
     "animate_fdtd_room_modes",
+    "animate_fdtd_side_branch",
     "animate_fdtd_slit_absorber",
     "animate_fdtd_transmission_tube",
     "animate_standing_wave_tube",

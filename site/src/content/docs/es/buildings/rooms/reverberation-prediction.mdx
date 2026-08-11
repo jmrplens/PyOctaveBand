@@ -123,7 +123,7 @@ distribución de absorción **no uniforme**:
 
 Los tres primeros modelos solo se diferencian en el denominador de
 $T = k\,V / (\text{término} + 4mV)$, con la constante de Sabine
-$k = 24\ln 10 / c_0$ (así $k = 0{,}161$ para $c_0 = 343\ \mathrm{m/s}$) y el
+$k = 24\ln 10 / c_0$ (de modo que $k = 0{,}161$ para $c_0 = 343\ \mathrm{m/s}$) y el
 término de absorción del aire $4mV$. Fitzroy y Arau-Puchades funcionan de otra
 manera: calculan tres *tiempos* de Eyring axiales y los combinan, de modo que sus
 entradas son tiempos de reverberación y no pueden sustituirse en ese denominador
@@ -144,7 +144,7 @@ dentro de un 0,07 %, el residuo de redondear $24\ln 10 = 55{,}262$ a 55,3.
 *Una sala de 10 × 7 × 3,5 m con suelo enmoquetado y techo acústico entre paredes
 de fondo duras, pasada por los cinco modelos. Fitzroy queda bastante por encima
 del resto porque un único par de paredes carga con casi toda la absorción; Sabine
-y Eyring acotan la zona intermedia, y Arau-Puchades templa la sobrepredicción de
+y Eyring acotan la zona intermedia, y Arau-Puchades templa la sobrestimación de
 Fitzroy con una media geométrica. Cuando los cinco se separan así, la sala te está
 diciendo que su campo no es difuso (§4): la separación es el diagnóstico, no un
 defecto de una de las fórmulas.*
@@ -212,7 +212,7 @@ opuesto*, en el orden $(\bar\alpha_x, \bar\alpha_y, \bar\alpha_z)$, donde
 $\bar\alpha_i$ corresponde al par perpendicular al eje $i$. Cada uno es la media
 ponderada por área sobre las dos superficies del par. En una sala rectangular las
 dos superficies tienen igual área, así que se reduce a su media aritmética — pero
-ya no en cuanto una de ellas queda partida por una ventana o un revestimiento. La
+deja de hacerlo en cuanto una de ellas queda partida por una ventana o un revestimiento. La
 absorción repartida de forma desigual *dentro* de un mismo par (una pared
 absorbente enfrentada a una dura) queda fuera de los dos modelos aunque el código
 siga devolviendo un número; ese caso pertenece a la lista de fallos del §4.
@@ -254,14 +254,14 @@ caso para el que existe el §2 y del que avisa el §4.
 Todos los modelos de la familia salen de una misma imagen. En un campo difuso un
 rayo recorre un **recorrido libre medio** $4V/S$ entre reflexiones, así que
 alcanza un contorno $cS/4V$ veces por segundo y cede parte de su energía en cada
-una. Toma esa pérdida como $\alpha$ por reflexión y linealízala y obtienes
+una. Toma esa pérdida como $\alpha$ por reflexión, linealízala, y obtienes
 **Sabine**: la tasa de decaimiento es proporcional a $\sum_i S_i\alpha_i$, y una
 caída de 60 dB tarda $k V / A$ segundos. Mantén la pérdida como multiplicativa
 — tras $n$ reflexiones la energía ha bajado en $(1-\bar\alpha)^n$ — y el
 logaritmo de ese factor da el $-S\ln(1-\bar\alpha)$ de **Eyring**, que es la razón
 de que Eyring sea siempre el más corto de los dos y de que ambos converjan cuando
 $\bar\alpha \to 0$. Haz esa misma contabilidad superficie a superficie en lugar de
-sobre la media y obtienes **Millington-Sette**, que se derrumba a cero en cuanto
+sobre la media y obtienes **Millington-Sette**, que se anula en cuanto
 una superficie absorbe perfectamente, porque un rayo que la alcanza no vuelve. El
 término de aire $4mV$ es esa misma longitud de recorrido aplicada al medio en
 lugar de al contorno.
@@ -345,7 +345,7 @@ resonancia es lo que Sabine y Eyring no pueden ver.
 
 Cuando la absorción se concentra en un eje (un suelo enmoquetado y un techo
 acústico frente a paredes por lo demás duras), una única media $\bar\alpha$
-tergiversa el campo. **Fitzroy** y **Arau-Puchades** dividen una sala
+falsea el campo. **Fitzroy** y **Arau-Puchades** dividen una sala
 rectangular en los tres pares de paredes opuestas y combinan los tiempos de
 reverberación de Eyring *axiales* $T_i$ (cada uno con la superficie total $S$ y
 la absorción media $\bar\alpha_i$ del par de paredes perpendicular al eje $i$):
@@ -381,10 +381,37 @@ print(round(room.fitzroy_reverberation_time(dims, absorption), 3))        # 0.97
 ```
 
 Por la desigualdad de las medias aritmética y geométrica, el tiempo de
-Arau-Puchades nunca supera al de Fitzroy; se sabe que Fitzroy sobrepredice
+Arau-Puchades nunca supera al de Fitzroy; se sabe que Fitzroy sobrestima
 cuando un par de paredes es muy reflectante, por lo que Arau-Puchades recomienda
 la media geométrica. Ambos se reducen exactamente a Eyring para una distribución
 de absorción uniforme.
+
+El falseamiento para el que existen estos dos modelos puede ejecutarse
+como experimento, y el clip de abajo lo hace. Una sección plana de
+8 × 2,5 m se simula dos veces con la misma absorción estadística **total**:
+repartida por los cuatro bordes, o concentrada en el par suelo-techo (el
+suelo enmoquetado y el techo acústico del propio ejemplo de esta página,
+α ≈ 0,79) entre extremos duros. Cualquier fórmula construida sobre una
+única media $\bar\alpha$ ve el mismo número en las dos salas, así que las
+predicciones de Sabine y Eyring — evaluadas para la sección bidimensional,
+cuyo recorrido libre medio es $\pi S/P$ — forman una única banda compartida
+por ambas. La sala con la absorción repartida decae dentro de ella, una
+recta a T = 160 ms frente a los 201 de Sabine. El decaimiento de la sala
+con la absorción concentrada no tiene una única pendiente, 183 ms al
+principio y 236 ms en la cola, y acaba 10 dB por encima de su gemela; el
+campo superviviente se ve en el panel RMS como un patrón estacionario entre
+los extremos duros, casi uniforme de suelo a techo: sonido corriendo
+paralelo al absorbente, rozándolo en incidencia rasante en lugar de
+golpearlo, que es el campo que el §4 describe en las salas
+desproporcionadas.
+
+<Video
+  name="anim_fdtd_absorption_placement"
+  width={2400}
+  height={1350}
+  title="La misma absorción total, dos decaimientos: la colocación en una sala plana (FDTD 2D)"
+  description="Una simulación FDTD 2D de una sección plana de 8 por 2,5 metros ejecutada dos veces con la misma absorción estadística total, repartida por los cuatro bordes o concentrada en el suelo y el techo entre extremos duros. Un eje inferior enfrenta en carrera los dos decaimientos de energía medidos a través de la banda compartida de Sabine-Eyring: la sala con la absorción repartida decae dentro de la banda a 160 ms, la sala con la absorción concentrada muestra dos pendientes de 183 y 236 ms y acaba 10 dB más alta, y su mapa RMS conserva un campo rasante a franjas que corre paralelo al par absorbente."
+/>
 
 ## 3. Comparación de los cinco modelos por banda
 
@@ -522,7 +549,7 @@ su dominio de validez:
 - **Fitzroy** y **Arau-Puchades** apuntan a salas rectangulares con la
   absorción concentrada en un eje, la oficina o vivienda típica con suelo y
   techo blandos entre paredes duras. La media geométrica de Arau templa la
-  conocida sobrepredicción de Fitzroy cuando un par de paredes es muy
+  conocida sobrestimación de Fitzroy cuando un par de paredes es muy
   reflectante.
 
 **Qué acepta cada modelo.** phonometry aplica a cada fórmula su propio dominio,
@@ -543,8 +570,8 @@ superan aproximadamente 1,2.
 
 **Cuándo fallan todas las fórmulas.** Las cinco heredan la misma hipótesis:
 un campo difuso, con sonido llegando por igual desde todas las direcciones
-en todos los puntos, que permanece difuso mientras decae. Las rupturas
-habituales:
+en todos los puntos, que permanece difuso mientras decae. Las formas
+habituales en que se rompe:
 
 - [**Por debajo de la frecuencia de Schroeder**](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular)
   la banda contiene un puñado
@@ -560,8 +587,11 @@ habituales:
   absorción en un solo par de superficies mantienen un campo rasante
   paralelo a las superficies duras que el absorbente apenas toca; el tiempo
   medido puede llegar a duplicar cualquier predicción estadística, la
-  experiencia práctica recogida en EN 12354-6 (ver
+  experiencia práctica recogida en la EN 12354-6 (ver
   [Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/)).
+  Ese campo rasante es el superviviente a franjas del clip del §2, que lo
+  mide viviendo más que toda la banda de Sabine-Eyring de su propia
+  sección.
 - **Las geometrías focalizantes** (cúpulas, paredes traseras curvas)
   concentran la energía tardía en lugar de mezclarla, produciendo
   decaimientos dependientes de la posición que ninguna fórmula de un solo
@@ -601,12 +631,12 @@ campo no es difuso.
 Una predicción solo sirve frente a un objetivo, y un requisito de tiempo de
 reverberación es un **intervalo a lo largo de las bandas de octava**, no un único
 límite superior — que es la razón de que la ficha del §5 imprima el objetivo como
-línea de referencia y no emita ningún veredicto. Referencias que conviene llevar
-encima:
+línea de referencia y no emita ningún veredicto. Referencias que conviene tener
+a mano:
 
 - Las **salas críticas para el habla** (aulas, salas de reuniones, salas de
   conferencias) se sitúan aproximadamente entre 0,4 s y 0,8 s en frecuencias
-  medias, y se ajustan más cuanto más pequeña es la sala. La Tabla 1 de la
+  medias, y el intervalo se estrecha cuanto más pequeña es la sala. La Tabla 1 de la
   ANSI/ASA S12.60-1:2010 es la versión más estricta de uso extendido: para aulas
   principales desocupadas y amuebladas limita la media de las octavas de 500 Hz,
   1 kHz y 2 kHz a **0,6 s** hasta 283 m³ y a **0,7 s** de 283 m³ a 566 m³, sin
