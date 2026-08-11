@@ -578,7 +578,8 @@ rango físico.
 | `specimen`, `client`, `mounted_by`, `manufacturer` | `str` | Identidad de cabecera del elemento ensayado y para quién / quién lo montó |
 | `area`, `mass_per_area` | `float > 0` | Superficie del elemento de ensayo $S$ (m²) y masa por unidad de superficie medida (kg/m²) |
 | `source_volume`, `receiving_volume` | `float > 0` | Volúmenes de las salas (m³) |
-| `temperature`, `relative_humidity`, `pressure` | `float` | Clima representativo único: temperatura del aire (°C, cualquier signo), humedad relativa (0–100 %), presión ambiente (kPa, > 0) |
+| `temperature`, `relative_humidity` | `float` | Clima representativo único: temperatura del aire (°C, cualquier signo), humedad relativa (0–100 %) |
+| `pressure` | `float > 0` | Presión (estática) ambiente durante el ensayo (kPa) |
 | `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Clima por recinto cuando el recinto emisor y el receptor se informan por separado (mismos rangos que arriba) |
 | `test_room`, `mounting`, `measurement_standard`, `test_date` | `str` | Instalación, condición de montaje, norma de medición (forma la línea de base normativa) y fecha de ensayo |
 | `laboratory`, `operator`, `report_id`, `notes` | `str` | Pie: institución, línea de firma del operador, número de informe y observaciones libres |
