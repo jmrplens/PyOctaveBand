@@ -184,7 +184,11 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
     (p_e, env_e), (p_s, env_s), times, alpha = _impedance_tube_fields()
     vmax = float(np.quantile(np.abs(p_e), 0.999))
     length, bore = 1.2, 0.1
-    env_base, env_h, env_max = 0.24, 0.34, 2.2
+    # The envelope baseline clears the microphone index labels: at its floor
+    # the trace runs along env_base, and the "1"/"2" over each microphone
+    # reach 0.192 (see _anim_tube_hardware), so the gap is the clip's own,
+    # not whatever the settled envelope happens to leave.
+    env_base, env_h, env_max = 0.265, 0.34, 2.2
     fig = _anim_figure()
     fig.suptitle(T("The virtual impedance tube: standing waves read the "
                    "absorption (2D FDTD)"), fontweight="bold")
@@ -279,12 +283,13 @@ _TTUBE_FPS = _ANIM_FPS * 4.0 / 7.0
 #: The shared 2 s closing hold, counted at this clip's own frame rate.
 _TTUBE_HOLD = round(2.0 * _TTUBE_FPS)
 _TTUBE_FRAMES = _TTUBE_ACTIVE + _TTUBE_HOLD
-#: Frame the closing hold (and with it the deferred-loading poster) freezes
-#: on: t = 3.2 ms, where the reflected and transmitted halves are fully
-#: separated and both still inside the tube. Both ends are anechoic, so by
-#: the end of the flight the packets have been absorbed and the tube is
-#: quiet -- a correct last frame, but an empty verdict. The time readout
-#: follows the frame back, so nothing on screen contradicts anything else.
+#: Frame the deferred-loading poster is cut from: t = 3.2 ms, where the
+#: reflected and transmitted halves are fully separated and both still
+#: inside the tube. Both ends are anechoic, so by the end of the flight the
+#: packets have been absorbed and the tube is quiet: a correct last frame,
+#: and the one the closing hold freezes on, but not the still that tells a
+#: reader what the clip is about. Only the poster is cut from here; the
+#: clip's own clock never leaves the flight it is timing.
 _TTUBE_VERDICT = 148
 
 
@@ -330,9 +335,9 @@ def _transmission_tube_fields(
             if sim.n % every == 0:
                 ps.append(sim.p[::2, ::2].astype(np.float32))
                 ts.append(sim.time)
-        while len(ps) < n_frames:          # end hold on the verdict frame
-            ps.append(ps[_TTUBE_VERDICT])
-            ts.append(ts[_TTUBE_VERDICT])
+        while len(ps) < n_frames:          # end hold on the last frame
+            ps.append(ps[-1])
+            ts.append(ts[-1])
         runs.append(np.stack(ps))
     omega = 2.0 * np.pi * _VTUBE_F
     k2 = (omega - 1j * _VTUBE_SIGMA) / _VTUBE_C2
@@ -404,7 +409,8 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
         return (*ims, tl_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_transmission_tube",
-                 frames=len(times), fps=_TTUBE_FPS, gif_fps=8)
+                 frames=len(times), fps=_TTUBE_FPS, gif_fps=8,
+                 poster_ss=_TTUBE_VERDICT / _TTUBE_FPS)
 
 
 def animate_standing_wave_tube(output_dir: str) -> None:
@@ -463,7 +469,10 @@ def animate_standing_wave_tube(output_dir: str) -> None:
         for j, xi in enumerate(mic_xi):
             xm = xs - xi
             _draw_mic(ax, xm, 1.42, direction=1, size=0.62, angle=-90.0)
-            ax.text(xm, 1.62, f"$p_{j + 1}$", ha="center", va="bottom",
+            # Clear of the microphone body: the italic p's bowl starts at
+            # the very top of the glyph box, so a label parked on the body
+            # edge loses the arc that closes it.
+            ax.text(xm, 1.83, f"$p_{j + 1}$", ha="center", va="bottom",
                     color=COLOR_FG, fontsize=9)
         # Waves: incident, reflected (fades in), their sum and the envelope
         (l_inc,) = ax.plot([], [], color=COLOR_PRIMARY, lw=1.2, alpha=0.85)

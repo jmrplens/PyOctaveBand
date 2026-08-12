@@ -27,6 +27,9 @@ def _poster_ss_for(webm: str) -> float | None:
 
     * the pillar-hall banner at simulation time 6 ms, the front threading the
       middle of the hall;
+    * the transmission tube at its verdict frame, where the reflected and
+      transmitted halves are separated and both still inside the tube (its
+      anechoic ends have absorbed everything by the last frame);
     * Lamb's problem at 95 us, where the Rayleigh train is still 22 mm inside
       the right edge (it leaves the 0.30 m view at 103 us) and both body
       fronts are drawn against their analytic arcs.
@@ -37,6 +40,9 @@ def _poster_ss_for(webm: str) -> float | None:
         dt = fdtd2d.FDTD2D(343.0, _PILLAR_DX, shape=(3, 8)).dt
         dt_frame = _PILLAR_EVERY * dt
         return float((6.0e-3 / dt_frame - _PILLAR_WARM) / _PILLAR_FPS)
+    if "anim_fdtd_transmission_tube" in name:
+        from .tubes import _TTUBE_FPS, _TTUBE_VERDICT
+        return float(_TTUBE_VERDICT / _TTUBE_FPS)
     if "anim_elastic_halfspace_waves" in name:
         from .halfspace import _HS_CP, _HS_DX, _HS_FPS
         dt = 0.6 * _HS_DX / (_HS_CP * float(np.sqrt(2.0)))
@@ -186,11 +192,17 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     ax.grid(False)
     ax.axis("off")
     caption_bbox = {"facecolor": "black" if dark else "white",
-                    "alpha": 0.55, "edgecolor": "none", "pad": 2.0}
-    ax.text(0.012, 0.055, T("2D FDTD wavefront in a hall of columns"),
-            transform=ax.transAxes, ha="left", va="bottom", fontsize=9,
+                    "alpha": 0.55, "edgecolor": "none", "pad": 1.5}
+    # The hall has no margin -- the axes are the whole canvas -- so the two
+    # captions go where the colonnade is not: the seeded layout leaves the
+    # strip below y = 0.13 clear on the right half (the caption, right
+    # aligned, is the wider of the two and the Spanish one wider still) and
+    # the whole left quarter clear (the clock). Read the other way round,
+    # the caption's translucent band bit into the bottom row of columns.
+    ax.text(0.988, 0.020, T("2D FDTD wavefront in a hall of columns"),
+            transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             color=COLOR_FG, bbox=caption_bbox)
-    t_txt = ax.text(0.988, 0.055, "", transform=ax.transAxes, ha="right",
+    t_txt = ax.text(0.012, 0.020, "", transform=ax.transAxes, ha="left",
                     va="bottom", family="monospace", fontsize=9,
                     color=COLOR_FG, bbox=caption_bbox)
 
