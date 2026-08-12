@@ -224,9 +224,23 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
         # plain <text> (full chain ending in sans-serif) stays sans. Normalise
         # every declaration to the generic 'sans-serif' so all text renders in
         # the viewer's native sans font, consistently and viewer-independently.
+        # Exception: mathtext draws radicals and extensible delimiters with a
+        # dedicated 'STIXSizeOneSym' run sized to match the glyph next to it
+        # (e.g. the bar over \sqrt{...}); rewriting that run to sans-serif
+        # swaps in the reader's sans glyph at the wrong size, so the radical
+        # bar no longer lines up with the symbol it covers. Leave any
+        # declaration whose family starts with 'STIX' untouched. The
+        # lookahead sits before the optional whitespace (not inside
+        # ``\s*``): matplotlib emits a space after the colon, and a
+        # trailing ``\s*(?!'STIX)`` would backtrack to zero width and test
+        # the lookahead against that leading space instead of the quote,
+        # matching (and clobbering) the STIX declaration it was meant to
+        # protect.
         import re as _re
         svg_text = pathlib.Path(path).read_text(encoding="utf-8")
-        svg_text = _re.sub(r"font-family:\s*[^;\"]+", "font-family: sans-serif", svg_text)
+        svg_text = _re.sub(
+            r"font-family:(?!\s*'STIX)\s*[^;\"]+", "font-family: sans-serif", svg_text
+        )
         pathlib.Path(path).write_text(svg_text, encoding="utf-8")
         return
     import io

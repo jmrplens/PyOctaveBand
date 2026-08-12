@@ -2897,7 +2897,7 @@ L 705.498437 28.798125
       <tspan x="85.136963" y="-0.630625" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">N</tspan>
       <tspan x="103.785083" y="-0.630625" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">M</tspan>
       <tspan x="91.495361" y="0.644371" style="font-size: 5.95px; font-family: sans-serif">0</tspan>
-      <tspan x="121.552905" y="-1.943125" style="font-size: 4.868028px; font-family: sans-serif">√</tspan>
+      <tspan x="121.552905" y="-1.943125" style="font-size: 4.868028px; font-family: 'STIXSizeOneSym'">√</tspan>
      </text>
      <rect x="126.689334" y="-10.46875" width="7.532959" height="0.53125"/>
     </g>

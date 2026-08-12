@@ -987,7 +987,7 @@ L 379.220625 26.798125
       <tspan x="66.500336" y="-0.630625" style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff">t</tspan>
       <tspan x="69.833099" y="-0.630625" style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff">u</tspan>
       <tspan x="75.220306" y="-0.630625" style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff">d</tspan>
-      <tspan x="13.318604" y="-2.0525" style="font-size: 4.800299px; font-family: sans-serif; fill: #ffffff">√</tspan>
+      <tspan x="13.318604" y="-2.0525" style="font-size: 4.800299px; font-family: 'STIXSizeOneSym'; fill: #ffffff">√</tspan>
       <tspan x="19.451508" y="-0.265625" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif; fill: #ffffff">N</tspan>
      </text>
      <rect x="18.389008" y="-10.46875" width="8.483398" height="0.53125"/>

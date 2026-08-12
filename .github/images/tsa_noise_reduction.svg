@@ -645,7 +645,7 @@ L 705.498438 32.52
       <tspan x="325.85556" y="-0.826875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">8</tspan>
       <tspan x="334.20517" y="-0.826875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">7</tspan>
       <tspan x="342.554779" y="-0.826875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">)</tspan>
-      <tspan x="175.986328" y="-2.81125" style="font-size: 6.765328px; font-family: sans-serif">√</tspan>
+      <tspan x="175.986328" y="-2.81125" style="font-size: 6.765328px; font-family: 'STIXSizeOneSym'">√</tspan>
       <tspan x="184.621185" y="-0.5" style="font-style: oblique; font-size: 12px; font-family: sans-serif">N</tspan>
      </text>
      <rect x="183.121185" y="-14.25" width="11.976562" height="0.75"/>
@@ -696,7 +696,7 @@ L 530.120781 60.960703
        <tspan x="30.484863" y="-0.100625" style="font-size: 9px; font-family: sans-serif">/</tspan>
        <tspan x="24.780762" y="-0.100625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">σ</tspan>
        <tspan x="39.99324" y="0.125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">N</tspan>
-       <tspan x="33.51709" y="-1.600625" style="font-size: 5.075188px; font-family: sans-serif">√</tspan>
+       <tspan x="33.51709" y="-1.600625" style="font-size: 5.075188px; font-family: 'STIXSizeOneSym'">√</tspan>
       </text>
       <rect x="38.86824" y="-10.4375" width="8.982422" height="0.5625"/>
      </g>
