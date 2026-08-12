@@ -1006,9 +1006,10 @@ conditions. Placing that source at a receiver adds the propagation adjustment
 $\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
 
 This page covers the source and propagation primitives, the flight-condition
-interpolation across a hemisphere database, the flight-path kinematics, the
-single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours, and
-the terrain mean-ground-plane and screening machinery.
+interpolation across a hemisphere database, the hover/idle source derivation
+of Table 3, the flight-path kinematics, the single-event integration to
+`SEL`/`LASmax`/`EPNL` and ground-grid contours, and the terrain
+mean-ground-plane and screening machinery.
 
 The EPNL this page computes is the same quantity certification asks for: ICAO
 Annex 16 Chapter 8 flies the helicopter level at 150 m over a centre
@@ -1155,7 +1156,131 @@ Types whose rotor configuration is mirrored with respect to their class
 reference substitute `h.mirrored()` (Eq. 2, $\varphi \to -\varphi$), and
 certification-level offsets enter as `level_offset`.
 
-## 4. Flight-path kinematics
+## 4. Hover, idle and taxi (guidance §A.3.5, Table 3)
+
+A hovering or idling helicopter is measured differently from a flyover: on a
+**ring of ground microphones** around the stationary aircraft (the CAEP
+in-ground hover practice the guidance points at), one band spectrum per ring
+bearing (0° at the nose, positive to starboard), reduced to the ring's polar
+distance — commonly 70 m rather than the flyover database's 60 m. The
+guidance defines four conditions — in-ground hover (HIGE), out-of-ground
+hover (HOGE), reduced-rpm idle and full-rpm idle — and three approaches in
+descending priority: measure all four rings (Approach 1), measure the HIGE
+ring and the other three in the 0° direction only (Approach 2), or measure
+the HIGE ring alone and apply fixed offsets (Approach 3).
+
+`hover_ring_hemisphere` extends the ring to a full `RotorcraftHemisphere`
+"assuming constant directivity in φ": each bin $(\varphi, \theta)$ reads the
+ring at the bearing $\pm\theta$ of its own half — port bins from negative
+bearings, starboard bins from positive ones, and the $\varphi = 0$ column
+under the aircraft takes the energy mean of the $\pm\theta$ ring values —
+with periodic interpolation in the energy domain. The NORAH2 reference
+implementation reads the same ring by the horizontal bearing of the emission
+direction instead (constant directivity in elevation, `mapping="bearing"`);
+the two readings coincide on the hemisphere rim and part by several dB at
+steep emission angles.
+
+`hover_derived_hemisphere` derives HOGE and the idles from the HIGE
+hemisphere by a uniform level offset: a measured 0°-direction difference
+(Approach 2, passed as `offset_db`), or the published Approach 3 constants —
++12 dB for HOGE, −12 dB for reduced-rpm idle and −2.5 dB for full-rpm idle,
+all from the HIGE disk. The guidance warns that those constants come from
+measurements with inverted microphones on ground plates and may not hold for
+other setups, and the reference database actually ships +8/−10/−2 dB (the
+`Corr_dB` corrections of its per-type interpolation files): pass them as
+`offset_db` to reproduce the prototype. The Approach 3 prose derives
+full-rpm idle from HOGE where its own Table 3 derives it from HIGE, 12 dB
+apart; the table, backed by the database, is what is implemented (see the
+[errata registry](https://jmrplens.github.io/phonometry/reference/errata/)).
+
+```python
+import numpy as np
+from phonometry import aircraft
+
+# A hover ring with a real campaign's shape: 31 one-third-octave spectra,
+# one per 30° of bearing, reduced to the 70 m polar distance.
+bearings = np.arange(-180.0, 151.0, 30.0)     # the ring closes at ±180°
+hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring_levels, distance=70.0)
+hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
+full_rpm_idle = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2.5 dB
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring.svg" alt="Two panels of the hover source derivation. On the left, the in-ground-hover ring at the 315 Hz band: band level at 70 m against ring bearing from minus 180 to 180 degrees, loudest ahead of the nose and on the rear starboard quarter. On the right, the fore-aft sections of the four derived sources against polar angle: the HIGE hemisphere built from the ring, and the out-of-ground hover, full-rpm idle and reduced-rpm idle curves at plus 12, minus 2.5 and minus 12 decibels from it, with a note that constant directivity in phi means each polar angle reads the ring at plus or minus that bearing" width="92%">
+</picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz-10 kHz thirds
+bearings = np.arange(-180.0, 151.0, 30.0)
+spectrum = 86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
+directivity = (3.5 * np.cos(np.radians(bearings))
+               + 3.0 * np.exp(-((bearings - 120.0) ** 2) / (2.0 * 40.0**2)))
+ring = spectrum[None, :] + directivity[:, None]
+hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring, distance=70.0)
+
+k = int(np.argmin(np.abs(freqs - 315.0)))
+theta = np.linspace(0.0, 180.0, 361)
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.2))
+ax.plot(np.append(bearings, 180.0), np.append(ring[:, k], ring[0, k]),
+        marker="o")
+ax.set(xlabel="Ring bearing [°]  (0° nose, +90° starboard)",
+       ylabel="Band level at 70 m [dB]")
+for condition, label in ((None, "HIGE (from the ring)"),
+                         ("out_of_ground_hover", "HOGE (+12 dB)"),
+                         ("full_rpm_idle", "Full-rpm idle (-2.5 dB)"),
+                         ("reduced_rpm_idle", "Reduced-rpm idle (-12 dB)")):
+    h = hige if condition is None else aircraft.hover_derived_hemisphere(hige, condition)
+    ax2.plot(theta, [aircraft.hemisphere_source_level(h, 0.0, t)[k] for t in theta],
+             label=label)
+ax2.set(xlabel="Polar angle θ [°]  (0° forward → 180° rearward)",
+        ylabel="Source level at 70 m [dB]")
+ax2.legend()
+plt.show()
+```
+
+</details>
+
+**Taxi** is a selection between two of these sources, not a new one: a
+helicopter without wheels taxis hovering in ground effect (the HIGE
+hemisphere), and a wheeled one ground-taxis on its wheels with the rotor at
+idle (the full-rpm-idle hemisphere). The guidance's sentence pairs them the
+other way around ("… in-ground hover and full-rpm idle respectively"); the
+pairing here follows the physics of the two operations (see the errata
+registry).
+
+```python
+taxi = full_rpm_idle if wheeled else hige     # guidance p. 19 (see caveat)
+```
+
+A hover or idle **event** is the standard single event with a stationary
+track: one hemisphere, a fixed position, the receiver of interest. The
+derived hemisphere carries the ring's `distance`, which the whole chain
+honours as the reference distance; hover and flyover hemispheres recorded at
+different distances run as separate events, which is also how the reference
+implementation switches source by operating mode.
+
+```python
+t = np.arange(0.0, 30.5, 0.5)                 # 30 s of hover at 3 m
+track = np.column_stack([np.zeros_like(t), np.zeros_like(t),
+                         np.full_like(t, 3.0)])
+res = aircraft.rotorcraft_event_level([hige], [0.0], [0.0], t, track, (100.0, 0.0))
+```
+
+What stays outside the implementation is §A.3.5's last resort when no hover
+data exists at all: correcting two side-line level-flight microphones to the
+150 m hover circle by the ICAO Annex 16 integrated method, a
+measurement-correction chain this module (which consumes already-reduced
+hemispheres) does not model.
+
+## 5. Flight-path kinematics
 
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
@@ -1173,7 +1298,7 @@ kin.airspeed, kin.path_angle              # select the hemisphere per point
 kin.bank_angle                            # tilts the hemisphere in turns
 ```
 
-## 5. The single event: `SEL`, `LASmax` and `EPNL`
+## 6. The single event: `SEL`, `LASmax` and `EPNL`
 
 `rotorcraft_event_level` runs the whole chain for one flyover at one receiver.
 Per track point, the flight condition selects (or blends) the hemispheres and
@@ -1235,7 +1360,7 @@ Radar-track workflows can hand the smoothed per-point `airspeed`, `path_angle`,
 deriving them from the positions; when they are derived, the track is in metres and seconds, so the
 database airspeeds must then be in m/s.
 
-## 6. Ground-grid contours
+## 7. Ground-grid contours
 
 `rotorcraft_noise_contour` evaluates the same event over a whole grid in one
 vectorised pass per emission step and reduces each receiver's history to the
@@ -1256,7 +1381,7 @@ The ground may vary across the receivers without a full elevation model: the
 value per grid point (shape `(len(y), len(x))`), and each receiver's two-ray
 model then uses its local values.
 
-## 7. Terrain: the mean ground plane and screening
+## 8. Terrain: the mean ground plane and screening
 
 Doc 32, 1st ed., assumes flat terrain; its guidance adds the machinery for
 real sites. A varying vertical section is represented by its **mean ground
@@ -1413,6 +1538,17 @@ coherent two-ray interference of guidance Eq. 30 towards the incoherent sum
 the guidance contains such a term, and this implementation follows the
 published equations.
 
+The Table 3 hover/idle derivation is anchored in closed form (the ring-to-rim
+identity, hand-computed constant-φ bins, the exact Approach 3 offsets) and
+end to end against the prototype's out-of-ground-hover verification case:
+its eight microphones, spanning bearings, elevations, receiver heights from
+0.01 m to 8.2 m and three ground classes, reproduce `LASmax`/`SEL` to
+0.45 dB worst case with the prototype's own conventions passed explicitly
+(`mapping="bearing"` and its +8 dB database correction as `offset_db`; the
+guidance's constant-φ text and published +12 dB are the defaults). The
+residual peaks on the nadir microphones, where the prototype's damped
+interference differs most from the published coherent Eq. 30.
+
 The terrain machinery is anchored in closed form: the mean ground plane is
 exact on linear and symmetric profiles, a flat section reproduces the
 flat-ground model to machine precision and an inclined plane its analytic
@@ -1484,9 +1620,12 @@ CNOSSOS flow resistivity), flight-condition interpolation (Eq. 3-10),
 flight-path kinematics (Eq. 16-21 / Doc 32 Eq. 8-10), recorded time (Eq. 22),
 the single-event metrics `SEL`/`LASmax` and `EPNL` (Doc 32 Eq. 27/28, ICAO
 Annex 16 App. 2), the mean ground plane and equivalent heights (Eq. 36-40),
-the log-mean flow resistivity (Eq. 41) and the terrain screening chain
-(Eq. 42-47 with the guidance's noise-path appendices; CNOSSOS-EU lineage).
-Hover, idle and taxi source handling (guidance §A.3.5) remains outside the
-implementation.
+the log-mean flow resistivity (Eq. 41), the terrain screening chain
+(Eq. 42-47 with the guidance's noise-path appendices; CNOSSOS-EU lineage) and
+the hover/idle source derivation of §A.3.5 Table 3 (the ring-to-hemisphere
+constant-φ extension, the Approach 2/3 offsets and the taxi selection rule).
+Only §A.3.5's no-hover-data fallback (two side-line microphones corrected to
+the 150 m hover circle by the ICAO Annex 16 integrated method) remains
+outside the implementation.
 
 ---

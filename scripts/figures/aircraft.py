@@ -24,6 +24,7 @@ from .theme import (
     COLOR_GRID,
     COLOR_MUTED,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     save_figure,
@@ -765,6 +766,80 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
              bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.75})
     plt.tight_layout()
     save_figure(output_dir, "rotorcraft_hemisphere.svg")
+    plt.close()
+
+
+def generate_rotorcraft_hover_ring(output_dir: str) -> None:
+    """NORAH2 guidance §A.3.5: the hover ring and the Table 3 derived sources."""
+    print("Generating rotorcraft_hover_ring...")
+    from phonometry import (
+        hemisphere_source_level,
+        hover_derived_hemisphere,
+        hover_ring_hemisphere,
+    )
+
+    # A ground-ring measurement with the shape of a real campaign: 31 thirds,
+    # one spectrum per 30 deg bearing, reduced to the 70 m polar distance,
+    # loudest ahead and on the rear starboard quarter.
+    freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz - 10 kHz
+    bearings = np.arange(-180.0, 151.0, 30.0)              # ring closes at 180
+    spectrum = 86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
+    directivity = (3.5 * np.cos(np.radians(bearings))
+                   + 3.0 * np.exp(-((bearings - 120.0) ** 2) / (2.0 * 40.0**2)))
+    ring = spectrum[None, :] + directivity[:, None]
+    hige = hover_ring_hemisphere(freqs, bearings, ring, distance=70.0)
+
+    k = int(np.argmin(np.abs(np.asarray(freqs) - 315.0)))
+    _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.2))
+
+    closed_bearings = np.append(bearings, 180.0)           # periodic closure
+    closed_ring = np.append(ring[:, k], ring[0, k])
+    ax.plot(closed_bearings, closed_ring, marker="o", markersize=4.5,
+            lw=1.8, color=COLOR_PRIMARY)
+    ax.axvline(0.0, color=COLOR_MUTED, lw=1.0, ls=":")
+    ax.text(4.0, float(closed_ring.min()) + 0.3, "nose", fontsize=9,
+            color=COLOR_FG, ha="left")
+    ax.set_xticks(np.arange(-180.0, 181.0, 60.0))
+    ax.set_xlabel("Ring bearing [°]  (0° nose, +90° starboard)")
+    ax.set_ylabel("Band level at 70 m [dB]")
+    ax.set_title("In-ground-hover ring, 315 Hz band", fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
+    ax.set_axisbelow(True)
+
+    theta = np.linspace(0.0, 180.0, 361)
+    conditions = (
+        ("HIGE (from the ring)", hige, COLOR_PRIMARY, "-"),
+        ("HOGE (+12 dB)",
+         hover_derived_hemisphere(hige, "out_of_ground_hover"),
+         COLOR_SECONDARY, "--"),
+        ("Full-rpm idle (-2.5 dB)",
+         hover_derived_hemisphere(hige, "full_rpm_idle"),
+         COLOR_TERTIARY, "--"),
+        ("Reduced-rpm idle (-12 dB)",
+         hover_derived_hemisphere(hige, "reduced_rpm_idle"),
+         COLOR_QUATERNARY, "--"),
+    )
+    top = 0.0
+    for label, hemisphere, color, style in conditions:
+        section = np.array([hemisphere_source_level(hemisphere, 0.0, t)[k]
+                            for t in theta])
+        top = max(top, float(section.max()))
+        ax2.plot(theta, section, color=color, ls=style, lw=1.8, label=label)
+    ax2.set_ylim(top=top + 8.0)          # room for the legend above the curves
+    ax2.set_xticks(np.arange(0.0, 181.0, 30.0))
+    ax2.set_xlabel("Polar angle θ [°]  (0° forward → 180° rearward)")
+    ax2.set_ylabel("Source level at 70 m [dB]")
+    ax2.set_title("Derived hover and idle sources (Table 3)",
+                  fontweight="bold", pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper right", fontsize=9)
+    ax2.text(0.02, 0.03,
+             "constant directivity in φ: each θ\nreads the ring at ±θ",
+             transform=ax2.transAxes, va="bottom", fontsize=9,
+             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.75})
+    plt.tight_layout()
+    save_figure(output_dir, "rotorcraft_hover_ring.svg")
     plt.close()
 
 

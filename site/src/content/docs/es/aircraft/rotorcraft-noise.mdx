@@ -16,7 +16,7 @@ references:
     number: "Research Project NOISE SC01, entregable D1.5d, contrato EASA.2020.FC.06"
     institution: "European Union Aviation Safety Agency"
     url: "https://www.easa.europa.eu/en/downloads/132005/en"
-    note: "La guía a nivel de ecuación (Ec. 13-35) que sustenta la implementación, con los valores de atenuación de la Tabla 4 y los hemisferios de referencia usados como oráculos. Alcance implementado (§A.3-A.5): el hemisferio de ruido, la divergencia esférica, la atenuación atmosférica (ISO 9613-1, Tabla 4), el efecto de suelo de Chien-Soroka (impedancia de Delany-Bazley, resistividad de flujo CNOSSOS), la interpolación entre condiciones de vuelo (Ec. 3-10), la cinemática de la trayectoria (Ec. 16-21 / Doc 32 Ec. 8-10), el tiempo registrado (Ec. 22), las métricas de evento único SEL/LASmax y EPNL (Doc 32 Ec. 27/28, Anexo 16 de la OACI Ap. 2), el plano medio del suelo y las alturas equivalentes (Ec. 36-40), la resistividad de flujo media logarítmica (Ec. 41) y la cadena de apantallamiento por terreno (Ec. 42-47 con los apéndices de caminos de ruido de la guía; filiación CNOSSOS-EU). El tratamiento de fuente en estacionario, ralentí y rodaje (§A.3.5) queda fuera de la implementación. El PDF enlazado es la descarga gratuita; el proyecto está catalogado en la página del proyecto en EASA (https://www.easa.europa.eu/en/research-projects/environmental-research-rotorcraft-noise)."
+    note: "La guía a nivel de ecuación (Ec. 13-35) que sustenta la implementación, con los valores de atenuación de la Tabla 4 y los hemisferios de referencia usados como oráculos. Alcance implementado (§A.3-A.5): el hemisferio de ruido, la divergencia esférica, la atenuación atmosférica (ISO 9613-1, Tabla 4), el efecto de suelo de Chien-Soroka (impedancia de Delany-Bazley, resistividad de flujo CNOSSOS), la interpolación entre condiciones de vuelo (Ec. 3-10), la cinemática de la trayectoria (Ec. 16-21 / Doc 32 Ec. 8-10), el tiempo registrado (Ec. 22), las métricas de evento único SEL/LASmax y EPNL (Doc 32 Ec. 27/28, Anexo 16 de la OACI Ap. 2), el plano medio del suelo y las alturas equivalentes (Ec. 36-40), la resistividad de flujo media logarítmica (Ec. 41), la cadena de apantallamiento por terreno (Ec. 42-47 con los apéndices de caminos de ruido de la guía; filiación CNOSSOS-EU) y la derivación de fuente de estacionario y ralentí de la Tabla 3 del §A.3.5 (extensión anillo-hemisferio con φ constante, desplazamientos de los Enfoques 2/3, selección de rodaje). Solo queda fuera de la implementación el recurso del §A.3.5 sin datos de estacionario (dos micrófonos laterales corregidos al círculo de estacionario de 150 m por el método integrado del Anexo 16 de la OACI). El PDF enlazado es la descarga gratuita; el proyecto está catalogado en la página del proyecto en EASA (https://www.easa.europa.eu/en/research-projects/environmental-research-rotorcraft-noise)."
   - type: article
     authors: ["Chien, C. F.", "Soroka, W. W."]
     year: 1975
@@ -409,6 +409,147 @@ plt.show()
 ```
 
 </details>
+
+## Estacionario, ralentí y rodaje (Tabla 3)
+
+Un helicóptero en estacionario o al ralentí no se mide como un sobrevuelo: se
+mide sobre un **anillo de micrófonos en tierra** alrededor de la aeronave
+inmóvil (la práctica CAEP de estacionario con efecto suelo a la que remite la
+guía), un espectro de bandas por rumbo del anillo (0° en el morro, positivo a
+estribor), reducido a la distancia polar del anillo, normalmente 70 m frente
+a los 60 m de la base de datos de sobrevuelo. El §A.3.5 de la guía define
+cuatro condiciones (estacionario con efecto suelo, HIGE; estacionario sin
+efecto suelo, HOGE; ralentí a régimen reducido; y ralentí a régimen pleno) y
+tres enfoques en prioridad descendente: medir los cuatro anillos; medir el
+anillo HIGE y las otras tres condiciones solo en la dirección de 0°; o medir
+el anillo HIGE a secas y aplicar desplazamientos fijos.
+
+`hover_ring_hemisphere` extiende el anillo a un `RotorcraftHemisphere`
+completo asumiendo directividad constante en φ: cada bin
+$(\varphi, \theta)$ lee el anillo en el rumbo $\pm\theta$ de su propia mitad
+(los bins de babor desde los rumbos negativos, los de estribor desde los
+positivos, y la columna $\varphi = 0$ bajo la aeronave toma la media
+energética de los valores del anillo en $\pm\theta$), interpolando
+periódicamente en el dominio de energía. La implementación de referencia
+NORAH2 lee el mismo anillo por el rumbo horizontal de la dirección de emisión
+(directividad constante en elevación): `mapping="bearing"` la reproduce. Las
+dos lecturas coinciden en el borde del hemisferio y se separan varios dB en
+ángulos de emisión abruptos: justo bajo el estacionario la lectura de φ
+constante promedia babor y estribor donde el prototipo lee el rumbo del
+morro.
+
+`hover_derived_hemisphere` deriva después HOGE y los ralentís del hemisferio
+HIGE con un desplazamiento de nivel uniforme: una diferencia medida en la
+dirección de 0° (Enfoque 2, pasada como `offset_db`) o las constantes
+publicadas del Enfoque 3: +12 dB para HOGE, −12 dB para el ralentí a régimen
+reducido y −2,5 dB para el ralentí a régimen pleno, todas desde el disco
+HIGE. Un desplazamiento espectral constante mueve el nivel ponderado A
+exactamente ese valor, que es como la Tabla 3 (definida sobre niveles $L_A$)
+se extiende a espectros de bandas.
+
+```python
+import numpy as np
+from phonometry import aircraft
+
+# Un anillo de estacionario con la forma de una campaña real: 31 espectros de
+# tercio de octava, uno por cada 30° de rumbo, reducidos a los 70 m polares.
+bearings = np.arange(-180.0, 151.0, 30.0)     # el anillo se cierra en ±180°
+hige = aircraft.hover_ring_hemisphere(freqs, bearings, niveles_anillo, distance=70.0)
+hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
+ralenti_pleno = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2,5 dB
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring_es.svg" alt="Dos paneles de la derivación de la fuente de estacionario. A la izquierda, el anillo de estacionario con efecto suelo en la banda de 315 Hz: nivel de banda a 70 m frente al rumbo del anillo de menos 180 a 180 grados, con el máximo delante del morro y en el cuarto trasero de estribor. A la derecha, las secciones proa-popa de las cuatro fuentes derivadas frente al ángulo polar: el hemisferio HIGE construido desde el anillo, y las curvas de estacionario sin efecto suelo, ralentí a régimen pleno y ralentí a régimen reducido a más 12, menos 2,5 y menos 12 decibelios de él, con una nota de que directividad constante en phi significa que cada ángulo polar lee el anillo en más o menos ese rumbo" width="92%" />
+
+*El anillo de la izquierda es la única medida; todo lo de la derecha se deriva
+de él. La sección HIGE arranca en el valor del morro del anillo y termina en
+el de la cola (esa es la extensión de φ constante trabajando), y las otras
+tres fuentes son la misma directividad desplazada entera: +12 dB hasta HOGE,
+−2,5 dB hasta el ralentí a régimen pleno, −12 dB hasta el reducido.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # tercios de 10 Hz a 10 kHz
+bearings = np.arange(-180.0, 151.0, 30.0)
+spectrum = 86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
+directivity = (3.5 * np.cos(np.radians(bearings))
+               + 3.0 * np.exp(-((bearings - 120.0) ** 2) / (2.0 * 40.0**2)))
+ring = spectrum[None, :] + directivity[:, None]
+hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring, distance=70.0)
+
+k = int(np.argmin(np.abs(freqs - 315.0)))
+theta = np.linspace(0.0, 180.0, 361)
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.2))
+ax.plot(np.append(bearings, 180.0), np.append(ring[:, k], ring[0, k]),
+        marker="o")
+ax.set(xlabel="Rumbo del anillo [°]  (0° morro, +90° estribor)",
+       ylabel="Nivel de banda a 70 m [dB]")
+for condition, label in ((None, "HIGE (del anillo)"),
+                         ("out_of_ground_hover", "HOGE (+12 dB)"),
+                         ("full_rpm_idle", "Ralentí a régimen pleno (-2,5 dB)"),
+                         ("reduced_rpm_idle", "Ralentí a régimen reducido (-12 dB)")):
+    h = hige if condition is None else aircraft.hover_derived_hemisphere(hige, condition)
+    ax2.plot(theta, [aircraft.hemisphere_source_level(h, 0.0, t)[k] for t in theta],
+             label=label)
+ax2.set(xlabel="Ángulo polar θ [°]  (0° hacia proa → 180° hacia popa)",
+        ylabel="Nivel de fuente a 70 m [dB]")
+ax2.legend()
+plt.show()
+```
+
+</details>
+
+:::note[Los desplazamientos publicados y los distribuidos]
+La guía advierte de que sus constantes salen de medidas con micrófonos
+invertidos sobre placas en el suelo y pueden no valer para otros montajes; y
+la base de datos pública de NORAH2 distribuye en realidad **+8/−10/−2 dB** en
+el archivo de interpolación de cada tipo. Pásalos como `offset_db` para
+reproducir el prototipo; las constantes publicadas de la Tabla 3 son los
+valores por defecto. La prosa del Enfoque 3 deriva además el ralentí a
+régimen pleno desde HOGE donde su propia tabla lo deriva desde HIGE, con
+12 dB de separación; lo implementado es la tabla, respaldada por la base de
+datos. Ambas divergencias están registradas en las
+[erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
+:::
+
+El **rodaje** es una selección entre dos de estas fuentes, no una fuente
+nueva: un helicóptero sin ruedas rueda en estacionario con efecto suelo (el
+hemisferio HIGE), y uno con ruedas rueda sobre ellas con el rotor al ralentí
+(el hemisferio de ralentí a régimen pleno). La frase de la guía los empareja
+al revés («… in-ground hover and full-rpm idle respectively»); el
+emparejamiento de aquí sigue la física de las dos operaciones (véase el
+registro de erratas).
+
+```python
+taxi = ralenti_pleno if con_ruedas else hige  # guía p. 19 (véase la salvedad)
+```
+
+Un **evento** de estacionario o ralentí es el evento único estándar con una
+trayectoria inmóvil: un hemisferio, una posición fija, el receptor de
+interés. El hemisferio derivado lleva la `distance` del anillo, que toda la
+cadena respeta como distancia de referencia; los hemisferios de estacionario
+y de sobrevuelo registrados a distancias distintas se ejecutan como eventos
+separados, que es también como la implementación de referencia cambia de
+fuente por modo de operación.
+
+```python
+t = np.arange(0.0, 30.5, 0.5)                 # 30 s de estacionario a 3 m
+track = np.column_stack([np.zeros_like(t), np.zeros_like(t),
+                         np.full_like(t, 3.0)])
+res = aircraft.rotorcraft_event_level([hige], [0.0], [0.0], t, track, (100.0, 0.0))
+```
+
+Lo que queda fuera de la implementación es el último recurso del §A.3.5
+cuando no existe ningún dato de estacionario: corregir dos micrófonos
+laterales de vuelo nivelado al círculo de estacionario de 150 m por el método
+integrado del Anexo 16 de la OACI, una cadena de corrección de medida que
+este módulo (que consume hemisferios ya reducidos) no modela.
 
 ## Cinemática de la trayectoria
 
@@ -845,6 +986,7 @@ reproduce los casos ARP de verificación del prototipo NORAH2:
 | Malla de contorno, 187 micrófonos | caso 3 ARP | 0,7 dB en el peor caso |
 | $\mathrm{PNLTM}$ | el mismo | 0,1 dB |
 | `EPNL` | el mismo | ≈ 1,3 dB (véase más abajo) |
+| `LASmax`/`SEL` de estacionario, 8 micrófonos | caso 4 ARP (estacionario sin efecto suelo) | 0,45 dB en el peor caso |
 
 :::note[Dos salvedades, no redondeo]
 La coincidencia del **EPNL** es un orden de magnitud más floja que todo lo demás
@@ -858,6 +1000,17 @@ que llega a 4,9 dB en pasos individuales de bajo nivel más allá de 7 km. Ni la
 Doc 32 ni la guía NORAH2 contienen tal término, así que esta implementación sigue
 las ecuaciones publicadas y no lo reproduce.
 :::
+
+La derivación de la Tabla 3 está anclada además en forma cerrada (la
+identidad anillo-borde, bins de φ constante calculados a mano, los
+desplazamientos exactos del Enfoque 3), y la fila de estacionario de la tabla
+es el caso de estacionario sin efecto suelo del prototipo reproducido con las
+convenciones del propio prototipo pasadas explícitamente: `mapping="bearing"`
+y su corrección de base de datos de +8 dB como `offset_db`. Sus ocho
+micrófonos abarcan rumbos, elevaciones, alturas de receptor de 0,01 m a
+8,2 m y tres clases de suelo; el residuo culmina en los micrófonos del nadir,
+donde la interferencia amortiguada del prototipo más se aparta de la Ec. 30
+coherente publicada.
 
 La maquinaria de terreno está anclada en forma cerrada: el plano medio del
 suelo es exacto en perfiles lineales y simétricos, una sección plana
@@ -884,7 +1037,9 @@ ajustes de propagación (`spherical_spreading_adjustment`,
 `atmospheric_adjustment`, `ground_effect_adjustment`, el modelo de
 Chien-Soroka con la impedancia de Delany-Bazley y las clases de resistividad
 de flujo CNOSSOS), la interpolación entre condiciones de vuelo
-(`flight_condition_weights`, `interpolated_source_level`), la cinemática de
+(`flight_condition_weights`, `interpolated_source_level`), la derivación de
+fuente de estacionario, ralentí y rodaje de la Tabla 3
+(`hover_ring_hemisphere`, `hover_derived_hemisphere`), la cinemática de
 la trayectoria (`flight_path_kinematics`), el SEL, LASmax y EPNL de evento
 único (`rotorcraft_event_level`), los contornos en malla de tierra
 (`rotorcraft_noise_contour`) y la cadena de plano medio del suelo y
@@ -892,11 +1047,13 @@ apantallamiento por terreno (`mean_ground_plane`, `mean_flow_resistivity`,
 `diffraction_attenuation`, `terrain_screening_adjustment`). Validado contra
 la Tabla 4 de la guía NORAH2, límites geométricos y rasantes en forma cerrada,
 y de extremo a extremo contra los casos de verificación ARP del prototipo
-NORAH2.
+NORAH2, incluida su operación de estacionario sin efecto suelo.
 
-**No cubierto.** El tratamiento de fuente en estacionario, ralentí y rodaje (guía
-§A.3.5) queda fuera de la implementación: el modelo de fuente por hemisferio
-supone un sobrevuelo, no un helicóptero estacionario o en ralentí en tierra.
+**No cubierto.** El recurso del §A.3.5 para un tipo sin ningún dato de
+estacionario (dos micrófonos laterales de vuelo nivelado corregidos al
+círculo de estacionario de 150 m por el método integrado del Anexo 16 de la
+OACI) es una cadena de corrección de medida que este módulo, que consume
+hemisferios ya reducidos, no modela.
 **Con phonometry no se distribuye ninguna base de datos de hemisferios, y no hay
 lector de ficheros NORAH**: el método está implementado, los datos no, así que
 los arrays salen de una campaña de medida o de la base de datos de referencia
