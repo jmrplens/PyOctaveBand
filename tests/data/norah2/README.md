@@ -4,13 +4,15 @@
 
 `norah2_arp_extract.zip` holds the **verification subset** of the NORAH2 public
 release (V2.0.74) consumed by `tests/aircraft/test_rotorcraft_norah2.py`: the
-R22 hemisphere set with its triangulation lookup (`Hemispheres/R22_*`) and the
-ARP single-event cases used as oracles (input flight paths `.inp`, per-step
-microphone histories `.his` and per-microphone metrics `.onl` for the Case 2,
-Case 3 and Case 4 operations listed in that module). The internal layout of the
-original archive is preserved, so the same parser code reads either source.
+R22 hemisphere set with its triangulation lookup (`Hemispheres/R22_*`,
+including the in-ground-hover ring measurement) and the ARP single-event cases
+used as oracles (input flight paths `.inp`, per-step microphone histories
+`.his` and per-microphone metrics `.onl` for the Case 2, Case 3 and Case 4
+operations listed in that module, among them the Case 4 out-of-ground-hover
+operation `R22_DEP_RT2`). The internal layout of the original archive is
+preserved, so the same parser code reads either source.
 
-It is a byte-identical extract of 44 of the ~360 files of the public release;
+It is a byte-identical extract of 47 of the ~360 files of the public release;
 nothing is modified, resampled or re-encoded.
 
 ## Source and authorship
