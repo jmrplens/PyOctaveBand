@@ -133,23 +133,36 @@ def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
 
 def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
                     gap: float = 8.0) -> float:
-    """Slide *artist* down until its box clears *other* by *gap* pixels.
+    """Slide *artist* back along its own baseline until it clears *other*.
 
-    The companion of :func:`_fit_text_x` for a label placed along a slope --
-    a rotated one climbing an arc, say -- where a longer string grows into
-    whatever sits above it instead of past a spine. Returns the applied
-    shift in data units (0.0 when the label already cleared).
+    The companion of :func:`_fit_text_x` for a label set along a slope -- a
+    rotated one lying on an arc, say -- where a longer string grows into
+    whatever sits above it instead of past a spine. Straight down is the
+    wrong way out for such a label: the curve it names is tangent to the
+    line it is drawn on and falls away from that line on both sides, so
+    dropping the label across the tangent walks it into the curve, while
+    sliding it back along the same line buys the same height and keeps the
+    offset. Returns the applied shift in display pixels (0.0 when the label
+    already cleared).
     """
     _settle(fig)
     top = _ink_box(artist).y1
     floor = _ink_box(other).y0 - gap
     if top <= floor:
         return 0.0
+    slope = np.radians(artist.get_rotation())
+    rise = abs(float(np.sin(slope)))
+    if rise < 1e-6:                  # a level label can only go down
+        dx_px, dy_px = 0.0, floor - top
+    else:
+        step = (top - floor) / rise
+        dx_px = -step * float(np.cos(slope))
+        dy_px = -step * rise
     inv = ax.transData.inverted()
-    (_, dy0), (_, dy1) = inv.transform([(0.0, 0.0), (0.0, top - floor)])
-    shift = abs(dy1 - dy0)
-    artist.set_y(float(artist.get_position()[1]) - shift)
-    return float(shift)
+    (x0, y0), (x1, y1) = inv.transform([(0.0, 0.0), (dx_px, dy_px)])
+    x, y = artist.get_position()
+    artist.set_position((float(x) + (x1 - x0), float(y) + (y1 - y0)))
+    return float(np.hypot(dx_px, dy_px))
 
 
 def _fit_text_x(fig: Any, ax: Any, artist: Any,
