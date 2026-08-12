@@ -495,6 +495,23 @@ def test_hover_ring_periodic_energy_interpolation() -> None:
     assert h.levels[ia[90.0], ip[170.0], 0] == pytest.approx(wrap)
 
 
+def test_hover_ring_middle_column_survives_inexact_step() -> None:
+    # A step of 180/14 deg builds a symmetric axis whose middle node can land
+    # a few ulp away from 0.0 in floating point; the phi = 0 column is
+    # selected structurally (by index, the axis being symmetric by
+    # construction), so it still takes the energy mean of ring(+-theta) and
+    # the halves still split port/starboard around it.
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(60.0 + _RING_BEARINGS / 10.0),
+                              azimuth_step=180.0 / 14.0)
+    assert h.azimuth.size == 15
+    ip = {p: i for i, p in enumerate(h.polar)}
+    mid = 10.0 * np.log10((10.0**6.9 + 10.0**5.1) / 2.0)
+    assert h.levels[7, ip[90.0], 0] == pytest.approx(mid)
+    assert h.levels[8, ip[60.0], 0] == pytest.approx(66.0)   # starboard side
+    assert h.levels[6, ip[60.0], 0] == pytest.approx(54.0)   # port side
+
+
 def test_hover_ring_bearing_mapping_closed_form() -> None:
     # The NORAH2 reference implementation's reading: the level depends on the
     # horizontal bearing beta = atan2(sin(theta)*sin(phi), cos(theta)).

@@ -398,10 +398,18 @@ def hover_ring_hemisphere(
         starboard = _ring_levels(brg, lv, po)
         port = _ring_levels(brg, lv, -po)
         grid = np.empty((az.size, po.size, freqs.size), dtype=np.float64)
-        grid[az > 0.0] = starboard
-        grid[az < 0.0] = port
-        mid = 0.5 * (10.0 ** (starboard / 10.0) + 10.0 ** (port / 10.0))
-        grid[az == 0.0] = 10.0 * np.log10(mid)
+        # The azimuth axis is symmetric by construction, so each node's side
+        # is fixed by its index: port before the middle, starboard after it
+        # and, with an even cell count, the phi = 0 column exactly in the
+        # middle. Selecting by index (not by comparing the node against 0.0)
+        # keeps the middle column the energy mean even when a step such as
+        # 180/14 leaves its floating-point node a few ulp away from zero.
+        cells = az.size - 1
+        grid[: (cells + 1) // 2] = port
+        grid[cells // 2 + 1:] = starboard
+        if cells % 2 == 0:
+            energy = 0.5 * (10.0 ** (starboard / 10.0) + 10.0 ** (port / 10.0))
+            grid[cells // 2] = 10.0 * np.log10(energy)
     return RotorcraftHemisphere(
         frequencies=freqs.copy(), azimuth=az, polar=po, levels=grid,
         distance=dist)
