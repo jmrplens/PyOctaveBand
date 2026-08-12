@@ -1460,15 +1460,17 @@ which is the check that enforces the rule; see
   with inverted microphones on ground plates and "may not be valid for other
   microphone setups".
 - **The problem:** the reference database the guidance builds on ships
-  different values: every one of the eleven `*_Triangulation.int` files of
-  the public release carries `Corr_dB` 8, -10 and -2 for the same three
+  different values: every one of the eleven per-type triangulation lookup
+  files (``*_triangulation.int``) of the public release carries `Corr_dB`
+  8, -10 and -2 for the same three
   operations, so the published constants and the database disagree by 4, 2
   and 0.5 dB. The guidance, whose section A.3.1 declares the shipped lookup
   data part of the hemisphere database and not to be edited, does not mention
   the difference, and its note questions the validity of the published values
   without naming the ones actually shipped.
 - **Evidence:** the identical `&CORRECTIONS` blocks of the eleven
-  interpolation lookup files of the V2.0.74 public release; the published
+  triangulation lookup files (``*_triangulation.int``) of the V2.0.74 public
+  release; the published
   constants verified on PDF pages 17 and 18 (printed pp. 18 and 19) of NORAH2
   SC01.D1.5d (EASA.2020.FC.06):2024.
 - **Library behaviour:** `hover_derived_hemisphere` defaults to the published

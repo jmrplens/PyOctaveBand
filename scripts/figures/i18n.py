@@ -4007,11 +4007,11 @@ _ES_EXACT = {
     "nose": "morro",
     "HIGE (from the ring)": "HIGE (del anillo)",
     "HOGE (+12 dB)": "HOGE (+12 dB)",
-    "Full-rpm idle (-2.5 dB)": "Ralentí a régimen pleno (-2,5 dB)",
-    "Reduced-rpm idle (-12 dB)": "Ralentí a régimen reducido (-12 dB)",
+    "Full-rpm idle (−2.5 dB)": "Ralentí a régimen pleno (−2,5 dB)",
+    "Reduced-rpm idle (−12 dB)": "Ralentí a régimen reducido (−12 dB)",
     "Source level at 70 m [dB]": "Nivel de fuente a 70 m [dB]",
-    "Derived hover and idle sources (Table 3)":
-        "Fuentes derivadas de estacionario y ralentí (Tabla 3)",
+    "Derived hover and idle sources (Table 3, φ = 0°)":
+        "Fuentes derivadas de estacionario y ralentí (Tabla 3, φ = 0°)",
     "constant directivity in φ: each θ\nreads the ring at ±θ":
         "directividad constante en φ: cada θ\nlee el anillo en ±θ",
     "SEL [dB]": "SEL [dB]",

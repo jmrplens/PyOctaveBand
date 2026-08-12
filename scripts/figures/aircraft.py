@@ -778,9 +778,10 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
         hover_ring_hemisphere,
     )
 
-    # A ground-ring measurement with the shape of a real campaign: 31 thirds,
-    # one spectrum per 30 deg bearing, reduced to the 70 m polar distance,
-    # loudest ahead and on the rear starboard quarter.
+    # A ground-ring measurement with the shape of a real campaign: one
+    # 31-band spectrum per 30 deg bearing, reduced to the 70 m polar
+    # distance, peaking at the nose and falling to the tail with the
+    # starboard half a few decibels above the port half.
     freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz - 10 kHz
     bearings = np.arange(-180.0, 151.0, 30.0)              # ring closes at 180
     spectrum = 86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
@@ -812,10 +813,10 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
         ("HOGE (+12 dB)",
          hover_derived_hemisphere(hige, "out_of_ground_hover"),
          COLOR_SECONDARY, "--"),
-        ("Full-rpm idle (-2.5 dB)",
+        ("Full-rpm idle (−2.5 dB)",
          hover_derived_hemisphere(hige, "full_rpm_idle"),
          COLOR_TERTIARY, "--"),
-        ("Reduced-rpm idle (-12 dB)",
+        ("Reduced-rpm idle (−12 dB)",
          hover_derived_hemisphere(hige, "reduced_rpm_idle"),
          COLOR_QUATERNARY, "--"),
     )
@@ -829,7 +830,7 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     ax2.set_xticks(np.arange(0.0, 181.0, 30.0))
     ax2.set_xlabel("Polar angle θ [°]  (0° forward → 180° rearward)")
     ax2.set_ylabel("Source level at 70 m [dB]")
-    ax2.set_title("Derived hover and idle sources (Table 3)",
+    ax2.set_title("Derived hover and idle sources (Table 3, φ = 0°)",
                   fontweight="bold", pad=10)
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax2.set_axisbelow(True)

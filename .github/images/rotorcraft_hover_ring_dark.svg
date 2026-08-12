@@ -735,57 +735,57 @@ z
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(478.228134 316.774863)">reads the ring at ±θ</text>
    </g>
    <g id="text_38">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="660.204609" y="16.318125" transform="rotate(-0 660.204609 16.318125)">Derived hover and idle sources (Table 3)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="660.204609" y="16.318125" transform="rotate(-0 660.204609 16.318125)">Derived hover and idle sources (Table 3, φ = 0°)</text>
    </g>
    <g id="legend_1">
     <g id="patch_13">
-     <path d="M 695.7875 87.520937 
+     <path d="M 691.492812 87.520937 
 L 843.463438 87.520937 
 Q 845.263438 87.520937 845.263438 85.720937 
 L 845.263438 32.618125 
 Q 845.263438 30.818125 843.463438 30.818125 
-L 695.7875 30.818125 
-Q 693.9875 30.818125 693.9875 32.618125 
-L 693.9875 85.720937 
-Q 693.9875 87.520937 695.7875 87.520937 
+L 691.492812 30.818125 
+Q 689.692812 30.818125 689.692812 32.618125 
+L 689.692812 85.720937 
+Q 689.692812 87.520937 691.492812 87.520937 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_67">
-     <path d="M 697.5875 38.106719 
-L 706.5875 38.106719 
-L 715.5875 38.106719 
+     <path d="M 693.292812 38.106719 
+L 702.292812 38.106719 
+L 711.292812 38.106719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_39">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="722.7875" y="41.256719" transform="rotate(-0 722.7875 41.256719)">HIGE (from the ring)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="718.492813" y="41.256719" transform="rotate(-0 718.492813 41.256719)">HIGE (from the ring)</text>
     </g>
     <g id="line2d_68">
-     <path d="M 697.5875 51.607422 
-L 706.5875 51.607422 
-L 715.5875 51.607422 
+     <path d="M 693.292812 51.607422 
+L 702.292812 51.607422 
+L 711.292812 51.607422 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_40">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="722.7875" y="54.757422" transform="rotate(-0 722.7875 54.757422)">HOGE (+12 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="718.492813" y="54.757422" transform="rotate(-0 718.492813 54.757422)">HOGE (+12 dB)</text>
     </g>
     <g id="line2d_69">
-     <path d="M 697.5875 65.108125 
-L 706.5875 65.108125 
-L 715.5875 65.108125 
+     <path d="M 693.292812 65.108125 
+L 702.292812 65.108125 
+L 711.292812 65.108125 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.8"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="722.7875" y="68.258125" transform="rotate(-0 722.7875 68.258125)">Full-rpm idle (-2.5 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="718.492813" y="68.258125" transform="rotate(-0 718.492813 68.258125)">Full-rpm idle (−2.5 dB)</text>
     </g>
     <g id="line2d_70">
-     <path d="M 697.5875 78.608828 
-L 706.5875 78.608828 
-L 715.5875 78.608828 
+     <path d="M 693.292812 78.608828 
+L 702.292812 78.608828 
+L 711.292812 78.608828 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #9467bd; stroke-width: 1.8"/>
     </g>
     <g id="text_42">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="722.7875" y="81.758828" transform="rotate(-0 722.7875 81.758828)">Reduced-rpm idle (-12 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="718.492813" y="81.758828" transform="rotate(-0 718.492813 81.758828)">Reduced-rpm idle (−12 dB)</text>
     </g>
    </g>
   </g>

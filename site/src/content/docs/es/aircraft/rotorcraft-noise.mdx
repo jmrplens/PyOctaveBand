@@ -451,19 +451,19 @@ se extiende a espectros de bandas.
 import numpy as np
 from phonometry import aircraft
 
-# Un anillo de estacionario con la forma de una campaña real: 31 espectros de
-# tercio de octava, uno por cada 30° de rumbo, reducidos a los 70 m polares.
+# Un anillo de estacionario con la forma de una campaña real: un espectro de
+# 31 tercios de octava por cada 30° de rumbo, reducido a los 70 m polares.
 bearings = np.arange(-180.0, 151.0, 30.0)     # el anillo se cierra en ±180°
 hige = aircraft.hover_ring_hemisphere(freqs, bearings, niveles_anillo, distance=70.0)
 hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
 ralenti_pleno = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2,5 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring_es.svg" alt="Dos paneles de la derivación de la fuente de estacionario. A la izquierda, el anillo de estacionario con efecto suelo en la banda de 315 Hz: nivel de banda a 70 m frente al rumbo del anillo de menos 180 a 180 grados, con el máximo delante del morro y en el cuarto trasero de estribor. A la derecha, las secciones proa-popa de las cuatro fuentes derivadas frente al ángulo polar: el hemisferio HIGE construido desde el anillo, y las curvas de estacionario sin efecto suelo, ralentí a régimen pleno y ralentí a régimen reducido a más 12, menos 2,5 y menos 12 decibelios de él, con una nota de que directividad constante en phi significa que cada ángulo polar lee el anillo en más o menos ese rumbo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring_es.svg" alt="Dos paneles de la derivación de la fuente de estacionario. A la izquierda, el anillo de estacionario con efecto suelo en la banda de 315 Hz: nivel de banda a 70 m frente al rumbo del anillo de menos 180 a 180 grados, con el máximo en el morro y cayendo hacia la cola, con la mitad de estribor unos decibelios por encima de la de babor. A la derecha, las secciones proa-popa de las cuatro fuentes derivadas frente al ángulo polar: el hemisferio HIGE construido desde el anillo, y las curvas de estacionario sin efecto suelo, ralentí a régimen pleno y ralentí a régimen reducido a más 12, menos 2,5 y menos 12 decibelios de él, con una nota de que directividad constante en phi significa que cada ángulo polar lee el anillo en más o menos ese rumbo" width="92%" />
 
 *El anillo de la izquierda es la única medida; todo lo de la derecha se deriva
 de él. La sección HIGE arranca en el valor del morro del anillo y termina en
-el de la cola (esa es la extensión de φ constante trabajando), y las otras
+el de la cola (esa es la extensión de φ constante en acción), y las otras
 tres fuentes son la misma directividad desplazada entera: +12 dB hasta HOGE,
 −2,5 dB hasta el ralentí a régimen pleno, −12 dB hasta el reducido.*
 
@@ -1008,7 +1008,7 @@ es el caso de estacionario sin efecto suelo del prototipo reproducido con las
 convenciones del propio prototipo pasadas explícitamente: `mapping="bearing"`
 y su corrección de base de datos de +8 dB como `offset_db`. Sus ocho
 micrófonos abarcan rumbos, elevaciones, alturas de receptor de 0,01 m a
-8,2 m y tres clases de suelo; el residuo culmina en los micrófonos del nadir,
+8,2 m y cuatro resistividades de flujo; el residuo culmina en los micrófonos del nadir,
 donde la interferencia amortiguada del prototipo más se aparta de la Ec. 30
 coherente publicada.
 

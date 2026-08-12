@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="856.963437pt" height="369.271562pt" viewBox="0 0 856.963437 369.271562" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="871.428047pt" height="369.271562pt" viewBox="0 0 871.428047 369.271562" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 369.271562 
-L 856.963437 369.271562 
-L 856.963437 0 
+L 871.428047 369.271562 
+L 871.428047 0 
 L 0 0 
 z
 "/>
@@ -735,57 +735,57 @@ z
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(478.228134 317.254863)">lee el anillo en ±θ</text>
    </g>
    <g id="text_38">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="660.204609" y="16.798125" transform="rotate(-0 660.204609 16.798125)">Fuentes derivadas de estacionario y ralentí (Tabla 3)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="660.204609" y="16.798125" transform="rotate(-0 660.204609 16.798125)">Fuentes derivadas de estacionario y ralentí (Tabla 3, φ = 0°)</text>
    </g>
    <g id="legend_1">
     <g id="patch_13">
-     <path d="M 653.507187 88.720937 
+     <path d="M 649.2125 88.720937 
 L 843.463437 88.720937 
 Q 845.263437 88.720937 845.263437 86.920937 
 L 845.263437 33.098125 
 Q 845.263437 31.298125 843.463437 31.298125 
-L 653.507187 31.298125 
-Q 651.707187 31.298125 651.707187 33.098125 
-L 651.707187 86.920937 
-Q 651.707187 88.720937 653.507187 88.720937 
+L 649.2125 31.298125 
+Q 647.4125 31.298125 647.4125 33.098125 
+L 647.4125 86.920937 
+Q 647.4125 88.720937 649.2125 88.720937 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_67">
-     <path d="M 655.307187 38.586719 
-L 664.307187 38.586719 
-L 673.307187 38.586719 
+     <path d="M 651.0125 38.586719 
+L 660.0125 38.586719 
+L 669.0125 38.586719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_39">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="680.507187" y="41.736719" transform="rotate(-0 680.507187 41.736719)">HIGE (del anillo)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="676.2125" y="41.736719" transform="rotate(-0 676.2125 41.736719)">HIGE (del anillo)</text>
     </g>
     <g id="line2d_68">
-     <path d="M 655.307187 52.087422 
-L 664.307187 52.087422 
-L 673.307187 52.087422 
+     <path d="M 651.0125 52.087422 
+L 660.0125 52.087422 
+L 669.0125 52.087422 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_40">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="680.507187" y="55.237422" transform="rotate(-0 680.507187 55.237422)">HOGE (+12 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="676.2125" y="55.237422" transform="rotate(-0 676.2125 55.237422)">HOGE (+12 dB)</text>
     </g>
     <g id="line2d_69">
-     <path d="M 655.307187 65.948125 
-L 664.307187 65.948125 
-L 673.307187 65.948125 
+     <path d="M 651.0125 65.948125 
+L 660.0125 65.948125 
+L 669.0125 65.948125 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.8"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="680.507187" y="69.098125" transform="rotate(-0 680.507187 69.098125)">Ralentí a régimen pleno (-2,5 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="676.2125" y="69.098125" transform="rotate(-0 676.2125 69.098125)">Ralentí a régimen pleno (−2,5 dB)</text>
     </g>
     <g id="line2d_70">
-     <path d="M 655.307187 79.808828 
-L 664.307187 79.808828 
-L 673.307187 79.808828 
+     <path d="M 651.0125 79.808828 
+L 660.0125 79.808828 
+L 669.0125 79.808828 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #9467bd; stroke-width: 1.8"/>
     </g>
     <g id="text_42">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="680.507187" y="82.958828" transform="rotate(-0 680.507187 82.958828)">Ralentí a régimen reducido (-12 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="676.2125" y="82.958828" transform="rotate(-0 676.2125 82.958828)">Ralentí a régimen reducido (−12 dB)</text>
     </g>
    </g>
   </g>

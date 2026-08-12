@@ -1197,8 +1197,8 @@ apart; the table, backed by the database, is what is implemented (see the
 import numpy as np
 from phonometry import aircraft
 
-# A hover ring with a real campaign's shape: 31 one-third-octave spectra,
-# one per 30° of bearing, reduced to the 70 m polar distance.
+# A hover ring with a real campaign's shape: one 31-band third-octave
+# spectrum per 30° of bearing, reduced to the 70 m polar distance.
 bearings = np.arange(-180.0, 151.0, 30.0)     # the ring closes at ±180°
 hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring_levels, distance=70.0)
 hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
@@ -1207,7 +1207,7 @@ full_rpm_idle = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2.5
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring.svg" alt="Two panels of the hover source derivation. On the left, the in-ground-hover ring at the 315 Hz band: band level at 70 m against ring bearing from minus 180 to 180 degrees, loudest ahead of the nose and on the rear starboard quarter. On the right, the fore-aft sections of the four derived sources against polar angle: the HIGE hemisphere built from the ring, and the out-of-ground hover, full-rpm idle and reduced-rpm idle curves at plus 12, minus 2.5 and minus 12 decibels from it, with a note that constant directivity in phi means each polar angle reads the ring at plus or minus that bearing" width="92%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_hover_ring.svg" alt="Two panels of the hover source derivation. On the left, the in-ground-hover ring at the 315 Hz band: band level at 70 m against ring bearing from minus 180 to 180 degrees, peaking at the nose and falling to the tail, the starboard half a few decibels above the port half. On the right, the fore-aft sections of the four derived sources against polar angle: the HIGE hemisphere built from the ring, and the out-of-ground hover, full-rpm idle and reduced-rpm idle curves at plus 12, minus 2.5 and minus 12 decibels from it, with a note that constant directivity in phi means each polar angle reads the ring at plus or minus that bearing" width="92%">
 </picture>
 
 <details>
@@ -1542,7 +1542,7 @@ The Table 3 hover/idle derivation is anchored in closed form (the ring-to-rim
 identity, hand-computed constant-φ bins, the exact Approach 3 offsets) and
 end to end against the prototype's out-of-ground-hover verification case:
 its eight microphones, spanning bearings, elevations, receiver heights from
-0.01 m to 8.2 m and three ground classes, reproduce `LASmax`/`SEL` to
+0.01 m to 8.2 m and four flow resistivities, reproduce `LASmax`/`SEL` to
 0.45 dB worst case with the prototype's own conventions passed explicitly
 (`mapping="bearing"` and its +8 dB database correction as `offset_db`; the
 guidance's constant-φ text and published +12 dB are the defaults). The

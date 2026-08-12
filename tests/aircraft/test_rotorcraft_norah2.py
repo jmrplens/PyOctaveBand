@@ -420,7 +420,7 @@ def test_case4_hover_ogh_event(norah_root: pathlib.Path) -> None:
         # microphones (the prototype damps the coherent two-ray interference
         # of Eq. 30, as documented for the flyover cases); the six oblique
         # microphones reproduce to 0.3 dB across bearings, elevations,
-        # heights (0.01-8.2 m) and ground classes (2e5-3e6 Pa.s/m2).
+        # heights (0.01-8.2 m) and flow resistivities (2e5-3e6 Pa.s/m2).
         assert res.la_max == pytest.approx(mic[8], abs=0.45), mic[:2]
         assert res.sel == pytest.approx(mic[9], abs=0.45), mic[:2]
         if mic[0] == 0.0 and mic[1] == 0.0:
