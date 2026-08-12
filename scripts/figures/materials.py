@@ -21,7 +21,7 @@ from phonometry._plot.common import (
     theme_line,
 )
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -2333,8 +2333,9 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
     minima = [float(lossy[np.argmin(np.abs(x - xm))])
               for xm in (0.12, 0.463, 0.806)]
     ax.annotate(
-        f"minima at 12, 46 and 81 cm: {minima[0]:.2f}, {minima[1]:.2f}, "
-        f"{minima[2]:.2f} dB\n(read the nearest one, and extrapolate to x = 0)",
+        f"minima at 12, 46 and 81 cm: {_fmt_minus(minima[0], '.2f')}, "
+        f"{_fmt_minus(minima[1], '.2f')}, {_fmt_minus(minima[2], '.2f')} dB\n"
+        "(read the nearest one, and extrapolate to x = 0)",
         xy=(0.806, minima[2]), xytext=(0.27, -14.6), fontsize=9.5, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG})
 

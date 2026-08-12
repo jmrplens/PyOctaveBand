@@ -340,19 +340,19 @@ L 705.763438 28.318125
    </g>
    <g id="text_13">
     <g id="patch_7">
-     <path d="M 539.659623 395.237852 
+     <path d="M 538.85181 395.237852 
 L 695.790873 395.237852 
 Q 701.290873 395.237852 701.290873 389.737852 
 L 701.290873 350.128828 
 Q 701.290873 344.628828 695.790873 344.628828 
-L 539.659623 344.628828 
-Q 534.159623 344.628828 534.159623 350.128828 
-L 534.159623 389.737852 
-Q 534.159623 395.237852 539.659623 395.237852 
+L 538.85181 344.628828 
+Q 533.35181 344.628828 533.35181 350.128828 
+L 533.35181 389.737852 
+Q 533.35181 395.237852 538.85181 395.237852 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(544.100873 359.588184)">R′tr,s,w = 31 dB   (Ctr = -3)</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(538.85181 359.588184)">R′tr,s,w = 31 dB   (Ctr = −3)</text>
     <text style="font-size: 11px; font-family: sans-serif" transform="translate(591.696498 372.791191)">D2m,nT,w = 33 dB</text>
     <text style="font-size: 11px; font-family: sans-serif" transform="translate(539.659623 385.994199)">air inlet limits the low bands</text>
    </g>

@@ -319,10 +319,10 @@ L 697.583125 28.318125
    <g id="text_19">
     <g id="patch_7">
      <path d="M 59.029634 389.611875 
-L 268.970102 389.611875 
-Q 272.570102 389.611875 272.570102 386.011875 
-L 272.570102 342.802031 
-Q 272.570102 339.202031 268.970102 339.202031 
+L 273.26479 389.611875 
+Q 276.86479 389.611875 276.86479 386.011875 
+L 276.86479 342.802031 
+Q 276.86479 339.202031 273.26479 339.202031 
 L 59.029634 339.202031 
 Q 55.429634 339.202031 55.429634 342.802031 
 L 55.429634 386.011875 
@@ -332,8 +332,8 @@ z
     </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 350.541504)">room 7 x 5 x 3 m, max_order = 60</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 361.343965)">wall alpha 0.10 -&gt; 0.50 with frequency</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">air at 20 C / 50 % RH: -0.4 % of T30 at 250 Hz,</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 382.948887)">-4.4 % at 4 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">air at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 382.948887)">−4.4 % at 4 kHz</text>
    </g>
    <g id="text_20">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.444297" y="16.318125" transform="rotate(-0 373.444297 16.318125)">Per-band decay: solid without air, dashed with air</text>

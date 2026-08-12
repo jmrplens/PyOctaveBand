@@ -566,13 +566,13 @@ L 306.611042 173.824052
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="317.458246" y="258.548125" transform="rotate(-0 317.458246 258.548125)">Rw = 30 dB</text>
    </g>
    <g id="text_27">
-    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="57.665781" y="46.347441" transform="rotate(-0 57.665781 46.347441)">Reference curve shifted by -22 dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="57.665781" y="46.347441" transform="rotate(-0 57.665781 46.347441)">Reference curve shifted by −22 dB</text>
    </g>
    <g id="text_28">
     <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="57.665781" y="71.572641" transform="rotate(-0 57.665781 71.572641)">Sum of unfavourable deviations = 31.8 dB  (limit 32.0 dB)</text>
    </g>
    <g id="text_29">
-    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="57.665781" y="96.797841" transform="rotate(-0 57.665781 96.797841)">Rw (C ; Ctr) = 30 (-2 ; -3) dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="57.665781" y="96.797841" transform="rotate(-0 57.665781 96.797841)">Rw (C ; Ctr) = 30 (−2 ; −3) dB</text>
    </g>
    <g id="text_30">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="319.925781" y="16.318125" transform="rotate(-0 319.925781 16.318125)">ISO 717-1 Weighted Sound Reduction Index (Annex C example)</text>

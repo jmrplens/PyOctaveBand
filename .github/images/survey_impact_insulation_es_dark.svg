@@ -276,7 +276,7 @@ Q 426.61431 68.93991 431.61431 68.93991
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(584.711185 48.133855)">L'nT,w(CI) = 58(-4) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(579.93931 48.133855)">L'nT,w(CI) = 58(−4) dB</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(431.61431 60.53659)">atención al signo menos: un recinto vivo reduce L'nT</text>
    </g>
    <g id="text_15">
@@ -336,10 +336,10 @@ z
    <g id="legend_1">
     <g id="patch_8">
      <path d="M 47.625781 382.175328 
-L 173.532969 382.175328 
-Q 175.332969 382.175328 175.332969 380.375328 
-L 175.332969 340.773219 
-Q 175.332969 338.973219 173.532969 338.973219 
+L 176.244219 382.175328 
+Q 178.044219 382.175328 178.044219 380.375328 
+L 178.044219 340.773219 
+Q 178.044219 338.973219 176.244219 338.973219 
 L 47.625781 338.973219 
 Q 45.825781 338.973219 45.825781 340.773219 
 L 45.825781 380.375328 
@@ -356,7 +356,7 @@ z
 " style="fill: #2ca02c; fill-opacity: 0.18; stroke: #2ca02c; stroke-opacity: 0.18; stroke-linejoin: miter"/>
     </g>
     <g id="text_16">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.625781" y="349.411813" transform="rotate(-0 74.625781 349.411813)">-k = -10 log10(T/T0)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.625781" y="349.411813" transform="rotate(-0 74.625781 349.411813)">−k = −10 log10(T/T0)</text>
     </g>
     <g id="line2d_25">
      <path d="M 49.425781 359.762516 

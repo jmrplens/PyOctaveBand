@@ -77,7 +77,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
         ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
         axins.plot(w, mag_db, color=color, linestyle=style)
 
-    ax.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3, label="-3 dB")
+    ax.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3, label="−3 dB")
     axins.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3)
     
     apply_axis_styling(ax, "Filter Architecture Comparison (Order 6, 1kHz Band)", xlim=(100, 8000), ylim=(-80, 5))
@@ -86,7 +86,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins.set_xlim(650, 1500)
     axins.set_ylim(-4, 0.5)  # Adjusted: from -4 to 0.5
     axins.grid(True, which="both", alpha=0.3)
-    axins.set_title("Zoom at -3 dB (Log Scale)", fontsize=9)
+    axins.set_title("Zoom at −3 dB (Log Scale)", fontsize=9)
 
     # Fix x-ticks for log scale zoom to look right
     from matplotlib.ticker import NullFormatter, ScalarFormatter
@@ -580,7 +580,7 @@ def generate_parametric_eq_family(output_dir: str) -> None:
         (EQSection("lowshelf", 125.0, gain_db=6.0),
          "Low shelf +6 dB", COLOR_TERTIARY, "-"),
         (EQSection("highshelf", 4000.0, gain_db=-6.0),
-         "High shelf -6 dB", "#9467bd", "-"),
+         "High shelf −6 dB", "#9467bd", "-"),
         (EQSection("lowpass", 10000.0),
          "Low-pass (Q = 0.707)", COLOR_SECONDARY, "--"),
         (EQSection("highpass", 50.0),

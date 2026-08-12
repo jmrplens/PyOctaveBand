@@ -1003,7 +1003,7 @@ L 193.450312 334.525312
 " style="fill: none; stroke: #9467bd; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="200.650312" y="337.675312" transform="rotate(-0 200.650312 337.675312)">Shelving agudo -6 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="200.650312" y="337.675312" transform="rotate(-0 200.650312 337.675312)">Shelving agudo −6 dB</text>
     </g>
     <g id="line2d_88">
      <path d="M 175.450312 348.026016 

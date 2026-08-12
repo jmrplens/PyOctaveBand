@@ -450,7 +450,7 @@ Q 410.979935 384.680256 415.979935 384.680256
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(546.80806 364.274201)">DI,n,e,w(C;Ctr) = 29(-1;-2) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(537.26431 364.274201)">DI,n,e,w(C;Ctr) = 29(−1;−2) dB</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(415.979935 376.276935)">DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N</text>
    </g>
    <g id="text_26">

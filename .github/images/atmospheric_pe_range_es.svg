@@ -664,7 +664,7 @@ L 75.405469 373.642969
 " style="fill: none; stroke: #d62728; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="376.792969" transform="rotate(-0 82.605469 376.792969)">Hacia arriba (b = -1 m/s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="376.792969" transform="rotate(-0 82.605469 376.792969)">Hacia arriba (b = −1 m/s)</text>
     </g>
     <g id="line2d_35">
      <path d="M 57.405469 387.503672 

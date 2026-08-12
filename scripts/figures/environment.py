@@ -614,7 +614,7 @@ def generate_atmospheric_sound_speed_profiles(output_dir: str) -> None:
     ax.plot(down.sound_speeds, down.heights, color=COLOR_PRIMARY, linewidth=2.0,
             label="Downward refraction (b = +1 m/s)", zorder=3)
     ax.plot(up.sound_speeds, up.heights, color=COLOR_SECONDARY, linewidth=2.0,
-            label="Upward refraction (b = -1 m/s)", zorder=3)
+            label="Upward refraction (b = −1 m/s)", zorder=3)
     ax.axvline(340.0, color=COLOR_FG, linestyle=":", linewidth=0.9, alpha=0.6)
     ax.set_xlabel("Effective sound speed [m/s]")
     ax.set_ylabel("Height [m]")
@@ -683,7 +683,7 @@ def generate_atmospheric_pe_range(output_dir: str) -> None:
         (linear_sound_speed_profile(0.0, ground_speed=c0, max_height=60.0),
          COLOR_FG, "--", "Homogeneous (b = 0)"),
         (log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0),
-         COLOR_SECONDARY, "-", "Upward (b = -1 m/s)"),
+         COLOR_SECONDARY, "-", "Upward (b = −1 m/s)"),
     ]
     _fig, ax = plt.subplots(figsize=(11.0, 6.2))
     with _warnings.catch_warnings():

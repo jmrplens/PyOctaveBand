@@ -1517,20 +1517,20 @@ L 672.323594 28.318125
    </g>
    <g id="text_28">
     <g id="patch_140">
-     <path d="M 512.619939 384.464631 
+     <path d="M 503.076189 384.464631 
 L 662.948064 384.464631 
 Q 667.948064 384.464631 667.948064 379.464631 
 L 667.948064 355.459162 
 Q 667.948064 350.459162 662.948064 350.459162 
-L 512.619939 350.459162 
-Q 507.619939 350.459162 507.619939 355.459162 
-L 507.619939 379.464631 
-Q 507.619939 384.464631 512.619939 384.464631 
+L 503.076189 350.459162 
+Q 498.076189 350.459162 498.076189 355.459162 
+L 498.076189 379.464631 
+Q 498.076189 384.464631 503.076189 384.464631 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(512.619939 364.058576)">R' = -10 log10(Σ 10^(-Rij/10))</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(524.230877 376.06131)">R'w (C; Ctr) = 57 (-1; -7) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(503.076189 364.058576)">R' = −10 log10(Σ 10^(−Rij/10))</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(514.687127 376.06131)">R'w (C; Ctr) = 57 (−1; −7) dB</text>
    </g>
    <g id="text_29">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="359.805938" y="16.318125" transform="rotate(-0 359.805938 16.318125)">ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)</text>

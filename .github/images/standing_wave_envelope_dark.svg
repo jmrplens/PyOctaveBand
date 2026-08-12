@@ -1067,16 +1067,16 @@ L 733.684688 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_7">
-    <path d="M 396.025741 321.201492 
-Q 497.534466 286.051912 597.986702 251.268164 
+    <path d="M 401.750263 321.184009 
+Q 500.401875 286.050667 598.000251 251.292419 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 593.774187 250.716153 
-L 597.986702 251.268164 
-L 595.017584 254.30697 
+    <path d="M 593.783051 250.777419 
+L 598.000251 251.292419 
+L 595.057931 254.357179 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_17">
-    <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 332.026688)">minima at 12, 46 and 81 cm: -5.99, -5.92, -5.85 dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 332.026688)">minima at 12, 46 and 81 cm: −5.99, −5.92, −5.85 dB</text>
     <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 343.429286)">(read the nearest one, and extrapolate to x = 0)</text>
    </g>
    <g id="patch_8">

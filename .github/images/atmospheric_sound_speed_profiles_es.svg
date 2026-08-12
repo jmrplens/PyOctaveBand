@@ -420,35 +420,35 @@ L 61.327493 28.318125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 169.190156 63.239531 
-L 361.499062 63.239531 
-Q 363.299062 63.239531 363.299062 61.439531 
-L 363.299062 34.618125 
-Q 363.299062 32.818125 361.499062 32.818125 
-L 169.190156 32.818125 
-Q 167.390156 32.818125 167.390156 34.618125 
-L 167.390156 61.439531 
-Q 167.390156 63.239531 169.190156 63.239531 
+     <path d="M 168.3225 63.239531 
+L 362.366719 63.239531 
+Q 364.166719 63.239531 364.166719 61.439531 
+L 364.166719 34.618125 
+Q 364.166719 32.818125 362.366719 32.818125 
+L 168.3225 32.818125 
+Q 166.5225 32.818125 166.5225 34.618125 
+L 166.5225 61.439531 
+Q 166.5225 63.239531 168.3225 63.239531 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_32">
-     <path d="M 170.990156 40.466719 
-L 179.990156 40.466719 
-L 188.990156 40.466719 
+     <path d="M 170.1225 40.466719 
+L 179.1225 40.466719 
+L 188.1225 40.466719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="196.190156" y="43.616719" transform="rotate(-0 196.190156 43.616719)">Refracción hacia abajo (b = +1 m/s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="195.3225" y="43.616719" transform="rotate(-0 195.3225 43.616719)">Refracción hacia abajo (b = +1 m/s)</text>
     </g>
     <g id="line2d_33">
-     <path d="M 170.990156 54.327422 
-L 179.990156 54.327422 
-L 188.990156 54.327422 
+     <path d="M 170.1225 54.327422 
+L 179.1225 54.327422 
+L 188.1225 54.327422 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="196.190156" y="57.477422" transform="rotate(-0 196.190156 57.477422)">Refracción hacia arriba (b = -1 m/s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="195.3225" y="57.477422" transform="rotate(-0 195.3225 57.477422)">Refracción hacia arriba (b = −1 m/s)</text>
     </g>
    </g>
   </g>

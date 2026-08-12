@@ -276,7 +276,7 @@ Q 469.040873 68.05991 474.040873 68.05991
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(584.311185 47.653855)">L'nT,w(CI) = 58(-4) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(579.53931 47.653855)">L'nT,w(CI) = 58(−4) dB</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(474.040873 59.65659)">note the minus sign: a live room lowers L'nT</text>
    </g>
    <g id="text_15">
@@ -336,10 +336,10 @@ z
    <g id="legend_1">
     <g id="patch_8">
      <path d="M 47.225781 381.695328 
-L 167.254844 381.695328 
-Q 169.054844 381.695328 169.054844 379.895328 
-L 169.054844 340.293219 
-Q 169.054844 338.493219 167.254844 338.493219 
+L 175.844219 381.695328 
+Q 177.644219 381.695328 177.644219 379.895328 
+L 177.644219 340.293219 
+Q 177.644219 338.493219 175.844219 338.493219 
 L 47.225781 338.493219 
 Q 45.425781 338.493219 45.425781 340.293219 
 L 45.425781 379.895328 
@@ -356,7 +356,7 @@ z
 " style="fill: #2ca02c; fill-opacity: 0.18; stroke: #2ca02c; stroke-opacity: 0.18; stroke-linejoin: miter"/>
     </g>
     <g id="text_16">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="348.931813" transform="rotate(-0 74.225781 348.931813)">-k = -10 log10(T/T0)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="348.931813" transform="rotate(-0 74.225781 348.931813)">−k = −10 log10(T/T0)</text>
     </g>
     <g id="line2d_25">
      <path d="M 49.025781 359.282516 

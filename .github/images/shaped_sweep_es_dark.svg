@@ -8714,7 +8714,7 @@ L 84.946094 432.000625
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
     </g>
     <g id="text_43">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="92.146094" y="435.150625" transform="rotate(-0 92.146094 435.150625)">Objetivo rosa (-3 dB por octava)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="92.146094" y="435.150625" transform="rotate(-0 92.146094 435.150625)">Objetivo rosa (−3 dB por octava)</text>
     </g>
     <g id="patch_14">
      <path d="M 66.946094 448.651328 

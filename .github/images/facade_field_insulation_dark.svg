@@ -453,20 +453,20 @@ L 705.763438 28.318125
    </g>
    <g id="text_28">
     <g id="patch_7">
-     <path d="M 496.581498 384.464631 
+     <path d="M 491.809623 384.464631 
 L 695.790873 384.464631 
 Q 700.790873 384.464631 700.790873 379.464631 
 L 700.790873 355.459162 
 Q 700.790873 350.459162 695.790873 350.459162 
-L 496.581498 350.459162 
-Q 491.581498 350.459162 491.581498 355.459162 
-L 491.581498 379.464631 
-Q 491.581498 384.464631 496.581498 384.464631 
+L 491.809623 350.459162 
+Q 486.809623 350.459162 486.809623 355.459162 
+L 486.809623 379.464631 
+Q 486.809623 384.464631 491.809623 384.464631 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(525.712748 364.058576)">Dls,2m,nT,w(C;Ctr) = 37(-1;-3) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(496.581498 376.06131)">45° loudspeaker method (-1.5 dB on R')</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(516.168998 364.058576)">Dls,2m,nT,w(C;Ctr) = 37(−1;−3) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(491.809623 376.06131)">45° loudspeaker method (−1.5 dB on R')</text>
    </g>
    <g id="text_29">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">ISO 16283-3 Field Facade Insulation</text>

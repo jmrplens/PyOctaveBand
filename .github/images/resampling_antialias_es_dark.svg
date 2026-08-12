@@ -3178,7 +3178,7 @@ L 81.767969 359.640625
 " style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.7; stroke-width: 1.2"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="88.967969" y="362.790625" transform="rotate(-0 88.967969 362.790625)">Atenuación de diseño -120 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="88.967969" y="362.790625" transform="rotate(-0 88.967969 362.790625)">Atenuación de diseño −120 dB</text>
     </g>
     <g id="patch_9">
      <path d="M 63.767969 376.651328 

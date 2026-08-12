@@ -1003,7 +1003,7 @@ L 206.484141 334.045312
 " style="fill: none; stroke: #9467bd; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="213.684141" y="337.195312" transform="rotate(-0 213.684141 337.195312)">High shelf -6 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="213.684141" y="337.195312" transform="rotate(-0 213.684141 337.195312)">High shelf −6 dB</text>
     </g>
     <g id="line2d_88">
      <path d="M 188.484141 347.546016 

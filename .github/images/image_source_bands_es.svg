@@ -319,10 +319,10 @@ L 697.583125 28.318125
    <g id="text_19">
     <g id="patch_7">
      <path d="M 59.029634 389.611875 
-L 276.552602 389.611875 
-Q 280.152602 389.611875 280.152602 386.011875 
-L 280.152602 342.802031 
-Q 280.152602 339.202031 276.552602 339.202031 
+L 280.84729 389.611875 
+Q 284.44729 389.611875 284.44729 386.011875 
+L 284.44729 342.802031 
+Q 284.44729 339.202031 280.84729 339.202031 
 L 59.029634 339.202031 
 Q 55.429634 339.202031 55.429634 342.802031 
 L 55.429634 386.011875 
@@ -332,8 +332,8 @@ z
     </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 350.541504)">sala de 7 x 5 x 3 m, max_order = 60</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 361.343965)">alpha de pared 0,10 -&gt; 0,50 con la frecuencia</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">aire a 20 °C / 50 % HR: -0,4 % del T30 a 250 Hz,</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 382.948887)">-4,4 % a 4 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">aire a 20 °C / 50 % HR: −0,4 % del T30 a 250 Hz,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 382.948887)">−4,4 % a 4 kHz</text>
    </g>
    <g id="text_20">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.444297" y="16.318125" transform="rotate(-0 373.444297 16.318125)">Decaimiento por banda: continua sin aire, a trazos con aire</text>

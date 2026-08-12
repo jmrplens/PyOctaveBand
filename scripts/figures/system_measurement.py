@@ -171,7 +171,7 @@ def generate_shaped_sweep(output_dir: str) -> None:
     posg = grid > 0.0
     axes[1].semilogx(grid[posg], target_db[posg], color=COLOR_SECONDARY,
                      linewidth=1.5, linestyle="--",
-                     label="Pink target (-3 dB per octave)")
+                     label="Pink target (−3 dB per octave)")
     axes[1].axvspan(50.0, 5000.0, color=theme_fill(COLOR_PRIMARY, axes[1]),
                     zorder=0, label="Sweep band (50 Hz - 5 kHz)")
     axes[1].set_xlim(20.0, 20000.0)
@@ -210,7 +210,7 @@ def generate_resampling_antialias(output_dir: str) -> None:
     ax.axvline(res.stopband_edge_hz, color=COLOR_SECONDARY, linestyle="--",
                linewidth=1.4, label="Stopband edge (alias fold)")
     ax.axhline(-res.stopband_attenuation_db, color=COLOR_FG, linestyle=":",
-               linewidth=1.2, alpha=0.7, label="Design attenuation -120 dB")
+               linewidth=1.2, alpha=0.7, label="Design attenuation −120 dB")
     ax.axvspan(res.stopband_edge_hz, f_hi, color=theme_fill(COLOR_SECONDARY, ax),
                zorder=0,
                label="Rejected band (would fold back as aliases)")

@@ -66,7 +66,7 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
     ax.semilogx(freqs, 10.0 * np.log10(smooth), color=COLOR_SECONDARY,
                 linewidth=2.2, label="1/3-octave smoothed")
     ax.semilogx(freqs, ref_db, color=COLOR_FG, linestyle="--", linewidth=1.4,
-                alpha=0.7, label="Exact -3.01 dB/octave power law")
+                alpha=0.7, label="Exact −3.01 dB/octave power law")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("PSD [dB re 1/Hz]")
     ax.set_title("Calibrated Spectral Density of Pink Noise (Bendat & Piersol)",
@@ -133,7 +133,7 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
     ax.semilogx(freqs, 10.0 * np.log10(res.psd[band]), color=COLOR_PRIMARY,
                 linewidth=1.2, label="Multitaper estimate ($K$ = 7, adaptive)")
     ax.semilogx(freqs, ref_db, color=COLOR_FG, linestyle="--", linewidth=1.4,
-                alpha=0.7, label="Exact -3.01 dB/octave power law")
+                alpha=0.7, label="Exact −3.01 dB/octave power law")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("PSD [dB re 1/Hz]")
     ax.set_title(

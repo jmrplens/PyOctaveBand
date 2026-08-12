@@ -2720,7 +2720,7 @@ def generate_itu_r_468_weighting(output_dir: str) -> None:
         (6300.0, float(electroacoustics.itu_r_468_weighting([6300.0])[0]),
          COLOR_PRIMARY, "+12.2 dB at 6.3 kHz"),
         (1000.0, 0.0, COLOR_PRIMARY, "0 dB at 1 kHz"),
-        (1000.0, -5.63, COLOR_SECONDARY, "-5.63 dB at 1 kHz"),
+        (1000.0, -5.63, COLOR_SECONDARY, "−5.63 dB at 1 kHz"),
     ):
         ax.plot([f0], [level], "o", color=col, markersize=7, zorder=6)
         ax.annotate(txt, xy=(f0, level), xytext=(-10, 10),

@@ -5581,7 +5581,7 @@ L 75.405469 387.421328
 " style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.7; stroke-width: 1.4"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="82.605469" y="390.571328" transform="rotate(-0 82.605469 390.571328)">Exact -3.01 dB/octave power law</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="82.605469" y="390.571328" transform="rotate(-0 82.605469 390.571328)">Exact −3.01 dB/octave power law</text>
     </g>
    </g>
   </g>

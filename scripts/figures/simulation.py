@@ -16,7 +16,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from .fields import _meshed_metadiffuser_ntff_levels
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .materials import _qr_metadiffuser_wells
 from .theme import (
     _FILENAME_SUFFIX,
@@ -397,7 +397,8 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
              xlim=(-72.0, 8.0))
     ax_l.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_l.set_title("What is left behind the line", fontweight="bold", pad=10)
-    ax_l.annotate(f"{10 * np.log10(behind):.1f} dB of the field energy sits\n"
+    ax_l.annotate(f"{_fmt_minus(10 * np.log10(behind), '.1f')} dB of the "
+                  "field energy sits\n"
                   "in the 20 sponge rows behind the line",
                   xy=(0.03, 0.90), xycoords="axes fraction", fontsize=9,
                   color=COLOR_FG,

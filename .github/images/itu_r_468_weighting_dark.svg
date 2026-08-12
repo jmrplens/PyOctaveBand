@@ -723,7 +723,7 @@ L 705.503125 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #1f77b4" x="410.925514" y="128.507452" transform="rotate(-0 410.925514 128.507452)">0 dB at 1 kHz</text>
    </g>
    <g id="text_22">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #d62728" x="410.925514" y="159.525747" transform="rotate(-0 410.925514 159.525747)">-5.63 dB at 1 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #d62728" x="410.925514" y="159.525747" transform="rotate(-0 410.925514 159.525747)">−5.63 dB at 1 kHz</text>
    </g>
    <g id="text_23">
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 49.952239)">for a 100 Hz fundamental the network cuts d2 by 13.8 dB</text>

@@ -13707,7 +13707,7 @@ L 75.405469 373.021328
 " style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #000000; stroke-opacity: 0.7; stroke-width: 1.4"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="376.171328" transform="rotate(-0 82.605469 376.171328)">Ley de potencias exacta de -3,01 dB/octava</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="376.171328" transform="rotate(-0 82.605469 376.171328)">Ley de potencias exacta de −3,01 dB/octava</text>
     </g>
    </g>
   </g>

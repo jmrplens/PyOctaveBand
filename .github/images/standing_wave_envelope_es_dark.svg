@@ -1075,16 +1075,16 @@ L 733.684688 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_7">
-    <path d="M 395.211682 320.451434 
-Q 497.126818 285.67235 597.983835 251.254354 
+    <path d="M 400.90163 320.434137 
+Q 499.97355 285.67219 597.990493 251.280408 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 593.773838 250.683452 
-L 597.983835 251.254354 
-L 595.001115 254.27981 
+    <path d="M 593.775747 250.745696 
+L 597.990493 251.280408 
+L 595.033876 254.331378 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_17">
-    <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 331.646688)">mínimos en 12, 46 y 81 cm: -5,99, -5,92, -5,85 dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 331.646688)">mínimos en 12, 46 y 81 cm: −5,99, −5,92, −5,85 dB</text>
     <text style="font-size: 9.5px; font-family: sans-serif; fill: #ffffff" transform="translate(234.161998 343.429286)">(leer el más cercano y extrapolar a x = 0)</text>
    </g>
    <g id="patch_8">

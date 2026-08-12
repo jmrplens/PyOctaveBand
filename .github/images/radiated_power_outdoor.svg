@@ -487,10 +487,10 @@ L 705.763438 138.138903
    <g id="text_23">
     <g id="patch_17">
      <path d="M 50.898346 68.501523 
-L 290.904596 68.501523 
-Q 295.904596 68.501523 295.904596 63.501523 
-L 295.904596 39.496055 
-Q 295.904596 34.496055 290.904596 34.496055 
+L 295.676471 68.501523 
+Q 300.676471 68.501523 300.676471 63.501523 
+L 300.676471 39.496055 
+Q 300.676471 34.496055 295.676471 34.496055 
 L 50.898346 34.496055 
 Q 45.898346 34.496055 45.898346 39.496055 
 L 45.898346 63.501523 
@@ -499,7 +499,7 @@ z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(50.898346 48.095469)">LW = Lp,in + Cd - R' + 10 log10(S/S0)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(50.898346 60.098203)">wall 176 m² + industrial door 24 m², Cd = -5 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(50.898346 60.098203)">wall 176 m² + industrial door 24 m², Cd = −5 dB</text>
    </g>
   </g>
  </g>

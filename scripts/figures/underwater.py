@@ -64,7 +64,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     info = [
         "Ls = LRN + ΔL",
-        "ΔL = -10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]",
+        "ΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]",
         "u = k d_s,  d_s = 0.7 D = 4.2 m",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,

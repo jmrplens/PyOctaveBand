@@ -1378,10 +1378,10 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
     right.set_title("The same absorption in two volumes",
                     fontweight="bold", pad=10)
     right.legend(loc="lower left", fontsize=8)
-    right.annotate("-42 % at 8 kHz", xy=(8000.0, 1.24), xytext=(0.42, 0.30),
+    right.annotate("−42 % at 8 kHz", xy=(8000.0, 1.24), xytext=(0.42, 0.30),
                    textcoords="axes fraction", fontsize=9, color=COLOR_FG,
                    arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
-    right.annotate("-1.7 % at 1 kHz", xy=(1000.0, 0.67), xytext=(0.05, 0.62),
+    right.annotate("−1.7 % at 1 kHz", xy=(1000.0, 0.67), xytext=(0.05, 0.62),
                    textcoords="axes fraction", fontsize=9, color=COLOR_FG,
                    arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
 
@@ -1689,8 +1689,8 @@ def generate_image_source_bands(output_dir: str) -> None:
     info = [
         "room 7 x 5 x 3 m, max_order = 60",
         "wall alpha 0.10 -> 0.50 with frequency",
-        "air at 20 C / 50 % RH: -0.4 % of T30 at 250 Hz,",
-        "-4.4 % at 4 kHz",
+        "air at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,",
+        "−4.4 % at 4 kHz",
     ]
     ax.text(0.015, 0.04, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=9, color=COLOR_FG,
