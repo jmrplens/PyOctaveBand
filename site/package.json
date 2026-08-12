@@ -22,8 +22,8 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.41.6",
-    "astro": "^7.1.6",
+    "@astrojs/starlight": "^0.41.7",
+    "astro": "^7.2.0",
     "katex": "^0.16.47",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
@@ -34,9 +34,9 @@
     "starlight-sidebar-topics": "^0.8.0"
   },
   "devDependencies": {
-    "html-validate": "^11.6.0",
+    "html-validate": "^11.6.2",
     "lighthouse": "^13.4.1",
     "pa11y-ci": "^4.1.1",
-    "puppeteer": "25.4.0"
+    "puppeteer": "25.5.0"
   }
 }
