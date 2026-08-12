@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **533/533 conformance checks pass** across 57 domains and 362 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **535/535 conformance checks pass** across 57 domains and 364 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -780,7 +780,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Rotorcraft noise (ECAC Doc 32 / NORAH2)</b>: 100% (12/12)</summary>
+<summary>&#9989; <b>Rotorcraft noise (ECAC Doc 32 / NORAH2)</b>: 100% (14/14)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -788,6 +788,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ECAC Doc 32 spherical spreading | ΔLs at ten times the 60 m hemisphere reference distance (Eq. 24), dB | -20 dB (+/-0 dB) | -20 dB | 0 dB | &#9989; |
 | ECAC Doc 32 ground effect (rigid limit) | ΔLg over a rigid surface at grazing incidence tends to +6 dB (Eq. 29), dB | 6 dB (+/-1 dB) | 6 dB | 0.002 dB | &#9989; |
 | ECAC Doc 32 propagation chain (NORAH2 prototype) | LA of a single-hemisphere emission vs the NORAH2 prototype single-event history (R22 approach, 223.66 m slant), dB(A) | 55.87 dB(A) (+/-0.1 dB(A)) | 55.886 dB(A) | 0.016 dB(A) | &#9989; |
+| NORAH2 guidance §A.3.5 ring derivation (constant φ) | Hemisphere rim bin (φ, θ) = (+90°, 150°) vs the ring level at +150°, dB | 75 dB (+/-0 dB) | 75 dB | 0 dB | &#9989; |
+| NORAH2 guidance §A.3.5 Table 3 (Approach 3 HOGE offset) | Out-of-ground-hover minus in-ground-hover level of a derived bin, dB | 12 dB (+/-0 dB) | 12 dB | 0 dB | &#9989; |
 | ECAC Doc 32 flight-condition interpolation (NORAH2 Eq. 8) | Distance-scaled triangle blend of three uniform hemispheres, hand-checked, dB | 97.0367 dB (+/-0.001 dB) | 97.0364 dB | 0 dB | &#9989; |
 | ECAC Doc 32 flight-path kinematics (Eq. 17) | Airspeed of a straight climbing track, 40 m/s ground speed at a 5° path angle, m/s | 40.15279 m/s (+/-0.0001 m/s) | 40.15279 m/s | 0 m/s | &#9989; |
 | ECAC Doc 32 retarded time (Eq. 22) | Recorded-time delay at 100 m slant distance, r/c with c = 346.1 m/s, s | 0.288934 s (+/-0.00001 s) | 0.288934 s | 0 s | &#9989; |
