@@ -222,7 +222,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     # Spanish one runs past the right spine. Measure the label that will be
     # drawn, scale it to the room if it is over, then slide it back inside
     # the panel -- so it neither leaves the axes nor climbs onto the screen.
-    shadow = (5.62 + 0.15, 12.0 - 0.35)
+    shadow = (5.62 + 0.15, il_txts[0].axes.get_xlim()[1] - 0.35)
     # One size for both panels -- they are twins, and two sizes would read
     # as two kinds of annotation -- stepped down until the longer string
     # fits. Stepped rather than scaled by the ratio: the rasteriser rounds
