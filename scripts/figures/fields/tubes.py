@@ -214,8 +214,12 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
         )
         # The standing-wave envelope, drawn above the hardware.
         ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
-        ax.text(0.005, env_base + 0.015, "|p| envelope", fontsize=7.5,
-                ha="left", va="bottom", color=COLOR_FG, alpha=0.8)
+        # Under the baseline, not over it: the envelope grows out of that
+        # line and the caption used to sit in the band the trace climbs
+        # through, so the rising curve struck its own name out. Below the
+        # line the band is empty all the way down to the tube wall.
+        ax.text(0.005, env_base - 0.035, "|p| envelope", fontsize=7.5,
+                ha="left", va="top", color=COLOR_FG, alpha=0.8)
         (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=1.9, zorder=6)
         ax.set_aspect(0.42, adjustable="box")
         ax.set_xlim(-0.125, length + 0.075)
