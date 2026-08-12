@@ -93,10 +93,12 @@ fixed-point profiles have a ready-to-use trajectory, because turning a
 procedural-step departure into a flight path needs the ICAO Doc 9911
 flight-mechanics performance model, which is not implemented.
 
-**Three specific gaps.** Rotorcraft hover, idle and taxi operations are outside
-the hemisphere source model, which assumes a flyover. The measurement-system
-verifier checks IEC 61265:1995 and not the superseding 2018 edition. And sonic
-boom is not touched anywhere in the library.
+**Three specific gaps.** Rotorcraft hover, idle and taxi run on the Table 3
+derived sources, but the guidance's last resort for a type with no hover data
+at all (two side-line level-flight microphones corrected to the 150 m hover
+circle by the Annex 16 integrated method) is not modelled. The
+measurement-system verifier checks IEC 61265:1995 and not the superseding
+2018 edition. And sonic boom is not touched anywhere in the library.
 
 Finally, the CNOSSOS-EU aircraft source of sections 2.6 and 2.7 is **not**
 implemented: aircraft noise here is the ICAO and ECAC family, which is a

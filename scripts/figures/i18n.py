@@ -3998,6 +3998,22 @@ _ES_EXACT = {
     "Polar angle θ [°]  (0° forward → 180° rearward)":
         "Ángulo polar θ [°]  (0° hacia proa → 180° hacia popa)",
     "Source level at 60 m [dB]": "Nivel de fuente a 60 m [dB]",
+    # Rotorcraft hover ring: the §A.3.5 Table 3 derivation.
+    "Ring bearing [°]  (0° nose, +90° starboard)":
+        "Rumbo del anillo [°]  (0° morro, +90° estribor)",
+    "Band level at 70 m [dB]": "Nivel de banda a 70 m [dB]",
+    "In-ground-hover ring, 315 Hz band":
+        "Anillo de estacionario con efecto suelo, banda de 315 Hz",
+    "nose": "morro",
+    "HIGE (from the ring)": "HIGE (del anillo)",
+    "HOGE (+12 dB)": "HOGE (+12 dB)",
+    "Full-rpm idle (−2.5 dB)": "Ralentí a régimen pleno (−2,5 dB)",
+    "Reduced-rpm idle (−12 dB)": "Ralentí a régimen reducido (−12 dB)",
+    "Source level at 70 m [dB]": "Nivel de fuente a 70 m [dB]",
+    "Derived hover and idle sources (Table 3, φ = 0°)":
+        "Fuentes derivadas de estacionario y ralentí (Tabla 3, φ = 0°)",
+    "constant directivity in φ: each θ\nreads the ring at ±θ":
+        "directividad constante en φ: cada θ\nlee el anillo en ±θ",
     "SEL [dB]": "SEL [dB]",
     "SEL [dB(A)]": "SEL [dB(A)]",
     "Speed [m/s]": "Velocidad [m/s]",

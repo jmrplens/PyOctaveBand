@@ -21,6 +21,12 @@ Doc 32):
 * :func:`hemisphere_source_level` -- the interpolated source level ``L(fc, φ, θ)``
   from a :class:`RotorcraftHemisphere`, bilinear over the 10° grid (Eq. 13) with
   nearest-bin fill outside the measured coverage (Eq. 14/15).
+* :func:`hover_ring_hemisphere` / :func:`hover_derived_hemisphere` -- the
+  hover/idle source derivation of guidance §A.3.5 (Table 3): the ground-ring
+  measurement of in-ground hover extended to a hemisphere assuming constant
+  directivity in ``φ``, and the out-of-ground-hover and idle hemispheres
+  derived from it by the published offsets or a measured 0°-direction
+  difference.
 * :func:`flight_condition_weights` / :func:`interpolated_source_level` -- the
   flight-condition interpolation across a hemisphere set: distance-scaled
   triangulation inside the convex hull of the normalised ``(V̄, γ̄)`` database
@@ -44,9 +50,10 @@ levels and event metrics).
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
@@ -256,6 +263,207 @@ def _fill_grid(
         flat[~filled, b] = 10.0 * np.log10(
             (nearest * e).sum(axis=1) / nearest.sum(axis=1))
     return flat.reshape(n_az, n_po, n_f)
+
+
+# --------------------------------------------------------------------------- #
+# Hover, idle and taxi source derivation (guidance §A.3.5, Table 3)
+# --------------------------------------------------------------------------- #
+
+
+#: The published Table 3 (Approach 3) offsets from the in-ground-hover disk, in
+#: dB (guidance §A.3.5). The guidance's own note warns they were derived from
+#: inverted microphones on ground plates and may not hold for other setups.
+_TABLE3_OFFSETS_DB: Final[Mapping[str, float]] = MappingProxyType({
+    "out_of_ground_hover": 12.0,   # HOGE = HIGE + 12 dB
+    "reduced_rpm_idle": -12.0,     # Gr. idle = HIGE - 12 dB
+    "full_rpm_idle": -2.5,         # Fl. idle = HIGE - 2.5 dB
+})
+
+
+def _grid_axis(
+    start: float, stop: float, step: float, name: str,
+) -> NDArray[np.float64]:
+    """A regular node axis from ``start`` to ``stop``; ``step`` must divide it."""
+    s = require_positive(step, name)
+    n = round((stop - start) / s)
+    if n < 1 or abs((stop - start) / s - n) > 1e-9:
+        raise ValueError(f"'{name}' must divide the {stop - start:g} degree span evenly.")
+    return np.linspace(start, stop, n + 1)
+
+
+def _ring_levels(
+    bearings: NDArray[np.float64], levels: NDArray[np.float64],
+    query_deg: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Ring band levels at the query bearings, shape ``query_deg.shape + (F,)``.
+
+    Periodic linear interpolation in the energy domain (the module's
+    interpolation domain throughout): the ring closes on itself, so the cell
+    between the last and the first bearing spans the wrap. A duplicated
+    ±180° endpoint pair leaves that wrap cell empty, which no query reaches.
+    """
+    nodes = np.concatenate([bearings, bearings[:1] + 360.0])
+    energy = 10.0 ** (np.concatenate([levels, levels[:1]], axis=0) / 10.0)
+    q = bearings[0] + np.mod(query_deg - bearings[0], 360.0)
+    i = np.clip(np.searchsorted(nodes, q) - 1, 0, nodes.size - 2)
+    step = nodes[i + 1] - nodes[i]
+    w = np.where(step > 0.0, (q - nodes[i]) / np.where(step > 0.0, step, 1.0), 0.0)
+    blend = (1.0 - w[..., None]) * energy[i] + w[..., None] * energy[i + 1]
+    return np.asarray(10.0 * np.log10(blend), dtype=np.float64)
+
+
+def hover_ring_hemisphere(
+    frequencies: NDArray[np.float64] | list[float],
+    bearings: NDArray[np.float64] | list[float],
+    levels: NDArray[np.float64] | list[list[float]],
+    *,
+    distance: float = 70.0,
+    azimuth_step: float = 10.0,
+    polar_step: float = 10.0,
+    mapping: str = "constant_phi",
+) -> RotorcraftHemisphere:
+    r"""Noise hemisphere from a ground-ring hover measurement (guidance §A.3.5).
+
+    In-ground hover, idle and their derived conditions are measured on a ring
+    of ground microphones around the stationary rotorcraft (the CAEP in-ground
+    hover practice the guidance points at): one band spectrum per ring bearing,
+    ``0°`` at the nose and positive to starboard, reduced to the polar distance
+    of the ring. Table 3 (Approaches 2/3) extends that ring to the full
+    hemisphere "assuming constant directivity in φ"; the guidance prints no
+    formula for the extension, so the two readings the data supports are
+    provided and documented here:
+
+    - ``"constant_phi"`` (default): the level depends only on the polar angle
+      ``θ``, port bins reading the ring at ``−θ`` and starboard bins at
+      ``+θ`` (each ring bearing meets the hemisphere rim at ``φ = ±90°``,
+      ``θ = |bearing|``, and slides inward at constant ``φ`` from there). The
+      ``φ = 0`` column under the aircraft takes the energy mean of the
+      ``±θ`` ring values. This is the literal reading of the guidance text,
+      and it preserves the port/starboard asymmetry the ring measures.
+    - ``"bearing"``: the level depends only on the horizontal bearing of the
+      emission direction, ``β = atan2(sin θ sin φ, cos θ)`` (constant
+      directivity in elevation instead of in azimuth). This is what the
+      NORAH2 reference implementation evaluates -- its out-of-ground-hover
+      verification case is reproduced with this mapping (and diverges from
+      ``"constant_phi"`` by several dB at steep emission angles, where the
+      two readings part).
+
+    Ring lookups interpolate periodically in the energy domain. The returned
+    hemisphere carries ``distance`` (hover rings are commonly reduced to
+    70 m rather than the 60 m of the flyover database), which the event chain
+    and the propagation adjustments honour as the reference distance.
+
+    :param frequencies: Band centre frequencies, in Hz, shape ``(F,)``.
+    :param bearings: Ring bearings, in degrees within ``[-180, 180]``,
+        strictly increasing, shape ``(B,)`` (``0`` at the nose, positive
+        starboard). The ring closes periodically; a duplicated ``±180°``
+        endpoint pair is accepted.
+    :param levels: Ring band levels, in dB at the ring's polar distance,
+        shape ``(B, F)``.
+    :param distance: Polar distance of the ring, in metres (default 70).
+    :param azimuth_step: Azimuth grid step, in degrees; must divide the
+        180° span (default 10, the NORAH grid).
+    :param polar_step: Polar grid step, in degrees; must divide the 180°
+        span (default 10).
+    :param mapping: ``"constant_phi"`` (guidance text) or ``"bearing"``
+        (NORAH2 reference implementation), see above.
+    :return: A :class:`RotorcraftHemisphere` on the requested grid.
+    :raises ValueError: If the inputs are invalid.
+    """
+    freqs = require_positive_array(frequencies, "frequencies")
+    brg = np.atleast_1d(np.asarray(bearings, dtype=np.float64))
+    lv = np.asarray(levels, dtype=np.float64)
+    if brg.ndim != 1 or brg.size < 2:
+        raise ValueError("'bearings' must be 1-D with at least two ring directions.")
+    if not np.all(np.isfinite(brg)) or np.any(np.diff(brg) <= 0.0):
+        raise ValueError("'bearings' must be finite and strictly increasing.")
+    if brg[0] < -180.0 or brg[-1] > 180.0:
+        raise ValueError("'bearings' must lie within [-180, 180] degrees.")
+    if lv.shape != (brg.size, freqs.size):
+        raise ValueError("'levels' must have shape (B, F) matching 'bearings' "
+                         "and 'frequencies'.")
+    if not np.all(np.isfinite(lv)):
+        raise ValueError("'levels' must be finite.")
+    dist = require_positive(distance, "distance")
+    key = require_choice(mapping, "mapping", ("constant_phi", "bearing"))
+    az = _grid_axis(-90.0, 90.0, azimuth_step, "azimuth_step")
+    po = _grid_axis(0.0, 180.0, polar_step, "polar_step")
+
+    if key == "bearing":
+        phi = np.radians(az)[:, None]
+        theta = np.radians(po)[None, :]
+        beta = np.degrees(np.arctan2(np.sin(theta) * np.sin(phi), np.cos(theta)))
+        grid = _ring_levels(brg, lv, beta)
+    else:
+        starboard = _ring_levels(brg, lv, po)
+        port = _ring_levels(brg, lv, -po)
+        grid = np.empty((az.size, po.size, freqs.size), dtype=np.float64)
+        # The azimuth axis is symmetric by construction, so each node's side
+        # is fixed by its index: port before the middle, starboard after it
+        # and, with an even cell count, the phi = 0 column exactly in the
+        # middle. Selecting by index (not by comparing the node against 0.0)
+        # keeps the middle column the energy mean even when a step such as
+        # 180/14 leaves its floating-point node a few ulp away from zero.
+        cells = az.size - 1
+        grid[: (cells + 1) // 2] = port
+        grid[cells // 2 + 1:] = starboard
+        if cells % 2 == 0:
+            energy = 0.5 * (10.0 ** (starboard / 10.0) + 10.0 ** (port / 10.0))
+            grid[cells // 2] = 10.0 * np.log10(energy)
+    return RotorcraftHemisphere(
+        frequencies=freqs.copy(), azimuth=az, polar=po, levels=grid,
+        distance=dist)
+
+
+def hover_derived_hemisphere(
+    hemisphere: RotorcraftHemisphere,
+    condition: str,
+    *,
+    offset_db: float | None = None,
+) -> RotorcraftHemisphere:
+    """HOGE/idle hemisphere derived from in-ground hover (guidance Table 3).
+
+    Table 3 derives the out-of-ground-hover and idle sources from the
+    in-ground-hover directivity pattern by a level offset, applied here
+    uniformly to every band and bin: the table is stated on ``LA`` levels,
+    and a constant spectral shift moves the ``LA`` by exactly that value
+    (which is also how the NORAH2 reference database applies its
+    corrections). With ``offset_db`` the offset is the measured 0°-direction
+    difference of Approach 2, ``LA_cond(0°) − LA_HIGE(0°)``; without it the
+    Approach 3 constants apply (+12 / −12 / −2.5 dB for
+    ``"out_of_ground_hover"`` / ``"reduced_rpm_idle"`` / ``"full_rpm_idle"``,
+    with the guidance's caveat that they come from inverted microphones on
+    ground plates). The corrections shipped with the NORAH2 public database
+    differ from the published constants (+8 / −10 / −2 dB in every type's
+    interpolation file); pass them as ``offset_db`` to reproduce the
+    reference implementation.
+
+    :param hemisphere: The in-ground-hover :class:`RotorcraftHemisphere`
+        (typically from :func:`hover_ring_hemisphere`; a fully measured
+        Approach 1 hemisphere works the same).
+    :param condition: ``"out_of_ground_hover"``, ``"reduced_rpm_idle"`` or
+        ``"full_rpm_idle"``.
+    :param offset_db: Explicit offset from in-ground hover, in dB (Approach 2
+        or a database correction). Default ``None``: the Approach 3 constant
+        of ``condition``.
+    :return: A new :class:`RotorcraftHemisphere` at the same grid and
+        reference distance, every measured bin shifted by the offset
+        (``NaN`` bins stay ``NaN``).
+    :raises ValueError: If the inputs are invalid.
+    """
+    key = require_choice(condition, "condition", tuple(_TABLE3_OFFSETS_DB))
+    if offset_db is None:
+        offset = _TABLE3_OFFSETS_DB[key]
+    elif math.isfinite(offset_db):
+        offset = float(offset_db)
+    else:
+        raise ValueError("'offset_db' must be finite.")
+    return RotorcraftHemisphere(
+        frequencies=np.asarray(hemisphere.frequencies, dtype=np.float64).copy(),
+        azimuth=np.asarray(hemisphere.azimuth, dtype=np.float64).copy(),
+        polar=np.asarray(hemisphere.polar, dtype=np.float64).copy(),
+        levels=np.asarray(hemisphere.levels, dtype=np.float64) + offset,
+        distance=hemisphere.distance)
 
 
 # --------------------------------------------------------------------------- #

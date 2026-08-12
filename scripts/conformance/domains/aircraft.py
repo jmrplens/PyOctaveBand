@@ -267,6 +267,39 @@ def _uniform_hemisphere(level: float, bands: list[float] | None = None) -> Any:
 
 @register(
     _ROTORCRAFT,
+    "NORAH2 guidance §A.3.5 ring derivation (constant φ)",
+    "Hemisphere rim bin (φ, θ) = (+90°, 150°) vs the ring level at +150°, dB",
+)
+def _chk_doc32_hover_ring() -> Outcome:
+    # Table 3, Approaches 2/3: the in-ground-hover ring extends to the
+    # hemisphere assuming constant directivity in phi, so the starboard rim
+    # bin at theta = 150 reads the ring at +150 deg. Ring level = 60 +
+    # bearing/10 dB -> 75 dB by hand.
+    brg = np.arange(-180.0, 151.0, 30.0)
+    h = ph.hover_ring_hemisphere([500.0], brg, (60.0 + brg / 10.0)[:, None])
+    got = float(ph.hemisphere_source_level(h, 90.0, 150.0)[0])
+    return numeric(75.0, got, 1e-9, unit="dB", places=3)
+
+
+@register(
+    _ROTORCRAFT,
+    "NORAH2 guidance §A.3.5 Table 3 (Approach 3 HOGE offset)",
+    "Out-of-ground-hover minus in-ground-hover level of a derived bin, dB",
+)
+def _chk_doc32_hover_offset() -> Outcome:
+    # Table 3, Approach 3: LA_HOGE(theta) = LA_HIGE(theta) + 12 dB from the
+    # in-ground-hover disk. A uniform 80 dB ring derives to 92 dB everywhere;
+    # the bin under the aircraft is compared.
+    hige = ph.hover_ring_hemisphere(
+        [500.0], np.arange(-180.0, 151.0, 30.0), np.full((12, 1), 80.0))
+    hoge = ph.hover_derived_hemisphere(hige, "out_of_ground_hover")
+    got = float(ph.hemisphere_source_level(hoge, 0.0, 90.0)[0]
+                - ph.hemisphere_source_level(hige, 0.0, 90.0)[0])
+    return numeric(12.0, got, 1e-9, unit="dB", places=3)
+
+
+@register(
+    _ROTORCRAFT,
     "ECAC Doc 32 flight-condition interpolation (NORAH2 Eq. 8)",
     "Distance-scaled triangle blend of three uniform hemispheres, hand-checked, dB",
 )

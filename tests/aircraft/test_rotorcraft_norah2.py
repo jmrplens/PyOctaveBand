@@ -71,6 +71,9 @@ from phonometry.aircraft.rotorcraft_noise import (
     RotorcraftGround,
     RotorcraftHemisphere,
     RotorcraftTrackState,
+    hemisphere_source_level,
+    hover_derived_hemisphere,
+    hover_ring_hemisphere,
     rotorcraft_event_level,
     rotorcraft_noise_contour,
 )
@@ -91,6 +94,7 @@ _PREFIXES = (
     "NORAH2_V2.0.74_public/ARP/Case3/SE/CH7_H1_APP_STD1_NE",
     "NORAH2_V2.0.74_public/ARP/Case3/SE/A600_H1_APP_STD2_NE",
     "NORAH2_V2.0.74_public/ARP/Case4/SE/R22_H1_APP_STD2_NE",
+    "NORAH2_V2.0.74_public/ARP/Case4/SE/R22_DEP_RT2",
 )
 
 
@@ -156,6 +160,47 @@ def _parse_hem(path: pathlib.Path) -> tuple[np.ndarray, ...]:
             row[row <= -998.0] = np.nan
             levels[row_ix, col_ix, :] = row
     return phi, theta, freqs, levels
+
+
+def _parse_ring(path: pathlib.Path) -> tuple[np.ndarray, np.ndarray,
+                                             np.ndarray, float]:
+    """Bearings, bands, band levels and polar distance of a ring-format .hem.
+
+    The hover-disk format carries a single ``PHIOBSEC`` bearing axis instead
+    of the hemisphere's two angle axes; each data row is the bearing followed
+    by the band levels (and derived summary columns, not read here).
+    """
+    lines = path.read_text(errors="replace").splitlines()
+    dist = bearings = freqs = None
+    i = 0
+    while i < len(lines):
+        ln = lines[i]
+        if ln.startswith("POLDIST"):
+            dist = float(ln.split()[1])
+        if ln.startswith("PHIOBSEC") and bearings is None and len(ln.split()) > 1:
+            bearings = np.array([float(v) for v in lines[i + 1].split()])
+            i += 2
+            continue
+        if ln.startswith("NFREQ"):
+            freqs = np.array([float(v) for v in lines[i + 1].split()])
+            i += 2
+            break
+        i += 1
+    assert dist is not None, path
+    assert bearings is not None, path
+    assert freqs is not None, path
+    levels = np.full((bearings.size, freqs.size), np.nan)
+    for ln in lines[i:]:
+        parts = ln.split()
+        if len(parts) > freqs.size:
+            try:
+                bearing = float(parts[0])
+            except ValueError:
+                continue
+            row = np.array([float(v) for v in parts[1:freqs.size + 1]])
+            levels[int(np.argmin(np.abs(bearings - bearing)))] = row
+    assert np.all(np.isfinite(levels)), path
+    return bearings, freqs, levels, dist
 
 
 def _parse_int(path: pathlib.Path) -> tuple[list[tuple[int, float, float, str]],
@@ -306,6 +351,96 @@ def test_case4_hard_ground_event(norah_root: pathlib.Path, r22_set: dict) -> Non
     assert np.sum(np.isnan(res.pnlt)) == np.sum(ref_pnlt <= -998.0)
     assert res.pnltm == pytest.approx(header["PNLTM"], abs=0.05)
     assert res.epnl == pytest.approx(header["EPNL"], abs=1.3)
+
+
+def test_hover_ring_rim_reproduces_ring_rows(norah_root: pathlib.Path) -> None:
+    # The committed in-ground-hover ring measurement (70 m polar distance,
+    # 13 bearings every 30 deg, 31 bands): every ring bearing meets the
+    # hemisphere rim at (phi, theta) = (+-90, |bearing|), band for band, and
+    # a hover event over the derived hemisphere runs finite.
+    bearings, freqs, levels, dist = _parse_ring(
+        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem")
+    assert dist == 70.0
+    assert bearings.size == 13
+    assert freqs.size == 31
+    hige = hover_ring_hemisphere(freqs, bearings, levels, distance=dist)
+    assert hige.distance == 70.0
+    for bearing in (150.0, -120.0):
+        k = int(np.nonzero(bearings == bearing)[0][0])
+        side = 90.0 if bearing > 0 else -90.0
+        got = hemisphere_source_level(hige, side, abs(bearing))
+        assert np.allclose(got, levels[k])
+    t = np.array([0.0, 1.0])
+    pos = np.array([[0.0, 0.0, 3.0], [0.0, 0.0, 3.0]])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # sub-noy-floor spectra warn in PNL
+        res = rotorcraft_event_level(
+            [hige], [0.0], [0.0], t, pos, (100.0, 0.0),
+            track_state=RotorcraftTrackState(airspeed=0.0, path_angle=0.0,
+                                             heading=0.0, bank_angle=0.0))
+    assert np.isfinite(res.la_max)
+    assert np.isfinite(res.sel)
+
+
+def test_case4_hover_ogh_event(norah_root: pathlib.Path) -> None:
+    # Case 4 out-of-ground hover (iMode "OGH", the rotorcraft held at
+    # (0, 0, 40 m)): the prototype derives the source from the in-ground-hover
+    # ring by the horizontal bearing of the emission direction and applies its
+    # own database correction, +8 dB in the shipped .int files where the
+    # guidance's Table 3 publishes +12, so both are passed explicitly here.
+    bearings, freqs, levels, dist = _parse_ring(
+        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem")
+    hige = hover_ring_hemisphere(freqs, bearings, levels, distance=dist,
+                                 mapping="bearing")
+    hoge = hover_derived_hemisphere(hige, "out_of_ground_hover", offset_db=8.0)
+    case = norah_root / "ARP" / "Case4" / "SE" / "R22_DEP_RT2"
+    inp = _parse_inp(case.with_suffix(".inp"))
+    header, rows = _parse_his(case.with_suffix(".his"))
+    mics = _parse_onl(case.with_suffix(".onl"))
+    assert mics.shape[0] == 8
+    # The single .inp step held for one second: the event needs two track
+    # points, and a constant 1 s history leaves SEL equal to LA.
+    t = np.array([0.0, 1.0])
+    pos = np.repeat(inp["positions"], 2, axis=0)
+    state = RotorcraftTrackState(
+        airspeed=float(inp["speed"][0]), path_angle=float(inp["vang"][0]),
+        heading=float(inp["heading"][0]), bank_angle=float(inp["roll"][0]))
+    nadir = None
+    for mic in mics:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # sub-noy-floor spectra warn in PNL
+            res = rotorcraft_event_level(
+                [hoge], [0.0], [0.0], t, pos, (mic[0], mic[1]),
+                ground=RotorcraftGround(receiver_height=mic[3],
+                                        ground_elevation=mic[2],
+                                        flow_resistivity=mic[4]),
+                track_state=state,
+                atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"))
+        # Measured deviations peak at +0.42 dB on the nadir and near-nadir
+        # microphones (the prototype damps the coherent two-ray interference
+        # of Eq. 30, as documented for the flyover cases); the six oblique
+        # microphones reproduce to 0.3 dB across bearings, elevations,
+        # heights (0.01-8.2 m) and flow resistivities (2e5-3e6 Pa.s/m2).
+        assert res.la_max == pytest.approx(mic[8], abs=0.45), mic[:2]
+        assert res.sel == pytest.approx(mic[9], abs=0.45), mic[:2]
+        if mic[0] == 0.0 and mic[1] == 0.0:
+            nadir = res
+    # The .his row of the nadir microphone (hr = 0.2 m): geometry, retarded
+    # time, the per-step LA and the tone-corrected maximum. The prototype
+    # prints THETAOBS 90 / PHIOBSEC 0 under the vertical, fixing the bearing
+    # convention of the hover-disk lookup. Its EPNL is not compared: on a
+    # degenerate single-step history the prototype applies its fixed
+    # 10*lg(0.5/10) duration correction, which measures its printing
+    # convention rather than the event chain.
+    assert nadir is not None
+    assert nadir.distance[0] == pytest.approx(rows[0, 5], abs=0.05)   # DOBS
+    assert nadir.polar[0] == pytest.approx(rows[0, 6], abs=0.01)      # THETAOBS
+    assert nadir.azimuth[0] == pytest.approx(rows[0, 7], abs=0.01)    # PHIOBSAC
+    assert nadir.times[0] - nadir.emission_times[0] == pytest.approx(
+        rows[0, 4], abs=0.01)                                         # trec
+    assert nadir.a_levels[0] == pytest.approx(rows[0, 9], abs=0.45)   # LA
+    assert nadir.la_max == pytest.approx(header["LAMAX"], abs=0.45)
+    assert nadir.pnltm == pytest.approx(header["PNLTM"], abs=0.5)
 
 
 def test_case2_soft_ground_event(norah_root: pathlib.Path, r22_set: dict) -> None:

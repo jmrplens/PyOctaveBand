@@ -431,6 +431,180 @@ def test_propagation_chain_reproduces_prototype_la(
 
 
 # --------------------------------------------------------------------------- #
+# Hover, idle and taxi derivation (guidance §A.3.5, Table 3)
+# --------------------------------------------------------------------------- #
+
+from phonometry.aircraft.rotorcraft_noise import (
+    hover_derived_hemisphere,
+    hover_ring_hemisphere,
+)
+
+#: Twelve ring bearings every 30°; the ring closes periodically at ±180°.
+_RING_BEARINGS = np.arange(-180.0, 151.0, 30.0)
+
+
+def _ring(levels_per_bearing: np.ndarray, bands: int = 2) -> np.ndarray:
+    """A ring level table with the same value in every band, shape (B, F)."""
+    return np.tile(np.asarray(levels_per_bearing, dtype=np.float64)[:, None],
+                   (1, bands))
+
+
+def test_hover_ring_uniform_ring_gives_uniform_hemisphere() -> None:
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(np.full(12, 80.0)))
+    assert h.distance == 70.0
+    assert h.azimuth.size == 19
+    assert h.polar.size == 19
+    assert np.allclose(h.levels, 80.0)
+    # Arbitrary off-node lookups stay at the uniform level.
+    assert hemisphere_source_level(h, 37.0, 112.0) == pytest.approx([80.0, 80.0])
+
+
+def test_hover_ring_constant_phi_closed_form() -> None:
+    # Ring level = 60 + bearing/10 dB: every hemisphere bin reads the ring at
+    # the bearing +-theta of its own half, in closed form.
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(60.0 + _RING_BEARINGS / 10.0))
+    ia = {a: i for i, a in enumerate(h.azimuth)}
+    ip = {p: i for i, p in enumerate(h.polar)}
+    assert h.levels[ia[30.0], ip[60.0], 0] == pytest.approx(66.0)    # ring(+60)
+    assert h.levels[ia[-30.0], ip[60.0], 0] == pytest.approx(54.0)   # ring(-60)
+    assert h.levels[ia[90.0], ip[150.0], 0] == pytest.approx(75.0)   # ring(+150)
+    # The phi = 0 column under the aircraft: energy mean of ring(+-theta),
+    # 10*lg((10^6.9 + 10^5.1)/2) at theta = 90.
+    mid = 10.0 * np.log10((10.0**6.9 + 10.0**5.1) / 2.0)
+    assert h.levels[ia[0.0], ip[90.0], 0] == pytest.approx(mid)
+    # Constant in phi within each half: the whole starboard row of theta = 60.
+    assert np.allclose(h.levels[[ia[10.0], ia[50.0], ia[90.0]], ip[60.0], :], 66.0)
+
+
+def test_hover_ring_periodic_energy_interpolation() -> None:
+    # Alternating 70/80 dB ring: lookups between bearings blend in the energy
+    # domain, and the wrap cell between +150 and -180 interpolates too.
+    alternating = np.where(np.arange(12) % 2 == 0, 70.0, 80.0)
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS, _ring(alternating))
+    # Rim lookup at theta = 15: halfway between ring(0) = 70 and ring(30) = 80,
+    # through the grid nodes at 10 and 20 (both stages are linear in energy).
+    expected = 10.0 * np.log10((10.0**7.0 + 10.0**8.0) / 2.0)
+    assert hemisphere_source_level(h, 90.0, 15.0)[0] == pytest.approx(expected)
+    # Grid node on the wrap: ring(170), two thirds from +150 (80 dB) towards
+    # -180 (70 dB).
+    ia = {a: i for i, a in enumerate(h.azimuth)}
+    ip = {p: i for i, p in enumerate(h.polar)}
+    wrap = 10.0 * np.log10((10.0**8.0 + 2.0 * 10.0**7.0) / 3.0)
+    assert h.levels[ia[90.0], ip[170.0], 0] == pytest.approx(wrap)
+
+
+def test_hover_ring_middle_column_survives_inexact_step() -> None:
+    # A step of 180/14 deg builds a symmetric axis whose middle node can land
+    # a few ulp away from 0.0 in floating point; the phi = 0 column is
+    # selected structurally (by index, the axis being symmetric by
+    # construction), so it still takes the energy mean of ring(+-theta) and
+    # the halves still split port/starboard around it.
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(60.0 + _RING_BEARINGS / 10.0),
+                              azimuth_step=180.0 / 14.0)
+    assert h.azimuth.size == 15
+    ip = {p: i for i, p in enumerate(h.polar)}
+    mid = 10.0 * np.log10((10.0**6.9 + 10.0**5.1) / 2.0)
+    assert h.levels[7, ip[90.0], 0] == pytest.approx(mid)
+    assert h.levels[8, ip[60.0], 0] == pytest.approx(66.0)   # starboard side
+    assert h.levels[6, ip[60.0], 0] == pytest.approx(54.0)   # port side
+
+
+def test_hover_ring_bearing_mapping_closed_form() -> None:
+    # The NORAH2 reference implementation's reading: the level depends on the
+    # horizontal bearing beta = atan2(sin(theta)*sin(phi), cos(theta)).
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(60.0 + _RING_BEARINGS / 10.0),
+                              mapping="bearing")
+    ia = {a: i for i, a in enumerate(h.azimuth)}
+    ip = {p: i for i, p in enumerate(h.polar)}
+    # The nadir bin reads the ring at bearing 0 (the prototype's convention).
+    assert h.levels[ia[0.0], ip[90.0], 0] == pytest.approx(60.0)
+    # Behind and below (phi = 0, theta = 120): bearing 180, the -180 row.
+    assert h.levels[ia[0.0], ip[120.0], 0] == pytest.approx(42.0)
+    # On the rim both mappings coincide: (phi, theta) = (+90, 60) is ring(+60).
+    assert h.levels[ia[90.0], ip[60.0], 0] == pytest.approx(66.0)
+    # Interior bin (phi, theta) = (+30, 60): beta = atan2(sin60 sin30, cos60),
+    # energy-interpolated between ring(+30) and ring(+60).
+    beta = np.degrees(np.arctan2(np.sin(np.radians(60.0)) * 0.5, 0.5))
+    w = (beta - 30.0) / 30.0
+    expected = 10.0 * np.log10((1.0 - w) * 10.0**6.3 + w * 10.0**6.6)
+    assert h.levels[ia[30.0], ip[60.0], 0] == pytest.approx(expected)
+
+
+def test_hover_derived_offsets_are_the_published_constants() -> None:
+    # Table 3 Approach 3: +12 / -12 / -2.5 dB from the in-ground-hover disk,
+    # uniformly on every band and bin, with NaN bins staying NaN.
+    freqs = np.array([500.0, 1000.0])
+    az = np.arange(-90.0, 91.0, 10.0)
+    po = np.arange(0.0, 181.0, 10.0)
+    levels = np.random.default_rng(7).uniform(60.0, 90.0, (19, 19, 2))
+    levels[3, 4, 0] = np.nan
+    hige = RotorcraftHemisphere(freqs, az, po, levels.copy(), distance=70.0)
+    for condition, offset in (("out_of_ground_hover", 12.0),
+                              ("reduced_rpm_idle", -12.0),
+                              ("full_rpm_idle", -2.5)):
+        got = hover_derived_hemisphere(hige, condition)
+        finite = np.isfinite(levels)
+        assert np.allclose(got.levels[finite], levels[finite] + offset)
+        assert np.isnan(got.levels[3, 4, 0])
+        assert got.distance == 70.0
+        assert np.array_equal(got.frequencies, freqs)
+        assert np.array_equal(got.azimuth, az)
+        assert np.array_equal(got.polar, po)
+    # The input hemisphere is left untouched.
+    assert np.array_equal(hige.levels, levels, equal_nan=True)
+
+
+def test_hover_derived_approach2_measured_offset() -> None:
+    # Approach 2: LA_HOGE(0) = 95.3, LA_HIGE(0) = 88.1 -> offset 7.2 dB,
+    # applied bin for bin; the 0-degree lookup rises by exactly that.
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS,
+                              _ring(60.0 + _RING_BEARINGS / 10.0))
+    hoge = hover_derived_hemisphere(h, "out_of_ground_hover",
+                                    offset_db=95.3 - 88.1)
+    assert np.allclose(hoge.levels - h.levels, 7.2)
+    before = hemisphere_source_level(h, 0.0, 0.0)
+    after = hemisphere_source_level(hoge, 0.0, 0.0)
+    assert after - before == pytest.approx([7.2, 7.2])
+
+
+def test_hover_helpers_validation() -> None:
+    freqs = [500.0, 1000.0]
+    ring = _ring(np.full(12, 80.0))
+    with pytest.raises(ValueError, match="frequencies"):
+        hover_ring_hemisphere([500.0, 0.0], _RING_BEARINGS, ring)
+    with pytest.raises(ValueError, match="frequencies"):
+        hover_ring_hemisphere([500.0, -1000.0], _RING_BEARINGS, ring)
+    with pytest.raises(ValueError, match="bearings"):
+        hover_ring_hemisphere(freqs, [0.0], [[80.0, 80.0]])
+    with pytest.raises(ValueError, match="bearings"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS[::-1], ring)
+    with pytest.raises(ValueError, match="bearings"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS + 200.0, ring)
+    with pytest.raises(ValueError, match="levels"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, ring[:, :1])
+    with pytest.raises(ValueError, match="levels"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS,
+                              np.where(ring > 0.0, np.nan, ring))
+    with pytest.raises(ValueError, match="distance"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, distance=0.0)
+    with pytest.raises(ValueError, match="azimuth_step"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, azimuth_step=7.0)
+    with pytest.raises(ValueError, match="polar_step"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, polar_step=1000.0)
+    with pytest.raises(ValueError, match="mapping"):
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, mapping="nearest")
+    h = hover_ring_hemisphere(freqs, _RING_BEARINGS, ring)
+    with pytest.raises(ValueError, match="condition"):
+        hover_derived_hemisphere(h, "hover")
+    with pytest.raises(ValueError, match="offset_db"):
+        hover_derived_hemisphere(h, "full_rpm_idle", offset_db=float("nan"))
+
+
+# --------------------------------------------------------------------------- #
 # Flight-condition interpolation (guidance Eq. 3-10)
 # --------------------------------------------------------------------------- #
 

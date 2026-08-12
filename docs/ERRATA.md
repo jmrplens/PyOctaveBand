@@ -1371,6 +1371,88 @@ which is the check that enforces the rule; see
   with Eq. (42), using Eq. (44) for $C''$ inside it.
 - **Status:** unreported.
 
+## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), §A.3.5 Approach 3 (full-rpm idle base)
+
+- **Location:** section A.3.5, Approach 3, step 3 (printed p. 18), against the
+  "Fl. idle" row of Table 3 (printed pp. 18-19).
+- **The print:** the step reads "add offset of 12 dB\* to derive out of ground
+  hover from the in-ground hover disk, -12 dB\* to derive reduced-rpm idle from
+  in-ground hover disk, and -2.5 dB\* to derive full-rpm idle from out of
+  ground hover"; the table prints
+  $LA_{\mathrm{FL.idle}}(\theta) = LA_{\mathrm{HIGE}}(\theta) - 2.5\ \mathrm{dB}^*$.
+- **The problem:** the prose derives full-rpm idle from out-of-ground hover
+  where the table derives it from in-ground hover, and the two prescriptions
+  land 12 dB apart (via the prose,
+  $LA_{\mathrm{HOGE}}(\theta) - 2.5 = LA_{\mathrm{HIGE}}(\theta) + 9.5$; via
+  the table, $LA_{\mathrm{HIGE}}(\theta) - 2.5$). Only the table keeps the
+  physical ordering of the conditions (full-rpm idle above reduced-rpm idle,
+  both below in-ground hover). The paragraph that introduces these phases, at
+  the end of section A.3.3 (printed p. 17), is itself left unfinished ("For
+  specific phases of a flight such as, turns, hover, taxiing"), pointing at an
+  editing pass the section did not get.
+- **Evidence:** the corrections shipped with the V2.0.74 public database are
+  all relative to the in-ground-hover disk (`Fullrpmidle -2` in every type's
+  interpolation lookup file), agreeing with the table and not with the prose.
+  Verified on PDF pages 16, 17 and 18 (printed pp. 17, 18 and 19) of NORAH2
+  SC01.D1.5d (EASA.2020.FC.06):2024.
+- **Library behaviour:** `hover_derived_hemisphere` applies every Table 3
+  offset from the in-ground-hover hemisphere, as the table prints; the
+  docstring states the base condition explicitly.
+- **Status:** unreported.
+
+## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), §A.3.5 taxi assignment
+
+- **Location:** section A.3.5, last paragraph (printed p. 19).
+- **The print:** "To include taxiing for helicopters with and without wheels
+  into the noise calculation the measured and derived hemispheres for
+  in-ground hover and full-rpm idle respectively should be employed."
+- **The problem:** read literally, the "respectively" pairs the wheeled
+  helicopter with the in-ground-hover source and the wheel-less one with
+  full-rpm idle, which is the reverse of the operations it models: a
+  helicopter without wheels can only taxi by hovering in ground effect, and a
+  wheeled helicopter ground-taxis on its wheels with the rotor at governed
+  idle, not producing lift. The two lists read as transposed. No oracle
+  settles it (the public release ships no taxi verification case), so the
+  pairing is corrected from the physics of the operations alone.
+- **Evidence:** internal comparison of the two prose lists against the
+  operations they name. Verified on PDF page 18 (printed p. 19) of NORAH2
+  SC01.D1.5d (EASA.2020.FC.06):2024.
+- **Library behaviour:** no function is affected (the rule selects between two
+  hemispheres the reader has already built); the rotorcraft guide documents
+  the physical pairing, wheel-less taxi on the in-ground-hover hemisphere and
+  wheeled taxi on the full-rpm-idle one, with this caveat.
+- **Status:** unreported.
+
+## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Table 3 offsets vs the shipped corrections
+
+- **Location:** Table 3, Approach 3 column (printed pp. 18-19), against the
+  `&CORRECTIONS` block of the interpolation lookup files shipped with the
+  NORAH2 V2.0.74 public release.
+- **The print:** offsets of +12 dB\* (out-of-ground hover), -12 dB\*
+  (reduced-rpm idle) and -2.5 dB\* (full-rpm idle) from the in-ground-hover
+  disk, with the asterisked note that they were derived from measurements
+  with inverted microphones on ground plates and "may not be valid for other
+  microphone setups".
+- **The problem:** the reference database the guidance builds on ships
+  different values: every one of the eleven per-type triangulation lookup
+  files (``*_triangulation.int``) of the public release carries `Corr_dB`
+  8, -10 and -2 for the same three
+  operations, so the published constants and the database disagree by 4, 2
+  and 0.5 dB. The guidance, whose section A.3.1 declares the shipped lookup
+  data part of the hemisphere database and not to be edited, does not mention
+  the difference, and its note questions the validity of the published values
+  without naming the ones actually shipped.
+- **Evidence:** the identical `&CORRECTIONS` blocks of the eleven
+  triangulation lookup files (``*_triangulation.int``) of the V2.0.74 public
+  release; the published
+  constants verified on PDF pages 17 and 18 (printed pp. 18 and 19) of NORAH2
+  SC01.D1.5d (EASA.2020.FC.06):2024.
+- **Library behaviour:** `hover_derived_hemisphere` defaults to the published
+  Table 3 constants and accepts a measured or database correction as
+  ``offset_db``; the end-to-end hover verification case passes the database's
+  +8 dB explicitly, and the docstring records the divergence.
+- **Status:** unreported.
+
 ## RANDI 3.1 Physics Description (NRL, Breeding et al.), Table 2
 
 - **Location:** Table 2 (representative ship source levels).

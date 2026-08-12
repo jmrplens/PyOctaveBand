@@ -26,6 +26,12 @@ Doc 32):
 * [`hemisphere_source_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#hemisphere_source_level) -- the interpolated source level `L(fc, φ, θ)`
   from a [`RotorcraftHemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafthemisphere), bilinear over the 10° grid (Eq. 13) with
   nearest-bin fill outside the measured coverage (Eq. 14/15).
+* [`hover_ring_hemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#hover_ring_hemisphere) / [`hover_derived_hemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#hover_derived_hemisphere) -- the
+  hover/idle source derivation of guidance §A.3.5 (Table 3): the ground-ring
+  measurement of in-ground hover extended to a hemisphere assuming constant
+  directivity in `φ`, and the out-of-ground-hover and idle hemispheres
+  derived from it by the published offsets or a measured 0°-direction
+  difference.
 * [`flight_condition_weights`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_condition_weights) / [`interpolated_source_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#interpolated_source_level) -- the
   flight-condition interpolation across a hemisphere set: distance-scaled
   triangulation inside the convex hull of the normalised `(V̄, γ̄)` database
@@ -253,6 +259,116 @@ grid return `NaN`.
 | `polar_deg` | Emission polar angle `θ`, in degrees. |
 
 **Returns:** Band levels at `(φ, θ)`, in dB, shape `(F,)`.
+
+## hover_derived_hemisphere
+
+```python
+hover_derived_hemisphere(
+    hemisphere: RotorcraftHemisphere,
+    condition: str,
+    *,
+    offset_db: float | None = None,
+) -> RotorcraftHemisphere
+```
+
+HOGE/idle hemisphere derived from in-ground hover (guidance Table 3).
+
+Table 3 derives the out-of-ground-hover and idle sources from the
+in-ground-hover directivity pattern by a level offset, applied here
+uniformly to every band and bin: the table is stated on `LA` levels,
+and a constant spectral shift moves the `LA` by exactly that value
+(which is also how the NORAH2 reference database applies its
+corrections). With `offset_db` the offset is the measured 0°-direction
+difference of Approach 2, `LA_cond(0°) − LA_HIGE(0°)`; without it the
+Approach 3 constants apply (+12 / −12 / −2.5 dB for
+`"out_of_ground_hover"` / `"reduced_rpm_idle"` / `"full_rpm_idle"`,
+with the guidance's caveat that they come from inverted microphones on
+ground plates). The corrections shipped with the NORAH2 public database
+differ from the published constants (+8 / −10 / −2 dB in every type's
+interpolation file); pass them as `offset_db` to reproduce the
+reference implementation.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `hemisphere` | The in-ground-hover [`RotorcraftHemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafthemisphere) (typically from [`hover_ring_hemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#hover_ring_hemisphere); a fully measured Approach 1 hemisphere works the same). |
+| `condition` | `"out_of_ground_hover"`, `"reduced_rpm_idle"` or `"full_rpm_idle"`. |
+| `offset_db` | Explicit offset from in-ground hover, in dB (Approach 2 or a database correction). Default `None`: the Approach 3 constant of `condition`. |
+
+**Returns:** A new [`RotorcraftHemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafthemisphere) at the same grid and reference distance, every measured bin shifted by the offset (`NaN` bins stay `NaN`).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the inputs are invalid. |
+
+## hover_ring_hemisphere
+
+```python
+hover_ring_hemisphere(
+    frequencies: NDArray[np.float64] | list[float],
+    bearings: NDArray[np.float64] | list[float],
+    levels: NDArray[np.float64] | list[list[float]],
+    *,
+    distance: float = 70.0,
+    azimuth_step: float = 10.0,
+    polar_step: float = 10.0,
+    mapping: str = 'constant_phi',
+) -> RotorcraftHemisphere
+```
+
+Noise hemisphere from a ground-ring hover measurement (guidance §A.3.5).
+
+In-ground hover, idle and their derived conditions are measured on a ring
+of ground microphones around the stationary rotorcraft (the CAEP in-ground
+hover practice the guidance points at): one band spectrum per ring bearing,
+`0°` at the nose and positive to starboard, reduced to the polar distance
+of the ring. Table 3 (Approaches 2/3) extends that ring to the full
+hemisphere "assuming constant directivity in φ"; the guidance prints no
+formula for the extension, so the two readings the data supports are
+provided and documented here:
+
+- `"constant_phi"` (default): the level depends only on the polar angle
+  `θ`, port bins reading the ring at `−θ` and starboard bins at
+  `+θ` (each ring bearing meets the hemisphere rim at `φ = ±90°`,
+  `θ = |bearing|`, and slides inward at constant `φ` from there). The
+  `φ = 0` column under the aircraft takes the energy mean of the
+  `±θ` ring values. This is the literal reading of the guidance text,
+  and it preserves the port/starboard asymmetry the ring measures.
+- `"bearing"`: the level depends only on the horizontal bearing of the
+  emission direction, `β = atan2(sin θ sin φ, cos θ)` (constant
+  directivity in elevation instead of in azimuth). This is what the
+  NORAH2 reference implementation evaluates -- its out-of-ground-hover
+  verification case is reproduced with this mapping (and diverges from
+  `"constant_phi"` by several dB at steep emission angles, where the
+  two readings part).
+
+Ring lookups interpolate periodically in the energy domain. The returned
+hemisphere carries `distance` (hover rings are commonly reduced to
+70 m rather than the 60 m of the flyover database), which the event chain
+and the propagation adjustments honour as the reference distance.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Band centre frequencies, in Hz, shape `(F,)`. |
+| `bearings` | Ring bearings, in degrees within `[-180, 180]`, strictly increasing, shape `(B,)` (`0` at the nose, positive starboard). The ring closes periodically; a duplicated `±180°` endpoint pair is accepted. |
+| `levels` | Ring band levels, in dB at the ring's polar distance, shape `(B, F)`. |
+| `distance` | Polar distance of the ring, in metres (default 70). |
+| `azimuth_step` | Azimuth grid step, in degrees; must divide the 180° span (default 10, the NORAH grid). |
+| `polar_step` | Polar grid step, in degrees; must divide the 180° span (default 10). |
+| `mapping` | `"constant_phi"` (guidance text) or `"bearing"` (NORAH2 reference implementation), see above. |
+
+**Returns:** A [`RotorcraftHemisphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafthemisphere) on the requested grid.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the inputs are invalid. |
 
 ## interpolated_source_level
 

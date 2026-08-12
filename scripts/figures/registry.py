@@ -34,6 +34,7 @@ from .aircraft import (
     generate_rotorcraft_flyover_event,
     generate_rotorcraft_ground_effect,
     generate_rotorcraft_hemisphere,
+    generate_rotorcraft_hover_ring,
     generate_rotorcraft_insertion_loss,
     generate_rotorcraft_kinematics,
     generate_rotorcraft_mean_ground_plane,
@@ -972,6 +973,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_anp_contour,
     # Rotorcraft: the ECAC Doc 32 hemisphere source and its propagation.
     generate_rotorcraft_hemisphere,
+    generate_rotorcraft_hover_ring,
     generate_rotorcraft_ground_effect,
     generate_rotorcraft_flyover_event,
     generate_rotorcraft_contour,
