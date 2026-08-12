@@ -15,7 +15,12 @@ from ..theme import (
     FIELD_INK,
     FIELD_STROKE,
 )
-from ._core import _fdtd_cw_capture, _rms_to_db
+from ._core import (
+    _fdtd_cw_capture,
+    _fit_text_x,
+    _rms_to_db,
+    _text_width_x,
+)
 
 _BARRIER_FREQS = (100.0, 500.0)
 # Receiver low over the ground: there the ground bounce reinforces both
@@ -185,9 +190,13 @@ def animate_fdtd_barrier(output_dir: str) -> None:
                   color="white", fontsize=8)
         ax_r.plot([rx], [ry], marker="o", ms=5, color="white",
                   markeredgecolor="black", markeredgewidth=0.8)
+        # Written out here, not in update(): the string never changes once
+        # the number is revealed, and the clamp below has to measure the
+        # label that will actually be drawn.
         il_txts.append(
-            ax_r.text(rx, ry + 0.45, "", ha="center", va="bottom",
-                      color="white", fontsize=7.5))
+            ax_r.text(rx, ry + 0.45,
+                      T(f"insertion loss {ils[col]:.0f} dB"), ha="center",
+                      va="bottom", color="white", fontsize=7.5))
         if col == 0:
             ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB re panel max]"), fontsize=8)
@@ -207,6 +216,25 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     # tick labels; the top-left stays clear of the centred column titles.
     t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # The insertion-loss labels are centred on the receiver, which sits
+    # 9 m along a 12 m panel with the screen at 5.5 m: the room they have
+    # is the shadow zone, and the English string fits in it while the
+    # Spanish one runs past the right spine. Measure the label that will be
+    # drawn, scale it to the room if it is over, then slide it back inside
+    # the panel -- so it neither leaves the axes nor climbs onto the screen.
+    shadow = (5.62 + 0.15, 12.0 - 0.35)
+    # One size for both panels -- they are twins, and two sizes would read
+    # as two kinds of annotation -- stepped down until the longer string
+    # fits. Stepped rather than scaled by the ratio: the rasteriser rounds
+    # the glyph size to whole pixels, so a 2 % reduction can come back the
+    # same width it went in.
+    while (max(_text_width_x(fig, il.axes, il) for il in il_txts)
+           > shadow[1] - shadow[0] and il_txts[0].get_fontsize() > 6.0):
+        for il in il_txts:
+            il.set_fontsize(il.get_fontsize() - 0.25)
+    for il in il_txts:
+        _fit_text_x(fig, il.axes, il, *shadow)
+        il.set_text("")
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):

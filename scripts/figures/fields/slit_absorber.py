@@ -14,7 +14,7 @@ from ..media import (
     _translate_str,
 )
 from ..theme import CMAP_FIELD, COLOR_FG, COLOR_GRID, COLOR_PRIMARY
-from ._core import _anim_speaker
+from ._core import _anim_speaker, _fit_text_x
 
 _SLIT_ABS_F0 = 300.0                     # critical-coupling design frequency
 _SLIT_ABS_TUBE = 0.60                    # air column before the panel face
@@ -245,6 +245,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
     ims: list[Any] = []
     ims_zoom: list[Any] = []
     a_txts: list[Any] = []
+    helm_txts: list[Any] = []
     for row, (title, h) in enumerate(zip(titles, heights, strict=True)):
         rows = _slit_absorber_cell_rows(dx, round(h / dx), ny)
         # Cell silhouette: the rigid part of the panel as five rectangles
@@ -335,12 +336,13 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
             bbox={"boxstyle": "round,pad=0.2",
                   "facecolor": fig.get_facecolor(), "alpha": 0.55,
                   "edgecolor": "none"})
-        ax_z.text(x_mouth, 0.5 * (y_cav[0] + y_cav[1]),
-                  T("Helmholtz resonator"), ha="center", va="center",
-                  fontsize=6.5, color=COLOR_FG, zorder=6,
-                  bbox={"boxstyle": "round,pad=0.2",
-                        "facecolor": fig.get_facecolor(), "alpha": 0.55,
-                        "edgecolor": "none"})
+        helm_txts.append(ax_z.text(
+            x_mouth, 0.5 * (y_cav[0] + y_cav[1]),
+            T("Helmholtz resonator"), ha="center", va="center",
+            fontsize=6.5, color=COLOR_FG, zorder=6,
+            bbox={"boxstyle": "round,pad=0.2",
+                  "facecolor": fig.get_facecolor(), "alpha": 0.55,
+                  "edgecolor": "none"}))
         if row == 0:
             ax_z.set_title(T("inside the cell"), fontsize=8.5)
         ims.append(im)
@@ -351,6 +353,13 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
     # well to the left of this spot.
     t_txt = fig.text(0.988, 0.015, "", ha="right", va="bottom",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # The resonator label is centred on the cell mouth, which sits close to
+    # the right edge of the 45 mm zoom: the English string just fits, the
+    # Spanish one crosses the dashed frame. Slide it back inside once the
+    # figure is complete and the zoom axes have their final width.
+    for helm in helm_txts:
+        _fit_text_x(fig, helm.axes, helm, x_zoom0, x_end,
+                    margin=0.05 * (x_end - x_zoom0))
     # The captured field is already steady, so the verdict can come early.
     reveal = int(0.30 * len(times))
 

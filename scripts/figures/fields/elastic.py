@@ -26,7 +26,7 @@ from ..theme import (
     FIELD_INK,
     FIELD_STROKE,
 )
-from ._core import _gain_note, _weak_field_gain
+from ._core import _fit_text_x, _gain_note, _weak_field_gain
 
 # --- Elastic FDTD clips: plate junction and coincidence --------------------
 # Both clips run the library's 2D P-SV solver (phonometry.simulation
@@ -219,8 +219,15 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
                                    4 * _EL_DX, y_end - _EJ_PLATE_Y,
                                    facecolor="none", edgecolor=COLOR_FG,
                                    lw=0.7, alpha=0.8))
+            # The same dark pill the clip's other labels carry: white on
+            # its own over magma, this one washed out to ~1.2:1 every time
+            # the bright spot reached the free end, which is exactly when
+            # the label matters.
             ax.text(_EJ_JUNC_X - 0.055, y_end - 0.005, T("free end"),
-                    ha="right", va="bottom", color="white", fontsize=7)
+                    ha="right", va="bottom", color="white", fontsize=7,
+                    zorder=5,
+                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
+                          "alpha": 0.5, "edgecolor": "none"})
         ax.plot([_EJ_SRC_X], [_EJ_PLATE_Y - 0.008], marker="v", ms=5,
                 color=COLOR_TERTIARY, markeredgecolor="white",
                 markeredgewidth=0.6, zorder=4)
@@ -242,9 +249,13 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
                               lw=1.1, alpha=0.85, zorder=3.5)
             ln_arts.append(ln_h)
         ax.set_ylim(y1, y0)
+        ax.set_ylabel("y [m]", fontsize=8)
         ax.tick_params(labelsize=7)
-        v_txt = ax.text(x1 - 0.015, y1 - 0.02, "", ha="right", va="bottom",
-                        color="white", fontsize=8, zorder=5,
+        # Written out here so the clamp below measures the pill that will
+        # actually be drawn; update() blanks it until the reveal.
+        v_txt = ax.text(x1 - 0.015, y1 - 0.02,
+                        verdicts[1 if with_junction else 0], ha="right",
+                        va="bottom", color="white", fontsize=8, zorder=5,
                         bbox={"boxstyle": _ANIM_PILL_BOX,
                               "facecolor": "black", "alpha": 0.5,
                               "edgecolor": "none"})
@@ -253,6 +264,12 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     axes[1].set_xlabel("x [m]", fontsize=8)
     t_txt = fig.text(0.985, 0.965, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # aspect="equal" makes the axes box narrower than its gridspec cell, so
+    # a pill anchored a fixed distance inside the data limits still hung its
+    # fill out over the page. Slide it back against the measured box.
+    for v_txt in v_txts:
+        _fit_text_x(fig, v_txt.axes, v_txt, x0, x1, margin=0.010)
+        v_txt.set_text("")
     reveal = int(0.62 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -488,8 +505,12 @@ def animate_elastic_coincidence(output_dir: str) -> None:
                                facecolor=COLOR_GRID, edgecolor=COLOR_FG,
                                lw=0.8, zorder=3))
         if col == 0:
-            ax.text(x0 + 0.02, _EC_PLATE_Y - 0.012,
-                    T("10 mm steel plate"), ha="left", va="bottom",
+            # Right-aligned at the far end of the plate it names: anchored
+            # at the near end it grew, in Spanish, into the incidence
+            # arrow, whose head then landed on the "0" of "10 mm" and left
+            # the plate reading 1 mm thick.
+            ax.text(x1 - 0.02, _EC_PLATE_Y - 0.012,
+                    T("10 mm steel plate"), ha="right", va="bottom",
                     color=FIELD_INK, fontsize=7.5, path_effects=outline,
                     zorder=4)
             ax.set_ylabel("y [m]", fontsize=8)

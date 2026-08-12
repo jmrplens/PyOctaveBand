@@ -3,8 +3,9 @@
 
 The continuous-wave capture loop and the running-RMS to dB conversion every
 FDTD clip post-processes its frames with, the weak-field display gain the
-clips that put a loud and a quiet region in the same colour ramp share, and
-the loudspeaker drawn on the clips that drive a bore.
+clips that put a loud and a quiet region in the same colour ramp share, the
+loudspeaker drawn on the clips that drive a bore, and the measure-then-slide
+pass that keeps an annotation inside its panel in either language.
 """
 
 from typing import Any
@@ -98,6 +99,82 @@ def _gain_note(region: str, gain: float) -> str:
     if gain <= 1.0:
         return ""
     return f"{region} drawn ×{gain:g} (+{20.0 * np.log10(gain):.0f} dB)"
+
+
+def _ink_box(artist: Any) -> Any:
+    """The rendered box of a label: its background patch, or its glyphs."""
+    patch = artist.get_bbox_patch()
+    if patch is not None:
+        return patch.get_window_extent()
+    return artist.get_window_extent()
+
+
+def _settle(fig: Any) -> None:
+    """Draw *fig* until its constrained layout stops moving under it.
+
+    The first draw of a constrained-layout figure is the one that decides
+    how wide the axes end up, and extents read from it still describe the
+    canvas the solver started from -- a couple of percent out, which is
+    exactly the size of the overhangs these helpers exist to measure. The
+    second draw sees the settled layout; from there the numbers repeat.
+    """
+    fig.canvas.draw()
+    fig.canvas.draw()
+
+
+def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
+    """The rendered width of *artist*, in x data units of *ax*."""
+    _settle(fig)
+    box = _ink_box(artist)
+    inv = ax.transData.inverted()
+    (x0, _), (x1, _) = inv.transform([(box.x0, 0.0), (box.x1, 0.0)])
+    return float(abs(x1 - x0))
+
+
+def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
+                    gap: float = 8.0) -> float:
+    """Slide *artist* down until its box clears *other* by *gap* pixels.
+
+    The companion of :func:`_fit_text_x` for a label placed along a slope --
+    a rotated one climbing an arc, say -- where a longer string grows into
+    whatever sits above it instead of past a spine. Returns the applied
+    shift in data units (0.0 when the label already cleared).
+    """
+    _settle(fig)
+    top = _ink_box(artist).y1
+    floor = _ink_box(other).y0 - gap
+    if top <= floor:
+        return 0.0
+    inv = ax.transData.inverted()
+    (_, dy0), (_, dy1) = inv.transform([(0.0, 0.0), (0.0, top - floor)])
+    shift = abs(dy1 - dy0)
+    artist.set_y(float(artist.get_position()[1]) - shift)
+    return float(shift)
+
+
+def _fit_text_x(fig: Any, ax: Any, artist: Any,
+                x_lo: float, x_hi: float, *, margin: float = 0.0) -> float:
+    """Slide *artist* along x until its rendered box sits inside the panel.
+
+    An annotation anchored at a data coordinate is placed for the string it
+    was written with: the Spanish translation is routinely longer and walks
+    out past the spine, taking its pill with it. Measuring the box that is
+    actually about to be drawn -- the background patch when the label has
+    one, the glyphs otherwise -- and shifting the anchor by the overflow
+    keeps every language inside ``[x_lo + margin, x_hi - margin]`` without
+    moving the labels that already fit. Returns the applied shift, in data
+    units, so a caller can move an arrow or a companion label with it.
+    """
+    _settle(fig)
+    box = _ink_box(artist)
+    inv = ax.transData.inverted()
+    (dx0, _), (dx1, _) = inv.transform([(box.x0, 0.0), (box.x1, 0.0)])
+    lo, hi = min(dx0, dx1), max(dx0, dx1)
+    shift = (max(0.0, (x_lo + margin) - lo)
+             - max(0.0, hi - (x_hi - margin)))
+    if shift:
+        artist.set_x(float(artist.get_position()[0]) + shift)
+    return float(shift)
 
 
 def _anim_speaker(ax: Any, x0: float, y_mid: float, bore: float, *,

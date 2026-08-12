@@ -14,7 +14,12 @@ from ..media import (
     _translate_str,
 )
 from ..theme import CMAP_FIELD, COLOR_FG, FIELD_INK, FIELD_STROKE
-from ._core import _fdtd_cw_capture, _gain_note, _weak_field_gain
+from ._core import (
+    _fdtd_cw_capture,
+    _fit_text_x,
+    _gain_note,
+    _weak_field_gain,
+)
 
 _APERTURE_F = 686.0                      # lambda = 0.50 m exactly
 _APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
@@ -136,6 +141,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     verdicts = [T("cylindrical re-radiation from the slit"),
                 T("the front passes: sharp-edged shadow")]
     ims: list[Any] = []
+    v_txts: list[Any] = []
     tau_txt: Any = None
     for col in range(2):
         gap = _APERTURE_WIDTHS[col]
@@ -171,13 +177,16 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
                   color=FIELD_INK, fontsize=7, path_effects=outline)
         if (note := _gain_note("past the wall", gains[col])):
-            ax_p.text(5.62, 4.28, T(note), ha="right", va="top",
+            # Clear of the top spine: the ascenders and their halo used to
+            # break the spine into pieces from 3 px away.
+            ax_p.text(5.62, 4.19, T(note), ha="right", va="top",
                       color=FIELD_INK, fontsize=6.5, path_effects=outline)
-        ax_r.text(3.85, 0.85, verdicts[col], ha="center", va="bottom",
-                  color="white", fontsize=7.5, zorder=6,
-                  bbox={"boxstyle": _ANIM_PILL_BOX,
-                        "facecolor": "black", "alpha": 0.45,
-                        "edgecolor": "none"})
+        v_txts.append(ax_r.text(
+            3.85, 0.85, verdicts[col], ha="center", va="bottom",
+            color="white", fontsize=7.5, zorder=6,
+            bbox={"boxstyle": _ANIM_PILL_BOX,
+                  "facecolor": "black", "alpha": 0.45,
+                  "edgecolor": "none"}))
         if col == 0:
             ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
@@ -198,6 +207,12 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         ims += [im_p, im_r]
     t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # The verdict pills are centred on the aperture, near the right of each
+    # RMS panel: in Spanish they carry their last letters -- and the whole
+    # translucent pill, which then composes against the white page instead
+    # of the field -- past the spine. Measure and slide them back in.
+    for v_txt in v_txts:
+        _fit_text_x(fig, v_txt.axes, v_txt, 0.08, 5.72, margin=0.12)
     reveal = int(0.5 * p_all.shape[1])
 
     def shadow_gained(col: int, k: int) -> Any:
