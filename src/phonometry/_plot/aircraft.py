@@ -73,7 +73,7 @@ _STRINGS: dict[str, str] = {
     "Segment {metric} [dB]": "{metric} por segmento [dB]",
     "Single-event segment contributions (ECAC Doc 29)": "Contribuciones por segmento de un evento único (ECAC Doc 29)",
     "Polar angle θ [°]  (0° forward → 180° rearward)": "Ángulo polar θ [°]  (0° adelante → 180° atrás)",
-    "Source level at 60 m [dB]": "Nivel de fuente a 60 m [dB]",
+    "Source level at {distance} m [dB]": "Nivel de fuente a {distance} m [dB]",
     "Rotorcraft noise hemisphere directivity (ECAC Doc 32)": "Directividad del hemisferio de ruido de rotorcraft (ECAC Doc 32)",
     "Aircraft noise contour (ECAC Doc 29)": "Curvas de ruido de aeronaves (ECAC Doc 29)",
     "Airspeed $V_A$": "Velocidad del aire $V_A$",
@@ -277,7 +277,9 @@ def plot_rotorcraft_hemisphere(
     ax.plot(theta, grid[:, idx], **{"color": _C_PRIMARY, "lw": 1.8,
             "label": f"{format_number(freqs[idx], language, decimals=0)} Hz (φ = 0°)", **kwargs})
     ax.set_xlabel(_t("Polar angle θ [°]  (0° forward → 180° rearward)", language))
-    ax.set_ylabel(_t("Source level at 60 m [dB]", language))
+    ax.set_ylabel(_t("Source level at {distance} m [dB]", language,
+                     distance=format_number(result.distance, language,
+                                            decimals=0)))
     ax.set_title(_t("Rotorcraft noise hemisphere directivity (ECAC Doc 32)", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
