@@ -453,7 +453,10 @@ from phonometry import aircraft
 
 # Un anillo de estacionario con la forma de una campaña real: un espectro de
 # 31 tercios de octava por cada 30° de rumbo, reducido a los 70 m polares.
-bearings = np.arange(-180.0, 151.0, 30.0)     # el anillo se cierra en ±180°
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)    # tercios de 10 Hz a 10 kHz
+bearings = np.arange(-180.0, 151.0, 30.0)               # el anillo se cierra en ±180°
+niveles_anillo = (86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
+                  + 3.5 * np.cos(np.radians(bearings))[:, None])
 hige = aircraft.hover_ring_hemisphere(freqs, bearings, niveles_anillo, distance=70.0)
 hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
 ralenti_pleno = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2,5 dB
@@ -527,6 +530,7 @@ emparejamiento de aquí sigue la física de las dos operaciones (véase el
 registro de erratas).
 
 ```python
+con_ruedas = False                            # patines: el rodaje es un estacionario
 taxi = ralenti_pleno if con_ruedas else hige  # guía p. 19 (véase la salvedad)
 ```
 

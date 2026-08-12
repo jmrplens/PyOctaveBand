@@ -1401,9 +1401,9 @@ which is the check that enforces the rule; see
 
 - **Location:** section A.3.5, Approach 3, step 3 (printed p. 18), against the
   "Fl. idle" row of Table 3 (printed pp. 18-19).
-- **The print:** the step reads "add offset of 12 dB* to derive out of ground
-  hover from the in-ground hover disk, -12 dB* to derive reduced-rpm idle from
-  in-ground hover disk, and -2.5 dB* to derive full-rpm idle from out of
+- **The print:** the step reads "add offset of 12 dB\* to derive out of ground
+  hover from the in-ground hover disk, -12 dB\* to derive reduced-rpm idle from
+  in-ground hover disk, and -2.5 dB\* to derive full-rpm idle from out of
   ground hover"; the table prints
   $LA_{\mathrm{FL.idle}}(\theta) = LA_{\mathrm{HIGE}}(\theta) - 2.5\ \mathrm{dB}^*$.
 - **The problem:** the prose derives full-rpm idle from out-of-ground hover
@@ -1454,8 +1454,8 @@ which is the check that enforces the rule; see
 - **Location:** Table 3, Approach 3 column (printed pp. 18-19), against the
   `&CORRECTIONS` block of the interpolation lookup files shipped with the
   NORAH2 V2.0.74 public release.
-- **The print:** offsets of +12 dB* (out-of-ground hover), -12 dB*
-  (reduced-rpm idle) and -2.5 dB* (full-rpm idle) from the in-ground-hover
+- **The print:** offsets of +12 dB\* (out-of-ground hover), -12 dB\*
+  (reduced-rpm idle) and -2.5 dB\* (full-rpm idle) from the in-ground-hover
   disk, with the asterisked note that they were derived from measurements
   with inverted microphones on ground plates and "may not be valid for other
   microphone setups".

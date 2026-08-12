@@ -437,7 +437,10 @@ from phonometry import aircraft
 
 # A hover ring with a real campaign's shape: one 31-band third-octave
 # spectrum per 30° of bearing, reduced to the 70 m polar distance.
-bearings = np.arange(-180.0, 151.0, 30.0)     # the ring closes at ±180°
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)    # 10 Hz-10 kHz thirds
+bearings = np.arange(-180.0, 151.0, 30.0)               # the ring closes at ±180°
+ring_levels = (86.0 - 10.0 * np.log10(freqs / 160.0) ** 2
+               + 3.5 * np.cos(np.radians(bearings))[:, None])
 hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring_levels, distance=70.0)
 hoge = aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")   # +12 dB
 full_rpm_idle = aircraft.hover_derived_hemisphere(hige, "full_rpm_idle")  # -2.5 dB
@@ -510,6 +513,7 @@ pairing here follows the physics of the two operations (see the errata
 registry).
 
 ```python
+wheeled = False                               # skid gear: taxi is a hover
 taxi = full_rpm_idle if wheeled else hige     # guidance p. 19 (see caveat)
 ```
 

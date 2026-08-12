@@ -279,7 +279,7 @@ def plot_rotorcraft_hemisphere(
     ax.set_xlabel(_t("Polar angle θ [°]  (0° forward → 180° rearward)", language))
     ax.set_ylabel(_t("Source level at {distance} m [dB]", language,
                      distance=format_number(result.distance, language,
-                                            decimals=0)))
+                                            decimals=1, trim=True)))
     ax.set_title(_t("Rotorcraft noise hemisphere directivity (ECAC Doc 32)", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")

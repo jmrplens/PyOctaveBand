@@ -557,6 +557,10 @@ def test_hover_derived_approach2_measured_offset() -> None:
 def test_hover_helpers_validation() -> None:
     freqs = [500.0, 1000.0]
     ring = _ring(np.full(12, 80.0))
+    with pytest.raises(ValueError, match="frequencies"):
+        hover_ring_hemisphere([500.0, 0.0], _RING_BEARINGS, ring)
+    with pytest.raises(ValueError, match="frequencies"):
+        hover_ring_hemisphere([500.0, -1000.0], _RING_BEARINGS, ring)
     with pytest.raises(ValueError, match="bearings"):
         hover_ring_hemisphere(freqs, [0.0], [[80.0, 80.0]])
     with pytest.raises(ValueError, match="bearings"):

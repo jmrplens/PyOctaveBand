@@ -106,11 +106,14 @@ una trayectoria lista para usar, porque convertir una salida por pasos de
 procedimiento en una trayectoria de vuelo exige el modelo de prestaciones de
 mecánica del vuelo del Doc 9911 de la OACI, que no está implementado.
 
-**Tres huecos concretos.** Las operaciones de helicóptero en estacionario,
-ralentí y rodaje quedan fuera del modelo de fuente de hemisferio, que supone un
-sobrevuelo. El verificador de sistemas de medida comprueba la IEC 61265:1995 y
-no la edición de 2018 que la sustituye. Y el estampido sónico no se toca en
-ningún punto de la biblioteca.
+**Tres huecos concretos.** El estacionario, el ralentí y el rodaje de
+helicóptero funcionan sobre las fuentes derivadas de la Tabla 3, pero el
+último recurso de la guía para un tipo sin ningún dato de estacionario (dos
+micrófonos laterales de vuelo nivelado corregidos al círculo de estacionario
+de 150 m por el método integrado del Anexo 16) no está modelado. El
+verificador de sistemas de medida comprueba la IEC 61265:1995 y no la edición
+de 2018 que la sustituye. Y el estampido sónico no se toca en ningún punto de
+la biblioteca.
 
 Por último, la fuente de aeronaves de CNOSSOS-EU de los apartados 2.6 y 2.7
 **no** está implementada: el ruido de aeronaves aquí es la familia de la OACI y

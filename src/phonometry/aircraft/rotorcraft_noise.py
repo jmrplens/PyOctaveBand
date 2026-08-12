@@ -370,11 +370,9 @@ def hover_ring_hemisphere(
     :return: A :class:`RotorcraftHemisphere` on the requested grid.
     :raises ValueError: If the inputs are invalid.
     """
-    freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+    freqs = require_positive_array(frequencies, "frequencies")
     brg = np.atleast_1d(np.asarray(bearings, dtype=np.float64))
     lv = np.asarray(levels, dtype=np.float64)
-    if freqs.ndim != 1 or freqs.size == 0 or not np.all(np.isfinite(freqs)):
-        raise ValueError("'frequencies' must be a non-empty 1-D finite array.")
     if brg.ndim != 1 or brg.size < 2:
         raise ValueError("'bearings' must be 1-D with at least two ring directions.")
     if not np.all(np.isfinite(brg)) or np.any(np.diff(brg) <= 0.0):
