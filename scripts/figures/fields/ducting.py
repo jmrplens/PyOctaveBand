@@ -148,6 +148,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     ims: list[Any] = []
     ims_e: list[Any] = []
     v_txts: list[Any] = []
+    ax_top: Any = None
     for row, depth in enumerate(_DUCT_SRC_DEPTHS):
         ax_c = fig.add_subplot(gs[row, 0])
         _grid_axes(ax_c)
@@ -198,17 +199,26 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         ax_f.tick_params(labelsize=7, labelleft=False)
         if row == 0:
             ax_f.tick_params(labelbottom=False)
+            ax_top = ax_f
         else:
             ax_f.set_xlabel(T("Range [m]"), fontsize=8)
         ims.append(im)
         ims_e.append(im_e)
         v_txts.append(v_txt)
-    # Right margin, below the suptitle: the lower field panel carries the
-    # "Range [m]" x-axis to the bottom-right corner, so a bottom readout
-    # collides with its tick labels; this spot clears both the tick labels
-    # and the (long) centred suptitle.
-    t_txt = fig.text(0.988, 0.90, "", ha="right", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    # Inside the upper panel, on the same dark pill as the channel-axis
+    # label. Every margin of this figure is spoken for: the bottom-right
+    # corner is the lower panel's "Range [m]" axis, the top-left and
+    # top-right ones are a whisker from the long centred titles, and the
+    # right margin between them put the readout astride the upper panel's
+    # top spine -- where, once that panel crossfades to the magma energy
+    # map, black text on black background disappeared. The pill carries its
+    # own contrast, so the readout no longer depends on what is under it.
+    t_txt = ax_top.text(55.0, 25.0, "", ha="left", va="top",
+                        family="monospace", fontsize=10, color="white",
+                        zorder=4,
+                        bbox={"boxstyle": "round,pad=0.2",
+                              "facecolor": "black", "alpha": 0.45,
+                              "edgecolor": "none"})
     reveal = int(0.83 * p_all.shape[1])    # ~17.5 s: pulse has crossed
     captions_on = int(0.38 * p_all.shape[1])   # first refocus is visible
 

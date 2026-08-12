@@ -176,7 +176,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
                  "facecolor": fig.get_facecolor(), "edgecolor": "none"}
     ax_p.text(1.95, -1.5, T("image source (ghost)"), ha="left",
               va="center", color=COLOR_FG, fontsize=7.5, bbox=hatch_box)
-    ax_p.text(13.7, -0.95, T("rigid ground"), ha="right", va="center",
+    ax_p.text(13.5, -0.95, T("rigid ground"), ha="right", va="center",
               color=COLOR_FG, fontsize=6.5, bbox=hatch_box)
     ax_p.text(0.3, 7.6, f"f = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
               color=FIELD_INK, fontsize=8, path_effects=outline)
@@ -211,16 +211,28 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_l.plot([th_dip], [float(np.interp(th_dip, theta, model_db))],
               marker="o", ms=5, color="white", markeredgecolor="black",
               markeredgewidth=0.8)
-    ax_l.legend(fontsize=7, loc="center right")
+    # Bottom right: past the third null the curve climbs back to its last
+    # maximum and stays in the top half of the panel, so the corner under it
+    # is the one patch of the panel no trace crosses. Centre right, where
+    # the legend used to sit, is exactly where the third minimum -- the one
+    # the clip exists to line up with its predicted null -- comes down.
+    ax_l.legend(fontsize=7, loc="lower right", framealpha=0.92)
     # The strip above 0 dB is data-free, so the closing caption fits there.
     # The longer Spanish verdict spans the whole panel at 7.5 pt, so it drops
-    # a step to keep a margin on both sides.
+    # a step to keep a margin on both sides. The dotted null lines run the
+    # full height of the panel and through the words, so the caption carries
+    # a halo to keep a clear channel around its glyphs.
     verdict_txt = ax_l.text(0.5, 0.975, "", transform=ax_l.transAxes,
                             ha="center", va="top", color=COLOR_FG,
                             fontsize=7.5 if _LANG == "en" else 6.5,
-                            fontweight="bold")
-    # Bottom-left corner: the arc panel's wide x-label owns bottom-right.
-    t_txt = fig.text(0.015, 0.02, "", ha="left", va="bottom",
+                            fontweight="bold", path_effects=[
+                                patheffects.withStroke(
+                                    linewidth=2.6, foreground=FIELD_STROKE)])
+    # Level with the arc panel's title, over the field panels, which carry
+    # no title of their own: the bottom-left corner put the readout right
+    # under the first x tick of the RMS panel, and the bottom-right one
+    # belongs to the arc panel's wide x-label.
+    t_txt = fig.text(0.02, 0.935, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
     reveal = int(0.83 * p_frames.shape[0])
 

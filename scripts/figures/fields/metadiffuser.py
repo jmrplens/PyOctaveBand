@@ -415,7 +415,12 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
                       va="center", fontsize=7, color=COLOR_FG)
         ims += [im_t, im_s]
         d_txts.append(d_txt)
-    t_txt = fig.text(0.985, 0.02, "", ha="right", va="bottom",
+    # Top-left margin, beside the centred suptitle: three columns of field
+    # panels carry their x ticks and "x [m]" all the way into the
+    # bottom-right corner, and a readout parked there merged with the third
+    # column's tick row -- the stem of the "t" reading as part of 1.00, the
+    # "ms" as part of 1.50.
+    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
     reveal = int(0.8 * tot_all.shape[1])
 
