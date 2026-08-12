@@ -24,6 +24,16 @@ from ._core import _rms_to_db
 _GROUND_FREQ = 400.0
 _GROUND_H = 1.5
 _GROUND_ARC_R = 8.0
+#: Level band of the arc panel the two curves are read in, and the axis
+#: bottom under it. Every corner of the reading band is crossed by a trace
+#: or by a null marker, and the deepest feature of the right half -- the
+#: third minimum, the one the clip exists to line up with its predicted
+#: null -- comes down into the lower right one. The panel therefore keeps a
+#: strip below the reading floor that no curve and no marker enters, and the
+#: legend lives there.
+_GROUND_ARC_TOP = 3.0
+_GROUND_ARC_FLOOR = -34.0
+_GROUND_ARC_BOTTOM = -41.0
 # Ground-effect timeline. Mesh: the carrier is 400 Hz (lambda = 0.858 m,
 # lambda / 8 = 107 mm) and the smallest geometric dimension is the 1.5 m
 # source height (1.5 / 4 = 0.38 m), so the rule dx = min(0.38, 0.107) m
@@ -176,7 +186,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
                  "facecolor": fig.get_facecolor(), "edgecolor": "none"}
     ax_p.text(1.95, -1.5, T("image source (ghost)"), ha="left",
               va="center", color=COLOR_FG, fontsize=7.5, bbox=hatch_box)
-    ax_p.text(13.7, -0.95, T("rigid ground"), ha="right", va="center",
+    ax_p.text(13.5, -0.95, T("rigid ground"), ha="right", va="center",
               color=COLOR_FG, fontsize=6.5, bbox=hatch_box)
     ax_p.text(0.3, 7.6, f"f = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
               color=FIELD_INK, fontsize=8, path_effects=outline)
@@ -198,11 +208,15 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_l.set_xlabel(T("elevation angle θ [°]"), fontsize=8)
     ax_l.set_ylabel(T("level [dB re max]"), fontsize=8)
     ax_l.set_xlim(0.0, 63.0)
-    ax_l.set_ylim(-34.0, 3.0)
+    ax_l.set_ylim(_GROUND_ARC_BOTTOM, _GROUND_ARC_TOP)
     ax_l.tick_params(labelsize=7)
     for i, th in enumerate(n for n in nulls if n <= 62.0):
-        ax_l.axvline(th, color=COLOR_SECONDARY, ls=":", lw=1.2,
-                     label=T("predicted nulls") if i == 0 else None)
+        # Spanning the reading band, not the frame: the strip below it is
+        # the legend's, and a full-height marker would be the thing the
+        # legend covers.
+        ax_l.plot([th, th], [_GROUND_ARC_FLOOR, _GROUND_ARC_TOP],
+                  color=COLOR_SECONDARY, ls=":", lw=1.2,
+                  label=T("predicted nulls") if i == 0 else None)
     ax_l.plot(theta, model_db, ls="--", color=COLOR_FG, lw=1.3, alpha=0.75,
               label=T("image-source model"))
     (l_sim,) = ax_l.plot([], [], color=COLOR_PRIMARY, lw=2.0, label="FDTD")
@@ -211,16 +225,26 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_l.plot([th_dip], [float(np.interp(th_dip, theta, model_db))],
               marker="o", ms=5, color="white", markeredgecolor="black",
               markeredgewidth=0.8)
-    ax_l.legend(fontsize=7, loc="center right")
+    # In the strip below the reading floor (see the band constants), which
+    # is the only patch of the panel neither curve nor marker enters.
+    ax_l.legend(fontsize=7, loc="lower right", framealpha=0.92,
+                borderpad=0.4, labelspacing=0.35, borderaxespad=0.4)
     # The strip above 0 dB is data-free, so the closing caption fits there.
     # The longer Spanish verdict spans the whole panel at 7.5 pt, so it drops
-    # a step to keep a margin on both sides.
+    # a step to keep a margin on both sides. The dotted null lines run the
+    # full height of the panel and through the words, so the caption carries
+    # a halo to keep a clear channel around its glyphs.
     verdict_txt = ax_l.text(0.5, 0.975, "", transform=ax_l.transAxes,
                             ha="center", va="top", color=COLOR_FG,
                             fontsize=7.5 if _LANG == "en" else 6.5,
-                            fontweight="bold")
-    # Bottom-left corner: the arc panel's wide x-label owns bottom-right.
-    t_txt = fig.text(0.015, 0.02, "", ha="left", va="bottom",
+                            fontweight="bold", path_effects=[
+                                patheffects.withStroke(
+                                    linewidth=2.6, foreground=FIELD_STROKE)])
+    # Level with the arc panel's title, over the field panels, which carry
+    # no title of their own: the bottom-left corner put the readout right
+    # under the first x tick of the RMS panel, and the bottom-right one
+    # belongs to the arc panel's wide x-label.
+    t_txt = fig.text(0.02, 0.935, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
     reveal = int(0.83 * p_frames.shape[0])
 

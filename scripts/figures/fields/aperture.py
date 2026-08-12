@@ -14,7 +14,12 @@ from ..media import (
     _translate_str,
 )
 from ..theme import CMAP_FIELD, COLOR_FG, FIELD_INK, FIELD_STROKE
-from ._core import _fdtd_cw_capture, _gain_note, _weak_field_gain
+from ._core import (
+    _fdtd_cw_capture,
+    _fit_text_x,
+    _gain_note,
+    _weak_field_gain,
+)
 
 _APERTURE_F = 686.0                      # lambda = 0.50 m exactly
 _APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
@@ -25,6 +30,11 @@ _APERTURE_DEPTH = 0.10                   # wall thickness across the opening
 _APERTURE_DX = 0.00625
 _APERTURE_EVERY = 3
 _APERTURE_FRAMES = 962
+#: Top of the framing. The display-gain note sits under the top spine and
+#: the incident-wavefront label just under the note, so the panel is framed
+#: 0.1 m above the band the two of them need; the sponge layer only starts
+#: at y = 4.75, so the extra strip is still physical field.
+_APERTURE_YTOP = 4.4
 #: 8/3 of the shared rate, matching the stride cut (see the note below).
 _APERTURE_FPS = _ANIM_FPS * 8.0 / 3.0
 
@@ -136,6 +146,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     verdicts = [T("cylindrical re-radiation from the slit"),
                 T("the front passes: sharp-edged shadow")]
     ims: list[Any] = []
+    v_txts: list[Any] = []
     tau_txt: Any = None
     for col in range(2):
         gap = _APERTURE_WIDTHS[col]
@@ -158,26 +169,33 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
             # Crop the sponge layers (and the injection seam) out of view,
             # so the frame edge is physical field.
             ax.set_xlim(0.08, 5.72)
-            ax.set_ylim(0.7, 4.3)
+            ax.set_ylim(0.7, _APERTURE_YTOP)
             ax.tick_params(labelsize=7)
         ax_p.tick_params(labelbottom=False)
         ax_r.set_xlabel("x [m]", fontsize=8)
-        ax_p.annotate("", xy=(1.15, 3.75), xytext=(0.55, 3.75),
+        # The arrow and its caption ride 0.1 m lower than the free field
+        # would need them to: the gain note is the other tenant of this
+        # strip, and its halo was rubbing out the caption's ascenders.
+        ax_p.annotate("", xy=(1.15, 3.65), xytext=(0.55, 3.65),
                       arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                   "lw": 1.2})
-        ax_p.text(0.85, 3.85, T("incident plane wavefront"), ha="left",
+        ax_p.text(0.85, 3.75, T("incident plane wavefront"), ha="left",
                   va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline)
         ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
                   color=FIELD_INK, fontsize=7, path_effects=outline)
         if (note := _gain_note("past the wall", gains[col])):
+            # The note keeps the band right under the incident-wavefront
+            # label; the air over its ascenders (which used to break the top
+            # spine into pieces from 3 px away) comes from the framing.
             ax_p.text(5.62, 4.28, T(note), ha="right", va="top",
                       color=FIELD_INK, fontsize=6.5, path_effects=outline)
-        ax_r.text(3.85, 0.85, verdicts[col], ha="center", va="bottom",
-                  color="white", fontsize=7.5, zorder=6,
-                  bbox={"boxstyle": _ANIM_PILL_BOX,
-                        "facecolor": "black", "alpha": 0.45,
-                        "edgecolor": "none"})
+        v_txts.append(ax_r.text(
+            3.85, 0.85, verdicts[col], ha="center", va="bottom",
+            color="white", fontsize=7.5, zorder=6,
+            bbox={"boxstyle": _ANIM_PILL_BOX,
+                  "facecolor": "black", "alpha": 0.45,
+                  "edgecolor": "none"}))
         if col == 0:
             ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
@@ -185,7 +203,8 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
                       T(f"f = {_APERTURE_F:.0f} Hz (λ = {lam:.2f} m)"),
                       ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline)
-            tau_txt = ax_r.text(5.55, 4.1, "", ha="right", va="top",
+            tau_txt = ax_r.text(5.55, _APERTURE_YTOP - 0.2, "", ha="right",
+                                va="top",
                                 fontsize=8.5, color="white", zorder=7,
                                 bbox={"boxstyle": _ANIM_PILL_BOX,
                                       "facecolor": "black", "alpha": 0.55,
@@ -193,11 +212,18 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         else:
             ax_p.tick_params(labelleft=False)
             ax_r.tick_params(labelleft=False)
-            ax_r.text(5.55, 4.1, T("same color scale"), color="white",
-                      fontsize=7, ha="right", va="top")
+            ax_r.text(5.55, _APERTURE_YTOP - 0.2, T("same color scale"),
+                      color="white", fontsize=7, ha="right", va="top")
         ims += [im_p, im_r]
     t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # The verdict pills are centred on the aperture, near the right of each
+    # RMS panel: in Spanish they carry their last letters -- and the whole
+    # translucent pill, which then composes against the white page instead
+    # of the field -- past the spine. Measure and slide them back in.
+    for v_txt in v_txts:
+        _fit_text_x(fig, v_txt.axes, v_txt, *v_txt.axes.get_xlim(),
+                    margin=0.12)
     reveal = int(0.5 * p_all.shape[1])
 
     def shadow_gained(col: int, k: int) -> Any:

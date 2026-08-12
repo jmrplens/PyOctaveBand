@@ -166,6 +166,13 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     T = _translate_str
     outline = [patheffects.withStroke(linewidth=2.0,
                                       foreground=FIELD_STROKE)]
+    # The ray fan is drawn over the scene, and two of its rays run straight
+    # through the source and receiver labels (worst on the dark page, where
+    # the rays are nearly the colour of the text). A wider halo keeps a
+    # clear channel around those two labels instead of a struck-through
+    # word; the rays still pass, which is what a ray fan does.
+    ray_outline = [patheffects.withStroke(linewidth=3.6,
+                                          foreground=FIELD_STROKE)]
     p_all, e_db, times, z, c_profs, rays = _refraction_fields()
     profiles = _refraction_profiles()
     half = p_all.shape[1] // 2
@@ -239,18 +246,19 @@ def animate_fdtd_refraction(output_dir: str) -> None:
                   markeredgewidth=0.8, zorder=4)
         ax_f.text(src_x + 8.0, src_h + 4.0, T("source (h = 2 m)"),
                   ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
-                  path_effects=outline, zorder=4)
+                  path_effects=ray_outline, zorder=4)
         ax_f.plot([recv_x], [src_h], marker="o", ms=5, color=FIELD_STROKE,
                   markeredgecolor=FIELD_INK, markeredgewidth=0.8, zorder=4)
         ax_f.text(recv_x, src_h + 6.0, T("receiver 350 m"), ha="center",
                   va="bottom", color=FIELD_INK, fontsize=7.5,
-                  path_effects=outline, zorder=4)
+                  path_effects=ray_outline, zorder=4)
         if row == 0:
+            # Halo rather than a filled box: the box was opaque and sat on
+            # the hatched ground, wiping out the first 170 px of its
+            # hatching so the band looked broken right after the spine.
             ax_f.text(20.0, -3.5, T("rigid ground"), ha="left",
                       va="center", color=COLOR_FG, fontsize=6.5,
-                      bbox={"boxstyle": "round,pad=0.2",
-                            "facecolor": fig.get_facecolor(),
-                            "edgecolor": "none"})
+                      path_effects=ray_outline, zorder=4)
             ax_f.text(22.0, 97.0, T(f"f = {_REFR_F:.0f} Hz"), ha="left",
                       va="top", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline, zorder=4)

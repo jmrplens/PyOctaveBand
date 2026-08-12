@@ -14,6 +14,7 @@ from ..theme import (
     FIELD_INK,
     FIELD_STROKE,
 )
+from ._core import _fit_text_below
 
 _QRD_DESIGN_F = 343.0 / 0.56             # ~612 Hz: lambda0 = 0.56 m
 _QRD_SLAB = (2.085, 3.915, 0.55, 0.85)   # x0, x1, y0, y1 of the panel slab
@@ -234,14 +235,20 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         ax_s.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.65)
         ax_s.text(3.0, 0.15, beams[col], ha="center", va="bottom",
                   color="white", fontsize=7.5)
-        d_txt = ax_s.text(5.45, 3.82, "", ha="right", va="top",
-                          color="white", fontsize=8.5, fontweight="bold")
+        # Written out here so the arc label below can be measured against
+        # the annotation that will actually be drawn; update() blanks it
+        # until the arc energy has settled.
+        d_txt = ax_s.text(5.45, 3.82,
+                          T(f"diffusion coefficient d = {d_coef[col]:.2f}"),
+                          ha="right", va="top", color="white",
+                          fontsize=8.5, fontweight="bold")
         if col == 0:
             ax_t.set_ylabel(T("sound field p"), fontsize=9)
             ax_s.set_ylabel(T("scattered field (total − incident)"),
                             fontsize=8)
-            ax_s.text(0.78, 2.05, T("receiver arc"), ha="left", va="bottom",
-                      color="white", fontsize=6.5, rotation=64.0)
+            arc_txt = ax_s.text(0.78, 2.05, T("receiver arc"), ha="left",
+                                va="bottom", color="white", fontsize=6.5,
+                                rotation=64.0)
         else:
             ax_t.tick_params(labelleft=False)
             ax_s.tick_params(labelleft=False)
@@ -253,6 +260,14 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         d_txts.append(d_txt)
     t_txt = fig.text(0.985, 0.02, "", ha="right", va="bottom",
                      family="monospace", fontsize=10, color=COLOR_FG)
+    # The arc label climbs the receiver arc toward the corner the diffusion
+    # coefficient is printed in, and the Spanish string is half again as
+    # long as the English one: at a fixed anchor its tail ran through the
+    # middle of that annotation. Push it down the arc instead, by whatever
+    # its own length asks for.
+    _fit_text_below(fig, d_txts[0].axes, arc_txt, d_txts[0], gap=10.0)
+    for d_txt in d_txts:
+        d_txt.set_text("")
     reveal = int(0.8 * tot_all.shape[1])   # arc energy has settled by here
 
     def update(k: int) -> tuple[Any, ...]:
