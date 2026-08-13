@@ -17,6 +17,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -234,10 +235,10 @@ def generate_trend_test(output_dir: str) -> None:
     index = np.arange(1, example.size + 1)
     ax.plot(index, res_flat.values, "o-", color=COLOR_PRIMARY,
             linewidth=1.2, markersize=5,
-            label="B&P Example 4.4: A = 86, accepted (no trend)")
+            label="B&P Example 4.4: $A$ = 86, accepted (no trend)")
     ax.plot(index, res_drift.values, "s-", color=COLOR_SECONDARY,
             linewidth=1.2, markersize=5,
-            label="Added rising drift: A = 38, rejected (trend)")
+            label="Added rising drift: $A$ = 38, rejected (trend)")
     ax.set_xticks(index[1::2])
     ax.set_xlabel("Sample index")
     ax.set_ylabel("Sequence value")
@@ -247,9 +248,10 @@ def generate_trend_test(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
     ax.text(0.02, 0.80,
-            "20 observations; the count A of pairs i < j with x[i] > x[j]\n"
+            "20 observations; the count $A$ of pairs $i < j$ with "
+            "$x_i > x_j$\n"
             "must fall in (64, 125] at the 5 % level (Table A.6). A rising\n"
-            "trend depresses A below the acceptance region",
+            "trend depresses $A$ below the acceptance region",
             transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -277,10 +279,10 @@ def generate_stationarity_test(output_dir: str) -> None:
     index = np.arange(1, res_steady.n_segments + 1)
     ax.plot(index, res_steady.segment_values, "o-", color=COLOR_PRIMARY,
             linewidth=1.2, markersize=5,
-            label="Steady noise: A = 91, accepted (stationary)")
+            label="Steady noise: $A$ = 91, accepted (stationary)")
     ax.plot(index, res_ramp.segment_values, "s-", color=COLOR_SECONDARY,
             linewidth=1.2, markersize=5,
-            label="+20 % gain ramp: A = 7, rejected (nonstationary)")
+            label="+20 % gain ramp: $A$ = 7, rejected (nonstationary)")
     ax.set_xticks(index[1::2])
     ax.set_xlabel("Segment index")
     ax.set_ylabel("Segment mean square")
@@ -290,8 +292,8 @@ def generate_stationarity_test(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
     ax.text(0.02, 0.80,
-            "20 segment mean squares; the count A of pairs i < j with\n"
-            "x[i] > x[j] must fall in (64, 125] at the 5 % level (Table A.6)",
+            "20 segment mean squares; the count $A$ of pairs $i < j$ with\n"
+            "$x_i > x_j$ must fall in (64, 125] at the 5 % level (Table A.6)",
             transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -330,7 +332,7 @@ def generate_rice_level_crossings(output_dir: str) -> None:
     ax.plot(res.levels, res.rates, "o", color=COLOR_PRIMARY, markersize=6,
             label="Measured crossing rate")
     ax.set_yscale("log")
-    ax.set_xlabel("Level a [signal units]")
+    ax.set_xlabel("Level $a$ [signal units]")
     ax.set_ylabel("Crossings per second [1/s]")
     ax.set_title("Level-Crossing Rates of Bandlimited Gaussian Noise (Rice)",
                  fontweight="bold", pad=12)
@@ -363,18 +365,20 @@ def generate_rice_peak_distribution(output_dir: str) -> None:
     exceedance = 1.0 - np.arange(1, peaks.size + 1) / peaks.size
     z = np.linspace(-2.5, 4.5, 400)
     ax.plot(z, _rice_peak_exceedance(z, 1.0), color=COLOR_FG, linewidth=1.0,
-            linestyle="--", alpha=0.6, label="Rayleigh limit (r = 1, narrowband)")
+            linestyle="--", alpha=0.6,
+            label="Rayleigh limit ($r = 1$, narrowband)")
     ax.plot(z, _rice_peak_exceedance(z, 0.0), color=COLOR_FG, linewidth=1.0,
-            linestyle=":", alpha=0.6, label="Gaussian limit (r = 0, wideband)")
+            linestyle=":", alpha=0.6,
+            label="Gaussian limit ($r = 0$, wideband)")
     ax.plot(z, res.peak_exceedance(z), color=COLOR_SECONDARY, linewidth=1.7,
-            label="Rice mixture at r = 0.746 (Eq. 5.223)")
+            label="Rice mixture at $r = 0.746$ (Eq. 5.223)")
     ax.plot(peaks, exceedance, drawstyle="steps-post", color=COLOR_PRIMARY,
             linewidth=1.2, label="Empirical peak exceedance (0-2 kHz noise)")
     ax.set_yscale("log")
     ax.set_xlim(-2.5, 4.5)
     ax.set_ylim(1e-5, 1.5)
     ax.set_xlabel(r"Standardized peak height $z = a/\sigma_x$")
-    ax.set_ylabel("Prob[peak > z]")
+    ax.set_ylabel(r"$\mathrm{Prob}[\mathrm{peak} > z]$")
     ax.set_title("Peak-Height Distribution and the Irregularity Factor (Rice)",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -444,7 +448,8 @@ def generate_uncertainty(output_dir: str) -> None:
                  label="95 % coverage interval")
     ax_m.set_xlabel("A-weighted level [dB]")
     ax_m.set_ylabel("Probability density")
-    ax_m.set_title(f"Y = {result.value:.2f} dB,  U = {big:.2f} dB (k = {k:.2f})",
+    ax_m.set_title(f"$Y$ = {result.value:.2f} dB,  $U$ = {big:.2f} dB "
+                   f"($k$ = {k:.2f})",
                    fontweight="bold", pad=10)
     ax_m.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_m.set_axisbelow(True)
@@ -495,9 +500,9 @@ def generate_stationarity_glide_blind_spot(output_dir: str) -> None:
     axes[0].set_title(f"(a) The record: a {f0:.0f} Hz to {f1:.0f} Hz glide at "
                       "constant amplitude", fontweight="bold", pad=8)
 
-    title_full = (f"(b) Full band: A = {full.count}, inside "
+    title_full = (f"(b) Full band: $A$ = {full.count}, inside "
                   f"{res_bounds(full)} — accepted, and blind")
-    title_band = (f"(c) Band-limited {lo:.0f}-{hi:.0f} Hz: A = {band.count}, "
+    title_band = (f"(c) Band-limited {lo:.0f}-{hi:.0f} Hz: $A$ = {band.count}, "
                   f"outside {res_bounds(band)} — rejected")
     for ax, res, color, title in (
         (axes[1], full, COLOR_PRIMARY, title_full),
@@ -551,8 +556,9 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
     levels = np.linspace(-4.0, 4.0, 33)
     for record, color, marker, size, label in (
         (gauss, COLOR_PRIMARY, "o", 6, "Gaussian reference"),
-        (clipped, COLOR_SECONDARY, "s", 4, "hard-clipped at 2.5 σ"),
-        (impulsive, COLOR_TERTIARY, "^", 4, "Gaussian + sparse 6 σ spikes"),
+        (clipped, COLOR_SECONDARY, "s", 4, r"hard-clipped at $2.5\,\sigma$"),
+        (impulsive, COLOR_TERTIARY, "^", 4,
+         r"Gaussian + sparse $6\,\sigma$ spikes"),
     ):
         res = level_crossing_rate(record, fs, levels=levels * np.std(record))
         ax_l.plot(res.levels / np.std(record), res.rice_rates, color=color,
@@ -562,13 +568,15 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
     for edge in (-2.5, 2.5):
         ax_l.axvline(edge, color=COLOR_SECONDARY, linestyle=":", linewidth=1.1,
                      alpha=0.8)
-    ax_l.text(-3.9, 0.16, "spikes lift both tails above the curve", fontsize=9,
+    # Two rows, not one: side by side at the same height the Spanish pair
+    # overlapped mid-panel (the committed asset shows them run together).
+    ax_l.text(-3.9, 0.34, "spikes lift both tails above the curve", fontsize=9,
               color=COLOR_TERTIARY, ha="left")
-    ax_l.text(4.0, 0.16, "clipping: no crossings past 2.5 σ", fontsize=9,
-              color=COLOR_SECONDARY, ha="right")
+    ax_l.text(4.0, 0.16, r"clipping: no crossings past $2.5\,\sigma$",
+              fontsize=9, color=COLOR_SECONDARY, ha="right")
     ax_l.set_yscale("log")
     ax_l.set_ylim(1e-1, 1e4)
-    ax_l.set_xlabel("Crossing level a / σ")
+    ax_l.set_xlabel(r"Crossing level $a/\sigma$")
     ax_l.set_ylabel("Crossings per second [1/s]")
     ax_l.set_title("Measured rates against each record's own Rice curve",
                    fontweight="bold", pad=10)
@@ -658,13 +666,13 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
                 label="GUM Gaussian")
         ax.axvspan(mc.interval[0], mc.interval[1], zorder=0,
                    color=theme_fill(COLOR_PRIMARY, ax),
-                   label=f"MC 95 % interval [{mc.interval[0]:.2f}, "
-                         f"{mc.interval[1]:.2f}]")
+                   label=f"MC 95 % interval [{_fmt_minus(mc.interval[0], '.2f')}, "
+                         f"{_fmt_minus(mc.interval[1], '.2f')}]")
         for edge in (gum.value - big, gum.value + big):
             ax.axvline(edge, color=COLOR_SECONDARY, ls="--", lw=1.4)
         ax.axvline(gum.value - big, color=COLOR_SECONDARY, ls="--", lw=1.4,
-                   label=f"GUM Y ± U  [{gum.value - big:.2f}, "
-                         f"{gum.value + big:.2f}]")
+                   label=rf"GUM $Y \pm U$  [{_fmt_minus(gum.value - big, '.2f')}, "
+                         f"{_fmt_minus(gum.value + big, '.2f')}]")
         if ymax is not None:
             ax.set_ylim(0, ymax)
             ax.annotate("all the mass beyond the bound\npiles up on it",
@@ -708,8 +716,8 @@ def generate_uncertainty_correlation(output_dir: str) -> None:
     ax_l.plot(rho, opposite, color=COLOR_SECONDARY, lw=2.0, ls="--",
               label="sensitivities of opposite sign")
     ax_l.axhline(quad, color=COLOR_FG, ls=":", lw=1.3,
-                 label=f"quadrature value {quad:.3f} dB (assumes ρ = 0)")
-    ax_l.set_xlabel("Correlation coefficient ρ between the two terms")
+                 label=rf"quadrature value {quad:.3f} dB (assumes $\rho = 0$)")
+    ax_l.set_xlabel(r"Correlation coefficient $\rho$ between the two terms")
     ax_l.set_ylabel("Combined standard uncertainty [dB]")
     ax_l.set_title("Two terms of 0.3 dB each", fontweight="bold", pad=10)
     ax_l.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
@@ -762,7 +770,7 @@ def generate_runs_test(output_dir: str) -> None:
         ax.axhline(median, color=COLOR_FG, linestyle="--", linewidth=1.1,
                    alpha=0.7, label="Sequence median")
         verdict = "trend-free" if res.trend_free else "rejected"
-        ax.set_title(f"r = {res.statistic} runs, accept "
+        ax.set_title(f"$r$ = {res.statistic} runs, accept "
                      f"({res.bounds[0]}, {res.bounds[1]}]: {verdict}",
                      fontweight="bold", pad=10)
         ax.set_xlabel("Sample index")

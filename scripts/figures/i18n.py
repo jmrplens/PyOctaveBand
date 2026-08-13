@@ -2168,37 +2168,38 @@ _ES_EXACT = {
     # Data qualification: trend and stationarity tests, Rice crossing statistics
     "Nonparametric Trend Test by Reverse Arrangements (B&P 4.5.2)":
         "Test de tendencia no paramétrico por inversiones de orden (B&P 4.5.2)",
-    "B&P Example 4.4: A = 86, accepted (no trend)":
-        "Ejemplo 4.4 de B&P: A = 86, aceptado (sin tendencia)",
-    "Added rising drift: A = 38, rejected (trend)":
-        "Deriva ascendente añadida: A = 38, rechazado (tendencia)",
+    "B&P Example 4.4: $A$ = 86, accepted (no trend)":
+        "Ejemplo 4.4 de B&P: $A$ = 86, aceptado (sin tendencia)",
+    "Added rising drift: $A$ = 38, rejected (trend)":
+        "Deriva ascendente añadida: $A$ = 38, rechazado (tendencia)",
     "Sample index": "Índice de muestra",
     "Sequence value": "Valor de la secuencia",
-    "20 observations; the count A of pairs i < j with x[i] > x[j]\n"
+    "20 observations; the count $A$ of pairs $i < j$ with $x_i > x_j$\n"
     "must fall in (64, 125] at the 5 % level (Table A.6). A rising\n"
-    "trend depresses A below the acceptance region":
-        "20 observaciones; el conteo A de pares i < j con x[i] > x[j]\n"
+    "trend depresses $A$ below the acceptance region":
+        "20 observaciones; el conteo $A$ de pares $i < j$ con $x_i > x_j$\n"
         "debe caer en (64, 125] al nivel del 5 % (Tabla A.6). Una deriva\n"
-        "ascendente reduce A por debajo de la región de aceptación",
+        "ascendente reduce $A$ por debajo de la región de aceptación",
     "Stationarity Test by Reverse Arrangements (B&P 10.3.1.1)":
         "Test de estacionariedad por inversiones de orden (B&P 10.3.1.1)",
-    "Steady noise: A = 91, accepted (stationary)":
-        "Ruido estable: A = 91, aceptado (estacionario)",
-    "+20 % gain ramp: A = 7, rejected (nonstationary)":
-        "Rampa de ganancia del +20 %: A = 7, rechazado (no estacionario)",
+    "Steady noise: $A$ = 91, accepted (stationary)":
+        "Ruido estable: $A$ = 91, aceptado (estacionario)",
+    "+20 % gain ramp: $A$ = 7, rejected (nonstationary)":
+        "Rampa de ganancia del +20 %: $A$ = 7, rechazado (no estacionario)",
     "Segment index": "Índice de segmento",
     "Segment mean square": "Media cuadrática por segmento",
-    "20 segment mean squares; the count A of pairs i < j with\n"
-    "x[i] > x[j] must fall in (64, 125] at the 5 % level (Table A.6)":
-        "20 medias cuadráticas por segmento; el conteo A de pares i < j con\n"
-        "x[i] > x[j] debe caer en (64, 125] al nivel del 5 % (Tabla A.6)",
+    "20 segment mean squares; the count $A$ of pairs $i < j$ with\n"
+    "$x_i > x_j$ must fall in (64, 125] at the 5 % level (Table A.6)":
+        "20 medias cuadráticas por segmento; el conteo $A$ de pares "
+        "$i < j$ con\n"
+        "$x_i > x_j$ debe caer en (64, 125] al nivel del 5 % (Tabla A.6)",
     "Level-Crossing Rates of Bandlimited Gaussian Noise (Rice)":
         "Tasas de cruce por nivel de ruido gaussiano de banda limitada "
         "(Rice)",
     r"Rice: $N_0\,\exp(-a^2/2\sigma_x^2)$ (Eq. 5.196)":
         r"Rice: $N_0\,\exp(-a^2/2\sigma_x^2)$ (Ec. 5.196)",
     "Measured crossing rate": "Tasa de cruces medida",
-    "Level a [signal units]": "Nivel a [unidades de la señal]",
+    "Level $a$ [signal units]": "Nivel $a$ [unidades de la señal]",
     "Crossings per second [1/s]": "Cruces por segundo [1/s]",
     "800-1200 Hz Gaussian band: 2014 zero crossings/s, an\n"
     r"apparent frequency $N_0/2 \approx$ 1007 Hz (B&P Example 5.13)":
@@ -2206,17 +2207,17 @@ _ES_EXACT = {
         r"frecuencia aparente $N_0/2 \approx$ 1007 Hz (B&P Ejemplo 5.13)",
     "Peak-Height Distribution and the Irregularity Factor (Rice)":
         "Distribución de alturas de pico y factor de irregularidad (Rice)",
-    "Rayleigh limit (r = 1, narrowband)":
-        "Límite de Rayleigh (r = 1, banda estrecha)",
-    "Gaussian limit (r = 0, wideband)":
-        "Límite gaussiano (r = 0, banda ancha)",
-    "Rice mixture at r = 0.746 (Eq. 5.223)":
-        "Mezcla de Rice con r = 0,746 (Ec. 5.223)",
+    "Rayleigh limit ($r = 1$, narrowband)":
+        "Límite de Rayleigh ($r = 1$, banda estrecha)",
+    "Gaussian limit ($r = 0$, wideband)":
+        "Límite gaussiano ($r = 0$, banda ancha)",
+    "Rice mixture at $r = 0.746$ (Eq. 5.223)":
+        "Mezcla de Rice con $r = 0{,}746$ (Ec. 5.223)",
     "Empirical peak exceedance (0-2 kHz noise)":
         "Excedencia empírica de picos (ruido de 0-2 kHz)",
     r"Standardized peak height $z = a/\sigma_x$":
         r"Altura de pico estandarizada $z = a/\sigma_x$",
-    "Prob[peak > z]": "Prob[pico > z]",
+    r"$\mathrm{Prob}[\mathrm{peak} > z]$": r"$\mathrm{Prob}[\mathrm{pico} > z]$",
     r"low-pass noise: $r = N_0/2M = \sqrt{5}/3$; negative maxima exist,"
     "\nso the peak law sits between Gaussian and Rayleigh (B&P 5.5.4)":
         r"ruido paso bajo: $r = N_0/2M = \sqrt{5}/3$; existen máximos"
@@ -4284,13 +4285,14 @@ _ES_EXACT = {
     "Measured rates against each record's own Rice curve":
         "Tasas medidas frente a la curva de Rice de cada registro",
     "Gaussian reference": "Referencia gaussiana",
-    "hard-clipped at 2.5 σ": "recortado duro a 2,5 σ",
-    "Gaussian + sparse 6 σ spikes": "gaussiano + picos dispersos de 6 σ",
+    r"hard-clipped at $2.5\,\sigma$": r"recortado duro a $2{,}5\,\sigma$",
+    r"Gaussian + sparse $6\,\sigma$ spikes":
+        r"gaussiano + picos dispersos de $6\,\sigma$",
     "spikes lift both tails above the curve":
         "los picos elevan las dos colas por encima de la curva",
-    "clipping: no crossings past 2.5 σ":
-        "recorte: sin cruces más allá de 2,5 σ",
-    "Crossing level a / σ": "Nivel de cruce a / σ",
+    r"clipping: no crossings past $2.5\,\sigma$":
+        r"recorte: sin cruces más allá de $2{,}5\,\sigma$",
+    r"Crossing level $a/\sigma$": r"Nivel de cruce $a/\sigma$",
     "Analysis upper cut-off [kHz]":
         "Frecuencia de corte superior de análisis [kHz]",
     "Irregularity factor $r$": "Factor de irregularidad $r$",
@@ -4299,8 +4301,8 @@ _ES_EXACT = {
     "ideal low-pass, $\\sqrt{5}/3$ = 0.745":
         "paso bajo ideal, $\\sqrt{5}/3$ = 0,745",
     "the physical band ends at 2 kHz": "la banda física acaba en 2 kHz",
-    "Correlation coefficient ρ between the two terms":
-        "Coeficiente de correlación ρ entre los dos términos",
+    r"Correlation coefficient $\rho$ between the two terms":
+        r"Coeficiente de correlación $\rho$ entre los dos términos",
     "Combined standard uncertainty [dB]":
         "Incertidumbre típica combinada [dB]",
     "Two terms of 0.3 dB each": "Dos términos de 0,3 dB cada uno",
@@ -5093,10 +5095,10 @@ _ES_PATTERNS = [
     (r"^counted (\d+)$", r"contadas \1"),
     (r"^law (\d+)$", r"ley \1"),
     # Core-metrology figures: dynamic verdict / error strings
-    (r"^r = (\d+) runs, accept \((\d+), (\d+)\]: trend-free$",
-     r"r = \1 rachas, aceptación (\2, \3]: sin tendencia"),
-    (r"^r = (\d+) runs, accept \((\d+), (\d+)\]: rejected$",
-     r"r = \1 rachas, aceptación (\2, \3]: rechazada"),
+    (r"^\$r\$ = (\d+) runs, accept \((\d+), (\d+)\]: trend-free$",
+     r"$r$ = \1 rachas, aceptación (\2, \3]: sin tendencia"),
+    (r"^\$r\$ = (\d+) runs, accept \((\d+), (\d+)\]: rejected$",
+     r"$r$ = \1 rachas, aceptación (\2, \3]: rechazada"),
     (r"^max \|recovered - true\| = (.+)$",
      r"máx |recuperada - verdadera| = \1"),
     (r"^estimated delay removed: (.+) samples$",
@@ -5232,15 +5234,23 @@ _ES_PATTERNS = [
      r"la banda de \1-\2 Hz del panel (c)"),
     (r"^segment values span (.+) to (.+)$",
      r"los valores de segmento van de \1 a \2"),
-    ((r"^\(b\) Full band: A = (.+), inside \((.+), (.+)\] — accepted, "
+    ((r"^\(b\) Full band: \$A\$ = (.+), inside \((.+), (.+)\] — accepted, "
       r"and blind$"),
-     r"(b) Banda completa: A = \1, dentro de (\2, \3] — aceptado, y ciego"),
-    ((r"^\(c\) Band-limited (.+)-(.+) Hz: A = (.+), outside \((.+), (.+)\] "
-      r"— rejected$"),
-     ("(c) Limitado a la banda de \\1-\\2 Hz: A = \\3, fuera de (\\4, \\5] "
+     r"(b) Banda completa: $A$ = \1, dentro de (\2, \3] — aceptado, y ciego"),
+    ((r"^\(c\) Band-limited (.+)-(.+) Hz: \$A\$ = (.+), outside "
+      r"\((.+), (.+)\] — rejected$"),
+     ("(c) Limitado a la banda de \\1-\\2 Hz: $A$ = \\3, fuera de (\\4, \\5] "
       "— rechazado")),
-    (r"^quadrature value (.+) dB \(assumes ρ = 0\)$",
-     r"valor en cuadratura \1 dB (supone ρ = 0)"),
+    # These three carry mathtext, so the automatic decimal-comma pass skips
+    # them and the comma is baked into the groups instead.
+    (r"^quadrature value (\d+)\.(\d+) dB \(assumes \$\\rho = 0\$\)$",
+     r"valor en cuadratura \1,\2 dB (supone $\\rho = 0$)"),
+    (r"^\$u_c\$ = (\d+)\.(\d+) dB$", r"$u_c$ = \1,\2 dB"),
+    ((r"^\$Y\$ = (\d+)\.(\d+) dB,  \$U\$ = (\d+)\.(\d+) dB "
+      r"\(\$k\$ = (\d+)\.(\d+)\)$"),
+     r"$Y$ = \1,\2 dB,  $U$ = \3,\4 dB ($k$ = \5,\6)"),
+    (r"^GUM \$Y \\pm U\$  \[(−?\d+)\.(\d+), (−?\d+)\.(\d+)\]$",
+     r"GUM $Y \\pm U$  [\1,\2, \3,\4]"),
     (r"^\+(.+) % understated$", r"+\1 % subestimado"),
     (r"^MC 95 % interval \[(.+), (.+)\]$", r"Intervalo MC 95 % [\1, \2]"),
     # Spectral estimation: the Welch segment trade-off and the noise-colour
