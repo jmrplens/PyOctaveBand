@@ -1,0 +1,208 @@
+#  Copyright (c) 2026. Jose Manuel Requena Plens
+"""What the clip fingerprint has to notice, and what it has to ignore.
+
+The clips are the one committed asset CI never regenerates, so the only thing
+standing between "the code that draws this clip changed" and a clip that
+quietly keeps its old frames is the fingerprint
+(``scripts/animation_fingerprint.py``) and the check that compares it. These
+tests pin both halves of that bargain, because either one failing makes the
+gate worthless: a fingerprint that misses a real change lets the staleness
+through, and a fingerprint that moves on a reflowed comment costs a
+several-minute re-render for nothing and is switched off within a week.
+
+The tree used here is a miniature of the real package written into a tmp
+directory: the registry with its ``_ANIMATIONS`` map, a clip module, the
+shared clip tail, the theme and the two translation tables. Building it from
+source text rather than from the repo is what lets a test change one line and
+ask what the fingerprint did about it.
+"""
+
+from __future__ import annotations
+
+import pathlib
+import sys
+
+import pytest
+
+_SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
+if _SCRIPTS not in sys.path:
+    sys.path.insert(0, _SCRIPTS)
+
+import animation_fingerprint as fp
+
+REGISTRY = '''
+from .schematics import animate_one, animate_two
+
+_ANIMATIONS = {
+    "anim_one": animate_one,
+    "anim_two": animate_two,
+}
+'''
+
+SCHEMATICS = '''
+from .media import _render_clip, _translate_str
+from .theme import COLOR_PRIMARY
+
+
+def _shared_label(ax):
+    """A helper both clips call."""
+    ax.text(0.0, 0.0, _translate_str("shared caption"), color=COLOR_PRIMARY)
+
+
+def animate_one(output_dir):
+    """The first clip."""
+    _shared_label(None)
+    _translate_str("only in clip one")
+    _translate_str(f"level {1.0:.1f} dB")
+    _render_clip(None, None, output_dir, "anim_one")
+
+
+def animate_two(output_dir):
+    """The second clip, which shares nothing but the tail."""
+    _translate_str("only in clip two")
+    _render_clip(None, None, output_dir, "anim_two")
+'''
+
+MEDIA = '''
+from .i18n import _translate_figure
+
+_ANIM_FPS = 20
+
+
+def _translate_str(s):
+    return s
+
+
+def _render_clip(fig, update, output_dir, stem):
+    _translate_figure(fig)
+    return _ANIM_FPS
+'''
+
+THEME = '''
+COLOR_PRIMARY = "#1f77b4"
+
+
+def set_theme(dark):
+    """The palette every frame is drawn with."""
+    return COLOR_PRIMARY if dark else COLOR_PRIMARY
+'''
+
+I18N = '''
+_ES_EXACT = {
+    "shared caption": "rótulo compartido",
+    "only in clip one": "solo en el clip uno",
+    "only in clip two": "solo en el clip dos",
+    "some other figure": "otra figura cualquiera",
+}
+
+_ES_PATTERNS = [
+    (r"^level (\\d+)\\.(\\d+) dB$", r"nivel \\1,\\2 dB"),
+    (r"^unrelated (\\d+) thing$", r"cosa \\1 no relacionada"),
+]
+
+
+def _translate_figure(fig):
+    return fig
+'''
+
+
+@pytest.fixture
+def tree(tmp_path: pathlib.Path) -> pathlib.Path:
+    """A miniature figures package, complete enough to fingerprint."""
+    package = tmp_path / "scripts" / "figures"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    for name, body in (("registry", REGISTRY), ("schematics", SCHEMATICS),
+                       ("media", MEDIA), ("theme", THEME), ("i18n", I18N)):
+        (package / f"{name}.py").write_text(body, encoding="utf-8")
+    return tmp_path
+
+
+def edit(tree: pathlib.Path, module: str, old: str, new: str) -> None:
+    """Rewrite one fragment of a module of the miniature tree."""
+    path = tree / "scripts" / "figures" / f"{module}.py"
+    text = path.read_text(encoding="utf-8")
+    assert text.count(old) == 1, old
+    path.write_text(text.replace(old, new), encoding="utf-8")
+
+
+def test_every_registered_clip_is_fingerprinted(tree: pathlib.Path) -> None:
+    assert sorted(fp.fingerprints(tree)) == ["anim_one", "anim_two"]
+
+
+def test_the_same_sources_give_the_same_fingerprint(tree: pathlib.Path) -> None:
+    assert fp.fingerprints(tree) == fp.fingerprints(tree)
+
+
+@pytest.mark.parametrize(
+    ("module", "old", "new", "moves"),
+    [
+        # The clip's own body: the whole point.
+        ("schematics", '"only in clip one"', '"clip one, reworded"',
+         {"anim_one"}),
+        # A helper it calls, in its own module.
+        ("schematics", 'ax.text(0.0, 0.0', 'ax.text(0.5, 0.0', {"anim_one"}),
+        # The shared clip tail: both clips are drawn through it.
+        ("media", "_ANIM_FPS = 20", "_ANIM_FPS = 25", {"anim_one", "anim_two"}),
+        # The theme, which nothing in a clip calls and every frame carries.
+        ("theme", '"#1f77b4"', '"#d62728"', {"anim_one", "anim_two"}),
+        # The translation machinery (this is the shape of the Spanish
+        # minus-sign repair that started all this).
+        ("i18n", "def _translate_figure(fig):\n    return fig",
+         "def _translate_figure(fig):\n    return str(fig)",
+         {"anim_one", "anim_two"}),
+        # A translation the clip's own text selects, exact and by pattern.
+        ("i18n", '"solo en el clip uno"', '"solo en el primer clip"',
+         {"anim_one"}),
+        ("i18n", '"rótulo compartido"', '"el rótulo compartido"',
+         {"anim_one"}),
+        ("i18n", r'r"nivel \1,\2 dB"', r'r"nivel de \1,\2 dB"', {"anim_one"}),
+    ],
+)
+def test_a_change_that_reaches_a_clip_moves_its_fingerprint(
+        tree: pathlib.Path, module: str, old: str, new: str,
+        moves: set[str]) -> None:
+    before = fp.fingerprints(tree)
+    edit(tree, module, old, new)
+    after = fp.fingerprints(tree)
+    moved = {clip for clip in before if before[clip] != after[clip]}
+    assert moved == moves
+
+
+@pytest.mark.parametrize(
+    ("module", "old", "new"),
+    [
+        # Comments and docstrings: the fingerprint is taken over the syntax
+        # tree, so prose cannot cost a re-render.
+        ("schematics", '"""The first clip."""', '"""The first clip, rewritten\n\n    with a longer explanation.\n    """'),
+        ("schematics", '"""A helper both clips call."""', "'''A helper.'''"),
+        ("theme", '"""The palette every frame is drawn with."""',
+         '"""The palette."""  # and a trailing comment'),
+        # A translation entry no clip of this tree writes, which is what the
+        # per-clip selection of the tables buys: an unrelated figure gaining
+        # or changing a Spanish string must not mark every clip stale.
+        ("i18n", '"otra figura cualquiera"', '"una figura distinta"'),
+        ("i18n", r'r"cosa \1 no relacionada"', r'r"otra cosa \1"'),
+    ],
+)
+def test_a_change_that_cannot_reach_a_clip_leaves_it_alone(
+        tree: pathlib.Path, module: str, old: str, new: str) -> None:
+    before = fp.fingerprints(tree)
+    edit(tree, module, old, new)
+    assert fp.fingerprints(tree) == before
+
+
+def test_a_new_clip_is_reported_rather_than_ignored(tree: pathlib.Path) -> None:
+    """A clip added to the registry has no stamp until it is rendered."""
+    before = fp.fingerprints(tree)
+    edit(tree, "registry", 'from .schematics import animate_one, animate_two',
+         'from .schematics import animate_one, animate_three, animate_two')
+    edit(tree, "registry", '    "anim_two": animate_two,',
+         '    "anim_two": animate_two,\n    "anim_three": animate_three,')
+    edit(tree, "schematics", 'def animate_two(output_dir):',
+         'def animate_three(output_dir):\n    """A third clip."""\n'
+         '    _render_clip(None, None, output_dir, "anim_three")\n\n\n'
+         'def animate_two(output_dir):')
+    after = fp.fingerprints(tree)
+    assert set(after) - set(before) == {"anim_three"}
+    assert {c: after[c] for c in before} == before

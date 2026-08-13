@@ -17,7 +17,7 @@ _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 
-from figures.i18n import _decimal_comma
+from figures.i18n import _decimal_comma, _ES_PATTERNS, lookup
 
 
 @pytest.mark.parametrize(
@@ -101,3 +101,31 @@ def test_legitimate_decimals_still_take_the_comma(
     text: str, expected: str
 ) -> None:
     assert _decimal_comma(text) == expected
+
+
+def test_every_replacement_template_of_the_pattern_table_compiles() -> None:
+    """One bad escape in one template silences the whole Spanish edition.
+
+    ``lookup`` walks the pattern list until something matches, and
+    ``re.sub`` compiles the *replacement* as it goes, so a template with a
+    stray ``\\l`` (a mathtext ``\\lambda`` written with one backslash instead
+    of two) raises for every string that reaches that row -- which is every
+    string the exact table and the earlier patterns do not answer. The
+    Spanish pass of a whole render run then dies on a label that has nothing
+    to do with the offending row, which is exactly how it was found.
+    """
+    import re
+
+    broken = []
+    for pattern, replacement in _ES_PATTERNS:
+        try:
+            re.sub(pattern, replacement, "")
+        except re.PatternError as exc:  # pragma: no cover - the failure text
+            broken.append(f"{pattern!r}: {exc}")
+    assert not broken, "\n".join(broken)
+
+
+def test_a_string_the_tables_do_not_know_comes_back_unchanged() -> None:
+    """The same guard, from the caller's side: no row may raise."""
+    assert lookup("zzz not a label anybody wrote 123") == (
+        "zzz not a label anybody wrote 123")
