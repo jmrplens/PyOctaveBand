@@ -1,0 +1,18 @@
+# What each committed clip was drawn by, one line per clip.
+#
+# The clips are not regenerated in CI (an FDTD run plus four video encodes
+# each), so nothing else can tell that the code drawing a clip has moved since
+# the clip was written. Each hash covers the clip's builder, everything it
+# reaches inside scripts/figures (the shared clip tail, the theme, the
+# translation machinery) and the translation-table entries its own strings
+# select; it is taken over the syntax tree, so comments and docstrings do not
+# move it. See scripts/animation_fingerprint.py.
+#
+# Written by the renderer. To refresh one clip, re-render it:
+#     python scripts/generate_graphs.py --animations --anim <clip>
+anim_fdtd_duct_cut_on 51eddf89a7eb4983
+anim_fdtd_expansion_chamber 996482c4a5016a89
+anim_fdtd_side_branch 71258bf06820cb15
+anim_image_source_buildup cc0098b6de500073
+anim_modulation_transfer b83da9124a6fead6
+anim_schroeder 46dfa1050eed8b9d
