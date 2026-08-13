@@ -235,6 +235,26 @@ def test_index_subscripts_are_italic() -> None:
             in element)
 
 
+def test_capital_greek_is_upright_and_lowercase_stays_italic() -> None:
+    # Capital Greek letters are operators and descriptors in this corpus
+    # and are set upright at every level, matching the roman Δ of
+    # difference of ISO 80000-2, the Δ_SOR print of ECAC Doc 29 §4.5.7 and
+    # the upright \Delta mathtext sets in the matplotlib figures.
+    element = _element("$ΔL_s$", size=20)
+    assert element.count("<tspan>Δ</tspan>") == 1
+    assert '<tspan font-style="italic">L</tspan>' in element
+    element = _element("$Δ_{SOR}$", size=20)
+    assert element.count("<tspan>Δ</tspan>") == 1
+    # Doc 29 prints the SOR subscript in italic (eq. 4-23): it is not on
+    # the curated roman list, so it takes the italic index default.
+    assert ('<tspan dy="4.4" font-size="14.0" font-style="italic">SOR</tspan>'
+            in element)
+    assert "italic" not in _element("banked by $Φ$ in turns")
+    # Lowercase Greek keeps the italic-variable rule, base and script.
+    assert '<tspan font-style="italic">θ</tspan>' in _element("$θ$")
+    assert '<tspan font-style="italic">η</tspan>' in _element("$η_{ij}$")
+
+
 def test_descriptive_subscripts_stay_upright() -> None:
     # The curated descriptive subscripts are word abbreviations and keep
     # the roman the standards print them in.
