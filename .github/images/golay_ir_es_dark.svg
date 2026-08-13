@@ -441,19 +441,58 @@ L 705.44375 28.798125
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 512.942129 372.685898 
+     <path d="M 498.554785 372.685898 
 L 695.744785 372.685898 
 Q 699.344785 372.685898 699.344785 369.085898 
-L 699.344785 347.120977 
-Q 699.344785 343.520977 695.744785 343.520977 
-L 512.942129 343.520977 
-Q 509.342129 343.520977 509.342129 347.120977 
-L 509.342129 369.085898 
-Q 509.342129 372.685898 512.942129 372.685898 
+L 699.344785 345.94957 
+Q 699.344785 342.34957 695.744785 342.34957 
+L 498.554785 342.34957 
+Q 494.954785 342.34957 494.954785 345.94957 
+L 494.954785 369.085898 
+Q 494.954785 372.685898 498.554785 372.685898 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(512.942129 355.220449)">máx |recuperada - verdadera| = 2,1e-14</text>
+    <!-- $\mathrm{máx}\,|\mathrm{recuperada} - \mathrm{verdadera}| = 2{,}1\times10^{-14}$ -->
+    <g style="fill: #ffffff" transform="translate(498.554785 355.220449)">
+     <text>
+      <tspan x="0" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      <tspan x="8.76709" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">á</tspan>
+      <tspan x="14.282227" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">x</tspan>
+      <tspan x="21.069609" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">|</tspan>
+      <tspan x="24.101836" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="27.802031" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="33.339141" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">c</tspan>
+      <tspan x="38.287383" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">u</tspan>
+      <tspan x="43.991484" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">p</tspan>
+      <tspan x="49.704375" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="55.241484" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="58.94168" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="64.456816" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="70.169707" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="77.438262" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
+      <tspan x="86.732695" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">v</tspan>
+      <tspan x="92.058867" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="97.595976" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="101.296172" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="107.009062" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="112.524199" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="118.23709" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="123.774199" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="127.474394" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="132.989531" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">|</tspan>
+      <tspan x="137.775176" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="147.069609" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="152.795684" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">,</tspan>
+      <tspan x="155.656523" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="163.136016" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">×</tspan>
+      <tspan x="172.430449" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="178.156523" y="-0.68925" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="183.96873" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">−</tspan>
+      <tspan x="189.247441" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="193.255693" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">4</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(578.505723 366.02291)">identidad exacta sin ruido</text>
    </g>
    <g id="text_19">

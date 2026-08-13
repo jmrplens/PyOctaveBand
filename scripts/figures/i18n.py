@@ -3852,7 +3852,6 @@ _ES_EXACT = {
     "Recovered IR (golay_impulse_response)":
         "RI recuperada (golay_impulse_response)",
     "True system response": "Respuesta verdadera del sistema",
-    "noise-free closed-form identity": "identidad exacta sin ruido",
     # regularized_inversion: vocabulary from the Spanish page (respuesta
     # medida, filtro inverso, producto ecualizado, banda ecualizada; "pone
     # tope" for caps, "reforzar" for boosting).
@@ -4643,9 +4642,13 @@ _ES_PATTERNS = [
     (r"^Welch 95 % interval \(\$n_d\$ = (\d+)\.(\d+)\)$",
      r"Intervalo del 95 % de Welch ($n_d$ = \1,\2)"),
     # golay_ir readout (baked-in recovery error); wording from the Spanish
-    # page and the exact entry above ("identidad exacta sin ruido").
-    (r"^max \|recovered - true\| = (.+)\nnoise-free closed-form identity$",
-     "máx |recuperada - verdadera| = \\1\nidentidad exacta sin ruido"),
+    # page; the mathtext key skips the decimal-comma pass, so the pattern
+    # writes the mantissa comma as {,} inside the math.
+    ((r"^\$\\max\\,\|\\mathrm\{recovered\} - \\mathrm\{true\}\|"
+      r" = (\d)\.(\d)\\times10\^\{(-?\d+)\}\$"
+      r"\nnoise-free closed-form identity$"),
+     ("$\\\\mathrm{máx}\\\\,|\\\\mathrm{recuperada} - \\\\mathrm{verdadera}|"
+      " = \\1{,}\\2\\\\times10^{\\3}$\nidentidad exacta sin ruido")),
     # dbfs_versus_spl legend (baked-in calibrator offset): symbols shared,
     # comma from the save-time pass.
     (r"^dBFS \+ (.+) dB$", r"dBFS + \1 dB"),
@@ -5178,8 +5181,6 @@ _ES_PATTERNS = [
      r"$r$ = \1 rachas, aceptación (\2, \3]: sin tendencia"),
     (r"^\$r\$ = (\d+) runs, accept \((\d+), (\d+)\]: rejected$",
      r"$r$ = \1 rachas, aceptación (\2, \3]: rechazada"),
-    (r"^max \|recovered - true\| = (.+)$",
-     r"máx |recuperada - verdadera| = \1"),
     (r"^estimated delay removed: (.+) samples$",
      r"retardo estimado eliminado: \1 muestras"),
     # FDTD second-batch clips: baked-number pills and titles
