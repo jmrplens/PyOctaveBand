@@ -8,6 +8,7 @@ instrument classes that qualify them. Everything here is embedded by a page
 under ``devices/``.
 """
 
+import re
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -17,7 +18,7 @@ from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -31,6 +32,12 @@ from .theme import (
     measure_weighting_response,
     save_figure,
 )
+
+# A negative reading a library plot assembled with ``format()``: the ASCII
+# hyphen before a digit, in a position no word or bracket claims. Restated to
+# the typographic U+2212 the axis formatters ship (the criterion of the
+# corpus-wide sweep over rendered SVG text).
+_ASCII_MINUS_RE = re.compile(r"(?<![\w)\]])-(?=\d)")
 
 
 def generate_intensity_demo(output_dir: str) -> None:
@@ -70,21 +77,23 @@ def generate_intensity_demo(output_dir: str) -> None:
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
     for ax, res, title in [
-        (ax1, plane, "Plane wave: Lp ≈ LI"),
+        (ax1, plane, "Plane wave: $L_p \\approx L_I$"),
         (ax2, standing, "Standing wave: reactive field"),
     ]:
         ax.semilogx(res.frequency, res.pressure_level, marker="o", markersize=5,
                     color=COLOR_PRIMARY, linewidth=1.5, markerfacecolor="white",
-                    markeredgewidth=1.3, label="Pressure level Lp")
+                    markeredgewidth=1.3, label="Pressure level $L_p$")
         ax.semilogx(res.frequency, res.intensity_level, marker="s", markersize=5,
                     color=COLOR_SECONDARY, linewidth=1.5, linestyle="--",
                     markerfacecolor="white", markeredgewidth=1.3,
-                    label="Intensity level LI")
+                    label="Intensity level $L_I$")
         apply_axis_styling(ax, title, xlim=(90, 5600), ylim=(0, 85))
         # The standard octave ticks extend past the band range: re-clamp.
         ax.set_xlim(90, 5600)
         dpi_db = round(float(res.total_pressure_intensity_index), 1) + 0.0
-        ax.text(0.05, 0.33, f"Pressure-intensity index\nδpI = {dpi_db:.1f} dB",
+        ax.text(0.05, 0.33,
+                f"Pressure-intensity index\n"
+                f"$\\delta_{{pI}}$ = {_fmt_minus(dpi_db, '.1f')} dB",
                 transform=ax.transAxes, fontsize=10, va="bottom", color=COLOR_FG)
         ax.legend(loc="upper right", fontsize=9)
     ax2.set_ylabel("")
@@ -151,9 +160,9 @@ def generate_distortion(output_dir: str) -> None:
     ha = np.asarray(res.harmonic_amplitudes)
     hdb = 20.0 * np.log10(np.maximum(ha, 1e-12) / ha[0])
     ax.plot(hz, hdb, "o", color=COLOR_SECONDARY, markersize=7, zorder=6,
-            label="Harmonics n·f₁")
+            label="Harmonics $n f_1$")
     for k, (fk, lk) in enumerate(zip(hz, hdb), start=1):
-        ax.annotate(f"n={k}", xy=(fk, lk), xytext=(0, 7),
+        ax.annotate(f"$n$ = {k}", xy=(fk, lk), xytext=(0, 7),
                     textcoords="offset points", ha="center", fontsize=8,
                     color=COLOR_FG)
 
@@ -217,8 +226,8 @@ def generate_frequency_response(output_dir: str) -> None:
         np.mean(clean_x**2)) * noise_frac_in
 
     cases = (
-        ("Noise on the output — H1 is unbiased", clean_x, y_out),
-        ("Noise on the input — H2 is unbiased", x_in, clean_y),
+        ("Noise on the output — $H_1$ is unbiased", clean_x, y_out),
+        ("Noise on the input — $H_2$ is unbiased", x_in, clean_y),
     )
 
     _fig, axes = plt.subplots(
@@ -234,11 +243,12 @@ def generate_frequency_response(output_dir: str) -> None:
 
         ax_mag, ax_coh = axes[0][col], axes[1][col]
         ax_mag.semilogx(freqs, true_db, color=COLOR_FG, linestyle="--",
-                        linewidth=1.6, alpha=0.7, label="True |H|")
+                        linewidth=1.6, alpha=0.7, label="True $|H|$")
         ax_mag.semilogx(freqs, h1.magnitude_db[pos], color=COLOR_PRIMARY,
-                        linewidth=1.8, label="H1 = Gxy / Gxx")
+                        linewidth=1.8, label="$H_1 = G_{xy}/G_{xx}$")
         ax_mag.semilogx(freqs, h2.magnitude_db[pos], color=COLOR_SECONDARY,
-                        linewidth=1.5, linestyle="-.", label="H2 = Gyy / Gyx")
+                        linewidth=1.5, linestyle="-.",
+                        label="$H_2 = G_{yy}/G_{yx}$")
         ax_mag.set_ylim(-80.0, 12.0)
         ax_mag.set_title(title, fontweight="bold", fontsize=11, pad=10)
         ax_mag.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -259,7 +269,8 @@ def generate_frequency_response(output_dir: str) -> None:
             snr = np.full_like(freqs, 1.0 / noise_frac_in**2)
         snr = np.maximum(snr, 1e-9)
         ax_coh.semilogx(freqs, snr / (1.0 + snr), color=COLOR_FG,
-                        linestyle=":", linewidth=1.4, label="SNR / (1 + SNR)")
+                        linestyle=":", linewidth=1.4,
+                        label="$\\mathrm{SNR}/(1 + \\mathrm{SNR})$")
         ax_coh.axhline(0.9, color=COLOR_SECONDARY, linestyle="--",
                        linewidth=1.2, alpha=0.8)
         ax_coh.set_ylabel("Coherence" if col == 0 else "")
@@ -272,7 +283,7 @@ def generate_frequency_response(output_dir: str) -> None:
         for _axf in (ax_mag, ax_coh):
             format_frequency_axis(_axf, 20.0, fs / 2.0)
     axes[0][0].set_ylabel("Magnitude [dB]")
-    _fig.suptitle("Choosing Between H1 and H2 (Bendat & Piersol)",
+    _fig.suptitle("Choosing Between $H_1$ and $H_2$ (Bendat & Piersol)",
                   fontweight="bold", fontsize=13)
     plt.tight_layout()
     save_figure(output_dir, "frequency_response.svg")
@@ -303,19 +314,19 @@ def generate_swept_sine_thd(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.loglog(freqs, 100.0 * res.thd[sel], color=COLOR_PRIMARY,
-              linewidth=2.0, label="Total THD(f)")
+              linewidth=2.0, label="Total $\\mathrm{THD}(f)$")
     ax.loglog(freqs, 100.0 * res.distortion_ratios[0][sel],
               color=COLOR_SECONDARY, linewidth=1.5, linestyle="--",
-              label="2nd harmonic d₂(f)")
+              label="2nd harmonic $d_2(f)$")
     ax.loglog(freqs, 100.0 * res.distortion_ratios[1][sel],
               color=COLOR_TERTIARY, linewidth=1.5, linestyle="--",
-              label="3rd harmonic d₃(f)")
+              label="3rd harmonic $d_3(f)$")
     ax.axhline(100.0 * (a2 / 2.0) / h1_ref, color=COLOR_SECONDARY,
                linestyle=":", linewidth=1.2, alpha=0.8,
-               label="Chebyshev asymptote (a₂/2)/H₁")
+               label="Chebyshev asymptote $(a_2/2)/H_1$")
     ax.axhline(100.0 * (a3 / 4.0) / h1_ref, color=COLOR_TERTIARY,
                linestyle=":", linewidth=1.2, alpha=0.8,
-               label="Chebyshev asymptote (a₃/4)/H₁")
+               label="Chebyshev asymptote $(a_3/4)/H_1$")
     ax.set_xlabel("Excitation frequency [Hz]")
     ax.set_ylabel("Distortion re fundamental [%]")
     ax.set_title("Swept-Sine Harmonic Distortion by Order (Farina / Novak)",
@@ -328,7 +339,7 @@ def generate_swept_sine_thd(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.985, 0.965,
             "one sweep separates every distortion order;\n"
-            "each rolls off where its product n·f crosses the 3 kHz corner",
+            "each rolls off where its product $n f$ crosses the 3 kHz corner",
             transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -515,7 +526,8 @@ def generate_program_loudness(output_dir: str) -> None:
     ax.plot(res.short_term_time, res.short_term, color=COLOR_PRIMARY,
             linewidth=2.2, label="Short-term S (3 s)")
     ax.axhline(res.integrated, color=COLOR_SECONDARY, linestyle="--",
-               linewidth=1.8, label=f"Integrated I = {res.integrated:.1f} LUFS")
+               linewidth=1.8,
+               label=f"Integrated I = {_fmt_minus(res.integrated, '.1f')} LUFS")
 
     # Label the programme sections along the top.
     t0 = 0.0
@@ -527,11 +539,11 @@ def generate_program_loudness(output_dir: str) -> None:
             ax.axvline(t0, color=COLOR_GRID, linewidth=0.8)
 
     info = [
-        f"I     = {res.integrated:6.1f} LUFS",
+        f"I     = {_fmt_minus(res.integrated, '6.1f')} LUFS",
         f"LRA   = {res.loudness_range:6.1f} LU",
-        f"max M = {res.max_momentary:6.1f} LUFS",
-        f"max S = {res.max_short_term:6.1f} LUFS",
-        f"TPmax = {res.true_peak:6.1f} dBTP",
+        f"max M = {_fmt_minus(res.max_momentary, '6.1f')} LUFS",
+        f"max S = {_fmt_minus(res.max_short_term, '6.1f')} LUFS",
+        f"TPmax = {_fmt_minus(res.true_peak, '6.1f')} dBTP",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
@@ -603,12 +615,13 @@ def generate_vibration_sound_power(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)",
-        f"S = {area:g} m2,  S0 = 1 m2",
-        "Part 1: e = 1 -> upper limit LW,max",
+        ("$L_W = L_v + 10\\,\\log_{10}(S/S_0) + 10\\,\\log_{10}(\\varepsilon)"
+        " + 10\\,\\log_{10}(411/400)$"),
+        f"$S$ = {area:g} m²,  $S_0$ = 1 m²",
+        "Part 1: $\\varepsilon = 1$ → upper limit $L_{W,\\mathrm{max}}$",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="left", fontsize=9, color=COLOR_FG, family="monospace",
+            va="bottom", ha="left", fontsize=9, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -799,10 +812,11 @@ def generate_sound_power_pressure_result(output_dir: str) -> None:
            linewidth=0.7, zorder=3)
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
-    ax.set_title(f"Enveloping-surface sound power (ISO 3744)  LWA = {lwa:.1f} dB(A)",
+    ax.set_title("Enveloping-surface sound power (ISO 3744)  "
+                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Sound power level LW [dB]")
+    ax.set_ylabel("Sound power level $L_W$ [dB]")
     ax.set_ylim(0.0, float(np.nanmax(lw)) + 8.0)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -840,10 +854,11 @@ def generate_sound_power_reverberation_result(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
-        f"Reverberation-room sound power (ISO 3741)  LWA = {lwa:.1f} dB(A)",
+        "Reverberation-room sound power (ISO 3741)  "
+        f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
         fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Sound power level LW [dB]")
+    ax.set_ylabel("Sound power level $L_W$ [dB]")
     ax.set_ylim(0.0, float(np.nanmax(lw)) + 8.0)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -887,10 +902,11 @@ def generate_sound_power_intensity_result(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
-        f"Intensity-scanning sound power (ISO 9614-2)  LWA = {lwa:.1f} dB(A)",
+        "Intensity-scanning sound power (ISO 9614-2)  "
+        f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
         fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Sound power level LW [dB]")
+    ax.set_ylabel("Sound power level $L_W$ [dB]")
     ax.set_ylim(0.0, float(np.nanmax(lw)) + 8.0)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -925,10 +941,11 @@ def generate_precision_anechoic_power(output_dir: str) -> None:
            linewidth=0.7, zorder=3)
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
-    ax.set_title(f"Precision sound power (ISO 3745)  LWA = {lwa:.1f} dB(A)",
+    ax.set_title("Precision sound power (ISO 3745)  "
+                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Sound power level LW [dB]")
+    ax.set_ylabel("Sound power level $L_W$ [dB]")
     ax.set_ylim(0.0, float(np.nanmax(lw)) + 8.0)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -978,10 +995,11 @@ def generate_intensity_scan_power(output_dir: str) -> None:
                        hatch="//", edgecolor="#888888", linewidth=0.8, zorder=2)
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
-    ax.set_title(f"Precision intensity scanning (ISO 9614-3)  LWA = {lwa:.1f} dB(A)",
+    ax.set_title("Precision intensity scanning (ISO 9614-3)  "
+                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Sound power level LW [dB]")
+    ax.set_ylabel("Sound power level $L_W$ [dB]")
     ax.set_ylim(0.0, float(np.nanmax(lw)) + 8.0)
     from matplotlib.patches import Patch
     handle = Patch(facecolor="#888888", alpha=0.28, hatch="//",
@@ -1009,7 +1027,7 @@ def generate_silencer_expansion_chamber(output_dir: str) -> None:
         res = expansion_chamber(freqs, length, m * pipe_area, pipe_area)
         peak = 10.0 * np.log10(1.0 + 0.25 * (m - 1.0 / m) ** 2)
         ax.plot(freqs, res.transmission_loss, color=color, lw=1.8,
-                label=f"m = {int(m)}  →  {peak:.1f} dB")
+                label=f"$m$ = {int(m)}  →  {peak:.1f} dB")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Transmission loss [dB]")
     ax.set_title("Expansion-chamber transmission loss (Bies Eq. 8.111)",
@@ -1018,7 +1036,8 @@ def generate_silencer_expansion_chamber(output_dir: str) -> None:
     ax.set_ylim(0.0, 20.0)
     format_frequency_axis(ax, 20.0, 2000.0)
     ax.grid(True, which="both", alpha=0.4)
-    ax.legend(loc="upper right", fontsize="small", title="Area ratio m = Sexp/Sduct")
+    ax.legend(loc="upper right", fontsize="small",
+              title="Area ratio $m = S_{\\mathrm{exp}}/S_{\\mathrm{duct}}$")
     plt.tight_layout()
     save_figure(output_dir, "silencer_expansion_chamber.svg")
     plt.close()
@@ -1107,7 +1126,7 @@ def generate_silencer_selection(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     ax.semilogx(freqs[inside], np.asarray(chamber.transmission_loss)[inside],
                 color=COLOR_PRIMARY, lw=1.9,
-                label="Reactive: 0.3 m expansion chamber, m = 4")
+                label="Reactive: 0.3 m expansion chamber, $m = 4$")
     ax.semilogx(freqs[inside], np.asarray(branch.transmission_loss)[inside],
                 color=COLOR_PRIMARY, lw=1.7, ls="--",
                 label="Reactive: Helmholtz branch tuned to 100 Hz")
@@ -1163,14 +1182,15 @@ def generate_silencer_extended_tube(output_dir: str) -> None:
     ax.plot(freqs, plain.transmission_loss, color=COLOR_FG, lw=1.6, ls="--",
             label="Plain chamber, 0.4 m")
     ax.plot(freqs, inlet.transmission_loss, color=COLOR_PRIMARY, lw=1.9,
-            label="Inlet extension L/4 = 0.10 m")
+            label="Inlet extension $L/4$ = 0.10 m")
     ax.plot(freqs, both.transmission_loss, color=COLOR_SECONDARY, lw=1.7,
-            ls="-.", label="Inlet L/4 and outlet L/2 = 0.20 m")
+            ls="-.", label="Inlet $L/4$ and outlet $L/2$ = 0.20 m")
     trough = 343.0 / (2.0 * kwargs["length"])
     ax.axvline(trough, color=COLOR_GRID, lw=1.2, ls=":")
-    ax.annotate(f"c/2L = {trough:.0f} Hz: the plain chamber is transparent "
-                "(0.0 dB),\nthe L/4 inlet gives 5.1 dB and the L/4 + L/2 pair "
-                "74 dB", xy=(trough, 5.1), xytext=(trough * 1.06, 26.0),
+    ax.annotate(f"$c/2L$ = {trough:.0f} Hz: the plain chamber is transparent "
+                "(0.0 dB),\nthe $L/4$ inlet gives 5.1 dB and the $L/4$ + "
+                "$L/2$ pair 74 dB", xy=(trough, 5.1),
+                xytext=(trough * 1.06, 26.0),
                 fontsize="small", color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     for fx, label in ((355.0, "0.1 dB"), (261.0, "0.4 dB")):
@@ -1278,10 +1298,10 @@ def generate_reverberation_correction_terms(output_dir: str) -> None:
     meteo = np.full(freqs.size, res.c1 + res.c2)
     minus_six = np.full(freqs.size, -6.0)
     terms = (
-        ("10 lg(A/A₀)", absorption, COLOR_PRIMARY),
-        ("4.34 A/S", eyring, COLOR_TERTIARY),
+        ("$10\\,\\mathrm{lg}(A/A_0)$", absorption, COLOR_PRIMARY),
+        ("$4.34\\,A/S$", eyring, COLOR_TERTIARY),
         ("Waterhouse", res.waterhouse_correction, COLOR_SECONDARY),
-        ("C₁ + C₂", meteo, COLOR_MUTED),
+        ("$C_1 + C_2$", meteo, COLOR_MUTED),
         ("−6 dB", minus_six, theme_fill(COLOR_MUTED, None)),
     )
 
@@ -1296,18 +1316,19 @@ def generate_reverberation_correction_terms(output_dir: str) -> None:
         up = up + np.clip(values, 0.0, None)
         down = down + np.clip(values, None, 0.0)
     ax.plot(x, res.sound_power_level - lp, "o-", color=COLOR_FG, markersize=4,
-            linewidth=1.6, label="LW − L̄p")
+            linewidth=1.6, label="$L_W - \\bar{L}_p$")
     ax.axhline(0.0, color=COLOR_FG, linewidth=1.0)
     ax.annotate("the Waterhouse term rules the low bands\n"
                 "(1.68 dB at 100 Hz, 0.02 dB at 10 kHz)", (0.6, 14.4),
                 fontsize=10, color=COLOR_SECONDARY)
-    ax.annotate("4.34 A/S is 0.32 dB in this hard room, and 0.79 dB with the "
-                "same room damped to T₆₀ = 0.8 s",
+    ax.annotate("$4.34\\,A/S$ is 0.32 dB in this hard room, and 0.79 dB with "
+                "the same room damped to $T_{60}$ = 0.8 s",
                 (0.6, -7.4), fontsize=10, color=COLOR_TERTIARY)
     ax.set_xticks(x)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=60, ha="right",
                        fontsize=8)
-    ax.set(xlabel=LABEL_FREQ_HZ, ylabel="Contribution to LW − L̄p [dB]",
+    ax.set(xlabel=LABEL_FREQ_HZ,
+           ylabel="Contribution to $L_W - \\bar{L}_p$ [dB]",
            ylim=(-8.0, 17.5))
     ax.set_title("The five terms of ISO 3741 Eq. 20", fontweight="bold",
                  pad=12)
@@ -1399,9 +1420,10 @@ def generate_k1_k2_corrections(output_dir: str) -> None:
         axl.plot([m], [value], "o", color=COLOR_FG, markersize=5)
         axl.annotate(f"{m:g} dB → {label}", (m, value),
                      textcoords="offset points", xytext=(8, 8), fontsize=9)
-    axl.set(xlabel="Source-to-background margin ΔLp [dB]",
-            ylabel="Background correction K1 [dB]", xlim=(0, 20), ylim=(0, 4.2))
-    axl.set_title("K1 is a cliff, not a slope", fontweight="bold", pad=12)
+    axl.set(xlabel="Source-to-background margin $\\Delta L_p$ [dB]",
+            ylabel="Background correction $K_1$ [dB]", xlim=(0, 20),
+            ylim=(0, 4.2))
+    axl.set_title("$K_1$ is a cliff, not a slope", fontweight="bold", pad=12)
     axl.grid(color=COLOR_GRID, linestyle="-")
 
     axr.semilogx(ratio, k2, color=COLOR_PRIMARY, linewidth=2.0)
@@ -1409,18 +1431,18 @@ def generate_k1_k2_corrections(output_dir: str) -> None:
     axr.fill_between(ratio, 10.0 * np.log10(1.0 + ratio / 1.2),
                      10.0 * np.log10(1.0 + ratio / 0.8),
                      color=theme_fill(COLOR_PRIMARY, axr), zorder=0,
-                     label="A known to ±20 %")
+                     label="$A$ known to ±20 %")
     for limit, colour, name in ((4.0, COLOR_SECONDARY, "ISO 3744 limit"),
                                 (7.0, COLOR_TERTIARY, "ISO 3746 limit")):
         r_limit = 10.0 ** (limit / 10.0) - 1.0
         share = 100.0 * r_limit / (1.0 + r_limit)
         axr.axhline(limit, color=colour, linestyle="--", linewidth=1.4)
-        axr.annotate(f"{name}: K2 = {limit:g} dB\n{share:.0f} % of the measured "
-                     f"energy is room", (0.055, limit + 0.18), fontsize=9,
-                     color=colour)
-    axr.set(xlabel="4S/A", ylabel="Environmental correction K2 [dB]",
+        axr.annotate(f"{name}: $K_2$ = {limit:g} dB\n{share:.0f} % of the "
+                     f"measured energy is room", (0.055, limit + 0.18),
+                     fontsize=9, color=colour)
+    axr.set(xlabel="$4S/A$", ylabel="Environmental correction $K_2$ [dB]",
             ylim=(0, 11))
-    axr.set_title("K2 saturates, and inherits every error in A",
+    axr.set_title("$K_2$ saturates, and inherits every error in $A$",
                   fontweight="bold", pad=12)
     axr.grid(which="both", color=COLOR_GRID, linestyle="-")
     axr.legend(loc="lower right", fontsize=9)
@@ -1449,11 +1471,12 @@ def generate_radiation_efficiency(output_dir: str) -> None:
     values = sigma.radiation_efficiency
     ax.fill_between(freqs, values, 1.0, where=values < 1.0,
                     color=theme_fill(COLOR_SECONDARY, ax), zorder=0)
-    ax.annotate("ISO/TS 7849-1 assumes ε = 1 here", (60.0, 1.35), fontsize=10,
-                color=COLOR_SECONDARY)
+    ax.annotate("ISO/TS 7849-1 assumes $\\varepsilon = 1$ here", (60.0, 1.35),
+                fontsize=10, color=COLOR_SECONDARY)
     for band in (125.0, 1000.0):
         index = float(np.interp(band, freqs, sigma.radiation_index))
-        ax.annotate(f"{index:.1f} dB", (band, float(np.interp(band, freqs, values))),
+        ax.annotate(f"{_fmt_minus(index, '.1f')} dB",
+                    (band, float(np.interp(band, freqs, values))),
                     textcoords="offset points", xytext=(6, -16), fontsize=10,
                     color=COLOR_SECONDARY)
     ax.annotate("the gap Part 1 pays for: 25 dB at 63 Hz,\n"
@@ -1536,14 +1559,14 @@ def generate_partial_power_map(output_dir: str) -> None:
                  "the box unfolded", fontweight="bold")
     fig.colorbar(plt.cm.ScalarMappable(
         norm=Normalize(vmin, vmax), cmap=cmap), ax=ax, shrink=0.8,
-        label="LWi [dB]")
+        label="$L_{Wi}$ [dB]")
 
     per_face = np.add.reduceat(signed, np.arange(0, 20, 4))
     axb.bar(range(5), 10.0 * np.log10(np.abs(per_face) / 1e-12),
             color=[COLOR_PRIMARY] * 5, width=0.6)
     axb.axhline(float(res.sound_power_level[0]), color=COLOR_SECONDARY,
                 linestyle="--", linewidth=1.6,
-                label=f"LW = {float(res.sound_power_level[0]):.1f} dB")
+                label=f"$L_W$ = {float(res.sound_power_level[0]):.1f} dB")
     axb.set_xticks(range(5))
     axb.set_xticklabels(faces)
     axb.set_ylabel("Face total [dB]")
@@ -1592,7 +1615,7 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
         axt.semilogx(res.frequency[usable],
                      -10.0 * np.log10(res.bias_correction[usable]),
                      color=colour, linewidth=2.0,
-                     label=f"Δr = {dr * 1000:.0f} mm")
+                     label=f"$\\Delta r$ = {dr * 1000:.0f} mm")
         f_max = res.max_valid_frequency
         axt.axvline(f_max, color=colour, linestyle=":", linewidth=1.3)
         axt.annotate(f"{f_max / 1000:.2f} kHz", (f_max, -1.9), fontsize=9,
@@ -1602,13 +1625,15 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
         margin = 10.0 * np.log10(dr / 0.025)
         axb.semilogx(res.frequency, np.full(res.frequency.shape, margin),
                      color=colour, linewidth=2.2)
-        axb.annotate(f"{margin:+.1f} dB", (11000.0, margin + 0.3), fontsize=10,
+        axb.annotate(f"{_fmt_minus(margin, '+.1f')} dB",
+                     (11000.0, margin + 0.3), fontsize=10,
                      color=colour, ha="right")
     axt.axhline(-0.3, color=COLOR_FG, linestyle="--", linewidth=1.3)
-    axt.annotate("−0.3 dB: the bound f_max is quoted against",
+    axt.annotate("−0.3 dB: the bound $f_{\\mathrm{max}}$ is quoted against",
                  (24.0, -0.24), fontsize=9)
     axt.set(ylabel="Finite-difference bias [dB]", ylim=(-2.4, 0.35))
-    axt.set_title("High end: the finite-difference bias, and f_max = 0.1 c/Δr",
+    axt.set_title("High end: the finite-difference bias, and "
+                  "$f_{\\mathrm{max}} = 0.1\\,c/\\Delta r$",
                   fontweight="bold", pad=12)
     axt.grid(which="both", color=COLOR_GRID, linestyle="-")
     axt.legend(loc="lower left", fontsize=9)
@@ -1617,7 +1642,7 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
     axb.annotate("25 mm: the separation Table 2 is written for", (24.0, 0.3),
                  fontsize=9)
     axb.set(xlabel=LABEL_FREQ_HZ,
-            ylabel="δpI0 margin,\nre 25 mm [dB]", ylim=(-8.0, 4.6))
+            ylabel="$\\delta_{pI0}$ margin,\nre 25 mm [dB]", ylim=(-8.0, 4.6))
     axb.set_title("Low end: doubling the spacer is worth 3 dB of margin",
                   fontweight="bold", pad=10)
     axb.grid(which="both", color=COLOR_GRID, linestyle="-")
@@ -1656,17 +1681,18 @@ def generate_true_peak_intersample(output_dir: str) -> None:
     axl.axhline(np.abs(x).max(), color=COLOR_SECONDARY, linestyle="--",
                 linewidth=1.3)
     axl.axhline(1.0, color=COLOR_FG, linestyle="--", linewidth=1.3)
-    axl.annotate(f"sample peak {sample_peak:.2f} dBFS",
+    axl.annotate(f"sample peak {_fmt_minus(sample_peak, '.2f')} dBFS",
                  (0.012, np.abs(x).max() + 0.04), fontsize=9,
                  color=COLOR_SECONDARY)
-    axl.annotate(f"true peak {true_peak:.2f} dBTP", (0.012, 1.04), fontsize=9)
+    axl.annotate(f"true peak {_fmt_minus(true_peak, '.2f')} dBTP",
+                 (0.012, 1.04), fontsize=9)
     for tick in np.arange(0, (n - 1) / fs, 1.0 / (4 * fs)):
         axl.plot([tick * 1000.0], [-1.28], "|", color=COLOR_MUTED,
                  markersize=6)
     axl.annotate("4× oversampled grid", (0.02, -1.24), fontsize=9,
                  color=COLOR_MUTED)
     axl.set(xlabel="Time [ms]", ylabel="Amplitude [FS]", ylim=(-1.35, 1.25))
-    axl.set_title("A 12 kHz tone at π/4: every sample misses the peak",
+    axl.set_title("A 12 kHz tone at $\\pi/4$: every sample misses the peak",
                   fontweight="bold", pad=12)
     axl.grid(color=COLOR_GRID, linestyle="-")
     axl.legend(loc="lower right", fontsize=9)
@@ -1677,16 +1703,18 @@ def generate_true_peak_intersample(output_dir: str) -> None:
                              strict=True):
         bound = 20.0 * np.log10(np.cos(np.pi * f_norm / ratio))
         axr.plot(f_norm, bound, color=colour, linewidth=2.0,
-                 label=f"n = {ratio}")
+                 label=f"$n$ = {ratio}")
     worst = 20.0 * np.log10(np.cos(np.pi * 0.25 / 4))
     axr.plot([0.25], [worst], "o", color=COLOR_FG, markersize=6)
-    axr.annotate(f"BS.1770 asks for n ≥ 4 at 48 kHz:\n{worst:.2f} dB left at "
-                 "f_norm = 1/4", (0.25, worst), textcoords="offset points",
-                 xytext=(-150, -46), fontsize=9)
+    axr.annotate(f"BS.1770 asks for $n \\geq 4$ at 48 kHz:\n"
+                 f"{_fmt_minus(worst, '.2f')} dB left at "
+                 "$f_{\\mathrm{norm}} = 1/4$", (0.25, worst),
+                 textcoords="offset points", xytext=(-150, -46), fontsize=9)
     axr.axvline(0.25, color=COLOR_FG, linestyle=":", linewidth=1.2)
     axr.set(xlabel="Tone frequency / sampling rate", ylabel="Under-read [dB]",
             xlim=(0.0, 0.5), ylim=(-7.0, 0.4))
-    axr.set_title("Worst-case under-read, 20 lg cos(π f_norm / n)",
+    axr.set_title("Worst-case under-read, "
+                  "$20\\,\\mathrm{lg}\\,\\cos(\\pi f_{\\mathrm{norm}}/n)$",
                   fontweight="bold", pad=12)
     axr.grid(color=COLOR_GRID, linestyle="-")
     axr.legend(loc="lower left", fontsize=9)
@@ -1718,7 +1746,8 @@ def generate_channel_weight_map(output_dir: str) -> None:
         ax.text(sign * 90.0, 20.0, f"{high:.2f}\n(+1.5 dB)", ha="center",
                 va="center", fontsize=11, fontweight="bold")
     ax.text(0.0, 62.0, "1.0 everywhere else", ha="center", fontsize=11)
-    ax.annotate("60° ≤ |azimuth| ≤ 120°,  |elevation| < 30°", (0.0, -50.0),
+    ax.annotate("$60° \\leq |\\mathrm{azimuth}| \\leq 120°$,  "
+                "$|\\mathrm{elevation}| < 30°$", (0.0, -50.0),
                 ha="center", fontsize=10)
 
     speakers = (("L", -30.0, 0.0), ("R", 30.0, 0.0), ("C", 0.0, 0.0),
@@ -1761,13 +1790,14 @@ def generate_sound_power_grades_declaration(output_dir: str) -> None:
         u = float(emission.precision_uncertainty(sigma_r0, sigma_omc, 2.0))
         axl.errorbar([k], [lwa], yerr=[[u], [u]], fmt="o", markersize=8,
                      capsize=10, elinewidth=2.4, color=COLOR_PRIMARY)
-        axl.annotate(f"U = {u:.1f} dB", (k, lwa - u), textcoords="offset points",
+        axl.annotate(f"$U$ = {u:.1f} dB", (k, lwa - u),
+                     textcoords="offset points",
                      xytext=(0, -16), ha="center", va="top", fontsize=10)
     axl.axhline(93.0, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6,
                 label="declared limit 93 dB(A)")
     axl.set_xticks(range(len(grades)))
     axl.set_xticklabels([name for name, _ in grades], fontsize=9)
-    axl.set_ylabel("LWA [dB re 1 pW]")
+    axl.set_ylabel("$L_{W\\!A}$ [dB re 1 pW]")
     axl.set_ylim(84.0, 101.0)
     axl.set_title("One measurement, three grades: 92.4 dB(A) against a 93 dB "
                   "limit", fontweight="bold", pad=12)
@@ -1777,20 +1807,22 @@ def generate_sound_power_grades_declaration(output_dir: str) -> None:
     modes = (("Operating mode 1", 88.0, 2.0, 89.0),
              ("Operating mode 2", 95.0, 2.0, 98.0))
     for k, (name, level, k_wa, l1) in enumerate(modes):
-        axr.bar([k], [level], width=0.5, color=COLOR_PRIMARY, label="LWA"
-                if k == 0 else None)
+        axr.bar([k], [level], width=0.5, color=COLOR_PRIMARY,
+                label="$L_{W\\!A}$" if k == 0 else None)
         axr.bar([k], [k_wa], width=0.5, bottom=level, color=COLOR_MUTED,
-                label="K_WA" if k == 0 else None)
+                label="$K_{W\\!A}$" if k == 0 else None)
         axr.plot([k], [l1], "D", color=COLOR_SECONDARY, markersize=10,
-                 label="verification level L1" if k == 0 else None)
+                 label="verification level $L_1$" if k == 0 else None)
         verdict = "verified" if l1 <= level + k_wa else "not verified"
-        axr.annotate(f"LWAd = {level + k_wa:.0f} dB\nL1 = {l1:.0f} dB\n{verdict}",
+        axr.annotate(f"$L_{{W\\!Ad}}$ = {level + k_wa:.0f} dB\n"
+                     f"$L_1$ = {l1:.0f} dB\n{verdict}",
                      (k, max(l1, level + k_wa) + 1.4), ha="center", fontsize=9)
     axr.set_xticks(range(len(modes)))
     axr.set_xticklabels([name for name, *_ in modes], fontsize=9)
     axr.set_ylabel("A-weighted sound power level [dB]")
     axr.set_ylim(80.0, 106.0)
-    axr.set_title("ISO 4871 Annex B: LWAd = LWA + K_WA, verified when L1 ≤ LWAd",
+    axr.set_title("ISO 4871 Annex B: $L_{W\\!Ad} = L_{W\\!A} + K_{W\\!A}$, "
+                  "verified when $L_1 \\leq L_{W\\!Ad}$",
                   fontweight="bold", pad=12)
     axr.grid(axis="y", color=COLOR_GRID, linestyle="-")
     axr.legend(loc="upper left", fontsize=9)
@@ -1912,7 +1944,7 @@ def generate_hvac_end_reflection(output_dir: str) -> None:
                                       termination="flush")
         ax.semilogx(np.asarray(er.frequencies), np.asarray(er.values), "o-",
                     color=color, lw=1.8, ms=4,
-                    label=f"D = {int(diameter * 1000)} mm")
+                    label=f"$D$ = {int(diameter * 1000)} mm")
     ax.set_xlim(50.0, 2500.0)
     ax.set_ylim(bottom=0.0)
     format_frequency_axis(ax, 50.0, 2500.0)
@@ -1969,9 +2001,9 @@ def generate_duct_attenuation_elements(output_dir: str) -> None:
         ax.semilogx(bands, np.asarray(el.values), style, color=color, lw=1.8,
                     marker="o", ms=4, label=label)
     ax.axvline(343.0 / (24 * inch), color=COLOR_FG, lw=1.2, ls=":", alpha=0.7)
-    ax.annotate("W/λ = 1", xy=(343.0 / (24 * inch), 1.0),
+    ax.annotate("$W/\\lambda = 1$", xy=(343.0 / (24 * inch), 1.0),
                 xytext=(700.0, 1.4), fontsize="small", color=COLOR_FG)
-    ax.set_title("(b) One bend, W = 24 in", fontweight="bold", pad=8)
+    ax.set_title("(b) One bend, $W$ = 24 in", fontweight="bold", pad=8)
 
     ax = axes[1][0]
     for method, color, style in (("bies", COLOR_PRIMARY, "-"),
@@ -2064,8 +2096,8 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
         # zero carries no level to disagree about.
         carries = printed > 0.0
         worst = float(np.max(np.abs(printed - computed)[carries]))
-        ax.set_title(f"{title}  (worst Δ {worst:.0f} dB)", fontweight="bold",
-                     fontsize="medium", pad=7)
+        ax.set_title(f"{title}  (worst $\\Delta$ {worst:.0f} dB)",
+                     fontweight="bold", fontsize="medium", pad=7)
         ax.set_xlim(50.0, 10000.0)
         format_frequency_axis(ax, 50.0, 10000.0)
         ax.grid(True, which="both", alpha=0.4)
@@ -2096,7 +2128,7 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
                                        passages=5, height=24 * inch)
         ax.semilogx(bands, np.asarray(res.values), "o-", color=color, lw=1.8,
                     ms=4, label=f"{velocity:.0f} m/s")
-    ax.annotate("55 lg(V/V₀): 16.6 dB per\ndoubling, every band",
+    ax.annotate("$55\\,\\mathrm{lg}(V/V_0)$: 16.6 dB per\ndoubling, every band",
                 xy=(250.0, 55.0), xytext=(400.0, 26.0), fontsize="small",
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
@@ -2117,9 +2149,9 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
                     ms=4, label=f"{flow:.0f} cfm ({velocity:.1f} m/s)")
         ax.axvline(peak, color=color, lw=1.0, ls=":")
     limit = air_terminal_velocity_limit(30, opening="supply")
-    ax.annotate(f"peak band f_P = 48.8 U_G moves up one octave per\ndoubling "
-                f"of the face velocity; ASHRAE Table 9 caps\nthe neck of an "
-                f"RC 30 supply outlet at {limit:.1f} m/s",
+    ax.annotate(f"peak band $f_P = 48.8\\,U_G$ moves up one octave per\n"
+                f"doubling of the face velocity; ASHRAE Table 9 caps\nthe "
+                f"neck of an RC 30 supply outlet at {limit:.1f} m/s",
                 xy=(250.0, 33.0), xytext=(340.0, 12.0), fontsize="small",
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
@@ -2174,10 +2206,13 @@ def generate_fan_sound_power(output_dir: str) -> None:
     ax.semilogx(np.asarray(casing.frequencies), np.asarray(casing.values), "-.",
                 color=COLOR_FG, lw=1.6, marker="s", ms=4,
                 label="Casing attenuation (Table 13.8)")
-    ax.annotate("the C_BFI increment is 2 dB and lands whole in the\noctave "
-                "containing the blade tone: 500 Hz at 1200 rev/min\n× 24 "
-                "blades, 2 kHz if the fan is selected faster",
-                xy=(2000.0, 79.0), xytext=(220.0, 44.0), fontsize="small",
+    # The annotation starts clear of the efficiency inset (the committed
+    # asset drew the inset over its first words).
+    ax.annotate("the $C_{\\mathrm{BFI}}$ increment is 2 dB and lands whole in "
+                "the\noctave containing the blade tone: 500 Hz at "
+                "1200 rev/min\n× 24 blades, 2 kHz if the fan is selected "
+                "faster",
+                xy=(2000.0, 79.0), xytext=(460.0, 44.0), fontsize="small",
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     ax.set_xlim(50.0, 10000.0)
@@ -2195,7 +2230,7 @@ def generate_fan_sound_power(output_dir: str) -> None:
     inset.plot(grid, [fan_efficiency_correction(v) for v in grid],
                color=COLOR_PRIMARY, lw=1.8)
     inset.set_xlabel("static efficiency [% of peak]", fontsize="x-small")
-    inset.set_ylabel("$C_{EFF}$ [dB]", fontsize="x-small")
+    inset.set_ylabel("$C_{\\mathrm{EFF}}$ [dB]", fontsize="x-small")
     inset.tick_params(labelsize="x-small")
     inset.grid(True, alpha=0.4)
     plt.tight_layout()
@@ -2225,7 +2260,7 @@ def generate_hvac_elbow_flow_noise(output_dir: str) -> None:
                     color=color, lw=1.8, marker="o", ms=4, label=label)
     f_unity = 343.0 / width
     ax.axvline(f_unity, color=COLOR_FG, lw=1.2, ls=":", alpha=0.7)
-    ax.annotate("W / lambda = 1\n(W = 0.30 m, 1143 Hz)", xy=(f_unity, 1.6),
+    ax.annotate("$W/\\lambda = 1$\n($W$ = 0.30 m, 1143 Hz)", xy=(f_unity, 1.6),
                 xytext=(1.35 * f_unity, 1.2), fontsize="small", color=COLOR_FG)
     ax.set_xlim(50.0, 10000.0)
     ax.set_ylim(bottom=0.0)
@@ -2244,10 +2279,11 @@ def generate_hvac_elbow_flow_noise(output_dir: str) -> None:
                                            area=0.04)
         ax.semilogx(np.asarray(fn.frequencies), np.asarray(fn.values), "o-",
                     color=color, lw=1.8, ms=4,
-                    label=f"Straight duct, U = {velocity:.0f} m/s")
+                    label=f"Straight duct, $U$ = {velocity:.0f} m/s")
     bend = hvac.flow_noise_bend(bands, flow_velocity=10.0, area=0.04, height=0.2)
     ax.semilogx(np.asarray(bend.frequencies), np.asarray(bend.values), "s--",
-                color=COLOR_FG, lw=1.8, ms=4, label="Mitred bend, U = 10 m/s")
+                color=COLOR_FG, lw=1.8, ms=4,
+                label="Mitred bend, $U$ = 10 m/s")
     ax.annotate("one bend at 10 m/s beats\na straight run at 20 m/s\nbelow 500 Hz",
                 xy=(125.0, 57.8), xytext=(320.0, 30.0),
                 fontsize="small", color=COLOR_FG,
@@ -2371,17 +2407,18 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(np.arange(bands.size) - 0.16, lp1 - nc45, width=0.32,
            color=theme_fill(COLOR_TERTIARY, ax), edgecolor=COLOR_TERTIARY,
-           label="Target IL = $L_{p1}$ − NC 45")
+           label="Target $\\mathrm{IL}$ = $L_{p1}$ − NC 45")
     ax.bar(np.arange(bands.size) + 0.16,
            np.asarray(norton.correction, dtype=float), width=0.32,
            color=theme_fill(COLOR_SECONDARY, ax), edgecolor=COLOR_SECONDARY,
            label="Interior correction $10\\,\\lg(S_E/R_i)$")
     ax.plot(np.arange(bands.size),
             np.asarray(norton.panel_transmission_loss, dtype=float), "o-",
-            color=COLOR_PRIMARY, lw=2.0, ms=6, label="Required panel R (Norton)")
+            color=COLOR_PRIMARY, lw=2.0, ms=6,
+            label="Required panel $R$ (Norton)")
     ax.plot(np.arange(bands.size),
             np.asarray(bies.panel_transmission_loss, dtype=float), "--",
-            color=COLOR_FG, lw=1.6, label="Required panel R (Bies default)")
+            color=COLOR_FG, lw=1.6, label="Required panel $R$ (Bies default)")
     ax.plot(np.arange(bands.size), printed, "D", color=COLOR_PRIMARY, ms=7,
             mfc="none", label="Norton's printed answer")
     ax.axhline(0.0, color=COLOR_GRID, lw=1.0)
@@ -2660,10 +2697,14 @@ def generate_loudness_gating(output_dir: str) -> None:
     # The result's own .plot() draws the momentary and short-term traces, the
     # integrated line and the LRA band.
     res.plot(ax=ax)
+    # The library legend carries "Integrated -23.0 LUFS" assembled with
+    # ``format``: restate its sign before the legend below is drawn.
+    for line in ax.get_lines():
+        line.set_label(_ASCII_MINUS_RE.sub("−", str(line.get_label())))
     finite = res.momentary[np.isfinite(res.momentary)]
     ungated = 10.0 * np.log10(np.mean(10.0 ** (finite / 10.0)))
     ax.axhline(ungated, color=COLOR_TERTIARY, ls="-.", lw=1.6,
-               label=f"Ungated mean {ungated:.1f} LUFS")
+               label=f"Ungated mean {_fmt_minus(ungated, '.1f')} LUFS")
     ax.legend(loc="center right", fontsize=9)
     plt.tight_layout()
     save_figure(output_dir, "loudness_gating.svg")
@@ -2689,6 +2730,12 @@ def generate_loudness_range(output_dir: str) -> None:
     # The result's own .plot() shades the loudness range between its 10th and
     # 95th percentile edges under the momentary / short-term / integrated traces.
     res.plot(ax=ax)
+    # Its legend reads "Integrated -22.6 LUFS" assembled with ``format``:
+    # restate the sign with the typographic minus of the axes.
+    legend = ax.get_legend()
+    if legend is not None:
+        for entry in legend.get_texts():
+            entry.set_text(_ASCII_MINUS_RE.sub("−", entry.get_text()))
     plt.tight_layout()
     save_figure(output_dir, "loudness_range.svg")
 
@@ -2738,8 +2785,8 @@ def generate_itu_r_468_weighting(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
     ax.text(0.015, 0.96,
-            "for a 100 Hz fundamental the network cuts d2 by 13.8 dB\n"
-            "and d3 by 10.3 dB, and lifts the 10th order and above",
+            "for a 100 Hz fundamental the network cuts $d_2$ by 13.8 dB\n"
+            "and $d_3$ by 10.3 dB, and lifts the 10th order and above",
             transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -2796,18 +2843,21 @@ def generate_intermodulation_tests(output_dir: str) -> None:
 
     panels = (
         (y_dfd, (0.0, 16000.0),
-         f"(a) Difference frequency, 13 / 14 kHz — d(d,2) = {dfd2 * 100:.2f} %",
-         ((1000.0, "f2-f1"), (12000.0, "2f1-f2"), (15000.0, "2f2-f1")),
-         "denominator: a(f1) + a(f2)"),
+         (f"(a) Difference frequency, 13 / 14 kHz — "
+          f"$d(d,2)$ = {dfd2 * 100:.2f} %"),
+         ((1000.0, "$f_2 - f_1$"), (12000.0, "$2f_1 - f_2$"),
+          (15000.0, "$2f_2 - f_1$")),
+         "denominator: $a(f_1) + a(f_2)$"),
         (y_tdfd, (0.0, 16000.0),
          (f"(b) Total difference frequency, 8 / 11.95 kHz — "
-          f"d(TDFD) = {tdfd * 100:.2f} %"),
-         ((3950.0, "f0-delta"), (4050.0, "f0+delta")),
+          f"$d(\\mathrm{{TDFD}})$ = {tdfd * 100:.2f} %"),
+         ((3950.0, "$f_0 - \\delta$"), (4050.0, "$f_0 + \\delta$")),
          "only the two in-band products count"),
         (y_dim, (0.0, 16000.0),
          (f"(c) Dynamic intermodulation, 15 kHz + 3.15 kHz square — "
           f"DIM = {dim * 100:.2f} %"),
-         tuple((abs(k * 3150.0 - 15000.0), f"k={k}") for k in (1, 2, 3, 4, 5)
+         tuple((abs(k * 3150.0 - 15000.0), f"$k$ = {k}")
+               for k in (1, 2, 3, 4, 5)
                if 0.0 < abs(k * 3150.0 - 15000.0) < 15000.0),
          "denominator: the 15 kHz sine alone"),
     )
@@ -2848,11 +2898,16 @@ def generate_feedback_stability(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(2, 1, figsize=(10, 9.2), sharey=True)
     titles = (
-        f"One open microphone — headroom {one.headroom:+.1f} dB",
-        f"Four open microphones — headroom {four.headroom:+.1f} dB",
+        f"One open microphone — headroom {_fmt_minus(one.headroom, '+.1f')} dB",
+        ("Four open microphones — headroom "
+        f"{_fmt_minus(four.headroom, '+.1f')} dB"),
     )
     for ax, res, title in zip(axes, (one, four), titles, strict=True):
         res.plot(ax=ax, language=_LANG)
+        # The library assembles the four bar readouts with ``format``: restate
+        # their negative signs with the typographic minus of the axes.
+        for reading in ax.texts:
+            reading.set_text(_ASCII_MINUS_RE.sub("−", reading.get_text()))
         ax.set_title(title, fontweight="bold", fontsize=11, pad=8)
     plt.tight_layout()
     save_figure(output_dir, "feedback_stability.svg")
@@ -2898,7 +2953,7 @@ def generate_microphone_patterns(output_dir: str) -> None:
                          10 ** (-30.0 / 20.0))
         radius = np.maximum(20.0 * np.log10(mag), -30.0)
         ax.plot(theta, radius, color=col, linewidth=2.0,
-                label=f"{name} (b = {b:.2f}): DI = {di:.1f} dB")
+                label=f"{name} ($b$ = {b:.2f}): DI = {di:.1f} dB")
     ax.set_ylim(-30.0, 0.0)
     ax.set_yticks([-30.0, -20.0, -10.0, 0.0])
     ax.set_theta_zero_location("N")
@@ -2959,7 +3014,7 @@ def generate_microphone_noise_weightings(output_dir: str) -> None:
     ax_top.legend(loc="lower left", fontsize=9)
 
     groups = (
-        ("this capsule\n(1/f, falling)", falling),
+        ("this capsule\n($1/f$, falling)", falling),
         ("a hissier capsule\n(rising to 20 kHz)", bright),
     )
     width, offset = 0.34, 0.19
@@ -2973,7 +3028,7 @@ def generate_microphone_noise_weightings(output_dir: str) -> None:
             ax_bot.annotate(f"{val:.1f} dB", xy=(xpos, val), xytext=(0, 4),
                             textcoords="offset points", ha="center",
                             fontsize=9, color=COLOR_FG)
-        ax_bot.annotate(f"network alone: {l468 - la:+.1f} dB",
+        ax_bot.annotate(f"network alone: {_fmt_minus(l468 - la, '+.1f')} dB",
                         xy=(k, max(la, l468)), xytext=(0, 22),
                         textcoords="offset points", ha="center", fontsize=9,
                         color=COLOR_FG, fontweight="bold")
@@ -3008,9 +3063,9 @@ def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
     h1_ref = 1.0 + 3.0 * a3 / 4.0
     _fig, ax = plt.subplots(figsize=(10, 6))
     orders = (
-        (0, "|H1(f)|", COLOR_PRIMARY, h1_ref),
-        (1, "|H2(f)|", COLOR_SECONDARY, a2 / 2.0),
-        (2, "|H3(f)|", COLOR_TERTIARY, a3 / 4.0),
+        (0, "$|H_1(f)|$", COLOR_PRIMARY, h1_ref),
+        (1, "$|H_2(f)|$", COLOR_SECONDARY, a2 / 2.0),
+        (2, "$|H_3(f)|$", COLOR_TERTIARY, a3 / 4.0),
     )
     for idx, label, col, asymptote in orders:
         mag = np.abs(np.asarray(res.harmonic_responses[idx]))
@@ -3018,8 +3073,8 @@ def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
             res.frequencies <= (idx + 1) * f2)
         ax.semilogx(res.frequencies[band],
                     20.0 * np.log10(np.maximum(mag[band], 1e-9)),
-                    color=col, linewidth=1.8, label=f"{label} over [{idx + 1}f1, "
-                                                    f"{idx + 1}f2]")
+                    color=col, linewidth=1.8,
+                    label=f"{label} over $[{idx + 1}f_1, {idx + 1}f_2]$")
         ax.axhline(20.0 * np.log10(asymptote), color=col, linestyle=":",
                    linewidth=1.2, alpha=0.8)
 
@@ -3034,8 +3089,8 @@ def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.56, 0.04,
-            "dotted: the Chebyshev levels 1 + 3a3/4, a2/2 and a3/4;\n"
-            "each order rolls off at the 3 kHz post-filter, not at n f2",
+            "dotted: the Chebyshev levels $1 + 3a_3/4$, $a_2/2$ and $a_3/4$;\n"
+            "each order rolls off at the 3 kHz post-filter, not at $n f_2$",
             transform=ax.transAxes, va="bottom", ha="center", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -3076,21 +3131,21 @@ def generate_swept_sine_methods(output_dir: str) -> None:
         ax_mag.semilogx(res.frequencies[band],
                         20.0 * np.log10(np.maximum(np.abs(h2[band]), 1e-9)),
                         color=col, linewidth=1.8, linestyle=style,
-                        label=f'|H2| — method="{label}"')
+                        label=f'$|H_2|$ — method="{label}"')
         ax_ph.semilogx(res.frequencies[band],
                        np.unwrap(np.angle(h2[band])), color=col,
                        linewidth=1.6, linestyle=style,
-                       label=f'arg H2 — method="{label}"')
+                       label=f'$\\arg H_2$ — method="{label}"')
 
     ax_mag.axhline(20.0 * np.log10(a2 / 2.0), color=COLOR_FG, linestyle=":",
-                   linewidth=1.2, label="Chebyshev level a2/2")
+                   linewidth=1.2, label="Chebyshev level $a_2/2$")
     ax_mag.axvline(f2, color=COLOR_FG, linestyle=":", linewidth=1.2)
-    ax_mag.annotate("f2 = 6 kHz: the Farina band stops here",
+    ax_mag.annotate("$f_2$ = 6 kHz: the Farina band stops here",
                     xy=(f2, -40.0), xytext=(-8, 0),
                     textcoords="offset points", ha="right", fontsize=9,
                     color=COLOR_FG)
     ax_mag.axvline(2 * f2, color=COLOR_PRIMARY, linestyle=":", linewidth=1.2)
-    ax_mag.annotate("2 f2 = 12 kHz", xy=(2 * f2, -40.0), xytext=(8, 0),
+    ax_mag.annotate("$2 f_2$ = 12 kHz", xy=(2 * f2, -40.0), xytext=(8, 0),
                     textcoords="offset points", ha="left", fontsize=9,
                     color=COLOR_PRIMARY)
     ax_mag.set_ylabel("Magnitude [dB]")
@@ -3098,7 +3153,7 @@ def generate_swept_sine_methods(output_dir: str) -> None:
     ax_mag.set_title("Same Recording, Two Deconvolutions "
                      "(Novak et al. 2015, Fig. 6)", fontweight="bold", pad=12)
     ax_ph.axhline(-np.pi / 2.0, color=COLOR_FG, linestyle=":", linewidth=1.2)
-    ax_ph.annotate("true phase of H2: -pi/2 at every frequency",
+    ax_ph.annotate("true phase of $H_2$: $-\\pi/2$ at every frequency",
                    xy=(60.0, -np.pi / 2.0), xytext=(0, 8),
                    textcoords="offset points", ha="left", fontsize=9,
                    color=COLOR_FG)

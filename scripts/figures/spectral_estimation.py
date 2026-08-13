@@ -522,10 +522,10 @@ def generate_miso_coherence(output_dir: str) -> None:
 
     ax_bot.semilogx(fb, res.ordinary_coherence[1][band], color=COLOR_TERTIARY,
                     linestyle=":", linewidth=1.6,
-                    label=r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by x1)")
+                    label=r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by $x_1$)")
     ax_bot.semilogx(fb, res.partial_coherence[1][band], color=COLOR_TERTIARY,
                     linewidth=1.8,
-                    label=r"Input 2 partial $\gamma^2_{2y\cdot 1}$ (x1 removed)")
+                    label=r"Input 2 partial $\gamma^2_{2y\cdot 1}$ ($x_1$ removed)")
     ax_bot.semilogx(fb, res.multiple_coherence[band], color=COLOR_FG,
                     linewidth=1.4, alpha=0.8,
                     label=r"Multiple $\gamma^2_{y:x}$")
@@ -537,8 +537,8 @@ def generate_miso_coherence(output_dir: str) -> None:
     ax_bot.set_axisbelow(True)
     ax_bot.legend(loc="center right", fontsize=8.5)
     ax_bot.text(0.015, 0.05,
-                "conditioning removes the shared x1 component:\n"
-                "the low-band ordinary coherence of x2 collapses",
+                "conditioning removes the shared $x_1$ component:\n"
+                "the low-band ordinary coherence of $x_2$ collapses",
                 transform=ax_bot.transAxes, va="bottom", ha="left",
                 fontsize=8.5, color=COLOR_FG)
     for ax in (ax_top, ax_bot):

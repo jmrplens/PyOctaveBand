@@ -14,7 +14,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -53,17 +53,17 @@ def generate_lden_profile(output_dir: str) -> None:
     ax.axvspan(23, 24, color=theme_fill(COLOR_PRIMARY, ax))
     ax.axvspan(0, 7, color=theme_fill(COLOR_PRIMARY, ax))
     ax.step(np.r_[hours, 24], np.r_[laeq_h, laeq_h[-1]], where="post",
-            color=COLOR_FG, linewidth=1.6, label="Hourly LAeq")
+            color=COLOR_FG, linewidth=1.6, label="Hourly $L_{Aeq}$")
     ax.hlines(ld, 7, 19, color=COLOR_TERTIARY, linestyle="--", linewidth=2,
-              label="Lday (+0 dB)")
+              label=r"$L_{\mathrm{day}}$ (+0 dB)")
     ax.hlines(le + 5, 19, 23, color="#e8a838", linestyle="--", linewidth=2,
-              label="Levening + 5 dB")
+              label=r"$L_{\mathrm{evening}}$ + 5 dB")
     ax.hlines(ln_ + 10, 23, 24, color=COLOR_PRIMARY, linestyle="--", linewidth=2)
     ax.hlines(ln_ + 10, 0, 7, color=COLOR_PRIMARY, linestyle="--", linewidth=2,
-              label="Lnight + 10 dB")
+              label=r"$L_{\mathrm{night}}$ + 10 dB")
     ax.hlines(l_den, 0, 24, color=COLOR_SECONDARY, linewidth=2.4,
-              label=f"Lden = {l_den:.1f} dB")
-    ax.set_title("Day-Evening-Night Level Lden (ISO 1996-1)",
+              label=rf"$L_{{\mathrm{{den}}}}$ = {l_den:.1f} dB")
+    ax.set_title(r"Day-Evening-Night Level $L_{\mathrm{den}}$ (ISO 1996-1)",
                  fontweight="bold", pad=12)
     ax.set_xlim(0, 24)
     ax.set_ylim(42, 80)
@@ -109,7 +109,8 @@ def generate_wind_turbine_tonality(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.02, 0.95,
-            f"Tonal audibility ΔLₐ = {res.tonal_audibility:.1f} dB\n"
+            f"Tonal audibility $\\Delta L_a$ = "
+            f"{_fmt_minus(res.tonal_audibility, '.1f')} dB\n"
             f"{'audible' if res.is_audible else 'not audible'}",
             transform=ax.transAxes, va="top", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
@@ -138,10 +139,10 @@ def generate_air_absorption_alpha(output_dir: str) -> None:
         alpha_km = air_attenuation(freqs, temp, rh) * 1000.0
         ax.loglog(freqs, alpha_km, color=color, linewidth=2.0,
                   label=f"{temp:g} °C, {rh:g} % RH")
-    ax.set_title("ISO 9613-1 Atmospheric Absorption α(f)", fontweight="bold",
-                 pad=12)
+    ax.set_title(r"ISO 9613-1 Atmospheric Absorption $\alpha(f)$",
+                 fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Attenuation coefficient α [dB/km]")
+    ax.set_ylabel(r"Attenuation coefficient $\alpha$ [dB/km]")
     ax.set_xlim(50.0, 10000.0)
     format_frequency_axis(ax, 50.0, 10000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -188,10 +189,10 @@ def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
     pos_bottom = np.zeros(len(bands))
     neg_bottom = np.zeros(len(bands))
     for term, color, label in [
-        (att.a_div, COLOR_PRIMARY, "Adiv — divergence"),
-        (att.a_atm, COLOR_TERTIARY, "Aatm — atmospheric"),
-        (att.a_gr, "#9467bd", "Agr — ground"),
-        (att.a_bar, "#ff7f0e", "Abar — barrier"),
+        (att.a_div, COLOR_PRIMARY, r"$A_{\mathrm{div}}$ — divergence"),
+        (att.a_atm, COLOR_TERTIARY, r"$A_{\mathrm{atm}}$ — atmospheric"),
+        (att.a_gr, "#9467bd", r"$A_{\mathrm{gr}}$ — ground"),
+        (att.a_bar, "#ff7f0e", r"$A_{\mathrm{bar}}$ — barrier"),
     ]:
         bottom = np.where(term >= 0.0, pos_bottom, neg_bottom)
         ax.bar(x, term, bottom=bottom, color=color, edgecolor=COLOR_FG,
@@ -200,12 +201,12 @@ def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
         neg_bottom += np.minimum(term, 0.0)
     ax.plot(x, att.a_total, marker="D", color=COLOR_SECONDARY, linewidth=2.0,
             markersize=6, markerfacecolor="white", markeredgewidth=1.4,
-            zorder=5, label="A — total")
+            zorder=5, label="$A$ — total")
 
     ax.set_title("ISO 9613-2 Attenuation Breakdown (with a 4 m barrier)",
                  fontweight="bold", pad=12)
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel("Attenuation A [dB]")
+    ax.set_ylabel("Attenuation $A$ [dB]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.axhline(0.0, color=COLOR_FG, linewidth=0.8, alpha=0.6)
@@ -267,7 +268,7 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
         fontweight="bold", pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel("Line power L'W,eq,line [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(45.0, 90.0)
@@ -324,8 +325,8 @@ def generate_cnossos_road_speed_law(output_dir: str) -> None:
         "CNOSSOS-EU Single-Vehicle Sound Power against Speed (reference conditions)",
         fontweight="bold", pad=12,
     )
-    ax.set_xlabel("Speed v [km/h]")
-    ax.set_ylabel("A-weighted sound power LW,A [dB(A) re 1 pW]")
+    ax.set_xlabel("Speed $v$ [km/h]")
+    ax.set_ylabel(r"A-weighted sound power $L_{W\!,A}$ [dB(A) re 1 pW]")
     ax.set_xlim(20.0, 130.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -489,7 +490,7 @@ def generate_impulse_prominence(output_dir: str) -> None:
     for ld, colour in ((5.0, COLOR_TERTIARY), (15.0, COLOR_PRIMARY),
                        (30.0, COLOR_SECONDARY)):
         ax_p.plot(orate, predicted_prominence(orate, np.full_like(orate, ld)),
-                  color=colour, label=f"LD = {ld:g} dB")
+                  color=colour, label=rf"$\mathrm{{LD}}$ = {ld:g} dB")
     ax_p.set_xscale("log")
     ax_p.set_xlabel("Onset rate [dB/s]")
     ax_p.set_ylabel("Predicted prominence $P$")
@@ -559,12 +560,12 @@ def generate_tonal_audibility(output_dir: str) -> None:
     ax.legend(loc="lower right", fontsize=9)
 
     info = [
-        "Kt = 0            (dLta < 4)",
-        "Kt = dLta - 4  (4 <= dLta <= 10)",
-        "Kt = 6            (dLta > 10)",
+        r"$K_t = 0$  ($\Delta L_{ta} < 4$)",
+        r"$K_t = \Delta L_{ta} - 4$  ($4 \leq \Delta L_{ta} \leq 10$)",
+        r"$K_t = 6$  ($\Delta L_{ta} > 10$)",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="left", fontsize=10, color=COLOR_FG, family="monospace",
+            va="top", ha="left", fontsize=10, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -612,9 +613,9 @@ def generate_atmospheric_sound_speed_profiles(output_dir: str) -> None:
     up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
     _fig, ax = plt.subplots(figsize=(7.0, 7.5))
     ax.plot(down.sound_speeds, down.heights, color=COLOR_PRIMARY, linewidth=2.0,
-            label="Downward refraction (b = +1 m/s)", zorder=3)
+            label="Downward refraction ($b$ = +1 m/s)", zorder=3)
     ax.plot(up.sound_speeds, up.heights, color=COLOR_SECONDARY, linewidth=2.0,
-            label="Upward refraction (b = −1 m/s)", zorder=3)
+            label="Upward refraction ($b$ = −1 m/s)", zorder=3)
     ax.axvline(340.0, color=COLOR_FG, linestyle=":", linewidth=0.9, alpha=0.6)
     ax.set_xlabel("Effective sound speed [m/s]")
     ax.set_ylabel("Height [m]")
@@ -651,7 +652,7 @@ def generate_atmospheric_ray_fan(output_dir: str) -> None:
     ax.set_ylabel("Height [m]")
     ax.set_xlim(0.0, 600.0)
     ax.set_ylim(0.0, 40.0)
-    ax.set_title("Sound Rays under Downward Refraction (b = +1 m/s)",
+    ax.set_title("Sound Rays under Downward Refraction ($b$ = +1 m/s)",
                  fontweight="bold", pad=12)
     ax.text(0.985, 0.94, "shallow rays are bent back to the ground\nand bounce on down-range",
             transform=ax.transAxes, va="top", ha="right", fontsize=9,
@@ -679,11 +680,11 @@ def generate_atmospheric_pe_range(output_dir: str) -> None:
     c0, zs, zr = 340.0, 2.0, 2.0
     cases = [
         (log_linear_sound_speed_profile(+1.0, ground_speed=c0, max_height=60.0),
-         COLOR_PRIMARY, "-", "Downward (b = +1 m/s)"),
+         COLOR_PRIMARY, "-", "Downward ($b$ = +1 m/s)"),
         (linear_sound_speed_profile(0.0, ground_speed=c0, max_height=60.0),
-         COLOR_FG, "--", "Homogeneous (b = 0)"),
+         COLOR_FG, "--", "Homogeneous ($b$ = 0)"),
         (log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0),
-         COLOR_SECONDARY, "-", "Upward (b = −1 m/s)"),
+         COLOR_SECONDARY, "-", "Upward ($b$ = −1 m/s)"),
     ]
     _fig, ax = plt.subplots(figsize=(11.0, 6.2))
     with _warnings.catch_warnings():
@@ -863,7 +864,7 @@ def generate_cnossos_rail_emission(output_dir: str) -> None:
         fontweight="bold", pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel("Line power L'W,eq,line [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(30.0, 95.0)
@@ -907,15 +908,15 @@ def generate_cnossos_rail_roughness_shift(output_dir: str) -> None:
         )
         ax.semilogx(freqs, total, color=color, marker=marker, linewidth=1.8,
                     markersize=5, markerfacecolor="white", markeredgewidth=1.2,
-                    label=f"v = {speed:g} km/h", zorder=4)
+                    label=f"$v$ = {speed:g} km/h", zorder=4)
     ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     ax.set_title(
         "CNOSSOS-EU Total Effective Roughness against Speed "
-        "(f = v/λ, λ in the wavelength domain)",
+        r"($f = v/\lambda$, $\lambda$ in the wavelength domain)",
         fontweight="bold", pad=12,
     )
     ax.set_xlabel("1/3-octave band centre frequency [Hz]")
-    ax.set_ylabel("Total effective roughness LR,TOT [dB re 1 μm]")
+    ax.set_ylabel(r"Total effective roughness $L_{R,\mathrm{TOT}}$ [dB re 1 μm]")
     ax.set_xlim(50.0, 10000.0)
     format_frequency_axis(ax, 50.0, 10000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -943,19 +944,19 @@ def generate_outdoor_level_cascade(output_dir: str) -> None:
     level = lw.copy()
     _fig, ax = plt.subplots(figsize=(11, 6.4))
     ax.plot(x, lw, "s--", color=COLOR_MUTED, linewidth=1.4, markersize=6,
-            label="LW = 95 dB (source power)", zorder=4)
+            label="$L_W$ = 95 dB (source power)", zorder=4)
     terms = (
-        (att.a_div, "− Adiv (divergence)", COLOR_PRIMARY),
-        (att.a_atm, "− Aatm (air)", COLOR_TERTIARY),
-        (att.a_gr, "− Agr (ground)", "#9467bd"),
-        (att.a_bar, "− Abar (barrier)", COLOR_SECONDARY),
+        (att.a_div, r"$-A_{\mathrm{div}}$ (divergence)", COLOR_PRIMARY),
+        (att.a_atm, r"$-A_{\mathrm{atm}}$ (air)", COLOR_TERTIARY),
+        (att.a_gr, r"$-A_{\mathrm{gr}}$ (ground)", "#9467bd"),
+        (att.a_bar, r"$-A_{\mathrm{bar}}$ (barrier)", COLOR_SECONDARY),
     )
     for term, label, color in terms:
         ax.bar(x, -np.asarray(term), bottom=level, color=color, alpha=0.85,
                width=0.62, label=label, zorder=2)
         level = level - np.asarray(term)
     ax.plot(x, level, "D-", color=COLOR_FG, linewidth=2.0, markersize=6,
-            label="LfT(DW) at the receiver", zorder=5)
+            label=r"$L_{fT}(\mathrm{DW})$ at the receiver", zorder=5)
     ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     ax.set_title("Where 95 dB of Source Power Goes (ISO 9613-2, 200 m)",
                  fontweight="bold", pad=12)
@@ -999,26 +1000,27 @@ def generate_iso9613_screening_anatomy(output_dir: str) -> None:
     left.plot(heights, single, color=COLOR_PRIMARY, linewidth=2.0,
               label="Single edge", zorder=4)
     left.plot(heights, double, color=COLOR_TERTIARY, linewidth=2.0,
-              label="Double edge, e = 2 m", zorder=4)
+              label="Double edge, $e$ = 2 m", zorder=4)
     left.axhline(20.0, color=COLOR_SECONDARY, linestyle=":", linewidth=1.6,
                  label="20 dB cap (single)", zorder=3)
     left.axhline(25.0, color="#9467bd", linestyle=":", linewidth=1.6,
                  label="25 dB cap (double)", zorder=3)
-    left.set_title("Dz at 500 Hz against barrier height (d = 200 m)",
+    left.set_title("$D_z$ at 500 Hz against barrier height ($d$ = 200 m)",
                    fontweight="bold", pad=10)
     left.set_xlabel("Barrier height [m]")
-    left.set_ylabel("Diffraction insertion loss Dz [dB]")
+    left.set_ylabel("Diffraction insertion loss $D_z$ [dB]")
     left.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     left.set_axisbelow(True)
     left.legend(loc="lower right", fontsize=9)
 
     x = np.arange(bands.size)
     right.plot(x, dz, "o-", color=COLOR_PRIMARY, linewidth=2.0, markersize=6,
-               label="Dz (Eq. (14))", zorder=4)
+               label="$D_z$ (Eq. (14))", zorder=4)
     right.plot(x, att.a_bar, "D-", color=COLOR_SECONDARY, linewidth=2.0,
-               markersize=6, label="Abar = max(Dz − Agr, 0) (Eq. (12))", zorder=4)
+               markersize=6,
+               label=r"$A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (Eq. (12))", zorder=4)
     right.fill_between(x, att.a_bar, dz, color=COLOR_TERTIARY, alpha=0.20,
-                       label="Agr, spent on the screened path", zorder=2)
+                       label=r"$A_{\mathrm{gr}}$, spent on the screened path", zorder=2)
     right.axhline(20.0, color=COLOR_MUTED, linestyle=":", linewidth=1.2, zorder=1)
     right.set_title("The ground effect is spent, not kept", fontweight="bold",
                     pad=10)
@@ -1061,9 +1063,9 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
 
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.4))
     left.semilogx(heights, rp_mag, color=COLOR_PRIMARY, linewidth=2.0,
-                  label="|Rp| — plane wave", zorder=4)
+                  label="$|R_p|$ — plane wave", zorder=4)
     left.semilogx(heights, q_mag, color=COLOR_SECONDARY, linewidth=2.0,
-                  label="|Q| — spherical wave", zorder=4)
+                  label="$|Q|$ — spherical wave", zorder=4)
     left.invert_xaxis()
     left.set_title("The coefficients part as the path grazes",
                    fontweight="bold", pad=10)
@@ -1074,13 +1076,14 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
     left.legend(loc="upper left", fontsize=9)
 
     right.semilogx(heights, dl_q, color=COLOR_SECONDARY, linewidth=2.0,
-                   label="with Q (spherical wave)", zorder=4)
+                   label="with $Q$ (spherical wave)", zorder=4)
     right.semilogx(heights, dl_p, color=COLOR_PRIMARY, linewidth=2.0,
-                   linestyle="--", label="with Rp alone (plane wave)", zorder=4)
+                   linestyle="--", label="with $R_p$ alone (plane wave)",
+                   zorder=4)
     right.invert_xaxis()
     right.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     right.annotate(
-        f"{dl_q[-1]:.1f} dB against {dl_p[-1]:.1f} dB",
+        f"{_fmt_minus(dl_q[-1], '.1f')} dB against {_fmt_minus(dl_p[-1], '.1f')} dB",
         xy=(float(heights[-1]), dl_q[-1]), xytext=(0.30, 0.18),
         textcoords="axes fraction", fontsize=10, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
@@ -1126,7 +1129,7 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
                       label=f"{freq:g} Hz", zorder=4)
     left.set_title("Wave-theoretic model: the path length alone",
                    fontweight="bold", pad=10)
-    left.set_xlabel("Top width e [m]")
+    left.set_xlabel("Top width $e$ [m]")
     left.set_ylabel("Gain over the thin screen [dB]")
     left.set_ylim(-0.1, 5.0)
     left.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1153,11 +1156,12 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
         right.plot(widths, gain, color=color, linewidth=2.0,
                    label=f"{freq:g} Hz", zorder=4)
     right.axhline(10.0 * np.log10(3.0), color=COLOR_MUTED, linestyle=":",
-                  linewidth=1.4, label="10 lg 3 = 4.77 dB (the C3 ceiling)",
+                  linewidth=1.4,
+                  label=r"$10\,\mathrm{lg}\,3 = 4.77$ dB (the $C_3$ ceiling)",
                   zorder=3)
-    right.set_title("ISO 9613-2: the path length plus the C3 factor",
+    right.set_title("ISO 9613-2: the path length plus the $C_3$ factor",
                     fontweight="bold", pad=10)
-    right.set_xlabel("Edge separation e [m]")
+    right.set_xlabel("Edge separation $e$ [m]")
     right.set_ylabel("Gain over the single edge [dB]")
     right.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     right.set_axisbelow(True)
@@ -1180,7 +1184,7 @@ def generate_shadow_zone_map(output_dir: str) -> None:
         ax.loglog(gradients,
                   [shadow_zone_distance(-float(g), hs, hr, ground_speed=340.0)
                    for g in gradients], color=color, linewidth=2.0,
-                  label=f"hs / hr = {hs:g} / {hr:g} m", zorder=4)
+                  label=f"$h_s/h_r$ = {hs:g} / {hr:g} m", zorder=4)
     ax.axvline(0.1, color=COLOR_MUTED, linestyle="--", linewidth=1.3, zorder=2)
     ax.plot([0.1], [shadow_zone_distance(-0.1, 2.0, 2.0, ground_speed=340.0)],
             "o", color=COLOR_FG, markersize=8, zorder=5)
@@ -1192,21 +1196,21 @@ def generate_shadow_zone_map(output_dir: str) -> None:
     ax.plot([grad_log],
             [shadow_zone_distance(-grad_log, 2.0, 2.0, ground_speed=340.0)],
             "s", color=COLOR_SECONDARY, markersize=8, zorder=5)
-    ax.annotate("the page's b = −1 m/s case: 109 m",
+    ax.annotate("the page's $b$ = −1 m/s case: 109 m",
                 xy=(grad_log, 108.6), xytext=(0.12, 480.0), fontsize=10,
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
-    ax.set_title("Where the Acoustic Shadow Starts (c₀ = 340 m/s)",
+    ax.set_title("Where the Acoustic Shadow Starts ($c_0$ = 340 m/s)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Upward sound-speed gradient |g| [1/s]")
-    ax.set_ylabel("Shadow-zone distance x_shadow [m]")
+    ax.set_xlabel("Upward sound-speed gradient $|g|$ [1/s]")
+    ax.set_ylabel(r"Shadow-zone distance $x_{\mathrm{shadow}}$ [m]")
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=10)
     secondary = ax.secondary_xaxis(
         "top", functions=(lambda g: 340.0 / np.maximum(g, 1e-9),
                           lambda r: 340.0 / np.maximum(r, 1e-9)))
-    secondary.set_xlabel("Radius of curvature Rc = c₀/|g| [m]")
+    secondary.set_xlabel("Radius of curvature $R_c = c_0/|g|$ [m]")
     plt.tight_layout()
     save_figure(output_dir, "shadow_zone_map.svg")
     plt.close()
@@ -1244,8 +1248,8 @@ def generate_refraction_homogeneous_check(output_dir: str) -> None:
                 label="+6 dB (coherent sum)", zorder=2)
     top.set_ylim(-35.0, 10.0)
     top.set_ylabel("Level re free field [dB]")
-    top.set_title("The Homogeneous Limit: 500 Hz, Rigid Ground, hs = hr = 2 m",
-                  fontweight="bold", pad=12)
+    top.set_title("The Homogeneous Limit: 500 Hz, Rigid Ground, "
+                  "$h_s = h_r$ = 2 m", fontweight="bold", pad=12)
     top.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     top.set_axisbelow(True)
     top.legend(loc="lower right", fontsize=9)
@@ -1296,7 +1300,7 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
     t_ax.axvline(20.0, color=COLOR_MUTED, linestyle=":", linewidth=1.3, zorder=2)
     t_ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     t_ax.set_title("Air temperature (2.2.10)", fontweight="bold", pad=10)
-    t_ax.set_xlabel("Air temperature τ [°C]")
+    t_ax.set_xlabel(r"Air temperature $\tau$ [°C]")
     t_ax.set_ylabel("Change in line power [dB(A)]")
     t_ax.legend(loc="upper right", fontsize=9)
 
@@ -1309,12 +1313,13 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
             - a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0,
                                           float(v))])
             for v in speeds], color=color, linewidth=2.0,
-            label=f"Qstud = {share:g}, Ts = 4 months", zorder=4)
+            label=rf"$Q_{{\mathrm{{stud}}}}$ = {share:g}, $T_s$ = 4 months",
+            zorder=4)
     for edge in (50.0, 90.0):
         s_ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
                      zorder=2)
     s_ax.set_title("Studded tyres (2.2.6-2.2.9)", fontweight="bold", pad=10)
-    s_ax.set_xlabel("Speed v [km/h]")
+    s_ax.set_xlabel("Speed $v$ [km/h]")
     s_ax.set_ylabel("Change in line power [dB(A)]")
     s_ax.legend(loc="upper right", fontsize=8)
 
@@ -1331,7 +1336,7 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
                  zorder=2)
     j_ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     j_ax.set_title("Junctions (2.2.17, 2.2.18)", fontweight="bold", pad=10)
-    j_ax.set_xlabel("Distance to the junction |x| [m]")
+    j_ax.set_xlabel("Distance to the junction $|x|$ [m]")
     j_ax.set_ylabel("Change in line power [dB(A)]")
     j_ax.legend(loc="lower right", fontsize=9)
 
@@ -1371,7 +1376,7 @@ def generate_cnossos_road_gradient(output_dir: str) -> None:
     ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     ax.set_title("CNOSSOS-EU Road-Gradient Correction (2.2.13-2.2.16)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Road gradient s [%]  (negative = downhill)")
+    ax.set_xlabel("Road gradient $s$ [%]  (negative = downhill)")
     ax.set_ylabel("Propulsion-noise correction [dB(A)]")
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -1408,7 +1413,7 @@ def generate_cnossos_road_surfaces(output_dir: str) -> None:
     ax.set_title("CNOSSOS-EU Road Surfaces (Table F-4, light vehicles)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Surface coefficient α [dB]")
+    ax.set_ylabel(r"Surface coefficient $\alpha$ [dB]")
     ax.set_xlim(63.0, 8000.0)
     format_frequency_axis(ax, 63.0, 8000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1464,7 +1469,7 @@ def generate_cnossos_rail_components(output_dir: str) -> None:
     right.axvline(200.0, color=COLOR_MUTED, linestyle=":", linewidth=1.4,
                   label="Aerodynamic threshold (2.3.13)", zorder=2)
     right.set_title("Each source line against speed", fontweight="bold", pad=10)
-    right.set_xlabel("Speed v [km/h]")
+    right.set_xlabel("Speed $v$ [km/h]")
     right.set_ylabel("Total line power [dB re 1 pW per metre]")
     right.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     right.set_axisbelow(True)
@@ -1535,16 +1540,16 @@ def generate_wind_turbine_apparent_power(output_dir: str) -> None:
     keep[[voided, flagged]] = False
     ax.plot(bins[keep], lwa[keep], "o", color=COLOR_PRIMARY, markersize=7,
             markerfacecolor="white", markeredgewidth=1.6,
-            label="Valid bin (margin > 6 dB)", zorder=5)
+            label="Valid bin (margin $>$ 6 dB)", zorder=5)
     ax.plot([bins[flagged]], [lwa[flagged]], "o", color="#e8a838", markersize=9,
             label="3-6 dB margin: reported with an asterisk", zorder=5)
     ax.plot([bins[voided]], [lwa[voided]], "x", color=COLOR_SECONDARY,
             markersize=12, markeredgewidth=2.4,
-            label="Margin ≤ 3 dB: bin voided", zorder=5)
+            label=r"Margin $\leq$ 3 dB: bin voided", zorder=5)
     ax.set_title("Apparent Sound Power against Wind Speed (IEC 61400-11)",
                  fontweight="bold", pad=12)
     ax.set_xlabel("Hub-height wind speed [m/s]  (0,5 m/s bins)")
-    ax.set_ylabel("LWA [dB(A) re 1 pW]")
+    ax.set_ylabel(r"$L_{W\!A}$ [dB(A) re 1 pW]")
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
@@ -1553,7 +1558,8 @@ def generate_wind_turbine_apparent_power(output_dir: str) -> None:
     factor = np.log(10.0 / z0ref) / np.log(hub / z0ref)
     secondary = ax.secondary_xaxis(
         "top", functions=(lambda v: v * factor, lambda v: v / factor))
-    secondary.set_xlabel("Formula (29) wind speed at 10 m, z0ref = 0,05 m [m/s]")
+    secondary.set_xlabel(
+        r"Formula (29) wind speed at 10 m, $z_{0,\mathrm{ref}}$ = 0,05 m [m/s]")
     plt.tight_layout()
     save_figure(output_dir, "wind_turbine_apparent_power.svg")
     plt.close()
@@ -1578,7 +1584,7 @@ def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
               solid_capstyle="butt", label="9.5.3: fixed 20-120 Hz band", zorder=5)
     left.set_title("Two critical bandwidths on one page", fontweight="bold",
                    pad=10)
-    left.set_xlabel("Tone frequency fc [Hz]")
+    left.set_xlabel("Tone frequency $f_c$ [Hz]")
     left.set_ylabel("Critical bandwidth [Hz]")
     left.set_xlim(20.0, 10000.0)
     format_frequency_axis(left, 20.0, 10000.0)
@@ -1587,15 +1593,17 @@ def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
     left.legend(loc="upper left", fontsize=8.5)
 
     right.semilogx(fc, -la, color=COLOR_PRIMARY, linewidth=2.0,
-                   label="Tonality needed to be audible (ΔLa > 0)", zorder=4)
+                   label=r"Tonality needed to be audible ($\Delta L_a > 0$)",
+                   zorder=4)
     right.semilogx(fc, -la - 3.0, "--", color=COLOR_SECONDARY, linewidth=1.8,
-                   label="Tonality needed to be reportable (ΔLa ≥ −3 dB)",
+                   label=r"Tonality needed to be reportable "
+                         r"($\Delta L_a \geq -3$ dB)",
                    zorder=4)
     right.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     right.set_title("The audibility criterion, read as required tonality",
                     fontweight="bold", pad=10)
     right.set_xlabel("Tone frequency [Hz]")
-    right.set_ylabel("Required tonality ΔLtn [dB]")
+    right.set_ylabel(r"Required tonality $\Delta L_{tn}$ [dB]")
     right.set_xlim(20.0, 10000.0)
     format_frequency_axis(right, 20.0, 10000.0)
     right.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5,
@@ -1635,16 +1643,17 @@ def generate_rd1367_kf_ki(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(11, 6.2))
     ax.step(diffs, kf, where="post", color=COLOR_PRIMARY, linewidth=2.4,
-            label="Kf, from LCeq,Ti − LAeq,Ti", zorder=4)
+            label="$K_f$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$", zorder=4)
     ax.step(diffs, ki, where="post", color=COLOR_SECONDARY, linewidth=2.0,
-            linestyle="--", label="Ki, from LAIeq,Ti − LAeq,Ti", zorder=4)
+            linestyle="--", label="$K_i$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$",
+            zorder=4)
     for edge in (10.0, 15.0):
         ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
                    zorder=2)
     ax.plot([13.0], [3.0], "o", color=COLOR_PRIMARY, markersize=9, zorder=5,
-            label="worked example: Lf = 13 dB → Kf = 3 dB")
+            label="worked example: $L_f$ = 13 dB → $K_f$ = 3 dB")
     ax.plot([5.0], [0.0], "s", color=COLOR_SECONDARY, markersize=9, zorder=5,
-            label="worked example: Li = 5 dB → Ki = 0 dB")
+            label="worked example: $L_i$ = 5 dB → $K_i$ = 0 dB")
     ax.set_title("RD 1367/2007: the Low-Frequency and Impulsive Corrections",
                  fontweight="bold", pad=12)
     ax.set_xlabel("Level difference [dB]")
@@ -1672,8 +1681,8 @@ def generate_rd1367_vs_iso_tonal(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(1, 2, figsize=(13, 5.8), sharey=True)
     for ax, spectrum, title in (
-        (axes[0], deep, "Lt = 10.5 dB: both methods agree"),
-        (axes[1], shallow, "Lt = 7.5 dB: the verdicts split"),
+        (axes[0], deep, "$L_t$ = 10.5 dB: both methods agree"),
+        (axes[1], shallow, "$L_t$ = 7.5 dB: the verdicts split"),
     ):
         rd = environment.tonal_correction(spectrum, freqs)
         flags = np.asarray(environment.tonal_seeking_survey(spectrum, freqs))
@@ -1695,9 +1704,9 @@ def generate_rd1367_vs_iso_tonal(output_dir: str) -> None:
         ax.set_axisbelow(True)
         ax.text(
             0.03, 0.97,
-            f"RD 1367 tonal_correction: Kt = {rd.correction:.0f} dB\n"
+            f"RD 1367 tonal_correction: $K_t$ = {rd.correction:.0f} dB\n"
             f"ISO 1996-2 survey flag at 250 Hz: {bool(flags[4])}\n"
-            f"Lt at 250 Hz = {rd.differences[4]:.1f} dB",
+            f"$L_t$ at 250 Hz = {_fmt_minus(rd.differences[4], '.1f')} dB",
             transform=ax.transAxes, va="top", fontsize=10, color=COLOR_FG,
             bbox={"boxstyle": "round", "facecolor": COLOR_PANEL, "alpha": 0.9},
         )

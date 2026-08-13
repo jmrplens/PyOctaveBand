@@ -2775,11 +2775,11 @@ Q 694.415713 366.531852 698.665713 366.531852
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 317.560396)">I     =  -23,0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 317.560396)">I     =  −23,0 LUFS</text>
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(708.900245 327.762057)">LRA   =   17,7 LU</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 338.304381)">máx M =  -17,7 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 348.846705)">máx S =  -19,0 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 359.389029)">TPmáx =   -8,6 dBTP</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 338.304381)">máx M =  −17,7 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 348.846705)">máx S =  −19,0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 359.389029)">TPmáx =   −8,6 dBTP</text>
    </g>
    <g id="text_21">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="428.284297" y="16.798125" transform="rotate(-0 428.284297 16.798125)">Medición de sonoridad de programa (EBU R 128)</text>
@@ -2787,10 +2787,10 @@ z
    <g id="legend_1">
     <g id="patch_9">
      <path d="M 55.605469 368.095781 
-L 197.489062 368.095781 
-Q 199.289062 368.095781 199.289062 366.295781 
-L 199.289062 312.832969 
-Q 199.289062 311.032969 197.489062 311.032969 
+L 199.092187 368.095781 
+Q 200.892187 368.095781 200.892187 366.295781 
+L 200.892187 312.832969 
+Q 200.892187 311.032969 199.092187 311.032969 
 L 55.605469 311.032969 
 Q 53.805469 311.032969 53.805469 312.832969 
 L 53.805469 366.295781 
@@ -2834,7 +2834,7 @@ L 75.405469 359.183672
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="362.333672" transform="rotate(-0 82.605469 362.333672)">Integrada I = -23,0 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="362.333672" transform="rotate(-0 82.605469 362.333672)">Integrada I = −23,0 LUFS</text>
     </g>
    </g>
   </g>

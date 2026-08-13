@@ -371,21 +371,84 @@ L 705.6425 28.318125
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 44.631009 80.504258 
-L 237.281009 80.504258 
-Q 242.281009 80.504258 242.281009 75.504258 
-L 242.281009 39.496055 
-Q 242.281009 34.496055 237.281009 34.496055 
+     <path d="M 44.631009 80.508945 
+L 182.431009 80.508945 
+Q 187.431009 80.508945 187.431009 75.508945 
+L 187.431009 39.496055 
+Q 187.431009 34.496055 182.431009 34.496055 
 L 44.631009 34.496055 
 Q 39.631009 34.496055 39.631009 39.496055 
-L 39.631009 75.504258 
-Q 39.631009 80.504258 44.631009 80.504258 
+L 39.631009 75.508945 
+Q 39.631009 80.508945 44.631009 80.508945 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(44.631009 48.095469)">Kt = 0            (dLta &lt; 4)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(44.631009 60.098203)">Kt = dLta - 4  (4 &lt;= dLta &lt;= 10)</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(44.631009 72.100937)">Kt = 6            (dLta &gt; 10)</text>
+    <!-- $K_t = 0$  ($\Delta L_{ta} &lt; 4$) -->
+    <g transform="translate(44.631009 48.097031)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">K</tspan>
+      <tspan x="45.312988" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="6.557617" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="50.884277" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="53.628906" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">a</tspan>
+      <tspan x="11.523926" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="21.851074" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="28.213379" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="31.39209" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="34.570801" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="38.472168" y="-0.40625" style="font-size: 10px; font-family: sans-serif">Δ</tspan>
+      <tspan x="60.140137" y="-0.40625" style="font-size: 10px; font-family: sans-serif">&lt;</tspan>
+      <tspan x="70.467285" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="76.82959" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+     </text>
+    </g>
+    <!-- $K_t = \Delta L_{ta} - 4$  ($4 \leq \Delta L_{ta} \leq 10$) -->
+    <g transform="translate(44.631009 60.101328)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">K</tspan>
+      <tspan x="28.691895" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="95.945801" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="6.557617" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="34.263184" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="37.007812" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">a</tspan>
+      <tspan x="101.51709" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="104.261719" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">a</tspan>
+      <tspan x="11.523926" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="21.851074" y="-0.40625" style="font-size: 10px; font-family: sans-serif">Δ</tspan>
+      <tspan x="43.519043" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="53.846191" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="60.208496" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="63.387207" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="66.565918" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="70.467285" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="78.777832" y="-0.40625" style="font-size: 10px; font-family: sans-serif">≤</tspan>
+      <tspan x="89.10498" y="-0.40625" style="font-size: 10px; font-family: sans-serif">Δ</tspan>
+      <tspan x="110.772949" y="-0.40625" style="font-size: 10px; font-family: sans-serif">≤</tspan>
+      <tspan x="121.100098" y="-0.40625" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="127.462402" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="133.824707" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+     </text>
+    </g>
+    <!-- $K_t = 6$  ($\Delta L_{ta} &gt; 10$) -->
+    <g transform="translate(44.631009 72.105625)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">K</tspan>
+      <tspan x="45.312988" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="6.557617" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="50.884277" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="53.628906" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">a</tspan>
+      <tspan x="11.523926" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="21.851074" y="-0.40625" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="28.213379" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="31.39209" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="34.570801" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="38.472168" y="-0.40625" style="font-size: 10px; font-family: sans-serif">Δ</tspan>
+      <tspan x="60.140137" y="-0.40625" style="font-size: 10px; font-family: sans-serif">&gt;</tspan>
+      <tspan x="70.467285" y="-0.40625" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="76.82959" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="83.191895" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="370.103672" y="16.318125" transform="rotate(-0 370.103672 16.318125)">ISO 1996-2 Tonal Adjustment</text>

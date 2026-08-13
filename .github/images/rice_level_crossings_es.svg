@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.558437pt" height="424.886875pt" viewBox="0 0 712.558437 424.886875" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.558437pt" height="424.918125pt" viewBox="0 0 712.558437 424.918125" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 424.886875 
-L 712.558437 424.886875 
+   <path d="M 0 424.918125 
+L 712.558437 424.918125 
 L 712.558437 0 
 L 0 0 
 z
@@ -148,7 +148,41 @@ L 632.550125 28.318125
      </g>
     </g>
     <g id="text_8">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="375.579609" y="415.284531" transform="rotate(-0 375.579609 415.284531)">Nivel a [unidades de la señal]</text>
+     <!-- Nivel $a$ [unidades de la señal] -->
+     <g transform="translate(301.279609 415.315781)">
+      <text>
+       <tspan x="0" y="-0.234375" style="font-size: 10px; font-family: sans-serif">N</tspan>
+       <tspan x="7.480469" y="-0.234375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="10.258789" y="-0.234375" style="font-size: 10px; font-family: sans-serif">v</tspan>
+       <tspan x="16.176758" y="-0.234375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="22.329102" y="-0.234375" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="25.107422" y="-0.234375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="34.414062" y="-0.234375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="37.592773" y="-0.234375" style="font-size: 10px; font-family: sans-serif">[</tspan>
+       <tspan x="41.494141" y="-0.234375" style="font-size: 10px; font-family: sans-serif">u</tspan>
+       <tspan x="47.832031" y="-0.234375" style="font-size: 10px; font-family: sans-serif">n</tspan>
+       <tspan x="54.169922" y="-0.234375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="56.948242" y="-0.234375" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="63.295898" y="-0.234375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="69.423828" y="-0.234375" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="75.771484" y="-0.234375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="81.923828" y="-0.234375" style="font-size: 10px; font-family: sans-serif">s</tspan>
+       <tspan x="87.133789" y="-0.234375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="90.3125" y="-0.234375" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="96.660156" y="-0.234375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="102.8125" y="-0.234375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="105.991211" y="-0.234375" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="108.769531" y="-0.234375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="114.897461" y="-0.234375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="118.076172" y="-0.234375" style="font-size: 10px; font-family: sans-serif">s</tspan>
+       <tspan x="123.286133" y="-0.234375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="129.438477" y="-0.234375" style="font-size: 10px; font-family: sans-serif">ñ</tspan>
+       <tspan x="135.776367" y="-0.234375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="141.904297" y="-0.234375" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="144.682617" y="-0.234375" style="font-size: 10px; font-family: sans-serif">]</tspan>
+       <tspan x="28.286133" y="-0.234375" style="font-style: oblique; font-size: 10px; font-family: sans-serif">a</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="matplotlib.axis_2">

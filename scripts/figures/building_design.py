@@ -106,9 +106,9 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     rw_dd = result.r_direct_w
     rpw = result.r_prime_w
     lines = [
-        f"Rw (Dd) = {rw_dd:.1f} dB",
-        f"R'w = {rpw:.1f} dB",
-        f"R'w − Rw = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
+        f"$R_w$ (Dd) = {rw_dd:.1f} dB",
+        f"$R′_w$ = {rpw:.1f} dB",
+        f"$R′_w - R_w$ = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
         f"Dd {direct_share:.1f} %   ΣFf,Fd,Df {flank_share:.1f} %",
     ]
     ax.text(0.985, 0.62, "\n".join(lines), transform=ax.transAxes,
@@ -142,7 +142,8 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
     ax.fill_between(x, 0.0, res.improvement, color=COLOR_TERTIARY, alpha=0.18,
                     zorder=0)
     ax.plot(x, res.improvement, "-", color=COLOR_PRIMARY, linewidth=2.4,
-            marker="o", markersize=6, zorder=5, label="delta-L (improvement)")
+            marker="o", markersize=6, zorder=5,
+            label=r"$\Delta L$ (improvement)")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(b)}" for b in freqs], rotation=45, fontsize=8)
@@ -156,8 +157,8 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"delta-Lw = {res.delta_lw} dB  (ISO 717-2)",
-        "one-third octave, mock-up (a0 = 1e-6 m/s^2)",
+        f"$\\Delta L_w$ = {res.delta_lw} dB  (ISO 717-2)",
+        "one-third octave, mock-up ($a_0 = 10^{-6}$ m/s²)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -199,19 +200,18 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
         freq, 150.0, 170.0, stiffness1, stiffness2, ties_per_area=2.5
     )
     ax_clf.loglog(freq, rigid.rigid_coupling_loss_factor, "--", color=COLOR_MUTED,
-                  linewidth=2.0, zorder=3, label="rigid connection (Yc = 0)")
+                  linewidth=2.0, zorder=3, label="rigid connection ($Y_c = 0$)")
     ax_clf.set_xticks([50, 125, 250, 500, 1000, 2000, 4000])
     ax_clf.set_xticklabels(["50", "125", "250", "500", "1k", "2k", "4k"])
     ax_clf.set_xlim(50.0, 5000.0)
-    # Plain ASCII decade labels: the mathtext 10^-n exponent would put a
-    # U+2212 minus in the SVG, which not every reader's sans-serif font has.
     ax_clf.set_yticks([1e-8, 1e-6, 1e-4, 1e-2, 1.0])
-    ax_clf.set_yticklabels(["1e-8", "1e-6", "1e-4", "1e-2", "1"])
+    ax_clf.set_yticklabels(
+        ["$10^{-8}$", "$10^{-6}$", "$10^{-4}$", "$10^{-2}$", "1"])
     ax_clf.set_ylim(1e-8, 2.0)
     ax_clf.set_xlabel(LABEL_FREQ_HZ)
-    ax_clf.set_ylabel("Coupling loss factor eta_ij")
+    ax_clf.set_ylabel(r"Coupling loss factor $\eta_{ij}$")
     ax_clf.set_title("Wall-tie structure-borne coupling\n(point-connection model, "
-                     "2.5 ties/m2)", fontweight="bold", pad=10)
+                     "2.5 ties/m²)", fontweight="bold", pad=10)
     ax_clf.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_clf.set_axisbelow(True)
     ax_clf.legend(loc="lower left", fontsize=9)
@@ -229,7 +229,8 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ax_tl.plot(xb, plain.transmission_loss, "-o", color=COLOR_PRIMARY,
                linewidth=2.4, markersize=6, zorder=4, label="cavity wall, no ties")
     ax_tl.plot(xb, tied.transmission_loss, "--s", color=COLOR_SECONDARY,
-               linewidth=2.4, markersize=6, zorder=4, label="2.5 ties/m2, k = 2 MN/m")
+               linewidth=2.4, markersize=6, zorder=4,
+               label="2.5 ties/m², $k$ = 2 MN/m")
     positions = []
     for curve, colour in ((plain, COLOR_PRIMARY), (tied, COLOR_SECONDARY)):
         f0 = curve.resonance_frequency
@@ -238,7 +239,7 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
         positions.append(pos)
         ax_tl.axvline(pos, color=colour, linestyle=":", linewidth=1.8, zorder=2)
         ax_tl.annotate(
-            f"fmsm = {f0:.0f} Hz", xy=(pos, 0.46),
+            f"$f_{{\\mathrm{{msm}}}}$ = {f0:.0f} Hz", xy=(pos, 0.46),
             xycoords=("data", "axes fraction"), ha="right" if positions[:1] else "left",
             va="bottom", fontsize=9, color=colour, rotation=90,
         )
@@ -247,9 +248,9 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ax_tl.set_xticks(xb[::2])
     ax_tl.set_xticklabels(["20", "31.5", "50", "80", "125", "200", "315", "500"])
     ax_tl.set_xlabel(LABEL_FREQ_HZ)
-    ax_tl.set_ylabel("Sound reduction index R [dB]")
-    ax_tl.set_title("Ties stiffen the cavity\n(140 kg/m2 leaves, 75 mm cavity, "
-                    "2.5 ties/m2)", fontweight="bold", pad=10)
+    ax_tl.set_ylabel("Sound reduction index $R$ [dB]")
+    ax_tl.set_title("Ties stiffen the cavity\n(140 kg/m² leaves, 75 mm cavity, "
+                    "2.5 ties/m²)", fontweight="bold", pad=10)
     ax_tl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_tl.set_axisbelow(True)
     ax_tl.legend(loc="upper left", fontsize=9)
@@ -290,15 +291,16 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
     ax.fill_betweenx([-5.0, 100.0], 40.0, f0, color=theme_fill(COLOR_FG, ax),
                      zorder=0)
     ax.plot(freqs, lightweight.improvement, "-.", color=COLOR_TERTIARY,
-            linewidth=2.0, label="40 log10(f/f0) + hammer term (chipboard)")
+            linewidth=2.0,
+            label=r"$40\,\log_{10}(f/f_0)$ + hammer term (chipboard)")
     ax.plot(freqs, asphalt.improvement, "--", color=COLOR_SECONDARY,
-            linewidth=2.0, label="40 log10(f/f0) (asphalt, dry)")
+            linewidth=2.0, label=r"$40\,\log_{10}(f/f_0)$ (asphalt, dry)")
     ax.plot(freqs, screed.improvement, "-", color=COLOR_PRIMARY, linewidth=2.4,
-            label="30 log10(f/f0) (sand-cement screed)")
+            label=r"$30\,\log_{10}(f/f_0)$ (sand-cement screed)")
     ax.plot(bands, printed.improvement, "o", color=COLOR_PRIMARY,
             markersize=5.5, zorder=6, label="ISO 12354-2 Annex G bands")
     ax.axvline(f0, color=COLOR_FG, linestyle=":", linewidth=1.3)
-    ax.annotate("f0 = 52.8 Hz", xy=(f0, 46.0), xytext=(f0 * 1.15, 46.0),
+    ax.annotate("$f_0$ = 52.8 Hz", xy=(f0, 46.0), xytext=(f0 * 1.15, 46.0),
                 fontsize=10, color=COLOR_FG, va="center")
 
     ax.set_xscale("log")
@@ -313,8 +315,8 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "35 mm screed m' = 73.5 kg/m2 on s' = 8 MN/m3",
-        f"delta-Lw = {delta_lw:.1f} dB  (ISO 12354-2 Formula C.4)",
+        "35 mm screed $m′$ = 73.5 kg/m² on $s′$ = 8 MN/m³",
+        f"$\\Delta L_w$ = {delta_lw:.1f} dB  (ISO 12354-2 Formula C.4)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -356,8 +358,8 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
                       1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0])
     layer = 0.005
     series = (
-        ("No. 1: E/d = 1.5e11 N/m3", 1.5e11, COLOR_SECONDARY, "--"),
-        ("No. 2: E/d = 2.8e8 N/m3", 2.8e8, COLOR_PRIMARY, "-"),
+        (r"No. 1: $E/d = 1.5\times10^{11}$ N/m³", 1.5e11, COLOR_SECONDARY, "--"),
+        (r"No. 2: $E/d = 2.8\times10^{8}$ N/m³", 2.8e8, COLOR_PRIMARY, "-"),
     )
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -372,7 +374,7 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
         ax.plot(bands, result.two_line, ":", color=colour, linewidth=1.5)
         ax.axvline(result.cut_off_frequency, color=colour, linestyle=":",
                    linewidth=1.0, alpha=0.7)
-        labels.append(f"{label.split(':')[0]}: fco = "
+        labels.append(f"{label.split(':')[0]}: $f_{{\\mathrm{{co}}}}$ = "
                       f"{result.cut_off_frequency:.0f} Hz")
 
     ax.plot([], [], ":", color=COLOR_MUTED, linewidth=1.5,
@@ -388,7 +390,7 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    info = ["140 mm concrete slab, hammer 0.5 kg, r = 15 mm", *labels]
+    info = ["140 mm concrete slab, hammer 0.5 kg, $r$ = 15 mm", *labels]
     ax.text(0.02, 0.70, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=11, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -437,12 +439,12 @@ def generate_structure_borne_power(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB",
-        "eta = 2.2/(f Ts),  v0 = 1 nm/s",
+        r"$L_{Ws} = 10\,\log_{10}(2\pi f\,\eta\,m\,S) + L_v - 60$ dB",
+        r"$\eta = 2.2/(f\,T_s)$,  $v_0$ = 1 nm/s",
         "reception-plate method (clause 7)",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="left", fontsize=9, color=COLOR_FG, family="monospace",
+            va="bottom", ha="left", fontsize=9, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -484,7 +486,7 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.plot(x, lws_c, color=COLOR_SECONDARY, marker="o", lw=2.0,
             label=r"characteristic $L_{Ws,c}$ (EN 15657)")
     ax.plot(x, lws_inst, color=COLOR_TERTIARY, marker="s", lw=2.0,
-            label=r"installed $L_{Ws,inst}$ = $L_{Ws,c}-D_C$")
+            label=r"installed $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$")
     for k, p in enumerate(res.path_levels):
         ax.plot(x, p, color=COLOR_GRID, lw=1.0, ls=":", marker=".",
                 label="paths $L_{n,s,ij}$" if k == 0 else None)
@@ -501,12 +503,14 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))",
-        "Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)",
-        "Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2",
+        r"$D_C = 10\,\log_{10}(|Y_s+Y_i|^2 / (|Y_s|\,\mathrm{Re}\,Y_i))$",
+        (r"$L_{n,s,ij} = L_{Ws,\mathrm{inst}} - D_{sa} - R_{ij}"
+         r" - 10\,\log_{10}(S_i/S_0) - 10\,\log_{10}(A_0/4)$"),
+        (r"$L_{n,s} = 10\,\log_{10}(\Sigma\,10^{L_{n,s,ij}/10})$,  "
+         "$S_0 = A_0$ = 10 m²"),
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="left", fontsize=8.5, color=COLOR_FG, family="monospace",
+            va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -583,7 +587,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.semilogx(bands, ml, color=COLOR_TERTIARY, ls="--", lw=1.6,
                 label="field-incidence mass law")
     ax.semilogx(bands, sharp.transmission_loss, color=COLOR_PRIMARY, lw=2.0,
-                marker="o", markersize=3, label="single panel R (Sharp)")
+                marker="o", markersize=3, label="single panel $R$ (Sharp)")
     ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_c$")
     ax.set_title("Single panel: mass law and coincidence",
                  fontweight="bold", pad=10)
@@ -601,7 +605,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.semilogx(bands, single, color=COLOR_TERTIARY, ls="--", lw=1.6,
                 label="single leaf (total mass)")
     ax.semilogx(bands, dw.transmission_loss, color=COLOR_PRIMARY, lw=2.0,
-                marker="o", markersize=3, label="double wall R")
+                marker="o", markersize=3, label="double wall $R$")
     ax.axvline(f0, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_0$")
     ax.set_title("Double wall: mass-spring-mass resonance",
                  fontweight="bold", pad=10)
@@ -675,7 +679,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     imp = predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
                                       k_correction=k)
 
-    labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L'_{n,w}$"]
+    labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L′_{n,w}$"]
     values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
     # COLOR_MUTED rather than the gridline grey for the starting term: a bar
     # is a read value, so it has to hold up against the page on both themes.
@@ -701,9 +705,9 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.set_axisbelow(True)
 
     info = [
-        "L'n,w = Ln,w,eq - ΔLw + K",
-        f"Ln,w,eq = 164 - 35 log10(m'/m'0) = {ln_eq:.1f} dB",
-        f"L'n,w = {imp.l_prime_n_w:.1f} dB → 45 dB",
+        r"$L′_{n,w} = L_{n,w,eq} - \Delta L_w + K$",
+        f"$L_{{n,w,eq}} = 164 - 35\\,\\log_{{10}}(m′/m′_0)$ = {ln_eq:.1f} dB",
+        f"$L′_{{n,w}}$ = {imp.l_prime_n_w:.1f} dB → 45 dB",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
@@ -781,16 +785,16 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
 
     twin = ax.twinx()
     twin.plot(x, res.r_prime, "-o", color=COLOR_FG, linewidth=2.0,
-              markersize=4, zorder=5, label="R' (apparent)")
-    twin.set_ylabel("Apparent sound reduction index R' [dB]")
+              markersize=4, zorder=5, label="$R′$ (apparent)")
+    twin.set_ylabel("Apparent sound reduction index $R′$ [dB]")
     handles, labels = ax.get_legend_handles_labels()
     extra, extra_labels = twin.get_legend_handles_labels()
     ax.legend(handles + extra, labels + extra_labels, loc="upper left",
               fontsize=9, ncol=3)
 
     info = [
-        "R' = −10 log10(Σ 10^(−Rij/10))",
-        (f"R'w (C; Ctr) = {res.rating.rating} "
+        r"$R′ = -10\,\log_{10}(\Sigma\,10^{-R_{ij}/10})$",
+        (f"$R′_w$ ($C$; $C_{{tr}}$) = {res.rating.rating} "
          f"({_fmt_minus(res.rating.c)}; {_fmt_minus(res.rating.ctr)}) dB"),
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -824,7 +828,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.plot(x, res.transmission_loss, "-o", color=COLOR_PRIMARY,
-            linewidth=2.2, markersize=5, zorder=5, label="predicted R (Sharp)")
+            linewidth=2.2, markersize=5, zorder=5, label="predicted $R$ (Sharp)")
     ax.plot(x, w.shifted_reference, "--s", color=COLOR_FG, linewidth=1.8,
             markersize=5, zorder=5, label="shifted reference")
     unfav = w.measured < w.shifted_reference
@@ -833,7 +837,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
                     zorder=1, label="unfavourable deviations")
     idx_fc = float(np.interp(np.log10(fc), np.log10(bands), x))
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-               zorder=4, label=f"coincidence fc = {fc:.0f} Hz")
+               zorder=4, label=f"coincidence $f_c$ = {fc:.0f} Hz")
 
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Predicted Single-Panel Insulation Rated per ISO 717-1",
@@ -843,8 +847,9 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Rw(C;Ctr) = {w.rating}({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB",
-        "6 mm float glass, m'' = 15 kg/m², η = 0.024",
+        (f"$R_w$($C$;$C_{{tr}}$) = {w.rating}"
+         f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
+        "6 mm float glass, $m′′$ = 15 kg/m², $\\eta$ = 0.024",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -882,7 +887,7 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
     idx_a = float(np.interp(np.log10(quick.plateau_start), np.log10(bands), x))
     idx_b = float(np.interp(np.log10(quick.plateau_end), np.log10(bands), x))
     ax.axvspan(idx_a, idx_b, color=theme_fill(COLOR_SECONDARY, ax), lw=0, zorder=0,
-               label="coincidence plateau (A to B)")
+               label="coincidence plateau ($A$ to $B$)")
     ax.plot(x, physical.transmission_loss, "-o", color=COLOR_PRIMARY,
             linewidth=2.2, markersize=5, zorder=5,
             label="physical model (mass law + coincidence + damping)")
@@ -891,7 +896,7 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
             label="plateau estimate (Norton Table 3.1)")
     idx_fc = float(np.interp(np.log10(f_c), np.log10(bands), x))
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-               zorder=4, label="critical frequency fc")
+               zorder=4, label="critical frequency $f_c$")
 
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Plateau Estimate Against the Physical Panel Model",
@@ -902,10 +907,10 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
-        f"6 mm float glass, m'' = {mass:.1f} kg/m², η = {eta:g}",
-        (f"plateau height 27 dB, B/A = 10 → A = {quick.plateau_start:.0f} Hz, "
-         f"B = {quick.plateau_end:.0f} Hz"),
-        "identical below A; the plateau replaces the whole coincidence region",
+        f"6 mm float glass, $m′′$ = {mass:.1f} kg/m², $\\eta$ = {eta:g}",
+        (f"plateau height 27 dB, $B/A = 10$ → $A$ = {quick.plateau_start:.0f} Hz, "
+         f"$B$ = {quick.plateau_end:.0f} Hz"),
+        "identical below $A$; the plateau replaces the whole coincidence region",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=9, color=COLOR_FG,
@@ -990,13 +995,11 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     penalty = float(
         flat.transmission_loss[worst] - corrugated.transmission_loss[worst]
     )
-    # Plain symbol names, not mathtext: the Spanish variant rewrites decimal
-    # points to commas everywhere except in mathtext strings.
     info = [
-        (f"1 mm steel sheet, m'' = {mass_flat:.1f} kg/m², flat "
-         f"fc = {flat_fc / 1000.0:.1f} kHz"),
-        (f"corrugated H = 10 mm, L = 100 mm, m'' = {mass_corr:.1f} kg/m², "
-         f"fc1 = {fc1:.0f} Hz, fc2 = {fc2 / 1000.0:.1f} kHz"),
+        (f"1 mm steel sheet, $m′′$ = {mass_flat:.1f} kg/m², flat "
+         f"$f_c$ = {flat_fc / 1000.0:.1f} kHz"),
+        (f"corrugated $H$ = 10 mm, $L$ = 100 mm, $m′′$ = {mass_corr:.1f} kg/m², "
+         f"$f_{{c1}}$ = {fc1:.0f} Hz, $f_{{c2}}$ = {fc2 / 1000.0:.1f} kHz"),
         (f"worst penalty {penalty:.0f} dB at {nominal[worst]:g} Hz, "
          "for a stiffer and only 9 % heavier panel"),
     ]
@@ -1043,7 +1046,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
         )
         ax.semilogx(ratio, with_mount, linestyle=style, color=COLOR_MUTED,
                     linewidth=1.8, zorder=3,
-                    label=f"elastic support Yk = {y_k:g} m/(N s)  (19e)")
+                    label=f"elastic support $Y_k$ = {y_k:g} m/(N s)  (19e)")
 
     # The exact curve's minimum: matched mobilities, best power transfer.
     low = int(np.argmin(exact))
@@ -1062,8 +1065,8 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
                 fontsize=9, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
-    ax.set_xlabel("Mobility ratio |Ys| / |Yi|")
-    ax.set_ylabel("Coupling term D_C [dB]")
+    ax.set_xlabel(r"Mobility ratio $|Y_s|/|Y_i|$")
+    ax.set_ylabel("Coupling term $D_C$ [dB]")
     ax.set_title("EN 12354-5 Coupling Term and Its Two Limits",
                  fontweight="bold", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1071,7 +1074,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "D_C = 10 log10(|Ys + Yi + Yk|² / (|Ys| Re{Yi}))",
+        r"$D_C = 10\,\log_{10}(|Y_s + Y_i + Y_k|^2 / (|Y_s|\,\mathrm{Re}\{Y_i\}))$",
         "left: velocity source (stiff receiver takes more)",
         "right: force source (stiff receiver takes less)",
     ]
@@ -1115,23 +1118,25 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
         regime = "over-critical" if res.over_critical else "under-critical"
         ax.loglog(freqs, res.peak_force, "-", color=colour, linewidth=2.4,
                   zorder=5,
-                  label=f"{label} ({regime}, fco = {res.cut_off_frequency:.0f} Hz)")
+                  label=(f"{label} ({regime}, $f_{{\\mathrm{{co}}}}$ = "
+                         f"{res.cut_off_frequency:.0f} Hz)"))
         ax.axvline(res.cut_off_frequency, color=colour, linestyle=":",
                    linewidth=1.4, zorder=3)
         f_limit = float(hammer_limiting_frequency(impedance))
         if freqs[0] < f_limit < freqs[-1]:
             ax.axvline(f_limit, color=colour, linestyle="-.", linewidth=1.2,
                        zorder=3)
-            ax.annotate(f"f_limit = {f_limit:.0f} Hz", xy=(f_limit, lower * 0.55),
+            ax.annotate(f"$f_{{\\mathrm{{limit}}}}$ = {f_limit:.0f} Hz",
+                        xy=(f_limit, lower * 0.55),
                         xytext=(f_limit * 1.25, lower * 0.35), fontsize=9,
                         color=colour,
                         arrowprops={"arrowstyle": "->", "lw": 1.0,
                                     "color": colour})
 
     ax.axhline(upper, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
-               zorder=4, label="|Fn|upper = 2 m vh / Ti  (rebound)")
+               zorder=4, label=r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (rebound)")
     ax.axhline(lower, color=COLOR_MUTED, linestyle="-.", linewidth=1.6,
-               zorder=4, label="|Fn|lower = m vh / Ti  (no rebound)")
+               zorder=4, label=r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (no rebound)")
     ax.annotate("", xy=(90.0, upper), xytext=(90.0, lower),
                 arrowprops={"arrowstyle": "<->", "lw": 1.4})
     ax.text(97.0, (upper * lower) ** 0.5,
@@ -1139,7 +1144,7 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
             fontsize=9, color=COLOR_FG, va="center")
 
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Line force |Fn| [N]")
+    ax.set_ylabel(r"Line force $|F_n|$ [N]")
     ax.set_title("Tapping-Machine Force: the Floor Decides the Excitation",
                  fontweight="bold", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1210,11 +1215,11 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
 
     twin = ax.twinx()
     twin.plot(x, res.l_prime_n, "-o", color=COLOR_FG, linewidth=2.0,
-              markersize=4, zorder=5, label="L'n (apparent)")
-    twin.set_ylabel("Apparent normalized impact level L'n [dB]")
+              markersize=4, zorder=5, label="$L′_n$ (apparent)")
+    twin.set_ylabel("Apparent normalized impact level $L′_n$ [dB]")
     idx_f0 = float(np.interp(np.log10(f_0), np.log10(bands), x))
     twin.axvline(idx_f0, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
-                 zorder=4, label=f"floating floor fo = {f_0:.1f} Hz")
+                 zorder=4, label=f"floating floor $f_0$ = {f_0:.1f} Hz")
     handles, labels = ax.get_legend_handles_labels()
     extra, extra_labels = twin.get_legend_handles_labels()
     ax.legend(handles + extra, labels + extra_labels, loc="upper right",
@@ -1222,7 +1227,8 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
 
     info = [
         "five paths, not thirteen: only the floor is excited",
-        f"L'n,w (CI) = {res.rating.rating} ({res.rating.ci}) dB",
+        (f"$L′_{{n,w}}$ ($C_I$) = {res.rating.rating} "
+         f"({_fmt_minus(res.rating.ci)}) dB"),
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=10, color=COLOR_FG,
@@ -1255,21 +1261,21 @@ def generate_radiation_efficiency_panels(output_dir: str) -> None:
     _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(13.0, 5.6))
     ax_l.loglog(bands, big.radiation_efficiency, "-o", color=COLOR_PRIMARY,
                 linewidth=2.2, markersize=5, zorder=5,
-                label="1.5 m x 1.25 m pane")
+                label="1.5 m × 1.25 m pane")
     ax_l.loglog(bands, small.radiation_efficiency, "-s", color=COLOR_SECONDARY,
                 linewidth=2.2, markersize=5, zorder=5,
-                label="0.5 m x 0.4 m pane, same glass")
+                label="0.5 m × 0.4 m pane, same glass")
     ax_l.axhline(1.0, color=COLOR_MUTED, linestyle="--", linewidth=1.4,
-                 zorder=3, label="sigma = 1 (as efficient as a piston)")
+                 zorder=3, label=r"$\sigma = 1$ (as efficient as a piston)")
     ax_l.axvline(f_c, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-                 zorder=3, label=f"critical frequency fc = {f_c:.0f} Hz")
+                 zorder=3, label=f"critical frequency $f_c$ = {f_c:.0f} Hz")
     peak = float(big.radiation_efficiency.max())
-    ax_l.annotate(f"coincidence peak: sigma = {peak:.2f}",
+    ax_l.annotate(f"coincidence peak: $\\sigma$ = {peak:.2f}",
                   xy=(2000.0, peak), xytext=(260.0, peak * 1.05), fontsize=9,
                   color=COLOR_FG,
                   arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax_l.set_xlabel(LABEL_FREQ_HZ)
-    ax_l.set_ylabel("Radiation efficiency sigma")
+    ax_l.set_ylabel(r"Radiation efficiency $\sigma$")
     ax_l.set_title("Edge Radiation, Coincidence and the Slow Return to Unity",
                    fontweight="bold", pad=12)
     ax_l.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5,
@@ -1315,26 +1321,31 @@ def generate_structure_borne_conversion(output_dir: str) -> None:
     x = np.arange(bands.size)
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(x, l_ws, "-o", color=COLOR_MUTED, linewidth=2.0, markersize=5,
-            zorder=4, label="L_Ws measured on the test plate (Y = 5.34e-6)")
+            zorder=4,
+            label=r"$L_{Ws}$ measured on the test plate ($Y = 5.34\times10^{-6}$)")
     ax.plot(x, l_wsn, "-s", color=COLOR_PRIMARY, linewidth=2.4, markersize=6,
             zorder=5,
-            label="L_Wsn on the standard plate (Y = 5e-6): what is declared")
+            label=(r"$L_{Wsn}$ on the standard plate ($Y = 5\times10^{-6}$): "
+                   "what is declared"))
     ax.plot(x, installed, "-^", color=COLOR_TERTIARY, linewidth=2.4,
             markersize=6, zorder=5,
-            label="L_Ws,inst on the receiving wall (Y = 24.1e-6)")
+            label=(r"$L_{Ws,\mathrm{inst}}$ on the receiving wall "
+                   r"($Y = 24.1\times10^{-6}$)"))
     ax.plot(x, characteristic, "-D", color=COLOR_SECONDARY, linewidth=2.4,
             markersize=6, zorder=5,
-            label="L_Ws,c with the source mobility (Y = 1e-3): the input to "
-                  "EN 12354-5")
+            label=(r"$L_{Ws,c}$ with the source mobility ($Y = 10^{-3}$): "
+                   "the input to EN 12354-5"))
     ax.plot(x, characteristic - d_c, "x", color=COLOR_FG, markersize=9,
             markeredgewidth=2.0, zorder=6,
-            label=f"L_Ws,c - D_C, D_C = {d_c:g} dB: back to L_Ws,inst")
+            label=(f"$L_{{Ws,c}} - D_C$, $D_C$ = {d_c:g} dB: "
+                   f"back to $L_{{Ws,\\mathrm{{inst}}}}$"))
 
     # The step the section exists to teach, marked in the lowest band.
     ax.annotate("", xy=(0, installed[0]), xytext=(0, l_wsn[0]),
                 arrowprops={"arrowstyle": "<->", "lw": 1.6})
     ax.text(0.12, 0.5 * (l_wsn[0] + installed[0]),
-            f"+{installed[0] - l_wsn[0]:.1f} dB = 10 lg(24.1/5.0):\n"
+            f"+{installed[0] - l_wsn[0]:.1f} dB = "
+            "$10\\,\\mathrm{lg}(24.1/5.0)$:\n"
             "a lighter receiver accepts more power",
             fontsize=9, color=COLOR_FG, va="center")
 

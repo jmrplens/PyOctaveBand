@@ -28,6 +28,22 @@ from .theme import (
     save_figure,
 )
 
+#: The ECMA-418-2 units carry the Sottek Hearing Model subscript
+#: (Bark_HMS, sone_HMS, tu_HMS, vacil_HMS); mathtext is the only clean way
+#: to set that subscript, and it stays roman on both sides: the unit name
+#: and the model tag are labels, not variables.
+_HMS_UNITS = {
+    "Bark_HMS": r"$\mathrm{Bark}_{\mathrm{HMS}}$",
+    "sone_HMS": r"$\mathrm{sone}_{\mathrm{HMS}}$",
+    "tu_HMS": r"$\mathrm{tu}_{\mathrm{HMS}}$",
+    "vacil_HMS": r"$\mathrm{vacil}_{\mathrm{HMS}}$",
+}
+
+
+def _hms(unit: str) -> str:
+    """The unit with its HMS model subscript composed, others untouched."""
+    return _HMS_UNITS.get(unit, unit)
+
 
 def generate_equal_loudness_contours(output_dir: str) -> None:
     """Plot the ISO 226:2023 normal equal-loudness-level contours."""
@@ -104,22 +120,22 @@ def generate_loudness_pattern(output_dir: str) -> None:
     _, ax = plt.subplots(figsize=(10, 6))
     ax.fill_between(z, flat.specific, color=COLOR_SECONDARY, alpha=0.25)
     ax.plot(z, flat.specific, color=COLOR_SECONDARY, linewidth=1.6,
-            label=f"Flat broadband 60 dB - N = {flat.loudness:.1f} sone")
+            label=f"Flat broadband 60 dB — $N$ = {flat.loudness:.1f} sone")
     ax.fill_between(z, narrow.specific, color=COLOR_PRIMARY, alpha=0.35)
     ax.plot(z, narrow.specific, color=COLOR_PRIMARY, linewidth=1.6,
-            label=f"1 kHz narrowband - N = {narrow.loudness:.1f} sone")
+            label=f"1 kHz narrowband — $N$ = {narrow.loudness:.1f} sone")
 
     peak_z = float(z[np.argmax(narrow.specific)])
     ax.annotate(
-        "Shaded area = total loudness N",
+        "Shaded area = total loudness $N$",
         xy=(peak_z + 0.6, float(narrow.specific.max()) * 0.45),
         xytext=(12.5, float(narrow.specific.max()) * 0.75),
         fontsize=10, arrowprops={"arrowstyle": "->", "lw": 0.9},
     )
     ax.set_title("Specific Loudness Pattern (ISO 532-1 Zwicker)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Critical-band rate z [Bark]")
-    ax.set_ylabel("Specific loudness N' [sone/Bark]")
+    ax.set_xlabel("Critical-band rate $z$ [Bark]")
+    ax.set_ylabel("Specific loudness $N′$ [sone/Bark]")
     ax.set_xlim(0, 24)
     # Headroom above the tallest pattern so the legend stays clear of it.
     ax.set_ylim(0, float(flat.specific.max()) * 1.28)
@@ -167,12 +183,12 @@ def generate_zwicker_time_varying(output_dir: str) -> None:
 
     ax.fill_between(times, trace, color=theme_fill(COLOR_PRIMARY, ax))
     ax.plot(times, trace, color=COLOR_PRIMARY, linewidth=1.6,
-            label="Loudness-vs-time N(t), 2 ms steps")
+            label="Loudness-vs-time $N(t)$, 2 ms steps")
     for value, color, style, label in (
         (res.loudness, COLOR_SECONDARY, "-",
-         f"Nmax = {res.loudness:.1f} sone (res.loudness)"),
-        (n5, COLOR_TERTIARY, "--", f"N5 = {n5:.1f} sone"),
-        (n10, COLOR_FG, ":", f"N10 = {n10:.1f} sone"),
+         rf"$N_{{\mathrm{{max}}}}$ = {res.loudness:.1f} sone (res.loudness)"),
+        (n5, COLOR_TERTIARY, "--", f"$N_5$ = {n5:.1f} sone"),
+        (n10, COLOR_FG, ":", f"$N_{{10}}$ = {n10:.1f} sone"),
     ):
         ax.axhline(value, color=color, linestyle=style, linewidth=1.5,
                    label=label)
@@ -180,7 +196,7 @@ def generate_zwicker_time_varying(output_dir: str) -> None:
                linewidth=1.2, alpha=0.7,
                label=f"arithmetic mean = {trace.mean():.1f} sone")
     ax.set_xlabel("Time [s]")
-    ax.set_ylabel("Loudness N [sone]")
+    ax.set_ylabel("Loudness $N$ [sone]")
     ax.set_xlim(0.0, float(times[-1]))
     ax.set_ylim(0.0, float(trace.max()) * 1.32)
     ax.set_title("1 kHz bursts stepping 45 to 85 dB",
@@ -194,8 +210,8 @@ def generate_zwicker_time_varying(output_dir: str) -> None:
     exceeded = 100.0 * np.array([(trace >= g).mean() for g in grid])
     ax2.plot(exceeded, grid, color=COLOR_PRIMARY, linewidth=2.0)
     for pct, value, color, label in (
-        (5.0, n5, COLOR_TERTIARY, "N5"),
-        (10.0, n10, COLOR_FG, "N10"),
+        (5.0, n5, COLOR_TERTIARY, "$N_5$"),
+        (10.0, n10, COLOR_FG, "$N_{10}$"),
     ):
         ax2.plot([pct], [value], "o", color=color, markersize=8,
                  markerfacecolor="white", markeredgewidth=1.8, zorder=6)
@@ -203,8 +219,8 @@ def generate_zwicker_time_varying(output_dir: str) -> None:
                      xytext=(pct + 14, value + 1.4), fontsize=10, color=color,
                      arrowprops={"arrowstyle": "->", "lw": 0.9,
                                  "color": color})
-    ax2.set_xlabel("Percentage of the analysis time exceeding N [%]")
-    ax2.set_ylabel("Loudness N [sone]")
+    ax2.set_xlabel("Percentage of the analysis time exceeding $N$ [%]")
+    ax2.set_ylabel("Loudness $N$ [sone]")
     ax2.set_xlim(0.0, 100.0)
     ax2.set_ylim(0.0, float(trace.max()) * 1.32)
     ax2.set_title(f"Exceedance over the {times[-1]:.1f} s record",
@@ -213,7 +229,7 @@ def generate_zwicker_time_varying(output_dir: str) -> None:
     ax2.set_axisbelow(True)
     ax2.text(
         0.97, 0.95,
-        f"stationary=True on the same record: N = {stationary.loudness:.1f} sone",
+        f"stationary=True on the same record: $N$ = {stationary.loudness:.1f} sone",
         transform=ax2.transAxes, ha="right", va="top", fontsize=9,
         color=COLOR_FG,
         bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
@@ -249,7 +265,7 @@ def generate_tone_audibility_uncertainty(output_dir: str) -> None:
     edges = [-2.0, 0.0, 2.0, 4.0, 6.0, 9.0, 12.0, 14.0]
     for step, (low, high) in enumerate(itertools.pairwise(edges)):
         ax.axhline(high, color=COLOR_GRID, linewidth=1.0, linestyle=":")
-        ax.text(0.46, (low + high) / 2, f"Kt = {step}", fontsize=9,
+        ax.text(0.46, (low + high) / 2, f"$K_t$ = {step}", fontsize=9,
                 color=COLOR_FG, va="center", ha="left")
     ax.axhline(0.0, color=COLOR_FG, linewidth=1.2)
 
@@ -260,19 +276,19 @@ def generate_tone_audibility_uncertainty(output_dir: str) -> None:
     ax.errorbar(index, decisive, yerr=uncertainty, fmt="o",
                 color=COLOR_PRIMARY, markersize=8, markerfacecolor="white",
                 markeredgewidth=1.8, capsize=6, linewidth=1.6, zorder=5,
-                label="decisive audibility of each spectrum, ± U (clause 6)")
+                label=r"decisive audibility of each spectrum, $\pm U$ (clause 6)")
     for x_i, y_i, f_i in zip(index, decisive, tones, strict=True):
         ax.annotate(f"{f_i:g} Hz", xy=(x_i, y_i), xytext=(x_i + 0.09, y_i + 0.5),
                     fontsize=9, color=COLOR_FG)
 
     ax.annotate(
-        f"Kt = {k_t} dB, but the interval reaches into Kt = {k_low} dB",
+        f"$K_t$ = {k_t} dB, but the interval reaches into $K_t$ = {k_low} dB",
         xy=(3.0, mean - mean_u), xytext=(1.55, 1.1), fontsize=10,
         color=COLOR_SECONDARY,
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_SECONDARY})
 
-    ax.set_xlabel("Measured 3 s spectrum (Annex E, run index j)")
-    ax.set_ylabel("Audibility ΔL [dB]")
+    ax.set_xlabel("Measured 3 s spectrum (Annex E, run index $j$)")
+    ax.set_ylabel(r"Audibility $\Delta L$ [dB]")
     ax.set_xlim(0.4, 5.8)
     ax.set_ylim(-2.0, 14.0)
     ax.set_xticks(index)
@@ -368,13 +384,14 @@ def _sottek_specific_panels(
     ax.fill_between(bark, specific, color=theme_fill(COLOR_PRIMARY, ax))
     ax.plot(bark, specific, color=COLOR_PRIMARY, linewidth=1.8)
     peak = int(np.argmax(specific))
-    ax.annotate(f"the carrier's band, {bark[peak]:.1f} Bark_HMS",
+    ax.annotate(f"the carrier's band, {bark[peak]:.1f} {_hms('Bark_HMS')}",
                 xy=(bark[peak], specific[peak]),
                 xytext=(bark[peak] + 2.0, specific[peak] * 0.92), fontsize=10,
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
-    ax.set_xlabel("Critical-band rate z [Bark_HMS]")
-    ax.set_ylabel(f"Specific {title.lower()} {symbol}'(z) [{unit}/Bark_HMS]")
+    ax.set_xlabel(f"Critical-band rate $z$ [{_hms('Bark_HMS')}]")
+    ax.set_ylabel(f"Specific {title.lower()} ${symbol}′(z)$ "
+                  f"[{_hms(unit)}/{_hms('Bark_HMS')}]")
     ax.set_xlim(0, 24)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
     ax.set_title(f"Average specific {title.lower()}", fontweight="bold",
@@ -383,11 +400,11 @@ def _sottek_specific_panels(
     ax.set_axisbelow(True)
 
     ax2.plot(time, trace, color=COLOR_PRIMARY, linewidth=1.6,
-             label=f"{symbol}(l50), the running value")
+             label=f"${symbol}(l_{{50}})$, the running value")
     ax2.axhline(single, color=COLOR_SECONDARY, linewidth=1.8, linestyle="--",
-                label=f"90th percentile = {single:.4f} {unit}")
+                label=f"90th percentile = {single:.4f} {_hms(unit)}")
     ax2.set_xlabel("Time [s]")
-    ax2.set_ylabel(f"{title} {symbol} [{unit}]")
+    ax2.set_ylabel(f"{title} ${symbol}$ [{_hms(unit)}]")
     ax2.set_xlim(float(time[0]), float(time[-1]))
     ax2.set_ylim(0.0, max(float(trace.max()), single) * 1.28)
     ax2.set_title("The single value is a percentile of this trace",
@@ -459,12 +476,12 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
         ax.fill_between(z, result.specific, color=theme_fill(color, ax))
         ax.plot(z, result.specific, color=color, linewidth=1.8,
                 label=(f"{centre:g} Hz critical band — "
-                       f"N = {result.loudness:.1f} sone, S = {acum:.2f} acum"))
+                       f"$N$ = {result.loudness:.1f} sone, $S$ = {acum:.2f} acum"))
         ax.axvline(centroid, color=color, linestyle="--", linewidth=1.2)
-        ax.annotate(f"⟨z⟩ = {centroid:.1f} Bark", xy=(centroid, 0.06),
+        ax.annotate(rf"$\langle z\rangle$ = {centroid:.1f} Bark", xy=(centroid, 0.06),
                     xytext=(centroid + 0.7, 0.06), fontsize=9, color=color)
-    ax.set_xlabel("Critical-band rate z [Bark]")
-    ax.set_ylabel("Specific loudness N' [sone/Bark]")
+    ax.set_xlabel("Critical-band rate $z$ [Bark]")
+    ax.set_ylabel("Specific loudness $N′$ [sone/Bark]")
     ax.set_xlim(0, 24)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
     ax.set_title("Equally loud, seven times as sharp", fontweight="bold",
@@ -485,7 +502,7 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
                  markerfacecolor="white", markeredgewidth=1.6,
                  label="Table A.2 hearing-test targets")
     ax2.set_xlabel(LABEL_FREQ_HZ)
-    ax2.set_ylabel("Sharpness S [acum]")
+    ax2.set_ylabel("Sharpness $S$ [acum]")
     ax2.set_ylim(0.0, 3.4)
     ax2.set_title("DIN 45692 Table A.2, 250 Hz to 4 kHz", fontweight="bold",
                   pad=10)
@@ -607,7 +624,7 @@ def generate_two_tone_separation(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(freqs, f_d, color=COLOR_PRIMARY, linewidth=2.2,
-                label="Threshold fD (Formula 19)")
+                label="Threshold $f_D$ (Formula 19)")
     ax.fill_between(freqs, f_d, 100.0,
                     color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
     ax.plot([212.0], [21.0], "o", color=COLOR_SECONDARY, markersize=9,
@@ -622,7 +639,7 @@ def generate_two_tone_separation(output_dir: str) -> None:
     ax.plot([137.3], [18.9], "s", color=COLOR_TERTIARY, markersize=9,
             zorder=5)
     ax.annotate("Annex E pair: 118.4 and 137.3 Hz,\n"
-                "18.9 Hz apart — below fD, so combined",
+                "18.9 Hz apart — below $f_D$, so combined",
                 xy=(137.3, 18.9), xytext=(95.0, 44.0), fontsize=10,
                 color=COLOR_TERTIARY,
                 arrowprops={"arrowstyle": "->", "lw": 1.0,
@@ -632,8 +649,8 @@ def generate_two_tone_separation(output_dir: str) -> None:
     ax.text(600.0, 12.0, "energy-summed into one FG entry", fontsize=11,
             color=COLOR_FG, ha="center")
 
-    ax.set_xlabel("Frequency of the more audible tone fT [Hz]")
-    ax.set_ylabel("Frequency separation |fT1 − fT2| [Hz]")
+    ax.set_xlabel("Frequency of the more audible tone $f_T$ [Hz]")
+    ax.set_ylabel(r"Frequency separation $|f_{T1} - f_{T2}|$ [Hz]")
     ax.set_xlim(88.0, 1000.0)
     ax.set_ylim(0.0, 100.0)
     ax.set_title("Two Tones in One Critical Band: Separate or Combined "
@@ -705,7 +722,7 @@ def generate_sti_curve(output_dir: str) -> None:
     ax.set_xscale("log")
     ax.set_title("STI vs Reverberation Time (IEC 60268-16)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Reverberation time T60 [s]")
+    ax.set_xlabel("Reverberation time $T_{60}$ [s]")
     ax.set_ylabel("STI")
     ax.set_xlim(0.25, 6.0)
     ax.set_ylim(y_min, y_max)
@@ -736,11 +753,11 @@ def generate_sharpness_weighting(output_dir: str) -> None:
 
     _, ax = plt.subplots(figsize=(10, 6.5))
     ax.semilogy(z, g_din, color=COLOR_PRIMARY, linewidth=2.2,
-                label="DIN 45692 g(z)")
+                label="DIN 45692 $g(z)$")
     ax.semilogy(z, g_bismarck, color=COLOR_TERTIARY, linewidth=1.7,
                 linestyle="--", label="von Bismarck (Annex B)")
     ax.semilogy(z, g_aures, color=COLOR_SECONDARY, linewidth=1.7,
-                linestyle="-.", label=f"Aures (Annex B, N = {total_n:.0f} sone)")
+                linestyle="-.", label=f"Aures (Annex B, $N$ = {total_n:.0f} sone)")
 
     # DIN weighting is flat (g = 1) up to 15.8 Bark, von Bismarck up to 15.
     # The three guides sit behind the curves, held back by shade: held back by
@@ -758,10 +775,10 @@ def generate_sharpness_weighting(output_dir: str) -> None:
                 fontsize=9, color=COLOR_TERTIARY, ha="center",
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_TERTIARY})
 
-    ax.set_title("Sharpness Weighting g(z) (DIN 45692)",
+    ax.set_title("Sharpness Weighting $g(z)$ (DIN 45692)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Critical-band rate z [Bark]")
-    ax.set_ylabel("Weighting g(z)")
+    ax.set_xlabel("Critical-band rate $z$ [Bark]")
+    ax.set_ylabel("Weighting $g(z)$")
     ax.set_xlim(0, 24)
     ax.set_ylim(0.4, 30)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
@@ -787,13 +804,13 @@ def generate_erb_bandwidth(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.loglog(f, erb, color=COLOR_PRIMARY, linewidth=2.2,
-              label="ERB$_N$ (Glasberg & Moore, 1990)")
+              label=r"$\mathrm{ERB}_N$ (Glasberg & Moore, 1990)")
     ax.loglog(f, third_octave, color=COLOR_SECONDARY, linewidth=1.6,
-              linestyle="--", label="One-third octave (23 % of f)")
+              linestyle="--", label="One-third octave (23 % of $f$)")
     ax.set_title("Auditory-Filter Bandwidth and the Cam Scale "
                  "(Glasberg & Moore, 1990)", fontweight="bold", pad=12)
     ax.set_xlabel("Centre frequency [Hz]")
-    ax.set_ylabel("Equivalent rectangular bandwidth ERB$_N$ [Hz]")
+    ax.set_ylabel(r"Equivalent rectangular bandwidth $\mathrm{ERB}_N$ [Hz]")
     ax.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
     format_frequency_axis(ax, 50.0, 16000.0)
     from matplotlib.ticker import FixedFormatter, FixedLocator
@@ -823,7 +840,7 @@ def generate_erb_bandwidth(output_dir: str) -> None:
     ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
     ax2.xaxis.set_minor_locator(NullLocator())
     ax2.xaxis.set_minor_formatter(NullFormatter())
-    ax2.set_xlabel("ERB$_N$ number [Cam]", color=COLOR_TERTIARY)
+    ax2.set_xlabel(r"$\mathrm{ERB}_N$ number [Cam]", color=COLOR_TERTIARY)
     save_figure(output_dir, "erb_bandwidth.svg")
     plt.close()
 
@@ -875,11 +892,11 @@ def generate_loudness_models_comparison(output_dir: str) -> None:
 
     _, ax = plt.subplots(figsize=(10, 6))
     ax.plot(levels, zw, "o-", color=COLOR_PRIMARY, linewidth=2.0, markersize=6,
-            label=f"Zwicker (ISO 532-1), N = {zw[2]:.1f} sone")
+            label=f"Zwicker (ISO 532-1), $N$ = {zw[2]:.1f} sone")
     ax.plot(levels, mg, "s--", color=COLOR_TERTIARY, linewidth=1.8, markersize=6,
-            label=f"Moore-Glasberg (ISO 532-2), N = {mg[2]:.1f} sone")
+            label=f"Moore-Glasberg (ISO 532-2), $N$ = {mg[2]:.1f} sone")
     ax.plot(levels, ec, "^-.", color=COLOR_SECONDARY, linewidth=1.8, markersize=6,
-            label=f"Sottek (ECMA-418-2), N = {ec[2]:.1f} sone")
+            label=f"Sottek (ECMA-418-2), $N$ = {ec[2]:.1f} sone")
 
     # The three models are anchored to 1 sone at 1 kHz / 40 dB SPL.
     ax.axhline(1.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
@@ -897,7 +914,7 @@ def generate_loudness_models_comparison(output_dir: str) -> None:
     ax.set_title("Loudness Models Compared (1 kHz tone)",
                  fontweight="bold", pad=12)
     ax.set_xlabel("Sound pressure level [dB SPL]")
-    ax.set_ylabel("Total loudness N [sone]")
+    ax.set_ylabel("Total loudness $N$ [sone]")
     ax.set_xlim(18, 82)
     ax.set_ylim(0, float(zw[-1]) * 1.08)
     ax.set_xticks([20, 30, 40, 50, 60, 70, 80])
@@ -923,7 +940,7 @@ def generate_sottek_specific_loudness(output_dir: str) -> None:
     _, ax = plt.subplots(figsize=(10, 6))
     ax.fill_between(bark, spec, color=COLOR_PRIMARY, alpha=0.30)
     ax.plot(bark, spec, color=COLOR_PRIMARY, linewidth=1.8,
-            label=f"1 kHz tone, 60 dB (N = {total:.1f} sone_HMS)")
+            label=f"1 kHz tone, 60 dB ($N$ = {total:.1f} {_hms('sone_HMS')})")
 
     peak_i = int(np.argmax(spec))
     ax.annotate("Peak specific loudness",
@@ -934,8 +951,8 @@ def generate_sottek_specific_loudness(output_dir: str) -> None:
 
     ax.set_title("Sottek Specific Loudness (ECMA-418-2)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Critical-band rate z [Bark]")
-    ax.set_ylabel("Specific loudness N' [sone_HMS/Bark]")
+    ax.set_xlabel("Critical-band rate $z$ [Bark]")
+    ax.set_ylabel(f"Specific loudness $N′$ [{_hms('sone_HMS')}/Bark]")
     ax.set_xlim(0, float(bark[-1]))
     ax.set_ylim(0, float(spec.max()) * 1.25)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
@@ -989,12 +1006,12 @@ def generate_tonality_roughness_demo(output_dir: str) -> None:
 
     # -- Top: time-dependent tonality, tone-in-noise vs pure noise -----------
     ax0.plot(t_tin, tv_tin, color=COLOR_PRIMARY, linewidth=1.8,
-             label=f"Tone in noise (T = {t_single:.2f} tu_HMS)")
+             label=f"Tone in noise ($T$ = {t_single:.2f} {_hms('tu_HMS')})")
     ax0.plot(_t_pn, tv_pn, color=COLOR_SECONDARY, linewidth=1.8,
-             label=f"Pure noise (T = {pn_single:.2f} tu_HMS)")
-    ax0.set_title("ECMA-418-2 Tonality T(t)", fontweight="bold", pad=10)
+             label=f"Pure noise ($T$ = {pn_single:.2f} {_hms('tu_HMS')})")
+    ax0.set_title("ECMA-418-2 Tonality $T(t)$", fontweight="bold", pad=10)
     ax0.set_xlabel("Time [s]")
-    ax0.set_ylabel("Tonality T [tu_HMS]")
+    ax0.set_ylabel(f"Tonality $T$ [{_hms('tu_HMS')}]")
     ax0.set_xlim(0, float(t_tin[-1]))
     ax0.set_ylim(0, max(1.0, float(tv_tin.max()) * 1.30))
     ax0.legend(loc="upper right", fontsize=9)
@@ -1005,15 +1022,15 @@ def generate_tonality_roughness_demo(output_dir: str) -> None:
     peak_i = int(np.argmax(r))
     ax1.plot(fmods[peak_i], r[peak_i], "o", color=COLOR_SECONDARY, markersize=9,
              markerfacecolor="none", markeredgewidth=1.6, zorder=5)
-    ax1.annotate(f"Peak R = {r[peak_i]:.1f} asper @ {fmods[peak_i]:.0f} Hz",
+    ax1.annotate(f"Peak $R$ = {r[peak_i]:.1f} asper @ {fmods[peak_i]:.0f} Hz",
                  xy=(float(fmods[peak_i]), float(r[peak_i])),
                  xytext=(105.0, float(r[peak_i]) * 0.95), fontsize=10,
                  color=COLOR_FG,
                  arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
     ax1.set_title("ECMA-418-2 Roughness vs Modulation Frequency",
                   fontweight="bold", pad=10)
-    ax1.set_xlabel("Modulation frequency f_mod [Hz]")
-    ax1.set_ylabel("Roughness R [asper]")
+    ax1.set_xlabel(r"Modulation frequency $f_{\mathrm{mod}}$ [Hz]")
+    ax1.set_ylabel("Roughness $R$ [asper]")
     ax1.set_xlim(10, 210)
     ax1.set_ylim(0, float(r.max()) * 1.25)
     ax1.legend(loc="upper right", fontsize=9)
@@ -1067,25 +1084,25 @@ def generate_hms_modulation_bandpass(output_dir: str) -> None:
     # roughness), matching the result .plot() renderers; legible on both
     # themes, kept literal on purpose.
     ax.semilogx(fm_fs, f_vals, "o-", color="#17becf", linewidth=2.2,
-                markersize=6, label="Fluctuation strength F (Clause 9, slow modulation)")
+                markersize=6, label="Fluctuation strength $F$ (Clause 9, slow modulation)")
     ax.semilogx(fm_r, r_vals, "s-", color="#8c564b", linewidth=2.2,
-                markersize=6, label="Roughness R (Clause 7, fast modulation)")
+                markersize=6, label="Roughness $R$ (Clause 7, fast modulation)")
 
     i_f = int(np.argmax(f_vals))
     i_r = int(np.argmax(r_vals))
-    ax.annotate(f"F = {f_vals[i_f]:.2f} vacil_HMS @ {fm_fs[i_f]:.0f} Hz",
+    ax.annotate(f"$F$ = {f_vals[i_f]:.2f} {_hms('vacil_HMS')} @ {fm_fs[i_f]:.0f} Hz",
                 xy=(float(fm_fs[i_f]), float(f_vals[i_f])),
                 xytext=(float(fm_fs[i_f]) * 1.6, float(f_vals[i_f]) * 1.06),
                 fontsize=10, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
-    ax.annotate(f"R = {r_vals[i_r]:.2f} asper @ {fm_r[i_r]:.0f} Hz",
+    ax.annotate(f"$R$ = {r_vals[i_r]:.2f} asper @ {fm_r[i_r]:.0f} Hz",
                 xy=(float(fm_r[i_r]), float(r_vals[i_r])),
                 xytext=(float(fm_r[i_r]) * 1.5, float(r_vals[i_r]) * 1.06),
                 fontsize=10, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
 
-    ax.set_xlabel("Modulation frequency f_mod [Hz]")
-    ax.set_ylabel("F [vacil_HMS] / R [asper]")
+    ax.set_xlabel(r"Modulation frequency $f_{\mathrm{mod}}$ [Hz]")
+    ax.set_ylabel(f"$F$ [{_hms('vacil_HMS')}] / $R$ [asper]")
     ax.set_title("Slow vs Fast Modulation Perception (ECMA-418-2 Sottek Hearing Model)",
                  fontweight="bold", pad=12)
     top = max(float(np.max(f_vals)), float(np.max(r_vals)))
@@ -1181,14 +1198,14 @@ def generate_fluctuation_strength(output_dir: str) -> None:
                        f"peak {f_noise.max():.1f} vacil"))
     ax.axvline(4.0, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.7,
                label="4 Hz reference")
-    ax.annotate(f"x{overshoot:.1f} at 4 Hz",
+    ax.annotate(f"×{overshoot:.1f} at 4 Hz",
                 xy=(4.0, float(f_noise[int(np.argmin(np.abs(fm_noise - 4.0)))])),
                 xytext=(0.62, float(f_noise.max()) * 0.86), fontsize=10,
                 color=COLOR_SECONDARY,
                 arrowprops={"arrowstyle": "->", "lw": 1.0,
                             "color": COLOR_SECONDARY})
-    ax.set_xlabel("Modulation frequency f_mod [Hz]")
-    ax.set_ylabel("Fluctuation strength F [vacil]")
+    ax.set_xlabel(r"Modulation frequency $f_{\mathrm{mod}}$ [Hz]")
+    ax.set_ylabel("Fluctuation strength $F$ [vacil]")
     ax.set_ylim(0.0, max(float(f_bbn.max()), float(f_noise.max())) * 1.20)
     ax.set_title("Both models on AM broadband noise, 60 dB",
                  fontweight="bold", pad=10)
@@ -1200,12 +1217,11 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "F = 5.8 (1.25 m - 0.25)(0.05 L - 1)",
-        "    / [(fmod/5)^2 + 4/fmod + 1.5]  vacil",
+        r"$F = 5.8\,(1.25\,m - 0.25)(0.05\,L - 1)$",
+        r"      $/\,[(f_{\mathrm{mod}}/5)^2 + 4/f_{\mathrm{mod}} + 1.5]$  vacil",
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
-            family="monospace",
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
 
@@ -1215,8 +1231,8 @@ def generate_fluctuation_strength(output_dir: str) -> None:
                  label=f"peak {f_tone[tone_peak]:.2f} vacil at "
                        f"{fm_tone[tone_peak]:g} Hz")
     ax2.axvline(4.0, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.7)
-    ax2.set_xlabel("Modulation frequency f_mod [Hz]")
-    ax2.set_ylabel("Fluctuation strength F [vacil]")
+    ax2.set_xlabel(r"Modulation frequency $f_{\mathrm{mod}}$ [Hz]")
+    ax2.set_ylabel("Fluctuation strength $F$ [vacil]")
     ax2.set_ylim(0.0, float(f_tone.max()) * 1.28)
     ax2.set_title("Signal model on the AM tone, 70 dB", fontweight="bold",
                   pad=10)
@@ -1247,15 +1263,15 @@ def generate_annoyance_weightings(output_dir: str) -> None:
         w_s = [psychoacoustic_annoyance(n5, float(s), 0.0, 0.0).w_s
                for s in sharpness]
         ax.plot(sharpness, w_s, style, color=COLOR_PRIMARY, linewidth=2.0,
-                label=f"N5 = {n5:g} sone")
+                label=f"$N_5$ = {n5:g} sone")
     ax.axvline(1.75, color=COLOR_SECONDARY, linewidth=1.4, linestyle="--")
     ax.annotate("1.75 acum: below it sharpness costs nothing",
                 xy=(1.75, 0.02), xytext=(2.1, 0.06), fontsize=10,
                 color=COLOR_SECONDARY,
                 arrowprops={"arrowstyle": "->", "lw": 1.0,
                             "color": COLOR_SECONDARY})
-    ax.set_xlabel("Sharpness S [acum]")
-    ax.set_ylabel("Sharpness weighting wS")
+    ax.set_xlabel("Sharpness $S$ [acum]")
+    ax.set_ylabel("Sharpness weighting $w_S$")
     ax.set_xlim(1.0, 5.0)
     ax.set_ylim(0.0, None)
     ax.set_title("The kink at the reference sharpness", fontweight="bold",
@@ -1271,14 +1287,16 @@ def generate_annoyance_weightings(output_dir: str) -> None:
     fluct = [psychoacoustic_annoyance(30.0, 2.0, float(v), 0.0).annoyance
              for v in magnitude]
     ax2.plot(magnitude, rough, color=COLOR_SECONDARY, linewidth=2.2,
-             label="all roughness: R = v, F = 0")
+             label="all roughness: $R = v$, $F = 0$")
     ax2.plot(magnitude, fluct, "--", color=COLOR_PRIMARY, linewidth=2.2,
-             label="all fluctuation: F = v, R = 0")
-    ax2.annotate(f"at v = 1.5, {rough[-1] - fluct[-1]:.1f} units apart",
+             label="all fluctuation: $F = v$, $R = 0$")
+    # The readout sits below the legend: at the legend's own height it was
+    # drawn straight through its second row (visible in the shipped asset).
+    ax2.annotate(f"at $v$ = 1.5, {rough[-1] - fluct[-1]:.1f} units apart",
                  xy=(1.5, (rough[-1] + fluct[-1]) / 2),
-                 xytext=(0.30, rough[-1] * 0.985), fontsize=10, color=COLOR_FG,
+                 xytext=(0.30, rough[-1] * 0.935), fontsize=10, color=COLOR_FG,
                  arrowprops={"arrowstyle": "->", "lw": 1.0})
-    ax2.set_xlabel("Sensation magnitude v [asper or vacil]")
+    ax2.set_xlabel("Sensation magnitude $v$ [asper or vacil]")
     ax2.set_ylabel("Psychoacoustic annoyance PA")
     ax2.set_xlim(0.0, 1.5)
     ax2.set_title("Roughness costs more than fluctuation (0.6 against 0.4)",
@@ -1286,7 +1304,7 @@ def generate_annoyance_weightings(output_dir: str) -> None:
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax2.set_axisbelow(True)
     ax2.legend(loc="upper left", fontsize=9)
-    ax2.text(0.03, 0.03, "N5 = 30 sone, S = 2.0 acum throughout",
+    ax2.text(0.03, 0.03, "$N_5$ = 30 sone, $S$ = 2.0 acum throughout",
              transform=ax2.transAxes, fontsize=9, color=COLOR_FG,
              bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                    "edgecolor": COLOR_GRID})
@@ -1307,10 +1325,10 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     # (label, sharpness [acum], fluctuation strength [vacil], roughness [asper],
     #  colour, linestyle).
     profiles = [
-        ("Baseline: S = 1.75 acum, F = R = 0", 1.75, 0.0, 0.0,
+        ("Baseline: $S$ = 1.75 acum, $F = R = 0$", 1.75, 0.0, 0.0,
          COLOR_FG, "--"),
-        ("Sharp: S = 3.5 acum", 3.5, 0.0, 0.0, COLOR_PRIMARY, "-"),
-        ("Rough + fluctuating: F = 1.2 vacil, R = 0.7 asper", 2.0, 1.2, 0.7,
+        ("Sharp: $S$ = 3.5 acum", 3.5, 0.0, 0.0, COLOR_PRIMARY, "-"),
+        ("Rough + fluctuating: $F$ = 1.2 vacil, $R$ = 0.7 asper", 2.0, 1.2, 0.7,
          COLOR_TERTIARY, "-"),
     ]
 
@@ -1327,12 +1345,13 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     ax.plot([30.0], [ex.annoyance], "o", color=COLOR_SECONDARY, markersize=10,
             markerfacecolor="white", markeredgewidth=2.0, zorder=6,
             label=f"Worked example (PA = {ex.annoyance:.2f})")
-    ax.annotate(f"PA = {ex.annoyance:.2f}\nwS = {ex.w_s:.3f}, wFR = {ex.w_fr:.3f}",
+    ax.annotate(f"PA = {ex.annoyance:.2f}\n$w_S$ = {ex.w_s:.3f}, "
+                f"$w_{{FR}}$ = {ex.w_fr:.3f}",
                 xy=(30.0, ex.annoyance), xytext=(33.0, ex.annoyance * 0.72),
                 fontsize=9, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
 
-    ax.set_xlabel("Percentile loudness N5 [sone]")
+    ax.set_xlabel("Percentile loudness $N_5$ [sone]")
     ax.set_ylabel("Psychoacoustic annoyance PA")
     ax.set_xlim(0.0, 62.0)
     ax.set_ylim(0.0, None)
@@ -1343,13 +1362,12 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "PA = N5 (1 + sqrt(wS^2 + wFR^2))",
-        "wS  = (S - 1.75) 0.25 log10(N5 + 10)",
-        "wFR = (2.18 / N5^0.4)(0.4 F + 0.6 R)",
+        r"$\mathrm{PA} = N_5(1 + \sqrt{w_S^2 + w_{FR}^2})$",
+        r"$w_S = (S - 1.75)\,0.25\,\log_{10}(N_5 + 10)$",
+        r"$w_{FR} = (2.18/N_5^{0.4})(0.4\,F + 0.6\,R)$",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
-            family="monospace",
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -1513,12 +1531,13 @@ def generate_tone_audibility(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69",
-        "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)",
-        "dL = LT - LG - av  (combustion engine, Annex E)",
+        r"$d\!f_c = 25 + 75\,(1 + 1.4\,(f_T/1000)^2)^{0.69}$",
+        (r"$L_G = L_S + 10\,\log_{10}(d\!f_c/d\!f)$,"
+         r"  $a_v = -2 - \log_{10}(1 + (f/502)^{2.5})$"),
+        r"$\Delta L = L_T - L_G - a_v$  (combustion engine, Annex E)",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="left", fontsize=8.5, color=COLOR_FG, family="monospace",
+            va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -1555,16 +1574,16 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
 
     # Daily energy-summed level and its one-sided 95 % upper limit LEX,8h + U.
     ax.axhspan(lex, upper, color=COLOR_SECONDARY, alpha=0.14, zorder=0,
-               label="LEX,8h + U (one-sided 95 %)")
+               label="$L_{EX,8h} + U$ (one-sided 95 %)")
     ax.axhline(lex, color=COLOR_SECONDARY, linewidth=2.0, zorder=4,
-               label="Daily LEX,8h")
+               label="Daily $L_{EX,8h}$")
     ax.axhline(upper, color=COLOR_SECONDARY, linewidth=1.2, linestyle="--",
                zorder=4)
 
     box = [
-        f"LEX,8h = {lex:.1f} dB",
-        f"U = {result.expanded_uncertainty:.1f} dB (k = 1.65)",
-        f"LEX,8h + U = {upper:.1f} dB",
+        f"$L_{{EX,8h}}$ = {lex:.1f} dB",
+        f"$U$ = {result.expanded_uncertainty:.1f} dB ($k$ = 1.65)",
+        f"$L_{{EX,8h}} + U$ = {upper:.1f} dB",
     ]
     ax.text(0.03, 0.78, "\n".join(box), transform=ax.transAxes, va="top",
             ha="left", fontsize=10, color=COLOR_FG,
@@ -1574,7 +1593,7 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
     ax.set_title("ISO 9612 Task-Based Exposure (Annex D)", fontweight="bold",
                  pad=12)
     ax.set_xlabel("Measurement task")
-    ax.set_ylabel("LEX,8h contribution [dB]")
+    ax.set_ylabel("$L_{EX,8h}$ contribution [dB]")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=15, ha="right")
     ax.set_ylim(0.0, upper + 10.0)
@@ -1833,7 +1852,7 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
     ax_spread.axvspan(70.0, ages[-1], color=theme_fill(COLOR_SECONDARY,
                                                        ax_spread), zorder=0)
     ax_spread.text(77.5, 21.5,
-                   "above 70 yr:\ninformative only\n(clause 4.1, f ≥ 3 kHz)",
+                   "above 70 yr:\ninformative only\n(clause 4.1, $f \\geq 3$ kHz)",
                    fontsize=10, ha="center", va="top", color=COLOR_SECONDARY)
     ax_spread.annotate(
         f"they cross at {cross:.0f} yr", xy=(cross, s_l[int(cross - 18)]),
@@ -1944,7 +1963,7 @@ def generate_htlan_compression(output_dir: str) -> None:
             label="$H + N$ = 40 dB")
     ax.plot(20.2, 24.8, "o", color="#1f77b4", markersize=9,
             markeredgecolor=ink)
-    ax.annotate("the worked case: H = 20.2, N = 24.8\n45.0 dB sum → 40.8 dB "
+    ax.annotate("the worked case: $H$ = 20.2, $N$ = 24.8\n45.0 dB sum → 40.8 dB "
                 "HTLAN, 4.2 dB removed",
                 xy=(20.2, 24.8), xytext=(2.0, 47.0), fontsize=11, color=ink,
                 arrowprops={"arrowstyle": "->", "lw": 1.0, "color": ink},
@@ -2001,7 +2020,7 @@ def generate_exposure_budget(output_dir: str) -> None:
         bottom += col
     total = float(bottom[-1])
     ax_b.text(xs[-1], total + 0.12,
-              f"u = {np.sqrt(total):.2f} dB → U = {1.65 * np.sqrt(total):.1f} dB",
+              f"$u$ = {np.sqrt(total):.2f} dB → $U$ = {1.65 * np.sqrt(total):.1f} dB",
               ha="center", fontsize=11, fontweight="bold")
     ax_b.annotate(
         "1.5 h of the day,\n91 % of the variance",
@@ -2161,19 +2180,19 @@ def generate_sii_masking_chain(output_dir: str) -> None:
     # The 30 dB window the audibility function lives inside.
     ax.fill_between(pos, d - 15.0, d + 15.0,
                     color=theme_fill(COLOR_TERTIARY, ax), zorder=0,
-                    label="the 30 dB window: Di − 15 to Di + 15")
+                    label="the 30 dB window: $D_i - 15$ to $D_i + 15$")
     ax.plot(pos, e, "o-", color=COLOR_PRIMARY, linewidth=2.0,
-            label="speech Ei'")
+            label="speech $E_i′$")
     ax.plot(pos, noise, "s--", color=COLOR_FG, linewidth=1.6,
-            label="external noise Ni'")
+            label="external noise $N_i′$")
     ax.plot(pos, res.masking, "^-", color=COLOR_SECONDARY, linewidth=1.8,
-            label="equivalent masking Zi")
+            label="equivalent masking $Z_i$")
     ax.plot(pos, d, ":", color=COLOR_TERTIARY, linewidth=2.2,
-            label="equivalent disturbance Di")
+            label="equivalent disturbance $D_i$")
     k = 8                                   # the 1 kHz band
     ax.annotate(
         f"at 1 kHz there is no noise in this band,\n"
-        f"yet Zi = {res.masking[k]:.0f} dB: the masking is spread up\n"
+        f"yet $Z_i$ = {res.masking[k]:.0f} dB: the masking is spread up\n"
         "from the low bands, not made here",
         xy=(pos[k], res.masking[k]), xytext=(pos[k] + 0.6, 54.0), fontsize=10,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
@@ -2181,7 +2200,7 @@ def generate_sii_masking_chain(output_dir: str) -> None:
     ax2 = ax.twinx()
     ax2.plot(pos, res.band_audibility, "-", color="#ff7f0e", linewidth=2.4,
              alpha=0.9)
-    ax2.set_ylabel("Band audibility Ai", color="#ff7f0e")
+    ax2.set_ylabel("Band audibility $A_i$", color="#ff7f0e")
     ax2.set_ylim(0.0, 1.0)
     ax2.tick_params(axis="y", colors="#ff7f0e")
     ax.set_xticks(pos)
@@ -2278,13 +2297,13 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
                        (2.5, COLOR_SECONDARY)):
         res = speech.sti_from_impulse_response(_sti_decay(t60), fs)
         ax_t.semilogx(mod, res.mtf[band], "o-", color=color, linewidth=1.8,
-                      markersize=5, label=f"T60 = {t60:g} s")
+                      markersize=5, label=f"$T_{{60}}$ = {t60:g} s")
         closed = 1.0 / np.sqrt(1.0 + (2.0 * np.pi * mod * t60 / 13.8) ** 2)
         ax_t.semilogx(mod, closed, "--", color=color, linewidth=1.2, alpha=0.8)
     for f_stipa in (_STIPA_F1[band], _STIPA_F2[band]):
         ax_t.axvline(f_stipa, color=COLOR_FG, linewidth=1.0, linestyle=":")
     ax_t.text(np.sqrt(_STIPA_F1[band] * _STIPA_F2[band]), 0.04,
-              "STIPA probes only these two F in this band", fontsize=10,
+              "STIPA probes only these two $F$ in this band", fontsize=10,
               ha="center", va="bottom", color=COLOR_FG)
     ax_t.set_title("Reverberation: a low-pass corner that moves",
                    fontweight="bold", pad=10)
@@ -2299,7 +2318,7 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
                       markersize=5, label=f"SNR = {snr:g} dB")
     quiet = speech.sti_from_impulse_response(ir, fs)
     ax_n.semilogx(mod, quiet.mtf[band], "--", color=COLOR_FG, linewidth=1.2,
-                  label="noise-free (T60 = 0.9 s)")
+                  label="noise-free ($T_{60}$ = 0.9 s)")
     ax_n.annotate(r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$",
                   xy=(1.25, 0.47), xytext=(5.0, 0.10), fontsize=11,
                   ha="center", arrowprops={"arrowstyle": "->", "lw": 1.0})
@@ -2308,8 +2327,8 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
     ax_n.legend(loc="lower left", fontsize=10)
 
     for ax in (ax_t, ax_n):
-        ax.set_xlabel("Modulation frequency F [Hz]")
-        ax.set_ylabel("Modulation transfer m (1 kHz band)")
+        ax.set_xlabel("Modulation frequency $F$ [Hz]")
+        ax.set_ylabel("Modulation transfer $m$ (1 kHz band)")
         ax.set_ylim(0.0, 1.05)
         ax.set_xticks([0.63, 1.0, 2.0, 4.0, 8.0, 12.5])
         ax.set_xticklabels(["0.63", "1", "2", "4", "8", "12.5"])

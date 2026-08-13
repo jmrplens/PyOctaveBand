@@ -12,6 +12,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -40,7 +41,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.0))
     ax.semilogx(freqs, res.source_level, "o-", color=COLOR_PRIMARY, linewidth=2.0,
-                markersize=4, label="Source level Ls")
+                markersize=4, label="Source level $L_s$")
     ax.semilogx(freqs, res.radiated_noise_level, "s--", color=COLOR_SECONDARY,
                 linewidth=1.6, markersize=3, alpha=0.8, label="Radiated noise level")
     ax.set_xlabel("Frequency [Hz]")
@@ -52,8 +53,8 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     twin = ax.twinx()
     twin.semilogx(freqs, res.surface_correction, ":", color=COLOR_TERTIARY,
-                  linewidth=2.0, label="Surface correction ΔL")
-    twin.set_ylabel("Surface correction ΔL [dB]")
+                  linewidth=2.0, label=r"Surface correction $\Delta L$")
+    twin.set_ylabel(r"Surface correction $\Delta L$ [dB]")
     # After twinx() re-initialises the shared x-axis with the default log
     # locator, so the octave-band labelling is not reset to 10^n ticks.
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -63,13 +64,12 @@ def generate_ship_source_level(output_dir: str) -> None:
     ax.legend(lines + tlines, labels + tlabels, loc="lower left", fontsize=9)
 
     info = [
-        "Ls = LRN + ΔL",
-        "ΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]",
-        "u = k d_s,  d_s = 0.7 D = 4.2 m",
+        r"$L_s = L_{RN} + \Delta L$",
+        r"$\Delta L = -10\,\log_{10}[(2u^4 + 14u^2)/(14 + 2u^2 + u^4)]$",
+        r"$u = k\,d_s$,  $d_s = 0.7\,D$ = 4.2 m",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
-            family="monospace",
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -111,11 +111,12 @@ def generate_pile_driving(output_dir: str) -> None:
     ax_w.legend(loc="upper right", fontsize=9)
 
     ax_c.semilogx(strikes, sel_cum, color=COLOR_TERTIARY, linewidth=2.2)
-    ax_c.set_xlabel("Number of strikes N")
+    ax_c.set_xlabel("Number of strikes $N$")
     ax_c.set_ylabel("Cumulative SEL [dB re 1 µPa²·s]")
     ax_c.set_title(
-        f"SEL_ss = {res.single_strike_sel:.0f} dB;  "
-        f"SEL_cum = SEL_ss + 10 log10(N)", fontsize=10)
+        f"$\\mathrm{{SEL}}_{{\\mathrm{{ss}}}}$ = {res.single_strike_sel:.0f} dB;  "
+        r"$\mathrm{SEL}_{\mathrm{cum}} = \mathrm{SEL}_{\mathrm{ss}}"
+        r" + 10\,\log_{10}(N)$", fontsize=10)
     ax_c.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_c.set_axisbelow(True)
     plt.tight_layout()
@@ -149,8 +150,8 @@ def generate_underwater_transmission_loss(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
     ax.text(0.02, 0.05,
-            f"f = 10 kHz, α = {res.absorption_coefficient:.2f} dB/km\n"
-            "practical spreading (R₀ = 1000 m)",
+            f"$f$ = 10 kHz, $\\alpha$ = {res.absorption_coefficient:.2f} dB/km\n"
+            "practical spreading ($R_0$ = 1000 m)",
             transform=ax.transAxes, va="bottom", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -175,11 +176,11 @@ def generate_weston_regimes(output_dir: str) -> None:
     # asymptotic form extrapolated far outside its own regime is meaningless
     # (the single-mode formula would sit below free field at 10 m).
     for curve, onset, label, color, style in (
-        (res.spherical, 0.0, "Spherical, 20 log10 r", "#8c8c8c", ":"),
+        (res.spherical, 0.0, r"Spherical, $20\,\log_{10} r$", "#8c8c8c", ":"),
         (res.cylindrical, bounds.spherical_to_cylindrical,
-         "Cylindrical, 10 log10 r", COLOR_SECONDARY, "--"),
+         r"Cylindrical, $10\,\log_{10} r$", COLOR_SECONDARY, "--"),
         (res.mode_stripping, bounds.cylindrical_to_mode_stripping,
-         "Mode stripping, 15 log10 r", COLOR_TERTIARY, "-."),
+         r"Mode stripping, $15\,\log_{10} r$", COLOR_TERTIARY, "-."),
         (res.single_mode, bounds.mode_stripping_to_single_mode,
          "Single mode", "#9467bd", (0, (3, 1, 1, 1))),
     ):
@@ -188,9 +189,9 @@ def generate_weston_regimes(output_dir: str) -> None:
     ax.plot(res.range_m, res.propagation_loss, color=COLOR_PRIMARY, linewidth=2.6,
             label="Composite propagation loss")
     for boundary, name in (
-        (bounds.spherical_to_cylindrical, "H/2ψc"),
-        (bounds.cylindrical_to_mode_stripping, "r_CS"),
-        (bounds.mode_stripping_to_single_mode, "r_MS"),
+        (bounds.spherical_to_cylindrical, r"$H/(2\psi_c)$"),
+        (bounds.cylindrical_to_mode_stripping, r"$r_{\mathrm{CS}}$"),
+        (bounds.mode_stripping_to_single_mode, r"$r_{\mathrm{MS}}$"),
     ):
         # The regime boundary is scaffolding for the curves, so it is drawn
         # back a step -- in shade, since a step back in opacity on the dark
@@ -209,9 +210,9 @@ def generate_weston_regimes(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.98, 0.05,
-            f"f = 250 Hz, H = 50 m, medium sand\n"
-            f"ψc = {np.degrees(bounds.critical_angle):.1f}°, "
-            f"η = {bounds.reflection_loss_gradient:.2f} Np/rad, "
+            "$f$ = 250 Hz, $H$ = 50 m, medium sand\n"
+            f"$\\psi_c$ = {np.degrees(bounds.critical_angle):.1f}°, "
+            f"$\\eta$ = {bounds.reflection_loss_gradient:.2f} Np/rad, "
             f"{bounds.mode_count:.0f} modes",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
@@ -242,7 +243,7 @@ def generate_marine_mammal_weighting(output_dir: str) -> None:
                     label=f"{label} (AUD INJ {crit.injury_sel:.0f} dB)")
     ax.axhline(0.0, color="#8c8c8c", linestyle=":", linewidth=1.0)
     ax.set_xlabel("Frequency [Hz]")
-    ax.set_ylabel("Weighting amplitude W(f) [dB]")
+    ax.set_ylabel("Weighting amplitude $W(f)$ [dB]")
     ax.set_title("Marine-Mammal Auditory Weighting (NMFS 2024, v3.0)",
                  fontweight="bold", pad=12)
     ax.set_ylim(-75.0, 5.0)
@@ -335,7 +336,7 @@ def generate_seabed_reflection(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.02, 0.95,
-            "Water ρ = 1000, c = 1500\nSand ρ = 1900, c = 1650",
+            "Water $\\rho$ = 1000, $c$ = 1500\nSand $\\rho$ = 1900, $c$ = 1650",
             transform=ax.transAxes, va="top", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -352,19 +353,19 @@ def generate_seabed_reflection_coefficient(output_dir: str) -> None:
     res = seabed_reflection(phi, rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0)
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(res.grazing_angle, res.magnitude, color=COLOR_PRIMARY, linewidth=2.0,
-            label="Reflection coefficient magnitude |R| (sand)")
+            label="Reflection coefficient magnitude $|R|$ (sand)")
     if res.critical_angle is not None:
         ax.axvline(res.critical_angle, color=COLOR_SECONDARY, linestyle="--", linewidth=1.4,
                    label=f"Critical angle ({res.critical_angle:.1f}°)")
     ax.set_xlabel("Grazing angle [°]")
-    ax.set_ylabel("Reflection coefficient magnitude |R|")
+    ax.set_ylabel("Reflection coefficient magnitude $|R|$")
     ax.set_title("Seabed Reflection Coefficient (Rayleigh)", fontweight="bold", pad=12)
     ax.set_ylim(0.0, 1.05)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.02, 0.95,
-            "Water ρ = 1000, c = 1500\nSand ρ = 1900, c = 1650",
+            "Water $\\rho$ = 1000, $c$ = 1500\nSand $\\rho$ = 1900, $c$ = 1650",
             transform=ax.transAxes, va="top", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -496,7 +497,7 @@ def generate_numerical_propagation(output_dir: str) -> None:
     axes[2].invert_yaxis()
     axes[2].set_xlabel("Range [km]")
     axes[2].set_ylabel("Transmission loss [dB]")
-    axes[2].set_title("Modes vs PE (50 Hz, z = 120 m)", fontweight="bold")
+    axes[2].set_title("Modes vs PE (50 Hz, $z$ = 120 m)", fontweight="bold")
     axes[2].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[2].legend(loc="upper right", fontsize=9)
 
@@ -524,14 +525,14 @@ def generate_seawater_absorption(output_dir: str) -> None:
     for name, color, ls, lw in styles:
         ax_a.loglog(freqs, alpha[name], ls, color=color, linewidth=lw, label=name)
     ax_a.set_xlabel("Frequency [Hz]")
-    ax_a.set_ylabel("Absorption coefficient alpha [dB/km]")
-    ax_a.set_title("Volume Absorption (10 C, 35 ppt, 100 m)",
+    ax_a.set_ylabel(r"Absorption coefficient $\alpha$ [dB/km]")
+    ax_a.set_title("Volume Absorption (10 °C, 35 ppt, 100 m)",
                    fontweight="bold", pad=12)
     ax_a.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_a.set_axisbelow(True)
     ax_a.legend(loc="upper left", fontsize=9)
     # The three relaxation regions of the Francois-Garrison expression.
-    for f_mark, label in ((300.0, "boric acid"), (30e3, "MgSO4"),
+    for f_mark, label in ((300.0, "boric acid"), (30e3, r"$\mathrm{MgSO_4}$"),
                           (500e3, "pure water")):
         a_mark = float(np.interp(f_mark, freqs, alpha["francois-garrison"]))
         ax_a.annotate(label, xy=(f_mark, a_mark),
@@ -542,7 +543,7 @@ def generate_seawater_absorption(output_dir: str) -> None:
 
     ref = alpha["francois-garrison"]
     ax_r.axhspan(-10.0, 10.0, color=theme_fill(COLOR_PRIMARY, ax_r), zorder=0)
-    ax_r.text(14.0, 10.5, "+/-10 % of Francois-Garrison", fontsize=9,
+    ax_r.text(14.0, 10.5, "±10 % of Francois-Garrison", fontsize=9,
               color=COLOR_FG)
     for name, color, ls, lw in styles[1:]:
         ax_r.semilogx(freqs, 100.0 * (alpha[name] / ref - 1.0), ls, color=color,
@@ -579,7 +580,7 @@ def generate_sound_speed_models(output_dir: str) -> None:
     for m, color in zip(models, colors, strict=True):
         ax_c.plot(profiles[m], depths, color=color, linewidth=1.8, label=m)
     ax_c.invert_yaxis()
-    ax_c.set_xlabel("Sound speed c [m/s]")
+    ax_c.set_xlabel("Sound speed $c$ [m/s]")
     ax_c.set_ylabel("Depth [m]")
     ax_c.set_title("Four Equations, One Profile", fontweight="bold", pad=12)
     ax_c.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -607,7 +608,7 @@ def generate_sound_speed_models(output_dir: str) -> None:
     check = float(sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie"))
     ax_c.text(0.03, 0.05,
               f"Mackenzie check point: {check:.3f} m/s\n"
-              "at 25 C, 35 ppt, 1000 m (not on this profile)",
+              "at 25 °C, 35 ppt, 1000 m (not on this profile)",
               transform=ax_c.transAxes, fontsize=8.5, color=COLOR_FG,
               bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                     "edgecolor": COLOR_GRID})
@@ -695,7 +696,7 @@ def generate_normal_modes(output_dir: str) -> None:
         exact = float(np.sqrt(k**2 - ((m + 1) * np.pi / depth_m) ** 2))
         ax.plot(res.mode_functions[m], res.mode_depths, color=colors[m],
                 linewidth=1.8,
-                label=f"m = {m + 1},  kr = {res.wavenumbers[m]:.5f} "
+                label=f"$m$ = {m + 1},  $k_r$ = {res.wavenumbers[m]:.5f} "
                       f"(exact {exact:.5f})")
     ax.axhline(50.0, color=COLOR_FG, linewidth=1.2, linestyle="--")
     ax.text(0.02, 0.885, "source depth 50 m", transform=ax.transAxes,
@@ -706,9 +707,9 @@ def generate_normal_modes(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED,
                             "linewidth": 1.0})
     ax.invert_yaxis()
-    ax.set_xlabel("Mode function Psi_m(z)")
+    ax.set_xlabel(r"Mode function $\Psi_m(z)$")
     ax.set_ylabel("Depth [m]")
-    ax.set_title("Mode m Has m - 1 Interior Nulls", fontweight="bold", pad=12)
+    ax.set_title("Mode $m$ Has $m - 1$ Interior Nulls", fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=8)
@@ -722,9 +723,9 @@ def generate_normal_modes(output_dir: str) -> None:
     ax.step(freqs, counts, where="post", color=COLOR_PRIMARY, linewidth=1.8,
             label="Propagating modes returned")
     ax.plot(freqs, 2.0 * freqs * depth_m / 1500.0, color=COLOR_SECONDARY,
-            linewidth=1.6, linestyle="--", label="M = kD/pi = 2fD/c")
+            linewidth=1.6, linestyle="--", label=r"$M = kD/\pi = 2fD/c$")
     ax.set_xlabel("Frequency [Hz]")
-    ax.set_ylabel("Number of propagating modes M")
+    ax.set_ylabel("Number of propagating modes $M$")
     ax.set_title("One Mode Cuts On at a Time", fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -732,7 +733,7 @@ def generate_normal_modes(output_dir: str) -> None:
 
     ax = axes[2]
     res.plot(ax=ax)
-    ax.set_title("Modal Transmission Loss (z = 100 m)", fontweight="bold",
+    ax.set_title("Modal Transmission Loss ($z$ = 100 m)", fontweight="bold",
                  pad=12)
     plt.tight_layout()
     save_figure(output_dir, "normal_modes.svg")
@@ -747,9 +748,9 @@ def generate_sonar_budget(output_dir: str) -> None:
     ranges = np.linspace(50.0, 30_000.0, 800)
     cases = (
         ("10 kHz, spherical only", 10e3, "spherical", None, COLOR_PRIMARY, "-"),
-        ("10 kHz, practical R0 = 1 km", 10e3, "practical", 1000.0,
+        ("10 kHz, practical $R_0$ = 1 km", 10e3, "practical", 1000.0,
          COLOR_TERTIARY, "-"),
-        ("20 kHz, practical R0 = 1 km", 20e3, "practical", 1000.0,
+        ("20 kHz, practical $R_0$ = 1 km", 20e3, "practical", 1000.0,
          COLOR_SECONDARY, "--"),
     )
     fom_full = float(passive_sonar_equation(
@@ -794,13 +795,13 @@ def generate_sonar_budget(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
     info = [
-        "SL = 140 dB re 1 uPa^2/Hz at 10 kHz",
+        "SL = 140 dB re 1 µPa²/Hz at 10 kHz",
         "NL = 60 dB,  DI = 15 dB,  DT = 8 dB",
-        "FOM = SL - (NL - DI) - DT",
+        (r"$\mathrm{FOM} = \mathrm{SL} - (\mathrm{NL} - \mathrm{DI})"
+         r" - \mathrm{DT}$"),
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
-            family="monospace",
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
@@ -826,7 +827,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
     zz = np.linspace(z_top, z_bot, 200)
     ax_c.plot(c_top + grad * zz, zz, color=COLOR_PRIMARY, linewidth=2.0)
     ax_c.invert_yaxis()
-    ax_c.set_xlabel("c(z) [m/s]")
+    ax_c.set_xlabel("$c(z)$ [m/s]")
     ax_c.set_ylabel("Depth [m]")
     ax_c.set_title("Linear Gradient", fontweight="bold", pad=12)
     ax_c.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -839,7 +840,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
                          launch_angles_deg=[angle], max_range=32e3,
                          n_steps=20000)
         ax_r.plot(rays.ranges[0] / 1000.0, rays.depths[0], color=color,
-                  linewidth=1.6, label=f"{angle:.0f} deg")
+                  linewidth=1.6, label=f"{angle:.0f}°")
         z_turn = (c_source / np.cos(np.radians(angle)) - c_top) / grad
         deepest = float(np.max(rays.depths[0]))
         first_turn = int(np.argmax(rays.depths[0] >= deepest - 0.5))
@@ -855,9 +856,9 @@ def generate_ray_turning_point(output_dir: str) -> None:
             r_arc = radius * (np.sin(t) + np.sin(theta0))
             ax_r.plot(r_arc / 1000.0, z_arc, "--", color=COLOR_FG,
                       linewidth=1.2, alpha=0.85,
-                      label="exact circular arc, R = c0/(g cos th0)")
+                      label=r"exact circular arc, $R = c_0/(g\,\cos\theta_0)$")
             ax_r.annotate(
-                f"analytic z_t = {z_turn:.1f} m\n"
+                f"analytic $z_t$ = {z_turn:.1f} m\n"
                 f"traced      = {deepest:.1f} m",
                 xy=(r_turn, z_turn), xytext=(26, -62),
                 textcoords="offset points", fontsize=8.5, color=COLOR_FG,
@@ -870,7 +871,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
     ax_r.set_ylim(1760.0, -70.0)
     ax_r.set_xlabel("Range [km]")
     ax_r.set_ylabel("Depth [m]")
-    ax_r.set_title("Every Ray Turns Where c(z_t) = c(z_s)/cos(theta_0)",
+    ax_r.set_title(r"Every Ray Turns Where $c(z_t) = c(z_s)/\cos\theta_0$",
                    fontweight="bold", pad=12)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
@@ -946,11 +947,11 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
     ax_ang.bar(index[inside], grazing[inside], color=COLOR_PRIMARY,
                label="within the paraxial band")
     ax_ang.bar(index[~inside], grazing[~inside], color=COLOR_SECONDARY,
-               label="steeper than 20 deg")
+               label="steeper than 20°")
     ax_ang.axhline(20.0, color=COLOR_FG, linewidth=1.4, linestyle="--")
     ax_ang.axhspan(0.0, 20.0, color=theme_fill(COLOR_PRIMARY, ax_ang), zorder=0)
-    ax_ang.set_xlabel("Mode index m")
-    ax_ang.set_ylabel("Modal grazing angle arccos(k_rm/k) [deg]")
+    ax_ang.set_xlabel("Mode index $m$")
+    ax_ang.set_ylabel(r"Modal grazing angle $\arccos(k_{rm}/k)$ [°]")
     ax_ang.set_title(f"{int(np.sum(~inside))} of {grazing.size} Modes Are "
                      "Outside It", fontweight="bold", pad=12)
     ax_ang.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -981,7 +982,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
                   markersize=5, zorder=5)
     ax_g.set_ylim(-20.0, 170.0)
     ax_g.set_xlabel("Frequency [Hz]")
-    ax_g.set_ylabel("Threshold [dB re 1 uPa; in-air groups re 20 uPa]")
+    ax_g.set_ylabel("Threshold [dB re 1 µPa; in-air groups re 20 µPa]")
     ax_g.set_title("Southall et al. (2019) Group Audiograms",
                    fontweight="bold", pad=12)
     ax_g.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1021,7 +1022,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
                   arrowprops={"arrowstyle": "->", "color": COLOR_MUTED,
                               "linewidth": 1.0})
     ax_o.set_xlabel("Frequency [Hz]")
-    ax_o.set_ylabel("Threshold [dB re 1 uPa]")
+    ax_o.set_ylabel("Threshold [dB re 1 µPa]")
     ax_o.set_title("Killer Whale (Ainslie 2010, Eq. 11.159)",
                    fontweight="bold", pad=12)
     ax_o.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1065,7 +1066,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
                                 n_events=3000, peak_spl=peak)
         res.plot(ax=ax)
         ax.set_title(f"{group}: cumulative {res.cumulative_sel:.1f} dB, "
-                     f"margin {res.sel_margin:+.1f} dB",
+                     f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",
                      fontweight="bold", pad=12)
     plt.tight_layout()
     save_figure(output_dir, "marine_mammal_assessment.svg")
@@ -1101,15 +1102,15 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     lf = auditory_weighting(freqs, "LF", guidance="nmfs-2024")
     p = lf.parameters
     ax.annotate("each minimum is that group's weighted TTS onset "
-                f"T_w = K + C\nLF: below f1 the filter falls at "
-                f"20a = {20 * p.a:.0f} dB/decade, above f2 at "
-                f"20b = {20 * p.b:.0f} dB/decade",
+                "$T_w = K + C$\nLF: below $f_1$ the filter falls at "
+                f"$20a$ = {20 * p.a:.0f} dB/decade, above $f_2$ at "
+                f"$20b$ = {20 * p.b:.0f} dB/decade",
                 xy=(0.03, 0.06), xycoords="axes fraction", fontsize=8.5,
                 color=COLOR_FG,
                 bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                       "edgecolor": COLOR_GRID})
     ax.set_xlabel("Frequency [Hz]")
-    ax.set_ylabel("Exposure function E(f) = K + C - W(f) [dB re 1 uPa^2 s]")
+    ax.set_ylabel("Exposure function $E(f) = K + C - W(f)$ [dB re 1 µPa²·s]")
     ax.set_title("What a Band Level Is Compared Against", fontweight="bold",
                  pad=12)
     ax.set_ylim(135.0, 265.0)
@@ -1124,10 +1125,10 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
         res = auditory_weighting(freqs, "LF", guidance=guidance)
         ax.semilogx(res.frequencies, res.weighting, ls, color=color,
                     linewidth=1.9,
-                    label=f"{guidance}  (b = {res.parameters.b:g})")
+                    label=f"{guidance}  ($b$ = {res.parameters.b:g})")
     ax.set_xlabel("Frequency [Hz]")
-    ax.set_ylabel("Weighting W(f) [dB]")
-    ax.set_title("What b = 5 Changed for LF Cetaceans", fontweight="bold",
+    ax.set_ylabel("Weighting $W(f)$ [dB]")
+    ax.set_title("What $b$ = 5 Changed for LF Cetaceans", fontweight="bold",
                  pad=12)
     ax.set_ylim(-60.0, 5.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1153,7 +1154,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     ax.set_xticklabels(groups)
     ax.set_ylim(120.0, 245.0)
     ax.set_xlabel("Hearing group")
-    ax.set_ylabel("Onset criterion [dB re 1 uPa^2 s / dB re 1 uPa]")
+    ax.set_ylabel("Onset criterion [dB re 1 µPa²·s / dB re 1 µPa]")
     ax.set_title("Impulsive Onset Criteria (NMFS 2024)", fontweight="bold",
                  pad=12)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1211,8 +1212,8 @@ def generate_piling_campaign_accumulation(output_dir: str) -> None:
             transform=ax.transAxes, fontsize=9, color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
-    ax.set_xlabel("Number of strikes N")
-    ax.set_ylabel("Weighted cumulative SEL [dB re 1 uPa^2 s]")
+    ax.set_xlabel("Number of strikes $N$")
+    ax.set_ylabel("Weighted cumulative SEL [dB re 1 µPa²·s]")
     ax.set_title("Accumulation Against the Criteria (dotted TTS, dashed AUD INJ)",
                  fontweight="bold", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)

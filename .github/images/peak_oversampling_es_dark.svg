@@ -475,52 +475,52 @@ L 427.04125 28.318125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 250.05125 296.115781 
+     <path d="M 246.23375 296.115781 
 L 421.44125 296.115781 
 Q 423.04125 296.115781 423.04125 294.515781 
 L 423.04125 247.313281 
 Q 423.04125 245.713281 421.44125 245.713281 
-L 250.05125 245.713281 
-Q 248.45125 245.713281 248.45125 247.313281 
-L 248.45125 294.515781 
-Q 248.45125 296.115781 250.05125 296.115781 
+L 246.23375 245.713281 
+Q 244.63375 245.713281 244.63375 247.313281 
+L 244.63375 294.515781 
+Q 244.63375 296.115781 246.23375 296.115781 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_29">
-     <path d="M 251.65125 252.192031 
-L 259.65125 252.192031 
-L 267.65125 252.192031 
+     <path d="M 247.83375 252.192031 
+L 255.83375 252.192031 
+L 263.83375 252.192031 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_16">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="274.05125" y="254.992031" transform="rotate(-0 274.05125 254.992031)">el tono continuo de 8 kHz</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="270.23375" y="254.992031" transform="rotate(-0 270.23375 254.992031)">el tono continuo de 8 kHz</text>
     </g>
     <g id="line2d_30">
      <g>
-      <use xlink:href="#mc99916e8d1" x="259.65125" y="264.192656" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#mc99916e8d1" x="255.83375" y="264.192656" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_17">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="274.05125" y="266.992656" transform="rotate(-0 274.05125 266.992656)">sus muestras a 48 kHz (6 por ciclo)</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="270.23375" y="266.992656" transform="rotate(-0 270.23375 266.992656)">sus muestras a 48 kHz (6 por ciclo)</text>
     </g>
     <g id="line2d_31">
-     <path d="M 251.65125 276.193281 
-L 259.65125 276.193281 
-L 267.65125 276.193281 
+     <path d="M 247.83375 276.193281 
+L 255.83375 276.193281 
+L 263.83375 276.193281 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #ffffff; stroke-width: 1.2"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="274.05125" y="278.993281" transform="rotate(-0 274.05125 278.993281)">pico verdadero</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="270.23375" y="278.993281" transform="rotate(-0 270.23375 278.993281)">pico verdadero</text>
     </g>
     <g id="line2d_32">
-     <path d="M 251.65125 288.193906 
-L 259.65125 288.193906 
-L 267.65125 288.193906 
+     <path d="M 247.83375 288.193906 
+L 255.83375 288.193906 
+L 263.83375 288.193906 
 " style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="274.05125" y="290.993906" transform="rotate(-0 274.05125 290.993906)">muestra mayor: -1,25 dB por debajo</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="270.23375" y="290.993906" transform="rotate(-0 270.23375 290.993906)">muestra mayor: −1,25 dB por debajo</text>
     </g>
    </g>
   </g>

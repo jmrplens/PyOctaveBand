@@ -300,10 +300,10 @@ L 706.040938 28.798125
    <g id="text_13">
     <g id="patch_7">
      <path d="M 48.384834 73.711914 
-L 179.487959 73.711914 
-Q 182.487959 73.711914 182.487959 70.711914 
-L 182.487959 46.708008 
-Q 182.487959 43.708008 179.487959 43.708008 
+L 179.584834 73.711914 
+Q 182.584834 73.711914 182.584834 70.711914 
+L 182.584834 46.708008 
+Q 182.584834 43.708008 179.584834 43.708008 
 L 48.384834 43.708008 
 Q 45.384834 43.708008 45.384834 46.708008 
 L 45.384834 70.711914 
@@ -311,8 +311,63 @@ Q 45.384834 73.711914 48.384834 73.711914
 z
 " style="fill: #e0e0e0; opacity: 0.6; stroke: #000000; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(48.384834 55.306641)">Agua ρ = 1000, c = 1500</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(48.384834 67.308594)">Arena ρ = 1900, c = 1650</text>
+    <!-- Agua $\rho$ = 1000, $c$ = 1500 -->
+    <g transform="translate(48.384834 55.306641)">
+     <text>
+      <tspan x="0" y="-0.578125" style="font-size: 10px; font-family: sans-serif">A</tspan>
+      <tspan x="6.84082" y="-0.578125" style="font-size: 10px; font-family: sans-serif">g</tspan>
+      <tspan x="13.188477" y="-0.578125" style="font-size: 10px; font-family: sans-serif">u</tspan>
+      <tspan x="19.526367" y="-0.578125" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="25.654297" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="35.180664" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="38.359375" y="-0.578125" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="46.738281" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="49.916992" y="-0.578125" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="56.279297" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="62.641602" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="69.003906" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="75.366211" y="-0.578125" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="78.544922" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="87.22168" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="90.400391" y="-0.578125" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="98.779297" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="101.958008" y="-0.578125" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="108.320312" y="-0.578125" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="114.682617" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="121.044922" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="28.833008" y="-0.578125" style="font-style: oblique; font-size: 10px; font-family: sans-serif">ρ</tspan>
+      <tspan x="81.723633" y="-0.578125" style="font-style: oblique; font-size: 10px; font-family: sans-serif">c</tspan>
+     </text>
+    </g>
+    <!-- Arena $\rho$ = 1900, $c$ = 1650 -->
+    <g transform="translate(48.384834 67.308594)">
+     <text>
+      <tspan x="0" y="-0.578125" style="font-size: 10px; font-family: sans-serif">A</tspan>
+      <tspan x="6.84082" y="-0.578125" style="font-size: 10px; font-family: sans-serif">r</tspan>
+      <tspan x="10.952148" y="-0.578125" style="font-size: 10px; font-family: sans-serif">e</tspan>
+      <tspan x="17.104492" y="-0.578125" style="font-size: 10px; font-family: sans-serif">n</tspan>
+      <tspan x="23.442383" y="-0.578125" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="29.570312" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="39.09668" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="42.275391" y="-0.578125" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="50.654297" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="53.833008" y="-0.578125" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="60.195312" y="-0.578125" style="font-size: 10px; font-family: sans-serif">9</tspan>
+      <tspan x="66.557617" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="72.919922" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="79.282227" y="-0.578125" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="82.460938" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="91.137695" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="94.316406" y="-0.578125" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="102.695312" y="-0.578125" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="105.874023" y="-0.578125" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="112.236328" y="-0.578125" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="118.598633" y="-0.578125" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="124.960938" y="-0.578125" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="32.749023" y="-0.578125" style="font-style: oblique; font-size: 10px; font-family: sans-serif">ρ</tspan>
+      <tspan x="85.639648" y="-0.578125" style="font-style: oblique; font-size: 10px; font-family: sans-serif">c</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_14">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="370.502109" y="16.798125" transform="rotate(-0 370.502109 16.798125)">Pérdida por reflexión en el fondo (Rayleigh)</text>

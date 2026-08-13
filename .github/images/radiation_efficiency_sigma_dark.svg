@@ -2026,13 +2026,47 @@ L 705.5 22.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_13">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="104.951561" y="79.570069" transform="rotate(-0 104.951561 79.570069)">ISO/TS 7849-1 assumes ε = 1 here</text>
+    <!-- ISO/TS 7849-1 assumes $\varepsilon = 1$ here -->
+    <g style="fill: #d62728" transform="translate(104.951561 79.570069)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">I</tspan>
+      <tspan x="2.949219" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">S</tspan>
+      <tspan x="9.296875" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">O</tspan>
+      <tspan x="17.167969" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">/</tspan>
+      <tspan x="20.537109" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">T</tspan>
+      <tspan x="26.645508" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">S</tspan>
+      <tspan x="32.993164" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="36.171875" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">7</tspan>
+      <tspan x="42.53418" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">8</tspan>
+      <tspan x="48.896484" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">4</tspan>
+      <tspan x="55.258789" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">9</tspan>
+      <tspan x="61.621094" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">-</tspan>
+      <tspan x="65.229492" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
+      <tspan x="71.591797" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="74.770508" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">a</tspan>
+      <tspan x="80.898438" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">s</tspan>
+      <tspan x="86.108398" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">s</tspan>
+      <tspan x="91.318359" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">u</tspan>
+      <tspan x="97.65625" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">m</tspan>
+      <tspan x="107.397461" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">e</tspan>
+      <tspan x="113.549805" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">s</tspan>
+      <tspan x="118.759766" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="129.291992" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">=</tspan>
+      <tspan x="139.619141" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
+      <tspan x="145.981445" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="149.160156" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">h</tspan>
+      <tspan x="155.498047" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">e</tspan>
+      <tspan x="161.650391" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">r</tspan>
+      <tspan x="165.761719" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">e</tspan>
+      <tspan x="121.938477" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #d62728">ε</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_14">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="205.68053" y="337.951423" transform="rotate(-0 205.68053 337.951423)">-23.4 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="205.68053" y="337.951423" transform="rotate(-0 205.68053 337.951423)">−23.4 dB</text>
    </g>
    <g id="text_15">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="474.061493" y="281.092174" transform="rotate(-0 474.061493 281.092174)">-17.6 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="474.061493" y="281.092174" transform="rotate(-0 474.061493 281.092174)">−17.6 dB</text>
    </g>
    <g id="text_16">
     <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(93.721528 246.887701)">the gap Part 1 pays for: 25 dB at 63 Hz,</text>

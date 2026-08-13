@@ -441,19 +441,52 @@ L 705.44375 28.318125
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 546.849629 372.205898 
+     <path d="M 530.954785 372.205898 
 L 695.744785 372.205898 
 Q 699.344785 372.205898 699.344785 368.605898 
-L 699.344785 346.961602 
-Q 699.344785 343.361602 695.744785 343.361602 
-L 546.849629 343.361602 
-Q 543.249629 343.361602 543.249629 346.961602 
-L 543.249629 368.605898 
-Q 543.249629 372.205898 546.849629 372.205898 
+L 699.344785 345.46957 
+Q 699.344785 341.86957 695.744785 341.86957 
+L 530.954785 341.86957 
+Q 527.354785 341.86957 527.354785 345.46957 
+L 527.354785 368.605898 
+Q 527.354785 372.205898 530.954785 372.205898 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(546.849629 354.740449)">max |recovered - true| = 2.1e-14</text>
+    <!-- $\max\,|\mathrm{recovered} - \mathrm{true}| = 2.1\times10^{-14}$ -->
+    <g transform="translate(530.954785 354.740449)">
+     <text>
+      <tspan x="0" y="-0.68925" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="8.76709" y="-0.68925" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="14.282227" y="-0.68925" style="font-size: 9px; font-family: sans-serif">x</tspan>
+      <tspan x="22.53082" y="-0.68925" style="font-size: 9px; font-family: sans-serif">|</tspan>
+      <tspan x="25.563047" y="-0.68925" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="29.263242" y="-0.68925" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="34.800351" y="-0.68925" style="font-size: 9px; font-family: sans-serif">c</tspan>
+      <tspan x="39.748594" y="-0.68925" style="font-size: 9px; font-family: sans-serif">o</tspan>
+      <tspan x="45.254941" y="-0.68925" style="font-size: 9px; font-family: sans-serif">v</tspan>
+      <tspan x="50.581113" y="-0.68925" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="56.118223" y="-0.68925" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="59.818418" y="-0.68925" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="65.355527" y="-0.68925" style="font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="72.821836" y="-0.68925" style="font-size: 9px; font-family: sans-serif">−</tspan>
+      <tspan x="82.116269" y="-0.68925" style="font-size: 9px; font-family: sans-serif">t</tspan>
+      <tspan x="85.645078" y="-0.68925" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="89.345273" y="-0.68925" style="font-size: 9px; font-family: sans-serif">u</tspan>
+      <tspan x="95.049375" y="-0.68925" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="100.586484" y="-0.68925" style="font-size: 9px; font-family: sans-serif">|</tspan>
+      <tspan x="105.372129" y="-0.68925" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="114.666562" y="-0.68925" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="120.392637" y="-0.68925" style="font-size: 9px; font-family: sans-serif">.</tspan>
+      <tspan x="123.253476" y="-0.68925" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="130.732969" y="-0.68925" style="font-size: 9px; font-family: sans-serif">×</tspan>
+      <tspan x="140.027402" y="-0.68925" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="145.753476" y="-0.68925" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="151.565683" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif">−</tspan>
+      <tspan x="156.844394" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif">1</tspan>
+      <tspan x="160.852646" y="-4.40625" style="font-size: 6.3px; font-family: sans-serif">4</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(557.628535 365.54291)">noise-free closed-form identity</text>
    </g>
    <g id="text_19">

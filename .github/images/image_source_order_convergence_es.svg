@@ -284,21 +284,93 @@ L 537.802949 99.711252
    </g>
    <g id="text_15">
     <g id="patch_9">
-     <path d="M 469.82297 390.091875 
+     <path d="M 478.962189 390.091875 
 L 657.401252 390.091875 
 Q 661.001252 390.091875 661.001252 386.491875 
-L 661.001252 354.084492 
-Q 661.001252 350.484492 657.401252 350.484492 
-L 469.82297 350.484492 
-Q 466.22297 350.484492 466.22297 354.084492 
-L 466.22297 386.491875 
-Q 466.22297 390.091875 469.82297 390.091875 
+L 661.001252 354.08168 
+Q 661.001252 350.48168 657.401252 350.48168 
+L 478.962189 350.48168 
+Q 475.362189 350.48168 475.362189 354.08168 
+L 475.362189 386.491875 
+Q 475.362189 390.091875 478.962189 390.091875 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(507.338908 361.823965)">sala de 7 x 5 x 3 m, alpha = 0,12</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(471.282658 372.626426)">V = 105 m^3, S = 142 m^2, fs = 48 kHz</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(469.82297 383.428887)">sombreado: +/- 10 % alrededor de Eyring</text>
+    <!-- sala de 7 × 5 × 3 m, $\alpha$ = 0,12 -->
+    <g transform="translate(521.861252 361.822559)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+      <tspan x="4.688965" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="10.204102" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="12.70459" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="18.219727" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="21.080566" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="26.793457" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="32.330566" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="35.191406" y="-0.15625" style="font-size: 9px; font-family: sans-serif">7</tspan>
+      <tspan x="40.91748" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="43.77832" y="-0.15625" style="font-size: 9px; font-family: sans-serif">×</tspan>
+      <tspan x="51.319336" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="54.180176" y="-0.15625" style="font-size: 9px; font-family: sans-serif">5</tspan>
+      <tspan x="59.90625" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="62.76709" y="-0.15625" style="font-size: 9px; font-family: sans-serif">×</tspan>
+      <tspan x="70.308105" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="73.168945" y="-0.15625" style="font-size: 9px; font-family: sans-serif">3</tspan>
+      <tspan x="78.89502" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="81.755859" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="90.522949" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="93.383789" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="102.177246" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="105.038086" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="112.579102" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="115.439941" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="121.166016" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="124.026855" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="129.75293" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="96.244629" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">α</tspan>
+     </text>
+    </g>
+    <!-- $V$ = 105 m³, $S$ = 142 m², $f_s$ = 48 kHz -->
+    <g transform="translate(491.711252 372.626426)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">V</tspan>
+      <tspan x="57.555176" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">S</tspan>
+      <tspan x="114.666504" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">f</tspan>
+      <tspan x="6.156738" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="9.017578" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="16.558594" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="19.419434" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="25.145508" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="30.871582" y="-0.15625" style="font-size: 9px; font-family: sans-serif">5</tspan>
+      <tspan x="36.597656" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="39.458496" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="48.225586" y="-0.15625" style="font-size: 9px; font-family: sans-serif">³</tspan>
+      <tspan x="51.833496" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="54.694336" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="63.268066" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="66.128906" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="73.669922" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="76.530762" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="82.256836" y="-0.15625" style="font-size: 9px; font-family: sans-serif">4</tspan>
+      <tspan x="87.98291" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="93.708984" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="96.569824" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="105.336914" y="-0.15625" style="font-size: 9px; font-family: sans-serif">²</tspan>
+      <tspan x="108.944824" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="111.805664" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="121.36333" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="124.22417" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="131.765186" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="134.626025" y="-0.15625" style="font-size: 9px; font-family: sans-serif">4</tspan>
+      <tspan x="140.3521" y="-0.15625" style="font-size: 9px; font-family: sans-serif">8</tspan>
+      <tspan x="146.078174" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="148.939014" y="-0.15625" style="font-size: 9px; font-family: sans-serif">k</tspan>
+      <tspan x="154.150928" y="-0.15625" style="font-size: 9px; font-family: sans-serif">H</tspan>
+      <tspan x="160.918506" y="-0.15625" style="font-size: 9px; font-family: sans-serif">z</tspan>
+      <tspan x="117.834961" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">s</tspan>
+     </text>
+    </g>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(478.962189 383.428887)">sombreado: ±10 % alrededor de Eyring</text>
    </g>
    <g id="text_16">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="355.423125" y="16.798125" transform="rotate(-0 355.423125 16.798125)">La retícula de imágenes es un horizonte temporal</text>

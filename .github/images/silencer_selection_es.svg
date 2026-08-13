@@ -683,71 +683,118 @@ L 700.163438 26.798125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 47.156781 96.273579 
-L 381.227527 96.273579 
-Q 382.893527 96.273579 382.893527 94.607579 
+     <path d="M 47.156781 96.27488 
+L 381.227527 96.27488 
+Q 382.893527 96.27488 382.893527 94.60888 
 L 382.893527 32.629125 
 Q 382.893527 30.963125 381.227527 30.963125 
 L 47.156781 30.963125 
 Q 45.490781 30.963125 45.490781 32.629125 
-L 45.490781 94.607579 
-Q 45.490781 96.273579 47.156781 96.273579 
+L 45.490781 94.60888 
+Q 45.490781 96.27488 47.156781 96.27488 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_65">
-     <path d="M 48.822781 38.042323 
-L 57.152781 38.042323 
-L 65.482781 38.042323 
+     <path d="M 48.822781 38.043625 
+L 57.152781 38.043625 
+L 65.482781 38.043625 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="40.957823" transform="rotate(-0 72.146781 40.957823)">Reactivo: cámara de expansión de 0,3 m, m = 4</text>
+     <!-- Reactivo: cámara de expansión de 0,3 m, $m = 4$ -->
+     <g transform="translate(72.146781 40.959125)">
+      <text>
+       <tspan x="0" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">R</tspan>
+       <tspan x="5.786591" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="10.910339" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">a</tspan>
+       <tspan x="16.013763" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
+       <tspan x="20.592606" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">t</tspan>
+       <tspan x="23.857986" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="26.171814" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">v</tspan>
+       <tspan x="31.100372" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">o</tspan>
+       <tspan x="36.195663" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">:</tspan>
+       <tspan x="39.001526" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="41.648804" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">c</tspan>
+       <tspan x="46.227646" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">á</tspan>
+       <tspan x="51.33107" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">m</tspan>
+       <tspan x="59.44368" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">a</tspan>
+       <tspan x="64.547104" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">r</tspan>
+       <tspan x="67.971069" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">a</tspan>
+       <tspan x="73.074493" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="75.721771" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">d</tspan>
+       <tspan x="81.008179" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="86.131927" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="88.779205" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="93.902954" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">x</tspan>
+       <tspan x="98.831512" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">p</tspan>
+       <tspan x="104.11792" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">a</tspan>
+       <tspan x="109.221344" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
+       <tspan x="114.499619" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">s</tspan>
+       <tspan x="118.838547" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">i</tspan>
+       <tspan x="121.152374" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">ó</tspan>
+       <tspan x="126.247665" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">n</tspan>
+       <tspan x="131.52594" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="134.173218" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">d</tspan>
+       <tspan x="139.459625" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">e</tspan>
+       <tspan x="144.583374" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="147.230652" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">0</tspan>
+       <tspan x="152.529266" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">,</tspan>
+       <tspan x="155.176544" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">3</tspan>
+       <tspan x="160.475159" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="163.122437" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">m</tspan>
+       <tspan x="171.235046" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">,</tspan>
+       <tspan x="173.882324" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif"> </tspan>
+       <tspan x="186.264734" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">=</tspan>
+       <tspan x="194.865314" y="-0.34375" style="font-size: 8.33px; font-family: sans-serif">4</tspan>
+       <tspan x="176.529602" y="-0.34375" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif">m</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_66">
-     <path d="M 48.822781 50.537974 
-L 57.152781 50.537974 
-L 65.482781 50.537974 
+     <path d="M 48.822781 50.539276 
+L 57.152781 50.539276 
+L 65.482781 50.539276 
 " style="fill: none; stroke-dasharray: 6.29,2.72; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.7"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="53.453474" transform="rotate(-0 72.146781 53.453474)">Reactivo: rama de Helmholtz sintonizada a 100 Hz</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="53.454776" transform="rotate(-0 72.146781 53.454776)">Reactivo: rama de Helmholtz sintonizada a 100 Hz</text>
     </g>
     <g id="line2d_67">
-     <path d="M 48.822781 63.033625 
-L 57.152781 63.033625 
-L 65.482781 63.033625 
+     <path d="M 48.822781 63.034927 
+L 57.152781 63.034927 
+L 65.482781 63.034927 
 " style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.8"/>
      <g>
-      <use xlink:href="#m5aade19f9a" x="57.152781" y="63.033625" style="fill: #2ca02c; stroke: #2ca02c"/>
+      <use xlink:href="#m5aade19f9a" x="57.152781" y="63.034927" style="fill: #2ca02c; stroke: #2ca02c"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="65.949125" transform="rotate(-0 72.146781 65.949125)">Disipativo: 1,5 m de conducto de 36 × 24 in con 25 mm de revestimiento</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="65.950427" transform="rotate(-0 72.146781 65.950427)">Disipativo: 1,5 m de conducto de 36 × 24 in con 25 mm de revestimiento</text>
     </g>
     <g id="line2d_68">
-     <path d="M 48.822781 75.529276 
-L 57.152781 75.529276 
-L 65.482781 75.529276 
+     <path d="M 48.822781 75.530577 
+L 57.152781 75.530577 
+L 65.482781 75.530577 
 " style="fill: none; stroke-dasharray: 11.52,2.88,1.8,2.88; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.8"/>
      <g>
-      <use xlink:href="#m5aade19f9a" x="57.152781" y="75.529276" style="fill: #2ca02c; stroke: #2ca02c"/>
+      <use xlink:href="#m5aade19f9a" x="57.152781" y="75.530577" style="fill: #2ca02c; stroke: #2ca02c"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="78.444776" transform="rotate(-0 72.146781 78.444776)">Disipativo: 1,5 m de conducto de 36 × 24 in con 50 mm de revestimiento</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="78.446077" transform="rotate(-0 72.146781 78.446077)">Disipativo: 1,5 m de conducto de 36 × 24 in con 50 mm de revestimiento</text>
     </g>
     <g id="line2d_69">
-     <path d="M 48.822781 88.024927 
-L 57.152781 88.024927 
-L 65.482781 88.024927 
+     <path d="M 48.822781 88.026228 
+L 57.152781 88.026228 
+L 65.482781 88.026228 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mf475beaf25" x="57.152781" y="88.024927" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
+      <use xlink:href="#mf475beaf25" x="57.152781" y="88.026228" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_22">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="90.940427" transform="rotate(-0 72.146781 90.940427)">Disipativo: unidad de bafles de cinco pasos, 5 ft</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="72.146781" y="90.941728" transform="rotate(-0 72.146781 90.941728)">Disipativo: unidad de bafles de cinco pasos, 5 ft</text>
     </g>
    </g>
   </g>

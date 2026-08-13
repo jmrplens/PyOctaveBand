@@ -59,12 +59,12 @@ def generate_insulation_rating(output_dir: str) -> None:
                 label="Shifted reference curve (ISO 717-1)")
     ax.semilogx(freqs, measured, marker="o", color=COLOR_PRIMARY, linewidth=1.8,
                 markersize=5, markerfacecolor="white", markeredgewidth=1.4,
-                zorder=4, label="Measured R' (third octave)")
+                zorder=4, label="Measured $R′$ (third octave)")
 
     # Rw is the shifted reference read at 500 Hz.
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.4)
     ax.plot(500, result.rating, "D", color=COLOR_SECONDARY, markersize=9, zorder=6)
-    ax.annotate(f"Rw = {result.rating} dB", xy=(500, result.rating),
+    ax.annotate(f"$R_w$ = {result.rating} dB", xy=(500, result.rating),
                 xytext=(560, result.rating - 9), fontsize=12, fontweight="bold",
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
@@ -72,7 +72,7 @@ def generate_insulation_rating(output_dir: str) -> None:
         (0.97, f"Reference curve shifted by {_fmt_minus(shift)} dB"),
         (0.90, (f"Sum of unfavourable deviations = {result.unfavourable_sum:.1f}"
                f" dB  (limit 32.0 dB)")),
-        (0.83, (f"Rw (C ; Ctr) = {result.rating} "
+        (0.83, (f"$R_w$ ($C$ ; $C_{{tr}}$) = {result.rating} "
                f"({_fmt_minus(result.c, '+d')} ; "
                f"{_fmt_minus(result.ctr, '+d')}) dB")),
     ):
@@ -82,7 +82,7 @@ def generate_insulation_rating(output_dir: str) -> None:
     ax.set_title("ISO 717-1 Weighted Sound Reduction Index (Annex C example)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Apparent sound reduction index R' [dB]")
+    ax.set_ylabel("Apparent sound reduction index $R′$ [dB]")
     ax.set_xscale("log")
     ax.set_xlim(90, 3600)
     ax.set_ylim(8, 44)
@@ -130,7 +130,7 @@ def generate_impact_rating(output_dir: str) -> None:
                 label="Shifted reference curve (ISO 717-2)")
     ax.semilogx(freqs, measured, marker="o", color=COLOR_PRIMARY, linewidth=1.8,
                 markersize=5, markerfacecolor="white", markeredgewidth=1.4,
-                zorder=4, label="Measured Ln (third octave)")
+                zorder=4, label="Measured $L_n$ (third octave)")
 
     # Ln,w is the shifted reference read at 500 Hz.
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.4)
@@ -138,7 +138,7 @@ def generate_impact_rating(output_dir: str) -> None:
     # The annotation sits in the clear gap between the rising measured curve
     # and the flat low-frequency reference plateau; the string is identical
     # in both languages, so the placement holds for every variant.
-    ax.annotate(f"Ln,w = {result.rating} dB", xy=(500, result.rating),
+    ax.annotate(f"$L_{{n,w}}$ = {result.rating} dB", xy=(500, result.rating),
                 xytext=(135, result.rating - 4.2), fontsize=12,
                 fontweight="bold",
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
@@ -147,8 +147,8 @@ def generate_impact_rating(output_dir: str) -> None:
         (0.97, f"Reference curve shifted by {shift} dB"),
         (0.90, (f"Sum of unfavourable deviations = {result.unfavourable_sum:.1f}"
                f" dB  (limit 32.0 dB)")),
-        (0.83, (f"Ln,w = {result.rating} dB ; "
-               f"CI = {_fmt_minus(result.ci, '+d')} dB")),
+        (0.83, (f"$L_{{n,w}}$ = {result.rating} dB ; "
+               f"$C_I$ = {_fmt_minus(result.ci, '+d')} dB")),
     ):
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
@@ -156,7 +156,7 @@ def generate_impact_rating(output_dir: str) -> None:
     ax.set_title("ISO 717-2 Weighted Normalized Impact Sound Level "
                  "(Annex C example)", fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Normalized impact sound pressure level Ln [dB]")
+    ax.set_ylabel("Normalized impact sound pressure level $L_n$ [dB]")
     ax.set_xscale("log")
     ax.set_xlim(90, 3600)
     ax.set_ylim(55, 86)
@@ -197,12 +197,12 @@ def generate_facade_prediction(output_dir: str) -> None:
     el_colors = [COLOR_PRIMARY, COLOR_SECONDARY, "#9467bd", "#ff7f0e"]
     for (name, rp), colour in zip(result.element_r.items(), el_colors):
         ax.plot(x, rp, "--", color=theme_line(colour, ax, quiet=0.65),
-                linewidth=1.1, marker=".", markersize=6, label=f"Rp — {name}")
+                linewidth=1.1, marker=".", markersize=6, label=f"$R_p$ — {name}")
     # Façade apparent reduction R' and standardized level difference D2m,nT.
     ax.plot(x, result.r_prime, "-", color=COLOR_FG, linewidth=2.6, marker="o",
-            markersize=6, zorder=5, label="R′ (façade)")
+            markersize=6, zorder=5, label="$R′$ (façade)")
     ax.plot(x, result.d_2m_nt, "-", color=COLOR_TERTIARY, linewidth=2.2, marker="s",
-            markersize=6, zorder=5, label="D2m,nT")
+            markersize=6, zorder=5, label="$D_{2m,nT}$")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(b)}" for b in bands])
@@ -215,8 +215,8 @@ def generate_facade_prediction(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9, ncol=2)
 
     info = [
-        f"R′tr,s,w = {result.r_tr_s_w} dB   (Ctr = {_fmt_minus(result.c_tr)})",
-        f"D2m,nT,w = {result.d_2m_nt_w} dB",
+        f"$R′_{{tr,s,w}}$ = {result.r_tr_s_w} dB   ($C_{{tr}}$ = {_fmt_minus(result.c_tr)})",
+        f"$D_{{2m,nT,w}}$ = {result.d_2m_nt_w} dB",
         "air inlet limits the low bands",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -253,18 +253,18 @@ def generate_intensity_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Shade the Kc adaptation lift between RI and RI,M (largest at low bands).
     ax.fill_between(x, result.r_i, result.r_i_modified, color=COLOR_TERTIARY,
-                    alpha=0.18, zorder=0, label="Kc adaptation")
+                    alpha=0.18, zorder=0, label="$K_c$ adaptation")
     ax.plot(x, result.r_i, "-", color=COLOR_PRIMARY, linewidth=2.6, marker="o",
-            markersize=6, zorder=5, label="RI (intensity)")
+            markersize=6, zorder=5, label="$R_I$ (intensity)")
     ax.plot(x, result.r_i_modified, "--", color=COLOR_TERTIARY, linewidth=2.2,
-            marker="s", markersize=6, zorder=5, label="RI,M = RI + Kc")
+            marker="s", markersize=6, zorder=5, label="$R_{I,M} = R_I + K_c$")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(f)}" for f in freqs], rotation=45, ha="right",
                        fontsize=8)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound reduction index [dB]")
-    ax.set_title("ISO 15186-1 Intensity Sound Reduction Index (RI and RI,M)",
+    ax.set_title("ISO 15186-1 Intensity Sound Reduction Index ($R_I$ and $R_{I,M}$)",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -273,8 +273,8 @@ def generate_intensity_insulation(output_dir: str) -> None:
     # Data-only info box (language-neutral); the Kc lift is explained by the
     # shaded "Kc adaptation" legend entry, which the ES translator handles.
     info = [
-        f"RI,w = {result.rating.rating} dB",
-        f"RI,M,w = {result.rating_modified.rating} dB",
+        f"$R_{{I,w}}$ = {result.rating.rating} dB",
+        f"$R_{{I,M,w}}$ = {result.rating_modified.rating} dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -304,11 +304,11 @@ def generate_survey_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Shade the reverberation-index correction k between D and DnT.
     ax.fill_between(x, res.d, res.d_nt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="k = 10 log10(T/T0)")
+                    zorder=0, label=r"$k = 10\,\log_{10}(T/T_0)$")
     ax.plot(x, res.d, "--", color=COLOR_PRIMARY, linewidth=1.8, marker="o",
-            markersize=6, zorder=5, label="D (level difference)")
+            markersize=6, zorder=5, label="$D$ (level difference)")
     ax.plot(x, res.d_nt, "-", color=COLOR_FG, linewidth=2.6, marker="s",
-            markersize=6, zorder=5, label="DnT (standardized)")
+            markersize=6, zorder=5, label="$D_{nT}$ (standardized)")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(b)}" for b in bands])
@@ -321,8 +321,8 @@ def generate_survey_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"DnT,w = {res.rating.rating} dB  (C = {_fmt_minus(res.rating.c)})",
-        "octave bands, T0 = 0.5 s",
+        f"$D_{{nT,w}}$ = {res.rating.rating} dB  ($C$ = {_fmt_minus(res.rating.c)})",
+        "octave bands, $T_0$ = 0.5 s",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -358,7 +358,7 @@ def generate_heavy_impact_sources(output_dir: str) -> None:
     ax_src.set_xticks(x)
     ax_src.set_xticklabels(["31.5", "63", "125", "250", "500"])
     ax_src.set_xlabel(LABEL_FREQ_HZ)
-    ax_src.set_ylabel("Impact force exposure level LFE [dB re 1 N]")
+    ax_src.set_ylabel("Impact force exposure level $L_{FE}$ [dB re 1 N]")
     ax_src.set_title("Standard heavy impact sources\n(ISO 16283-2 Table A.1, "
                      "JIS A 1418-2 Tables A.1/A.2)", fontweight="bold", pad=10)
     ax_src.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -370,11 +370,11 @@ def generate_heavy_impact_sources(output_dir: str) -> None:
     res = a_weighted_maximum_impact_level(levels)
     xr = np.arange(4)
     ax_rate.bar(xr - 0.19, res.levels, width=0.36, color=COLOR_PRIMARY,
-                label="Li,Fmax (measured)", zorder=3)
+                label=r"$L_{i,F\mathrm{max}}$ (measured)", zorder=3)
     ax_rate.bar(xr + 0.19, res.corrected, width=0.36, color=COLOR_TERTIARY,
-                label="Li,Fmax + A (Table D.3)", zorder=3)
+                label=r"$L_{i,F\mathrm{max}} + A$ (Table D.3)", zorder=3)
     ax_rate.axhline(res.rating, color=COLOR_SECONDARY, linewidth=2.0, zorder=4,
-                    label=f"LiA,Fmax = {res.rating} dB")
+                    label=rf"$L_{{iA,F\mathrm{{max}}}}$ = {res.rating} dB")
     ax_rate.set_xticks(xr)
     ax_rate.set_xticklabels(["63", "125", "250", "500"])
     ax_rate.set_xlabel(LABEL_FREQ_HZ)
@@ -422,15 +422,15 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
         )
         ax_path.plot(x, res.reduction_index, style, color=colour, linewidth=2.4,
                      marker="o", markersize=6, zorder=4,
-                     label=f"Rcl, plenum h = {depth:g} m")
+                     label=f"$R_{{cl}}$, plenum $h$ = {depth:g} m")
     ax_path.plot(x, 2.0 * ceiling, ":", color=COLOR_SECONDARY, linewidth=2.0,
-                 marker="s", markersize=5, zorder=3, label="RS + RR (two ceilings)")
+                 marker="s", markersize=5, zorder=3, label="$R_S + R_R$ (two ceilings)")
     ax_path.set_xticks(x)
     ax_path.set_xticklabels(["63", "125", "250", "500", "1k", "2k", "4k"])
     ax_path.set_xlabel(LABEL_FREQ_HZ)
     ax_path.set_ylabel("Sound reduction index [dB]")
     ax_path.set_title("Suspended-ceiling plenum path\n(one-dimensional model, "
-                      "LR = 4.75 m, reflecting sidewalls)",
+                      "$L_R$ = 4.75 m, reflecting sidewalls)",
                       fontweight="bold", pad=10)
     ax_path.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_path.set_axisbelow(True)
@@ -446,7 +446,7 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
                         color=COLOR_SECONDARY, alpha=0.25, interpolate=True,
                         zorder=1, label="deficiencies")
     ax_cac.plot(xc, cac.measured, "-o", color=COLOR_PRIMARY, linewidth=2.4,
-                markersize=6, zorder=4, label="Dn,c (measured)")
+                markersize=6, zorder=4, label="$D_{n,c}$ (measured)")
     ax_cac.plot(xc, cac.shifted_reference, "--s", color=COLOR_TERTIARY,
                 linewidth=2.0, markersize=5, zorder=3,
                 label="ASTM E413 contour, fitted")
@@ -454,7 +454,7 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
     ax_cac.set_xticklabels(["125", "200", "315", "500", "800", "1.25k",
                             "2k", "3.15k"], rotation=45, fontsize=8)
     ax_cac.set_xlabel(LABEL_FREQ_HZ)
-    ax_cac.set_ylabel("Normalized ceiling attenuation Dn,c [dB]")
+    ax_cac.set_ylabel("Normalized ceiling attenuation $D_{n,c}$ [dB]")
     ax_cac.set_title(f"Ceiling attenuation class\n(ASTM E1414/E413, "
                      f"CAC = {cac.rating} dB)", fontweight="bold", pad=10)
     ax_cac.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -488,14 +488,14 @@ def generate_flanking_transmission(output_dir: str) -> None:
     x = np.arange(len(freqs))
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(x, res.k_ij, "-", color=COLOR_PRIMARY, linewidth=2.4, marker="o",
-            markersize=6, zorder=5, label="Kij (ISO 10848)")
+            markersize=6, zorder=5, label="$K_{ij}$ (ISO 10848)")
     ax.axhline(res.single_number, color=COLOR_SECONDARY, linestyle="--",
-               linewidth=1.6, zorder=4, label="mean Kij (200-1250 Hz)")
+               linewidth=1.6, zorder=4, label="mean $K_{ij}$ (200-1250 Hz)")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(b)}" for b in freqs], rotation=45, fontsize=8)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Vibration reduction index Kij [dB]")
+    ax.set_ylabel("Vibration reduction index $K_{ij}$ [dB]")
     ax.set_title("ISO 10848 Junction Vibration Reduction Index",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -504,9 +504,9 @@ def generate_flanking_transmission(output_dir: str) -> None:
 
     info = [
         "rigid T-junction, two heavy walls",
-        "lij = 4 m, Si = 12 m^2, Sj = 10 m^2",
+        "$l_{ij}$ = 4 m, $S_i$ = 12 m², $S_j$ = 10 m²",
         "Formula (13), one-third octave",
-        f"mean Kij = {res.single_number:.1f} dB",
+        f"mean $K_{{ij}}$ = {res.single_number:.1f} dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -556,25 +556,25 @@ def generate_insulation_uncertainty_demo(output_dir: str) -> None:
     # outer, so the two read as distinct steps of the same hue.
     ax.fill_between(freqs, measured - exp_band, measured + exp_band,
                     color=theme_fill(COLOR_PRIMARY, ax), zorder=0,
-                    label="Expanded uncertainty ±U (95 %)")
+                    label=r"Expanded uncertainty $\pm U$ (95 %)")
     ax.fill_between(freqs, measured - u_band, measured + u_band,
                     color=theme_fill(COLOR_PRIMARY, ax, delta_e=26.0), zorder=0.1,
-                    label="Standard uncertainty ±u")
+                    label=r"Standard uncertainty $\pm u$")
     ax.semilogx(freqs, measured, marker="o", color=COLOR_PRIMARY, linewidth=1.9,
                 markersize=5, markerfacecolor="white", markeredgewidth=1.4,
-                zorder=4, label="Measured R'")
+                zorder=4, label="Measured $R′$")
 
     # Single-number R'w with its expanded uncertainty, read at 500 Hz.
     ax.errorbar(500, rating, yerr=exp_single, fmt="D", color=COLOR_SECONDARY,
                 markersize=9, capsize=6, elinewidth=1.8, zorder=6,
-                label="R'w ± U (single number)")
+                label=r"$R′_w \pm U$ (single number)")
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.35, zorder=0)
 
     # Word-free box (the situation and band meanings are in the title/legend, so
     # translation reduces to the automatic decimal-comma substitution).
     box = [
-        f"R'w = {rating} ± {exp_single:.1f} dB",
-        f"U = k·u ,  k = {k:g} (95 %)",
+        f"$R′_w$ = {rating} ± {exp_single:.1f} dB",
+        rf"$U = k\,u$ ,  $k$ = {k:g} (95 %)",
     ]
     ax.text(0.03, 0.97, "\n".join(box), transform=ax.transAxes, va="top",
             ha="left", fontsize=10, color=COLOR_FG,
@@ -584,7 +584,7 @@ def generate_insulation_uncertainty_demo(output_dir: str) -> None:
     ax.set_title("ISO 12999-1 Measurement Uncertainty (situation B, airborne)",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Apparent sound reduction index R' [dB]")
+    ax.set_ylabel("Apparent sound reduction index $R′$ [dB]")
     ax.set_xscale("log")
     ax.set_xlim(90, 3600)
     ax.set_ylim(8, 42)
@@ -645,7 +645,7 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
                label="enlarged range (Annex B)")
     ax.axvspan(18.5, 20.5, color=enlarged, zorder=0)
     ax.plot(x, ext.measured, "-o", color=COLOR_PRIMARY, linewidth=2.2,
-            markersize=5, zorder=5, label="measured R")
+            markersize=5, zorder=5, label="measured $R$")
     ax.plot(x[core], ext.core.shifted_reference, "--s", color=COLOR_FG,
             linewidth=1.8, markersize=5, zorder=5,
             label="shifted reference (100-3150 Hz)")
@@ -655,7 +655,7 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
                     interpolate=True, zorder=1,
                     label="unfavourable deviations")
 
-    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_ylabel("Sound reduction index $R$ [dB]")
     ax.set_title("ISO 717-1 Enlarged-Range Rating (Annex B)",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -663,10 +663,10 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (f"Rw(C;Ctr) = {ext.rating:g}"
+        (f"$R_w$($C$;$C_{{tr}}$) = {ext.rating:g}"
          f"({_fmt_minus(ext.c, 'g')};{_fmt_minus(ext.ctr, 'g')})"),
-        (f"C50-5000 = {_fmt_minus(ext.c_50_5000, 'g')},  "
-         f"Ctr,50-5000 = {_fmt_minus(ext.ctr_50_5000, 'g')}"),
+        (f"$C_{{50-5000}}$ = {_fmt_minus(ext.c_50_5000, 'g')},  "
+         f"$C_{{tr,50-5000}}$ = {_fmt_minus(ext.ctr_50_5000, 'g')}"),
         "rating on the core bands, terms on the full range",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -699,11 +699,11 @@ def generate_field_airborne_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.fill_between(x, field.d, field.dnt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="10 log10(T/T0)")
+                    zorder=0, label=r"$10\,\log_{10}(T/T_0)$")
     ax.plot(x, field.d, "--o", color=COLOR_PRIMARY, linewidth=1.8,
-            markersize=5, zorder=5, label="D (level difference)")
+            markersize=5, zorder=5, label="$D$ (level difference)")
     ax.plot(x, field.dnt, "-s", color=COLOR_FG, linewidth=2.4, markersize=5,
-            zorder=5, label="DnT (standardized)")
+            zorder=5, label="$D_{nT}$ (standardized)")
 
     ax.set_ylabel("Level difference [dB]")
     ax.set_title("ISO 16283-1 Field Airborne Insulation",
@@ -713,8 +713,9 @@ def generate_field_airborne_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"DnT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
-        f"R'w = {w_rp.rating} dB   (S = 12.5 m², V = 30.4 m³)",
+        (f"$D_{{nT,w}}$($C$;$C_{{tr}}$) = {w.rating}"
+         f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
+        f"$R′_w$ = {w_rp.rating} dB   ($S$ = 12.5 m², $V$ = 30.4 m³)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -747,13 +748,13 @@ def generate_facade_field_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.plot(x, fac.d_2m_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=5,
-            zorder=6, label="D2m,nT (standardized)")
+            zorder=6, label="$D_{2m,nT}$ (standardized)")
     ax.plot(x, fac.d_2m, "--o", color=COLOR_PRIMARY, linewidth=1.8,
-            markersize=5, zorder=5, label="D2m = L1,2m - L2")
+            markersize=5, zorder=5, label="$D_{2m} = L_{1,2m} - L_2$")
     ax.plot(x, fac.d_2m_n, ":", color=COLOR_SECONDARY, linewidth=1.8,
-            marker=".", zorder=5, label="D2m,n (normalized)")
+            marker=".", zorder=5, label="$D_{2m,n}$ (normalized)")
     ax.plot(x, fac.r_prime, "-.", color=COLOR_TERTIARY, linewidth=1.8,
-            marker="^", markersize=5, zorder=5, label="R'45° (element)")
+            marker="^", markersize=5, zorder=5, label="$R′_{45°}$ (element)")
 
     ax.set_ylabel("Level difference / reduction index [dB]")
     ax.set_title("ISO 16283-3 Field Facade Insulation",
@@ -763,9 +764,9 @@ def generate_facade_field_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (f"Dls,2m,nT,w(C;Ctr) = {w.rating}"
+        (f"$D_{{ls,2m,nT,w}}$($C$;$C_{{tr}}$) = {w.rating}"
          f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
-        "45° loudspeaker method (−1.5 dB on R')",
+        "45° loudspeaker method (−1.5 dB on $R′$)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -792,11 +793,11 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, bands, fontsize=10)
     ax.fill_between(x, res.l_i, res.l_nt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="−k = −10 log10(T/T0)")
+                    zorder=0, label=r"$-k = -10\,\log_{10}(T/T_0)$")
     ax.plot(x, res.l_i, "--o", color=COLOR_PRIMARY, linewidth=1.8,
-            markersize=6, zorder=5, label="Li (impact level)")
+            markersize=6, zorder=5, label="$L_i$ (impact level)")
     ax.plot(x, res.l_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=6,
-            zorder=5, label="L'nT (standardized)")
+            zorder=5, label="$L′_{nT}$ (standardized)")
 
     ax.set_ylabel("Impact sound pressure level [dB]")
     ax.set_title("ISO 10052 Survey Method: Impact Sound",
@@ -806,9 +807,9 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
 
     info = [
-        (f"L'nT,w(CI) = {res.rating.rating}"
+        (f"$L′_{{nT,w}}$($C_I$) = {res.rating.rating}"
          f"({_fmt_minus(res.rating.ci)}) dB"),
-        "note the minus sign: a live room lowers L'nT",
+        "note the minus sign: a live room lowers $L′_{nT}$",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
@@ -844,23 +845,24 @@ def generate_lab_insulation_result(output_dir: str) -> None:
     x = np.arange(16)
 
     ax1.plot(x, lab.r, "-o", color=COLOR_PRIMARY, linewidth=2.2,
-             markersize=5, zorder=5, label="measured R")
+             markersize=5, zorder=5, label="measured $R$")
     assert lab.rating.shifted_reference is not None
     ax1.plot(x, lab.rating.shifted_reference, "--s", color=COLOR_FG,
              linewidth=1.6, markersize=4, zorder=5, label="shifted reference")
-    ax1.set_ylabel("Sound reduction index R [dB]")
-    ax1.set_title(f"Airborne: Rw(C;Ctr) = {lab.rating.rating}"
-                  f"({lab.rating.c};{lab.rating.ctr}) dB", fontsize=11)
+    ax1.set_ylabel("Sound reduction index $R$ [dB]")
+    ax1.set_title(f"Airborne: $R_w$($C$;$C_{{tr}}$) = {lab.rating.rating}"
+                  f"({_fmt_minus(lab.rating.c)};{_fmt_minus(lab.rating.ctr)})"
+                  " dB", fontsize=11)
     ax1.legend(loc="upper left", fontsize=9)
 
     ax2.plot(x, imp.l_n, "-o", color=COLOR_SECONDARY, linewidth=2.2,
-             markersize=5, zorder=5, label="normalized Ln")
+             markersize=5, zorder=5, label="normalized $L_n$")
     assert imp.rating.shifted_reference is not None
     ax2.plot(x, imp.rating.shifted_reference, "--s", color=COLOR_FG,
              linewidth=1.6, markersize=4, zorder=5, label="shifted reference")
-    ax2.set_ylabel("Impact sound pressure level Ln [dB]")
-    ax2.set_title(f"Impact: Ln,w(CI) = {imp.rating.rating}"
-                  f"({imp.rating.ci}) dB", fontsize=11)
+    ax2.set_ylabel("Impact sound pressure level $L_n$ [dB]")
+    ax2.set_title(f"Impact: $L_{{n,w}}$($C_I$) = {imp.rating.rating}"
+                  f"({_fmt_minus(imp.rating.ci)}) dB", fontsize=11)
     ax2.legend(loc="upper right", fontsize=9)
 
     plt.suptitle("ISO 10140 Laboratory Insulation (flanking suppressed)",
@@ -889,7 +891,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.plot(x, res.d_i_n_e, "-o", color=COLOR_PRIMARY, linewidth=2.2,
-            markersize=5, zorder=5, label="DI,n,e (element)")
+            markersize=5, zorder=5, label="$D_{I,n,e}$ (element)")
     ax.plot(x, res.rating.shifted_reference, "--s", color=COLOR_FG,
             linewidth=1.8, markersize=5, zorder=5, label="shifted reference")
     unfav = res.rating.measured < res.rating.shifted_reference
@@ -907,9 +909,9 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
+        (f"$D_{{I,n,e,w}}$($C$;$C_{{tr}}$) = {res.rating.rating}"
          f"({_fmt_minus(res.rating.c)};{_fmt_minus(res.rating.ctr)}) dB"),
-        "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N",
+        r"$D_{I,n,e} = L_{p1} - 6 - [L_{In} + 10\,\log_{10}(S_m/A_0)] + 10\,\log_{10} N$",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -940,7 +942,7 @@ def generate_flanking_level_difference(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.plot(x, res.d_n_f, "-o", color=COLOR_PRIMARY, linewidth=2.2,
-            markersize=5, zorder=5, label="Dn,f (flanking)")
+            markersize=5, zorder=5, label="$D_{n,f}$ (flanking)")
     ax.plot(x, res.rating.shifted_reference, "--s", color=COLOR_FG,
             linewidth=1.8, markersize=5, zorder=5, label="shifted reference")
     unfav = res.rating.measured < res.rating.shifted_reference
@@ -957,9 +959,9 @@ def generate_flanking_level_difference(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (f"Dn,f,w(C;Ctr) = {res.rating.rating}"
-         f"({res.rating.c};{res.rating.ctr}) dB"),
-        "Dn,f = L1 - L2 - 10 log10(A/A0)",
+        (f"$D_{{n,f,w}}$($C$;$C_{{tr}}$) = {res.rating.rating}"
+         f"({_fmt_minus(res.rating.c)};{_fmt_minus(res.rating.ctr)}) dB"),
+        r"$D_{n,f} = L_1 - L_2 - 10\,\log_{10}(A/A_0)$",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -1004,8 +1006,8 @@ def generate_radiated_power_outdoor(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LW = Lp,in + Cd - R' + 10 log10(S/S0)",
-        "wall 176 m² + industrial door 24 m², Cd = −5 dB",
+        r"$L_W = L_{p,\mathrm{in}} + C_d - R′ + 10\,\log_{10}(S/S_0)$",
+        "wall 176 m² + industrial door 24 m², $C_d$ = −5 dB",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG, zorder=10,
@@ -1076,24 +1078,24 @@ def generate_insulation_adaptation_terms(output_dir: str) -> None:
     assert w_heavy.shifted_reference is not None
     ax_spec.plot(x, w_heavy.shifted_reference, "--", color=COLOR_FG,
                  linewidth=1.5, zorder=3,
-                 label=f"shifted reference (both, Rw = {w_heavy.rating} dB)")
+                 label=f"shifted reference (both, $R_w$ = {w_heavy.rating} dB)")
     ax_spec.plot(x, heavy, "-o", color=COLOR_PRIMARY, linewidth=2.4,
                  markersize=5, zorder=5, label="150 mm dense concrete")
     ax_spec.plot(x, light, "-s", color=COLOR_SECONDARY, linewidth=2.4,
-                 markersize=5, zorder=5, label="double leaf, 12 kg/m2 + 90 mm")
+                 markersize=5, zorder=5, label="double leaf, 12 kg/m² + 90 mm")
     ax_spec.annotate(f"mass-air-mass resonance at {f0:.0f} Hz, below the\n"
                      "rated range: the double leaf enters it still climbing",
                      xy=(0.0, float(light[0])), xytext=(1.4, float(light.min()) + 2.0),
                      fontsize=9, color=COLOR_FG,
                      arrowprops={"arrowstyle": "->", "lw": 1.0})
-    ax_spec.set_ylabel("Sound reduction index R [dB]")
+    ax_spec.set_ylabel("Sound reduction index $R$ [dB]")
     ax_spec.set_title("Same weighted rating, different spectrum",
                       fontweight="bold", pad=10)
     ax_spec.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_spec.set_axisbelow(True)
     ax_spec.legend(loc="lower right", fontsize=9)
 
-    groups = ("Rw", "Rw + C", "Rw + Ctr")
+    groups = ("$R_w$", "$R_w + C$", "$R_w + C_{tr}$")
     heavy_vals = [w_heavy.rating, w_heavy.rating + w_heavy.c,
                   w_heavy.rating + w_heavy.ctr]
     light_vals = [w_light.rating, w_light.rating + w_light.c,
@@ -1118,7 +1120,7 @@ def generate_insulation_adaptation_terms(output_dir: str) -> None:
     ax_bar.set_xticklabels(groups)
     ax_bar.set_ylabel("Single number [dB]")
     ax_bar.set_ylim(float(min(light_vals)) - 9.0, float(max(heavy_vals)) + 5.0)
-    ax_bar.set_title("Rw alone is not a specification",
+    ax_bar.set_title("$R_w$ alone is not a specification",
                      fontweight="bold", pad=10)
     ax_bar.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_bar.set_axisbelow(True)
@@ -1154,7 +1156,8 @@ def generate_background_correction_regimes(output_dir: str) -> None:
                    alpha=0.7, zorder=2)
     ax.text(3.0, cap + 0.18, "limit of measurement\n(fixed 1,3 dB, flag the band)",
             ha="center", fontsize=9, color=COLOR_FG)
-    ax.annotate(f"6 - 10 lg(10^0,6 - 1) = {formula[margin.searchsorted(6.0)]:.2f} dB",
+    ax.annotate(rf"$6 - 10\,\mathrm{{lg}}(10^{{0{{,}}6}} - 1)$"
+                rf" = {formula[margin.searchsorted(6.0)]:.2f} dB",
                 xy=(6.0, cap), xytext=(7.4, cap + 0.62), fontsize=9,
                 color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax.annotate("the field rule stops here", xy=(10.0, 0.0),
@@ -1165,8 +1168,8 @@ def generate_background_correction_regimes(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax.set_xlim(0.0, 20.0)
     ax.set_ylim(-0.15, 2.3)
-    ax.set_xlabel("Signal-to-background margin Lsb - Lb [dB]")
-    ax.set_ylabel("Correction applied, Lsb - L [dB]")
+    ax.set_xlabel("Signal-to-background margin $L_{sb} - L_b$ [dB]")
+    ax.set_ylabel("Correction applied, $L_{sb} - L$ [dB]")
     ax.set_title("Background-noise correction: two standards, two thresholds",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1195,27 +1198,28 @@ def generate_fast_reverberation_correction(output_dir: str) -> None:
                     color=theme_fill(COLOR_SECONDARY, ax), zorder=1,
                     label="more than 1 dB apart")
     ax.plot(t, fast, "-", color=COLOR_PRIMARY, linewidth=2.6, zorder=5,
-            label="Fast maximum: 10 lg[g(C)/g(C0)] (ISO 16283-2)")
+            label=r"Fast maximum: $10\,\mathrm{lg}[g(C)/g(C_0)]$ (ISO 16283-2)")
     ax.plot(t, energy, "--", color=COLOR_TERTIARY, linewidth=2.2, zorder=4,
-            label="energy average: 10 lg(T/T0)")
+            label=r"energy average: $10\,\mathrm{lg}(T/T_0)$")
     ax.axhline(0.0, color=COLOR_FG, linewidth=1.0, alpha=0.6, zorder=2)
     ax.axvline(0.5, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
                zorder=2)
     ax.axvline(1.7275, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7,
                zorder=2)
-    ax.annotate("T = T0 = 0,5 s\nboth terms vanish", xy=(0.5, 0.0),
+    ax.annotate("$T = T_0$ = 0,5 s\nboth terms vanish", xy=(0.5, 0.0),
                 xytext=(0.62, 4.4), fontsize=9, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
-    ax.annotate("T = 1,7275 s: C = 1, g = 1/e", xy=(1.7275, float(
+    ax.annotate("$T$ = 1,7275 s: $C = 1$, $g = 1/e$", xy=(1.7275, float(
         np.interp(1.7275, t, fast))), xytext=(1.95, 1.1), fontsize=9,
         color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
-    ax.annotate(f"at T = 5 s the energy average has grown to "
+    ax.annotate(f"at $T$ = 5 s the energy average has grown to "
                 f"{energy[-1]:.1f} dB\nwhile the Fast term has saturated at "
                 f"{fast[-1]:.1f} dB",
-                xy=(5.0, float(fast[-1])), xytext=(2.55, 8.4), fontsize=9,
-                color=COLOR_FG, arrowprops={"arrowstyle": "->", "lw": 1.0})
+                xy=(5.0, float(fast[-1])), xytext=(2.55, 6.0), fontsize=9,
+                va="bottom", color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax.set_xlim(0.2, 5.0)
-    ax.set_xlabel("Receiving-room reverberation time T [s]")
+    ax.set_xlabel("Receiving-room reverberation time $T$ [s]")
     ax.set_ylabel("Term subtracted from the measured level [dB]")
     ax.set_title("A Fast detector cannot follow a long decay",
                  fontweight="bold", pad=12)
@@ -1271,11 +1275,11 @@ def generate_lab_versus_field_insulation(output_dir: str) -> None:
     ax.fill_between(x, poor, lab, color=theme_fill(COLOR_SECONDARY, ax),
                     zorder=1)
     ax.plot(x, lab, "-o", color=COLOR_PRIMARY, linewidth=2.6, markersize=5,
-            zorder=5, label=f"laboratory R (Rw = {w_lab.rating} dB)")
+            zorder=5, label=f"laboratory $R$ ($R_w$ = {w_lab.rating} dB)")
     ax.plot(x, good, "-s", color=COLOR_TERTIARY, linewidth=2.2, markersize=4,
-            zorder=4, label=f"field R', good junctions (R'w = {w_good.rating} dB)")
+            zorder=4, label=f"field $R′$, good junctions ($R′_w$ = {w_good.rating} dB)")
     ax.plot(x, poor, "-^", color=COLOR_SECONDARY, linewidth=2.2, markersize=4,
-            zorder=4, label=f"field R', flanking dominant (R'w = {w_poor.rating} dB)")
+            zorder=4, label=f"field $R′$, flanking dominant ($R′_w$ = {w_poor.rating} dB)")
 
     mid = len(x) // 2
     ax.annotate("", xy=(mid, float(lab[mid])), xytext=(mid, float(good[mid])),
@@ -1315,7 +1319,7 @@ def generate_composite_facade_weak_element(output_dir: str) -> None:
         overall = [composite_transmission_loss([6.0, 2.0], [blind, float(w)])
                    for w in window]
         ax.plot(window, overall, "-", color=colour, linewidth=2.4, zorder=4,
-                label=f"blind part RA = {blind:g} dBA")
+                label=f"blind part $R_A$ = {blind:g} dBA")
         # The asymptote belongs to its own curve, so it keeps the colour and
         # steps back in shade. Stepping back in opacity would step it back
         # into the dark page, where the blue and the red both disappeared.
@@ -1340,10 +1344,10 @@ def generate_composite_facade_weak_element(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     ax.set_xlim(20.0, 55.0)
-    ax.set_xlabel("Window RA [dBA]  (2 m2 of an 8 m2 facade)")
-    ax.set_ylabel("Overall facade RA [dBA]")
+    ax.set_xlabel("Window $R_A$ [dBA]  (2 m² of an 8 m² facade)")
+    ax.set_ylabel("Overall facade $R_A$ [dBA]")
     ax.set_title("The weak element sets the composite\n"
-                 "(Ejemplo 7.5 geometry: 6 m2 blind part + 2 m2 window)",
+                 "(Ejemplo 7.5 geometry: 6 m² blind part + 2 m² window)",
                  fontweight="bold", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -1375,7 +1379,7 @@ def generate_intensity_field_indicator(output_dir: str) -> None:
                     color=theme_fill(COLOR_SECONDARY, ax), zorder=1,
                     label="surface not qualified")
     ax.plot(x, f_pi, "-o", color=COLOR_PRIMARY, linewidth=2.4, markersize=5,
-            zorder=5, label="FpI = Lp - LIn (Formula (10))")
+            zorder=5, label="$F_{pI} = L_p - L_{In}$ (Formula (10))")
     ax.axhline(10.0, color=COLOR_FG, linewidth=1.6, linestyle="--", zorder=3,
                label="10 dB: reflecting specimen (6.4.2)")
     ax.axhline(6.0, color=COLOR_TERTIARY, linewidth=1.6, linestyle=":",
@@ -1387,7 +1391,7 @@ def generate_intensity_field_indicator(output_dir: str) -> None:
             bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     ax.set_ylim(0.0, float(f_pi.max()) + 3.4)
-    ax.set_ylabel("Surface pressure-intensity indicator FpI [dB]")
+    ax.set_ylabel("Surface pressure-intensity indicator $F_{pI}$ [dB]")
     ax.set_title("Qualifying the measurement surface (ISO 15186-1, 6.4.2)",
                  fontweight="bold", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)

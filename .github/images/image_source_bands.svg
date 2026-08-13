@@ -319,20 +319,57 @@ L 697.583125 28.318125
    <g id="text_19">
     <g id="patch_7">
      <path d="M 59.029634 389.611875 
-L 273.26479 389.611875 
-Q 276.86479 389.611875 276.86479 386.011875 
-L 276.86479 342.802031 
-Q 276.86479 339.202031 273.26479 339.202031 
-L 59.029634 339.202031 
-Q 55.429634 339.202031 55.429634 342.802031 
+L 277.76479 389.611875 
+Q 281.36479 389.611875 281.36479 386.011875 
+L 281.36479 342.800625 
+Q 281.36479 339.200625 277.76479 339.200625 
+L 59.029634 339.200625 
+Q 55.429634 339.200625 55.429634 342.800625 
 L 55.429634 386.011875 
 Q 55.429634 389.611875 59.029634 389.611875 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 350.541504)">room 7 x 5 x 3 m, max_order = 60</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 361.343965)">wall alpha 0.10 -&gt; 0.50 with frequency</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">air at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 350.540098)">room 7 × 5 × 3 m, max_order = 60</text>
+    <!-- wall $\alpha$ 0.10 → 0.50 with frequency -->
+    <g transform="translate(59.029634 361.343965)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">w</tspan>
+      <tspan x="7.36084" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="12.875977" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="15.376465" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="17.876953" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="26.67041" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="29.53125" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="35.257324" y="-0.15625" style="font-size: 9px; font-family: sans-serif">.</tspan>
+      <tspan x="38.118164" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="43.844238" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="49.570312" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="52.431152" y="-0.15625" style="font-size: 9px; font-family: sans-serif">→</tspan>
+      <tspan x="59.972168" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="62.833008" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="68.559082" y="-0.15625" style="font-size: 9px; font-family: sans-serif">.</tspan>
+      <tspan x="71.419922" y="-0.15625" style="font-size: 9px; font-family: sans-serif">5</tspan>
+      <tspan x="77.145996" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="82.87207" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="85.73291" y="-0.15625" style="font-size: 9px; font-family: sans-serif">w</tspan>
+      <tspan x="93.09375" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+      <tspan x="95.594238" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+      <tspan x="99.123047" y="-0.15625" style="font-size: 9px; font-family: sans-serif">h</tspan>
+      <tspan x="104.827148" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="107.687988" y="-0.15625" style="font-size: 9px; font-family: sans-serif">f</tspan>
+      <tspan x="110.856445" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="114.556641" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="120.09375" y="-0.15625" style="font-size: 9px; font-family: sans-serif">q</tspan>
+      <tspan x="125.806641" y="-0.15625" style="font-size: 9px; font-family: sans-serif">u</tspan>
+      <tspan x="131.510742" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="137.047852" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+      <tspan x="142.751953" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+      <tspan x="147.700195" y="-0.15625" style="font-size: 9px; font-family: sans-serif">y</tspan>
+      <tspan x="20.737793" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">α</tspan>
+     </text>
+    </g>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 372.146426)">air at 20 °C / 50 % RH: −0.4 % of T30 at 250 Hz,</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(59.029634 382.948887)">−4.4 % at 4 kHz</text>
    </g>
    <g id="text_20">

@@ -1680,15 +1680,15 @@ L 705.826562 24.318125
    </g>
    <g id="legend_1">
     <g id="patch_168">
-     <path d="M 62.778906 82.120781 
-L 218.306328 82.120781 
-Q 220.006328 82.120781 220.006328 80.420781 
-L 220.006328 30.268125 
-Q 220.006328 28.568125 218.306328 28.568125 
+     <path d="M 62.778906 82.122109 
+L 222.362422 82.122109 
+Q 224.062422 82.122109 224.062422 80.422109 
+L 224.062422 30.268125 
+Q 224.062422 28.568125 222.362422 28.568125 
 L 62.778906 28.568125 
 Q 61.078906 28.568125 61.078906 30.268125 
-L 61.078906 80.420781 
-Q 61.078906 82.120781 62.778906 82.120781 
+L 61.078906 80.422109 
+Q 61.078906 82.122109 62.778906 82.122109 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -1721,16 +1721,42 @@ z
 " style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="63.928125" transform="rotate(-0 88.278906 63.928125)">MC 95 % interval [-0.98, 0.98]</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="63.928125" transform="rotate(-0 88.278906 63.928125)">MC 95 % interval [−0.98, 0.98]</text>
     </g>
     <g id="line2d_34">
-     <path d="M 64.478906 73.703789 
-L 72.978906 73.703789 
-L 81.478906 73.703789 
+     <path d="M 64.478906 73.705117 
+L 72.978906 73.705117 
+L 81.478906 73.705117 
 " style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="76.678789" transform="rotate(-0 88.278906 76.678789)">GUM Y ± U  [-1.15, 1.15]</text>
+     <!-- GUM $Y \pm U$  [−1.15, 1.15] -->
+     <g transform="translate(88.278906 76.680117)">
+      <text>
+       <tspan x="0" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">G</tspan>
+       <tspan x="6.58667" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">U</tspan>
+       <tspan x="12.808105" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">M</tspan>
+       <tspan x="20.141846" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="29.691895" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">±</tspan>
+       <tspan x="44.691406" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="47.393311" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="50.095215" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">[</tspan>
+       <tspan x="53.411377" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">−</tspan>
+       <tspan x="60.533447" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="65.941406" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="68.643311" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="74.05127" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">5</tspan>
+       <tspan x="79.459229" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">,</tspan>
+       <tspan x="82.161133" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="84.863037" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="90.270996" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="92.9729" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="98.380859" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">5</tspan>
+       <tspan x="103.788818" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">]</tspan>
+       <tspan x="22.84375" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">Y</tspan>
+       <tspan x="38.469971" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">U</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
@@ -3376,15 +3402,15 @@ L 705.826563 284.718125
    </g>
    <g id="legend_2">
     <g id="patch_337">
-     <path d="M 62.778906 342.520781 
-L 226.055938 342.520781 
-Q 227.755938 342.520781 227.755938 340.820781 
+     <path d="M 62.778906 342.522109 
+L 226.055938 342.522109 
+Q 227.755938 342.522109 227.755938 340.822109 
 L 227.755938 290.668125 
 Q 227.755938 288.968125 226.055938 288.968125 
 L 62.778906 288.968125 
 Q 61.078906 288.968125 61.078906 290.668125 
-L 61.078906 340.820781 
-Q 61.078906 342.520781 62.778906 342.520781 
+L 61.078906 340.822109 
+Q 61.078906 342.522109 62.778906 342.522109 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -3420,13 +3446,40 @@ z
      <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="324.328125" transform="rotate(-0 88.278906 324.328125)">MC 95 % interval [69.19, 77.86]</text>
     </g>
     <g id="line2d_66">
-     <path d="M 64.478906 334.103789 
-L 72.978906 334.103789 
-L 81.478906 334.103789 
+     <path d="M 64.478906 334.105117 
+L 72.978906 334.105117 
+L 81.478906 334.105117 
 " style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_41">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="337.078789" transform="rotate(-0 88.278906 337.078789)">GUM Y ± U  [68.85, 77.17]</text>
+     <!-- GUM $Y \pm U$  [68.85, 77.17] -->
+     <g transform="translate(88.278906 337.080117)">
+      <text>
+       <tspan x="0" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">G</tspan>
+       <tspan x="6.58667" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">U</tspan>
+       <tspan x="12.808105" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">M</tspan>
+       <tspan x="20.141846" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="29.691895" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">±</tspan>
+       <tspan x="44.691406" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="47.393311" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="50.095215" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">[</tspan>
+       <tspan x="53.411377" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">6</tspan>
+       <tspan x="58.819336" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">8</tspan>
+       <tspan x="64.227295" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="66.929199" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">8</tspan>
+       <tspan x="72.337158" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">5</tspan>
+       <tspan x="77.745117" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">,</tspan>
+       <tspan x="80.447021" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="83.148926" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">7</tspan>
+       <tspan x="88.556885" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">7</tspan>
+       <tspan x="93.964844" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="96.666748" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="102.074707" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">7</tspan>
+       <tspan x="107.482666" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">]</tspan>
+       <tspan x="22.84375" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">Y</tspan>
+       <tspan x="38.469971" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">U</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
@@ -5147,15 +5200,15 @@ L 584.766608 565.564723
    </g>
    <g id="legend_3">
     <g id="patch_507">
-     <path d="M 62.778906 602.920781 
-L 215.239688 602.920781 
-Q 216.939688 602.920781 216.939688 601.220781 
+     <path d="M 62.778906 602.922109 
+L 215.239688 602.922109 
+Q 216.939688 602.922109 216.939688 601.222109 
 L 216.939688 551.068125 
 Q 216.939688 549.368125 215.239688 549.368125 
 L 62.778906 549.368125 
 Q 61.078906 549.368125 61.078906 551.068125 
-L 61.078906 601.220781 
-Q 61.078906 602.920781 62.778906 602.920781 
+L 61.078906 601.222109 
+Q 61.078906 602.922109 62.778906 602.922109 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -5191,13 +5244,38 @@ z
      <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="584.728125" transform="rotate(-0 88.278906 584.728125)">MC 95 % interval [0.83, 1.00]</text>
     </g>
     <g id="line2d_110">
-     <path d="M 64.478906 594.503789 
-L 72.978906 594.503789 
-L 81.478906 594.503789 
+     <path d="M 64.478906 594.505117 
+L 72.978906 594.505117 
+L 81.478906 594.505117 
 " style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_68">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start" x="88.278906" y="597.478789" transform="rotate(-0 88.278906 597.478789)">GUM Y ± U  [0.84, 1.06]</text>
+     <!-- GUM $Y \pm U$  [0.84, 1.06] -->
+     <g transform="translate(88.278906 597.480117)">
+      <text>
+       <tspan x="0" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">G</tspan>
+       <tspan x="6.58667" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">U</tspan>
+       <tspan x="12.808105" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">M</tspan>
+       <tspan x="20.141846" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="29.691895" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">±</tspan>
+       <tspan x="44.691406" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="47.393311" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="50.095215" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">[</tspan>
+       <tspan x="53.411377" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">0</tspan>
+       <tspan x="58.819336" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="61.52124" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">8</tspan>
+       <tspan x="66.929199" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">4</tspan>
+       <tspan x="72.337158" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">,</tspan>
+       <tspan x="75.039062" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif"> </tspan>
+       <tspan x="77.740967" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">1</tspan>
+       <tspan x="83.148926" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">.</tspan>
+       <tspan x="85.85083" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">0</tspan>
+       <tspan x="91.258789" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">6</tspan>
+       <tspan x="96.666748" y="-0.546875" style="font-size: 8.5px; font-family: sans-serif">]</tspan>
+       <tspan x="22.84375" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">Y</tspan>
+       <tspan x="38.469971" y="-0.546875" style="font-style: oblique; font-size: 8.5px; font-family: sans-serif">U</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

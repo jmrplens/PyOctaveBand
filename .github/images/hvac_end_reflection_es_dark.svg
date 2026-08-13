@@ -546,40 +546,82 @@ z
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="584.363313" y="42.293562" transform="rotate(-0 584.363313 42.293562)">Diámetro del conducto</text>
     </g>
     <g id="line2d_56">
-     <path d="M 603.091046 52.274905 
-L 611.421046 52.274905 
-L 619.751046 52.274905 
+     <path d="M 603.083888 52.274905 
+L 611.413888 52.274905 
+L 619.743888 52.274905 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mc6338cc71e" x="611.421046" y="52.274905" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#mc6338cc71e" x="611.413888" y="52.274905" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_19">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="626.415046" y="55.190405" transform="rotate(-0 626.415046 55.190405)">D = 150 mm</text>
+     <!-- $D$ = 150 mm -->
+     <g style="fill: #ffffff" transform="translate(626.407888 55.190405)">
+      <text>
+       <tspan x="0" y="-0.8125" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif; fill: #ffffff">D</tspan>
+       <tspan x="6.412827" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="9.060104" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">=</tspan>
+       <tspan x="16.038162" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="18.68544" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">1</tspan>
+       <tspan x="23.984055" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">5</tspan>
+       <tspan x="29.282669" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">0</tspan>
+       <tspan x="34.581284" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="37.228561" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+       <tspan x="45.341171" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_57">
-     <path d="M 603.091046 64.770555 
-L 611.421046 64.770555 
-L 619.751046 64.770555 
+     <path d="M 603.083888 64.770555 
+L 611.413888 64.770555 
+L 619.743888 64.770555 
 " style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m1b7f8bbf56" x="611.421046" y="64.770555" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1b7f8bbf56" x="611.413888" y="64.770555" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="626.415046" y="67.686055" transform="rotate(-0 626.415046 67.686055)">D = 300 mm</text>
+     <!-- $D$ = 300 mm -->
+     <g style="fill: #ffffff" transform="translate(626.407888 67.686055)">
+      <text>
+       <tspan x="0" y="-0.8125" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif; fill: #ffffff">D</tspan>
+       <tspan x="6.412827" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="9.060104" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">=</tspan>
+       <tspan x="16.038162" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="18.68544" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">3</tspan>
+       <tspan x="23.984055" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">0</tspan>
+       <tspan x="29.282669" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">0</tspan>
+       <tspan x="34.581284" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="37.228561" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+       <tspan x="45.341171" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_58">
-     <path d="M 603.091046 77.266206 
-L 611.421046 77.266206 
-L 619.751046 77.266206 
+     <path d="M 603.083888 77.266206 
+L 611.413888 77.266206 
+L 619.743888 77.266206 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m5aade19f9a" x="611.421046" y="77.266206" style="fill: #2ca02c; stroke: #2ca02c"/>
+      <use xlink:href="#m5aade19f9a" x="611.413888" y="77.266206" style="fill: #2ca02c; stroke: #2ca02c"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="626.415046" y="80.181706" transform="rotate(-0 626.415046 80.181706)">D = 600 mm</text>
+     <!-- $D$ = 600 mm -->
+     <g style="fill: #ffffff" transform="translate(626.407888 80.181706)">
+      <text>
+       <tspan x="0" y="-0.8125" style="font-style: oblique; font-size: 8.33px; font-family: sans-serif; fill: #ffffff">D</tspan>
+       <tspan x="6.412827" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="9.060104" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">=</tspan>
+       <tspan x="16.038162" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="18.68544" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">6</tspan>
+       <tspan x="23.984055" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">0</tspan>
+       <tspan x="29.282669" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">0</tspan>
+       <tspan x="34.581284" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="37.228561" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+       <tspan x="45.341171" y="-0.8125" style="font-size: 8.33px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

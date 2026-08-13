@@ -318,7 +318,19 @@ z
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(267.622013 47.746777)">EDT 1.00 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(268.786388 58.548535)">T20 1.00 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(268.786388 69.350293)">T30 1.00 s</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(276.252169 80.152051)">C = -0 %</text>
+    <!-- $C$ = −0 % -->
+    <g transform="translate(271.904044 80.152051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif">−</tspan>
+      <tspan x="27.087891" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="32.813965" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="35.674805" y="-0.3125" style="font-size: 9px; font-family: sans-serif">%</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(200.847638 90.953809)">T20 = T30, curvature ~ 0</text>
    </g>
    <g id="text_18">
@@ -966,7 +978,19 @@ z
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(569.394565 47.746777)">EDT 0.72 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(570.55894 58.548535)">T20 1.78 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(570.55894 69.350293)">T30 2.18 s</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(575.545503 80.152051)">C = 23 %</text>
+    <!-- $C$ = 23 % -->
+    <g transform="translate(575.476596 80.152051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="25.272949" y="-0.3125" style="font-size: 9px; font-family: sans-serif">3</tspan>
+      <tspan x="30.999023" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="33.859863" y="-0.3125" style="font-size: 9px; font-family: sans-serif">%</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(514.102221 90.954512)">T30 &gt; T20: report both</text>
    </g>
    <g id="text_28">
@@ -1869,23 +1893,34 @@ L 927.983125 191.465918
    </g>
    <g id="text_37">
     <g id="patch_19">
-     <path d="M 812.723367 97.6175 
+     <path d="M 818.38493 97.6175 
 L 919.729148 97.6175 
 Q 923.329148 97.6175 923.329148 94.0175 
 L 923.329148 40.008008 
 Q 923.329148 36.408008 919.729148 36.408008 
-L 812.723367 36.408008 
-Q 809.123367 36.408008 809.123367 40.008008 
-L 809.123367 94.0175 
-Q 809.123367 97.6175 812.723367 97.6175 
+L 818.38493 36.408008 
+Q 814.78493 36.408008 814.78493 40.008008 
+L 814.78493 94.0175 
+Q 814.78493 97.6175 818.38493 97.6175 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(871.167117 47.746777)">EDT 0.58 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(872.331492 58.548535)">T20 0.99 s</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(872.331492 69.350293)">T30 1.00 s</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(883.044305 80.152051)">C = 1 %</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(812.723367 90.954512)">EDT &lt;&lt; T30: a dry seat</text>
+    <!-- $C$ = 1 % -->
+    <g transform="translate(883.009148 80.152051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="25.272949" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="28.133789" y="-0.3125" style="font-size: 9px; font-family: sans-serif">%</tspan>
+     </text>
+    </g>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(818.38493 90.954512)">EDT ≪ T30: a dry seat</text>
    </g>
    <g id="text_38">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="790.416849" y="16.318125" transform="rotate(-0 790.416849 16.318125)">strong early energy</text>

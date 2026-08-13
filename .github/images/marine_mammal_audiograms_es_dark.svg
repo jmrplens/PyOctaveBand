@@ -580,7 +580,7 @@ L 477.285938 62.982895
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="192.975781" transform="rotate(-90 14.798438 192.975781)">Umbral [dB re 1 uPa; grupos en aire re 20 uPa]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="192.975781" transform="rotate(-90 14.798438 192.975781)">Umbral [dB re 1 µPa; grupos en aire re 20 µPa]</text>
     </g>
    </g>
    <g id="line2d_79">
@@ -1706,7 +1706,7 @@ L 957.885938 35.248283
      </g>
     </g>
     <g id="text_48">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="495.398438" y="192.975781" transform="rotate(-90 495.398438 192.975781)">Umbral [dB re 1 uPa]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="495.398438" y="192.975781" transform="rotate(-90 495.398438 192.975781)">Umbral [dB re 1 µPa]</text>
     </g>
    </g>
    <g id="line2d_164">

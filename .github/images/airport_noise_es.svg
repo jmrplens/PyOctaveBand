@@ -493,35 +493,65 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 613.872187 62.519531 
+     <path d="M 613.815938 62.519531 
 L 699.585938 62.519531 
 Q 701.385938 62.519531 701.385938 60.719531 
 L 701.385938 34.618125 
 Q 701.385938 32.818125 699.585938 32.818125 
-L 613.872187 32.818125 
-Q 612.072188 32.818125 612.072188 34.618125 
-L 612.072188 60.719531 
-Q 612.072188 62.519531 613.872187 62.519531 
+L 613.815938 32.818125 
+Q 612.015938 32.818125 612.015938 34.618125 
+L 612.015938 60.719531 
+Q 612.015938 62.519531 613.815938 62.519531 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_51">
-     <path d="M 615.672188 40.106719 
-L 624.672188 40.106719 
-L 633.672188 40.106719 
+     <path d="M 615.615938 40.106719 
+L 624.615938 40.106719 
+L 633.615938 40.106719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_12">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="640.872188" y="43.256719" transform="rotate(-0 640.872188 43.256719)">P = 20000 N</text>
+     <!-- $P$ = 20000 N -->
+     <g transform="translate(640.815938 43.256719)">
+      <text>
+       <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">P</tspan>
+       <tspan x="5.427246" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="8.288086" y="-0.3125" style="font-size: 9px; font-family: sans-serif">=</tspan>
+       <tspan x="15.829102" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="18.689941" y="-0.3125" style="font-size: 9px; font-family: sans-serif">2</tspan>
+       <tspan x="24.416016" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="30.14209" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="35.868164" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="41.594238" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="47.320312" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="50.181152" y="-0.3125" style="font-size: 9px; font-family: sans-serif">N</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_52">
-     <path d="M 615.672188 53.607422 
-L 624.672188 53.607422 
-L 633.672188 53.607422 
+     <path d="M 615.615938 53.607422 
+L 624.615938 53.607422 
+L 633.615938 53.607422 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_13">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="640.872188" y="56.757422" transform="rotate(-0 640.872188 56.757422)">P = 12000 N</text>
+     <!-- $P$ = 12000 N -->
+     <g transform="translate(640.815938 56.757422)">
+      <text>
+       <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">P</tspan>
+       <tspan x="5.427246" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="8.288086" y="-0.3125" style="font-size: 9px; font-family: sans-serif">=</tspan>
+       <tspan x="15.829102" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="18.689941" y="-0.3125" style="font-size: 9px; font-family: sans-serif">1</tspan>
+       <tspan x="24.416016" y="-0.3125" style="font-size: 9px; font-family: sans-serif">2</tspan>
+       <tspan x="30.14209" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="35.868164" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="41.594238" y="-0.3125" style="font-size: 9px; font-family: sans-serif">0</tspan>
+       <tspan x="47.320312" y="-0.3125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="50.181152" y="-0.3125" style="font-size: 9px; font-family: sans-serif">N</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

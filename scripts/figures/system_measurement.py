@@ -246,6 +246,7 @@ def generate_golay_ir(output_dir: str) -> None:
     impulse[0] = 1.0
     true_ir = scipy_signal.lfilter(b, a, impulse)
     err = float(np.max(np.abs(ir - true_ir)))
+    mantissa, exponent = f"{err:.1e}".split("e")
 
     t_ms = 1e3 * np.arange(length) / fs
     view = t_ms <= 6.0
@@ -255,8 +256,9 @@ def generate_golay_ir(output_dir: str) -> None:
     ax.plot(t_ms[view], true_ir[view], color=COLOR_SECONDARY, linewidth=1.2,
             linestyle="--", label="True system response")
     ax.text(0.985, 0.05,
-            f"max |recovered - true| = {err:.1e}\n"
-            "noise-free closed-form identity",
+            rf"$\max\,|\mathrm{{recovered}} - \mathrm{{true}}|"
+            rf" = {mantissa}\times10^{{{int(exponent)}}}$"
+            "\nnoise-free closed-form identity",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=9,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,

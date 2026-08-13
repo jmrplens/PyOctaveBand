@@ -383,16 +383,16 @@ z
 " clip-path="url(#p5ea899ab99)" style="fill: #555555; stroke: #555555; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_15">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="130.217837" y="241.808909" transform="rotate(-0 130.217837 241.808909)">-6.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="130.217837" y="241.808909" transform="rotate(-0 130.217837 241.808909)">−6.0 dB</text>
    </g>
    <g id="text_16">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="295.00881" y="209.636614" transform="rotate(-0 295.00881 209.636614)">-4.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="295.00881" y="209.636614" transform="rotate(-0 295.00881 209.636614)">−4.0 dB</text>
    </g>
    <g id="text_17">
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="459.799784" y="129.292025" transform="rotate(-0 459.799784 129.292025)">0.0 dB</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="624.590757" y="306.153498" transform="rotate(-0 624.590757 306.153498)">-10.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="624.590757" y="306.153498" transform="rotate(-0 624.590757 306.153498)">−10.0 dB</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="377.404297" y="15.558281" transform="rotate(-0 377.404297 15.558281)">One open microphone — headroom +0.0 dB</text>
@@ -777,19 +777,19 @@ z
 " clip-path="url(#pe1d20e3692)" style="fill: #d62728; stroke: #555555; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_36">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="130.217837" y="567.608909" transform="rotate(-0 130.217837 567.608909)">-6.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="130.217837" y="567.608909" transform="rotate(-0 130.217837 567.608909)">−6.0 dB</text>
    </g>
    <g id="text_37">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="295.00881" y="535.436614" transform="rotate(-0 295.00881 535.436614)">-4.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="295.00881" y="535.436614" transform="rotate(-0 295.00881 535.436614)">−4.0 dB</text>
    </g>
    <g id="text_38">
     <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="459.799784" y="358.243768" transform="rotate(-0 459.799784 358.243768)">6.0 dB</text>
    </g>
    <g id="text_39">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="624.590757" y="535.105241" transform="rotate(-0 624.590757 535.105241)">-4.0 dB</text>
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="624.590757" y="535.105241" transform="rotate(-0 624.590757 535.105241)">−4.0 dB</text>
    </g>
    <g id="text_40">
-    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="377.404297" y="341.358281" transform="rotate(-0 377.404297 341.358281)">Four open microphones — headroom -6.0 dB</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="377.404297" y="341.358281" transform="rotate(-0 377.404297 341.358281)">Four open microphones — headroom −6.0 dB</text>
    </g>
    <g id="legend_2">
     <g id="patch_21">

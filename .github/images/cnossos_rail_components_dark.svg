@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="929.085938pt" height="381.435pt" viewBox="0 0 929.085938 381.435" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="929.085938pt" height="381.435781pt" viewBox="0 0 929.085938 381.435781" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 381.435 
-L 929.085938 381.435 
+   <path d="M 0 381.435781 
+L 929.085938 381.435781 
 L 929.085938 0 
 L 0 0 
 z
@@ -571,12 +571,12 @@ L 459.285937 328.828196
     <g id="patch_7">
      <path d="M 201.091328 338.733437 
 L 305.482891 338.733437 
-Q 307.282891 338.733437 307.282891 336.933438 
+Q 307.282891 338.733437 307.282891 336.933437 
 L 307.282891 297.331328 
 Q 307.282891 295.531328 305.482891 295.531328 
 L 201.091328 295.531328 
 Q 199.291328 295.531328 199.291328 297.331328 
-L 199.291328 336.933438 
+L 199.291328 336.933437 
 Q 199.291328 338.733437 201.091328 338.733437 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
@@ -726,7 +726,25 @@ L 903.158771 26.318125
      </g>
     </g>
     <g id="text_28">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="715.887109" y="371.831875" transform="rotate(-0 715.887109 371.831875)">Speed v [km/h]</text>
+     <!-- Speed $v$ [km/h] -->
+     <g style="fill: #ffffff" transform="translate(677.537109 371.833438)">
+      <text>
+       <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">S</tspan>
+       <tspan x="6.347656" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">p</tspan>
+       <tspan x="12.695312" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">e</tspan>
+       <tspan x="18.847656" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">e</tspan>
+       <tspan x="25" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">d</tspan>
+       <tspan x="31.347656" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="40.444336" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="43.623047" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">[</tspan>
+       <tspan x="47.524414" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">k</tspan>
+       <tspan x="53.31543" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">m</tspan>
+       <tspan x="63.056641" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">/</tspan>
+       <tspan x="66.425781" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">h</tspan>
+       <tspan x="72.763672" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">]</tspan>
+       <tspan x="34.526367" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">v</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="matplotlib.axis_4">

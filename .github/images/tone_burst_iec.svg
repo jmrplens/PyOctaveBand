@@ -722,35 +722,35 @@ L 295.638021 48.680234
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 193.308021 79.081484 
+     <path d="M 189.490521 79.081484 
 L 290.038021 79.081484 
 Q 291.638021 79.081484 291.638021 77.481484 
 L 291.638021 54.280234 
 Q 291.638021 52.680234 290.038021 52.680234 
-L 193.308021 52.680234 
-Q 191.708021 52.680234 191.708021 54.280234 
-L 191.708021 77.481484 
-Q 191.708021 79.081484 193.308021 79.081484 
+L 189.490521 52.680234 
+Q 187.890521 52.680234 187.890521 54.280234 
+L 187.890521 77.481484 
+Q 187.890521 79.081484 189.490521 79.081484 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_29">
-     <path d="M 194.908021 59.158984 
-L 202.908021 59.158984 
-L 210.908021 59.158984 
+     <path d="M 191.090521 59.158984 
+L 199.090521 59.158984 
+L 207.090521 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="217.308021" y="61.958984" transform="rotate(-0 217.308021 61.958984)">FAST envelope</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="213.490521" y="61.958984" transform="rotate(-0 213.490521 61.958984)">FAST envelope</text>
     </g>
     <g id="line2d_30">
-     <path d="M 194.908021 71.159609 
-L 202.908021 71.159609 
-L 210.908021 71.159609 
+     <path d="M 191.090521 71.159609 
+L 199.090521 71.159609 
+L 207.090521 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="217.308021" y="73.959609" transform="rotate(-0 217.308021 73.959609)">IEC target -1.0 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="213.490521" y="73.959609" transform="rotate(-0 213.490521 73.959609)">IEC target −1.0 dB</text>
     </g>
    </g>
   </g>
@@ -1091,35 +1091,35 @@ L 568.610573 48.680234
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 466.280573 79.081484 
+     <path d="M 462.463073 79.081484 
 L 563.010573 79.081484 
 Q 564.610573 79.081484 564.610573 77.481484 
 L 564.610573 54.280234 
 Q 564.610573 52.680234 563.010573 52.680234 
-L 466.280573 52.680234 
-Q 464.680573 52.680234 464.680573 54.280234 
-L 464.680573 77.481484 
-Q 464.680573 79.081484 466.280573 79.081484 
+L 462.463073 52.680234 
+Q 460.863073 52.680234 460.863073 54.280234 
+L 460.863073 77.481484 
+Q 460.863073 79.081484 462.463073 79.081484 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_59">
-     <path d="M 467.880573 59.158984 
-L 475.880573 59.158984 
-L 483.880573 59.158984 
+     <path d="M 464.063073 59.158984 
+L 472.063073 59.158984 
+L 480.063073 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="490.280573" y="61.958984" transform="rotate(-0 490.280573 61.958984)">FAST envelope</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="486.463073" y="61.958984" transform="rotate(-0 486.463073 61.958984)">FAST envelope</text>
     </g>
     <g id="line2d_60">
-     <path d="M 467.880573 71.159609 
-L 475.880573 71.159609 
-L 483.880573 71.159609 
+     <path d="M 464.063073 71.159609 
+L 472.063073 71.159609 
+L 480.063073 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_28">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="490.280573" y="73.959609" transform="rotate(-0 490.280573 73.959609)">IEC target -4.8 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="486.463073" y="73.959609" transform="rotate(-0 486.463073 73.959609)">IEC target −4.8 dB</text>
     </g>
    </g>
   </g>
@@ -1371,35 +1371,35 @@ L 841.583125 48.680234
    </g>
    <g id="legend_3">
     <g id="patch_19">
-     <path d="M 734.163125 79.081484 
+     <path d="M 730.345625 79.081484 
 L 835.983125 79.081484 
 Q 837.583125 79.081484 837.583125 77.481484 
 L 837.583125 54.280234 
 Q 837.583125 52.680234 835.983125 52.680234 
-L 734.163125 52.680234 
-Q 732.563125 52.680234 732.563125 54.280234 
-L 732.563125 77.481484 
-Q 732.563125 79.081484 734.163125 79.081484 
+L 730.345625 52.680234 
+Q 728.745625 52.680234 728.745625 54.280234 
+L 728.745625 77.481484 
+Q 728.745625 79.081484 730.345625 79.081484 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_89">
-     <path d="M 735.763125 59.158984 
-L 743.763125 59.158984 
-L 751.763125 59.158984 
+     <path d="M 731.945625 59.158984 
+L 739.945625 59.158984 
+L 747.945625 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_37">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="758.163125" y="61.958984" transform="rotate(-0 758.163125 61.958984)">FAST envelope</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="754.345625" y="61.958984" transform="rotate(-0 754.345625 61.958984)">FAST envelope</text>
     </g>
     <g id="line2d_90">
-     <path d="M 735.763125 71.159609 
-L 743.763125 71.159609 
-L 751.763125 71.159609 
+     <path d="M 731.945625 71.159609 
+L 739.945625 71.159609 
+L 747.945625 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="758.163125" y="73.959609" transform="rotate(-0 758.163125 73.959609)">IEC target -11.1 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="754.345625" y="73.959609" transform="rotate(-0 754.345625 73.959609)">IEC target −11.1 dB</text>
     </g>
    </g>
   </g>

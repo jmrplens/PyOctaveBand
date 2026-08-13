@@ -337,16 +337,32 @@ z
     </g>
    </g>
    <g id="patch_7">
-    <path d="M 273.896053 229.819398 
-Q 235.229203 209.612412 197.553239 189.923256 
+    <path d="M 257.430972 229.649648 
+Q 226.944868 209.612957 197.393068 190.19033 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 200.695773 194.273483 
-L 197.553239 189.923256 
-L 202.918941 190.019365 
+    <path d="M 200.086113 194.83226 
+L 197.393068 190.19033 
+L 202.722439 190.821052 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="text_14">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: start" x="228.251501" y="241.864792" transform="rotate(-0 228.251501 241.864792)">alpha_w = 0.60(M)</text>
+    <!-- $\alpha_w$ = 0.60(M) -->
+    <g transform="translate(228.251501 241.864792)">
+     <text>
+      <tspan x="0" y="-0.890625" style="font-style: oblique; font-size: 12px; font-family: sans-serif">α</tspan>
+      <tspan x="7.910156" y="0.909369" style="font-style: oblique; font-size: 8.4px; font-family: sans-serif">w</tspan>
+      <tspan x="15.108398" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif"> </tspan>
+      <tspan x="19.286133" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">=</tspan>
+      <tspan x="29.34082" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif"> </tspan>
+      <tspan x="33.518555" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">0</tspan>
+      <tspan x="41.868164" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">.</tspan>
+      <tspan x="46.426758" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">6</tspan>
+      <tspan x="54.776367" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">0</tspan>
+      <tspan x="63.125977" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">(</tspan>
+      <tspan x="68.610352" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">M</tspan>
+      <tspan x="80.551758" y="-0.890625" style="font-weight: 700; font-size: 12px; font-family: sans-serif">)</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_15">
     <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="60.843906" y="287.788641" transform="rotate(-0 60.843906 287.788641)">Reference curve shifted by 0.40</text>
@@ -393,49 +409,76 @@ z
      <path d="M 404.555313 384.178125 
 L 595.803906 384.178125 
 Q 597.603906 384.178125 597.603906 382.378125 
-L 597.603906 342.776016 
-Q 597.603906 340.976016 595.803906 340.976016 
-L 404.555313 340.976016 
-Q 402.755313 340.976016 402.755313 342.776016 
+L 597.603906 342.236719 
+Q 597.603906 340.436719 595.803906 340.436719 
+L 404.555313 340.436719 
+Q 402.755313 340.436719 402.755313 342.236719 
 L 402.755313 382.378125 
 Q 402.755313 384.178125 404.555313 384.178125 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_9">
-     <path d="M 406.355313 351.414609 
-L 424.355313 351.414609 
-L 424.355313 345.114609 
-L 406.355313 345.114609 
+     <path d="M 406.355313 350.875312 
+L 424.355313 350.875312 
+L 424.355313 344.575312 
+L 406.355313 344.575312 
 z
 " style="fill: #d62728; fill-opacity: 0.25; stroke: #d62728; stroke-opacity: 0.25; stroke-linejoin: miter"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="431.555313" y="351.414609" transform="rotate(-0 431.555313 351.414609)">Unfavourable deviations</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="431.555313" y="350.875312" transform="rotate(-0 431.555313 350.875312)">Unfavourable deviations</text>
     </g>
     <g id="line2d_33">
-     <path d="M 406.355313 361.765312 
-L 415.355313 361.765312 
-L 424.355313 361.765312 
+     <path d="M 406.355313 361.226016 
+L 415.355313 361.226016 
+L 424.355313 361.226016 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.6"/>
      <g>
-      <use xlink:href="#m3a5ffddf03" x="415.355313" y="361.765312" style="stroke: #000000; stroke-linejoin: miter"/>
+      <use xlink:href="#m3a5ffddf03" x="415.355313" y="361.226016" style="stroke: #000000; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="431.555313" y="364.915312" transform="rotate(-0 431.555313 364.915312)">Shifted reference curve (ISO 11654)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="431.555313" y="364.376016" transform="rotate(-0 431.555313 364.376016)">Shifted reference curve (ISO 11654)</text>
     </g>
     <g id="line2d_34">
-     <path d="M 406.355313 375.266016 
-L 415.355313 375.266016 
-L 424.355313 375.266016 
+     <path d="M 406.355313 374.728125 
+L 415.355313 374.728125 
+L 424.355313 374.728125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m554ec6b133" x="415.355313" y="375.266016" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.4"/>
+      <use xlink:href="#m554ec6b133" x="415.355313" y="374.728125" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.4"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="431.555313" y="378.416016" transform="rotate(-0 431.555313 378.416016)">Practical absorption alpha_p</text>
+     <!-- Practical absorption $\alpha_p$ -->
+     <g transform="translate(431.555313 377.878125)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">P</tspan>
+       <tspan x="5.427246" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="9.127441" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="14.642578" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="19.59082" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="23.119629" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="25.620117" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="30.568359" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="36.083496" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="38.583984" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="41.444824" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="46.959961" y="-0.15625" style="font-size: 9px; font-family: sans-serif">b</tspan>
+       <tspan x="52.672852" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="57.361816" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="62.868164" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="66.568359" y="-0.15625" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="72.28125" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="75.810059" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="78.310547" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="83.816895" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="89.520996" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="92.381836" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">α</tspan>
+       <tspan x="98.314453" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">p</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="line2d_35">

@@ -395,55 +395,55 @@ L 741.44375 22.318125
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 608.318281 83.520937 
+     <path d="M 604.023594 83.520937 
 L 735.14375 83.520937 
 Q 736.94375 83.520937 736.94375 81.720937 
 L 736.94375 28.618125 
 Q 736.94375 26.818125 735.14375 26.818125 
-L 608.318281 26.818125 
-Q 606.518281 26.818125 606.518281 28.618125 
-L 606.518281 81.720937 
-Q 606.518281 83.520937 608.318281 83.520937 
+L 604.023594 26.818125 
+Q 602.223594 26.818125 602.223594 28.618125 
+L 602.223594 81.720937 
+Q 602.223594 83.520937 604.023594 83.520937 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_9">
-     <path d="M 610.118281 37.256719 
-L 628.118281 37.256719 
-L 628.118281 30.956719 
-L 610.118281 30.956719 
+     <path d="M 605.823594 37.256719 
+L 623.823594 37.256719 
+L 623.823594 30.956719 
+L 605.823594 30.956719 
 z
 " style="fill: #ffe7d2"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="635.318281" y="37.256719" transform="rotate(-0 635.318281 37.256719)">LRA 10.0 LU</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="631.023594" y="37.256719" transform="rotate(-0 631.023594 37.256719)">LRA 10.0 LU</text>
     </g>
     <g id="line2d_38">
-     <path d="M 610.118281 47.607422 
-L 619.118281 47.607422 
-L 628.118281 47.607422 
+     <path d="M 605.823594 47.607422 
+L 614.823594 47.607422 
+L 623.823594 47.607422 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="635.318281" y="50.757422" transform="rotate(-0 635.318281 50.757422)">Momentary (400 ms)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="631.023594" y="50.757422" transform="rotate(-0 631.023594 50.757422)">Momentary (400 ms)</text>
     </g>
     <g id="line2d_39">
-     <path d="M 610.118281 61.108125 
-L 619.118281 61.108125 
-L 628.118281 61.108125 
+     <path d="M 605.823594 61.108125 
+L 614.823594 61.108125 
+L 623.823594 61.108125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="635.318281" y="64.258125" transform="rotate(-0 635.318281 64.258125)">Short-term (3 s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="631.023594" y="64.258125" transform="rotate(-0 631.023594 64.258125)">Short-term (3 s)</text>
     </g>
     <g id="line2d_40">
-     <path d="M 610.118281 74.608828 
-L 619.118281 74.608828 
-L 628.118281 74.608828 
+     <path d="M 605.823594 74.608828 
+L 614.823594 74.608828 
+L 623.823594 74.608828 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.6"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="635.318281" y="77.758828" transform="rotate(-0 635.318281 77.758828)">Integrated -22.6 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="631.023594" y="77.758828" transform="rotate(-0 631.023594 77.758828)">Integrated −22.6 LUFS</text>
     </g>
    </g>
   </g>

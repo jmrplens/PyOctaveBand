@@ -2029,13 +2029,46 @@ L 705.42 22.798125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_13">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="105.312467" y="79.968113" transform="rotate(-0 105.312467 79.968113)">ISO/TS 7849-1 supone ε = 1 aquí</text>
+    <!-- ISO/TS 7849-1 supone $\varepsilon = 1$ aquí -->
+    <g style="fill: #d62728" transform="translate(105.312467 79.968113)">
+     <text>
+      <tspan x="0" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">I</tspan>
+      <tspan x="2.949219" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">S</tspan>
+      <tspan x="9.296875" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">O</tspan>
+      <tspan x="17.167969" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">/</tspan>
+      <tspan x="20.537109" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">T</tspan>
+      <tspan x="26.645508" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">S</tspan>
+      <tspan x="32.993164" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="36.171875" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">7</tspan>
+      <tspan x="42.53418" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">8</tspan>
+      <tspan x="48.896484" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">4</tspan>
+      <tspan x="55.258789" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">9</tspan>
+      <tspan x="61.621094" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">-</tspan>
+      <tspan x="65.229492" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
+      <tspan x="71.591797" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="74.770508" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">s</tspan>
+      <tspan x="79.980469" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">u</tspan>
+      <tspan x="86.318359" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">p</tspan>
+      <tspan x="92.666016" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">o</tspan>
+      <tspan x="98.78418" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">n</tspan>
+      <tspan x="105.12207" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">e</tspan>
+      <tspan x="111.274414" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="121.806641" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">=</tspan>
+      <tspan x="132.133789" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
+      <tspan x="138.496094" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="141.674805" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">a</tspan>
+      <tspan x="147.802734" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">q</tspan>
+      <tspan x="154.150391" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">u</tspan>
+      <tspan x="160.488281" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">í</tspan>
+      <tspan x="114.453125" y="-0" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #d62728">ε</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_14">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="205.971889" y="338.002501" transform="rotate(-0 205.971889 338.002501)">-23,4 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="205.971889" y="338.002501" transform="rotate(-0 205.971889 338.002501)">−23,4 dB</text>
    </g>
    <g id="text_15">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="474.155813" y="281.224646" transform="rotate(-0 474.155813 281.224646)">-17,6 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="474.155813" y="281.224646" transform="rotate(-0 474.155813 281.224646)">−17,6 dB</text>
    </g>
    <g id="text_16">
     <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(94.090679 247.02905)">lo que la Parte 1 paga: 25 dB en 63 Hz,</text>

@@ -547,13 +547,52 @@ L 693.024688 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_19">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #ffffff" x="680.150334" y="69.458894" transform="rotate(-0 680.150334 69.458894)">apparent total density rho_t/rho0 = 25.9</text>
+    <!-- apparent total density $\rho_t/\rho_0$ = 25.9 -->
+    <g style="fill: #ffffff" transform="translate(522.470334 69.4603)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="5.515137" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">p</tspan>
+      <tspan x="11.228027" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">p</tspan>
+      <tspan x="16.940918" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="22.456055" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="26.15625" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="31.693359" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">n</tspan>
+      <tspan x="37.397461" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="40.92627" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="43.787109" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="47.315918" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">o</tspan>
+      <tspan x="52.822266" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="56.351074" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="61.866211" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">l</tspan>
+      <tspan x="64.366699" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="67.227539" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="72.94043" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="78.477539" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">n</tspan>
+      <tspan x="84.181641" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">s</tspan>
+      <tspan x="88.870605" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">i</tspan>
+      <tspan x="91.371094" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="94.899902" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">y</tspan>
+      <tspan x="100.226074" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="111.516064" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">/</tspan>
+      <tspan x="124.515527" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="127.376367" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="134.917383" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="137.778223" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="143.504297" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">5</tspan>
+      <tspan x="149.230371" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">.</tspan>
+      <tspan x="152.091211" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">9</tspan>
+      <tspan x="103.086914" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">ρ</tspan>
+      <tspan x="114.548291" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">ρ</tspan>
+      <tspan x="108.799805" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="120.261182" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">0</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_20">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="109.615975" y="328.734492" transform="rotate(-0 109.615975 328.734492)">decoupling frequency 127 Hz</text>
    </g>
    <g id="text_21">
-    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="58.962796" y="387.695859" transform="rotate(-0 58.962796 387.695859)">Soft fibrous layer: porosity 0.98, flow resistivity 25 kPa s/m², frame density 30 kg/m³</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="58.962796" y="387.695859" transform="rotate(-0 58.962796 387.695859)">Soft fibrous layer: porosity 0.98, flow resistivity 25 kPa·s/m², frame density 30 kg/m³</text>
    </g>
    <g id="text_22">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="371.165859" y="16.318125" transform="rotate(-0 371.165859 16.318125)">A Limp Frame Carries Its Own Inertia</text>

@@ -353,39 +353,59 @@ L 428.785625 54.722812
    </g>
    <g id="legend_1">
     <g id="patch_17">
-     <path d="M 356.760313 327.617656 
+     <path d="M 366.415625 327.617656 
 L 422.485625 327.617656 
 Q 424.285625 327.617656 424.285625 325.817656 
-L 424.285625 299.71625 
-Q 424.285625 297.91625 422.485625 297.91625 
-L 356.760313 297.91625 
-Q 354.960313 297.91625 354.960313 299.71625 
-L 354.960313 325.817656 
-Q 354.960313 327.617656 356.760313 327.617656 
+L 424.285625 299.713437 
+Q 424.285625 297.913437 422.485625 297.913437 
+L 366.415625 297.913437 
+Q 364.615625 297.913437 364.615625 299.713437 
+L 364.615625 325.817656 
+Q 364.615625 327.617656 366.415625 327.617656 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_18">
-     <path d="M 358.560313 308.354844 
-L 376.560313 308.354844 
-L 376.560313 302.054844 
-L 358.560313 302.054844 
+     <path d="M 368.215625 308.353437 
+L 386.215625 308.353437 
+L 386.215625 302.053437 
+L 368.215625 302.053437 
 z
 " style="fill: #1f77b4"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.760313" y="308.354844" transform="rotate(-0 383.760313 308.354844)">at 2 f_m</text>
+     <!-- at $2 f_m$ -->
+     <g style="fill: #ffffff" transform="translate(393.415625 308.353437)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+       <tspan x="5.515137" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+       <tspan x="9.043945" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="11.904785" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+       <tspan x="17.630859" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">f</tspan>
+       <tspan x="20.799316" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      </text>
+     </g>
     </g>
     <g id="patch_19">
-     <path d="M 358.560313 321.855547 
-L 376.560313 321.855547 
-L 376.560313 315.555547 
-L 358.560313 315.555547 
+     <path d="M 368.215625 321.855547 
+L 386.215625 321.855547 
+L 386.215625 315.555547 
+L 368.215625 315.555547 
 z
 " style="fill: #2ca02c"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="383.760313" y="321.855547" transform="rotate(-0 383.760313 321.855547)">at 4 f_m</text>
+     <!-- at $4 f_m$ -->
+     <g style="fill: #ffffff" transform="translate(393.415625 321.855547)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+       <tspan x="5.515137" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">t</tspan>
+       <tspan x="9.043945" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+       <tspan x="11.904785" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">4</tspan>
+       <tspan x="17.630859" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">f</tspan>
+       <tspan x="20.799316" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

@@ -6602,19 +6602,64 @@ L 693.145625 28.798125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_19">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="126.498819" y="48.331285" transform="rotate(-0 126.498819 48.331285)">n=1</text>
+    <!-- $n$ = 1 -->
+    <g transform="translate(115.498819 48.331285)">
+     <text>
+      <tspan x="0" y="-0.171875" style="font-style: oblique; font-size: 8px; font-family: sans-serif">n</tspan>
+      <tspan x="5.070312" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.613281" y="-0.171875" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="14.316406" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="16.859375" y="-0.171875" style="font-size: 8px; font-family: sans-serif">1</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_20">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="197.32967" y="160.985423" transform="rotate(-0 197.32967 160.985423)">n=2</text>
+    <!-- $n$ = 2 -->
+    <g transform="translate(186.32967 160.985423)">
+     <text>
+      <tspan x="0" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">n</tspan>
+      <tspan x="5.070312" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.613281" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="14.316406" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="16.859375" y="-0.0625" style="font-size: 8px; font-family: sans-serif">2</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_21">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="268.160521" y="175.561491" transform="rotate(-0 268.160521 175.561491)">n=3</text>
+    <!-- $n$ = 3 -->
+    <g transform="translate(257.160521 175.561491)">
+     <text>
+      <tspan x="0" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">n</tspan>
+      <tspan x="5.070312" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.613281" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="14.316406" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="16.859375" y="-0.0625" style="font-size: 8px; font-family: sans-serif">3</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_22">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="338.991372" y="196.229094" transform="rotate(-0 338.991372 196.229094)">n=4</text>
+    <!-- $n$ = 4 -->
+    <g transform="translate(327.991372 196.229094)">
+     <text>
+      <tspan x="0" y="-0.171875" style="font-style: oblique; font-size: 8px; font-family: sans-serif">n</tspan>
+      <tspan x="5.070312" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.613281" y="-0.171875" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="14.316406" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="16.859375" y="-0.171875" style="font-size: 8px; font-family: sans-serif">4</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_23">
-    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="409.822222" y="216.702381" transform="rotate(-0 409.822222 216.702381)">n=5</text>
+    <!-- $n$ = 5 -->
+    <g transform="translate(398.822222 216.702381)">
+     <text>
+      <tspan x="0" y="-0.171875" style="font-style: oblique; font-size: 8px; font-family: sans-serif">n</tspan>
+      <tspan x="5.070312" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.613281" y="-0.171875" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="14.316406" y="-0.171875" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="16.859375" y="-0.171875" style="font-size: 8px; font-family: sans-serif">5</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_24">
     <g id="patch_7">
@@ -6640,15 +6685,15 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 558.816406 63.359531 
-L 686.845625 63.359531 
-Q 688.645625 63.359531 688.645625 61.559531 
+     <path d="M 558.816406 63.360937 
+L 686.845625 63.360937 
+Q 688.645625 63.360937 688.645625 61.560937 
 L 688.645625 35.098125 
 Q 688.645625 33.298125 686.845625 33.298125 
 L 558.816406 33.298125 
 Q 557.016406 33.298125 557.016406 35.098125 
-L 557.016406 61.559531 
-Q 557.016406 63.359531 558.816406 63.359531 
+L 557.016406 61.560937 
+Q 557.016406 63.360937 558.816406 63.360937 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -6676,11 +6721,28 @@ z
 " style="stroke: #d62728"/>
      </defs>
      <g>
-      <use xlink:href="#m1c3dccf219" x="569.616406" y="54.447422" style="fill: #d62728; stroke: #d62728"/>
+      <use xlink:href="#m1c3dccf219" x="569.616406" y="54.448828" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="585.816406" y="57.597422" transform="rotate(-0 585.816406 57.597422)">Armónicos n·f₁</text>
+     <!-- Armónicos $n f_1$ -->
+     <g transform="translate(585.816406 57.598828)">
+      <text>
+       <tspan x="0" y="-0.796875" style="font-size: 9px; font-family: sans-serif">A</tspan>
+       <tspan x="6.156738" y="-0.796875" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="9.856934" y="-0.796875" style="font-size: 9px; font-family: sans-serif">m</tspan>
+       <tspan x="18.624023" y="-0.796875" style="font-size: 9px; font-family: sans-serif">ó</tspan>
+       <tspan x="24.130371" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="29.834473" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="32.334961" y="-0.796875" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="37.283203" y="-0.796875" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="42.789551" y="-0.796875" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="47.478516" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="50.339355" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="56.043457" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="59.211914" y="0.553121" style="font-size: 6.3px; font-family: sans-serif">1</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="line2d_36">

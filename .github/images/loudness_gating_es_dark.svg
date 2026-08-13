@@ -3913,64 +3913,64 @@ L 741.503125 22.318125
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 580.166875 232.498711 
+     <path d="M 575.872188 232.498711 
 L 735.203125 232.498711 
 Q 737.003125 232.498711 737.003125 230.698711 
 L 737.003125 163.735195 
 Q 737.003125 161.935195 735.203125 161.935195 
-L 580.166875 161.935195 
-Q 578.366875 161.935195 578.366875 163.735195 
-L 578.366875 230.698711 
-Q 578.366875 232.498711 580.166875 232.498711 
+L 575.872188 161.935195 
+Q 574.072188 161.935195 574.072188 163.735195 
+L 574.072188 230.698711 
+Q 574.072188 232.498711 575.872188 232.498711 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_9">
-     <path d="M 581.966875 172.373789 
-L 599.966875 172.373789 
-L 599.966875 166.073789 
-L 581.966875 166.073789 
+     <path d="M 577.672188 172.373789 
+L 595.672188 172.373789 
+L 595.672188 166.073789 
+L 577.672188 166.073789 
 z
 " style="fill: #241202"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="607.166875" y="172.373789" transform="rotate(-0 607.166875 172.373789)">LRA 1,6 LU</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.872188" y="172.373789" transform="rotate(-0 602.872188 172.373789)">LRA 1,6 LU</text>
     </g>
     <g id="line2d_35">
-     <path d="M 581.966875 183.084492 
-L 590.966875 183.084492 
-L 599.966875 183.084492 
+     <path d="M 577.672188 183.084492 
+L 586.672188 183.084492 
+L 595.672188 183.084492 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="607.166875" y="186.234492" transform="rotate(-0 607.166875 186.234492)">Momentánea (400 ms)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.872188" y="186.234492" transform="rotate(-0 602.872188 186.234492)">Momentánea (400 ms)</text>
     </g>
     <g id="line2d_36">
-     <path d="M 581.966875 196.585195 
-L 590.966875 196.585195 
-L 599.966875 196.585195 
+     <path d="M 577.672188 196.585195 
+L 586.672188 196.585195 
+L 595.672188 196.585195 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="607.166875" y="199.735195" transform="rotate(-0 607.166875 199.735195)">Corto plazo (3 s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.872188" y="199.735195" transform="rotate(-0 602.872188 199.735195)">Corto plazo (3 s)</text>
     </g>
     <g id="line2d_37">
-     <path d="M 581.966875 210.085898 
-L 590.966875 210.085898 
-L 599.966875 210.085898 
+     <path d="M 577.672188 210.085898 
+L 586.672188 210.085898 
+L 595.672188 210.085898 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.6"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="607.166875" y="213.235898" transform="rotate(-0 607.166875 213.235898)">Integrada -23,0 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.872188" y="213.235898" transform="rotate(-0 602.872188 213.235898)">Integrada −23,0 LUFS</text>
     </g>
     <g id="line2d_38">
-     <path d="M 581.966875 223.586602 
-L 590.966875 223.586602 
-L 599.966875 223.586602 
+     <path d="M 577.672188 223.586602 
+L 586.672188 223.586602 
+L 595.672188 223.586602 
 " style="fill: none; stroke-dasharray: 10.24,2.56,1.6,2.56; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.6"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="607.166875" y="226.736602" transform="rotate(-0 607.166875 226.736602)">Media sin puerta -27,7 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.872188" y="226.736602" transform="rotate(-0 602.872188 226.736602)">Media sin puerta −27,7 LUFS</text>
     </g>
    </g>
   </g>

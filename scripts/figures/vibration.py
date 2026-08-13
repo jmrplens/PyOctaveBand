@@ -11,6 +11,18 @@ embedded by a page under ``vibration/``.
 import math
 from typing import Literal
 
+
+def _sci_math(value: float, digits: int = 2) -> str:
+    """A scientific-notation reading composed as mathtext.
+
+    ``f"{4.4e-3:.2e}"`` writes "4.40e-03", which a figure has no business
+    showing; this returns ``$4.40\\times10^{-3}$``, where mathtext sets the
+    proper multiplication sign and a typographic minus in the exponent.
+    """
+    exponent = math.floor(math.log10(abs(value)))
+    mantissa = value / 10.0**exponent
+    return rf"${mantissa:.{digits}f}\times10^{{{exponent}}}$"
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
@@ -80,8 +92,8 @@ def generate_junction_transmission(output_dir: str) -> None:
 
     info = [
         "X-junction: 100 mm / 200 mm concrete",
-        f"chi = {res.chi:.3f},  psi = {res.psi:.3f}",
-        f"theta_co = arcsin(chi) = {theta_co:.1f} deg",
+        rf"$\chi$ = {res.chi:.3f},  $\psi$ = {res.psi:.3f}",
+        rf"$\theta_\mathrm{{co}} = \arcsin\chi$ = {theta_co:.1f}°",
         f"corner avg = {res.corner_average:.4f}",
         f"straight avg = {res.straight_average:.4f}",
     ]
@@ -112,9 +124,11 @@ def generate_mechanical_mobility(output_dir: str) -> None:
     a = convert_frf(h, freq, "receptance", "accelerance")
     # Normalise each FRF to O(1) near resonance so all three share one axis.
     curves = [
-        (np.abs(h) * k, COLOR_PRIMARY, "Receptance $|H|$ (× k)"),
-        (np.abs(y) * k / w0, COLOR_SECONDARY, r"Mobility $|Y|$ (× k/$\omega_0$)"),
-        (np.abs(a) * k / w0**2, COLOR_TERTIARY, r"Accelerance $|A|$ (× k/$\omega_0^2$)"),
+        (np.abs(h) * k, COLOR_PRIMARY, r"Receptance $|H|$ ($\times k$)"),
+        (np.abs(y) * k / w0, COLOR_SECONDARY,
+         r"Mobility $|Y|$ ($\times k/\omega_0$)"),
+        (np.abs(a) * k / w0**2, COLOR_TERTIARY,
+         r"Accelerance $|A|$ ($\times k/\omega_0^2$)"),
     ]
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     for mag, color, label in curves:
@@ -131,10 +145,10 @@ def generate_mechanical_mobility(output_dir: str) -> None:
     ax.legend(loc="lower center", fontsize=9, ncol=2)
 
     info = [
-        "SDOF: m = 2 kg, k = 8000 N/m, c = 5 N.s/m",
-        "H = 1/(k - w^2 m + j w c)",
-        "Y = j w H,   A = -w^2 H  (Table 1)",
-        f"f0 = {f0:.1f} Hz,  |Y(f0)| = 1/c",
+        "SDOF: $m$ = 2 kg, $k$ = 8000 N/m, $c$ = 5 N·s/m",
+        r"$H = 1/(k - \omega^2 m + \mathrm{j}\,\omega c)$",
+        r"$Y = \mathrm{j}\,\omega H$,   $A = -\omega^2 H$  (Table 1)",
+        rf"$f_0$ = {f0:.1f} Hz,  $|Y(f_0)| = 1/c$",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
@@ -177,7 +191,8 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         3, 1, figsize=(10, 10.2), sharex=True,
         gridspec_kw={"height_ratios": [1.5, 1.0, 0.85]})
     ax.semilogx(freq, transfer_stiffness_level(k_true), color=COLOR_PRIMARY,
-                linewidth=2.2, label=r"true $L_k$ of $k_{2,1}=k+j\omega c$")
+                linewidth=2.2,
+                label=r"true $L_k$ of $k_{2,1}=k+\mathrm{j}\,\omega c$")
     ax.semilogx(freq, transfer_stiffness_level(k_indirect), color=COLOR_SECONDARY,
                 linewidth=2.0, linestyle="--",
                 label=r"indirect method $-(2\pi f)^2 m_2 T$")
@@ -196,10 +211,10 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     ax.set_xlim(freq[0], freq[-1])
     ax.legend(loc="upper left", fontsize=9)
     info = [
-        "Kelvin-Voigt: k = 1 MN/m, c = 120 N.s/m",
-        f"blocking mass m2 = 8 kg,  f0 = {f0:.1f} Hz",
-        f"|T| falls to 0.1 at {f_valid:.0f} Hz",
-        "shaded: Inequality (2) not met -> no result",
+        "Kelvin-Voigt: $k$ = 1 MN/m, $c$ = 120 N·s/m",
+        rf"blocking mass $m_2$ = 8 kg,  $f_0$ = {f0:.1f} Hz",
+        rf"$|T|$ falls to 0.1 at {f_valid:.0f} Hz",
+        "shaded: Inequality (2) not met → no result",
     ]
     ax.text(0.985, 0.05, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -233,7 +248,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     low.set_xlabel(LABEL_FREQ_HZ)
     format_frequency_axis(low, float(freq[0]), float(freq[-1]))
     low.legend(loc="upper left", fontsize=9)
-    low.text(0.985, 0.90, "Kelvin-Voigt makes η rise with frequency; real\n"
+    low.text(0.985, 0.90, "Kelvin-Voigt makes $\\eta$ rise with frequency; real\n"
              "elastomers are far flatter, so this is a model, not a material",
              transform=low.transAxes, va="top", ha="right", fontsize=9.5,
              color=COLOR_FG)
@@ -301,10 +316,10 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     format_frequency_axis(ax_bot, float(freq[0]), float(freq[-1]))
 
     info = [
-        "calibration block m = 10 kg",
-        "|A| = 1/m = 0.100 1/kg  (7.5.2)",
-        "criterion: agree within +/- 5 %",
-        "high-f drift -> attachment error",
+        "calibration block $m$ = 10 kg",
+        r"$|A| = 1/m$ = 0.100 1/kg  (7.5.2)",
+        "criterion: agree within ±5 %",
+        "high-f drift → attachment error",
     ]
     ax_top.text(0.985, 0.05, "\n".join(info), transform=ax_top.transAxes,
                 va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -396,9 +411,9 @@ def generate_weighted_acceleration(output_dir: str) -> None:
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
         f"Weighted seat acceleration (ISO 2631-1)  $a_w$ = {result.overall:.3f} "
-        "m/s$^2$", fontweight="bold", pad=12)
+        "m/s²", fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("r.m.s. acceleration [m/s$^2$]")
+    ax.set_ylabel("r.m.s. acceleration [m/s²]")
     ax.legend(loc="upper right", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -423,7 +438,7 @@ def generate_daily_vibration_exposure(output_dir: str) -> None:
         labels=["brush-saw", "felling", "stripping"],
     )
 
-    labels = [*result.labels, "A(8)"]
+    labels = [*result.labels, "$A(8)$"]
     values = [*result.partials.tolist(), result.a8]
     positions = np.arange(len(values), dtype=float)
     colors = ["#9e9e9e"] * result.partials.size + [COLOR_PRIMARY]
@@ -433,16 +448,16 @@ def generate_daily_vibration_exposure(output_dir: str) -> None:
     eav = result.assessment.action_value
     elv = result.assessment.limit_value
     ax.axhline(eav, color=COLOR_TERTIARY, linestyle="--", linewidth=1.6,
-               label=f"EAV = {eav:g} m/s$^2$", zorder=2)
+               label=f"EAV = {eav:g} m/s²", zorder=2)
     ax.axhline(elv, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6,
-               label=f"ELV = {elv:g} m/s$^2$", zorder=2)
+               label=f"ELV = {elv:g} m/s²", zorder=2)
     ax.set_xticks(positions)
     ax.set_xticklabels(labels, rotation=30, ha="right")
-    ax.set_ylabel("Daily exposure A(8) [m/s$^2$]")
+    ax.set_ylabel("Daily exposure $A(8)$ [m/s²]")
     ax.set_ylim(0.0, elv * 1.2)
     ax.set_title(
-        f"Hand-arm daily exposure (ISO 5349 / 2002-44-EC)  A(8) = "
-        f"{result.a8:.2f} m/s$^2$", fontweight="bold", pad=12)
+        f"Hand-arm daily exposure (ISO 5349 / 2002-44-EC)  $A(8)$ = "
+        f"{result.a8:.2f} m/s²", fontweight="bold", pad=12)
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -644,7 +659,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
               label="$a_z(t)$, unweighted", zorder=2)
     ax_t.plot(time, weighted, color=COLOR_PRIMARY, linewidth=1.0,
               label="$a_w(t)$, Wk-weighted", zorder=3)
-    ax_t.set_ylabel("acceleration [m/s$^2$]")
+    ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title(
         "(a)  A seated off-road record: 4.5 Hz ride plus five impacts",
         fontsize=10, fontweight="bold", loc="left", pad=6)
@@ -653,18 +668,18 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_r.plot(time, running, color=COLOR_PRIMARY, linewidth=1.4,
               label="running r.m.s., 1 s (Eq. (3))", zorder=3)
     ax_r.axhline(a_w, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
-                 label=f"$a_w$ = {a_w:.2f} m/s$^2$ (Eq. (1))", zorder=2)
+                 label=f"$a_w$ = {a_w:.2f} m/s² (Eq. (1))", zorder=2)
     peak_index = int(np.argmax(running))
     ax_r.plot([time[peak_index]], [mtvv], marker="o", markersize=7,
               color=COLOR_SECONDARY, zorder=4,
-              label=f"MTVV = {mtvv:.2f} m/s$^2$ (Eq. (4))")
-    ax_r.annotate(f"MTVV / $a_w$ = {mtvv / a_w:.2f}   (> 1.5)",
+              label=f"MTVV = {mtvv:.2f} m/s² (Eq. (4))")
+    ax_r.annotate(rf"$\mathrm{{MTVV}}/a_w$ = {mtvv / a_w:.2f}   (> 1.5)",
                   xy=(time[peak_index], mtvv),
                   xytext=(time[peak_index] - 6.5, mtvv * 0.78), fontsize=9,
                   color=COLOR_SECONDARY,
                   arrowprops={"arrowstyle": "->", "lw": 0.9,
                               "color": COLOR_SECONDARY})
-    ax_r.set_ylabel("r.m.s. [m/s$^2$]")
+    ax_r.set_ylabel("r.m.s. [m/s²]")
     ax_r.set_title("(b)  The 1 s running r.m.s., whose maximum is the MTVV",
                    fontsize=10, fontweight="bold", loc="left", pad=6)
     ax_r.legend(loc="upper left", fontsize=9)
@@ -678,7 +693,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
               color=COLOR_SECONDARY, zorder=4,
               label=f"VDV = {vdv:.2f} m/s$^{{1.75}}$ (Eq. (5))")
     ax_v.annotate(
-        f"VDV / ($a_w T^{{1/4}}$) = {vdv / (a_w * duration ** 0.25):.2f}"
+        rf"$\mathrm{{VDV}}/(a_w T^{{1/4}})$ = {vdv / (a_w * duration ** 0.25):.2f}"
         "   (> 1.75)",
         xy=(duration, vdv), xytext=(7.0, vdv * 0.55), fontsize=9,
         color=COLOR_SECONDARY,
@@ -726,18 +741,18 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
               label=r"$D_y = 31.8\,A(8)^{-1.06}$ (Eq. (C.1))")
     ax.loglog(table_a8, table_years, linestyle="none", marker="o",
               markersize=8, color=COLOR_SECONDARY, zorder=4,
-              label="Table C.1: 26 / 14 / 7 / 3.7 m/s$^2$")
+              label="Table C.1: 26 / 14 / 7 / 3.7 m/s²")
     for value, label, colour in ((2.5, "EAV 2.5", COLOR_TERTIARY),
                                  (5.0, "ELV 5.0", COLOR_SECONDARY)):
         ax.axvline(value, color=colour, linestyle="--", linewidth=1.5,
                    zorder=2)
         ax.text(value * 1.04, 0.36,
-                f"{label} m/s$^2$\n{vibration.hav_vwf_lifetime_years(value):.1f}"
+                f"{label} m/s²\n{vibration.hav_vwf_lifetime_years(value):.1f}"
                 " years", fontsize=9, color=colour, va="bottom")
 
     ax.set_title("Group-mean years to a 10 % prevalence of vibration white "
                  "finger (ISO 5349-1 Annex C)", fontweight="bold", pad=12)
-    ax.set_xlabel("Daily exposure $A(8)$ [m/s$^2$]")
+    ax.set_xlabel("Daily exposure $A(8)$ [m/s²]")
     ax.set_ylabel("Exposure duration $D_y$ [years]")
     ax.set_xlim(1.0, 40.0)
     ax.set_ylim(0.3, 60.0)
@@ -808,7 +823,7 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
                   color=COLOR_SECONDARY,
                   arrowprops={"arrowstyle": "->", "lw": 0.9,
                               "color": COLOR_SECONDARY})
-    ax_t.set_ylabel("acceleration [m/s$^2$]")
+    ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title("(a)  The seat-to-spine filter turns an impact into a "
                    "ringing response", fontsize=10, fontweight="bold",
                    loc="left", pad=6)
@@ -829,11 +844,11 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
                       xy=(time[indices[rank]], peaks[rank]),
                       xytext=(time[indices[rank]] + 0.18, peaks[rank] + 1.6),
                       fontsize=9, color=COLOR_FG)
-    ax_p.set_ylabel("$A_z$ [m/s$^2$]")
+    ax_p.set_ylabel("$A_z$ [m/s²]")
     ax_p.set_xlabel("Time [s]")
     ax_p.set_title(
         f"(b)  Each peak's share of $\\sum A_{{z,i}}^6$ — dose $D_z$ = "
-        f"{dose:.1f} m/s$^2$", fontsize=10, fontweight="bold", loc="left",
+        f"{dose:.1f} m/s²", fontsize=10, fontweight="bold", loc="left",
         pad=6)
     ax_p.legend(loc="upper left", fontsize=9)
 
@@ -879,11 +894,11 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     # The identical-plate X-junction: Kij = 10 log10 12 + 5 log10(fc2/1000).
     res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
     ax.scatter([1.0], [res_eq.corner_reduction_index], color=COLOR_FG, s=70,
-               zorder=6, label="identical plates (τ = 1/12)")
+               zorder=6, label=r"identical plates ($\tau = 1/12$)")
 
     ax.set_xticks(np.arange(0.5, 4.01, 0.5))
     ax.set_xticklabels([f"{v:.1f}" for v in np.arange(0.5, 4.01, 0.5)])
-    ax.set_xlabel("Thickness ratio h2/h1")
+    ax.set_xlabel("Thickness ratio $h_2/h_1$")
     ax.set_ylabel("Vibration reduction index $K_{ij}$ [dB]")
     ax.set_title("Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)",
                  fontweight="bold", pad=12)
@@ -892,7 +907,7 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)",
+        r"$K_{ij} = 10\,\log_{10}(1/\bar{\tau}) + 5\,\log_{10}(f_{c2}/1000)$",
         "concrete, plate 1 fixed at 100 mm",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -965,7 +980,7 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
-        "15 rollers, D = 34 mm, d = 6 mm, φ = 12.96°, 2000 r/min",
+        r"15 rollers, $D$ = 34 mm, $d$ = 6 mm, $\varphi$ = 12.96°, 2000 r/min",
         f"BPFO = {bpfo:.0f} Hz, BPFI = {faults['BPFI']:.0f} Hz",
         "the envelope lines fall on BPFO, not on BPFI: outer-race spall",
     ]
@@ -1055,7 +1070,7 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", which="both")
     ax.set_axisbelow(True)
     for label, value in zip(labels, values, strict=True):
-        ax.annotate(f"{value:.2e}", xy=(label, value), xytext=(0, 4),
+        ax.annotate(_sci_math(value), xy=(label, value), xytext=(0, 4),
                     textcoords="offset points", ha="center", fontsize=8.5,
                     color=COLOR_FG)
 
@@ -1110,9 +1125,9 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     ax.legend(loc="lower center", fontsize=9, ncol=2)
 
     info = [
-        "below f0: stiffness-controlled, |Y| ~ ω/k",
-        "above f0: mass-controlled, |Y| ~ 1/(ωm)",
-        f"f0 = {f0:.1f} Hz,  1/c = {1.0 / c:.2f} m/(N·s)",
+        r"below $f_0$: stiffness-controlled, $|Y| \sim \omega/k$",
+        r"above $f_0$: mass-controlled, $|Y| \sim 1/(\omega m)$",
+        rf"$f_0$ = {f0:.1f} Hz,  $1/c$ = {1.0 / c:.2f} m/(N·s)",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG,
@@ -1214,7 +1229,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
         _relabel_spectrum(ax, title)
         ax.set_ylim(0.0, 1.25)
         ax.annotate(
-            "sidebands at ± fs = 25 Hz:\n"
+            "sidebands at $\\pm f_s$ = 25 Hz:\n"
             + ("low and flat" if "Localised" in title
                else "tall groups, and the\nhigher harmonics lift"),
             xy=(gmf + 2.0 * shaft, 0.34 if "Localised" in title else 0.62),
@@ -1236,7 +1251,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
                       "family")
     ax.set_yscale("log")
     ax.set_ylim(1.0e-5, 3.0)
-    ax.annotate("rotor-slot harmonic\nwith ± fs sidebands:\n"
+    ax.annotate("rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
                 "the spacing is the diagnosis",
                 xy=(motor["fsh"], 1.6e-3), xytext=(1700.0, 0.02),
                 fontsize=9, color=COLOR_FG,
@@ -1255,11 +1270,11 @@ def generate_machine_fault_families(output_dir: str) -> None:
     _relabel_spectrum(ax, "Ducted fan: the blade rate and its rotating lobe "
                       "patterns")
     ax.set_ylim(0.0, 1.3)
-    ax.annotate("mL = 10 turns at 35 Hz,\nbelow the shaft: weak",
+    ax.annotate("$m_L$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
                 xy=(fan["lobe n=1 m=10"], 0.12), xytext=(64.0, 0.72),
                 fontsize=9, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
-    ax.annotate("mL = 2 turns at 175 Hz,\n3x the shaft speed: strong",
+    ax.annotate("$m_L$ = 2 turns at 175 Hz,\n3x the shaft speed: strong",
                 xy=(fan["lobe n=1 m=2"], 0.68), xytext=(196.0, 0.96),
                 fontsize=9, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
@@ -1326,8 +1341,8 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
                      1.06 * top),
                      arrowprops={"arrowstyle": "<->", "color": COLOR_SECONDARY})
     axes[1].text(t0 + 0.5e3 / bpfo, 1.14 * top,
-                 f"1/BPFO = {1e3 / bpfo:.2f} ms", ha="center", fontsize=9,
-                 color=COLOR_SECONDARY)
+                 rf"$1/\mathrm{{BPFO}}$ = {1e3 / bpfo:.2f} ms", ha="center",
+                 fontsize=9, color=COLOR_SECONDARY)
 
     axes[2].plot(res.times[window] * 1e3, res.envelope[window],
                  color=COLOR_SECONDARY, linewidth=1.0)
@@ -1407,10 +1422,10 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     info = [
-        r"plate:  $Y = 1/(8\sqrt{B' m''})$, real and flat",
-        r"beam:   $Y = (1-\mathrm{j})/(4 m' c_B)$, $\propto f^{-1/2}$",
+        r"plate:  $Y = 1/(8\sqrt{B′ m′′})$, real and flat",
+        r"beam:   $Y = (1-\mathrm{j})/(4 m′ c_B)$, $\propto f^{-1/2}$",
         r"rod:    $Y = 1/(\rho c_L S)$, real and flat",
-        f"plate |Y| = {float(plate.magnitude[0]):.2e} m/(N·s)",
+        f"plate $|Y|$ = {_sci_math(float(plate.magnitude[0]))} m/(N·s)",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
@@ -1459,7 +1474,7 @@ def generate_mobility_random_error(output_dir: str) -> None:
     ax.scatter([75.0], [float(random_error_percent(0.8, 75))], marker="*",
                s=190, color=COLOR_FG, zorder=7,
                label=r"the standard's own example: $\gamma^2 = 0.8$, "
-                     "n = 75 → 4.08 %")
+                     "$n$ = 75 → 4.08 %")
 
     ax.set_xlabel("Number of averaged spectra $n$")
     ax.set_ylabel(r"Normalized random error $\varepsilon$ [%]")
@@ -1470,7 +1485,7 @@ def generate_mobility_random_error(output_dir: str) -> None:
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
-    ax.text(0.015, 0.05, "the marked n is what each coherence needs to reach "
+    ax.text(0.015, 0.05, "the marked $n$ is what each coherence needs to reach "
             "5 %: 11 averages at 0.95, 200 at 0.5.\nFixing the measurement is "
             "cheaper than averaging through it.", transform=ax.transAxes,
             va="bottom", ha="left", fontsize=9.5, color=COLOR_FG)

@@ -713,35 +713,79 @@ L 420.821669 40.636094
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 50.803906 60.918906 
-L 168.369219 60.918906 
-Q 170.169219 60.918906 170.169219 59.118906 
-L 170.169219 32.618125 
-Q 170.169219 30.818125 168.369219 30.818125 
+     <path d="M 50.803906 61.510234 
+L 168.433906 61.510234 
+Q 170.233906 61.510234 170.233906 59.710234 
+L 170.233906 32.618125 
+Q 170.233906 30.818125 168.433906 30.818125 
 L 50.803906 30.818125 
 Q 49.003906 30.818125 49.003906 32.618125 
-L 49.003906 59.118906 
-Q 49.003906 60.918906 50.803906 60.918906 
+L 49.003906 59.710234 
+Q 49.003906 61.510234 50.803906 61.510234 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_59">
-     <path d="M 52.603906 38.146094 
-L 61.603906 38.146094 
-L 70.603906 38.146094 
+     <path d="M 52.603906 38.198125 
+L 61.603906 38.198125 
+L 70.603906 38.198125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_14">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="41.296094" transform="rotate(-0 77.803906 41.296094)">|Rp| — onda plana</text>
+     <!-- $|R_p|$ — onda plana -->
+     <g transform="translate(77.803906 41.348125)">
+      <text>
+       <tspan x="0" y="-0.125" style="font-size: 9px; font-family: sans-serif">|</tspan>
+       <tspan x="13.530762" y="-0.125" style="font-size: 9px; font-family: sans-serif">|</tspan>
+       <tspan x="16.562988" y="-0.125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="28.423828" y="-0.125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="31.284668" y="-0.125" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="36.791016" y="-0.125" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="42.495117" y="-0.125" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="48.208008" y="-0.125" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="53.723145" y="-0.125" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="56.583984" y="-0.125" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="62.296875" y="-0.125" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="64.797363" y="-0.125" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="70.3125" y="-0.125" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="76.016602" y="-0.125" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="3.032227" y="-0.125" style="font-style: oblique; font-size: 9px; font-family: sans-serif">R</tspan>
+       <tspan x="9.285645" y="1.224996" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">p</tspan>
+       <tspan x="19.423828" y="-0.125" style="font-size: 9px; font-family: sans-serif">—</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_60">
-     <path d="M 52.603906 52.006797 
-L 61.603906 52.006797 
-L 70.603906 52.006797 
+     <path d="M 52.603906 52.598125 
+L 61.603906 52.598125 
+L 70.603906 52.598125 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_15">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="77.803906" y="55.156797" transform="rotate(-0 77.803906 55.156797)">|Q| — onda esférica</text>
+     <!-- $|Q|$ — onda esférica -->
+     <g transform="translate(77.803906 55.748125)">
+      <text>
+       <tspan x="0" y="-0.796875" style="font-size: 9px; font-family: sans-serif">|</tspan>
+       <tspan x="10.116211" y="-0.796875" style="font-size: 9px; font-family: sans-serif">|</tspan>
+       <tspan x="13.148438" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="25.009277" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="27.870117" y="-0.796875" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="33.376465" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="39.080566" y="-0.796875" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="44.793457" y="-0.796875" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="50.308594" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="53.169434" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="58.706543" y="-0.796875" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="63.395508" y="-0.796875" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="66.563965" y="-0.796875" style="font-size: 9px; font-family: sans-serif">é</tspan>
+       <tspan x="72.101074" y="-0.796875" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="75.80127" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="78.301758" y="-0.796875" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="83.25" y="-0.796875" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="3.032227" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">Q</tspan>
+       <tspan x="16.009277" y="-0.796875" style="font-size: 9px; font-family: sans-serif">—</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
@@ -1126,16 +1170,16 @@ L 885.981562 26.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_13">
-    <path d="M 686.025796 273.816526 
-Q 776.245159 206.139383 865.570155 139.13314 
+    <path d="M 690.554688 273.795507 
+Q 778.51593 206.139198 865.590962 139.164527 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
-    <path d="M 861.170227 139.933534 
-L 865.570155 139.13314 
-L 863.570513 143.13332 
+    <path d="M 861.201006 140.017928 
+L 865.590962 139.164527 
+L 863.639709 143.188532 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: round"/>
    </g>
    <g id="text_25">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="610.015203" y="284.614281" transform="rotate(-0 610.015203 284.614281)">-11,8 dB frente a -40,1 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="610.015203" y="284.614281" transform="rotate(-0 610.015203 284.614281)">−11,8 dB frente a −40,1 dB</text>
    </g>
    <g id="text_26">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="688.862734" y="16.318125" transform="rotate(-0 688.862734 16.318125)">Lo que la onda de suelo mantiene vivo (500 Hz, 50 m)</text>
@@ -1389,34 +1433,87 @@ L 868.061669 326.995469
    <g id="legend_2">
     <g id="patch_14">
      <path d="M 498.043906 336.813438 
-L 639.024688 336.813438 
-Q 640.824688 336.813438 640.824688 335.013438 
-L 640.824688 308.552031 
-Q 640.824688 306.752031 639.024688 306.752031 
-L 498.043906 306.752031 
-Q 496.243906 306.752031 496.243906 308.552031 
+L 637.633906 336.813438 
+Q 639.433906 336.813438 639.433906 335.013438 
+L 639.433906 308.011328 
+Q 639.433906 306.211328 637.633906 306.211328 
+L 498.043906 306.211328 
+Q 496.243906 306.211328 496.243906 308.011328 
 L 496.243906 335.013438 
 Q 496.243906 336.813438 498.043906 336.813438 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_114">
-     <path d="M 499.843906 314.400625 
-L 508.843906 314.400625 
-L 517.843906 314.400625 
+     <path d="M 499.843906 313.861328 
+L 508.843906 313.861328 
+L 517.843906 313.861328 
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="525.043906" y="317.550625" transform="rotate(-0 525.043906 317.550625)">con Q (onda esférica)</text>
+     <!-- con $Q$ (onda esférica) -->
+     <g transform="translate(525.043906 317.011328)">
+      <text>
+       <tspan x="0" y="-0.796875" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="4.948242" y="-0.796875" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="10.45459" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="16.158691" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="26.103516" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="28.964355" y="-0.796875" style="font-size: 9px; font-family: sans-serif">(</tspan>
+       <tspan x="32.475586" y="-0.796875" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="37.981934" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="43.686035" y="-0.796875" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="49.398926" y="-0.796875" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="54.914062" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="57.774902" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="63.312012" y="-0.796875" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="68.000977" y="-0.796875" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="71.169434" y="-0.796875" style="font-size: 9px; font-family: sans-serif">é</tspan>
+       <tspan x="76.706543" y="-0.796875" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="80.406738" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="82.907227" y="-0.796875" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="87.855469" y="-0.796875" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="93.370605" y="-0.796875" style="font-size: 9px; font-family: sans-serif">)</tspan>
+       <tspan x="19.019531" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">Q</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_115">
-     <path d="M 499.843906 327.901328 
-L 508.843906 327.901328 
-L 517.843906 327.901328 
+     <path d="M 499.843906 327.363438 
+L 508.843906 327.363438 
+L 517.843906 327.363438 
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 2"/>
     </g>
     <g id="text_28">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="525.043906" y="331.051328" transform="rotate(-0 525.043906 331.051328)">solo con Rp (onda plana)</text>
+     <!-- solo con $R_p$ (onda plana) -->
+     <g transform="translate(525.043906 330.513438)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="4.688965" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="10.195312" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="12.695801" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="18.202148" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="21.062988" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="26.01123" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="31.517578" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="37.22168" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="50.581055" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="53.441895" y="-0.15625" style="font-size: 9px; font-family: sans-serif">(</tspan>
+       <tspan x="56.953125" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="62.459473" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="68.163574" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="73.876465" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="79.391602" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="82.252441" y="-0.15625" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="87.965332" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="90.46582" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="95.980957" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="101.685059" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="107.200195" y="-0.15625" style="font-size: 9px; font-family: sans-serif">)</tspan>
+       <tspan x="40.08252" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">R</tspan>
+       <tspan x="46.335938" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">p</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>

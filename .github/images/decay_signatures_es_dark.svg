@@ -318,7 +318,19 @@ z
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(267.622013 48.226777)">EDT 1,00 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(268.786388 59.028535)">T20 1,00 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(268.786388 69.830293)">T30 1,00 s</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(276.252169 80.632051)">C = -0 %</text>
+    <!-- $C$ = −0 % -->
+    <g style="fill: #ffffff" transform="translate(271.904044 80.632051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
+      <tspan x="27.087891" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="32.813965" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="35.674805" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">%</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(200.671857 91.433809)">T20 = T30, curvatura ~ 0</text>
    </g>
    <g id="text_18">
@@ -966,7 +978,19 @@ z
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(569.394565 48.226777)">EDT 0,72 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(570.55894 59.028535)">T20 1,78 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(570.55894 69.830293)">T30 2,18 s</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(575.545503 80.632051)">C = 23 %</text>
+    <!-- $C$ = 23 % -->
+    <g style="fill: #ffffff" transform="translate(575.476596 80.632051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="25.272949" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">3</tspan>
+      <tspan x="30.999023" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="33.859863" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">%</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(483.036753 91.434512)">T30 &gt; T20: informa de ambos</text>
    </g>
    <g id="text_28">
@@ -1869,23 +1893,34 @@ L 927.983125 191.945918
    </g>
    <g id="text_37">
     <g id="patch_19">
-     <path d="M 783.711023 98.0975 
+     <path d="M 789.372586 98.0975 
 L 919.729148 98.0975 
 Q 923.329148 98.0975 923.329148 94.4975 
 L 923.329148 40.488008 
 Q 923.329148 36.888008 919.729148 36.888008 
-L 783.711023 36.888008 
-Q 780.111023 36.888008 780.111023 40.488008 
-L 780.111023 94.4975 
-Q 780.111023 98.0975 783.711023 98.0975 
+L 789.372586 36.888008 
+Q 785.772586 36.888008 785.772586 40.488008 
+L 785.772586 94.4975 
+Q 785.772586 98.0975 789.372586 98.0975 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(871.167117 48.226777)">EDT 0,58 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(872.331492 59.028535)">T20 0,99 s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(872.331492 69.830293)">T30 1,00 s</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(883.044305 80.632051)">C = 1 %</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(783.711023 91.434512)">EDT &lt;&lt; T30: una butaca seca</text>
+    <!-- $C$ = 1 % -->
+    <g style="fill: #ffffff" transform="translate(883.009148 80.632051)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">C</tspan>
+      <tspan x="6.28418" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="9.14502" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="16.686035" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="19.546875" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="25.272949" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="28.133789" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">%</tspan>
+     </text>
+    </g>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(789.372586 91.434512)">EDT ≪ T30: una butaca seca</text>
    </g>
    <g id="text_38">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="790.416849" y="16.798125" transform="rotate(-0 790.416849 16.798125)">energía temprana fuerte</text>
