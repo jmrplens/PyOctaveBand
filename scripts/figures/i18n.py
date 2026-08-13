@@ -553,14 +553,15 @@ _ES_EXACT = {
     "Aircraft Departure SEL Contour (ECAC Doc 29)":
         "Contorno SEL de despegue (ECAC Doc 29)",
     "Aircraft noise contour (ECAC Doc 29)": "Contorno de ruido de aeronave (ECAC Doc 29)",
-    "Start-of-Roll Directivity ΔSOR (ECAC Doc 29 §4.5.7)":
-        "Directividad de inicio de rodaje ΔSOR (ECAC Doc 29 §4.5.7)",
+    r"Start-of-Roll Directivity $\Delta_{SOR}$ (ECAC Doc 29 §4.5.7)":
+        r"Directividad de inicio de rodaje $\Delta_{SOR}$ (ECAC Doc 29 §4.5.7)",
     "Turbofan jet (Eq. 4-24a)": "Reactor turbofán (Ec. 4-24a)",
     "Turboprop (Eq. 4-24b)": "Turbohélice (Ec. 4-24b)",
     "90°\nabeam": "90°\ntravés",
     "180° behind": "180° detrás",
-    "radial axis: ΔSOR [dB] relative to abeam  ·  dSOR = 300 m":
-        "eje radial: ΔSOR [dB] relativo al través  ·  dSOR = 300 m",
+    r"radial axis: $\Delta_{SOR}$ [dB] relative to abeam  ·  $d_{SOR}$ = 300 m":
+        r"eje radial: $\Delta_{SOR}$ [dB] relativo al través"
+        r"  ·  $d_{SOR}$ = 300 m",
     "Rotorcraft Ground Effect (ECAC Doc 32, Chien-Soroka)":
         "Efecto de suelo de rotorcraft (ECAC Doc 32, Chien-Soroka)",
     "Rotorcraft Flyover Time History (ECAC Doc 32)":
@@ -584,18 +585,20 @@ _ES_EXACT = {
         "camino (ECAC Doc 32 / NORAH2)",
     "Below line of sight": "Por debajo de la línea de visión",
     "25 dB cap (§A.4.5)": "tope de 25 dB (§A.4.5)",
-    "Diffraction attenuation ΔLd [dB]": "Atenuación por difracción ΔLd [dB]",
-    "Path difference δ [m]": "Diferencia de camino δ [m]",
-    "10 Ch lg 3 at grazing incidence (δ = 0):\n"
-    "4.8 dB where Ch = 1, 3.0 dB at 63 Hz":
-        "10 Ch lg 3 en incidencia rasante (δ = 0):\n"
-        "4,8 dB donde Ch = 1, 3,0 dB en 63 Hz",
+    r"Diffraction attenuation $\Delta L_d$ [dB]":
+        r"Atenuación por difracción $\Delta L_d$ [dB]",
+    r"Path difference $\delta$ [m]": r"Diferencia de camino $\delta$ [m]",
+    r"$10\,C_h\,\mathrm{lg}\,3$ at grazing incidence ($\delta = 0$):" "\n"
+    r"4.8 dB where $C_h$ = 1, 3.0 dB at 63 Hz":
+        r"$10\,C_h\,\mathrm{lg}\,3$ en incidencia rasante ($\delta = 0$):" "\n"
+        r"4,8 dB donde $C_h$ = 1, 3,0 dB en 63 Hz",
     "A-weighted sound pressure level [dB(A)]":
         "Nivel de presión acústica ponderado A [dB(A)]",
     "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
     "One-third-octave-band centre frequency [Hz]":
         "Frecuencia central de banda de 1/3 de octava [Hz]",
-    "Ground-effect adjustment ΔLg [dB]": "Ajuste por efecto de suelo ΔLg [dB]",
+    r"Ground-effect adjustment $\Delta L_g$ [dB]":
+        r"Ajuste por efecto de suelo $\Delta L_g$ [dB]",
     "Hard (asphalt/concrete, class G)": "Duro (asfalto/hormigón, clase G)",
     "Soft (grass/pasture, class D)": "Blando (hierba/pasto, clase D)",
     "x [km]": "x [km]",
@@ -3954,24 +3957,26 @@ _ES_EXACT = {
     "(b) Lateral attenuation (Eq. 4-18/4-19)":
         "(b) Atenuación lateral (ec. 4-18/4-19)",
     "(d) Duration correction (Eq. 4-14)": "(d) Corrección de duración (ec. 4-14)",
-    "Depression angle φ [°]": "Ángulo de depresión φ [°]",
-    "Elevation angle β [°]": "Ángulo de elevación β [°]",
-    "Λ(β, ℓ) subtracted [dB]": "Λ(β, ℓ) restada [dB]",
-    "Segment speed Vseg [m/s]": "Velocidad del segmento Vseg [m/s]",
+    r"Depression angle $\varphi$ [°]": r"Ángulo de depresión $\varphi$ [°]",
+    r"Elevation angle $\beta$ [°]": r"Ángulo de elevación $\beta$ [°]",
+    r"$\Lambda(\beta, \ell)$ subtracted [dB]": r"$\Lambda(\beta, \ell)$ restada [dB]",
+    r"Segment speed $V_{\mathrm{seg}}$ [m/s]":
+        r"Velocidad del segmento $V_{\mathrm{seg}}$ [m/s]",
     "Wing-mounted": "En ala",
     "Fuselage-mounted": "En fuselaje",
     "Propeller": "Hélice",
-    "Λ = 0 above 50°": "Λ = 0 por encima de 50°",
+    r"$\Lambda = 0$ above 50°": r"$\Lambda = 0$ por encima de 50°",
     "observer alongside": "observador junto al segmento",
-    "Vref = 82.3 m/s (160 kn)": "Vref = 82,3 m/s (160 kn)",
+    r"$V_{\mathrm{ref}}$ = 82.3 m/s (160 kn)":
+        r"$V_{\mathrm{ref}}$ = 82,3 m/s (160 kn)",
     "take-off ground roll": "carrera de despegue",
     "default ground track": "traza en tierra por defecto",
     # Rotorcraft: the ECAC Doc 32 hemisphere, its interpolation and its terrain.
-    "Fore-aft section (φ = 0°)": "Sección proa-popa (φ = 0°)",
+    r"Fore-aft section ($\varphi$ = 0°)": r"Sección proa-popa ($\varphi$ = 0°)",
     "measured polar band": "banda polar medida",
     "measured coverage": "cobertura medida",
-    "Polar angle θ [°]": "Ángulo polar θ [°]",
-    "Azimuth φ [°]": "Acimut φ [°]",
+    r"Polar angle $\theta$ [°]": r"Ángulo polar $\theta$ [°]",
+    r"Azimuth $\varphi$ [°]": r"Acimut $\varphi$ [°]",
     "Uniform pasture (class D)": "Pastizal uniforme (clase D)",
     "A 600 m hard strip across it": "Una franja dura de 600 m que lo cruza",
     "track": "trayectoria",
@@ -3979,13 +3984,13 @@ _ES_EXACT = {
     "Mean Ground Plane and Equivalent Heights (ECAC Doc 32 / NORAH2)":
         "Plano medio del terreno y alturas equivalentes (ECAC Doc 32 / NORAH2)",
     "receiver": "receptor",
-    "Raw (V, γ) plane — pass it as triangles=":
-        "Plano (V, γ) sin normalizar: se pasa como triangles=",
+    r"Raw ($V$, $\gamma$) plane — pass it as triangles=":
+        r"Plano ($V$, $\gamma$) sin normalizar: se pasa como triangles=",
     "Normalised plane — the library default":
         "Plano normalizado: el comportamiento por defecto",
-    "Airspeed V [m/s]": "Velocidad aerodinámica V [m/s]",
-    "Path angle γ [°]": "Ángulo de trayectoria γ [°]",
-    "Ffc · γ / Δγ": "Ffc · γ / Δγ",
+    "Airspeed $V$ [m/s]": "Velocidad aerodinámica $V$ [m/s]",
+    r"Path angle $\gamma$ [°]": r"Ángulo de trayectoria $\gamma$ [°]",
+    r"$F_{fc}\,\gamma/\Delta\gamma$": r"$F_{fc}\,\gamma/\Delta\gamma$",
     "database conditions": "condiciones de la base de datos",
     "query inside the hull": "consulta dentro de la envolvente",
     "query outside: nearest, unblended":
@@ -3995,8 +4000,8 @@ _ES_EXACT = {
         "Spline de suavizado remuestreado a 0,5 s",
     # Labels the aircraft result objects draw themselves.
     "Segment SEL [dB]": "SEL del segmento [dB]",
-    "Polar angle θ [°]  (0° forward → 180° rearward)":
-        "Ángulo polar θ [°]  (0° hacia proa → 180° hacia popa)",
+    r"Polar angle $\theta$ [°]  (0° forward → 180° rearward)":
+        r"Ángulo polar $\theta$ [°]  (0° hacia proa → 180° hacia popa)",
     "Source level at 60 m [dB]": "Nivel de fuente a 60 m [dB]",
     # Rotorcraft hover ring: the §A.3.5 Table 3 derivation.
     "Ring bearing [°]  (0° nose, +90° starboard)":
@@ -4010,10 +4015,12 @@ _ES_EXACT = {
     "Full-rpm idle (−2.5 dB)": "Ralentí a régimen pleno (−2,5 dB)",
     "Reduced-rpm idle (−12 dB)": "Ralentí a régimen reducido (−12 dB)",
     "Source level at 70 m [dB]": "Nivel de fuente a 70 m [dB]",
-    "Derived hover and idle sources (Table 3, φ = 0°)":
-        "Fuentes derivadas de estacionario y ralentí (Tabla 3, φ = 0°)",
-    "constant directivity in φ: each θ\nreads the ring at ±θ":
-        "directividad constante en φ: cada θ\nlee el anillo en ±θ",
+    r"Derived hover and idle sources (Table 3, $\varphi$ = 0°)":
+        r"Fuentes derivadas de estacionario y ralentí (Tabla 3, $\varphi$ = 0°)",
+    r"constant directivity in $\varphi$: each $\theta$" "\n"
+    r"reads the ring at $\pm\theta$":
+        r"directividad constante en $\varphi$: cada $\theta$" "\n"
+        r"lee el anillo en $\pm\theta$",
     "SEL [dB]": "SEL [dB]",
     "SEL [dB(A)]": "SEL [dB(A)]",
     "Speed [m/s]": "Velocidad [m/s]",
@@ -4356,10 +4363,10 @@ _ES_PATTERNS = [
       r"SEL total \1 dB; el segmento más próximo aporta por sí solo"
       "\n"
       r"el \2 % de la energía. Rayado: la carrera de despegue.")),
-    (r"^ℓ = (.+) m$", r"ℓ = \1 m"),
-    (r"^λ = (.+) m$", r"λ = \1 m"),
-    (r"^\(c\) Noise fraction, dλ = (.+) m \(Eq\. 4-20\)$",
-     r"(c) Fracción de ruido, dλ = \1 m (ec. 4-20)"),
+    (r"^\$\\ell\$ = (.+) m$", r"$\\ell$ = \1 m"),
+    (r"^\$\\lambda\$ = (.+) m$", r"$\\lambda$ = \1 m"),
+    (r"^\(c\) Noise fraction, \$d_\\lambda\$ = (.+) m \(Eq\. 4-20\)$",
+     r"(c) Fracción de ruido, $d_\\lambda$ = \1 m (ec. 4-20)"),
     ((r"^impedance adjustment \(Eq\. 4-6/4-7\), for scale:\n"
       r"15 °C, 101\.3 kPa: (.+) dB\n30 °C, 101\.3 kPa: (.+) dB\n"
       r"15 °C, 95\.0 kPa: (.+) dB$"),
@@ -4377,22 +4384,24 @@ _ES_PATTERNS = [
       r"outside the dashed patch the field is gap-filled, not measured$"),
      (r"\1 dB entre la celda medida más y menos ruidosa;" "\n"
       "fuera del recinto discontinuo el campo está rellenado, no medido")),
-    (r"^hs = (.+) m$", r"hs = \1 m"),
-    (r"^hr = (.+) m$", r"hr = \1 m"),
+    (r"^\$h_s\$ = (\d+) m$", r"$h_s$ = \1 m"),
+    (r"^\$h_r\$ = (\d+)\.(\d+) m$", r"$h_r$ = \1,\2 m"),
     (r"^true heights \((.+) m, (.+) m\)$", r"alturas reales (\1 m, \2 m)"),
     (r"^equivalent heights \((.+) m, (.+) m\)$",
      r"alturas equivalentes (\1 m, \2 m)"),
-    ((r"^V = (.+) m/s, γ = (.+)°: the two\n"
-      r"triangulations blend (.+) and (.+)$"),
-     (r"V = \1 m/s, γ = \2°: las dos triangulaciones" "\n"
-      r"mezclan \3 y \4")),
-    (r"^peak \|Φ\| = (.+)°  ·  the turn asks for (.+)°$",
-     r"|Φ| máximo = \1°  ·  el viraje pide \2°"),
+    ((r"^\$V\$ = (.+) m/s, \$\\gamma\$ = (.+)°: the two\n"
+      r"triangulations blend\n(.+) and (.+)$"),
+     (r"$V$ = \1 m/s, $\\gamma$ = \2°: las dos" "\n"
+      r"triangulaciones mezclan" "\n"
+      r"\3 y \4")),
+    (r"^peak \$\|\\Phi\|\$ = (.+)°  ·  the turn asks for (\d+)\.(\d+)°$",
+     r"$|\\Phi|$ máximo = \1°  ·  el viraje pide \2,\3°"),
     (r"^Total SEL = (.+) dB$", r"SEL total = \1 dB"),
-    (r"^Mean ground plane \(a = (.+)\)$", r"Plano medio del terreno (a = \1)"),
-    (r"^(.+) Hz \(φ = 0°\)$", r"\1 Hz (φ = 0°)"),
-    (r"^edge height h0 = (.+) m, single edge$",
-     r"altura de arista h0 = \1 m, arista única"),
+    (r"^Mean ground plane \(\$a\$ = (\d+)\.(\d+)\)$",
+     r"Plano medio del terreno ($a$ = \1,\2)"),
+    (r"^(.+) Hz \(\$\\varphi\$ = 0°\)$", r"\1 Hz ($\\varphi$ = 0°)"),
+    (r"^edge height \$h_0\$ = (\d+)\.(\d+) m, single edge$",
+     r"altura de arista $h_0$ = \1,\2 m, arista única"),
     # coupling_term_regimes annotations (baked-in computed values).
     (r"^elastic support Yk = (.+) m/\(N s\)  \(19e\)$",
      r"apoyo elástico Yk = \1 m/(N s)  (19e)"),
@@ -4538,8 +4547,8 @@ _ES_PATTERNS = [
     (r"^SL = 140, NL = 60, DI = 15, DT = 8 dB\nfigure of merit = (.+) dB$",
      "SL = 140, NL = 60, DI = 15, DT = 8 dB\\nfigura de mérito = \\1 dB"),
     (r"^SAE band \((\d+) m\)$", r"banda SAE (\1 m)"),
-    (r"^source (\d+) m, receiver (.+) m, offset (\d+) m$",
-     r"fuente \1 m, receptor \2 m, offset \3 m"),
+    (r"^\$h_s\$ = (\d+) m, \$h_r\$ = (\d+)\.(\d+) m, \$d_p\$ = (\d+) m$",
+     r"$h_s$ = \1 m, $h_r$ = \2,\3 m, $d_p$ = \4 m"),
     ((r"^SEL (\d+)\.(\d+) dB\(A\)  ·  EPNL (\d+)\.(\d+) EPNdB\n"
      r"level flyover, 60 kt, 150 m, 120 m sideline, grass$"),
      ("SEL \\1,\\2 dB(A)  ·  EPNL \\3,\\4 EPNdB\n"
@@ -4975,8 +4984,8 @@ _ES_PATTERNS = [
     (r"^Tonal audibility ΔLₐ = (-?\d+)\.(\d+) dB\nnot audible$",
      "Audibilidad tonal ΔLₐ = \\1,\\2 dB\nno audible"),
     (r"^PNLTM = (\d+)\.(\d+) PNdB$", r"PNLTM = \1,\2 PNdB"),
-    (r"^EPNL = (\d+)\.(\d+) EPNdB\nD = ([+-]?\d+)\.(\d+) dB$",
-     "EPNL = \\1,\\2 EPNdB\nD = \\3,\\4 dB"),
+    (r"^EPNL = (\d+)\.(\d+) EPNdB\n\$D\$ = ([+−]?\d+)\.(\d+) dB$",
+     "EPNL = \\1,\\2 EPNdB\n$D$ = \\3,\\4 dB"),
     # ground_reflection_coefficient: the grazing-limit annotation.
     (r"^(-?\d+)\.(\d+) dB against (-?\d+)\.(\d+) dB$",
      r"\1,\2 dB frente a \3,\4 dB"),

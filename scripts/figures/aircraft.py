@@ -19,6 +19,7 @@ from phonometry._plot.common import (
     theme_line,
 )
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -68,7 +69,8 @@ def generate_epnl(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.02, 0.95,
-            f"EPNL = {res.epnl:.1f} EPNdB\nD = {res.duration_correction:+.1f} dB",
+            f"EPNL = {res.epnl:.1f} EPNdB\n"
+            f"$D$ = {_fmt_minus(res.duration_correction, '+.1f')} dB",
             transform=ax.transAxes, va="top", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -126,7 +128,7 @@ def generate_airport_noise(output_dir: str) -> None:
     for p, color in ((20000.0, COLOR_PRIMARY), (12000.0, COLOR_SECONDARY)):
         res = npd_curve(powers, distances, levels, p)
         ax.plot(res.distance, res.level, color=color, linewidth=2.0,
-                label=f"P = {p:.0f} N")
+                label=f"$P$ = {p:.0f} N")
         ax.plot(res.table_distances, res.table_levels, "o", color=color, markersize=4)
     ax.set_xscale("log")
     ax.set_xlabel("Slant distance [m]")
@@ -218,15 +220,17 @@ def generate_airport_sor(output_dir: str) -> None:
         ax.fill(dx, dy, color=color, alpha=theme_fill_alpha(color, ax), zorder=1)
         ax.plot(dx, dy, color=color, linewidth=2.2, zorder=3, label=label)
     for g in (0.0, -4.0, -8.0, -12.0):           # radial dB labels down the centre
-        ax.text(0.6, -(g - r0), f"{g:.0f}", fontsize=8, color=COLOR_FG, ha="left",
-                va="center", zorder=4)
+        ax.text(0.6, -(g - r0), _fmt_minus(g, ".0f"), fontsize=8, color=COLOR_FG,
+                ha="left", va="center", zorder=4)
     ax.set_aspect("equal")
     ax.axis("off")
     ax.set_xlim(-21.0, 21.0)
     ax.set_ylim(-20.2, 1.5)
-    ax.set_title("Start-of-Roll Directivity ΔSOR (ECAC Doc 29 §4.5.7)",
+    ax.set_title(r"Start-of-Roll Directivity $\Delta_{SOR}$ (ECAC Doc 29 §4.5.7)",
                  fontweight="bold", pad=6)
-    ax.text(0.0, 1.0, "radial axis: ΔSOR [dB] relative to abeam  ·  dSOR = 300 m",
+    ax.text(0.0, 1.0,
+            r"radial axis: $\Delta_{SOR}$ [dB] relative to abeam"
+            r"  ·  $d_{SOR}$ = 300 m",
             fontsize=9, color=COLOR_FG, ha="center", va="bottom")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.02), ncol=2, fontsize=9,
               frameon=False)
@@ -253,14 +257,15 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
             label="Soft (grass/pasture, class D)")
     ax.set_xscale("log")
     ax.set_xlabel("One-third-octave-band centre frequency [Hz]")
-    ax.set_ylabel("Ground-effect adjustment ΔLg [dB]")
+    ax.set_ylabel(r"Ground-effect adjustment $\Delta L_g$ [dB]")
     ax.set_title("Rotorcraft Ground Effect (ECAC Doc 32, Chien-Soroka)",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6, which="both")
     ax.set_axisbelow(True)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.legend(loc="lower left", fontsize=9)
-    ax.text(0.98, 0.05, f"source {hs:.0f} m, receiver {hr:.1f} m, offset {dp:.0f} m",
+    ax.text(0.98, 0.05,
+            f"$h_s$ = {hs:.0f} m, $h_r$ = {hr:.1f} m, $d_p$ = {dp:.0f} m",
             transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -404,19 +409,19 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     # figure now plots, higher up (where it used to sit) the 250 Hz curve
     # cuts straight through the text.
     ax.annotate(
-        f"10 Ch lg 3 at grazing incidence (δ = 0):\n"
-        f"{grazing:.1f} dB where Ch = 1, {grazing_63:.1f} dB at 63 Hz",
+        r"$10\,C_h\,\mathrm{lg}\,3$ at grazing incidence ($\delta = 0$):" "\n"
+        f"{grazing:.1f} dB where $C_h$ = 1, {grazing_63:.1f} dB at 63 Hz",
         xy=(0.0, grazing), xytext=(0.45, 1.6),
         fontsize=9, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
-    ax.set_xlabel("Path difference δ [m]")
-    ax.set_ylabel("Diffraction attenuation ΔLd [dB]")
+    ax.set_xlabel(r"Path difference $\delta$ [m]")
+    ax.set_ylabel(r"Diffraction attenuation $\Delta L_d$ [dB]")
     ax.set_title("Rotorcraft Diffraction Attenuation vs Path Difference "
                  "(ECAC Doc 32 / NORAH2)", fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
-    ax.text(0.98, 0.05, f"edge height h0 = {h0:.1f} m, single edge",
+    ax.text(0.98, 0.05, f"edge height $h_0$ = {h0:.1f} m, single edge",
             transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -567,8 +572,8 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
         di = np.array([engine_installation_correction(p, mounting) for p in phi])
         ax_i.plot(phi, di, color=color, lw=2.0, label=label)
     ax_i.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.4)
-    ax_i.set(xlabel="Depression angle φ [°]", ylabel="ΔI(φ) [dB]",
-             xlim=(0.0, 180.0))
+    ax_i.set(xlabel=r"Depression angle $\varphi$ [°]",
+             ylabel=r"$\Delta I(\varphi)$ [dB]", xlim=(0.0, 180.0))
     ax_i.set_title("(a) Engine installation (Eq. 4-15/4-16)", fontsize=11,
                    fontweight="bold")
     ax_i.legend(loc="lower center", fontsize=8)
@@ -578,11 +583,11 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     for ell, color in ((100.0, COLOR_TERTIARY), (300.0, COLOR_SECONDARY),
                        (914.0, COLOR_PRIMARY)):
         lam = np.array([lateral_attenuation(b, ell) for b in beta])
-        ax_l.plot(beta, lam, color=color, lw=2.0, label=f"ℓ = {ell:.0f} m")
+        ax_l.plot(beta, lam, color=color, lw=2.0, label=rf"$\ell$ = {ell:.0f} m")
     ax_l.axvline(50.0, color=COLOR_FG, lw=1.0, ls="--", alpha=0.5)
-    ax_l.text(51.0, 8.0, "Λ = 0 above 50°", fontsize=8, color=COLOR_FG)
-    ax_l.set(xlabel="Elevation angle β [°]", ylabel="Λ(β, ℓ) subtracted [dB]",
-             xlim=(0.0, 90.0))
+    ax_l.text(51.0, 8.0, r"$\Lambda = 0$ above 50°", fontsize=8, color=COLOR_FG)
+    ax_l.set(xlabel=r"Elevation angle $\beta$ [°]",
+             ylabel=r"$\Lambda(\beta, \ell)$ subtracted [dB]", xlim=(0.0, 90.0))
     ax_l.set_title("(b) Lateral attenuation (Eq. 4-18/4-19)", fontsize=11,
                    fontweight="bold")
     ax_l.legend(loc="upper right", fontsize=8)
@@ -592,16 +597,16 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
         (float(npd_level(_DOC29_POWERS, _DOC29_DISTANCES, _DOC29_SEL, 12000.0, 526.0)[0])
          - float(npd_level(_DOC29_POWERS, _DOC29_DISTANCES, _DOC29_LMAX, 12000.0, 526.0)[0]))
         / 10.0)
-    for length, color, label in ((464.0, COLOR_PRIMARY, "λ = 464 m"),
-                                 (2000.0, COLOR_SECONDARY, "λ = 2 000 m")):
+    for length, color, label in ((464.0, COLOR_PRIMARY, r"$\lambda$ = 464 m"),
+                                 (2000.0, COLOR_SECONDARY, r"$\lambda$ = 2 000 m")):
         frac = np.linspace(-1.0, 2.0, 601)
         df = np.array([noise_fraction(f * length, length, d_lambda) for f in frac])
         ax_f.plot(frac, df, color=color, lw=2.0, label=label)
     ax_f.axvspan(0.0, 1.0, color=theme_fill(COLOR_PRIMARY, ax_f), zorder=0)
     ax_f.text(0.5, -13.0, "observer alongside", ha="center", fontsize=8,
               color=COLOR_FG)
-    ax_f.set(xlabel="q / λ", ylabel="ΔF [dB]", ylim=(-15.0, 1.0))
-    ax_f.set_title(f"(c) Noise fraction, dλ = {d_lambda:.0f} m (Eq. 4-20)",
+    ax_f.set(xlabel=r"$q/\lambda$", ylabel=r"$\Delta F$ [dB]", ylim=(-15.0, 1.0))
+    ax_f.set_title(rf"(c) Noise fraction, $d_\lambda$ = {d_lambda:.0f} m (Eq. 4-20)",
                    fontsize=11, fontweight="bold")
     ax_f.legend(loc="lower right", fontsize=8)
 
@@ -611,16 +616,20 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     ax_v.plot(v, dv, color=COLOR_PRIMARY, lw=2.0)
     ax_v.axvline(_VREF_MS, color=COLOR_FG, lw=1.0, ls="--", alpha=0.5)
     ax_v.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.4)
-    ax_v.text(_VREF_MS + 1.5, 1.4, "Vref = 82.3 m/s (160 kn)", fontsize=8,
-              color=COLOR_FG)
-    ax_v.set(xlabel="Segment speed Vseg [m/s]", ylabel="ΔV [dB]")
+    # Below the impedance box: at the old 1.4 the box's backdrop painted
+    # over the tail of this reading.
+    ax_v.text(_VREF_MS + 1.5, 1.05, r"$V_{\mathrm{ref}}$ = 82.3 m/s (160 kn)",
+              fontsize=8, color=COLOR_FG)
+    ax_v.set(xlabel=r"Segment speed $V_{\mathrm{seg}}$ [m/s]",
+             ylabel=r"$\Delta V$ [dB]")
     ax_v.set_title("(d) Duration correction (Eq. 4-14)", fontsize=11,
                    fontweight="bold")
     ax_v.text(0.98, 0.96,
               "impedance adjustment (Eq. 4-6/4-7), for scale:\n"
-              f"15 °C, 101.3 kPa: {impedance_adjustment():+.2f} dB\n"
-              f"30 °C, 101.3 kPa: {impedance_adjustment(30.0):+.2f} dB\n"
-              f"15 °C, 95.0 kPa: {impedance_adjustment(15.0, 95.0):+.2f} dB",
+              f"15 °C, 101.3 kPa: {_fmt_minus(impedance_adjustment(), '+.2f')} dB\n"
+              f"30 °C, 101.3 kPa: {_fmt_minus(impedance_adjustment(30.0), '+.2f')} dB\n"
+              f"15 °C, 95.0 kPa: "
+              f"{_fmt_minus(impedance_adjustment(15.0, 95.0), '+.2f')} dB",
               transform=ax_v.transAxes, ha="right", va="top", fontsize=8,
               bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
 
@@ -730,10 +739,18 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
     for band, color in ((100.0, COLOR_TERTIARY), (630.0, COLOR_PRIMARY),
                         (4000.0, COLOR_SECONDARY)):
         h.plot(ax=ax, band=band, color=color, lw=2.0)
+    # The result's own xlabel and legend, restated with the composed angles
+    # so both panels of this figure write them the same way. The legend keeps
+    # the band frequencies exactly as the library snapped them (631, 3981).
+    ax.set_xlabel(r"Polar angle $\theta$ [°]  (0° forward → 180° rearward)")
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles,
+              [lbl.replace("(φ = 0°)", r"($\varphi$ = 0°)") for lbl in labels],
+              loc="upper right", fontsize="small")
     ax.axvspan(40.0, 140.0, color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
     ax.text(90.0, ax.get_ylim()[0] + 2.0, "measured polar band", ha="center",
             fontsize=9, color=COLOR_FG)
-    ax.set_title("Fore-aft section (φ = 0°)", fontweight="bold", pad=10)
+    ax.set_title(r"Fore-aft section ($\varphi$ = 0°)", fontweight="bold", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
 
@@ -754,8 +771,8 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
              color=COLOR_FG)
     ax2.figure.colorbar(cs, ax=ax2, label="Source level at 60 m [dB]")
     spread = float(np.nanmax(grid) - np.nanmin(grid))
-    ax2.set_xlabel("Polar angle θ [°]")
-    ax2.set_ylabel("Azimuth φ [°]")
+    ax2.set_xlabel(r"Polar angle $\theta$ [°]")
+    ax2.set_ylabel(r"Azimuth $\varphi$ [°]")
     ax2.set_title(f"{freqs[idx]:.0f} Hz band, the most directive one",
                   fontweight="bold",
                   pad=10)
@@ -828,15 +845,16 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
         ax2.plot(theta, section, color=color, ls=style, lw=1.8, label=label)
     ax2.set_ylim(top=top + 8.0)          # room for the legend above the curves
     ax2.set_xticks(np.arange(0.0, 181.0, 30.0))
-    ax2.set_xlabel("Polar angle θ [°]  (0° forward → 180° rearward)")
+    ax2.set_xlabel(r"Polar angle $\theta$ [°]  (0° forward → 180° rearward)")
     ax2.set_ylabel("Source level at 70 m [dB]")
-    ax2.set_title("Derived hover and idle sources (Table 3, φ = 0°)",
+    ax2.set_title(r"Derived hover and idle sources (Table 3, $\varphi$ = 0°)",
                   fontweight="bold", pad=10)
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax2.set_axisbelow(True)
     ax2.legend(loc="upper right", fontsize=9)
     ax2.text(0.02, 0.03,
-             "constant directivity in φ: each θ\nreads the ring at ±θ",
+             r"constant directivity in $\varphi$: each $\theta$" "\n"
+             r"reads the ring at $\pm\theta$",
              transform=ax2.transAxes, va="bottom", fontsize=9,
              bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.75})
     plt.tight_layout()
@@ -908,6 +926,11 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     _fig, (ax, ax2) = plt.subplots(2, 1, figsize=(10, 8),
                                    gridspec_kw={"height_ratios": [1.0, 1.0]})
     plane.plot(ax=ax)
+    # The result's own legend entry, restated with the composed slope symbol
+    # so it matches the equivalent-height annotations beside it.
+    for line in ax.get_lines():
+        if line.get_label().startswith("Mean ground plane (a = "):
+            line.set_label(line.get_label().replace("(a = ", r"($a$ = "))
     # The result fills the ground under the terrain with a very pale wash;
     # repaint it as an opaque theme fill so it stays legible on both pages.
     for coll in ax.collections:
@@ -916,8 +939,10 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     ax.plot([src[0]], [src[1]], "o", color=COLOR_SECONDARY, ms=9, label="source")
     ax.plot([rcv[0]], [rcv[1]], "o", color=COLOR_PRIMARY, ms=7, label="receiver")
     m, c = float(plane.slope), float(plane.intercept)
-    for (px, py), color, label in ((src, COLOR_SECONDARY, f"hs = {hs_eq:.0f} m"),
-                                   (rcv, COLOR_PRIMARY, f"hr = {hr_eq:.1f} m")):
+    for (px, py), color, label in ((src, COLOR_SECONDARY,
+                                    f"$h_s$ = {hs_eq:.0f} m"),
+                                   (rcv, COLOR_PRIMARY,
+                                    f"$h_r$ = {hr_eq:.1f} m")):
         # Foot of the perpendicular onto the fitted plane.
         fx = (px + m * (py - c)) / (1.0 + m**2)
         ax.plot([px, fx], [py, m * fx + c], color=color, lw=1.6, ls="-")
@@ -945,7 +970,7 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
              label=f"equivalent heights ({hs_eq:.0f} m, {hr_eq:.1f} m)")
     ax2.set_xscale("log")
     ax2.set_xlabel("One-third-octave-band centre frequency [Hz]")
-    ax2.set_ylabel("Ground-effect adjustment ΔLg [dB]")
+    ax2.set_ylabel(r"Ground-effect adjustment $\Delta L_g$ [dB]")
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6, which="both")
     ax2.set_axisbelow(True)
     format_frequency_axis(ax2, float(freqs.min()), float(freqs.max()))
@@ -987,13 +1012,13 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
     _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.6))
     for axis, pts, tri, weights, qi, qo, title, xlabel, ylabel in (
             (ax, raw, raw_tri, w_raw, inside, outside,
-             "Raw (V, γ) plane — pass it as triangles=",
-             "Airspeed V [m/s]", "Path angle γ [°]"),
+             r"Raw ($V$, $\gamma$) plane — pass it as triangles=",
+             "Airspeed $V$ [m/s]", r"Path angle $\gamma$ [°]"),
             (ax2, norm, Delaunay(norm).simplices, w_norm,
              (inside[0] / dv, scale * inside[1] / dg),
              (outside[0] / dv, scale * outside[1] / dg),
              "Normalised plane — the library default",
-             "V / ΔV", "Ffc · γ / Δγ")):
+             r"$V/\Delta V$", r"$F_{fc}\,\gamma/\Delta\gamma$")):
         axis.triplot(pts[:, 0], pts[:, 1], tri, color=COLOR_MUTED, lw=0.9,
                      zorder=1)
         # The simplex that encloses the query, and the three weights it blends.
@@ -1017,9 +1042,13 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
         axis.set_axisbelow(True)
         axis.legend(loc="upper left", fontsize=8)
+    # Three short lines: at the old two-line width the box's first line ran
+    # under the legend in the Spanish variant.
     ax2.text(0.98, 0.96,
-             f"V = {inside[0]:.0f} m/s, γ = {inside[1]:.0f}°: the two\n"
-             f"triangulations blend {', '.join(str(i) for i, _ in w_raw)} and "
+             rf"$V$ = {inside[0]:.0f} m/s, "
+             rf"$\gamma$ = {_fmt_minus(inside[1], '.0f')}°: the two" "\n"
+             "triangulations blend\n"
+             f"{', '.join(str(i) for i, _ in w_raw)} and "
              f"{', '.join(str(i) for i, _ in w_norm)}",
              transform=ax2.transAxes, ha="right", va="top", fontsize=9,
              bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.75})
@@ -1067,7 +1096,8 @@ def generate_rotorcraft_kinematics(output_dir: str) -> None:
         axis.set_axisbelow(True)
         peak = float(np.nanmax(np.abs(kin.bank_angle)))
         axis.text(0.02, 0.04,
-                  f"peak |Φ| = {peak:.0f}°  ·  the turn asks for {designed:.1f}°",
+                  rf"peak $|\Phi|$ = {peak:.0f}°"
+                  f"  ·  the turn asks for {designed:.1f}°",
                   transform=axis.transAxes, va="bottom", fontsize=9,
                   bbox={"boxstyle": "round", "facecolor": COLOR_GRID,
                         "alpha": 0.75})

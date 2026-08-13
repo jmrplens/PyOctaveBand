@@ -462,20 +462,35 @@ L 705.885938 28.318125
    </g>
    <g id="text_21">
     <g id="patch_8">
-     <path d="M 60.460234 73.233477 
-L 165.443047 73.233477 
-Q 168.443047 73.233477 168.443047 70.233477 
+     <path d="M 60.460234 73.235039 
+L 165.443047 73.235039 
+Q 168.443047 73.235039 168.443047 70.235039 
 L 168.443047 46.228008 
 Q 168.443047 43.228008 165.443047 43.228008 
 L 60.460234 43.228008 
 Q 57.460234 43.228008 57.460234 46.228008 
-L 57.460234 70.233477 
-Q 57.460234 73.233477 60.460234 73.233477 
+L 57.460234 70.235039 
+Q 57.460234 73.235039 60.460234 73.235039 
 z
 " style="fill: #555555; opacity: 0.6; stroke: #ffffff; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(60.460234 54.827422)">EPNL = 114,0 EPNdB</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(60.460234 66.830156)">D = -6,6 dB</text>
+    <!-- $D$ = −6,6 dB -->
+    <g style="fill: #ffffff" transform="translate(60.460234 66.831719)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">D</tspan>
+      <tspan x="7.700195" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="10.878906" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="19.257812" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="22.436523" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">−</tspan>
+      <tspan x="30.81543" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">6</tspan>
+      <tspan x="37.177734" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">,</tspan>
+      <tspan x="40.356445" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">6</tspan>
+      <tspan x="46.71875" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="49.897461" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="56.245117" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">B</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_22">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="376.587109" y="16.318125" transform="rotate(-0 376.587109 16.318125)">Sobrevuelo de aeronave ICAO — Nivel efectivo de ruido percibido (Anexo 16)</text>
