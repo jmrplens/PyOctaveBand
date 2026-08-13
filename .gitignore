@@ -105,3 +105,6 @@ site/lighthouse-results/
 # .github/reports and are committed from there, so nothing at the root is ever
 # wanted.
 /*.pdf
+
+# The freshness check takes this lock while it rewrites the manifest.
+scripts/animation_fingerprints.lock

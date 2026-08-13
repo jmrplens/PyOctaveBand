@@ -110,6 +110,10 @@ _IGNORED: frozenset[tuple[str, str]] = frozenset(
 #: patterns to every clip.
 _MIN_PATTERN_RUN = 4
 
+#: Shortest half of a run split across an interpolation (see
+#: :func:`_run_is_written`).
+_MIN_SPLIT = 3
+
 Symbol = tuple[str, str]
 
 
@@ -123,6 +127,8 @@ class _Module:
         self.symbols: dict[str, ast.AST] = {}
         #: local name -> (module, attribute); an empty attribute is the module
         self.imports: dict[str, tuple[str, str]] = {}
+        #: top-level statements that define no name (see :meth:`collect`)
+        self.body: list[ast.stmt] = []
 
     def collect(self, node: ast.stmt) -> None:
         if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
@@ -150,6 +156,13 @@ class _Module:
             for child in ast.iter_child_nodes(node):
                 if isinstance(child, ast.stmt):
                     self.collect(child)
+        elif isinstance(node, ast.Expr):
+            # A bare top-level expression defines no name, and one of them
+            # decides how every frame looks: the ``plt.rcParams.update({...})``
+            # block of ``figures.theme`` sets the base font size, the grid and
+            # its alpha. Collected under a synthetic name so the walk can pull
+            # it in with the module's other roots.
+            self.body.append(node)
 
     def _resolve_import(self, node: ast.ImportFrom) -> str:
         """The absolute module name of a ``from ... import`` statement."""
@@ -423,14 +436,50 @@ def _selected_translations(literals: set[str],
     """
     chosen: list[str] = []
     for key, value in exact:
-        if key in literals:
+        if key in literals or _key_is_written(key, literals):
             chosen.append(f"exact\x00{key}\x00{value}")
     for pattern, repl in patterns:
         runs = _pattern_runs(pattern)
-        if runs and all(any(run in literal for literal in literals)
-                        for run in runs):
+        if runs and all(_run_is_written(run, literals) for run in runs):
             chosen.append(f"pattern\x00{pattern}\x00{repl}")
     return sorted(chosen)
+
+
+def _key_is_written(key: str, literals: set[str]) -> bool:
+    """Whether the clip writes an exact-table key it assembles with numbers.
+
+    ``"$L$ = 0.30 m · $m$ = 4"`` is an entry of the exact table -- a label
+    with no words for the pattern list to key on -- and the clip builds it as
+    ``f"$L$ = {length:.2f} m · $m$ = {ratio:.0f}"``. Taking the numbers out
+    leaves exactly the fragments the source writes, so a key whose every
+    non-numeric piece is written counts as this clip's.
+    """
+    import re as _re
+
+    pieces = [piece for piece in _re.split(r"[\d]+", key)
+              if len(piece.strip()) >= _MIN_SPLIT]
+    return bool(pieces) and all(
+        any(piece in literal for literal in literals) for piece in pieces)
+
+
+def _run_is_written(run: str, literals: set[str]) -> bool:
+    """Whether the clip writes *run*, whole or split across an interpolation.
+
+    ``"Sabine, $T$ = 300 ms"`` is built as ``f"{name}, $T$ = {ms} ms"``, so
+    the pattern's run ``"Sabine, $T$ = "`` sits in no single fragment: the
+    name comes from a variable and only ``", $T$ = "`` is written literally.
+    A run therefore also counts when it splits in two and both halves are
+    written -- one split, both halves at least three characters, so the rule
+    cannot degenerate into "every run is written character by character".
+    """
+    if any(run in literal for literal in literals):
+        return True
+    for cut in range(_MIN_SPLIT, len(run) - _MIN_SPLIT + 1):
+        head, tail = run[:cut], run[cut:]
+        if (any(head in literal for literal in literals)
+                and any(tail in literal for literal in literals)):
+            return True
+    return False
 
 
 def fingerprint_parts(sources: Sources, clip: str,
@@ -442,6 +491,16 @@ def fingerprint_parts(sources: Sources, clip: str,
         f"{module}.{name}\x00{_dump(sources.node((module, name)))}"  # type: ignore[arg-type]
         for module, name in symbols
     )
+    # Plus the top-level statements of every module the clip reaches. They
+    # define no name, so the walk cannot reach them by reference, and one of
+    # them is ``figures.theme``'s ``plt.rcParams.update({...})``: the base font
+    # size, the grid and its alpha, i.e. how every frame looks.
+    for module in sorted({module for module, _ in symbols}):
+        body = sources.modules[module].body
+        if body:
+            code.append(f"{module}.<module>\x00"
+                        + _dump(ast.Module(body=body, type_ignores=[])))
+    code.sort()
     exact, patterns = _table_entries(sources)
     text = _selected_translations(_literals(sources, symbols), exact, patterns)
     return code, text
@@ -521,6 +580,9 @@ def stamp(clips: Iterable[str], root: pathlib.Path | None = None) -> None:
     if not names:
         return
     current = fingerprints(root or _SCRIPTS.parent)
+    # The lock file is never removed: unlinking it after the release lets a
+    # later run create a fresh inode and lock that one while another run is
+    # still inside the old one, which is the very race this guards.
     lock = MANIFEST.with_suffix(".lock")
     with lock.open("w") as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
@@ -532,5 +594,4 @@ def stamp(clips: Iterable[str], root: pathlib.Path | None = None) -> None:
             write_manifest(stamps)
         finally:
             fcntl.flock(handle, fcntl.LOCK_UN)
-    lock.unlink(missing_ok=True)
 

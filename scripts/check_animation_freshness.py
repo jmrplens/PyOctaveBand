@@ -52,11 +52,19 @@ def main() -> int:
             f"{clip}: stamped in {fp.MANIFEST.name} but no longer a registered "
             "clip; delete the line if the clip is gone")
     for clip in sorted(current):
-        rendered = (IMAGES / f"{clip}.webm").exists()
+        missing = [
+            name for name in (f"{clip}.webm", f"{clip}_dark.webm",
+                              f"{clip}_es.webm", f"{clip}_es_dark.webm")
+            if not (IMAGES / name).exists()
+        ]
+        if missing:
+            problems.append(
+                f"{clip}: {len(missing)} of its four variants are not "
+                f"committed ({', '.join(missing)})")
         if clip not in stamped:
             problems.append(
                 f"{clip}: no fingerprint recorded"
-                + ("; re-render the clip to stamp it" if rendered
+                + ("; re-render the clip to stamp it" if not missing
                    else " and no clip committed either"))
         elif stamped[clip] != current[clip]:
             problems.append(
