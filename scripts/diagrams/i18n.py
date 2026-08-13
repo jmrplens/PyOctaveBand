@@ -2158,28 +2158,29 @@ _ES: dict[str, str] = {
         "en fase (δ ≈ nλ): hasta +6 dB    ·    en oposición (δ ≈ λ/2 sobre "
         "suelo duro): un mínimo profundo",
     # 2D FDTD wave simulation
-    "Domain  c(x, y), ρ(x, y), dx": "Dominio  c(x, y), ρ(x, y), dx",
+    "Domain  $c(x, y)$, $ρ(x, y)$, $dx$":
+        "Dominio  $c(x, y)$, $ρ(x, y)$, $dx$",
     "square cells; dt from the Courant number":
         "celdas cuadradas; dt desde el número de Courant",
     "Geometry and boundaries": "Geometría y contornos",
     "rigid, impedance or absorbing edges; obstacles":
         "bordes rígidos, de impedancia o absorbentes; obstáculos",
-    "Sources  s(t) injected at cells  (Eq. 4.11-4.12 grid)":
-        "Fuentes  s(t) inyectadas en celdas  (malla de Ec. 4.11-4.12)",
+    "Sources  $s(t)$ injected at cells  (Eq. 4.11-4.12 grid)":
+        "Fuentes  $s(t)$ inyectadas en celdas  (malla de Ec. 4.11-4.12)",
     "Gaussian pulse, ramped tone or arbitrary sampled signal":
         "pulso gaussiano, tono con rampa o señal muestreada arbitraria",
     "Staggered-grid leapfrog update  (Eqs. 4.11-4.12)":
         "Actualización leapfrog en malla escalonada  (Ecs. 4.11-4.12)",
-    "v ← v − (dt/ρ·dx)·grad p,  then  p ← p − (ρc²·dt/dx)·div v":
-        "v ← v − (dt/ρ·dx)·grad p,  y luego  p ← p − (ρc²·dt/dx)·div v",
-    "stable while  CN = c·dt·√2/dx ≤ 1  (Eqs. 4.13-4.14)":
-        "estable mientras  CN = c·dt·√2/dx ≤ 1  (Ecs. 4.13-4.14)",
+    "$v ← v − (dt/ρ·dx)·grad p$,  then  $p ← p − (ρc^2·dt/dx)·div v$":
+        "$v ← v − (dt/ρ·dx)·grad p$,  y luego  $p ← p − (ρc^2·dt/dx)·div v$",
+    "stable while  $CN = c·dt·√2/dx ≤ 1$  (Eqs. 4.13-4.14)":
+        "estable mientras  $CN = c·dt·√2/dx ≤ 1$  (Ecs. 4.13-4.14)",
     "resolve ≥ 10 cells per wavelength to keep dispersion low":
         "resolver ≥ 10 celdas por longitud de onda para baja dispersión",
     "2D acoustic FDTD wave simulation (staggered leapfrog)":
         "Simulación de ondas FDTD acústica 2D (leapfrog escalonado)",
-    "FDTDResult:  probe histories p(t), field snapshots, .plot()":
-        "FDTDResult:  historias de sonda p(t), instantáneas del campo, "
+    "FDTDResult:  probe histories $p(t)$, field snapshots, .plot()":
+        "FDTDResult:  historias de sonda $p(t)$, instantáneas del campo, "
         ".plot()",
     "deterministic: same inputs, bit-identical outputs":
         "determinista: mismas entradas, salidas idénticas bit a bit",
@@ -3833,8 +3834,8 @@ _ES: dict[str, str] = {
         "Campo cercano a lejano: contorno, holguras y ángulos",
     "far-field origin: the centre of the panel face":
         "origen de campo lejano: el centro de la cara del panel",
-    "The far field is evaluated at r → ∞, and lives nowhere on the grid:":
-        "El campo lejano se evalúa en r → ∞ y no vive en ninguna celda:",
+    "The far field is evaluated at $r → ∞$, and lives nowhere on the grid:":
+        "El campo lejano se evalúa en $r → ∞$ y no vive en ninguna celda:",
     "far_field_from_contour propagates the captured phasors with the free-space Green function":
         "far_field_from_contour propaga los fasores con la función de Green de campo libre",
     "sponge, 60 cells": "esponja, 60 celdas",
@@ -3868,23 +3869,27 @@ _ES: dict[str, str] = {
     "evanescent both sides": "evanescente a ambos lados",
     "last fluid row": "última fila de fluido",
     "first solid row": "primera fila de sólido",
-    "A region painted from row i down puts the contact on the":
-        "Una región pintada desde la fila i hacia abajo sitúa el contacto en",
-    "face plane y = i·dx: density averaged arithmetically onto":
-        "el plano de caras y = i·dx: densidad promediada aritméticamente en",
+    "A region painted from row $i$ down puts the contact on the":
+        "Una región pintada desde la fila $i$ hacia abajo sitúa el contacto "
+        "en",
+    "face plane $y = i·dx$: density averaged arithmetically onto":
+        "el plano de caras $y = i·dx$: densidad promediada aritméticamente en",
     "the faces, shear modulus harmonically onto the corners":
         "las caras y módulo de cizalla armónicamente en las esquinas",
     "Sponge bands line the outer edges of every panel; no side is both free and absorbing":
         "Bandas de esponja recubren los bordes exteriores; ningún lado es a la vez libre y absorbente",
+    "$V = (Z_2−Z_1)/(Z_2+Z_1)$ = 0.938":
+        "$V = (Z_2−Z_1)/(Z_2+Z_1)$ = 0,938",
     "no shear is excited, so the steel":
         "no se excita cizalla, así que el acero",
-    "acts as a liquid of its ρ and c_P":
-        "actúa como un líquido de su ρ y c_P",
+    "acts as a liquid of its $ρ$ and $c_P$":
+        "actúa como un líquido de su $ρ$ y $c_P$",
     "critical angles 14.5° and 27.5°": "ángulos críticos 14,5° y 27,5°",
     "between them P is evanescent and": "entre ellos P es evanescente y",
     "the shear wave carries the power": "la onda de cizalla lleva la potencia",
     "over steel the deficit is 0.03 %": "sobre acero el déficit es del 0,03 %",
-    "the tail reaches ~7 λ up, so no": "la cola llega a ~7 λ, así que ningún",
+    "the tail reaches ~7 $λ$ up, so no":
+        "la cola llega a ~7 $λ$, así que ningún",
     "time of flight can separate it": "tiempo de vuelo la separa",
     # Immersed-plate transmission scene (simulation/elastic-waves).
     "Immersed-plate transmission: the strip, the probes and the time gate":
@@ -3899,24 +3904,25 @@ _ES: dict[str, str] = {
     "transmitted ring-down;": "cola transmitida;",
     "no echo in the record": "sin eco en el registro",
     "time [µs]": "tiempo [µs]",
-    "I from the gated probe A, T from probe B":
-        "I de la sonda A enventanada, T de la sonda B",
+    "$I$ from the gated probe A, $T$ from probe B":
+        "$I$ de la sonda A enventanada, $T$ de la sonda B",
     "Inside the plate, at half-wave thickness":
         "Dentro de la placa, a espesor de media onda",
-    "f_n = n c_P / (2h) = 295 kHz for 10 mm of steel":
-        "f_n = n c_P / (2h) = 295 kHz para 10 mm de acero",
+    "$f_n = n c_P / (2h)$ = 295 kHz for 10 mm of steel":
+        "$f_n = n c_P / (2h)$ = 295 kHz para 10 mm de acero",
     "the plate goes transparent there, three decades above audio":
         "allí la placa se vuelve transparente, tres décadas sobre el audio",
     "1.5 mm plane pulse at 0.25 m": "pulso plano 1,5 mm en 0,25 m",
     "one-way; usable to 340 kHz": "unidireccional; hasta 340 kHz",
     "probe A, 30 mm above": "sonda A, 30 mm por encima",
-    "10 mm STEEL at y = 0.35 m": "STEEL de 10 mm en y = 0,35 m",
+    "10 mm STEEL at $y$ = 0.35 m": "STEEL de 10 mm en $y$ = 0,35 m",
     "painted into WATER": "pintado dentro de WATER",
     "probe B, 50 mm below": "sonda B, 50 mm por debajo",
     "probe A": "sonda A",
     "probe B": "sonda B",
     # Mathematics that reads the same in both languages.
-    "TL(f) = 20 log₁₀ |I(f) / T(f)|": "TL(f) = 20 log₁₀ |I(f) / T(f)|",
+    "$TL(f) = 20 log_{10} |I(f) / T(f)|$":
+        "$TL(f) = 20 log_{10} |I(f) / T(f)|$",
     # Infrasound measurement chain (signals/levels/special-weightings).
     "Measuring infrasound: the chain that must deliver 0,25 Hz":
         "Medir infrasonido: la cadena que debe llegar a 0,25 Hz",

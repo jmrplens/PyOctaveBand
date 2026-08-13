@@ -44,6 +44,226 @@ DARK = Theme(
 _FONT = "Segoe UI, Helvetica, Arial, sans-serif"
 _MONO = "Consolas, Menlo, monospace"
 
+#: Combining diacritics a symbol may carry (T̂, L̄, x̃); each travels with
+#: the base letter it modifies, so the pair styles as one glyph. Circumflex,
+#: macron, overline, dot above, tilde, acute, grave, breve and dot below.
+_COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
+
+#: The letter runs a sub/superscript sets upright: the descriptive
+#: subscripts of the corpus, printed in roman by the standards that define
+#: them -- weightings, averages and exposure (Aeq, eq, EQ, EX), extremes
+#: and bounds (max, MAX, min, upper, lower, low, high, limit), qualifiers
+#: (ref, rms, tot, TOT, eff, mod, norm, spec, inst, cal, tab, cum, ss,
+#: shadow, co, tr, diff, ff, ax, SN, CS, MS), the hand-arm/whole-body
+#: vibration axes of ISO 5349 and ISO 2631 (hv, hwx, hwy, hwz, wx, wy, wz),
+#: and the Spanish twins the i18n table sets beside them (sup for upper,
+#: ef for eff). Every other letter run inside a script is an index and is
+#: set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a subscript
+#: that abbreviates a word, never for letter-indices.
+_ROMAN_SCRIPTS = frozenset((
+    "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
+    "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "ef", "mod",
+    "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
+    "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
+    "wx", "wy", "wz",
+))
+
+#: Script metrics of the ``$...$`` composer, as fractions of the font size:
+#: how far a subscript drops, how far a superscript rises, and the glyph
+#: scale of both.
+_SUB_DROP = 0.22
+_SUP_RISE = -0.38
+_SCRIPT_SCALE = 0.70
+
+#: Font size of the title :meth:`SVG.render` sets across the top. The
+#: ``$...$`` composer scales scripts against the size the ``<text>`` is
+#: given, so the two must always be the same number.
+_TITLE_SIZE = 26
+
+
+def _esc(s: str) -> str:
+    """Escape XML metacharacters so labels may contain <, > and & literally."""
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]]:
+    """Split one math run into ``(kind, text)`` chunks.
+
+    ``var`` is set in italic: at the baseline a single letter -- Latin or
+    Greek, with any combining marks -- and at script level (*script* true,
+    tokenizing the payload of a ``_``/``^``) also letter runs, which there
+    are indices (``$K_{ij}$``), unless the run is one of the descriptive
+    subscripts of :data:`_ROMAN_SCRIPTS` (``$L_{Aeq}$``). ``up`` stays
+    upright: digits, operators, primes, brackets, and at the baseline runs
+    of two or more Latin letters, which are operator names and acronyms
+    (log, grad, CN), never products; a product of two symbols is written
+    with an explicit space or middle dot between them. ``sub`` and ``sup``
+    carry the payload of ``_``/``^``, braced or single character, to be
+    tokenized again at script size.
+
+    Malformed markup raises :class:`ValueError` naming the whole string *s*
+    and the offending piece, so a typo breaks the generation instead of
+    publishing a silently mis-set diagram: a multi-character script written
+    without braces (``f_max`` sets only the f-m pair and pushes "ax" back to
+    the baseline), a comma glued to an unbraced script (``L_p,s`` would push
+    ",s" back to the baseline; spaced-off commas as in ``a_x , a_y`` stay
+    legal), a script marker with an empty payload (``L_``, ``L_{}``), an
+    unclosed script brace, and a script inside a script (``L_{p_1}``),
+    which the composer cannot set.
+    """
+    out: list[tuple[str, str]] = []
+    i = 0
+    while i < len(run):
+        ch = run[i]
+        if ch in "_^":
+            if script:
+                raise ValueError(
+                    f"nested script {run[i:]!r} inside a script of {s!r}: "
+                    "the composer sets a single script level"
+                )
+            kind = "sub" if ch == "_" else "sup"
+            if i + 1 == len(run):
+                raise ValueError(
+                    f"empty script {ch!r} at the end of a math run in {s!r}"
+                )
+            if run[i + 1] == "{":
+                end = run.find("}", i + 2)
+                if end < 0:
+                    raise ValueError(
+                        f"unclosed script brace {run[i:]!r} in {s!r}"
+                    )
+                if end == i + 2:
+                    raise ValueError(
+                        f"empty script {run[i:end + 1]!r} in {s!r}"
+                    )
+                out.append((kind, run[i + 2:end]))
+                i = end + 1
+            else:
+                nxt = run[i + 2:i + 3]
+                if nxt == "(":
+                    raise ValueError(
+                        f"ambiguous script {run[i:i + 2]!r} before '(' in "
+                        f"{s!r}: brace the script and keep the argument "
+                        f"outside, as {ch}{{{run[i + 1]}}}(...)"
+                    )
+                if nxt.isalnum():
+                    j = i + 2
+                    while j < len(run) and run[j].isalnum():
+                        j += 1
+                    raise ValueError(
+                        f"ambiguous script {run[i:j]!r} in {s!r}: only "
+                        f"{run[i + 1]!r} would attach to {ch!r}, brace the "
+                        f"whole script as {ch}{{...}}"
+                    )
+                if nxt == "," and i + 3 < len(run) and run[i + 3].isalnum():
+                    j = i + 3
+                    while j < len(run) and (run[j].isalnum()
+                                            or run[j] == ","):
+                        j += 1
+                    raise ValueError(
+                        f"ambiguous comma {run[i:j]!r} in {s!r}: glued to "
+                        f"the script it reads as part of the subscript, "
+                        f"write {ch}{{{run[i + 1]},...}} or space the "
+                        "comma off"
+                    )
+                out.append((kind, run[i + 1:i + 2]))
+                i += 2
+        elif ch.isalpha():
+            latin = ch.isascii()
+            j = i + 1
+            while j < len(run) and (
+                run[j] in _COMBINING
+                or (latin and run[j].isascii() and run[j].isalpha())
+            ):
+                j += 1
+            if script:
+                kind = "up" if run[i:j] in _ROMAN_SCRIPTS else "var"
+            else:
+                letters = sum(1 for c in run[i:j] if c not in _COMBINING)
+                kind = "var" if letters == 1 else "up"
+            out.append((kind, run[i:j]))
+            i = j
+        else:
+            j = i
+            while j < len(run) and run[j] not in "_^" and not run[j].isalpha():
+                j += 1
+            out.append(("up", run[i:j]))
+            i = j
+    return out
+
+
+def _math_spans(s: str, size: int) -> str:
+    """Compose a translated ``$...$`` string into styled ``<tspan>`` runs.
+
+    Prose outside the ``$...$`` spans stays upright at the baseline; inside
+    them variables are italicised and ``_``/``^`` scripts are dropped or
+    raised via ``dy`` at reduced size, with the offset restored on the next
+    run. No tspan carries an ``x`` of its own, so the whole string remains
+    one text chunk and ``text-anchor`` keeps working. The caller must put
+    ``xml:space="preserve"`` on the wrapping ``<text>``: without it librsvg
+    collapses every space at a tspan boundary, even NBSP. Radicals keep the
+    house spelling ``√(...)``; there are no commands, every glyph is
+    literal, and a backslash in a math run is an error -- the LaTeX
+    commands of the matplotlib figures do not exist here.
+
+    Script policy: inside a ``_``/``^`` script, letters are indices and are
+    set in italic (``$K_{ij}$``, ``$η_{ij}$``), except the descriptive
+    subscripts curated in :data:`_ROMAN_SCRIPTS`, which are abbreviations
+    of words and stay upright as the standards print them (``$L_{Aeq}$``,
+    ``$f_{max}$``). At the baseline the opposite rule holds: a run of two
+    or more Latin letters is an operator name or an acronym (log, grad,
+    CN, TL) and stays upright, single letters are italic variables. The
+    grid steps ``dx``/``dt`` follow that baseline rule inside a formula
+    (upright, per the roman d of ISO 80000-2); in plain prose ("dt from
+    the Courant number") they are not mathematics and take no ``$...$``.
+    """
+    segments = s.split("$")
+    if len(segments) % 2 == 0:
+        raise ValueError(f"unbalanced $ markup in {s!r}")
+    chunks: list[tuple[str, bool, float, float]] = []
+
+    def add(text: str, italic: bool = False, shift: float = 0.0,
+            scale: float = 1.0) -> None:
+        if not text:
+            return
+        if chunks and chunks[-1][1:] == (italic, shift, scale):
+            chunks[-1] = (chunks[-1][0] + text, italic, shift, scale)
+        else:
+            chunks.append((text, italic, shift, scale))
+
+    for k, segment in enumerate(segments):
+        if k % 2 == 0:
+            add(segment)
+            continue
+        if "\\" in segment:
+            raise ValueError(
+                f"backslash in math run {segment!r} of {s!r}: there are no "
+                "commands here, write the glyph itself (θ, √, ·, …)"
+            )
+        for kind, payload in _math_tokens(segment, s):
+            if kind in ("var", "up"):
+                add(payload, italic=kind == "var")
+            else:
+                shift = _SUB_DROP if kind == "sub" else _SUP_RISE
+                for kind2, payload2 in _math_tokens(payload, s, script=True):
+                    add(payload2, italic=kind2 == "var", shift=shift,
+                        scale=_SCRIPT_SCALE)
+
+    parts: list[str] = []
+    baseline = 0.0
+    for text, italic, shift, scale in chunks:
+        attrs: list[str] = []
+        dy = (shift - baseline) * size
+        baseline = shift
+        if abs(dy) > 1e-9:
+            attrs.append(f' dy="{dy:.1f}"')
+        if scale != 1.0:
+            attrs.append(f' font-size="{size * scale:.1f}"')
+        if italic:
+            attrs.append(' font-style="italic"')
+        parts.append(f'<tspan{"".join(attrs)}>{_esc(text)}</tspan>')
+    return "".join(parts)
+
 
 class SVG:
     """Tiny element accumulator with technical-drawing helpers."""
@@ -90,14 +310,20 @@ class SVG:
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
         s = self.tr(s)
-        # Escape XML metacharacters so labels may contain <, > and & literally.
-        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         fill = fill or self.th.fg
         w = ' font-weight="600"' if bold else ""
+        if "$" in s:
+            # Composed mathematics: ``mono`` and ``italic`` do not apply,
+            # the markup styles every glyph run itself (see _math_spans).
+            self.add(f'<text x="{x}" y="{y}" font-family="{_FONT}" '
+                     f'font-size="{size}" fill="{fill}" '
+                     f'text-anchor="{anchor}"{w} xml:space="preserve">'
+                     f'{_math_spans(s, size)}</text>')
+            return
         i = ' font-style="italic"' if italic else ""
         fam = _MONO if mono else _FONT
         self.add(f'<text x="{x}" y="{y}" font-family="{fam}" font-size="{size}" '
-                 f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{s}</text>')
+                 f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{_esc(s)}</text>')
 
     def path(self, d: str, fill: str = "none", stroke: str = "none",
              sw: float = 1.5, dash: str = "") -> None:
@@ -193,14 +419,15 @@ class SVG:
 
     def render(self, title: str) -> str:
         th = self.th
-        t = (self.tr(title).replace("&", "&amp;").replace("<", "&lt;")
-             .replace(">", "&gt;"))
+        t = self.tr(title)
+        body = (f' xml:space="preserve">{_math_spans(t, _TITLE_SIZE)}'
+                if "$" in t else f'>{_esc(t)}')
         head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
                 f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
                 f'<text x="{self.w / 2}" y="30" font-family="{_FONT}" '
-                f'font-size="26" font-weight="600" fill="{th.fg}" '
-                f'text-anchor="middle">{t}</text>')
+                f'font-size="{_TITLE_SIZE}" font-weight="600" fill="{th.fg}" '
+                f'text-anchor="middle"{body}</text>')
         return head + "".join(self.parts) + "</svg>"
 
 
