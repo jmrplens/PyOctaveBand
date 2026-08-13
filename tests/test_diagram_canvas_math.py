@@ -320,4 +320,6 @@ def test_composition_is_deterministic() -> None:
         svg.text(450, 130, "$TL(f) = 20 log_{10} |I(f) / T(f)|$", size=20)
         return svg.render("A title with $f_c$ inside")
 
-    assert build() == build()
+    first = build()
+    second = build()
+    assert first == second

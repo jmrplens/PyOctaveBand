@@ -75,6 +75,11 @@ _SUB_DROP = 0.22
 _SUP_RISE = -0.38
 _SCRIPT_SCALE = 0.70
 
+#: Font size of the title :meth:`SVG.render` sets across the top. The
+#: ``$...$`` composer scales scripts against the size the ``<text>`` is
+#: given, so the two must always be the same number.
+_TITLE_SIZE = 26
+
 
 def _esc(s: str) -> str:
     """Escape XML metacharacters so labels may contain <, > and & literally."""
@@ -415,13 +420,13 @@ class SVG:
     def render(self, title: str) -> str:
         th = self.th
         t = self.tr(title)
-        body = (f' xml:space="preserve">{_math_spans(t, 26)}' if "$" in t
-                else f'>{_esc(t)}')
+        body = (f' xml:space="preserve">{_math_spans(t, _TITLE_SIZE)}'
+                if "$" in t else f'>{_esc(t)}')
         head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
                 f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
                 f'<text x="{self.w / 2}" y="30" font-family="{_FONT}" '
-                f'font-size="26" font-weight="600" fill="{th.fg}" '
+                f'font-size="{_TITLE_SIZE}" font-weight="600" fill="{th.fg}" '
                 f'text-anchor="middle"{body}</text>')
         return head + "".join(self.parts) + "</svg>"
 
