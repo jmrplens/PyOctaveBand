@@ -702,7 +702,7 @@ L 611.652344 68.422032
      </g>
     </g>
     <g id="text_19">
-     <!-- Ancho de banda rectangular equivalente ERB$_N$ [Hz] -->
+     <!-- Ancho de banda rectangular equivalente $\mathrm{ERB}_N$ [Hz] -->
      <g transform="translate(14.8 352.138125) rotate(-90)">
       <text>
        <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif">A</tspan>
@@ -836,15 +836,15 @@ L 349.727141 248.481054
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 59.952344 91.520938 
-L 229.512344 91.520938 
-Q 231.312344 91.520938 231.312344 89.720937 
+     <path d="M 59.952344 91.522344 
+L 229.512344 91.522344 
+Q 231.312344 91.522344 231.312344 89.722344 
 L 231.312344 63.618125 
 Q 231.312344 61.818125 229.512344 61.818125 
 L 59.952344 61.818125 
 Q 58.152344 61.818125 58.152344 63.618125 
-L 58.152344 89.720937 
-Q 58.152344 91.520938 59.952344 91.520938 
+L 58.152344 89.722344 
+Q 58.152344 91.522344 59.952344 91.522344 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
@@ -855,7 +855,7 @@ L 79.752344 69.108125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <!-- ERB$_N$ (Glasberg y Moore, 1990) -->
+     <!-- $\mathrm{ERB}_N$ (Glasberg y Moore, 1990) -->
      <g transform="translate(86.952344 72.258125)">
       <text>
        <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">E</tspan>
@@ -891,13 +891,45 @@ L 79.752344 69.108125
      </g>
     </g>
     <g id="line2d_102">
-     <path d="M 61.752344 82.608828 
-L 70.752344 82.608828 
-L 79.752344 82.608828 
+     <path d="M 61.752344 82.610234 
+L 70.752344 82.610234 
+L 79.752344 82.610234 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.6"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="86.952344" y="85.758828" transform="rotate(-0 86.952344 85.758828)">Tercio de octava (23 % de f)</text>
+     <!-- Tercio de octava (23 % de $f$) -->
+     <g transform="translate(86.952344 85.760234)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">T</tspan>
+       <tspan x="4.497559" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="10.034668" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="13.734863" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="18.683105" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="21.183594" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="26.689941" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="29.550781" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="35.263672" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="40.800781" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="43.661621" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="49.167969" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="54.116211" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="57.64502" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="63.160156" y="-0.15625" style="font-size: 9px; font-family: sans-serif">v</tspan>
+       <tspan x="68.486328" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="74.001465" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="76.862305" y="-0.15625" style="font-size: 9px; font-family: sans-serif">(</tspan>
+       <tspan x="80.373535" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+       <tspan x="86.099609" y="-0.15625" style="font-size: 9px; font-family: sans-serif">3</tspan>
+       <tspan x="91.825684" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="94.686523" y="-0.15625" style="font-size: 9px; font-family: sans-serif">%</tspan>
+       <tspan x="103.238281" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="106.099121" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="111.812012" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="117.349121" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="123.378418" y="-0.15625" style="font-size: 9px; font-family: sans-serif">)</tspan>
+       <tspan x="120.209961" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">f</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="line2d_103">
@@ -1032,7 +1064,7 @@ L 542.470444 57.318125
      </g>
     </g>
     <g id="text_31">
-     <!-- Número ERB$_N$ [Cam] -->
+     <!-- Número $\mathrm{ERB}_N$ [Cam] -->
      <g style="fill: #2ca02c" transform="translate(281.402344 36.318125)">
       <text>
        <tspan x="0" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #2ca02c">N</tspan>

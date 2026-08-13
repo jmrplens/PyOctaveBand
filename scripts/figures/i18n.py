@@ -1117,14 +1117,16 @@ _ES_EXACT = {
     "ISO/PAS 20065 Tonal Audibility": "Audibilidad tonal ISO/PAS 20065",
     r"Audibility $\Delta L$ [dB]": r"Audibilidad $\Delta L$ [dB]",
     r"threshold $\Delta L = 0$ dB": r"umbral $\Delta L = 0$ dB",
-    # The formula box: only the parenthetical tail carries language, and
-    # the saver's decimal-comma pass restyles the digits.
-    "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69\n"
-    "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)\n"
-    "dL = LT - LG - av  (combustion engine, Annex E)":
-        "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69\n"
-        "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)\n"
-        "dL = LT - LG - av  (motor de combustión, Anexo E)",
+    # The formula box: only the parenthetical tail carries language; the
+    # mathtext keeps the comma pass out, so the Spanish twin bakes {,}.
+    "$d\\!f_c = 25 + 75\\,(1 + 1.4\\,(f_T/1000)^2)^{0.69}$\n"
+    "$L_G = L_S + 10\\,\\log_{10}(d\\!f_c/d\\!f)$,"
+    "  $a_v = -2 - \\log_{10}(1 + (f/502)^{2.5})$\n"
+    "$\\Delta L = L_T - L_G - a_v$  (combustion engine, Annex E)":
+        "$d\\!f_c = 25 + 75\\,(1 + 1{,}4\\,(f_T/1000)^2)^{0{,}69}$\n"
+        "$L_G = L_S + 10\\,\\log_{10}(d\\!f_c/d\\!f)$,"
+        "  $a_v = -2 - \\log_{10}(1 + (f/502)^{2{,}5})$\n"
+        "$\\Delta L = L_T - L_G - a_v$  (motor de combustión, Anexo E)",
     # facade_prediction figure (EN 12354-3 Annex F)
     "EN 12354-3 Façade Sound Insulation (Annex F example)":
         "Aislamiento acústico de fachada EN 12354-3 (ejemplo del Anexo F)",
@@ -1368,13 +1370,20 @@ _ES_EXACT = {
     "Bin power [dB]": "Potencia por bin [dB]",
     "Specific Loudness Pattern (ISO 532-1 Zwicker)":
         "Patr\u00f3n de sonoridad espec\u00edfica (Zwicker, ISO 532-1)",
+    # The plain critical-band pair stays for the clips (schematics.py);
+    # the static figures now set the same labels in mathtext.
     "Critical-band rate z [Bark]": "Raz\u00f3n de banda cr\u00edtica z [Bark]",
+    "Critical-band rate $z$ [Bark]": "Raz\u00f3n de banda cr\u00edtica $z$ [Bark]",
     "Specific loudness N' [sone/Bark]":
         "Sonoridad espec\u00edfica N' [sonios/Bark]",
-    "Shaded area = total loudness N": "\u00c1rea sombreada = sonoridad total N",
+    "Specific loudness $N\u2032$ [sone/Bark]":
+        "Sonoridad espec\u00edfica $N\u2032$ [sonios/Bark]",
+    "Shaded area = total loudness $N$":
+        "\u00c1rea sombreada = sonoridad total $N$",
     "STI vs Reverberation Time (IEC 60268-16)":
         "STI frente al tiempo de reverberaci\u00f3n (IEC 60268-16)",
-    "Reverberation time T60 [s]": "Tiempo de reverberaci\u00f3n T60 [s]",
+    "Reverberation time $T_{60}$ [s]":
+        "Tiempo de reverberaci\u00f3n $T_{60}$ [s]",
     "Analytic Schroeder MTF (closed form)":
         "MTF de Schroeder anal\u00edtica (forma cerrada)",
     "Measured (sti_from_impulse_response)":
@@ -1525,13 +1534,13 @@ _ES_EXACT = {
     "Clean reference": "Referencia limpia",
     "Segment score": "Puntuación por segmento",
     "dropout": "corte",
-    "the 30 dB window: Di − 15 to Di + 15":
-        "la ventana de 30 dB: de Di − 15 a Di + 15",
-    "speech Ei'": "voz Ei'",
-    "external noise Ni'": "ruido externo Ni'",
-    "equivalent masking Zi": "enmascaramiento equivalente Zi",
-    "equivalent disturbance Di": "perturbación equivalente Di",
-    "Band audibility Ai": "Audibilidad de banda Ai",
+    "the 30 dB window: $D_i - 15$ to $D_i + 15$":
+        "la ventana de 30 dB: de $D_i - 15$ a $D_i + 15$",
+    "speech $E_i′$": "voz $E_i′$",
+    "external noise $N_i′$": "ruido externo $N_i′$",
+    "equivalent masking $Z_i$": "enmascaramiento equivalente $Z_i$",
+    "equivalent disturbance $D_i$": "perturbación equivalente $D_i$",
+    # "Band audibility $A_i$" already pairs above for the SII bars figure.
     "Equivalent spectrum level [dB]": "Nivel de espectro equivalente [dB]",
     "The octave procedure carries no spread of masking":
         "El procedimiento por octavas no incluye la extensión del enmascaramiento",
@@ -1545,11 +1554,14 @@ _ES_EXACT = {
         "Reverberación: una frecuencia de corte que se desplaza",
     "Steady noise: the same curve, scaled down":
         "Ruido estacionario: la misma curva, escalada",
+    # The plain modulation-frequency pair stays for the clips
+    # (schematics.py); the static figures now set the label in mathtext.
     "Modulation frequency F [Hz]": "Frecuencia de modulación F [Hz]",
-    "Modulation transfer m (1 kHz band)":
-        "Transferencia de modulación m (banda de 1 kHz)",
-    "STIPA probes only these two F in this band":
-        "STIPA solo sondea estas dos F en esta banda",
+    "Modulation frequency $F$ [Hz]": "Frecuencia de modulación $F$ [Hz]",
+    "Modulation transfer $m$ (1 kHz band)":
+        "Transferencia de modulación $m$ (banda de 1 kHz)",
+    "STIPA probes only these two $F$ in this band":
+        "STIPA solo sondea estas dos $F$ en esta banda",
     # anim_modulation_transfer: the envelope clip of speech-transmission.
     "The modulation transfer function on the envelope (IEC 60268-16)":
         "La función de transferencia de modulación sobre la envolvente "
@@ -1572,7 +1584,7 @@ _ES_EXACT = {
         "Ahora se fija la sala y el ruido se lleva parte del nivel",
     "Noise raises a floor under the same mean: m falls again":
         "El ruido levanta un suelo bajo la misma media: m vuelve a caer",
-    "noise-free (T60 = 0.9 s)": "sin ruido (T60 = 0,9 s)",
+    "noise-free ($T_{60}$ = 0.9 s)": "sin ruido ($T_{60}$ = 0,9 s)",
     r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$":
         r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: constante en $F$",
     "One impulse response against the level it is played at":
@@ -1626,9 +1638,9 @@ _ES_EXACT = {
     "Age component $H$ (HTLA) [dB]": "Componente de edad $H$ (HTLA) [dB]",
     "Noise component $N$ (NIPTS) [dB]":
         "Componente de ruido $N$ (NIPTS) [dB]",
-    "the worked case: H = 20.2, N = 24.8\n45.0 dB sum → 40.8 dB HTLAN, "
+    "the worked case: $H$ = 20.2, $N$ = 24.8\n45.0 dB sum → 40.8 dB HTLAN, "
     "4.2 dB removed":
-        "el caso del ejemplo: H = 20,2, N = 24,8\n"
+        "el caso del ejemplo: $H$ = 20,2, $N$ = 24,8\n"
         "suma de 45,0 dB → 40,8 dB de HTLAN, 4,2 dB restados",
     "GUM uncertainty budget": "Presupuesto de incertidumbre (GUM)",
     "Contribution to combined uncertainty [dB]":
@@ -1667,10 +1679,10 @@ _ES_EXACT = {
     # Rating statement, symbols only: reads the same in Spanish.
     "$R_w$ ($C$ ; $C_{tr}$) = 30 (−2 ; −3) dB":
         "$R_w$ ($C$ ; $C_{tr}$) = 30 (−2 ; −3) dB",
-    "Sharpness Weighting g(z) (DIN 45692)":
-        "Ponderación de agudeza g(z) (DIN 45692)",
-    "Weighting g(z)": "Ponderación g(z)",
-    "DIN 45692 g(z)": "g(z) DIN 45692",
+    "Sharpness Weighting $g(z)$ (DIN 45692)":
+        "Ponderación de agudeza $g(z)$ (DIN 45692)",
+    "Weighting $g(z)$": "Ponderación $g(z)$",
+    "DIN 45692 $g(z)$": "$g(z)$ DIN 45692",
     "von Bismarck (Annex B)": "von Bismarck (Anexo B)",
     "DIN knee\n15.8 Bark": "Codo DIN\n15,8 Bark",
     "Bismarck knee\n15 Bark": "Codo Bismarck\n15 Bark",
@@ -1759,17 +1771,18 @@ _ES_EXACT = {
     "Auditory-Filter Bandwidth and the Cam Scale (Glasberg & Moore, 1990)":
         "Ancho de banda del filtro auditivo y escala Cam (Glasberg y Moore, 1990)",
     "Centre frequency [Hz]": "Frecuencia central [Hz]",
-    "Equivalent rectangular bandwidth ERB$_N$ [Hz]":
-        "Ancho de banda rectangular equivalente ERB$_N$ [Hz]",
-    "ERB$_N$ (Glasberg & Moore, 1990)": "ERB$_N$ (Glasberg y Moore, 1990)",
-    "One-third octave (23 % of f)": "Tercio de octava (23 % de f)",
-    "ERB$_N$ number [Cam]": "Número ERB$_N$ [Cam]",
+    r"Equivalent rectangular bandwidth $\mathrm{ERB}_N$ [Hz]":
+        r"Ancho de banda rectangular equivalente $\mathrm{ERB}_N$ [Hz]",
+    r"$\mathrm{ERB}_N$ (Glasberg & Moore, 1990)":
+        r"$\mathrm{ERB}_N$ (Glasberg y Moore, 1990)",
+    "One-third octave (23 % of $f$)": "Tercio de octava (23 % de $f$)",
+    r"$\mathrm{ERB}_N$ number [Cam]": r"Número $\mathrm{ERB}_N$ [Cam]",
     "1 kHz = 15.59 Cam": "1 kHz = 15,59 Cam",
     # --- Advanced psychoacoustics figures (plan-17 block A) ---
     "Loudness Models Compared (1 kHz tone)":
         "Modelos de sonoridad comparados (tono de 1 kHz)",
     "Sound pressure level [dB SPL]": "Nivel de presión acústica [dB SPL]",
-    "Total loudness N [sone]": "Sonoridad total N [sonios]",
+    "Total loudness $N$ [sone]": "Sonoridad total $N$ [sonios]",
     "Sottek ECMA-418-2": "Sottek ECMA-418-2",
     "Anchor: 1 kHz / 40 dB = 1 sone":
         "Anclaje: 1 kHz / 40 dB = 1 sonio",
@@ -1777,26 +1790,27 @@ _ES_EXACT = {
         "Los modelos divergen a niveles altos",
     "Sottek Specific Loudness (ECMA-418-2)":
         "Sonoridad específica de Sottek (ECMA-418-2)",
-    "Specific loudness N' [sone_HMS/Bark]":
-        "Sonoridad específica N' [sonios_HMS/Bark]",
+    r"Specific loudness $N′$ [$\mathrm{sone}_{\mathrm{HMS}}$/Bark]":
+        r"Sonoridad específica $N′$ [$\mathrm{sonios}_{\mathrm{HMS}}$/Bark]",
     "Peak specific loudness": "Sonoridad específica máxima",
-    "ECMA-418-2 Tonality T(t)": "Tonalidad T(t) (ECMA-418-2)",
-    "Tonality T [tu_HMS]": "Tonalidad T [tu_HMS]",
+    "ECMA-418-2 Tonality $T(t)$": "Tonalidad $T(t)$ (ECMA-418-2)",
+    r"Tonality $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]":
+        r"Tonalidad $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]",
     "ECMA-418-2 Roughness vs Modulation Frequency":
         "Aspereza vs frecuencia de modulación (ECMA-418-2)",
-    "Modulation frequency f_mod [Hz]":
-        "Frecuencia de modulación f_mod [Hz]",
-    "Roughness R [asper]": "Aspereza R [asper]",
+    r"Modulation frequency $f_{\mathrm{mod}}$ [Hz]":
+        r"Frecuencia de modulación $f_{\mathrm{mod}}$ [Hz]",
+    "Roughness $R$ [asper]": "Aspereza $R$ [asper]",
     "1 kHz carrier, 100 % AM": "Portadora de 1 kHz, AM del 100 %",
     "Sound Quality Metrics (ECMA-418-2 Sottek Hearing Model)":
         "Métricas de calidad sonora (modelo auditivo de Sottek, ECMA-418-2)",
     "Slow vs Fast Modulation Perception (ECMA-418-2 Sottek Hearing Model)":
         "Percepción de modulación lenta vs rápida (modelo auditivo de "
         "Sottek, ECMA-418-2)",
-    "Fluctuation strength F (Clause 9, slow modulation)":
-        "Intensidad de fluctuación F (cláusula 9, modulación lenta)",
-    "Roughness R (Clause 7, fast modulation)":
-        "Aspereza R (cláusula 7, modulación rápida)",
+    "Fluctuation strength $F$ (Clause 9, slow modulation)":
+        "Intensidad de fluctuación $F$ (cláusula 9, modulación lenta)",
+    "Roughness $R$ (Clause 7, fast modulation)":
+        "Aspereza $R$ (cláusula 7, modulación rápida)",
     "1 kHz carrier, 100 % AM, overall 60 dB SPL":
         "Portadora de 1 kHz, AM del 100 %, 60 dB SPL globales",
     "Time-Varying Loudness (ISO 532-3)":
@@ -1808,36 +1822,37 @@ _ES_EXACT = {
     # Fluctuation strength + psychoacoustic annoyance (Fastl & Zwicker; Osses 2016)
     "Fluctuation Strength — 4 Hz Band-Pass Characteristic":
         "Intensidad de fluctuación — característica de paso de banda a 4 Hz",
-    "Fluctuation strength F [vacil]": "Intensidad de fluctuación F [vacil]",
+    "Fluctuation strength $F$ [vacil]":
+        "Intensidad de fluctuación $F$ [vacil]",
     "AM-tone F, signal model [vacil]":
         "F de tono AM, modelo de señal [vacil]",
     "4 Hz reference": "referencia 4 Hz",
     "Psychoacoustic Annoyance vs Loudness (Fastl & Zwicker)":
         "Molestia psicoacústica vs sonoridad (Fastl y Zwicker)",
-    "Percentile loudness N5 [sone]": "Sonoridad percentil N5 [sonios]",
+    "Percentile loudness $N_5$ [sone]": "Sonoridad percentil $N_5$ [sonios]",
     "Psychoacoustic annoyance PA": "Molestia psicoacústica PA",
-    "Baseline: S = 1.75 acum, F = R = 0":
-        "Base: S = 1,75 acum, F = R = 0",
-    "Sharp: S = 3.5 acum": "Aguda: S = 3,5 acum",
-    "Rough + fluctuating: F = 1.2 vacil, R = 0.7 asper":
-        "Áspera + fluctuante: F = 1,2 vacil, R = 0,7 asper",
+    "Baseline: $S$ = 1.75 acum, $F = R = 0$":
+        "Base: $S$ = 1,75 acum, $F = R = 0$",
+    "Sharp: $S$ = 3.5 acum": "Aguda: $S$ = 3,5 acum",
+    "Rough + fluctuating: $F$ = 1.2 vacil, $R$ = 0.7 asper":
+        "Áspera + fluctuante: $F$ = 1,2 vacil, $R$ = 0,7 asper",
     # zwicker_time_varying: the clause 6 trace and its percentiles
     "Time-Varying Loudness and the Percentiles (ISO 532-1 clause 6)":
         "Sonoridad variable en el tiempo y los percentiles "
         "(ISO 532-1, apartado 6)",
     "1 kHz bursts stepping 45 to 85 dB":
         "Ráfagas de 1 kHz que suben de 45 a 85 dB",
-    "Loudness-vs-time N(t), 2 ms steps":
-        "Sonoridad frente al tiempo N(t), pasos de 2 ms",
-    "Loudness N [sone]": "Sonoridad N [sonios]",
-    "Percentage of the analysis time exceeding N [%]":
-        "Porcentaje del tiempo de análisis que supera N [%]",
+    "Loudness-vs-time $N(t)$, 2 ms steps":
+        "Sonoridad frente al tiempo $N(t)$, pasos de 2 ms",
+    "Loudness $N$ [sone]": "Sonoridad $N$ [sonios]",
+    "Percentage of the analysis time exceeding $N$ [%]":
+        "Porcentaje del tiempo de análisis que supera $N$ [%]",
     # sharpness_pair_and_targets (DIN 45692)
     "Sharpness: Where the Loudness Sits, Not How Much There Is":
         "Agudeza: dónde se sitúa la sonoridad, no cuánta hay",
     "Equally loud, seven times as sharp":
         "Igual de sonoras, siete veces más agudas",
-    "Sharpness S [acum]": "Agudeza S [acum]",
+    "Sharpness $S$ [acum]": "Agudeza $S$ [acum]",
     "DIN 45692 Table A.2, 250 Hz to 4 kHz":
         "Tabla A.2 de DIN 45692, de 250 Hz a 4 kHz",
     "Table A.2 hearing-test targets":
@@ -1858,19 +1873,25 @@ _ES_EXACT = {
     "Average specific roughness": "Aspereza específica media",
     "Average specific fluctuation strength":
         "Intensidad de fluctuación específica media",
-    "Critical-band rate z [Bark_HMS]": "Razón de banda crítica z [Bark_HMS]",
-    "Specific roughness R'(z) [asper/Bark_HMS]":
-        "Aspereza específica R'(z) [asper/Bark_HMS]",
-    "Specific fluctuation strength F'(z) [vacil_HMS/Bark_HMS]":
-        "Intensidad de fluctuación específica F'(z) [vacil_HMS/Bark_HMS]",
-    "Fluctuation strength F [vacil_HMS]":
-        "Intensidad de fluctuación F [vacil_HMS]",
+    r"Critical-band rate $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]":
+        r"Razón de banda crítica $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Specific roughness $R′(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]":
+        r"Aspereza específica $R′(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Specific fluctuation strength $F′(z)$ "
+    r"[$\mathrm{vacil}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]":
+        r"Intensidad de fluctuación específica $F′(z)$ "
+        r"[$\mathrm{vacil}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Fluctuation strength $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]":
+        r"Intensidad de fluctuación $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]",
     "The single value is a percentile of this trace":
         "El valor único es un percentil de esta traza",
-    "R(l50), the running value": "R(l50), el valor dependiente del tiempo",
-    "F(l50), the running value": "F(l50), el valor dependiente del tiempo",
+    "$R(l_{50})$, the running value":
+        "$R(l_{50})$, el valor dependiente del tiempo",
+    "$F(l_{50})$, the running value":
+        "$F(l_{50})$, el valor dependiente del tiempo",
     # hms_modulation_bandpass ylabel: symbols and units read the same
-    "F [vacil_HMS] / R [asper]": "F [vacil_HMS] / R [asper]",
+    r"$F$ [$\mathrm{vacil}_{\mathrm{HMS}}$] / $R$ [asper]":
+        r"$F$ [$\mathrm{vacil}_{\mathrm{HMS}}$] / $R$ [asper]",
     # fluctuation_strength: the two models side by side
     "Fluctuation Strength — the 4 Hz Band-Pass, and Which Model to Quote":
         "Intensidad de fluctuación: el paso de banda a 4 Hz y qué modelo "
@@ -1879,37 +1900,39 @@ _ES_EXACT = {
         "Los dos modelos sobre ruido de banda ancha AM, 60 dB",
     "Signal model on the AM tone, 70 dB":
         "El modelo de señal sobre el tono AM, 70 dB",
-    # The Eq. 10.2 info box is all symbols; the saver's decimal-comma pass
-    # restyles its digits, so it reads the same in Spanish.
-    "F = 5.8 (1.25 m - 0.25)(0.05 L - 1)\n"
-    "    / [(fmod/5)^2 + 4/fmod + 1.5]  vacil":
-        "F = 5.8 (1.25 m - 0.25)(0.05 L - 1)\n"
-        "    / [(fmod/5)^2 + 4/fmod + 1.5]  vacil",
+    # The Eq. 10.2 info box is all symbols; the mathtext keeps the comma
+    # pass out, so the Spanish twin bakes its decimals as {,}.
+    "$F = 5.8\\,(1.25\\,m - 0.25)(0.05\\,L - 1)$\n"
+    "      $/\\,[(f_{\\mathrm{mod}}/5)^2 + 4/f_{\\mathrm{mod}} + 1.5]$  vacil":
+        "$F = 5{,}8\\,(1{,}25\\,m - 0{,}25)(0{,}05\\,L - 1)$\n"
+        "      $/\\,[(f_{\\mathrm{mod}}/5)^2 + 4/f_{\\mathrm{mod}} + 1{,}5]$"
+        "  vacil",
     # annoyance_weightings + psychoacoustic_annoyance (Fastl & Zwicker)
     "The Two Weightings of the Psychoacoustic Annoyance Model":
         "Las dos ponderaciones del modelo de molestia psicoacústica",
     "The kink at the reference sharpness":
         "El codo en la agudeza de referencia",
-    "Sharpness weighting wS": "Ponderación de agudeza wS",
+    "Sharpness weighting $w_S$": "Ponderación de agudeza $w_S$",
     "1.75 acum: below it sharpness costs nothing":
         "1,75 acum: por debajo, la agudeza no cuesta nada",
     # "vs" instead of "frente a": measured, the longer form ran 12 px past
     # the right canvas edge (the title is centred on the right-hand panel).
     "Roughness costs more than fluctuation (0.6 against 0.4)":
         "La aspereza cuesta más que la fluctuación (0,6 vs 0,4)",
-    "Sensation magnitude v [asper or vacil]":
-        "Magnitud de sensación v [asper o vacil]",
-    "all roughness: R = v, F = 0": "todo en aspereza: R = v, F = 0",
-    "all fluctuation: F = v, R = 0": "todo en fluctuación: F = v, R = 0",
-    "N5 = 30 sone, S = 2.0 acum throughout":
-        "N5 = 30 sonios, S = 2,0 acum en todo el panel",
+    "Sensation magnitude $v$ [asper or vacil]":
+        "Magnitud de sensación $v$ [asper o vacil]",
+    "all roughness: $R = v$, $F = 0$": "todo en aspereza: $R = v$, $F = 0$",
+    "all fluctuation: $F = v$, $R = 0$":
+        "todo en fluctuación: $F = v$, $R = 0$",
+    "$N_5$ = 30 sone, $S$ = 2.0 acum throughout":
+        "$N_5$ = 30 sonios, $S$ = 2,0 acum en todo el panel",
     # The PA info box is all symbols, same story as Eq. 10.2 above.
-    "PA = N5 (1 + sqrt(wS^2 + wFR^2))\n"
-    "wS  = (S - 1.75) 0.25 log10(N5 + 10)\n"
-    "wFR = (2.18 / N5^0.4)(0.4 F + 0.6 R)":
-        "PA = N5 (1 + sqrt(wS^2 + wFR^2))\n"
-        "wS  = (S - 1.75) 0.25 log10(N5 + 10)\n"
-        "wFR = (2.18 / N5^0.4)(0.4 F + 0.6 R)",
+    "$\\mathrm{PA} = N_5(1 + \\sqrt{w_S^2 + w_{FR}^2})$\n"
+    "$w_S = (S - 1.75)\\,0.25\\,\\log_{10}(N_5 + 10)$\n"
+    "$w_{FR} = (2.18/N_5^{0.4})(0.4\\,F + 0.6\\,R)$":
+        "$\\mathrm{PA} = N_5(1 + \\sqrt{w_S^2 + w_{FR}^2})$\n"
+        "$w_S = (S - 1{,}75)\\,0{,}25\\,\\log_{10}(N_5 + 10)$\n"
+        "$w_{FR} = (2{,}18/N_5^{0{,}4})(0{,}4\\,F + 0{,}6\\,R)$",
     # tnr_pr_comparison (ECMA-418-1)
     "Tone-to-Noise Ratio and Prominence Ratio Compared (ECMA-418-1)":
         "Relación tono-ruido y relación de prominencia comparadas "
@@ -1930,28 +1953,27 @@ _ES_EXACT = {
     # tone_audibility_uncertainty + two_tone_separation (ISO/PAS 20065)
     "Decisive Audibility, Its Uncertainty and the Tonal Adjustment":
         "Audibilidad decisiva, su incertidumbre y el ajuste tonal",
-    "Audibility ΔL [dB]": "Audibilidad ΔL [dB]",
-    "Measured 3 s spectrum (Annex E, run index j)":
-        "Espectro de 3 s medido (Anexo E, índice de medida j)",
-    "decisive audibility of each spectrum, ± U (clause 6)":
-        "audibilidad decisiva de cada espectro, ± U (apartado 6)",
+    "Measured 3 s spectrum (Annex E, run index $j$)":
+        "Espectro de 3 s medido (Anexo E, índice de medida $j$)",
+    r"decisive audibility of each spectrum, $\pm U$ (clause 6)":
+        r"audibilidad decisiva de cada espectro, $\pm U$ (apartado 6)",
     "Two Tones in One Critical Band: Separate or Combined (ISO/PAS 20065 "
     "Formula 19)":
         "Dos tonos en una banda crítica: separados o combinados "
         "(Fórmula 19 de ISO/PAS 20065)",
-    "Threshold fD (Formula 19)": "Umbral fD (Fórmula 19)",
-    "Frequency of the more audible tone fT [Hz]":
-        "Frecuencia del tono más audible fT [Hz]",
-    "Frequency separation |fT1 − fT2| [Hz]":
-        "Separación en frecuencia |fT1 − fT2| [Hz]",
+    "Threshold $f_D$ (Formula 19)": "Umbral $f_D$ (Fórmula 19)",
+    "Frequency of the more audible tone $f_T$ [Hz]":
+        "Frecuencia del tono más audible $f_T$ [Hz]",
+    r"Frequency separation $|f_{T1} - f_{T2}|$ [Hz]":
+        r"Separación en frecuencia $|f_{T1} - f_{T2}|$ [Hz]",
     "minimum 21 Hz at 212 Hz": "mínimo de 21 Hz a 212 Hz",
     "rated separately": "evaluados por separado",
     "energy-summed into one FG entry":
         "sumados en energía en una única entrada FG",
     "Annex E pair: 118.4 and 137.3 Hz,\n"
-    "18.9 Hz apart — below fD, so combined":
+    "18.9 Hz apart — below $f_D$, so combined":
         "Pareja del Anexo E: 118,4 y 137,3 Hz,\n"
-        "separados 18,9 Hz, por debajo de fD: se combinan",
+        "separados 18,9 Hz, por debajo de $f_D$: se combinan",
     # Electroacoustics (IEC 60268-3 distortion; Bendat & Piersol response)
     "Harmonic Distortion of a Single-Tone Test (IEC 60268-3)":
         "Distorsión armónica de un ensayo con tono único (IEC 60268-3)",
@@ -2773,13 +2795,13 @@ _ES_EXACT = {
     "Hard-ground limit (+6 dB)": "Límite de suelo rígido (+6 dB)",
     "ISO 9612 Task-Based Exposure (Annex D)":
         "Exposición por tareas (ISO 9612, Anexo D)",
-    "LEX,8h contribution [dB]": "Contribución a LEX,8h [dB]",
+    "$L_{EX,8h}$ contribution [dB]": "Contribución a $L_{EX,8h}$ [dB]",
     "Measurement task": "Tarea de medición",
     "planning/breaks": "planificación/pausas",
     "welding": "soldadura",
     "cutting/grinding": "corte/amolado",
-    "Daily LEX,8h": "LEX,8h diario",
-    "LEX,8h + U (one-sided 95 %)": "LEX,8h + U (unilateral 95 %)",
+    "Daily $L_{EX,8h}$": "$L_{EX,8h}$ diario",
+    "$L_{EX,8h} + U$ (one-sided 95 %)": "$L_{EX,8h} + U$ (unilateral 95 %)",
     # Outdoor propagation, barriers and refraction figures (FL3).
     "Where 95 dB of Source Power Goes (ISO 9613-2, 200 m)":
         "En qué se gastan los 95 dB de la fuente (ISO 9613-2, 200 m)",
@@ -4633,14 +4655,17 @@ _ES_PATTERNS = [
     # sii_masking_chain / sii_octave_masking_blindness (baked-in values).
     ((r"^The clause 5 chain under a low-frequency masker \(SII = (\d)\.(\d+)\)$"),
      r"La cadena del capítulo 5 con un enmascarante grave (SII = \1,\2)"),
-    ((r"^at 1 kHz there is no noise in this band,\nyet Zi = (\d+) dB: the "
+    ((r"^at 1 kHz there is no noise in this band,\nyet \$Z_i\$ = (\d+) dB: the "
       r"masking is spread up\nfrom the low bands, not made here$"),
-     ("a 1 kHz no hay ruido en esta banda,\ny sin embargo Zi = \\1 dB: el "
+     ("a 1 kHz no hay ruido en esta banda,\ny sin embargo $Z_i$ = \\1 dB: el "
       "enmascaramiento\nsube desde las bandas graves, no se genera aquí")),
     (r"^(\d)\.(\d+) index units apart$", r"\1,\2 unidades de índice de diferencia"),
     # sti_level_dependence legend (baked-in uncorrected STI).
     (r"^without them: a flat (\d)\.(\d+)$", r"sin ellas: un \1,\2 constante"),
+    # The plain T60 pattern stays for the clips (schematics.py); the static
+    # sti_mtf_curves legends now carry mathtext and bake the comma.
     (r"^T60 = (.+) s$", r"T60 = \1 s"),
+    (r"^\$T_\{60\}\$ = (\d+)\.(\d+) s$", r"$T_{60}$ = \1,\2 s"),
     (r"^SNR = (.+) dB$", r"SNR = \1 dB"),
     # age_threshold_sex_and_spread annotations (baked-in ISO 7029 values).
     (r"^\$s_u\$ peaks at (\d+) yr \((\d+)\.(\d+) dB\)$",
@@ -4714,10 +4739,10 @@ _ES_PATTERNS = [
      "Precisi\u00f3n en alta frecuencia de la ponderaci\u00f3n A @ fs=\\1 kHz"),
     (r"^Impulse Response \((.+) Hz Band\) - Transient/Stability Comparison$",
      "Respuesta al impulso (banda de \\1 Hz) \u2014 transitorio y estabilidad"),
-    (r"^1 kHz narrowband - N = (.+) sone$",
-     "Banda estrecha de 1 kHz - N = \\1 sonios"),
-    (r"^Flat broadband 60 dB - N = (.+) sone$",
-     "Banda ancha plana a 60 dB - N = \\1 sonios"),
+    (r"^1 kHz narrowband — \$N\$ = (\d+)\.(\d+) sone$",
+     "Banda estrecha de 1 kHz — $N$ = \\1,\\2 sonios"),
+    (r"^Flat broadband 60 dB — \$N\$ = (\d+)\.(\d+) sone$",
+     "Banda ancha plana a 60 dB — $N$ = \\1,\\2 sonios"),
     (r"^Pressure-intensity index\n\$\\delta_\{pI\}\$ = (\u2212?\d+)\.(\d+) dB$",
      ("\u00cdndice presi\u00f3n-intensidad\n" r"$\\delta_{pI}$ = \1,\2 dB")),
     (r"^Reference curve shifted by (.+) dB$",
@@ -4755,68 +4780,90 @@ _ES_PATTERNS = [
      r"ganancia de lazo Zs + Gs = \1 dB"),
     (r"^each round trip is x (.+)$", r"cada vuelta es x \1"),
     (r"^sum converges to (.+) dB$", r"la suma converge a \1 dB"),
-    (r"^Aures \(Annex B, N = (.+) sone\)$",
-     r"Aures (Anexo B, N = \1 sonios)"),
+    (r"^Aures \(Annex B, \$N\$ = (\d+) sone\)$",
+     r"Aures (Anexo B, $N$ = \1 sonios)"),
     (r"^Spatial decay D2,S = (.+) dB$",
      r"Decaimiento espacial D2,S = \1 dB"),
-    (r"^Zwicker \(ISO 532-1\), N = (.+) sone$",
-     r"Zwicker (ISO 532-1), N = \1 sonios"),
-    (r"^Moore-Glasberg \(ISO 532-2\), N = (.+) sone$",
-     r"Moore-Glasberg (ISO 532-2), N = \1 sonios"),
-    (r"^Sottek \(ECMA-418-2\), N = (.+) sone$",
-     r"Sottek (ECMA-418-2), N = \1 sonios"),
-    (r"^1 kHz tone, 60 dB \(N = (.+) sone_HMS\)$",
-     r"Tono de 1 kHz, 60 dB (N = \1 sonios_HMS)"),
-    (r"^Tone in noise \(T = (.+) tu_HMS\)$",
-     r"Tono en ruido (T = \1 tu_HMS)"),
-    (r"^Pure noise \(T = (.+) tu_HMS\)$",
-     r"Ruido puro (T = \1 tu_HMS)"),
-    (r"^Peak R = (.+) asper @ (.+) Hz$",
-     r"Máximo R = \1 asper @ \2 Hz"),
+    (r"^Zwicker \(ISO 532-1\), \$N\$ = (\d+)\.(\d+) sone$",
+     r"Zwicker (ISO 532-1), $N$ = \1,\2 sonios"),
+    (r"^Moore-Glasberg \(ISO 532-2\), \$N\$ = (\d+)\.(\d+) sone$",
+     r"Moore-Glasberg (ISO 532-2), $N$ = \1,\2 sonios"),
+    (r"^Sottek \(ECMA-418-2\), \$N\$ = (\d+)\.(\d+) sone$",
+     r"Sottek (ECMA-418-2), $N$ = \1,\2 sonios"),
+    ((r"^1 kHz tone, 60 dB \(\$N\$ = (\d+)\.(\d+) "
+      r"\$\\mathrm\{sone\}_\{\\mathrm\{HMS\}\}\$\)$"),
+     r"Tono de 1 kHz, 60 dB ($N$ = \1,\2 $\\mathrm{sonios}_{\\mathrm{HMS}}$)"),
+    ((r"^Tone in noise \(\$T\$ = (\d+)\.(\d+) "
+      r"\$\\mathrm\{tu\}_\{\\mathrm\{HMS\}\}\$\)$"),
+     r"Tono en ruido ($T$ = \1,\2 $\\mathrm{tu}_{\\mathrm{HMS}}$)"),
+    ((r"^Pure noise \(\$T\$ = (\d+)\.(\d+) "
+      r"\$\\mathrm\{tu\}_\{\\mathrm\{HMS\}\}\$\)$"),
+     r"Ruido puro ($T$ = \1,\2 $\\mathrm{tu}_{\\mathrm{HMS}}$)"),
+    (r"^Peak \$R\$ = (\d+)\.(\d+) asper @ (\d+) Hz$",
+     r"Máximo $R$ = \1,\2 asper @ \3 Hz"),
     (r"^AM broadband noise \(closed form, 60 dB\), peak (.+) vacil$",
      r"Ruido de banda ancha AM (forma cerrada, 60 dB), máximo \1 vacil"),
     (r"^AM tone \(signal model, 70 dB\), peak (.+) vacil$",
      r"Tono AM (modelo de señal, 70 dB), máximo \1 vacil"),
     (r"^Worked example \(PA = (.+)\)$",
      r"Ejemplo resuelto (PA = \1)"),
-    (r"^PA = (.+)\nwS = (.+), wFR = (.+)$",
-     "PA = \\1\\nwS = \\2, wFR = \\3"),
+    (r"^PA = (\d+)\.(\d+)\n\$w_S\$ = (\d+)\.(\d+), \$w_\{FR\}\$ = (\d+)\.(\d+)$",
+     "PA = \\1,\\2\\n$w_S$ = \\3,\\4, $w_{FR}$ = \\5,\\6"),
     # zwicker_time_varying readouts (values recomputed per run). The two
     # "... sone" lines must precede the generic "(.+) sone" catch-all,
     # which used to swallow them with their English prose intact.
     (r"^Exceedance over the (.+) s record$",
      r"Excedencia sobre el registro de \1 s"),
-    (r"^Nmax = (.+) sone \(res\.loudness\)$",
-     r"Nmax = \1 sonios (res.loudness)"),
+    (r"^\$N_\{\\mathrm\{max\}\}\$ = (\d+)\.(\d+) sone \(res\.loudness\)$",
+     r"$N_{\\mathrm{max}}$ = \1,\2 sonios (res.loudness)"),
+    (r"^\$N_5\$ = (\d+)\.(\d+) sone$", r"$N_5$ = \1,\2 sonios"),
+    (r"^\$N_\{10\}\$ = (\d+)\.(\d+) sone$", r"$N_{10}$ = \1,\2 sonios"),
     (r"^arithmetic mean = (.+) sone$",
      r"media aritmética = \1 sonios"),
-    (r"^stationary=True on the same record: N = (.+) sone$",
-     r"stationary=True en el mismo registro: N = \1 sonios"),
+    (r"^stationary=True on the same record: \$N\$ = (\d+)\.(\d+) sone$",
+     r"stationary=True en el mismo registro: $N$ = \1,\2 sonios"),
     # sharpness_pair_and_targets band legends and centroids
-    (r"^(\d+) Hz critical band — N = (.+) sone, S = (.+) acum$",
-     r"Banda crítica de \1 Hz: N = \2 sonios, S = \3 acum"),
-    (r"^⟨z⟩ = (.+) Bark$", r"⟨z⟩ = \1 Bark"),
+    ((r"^(\d+) Hz critical band — \$N\$ = (\d+)\.(\d+) sone, "
+      r"\$S\$ = (\d+)\.(\d+) acum$"),
+     r"Banda crítica de \1 Hz: $N$ = \2,\3 sonios, $S$ = \4,\5 acum"),
+    (r"^\$\\langle z\\rangle\$ = (\d+)\.(\d+) Bark$",
+     r"$\\langle z\\rangle$ = \1,\2 Bark"),
     # Sottek specific panels: percentile line and carrier annotation
-    (r"^90th percentile = (.+)$", r"percentil 90 = \1"),
-    (r"^the carrier's band, (.+) Bark_HMS$",
-     r"la banda de la portadora, \1 Bark_HMS"),
+    (r"^90th percentile = (\d+)\.(\d+) (.+)$", r"percentil 90 = \1,\2 \3"),
+    ((r"^the carrier's band, (\d+)\.(\d+) "
+      r"\$\\mathrm\{Bark\}_\{\\mathrm\{HMS\}\}\$$"),
+     r"la banda de la portadora, \1,\2 $\\mathrm{Bark}_{\\mathrm{HMS}}$"),
     # hms_modulation_bandpass peak readouts: units read the same
-    (r"^R = (.+) asper @ (.+) Hz$", r"R = \1 asper @ \2 Hz"),
-    (r"^F = (.+) vacil_HMS @ (.+) Hz$", r"F = \1 vacil_HMS @ \2 Hz"),
+    (r"^\$R\$ = (\d+)\.(\d+) asper @ (\d+) Hz$", r"$R$ = \1,\2 asper @ \3 Hz"),
+    ((r"^\$F\$ = (\d+)\.(\d+) \$\\mathrm\{vacil\}_\{\\mathrm\{HMS\}\}\$ "
+      r"@ (\d+) Hz$"),
+     r"$F$ = \1,\2 $\\mathrm{vacil}_{\\mathrm{HMS}}$ @ \3 Hz"),
     # fluctuation_strength model legends
+    # The overshoot readout shipped untranslated ("x1.5 at 4 Hz"); the
+    # multiplication sign is now the real ×, and the pair is paid here.
+    (r"^×(.+) at 4 Hz$", r"×\1 a 4 Hz"),
     (r"^closed form, Eq\. 10\.2 — peak (.+) vacil$",
      r"forma cerrada, Ec. 10.2: máximo \1 vacil"),
     (r"^Osses 2016 signal model — peak (.+) vacil$",
      r"modelo de señal de Osses 2016: máximo \1 vacil"),
     (r"^peak (.+) vacil at (.+) Hz$", r"máximo de \1 vacil a \2 Hz"),
     # annoyance_weightings right-panel gap readout
-    (r"^at v = 1\.5, (.+) units apart$",
-     r"a v = 1,5, \1 unidades de diferencia"),
+    (r"^at \$v\$ = 1\.5, (\d+)\.(\d+) units apart$",
+     r"a $v$ = 1,5, \1,\2 unidades de diferencia"),
     # tone_audibility_uncertainty readouts
     (r"^mean audibility (.+) ± (.+) dB \(Formula 20\)$",
      r"audibilidad media \1 ± \2 dB (Fórmula 20)"),
-    (r"^Kt = (\d+) dB, but the interval reaches into Kt = (\d+) dB$",
-     r"Kt = \1 dB, pero el intervalo entra en Kt = \2 dB"),
+    (r"^\$K_t\$ = (\d+) dB, but the interval reaches into \$K_t\$ = (\d+) dB$",
+     r"$K_t$ = \1 dB, pero el intervalo entra en $K_t$ = \2 dB"),
+    # ISO 9612 exposure readouts: the mathtext keeps the comma pass out,
+    # so these bake the decimal comma into the translation.
+    ((r"^\$L_\{EX,8h\}\$ = (\d+)\.(\d+) dB\n"
+      r"\$U\$ = (\d+)\.(\d+) dB \(\$k\$ = 1\.65\)\n"
+      r"\$L_\{EX,8h\} \+ U\$ = (\d+)\.(\d+) dB$"),
+     ("$L_{EX,8h}$ = \\1,\\2 dB\n$U$ = \\3,\\4 dB ($k$ = 1,65)\n"
+      "$L_{EX,8h} + U$ = \\5,\\6 dB")),
+    (r"^\$u\$ = (\d+)\.(\d+) dB → \$U\$ = (\d+)\.(\d+) dB$",
+     r"$u$ = \1,\2 dB → $U$ = \3,\4 dB"),
     (r"^Short-term loudness STL \(STL peak = (.+) sone\)$",
      r"Sonoridad a corto plazo STL (STL máx = \1 sonios)"),
     (r"^Long-term loudness LTL \(LTL peak = (.+) sone\)$",
