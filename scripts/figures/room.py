@@ -15,7 +15,7 @@ from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -94,7 +94,7 @@ def generate_schroeder_decay(output_dir: str) -> None:
         t_cross = float(np.interp(target, level[::-1], time[::-1]))
         ax.plot(t_cross, target, "o", color=COLOR_FG, markersize=5, zorder=6)
         # Place level labels clear of the upper-right legend.
-        ax.text(1.40, target + 0.8, f"{target:.0f} dB", ha="left",
+        ax.text(1.40, target + 0.8, f"{_fmt_minus(target, '.0f')} dB", ha="left",
                 va="bottom", fontsize=8, color=COLOR_FG, alpha=0.85)
 
     ax.text(0.12, -7.0, "EDT slope", fontsize=8, color="#9467bd", rotation=0)
@@ -364,12 +364,12 @@ def generate_sweep_distortion_separation(output_dir: str) -> None:
     for order, color in ((2, COLOR_SECONDARY), (3, COLOR_TERTIARY), (4, "#9467bd")):
         advance = seconds * np.log(order) / span
         ax.axvline(-advance, color=color, linestyle="--", linewidth=1.3)
-        ax.annotate(f"H{order:d}\n−{advance:.2f} s", xy=(-advance, 2.0),
+        ax.annotate(f"$H_{order:d}$\n−{advance:.2f} s", xy=(-advance, 2.0),
                     xytext=(-advance, 6.0), fontsize=9, color=color,
                     ha="center", va="bottom")
     ax.annotate("causal part: what impulse_response() returns", xy=(0.35, -6.0),
                 fontsize=10, color=COLOR_FG, ha="left")
-    ax.set_title("Harmonic distortion lands before t = 0 (ISO 18233 B.5)",
+    ax.set_title("Harmonic distortion lands before $t$ = 0 (ISO 18233 B.5)",
                  fontweight="bold", pad=18)
     ax.set_xlabel("Arrival time relative to the linear impulse response [s]")
     ax.set_ylabel("Level re peak [dB]")
@@ -435,13 +435,14 @@ def generate_source_distance_bias(output_dir: str) -> None:
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         axis.set_xlim(0.0, 7.4)
         axis.legend(loc="lower right", fontsize=9)
-    ax_t.annotate(f"excluded: r < d_min = {d_min:.1f} m", xy=(d_min / 2, 0.73),
+    ax_t.annotate(rf"excluded: $r < d_{{\mathrm{{min}}}}$ = {d_min:.1f} m",
+                  xy=(d_min / 2, 0.73),
                   fontsize=10, color=COLOR_SECONDARY, ha="center")
     ax_t.annotate(f"critical distance {r_c:.1f} m", xy=(r_c, 0.08),
                   xytext=(r_c + 0.4, 0.08), fontsize=9, color=COLOR_FG,
                   va="center", ha="left")
-    ax_t.set_title("A microphone inside d_min returns wrong numbers, not noisy "
-                   "ones", fontweight="bold", pad=10)
+    ax_t.set_title(r"A microphone inside $d_{\mathrm{min}}$ returns wrong "
+                   "numbers, not noisy ones", fontweight="bold", pad=10)
     plt.tight_layout()
     save_figure(output_dir, "source_distance_bias.svg")
     plt.close()
@@ -485,7 +486,7 @@ def generate_modal_count_per_band(output_dir: str) -> None:
     ax.set_ylabel("Modes inside the octave band")
     ax.set_ylim(5.0, counts.max() * 6.0)
     ax.set_title("What the analysis band averages over (7 × 5 × 3 m room, "
-                 "V = 105 m³)", fontweight="bold", pad=10)
+                 "$V$ = 105 m³)", fontweight="bold", pad=10)
     ax.grid(which="both", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -601,14 +602,16 @@ def generate_open_plan_quality(output_dir: str) -> None:
     # Annex A: the two ends of the informative scale, shaded on each axis.
     ax_l.axhspan(50.0, 62.0, color=theme_fill(COLOR_SECONDARY, ax_l), zorder=0)
     ax_l.axhspan(30.0, 48.0, color=theme_fill(COLOR_PRIMARY, ax_l), zorder=0)
-    ax_l.annotate("Lp,A,S,4m > 50 dB: poor", xy=(2.1, 59.0), fontsize=9,
-                  color=COLOR_FG)
-    ax_l.annotate("Lp,A,S,4m ≤ 48 dB: good target", xy=(2.1, 32.0), fontsize=9,
-                  color=COLOR_FG)
+    ax_l.annotate(r"$L_{p,A,S,4\,\mathrm{m}} > 50$ dB: poor", xy=(2.1, 59.0),
+                  fontsize=9, color=COLOR_FG)
+    ax_l.annotate(r"$L_{p,A,S,4\,\mathrm{m}} \leq 48$ dB: good target",
+                  xy=(2.1, 32.0), fontsize=9, color=COLOR_FG)
     ax_s.axvspan(1.8, 5.0, color=theme_fill(COLOR_PRIMARY, ax_s), zorder=0)
     ax_s.axvspan(10.0, 20.0, color=theme_fill(COLOR_SECONDARY, ax_s), zorder=0)
-    ax_s.annotate("rD ≤ 5 m: good", xy=(2.1, 0.10), fontsize=9, color=COLOR_FG)
-    ax_s.annotate("rD > 10 m: poor", xy=(10.4, 0.10), fontsize=9, color=COLOR_FG)
+    ax_s.annotate(r"$r_D \leq 5$ m: good", xy=(2.1, 0.10), fontsize=9,
+                  color=COLOR_FG)
+    ax_s.annotate(r"$r_D > 10$ m: poor", xy=(10.4, 0.10), fontsize=9,
+                  color=COLOR_FG)
 
     for label, d2s, lp_4m, sti_0, sti_slope, color in cases:
         slope = -d2s / np.log10(2.0)
@@ -620,14 +623,15 @@ def generate_open_plan_quality(output_dir: str) -> None:
                   + slope * np.log10(span), "--", color=color, linewidth=1.6)
         ax_l.plot(positions, levels, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
-                  label=f"{label}: D2,S = {res.d2s:.0f} dB, "
-                        f"Lp,A,S,4m = {res.lp_as_4m:.0f} dB")
+                  label=rf"{label}: $D_{{2,S}}$ = {res.d2s:.0f} dB, "
+                        rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {res.lp_as_4m:.0f} dB")
         ax_l.plot(4.0, res.lp_as_4m, "D", color=color, markersize=9, zorder=6)
         ax_s.plot(span, sti_0 - sti_slope * span, "--", color=color,
                   linewidth=1.6)
         ax_s.plot(positions, sti, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
-                  label=f"{label}: rD = {res.rd:.1f} m, rP = {res.rp:.0f} m")
+                  label=f"{label}: $r_D$ = {res.rd:.1f} m, "
+                        f"$r_P$ = {res.rp:.0f} m")
         ax_s.plot(res.rd, 0.50, "D", color=color, markersize=9, zorder=6)
 
     ax_l.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
@@ -641,7 +645,7 @@ def generate_open_plan_quality(output_dir: str) -> None:
     ax_s.annotate("STI = 0.20", xy=(16.5, 0.22), fontsize=9, color=COLOR_FG)
     ax_s.set_ylabel("Speech transmission index")
     ax_s.set_ylim(0.0, 0.85)
-    ax_s.set_xlabel("Distance from the talker r [m]")
+    ax_s.set_xlabel("Distance from the talker $r$ [m]")
 
     from matplotlib.ticker import NullFormatter, ScalarFormatter
     for axis in (ax_l, ax_s):
@@ -677,20 +681,23 @@ def generate_absorption_per_table(output_dir: str) -> None:
     _fig, (ax_a, ax_w) = plt.subplots(1, 2, figsize=(12.5, 5.8))
 
     ax_a.plot(span, communication, color=COLOR_PRIMARY, linewidth=2.0,
-              label="Communication: A_tab > 6.31 r_s²  (L_SN > −6 dB)")
+              label=r"Communication: $A_{\mathrm{tab}} > 6.31\,r_s^2$  "
+                    r"($L_{\mathrm{SN}} > -6$ dB)")
     ax_a.plot(span, privacy, color=COLOR_SECONDARY, linewidth=2.0,
-              label="Privacy: A_tab < 3.16 r_t²  (L_SN < −9 dB)")
+              label=r"Privacy: $A_{\mathrm{tab}} < 3.16\,r_t^2$  "
+                    r"($L_{\mathrm{SN}} < -9$ dB)")
     ax_a.axhspan(lower, upper, color=theme_fill(COLOR_TERTIARY, ax_a), zorder=0)
-    ax_a.annotate(f"feasible A_tab: {lower:.1f} to {upper:.1f} m²",
+    ax_a.annotate(rf"feasible $A_{{\mathrm{{tab}}}}$: {lower:.1f} to "
+                  f"{upper:.1f} m²",
                   xy=(2.55, (lower + upper) / 2 + 1.4), fontsize=9,
                   color=COLOR_FG, ha="center")
     ax_a.plot([r_s], [lower], "o", color=COLOR_PRIMARY, markersize=9)
     ax_a.plot([r_t], [upper], "o", color=COLOR_SECONDARY, markersize=9)
-    ax_a.annotate(f"r_s = {r_s:g} m → A_tab > {lower:.1f} m²",
+    ax_a.annotate(rf"$r_s$ = {r_s:g} m → $A_{{\mathrm{{tab}}}}$ > {lower:.1f} m²",
                   xy=(r_s, lower), xytext=(0.66, 22.0), fontsize=9,
                   color=COLOR_PRIMARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_PRIMARY})
-    ax_a.annotate(f"r_t = {r_t:g} m → A_tab < {upper:.1f} m²",
+    ax_a.annotate(rf"$r_t$ = {r_t:g} m → $A_{{\mathrm{{tab}}}}$ < {upper:.1f} m²",
                   xy=(r_t, upper), xytext=(2.05, 6.0), fontsize=9,
                   color=COLOR_SECONDARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY})
@@ -699,7 +706,7 @@ def generate_absorption_per_table(output_dir: str) -> None:
     ax_a.plot([2.5], [float(room.absorption_per_table(2.5, -9.0))], "s",
               color=COLOR_SECONDARY, markersize=7, markerfacecolor="none")
     ax_a.set_xlabel("Separation [m]")
-    ax_a.set_ylabel("Absorption per occupied table A_tab [m²]")
+    ax_a.set_ylabel(r"Absorption per occupied table $A_{\mathrm{tab}}$ [m²]")
     ax_a.set_ylim(0.0, 60.0)
     ax_a.set_xlim(0.6, 3.2)
     ax_a.set_title("The design window, for one layout", fontweight="bold",
@@ -717,7 +724,7 @@ def generate_absorption_per_table(output_dir: str) -> None:
     ax_w.fill_between(ratios, 0.0, width, where=width > 0.0, zorder=0,
                       color=theme_fill(COLOR_TERTIARY, ax_w))
     ax_w.axvline(closure, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6)
-    ax_w.annotate(f"window closes at r_t / r_s = {closure:.2f}",
+    ax_w.annotate(f"window closes at $r_t/r_s$ = {closure:.2f}",
                   xy=(closure, -4.0), xytext=(closure + 0.05, -4.0),
                   fontsize=10, color=COLOR_SECONDARY)
     ax_w.plot([r_t / r_s], [upper - lower], "o", color=COLOR_TERTIARY,
@@ -726,10 +733,10 @@ def generate_absorption_per_table(output_dir: str) -> None:
                   xy=(r_t / r_s, upper - lower), xytext=(1.02, 9.6),
                   fontsize=9, color=COLOR_TERTIARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_TERTIARY})
-    ax_w.set_xlabel("Table spacing over cross-table separation, r_t / r_s")
-    ax_w.set_ylabel("Width of the feasible A_tab window [m²]")
+    ax_w.set_xlabel("Table spacing over cross-table separation, $r_t/r_s$")
+    ax_w.set_ylabel(r"Width of the feasible $A_{\mathrm{tab}}$ window [m²]")
     ax_w.set_xlim(1.0, 2.2)
-    ax_w.set_title(f"Packed tables close it (r_s = {r_s:g} m)",
+    ax_w.set_title(f"Packed tables close it ($r_s$ = {r_s:g} m)",
                    fontweight="bold", pad=10)
     ax_w.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_w.set_axisbelow(True)
@@ -760,20 +767,22 @@ def generate_open_plan_decay(output_dir: str) -> None:
     rr = np.logspace(np.log10(2.0), np.log10(16.0), 100)
     line_spl, = ax.plot(rr, a_lp + b_log * np.log10(rr), color=COLOR_PRIMARY,
                         linestyle="--", linewidth=1.8,
-                        label=f"Spatial decay D2,S = {m.d2s:.1f} dB")
+                        label=f"Spatial decay $D_{{2,S}}$ = {m.d2s:.1f} dB")
     pts_spl, = ax.plot(r, lp, "o", color=COLOR_PRIMARY, markersize=7,
                        markerfacecolor="white", markeredgewidth=1.6,
-                       label="Measured Lp,A,S")
+                       label=r"Measured $L_{p,A,S}$")
     ax.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
     mark_4m, = ax.plot(4.0, m.lp_as_4m, "D", color=COLOR_SECONDARY, markersize=9,
-                       zorder=6, label=f"Lp,A,S,4m = {m.lp_as_4m:.0f} dB")
-    ax.annotate(f"Lp,A,S,4m = {m.lp_as_4m:.0f} dB", xy=(4.0, m.lp_as_4m),
+                       zorder=6,
+                       label=rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB")
+    ax.annotate(rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB",
+                xy=(4.0, m.lp_as_4m),
                 xytext=(4.7, m.lp_as_4m + 4.5), fontsize=10,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     ax.set_title("Open-Plan Spatial Decay of Speech (ISO 3382-3)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Distance from the talker r [m]")
+    ax.set_xlabel("Distance from the talker $r$ [m]")
     ax.set_ylabel("A-weighted SPL [dB]", color=COLOR_PRIMARY)
     ax.set_xlim(1.7, 18.0)
     ax.set_ylim(30, 62)
@@ -791,7 +800,7 @@ def generate_open_plan_decay(output_dir: str) -> None:
                          linewidth=1.7, label="STI vs distance")
     ax2.plot(r, sti, "s", color=COLOR_TERTIARY, markersize=5,
              markerfacecolor="white", markeredgewidth=1.3)
-    for dist, level, name in [(m.rd, 0.50, "rD"), (m.rp, 0.20, "rP")]:
+    for dist, level, name in [(m.rd, 0.50, "$r_D$"), (m.rp, 0.20, "$r_P$")]:
         ax2.axhline(level, color=COLOR_FG, linestyle=":", alpha=0.25, linewidth=1)
         ax2.plot(dist, level, "v", color=COLOR_SECONDARY, markersize=9, zorder=6)
         ax2.annotate(f"{name} = {dist:.1f} m", xy=(dist, level),
@@ -890,8 +899,8 @@ def generate_image_source_reflectogram(output_dir: str) -> None:
     cbar.set_label("Reflection order")
     ax.set_xlabel("Arrival time [ms]")
     ax.set_ylabel("Reflection level re direct [dB]")
-    ax.set_title("Image-Source Room Impulse Response: a 7x5x3 m room "
-                 "(order <= 10)", fontweight="bold", pad=12)
+    ax.set_title("Image-Source Room Impulse Response: a 7 × 5 × 3 m room "
+                 "(order ≤ 10)", fontweight="bold", pad=12)
     ax.set_xlim(0.0, 120.0)
     ax.set_ylim(-60.0, 5.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -899,7 +908,7 @@ def generate_image_source_reflectogram(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.015, 0.03,
             "each reflection is a mirror image of the source;\n"
-            "amplitude = product of wall reflection factors / (4 pi r)",
+            r"amplitude = product of wall reflection factors / ($4\pi r$)",
             transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -951,10 +960,10 @@ def generate_reverberation_models(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "room 10 x 7 x 3.5 m",
-        "V = 245 m^3, S = 259 m^2",
+        "room 10 × 7 × 3.5 m",
+        "$V$ = 245 m³, $S$ = 259 m²",
         "anisotropic: absorptive floor/ceiling",
-        "c0 = 343 m/s, air at 20 C / 50 % RH",
+        "$c_0$ = 343 m/s, air at 20 °C / 50 % RH",
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=11, color=COLOR_FG,
@@ -1034,7 +1043,7 @@ def generate_enclosed_space_absorption(output_dir: str) -> None:
         ax_t.semilogx(freq, res.reverberation_time, color=colour, marker="o",
                       label=name)
     for ax, ylab, title in (
-        (ax_a, "Equivalent absorption area $A$ [m$^2$]", "Absorption area (Formula 1)"),
+        (ax_a, "Equivalent absorption area $A$ [m²]", "Absorption area (Formula 1)"),
         (ax_t, "Reverberation time $T$ [s]", "Reverberation time (Formula 5)"),
     ):
         ax.set_xticks(freq)
@@ -1308,7 +1317,7 @@ def generate_reverberation_model_absorption(output_dir: str) -> None:
     for mark in (0.2, 0.5, 0.9):
         value = float(np.interp(mark, alpha, departure))
         bottom.plot([mark], [value], "o", color=COLOR_FG, ms=5, zorder=6)
-        bottom.annotate(f"{value:.0f} %", xy=(mark, value),
+        bottom.annotate(f"{_fmt_minus(value, '.0f')} %", xy=(mark, value),
                         xytext=(mark + 0.02, value + 9.0), fontsize=9,
                         color=COLOR_FG)
     bottom.set_xlabel(r"Mean absorption coefficient $\bar\alpha$")
@@ -1317,8 +1326,8 @@ def generate_reverberation_model_absorption(output_dir: str) -> None:
     bottom.set_ylim(-85.0, 12.0)
 
     info = [
-        "room 8 x 5 x 3 m",
-        "V = 120 m^3, S = 158 m^2",
+        "room 8 × 5 × 3 m",
+        "$V$ = 120 m³, $S$ = 158 m²",
         "uniform absorption, no air term",
         "shaded: outside Sabine's domain",
     ]
@@ -1358,13 +1367,13 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
         left.loglog(freq, humid.absorption_area - still.absorption_area,
                     color=colour, marker="o", markersize=4, linewidth=1.8,
                     label=name.replace("C_", " °C, ") + " % RH")
-    left.set_ylabel(r"Air term $A_{air} = 4mV(1-\psi)$ [m$^2$]")
-    left.set_title(r"Six climate profiles, $V$ = 2000 m$^3$",
+    left.set_ylabel(r"Air term $A_{\mathrm{air}} = 4mV(1-\psi)$ [m²]")
+    left.set_title(r"Six climate profiles, $V$ = 2000 m³",
                    fontweight="bold", pad=10)
     left.legend(loc="upper left", fontsize=8)
 
-    styles = ((60.0, 94.0, COLOR_PRIMARY, r"60 m$^3$ office"),
-              (2000.0, 1000.0, COLOR_SECONDARY, r"2000 m$^3$ hall"))
+    styles = ((60.0, 94.0, COLOR_PRIMARY, "60 m³ office"),
+              (2000.0, 1000.0, COLOR_SECONDARY, "2000 m³ hall"))
     for volume, area, colour, label in styles:
         for condition, dash in ((None, "-"), ("20C_50-70", "--")):
             res = enclosed_space_reverberation([(area, soft)], volume,
@@ -1452,7 +1461,7 @@ def generate_enclosed_space_objects(output_dir: str) -> None:
     left.set_xticklabels([f"{f:g}" if f < 1000 else f"{f / 1000:g}k"
                           for f in freq])
     left.set_xlabel("Octave-band centre frequency [Hz]")
-    left.set_ylabel(r"Equivalent absorption area $A$ [m$^2$]")
+    left.set_ylabel("Equivalent absorption area $A$ [m²]")
     left.set_title("Where the absorption comes from", fontweight="bold", pad=10)
     left.legend(loc="upper left", fontsize=9)
 
@@ -1565,9 +1574,9 @@ def generate_image_source_order_convergence(output_dir: str) -> None:
     count.tick_params(axis="y", colors=COLOR_MUTED)
 
     info = [
-        "room 7 x 5 x 3 m, alpha = 0.12",
-        "V = 105 m^3, S = 142 m^2, fs = 48 kHz",
-        "shaded: +/- 10 % around Eyring",
+        r"room 7 × 5 × 3 m, $\alpha$ = 0.12",
+        "$V$ = 105 m³, $S$ = 142 m², $f_s$ = 48 kHz",
+        "shaded: ±10 % around Eyring",
     ]
     ax.text(0.985, 0.04, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=9, color=COLOR_FG,
@@ -1625,7 +1634,7 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
     for ratio, value, reference in zip(ratios, specular, eyring):
         if ratio in (1.0, 3.0, 6.0):
             offset = -0.16 if ratio >= 5.0 else 0.11
-            ax.annotate(f"x{value / reference:.2f}", xy=(ratio, value),
+            ax.annotate(f"×{value / reference:.2f}", xy=(ratio, value),
                         xytext=(ratio - 0.32, value + offset), fontsize=9,
                         color=COLOR_FG)
     ax.set_xlabel(r"Room elongation  $L_x : L_y = L_z$")
@@ -1638,7 +1647,7 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "V = 105 m^3 and mean alpha = 0.12 held fixed",
+        r"$V$ = 105 m³ and mean $\alpha$ = 0.12 held fixed",
         "cube (1:1) through a 6:1 corridor",
         "mean of 4 source-receiver pairs, max_order = 60",
     ]
@@ -1687,9 +1696,9 @@ def generate_image_source_bands(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "room 7 x 5 x 3 m, max_order = 60",
-        "wall alpha 0.10 -> 0.50 with frequency",
-        "air at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,",
+        "room 7 × 5 × 3 m, max_order = 60",
+        r"wall $\alpha$ 0.10 → 0.50 with frequency",
+        "air at 20 °C / 50 % RH: −0.4 % of T30 at 250 Hz,",
         "−4.4 % at 4 kHz",
     ]
     ax.text(0.015, 0.04, "\n".join(info), transform=ax.transAxes,
@@ -1734,7 +1743,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
         gap = float(np.max(np.diff(np.unique(np.round(freqs, 1)))))
         ax.set_ylim(0.0, 1.0)
         ax.set_yticks([])
-        ax.set_ylabel(f"{name}\n{dims[0]:.2f} x {dims[1]:.2f} x {dims[2]:.2f} m",
+        ax.set_ylabel(f"{name}\n{dims[0]:.2f} × {dims[1]:.2f} × {dims[2]:.2f} m",
                       fontsize=9, rotation=0, ha="right", va="center")
         ax.text(0.99, 0.82, f"{freqs.size} modes, {distinct} distinct "
                             f"frequencies; largest gap {gap:.1f} Hz",
@@ -1761,7 +1770,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
     handles = [Line2D([], [], color=colour, linewidth=2.0, label=kind)
                for kind, colour in family.items()]
     axes[0].legend(handles=handles, loc="upper left", fontsize=8, ncol=3)
-    axes[0].set_title(r"Three rooms of 105 m$^3$, modes up to 200 Hz",
+    axes[0].set_title("Three rooms of 105 m³, modes up to 200 Hz",
                       fontweight="bold", pad=10)
     plt.tight_layout()
     save_figure(output_dir, "room_proportion_modes.svg")
@@ -1786,7 +1795,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
                                    mean_absorption=0.15, distances=grid,
                                    directivity=q)
         left.semilogx(field.distances, field.total, color=colour, linewidth=2.0,
-                      label=f"Q = {q:g}  ($r_c$ = {field.critical_distance:.2f} m)",
+                      label=f"$Q$ = {q:g}  ($r_c$ = {field.critical_distance:.2f} m)",
                       zorder=5)
         left.axvline(field.critical_distance, color=colour, linestyle=":",
                      linewidth=1.2, zorder=3)
@@ -1802,11 +1811,12 @@ def generate_steady_state_directivity(output_dir: str) -> None:
         right.semilogx(
             field.distances, field.total, color=colour, linewidth=2.0,
             label=rf"$\bar\alpha$ = {absorption:g}  ($R$ = "
-                  rf"{field.room_constant:.0f} m$^2$)", zorder=5)
+                  f"{field.room_constant:.0f} m²)", zorder=5)
     right.set_title(r"Absorption moves the plateau, not the direct field",
                     fontweight="bold", pad=10)
     right.legend(loc="upper right", fontsize=9)
-    right.annotate("10.1 dB = 10 lg(R2/R1)", xy=(8.0, 73.2), xytext=(0.06, 0.22),
+    right.annotate(r"10.1 dB = $10\,\mathrm{lg}(R_2/R_1)$", xy=(8.0, 73.2),
+                   xytext=(0.06, 0.22),
                    textcoords="axes fraction", fontsize=9, color=COLOR_FG,
                    arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
 
@@ -1817,7 +1827,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
         ax.set_axisbelow(True)
     left.set_ylabel("Sound pressure level [dB]")
 
-    info = "12 x 8 x 4 m workshop, S = 352 m^2, Lw = 90 dB re 1 pW"
+    info = "12 × 8 × 4 m workshop, $S$ = 352 m², $L_W$ = 90 dB re 1 pW"
     left.text(0.015, 0.04, info, transform=left.transAxes, va="bottom",
               ha="left", fontsize=9, color=COLOR_FG,
               bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
@@ -1854,7 +1864,7 @@ def generate_decay_signatures(output_dir: str) -> None:
         ("coupled volume", noise * np.sqrt(0.98 * envelope(0.6)
                                            + 0.02 * envelope(2.5)),
          "T30 > T20: report both"),
-        ("strong early energy", early, "EDT << T30: a dry seat"),
+        ("strong early energy", early, "EDT ≪ T30: a dry seat"),
     )
 
     _fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.8), sharey=True)
@@ -1875,7 +1885,8 @@ def generate_decay_signatures(output_dir: str) -> None:
         summary = (f"EDT {float(res.edt[0]):.2f} s\n"
                    f"T20 {float(res.t20[0]):.2f} s\n"
                    f"T30 {float(res.t30[0]):.2f} s\n"
-                   f"C = {float(res.curvature[0]):.0f} %\n{verdict}")
+                   f"$C$ = {_fmt_minus(float(res.curvature[0]), '.0f')} %"
+                   f"\n{verdict}")
         ax.text(0.97, 0.95, summary, transform=ax.transAxes, ha="right",
                 va="top", fontsize=9, color=COLOR_FG,
                 bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
@@ -1940,8 +1951,8 @@ def generate_decay_range_bias(output_dir: str) -> None:
     ax.legend(loc="center right", fontsize=9)
 
     info = [
-        "synthetic single-slope decay, T = 1.0 s",
-        "white noise floor swept, fs = 48 kHz",
+        "synthetic single-slope decay, $T$ = 1.0 s",
+        "white noise floor swept, $f_s$ = 48 kHz",
         "green band: the 5 % JND",
         "red band: flagged invalid for T20",
         "below ~34 dB the fit returns NaN",

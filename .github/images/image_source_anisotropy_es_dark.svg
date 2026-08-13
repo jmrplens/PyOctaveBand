@@ -349,29 +349,66 @@ L 706.104063 28.798125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_17">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="42.527018" y="181.599534" transform="rotate(-0 42.527018 181.599534)">x1.05</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="42.527018" y="181.599534" transform="rotate(-0 42.527018 181.599534)">×1,05</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="280.795257" y="160.907049" transform="rotate(-0 280.795257 160.907049)">x1.30</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="280.795257" y="160.907049" transform="rotate(-0 280.795257 160.907049)">×1,30</text>
    </g>
    <g id="text_19">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.197614" y="70.860526" transform="rotate(-0 638.197614 70.860526)">x2.50</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.197614" y="70.860526" transform="rotate(-0 638.197614 70.860526)">×2,50</text>
    </g>
    <g id="text_20">
     <g id="patch_7">
      <path d="M 465.920498 389.172525 
 L 696.275498 389.172525 
 Q 699.875498 389.172525 699.875498 385.572525 
-L 699.875498 353.165142 
-Q 699.875498 349.565142 696.275498 349.565142 
-L 465.920498 349.565142 
-Q 462.320498 349.565142 462.320498 353.165142 
+L 699.875498 353.163736 
+Q 699.875498 349.563736 696.275498 349.563736 
+L 465.920498 349.563736 
+Q 462.320498 349.563736 462.320498 353.163736 
 L 462.320498 385.572525 
 Q 462.320498 389.172525 465.920498 389.172525 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(513.367373 360.904615)">V = 105 m^3 y alpha media = 0,12 fijos</text>
+    <!-- $V$ = 105 m³ y $\alpha$ media = 0,12 fijos -->
+    <g style="fill: #ffffff" transform="translate(542.015498 360.904615)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">V</tspan>
+      <tspan x="62.881348" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">α</tspan>
+      <tspan x="6.156738" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="9.017578" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="16.558594" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="19.419434" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="25.145508" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="30.871582" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">5</tspan>
+      <tspan x="36.597656" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="39.458496" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      <tspan x="48.225586" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">³</tspan>
+      <tspan x="51.833496" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="54.694336" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">y</tspan>
+      <tspan x="60.020508" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="68.813965" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="71.674805" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      <tspan x="80.441895" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
+      <tspan x="85.979004" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
+      <tspan x="91.691895" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">i</tspan>
+      <tspan x="94.192383" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="99.70752" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="102.568359" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="110.109375" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="112.970215" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="118.696289" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">,</tspan>
+      <tspan x="121.557129" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="127.283203" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="133.009277" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="135.870117" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">f</tspan>
+      <tspan x="139.038574" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">i</tspan>
+      <tspan x="141.539062" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">j</tspan>
+      <tspan x="144.039551" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">o</tspan>
+      <tspan x="149.545898" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">s</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(561.64956 371.707076)">del cubo (1:1) a un pasillo 6:1</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(465.920498 382.509537)">media de 4 pares fuente-receptor, max_order = 60</text>
    </g>

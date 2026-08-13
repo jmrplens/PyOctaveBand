@@ -892,13 +892,13 @@ L 697.501563 339.083229
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_23">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="202.832266" y="359.517379" transform="rotate(-0 202.832266 359.517379)">-10 %</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="202.832266" y="359.517379" transform="rotate(-0 202.832266 359.517379)">−10 %</text>
    </g>
    <g id="text_24">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="393.089688" y="386.250713" transform="rotate(-0 393.089688 386.250713)">-28 %</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="393.089688" y="386.250713" transform="rotate(-0 393.089688 386.250713)">−28 %</text>
    </g>
    <g id="text_25">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="646.76625" y="436.755035" transform="rotate(-0 646.76625 436.755035)">-61 %</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="646.76625" y="436.755035" transform="rotate(-0 646.76625 436.755035)">−61 %</text>
    </g>
    <g id="text_26">
     <g id="patch_17">
@@ -914,8 +914,34 @@ Q 69.223027 482.021828 72.823027 482.021828
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(72.823027 442.95216)">room 8 x 5 x 3 m</text>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(72.823027 453.753918)">V = 120 m^3, S = 158 m^2</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(72.823027 442.95216)">room 8 × 5 × 3 m</text>
+    <!-- $V$ = 120 m³, $S$ = 158 m² -->
+    <g style="fill: #ffffff" transform="translate(72.823027 453.753918)">
+     <text>
+      <tspan x="0" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">V</tspan>
+      <tspan x="57.555176" y="-0.3125" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">S</tspan>
+      <tspan x="6.156738" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="9.017578" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="16.558594" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="19.419434" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="25.145508" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="30.871582" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="36.597656" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="39.458496" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      <tspan x="48.225586" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">³</tspan>
+      <tspan x="51.833496" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">,</tspan>
+      <tspan x="54.694336" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="63.268066" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="66.128906" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="73.669922" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="76.530762" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="82.256836" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">5</tspan>
+      <tspan x="87.98291" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">8</tspan>
+      <tspan x="93.708984" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="96.569824" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
+      <tspan x="105.336914" y="-0.3125" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">²</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(72.823027 464.556379)">uniform absorption, no air term</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(72.823027 475.35884)">shaded: outside Sabine's domain</text>
    </g>

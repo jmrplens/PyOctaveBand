@@ -287,21 +287,87 @@ L 705.583125 28.318125
    <g id="text_15">
     <g id="patch_7">
      <path d="M 54.027634 395.237852 
-L 250.511696 395.237852 
-Q 256.011696 395.237852 256.011696 389.737852 
-L 256.011696 336.927539 
-Q 256.011696 331.427539 250.511696 331.427539 
-L 54.027634 331.427539 
-Q 48.527634 331.427539 48.527634 336.927539 
+L 254.227634 395.237852 
+Q 259.727634 395.237852 259.727634 389.737852 
+L 259.727634 336.92582 
+Q 259.727634 331.42582 254.227634 331.42582 
+L 54.027634 331.42582 
+Q 48.527634 331.42582 48.527634 336.92582 
 L 48.527634 389.737852 
 Q 48.527634 395.237852 54.027634 395.237852 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 346.386035)">room 10 x 7 x 3.5 m</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 359.588184)">V = 245 m^3, S = 259 m^2</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 372.791191)">anisotropic: absorptive floor/ceiling</text>
-    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 385.994199)">c0 = 343 m/s, air at 20 C / 50 % RH</text>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 346.384316)">room 10 × 7 × 3.5 m</text>
+    <!-- $V$ = 245 m³, $S$ = 259 m² -->
+    <g transform="translate(54.027634 359.586465)">
+     <text>
+      <tspan x="0" y="-0.828125" style="font-style: oblique; font-size: 11px; font-family: sans-serif">V</tspan>
+      <tspan x="70.345215" y="-0.828125" style="font-style: oblique; font-size: 11px; font-family: sans-serif">S</tspan>
+      <tspan x="7.524902" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="11.021484" y="-0.828125" style="font-size: 11px; font-family: sans-serif">=</tspan>
+      <tspan x="20.238281" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="23.734863" y="-0.828125" style="font-size: 11px; font-family: sans-serif">2</tspan>
+      <tspan x="30.733398" y="-0.828125" style="font-size: 11px; font-family: sans-serif">4</tspan>
+      <tspan x="37.731934" y="-0.828125" style="font-size: 11px; font-family: sans-serif">5</tspan>
+      <tspan x="44.730469" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="48.227051" y="-0.828125" style="font-size: 11px; font-family: sans-serif">m</tspan>
+      <tspan x="58.942383" y="-0.828125" style="font-size: 11px; font-family: sans-serif">³</tspan>
+      <tspan x="63.352051" y="-0.828125" style="font-size: 11px; font-family: sans-serif">,</tspan>
+      <tspan x="66.848633" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="77.327637" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="80.824219" y="-0.828125" style="font-size: 11px; font-family: sans-serif">=</tspan>
+      <tspan x="90.041016" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="93.537598" y="-0.828125" style="font-size: 11px; font-family: sans-serif">2</tspan>
+      <tspan x="100.536133" y="-0.828125" style="font-size: 11px; font-family: sans-serif">5</tspan>
+      <tspan x="107.534668" y="-0.828125" style="font-size: 11px; font-family: sans-serif">9</tspan>
+      <tspan x="114.533203" y="-0.828125" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="118.029785" y="-0.828125" style="font-size: 11px; font-family: sans-serif">m</tspan>
+      <tspan x="128.745117" y="-0.828125" style="font-size: 11px; font-family: sans-serif">²</tspan>
+     </text>
+    </g>
+    <text style="font-size: 11px; font-family: sans-serif" transform="translate(54.027634 372.789473)">anisotropic: absorptive floor/ceiling</text>
+    <!-- $c_0$ = 343 m/s, air at 20 °C / 50 % RH -->
+    <g transform="translate(54.027634 385.994199)">
+     <text>
+      <tspan x="0" y="-0.640625" style="font-style: oblique; font-size: 11px; font-family: sans-serif">c</tspan>
+      <tspan x="6.047852" y="1.00937" style="font-size: 7.7px; font-family: sans-serif">0</tspan>
+      <tspan x="11.247607" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="14.744189" y="-0.640625" style="font-size: 11px; font-family: sans-serif">=</tspan>
+      <tspan x="23.960986" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="27.457568" y="-0.640625" style="font-size: 11px; font-family: sans-serif">3</tspan>
+      <tspan x="34.456104" y="-0.640625" style="font-size: 11px; font-family: sans-serif">4</tspan>
+      <tspan x="41.454639" y="-0.640625" style="font-size: 11px; font-family: sans-serif">3</tspan>
+      <tspan x="48.453174" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="51.949756" y="-0.640625" style="font-size: 11px; font-family: sans-serif">m</tspan>
+      <tspan x="62.665088" y="-0.640625" style="font-size: 11px; font-family: sans-serif">/</tspan>
+      <tspan x="66.371143" y="-0.640625" style="font-size: 11px; font-family: sans-serif">s</tspan>
+      <tspan x="72.1021" y="-0.640625" style="font-size: 11px; font-family: sans-serif">,</tspan>
+      <tspan x="75.598682" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="79.095264" y="-0.640625" style="font-size: 11px; font-family: sans-serif">a</tspan>
+      <tspan x="85.835986" y="-0.640625" style="font-size: 11px; font-family: sans-serif">i</tspan>
+      <tspan x="88.892139" y="-0.640625" style="font-size: 11px; font-family: sans-serif">r</tspan>
+      <tspan x="93.4146" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="96.911182" y="-0.640625" style="font-size: 11px; font-family: sans-serif">a</tspan>
+      <tspan x="103.651904" y="-0.640625" style="font-size: 11px; font-family: sans-serif">t</tspan>
+      <tspan x="107.964893" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="111.461475" y="-0.640625" style="font-size: 11px; font-family: sans-serif">2</tspan>
+      <tspan x="118.46001" y="-0.640625" style="font-size: 11px; font-family: sans-serif">0</tspan>
+      <tspan x="125.458545" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="128.955127" y="-0.640625" style="font-size: 11px; font-family: sans-serif">°</tspan>
+      <tspan x="134.455127" y="-0.640625" style="font-size: 11px; font-family: sans-serif">C</tspan>
+      <tspan x="142.135791" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="145.632373" y="-0.640625" style="font-size: 11px; font-family: sans-serif">/</tspan>
+      <tspan x="149.338428" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="152.83501" y="-0.640625" style="font-size: 11px; font-family: sans-serif">5</tspan>
+      <tspan x="159.833545" y="-0.640625" style="font-size: 11px; font-family: sans-serif">0</tspan>
+      <tspan x="166.83208" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="170.328662" y="-0.640625" style="font-size: 11px; font-family: sans-serif">%</tspan>
+      <tspan x="180.780811" y="-0.640625" style="font-size: 11px; font-family: sans-serif"> </tspan>
+      <tspan x="184.277393" y="-0.640625" style="font-size: 11px; font-family: sans-serif">R</tspan>
+      <tspan x="191.920459" y="-0.640625" style="font-size: 11px; font-family: sans-serif">H</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_16">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="374.844297" y="16.318125" transform="rotate(-0 374.844297 16.318125)">Reverberation-time prediction models</text>

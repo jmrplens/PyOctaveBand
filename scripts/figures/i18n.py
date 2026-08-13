@@ -927,11 +927,12 @@ _ES_EXACT = {
     "Millington-Sette": "Millington-Sette",
     "Fitzroy": "Fitzroy",
     "Arau-Puchades": "Arau-Puchades",
-    "room 10 x 7 x 3.5 m\nV = 245 m^3, S = 259 m^2\n"
-    "anisotropic: absorptive floor/ceiling\nc0 = 343 m/s, air at 20 C / 50 % RH":
-        "sala de 10 x 7 x 3,5 m\nV = 245 m^3, S = 259 m^2\n"
+    "room 10 × 7 × 3.5 m\n$V$ = 245 m³, $S$ = 259 m²\n"
+    "anisotropic: absorptive floor/ceiling\n"
+    "$c_0$ = 343 m/s, air at 20 °C / 50 % RH":
+        "sala de 10 × 7 × 3,5 m\n$V$ = 245 m³, $S$ = 259 m²\n"
         "anisótropa: suelo y techo absorbentes\n"
-        "c0 = 343 m/s, aire a 20 °C / 50 % HR",
+        "$c_0$ = 343 m/s, aire a 20 °C / 50 % HR",
     # dynamic_stiffness figure (EN 29052-1)
     "EN 29052-1 Floating-Floor Resonance":
         "Resonancia de suelo flotante EN 29052-1",
@@ -1402,23 +1403,25 @@ _ES_EXACT = {
     "Effective signal-to-noise ratio of the recovered impulse response":
         "Relación señal-ruido efectiva de la respuesta al impulso recuperada",
     "noise floor read here": "el ruido de fondo se lee aquí",
-    "Harmonic distortion lands before t = 0 (ISO 18233 B.5)":
-        "La distorsión armónica cae antes de t = 0 (ISO 18233 B.5)",
+    "Harmonic distortion lands before $t$ = 0 (ISO 18233 B.5)":
+        "La distorsión armónica cae antes de $t$ = 0 (ISO 18233 B.5)",
     "Arrival time relative to the linear impulse response [s]":
         "Tiempo de llegada respecto a la respuesta al impulso lineal [s]",
     "causal part: what impulse_response() returns":
         "parte causal: lo que devuelve impulse_response()",
-    "A microphone inside d_min returns wrong numbers, not noisy ones":
-        "Un micrófono dentro de d_min da números equivocados, no ruidosos",
+    r"A microphone inside $d_{\mathrm{min}}$ returns wrong numbers, not noisy "
+    "ones":
+        r"Un micrófono dentro de $d_{\mathrm{min}}$ da números equivocados, "
+        "no ruidosos",
     "Source–receiver distance [m]": "Distancia fuente–receptor [m]",
     "Decay time [s]": "Tiempo de caída [s]",
     "Clarity C80 [dB]": "Claridad C80 [dB]",
     "T30 (500–1000 Hz)": "T30 (500–1000 Hz)",
     "EDT (500–1000 Hz)": "EDT (500–1000 Hz)",
     "C80 (500–1000 Hz)": "C80 (500–1000 Hz)",
-    "What the analysis band averages over (7 × 5 × 3 m room, V = 105 m³)":
+    "What the analysis band averages over (7 × 5 × 3 m room, $V$ = 105 m³)":
         "Sobre qué promedia la banda de análisis (sala de 7 × 5 × 3 m, "
-        "V = 105 m³)",
+        "$V$ = 105 m³)",
     "Modes inside the octave band": "Modos dentro de la banda de octava",
     "Below the Schroeder frequency": "Por debajo de la frecuencia de Schroeder",
     "Above it": "Por encima",
@@ -1432,28 +1435,32 @@ _ES_EXACT = {
     # ISO 3382-3 Annex A quality ranges and the absorption-per-table window
     "The same two quantities at the two ends of Annex A":
         "Las mismas dos magnitudes en los dos extremos del Anexo A",
-    "Lp,A,S,4m > 50 dB: poor": "Lp,A,S,4m > 50 dB: deficiente",
-    "Lp,A,S,4m ≤ 48 dB: good target":
-        "Lp,A,S,4m ≤ 48 dB: objetivo bueno",
-    "rD ≤ 5 m: good": "rD ≤ 5 m: bueno",
-    "rD > 10 m: poor": "rD > 10 m: deficiente",
+    r"$L_{p,A,S,4\,\mathrm{m}} > 50$ dB: poor":
+        r"$L_{p,A,S,4\,\mathrm{m}} > 50$ dB: deficiente",
+    r"$L_{p,A,S,4\,\mathrm{m}} \leq 48$ dB: good target":
+        r"$L_{p,A,S,4\,\mathrm{m}} \leq 48$ dB: objetivo bueno",
+    r"$r_D \leq 5$ m: good": r"$r_D \leq 5$ m: bueno",
+    r"$r_D > 10$ m: poor": r"$r_D > 10$ m: deficiente",
     "A-weighted speech level [dB]": "Nivel de habla ponderado A [dB]",
     "Speech transmission index": "Índice de transmisión del habla",
     "STI = 0.50": "STI = 0,50",
     "STI = 0.20": "STI = 0,20",
     "The design window, for one layout":
         "La ventana de diseño, para una distribución",
-    "Communication: A_tab > 6.31 r_s²  (L_SN > −6 dB)":
-        "Comunicación: A_tab > 6,31 r_s²  (L_SN > −6 dB)",
-    "Privacy: A_tab < 3.16 r_t²  (L_SN < −9 dB)":
-        "Privacidad: A_tab < 3,16 r_t²  (L_SN < −9 dB)",
+    r"Communication: $A_{\mathrm{tab}} > 6.31\,r_s^2$  "
+    r"($L_{\mathrm{SN}} > -6$ dB)":
+        r"Comunicación: $A_{\mathrm{tab}} > 6{,}31\,r_s^2$  "
+        r"($L_{\mathrm{SN}} > -6$ dB)",
+    r"Privacy: $A_{\mathrm{tab}} < 3.16\,r_t^2$  ($L_{\mathrm{SN}} < -9$ dB)":
+        r"Privacidad: $A_{\mathrm{tab}} < 3{,}16\,r_t^2$  "
+        r"($L_{\mathrm{SN}} < -9$ dB)",
     "Separation [m]": "Separación [m]",
-    "Absorption per occupied table A_tab [m²]":
-        "Absorción por mesa ocupada A_tab [m²]",
-    "Table spacing over cross-table separation, r_t / r_s":
-        "Separación entre mesas frente a la de la mesa, r_t / r_s",
-    "Width of the feasible A_tab window [m²]":
-        "Anchura de la ventana factible de A_tab [m²]",
+    r"Absorption per occupied table $A_{\mathrm{tab}}$ [m²]":
+        r"Absorción por mesa ocupada $A_{\mathrm{tab}}$ [m²]",
+    "Table spacing over cross-table separation, $r_t/r_s$":
+        "Separación entre mesas frente a la de la mesa, $r_t/r_s$",
+    r"Width of the feasible $A_{\mathrm{tab}}$ window [m²]":
+        r"Anchura de la ventana factible de $A_{\mathrm{tab}}$ [m²]",
     "Two ratings: the RC Mark II tag reads the character":
         "Dos calificaciones: la etiqueta RC Mark II lee el carácter",
     "Tag threshold (D.3): +5 / +3 dB":
@@ -1490,8 +1497,8 @@ _ES_EXACT = {
     "Injury probability (Annex C)": "Probabilidad de lesión (Anexo C)",
     "male": "hombre",
     "female": "mujer",
-    "Equivalent absorption area $A$ [m$^2$]":
-        "Área de absorción equivalente $A$ [m$^2$]",
+    "Equivalent absorption area $A$ [m²]":
+        "Área de absorción equivalente $A$ [m²]",
     "Absorption area (Formula 1)": "Área de absorción (Fórmula 1)",
     "Reverberation time $T$ [s]": "Tiempo de reverberación $T$ [s]",
     "Reverberation time (Formula 5)": "Tiempo de reverberación (Fórmula 5)",
@@ -1763,9 +1770,9 @@ _ES_EXACT = {
         "la suma no converge: esto es el acople",
     "Open-Plan Spatial Decay of Speech (ISO 3382-3)":
         "Decaimiento espacial del habla en oficina abierta (ISO 3382-3)",
-    "Distance from the talker r [m]": "Distancia al hablante r [m]",
+    "Distance from the talker $r$ [m]": "Distancia al hablante $r$ [m]",
     "A-weighted SPL [dB]": "SPL ponderado A [dB]",
-    "Measured Lp,A,S": "Lp,A,S medido",
+    r"Measured $L_{p,A,S}$": r"$L_{p,A,S}$ medido",
     "STI vs distance": "STI vs distancia",
     # --- ERB_N / Cam auditory-filter scale (Glasberg & Moore 1990) ---
     "Auditory-Filter Bandwidth and the Cam Scale (Glasberg & Moore, 1990)":
@@ -2272,9 +2279,9 @@ _ES_EXACT = {
         "ESTOI valora más alto el enmascarador modulado: acredita el\n"
         "habla vislumbrada en los silencios. STOI apenas los separa.",
     # Room acoustics: image-source reflectogram (Kuttruff 4.1 / Vorlander 11.4)
-    "Image-Source Room Impulse Response: a 7x5x3 m room (order <= 10)":
-        "Respuesta al impulso por fuentes imagen: sala de 7x5x3 m "
-        "(orden <= 10)",
+    "Image-Source Room Impulse Response: a 7 × 5 × 3 m room (order ≤ 10)":
+        "Respuesta al impulso por fuentes imagen: sala de 7 × 5 × 3 m "
+        "(orden ≤ 10)",
     "Reflection order": "Orden de reflexión",
     "Arrival time [ms]": "Tiempo de llegada [ms]",
     "Reflection level re direct [dB]": "Nivel de reflexión rel. directo [dB]",
@@ -2295,9 +2302,9 @@ _ES_EXACT = {
     "(4 pi / 3)(c t)^3 / V": "(4 pi / 3)(c t)^3 / V",
     "counted": "contadas",
     "each reflection is a mirror image of the source;\n"
-    "amplitude = product of wall reflection factors / (4 pi r)":
+    r"amplitude = product of wall reflection factors / ($4\pi r$)":
         "cada reflexión es una imagen especular de la fuente;\n"
-        "amplitud = producto de factores de reflexión de pared / (4 pi r)",
+        r"amplitud = producto de factores de reflexión de pared / ($4\pi r$)",
     # decay_signatures panel titles (buildings/rooms/room-acoustics).
     "single slope": "pendiente única",
     "coupled volume": "volumen acoplado",
@@ -2314,11 +2321,11 @@ _ES_EXACT = {
     "ISO min. T30": "mín. ISO T30",
     "flag T20": "indicador T20",
     "flag T30": "indicador T30",
-    "synthetic single-slope decay, T = 1.0 s\nwhite noise floor swept, "
-    "fs = 48 kHz\ngreen band: the 5 % JND\nred band: flagged invalid for "
+    "synthetic single-slope decay, $T$ = 1.0 s\nwhite noise floor swept, "
+    "$f_s$ = 48 kHz\ngreen band: the 5 % JND\nred band: flagged invalid for "
     "T20\nbelow ~34 dB the fit returns NaN":
-        "decaimiento sintético de pendiente única, T = 1,0 s\nsuelo de "
-        "ruido blanco barrido, fs = 48 kHz\nbanda verde: la DAP del 5 %\n"
+        "decaimiento sintético de pendiente única, $T$ = 1,0 s\nsuelo de "
+        "ruido blanco barrido, $f_s$ = 48 kHz\nbanda verde: la DAP del 5 %\n"
         "banda roja: marcada no válida para T20\npor debajo de ~34 dB el "
         "ajuste devuelve NaN",
     # reverberation_model_absorption (Sabine against the mean absorption).
@@ -2330,25 +2337,25 @@ _ES_EXACT = {
     "Eyring falls to zero": "Eyring cae a cero",
     "Sabine stays finite:\n0.12 s at $\\alpha = 1$":
         "Sabine se mantiene finito:\n0,12 s en $\\alpha = 1$",
-    "room 8 x 5 x 3 m\nV = 120 m^3, S = 158 m^2\nuniform absorption, no "
+    "room 8 × 5 × 3 m\n$V$ = 120 m³, $S$ = 158 m²\nuniform absorption, no "
     "air term\nshaded: outside Sabine's domain":
-        "sala de 8 x 5 x 3 m\nV = 120 m^3, S = 158 m^2\nabsorción "
+        "sala de 8 × 5 × 3 m\n$V$ = 120 m³, $S$ = 158 m²\nabsorción "
         "uniforme, sin término de aire\nsombreado: fuera del dominio de "
         "Sabine",
     # enclosed_space_air_term (EN 12354-6 clause 4.3): "término de aire",
     # "oficina" and "sala" as the enclosed-space-absorption page words them.
-    r"Air term $A_{air} = 4mV(1-\psi)$ [m$^2$]":
-        r"Término de aire $A_{air} = 4mV(1-\psi)$ [m$^2$]",
-    r"Six climate profiles, $V$ = 2000 m$^3$":
-        r"Seis perfiles climáticos, $V$ = 2000 m$^3$",
+    r"Air term $A_{\mathrm{air}} = 4mV(1-\psi)$ [m²]":
+        r"Término de aire $A_{\mathrm{air}} = 4mV(1-\psi)$ [m²]",
+    "Six climate profiles, $V$ = 2000 m³":
+        "Seis perfiles climáticos, $V$ = 2000 m³",
     "The same absorption in two volumes":
         "La misma absorción en dos volúmenes",
-    r"60 m$^3$ office (no air)": r"oficina de 60 m$^3$ (sin aire)",
-    r"60 m$^3$ office (20 °C, 50-70 %)":
-        r"oficina de 60 m$^3$ (20 °C, 50-70 %)",
-    r"2000 m$^3$ hall (no air)": r"sala de 2000 m$^3$ (sin aire)",
-    r"2000 m$^3$ hall (20 °C, 50-70 %)":
-        r"sala de 2000 m$^3$ (20 °C, 50-70 %)",
+    "60 m³ office (no air)": "oficina de 60 m³ (sin aire)",
+    "60 m³ office (20 °C, 50-70 %)":
+        "oficina de 60 m³ (20 °C, 50-70 %)",
+    "2000 m³ hall (no air)": "sala de 2000 m³ (sin aire)",
+    "2000 m³ hall (20 °C, 50-70 %)":
+        "sala de 2000 m³ (20 °C, 50-70 %)",
     "−1.7 % at 1 kHz": "−1,7 % a 1 kHz",
     "−42 % at 8 kHz": "−42 % a 8 kHz",
     # enclosed_space_objects (EN 12354-6 Annex E case 2): "desnuda" and
@@ -2374,10 +2381,10 @@ _ES_EXACT = {
     "T30 from the synthetic RIR": "T30 de la RIR sintética",
     "Eyring, 0.93 s": "Eyring, 0,93 s",
     "Audible images": "Imágenes audibles",
-    "room 7 x 5 x 3 m, alpha = 0.12\nV = 105 m^3, S = 142 m^2, fs = 48 "
-    "kHz\nshaded: +/- 10 % around Eyring":
-        "sala de 7 x 5 x 3 m, alpha = 0,12\nV = 105 m^3, S = 142 m^2, "
-        "fs = 48 kHz\nsombreado: +/- 10 % alrededor de Eyring",
+    "room 7 × 5 × 3 m, $\\alpha$ = 0.12\n$V$ = 105 m³, $S$ = 142 m², "
+    "$f_s$ = 48 kHz\nshaded: ±10 % around Eyring":
+        "sala de 7 × 5 × 3 m, $\\alpha$ = 0,12\n$V$ = 105 m³, $S$ = 142 m², "
+        "$f_s$ = 48 kHz\nsombreado: ±10 % alrededor de Eyring",
     # image_source_anisotropy: "alargamiento" and "especular (fuentes
     # imagen)" as the page's own snippet labels them.
     "Where the specular decay leaves the diffuse-field estimate":
@@ -2388,31 +2395,31 @@ _ES_EXACT = {
     "specular (image source)": "especular (fuentes imagen)",
     "Eyring (diffuse field)": "Eyring (campo difuso)",
     r"$\pm$ 10 % around Eyring": r"$\pm$ 10 % alrededor de Eyring",
-    "V = 105 m^3 and mean alpha = 0.12 held fixed\ncube (1:1) through a "
+    "$V$ = 105 m³ and mean $\\alpha$ = 0.12 held fixed\ncube (1:1) through a "
     "6:1 corridor\nmean of 4 source-receiver pairs, max_order = 60":
-        "V = 105 m^3 y alpha media = 0,12 fijos\ndel cubo (1:1) a un "
+        "$V$ = 105 m³ y $\\alpha$ media = 0,12 fijos\ndel cubo (1:1) a un "
         "pasillo 6:1\nmedia de 4 pares fuente-receptor, max_order = 60",
     # image_source_bands: "continua"/"a trazos" as the page words them.
     "Per-band decay: solid without air, dashed with air":
         "Decaimiento por banda: continua sin aire, a trazos con aire",
-    "room 7 x 5 x 3 m, max_order = 60\nwall alpha 0.10 -> 0.50 with "
-    "frequency\nair at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,\n"
+    "room 7 × 5 × 3 m, max_order = 60\nwall $\\alpha$ 0.10 → 0.50 with "
+    "frequency\nair at 20 °C / 50 % RH: −0.4 % of T30 at 250 Hz,\n"
     "−4.4 % at 4 kHz":
-        "sala de 7 x 5 x 3 m, max_order = 60\nalpha de pared 0,10 -> 0,50 "
+        "sala de 7 × 5 × 3 m, max_order = 60\n$\\alpha$ de pared 0,10 → 0,50 "
         "con la frecuencia\naire a 20 °C / 50 % HR: −0,4 % del T30 a "
         "250 Hz,\n−4,4 % a 4 kHz",
     # room_proportion_modes; "axial" reads the same in Spanish and matches
     # the library's own rectangular_room_modes label.
-    r"Three rooms of 105 m$^3$, modes up to 200 Hz":
-        r"Tres salas de 105 m$^3$, modos hasta 200 Hz",
+    "Three rooms of 105 m³, modes up to 200 Hz":
+        "Tres salas de 105 m³, modos hasta 200 Hz",
     "axial": "axial",
     "tangential": "tangencial",
     "oblique": "oblicuo",
     "cube": "cubo",
-    "cube\n4.72 x 4.72 x 4.72 m": "cubo\n4,72 x 4,72 x 4,72 m",
+    "cube\n4.72 × 4.72 × 4.72 m": "cubo\n4,72 × 4,72 × 4,72 m",
     "Bolt 1 : 1.4 : 1.9": "Bolt 1 : 1,4 : 1,9",
-    "Bolt 1 : 1.4 : 1.9\n3.40 x 4.77 x 6.47 m":
-        "Bolt 1 : 1,4 : 1,9\n3,40 x 4,77 x 6,47 m",
+    "Bolt 1 : 1.4 : 1.9\n3.40 × 4.77 × 6.47 m":
+        "Bolt 1 : 1,4 : 1,9\n3,40 × 4,77 × 6,47 m",
     "Spacing to the next\ndistinct mode [Hz]":
         "Separación al siguiente\nmodo distinto [Hz]",
     # steady_state_directivity / steady_state_field; "Total" matches the
@@ -2422,8 +2429,10 @@ _ES_EXACT = {
         "La absorción mueve la meseta, no el campo directo",
     "Distance from source [m]": "Distancia a la fuente [m]",
     "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
-    "12 x 8 x 4 m workshop, S = 352 m^2, Lw = 90 dB re 1 pW":
-        "taller de 12 x 8 x 4 m, S = 352 m^2, Lw = 90 dB re 1 pW",
+    "12 × 8 × 4 m workshop, $S$ = 352 m², $L_W$ = 90 dB re 1 pW":
+        "taller de 12 × 8 × 4 m, $S$ = 352 m², $L_W$ = 90 dB re 1 pW",
+    r"10.1 dB = $10\,\mathrm{lg}(R_2/R_1)$":
+        r"10,1 dB = $10\,\mathrm{lg}(R_2/R_1)$",
     "Total": "Total",
     # Underwater acoustics (ISO 17208 ship radiated noise; ISO 18406 pile driving)
     # piling_campaign_accumulation: the two units at the FL4/FL8 boundary each
@@ -4575,16 +4584,20 @@ _ES_PATTERNS = [
     # composite_facade_weak_element legend (blind-part value baked in);
     # "parte ciega" as the spanish-building-code page words it.
     (r"^blind part \$R_A\$ = (\d+) dBA$", r"parte ciega $R_A$ = \1 dBA"),
-    # decay_signatures summary boxes (EDT/T20/T30/curvature baked in).
-    ((r"^EDT (.+) s\nT20 (.+) s\nT30 (.+) s\nC = (.+) %\n"
-      r"T20 = T30, curvature ~ 0$"),
-     r"EDT \1 s\nT20 \2 s\nT30 \3 s\nC = \4 %\nT20 = T30, curvatura ~ 0"),
-    ((r"^EDT (.+) s\nT20 (.+) s\nT30 (.+) s\nC = (.+) %\n"
-      r"T30 > T20: report both$"),
-     r"EDT \1 s\nT20 \2 s\nT30 \3 s\nC = \4 %\nT30 > T20: informa de ambos"),
-    ((r"^EDT (.+) s\nT20 (.+) s\nT30 (.+) s\nC = (.+) %\n"
-      r"EDT << T30: a dry seat$"),
-     r"EDT \1 s\nT20 \2 s\nT30 \3 s\nC = \4 %\nEDT << T30: una butaca seca"),
+    # decay_signatures summary boxes (EDT/T20/T30/curvature baked in; the
+    # mathtext $C$ blocks the decimal-comma pass, so the commas are here).
+    ((r"^EDT (\d+)\.(\d+) s\nT20 (\d+)\.(\d+) s\nT30 (\d+)\.(\d+) s\n"
+      r"\$C\$ = (.+) %\nT20 = T30, curvature ~ 0$"),
+     (r"EDT \1,\2 s\nT20 \3,\4 s\nT30 \5,\6 s\n$C$ = \7 %\n"
+      r"T20 = T30, curvatura ~ 0")),
+    ((r"^EDT (\d+)\.(\d+) s\nT20 (\d+)\.(\d+) s\nT30 (\d+)\.(\d+) s\n"
+      r"\$C\$ = (.+) %\nT30 > T20: report both$"),
+     (r"EDT \1,\2 s\nT20 \3,\4 s\nT30 \5,\6 s\n$C$ = \7 %\n"
+      r"T30 > T20: informa de ambos")),
+    ((r"^EDT (\d+)\.(\d+) s\nT20 (\d+)\.(\d+) s\nT30 (\d+)\.(\d+) s\n"
+      r"\$C\$ = (.+) %\nEDT ≪ T30: a dry seat$"),
+     (r"EDT \1,\2 s\nT20 \3,\4 s\nT30 \5,\6 s\n$C$ = \7 %\n"
+      r"EDT ≪ T30: una butaca seca")),
     # image_source_order_convergence crossing annotation (order baked in).
     (r"^crosses Eyring at order (\d+)\nand keeps rising$",
      r"cruza Eyring en el orden \1\ny sigue subiendo"),
@@ -4782,8 +4795,8 @@ _ES_PATTERNS = [
     (r"^sum converges to (.+) dB$", r"la suma converge a \1 dB"),
     (r"^Aures \(Annex B, \$N\$ = (\d+) sone\)$",
      r"Aures (Anexo B, $N$ = \1 sonios)"),
-    (r"^Spatial decay D2,S = (.+) dB$",
-     r"Decaimiento espacial D2,S = \1 dB"),
+    (r"^Spatial decay \$D_\{2,S\}\$ = (\d+)\.(\d+) dB$",
+     r"Decaimiento espacial $D_{2,S}$ = \1,\2 dB"),
     (r"^Zwicker \(ISO 532-1\), \$N\$ = (\d+)\.(\d+) sone$",
      r"Zwicker (ISO 532-1), $N$ = \1,\2 sonios"),
     (r"^Moore-Glasberg \(ISO 532-2\), \$N\$ = (\d+)\.(\d+) sone$",
@@ -5037,8 +5050,9 @@ _ES_PATTERNS = [
      r"barrido de \1 s, deconvolucionado — \2 dB"),
     (r"^sweep over pistol: \+(.+) dB\ntwo doublings of sweep length: \+(.+) dB$",
      r"barrido frente a pistola: +\1 dB\ndos duplicaciones de la duración: +\2 dB"),
-    (r"^H(\d)\n−(.+) s$", r"H\1\n−\2 s"),
-    (r"^excluded: r < d_min = (.+) m$", r"excluida: r < d_min = \1 m"),
+    (r"^\$H_(\d)\$\n−(\d+)\.(\d+) s$", r"$H_\1$\n−\2,\3 s"),
+    (r"^excluded: \$r < d_\{\\mathrm\{min\}\}\$ = (\d+)\.(\d+) m$",
+     r"excluida: $r < d_{\\mathrm{min}}$ = \1,\2 m"),
     (r"^critical distance (.+) m$", r"distancia crítica \1 m"),
     (r"^Schroeder frequency (.+) Hz$", r"Frecuencia de Schroeder \1 Hz"),
     (r"^sweep, stationary$", r"barrido, estacionario"),
@@ -5046,23 +5060,37 @@ _ES_PATTERNS = [
     (r"^sweep, \+0\.3 K during the take$", r"barrido, +0,3 K durante la toma"),
     (r"^MLS, \+0\.3 K during the take$", r"MLS, +0,3 K durante la toma"),
     # ISO 3382-3 Annex A quality ranges and the absorption-per-table window
-    (r"^Treated: D2,S = (.+) dB, Lp,A,S,4m = (.+) dB$",
-     r"Tratada: D2,S = \1 dB, Lp,A,S,4m = \2 dB"),
-    (r"^Untreated: D2,S = (.+) dB, Lp,A,S,4m = (.+) dB$",
-     r"Sin tratar: D2,S = \1 dB, Lp,A,S,4m = \2 dB"),
-    (r"^Treated: rD = (.+) m, rP = (.+) m$", r"Tratada: rD = \1 m, rP = \2 m"),
-    (r"^Untreated: rD = (.+) m, rP = (.+) m$",
-     r"Sin tratar: rD = \1 m, rP = \2 m"),
-    (r"^feasible A_tab: (.+) to (.+) m²$",
-     r"A_tab factible: de \1 a \2 m²"),
-    (r"^r_s = (.+) m → A_tab > (.+) m²$", r"r_s = \1 m → A_tab > \2 m²"),
-    (r"^r_t = (.+) m → A_tab < (.+) m²$", r"r_t = \1 m → A_tab < \2 m²"),
-    (r"^window closes at r_t / r_s = (.+)$",
-     r"la ventana se cierra en r_t / r_s = \1"),
+    # (the mathtext blocks the decimal-comma pass, so the commas are here).
+    ((r"^Treated: \$D_\{2,S\}\$ = (\d+) dB, "
+      r"\$L_\{p,A,S,4\\,\\mathrm\{m\}\}\$ = (\d+) dB$"),
+     r"Tratada: $D_{2,S}$ = \1 dB, $L_{p,A,S,4\,\\mathrm{m}}$ = \2 dB"),
+    ((r"^Untreated: \$D_\{2,S\}\$ = (\d+) dB, "
+      r"\$L_\{p,A,S,4\\,\\mathrm\{m\}\}\$ = (\d+) dB$"),
+     r"Sin tratar: $D_{2,S}$ = \1 dB, $L_{p,A,S,4\,\\mathrm{m}}$ = \2 dB"),
+    (r"^Treated: \$r_D\$ = (\d+)\.(\d+) m, \$r_P\$ = (\d+) m$",
+     r"Tratada: $r_D$ = \1,\2 m, $r_P$ = \3 m"),
+    (r"^Untreated: \$r_D\$ = (\d+)\.(\d+) m, \$r_P\$ = (\d+) m$",
+     r"Sin tratar: $r_D$ = \1,\2 m, $r_P$ = \3 m"),
+    (r"^\$r_D\$ = (\d+)\.(\d+) m$", r"$r_D$ = \1,\2 m"),
+    (r"^\$r_P\$ = (\d+)\.(\d+) m$", r"$r_P$ = \1,\2 m"),
+    (r"^feasible \$A_\{\\mathrm\{tab\}\}\$: (\d+)\.(\d+) to (\d+)\.(\d+) m²$",
+     r"$A_{\\mathrm{tab}}$ factible: de \1,\2 a \3,\4 m²"),
+    ((r"^\$r_s\$ = (\d+)\.(\d+) m → \$A_\{\\mathrm\{tab\}\}\$ > "
+      r"(\d+)\.(\d+) m²$"),
+     r"$r_s$ = \1,\2 m → $A_{\\mathrm{tab}}$ > \3,\4 m²"),
+    (r"^\$r_t\$ = (\d+) m → \$A_\{\\mathrm\{tab\}\}\$ < (\d+)\.(\d+) m²$",
+     r"$r_t$ = \1 m → $A_{\\mathrm{tab}}$ < \2,\3 m²"),
+    (r"^window closes at \$r_t/r_s\$ = (\d+)\.(\d+)$",
+     r"la ventana se cierra en $r_t/r_s$ = \1,\2"),
     (r"^this layout: (.+), (.+) m² wide$",
      r"esta distribución: \1, \2 m² de anchura"),
-    (r"^Packed tables close it \(r_s = (.+) m\)$",
-     r"Con las mesas juntas se cierra (r_s = \1 m)"),
+    (r"^Packed tables close it \(\$r_s\$ = (\d+)\.(\d+) m\)$",
+     r"Con las mesas juntas se cierra ($r_s$ = \1,\2 m)"),
+    # steady_state_directivity legends (mathtext blocks the comma pass).
+    (r"^\$Q\$ = (\d+)  \(\$r_c\$ = (\d+)\.(\d+) m\)$",
+     r"$Q$ = \1  ($r_c$ = \2,\3 m)"),
+    (r"^\$\\bar\\alpha\$ = (\d+)\.(\d+)  \(\$R\$ = (\d+) m²\)$",
+     r"$\\bar\\alpha$ = \1,\2  ($R$ = \3 m²)"),
     (r"^(\d+) yr$", r"\1 años"),
     (r"^10-90 % band \((\d+) yr\)$", r"banda 10-90 % (\1 años)"),
     # Tier-1 animation dynamic labels

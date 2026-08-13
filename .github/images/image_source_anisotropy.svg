@@ -341,29 +341,72 @@ L 705.704063 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_17">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="42.127018" y="181.119534" transform="rotate(-0 42.127018 181.119534)">x1.05</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="42.127018" y="181.119534" transform="rotate(-0 42.127018 181.119534)">×1.05</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="280.395257" y="160.427049" transform="rotate(-0 280.395257 160.427049)">x1.30</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="280.395257" y="160.427049" transform="rotate(-0 280.395257 160.427049)">×1.30</text>
    </g>
    <g id="text_19">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="637.797614" y="70.380526" transform="rotate(-0 637.797614 70.380526)">x2.50</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="637.797614" y="70.380526" transform="rotate(-0 637.797614 70.380526)">×2.50</text>
    </g>
    <g id="text_20">
     <g id="patch_7">
      <path d="M 474.122529 388.692525 
 L 695.875498 388.692525 
 Q 699.475498 388.692525 699.475498 385.092525 
-L 699.475498 352.685142 
-Q 699.475498 349.085142 695.875498 349.085142 
-L 474.122529 349.085142 
-Q 470.522529 349.085142 470.522529 352.685142 
+L 699.475498 352.683736 
+Q 699.475498 349.083736 695.875498 349.083736 
+L 474.122529 349.083736 
+Q 470.522529 349.083736 470.522529 352.683736 
 L 470.522529 385.092525 
 Q 470.522529 388.692525 474.122529 388.692525 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(477.950341 360.424615)">V = 105 m^3 and mean alpha = 0.12 held fixed</text>
+    <!-- $V$ = 105 m³ and mean $\alpha$ = 0.12 held fixed -->
+    <g transform="translate(506.605498 360.424615)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">V</tspan>
+      <tspan x="102.871582" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">α</tspan>
+      <tspan x="6.156738" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="9.017578" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="16.558594" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="19.419434" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="25.145508" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="30.871582" y="-0.15625" style="font-size: 9px; font-family: sans-serif">5</tspan>
+      <tspan x="36.597656" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="39.458496" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="48.225586" y="-0.15625" style="font-size: 9px; font-family: sans-serif">³</tspan>
+      <tspan x="51.833496" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="54.694336" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="60.209473" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+      <tspan x="65.913574" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="71.626465" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="74.487305" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="83.254395" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="88.791504" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+      <tspan x="94.306641" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+      <tspan x="100.010742" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="108.804199" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="111.665039" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="119.206055" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="122.066895" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="127.792969" y="-0.15625" style="font-size: 9px; font-family: sans-serif">.</tspan>
+      <tspan x="130.653809" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="136.379883" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="142.105957" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="144.966797" y="-0.15625" style="font-size: 9px; font-family: sans-serif">h</tspan>
+      <tspan x="150.670898" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="156.208008" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="158.708496" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="164.421387" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="167.282227" y="-0.15625" style="font-size: 9px; font-family: sans-serif">f</tspan>
+      <tspan x="170.450684" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+      <tspan x="172.951172" y="-0.15625" style="font-size: 9px; font-family: sans-serif">x</tspan>
+      <tspan x="178.277344" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+      <tspan x="183.814453" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+     </text>
+    </g>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(547.683466 371.227076)">cube (1:1) through a 6:1 corridor</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(474.122529 382.029537)">mean of 4 source-receiver pairs, max_order = 60</text>
    </g>
