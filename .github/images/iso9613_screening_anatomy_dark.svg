@@ -1110,18 +1110,17 @@ L 521.167969 51.612109
      </g>
     </g>
     <g id="text_44">
-     <!-- $A_{bar} = \max(D_z - A_{gr}, 0)$ (Eq. (12)) -->
+     <!-- $A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (Eq. (12)) -->
      <g style="fill: #ffffff" transform="translate(528.367969 54.762109)">
       <text>
        <tspan x="0" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
        <tspan x="51.020068" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">D</tspan>
        <tspan x="72.551074" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="6.156738" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">b</tspan>
-       <tspan x="10.155762" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
-       <tspan x="14.016357" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
-       <tspan x="57.950244" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">z</tspan>
-       <tspan x="78.707813" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
-       <tspan x="82.706836" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
+       <tspan x="6.156738" y="1.178121" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">b</tspan>
+       <tspan x="10.155762" y="1.178121" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
+       <tspan x="14.016357" y="1.178121" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
+       <tspan x="78.707813" y="1.178121" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
+       <tspan x="82.706836" y="1.178121" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
        <tspan x="18.606006" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">=</tspan>
        <tspan x="27.900439" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">m</tspan>
        <tspan x="36.667529" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">a</tspan>
@@ -1142,6 +1141,7 @@ L 521.167969 51.612109
        <tspan x="132.125098" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">2</tspan>
        <tspan x="137.851172" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
        <tspan x="141.362402" y="-0.171875" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
+       <tspan x="57.950244" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">z</tspan>
       </text>
      </g>
     </g>
@@ -1154,12 +1154,12 @@ z
 " style="fill: #2ca02c; fill-opacity: 0.2; stroke: #2ca02c; stroke-opacity: 0.2; stroke-linejoin: miter"/>
     </g>
     <g id="text_45">
-     <!-- $A_{gr}$, spent on the screened path -->
+     <!-- $A_{\mathrm{gr}}$, spent on the screened path -->
      <g style="fill: #ffffff" transform="translate(528.367969 68.802109)">
       <text>
        <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="6.156738" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
-       <tspan x="10.155762" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
+       <tspan x="6.156738" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
+       <tspan x="10.155762" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
        <tspan x="12.991992" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">,</tspan>
        <tspan x="15.852832" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff"> </tspan>
        <tspan x="18.713672" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">s</tspan>

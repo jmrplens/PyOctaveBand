@@ -189,10 +189,10 @@ def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
     pos_bottom = np.zeros(len(bands))
     neg_bottom = np.zeros(len(bands))
     for term, color, label in [
-        (att.a_div, COLOR_PRIMARY, "$A_{div}$ — divergence"),
-        (att.a_atm, COLOR_TERTIARY, "$A_{atm}$ — atmospheric"),
-        (att.a_gr, "#9467bd", "$A_{gr}$ — ground"),
-        (att.a_bar, "#ff7f0e", "$A_{bar}$ — barrier"),
+        (att.a_div, COLOR_PRIMARY, r"$A_{\mathrm{div}}$ — divergence"),
+        (att.a_atm, COLOR_TERTIARY, r"$A_{\mathrm{atm}}$ — atmospheric"),
+        (att.a_gr, "#9467bd", r"$A_{\mathrm{gr}}$ — ground"),
+        (att.a_bar, "#ff7f0e", r"$A_{\mathrm{bar}}$ — barrier"),
     ]:
         bottom = np.where(term >= 0.0, pos_bottom, neg_bottom)
         ax.bar(x, term, bottom=bottom, color=color, edgecolor=COLOR_FG,
@@ -946,10 +946,10 @@ def generate_outdoor_level_cascade(output_dir: str) -> None:
     ax.plot(x, lw, "s--", color=COLOR_MUTED, linewidth=1.4, markersize=6,
             label="$L_W$ = 95 dB (source power)", zorder=4)
     terms = (
-        (att.a_div, "$-A_{div}$ (divergence)", COLOR_PRIMARY),
-        (att.a_atm, "$-A_{atm}$ (air)", COLOR_TERTIARY),
-        (att.a_gr, "$-A_{gr}$ (ground)", "#9467bd"),
-        (att.a_bar, "$-A_{bar}$ (barrier)", COLOR_SECONDARY),
+        (att.a_div, r"$-A_{\mathrm{div}}$ (divergence)", COLOR_PRIMARY),
+        (att.a_atm, r"$-A_{\mathrm{atm}}$ (air)", COLOR_TERTIARY),
+        (att.a_gr, r"$-A_{\mathrm{gr}}$ (ground)", "#9467bd"),
+        (att.a_bar, r"$-A_{\mathrm{bar}}$ (barrier)", COLOR_SECONDARY),
     )
     for term, label, color in terms:
         ax.bar(x, -np.asarray(term), bottom=level, color=color, alpha=0.85,
@@ -1018,9 +1018,9 @@ def generate_iso9613_screening_anatomy(output_dir: str) -> None:
                label="$D_z$ (Eq. (14))", zorder=4)
     right.plot(x, att.a_bar, "D-", color=COLOR_SECONDARY, linewidth=2.0,
                markersize=6,
-               label=r"$A_{bar} = \max(D_z - A_{gr}, 0)$ (Eq. (12))", zorder=4)
+               label=r"$A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (Eq. (12))", zorder=4)
     right.fill_between(x, att.a_bar, dz, color=COLOR_TERTIARY, alpha=0.20,
-                       label="$A_{gr}$, spent on the screened path", zorder=2)
+                       label=r"$A_{\mathrm{gr}}$, spent on the screened path", zorder=2)
     right.axhline(20.0, color=COLOR_MUTED, linestyle=":", linewidth=1.2, zorder=1)
     right.set_title("The ground effect is spent, not kept", fontweight="bold",
                     pad=10)

@@ -648,13 +648,13 @@ z
 " style="fill: #1f77b4; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
     </g>
     <g id="text_19">
-     <!-- $A_{div}$ — divergencia -->
+     <!-- $A_{\mathrm{div}}$ — divergencia -->
      <g transform="translate(80.989844 57.240234)">
       <text>
        <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">d</tspan>
-       <tspan x="10.155762" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">i</tspan>
-       <tspan x="11.906104" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">v</tspan>
+       <tspan x="6.156738" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">d</tspan>
+       <tspan x="10.155762" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">i</tspan>
+       <tspan x="11.906104" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">v</tspan>
        <tspan x="15.880518" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="27.741357" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="30.602197" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
@@ -681,13 +681,13 @@ z
 " style="fill: #2ca02c; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
     </g>
     <g id="text_20">
-     <!-- $A_{atm}$ — atmosférica -->
+     <!-- $A_{\mathrm{atm}}$ — atmosférica -->
      <g transform="translate(80.989844 71.102344)">
       <text>
        <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="0.553121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">a</tspan>
-       <tspan x="10.017334" y="0.553121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">t</tspan>
-       <tspan x="12.4875" y="0.553121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">m</tspan>
+       <tspan x="6.156738" y="0.553121" style="font-size: 6.3px; font-family: sans-serif">a</tspan>
+       <tspan x="10.017334" y="0.553121" style="font-size: 6.3px; font-family: sans-serif">t</tspan>
+       <tspan x="12.4875" y="0.553121" style="font-size: 6.3px; font-family: sans-serif">m</tspan>
        <tspan x="18.870557" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="30.731396" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="33.592236" y="-0.796875" style="font-size: 9px; font-family: sans-serif">a</tspan>
@@ -714,12 +714,12 @@ z
 " style="fill: #9467bd; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
     </g>
     <g id="text_21">
-     <!-- $A_{gr}$ — suelo -->
+     <!-- $A_{\mathrm{gr}}$ — suelo -->
      <g transform="translate(211.219844 43.738125)">
       <text>
        <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">g</tspan>
-       <tspan x="10.155762" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">r</tspan>
+       <tspan x="6.156738" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">g</tspan>
+       <tspan x="10.155762" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">r</tspan>
        <tspan x="12.991992" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="24.852832" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="27.713672" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
@@ -740,13 +740,13 @@ z
 " style="fill: #ff7f0e; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
-     <!-- $A_{bar}$ — barrera -->
+     <!-- $A_{\mathrm{bar}}$ — barrera -->
      <g transform="translate(211.219844 57.778125)">
       <text>
        <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">b</tspan>
-       <tspan x="10.155762" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">a</tspan>
-       <tspan x="14.016357" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">r</tspan>
+       <tspan x="6.156738" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">b</tspan>
+       <tspan x="10.155762" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">a</tspan>
+       <tspan x="14.016357" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">r</tspan>
        <tspan x="16.852588" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="28.713428" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="31.574268" y="-0.15625" style="font-size: 9px; font-family: sans-serif">b</tspan>

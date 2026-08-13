@@ -2805,10 +2805,10 @@ _ES_EXACT = {
     "Speed $v$ [km/h]": "Velocidad $v$ [km/h]",
     r"A-weighted sound power $L_{W\!,A}$ [dB(A) re 1 pW]":
         r"Potencia acústica ponderada A $L_{W\!,A}$ [dB(A) re 1 pW]",
-    "$A_{div}$ — divergence": "$A_{div}$ — divergencia",
-    "$A_{atm}$ — atmospheric": "$A_{atm}$ — atmosférica",
-    "$A_{gr}$ — ground": "$A_{gr}$ — suelo",
-    "$A_{bar}$ — barrier": "$A_{bar}$ — barrera",
+    r"$A_{\mathrm{div}}$ — divergence": r"$A_{\mathrm{div}}$ — divergencia",
+    r"$A_{\mathrm{atm}}$ — atmospheric": r"$A_{\mathrm{atm}}$ — atmosférica",
+    r"$A_{\mathrm{gr}}$ — ground": r"$A_{\mathrm{gr}}$ — suelo",
+    r"$A_{\mathrm{bar}}$ — barrier": r"$A_{\mathrm{bar}}$ — barrera",
     "$A$ — total": "$A$ — total",
     "Spherical-Wave Ground Effect (Weyl-Van der Pol)":
         "Efecto suelo de onda esférica (Weyl-Van der Pol)",
@@ -2833,10 +2833,10 @@ _ES_EXACT = {
     "$L_W$ = 95 dB (source power)": "$L_W$ = 95 dB (potencia de la fuente)",
     r"$L_{fT}(\mathrm{DW})$ at the receiver":
         r"$L_{fT}(\mathrm{DW})$ en el receptor",
-    "$-A_{div}$ (divergence)": "$-A_{div}$ (divergencia)",
-    "$-A_{atm}$ (air)": "$-A_{atm}$ (aire)",
-    "$-A_{gr}$ (ground)": "$-A_{gr}$ (suelo)",
-    "$-A_{bar}$ (barrier)": "$-A_{bar}$ (barrera)",
+    r"$-A_{\mathrm{div}}$ (divergence)": r"$-A_{\mathrm{div}}$ (divergencia)",
+    r"$-A_{\mathrm{atm}}$ (air)": r"$-A_{\mathrm{atm}}$ (aire)",
+    r"$-A_{\mathrm{gr}}$ (ground)": r"$-A_{\mathrm{gr}}$ (suelo)",
+    r"$-A_{\mathrm{bar}}$ (barrier)": r"$-A_{\mathrm{bar}}$ (barrera)",
     "$D_z$ at 500 Hz against barrier height ($d$ = 200 m)":
         "$D_z$ a 500 Hz frente a la altura de barrera ($d$ = 200 m)",
     "Single edge": "Borde simple",
@@ -2847,10 +2847,10 @@ _ES_EXACT = {
     "Diffraction insertion loss $D_z$ [dB]":
         "Pérdida por inserción debida a la difracción $D_z$ [dB]",
     "$D_z$ (Eq. (14))": "$D_z$ (ec. (14))",
-    r"$A_{bar} = \max(D_z - A_{gr}, 0)$ (Eq. (12))":
-        r"$A_{bar} = \max(D_z - A_{gr}, 0)$ (ec. (12))",
-    "$A_{gr}$, spent on the screened path":
-        "$A_{gr}$, gastada en el camino apantallado",
+    r"$A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (Eq. (12))":
+        r"$A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (ec. (12))",
+    r"$A_{\mathrm{gr}}$, spent on the screened path":
+        r"$A_{\mathrm{gr}}$, gastada en el camino apantallado",
     "The ground effect is spent, not kept":
         "El efecto del suelo se gasta, no se conserva",
     "The coefficients part as the path grazes":

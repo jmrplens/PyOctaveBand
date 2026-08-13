@@ -696,7 +696,7 @@ z
 " style="fill: #1f77b4; opacity: 0.85"/>
     </g>
     <g id="text_19">
-     <!-- $-A_{div}$ (divergence) -->
+     <!-- $-A_{\mathrm{div}}$ (divergence) -->
      <g style="fill: #ffffff" transform="translate(74.225781 404.515781)">
       <text>
        <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
@@ -714,9 +714,9 @@ z
        <tspan x="74.472803" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">e</tspan>
        <tspan x="80.009912" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
        <tspan x="7.541016" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="13.697754" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">d</tspan>
-       <tspan x="17.696777" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">i</tspan>
-       <tspan x="19.447119" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">v</tspan>
+       <tspan x="13.697754" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">d</tspan>
+       <tspan x="17.696777" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">i</tspan>
+       <tspan x="19.447119" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">v</tspan>
       </text>
      </g>
     </g>
@@ -729,7 +729,7 @@ z
 " style="fill: #2ca02c; opacity: 0.85"/>
     </g>
     <g id="text_20">
-     <!-- $-A_{atm}$ (air) -->
+     <!-- $-A_{\mathrm{atm}}$ (air) -->
      <g style="fill: #ffffff" transform="translate(238.925781 377.511563)">
       <text>
        <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
@@ -740,9 +740,9 @@ z
        <tspan x="40.799268" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
        <tspan x="44.499463" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
        <tspan x="7.541016" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="13.697754" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
-       <tspan x="17.55835" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">t</tspan>
-       <tspan x="20.028516" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">m</tspan>
+       <tspan x="13.697754" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
+       <tspan x="17.55835" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">t</tspan>
+       <tspan x="20.028516" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">m</tspan>
       </text>
      </g>
     </g>
@@ -755,7 +755,7 @@ z
 " style="fill: #9467bd; opacity: 0.85"/>
     </g>
     <g id="text_21">
-     <!-- $-A_{gr}$ (ground) -->
+     <!-- $-A_{\mathrm{gr}}$ (ground) -->
      <g style="fill: #ffffff" transform="translate(238.925781 391.013672)">
       <text>
        <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
@@ -769,8 +769,8 @@ z
        <tspan x="53.232715" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">d</tspan>
        <tspan x="58.945605" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
        <tspan x="7.541016" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="13.697754" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
-       <tspan x="17.696777" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
+       <tspan x="13.697754" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">g</tspan>
+       <tspan x="17.696777" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
       </text>
      </g>
     </g>
@@ -783,7 +783,7 @@ z
 " style="fill: #d62728; opacity: 0.85"/>
     </g>
     <g id="text_22">
-     <!-- $-A_{bar}$ (barrier) -->
+     <!-- $-A_{\mathrm{bar}}$ (barrier) -->
      <g style="fill: #ffffff" transform="translate(238.925781 405.053672)">
       <text>
        <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">−</tspan>
@@ -798,9 +798,9 @@ z
        <tspan x="57.431689" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">r</tspan>
        <tspan x="61.131885" y="-0.15625" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">)</tspan>
        <tspan x="7.541016" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif; fill: #ffffff">A</tspan>
-       <tspan x="13.697754" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">b</tspan>
-       <tspan x="17.696777" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
-       <tspan x="21.557373" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
+       <tspan x="13.697754" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">b</tspan>
+       <tspan x="17.696777" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">a</tspan>
+       <tspan x="21.557373" y="1.193746" style="font-size: 6.3px; font-family: sans-serif; fill: #ffffff">r</tspan>
       </text>
      </g>
     </g>

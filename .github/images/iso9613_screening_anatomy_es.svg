@@ -1134,18 +1134,17 @@ L 521.567969 51.612109
      </g>
     </g>
     <g id="text_44">
-     <!-- $A_{bar} = \max(D_z - A_{gr}, 0)$ (ec. (12)) -->
+     <!-- $A_{\mathrm{bar}} = \max(D_z - A_{\mathrm{gr}}, 0)$ (ec. (12)) -->
      <g transform="translate(528.767969 54.762109)">
       <text>
        <tspan x="0" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
        <tspan x="51.020068" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">D</tspan>
        <tspan x="72.551074" y="-0.171875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">b</tspan>
-       <tspan x="10.155762" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">a</tspan>
-       <tspan x="14.016357" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">r</tspan>
-       <tspan x="57.950244" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">z</tspan>
-       <tspan x="78.707813" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">g</tspan>
-       <tspan x="82.706836" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">r</tspan>
+       <tspan x="6.156738" y="1.178121" style="font-size: 6.3px; font-family: sans-serif">b</tspan>
+       <tspan x="10.155762" y="1.178121" style="font-size: 6.3px; font-family: sans-serif">a</tspan>
+       <tspan x="14.016357" y="1.178121" style="font-size: 6.3px; font-family: sans-serif">r</tspan>
+       <tspan x="78.707813" y="1.178121" style="font-size: 6.3px; font-family: sans-serif">g</tspan>
+       <tspan x="82.706836" y="1.178121" style="font-size: 6.3px; font-family: sans-serif">r</tspan>
        <tspan x="18.606006" y="-0.171875" style="font-size: 9px; font-family: sans-serif">=</tspan>
        <tspan x="27.900439" y="-0.171875" style="font-size: 9px; font-family: sans-serif">m</tspan>
        <tspan x="36.667529" y="-0.171875" style="font-size: 9px; font-family: sans-serif">a</tspan>
@@ -1166,6 +1165,7 @@ L 521.567969 51.612109
        <tspan x="131.211035" y="-0.171875" style="font-size: 9px; font-family: sans-serif">2</tspan>
        <tspan x="136.937109" y="-0.171875" style="font-size: 9px; font-family: sans-serif">)</tspan>
        <tspan x="140.44834" y="-0.171875" style="font-size: 9px; font-family: sans-serif">)</tspan>
+       <tspan x="57.950244" y="1.178121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">z</tspan>
       </text>
      </g>
     </g>
@@ -1178,12 +1178,12 @@ z
 " style="fill: #2ca02c; fill-opacity: 0.2; stroke: #2ca02c; stroke-opacity: 0.2; stroke-linejoin: miter"/>
     </g>
     <g id="text_45">
-     <!-- $A_{gr}$, gastada en el camino apantallado -->
+     <!-- $A_{\mathrm{gr}}$, gastada en el camino apantallado -->
      <g transform="translate(528.767969 68.802109)">
       <text>
        <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">A</tspan>
-       <tspan x="6.156738" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">g</tspan>
-       <tspan x="10.155762" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">r</tspan>
+       <tspan x="6.156738" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">g</tspan>
+       <tspan x="10.155762" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">r</tspan>
        <tspan x="12.991992" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
        <tspan x="15.852832" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
        <tspan x="18.713672" y="-0.15625" style="font-size: 9px; font-family: sans-serif">g</tspan>
