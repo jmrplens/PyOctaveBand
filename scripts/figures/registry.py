@@ -1300,6 +1300,14 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
     rendered in all four language x theme variants off one field
     computation (:func:`_render_anim_variants`) instead of once in whatever
     language and theme the caller has set.
+
+    A four-variant render also stamps the clip's fingerprint into
+    ``scripts/animation_fingerprints.txt``, which is how
+    ``scripts/check_animation_freshness.py`` can later tell that the code
+    drawing a committed clip has moved on without it. The stamp is written
+    here, with the files it describes, so a re-render cannot forget it; a
+    single-variant render does not stamp, because it leaves the other three
+    variants of that clip as they were.
     """
     import shutil
 
@@ -1317,12 +1325,18 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
         clips = list(names)
     else:
         clips = list(_ANIMATIONS)
+    stamped: list[str] = []
     for clip in clips:
         if variants:
             print(f"--- Generating {clip} (4 variants) ---")
             _render_anim_variants(clip, output_dir)
+            stamped.append(clip)
         else:
             _ANIMATIONS[clip](output_dir)
+    if stamped:
+        import animation_fingerprint
+
+        animation_fingerprint.stamp(stamped)
 
 
 # ====================================================================# Command line / parallel figure generation

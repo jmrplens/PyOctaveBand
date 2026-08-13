@@ -113,6 +113,15 @@ animations:
 	# figures, plates and clips at once.
 	$(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_graphs.py --animations
 
+# The clips are never regenerated in CI, so nothing else can tell that the
+# code drawing one has moved since the clip was committed -- which is how
+# twelve of them kept an ASCII hyphen in their Spanish tick labels for months
+# after that was repaired. Each render stamps a fingerprint of the code that
+# drew the clip; this recomputes them from the sources (no rendering, a couple
+# of seconds) and names every clip whose fingerprint has moved.
+animation-freshness:
+	$(PYTHON) scripts/check_animation_freshness.py
+
 # Re-extract only the deferred-loading poster stills (anim_*_poster.jpg) from
 # the committed animation WebMs, without the slow clip re-encode. Posters are
 # JPEG so they stay outside the SVG/PNG figure pipeline (`graphs` deletion and
@@ -243,6 +252,6 @@ coverage:
 check: lint security test
 
 .PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
-	animations posters brand lighthouse \
+	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
 	snippets snippets-static

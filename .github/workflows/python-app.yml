@@ -40,6 +40,18 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install -e .
+    # The clips are the one committed asset CI never regenerates: an FDTD run
+    # plus four video encodes each is far too slow for a pull request, and the
+    # encoders are not bit-reproducible anyway. So nothing could tell that the
+    # code drawing a clip had moved since the clip was written, and twelve of
+    # them shipped an ASCII hyphen in their Spanish tick labels for months
+    # after that was repaired, with every gate green. Each render stamps a
+    # fingerprint of the code that drew it; this recomputes the fingerprints
+    # from the sources and names any clip whose one has moved. It parses the
+    # figure package rather than importing it, so it needs no rendering stack
+    # and runs in seconds.
+    - name: Check every committed clip matches the code that draws it
+      run: python scripts/check_animation_freshness.py
     - name: Lint with Ruff
       run: ruff check .
     - name: Type check with Mypy
