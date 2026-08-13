@@ -152,14 +152,14 @@ _ES: dict[str, str] = {
     "Facade sound insulation setup (ISO 16283-3)":
         "Montaje de aislamiento acustico de fachada (ISO 16283-3)",
     "Receiving room": "Recinto receptor",
-    "S = 11.5 m²": "S = 11,5 m²",
+    "$S$ = 11.5 m²": "$S$ = 11,5 m²",
     "Loudspeaker": "Altavoz",
     "(on the ground)": "(sobre el suelo)",
     "45° ± 5°": "45° ± 5°",
-    "r ≥ 5 m element / ≥ 7 m global": "r ≥ 5 m elemento / ≥ 7 m global",
-    "D > 3.5 m (element) / > 5 m (global)":
-        "D > 3,5 m (elemento) / > 5 m (global)",
-    "L₁,s  element method": "L₁,s  metodo de elemento",
+    "$r ≥ 5$ m element / ≥ 7 m global": "$r ≥ 5$ m elemento / ≥ 7 m global",
+    "$D > 3.5$ m (element) / > 5 m (global)":
+        "$D > 3,5$ m (elemento) / > 5 m (global)",
+    "$L_{1,s}$  element method": "$L_{1,s}$  metodo de elemento",
     "≤ 10 mm parallel / ≤ 3 mm normal": "≤ 10 mm paralelo / ≤ 3 mm normal",
     "3 to 10 positions, never gridded":
         "de 3 a 10 posiciones, nunca en rejilla",
@@ -168,10 +168,10 @@ _ES: dict[str, str] = {
     "1.5 m": "1,5 m",
     "above the": "por encima del",
     "receiving-room floor": "suelo del recinto receptor",
-    "Element method → R'45° (loudspeaker) or R'tr,s (traffic): "
-    "one component, comparable with a laboratory R.":
-        "Metodo de elemento → R'45° o R'tr,s: un componente, comparable "
-        "con una R de laboratorio.",
+    "Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ (traffic): "
+    "one component, comparable with a laboratory $R$.":
+        "Metodo de elemento → $R′_{45°}$ o $R′_{tr,s}$: un componente, "
+        "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
     "not comparable with a laboratory R.":
         "Metodo global → D2m,nT: la fachada tal como esta construida; "
@@ -198,24 +198,24 @@ _ES: dict[str, str] = {
         "ISO 16283-2 Anexo A / ISO 10140-5 Anexo F",
     "180 mm": "180 mm",
     "30 mm wall": "pared de 30 mm",
-    "m_eff = (2.5 ± 0.1) kg": "m_ef = (2,5 ± 0,1) kg",
-    "e = 0.8 ± 0.1": "e = 0,8 ± 0,1",
+    "$m_{eff}$ = (2.5 ± 0.1) kg": "$m_{ef}$ = (2,5 ± 0,1) kg",
+    "$e$ = 0.8 ± 0.1": "$e$ = 0,8 ± 0,1",
     "(100 ± 1) cm": "(100 ± 1) cm",
     "from the ball's BOTTOM": "desde la BASE de la pelota",
     "(c) bang machine": "(c) maquina de golpes",
     "JIS A 1418-2 only": "solo en JIS A 1418-2",
     "(2.4 ± 0.2)·10⁵ Pa": "(2,4 ± 0,2)·10⁵ Pa",
-    "m_eff = (7.3 ± 0.2) kg": "m_ef = (7,3 ± 0,2) kg",
+    "$m_{eff}$ = (7.3 ± 0.2) kg": "$m_{ef}$ = (7,3 ± 0,2) kg",
     "85 cm": "85 cm",
     "source": "fuente",
     "rigid floor +": "suelo rigido +",
     "force plate": "plataforma de fuerza",
     "octave filter": "filtro de octava",
-    "analyser → L_FE": "analizador → L_FE",
+    "analyser → $L_{FE}$": "analizador → $L_{FE}$",
     "JIS A 1418-2 Annex C: the filter goes BEFORE the analyser,":
         "JIS A 1418-2 Anexo C: el filtro va ANTES del analizador,",
-    "so L_FE is evaluated once per band":
-        "de modo que L_FE se evalua una vez por banda",
+    "so $L_{FE}$ is evaluated once per band":
+        "de modo que $L_{FE}$ se evalua una vez por banda",
     "The dimensions above are the standards' informative construction "
     "examples;":
         "Las dimensiones anteriores son ejemplos constructivos informativos "
@@ -242,9 +242,9 @@ _ES: dict[str, str] = {
         "Alternativa (apartado 6.3.1): microfono giratorio sobre soporte, "
         "≥ 10° respecto a la horizontal, radio de barrido ≥ 1 m.",
     "Without a real-time octave analyser, repeat the whole sweep once per "
-    "band and read each 30 s Leq.":
+    "band and read each 30 s $L_{eq}$.":
         "Sin analizador de octavas en tiempo real, repetir todo el barrido "
-        "una vez por banda y leer cada Leq de 30 s.",
+        "una vez por banda y leer cada $L_{eq}$ de 30 s.",
     "Tapping machine (6.2.3): centre of the floor, on the diagonal; "
     "three positions at 45° to the ribs.":
         "Maquina de impactos (6.2.3): centro del forjado, en la diagonal; "
@@ -255,17 +255,19 @@ _ES: dict[str, str] = {
         "Levantamiento del recinto: una sala, tres listas de entrada "
         "(EN 12354-6)",
     "1000 Hz octave band": "banda de octava de 1000 Hz",
-    "V = 29.75 m³": "V = 29,75 m³",
-    "ceiling  12.39 m²  αs 0.02": "techo  12,39 m²  αs 0,02",
-    "glass facade  10.90 m²  αs 0.04": "fachada de vidrio  10,90 m²  αs 0,04",
-    "floor  12.39 m²  αs 0.05": "suelo  12,39 m²  αs 0,05",
-    "short wall  6.55 m²  αs 0.04  (x2)": "pared corta  6,55 m²  αs 0,04  (x2)",
-    "long wall (brick)  10.90 m²  αs 0.04":
-        "pared larga (ladrillo)  10,90 m²  αs 0,04",
+    "$V$ = 29.75 m³": "$V$ = 29,75 m³",
+    "ceiling  12.39 m²  $α_s$ 0.02": "techo  12,39 m²  $α_s$ 0,02",
+    "glass facade  10.90 m²  $α_s$ 0.04":
+        "fachada de vidrio  10,90 m²  $α_s$ 0,04",
+    "floor  12.39 m²  $α_s$ 0.05": "suelo  12,39 m²  $α_s$ 0,05",
+    "short wall  6.55 m²  $α_s$ 0.04  (x2)":
+        "pared corta  6,55 m²  $α_s$ 0,04  (x2)",
+    "long wall (brick)  10.90 m²  $α_s$ 0.04":
+        "pared larga (ladrillo)  10,90 m²  $α_s$ 0,04",
     "objects: 0.15, 0.60, 2 × 0.05, 2 × 0.65 m³":
         "objetos: 0,15, 0,60, 2 × 0,05, 2 × 0,65 m³",
-    "A = 2.26 m²   (Formula 1)": "A = 2,26 m²   (fórmula 1)",
-    "Aobj = 2.77 m²    ψ = 0.072": "Aobj = 2,77 m²    ψ = 0,072",
+    "$A$ = 2.26 m²   (Formula 1)": "$A$ = 2,26 m²   (fórmula 1)",
+    "$A_{obj}$ = 2.77 m²    $ψ$ = 0.072": "$A_{obj}$ = 2,77 m²    $ψ$ = 0,072",
     "(Formula 4, then Formula 3)": "(fórmula 4, después fórmula 3)",
     # The printed surfaces list: code stays code (periods and identifiers as
     # the reader types them, like the page's own snippet); only the trailing
@@ -277,8 +279,8 @@ _ES: dict[str, str] = {
     "    (6.55, 0.04),    # short wall": "    (6.55, 0.04),    # pared corta",
     # The one-wall-two-rows inset: mnemonic subscripts follow the block's
     # "pared"/"ventana" wording (vent = ventana, not ventilación).
-    "(Swall − Swin, αwall)": "(Spared − Svent, αpared)",
-    "(Swin, αwin)": "(Svent, αvent)",
+    "($S_{wall} − S_{win}$, $α_{wall}$)": "($S_{pared} − S_{vent}$, $α_{pared}$)",
+    "($S_{win}$, $α_{win}$)": "($S_{vent}$, $α_{vent}$)",
     "One wall, two rows": "Una pared, dos filas",
     "window": "ventana",
     "one wall on the drawing": "una pared en el plano",
@@ -289,12 +291,12 @@ _ES: dict[str, str] = {
         "pondera por área.",
     "Directivity factor Q: four mountings, four critical distances":
         "Factor de directividad Q: cuatro montajes, cuatro distancias críticas",
-    "The same compact source, four mountings (workshop with R = 62 m²)":
-        "La misma fuente compacta, cuatro montajes (taller con R = 62 m²)",
-    "radiates into 4π sr": "radia en 4π sr",
-    "radiates into 2π sr": "radia en 2π sr",
-    "radiates into π sr": "radia en π sr",
-    "radiates into π/2 sr": "radia en π/2 sr",
+    "The same compact source, four mountings (workshop with $R$ = 62 m²)":
+        "La misma fuente compacta, cuatro montajes (taller con $R$ = 62 m²)",
+    "radiates into $4π$ sr": "radia en $4π$ sr",
+    "radiates into $2π$ sr": "radia en $2π$ sr",
+    "radiates into $π$ sr": "radia en $π$ sr",
+    "radiates into $π/2$ sr": "radia en $π/2$ sr",
     "free space": "campo libre",
     "hard floor": "suelo rígido",
     "floor-wall edge": "arista suelo-pared",
@@ -303,13 +305,13 @@ _ES: dict[str, str] = {
     "on the slab": "sobre la solera",
     "against a wall on the slab": "contra una pared, sobre la solera",
     "in the corner of the workshop": "en el rincón del taller",
-    "Q multiplies the direct term only: the reverberant plateau does not move.":
-        "Q solo multiplica el término directo: la meseta reverberante no se "
+    "$Q$ multiplies the direct term only: the reverberant plateau does not move.":
+        "$Q$ solo multiplica el término directo: la meseta reverberante no se "
         "mueve.",
-    "rc = √(Q·R/16π), so two steps of mounting move the crossover by a "
+    "$r_c = √(Q·R/16π)$, so two steps of mounting move the crossover by a "
     "factor of 2.":
-        "rc = √(Q·R/16π), así que dos escalones de montaje desplazan el cruce "
-        "un factor 2.",
+        "$r_c = √(Q·R/16π)$, así que dos escalones de montaje desplazan el "
+        "cruce un factor 2.",
     "Calibration chain — from calibrator to physical units":
         "Cadena de calibración — del calibrador a unidades físicas",
     # Speech Intelligibility Index (ANSI S3.5-1997)
@@ -318,18 +320,20 @@ _ES: dict[str, str] = {
     # Room-noise rating methods (ANSI/ASA S12.2-2019)
     "Room-noise rating methods (ANSI/ASA S12.2-2019): NC and RC Mark II":
         "Calificación del ruido de salas (S12.2-2019): NC y RC Mark II",
-    "Octave-band sound pressure levels  L(f)":
-        "Niveles de presión acústica por banda de octava  L(f)",
+    "Octave-band sound pressure levels  $L(f)$":
+        "Niveles de presión acústica por banda de octava  $L(f)$",
     "NC — tangency method": "NC — método de tangencia",
     "Table 1 curves": "curvas de la Tabla 1",
     "NC value in each band": "Valor NC en cada banda",
-    "curve level = L(f) at that f": "nivel de la curva = L(f) en esa f",
+    "curve level = $L(f)$ at that $f$":
+        "nivel de la curva = $L(f)$ en esa $f$",
     "NC = highest curve touched": "NC = curva más alta tocada",
     "note the governing band": "anotar la banda determinante",
     "NC-NN (band)": "NC-NN (banda)",
     "RC Mark II  (Annex D)": "RC Mark II  (Anexo D)",
     "−5 dB/octave curves": "curvas de −5 dB/octava",
-    "RC = round(LMF)   (clause D.4)": "RC = redondeo(LMF)   (cláusula D.4)",
+    "RC = round($L_{MF}$)   (clause D.4)":
+        "RC = redondeo($L_{MF}$)   (cláusula D.4)",
     "Spectral tag  (clause D.3)": "Etiqueta espectral  (cláusula D.3)",
     "R  rumble: a band ≤ 500 Hz exceeds RC by > 5 dB":
         "R  retumbo: una banda ≤ 500 Hz supera RC en > 5 dB",
@@ -363,25 +367,28 @@ _ES: dict[str, str] = {
     "Two surfaces meeting": "Dos superficies",
     "Three surfaces meeting": "Tres superficies",
     "Instrument and condition": "Instrumento y condición",
-    "Integrating-averaging, L_EQ": "Integrador-promediador, L_EQ",
+    "Integrating-averaging, $L_{EQ}$": "Integrador-promediador, $L_{EQ}$",
     "Class 2 minimum (5.1.1)": "Clase 2 como mínimo (5.1.1)",
     "Octave bands 16 Hz – 8 kHz": "Bandas de octava 16 Hz – 8 kHz",
     "Room unoccupied, plant running": "Sala vacía, instalación en marcha",
-    "L_EQ at the named position — or scan the whole space at ≤ 0.5 m/s "
+    "$L_{EQ}$ at the named position — or scan the whole space at ≤ 0.5 m/s "
     "for ≥ 20 s":
-        "L_EQ en la posición indicada — o barrer toda la sala a ≤ 0,5 m/s "
+        "$L_{EQ}$ en la posición indicada — o barrer toda la sala a ≤ 0,5 m/s "
         "durante ≥ 20 s",
     "green dashed: microphone exclusion zones (5.2.5)":
         "verde discontinuo: zonas excluidas para el micrófono (5.2.5)",
     "Before rating (5.3.2): is the noise steady?":
         "Antes de calificar (5.3.2): ¿es estacionario el ruido?",
+    # Both languages keep the two level differences on this first line, so
+    # the pair composes the same mathematics; the Spanish drops the spelt
+    # sound level meter to stay inside the panel.
     "screen 16, 31.5 and 63 Hz aurally and on a fast, Z-weighted meter, "
-    "then check L_MAX − L_EQ and L_10 − L_EQ":
-        "explorar 16, 31,5 y 63 Hz de oído y con el sonómetro en rápida y "
-        "ponderación Z; comprobar",
+    "then check $L_{MAX} − L_{EQ}$ and $L_{10} − L_{EQ}$":
+        "explorar 16, 31,5 y 63 Hz de oído y en rápida con ponderación Z; "
+        "comprobar $L_{MAX} − L_{EQ}$ y $L_{10} − L_{EQ}$",
     "against Table 3 — a field that fails belongs to RNC (clause 5.3), "
     "not to NC or RC":
-        "L_MAX − L_EQ y L_10 − L_EQ frente a la Tabla 3 — si falla, es RNC "
+        "frente a la Tabla 3 — si falla, es RNC "
         "(cláusula 5.3), no NC ni RC",
     # Where the ISO 3382-3 measurement line goes (clauses 5.1 and 5.2)
     "Where the ISO 3382-3 measurement line goes (clauses 5.1 and 5.2)":
@@ -397,7 +404,8 @@ _ES: dict[str, str] = {
     "1.2 m screens": "mamparas de 1,2 m",
     "P1 at the nearest workstation; the path need not be straight":
         "P1 en el puesto más cercano; la trayectoria no tiene que ser recta",
-    "only 2 m to 16 m enter D2,S": "solo de 2 m a 16 m entran en D2,S",
+    "only 2 m to 16 m enter $D_{2,S}$":
+        "solo de 2 m a 16 m entran en $D_{2,S}$",
     "≥ 0.5 m from tables": "≥ 0,5 m de las mesas",
     "(b) Section — both heights are 1.2 m (5.2.2)":
         "(b) Sección — ambas alturas son 1,2 m (5.2.2)",
@@ -431,14 +439,14 @@ _ES: dict[str, str] = {
     "Room plan (top view) — 10.0 × 6.0 m, 3.5 m high":
         "Planta de la sala (vista superior) — 10,0 × 6,0 m, 3,5 m de altura",
     "avoid symmetry lines": "evitar las líneas de simetría",
-    "2.4 m > d_min": "2,4 m > d_min",
-    "d_min": "d_min",
+    "2.4 m $> d_{min}$": "2,4 m $> d_{min}$",
+    "$d_{min}$": "$d_{min}$",
     "• source height 1.5 m": "• fuente a 1,5 m de altura",
     "• off the symmetry axes": "• fuera de los ejes de simetría",
     "ISO 3382-2 (source clearance):":
         "ISO 3382-2 (separación a la fuente):",
-    "d_min = 2√(V/cT̂) = 2.0 m": "d_min = 2√(V/cT̂) = 2,0 m",
-    "for V = 210 m³, T̂ = 0.6 s": "para V = 210 m³, T̂ = 0,6 s",
+    "$d_{min} = 2√(V/(c·T̂))$ = 2.0 m": "$d_{min} = 2√(V/(c·T̂))$ = 2,0 m",
+    "for $V$ = 210 m³, $T̂$ = 0.6 s": "para $V$ = 210 m³, $T̂$ = 0,6 s",
     # The measuring chain in section (ISO 3382-1, 4.2 and 4.3)
     "The measuring chain in section (ISO 3382-1 clauses 4.2 and 4.3)":
         "La cadena de medida en sección (ISO 3382-1, cláusulas 4.2 y 4.3)",
@@ -446,7 +454,7 @@ _ES: dict[str, str] = {
         "Sección de la misma sala de 10,0 × 6,0 × 3,5 m",
     "dodecahedron": "dodecaedro",
     "acoustic centre": "centro acústico",
-    "d_min = 2.0 m": "d_min = 2,0 m",
+    "$d_{min}$ = 2.0 m": "$d_{min}$ = 2,0 m",
     "ISO 3382-1 Table 1 — omnidirectionality over gliding 30° arcs":
         "ISO 3382-1 Tabla 1 — omnidireccionalidad (arcos de 30°)",
     "Hz / dB, measured at ≥ 1.5 m — in practice a dodecahedron, not a monitor":
@@ -463,23 +471,23 @@ _ES: dict[str, str] = {
         "Dimensionado de la excitación para una sala con T = 1,2 s (ISO 18233)",
     "1  What you play, and how long you keep recording":
         "1  Qué se reproduce, y cuánto se sigue grabando",
-    "sweep, 4.0 s = 3.3 × T": "barrido, 4,0 s = 3,3 × T",
-    "silence ≈ T": "silencio ≈ T",
+    "sweep, 4.0 s = 3.3 × $T$": "barrido, 4,0 s = 3,3 × $T$",
+    "silence $≈ T$": "silencio $≈ T$",
     "record window 5.2 s": "ventana de grabación 5,2 s",
-    "B.3.1: sweep 2–4 × T, silent gap ≈ T   |   B.6: +3 dB effective SNR "
+    "B.3.1: sweep 2–4 × $T$, silent gap $≈ T$   |   B.6: +3 dB effective SNR "
     "per doubling":
-        "B.3.1: barrido 2–4 × T, silencio ≈ T   |   B.6: +3 dB de S/R "
+        "B.3.1: barrido 2–4 × $T$, silencio $≈ T$   |   B.6: +3 dB de S/R "
         "efectiva por duplicación",
-    "2  If the excitation repeats, the period must exceed T (6.2.2.2)":
-        "2  Si la excitación se repite, el periodo debe superar T (6.2.2.2)",
+    "2  If the excitation repeats, the period must exceed $T$ (6.2.2.2)":
+        "2  Si la excitación se repite, el periodo debe superar $T$ (6.2.2.2)",
     "period 1, warm-up: discarded": "periodo 1, arranque: se descarta",
     "period 2, kept": "periodo 2, se conserva",
-    "order 17 → 2.73 s ≥ T": "orden 17 → 2,73 s ≥ T",
+    "order 17 → 2.73 s $≥ T$": "orden 17 → 2,73 s $≥ T$",
     "0.68 s": "0,68 s",
-    "order 15 is shorter than T: the tail folds onto the head and T comes "
+    "order 15 is shorter than $T$: the tail folds onto the head and $T$ comes "
     "out short":
-        "el orden 15 es más corto que T: la cola se pliega sobre el inicio y "
-        "T sale corto",
+        "el orden 15 es más corto que $T$: la cola se pliega sobre el inicio y "
+        "$T$ sale corto",
     "3  After linear deconvolution (B.5)":
         "3  Tras la deconvolución lineal (B.5)",
     "kept by default: the linear impulse response and its tail":
@@ -611,22 +619,25 @@ _ES: dict[str, str] = {
         "riesgo de lesión lumbar de Weibull, por sexo (Tabla C.1/C.2)",
     "Multiple-shock spinal-response dose and injury risk (ISO 2631-5)":
         "Dosis espinal por choques múltiples y riesgo de lesión (ISO 2631-5)",
-    "Surfaces  (Si, αs,i)": "Superficies  (Si, αs,i)",
+    "Surfaces  ($S_i$, $α_{s,i}$)": "Superficies  ($S_i$, $α_{s,i}$)",
     "area and absorption per band": "área y absorción por banda",
-    "Objects  (Vobj)": "Objetos  (Vobj)",
-    "Aobj = Vobj^(2/3)  (Formula 4)": "Aobj = Vobj^(2/3)  (Fórmula 4)",
-    "Equivalent absorption area  A  (clause 4.3, Formula 1)":
-        "Área de absorción equivalente  A  (cláusula 4.3, Fórmula 1)",
-    "A = Σ αs,i·Si + Σ Aobj + Aair;   Aair = 4·m·V·(1 − ψ)  (Formula 2)":
-        "A = Σ αs,i·Si + Σ Aobj + Aair;   Aair = 4·m·V·(1 − ψ)  (Fórmula 2)",
-    "Object fraction  ψ = Σ Vobj / V   (Formula 3)":
-        "Fracción de objetos  ψ = Σ Vobj / V   (Fórmula 3)",
-    "air absorption negligible below 1 kHz for V < 200 m³":
-        "absorción del aire despreciable bajo 1 kHz si V < 200 m³",
-    "Reverberation time  T = 55.3/c₀ · V·(1 − ψ) / A  (Formula 5)":
-        "Tiempo de reverberación  T = 55.3/c₀ · V·(1 − ψ) / A  (Fórmula 5)",
-    "c₀ = 345.6 m/s so 55.3/c₀ = 0.16  (clause 4.4)":
-        "c₀ = 345.6 m/s, así 55.3/c₀ = 0.16  (cláusula 4.4)",
+    "Objects  ($V_{obj}$)": "Objetos  ($V_{obj}$)",
+    "$A_{obj} = V_{obj}^{2/3}$  (Formula 4)":
+        "$A_{obj} = V_{obj}^{2/3}$  (Fórmula 4)",
+    "Equivalent absorption area  $A$  (clause 4.3, Formula 1)":
+        "Área de absorción equivalente  $A$  (cláusula 4.3, Fórmula 1)",
+    "$A = Σ α_{s,i}·S_i + Σ A_{obj} + A_{air}$;   "
+    "$A_{air} = 4·m·V·(1 − ψ)$  (Formula 2)":
+        "$A = Σ α_{s,i}·S_i + Σ A_{obj} + A_{air}$;   "
+        "$A_{air} = 4·m·V·(1 − ψ)$  (Fórmula 2)",
+    "Object fraction  $ψ = Σ V_{obj} / V$   (Formula 3)":
+        "Fracción de objetos  $ψ = Σ V_{obj} / V$   (Fórmula 3)",
+    "air absorption negligible below 1 kHz for $V < 200$ m³":
+        "absorción del aire despreciable bajo 1 kHz si $V < 200$ m³",
+    "Reverberation time  $T = 55.3/c_0 · V·(1 − ψ) / A$  (Formula 5)":
+        "Tiempo de reverberación  $T = 55,3/c_0 · V·(1 − ψ) / A$  (Fórmula 5)",
+    "$c_0$ = 345.6 m/s so $55.3/c_0$ = 0.16  (clause 4.4)":
+        "$c_0$ = 345,6 m/s, así $55,3/c_0$ = 0,16  (cláusula 4.4)",
     "Absorption area and reverberation time of a room (EN 12354-6)":
         "Área de absorción y tiempo de reverberación de una sala (EN 12354-6)",
     "Speech  Ei'": "Habla  Ei'",
@@ -1116,8 +1127,8 @@ _ES: dict[str, str] = {
     "correlation /": "correlación /",
     "inverse filter": "filtro inverso",
     "acoustic path": "trayecto acústico",
-    "The room response h(t) is recovered by deconvolving the microphone signal.":
-        "La respuesta de la sala h(t) se recupera deconvolucionando "
+    "The room response $h(t)$ is recovered by deconvolving the microphone signal.":
+        "La respuesta de la sala $h(t)$ se recupera deconvolucionando "
         "la señal del micrófono.",
     # d10 - ISO 3744/3746 sound power measurement surfaces
     "ISO 3744 / 3746 sound power measurement surfaces":
@@ -1142,10 +1153,10 @@ _ES: dict[str, str] = {
     "structure-borne impact": "impacto estructural",
     "radiated impact sound": "ruido de impactos radiado",
     "Impact sound insulation": "Aislamiento de impactos",
-    "Li = energy-averaged": "Li = promedio en energía",
+    "$L_i$ = energy-averaged": "$L_i$ = promedio en energía",
     "band level (Formula 10)": "del nivel de banda (Fórmula 10)",
-    "A = 0.16 V/T  (Sabine)": "A = 0,16 V/T  (Sabine)",
-    "T₀ = 0.5 s , A₀ = 10 m²": "T₀ = 0,5 s , A₀ = 10 m²",
+    "$A = 0.16 V/T$  (Sabine)": "$A = 0,16 V/T$  (Sabine)",
+    "$T_0$ = 0.5 s , $A_0$ = 10 m²": "$T_0$ = 0,5 s , $A_0$ = 10 m²",
     # d12 - sound power methods comparison
     "Sound power methods compared": "Métodos de potencia acústica comparados",
     "Free field over a reflecting plane":
@@ -1488,9 +1499,9 @@ _ES: dict[str, str] = {
         "Caída espacial del habla en oficina diáfana (ISO 3382-3)",
     "what open_plan_metrics returns": "lo que devuelve open_plan_metrics",
     "Clause 4 also requires the average A-weighted background "
-    "noise  Lp,A,B  (Cl. 6.4)":
+    "noise  $L_{p,A,B}$  (Cl. 6.4)":
         "La cláusula 4 exige además el ruido de fondo medio ponderado A  "
-        "Lp,A,B  (cl. 6.4)",
+        "$L_{p,A,B}$  (cl. 6.4)",
     "Measurement uncertainty from tables to expanded U (ISO 12999-1)":
         "Incertidumbre de medición: de las tablas a la U expandida (ISO 12999-1)",
     "Single-number sound-absorption rating (ISO 11654)":
@@ -1570,26 +1581,27 @@ _ES: dict[str, str] = {
     "privacy distance": "distancia de privacidad",
     "fitted STI = 0.20 · Cl. 3.7": "STI ajustado = 0,20 · Cl. 3.7",
     # ISO 12999-1
-    "Standard uncertainty  u  — reproducibility read from the tables":
-        "Incertidumbre típica  u  — reproducibilidad leída de las tablas",
-    "bands: Tables 2/4 · ratings: Tables 3/5 · situation A (σR) / B (σsitu) / "
-    "C (σr)":
-        "bandas: Tablas 2/4 · índices: Tablas 3/5 · situación A (σR) / "
-        "B (σsitu) / C (σr)",
-    "Reduce by  m  independent measurements   u/√m   (Formula A.7)":
-        "Reducir con  m  mediciones independientes   u/√m   (Fórmula A.7)",
+    "Standard uncertainty  $u$  — reproducibility read from the tables":
+        "Incertidumbre típica  $u$  — reproducibilidad leída de las tablas",
+    "bands: Tables 2/4 · ratings: Tables 3/5 · situation A ($σ_R$) / B ($σ_{situ}$) / "
+    "C ($σ_r$)":
+        "bandas: Tablas 2/4 · índices: Tablas 3/5 · situación A ($σ_R$) / "
+        "B ($σ_{situ}$) / C ($σ_r$)",
+    "Reduce by  $m$  independent measurements   $u/√m$   (Formula A.7)":
+        "Reducir con  $m$  mediciones independientes   $u/√m$   (Fórmula A.7)",
     "and combine model with reality per Annex A when predicting":
         "y combinar modelo con realidad según el Anexo A al predecir",
-    "Combine uncorrelated contributions   uc = √(Σ u_i²)   (Formula C.2)":
-        "Combinar contribuciones no correlacionadas   uc = √(Σ u_i²)   "
+    "Combine uncorrelated contributions   $u_c = √(Σ u_i^2)$   (Formula C.2)":
+        "Combinar contribuciones no correlacionadas   $u_c = √(Σ u_i^2)$   "
         "(Fórmula C.2)",
     "single-number combination of Annex B uses Formula B.2":
         "la combinación de índice único del Anexo B usa la Fórmula B.2",
-    "Expand   U = k·u   (Formula 2),   k from Table 8   (k ≥ 1)":
-        "Expandir   U = k·u   (Fórmula 2),   k de la Tabla 8   (k ≥ 1)",
+    "Expand   $U = k·u$   (Formula 2),   $k$ from Table 8   ($k ≥ 1$)":
+        "Expandir   $U = k·u$   (Fórmula 2),   $k$ de la Tabla 8   ($k ≥ 1$)",
     "the coverage factor depends on the reported quantity and situation":
         "el factor de cobertura depende de la magnitud reportada y la situación",
-    "Report   Y = y ± U   (Formula 3)": "Reportar   Y = y ± U   (Fórmula 3)",
+    "Report   $Y = y ± U$   (Formula 3)":
+        "Reportar   $Y = y ± U$   (Fórmula 3)",
     "two-sided coverage factor": "factor de cobertura bilateral",
     "Declare conformity   (Formulae 4/5)": "Declarar conformidad   (Fórmulas 4/5)",
     "one-sided coverage factor": "factor de cobertura unilateral",
@@ -2088,42 +2100,45 @@ _ES: dict[str, str] = {
         "Medición en placa receptora de la potencia estructural (EN 15657)",
     "Source under test (pump, fan, boiler …)":
         "Fuente bajo ensayo (bomba, ventilador, caldera …)",
-    "Reception plate  (m, S, η)": "Placa receptora  (m, S, η)",
-    "velocity positions → Lv": "posiciones de velocidad → Lv",
+    "Reception plate  ($m$, $S$, $η$)": "Placa receptora  ($m$, $S$, $η$)",
+    "velocity positions → $L_v$": "posiciones de velocidad → $L_v$",
     "injected structure-borne power": "potencia estructural inyectada",
     "resilient supports": "apoyos resilientes",
     "Plate power balance": "Balance de potencia de la placa",
-    "η = 2.2 / (f·Ts)   (Formula 13)": "η = 2,2 / (f·Ts)   (Fórmula 13)",
+    "$η = 2.2 / (f·T_s)$   (Formula 13)":
+        "$η = 2,2 / (f·T_s)$   (Fórmula 13)",
     # Formula 14, symbols only: reads the same in Spanish.
-    "L_Ws = 10 log10(2πf·η·m·S / f₀m₀S₀)":
-        "L_Ws = 10 log10(2πf·η·m·S / f₀m₀S₀)",
-    "+ Lv − 60   (Formula 14)": "+ Lv − 60   (Fórmula 14)",
+    "$L_{Ws} = 10 log_{10}(2πf·η·m·S / f_0 m_0 S_0)$":
+        "$L_{Ws} = 10 log_{10}(2πf·η·m·S / f_0 m_0 S_0)$",
+    "$+ L_v − 60$   (Formula 14)": "$+ L_v − 60$   (Fórmula 14)",
     "→ source quantities (Formulae 15–19):":
         "→ magnitudes de fuente (Fórmulas 15–19):",
-    "equivalent blocked force L_Fb,eq ,": "fuerza bloqueada equivalente L_Fb,eq ,",
-    "L_Wsn consumed by EN 12354-5": "L_Wsn que consume EN 12354-5",
+    "equivalent blocked force $L_{Fb,eq}$ ,":
+        "fuerza bloqueada equivalente $L_{Fb,eq}$ ,",
+    "$L_{Wsn}$ consumed by EN 12354-5": "$L_{Wsn}$ que consume EN 12354-5",
     "spatial average:  Lv = 10 log10[(1/N)·Σ 10^(Lv,i/10)]   (Formula 12)":
         "promedio espacial:  Lv = 10 log10[(1/N)·Σ 10^(Lv,i/10)]   (Fórmula 12)",
     # Installed structure-borne sound (EN 12354-5)
     "Installed structure-borne sound paths (EN 12354-5)":
         "Vías del sonido estructural de equipos instalados (EN 12354-5)",
     "Service equipment (pump)": "Equipo de servicio (bomba)",
-    "coupling D_C   (Formula 19b)": "acoplamiento D_C   (Fórmula 19b)",
-    "path along the slab into the wall  (i → j)":
-        "vía por el forjado hacia la pared  (i → j)",
-    "excited floor radiates (path i = j)":
-        "el forjado excitado radia (vía i = j)",
+    "coupling $D_C$   (Formula 19b)": "acoplamiento $D_C$   (Fórmula 19b)",
+    "path along the slab into the wall  ($i$ → $j$)":
+        "vía por el forjado hacia la pared  ($i$ → $j$)",
+    "excited floor radiates (path $i = j$)":
+        "el forjado excitado radia (vía $i = j$)",
     "Prediction cascade": "Cascada de predicción",
     "characteristic power (EN 15657)": "potencia característica (EN 15657)",
     "coupling at the contacts (19b)": "acoplamiento en los contactos (19b)",
     "installed power (18b)": "potencia instalada (18b)",
     "per transmission path (18a)": "por vía de transmisión (18a)",
-    "energetic sum L_n,s (17)": "suma energética L_n,s (17)",
+    "energetic sum $L_{n,s}$ (17)": "suma energética $L_{n,s}$ (17)",
     # Formula 17, symbols only: reads the same in Spanish.
     "10 log10 Σ 10^(L_n,s,ij/10)": "10 log10 Σ 10^(L_n,s,ij/10)",
-    "each path i → j: excited element i, radiating element j in the receiving room":
-        "cada vía i → j: elemento excitado i, elemento radiante j en el "
-        "recinto receptor",
+    "each path $i$ → $j$: excited element $i$, radiating element $j$ "
+    "in the receiving room":
+        "cada vía $i$ → $j$: elemento excitado $i$, elemento radiante $j$ "
+        "en el recinto receptor",
     # Wind-turbine noise measurement geometry (IEC 61400-11)
     "Wind-turbine noise measurement geometry (IEC 61400-11)":
         "Geometría de medida del ruido de aerogenerador (IEC 61400-11)",
@@ -2950,23 +2965,25 @@ _ES: dict[str, str] = {
     # Reverberation-time prediction (Sabine / Eyring)
     "Predicting the reverberation time: Sabine against Eyring":
         "Predicción del tiempo de reverberación: Sabine frente a Eyring",
-    "Room 10 × 7 × 3.5 m — V = 245 m³, S = 259 m²":
-        "Sala de 10 × 7 × 3,5 m — V = 245 m³, S = 259 m²",
+    "Room 10 × 7 × 3.5 m — $V$ = 245 m³, $S$ = 259 m²":
+        "Sala de 10 × 7 × 3,5 m — $V$ = 245 m³, $S$ = 259 m²",
     "hard end walls, lightly treated side walls, carpet and acoustic ceiling":
         "testeros duros, laterales con tratamiento ligero, moqueta y "
         "techo acústico",
-    "mean absorption ᾱ runs from 0.21 at 125 Hz to 0.51 at 4 kHz":
-        "la absorción media ᾱ va de 0,21 a 125 Hz a 0,51 a 4 kHz",
-    "T = 0.161·V / (Σ Si·αi + 4mV)": "T = 0,161·V / (Σ Si·αi + 4mV)",
-    "low, even absorption (ᾱ up to ≈ 0.2);":
-        "absorción baja y uniforme (ᾱ hasta ≈ 0,2);",
-    "stays finite even at α = 1": "queda finita incluso con α = 1",
-    "T = 0.161·V / (−S·ln(1 − ᾱ) + 4mV)":
-        "T = 0,161·V / (−S·ln(1 − ᾱ) + 4mV)",
+    "mean absorption $ᾱ$ runs from 0.21 at 125 Hz to 0.51 at 4 kHz":
+        "la absorción media $ᾱ$ va de 0,21 a 125 Hz a 0,51 a 4 kHz",
+    "$T = 0.161·V / (Σ S_i·α_i + 4·m·V)$":
+        "$T = 0,161·V / (Σ S_i·α_i + 4·m·V)$",
+    "low, even absorption ($ᾱ$ up to ≈ 0.2);":
+        "absorción baja y uniforme ($ᾱ$ hasta ≈ 0,2);",
+    "stays finite even at $α$ = 1": "queda finita incluso con $α$ = 1",
+    "$T = 0.161·V / (−S·ln(1 − ᾱ) + 4·m·V)$":
+        "$T = 0,161·V / (−S·ln(1 − ᾱ) + 4·m·V)$",
     "strong, even absorption;": "absorción fuerte y uniforme;",
-    "reaches T = 0 at total absorption":
-        "llega a T = 0 con absorción total",
-    "Predicted T60 per octave band": "T60 predicho por banda de octava",
+    "reaches $T$ = 0 at total absorption":
+        "llega a $T$ = 0 con absorción total",
+    "Predicted $T_{60}$ per octave band":
+        "$T_{60}$ predicho por banda de octava",
     # Model names are proper names; looked at, and the same in Spanish.
     "Sabine": "Sabine",
     "Eyring": "Eyring",
@@ -2975,15 +2992,15 @@ _ES: dict[str, str] = {
     "0.74": "0,74", "0.47": "0,47", "0.37": "0,37", "0.31": "0,31",
     "0.30": "0,30", "0.66": "0,66", "0.39": "0,39", "0.29": "0,29",
     "0.23": "0,23", "0.21": "0,21", "0.22": "0,22",
-    "Eyring runs 11 to 29 % shorter here: ᾱ is past Sabine's comfort zone":
-        "Eyring sale entre un 11 y un 29 % más corto: ᾱ excede la zona "
+    "Eyring runs 11 to 29 % shorter here: $ᾱ$ is past Sabine's comfort zone":
+        "Eyring sale entre un 11 y un 29 % más corto: $ᾱ$ excede la zona "
         "cómoda de Sabine",
     "Domain of validity: a diffuse field that stays diffuse while it decays":
         "Dominio de validez: un campo difuso que sigue difuso mientras "
         "decae",
-    "below the Schroeder frequency, in coupled volumes and in corridor-like rooms no single T60 exists":
+    "below the Schroeder frequency, in coupled volumes and in corridor-like rooms no single $T_{60}$ exists":
         "bajo la frecuencia de Schroeder, en volúmenes acoplados y en "
-        "salas tipo pasillo no existe un T60 único",
+        "salas tipo pasillo no existe un $T_{60}$ único",
     # Panel between rooms (mass law and coincidence)
     "Panel between rooms: mass law and the coincidence dip":
         "Panel entre recintos: ley de masas y valle de coincidencia",
@@ -2991,20 +3008,20 @@ _ES: dict[str, str] = {
         "Panel en ensayo: yeso laminado de 12,5 mm",
     "diffuse incidence": "incidencia difusa",
     "transmitted": "transmitido",
-    "bending wave at fc": "onda de flexión en fc",
+    "bending wave at $f_c$": "onda de flexión en $f_c$",
     "12.5 mm": "12,5 mm",
-    "m″ = 8.8 kg/m²": "m″ = 8,8 kg/m²",
-    "fc = 2.6 kHz": "fc = 2,6 kHz",
+    "$m″$ = 8.8 kg/m²": "$m″$ = 8,8 kg/m²",
+    "$f_c$ = 2.6 kHz": "$f_c$ = 2,6 kHz",
     "+6 dB/octave": "+6 dB/octava",
-    "predicted R(f)": "R(f) predicho",
-    "Diffuse-field mass law: R rises 6 dB per octave and 6 dB per doubling of m″":
-        "Ley de masas en campo difuso: R sube 6 dB por octava y 6 dB por "
-        "duplicación de m″",
-    "At fc = (c₀²/2π) √(m″/B′) = 2619 Hz the free bending wave matches the trace wavelength":
-        "En fc = (c₀²/2π) √(m″/B′) = 2619 Hz la onda libre de flexión iguala "
-        "la longitud de onda de traza",
-    "Sharp's prediction rates at Rw = 27 dB; the dip collects the unfavourable deviations":
-        "La predicción de Sharp puntúa Rw = 27 dB; el valle concentra las "
+    "predicted $R(f)$": "$R(f)$ predicho",
+    "Diffuse-field mass law: $R$ rises 6 dB per octave and 6 dB per doubling of $m″$":
+        "Ley de masas en campo difuso: $R$ sube 6 dB por octava y 6 dB por "
+        "duplicación de $m″$",
+    "At $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz the free bending wave matches the trace wavelength":
+        "En $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz la onda libre de flexión "
+        "iguala la longitud de onda de traza",
+    "Sharp's prediction rates at $R_w$ = 27 dB; the dip collects the unfavourable deviations":
+        "La predicción de Sharp puntúa $R_w$ = 27 dB; el valle concentra las "
         "desviaciones desfavorables",
     # Porous layer on a rigid wall
     "Porous absorber on a rigid wall: microstructure to absorption":
@@ -3059,11 +3076,13 @@ _ES: dict[str, str] = {
     "2nd order": "2.º orden",
     "the image sees": "la imagen ve",
     "a straight path": "un camino recto",
-    "plan at the source plane z = 1.5 m": "planta en el plano de la fuente z = 1,5 m",
+    "plan at the source plane $z$ = 1.5 m":
+        "planta en el plano de la fuente $z$ = 1,5 m",
     "7.0 m": "7,0 m",
-    "every reflection is the free-field arrival of a mirror image: t = r/c, √(1−α) per bounce, 1/(4πr) spreading":
-        "cada reflexión llega como campo libre de su imagen: t = r/c, √(1−α) "
-        "por rebote, esparcimiento 1/(4πr)",
+    "every reflection is the free-field arrival of a mirror image: "
+    "$t = r/c$, $√(1−α)$ per bounce, $1/(4πr)$ spreading":
+        "cada reflexión llega como campo libre de su imagen: $t = r/c$, "
+        "$√(1−α)$ por rebote, esparcimiento $1/(4πr)$",
     "in-plane images up to order 2 shown; the full lattice adds floor, ceiling and outer mirror rooms":
         "imágenes en planta hasta orden 2; la retícula completa añade suelo, "
         "techo y salas más lejanas",
@@ -3176,11 +3195,11 @@ _ES: dict[str, str] = {
         "Placas receptoras de baja y alta movilidad de la EN 15657",
     "Low-mobility plate (7.2.2)": "Placa de baja movilidad (7.2.2)",
     "3,15 m x 2,23 m": "3,15 m x 2,23 m",
-    "100 mm concrete, ρ = 2 300 ± 200 kg/m³":
-        "hormigón de 100 mm, ρ = 2 300 ± 200 kg/m³",
-    "S = 7,0 m² (≥ 5 m²), sides ≈ √2 : 1":
-        "S = 7,0 m² (≥ 5 m²), lados ≈ √2 : 1",
-    "η ≥ 0,08 over 50 Hz to 100 Hz": "η ≥ 0,08 de 50 Hz a 100 Hz",
+    "100 mm concrete, $ρ$ = 2 300 ± 200 kg/m³":
+        "hormigón de 100 mm, $ρ$ = 2 300 ± 200 kg/m³",
+    "$S$ = 7,0 m² (≥ 5 m²), sides ≈ $√2$ : 1":
+        "$S$ = 7,0 m² (≥ 5 m²), lados ≈ $√2$ : 1",
+    "$η ≥ 0,08$ over 50 Hz to 100 Hz": "$η ≥ 0,08$ de 50 Hz a 100 Hz",
     "≥ 6 velocity positions, ≈ 0,5 m apart":
         "≥ 6 posiciones de velocidad, a ≈ 0,5 m entre sí",
     "and ≥ 0,1 m from any contact point":
@@ -3195,7 +3214,7 @@ _ES: dict[str, str] = {
     "so the source's own airborne sound":
         "para que el ruido aéreo de la propia fuente",
     "cannot drive the sheet": "no excite la lámina",
-    "Ts and Y measured with the": "Ts e Y medidos con la",
+    "$T_s$ and $Y$ measured with the": "$T_s$ e $Y$ medidos con la",
     "source fitted (7.1)": "fuente instalada (7.1)",
     "Three-plate bench (Figure 2)": "Banco de tres placas (figura 2)",
     "whirlpool bath": "bañera de hidromasaje",
@@ -3207,10 +3226,10 @@ _ES: dict[str, str] = {
     "is measured per EN ISO 10848-1": "se mide según la EN ISO 10848-1",
     "in every band, with the": "en cada banda, con el",
     "equipment removed": "equipo desmontado",
-    "low-mobility plate -> blocked force (15) -> characteristic power L_Wsn (17)":
-        "placa de baja movilidad -> fuerza bloqueada (15) -> potencia característica L_Wsn (17)",
-    "high-mobility plate -> free velocity (18) -> source mobility |Y_S,eq| (19)":
-        "placa de alta movilidad -> velocidad libre (18) -> movilidad de fuente |Y_S,eq| (19)",
+    "low-mobility plate -> blocked force (15) -> characteristic power $L_{Wsn}$ (17)":
+        "placa de baja movilidad -> fuerza bloqueada (15) -> potencia característica $L_{Wsn}$ (17)",
+    "high-mobility plate -> free velocity (18) -> source mobility $|Y_{S,eq}|$ (19)":
+        "placa de alta movilidad -> velocidad libre (18) -> movilidad de fuente $|Y_{S,eq}|$ (19)",
     "ISO 16251-1 small floor mock-up for floor-covering improvement":
         "Maqueta de suelo de la ISO 16251-1 para la mejora de un revestimiento",
     "Section": "Sección",
@@ -3244,8 +3263,8 @@ _ES: dict[str, str] = {
         "tres ciclos: con probeta  |  sin probeta (martillos repetidos dentro de ± 20 mm)  |  ruido de fondo",
     "≥ 20 s per level; background rule: unchanged ≥ 15 dB, energy subtraction 6-15 dB, −1,3 dB below 6 dB":
         "≥ 20 s por nivel; regla de fondo: sin cambio ≥ 15 dB, resta energética 6-15 dB, −1,3 dB por debajo de 6 dB",
-    "L_a = 10 lg(<a²>/a₀²),  a₀ = 10⁻⁶ m/s²   (Formula 1)":
-        "L_a = 10 lg(<a²>/a₀²),  a₀ = 10⁻⁶ m/s²   (fórmula 1)",
+    "$L_a = 10 lg(⟨a^2⟩/a_0^2)$,  $a_0$ = 10⁻⁶ m/s²   (Formula 1)":
+        "$L_a = 10 lg(⟨a^2⟩/a_0^2)$,  $a_0$ = 10⁻⁶ m/s²   (fórmula 1)",
     "EN 12354-1 Annex E junction types, path branches and the mass ratio":
         "Tipos de unión del anexo E de la EN 12354-1, ramas de vía y cociente de masas",
     "rigid cross": "cruz rígida",
@@ -3261,29 +3280,29 @@ _ES: dict[str, str] = {
     "corner:": "esquina:",
     "thickness change:": "cambio de espesor:",
     "lightweight double leaf:": "doble hoja ligera:",
-    "M = lg(m'perp,i / m'i): m'i is the element carrying the path, so the ratio is per path, not per junction.":
-        "M = lg(m'perp,i / m'i): m'i es el elemento que lleva la vía, así que el cociente es por vía, no por unión.",
-    "The functions take the RATIO, not M. Annex H.3 floor, ratio 1,61: 'through' -> K13 = 12,5 dB, 'corner' -> K12 = 8,9 dB":
-        "Las funciones toman el COCIENTE, no M. Forjado del anexo H.3, cociente 1,61: 'through' -> K13 = 12,5 dB, 'corner' -> K12 = 8,9 dB",
-    "ℓf is the coupling length along the junction line, measured surface to surface. Annex E values are read at 500 Hz, +/- 3 dB.":
-        "ℓf es la longitud de acoplamiento a lo largo de la unión, medida de superficie a superficie. Los valores del anexo E se leen a 500 Hz, +/- 3 dB.",
+    "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ is the element carrying the path, so the ratio is per path, not per junction.":
+        "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ es el elemento que lleva la vía, así que el cociente es por vía, no por unión.",
+    "The functions take the RATIO, not $M$. Annex H.3 floor, ratio 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB":
+        "Las funciones toman el COCIENTE, no $M$. Forjado del anexo H.3, cociente 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB",
+    "$ℓ_f$ is the coupling length along the junction line, measured surface to surface. Annex E values are read at 500 Hz, ± 3 dB.":
+        "$ℓ_f$ es la longitud de acoplamiento a lo largo de la unión, medida de superficie a superficie. Los valores del anexo E se leen a 500 Hz, ± 3 dB.",
     "ISO 12354-1 Annex L worked building: elements, junctions, paths":
         "Edificio resuelto del anexo L de la ISO 12354-1: elementos, uniones y vías",
     "Section: two stacked dwellings": "Sección: dos viviendas superpuestas",
     "source dwelling": "vivienda emisora",
     "receiving dwelling": "vivienda receptora",
-    "T  rigid T (floor to external wall): Kij = 6,4 / 11,2 dB":
-        "T  T rígida (forjado a muro exterior): Kij = 6,4 / 11,2 dB",
-    "X  rigid cross (floor to internal wall): Kij = 8,8 / 11,0 dB":
-        "X  cruz rígida (forjado a tabique interior): Kij = 8,8 / 11,0 dB",
-    "separating floor  220 mm concrete, 484 kg/m², fc = 76,8 Hz":
-        "forjado separador  hormigón de 220 mm, 484 kg/m², fc = 76,8 Hz",
-    "on it  35 mm screed, 73,5 kg/m², on s' = 8 MN/m³":
-        "sobre él  solera de 35 mm, 73,5 kg/m², sobre s' = 8 MN/m³",
-    "external walls  365 mm AAC, 219 kg/m², fc = 92,6 Hz":
-        "muros exteriores  hormigón celular de 365 mm, 219 kg/m², fc = 92,6 Hz",
-    "internal walls  200 mm calcium silicate, 360 kg/m², fc = 128,4 Hz":
-        "tabiques interiores  silicocalcáreo de 200 mm, 360 kg/m², fc = 128,4 Hz",
+    "T  rigid T (floor to external wall): $K_{ij}$ = 6,4 / 11,2 dB":
+        "T  T rígida (forjado a muro exterior): $K_{ij}$ = 6,4 / 11,2 dB",
+    "X  rigid cross (floor to internal wall): $K_{ij}$ = 8,8 / 11,0 dB":
+        "X  cruz rígida (forjado a tabique interior): $K_{ij}$ = 8,8 / 11,0 dB",
+    "separating floor  220 mm concrete, 484 kg/m², $f_c$ = 76,8 Hz":
+        "forjado separador  hormigón de 220 mm, 484 kg/m², $f_c$ = 76,8 Hz",
+    "on it  35 mm screed, 73,5 kg/m², on $s′$ = 8 MN/m³":
+        "sobre él  solera de 35 mm, 73,5 kg/m², sobre $s′$ = 8 MN/m³",
+    "external walls  365 mm AAC, 219 kg/m², $f_c$ = 92,6 Hz":
+        "muros exteriores  hormigón celular de 365 mm, 219 kg/m², $f_c$ = 92,6 Hz",
+    "internal walls  200 mm calcium silicate, 360 kg/m², $f_c$ = 128,4 Hz":
+        "tabiques interiores  silicocalcáreo de 200 mm, 360 kg/m², $f_c$ = 128,4 Hz",
     "Plan: the separating floor": "Planta: el forjado separador",
     "external wall (T)": "muro exterior (T)",
     "internal wall (X)": "tabique interior (X)",
@@ -3305,8 +3324,9 @@ _ES: dict[str, str] = {
     "edge strip, both sides": "banda perimetral, en ambos lados",
     "any rigid bridge here": "cualquier puente rígido aquí",
     "short-circuits the spring": "cortocircuita el muelle",
-    "s' = 8 MN/m³  →  fo = 52,8 Hz": "s' = 8 MN/m³  →  fo = 52,8 Hz",
-    "ΔL = 30 lg(f/fo) or 40 lg(f/fo)": "ΔL = 30 lg(f/fo) o 40 lg(f/fo)",
+    "$s′$ = 8 MN/m³  →  $f_0$ = 52,8 Hz": "$s′$ = 8 MN/m³  →  $f_0$ = 52,8 Hz",
+    "$ΔL = 30 lg(f/f_0)$ or $40 lg(f/f_0)$":
+        "$ΔL = 30 lg(f/f_0)$ o $40 lg(f/f_0)$",
     "(ISO 12354-2 C.1 / C.3)": "(ISO 12354-2 C.1 / C.3)",
     "(b) discrete mounts": "(b) apoyos discretos",
     "structural slab": "forjado estructural",
@@ -3319,12 +3339,12 @@ _ES: dict[str, str] = {
     "masonry": "fábrica",
     "adhesive dabs": "pelladas",
     "studs + cavity": "montantes + cámara",
-    "(D.1)  fo = 542 Hz": "(D.1)  fo = 542 Hz",
-    "(D.2)  fo = 70,8 Hz": "(D.2)  fo = 70,8 Hz",
+    "(D.1)  $f_0$ = 542 Hz": "(D.1)  $f_0$ = 542 Hz",
+    "(D.2)  $f_0$ = 70,8 Hz": "(D.2)  $f_0$ = 70,8 Hz",
     "the same board, two fixings: nearly 23 dB between them, and no formula here can see which one was built":
         "la misma placa, dos fijaciones: casi 23 dB entre ellas, y ninguna fórmula de aquí ve cuál se construyó",
-    "s' is the EN 29052-1 value measured WITHOUT pre-load, and the series law (C.6) holds only for an uncut layer":
-        "s' es el valor EN 29052-1 medido SIN precarga, y la ley en serie (C.6) solo vale si la capa no está cortada",
+    "$s′$ is the EN 29052-1 value measured WITHOUT pre-load, and the series law (C.6) holds only for an uncut layer":
+        "$s′$ es el valor EN 29052-1 medido SIN precarga, y la ley en serie (C.6) solo vale si la capa no está cortada",
     # --- B9 reconstruction of B10b's decay-range plate ---
     "The decay-range budget of one band: INR, truncation and the evaluation windows (ISO 3382)":
         "El presupuesto de rango de caída de una banda: INR, truncamiento y ventanas de evaluación (ISO 3382)",
@@ -3335,7 +3355,7 @@ _ES: dict[str, str] = {
     "Level [dB]": "Nivel [dB]",
     "peak": "pico",
     "background noise": "ruido de fondo",
-    "integration truncated here (t₁)": "integración truncada aquí (t₁)",
+    "integration truncated here ($t_1$)": "integración truncada aquí ($t_1$)",
     "tail compensated as": "cola compensada como",
     "an exponential decay (C)": "una caída exponencial (C)",
     "INR = 55 dB": "INR = 55 dB",
