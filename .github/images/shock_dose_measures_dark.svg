@@ -7765,8 +7765,8 @@ L 72.005469 466.17287
      <!-- $\left(\int_0^t a_w^4\,dt\right)^{1/4}$ -->
      <g style="fill: #ffffff" transform="translate(79.205469 469.32287)">
       <text>
-       <tspan x="0" y="0.465078" style="font-size: 9.130386px; font-family: sans-serif; fill: #ffffff">(</tspan>
-       <tspan x="37.457841" y="0.465078" style="font-size: 9.130386px; font-family: sans-serif; fill: #ffffff">)</tspan>
+       <tspan x="0" y="0.465078" style="font-size: 9.130386px; font-family: 'STIXSizeTwoSym'; fill: #ffffff">(</tspan>
+       <tspan x="37.457841" y="0.465078" style="font-size: 9.130386px; font-family: 'STIXSizeTwoSym'; fill: #ffffff">)</tspan>
        <tspan x="5.374619" y="-0.228672" style="font-size: 9px; font-family: sans-serif; fill: #ffffff">∫</tspan>
        <tspan x="13.182548" y="-9.419297" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">t</tspan>
        <tspan x="21.356249" y="2.552328" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif; fill: #ffffff">w</tspan>

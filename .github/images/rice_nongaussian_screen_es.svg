@@ -1359,7 +1359,7 @@ L 519.671191 330.084844
        <tspan x="117.885208" y="-0.085" style="font-size: 9px; font-family: sans-serif">7</tspan>
        <tspan x="123.611282" y="-0.085" style="font-size: 9px; font-family: sans-serif">4</tspan>
        <tspan x="129.337357" y="-0.085" style="font-size: 9px; font-family: sans-serif">5</tspan>
-       <tspan x="73.867676" y="-1.475625" style="font-size: 5.142857px; font-family: sans-serif">√</tspan>
+       <tspan x="73.867676" y="-1.475625" style="font-size: 5.142857px; font-family: 'STIXSizeOneSym'">√</tspan>
       </text>
       <rect x="79.301224" y="-10.4375" width="7.976074" height="0.5625"/>
      </g>
