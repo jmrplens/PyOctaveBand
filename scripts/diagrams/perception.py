@@ -95,7 +95,7 @@ def _d_sti_chain(s: SVG, th: Theme) -> None:
         if i == 1:  # the room degrades the modulation transfer function
             cx = x + bw / 2
             s.line(cx, y + bh, cx, y + bh + 18, th.muted, 1.2, dash="3,3")
-            s.text(cx, y + bh + 40, "m(F) drops", 18, th.muted, italic=True)
+            s.text(cx, y + bh + 40, "$m(F)$ drops", 18, th.muted)
         if i < len(stages) - 1:
             s.arrow(x + bw + 1, y + bh / 2, x + bw + gap - 2, y + bh / 2, th.fg, 2)
         x += bw + gap
@@ -105,9 +105,9 @@ def _d_speech_intelligibility(s: SVG, th: Theme) -> None:
     """SII computation flow (ANSI S3.5-1997, one-third-octave method)."""
     # --- Top: three equivalent-spectrum-level inputs (per 1/3-octave band) ---
     inputs = [
-        (150.0, "Speech  Ei'", th.primary),
-        (450.0, "Noise  Ni'", th.secondary),
-        (750.0, "Threshold  Ti'", th.accent),
+        (150.0, "Speech  $E′_i$", th.primary),
+        (450.0, "Noise  $N′_i$", th.secondary),
+        (750.0, "Threshold  $T′_i$", th.accent),
     ]
     iw, ih, iy = 220.0, 66.0, 40.0
     for cx, label, col in inputs:
@@ -120,9 +120,9 @@ def _d_speech_intelligibility(s: SVG, th: Theme) -> None:
     cx, bw, bh = 450.0, 470.0, 70.0
     x0 = cx - bw / 2
     chain = [
-        (150.0, "Self-masking + spread of masking", "Zi   (clause 5.4)"),
-        (264.0, "Equivalent disturbance Di", "max(masking, internal noise) (5.6)"),
-        (378.0, "Band audibility Ai = (Ei' − Di + 15)/30", "clipped to [0, 1]   (clause 5.8)"),
+        (150.0, "Self-masking + spread of masking", "$Z_i$   (clause 5.4)"),
+        (264.0, "Equivalent disturbance $D_i$", "max(masking, internal noise) (5.6)"),
+        (378.0, "Band audibility $A_i = (E′_i − D_i + 15)/30$", "clipped to [0, 1]   (clause 5.8)"),
     ]
     for by, l1, l2 in chain:
         s.rect(x0, by, bw, bh, th.panel, th.fg, rx=12, sw=2)
@@ -134,8 +134,8 @@ def _d_speech_intelligibility(s: SVG, th: Theme) -> None:
     # --- Band-importance weighting and the final index ---
     s.arrow(cx, 448, cx, 486, th.fg, 2.0)
     s.rect(x0, 486, bw, 74, "none", th.primary, rx=12, sw=2.4)
-    s.text(cx, 516, "SII = Σ I_i A_i", 26, th.fg, "middle", bold=True)
-    s.text(cx, 542, "band importance I_i (Table 3)  ·  index in [0, 1]  (clause 6)",
+    s.text(cx, 516, "$SII = Σ I_i A_i$", 26, th.fg, "middle", bold=True)
+    s.text(cx, 542, "band importance $I_i$ (Table 3)  ·  index in [0, 1]  (clause 6)",
            16, th.primary, "middle")
 
 
@@ -145,7 +145,7 @@ def _d_hearing_threshold(s: SVG, th: Theme) -> None:
     # --- Inputs --------------------------------------------------------------
     iw, ih = 540.0, 62.0
     s.rect(cx - iw / 2, 56, iw, ih, th.panel, th.fg, rx=10, sw=2)
-    s.text(cx, 84, "Age Y,  sex,  population fractile Q", 20, th.fg,
+    s.text(cx, 84, "Age $Y$,  sex,  population fractile $Q$", 20, th.fg,
            "middle", bold=True)
     s.text(cx, 106, "audiometric frequencies 125 Hz – 8000 Hz", 15, th.muted,
            "middle")
@@ -160,10 +160,14 @@ def _d_hearing_threshold(s: SVG, th: Theme) -> None:
         s.text(cx, y + 47, l2, 14, th.muted, "middle")
 
     # --- ISO 7029 chain ------------------------------------------------------
+    # The dHmd/dHQ formulas and the su/sl spreads stay out of $...$ markup:
+    # ISO 7029:2017 (4.2, Formulae (4)/(5)) prints the md, u and l
+    # subscripts upright, and the curated roman list cannot carry them (md
+    # is missing; a bare u or l would set every such index upright).
     _step(152, "Median deviation from age 18   (ISO 7029, 4.2)",
           "dHmd = a · (Y − 18) ^ b   (Table 1, by sex)", th.primary)
     _step(244, "Spread su / sl   (ISO 7029, 4.3)",
-          "degree-5 polynomials in (Y − 18)   (Tables 2–5)", th.fg)
+          "degree-5 polynomials in $(Y − 18)$   (Tables 2–5)", th.fg)
     _step(336, "Fractile threshold   (ISO 7029, 4.4)",
           "dHQ = dHmd + z(Q) * s   (su if Q >= 0.5, else sl)", th.fg)
     s.arrow(cx, 212, cx, 244, th.fg, 1.8)
@@ -201,21 +205,27 @@ def _d_nihl(s: SVG, th: Theme) -> None:
             s.text(cxx, y + 48, l2, 13, th.muted, "middle")
 
     # --- Inputs -------------------------------------------------------------
-    _step(lxc, 56, "Age Y,  sex,  fractile Q", "database A = ISO 7029", th.fg)
+    # L_EX,8h stays plain: ISO 1999:2013 prints the whole EX,8h subscript
+    # upright, and the composer has no upright run for the "8h" unit inside
+    # a script, so $L_{EX,8h}$ would set the h as an italic index.
+    _step(lxc, 56, "Age $Y$,  sex,  fractile $Q$", "database A = ISO 7029", th.fg)
     _step(rxc, 56, "Exposure L_EX,8h,  t years",
           "normalized to 8 h / 5 days", th.fg)
 
     # --- Left lane: age component H (HTLA) ----------------------------------
     s.arrow(lxc, 118, lxc, 150, th.fg, 1.8)
-    _step(lxc, 150, "Age threshold  H  (HTLA)",
+    _step(lxc, 150, "Age threshold  $H$  (HTLA)",
           "ISO 7029 fractile, dB", th.primary)
 
     # --- Right lane: noise component N (NIPTS) ------------------------------
     s.arrow(rxc, 118, rxc, 150, th.fg, 1.8)
-    _step(rxc, 150, "Median NIPTS  N50  (6.3.1)",
-          "N50 = [u + v·log10(t/t0)]·(L − L0)²", th.secondary)
+    _step(rxc, 150, "Median NIPTS  $N_{50}$  (6.3.1)",
+          "$N_{50} = [u + v·log_{10}(t/t_0)]·(L − L_0)^2$", th.secondary)
     s.arrow(rxc, 212, rxc, 244, th.fg, 1.8)
-    _step(rxc, 244, "Fractile NIPTS  N  (6.3.2)",
+    # The du/dl fractile arms stay plain: ISO 1999:2013, Formulae (4) and
+    # (5), prints d with an upright u/l subscript, which the roman list
+    # cannot carry letter by letter.
+    _step(rxc, 244, "Fractile NIPTS  $N$  (6.3.2)",
           "N = N50 + z·(du if z ≥ 0 else dl)", th.fg)
 
     # --- Converge into HTLAN ------------------------------------------------
@@ -223,7 +233,7 @@ def _d_nihl(s: SVG, th: Theme) -> None:
     s.arrow(lxc, 212, cx - 118.0, box_y, th.fg, 1.8)
     s.arrow(rxc, 306, cx + 118.0, box_y, th.fg, 1.8)
     s.rect(cx - bw / 2, box_y, bw, 66, "none", th.primary, rx=10, sw=2.4)
-    s.text(cx, box_y + 29, "HTLAN   H' = H + N − H·N / 120", 20, th.fg,
+    s.text(cx, box_y + 29, "HTLAN   $H′ = H + N − H·N / 120$", 20, th.fg,
            "middle", bold=True)
     s.text(cx, box_y + 51, "threshold from age and noise  (Formula 1, 6.1)",
            13, th.muted, "middle")
@@ -251,19 +261,23 @@ def _d_zwicker(s: SVG, th: Theme) -> None:
           "(Clause 5.4, Table A.3)",
           "the 11 lowest bands grouped into 3 critical bands, 25-250 Hz",
           th.primary)
+    # The corrections line stays plain: ISO 532-1:2017 prints ΔL_DF and
+    # L_TQ (Tables A.5/A.6) with upright DF/TQ subscripts the roman list
+    # does not carry, and composing only the a₀ beside them would split one
+    # enumeration into two styles.
     _step(218, "Core loudness of the 20 critical bands  (Tables A.4-A.7)",
           "a₀ transmission (A.4), diffuse-field DDF (A.5), threshold in quiet "
           "LTQ (A.6)", th.fg)
-    _step(304, "Specific loudness  N′(z)  over 0.1-Bark steps to 24 Bark",
+    _step(304, "Specific loudness  $N′(z)$  over 0.1-Bark steps to 24 Bark",
           "upper masking slopes added band to band (Table A.9)", th.secondary)
     for y0, y1 in ((190, 218), (276, 304)):
         s.arrow(cx, y0, cx, y1, th.fg, 1.8)
     s.arrow(cx, 362, cx, 392, th.fg, 1.8)
 
     s.rect(x0, 392, bw, 60, "none", th.primary, rx=10, sw=2.4)
-    s.text(cx, 417, "Total loudness  N = ∫ N′(z) dz  [sone]", 17, th.fg, "middle",
+    s.text(cx, 417, "Total loudness  $N = ∫ N′(z) dz$  [sone]", 17, th.fg, "middle",
            bold=True)
-    s.text(cx, 438, "loudness level  LN = 40 + 10·log₂ N  [phon]", 14, th.muted,
+    s.text(cx, 438, "loudness level  $L_N = 40 + 10·log_2 N$  [phon]", 14, th.muted,
            "middle")
 
 
@@ -279,6 +293,10 @@ def _d_loudness_capture(s: SVG, th: Theme) -> None:
     since ISO 532-1 itself prescribes no distance.
     """
     # --- Panel A: free field ------------------------------------------------
+    # NF, ND and the NL/NR pair stay plain in this diagram: ISO 532-1:2017
+    # (3.19 Note 1, Annex D) prints them as N with upright F/D/L/R
+    # descriptor subscripts, which the composer's roman list cannot carry
+    # letter by letter.
     ax0, pw = 26.0, 418.0
     s.rect(ax0, 48, pw, 330, th.panel, th.muted, rx=12, sw=1.6)
     s.text(ax0 + pw / 2, 76, "A — Free field  (NF)", 20, th.fg, bold=True)
@@ -525,19 +543,19 @@ def _d_tone_audibility_acquisition(s: SVG, th: Theme) -> None:
         s.line(base + slot / 2, 232, base + slot / 2, 244, th.muted, 1.2)
 
     s.text(x0, 310, "3 — each merged spectrum gives one decisive audibility "
-           "ΔLj (clause 5.3.8)", 16, th.fg, "start", bold=True)
+           "$ΔL_j$ (clause 5.3.8)", 16, th.fg, "start", bold=True)
 
     # --- 3: the energy mean of the decisive audibilities --------------------
     s.path(f"M {x0} 326 L {x1} 326 L {x1 - 170} 358 L {x0 + 170} 358 Z",
            fill=th.panel, stroke=th.muted, sw=1.4)
     s.rect(x0 + 170, 356, span - 340, 52, "none", th.primary, rx=8, sw=2.2)
-    s.text(450, 379, "Energy mean of the J decisive audibilities", 16, th.fg,
+    s.text(450, 379, "Energy mean of the $J$ decisive audibilities", 16, th.fg,
            bold=True)
     s.text(450, 399, "Formula (20); an empty spectrum counts as −10 dB "
            "(Formula 21)", 13, th.muted)
     s.arrow(450, 408, 450, 432, th.fg, 1.8)
     s.rect(x0 + 190, 432, span - 380, 50, "none", th.accent, rx=8, sw=2.4)
-    s.text(450, 453, "mean audibility ΔL  →  tonal adjustment Kt", 17, th.fg,
+    s.text(450, 453, "mean audibility $ΔL$  →  tonal adjustment $K_t$", 17, th.fg,
            bold=True)
     s.text(450, 473, "ISO 1996-2:2017 Annex J, Table J.1", 13, th.muted)
 
@@ -545,13 +563,13 @@ def _d_tone_audibility_acquisition(s: SVG, th: Theme) -> None:
     s.rect(x0, 502, span, 92, th.panel, th.muted, rx=10, sw=1.6)
     left = (
         "class 1 chain (IEC 61672-1), lower limit ≤ 20 Hz",
-        "line spacing Δf between 1.9 Hz and 4.0 Hz",
+        "line spacing $Δf$ between 1.9 Hz and 4.0 Hz",
         "Hanning window, mandatory",
     )
     right = (
         "amplitude resolution ≥ 0.1 dB, anti-aliasing filter",
         "A-weighted spectrum (clause 5.3.2)",
-        "U ≤ 1.5 dB: below 12 spectra, U must be reported",
+        "$U ≤ 1.5$ dB: below 12 spectra, $U$ must be reported",
     )
     for k, txt in enumerate(left):
         s.circle(x0 + 22, 528 + k * 22, 3.6, th.primary)
@@ -635,7 +653,7 @@ def _d_dosimeter(s: SVG, th: Theme) -> None:
     # Strategy 2: job-based; random samples over the homogeneous group.
     y2 = 300.0
     strip(y2, "Job-based (Clause 10)",
-          "N ≥ 5 random samples over the homogeneous exposure group")
+          "$N ≥ 5$ random samples over the homogeneous exposure group")
     s.rect(x0, y2, bw, 44, "none", th.muted, rx=6, sw=1.6, dash="5,4")
     for frac in (0.05, 0.24, 0.46, 0.65, 0.86):
         s.rect(x0 + bw * frac, y2 + 6, bw * 0.06, 32, th.panel, th.primary,
@@ -650,7 +668,9 @@ def _d_dosimeter(s: SVG, th: Theme) -> None:
     s.rect(x0 + 8, y3 + 30, bw - 16, 7, th.panel, th.primary, rx=3, sw=1.2)
     s.rect(x0 + 16, y3 + 43, bw - 32, 7, th.panel, th.primary, rx=3, sw=1.2)
 
-    # All three land in the same deliverable.
+    # All three land in the same deliverable. LEX,8h stays plain: same
+    # upright EX,8h subscript as on the ISO 1999 plate, not composable
+    # while the roman list has no run for the "8h" unit inside a script.
     s.text(620, 520, "choose by work pattern (Table B.1)  →  LEX,8h + Annex C uncertainty",
            17, th.fg)
 
@@ -666,17 +686,20 @@ def _d_sound_quality(s: SVG, th: Theme) -> None:
     0.9999 asper, 0.9957 vacil_HMS)."""
     # Input signal
     s.rect(230, 52, 440, 56, th.panel, th.fg, rx=10, sw=2)
-    s.text(450, 76, "Calibrated signal x(t) in pascals", 16, th.fg, bold=True)
+    s.text(450, 76, "Calibrated signal $x(t)$ in pascals", 16, th.fg, bold=True)
     s.text(450, 97, "any sample rate: each metric resamples to 48 kHz "
            "internally", 12, th.muted)
 
     # Two auditory front ends
     s.rect(60, 148, 270, 56, th.panel, th.primary, rx=10, sw=2)
-    s.text(195, 172, "Specific loudness N'(z)", 15, th.fg, bold=True)
+    s.text(195, 172, "Specific loudness $N′(z)$", 15, th.fg, bold=True)
     s.text(195, 192, "Zwicker pattern over 24 Bark", 12, th.muted)
     s.rect(390, 148, 450, 56, th.panel, th.primary, rx=10, sw=2)
     s.text(615, 172, "Sottek Hearing Model front end (ECMA-418-2)", 15,
            th.fg, bold=True)
+    # The Bark_HMS, tu_HMS and vacil_HMS units keep their plain spelling in
+    # this diagram: ECMA-418-2 prints the HMS subscript upright, and the
+    # curated roman list does not carry HMS yet.
     s.text(615, 192, "outer/middle-ear filter + 53 auditory bands "
            "(Bark_HMS)", 12, th.muted)
     s.arrow(350, 108, 210, 144, th.fg, 1.8)
@@ -684,19 +707,19 @@ def _d_sound_quality(s: SVG, th: Theme) -> None:
 
     # The four metric boxes
     metrics = (
-        (42.0, "Sharpness S", "DIN 45692",
-         "g(z)-weighted first moment", "of N'(z), with k = 0.108",
+        (42.0, "Sharpness $S$", "DIN 45692",
+         "$g(z)$-weighted first moment", "of $N′(z)$, with $k$ = 0.108",
          ("critical-band-wide noise", "at 1 kHz, 60 dB"),
-         "→ S = 1.00 acum"),
-        (262.0, "Tonality T", "ECMA-418-2 clause 6",
+         "→ $S$ = 1.00 acum"),
+        (262.0, "Tonality $T$", "ECMA-418-2 clause 6",
          "band autocorrelation finds", "periodic components",
-         ("1 kHz tone at 40 dB",), "→ T = 1.000 tu_HMS (999 Hz)"),
-        (482.0, "Roughness R", "ECMA-418-2 clause 7",
+         ("1 kHz tone at 40 dB",), "→ $T$ = 1.000 tu_HMS (999 Hz)"),
+        (482.0, "Roughness $R$", "ECMA-418-2 clause 7",
          "fast envelope modulation,", "band-pass peaking near 70 Hz",
-         ("1 kHz, 100 % AM at 70 Hz, 60 dB",), "→ R = 0.9999 asper"),
-        (702.0, "Fluctuation strength F", "ECMA-418-2 clause 9 (HSA)",
+         ("1 kHz, 100 % AM at 70 Hz, 60 dB",), "→ $R$ = 0.9999 asper"),
+        (702.0, "Fluctuation strength $F$", "ECMA-418-2 clause 9 (HSA)",
          "slow envelope modulation,", "band-pass peaking near 4 Hz",
-         ("1 kHz, 100 % AM at 4 Hz, 60 dB",), "→ F = 0.9957 vacil_HMS"),
+         ("1 kHz, 100 % AM at 4 Hz, 60 dB",), "→ $F$ = 0.9957 vacil_HMS"),
     )
     for x0, name, std, m1, m2, refs, val in metrics:
         cx = x0 + 98.0
@@ -720,8 +743,8 @@ def _d_sound_quality(s: SVG, th: Theme) -> None:
     s.rect(130, 412, 640, 68, "none", th.accent, rx=10, sw=1.6, dash="6,5")
     s.text(450, 439, "Downstream, the sensations combine into annoyance",
            15, th.accent, bold=True)
-    s.text(450, 463, "N5, S, R and F feed the Fastl and Zwicker "
-           "psychoacoustic annoyance PA = N5·(1 + √(wS² + wFR²))", 12,
+    s.text(450, 463, "$N_5$, $S$, $R$ and $F$ feed the Fastl and Zwicker "
+           "psychoacoustic annoyance $PA = N_5·(1 + √(w_S^2 + w_{FR}^2))$", 12,
            th.fg)
 
 
@@ -741,22 +764,22 @@ def _d_tone_audibility(s: SVG, th: Theme) -> None:
         s.text(cx, y + 25, l1, 16, th.fg, bold=True)
         s.text(cx, y + 45, l2, 12, th.muted)
 
-    step(52, "Narrow-band FFT spectrum — line spacing Δf = 2.7 Hz",
-         "Annex E engine spectrum; peak detected at fT = 137.3 Hz (not on "
+    step(52, "Narrow-band FFT spectrum — line spacing $Δf$ = 2.7 Hz",
+         "Annex E engine spectrum; peak detected at $f_T$ = 137.3 Hz (not on "
          "a slope)", th.fg)
-    step(138, "Critical band about the tone — Δfc = 101.36 Hz",
-         "geometric placement: corners 95.67 and 197.04 Hz, √(f1·f2) = fT",
+    step(138, "Critical band about the tone — $Δf_c$ = 101.36 Hz",
+         "geometric placement: corners 95.67 and 197.04 Hz, $√(f_1·f_2) = f_T$",
          th.primary)
     step(224, "Levels from the spectrum lines in the band",
-         "masking noise LS = 49.22 dB (iterative mean); tone LT = 67.96 dB "
+         "masking noise $L_S$ = 49.22 dB (iterative mean); tone $L_T$ = 67.96 dB "
          "(energy sum)", th.primary)
     step(310, "Masking threshold seen by the ear",
-         "LG = LS + 10·log10(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB",
-         th.primary)
+         "$L_G = L_S + 10·log_{10}(Δf_c/Δf)$ = 64.97 dB;  masking index "
+         "$a_v$ = −2.02 dB", th.primary)
     s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
-    s.text(cx, 421, "Audibility ΔL = LT − LG − av = 5.01 dB", 17, th.fg,
+    s.text(cx, 421, "Audibility $ΔL = L_T − L_G − a_v$ = 5.01 dB", 17, th.fg,
            bold=True)
-    s.text(cx, 443, "the largest ΔL of the nine tones: the decisive "
+    s.text(cx, 443, "the largest $ΔL$ of the nine tones: the decisive "
            "audibility of this spectrum", 12, th.muted)
     for y0, y1 in ((110, 134), (196, 220), (282, 306), (368, 392),
                    (456, 484)):
@@ -766,8 +789,8 @@ def _d_tone_audibility(s: SVG, th: Theme) -> None:
            dash="6,5")
     s.text(cx, 515, "From audibility to penalty (ISO 1996-2:2017 Annex J)",
            15, th.secondary, bold=True)
-    s.text(cx, 539, "energy mean of the five spectra ΔL = 6.98 dB → tonal "
-           "adjustment Kt = 4 dB (Table J.1)", 13, th.fg)
+    s.text(cx, 539, "energy mean of the five spectra $ΔL$ = 6.98 dB → tonal "
+           "adjustment $K_t$ = 4 dB (Table J.1)", 13, th.fg)
 
 
 # ---------------------------------------------------------------------------
@@ -779,13 +802,13 @@ def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
     S = 2.0 acum, F = 0.5 vacil, R = 0.3 asper) through the two weightings
     (wS = 0.1001, wFR = 0.2125) into PA = 37.05."""
     inputs = (
-        (42.0, "S = 2.0 acum", "sharpness (DIN 45692)",
+        (42.0, "$S$ = 2.0 acum", "sharpness (DIN 45692)",
          "counts only above 1.75 acum"),
-        (262.0, "N5 = 30 sone", "percentile loudness (ISO 532-1)",
+        (262.0, "$N_5$ = 30 sone", "percentile loudness (ISO 532-1)",
          "exceeded 5 % of the time"),
-        (482.0, "F = 0.5 vacil", "fluctuation strength",
+        (482.0, "$F$ = 0.5 vacil", "fluctuation strength",
          "slow modulation, ≈ 4 Hz"),
-        (702.0, "R = 0.3 asper", "roughness", "fast modulation, ≈ 70 Hz"),
+        (702.0, "$R$ = 0.3 asper", "roughness", "fast modulation, ≈ 70 Hz"),
     )
     for x0, name, s1, s2 in inputs:
         cx = x0 + 98.0
@@ -796,16 +819,16 @@ def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
 
     # Weighting boxes: wS takes S and N5; wFR takes N5, F and R.
     s.rect(90, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
-    s.text(260, 230, "Sharpness weighting wS = 0.1001", 15, th.fg,
+    s.text(260, 230, "Sharpness weighting $w_S$ = 0.1001", 15, th.fg,
            bold=True)
-    s.text(260, 252, "wS = (S − 1.75) · 0.25 · log10(N5 + 10)", 13,
-           th.primary, mono=True)
-    s.text(260, 274, "zero for S ≤ 1.75 acum", 12, th.muted)
+    s.text(260, 252, "$w_S = (S − 1.75) · 0.25 · log_{10}(N_5 + 10)$", 13,
+           th.primary)
+    s.text(260, 274, "zero for $S ≤ 1.75$ acum", 12, th.muted)
     s.rect(470, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
-    s.text(640, 230, "Roughness and fluctuation wFR = 0.2125", 15, th.fg,
+    s.text(640, 230, "Roughness and fluctuation $w_{FR}$ = 0.2125", 15, th.fg,
            bold=True)
-    s.text(640, 252, "wFR = 2.18 / N5^0.4 · (0.4·F + 0.6·R)", 13,
-           th.primary, mono=True)
+    s.text(640, 252, "$w_{FR} = 2.18 / N_5^{0.4} · (0.4·F + 0.6·R)$", 13,
+           th.primary)
     s.text(640, 274, "roughness weighs more: 0.6 against 0.4", 12,
            th.muted)
     s.arrow(141, 132, 200, 200, th.fg, 1.8)
@@ -816,15 +839,15 @@ def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
 
     # Combination
     s.rect(200, 344, 500, 72, "none", th.accent, rx=10, sw=2.4)
-    s.text(450, 374, "PA = N5 · (1 + √(wS² + wFR²)) = 37.05", 18, th.fg,
+    s.text(450, 374, "$PA = N_5 · (1 + √(w_S^2 + w_{FR}^2))$ = 37.05", 18, th.fg,
            bold=True)
     s.text(450, 399, "Fastl and Zwicker Eq. 16.2 (origin Widmann 1992)",
            12, th.muted)
     s.arrow(260, 290, 380, 340, th.fg, 1.8)
     s.arrow(640, 290, 520, 340, th.fg, 1.8)
 
-    s.text(450, 464, "a neutral sound (S ≤ 1.75 acum, F = R = 0) sits on "
-           "the baseline PA = N5", 14, th.fg)
+    s.text(450, 464, "a neutral sound ($S ≤ 1.75$ acum, $F = R = 0$) sits on "
+           "the baseline $PA = N_5$", 14, th.fg)
     s.text(450, 488, "sharpness, roughness and fluctuation only ever lift "
            "the annoyance above the loudness", 13, th.muted)
 
@@ -845,7 +868,7 @@ def _d_objective_intelligibility(s: SVG, th: Theme) -> None:
         s.text(cx, y + 25, l1, 16, th.fg, bold=True)
         s.text(cx, y + 45, l2, 12, th.muted)
 
-    step(52, "Clean reference x(t) and degraded version y(t)",
+    step(52, "Clean reference $x(t)$ and degraded version $y(t)$",
          "the guide's example: speech-like material in a flat masker at "
          "0 dB SNR", th.fg)
     step(138, "Resample to 10 kHz and drop the silent frames",

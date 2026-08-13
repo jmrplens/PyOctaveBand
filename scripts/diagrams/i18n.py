@@ -503,8 +503,8 @@ _ES: dict[str, str] = {
     # Hearing threshold (ISO 7029 / ISO 389-7)
     "Hearing-threshold model (ISO 7029 age distribution, ISO 389-7 zero)":
         "Modelo del umbral de audición (ISO 7029 por edad, cero ISO 389-7)",
-    "Age Y,  sex,  population fractile Q":
-        "Edad Y,  sexo,  fractil poblacional Q",
+    "Age $Y$,  sex,  population fractile $Q$":
+        "Edad $Y$,  sexo,  fractil poblacional $Q$",
     "audiometric frequencies 125 Hz – 8000 Hz":
         "frecuencias audiométricas 125 Hz – 8000 Hz",
     "Median deviation from age 18   (ISO 7029, 4.2)":
@@ -513,8 +513,8 @@ _ES: dict[str, str] = {
         "dHmd = a · (Y − 18) ^ b   (Tabla 1, por sexo)",
     "Spread su / sl   (ISO 7029, 4.3)":
         "Dispersión su / sl   (ISO 7029, 4.3)",
-    "degree-5 polynomials in (Y − 18)   (Tables 2–5)":
-        "polinomios de grado 5 en (Y − 18)   (Tablas 2–5)",
+    "degree-5 polynomials in $(Y − 18)$   (Tables 2–5)":
+        "polinomios de grado 5 en $(Y − 18)$   (Tablas 2–5)",
     "Fractile threshold   (ISO 7029, 4.4)":
         "Umbral del fractil   (ISO 7029, 4.4)",
     "dHQ = dHmd + z(Q) * s   (su if Q >= 0.5, else sl)":
@@ -554,19 +554,19 @@ _ES: dict[str, str] = {
     # Noise-induced hearing loss (ISO 1999)
     "Noise-induced hearing loss (ISO 1999): NIPTS and HTLAN":
         "Pérdida auditiva inducida por ruido (ISO 1999): NIPTS y HTLAN",
-    "Age Y,  sex,  fractile Q": "Edad Y,  sexo,  fractil Q",
+    "Age $Y$,  sex,  fractile $Q$": "Edad $Y$,  sexo,  fractil $Q$",
     "database A = ISO 7029": "base de datos A = ISO 7029",
     "Exposure L_EX,8h,  t years": "Exposición L_EX,8h,  t años",
     "normalized to 8 h / 5 days": "normalizada a 8 h / 5 días",
-    "Age threshold  H  (HTLA)": "Umbral por edad  H  (HTLA)",
+    "Age threshold  $H$  (HTLA)": "Umbral por edad  $H$  (HTLA)",
     "ISO 7029 fractile, dB": "fractil ISO 7029, dB",
-    "Median NIPTS  N50  (6.3.1)": "NIPTS mediana  N50  (6.3.1)",
-    "N50 = [u + v·log10(t/t0)]·(L − L0)²":
-        "N50 = [u + v·log10(t/t0)]·(L − L0)²",
-    "Fractile NIPTS  N  (6.3.2)": "NIPTS del fractil  N  (6.3.2)",
+    "Median NIPTS  $N_{50}$  (6.3.1)": "NIPTS mediana  $N_{50}$  (6.3.1)",
+    "$N_{50} = [u + v·log_{10}(t/t_0)]·(L − L_0)^2$":
+        "$N_{50} = [u + v·log_{10}(t/t_0)]·(L − L_0)^2$",
+    "Fractile NIPTS  $N$  (6.3.2)": "NIPTS del fractil  $N$  (6.3.2)",
     "N = N50 + z·(du if z ≥ 0 else dl)":
         "N = N50 + z·(du si z ≥ 0, si no dl)",
-    "HTLAN   H' = H + N − H·N / 120": "HTLAN   H' = H + N − H·N / 120",
+    "HTLAN   $H′ = H + N − H·N / 120$": "HTLAN   $H′ = H + N − H·N / 120$",
     "threshold from age and noise  (Formula 1, 6.1)":
         "umbral por edad y ruido  (Fórmula 1, 6.1)",
     # Impulsive-sound prominence (NT ACOU 112)
@@ -642,20 +642,20 @@ _ES: dict[str, str] = {
         "$c_0$ = 345,6 m/s, así $55,3/c_0$ = 0,16  (cláusula 4.4)",
     "Absorption area and reverberation time of a room (EN 12354-6)":
         "Área de absorción y tiempo de reverberación de una sala (EN 12354-6)",
-    "Speech  Ei'": "Habla  Ei'",
-    "Noise  Ni'": "Ruido  Ni'",
-    "Threshold  Ti'": "Umbral  Ti'",
+    "Speech  $E′_i$": "Habla  $E′_i$",
+    "Noise  $N′_i$": "Ruido  $N′_i$",
+    "Threshold  $T′_i$": "Umbral  $T′_i$",
     "spectrum level (dB)": "nivel espectral (dB)",
     "Self-masking + spread of masking": "Automáscara + propagación de la máscara",
-    "Zi   (clause 5.4)": "Zi   (cláusula 5.4)",
-    "Equivalent disturbance Di": "Perturbación equivalente Di",
+    "$Z_i$   (clause 5.4)": "$Z_i$   (cláusula 5.4)",
+    "Equivalent disturbance $D_i$": "Perturbación equivalente $D_i$",
     "max(masking, internal noise) (5.6)":
         "máx(máscara, ruido interno) (5.6)",
-    "Band audibility Ai = (Ei' − Di + 15)/30":
-        "Audibilidad de banda Ai = (Ei' − Di + 15)/30",
+    "Band audibility $A_i = (E′_i − D_i + 15)/30$":
+        "Audibilidad de banda $A_i = (E′_i − D_i + 15)/30$",
     "clipped to [0, 1]   (clause 5.8)": "acotada a [0, 1]   (cláusula 5.8)",
-    "band importance I_i (Table 3)  ·  index in [0, 1]  (clause 6)":
-        "importancia de banda I_i (Tabla 3)  ·  índice en [0, 1]  (cláusula 6)",
+    "band importance $I_i$ (Table 3)  ·  index in [0, 1]  (clause 6)":
+        "importancia de banda $I_i$ (Tabla 3)  ·  índice en [0, 1]  (cláusula 6)",
     # Human vibration (ISO 2631-1 / ISO 8041-1 / 2002-44-EC)
     "Whole-body vibration measurement chain (ISO 2631-1 / ISO 8041-1)":
         "Cadena de medición de vibración de cuerpo entero (ISO 2631-1 / ISO 8041-1)",
@@ -1000,29 +1000,29 @@ _ES: dict[str, str] = {
     "line into 3 s spectra (clause 4.3)":
         "2 — los espectros básicos (menos de 1 s) se combinan línea a línea "
         "en espectros de 3 s (capítulo 4.3)",
-    "3 — each merged spectrum gives one decisive audibility ΔLj "
+    "3 — each merged spectrum gives one decisive audibility $ΔL_j$ "
     "(clause 5.3.8)":
-        "3 — cada espectro combinado da una audibilidad decisiva ΔLj "
+        "3 — cada espectro combinado da una audibilidad decisiva $ΔL_j$ "
         "(capítulo 5.3.8)",
-    "Energy mean of the J decisive audibilities":
-        "Media energética de las J audibilidades decisivas",
+    "Energy mean of the $J$ decisive audibilities":
+        "Media energética de las $J$ audibilidades decisivas",
     "Formula (20); an empty spectrum counts as −10 dB (Formula 21)":
         "Fórmula (20); un espectro sin tono cuenta como −10 dB (Fórmula 21)",
-    "mean audibility ΔL  →  tonal adjustment Kt":
-        "audibilidad media ΔL  →  ajuste tonal Kt",
+    "mean audibility $ΔL$  →  tonal adjustment $K_t$":
+        "audibilidad media $ΔL$  →  ajuste tonal $K_t$",
     "ISO 1996-2:2017 Annex J, Table J.1":
         "ISO 1996-2:2017 Anexo J, Tabla J.1",
     "class 1 chain (IEC 61672-1), lower limit ≤ 20 Hz":
         "cadena de clase 1 (IEC 61672-1), límite inferior ≤ 20 Hz",
-    "line spacing Δf between 1.9 Hz and 4.0 Hz":
-        "espaciado de líneas Δf entre 1,9 Hz y 4,0 Hz",
+    "line spacing $Δf$ between 1.9 Hz and 4.0 Hz":
+        "espaciado de líneas $Δf$ entre 1,9 Hz y 4,0 Hz",
     "Hanning window, mandatory": "ventana de Hanning, obligatoria",
     "amplitude resolution ≥ 0.1 dB, anti-aliasing filter":
         "resolución de amplitud ≥ 0,1 dB, filtro antialias",
     "A-weighted spectrum (clause 5.3.2)":
         "espectro ponderado A (capítulo 5.3.2)",
-    "U ≤ 1.5 dB: below 12 spectra, U must be reported":
-        "U ≤ 1,5 dB: con menos de 12 espectros, informar U",
+    "$U ≤ 1.5$ dB: below 12 spectra, $U$ must be reported":
+        "$U ≤ 1,5$ dB: con menos de 12 espectros, informar $U$",
     # ISO 532-2 capture routes (perception/psychoacoustics/advanced-loudness).
     "Which recording maps to which arguments (ISO 532-2 clause 7.2)":
         "Qué grabación corresponde a qué argumentos (ISO 532-2, cap. 7.2)",
@@ -1106,7 +1106,7 @@ _ES: dict[str, str] = {
     "reverberation + noise": "reverberación + ruido",
     "Microphone": "Micrófono",
     "Analysis": "Análisis",
-    "m(F) drops": "m(F) cae",
+    "$m(F)$ drops": "$m(F)$ cae",
     "Airborne sound insulation setup (ISO 16283-1)":
         "Montaje de aislamiento acústico aéreo (ISO 16283-1)",
     "Source room": "Recinto emisor",
@@ -1669,14 +1669,14 @@ _ES: dict[str, str] = {
     "LTQ (A.6)":
         "transmisión a₀ (A.4), DDF de campo difuso (A.5), umbral en silencio "
         "LTQ (A.6)",
-    "Specific loudness  N′(z)  over 0.1-Bark steps to 24 Bark":
-        "Sonoridad específica  N′(z)  en pasos de 0,1 Bark hasta 24 Bark",
+    "Specific loudness  $N′(z)$  over 0.1-Bark steps to 24 Bark":
+        "Sonoridad específica  $N′(z)$  en pasos de 0,1 Bark hasta 24 Bark",
     "upper masking slopes added band to band (Table A.9)":
         "pendientes de enmascaramiento superior sumadas banda a banda (Tabla A.9)",
-    "Total loudness  N = ∫ N′(z) dz  [sone]":
-        "Sonoridad total  N = ∫ N′(z) dz  [sone]",
-    "loudness level  LN = 40 + 10·log₂ N  [phon]":
-        "nivel de sonoridad  LN = 40 + 10·log₂ N  [phon]",
+    "Total loudness  $N = ∫ N′(z) dz$  [sone]":
+        "Sonoridad total  $N = ∫ N′(z) dz$  [sone]",
+    "loudness level  $L_N = 40 + 10·log_2 N$  [phon]":
+        "nivel de sonoridad  $L_N = 40 + 10·log_2 N$  [phon]",
     # Loudspeaker free-field sensitivity (IEC 60268-5)
     "Loudspeaker free-field sensitivity measurement (IEC 60268-5)":
         "Sensibilidad de altavoz en campo libre (IEC 60268-5)",
@@ -1875,8 +1875,8 @@ _ES: dict[str, str] = {
     "split the day into tasks — ≥ 3 samples (│) per task, plus each duration":
         "dividir la jornada en tareas — ≥ 3 muestras (│) y la duración por tarea",
     "Job-based (Clause 10)": "Basada en la función (apartado 10)",
-    "N ≥ 5 random samples over the homogeneous exposure group":
-        "N ≥ 5 muestras aleatorias sobre el grupo de exposición homogéneo",
+    "$N ≥ 5$ random samples over the homogeneous exposure group":
+        "$N ≥ 5$ muestras aleatorias sobre el grupo de exposición homogéneo",
     "Full-day (Clause 11)": "Jornada completa (apartado 11)",
     "the whole shift, at least 3 times (5 if the days differ by > 3 dB)":
         "toda la jornada, al menos 3 veces (5 si los días difieren en > 3 dB)",
@@ -2809,119 +2809,120 @@ _ES: dict[str, str] = {
     # Sound-quality metric family (DIN 45692 + ECMA-418-2)
     "Sound quality beyond loudness: four calibrated sensations":
         "Calidad sonora más allá de la sonoridad: cuatro sensaciones",
-    "Calibrated signal x(t) in pascals":
-        "Señal calibrada x(t) en pascales",
+    "Calibrated signal $x(t)$ in pascals":
+        "Señal calibrada $x(t)$ en pascales",
     "any sample rate: each metric resamples to 48 kHz internally":
         "cualquier fs: cada métrica remuestrea internamente a 48 kHz",
-    "Specific loudness N'(z)": "Sonoridad específica N'(z)",
+    "Specific loudness $N′(z)$": "Sonoridad específica $N′(z)$",
     "Zwicker pattern over 24 Bark": "patrón de Zwicker sobre 24 Bark",
     "Sottek Hearing Model front end (ECMA-418-2)":
         "Etapa de entrada del modelo de Sottek (ECMA-418-2)",
     "outer/middle-ear filter + 53 auditory bands (Bark_HMS)":
         "filtro de oído externo/medio + 53 bandas auditivas (Bark_HMS)",
-    "Sharpness S": "Agudeza S",
-    "g(z)-weighted first moment": "primer momento ponderado",
-    "of N'(z), with k = 0.108": "por g(z) de N'(z), k = 0,108",
+    "Sharpness $S$": "Agudeza $S$",
+    "$g(z)$-weighted first moment": "primer momento ponderado por $g(z)$",
+    "of $N′(z)$, with $k$ = 0.108": "de $N′(z)$, con $k$ = 0,108",
     "critical-band-wide noise": "ruido de una banda crítica",
     "at 1 kHz, 60 dB": "a 1 kHz, 60 dB",
-    "→ S = 1.00 acum": "→ S = 1,00 acum",
-    "Tonality T": "Tonalidad T",
+    "→ $S$ = 1.00 acum": "→ $S$ = 1,00 acum",
+    "Tonality $T$": "Tonalidad $T$",
     "ECMA-418-2 clause 6": "ECMA-418-2, cláusula 6",
     "band autocorrelation finds": "la autocorrelación por banda",
     "periodic components": "detecta componentes periódicas",
     "1 kHz tone at 40 dB": "tono de 1 kHz a 40 dB",
-    "→ T = 1.000 tu_HMS (999 Hz)": "→ T = 1,000 tu_HMS (999 Hz)",
-    "Roughness R": "Aspereza R",
+    "→ $T$ = 1.000 tu_HMS (999 Hz)": "→ $T$ = 1,000 tu_HMS (999 Hz)",
+    "Roughness $R$": "Aspereza $R$",
     "ECMA-418-2 clause 7": "ECMA-418-2, cláusula 7",
     "fast envelope modulation,": "modulación rápida de la envolvente,",
     "band-pass peaking near 70 Hz": "paso banda con pico hacia 70 Hz",
     "1 kHz, 100 % AM at 70 Hz, 60 dB": "1 kHz, AM 100 % a 70 Hz, 60 dB",
-    "→ R = 0.9999 asper": "→ R = 0,9999 asper",
-    "Fluctuation strength F": "Intensidad de fluctuación F",
+    "→ $R$ = 0.9999 asper": "→ $R$ = 0,9999 asper",
+    "Fluctuation strength $F$": "Intensidad de fluctuación $F$",
     "ECMA-418-2 clause 9 (HSA)": "ECMA-418-2, cláusula 9 (HSA)",
     "slow envelope modulation,": "modulación lenta de la envolvente,",
     "band-pass peaking near 4 Hz": "paso banda con pico hacia 4 Hz",
     "1 kHz, 100 % AM at 4 Hz, 60 dB": "1 kHz, AM 100 % a 4 Hz, 60 dB",
-    "→ F = 0.9957 vacil_HMS": "→ F = 0,9957 vacil_HMS",
+    "→ $F$ = 0.9957 vacil_HMS": "→ $F$ = 0,9957 vacil_HMS",
     "Downstream, the sensations combine into annoyance":
         "Aguas abajo, las sensaciones se combinan en molestia",
-    "N5, S, R and F feed the Fastl and Zwicker psychoacoustic annoyance PA = N5·(1 + √(wS² + wFR²))":
-        "N5, S, R y F alimentan la molestia psicoacústica de Fastl y "
-        "Zwicker PA = N5·(1 + √(wS² + wFR²))",
+    "$N_5$, $S$, $R$ and $F$ feed the Fastl and Zwicker psychoacoustic annoyance $PA = N_5·(1 + √(w_S^2 + w_{FR}^2))$":
+        "$N_5$, $S$, $R$ y $F$ alimentan la molestia psicoacústica de Fastl y "
+        "Zwicker $PA = N_5·(1 + √(w_S^2 + w_{FR}^2))$",
     # Tone audibility (ISO/PAS 20065)
     "Tone audibility: from spectrum to penalty (ISO/PAS 20065)":
         "Audibilidad tonal: del espectro al ajuste (ISO/PAS 20065)",
-    "Narrow-band FFT spectrum — line spacing Δf = 2.7 Hz":
-        "Espectro FFT de banda estrecha — resolución Δf = 2,7 Hz",
-    "Annex E engine spectrum; peak detected at fT = 137.3 Hz (not on a slope)":
-        "espectro del motor del Anexo E; pico detectado en fT = 137,3 Hz "
+    "Narrow-band FFT spectrum — line spacing $Δf$ = 2.7 Hz":
+        "Espectro FFT de banda estrecha — resolución $Δf$ = 2,7 Hz",
+    "Annex E engine spectrum; peak detected at $f_T$ = 137.3 Hz (not on a slope)":
+        "espectro del motor del Anexo E; pico detectado en $f_T$ = 137,3 Hz "
         "(no en una ladera)",
-    "Critical band about the tone — Δfc = 101.36 Hz":
-        "Banda crítica en torno al tono — Δfc = 101,36 Hz",
-    "geometric placement: corners 95.67 and 197.04 Hz, √(f1·f2) = fT":
+    "Critical band about the tone — $Δf_c$ = 101.36 Hz":
+        "Banda crítica en torno al tono — $Δf_c$ = 101,36 Hz",
+    "geometric placement: corners 95.67 and 197.04 Hz, $√(f_1·f_2) = f_T$":
         "colocación geométrica: esquinas en 95,67 y 197,04 Hz, "
-        "√(f1·f2) = fT",
+        "$√(f_1·f_2) = f_T$",
     "Levels from the spectrum lines in the band":
         "Niveles desde las líneas del espectro en la banda",
-    "masking noise LS = 49.22 dB (iterative mean); tone LT = 67.96 dB (energy sum)":
-        "ruido enmascarante LS = 49,22 dB (media iterativa); tono "
-        "LT = 67,96 dB (suma energética)",
+    "masking noise $L_S$ = 49.22 dB (iterative mean); tone $L_T$ = 67.96 dB (energy sum)":
+        "ruido enmascarante $L_S$ = 49,22 dB (media iterativa); tono "
+        "$L_T$ = 67,96 dB (suma energética)",
     "Masking threshold seen by the ear":
         "Umbral de enmascaramiento visto por el oído",
-    "LG = LS + 10·log10(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB":
-        "LG = LS + 10·log10(Δfc/Δf) = 64,97 dB;  índice de enmascaramiento "
-        "av = −2,02 dB",
-    "Audibility ΔL = LT − LG − av = 5.01 dB":
-        "Audibilidad ΔL = LT − LG − av = 5,01 dB",
-    "the largest ΔL of the nine tones: the decisive audibility of this spectrum":
-        "el mayor ΔL de los nueve tonos: la audibilidad decisiva de este "
+    "$L_G = L_S + 10·log_{10}(Δf_c/Δf)$ = 64.97 dB;  masking index "
+    "$a_v$ = −2.02 dB":
+        "$L_G = L_S + 10·log_{10}(Δf_c/Δf)$ = 64,97 dB;  índice de "
+        "enmascaramiento $a_v$ = −2,02 dB",
+    "Audibility $ΔL = L_T − L_G − a_v$ = 5.01 dB":
+        "Audibilidad $ΔL = L_T − L_G − a_v$ = 5,01 dB",
+    "the largest $ΔL$ of the nine tones: the decisive audibility of this spectrum":
+        "el mayor $ΔL$ de los nueve tonos: la audibilidad decisiva de este "
         "espectro",
     "From audibility to penalty (ISO 1996-2:2017 Annex J)":
         "De la audibilidad al ajuste (ISO 1996-2:2017, Anexo J)",
-    "energy mean of the five spectra ΔL = 6.98 dB → tonal adjustment Kt = 4 dB (Table J.1)":
-        "media energética de los cinco espectros ΔL = 6,98 dB → ajuste "
-        "tonal Kt = 4 dB (Tabla J.1)",
+    "energy mean of the five spectra $ΔL$ = 6.98 dB → tonal adjustment $K_t$ = 4 dB (Table J.1)":
+        "media energética de los cinco espectros $ΔL$ = 6,98 dB → ajuste "
+        "tonal $K_t$ = 4 dB (Tabla J.1)",
     # Psychoacoustic annoyance (Fastl & Zwicker)
     "Psychoacoustic annoyance: four sensations, one scalar":
         "Molestia psicoacústica: cuatro sensaciones, un escalar",
-    "S = 2.0 acum": "S = 2,0 acum",
+    "$S$ = 2.0 acum": "$S$ = 2,0 acum",
     "sharpness (DIN 45692)": "agudeza (DIN 45692)",
     "counts only above 1.75 acum": "solo cuenta sobre 1,75 acum",
-    "N5 = 30 sone": "N5 = 30 sone",
+    "$N_5$ = 30 sone": "$N_5$ = 30 sone",
     "percentile loudness (ISO 532-1)": "sonoridad percentil (ISO 532-1)",
     "exceeded 5 % of the time": "superada el 5 % del tiempo",
-    "F = 0.5 vacil": "F = 0,5 vacil",
+    "$F$ = 0.5 vacil": "$F$ = 0,5 vacil",
     "fluctuation strength": "intensidad de fluctuación",
     "slow modulation, ≈ 4 Hz": "modulación lenta, ≈ 4 Hz",
-    "R = 0.3 asper": "R = 0,3 asper",
+    "$R$ = 0.3 asper": "$R$ = 0,3 asper",
     "roughness": "aspereza",
     "fast modulation, ≈ 70 Hz": "modulación rápida, ≈ 70 Hz",
-    "Sharpness weighting wS = 0.1001":
-        "Ponderación de la agudeza wS = 0,1001",
-    "wS = (S − 1.75) · 0.25 · log10(N5 + 10)":
-        "wS = (S − 1,75) · 0,25 · log10(N5 + 10)",
-    "zero for S ≤ 1.75 acum": "cero para S ≤ 1,75 acum",
-    "Roughness and fluctuation wFR = 0.2125":
-        "Aspereza y fluctuación wFR = 0,2125",
-    "wFR = 2.18 / N5^0.4 · (0.4·F + 0.6·R)":
-        "wFR = 2,18 / N5^0,4 · (0,4·F + 0,6·R)",
+    "Sharpness weighting $w_S$ = 0.1001":
+        "Ponderación de la agudeza $w_S$ = 0,1001",
+    "$w_S = (S − 1.75) · 0.25 · log_{10}(N_5 + 10)$":
+        "$w_S = (S − 1,75) · 0,25 · log_{10}(N_5 + 10)$",
+    "zero for $S ≤ 1.75$ acum": "cero para $S ≤ 1,75$ acum",
+    "Roughness and fluctuation $w_{FR}$ = 0.2125":
+        "Aspereza y fluctuación $w_{FR}$ = 0,2125",
+    "$w_{FR} = 2.18 / N_5^{0.4} · (0.4·F + 0.6·R)$":
+        "$w_{FR} = 2,18 / N_5^{0,4} · (0,4·F + 0,6·R)$",
     "roughness weighs more: 0.6 against 0.4":
         "la aspereza pesa más: 0,6 frente a 0,4",
-    "PA = N5 · (1 + √(wS² + wFR²)) = 37.05":
-        "PA = N5 · (1 + √(wS² + wFR²)) = 37,05",
+    "$PA = N_5 · (1 + √(w_S^2 + w_{FR}^2))$ = 37.05":
+        "$PA = N_5 · (1 + √(w_S^2 + w_{FR}^2))$ = 37,05",
     "Fastl and Zwicker Eq. 16.2 (origin Widmann 1992)":
         "Fastl y Zwicker, Ec. 16.2 (origen Widmann 1992)",
-    "a neutral sound (S ≤ 1.75 acum, F = R = 0) sits on the baseline PA = N5":
-        "un sonido neutro (S ≤ 1,75 acum, F = R = 0) queda en la línea "
-        "base PA = N5",
+    "a neutral sound ($S ≤ 1.75$ acum, $F = R = 0$) sits on the baseline $PA = N_5$":
+        "un sonido neutro ($S ≤ 1,75$ acum, $F = R = 0$) queda en la línea "
+        "base $PA = N_5$",
     "sharpness, roughness and fluctuation only ever lift the annoyance above the loudness":
         "la agudeza, la aspereza y la fluctuación solo elevan la "
         "molestia por encima de la sonoridad",
     # Objective intelligibility (STOI / ESTOI)
     "STOI and ESTOI: correlating clean against degraded speech":
         "STOI y ESTOI: correlación entre habla limpia y degradada",
-    "Clean reference x(t) and degraded version y(t)":
-        "Referencia limpia x(t) y versión degradada y(t)",
+    "Clean reference $x(t)$ and degraded version $y(t)$":
+        "Referencia limpia $x(t)$ y versión degradada $y(t)$",
     "the guide's example: speech-like material in a flat masker at 0 dB SNR":
         "el ejemplo de la guía: material tipo habla en un enmascarador "
         "plano a 0 dB de SNR",
