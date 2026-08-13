@@ -25,7 +25,7 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
     # --- Inputs (two feeder boxes) -----------------------------------------
     iw = 320.0
     s.rect(x0, 48, iw, bh, th.panel, th.fg, rx=10, sw=2)
-    s.text(x0 + iw / 2, 72, "Domain  c(x, y), ρ(x, y), dx", 17, th.fg,
+    s.text(x0 + iw / 2, 72, "Domain  $c(x, y)$, $ρ(x, y)$, $dx$", 17, th.fg,
            "middle", bold=True)
     s.text(x0 + iw / 2, 92, "square cells; dt from the Courant number",
            13, th.muted, "middle")
@@ -46,9 +46,9 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
     _step(150, "Sources  s(t) injected at cells  (Eq. 4.11-4.12 grid)",
           "Gaussian pulse, ramped tone or arbitrary sampled signal", th.fg)
     _step(238, "Staggered-grid leapfrog update  (Eqs. 4.11-4.12)",
-          "v ← v − (dt/ρ·dx)·grad p,  then  p ← p − (ρc²·dt/dx)·div v",
+          "$v ← v − (dt/ρ·dx)·grad p$,  then  $p ← p − (ρc^2·dt/dx)·div v$",
           th.primary)
-    _step(326, "stable while  CN = c·dt·√2/dx ≤ 1  (Eqs. 4.13-4.14)",
+    _step(326, "stable while  $CN = c·dt·√2/dx ≤ 1$  (Eqs. 4.13-4.14)",
           "resolve ≥ 10 cells per wavelength to keep dispersion low",
           th.secondary)
     for y0, y1 in ((208, 238), (296, 326), (384, 414)):
@@ -166,8 +166,9 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
         a = math.radians(-64.0 + 128.0 * k / 64.0)
         pts.append(f"{ox + r * math.sin(a):.1f} {oy - r * math.cos(a):.1f}")
     s.path("M " + " L ".join(pts), stroke=th.accent, sw=1.6, dash="7,5")
-    for ang, lab, anc in ((-60.0, "θ = −60°", "end"), (0.0, "θ = 0", "middle"),
-                          (60.0, "θ = +60°", "start")):
+    for ang, lab, anc in ((-60.0, "$θ$ = −60°", "end"),
+                          (0.0, "$θ$ = 0", "middle"),
+                          (60.0, "$θ$ = +60°", "start")):
         a = math.radians(ang)
         s.arrow(ox + 0.62 * r * math.sin(a), oy - 0.62 * r * math.cos(a),
                 ox + r * math.sin(a), oy - r * math.cos(a), th.accent, 1.8)
@@ -231,14 +232,14 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
     heads = ("(a) normal incidence", "(b) oblique: mode conversion",
              "(c) beyond both critical angles")
     caps = (
-        (("V = (Z₂−Z₁)/(Z₂+Z₁) = 0.938", th.fg, True),
+        (("$V = (Z_2−Z_1)/(Z_2+Z_1)$ = 0.938", th.fg, True),
          ("no shear is excited, so the steel", th.muted, False),
-         ("acts as a liquid of its ρ and c_P", th.muted, False)),
+         ("acts as a liquid of its $ρ$ and $c_P$", th.muted, False)),
         (("critical angles 14.5° and 27.5°", th.fg, True),
          ("between them P is evanescent and", th.muted, False),
          ("the shear wave carries the power", th.muted, False)),
         (("over steel the deficit is 0.03 %", th.fg, True),
-         ("the tail reaches ~7 λ up, so no", th.muted, False),
+         ("the tail reaches ~7 $λ$ up, so no", th.muted, False),
          ("time of flight can separate it", th.muted, False)),
     )
 
@@ -318,7 +319,7 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
            "A region painted from row i down puts the contact on the", 14,
            th.fg, "start")
     s.text(ix0 + 164, iy0 + 52,
-           "face plane y = i·dx: density averaged arithmetically onto", 14,
+           "face plane $y = i·dx$: density averaged arithmetically onto", 14,
            th.fg, "start")
     s.text(ix0 + 164, iy0 + 74,
            "the faces, shear modulus harmonically onto the corners", 14,
@@ -416,7 +417,8 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         s.text(xx, tb + 30, str(tick), 12, th.muted)
     s.text(tx0 + tw / 2, tb + 52, "time [µs]", 13, th.muted)
 
-    s.text(618, 400, "TL(f) = 20 log₁₀ |I(f) / T(f)|", 20, th.fg, bold=True)
+    s.text(618, 400, "$TL(f) = 20 log_{10} |I(f) / T(f)|$", 20, th.fg,
+           bold=True)
     s.text(618, 424, "I from the gated probe A, T from probe B", 14, th.muted)
 
     # --- The half-wave resonance inside the plate -------------------------
@@ -430,7 +432,7 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         xx = pl + (pr - pl) * k / 60.0
         pts.append(f"{xx:.1f} {pmid - 22 * math.sin(math.pi * k / 60.0):.1f}")
     s.path("M " + " L ".join(pts), stroke=th.accent, sw=2.2)
-    s.text(618, 550, "f_n = n c_P / (2h) = 295 kHz for 10 mm of steel", 15,
+    s.text(618, 550, "$f_n = n c_P / (2h)$ = 295 kHz for 10 mm of steel", 15,
            th.accent, bold=True)
     s.text(618, 572, "the plate goes transparent there, three decades "
            "above audio", 13, th.muted)
