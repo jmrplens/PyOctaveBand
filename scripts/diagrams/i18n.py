@@ -2461,14 +2461,14 @@ _ES: dict[str, str] = {
     # Helicopter overflight certification (ICAO Annex 16, Chapter 8)
     "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)":
         "Certificación de ruido de helicópteros (Anexo 16 OACI, Capítulo 8)",
-    "level flight at 0.9 VH": "vuelo nivelado a 0,9 VH",
+    "level flight at 0.9 $V_H$": "vuelo nivelado a 0,9 $V_H$",
     "centre microphone": "micrófono central",
     "track": "trayectoria",
     "3 microphones on a line perpendicular to the track":
         "3 micrófonos en una línea perpendicular a la trayectoria",
-    "Speed: the least of 0.9 VH, 0.9 VNE, 0.45 VH + 120 km/h and 0.45 VNE + 120 km/h":
-        "Velocidad: la menor de 0,9 VH, 0,9 VNE, 0,45 VH + 120 km/h y "
-        "0,45 VNE + 120 km/h",
+    "Speed: the least of 0.9 $V_H$, 0.9 $V_{NE}$, 0.45 $V_H$ + 120 km/h and 0.45 $V_{NE}$ + 120 km/h":
+        "Velocidad: la menor de 0,9 $V_H$, 0,9 $V_{NE}$, 0,45 $V_H$ + "
+        "120 km/h y 0,45 $V_{NE}$ + 120 km/h",
     "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number":
         "EPNL en EPNdB en los tres puntos; al menos seis pasadas, con viento "
         "en cara y en cola a partes iguales",
@@ -3586,19 +3586,19 @@ _ES: dict[str, str] = {
     "at $d_s$ behind a take-off roll and at $d_p$ elsewhere":
         "en $d_s$ tras un recorrido de despegue, si no en $d_p$",
     # Doc 29 symbol (distance from start of roll), identical in Spanish.
-    "dSOR": "dSOR",
-    "β elevation of the path over the ground line · ε bank, positive with "
-    "the starboard wing up · φ = β + ε to":
-        "β elevación del rayo sobre la línea de tierra · ε alabeo, positivo "
-        "con el ala de estribor arriba · φ = β + ε a",
-    "starboard and β − ε to port · ψ = arccos(q/dSOR), 90° abeam to 180° "
-    "astern, the jet lobe peaking near 120°":
-        "estribor y β − ε a babor · ψ = arccos(q/dSOR), de 90° al través a "
-        "180° a popa, lóbulo de chorro máximo a 120°",
-    "NPD lookup: dp for exposure levels, ds for maximum levels, floored at "
-    "30 m; ΔSOR scaled by 762 m/dSOR beyond 762 m":
-        "consulta NPD: dp para exposición, ds para máximos, cota inferior "
-        "30 m; ΔSOR escalado por 762 m/dSOR desde 762 m",
+    "$d_{SOR}$": "$d_{SOR}$",
+    "$β$ elevation of the path over the ground line · $ε$ bank, positive "
+    "with the starboard wing up · $φ = β + ε$ to":
+        "$β$ elevación del rayo sobre la línea de tierra · $ε$ alabeo, "
+        "positivo con el ala de estribor arriba · $φ = β + ε$ a",
+    "starboard and $β − ε$ to port · $ψ = arccos(q/d_{SOR})$, 90° abeam to "
+    "180° astern, the jet lobe peaking near 120°":
+        "estribor y $β − ε$ a babor · $ψ = arccos(q/d_{SOR})$, de 90° al "
+        "través a 180° a popa, lóbulo de chorro máximo a 120°",
+    "NPD lookup: $d_p$ for exposure levels, $d_s$ for maximum levels, "
+    "floored at 30 m; $Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m":
+        "consulta NPD: $d_p$ para exposición, $d_s$ para máximos, cota "
+        "inferior 30 m; $Δ_{SOR}$ escalado por 762 m/$d_{SOR}$ desde 762 m",
     "receiver, 1.2 m": "receptor, 1,2 m",
     "wing plane": "plano alar",
     "β elevation of the path over the ground line · ε bank, positive with the starboard wing up":

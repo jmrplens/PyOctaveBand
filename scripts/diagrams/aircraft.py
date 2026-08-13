@@ -155,7 +155,7 @@ def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
     s.ground(gy, 40.0, 560.0)
     s.line(70.0, hy, 530.0, hy, th.muted, 1.3, dash="8,6")
     s.arrow(530.0, hy, 556.0, hy, th.fg, 2.0)
-    s.text(72.0, 112.0, "level flight at 0.9 VH", 16, th.fg, anchor="start")
+    s.text(72.0, 112.0, "level flight at 0.9 $V_H$", 16, th.fg, anchor="start")
 
     # Helicopter silhouette (flying to the right).
     s.line(240.0, 126.0, 360.0, 126.0, th.fg, 3.0)          # main rotor
@@ -201,7 +201,7 @@ def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
 
     # --- normative context -------------------------------------------------
     s.text(80.0, 540.0,
-           "Speed: the least of 0.9 VH, 0.9 VNE, 0.45 VH + 120 km/h and 0.45 VNE + 120 km/h",
+           "Speed: the least of 0.9 $V_H$, 0.9 $V_{NE}$, 0.45 $V_H$ + 120 km/h and 0.45 $V_{NE}$ + 120 km/h",
            16, th.fg, anchor="start")
     s.text(80.0, 566.0,
            "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number",
@@ -344,20 +344,20 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     s.text(rx - 4.0, ry - 12.0, "$O$", 15, th.fg, bold=True, anchor="end")
     _arc(s, cx, cy, 36.0, 0.0, 120.0, th.fg, 1.4)
     s.text(cx + 18.0, cy - 46.0, "$ψ$ = 120°", 15, th.fg, anchor="start")
-    s.text(cx - 66.0, cy - 26.0, "dSOR", 14, th.secondary, anchor="end")
+    s.text(cx - 66.0, cy - 26.0, "$d_{SOR}$", 14, th.secondary, anchor="end")
     s.line(cx, cy, cx - 110.0, cy, th.muted, 1.0, dash="3,4")
     s.text(cx - 118.0, cy + 5.0, "180°", 13, th.muted, anchor="end")
     s.text(cx + 150.0, cy + 30.0, "0° nose", 13, th.muted, anchor="middle")
 
     # --- what the angles are for --------------------------------------------
     s.text(60.0, 636.0,
-           "β elevation of the path over the ground line · ε bank, positive with the starboard wing up · φ = β + ε to",
+           "$β$ elevation of the path over the ground line · $ε$ bank, positive with the starboard wing up · $φ = β + ε$ to",
            15, th.muted, anchor="start")
     s.text(60.0, 658.0,
-           "starboard and β − ε to port · ψ = arccos(q/dSOR), 90° abeam to 180° astern, the jet lobe peaking near 120°",
+           "starboard and $β − ε$ to port · $ψ = arccos(q/d_{SOR})$, 90° abeam to 180° astern, the jet lobe peaking near 120°",
            15, th.muted, anchor="start")
     s.text(60.0, 680.0,
-           "NPD lookup: dp for exposure levels, ds for maximum levels, floored at 30 m; ΔSOR scaled by 762 m/dSOR beyond 762 m",
+           "NPD lookup: $d_p$ for exposure levels, $d_s$ for maximum levels, floored at 30 m; $Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m",
            15, th.muted, anchor="start")
 
 
