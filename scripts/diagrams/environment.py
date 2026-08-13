@@ -70,7 +70,8 @@ def _d_outdoor(s: SVG, th: Theme) -> None:
     c_direct = th.muted         # blocked direct ray
     gy = 430.0                  # ground line
     s.ground(gy, 60.0, 840.0)
-    s.text(66.0, gy + 26.0, "Ground (Gs, Gm, Gr)", 18, th.muted, anchor="start")
+    s.text(66.0, gy + 26.0, "Ground ($G_s$, $G_m$, $G_r$)", 18, th.muted,
+           anchor="start")
 
     # --- source (loudspeaker) on the left, acoustic centre at (sx, sy) -------
     sx, sy = 150.0, 300.0
@@ -104,6 +105,9 @@ def _d_outdoor(s: SVG, th: Theme) -> None:
     s.text(285.0, sy + 40.0, "direct path (blocked)", 16, c_direct,
            anchor="middle", italic=True)
     # Diffracted ray up to the top edge, then down to the receiver.
+    # dss/dsr stay uncomposed for now: ISO 9613-2:1996 Eq. (16) prints both
+    # subscripts upright, but _ROMAN_SCRIPTS holds "ss" and not "sr", so
+    # $d_{ss}$/$d_{sr}$ would set the pair in two different styles.
     s.line(sx + 12, sy - 12, ex, ey, c_diff, 3.0)
     s.arrow(ex, ey, rx, ry + 2, c_diff, 3.0)
     s.text(300.0, 208.0, "dss", 18, c_diff, anchor="middle")
@@ -111,14 +115,17 @@ def _d_outdoor(s: SVG, th: Theme) -> None:
     s.text(ex, ey - 22.0, "diffracted path", 17, c_diff, bold=True)
 
     # --- heights (witness dimensions) ---------------------------------------
-    s.dim(sx - 44, gy, sx - 44, sy - 6, "hs", offset=0, label_side="left")
+    s.dim(sx - 44, gy, sx - 44, sy - 6, "$h_s$", offset=0, label_side="left")
     s.line(sx - 44, gy, sx, gy, th.muted, 0.9, dash="3,3")
     s.line(sx - 44, sy - 6, sx, sy - 6, th.muted, 0.9, dash="3,3")
-    s.dim(rx + 40, gy, rx + 40, ry + 6, "hr", offset=0, label_side="right")
+    s.dim(rx + 40, gy, rx + 40, ry + 6, "$h_r$", offset=0, label_side="right")
     s.line(rx, gy, rx + 40, gy, th.muted, 0.9, dash="3,3")
     s.line(rx, ry + 6, rx + 40, ry + 6, th.muted, 0.9, dash="3,3")
 
     # --- master relations ---------------------------------------------------
+    # Both stay uncomposed for now: the first carries the dss/dsr pair noted
+    # above, and Eq. (14) prints "met" upright (ISO 9613-2:1996, p. 9) while
+    # _ROMAN_SCRIPTS has no "met", so $K_{met}$ would set it as an index.
     s.text(450.0, gy + 58.0, "z = dss + dsr − d   (path difference)", 19,
            th.fg, bold=True)
     s.text(450.0, gy + 84.0,
@@ -133,7 +140,7 @@ def _d_impulse_prominence(s: SVG, th: Theme) -> None:
 
     # --- Input --------------------------------------------------------------
     s.rect(x0, 56, bw, bh, th.panel, th.fg, rx=10, sw=2)
-    s.text(cx, 82, "A-weighted level history  L_pAF  (time weighting F)", 19,
+    s.text(cx, 82, "A-weighted level history  $L_{pAF}$  (time weighting F)", 19,
            th.fg, "middle", bold=True)
     s.text(cx, 103, "an onset = a stretch where the gradient exceeds 10 dB/s "
            "(clauses 4.5-4.7)", 13, th.muted, "middle")
@@ -145,16 +152,20 @@ def _d_impulse_prominence(s: SVG, th: Theme) -> None:
         s.text(cx, y + 47, l2, 13, th.muted, "middle")
 
     _step(150, "Per impulse: onset rate OR and level difference LD",
-          "OR = onset slope [dB/s],   LD = Le − Ls [dB]", th.primary)
-    _step(242, "Predicted prominence  P   (clause 7, Formula 1)",
-          "P = 3·log10(OR) + 2·log10(LD);   highest P over 30 min governs", th.fg)
-    _step(334, "Adjustment  KI   (clause 8, Formula 2)",
-          "KI = 1.8·(P − 5) dB for P > 5, else 0", th.secondary)
+          "OR = onset slope [dB/s],   $LD = L_e − L_s$ [dB]", th.primary)
+    _step(242, "Predicted prominence  $P$   (clause 7, Formula 1)",
+          "$P = 3·log_{10}(OR) + 2·log_{10}(LD)$;   highest $P$ over 30 min "
+          "governs", th.fg)
+    _step(334, "Adjustment  $K_I$   (clause 8, Formula 2)",
+          "$K_I = 1.8·(P − 5)$ dB for $P > 5$, else 0", th.secondary)
     s.arrow(cx, 210, cx, 242, th.fg, 1.8)
     s.arrow(cx, 302, cx, 334, th.fg, 1.8)
     s.arrow(cx, 394, cx, 426, th.fg, 1.8)
 
     # --- Output -------------------------------------------------------------
+    # The rating-level formula stays uncomposed for now: the exponent
+    # carries the subscripts of LAeq and KI, and the composer sets a single
+    # script level (same 10^(L/10) family as the energy sums elsewhere).
     s.rect(x0, 426, bw, 60, "none", th.primary, rx=10, sw=2.4)
     s.text(cx, 452, "Rating level  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
            18, th.fg, "middle", bold=True)
@@ -208,13 +219,13 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
 
     # Rotor diameter D across the swept ellipse.
     dx_ = rx_ - 58.0
-    s.dim(dx_, hub_y - rr, dx_, hub_y + rr, "D", offset=0, label_side="left")
+    s.dim(dx_, hub_y - rr, dx_, hub_y + rr, "$D$", offset=0, label_side="left")
     s.line(rx_ - 8, hub_y - rr, dx_, hub_y - rr, th.muted, 0.9, dash="3,3")
     s.line(rx_ - 8, hub_y + rr, dx_, hub_y + rr, th.muted, 0.9, dash="3,3")
 
     # Hub height H, downwind of the tower.
     hx_ = tx + 56.0
-    s.dim(hx_, gy, hx_, hub_y, "H", offset=0, label_side="right")
+    s.dim(hx_, gy, hx_, hub_y, "$H$", offset=0, label_side="right")
     s.line(tx + 10, gy, hx_, gy, th.muted, 0.9, dash="3,3")
     s.line(tx + 28, hub_y, hx_, hub_y, th.muted, 0.9, dash="3,3")
 
@@ -228,7 +239,7 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
 
     # Slant distance R1 from the rotor centre to the microphone.
     s.line(rx_, hub_y, mx - 12, gy - 8.0, th.primary, 2.2, dash="9,6")
-    s.text(430.0, 296.0, "R1", 19, th.primary, bold=True)
+    s.text(430.0, 296.0, "$R_1$", 19, th.primary, bold=True)
     # Board-to-R1 inclination angle (25°..40°).
     ang = math.atan2(gy - 8.0 - hub_y, mx - 12 - rx_)   # slope of R1
     r_arc = 52.0
@@ -237,10 +248,10 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
     s.path(f"M {mx - 12 - r_arc:.1f} {gy - 8:.1f} "
            f"A {r_arc:.0f} {r_arc:.0f} 0 0 1 {axp:.1f} {ayp:.1f}",
            stroke=th.muted, sw=1.3)
-    s.text(mx - 74, gy - 22.0, "φ", 17, th.muted)
+    s.text(mx - 74, gy - 22.0, "$φ$", 17, th.muted)
 
     # Horizontal reference distance R0.
-    s.dim(tx, gy, mx, gy, "R0 = H + D/2", offset=40)
+    s.dim(tx, gy, mx, gy, "$R_0 = H + D/2$", offset=40)
 
     # --- plan-view inset: the Figure 3 position pattern ---------------------
     pcx, pcy, pr = 794.0, 218.0, 76.0
@@ -277,13 +288,13 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
 
     # --- governing relations -------------------------------------------------
     s.text(450.0, 560.0,
-           "R1 = √(H² + R0²)   slant distance, rotor centre → microphone",
+           "$R_1 = √(H^2 + R_0^2)$   slant distance, rotor centre → microphone",
            19, th.fg, bold=True)
     s.text(450.0, 588.0,
-           "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Formula 26, S0 = 1 m²)",
+           "$L_{WA,i} = L_{p,i} − 6 + 10 log_{10}(4π R_1^2 / S_0)$   (Formula 26, $S_0$ = 1 m²)",
            19, th.primary, bold=True)
     s.text(450.0, 614.0,
-           "the −6 dB removes the board's pressure doubling; board-to-R1 angle φ = 25°–40°",
+           "the −6 dB removes the board's pressure doubling; board-to-$R_1$ angle $φ$ = 25°–40°",
            16, th.muted)
 
 
@@ -312,17 +323,17 @@ def _d_ground_reflection(s: SVG, th: Theme) -> None:
                stroke=th.muted, sw=1.3)
     s.circle(sx, sy, 8.0, th.fg)
     s.text(sx, sy - 66.0, "Source", 20, th.fg, bold=True)
-    s.text(sx - 14, sy + 24, "S", 15, th.fg, anchor="end", mono=True)
+    s.text(sx - 14, sy + 24, "$S$", 15, th.fg, anchor="end")
     s.line(sx, sy + 8, sx, gy, th.fg, 2.0)
 
     # Receiver: measurement microphone.
     s.mic(rx, ry, gy, 1.0)
     s.text(rx, ry - 18.0, "Receiver", 20, th.fg, bold=True)
-    s.text(rx - 18, ry + 10.0, "R", 15, th.fg, anchor="end", mono=True)
+    s.text(rx - 18, ry + 10.0, "$R$", 15, th.fg, anchor="end")
 
     # Direct ray r1.
     s.arrow(sx + 10, sy, rx - 8, ry - 2, th.primary, 2.6)
-    s.text(430.0, 236.0, "direct ray  r1", 17, th.primary, bold=True)
+    s.text(430.0, 236.0, "direct ray  $r_1$", 17, th.primary, bold=True)
 
     # Reflected ray via the specular point (equal angles).
     s.line(sx + 6, sy + 7, bx, gy, th.accent, 2.6)
@@ -339,29 +350,33 @@ def _d_ground_reflection(s: SVG, th: Theme) -> None:
     s.circle(ix, iy, 8.0, "none", th.secondary, 1.8)
     s.line(sx, gy, ix, iy - 8, th.secondary, 1.2, dash="4,4")
     s.text(ix + 18, iy + 5, "image source", 16, th.secondary, anchor="start")
-    s.text(ix - 16, iy + 5, "S′", 15, th.secondary, anchor="end", mono=True)
+    s.text(ix - 16, iy + 5, "$S′$", 15, th.secondary, anchor="end")
     # The unfolded path S' -> R is straight through the bounce point: r2.
     s.line(ix, iy - 6, bx, gy, th.secondary, 1.6, dash="7,5")
     s.line(bx, gy, rx - 6, ry + 4, th.secondary, 1.2, dash="2,6")
-    s.text(380.0, iy - 62.0, "r2 = |S′R|", 16, th.secondary, mono=True)
+    s.text(380.0, iy - 62.0, "$r_2 = |S′R|$", 16, th.secondary)
 
     # Heights.
-    s.dim(sx - 46, gy, sx - 46, sy, "hs", offset=0, label_side="left")
+    s.dim(sx - 46, gy, sx - 46, sy, "$h_s$", offset=0, label_side="left")
     s.line(sx - 46, gy, sx - 8, gy, th.muted, 0.9, dash="3,3")
     s.line(sx - 46, sy, sx - 8, sy, th.muted, 0.9, dash="3,3")
-    s.dim(rx + 42, gy, rx + 42, ry, "hr", offset=0, label_side="right")
+    s.dim(rx + 42, gy, rx + 42, ry, "$h_r$", offset=0, label_side="right")
     s.line(rx + 8, gy, rx + 42, gy, th.muted, 0.9, dash="3,3")
     s.line(rx + 8, ry, rx + 42, ry, th.muted, 0.9, dash="3,3")
 
     # Governing relations (top block, clear of the geometry).
-    s.text(560.0, 88.0, "path difference  δ = r2 − r1", 20, th.fg, bold=True)
-    s.text(560.0, 114.0, "phase difference  Δφ = 2π δ / λ  (+ arg Q)", 18,
+    s.text(560.0, 88.0, "path difference  $δ = r_2 − r_1$", 20, th.fg,
+           bold=True)
+    s.text(560.0, 114.0, "phase difference  $Δφ = 2π δ / λ$  (+ $arg Q$)", 18,
            th.fg)
+    # The pressure sum stays uncomposed for now: each exponent carries
+    # the subscripts of r1 and r2, and the composer sets a single script
+    # level (nested-script family).
     s.text(560.0, 142.0,
            "p ∝ e^(jkr1)/r1 + Q · e^(jkr2)/r2   (Q = ground reflection coefficient)",
            16, th.muted)
     s.text(560.0, 168.0,
-           "in phase (δ ≈ nλ): up to +6 dB    ·    out of phase (δ ≈ λ/2 on hard ground): a deep dip",
+           "in phase ($δ ≈ nλ$): up to +6 dB    ·    out of phase ($δ ≈ λ/2$ on hard ground): a deep dip",
            15, th.muted)
 
 
@@ -430,18 +445,18 @@ def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
     # --- wind profile arrows (blowing left to right) -----------------------
     for wy, wl in ((84.0, 116.0), (114.0, 82.0), (144.0, 52.0)):
         s.arrow(500.0, wy, 500.0 + wl, wy, th.accent, 2.2)
-    s.text(548.0, 66.0, "wind u(z)", 16, th.accent, bold=True)
+    s.text(548.0, 66.0, "wind $u(z)$", 16, th.accent, bold=True)
 
     # --- inset: effective-sound-speed profiles -----------------------------
-    s.text(143.0, 52.0, "c_eff(z) = c(z) + u(z)", 15, th.fg, bold=True)
+    s.text(143.0, 52.0, "$c_{eff}(z) = c(z) + u(z)$", 15, th.fg, bold=True)
     s.rect(58, 64, 170, 170, th.panel, th.fg, rx=8, sw=1.5)
     s.arrow(76.0, 214.0, 76.0, 88.0, th.muted, 1.3)
-    s.text(76.0, 80.0, "z", 13, th.muted, italic=True)
+    s.text(76.0, 80.0, "$z$", 13, th.muted)
     s.line(76.0, 214.0, 214.0, 214.0, th.muted, 1.3)
     s.path("M 143 214 Q 146 150 192 96", stroke=th.primary, sw=2.2)
     s.path("M 143 214 Q 140 150 100 96", stroke=th.secondary, sw=2.2)
-    s.text(197.0, 92.0, "+u", 13, th.primary, anchor="start")
-    s.text(96.0, 92.0, "−u", 13, th.secondary, anchor="end")
+    s.text(197.0, 92.0, "$+u$", 13, th.primary, anchor="start")
+    s.text(96.0, 92.0, "$−u$", 13, th.secondary, anchor="end")
     s.text(143.0, 229.0, "340 m/s", 12, th.muted, mono=True)
 
     # --- physics captions --------------------------------------------------
@@ -452,7 +467,7 @@ def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
            "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)",
            16, th.fg, anchor="start")
     s.text(80.0, 592.0,
-           "a ±0.1 (m/s)/m gradient curves rays with radius Rc = c0/|g| ≈ 3.4 km; source hs = 2 m, receiver hr = 1.5 m",
+           "a ±0.1 (m/s)/m gradient curves rays with radius $R_c = c_0/|g|$ ≈ 3.4 km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m",
            16, th.muted, anchor="start")
 
 
@@ -495,13 +510,12 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
 
     # Blocked direct path and the diffracted path A + B.
     s.line(sx + 12, sy - 4, rx - 4, ry + 4, th.muted, 1.6, dash="7,6")
-    s.text(268, 308, "direct d = 100.00 m (blocked)", 15, th.muted,
-           italic=True)
+    s.text(268, 308, "direct $d$ = 100.00 m (blocked)", 15, th.muted)
     s.line(sx + 10, sy - 10, ex, ey, th.accent, 2.6)
     s.arrow(ex, ey, rx - 4, ry - 2, th.accent, 2.6)
     s.circle(ex, ey, 5.5, th.bg, th.fg, 2.0)
-    s.text(258, 162, "A = 50.09 m", 17, th.accent, bold=True)
-    s.text(660, 152, "B = 50.06 m", 17, th.accent, bold=True)
+    s.text(258, 162, "$A$ = 50.09 m", 17, th.accent, bold=True)
+    s.text(660, 152, "$B$ = 50.06 m", 17, th.accent, bold=True)
 
     # Height and distance dimensions.
     s.dim(64, gy, 64, sy - 4, "1.0 m", offset=0, size=15, label_side="left")
@@ -515,13 +529,16 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
 
     # --- captions ----------------------------------------------------------
     s.text(80, 420,
-           "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz",
+           "path difference $δ = A + B − d$ = 0.15 m; Fresnel number $N = 2δ/λ$ = 0.44 at 500 Hz",
            18, th.fg, anchor="start")
+    # The Kurze-Anderson line stays uncomposed for now: ISO 9613-2:1996
+    # prints the "bar" subscript upright (Eq. 12, p. 9) and
+    # _ROMAN_SCRIPTS has no "bar", so $Δ_{bar}$ would set it as an index.
     s.text(80, 448,
            "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz",
            18, th.primary, anchor="start", bold=True)
     s.text(80, 476,
-           "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",
+           "$N$ grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",
            17, th.muted, anchor="start")
 
 
@@ -548,8 +565,9 @@ def _d_ground_regions(s: SVG, th: Theme) -> None:
     grass_end = src_end + 70.0 * scale
     s.rect(grass_end, gy - band, rec_start - grass_end, band, th.muted,
            th.accent, sw=2.0)
-    s.text((src_end + grass_end) / 2, gy - band - 12, "grass, G = 1", 17, th.fg)
-    s.text((grass_end + rec_start) / 2, gy - band - 12, "asphalt, G = 0", 17,
+    s.text((src_end + grass_end) / 2, gy - band - 12, "grass, $G = 1$", 17,
+           th.fg)
+    s.text((grass_end + rec_start) / 2, gy - band - 12, "asphalt, $G = 0$", 17,
            th.fg)
 
     s.ground(gy, 50.0, 850.0)
@@ -560,20 +578,20 @@ def _d_ground_regions(s: SVG, th: Theme) -> None:
     s.line(x0, gy - hs, x0, gy, th.fg, 2.0)
     s.text(x0 + 12, gy - hs - 40, "Source", 20, th.fg, anchor="start",
            bold=True)
-    s.text(x0 + 12, gy - hs - 18, "hs = 1,5 m", 17, th.muted, anchor="start")
+    s.text(x0 + 12, gy - hs - 18, "$h_s$ = 1,5 m", 17, th.muted, anchor="start")
     s.mic(x1, gy - hs, gy, 1.0)
     s.text(x1 - 12, gy - hs - 40, "Receiver", 20, th.fg, anchor="end",
            bold=True)
-    s.text(x1 - 12, gy - hs - 18, "hr = 1,5 m", 17, th.muted, anchor="end")
+    s.text(x1 - 12, gy - hs - 18, "$h_r$ = 1,5 m", 17, th.muted, anchor="end")
     s.line(x0, gy - hs, x1, gy - hs, th.muted, 1.4, dash="7,5")
 
     # Region dimensions along the ground.
-    s.dim(x0, gy + 44, src_end, gy + 44, "source region  30 hs = 45 m", 0, 18)
+    s.dim(x0, gy + 44, src_end, gy + 44, "source region  $30 h_s$ = 45 m", 0, 18)
     s.dim(src_end, gy + 80, rec_start, gy + 80, "middle region  110 m", 0, 18)
-    s.dim(rec_start, gy + 44, x1, gy + 44, "receiver region  30 hr = 45 m", 0, 18)
+    s.dim(rec_start, gy + 44, x1, gy + 44, "receiver region  $30 h_r$ = 45 m", 0, 18)
     for xv in (x0, src_end, rec_start, x1):
         s.line(xv, gy + 28, xv, gy + 92, th.muted, 0.9, dash="3,3")
-    s.dim(x0, gy + 118, x1, gy + 118, "dp = 200 m", 0, 19)
+    s.dim(x0, gy + 118, x1, gy + 118, "$d_p$ = 200 m", 0, 19)
 
     # Inset: the same path at 60 m, regions overlapping, no middle region.
     iy = gy + 190.0
@@ -583,23 +601,22 @@ def _d_ground_regions(s: SVG, th: Theme) -> None:
     s.circle(ix0, iy - 46, 6, th.secondary)
     s.circle(ix1, iy - 46, 6, th.primary)
     s.dim(ix0, iy + 48, ix1, iy + 48,
-          "dp = 60 m: the regions overlap, so there is no middle region", 0, 18)
+          "$d_p$ = 60 m: the regions overlap, so there is no middle region", 0, 18)
 
     # The two reading boxes, on one row under the drawing.
     by = 500.0
     s.rect(70.0, by, 380, 100, th.panel, th.muted, rx=8, sw=1.2)
-    s.text(84.0, by + 28, "G is the porous fraction of its region", 19, th.fg,
+    s.text(84.0, by + 28, "$G$ is the porous fraction of its region", 19, th.fg,
            anchor="start", bold=True)
-    s.text(84.0, by + 54, "Gs = 25/45 = 0,55", 18, th.fg, anchor="start",
-           mono=True)
-    s.text(84.0, by + 78, "Gm = 70/110 = 0,64   Gr = 1,00", 18, th.fg,
-           anchor="start", mono=True)
+    s.text(84.0, by + 54, "$G_s = 25/45$ = 0,55", 18, th.fg, anchor="start")
+    s.text(84.0, by + 78, "$G_m = 70/110$ = 0,64   $G_r$ = 1,00", 18, th.fg,
+           anchor="start")
 
     s.rect(470.0, by, 380, 100, th.panel, th.muted, rx=8, sw=1.2)
-    s.text(484.0, by + 28, "q = 1 − 30(hs + hr)/dp = 0,55", 19, th.fg,
-           anchor="start", mono=True)
-    s.text(484.0, by + 54, "below 30(hs + hr) = 90 m: q = 0, Am = 0", 18,
-           th.secondary, anchor="start")
+    s.text(484.0, by + 28, "$q = 1 − 30(h_s + h_r)/d_p$ = 0,55", 19, th.fg,
+           anchor="start")
+    s.text(484.0, by + 54, "below $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$",
+           18, th.secondary, anchor="start")
     s.text(484.0, by + 78, "and ground_middle is ignored entirely", 18, th.fg,
            anchor="start")
 
@@ -644,7 +661,7 @@ def _d_barrier_four_paths(s: SVG, th: Theme) -> None:
     # Q at each ground reflection (the specular points of the image paths).
     for qx in (sx + (ex - sx) * 0.5, ex + (rx - ex) * 0.5):
         s.circle(qx, gy, 7, th.bg, th.fg, sw=1.8)
-        s.text(qx, gy - 12, "Q", 18, th.fg, bold=True, mono=True)
+        s.text(qx, gy - 12, "$Q$", 18, th.fg, bold=True)
 
     # Source, receiver and their images.
     s.circle(sx, sy, 9, th.secondary)
@@ -678,7 +695,7 @@ def _d_barrier_four_paths(s: SVG, th: Theme) -> None:
     s.rect(bx0, ty + 56, bx1 - bx0, by0 - ty - 56, th.bg, th.fg, sw=1.6)
     s.path(f"M {tx + 20} {ty + 84} L {bx0} {ty + 56} L {bx1} {ty + 56} "
            f"L {tx + 226} {ty + 88}", stroke=th.primary, sw=2.0)
-    s.dim(bx0, ty + 46, bx1, ty + 46, "e", 0, 17)
+    s.dim(bx0, ty + 46, bx1, ty + 46, "$e$", 0, 17)
 
 
 # ---------------------------------------------------------------------------
@@ -711,6 +728,10 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     hx = rx0 + 5.5 * seg
     s.circle(hx, cy, 8, th.secondary)
     s.dim(rx0 + 5 * seg, cy + 30, rx0 + 6 * seg, cy + 30, "dL = 20 m", 0, 17)
+    # The per-segment level stays uncomposed for now: Directive (EU)
+    # 2015/996 Eq. (2.2.1) prints the whole subscript chain (W',eq,line,
+    # i,m) in italic while _ROMAN_SCRIPTS pins "eq" upright, so the
+    # composer can reproduce neither the source nor the house style.
     s.text(rx0, cy + 62, "each segment carries L'W,eq,line,i + 10 lg(dL)", 18,
            th.fg, anchor="start", mono=False)
 
@@ -719,7 +740,7 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     s.line(jx, py - lane - 20, jx, py + lane + 20, th.primary, 2.4)
     s.text(jx + 8, py - lane - 26, "signal-controlled junction", 17, th.primary,
            anchor="start")
-    s.dim(hx, py - lane - 44, jx, py - lane - 44, "x = 60 m", 0, 17)
+    s.dim(hx, py - lane - 44, jx, py - lane - 44, "$x$ = 60 m", 0, 17)
     s.line(hx, py - lane - 52, hx, py - lane - 4, th.muted, 0.9, dash="3,3")
 
     # A small inline graph of the taper, clear of the road.
@@ -729,7 +750,8 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     s.line(gx0, gy0, gx1, gy0, th.muted, 1.4)
     s.line(gx0, gy0, gx0, gy0 - 48, th.muted, 1.4)
     s.path(f"M {gx0} {gy0 - 48} L {gx1} {gy0}", stroke=th.primary, sw=2.0)
-    s.text(gx0 - 12, gy0 - 56, "max(1 − |x|/100, 0)", 15, th.fg, anchor="start")
+    s.text(gx0 - 12, gy0 - 56, "$max(1 − |x|/100, 0)$", 15, th.fg,
+           anchor="start")
     s.text(gx1, gy0 + 22, "100 m", 15, th.muted)
 
     # The receiving facade, in plan.
@@ -754,7 +776,7 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     s.path(f"M 120 {sy - 6} L 420 {sy - 40}", stroke=th.primary, sw=2.2)
     s.arrow(150.0, sy - 66, 250.0, sy - 78, th.primary, 1.8)
     s.arrow(390.0, sy - 90, 290.0, sy - 78, th.secondary, 1.8)
-    s.text(430.0, sy - 118, "gradient s: the flow is split", 17, th.primary)
+    s.text(430.0, sy - 118, "gradient $s$: the flow is split", 17, th.primary)
     s.text(430.0, sy - 98, "and corrected uphill and downhill", 17, th.primary)
 
     rxr = 700.0
@@ -811,8 +833,8 @@ def _d_cnossos_rail(s: SVG, th: Theme) -> None:
     s.line(cx, ay, rx, ry, th.primary, 1.8)
     s.line(cx, by, rx, ry, th.accent, 1.8)
     s.line(cx, ay, rx + 10, ay, th.muted, 1.2, dash="5,4")
-    s.text(cx + 250, ay - 14, "ψ > 0", 19, th.primary)
-    s.text(cx + 340, ay + 34, "ψ ≤ 0: the vertical correction of A is zero",
+    s.text(cx + 250, ay - 14, "$ψ > 0$", 19, th.primary)
+    s.text(cx + 340, ay + 34, "$ψ ≤ 0$: the vertical correction of A is zero",
            17, th.secondary)
     s.text(rx, ry - 24, "receiver, 4 m", 18, th.fg, bold=True)
 
@@ -838,7 +860,7 @@ def _d_cnossos_rail(s: SVG, th: Theme) -> None:
     s.arrow(ox, py, ox + 140, py - 78, th.primary, 1.8)
     s.text(ox + 148, py - 82, "receiver bearing", 17, th.primary,
            anchor="start")
-    s.text(ox + 56, py - 18, "φ", 20, th.primary, bold=True)
+    s.text(ox + 56, py - 18, "$φ$", 20, th.primary, bold=True)
     s.rect(600.0, py - 140, 280, 112, th.panel, th.muted, rx=8, sw=1.2)
     s.text(614.0, py - 110, "Impact noise applies from 50 m", 16, th.fg,
            anchor="start")
@@ -906,8 +928,8 @@ def _d_wind_turbine_board(s: SVG, th: Theme) -> None:
            bold=True)
     for i, line in enumerate((
         "within ±15° of downwind",
-        "R0 to ±20 %, max ±30 m, measured to ±2 %",
-        "board inclination φ between 25° and 40°",
+        "$R_0$ to ±20 %, max ±30 m, measured to ±2 %",
+        "board inclination $φ$ between 25° and 40°",
         "reflections from structures < 0,2 dB",
     )):
         s.text(84.0, 458.0 + i * 24.0, line, 17, th.fg, anchor="start")
@@ -941,7 +963,7 @@ def _d_rd1367_chain(s: SVG, th: Theme) -> None:
         s.rect(x0 + w * a / 24.0, py, w * (b - a) / 24.0, 34, th.panel,
                th.muted, sw=1.2)
         s.text(x0 + w * (a + b) / 48.0, py + 23, label, 16, th.fg)
-    s.text(x0, py + 58, "noise phases Ti of uniformly perceived level", 17,
+    s.text(x0, py + 58, "noise phases $T_i$ of uniformly perceived level", 17,
            th.muted, anchor="start")
 
     # Stage 2: the phase corrections.
@@ -949,9 +971,13 @@ def _d_rd1367_chain(s: SVG, th: Theme) -> None:
     s.rect(x0, y1, 360, 108, th.panel, th.muted, rx=8, sw=1.2)
     s.text(x0 + 14, y1 + 28, "2 — each phase, corrected", 19, th.fg,
            anchor="start", bold=True)
+    # The LKeq strings of this builder stay uncomposed for now: the
+    # tokenizer reads "Keq" as one run, so it cannot set it as the roman
+    # "Aeq" of _ROMAN_SCRIPTS beside it, and the period level also nests
+    # the LKeq,Ti subscript inside the 10^(L/10) exponent.
     s.text(x0 + 14, y1 + 56, "LKeq,Ti = LAeq,Ti + Kt + Kf + Ki", 17, th.fg,
            anchor="start", mono=True)
-    s.text(x0 + 14, y1 + 82, "Kt + Kf + Ki ≤ 9 dB (Annex IV A.3.3)", 17,
+    s.text(x0 + 14, y1 + 82, "$K_t + K_f + K_i ≤ 9$ dB (Annex IV A.3.3)", 17,
            th.secondary, anchor="start")
 
     # Stage 3: the duration-weighted mean.
@@ -971,8 +997,8 @@ def _d_rd1367_chain(s: SVG, th: Theme) -> None:
     s.rect(x0, y2, 360, 96, th.panel, th.muted, rx=8, sw=1.2)
     s.text(x0 + 14, y2 + 28, "4 — the annual value", 19, th.fg, anchor="start",
            bold=True)
-    s.text(x0 + 14, y2 + 56, "LK,x over the operating days", 18, th.fg,
-           anchor="start", mono=True)
+    s.text(x0 + 14, y2 + 56, "$L_{K,x}$ over the operating days", 18, th.fg,
+           anchor="start")
     s.text(x0 + 14, y2 + 82, "303 open / 62 closed → 56 dB", 17, th.accent,
            anchor="start", mono=True)
     s.arrow(x0 + 180, y1 + 118, x0 + 180, y2 - 8, th.muted, 1.8)
@@ -983,7 +1009,7 @@ def _d_rd1367_chain(s: SVG, th: Theme) -> None:
     for i, (label, value) in enumerate((
         ("worst phase ≤ limit + 5 dB", "59 ≤ 60 ✓"),
         ("daily LKeq,x ≤ limit + 3 dB", "57 ≤ 58 ✓"),
-        ("annual LK,x ≤ limit", "56 > 55 ✗"),
+        ("annual $L_{K,x}$ ≤ limit", "56 > 55 ✗"),
     )):
         yy = y2 + i * 40
         color = th.secondary if i == 2 else th.accent

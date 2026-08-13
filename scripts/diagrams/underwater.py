@@ -66,7 +66,12 @@ def _d_hydrophone_deployment(s: SVG, th: Theme) -> None:
     s.text(bx + 16, surf + 100 * math.tan(math.radians(30)) * sc + 32,
            "vertical array of 3 hydrophones", 15, th.muted, anchor="start")
 
-    # Lateral distance at the CPA and the water depth.
+    # Lateral distance at the CPA and the water depth. The d_CPA and l_DW
+    # labels stay plain for now: ISO 17208-1 prints the CPA and DW
+    # subscripts upright (3.3 Note 1, 3.6) and the composer's curated roman
+    # list does not carry them, so $d_{CPA}$ would set them as italic
+    # indices; the sibling strings with L ride along so the plate keeps one
+    # style.
     s.dim(shx, 100, bx, 100, "dCPA ≥ 100 m (or 1·L)", offset=0, size=17)
     s.line(shx, 130, shx, 106, th.muted, 0.9, dash="3,3")
     s.line(bx, 116, bx, 106, th.muted, 0.9, dash="3,3")
@@ -145,7 +150,7 @@ def _d_sofar_channel(s: SVG, th: Theme) -> None:
     s.line(90, ax_y, 850, ax_y, th.muted, 1.2, dash="7,5")
 
     # --- Left: the sound-speed profile c(z) --------------------------------
-    s.text(195, 76, "Sound-speed profile c(z)", 18, th.fg, bold=True)
+    s.text(195, 76, "Sound-speed profile $c(z)$", 18, th.fg, bold=True)
     def cx_of(c: float) -> float:                     # 1480..1540 m/s
         return 90.0 + (c - 1480.0) / 60.0 * 180.0
     x_s, x_m, x_b = cx_of(1524), cx_of(1492), cx_of(1527)
@@ -182,7 +187,7 @@ def _d_sofar_channel(s: SVG, th: Theme) -> None:
            16, th.muted, italic=True)
 
     # Physics of the channel.
-    s.text(80, 560, "c rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound",
+    s.text(80, 560, "$c$ rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound",
            17, th.fg, anchor="start")
     s.text(80, 588, "rays launched within about ±12° of the axis stay trapped and can cross entire oceans",
            17, th.fg, anchor="start")
@@ -373,7 +378,7 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
     s.text(764, 192, "detector", 15, th.fg)
     s.text(764, 212, "DT", 18, th.fg, bold=True, mono=True)
     s.arrow(668, 196, 698, 196, th.fg, 1.6)
-    s.text(388, 282, "SE = SL − TL − (NL − DI) − DT", 16, th.fg)
+    s.text(388, 282, "$SE = SL − TL − (NL − DI) − DT$", 16, th.fg)
 
     # --- Active monostatic --------------------------------------------------
     s.text(60, 350, "Active, monostatic: out and back", 19, th.fg, bold=True,
@@ -408,10 +413,10 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
                        (192.0, 560.0, 500.0)):
         s.circle(sx, sy, 3, th.accent)
         s.arrow(sx, sy, 150, ey, th.accent, 1.2)
-    s.text(316, 536, "SE = SL − 2 TL + TS − (NL − DI) − DT", 16, th.fg)
+    s.text(316, 536, "$SE = SL − 2 TL + TS − (NL − DI) − DT$", 16, th.fg)
     s.text(660, 524, "RL: surface, volume and bottom scattering", 14,
            th.accent, anchor="middle")
-    s.text(660, 548, "replaces NL − DI when reverberation-limited", 14,
+    s.text(660, 548, "replaces $NL − DI$ when reverberation-limited", 14,
            th.fg, anchor="middle")
 
     # --- Reference conventions ---------------------------------------------
@@ -434,10 +439,10 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
     x0, x1 = 250.0, 850.0
 
     # --- c(z) profile, in its own narrow panel on the left ------------------
-    s.text(150, 96, "c(z)", 17, th.fg, bold=True)
+    s.text(150, 96, "$c(z)$", 17, th.fg, bold=True)
     s.line(90, surf, 90, bot, th.muted, 1.4)
     s.line(90, bot, 210, bot, th.muted, 1.4)
-    s.text(212, bot + 18, "c", 15, th.muted, anchor="start")
+    s.text(212, bot + 18, "$c$", 15, th.muted, anchor="start")
     axis_y = surf + 0.42 * (bot - surf)
     s.path(f"M 186 {surf:.0f} Q 120 {surf + 60:.0f} 116 {axis_y:.0f} "
            f"Q 132 {bot - 60:.0f} 196 {bot:.0f}", stroke=th.primary, sw=2.4)
@@ -446,18 +451,22 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
 
     # --- The waveguide ------------------------------------------------------
     s.line(x0, surf, x1, surf, th.primary, 2.4)
-    s.text(x0 + 8, surf - 12, "sea surface: pressure release, p = 0", 15, th.fg,
+    s.text(x0 + 8, surf - 12, "sea surface: pressure release, $p = 0$", 15, th.fg,
            anchor="start")
     s.ground(bot, x0, x1, hatch=30)
+    # The bottom condition stays plain for now: in $dΨ/dz$ the composer
+    # would set the differential d italic (single-letter default before a
+    # Greek letter) while the dz run composes upright, and there is no
+    # mechanism for the roman d of ISO 80000-2 next to Ψ.
     s.text(x0 + 8, bot + 30, "bottom: Ψ(D) = 0 (pressure release) or dΨ/dz = 0 (rigid)",
            15, th.fg, anchor="start")
 
     # Coordinate frame: r to the right, z down.
     s.arrow(x0, surf, x0 + 74, surf, th.fg, 1.8)
-    s.text(x0 + 80, surf + 18, "r", 17, th.fg, anchor="start", italic=True)
+    s.text(x0 + 80, surf + 18, "$r$", 17, th.fg, anchor="start")
     s.arrow(x0, surf, x0, surf + 66, th.fg, 1.8)
-    s.text(x0 - 12, surf + 66, "z", 17, th.fg, anchor="end", italic=True)
-    s.dim(228, surf, 228, bot, "D", offset=0, size=17)
+    s.text(x0 - 12, surf + 66, "$z$", 17, th.fg, anchor="end")
+    s.dim(228, surf, 228, bot, "$D$", offset=0, size=17)
 
     # Source, receiver and one turning ray.
     zs = surf + 0.30 * (bot - surf)
@@ -465,11 +474,11 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
     rr = 700.0
     s.circle(310, zs, 7, th.secondary)
     s.circle(310, zs, 2.4, th.bg)
-    s.text(306, zs - 14, "source, z_s", 14, th.fg, anchor="middle")
+    s.text(306, zs - 14, "source, $z_s$", 14, th.fg, anchor="middle")
     s.line(rr, surf, rr, bot, th.muted, 1.0, dash="5,4")
     s.circle(rr, zr, 7, th.accent)
     s.circle(rr, zr, 2.4, th.bg)
-    s.text(rr + 14, zr + 24, "receiver, z", 14, th.fg, anchor="start")
+    s.text(rr + 14, zr + 24, "receiver, $z$", 14, th.fg, anchor="start")
 
     d = f"M 310 {zs:.1f}"
     zt = surf + 0.86 * (bot - surf)
@@ -480,20 +489,20 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
         d += f" L {xr:.1f} {zz:.1f}"
     s.path(d, stroke=th.secondary, sw=1.8)
     s.circle(570, zt, 4, th.secondary)
-    s.text(520, zt + 24, "turning depth z_t:  c(z_t) = c(z_s)/cos θ₀", 14, th.fg)
+    s.text(520, zt + 24, "turning depth $z_t$:  $c(z_t) = c(z_s)/cos θ_0$", 14, th.fg)
 
     # --- What each solver returns in that frame -----------------------------
     s.text(96, 452, "modes:", 16, th.fg, bold=True, anchor="start")
-    s.text(176, 452, "standing waves in z, travelling as exp(i k_rm r)", 16,
+    s.text(176, 452, "standing waves in $z$, travelling as $exp(i k_{rm} r)$", 16,
            th.fg, anchor="start")
     s.text(96, 478, "rays:", 16, th.fg, bold=True, anchor="start")
     s.text(176, 478, "trajectories, travel times, convergence zones", 16, th.fg,
            anchor="start")
     s.text(96, 504, "PE:", 16, th.fg, bold=True, anchor="start")
-    s.text(176, 504, "the envelope marched in r, one step Δr at a time", 16,
+    s.text(176, 504, "the envelope marched in $r$, one step $Δr$ at a time", 16,
            th.fg, anchor="start")
 
-    s.text(96, 544, "All three take the same range-independent c(z): no sediment attenuation, no bathymetry",
+    s.text(96, 544, "All three take the same range-independent $c(z)$: no sediment attenuation, no bathymetry",
            17, th.fg, anchor="start")
 
 
@@ -543,12 +552,13 @@ def _d_marine_mammal_exposure(s: SVG, th: Theme) -> None:
     s.circle(ax_ - 26, 258, 2.4, th.fg)
     s.text(ax_ + 30, 214, "the criterion applies here", 14, th.accent)
     s.arrow(hx_ + 16, 274, ax_ - 46, 262, th.primary, 1.8)
-    s.text(ax_ - 74, 296, "TL(f, R)", 15, th.primary, bold=True, anchor="middle")
-    s.dim(hx_, 128, ax_, 128, "range R", offset=0, size=15)
+    s.text(ax_ - 74, 296, "$TL(f, R)$", 15, th.primary, bold=True, anchor="middle")
+    s.dim(hx_, 128, ax_, 128, "range $R$", offset=0, size=15)
 
     # --- The three steps between the two ------------------------------------
     s.rect(60, 400, 460, 132, th.panel, th.muted, rx=4, sw=1.0)
-    boxes = (("per-band SEL", 120.0), ("× W(f)", 260.0), ("+ 10 lg N", 400.0))
+    boxes = (("per-band SEL", 120.0), ("$× W(f)$", 260.0),
+             ("$+ 10 lg N$", 400.0))
     for label, bx in boxes:
         s.rect(bx - 58, 418, 116, 40, th.bg, th.fg, rx=4, sw=1.6)
         s.text(bx, 443, label, 15, th.fg)

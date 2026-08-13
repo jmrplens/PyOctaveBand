@@ -235,6 +235,26 @@ def test_index_subscripts_are_italic() -> None:
             in element)
 
 
+def test_capital_greek_is_upright_and_lowercase_stays_italic() -> None:
+    # Capital Greek letters are operators and descriptors in this corpus
+    # and are set upright at every level, matching the roman Δ of
+    # difference of ISO 80000-2, the Δ_SOR print of ECAC Doc 29 §4.5.7 and
+    # the upright \Delta mathtext sets in the matplotlib figures.
+    element = _element("$ΔL_s$", size=20)
+    assert element.count("<tspan>Δ</tspan>") == 1
+    assert '<tspan font-style="italic">L</tspan>' in element
+    element = _element("$Δ_{SOR}$", size=20)
+    assert element.count("<tspan>Δ</tspan>") == 1
+    # Doc 29 prints the SOR subscript in italic (eq. 4-23): it is not on
+    # the curated roman list, so it takes the italic index default.
+    assert ('<tspan dy="4.4" font-size="14.0" font-style="italic">SOR</tspan>'
+            in element)
+    assert "italic" not in _element("banked by $Φ$ in turns")
+    # Lowercase Greek keeps the italic-variable rule, base and script.
+    assert '<tspan font-style="italic">θ</tspan>' in _element("$θ$")
+    assert '<tspan font-style="italic">η</tspan>' in _element("$η_{ij}$")
+
+
 def test_descriptive_subscripts_stay_upright() -> None:
     # The curated descriptive subscripts are word abbreviations and keep
     # the roman the standards print them in.
@@ -301,16 +321,36 @@ def _style_runs(s: str) -> list[list[tuple[str, str]]]:
     return out
 
 
+# English strings that spell a quantity out as prose where the Spanish
+# twin writes the symbol, so the twin composes exactly one math segment
+# its English side does not have ("a quarter wavelength" beside $λ/4$).
+_SYMBOL_SPELLED_AS_PROSE = {
+    (
+        "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 "
+        "sin^{2}(k·L)]$, peaking where the 0.3 m chamber is a quarter "
+        "wavelength"
+    ),
+}
+
+
 def test_spanish_twins_mirror_the_math_structure() -> None:
     # Every $...$ pair of the diagram i18n table must compose with the same
     # script structure and the same italic/roman style, position by
     # position: a twin whose subscript falls off the curated roman list
     # while the English side is on it (f_upper beside f_sup, m_eff beside
     # m_ef) would silently publish the two languages in different styles.
+    # The curated prose-to-symbol twins carry one extra trailing segment
+    # with no English counterpart to mirror; the segments before it must
+    # still pair up run by run.
     pairs = [(en, es) for en, es in _ES.items() if "$" in en or "$" in es]
     assert pairs, "the diagram i18n table lost its $...$ entries"
     for en, es in pairs:
-        assert _style_runs(en) == _style_runs(es), (en, es)
+        en_runs = _style_runs(en)
+        es_runs = _style_runs(es)
+        if en in _SYMBOL_SPELLED_AS_PROSE:
+            assert len(es_runs) == len(en_runs) + 1, (en, es)
+            es_runs = es_runs[: len(en_runs)]
+        assert en_runs == es_runs, (en, es)
 
 
 def test_composition_is_deterministic() -> None:

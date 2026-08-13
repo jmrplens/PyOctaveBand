@@ -90,14 +90,17 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
     """Split one math run into ``(kind, text)`` chunks.
 
     ``var`` is set in italic: at the baseline a single letter -- Latin or
-    Greek, with any combining marks -- and at script level (*script* true,
-    tokenizing the payload of a ``_``/``^``) also letter runs, which there
-    are indices (``$K_{ij}$``), unless the run is one of the descriptive
-    subscripts of :data:`_ROMAN_SCRIPTS` (``$L_{Aeq}$``). ``up`` stays
-    upright: digits, operators, primes, brackets, and at the baseline runs
-    of two or more Latin letters, which are operator names and acronyms
-    (log, grad, CN), never products; a product of two symbols is written
-    with an explicit space or middle dot between them. ``sub`` and ``sup``
+    lowercase Greek, with any combining marks -- and at script level
+    (*script* true, tokenizing the payload of a ``_``/``^``) also letter
+    runs, which there are indices (``$K_{ij}$``), unless the run is one of
+    the descriptive subscripts of :data:`_ROMAN_SCRIPTS` (``$L_{Aeq}$``).
+    ``up`` stays upright: digits, operators, primes, brackets, capital
+    Greek letters at every level (``Δ``, ``Φ``: operators and descriptors
+    per the roman Δ of ISO 80000-2, the ``Δ_SOR`` print of ECAC Doc 29 and
+    the upright ``\\Delta`` mathtext sets in the matplotlib figures), and
+    at the baseline runs of two or more Latin letters, which are operator
+    names and acronyms (log, grad, CN), never products; a product of two
+    symbols is written with an explicit space or middle dot between them. ``sub`` and ``sup``
     carry the payload of ``_``/``^``, braced or single character, to be
     tokenized again at script size.
 
@@ -176,7 +179,11 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                 or (latin and run[j].isascii() and run[j].isalpha())
             ):
                 j += 1
-            if script:
+            if not latin and ch.isupper():
+                # Capital Greek is upright at every level: in this corpus
+                # it is an operator or a descriptor, never an index.
+                kind = "up"
+            elif script:
                 kind = "up" if run[i:j] in _ROMAN_SCRIPTS else "var"
             else:
                 letters = sum(1 for c in run[i:j] if c not in _COMBINING)
@@ -212,7 +219,13 @@ def _math_spans(s: str, size: int) -> str:
     of words and stay upright as the standards print them (``$L_{Aeq}$``,
     ``$f_{max}$``). At the baseline the opposite rule holds: a run of two
     or more Latin letters is an operator name or an acronym (log, grad,
-    CN, TL) and stays upright, single letters are italic variables. The
+    CN, TL) and stays upright, single letters are italic variables. Greek
+    letters split by case at every level: lowercase are italic variables
+    (``$θ$``, ``$η_{ij}$``) and capitals are upright (``$ΔL_s$``,
+    ``$Δ_{SOR}$``, ``$Φ$``) -- in this corpus a capital Greek letter is an
+    operator or a descriptor, matching the roman Δ of difference of ISO
+    80000-2, the ``Δ_SOR`` print of ECAC Doc 29 §4.5.7 and the upright
+    ``\\Delta`` matplotlib's mathtext sets in the figures. The
     grid steps ``dx``/``dt`` follow that baseline rule inside a formula
     (upright, per the roman d of ISO 80000-2); in plain prose ("dt from
     the Courant number") they are not mathematics and take no ``$...$``.
