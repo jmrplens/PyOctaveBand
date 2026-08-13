@@ -161,7 +161,7 @@ _ES: dict[str, str] = {
     "$r ≥ 5$ m element / ≥ 7 m global": "$r ≥ 5$ m elemento / ≥ 7 m global",
     "$D > 3.5$ m (element) / > 5 m (global)":
         "$D > 3,5$ m (elemento) / > 5 m (global)",
-    "$L_{1,s}$  element method": "$L_{1,s}$  metodo de elemento",
+    "$L_{1,s}$  element method": "$L_{1,s}$  método de elemento",
     "≤ 10 mm parallel / ≤ 3 mm normal": "≤ 10 mm paralelo / ≤ 3 mm normal",
     "3 to 10 positions, never gridded":
         "de 3 a 10 posiciones, nunca en rejilla",
@@ -172,7 +172,7 @@ _ES: dict[str, str] = {
     "receiving-room floor": "suelo del recinto receptor",
     "Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ (traffic): "
     "one component, comparable with a laboratory $R$.":
-        "Metodo de elemento → $R′_{45°}$ o $R′_{tr,s}$: un componente, "
+        "Método de elemento → $R′_{45°}$ o $R′_{tr,s}$: un componente, "
         "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
     "not comparable with a laboratory R.":
