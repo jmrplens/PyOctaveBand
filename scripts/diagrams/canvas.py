@@ -44,9 +44,27 @@ DARK = Theme(
 _FONT = "Segoe UI, Helvetica, Arial, sans-serif"
 _MONO = "Consolas, Menlo, monospace"
 
-#: Combining diacritics a symbol may carry (T̂, L̄); each travels with the
-#: base letter it modifies, so the pair styles as one glyph.
-_COMBINING = "̂̄̅̇"
+#: Combining diacritics a symbol may carry (T̂, L̄, x̃); each travels with
+#: the base letter it modifies, so the pair styles as one glyph. Circumflex,
+#: macron, overline, dot above, tilde, acute, grave, breve and dot below.
+_COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
+
+#: The letter runs a sub/superscript sets upright: the descriptive
+#: subscripts of the corpus, printed in roman by the standards that define
+#: them -- weightings and averages (Aeq, eq, EQ), extremes and bounds (max,
+#: MAX, min, upper, lower, limit), qualifiers (ref, rms, tot, TOT, eff,
+#: mod, norm, spec, inst, cal, tab, cum, ss, shadow, co, tr, diff, ff, ax,
+#: SN, CS, MS) and the hand-arm/whole-body vibration axes of ISO 5349 and
+#: ISO 2631 (hv, hwx, hwy, hwz, wx, wy, wz). Every other letter run inside
+#: a script is an index and is set in italic ($K_{ij}$, $η_{ij}$); extend
+#: this set only for a subscript that abbreviates a word, never for
+#: letter-indices.
+_ROMAN_SCRIPTS = frozenset((
+    "Aeq", "eq", "EQ", "max", "MAX", "min", "upper", "lower", "limit",
+    "ref", "rms", "tot", "TOT", "eff", "mod", "norm", "spec", "inst",
+    "cal", "tab", "cum", "ss", "shadow", "co", "tr", "diff", "ff", "ax",
+    "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz", "wx", "wy", "wz",
+))
 
 #: Script metrics of the ``$...$`` composer, as fractions of the font size:
 #: how far a subscript drops, how far a superscript rises, and the glyph
@@ -61,28 +79,67 @@ def _esc(s: str) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _math_tokens(run: str) -> list[tuple[str, str]]:
+def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]]:
     """Split one math run into ``(kind, text)`` chunks.
 
-    ``var`` is a single letter -- Latin or Greek, with any combining marks --
-    and is set in italic. ``up`` stays upright: digits, operators, primes,
-    brackets, and runs of two or more Latin letters, which are operator
-    names and acronyms (log, grad, CN), never products; a product of two
-    symbols is written with an explicit space or middle dot between them.
-    ``sub`` and ``sup`` carry the payload of ``_``/``^``, braced or single
-    character, to be tokenized again at script size.
+    ``var`` is set in italic: at the baseline a single letter -- Latin or
+    Greek, with any combining marks -- and at script level (*script* true,
+    tokenizing the payload of a ``_``/``^``) also letter runs, which there
+    are indices (``$K_{ij}$``), unless the run is one of the descriptive
+    subscripts of :data:`_ROMAN_SCRIPTS` (``$L_{Aeq}$``). ``up`` stays
+    upright: digits, operators, primes, brackets, and at the baseline runs
+    of two or more Latin letters, which are operator names and acronyms
+    (log, grad, CN), never products; a product of two symbols is written
+    with an explicit space or middle dot between them. ``sub`` and ``sup``
+    carry the payload of ``_``/``^``, braced or single character, to be
+    tokenized again at script size.
+
+    Malformed markup raises :class:`ValueError` naming the whole string *s*
+    and the offending piece, so a typo breaks the generation instead of
+    publishing a silently mis-set diagram: a multi-character script written
+    without braces (``f_max`` sets only the f-m pair and pushes "ax" back to
+    the baseline), a script marker with an empty payload (``L_``, ``L_{}``),
+    an unclosed script brace, and a script inside a script (``L_{p_1}``),
+    which the composer cannot set.
     """
     out: list[tuple[str, str]] = []
     i = 0
     while i < len(run):
         ch = run[i]
         if ch in "_^":
+            if script:
+                raise ValueError(
+                    f"nested script {run[i:]!r} inside a script of {s!r}: "
+                    "the composer sets a single script level"
+                )
             kind = "sub" if ch == "_" else "sup"
-            if i + 1 < len(run) and run[i + 1] == "{":
-                end = run.index("}", i + 2)
+            if i + 1 == len(run):
+                raise ValueError(
+                    f"empty script {ch!r} at the end of a math run in {s!r}"
+                )
+            if run[i + 1] == "{":
+                end = run.find("}", i + 2)
+                if end < 0:
+                    raise ValueError(
+                        f"unclosed script brace {run[i:]!r} in {s!r}"
+                    )
+                if end == i + 2:
+                    raise ValueError(
+                        f"empty script {run[i:end + 1]!r} in {s!r}"
+                    )
                 out.append((kind, run[i + 2:end]))
                 i = end + 1
             else:
+                if i + 2 < len(run) and (run[i + 2].isalnum()
+                                         or run[i + 2] == "("):
+                    j = i + 2
+                    while j < len(run) and run[j].isalnum():
+                        j += 1
+                    raise ValueError(
+                        f"ambiguous script {run[i:j]!r} in {s!r}: only "
+                        f"{run[i + 1]!r} would attach to {ch!r}, brace the "
+                        f"whole script as {ch}{{...}}"
+                    )
                 out.append((kind, run[i + 1:i + 2]))
                 i += 2
         elif ch.isalpha():
@@ -93,8 +150,12 @@ def _math_tokens(run: str) -> list[tuple[str, str]]:
                 or (latin and run[j].isascii() and run[j].isalpha())
             ):
                 j += 1
-            letters = sum(1 for c in run[i:j] if c not in _COMBINING)
-            out.append(("var" if letters == 1 else "up", run[i:j]))
+            if script:
+                kind = "up" if run[i:j] in _ROMAN_SCRIPTS else "var"
+            else:
+                letters = sum(1 for c in run[i:j] if c not in _COMBINING)
+                kind = "var" if letters == 1 else "up"
+            out.append((kind, run[i:j]))
             i = j
         else:
             j = i
@@ -116,7 +177,19 @@ def _math_spans(s: str, size: int) -> str:
     ``xml:space="preserve"`` on the wrapping ``<text>``: without it librsvg
     collapses every space at a tspan boundary, even NBSP. Radicals keep the
     house spelling ``√(...)``; there are no commands, every glyph is
-    literal.
+    literal, and a backslash in a math run is an error -- the LaTeX
+    commands of the matplotlib figures do not exist here.
+
+    Script policy: inside a ``_``/``^`` script, letters are indices and are
+    set in italic (``$K_{ij}$``, ``$η_{ij}$``), except the descriptive
+    subscripts curated in :data:`_ROMAN_SCRIPTS`, which are abbreviations
+    of words and stay upright as the standards print them (``$L_{Aeq}$``,
+    ``$f_{max}$``). At the baseline the opposite rule holds: a run of two
+    or more Latin letters is an operator name or an acronym (log, grad,
+    CN, TL) and stays upright, single letters are italic variables. The
+    grid steps ``dx``/``dt`` follow that baseline rule inside a formula
+    (upright, per the roman d of ISO 80000-2); in plain prose ("dt from
+    the Courant number") they are not mathematics and take no ``$...$``.
     """
     segments = s.split("$")
     if len(segments) % 2 == 0:
@@ -136,12 +209,17 @@ def _math_spans(s: str, size: int) -> str:
         if k % 2 == 0:
             add(segment)
             continue
-        for kind, payload in _math_tokens(segment):
+        if "\\" in segment:
+            raise ValueError(
+                f"backslash in math run {segment!r} of {s!r}: there are no "
+                "commands here, write the glyph itself (θ, √, ·, …)"
+            )
+        for kind, payload in _math_tokens(segment, s):
             if kind in ("var", "up"):
                 add(payload, italic=kind == "var")
             else:
                 shift = _SUB_DROP if kind == "sub" else _SUP_RISE
-                for kind2, payload2 in _math_tokens(payload):
+                for kind2, payload2 in _math_tokens(payload, s, script=True):
                     add(payload2, italic=kind2 == "var", shift=shift,
                         scale=_SCRIPT_SCALE)
 

@@ -136,6 +136,86 @@ def test_unbalanced_markup_raises() -> None:
         _element("broken $L_p")
 
 
+def test_multicharacter_script_without_braces_raises() -> None:
+    # $f_max$ would silently set f with an m subscript and push "ax" back
+    # to the baseline; the guard names the string and the ambiguous piece.
+    with pytest.raises(ValueError) as excinfo:
+        _element("cut-off $f_max$ of the array")
+    assert "'_max'" in str(excinfo.value)
+    assert "'cut-off $f_max$ of the array'" in str(excinfo.value)
+    with pytest.raises(ValueError, match="ambiguous script"):
+        _element("$p_ref$")
+    # An opening bracket right after the script character is the same trap.
+    with pytest.raises(ValueError, match="ambiguous script"):
+        _element("$f_n(2h)$")
+
+
+def test_backslash_in_math_raises() -> None:
+    # There are no LaTeX commands in the diagram composer; a backslash
+    # would be published as a literal glyph.
+    with pytest.raises(ValueError) as excinfo:
+        _element("$\\theta_0$ incidence")
+    assert "backslash" in str(excinfo.value)
+    # repr doubles the backslash in the quoted pieces of the message.
+    assert r"'\\theta_0'" in str(excinfo.value)
+    assert r"'$\\theta_0$ incidence'" in str(excinfo.value)
+
+
+def test_unclosed_script_brace_raises_with_context() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        _element("$L_{p$ level")
+    assert "unclosed script brace" in str(excinfo.value)
+    assert "'_{p'" in str(excinfo.value)
+    assert "'$L_{p$ level'" in str(excinfo.value)
+    with pytest.raises(ValueError, match="unclosed script brace"):
+        _element("$c^{2$")
+
+
+def test_nested_script_raises() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        _element("$L_{p_1}$")
+    assert "nested script" in str(excinfo.value)
+    assert "'$L_{p_1}$'" in str(excinfo.value)
+    with pytest.raises(ValueError, match="nested script"):
+        _element("$a_{b^2}$")
+
+
+def test_empty_script_payload_raises() -> None:
+    for broken in ("$L_$", "$L^$", "$L_{}$"):
+        with pytest.raises(ValueError, match="empty script"):
+            _element(broken)
+
+
+def test_index_subscripts_are_italic() -> None:
+    # Letters inside a script are indices: italic, unlike the same run at
+    # the baseline, where two or more Latin letters read as an acronym.
+    element = _element("$K_{ij}$", size=20)
+    assert ('<tspan dy="4.4" font-size="14.0" font-style="italic">ij</tspan>'
+            in element)
+    element = _element("$η_{ij}$", size=20)
+    assert '<tspan font-style="italic">η</tspan>' in element
+    assert ('<tspan dy="4.4" font-size="14.0" font-style="italic">ij</tspan>'
+            in element)
+
+
+def test_descriptive_subscripts_stay_upright() -> None:
+    # The curated descriptive subscripts are word abbreviations and keep
+    # the roman the standards print them in.
+    element = _element("$L_{Aeq}$", size=20)
+    assert '<tspan dy="4.4" font-size="14.0">Aeq</tspan>' in element
+    element = _element("$f_{max}$", size=20)
+    assert '<tspan dy="4.4" font-size="14.0">max</tspan>' in element
+
+
+def test_tilde_travels_with_its_letter() -> None:
+    # x̃ (x + U+0303) styles as one glyph; splitting the pair into tspans
+    # of different style makes Chromium misplace the mark.
+    assert '<tspan font-style="italic">x̃</tspan>' in _element("$x̃$")
+    element = _element("$x̃_{ref}$", size=20)
+    assert '<tspan font-style="italic">x̃</tspan>' in element
+    assert '<tspan dy="4.4" font-size="14.0">ref</tspan>' in element
+
+
 def test_translation_happens_before_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
