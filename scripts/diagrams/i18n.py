@@ -1249,14 +1249,16 @@ _ES: dict[str, str] = {
     "Mic 4": "Micróf. 4",
     "incident": "incidente",
     "reflected": "reflejada",
-    "H₁₂ → reflection factor r (Eq. 17), absorption α = 1 − |r|² (Eq. 18), "
-    "Z/ρc₀ = (1+r)/(1−r) (Eq. 19)":
-        "H₁₂ → factor de reflexión r (Ec. 17), absorción α = 1 − |r|² (Ec. 18), "
-        "Z/ρc₀ = (1+r)/(1−r) (Ec. 19)",
-    "Working range f_l < f < f_u set by the microphone spacing s "
-    "and the tube diameter (Clause 6.1)":
-        "Rango útil f_l < f < f_u fijado por la separación s de micrófonos "
-        "y el diámetro del tubo (apartado 6.1)",
+    "$H_{12}$ → reflection factor $r$ (Eq. 17), "
+    "absorption $α = 1 − |r|^2$ (Eq. 18), "
+    "$Z/ρc_0 = (1+r)/(1−r)$ (Eq. 19)":
+        "$H_{12}$ → factor de reflexión $r$ (Ec. 17), "
+        "absorción $α = 1 − |r|^2$ (Ec. 18), "
+        "$Z/ρc_0 = (1+r)/(1−r)$ (Ec. 19)",
+    "Working range $f_l < f < f_u$ set by the microphone spacing "
+    "$s$ and the tube diameter (Clause 6.1)":
+        "Rango útil $f_l < f < f_u$ fijado por la separación $s$ de "
+        "micrófonos y el diámetro del tubo (apartado 6.1)",
     "ASTM E2611: two further microphones behind the specimen also "
     "give the transmission loss":
         "ASTM E2611: dos micrófonos más tras la probeta dan también "
@@ -1266,11 +1268,14 @@ _ES: dict[str, str] = {
         "Tubo de pérdida por transmisión de cuatro micrófonos (ASTM E2611)",
     "Termination": "Terminación",
     "(2 loads)": "(2 cargas)",
-    "Decompose A, B (upstream) and C, D (downstream) → transfer matrix T (Eq. 22)":
-        "Descomponer A, B (aguas arriba) y C, D (aguas abajo) → "
-        "matriz de transferencia T (Ec. 22)",
-    "TL = 20 log₁₀ |(T₁₁ + T₁₂/ρc + ρc·T₂₁ + T₂₂) / 2|   (Eq. 26)":
-        "TL = 20 log₁₀ |(T₁₁ + T₁₂/ρc + ρc·T₂₁ + T₂₂) / 2|   (Ec. 26)",
+    "Decompose $A$, $B$ (upstream) and $C$, $D$ (downstream) → "
+    "transfer matrix $T$ (Eq. 22)":
+        "Descomponer $A$, $B$ (aguas arriba) y $C$, $D$ (aguas abajo) → "
+        "matriz de transferencia $T$ (Ec. 22)",
+    "$TL = 20 log_{10} |(T_{11} + T_{12}/ρc + ρc·T_{21} + T_{22}) / 2|$"
+    "   (Eq. 26)":
+        "$TL = 20 log_{10} |(T_{11} + T_{12}/ρc + ρc·T_{21} + T_{22}) / 2|$"
+        "   (Ec. 26)",
     "Two-load method: repeat with two terminations; the one-load "
     "variant uses a single anechoic end":
         "Método de dos cargas: repetir con dos terminaciones; la variante "
@@ -1282,37 +1287,39 @@ _ES: dict[str, str] = {
     "specimen (A, d)": "probeta (A, d)",
     "laminar flow  q_v": "flujo laminar  q_v",
     "manom.": "manóm.",
-    "R = Δp / q_v   (through-origin fit at 0.5 mm/s)":
-        "R = Δp / q_v   (ajuste por el origen a 0,5 mm/s)",
+    "$R = Δp / q_v$   (through-origin fit at 0.5 mm/s)":
+        "$R = Δp / q_v$   (ajuste por el origen a 0,5 mm/s)",
     "Alternating method (ISO 9053-2)": "Método alternante (ISO 9053-2)",
     "cavity": "cavidad",
     "specimen / airtight": "probeta / cierre estanco",
-    "piston  f = 1–4 Hz": "pistón  f = 1–4 Hz",
-    "R from L_p,s − L_p,t   (κ′ per Annex A)":
-        "R por L_p,s − L_p,t   (κ′ según Anexo A)",
+    "piston  $f$ = 1–4 Hz": "pistón  $f$ = 1–4 Hz",
+    "$R$ from $L_{p,s} − L_{p,t}$   ($κ′$ per Annex A)":
+        "$R$ por $L_{p,s} − L_{p,t}$   ($κ′$ según Anexo A)",
     "seal": "sellado",
     "grid": "rejilla",
-    "specimen  A, d": "probeta  A, d",
+    "specimen  $A$, $d$": "probeta  $A$, $d$",
     "flow source": "fuente de caudal",
     # "≥ 1 diámetro" (78 px) poked 8 px past the plate's left edge at this
     # dimension's 62 px slot; the abbreviation measures 58 px.
     "≥ 1 bore": "≥ 1 diám.",
     "cell ≥ 29 mm bore, ≥ 1 bore of free space above":
         "celda ≥ 29 mm de diámetro, ≥ 1 diámetro libre por encima",
-    "q_v and Δp each to ±5 %, Δp readable to 0.1 Pa":
-        "q_v y Δp con ±5 % cada uno, Δp legible hasta 0,1 Pa",
-    "grid ≥ 50 % open, R < 1 %; d measured in position":
-        "rejilla ≥ 50 % abierta, R < 1 %; d medido en posición",
-    "measurement cell → L_p,s (h_s)": "celda de medida → L_p,s (h_s)",
-    "airtight termination → L_p,t (h_t)": "terminación estanca → L_p,t (h_t)",
+    "$q_v$ and $Δp$ each to ±5 %, $Δp$ readable to 0.1 Pa":
+        "$q_v$ y $Δp$ con ±5 % cada uno, $Δp$ legible hasta 0,1 Pa",
+    "grid ≥ 50 % open, $R < 1$ %; $d$ measured in position":
+        "rejilla ≥ 50 % abierta, $R < 1$ %; $d$ medido en posición",
+    "measurement cell → $L_{p,s}$ ($h_s$)":
+        "celda de medida → $L_{p,s}$ ($h_s$)",
+    "airtight termination → $L_{p,t}$ ($h_t$)":
+        "terminación estanca → $L_{p,t}$ ($h_t$)",
     # d24 - ISO 354 reverberation-room sound absorption
     "Reverberation-room sound absorption (ISO 354)":
         "Absorción acústica en cámara reverberante (ISO 354)",
     "Reverberation room · plan": "Cámara reverberante · planta",
-    "V = 200 m³ (≥ 150 m³)": "V = 200 m³ (≥ 150 m³)",
+    "$V$ = 200 m³ (≥ 150 m³)": "$V$ = 200 m³ (≥ 150 m³)",
     "diffusers  0.8–3 m² each, ≈ 5 kg/m² (Annex A)":
         "difusores  0,8–3 m² cada uno, ≈ 5 kg/m² (Anexo A)",
-    "Test specimen  S = 10.8 m²": "Probeta de ensayo  S = 10,8 m²",
+    "Test specimen  $S$ = 10.8 m²": "Probeta de ensayo  $S$ = 10,8 m²",
     "10–12 m², width/length 0.7–1, edges not parallel to the room":
         "10–12 m², anchura/longitud 0,7–1, bordes no paralelos a la cámara",
     "microphones ≥ 1.5 m apart, ≥ 2 m from a source, ≥ 1 m from any "
@@ -1331,16 +1338,16 @@ _ES: dict[str, str] = {
     "Type E-400: 400 mm face to floor":
         "Tipo E-400: 400 mm de la cara al suelo",
     "perimeter frame, flush": "marco perimetral, enrasado",
-    "A = 55.3 V/(c T) − 4 V m   ·   c = 331 + 0.6 t  (15–30 °C)":
-        "A = 55,3 V/(c T) − 4 V m   ·   c = 331 + 0,6 t  (15–30 °C)",
+    "$A = 55.3 V/(c T) − 4 V m$   ·   $c = 331 + 0.6 t$  (15–30 °C)":
+        "$A = 55,3 V/(c T) − 4 V m$   ·   $c = 331 + 0,6 t$  (15–30 °C)",
     "≥ 12 spatially independent decays = ≥ 3 microphones × ≥ 2 sources "
-    "· T₂₀ read from −5 dB over 20 dB":
+    "· $T_{20}$ read from −5 dB over 20 dB":
         "≥ 12 curvas de caída espacialmente independientes = ≥ 3 micrófonos "
-        "× ≥ 2 fuentes · T₂₀ leído desde −5 dB sobre 20 dB",
-    "the empty-room A₁ must clear the Table 1 ceiling, and T₁ is "
+        "× ≥ 2 fuentes · $T_{20}$ leído desde −5 dB sobre 20 dB",
+    "the empty-room $A_1$ must clear the Table 1 ceiling, and $T_1$ is "
     "measured without the specimen frame":
-        "A₁ de la cámara vacía debe quedar bajo el techo de la Tabla 1, y T₁ "
-        "se mide sin el marco de la probeta",
+        "$A_1$ de la cámara vacía debe quedar bajo el techo de la Tabla 1, y "
+        "$T_1$ se mide sin el marco de la probeta",
     # d25 - ISO 10534-1 standing-wave-ratio apparatus
     # Measured against the 900 px canvas (Arial metrics): the previous
     # wording ("recorrido de la sonda y los mínimos") ran 960 px and was
@@ -1354,15 +1361,16 @@ _ES: dict[str, str] = {
         "Probeta sobre la terminación rígida",
     "probe microphone on a graduated carriage":
         "micrófono de sonda sobre carro graduado",
-    "|p(x)| envelope": "envolvente |p(x)|",
-    "Z/ρc₀ = (1 + r)/(1 − r) = 1.13 − 1.22j":
-        "Z/ρc₀ = (1 + r)/(1 − r) = 1,13 − 1,22j",
+    "$|p(x)|$ envelope": "envolvente $|p(x)|$",
+    "$Z/ρc_0 = (1 + r)/(1 − r)$ = 1.13 − 1.22j":
+        "$Z/ρc_0 = (1 + r)/(1 − r)$ = 1,13 − 1,22j",
     # The rest of the same reduction chain, and the ΔL dimension: decimal
     # commas so the chain does not mix separators line to line.
-    "|r| = (s − 1)/(s + 1) = 0.5": "|r| = (s − 1)/(s + 1) = 0,5",
-    "α = 1 − |r|² = 0.75": "α = 1 − |r|² = 0,75",
-    "Φ = 4π x_min,1/λ − π = −54.1°": "Φ = 4π x_min,1/λ − π = −54,1°",
-    "ΔL = 9.54 dB": "ΔL = 9,54 dB",
+    "$|r| = (s − 1)/(s + 1)$ = 0.5": "$|r| = (s − 1)/(s + 1)$ = 0,5",
+    "$α = 1 − |r|^2$ = 0.75": "$α = 1 − |r|^2$ = 0,75",
+    "$Φ = 4π x_{min,1}/λ − π$ = −54.1°":
+        "$Φ = 4π x_{min,1}/λ − π$ = −54,1°",
+    "$ΔL$ = 9.54 dB": "$ΔL$ = 9,54 dB",
     # 703 px overflowed the note's 680 px slot by 11 px on the left; dropping
     # the article and "en la pared" -> "de pared" brings it to 664 px.
     "minima far from the specimen fill in (wall losses, exaggerated "
@@ -1382,71 +1390,76 @@ _ES: dict[str, str] = {
         "Dispersión a incidencia aleatoria en cámara reverberante (ISO 17497-1)",
     "Reverberation room": "Cámara reverberante",
     "Turntable and base plate": "Plataforma giratoria y placa base",
-    "sample on the plate for T2 and T4":
-        "probeta sobre la placa en T2 y T4",
+    "sample on the plate for $T_2$ and $T_4$":
+        "probeta sobre la placa en $T_2$ y $T_4$",
     "the only thing that moves": "lo único que se mueve",
     # "≥ 1.0 m" (the turntable wall clearance) is already in the table above.
     "fixed sources (≥ 2)": "fuentes fijas (≥ 2)",
     "fixed microphones (≥ 3)": "micrófonos fijos (≥ 3)",
-    "T1 base plate, static  ·  T2 sample, static  →  α_s (Eq. 1)":
-        "T1 placa base, estática  ·  T2 probeta, estática  →  α_s (Ec. 1)",
-    "T3 base plate, rotating  ·  T4 sample, rotating  →  α_spec (Eq. 4)":
-        "T3 placa base, girando  ·  T4 probeta, girando  →  α_spec (Ec. 4)",
-    "s = (α_spec − α_s) / (1 − α_s)   (Eq. 5)":
-        "s = (α_spec − α_s) / (1 − α_s)   (Ec. 5)",
-    "α from 55.3·(V/S)·(1/cT) − 4(V/S)m  ·  the base plate must pass the "
-    "Table 1 ceiling":
-        "α con 55,3·(V/S)·(1/cT) − 4(V/S)m  ·  la placa base debe cumplir el "
-        "límite de la Tabla 1",
+    "$T_1$ base plate, static  ·  $T_2$ sample, static  →  $α_s$ (Eq. 1)":
+        "$T_1$ placa base, estática  ·  $T_2$ probeta, estática  →  "
+        "$α_s$ (Ec. 1)",
+    "$T_3$ base plate, rotating  ·  $T_4$ sample, rotating  →  "
+    "$α_{spec}$ (Eq. 4)":
+        "$T_3$ placa base, girando  ·  $T_4$ probeta, girando  →  "
+        "$α_{spec}$ (Ec. 4)",
+    "$s = (α_{spec} − α_s) / (1 − α_s)$   (Eq. 5)":
+        "$s = (α_{spec} − α_s) / (1 − α_s)$   (Ec. 5)",
+    "$α$ from $55.3·(V/S)·(1/(c T)) − 4(V/S)m$  ·  the base plate "
+    "must pass the Table 1 ceiling":
+        "$α$ con $55,3·(V/S)·(1/(c T)) − 4(V/S)m$  ·  la placa base debe "
+        "cumplir el límite de la Tabla 1",
     # d16 - ISO 17497-2 free-field diffusion goniometer
     "Free-field diffusion goniometer (ISO 17497-2)":
         "Goniómetro de difusión en campo libre (ISO 17497-2)",
     "Test sample": "Probeta de ensayo",
     "Turntable": "Plataforma giratoria",
     "Fixed source": "Fuente fija",
-    "polar response L_i": "respuesta polar L_i",
+    "polar response $L_i$": "respuesta polar $L_i$",
     "receiver arc (5° steps)": "arco de receptores (pasos de 5°)",
     "d = [(Σ10^(L_i/10))² − Σ(10^(L_i/10))²] / [(n−1)·Σ(10^(L_i/10))²]   (Formula 5)":
         "d = [(Σ10^(L_i/10))² − Σ(10^(L_i/10))²] / [(n−1)·Σ(10^(L_i/10))²]   (Fórmula 5)",
-    "d_n = (d − d_ref) / (1 − d_ref)   (Formula 7)":
-        "d_n = (d − d_ref) / (1 − d_ref)   (Fórmula 7)",
+    "$d_n = (d − d_{ref}) / (1 − d_{ref})$   (Formula 7)":
+        "$d_n = (d − d_{ref}) / (1 − d_{ref})$   (Fórmula 7)",
     "5° receiver steps · turntable rotates the sample · source fixed":
         "pasos de 5° entre receptores · la plataforma gira la probeta · fuente fija",
     # d17 - ISO 13472-1 in-situ road absorption, subtraction technique
     "In-situ road absorption — subtraction technique (ISO 13472-1)":
         "Absorción in situ de carreteras — técnica de sustracción (ISO 13472-1)",
     "Road surface": "Superficie de la carretera",
-    "direct  ds−dm": "directo  ds−dm",
-    "reflected  ds+dm": "reflejado  ds+dm",
-    "to image source (ds below)": "hacia fuente imagen (ds por debajo)",
-    "ds = 1.25 m": "ds = 1,25 m",
-    "dm = 0.25 m": "dm = 0,25 m",
+    "direct  $d_s−d_m$": "directo  $d_s−d_m$",
+    "reflected  $d_s+d_m$": "reflejado  $d_s+d_m$",
+    "to image source ($d_s$ below)":
+        "hacia fuente imagen ($d_s$ por debajo)",
+    "$d_s$ = 1.25 m": "$d_s$ = 1,25 m",
+    "$d_m$ = 0.25 m": "$d_m$ = 0,25 m",
     "Free-field reference": "Referencia en campo libre",
-    "Hi: no ground reflection in the window":
-        "Hi: sin reflexión del suelo en la ventana",
-    "Kr = (ds − dm)/(ds + dm) = 2/3   (Clause 4.1)":
-        "Kr = (ds − dm)/(ds + dm) = 2/3   (apartado 4.1)",
-    "α(f) = 1 − (1/Kr²)·|Hr/Hi|²   ·   Δτ = 2 dm / c":
-        "α(f) = 1 − (1/Kr²)·|Hr/Hi|²   ·   Δτ = 2 dm / c",
-    "Adrienne time window isolates the reflected response Hr":
-        "La ventana temporal Adrienne aísla la respuesta reflejada Hr",
+    "$H_i$: no ground reflection in the window":
+        "$H_i$: sin reflexión del suelo en la ventana",
+    "$K_r = (d_s − d_m)/(d_s + d_m) = 2/3$   (Clause 4.1)":
+        "$K_r = (d_s − d_m)/(d_s + d_m) = 2/3$   (apartado 4.1)",
+    "$α(f) = 1 − (1/K_r^2)·|H_r/H_i|^2$   ·   $Δτ = 2 d_m / c$":
+        "$α(f) = 1 − (1/K_r^2)·|H_r/H_i|^2$   ·   $Δτ = 2 d_m / c$",
+    "Adrienne time window isolates the reflected response $H_r$":
+        "La ventana temporal Adrienne aísla la respuesta reflejada $H_r$",
     # d18 - ISO 13472-2 in-situ road absorption, spot method
     "In-situ road absorption — spot method (ISO 13472-2)":
         "Absorción in situ de carreteras — método puntual (ISO 13472-2)",
     "Road surface (test sample)": "Superficie de carretera (probeta)",
     "Spot method (ISO 13472-2)": "Método puntual (ISO 13472-2)",
-    "f_u = 0.58 c₀ / d   (Clause 5.4.1)":
-        "f_u = 0,58 c₀ / d   (apartado 5.4.1)",
-    "0.05 c₀/f_min < s < 0.45 c₀/f_max   (Clause 5.4.2)":
-        "0,05 c₀/f_min < s < 0,45 c₀/f_max   (apartado 5.4.2)",
+    "$f_u = 0.58 c_0 / d$   (Clause 5.4.1)":
+        "$f_u = 0,58 c_0 / d$   (apartado 5.4.1)",
+    "$0.05 c_0/f_{min} < s < 0.45 c_0/f_{max}$   (Clause 5.4.2)":
+        "$0,05 c_0/f_{min} < s < 0,45 c_0/f_{max}$   (apartado 5.4.2)",
     "Working range: 250–1600 Hz (1/3-octave)":
         "Rango útil: 250–1600 Hz (1/3 de octava)",
-    "Two-microphone transfer function H₁₂":
-        "Función de transferencia de dos micrófonos H₁₂",
-    "→ ISO 10534-2 decomposition → α(f)":
-        "→ descomposición ISO 10534-2 → α(f)",
-    "Tube sealed onto the road; plane waves only below f_u":
-        "Tubo sellado sobre la carretera; solo ondas planas por debajo de f_u",
+    "Two-microphone transfer function $H_{12}$":
+        "Función de transferencia de dos micrófonos $H_{12}$",
+    "→ ISO 10534-2 decomposition → $α(f)$":
+        "→ descomposición ISO 10534-2 → $α(f)$",
+    "Tube sealed onto the road; plane waves only below $f_u$":
+        "Tubo sellado sobre la carretera; solo ondas planas por debajo "
+        "de $f_u$",
     # d19 - ISO 3745 precision sound power (anechoic / hemi-anechoic room)
     "Precision sound power in an anechoic room (ISO 3745)":
         "Potencia acústica de precisión en cámara anecoica (ISO 3745)",
@@ -1616,11 +1629,12 @@ _ES: dict[str, str] = {
     "Declare conformity   (Formulae 4/5)": "Declarar conformidad   (Fórmulas 4/5)",
     "one-sided coverage factor": "factor de cobertura unilateral",
     # ISO 11654
-    "Measured  αs  at one-third octaves, 200 Hz to 5000 Hz":
-        "αs medido en tercios de octava, 200 Hz a 5000 Hz",
+    "Measured  $α_s$  at one-third octaves, 200 Hz to 5000 Hz":
+        "$α_s$ medido en tercios de octava, 200 Hz a 5000 Hz",
     "from a reverberation room (ISO 354)": "en cámara reverberante (ISO 354)",
-    "Practical  αp  per octave band, 250 Hz to 4000 Hz  (Clause 4.1)":
-        "αp práctico por banda de octava, 250 Hz a 4000 Hz  (apartado 4.1)",
+    "Practical  $α_p$  per octave band, 250 Hz to 4000 Hz  (Clause 4.1)":
+        "$α_p$ práctico por banda de octava, 250 Hz a 4000 Hz  "
+        "(apartado 4.1)",
     "mean of the three one-third octaves, rounded to 0.05":
         "media de los tres tercios de octava, redondeado a 0,05",
     "Shift the reference curve in 0.05 steps to best fit  (Clause 4.2)":
@@ -1628,14 +1642,15 @@ _ES: dict[str, str] = {
         "ajuste  (apartado 4.2)",
     "sum of unfavourable deviations kept ≤ 0.10":
         "suma de desviaciones desfavorables ≤ 0,10",
-    "Weighted coefficient  αw = shifted reference at 500 Hz":
-        "Coeficiente ponderado  αw = referencia desplazada a 500 Hz",
-    "Shape indicators (L, M, H) where  αp − reference ≥ 0.25":
-        "Indicadores de forma (L, M, H) donde  αp − referencia ≥ 0,25",
+    "Weighted coefficient  $α_w$ = shifted reference at 500 Hz":
+        "Coeficiente ponderado  $α_w$ = referencia desplazada a 500 Hz",
+    "Shape indicators (L, M, H) where  $α_p$ − reference ≥ 0.25":
+        "Indicadores de forma (L, M, H) donde  $α_p$ − referencia ≥ 0,25",
     "Sound absorption class  A to E   (Table B.1, Annex B)":
         "Clase de absorción acústica  A a E   (Tabla B.1, Anexo B)",
-    "or “Not classified” when αw falls below the class-E band":
-        "o «No clasificado» cuando αw cae por debajo de la banda de clase E",
+    "or “Not classified” when $α_w$ falls below the class-E band":
+        "o «No clasificado» cuando $α_w$ cae por debajo de la banda de "
+        "clase E",
     # Zwicker
     "28 one-third-octave band levels, 25 Hz to 12.5 kHz":
         "28 niveles de banda de tercio de octava, 25 Hz a 12,5 kHz",
@@ -1907,9 +1922,10 @@ _ES: dict[str, str] = {
     "Mass-spring model": "Modelo masa-resorte",
     "read at the peak, extrapolated to zero force":
         "se lee en el pico, extrapolado a fuerza nula",
-    "s′t = 4π² m′t fr²   (Formula 4)": "s′t = 4π² m′t fr²   (Fórmula 4)",
-    "f₀ = (1/2π)·√(s′/m′)   (Formula 2)":
-        "f₀ = (1/2π)·√(s′/m′)   (Fórmula 2)",
+    "$s′_t = 4π^2 m′_t f_r^2$   (Formula 4)":
+        "$s′_t = 4π^2 m′_t f_r^2$   (Fórmula 4)",
+    "$f_0 = (1/2π)·√(s′/m′)$   (Formula 2)":
+        "$f_0 = (1/2π)·√(s′/m′)$   (Fórmula 2)",
     # Mechanical-mobility rig (ISO 7626)
     "Mechanical-mobility measurement on a beam (ISO 7626)":
         "Medición de movilidad mecánica sobre una viga (ISO 7626)",
@@ -3047,21 +3063,23 @@ _ES: dict[str, str] = {
         "Absorbente poroso sobre pared rígida: microestructura y absorción",
     "Porous layer (mineral wool)": "Capa porosa (lana mineral)",
     "plane wave, normal incidence": "onda plana, incidencia normal",
-    "reflected: |R|² = 1 − α = 0.09": "reflejado: |R|² = 1 − α = 0,09",
+    "reflected: $|R|^2 = 1 − α$ = 0.09":
+        "reflejado: $|R|^2 = 1 − α$ = 0,09",
     "microstructure (zoom)": "microestructura (ampliada)",
     "fibre frame": "esqueleto de fibras",
-    "air in the pores: φ = 0.98": "aire en los poros: φ = 0,98",
-    "σ = 20 kPa·s/m²  (flow resistivity)":
-        "σ = 20 kPa·s/m²  (resistividad al flujo)",
-    "φ = 0.98  (porosity)": "φ = 0,98  (porosidad)",
-    "α∞ = 1.0  (tortuosity)": "α∞ = 1,0  (tortuosidad)",
-    "Λ = Λ′ = 87 µm  (viscous / thermal lengths)":
-        "Λ = Λ′ = 87 µm  (longitudes viscosa y térmica)",
-    "JCA equivalent fluid: the five parameters give Zc and k; a hard-backed layer has Zs = −j Zc cot(kd)":
-        "Fluido equivalente JCA: los cinco parámetros dan Zc y k; con "
-        "respaldo rígido Zs = −j Zc cot(kd)",
-    "α = 1 − |R|² = 0.91 at 1 kHz for this 50 mm layer":
-        "α = 1 − |R|² = 0,91 a 1 kHz para esta capa de 50 mm",
+    "air in the pores: $φ$ = 0.98": "aire en los poros: $φ$ = 0,98",
+    "$σ$ = 20 kPa·s/m²  (flow resistivity)":
+        "$σ$ = 20 kPa·s/m²  (resistividad al flujo)",
+    "$φ$ = 0.98  (porosity)": "$φ$ = 0,98  (porosidad)",
+    "$α_∞$ = 1.0  (tortuosity)": "$α_∞$ = 1,0  (tortuosidad)",
+    "$Λ = Λ′$ = 87 µm  (viscous / thermal lengths)":
+        "$Λ = Λ′$ = 87 µm  (longitudes viscosa y térmica)",
+    "JCA equivalent fluid: the five parameters give $Z_c$ and $k$; "
+    "a hard-backed layer has $Z_s = −j Z_c cot(k·d)$":
+        "Fluido equivalente JCA: los cinco parámetros dan $Z_c$ y $k$; con "
+        "respaldo rígido $Z_s = −j Z_c cot(k·d)$",
+    "$α = 1 − |R|^2$ = 0.91 at 1 kHz for this 50 mm layer":
+        "$α = 1 − |R|^2$ = 0,91 a 1 kHz para esta capa de 50 mm",
     "viscous friction in the pores and heat exchange with the frame dissipate the sound energy":
         "la fricción viscosa en los poros y el intercambio de calor con el "
         "esqueleto disipan la energía sonora",
