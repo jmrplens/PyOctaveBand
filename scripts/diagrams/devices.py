@@ -39,15 +39,15 @@ def _d_pp_probe(s: SVG, th: Theme) -> None:
         s.rect(tx, ay - 16, 14, 32, th.muted, rx=2)
     s.rect(414, ay - 6, 72, 12, th.panel, th.muted, rx=4, sw=1.2)  # spacer
 
-    s.text(360, ay - 38, "p1", 20, th.fg, mono=True, bold=True)
-    s.text(540, ay - 38, "p2", 20, th.fg, mono=True, bold=True)
+    s.text(360, ay - 38, "$p_1$", 20, th.fg, bold=True)
+    s.text(540, ay - 38, "$p_2$", 20, th.fg, bold=True)
 
     # Δr dimension between the capsule tips, drafting style
-    s.dim(414, ay - 16, 486, ay - 16, "Δr = 12 mm", offset=-66, size=18)
+    s.dim(414, ay - 16, 486, ay - 16, "$Δr$ = 12 mm", offset=-66, size=18)
 
     # p-p estimator notes near the capsules
-    s.text(280, 365, "u from the p2−p1 gradient", 19, th.muted, mono=True)
-    s.text(620, 365, "p = (p1+p2)/2", 19, th.muted, mono=True)
+    s.text(280, 365, "$u$ from the $p_2−p_1$ gradient", 19, th.muted)
+    s.text(620, 365, "$p = (p_1+p_2)/2$", 19, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ def _d_surfaces(s: SVG, th: Theme) -> None:
     # radius r drawn to position 8 (a mid-height point on the surface).
     r8 = pts[7]
     s.line(cx, gy, r8[0], r8[1], th.accent, 1.6, dash="6,4")
-    s.text((cx + r8[0]) / 2 + 10, (gy + r8[1]) / 2 + 4, "radius r ≥ 2 d₀",
+    s.text((cx + r8[0]) / 2 + 10, (gy + r8[1]) / 2 + 4, "radius $r ≥ 2 d_0$",
            17, th.accent, anchor="start")
     for i, (px, py) in enumerate(pts, start=1):
         s.circle(px, py, 6.5, th.secondary)
@@ -95,7 +95,7 @@ def _d_surfaces(s: SVG, th: Theme) -> None:
         if i in labelled:
             s.text(px, py - 12, str(i), 16, th.fg, bold=True)
     s.text(cx, gy + 62, "10 key positions (Table B.1)", 17, th.muted)
-    s.text(cx, gy + 86, "one plane · S = 2πr²", 18, th.primary, bold=True, mono=True)
+    s.text(cx, gy + 86, "one plane · $S = 2πr^2$", 18, th.primary, bold=True)
 
     # ===== Right panel: parallelepiped measurement surface =====
     bx2, gy2 = 675.0, 420.0
@@ -106,13 +106,13 @@ def _d_surfaces(s: SVG, th: Theme) -> None:
     _box_solid(s, th, bx2, gy2, 46, 40, 58)
     _box_wire(s, th, bx2, gy2, 96, 90, 108, th.accent)
     s.text(bx2, gy2 + 40, "Measurement surface", 17, th.muted)
-    s.text(bx2, gy2 + 64, "one plane · S = 4(ab+bc+ca)", 18, th.accent,
-           bold=True, mono=True)
+    s.text(bx2, gy2 + 64, "one plane · $S = 4(a·b+b·c+c·a)$", 18, th.accent,
+           bold=True)
 
     # Measurement distance d: vertical clearance between the source top face
     # and the enveloping measurement surface (labelled arrow + caption above).
-    s.text(bx2, 208, "measurement distance d", 18, th.secondary, bold=True)
-    s.dim(bx2, gy2 - 108, bx2, gy2 - 58, "d", offset=0, size=20,
+    s.text(bx2, 208, "measurement distance $d$", 18, th.secondary, bold=True)
+    s.dim(bx2, gy2 - 108, bx2, gy2 - 58, "$d$", offset=0, size=20,
           label_side="right")
 
 
@@ -132,33 +132,33 @@ def _d_methods(s: SVG, th: Theme) -> None:
         ("ISO 3744 / 3746", "Free field over a reflecting plane",
          "Grade 2 / 3 (engineering / survey)",
          "Sound pressure · enveloping surface",
-         "LW = L̄'p + 10 log10(S/S₀) − K1 − K2",
-         "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)", th.primary, "hemi"),
+         "$L_W = L̄′_p + 10 log_{10}(S/S_0) − K_1 − K_2$",
+         "$K_{2A}$ ≤ 4 dB (3744) / ≤ 7 dB (3746)", th.primary, "hemi"),
         ("ISO 3745", "Qualified anechoic / hemi-anechoic room",
          "Grade 1 (precision)",
          "Sound pressure · fixed 20 / 40 array",
-         "LW = L̄p + 10 log10(S/S₀) + C₁+C₂+C₃",
-         "r ≥ 2 d₀ , qualified free field", th.primary, "anech"),
+         "$L_W = L̄_p + 10 log_{10}(S/S_0) + C_1+C_2+C_3$",
+         "$r ≥ 2 d_0$ , qualified free field", th.primary, "anech"),
         ("ISO 3741", "Reverberation test room",
          "Grade 1 (precision)",
          "Sound pressure · diffuse field",
-         "LW ← L̄p , A , V , S , f",
-         "V ≥ 200 m³ , source ≤ 2 % of V", th.accent, "reverb"),
+         "$L_W ← L̄_p , A , V , S , f$",
+         "$V$ ≥ 200 m³ , source ≤ 2 % of $V$", th.accent, "reverb"),
         ("ISO 9614-2", "In situ — any environment",
          "Grade 2 / 3 (engineering / survey)",
          "Sound intensity · scanning",
-         "LW = 10 log10 |Σ IᵢSᵢ| / W₀",
-         "no non-positive bands · FpI < Ld", th.secondary, "probe"),
+         "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$",
+         "no non-positive bands · $F_{pI} < L_d$", th.secondary, "probe"),
         ("ISO 9614-3", "In situ — any environment",
          "Grade 1 (precision)",
          "Sound intensity · scanning, tighter",
-         "LW = 10 log10 |Σ IᵢSᵢ| / W₀",
+         "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$",
          "five Annex C criteria per band", th.secondary, "probe"),
         ("ISO/TS 7849-1 / -2", "Any — no acoustic measurement",
-         "Upper limit (ε = 1) / engineering",
+         "Upper limit ($ε = 1$) / engineering",
          "Surface velocity · accelerometers",
-         "LWA = LvA + 10 lg(S/S₀) + 10 lg ε",
-         "ε assumed (-1) or measured (-2)", th.fg, "accel"),
+         "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$",
+         "$ε$ assumed (-1) or measured (-2)", th.fg, "accel"),
     ]
     cw, ch, gap = 286.0, 300.0, 12.0
     x0 = (900 - (3 * cw + 2 * gap)) / 2
@@ -220,7 +220,7 @@ def _d_methods(s: SVG, th: Theme) -> None:
                    f"L {cxc - 36} {py + 18} L {cxc + 32} {py + 18}",
                    stroke=th.accent, sw=1.7)
             s.circle(cxc + 32, py + 18, 5, th.secondary)
-            s.text(cxc, py + 44, "I⊥", 16, col, bold=True, mono=True)
+            s.text(cxc, py + 44, "$I⊥$", 16, col, bold=True)
 
         # Attribute rows.
         for yy, txt, cc, bold in ((py + 78, env, th.fg, False),
@@ -230,7 +230,7 @@ def _d_methods(s: SVG, th: Theme) -> None:
 
         # Headline relation in a boxed footer, then the binding limit.
         s.rect(x + 6, cbot - 66, cw - 12, 36, "none", col, rx=8, dash="5,4")
-        s.text(cxc, cbot - 43, formula, 11, th.fg, bold=True, mono=True)
+        s.text(cxc, cbot - 43, formula, 11, th.fg, bold=True)
         s.text(cxc, cbot - 12, note, 13, th.muted)
 
 
@@ -279,7 +279,7 @@ def _d_precision_anechoic(s: SVG, th: Theme) -> None:
     pts = [(cx + R * x + 46 * y, gy - 30 * y - R * z) for x, y, z in b1]
     r8 = pts[7]
     s.line(cx, gy, r8[0], r8[1], th.accent, 1.6, dash="6,4")
-    s.text((cx + r8[0]) / 2 + 8, (gy + r8[1]) / 2 + 2, "radius r", 16,
+    s.text((cx + r8[0]) / 2 + 8, (gy + r8[1]) / 2 + 2, "radius $r$", 16,
            th.accent, anchor="start")
     for px, py in pts:
         s.circle(px, py, 6.5, th.secondary)
@@ -288,11 +288,13 @@ def _d_precision_anechoic(s: SVG, th: Theme) -> None:
 
     # Governing relations.
     for y, txt, col, bold in (
-        (514, "LW = ⟨Lp⟩ + 10 log10(S/S0) + C1 + C2 + C3", th.fg, True),
-        (540, "S = 2πr² (hemi-anechoic) · 4πr² (anechoic)", th.primary, True),
-        (564, "K1: per-position background correction", th.muted, False),
-        (587, "C1, C2, C3: meteorological corrections (ps, θ, a(f))",
-         th.muted, False),
+        (514, "$L_W = ⟨L_p⟩ + 10 log_{10}(S/S_0) + C_1 + C_2 + C_3$",
+         th.fg, True),
+        (540, "$S = 2πr^2$ (hemi-anechoic) · $4πr^2$ (anechoic)",
+         th.primary, True),
+        (564, "$K_1$: per-position background correction", th.muted, False),
+        (587, ("$C_1$, $C_2$, $C_3$: meteorological corrections "
+               "($p_s$, $θ$, $a(f)$)"), th.muted, False),
     ):
         s.text(450, y, txt, 19 if bold else 18, col, bold=bold)
 
@@ -309,7 +311,7 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
     _box_wire(s, th, bx, gy, 150, 120, 240, th.primary)
     _box_solid(s, th, bx, gy, 45, 34, 70)
     s.text(bx, gy - 82, "Source", 18, th.fg, bold=True)
-    s.text(bx, 214, "Measurement surface (segments S_i)", 17, th.primary,
+    s.text(bx, 214, "Measurement surface (segments $S_i$)", 17, th.primary,
            bold=True)
 
     # Segment grid on the front face (3 x 3 segments Sᵢ).
@@ -318,7 +320,7 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
         s.line(gx, ft, gx, fb, th.muted, 1.2, dash="4,4")
     for gyy in (ft + 80, ft + 160):
         s.line(fl, gyy, fr, gyy, th.muted, 1.2, dash="4,4")
-    s.text(fl + 50, ft + 46, "S_i", 18, th.fg, bold=True)
+    s.text(fl + 50, ft + 46, "$S_i$", 18, th.fg, bold=True)
 
     # Serpentine scan path across the segment-row centres.
     ys = (ft + 40, ft + 120, ft + 200)
@@ -339,15 +341,16 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
     # Normal-intensity arrows exiting the left column of segments.
     for yy in ys:
         s.arrow(fl, yy, fl - 34, yy + 8, th.secondary, 2.0)
-    s.text(fl - 40, ys[1] + 30, "I_n (normal intensity)", 15, th.secondary,
+    s.text(fl - 40, ys[1] + 30, "$I_n$ (normal intensity)", 15, th.secondary,
            anchor="end")
 
     # Governing relations.
     for y, txt, col, bold in (
-        (505, "P = Σ I_n,i · S_i   (partial powers per segment)", th.fg, True),
-        (533, "LW = 10 log10(P/P0),  P0 = 1 pW", th.accent, True),
-        (559, "Field indicators: F_pIn , FT , FS", th.primary, True),
-        (583, "Five acceptance criteria (Annex C); band invalid if P < 0",
+        (505, "$P = Σ I_{n,i} · S_i$   (partial powers per segment)",
+         th.fg, True),
+        (533, "$L_W = 10 log_{10}(P/P_0)$,  $P_0$ = 1 pW", th.accent, True),
+        (559, "Field indicators: $F_{pIn}$ , $F_T$ , $F_S$", th.primary, True),
+        (583, "Five acceptance criteria (Annex C); band invalid if $P < 0$",
          th.muted, False),
     ):
         s.text(450, y, txt, 19 if bold else 18, col, bold=bold)
@@ -418,13 +421,13 @@ def _d_reverberation_power(s: SVG, th: Theme) -> None:
            anchor="start")
     m1x, m1y = mp(ax, *_REV_MICS[0])
     s.line(sx, sy, m1x, m1y, th.primary, 1.4, dash="6,4")
-    s.text((sx + m1x) / 2, sy - 10, "> d_min", 15, th.primary, bold=True)
+    s.text((sx + m1x) / 2, sy - 10, "$> d_{min}$", 15, th.primary, bold=True)
     m5x, m5y = mp(ax, *_REV_MICS[4])
     m6x, m6y = mp(ax, *_REV_MICS[5])
     s.line(m5x, m5y, m6x, m6y, th.secondary, 1.4, dash="6,4")
     lx_, ly_ = (m5x + m6x) / 2, (m5y + m6y) / 2
     s.line(lx_, ly_, lx_, ly_ - 34, th.secondary, 1.0)
-    s.text(lx_, ly_ - 40, "≥ λ/2", 15, th.secondary, bold=True)
+    s.text(lx_, ly_ - 40, "$≥ λ/2$", 15, th.secondary, bold=True)
 
     s.rect(sx - 16, sy - 13, 32, 26, th.fg, rx=3)
     s.text(sx - 22, sy + 34, "Source under test", 15, th.fg, bold=True,
@@ -452,23 +455,24 @@ def _d_reverberation_power(s: SVG, th: Theme) -> None:
     # ===== Footer: the rules the drawing cannot dimension =====
     s.line(50, 386, 850, 386, th.muted, 1.0)
     for k, (txt, col, bold) in enumerate((
-        ("d_min = D₁ √(V / T₆₀) ,  D₁ = 0,08  (0,16 recommended below 5 kHz)",
-         th.primary, True),
-        (("V = 200 m³ · T₆₀ = 2,0 s  →  d_min = 0,8 m,  or 1,6 m at the "
-          "recommended D₁"), th.primary, True),
-        (("six positions: > 1,0 m from every room surface · > d_min from the "
-          "source · spacing ≥ λ/2 (1,7 m at 100 Hz)"), th.fg, False),
-        (("traverse instead: ≥ d_min from the source · ≥ 1,0 m from any "
+        (("$d_{min} = D_1 √(V / T_{60})$ ,  $D_1$ = 0,08  "
+          "(0,16 recommended below 5 kHz)"), th.primary, True),
+        (("$V$ = 200 m³ · $T_{60}$ = 2,0 s  →  $d_{min}$ = 0,8 m,  or 1,6 m "
+          "at the recommended $D_1$"), th.primary, True),
+        (("six positions: > 1,0 m from every room surface · $> d_{min}$ from "
+          "the source · spacing $≥ λ/2$ (1,7 m at 100 Hz)"), th.fg, False),
+        (("traverse instead: $≥ d_{min}$ from the source · ≥ 1,0 m from any "
           "surface · ≥ 0,5 m from a diffuser"), th.fg, False),
-        (("· not within 10° of a room surface · length ≥ 3λ or 10,3 m, "
+        (("· not within 10° of a room surface · length $≥ 3λ$ or 10,3 m, "
           "whichever is smaller"), th.fg, False),
-        (("comparison method: the same six positions, and no A, no V, no S, "
-          "no Waterhouse and no C₁ in Eq. 21"), th.accent, True),
+        (("comparison method: the same six positions, and no $A$, no $V$, "
+          "no $S$, no Waterhouse and no $C_1$ in Eq. 21"), th.accent, True),
         (("averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · "
           "background at the same positions, just before or after"),
          th.secondary, True),
-        (("hard walls, α < 0,06 within one wavelength of the source · T₆₀ per "
-          "ISO 3382-2 from the first 10 dB or 15 dB only"), th.muted, False),
+        (("hard walls, $α < 0,06$ within one wavelength of the source · "
+          "$T_{60}$ per ISO 3382-2 from the first 10 dB or 15 dB only"),
+         th.muted, False),
     )):
         s.text(58, 412 + k * 23, txt, 15, col, anchor="start", bold=bold)
 
@@ -509,12 +513,12 @@ def _d_box_array(s: SVG, th: Theme) -> None:
                    (tx, ty + td), (tx + tw / 2, ty + td), (tx + tw, ty + td),
                    (tx + tw / 4, ty + td / 2), (tx + 3 * tw / 4, ty + td / 2)):
         key(px, py, None)
-    s.dim(tx + tw / 2, ty + td + 30, tx + tw, ty + td + 30, "≤ 3d", offset=0,
+    s.dim(tx + tw / 2, ty + td + 30, tx + tw, ty + td + 30, "$≤ 3d$", offset=0,
           size=16)
-    s.dim(tx, ty + 34, tx + (tw - rw) / 2, ty + 34, "d = 1 m", offset=0,
+    s.dim(tx, ty + 34, tx + (tw - rw) / 2, ty + 34, "$d$ = 1 m", offset=0,
           size=16)
-    s.text(tx + tw / 2, ty + td + 74, "2a = l₁ + 2d = 3,4 m   ·   2b = 2,9 m",
-           16, th.accent, mono=True)
+    s.text(tx + tw / 2, ty + td + 74,
+           "$2a = l_1 + 2d$ = 3,4 m   ·   $2b$ = 2,9 m", 16, th.accent)
 
     # ===== Right: side view =====
     ex, gy = 512.0, 336.0               # left edge and the reflecting plane
@@ -540,24 +544,25 @@ def _d_box_array(s: SVG, th: Theme) -> None:
     dx_, dy_ = ox - ex, oy - (gy - eh)
     n = (dx_ ** 2 + dy_ ** 2) ** 0.5
     key(ex, gy - eh, (44 * dx_ / n, 44 * dy_ / n))
-    s.text(ex + 6, gy - eh - 12, "at a corner: aimed at O", 14, th.muted,
+    s.text(ex + 6, gy - eh - 12, "at a corner: aimed at $O$", 14, th.muted,
            anchor="start")
     s.circle(ox, oy, 3.8, th.fg)
-    s.text(ox + 10, oy - 8, "O", 16, th.fg, bold=True, anchor="start")
-    s.dim(ex + ew, gy, ex + ew, gy - eh, "c = 2,1 m", offset=36, size=16,
+    s.text(ox + 10, oy - 8, "$O$", 16, th.fg, bold=True, anchor="start")
+    s.dim(ex + ew, gy, ex + ew, gy - eh, "$c$ = 2,1 m", offset=36, size=16,
           label_side="right")
 
     # ===== Footer =====
     s.line(50, 418, 850, 418, th.muted, 1.0)
     for k, (txt, col, bold) in enumerate((
-        (("S = 4(ab + bc + ca) = 36,3 m²   for l₁ × l₂ × l₃ = "
-          "1,4 × 0,9 × 1,1 m at d = 1 m"), th.accent, True),
+        (("$S = 4(a·b + b·c + c·a)$ = 36,3 m²   for $l_1 × l_2 × l_3$ = "
+          "1,4 × 0,9 × 1,1 m at $d$ = 1 m"), th.accent, True),
         (("each of the five planes is split on its own into equal partial "
-          "areas of side ≤ 3d (clause C.1)"), th.fg, False),
+          "areas of side $≤ 3d$ (clause C.1)"), th.fg, False),
         (("key positions: the centre of every partial area, plus its corners "
           "except those in the reflecting plane"), th.fg, False),
-        (("nine is the minimum, for one partial area per plane; here 2a > 3d, "
-          "so the long faces split and the array grows"), th.muted, False),
+        (("nine is the minimum, for one partial area per plane; here "
+          "$2a > 3d$, so the long faces split and the array grows"),
+         th.muted, False),
         ("the survey method (ISO 3746) keeps only the partial-area centres",
          th.muted, False),
     )):
@@ -596,8 +601,8 @@ def _d_radiation_factor(s: SVG, th: Theme) -> None:
         s.circle(cxp, cyp, 1.5, th.bg)
     _accel(s, cells[5][0], cells[5][1] - 4)
     _motion_arrows(s, cells[5][0], cells[5][1] - 46, 14, th.secondary)
-    s.text(bx - 40, 120, "⟨v_j²⟩ on the casing", 17, th.secondary, bold=True,
-           mono=True)
+    s.text(bx - 40, 120, "$⟨v_j^2⟩$ on the casing", 17, th.secondary,
+           bold=True)
     s.line(bx - 10, 130, bx - 44, 196, th.muted, 1.0)
 
     # The ISO 9614 measurement surface, offset 0,25 m from the casing.
@@ -623,26 +628,25 @@ def _d_radiation_factor(s: SVG, th: Theme) -> None:
     # Radiated power leaving the surface.
     for yy in (fy + 26, fy + 76, fy + 126):
         s.arrow(fx0 - off, yy, fx0 - off - 34, yy + 8, th.primary, 2.0)
-    s.text(fx0 - off - 44, fy + 82, "P_j", 18, th.primary, bold=True,
-           mono=True, anchor="end")
+    s.text(fx0 - off - 44, fy + 82, "$P_j$", 18, th.primary, bold=True,
+           anchor="end")
 
     # Relation strip.
     lx = 590.0
-    s.text(lx, 120, "Determining ε_j (Part 2)", 19, th.fg, bold=True,
+    s.text(lx, 120, "Determining $ε_j$ (Part 2)", 19, th.fg, bold=True,
            anchor="start")
     for y, txt, col, bold in (
-        (154, "ε_j = P_j / (Z_c,n ⟨v_j²⟩ S)", th.primary, True),
-        (186, "P_j : ISO 9614 band power", th.muted, False),
-        (212, "⟨v_j²⟩ : surface-averaged", th.muted, False),
+        (154, "$ε_j = P_j / (Z_{c,n} ⟨v_j^2⟩ S)$", th.primary, True),
+        (186, "$P_j$ : ISO 9614 band power", th.muted, False),
+        (212, "$⟨v_j^2⟩$ : surface-averaged", th.muted, False),
         (238, "normal velocity, same bands", th.muted, False),
     ):
-        s.text(lx, y, txt, 16 if bold else 15, col, anchor="start", bold=bold,
-               mono=bold)
+        s.text(lx, y, txt, 16 if bold else 15, col, anchor="start", bold=bold)
     s.rect(lx - 10, 268, 260, 118, th.panel, th.secondary, rx=10, sw=2.0)
     for k, txt in enumerate((
         "one machine, one run:", "the same operating mode,",
         "the same mounting, the same bands.",
-        "ε_j is a property of the structure",
+        "$ε_j$ is a property of the structure",
         "and its excitation together.",
     )):
         s.text(lx, 292 + k * 22, txt, 15, th.fg, anchor="start",
@@ -651,8 +655,8 @@ def _d_radiation_factor(s: SVG, th: Theme) -> None:
            "the rest of the family", 17, th.fg, bold=True)
     s.text(450, 478, "mean segment-to-source distance ≥ 200 mm (ISO 9614-2, "
            "clause 8.2)", 16, th.muted)
-    s.text(450, 506, "Part 1 skips this measurement and sets ε = 1, which is "
-           "why it returns an upper limit", 16, th.muted)
+    s.text(450, 506, "Part 1 skips this measurement and sets $ε = 1$, which "
+           "is why it returns an upper limit", 16, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -689,8 +693,8 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
     capsules(cx, cy, th.secondary)
     s.text(cx, cy + 84, "pink or white noise, 45 Hz to 7,1 kHz", 14, th.muted)
     s.text(cx, cy + 106, "both capsules within ± 0,1 dB", 14, th.muted)
-    s.text(cx, cy + 134, "δpI0 = L_p − L_I0", 18, th.primary, bold=True,
-           mono=True)
+    s.text(cx, cy + 134, "$δ_{pI0} = L_p − L_{I0}$", 18, th.primary,
+           bold=True)
 
     # --- 2: the sound calibrator on one capsule at a time -------------------
     x1 = tops[1]
@@ -716,14 +720,13 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
     s.text(cx, cy + 100, "measurement surface", 14, th.muted)
     s.arrow(sxl + 12, cy - 74, sxl + 92, cy - 74, th.muted, 2.0)
     s.text(sxl + 52, cy - 82, "energy leaving the source", 13, th.muted)
-    for yy, col, lab, sgn in ((cy - 36, th.secondary, "+ I_n", 1.0),
-                              (cy + 36, th.primary, "− I_n", -1.0)):
+    for yy, col, lab, sgn in ((cy - 36, th.secondary, "$+ I_n$", 1.0),
+                              (cy + 36, th.primary, "$− I_n$", -1.0)):
         s.line(cx - 34, yy, cx + 34, yy, th.fg, 2.0)
         s.circle(cx - 14, yy, 5.5, th.fg)
         s.circle(cx + 14, yy, 5.5, th.fg)
         s.arrow(cx, yy - 20, cx + sgn * 38, yy - 20, col, 2.0)
-        s.text(cx + 50, yy + 5, lab, 15, col, bold=True, mono=True,
-               anchor="start")
+        s.text(cx + 50, yy + 5, lab, 15, col, bold=True, anchor="start")
     _rot_arrow(s, cx, cy, 46.0, 250.0, 470.0, th.muted, 1.8)
     s.text(cx - 52, cy + 5, "180°", 15, th.muted, anchor="end")
     s.text(cx, cy + 124, "acoustic centre held in place", 14, th.muted)
@@ -738,8 +741,8 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
         "same signs → the two channels are swapped, or one is inverted",
         ("more than 1,5 dB apart → the probe disturbs its own field, or the "
          "channels are not matched"),
-        ("δpI0 belongs to the probe, its spacer and the analyser together — "
-         "not to the microphones"),
+        ("$δ_{pI0}$ belongs to the probe, its spacer and the analyser "
+         "together — not to the microphones"),
     )):
         s.text(60, 482 + k * 24, txt, 15, th.muted, anchor="start")
 
@@ -790,7 +793,7 @@ def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:
     s.text(mx + 24, ax_y - 24, "Measurement microphone", 17, th.fg, bold=True)
 
     # Reference distance, drafting style, between baffle and capsule tip.
-    s.dim(fx, ax_y, mx - 12, ax_y, "r = 1 m", offset=92)
+    s.dim(fx, ax_y, mx - 12, ax_y, "$r$ = 1 m", offset=92)
 
     # Drive: amplifier delivering 1 W into the rated impedance.
     s.rect(85, 383, 140, 54, th.panel, th.primary, rx=8, sw=2)
@@ -799,10 +802,12 @@ def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:
     s.line(155, 383, 155, 345, th.fg, 1.6)
     s.line(155, 345, fx - 62, 345, th.fg, 1.6)
 
-    # Governing relations.
+    # Governing relations. The Up, Lp(1 m) and LM relations stay plain: each
+    # carries a unit as a factor or an argument (1 W, 1 m, 1 V/Pa), and the
+    # composer has no upright run for a single-letter unit inside math.
     for y, txt, col, bold in (
-        (508, "Characteristic sensitivity: Lp at 1 m for 1 W into the rated impedance",
-         th.fg, True),
+        (508, ("Characteristic sensitivity: $L_p$ at 1 m for 1 W into the "
+               "rated impedance"), th.fg, True),
         (534, "Up = √(R · 1 W): 2.83 V is 1 W into 8 Ω but 2 W into 4 Ω (+3 dB)",
          th.secondary, True),
         (559, "Lp(1 m) = Lp(r) + 20 log10(r / 1 m)   (far field, inverse-distance law)",
@@ -850,7 +855,8 @@ def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
     # One accelerometer drawn explicitly, with its vibratory motion.
     _accel(s, pts[5][0], pts[5][1] - 4)
     _motion_arrows(s, pts[5][0], pts[5][1] - 46, 16, th.secondary)
-    s.text(250, 150, "Vibrating measurement surface S", 19, th.fg, bold=True)
+    s.text(250, 150, "Vibrating measurement surface $S$", 19, th.fg,
+           bold=True)
     s.line(310, 160, 340, 228, th.muted, 1.0)
 
     # Radiated sound from the surface.
@@ -870,20 +876,20 @@ def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
 
     # Number of measurement positions and the survey relation.
     lx = 575.0
-    s.text(lx, 110, "Initial number of positions N", 19, th.fg, bold=True,
+    s.text(lx, 110, "Initial number of positions $N$", 19, th.fg, bold=True,
            anchor="start")
-    for y, txt in ((140, "S < 1 m²   →   5"),
-                   (166, "1 m² ≤ S ≤ 10 m²  →  10"),
-                   (192, "S > 10 m²  →  S / S₀")):
-        s.text(lx, y, txt, 16, th.fg, anchor="start", mono=True)
-    s.text(lx, 220, "one accelerometer per cell of area S/N", 15, th.muted,
+    for y, txt in ((140, "$S$ < 1 m²   →   5"),
+                   (166, "1 m² ≤ $S$ ≤ 10 m²  →  10"),
+                   (192, "$S$ > 10 m²  →  $S / S_0$")):
+        s.text(lx, y, txt, 16, th.fg, anchor="start")
+    s.text(lx, 220, "one accelerometer per cell of area $S/N$", 15, th.muted,
            anchor="start")
     s.text(lx, 284, "Survey sound power", 19, th.fg, bold=True, anchor="start")
     # Two logarithms in one line: the smaller face keeps it inside the column.
-    s.text(lx, 314, "LWA = LvA + 10 log10(S/S₀) + 10 log10 ε", 13, th.primary,
-           anchor="start", bold=True, mono=True)
-    s.text(lx, 342, "ε = 1 assumed → upper limit LWA,max", 15, th.muted,
-           anchor="start")
+    s.text(lx, 314, "$L_{WA} = L_{vA} + 10 log_{10}(S/S_0) + 10 log_{10} ε$",
+           13, th.primary, anchor="start", bold=True)
+    s.text(lx, 342, "$ε = 1$ assumed → upper limit $L_{WA,max}$", 15,
+           th.muted, anchor="start")
     s.text(lx, 368, "normal surface velocity, A-weighted r.m.s.", 15,
            th.muted, anchor="start")
 
@@ -903,11 +909,11 @@ def _d_swept_sine(s: SVG, th: Theme) -> None:
         s.text((x0 + x1) / 2, y0 + 32.0, l1, 18, th.fg, bold=True)
         s.text((x0 + x1) / 2, y0 + 56.0, l2, 14, th.muted)
 
-    box(60, 300, 64, "Exponential sweep x(t)", "20 Hz → 6 kHz in T = 4 s",
+    box(60, 300, 64, "Exponential sweep $x(t)$", "20 Hz → 6 kHz in $T$ = 4 s",
         th.fg)
     box(340, 560, 64, "Device under test", "weakly nonlinear: gain + harmonics",
         th.primary)
-    box(600, 840, 64, "Recording y(t)", "sweep + distortion products", th.fg)
+    box(600, 840, 64, "Recording $y(t)$", "sweep + distortion products", th.fg)
     s.arrow(300.0, 102.0, 336.0, 102.0, th.fg, 2.0)
     s.arrow(560.0, 102.0, 596.0, 102.0, th.fg, 2.0)
     box(520, 840, 180, "Deconvolve with the inverse filter",
@@ -938,23 +944,25 @@ def _d_swept_sine(s: SVG, th: Theme) -> None:
     s.rect(505, 358, 62, 72, "none", th.secondary, rx=8, sw=1.2, dash="5,4")
     s.rect(432, 382, 60, 48, "none", th.accent, rx=8, sw=1.2, dash="5,4")
     s.rect(380, 402, 54, 28, "none", th.muted, rx=6, sw=1.0, dash="5,4")
-    s.text(663.0, 310.0, "h1 (linear), t = 0", 15, th.primary, bold=True)
-    s.text(536.0, 346.0, "h2", 15, th.secondary, bold=True)
-    s.text(462.0, 370.0, "h3", 15, th.accent, bold=True)
-    s.text(398.0, 396.0, "h4", 13, th.muted)
+    s.text(663.0, 310.0, "$h_1$ (linear), $t = 0$", 15, th.primary, bold=True)
+    s.text(536.0, 346.0, "$h_2$", 15, th.secondary, bold=True)
+    s.text(462.0, 370.0, "$h_3$", 15, th.accent, bold=True)
+    s.text(398.0, 396.0, "$h_4$", 13, th.muted)
     s.text(210.0, 344.0, "harmonic orders arrive early,", 15, th.muted,
            italic=True)
     s.text(210.0, 366.0, "each in its own window", 15, th.muted, italic=True)
 
     # Pre-arrival advances (260 px per second).
-    s.dim(514.0, ax_y, 640.0, ax_y, "L·ln 2 = 0.49 s", offset=42, size=15)
-    s.dim(440.0, ax_y, 640.0, ax_y, "L·ln 3 = 0.77 s", offset=80, size=15)
+    s.dim(514.0, ax_y, 640.0, ax_y, "$L·ln 2$ = 0.49 s", offset=42, size=15)
+    s.dim(440.0, ax_y, 640.0, ax_y, "$L·ln 3$ = 0.77 s", offset=80, size=15)
 
     s.text(450.0, 562.0,
-           "L = T / ln(f2/f1) = 0.70 s here; the order-n products compress L·ln n ahead of the linear response",
+           "$L = T / ln(f_2/f_1)$ = 0.70 s here; the order-$n$ products "
+           "compress $L·ln n$ ahead of the linear response",
            17, th.fg, bold=True)
     s.text(450.0, 590.0,
-           "window each arrival  →  H1(f), H2(f), H3(f), …  →  THD(f) = √( Σ |Hn(nf)|² ) / |H1(f)|",
+           "window each arrival  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →  "
+           "$THD(f) = √( Σ |H_{n}(n f)|^2 ) / |H_{1}(f)|$",
            16, th.primary)
 
 
@@ -974,11 +982,11 @@ def _d_program_loudness(s: SVG, th: Theme) -> None:
         s.text(cx, y + 25, l1, 15, th.fg, bold=True)
         s.text(cx, y + 45, l2, 12, th.muted)
 
-    step(52, "Programme x — channel weights Gi: 1.0 front, 1.41 surround",
+    step(52, "Programme $x$ — channel weights $G_i$: 1.0 front, 1.41 surround",
          "anchor: a 0 dB FS 997 Hz sine on one front channel reads "
          "−3.01 LKFS", th.fg)
     step(138, "K-weighting: +4 dB spherical-head shelf + RLB high-pass",
-         "LK = −0.691 + 10·log10 Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
+         "$L_K = −0.691 + 10·log_{10} Σ G_i·z_i$;  LKFS ≡ LUFS, 1 LU = 1 dB",
          th.primary)
     step(224, "Mean square in 400 ms blocks, 75 % overlap",
          "absolute gate: blocks below −70 LUFS are dropped", th.primary)
@@ -986,7 +994,7 @@ def _d_program_loudness(s: SVG, th: Theme) -> None:
          "example: 10 s at −23 dBFS + 30 s of quiet → threshold "
          "−39.0 LUFS", th.primary)
     s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
-    s.text(cx, 421, "Integrated loudness I = −23.1 LUFS: the tail is "
+    s.text(cx, 421, "Integrated loudness $I$ = −23.1 LUFS: the tail is "
            "gated out", 16, th.fg, bold=True)
     s.text(cx, 443, "EBU R 128 target −23.0 LUFS; tolerance ±0.2 LU in "
            "QC, ±1.0 LU live", 12, th.muted)
@@ -1004,7 +1012,8 @@ def _d_program_loudness(s: SVG, th: Theme) -> None:
     s.text(780, 71, "raw signal", 11, th.muted)
 
     s.rect(70, 492, 360, 82, th.panel, th.secondary, rx=10, sw=2)
-    s.text(250, 517, "Loudness range LRA = P95 − P10", 14, th.fg, bold=True)
+    s.text(250, 517, "Loudness range $LRA = P_{95} − P_{10}$", 14, th.fg,
+           bold=True)
     s.text(250, 538, "short-term 3 s windows, deeper −20 LU gate", 11,
            th.muted)
     s.text(250, 558, "10.0 LU on the Tech 3342 two-step case", 11,
@@ -1012,7 +1021,7 @@ def _d_program_loudness(s: SVG, th: Theme) -> None:
     s.rect(470, 492, 360, 82, th.panel, th.secondary, rx=10, sw=2)
     s.text(650, 517, "True peak: 4× oversampling, in dBTP", 14, th.fg,
            bold=True)
-    s.text(650, 538, "the fs/4 tone: sample peak −3.01 dB, true peak "
+    s.text(650, 538, "the $f_s/4$ tone: sample peak −3.01 dB, true peak "
            "+0.12 dBTP", 11, th.muted)
     s.text(650, 558, "R 128 production ceiling −1 dBTP", 11,
            th.secondary, bold=True)
@@ -1053,7 +1062,7 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
                stroke=th.muted, sw=1.2)
     s.text(155, 296, "Enclosure", 17, th.primary, bold=True)
     s.text(178, 428, "Machine", 15, th.fg)
-    s.text(185, 482, "enclosure IL = R − C", 15, th.primary, bold=True)
+    s.text(185, 482, "enclosure $IL = R − C$", 15, th.primary, bold=True)
     s.text(185, 504, "25 dB at 500 Hz", 14, th.fg)
 
     # --- path: duct with expansion chamber, lined elbow and open end -------
@@ -1079,7 +1088,7 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     s.line(566.0, 288.0, 590.0, 272.0, th.muted, 1.0)
     s.text(548, 170, "open end", 14, th.fg, anchor="end")
     s.line(554.0, 176.0, 572.0, 190.0, th.muted, 1.0)
-    s.text(480, 482, "silencer TL peak 6.5 dB at 286 Hz (m = 4)", 14,
+    s.text(480, 482, "silencer TL peak 6.5 dB at 286 Hz ($m = 4$)", 14,
            th.primary, bold=True)
     s.text(480, 504, "lined elbow 6 dB at 1 kHz; open end 18 dB at 63 Hz",
            13, th.fg)
@@ -1089,7 +1098,7 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     s.rect(716, 320, 54, 44, th.bg, th.muted, sw=1.5)
     s.person(806, gy, 92)
     s.text(775, 290, "Operator cabin", 17, th.fg, bold=True)
-    s.text(770, 482, "cabin IL = R − C", 15, th.primary, bold=True)
+    s.text(770, 482, "cabin $IL = R − C$", 15, th.primary, bold=True)
     s.text(770, 504, "31 dB at 1 kHz", 14, th.fg)
 
     # --- captions ----------------------------------------------------------
@@ -1099,10 +1108,14 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     # Both caption lines run the full width of the canvas; the smaller face is
     # what keeps the longest of them (the silencer one) off the right edge.
     s.text(80, 568,
-           "enclosure and cabin share IL = R − C, with C = 10 log10(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)",
+           "enclosure and cabin share $IL = R − C$, with "
+           "$C = 10 log_{10}(0.3 + S_E/R_i)$ = 4.9 dB for a lined interior "
+           "($ᾱ = 0.3$)",
            15, th.fg, anchor="start")
     s.text(80, 596,
-           "reactive silencer: TL = 10 log10[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength",
+           "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 "
+           "sin^{2}(k·L)]$, peaking where the 0.3 m chamber is a quarter "
+           "wavelength",
            15, th.muted, anchor="start")
 
 
@@ -1140,8 +1153,7 @@ def _d_duct_path(s: SVG, th: Theme) -> None:
     s.circle(plant_x + 124, 403, 7, th.primary)
     s.text(plant_x + 124, 342, "1 · Fan, 5000 cfm, 2 in w.g.", 14, th.primary,
            bold=True)
-    s.text(plant_x + 124, 466, "same L_W into both runs", 13, th.muted,
-           mono=True)
+    s.text(plant_x + 124, 466, "same $L_W$ into both runs", 13, th.muted)
 
     # --- the supply run, left to right, above the office ceiling -----------
     supply = (
@@ -1190,8 +1202,8 @@ def _d_duct_path(s: SVG, th: Theme) -> None:
 
     # --- the receiver ------------------------------------------------------
     s.person(room_x + 214, floor_y, 82, seated=True)
-    s.dim(780.0, ceil_y + 6, 780.0, floor_y - 68, "r = 1.83 m", size=13)
-    s.text(room_x + 12, 392, "Q = 2, flush in the ceiling", 13, th.muted,
+    s.dim(780.0, ceil_y + 6, 780.0, floor_y - 68, "$r$ = 1.83 m", size=13)
+    s.text(room_x + 12, 392, "$Q = 2$, flush in the ceiling", 13, th.muted,
            anchor="start")
 
     # --- the legend --------------------------------------------------------
@@ -1272,8 +1284,8 @@ def _d_silencer_iso7235(s: SVG, th: Theme) -> None:
                dash="3,3")
         s.line(x_rd - 8, y - 24, x_rd - 8, y + duct_h + 24, th.muted, 1.2,
                dash="3,3")
-        s.text(x_rd + w_rd, y - 10, "L_pI" if row == 0 else "L_pII", 15,
-               colour, anchor="end", mono=True)
+        s.text(x_rd + w_rd, y - 10, "$L_{pI}$" if row == 0 else "$L_{pII}$",
+               15, colour, anchor="end")
 
     # --- what each element is ----------------------------------------------
     for x, label in ((x_box + w_box / 2, "sealed, lined loudspeaker box"),
@@ -1284,10 +1296,10 @@ def _d_silencer_iso7235(s: SVG, th: Theme) -> None:
     s.text(x_rd + w_rd / 2, 488,
            "three positions on a line inclined to the axis, at mid-length",
            12, th.muted)
-    s.text(x_ob + w_ob / 2, 488, "r ≤ 0.3 planes", 12, th.muted)
+    s.text(x_ob + w_ob / 2, 488, "$r ≤ 0.3$ planes", 12, th.muted)
 
     # --- the quantity and its qualification rules ---------------------------
-    s.text(60, 532, "D_i = L_pI − L_pII, one third octave at a time", 17,
+    s.text(60, 532, "$D_i = L_{pI} − L_{pII}$, one third octave at a time", 17,
            th.fg, anchor="start")
     left = (
         "modal filter: ≥ 3 dB on the fundamental at the low-frequency end,",
@@ -1296,7 +1308,7 @@ def _d_silencer_iso7235(s: SVG, th: Theme) -> None:
         "matched within 5 % in every linear dimension (5.2.3)",
     )
     right = (
-        "reflection coefficient r ≤ 0.3 at the source and receiving",
+        "reflection coefficient $r ≤ 0.3$ at the source and receiving",
         "qualification planes (5.2.2.5, 5.2.4.3)",
         "signal ≥ 6 dB and preferably ≥ 10 dB above the background",
         "(5.2.2.2); IEC 61260 third octaves, class 1 chain (5.2.4.6)",
@@ -1344,7 +1356,7 @@ def _d_room_to_room(s: SVG, th: Theme) -> None:
     s.text(xd - 10, 288, "Operator room 5 × 5 × 3 m", 16, th.fg, bold=True,
            anchor="end")
     s.text(xd - 10, 306, "carpet, same ceiling", 13, th.muted, anchor="end")
-    s.text(xb + 6, 250, "S_w", 15, th.secondary, bold=True)
+    s.text(xb + 6, 250, "$S_w$", 15, th.secondary, bold=True)
 
     # --- the blower in the floor-wall intersection: Q = 4 ------------------
     s.path(f"M {xa} {fl} L {xa + 104} {fl} A 104 104 0 0 0 {xa} {fl - 104} Z",
@@ -1356,16 +1368,16 @@ def _d_room_to_room(s: SVG, th: Theme) -> None:
         s.path(f"M {xa + 31 + r * 0.30:.0f} {fl - 21 - r:.0f} "
                f"A {r} {r} 0 0 1 {xa + 31 + r:.0f} {fl - 21 - r * 0.30:.0f}",
                stroke=th.muted, sw=1.1)
-    s.text(xa + 118, fl - 84, "Q = 4", 15, th.primary, anchor="start",
+    s.text(xa + 118, fl - 84, "$Q = 4$", 15, th.primary, anchor="start",
            bold=True)
 
     # --- the path across the partition -------------------------------------
     s.arrow(xa + 250, 350, xb - 6, 350, th.primary, 2.2)
-    s.text(xa + 250, 340, "L_p1", 14, th.primary, anchor="start", mono=True)
+    s.text(xa + 250, 340, "$L_{p1}$", 14, th.primary, anchor="start")
     s.arrow(xc + 6, 350, xd - 78, 350, th.primary, 2.2)
-    s.text(xd - 86, 340, "L_p2", 14, th.primary, anchor="end", mono=True)
+    s.text(xd - 86, 340, "$L_{p2}$", 14, th.primary, anchor="end")
     s.arrow(xc + 6, 380, xb - 6, 380, th.muted, 1.0)
-    s.text(xc + 14, 376, "τ S_w", 12, th.muted, anchor="start", mono=True)
+    s.text(xc + 14, 376, "$τ S_w$", 12, th.muted, anchor="start")
     s.person(xd - 40, fl, 78)
 
     # --- the flanking route the equation does not price --------------------
@@ -1381,19 +1393,21 @@ def _d_room_to_room(s: SVG, th: Theme) -> None:
 
     # --- the numbers, outside the rooms -------------------------------------
     s.text(50, 480, "source side — blower on the floor at a wall mid-point: "
-                    "L_W = 105 dB at 125 Hz, Q = 4 adds 6.0 dB, L_p1 = 107.0 dB",
+                    "$L_W$ = 105 dB at 125 Hz, $Q = 4$ adds 6.0 dB, "
+                    "$L_{p1}$ = 107.0 dB",
            14, th.fg, anchor="start")
     s.text(50, 502, "partition — 5 m × 3 m = 15 m², TL = 39 dB at 125 Hz; "
-                    "the τ S_w returned to the source room is off by default",
+                    "the $τ S_w$ returned to the source room is off by default",
            14, th.fg, anchor="start")
-    s.text(50, 524, "receiving side — S₂α₂ = 5.5 m² at 125 Hz rising to "
-                    "39.2 m² at 4 kHz; L_p2 = 72.4 dB against 60 dB for NC 45",
+    s.text(50, 524, "receiving side — $S_{2}α_{2}$ = 5.5 m² at 125 Hz rising to "
+                    "39.2 m² at 4 kHz; $L_{p2}$ = 72.4 dB against 60 dB for "
+                    "NC 45",
            14, th.fg, anchor="start")
 
     # --- the equation and where it turns over -------------------------------
-    s.text(50, 558, "NR = TL − 10 log10[S_w / (S₂α₂ + τ S_w)]", 17, th.fg,
-           anchor="start")
-    s.text(50, 584, "S₂α₂ passes the 15 m² of the wall between 250 and "
+    s.text(50, 558, "$NR = TL − 10 log_{10}[S_w / (S_{2}α_{2} + τ S_w)]$", 17,
+           th.fg, anchor="start")
+    s.text(50, 584, "$S_{2}α_{2}$ passes the 15 m² of the wall between 250 and "
                     "500 Hz: below it the wall delivers less than its TL",
            15, th.primary, anchor="start")
     s.text(50, 608, "both levels are reverberant-field spatial averages, and "
@@ -1417,8 +1431,8 @@ def _d_machine_enclosure(s: SVG, th: Theme) -> None:
     t = 12.0                       # drawn wall thickness
 
     s.ground(gy, 40.0, 700.0)
-    s.text(455, 92, "S_E = 24 m² of exposed shell — a 3.0 × 2.0 × 1.8 m box, "
-                    "five faces", 16, th.primary, bold=True)
+    s.text(455, 92, "$S_E$ = 24 m² of exposed shell — a 3.0 × 2.0 × 1.8 m "
+                    "box, five faces", 16, th.primary, bold=True)
 
     # --- roof: the lined cooling outlet and the sleeved service entry ------
     s.rect(520, 128, 56, yt - 128, "none", th.fg, sw=2.2)
@@ -1438,7 +1452,8 @@ def _d_machine_enclosure(s: SVG, th: Theme) -> None:
            "none", th.accent, sw=2.0, dash="6,4")
     s.rect(x0 + t, yt + t, x1 - x0 - 2 * t, gy - yt - t, "none", th.muted,
            sw=1.4, dash="2,4")
-    s.text(455, 240, "S_i = 30 m², ᾱ_i = 0.30  →  R_i = 12.9 m²", 15, th.fg)
+    s.text(455, 240, "$S_i$ = 30 m², $ᾱ_i = 0.30$  →  $R_i$ = 12.9 m²", 15,
+           th.fg)
     s.text(455, 262, "wall build-up: sheet-steel mass, absorbent lining, "
                      "perforated facing", 13, th.muted)
 
@@ -1459,13 +1474,11 @@ def _d_machine_enclosure(s: SVG, th: Theme) -> None:
         s.line(218, dy, 242, dy, th.accent, 2.6)
     s.rect(218, 452, 24, gy - 452, th.secondary, th.secondary, sw=1.0)
     s.text(206, 252, "access door", 15, th.fg, anchor="end")
-    s.text(202, 272, "1.28 m², R = 15 dB", 13, th.muted, anchor="end",
-           mono=True)
+    s.text(202, 272, "1.28 m², $R$ = 15 dB", 13, th.muted, anchor="end")
     s.text(206, 312, "compression seal", 13, th.accent, anchor="end")
     s.line(208, 308, 216, 274, th.muted, 1.0)
     s.text(206, 420, "unsealed gap at the foot", 13, th.secondary, anchor="end")
-    s.text(206, 440, "0.24 m² = 1 % of S_E", 13, th.secondary, anchor="end",
-           mono=True)
+    s.text(206, 440, "0.24 m² = 1 % of $S_E$", 13, th.secondary, anchor="end")
     s.line(208, 446, 216, 460, th.muted, 1.0)
 
     # --- the lined cooling inlet -------------------------------------------
@@ -1482,12 +1495,13 @@ def _d_machine_enclosure(s: SVG, th: Theme) -> None:
     s.dim(858, yt, 858, gy, "1.8 m", size=15)
 
     # --- the equation and the two results ----------------------------------
-    s.text(40, 560, "IL = R − C,   C = 10 log10(0.3 + S_E/R_i) = 3.4 dB",
+    s.text(40, 560, "$IL = R − C$,   $C = 10 log_{10}(0.3 + S_E/R_i)$ "
+                    "= 3.4 dB",
            17, th.fg, anchor="start")
-    s.text(40, 586, "sealed shell (mean R = 32.3 dB): mean IL = 28.9 dB",
+    s.text(40, 586, "sealed shell (mean $R$ = 32.3 dB): mean IL = 28.9 dB",
            15, th.primary, anchor="start")
     s.text(40, 610, "with the door: 21.4 dB — with the 1 % gap as well: "
-                    "15.1 dB, against the 10 log10(S_E/S_a) = 20 dB cap",
+                    "15.1 dB, against the $10 log_{10}(S_E/S_a)$ = 20 dB cap",
            15, th.secondary, anchor="start")
     s.text(40, 634, "an enclosure delivers its worst element, not its panels",
            15, th.muted, anchor="start")
@@ -1566,8 +1580,8 @@ def _d_distortion_bench(s: SVG, th: Theme) -> None:
          "(14.12.3.2 a)"),
         ("generator muted: residual < 1/3 of the distortion voltage, or the "
          "result is discarded (14.12.3.2 d)"),
-        ("highest significant harmonic inside the band: f₁ ≤ f_limit / n "
-         "(14.12.4.1 — 30 kHz and n = 5 give 6 kHz)"),
+        ("highest significant harmonic inside the band: $f_1 ≤ f_{limit} / n$ "
+         "(14.12.4.1 — 30 kHz and $n = 5$ give 6 kHz)"),
     )
     for k, txt in enumerate(checks):
         s.circle(76, 476 + k * 24, 4.0, th.accent)
@@ -1608,7 +1622,7 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
     s.line(216, 148, 216, 232, th.accent, 1.8, dash="7,4")
     s.line(216, 232, 123, 232, th.accent, 1.8, dash="7,4")
     s.arrow(160, 232, 123, 232, th.accent, 1.8)
-    s.text(233, 252, "loopback — channel 2 fixes t = 0", 14, th.accent)
+    s.text(233, 252, "loopback — channel 2 fixes $t = 0$", 14, th.accent)
 
     # ---- panel (b): acoustic, with the first reflection --------------------
     s.rect(444, 56, 416, 214, th.panel, th.muted, rx=12, sw=1.6)
@@ -1627,21 +1641,23 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
     s.rect(mx + 12, hy - 4, 10, 8, th.fg, rx=2)
 
     s.line(sx + 24, hy, mx - 20, hy, th.fg, 2.0)
-    s.dim(sx, hy, mx, hy, "d = 1.00 m", offset=-38, size=15)
+    s.dim(sx, hy, mx, hy, "$d$ = 1.00 m", offset=-38, size=15)
     fx = (sx + mx) / 2
     s.line(sx, hy, fx, gy, th.secondary, 1.8, dash="8,5")
     s.line(fx, gy, mx, hy, th.secondary, 1.8, dash="8,5")
     s.text(fx, gy - 10, "reflected path 2.60 m", 14, th.secondary)
 
     # ---- what the room costs, under both panels ---------------------------
-    s.text(450, 296, "Reflection-free time t_g = (2.60 − 1.00) m / (343 m/s) "
-           "= 4.7 ms: past that the record is the room, not the loudspeaker.",
+    s.text(450, 296, "Reflection-free time $t_g$ = (2.60 − 1.00) m / "
+           "(343 m/s) = 4.7 ms: past that the record is the room, not the "
+           "loudspeaker.",
            16, th.fg)
 
     # ---- the shared time budget of the harmonic arrivals -------------------
     x0, x1, ty = 90.0, 830.0, 412.0
     s.text(450, 336, "The recording, on the sweep's own time axis: "
-           "f₁ = 20 Hz, f₂ = 6 kHz, T = 4 s, so L = T / ln(f₂/f₁) = 0.70 s",
+           "$f_1$ = 20 Hz, $f_2$ = 6 kHz, $T$ = 4 s, so "
+           "$L = T / ln(f_2/f_1)$ = 0.70 s",
            17, th.fg, bold=True)
     s.line(x0, ty, x1, ty, th.fg, 2.0)
     s.arrow(x1 - 30, ty, x1, ty, th.fg, 2.0)
@@ -1650,12 +1666,12 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
         """Map an arrival time in seconds onto the strip (−1.0 s … +0.3 s)."""
         return x0 + (t + 1.0) / 1.3 * (x1 - 40 - x0)
 
-    for t, lab, col, h in ((0.0, "h₁ (linear)", th.primary, 46.0),
-                           (-0.486, "h₂  −0.49 s", th.secondary, 34.0),
-                           (-0.770, "h₃  −0.77 s", th.accent, 26.0)):
+    for t, lab, col, h in ((0.0, "$h_1$ (linear)", th.primary, 46.0),
+                           (-0.486, "$h_2$  −0.49 s", th.secondary, 34.0),
+                           (-0.770, "$h_3$  −0.77 s", th.accent, 26.0)):
         s.line(tx(t), ty, tx(t), ty - h, col, 3.0)
         s.text(tx(t), ty - h - 9, lab, 15, col, bold=True)
-    s.text(tx(0.0), ty + 22, "t = 0", 14, th.muted)
+    s.text(tx(0.0), ty + 22, "$t = 0$", 14, th.muted)
 
     # The per-order window against the closest spacing.
     s.rect(tx(-0.486), ty + 14, tx(-0.202) - tx(-0.486), 26,
@@ -1663,11 +1679,11 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
     s.text((tx(-0.486) + tx(-0.202)) / 2, ty + 62,
            "per-order window: 8192 samples = 0.17 s at 48 kHz", 14, th.muted)
     s.dim(tx(-0.770), ty + 104, tx(-0.486), ty + 104,
-          "L ln(3/2) = 0.28 s: the closest pair of arrivals", offset=0,
+          "$L ln(3/2)$ = 0.28 s: the closest pair of arrivals", offset=0,
           size=15)
 
     s.text(40, ty + 144, "Record until the decay has died, or the pre-arrivals "
-           "wrap round the circular deconvolution into the end of h₁.",
+           "wrap round the circular deconvolution into the end of $h_1$.",
            16, th.fg, anchor="start")
     s.text(40, ty + 168, "State the drive amplitude and the fade with the "
            "result, and pass the same fade to the analysis.",
@@ -1712,7 +1728,7 @@ def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
         s.circle(cx + r * math.cos(a), cy - r * math.sin(a), 3.6, th.accent)
     s.text(cx - r + 4, cy - 14, "180°", 14, th.accent)
     s.text(cx, cy - r - 14, "90°", 14, th.accent)
-    s.text(cx + 122, cy - 116, "θ stepped by 10° or 15°", 14, th.accent)
+    s.text(cx + 122, cy - 116, "$θ$ stepped by 10° or 15°", 14, th.accent)
 
     # Turntable, with the reference point over the rotation axis.
     s.ellipse(cx, cy, 70, 28, th.panel, th.muted, sw=1.8)
@@ -1734,15 +1750,15 @@ def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
     s.line(cx - 30, cy + 22, cx - 116, cy + 78, th.muted, 1.2, dash="4,4")
     s.text(60, cy + 116, "reference point on the rotation axis:", 14,
            th.muted, anchor="start")
-    s.text(60, cy + 134, "r never changes as θ is swept", 14,
+    s.text(60, cy + 134, "$r$ never changes as $θ$ is swept", 14,
            th.muted, anchor="start")
-    s.dim(cx, cy, mx - 16, cy, "r = 2 m", offset=150, size=16)
+    s.dim(cx, cy, mx - 16, cy, "$r$ = 2 m", offset=150, size=16)
 
     # The drive rule that makes the cut a pattern rather than a response.
     s.rect(596, 62, 264, 128, th.panel, th.secondary, rx=10, sw=2.0)
     s.text(728, 90, "Drive condition (23.1.2.3)", 16, th.fg, bold=True)
     s.text(728, 114, "input voltage retrimmed at each", 14, th.muted)
-    s.text(728, 132, "frequency or band so that L_p on", 14, th.muted)
+    s.text(728, 132, "frequency or band so that $L_p$ on", 14, th.muted)
     s.text(728, 150, "the reference axis stays constant", 14, th.muted)
     s.text(728, 176, "500 Hz · 1 k · 2 k · 4 k · 8 k", 15, th.secondary)
 
@@ -1771,8 +1787,8 @@ def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
     s.text(728, iy + ir + 56, "full radius = 25 dB (clause 3)", 14, th.muted)
 
     s.text(450, 542, "Directivity index: free field on axis against a "
-           "reverberation room, D_i = L_ax − L_p + 10 lg(T/T₀) − 10 lg(V/V₀) "
-           "+ 25 dB (23.3.2.1),", 16, th.fg)
+           "reverberation room, $D_i = L_{ax} − L_p + 10 lg(T/T_0) − "
+           "10 lg(V/V_0)$ + 25 dB (23.3.2.1),", 16, th.fg)
     s.text(450, 566, "or by integrating these polar curves over the sphere "
            "(23.3.2.2).", 16, th.muted)
 
@@ -1815,10 +1831,10 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
     s.line(cx - 18, cy, x0 + 246, cy, th.muted, 1.2, dash="7,5")
     s.text(x0 + w / 2, cy + 78, "one source on the reference axis,", 14,
            th.muted)
-    s.text(x0 + w / 2, cy + 96, "far enough that r ≥ d,", 14, th.muted)
-    s.text(x0 + w / 2, cy + 114, "r ≥ d²/λ and r ≥ 3 × the source", 14,
+    s.text(x0 + w / 2, cy + 96, "far enough that $r ≥ d$,", 14, th.muted)
+    s.text(x0 + w / 2, cy + 114, "$r ≥ d^2/λ$ and $r$ ≥ 3 × the source", 14,
            th.muted)
-    s.text(x0 + w / 2, cy + 144, "M_ff : the undisturbed", 16, th.primary,
+    s.text(x0 + w / 2, cy + 144, "$M_{ff}$ : the undisturbed", 16, th.primary,
            bold=True)
     s.text(x0 + w / 2, cy + 164, "pressure of the plane wave", 15, th.muted)
 
@@ -1833,9 +1849,9 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
     s.text(x1 + w / 2, cy + 78, "sound from every direction,", 14, th.muted)
     s.text(x1 + w / 2, cy + 96, "with equal probability", 14, th.muted)
     s.text(x1 + w / 2, cy + 114, "(a reverberation room)", 14, th.muted)
-    s.text(x1 + w / 2, cy + 144, "M_diff : the r.m.s. of M(θ)", 16, th.accent,
-           bold=True)
-    s.text(x1 + w / 2, cy + 164, "D = 20 lg(M₀ / M_diff)", 15, th.muted)
+    s.text(x1 + w / 2, cy + 144, "$M_{diff}$ : the r.m.s. of $M(θ)$", 16,
+           th.accent, bold=True)
+    s.text(x1 + w / 2, cy + 164, "$D = 20 lg(M_0 / M_{diff})$", 15, th.muted)
 
     # --- 3: pressure, the capsule closed into a coupler ---------------------
     x2 = tops[2]
@@ -1844,11 +1860,11 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
     s.circle(cx - 92, cy, 16, th.panel, th.muted, 1.6)
     s.arrow(cx - 92, cy + 30, cx - 92, cy - 30, th.secondary, 1.6)
     capsule(cx, cy)
-    s.text(cx - 56, cy - 62, "cavity small against λ", 14, th.muted)
+    s.text(cx - 56, cy - 62, "cavity small against $λ$", 14, th.muted)
     s.text(x2 + w / 2, cy + 78, "a coupler or a calibrator:", 14, th.muted)
     s.text(x2 + w / 2, cy + 96, "the pressure the capsule", 14, th.muted)
     s.text(x2 + w / 2, cy + 114, "itself replaces", 14, th.muted)
-    s.text(x2 + w / 2, cy + 144, "M_p : pressure at", 16, th.secondary,
+    s.text(x2 + w / 2, cy + 144, "$M_p$ : pressure at", 16, th.secondary,
            bold=True)
     s.text(x2 + w / 2, cy + 164, "the acoustic entry", 15, th.muted)
 
@@ -1857,8 +1873,8 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
     s.text(54, 408, "The bench (clauses 5.5.2, 5.6.2, 5.7)", 17, th.fg,
            anchor="start", bold=True)
     rules = (
-        ("anechoic room; the spherical wave counts as plane at least λ/2 from "
-         "the centre of curvature at the lowest frequency"),
+        ("anechoic room; the spherical wave counts as plane at least $λ/2$ "
+         "from the centre of curvature at the lowest frequency"),
         ("substitution: the microphone under test and a calibrated reference "
          "at the same point, one after the other (highest accuracy)"),
         ("simultaneous comparison at two nearby points only after showing it "
@@ -1871,7 +1887,7 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
            anchor="end", mono=True)
 
     s.text(450, 528, "Polar cuts (13.1.2 a): distance, sound pressure and "
-           "frequency held constant while θ is stepped, preferably by 10° or "
-           "15°,", 16, th.fg)
+           "frequency held constant while $θ$ is stepped, preferably by 10° "
+           "or 15°,", 16, th.fg)
     s.text(450, 552, "at the octave centres 125 Hz to 16 kHz, with the "
            "reference axis as 0° of the polar diagram.", 16, th.muted)
