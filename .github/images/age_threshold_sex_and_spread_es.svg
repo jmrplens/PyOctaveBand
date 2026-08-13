@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="887.640169pt" height="382.166875pt" viewBox="0 0 887.640169 382.166875" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="892.147982pt" height="382.166875pt" viewBox="0 0 892.147982 382.166875" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 382.166875 
-L 887.640169 382.166875 
-L 887.640169 0 
+L 892.147982 382.166875 
+L 892.147982 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -1166,32 +1166,34 @@ L 741.719083 111.34226
     </g>
    </g>
    <g id="text_37">
-    <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(794.304232 88.066772)">above 70 yr:</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(784.959701 100.069507)">informative only</text>
-    <!-- (clause 4.1, $f \geq 3$ kHz) -->
-    <g style="fill: #d62728" transform="translate(771.140169 112.073803)">
+    <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(766.632357 88.237085)">por encima de 70 años:</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #d62728" transform="translate(785.440951 100.239819)">solo informativo</text>
+    <!-- (capítulo 4.1, $f \geq 3$ kHz) -->
+    <g style="fill: #d62728" transform="translate(767.240169 112.644116)">
      <text>
-      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">(</tspan>
-      <tspan x="3.901367" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">c</tspan>
-      <tspan x="9.399414" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">l</tspan>
-      <tspan x="12.177734" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">a</tspan>
-      <tspan x="18.305664" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">u</tspan>
-      <tspan x="24.643555" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">s</tspan>
-      <tspan x="29.853516" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">e</tspan>
-      <tspan x="36.005859" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
-      <tspan x="39.18457" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">4</tspan>
-      <tspan x="45.546875" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">.</tspan>
-      <tspan x="48.725586" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
-      <tspan x="55.087891" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">,</tspan>
-      <tspan x="58.266602" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
-      <tspan x="66.914062" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">≥</tspan>
-      <tspan x="77.241211" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">3</tspan>
-      <tspan x="83.603516" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
-      <tspan x="86.782227" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">k</tspan>
-      <tspan x="92.573242" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">H</tspan>
-      <tspan x="100.092773" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">z</tspan>
-      <tspan x="105.341797" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #d62728">)</tspan>
-      <tspan x="61.445312" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #d62728">f</tspan>
+      <tspan x="0" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">(</tspan>
+      <tspan x="3.901367" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">c</tspan>
+      <tspan x="9.399414" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">a</tspan>
+      <tspan x="15.527344" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">p</tspan>
+      <tspan x="21.875" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">í</tspan>
+      <tspan x="24.65332" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">t</tspan>
+      <tspan x="28.574219" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">u</tspan>
+      <tspan x="34.912109" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">l</tspan>
+      <tspan x="37.69043" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">o</tspan>
+      <tspan x="43.808594" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="46.987305" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">4</tspan>
+      <tspan x="53.349609" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">.</tspan>
+      <tspan x="56.52832" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">1</tspan>
+      <tspan x="62.890625" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">,</tspan>
+      <tspan x="66.069336" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="74.716797" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">≥</tspan>
+      <tspan x="85.043945" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">3</tspan>
+      <tspan x="91.40625" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728"> </tspan>
+      <tspan x="94.584961" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">k</tspan>
+      <tspan x="100.375977" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">H</tspan>
+      <tspan x="107.895508" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">z</tspan>
+      <tspan x="113.144531" y="-0" style="font-size: 10px; font-family: sans-serif; fill: #d62728">)</tspan>
+      <tspan x="69.248047" y="-0" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #d62728">f</tspan>
      </text>
     </g>
    </g>

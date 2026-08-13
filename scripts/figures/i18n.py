@@ -1300,7 +1300,10 @@ _ES_EXACT = {
         "el término de Waterhouse manda en las bandas graves\n"
         "(1,68 dB a 100 Hz, 0,02 dB a 10 kHz)",
     # The mathtext skips the save-time comma pass: commas baked in, and the
-    # 4.34 inside the math carries the brace-guarded {,} form.
+    # 4.34 inside the math carries the brace-guarded {,} form. The legend
+    # entry carries no words at all, so it needs the same entry to reach the
+    # comma the annotation beside it already shows.
+    "$4.34\\,A/S$": "$4{,}34\\,A/S$",
     "$4.34\\,A/S$ is 0.32 dB in this hard room, and 0.79 dB with the same "
     "room damped to $T_{60}$ = 0.8 s":
         "$4{,}34\\,A/S$ es 0,32 dB en esta cámara reflectante, y 0,79 dB con "
@@ -1541,8 +1544,9 @@ _ES_EXACT = {
     "$s_u$ (worse than the median)": "$s_u$ (peor que la mediana)",
     "$s_l$ (better than the median)": "$s_l$ (mejor que la mediana)",
     "$s_u - s_l$: the asymmetry": "$s_u - s_l$: la asimetría",
-    "above 70 yr:\ninformative only\n(clause 4.1, f ≥ 3 kHz)":
-        "por encima de 70 años:\nsolo informativo\n(capítulo 4.1, f ≥ 3 kHz)",
+    "above 70 yr:\ninformative only\n(clause 4.1, $f \\geq 3$ kHz)":
+        "por encima de 70 años:\nsolo informativo\n"
+        "(capítulo 4.1, $f \\geq 3$ kHz)",
     "The frames the 40 dB rule drops (shaded), and the segment scores under them":
         "Las tramas que descarta la regla de 40 dB (sombreadas) y las "
         "puntuaciones por segmento debajo",
