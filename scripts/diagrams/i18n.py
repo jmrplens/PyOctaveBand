@@ -2349,15 +2349,15 @@ _ES: dict[str, str] = {
     # SOFAR channel (deep sound channel)
     "The SOFAR channel: a deep-ocean sound waveguide":
         "El canal SOFAR: una guía de ondas del océano profundo",
-    "Sound-speed profile c(z)": "Perfil de velocidad del sonido c(z)",
+    "Sound-speed profile $c(z)$": "Perfil de velocidad del sonido $c(z)$",
     "Ray paths near the axis": "Trayectorias de rayos cerca del eje",
     "sea surface": "superficie del mar",
     "source on the channel axis": "fuente en el eje del canal",
     "rays that stay in the channel meet no surface or bottom loss":
         "los rayos que permanecen en el canal no sufren pérdidas en "
         "superficie ni en fondo",
-    "c rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound":
-        "c aumenta hacia la superficie (temperatura) y hacia el fondo "
+    "$c$ rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound":
+        "$c$ aumenta hacia la superficie (temperatura) y hacia el fondo "
         "(presión); el mínimo atrapa el sonido",
     "rays launched within about ±12° of the axis stay trapped and can cross entire oceans":
         "los rayos lanzados a menos de unos ±12° del eje quedan atrapados "
@@ -2419,8 +2419,8 @@ _ES: dict[str, str] = {
     "target strength": "índice de blanco",
     "RL: surface, volume and bottom scattering":
         "RL: dispersión superficie/volumen/fondo",
-    "replaces NL − DI when reverberation-limited":
-        "sustituye a NL − DI si domina la reverberación",
+    "replaces $NL − DI$ when reverberation-limited":
+        "sustituye a $NL − DI$ si domina la reverberación",
     "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²":
         "Niveles de campo re 1 µPa; un nivel de fuente lleva el metro "
         "cuadrado de su distancia, re 1 µPa²m²",
@@ -2431,24 +2431,24 @@ _ES: dict[str, str] = {
     "The range-independent waveguide the three solvers share":
         "La guía de ondas que comparten los tres solucionadores",
     "channel axis": "eje del canal",
-    "sea surface: pressure release, p = 0":
-        "superficie: presión nula, p = 0",
+    "sea surface: pressure release, $p = 0$":
+        "superficie: presión nula, $p = 0$",
     "bottom: Ψ(D) = 0 (pressure release) or dΨ/dz = 0 (rigid)":
         "fondo: Ψ(D) = 0 (presión nula) o dΨ/dz = 0 (rígido)",
-    "source, z_s": "fuente, z_s",
-    "receiver, z": "receptor, z",
-    "turning depth z_t:  c(z_t) = c(z_s)/cos θ₀":
-        "profundidad de retorno z_t:  c(z_t) = c(z_s)/cos θ₀",
+    "source, $z_s$": "fuente, $z_s$",
+    "receiver, $z$": "receptor, $z$",
+    "turning depth $z_t$:  $c(z_t) = c(z_s)/cos θ_0$":
+        "profundidad de retorno $z_t$:  $c(z_t) = c(z_s)/cos θ_0$",
     "modes:": "modos:",
     "rays:": "rayos:",
-    "standing waves in z, travelling as exp(i k_rm r)":
-        "ondas estacionarias en z, que viajan como exp(i k_rm r)",
+    "standing waves in $z$, travelling as $exp(i k_{rm} r)$":
+        "ondas estacionarias en $z$, que viajan como $exp(i k_{rm} r)$",
     "trajectories, travel times, convergence zones":
         "trayectorias, tiempos de viaje, zonas de convergencia",
-    "the envelope marched in r, one step Δr at a time":
-        "la envolvente avanzada en r, un paso Δr cada vez",
-    "All three take the same range-independent c(z): no sediment attenuation, no bathymetry":
-        "Los tres toman el mismo c(z) independiente de la distancia: sin "
+    "the envelope marched in $r$, one step $Δr$ at a time":
+        "la envolvente avanzada en $r$, un paso $Δr$ cada vez",
+    "All three take the same range-independent $c(z)$: no sediment attenuation, no bathymetry":
+        "Los tres toman el mismo $c(z)$ independiente de la distancia: sin "
         "atenuación del sedimento ni batimetría",
     # Marine-mammal exposure assessment
     "Marine-mammal exposure: measured here, assessed there":
@@ -2457,7 +2457,7 @@ _ES: dict[str, str] = {
     "Plan: the two isopleths": "Planta: las dos isopletas",
     "calibrated hydrophone": "hidrófono calibrado",
     "band SEL measured here": "SEL por bandas medido aquí",
-    "range R": "distancia R",
+    "range $R$": "distancia $R$",
     "the criterion applies here": "el criterio se aplica aquí",
     "per-band SEL": "SEL por bandas",
     "weighted cumulative SEL  vs  AUD INJ / TTS":
