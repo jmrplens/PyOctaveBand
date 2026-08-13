@@ -213,7 +213,7 @@ _ES_EXACT = {
     "plate motion": "movimiento de la placa",
     "Response magnitude": "Módulo de la respuesta",
     "Phase [deg]": "Fase [grados]",
-    "-90 deg: resonance": "-90 grados: resonancia",
+    "−90 deg: resonance": "−90 grados: resonancia",
     "below fr: the plate follows the force":
         "por debajo de fr: la placa sigue a la fuerza",
     "at fr: a quarter cycle behind, amplitude peaks":
@@ -3301,7 +3301,7 @@ _ES_EXACT = {
     # anim_loudness_gating: the double gate deciding block by block.
     "The two passes of the EBU R 128 gate (BS.1770-5)":
         "Las dos pasadas de la puerta de EBU R 128 (BS.1770-5)",
-    "absolute gate, -70 LUFS": "puerta absoluta, -70 LUFS",
+    "absolute gate, −70 LUFS": "puerta absoluta, −70 LUFS",
     "Blocks per LU": "Bloques por LU",
     "Loudness range (Tech 3342)": "Rango de sonoridad (3342)",
     "block, counted": "bloque, contado",

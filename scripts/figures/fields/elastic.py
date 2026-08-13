@@ -11,6 +11,7 @@ from typing import Any
 
 import numpy as np
 
+from ..i18n import _fmt_minus
 from ..media import (
     _ANIM_HOLD,
     _ANIM_PILL_BOX,
@@ -488,10 +489,12 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     ml = [10.0 * float(np.log10(1.0 + (np.pi * f * m2 * np.cos(theta)
                                        / (_EL_RHO0 * _EL_C0)) ** 2))
           for f in (0.5 * fc, 2.0 * fc)]
-    verdicts = [T(f"below f_c: the mass law holds: {trans_db[0]:.0f} dB "
-                  f"(it predicts {-ml[0]:.0f})"),
-                T(f"above f_c: trace matches λ_B: {trans_db[1]:.0f} dB, "
-                  f"the mass law said {-ml[1]:.0f}")]
+    verdicts = [T(f"below f_c: the mass law holds: "
+                  f"{_fmt_minus(trans_db[0], '.0f')} dB "
+                  f"(it predicts {_fmt_minus(-ml[0], '.0f')})"),
+                T(f"above f_c: trace matches λ_B: "
+                  f"{_fmt_minus(trans_db[1], '.0f')} dB, "
+                  f"the mass law said {_fmt_minus(-ml[1], '.0f')}")]
     ims: list[Any] = []
     v_txts: list[Any] = []
     for col, (ax, title, data) in enumerate(
