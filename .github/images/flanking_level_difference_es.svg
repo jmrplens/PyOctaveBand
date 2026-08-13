@@ -439,20 +439,80 @@ L 705.763438 28.798125
    </g>
    <g id="text_25">
     <g id="patch_7">
-     <path d="M 541.43306 384.944631 
+     <path d="M 549.790873 384.944631 
 L 695.790873 384.944631 
 Q 700.790873 384.944631 700.790873 379.944631 
-L 700.790873 355.939162 
-Q 700.790873 350.939162 695.790873 350.939162 
-L 541.43306 350.939162 
-Q 536.43306 350.939162 536.43306 355.939162 
-L 536.43306 379.944631 
-Q 536.43306 384.944631 541.43306 384.944631 
+L 700.790873 355.936037 
+Q 700.790873 350.936037 695.790873 350.936037 
+L 549.790873 350.936037 
+Q 544.790873 350.936037 544.790873 355.936037 
+L 544.790873 379.944631 
+Q 544.790873 384.944631 549.790873 384.944631 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(555.568998 364.538576)">Dn,f,w(C;Ctr) = 60(-1;-3) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(541.43306 376.54131)">Dn,f = L1 - L2 - 10 log10(A/A0)</text>
+    <!-- $D_{n,f,w}$($C$;$C_{tr}$) = 60(−1;−3) dB -->
+    <g transform="translate(552.390873 364.537013)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">D</tspan>
+      <tspan x="31.678711" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">C</tspan>
+      <tspan x="42.030273" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">C</tspan>
+      <tspan x="7.700195" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">n</tspan>
+      <tspan x="15.725586" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">f</tspan>
+      <tspan x="21.778809" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">w</tspan>
+      <tspan x="49.012695" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">t</tspan>
+      <tspan x="51.757324" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">r</tspan>
+      <tspan x="12.136719" y="1.093745" style="font-size: 7px; font-family: sans-serif">,</tspan>
+      <tspan x="18.189941" y="1.093745" style="font-size: 7px; font-family: sans-serif">,</tspan>
+      <tspan x="27.777344" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="38.661133" y="-0.40625" style="font-size: 10px; font-family: sans-serif">;</tspan>
+      <tspan x="54.908691" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+      <tspan x="58.810059" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="61.98877" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="70.367676" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="73.546387" y="-0.40625" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="79.908691" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="86.270996" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="90.172363" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="98.55127" y="-0.40625" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="104.913574" y="-0.40625" style="font-size: 10px; font-family: sans-serif">;</tspan>
+      <tspan x="108.282715" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="116.661621" y="-0.40625" style="font-size: 10px; font-family: sans-serif">3</tspan>
+      <tspan x="123.023926" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+      <tspan x="126.925293" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="130.104004" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="136.45166" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
+    <!-- $D_{n,f} = L_1 - L_2 - 10\,\log_{10}(A/A_0)$ -->
+    <g transform="translate(549.790873 376.54131)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">D</tspan>
+      <tspan x="30.73877" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="53.3125" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="120.27985" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">A</tspan>
+      <tspan x="130.489811" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">A</tspan>
+      <tspan x="7.700195" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">n</tspan>
+      <tspan x="15.725586" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">f</tspan>
+      <tspan x="12.136719" y="1.093745" style="font-size: 7px; font-family: sans-serif">,</tspan>
+      <tspan x="36.310059" y="1.093745" style="font-size: 7px; font-family: sans-serif">1</tspan>
+      <tspan x="58.883789" y="1.093745" style="font-size: 7px; font-family: sans-serif">2</tspan>
+      <tspan x="105.574251" y="1.093745" style="font-size: 7px; font-family: sans-serif">1</tspan>
+      <tspan x="110.027865" y="1.093745" style="font-size: 7px; font-family: sans-serif">0</tspan>
+      <tspan x="137.330631" y="1.093745" style="font-size: 7px; font-family: sans-serif">0</tspan>
+      <tspan x="20.411621" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="42.985352" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="65.559082" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="75.88623" y="-0.40625" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="82.248535" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="90.234407" y="-0.40625" style="font-size: 10px; font-family: sans-serif">l</tspan>
+      <tspan x="93.012728" y="-0.40625" style="font-size: 10px; font-family: sans-serif">o</tspan>
+      <tspan x="99.130892" y="-0.40625" style="font-size: 10px; font-family: sans-serif">g</tspan>
+      <tspan x="116.378483" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="127.12067" y="-0.40625" style="font-size: 10px; font-family: sans-serif">/</tspan>
+      <tspan x="142.057682" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_26">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.798125" transform="rotate(-0 373.344609 16.798125)">Transmisión aérea por flancos ISO 10848</text>
@@ -554,52 +614,70 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 47.225781 76.500234 
-L 200.166719 76.500234 
-Q 201.966719 76.500234 201.966719 74.700234 
+     <path d="M 47.225781 76.501641 
+L 200.166719 76.501641 
+Q 201.966719 76.501641 201.966719 74.701641 
 L 201.966719 35.098125 
 Q 201.966719 33.298125 200.166719 33.298125 
 L 47.225781 33.298125 
 Q 45.425781 33.298125 45.425781 35.098125 
-L 45.425781 74.700234 
-Q 45.425781 76.500234 47.225781 76.500234 
+L 45.425781 74.701641 
+Q 45.425781 76.501641 47.225781 76.501641 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_47">
-     <path d="M 49.025781 40.586719 
-L 58.025781 40.586719 
-L 67.025781 40.586719 
+     <path d="M 49.025781 40.588125 
+L 58.025781 40.588125 
+L 67.025781 40.588125 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.2; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#mabc070e0cf" x="58.025781" y="40.586719" style="fill: #1f77b4; stroke: #1f77b4"/>
+      <use xlink:href="#mabc070e0cf" x="58.025781" y="40.588125" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
     <g id="text_27">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="43.736719" transform="rotate(-0 74.225781 43.736719)">Dn,f (flancos)</text>
+     <!-- $D_{n,f}$ (flancos) -->
+     <g transform="translate(74.225781 43.738125)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">D</tspan>
+       <tspan x="6.930176" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">n</tspan>
+       <tspan x="14.153027" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">f</tspan>
+       <tspan x="10.923047" y="1.193746" style="font-size: 6.3px; font-family: sans-serif">,</tspan>
+       <tspan x="16.617041" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="19.477881" y="-0.15625" style="font-size: 9px; font-family: sans-serif">(</tspan>
+       <tspan x="22.989111" y="-0.15625" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="26.157568" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="28.658057" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="34.173193" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="39.877295" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="44.825537" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="50.331885" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="55.02085" y="-0.15625" style="font-size: 9px; font-family: sans-serif">)</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_48">
-     <path d="M 49.025781 54.087422 
-L 58.025781 54.087422 
-L 67.025781 54.087422 
+     <path d="M 49.025781 54.088828 
+L 58.025781 54.088828 
+L 67.025781 54.088828 
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.8"/>
      <g>
-      <use xlink:href="#m3a5ffddf03" x="58.025781" y="54.087422" style="stroke: #000000; stroke-linejoin: miter"/>
+      <use xlink:href="#m3a5ffddf03" x="58.025781" y="54.088828" style="stroke: #000000; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_28">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="57.237422" transform="rotate(-0 74.225781 57.237422)">referencia desplazada</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="57.238828" transform="rotate(-0 74.225781 57.238828)">referencia desplazada</text>
     </g>
     <g id="patch_9">
-     <path d="M 49.025781 70.738125 
-L 67.025781 70.738125 
-L 67.025781 64.438125 
-L 49.025781 64.438125 
+     <path d="M 49.025781 70.739531 
+L 67.025781 70.739531 
+L 67.025781 64.439531 
+L 49.025781 64.439531 
 z
 " style="fill: #d62728; fill-opacity: 0.25; stroke: #d62728; stroke-opacity: 0.25; stroke-linejoin: miter"/>
     </g>
     <g id="text_29">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="70.738125" transform="rotate(-0 74.225781 70.738125)">desviaciones desfavorables</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="74.225781" y="70.739531" transform="rotate(-0 74.225781 70.739531)">desviaciones desfavorables</text>
     </g>
    </g>
   </g>

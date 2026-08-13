@@ -224,14 +224,14 @@ _ES_EXACT = {
     # Building acoustics: sound insulation (B8 figures)
     "Same weighted rating, different spectrum":
         "El mismo indice ponderado, distinto espectro",
-    "Rw alone is not a specification":
-        "Rw por si solo no es una especificacion",
+    "$R_w$ alone is not a specification":
+        "$R_w$ por si solo no es una especificacion",
     # Bar-group tick label, symbols only: reads the same in Spanish.
-    "Rw + Ctr": "Rw + Ctr",
-    "shifted reference (both, Rw = 49 dB)":
-        "curva de referencia desplazada (ambas, Rw = 49 dB)",
+    "$R_w + C_{tr}$": "$R_w + C_{tr}$",
+    "shifted reference (both, $R_w$ = 49 dB)":
+        "curva de referencia desplazada (ambas, $R_w$ = 49 dB)",
     "150 mm dense concrete": "hormigon denso de 150 mm",
-    "double leaf, 12 kg/m2 + 90 mm": "doble hoja, 12 kg/m2 + 90 mm",
+    "double leaf, 12 kg/m² + 90 mm": "doble hoja, 12 kg/m² + 90 mm",
     "mass-air-mass resonance at 82 Hz, below the\n"
     "rated range: the double leaf enters it still climbing":
         "resonancia masa-aire-masa en 82 Hz, por debajo del\n"
@@ -249,51 +249,55 @@ _ES_EXACT = {
         "limite de medicion\n(1,3 dB fijos, senalar la banda)",
     "the field rule stops here": "la regla in situ termina aqui",
     "the laboratory rule stops here": "la regla de laboratorio termina aqui",
-    "Signal-to-background margin Lsb - Lb [dB]":
-        "Margen senal-fondo Lsb - Lb [dB]",
-    "Correction applied, Lsb - L [dB]": "Correccion aplicada, Lsb - L [dB]",
+    "Signal-to-background margin $L_{sb} - L_b$ [dB]":
+        "Margen senal-fondo $L_{sb} - L_b$ [dB]",
+    "Correction applied, $L_{sb} - L$ [dB]":
+        "Correccion aplicada, $L_{sb} - L$ [dB]",
     "A Fast detector cannot follow a long decay":
         "Un detector Fast no puede seguir una caida larga",
     "more than 1 dB apart": "mas de 1 dB de diferencia",
-    "Fast maximum: 10 lg[g(C)/g(C0)] (ISO 16283-2)":
-        "maximo Fast: 10 lg[g(C)/g(C0)] (ISO 16283-2)",
-    "energy average: 10 lg(T/T0)": "promedio energetico: 10 lg(T/T0)",
-    "at T = 5 s the energy average has grown to 10.0 dB\n"
+    "Fast maximum: $10\\,\\mathrm{lg}[g(C)/g(C_0)]$ (ISO 16283-2)":
+        "maximo Fast: $10\\,\\mathrm{lg}[g(C)/g(C_0)]$ (ISO 16283-2)",
+    "energy average: $10\\,\\mathrm{lg}(T/T_0)$":
+        "promedio energetico: $10\\,\\mathrm{lg}(T/T_0)$",
+    "at $T$ = 5 s the energy average has grown to 10.0 dB\n"
     "while the Fast term has saturated at 5.1 dB":
-        "a T = 5 s el promedio energético ha crecido hasta 10,0 dB\n"
+        "a $T$ = 5 s el promedio energético ha crecido hasta 10,0 dB\n"
         "mientras el término Fast se ha saturado en 5,1 dB",
-    "T = T0 = 0,5 s\nboth terms vanish":
-        "T = T0 = 0,5 s\nambos terminos se anulan",
-    "T = 1,7275 s: C = 1, g = 1/e": "T = 1,7275 s: C = 1, g = 1/e",
-    "Receiving-room reverberation time T [s]":
-        "Tiempo de reverberacion del recinto receptor T [s]",
+    "$T = T_0$ = 0,5 s\nboth terms vanish":
+        "$T = T_0$ = 0,5 s\nambos terminos se anulan",
+    "$T$ = 1,7275 s: $C = 1$, $g = 1/e$":
+        "$T$ = 1,7275 s: $C = 1$, $g = 1/e$",
+    "Receiving-room reverberation time $T$ [s]":
+        "Tiempo de reverberacion del recinto receptor $T$ [s]",
     "Term subtracted from the measured level [dB]":
         "Termino restado al nivel medido [dB]",
     "The same wall, in the laboratory and in two buildings\n"
     "(EN 12354-1 flanking over twelve paths)":
         "La misma pared, en laboratorio y en dos edificios\n"
         "(transmision por flancos EN 12354-1 sobre doce caminos)",
-    "laboratory R (Rw = 49 dB)": "R de laboratorio (Rw = 49 dB)",
-    "field R', good junctions (R'w = 47 dB)":
-        "R' in situ, uniones buenas (R'w = 47 dB)",
-    "field R', flanking dominant (R'w = 42 dB)":
-        "R' in situ, flancos dominantes (R'w = 42 dB)",
+    "laboratory $R$ ($R_w$ = 49 dB)": "$R$ de laboratorio ($R_w$ = 49 dB)",
+    "field $R′$, good junctions ($R′_w$ = 47 dB)":
+        "$R′$ in situ, uniones buenas ($R′_w$ = 47 dB)",
+    "field $R′$, flanking dominant ($R′_w$ = 42 dB)":
+        "$R′$ in situ, flancos dominantes ($R′_w$ = 42 dB)",
     "2 dB: normal": "2 dB: normal",
     "7 dB: find the path": "7 dB: busque el camino",
     "The weak element sets the composite\n"
-    "(Ejemplo 7.5 geometry: 6 m2 blind part + 2 m2 window)":
+    "(Ejemplo 7.5 geometry: 6 m² blind part + 2 m² window)":
         "El elemento debil fija el conjunto\n"
-        "(geometria del Ejemplo 7.5: 6 m2 de parte ciega + 2 m2 de ventana)",
-    "Window RA [dBA]  (2 m2 of an 8 m2 facade)":
-        "RA de la ventana [dBA]  (2 m2 de una fachada de 8 m2)",
-    "Overall facade RA [dBA]": "RA global de la fachada [dBA]",
+        "(geometria del Ejemplo 7.5: 6 m² de parte ciega + 2 m² de ventana)",
+    "Window $R_A$ [dBA]  (2 m² of an 8 m² facade)":
+        "$R_A$ de la ventana [dBA]  (2 m² de una fachada de 8 m²)",
+    "Overall facade $R_A$ [dBA]": "$R_A$ global de la fachada [dBA]",
     "+10 dBA on the blind part: +0.4 dBA":
         "+10 dBA en la parte ciega: +0,4 dBA",
     "+5 dBA on the window: +4.1 dBA": "+5 dBA en la ventana: +4,1 dBA",
     "Qualifying the measurement surface (ISO 15186-1, 6.4.2)":
         "Calificacion de la superficie de medicion (ISO 15186-1, 6.4.2)",
     "surface not qualified": "superficie no calificada",
-    "FpI = Lp - LIn (Formula (10))": "FpI = Lp - LIn (Formula (10))",
+    "$F_{pI} = L_p - L_{In}$ (Formula (10))":
+        "$F_{pI} = L_p - L_{In}$ (Formula (10))",
     "10 dB: reflecting specimen (6.4.2)":
         "10 dB: probeta reflectante (6.4.2)",
     "6 dB: absorbing specimen": "6 dB: probeta absorbente",
@@ -301,8 +305,8 @@ _ES_EXACT = {
     "then absorption in the receiving room":
         "remedio en orden: primero +5 a 10 cm de distancia de medicion,\n"
         "despues absorcion en el recinto receptor",
-    "Surface pressure-intensity indicator FpI [dB]":
-        "Indicador superficial presion-intensidad FpI [dB]",
+    "Surface pressure-intensity indicator $F_{pI}$ [dB]":
+        "Indicador superficial presion-intensidad $F_{pI}$ [dB]",
     # ANP fleet database guide
     "ANP NPD Curves - Boeing 747-100 / JT9DBD (SEL, departure)":
         "Curvas NPD ANP - Boeing 747-100 / JT9DBD (SEL, despegue)",
@@ -534,6 +538,8 @@ _ES_EXACT = {
     "Composite wall with a small aperture":
         "Pared compuesta con una abertura pequeña",
     "Sound reduction index R [dB]": "Índice de reducción acústica R [dB]",
+    "Sound reduction index $R$ [dB]":
+        "Índice de reducción acústica $R$ [dB]",
     r"Radiation efficiency $\sigma$": r"Eficiencia de radiación $\sigma$",
     "field-incidence mass law": "ley de masas de campo",
     "single panel R (Sharp)": "R de panel simple (Sharp)",
@@ -753,25 +759,28 @@ _ES_EXACT = {
     "Class 1 corridor": "Corredor de clase 1",
     "Class 2 corridor": "Corredor de clase 2",
     # intensity_insulation figure (ISO 15186-1)
-    "ISO 15186-1 Intensity Sound Reduction Index (RI and RI,M)":
-        "Índice de reducción acústica por intensidad ISO 15186-1 (RI y RI,M)",
+    "ISO 15186-1 Intensity Sound Reduction Index ($R_I$ and $R_{I,M}$)":
+        "Índice de reducción acústica por intensidad ISO 15186-1 "
+        "($R_I$ y $R_{I,M}$)",
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
-    "Kc adaptation": "Adaptación Kc",
-    "RI (intensity)": "RI (intensidad)",
+    "$K_c$ adaptation": "Adaptación $K_c$",
+    "$R_I$ (intensity)": "$R_I$ (intensidad)",
     # intensity_element_insulation info box: rating and formula, symbols only.
-    "DI,n,e,w(C;Ctr) = 29(−1;−2) dB\n"
-    "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N":
-        "DI,n,e,w(C;Ctr) = 29(−1;−2) dB\n"
-        "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N",
+    "$D_{I,n,e,w}$($C$;$C_{tr}$) = 29(−1;−2) dB\n"
+    "$D_{I,n,e} = L_{p1} - 6 - [L_{In} + 10\\,\\log_{10}(S_m/A_0)]"
+    " + 10\\,\\log_{10} N$":
+        "$D_{I,n,e,w}$($C$;$C_{tr}$) = 29(−1;−2) dB\n"
+        "$D_{I,n,e} = L_{p1} - 6 - [L_{In} + 10\\,\\log_{10}(S_m/A_0)]"
+        " + 10\\,\\log_{10} N$",
     # survey_insulation figure (ISO 10052)
     "ISO 10052 Survey Method: Reverberation-Index Correction":
         "Método de control ISO 10052: corrección por índice de reverberación",
     "Level difference [dB]": "Diferencia de nivel [dB]",
-    "D (level difference)": "D (diferencia de nivel)",
-    "DnT (standardized)": "DnT (estandarizada)",
-    "octave bands, T0 = 0.5 s": "bandas de octava, T0 = 0,5 s",
-    "DnT,w = 49 dB  (C = −1)\noctave bands, T0 = 0.5 s":
-        "DnT,w = 49 dB  (C = −1)\nbandas de octava, T0 = 0,5 s",
+    "$D$ (level difference)": "$D$ (diferencia de nivel)",
+    "$D_{nT}$ (standardized)": "$D_{nT}$ (estandarizada)",
+    "octave bands, $T_0$ = 0.5 s": "bandas de octava, $T_0$ = 0,5 s",
+    "$D_{nT,w}$ = 49 dB  ($C$ = −1)\noctave bands, $T_0$ = 0.5 s":
+        "$D_{nT,w}$ = 49 dB  ($C$ = −1)\nbandas de octava, $T_0$ = 0,5 s",
     # absorption_uncertainty figure (ISO 12999-2)
     "ISO 12999-2 Sound Absorption Coefficient Uncertainty":
         "Incertidumbre del coeficiente de absorción acústica (ISO 12999-2)",
@@ -792,8 +801,8 @@ _ES_EXACT = {
     "Standard heavy impact sources\n(ISO 16283-2 Table A.1, JIS A 1418-2 Tables A.1/A.2)":
         "Fuentes de impacto pesadas normalizadas\n(ISO 16283-2 Tabla A.1, "
         "JIS A 1418-2 Tablas A.1/A.2)",
-    "Impact force exposure level LFE [dB re 1 N]":
-        "Nivel de exposición a la fuerza de impacto LFE [dB re 1 N]",
+    "Impact force exposure level $L_{FE}$ [dB re 1 N]":
+        "Nivel de exposición a la fuerza de impacto $L_{FE}$ [dB re 1 N]",
     "rubber ball tolerance": "tolerancia de la pelota de caucho",
     "rubber ball nominal": "pelota de caucho nominal",
     "bang machine tolerance": "tolerancia de la máquina de neumático",
@@ -803,25 +812,27 @@ _ES_EXACT = {
         "la Tabla D.4)",
     "Maximum impact sound pressure level [dB]":
         "Nivel máximo de presión acústica de impactos [dB]",
-    "Li,Fmax (measured)": "Li,Fmax (medido)",
-    "Li,Fmax + A (Table D.3)": "Li,Fmax + A (Tabla D.3)",
+    "$L_{i,F\\mathrm{max}}$ (measured)": "$L_{i,F\\mathrm{max}}$ (medido)",
+    "$L_{i,F\\mathrm{max}} + A$ (Table D.3)":
+        "$L_{i,F\\mathrm{max}} + A$ (Tabla D.3)",
     # Rating line, symbols only: reads the same in Spanish.
-    "LiA,Fmax = 55 dB": "LiA,Fmax = 55 dB",
+    "$L_{iA,F\\mathrm{max}}$ = 55 dB": "$L_{iA,F\\mathrm{max}}$ = 55 dB",
     # ceiling_plenum_flanking figure (Vigran 9.2.3 / ASTM E1414 / ASTM E413)
-    "Suspended-ceiling plenum path\n(one-dimensional model, LR = 4.75 m, reflecting sidewalls)":
+    "Suspended-ceiling plenum path\n(one-dimensional model, $L_R$ = 4.75 m, "
+    "reflecting sidewalls)":
         "Trayecto por plenum de techo suspendido\n(modelo unidimensional, "
-        "LR = 4.75 m, paredes laterales reflectantes)",
-    "RS + RR (two ceilings)": "RS + RR (dos techos)",
+        "$L_R$ = 4,75 m, paredes laterales reflectantes)",
+    "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
     "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":
         "Clase de atenuación de techo\n(ASTM E1414/E413, CAC = 34 dB)",
-    "Normalized ceiling attenuation Dn,c [dB]":
-        "Diferencia de niveles normalizada del techo Dn,c [dB]",
-    "Dn,c (measured)": "Dn,c (medido)",
+    "Normalized ceiling attenuation $D_{n,c}$ [dB]":
+        "Diferencia de niveles normalizada del techo $D_{n,c}$ [dB]",
+    "$D_{n,c}$ (measured)": "$D_{n,c}$ (medido)",
     "ASTM E413 contour, fitted": "curva ASTM E413 ajustada",
     "deficiencies": "deficiencias",
     # "plenum" is the Spanish word too (see the block title above).
-    "Rcl, plenum h = 0.43 m": "Rcl, plenum h = 0,43 m",
-    "Rcl, plenum h = 0.86 m": "Rcl, plenum h = 0,86 m",
+    "$R_{cl}$, plenum $h$ = 0.43 m": "$R_{cl}$, plenum $h$ = 0,43 m",
+    "$R_{cl}$, plenum $h$ = 0.86 m": "$R_{cl}$, plenum $h$ = 0,86 m",
     # masonry_wall_ties figure (Hopkins 3.11.3.2 / 4.3.5.4.1)
     "Wall-tie structure-borne coupling\n(point-connection model, 2.5 ties/m2)":
         "Acoplamiento estructural por llaves de muro\n(modelo de unión puntual, "
@@ -861,15 +872,14 @@ _ES_EXACT = {
     # flanking_transmission figure (ISO 10848)
     "ISO 10848 Junction Vibration Reduction Index":
         "Índice de reducción de vibraciones de unión (ISO 10848)",
-    "Vibration reduction index Kij [dB]":
-        "Índice de reducción de vibraciones Kij [dB]",
-    "Kij (ISO 10848)": "Kij (ISO 10848)",
-    "mean Kij (200-1250 Hz)": "Kij medio (200-1250 Hz)",
-    "rigid T-junction, two heavy walls\nlij = 4 m, Si = 12 m^2, Sj = 10 m^2\n"
-    "Formula (13), one-third octave\nmean Kij = 9.5 dB":
+    "$K_{ij}$ (ISO 10848)": "$K_{ij}$ (ISO 10848)",
+    "mean $K_{ij}$ (200-1250 Hz)": "$K_{ij}$ medio (200-1250 Hz)",
+    "rigid T-junction, two heavy walls\n"
+    "$l_{ij}$ = 4 m, $S_i$ = 12 m², $S_j$ = 10 m²\n"
+    "Formula (13), one-third octave\nmean $K_{ij}$ = 9.5 dB":
         "unión en T rígida, dos muros pesados\n"
-        "lij = 4 m, Si = 12 m^2, Sj = 10 m^2\n"
-        "Fórmula (13), tercios de octava\nKij medio = 9,5 dB",
+        "$l_{ij}$ = 4 m, $S_i$ = 12 m², $S_j$ = 10 m²\n"
+        "Fórmula (13), tercios de octava\n$K_{ij}$ medio = 9,5 dB",
     # tonal_audibility figure (ISO 1996-2)
     "ISO 1996-2 Tonal Adjustment": "Ajuste tonal ISO 1996-2",
     r"Tonal audibility $\Delta L_{ta}$ [dB]":
@@ -1087,15 +1097,15 @@ _ES_EXACT = {
         "Aislamiento acústico de fachada EN 12354-3 (ejemplo del Anexo F)",
     "Reduction index / level difference [dB]":
         "Índice de reducción / diferencia de niveles [dB]",
-    "Rp — wall": "Rp — muro",
-    "Rp — window": "Rp — ventana",
-    "Rp — skylight": "Rp — claraboya",
-    "Rp — air inlet": "Rp — entrada de aire",
-    "R′ (façade)": "R′ (fachada)",
+    "$R_p$ — wall": "$R_p$ — muro",
+    "$R_p$ — window": "$R_p$ — ventana",
+    "$R_p$ — skylight": "$R_p$ — claraboya",
+    "$R_p$ — air inlet": "$R_p$ — entrada de aire",
+    "$R′$ (façade)": "$R′$ (fachada)",
     "air inlet limits the low bands": "la entrada de aire limita las bandas bajas",
-    "R′tr,s,w = 31 dB   (Ctr = −3)\nD2m,nT,w = 33 dB\n"
+    "$R′_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
     "air inlet limits the low bands":
-        "R′tr,s,w = 31 dB   (Ctr = −3)\nD2m,nT,w = 33 dB\n"
+        "$R′_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
         "la entrada de aire limita las bandas bajas",
     # facade_elevation_geometry element names, drawn by plot_facade_elements;
     # worded as the facade-insulation page's own alt text.
@@ -1606,12 +1616,15 @@ _ES_EXACT = {
         "\u00cdndice ponderado de reducci\u00f3n ac\u00fastica (ISO 717-1, ejemplo del Anexo C)",
     "Apparent sound reduction index R' [dB]":
         "\u00cdndice de reducci\u00f3n ac\u00fastica aparente R' [dB]",
-    "Measured R' (third octave)": "R' medido (tercios de octava)",
+    "Apparent sound reduction index $R′$ [dB]":
+        "Índice de reducción acústica aparente $R′$ [dB]",
+    "Measured $R′$ (third octave)": "$R′$ medido (tercios de octava)",
     "Shifted reference curve (ISO 717-1)":
         "Curva de referencia desplazada (ISO 717-1)",
     "Unfavourable deviations": "Desviaciones desfavorables",
     # Rating statement, symbols only: reads the same in Spanish.
-    "Rw (C ; Ctr) = 30 (−2 ; −3) dB": "Rw (C ; Ctr) = 30 (−2 ; −3) dB",
+    "$R_w$ ($C$ ; $C_{tr}$) = 30 (−2 ; −3) dB":
+        "$R_w$ ($C$ ; $C_{tr}$) = 30 (−2 ; −3) dB",
     "Sharpness Weighting g(z) (DIN 45692)":
         "Ponderación de agudeza g(z) (DIN 45692)",
     "Weighting g(z)": "Ponderación g(z)",
@@ -1622,9 +1635,9 @@ _ES_EXACT = {
     "ISO 717-2 Weighted Normalized Impact Sound Level (Annex C example)":
         "Nivel de ruido de impactos normalizado y ponderado "
         "(ISO 717-2, ejemplo del Anexo C)",
-    "Normalized impact sound pressure level Ln [dB]":
-        "Nivel de presión acústica de impactos normalizado Ln [dB]",
-    "Measured Ln (third octave)": "Ln medido (tercios de octava)",
+    "Normalized impact sound pressure level $L_n$ [dB]":
+        "Nivel de presión acústica de impactos normalizado $L_n$ [dB]",
+    "Measured $L_n$ (third octave)": "$L_n$ medido (tercios de octava)",
     "Shifted reference curve (ISO 717-2)":
         "Curva de referencia desplazada (ISO 717-2)",
     "Unfavourable deviations (measured above reference)":
@@ -2651,10 +2664,11 @@ _ES_EXACT = {
         "R' = −10 log10(Σ 10^(−Rij/10))\nR'w (C; Ctr) = 57 (−1; −7) dB",
     "ISO 12999-1 Measurement Uncertainty (situation B, airborne)":
         "Incertidumbre de medición ISO 12999-1 (situación B, aéreo)",
-    "Measured R'": "R' medido",
-    "Standard uncertainty ±u": "Incertidumbre típica ±u",
-    "Expanded uncertainty ±U (95 %)": "Incertidumbre expandida ±U (95 %)",
-    "R'w ± U (single number)": "R'w ± U (valor único)",
+    "Measured $R′$": "$R′$ medido",
+    "Standard uncertainty $\\pm u$": "Incertidumbre típica $\\pm u$",
+    "Expanded uncertainty $\\pm U$ (95 %)":
+        "Incertidumbre expandida $\\pm U$ (95 %)",
+    "$R′_w \\pm U$ (single number)": "$R′_w \\pm U$ (valor único)",
     # Outdoor propagation & occupational exposure (PR-C).
     "ISO 9613-1 Atmospheric Absorption α(f)":
         "Absorción atmosférica α(f) (ISO 9613-1)",
@@ -3344,7 +3358,7 @@ _ES_EXACT = {
     "ISO 717-1 Enlarged-Range Rating (Annex B)":
         "Índice ponderado con rango ampliado ISO 717-1 (Anexo B)",
     "enlarged range (Annex B)": "rango ampliado (Anexo B)",
-    "measured R": "R medido",
+    "measured $R$": "$R$ medido",
     "shifted reference (100-3150 Hz)": "referencia desplazada (100-3150 Hz)",
     "shifted reference": "referencia desplazada",
     "unfavourable deviations": "desviaciones desfavorables",
@@ -3352,30 +3366,30 @@ _ES_EXACT = {
         "Aislamiento a ruido aéreo in situ ISO 16283-1",
     "ISO 16283-3 Field Facade Insulation":
         "Aislamiento de fachada in situ ISO 16283-3",
-    "D2m,nT (standardized)": "D2m,nT (estandarizada)",
-    "D2m,n (normalized)": "D2m,n (normalizada)",
-    "R'45° (element)": "R'45° (elemento)",
+    "$D_{2m,nT}$ (standardized)": "$D_{2m,nT}$ (estandarizada)",
+    "$D_{2m,n}$ (normalized)": "$D_{2m,n}$ (normalizada)",
+    "$R′_{45°}$ (element)": "$R′_{45°}$ (elemento)",
     "Level difference / reduction index [dB]":
         "Diferencia de nivel / índice de reducción [dB]",
     "ISO 10052 Survey Method: Impact Sound":
         "Método de control ISO 10052: ruido de impactos",
-    "Li (impact level)": "Li (nivel de impactos)",
-    "L'nT (standardized)": "L'nT (estandarizado)",
+    "$L_i$ (impact level)": "$L_i$ (nivel de impactos)",
+    "$L′_{nT}$ (standardized)": "$L′_{nT}$ (estandarizado)",
     "Impact sound pressure level [dB]":
         "Nivel de presión acústica de impactos [dB]",
     "ISO 10140 Laboratory Insulation (flanking suppressed)":
         "Aislamiento en laboratorio ISO 10140 (flancos suprimidos)",
-    "normalized Ln": "Ln normalizado",
-    "Impact sound pressure level Ln [dB]":
-        "Nivel de presión acústica de impactos Ln [dB]",
+    "normalized $L_n$": "$L_n$ normalizado",
+    "Impact sound pressure level $L_n$ [dB]":
+        "Nivel de presión acústica de impactos $L_n$ [dB]",
     "ISO 15186-1 Small-Element Insulation by Intensity":
         "Aislamiento de elementos pequeños por intensidad ISO 15186-1",
-    "DI,n,e (element)": "DI,n,e (elemento)",
+    "$D_{I,n,e}$ (element)": "$D_{I,n,e}$ (elemento)",
     "Element normalized level difference [dB]":
         "Diferencia de niveles normalizada de elemento [dB]",
     "ISO 10848 Airborne Flanking Transmission":
         "Transmisión aérea por flancos ISO 10848",
-    "Dn,f (flanking)": "Dn,f (flancos)",
+    "$D_{n,f}$ (flanking)": "$D_{n,f}$ (flancos)",
     "Normalized flanking level difference [dB]":
         "Diferencia de niveles normalizada de flancos [dB]",
     "EN 12354-2 Impact Sound Prediction (Annex E.3)":
@@ -3389,6 +3403,10 @@ _ES_EXACT = {
     "EN 12354-4 Radiated Sound Power (Annex G)":
         "Potencia acústica radiada EN 12354-4 (Anexo G)",
     "radiated $L_W$ per octave": "$L_W$ radiada por octava",
+    "$L_W = L_{p,\\mathrm{in}} + C_d - R′ + 10\\,\\log_{10}(S/S_0)$\n"
+    "wall 176 m² + industrial door 24 m², $C_d$ = −5 dB":
+        "$L_W = L_{p,\\mathrm{in}} + C_d - R′ + 10\\,\\log_{10}(S/S_0)$\n"
+        "muro de 176 m² + puerta industrial de 24 m², $C_d$ = −5 dB",
     "Radiated sound power level [dB re 1 pW]":
         "Nivel de potencia acústica radiada [dB re 1 pW]",
     "Predicted Single-Panel Insulation Rated per ISO 717-1":
@@ -4445,7 +4463,7 @@ _ES_PATTERNS = [
      r"suma sin redondear = \1,\2 dB"),
     # composite_facade_weak_element legend (blind-part value baked in);
     # "parte ciega" as the spanish-building-code page words it.
-    (r"^blind part RA = (\d+) dBA$", r"parte ciega RA = \1 dBA"),
+    (r"^blind part \$R_A\$ = (\d+) dBA$", r"parte ciega $R_A$ = \1 dBA"),
     # decay_signatures summary boxes (EDT/T20/T30/curvature baked in).
     ((r"^EDT (.+) s\nT20 (.+) s\nT30 (.+) s\nC = (.+) %\n"
       r"T20 = T30, curvature ~ 0$"),
@@ -4906,26 +4924,37 @@ _ES_PATTERNS = [
      r"Campo de presión FDTD en t = \1 ms"),
     (r"^probe \((.+)\) m$", r"sonda (\1) m"),
     # Building & structure-borne result figures (dynamic values baked in).
-    (r"^Airborne: Rw\(C;Ctr\) = (.+) dB$", r"Aéreo: Rw(C;Ctr) = \1 dB"),
-    (r"^Impact: Ln,w\(CI\) = (.+) dB$", r"Impacto: Ln,w(CI) = \1 dB"),
+    (r"^Airborne: \$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB$",
+     r"Aéreo: $R_w$($C$;$C_{tr}$) = \1 dB"),
+    (r"^Impact: \$L_\{n,w\}\$\(\$C_I\$\) = (.+) dB$",
+     r"Impacto: $L_{n,w}$($C_I$) = \1 dB"),
     (r"^coincidence fc = (\d+) Hz$", r"coincidencia fc = \1 Hz"),
     (r"^\$L_\{WA\}\$ = (\d+)\.(\d+) dB\(A\)$", r"$L_{WA}$ = \1,\2 dB(A)"),
     # Their multi-line info boxes are single Text artists, so the whole
     # joined string is matched at once (values stay as capture groups).
-    ((r"^Rw\(C;Ctr\) = (.+)\nC50-5000 = (.+)\n"
+    ((r"^\$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+)\n\$C_\{50-5000\}\$ = (.+)\n"
       r"rating on the core bands, terms on the full range$"),
-     ("Rw(C;Ctr) = \\1\nC50-5000 = \\2\n"
+     ("$R_w$($C$;$C_{tr}$) = \\1\n$C_{50-5000}$ = \\2\n"
       "índice en las bandas básicas, términos en el rango completo")),
-    ((r"^Dls,2m,nT,w\(C;Ctr\) = (.+) dB\n45° loudspeaker method "
-      r"\(−1\.5 dB on R'\)$"),
-     "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (−1,5 dB en R')"),
-    ((r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
-      r"L'nT$"),
-     "L'nT,w(CI) = \\1 dB\natención al signo menos: un recinto vivo reduce L'nT"),
-    ((r"^LW = Lp,in \+ Cd - R' \+ 10 log10\(S/S0\)\nwall 176 m² \+ industrial "
-      r"door 24 m², Cd = −5 dB$"),
-     ("LW = Lp,in + Cd - R' + 10 log10(S/S0)\n"
-      "muro de 176 m² + puerta industrial de 24 m², Cd = −5 dB")),
+    ((r"^\$D_\{ls,2m,nT,w\}\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
+      r"45° loudspeaker method \(−1\.5 dB on \$R′\$\)$"),
+     ("$D_{ls,2m,nT,w}$($C$;$C_{tr}$) = \\1 dB\n"
+      "método del altavoz a 45° (−1,5 dB en $R′$)")),
+    ((r"^\$L′_\{nT,w\}\$\(\$C_I\$\) = (.+) dB\n"
+      r"note the minus sign: a live room lowers \$L′_\{nT\}\$$"),
+     ("$L′_{nT,w}$($C_I$) = \\1 dB\n"
+      "atención al signo menos: un recinto vivo reduce $L′_{nT}$")),
+    ((r"^\$D_\{nT,w\}\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
+      r"\$R′_w\$ = (\d+) dB   \(\$S\$ = 12\.5 m², \$V\$ = 30\.4 m³\)$"),
+     ("$D_{nT,w}$($C$;$C_{tr}$) = \\1 dB\n"
+      "$R′_w$ = \\2 dB   ($S$ = 12,5 m², $V$ = 30,4 m³)")),
+    ((r"^\$R′_w\$ = (\d+) ± (\d+)\.(\d+) dB\n"
+      r"\$U = k\\,u\$ ,  \$k\$ = (\d+)\.(\d+) \(95 %\)$"),
+     ("$R′_w$ = \\1 ± \\2,\\3 dB\n"
+      "$U = k\\,u$ ,  $k$ = \\4,\\5 (95 %)")),
+    ((r"^\$6 - 10\\,\\mathrm\{lg\}\(10\^\{0\{,\}6\} - 1\)\$"
+      r" = (\d+)\.(\d+) dB$"),
+     r"$6 - 10\\,\\mathrm{lg}(10^{0{,}6} - 1)$ = \1,\2 dB"),
     ((r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
       r"η = 0\.024$"),
      "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
