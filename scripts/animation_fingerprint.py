@@ -69,7 +69,6 @@ from __future__ import annotations
 import ast
 import hashlib
 import pathlib
-import re
 from collections.abc import Iterable, Iterator
 
 _SCRIPTS = pathlib.Path(__file__).resolve().parent
@@ -81,7 +80,6 @@ _SCRIPTS = pathlib.Path(__file__).resolve().parent
 MANIFEST = _SCRIPTS / "animation_fingerprints.txt"
 
 #: The package the walk stays inside.
-_PKG_ROOT = _SCRIPTS / "figures"
 _PKG_NAME = "figures"
 
 #: Where the clip names are mapped to their builders.
@@ -234,7 +232,7 @@ class Sources:
     def closure(self, roots: Iterable[Symbol]) -> set[Symbol]:
         """Every package symbol reachable from *roots*, roots included."""
         seen: set[Symbol] = set()
-        stack = [r for r in roots]
+        stack = list(roots)
         while stack:
             symbol = stack.pop()
             if symbol in seen or symbol in _IGNORED or symbol in _TABLES:
@@ -510,16 +508,29 @@ def stamp(clips: Iterable[str], root: pathlib.Path | None = None) -> None:
     Called by the renderer once a clip's four variants are on disk, so the
     stamp and the files it describes are written together and a re-render
     cannot forget to refresh it.
+
+    Read-modify-write under a lock: re-rendering several clips at once is the
+    normal way to work through a batch, and two runs finishing together would
+    otherwise each write back the manifest they read, losing one of the two
+    stamps -- the one failure mode of this file that would be invisible until
+    CI asked for the missing clip.
     """
+    import fcntl
+
     names = list(clips)
     if not names:
         return
     current = fingerprints(root or _SCRIPTS.parent)
-    stamps = read_manifest()
-    for clip in names:
-        if clip in current:
-            stamps[clip] = current[clip]
-    write_manifest(stamps)
+    lock = MANIFEST.with_suffix(".lock")
+    with lock.open("w") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            stamps = read_manifest()
+            for clip in names:
+                if clip in current:
+                    stamps[clip] = current[clip]
+            write_manifest(stamps)
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
+    lock.unlink(missing_ok=True)
 
-
-_ANSI = re.compile(r"\x1b\[[0-9;]*m")
