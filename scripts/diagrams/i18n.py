@@ -28,17 +28,18 @@ _ES: dict[str, str] = {
     # ISO 9613-2 ground regions (environment/propagation/outdoor-propagation).
     "ISO 9613-2 ground regions and the ground factor G":
         "Regiones de suelo y factor de suelo G (ISO 9613-2)",
-    "G is the porous fraction of its region":
-        "G es la fracción porosa de su región",
-    "grass, G = 1": "hierba, G = 1",
-    "asphalt, G = 0": "asfalto, G = 0",
-    "source region  30 hs = 45 m": "región de la fuente  30 hs = 45 m",
+    "$G$ is the porous fraction of its region":
+        "$G$ es la fracción porosa de su región",
+    "grass, $G = 1$": "hierba, $G = 1$",
+    "asphalt, $G = 0$": "asfalto, $G = 0$",
+    "source region  $30 h_s$ = 45 m": "región de la fuente  $30 h_s$ = 45 m",
     "middle region  110 m": "región intermedia  110 m",
-    "receiver region  30 hr = 45 m": "región del receptor  30 hr = 45 m",
-    "dp = 60 m: the regions overlap, so there is no middle region":
-        "dp = 60 m: las regiones se solapan y no hay región intermedia",
-    "below 30(hs + hr) = 90 m: q = 0, Am = 0":
-        "por debajo de 30(hs + hr) = 90 m: q = 0, Am = 0",
+    "receiver region  $30 h_r$ = 45 m":
+        "región del receptor  $30 h_r$ = 45 m",
+    "$d_p$ = 60 m: the regions overlap, so there is no middle region":
+        "$d_p$ = 60 m: las regiones se solapan y no hay región intermedia",
+    "below $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$":
+        "por debajo de $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$",
     "and ground_middle is ignored entirely":
         "y ground_middle se ignora por completo",
     # The four diffracted paths (environment/propagation/ground-barriers).
@@ -62,11 +63,11 @@ _ES: dict[str, str] = {
     "each segment carries L'W,eq,line,i + 10 lg(dL)":
         "cada segmento lleva L'W,eq,line,i + 10 lg(dL)",
     "signal-controlled junction": "intersección semaforizada",
-    "max(1 − |x|/100, 0)": "max(1 − |x|/100, 0)",
+    "$max(1 − |x|/100, 0)$": "$max(1 − |x|/100, 0)$",
     "dwelling façade": "fachada de vivienda",
     "road surface": "pavimento",
     "equivalent point source": "fuente puntual equivalente",
-    "gradient s: the flow is split": "pendiente s: el flujo se divide",
+    "gradient $s$: the flow is split": "pendiente $s$: el flujo se divide",
     "and corrected uphill and downhill": "y se corrige en subida y en bajada",
     "receiver point": "punto receptor",
     # CNOSSOS-EU railway source lines (environment/sources).
@@ -79,9 +80,9 @@ _ES: dict[str, str] = {
     "B — exhausts, roof apparatus,": "B — escapes, equipos de techo,",
     "pantograph recess": "hueco del pantógrafo",
     "receiver, 4 m": "receptor, 4 m",
-    "ψ > 0": "ψ > 0",
-    "ψ ≤ 0: the vertical correction of A is zero":
-        "ψ ≤ 0: la corrección vertical de A es nula",
+    "$ψ > 0$": "$ψ > 0$",
+    "$ψ ≤ 0$: the vertical correction of A is zero":
+        "$ψ ≤ 0$: la corrección vertical de A es nula",
     "track axis": "eje de la vía",
     "0 dB broadside": "0 dB en perpendicular",
     "−20 dB along the track": "−20 dB en el eje de la vía",
@@ -108,10 +109,10 @@ _ES: dict[str, str] = {
         "documentar y corregir su pérdida por inserción",
     "Position (clause 7.1)": "Posición (capítulo 7.1)",
     "within ±15° of downwind": "dentro de ±15° de la dirección a sotavento",
-    "R0 to ±20 %, max ±30 m, measured to ±2 %":
-        "R0 con ±20 %, máx. ±30 m, medida con ±2 %",
-    "board inclination φ between 25° and 40°":
-        "inclinación del tablero φ entre 25° y 40°",
+    "$R_0$ to ±20 %, max ±30 m, measured to ±2 %":
+        "$R_0$ con ±20 %, máx. ±30 m, medida con ±2 %",
+    "board inclination $φ$ between 25° and 40°":
+        "inclinación del tablero $φ$ entre 25° y 40°",
     "reflections from structures < 0,2 dB":
         "reflexiones de estructuras < 0,2 dB",
     # RD 1367/2007 chain (environment/assessment/spanish-noise-regulation).
@@ -132,19 +133,20 @@ _ES: dict[str, str] = {
     "2 h shut": "2 h cerrada",
     "6 h, machine": "6 h, máquina",
     "4 h, rest": "4 h, resto",
-    "noise phases Ti of uniformly perceived level":
-        "fases de ruido Ti de nivel percibido uniforme",
+    "noise phases $T_i$ of uniformly perceived level":
+        "fases de ruido $T_i$ de nivel percibido uniforme",
     "2 — each phase, corrected": "2 — cada fase, corregida",
-    "Kt + Kf + Ki ≤ 9 dB (Annex IV A.3.3)":
-        "Kt + Kf + Ki ≤ 9 dB (Anexo IV A.3.3)",
+    "$K_t + K_f + K_i ≤ 9$ dB (Annex IV A.3.3)":
+        "$K_t + K_f + K_i ≤ 9$ dB (Anexo IV A.3.3)",
     "3 — the period level": "3 — el nivel del período",
     "round_reported_level → 57 dB": "round_reported_level → 57 dB",
     "4 — the annual value": "4 — el valor anual",
-    "LK,x over the operating days": "LK,x sobre los días de actividad",
+    "$L_{K,x}$ over the operating days":
+        "$L_{K,x}$ sobre los días de actividad",
     "303 open / 62 closed → 56 dB": "303 abierta / 62 cerrada → 56 dB",
     "worst phase ≤ limit + 5 dB": "peor fase ≤ límite + 5 dB",
     "daily LKeq,x ≤ limit + 3 dB": "LKeq,x diario ≤ límite + 3 dB",
-    "annual LK,x ≤ limit": "LK,x anual ≤ límite",
+    "annual $L_{K,x}$ ≤ limit": "$L_{K,x}$ anual ≤ límite",
     "Article 25.2 drops the third criterion for an ":
         "El artículo 25.2 suprime el tercer criterio para una ",
     "activity already in operation": "actividad ya en funcionamiento",
@@ -570,22 +572,22 @@ _ES: dict[str, str] = {
     # Impulsive-sound prominence (NT ACOU 112)
     "Impulsive-sound prominence and LAeq adjustment (NT ACOU 112)":
         "Prominencia de sonidos impulsivos y ajuste de LAeq (NT ACOU 112)",
-    "A-weighted level history  L_pAF  (time weighting F)":
-        "Historia del nivel ponderado A  L_pAF  (ponderación F)",
+    "A-weighted level history  $L_{pAF}$  (time weighting F)":
+        "Historia del nivel ponderado A  $L_{pAF}$  (ponderación F)",
     "an onset = a stretch where the gradient exceeds 10 dB/s (clauses 4.5-4.7)":
         "un arranque = tramo donde el gradiente supera 10 dB/s (cláusulas 4.5-4.7)",
     "Per impulse: onset rate OR and level difference LD":
         "Por impulso: tasa de crecimiento OR y diferencia de nivel LD",
-    "OR = onset slope [dB/s],   LD = Le − Ls [dB]":
-        "OR = pendiente de crecimiento [dB/s],   LD = Le − Ls [dB]",
-    "Predicted prominence  P   (clause 7, Formula 1)":
-        "Prominencia prevista  P   (cláusula 7, Fórmula 1)",
-    "P = 3·log10(OR) + 2·log10(LD);   highest P over 30 min governs":
-        "P = 3·log10(OR) + 2·log10(LD);   la P más alta en 30 min gobierna",
-    "Adjustment  KI   (clause 8, Formula 2)":
-        "Ajuste  KI   (cláusula 8, Fórmula 2)",
-    "KI = 1.8·(P − 5) dB for P > 5, else 0":
-        "KI = 1.8·(P − 5) dB si P > 5, si no 0",
+    "OR = onset slope [dB/s],   $LD = L_e − L_s$ [dB]":
+        "OR = pendiente de crecimiento [dB/s],   $LD = L_e − L_s$ [dB]",
+    "Predicted prominence  $P$   (clause 7, Formula 1)":
+        "Prominencia prevista  $P$   (cláusula 7, Fórmula 1)",
+    "$P = 3·log_{10}(OR) + 2·log_{10}(LD)$;   highest $P$ over 30 min governs":
+        "$P = 3·log_{10}(OR) + 2·log_{10}(LD)$;   la $P$ más alta en 30 min gobierna",
+    "Adjustment  $K_I$   (clause 8, Formula 2)":
+        "Ajuste  $K_I$   (cláusula 8, Fórmula 2)",
+    "$K_I = 1.8·(P − 5)$ dB for $P > 5$, else 0":
+        "$K_I = 1.8·(P − 5)$ dB si $P > 5$, si no 0",
     "Rating level  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )":
         "Nivel de evaluación  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
     "impulse-adjusted level over the reference time  (Note 1)":
@@ -1223,7 +1225,7 @@ _ES: dict[str, str] = {
         "Geometría fuente–barrera–receptor (ISO 9613-2)",
     "Receiver": "Receptor",
     "Barrier": "Barrera",
-    "Ground (Gs, Gm, Gr)": "Suelo (Gs, Gm, Gr)",
+    "Ground ($G_s$, $G_m$, $G_r$)": "Suelo ($G_s$, $G_m$, $G_r$)",
     "diffracted path": "trayecto difractado",
     "direct path (blocked)": "trayecto directo (bloqueado)",
     "z = dss + dsr − d   (path difference)":
@@ -2165,27 +2167,28 @@ _ES: dict[str, str] = {
     "Plan view (Figure 3)": "Planta (Figura 3)",
     "reference position 1 (downwind)": "referencia 1 (a sotavento)",
     "optional positions 2–4": "posiciones opcionales 2–4",
-    "R1 = √(H² + R0²)   slant distance, rotor centre → microphone":
-        "R1 = √(H² + R0²)   distancia oblicua, centro del rotor → micrófono",
-    "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Formula 26, S0 = 1 m²)":
-        "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Fórmula 26, S0 = 1 m²)",
-    "the −6 dB removes the board's pressure doubling; board-to-R1 angle φ = 25°–40°":
+    "$R_1 = √(H^2 + R_0^2)$   slant distance, rotor centre → microphone":
+        "$R_1 = √(H^2 + R_0^2)$   distancia oblicua, centro del rotor → micrófono",
+    "$L_{WA,i} = L_{p,i} − 6 + 10 log_{10}(4π R_1^2 / S_0)$   (Formula 26, $S_0$ = 1 m²)":
+        "$L_{WA,i} = L_{p,i} − 6 + 10 log_{10}(4π R_1^2 / S_0)$   (Fórmula 26, $S_0$ = 1 m²)",
+    "the −6 dB removes the board's pressure doubling; board-to-$R_1$ angle $φ$ = 25°–40°":
         "los −6 dB descuentan la duplicación de presión de la placa; "
-        "ángulo placa–R1 φ = 25°–40°",
+        "ángulo placa–$R_1$ $φ$ = 25°–40°",
     # Ground reflection (image source)
     "Ground reflection: direct ray, image source and path difference":
         "Reflexión del suelo: rayo directo, fuente imagen y diferencia de camino",
     "image source": "fuente imagen",
-    "direct ray  r1": "rayo directo  r1",
+    "direct ray  $r_1$": "rayo directo  $r_1$",
     "reflected ray": "rayo reflejado",
     "equal angles": "ángulos iguales",
-    "path difference  δ = r2 − r1": "diferencia de camino  δ = r2 − r1",
-    "phase difference  Δφ = 2π δ / λ  (+ arg Q)":
-        "diferencia de fase  Δφ = 2π δ / λ  (+ arg Q)",
+    "path difference  $δ = r_2 − r_1$":
+        "diferencia de camino  $δ = r_2 − r_1$",
+    "phase difference  $Δφ = 2π δ / λ$  (+ $arg Q$)":
+        "diferencia de fase  $Δφ = 2π δ / λ$  (+ $arg Q$)",
     "p ∝ e^(jkr1)/r1 + Q · e^(jkr2)/r2   (Q = ground reflection coefficient)":
         "p ∝ e^(jkr1)/r1 + Q · e^(jkr2)/r2   (Q = coeficiente de reflexión del suelo)",
-    "in phase (δ ≈ nλ): up to +6 dB    ·    out of phase (δ ≈ λ/2 on hard ground): a deep dip":
-        "en fase (δ ≈ nλ): hasta +6 dB    ·    en oposición (δ ≈ λ/2 sobre "
+    "in phase ($δ ≈ nλ$): up to +6 dB    ·    out of phase ($δ ≈ λ/2$ on hard ground): a deep dip":
+        "en fase ($δ ≈ nλ$): hasta +6 dB    ·    en oposición ($δ ≈ λ/2$ sobre "
         "suelo duro): un mínimo profundo",
     # 2D FDTD wave simulation
     "Domain  $c(x, y)$, $ρ(x, y)$, $dx$":
@@ -2454,7 +2457,7 @@ _ES: dict[str, str] = {
     # Atmospheric refraction (Salomons / Attenborough & Van Renterghem)
     "Atmospheric refraction: downwind multipath and the upwind shadow":
         "Refracción atmosférica: multitrayecto y sombra por el viento",
-    "wind u(z)": "viento u(z)",
+    "wind $u(z)$": "viento $u(z)$",
     "acoustic shadow": "sombra acústica",
     "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB":
         "Contra el viento: los rayos suben; desde ≈ 220 m se abre una "
@@ -2462,9 +2465,9 @@ _ES: dict[str, str] = {
     "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)":
         "A favor del viento: los rayos bajan y llegan la directa y la "
         "rebotada en el suelo (multitrayecto)",
-    "a ±0.1 (m/s)/m gradient curves rays with radius Rc = c0/|g| ≈ 3.4 km; source hs = 2 m, receiver hr = 1.5 m":
-        "gradiente de ±0,1 (m/s)/m → radio Rc = c0/|g| ≈ 3,4 km; fuente "
-        "hs = 2 m, receptor hr = 1,5 m",
+    "a ±0.1 (m/s)/m gradient curves rays with radius $R_c = c_0/|g|$ ≈ 3.4 km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m":
+        "gradiente de ±0,1 (m/s)/m → radio $R_c = c_0/|g|$ ≈ 3,4 km; fuente "
+        "$h_s$ = 2 m, receptor $h_r$ = 1,5 m",
     # Aircraft noise certification points (ICAO Annex 16, Chapter 3)
     "Aircraft noise certification points (ICAO Annex 16, Chapter 3)":
         "Certificación de ruido de aeronaves (Anexo 16 OACI, Capítulo 3)",
@@ -3065,19 +3068,20 @@ _ES: dict[str, str] = {
     # Barrier diffraction over ground (Fresnel number)
     "Barrier diffraction over ground: the Fresnel number at work":
         "Difracción en barrera sobre el suelo: el número de Fresnel en acción",
-    "A = 50.09 m": "A = 50,09 m",
-    "B = 50.06 m": "B = 50,06 m",
-    "direct d = 100.00 m (blocked)": "directo d = 100,00 m (bloqueado)",
+    "$A$ = 50.09 m": "$A$ = 50,09 m",
+    "$B$ = 50.06 m": "$B$ = 50,06 m",
+    "direct $d$ = 100.00 m (blocked)":
+        "directo $d$ = 100,00 m (bloqueado)",
     "1.0 m": "1,0 m",
     "4.0 m": "4,0 m",
-    "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz":
-        "diferencia de caminos δ = A + B − d = 0,15 m; número de Fresnel "
-        "N = 2δ/λ = 0,44 a 500 Hz",
+    "path difference $δ = A + B − d$ = 0.15 m; Fresnel number $N = 2δ/λ$ = 0.44 at 500 Hz":
+        "diferencia de caminos $δ = A + B − d$ = 0,15 m; número de Fresnel "
+        "$N = 2δ/λ$ = 0,44 a 500 Hz",
     "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz":
         "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10,0 dB "
         "a 500 Hz",
-    "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
-        "N crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
+    "$N$ grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
+        "$N$ crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
         "(escala vertical exagerada)",
     # Image-source lattice in plan
     "Image-source lattice in plan: first reflections of a 7 × 5 m room":
