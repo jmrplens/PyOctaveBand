@@ -44,6 +44,122 @@ DARK = Theme(
 _FONT = "Segoe UI, Helvetica, Arial, sans-serif"
 _MONO = "Consolas, Menlo, monospace"
 
+#: Combining diacritics a symbol may carry (T̂, L̄); each travels with the
+#: base letter it modifies, so the pair styles as one glyph.
+_COMBINING = "̂̄̅̇"
+
+#: Script metrics of the ``$...$`` composer, as fractions of the font size:
+#: how far a subscript drops, how far a superscript rises, and the glyph
+#: scale of both.
+_SUB_DROP = 0.22
+_SUP_RISE = -0.38
+_SCRIPT_SCALE = 0.70
+
+
+def _esc(s: str) -> str:
+    """Escape XML metacharacters so labels may contain <, > and & literally."""
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _math_tokens(run: str) -> list[tuple[str, str]]:
+    """Split one math run into ``(kind, text)`` chunks.
+
+    ``var`` is a single letter -- Latin or Greek, with any combining marks --
+    and is set in italic. ``up`` stays upright: digits, operators, primes,
+    brackets, and runs of two or more Latin letters, which are operator
+    names and acronyms (log, grad, CN), never products; a product of two
+    symbols is written with an explicit space or middle dot between them.
+    ``sub`` and ``sup`` carry the payload of ``_``/``^``, braced or single
+    character, to be tokenized again at script size.
+    """
+    out: list[tuple[str, str]] = []
+    i = 0
+    while i < len(run):
+        ch = run[i]
+        if ch in "_^":
+            kind = "sub" if ch == "_" else "sup"
+            if i + 1 < len(run) and run[i + 1] == "{":
+                end = run.index("}", i + 2)
+                out.append((kind, run[i + 2:end]))
+                i = end + 1
+            else:
+                out.append((kind, run[i + 1:i + 2]))
+                i += 2
+        elif ch.isalpha():
+            latin = ch.isascii()
+            j = i + 1
+            while j < len(run) and (
+                run[j] in _COMBINING
+                or (latin and run[j].isascii() and run[j].isalpha())
+            ):
+                j += 1
+            letters = sum(1 for c in run[i:j] if c not in _COMBINING)
+            out.append(("var" if letters == 1 else "up", run[i:j]))
+            i = j
+        else:
+            j = i
+            while j < len(run) and run[j] not in "_^" and not run[j].isalpha():
+                j += 1
+            out.append(("up", run[i:j]))
+            i = j
+    return out
+
+
+def _math_spans(s: str, size: int) -> str:
+    """Compose a translated ``$...$`` string into styled ``<tspan>`` runs.
+
+    Prose outside the ``$...$`` spans stays upright at the baseline; inside
+    them variables are italicised and ``_``/``^`` scripts are dropped or
+    raised via ``dy`` at reduced size, with the offset restored on the next
+    run. No tspan carries an ``x`` of its own, so the whole string remains
+    one text chunk and ``text-anchor`` keeps working. The caller must put
+    ``xml:space="preserve"`` on the wrapping ``<text>``: without it librsvg
+    collapses every space at a tspan boundary, even NBSP. Radicals keep the
+    house spelling ``√(...)``; there are no commands, every glyph is
+    literal.
+    """
+    segments = s.split("$")
+    if len(segments) % 2 == 0:
+        raise ValueError(f"unbalanced $ markup in {s!r}")
+    chunks: list[tuple[str, bool, float, float]] = []
+
+    def add(text: str, italic: bool = False, shift: float = 0.0,
+            scale: float = 1.0) -> None:
+        if not text:
+            return
+        if chunks and chunks[-1][1:] == (italic, shift, scale):
+            chunks[-1] = (chunks[-1][0] + text, italic, shift, scale)
+        else:
+            chunks.append((text, italic, shift, scale))
+
+    for k, segment in enumerate(segments):
+        if k % 2 == 0:
+            add(segment)
+            continue
+        for kind, payload in _math_tokens(segment):
+            if kind in ("var", "up"):
+                add(payload, italic=kind == "var")
+            else:
+                shift = _SUB_DROP if kind == "sub" else _SUP_RISE
+                for kind2, payload2 in _math_tokens(payload):
+                    add(payload2, italic=kind2 == "var", shift=shift,
+                        scale=_SCRIPT_SCALE)
+
+    parts: list[str] = []
+    baseline = 0.0
+    for text, italic, shift, scale in chunks:
+        attrs: list[str] = []
+        dy = (shift - baseline) * size
+        baseline = shift
+        if abs(dy) > 1e-9:
+            attrs.append(f' dy="{dy:.1f}"')
+        if scale != 1.0:
+            attrs.append(f' font-size="{size * scale:.1f}"')
+        if italic:
+            attrs.append(' font-style="italic"')
+        parts.append(f'<tspan{"".join(attrs)}>{_esc(text)}</tspan>')
+    return "".join(parts)
+
 
 class SVG:
     """Tiny element accumulator with technical-drawing helpers."""
@@ -90,14 +206,20 @@ class SVG:
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
         s = self.tr(s)
-        # Escape XML metacharacters so labels may contain <, > and & literally.
-        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         fill = fill or self.th.fg
         w = ' font-weight="600"' if bold else ""
+        if "$" in s:
+            # Composed mathematics: ``mono`` and ``italic`` do not apply,
+            # the markup styles every glyph run itself (see _math_spans).
+            self.add(f'<text x="{x}" y="{y}" font-family="{_FONT}" '
+                     f'font-size="{size}" fill="{fill}" '
+                     f'text-anchor="{anchor}"{w} xml:space="preserve">'
+                     f'{_math_spans(s, size)}</text>')
+            return
         i = ' font-style="italic"' if italic else ""
         fam = _MONO if mono else _FONT
         self.add(f'<text x="{x}" y="{y}" font-family="{fam}" font-size="{size}" '
-                 f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{s}</text>')
+                 f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{_esc(s)}</text>')
 
     def path(self, d: str, fill: str = "none", stroke: str = "none",
              sw: float = 1.5, dash: str = "") -> None:
@@ -193,14 +315,15 @@ class SVG:
 
     def render(self, title: str) -> str:
         th = self.th
-        t = (self.tr(title).replace("&", "&amp;").replace("<", "&lt;")
-             .replace(">", "&gt;"))
+        t = self.tr(title)
+        body = (f' xml:space="preserve">{_math_spans(t, 26)}' if "$" in t
+                else f'>{_esc(t)}')
         head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
                 f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
                 f'<text x="{self.w / 2}" y="30" font-family="{_FONT}" '
                 f'font-size="26" font-weight="600" fill="{th.fg}" '
-                f'text-anchor="middle">{t}</text>')
+                f'text-anchor="middle"{body}</text>')
         return head + "".join(self.parts) + "</svg>"
 
 
