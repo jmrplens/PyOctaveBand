@@ -244,13 +244,13 @@ def _segment_panel(s: SVG, th: Theme, x_s1: float, y_path: float, q_px: float,
            dash="4,5")
     s.arrow(x_s2 + 30.0, y_path, x_s2 + 56.0, y_path, th.muted, 1.4)
     s.line(x_s1, y_path, x_s2, y_path, th.accent, 3.4)
-    for xp, lab in ((x_s1, "S1"), (x_s2, "S2")):
+    for xp, lab in ((x_s1, "$S_1$"), (x_s2, "$S_2$")):
         s.circle(xp, y_path, 5.0, th.accent)
         s.text(xp, y_path - 12.0, lab, 15, th.fg, bold=True)
     s.circle(x_sp, y_path, 4.0, th.bg, th.fg, 1.6)
-    s.text(x_sp, y_path - 12.0, "Sp", 15, th.muted)
+    s.text(x_sp, y_path - 12.0, "$S_p$", 15, th.muted)
     s.circle(ox, oy, 6.0, th.secondary)
-    s.text(ox + 14.0, oy + 6.0, "O", 16, th.fg, bold=True, anchor="start")
+    s.text(ox + 14.0, oy + 6.0, "$O$", 16, th.fg, bold=True, anchor="start")
     return ox, oy
 
 
@@ -273,16 +273,16 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     s.line(118.0, ya, ox, oy, th.muted, 1.2, dash="5,4")          # d1
     s.line(118.0 + 464.0 * sc, ya, ox, oy, th.muted, 1.2, dash="5,4")   # d2
     s.line(ox, ya, ox, oy, th.primary, 2.0)                        # dp
-    s.text(ox + 20.0, (ya + oy) / 2 + 5.0, "dp = 526 m", 15, th.primary,
+    s.text(ox + 20.0, (ya + oy) / 2 + 5.0, "$d_p$ = 526 m", 15, th.primary,
            anchor="start")
-    s.text(150.0, (ya + oy) / 2 + 26.0, "d1 = 568 m", 14, th.muted, anchor="end")
-    s.text(300.0, (ya + oy) / 2 + 26.0, "d2 = 582 m", 14, th.muted, anchor="start")
-    s.dim(118.0, ya - 32.0, ox, ya - 32.0, "q = 214 m", offset=0, size=14)
-    s.dim(118.0, ya - 60.0, 118.0 + 464.0 * sc, ya - 60.0, "λ = 464 m",
+    s.text(150.0, (ya + oy) / 2 + 26.0, "$d_1$ = 568 m", 14, th.muted, anchor="end")
+    s.text(300.0, (ya + oy) / 2 + 26.0, "$d_2$ = 582 m", 14, th.muted, anchor="start")
+    s.dim(118.0, ya - 32.0, ox, ya - 32.0, "$q$ = 214 m", offset=0, size=14)
+    s.dim(118.0, ya - 60.0, 118.0 + 464.0 * sc, ya - 60.0, "$λ$ = 464 m",
           offset=0, size=14)
-    s.text(60.0, 350.0, "0 ≤ q ≤ λ, so ds = dp and an exposure level",
+    s.text(60.0, 350.0, "$0 ≤ q ≤ λ$, so $d_s = d_p$ and an exposure level",
            14, th.muted, anchor="start")
-    s.text(60.0, 370.0, "reads the NPD table at dp (§4.4.1)", 14, th.muted,
+    s.text(60.0, 370.0, "reads the NPD table at $d_p$ (§4.4.1)", 14, th.muted,
            anchor="start")
 
     # --- (b) observer behind the segment (Fig. 4-2a) ------------------------
@@ -292,15 +292,15 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     obx, oby = _segment_panel(s, th, x_s1b, ya, -300.0 * sc, 520.0 * sc,
                               464.0 * sc)
     s.line(x_s1b, ya, obx, oby, th.secondary, 2.0)                 # ds = d1
-    s.text(obx + 22.0, (ya + oby) / 2 + 30.0, "ds = d1 = 600 m", 15,
+    s.text(obx + 22.0, (ya + oby) / 2 + 30.0, "$d_s = d_1$ = 600 m", 15,
            th.secondary, anchor="start")
     s.line(obx, ya, obx, oby, th.primary, 1.4, dash="4,4")         # dp
-    s.text(obx - 10.0, (ya + oby) / 2 - 22.0, "dp = 520 m", 14, th.primary,
+    s.text(obx - 10.0, (ya + oby) / 2 - 22.0, "$d_p$ = 520 m", 14, th.primary,
            anchor="end")
-    s.dim(obx, ya - 32.0, x_s1b, ya - 32.0, "q = −300 m", offset=0, size=14)
-    s.text(478.0, 350.0, "q < 0, so the exposure level reads the table",
+    s.dim(obx, ya - 32.0, x_s1b, ya - 32.0, "$q$ = −300 m", offset=0, size=14)
+    s.text(478.0, 350.0, "$q < 0$, so the exposure level reads the table",
            14, th.muted, anchor="start")
-    s.text(478.0, 370.0, "at ds behind a take-off roll and at dp elsewhere",
+    s.text(478.0, 370.0, "at $d_s$ behind a take-off roll and at $d_p$ elsewhere",
            14, th.muted, anchor="start")
 
     # --- (c) the plane normal to the flight path (Fig. 4-3) -----------------
@@ -318,11 +318,11 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     s.line(ac_x - 66.0, ac_y, ac_x + 78.0, ac_y, th.muted, 1.0, dash="4,4")
     s.ellipse(ac_x, ac_y, 13.0, 9.0, th.panel, th.fg, 2.0)
     _arc(s, ac_x, ac_y, 44.0, 0.0, 15.0, th.accent, 1.4)
-    s.text(ac_x + 66.0, ac_y - 22.0, "ε = 15°", 14, th.accent, anchor="start")
+    s.text(ac_x + 66.0, ac_y - 22.0, "$ε$ = 15°", 14, th.accent, anchor="start")
     _arc(s, ac_x, ac_y, 84.0, 15.0, -18.0, th.fg, 1.4)
-    s.text(ac_x + 96.0, ac_y + 14.0, "φ = β + ε = 33°", 15, th.fg, anchor="start")
+    s.text(ac_x + 96.0, ac_y + 14.0, "$φ = β + ε$ = 33°", 15, th.fg, anchor="start")
     _arc(s, obs_x, gy, 62.0, 180.0, 162.0, th.primary, 1.4)
-    s.text(obs_x - 86.0, gy - 10.0, "β = 18°", 15, th.primary, anchor="end")
+    s.text(obs_x - 86.0, gy - 10.0, "$β$ = 18°", 15, th.primary, anchor="end")
     s.mic(obs_x, gy - 22.0, gy, 0.6)
     s.text(obs_x + 22.0, gy + 20.0, "receiver, 1.2 m", 14, th.muted,
            anchor="middle")
@@ -341,9 +341,9 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     rx, ry = _polar(cx, cy, 96.0, 120.0)
     s.line(cx, cy, rx, ry, th.secondary, 2.0)
     s.circle(rx, ry, 6.0, th.secondary)
-    s.text(rx - 4.0, ry - 12.0, "O", 15, th.fg, bold=True, anchor="end")
+    s.text(rx - 4.0, ry - 12.0, "$O$", 15, th.fg, bold=True, anchor="end")
     _arc(s, cx, cy, 36.0, 0.0, 120.0, th.fg, 1.4)
-    s.text(cx + 18.0, cy - 46.0, "ψ = 120°", 15, th.fg, anchor="start")
+    s.text(cx + 18.0, cy - 46.0, "$ψ$ = 120°", 15, th.fg, anchor="start")
     s.text(cx - 66.0, cy - 26.0, "dSOR", 14, th.secondary, anchor="end")
     s.line(cx, cy, cx - 110.0, cy, th.muted, 1.0, dash="3,4")
     s.text(cx - 118.0, cy + 5.0, "180°", 13, th.muted, anchor="end")
@@ -418,7 +418,7 @@ def _d_aircraft_noise_station(s: SVG, th: Theme) -> None:
         s.circle(mast + cup, gy - mast_h - 7.0, 5.0, th.primary)
     s.rect(mast + 8.0, gy - mast_h + 34.0, 32.0, 18.0, th.panel, th.fg,
            rx=3.0, sw=1.4)
-    s.text(mast + 46.0, gy - mast_h + 48.0, "T, RH", 13, th.muted,
+    s.text(mast + 46.0, gy - mast_h + 48.0, "$T$, RH", 13, th.muted,
            anchor="start")
     s.dim(mast - 36.0, gy, mast - 36.0, gy - mast_h, "10 m", offset=0, size=15)
     s.text(mast, gy + 22.0, "met mast, within 2 000 m", 14, th.muted)
@@ -509,26 +509,26 @@ def _d_rotorcraft_hemisphere(s: SVG, th: Theme) -> None:
 
     # --- (a) the polar angle, in the vertical centre plane (φ = 0) ---------
     ax, ay = 236.0, 162.0
-    s.text(52.0, 72.0, "(a) Polar angle θ, centre plane φ = 0", 17, th.fg,
+    s.text(52.0, 72.0, "(a) Polar angle $θ$, centre plane $φ$ = 0", 17, th.fg,
            bold=True, anchor="start")
     _arc(s, ax, ay, r, 0.0, -180.0, th.muted, 1.4)
     for ang in (0.0, -90.0, -180.0):
         s.line(ax, ay, *_polar(ax, ay, r, ang), th.muted, 1.0, dash="4,4")
-    s.text(ax + r + 10.0, ay + 6.0, "θ = 0 nose", 14, th.fg, anchor="start")
-    s.text(ax - r - 10.0, ay + 6.0, "θ = 180 tail", 14, th.fg, anchor="end")
-    s.text(ax, ay + r + 26.0, "θ = 90 beneath", 14, th.fg)
+    s.text(ax + r + 10.0, ay + 6.0, "$θ$ = 0 nose", 14, th.fg, anchor="start")
+    s.text(ax - r - 10.0, ay + 6.0, "$θ$ = 180 tail", 14, th.fg, anchor="end")
+    s.text(ax, ay + r + 26.0, "$θ$ = 90 beneath", 14, th.fg)
     _arc(s, ax, ay, r - 20.0, -40.0, -140.0, th.accent, 5.0)
     s.line(*_polar(ax, ay, r * 0.30, -52.0), *_polar(ax, ay, r, -52.0),
            th.primary, 1.4)
-    s.text(*_polar(ax, ay, r * 0.68, -52.0), "rh = 60 m", 14, th.primary,
+    s.text(*_polar(ax, ay, r * 0.68, -52.0), "$r_h$ = 60 m", 14, th.primary,
            anchor="start")
-    s.text(ax, ay + r + 50.0, "measured polar band θt1 … θt2,", 13, th.accent)
+    s.text(ax, ay + r + 50.0, "measured polar band $θ_{t1}$ … $θ_{t2}$,", 13, th.accent)
     s.text(ax, ay + r + 68.0, "the two 10 dB-down instants", 13, th.muted)
     _heli_glyph(s, ax, ay, True, 1.0)
 
     # --- (b) the azimuth, in the plane across the aircraft (θ = 90) --------
     bx, by = 664.0, 162.0
-    s.text(470.0, 72.0, "(b) Azimuth φ, seen from astern", 17, th.fg, bold=True,
+    s.text(470.0, 72.0, "(b) Azimuth $φ$, seen from astern", 17, th.fg, bold=True,
            anchor="start")
     _arc(s, bx, by, r, 0.0, -180.0, th.muted, 1.4)
     _arc(s, bx, by, r - 20.0, -30.0, -150.0, th.accent, 5.0)
@@ -537,10 +537,10 @@ def _d_rotorcraft_hemisphere(s: SVG, th: Theme) -> None:
     for ang in (-30.0, -150.0):
         px, py = _polar(bx, by, r + 20.0, ang)
         s.text(px, py + 6.0, "60°", 13, th.accent)
-    s.text(bx + r, by + 26.0, "φ = +90 starboard", 14, th.fg)
-    s.text(bx - r, by + 26.0, "φ = −90 port", 14, th.fg)
-    s.text(bx, by + r + 26.0, "φ = 0 beneath", 14, th.fg)
-    s.text(bx, by + r + 50.0, "measured lateral band −60° ≤ φ ≤ 60°,", 13,
+    s.text(bx + r, by + 26.0, "$φ$ = +90 starboard", 14, th.fg)
+    s.text(bx - r, by + 26.0, "$φ$ = −90 port", 14, th.fg)
+    s.text(bx, by + r + 26.0, "$φ$ = 0 beneath", 14, th.fg)
+    s.text(bx, by + r + 50.0, "measured lateral band $−60° ≤ φ ≤ 60°$,", 13,
            th.accent)
     s.text(bx, by + r + 68.0, "outside it the bins are gap-filled", 13, th.muted)
     _heli_glyph(s, bx, by, False, 1.0)
@@ -558,15 +558,15 @@ def _d_rotorcraft_hemisphere(s: SVG, th: Theme) -> None:
     s.text(hx - 46.0, hy - 26.0, "60 m", 13, th.primary, anchor="end")
     s.mic(742.0, gy - 22.0, gy, 0.6)
     s.line(hx + 26.0, hy + 26.0, 740.0, gy - 26.0, th.primary, 2.2)
-    s.text(540.0, 468.0, "slant range r", 14, th.primary)
+    s.text(540.0, 468.0, "slant range $r$", 14, th.primary)
     s.text(742.0, gy + 24.0, "receiver, 1.2 m", 14, th.muted)
     s.line(hx - 32.0, hy + 8.0, hx + 32.0, hy - 8.0, th.accent, 2.0, dash="5,4")
-    s.text(hx + 44.0, hy - 22.0, "banked by Φ in turns", 13, th.accent,
+    s.text(hx + 44.0, hy - 22.0, "banked by $Φ$ in turns", 13, th.accent,
            anchor="start")
 
     # --- the array contract -------------------------------------------------
     s.text(60.0, 584.0,
-           "ΔLs = −20 lg(r/60) · ΔLa = −α(f)(r − 60) · ΔLg from the two-ray model over the ground",
+           "$ΔL_s = −20 lg(r/60)$ · $ΔL_a = −α(f)(r − 60)$ · $ΔL_g$ from the two-ray model over the ground",
            15, th.fg, anchor="start")
     s.text(60.0, 608.0,
            "levels[a, p, f] in dB at 60 m under the ICAO reference atmosphere (25 °C, 70 % RH, 101.325 kPa):",
@@ -575,5 +575,5 @@ def _d_rotorcraft_hemisphere(s: SVG, th: Theme) -> None:
            "19 azimuths × 19 polar angles at 10°, 31 one-third-octave bands from 10 Hz to 10 kHz",
            15, th.muted, anchor="start")
     s.text(60.0, 656.0,
-           "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at −φ",
+           "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at $−φ$",
            15, th.muted, anchor="start")

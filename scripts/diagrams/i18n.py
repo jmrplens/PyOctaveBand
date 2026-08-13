@@ -3565,26 +3565,26 @@ _ES: dict[str, str] = {
         "(c) En el plano normal a la trayectoria",
     "(d) Behind the take-off roll, in plan":
         "(d) Detrás de la carrera de despegue, en planta",
-    "dp = 526 m": "dp = 526 m",
-    "d1 = 568 m": "d1 = 568 m",
-    "d2 = 582 m": "d2 = 582 m",
-    "q = 214 m": "q = 214 m",
-    "q = −300 m": "q = −300 m",
-    "ds = d1 = 600 m": "ds = d1 = 600 m",
+    "$d_p$ = 526 m": "$d_p$ = 526 m",
+    "$d_1$ = 568 m": "$d_1$ = 568 m",
+    "$d_2$ = 582 m": "$d_2$ = 582 m",
+    "$q$ = 214 m": "$q$ = 214 m",
+    "$q$ = −300 m": "$q$ = −300 m",
+    "$d_s = d_1$ = 600 m": "$d_s = d_1$ = 600 m",
     "0 ≤ q ≤ λ:  ds = dp, and the NPD lookup for an":
         "0 ≤ q ≤ λ:  ds = dp, y la consulta NPD de un",
     "exposure level uses dp (§4.4.1)": "nivel de exposición usa dp (§4.4.1)",
     "q < 0:  the NPD lookup uses ds behind a take-off":
         "q < 0:  la consulta NPD usa ds detrás de una carrera de",
     "ground roll, and dp everywhere else": "despegue, y dp en todos los demás casos",
-    "0 ≤ q ≤ λ, so ds = dp and an exposure level":
-        "0 ≤ q ≤ λ: ds = dp y un nivel de exposición",
-    "reads the NPD table at dp (§4.4.1)":
-        "consulta la tabla NPD en dp (§4.4.1)",
-    "q < 0, so the exposure level reads the table":
-        "q < 0: el nivel de exposición consulta la tabla",
-    "at ds behind a take-off roll and at dp elsewhere":
-        "en ds tras un recorrido de despegue, si no en dp",
+    "$0 ≤ q ≤ λ$, so $d_s = d_p$ and an exposure level":
+        "$0 ≤ q ≤ λ$: $d_s = d_p$ y un nivel de exposición",
+    "reads the NPD table at $d_p$ (§4.4.1)":
+        "consulta la tabla NPD en $d_p$ (§4.4.1)",
+    "$q < 0$, so the exposure level reads the table":
+        "$q < 0$: el nivel de exposición consulta la tabla",
+    "at $d_s$ behind a take-off roll and at $d_p$ elsewhere":
+        "en $d_s$ tras un recorrido de despegue, si no en $d_p$",
     # Doc 29 symbol (distance from start of roll), identical in Spanish.
     "dSOR": "dSOR",
     "β elevation of the path over the ground line · ε bank, positive with "
@@ -3645,7 +3645,7 @@ _ES: dict[str, str] = {
     "tracking": "seguimiento",
     "24 bands, 50 Hz-10 kHz": "24 bandas, 50 Hz-10 kHz",
     "one sample every 500 ms ± 5 ms": "una muestra cada 500 ms ± 5 ms",
-    "T, RH": "T, HR",
+    "$T$, RH": "$T$, HR",
     "met mast, within 2 000 m of the station":
         "torre meteorológica, a menos de 2 000 m de la estación",
     "Test window (aeroplanes): no precipitation; −10 to 35 °C and 20 to 95 % RH over the path above 10 m;":
@@ -3659,39 +3659,40 @@ _ES: dict[str, str] = {
     # ECAC Doc 32 noise hemisphere (aircraft/rotorcraft-noise).
     "The rotorcraft noise hemisphere and its angles (ECAC Doc 32)":
         "El hemisferio de ruido del giroavión y sus ángulos (ECAC Doc 32)",
-    "measured polar band θt1 … θt2,": "banda polar medida θt1 … θt2,",
+    "measured polar band $θ_{t1}$ … $θ_{t2}$,":
+        "banda polar medida $θ_{t1}$ … $θ_{t2}$,",
     "the two 10 dB-down instants": "los dos instantes de 10 dB por debajo",
-    "measured lateral band −60° ≤ φ ≤ 60°,":
-        "banda lateral medida −60° ≤ φ ≤ 60°,",
+    "measured lateral band $−60° ≤ φ ≤ 60°$,":
+        "banda lateral medida $−60° ≤ φ ≤ 60°$,",
     "outside it the bins are gap-filled": "fuera de ella los bins se rellenan",
-    "ΔLs = −20 lg(r/60) · ΔLa = −α(f)(r − 60) · ΔLg from the two-ray model "
-    "over the ground":
-        "ΔLs = −20 lg(r/60) · ΔLa = −α(f)(r − 60) · ΔLg del modelo de dos "
-        "rayos sobre el suelo",
-    "(a) Polar angle θ, centre plane φ = 0":
-        "(a) Ángulo polar θ, plano central φ = 0",
-    "(b) Azimuth φ, seen from astern": "(b) Acimut φ, visto desde popa",
+    "$ΔL_s = −20 lg(r/60)$ · $ΔL_a = −α(f)(r − 60)$ · $ΔL_g$ from the "
+    "two-ray model over the ground":
+        "$ΔL_s = −20 lg(r/60)$ · $ΔL_a = −α(f)(r − 60)$ · $ΔL_g$ del modelo "
+        "de dos rayos sobre el suelo",
+    "(a) Polar angle $θ$, centre plane $φ$ = 0":
+        "(a) Ángulo polar $θ$, plano central $φ$ = 0",
+    "(b) Azimuth $φ$, seen from astern": "(b) Acimut $φ$, visto desde popa",
     "(c) The 60 m sphere on a flight path":
         "(c) La esfera de 60 m sobre una trayectoria",
-    "θ = 0 nose": "θ = 0 morro",
-    "θ = 90 beneath": "θ = 90 debajo",
-    "θ = 180 tail": "θ = 180 cola",
+    "$θ$ = 0 nose": "$θ$ = 0 morro",
+    "$θ$ = 90 beneath": "$θ$ = 90 debajo",
+    "$θ$ = 180 tail": "$θ$ = 180 cola",
     "measured band": "banda medida",
     "θt1 … θt2, the 10 dB-down instants": "θt1 … θt2, los instantes a 10 dB del máximo",
-    "rh = 60 m": "rh = 60 m",
-    "φ = +90 starboard": "φ = +90 estribor",
-    "φ = 0 beneath": "φ = 0 debajo",
-    "φ = −90 port": "φ = −90 babor",
+    "$r_h$ = 60 m": "$r_h$ = 60 m",
+    "$φ$ = +90 starboard": "$φ$ = +90 estribor",
+    "$φ$ = 0 beneath": "$φ$ = 0 debajo",
+    "$φ$ = −90 port": "$φ$ = −90 babor",
     "outside ±60° the bins are gap-filled from the nearest":
         "fuera de ±60° las celdas se rellenan desde la más próxima",
-    "slant range r": "distancia oblicua r",
-    "banked by Φ in turns": "alabeado Φ en los virajes",
+    "slant range $r$": "distancia oblicua $r$",
+    "banked by $Φ$ in turns": "alabeado $Φ$ en los virajes",
     "levels[a, p, f] in dB at 60 m under the ICAO reference atmosphere (25 °C, 70 % RH, 101.325 kPa):":
         "levels[a, p, f] en dB a 60 m bajo la atmósfera de referencia OACI (25 °C, 70 % HR, 101,325 kPa):",
     "19 azimuths × 19 polar angles at 10°, 31 one-third-octave bands from 10 Hz to 10 kHz":
         "19 acimutes × 19 ángulos polares cada 10°, 31 bandas de tercio de octava de 10 Hz a 10 kHz",
-    "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at −φ":
-        "las celdas no medidas son NaN, nunca 0 dB; los miembros de clase con rotor espejado leen los mismos datos en −φ",
+    "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at $−φ$":
+        "las celdas no medidas son NaN, nunca 0 dB; los miembros de clase con rotor espejado leen los mismos datos en $−φ$",
     # Sound-field audiometry (ISO 389-7 / ISO 8253-2) — B15b
     "Sound-field audiometry and the ISO 389-7 reference zero":
         "Audiometría en campo sonoro y el cero de referencia de ISO 389-7",
