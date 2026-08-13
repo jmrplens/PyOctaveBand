@@ -229,11 +229,18 @@ def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
 
 
 def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
-                color: str, lo: str = "", hi: str = "") -> dict[str, Any]:
+                color: str, lo: str = "", hi: str = "",
+                end_dy: float = -0.12) -> dict[str, Any]:
     """A semicircular meter dial; move the needle with :func:`_set_gauge`.
 
     ``lo``/``hi`` are optional scale-endpoint labels (left and right end of
-    the arc), so a reader can anchor the needle position to numbers.
+    the arc), so a reader can anchor the needle position to numbers, and
+    ``end_dy`` is where they hang, in radii below the arc's own baseline.
+    The default drops them far enough to clear the needle at full scale,
+    which is what a label wide for its dial needs; a dial whose endpoint
+    labels are two or three characters wide is better served by a shallower
+    drop, close enough under the arc ends to read as belonging to that arc
+    rather than floating in the gap to the next dial.
     """
     from matplotlib.patches import Arc
 
@@ -249,10 +256,10 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     # Spanish "20 sonios" against the English "20 sone") otherwise reaches
     # back under the needle tip with a couple of pixels to spare.
     if lo:
-        ax.text(cx - 1.12 * r, cy - 0.12 * r, lo, ha="center", va="top",
+        ax.text(cx - 1.12 * r, cy + end_dy * r, lo, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     if hi:
-        ax.text(cx + 1.12 * r, cy - 0.12 * r, hi, ha="center", va="top",
+        ax.text(cx + 1.12 * r, cy + end_dy * r, hi, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     (needle,) = ax.plot([cx, cx - 0.78 * r], [cy, cy], color=color, lw=2.4,
                         solid_capstyle="round")
@@ -450,9 +457,15 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
 
     # --- meter gauges + response traces -----------------------------------
     # One shared 0..1.2 scale, spelled out on the first dial only (the
-    # endpoint labels of adjacent dials would otherwise collide).
+    # endpoint labels of adjacent dials would otherwise collide). "0" and
+    # "1.2" are two or three characters wide and never reach back under the
+    # needle, so they hang just clear of the arc ends instead of at the
+    # shared default, which drops them into the gap between F and S where
+    # they read as labelling neither. Not flush against the ends either: at
+    # this radius the arc's own end tick is horizontal, and a label whose
+    # top edge meets it is drawn with a line through its digits.
     gauges = [_make_gauge(ax_g, 0.6, 0.0, 0.5, "F", COLOR_PRIMARY,
-                          lo="0", hi="1.2"),
+                          lo="0", hi="1.2", end_dy=-0.04),
               _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY),
               _make_gauge(ax_g, 2.8, 0.0, 0.5, "I", col_imp)]
     ax_t.set_xlim(0.5, 4.0)
