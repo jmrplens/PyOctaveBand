@@ -10,7 +10,9 @@
 #
 # Written by the renderer. To refresh one clip, re-render it:
 #     python scripts/generate_graphs.py --animations --anim <clip>
+anim_elastic_halfspace_waves d4c6b03e1874b384
 anim_fdtd_absorption_placement 20a3e82deab423f6
+anim_fdtd_dispersion 6de574766da9812d
 anim_fdtd_duct_cut_on 51eddf89a7eb4983
 anim_fdtd_expansion_chamber 996482c4a5016a89
 anim_fdtd_room_modes c4c970b6a5bac45d
@@ -18,5 +20,7 @@ anim_fdtd_side_branch 71258bf06820cb15
 anim_image_source_buildup cc0098b6de500073
 anim_intensity_scan_power 836278515c2c9dc9
 anim_modulation_transfer b83da9124a6fead6
+anim_onset_detection 28346608ed02edd7
 anim_schroeder 46dfa1050eed8b9d
+anim_specific_loudness 0c2a8a69ab3f3620
 anim_time_weighting 42a8c62341643954
