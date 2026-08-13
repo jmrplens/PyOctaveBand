@@ -403,15 +403,15 @@ _ES_EXACT = {
     r"internal loss factor $\eta_1$": r"factor de pérdidas interno $\eta_1$",
     "Plateau Estimate Against the Physical Panel Model":
         "Estimación por meseta frente al modelo físico del panel",
-    "coincidence plateau (A to B)": "meseta de coincidencia (A a B)",
+    "coincidence plateau ($A$ to $B$)": "meseta de coincidencia ($A$ a $B$)",
     "physical model (mass law + coincidence + damping)":
         "modelo físico (ley de masas + coincidencia + amortiguamiento)",
     "plateau estimate (Norton Table 3.1)":
         "estimación por meseta (Norton, tabla 3.1)",
-    "critical frequency fc": "frecuencia crítica fc",
+    "critical frequency $f_c$": "frecuencia crítica $f_c$",
     "Transmission loss TL [dB]": "Pérdida por transmisión TL [dB]",
-    "identical below A; the plateau replaces the whole coincidence region":
-        "idénticas por debajo de A; la meseta sustituye toda la región de "
+    "identical below $A$; the plateau replaces the whole coincidence region":
+        "idénticas por debajo de $A$; la meseta sustituye toda la región de "
         "coincidencia",
     "Corrugating a Sheet Flattens Its Sound Reduction Index":
         "Grecar una chapa aplana su índice de reducción acústica",
@@ -542,8 +542,8 @@ _ES_EXACT = {
         "Índice de reducción acústica $R$ [dB]",
     r"Radiation efficiency $\sigma$": r"Eficiencia de radiación $\sigma$",
     "field-incidence mass law": "ley de masas de campo",
-    "single panel R (Sharp)": "R de panel simple (Sharp)",
-    "double wall R": "R de pared doble",
+    "single panel $R$ (Sharp)": "$R$ de panel simple (Sharp)",
+    "double wall $R$": "$R$ de pared doble",
     "single leaf (total mass)": "hoja simple (masa total)",
     "solid wall alone": "pared maciza sola",
     "wall + 1 % open slit": "pared + rendija 1 % abierta",
@@ -793,10 +793,11 @@ _ES_EXACT = {
         "Mejora a impacto de revestimientos de suelo (ISO 16251-1)",
     "Improvement of impact sound insulation [dB]":
         "Mejora del aislamiento a impactos [dB]",
-    "delta-L (improvement)": "delta-L (mejora)",
-    "delta-Lw = 29 dB  (ISO 717-2)\none-third octave, mock-up (a0 = 1e-6 m/s^2)":
-        "delta-Lw = 29 dB  (ISO 717-2)\n"
-        "tercios de octava, maqueta (a0 = 1e-6 m/s^2)",
+    r"$\Delta L$ (improvement)": r"$\Delta L$ (mejora)",
+    "$\\Delta L_w$ = 29 dB  (ISO 717-2)\n"
+    "one-third octave, mock-up ($a_0 = 10^{-6}$ m/s²)":
+        "$\\Delta L_w$ = 29 dB  (ISO 717-2)\n"
+        "tercios de octava, maqueta ($a_0 = 10^{-6}$ m/s²)",
     # heavy_impact_sources figure (ISO 16283-2 / JIS A 1418-2 / ISO 717-2)
     "Standard heavy impact sources\n(ISO 16283-2 Table A.1, JIS A 1418-2 Tables A.1/A.2)":
         "Fuentes de impacto pesadas normalizadas\n(ISO 16283-2 Tabla A.1, "
@@ -834,41 +835,51 @@ _ES_EXACT = {
     "$R_{cl}$, plenum $h$ = 0.43 m": "$R_{cl}$, plenum $h$ = 0,43 m",
     "$R_{cl}$, plenum $h$ = 0.86 m": "$R_{cl}$, plenum $h$ = 0,86 m",
     # masonry_wall_ties figure (Hopkins 3.11.3.2 / 4.3.5.4.1)
-    "Wall-tie structure-borne coupling\n(point-connection model, 2.5 ties/m2)":
+    "Wall-tie structure-borne coupling\n(point-connection model, 2.5 ties/m²)":
         "Acoplamiento estructural por llaves de muro\n(modelo de unión puntual, "
-        "2.5 llaves/m2)",
-    "Coupling loss factor eta_ij": "Factor de pérdidas por acoplamiento eta_ij",
-    "rigid connection (Yc = 0)": "unión rígida (Yc = 0)",
-    "Ties stiffen the cavity\n(140 kg/m2 leaves, 75 mm cavity, 2.5 ties/m2)":
-        "Las llaves rigidizan la cámara\n(hojas de 140 kg/m2, cámara de 75 mm, "
-        "2.5 llaves/m2)",
+        "2.5 llaves/m²)",
+    r"Coupling loss factor $\eta_{ij}$":
+        r"Factor de pérdidas por acoplamiento $\eta_{ij}$",
+    "rigid connection ($Y_c = 0$)": "unión rígida ($Y_c = 0$)",
+    "Ties stiffen the cavity\n(140 kg/m² leaves, 75 mm cavity, 2.5 ties/m²)":
+        "Las llaves rigidizan la cámara\n(hojas de 140 kg/m², cámara de 75 mm, "
+        "2.5 llaves/m²)",
     "cavity wall, no ties": "muro con cámara, sin llaves",
-    "2.5 ties/m2, k = 2 MN/m": "2,5 llaves/m2, k = 2 MN/m",
+    "2.5 ties/m², $k$ = 2 MN/m": "2,5 llaves/m², $k$ = 2 MN/m",
     # Resonance markers, symbols only: read the same in Spanish.
-    "fmsm = 26 Hz": "fmsm = 26 Hz",
-    "fmsm = 50 Hz": "fmsm = 50 Hz",
+    "$f_{\\mathrm{msm}}$ = 26 Hz": "$f_{\\mathrm{msm}}$ = 26 Hz",
+    "$f_{\\mathrm{msm}}$ = 50 Hz": "$f_{\\mathrm{msm}}$ = 50 Hz",
     "combined-mass range added by the ties":
         "rango de masa combinada añadido por las llaves",
     # floating_floor_prediction / soft_covering_prediction figures
     "Floating-Floor Impact Improvement Above the Mass-Spring Resonance":
         "Mejora a impactos del suelo flotante por encima de la resonancia masa-resorte",
-    "30 log10(f/f0) (sand-cement screed)": "30 log10(f/f0) (solera de mortero de cemento)",
-    "40 log10(f/f0) (asphalt, dry)": "40 log10(f/f0) (asfalto, seco)",
-    "40 log10(f/f0) + hammer term (chipboard)":
-        "40 log10(f/f0) + término del martillo (tablero de partículas)",
+    r"$30\,\log_{10}(f/f_0)$ (sand-cement screed)":
+        r"$30\,\log_{10}(f/f_0)$ (solera de mortero de cemento)",
+    r"$40\,\log_{10}(f/f_0)$ (asphalt, dry)":
+        r"$40\,\log_{10}(f/f_0)$ (asfalto, seco)",
+    r"$40\,\log_{10}(f/f_0)$ + hammer term (chipboard)":
+        r"$40\,\log_{10}(f/f_0)$ + término del martillo (tablero de partículas)",
     "ISO 12354-2 Annex G bands": "Bandas del Anexo G de ISO 12354-2",
-    "35 mm screed m' = 73.5 kg/m2 on s' = 8 MN/m3\n"
-    "delta-Lw = 32.2 dB  (ISO 12354-2 Formula C.4)":
-        "solera de 35 mm m' = 73.5 kg/m2 sobre s' = 8 MN/m3\n"
-        "delta-Lw = 32.2 dB  (fórmula C.4 de ISO 12354-2)",
+    "$f_0$ = 52.8 Hz": "$f_0$ = 52,8 Hz",
+    "35 mm screed $m′$ = 73.5 kg/m² on $s′$ = 8 MN/m³\n"
+    "$\\Delta L_w$ = 32.2 dB  (ISO 12354-2 Formula C.4)":
+        "solera de 35 mm $m′$ = 73,5 kg/m² sobre $s′$ = 8 MN/m³\n"
+        "$\\Delta L_w$ = 32,2 dB  (fórmula C.4 de ISO 12354-2)",
     "Soft Floor Covering Improvement From the Hammer Contact Stiffness":
         "Mejora del revestimiento de suelo blando a partir de la rigidez de contacto del martillo",
     "two-line estimate (0 dB, 12 dB/oct)":
         "estimación de dos rectas (0 dB, 12 dB/oct)",
-    "140 mm concrete slab, hammer 0.5 kg, r = 15 mm\n"
-    "No. 1: fco = 2318 Hz\nNo. 2: fco = 100 Hz":
-        "losa de hormigón de 140 mm, martillo 0.5 kg, r = 15 mm\n"
-        "N.o 1: fco = 2318 Hz\nN.o 2: fco = 100 Hz",
+    "140 mm concrete slab, hammer 0.5 kg, $r$ = 15 mm\n"
+    "No. 1: $f_{\\mathrm{co}}$ = 2318 Hz\nNo. 2: $f_{\\mathrm{co}}$ = 100 Hz":
+        "losa de hormigón de 140 mm, martillo 0,5 kg, $r$ = 15 mm\n"
+        "N.o 1: $f_{\\mathrm{co}}$ = 2318 Hz\nN.o 2: $f_{\\mathrm{co}}$ = 100 Hz",
+    # The two resilient-layer legend entries carry the layer stiffness the
+    # page discusses; Hopkins' covering numbers stay as printed.
+    r"No. 1: $E/d = 1.5\times10^{11}$ N/m³":
+        r"N.o 1: $E/d = 1{,}5\times10^{11}$ N/m³",
+    r"No. 2: $E/d = 2.8\times10^{8}$ N/m³":
+        r"N.o 2: $E/d = 2{,}8\times10^{8}$ N/m³",
     # flanking_transmission figure (ISO 10848)
     "ISO 10848 Junction Vibration Reduction Index":
         "Índice de reducción de vibraciones de unión (ISO 10848)",
@@ -1059,27 +1070,32 @@ _ES_EXACT = {
         r"Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]",
     "low-mobility plate": "placa de baja movilidad",
     "high-mobility plate": "placa de alta movilidad",
-    "LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB\n"
-    "eta = 2.2/(f Ts),  v0 = 1 nm/s\nreception-plate method (clause 7)":
-        "LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB\n"
-        "eta = 2,2/(f Ts),  v0 = 1 nm/s\n"
+    "$L_{Ws} = 10\\,\\log_{10}(2\\pi f\\,\\eta\\,m\\,S) + L_v - 60$ dB\n"
+    "$\\eta = 2.2/(f\\,T_s)$,  $v_0$ = 1 nm/s\n"
+    "reception-plate method (clause 7)":
+        "$L_{Ws} = 10\\,\\log_{10}(2\\pi f\\,\\eta\\,m\\,S) + L_v - 60$ dB\n"
+        "$\\eta = 2{,}2/(f\\,T_s)$,  $v_0$ = 1 nm/s\n"
         "método de la placa receptora (apartado 7)",
     # installed_structure_borne figure (EN 12354-5)
     "EN 12354-5 Installed Structure-Borne Sound":
         "Ruido estructural instalado EN 12354-5",
     r"characteristic $L_{Ws,c}$ (EN 15657)":
         r"característica $L_{Ws,c}$ (EN 15657)",
-    r"installed $L_{Ws,inst}$ = $L_{Ws,c}-D_C$":
-        r"instalada $L_{Ws,inst}$ = $L_{Ws,c}-D_C$",
+    r"installed $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$":
+        r"instalada $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$",
     "paths $L_{n,s,ij}$": "caminos $L_{n,s,ij}$",
     r"total $L_{n,s}$": r"total $L_{n,s}$",
-    # Monospace formula box, symbols only: reads the same in Spanish.
-    "DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))\n"
-    "Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)\n"
-    "Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2":
-        "DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))\n"
-        "Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)\n"
-        "Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2",
+    # Formula box, symbols only: reads the same in Spanish.
+    "$D_C = 10\\,\\log_{10}(|Y_s+Y_i|^2 / (|Y_s|\\,\\mathrm{Re}\\,Y_i))$\n"
+    "$L_{n,s,ij} = L_{Ws,\\mathrm{inst}} - D_{sa} - R_{ij}"
+    " - 10\\,\\log_{10}(S_i/S_0) - 10\\,\\log_{10}(A_0/4)$\n"
+    "$L_{n,s} = 10\\,\\log_{10}(\\Sigma\\,10^{L_{n,s,ij}/10})$,  "
+    "$S_0 = A_0$ = 10 m²":
+        "$D_C = 10\\,\\log_{10}(|Y_s+Y_i|^2 / (|Y_s|\\,\\mathrm{Re}\\,Y_i))$\n"
+        "$L_{n,s,ij} = L_{Ws,\\mathrm{inst}} - D_{sa} - R_{ij}"
+        " - 10\\,\\log_{10}(S_i/S_0) - 10\\,\\log_{10}(A_0/4)$\n"
+        "$L_{n,s} = 10\\,\\log_{10}(\\Sigma\\,10^{L_{n,s,ij}/10})$,  "
+        "$S_0 = A_0$ = 10 m²",
     # tone_audibility figure (ISO/PAS 20065)
     "ISO/PAS 20065 Tonal Audibility": "Audibilidad tonal ISO/PAS 20065",
     r"Audibility $\Delta L$ [dB]": r"Audibilidad $\Delta L$ [dB]",
@@ -1614,8 +1630,6 @@ _ES_EXACT = {
     "EDT slope": "Pendiente EDT",
     "ISO 717-1 Weighted Sound Reduction Index (Annex C example)":
         "\u00cdndice ponderado de reducci\u00f3n ac\u00fastica (ISO 717-1, ejemplo del Anexo C)",
-    "Apparent sound reduction index R' [dB]":
-        "\u00cdndice de reducci\u00f3n ac\u00fastica aparente R' [dB]",
     "Apparent sound reduction index $R′$ [dB]":
         "Índice de reducción acústica aparente $R′$ [dB]",
     "Measured $R′$ (third octave)": "$R′$ medido (tercios de octava)",
@@ -2647,7 +2661,7 @@ _ES_EXACT = {
     "ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)":
         "Modelo detallado ISO 12354-1: camino dominante por banda (Anexo L)",
     "other paths": "otros caminos",
-    "R' (apparent)": "R' (aparente)",
+    "$R′$ (apparent)": "$R′$ (aparente)",
     "Transmission path": "Camino de transmisión",
     "Dd — direct": "Dd — directo",
     "Ff — flanking–flanking": "Ff — flanco–flanco",
@@ -2656,12 +2670,14 @@ _ES_EXACT = {
     "dominant path": "camino dominante",
     # prediction_flanking_demo / detailed_prediction_paths info boxes:
     # ratings and formulae, symbols only (decimal commas aside).
-    "Rw (Dd) = 57.0 dB\nR'w = 52.2 dB\nR'w − Rw = −4.8 dB\n"
+    "$R_w$ (Dd) = 57.0 dB\n$R′_w$ = 52.2 dB\n$R′_w - R_w$ = −4.8 dB\n"
     "Dd 32.9 %   ΣFf,Fd,Df 67.1 %":
-        "Rw (Dd) = 57,0 dB\nR'w = 52,2 dB\nR'w − Rw = −4,8 dB\n"
+        "$R_w$ (Dd) = 57,0 dB\n$R′_w$ = 52,2 dB\n$R′_w - R_w$ = −4,8 dB\n"
         "Dd 32,9 %   ΣFf,Fd,Df 67,1 %",
-    "R' = −10 log10(Σ 10^(−Rij/10))\nR'w (C; Ctr) = 57 (−1; −7) dB":
-        "R' = −10 log10(Σ 10^(−Rij/10))\nR'w (C; Ctr) = 57 (−1; −7) dB",
+    "$R′ = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
+    "$R′_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB":
+        "$R′ = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
+        "$R′_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB",
     "ISO 12999-1 Measurement Uncertainty (situation B, airborne)":
         "Incertidumbre de medición ISO 12999-1 (situación B, aéreo)",
     "Measured $R′$": "$R′$ medido",
@@ -3396,10 +3412,12 @@ _ES_EXACT = {
         "Predicción de ruido de impactos EN 12354-2 (Anexo E.3)",
     "Level / correction [dB]": "Nivel / corrección [dB]",
     # impact_prediction_terms info box: formulae, symbols only.
-    "L'n,w = Ln,w,eq - ΔLw + K\n"
-    "Ln,w,eq = 164 - 35 log10(m'/m'0) = 76.2 dB\nL'n,w = 45.2 dB → 45 dB":
-        "L'n,w = Ln,w,eq - ΔLw + K\n"
-        "Ln,w,eq = 164 - 35 log10(m'/m'0) = 76,2 dB\nL'n,w = 45,2 dB → 45 dB",
+    "$L′_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
+    "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m′/m′_0)$ = 76.2 dB\n"
+    "$L′_{n,w}$ = 45.2 dB → 45 dB":
+        "$L′_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
+        "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m′/m′_0)$ = 76,2 dB\n"
+        "$L′_{n,w}$ = 45,2 dB → 45 dB",
     "EN 12354-4 Radiated Sound Power (Annex G)":
         "Potencia acústica radiada EN 12354-4 (Anexo G)",
     "radiated $L_W$ per octave": "$L_W$ radiada por octava",
@@ -3411,7 +3429,7 @@ _ES_EXACT = {
         "Nivel de potencia acústica radiada [dB re 1 pW]",
     "Predicted Single-Panel Insulation Rated per ISO 717-1":
         "Aislamiento previsto de panel simple evaluado según ISO 717-1",
-    "predicted R (Sharp)": "R previsto (Sharp)",
+    "predicted $R$ (Sharp)": "$R$ previsto (Sharp)",
     # Shared ylabel of single_panel_rating, plateau_transmission_loss,
     # orthotropic_transmission_loss and panel_insulation_concept; "pérdida
     # por transmisión" as the panel-sound-insulation page words it.
@@ -3912,22 +3930,23 @@ _ES_EXACT = {
         "Fórmula 19b (exacta, movilidades complejas)",
     "force-source limit (19c)": "límite de fuente de fuerza (19c)",
     "velocity-source limit (19d)": "límite de fuente de velocidad (19d)",
-    "Mobility ratio |Ys| / |Yi|": "Cociente de movilidades |Ys| / |Yi|",
-    "Coupling term D_C [dB]": "Término de acoplamiento D_C [dB]",
+    r"Mobility ratio $|Y_s|/|Y_i|$": r"Cociente de movilidades $|Y_s|/|Y_i|$",
+    "Coupling term $D_C$ [dB]": "Término de acoplamiento $D_C$ [dB]",
     "EN 12354-5 Coupling Term and Its Two Limits":
         "Término de acoplamiento de la EN 12354-5 y sus dos límites",
-    "D_C = 10 log10(|Ys + Yi + Yk|² / (|Ys| Re{Yi}))\n"
+    "$D_C = 10\\,\\log_{10}(|Y_s + Y_i + Y_k|^2 / (|Y_s|\\,\\mathrm{Re}\\{Y_i\\}))$\n"
     "left: velocity source (stiff receiver takes more)\n"
     "right: force source (stiff receiver takes less)":
-        "D_C = 10 log10(|Ys + Yi + Yk|² / (|Ys| Re{Yi}))\n"
+        "$D_C = 10\\,\\log_{10}(|Y_s + Y_i + Y_k|^2 / "
+        "(|Y_s|\\,\\mathrm{Re}\\{Y_i\\}))$\n"
         "izquierda: fuente de velocidad (un receptor rígido acepta más)\n"
         "derecha: fuente de fuerza (un receptor rígido acepta menos)",
     # tapping_force_spectrum (buildings/design/resilient-layers)
-    "|Fn|upper = 2 m vh / Ti  (rebound)":
-        "|Fn|superior = 2 m vh / Ti  (con rebote)",
-    "|Fn|lower = m vh / Ti  (no rebound)":
-        "|Fn|inferior = m vh / Ti  (sin rebote)",
-    "Line force |Fn| [N]": "Fuerza por línea |Fn| [N]",
+    r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (rebound)":
+        r"$|F_n|_{\mathrm{sup}} = 2\,m\,v_h/T_i$  (con rebote)",
+    r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (no rebound)":
+        r"$|F_n|_{\mathrm{inf}} = m\,v_h/T_i$  (sin rebote)",
+    r"Line force $|F_n|$ [N]": r"Fuerza por línea $|F_n|$ [N]",
     "Tapping-Machine Force: the Floor Decides the Excitation":
         "Fuerza de la máquina de impactos: el forjado decide la excitación",
     "0.5 kg hammer dropped 40 mm, 10 impacts per second\n"
@@ -3935,17 +3954,16 @@ _ES_EXACT = {
         "martillo de 0,5 kg desde 40 mm, 10 impactos por segundo\n"
         "rango de acústica de la edificación sombreado",
     # detailed_impact_paths (buildings/design/detailed-prediction)
-    "Apparent normalized impact level L'n [dB]":
-        "Nivel de impactos normalizado aparente L'n [dB]",
-    "L'n (apparent)": "L'n (aparente)",
+    "Apparent normalized impact level $L′_n$ [dB]":
+        "Nivel de impactos normalizado aparente $L′_n$ [dB]",
+    "$L′_n$ (apparent)": "$L′_n$ (aparente)",
     "ISO 12354-2 Detailed Model: the Direct Path Governs (Annex G)":
         "Modelo detallado de la ISO 12354-2: manda la vía directa (anexo G)",
     # radiation_efficiency_panels (buildings/design/panel-sound-insulation)
-    "0.5 m x 0.4 m pane, same glass":
-        "vidrio de 0,5 m x 0,4 m, el mismo material",
-    "sigma = 1 (as efficient as a piston)":
-        "sigma = 1 (tan eficiente como un pistón)",
-    "Radiation efficiency sigma": "Eficiencia de radiación sigma",
+    "0.5 m × 0.4 m pane, same glass":
+        "vidrio de 0,5 m × 0,4 m, el mismo material",
+    r"$\sigma = 1$ (as efficient as a piston)":
+        r"$\sigma = 1$ (tan eficiente como un pistón)",
     # simply_supported is the boundary= literal, kept as typed.
     "Baffled plate (simply_supported)": "Placa con bafle (simply_supported)",
     "Edge Radiation, Coincidence and the Slow Return to Unity":
@@ -3955,14 +3973,18 @@ _ES_EXACT = {
         "Una fuente, cuatro niveles: la cadena de conversión de la EN 15657",
     "Structure-borne power level [dB re 1 pW]":
         "Nivel de potencia estructural [dB re 1 pW]",
-    "L_Ws measured on the test plate (Y = 5.34e-6)":
-        "L_Ws medido sobre la placa de ensayo (Y = 5,34e-6)",
-    "L_Wsn on the standard plate (Y = 5e-6): what is declared":
-        "L_Wsn sobre la placa normalizada (Y = 5e-6): lo que se declara",
-    "L_Ws,inst on the receiving wall (Y = 24.1e-6)":
-        "L_Ws,inst sobre el muro receptor (Y = 24,1e-6)",
-    "L_Ws,c with the source mobility (Y = 1e-3): the input to EN 12354-5":
-        "L_Ws,c con la movilidad de la fuente (Y = 1e-3): la entrada de la EN 12354-5",
+    r"$L_{Ws}$ measured on the test plate ($Y = 5.34\times10^{-6}$)":
+        r"$L_{Ws}$ medido sobre la placa de ensayo ($Y = 5{,}34\times10^{-6}$)",
+    r"$L_{Wsn}$ on the standard plate ($Y = 5\times10^{-6}$): what is declared":
+        r"$L_{Wsn}$ sobre la placa normalizada ($Y = 5\times10^{-6}$): "
+        "lo que se declara",
+    r"$L_{Ws,\mathrm{inst}}$ on the receiving wall ($Y = 24.1\times10^{-6}$)":
+        r"$L_{Ws,\mathrm{inst}}$ sobre el muro receptor "
+        r"($Y = 24{,}1\times10^{-6}$)",
+    r"$L_{Ws,c}$ with the source mobility ($Y = 10^{-3}$): "
+    "the input to EN 12354-5":
+        r"$L_{Ws,c}$ con la movilidad de la fuente ($Y = 10^{-3}$): "
+        "la entrada de la EN 12354-5",
     "EN 12354-5 Annex I.3 flushing cistern, wall contact\n"
     "markers reproduce the printed Table I.8 columns":
         "Cisterna del anexo I.3 de la EN 12354-5, contacto en el muro\n"
@@ -4420,36 +4442,49 @@ _ES_PATTERNS = [
     (r"^(.+) Hz \(\$\\varphi\$ = 0°\)$", r"\1 Hz ($\\varphi$ = 0°)"),
     (r"^edge height \$h_0\$ = (\d+)\.(\d+) m, single edge$",
      r"altura de arista $h_0$ = \1,\2 m, arista única"),
-    # coupling_term_regimes annotations (baked-in computed values).
-    (r"^elastic support Yk = (.+) m/\(N s\)  \(19e\)$",
-     r"apoyo elástico Yk = \1 m/(N s)  (19e)"),
+    # coupling_term_regimes annotations (baked-in computed values; the label
+    # carries $...$, so the replacement bakes the decimal comma).
+    (r"^elastic support \$Y_k\$ = (\d+)\.(\d+) m/\(N s\)  \(19e\)$",
+     r"apoyo elástico $Y_k$ = \1,\2 m/(N s)  (19e)"),
     (r"^matched mobilities: (.+) dB$", r"movilidades igualadas: \1 dB"),
     (r"^pump on a concrete slab: (.+) dB$",
      r"bomba sobre un forjado de hormigón: \1 dB"),
     # tapping_force_spectrum legend and annotations.
-    (r"^(\d+) mm concrete slab \(under-critical, fco = (.+) Hz\)$",
-     r"forjado de hormigón de \1 mm (subcrítico, fco = \2 Hz)"),
-    (r"^(\d+) mm chipboard walking surface \(over-critical, fco = (.+) Hz\)$",
-     r"tablero de partículas de \1 mm (supercrítico, fco = \2 Hz)"),
-    (r"^f_limit = (.+) Hz$", r"f_límite = \1 Hz"),
+    ((r"^(\d+) mm concrete slab \(under-critical, "
+      r"\$f_\{\\mathrm\{co\}\}\$ = (\d+) Hz\)$"),
+     r"forjado de hormigón de \1 mm (subcrítico, $f_{\\mathrm{co}}$ = \2 Hz)"),
+    ((r"^(\d+) mm chipboard walking surface \(over-critical, "
+      r"\$f_\{\\mathrm\{co\}\}\$ = (\d+) Hz\)$"),
+     (r"tablero de partículas de \1 mm (supercrítico, "
+      r"$f_{\\mathrm{co}}$ = \2 Hz)")),
+    (r"^\$f_\{\\mathrm\{limit\}\}\$ = (\d+) Hz$",
+     r"$f_{\\mathrm{límite}}$ = \1 Hz"),
     (r"^(.+) dB in mean square\n\((.+) N to (.+) N\)$",
      r"\1 dB en valor cuadrático medio\n(de \2 N a \3 N)"),
-    # detailed_impact_paths annotations.
-    (r"^floating floor fo = (.+) Hz$", r"suelo flotante fo = \1 Hz"),
+    # detailed_impact_paths annotations (mathtext skips the decimal-comma
+    # pass, so the replacements bake the comma).
+    (r"^floating floor \$f_0\$ = (\d+)\.(\d+) Hz$",
+     r"suelo flotante $f_0$ = \1,\2 Hz"),
     ((r"^five paths, not thirteen: only the floor is excited\n"
-      r"L'n,w \(CI\) = (.+) \((.+)\) dB$"),
+      r"\$L′_\{n,w\}\$ \(\$C_I\$\) = (.+) \((.+)\) dB$"),
      ("cinco vías, no trece: solo se excita el forjado\n"
-      r"L'n,w (CI) = \1 (\2) dB")),
-    # structure_borne_conversion annotation (baked-in computed values).
-    ((r"^\+(.+) dB = 10 lg\(24\.1/5\.0\):\n"
+      r"$L′_{n,w}$ ($C_I$) = \1 (\2) dB")),
+    # structure_borne_conversion annotation (baked-in computed values; the
+    # mathtext blocks the decimal-comma pass, so the commas are written here).
+    ((r"^\+(\d+)\.(\d+) dB = \$10\\,\\mathrm\{lg\}\(24\.1/5\.0\)\$:\n"
       r"a lighter receiver accepts more power$"),
-     "+\\1 dB = 10 lg(24,1/5,0):\nun receptor más ligero acepta más potencia"),
-    (r"^L_Ws,c - D_C, D_C = (.+) dB: back to L_Ws,inst$",
-     r"L_Ws,c - D_C, D_C = \1 dB: de vuelta a L_Ws,inst"),
+     (r"+\1,\2 dB = $10\\,\\mathrm{lg}(24{,}1/5{,}0)$:"
+      "\nun receptor más ligero acepta más potencia")),
+    ((r"^\$L_\{Ws,c\} - D_C\$, \$D_C\$ = (\d+)\.(\d+) dB: "
+      r"back to \$L_\{Ws,\\mathrm\{inst\}\}\$$"),
+     (r"$L_{Ws,c} - D_C$, $D_C$ = \1,\2 dB: "
+      r"de vuelta a $L_{Ws,\\mathrm{inst}}$")),
     # radiation_efficiency_panels legend and annotations.
-    (r"^(.+) m x (.+) m pane$", r"vidrio de \1 m x \2 m"),
-    (r"^critical frequency fc = (.+) Hz$", r"frecuencia crítica fc = \1 Hz"),
-    (r"^coincidence peak: sigma = (.+)$", r"pico de coincidencia: sigma = \1"),
+    (r"^(.+) m × (.+) m pane$", r"vidrio de \1 m × \2 m"),
+    (r"^critical frequency \$f_c\$ = (\d+) Hz$",
+     r"frecuencia crítica $f_c$ = \1 Hz"),
+    (r"^coincidence peak: \$\\sigma\$ = (\d+)\.(\d+)$",
+     r"pico de coincidencia: $\\sigma$ = \1,\2"),
     ((r"^at (.+) Hz the small pane radiates (.+) times better:\n"
       r"the uncancelled edge strip is a larger fraction of it$"),
      (r"a \1 Hz el vidrio pequeño radia \2 veces mejor:\n"
@@ -4488,13 +4523,17 @@ _ES_PATTERNS = [
      ("plataforma excitada, cilindro excitado solo a través de las uniones\n"
       "potencia inyectada = \\1 W\n"
       "el acoplamiento queda muy por debajo del amortiguamiento: SEA válido")),
-    # plateau_transmission_loss info box (baked-in panel and plateau values).
-    ((r"^6 mm float glass, m'' = (.+) kg/m², η = (.+)\n"
-      r"plateau height 27 dB, B/A = 10 → A = (.+) Hz, B = (.+) Hz\n"
-      r"identical below A; the plateau replaces the whole coincidence region$"),
-     ("vidrio float de 6 mm, m'' = \\1 kg/m², η = \\2\n"
-      "altura de meseta 27 dB, B/A = 10 → A = \\3 Hz, B = \\4 Hz\n"
-      "idénticas por debajo de A; la meseta sustituye toda la región de "
+    # plateau_transmission_loss info box (baked-in panel and plateau values;
+    # the mathtext blocks the decimal-comma pass, so the commas are here).
+    ((r"^6 mm float glass, \$m′′\$ = (\d+)\.(\d+) kg/m², "
+      r"\$\\eta\$ = (\d+)\.(\d+)\n"
+      r"plateau height 27 dB, \$B/A = 10\$ → \$A\$ = (\d+) Hz, "
+      r"\$B\$ = (\d+) Hz\n"
+      r"identical below \$A\$; the plateau replaces the whole coincidence "
+      r"region$"),
+     (r"vidrio float de 6 mm, $m′′$ = \1,\2 kg/m², $\\eta$ = \3,\4"
+      "\naltura de meseta 27 dB, $B/A = 10$ → $A$ = \\5 Hz, $B$ = \\6 Hz\n"
+      "idénticas por debajo de $A$; la meseta sustituye toda la región de "
       "coincidencia")),
     # slow_sound_absorber panel-depth annotation (baked-in wavelength ratio).
     (r"^Normal incidence, rigid backing, panel depth L = lambda/(\d+)$",
@@ -4928,7 +4967,7 @@ _ES_PATTERNS = [
      r"Aéreo: $R_w$($C$;$C_{tr}$) = \1 dB"),
     (r"^Impact: \$L_\{n,w\}\$\(\$C_I\$\) = (.+) dB$",
      r"Impacto: $L_{n,w}$($C_I$) = \1 dB"),
-    (r"^coincidence fc = (\d+) Hz$", r"coincidencia fc = \1 Hz"),
+    (r"^coincidence \$f_c\$ = (\d+) Hz$", r"coincidencia $f_c$ = \1 Hz"),
     (r"^\$L_\{WA\}\$ = (\d+)\.(\d+) dB\(A\)$", r"$L_{WA}$ = \1,\2 dB(A)"),
     # Their multi-line info boxes are single Text artists, so the whole
     # joined string is matched at once (values stay as capture groups).
@@ -4955,9 +4994,10 @@ _ES_PATTERNS = [
     ((r"^\$6 - 10\\,\\mathrm\{lg\}\(10\^\{0\{,\}6\} - 1\)\$"
       r" = (\d+)\.(\d+) dB$"),
      r"$6 - 10\\,\\mathrm{lg}(10^{0{,}6} - 1)$ = \1,\2 dB"),
-    ((r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
-      r"η = 0\.024$"),
-     "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
+    ((r"^\$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
+      r"6 mm float glass, \$m′′\$ = 15 kg/m², \$\\eta\$ = 0\.024$"),
+     ("$R_w$($C$;$C_{tr}$) = \\1 dB\n"
+      r"vidrio flotado de 6 mm, $m′′$ = 15 kg/m², $\\eta$ = 0,024")),
     ((r"^Kij = 10 log10\(1/τ̄\) \+ 5 log10\(fc2/1000\)\nconcrete, plate 1 fixed "
       r"at 100 mm$"),
      "Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
@@ -5027,17 +5067,21 @@ _ES_PATTERNS = [
      ("RD 1367 tonal_correction: Kt = \\1 dB\n"
       "Indicador de cribado ISO 1996-2 en 250 Hz: \\2\n"
       "Lt en 250 Hz = \\3,\\4 dB")),
-    # orthotropic_transmission_loss info box (library values baked in).
-    ((r"^1 mm steel sheet, m'' = (.+) kg/m², flat fc = (.+) kHz\n"
-      r"corrugated H = (\d+) mm, L = (\d+) mm, m'' = (.+) kg/m², "
-      r"fc1 = (.+) Hz, fc2 = (.+) kHz\n"
-      r"worst penalty (.+) dB at (.+) Hz, for a stiffer and only 9 % "
+    # orthotropic_transmission_loss info box (library values baked in; the
+    # mathtext blocks the decimal-comma pass, so the commas are here).
+    ((r"^1 mm steel sheet, \$m′′\$ = (\d+)\.(\d+) kg/m², flat "
+      r"\$f_c\$ = (\d+)\.(\d+) kHz\n"
+      r"corrugated \$H\$ = (\d+) mm, \$L\$ = (\d+) mm, "
+      r"\$m′′\$ = (\d+)\.(\d+) kg/m², "
+      r"\$f_\{c1\}\$ = (\d+) Hz, \$f_\{c2\}\$ = (\d+)\.(\d+) kHz\n"
+      r"worst penalty (\d+) dB at (\d+) Hz, for a stiffer and only 9 % "
       r"heavier panel$"),
-     ("chapa de acero de 1 mm, m'' = \\1 kg/m², fc plana = \\2 kHz\n"
-      "grecada H = \\3 mm, L = \\4 mm, m'' = \\5 kg/m², "
-      "fc1 = \\6 Hz, fc2 = \\7 kHz\n"
-      "penalización máxima \\8 dB a \\9 Hz, con un panel más rígido y solo "
-      "un 9 % más pesado")),
+     (r"chapa de acero de 1 mm, $m′′$ = \1,\2 kg/m², "
+      r"$f_c$ plana = \3,\4 kHz"
+      "\ngrecada $H$ = \\5 mm, $L$ = \\6 mm, $m′′$ = \\7,\\8 kg/m², "
+      "$f_{c1}$ = \\g<9> Hz, $f_{c2}$ = \\g<10>,\\g<11> kHz\n"
+      "penalización máxima \\g<12> dB a \\g<13> Hz, con un panel más rígido "
+      "y solo un 9 % más pesado")),
     # limp_frame_effective_density annotations (library values baked in).
     (r"^apparent total density rho_t/rho0 = (.+)$",
      r"densidad total aparente rho_t/rho0 = \1"),
