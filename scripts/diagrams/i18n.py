@@ -530,27 +530,30 @@ _ES: dict[str, str] = {
     # Measurement uncertainty (ISO/IEC Guide 98-3 / Supplement 1)
     "Uncertainty: GUM propagation vs Monte Carlo (Guide 98-3)":
         "Incertidumbre: propagación GUM frente a Monte Carlo (Guía 98-3)",
-    "Measurement model  y = f(x_1, …, x_N)":
-        "Modelo de medida  y = f(x_1, …, x_N)",
-    "input estimates x_i with standard uncertainties u(x_i)":
-        "estimaciones de entrada x_i con incertidumbres típicas u(x_i)",
+    "Measurement model  $y = f(x_1, …, x_N)$":
+        "Modelo de medida  $y = f(x_1, …, x_N)$",
+    "input estimates $x_i$ with standard uncertainties $u(x_i)$":
+        "estimaciones de entrada $x_i$ con incertidumbres típicas $u(x_i)$",
     "Law of propagation  (GUM 5)": "Ley de propagación  (GUM 5)",
-    "sensitivity c_i = ∂f / ∂x_i": "sensibilidad c_i = ∂f / ∂x_i",
+    "sensitivity $c_i = ∂f / ∂x_i$": "sensibilidad $c_i = ∂f / ∂x_i$",
     "Combine in quadrature": "Combinación en cuadratura",
-    "uc² = Σ c_i² u²(x_i) + correlation":
-        "uc² = Σ c_i² u²(x_i) + correlación",
+    "$u_c^2 = Σ c_i^2 u^{2}(x_i)$ + correlation":
+        "$u_c^2 = Σ c_i^2 u^{2}(x_i)$ + correlación",
     "Effective dof  (Annex G.4)": "Grados de libertad efectivos  (Anexo G.4)",
-    "v_eff — Welch–Satterthwaite": "v_eff — Welch–Satterthwaite",
-    "U = k · uc": "U = k · uc",
-    "k = t_p(v_eff)   (clause 6)": "k = t_p(v_eff)   (cláusula 6)",
+    "$v_{eff}$ — Welch–Satterthwaite": "$v_{eff}$ — Welch–Satterthwaite",
+    "$U = k · u_c$": "$U = k · u_c$",
+    "$k = t_{p}(v_{eff})$   (clause 6)":
+        "$k = t_{p}(v_{eff})$   (cláusula 6)",
     "Monte Carlo  (Suppl. 1, 7)": "Monte Carlo  (Supl. 1, 7)",
-    "draw x_i from its PDF g(x_i)": "muestrear x_i de su PDF g(x_i)",
-    "Propagate M trials": "Propagar M ensayos",
-    "y_r = f(x_1r, …, x_Nr)": "y_r = f(x_1r, …, x_Nr)",
-    "Sort {y_r}, take fractiles": "Ordenar {y_r}, tomar fractiles",
+    "draw $x_i$ from its PDF $g(x_i)$":
+        "muestrear $x_i$ de su PDF $g(x_i)$",
+    "Propagate $M$ trials": "Propagar $M$ ensayos",
+    "$y_r = f(x_{1r}, …, x_{Nr})$": "$y_r = f(x_{1r}, …, x_{Nr})$",
+    "Sort ${y_r}$, take fractiles": "Ordenar ${y_r}$, tomar fractiles",
     "prob.-symmetric 95 % interval": "intervalo simétrico en prob. al 95 %",
     "coverage interval": "intervalo de cobertura",
-    "[y_low, y_high]   (clause 7.7)": "[y_low, y_high]   (cláusula 7.7)",
+    "$[y_{low}, y_{high}]$   (clause 7.7)":
+        "$[y_{low}, y_{high}]$   (cláusula 7.7)",
     # Noise-induced hearing loss (ISO 1999)
     "Noise-induced hearing loss (ISO 1999): NIPTS and HTLAN":
         "Pérdida auditiva inducida por ruido (ISO 1999): NIPTS y HTLAN",
@@ -818,18 +821,18 @@ _ES: dict[str, str] = {
     "accel.": "acel.",
     "(stud)": "(perno)",
     "load direction": "dirección de carga",
-    "1800 r/min  →  T = 33.3 ms per revolution":
-        "1800 r/min  →  T = 33,3 ms por vuelta",
+    "1800 r/min  →  $T$ = 33.3 ms per revolution":
+        "1800 r/min  →  $T$ = 33,3 ms por vuelta",
     "mesh frequency 37 × 30 = 1110 Hz; five mesh harmonics":
         "frecuencia de engrane 37 × 30 = 1110 Hz; cinco armónicos",
-    "need fs ≥ 2.56 × 5550 = 14.2 kHz":
-        "exigen fs ≥ 2,56 × 5550 = 14,2 kHz",
+    "need $f_s ≥ 2.56 × 5550$ = 14.2 kHz":
+        "exigen $f_s ≥ 2,56 × 5550$ = 14,2 kHz",
     "One front end, one clock": "Un solo frontal, un solo reloj",
     "vibration": "vibración",
-    "fs = 25.6 kHz, gains fixed": "fs = 25,6 kHz, ganancias fijas",
+    "$f_s$ = 25.6 kHz, gains fixed": "$f_s$ = 25,6 kHz, ganancias fijas",
     "one pulse per revolution": "un pulso por vuelta",
     "the pulse is the block boundary": "el pulso marca el bloque",
-    "record N + 1 revolutions": "registra N + 1 vueltas",
+    "record $N + 1$ revolutions": "registra $N + 1$ vueltas",
     "A tacho pulse per revolution and an accelerometer in the load direction: "
     "the period is measured, never assumed":
         "Un pulso de tacómetro por vuelta y un acelerómetro en la dirección de "
@@ -842,25 +845,26 @@ _ES: dict[str, str] = {
     "Floor reflection": "Reflexión en el suelo",
     # The path lengths and the two closed forms carry decimals, so they are
     # listed to get the Spanish comma; the symbols themselves are shared.
-    "r_d = 1.00 m": "r_d = 1,00 m",
-    "r_r = 2.60 m": "r_r = 2,60 m",
-    "Delta d = r_r - r_d = 1.60 m": "Delta d = r_r - r_d = 1,60 m",
-    "t0 = Delta d / c = 4.7 ms": "t0 = Delta d / c = 4,7 ms",
-    "a = R * r_d / r_r = 0.38 R": "a = R * r_d / r_r = 0,38 R",
+    "$r_d$ = 1.00 m": "$r_d$ = 1,00 m",
+    "$r_r$ = 2.60 m": "$r_r$ = 2,60 m",
+    "$Δd = r_r − r_d$ = 1.60 m": "$Δd = r_r − r_d$ = 1,60 m",
+    "$t_0 = Δd / c$ = 4.7 ms": "$t_0 = Δd / c$ = 4,7 ms",
+    "$a = R · r_d / r_r = 0.38 R$": "$a = R · r_d / r_r = 0,38 R$",
     "The 8 ms example of this page": "El ejemplo de 8 ms de esta página",
-    "Delta d = c * 8 ms = 2.74 m": "Delta d = c * 8 ms = 2,74 m",
-    "R = a * r_r / r_d = 3.74 a  <= 1": "R = a * r_r / r_d = 3,74 a  <= 1",
+    "$Δd = c · 8 ms$ = 2.74 m": "$Δd = c · 8 ms$ = 2,74 m",
+    "$R = a · r_r / r_d = 3.74 a ≤ 1$":
+        "$R = a · r_r / r_d = 3,74 a ≤ 1$",
     "a side wall 1.37 m from the direct path":
         "una pared lateral a 1,37 m del camino directo",
-    "so a > 0.27 is not one specular reflection":
-        "así que a > 0,27 no es una sola reflexión especular",
+    "so $a > 0.27$ is not one specular reflection":
+        "así que $a > 0,27$ no es una sola reflexión especular",
     "The reflection has to arrive before the record ends and at least 10 dB "
     "above its noise floor;":
         "La reflexión debe llegar antes de que acabe el registro y al menos "
         "10 dB por encima de su ruido de fondo;",
-    "c moves about 0.6 m/s per kelvin, so convert the delay with the "
+    "$c$ moves about 0.6 m/s per kelvin, so convert the delay with the "
     "temperature you measured":
-        "c cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
+        "$c$ cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
         "temperatura medida",
     # Instrumenting a MISO measurement (signals/spectra/miso-coherence).
     "Instrumenting a MISO measurement: one reference per source":
@@ -874,16 +878,16 @@ _ES: dict[str, str] = {
     "ref 2": "ref 2",
     # "ref 1  x1" and "ref 2  x2" are channel identifiers ("ref" abbreviates
     # referencia too), so they read the same in Spanish.
-    "ref 1  x1": "ref 1  x1",
-    "ref 2  x2": "ref 2  x2",
-    "receiver  y": "receptor  y",
+    "ref 1  $x_1$": "ref 1  $x_1$",
+    "ref 2  $x_2$": "ref 2  $x_2$",
+    "receiver  $y$": "receptor  $y$",
     "leakage": "fuga",
     "One front end": "Un solo frontal",
     "one clock, fixed gains": "un reloj, ganancias fijas",
     "Before reading": "Antes de leer",
     "the split": "el reparto",
     "coherence between": "coherencia entre",
-    "x1 and x2 > 0.9": "x1 y x2 > 0,9",
+    "$x_1$ and $x_2$ > 0.9": "$x_1$ y $x_2$ > 0,9",
     "⇒ do not attribute": "⇒ no atribuir",
     "ref 1: accelerometer stud-mounted on the fan foot":
         "ref 1: acelerómetro atornillado a la pata del ventilador",
@@ -908,11 +912,13 @@ _ES: dict[str, str] = {
     "Type B - from the propagation clause":
         "Tipo B - del capítulo de propagación",
     "Position scatter": "Dispersión entre posiciones",
-    "Type A - s/sqrt(n), v = n - 1": "Tipo A - s/sqrt(n), v = n - 1",
+    "Type A - $s/√n$, $v = n − 1$": "Tipo A - $s/√n$, $v = n − 1$",
     "Instrument class tolerance": "Tolerancia de clase del instrumento",
-    "Type B - rectangular, a = 0.3 dB": "Tipo B - rectangular, a = 0,3 dB",
+    "Type B - rectangular, $a$ = 0.3 dB":
+        "Tipo B - rectangular, $a$ = 0,3 dB",
     "Calibrator class tolerance": "Tolerancia de clase del calibrador",
-    "Type B - rectangular, a = 0.4 dB": "Tipo B - rectangular, a = 0,4 dB",
+    "Type B - rectangular, $a$ = 0.4 dB":
+        "Tipo B - rectangular, $a$ = 0,4 dB",
     "one calibrator for two channels makes their":
         "un solo calibrador para dos canales correlaciona",
     "calibration terms correlated, not two rows":
@@ -1072,16 +1078,16 @@ _ES: dict[str, str] = {
     "Calibrate": "Calibrar",
     "Weighting": "Ponderación",
     "Octave": "Octavas",
-    "bands 1/b": "bandas 1/b",
+    "bands $1/b$": "bandas $1/b$",
     "Ballistics": "Temporal",
     "Metrics": "Métricas",
     # Level symbols, the same in the Spanish edition.
-    "Leq, LN…": "Leq, LN…",
+    "$L_{eq}$, $L_N$…": "$L_{eq}$, $L_N$…",
     "Multirate decimation in the octave filter bank":
         "Decimación multitasa en el banco de filtros de octava",
     # Unit symbols, the same in Spanish; "fs = 48 kHz" is shared with the
     # multichannel-capture plate.
-    "fs = 48 kHz": "fs = 48 kHz",
+    "$f_s$ = 48 kHz": "$f_s$ = 48 kHz",
     "6 kHz": "6 kHz",
     "16 kHz band": "Banda de 16 kHz",
     "1 kHz band": "Banda de 1 kHz",
@@ -1556,7 +1562,7 @@ _ES: dict[str, str] = {
     "band signal": "señal de banda",
     "square": "cuadrado",
     "one-pole RC": "RC de un polo",
-    "time constant τ": "constante de tiempo τ",
+    "time constant $τ$": "constante de tiempo $τ$",
     "to decibels": "a decibelios",
     "time-weighted level": "nivel con ponderación temporal",
     "Fast (F)": "Rápida (F)",
@@ -1587,9 +1593,9 @@ _ES: dict[str, str] = {
     "axis = −1  (time)": "eje = −1  (tiempo)",
     "the channel axis 0": "el eje de canal 0",
     "rides through untouched": "pasa intacto",
-    "A mono call returns a scalar; a C-channel call returns C results.":
-        "Una llamada mono devuelve un escalar; una de C canales devuelve C "
-        "resultados.",
+    "A mono call returns a scalar; a $C$-channel call returns $C$ results.":
+        "Una llamada mono devuelve un escalar; una de $C$ canales devuelve "
+        "$C$ resultados.",
     "Band metrics widen the reduced axis instead: (…, bands).":
         "Las métricas por banda ensanchan el eje reducido: (…, bandas).",
     # open-plan
@@ -2248,10 +2254,11 @@ _ES: dict[str, str] = {
         "las tres valen 0 dB a 1 kHz; clase 1: ±0,7 dB",
     "Squaring + time weighting  F / S":
         "Cuadrado + ponderación temporal  F / S",
-    "exponential detector: τF = 125 ms, τS = 1 s":
-        "detector exponencial: τF = 125 ms, τS = 1 s",
+    "exponential detector: $τ_F$ = 125 ms, $τ_S$ = 1 s":
+        "detector exponencial: $τ_F$ = 125 ms, $τ_S$ = 1 s",
     "Display": "Pantalla",
-    "LAF(t), LAS(t) in dB re 20 µPa": "LAF(t), LAS(t) en dB re 20 µPa",
+    "$L_{AF}(t)$, $L_{AS}(t)$ in dB re 20 µPa":
+        "$L_{AF}(t)$, $L_{AS}(t)$ en dB re 20 µPa",
     # Laboratory sound insulation suite (ISO 10140)
     "Laboratory sound insulation suite (ISO 10140)":
         "Cámaras de aislamiento acústico de laboratorio (ISO 10140)",
@@ -2559,24 +2566,27 @@ _ES: dict[str, str] = {
     "Power amplifier": "Amplificador",
     "Loudspeaker under test": "Altavoz en ensayo",
     "measurement microphone": "micrófono de medición",
-    "Channel 1: reference x(t)": "Canal 1: referencia x(t)",
+    "Channel 1: reference $x(t)$": "Canal 1: referencia $x(t)$",
     "the electrical drive signal": "la señal eléctrica de excitación",
-    "Channel 2: response y(t)": "Canal 2: respuesta y(t)",
+    "Channel 2: response $y(t)$": "Canal 2: respuesta $y(t)$",
     "acoustic output at the microphone": "salida acústica en el micrófono",
     "Dual-channel FFT analysis (Welch)":
         "Análisis FFT de dos canales (Welch)",
     # The estimator formulas read the same in both languages.
-    "H1(f) = Gxy / Gxx": "H1(f) = Gxy / Gxx",
-    "γ²(f) = |Gxy|² / (Gxx·Gyy)": "γ²(f) = |Gxy|² / (Gxx·Gyy)",
-    "Hann segments, 50 % overlap  →  Gxx(f), Gyy(f), Gxy(f)":
-        "segmentos Hann, 50 % de solape  →  Gxx(f), Gyy(f), Gxy(f)",
-    "unbiased with output noise; H2 = Gyy/Gyx for input noise":
-        "insesgado ante ruido a la salida (H2 = Gyy/Gyx a la entrada)",
+    "$H_{1}(f) = G_{xy} / G_{xx}$": "$H_{1}(f) = G_{xy} / G_{xx}$",
+    "$γ^{2}(f) = |G_{xy}|^2 / (G_{xx}·G_{yy})$":
+        "$γ^{2}(f) = |G_{xy}|^2 / (G_{xx}·G_{yy})$",
+    "Hann segments, 50 % overlap  →  $G_{xx}(f)$, $G_{yy}(f)$, $G_{xy}(f)$":
+        "segmentos Hann, 50 % de solape  →  $G_{xx}(f)$, $G_{yy}(f)$, "
+        "$G_{xy}(f)$",
+    "unbiased with output noise; $H_2 = G_{yy}/G_{yx}$ for input noise":
+        "insesgado ante ruido a la salida ($H_2 = G_{yy}/G_{yx}$ a la "
+        "entrada)",
     "1 for a noiseless linear path; less with output noise":
         "1 en un camino lineal sin ruido; menor con ruido a la salida",
-    "trust |H1| only where γ² stays near 1: coherence dips flag noise, distortion or an unresolved delay":
-        "fiarse de |H1| solo donde γ² ronda 1: las caídas delatan ruido, "
-        "distorsión o retardo sin resolver",
+    "trust $|H_1|$ only where $γ^2$ stays near 1: coherence dips flag noise, distortion or an unresolved delay":
+        "fiarse de $|H_1|$ solo donde $γ^2$ ronda 1: las caídas delatan "
+        "ruido, distorsión o retardo sin resolver",
     # Test-signal family panel
     "The test-signal family at a glance":
         "La familia de señales de ensayo de un vistazo",
@@ -2586,12 +2596,13 @@ _ES: dict[str, str] = {
     "Tone burst": "Salva de tono",
     "flat PSD: 0 dB/octave": "DEP plana: 0 dB/octava",
     # log10 is shared notation (as for the reception-plate relations above).
-    "log10 f": "log10 f",
+    "$log_{10} f$": "$log_{10} f$",
     "equal power per hertz": "igual potencia por hercio",
     "−3 dB/octave PSD": "DEP de −3 dB/octava",
     "equal power per octave": "igual potencia por octava",
     "flat, line spectrum": "espectro de rayas plano",
-    "binary ±1, period 2^m − 1 samples": "binaria ±1, periodo 2^m − 1 muestras",
+    "binary ±1, period $2^m − 1$ samples":
+        "binaria ±1, periodo $2^m − 1$ muestras",
     "linear": "lineal",
     "exponential": "exponencial",
     "exponential: equal time (and energy) per octave; linear: equal time per hertz":
@@ -2609,67 +2620,69 @@ _ES: dict[str, str] = {
     # Welch PSD pipeline (Bendat & Piersol)
     "The Welch PSD pipeline: segment, taper, average (Bendat & Piersol)":
         "PSD de Welch: segmentar, enventanar, promediar (Bendat & Piersol)",
-    "Record x(t) — fs = 48 kHz, 20 s of pink noise":
-        "Registro x(t) — fs = 48 kHz, 20 s de ruido rosa",
+    "Record $x(t)$ — $f_s$ = 48 kHz, 20 s of pink noise":
+        "Registro $x(t)$ — $f_s$ = 48 kHz, 20 s de ruido rosa",
     "960 000 samples, calibrated end to end: pascals in, Pa²/Hz out":
         "960 000 muestras, calibrado de extremo a extremo: pascales dentro, "
         "Pa²/Hz fuera",
     "Split into 50 %-overlapped segments — nperseg = 4096":
         "División en segmentos con 50 % de solape — nperseg = 4096",
-    "467 segments of 85.3 ms; bin spacing Δf = fs/4096 = 11.7 Hz":
-        "467 segmentos de 85,3 ms; separación de bins Δf = fs/4096 = "
+    "467 segments of 85.3 ms; bin spacing $Δf = f_s/4096$ = 11.7 Hz":
+        "467 segmentos de 85,3 ms; separación de bins $Δf = f_s/4096$ = "
         "11,7 Hz",
     "Hann taper on every segment": "Ventana de Hann en cada segmento",
-    "ENBW = 1.5 bins → resolution bandwidth Be = 1.5·Δf = 17.6 Hz":
-        "ENBW = 1,5 bins → ancho de banda de resolución Be = 1,5·Δf = "
+    "ENBW = 1.5 bins → resolution bandwidth $B_e = 1.5·Δf$ = 17.6 Hz":
+        "ENBW = 1,5 bins → ancho de banda de resolución $B_e = 1,5·Δf$ = "
         "17,6 Hz",
-    "One-sided |FFT|² periodogram of each segment, then average":
-        "Periodograma unilateral |FFT|² de cada segmento, y promedio",
-    "overlap correlation (Welch 1967): 467 segments → n_d = 442 effective averages":
-        "correlación por solape (Welch 1967): 467 segmentos → n_d = 442 "
+    "One-sided $|FFT|^2$ periodogram of each segment, then average":
+        "Periodograma unilateral $|FFT|^2$ de cada segmento, y promedio",
+    "overlap correlation (Welch 1967): 467 segments → $n_d$ = 442 effective averages":
+        "correlación por solape (Welch 1967): 467 segmentos → $n_d$ = 442 "
         "promedios efectivos",
-    "Gxx(f) with its chi-square confidence interval":
-        "Gxx(f) con su intervalo de confianza chi-cuadrado",
-    "random error εr = 1/√n_d = 4.8 %;  2·n_d ≈ 885 degrees of freedom":
-        "error aleatorio εr = 1/√n_d = 4,8 %;  2·n_d ≈ 885 grados de "
-        "libertad",
+    "$G_{xx}(f)$ with its chi-square confidence interval":
+        "$G_{xx}(f)$ con su intervalo de confianza chi-cuadrado",
+    "random error $ε_r = 1/√n_d$ = 4.8 %;  $2·n_d ≈ 885$ degrees of freedom":
+        "error aleatorio $ε_r = 1/√n_d$ = 4,8 %;  $2·n_d ≈ 885$ grados "
+        "de libertad",
     "The trade-off: segment length buys resolution or stability, never both":
         "El compromiso: el segmento compra resolución o estabilidad, "
         "nunca ambas",
-    "longer segments → finer Be but fewer averages (larger εr); shorter → the reverse":
-        "segmentos más largos → Be más fino pero menos promedios (mayor "
-        "εr); más cortos → lo contrario",
+    "longer segments → finer $B_e$ but fewer averages (larger $ε_r$); shorter → the reverse":
+        "segmentos más largos → $B_e$ más fino pero menos promedios "
+        "(mayor $ε_r$); más cortos → lo contrario",
     # MISO coherence (Bendat & Piersol Chapter 7)
     "MISO coherence: from correlated sources to per-source contributions":
         "Coherencia MISO: de fuentes correladas a contribuciones por fuente",
-    "Input x1": "Entrada x1",
+    "Input $x_1$": "Entrada $x_1$",
     "white noise": "ruido blanco",
-    "Input x2 = 0.7·x1 + noise": "Entrada x2 = 0,7·x1 + ruido",
-    "correlated with x1": "correlada con x1",
-    "Path H1(f)": "Camino H1(f)",
+    "Input $x_2 = 0.7·x_1$ + noise": "Entrada $x_2 = 0,7·x_1$ + ruido",
+    "correlated with $x_1$": "correlada con $x_1$",
+    "Path $H_{1}(f)$": "Camino $H_{1}(f)$",
     "low-pass, 400 Hz": "paso bajo, 400 Hz",
-    "Path H2(f)": "Camino H2(f)",
+    "Path $H_{2}(f)$": "Camino $H_{2}(f)$",
     "high-pass, 1.5 kHz": "paso alto, 1,5 kHz",
-    "noise n(t)": "ruido n(t)",
-    "Output y(t)": "Salida y(t)",
-    "Welch cross-spectral matrix — Gxx (2×2) and Gxy, nperseg = 2048":
-        "Matriz de espectros cruzados de Welch — Gxx (2×2) y Gxy, "
-        "nperseg = 2048",
-    "conditioning: Schur steps Gij·r! (Eq. 7.94), inputs ordered by descending ordinary coherence":
-        "condicionamiento: pasos de Schur Gij·r! (Ec. 7.94), entradas "
-        "ordenadas por coherencia ordinaria descendente",
+    "noise $n(t)$": "ruido $n(t)$",
+    "Output $y(t)$": "Salida $y(t)$",
+    "Welch cross-spectral matrix — $G_{xx}$ (2×2) and $G_{xy}$, nperseg = 2048":
+        "Matriz de espectros cruzados de Welch — $G_{xx}$ (2×2) y "
+        "$G_{xy}$, nperseg = 2048",
+    "conditioning: Schur steps $G_{ij·r!}$ (Eq. 7.94), inputs ordered by descending ordinary coherence":
+        "condicionamiento: pasos de Schur $G_{ij·r!}$ (Ec. 7.94), "
+        "entradas ordenadas por coherencia ordinaria descendente",
     "Multiple and partial coherence": "Coherencia múltiple y parcial",
     "input 2 in the 100-300 Hz band: ordinary 0.32 → partial 0.00":
         "entrada 2 en la banda de 100-300 Hz: ordinaria 0,32 → parcial "
         "0,00",
-    "multiple γ²y:x = 1 − Gnn/Gyy ≈ 1.00 (100-300 Hz)":
-        "múltiple γ²y:x = 1 − Gnn/Gyy ≈ 1,00 (100-300 Hz)",
+    "multiple $γ^2_{y:x} = 1 − G_{nn}/G_{yy}$ ≈ 1.00 (100-300 Hz)":
+        "múltiple $γ^2_{y:x} = 1 − G_{nn}/G_{yy}$ ≈ 1,00 (100-300 Hz)",
     "Contribution of each source": "Contribución de cada fuente",
-    "Gvi = γ²iy·(i−1)!·Gyy per input": "Gvi = γ²iy·(i−1)!·Gyy por entrada",
-    "ΣGvi + Gnn = Gyy, band by band": "ΣGvi + Gnn = Gyy, banda a banda",
-    "each conditioning step spends one average: the i-th ordered input carries n_d − (i − 1); here n_d = 242":
+    "$G_{vi} = γ^2_{iy·(i−1)!}·G_{yy}$ per input":
+        "$G_{vi} = γ^2_{iy·(i−1)!}·G_{yy}$ por entrada",
+    "$ΣG_{vi} + G_{nn} = G_{yy}$, band by band":
+        "$ΣG_{vi} + G_{nn} = G_{yy}$, banda a banda",
+    "each conditioning step spends one average: the $i$-th ordered input carries $n_d − (i − 1)$; here $n_d$ = 242":
         "cada paso de condicionamiento gasta un promedio: la entrada "
-        "i-ésima ordenada lleva n_d − (i − 1); aquí n_d = 242",
+        "$i$-ésima ordenada lleva $n_d − (i − 1)$; aquí $n_d$ = 242",
     "average generously before reading a small partial coherence as zero":
         "promedia con generosidad antes de leer como cero una coherencia "
         "parcial pequeña",
@@ -2678,26 +2691,26 @@ _ES: dict[str, str] = {
         "El compromiso tiempo-frecuencia: dos teselados del mismo registro",
     "Short window — nperseg = 256": "Ventana corta — nperseg = 256",
     "Long window — nperseg = 1024": "Ventana larga — nperseg = 1024",
-    "T_B = 16 ms,  Be ≈ 1/T_B = 62.5 Hz":
-        "T_B = 16 ms,  Be ≈ 1/T_B = 62,5 Hz",
-    "T_B = 64 ms,  Be ≈ 15.6 Hz": "T_B = 64 ms,  Be ≈ 15,6 Hz",
+    "$T_B$ = 16 ms,  $B_e ≈ 1/T_B$ = 62.5 Hz":
+        "$T_B$ = 16 ms,  $B_e ≈ 1/T_B$ = 62,5 Hz",
+    "$T_B$ = 64 ms,  $B_e$ ≈ 15.6 Hz": "$T_B$ = 64 ms,  $B_e$ ≈ 15,6 Hz",
     "sharp click, smeared tone": "clic nítido, tono emborronado",
     "sharp tone, smeared click": "tono nítido, clic emborronado",
     "tone": "tono",
     "click": "clic",
-    "each cell is one unaveraged estimate: Be·T_B ≈ 1 and εr = 1 (n_d = 1)":
-        "cada celda es una estimación sin promediar: Be·T_B ≈ 1 y εr = 1 "
-        "(n_d = 1)",
-    "the record fixes the product; nperseg only chooses how to spend it (fs = 16 kHz here)":
+    "each cell is one unaveraged estimate: $B_e·T_B ≈ 1$ and $ε_r = 1$ ($n_d = 1$)":
+        "cada celda es una estimación sin promediar: $B_e·T_B ≈ 1$ y "
+        "$ε_r = 1$ ($n_d = 1$)",
+    "the record fixes the product; nperseg only chooses how to spend it ($f_s$ = 16 kHz here)":
         "el registro fija el producto; nperseg solo elige cómo gastarlo "
-        "(aquí fs = 16 kHz)",
+        "(aquí $f_s$ = 16 kHz)",
     # Cepstrum chain (Havelock Ch. 27)
     "The cepstrum chain: an echo becomes a quefrency spike":
         "La cadena del cepstro: un eco se vuelve un pico en quefrencia",
     "Signal with one echo": "Señal con un eco",
-    "Ripply spectrum |X(f)|": "Espectro ondulado |X(f)|",
+    "Ripply spectrum $|X(f)|$": "Espectro ondulado $|X(f)|$",
     "cosine ripple of period": "ondulación coseno de periodo",
-    "Take the log: ln |X|²": "Logaritmo: ln |X|²",
+    "Take the log: $ln |X|^2$": "Logaritmo: $ln |X|^2$",
     "the multiplicative echo": "el eco multiplicativo",
     "becomes an additive ripple": "se vuelve ondulación aditiva",
     "Inverse FFT": "FFT inversa",
@@ -2706,97 +2719,100 @@ _ES: dict[str, str] = {
     "quefrency": "quefrencia",
     "source wavelet,": "ondícula de la fuente,",
     "below 2 ms": "bajo 2 ms",
-    "a = 0.5,  t0 = 8 ms": "a = 0,5;  t0 = 8 ms",
-    "a = 0.5 at t0 = 8 ms": "a = 0,5 en t0 = 8 ms",
-    "−a²/2 = −0.125": "−a²/2 = −0,125",
+    "$a$ = 0.5,  $t_0$ = 8 ms": "$a$ = 0,5;  $t_0$ = 8 ms",
+    "$a$ = 0.5 at $t_0$ = 8 ms": "$a$ = 0,5 en $t_0$ = 8 ms",
+    "$−a^2/2$ = −0.125": "$−a^2/2$ = −0,125",
     "lifter cutoff 4 ms": "corte del lifter en 4 ms",
     "lowpass: envelope": "paso bajo: envolvente",
     "highpass: the echo ripple alone":
         "paso alto: solo la ondulación del eco",
-    "rahmonics at n·t0 with heights a, −a²/2, a³/3, …, whatever the source spectrum does":
-        "rahmónicos en n·t0 con alturas a, −a²/2, a³/3, …, haga lo que "
-        "haga el espectro de la fuente",
-    "the highpass ripple swings between 20·log10(1 ± a) = +3.5 and −6.0 dB; echo_detection reads t0 and a off the peak":
-        "la ondulación paso alto oscila entre 20·log10(1 ± a) = +3,5 y "
-        "−6,0 dB; echo_detection lee t0 y a del pico",
+    "rahmonics at $n·t_0$ with heights $a$, $−a^2/2$, $a^3/3$, …, whatever the source spectrum does":
+        "rahmónicos en $n·t_0$ con alturas $a$, $−a^2/2$, $a^3/3$, …, "
+        "haga lo que haga el espectro de la fuente",
+    "the highpass ripple swings between $20·log_{10}(1 ± a)$ = +3.5 and −6.0 dB; echo_detection reads $t_0$ and $a$ off the peak":
+        "la ondulación paso alto oscila entre $20·log_{10}(1 ± a)$ = "
+        "+3,5 y −6,0 dB; echo_detection lee $t_0$ y $a$ del pico",
     # Time synchronous averaging (McFadden 1987)
     "Time synchronous averaging: trigger, slice, average":
         "Promediado síncrono temporal: disparo, troceado, promedio",
     "Tachometer: one trigger pulse per revolution":
         "Tacómetro: un pulso de disparo por revolución",
-    "T = 1/32 s = 256 samples": "T = 1/32 s = 256 muestras",
-    "Recording y(t) at fs = 8192 Hz: the synchronous signature buried in noise":
-        "Registro y(t) a fs = 8192 Hz: la firma síncrona sepultada en ruido",
+    "$T$ = 1/32 s = 256 samples": "$T$ = 1/32 s = 256 muestras",
+    "Recording $y(t)$ at $f_s$ = 8192 Hz: the synchronous signature buried in noise":
+        "Registro $y(t)$ a $f_s$ = 8192 Hz: la firma síncrona sepultada "
+        "en ruido",
     "slice at every trigger": "trocear en cada disparo",
-    "N aligned blocks": "N bloques alineados",
-    "one period T each": "de un periodo T cada uno",
+    "$N$ aligned blocks": "$N$ bloques alineados",
+    "one period $T$ each": "de un periodo $T$ cada uno",
     "Coherent average": "Promedio coherente",
-    "N = 40 here": "aquí N = 40",
+    "$N$ = 40 here": "aquí $N$ = 40",
     "The periodic part survives": "La parte periódica sobrevive",
     "comb teeth of unit gain": "dientes del peine de ganancia uno",
-    "at every order k/T": "en cada orden k/T",
-    "Asynchronous noise falls as 1/√N":
-        "El ruido asíncrono cae como 1/√N",
-    "power −10·log10 N = −16 dB for N = 40;  amplitude gain √N = 6.3":
-        "potencia −10·log10 N = −16 dB con N = 40;  ganancia en amplitud "
-        "√N = 6,3",
+    "at every order $k/T$": "en cada orden $k/T$",
+    "Asynchronous noise falls as $1/√N$":
+        "El ruido asíncrono cae como $1/√N$",
+    "power $−10·log_{10} N$ = −16 dB for $N$ = 40;  amplitude gain $√N$ = 6.3":
+        "potencia $−10·log_{10} N$ = −16 dB con $N$ = 40;  ganancia en "
+        "amplitud $√N$ = 6,3",
     "Residual": "Residual",
     "record − tiled average:": "registro − promedio repetido:",
     "everything not synchronous": "todo lo no síncrono",
-    "a tone on a non-integer order is only attenuated: choose N so a comb node lands on it":
-        "un tono en un orden no entero solo se atenúa: elige N para que un "
-        "nodo del peine caiga sobre él",
-    "McFadden's example: N = 20 nulls the 32.05-order tone (20·32.05 = 641); the habitual N = 32 does not":
-        "el ejemplo de McFadden: N = 20 anula el tono de orden 32,05 "
-        "(20·32,05 = 641); el habitual N = 32 no",
+    "a tone on a non-integer order is only attenuated: choose $N$ so a comb node lands on it":
+        "un tono en un orden no entero solo se atenúa: elige $N$ para "
+        "que un nodo del peine caiga sobre él",
+    "McFadden's example: $N$ = 20 nulls the 32.05-order tone (20·32.05 = 641); the habitual $N$ = 32 does not":
+        "el ejemplo de McFadden: $N$ = 20 anula el tono de orden 32,05 "
+        "(20·32,05 = 641); el habitual $N$ = 32 no",
     # Correlation-based time-delay estimation (Knapp & Carter)
     "Time-delay estimation: two microphones and one correlation peak":
         "Estimación del retardo: dos micrófonos y un pico de correlación",
-    "Δr = c·τ0 ≈ 0.84 m  (c = 343 m/s)":
-        "Δr = c·τ0 ≈ 0,84 m  (c = 343 m/s)",
-    "mic 1 — x(t)": "micro 1 — x(t)",
-    "mic 2 — y(t)": "micro 2 — y(t)",
-    "spacing d": "separación d",
+    "$Δr = c·τ_0$ ≈ 0.84 m  ($c$ = 343 m/s)":
+        "$Δr = c·τ_0$ ≈ 0,84 m  ($c$ = 343 m/s)",
+    "mic 1 — $x(t)$": "micro 1 — $x(t)$",
+    "mic 2 — $y(t)$": "micro 2 — $y(t)$",
+    "spacing $d$": "separación $d$",
     # The page's own displayed formula writes \sin (ISO 80000-2 notation),
     # so the plate keeps "sin"; the PHAT weight is shared notation too.
-    "sin θ = c·τ0 / d": "sin θ = c·τ0 / d",
-    "ψ(f) = 1/|Gxy|": "ψ(f) = 1/|Gxy|",
-    "cross-correlation against lag — y(t) = α·x(t − τ0) + n(t)":
-        "correlación cruzada frente al retardo — y(t) = α·x(t − τ0) + n(t)",
+    "$sin θ = c·τ_0 / d$": "$sin θ = c·τ_0 / d$",
+    "$ψ(f) = 1/|G_{xy}|$": "$ψ(f) = 1/|G_{xy}|$",
+    "cross-correlation against lag — $y(t) = α·x(t − τ_0) + n(t)$":
+        "correlación cruzada frente al retardo — $y(t) = α·x(t − τ_0) + "
+        "n(t)$",
     "direct correlator: broad peak": "correlador directo: pico ancho",
     "GCC-PHAT: sharp spike": "GCC-PHAT: pico estrecho",
-    "τ0 = 20 samples / 8192 Hz = 2.44 ms":
-        "τ0 = 20 muestras / 8192 Hz = 2,44 ms",
+    "$τ_0$ = 20 samples / 8192 Hz = 2.44 ms":
+        "$τ_0$ = 20 muestras / 8192 Hz = 2,44 ms",
     "parabolic peak interpolation + ×16 local upsampling → error below 0.002 samples":
         "interpolación parabólica del pico + sobremuestreo local ×16 → "
         "error por debajo de 0,002 muestras",
-    "the 'phase' route reads the same τ0 from the slope of the unwrapped cross-spectrum phase":
-        "la vía 'phase' lee el mismo τ0 de la pendiente de la fase "
+    "the 'phase' route reads the same $τ_0$ from the slope of the unwrapped cross-spectrum phase":
+        "la vía 'phase' lee el mismo $τ_0$ de la pendiente de la fase "
         "desenrollada del espectro cruzado",
     # Data qualification decision flow (Bendat & Piersol 10.3)
     "Data qualification: the stationarity decision (Bendat & Piersol 10.3)":
         "Calificación de datos: decisión de estacionariedad (B&P 10.3)",
-    "Time record x(t)": "Registro temporal x(t)",
+    "Time record $x(t)$": "Registro temporal $x(t)$",
     "before trusting any PSD, Leq or GUM average":
         "antes de confiar en cualquier promedio PSD, Leq o GUM",
-    "Mean square per interval — N = 20 equal segments":
-        "Media cuadrática por intervalo — N = 20 segmentos iguales",
+    "Mean square per interval — $N$ = 20 equal segments":
+        "Media cuadrática por intervalo — $N$ = 20 segmentos iguales",
     "each interval long against the record's lowest frequencies; also rms, mean or variance":
         "cada intervalo largo frente a las frecuencias más bajas del "
         "registro; también rms, media o varianza",
-    "Reverse arrangement count A": "Recuento de inversiones A",
-    "pairs i < j with x_i > x_j; trend-free mean μ_A = N(N−1)/4 = 95":
-        "pares i < j con x_i > x_j; media sin tendencia μ_A = N(N−1)/4 = 95",
-    "(Table A.6, α = 0.05)": "(Tabla A.6, α = 0,05)",
+    "Reverse arrangement count $A$": "Recuento de inversiones $A$",
+    "pairs $i < j$ with $x_i > x_j$; trend-free mean $μ_A = N(N−1)/4$ = 95":
+        "pares $i < j$ con $x_i > x_j$; media sin tendencia "
+        "$μ_A = N(N−1)/4$ = 95",
+    "(Table A.6, $α = 0.05$)": "(Tabla A.6, $α = 0,05$)",
     "yes": "sí",
     "Nonstationary: do not average": "No estacionario: no promediar",
-    "+20 % gain ramp: A = 7 → rejected":
-        "rampa de ganancia del +20 %: A = 7 → rechazado",
+    "+20 % gain ramp: $A = 7$ → rejected":
+        "rampa de ganancia del +20 %: $A = 7$ → rechazado",
     "split at the change, or go short-time (spectrogram)":
         "divide en el cambio, o pasa a corto plazo (espectrograma)",
     "Stationary: analyse": "Estacionario: analizar",
-    "steady noise: A = 91 → accepted":
-        "ruido estable: A = 91 → aceptado",
+    "steady noise: $A = 91$ → accepted":
+        "ruido estable: $A = 91$ → aceptado",
     "the chi-square CIs and error formulas hold":
         "los IC chi-cuadrado y las fórmulas de error valen",
     "the runs test (method=\"runs\") is the two-sided companion: too many runs is as suspect as too few":
@@ -3163,18 +3179,19 @@ _ES: dict[str, str] = {
     "94 dB at 1 kHz  (IEC 60942)": "94 dB a 1 kHz  (IEC 60942)",
     "Measurement recording": "Grabación de medición",
     "same microphone, same gain": "mismo micrófono, misma ganancia",
-    "the factor S in pascals per digital unit":
-        "el factor S en pascales por unidad digital",
-    "Calibrated pressure   p(t) = S · x(t)   in pascals":
-        "Presión calibrada   p(t) = S · x(t)   en pascales",
-    "every level function takes S as calibration_factor=":
-        "toda función de nivel acepta S como calibration_factor=",
+    "the factor $S$ in pascals per digital unit":
+        "el factor $S$ en pascales por unidad digital",
+    "Calibrated pressure   $p(t) = S · x(t)$   in pascals":
+        "Presión calibrada   $p(t) = S · x(t)$   en pascales",
+    "every level function takes $S$ as calibration_factor=":
+        "toda función de nivel acepta $S$ como calibration_factor=",
     "Display and statistics": "Pantalla y estadística",
-    "exponential detector, τF = 125 ms":
-        "detector exponencial, τF = 125 ms",
+    "exponential detector, $τ_F$ = 125 ms":
+        "detector exponencial, $τ_F$ = 125 ms",
     "Integrated levels": "Niveles integrados",
     # IEC 61672 level symbols; the Spanish page prints LCpeak too.
-    "LAeq   LAE   LCpeak": "LAeq   LAE   LCpeak",
+    "$L_{Aeq}$   $L_{AE}$   $L_{Cpeak}$":
+        "$L_{Aeq}$   $L_{AE}$   $L_{Cpeak}$",
     "energy average, no ballistics": "promedio energético, sin balística",
     "Band spectrum": "Espectro por bandas",
     "IEC 61260-1 band edges": "bordes de banda IEC 61260-1",
@@ -3203,20 +3220,20 @@ _ES: dict[str, str] = {
     "one factor for the whole library": "un solo factor para toda la biblioteca",
     "Levels in dB SPL": "Niveles en dB SPL",
     "No calibrator?": "¿Sin calibrador?",
-    "S = 1, samples read as Pa": "S = 1, muestras como Pa",
+    "$S = 1$, samples read as Pa": "$S = 1$, muestras como Pa",
     "use dbfs=True for dBFS": "usa dbfs=True para dBFS",
     # Filter bank data flow: decimation decision and band outputs
     "Inside a band: the decimation decision and the biquad cascade":
         "Dentro de una banda: diezmado y cascada de biquads",
-    "Input signal  x(t)": "Señal de entrada  x(t)",
-    "sample rate fs": "frecuencia de muestreo fs",
+    "Input signal  $x(t)$": "Señal de entrada  $x(t)$",
+    "sample rate $f_s$": "frecuencia de muestreo $f_s$",
     "Room to decimate?": "¿Cabe diezmar?",
-    "fs / 2 ≥ 1.25 · f_upper": "fs / 2 ≥ 1,25 · f_sup",
-    "M = floor[(fs / 2) / (1.25 · f_upper)]":
-        "M = floor[(fs / 2) / (1,25 · f_sup)]",
-    "poles stay clear of z = 1": "los polos se alejan de z = 1",
-    "SOS band filter at fs / M": "Filtro SOS de banda a fs / M",
-    "SOS band filter at fs": "Filtro SOS de banda a fs",
+    "$f_s / 2 ≥ 1.25 · f_{upper}$": "$f_s / 2 ≥ 1,25 · f_{sup}$",
+    "$M = floor[(f_s / 2) / (1.25 · f_{upper})]$":
+        "$M = floor[(f_s / 2) / (1,25 · f_{sup})]$",
+    "poles stay clear of $z = 1$": "los polos se alejan de $z = 1$",
+    "SOS band filter at $f_s / M$": "Filtro SOS de banda a $f_s / M$",
+    "SOS band filter at $f_s$": "Filtro SOS de banda a $f_s$",
     "cascaded biquads": "biquads en cascada",
     "designed on the IEC 61260-1 band edges":
         "diseñado sobre los bordes IEC 61260-1",
@@ -3226,8 +3243,8 @@ _ES: dict[str, str] = {
     "(b, a) pair": "de orden alto",
     "Band level": "Nivel de banda",
     "RMS or peak, in dB re 20 µPa": "RMS o pico, en dB re 20 µPa",
-    "sigbands=True also returns the band signal at fs":
-        "sigbands=True devuelve además la señal de banda a fs",
+    "sigbands=True also returns the band signal at $f_s$":
+        "sigbands=True devuelve además la señal de banda a $f_s$",
     "the decimated branch is interpolated back with resample_poly(M, 1)":
         "la rama diezmada se interpola de vuelta con resample_poly(M, 1)",
     # --- B9: buildings/design plates (EN 15657, ISO 16251-1, ISO 12354) ---
@@ -4004,8 +4021,8 @@ _ES: dict[str, str] = {
     "Recorder": "Grabador",
     "low-cut switch OFF": "corte de graves: OFF",
     "G weighting + integrator": "ponderación G + integrador",
-    "report LpG with the chain corner,":
-        "informa LpG con la esquina de la cadena,",
+    "report $L_{pG}$ with the chain corner,":
+        "informa $L_{pG}$ con la esquina de la cadena,",
     "the screens and the averaging time":
         "las pantallas y el tiempo de promediado",
     "What the chain lets through": "Lo que deja pasar la cadena",
@@ -4029,7 +4046,7 @@ _ES: dict[str, str] = {
     "single sample clock": "un solo reloj",
     "a second interface": "una segunda interfaz",
     "= two clocks, not one array": "= dos relojes, no un array",
-    "x, the array you analyse": "x, el array que analizas",
+    "$x$, the array you analyse": "$x$, el array que analizas",
     "Write down, with the file:": "Anota, junto al archivo:",
     "one clock  |  locked gains": "un reloj  |  ganancias fijas",
     "the row-to-position map": "el mapa fila-posición",
