@@ -728,7 +728,7 @@ z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(594.059611 352.347351)">Ls = LRN + ΔL</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(445.658908 362.594832)">ΔL = -10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(445.658908 362.594832)">ΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]</text>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(501.94883 372.797156)">u = k d_s,  d_s = 0,7 D = 4,2 m</text>
    </g>
    <g id="text_19">

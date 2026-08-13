@@ -15,7 +15,7 @@ import numpy as np
 
 from phonometry._plot.common import theme_fill, theme_line
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     _THIRD_OCTAVE_16,
     COLOR_FG,
@@ -69,11 +69,12 @@ def generate_insulation_rating(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     for dy, text in (
-        (0.97, f"Reference curve shifted by {shift} dB"),
+        (0.97, f"Reference curve shifted by {_fmt_minus(shift)} dB"),
         (0.90, (f"Sum of unfavourable deviations = {result.unfavourable_sum:.1f}"
                f" dB  (limit 32.0 dB)")),
         (0.83, (f"Rw (C ; Ctr) = {result.rating} "
-               f"({result.c:+d} ; {result.ctr:+d}) dB")),
+               f"({_fmt_minus(result.c, '+d')} ; "
+               f"{_fmt_minus(result.ctr, '+d')}) dB")),
     ):
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
@@ -146,7 +147,8 @@ def generate_impact_rating(output_dir: str) -> None:
         (0.97, f"Reference curve shifted by {shift} dB"),
         (0.90, (f"Sum of unfavourable deviations = {result.unfavourable_sum:.1f}"
                f" dB  (limit 32.0 dB)")),
-        (0.83, f"Ln,w = {result.rating} dB ; CI = {result.ci:+d} dB"),
+        (0.83, (f"Ln,w = {result.rating} dB ; "
+               f"CI = {_fmt_minus(result.ci, '+d')} dB")),
     ):
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
@@ -213,7 +215,7 @@ def generate_facade_prediction(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9, ncol=2)
 
     info = [
-        f"R′tr,s,w = {result.r_tr_s_w} dB   (Ctr = {result.c_tr})",
+        f"R′tr,s,w = {result.r_tr_s_w} dB   (Ctr = {_fmt_minus(result.c_tr)})",
         f"D2m,nT,w = {result.d_2m_nt_w} dB",
         "air inlet limits the low bands",
     ]
@@ -319,7 +321,7 @@ def generate_survey_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"DnT,w = {res.rating.rating} dB  (C = {res.rating.c})",
+        f"DnT,w = {res.rating.rating} dB  (C = {_fmt_minus(res.rating.c)})",
         "octave bands, T0 = 0.5 s",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -661,8 +663,10 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Rw(C;Ctr) = {ext.rating:g}({ext.c:g};{ext.ctr:g})",
-        f"C50-5000 = {ext.c_50_5000:g},  Ctr,50-5000 = {ext.ctr_50_5000:g}",
+        (f"Rw(C;Ctr) = {ext.rating:g}"
+         f"({_fmt_minus(ext.c, 'g')};{_fmt_minus(ext.ctr, 'g')})"),
+        (f"C50-5000 = {_fmt_minus(ext.c_50_5000, 'g')},  "
+         f"Ctr,50-5000 = {_fmt_minus(ext.ctr_50_5000, 'g')}"),
         "rating on the core bands, terms on the full range",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -759,8 +763,9 @@ def generate_facade_field_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Dls,2m,nT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
-        "45° loudspeaker method (-1.5 dB on R')",
+        (f"Dls,2m,nT,w(C;Ctr) = {w.rating}"
+         f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
+        "45° loudspeaker method (−1.5 dB on R')",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -787,7 +792,7 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, bands, fontsize=10)
     ax.fill_between(x, res.l_i, res.l_nt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="-k = -10 log10(T/T0)")
+                    zorder=0, label="−k = −10 log10(T/T0)")
     ax.plot(x, res.l_i, "--o", color=COLOR_PRIMARY, linewidth=1.8,
             markersize=6, zorder=5, label="Li (impact level)")
     ax.plot(x, res.l_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=6,
@@ -801,7 +806,8 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
 
     info = [
-        f"L'nT,w(CI) = {res.rating.rating}({res.rating.ci}) dB",
+        (f"L'nT,w(CI) = {res.rating.rating}"
+         f"({_fmt_minus(res.rating.ci)}) dB"),
         "note the minus sign: a live room lowers L'nT",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
@@ -902,7 +908,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
 
     info = [
         (f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
-         f"({res.rating.c};{res.rating.ctr}) dB"),
+         f"({_fmt_minus(res.rating.c)};{_fmt_minus(res.rating.ctr)}) dB"),
         "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -999,7 +1005,7 @@ def generate_radiated_power_outdoor(output_dir: str) -> None:
 
     info = [
         "LW = Lp,in + Cd - R' + 10 log10(S/S0)",
-        "wall 176 m² + industrial door 24 m², Cd = -5 dB",
+        "wall 176 m² + industrial door 24 m², Cd = −5 dB",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG, zorder=10,

@@ -723,7 +723,7 @@ L 705.903125 28.318125
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #1f77b4" x="411.325514" y="128.507452" transform="rotate(-0 411.325514 128.507452)">0 dB a 1 kHz</text>
    </g>
    <g id="text_22">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #d62728" x="411.325514" y="159.525747" transform="rotate(-0 411.325514 159.525747)">-5,63 dB a 1 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: end; fill: #d62728" x="411.325514" y="159.525747" transform="rotate(-0 411.325514 159.525747)">−5,63 dB a 1 kHz</text>
    </g>
    <g id="text_23">
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(59.548434 49.952239)">para un fundamental de 100 Hz la red recorta d2 en 13,8 dB</text>

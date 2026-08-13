@@ -448,7 +448,7 @@ L 192.955781 53.607422
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="200.155781" y="56.757422" transform="rotate(-0 200.155781 56.757422)">Upward refraction (b = -1 m/s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="200.155781" y="56.757422" transform="rotate(-0 200.155781 56.757422)">Upward refraction (b = −1 m/s)</text>
     </g>
    </g>
   </g>

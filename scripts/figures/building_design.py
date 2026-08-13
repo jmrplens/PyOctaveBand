@@ -15,7 +15,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     _THIRD_OCTAVE_16,
     COLOR_FG,
@@ -108,7 +108,7 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     lines = [
         f"Rw (Dd) = {rw_dd:.1f} dB",
         f"R'w = {rpw:.1f} dB",
-        f"R'w − Rw = {rpw - rw_dd:.1f} dB",
+        f"R'w − Rw = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
         f"Dd {direct_share:.1f} %   ΣFf,Fd,Df {flank_share:.1f} %",
     ]
     ax.text(0.985, 0.62, "\n".join(lines), transform=ax.transAxes,
@@ -687,7 +687,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.set_xticks(np.arange(4))
     ax.set_xticklabels(labels, fontsize=12)
     for bar, value in zip(bars, values):
-        ax.annotate(f"{value:+.1f}",
+        ax.annotate(_fmt_minus(value, "+.1f"),
                     xy=(bar.get_x() + bar.get_width() / 2.0, value),
                     xytext=(0, 5 if value >= 0 else -14),
                     textcoords="offset points", ha="center", fontsize=10,
@@ -789,8 +789,9 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
               fontsize=9, ncol=3)
 
     info = [
-        "R' = -10 log10(Σ 10^(-Rij/10))",
-        f"R'w (C; Ctr) = {res.rating.rating} ({res.rating.c}; {res.rating.ctr}) dB",
+        "R' = −10 log10(Σ 10^(−Rij/10))",
+        (f"R'w (C; Ctr) = {res.rating.rating} "
+         f"({_fmt_minus(res.rating.c)}; {_fmt_minus(res.rating.ctr)}) dB"),
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -842,7 +843,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Rw(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
+        f"Rw(C;Ctr) = {w.rating}({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB",
         "6 mm float glass, m'' = 15 kg/m², η = 0.024",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,

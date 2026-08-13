@@ -1281,28 +1281,28 @@ L 892.44 28.48
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_13">
-    <path d="M 710.941416 238.993939 
-Q 791.789005 203.262565 871.613981 167.983144 
+    <path d="M 712.911493 238.985018 
+Q 792.7752 203.262465 871.618317 167.996416 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 867.593598 167.792032 
-L 871.613981 167.983144 
-L 869.048861 171.084783 
+    <path d="M 867.597124 167.823211 
+L 871.618317 167.996416 
+L 869.067037 171.109448 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_38">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="663.086159" y="248.640719" transform="rotate(-0 663.086159 248.640719)">-42 % a 8 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="663.086159" y="248.640719" transform="rotate(-0 663.086159 248.640719)">−42 % a 8 kHz</text>
    </g>
    <g id="patch_14">
-    <path d="M 560.405221 153.30925 
-Q 626.744422 199.95458 692.169042 245.956838 
+    <path d="M 562.407977 153.320919 
+Q 627.750942 199.955442 692.183868 245.940482 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 690.259476 242.413738 
-L 692.169042 245.956838 
-L 688.188822 245.358631 
+    <path d="M 690.29925 242.384049 
+L 692.183868 245.940482 
+L 688.207951 245.314317 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_39">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="516.774227" y="147.995819" transform="rotate(-0 516.774227 147.995819)">-1,7 % a 1 kHz</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="516.774227" y="147.995819" transform="rotate(-0 516.774227 147.995819)">−1,7 % a 1 kHz</text>
    </g>
    <g id="text_40">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="694.721172" y="18.48" transform="rotate(-0 694.721172 18.48)">La misma absorción en dos volúmenes</text>

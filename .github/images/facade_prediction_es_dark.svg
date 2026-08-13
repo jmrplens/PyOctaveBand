@@ -352,7 +352,7 @@ Q 464.197123 395.717852 469.697123 395.717852
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(545.775873 360.068184)">R′tr,s,w = 31 dB   (Ctr = -3)</text>
+    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(540.52681 360.068184)">R′tr,s,w = 31 dB   (Ctr = −3)</text>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(593.371498 373.271191)">D2m,nT,w = 33 dB</text>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(469.697123 386.474199)">la entrada de aire limita las bandas bajas</text>
    </g>

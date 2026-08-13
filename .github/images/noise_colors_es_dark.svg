@@ -12248,7 +12248,7 @@ L 73.955469 78.183789
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.8"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="81.158789" transform="rotate(-0 80.755469 81.158789)">pink: medida -3,0069, exacta -3,0103 dB/octava</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="81.158789" transform="rotate(-0 80.755469 81.158789)">pink: medida −3,0069, exacta −3,0103 dB/octava</text>
     </g>
     <g id="line2d_95">
      <path d="M 56.955469 90.934453 
@@ -12257,7 +12257,7 @@ L 73.955469 90.934453
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="93.909453" transform="rotate(-0 80.755469 93.909453)">red: medida -6,0180, exacta -6,0206 dB/octava</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="93.909453" transform="rotate(-0 80.755469 93.909453)">red: medida −6,0180, exacta −6,0206 dB/octava</text>
     </g>
    </g>
   </g>

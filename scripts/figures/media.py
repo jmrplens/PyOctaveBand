@@ -124,7 +124,8 @@ def _anim_figure() -> Any:
 def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
                  output_dir: str, stem: str, *, frames: int | None = None,
                  fps: float | None = None, gif_fps: int | None = None,
-                 poster_ss: float | None = None) -> None:
+                 poster_ss: float | None = None,
+                 measure: Callable[[], None] | None = None) -> None:
     """Shared clip tail: drive *update* through FuncAnimation and encode.
 
     Static artists (tick labels included) get the same Spanish pass as the
@@ -132,11 +133,27 @@ def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
     each clip's update function. ``frames``/``fps`` override the shared
     timeline for clips that need their own budget (the FDTD room modes);
     ``gif_fps`` is forwarded to the GitHub-GIF palette pass.
+
+    ``measure`` runs after the figure is in its final language and before
+    the first frame is built. A clip that fits a label against the geometry
+    of its axes (``fields._core``) has to read the canvas the frames are
+    drawn on, and the Spanish pass can still resize that canvas here: it
+    swaps the tick formatters for versions that write a decimal comma and a
+    typographic minus, and under constrained layout a tick label that
+    changes width moves the axes it belongs to. Measuring from this hook
+    reads the settled geometry. Whatever the callback measures must already
+    be in its final text, sign included -- these helpers measure the box of
+    a rendered string, so a number whose ASCII hyphen is swapped for U+2212
+    after the fit was measured against a glyph that is not the one drawn.
+    A clip that blanks a pre-translated label until its reveal frame blanks
+    it inside this callback too, after the fit.
     """
     from matplotlib.animation import FuncAnimation
 
     audit_figure(stem)
     _translate_figure(fig)
+    if measure is not None:
+        measure()
     n_frames = _ANIM_FRAMES if frames is None else frames
     rate = _ANIM_FPS if fps is None else fps
     anim = FuncAnimation(fig, update, frames=n_frames,

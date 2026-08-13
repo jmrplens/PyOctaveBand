@@ -265,9 +265,11 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     # long as the English one: at a fixed anchor its tail ran through the
     # middle of that annotation. Push it down the arc instead, by whatever
     # its own length asks for.
-    _fit_text_below(fig, d_txts[0].axes, arc_txt, d_txts[0], gap=10.0)
-    for d_txt in d_txts:
-        d_txt.set_text("")
+    def fit_arc_label() -> None:
+        _fit_text_below(fig, d_txts[0].axes, arc_txt, d_txts[0], gap=10.0)
+        for d_txt in d_txts:
+            d_txt.set_text("")
+
     reveal = int(0.8 * tot_all.shape[1])   # arc energy has settled by here
 
     def update(k: int) -> tuple[Any, ...]:
@@ -281,4 +283,5 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         return (*ims, *d_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_diffusion",
-                 frames=int(tot_all.shape[1]), fps=_DIFF_FPS, gif_fps=5)
+                 frames=int(tot_all.shape[1]), fps=_DIFF_FPS, gif_fps=5,
+                 measure=fit_arc_label)

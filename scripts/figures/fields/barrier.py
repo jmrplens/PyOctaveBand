@@ -228,13 +228,14 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     # fits. Stepped rather than scaled by the ratio: the rasteriser rounds
     # the glyph size to whole pixels, so a 2 % reduction can come back the
     # same width it went in.
-    while (max(_text_width_x(fig, il.axes, il) for il in il_txts)
-           > shadow[1] - shadow[0] and il_txts[0].get_fontsize() > 6.0):
+    def fit_insertion_loss() -> None:
+        while (max(_text_width_x(fig, il.axes, il) for il in il_txts)
+               > shadow[1] - shadow[0] and il_txts[0].get_fontsize() > 6.0):
+            for il in il_txts:
+                il.set_fontsize(il.get_fontsize() - 0.25)
         for il in il_txts:
-            il.set_fontsize(il.get_fontsize() - 0.25)
-    for il in il_txts:
-        _fit_text_x(fig, il.axes, il, *shadow)
-        il.set_text("")
+            _fit_text_x(fig, il.axes, il, *shadow)
+            il.set_text("")
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):
@@ -250,4 +251,5 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         return (*ims, *il_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_barrier",
-                 frames=int(p_all.shape[1]), fps=_BARRIER_FPS, gif_fps=5)
+                 frames=int(p_all.shape[1]), fps=_BARRIER_FPS, gif_fps=5,
+                 measure=fit_insertion_loss)

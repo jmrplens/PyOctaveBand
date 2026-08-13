@@ -249,19 +249,19 @@ L 705.763438 28.318125
    </g>
    <g id="text_13">
     <g id="patch_7">
-     <path d="M 558.136185 395.237852 
+     <path d="M 557.223529 395.237852 
 L 695.790873 395.237852 
 Q 701.290873 395.237852 701.290873 389.737852 
 L 701.290873 363.331836 
 Q 701.290873 357.831836 695.790873 357.831836 
-L 558.136185 357.831836 
-Q 552.636185 357.831836 552.636185 363.331836 
-L 552.636185 389.737852 
-Q 552.636185 395.237852 558.136185 395.237852 
+L 557.223529 357.831836 
+Q 551.723529 357.831836 551.723529 363.331836 
+L 551.723529 389.737852 
+Q 551.723529 395.237852 557.223529 395.237852 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(562.472591 372.791191)">DnT,w = 49 dB  (C = -1)</text>
+    <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(557.223529 372.791191)">DnT,w = 49 dB  (C = −1)</text>
     <text style="font-size: 11px; font-family: sans-serif; fill: #ffffff" transform="translate(558.136185 385.994199)">octave bands, T0 = 0.5 s</text>
    </g>
    <g id="text_14">

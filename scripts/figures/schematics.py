@@ -18,7 +18,7 @@ from matplotlib.collections import LineCollection
 
 from phonometry._plot.common import format_frequency_axis
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .media import (
     _ANIM_FPS,
     _ANIM_FRAMES,
@@ -229,11 +229,18 @@ def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
 
 
 def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
-                color: str, lo: str = "", hi: str = "") -> dict[str, Any]:
+                color: str, lo: str = "", hi: str = "",
+                end_dy: float = -0.12) -> dict[str, Any]:
     """A semicircular meter dial; move the needle with :func:`_set_gauge`.
 
     ``lo``/``hi`` are optional scale-endpoint labels (left and right end of
-    the arc), so a reader can anchor the needle position to numbers.
+    the arc), so a reader can anchor the needle position to numbers, and
+    ``end_dy`` is where they hang, in radii below the arc's own baseline.
+    The default drops them far enough to clear the needle at full scale,
+    which is what a label wide for its dial needs; a dial whose endpoint
+    labels are two or three characters wide is better served by a shallower
+    drop, close enough under the arc ends to read as belonging to that arc
+    rather than floating in the gap to the next dial.
     """
     from matplotlib.patches import Arc
 
@@ -249,10 +256,10 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     # Spanish "20 sonios" against the English "20 sone") otherwise reaches
     # back under the needle tip with a couple of pixels to spare.
     if lo:
-        ax.text(cx - 1.12 * r, cy - 0.12 * r, lo, ha="center", va="top",
+        ax.text(cx - 1.12 * r, cy + end_dy * r, lo, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     if hi:
-        ax.text(cx + 1.12 * r, cy - 0.12 * r, hi, ha="center", va="top",
+        ax.text(cx + 1.12 * r, cy + end_dy * r, hi, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     (needle,) = ax.plot([cx, cx - 0.78 * r], [cy, cy], color=color, lw=2.4,
                         solid_capstyle="round")
@@ -450,9 +457,15 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
 
     # --- meter gauges + response traces -----------------------------------
     # One shared 0..1.2 scale, spelled out on the first dial only (the
-    # endpoint labels of adjacent dials would otherwise collide).
+    # endpoint labels of adjacent dials would otherwise collide). "0" and
+    # "1.2" are two or three characters wide and never reach back under the
+    # needle, so they hang just clear of the arc ends instead of at the
+    # shared default, which drops them into the gap between F and S where
+    # they read as labelling neither. Not flush against the ends either: at
+    # this radius the arc's own end tick is horizontal, and a label whose
+    # top edge meets it is drawn with a line through its digits.
     gauges = [_make_gauge(ax_g, 0.6, 0.0, 0.5, "F", COLOR_PRIMARY,
-                          lo="0", hi="1.2"),
+                          lo="0", hi="1.2", end_dy=-0.04),
               _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY),
               _make_gauge(ax_g, 2.8, 0.0, 0.5, "I", col_imp)]
     ax_t.set_xlim(0.5, 4.0)
@@ -623,7 +636,8 @@ def animate_onset_detection(output_dir: str) -> None:
         x_txt = min(max(tc_view, 0.55 + txt_half + 0.02), 3.0 - txt_half - 0.02)
         lens_txt.set_position((x_txt, y0 + ry * 1.35))
         # A gradient of -0.3 dB/s rounds to "-0", a sign in front of a zero.
-        lens_txt.set_text(T(f"dL/dt = {g if round(g) else 0.0:.0f} dB/s"))
+        lens_txt.set_text(
+            T(f"dL/dt = {_fmt_minus(g if round(g) else 0.0, '.0f')} dB/s"))
         lens_txt.set_color(color)
         hot_m = (t <= tc) & is_onset
         hot.set_data(t[hot_m], laf[hot_m])
@@ -781,7 +795,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                                                color=COLOR_SECONDARY,
                                                alpha=0.22)
             pn["mline"].set_ydata([mean, mean])
-            pn["txt"].set_text(T(f"⟨p·u⟩ = {mean:+.2f}"))
+            pn["txt"].set_text(T(f"⟨p·u⟩ = {_fmt_minus(mean, '+.2f')}"))
             arts += [pn["p_ph"], pn["u_ph"], pn["i_arrow"],
                      pn["mean_marker"], pn["mean_lab"],
                      pn["iline"], pn["fill"], pn["mline"], pn["txt"]]
@@ -1974,7 +1988,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     ax_p.set_ylabel(T("Phase [deg]"), fontsize=9)
     # Haloed: the Spanish string reaches as far as the phase flank, and the
     # trace was filling the counter of its last letter.
-    ax_p.text(f_lo + 1.0, -83.0, T("-90 deg: resonance"), ha="left",
+    ax_p.text(f_lo + 1.0, -83.0, T("−90 deg: resonance"), ha="left",
               va="bottom", color=COLOR_SECONDARY, fontsize=8.5,
               path_effects=_halo())
     (dot_p,) = ax_p.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
@@ -2023,7 +2037,8 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
         # lone T("phase"), the readout kept the English decimal point through
         # the entire Spanish variant.
         drive_txt.set_text(
-            T(f"f = {f:4.1f} Hz    phase = {deg:6.1f}\u00b0"))
+            T(f"f = {f:4.1f} Hz    phase = "
+              f"{_fmt_minus(deg, '6.1f')}\u00b0"))
         return (plate, plate_lbl, spec, spec_lbl, force, motion, dot_m, dot_p,
                 state_txt, drive_txt)
 
@@ -2383,7 +2398,7 @@ def animate_loudness_gating(output_dir: str) -> None:
                          label=T("short-term (3 s)"))
     ax_t.axhline(_GATE_ABSOLUTE, color=COLOR_FG, lw=1.0, ls=":",
                  alpha=0.8)
-    ax_t.text(0.4, _GATE_ABSOLUTE + 0.8, T("absolute gate, -70 LUFS"),
+    ax_t.text(0.4, _GATE_ABSOLUTE + 0.8, T("absolute gate, −70 LUFS"),
               ha="left", va="bottom", color=COLOR_FG, fontsize=7.5)
     rel_line = ax_t.axhline(-70.0, color=COLOR_SECONDARY, lw=1.6, ls="--")
     # The threshold labels ride over the block scatter, so they carry the
@@ -2465,7 +2480,8 @@ def animate_loudness_gating(output_dir: str) -> None:
         rel_line.set_ydata([gamma, gamma])
         rel_line_h.set_ydata([gamma, gamma])
         rel_txt.set_position((duration - 0.4, gamma + 0.6))
-        rel_txt.set_text(T(f"relative gate {gamma:.1f} LUFS"))
+        rel_txt.set_text(
+            T(f"relative gate {_fmt_minus(gamma, '.1f')} LUFS"))
         int_line.set_ydata([integrated, integrated])
         head.set_data([played, played], [-72.0, -8.0])
         counts = np.histogram(l_seen, bins=edges)[0]
@@ -2499,7 +2515,8 @@ def animate_loudness_gating(output_dir: str) -> None:
                 line.set_ydata([gate_lra, gate_lra])
                 line.set_visible(True)
             lra_gate_txt.set_position((duration - 0.4, gate_lra + 0.6))
-            lra_gate_txt.set_text(T(f"short-term gate {gate_lra:.1f} LUFS"))
+            lra_gate_txt.set_text(
+                T(f"short-term gate {_fmt_minus(gate_lra, '.1f')} LUFS"))
             lra_gate_txt.set_visible(True)
             arts += [p10, p95, lra_band["art"], lra_gate, lra_gate_h,
                      lra_gate_txt]
@@ -2517,8 +2534,8 @@ def animate_loudness_gating(output_dir: str) -> None:
         ax_t.set_title(act, fontsize=9.5, fontstyle="italic", color=COLOR_FG)
 
         values = [
-            T(f"{integrated:.1f} LUFS"),
-            T(f"{ungated:.1f} LUFS"),
+            T(f"{_fmt_minus(integrated, '.1f')} LUFS"),
+            T(f"{_fmt_minus(ungated, '.1f')} LUFS"),
             T(f"{integrated - ungated:+.2f} LU"),
             T(f"{int((~passing).sum())} of {l_seen.size}"),
         ]
@@ -2794,7 +2811,8 @@ def animate_epnl_flyover(output_dir: str) -> None:
         if known_peak:
             _light_box(boxes[0], T(f"{d['pnltm']:.2f} PNdB"), COLOR_SECONDARY)
         if k >= epnl_at:
-            _light_box(boxes[1], T(f"{d['duration_correction']:.2f} dB"),
+            _light_box(boxes[1],
+                       T(f"{_fmt_minus(d['duration_correction'], '.2f')} dB"),
                        COLOR_TERTIARY)
             _light_box(boxes[2], T(f"{d['epnl']:.2f} EPNdB"), COLOR_PRIMARY,
                        fill=True)
@@ -3225,10 +3243,11 @@ def animate_iso717_shift(output_dir: str) -> None:
             lines.append(T("largest sum still under the cap"))
             lines.append(f"{name} = {track['rating']:d} dB")
             if impact:
-                lines.append(T(f"CI = {int(res.ci):+d} dB"))
+                lines.append(
+                    T(f"CI = {_fmt_minus(int(res.ci), '+d')} dB"))
             else:
-                lines.append(T(f"C = {int(res.c):+d} dB, "
-                               f"Ctr = {int(res.ctr):+d} dB"))
+                lines.append(T(f"C = {_fmt_minus(int(res.c), '+d')} dB, "
+                               f"Ctr = {_fmt_minus(int(res.ctr), '+d')} dB"))
         else:
             lines.append(T("legal, but the sum is smaller:"))
             lines.append(T("this is one step too far"))
@@ -3466,18 +3485,19 @@ def animate_block_vs_exponential(output_dir: str) -> None:
         blk_trace.set_data(ms, act["blk"][:i + 1])
         now_dot.set_data([offsets[i] * 1e3], [act["blk"][i]])
         ax_a.set_title(
-            T(f"class 1 is {limit:.1f} dB about {target:.1f} dB"),
+            T(f"class 1 is {_fmt_minus(limit, '.1f')} dB "
+              f"about {_fmt_minus(target, '.1f')} dB"),
             fontsize=8.5, color=COLOR_FG)
 
         seen_b = act["blk"][:i + 1]
         seen_e = act["exp"][:i + 1]
         lines = [
             T(f"burst {act['seconds'] * 1e3:.0f} ms, "
-              f"IEC target {target:.1f} dB"),
-            T(f"exponential  {act['exp'][i]:6.2f} dB "
-              f"({act['exp'][i] - target:+.2f})"),
-            T(f"block Leq    {act['blk'][i]:6.2f} dB "
-              f"({act['blk'][i] - target:+.2f})"),
+              f"IEC target {_fmt_minus(target, '.1f')} dB"),
+            T(f"exponential  {_fmt_minus(act['exp'][i], '6.2f')} dB "
+              f"({_fmt_minus(act['exp'][i] - target, '+.2f')})"),
+            T(f"block Leq    {_fmt_minus(act['blk'][i], '6.2f')} dB "
+              f"({_fmt_minus(act['blk'][i] - target, '+.2f')})"),
             T(f"spread so far, exponential: "
               f"{float(seen_e.max() - seen_e.min()):.2f} dB"),
             T(f"spread so far, block Leq:   "
@@ -3710,8 +3730,10 @@ def animate_feedback_howl(output_dir: str) -> None:
                if a == 1 else
                T("Four more decibels of system gain: the loop reaches unity"))
         act_txt.set_text(act)
-        lines = [T(f"Zs = {case['zs']:.0f} dB, {mics:d} open microphone(s)"),
-                 T(f"loop gain Zs + Gs = {case['loop']:+.1f} dB"),
+        lines = [T(f"Zs = {_fmt_minus(case['zs'], '.0f')} dB, "
+                   f"{mics:d} open microphone(s)"),
+                 T(f"loop gain Zs + Gs = "
+                   f"{_fmt_minus(case['loop'], '+.1f')} dB"),
                  T(f"each round trip is x {case['g']:.3f}")]
         if np.isfinite(case["limit"]):
             lines.append(T(f"sum converges to "

@@ -8687,10 +8687,10 @@ L 711.68375 264.316953
    <g id="legend_1">
     <g id="patch_13">
      <path d="M 65.146094 453.933437 
-L 227.456875 453.933437 
-Q 229.256875 453.933437 229.256875 452.133437 
-L 229.256875 412.531328 
-Q 229.256875 410.731328 227.456875 410.731328 
+L 231.751562 453.933437 
+Q 233.551562 453.933437 233.551562 452.133437 
+L 233.551562 412.531328 
+Q 233.551562 410.731328 231.751562 410.731328 
 L 65.146094 410.731328 
 Q 63.346094 410.731328 63.346094 412.531328 
 L 63.346094 452.133437 
@@ -8714,7 +8714,7 @@ L 84.946094 431.520625
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
     </g>
     <g id="text_43">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="92.146094" y="434.670625" transform="rotate(-0 92.146094 434.670625)">Pink target (-3 dB per octave)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="92.146094" y="434.670625" transform="rotate(-0 92.146094 434.670625)">Pink target (−3 dB per octave)</text>
     </g>
     <g id="patch_14">
      <path d="M 66.946094 448.171328 

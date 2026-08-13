@@ -18,6 +18,7 @@ from typing import Any
 
 import numpy as np
 
+from ..i18n import _fmt_minus
 from ..media import _ANIM_PILL_BOX, _anim_figure, _render_clip, _translate_str
 from ..theme import (
     CMAP_FIELD,
@@ -396,9 +397,10 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
                 tail = ""
                 if contact[j] > r_crit + 60.0:
                     tail = "\n" + T(
-                        f"beyond {r_crit:.0f} m the net is {ratios[i][j]:+.1f}"
+                        f"beyond {r_crit:.0f} m the net is "
+                        f"{_fmt_minus(ratios[i][j], '+.1f')}"
                         f" % of what entered inside (theory "
-                        f"{forms[i]:+.1f} %)")
+                        f"{_fmt_minus(forms[i], '+.1f')} %)")
                 pills[i].set_text(head + tail)
             artists += [ims[i], pills[i], f_lines[i]]
         psi = angles[j]

@@ -8,6 +8,7 @@ loudspeaker drawn on the clips that drive a bore, and the measure-then-slide
 pass that keeps an annotation inside its panel in either language.
 """
 
+import sys
 from typing import Any
 
 import numpy as np
@@ -101,8 +102,22 @@ def _gain_note(region: str, gain: float) -> str:
     return f"{region} drawn ×{gain:g} (+{20.0 * np.log10(gain):.0f} dB)"
 
 
-def _ink_box(artist: Any) -> Any:
-    """The rendered box of a label: its background patch, or its glyphs."""
+def _layout_box(artist: Any) -> Any:
+    """The rendered box of a label: its background patch, or its glyphs.
+
+    For a label with a background patch -- a pill -- this is the patch's own
+    extent, which is literal ink: a rounded box has no hidden margin. For
+    plain text it is Matplotlib's *layout* box, which reserves vertical room
+    for a descender the string may not have: measured against the pixels it
+    actually paints, a string with no g/y/p/q/j reads around a third taller
+    than its glyphs, nearly all of it below the baseline. A gap measured
+    between two such boxes therefore overshoots the gap that is visible --
+    close to double it for a small ``gap=`` with a descender-less string on
+    either side, measured on a pair at the sizes these clips use. Horizontal
+    ink is much closer to this box, ascent and descent being a vertical
+    reservation, which is why :func:`_fit_text_x` reads it as ink and
+    :func:`_fit_text_below` is the one that has to be read as layout.
+    """
     patch = artist.get_bbox_patch()
     if patch is not None:
         return patch.get_window_extent()
@@ -125,7 +140,7 @@ def _settle(fig: Any) -> None:
 def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
     """The rendered width of *artist*, in x data units of *ax*."""
     _settle(fig)
-    box = _ink_box(artist)
+    box = _layout_box(artist)
     inv = ax.transData.inverted()
     (x0, _), (x1, _) = inv.transform([(box.x0, 0.0), (box.x1, 0.0)])
     return float(abs(x1 - x0))
@@ -144,20 +159,31 @@ def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
     sliding it back along the same line buys the same height and keeps the
     offset. Returns the applied shift in display pixels (0.0 when the label
     already cleared).
+
+    The boxes are read as layout boxes (see :func:`_layout_box`), so the gap
+    that ends up visible is wider than the ``gap`` asked for -- for two
+    plain strings, close to twice it. The clips were composed against that
+    behaviour, so ``gap`` is a knob for the look, not a measurement of the
+    white space.
     """
     _settle(fig)
-    top = _ink_box(artist).y1
-    floor = _ink_box(other).y0 - gap
+    top = _layout_box(artist).y1
+    floor = _layout_box(other).y0 - gap
     if top <= floor:
         return 0.0
+    # The label slides along its own baseline, so the drop it needs
+    # (``floor - top``, negative) buys the step down the line through the
+    # *signed* sine of the rotation: a label tilted the other way (sin < 0)
+    # travels the other way in x for the same drop, which taking the sine's
+    # magnitude here would have sent into the text it is clearing.
     slope = np.radians(artist.get_rotation())
-    rise = abs(float(np.sin(slope)))
-    if rise < 1e-6:                  # a level label can only go down
+    sin_t = float(np.sin(slope))
+    if abs(sin_t) < 1e-6:            # a level label can only go down
         dx_px, dy_px = 0.0, floor - top
     else:
-        step = (top - floor) / rise
-        dx_px = -step * float(np.cos(slope))
-        dy_px = -step * rise
+        step = (floor - top) / sin_t
+        dx_px = step * float(np.cos(slope))
+        dy_px = step * sin_t
     inv = ax.transData.inverted()
     (x0, y0), (x1, y1) = inv.transform([(0.0, 0.0), (dx_px, dy_px)])
     x, y = artist.get_position()
@@ -177,14 +203,29 @@ def _fit_text_x(fig: Any, ax: Any, artist: Any,
     keeps every language inside ``[x_lo + margin, x_hi - margin]`` without
     moving the labels that already fit. Returns the applied shift, in data
     units, so a caller can move an arrow or a companion label with it.
+
+    A string wider than the room it is given here cannot be put inside it by
+    sliding, and the two overflows would otherwise net out into a shift that
+    leaves the label hanging over both edges at once. Such a label is
+    anchored at ``x_lo + margin`` instead -- it overflows in reading order,
+    where the eye is already going -- and says so on stderr, next to the
+    encoder notes, rather than passing silently.
     """
     _settle(fig)
-    box = _ink_box(artist)
+    box = _layout_box(artist)
     inv = ax.transData.inverted()
     (dx0, _), (dx1, _) = inv.transform([(box.x0, 0.0), (box.x1, 0.0)])
     lo, hi = min(dx0, dx1), max(dx0, dx1)
-    shift = (max(0.0, (x_lo + margin) - lo)
-             - max(0.0, hi - (x_hi - margin)))
+    room_lo, room_hi = x_lo + margin, x_hi - margin
+    if hi - lo > room_hi - room_lo:
+        print(f"note: {artist.get_text()!r} does not fit "
+              f"[{room_lo:.3g}, {room_hi:.3g}] even flush against one edge "
+              f"({hi - lo:.3g} > {room_hi - room_lo:.3g} data units)",
+              file=sys.stderr)
+        shift = room_lo - lo
+    else:
+        shift = (max(0.0, room_lo - lo)
+                 - max(0.0, hi - room_hi))
     if shift:
         artist.set_x(float(artist.get_position()[0]) + shift)
     return float(shift)

@@ -21,6 +21,7 @@ from scipy import signal as scipy_signal
 from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -77,7 +78,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
         ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
         axins.plot(w, mag_db, color=color, linestyle=style)
 
-    ax.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3, label="-3 dB")
+    ax.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3, label="−3 dB")
     axins.axhline(-3, color=COLOR_FG, linestyle=":", alpha=0.3)
     
     apply_axis_styling(ax, "Filter Architecture Comparison (Order 6, 1kHz Band)", xlim=(100, 8000), ylim=(-80, 5))
@@ -86,7 +87,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins.set_xlim(650, 1500)
     axins.set_ylim(-4, 0.5)  # Adjusted: from -4 to 0.5
     axins.grid(True, which="both", alpha=0.3)
-    axins.set_title("Zoom at -3 dB (Log Scale)", fontsize=9)
+    axins.set_title("Zoom at −3 dB (Log Scale)", fontsize=9)
 
     # Fix x-ticks for log scale zoom to look right
     from matplotlib.ticker import NullFormatter, ScalarFormatter
@@ -580,7 +581,7 @@ def generate_parametric_eq_family(output_dir: str) -> None:
         (EQSection("lowshelf", 125.0, gain_db=6.0),
          "Low shelf +6 dB", COLOR_TERTIARY, "-"),
         (EQSection("highshelf", 4000.0, gain_db=-6.0),
-         "High shelf -6 dB", "#9467bd", "-"),
+         "High shelf −6 dB", "#9467bd", "-"),
         (EQSection("lowpass", 10000.0),
          "Low-pass (Q = 0.707)", COLOR_SECONDARY, "--"),
         (EQSection("highpass", 50.0),
@@ -1716,10 +1717,12 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
     ax_a.bar(x - 0.19, two_fm, 0.36, color=COLOR_PRIMARY, label="at 2 f_m")
     ax_a.bar(x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label="at 4 f_m")
     for xi, value in zip(x - 0.19, two_fm):
-        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+        ax_a.annotate(_fmt_minus(value, ".0f"), (xi, value),
+                      ha="center", va="top",
                       fontsize=9, xytext=(0, -4), textcoords="offset points")
     for xi, value in zip(x + 0.19, four_fm):
-        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+        ax_a.annotate(_fmt_minus(value, ".0f"), (xi, value),
+                      ha="center", va="top",
                       fontsize=9, xytext=(0, -4), textcoords="offset points")
     ax_a.set_title("Relative attenuation out of band", fontweight="bold",
                    pad=12)

@@ -318,7 +318,7 @@ margen libre, sin bajar nunca de cero.
   la Tabla 3 y su factor de suelo $G$ (0 = duro/reflectante, 1 =
   poroso/absorbente). Un $A_{gr}$ **negativo** es una *ganancia* neta por la
   reflexión constructiva en el suelo.
-* **Apantallamiento** por una barrera es la pérdida por inserción por difracción
+* **Apantallamiento** por una barrera es la pérdida por inserción debida a la difracción
   $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
   limitada a 20 dB (un borde) o 25 dB (doble borde). Para una barrera de borde
   superior, el efecto del suelo del recorrido apantallado se integra en él,
@@ -456,7 +456,7 @@ lp = environment.predicted_receiver_level(
 )
 print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
 
-# Dz por sí solo: la pérdida por inserción por difracción de la Ec. (14), antes de la Ec. (12)
+# Dz por sí solo: la pérdida por inserción debida a la difracción de la Ec. (14), antes de la Ec. (12)
 dz = environment.barrier_attenuation(barrier, 200.0, bands)
 print(np.round(dz, 2))            # [ 9.13 11.24 13.73 16.45 19.31 20.   20.   20.  ]
 print(np.allclose(att.a_bar, np.maximum(dz - att.a_gr, 0.0)))   # True
@@ -495,8 +495,8 @@ plt.show()
 
 </details>
 
-`barrier_attenuation` devuelve el propio $D_z$, la pérdida por inserción por
-difracción en bruto de la Ec. (14), que *no* es lo que declara el compuesto. Para
+`barrier_attenuation` devuelve el propio $D_z$, la pérdida por inserción en bruto
+debida a la difracción de la Ec. (14), que *no* es lo que declara el compuesto. Para
 una barrera de borde superior, `a_bar` es `np.maximum(dz - a_gr, 0)` (Ec. (12),
 Nota 13), y la igualdad impresa arriba es la forma más limpia de ver que el
 efecto del suelo se gasta en vez de conservarse: a 250 Hz el camino apantallado
@@ -725,7 +725,7 @@ deciden si una barrera real entrega su $D_z$ calculado:
   ganancia *neta* de construir la barrera es proporcionalmente menor que su
   $D_z$ nominal; los dos efectos no se apilan.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso9613_screening_anatomy_es.svg" alt="Dos paneles sobre el término de apantallamiento de ISO 9613-2. Izquierda: la pérdida por inserción por difracción Dz a 500 Hz frente a la altura de barrera para un recorrido de 200 m, una curva para borde simple, otra para doble borde con una separación de bordes de 2 m y otra para el borde simple con el factor meteorológico Kmet, con los topes de 20 dB y 25 dB dibujados como techos horizontales contra los que chocan las curvas. Derecha: Dz frente a la frecuencia de banda de octava para una pantalla de 4 m junto a Abar = Dz menos Agr sobre suelo poroso, siendo la separación entre las dos curvas el efecto del suelo que la barrera tiene que gastarse antes de comprar nada, y con Abar recortado a cero en la banda de 250 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso9613_screening_anatomy_es.svg" alt="Dos paneles sobre el término de apantallamiento de ISO 9613-2. Izquierda: la pérdida por inserción debida a la difracción Dz a 500 Hz frente a la altura de barrera para un recorrido de 200 m, una curva para borde simple, otra para doble borde con una separación de bordes de 2 m y otra para el borde simple con el factor meteorológico Kmet, con los topes de 20 dB y 25 dB dibujados como techos horizontales contra los que chocan las curvas. Derecha: Dz frente a la frecuencia de banda de octava para una pantalla de 4 m junto a Abar = Dz menos Agr sobre suelo poroso, siendo la separación entre las dos curvas el efecto del suelo que la barrera tiene que gastarse antes de comprar nada, y con Abar recortado a cero en la banda de 250 Hz" width="88%" />
 
 *Izquierda: más altura deja de pagar en cuanto $D_z$ toca su tope; más allá de
 unos 7 m de pantalla en este recorrido, la curva de borde simple es plana en

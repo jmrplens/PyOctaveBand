@@ -1514,7 +1514,7 @@ def generate_tone_audibility(output_dir: str) -> None:
 
     info = [
         "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69",
-        "LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2.5)",
+        "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)",
         "dL = LT - LG - av  (combustion engine, Annex E)",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,

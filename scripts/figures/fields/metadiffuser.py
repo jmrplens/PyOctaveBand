@@ -407,11 +407,13 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
             ax_t.text(xc, 0.06, T("real slits and resonators meshed at "
                                   "0.25 mm"), ha="center", va="bottom",
                       color=FIELD_INK, fontsize=6.5, path_effects=outline)
-            ax_t.annotate("", xy=(x_r + 0.045, y1 - 0.023),
-                          xytext=(x_r + 0.045, y1),
-                          arrowprops={"arrowstyle": "-", "color": COLOR_FG,
-                                      "lw": 1.6})
-            ax_t.text(x_r + 0.07, y1 - 0.012, "2 cm", ha="left",
+            # No dimension bar on this one: the panel is 2 cm deep against
+            # the QRD's 27, and a bar drawn to that scale is four pixels of
+            # a stroke 1.6 wide -- a full stop in front of the text, not a
+            # measurement. The number sits against the end of the slab it
+            # measures instead, which at this thickness is the slab's own
+            # thickness anyway.
+            ax_t.text(x_r + 0.02, y1 - 0.012, "2 cm", ha="left",
                       va="center", fontsize=7, color=COLOR_FG)
         ims += [im_t, im_s]
         d_txts.append(d_txt)

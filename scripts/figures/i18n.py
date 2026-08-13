@@ -213,7 +213,7 @@ _ES_EXACT = {
     "plate motion": "movimiento de la placa",
     "Response magnitude": "Módulo de la respuesta",
     "Phase [deg]": "Fase [grados]",
-    "-90 deg: resonance": "-90 grados: resonancia",
+    "−90 deg: resonance": "−90 grados: resonancia",
     "below fr: the plate follows the force":
         "por debajo de fr: la placa sigue a la fuerza",
     "at fr: a quarter cycle behind, amplitude peaks":
@@ -513,7 +513,7 @@ _ES_EXACT = {
         "Biquads de EQ paramétrico (RBJ Audio EQ Cookbook)",
     "Peaking +6 dB (Q = 1.4)": "Campana +6 dB (Q = 1.4)",
     "Low shelf +6 dB": "Shelving grave +6 dB",
-    "High shelf -6 dB": "Shelving agudo -6 dB",
+    "High shelf −6 dB": "Shelving agudo −6 dB",
     "Low-pass (Q = 0.707)": "Paso bajo (Q = 0.707)",
     "High-pass (Q = 0.707)": "Paso alto (Q = 0.707)",
     "Band-pass (Q = 2)": "Paso banda (Q = 2)",
@@ -733,7 +733,7 @@ _ES_EXACT = {
         "Ponderaci\u00f3n temporal F/S/I (IEC 61672-1)",
     "Zero-Phase Filtering: Group Delay Elimination (250 Hz Band)":
         "Filtrado de fase cero: eliminaci\u00f3n del retardo de grupo (banda de 250 Hz)",
-    "Zoom at -3 dB (Log Scale)": "Zoom en -3 dB (escala log)",
+    "Zoom at −3 dB (Log Scale)": "Zoom en −3 dB (escala log)",
     "Zoom: A-weighting is positive (max +1.27 dB @ 2.5 kHz)":
         "Zoom: la ponderaci\u00f3n A es positiva (m\u00e1x +1,27 dB @ 2,5 kHz)",
     "block boundary:\nfilter transient restarts":
@@ -756,9 +756,9 @@ _ES_EXACT = {
     "Kc adaptation": "Adaptación Kc",
     "RI (intensity)": "RI (intensidad)",
     # intensity_element_insulation info box: rating and formula, symbols only.
-    "DI,n,e,w(C;Ctr) = 29(-1;-2) dB\n"
+    "DI,n,e,w(C;Ctr) = 29(−1;−2) dB\n"
     "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N":
-        "DI,n,e,w(C;Ctr) = 29(-1;-2) dB\n"
+        "DI,n,e,w(C;Ctr) = 29(−1;−2) dB\n"
         "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N",
     # survey_insulation figure (ISO 10052)
     "ISO 10052 Survey Method: Reverberation-Index Correction":
@@ -767,8 +767,8 @@ _ES_EXACT = {
     "D (level difference)": "D (diferencia de nivel)",
     "DnT (standardized)": "DnT (estandarizada)",
     "octave bands, T0 = 0.5 s": "bandas de octava, T0 = 0,5 s",
-    "DnT,w = 49 dB  (C = -1)\noctave bands, T0 = 0.5 s":
-        "DnT,w = 49 dB  (C = -1)\nbandas de octava, T0 = 0,5 s",
+    "DnT,w = 49 dB  (C = −1)\noctave bands, T0 = 0.5 s":
+        "DnT,w = 49 dB  (C = −1)\nbandas de octava, T0 = 0,5 s",
     # absorption_uncertainty figure (ISO 12999-2)
     "ISO 12999-2 Sound Absorption Coefficient Uncertainty":
         "Incertidumbre del coeficiente de absorción acústica (ISO 12999-2)",
@@ -1074,10 +1074,10 @@ _ES_EXACT = {
     # The formula box: only the parenthetical tail carries language, and
     # the saver's decimal-comma pass restyles the digits.
     "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69\n"
-    "LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2.5)\n"
+    "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)\n"
     "dL = LT - LG - av  (combustion engine, Annex E)":
         "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69\n"
-        "LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2.5)\n"
+        "LG = LS + 10 log10(dfc/df),  av = −2 - log10(1 + (f/502)^2.5)\n"
         "dL = LT - LG - av  (motor de combustión, Anexo E)",
     # facade_prediction figure (EN 12354-3 Annex F)
     "EN 12354-3 Façade Sound Insulation (Annex F example)":
@@ -1090,9 +1090,9 @@ _ES_EXACT = {
     "Rp — air inlet": "Rp — entrada de aire",
     "R′ (façade)": "R′ (fachada)",
     "air inlet limits the low bands": "la entrada de aire limita las bandas bajas",
-    "R′tr,s,w = 31 dB   (Ctr = -3)\nD2m,nT,w = 33 dB\n"
+    "R′tr,s,w = 31 dB   (Ctr = −3)\nD2m,nT,w = 33 dB\n"
     "air inlet limits the low bands":
-        "R′tr,s,w = 31 dB   (Ctr = -3)\nD2m,nT,w = 33 dB\n"
+        "R′tr,s,w = 31 dB   (Ctr = −3)\nD2m,nT,w = 33 dB\n"
         "la entrada de aire limita las bandas bajas",
     # facade_elevation_geometry element names, drawn by plot_facade_elements;
     # worded as the facade-insulation page's own alt text.
@@ -1608,7 +1608,7 @@ _ES_EXACT = {
         "Curva de referencia desplazada (ISO 717-1)",
     "Unfavourable deviations": "Desviaciones desfavorables",
     # Rating statement, symbols only: reads the same in Spanish.
-    "Rw (C ; Ctr) = 30 (-2 ; -3) dB": "Rw (C ; Ctr) = 30 (-2 ; -3) dB",
+    "Rw (C ; Ctr) = 30 (−2 ; −3) dB": "Rw (C ; Ctr) = 30 (−2 ; −3) dB",
     "Sharpness Weighting g(z) (DIN 45692)":
         "Ponderación de agudeza g(z) (DIN 45692)",
     "Weighting g(z)": "Ponderación g(z)",
@@ -1925,7 +1925,7 @@ _ES_EXACT = {
     "AES17 CCIR-RMS (0 dB at 2 kHz)": "CCIR-RMS de AES17 (0 dB a 2 kHz)",
     "+12.2 dB at 6.3 kHz": "+12,2 dB a 6,3 kHz",
     "0 dB at 1 kHz": "0 dB a 1 kHz",
-    "-5.63 dB at 1 kHz": "-5,63 dB a 1 kHz",
+    "−5.63 dB at 1 kHz": "−5,63 dB a 1 kHz",
     "for a 100 Hz fundamental the network cuts d2 by 13.8 dB\n"
     "and d3 by 10.3 dB, and lifts the 10th order and above":
         "para un fundamental de 100 Hz la red recorta d2 en 13,8 dB\n"
@@ -2007,8 +2007,8 @@ _ES_EXACT = {
         "Intervalo de confianza chi-cuadrado del 95 %",
     "Welch PSD estimate": "Estimación de la PSD de Welch",
     "1/3-octave smoothed": "Suavizado en 1/3 de octava",
-    "Exact -3.01 dB/octave power law":
-        "Ley de potencias exacta de -3,01 dB/octava",
+    "Exact −3.01 dB/octave power law":
+        "Ley de potencias exacta de −3,01 dB/octava",
     # Thomson multitaper spectral density (Percival & Walden 1993)
     "Thomson Multitaper Density of a Short Record (Percival & Walden)":
         # Measured on the drawn figure: "de un registro corto" ran 4,9 px
@@ -2274,8 +2274,8 @@ _ES_EXACT = {
     r"2000 m$^3$ hall (no air)": r"sala de 2000 m$^3$ (sin aire)",
     r"2000 m$^3$ hall (20 °C, 50-70 %)":
         r"sala de 2000 m$^3$ (20 °C, 50-70 %)",
-    "-1.7 % at 1 kHz": "-1,7 % a 1 kHz",
-    "-42 % at 8 kHz": "-42 % a 8 kHz",
+    "−1.7 % at 1 kHz": "−1,7 % a 1 kHz",
+    "−42 % at 8 kHz": "−42 % a 8 kHz",
     # enclosed_space_objects (EN 12354-6 Annex E case 2): "desnuda" and
     # "amueblada" as the page's own snippet labels them.
     "Where the absorption comes from": "De dónde sale la absorción",
@@ -2321,11 +2321,11 @@ _ES_EXACT = {
     "Per-band decay: solid without air, dashed with air":
         "Decaimiento por banda: continua sin aire, a trazos con aire",
     "room 7 x 5 x 3 m, max_order = 60\nwall alpha 0.10 -> 0.50 with "
-    "frequency\nair at 20 C / 50 % RH: -0.4 % of T30 at 250 Hz,\n"
-    "-4.4 % at 4 kHz":
+    "frequency\nair at 20 C / 50 % RH: −0.4 % of T30 at 250 Hz,\n"
+    "−4.4 % at 4 kHz":
         "sala de 7 x 5 x 3 m, max_order = 60\nalpha de pared 0,10 -> 0,50 "
-        "con la frecuencia\naire a 20 °C / 50 % HR: -0,4 % del T30 a "
-        "250 Hz,\n-4,4 % a 4 kHz",
+        "con la frecuencia\naire a 20 °C / 50 % HR: −0,4 % del T30 a "
+        "250 Hz,\n−4,4 % a 4 kHz",
     # room_proportion_modes; "axial" reads the same in Spanish and matches
     # the library's own rectangular_room_modes label.
     r"Three rooms of 105 m$^3$, modes up to 200 Hz":
@@ -2385,9 +2385,9 @@ _ES_EXACT = {
     "0.0e+00 Pa — the row is bit-identical":
         "mayor diferencia entre columnas contiguas:\n"
         "0,0e+00 Pa — la fila es idéntica bit a bit",
-    "-38.4 dB of the field energy sits\n"
+    "−38.4 dB of the field energy sits\n"
     "in the 20 sponge rows behind the line":
-        "-38,4 dB de la energía del campo está\n"
+        "−38,4 dB de la energía del campo está\n"
         "en las 20 filas de esponja tras la línea",
     "What the transfer matrix homogenises: five slit resonators, each one "
     "reflection coefficient":
@@ -2542,9 +2542,9 @@ _ES_EXACT = {
         "NL = 60 dB,  DI = 15 dB,  DT = 8 dB\nFOM = SL - (NL - DI) - DT",
     # The ship_source_level info box is mathematics that reads the same in
     # both languages; the save-time pass sets the decimal commas.
-    "Ls = LRN + ΔL\nΔL = -10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
+    "Ls = LRN + ΔL\nΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
     "u = k d_s,  d_s = 0.7 D = 4.2 m":
-        "Ls = LRN + ΔL\nΔL = -10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
+        "Ls = LRN + ΔL\nΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
         "u = k d_s,  d_s = 0.7 D = 4.2 m",
     "Linear Gradient": "Gradiente lineal",
     "Every Ray Turns Where c(z_t) = c(z_s)/cos(theta_0)":
@@ -2640,12 +2640,12 @@ _ES_EXACT = {
     "dominant path": "camino dominante",
     # prediction_flanking_demo / detailed_prediction_paths info boxes:
     # ratings and formulae, symbols only (decimal commas aside).
-    "Rw (Dd) = 57.0 dB\nR'w = 52.2 dB\nR'w − Rw = -4.8 dB\n"
+    "Rw (Dd) = 57.0 dB\nR'w = 52.2 dB\nR'w − Rw = −4.8 dB\n"
     "Dd 32.9 %   ΣFf,Fd,Df 67.1 %":
-        "Rw (Dd) = 57,0 dB\nR'w = 52,2 dB\nR'w − Rw = -4,8 dB\n"
+        "Rw (Dd) = 57,0 dB\nR'w = 52,2 dB\nR'w − Rw = −4,8 dB\n"
         "Dd 32,9 %   ΣFf,Fd,Df 67,1 %",
-    "R' = -10 log10(Σ 10^(-Rij/10))\nR'w (C; Ctr) = 57 (-1; -7) dB":
-        "R' = -10 log10(Σ 10^(-Rij/10))\nR'w (C; Ctr) = 57 (-1; -7) dB",
+    "R' = −10 log10(Σ 10^(−Rij/10))\nR'w (C; Ctr) = 57 (−1; −7) dB":
+        "R' = −10 log10(Σ 10^(−Rij/10))\nR'w (C; Ctr) = 57 (−1; −7) dB",
     "ISO 12999-1 Measurement Uncertainty (situation B, airborne)":
         "Incertidumbre de medición ISO 12999-1 (situación B, aéreo)",
     "Measured R'": "R' medido",
@@ -2742,7 +2742,7 @@ _ES_EXACT = {
     "25 dB cap (double)": "tope de 25 dB (doble)",
     "Barrier height [m]": "Altura de la barrera [m]",
     "Diffraction insertion loss Dz [dB]":
-        "Pérdida por inserción por difracción Dz [dB]",
+        "Pérdida por inserción debida a la difracción Dz [dB]",
     "Abar = max(Dz − Agr, 0) (Eq. (12))":
         "Abar = max(Dz − Agr, 0) (ec. (12))",
     "Agr, spent on the screened path":
@@ -2953,9 +2953,9 @@ _ES_EXACT = {
         r"casi anecoica  |r| = 0,1  ($\Delta L$ = 1,74 dB)",
     "the same, with tube loss (k₀'' = 0.013 Np/m)":
         "la misma, con la atenuación del tubo (k₀'' = 0,013 Np/m)",
-    "minima at 12, 46 and 81 cm: -5.99, -5.92, -5.85 dB\n"
+    "minima at 12, 46 and 81 cm: −5.99, −5.92, −5.85 dB\n"
     "(read the nearest one, and extrapolate to x = 0)":
-        "mínimos en 12, 46 y 81 cm: -5,99, -5,92, -5,85 dB\n"
+        "mínimos en 12, 46 y 81 cm: −5,99, −5,92, −5,85 dB\n"
         "(leer el más cercano y extrapolar a x = 0)",
     "specimen face  x = 0": "cara de la probeta  x = 0",
     # sound_absorption_inversion figure (ISO 354 worked example)
@@ -3301,7 +3301,7 @@ _ES_EXACT = {
     # anim_loudness_gating: the double gate deciding block by block.
     "The two passes of the EBU R 128 gate (BS.1770-5)":
         "Las dos pasadas de la puerta de EBU R 128 (BS.1770-5)",
-    "absolute gate, -70 LUFS": "puerta absoluta, -70 LUFS",
+    "absolute gate, −70 LUFS": "puerta absoluta, −70 LUFS",
     "Blocks per LU": "Bloques por LU",
     "Loudness range (Tech 3342)": "Rango de sonoridad (3342)",
     "block, counted": "bloque, contado",
@@ -3418,7 +3418,7 @@ _ES_EXACT = {
     "Effective Sound-Speed Profiles (Salomons Eq. 4.5)":
         "Perfiles de velocidad efectiva del sonido (Salomons ec. 4.5)",
     "Downward refraction (b = +1 m/s)": "Refracción hacia abajo (b = +1 m/s)",
-    "Upward refraction (b = -1 m/s)": "Refracción hacia arriba (b = -1 m/s)",
+    "Upward refraction (b = −1 m/s)": "Refracción hacia arriba (b = −1 m/s)",
     "Sound Rays under Downward Refraction (b = +1 m/s)":
         "Rayos sonoros con refracción hacia abajo (b = +1 m/s)",
     "shallow rays are bent back to the ground\nand bounce on down-range":
@@ -3427,7 +3427,7 @@ _ES_EXACT = {
         "Nivel relativo GFPE a la altura del receptor (400 Hz, 2 m)",
     "Downward (b = +1 m/s)": "Hacia abajo (b = +1 m/s)",
     "Homogeneous (b = 0)": "Homogénea (b = 0)",
-    "Upward (b = -1 m/s)": "Hacia arriba (b = -1 m/s)",
+    "Upward (b = −1 m/s)": "Hacia arriba (b = −1 m/s)",
     "Wave-Theoretic Barrier Insertion Loss":
         "Pérdida por inserción de barrera (teoría ondulatoria)",
     "Kurze-Anderson (thin screen)": "Kurze-Anderson (pantalla delgada)",
@@ -3659,7 +3659,7 @@ _ES_EXACT = {
     "Passband edge": "Borde de la banda de paso",
     "Stopband edge (alias fold)":
         "Borde de la banda atenuada (pliegue de alias)",
-    "Design attenuation -120 dB": "Atenuación de diseño -120 dB",
+    "Design attenuation −120 dB": "Atenuación de diseño −120 dB",
     "Rejected band (would fold back as aliases)":
         "Banda rechazada (se plegaría como alias)",
     "The Three Cepstrum Variants of One Echo-Carrying Record":
@@ -3753,7 +3753,7 @@ _ES_EXACT = {
         "Barrido conformado con un espectro objetivo arbitrario "
         "(síntesis por retardo de grupo)",
     "Welch spectrum of the sweep": "Espectro de Welch del barrido",
-    "Pink target (-3 dB per octave)": "Objetivo rosa (-3 dB por octava)",
+    "Pink target (−3 dB per octave)": "Objetivo rosa (−3 dB por octava)",
     "Sweep band (50 Hz - 5 kHz)": "Banda del barrido (50 Hz - 5 kHz)",
     "Level re in-band max [dB]": "Nivel respecto al máximo en banda [dB]",
     "nearly constant envelope: the energy shaping lives\n"
@@ -4607,13 +4607,13 @@ _ES_PATTERNS = [
     (r"^(\d+) dB at 500 Hz$", r"\1 dB a 500 Hz"),
     (r"^step (\d+) of (\d+)$", r"paso \1 de \2"),
     (r"^sum = (.+) dB$", r"suma = \1 dB"),
-    (r"^C = ([-+]\d+) dB, Ctr = ([-+]\d+) dB$",
+    (r"^C = ([-+−]\d+) dB, Ctr = ([-+−]\d+) dB$",
      r"C = \1 dB, Ctr = \2 dB"),
-    (r"^CI = ([-+]\d+) dB$", r"CI = \1 dB"),
+    (r"^CI = ([-+−]\d+) dB$", r"CI = \1 dB"),
     # --- anim_dynamic_stiffness_sweep: the drive readout, every frame. The
     # padding inside the captures is what keeps the monospace columns still
     # while the numbers change width.
-    (r"^f = ( *[\d.]+) Hz    phase = ( *-?[\d.]+)°$",
+    (r"^f = ( *[\d.]+) Hz    phase = ( *[-−]?[\d.]+)°$",
      r"f = \1 Hz    fase = \2°"),
     # --- anim_block_vs_exponential: readouts rewritten on every frame ---
     (r"^4 kHz burst, (\d+) ms$", r"ráfaga de 4 kHz, \1 ms"),
@@ -4908,15 +4908,15 @@ _ES_PATTERNS = [
      ("Rw(C;Ctr) = \\1\nC50-5000 = \\2\n"
       "índice en las bandas básicas, términos en el rango completo")),
     ((r"^Dls,2m,nT,w\(C;Ctr\) = (.+) dB\n45° loudspeaker method "
-      r"\(-1\.5 dB on R'\)$"),
-     "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (-1,5 dB en R')"),
+      r"\(−1\.5 dB on R'\)$"),
+     "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (−1,5 dB en R')"),
     ((r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
       r"L'nT$"),
      "L'nT,w(CI) = \\1 dB\natención al signo menos: un recinto vivo reduce L'nT"),
     ((r"^LW = Lp,in \+ Cd - R' \+ 10 log10\(S/S0\)\nwall 176 m² \+ industrial "
-      r"door 24 m², Cd = -5 dB$"),
+      r"door 24 m², Cd = −5 dB$"),
      ("LW = Lp,in + Cd - R' + 10 log10(S/S0)\n"
-      "muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB")),
+      "muro de 176 m² + puerta industrial de 24 m², Cd = −5 dB")),
     ((r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
       r"η = 0\.024$"),
      "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
@@ -5234,6 +5234,36 @@ def _decimal_comma(s: str) -> str:
         last = m.end()
     out.append(_DECIMAL_RE.sub(r"\1,\2", s[last:]))
     return "".join(out)
+
+
+# The sign of a formatted number, keeping any width padding in front of it
+# ("%6.2f" writes " -4.82", and the clip readouts hold their monospace
+# columns still with that padding).
+_LEADING_SIGN_RE = re.compile(r"^(\s*)-")
+
+
+def _fmt_minus(value: Any, spec: str = "") -> str:
+    """Format *value* for a label, with the minus sign the figures are set in.
+
+    ``format`` writes a negative number with an ASCII hyphen, so a reading
+    assembled from an f-string ("phase = -176.0") is drawn with a shorter,
+    lower minus than the tick labels beside it, which carry the typographic
+    U+2212 the axis formatters ship (and which :func:`_translate_figure`
+    reinstates when it swaps a formatter for the Spanish pass). Numbers
+    interpolated into a label go through here instead.
+
+    Only the sign is rewritten. A hyphen inside the number's own text (the
+    exponent of ``1e-05``) and every hyphen of the sentence around it --
+    standard designations such as "IEC 61672-1", compound names, ranges --
+    are left alone, which is why this takes the number and its format spec
+    rather than the finished string: there is no reliable way to tell the
+    three apart once they are all hyphens in one line of prose.
+
+    Call it while the label is being built, before the string reaches
+    ``_translate_str``: the Spanish tables are keyed by the text as it is
+    drawn, so the sign has to be settled before the lookup, not after it.
+    """
+    return _LEADING_SIGN_RE.sub("\\1\u2212", format(value, spec), count=1)
 
 
 def set_lang(lang: str) -> None:

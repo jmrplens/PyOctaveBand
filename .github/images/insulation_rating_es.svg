@@ -566,13 +566,13 @@ L 308.286042 175.834052
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: start" x="319.133246" y="260.558125" transform="rotate(-0 319.133246 260.558125)">Rw = 30 dB</text>
    </g>
    <g id="text_27">
-    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="59.340781" y="48.357441" transform="rotate(-0 59.340781 48.357441)">Curva de referencia desplazada -22 dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="59.340781" y="48.357441" transform="rotate(-0 59.340781 48.357441)">Curva de referencia desplazada −22 dB</text>
    </g>
    <g id="text_28">
     <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="59.340781" y="73.962641" transform="rotate(-0 59.340781 73.962641)">Suma de desviaciones desfavorables = 31,8 dB  (límite 32,0 dB)</text>
    </g>
    <g id="text_29">
-    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="59.340781" y="98.807841" transform="rotate(-0 59.340781 98.807841)">Rw (C ; Ctr) = 30 (-2 ; -3) dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="59.340781" y="98.807841" transform="rotate(-0 59.340781 98.807841)">Rw (C ; Ctr) = 30 (−2 ; −3) dB</text>
    </g>
    <g id="text_30">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="321.600781" y="18.328125" transform="rotate(-0 321.600781 18.328125)">Índice ponderado de reducción acústica (ISO 717-1, ejemplo del Anexo C)</text>

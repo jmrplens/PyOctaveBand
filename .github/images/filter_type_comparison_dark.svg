@@ -1288,7 +1288,7 @@ L 525.867969 401.495781
 " style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.3; stroke-width: 1.5"/>
     </g>
     <g id="text_29">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="533.867969" y="404.995781" transform="rotate(-0 533.867969 404.995781)">-3 dB</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="533.867969" y="404.995781" transform="rotate(-0 533.867969 404.995781)">−3 dB</text>
     </g>
    </g>
   </g>
@@ -1896,7 +1896,7 @@ L 274.605469 58.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_38">
-    <text style="font-size: 9px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="176.955469" y="52.318125" transform="rotate(-0 176.955469 52.318125)">Zoom at -3 dB (Log Scale)</text>
+    <text style="font-size: 9px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="176.955469" y="52.318125" transform="rotate(-0 176.955469 52.318125)">Zoom at −3 dB (Log Scale)</text>
    </g>
   </g>
  </g>

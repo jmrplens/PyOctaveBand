@@ -1517,20 +1517,20 @@ L 672.723594 28.318125
    </g>
    <g id="text_28">
     <g id="patch_140">
-     <path d="M 513.019939 384.464631 
+     <path d="M 503.476189 384.464631 
 L 663.348064 384.464631 
 Q 668.348064 384.464631 668.348064 379.464631 
 L 668.348064 355.459162 
 Q 668.348064 350.459162 663.348064 350.459162 
-L 513.019939 350.459162 
-Q 508.019939 350.459162 508.019939 355.459162 
-L 508.019939 379.464631 
-Q 508.019939 384.464631 513.019939 384.464631 
+L 503.476189 350.459162 
+Q 498.476189 350.459162 498.476189 355.459162 
+L 498.476189 379.464631 
+Q 498.476189 384.464631 503.476189 384.464631 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(513.019939 364.058576)">R' = -10 log10(Σ 10^(-Rij/10))</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(524.630877 376.06131)">R'w (C; Ctr) = 57 (-1; -7) dB</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(503.476189 364.058576)">R' = −10 log10(Σ 10^(−Rij/10))</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(515.087127 376.06131)">R'w (C; Ctr) = 57 (−1; −7) dB</text>
    </g>
    <g id="text_29">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="360.205938" y="16.318125" transform="rotate(-0 360.205938 16.318125)">Modelo detallado ISO 12354-1: camino dominante por banda (Anexo L)</text>
