@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1036.92125pt" height="338.840312pt" viewBox="0 0 1036.92125 338.840312" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1036.92125pt" height="338.898125pt" viewBox="0 0 1036.92125 338.898125" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 338.840312 
-L 1036.92125 338.840312 
+   <path d="M 0 338.898125 
+L 1036.92125 338.898125 
 L 1036.92125 0 
 L 0 0 
 z
@@ -133,7 +133,38 @@ L 323.85772 26.798125
      </g>
     </g>
     <g id="text_7">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="194.822422" y="329.194219" transform="rotate(-0 194.822422 329.194219)">Temperatura del aire τ [°C]</text>
+     <!-- Temperatura del aire $\tau$ [°C] -->
+     <g transform="translate(126.622422 329.195781)">
+      <text>
+       <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif">T</tspan>
+       <tspan x="5.108398" y="-0.40625" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="11.260742" y="-0.40625" style="font-size: 10px; font-family: sans-serif">m</tspan>
+       <tspan x="21.001953" y="-0.40625" style="font-size: 10px; font-family: sans-serif">p</tspan>
+       <tspan x="27.349609" y="-0.40625" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="33.501953" y="-0.40625" style="font-size: 10px; font-family: sans-serif">r</tspan>
+       <tspan x="37.613281" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="43.741211" y="-0.40625" style="font-size: 10px; font-family: sans-serif">t</tspan>
+       <tspan x="47.662109" y="-0.40625" style="font-size: 10px; font-family: sans-serif">u</tspan>
+       <tspan x="54" y="-0.40625" style="font-size: 10px; font-family: sans-serif">r</tspan>
+       <tspan x="58.111328" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="64.239258" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="67.417969" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="73.765625" y="-0.40625" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="79.917969" y="-0.40625" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="82.696289" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="85.875" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="92.00293" y="-0.40625" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="94.78125" y="-0.40625" style="font-size: 10px; font-family: sans-serif">r</tspan>
+       <tspan x="98.892578" y="-0.40625" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="105.044922" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="114.244141" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="117.422852" y="-0.40625" style="font-size: 10px; font-family: sans-serif">[</tspan>
+       <tspan x="121.324219" y="-0.40625" style="font-size: 10px; font-family: sans-serif">°</tspan>
+       <tspan x="126.324219" y="-0.40625" style="font-size: 10px; font-family: sans-serif">C</tspan>
+       <tspan x="133.306641" y="-0.40625" style="font-size: 10px; font-family: sans-serif">]</tspan>
+       <tspan x="108.223633" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">τ</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="matplotlib.axis_2">
@@ -545,7 +576,29 @@ L 646.876757 26.798125
      </g>
     </g>
     <g id="text_25">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="541.302422" y="329.194219" transform="rotate(-0 541.302422 329.194219)">Velocidad v [km/h]</text>
+     <!-- Velocidad $v$ [km/h] -->
+     <g transform="translate(494.502422 329.195781)">
+      <text>
+       <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif">V</tspan>
+       <tspan x="6.84082" y="-0.40625" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="12.993164" y="-0.40625" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="15.771484" y="-0.40625" style="font-size: 10px; font-family: sans-serif">o</tspan>
+       <tspan x="21.889648" y="-0.40625" style="font-size: 10px; font-family: sans-serif">c</tspan>
+       <tspan x="27.387695" y="-0.40625" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="30.166016" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="36.513672" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="42.641602" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+       <tspan x="48.989258" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="58.085938" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="61.264648" y="-0.40625" style="font-size: 10px; font-family: sans-serif">[</tspan>
+       <tspan x="65.166016" y="-0.40625" style="font-size: 10px; font-family: sans-serif">k</tspan>
+       <tspan x="70.957031" y="-0.40625" style="font-size: 10px; font-family: sans-serif">m</tspan>
+       <tspan x="80.698242" y="-0.40625" style="font-size: 10px; font-family: sans-serif">/</tspan>
+       <tspan x="84.067383" y="-0.40625" style="font-size: 10px; font-family: sans-serif">h</tspan>
+       <tspan x="90.405273" y="-0.40625" style="font-size: 10px; font-family: sans-serif">]</tspan>
+       <tspan x="52.167969" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">v</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -811,35 +864,93 @@ L 670.33772 234.308507
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 545.57125 57.199375 
+     <path d="M 550.28125 57.199375 
 L 677.64125 57.199375 
 Q 679.24125 57.199375 679.24125 55.599375 
 L 679.24125 32.398125 
 Q 679.24125 30.798125 677.64125 30.798125 
-L 545.57125 30.798125 
-Q 543.97125 30.798125 543.97125 32.398125 
-L 543.97125 55.599375 
-Q 543.97125 57.199375 545.57125 57.199375 
+L 550.28125 30.798125 
+Q 548.68125 30.798125 548.68125 32.398125 
+L 548.68125 55.599375 
+Q 548.68125 57.199375 550.28125 57.199375 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_63">
-     <path d="M 547.17125 37.276875 
-L 555.17125 37.276875 
-L 563.17125 37.276875 
+     <path d="M 551.88125 37.276875 
+L 559.88125 37.276875 
+L 567.88125 37.276875 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_35">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="569.57125" y="40.076875" transform="rotate(-0 569.57125 40.076875)">Qstud = 0,2, Ts = 4 meses</text>
+     <!-- $Q_{\mathrm{stud}}$ = 0,2, $T_s$ = 4 meses -->
+     <g transform="translate(574.28125 40.076875)">
+      <text>
+       <tspan x="0" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">Q</tspan>
+       <tspan x="48.330469" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">T</tspan>
+       <tspan x="6.296875" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">s</tspan>
+       <tspan x="9.214453" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">t</tspan>
+       <tspan x="11.410156" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">u</tspan>
+       <tspan x="14.959375" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">d</tspan>
+       <tspan x="18.732813" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="21.275781" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+       <tspan x="27.978906" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="30.521875" y="-0.0625" style="font-size: 8px; font-family: sans-serif">0</tspan>
+       <tspan x="35.611719" y="-0.0625" style="font-size: 8px; font-family: sans-serif">,</tspan>
+       <tspan x="38.154688" y="-0.0625" style="font-size: 8px; font-family: sans-serif">2</tspan>
+       <tspan x="43.244531" y="-0.0625" style="font-size: 8px; font-family: sans-serif">,</tspan>
+       <tspan x="45.7875" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="56.353516" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="58.896484" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+       <tspan x="65.599609" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="68.142578" y="-0.0625" style="font-size: 8px; font-family: sans-serif">4</tspan>
+       <tspan x="73.232422" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="75.775391" y="-0.0625" style="font-size: 8px; font-family: sans-serif">m</tspan>
+       <tspan x="83.568359" y="-0.0625" style="font-size: 8px; font-family: sans-serif">e</tspan>
+       <tspan x="88.490234" y="-0.0625" style="font-size: 8px; font-family: sans-serif">s</tspan>
+       <tspan x="92.658203" y="-0.0625" style="font-size: 8px; font-family: sans-serif">e</tspan>
+       <tspan x="97.580078" y="-0.0625" style="font-size: 8px; font-family: sans-serif">s</tspan>
+       <tspan x="53.217188" y="1.137496" style="font-style: oblique; font-size: 5.6px; font-family: sans-serif">s</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_64">
-     <path d="M 547.17125 49.2775 
-L 555.17125 49.2775 
-L 563.17125 49.2775 
+     <path d="M 551.88125 49.2775 
+L 559.88125 49.2775 
+L 567.88125 49.2775 
 " style="fill: none; stroke: #2ca02c; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_36">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="569.57125" y="52.0775" transform="rotate(-0 569.57125 52.0775)">Qstud = 0,5, Ts = 4 meses</text>
+     <!-- $Q_{\mathrm{stud}}$ = 0,5, $T_s$ = 4 meses -->
+     <g transform="translate(574.28125 52.0775)">
+      <text>
+       <tspan x="0" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">Q</tspan>
+       <tspan x="48.330469" y="-0.0625" style="font-style: oblique; font-size: 8px; font-family: sans-serif">T</tspan>
+       <tspan x="6.296875" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">s</tspan>
+       <tspan x="9.214453" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">t</tspan>
+       <tspan x="11.410156" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">u</tspan>
+       <tspan x="14.959375" y="1.137496" style="font-size: 5.6px; font-family: sans-serif">d</tspan>
+       <tspan x="18.732813" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="21.275781" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+       <tspan x="27.978906" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="30.521875" y="-0.0625" style="font-size: 8px; font-family: sans-serif">0</tspan>
+       <tspan x="35.611719" y="-0.0625" style="font-size: 8px; font-family: sans-serif">,</tspan>
+       <tspan x="38.154688" y="-0.0625" style="font-size: 8px; font-family: sans-serif">5</tspan>
+       <tspan x="43.244531" y="-0.0625" style="font-size: 8px; font-family: sans-serif">,</tspan>
+       <tspan x="45.7875" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="56.353516" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="58.896484" y="-0.0625" style="font-size: 8px; font-family: sans-serif">=</tspan>
+       <tspan x="65.599609" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="68.142578" y="-0.0625" style="font-size: 8px; font-family: sans-serif">4</tspan>
+       <tspan x="73.232422" y="-0.0625" style="font-size: 8px; font-family: sans-serif"> </tspan>
+       <tspan x="75.775391" y="-0.0625" style="font-size: 8px; font-family: sans-serif">m</tspan>
+       <tspan x="83.568359" y="-0.0625" style="font-size: 8px; font-family: sans-serif">e</tspan>
+       <tspan x="88.490234" y="-0.0625" style="font-size: 8px; font-family: sans-serif">s</tspan>
+       <tspan x="92.658203" y="-0.0625" style="font-size: 8px; font-family: sans-serif">e</tspan>
+       <tspan x="97.580078" y="-0.0625" style="font-size: 8px; font-family: sans-serif">s</tspan>
+       <tspan x="53.217188" y="1.137496" style="font-style: oblique; font-size: 5.6px; font-family: sans-serif">s</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
@@ -959,7 +1070,37 @@ L 1016.81772 26.798125
      </g>
     </g>
     <g id="text_44">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="887.782422" y="329.237969" transform="rotate(-0 887.782422 329.237969)">Distancia al cruce |x| [m]</text>
+     <!-- Distancia al cruce $|x|$ [m] -->
+     <g transform="translate(824.832422 329.295781)">
+      <text>
+       <tspan x="0" y="-0.359375" style="font-size: 10px; font-family: sans-serif">D</tspan>
+       <tspan x="7.700195" y="-0.359375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="10.478516" y="-0.359375" style="font-size: 10px; font-family: sans-serif">s</tspan>
+       <tspan x="15.688477" y="-0.359375" style="font-size: 10px; font-family: sans-serif">t</tspan>
+       <tspan x="19.609375" y="-0.359375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="25.737305" y="-0.359375" style="font-size: 10px; font-family: sans-serif">n</tspan>
+       <tspan x="32.075195" y="-0.359375" style="font-size: 10px; font-family: sans-serif">c</tspan>
+       <tspan x="37.573242" y="-0.359375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+       <tspan x="40.351562" y="-0.359375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="46.479492" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="49.658203" y="-0.359375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+       <tspan x="55.786133" y="-0.359375" style="font-size: 10px; font-family: sans-serif">l</tspan>
+       <tspan x="58.564453" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="61.743164" y="-0.359375" style="font-size: 10px; font-family: sans-serif">c</tspan>
+       <tspan x="67.241211" y="-0.359375" style="font-size: 10px; font-family: sans-serif">r</tspan>
+       <tspan x="71.352539" y="-0.359375" style="font-size: 10px; font-family: sans-serif">u</tspan>
+       <tspan x="77.69043" y="-0.359375" style="font-size: 10px; font-family: sans-serif">c</tspan>
+       <tspan x="83.188477" y="-0.359375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+       <tspan x="89.34082" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="92.519531" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+       <tspan x="101.806641" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+       <tspan x="105.175781" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+       <tspan x="108.354492" y="-0.359375" style="font-size: 10px; font-family: sans-serif">[</tspan>
+       <tspan x="112.255859" y="-0.359375" style="font-size: 10px; font-family: sans-serif">m</tspan>
+       <tspan x="121.99707" y="-0.359375" style="font-size: 10px; font-family: sans-serif">]</tspan>
+       <tspan x="95.888672" y="-0.359375" style="font-style: oblique; font-size: 10px; font-family: sans-serif">x</tspan>
+      </text>
+     </g>
     </g>
    </g>
    <g id="matplotlib.axis_6">

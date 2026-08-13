@@ -1338,12 +1338,12 @@ _ES_EXACT = {
     "Sound Exposure Level: the event normalized to 1 s":
         "Nivel de exposici\u00f3n sonora: el evento normalizado a 1 s",
     "Level [dBFS]": "Nivel [dBFS]",
-    "Hourly LAeq": "LAeq horario",
-    "Lday (+0 dB)": "Ld\u00eda (+0 dB)",
-    "Levening + 5 dB": "Ltarde + 5 dB",
-    "Lnight + 10 dB": "Lnoche + 10 dB",
-    "Day-Evening-Night Level Lden (ISO 1996-1)":
-        "Nivel d\u00eda-tarde-noche Lden (ISO 1996-1)",
+    "Hourly $L_{Aeq}$": "$L_{Aeq}$ horario",
+    r"$L_{\mathrm{day}}$ (+0 dB)": r"$L_{\mathrm{día}}$ (+0 dB)",
+    r"$L_{\mathrm{evening}}$ + 5 dB": r"$L_{\mathrm{tarde}}$ + 5 dB",
+    r"$L_{\mathrm{night}}$ + 10 dB": r"$L_{\mathrm{noche}}$ + 10 dB",
+    r"Day-Evening-Night Level $L_{\mathrm{den}}$ (ISO 1996-1)":
+        r"Nivel día-tarde-noche $L_{\mathrm{den}}$ (ISO 1996-1)",
     "Hour of day": "Hora del d\u00eda",
     "Averaged FFT spectrum (Hann)": "Espectro FFT promediado (Hann)",
     "Critical band around the tone": "Banda cr\u00edtica en torno al tono",
@@ -2692,10 +2692,8 @@ _ES_EXACT = {
         "Incertidumbre expandida $\\pm U$ (95 %)",
     "$R′_w \\pm U$ (single number)": "$R′_w \\pm U$ (valor único)",
     # Outdoor propagation & occupational exposure (PR-C).
-    "ISO 9613-1 Atmospheric Absorption α(f)":
-        "Absorción atmosférica α(f) (ISO 9613-1)",
-    "Attenuation coefficient α [dB/km]":
-        "Coeficiente de atenuación α [dB/km]",
+    r"ISO 9613-1 Atmospheric Absorption $\alpha(f)$":
+        r"Absorción atmosférica $\alpha(f)$ (ISO 9613-1)",
     "ISO 9613-1 atmospheric attenuation":
         "Atenuación atmosférica ISO 9613-1",
     r"Attenuation coefficient $\alpha$ [dB/km]":
@@ -2709,20 +2707,21 @@ _ES_EXACT = {
     "CNOSSOS-EU Railway Source Line Power (96 coaches/h at 160 km/h)":
         "Potencia de la línea fuente ferroviaria CNOSSOS-EU "
         "(96 coches/h a 160 km/h)",
-    "Line power L'W,eq,line [dB re 1 pW/m]":
-        "Potencia de la línea L'W,eq,line [dB re 1 pW/m]",
+    r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]":
+        r"Potencia de la línea $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]",
     "Both source heights": "Ambas alturas de fuente",
     "Source A, 0,5 m (rolling, impact, traction)":
         "Fuente A, 0,5 m (rodadura, impacto, tracción)",
     "Source B, 4,0 m (traction, aerodynamic)":
         "Fuente B, 4,0 m (tracción, aerodinámico)",
     "CNOSSOS-EU Total Effective Roughness against Speed "
-    "(f = v/λ, λ in the wavelength domain)":
+    r"($f = v/\lambda$, $\lambda$ in the wavelength domain)":
         "Rugosidad efectiva total CNOSSOS-EU frente a la velocidad "
-        "(f = v/λ, λ en el dominio de longitud de onda)",
-    "Total effective roughness LR,TOT [dB re 1 μm]":
-        "Rugosidad efectiva total LR,TOT [dB re 1 μm]",
+        r"($f = v/\lambda$, $\lambda$ en el dominio de longitud de onda)",
+    r"Total effective roughness $L_{R,\mathrm{TOT}}$ [dB re 1 μm]":
+        r"Rugosidad efectiva total $L_{R,\mathrm{TOT}}$ [dB re 1 μm]",
     "Attenuation A [dB]": "Atenuación A [dB]",
+    "Attenuation $A$ [dB]": "Atenuación $A$ [dB]",
     "CNOSSOS-EU Road Source Line Power (urban arterial, 50 km/h)":
         "Potencia de la línea fuente viaria CNOSSOS-EU (vía urbana, 50 km/h)",
     "Total source line": "Línea fuente total",
@@ -2739,14 +2738,14 @@ _ES_EXACT = {
     "CNOSSOS-EU Single-Vehicle Sound Power against Speed (reference conditions)":
         "Potencia acústica de un vehículo frente a la velocidad "
         "(CNOSSOS-EU, condiciones de referencia)",
-    "Speed v [km/h]": "Velocidad v [km/h]",
-    "A-weighted sound power LW,A [dB(A) re 1 pW]":
-        "Potencia acústica ponderada A LW,A [dB(A) re 1 pW]",
-    "Adiv — divergence": "Adiv — divergencia",
-    "Aatm — atmospheric": "Aatm — atmosférica",
-    "Agr — ground": "Agr — suelo",
-    "Abar — barrier": "Abar — barrera",
-    "A — total": "A — total",
+    "Speed $v$ [km/h]": "Velocidad $v$ [km/h]",
+    r"A-weighted sound power $L_{W\!,A}$ [dB(A) re 1 pW]":
+        r"Potencia acústica ponderada A $L_{W\!,A}$ [dB(A) re 1 pW]",
+    "$A_{div}$ — divergence": "$A_{div}$ — divergencia",
+    "$A_{atm}$ — atmospheric": "$A_{atm}$ — atmosférica",
+    "$A_{gr}$ — ground": "$A_{gr}$ — suelo",
+    "$A_{bar}$ — barrier": "$A_{bar}$ — barrera",
+    "$A$ — total": "$A$ — total",
     "Spherical-Wave Ground Effect (Weyl-Van der Pol)":
         "Efecto suelo de onda esférica (Weyl-Van der Pol)",
     "Level re free field [dB]": "Nivel respecto al campo libre [dB]",
@@ -2767,25 +2766,27 @@ _ES_EXACT = {
     # Outdoor propagation, barriers and refraction figures (FL3).
     "Where 95 dB of Source Power Goes (ISO 9613-2, 200 m)":
         "En qué se gastan los 95 dB de la fuente (ISO 9613-2, 200 m)",
-    "LW = 95 dB (source power)": "LW = 95 dB (potencia de la fuente)",
-    "LfT(DW) at the receiver": "LfT(DW) en el receptor",
-    "− Adiv (divergence)": "− Adiv (divergencia)",
-    "− Aatm (air)": "− Aatm (aire)",
-    "− Agr (ground)": "− Agr (suelo)",
-    "− Abar (barrier)": "− Abar (barrera)",
-    "Dz at 500 Hz against barrier height (d = 200 m)":
-        "Dz a 500 Hz frente a la altura de barrera (d = 200 m)",
+    "$L_W$ = 95 dB (source power)": "$L_W$ = 95 dB (potencia de la fuente)",
+    r"$L_{fT}(\mathrm{DW})$ at the receiver":
+        r"$L_{fT}(\mathrm{DW})$ en el receptor",
+    "$-A_{div}$ (divergence)": "$-A_{div}$ (divergencia)",
+    "$-A_{atm}$ (air)": "$-A_{atm}$ (aire)",
+    "$-A_{gr}$ (ground)": "$-A_{gr}$ (suelo)",
+    "$-A_{bar}$ (barrier)": "$-A_{bar}$ (barrera)",
+    "$D_z$ at 500 Hz against barrier height ($d$ = 200 m)":
+        "$D_z$ a 500 Hz frente a la altura de barrera ($d$ = 200 m)",
     "Single edge": "Borde simple",
-    "Double edge, e = 2 m": "Doble borde, e = 2 m",
+    "Double edge, $e$ = 2 m": "Doble borde, $e$ = 2 m",
     "20 dB cap (single)": "tope de 20 dB (simple)",
     "25 dB cap (double)": "tope de 25 dB (doble)",
     "Barrier height [m]": "Altura de la barrera [m]",
-    "Diffraction insertion loss Dz [dB]":
-        "Pérdida por inserción debida a la difracción Dz [dB]",
-    "Abar = max(Dz − Agr, 0) (Eq. (12))":
-        "Abar = max(Dz − Agr, 0) (ec. (12))",
-    "Agr, spent on the screened path":
-        "Agr, gastada en el camino apantallado",
+    "Diffraction insertion loss $D_z$ [dB]":
+        "Pérdida por inserción debida a la difracción $D_z$ [dB]",
+    "$D_z$ (Eq. (14))": "$D_z$ (ec. (14))",
+    r"$A_{bar} = \max(D_z - A_{gr}, 0)$ (Eq. (12))":
+        r"$A_{bar} = \max(D_z - A_{gr}, 0)$ (ec. (12))",
+    "$A_{gr}$, spent on the screened path":
+        "$A_{gr}$, gastada en el camino apantallado",
     "The ground effect is spent, not kept":
         "El efecto del suelo se gasta, no se conserva",
     "The coefficients part as the path grazes":
@@ -2795,33 +2796,33 @@ _ES_EXACT = {
     "Source = receiver height [m]  (grazing to the right)":
         "Altura de fuente = receptor [m]  (rasante hacia la derecha)",
     "Magnitude": "Módulo",
-    "|Rp| — plane wave": "|Rp| — onda plana",
-    "|Q| — spherical wave": "|Q| — onda esférica",
-    "with Q (spherical wave)": "con Q (onda esférica)",
-    "with Rp alone (plane wave)": "solo con Rp (onda plana)",
+    "$|R_p|$ — plane wave": "$|R_p|$ — onda plana",
+    "$|Q|$ — spherical wave": "$|Q|$ — onda esférica",
+    "with $Q$ (spherical wave)": "con $Q$ (onda esférica)",
+    "with $R_p$ alone (plane wave)": "solo con $R_p$ (onda plana)",
     "Wave-theoretic model: the path length alone":
         "Modelo ondulatorio: solo la longitud del camino",
-    "ISO 9613-2: the path length plus the C3 factor":
-        "ISO 9613-2: la longitud del camino más el factor C3",
-    "Top width e [m]": "Ancho superior e [m]",
-    "Edge separation e [m]": "Separación de bordes e [m]",
+    "ISO 9613-2: the path length plus the $C_3$ factor":
+        "ISO 9613-2: la longitud del camino más el factor $C_3$",
+    "Top width $e$ [m]": "Ancho superior $e$ [m]",
+    "Edge separation $e$ [m]": "Separación de bordes $e$ [m]",
     "Gain over the thin screen [dB]": "Ganancia sobre la pantalla delgada [dB]",
     "Gain over the single edge [dB]": "Ganancia sobre el borde simple [dB]",
-    "10 lg 3 = 4.77 dB (the C3 ceiling)":
-        "10 lg 3 = 4,77 dB (el techo de C3)",
-    "Where the Acoustic Shadow Starts (c₀ = 340 m/s)":
-        "Dónde empieza la sombra acústica (c₀ = 340 m/s)",
-    "Upward sound-speed gradient |g| [1/s]":
-        "Gradiente de velocidad del sonido hacia arriba |g| [1/s]",
-    "Shadow-zone distance x_shadow [m]":
-        "Distancia de zona de sombra x_shadow [m]",
-    "Radius of curvature Rc = c₀/|g| [m]":
-        "Radio de curvatura Rc = c₀/|g| [m]",
+    r"$10\,\mathrm{lg}\,3 = 4.77$ dB (the $C_3$ ceiling)":
+        r"$10\,\mathrm{lg}\,3 = 4{,}77$ dB (el techo de $C_3$)",
+    "Where the Acoustic Shadow Starts ($c_0$ = 340 m/s)":
+        "Dónde empieza la sombra acústica ($c_0$ = 340 m/s)",
+    "Upward sound-speed gradient $|g|$ [1/s]":
+        "Gradiente de velocidad del sonido hacia arriba $|g|$ [1/s]",
+    r"Shadow-zone distance $x_{\mathrm{shadow}}$ [m]":
+        r"Distancia de zona de sombra $x_{\mathrm{shadow}}$ [m]",
+    "Radius of curvature $R_c = c_0/|g|$ [m]":
+        "Radio de curvatura $R_c = c_0/|g|$ [m]",
     "representative −0.1 s⁻¹: 233 m": "−0,1 s⁻¹ representativo: 233 m",
-    "the page's b = −1 m/s case: 109 m":
-        "el caso b = −1 m/s de la página: 109 m",
-    "The Homogeneous Limit: 500 Hz, Rigid Ground, hs = hr = 2 m":
-        "El límite homogéneo: 500 Hz, suelo rígido, hs = hr = 2 m",
+    "the page's $b$ = −1 m/s case: 109 m":
+        "el caso $b$ = −1 m/s de la página: 109 m",
+    "The Homogeneous Limit: 500 Hz, Rigid Ground, $h_s = h_r$ = 2 m":
+        "El límite homogéneo: 500 Hz, suelo rígido, $h_s = h_r$ = 2 m",
     "GFPE, zero gradient": "GFPE, gradiente nulo",
     "Coherent two-ray closed form": "Forma cerrada coherente de dos rayos",
     "+6 dB (coherent sum)": "+6 dB (suma coherente)",
@@ -2829,26 +2830,29 @@ _ES_EXACT = {
     "dotted lines: ±0.6 dB": "líneas de puntos: ±0,6 dB",
     # CNOSSOS-EU road corrections, gradient, surfaces and rail figures (FL3).
     "Air temperature (2.2.10)": "Temperatura del aire (2.2.10)",
-    "Air temperature τ [°C]": "Temperatura del aire τ [°C]",
+    r"Air temperature $\tau$ [°C]": r"Temperatura del aire $\tau$ [°C]",
     "Change in line power [dB(A)]": "Cambio de la potencia de línea [dB(A)]",
     "Light (1)": "Ligeros (1)",
     "Heavy (3)": "Pesados (3)",
     "Studded tyres (2.2.6-2.2.9)": "Neumáticos con clavos (2.2.6-2.2.9)",
-    "Qstud = 0.2, Ts = 4 months": "Qstud = 0,2, Ts = 4 meses",
-    "Qstud = 0.5, Ts = 4 months": "Qstud = 0,5, Ts = 4 meses",
+    r"$Q_{\mathrm{stud}}$ = 0.2, $T_s$ = 4 months":
+        r"$Q_{\mathrm{stud}}$ = 0,2, $T_s$ = 4 meses",
+    r"$Q_{\mathrm{stud}}$ = 0.5, $T_s$ = 4 months":
+        r"$Q_{\mathrm{stud}}$ = 0,5, $T_s$ = 4 meses",
     "Junctions (2.2.17, 2.2.18)": "Cruces (2.2.17, 2.2.18)",
     "Crossing with lights": "Cruce con semáforo",
     "Roundabout": "Glorieta",
-    "Distance to the junction |x| [m]": "Distancia al cruce |x| [m]",
+    "Distance to the junction $|x|$ [m]": "Distancia al cruce $|x|$ [m]",
     "CNOSSOS-EU Road-Gradient Correction (2.2.13-2.2.16)":
         "Corrección por pendiente de la vía CNOSSOS-EU (2.2.13-2.2.16)",
-    "Road gradient s [%]  (negative = downhill)":
-        "Pendiente de la vía s [%]  (negativa = bajada)",
+    "Road gradient $s$ [%]  (negative = downhill)":
+        "Pendiente de la vía $s$ [%]  (negativa = bajada)",
     "Propulsion-noise correction [dB(A)]":
         "Corrección del ruido de propulsión [dB(A)]",
     "CNOSSOS-EU Road Surfaces (Table F-4, light vehicles)":
         "Pavimentos CNOSSOS-EU (Tabla F-4, vehículos ligeros)",
-    "Surface coefficient α [dB]": "Coeficiente de pavimento α [dB]",
+    r"Surface coefficient $\alpha$ [dB]":
+        r"Coeficiente de pavimento $\alpha$ [dB]",
     "reference road surface (all speeds)":
         "pavimento de referencia (todas las velocidades)",
     "2-layer ZOAB (fine) (80-130 km/h)": "ZOAB de 2 capas (fino) (80-130 km/h)",
@@ -2883,12 +2887,14 @@ _ES_EXACT = {
         "Potencia acústica aparente frente al viento (IEC 61400-11)",
     "Hub-height wind speed [m/s]  (0,5 m/s bins)":
         "Velocidad del viento a altura de buje [m/s]  (intervalos de 0,5 m/s)",
-    "Formula (29) wind speed at 10 m, z0ref = 0,05 m [m/s]":
-        "Velocidad del viento a 10 m de la Fórmula (29), z0ref = 0,05 m [m/s]",
-    "Valid bin (margin > 6 dB)": "Intervalo válido (margen > 6 dB)",
+    r"Formula (29) wind speed at 10 m, $z_{0,\mathrm{ref}}$ = 0,05 m [m/s]":
+        r"Velocidad del viento a 10 m de la Fórmula (29), "
+        r"$z_{0,\mathrm{ref}}$ = 0,05 m [m/s]",
+    "Valid bin (margin $>$ 6 dB)": "Intervalo válido (margen $>$ 6 dB)",
     "3-6 dB margin: reported with an asterisk":
         "Margen de 3-6 dB: se declara con asterisco",
-    "Margin ≤ 3 dB: bin voided": "Margen ≤ 3 dB: intervalo anulado",
+    r"Margin $\leq$ 3 dB: bin voided": r"Margen $\leq$ 3 dB: intervalo anulado",
+    r"$L_{W\!A}$ [dB(A) re 1 pW]": r"$L_{W\!A}$ [dB(A) re 1 pW]",
     "Two critical bandwidths on one page":
         "Dos anchos de banda críticos en una página",
     "IEC 61400-11 critical band (Zwicker)":
@@ -2896,15 +2902,16 @@ _ES_EXACT = {
     "ISO 1996-2 Table C.1": "Tabla C.1 de ISO 1996-2",
     "9.5.3: fixed 20-120 Hz band": "9.5.3: banda fija de 20-120 Hz",
     "Critical bandwidth [Hz]": "Ancho de banda crítico [Hz]",
-    "Tone frequency fc [Hz]": "Frecuencia del tono fc [Hz]",
+    "Tone frequency $f_c$ [Hz]": "Frecuencia del tono $f_c$ [Hz]",
     "Tone frequency [Hz]": "Frecuencia del tono [Hz]",
     "The audibility criterion, read as required tonality":
         "El criterio de audibilidad, leído como tonalidad exigida",
-    "Tonality needed to be audible (ΔLa > 0)":
-        "Tonalidad necesaria para ser audible (ΔLa > 0)",
-    "Tonality needed to be reportable (ΔLa ≥ −3 dB)":
-        "Tonalidad necesaria para ser declarable (ΔLa ≥ −3 dB)",
-    "Required tonality ΔLtn [dB]": "Tonalidad exigida ΔLtn [dB]",
+    r"Tonality needed to be audible ($\Delta L_a > 0$)":
+        r"Tonalidad necesaria para ser audible ($\Delta L_a > 0$)",
+    r"Tonality needed to be reportable ($\Delta L_a \geq -3$ dB)":
+        r"Tonalidad necesaria para ser declarable ($\Delta L_a \geq -3$ dB)",
+    r"Required tonality $\Delta L_{tn}$ [dB]":
+        r"Tonalidad exigida $\Delta L_{tn}$ [dB]",
     # RD 1367/2007 assessment figures (FL3); the .plot() labels mirror the
     # library's own translations in src/phonometry/_plot/environment.py.
     "Band level": "Nivel de banda",
@@ -2913,26 +2920,30 @@ _ES_EXACT = {
         "Corrección tonal $K_t$ = 6 dB (RD 1367/2007)",
     "RD 1367/2007: the Low-Frequency and Impulsive Corrections":
         "RD 1367/2007: las correcciones de baja frecuencia e impulsiva",
-    "Kf, from LCeq,Ti − LAeq,Ti": "Kf, a partir de LCeq,Ti − LAeq,Ti",
-    "Ki, from LAIeq,Ti − LAeq,Ti": "Ki, a partir de LAIeq,Ti − LAeq,Ti",
-    "worked example: Lf = 13 dB → Kf = 3 dB":
-        "ejemplo resuelto: Lf = 13 dB → Kf = 3 dB",
-    "worked example: Li = 5 dB → Ki = 0 dB":
-        "ejemplo resuelto: Li = 5 dB → Ki = 0 dB",
-    "Lt = 10.5 dB: both methods agree":
-        "Lt = 10,5 dB: los dos métodos coinciden",
-    "Lt = 7.5 dB: the verdicts split":
-        "Lt = 7,5 dB: los veredictos se separan",
+    "$K_f$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$":
+        "$K_f$, a partir de $L_{Ceq,Ti} - L_{Aeq,Ti}$",
+    "$K_i$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$":
+        "$K_i$, a partir de $L_{AIeq,Ti} - L_{Aeq,Ti}$",
+    "worked example: $L_f$ = 13 dB → $K_f$ = 3 dB":
+        "ejemplo resuelto: $L_f$ = 13 dB → $K_f$ = 3 dB",
+    "worked example: $L_i$ = 5 dB → $K_i$ = 0 dB":
+        "ejemplo resuelto: $L_i$ = 5 dB → $K_i$ = 0 dB",
+    "$L_t$ = 10.5 dB: both methods agree":
+        "$L_t$ = 10,5 dB: los dos métodos coinciden",
+    "$L_t$ = 7.5 dB: the verdicts split":
+        "$L_t$ = 7,5 dB: los veredictos se separan",
     "Arithmetic mean of the two neighbours":
         "Media aritmética de las dos vecinas",
     "Band sound pressure level [dB]":
         "Nivel de presión acústica por banda [dB]",
     # ISO 1996-2 tonal adjustment: the Kt formula box is symbols only, and
     # reads the same in the Spanish edition.
-    "Kt = 0            (dLta < 4)\nKt = dLta - 4  (4 <= dLta <= 10)\n"
-    "Kt = 6            (dLta > 10)":
-        "Kt = 0            (dLta < 4)\nKt = dLta - 4  (4 <= dLta <= 10)\n"
-        "Kt = 6            (dLta > 10)",
+    r"$K_t = 0$  ($\Delta L_{ta} < 4$)" "\n"
+    r"$K_t = \Delta L_{ta} - 4$  ($4 \leq \Delta L_{ta} \leq 10$)" "\n"
+    r"$K_t = 6$  ($\Delta L_{ta} > 10$)":
+        r"$K_t = 0$  ($\Delta L_{ta} < 4$)" "\n"
+        r"$K_t = \Delta L_{ta} - 4$  ($4 \leq \Delta L_{ta} \leq 10$)" "\n"
+        r"$K_t = 6$  ($\Delta L_{ta} > 10$)",
     # Materials: absorption rating, airflow resistance, impedance tube
     "Shifted reference curve (ISO 11654)":
         "Curva de referencia desplazada (ISO 11654)",
@@ -3462,17 +3473,19 @@ _ES_EXACT = {
     # wave-theoretic barrier insertion loss (ground-and-barriers guide).
     "Effective Sound-Speed Profiles (Salomons Eq. 4.5)":
         "Perfiles de velocidad efectiva del sonido (Salomons ec. 4.5)",
-    "Downward refraction (b = +1 m/s)": "Refracción hacia abajo (b = +1 m/s)",
-    "Upward refraction (b = −1 m/s)": "Refracción hacia arriba (b = −1 m/s)",
-    "Sound Rays under Downward Refraction (b = +1 m/s)":
-        "Rayos sonoros con refracción hacia abajo (b = +1 m/s)",
+    "Downward refraction ($b$ = +1 m/s)":
+        "Refracción hacia abajo ($b$ = +1 m/s)",
+    "Upward refraction ($b$ = −1 m/s)":
+        "Refracción hacia arriba ($b$ = −1 m/s)",
+    "Sound Rays under Downward Refraction ($b$ = +1 m/s)":
+        "Rayos sonoros con refracción hacia abajo ($b$ = +1 m/s)",
     "shallow rays are bent back to the ground\nand bounce on down-range":
         "los rayos rasantes se curvan de vuelta al suelo\ny rebotan a lo largo de la distancia",
     "GFPE Relative Level at the Receiver Height (400 Hz, 2 m)":
         "Nivel relativo GFPE a la altura del receptor (400 Hz, 2 m)",
-    "Downward (b = +1 m/s)": "Hacia abajo (b = +1 m/s)",
-    "Homogeneous (b = 0)": "Homogénea (b = 0)",
-    "Upward (b = −1 m/s)": "Hacia arriba (b = −1 m/s)",
+    "Downward ($b$ = +1 m/s)": "Hacia abajo ($b$ = +1 m/s)",
+    "Homogeneous ($b$ = 0)": "Homogénea ($b$ = 0)",
+    "Upward ($b$ = −1 m/s)": "Hacia arriba ($b$ = −1 m/s)",
     "Wave-Theoretic Barrier Insertion Loss":
         "Pérdida por inserción de barrera (teoría ondulatoria)",
     "Kurze-Anderson (thin screen)": "Kurze-Anderson (pantalla delgada)",
@@ -5074,29 +5087,38 @@ _ES_PATTERNS = [
     # cnossos_road_speed_law rolling/propulsion crossover annotation.
     (r"^crossover (\d+) km/h$", r"cruce \1 km/h"),
     # Environment & aircraft figure readouts carrying computed values (FL3).
-    (r"^Lden = (\d+)\.(\d+) dB$", r"Lden = \1,\2 dB"),
+    (r"^\$L_\{\\mathrm\{den\}\}\$ = (\d+)\.(\d+) dB$",
+     r"$L_{\\mathrm{den}}$ = \1,\2 dB"),
     (r"^Masking level = (\d+)\.(\d+) dB$",
      r"Nivel de enmascaramiento = \1,\2 dB"),
     (r"^Tone = (\d+)\.(\d+) dB$", r"Tono = \1,\2 dB"),
-    (r"^Tonal audibility ΔLₐ = (-?\d+)\.(\d+) dB\naudible$",
-     "Audibilidad tonal ΔLₐ = \\1,\\2 dB\naudible"),
-    (r"^Tonal audibility ΔLₐ = (-?\d+)\.(\d+) dB\nnot audible$",
-     "Audibilidad tonal ΔLₐ = \\1,\\2 dB\nno audible"),
+    (r"^Tonal audibility \$\\Delta L_a\$ = ([+−]?\d+)\.(\d+) dB\naudible$",
+     "Audibilidad tonal $\\\\Delta L_a$ = \\1,\\2 dB\naudible"),
+    (r"^Tonal audibility \$\\Delta L_a\$ = ([+−]?\d+)\.(\d+) dB\nnot audible$",
+     "Audibilidad tonal $\\\\Delta L_a$ = \\1,\\2 dB\nno audible"),
     (r"^PNLTM = (\d+)\.(\d+) PNdB$", r"PNLTM = \1,\2 PNdB"),
     (r"^EPNL = (\d+)\.(\d+) EPNdB\n\$D\$ = ([+−]?\d+)\.(\d+) dB$",
      "EPNL = \\1,\\2 EPNdB\n$D$ = \\3,\\4 dB"),
     # ground_reflection_coefficient: the grazing-limit annotation.
-    (r"^(-?\d+)\.(\d+) dB against (-?\d+)\.(\d+) dB$",
+    (r"^([+−]?\d+)\.(\d+) dB against ([+−]?\d+)\.(\d+) dB$",
      r"\1,\2 dB frente a \3,\4 dB"),
+    # shadow_zone_map legend: source/receiver height pairs per curve.
+    (r"^\$h_s/h_r\$ = (\d+)\.(\d+) / (\d+)\.(\d+) m$",
+     r"$h_s/h_r$ = \1,\2 / \3,\4 m"),
+    (r"^\$h_s/h_r\$ = (\d+) / (\d+) m$", r"$h_s/h_r$ = \1 / \2 m"),
+    # cnossos_rail_roughness_shift legend: one speed per curve.
+    (r"^\$v\$ = (\d+) km/h$", r"$v$ = \1 km/h"),
+    # impulse_prominence legend: one level difference per curve.
+    (r"^\$\\mathrm\{LD\}\$ = (\d+) dB$", r"$\\mathrm{LD}$ = \1 dB"),
     # cnossos_road_gradient legend: category and speed per curve.
     (r"^Category ([123]), (\d+) km/h$", r"Categoría \1, \2 km/h"),
     # rd1367_vs_iso_tonal info boxes (True/False are the API's literals).
-    ((r"^RD 1367 tonal_correction: Kt = (\d+) dB\n"
+    ((r"^RD 1367 tonal_correction: \$K_t\$ = (\d+) dB\n"
       r"ISO 1996-2 survey flag at 250 Hz: (True|False)\n"
-      r"Lt at 250 Hz = (\d+)\.(\d+) dB$"),
-     ("RD 1367 tonal_correction: Kt = \\1 dB\n"
+      r"\$L_t\$ at 250 Hz = ([+−]?\d+)\.(\d+) dB$"),
+     ("RD 1367 tonal_correction: $K_t$ = \\1 dB\n"
       "Indicador de cribado ISO 1996-2 en 250 Hz: \\2\n"
-      "Lt en 250 Hz = \\3,\\4 dB")),
+      "$L_t$ en 250 Hz = \\3,\\4 dB")),
     # orthotropic_transmission_loss info box (library values baked in; the
     # mathtext blocks the decimal-comma pass, so the commas are here).
     ((r"^1 mm steel sheet, \$m′′\$ = (\d+)\.(\d+) kg/m², flat "

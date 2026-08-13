@@ -338,20 +338,54 @@ L 705.763437 28.318125
    </g>
    <g id="text_16">
     <g id="patch_8">
-     <path d="M 54.222534 73.233477 
-L 205.028784 73.233477 
-Q 208.028784 73.233477 208.028784 70.233477 
-L 208.028784 46.228008 
-Q 208.028784 43.228008 205.028784 43.228008 
+     <path d="M 54.222534 73.235039 
+L 205.722534 73.235039 
+Q 208.722534 73.235039 208.722534 70.235039 
+L 208.722534 46.228008 
+Q 208.722534 43.228008 205.722534 43.228008 
 L 54.222534 43.228008 
 Q 51.222534 43.228008 51.222534 46.228008 
-L 51.222534 70.233477 
-Q 51.222534 73.233477 54.222534 73.233477 
+L 51.222534 70.235039 
+Q 51.222534 73.235039 54.222534 73.235039 
 z
 " style="fill: #e0e0e0; opacity: 0.6; stroke: #000000; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(54.222534 54.827422)">Audibilidad tonal ΔLₐ = 8,6 dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(54.222534 66.830156)">audible</text>
+    <!-- Audibilidad tonal $\Delta L_a$ = 8,6 dB -->
+    <g transform="translate(54.222534 54.828984)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif">A</tspan>
+      <tspan x="6.84082" y="-0.40625" style="font-size: 10px; font-family: sans-serif">u</tspan>
+      <tspan x="13.178711" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="19.526367" y="-0.40625" style="font-size: 10px; font-family: sans-serif">i</tspan>
+      <tspan x="22.304688" y="-0.40625" style="font-size: 10px; font-family: sans-serif">b</tspan>
+      <tspan x="28.652344" y="-0.40625" style="font-size: 10px; font-family: sans-serif">i</tspan>
+      <tspan x="31.430664" y="-0.40625" style="font-size: 10px; font-family: sans-serif">l</tspan>
+      <tspan x="34.208984" y="-0.40625" style="font-size: 10px; font-family: sans-serif">i</tspan>
+      <tspan x="36.987305" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="43.334961" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="49.462891" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="55.810547" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="58.989258" y="-0.40625" style="font-size: 10px; font-family: sans-serif">t</tspan>
+      <tspan x="62.910156" y="-0.40625" style="font-size: 10px; font-family: sans-serif">o</tspan>
+      <tspan x="69.02832" y="-0.40625" style="font-size: 10px; font-family: sans-serif">n</tspan>
+      <tspan x="75.366211" y="-0.40625" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="81.494141" y="-0.40625" style="font-size: 10px; font-family: sans-serif">l</tspan>
+      <tspan x="84.272461" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="87.451172" y="-0.40625" style="font-size: 10px; font-family: sans-serif">Δ</tspan>
+      <tspan x="104.42627" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="107.60498" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="115.983887" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="119.162598" y="-0.40625" style="font-size: 10px; font-family: sans-serif">8</tspan>
+      <tspan x="125.524902" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="128.703613" y="-0.40625" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="135.065918" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="138.244629" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="144.592285" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+      <tspan x="94.291992" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="99.863281" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">a</tspan>
+     </text>
+    </g>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(54.222534 66.831719)">audible</text>
    </g>
    <g id="text_17">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">Audibilidad tonal de aerogenerador (IEC 61400-11)</text>
