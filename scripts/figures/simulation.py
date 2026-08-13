@@ -64,6 +64,11 @@ def generate_metadiffuser_ntff_polar(output_dir: str) -> None:
         label="FDTD + NTFF, panel meshed at 0.5 mm",
     )
     ax.set_ylim(-40.0, 2.0)
+    # The default theta formatter writes its negative angles with an ASCII
+    # hyphen; restate the same grid with the typographic minus.
+    polar: Any = ax
+    polar.set_thetagrids(np.arange(-90, 91, 30),
+                         [f"{_fmt_minus(a, '.0f')}°" for a in range(-90, 91, 30)])
     ax.set_title(
         "Far field of the meshed metadiffuser vs the model (2 kHz)",
         pad=18, fontweight="bold",
@@ -367,7 +372,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
     ax_f.text(0.04, 0.5 * sponge * dx, "sponge", fontsize=9, color=FIELD_INK)
     ax_f.text(0.04, (ny - 0.5 * sponge) * dx, "sponge", fontsize=9,
               color=FIELD_INK)
-    ax_f.set(xlabel="x [m]", ylabel="y [m]")
+    ax_f.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_f.set_title("Settled field, 1 kHz CW", fontweight="bold", pad=10)
 
     # (b) the transverse cut: flat to the last bit of a float64
@@ -375,7 +380,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
               linewidth=2.2, label="envelope over one period")
     ax_t.plot(np.arange(nx) * dx, field[80, :], color=COLOR_MUTED,
               linewidth=1.6, linestyle="--", label="one snapshot")
-    ax_t.set(xlabel="x [m]", ylabel="Pressure [Pa]",
+    ax_t.set(xlabel="$x$ [m]", ylabel="Pressure [Pa]",
              ylim=(-1.45 * amp, 1.75 * amp))
     ax_t.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_t.legend(loc="lower center", fontsize=9)
@@ -393,7 +398,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
     ax_l.axhspan(0.0, sponge * dx, color=COLOR_MUTED, alpha=0.25)
     ax_l.axhspan((ny - sponge) * dx, ny * dx, color=COLOR_MUTED, alpha=0.25)
     ax_l.invert_yaxis()
-    ax_l.set(xlabel="Row envelope [dB re the forward field]", ylabel="y [m]",
+    ax_l.set(xlabel="Row envelope [dB re the forward field]", ylabel="$y$ [m]",
              xlim=(-72.0, 8.0))
     ax_l.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_l.set_title("What is left behind the line", fontweight="bold", pad=10)
@@ -491,7 +496,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
     extent = (c0 * dx, c1 * dx, r1 * dx, r0 * dx)
     ax_g.imshow(crop, cmap="Greys", vmin=0.0, vmax=1.6, extent=extent,
                 aspect="equal", interpolation="nearest")
-    ax_g.set(xlabel="x [m]", ylabel="y [m]")
+    ax_g.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_g.set_title("What the solver steps on: the same panel as a boolean "
                    "obstacle mask at dx = 0.5 mm",
                    fontweight="bold", pad=10)
@@ -508,7 +513,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
     for spine in ax_z.spines.values():
         spine.set_color(COLOR_SECONDARY)
         spine.set_linewidth(1.8)
-    ax_z.set(xlabel="x [m]", ylabel="y [m]")
+    ax_z.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_z.set_title("The fifth cell magnified: the 3.2 mm neck is six cells "
                    "wide, and it is what sets dx", fontweight="bold", pad=10)
     neck_y = (ix["r_face"] + round(0.005 / dx)) * dx
@@ -518,17 +523,21 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
                   color=COLOR_SECONDARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
                               "lw": 1.0})
+    # The Greys mask panel stays white on both themes, so its in-axes
+    # annotations keep a fixed dark ink rather than COLOR_FG (the scholte
+    # figure's rule for a field that never darkens).
+    ink = "#3a3a3a"
     ax_z.annotate("20.3 mm slit", xy=((z0 + 40) * dx,
                                      (ix["r_face"] + 22) * dx),
                   xytext=((z0 + 6) * dx, (r0 + 8) * dx), fontsize=9,
-                  color=COLOR_FG,
-                  arrowprops={"arrowstyle": "->", "color": COLOR_FG,
+                  color=ink,
+                  arrowprops={"arrowstyle": "->", "color": ink,
                               "lw": 1.0})
     ax_z.annotate("3 mm rigid backing",
                   xy=((z0 + 60) * dx, (ix["r_face"] + ix["slab"] - 3) * dx),
                   xytext=((z0 + 10) * dx, (r1 - 6) * dx), fontsize=9,
-                  color=COLOR_FG,
-                  arrowprops={"arrowstyle": "->", "color": COLOR_FG,
+                  color=ink,
+                  arrowprops={"arrowstyle": "->", "color": ink,
                               "lw": 1.0})
 
     save_figure(output_dir, "metadiffuser_meshed_panel.webp",
@@ -595,7 +604,7 @@ def generate_elastic_probe_traces(output_dir: str) -> None:
                     xytext=(t_mark + 0.08, -0.72), fontsize=9, color=col,
                     arrowprops={"arrowstyle": "->", "color": col, "lw": 0.9})
     ax.annotate(f"echo / incident = {ratio:.3f}\n"
-                f"(Z₂−Z₁)/(Z₂+Z₁) = {exact:.3f}",
+                f"$(Z_2 - Z_1)/(Z_2 + Z_1)$ = {exact:.3f}",
                 xy=(0.02, 0.04), xycoords="axes fraction", fontsize=10,
                 color=COLOR_FG,
                 bbox={"facecolor": COLOR_PANEL, "edgecolor": COLOR_GRID,

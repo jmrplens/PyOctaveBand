@@ -429,19 +429,46 @@ L 647.230987 253.203452
    <g id="text_17">
     <g id="patch_9">
      <path d="M 66.035292 338.119195 
-L 188.571229 338.119195 
-Q 192.571229 338.119195 192.571229 334.119195 
-L 192.571229 310.114508 
-Q 192.571229 306.114508 188.571229 306.114508 
-L 66.035292 306.114508 
-Q 62.035292 306.114508 62.035292 310.114508 
+L 199.335292 338.119195 
+Q 203.335292 338.119195 203.335292 334.119195 
+L 203.335292 310.112164 
+Q 203.335292 306.112164 199.335292 306.112164 
+L 66.035292 306.112164 
+Q 62.035292 306.112164 62.035292 310.112164 
 L 62.035292 334.119195 
 Q 62.035292 338.119195 66.035292 338.119195 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(66.035292 318.713922)">eco / incidente = 0,938</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(66.035292 330.715875)">(Z₂−Z₁)/(Z₂+Z₁) = 0,938</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(66.035292 318.711578)">eco / incidente = 0,938</text>
+    <!-- $(Z_2 - Z_1)/(Z_2 + Z_1)$ = 0,938 -->
+    <g transform="translate(66.035292 330.715875)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="17.427246" y="-0.40625" style="font-size: 10px; font-family: sans-serif">−</tspan>
+      <tspan x="39.332031" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+      <tspan x="43.233398" y="-0.40625" style="font-size: 10px; font-family: sans-serif">/</tspan>
+      <tspan x="46.602539" y="-0.40625" style="font-size: 10px; font-family: sans-serif">(</tspan>
+      <tspan x="64.029785" y="-0.40625" style="font-size: 10px; font-family: sans-serif">+</tspan>
+      <tspan x="85.93457" y="-0.40625" style="font-size: 10px; font-family: sans-serif">)</tspan>
+      <tspan x="89.835938" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="93.014648" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="101.393555" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="104.572266" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="110.93457" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="114.113281" y="-0.40625" style="font-size: 10px; font-family: sans-serif">9</tspan>
+      <tspan x="120.475586" y="-0.40625" style="font-size: 10px; font-family: sans-serif">3</tspan>
+      <tspan x="126.837891" y="-0.40625" style="font-size: 10px; font-family: sans-serif">8</tspan>
+      <tspan x="3.901367" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">Z</tspan>
+      <tspan x="27.754395" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">Z</tspan>
+      <tspan x="50.503906" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">Z</tspan>
+      <tspan x="74.356934" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">Z</tspan>
+      <tspan x="10.751953" y="1.093745" style="font-size: 7px; font-family: sans-serif">2</tspan>
+      <tspan x="34.60498" y="1.093745" style="font-size: 7px; font-family: sans-serif">1</tspan>
+      <tspan x="57.354492" y="1.093745" style="font-size: 7px; font-family: sans-serif">2</tspan>
+      <tspan x="81.20752" y="1.093745" style="font-size: 7px; font-family: sans-serif">1</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_18">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="381.676038" y="16.318125" transform="rotate(-0 381.676038 16.318125)">Agua sobre acero con incidencia normal: el historial de sonda que dibuja res.plot()</text>

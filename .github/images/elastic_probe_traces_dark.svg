@@ -429,19 +429,46 @@ L 646.896858 252.936502
    <g id="text_17">
     <g id="patch_9">
      <path d="M 65.635292 338.119195 
-L 188.171229 338.119195 
-Q 192.171229 338.119195 192.171229 334.119195 
-L 192.171229 310.114508 
-Q 192.171229 306.114508 188.171229 306.114508 
-L 65.635292 306.114508 
-Q 61.635292 306.114508 61.635292 310.114508 
+L 198.935292 338.119195 
+Q 202.935292 338.119195 202.935292 334.119195 
+L 202.935292 310.112164 
+Q 202.935292 306.112164 198.935292 306.112164 
+L 65.635292 306.112164 
+Q 61.635292 306.112164 61.635292 310.112164 
 L 61.635292 334.119195 
 Q 61.635292 338.119195 65.635292 338.119195 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(65.635292 318.713922)">echo / incident = 0.938</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(65.635292 330.715875)">(Z₂−Z₁)/(Z₂+Z₁) = 0.938</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(65.635292 318.711578)">echo / incident = 0.938</text>
+    <!-- $(Z_2 - Z_1)/(Z_2 + Z_1)$ = 0.938 -->
+    <g style="fill: #ffffff" transform="translate(65.635292 330.715875)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">(</tspan>
+      <tspan x="17.427246" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">−</tspan>
+      <tspan x="39.332031" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">)</tspan>
+      <tspan x="43.233398" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">/</tspan>
+      <tspan x="46.602539" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">(</tspan>
+      <tspan x="64.029785" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">+</tspan>
+      <tspan x="85.93457" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">)</tspan>
+      <tspan x="89.835938" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="93.014648" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="101.393555" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="104.572266" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="110.93457" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">.</tspan>
+      <tspan x="114.113281" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">9</tspan>
+      <tspan x="120.475586" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">3</tspan>
+      <tspan x="126.837891" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">8</tspan>
+      <tspan x="3.901367" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">Z</tspan>
+      <tspan x="27.754395" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">Z</tspan>
+      <tspan x="50.503906" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">Z</tspan>
+      <tspan x="74.356934" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">Z</tspan>
+      <tspan x="10.751953" y="1.093745" style="font-size: 7px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="34.60498" y="1.093745" style="font-size: 7px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="57.354492" y="1.093745" style="font-size: 7px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="81.20752" y="1.093745" style="font-size: 7px; font-family: sans-serif; fill: #ffffff">1</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_18">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="381.276038" y="16.318125" transform="rotate(-0 381.276038 16.318125)">Water over steel at normal incidence: the probe history res.plot() draws</text>
