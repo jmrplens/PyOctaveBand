@@ -268,9 +268,11 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     # aspect="equal" makes the axes box narrower than its gridspec cell, so
     # a pill anchored a fixed distance inside the data limits still hung its
     # fill out over the page. Slide it back against the measured box.
-    for v_txt in v_txts:
-        _fit_text_x(fig, v_txt.axes, v_txt, x0, x1, margin=0.010)
-        v_txt.set_text("")
+    def fit_verdicts() -> None:
+        for v_txt in v_txts:
+            _fit_text_x(fig, v_txt.axes, v_txt, x0, x1, margin=0.010)
+            v_txt.set_text("")
+
     reveal = int(0.62 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -286,7 +288,8 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
         return (*ims, *ln_arts, *v_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_elastic_plate_junction",
-                 frames=n_active + _ANIM_HOLD, gif_fps=6)
+                 frames=n_active + _ANIM_HOLD, gif_fps=6,
+                 measure=fit_verdicts)
 
 
 # Coincidence clip geometry [m]: the same 10 mm steel plate lying flat at

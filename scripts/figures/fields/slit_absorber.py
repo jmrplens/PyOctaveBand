@@ -357,9 +357,11 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
     # the right edge of the 45 mm zoom: the English string just fits, the
     # Spanish one crosses the dashed frame. Slide it back inside once the
     # figure is complete and the zoom axes have their final width.
-    for helm in helm_txts:
-        _fit_text_x(fig, helm.axes, helm, x_zoom0, x_end,
-                    margin=0.05 * (x_end - x_zoom0))
+    def fit_resonator_labels() -> None:
+        for helm in helm_txts:
+            _fit_text_x(fig, helm.axes, helm, x_zoom0, x_end,
+                        margin=0.05 * (x_end - x_zoom0))
+
     # The captured field is already steady, so the verdict can come early.
     reveal = int(0.30 * len(times))
 
@@ -375,7 +377,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
         return (*ims, *ims_zoom, *a_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_slit_absorber",
-                 frames=len(times), gif_fps=8)
+                 frames=len(times), gif_fps=8, measure=fit_resonator_labels)
 
 
 def _anim_slit_tube_walls(ax: Any, length: float, bore: float, *,

@@ -221,9 +221,11 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     # RMS panel: in Spanish they carry their last letters -- and the whole
     # translucent pill, which then composes against the white page instead
     # of the field -- past the spine. Measure and slide them back in.
-    for v_txt in v_txts:
-        _fit_text_x(fig, v_txt.axes, v_txt, *v_txt.axes.get_xlim(),
-                    margin=0.12)
+    def fit_verdicts() -> None:
+        for v_txt in v_txts:
+            _fit_text_x(fig, v_txt.axes, v_txt, *v_txt.axes.get_xlim(),
+                        margin=0.12)
+
     reveal = int(0.5 * p_all.shape[1])
 
     def shadow_gained(col: int, k: int) -> Any:
@@ -250,4 +252,5 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         return (*ims, tau_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_aperture_slit",
-                 frames=int(p_all.shape[1]), fps=_APERTURE_FPS, gif_fps=8)
+                 frames=int(p_all.shape[1]), fps=_APERTURE_FPS, gif_fps=8,
+                 measure=fit_verdicts)
