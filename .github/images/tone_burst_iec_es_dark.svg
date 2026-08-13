@@ -722,35 +722,35 @@ L 295.638021 48.680234
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 184.123021 79.081484 
+     <path d="M 180.305521 79.081484 
 L 290.038021 79.081484 
 Q 291.638021 79.081484 291.638021 77.481484 
 L 291.638021 54.280234 
 Q 291.638021 52.680234 290.038021 52.680234 
-L 184.123021 52.680234 
-Q 182.523021 52.680234 182.523021 54.280234 
-L 182.523021 77.481484 
-Q 182.523021 79.081484 184.123021 79.081484 
+L 180.305521 52.680234 
+Q 178.705521 52.680234 178.705521 54.280234 
+L 178.705521 77.481484 
+Q 178.705521 79.081484 180.305521 79.081484 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_29">
-     <path d="M 185.723021 59.158984 
-L 193.723021 59.158984 
-L 201.723021 59.158984 
+     <path d="M 181.905521 59.158984 
+L 189.905521 59.158984 
+L 197.905521 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="208.123021" y="61.958984" transform="rotate(-0 208.123021 61.958984)">Envolvente FAST</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="204.305521" y="61.958984" transform="rotate(-0 204.305521 61.958984)">Envolvente FAST</text>
     </g>
     <g id="line2d_30">
-     <path d="M 185.723021 71.159609 
-L 193.723021 71.159609 
-L 201.723021 71.159609 
+     <path d="M 181.905521 71.159609 
+L 189.905521 71.159609 
+L 197.905521 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="208.123021" y="73.959609" transform="rotate(-0 208.123021 73.959609)">Objetivo IEC -1,0 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="204.305521" y="73.959609" transform="rotate(-0 204.305521 73.959609)">Objetivo IEC −1,0 dB</text>
     </g>
    </g>
   </g>
@@ -1091,35 +1091,35 @@ L 568.610573 48.680234
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 457.095573 79.081484 
+     <path d="M 453.278073 79.081484 
 L 563.010573 79.081484 
 Q 564.610573 79.081484 564.610573 77.481484 
 L 564.610573 54.280234 
 Q 564.610573 52.680234 563.010573 52.680234 
-L 457.095573 52.680234 
-Q 455.495573 52.680234 455.495573 54.280234 
-L 455.495573 77.481484 
-Q 455.495573 79.081484 457.095573 79.081484 
+L 453.278073 52.680234 
+Q 451.678073 52.680234 451.678073 54.280234 
+L 451.678073 77.481484 
+Q 451.678073 79.081484 453.278073 79.081484 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_59">
-     <path d="M 458.695573 59.158984 
-L 466.695573 59.158984 
-L 474.695573 59.158984 
+     <path d="M 454.878073 59.158984 
+L 462.878073 59.158984 
+L 470.878073 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="481.095573" y="61.958984" transform="rotate(-0 481.095573 61.958984)">Envolvente FAST</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="477.278073" y="61.958984" transform="rotate(-0 477.278073 61.958984)">Envolvente FAST</text>
     </g>
     <g id="line2d_60">
-     <path d="M 458.695573 71.159609 
-L 466.695573 71.159609 
-L 474.695573 71.159609 
+     <path d="M 454.878073 71.159609 
+L 462.878073 71.159609 
+L 470.878073 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_28">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="481.095573" y="73.959609" transform="rotate(-0 481.095573 73.959609)">Objetivo IEC -4,8 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="477.278073" y="73.959609" transform="rotate(-0 477.278073 73.959609)">Objetivo IEC −4,8 dB</text>
     </g>
    </g>
   </g>
@@ -1371,35 +1371,35 @@ L 841.583125 48.680234
    </g>
    <g id="legend_3">
     <g id="patch_19">
-     <path d="M 724.978125 79.081484 
+     <path d="M 721.160625 79.081484 
 L 835.983125 79.081484 
 Q 837.583125 79.081484 837.583125 77.481484 
 L 837.583125 54.280234 
 Q 837.583125 52.680234 835.983125 52.680234 
-L 724.978125 52.680234 
-Q 723.378125 52.680234 723.378125 54.280234 
-L 723.378125 77.481484 
-Q 723.378125 79.081484 724.978125 79.081484 
+L 721.160625 52.680234 
+Q 719.560625 52.680234 719.560625 54.280234 
+L 719.560625 77.481484 
+Q 719.560625 79.081484 721.160625 79.081484 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_89">
-     <path d="M 726.578125 59.158984 
-L 734.578125 59.158984 
-L 742.578125 59.158984 
+     <path d="M 722.760625 59.158984 
+L 730.760625 59.158984 
+L 738.760625 59.158984 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.3; stroke-linecap: square"/>
     </g>
     <g id="text_37">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="748.978125" y="61.958984" transform="rotate(-0 748.978125 61.958984)">Envolvente FAST</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="745.160625" y="61.958984" transform="rotate(-0 745.160625 61.958984)">Envolvente FAST</text>
     </g>
     <g id="line2d_90">
-     <path d="M 726.578125 71.159609 
-L 734.578125 71.159609 
-L 742.578125 71.159609 
+     <path d="M 722.760625 71.159609 
+L 730.760625 71.159609 
+L 738.760625 71.159609 
 " style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_38">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="748.978125" y="73.959609" transform="rotate(-0 748.978125 73.959609)">Objetivo IEC -11,1 dB</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="745.160625" y="73.959609" transform="rotate(-0 745.160625 73.959609)">Objetivo IEC −11,1 dB</text>
     </g>
    </g>
   </g>

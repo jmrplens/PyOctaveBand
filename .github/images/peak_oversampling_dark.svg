@@ -520,7 +520,7 @@ L 274.4975 288.193906
 " style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.4"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="280.8975" y="290.993906" transform="rotate(-0 280.8975 290.993906)">largest sample: -1.25 dB low</text>
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="280.8975" y="290.993906" transform="rotate(-0 280.8975 290.993906)">largest sample: −1.25 dB low</text>
     </g>
    </g>
   </g>

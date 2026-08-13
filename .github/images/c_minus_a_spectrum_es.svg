@@ -756,20 +756,52 @@ L 438.194609 28.318125
    <g id="text_23">
     <g id="patch_7">
      <path d="M 52.843846 306.530992 
-L 130.020409 306.530992 
-Q 133.020409 306.530992 133.020409 303.530992 
-L 133.020409 267.522789 
-Q 133.020409 264.522789 130.020409 264.522789 
-L 52.843846 264.522789 
-Q 49.843846 264.522789 49.843846 267.522789 
+L 134.792284 306.530992 
+Q 137.792284 306.530992 137.792284 303.530992 
+L 137.792284 266.324352 
+Q 137.792284 263.324352 134.792284 263.324352 
+L 52.843846 263.324352 
+Q 49.843846 263.324352 49.843846 266.324352 
 L 49.843846 303.530992 
 Q 49.843846 306.530992 52.843846 306.530992 
 z
 " style="fill: #f0f2f5; stroke: #9e9e9e; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(52.843846 276.122203)">LAeq 52,4 dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(52.843846 288.124937)">LCeq 75,7 dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(52.843846 300.127672)">C - A = 23,2 dB</text>
+    <!-- $L_{Aeq}$ 52,4 dB -->
+    <g transform="translate(52.843846 274.925328)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="5.571289" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">A</tspan>
+      <tspan x="10.359863" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">e</tspan>
+      <tspan x="14.666504" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">q</tspan>
+      <tspan x="19.383301" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="22.562012" y="-0.40625" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="28.924316" y="-0.40625" style="font-size: 10px; font-family: sans-serif">2</tspan>
+      <tspan x="35.286621" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="38.465332" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="44.827637" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="48.006348" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="54.354004" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
+    <!-- $L_{Ceq}$ 75,7 dB -->
+    <g transform="translate(52.843846 287.527281)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="5.571289" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">C</tspan>
+      <tspan x="10.458984" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">e</tspan>
+      <tspan x="14.765625" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">q</tspan>
+      <tspan x="19.482422" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="22.661133" y="-0.40625" style="font-size: 10px; font-family: sans-serif">7</tspan>
+      <tspan x="29.023438" y="-0.40625" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="35.385742" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="38.564453" y="-0.40625" style="font-size: 10px; font-family: sans-serif">7</tspan>
+      <tspan x="44.926758" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="48.105469" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="54.453125" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(52.843846 300.127672)">C − A = 23,2 dB</text>
    </g>
    <g id="text_24">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="239.560195" y="16.318125" transform="rotate(-0 239.560195 16.318125)">Un retumbo de 50 Hz bajo un siseo ligero</text>
@@ -1501,20 +1533,52 @@ L 849.763437 28.318125
    <g id="text_40">
     <g id="patch_14">
      <path d="M 464.412674 306.530992 
-L 535.226737 306.530992 
-Q 538.226737 306.530992 538.226737 303.530992 
-L 538.226737 267.522789 
-Q 538.226737 264.522789 535.226737 264.522789 
-L 464.412674 264.522789 
-Q 461.412674 264.522789 461.412674 267.522789 
+L 539.998612 306.530992 
+Q 542.998612 306.530992 542.998612 303.530992 
+L 542.998612 266.324352 
+Q 542.998612 263.324352 539.998612 263.324352 
+L 464.412674 263.324352 
+Q 461.412674 263.324352 461.412674 266.324352 
 L 461.412674 303.530992 
 Q 461.412674 306.530992 464.412674 306.530992 
 z
 " style="fill: #f0f2f5; stroke: #9e9e9e; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(464.412674 276.122203)">LAeq 54,6 dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(464.412674 288.124937)">LCeq 56,4 dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(464.412674 300.127672)">C - A = 1,8 dB</text>
+    <!-- $L_{Aeq}$ 54,6 dB -->
+    <g transform="translate(464.412674 274.925328)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="5.571289" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">A</tspan>
+      <tspan x="10.359863" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">e</tspan>
+      <tspan x="14.666504" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">q</tspan>
+      <tspan x="19.383301" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="22.562012" y="-0.40625" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="28.924316" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="35.286621" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="38.465332" y="-0.40625" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="44.827637" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="48.006348" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="54.354004" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
+    <!-- $L_{Ceq}$ 56,4 dB -->
+    <g transform="translate(464.412674 287.527281)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">L</tspan>
+      <tspan x="5.571289" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">C</tspan>
+      <tspan x="10.458984" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">e</tspan>
+      <tspan x="14.765625" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">q</tspan>
+      <tspan x="19.482422" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="22.661133" y="-0.40625" style="font-size: 10px; font-family: sans-serif">5</tspan>
+      <tspan x="29.023438" y="-0.40625" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="35.385742" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="38.564453" y="-0.40625" style="font-size: 10px; font-family: sans-serif">4</tspan>
+      <tspan x="44.926758" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="48.105469" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="54.453125" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(464.412674 300.127672)">C − A = 1,8 dB</text>
    </g>
    <g id="text_41">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="651.129023" y="16.318125" transform="rotate(-0 651.129023 16.318125)">Ruido rosa de banda ancha</text>

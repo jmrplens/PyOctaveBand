@@ -577,19 +577,19 @@ def generate_parametric_eq_family(output_dir: str) -> None:
 
     family = [
         (EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
-         "Peaking +6 dB (Q = 1.4)", COLOR_PRIMARY, "-"),
+         "Peaking +6 dB ($Q$ = 1.4)", COLOR_PRIMARY, "-"),
         (EQSection("lowshelf", 125.0, gain_db=6.0),
          "Low shelf +6 dB", COLOR_TERTIARY, "-"),
         (EQSection("highshelf", 4000.0, gain_db=-6.0),
          "High shelf −6 dB", "#9467bd", "-"),
         (EQSection("lowpass", 10000.0),
-         "Low-pass (Q = 0.707)", COLOR_SECONDARY, "--"),
+         "Low-pass ($Q$ = 0.707)", COLOR_SECONDARY, "--"),
         (EQSection("highpass", 50.0),
-         "High-pass (Q = 0.707)", "#8c564b", "--"),
+         "High-pass ($Q$ = 0.707)", "#8c564b", "--"),
         (EQSection("bandpass", 500.0, q=2.0),
-         "Band-pass (Q = 2)", "#ff7f0e", "-."),
+         "Band-pass ($Q$ = 2)", "#ff7f0e", "-."),
         (EQSection("notch", 2000.0, q=6.0),
-         "Notch (Q = 6)", "#17becf", "-."),
+         "Notch ($Q$ = 6)", "#17becf", "-."),
     ]
 
     _, ax = plt.subplots(figsize=(10, 6))
@@ -672,9 +672,9 @@ def generate_ln_levels_example(output_dir: str) -> None:
     for n_value, color, style in [(10, COLOR_SECONDARY, "--"), (50, COLOR_FG, "-"), (90, COLOR_TERTIARY, "-.")]:
         ax.axhline(
             float(stats[n_value]), color=color, linestyle=style, linewidth=1.5,
-            label=f"L{n_value} = {float(stats[n_value]):.1f} dB",
+            label=f"$L_{{{n_value}}}$ = {float(stats[n_value]):.1f} dB",
         )
-    ax.set_title("Statistical Levels L10 / L50 / L90 (Fast envelope)", fontweight="bold", pad=12)
+    ax.set_title("Statistical Levels $L_{10}$ / $L_{50}$ / $L_{90}$ (Fast envelope)", fontweight="bold", pad=12)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(LABEL_LEVEL_DB)
     ax.set_xlim(0, duration)
@@ -746,7 +746,7 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
     ax.semilogx(freqs, reference, color=COLOR_FG, linewidth=2, label="IEC 61672-1 analytic curve")
     ax.semilogx(freqs, legacy, color=COLOR_SECONDARY, linestyle="--", label="Plain bilinear (high_accuracy=False)")
     ax.semilogx(freqs, accurate, color=COLOR_PRIMARY, linestyle="-.", label="Oversampled (high_accuracy=True)")
-    ax.set_title(f"A-Weighting High-Frequency Accuracy @ fs={fs//1000} kHz", fontweight="bold", pad=12)
+    ax.set_title(f"A-Weighting High-Frequency Accuracy @ $f_s$ = {fs // 1000} kHz", fontweight="bold", pad=12)
     ax.set_ylabel(LABEL_LEVEL_DB)
     ax.legend(loc="lower left")
 
@@ -831,7 +831,7 @@ def generate_tone_burst_iec(output_dir: str) -> None:
 
         ax.plot(t_all, env_db, color=COLOR_PRIMARY, linewidth=1.3, label="FAST envelope")
         ax.axhline(target, color=COLOR_SECONDARY, linestyle="--", linewidth=1.2,
-                   label=f"IEC target {target} dB")
+                   label=f"IEC target {_fmt_minus(target, '.1f')} dB")
         ax.set_title(f"{duration * 1000:g} ms burst", fontsize=11, fontweight="bold")
         ax.set_xlim(0.4, 1.4)
         ax.set_ylim(-30, 3)
@@ -958,8 +958,8 @@ def generate_class_mask_overlay(output_dir: str) -> None:
     ax.set_xlim(0.08, 8)
     ax.set_ylim(-6, 90)
     ax.set_title("Relative Attenuation vs IEC 61260-1:2014 Class Limits", fontweight="bold", pad=12)
-    ax.set_xlabel("Normalized frequency  f / fm")
-    ax.set_ylabel("Relative attenuation ΔA [dB]")
+    ax.set_xlabel(r"Normalized frequency  $f\,/\,f_m$")
+    ax.set_ylabel(r"Relative attenuation $\Delta A$ [dB]")
     ax.set_xticks([0.125, 0.25, 0.5, 0.707, 1, 1.414, 2, 4, 8])
     ax.set_xticklabels(["0.125", "0.25", "0.5", "0.707", "1", "1.41", "2", "4", "8"])
     ax.legend(loc="upper left", fontsize=9)
@@ -1008,8 +1008,8 @@ def generate_filter_class0_mask(output_dir: str) -> None:
     ax.set_ylim(-0.7, 6)
     ax.set_title("Pass-band Class 0/1/2 Limits (IEC 61260:1995 / ANSI S1.11-2004)",
                  fontweight="bold", pad=12)
-    ax.set_xlabel("Normalized frequency  f / fm")
-    ax.set_ylabel("Relative attenuation ΔA [dB]")
+    ax.set_xlabel(r"Normalized frequency  $f\,/\,f_m$")
+    ax.set_ylabel(r"Relative attenuation $\Delta A$ [dB]")
     ax.set_xticks([0.707, 0.841, 1, 1.189, 1.414])
     ax.set_xticklabels(["0.707", "0.841", "1", "1.189", "1.414"])
     ax.xaxis.set_minor_formatter(mticker.NullFormatter())  # keep only explicit ticks
@@ -1089,7 +1089,7 @@ def generate_sel_concept(output_dir: str) -> None:
     ax.plot(tt, level, color=COLOR_PRIMARY, linewidth=1.2,
             label="Fast level of the event")
     ax.hlines(l_eq, 0, seconds, color=COLOR_TERTIARY, linestyle="--",
-              linewidth=1.6, label="Leq over the whole event")
+              linewidth=1.6, label="$L_{eq}$ over the whole event")
     # SEL: same energy squeezed into 1 s (drawn as a 1 s block)
     ax.fill_between([3.5, 4.5], -55, l_sel, color=COLOR_SECONDARY, alpha=0.25)
     ax.hlines(l_sel, 3.5, 4.5, color=COLOR_SECONDARY, linewidth=2.2,
@@ -1152,22 +1152,22 @@ def generate_slm_level_track(output_dir: str) -> None:
     ax.annotate("the 1 s event", xy=(4.5, 82.5), ha="center",
                 color=COLOR_SECONDARY, fontsize=9)
     ax.plot(t, laf_t, color=COLOR_PRIMARY, linewidth=0.8,
-            label="LAF(t), Fast A-weighted level")
+            label="$L_{AF}(t)$, Fast A-weighted level")
     for value, name, color, style in [
-        (la_eq, "LAeq", COLOR_FG, "--"),
-        (float(ln[10]), "L10", COLOR_SECONDARY, ":"),
-        (float(ln[50]), "L50", COLOR_TERTIARY, "-."),
-        (float(ln[90]), "L90", COLOR_QUATERNARY, (0, (6, 2))),
+        (la_eq, "$L_{Aeq}$", COLOR_FG, "--"),
+        (float(ln[10]), "$L_{10}$", COLOR_SECONDARY, ":"),
+        (float(ln[50]), "$L_{50}$", COLOR_TERTIARY, "-."),
+        (float(ln[90]), "$L_{90}$", COLOR_QUATERNARY, (0, (6, 2))),
     ]:
         ax.axhline(value, color=color, linestyle=style, linewidth=1.4,
                    label=f"{name} = {value:.1f} dB")
-    ax.annotate(f"LAE = {lae:.1f} dB: the whole event energy in 1 s",
+    ax.annotate(f"$L_{{AE}}$ = {lae:.1f} dB: the whole event energy in 1 s",
                 xy=(5.0, lae), xytext=(6.0, lae + 3.0), fontsize=9,
                 arrowprops={"arrowstyle": "->", "lw": 0.9})
     ax.set_title("What step 4 reports, drawn on the recording it read",
                  fontweight="bold", pad=12)
     ax.set_xlabel("Time [s]")
-    ax.set_ylabel("Level [dB re 20 uPa]")
+    ax.set_ylabel("Level [dB re 20 µPa]")
     ax.set_xlim(0, 10)
     ax.set_ylim(40, 92)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")
@@ -1205,7 +1205,7 @@ def generate_slm_third_octave(output_dir: str) -> None:
     ax.set_title("One-third-octave spectrum of the same ten seconds",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Band level [dB re 20 uPa]")
+    ax.set_ylabel("Band level [dB re 20 µPa]")
     ax.set_ylim(-25, 78)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")
     ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
@@ -1233,7 +1233,7 @@ def generate_energy_vs_arithmetic_mean(output_dir: str) -> None:
     ax_left.axhline(arithmetic, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
                     label=f"arithmetic mean of the dB values = {arithmetic:.0f} dB")
     ax_left.axhline(energetic, color=COLOR_SECONDARY, linestyle="--",
-                    linewidth=1.8, label=f"Leq (energy mean) = {energetic:.0f} dB")
+                    linewidth=1.8, label=f"$L_{{eq}}$ (energy mean) = {energetic:.0f} dB")
     ax_left.annotate("", xy=(1.45, energetic), xytext=(1.45, arithmetic),
                      arrowprops={"arrowstyle": "<->", "lw": 1.2})
     ax_left.text(1.5, 0.5 * (arithmetic + energetic),
@@ -1247,9 +1247,9 @@ def generate_energy_vs_arithmetic_mean(output_dir: str) -> None:
     ax_left.grid(axis="y", color=COLOR_GRID, linestyle="-")
 
     ax_right.plot(sigma, gaussian, color=COLOR_PRIMARY, linewidth=1.8,
-                  label="Gaussian spread: 0.115 sigma^2")
+                  label=r"Gaussian spread: $0.115\,\sigma^2$")
     ax_right.plot(sigma, two_level, color=COLOR_TERTIARY, linewidth=1.8,
-                  linestyle="--", label="two levels, one sigma either side")
+                  linestyle="--", label=r"two levels, one $\sigma$ either side")
     ax_right.axvline(5.0, color=COLOR_MUTED, linewidth=1.0)
     ax_right.annotate("levels spread over 10 dB", xy=(5.0, 2.5),
                       xytext=(5.6, 1.0), fontsize=9,
@@ -1257,7 +1257,7 @@ def generate_energy_vs_arithmetic_mean(output_dir: str) -> None:
     ax_right.set_title("The error of averaging decibels, and it never changes "
                        "sign", fontweight="bold", pad=12)
     ax_right.set_xlabel("Standard deviation of the levels [dB]")
-    ax_right.set_ylabel("Leq minus the arithmetic dB mean [dB]")
+    ax_right.set_ylabel("$L_{eq}$ minus the arithmetic dB mean [dB]")
     ax_right.set_xlim(0, 12)
     ax_right.set_ylim(0, 18)
     ax_right.grid(color=COLOR_GRID, linestyle="-")
@@ -1324,18 +1324,18 @@ def generate_level_distribution(output_dir: str) -> None:
                       label=name)
         for p in (10, 50, 90):
             ax_right.plot(p, float(curve[p]), "o", color=color, markersize=5)
-            ax_right.annotate(f"L{p}", xy=(p, float(curve[p])), fontsize=8,
+            ax_right.annotate(f"$L_{{{p}}}$", xy=(p, float(curve[p])), fontsize=8,
                               color=color, textcoords="offset points",
                               xytext=(4, 5))
         spread = float(curve[10]) - float(curve[90])
         gap = la_eq - float(curve[50])
-        note = (f"{name}:  L10 - L90 = {spread:.1f} dB"
-                f"   |   LAeq - L50 = {gap:.1f} dB")
+        note = (f"{name}:  $L_{{10}} - L_{{90}}$ = {spread:.1f} dB"
+                f"   |   $L_{{Aeq}} - L_{{50}}$ = {_fmt_minus(gap, '.1f')} dB")
         notes.append((note, color))
 
     ax_left.axhline(la_eq, color=COLOR_FG, linestyle="--", linewidth=1.6,
-                    label=f"LAeq = {la_eq:.1f} dB (both)")
-    ax_left.set_title("Two noises with the same LAeq", fontweight="bold", pad=12)
+                    label=f"$L_{{Aeq}}$ = {la_eq:.1f} dB (both)")
+    ax_left.set_title("Two noises with the same $L_{Aeq}$", fontweight="bold", pad=12)
     ax_left.set_xlabel("Time [s]")
     ax_left.set_ylabel(LABEL_LEVEL_DB)
     ax_left.set_xlim(0, 60)
@@ -1385,7 +1385,7 @@ def generate_peak_oversampling(output_dir: str) -> None:
                     label="true peak")
     ax_left.axhline(on_grid, color=COLOR_SECONDARY, linestyle=":",
                     linewidth=1.4,
-                    label=f"largest sample: {20 * np.log10(on_grid):.2f} dB low")
+                    label=f"largest sample: {_fmt_minus(20 * np.log10(on_grid), '.2f')} dB low")
     ax_left.set_title("The crest falls between two samples",
                       fontweight="bold", pad=12)
     ax_left.set_xlabel("Time [ms]")
@@ -1448,9 +1448,9 @@ def generate_dose_exchange(output_dir: str) -> None:
         exposure = 8.0 * (20e-6 * 10 ** (target / 20)) ** 2
         ax.semilogx(hours, target - offsets, color=color, linestyle=style,
                     linewidth=1.9,
-                    label=f"LEX,8h = {target:.0f} dB  (E = {exposure:.2f} Pa2h)")
+                    label=f"$L_{{EX,8h}}$ = {target:.0f} dB  ($E$ = {exposure:.2f} Pa²·h)")
     ax.plot(8.0, 90.0, "o", color=COLOR_FG, markersize=7)
-    ax.annotate("90 dB(A) for 8 h = 3.20 Pa2h", xy=(8.0, 90.0),
+    ax.annotate("90 dB(A) for 8 h = 3.20 Pa²·h", xy=(8.0, 90.0),
                 xytext=(1.1, 96.0), fontsize=9,
                 arrowprops={"arrowstyle": "->", "lw": 0.9})
     ax.annotate("+3 dB for every halving of the duration", xy=(2.0, 88.0),
@@ -1572,7 +1572,8 @@ def generate_c_minus_a_spectrum(output_dir: str) -> None:
         la = float(leq(weighting_filter(x, fs, curve="A")))
         lc = float(leq(weighting_filter(x, fs, curve="C")))
         ax.text(0.03, 0.05,
-                f"LAeq {la:.1f} dB\nLCeq {lc:.1f} dB\nC - A = {lc - la:.1f} dB",
+                f"$L_{{Aeq}}$ {la:.1f} dB\n$L_{{Ceq}}$ {lc:.1f} dB\n"
+                f"C − A = {_fmt_minus(lc - la, '.1f')} dB",
                 transform=ax.transAxes, fontsize=10,
                 bbox={"boxstyle": "round", "facecolor": COLOR_PANEL,
                       "edgecolor": COLOR_MUTED})
@@ -1620,11 +1621,13 @@ def generate_pole_migration(output_dir: str) -> None:
         ax.plot(np.real(poles), np.imag(poles), "x", color=COLOR_SECONDARY,
                 markersize=9, markeredgewidth=2.0, label="poles")
         ax.plot([0.0] * 4, [0.0] * 4, "o", color=COLOR_PRIMARY,
-                markerfacecolor="none", markersize=9, label="zeros (at z = 0)")
+                markerfacecolor="none", markersize=9, label="zeros (at $z = 0$)")
         gap = 1.0 - float(np.max(np.abs(poles)))
-        ax.set_title(f"{title}\n1 - r = {gap:.1e}", fontweight="bold", pad=10)
-        ax.set_xlabel("Re z")
-        ax.set_ylabel("Im z")
+        mantissa, exponent = f"{gap:.1e}".split("e")
+        ax.set_title(f"{title}\n$1 - r = {mantissa}\\times10^{{{int(exponent)}}}$",
+                     fontweight="bold", pad=10)
+        ax.set_xlabel(r"$\mathrm{Re}\,z$")
+        ax.set_ylabel(r"$\mathrm{Im}\,z$")
         ax.set_xlim(-1.25, 1.25)
         ax.set_ylim(-1.25, 1.25)
         ax.set_aspect("equal")
@@ -1640,7 +1643,7 @@ def generate_pole_migration(output_dir: str) -> None:
     inset.set_xlim(0.9985, 1.0004)
     inset.set_ylim(-0.0045, 0.0045)
     inset.tick_params(labelsize=7)
-    inset.set_title("zoom at z = 1", fontsize=8)
+    inset.set_title("zoom at $z = 1$", fontsize=8)
     ax_a.indicate_inset_zoom(inset, edgecolor=COLOR_FG)
 
     radius_dec = [1.0 - float(np.max(np.abs(sos2zpk(np.asarray(s))[1])))
@@ -1654,7 +1657,7 @@ def generate_pole_migration(output_dir: str) -> None:
     ax_c.set_title("Every band of the 1/3-octave bank", fontweight="bold",
                    pad=10)
     ax_c.set_xlabel(LABEL_FREQ_HZ)
-    ax_c.set_ylabel("1 - (largest pole radius)")
+    ax_c.set_ylabel("1 − (largest pole radius)")
     ax_c.grid(which="both", color=COLOR_GRID, linestyle="-")
     ax_c.legend(loc="lower right", fontsize=8)
     format_frequency_axis(ax_c, 11.0, 23000.0, minor=None)
@@ -1714,8 +1717,8 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
 
     x = np.arange(len(names))
     fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(12, 5.0))
-    ax_a.bar(x - 0.19, two_fm, 0.36, color=COLOR_PRIMARY, label="at 2 f_m")
-    ax_a.bar(x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label="at 4 f_m")
+    ax_a.bar(x - 0.19, two_fm, 0.36, color=COLOR_PRIMARY, label="at $2 f_m$")
+    ax_a.bar(x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label="at $4 f_m$")
     for xi, value in zip(x - 0.19, two_fm):
         ax_a.annotate(_fmt_minus(value, ".0f"), (xi, value),
                       ha="center", va="top",
@@ -1811,7 +1814,7 @@ def generate_leakage_floor(output_dir: str) -> None:
     ax.set_title("A 1 kHz tone at 100 dB over a pink-noise floor",
                  fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel("Band level [dB re 20 uPa]")
+    ax.set_ylabel("Band level [dB re 20 µPa]")
     ax.set_ylim(5, 108)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")
     ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
@@ -1875,7 +1878,7 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     ax_a.set_title("Eight 100 ms blocks of a level-stepping signal",
                    fontweight="bold", pad=12)
     ax_a.set_xlabel("Time [s]")
-    ax_a.set_ylabel("LAF [dB re 20 uPa]")
+    ax_a.set_ylabel("$L_{AF}$ [dB re 20 µPa]")
     ax_a.set_xlim(0, t[-1])
     ax_a.set_ylim(30, 85)
     ax_a.grid(color=COLOR_GRID, linestyle="-")
@@ -1893,7 +1896,7 @@ def generate_streaming_level_seams(output_dir: str) -> None:
               linewidth=1.4, label="steady_ic=False")
     ax_b.plot(t[:shown * block], steady, color=COLOR_TERTIARY, linewidth=1.4,
               linestyle="--", label="steady_ic=True")
-    ax_b.annotate("5 tau on Fast: 0.63 s", xy=(0.31, 82.0), ha="center",
+    ax_b.annotate(r"$5\tau$ on Fast: 0.63 s", xy=(0.31, 82.0), ha="center",
                   fontsize=9, color=COLOR_SECONDARY)
     ax_b.set_title("The settling ramp, magnified", fontweight="bold", pad=12)
     ax_b.set_xlabel("Time [s]")
@@ -1946,7 +1949,7 @@ def generate_survey_channel_average(output_dir: str) -> None:
                   linestyle="--", label="arithmetic mean of the dB values")
     ax_a.set_title("A five-position room survey in one octave_filter call",
                    fontweight="bold", pad=12)
-    ax_a.set_ylabel("Band level [dB re 20 uPa]")
+    ax_a.set_ylabel("Band level [dB re 20 µPa]")
     ax_a.grid(which="major", color=COLOR_GRID, linestyle="-")
     ax_a.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
     ax_a.legend(loc="lower left", fontsize=9)

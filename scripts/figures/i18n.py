@@ -528,13 +528,13 @@ _ES_EXACT = {
         "Ventanas de análisis: el compromiso espectral (Harris 1978)",
     "Parametric EQ Biquads (RBJ Audio EQ Cookbook)":
         "Biquads de EQ paramétrico (RBJ Audio EQ Cookbook)",
-    "Peaking +6 dB (Q = 1.4)": "Campana +6 dB (Q = 1.4)",
+    "Peaking +6 dB ($Q$ = 1.4)": "Campana +6 dB ($Q$ = 1,4)",
     "Low shelf +6 dB": "Shelving grave +6 dB",
     "High shelf −6 dB": "Shelving agudo −6 dB",
-    "Low-pass (Q = 0.707)": "Paso bajo (Q = 0.707)",
-    "High-pass (Q = 0.707)": "Paso alto (Q = 0.707)",
-    "Band-pass (Q = 2)": "Paso banda (Q = 2)",
-    "Notch (Q = 6)": "Rechazo de banda (Q = 6)",
+    "Low-pass ($Q$ = 0.707)": "Paso bajo ($Q$ = 0,707)",
+    "High-pass ($Q$ = 0.707)": "Paso alto ($Q$ = 0,707)",
+    "Band-pass ($Q$ = 2)": "Paso banda ($Q$ = 2)",
+    "Notch ($Q$ = 6)": "Rechazo de banda ($Q$ = 6)",
     "Frequency offset [DFT bins]": "Desplazamiento en frecuencia [bins de la DFT]",
     "Level re main lobe [dB]": "Nivel re lóbulo principal [dB]",
     "GFPE relative sound level": "Nivel sonoro relativo GFPE",
@@ -657,8 +657,9 @@ _ES_EXACT = {
     "Log-magnitude envelope": "Envolvente log-magnitud",
     "Schroeder decay (EDC)": "Decaimiento de Schroeder (EDC)",
     "Normalized Response": "Respuesta normalizada",
-    "Normalized frequency  f / fm": "Frecuencia normalizada  f / fm",
-    "Relative attenuation \u0394A [dB]": "Atenuaci\u00f3n relativa \u0394A [dB]",
+    r"Normalized frequency  $f\,/\,f_m$": r"Frecuencia normalizada  $f\,/\,f_m$",
+    r"Relative attenuation $\Delta A$ [dB]":
+        "Atenuación relativa $\\Delta A$ [dB]",
     "Sound pressure level [dB re 20 \u00b5Pa]": "Nivel de presi\u00f3n ac\u00fastica [dB re 20 \u00b5Pa]",
     "1/3 Octave Band Analysis": "An\u00e1lisis en bandas de octava 1/3",
     "1/12 Octave Spectrogram (Fast windows, 87.5% overlap)":
@@ -749,8 +750,8 @@ _ES_EXACT = {
     "Right Channel: Log Sine Sweep": "Canal derecho: barrido senoidal logar\u00edtmico",
     "Slow (1000ms)": "Slow (1000 ms)",
     "Stateful blocks (state carried)": "Bloques con estado (estado conservado)",
-    "Statistical Levels L10 / L50 / L90 (Fast envelope)":
-        "Niveles estad\u00edsticos L10 / L50 / L90 (envolvente Fast)",
+    "Statistical Levels $L_{10}$ / $L_{50}$ / $L_{90}$ (Fast envelope)":
+        "Niveles estad\u00edsticos $L_{10}$ / $L_{50}$ / $L_{90}$ (envolvente Fast)",
     "Sum (Flat)": "Suma (plana)",
     "Time Weighting Ballistics (IEC 61672-1)":
         "Ponderaci\u00f3n temporal F/S/I (IEC 61672-1)",
@@ -1351,7 +1352,7 @@ _ES_EXACT = {
         "Comprobaci\u00f3n de estabilidad del tono de calibraci\u00f3n (IEC 60942:2017, 5.3.3)",
     "F-weighted level re mean [dB]": "Nivel con ponderaci\u00f3n F re media [dB]",
     "Fast level of the event": "Nivel Fast del evento",
-    "Leq over the whole event": "Leq de todo el evento",
+    "$L_{eq}$ over the whole event": "$L_{eq}$ de todo el evento",
     "SEL: same energy in 1 s": "SEL: la misma energ\u00eda en 1 s",
     "equal energy": "igual energ\u00eda",
     "Sound Exposure Level: the event normalized to 1 s":
@@ -4154,12 +4155,13 @@ _ES_EXACT = {
     "Bank angle $\\Phi$": "Ángulo de alabeo $\\Phi$",
     # Levels: the sound-level-meter walkthrough, energy averaging, percentiles,
     # peak detection, exposure and the C - A spectrum (signals/levels).
-    "Level [dB re 20 uPa]": "Nivel [dB re 20 uPa]",
-    "Band level [dB re 20 uPa]": "Nivel de banda [dB re 20 uPa]",
+    "Level [dB re 20 µPa]": "Nivel [dB re 20 µPa]",
+    "Band level [dB re 20 µPa]": "Nivel de banda [dB re 20 µPa]",
     "Band level [dB]": "Nivel de banda [dB]",
     "What step 4 reports, drawn on the recording it read":
         "Lo que informa el paso 4, dibujado sobre la grabación que leyó",
-    "LAF(t), Fast A-weighted level": "LAF(t), nivel ponderado A con Fast",
+    "$L_{AF}(t)$, Fast A-weighted level":
+        "$L_{AF}(t)$, nivel ponderado A con Fast",
     "the 1 s event": "el evento de 1 s",
     "One-third-octave spectrum of the same ten seconds":
         "Espectro en tercios de octava de los mismos diez segundos",
@@ -4173,12 +4175,14 @@ _ES_EXACT = {
         "El error de promediar decibelios, y nunca cambia de signo",
     "Standard deviation of the levels [dB]":
         "Desviación típica de los niveles [dB]",
-    "Leq minus the arithmetic dB mean [dB]":
-        "Leq menos la media aritmética en dB [dB]",
-    "Gaussian spread: 0.115 sigma^2": "dispersión gaussiana: 0,115 sigma^2",
-    "two levels, one sigma either side": "dos niveles, a una sigma a cada lado",
+    "$L_{eq}$ minus the arithmetic dB mean [dB]":
+        "$L_{eq}$ menos la media aritmética en dB [dB]",
+    r"Gaussian spread: $0.115\,\sigma^2$":
+        r"dispersión gaussiana: $0{,}115\,\sigma^2$",
+    r"two levels, one $\sigma$ either side":
+        r"dos niveles, a una $\sigma$ a cada lado",
     "levels spread over 10 dB": "niveles con una dispersión de 10 dB",
-    "Two noises with the same LAeq": "Dos ruidos con el mismo LAeq",
+    "Two noises with the same $L_{Aeq}$": "Dos ruidos con el mismo $L_{Aeq}$",
     "steady noise": "ruido estacionario",
     "quiet background, three events": "fondo silencioso, tres eventos",
     "Their exceedance curves": "Sus curvas de excedencia",
@@ -4202,7 +4206,7 @@ _ES_EXACT = {
     "30 min": "30 min",
     "+3 dB for every halving of the duration":
         "+3 dB por cada reducción a la mitad de la duración",
-    "90 dB(A) for 8 h = 3.20 Pa2h": "90 dB(A) durante 8 h = 3,20 Pa2h",
+    "90 dB(A) for 8 h = 3.20 Pa²·h": "90 dB(A) durante 8 h = 3,20 Pa²·h",
     "Every detector under-reads every short event":
         "Todo detector subestima todo evento corto",
     "Toneburst duration [ms]": "Duración de la ráfaga tonal [ms]",
@@ -4261,10 +4265,10 @@ _ES_EXACT = {
         "aquí la falda ya ha caído por debajo del ruido:\n"
         "estas bandas sí miden el sonido",
     "poles": "polos",
-    "zeros (at z = 0)": "ceros (en z = 0)",
-    "zoom at z = 1": "zoom en z = 1",
+    "zeros (at $z = 0$)": "ceros (en $z = 0$)",
+    "zoom at $z = 1$": "zoom en $z = 1$",
     "Every band of the 1/3-octave bank": "Todo el banco de 1/3 de octava",
-    "1 - (largest pole radius)": "1 - (mayor radio de polo)",
+    "1 − (largest pole radius)": "1 − (mayor radio de polo)",
     "resample=False (one rate)": "resample=False (una sola frecuencia)",
     "the default multirate bank": "el banco multitasa por defecto",
     "Relative attenuation out of band": "Atenuación relativa fuera de banda",
@@ -4272,16 +4276,16 @@ _ES_EXACT = {
         "Retardo de grupo en la frecuencia central de banda",
     "The 1 kHz octave band at 48 kHz, order 6":
         "La banda de octava de 1 kHz a 48 kHz, orden 6",
-    "at 2 f_m": "en 2 f_m",
-    "at 4 f_m": "en 4 f_m",
+    "at $2 f_m$": "en $2 f_m$",
+    "at $4 f_m$": "en $4 f_m$",
     # Block processing and multichannel surveys (signals/filters).
     "Eight 100 ms blocks of a level-stepping signal":
         "Ocho bloques de 100 ms de una señal con escalones de nivel",
     # Symbol and reference notation, shared (cf. "Nivel [dB re 20 uPa]").
-    "LAF [dB re 20 uPa]": "LAF [dB re 20 uPa]",
+    "$L_{AF}$ [dB re 20 µPa]": "$L_{AF}$ [dB re 20 µPa]",
     "one continuous pass": "una sola pasada continua",
     "The settling ramp, magnified": "La rampa de asentamiento, ampliada",
-    "5 tau on Fast: 0.63 s": "5 tau en Fast: 0,63 s",
+    r"$5\tau$ on Fast: 0.63 s": r"$5\tau$ en Fast: 0,63 s",
     "A five-position room survey in one octave_filter call":
         "Cinco posiciones de una sala en una sola llamada a octave_filter",
     "the five positions": "las cinco posiciones",
@@ -4748,8 +4752,8 @@ _ES_PATTERNS = [
     (r"^Measured 1/(\d+) Octave Bands$", r"Bandas de 1/\1 de octava medidas"),
     (r"^IEC target (.+) dB$", r"Objetivo IEC \1 dB"),
     (r"^([\d.]+) ms burst$", "R\u00e1faga de \\1 ms"),
-    (r"^A-Weighting High-Frequency Accuracy @ fs=(\d+) kHz$",
-     "Precisi\u00f3n en alta frecuencia de la ponderaci\u00f3n A @ fs=\\1 kHz"),
+    (r"^A-Weighting High-Frequency Accuracy @ \$f_s\$ = (\d+) kHz$",
+     "Precisi\u00f3n en alta frecuencia de la ponderaci\u00f3n A @ $f_s$ = \\1 kHz"),
     (r"^Impulse Response \((.+) Hz Band\) - Transient/Stability Comparison$",
      "Respuesta al impulso (banda de \\1 Hz) \u2014 transitorio y estabilidad"),
     (r"^1 kHz narrowband — \$N\$ = (\d+)\.(\d+) sone$",
@@ -5253,21 +5257,31 @@ _ES_PATTERNS = [
     # Levels: labels and annotations carrying computed values.
     (r"^arithmetic mean of the dB values = (.+) dB$",
      r"media aritmética de los valores en dB = \1 dB"),
-    (r"^Leq \(energy mean\) = (.+) dB$", r"Leq (media energética) = \1 dB"),
-    (r"^LAeq = (.+) dB \(both\)$", r"LAeq = \1 dB (ambos)"),
-    # slm_level_track legend line: the symbol is shared; comma at save time.
-    (r"^LAeq = (.+) dB$", r"LAeq = \1 dB"),
-    # c_minus_a_spectrum info box: level symbols shared; commas at save time.
-    (r"^LAeq (.+) dB\nLCeq (.+) dB\nC - A = (.+) dB$",
-     "LAeq \\1 dB\nLCeq \\2 dB\nC - A = \\3 dB"),
-    (r"^steady noise:  L10 - L90 = (.+) dB   \|   LAeq - L50 = (.+) dB$",
-     r"ruido estacionario:  L10 - L90 = \1 dB   |   LAeq - L50 = \2 dB"),
-    ((r"^quiet background, three events:  L10 - L90 = (.+) dB   \|   "
-      r"LAeq - L50 = (.+) dB$"),
-     ("fondo silencioso, tres eventos:  L10 - L90 = \\1 dB   |   "
-      "LAeq - L50 = \\2 dB")),
-    (r"^LAE = (.+) dB: the whole event energy in 1 s$",
-     r"LAE = \1 dB: toda la energía del evento en 1 s"),
+    (r"^\$L_\{eq\}\$ \(energy mean\) = (\d+) dB$",
+     r"$L_{eq}$ (media energética) = \1 dB"),
+    (r"^\$L_\{Aeq\}\$ = (\d+)\.(\d+) dB \(both\)$",
+     r"$L_{Aeq}$ = \1,\2 dB (ambos)"),
+    # The slm_level_track and ln_levels_example legend lines: the symbols are
+    # shared, and the "$" blocks the save-time comma pass, so it is baked in.
+    (r"^\$L_\{Aeq\}\$ = (\d+)\.(\d+) dB$", r"$L_{Aeq}$ = \1,\2 dB"),
+    (r"^\$L_\{(\d+)\}\$ = (\d+)\.(\d+) dB$", r"$L_{\1}$ = \2,\3 dB"),
+    # c_minus_a_spectrum info box: level symbols shared; commas baked in.
+    ((r"^\$L_\{Aeq\}\$ (\d+)\.(\d+) dB\n\$L_\{Ceq\}\$ (\d+)\.(\d+) dB\n"
+      r"C − A = (−?\d+)\.(\d+) dB$"),
+     ("$L_{Aeq}$ \\1,\\2 dB\n$L_{Ceq}$ \\3,\\4 dB\nC − A = \\5,\\6 dB")),
+    ((r"^steady noise:  \$L_\{10\} - L_\{90\}\$ = (\d+)\.(\d+) dB   \|   "
+      r"\$L_\{Aeq\} - L_\{50\}\$ = (−?\d+)\.(\d+) dB$"),
+     ("ruido estacionario:  $L_{10} - L_{90}$ = \\1,\\2 dB   |   "
+      "$L_{Aeq} - L_{50}$ = \\3,\\4 dB")),
+    ((r"^quiet background, three events:  \$L_\{10\} - L_\{90\}\$ = "
+      r"(\d+)\.(\d+) dB   \|   \$L_\{Aeq\} - L_\{50\}\$ = (−?\d+)\.(\d+) dB$"),
+     ("fondo silencioso, tres eventos:  $L_{10} - L_{90}$ = \\1,\\2 dB   |   "
+      "$L_{Aeq} - L_{50}$ = \\3,\\4 dB")),
+    (r"^\$L_\{AE\}\$ = (\d+)\.(\d+) dB: the whole event energy in 1 s$",
+     r"$L_{AE}$ = \1,\2 dB: toda la energía del evento en 1 s"),
+    # dose_exchange legend: the "$" blocks the comma pass, so it is baked in.
+    (r"^\$L_\{EX,8h\}\$ = (\d+) dB  \(\$E\$ = (\d+)\.(\d+) Pa²·h\)$",
+     r"$L_{EX,8h}$ = \1 dB  ($E$ = \2,\3 Pa²·h)"),
     (r"^Z \(unweighted\): bands sum to (.+) dB$",
      r"Z (sin ponderar): las bandas suman \1 dB"),
     (r"^A-weighted: bands sum to (.+) dB$",
@@ -5280,9 +5294,14 @@ _ES_PATTERNS = [
     # Filters: bank order, pole radius and streaming seams (computed values).
     (r"^measured band levels, order (\d+)$",
      r"niveles de banda medidos, orden \1"),
-    (r"^Designed at (.+) kHz\n1 - r = (.+)$", r"Diseñada a \1 kHz\n1 - r = \2"),
-    (r"^As the bank realizes it, at (.+) Hz\n1 - r = (.+)$",
-     r"Tal como la realiza el banco, a \1 Hz\n1 - r = \2"),
+    # pole_migration titles: the mantissa sits inside math, so its decimal
+    # comma is baked as {,} (the "$" blocks the save-time comma pass).
+    (r"^Designed at (\d+) kHz\n\$1 - r = (\d)\.(\d)\\times10\^\{(-?\d+)\}\$$",
+     "Diseñada a \\1 kHz\n$1 - r = \\2{,}\\3\\\\times10^{\\4}$"),
+    ((r"^As the bank realizes it, at (\d+) Hz\n"
+      r"\$1 - r = (\d)\.(\d)\\times10\^\{(-?\d+)\}\$$"),
+     ("Tal como la realiza el banco, a \\1 Hz\n"
+      "$1 - r = \\2{,}\\3\\\\times10^{\\4}$")),
     ((r"^The (.+) Hz one-third-octave band, before and after decimation "
       r"by (\d+)$"),
      r"La banda de tercio de octava de \1 Hz, antes y después de diezmar por \2"),
