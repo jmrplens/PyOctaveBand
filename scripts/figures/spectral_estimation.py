@@ -20,6 +20,7 @@ from phonometry._plot.common import (
     theme_line,
 )
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -304,8 +305,10 @@ def generate_noise_colors(output_dir: str) -> None:
                     linewidth=1.0)
         ax.semilogx(freqs, 3.0103 * alpha * np.log2(freqs / 1000.0),
                     color=color, linestyle="--", linewidth=1.8,
-                    label=f"{name}: measured {slope:+.4f}, "
-                          f"exact {3.0103 * alpha:+.4f} dB/octave")
+                    label=(f"{name}: measured "
+                           f"{_fmt_minus(slope, '+.4f')}, exact "
+                           f"{_fmt_minus(3.0103 * alpha, '+.4f')} "
+                           f"dB/octave"))
     ax.set_xlim(20.0, 20000.0)
     ax.set_ylim(-42.0, 48.0)
     format_frequency_axis(ax, 20.0, 20000.0)
@@ -448,8 +451,8 @@ def generate_window_functions_tradeoff(output_dir: str) -> None:
         shown = bins <= 16.0
         ax.plot(bins[shown], level[shown], color=color, linestyle=style,
                 linewidth=1.4, alpha=0.9,
-                label=(f"{name}: ENBW {res.enbw_bins:.2f} bins, "
-                       f"sidelobe {res.highest_sidelobe_db:.1f} dB"))
+                label=(f"{name}: ENBW {res.enbw_bins:.2f} bins, sidelobe "
+                       f"{_fmt_minus(res.highest_sidelobe_db, '.1f')} dB"))
     ax.set_xlim(0.0, 16.0)
     ax.set_ylim(-100.0, 5.0)
     ax.set_xlabel("Frequency offset [DFT bins]")

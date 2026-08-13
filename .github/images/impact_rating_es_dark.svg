@@ -558,7 +558,7 @@ L 293.811444 114.247698
     <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="58.065781" y="71.952641" transform="rotate(-0 58.065781 71.952641)">Suma de desviaciones desfavorables = 28,0 dB  (límite 32,0 dB)</text>
    </g>
    <g id="text_29">
-    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="58.065781" y="96.797841" transform="rotate(-0 58.065781 96.797841)">Ln,w = 79 dB ; CI = -11 dB</text>
+    <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="58.065781" y="96.797841" transform="rotate(-0 58.065781 96.797841)">Ln,w = 79 dB ; CI = −11 dB</text>
    </g>
    <g id="text_30">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="320.325781" y="16.318125" transform="rotate(-0 320.325781 16.318125)">Nivel de ruido de impactos normalizado y ponderado (ISO 717-2, ejemplo del Anexo C)</text>

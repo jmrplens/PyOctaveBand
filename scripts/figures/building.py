@@ -147,7 +147,8 @@ def generate_impact_rating(output_dir: str) -> None:
         (0.97, f"Reference curve shifted by {shift} dB"),
         (0.90, (f"Sum of unfavourable deviations = {result.unfavourable_sum:.1f}"
                f" dB  (limit 32.0 dB)")),
-        (0.83, f"Ln,w = {result.rating} dB ; CI = {result.ci:+d} dB"),
+        (0.83, (f"Ln,w = {result.rating} dB ; "
+               f"CI = {_fmt_minus(result.ci, '+d')} dB")),
     ):
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
@@ -662,8 +663,10 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Rw(C;Ctr) = {ext.rating:g}({ext.c:g};{ext.ctr:g})",
-        f"C50-5000 = {ext.c_50_5000:g},  Ctr,50-5000 = {ext.ctr_50_5000:g}",
+        (f"Rw(C;Ctr) = {ext.rating:g}"
+         f"({_fmt_minus(ext.c, 'g')};{_fmt_minus(ext.ctr, 'g')})"),
+        (f"C50-5000 = {_fmt_minus(ext.c_50_5000, 'g')},  "
+         f"Ctr,50-5000 = {_fmt_minus(ext.ctr_50_5000, 'g')}"),
         "rating on the core bands, terms on the full range",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,

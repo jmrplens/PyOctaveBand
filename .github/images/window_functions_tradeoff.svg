@@ -2929,53 +2929,53 @@ L 699.385625 28.318125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 458.665156 89.520937 
+     <path d="M 454.370469 89.520937 
 L 693.085625 89.520937 
 Q 694.885625 89.520937 694.885625 87.720937 
 L 694.885625 34.618125 
 Q 694.885625 32.818125 693.085625 32.818125 
-L 458.665156 32.818125 
-Q 456.865156 32.818125 456.865156 34.618125 
-L 456.865156 87.720937 
-Q 456.865156 89.520937 458.665156 89.520937 
+L 454.370469 32.818125 
+Q 452.570469 32.818125 452.570469 34.618125 
+L 452.570469 87.720937 
+Q 452.570469 89.520937 454.370469 89.520937 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_35">
-     <path d="M 460.465156 40.106719 
-L 469.465156 40.106719 
-L 478.465156 40.106719 
+     <path d="M 456.170469 40.106719 
+L 465.170469 40.106719 
+L 474.170469 40.106719 
 " style="fill: none; stroke: #000000; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="485.665156" y="43.256719" transform="rotate(-0 485.665156 43.256719)">boxcar: ENBW 1.00 bins, sidelobe -13.3 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="481.370469" y="43.256719" transform="rotate(-0 481.370469 43.256719)">boxcar: ENBW 1.00 bins, sidelobe −13.3 dB</text>
     </g>
     <g id="line2d_36">
-     <path d="M 460.465156 53.607422 
-L 469.465156 53.607422 
-L 478.465156 53.607422 
+     <path d="M 456.170469 53.607422 
+L 465.170469 53.607422 
+L 474.170469 53.607422 
 " style="fill: none; stroke: #1f77b4; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="485.665156" y="56.757422" transform="rotate(-0 485.665156 56.757422)">hann: ENBW 1.50 bins, sidelobe -31.5 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="481.370469" y="56.757422" transform="rotate(-0 481.370469 56.757422)">hann: ENBW 1.50 bins, sidelobe −31.5 dB</text>
     </g>
     <g id="line2d_37">
-     <path d="M 460.465156 67.108125 
-L 469.465156 67.108125 
-L 478.465156 67.108125 
+     <path d="M 456.170469 67.108125 
+L 465.170469 67.108125 
+L 474.170469 67.108125 
 " style="fill: none; stroke: #d62728; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="485.665156" y="70.258125" transform="rotate(-0 485.665156 70.258125)">hamming: ENBW 1.36 bins, sidelobe -42.7 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="481.370469" y="70.258125" transform="rotate(-0 481.370469 70.258125)">hamming: ENBW 1.36 bins, sidelobe −42.7 dB</text>
     </g>
     <g id="line2d_38">
-     <path d="M 460.465156 80.608828 
-L 469.465156 80.608828 
-L 478.465156 80.608828 
+     <path d="M 456.170469 80.608828 
+L 465.170469 80.608828 
+L 474.170469 80.608828 
 " style="fill: none; stroke: #2ca02c; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="485.665156" y="83.758828" transform="rotate(-0 485.665156 83.758828)">blackman: ENBW 1.73 bins, sidelobe -58.1 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="481.370469" y="83.758828" transform="rotate(-0 481.370469 83.758828)">blackman: ENBW 1.73 bins, sidelobe −58.1 dB</text>
     </g>
    </g>
   </g>

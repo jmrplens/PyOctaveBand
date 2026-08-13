@@ -687,7 +687,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.set_xticks(np.arange(4))
     ax.set_xticklabels(labels, fontsize=12)
     for bar, value in zip(bars, values):
-        ax.annotate(f"{value:+.1f}",
+        ax.annotate(_fmt_minus(value, "+.1f"),
                     xy=(bar.get_x() + bar.get_width() / 2.0, value),
                     xytext=(0, 5 if value >= 0 else -14),
                     textcoords="offset points", ha="center", fontsize=10,
@@ -843,7 +843,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        f"Rw(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
+        f"Rw(C;Ctr) = {w.rating}({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB",
         "6 mm float glass, m'' = 15 kg/m², η = 0.024",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,

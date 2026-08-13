@@ -21,6 +21,7 @@ from scipy import signal as scipy_signal
 from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
+from .i18n import _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -1716,10 +1717,12 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
     ax_a.bar(x - 0.19, two_fm, 0.36, color=COLOR_PRIMARY, label="at 2 f_m")
     ax_a.bar(x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label="at 4 f_m")
     for xi, value in zip(x - 0.19, two_fm):
-        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+        ax_a.annotate(_fmt_minus(value, ".0f"), (xi, value),
+                      ha="center", va="top",
                       fontsize=9, xytext=(0, -4), textcoords="offset points")
     for xi, value in zip(x + 0.19, four_fm):
-        ax_a.annotate(f"{value:.0f}", (xi, value), ha="center", va="top",
+        ax_a.annotate(_fmt_minus(value, ".0f"), (xi, value),
+                      ha="center", va="top",
                       fontsize=9, xytext=(0, -4), textcoords="offset points")
     ax_a.set_title("Relative attenuation out of band", fontweight="bold",
                    pad=12)

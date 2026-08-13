@@ -12248,7 +12248,7 @@ L 73.955469 77.703789
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.8"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="80.678789" transform="rotate(-0 80.755469 80.678789)">pink: measured -3.0069, exact -3.0103 dB/octave</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="80.678789" transform="rotate(-0 80.755469 80.678789)">pink: measured −3.0069, exact −3.0103 dB/octave</text>
     </g>
     <g id="line2d_95">
      <path d="M 56.955469 90.454453 
@@ -12257,7 +12257,7 @@ L 73.955469 90.454453
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="93.429453" transform="rotate(-0 80.755469 93.429453)">red: measured -6.0180, exact -6.0206 dB/octave</text>
+     <text style="font-size: 8.5px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.755469" y="93.429453" transform="rotate(-0 80.755469 93.429453)">red: measured −6.0180, exact −6.0206 dB/octave</text>
     </g>
    </g>
   </g>

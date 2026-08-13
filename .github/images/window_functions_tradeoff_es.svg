@@ -2929,53 +2929,53 @@ L 699.785625 28.798125
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 437.674688 91.440938 
+     <path d="M 433.38 91.440938 
 L 693.485625 91.440938 
 Q 695.285625 91.440938 695.285625 89.640938 
 L 695.285625 35.098125 
 Q 695.285625 33.298125 693.485625 33.298125 
-L 437.674688 33.298125 
-Q 435.874688 33.298125 435.874688 35.098125 
-L 435.874688 89.640938 
-Q 435.874688 91.440938 437.674688 91.440938 
+L 433.38 33.298125 
+Q 431.58 33.298125 431.58 35.098125 
+L 431.58 89.640938 
+Q 431.58 91.440938 433.38 91.440938 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_35">
-     <path d="M 439.474688 40.946719 
-L 448.474688 40.946719 
-L 457.474688 40.946719 
+     <path d="M 435.18 40.946719 
+L 444.18 40.946719 
+L 453.18 40.946719 
 " style="fill: none; stroke: #000000; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="464.674688" y="44.096719" transform="rotate(-0 464.674688 44.096719)">boxcar: ENBW 1,00 bins, lóbulo lateral -13,3 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="460.38" y="44.096719" transform="rotate(-0 460.38 44.096719)">boxcar: ENBW 1,00 bins, lóbulo lateral −13,3 dB</text>
     </g>
     <g id="line2d_36">
-     <path d="M 439.474688 54.807422 
-L 448.474688 54.807422 
-L 457.474688 54.807422 
+     <path d="M 435.18 54.807422 
+L 444.18 54.807422 
+L 453.18 54.807422 
 " style="fill: none; stroke: #1f77b4; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="464.674688" y="57.957422" transform="rotate(-0 464.674688 57.957422)">hann: ENBW 1,50 bins, lóbulo lateral -31,5 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="460.38" y="57.957422" transform="rotate(-0 460.38 57.957422)">hann: ENBW 1,50 bins, lóbulo lateral −31,5 dB</text>
     </g>
     <g id="line2d_37">
-     <path d="M 439.474688 68.668125 
-L 448.474688 68.668125 
-L 457.474688 68.668125 
+     <path d="M 435.18 68.668125 
+L 444.18 68.668125 
+L 453.18 68.668125 
 " style="fill: none; stroke: #d62728; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="464.674688" y="71.818125" transform="rotate(-0 464.674688 71.818125)">hamming: ENBW 1,36 bins, lóbulo lateral -42,7 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="460.38" y="71.818125" transform="rotate(-0 460.38 71.818125)">hamming: ENBW 1,36 bins, lóbulo lateral −42,7 dB</text>
     </g>
     <g id="line2d_38">
-     <path d="M 439.474688 82.528828 
-L 448.474688 82.528828 
-L 457.474688 82.528828 
+     <path d="M 435.18 82.528828 
+L 444.18 82.528828 
+L 453.18 82.528828 
 " style="fill: none; stroke: #2ca02c; stroke-opacity: 0.9; stroke-width: 1.4; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="464.674688" y="85.678828" transform="rotate(-0 464.674688 85.678828)">blackman: ENBW 1,73 bins, lóbulo lateral -58,1 dB</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="460.38" y="85.678828" transform="rotate(-0 460.38 85.678828)">blackman: ENBW 1,73 bins, lóbulo lateral −58,1 dB</text>
     </g>
    </g>
   </g>
