@@ -170,13 +170,13 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
                         edgecolor=COLOR_FG, lw=0.8, hatch="///")
         ax.tick_params(labelsize=7)
     ax_p.tick_params(labelbottom=False)
-    ax_r.set_xlabel("x [m]", fontsize=8)
+    ax_r.set_xlabel("$x$ [m]", fontsize=8)
     ax_p.set_ylabel(T("instantaneous pressure"), fontsize=9)
     ax_r.set_ylabel(T("RMS level: interference lobes"), fontsize=8)
     # Source, ghosted image source and the mirror geometry.
     ax_p.plot([1.6], [_GROUND_H], marker="o", ms=5, color=COLOR_TERTIARY,
               markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
-    ax_p.text(1.95, 1.65, T("source (h = 1.5 m)"), ha="left", va="center",
+    ax_p.text(1.95, 1.65, T("source ($h$ = 1.5 m)"), ha="left", va="center",
               color=FIELD_INK, fontsize=7.5, path_effects=outline)
     ax_p.plot([1.6], [-_GROUND_H], marker="o", ms=5, mfc="none",
               color=COLOR_TERTIARY, alpha=0.85)
@@ -188,7 +188,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
               va="center", color=COLOR_FG, fontsize=7.5, bbox=hatch_box)
     ax_p.text(13.5, -0.95, T("rigid ground"), ha="right", va="center",
               color=COLOR_FG, fontsize=6.5, bbox=hatch_box)
-    ax_p.text(0.3, 7.6, f"f = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
+    ax_p.text(0.3, 7.6, f"$f$ = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
               color=FIELD_INK, fontsize=8, path_effects=outline)
     # Sampling arc and the receiver sitting in the first-order dip.
     ax_r.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.6)
@@ -205,7 +205,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     _grid_axes(ax_l)
     ax_l.set_title(T("Level on the 8 m arc"), fontsize=10,
                    fontweight="bold")
-    ax_l.set_xlabel(T("elevation angle θ [°]"), fontsize=8)
+    ax_l.set_xlabel(T(r"elevation angle $\theta$ [°]"), fontsize=8)
     ax_l.set_ylabel(T("level [dB re max]"), fontsize=8)
     ax_l.set_xlim(0.0, 63.0)
     ax_l.set_ylim(_GROUND_ARC_BOTTOM, _GROUND_ARC_TOP)
@@ -255,7 +255,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
         verdict_txt.set_text(
             T("dips land exactly on the predicted nulls")
             if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1000.0:4.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (im_p, im_r, l_sim, verdict_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_ground_effect",

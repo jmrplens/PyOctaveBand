@@ -143,8 +143,8 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
     fig.suptitle(T("Expansion-chamber silencer: pass band vs stop band "
                    "(2D FDTD)"), fontweight="bold")
     axes = fig.subplots(2, 1, sharex=True)
-    titles = [T(f"Pass band: {f_pass:.0f} Hz, kL = π"),
-              T(f"Stop band peak: {f_peak:.0f} Hz, kL = π/2")]
+    titles = [T(f"Pass band: {f_pass:.0f} Hz, $kL = \\pi$"),
+              T(f"Stop band peak: {f_peak:.0f} Hz, $kL = \\pi/2$")]
     verdicts = [T("the chamber is acoustically invisible"),
                 T("the mismatch reflects the wave back up the pipe")]
     ims: list[Any] = []
@@ -161,7 +161,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
         _anim_chamber_hardware(ax, length, height, pipe_y,
                                (0.55, 0.55 + _CHAMBER_L))
         ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
-        ax.text(0.005, env_base - 0.008, "|p| envelope", fontsize=7.5,
+        ax.text(0.005, env_base - 0.008, "$|p|$ envelope", fontsize=7.5,
                 ha="left", va="top", color=COLOR_FG, alpha=0.8)
         # The settled envelope, static: the clip captures steady state.
         ax.plot(x_env[env_from:],
@@ -199,7 +199,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
                 T(f"TL = {tl:.1f} dB at {f:.0f} Hz")
                 if k >= reveal else "")
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1e3:5.1f} ms"))
         return (*ims, *tl_txts, *v_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_expansion_chamber",
@@ -242,5 +242,5 @@ def _anim_chamber_hardware(ax: Any, length: float, height: float,
     ax.text(length + 0.045, pipe_y[0] - 0.02, "anechoic termination",
             ha="right", va="top", fontsize=7.5)
     ax.text(0.5 * (x0 + x1), height + wall + 0.006,
-            f"L = {_CHAMBER_L:.2f} m · m = {_CHAMBER_M:.0f}", ha="center",
-            va="bottom", fontsize=7.5, color=COLOR_FG)
+            f"$L$ = {_CHAMBER_L:.2f} m · $m$ = {_CHAMBER_M:.0f}",
+            ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)

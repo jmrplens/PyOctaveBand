@@ -398,7 +398,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
     x_vis = np.where(on, np.sin(2 * np.pi * 4.0 * t), 0.0)
     ax_s.plot(0.6 + 8.8 * t[::4] / 4.0, 8.2 + 0.7 * x_vis[::4],
               color=COLOR_PRIMARY, lw=1.0, alpha=0.9)
-    ax_s.text(9.4, 9.05, T("input x(t)"), ha="right", va="bottom",
+    ax_s.text(9.4, 9.05, T("input $x(t)$"), ha="right", va="bottom",
               color=COLOR_FG, fontsize=9)
     (strip_cur,) = ax_s.plot([0.6, 0.6], [7.4, 9.0], color=COLOR_FG,
                              lw=1.2, alpha=0.7)
@@ -415,7 +415,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
               color=COLOR_FG, fontsize=8.5)
     ax_s.plot([2.7, 3.2], [5.6, 5.6], **wire)
     _draw_resistor(ax_s, 3.2, 5.0, 5.6)
-    ax_s.text(4.1, 6.1, "R", ha="center", va="bottom", color=COLOR_FG,
+    ax_s.text(4.1, 6.1, "$R$", ha="center", va="bottom", color=COLOR_FG,
               fontsize=11)
     ax_s.plot([5.0, 8.1], [5.6, 5.6], **wire)
     ax_s.plot([6.3], [5.6], marker="o", ms=4, color=COLOR_FG)
@@ -429,7 +429,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
     ax_s.plot([6.3, 6.3], [5.6, 4.7], **wire)
     ax_s.plot([5.6, 7.0], [4.7, 4.7], color=COLOR_FG, lw=2.2)
     ax_s.plot([5.6, 7.0], [3.2, 3.2], color=COLOR_FG, lw=2.2)
-    ax_s.text(7.2, 3.95, "C", ha="left", va="center", color=COLOR_FG,
+    ax_s.text(7.2, 3.95, "$C$", ha="left", va="center", color=COLOR_FG,
               fontsize=11)
     # tank walls, animated fill and a liquid-level line so partial charge
     # reads as partial even in a still frame
@@ -450,7 +450,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
     charge_arrow = _make_arrow(ax_s, COLOR_TERTIARY, scale=12.0)
     charge_txt = ax_s.text(4.95, 3.9, "", ha="right", va="center",
                            color=COLOR_FG, fontsize=8.5)
-    ax_s.text(5.0, 1.3, T("τ = RC sets attack and decay"), ha="center",
+    ax_s.text(5.0, 1.3, T(r"$\tau = RC$ sets attack and decay"), ha="center",
               va="center", color=COLOR_FG, fontsize=9)
     ax_s.text(5.0, 0.6, "F 125 ms · S 1000 ms · I 35/1500 ms", ha="center",
               va="center", color=COLOR_FG, fontsize=8.5, alpha=0.85)
@@ -556,7 +556,7 @@ def animate_onset_detection(output_dir: str) -> None:
     ax.set_xlim(0.55, 3.0)
     ax.set_ylim(42, 100)
     ax.plot(t, laf, color=COLOR_PRIMARY, lw=1.8,
-            label=T("L_AF (A-weighted, Fast)"))
+            label=T("$L_{AF}$ (A-weighted, Fast)"))
     (hot,) = ax.plot([], [], color=COLOR_SECONDARY, lw=4.0,
                      solid_capstyle="round", label=T("onset (> 10 dB/s)"))
     rx, ry = 0.13, 6.5
@@ -572,12 +572,12 @@ def animate_onset_detection(output_dir: str) -> None:
     # into the bottom-left corner where this caption is anchored, so the
     # caption is drawn above it and haloed: the handle is the same ink as the
     # text, and crossing it whole reads as a struck-through word.
-    ax.text(0.02, 0.05, T("detector: onset when dL/dt > 10 dB/s"),
+    ax.text(0.02, 0.05, T("detector: onset when $dL/dt > 10$ dB/s"),
             transform=ax.transAxes, ha="left", va="bottom", color=COLOR_FG,
             fontsize=9, zorder=8, path_effects=_halo(3.0))
     ax.set_title(T("Impulse onset detection (NT ACOU 112)"), fontweight="bold")
     ax.set_xlabel(T("Time [s]"))
-    ax.set_ylabel(T("A-weighted level L_AF [dB]"), fontsize=9)
+    ax.set_ylabel(T("A-weighted level $L_{AF}$ [dB]"), fontsize=9)
     ax.legend(loc="upper right", fontsize=8)
 
     ax_b = fig.add_subplot(gs[1])
@@ -593,11 +593,11 @@ def animate_onset_detection(output_dir: str) -> None:
     verdict = ax_b.text(5.0, 0.28, "", ha="center", va="center",
                         color=COLOR_SECONDARY, fontsize=10, fontweight="bold")
     values = (f"OR = {onset_rate:.0f} dB/s", f"LD = {level_diff:.0f} dB",
-              f"P = {prom:.1f}", f"KI = {ki:.1f} dB")
+              f"$P$ = {prom:.1f}", f"KI = {ki:.1f} dB")
 
     # How far the readout reaches either side of the lens it is centred on,
     # measured on the widest gradient the sweep ever shows.
-    lens_txt.set_text(T(f"dL/dt = {onset_rate:.0f} dB/s"))
+    lens_txt.set_text(T(f"$dL/dt$ = {onset_rate:.0f} dB/s"))
     txt_half = _half_width(fig, ax, lens_txt)
     lens_txt.set_text("")
 
@@ -637,7 +637,7 @@ def animate_onset_detection(output_dir: str) -> None:
         lens_txt.set_position((x_txt, y0 + ry * 1.35))
         # A gradient of -0.3 dB/s rounds to "-0", a sign in front of a zero.
         lens_txt.set_text(
-            T(f"dL/dt = {_fmt_minus(g if round(g) else 0.0, '.0f')} dB/s"))
+            T(f"$dL/dt$ = {_fmt_minus(g if round(g) else 0.0, '.0f')} dB/s"))
         lens_txt.set_color(color)
         hot_m = (t <= tc) & is_onset
         hot.set_data(t[hot_m], laf[hot_m])
@@ -672,7 +672,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
         (T("Standing wave — reactive"), np.pi / 2, T("p and u 90° apart")),
     ]
     fig = _anim_figure()
-    fig.suptitle(T("Two-microphone p-p probe: instantaneous intensity p·u"),
+    fig.suptitle(T(r"Two-microphone p-p probe: instantaneous intensity $p\cdot u$"),
                  fontweight="bold")
     gs = fig.add_gridspec(2, 2, height_ratios=[1.15, 1.0])
     dial_c, dial_r = (1.55, 3.05), 1.25
@@ -686,10 +686,10 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                               edgecolor=COLOR_GRID, lw=1.2))
         p_ph = _make_arrow(ax_s, COLOR_PRIMARY, scale=11.0)
         u_ph = _make_arrow(ax_s, COLOR_TERTIARY, scale=11.0)
-        ax_s.text(dial_c[0] - dial_r - 0.15, dial_c[1] + dial_r - 0.15, "p",
+        ax_s.text(dial_c[0] - dial_r - 0.15, dial_c[1] + dial_r - 0.15, "$p$",
                   color=COLOR_PRIMARY, fontsize=11, ha="right", va="center",
                   fontweight="bold")
-        ax_s.text(dial_c[0] - dial_r - 0.15, dial_c[1] - dial_r + 0.15, "u",
+        ax_s.text(dial_c[0] - dial_r - 0.15, dial_c[1] - dial_r + 0.15, "$u$",
                   color=COLOR_TERTIARY, fontsize=11, ha="right", va="center",
                   fontweight="bold")
         # Tucked up under the phasor dial so it clears the intensity
@@ -701,7 +701,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
         ax_s.annotate("", xy=(6.85, 2.6), xytext=(5.15, 2.6),
                       arrowprops={"arrowstyle": "<->", "color": COLOR_FG,
                                   "lw": 1.0})
-        ax_s.text(6.0, 2.38, T("spacer Δr"), ha="center", va="top",
+        ax_s.text(6.0, 2.38, T(r"spacer $\Delta r$"), ha="center", va="top",
                   color=COLOR_FG, fontsize=8.5)
         ax_s.plot([3.4, 8.6], [i_axis_y, i_axis_y], color=COLOR_GRID,
                   lw=1.0, ls="--")
@@ -713,11 +713,11 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                   color=COLOR_FG, fontsize=10, alpha=0.8)
         ax_s.text(8.85, i_axis_y, "+", ha="left", va="center",
                   color=COLOR_FG, fontsize=10, alpha=0.8)
-        ax_s.text(3.4, 1.55, T("I(t) = p·u"), ha="left", va="bottom",
+        ax_s.text(3.4, 1.55, T(r"$I(t) = p\cdot u$"), ha="left", va="bottom",
                   color=COLOR_SECONDARY, fontsize=9)
         i_arrow = _make_arrow(ax_s, COLOR_SECONDARY, scale=16.0)
         (mean_marker,) = ax_s.plot([], [], marker="^", ms=7, color=COLOR_FG)
-        mean_lab = ax_s.text(6.0, 0.42, "⟨I⟩", ha="center", va="top",
+        mean_lab = ax_s.text(6.0, 0.42, r"$\langle I\rangle$", ha="center", va="top",
                              color=COLOR_FG, fontsize=8.5)
 
         ax_tr = fig.add_subplot(gs[1, col])
@@ -727,15 +727,15 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
         p_sig = np.cos(w * t)
         u_sig = np.cos(w * t - phi)
         ax_tr.plot(t, p_sig, color=COLOR_PRIMARY, alpha=0.55, lw=1.1,
-                   label=T("pressure p"))
+                   label=T("pressure $p$"))
         # Dashed, because in the progressive panel p and u are the same
         # normalised curve: drawn solid, the velocity covers the pressure
         # pixel for pixel and the legend announces a blue trace that is
         # nowhere on the page.
         ax_tr.plot(t, u_sig, color=COLOR_TERTIARY, alpha=0.55, lw=1.3,
-                   ls=(0, (5, 3)), label=T("velocity u"))
+                   ls=(0, (5, 3)), label=T("velocity $u$"))
         (iline,) = ax_tr.plot([], [], color=COLOR_SECONDARY, lw=2.0,
-                              label=T("intensity p·u"))
+                              label=T(r"intensity $p\cdot u$"))
         mline = ax_tr.axhline(0.0, color=COLOR_FG, ls="--", lw=1.1, alpha=0.7)
         txt = ax_tr.text(0.5, 0.02, "", transform=ax_tr.transAxes,
                          ha="center", va="bottom", family="monospace",
@@ -795,7 +795,8 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                                                color=COLOR_SECONDARY,
                                                alpha=0.22)
             pn["mline"].set_ydata([mean, mean])
-            pn["txt"].set_text(T(f"⟨p·u⟩ = {_fmt_minus(mean, '+.2f')}"))
+            pn["txt"].set_text(
+                T(rf"$\langle p\cdot u\rangle$ = {_fmt_minus(mean, '+.2f')}"))
             arts += [pn["p_ph"], pn["u_ph"], pn["i_arrow"],
                      pn["mean_marker"], pn["mean_lab"],
                      pn["iline"], pn["fill"], pn["mline"], pn["txt"]]
@@ -879,7 +880,7 @@ def animate_schroeder(output_dir: str) -> None:
     ax_e.set_ylabel(T("Level [dB]"), fontsize=9)
     ax_e.legend(handles=[
         Patch(facecolor="gray", alpha=0.4,
-              label=T("squared impulse response p²")),
+              label=T("squared impulse response $p^2$")),
         Patch(facecolor=COLOR_SECONDARY, alpha=fill_alpha,
               label=T("tail energy") + r"  $E(t)=\int_t^{\infty}p^2\,d\tau$"),
     ], loc="upper right", fontsize=8.5)
@@ -1070,7 +1071,7 @@ def animate_flanking_paths(output_dir: str) -> None:
                 _set_wavefronts(pn["arcs"], [0.0] * 3, 1.0)
                 if pn["key"] != "Dd" and 0.35 < frac < 0.75:
                     junc_txt.set_text(
-                        T("junction: Kij attenuates each transfer"))
+                        T(r"junction: $K_{ij}$ attenuates each transfer"))
             else:
                 pn["pulse"].set_visible(False)
                 age = (tc - t0) - travel
@@ -1080,7 +1081,7 @@ def animate_flanking_paths(output_dir: str) -> None:
                 lab.set_color(pn["color"])
             arts += [pn["pulse"], pn["trail"], *pn["arcs"], lab]
         verdict.set_text(
-            T("R'w sums all paths — always below the wall alone")
+            T("$R\u2032_w$ sums all paths — always below the wall alone")
             if tc >= 9.4 else "")
         arts += [junc_txt, verdict]
         return tuple(arts)
@@ -1194,7 +1195,7 @@ def animate_intensity_scan_power(output_dir: str) -> None:
         arr.set_positions((xa, ya), (xa, ya + ln))
         arr.set_visible(False)
         ad["arrow"] = arr
-    ax.text(0.15, 6.25, T("normal intensity I·n on the surface"),
+    ax.text(0.15, 6.25, T(r"normal intensity $I\cdot n$ on the surface"),
             ha="left", va="top", color=COLOR_SECONDARY, fontsize=9)
 
     # Right column: per-face partial powers into the L_W meter.
@@ -1284,7 +1285,7 @@ def animate_intensity_scan_power(output_dir: str) -> None:
                                (lw_now - gauge_lo) / (gauge_hi - gauge_lo),
                                T(f"{lw_now:.1f} dB"))
         verdict.set_text(
-            T("any enclosing surface gives the same P") if acc >= 0.999
+            T("any enclosing surface gives the same $P$") if acc >= 0.999
             else "")
         arts.append(verdict)
         return tuple(arts)
@@ -1418,7 +1419,7 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
             age = (tc * 2.2) % 1.0
             _set_wavefronts(arcs, [11.5 * ((age + 0.25 * i) % 1.0)
                                    for i in range(4)], 11.5, color=col)
-            freq_txt.set_text(f"f = {f_now:5.0f} Hz")
+            freq_txt.set_text(f"$f$ = {f_now:5.0f} Hz")
         else:
             _set_wavefronts(arcs, [0.0] * 4, 1.0)
             freq_txt.set_text("")
@@ -1478,7 +1479,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     z = np.arange(1, 241) * 0.1
 
     fig = _anim_figure()
-    fig.suptitle(T("Specific loudness N'(z) and its integral (ISO 532-1)"),
+    fig.suptitle(T("Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)"),
                  fontweight="bold")
     gs = fig.add_gridspec(1, 2, width_ratios=[2.1, 1.0])
     ax = fig.add_subplot(gs[0])
@@ -1486,8 +1487,8 @@ def animate_specific_loudness(output_dir: str) -> None:
     ax.set_xlim(0.0, 24.0)
     # headroom above the 85 dB pattern (max N' ~ 5.4 sone/Bark)
     ax.set_ylim(0.0, 6.0)
-    ax.set_xlabel(T("Critical-band rate z [Bark]"))
-    ax.set_ylabel(T("Specific loudness N' [sone/Bark]"), fontsize=9)
+    ax.set_xlabel(T("Critical-band rate $z$ [Bark]"))
+    ax.set_ylabel(T("Specific loudness $N\u2032$ [sone/Bark]"), fontsize=9)
     (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=2.2)
     fill = {"art": None}
     ax.axvline(8.5, color=COLOR_FG, lw=0.9, ls=":", alpha=0.6)
@@ -1511,7 +1512,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     _draw_speaker(ax_m, 0.55, 7.7, size=0.7)
     ax_m.text(1.15, 7.7, T("1 kHz narrowband"), ha="left", va="center",
               color=COLOR_FG, fontsize=8.5)
-    gauge = _make_gauge(ax_m, 2.0, 4.6, 1.05, "N", COLOR_SECONDARY,
+    gauge = _make_gauge(ax_m, 2.0, 4.6, 1.05, "$N$", COLOR_SECONDARY,
                         lo="0", hi=T("20 sone"))
     ax_m.text(2.0, 6.5, r"$N = \int_0^{24} N'(z)\, dz$", ha="center",
               va="bottom", color=COLOR_FG, fontsize=11)
@@ -1543,14 +1544,14 @@ def animate_specific_loudness(output_dir: str) -> None:
                                       color=COLOR_PRIMARY, alpha=0.3, lw=0)
         n_part = float(np.trapezoid(spec[m], z[m])) if m.any() else 0.0
         n_show = totals[lv] if z_lim >= 24.0 else n_part
-        level_txt.set_text(f"L = {lv} dB")
+        level_txt.set_text(f"$L$ = {lv} dB")
         spread.set_visible(lv >= 80)
         arts: list[Any] = [line, fill["art"], level_txt, spread]
         arts += _set_gauge(gauge, n_show / 20.0, T(f"{n_show:.1f} sone"))
         for j, (lv_s, box) in enumerate(zip(steps, step_boxes, strict=True)):
             done = (tc >= (int_t1, 5.2, 8.9)[j])
             if done:
-                _light_box(box, T(f"N = {totals[lv_s]:.1f} sone"),
+                _light_box(box, T(f"$N$ = {totals[lv_s]:.1f} sone"),
                            COLOR_SECONDARY if j == 2 else COLOR_PRIMARY,
                            fill=j == 2)
             else:
@@ -1619,7 +1620,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
         ax_a.plot([ca[0] + r_mic * np.cos(ang)],
                   [ca[1] + r_mic * np.sin(ang)], marker="o", ms=4,
                   color=COLOR_PRIMARY)
-    ax_a.text(ca[0], ca[1] - r_mic + 0.14, T("microphone sphere, r"),
+    ax_a.text(ca[0], ca[1] - r_mic + 0.14, T("microphone sphere, $r$"),
               ha="center", va="bottom", color=COLOR_PRIMARY, fontsize=8)
     arcs_a = _make_wavefronts(ax_a, *ca, COLOR_TERTIARY, n=4)
     note_a = ax_a.text(4.0, 0.92, T("direct sound only — no reflections"),
@@ -1715,8 +1716,8 @@ def animate_power_two_rooms(output_dir: str) -> None:
         arts += [room, mic_dot, note_a, note_r]
         # microphone readings appear, then each formula computes L_W
         if tc >= t_meter:
-            lp_a.set_text(T(f"mean Lp = {lp_free:.1f} dB"))
-            lp_r.set_text(T(f"mean Lp = {lp_diff:.1f} dB"))
+            lp_a.set_text(T(f"mean $L_p$ = {lp_free:.1f} dB"))
+            lp_r.set_text(T(f"mean $L_p$ = {lp_diff:.1f} dB"))
         else:
             lp_a.set_text("")
             lp_r.set_text("")
@@ -1737,7 +1738,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
             arr_a.set_visible(True)
             arr_r.set_visible(True)
             verdict.set_text(
-                T("the room changes Lp, not the source power"))
+                T("the room changes $L_p$, not the source power"))
         else:
             _dim_box(lw_box)
             arr_a.set_visible(False)
@@ -1809,7 +1810,7 @@ def animate_comb_filtering(output_dir: str) -> None:
     tau_ann = ax_t.annotate("", xy=(0.0, 0.9), xytext=(0.0, 0.9),
                             arrowprops={"arrowstyle": "<->",
                                         "color": COLOR_FG, "lw": 1.0})
-    tau_txt = ax_t.text(0.0, 0.98, "τ", ha="center", va="bottom",
+    tau_txt = ax_t.text(0.0, 0.98, r"$\tau$", ha="center", va="bottom",
                         color=COLOR_FG, fontsize=9)
     ax_t.text(0.97, 0.92, T("direct"), transform=ax_t.transAxes, ha="right",
               va="top", color=COLOR_PRIMARY, fontsize=8)
@@ -1860,7 +1861,7 @@ def animate_comb_filtering(output_dir: str) -> None:
         # three decimals keep the two readouts mutually consistent on
         # screen even for the near-zero floor geometry (Δ = c·τ)
         delta_txt.set_text(
-            T(f"Δ = {r2 - r1:.3f} m   τ = {tau * 1e3:.3f} ms"))
+            T(rf"$\Delta$ = {r2 - r1:.3f} m   $\tau$ = {tau * 1e3:.3f} ms"))
         # time domain: two arrivals separated by tau
         t1, t2 = r1 / c0 * 1e3, r2 / c0 * 1e3
         stem_d.set_data([t1, t1], [0.0, 1.0])
@@ -1918,7 +1919,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     phase = np.degrees(np.angle(response(freqs)))
 
     fig = _anim_figure()
-    fig.suptitle(T("Reading fr on the EN 29052-1 rig"), fontweight="bold")
+    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"), fontweight="bold")
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.0])
 
@@ -1945,7 +1946,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     force = ax_r.annotate("", xy=(1.2, y_arrow), xytext=(1.2, y_arrow),
                           arrowprops={"arrowstyle": "-|>", "lw": 2.6,
                                       "color": COLOR_SECONDARY})
-    ax_r.text(0.95, 3.58, T("F(t)"), ha="center", va="bottom",
+    ax_r.text(0.95, 3.58, T("$F(t)$"), ha="center", va="bottom",
               color=COLOR_SECONDARY, fontsize=10, family="monospace")
     ax_r.plot([1.2, 1.2], [y_arrow - 0.03, y_arrow + 0.03],
               color=COLOR_SECONDARY, lw=1.0)
@@ -1972,7 +1973,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     ax_m.set_xlim(f_lo - f_pad, f_hi + f_pad)
     ax_m.set_ylim(0.0, float(mag.max()) * 1.18)
     ax_m.set_ylabel(T("Response magnitude"), fontsize=9)
-    ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T("fr = 25 Hz"), ha="left",
+    ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T(r"$f_r$ = 25 Hz"), ha="left",
               va="top", color=COLOR_FG, fontsize=9)
     (dot_m,) = ax_m.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
 
@@ -2027,17 +2028,17 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
         dot_p.set_data([f], [np.degrees(np.angle(h))])
         deg = np.degrees(np.angle(h))
         if f < f_r - 3.0:
-            state = T("below fr: the plate follows the force")
+            state = T(r"below $f_r$: the plate follows the force")
         elif f <= f_r + 3.0:
-            state = T("at fr: a quarter cycle behind, amplitude peaks")
+            state = T(r"at $f_r$: a quarter cycle behind, amplitude peaks")
         else:
-            state = T("above fr: the plate moves against the force")
+            state = T(r"above $f_r$: the plate moves against the force")
         state_txt.set_text(state)
         # Translated whole, values included: assembled from an f-string and a
         # lone T("phase"), the readout kept the English decimal point through
         # the entire Spanish variant.
         drive_txt.set_text(
-            T(f"f = {f:4.1f} Hz    phase = "
+            T(f"$f$ = {f:4.1f} Hz    phase = "
               f"{_fmt_minus(deg, '6.1f')}\u00b0"))
         return (plate, plate_lbl, spec, spec_lbl, force, motion, dot_m, dot_p,
                 state_txt, drive_txt)
@@ -2172,7 +2173,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
     ax_e.set_xlabel(T("Time [s]"), fontsize=9)
     ax_e.set_ylabel(T("Intensity envelope, received mean = 1"), fontsize=9)
     ax_e.plot(t_env, tx, color=COLOR_MUTED, lw=1.2, ls="--",
-              label=T("transmitted, m = 1"))
+              label=T("transmitted, $m$ = 1"))
     (rx_line,) = ax_e.plot([], [], color=COLOR_PRIMARY, lw=2.4,
                            label=T("received"))
     ax_e.axhline(1.0, color=COLOR_FG, lw=0.9, ls="-.", alpha=0.55)
@@ -2200,8 +2201,8 @@ def animate_modulation_transfer(output_dir: str) -> None:
     ax_m.set_ylim(0.0, 1.05)
     ax_m.set_xticks([1.0, 10.0])
     ax_m.set_xticklabels(["1", "10"])
-    ax_m.set_xlabel(T("Modulation frequency F [Hz]"), fontsize=8.5)
-    ax_m.set_ylabel(T("m"), fontsize=8.5)
+    ax_m.set_xlabel(T("Modulation frequency $F$ [Hz]"), fontsize=8.5)
+    ax_m.set_ylabel(T("$m$"), fontsize=8.5)
     ax_m.tick_params(labelsize=8)
     (m_line,) = ax_m.plot([], [], color=COLOR_PRIMARY, lw=1.8, marker="o",
                           ms=3.4)
@@ -2252,7 +2253,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
             state = noi[round(frac * (len(noi) - 1))]
             head = (T(f"T60 = {_MTF_ACT2_T60:.2f} s")
                     + T(f"  SNR = {state['snr']:.0f} dB"))
-            act = T("Noise raises a floor under the same mean: m falls again")
+            act = T("Noise raises a floor under the same mean: $m$ falls again")
         rx = state["rx"]
         rx_line.set_data(t_env, rx)
         hi, lo = float(rx.max()), float(rx.min())
@@ -2267,7 +2268,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
                 t_env, 0.0, state["floor"], color=COLOR_TERTIARY, alpha=0.30,
                 lw=0)
         m_drawn = (hi - lo) / (hi + lo)
-        m_txt.set_text(head + "\n" + T(f"m({f_probe:.0f} Hz) = {m_drawn:.2f}"))
+        m_txt.set_text(head + "\n" + T(f"$m$({f_probe:.0f} Hz) = {m_drawn:.2f}"))
         ax_e.set_title(act, fontsize=9.5, fontstyle="italic", color=COLOR_FG)
         m_line.set_data(_MTF_MOD_FREQS, state["mtf"])
         m_dot.set_data([f_probe], [state["mtf"][_MTF_PROBE_INDEX]])
@@ -2440,7 +2441,7 @@ def animate_loudness_gating(output_dir: str) -> None:
     ax_v = fig.add_subplot(gs[1, :])
     _schematic_axes(ax_v, (0.0, 12.0), (0.0, 1.6))
     boxes = [
-        _flow_box(ax_v, 1.6, 0.8, 2.9, 1.15, T("Integrated I (gated)")),
+        _flow_box(ax_v, 1.6, 0.8, 2.9, 1.15, T("Integrated $I$ (gated)")),
         _flow_box(ax_v, 4.7, 0.8, 2.9, 1.15, T("Ungated energy mean")),
         _flow_box(ax_v, 7.8, 0.8, 2.9, 1.15, T("What the gate is worth")),
         _flow_box(ax_v, 10.7, 0.8, 2.5, 1.15, T("Blocks gated out")),
@@ -2657,7 +2658,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
     bars = ax_s.bar(xs, np.zeros(24), width=0.78, color=COLOR_PRIMARY,
                     alpha=0.85)
     (bg_line,) = ax_s.plot([], [], color=COLOR_SECONDARY, lw=1.8, ls="--",
-                           label=T("fitted background SPL''"))
+                           label=T(r"fitted background $\mathrm{SPL}''$"))
     excess_arrow = _make_arrow(ax_s, COLOR_SECONDARY, scale=9.0)
     excess_arrow.set_arrowstyle("<|-|>", head_length=0.55, head_width=0.32)
     # Anchored in axes coordinates, in the empty band above the spectrum:
@@ -2682,11 +2683,11 @@ def animate_epnl_flyover(output_dir: str) -> None:
     (pnl_line,) = ax_h.plot([], [], color=COLOR_MUTED, lw=1.6, marker="o",
                             ms=2.4, label=T("PNL"))
     (pnlt_line,) = ax_h.plot([], [], color=COLOR_PRIMARY, lw=2.0, marker="o",
-                             ms=2.4, label=T("PNLT = PNL + C"))
+                             ms=2.4, label=T(r"$\mathrm{PNLT} = \mathrm{PNL} + C$"))
     gap = {"art": None, "win": None}
     thr_line = ax_h.axhline(threshold, color=COLOR_SECONDARY, lw=1.2,
                             ls=":", visible=False)
-    thr_txt = ax_h.text(0.3, threshold + 0.8, T("PNLTM - 10 dB"), ha="left",
+    thr_txt = ax_h.text(0.3, threshold + 0.8, T(r"$\mathrm{PNLTM} - 10$ dB"), ha="left",
                         va="bottom", color=COLOR_SECONDARY, fontsize=8,
                         visible=False)
     (peak_dot,) = ax_h.plot([], [], ls="none", marker="v", ms=8.0,
@@ -2710,7 +2711,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
     (slant,) = ax_v.plot([], [], color=COLOR_PRIMARY, lw=1.0, ls=":")
     boxes = [
         _flow_box(ax_v, 8.7, 3.55, 6.4, 1.10, T("Peak PNLTM")),
-        _flow_box(ax_v, 8.7, 2.15, 6.4, 1.10, T("Duration correction D")),
+        _flow_box(ax_v, 8.7, 2.15, 6.4, 1.10, T("Duration correction $D$")),
         _flow_box(ax_v, 8.7, 0.75, 6.4, 1.10, T("EPNL")),
     ]
 
@@ -2748,8 +2749,8 @@ def animate_epnl_flyover(output_dir: str) -> None:
             excess_arrow.set_positions((float(w), float(background[j][w])),
                                        (float(w), float(spectra[j][w])))
             exc_txt.set_visible(True)
-            exc_txt.set_text(T(f"F = {f_exc:.1f} dB at {bands[w]:.0f} Hz")
-                             + "\n" + T(f"C = {d['c'][j]:.2f} dB"))
+            exc_txt.set_text(T(f"$F$ = {f_exc:.1f} dB at {bands[w]:.0f} Hz")
+                             + "\n" + T(f"$C$ = {d['c'][j]:.2f} dB"))
         else:
             excess_arrow.set_visible(False)
             exc_txt.set_visible(False)
@@ -2952,7 +2953,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
     t_env = np.linspace(d["direct_ms"], _IS_RUN_MS, 200)
     ax_r.plot(t_env, 20.0 * np.log10(d["direct_ms"] / t_env),
               color=COLOR_SECONDARY, lw=1.2, ls="--",
-              label=T("1/r spreading"))
+              label=T("$1/r$ spreading"))
     ax_r.legend(loc="upper right", fontsize=7.5, framealpha=0.9)
 
     # --- bottom right: the count, against the analytic law ---------------
@@ -2966,7 +2967,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
     t_law = np.linspace(0.0, _IS_RUN_MS, 200)
     ax_n.plot(t_law, 4.0 * np.pi / 3.0 * (c * t_law / 1e3) ** 3 / volume,
               color=COLOR_SECONDARY, lw=1.4, ls="--",
-              label=T("(4 pi / 3)(c t)^3 / V"))
+              label=T(r"$(4\pi/3)(ct)^3/V$"))
     (count_line,) = ax_n.plot([], [], color=COLOR_PRIMARY, lw=2.0,
                               label=T("counted"))
     count_txt = ax_n.text(0.03, 0.95, "", transform=ax_n.transAxes,
@@ -2983,8 +2984,8 @@ def animate_image_source_buildup(output_dir: str) -> None:
         now = _IS_RUN_MS * np.clip((k - lead) / (sweep - lead), 0.0, 1.0)
         radius = c * now / 1e3
         front.set_radius(max(radius, 0.01))
-        radius_txt.set_text(T(f"t = {now:4.1f} ms") + "\n"
-                            + T(f"c t = {radius:5.1f} m"))
+        radius_txt.set_text(T(f"$t$ = {now:4.1f} ms") + "\n"
+                            + T(f"$ct$ = {radius:5.1f} m"))
 
         reached = plan_t <= now
         pts = plan_xy[reached]
@@ -3209,8 +3210,8 @@ def animate_iso717_shift(output_dir: str) -> None:
             max(y.max(), curve.max()))
         pad = 0.18 * (hi_y - lo_y)
         ax_s.set_ylim(lo_y - pad, hi_y + pad)
-        ax_s.set_ylabel(T("Normalized impact level L'nT [dB]") if impact
-                        else T("Sound reduction index R [dB]"), fontsize=9)
+        ax_s.set_ylabel(T("Normalized impact level $L\u2032_{nT}$ [dB]") if impact
+                        else T("Sound reduction index $R$ [dB]"), fontsize=9)
         act_txt.set_text(act)
 
         reads = [f["read"] for f in track["frames"]]
@@ -3239,15 +3240,15 @@ def animate_iso717_shift(output_dir: str) -> None:
         if not st["ok"]:
             lines.append(T("over the cap: shift again"))
         elif idx == track["accepted"]:
-            name = T("L'nT,w") if impact else T("Rw")
+            name = T("$L\u2032_{nT,w}$") if impact else T("$R_w$")
             lines.append(T("largest sum still under the cap"))
             lines.append(f"{name} = {track['rating']:d} dB")
             if impact:
                 lines.append(
-                    T(f"CI = {_fmt_minus(int(res.ci), '+d')} dB"))
+                    T(f"$C_I$ = {_fmt_minus(int(res.ci), '+d')} dB"))
             else:
-                lines.append(T(f"C = {_fmt_minus(int(res.c), '+d')} dB, "
-                               f"Ctr = {_fmt_minus(int(res.ctr), '+d')} dB"))
+                lines.append(T(f"$C$ = {_fmt_minus(int(res.c), '+d')} dB, "
+                               f"$C_{{tr}}$ = {_fmt_minus(int(res.ctr), '+d')} dB"))
         else:
             lines.append(T("legal, but the sum is smaller:"))
             lines.append(T("this is one step too far"))
@@ -3726,13 +3727,13 @@ def animate_feedback_howl(output_dir: str) -> None:
         mics = case["mics"]
         act = (T("Long's 10 dB margin: each copy is a third of the last")
                if a == 0 else
-               T("Four open microphones add 10 lg 4 = 6 dB to the loop")
+               T(r"Four open microphones add $10\,\mathrm{lg}\,4$ = 6 dB to the loop")
                if a == 1 else
                T("Four more decibels of system gain: the loop reaches unity"))
         act_txt.set_text(act)
-        lines = [T(f"Zs = {_fmt_minus(case['zs'], '.0f')} dB, "
+        lines = [T(f"$Z_S$ = {_fmt_minus(case['zs'], '.0f')} dB, "
                    f"{mics:d} open microphone(s)"),
-                 T(f"loop gain Zs + Gs = "
+                 T(f"loop gain $Z_S + G_S$ = "
                    f"{_fmt_minus(case['loop'], '+.1f')} dB"),
                  T(f"each round trip is x {case['g']:.3f}")]
         if np.isfinite(case["limit"]):

@@ -193,7 +193,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
     fig.suptitle(T("The virtual impedance tube: standing waves read the "
                    "absorption (2D FDTD)"), fontweight="bold")
     axes = fig.subplots(2, 1, sharex=True)
-    titles = [T("Rigid end: deep minima, |r| ~ 1"),
+    titles = [T(r"Rigid end: deep minima, $|r| \sim 1$"),
               T("10 cm lossy sample: shallow minima")]
     mics = ((length - 0.10 - 0.20, "1"), (length - 0.10 - 0.15, "2"))
     ims: list[Any] = []
@@ -218,7 +218,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
         # line and the caption used to sit in the band the trace climbs
         # through, so the rising curve struck its own name out. Below the
         # line the band is empty all the way down to the tube wall.
-        ax.text(0.005, env_base - 0.035, "|p| envelope", fontsize=7.5,
+        ax.text(0.005, env_base - 0.035, "$|p|$ envelope", fontsize=7.5,
                 ha="left", va="top", color=COLOR_FG, alpha=0.8)
         (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=1.9, zorder=6)
         ax.set_aspect(0.42, adjustable="box")
@@ -253,10 +253,10 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
             line.set_data(x_env[env_from:],
                           env_base + env_row[env_from:] / env_max * env_h)
         a_txt.set_text(
-            T(f"alpha = {alpha:.2f} at {_VTUBE_F:.0f} Hz")
+            T(f"$\\alpha$ = {alpha:.2f} at {_VTUBE_F:.0f} Hz")
             if k >= reveal else ""
         )
-        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.1f} ms"))
         return (*ims, *lines, a_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_impedance_tube",
@@ -409,7 +409,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
             T(f"TL = {tl:.1f} dB at {_VTUBE_F:.0f} Hz")
             if k >= reveal else ""
         )
-        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1e3:5.1f} ms"))
         return (*ims, tl_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_transmission_tube",
@@ -502,8 +502,8 @@ def animate_standing_wave_tube(output_dir: str) -> None:
     legend_ax.axis("off")
     for xl, color, lab in ((0.30, COLOR_PRIMARY, T("incident")),
                            (0.44, COLOR_TERTIARY, T("reflected")),
-                           (0.58, COLOR_SECONDARY, T("sum p(x, t)")),
-                           (0.72, COLOR_FG, T("envelope |p(x)|"))):
+                           (0.58, COLOR_SECONDARY, T("sum $p(x, t)$")),
+                           (0.72, COLOR_FG, T("envelope $|p(x)|$"))):
         legend_ax.plot([xl, xl + 0.025], [0.028, 0.028], color=color,
                        lw=2.0, ls="--" if color == COLOR_FG else "-",
                        transform=legend_ax.transAxes)
@@ -544,7 +544,8 @@ def animate_standing_wave_tube(output_dir: str) -> None:
                     T("deep nodes") if refl >= 1.0 else T("shallow nodes"))
                 pn["note"].set_alpha(a_env)
                 pn["readout"].set_text(
-                    T(f"|R| = {refl:.2f}   α = {1.0 - refl**2:.2f}"))
+                    T(f"$|R|$ = {refl:.2f}   "
+                      f"$\\alpha$ = {1.0 - refl**2:.2f}"))
                 pn["readout"].set_alpha(a_env)
             else:
                 pn["mic_dots"].set_data([], [])

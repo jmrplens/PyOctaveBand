@@ -145,10 +145,10 @@ def animate_fdtd_barrier(output_dir: str) -> None:
                  fontweight="bold")
     gs = fig.add_gridspec(2, 2)
     titles = [
-        T(f"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
-          f"(λ ≈ {lam[0]:.1f} m)"),
-        T(f"High frequency: {_BARRIER_FREQS[1]:.0f} Hz "
-          f"(λ ≈ {lam[1]:.2f} m)"),
+        T(rf"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
+          rf"($\lambda$ ≈ {lam[0]:.1f} m)"),
+        T(rf"High frequency: {_BARRIER_FREQS[1]:.0f} Hz "
+          rf"($\lambda$ ≈ {lam[1]:.2f} m)"),
     ]
     verdicts = [T("diffraction fills the shadow"), T("deep, clean shadow")]
     ims: list[Any] = []
@@ -177,7 +177,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
                                    lw=0.6))
             ax.tick_params(labelsize=7)
         ax_p.tick_params(labelbottom=False)
-        ax_r.set_xlabel("x [m]", fontsize=8)
+        ax_r.set_xlabel("$x$ [m]", fontsize=8)
         ax_p.plot([2.0], [0.5], marker="o", ms=5, color=COLOR_TERTIARY,
                   markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
         ax_p.text(2.25, 0.55, T("source"), ha="left", va="center",
@@ -198,7 +198,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
                       T(f"insertion loss {ils[col]:.0f} dB"), ha="center",
                       va="bottom", color="white", fontsize=7.5))
         if col == 0:
-            ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
+            ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB re panel max]"), fontsize=8)
             ax_p.text(0.25, -0.27, T("rigid ground"), ha="left",
                       va="center", color=COLOR_FG, fontsize=6.5,
@@ -247,7 +247,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
             il_txts[col].set_text(
                 T(f"insertion loss {ils[col]:.0f} dB")
                 if times[k] >= 0.032 else "")
-        t_txt.set_text(T(f"t = {times[k] * 1000.0:4.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (*ims, *il_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_barrier",

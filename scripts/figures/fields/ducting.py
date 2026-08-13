@@ -137,7 +137,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     vmax = float(np.quantile(np.abs(p_all[:, :half]), 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("SOFAR channel: sound trapped by the c(z) minimum "
+    fig.suptitle(T("SOFAR channel: sound trapped by the $c(z)$ minimum "
                    "(2D FDTD)"), fontweight="bold")
     gs = fig.add_gridspec(2, 2, width_ratios=[0.22, 1.0])
     titles = [T("Source on the channel axis (depth 400 m)"),
@@ -163,7 +163,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         ax_c.set_ylabel(T("Depth [m]"), fontsize=8)
         ax_c.tick_params(labelsize=6)
         if row == 1:
-            ax_c.set_xlabel(T("c(z) [m/s]"), fontsize=7)
+            ax_c.set_xlabel(T("$c(z)$ [m/s]"), fontsize=7)
 
         ax_f = fig.add_subplot(gs[row, 1])
         ax_f.grid(False)
@@ -189,7 +189,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         # A translucent dark pill keeps this label legible once the bright
         # magma energy overlay fades in over the channel axis (a plain white
         # stroke washes out against the near-white high-energy region).
-        ax_f.text(2360.0, 425.0, T("channel axis (c minimum)"), ha="right",
+        ax_f.text(2360.0, 425.0, T("channel axis ($c$ minimum)"), ha="right",
                   va="top", color="white", fontsize=7, zorder=4,
                   bbox={"boxstyle": "round,pad=0.2", "facecolor": "black",
                         "alpha": 0.45, "edgecolor": "none"})
@@ -228,7 +228,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
             ims[row].set_data(p_all[row][k])
             ims_e[row].set_alpha(alpha)
             v_txts[row].set_text(verdicts[row] if k >= captions_on else "")
-        t_txt.set_text(T(f"t = {times[k]:5.2f} s"))
+        t_txt.set_text(T(f"$t$ = {times[k]:5.2f} s"))
         return (*ims, *ims_e, *v_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_ducting",

@@ -141,8 +141,9 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     fig.suptitle(T("Sound through a wall aperture (2D FDTD)"),
                  fontweight="bold")
     gs = fig.add_gridspec(2, 2)
-    titles = [T(f"Slit w = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm (λ/20)"),
-              T(f"Opening w = {_APERTURE_WIDTHS[1]:.2f} m (= λ)")]
+    titles = [T(rf"Slit $w$ = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm "
+                rf"($\lambda/20$)"),
+              T(rf"Opening $w$ = {_APERTURE_WIDTHS[1]:.2f} m (= $\lambda$)")]
     verdicts = [T("cylindrical re-radiation from the slit"),
                 T("the front passes: sharp-edged shadow")]
     ims: list[Any] = []
@@ -172,7 +173,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
             ax.set_ylim(0.7, _APERTURE_YTOP)
             ax.tick_params(labelsize=7)
         ax_p.tick_params(labelbottom=False)
-        ax_r.set_xlabel("x [m]", fontsize=8)
+        ax_r.set_xlabel("$x$ [m]", fontsize=8)
         # The arrow and its caption ride 0.1 m lower than the free field
         # would need them to: the gain note is the other tenant of this
         # strip, and its halo was rubbing out the caption's ascenders.
@@ -197,10 +198,11 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
                   "facecolor": "black", "alpha": 0.45,
                   "edgecolor": "none"}))
         if col == 0:
-            ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
+            ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
             ax_p.text(0.2, 0.85,
-                      T(f"f = {_APERTURE_F:.0f} Hz (λ = {lam:.2f} m)"),
+                      T(rf"$f$ = {_APERTURE_F:.0f} Hz "
+                        rf"($\lambda$ = {lam:.2f} m)"),
                       ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline)
             tau_txt = ax_r.text(5.55, _APERTURE_YTOP - 0.2, "", ha="right",
@@ -247,8 +249,8 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
             ims[2 * col].set_data(shadow_gained(col, k))
             ims[2 * col + 1].set_data(db_all[col][k])
         tau_txt.set_text(
-            T(f"slit τ = {tau:.2f} (Gomperts)") if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1e3:4.1f} ms"))
+            T(rf"slit $\tau$ = {tau:.2f} (Gomperts)") if k >= reveal else "")
+        t_txt.set_text(T(f"$t$ = {times[k] * 1e3:4.1f} ms"))
         return (*ims, tau_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_aperture_slit",

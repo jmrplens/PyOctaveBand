@@ -224,8 +224,8 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
                              color=color, lw=1.4, marker="o",
                              ms=(3.2, 2.0, 1.1)[i], zorder=4)[0])
         ax.text(0.006, 0.985,
-                T(f"{tube['cells']} cells per wavelength · "
-                  f"Δx = {tube['dx'] * 1000:.1f} mm"),
+                T(rf"{tube['cells']} cells per wavelength · "
+                  rf"$\Delta x$ = {tube['dx'] * 1000:.1f} mm"),
                 transform=ax.transAxes, ha="left", va="top", fontsize=9.0,
                 fontweight="bold", color=color)
         # The readout sits at the foot of its panel: the trace occupies the
@@ -271,7 +271,7 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
                      family="monospace", fontsize=10, color=COLOR_FG)
     fig.text(0.5, 0.011,
              T(f"Air at {_DISP_C:.0f} m/s, a {_DISP_F0:.0f} Hz burst, "
-               f"per-axis Courant number S = {courant:.3f}; grey is the "
+               f"per-axis Courant number $S$ = {courant:.3f}; grey is the "
                f"exact continuous wave, dots are the grid cells"),
              ha="center", va="bottom", fontsize=8, color=COLOR_FG,
              alpha=0.85)
@@ -304,7 +304,7 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
                     f"{lag:.2f} m behind (theory "
                     f"{(1 - tube['v_pred']) * _DISP_C * t:.2f} m)"))
             artists += [lines[i], exacts[i], pills[i]]
-        t_txt.set_text(T(f"t = {t * 1e3:5.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {t * 1e3:5.2f} ms"))
         return tuple(artists)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_dispersion",

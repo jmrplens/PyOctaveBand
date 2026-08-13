@@ -213,7 +213,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
         ax_c.set_ylabel(T("Height [m]"), fontsize=8)
         ax_c.tick_params(labelsize=6)
         if row == 1:
-            ax_c.set_xlabel(T("c_eff(z) [m/s]"), fontsize=7)
+            ax_c.set_xlabel(T(r"$c_{\mathrm{eff}}(z)$ [m/s]"), fontsize=7)
 
         ax_f = fig.add_subplot(gs[row, 1])
         ax_f.grid(False)
@@ -244,7 +244,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
         ax_f.plot([src_x], [src_h], marker="o", ms=5,
                   color=COLOR_TERTIARY, markeredgecolor=FIELD_STROKE,
                   markeredgewidth=0.8, zorder=4)
-        ax_f.text(src_x + 8.0, src_h + 4.0, T("source (h = 2 m)"),
+        ax_f.text(src_x + 8.0, src_h + 4.0, T("source ($h$ = 2 m)"),
                   ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=ray_outline, zorder=4)
         ax_f.plot([recv_x], [src_h], marker="o", ms=5, color=FIELD_STROKE,
@@ -259,7 +259,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
             ax_f.text(20.0, -3.5, T("rigid ground"), ha="left",
                       va="center", color=COLOR_FG, fontsize=6.5,
                       path_effects=ray_outline, zorder=4)
-            ax_f.text(22.0, 97.0, T(f"f = {_REFR_F:.0f} Hz"), ha="left",
+            ax_f.text(22.0, 97.0, T(f"$f$ = {_REFR_F:.0f} Hz"), ha="left",
                       va="top", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline, zorder=4)
         else:
@@ -311,7 +311,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
                 ln.set_alpha(alpha_r)
                 arts.append(ln)
             v_txts[row].set_text(verdicts[row] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k]:5.2f} s"))
+        t_txt.set_text(T(f"$t$ = {times[k]:5.2f} s"))
         return (*ims, *ims_e, *arts, *v_txts, t_txt)
 
     # gif_fps 4: the steady CW field moves everywhere in every frame, the

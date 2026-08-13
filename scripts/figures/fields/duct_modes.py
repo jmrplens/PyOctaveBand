@@ -224,7 +224,7 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
             # Above the station line, not beside its foot: the verdict
             # pill lives at the foot and the Spanish of it is long.
             ax.text(_DUCT_STATION - 0.08, _DUCT_A - 0.03,
-                    T(f"section at x = {_DUCT_STATION:.0f} m"),
+                    T(f"section at $x$ = {_DUCT_STATION:.0f} m"),
                     fontsize=7, ha="right", va="top", color="white",
                     zorder=5,
                     bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
@@ -253,10 +253,10 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
         (prof,) = pax.plot(np.zeros(ny), y_col, color=COLOR_FG, lw=1.3,
                            zorder=3)
         if row == 0:
-            pax.set_title(T("p across the section"), fontsize=7.5)
+            pax.set_title(T("$p$ across the section"), fontsize=7.5)
             pax.set_xticklabels([])
         else:
-            pax.set_xlabel(T("p / plane mode"), fontsize=7)
+            pax.set_xlabel(T("$p$ / plane mode"), fontsize=7)
         profs.append(prof)
         means.append(mean_ln)
     fc_txt = fig.text(0.5, 0.038,
@@ -279,7 +279,7 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
             profs[i].set_xdata(col[kf])
             means[i].set_xdata([float(col[kf].mean())] * 2)
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.1f} ms"))
         return (*ims, *profs, *means, *v_txts, fc_txt, scale_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_duct_cut_on",
