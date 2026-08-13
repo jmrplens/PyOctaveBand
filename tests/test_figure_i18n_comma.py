@@ -17,7 +17,7 @@ _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 
-from figures.i18n import _decimal_comma, _ES_PATTERNS, lookup
+from figures.i18n import _ES_PATTERNS, _decimal_comma, lookup
 
 
 @pytest.mark.parametrize(

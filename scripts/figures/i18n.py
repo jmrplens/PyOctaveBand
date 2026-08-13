@@ -3415,9 +3415,10 @@ _ES_EXACT = {
     "Flat panel vs Schroeder diffuser (2D FDTD)":
         "Panel plano frente a difusor de Schroeder (FDTD 2D)",
     "Flat rigid panel": "Panel rígido plano",
-    "Schroeder diffuser (QRD, N = 7)": "Difusor de Schroeder (QRD, N = 7)",
+    "Schroeder diffuser (QRD, $N$ = 7)":
+        "Difusor de Schroeder (QRD, $N$ = 7)",
     "incident plane wavefront": "frente de onda plano incidente",
-    "sound field p": "campo sonoro p",
+    "sound field $p$": "campo sonoro $p$",
     "scattered field (total − incident)":
         "campo dispersado (total − incidente)",
     "specular beam": "haz especular",
@@ -4500,18 +4501,19 @@ _ES_PATTERNS = [
      ("el tubo resuena a \\1,\\2 Hz, no a \\3,\\4:\n"
       "$\\\\ell_{\\\\mathrm{ef}} = c/4f$ = \\5 mm: se recorta para afinarlo")),
     # anim_fdtd_absorption_placement: readouts carrying measured values.
-    (r"^measured T = (\d+) ms: inside the band$",
-     r"T medida = \1 ms: dentro de la banda"),
-    (r"^early (\d+) ms, tail (\d+) ms: no single T$",
-     r"inicial \1 ms, cola \2 ms: sin una única T"),
-    (r"^Sabine, T = (\d+) ms$", r"Sabine, T = \1 ms"),
-    (r"^Eyring, T = (\d+) ms$", r"Eyring, T = \1 ms"),
-    ((r"^Locally reacting resistive edges; both rooms hold (\d+\.\d) m of "
-      r"statistical absorption \(α_st = (\d+\.\d\d) on 21 m vs (\d+\.\d\d) "
-      r"on 16 m\); 250 Hz burst\.$"),
-     (r"Bordes resistivos de reacción local; ambas salas tienen \1 m de "
-      r"absorción estadística (α_st = \2 en 21 m frente a \3 en 16 m); "
-      r"ráfaga de 250 Hz.")),
+    (r"^measured \$T\$ = (\d+) ms: inside the band$",
+     r"$T$ medida = \1 ms: dentro de la banda"),
+    (r"^early (\d+) ms, tail (\d+) ms: no single \$T\$$",
+     r"inicial \1 ms, cola \2 ms: sin una única $T$"),
+    (r"^Sabine, \$T\$ = (\d+) ms$", r"Sabine, $T$ = \1 ms"),
+    (r"^Eyring, \$T\$ = (\d+) ms$", r"Eyring, $T$ = \1 ms"),
+    ((r"^Locally reacting resistive edges; both rooms hold (\d+)\.(\d) m of "
+      r"statistical absorption \(\$\\alpha_\{\\mathrm\{st\}\}\$ = "
+      r"(\d+)\.(\d\d) on 21 m vs (\d+)\.(\d\d) on 16 m\); "
+      r"250 Hz burst\.$"),
+     ("Bordes resistivos de reacción local; ambas salas tienen \\1,\\2 m de "
+      "absorción estadística ($\\\\alpha_{\\\\mathrm{st}}$ = \\3,\\4 en 21 m "
+      "frente a \\5,\\6 en 16 m); ráfaga de 250 Hz.")),
     # Aircraft: labels and annotations carrying computed values.
     (r"^closest segment: (.+) dB$", r"segmento más próximo: \1 dB"),
     ((r"^receiver 3 000 m along track, 500 m to the side, 1\.2 m up\.\n"
@@ -5190,7 +5192,8 @@ _ES_PATTERNS = [
     (r"^High frequency: (\d+) Hz \(\$\\lambda\$ ≈ (\d+)\.(\d+) m\)$",
      r"Alta frecuencia: \1 Hz ($\\lambda$ ≈ \2,\3 m)"),
     (r"^insertion loss (.+) dB$", r"pérdida por inserción \1 dB"),
-    (r"^diffusion coefficient d = (.+)$", r"coeficiente de difusión d = \1"),
+    (r"^diffusion coefficient \$d\$ = (\d+)\.(\d+)$",
+     r"coeficiente de difusión $d$ = \1,\2"),
     (r"^design frequency (.+) Hz$", r"frecuencia de diseño \1 Hz"),
     # 2D FDTD wave simulation (public API concept figure)
     (r"^FDTD pressure field at t = (.+) ms$",
@@ -5267,7 +5270,7 @@ _ES_PATTERNS = [
     (r"^estimated delay removed: (.+) samples$",
      r"retardo estimado eliminado: \1 muestras"),
     # FDTD second-batch clips: baked-number pills and titles
-    (r"^slit h = (.+) mm$", r"rendija h = \1 mm"),
+    (r"^slit \$h\$ = (\d+)\.(\d+) mm$", r"rendija $h$ = \1,\2 mm"),
     (r"^Pass band: (\d+) Hz, \$kL = \\pi\$$",
      r"Banda de paso: \1 Hz, $kL = \\pi$"),
     (r"^Stop band peak: (\d+) Hz, \$kL = \\pi/2\$$",

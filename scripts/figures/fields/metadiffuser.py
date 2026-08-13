@@ -379,7 +379,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
             ax.set_ylim(0.0, 1.12)
             ax.tick_params(labelsize=7)
         ax_t.tick_params(labelbottom=False)
-        ax_s.set_xlabel("x [m]", fontsize=8)
+        ax_s.set_xlabel("$x$ [m]", fontsize=8)
         if col == 1:
             ax_t.text(xc, 0.97, T("incident plane wavefront"), ha="center",
                       va="bottom", color=FIELD_INK, fontsize=7.5,
@@ -390,7 +390,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         d_txt = ax_s.text(xc, 1.03, "", ha="center", va="top",
                           color="white", fontsize=7.5, fontweight="bold")
         if col == 0:
-            ax_t.set_ylabel(T("sound field p"), fontsize=9)
+            ax_t.set_ylabel(T("sound field $p$"), fontsize=9)
             ax_s.set_ylabel(T("scattered field (total − incident)"),
                             fontsize=8)
         else:
@@ -418,7 +418,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         ims += [im_t, im_s]
         d_txts.append(d_txt)
     # Top-left margin, beside the centred suptitle: three columns of field
-    # panels carry their x ticks and "x [m]" all the way into the
+    # panels carry their x ticks and "$x$ [m]" all the way into the
     # bottom-right corner, and a readout parked there merged with the third
     # column's tick row -- the stem of the "t" reading as part of 1.00, the
     # "ms" as part of 1.50.
@@ -435,7 +435,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
             ims[2 * col].set_data(tot_all[col][k])
             ims[2 * col + 1].set_data(trail_db[col][k])
             d_txts[col].set_text(verdicts[col] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1000.0:4.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.2f} ms"))
         return (*ims, *d_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_metadiffuser",

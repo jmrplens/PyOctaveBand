@@ -188,7 +188,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     fig.suptitle(T("Flat panel vs Schroeder diffuser (2D FDTD)"),
                  fontweight="bold")
     gs = fig.add_gridspec(2, 2)
-    titles = [T("Flat rigid panel"), T("Schroeder diffuser (QRD, N = 7)")]
+    titles = [T("Flat rigid panel"), T("Schroeder diffuser (QRD, $N$ = 7)")]
     beams = [T("specular beam"), T("scattered fan")]
     # Panel cross-sections: the flat slab, and the staircase along the QRD
     # surface (wells carved into the same slab).
@@ -225,7 +225,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
             ax.set_ylim(0.0, 4.0)
             ax.tick_params(labelsize=7)
         ax_t.tick_params(labelbottom=False)
-        ax_s.set_xlabel("x [m]", fontsize=8)
+        ax_s.set_xlabel("$x$ [m]", fontsize=8)
         ax_t.text(3.0, 3.6, T("incident plane wavefront"), ha="center",
                   va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline)
@@ -239,11 +239,11 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         # the annotation that will actually be drawn; update() blanks it
         # until the arc energy has settled.
         d_txt = ax_s.text(5.45, 3.82,
-                          T(f"diffusion coefficient d = {d_coef[col]:.2f}"),
+                          T(f"diffusion coefficient $d$ = {d_coef[col]:.2f}"),
                           ha="right", va="top", color="white",
                           fontsize=8.5, fontweight="bold")
         if col == 0:
-            ax_t.set_ylabel(T("sound field p"), fontsize=9)
+            ax_t.set_ylabel(T("sound field $p$"), fontsize=9)
             ax_s.set_ylabel(T("scattered field (total − incident)"),
                             fontsize=8)
             arc_txt = ax_s.text(0.78, 2.05, T("receiver arc"), ha="left",
@@ -277,9 +277,9 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
             ims[2 * col].set_data(tot_all[col][k])
             ims[2 * col + 1].set_data(trail_db[col][k])
             d_txts[col].set_text(
-                T(f"diffusion coefficient d = {d_coef[col]:.2f}")
+                T(f"diffusion coefficient $d$ = {d_coef[col]:.2f}")
                 if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1000.0:4.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (*ims, *d_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_diffusion",
