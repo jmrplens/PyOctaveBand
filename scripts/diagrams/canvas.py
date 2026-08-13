@@ -51,19 +51,21 @@ _COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
 
 #: The letter runs a sub/superscript sets upright: the descriptive
 #: subscripts of the corpus, printed in roman by the standards that define
-#: them -- weightings and averages (Aeq, eq, EQ), extremes and bounds (max,
-#: MAX, min, upper, lower, limit), qualifiers (ref, rms, tot, TOT, eff,
-#: mod, norm, spec, inst, cal, tab, cum, ss, shadow, co, tr, diff, ff, ax,
-#: SN, CS, MS) and the hand-arm/whole-body vibration axes of ISO 5349 and
-#: ISO 2631 (hv, hwx, hwy, hwz, wx, wy, wz). Every other letter run inside
-#: a script is an index and is set in italic ($K_{ij}$, $η_{ij}$); extend
-#: this set only for a subscript that abbreviates a word, never for
-#: letter-indices.
+#: them -- weightings, averages and exposure (Aeq, eq, EQ, EX), extremes
+#: and bounds (max, MAX, min, upper, lower, low, high, limit), qualifiers
+#: (ref, rms, tot, TOT, eff, mod, norm, spec, inst, cal, tab, cum, ss,
+#: shadow, co, tr, diff, ff, ax, SN, CS, MS), the hand-arm/whole-body
+#: vibration axes of ISO 5349 and ISO 2631 (hv, hwx, hwy, hwz, wx, wy, wz),
+#: and the Spanish twins the i18n table sets beside them (sup for upper,
+#: ef for eff). Every other letter run inside a script is an index and is
+#: set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a subscript
+#: that abbreviates a word, never for letter-indices.
 _ROMAN_SCRIPTS = frozenset((
-    "Aeq", "eq", "EQ", "max", "MAX", "min", "upper", "lower", "limit",
-    "ref", "rms", "tot", "TOT", "eff", "mod", "norm", "spec", "inst",
-    "cal", "tab", "cum", "ss", "shadow", "co", "tr", "diff", "ff", "ax",
-    "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz", "wx", "wy", "wz",
+    "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
+    "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "ef", "mod",
+    "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
+    "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
+    "wx", "wy", "wz",
 ))
 
 #: Script metrics of the ``$...$`` composer, as fractions of the font size:
@@ -98,8 +100,10 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
     and the offending piece, so a typo breaks the generation instead of
     publishing a silently mis-set diagram: a multi-character script written
     without braces (``f_max`` sets only the f-m pair and pushes "ax" back to
-    the baseline), a script marker with an empty payload (``L_``, ``L_{}``),
-    an unclosed script brace, and a script inside a script (``L_{p_1}``),
+    the baseline), a comma glued to an unbraced script (``L_p,s`` would push
+    ",s" back to the baseline; spaced-off commas as in ``a_x , a_y`` stay
+    legal), a script marker with an empty payload (``L_``, ``L_{}``), an
+    unclosed script brace, and a script inside a script (``L_{p_1}``),
     which the composer cannot set.
     """
     out: list[tuple[str, str]] = []
@@ -130,8 +134,14 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                 out.append((kind, run[i + 2:end]))
                 i = end + 1
             else:
-                if i + 2 < len(run) and (run[i + 2].isalnum()
-                                         or run[i + 2] == "("):
+                nxt = run[i + 2:i + 3]
+                if nxt == "(":
+                    raise ValueError(
+                        f"ambiguous script {run[i:i + 2]!r} before '(' in "
+                        f"{s!r}: brace the script and keep the argument "
+                        f"outside, as {ch}{{{run[i + 1]}}}(...)"
+                    )
+                if nxt.isalnum():
                     j = i + 2
                     while j < len(run) and run[j].isalnum():
                         j += 1
@@ -139,6 +149,17 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                         f"ambiguous script {run[i:j]!r} in {s!r}: only "
                         f"{run[i + 1]!r} would attach to {ch!r}, brace the "
                         f"whole script as {ch}{{...}}"
+                    )
+                if nxt == "," and i + 3 < len(run) and run[i + 3].isalnum():
+                    j = i + 3
+                    while j < len(run) and (run[j].isalnum()
+                                            or run[j] == ","):
+                        j += 1
+                    raise ValueError(
+                        f"ambiguous comma {run[i:j]!r} in {s!r}: glued to "
+                        f"the script it reads as part of the subscript, "
+                        f"write {ch}{{{run[i + 1]},...}} or space the "
+                        "comma off"
                     )
                 out.append((kind, run[i + 1:i + 2]))
                 i += 2

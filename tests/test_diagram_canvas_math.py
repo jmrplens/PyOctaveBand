@@ -23,6 +23,7 @@ if _SCRIPTS not in sys.path:
 
 from diagrams import canvas
 from diagrams.canvas import _FONT, LIGHT, SVG
+from diagrams.i18n import _ES
 
 
 def _element(s: str, **kwargs: object) -> str:
@@ -145,9 +146,36 @@ def test_multicharacter_script_without_braces_raises() -> None:
     assert "'cut-off $f_max$ of the array'" in str(excinfo.value)
     with pytest.raises(ValueError, match="ambiguous script"):
         _element("$p_ref$")
-    # An opening bracket right after the script character is the same trap.
-    with pytest.raises(ValueError, match="ambiguous script"):
+    # An opening bracket right after the script character is the same trap,
+    # but braces around the whole tail would swallow the argument into the
+    # subscript, so the advice must point at bracing the script alone.
+    with pytest.raises(ValueError) as excinfo:
         _element("$f_n(2h)$")
+    assert "ambiguous script '_n' before '('" in str(excinfo.value)
+    assert "_{n}(...)" in str(excinfo.value)
+
+
+def test_comma_glued_to_unbraced_script_raises() -> None:
+    # $L_p,s$ would set p as the subscript and push ",s" back to the
+    # baseline; the guard demands braces. A spaced-off comma is a list
+    # separator and stays legal.
+    with pytest.raises(ValueError) as excinfo:
+        _element("$L_p,s$")
+    assert "ambiguous comma '_p,s'" in str(excinfo.value)
+    assert "'$L_p,s$'" in str(excinfo.value)
+    element = _element("$a_x , a_y , a_z$", size=20)
+    assert ('<tspan dy="4.4" font-size="14.0" font-style="italic">x</tspan>'
+            in element)
+    assert '<tspan dy="-4.4"> , </tspan>' in element
+    # Braced, the comma composes inside the script, mixing the italic
+    # indices and the roman descriptive run.
+    element = _element("$L_{n,w,eq}$", size=20)
+    assert (
+        '<tspan dy="4.4" font-size="14.0" font-style="italic">n</tspan>'
+        '<tspan font-size="14.0">,</tspan>'
+        '<tspan font-size="14.0" font-style="italic">w</tspan>'
+        '<tspan font-size="14.0">,eq</tspan>'
+    ) in element
 
 
 def test_backslash_in_math_raises() -> None:
@@ -169,6 +197,15 @@ def test_unclosed_script_brace_raises_with_context() -> None:
     assert "'$L_{p$ level'" in str(excinfo.value)
     with pytest.raises(ValueError, match="unclosed script brace"):
         _element("$c^{2$")
+
+
+def test_consecutive_scripts_stay_legal() -> None:
+    # $x_1^2$ is not nesting: the subscript and the superscript both hang
+    # off the baseline symbol, and the dy bookkeeping walks drop to rise.
+    element = _element("$x_1^2$", size=20)
+    assert '<tspan font-style="italic">x</tspan>' in element
+    assert '<tspan dy="4.4" font-size="14.0">1</tspan>' in element
+    assert '<tspan dy="-12.0" font-size="14.0">2</tspan>' in element
 
 
 def test_nested_script_raises() -> None:
@@ -240,6 +277,40 @@ def test_render_composes_math_in_the_title() -> None:
         '<tspan dy="5.7" font-size="18.2" font-style="italic">w</tspan>'
         '<tspan dy="-5.7"> measured</tspan>'
     ) in composed
+
+
+def _style_runs(s: str) -> list[list[tuple[str, str]]]:
+    """Per math segment, the merged (level, style) runs the composer sets."""
+    out: list[list[tuple[str, str]]] = []
+    for k, segment in enumerate(s.split("$")):
+        if k % 2 == 0:
+            continue
+        runs: list[tuple[str, str]] = []
+        for kind, payload in canvas._math_tokens(segment, s):
+            if kind in ("var", "up"):
+                pieces = [("base", kind)]
+            else:
+                pieces = [
+                    (kind, kind2) for kind2, _ in
+                    canvas._math_tokens(payload, s, script=True)
+                ]
+            for piece in pieces:
+                if not runs or runs[-1] != piece:
+                    runs.append(piece)
+        out.append(runs)
+    return out
+
+
+def test_spanish_twins_mirror_the_math_structure() -> None:
+    # Every $...$ pair of the diagram i18n table must compose with the same
+    # script structure and the same italic/roman style, position by
+    # position: a twin whose subscript falls off the curated roman list
+    # while the English side is on it (f_upper beside f_sup, m_eff beside
+    # m_ef) would silently publish the two languages in different styles.
+    pairs = [(en, es) for en, es in _ES.items() if "$" in en or "$" in es]
+    assert pairs, "the diagram i18n table lost its $...$ entries"
+    for en, es in pairs:
+        assert _style_runs(en) == _style_runs(es), (en, es)
 
 
 def test_composition_is_deterministic() -> None:
