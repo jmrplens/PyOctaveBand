@@ -3191,7 +3191,7 @@ _ES: dict[str, str] = {
         "$ᾱ = 0,3$)",
     "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 sin^{2}(k·L)]$, peaking where the 0.3 m chamber is a quarter wavelength":
         "silenciador reactivo: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 "
-        "sin^{2}(k·L)]$, máximo donde la cámara de 0,3 m mide λ/4",
+        "sin^{2}(k·L)]$, máximo donde la cámara de 0,3 m mide $λ/4$",
     # Sound level meter pipeline (IEC 61672-1), one function per stage
     "The sound level meter pipeline: one function per stage":
         "La cadena del sonómetro: una función por etapa",
