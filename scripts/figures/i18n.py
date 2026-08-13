@@ -2083,8 +2083,8 @@ _ES_EXACT = {
     "Power cepstrum": "Cepstro de potencia",
     "Searched band": "Banda de búsqueda",
     "True echo delay (8 ms)": "Retardo verdadero del eco (8 ms)",
-    "Detected peak (height = reflection a)":
-        "Pico detectado (altura = reflexión a)",
+    "Detected peak (height = reflection $a$)":
+        "Pico detectado (altura = reflexión $a$)",
     "Quefrency [ms]": "Quefrencia [ms]",
     "Cepstrum": "Cepstro",
     "spectral ripple of period 1/(8 ms) collapses to one\n"
@@ -2106,23 +2106,23 @@ _ES_EXACT = {
     "Periodic Waveform Extracted from Noise":
         "Forma de onda periódica extraída del ruido",
     "One noisy period": "Un período ruidoso",
-    "Average of N = 40 periods": "Promedio de N = 40 períodos",
+    "Average of $N$ = 40 periods": "Promedio de $N$ = 40 períodos",
     "True periodic waveform": "Forma de onda periódica verdadera",
-    "averaging N periods lowers the asynchronous\n"
+    "averaging $N$ periods lowers the asynchronous\n"
     "noise by $\\sqrt{N}$ in amplitude":
-        "promediar N períodos reduce el ruido asíncrono\n"
+        "promediar $N$ períodos reduce el ruido asíncrono\n"
         "en $\\sqrt{N}$ en amplitud",
-    "Rejecting a Tone by Choosing N (McFadden 1987)":
-        "Rechazo de un tono eligiendo N (McFadden 1987)",
-    "N = 32 (power of two)": "N = 32 (potencia de dos)",
-    "N = 20 (node on 32.05)": "N = 20 (nodo en 32,05)",
+    "Rejecting a Tone by Choosing $N$ (McFadden 1987)":
+        "Rechazo de un tono eligiendo $N$ (McFadden 1987)",
+    "$N$ = 32 (power of two)": "$N$ = 32 (potencia de dos)",
+    "$N$ = 20 (node on 32.05)": "$N$ = 20 (nodo en 32,05)",
     "Interfering tone (32.05)": "Tono interferente (32,05)",
     "Frequency [orders]": "Frecuencia [órdenes]",
     "Comb filter magnitude": "Magnitud del filtro peine",
-    "N = 20 puts a node on 32.05 orders and removes\n"
-    "it; the power-of-two N = 32 lets it through":
-        "N = 20 sitúa un nodo en 32,05 órdenes y lo\n"
-        "elimina; la potencia de dos N = 32 lo deja pasar",
+    "$N$ = 20 puts a node on 32.05 orders and removes\n"
+    "it; the power-of-two $N$ = 32 lets it through":
+        "$N$ = 20 sitúa un nodo en 32,05 órdenes y lo\n"
+        "elimina; la potencia de dos $N$ = 32 lo deja pasar",
     # Multiple-input coherence (Bendat & Piersol Ch. 7)
     "Multiple-Input Coherence: Which Source Dominates Each Band "
     "(Bendat & Piersol Ch. 7)":
@@ -3706,8 +3706,9 @@ _ES_EXACT = {
     "Real cepstrum (exactly half the power)":
         "Cepstro real (exactamente la mitad del de potencia)",
     "Complex cepstrum": "Cepstro complejo",
-    "first rahmonic at 8 ms:\nheight ≈ a on the power cepstrum":
-        "primer rahmónico en 8 ms:\naltura ≈ a en el cepstro de potencia",
+    "first rahmonic at 8 ms:\nheight $\\approx a$ on the power cepstrum":
+        "primer rahmónico en 8 ms:\n"
+        "altura $\\approx a$ en el cepstro de potencia",
     "second rahmonic: $-a^2/2$": "segundo rahmónico: $-a^2/2$",
     "Liftering at 4 ms: Envelope Versus Echo Ripple":
         "Liftering a 4 ms: envolvente frente a rizado del eco",
@@ -3805,7 +3806,7 @@ _ES_EXACT = {
     "Measured RMS error of the average":
         "Error RMS medido del promedio",
     "Ideal $\\sigma/\\sqrt{N}$": "$\\sigma/\\sqrt{N}$ ideal",
-    "Number of averages N": "Número de promedios N",
+    "Number of averages $N$": "Número de promedios $N$",
     "RMS error of the averaged waveform":
         "Error RMS de la forma de onda promediada",
     "Runs Test About the Median (Wald & Wolfowitz)":

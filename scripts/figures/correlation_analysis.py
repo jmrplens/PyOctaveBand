@@ -108,7 +108,7 @@ def generate_cepstrum_echo(output_dir: str) -> None:
                alpha=0.7, label="True echo delay (8 ms)")
     ax.plot([1e3 * res.delay], [res.reflection_coefficient], "v",
             color=COLOR_SECONDARY, markersize=10,
-            label="Detected peak (height = reflection a)")
+            label="Detected peak (height = reflection $a$)")
     ax.set_xlim(0.0, 30.0)
     ax.set_ylim(-0.3, 0.65)
     ax.set_xlabel("Quefrency [ms]")
@@ -200,7 +200,7 @@ def generate_synchronous_average(output_dir: str) -> None:
     ax0.plot(t_ms, signal[:m], color=COLOR_GRID, linewidth=1.0,
              label="One noisy period")
     ax0.plot(t_ms, res.period_waveform, color=COLOR_PRIMARY, linewidth=1.8,
-             label=f"Average of N = {n_avg} periods")
+             label=f"Average of $N$ = {n_avg} periods")
     ax0.plot(t_ms, true_one, color=COLOR_SECONDARY, linestyle="--",
              linewidth=1.2, label="True periodic waveform")
     ax0.set_xlim(0.0, 1e3 * period)
@@ -212,7 +212,7 @@ def generate_synchronous_average(output_dir: str) -> None:
     ax0.set_axisbelow(True)
     ax0.legend(loc="upper right", fontsize=8)
     ax0.text(0.02, 0.03,
-             "averaging N periods lowers the asynchronous\n"
+             "averaging $N$ periods lowers the asynchronous\n"
              "noise by $\\sqrt{N}$ in amplitude",
              transform=ax0.transAxes, va="bottom", ha="left", fontsize=8.5,
              color=COLOR_FG)
@@ -223,23 +223,23 @@ def generate_synchronous_average(output_dir: str) -> None:
     c20 = comb_filter_response(freqs, period, 20)
     c32 = comb_filter_response(freqs, period, 32)
     ax1.plot(orders, c32, color=COLOR_TERTIARY, linewidth=1.2,
-             label="N = 32 (power of two)")
+             label="$N$ = 32 (power of two)")
     ax1.plot(orders, c20, color=COLOR_PRIMARY, linewidth=1.4,
-             label="N = 20 (node on 32.05)")
+             label="$N$ = 20 (node on 32.05)")
     ax1.axvline(32.05, color=COLOR_SECONDARY, linestyle=":", linewidth=1.3,
                 label="Interfering tone (32.05)")
     ax1.set_xlim(31.0, 33.0)
     ax1.set_ylim(0.0, 1.05)
     ax1.set_xlabel("Frequency [orders]")
     ax1.set_ylabel("Comb filter magnitude")
-    ax1.set_title("Rejecting a Tone by Choosing N (McFadden 1987)",
+    ax1.set_title("Rejecting a Tone by Choosing $N$ (McFadden 1987)",
                   fontweight="bold", pad=10)
     ax1.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax1.set_axisbelow(True)
     ax1.legend(loc="upper right", fontsize=8)
     ax1.text(0.02, 0.55,
-             "N = 20 puts a node on 32.05 orders and removes\n"
-             "it; the power-of-two N = 32 lets it through",
+             "$N$ = 20 puts a node on 32.05 orders and removes\n"
+             "it; the power-of-two $N$ = 32 lets it through",
              transform=ax1.transAxes, va="top", ha="left", fontsize=8.5,
              color=COLOR_FG)
 
@@ -284,7 +284,8 @@ def generate_cepstrum_variants(output_dir: str) -> None:
     axins.tick_params(labelsize=7)
     axins.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.indicate_inset_zoom(axins, edgecolor=COLOR_FG, alpha=0.5)
-    ax.annotate("first rahmonic at 8 ms:\nheight ≈ a on the power cepstrum",
+    ax.annotate("first rahmonic at 8 ms:\n"
+                "height $\\approx a$ on the power cepstrum",
                 xy=(8.0, 0.5), xytext=(2.5, 0.42), fontsize=9,
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
@@ -522,7 +523,7 @@ def generate_tsa_noise_reduction(output_dir: str) -> None:
               label=r"Ideal $\sigma/\sqrt{N}$")
     ax.set_xticks(counts)
     ax.set_xticklabels([str(n) for n in counts])
-    ax.set_xlabel("Number of averages N")
+    ax.set_xlabel("Number of averages $N$")
     ax.set_ylabel("RMS error of the averaged waveform")
     ax.set_title(r"TSA Noise Reduction: the $\sqrt{N}$ Law (McFadden 1987)",
                  fontweight="bold", pad=12)

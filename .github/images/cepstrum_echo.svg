@@ -1684,54 +1684,95 @@ L 699.162813 28.318125
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 495.319844 89.520937 
-L 692.862813 89.520937 
-Q 694.662813 89.520937 694.662813 87.720937 
+     <path d="M 495.222813 89.522344 
+L 692.862813 89.522344 
+Q 694.662813 89.522344 694.662813 87.722344 
 L 694.662813 34.618125 
 Q 694.662813 32.818125 692.862813 32.818125 
-L 495.319844 32.818125 
-Q 493.519844 32.818125 493.519844 34.618125 
-L 493.519844 87.720937 
-Q 493.519844 89.520937 495.319844 89.520937 
+L 495.222813 32.818125 
+Q 493.422813 32.818125 493.422813 34.618125 
+L 493.422813 87.722344 
+Q 493.422813 89.522344 495.222813 89.522344 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_28">
-     <path d="M 497.119844 40.106719 
-L 506.119844 40.106719 
-L 515.119844 40.106719 
+     <path d="M 497.022813 40.106719 
+L 506.022813 40.106719 
+L 515.022813 40.106719 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.1; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.319844" y="43.256719" transform="rotate(-0 522.319844 43.256719)">Power cepstrum</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.222813" y="43.256719" transform="rotate(-0 522.222813 43.256719)">Power cepstrum</text>
     </g>
     <g id="patch_9">
-     <path d="M 497.119844 56.757422 
-L 515.119844 56.757422 
-L 515.119844 50.457422 
-L 497.119844 50.457422 
+     <path d="M 497.022813 56.757422 
+L 515.022813 56.757422 
+L 515.022813 50.457422 
+L 497.022813 50.457422 
 z
 " style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.319844" y="56.757422" transform="rotate(-0 522.319844 56.757422)">Searched band</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.222813" y="56.757422" transform="rotate(-0 522.222813 56.757422)">Searched band</text>
     </g>
     <g id="line2d_29">
-     <path d="M 497.119844 67.108125 
-L 506.119844 67.108125 
-L 515.119844 67.108125 
+     <path d="M 497.022813 67.108125 
+L 506.022813 67.108125 
+L 515.022813 67.108125 
 " style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-opacity: 0.7; stroke-width: 1.3"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.319844" y="70.258125" transform="rotate(-0 522.319844 70.258125)">True echo delay (8 ms)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.222813" y="70.258125" transform="rotate(-0 522.222813 70.258125)">True echo delay (8 ms)</text>
     </g>
     <g id="line2d_30">
      <g>
-      <use xlink:href="#me284da6c85" x="506.119844" y="80.608828" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
+      <use xlink:href="#me284da6c85" x="506.022813" y="80.610234" style="fill: #d62728; stroke: #d62728; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="522.319844" y="83.758828" transform="rotate(-0 522.319844 83.758828)">Detected peak (height = reflection a)</text>
+     <!-- Detected peak (height = reflection $a$) -->
+     <g transform="translate(522.222813 83.760234)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">D</tspan>
+       <tspan x="6.930176" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="12.467285" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="15.996094" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="21.533203" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="26.481445" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="30.010254" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="35.547363" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="41.260254" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="44.121094" y="-0.15625" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="49.833984" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="55.371094" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="60.88623" y="-0.15625" style="font-size: 9px; font-family: sans-serif">k</tspan>
+       <tspan x="66.098145" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="68.958984" y="-0.15625" style="font-size: 9px; font-family: sans-serif">(</tspan>
+       <tspan x="72.470215" y="-0.15625" style="font-size: 9px; font-family: sans-serif">h</tspan>
+       <tspan x="78.174316" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="83.711426" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="86.211914" y="-0.15625" style="font-size: 9px; font-family: sans-serif">g</tspan>
+       <tspan x="91.924805" y="-0.15625" style="font-size: 9px; font-family: sans-serif">h</tspan>
+       <tspan x="97.628906" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="101.157715" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="104.018555" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+       <tspan x="111.55957" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="114.42041" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="118.120605" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="123.657715" y="-0.15625" style="font-size: 9px; font-family: sans-serif">f</tspan>
+       <tspan x="126.826172" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="129.32666" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="134.86377" y="-0.15625" style="font-size: 9px; font-family: sans-serif">c</tspan>
+       <tspan x="139.812012" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="143.34082" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="145.841309" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+       <tspan x="151.347656" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="157.051758" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="165.427734" y="-0.15625" style="font-size: 9px; font-family: sans-serif">)</tspan>
+       <tspan x="159.912598" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">a</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
