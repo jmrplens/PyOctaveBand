@@ -43,7 +43,7 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
         s.text(cx, y + 25, l1, 17, th.fg, "middle", bold=True)
         s.text(cx, y + 45, l2, 13, th.muted, "middle")
 
-    _step(150, "Sources  s(t) injected at cells  (Eq. 4.11-4.12 grid)",
+    _step(150, "Sources  $s(t)$ injected at cells  (Eq. 4.11-4.12 grid)",
           "Gaussian pulse, ramped tone or arbitrary sampled signal", th.fg)
     _step(238, "Staggered-grid leapfrog update  (Eqs. 4.11-4.12)",
           "$v ← v − (dt/ρ·dx)·grad p$,  then  $p ← p − (ρc^2·dt/dx)·div v$",
@@ -56,7 +56,7 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
 
     # --- Output -------------------------------------------------------------
     s.rect(x0, 414, bw, bh, "none", th.primary, rx=10, sw=2.4)
-    s.text(cx, 439, "FDTDResult:  probe histories p(t), field snapshots, .plot()",
+    s.text(cx, 439, "FDTDResult:  probe histories $p(t)$, field snapshots, .plot()",
            17, th.fg, "middle", bold=True)
     s.text(cx, 459, "deterministic: same inputs, bit-identical outputs", 13,
            th.muted, "middle")
@@ -145,7 +145,7 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
         (cx1, gy(173), cx1 + 22, gy(173), cx1 + 34, gy(173) + 5),
     ):
         s.arrow(ax, ay, bx, by, th.secondary, 1.6)
-        s.text(lx, ly, "n", 15, th.secondary, "middle", bold=True, italic=True)
+        s.text(lx, ly, "$n$", 15, th.secondary, "middle", bold=True)
 
     # Two clearances worth drafting; the other two are in the notes.
     s.dim(gx(178), cy0, gx(178), py_t, "40", offset=0, label_side="left",
@@ -180,7 +180,7 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
                    lab, 16, th.accent, anc, bold=True)
     s.line(ox, oy, ox, oy - 0.6 * r, th.accent, 1.0, dash="4,4")
     s.text(ox, oy - r - 40,
-           "The far field is evaluated at r → ∞, and lives nowhere on the "
+           "The far field is evaluated at $r → ∞$, and lives nowhere on the "
            "grid:", 17, th.accent, "middle", bold=True)
     s.text(ox, oy - r - 18,
            "far_field_from_contour propagates the captured phasors with the "
@@ -280,7 +280,7 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
                 col, 2.0)
         s.text(bx + 98 * math.sin(a) + 6, y_if + 88 * math.cos(a) + 5, lab,
                15, col, "start", bold=True)
-    s.text(bx - 12, y_if - 58, "θ", 16, th.fg, "end", italic=True)
+    s.text(bx - 12, y_if - 58, "$θ$", 16, th.fg, "end")
     s.circle(bx, y_if - 96, 5.5, th.primary)
     s.text(bx + 12, y_if - 116, "probe on the normal,", 13, th.primary,
            "start")
@@ -316,7 +316,7 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
     s.text(ix0 + 86, iy0 + 16, "last fluid row", 13, th.muted)
     s.text(ix0 + 86, iy0 + 90, "first solid row", 13, th.muted)
     s.text(ix0 + 164, iy0 + 30,
-           "A region painted from row i down puts the contact on the", 14,
+           "A region painted from row $i$ down puts the contact on the", 14,
            th.fg, "start")
     s.text(ix0 + 164, iy0 + 52,
            "face plane $y = i·dx$: density averaged arithmetically onto", 14,
@@ -364,7 +364,7 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         (170.0, gy(0.25), "1.5 mm plane pulse at 0.25 m", th.secondary, True),
         (192.0, gy(0.25), "one-way; usable to 340 kHz", th.muted, False),
         (300.0, gy(0.32), "probe A, 30 mm above", th.primary, True),
-        (352.0, gy(0.355), "10 mm STEEL at y = 0.35 m", th.fg, True),
+        (352.0, gy(0.355), "10 mm STEEL at $y$ = 0.35 m", th.fg, True),
         (374.0, gy(0.355), "painted into WATER", th.muted, False),
         (430.0, gy(0.41), "probe B, 50 mm below", th.primary, True),
     ):
@@ -419,7 +419,8 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
 
     s.text(618, 400, "$TL(f) = 20 log_{10} |I(f) / T(f)|$", 20, th.fg,
            bold=True)
-    s.text(618, 424, "I from the gated probe A, T from probe B", 14, th.muted)
+    s.text(618, 424, "$I$ from the gated probe A, $T$ from probe B", 14,
+           th.muted)
 
     # --- The half-wave resonance inside the plate -------------------------
     s.rect(408, 448, 420, 140, "none", th.muted, rx=10, sw=1.4, dash="6,5")
