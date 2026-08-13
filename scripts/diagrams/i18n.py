@@ -264,8 +264,11 @@ _ES: dict[str, str] = {
     "floor  12.39 m²  $α_s$ 0.05": "suelo  12,39 m²  $α_s$ 0,05",
     "short wall  6.55 m²  $α_s$ 0.04  (x2)":
         "pared corta  6,55 m²  $α_s$ 0,04  (x2)",
+    # Single separators on this one tag: composed text keeps its
+    # whitespace, and with the doubled gaps the longer Spanish wording
+    # would push its last digit under the surfaces panel.
     "long wall (brick)  10.90 m²  $α_s$ 0.04":
-        "pared larga (ladrillo)  10,90 m²  $α_s$ 0,04",
+        "pared larga (ladrillo) 10,90 m² $α_s$ 0,04",
     "objects: 0.15, 0.60, 2 × 0.05, 2 × 0.65 m³":
         "objetos: 0,15, 0,60, 2 × 0,05, 2 × 0,65 m³",
     "$A$ = 2.26 m²   (Formula 1)": "$A$ = 2,26 m²   (fórmula 1)",
