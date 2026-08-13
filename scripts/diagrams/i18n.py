@@ -595,31 +595,32 @@ _ES: dict[str, str] = {
         "Nivel de evaluación  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
     "impulse-adjusted level over the reference time  (Note 1)":
         "nivel ajustado por impulsos sobre el tiempo de referencia  (Nota 1)",
-    "Vertical seat acceleration  az(t)":
-        "Aceleración vertical del asiento  az(t)",
+    "Vertical seat acceleration  $a_{z}(t)$":
+        "Aceleración vertical del asiento  $a_{z}(t)$",
     "conditioned per 5.1.3:  HP 0.01 Hz (2nd order) / LP 80 Hz (4th order)":
         "acondicionada según 5.1.3:  PA 0,01 Hz (2.º orden) / PB 80 Hz "
         "(4.º orden)",
     "not the ISO 2631-1 0.4 Hz / 100 Hz filters":
         "no los filtros de 0,4 Hz / 100 Hz de ISO 2631-1",
-    "Spinal response  Az(t)  (clause 5.2, Formula 1/2)":
-        "Respuesta de la columna  Az(t)  (cláusula 5.2, Fórmula 1/2)",
-    "seat-to-spine transfer function H(f): 1 zero, 6 poles":
-        "función de transferencia asiento-columna H(f): 1 cero, 6 polos",
-    "Acceleration dose  Dz = 1.07·(Σ Az,i^6)^(1/6)  (Formula 3)":
-        "Dosis de aceleración  Dz = 1.07·(Σ Az,i^6)^(1/6)  (Fórmula 3)",
-    "Az,i = positive peaks;   daily dose Dzd = Dz·(td/tm)^(1/6)":
-        "Az,i = picos positivos;   dosis diaria Dzd = Dz·(td/tm)^(1/6)",
-    "Compressive stress  Sd = mz·Dzd  (Annex C, Formula C.1)":
-        "Tensión compresiva  Sd = mz·Dzd  (Anexo C, Fórmula C.1)",
-    "mz = 0.029 (male) / 0.025 (female) MPa per m/s²":
-        "mz = 0.029 (hombre) / 0.025 (mujer) MPa por m/s²",
+    "Spinal response  $A_{z}(t)$  (clause 5.2, Formula 1/2)":
+        "Respuesta de la columna  $A_{z}(t)$  (cláusula 5.2, Fórmula 1/2)",
+    "seat-to-spine transfer function $H(f)$: 1 zero, 6 poles":
+        "función de transferencia asiento-columna $H(f)$: 1 cero, 6 polos",
+    "Acceleration dose  $D_z = 1.07·(Σ A_{z,i}^6)^{1/6}$  (Formula 3)":
+        "Dosis de aceleración  $D_z = 1,07·(Σ A_{z,i}^6)^{1/6}$  (Fórmula 3)",
+    "$A_{z,i}$ = positive peaks;   daily dose $D_{zd} = D_z·(t_d/t_m)^{1/6}$":
+        "$A_{z,i}$ = picos positivos;   dosis diaria "
+        "$D_{zd} = D_z·(t_d/t_m)^{1/6}$",
+    "Compressive stress  $S_d = m_z·D_{zd}$  (Annex C, Formula C.1)":
+        "Tensión compresiva  $S_d = m_z·D_{zd}$  (Anexo C, Fórmula C.1)",
+    "$m_z$ = 0.029 (male) / 0.025 (female) MPa per m/s²":
+        "$m_z$ = 0,029 (hombre) / 0,025 (mujer) MPa por m/s²",
     "Stress variable  R = [Σ (Sd·N^(1/6) / (Su − Sstat))^6]^(1/6)":
         "Variable de tensión  R = [Σ (Sd·N^(1/6) / (Su − Sstat))^6]^(1/6)",
     "Su = 6.75 − Sage·(b+i) MPa, cumulated over exposure years (C.3/C.4)":
         "Su = 6.75 − Sage·(b+i) MPa, acumulada sobre los años de exposición (C.3/C.4)",
-    "Injury probability  P(R) = 1 − exp(−(R/α)^β)  (Formula C.5)":
-        "Probabilidad de lesión  P(R) = 1 − exp(−(R/α)^β)  (Fórmula C.5)",
+    "Injury probability  $P(R) = 1 − exp(−(R/α)^β)$  (Formula C.5)":
+        "Probabilidad de lesión  $P(R) = 1 − exp(−(R/α)^β)$  (Fórmula C.5)",
     "Weibull risk of lumbar injury, by sex (Table C.1/C.2)":
         "riesgo de lesión lumbar de Weibull, por sexo (Tabla C.1/C.2)",
     "Multiple-shock spinal-response dose and injury risk (ISO 2631-5)":
@@ -667,8 +668,10 @@ _ES: dict[str, str] = {
     "Triaxial accelerometer": "Acelerómetro triaxial",
     "Band limiting + Wk / Wd": "Limitación de banda + Wk / Wd",
     "weighting (ISO 8041-1)": "ponderación (ISO 8041-1)",
-    "Weighted r.m.s. a_w  &  VDV": "a_w eficaz ponderada  y  VDV",
+    "Weighted r.m.s. $a_w$  &  VDV": "$a_w$ eficaz ponderada  y  VDV",
     "(ISO 2631-1)": "(ISO 2631-1)",
+    "$A(8) = max(1.4·a_{wx} , 1.4·a_{wy} , a_{wz})·√(T/T_0)$":
+        "$A(8) = max(1,4·a_{wx} , 1,4·a_{wy} , a_{wz})·√(T/T_0)$",
     "assessed vs EAV / ELV (Directive 2002/44/EC)":
         "evaluada frente a EAV / ELV (Directiva 2002/44/CE)",
     # Hand-transmitted vibration setup (ISO 5349-1/-2, Directive 2002/44/EC)
@@ -702,13 +705,13 @@ _ES: dict[str, str] = {
         "girado para que y_h siga el eje de",
     "handle axis. All three axes are":
         "la empuñadura. Se miden los tres",
-    "measured, and every k = 1.": "ejes, y todo k = 1.",
+    "measured, and every $k = 1$.": "ejes, y todo $k = 1$.",
     "Wh-weighted, one per axis (ISO 5349-1 A.1)":
         "ponderada Wh, una por eje (ISO 5349-1 A.1)",
     "vibration total value (Eq. (1))":
         "valor total de vibración (Ec. (1))",
-    "T_i is total contact time per day (5.5)":
-        "T_i es el tiempo total de contacto diario (5.5)",
+    "$T_i$ is total contact time per day (5.5)":
+        "$T_i$ es el tiempo total de contacto diario (5.5)",
     "one per hand, two significant figures (clause 8)":
         "una por mano, dos cifras significativas (capítulo 8)",
     "EAV 2.5 m/s²   ·   ELV 5 m/s²": "EAV 2,5 m/s²   ·   ELV 5 m/s²",
@@ -744,8 +747,8 @@ _ES: dict[str, str] = {
         "pegado al cojín para que los acelerómetros queden",
     "between the ischial tuberosities (5.1.2)":
         "entre las tuberosidades isquiáticas (5.1.2)",
-    "z is positive to cranial: the method is about":
-        "z es positivo hacia craneal: el método trata de",
+    "$z$ is positive to cranial: the method is about":
+        "$z$ es positivo hacia craneal: el método trata de",
     "compressive spinal loading (5.1.3, first step)":
         "la carga de compresión espinal (5.1.3, primer paso)",
     "a contact switch or video detects loss of contact,":
@@ -761,7 +764,8 @@ _ES: dict[str, str] = {
     "landing impact after a free fall shall be (5.1.2)":
         "tras una caída libre sí cuenta (5.1.2)",
     "no contact": "sin contacto",
-    "az(t), conditioned per 5.1.3": "az(t), acondicionada según 5.1.3",
+    "$a_{z}(t)$, conditioned per 5.1.3":
+        "$a_{z}(t)$, acondicionada según 5.1.3",
     "segment 1": "segmento 1",
     "segment 2": "segmento 2",
     "segment 3": "segmento 3",
@@ -1939,15 +1943,18 @@ _ES: dict[str, str] = {
     "Structure under test (free-free beam)":
         "Estructura bajo ensayo (viga libre-libre)",
     "Impedance head": "Cabeza de impedancia",
-    "F and a at the drive point": "F y a en el mismo punto",
-    "driving point:  Yii = vi / Fi": "punto de excitación:  Yii = vi / Fi",
-    "transfer:  Yji = vj / Fi": "transferencia:  Yji = vj / Fi",
-    "Y(f) = v/F  [m/(N·s)] · attached exciter (Part 2) · impact hammer (Part 5)":
-        "Y(f) = v/F  [m/(N·s)] · excitador acoplado (Parte 2) · martillo de "
-        "impacto (Parte 5)",
-    "same measurement, three FRFs: x/F receptance · v/F mobility · a/F accelerance":
-        "una misma medición, tres FRF: x/F receptancia · v/F movilidad · "
-        "a/F acelerancia",
+    "$F$ and $a$ at the drive point": "$F$ y $a$ en el mismo punto",
+    "driving point:  $Y_{ii} = v_i / F_i$":
+        "punto de excitación:  $Y_{ii} = v_i / F_i$",
+    "transfer:  $Y_{ji} = v_j / F_i$": "transferencia:  $Y_{ji} = v_j / F_i$",
+    "$Y(f) = v/F$  [m/(N·s)] · attached exciter (Part 2) · impact hammer "
+    "(Part 5)":
+        "$Y(f) = v/F$  [m/(N·s)] · excitador acoplado (Parte 2) · martillo "
+        "de impacto (Parte 5)",
+    "same measurement, three FRFs: $x/F$ receptance · $v/F$ mobility · "
+    "$a/F$ accelerance":
+        "una misma medición, tres FRF: $x/F$ receptancia · $v/F$ movilidad "
+        "· $a/F$ acelerancia",
     "Exciter": "Excitador",
     # Dynamic transfer stiffness (ISO 10846)
     "Dynamic transfer stiffness: direct and indirect methods (ISO 10846)":
@@ -1957,35 +1964,38 @@ _ES: dict[str, str] = {
     "excitation mass": "masa de excitación",
     "isolator under test": "aislador bajo ensayo",
     "force transducer": "transductor de fuerza",
-    "blocking mass m₂": "masa de bloqueo m₂",
+    "blocking mass $m_2$": "masa de bloqueo $m_2$",
     "soft support": "apoyo blando",
-    "output blocked:  u₂ ≈ 0 → measure F₂,b":
-        "salida bloqueada:  u₂ ≈ 0 → se mide F₂,b",
-    "measure T = u₂ / u₁  (small)": "se mide T = u₂ / u₁  (pequeña)",
-    "valid where ΔL₁,₂ = La₁ − La₂ ≥ 20 dB, i.e. |T| ≤ 0.1   (Part 3, Inequality 2)":
-        "válido donde ΔL₁,₂ = La₁ − La₂ ≥ 20 dB, es decir |T| ≤ 0,1   "
-        "(Parte 3, Desigualdad 2)",
+    "output blocked:  $u_2 ≈ 0$ → measure $F_{2,b}$":
+        "salida bloqueada:  $u_2 ≈ 0$ → se mide $F_{2,b}$",
+    "measure $T = u_2 / u_1$  (small)": "se mide $T = u_2 / u_1$  (pequeña)",
+    "valid where $ΔL_{1,2} = L_{a1} − L_{a2} ≥ 20$ dB, i.e. $|T| ≤ 0.1$   "
+    "(Part 3, Inequality 2)":
+        "válido donde $ΔL_{1,2} = L_{a1} − L_{a2} ≥ 20$ dB, es decir "
+        "$|T| ≤ 0,1$   (Parte 3, Desigualdad 2)",
     "the blocking force approximates the force delivered to a stiff receiver (Part 1, Eq. 7)":
         "la fuerza de bloqueo aproxima la fuerza entregada a un receptor "
         "rígido (Parte 1, Ec. 7)",
-    "a′₁: unwanted transverse input,": "a′₁: entrada transversal no deseada,",
-    "≥ 15 dB below a₁ (Inequality 3)": "≥ 15 dB por debajo de a₁ (Desigualdad 3)",
+    "$a′_1$: unwanted transverse input,":
+        "$a′_1$: entrada transversal no deseada,",
+    "≥ 15 dB below $a_1$ (Inequality 3)":
+        "≥ 15 dB por debajo de $a_1$ (Desigualdad 3)",
     # The transverse-input symbol: subscripts only, identical in Spanish.
-    "a₁ₓ": "a₁ₓ",
+    "$a_{1x}$": "$a_{1x}$",
     "The two ways the static preload is applied (ISO 10846-1, 6.3.3.1)":
         "Las dos formas de aplicar la precarga estática (ISO 10846-1, 6.3.3.1)",
     "a) gravity: the output-side mass is the preload":
         "a) gravedad: la masa de salida es la precarga",
     "load mass": "masa de carga",
-    "W = load": "W = carga",
+    "$W$ = load": "$W$ = carga",
     "simple, but unstable for large isolators at high loads":
         "sencillo, pero inestable con precargas altas",
     "b) frame and actuator, with decoupling springs":
         "b) bastidor y actuador, con muelles de desacoplo",
     "actuator: 100 % of the": "actuador: 100 % de la",
     "permissible static load": "carga estática admisible",
-    "auxiliary springs decouple m₂ from the frame":
-        "los muelles auxiliares desacoplan m₂ del bastidor",
+    "auxiliary springs decouple $m_2$ from the frame":
+        "los muelles auxiliares desacoplan $m_2$ del bastidor",
     "Transverse translations are standardised too (ISO 10846-2, 5.2)":
         "Las traslaciones transversales también están normalizadas "
         "(ISO 10846-2, 5.2)",
@@ -1995,7 +2005,8 @@ _ES: dict[str, str] = {
     "elements, suppress the unwanted input":
         "simétricos, suprimen la entrada no deseada",
     "output shear force summed from two": "fuerza cortante de salida sumada",
-    "transducers,  F₂ = F₂′ + F₂″": "de dos transductores,  F₂ = F₂′ + F₂″",
+    "transducers,  $F_2 = F_2′ + F_2″$":
+        "de dos transductores,  $F_2 = F_2′ + F_2″$",
     "a mount is loaded in shear as well as in compression, and the transverse "
     "stiffness is usually the smaller of the two":
         "un apoyo trabaja a cortante además de a compresión, y la rigidez "
@@ -2030,22 +2041,23 @@ _ES: dict[str, str] = {
     "subsystem 2": "subsistema 2",
     "impedance head": "cabeza de impedancia",
     "shaker": "excitador",
-    "Π₁ measured,  Π₂ = 0": "Π₁ medida,  Π₂ = 0",
-    "Π₂ measured,  Π₁ = 0": "Π₂ medida,  Π₁ = 0",
+    "$Π_1$ measured,  $Π_2 = 0$": "$Π_1$ medida,  $Π_2 = 0$",
+    "$Π_2$ measured,  $Π_1 = 0$": "$Π_2$ medida,  $Π_1 = 0$",
     # Energy bookkeeping of the two runs: symbols only, identical in Spanish.
-    "E₁ = M₁⟨v₁²⟩,   E₂ = M₂⟨v₂²⟩": "E₁ = M₁⟨v₁²⟩,   E₂ = M₂⟨v₂²⟩",
-    "Πin = ½ Re{F v*} at the drive point, from an impedance head — not the "
-    "amplifier setting":
-        "Πin = ½ Re{F v*} en el punto de excitación, con cabeza de impedancia "
-        "y no con el ajuste del amplificador",
-    "⟨v²⟩ space-averaged over several positions per subsystem, away from the "
-    "edges and from the drive point":
-        "⟨v²⟩ promediada en el espacio sobre varias posiciones por subsistema, "
-        "lejos de los bordes y del punto de excitación",
-    "one run inverts to η₁₂ only if η₁ and η₂ are known from a decay "
-    "measurement; two runs solve all four":
-        "un ensayo despeja η₁₂ solo si η₁ y η₂ se conocen por medición de "
-        "decaimiento; dos ensayos resuelven los cuatro",
+    "$E_1 = M_1⟨v_1^2⟩,   E_2 = M_2⟨v_2^2⟩$":
+        "$E_1 = M_1⟨v_1^2⟩,   E_2 = M_2⟨v_2^2⟩$",
+    "$Π_{in} = ½ Re{F v*}$ at the drive point, from an impedance head — "
+    "not the amplifier setting":
+        "$Π_{in} = ½ Re{F v*}$ en el punto de excitación, con cabeza de "
+        "impedancia y no con el ajuste del amplificador",
+    "$⟨v^2⟩$ space-averaged over several positions per subsystem, away "
+    "from the edges and from the drive point":
+        "$⟨v^2⟩$ promediada en el espacio sobre varias posiciones por "
+        "subsistema, lejos de los bordes y del punto de excitación",
+    "one run inverts to $η_{12}$ only if $η_1$ and $η_2$ are known from a "
+    "decay measurement; two runs solve all four":
+        "un ensayo despeja $η_{12}$ solo si $η_1$ y $η_2$ se conocen por "
+        "medición de decaimiento; dos ensayos resuelven los cuatro",
     "bands wide enough to hold several modes of each subsystem: the modal "
     "densities decide how wide":
         "bandas anchas para contener varios modos de cada subsistema: las "
@@ -2061,36 +2073,37 @@ _ES: dict[str, str] = {
     "spall on the outer race": "descascarillado en la pista exterior",
     "BPFO = 207.0 Hz: one impact per pass":
         "BPFO = 207,0 Hz: un impacto por paso",
-    "D = 34 mm (pitch)": "D = 34 mm (primitivo)",
-    "d = 6 mm": "d = 6 mm",
-    "inner race turns at fs = 33.33 Hz,": "la pista interior gira a fs = 33,33 Hz,",
+    "$D$ = 34 mm (pitch)": "$D$ = 34 mm (primitivo)",
+    "$d$ = 6 mm": "$d$ = 6 mm",
+    "inner race turns at $f_s$ = 33.33 Hz,":
+        "la pista interior gira a $f_s$ = 33,33 Hz,",
     "outer race stationary": "la exterior está fija",
-    "cage FTF = 13.8 Hz = 0.41 fs": "jaula FTF = 13,8 Hz = 0,41 fs",
+    "cage FTF = 13.8 Hz = 0.41 $f_s$": "jaula FTF = 13,8 Hz = 0,41 $f_s$",
     "bearing axis": "eje del rodamiento",
     "outer ring": "aro exterior",
     "inner ring": "aro interior",
     "radial plane": "plano radial",
-    "contact line,  φ = 12.96°": "línea de contacto,  φ = 12,96°",
+    "contact line,  $φ$ = 12.96°": "línea de contacto,  $φ$ = 12,96°",
     "the contact angle exists only in this view: it is measured":
         "el ángulo de contacto solo existe en esta vista: se mide",
-    "from the radial plane, so φ = 0 for a deep-groove ball bearing":
-        "desde el plano radial: φ = 0 en un rodamiento de bolas",
-    "and φ > 0 for angular-contact and tapered-roller types":
-        "y φ > 0 en los de contacto angular y de rodillos cónicos",
+    "from the radial plane, so $φ = 0$ for a deep-groove ball bearing":
+        "desde el plano radial: $φ = 0$ en un rodamiento de bolas",
+    "and $φ > 0$ for angular-contact and tapered-roller types":
+        "y $φ > 0$ en los de contacto angular y de rodillos cónicos",
     "chipped tooth": "diente desconchado",
     "28-tooth pinion on a": "piñón de 28 dientes sobre un",
     "1500 r/min shaft:": "eje a 1500 r/min:",
-    "fs = 25 Hz": "fs = 25 Hz",
+    "$f_s$ = 25 Hz": "$f_s$ = 25 Hz",
     "6 blades (solid), 4 vanes (dashed)":
         "6 álabes (continuos), 4 directrices (a trazos)",
-    "GMF = N fs = 28 × 25 = 700 Hz, and a chipped tooth modulates it once "
-    "per revolution: sidebands at ± fs":
-        "GMF = N fs = 28 × 25 = 700 Hz, y un diente desconchado la modula una "
-        "vez por vuelta: bandas laterales a ± fs",
-    "mL = nN ± kV = 6 ± 4 → 2 or 10 lobes, turning at nNfs/mL = 175 or 35 Hz: "
-    "the faster pattern radiates far more strongly":
-        "mL = nN ± kV = 6 ± 4 → 2 o 10 lóbulos, que giran a nNfs/mL = 175 o "
-        "35 Hz: el patrón más rápido radia mucho más",
+    "$GMF = N f_s = 28 × 25$ = 700 Hz, and a chipped tooth modulates it "
+    "once per revolution: sidebands at $± f_s$":
+        "$GMF = N f_s = 28 × 25$ = 700 Hz, y un diente desconchado la modula "
+        "una vez por vuelta: bandas laterales a $± f_s$",
+    "$m_L = n·N ± k·V = 6 ± 4$ → 2 or 10 lobes, turning at $n·N·f_s/m_L$ = "
+    "175 or 35 Hz: the faster pattern radiates far more strongly":
+        "$m_L = n·N ± k·V = 6 ± 4$ → 2 o 10 lóbulos, que giran a "
+        "$n·N·f_s/m_L$ = 175 o 35 Hz: el patrón más rápido radia mucho más",
     # Condition monitoring on a machine train (Norton & Karczub Section 8.4)
     "Condition monitoring on a motor-gearbox train (Norton Section 8.4)":
         "Monitorización de estado en un tren motor-reductora (Norton 8.4)",
@@ -2123,14 +2136,14 @@ _ES: dict[str, str] = {
     "marginal there and a hand-held probe is useless":
         "queda justa y una punta manual no sirve",
     "Acquisition": "Adquisición",
-    "fs = 20 kHz clears the 3 kHz housing resonance":
-        "fs = 20 kHz supera la resonancia de 3 kHz del soporte",
-    "T = 2 s at 2000 r/min = 67 revolutions":
-        "T = 2 s a 2000 r/min = 67 vueltas",
-    "Δf = 1/T = 0.5 Hz, against fs = 33.3 Hz":
-        "Δf = 1/T = 0,5 Hz, frente a fs = 33,3 Hz",
-    "enough to resolve the ± fs sidebands, which are":
-        "suficiente para resolver las bandas laterales a ± fs, que son",
+    "$f_s$ = 20 kHz clears the 3 kHz housing resonance":
+        "$f_s$ = 20 kHz supera la resonancia de 3 kHz del soporte",
+    "$T$ = 2 s at 2000 r/min = 67 revolutions":
+        "$T$ = 2 s a 2000 r/min = 67 vueltas",
+    "$Δf = 1/T$ = 0.5 Hz, against $f_s$ = 33.3 Hz":
+        "$Δf = 1/T$ = 0,5 Hz, frente a $f_s$ = 33,3 Hz",
+    "enough to resolve the $± f_s$ sidebands, which are":
+        "suficiente para resolver las bandas laterales a $± f_s$, que son",
     "what separates an inner-race defect from an":
         "lo que distingue un defecto de pista interior de uno",
     "outer-race one": "de pista exterior",
@@ -2283,20 +2296,24 @@ _ES: dict[str, str] = {
         "Medición de vibración en uniones en L y en T (ISO 10848)",
     "L-junction": "Unión en L",
     "T-junction": "Unión en T",
-    "Shaker or hammer on element i": "Excitador o martillo sobre el elemento i",
+    "Shaker or hammer on element $i$":
+        "Excitador o martillo sobre el elemento $i$",
     "accelerometers on i and j": "acelerómetros en i y j",
-    "lij ≥ 2.3 m": "lij ≥ 2,3 m",
+    "$l_{ij} ≥ 2.3$ m": "$l_{ij} ≥ 2,3$ m",
     "concrete plates 140 mm to 200 mm thick":
         "placas de hormigón de 140 mm a 200 mm de espesor",
-    "lij ≥ 2.3 m along the junction; element sizes 3.0 m ≤ li < 6.0 m":
-        "lij ≥ 2,3 m a lo largo de la unión; dimensiones de elemento "
-        "3,0 m ≤ li < 6,0 m",
-    "≥ 4 excitation positions on i; accelerometers ≥ 0.25 m from edges, ≥ 0.5 m apart":
-        "≥ 4 posiciones de excitación en i; acelerómetros a ≥ 0,25 m de los "
-        "bordes y ≥ 0,5 m entre sí",
-    "Kij = D̄v,ij + 10 log10( lij / √(ai·aj) ),   ai = equivalent absorption length":
-        "Kij = D̄v,ij + 10 log10( lij / √(ai·aj) ),   ai = long. de "
-        "absorción equiv.",
+    "$l_{ij} ≥ 2.3$ m along the junction; element sizes 3.0 m $≤ l_i <$ "
+    "6.0 m":
+        "$l_{ij} ≥ 2,3$ m a lo largo de la unión; dimensiones de elemento "
+        "3,0 m $≤ l_i <$ 6,0 m",
+    "≥ 4 excitation positions on $i$; accelerometers ≥ 0.25 m from edges, "
+    "≥ 0.5 m apart":
+        "≥ 4 posiciones de excitación en $i$; acelerómetros a ≥ 0,25 m de "
+        "los bordes y ≥ 0,5 m entre sí",
+    "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) )$,   $a_i$ = "
+    "equivalent absorption length":
+        "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) )$,   "
+        "$a_i$ = long. de absorción equiv.",
     # Sound power from surface vibration (ISO/TS 7849)
     "Sound power from surface vibration (ISO/TS 7849)":
         "Potencia acústica a partir de la vibración superficial (ISO/TS 7849)",
