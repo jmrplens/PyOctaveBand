@@ -2440,14 +2440,15 @@ _ES_EXACT = {
     # thought the other owned it, so its lines were the last of the baseline.
     "Accumulation Against the Criteria (dotted TTS, dashed AUD INJ)":
         "Acumulación frente a los criterios (TTS punteado, AUD INJ discontinuo)",
-    "Weighted cumulative SEL [dB re 1 uPa^2 s]":
-        "SEL acumulado ponderado [dB re 1 uPa^2 s]",
+    "Weighted cumulative SEL [dB re 1 µPa²·s]":
+        "SEL acumulado ponderado [dB re 1 µPa²·s]",
     "Ship Equivalent Monopole Source Level (ISO 17208-2)":
         "Nivel de fuente monopolar equivalente de buque (ISO 17208-2)",
-    "Source level Ls": "Nivel de fuente Ls",
+    "Source level $L_s$": "Nivel de fuente $L_s$",
     "Radiated noise level": "Nivel de ruido radiado",
-    "Surface correction ΔL [dB]": "Corrección de superficie ΔL [dB]",
-    "Surface correction ΔL": "Corrección de superficie ΔL",
+    r"Surface correction $\Delta L$ [dB]":
+        r"Corrección de superficie $\Delta L$ [dB]",
+    r"Surface correction $\Delta L$": r"Corrección de superficie $\Delta L$",
     "Level [dB re 1 µPa·m]": "Nivel [dB re 1 µPa·m]",
     "Percussive Pile-Driving Strike (ISO 18406)":
         "Golpe de hincado de pilotes por percusión (ISO 18406)",
@@ -2498,7 +2499,7 @@ _ES_EXACT = {
     "echo off the steel\n3.04 ms": "eco en el acero\n3,04 ms",
     "echo / incident = 0.938\n$(Z_2 - Z_1)/(Z_2 + Z_1)$ = 0.938":
         "eco / incidente = 0,938\n$(Z_2 - Z_1)/(Z_2 + Z_1)$ = 0,938",
-    "Number of strikes N": "Número de golpes N",
+    "Number of strikes $N$": "Número de golpes $N$",
     "Cumulative SEL [dB re 1 µPa²·s]": "SEL acumulado [dB re 1 µPa²·s]",
     "ICAO Aircraft Flyover — Effective Perceived Noise Level (Annex 16)":
         "Sobrevuelo de aeronave ICAO — Nivel efectivo de ruido percibido (Anexo 16)",
@@ -2545,15 +2546,16 @@ _ES_EXACT = {
     "Weston Shallow-Water Propagation Regimes (Ainslie §9.1.1.2)":
         "Regímenes de propagación de Weston en aguas someras (Ainslie §9.1.1.2)",
     "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
-    "Spherical, 20 log10 r": "Esférica, 20 log10 r",
-    "Cylindrical, 10 log10 r": "Cilíndrica, 10 log10 r",
-    "Mode stripping, 15 log10 r": "Descamado de modos, 15 log10 r",
+    r"Spherical, $20\,\log_{10} r$": r"Esférica, $20\,\log_{10} r$",
+    r"Cylindrical, $10\,\log_{10} r$": r"Cilíndrica, $10\,\log_{10} r$",
+    r"Mode stripping, $15\,\log_{10} r$":
+        r"Descamado de modos, $15\,\log_{10} r$",
     "Single mode": "Modo único",
     "Composite propagation loss": "Pérdida de propagación compuesta",
     # Marine-mammal auditory weighting (NMFS 2024 v3.0).
     "Marine-Mammal Auditory Weighting (NMFS 2024, v3.0)":
         "Ponderación auditiva de mamíferos marinos (NMFS 2024, v3.0)",
-    "Weighting amplitude W(f) [dB]": "Amplitud de ponderación W(f) [dB]",
+    "Weighting amplitude $W(f)$ [dB]": "Amplitud de ponderación $W(f)$ [dB]",
     "Passive Sonar Equation": "Ecuación del sonar pasivo",
     "Signal excess [dB]": "Exceso de señal [dB]",
     "Signal excess": "Exceso de señal",
@@ -2567,12 +2569,12 @@ _ES_EXACT = {
     "Bottom loss (sand)": "Pérdida por reflexión (arena)",
     "Seabed Reflection Coefficient (Rayleigh)":
         "Coeficiente de reflexión del fondo (Rayleigh)",
-    "Reflection coefficient magnitude |R|":
-        "Módulo del coeficiente de reflexión |R|",
-    "Reflection coefficient magnitude |R| (sand)":
-        "Módulo del coeficiente de reflexión |R| (arena)",
-    "Water ρ = 1000, c = 1500\nSand ρ = 1900, c = 1650":
-        "Agua ρ = 1000, c = 1500\nArena ρ = 1900, c = 1650",
+    "Reflection coefficient magnitude $|R|$":
+        "Módulo del coeficiente de reflexión $|R|$",
+    "Reflection coefficient magnitude $|R|$ (sand)":
+        "Módulo del coeficiente de reflexión $|R|$ (arena)",
+    "Water $\\rho$ = 1000, $c$ = 1500\nSand $\\rho$ = 1900, $c$ = 1650":
+        "Agua $\\rho$ = 1000, $c$ = 1500\nArena $\\rho$ = 1900, $c$ = 1650",
     "Ocean Ambient Noise (Wenz)": "Ruido ambiental oceánico (Wenz)",
     "Spectrum level [dB re 1 µPa²/Hz]": "Nivel espectral [dB re 1 µPa²/Hz]",
     "Ship Traffic Source Level (JOMOPANS-ECHO)":
@@ -2581,7 +2583,7 @@ _ES_EXACT = {
     "Source": "Fuente",
     "Range [km]": "Distancia [km]",
     "Parabolic equation (50 Hz)": "Ecuación parabólica (50 Hz)",
-    "Modes vs PE (50 Hz, z = 120 m)": "Modos vs PE (50 Hz, z = 120 m)",
+    "Modes vs PE (50 Hz, $z$ = 120 m)": "Modos vs PE (50 Hz, $z$ = 120 m)",
     "Normal modes": "Modos normales",
     "Parabolic equation": "Ecuación parabólica",
     "Source spectral density [dB re 1 µPa²/Hz at 1 m]":
@@ -2604,69 +2606,71 @@ _ES_EXACT = {
     "Normal-mode TL (30 Hz, 100 m waveguide, 3 modes)":
         "TL de modos normales (30 Hz, guía de 100 m, 3 modos)",
     "Total TL": "TL total",
-    "Mode function Psi_m(z)": "Función modal Psi_m(z)",
-    "Mode m Has m - 1 Interior Nulls":
-        "El modo m tiene m - 1 ceros interiores",
-    "Number of propagating modes M": "Número de modos propagantes M",
+    r"Mode function $\Psi_m(z)$": r"Función modal $\Psi_m(z)$",
+    "Mode $m$ Has $m - 1$ Interior Nulls":
+        "El modo $m$ tiene $m - 1$ ceros interiores",
+    "Number of propagating modes $M$": "Número de modos propagantes $M$",
     "One Mode Cuts On at a Time": "Los modos entran de uno en uno",
     "Propagating modes returned": "Modos propagantes devueltos",
     "mode 4 has a null at the source depth,\nso the source does not excite it":
         "el modo 4 tiene un cero a la profundidad\nde la fuente, que por eso "
         "no lo excita",
     "source depth 50 m": "profundidad de la fuente: 50 m",
-    "Modal Transmission Loss (z = 100 m)":
-        "Pérdida por transmisión modal (z = 100 m)",
+    "Modal Transmission Loss ($z$ = 100 m)":
+        "Pérdida por transmisión modal ($z$ = 100 m)",
     "10 kHz, spherical only": "10 kHz, solo esférica",
-    "10 kHz, practical R0 = 1 km": "10 kHz, ley práctica, R0 = 1 km",
-    "20 kHz, practical R0 = 1 km": "20 kHz, ley práctica, R0 = 1 km",
+    "10 kHz, practical $R_0$ = 1 km": "10 kHz, ley práctica, $R_0$ = 1 km",
+    "20 kHz, practical $R_0$ = 1 km": "20 kHz, ley práctica, $R_0$ = 1 km",
     "A Passive Sonar Budget, End to End":
         "Un balance de sonar pasivo, de punta a punta",
-    "SL = 140 dB re 1 uPa^2/Hz at 10 kHz\n"
-    "NL = 60 dB,  DI = 15 dB,  DT = 8 dB\nFOM = SL - (NL - DI) - DT":
-        "SL = 140 dB re 1 uPa^2/Hz a 10 kHz\n"
-        "NL = 60 dB,  DI = 15 dB,  DT = 8 dB\nFOM = SL - (NL - DI) - DT",
+    "SL = 140 dB re 1 µPa²/Hz at 10 kHz\n"
+    "NL = 60 dB,  DI = 15 dB,  DT = 8 dB\n"
+    r"$\mathrm{FOM} = \mathrm{SL} - (\mathrm{NL} - \mathrm{DI})"
+    r" - \mathrm{DT}$":
+        "SL = 140 dB re 1 µPa²/Hz a 10 kHz\n"
+        "NL = 60 dB,  DI = 15 dB,  DT = 8 dB\n"
+        r"$\mathrm{FOM} = \mathrm{SL} - (\mathrm{NL} - \mathrm{DI})"
+        r" - \mathrm{DT}$",
     # The ship_source_level info box is mathematics that reads the same in
-    # both languages; the save-time pass sets the decimal commas.
-    "Ls = LRN + ΔL\nΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
-    "u = k d_s,  d_s = 0.7 D = 4.2 m":
-        "Ls = LRN + ΔL\nΔL = −10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]\n"
-        "u = k d_s,  d_s = 0.7 D = 4.2 m",
+    # both languages; the mathtext blocks the save-time comma pass, so the
+    # Spanish twin bakes the commas (brace-guarded inside the math).
+    "$L_s = L_{RN} + \\Delta L$\n"
+    "$\\Delta L = -10\\,\\log_{10}[(2u^4 + 14u^2)/(14 + 2u^2 + u^4)]$\n"
+    "$u = k\\,d_s$,  $d_s = 0.7\\,D$ = 4.2 m":
+        "$L_s = L_{RN} + \\Delta L$\n"
+        "$\\Delta L = -10\\,\\log_{10}[(2u^4 + 14u^2)/(14 + 2u^2 + u^4)]$\n"
+        "$u = k\\,d_s$,  $d_s = 0{,}7\\,D$ = 4,2 m",
     "Linear Gradient": "Gradiente lineal",
-    "Every Ray Turns Where c(z_t) = c(z_s)/cos(theta_0)":
-        "Cada rayo gira donde c(z_t) = c(z_s)/cos(theta_0)",
-    "exact circular arc, R = c0/(g cos th0)":
-        "arco circular exacto, R = c0/(g cos th0)",
+    r"Every Ray Turns Where $c(z_t) = c(z_s)/\cos\theta_0$":
+        r"Cada rayo gira donde $c(z_t) = c(z_s)/\cos\theta_0$",
+    r"exact circular arc, $R = c_0/(g\,\cos\theta_0)$":
+        r"arco circular exacto, $R = c_0/(g\,\cos\theta_0)$",
     "source, 100 m": "fuente, 100 m",
-    "2 deg": "2°",
-    "4 deg": "4°",
-    "6 deg": "6°",
-    "8 deg": "8°",
-    "10 deg": "10°",
     "50 Hz in 100 m of Water, Receiver at 60 m":
         "50 Hz en 100 m de agua, receptor a 60 m",
     "Normal modes, range-averaged (reference)":
         "Modos normales, promediados en distancia (referencia)",
     "Parabolic equation, range-averaged":
         "Ecuación parabólica, promediada en distancia",
-    "Modal grazing angle arccos(k_rm/k) [deg]":
-        "Ángulo rasante modal arccos(k_rm/k) [°]",
-    "Mode index m": "Índice de modo m",
+    r"Modal grazing angle $\arccos(k_{rm}/k)$ [°]":
+        r"Ángulo rasante modal $\arccos(k_{rm}/k)$ [°]",
+    "Mode index $m$": "Índice de modo $m$",
     "within the paraxial band": "dentro de la banda paraxial",
-    "steeper than 20 deg": "más inclinados que 20°",
-    "Volume Absorption (10 C, 35 ppt, 100 m)":
+    "steeper than 20°": "más inclinados que 20°",
+    "Volume Absorption (10 °C, 35 ppt, 100 m)":
         "Absorción de volumen (10 °C, 35 ppt, 100 m)",
-    "Absorption coefficient alpha [dB/km]":
-        "Coeficiente de absorción α [dB/km]",
+    r"Absorption coefficient $\alpha$ [dB/km]":
+        r"Coeficiente de absorción $\alpha$ [dB/km]",
     "Departure from Francois-Garrison [%]":
         "Desviación respecto a Francois-Garrison [%]",
     "Where Each Simplification Is Honest":
         "Dónde es honesta cada simplificación",
-    "+/-10 % of Francois-Garrison": "+/-10 % de Francois-Garrison",
+    "±10 % of Francois-Garrison": "±10 % de Francois-Garrison",
     "boric acid": "ácido bórico",
     "pure water": "agua pura",
-    "MgSO4": "MgSO4",
+    r"$\mathrm{MgSO_4}$": r"$\mathrm{MgSO_4}$",
     "Four Equations, One Profile": "Cuatro ecuaciones, un perfil",
-    "Sound speed c [m/s]": "Velocidad del sonido c [m/s]",
+    "Sound speed $c$ [m/s]": "Velocidad del sonido $c$ [m/s]",
     "Difference from UNESCO / Chen-Millero [m/s]":
         "Diferencia respecto a UNESCO / Chen-Millero [m/s]",
     "Medwin: beyond ~1000 m": "Medwin: más allá de ~1000 m",
@@ -2681,9 +2685,9 @@ _ES_EXACT = {
     "Weighted (VHF, nmfs-2024)": "Ponderada (VHF, nmfs-2024)",
     "Southall et al. (2019) Group Audiograms":
         "Audiogramas de grupo de Southall et al. (2019)",
-    "Threshold [dB re 1 uPa; in-air groups re 20 uPa]":
-        "Umbral [dB re 1 uPa; grupos en aire re 20 uPa]",
-    "Threshold [dB re 1 uPa]": "Umbral [dB re 1 uPa]",
+    "Threshold [dB re 1 µPa; in-air groups re 20 µPa]":
+        "Umbral [dB re 1 µPa; grupos en aire re 20 µPa]",
+    "Threshold [dB re 1 µPa]": "Umbral [dB re 1 µPa]",
     "OCA (in air)": "OCA (en aire)",
     "PCA (in air)": "PCA (en aire)",
     "no published fit for LF cetaceans":
@@ -2693,16 +2697,16 @@ _ES_EXACT = {
         "Orca (Ainslie 2010, ec. 11.159)",
     "What a Band Level Is Compared Against":
         "Contra qué se compara un nivel de banda",
-    "Exposure function E(f) = K + C - W(f) [dB re 1 uPa^2 s]":
-        "Función de exposición E(f) = K + C - W(f) [dB re 1 uPa^2 s]",
-    "What b = 5 Changed for LF Cetaceans":
-        "Lo que b = 5 cambió para los cetáceos LF",
-    "Weighting W(f) [dB]": "Ponderación W(f) [dB]",
-    "nmfs-2018  (b = 2)": "nmfs-2018  (b = 2)",
-    "nmfs-2024  (b = 5)": "nmfs-2024  (b = 5)",
+    "Exposure function $E(f) = K + C - W(f)$ [dB re 1 µPa²·s]":
+        "Función de exposición $E(f) = K + C - W(f)$ [dB re 1 µPa²·s]",
+    "What $b$ = 5 Changed for LF Cetaceans":
+        "Lo que $b$ = 5 cambió para los cetáceos LF",
+    "Weighting $W(f)$ [dB]": "Ponderación $W(f)$ [dB]",
+    "nmfs-2018  ($b$ = 2)": "nmfs-2018  ($b$ = 2)",
+    "nmfs-2024  ($b$ = 5)": "nmfs-2024  ($b$ = 5)",
     "Hearing group": "Grupo auditivo",
-    "Onset criterion [dB re 1 uPa^2 s / dB re 1 uPa]":
-        "Criterio de inicio [dB re 1 uPa^2 s / dB re 1 uPa]",
+    "Onset criterion [dB re 1 µPa²·s / dB re 1 µPa]":
+        "Criterio de inicio [dB re 1 µPa²·s / dB re 1 µPa]",
     "Impulsive Onset Criteria (NMFS 2024)":
         "Criterios de inicio impulsivos (NMFS 2024)",
     "TTS SEL (weighted)": "SEL de TTS (ponderado)",
@@ -4661,10 +4665,18 @@ _ES_PATTERNS = [
      r"TL = \1 dB a \2 Hz"),
     (r"^Integrated I = (.+) LUFS$", "Integrada I = \\1 LUFS"),
     (r"^LRA = (.+) LU \(P10-P95\)$", "LRA = \\1 LU (P10-P95)"),
-    (r"^f = 10 kHz, α = (.+) dB/km\npractical spreading \(R₀ = 1000 m\)$",
-     "f = 10 kHz, α = \\1 dB/km\\nensanchamiento práctico (R₀ = 1000 m)"),
-    (r"^f = 250 Hz, H = 50 m, medium sand\nψc = (.+)°, η = (.+) Np/rad, (.+) modes$",
-     "f = 250 Hz, H = 50 m, arena media\\nψc = \\1°, η = \\2 Np/rad, \\3 modos"),
+    # The keys carry $...$ now, which blocks the save-time decimal-comma
+    # pass, so the replacements bake the commas.
+    ((r"^\$f\$ = 10 kHz, \$\\alpha\$ = (\d+)\.(\d+) dB/km\n"
+      r"practical spreading \(\$R_0\$ = 1000 m\)$"),
+     (r"$f$ = 10 kHz, $\\alpha$ = \1,\2 dB/km"
+      "\nensanchamiento práctico ($R_0$ = 1000 m)")),
+    ((r"^\$f\$ = 250 Hz, \$H\$ = 50 m, medium sand\n"
+      r"\$\\psi_c\$ = (\d+)\.(\d+)°, \$\\eta\$ = (\d+)\.(\d+) Np/rad, "
+      r"(\d+) modes$"),
+     (r"$f$ = 250 Hz, $H$ = 50 m, arena media"
+      "\n"
+      r"$\\psi_c$ = \1,\2°, $\\eta$ = \3,\4 Np/rad, \5 modos")),
     # stoi_segment_scores legend and annotation (baked-in values).
     (r"^steady noise at 0 dB \(STOI = (\d)\.(\d+)\)$",
      r"ruido estacionario a 0 dB (STOI = \1,\2)"),
@@ -5416,6 +5428,14 @@ _ES_PATTERNS = [
     # Underwater figures: readouts carrying computed values (the detection
     # ranges, the modal wavenumbers, the orca branches, the exposure
     # functions and the sound-speed spread).
+    # pile_driving title: mathematics that reads the same in both languages
+    # (the strike SEL value is computed), kept as a deliberate identity.
+    ((r"^\$\\mathrm\{SEL\}_\{\\mathrm\{ss\}\}\$ = (\d+) dB;  "
+      r"\$\\mathrm\{SEL\}_\{\\mathrm\{cum\}\} = \\mathrm\{SEL\}_\{\\mathrm\{ss\}\}"
+      r" \+ 10\\,\\log_\{10\}\(N\)\$$"),
+     (r"$\\mathrm{SEL}_{\\mathrm{ss}}$ = \1 dB;  "
+      r"$\\mathrm{SEL}_{\\mathrm{cum}} = \\mathrm{SEL}_{\\mathrm{ss}}"
+      r" + 10\\,\\log_{10}(N)$")),
     (r"^Detection range ([\d.]+) m$", r"Alcance de detección \1 m"),
     (r"^Figure of merit ([\d.]+) dB$", r"Figura de mérito \1 dB"),
     (r"^Figure of merit = ([\d.]+) dB$", r"Figura de mérito = \1 dB"),
@@ -5426,8 +5446,8 @@ _ES_PATTERNS = [
     (r"^still detectable at ([\d.]+) km$", r"aún detectable a \1 km"),
     (r"^Peak = ([\d.]+) dB re 1 µPa$", r"Pico = \1 dB re 1 µPa"),
     (r"^(\d+) modes \((\d+) Hz\)$", r"\1 modos (\2 Hz)"),
-    (r"^m = (\d),  kr = ([\d.]+) \(exact ([\d.]+)\)$",
-     r"m = \1,  kr = \2 (exacto \3)"),
+    (r"^\$m\$ = (\d),  \$k_r\$ = (\d+)\.(\d+) \(exact (\d+)\.(\d+)\)$",
+     r"$m$ = \1,  $k_r$ = \2,\3 (exacto \4,\5)"),
     (r"^(\d+) of (\d+) Modes Are Outside It$",
      r"\1 de \2 modos quedan fuera"),
     ((r"^the PE loses ([\d.]+) dB of level at every range,\n"
@@ -5436,15 +5456,15 @@ _ES_PATTERNS = [
      ("la PE pierde \\1 dB de nivel a cualquier distancia,\n"
       "y el sesgo no se diluye: una guía ideal\n"
       "no descama ningún modo")),
-    (r"^analytic z_t = ([\d.]+) m\ntraced      = ([\d.]+) m$",
-     "z_t analítica = \\1 m\nz_t trazada   = \\2 m"),
+    (r"^analytic \$z_t\$ = (\d+)\.(\d+) m\ntraced      = (\d+)\.(\d+) m$",
+     "$z_t$ analítica = \\1,\\2 m\ntrazada      = \\3,\\4 m"),
     ((r"^Mackenzie check point: ([\d.]+) m/s\n"
-      r"at 25 C, 35 ppt, 1000 m \(not on this profile\)$"),
+      r"at 25 °C, 35 ppt, 1000 m \(not on this profile\)$"),
      ("Punto de comprobación de Mackenzie: \\1 m/s\n"
       "a 25 °C, 35 ppt, 1000 m (fuera de este perfil)")),
     (r"^Spread on This Profile: up to ([\d.]+) m/s$",
      r"Dispersión en este perfil: hasta \1 m/s"),
-    (r"^(LF|HF|VHF|PW|OW): cumulative ([\d.]+) dB, margin ([+-][\d.]+) dB$",
+    (r"^(LF|HF|VHF|PW|OW): cumulative ([\d.]+) dB, margin ([+−][\d.]+) dB$",
      r"\1: acumulado \2 dB, margen \3 dB"),
     (r"^minimum ([\d.]+) dB at ([\d.]+) kHz$", r"mínimo de \1 dB a \2 kHz"),
     (r"^second branch there: ([\d.]+) dB$", r"el segundo tramo allí: \1 dB"),
@@ -5454,12 +5474,12 @@ _ES_PATTERNS = [
       r"reading the second one at 50 kHz loses ([\d.]+) dB$"),
      ("el tercer tramo empieza en 46,2 kHz;\n"
       "leer el segundo a 50 kHz pierde \\1 dB")),
-    ((r"^each minimum is that group's weighted TTS onset T_w = K \+ C\n"
-      r"LF: below f1 the filter falls at 20a = (\d+) dB/decade, "
-      r"above f2 at 20b = (\d+) dB/decade$"),
-     ("cada mínimo es el inicio de TTS ponderado de su grupo T_w = K + C\n"
-      "LF: bajo f1 el filtro cae a 20a = \\1 dB/década, "
-      "sobre f2 a 20b = \\2 dB/década")),
+    ((r"^each minimum is that group's weighted TTS onset \$T_w = K \+ C\$\n"
+      r"LF: below \$f_1\$ the filter falls at \$20a\$ = (\d+) dB/decade, "
+      r"above \$f_2\$ at \$20b\$ = (\d+) dB/decade$"),
+     ("cada mínimo es el inicio de TTS ponderado de su grupo $T_w = K + C$\n"
+      "LF: bajo $f_1$ el filtro cae a $20a$ = \\1 dB/década, "
+      "sobre $f_2$ a $20b$ = \\2 dB/década")),
 ]
 
 # The Spanish decimal comma, with the numbers that are NOT decimals carved

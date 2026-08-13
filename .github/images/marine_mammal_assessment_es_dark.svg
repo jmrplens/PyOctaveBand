@@ -1503,7 +1503,7 @@ L 780.685938 28.798125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_45">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="610.587109" y="16.798125" transform="rotate(-0 610.587109 16.798125)">LF: acumulado 168,3 dB, margen -14,7 dB</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="610.587109" y="16.798125" transform="rotate(-0 610.587109 16.798125)">LF: acumulado 168,3 dB, margen −14,7 dB</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
@@ -2318,7 +2318,7 @@ L 1173.885937 28.798125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_72">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="1003.787109" y="16.798125" transform="rotate(-0 1003.787109 16.798125)">VHF: acumulado 109,3 dB, margen -49,7 dB</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="1003.787109" y="16.798125" transform="rotate(-0 1003.787109 16.798125)">VHF: acumulado 109,3 dB, margen −49,7 dB</text>
    </g>
    <g id="legend_3">
     <g id="patch_19">
