@@ -342,10 +342,11 @@ _ES_EXACT = {
     "predicted BSF": "BSF previsto",
     "shaft rate": "frecuencia de giro del eje",
     "Envelope amplitude": "Amplitud de la envolvente",
-    "15 rollers, D = 34 mm, d = 6 mm, φ = 12.96°, 2000 r/min\n"
+    "15 rollers, $D$ = 34 mm, $d$ = 6 mm, $\\varphi$ = 12.96°, 2000 r/min\n"
     "BPFO = 207 Hz, BPFI = 293 Hz\n"
     "the envelope lines fall on BPFO, not on BPFI: outer-race spall":
-        "15 rodillos, D = 34 mm, d = 6 mm, φ = 12,96°, 2000 r/min\n"
+        "15 rodillos, $D$ = 34 mm, $d$ = 6 mm, $\\varphi$ = 12,96°, "
+        "2000 r/min\n"
         "BPFO = 207 Hz, BPFI = 293 Hz\n"
         "las líneas de la envolvente caen en BPFO, no en BPFI: "
         "descascarillado de la pista exterior",
@@ -372,18 +373,20 @@ _ES_EXACT = {
     "gear": "engranaje",
     "motor": "motor",
     "blade": "álabe",
-    "sidebands at ± fs = 25 Hz:\nlow and flat":
-        "bandas laterales a ± fs = 25 Hz:\nbajas y planas",
-    "sidebands at ± fs = 25 Hz:\ntall groups, and the\nhigher harmonics lift":
-        "bandas laterales a ± fs = 25 Hz:\ngrupos altos, y los armónicos\n"
-        "superiores se levantan",
-    "rotor-slot harmonic\nwith ± fs sidebands:\nthe spacing is the diagnosis":
-        "armónico de ranura de rotor\ncon bandas laterales a ± fs:\n"
+    "sidebands at $\\pm f_s$ = 25 Hz:\nlow and flat":
+        "bandas laterales a $\\pm f_s$ = 25 Hz:\nbajas y planas",
+    "sidebands at $\\pm f_s$ = 25 Hz:\ntall groups, and the\n"
+    "higher harmonics lift":
+        "bandas laterales a $\\pm f_s$ = 25 Hz:\ngrupos altos, y los "
+        "armónicos\nsuperiores se levantan",
+    "rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
+    "the spacing is the diagnosis":
+        "armónico de ranura de rotor\ncon bandas laterales a $\\pm f_s$:\n"
         "el espaciado es el diagnóstico",
-    "mL = 10 turns at 35 Hz,\nbelow the shaft: weak":
-        "mL = 10 gira a 35 Hz,\npor debajo del eje: débil",
-    "mL = 2 turns at 175 Hz,\n3x the shaft speed: strong":
-        "mL = 2 gira a 175 Hz,\n3 veces la velocidad del eje: fuerte",
+    "$m_L$ = 10 turns at 35 Hz,\nbelow the shaft: weak":
+        "$m_L$ = 10 gira a 35 Hz,\npor debajo del eje: débil",
+    "$m_L$ = 2 turns at 175 Hz,\n3x the shaft speed: strong":
+        "$m_L$ = 2 gira a 175 Hz,\n3 veces la velocidad del eje: fuerte",
     # envelope_chain_steps: the envelope route made visible, step by step.
     "What Each Step of the Envelope Route Does to the Signal":
         "Qué le hace cada paso de la ruta de la envolvente a la señal",
@@ -960,13 +963,13 @@ _ES_EXACT = {
     "corner average": "media esquina",
     "straight average": "media recta",
     "X-junction: 100 mm / 200 mm concrete\n"
-    "chi = 0.707,  psi = 4.000\n"
-    "theta_co = arcsin(chi) = 45.0 deg\n"
+    "$\\chi$ = 0.707,  $\\psi$ = 4.000\n"
+    "$\\theta_\\mathrm{co} = \\arcsin\\chi$ = 45.0°\n"
     "corner avg = 0.0331\n"
     "straight avg = 0.0072":
         "unión en X: hormigón de 100 mm / 200 mm\n"
-        "chi = 0,707,  psi = 4,000\n"
-        "theta_co = arcsin(chi) = 45,0 grados\n"
+        "$\\chi$ = 0,707,  $\\psi$ = 4,000\n"
+        "$\\theta_\\mathrm{co} = \\arcsin\\chi$ = 45,0°\n"
         "media esquina = 0,0331\n"
         "media recta = 0,0072",
     r"$\theta_\mathrm{co} = 45°$: $\tau_{12} = 0$ beyond it":
@@ -977,19 +980,20 @@ _ES_EXACT = {
     "ISO 7626-1 Mechanical Mobility FRFs":
         "FRF de movilidad mecánica ISO 7626-1",
     "Normalized FRF magnitude": "Magnitud FRF normalizada",
-    "Receptance $|H|$ (× k)": "Receptancia $|H|$ (× k)",
-    r"Mobility $|Y|$ (× k/$\omega_0$)": r"Movilidad $|Y|$ (× k/$\omega_0$)",
-    r"Accelerance $|A|$ (× k/$\omega_0^2$)":
-        r"Acelerancia $|A|$ (× k/$\omega_0^2$)",
+    r"Receptance $|H|$ ($\times k$)": r"Receptancia $|H|$ ($\times k$)",
+    r"Mobility $|Y|$ ($\times k/\omega_0$)":
+        r"Movilidad $|Y|$ ($\times k/\omega_0$)",
+    r"Accelerance $|A|$ ($\times k/\omega_0^2$)":
+        r"Acelerancia $|A|$ ($\times k/\omega_0^2$)",
     "resonance $f_0$": "resonancia $f_0$",
-    "SDOF: m = 2 kg, k = 8000 N/m, c = 5 N.s/m\n"
-    "H = 1/(k - w^2 m + j w c)\n"
-    "Y = j w H,   A = -w^2 H  (Table 1)\n"
-    "f0 = 10.1 Hz,  |Y(f0)| = 1/c":
-        "SDOF: m = 2 kg, k = 8000 N/m, c = 5 N.s/m\n"
-        "H = 1/(k - w^2 m + j w c)\n"
-        "Y = j w H,   A = -w^2 H  (Tabla 1)\n"
-        "f0 = 10,1 Hz,  |Y(f0)| = 1/c",
+    "SDOF: $m$ = 2 kg, $k$ = 8000 N/m, $c$ = 5 N·s/m\n"
+    "$H = 1/(k - \\omega^2 m + \\mathrm{j}\\,\\omega c)$\n"
+    "$Y = \\mathrm{j}\\,\\omega H$,   $A = -\\omega^2 H$  (Table 1)\n"
+    "$f_0$ = 10.1 Hz,  $|Y(f_0)| = 1/c$":
+        "SDOF: $m$ = 2 kg, $k$ = 8000 N/m, $c$ = 5 N·s/m\n"
+        "$H = 1/(k - \\omega^2 m + \\mathrm{j}\\,\\omega c)$\n"
+        "$Y = \\mathrm{j}\\,\\omega H$,   $A = -\\omega^2 H$  (Tabla 1)\n"
+        "$f_0$ = 10,1 Hz,  $|Y(f_0)| = 1/c$",
     # mobility_result_lines figure (ISO 7626-1 / ISO 7626-2 A.4)
     "0° at the resonance: $Y$ is real, $|Y| = 1/c$":
         "0° en la resonancia: $Y$ es real, $|Y| = 1/c$",
@@ -1006,14 +1010,14 @@ _ES_EXACT = {
     "infinite beam, 100 × 200 mm steel":
         "viga infinita, acero de 100 × 200 mm",
     "steel strut, longitudinal": "puntal de acero, longitudinal",
-    "plate:  $Y = 1/(8\\sqrt{B' m''})$, real and flat\n"
-    "beam:   $Y = (1-\\mathrm{j})/(4 m' c_B)$, $\\propto f^{-1/2}$\n"
+    "plate:  $Y = 1/(8\\sqrt{B′ m′′})$, real and flat\n"
+    "beam:   $Y = (1-\\mathrm{j})/(4 m′ c_B)$, $\\propto f^{-1/2}$\n"
     "rod:    $Y = 1/(\\rho c_L S)$, real and flat\n"
-    "plate |Y| = 2.55e-06 m/(N·s)":
-        "placa: $Y = 1/(8\\sqrt{B' m''})$, real y plana\n"
-        "viga:  $Y = (1-\\mathrm{j})/(4 m' c_B)$, $\\propto f^{-1/2}$\n"
+    "plate $|Y|$ = $2.55\\times10^{-6}$ m/(N·s)":
+        "placa: $Y = 1/(8\\sqrt{B′ m′′})$, real y plana\n"
+        "viga:  $Y = (1-\\mathrm{j})/(4 m′ c_B)$, $\\propto f^{-1/2}$\n"
         "barra: $Y = 1/(\\rho c_L S)$, real y plana\n"
-        "placa |Y| = 2,55e-06 m/(N·s)",
+        "placa $|Y|$ = $2{,}55\\times10^{-6}$ m/(N·s)",
     # mobility_random_error figure (ISO 7626-2 Annex A)
     "How Many Averages the 5 % Criterion Costs (ISO 7626-2, Annex A)":
         "Cuántos promedios cuesta el criterio del 5 % (ISO 7626-2, Anexo A)",
@@ -1021,12 +1025,13 @@ _ES_EXACT = {
     r"Normalized random error $\varepsilon$ [%]":
         r"Error aleatorio normalizado $\varepsilon$ [%]",
     "the Annex A criterion, 5 %": "el criterio del Anexo A, 5 %",
-    "the standard's own example: $\\gamma^2 = 0.8$, n = 75 → 4.08 %":
-        "el ejemplo de la propia norma: $\\gamma^2 = 0{,}8$, n = 75 → 4,08 %",
-    "the marked n is what each coherence needs to reach 5 %: 11 averages "
+    "the standard's own example: $\\gamma^2 = 0.8$, $n$ = 75 → 4.08 %":
+        "el ejemplo de la propia norma: $\\gamma^2 = 0{,}8$, $n$ = 75 → "
+        "4,08 %",
+    "the marked $n$ is what each coherence needs to reach 5 %: 11 averages "
     "at 0.95, 200 at 0.5.\nFixing the measurement is cheaper than averaging "
     "through it.":
-        "la n marcada es la que cada coherencia necesita para llegar al "
+        "la $n$ marcada es la que cada coherencia necesita para llegar al "
         "5 %: 11 promedios a 0,95, 200 a 0,5.\nArreglar la medición sale "
         "más barato que compensarla promediando.",
     # transfer_stiffness figure (ISO 10846)
@@ -1034,8 +1039,8 @@ _ES_EXACT = {
         "Rigidez dinámica de transferencia ISO 10846",
     r"Transfer stiffness level $L_k$ [dB re 1 N/m]":
         r"Nivel de rigidez de transferencia $L_k$ [dB re 1 N/m]",
-    r"true $L_k$ of $k_{2,1}=k+j\omega c$":
-        r"$L_k$ real de $k_{2,1}=k+j\omega c$",
+    r"true $L_k$ of $k_{2,1}=k+\mathrm{j}\,\omega c$":
+        r"$L_k$ real de $k_{2,1}=k+\mathrm{j}\,\omega c$",
     r"indirect method $-(2\pi f)^2 m_2 T$":
         r"método indirecto $-(2\pi f)^2 m_2 T$",
     r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]":
@@ -1044,18 +1049,18 @@ _ES_EXACT = {
     r"loss factor $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$":
         r"factor de pérdidas $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$",
     "the ±1 dB the criterion buys": "el ±1 dB que garantiza el criterio",
-    "Kelvin-Voigt makes η rise with frequency; real\n"
+    "Kelvin-Voigt makes $\\eta$ rise with frequency; real\n"
     "elastomers are far flatter, so this is a model, not a material":
-        "Kelvin-Voigt hace subir η con la frecuencia; los elastómeros\n"
+        "Kelvin-Voigt hace subir $\\eta$ con la frecuencia; los elastómeros\n"
         "reales son mucho más planos: esto es un modelo, no un material",
-    "Kelvin-Voigt: k = 1 MN/m, c = 120 N.s/m\n"
-    "blocking mass m2 = 8 kg,  f0 = 56.3 Hz\n"
-    "|T| falls to 0.1 at 189 Hz\n"
-    "shaded: Inequality (2) not met -> no result":
-        "Kelvin-Voigt: k = 1 MN/m, c = 120 N.s/m\n"
-        "masa de bloqueo m2 = 8 kg,  f0 = 56,3 Hz\n"
-        "|T| cae a 0,1 a 189 Hz\n"
-        "sombreado: Desigualdad (2) sin cumplir -> sin resultado",
+    "Kelvin-Voigt: $k$ = 1 MN/m, $c$ = 120 N·s/m\n"
+    "blocking mass $m_2$ = 8 kg,  $f_0$ = 56.3 Hz\n"
+    "$|T|$ falls to 0.1 at 189 Hz\n"
+    "shaded: Inequality (2) not met → no result":
+        "Kelvin-Voigt: $k$ = 1 MN/m, $c$ = 120 N·s/m\n"
+        "masa de bloqueo $m_2$ = 8 kg,  $f_0$ = 56,3 Hz\n"
+        "$|T|$ cae a 0,1 a 189 Hz\n"
+        "sombreado: Desigualdad (2) sin cumplir → sin resultado",
     # rigid_mass_calibration figure (ISO 7626-2, 7.5.2)
     "ISO 7626-2 Rigid-Mass Calibration Check":
         "Verificación de calibración con masa rígida ISO 7626-2",
@@ -1065,14 +1070,14 @@ _ES_EXACT = {
     r"$\pm$5 % tolerance band": r"banda de tolerancia $\pm$5 %",
     "within tolerance": "dentro de tolerancia",
     "out of tolerance": "fuera de tolerancia",
-    "calibration block m = 10 kg\n"
-    "|A| = 1/m = 0.100 1/kg  (7.5.2)\n"
-    "criterion: agree within +/- 5 %\n"
-    "high-f drift -> attachment error":
-        "bloque de calibración m = 10 kg\n"
-        "|A| = 1/m = 0,100 1/kg  (7.5.2)\n"
-        "criterio: coincidir dentro de +/- 5 %\n"
-        "deriva en alta f -> error de fijación",
+    "calibration block $m$ = 10 kg\n"
+    "$|A| = 1/m$ = 0.100 1/kg  (7.5.2)\n"
+    "criterion: agree within ±5 %\n"
+    "high-f drift → attachment error":
+        "bloque de calibración $m$ = 10 kg\n"
+        "$|A| = 1/m$ = 0,100 1/kg  (7.5.2)\n"
+        "criterio: coincidir dentro de ±5 %\n"
+        "deriva en alta f → error de fijación",
     # vibration_sound_power figure (ISO/TS 7849)
     "ISO/TS 7849 Sound Power from Surface Vibration":
         "Potencia acústica desde vibración superficial ISO/TS 7849",
@@ -1180,10 +1185,11 @@ _ES_EXACT = {
     r"Band audibility $A_i$": r"Audibilidad de banda $A_i$",
     r"Importance-weighted $I_i\,A_i$ (scaled)":
         r"Ponderada por importancia $I_i\,A_i$ (escalada)",
-    "r.m.s. acceleration [m/s$^2$]": "Aceleración eficaz [m/s$^2$]",
+    "r.m.s. acceleration [m/s²]": "Aceleración eficaz [m/s²]",
     "Unweighted $a_i$": "Sin ponderar $a_i$",
     "Weighted $W_i\\,a_i$ (Wk)": "Ponderada $W_i\\,a_i$ (Wk)",
-    "Daily exposure A(8) [m/s$^2$]": "Exposición diaria A(8) [m/s$^2$]",
+    "EAV = 2.5 m/s²": "VAE = 2,5 m/s²",
+    "ELV = 5 m/s²": "VLE = 5 m/s²",
     "brush-saw": "desbrozadora",
     "felling": "tala",
     "stripping": "descortezado",
@@ -1221,7 +1227,8 @@ _ES_EXACT = {
         "(c)  La acumulación de cuarta potencia, cuyo punto final es el VDV",
     "$a_z(t)$, unweighted": "$a_z(t)$, sin ponderar",
     "$a_w(t)$, Wk-weighted": "$a_w(t)$, ponderada con Wk",
-    "acceleration [m/s$^2$]": "aceleración [m/s$^2$]",
+    "acceleration [m/s²]": "aceleración [m/s²]",
+    "r.m.s. [m/s²]": "valor eficaz [m/s²]",
     "running r.m.s., 1 s (Eq. (3))": "eficaz móvil, 1 s (Ec. (3))",
     r"$a_w\,t^{1/4}$ (the basic method)":
         r"$a_w\,t^{1/4}$ (el método básico)",
@@ -1234,9 +1241,9 @@ _ES_EXACT = {
     "(a)  The seat-to-spine filter turns an impact into a ringing response":
         "(a)  El filtro asiento-columna convierte un impacto en una "
         "respuesta que resuena",
-    "(b)  Each peak's share of $\\sum A_{z,i}^6$ — dose $D_z$ = 32.5 m/s$^2$":
+    "(b)  Each peak's share of $\\sum A_{z,i}^6$ — dose $D_z$ = 32.5 m/s²":
         "(b)  La parte de cada pico en $\\sum A_{z,i}^6$ — dosis $D_z$ = "
-        "32,5 m/s$^2$",
+        "32,5 m/s²",
     "0.4 s of free fall at $-1\\,g$:\n"
     "the 0.01 Hz high pass of 5.1.3 keeps it":
         "0,4 s de caída libre a $-1\\,g$:\n"
@@ -1250,13 +1257,13 @@ _ES_EXACT = {
     "(ISO 5349-1 Annex C)":
         "Años de media de grupo hasta una prevalencia del 10 % de "
         "dedo blanco (ISO 5349-1, Anexo C)",
-    "Daily exposure $A(8)$ [m/s$^2$]": "Exposición diaria $A(8)$ [m/s$^2$]",
+    "Daily exposure $A(8)$ [m/s²]": "Exposición diaria $A(8)$ [m/s²]",
     "Exposure duration $D_y$ [years]":
         "Duración de la exposición $D_y$ [años]",
-    "EAV 2.5 m/s$^2$\n12.0 years": "VAE 2,5 m/s$^2$\n12,0 años",
-    "ELV 5.0 m/s$^2$\n5.8 years": "VLE 5,0 m/s$^2$\n5,8 años",
-    "Table C.1: 26 / 14 / 7 / 3.7 m/s$^2$":
-        "Tabla C.1: 26 / 14 / 7 / 3,7 m/s$^2$",
+    "EAV 2.5 m/s²\n12.0 years": "VAE 2,5 m/s²\n12,0 años",
+    "ELV 5.0 m/s²\n5.8 years": "VLE 5,0 m/s²\n5,8 años",
+    "Table C.1: 26 / 14 / 7 / 3.7 m/s²":
+        "Tabla C.1: 26 / 14 / 7 / 3,7 m/s²",
     "extrapolation beyond Table C.1": "extrapolación fuera de la Tabla C.1",
     # Precision sound power (ISO 3745 / ISO 9614-3)
     "Sound power level $L_W$ [dB]": "Nivel de potencia acústica $L_W$ [dB]",
@@ -3521,8 +3528,14 @@ _ES_EXACT = {
     "X straight": "X recta",
     "T-junction (1) corner": "unión en T (1) esquina",
     "L corner": "L esquina",
-    "identical plates (τ = 1/12)": "placas idénticas (τ = 1/12)",
-    "Thickness ratio h2/h1": "Relación de espesores h2/h1",
+    r"identical plates ($\tau = 1/12$)": r"placas idénticas ($\tau = 1/12$)",
+    "Thickness ratio $h_2/h_1$": "Relación de espesores $h_2/h_1$",
+    "$K_{ij} = 10\\,\\log_{10}(1/\\bar{\\tau}) + "
+    "5\\,\\log_{10}(f_{c2}/1000)$\n"
+    "concrete, plate 1 fixed at 100 mm":
+        "$K_{ij} = 10\\,\\log_{10}(1/\\bar{\\tau}) + "
+        "5\\,\\log_{10}(f_{c2}/1000)$\n"
+        "hormigón, placa 1 fija en 100 mm",
     "Vibration reduction index $K_{ij}$ [dB]":
         "Índice de reducción de vibraciones $K_{ij}$ [dB]",
     "Reading a Driving-Point Mobility (ISO 7626-1)":
@@ -5038,11 +5051,34 @@ _ES_PATTERNS = [
     (r"^new trough,\n(.+) dB$", "cero nuevo,\n\\1 dB"),
     (r"^Partition area \$S_w\$ = (\d+) m²$",
      r"Área de la partición $S_w$ = \1 m²"),
-    # Human-vibration dynamic titles (numeric a_w / A(8))
-    (r"^Weighted seat acceleration \(ISO 2631-1\)  (.+)$",
-     r"Aceleración ponderada del asiento (ISO 2631-1)  \1"),
-    (r"^Hand-arm daily exposure \(ISO 5349 / 2002-44-EC\)  (.+)$",
-     r"Exposición diaria mano-brazo (ISO 5349 / 2002-44-EC)  \1"),
+    # Human-vibration dynamic titles (numeric a_w / A(8)); the mathtext
+    # blocks the decimal-comma pass, so the commas are baked here.
+    ((r"^Weighted seat acceleration \(ISO 2631-1\)  "
+      r"\$a_w\$ = (\d+)\.(\d+) m/s²$"),
+     r"Aceleración ponderada del asiento (ISO 2631-1)  $a_w$ = \1,\2 m/s²"),
+    ((r"^Hand-arm daily exposure \(ISO 5349 / 2002-44-EC\)  "
+      r"\$A\(8\)\$ = (\d+)\.(\d+) m/s²$"),
+     (r"Exposición diaria mano-brazo (ISO 5349 / 2002-44-EC)  "
+      r"$A(8)$ = \1,\2 m/s²")),
+    # shock_dose_measures dynamic readouts (Eq. names translated; the two
+    # ratio annotations carry mathtext, so their commas are baked too).
+    (r"^\$a_w\$ = (\d+)\.(\d+) m/s² \(Eq\. \(1\)\)$",
+     r"$a_w$ = \1,\2 m/s² (Ec. (1))"),
+    (r"^MTVV = (\d+)\.(\d+) m/s² \(Eq\. \(4\)\)$",
+     r"MTVV = \1,\2 m/s² (Ec. (4))"),
+    (r"^VDV = (\d+)\.(\d+) m/s\$\^\{1\.75\}\$ \(Eq\. \(5\)\)$",
+     r"VDV = \1,\2 m/s$^{1{,}75}$ (Ec. (5))"),
+    (r"^\$\\mathrm\{MTVV\}/a_w\$ = (\d+)\.(\d+)   \(> 1\.5\)$",
+     r"$\\mathrm{MTVV}/a_w$ = \1,\2   (> 1,5)"),
+    (r"^\$\\mathrm\{VDV\}/\(a_w T\^\{1/4\}\)\$ = (\d+)\.(\d+)   \(> 1\.75\)$",
+     r"$\\mathrm{VDV}/(a_w T^{1/4})$ = \1,\2   (> 1,75)"),
+    # envelope_chain_steps period readout (mathtext blocks the comma pass).
+    (r"^\$1/\\mathrm\{BPFO\}\$ = (\d+)\.(\d+) ms$",
+     r"$1/\\mathrm{BPFO}$ = \1,\2 ms"),
+    # experimental_sea_clf bar readouts composed by _sci_math (the comma
+    # goes inside the mathtext as {,}).
+    (r"^\$(\d)\.(\d+)\\times10\^\{(-?\d+)\}\$$",
+     r"$\1{,}\2\\times10^{\3}$"),
     # Speech intelligibility dynamic title (numeric SII)
     (r"^Speech Intelligibility Index \(ANSI S3\.5-1997\)   SII = (.+)$",
      r"Índice de inteligibilidad del habla (ANSI S3.5-1997)   SII = \1"),
@@ -5165,15 +5201,13 @@ _ES_PATTERNS = [
       r"6 mm float glass, \$m′′\$ = 15 kg/m², \$\\eta\$ = 0\.024$"),
      ("$R_w$($C$;$C_{tr}$) = \\1 dB\n"
       r"vidrio flotado de 6 mm, $m′′$ = 15 kg/m², $\\eta$ = 0,024")),
-    ((r"^Kij = 10 log10\(1/τ̄\) \+ 5 log10\(fc2/1000\)\nconcrete, plate 1 fixed "
-      r"at 100 mm$"),
-     "Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
-    ((r"^below f0: stiffness-controlled, \|Y\| ~ ω/k\n"
-      r"above f0: mass-controlled, \|Y\| ~ 1/\(ωm\)\n"
-      r"f0 = (.+) Hz,  1/c = (.+) m/\(N·s\)$"),
-     ("por debajo de f0: dominio de la rigidez, |Y| ~ ω/k\n"
-      "por encima de f0: dominio de la masa, |Y| ~ 1/(ωm)\n"
-      "f0 = \\1 Hz,  1/c = \\2 m/(N·s)")),
+    ((r"^below \$f_0\$: stiffness-controlled, \$\|Y\| \\sim \\omega/k\$\n"
+      r"above \$f_0\$: mass-controlled, \$\|Y\| \\sim 1/\(\\omega m\)\$\n"
+      r"\$f_0\$ = (\d+)\.(\d+) Hz,  \$1/c\$ = (\d+)\.(\d+) m/\(N·s\)$"),
+     ("por debajo de $f_0$: dominio de la rigidez, $|Y| \\\\sim \\\\omega/k$\n"
+      "por encima de $f_0$: dominio de la masa, "
+      "$|Y| \\\\sim 1/(\\\\omega m)$\n"
+      "$f_0$ = \\1,\\2 Hz,  $1/c$ = \\3,\\4 m/(N·s)")),
     # Programme-loudness .plot() legend lines (loudness_gating/loudness_range).
     (r"^Integrated (.+) LUFS$", r"Integrada \1 LUFS"),
     (r"^Ungated mean (.+) LUFS$", r"Media sin puerta \1 LUFS"),

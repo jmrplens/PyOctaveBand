@@ -2029,21 +2029,81 @@ L 705.704063 28.798125
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 293.87081 263.541562 
-L 695.875498 263.541562 
-Q 700.375498 263.541562 700.375498 259.041562 
+     <path d="M 293.87081 263.542969 
+L 695.875498 263.542969 
+Q 700.375498 263.542969 700.375498 259.042969 
 L 700.375498 226.274883 
 Q 700.375498 221.774883 695.875498 221.774883 
 L 293.87081 221.774883 
 Q 289.37081 221.774883 289.37081 226.274883 
-L 289.37081 259.041562 
-Q 289.37081 263.541562 293.87081 263.541562 
+L 289.37081 259.042969 
+Q 289.37081 263.542969 293.87081 263.542969 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(430.195498 234.014355)">15 rodillos, D = 34 mm, d = 6 mm, φ = 12,96°, 2000 r/min</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(557.272685 244.816113)">BPFO = 207 Hz, BPFI = 293 Hz</text>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(293.87081 255.978574)">las líneas de la envolvente caen en BPFO, no en BPFI: descascarillado de la pista exterior</text>
+    <!-- 15 rodillos, $D$ = 34 mm, $d$ = 6 mm, $\varphi$ = 12,96°, 2000 r/min -->
+    <g transform="translate(430.105498 234.015762)">
+     <text>
+      <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="5.726074" y="-0.15625" style="font-size: 9px; font-family: sans-serif">5</tspan>
+      <tspan x="11.452148" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="14.312988" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="18.013184" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+      <tspan x="23.519531" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="29.232422" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+      <tspan x="31.73291" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="34.233398" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+      <tspan x="36.733887" y="-0.15625" style="font-size: 9px; font-family: sans-serif">o</tspan>
+      <tspan x="42.240234" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+      <tspan x="46.929199" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="49.790039" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="59.581055" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="62.441895" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="69.98291" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="72.84375" y="-0.15625" style="font-size: 9px; font-family: sans-serif">3</tspan>
+      <tspan x="78.569824" y="-0.15625" style="font-size: 9px; font-family: sans-serif">4</tspan>
+      <tspan x="84.295898" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="87.156738" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="95.923828" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="104.690918" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="107.551758" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="116.125488" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="118.986328" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="126.527344" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="129.388184" y="-0.15625" style="font-size: 9px; font-family: sans-serif">6</tspan>
+      <tspan x="135.114258" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="137.975098" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="146.742188" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="155.509277" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="158.370117" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="167.167969" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="170.028809" y="-0.15625" style="font-size: 9px; font-family: sans-serif">=</tspan>
+      <tspan x="177.569824" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="180.430664" y="-0.15625" style="font-size: 9px; font-family: sans-serif">1</tspan>
+      <tspan x="186.156738" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="191.882812" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="194.743652" y="-0.15625" style="font-size: 9px; font-family: sans-serif">9</tspan>
+      <tspan x="200.469727" y="-0.15625" style="font-size: 9px; font-family: sans-serif">6</tspan>
+      <tspan x="206.195801" y="-0.15625" style="font-size: 9px; font-family: sans-serif">°</tspan>
+      <tspan x="210.695801" y="-0.15625" style="font-size: 9px; font-family: sans-serif">,</tspan>
+      <tspan x="213.556641" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="216.41748" y="-0.15625" style="font-size: 9px; font-family: sans-serif">2</tspan>
+      <tspan x="222.143555" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="227.869629" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="233.595703" y="-0.15625" style="font-size: 9px; font-family: sans-serif">0</tspan>
+      <tspan x="239.321777" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+      <tspan x="242.182617" y="-0.15625" style="font-size: 9px; font-family: sans-serif">r</tspan>
+      <tspan x="245.882812" y="-0.15625" style="font-size: 9px; font-family: sans-serif">/</tspan>
+      <tspan x="248.915039" y="-0.15625" style="font-size: 9px; font-family: sans-serif">m</tspan>
+      <tspan x="257.682129" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+      <tspan x="260.182617" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+      <tspan x="52.650879" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">D</tspan>
+      <tspan x="110.412598" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">d</tspan>
+      <tspan x="161.230957" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">φ</tspan>
+     </text>
+    </g>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(557.272685 244.81752)">BPFO = 207 Hz, BPFI = 293 Hz</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(293.87081 255.97998)">las líneas de la envolvente caen en BPFO, no en BPFI: descascarillado de la pista exterior</text>
    </g>
    <g id="text_19">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="378.085234" y="16.798125" transform="rotate(-0 378.085234 16.798125)">Líneas de fallo del rodamiento sobre un espectro de envolvente medido</text>

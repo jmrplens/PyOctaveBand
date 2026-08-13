@@ -1457,22 +1457,86 @@ L 705.928125 28.318125
    </g>
    <g id="text_7">
     <g id="patch_7">
-     <path d="M 539.766598 270.332853 
+     <path d="M 542.79316 270.332853 
 L 696.19316 270.332853 
 Q 701.19316 270.332853 701.19316 265.332853 
-L 701.19316 217.278166 
-Q 701.19316 212.278166 696.19316 212.278166 
-L 539.766598 212.278166 
-Q 534.766598 212.278166 534.766598 217.278166 
-L 534.766598 265.332853 
-Q 534.766598 270.332853 539.766598 270.332853 
+L 701.19316 217.218791 
+Q 701.19316 212.218791 696.19316 212.218791 
+L 542.79316 212.218791 
+Q 537.79316 212.218791 537.79316 217.218791 
+L 537.79316 265.332853 
+Q 537.79316 270.332853 542.79316 270.332853 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(557.858785 225.87758)">calibration block m = 10 kg</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(540.391598 237.924064)">|A| = 1/m = 0.100 1/kg  (7.5.2)</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(544.904098 249.926798)">criterion: agree within +/- 5 %</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(539.766598 261.929533)">high-f drift -&gt; attachment error</text>
+    <!-- calibration block $m$ = 10 kg -->
+    <g style="fill: #ffffff" transform="translate(557.79316 225.819767)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">c</tspan>
+      <tspan x="5.498047" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="11.625977" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">l</tspan>
+      <tspan x="14.404297" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">i</tspan>
+      <tspan x="17.182617" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">b</tspan>
+      <tspan x="23.530273" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">r</tspan>
+      <tspan x="27.641602" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">a</tspan>
+      <tspan x="33.769531" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">t</tspan>
+      <tspan x="37.69043" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">i</tspan>
+      <tspan x="40.46875" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">o</tspan>
+      <tspan x="46.586914" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">n</tspan>
+      <tspan x="52.924805" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="56.103516" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">b</tspan>
+      <tspan x="62.451172" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">l</tspan>
+      <tspan x="65.229492" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">o</tspan>
+      <tspan x="71.347656" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">c</tspan>
+      <tspan x="76.845703" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">k</tspan>
+      <tspan x="82.636719" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="95.556641" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="98.735352" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="107.114258" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="110.292969" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="116.655273" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="123.017578" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="126.196289" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">k</tspan>
+      <tspan x="131.987305" y="-0.40625" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">g</tspan>
+      <tspan x="85.81543" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">m</tspan>
+     </text>
+    </g>
+    <!-- $|A| = 1/m$ = 0.100 1/kg  (7.5.2) -->
+    <g style="fill: #ffffff" transform="translate(542.79316 237.924064)">
+     <text>
+      <tspan x="0" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">|</tspan>
+      <tspan x="10.209961" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">|</tspan>
+      <tspan x="15.527344" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="25.854492" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="32.216797" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">/</tspan>
+      <tspan x="45.327148" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="48.505859" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">=</tspan>
+      <tspan x="56.884766" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="60.063477" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="66.425781" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">.</tspan>
+      <tspan x="69.604492" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="75.966797" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="82.329102" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">0</tspan>
+      <tspan x="88.691406" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="91.870117" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">1</tspan>
+      <tspan x="98.232422" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">/</tspan>
+      <tspan x="101.601562" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">k</tspan>
+      <tspan x="107.392578" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">g</tspan>
+      <tspan x="113.740234" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="116.918945" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff"> </tspan>
+      <tspan x="120.097656" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">(</tspan>
+      <tspan x="123.999023" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">7</tspan>
+      <tspan x="130.361328" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">.</tspan>
+      <tspan x="133.540039" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">5</tspan>
+      <tspan x="139.902344" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">.</tspan>
+      <tspan x="143.081055" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">2</tspan>
+      <tspan x="149.443359" y="-0.359375" style="font-size: 10px; font-family: sans-serif; fill: #ffffff">)</tspan>
+      <tspan x="3.369141" y="-0.359375" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">A</tspan>
+      <tspan x="35.585938" y="-0.359375" style="font-style: oblique; font-size: 10px; font-family: sans-serif; fill: #ffffff">m</tspan>
+     </text>
+    </g>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(555.058785 249.926798)">criterion: agree within ±5 %</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(543.37441 261.929533)">high-f drift → attachment error</text>
    </g>
    <g id="text_8">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="381.429297" y="16.318125" transform="rotate(-0 381.429297 16.318125)">ISO 7626-2 Rigid-Mass Calibration Check</text>
