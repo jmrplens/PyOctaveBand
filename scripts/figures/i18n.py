@@ -2185,16 +2185,16 @@ _ES_EXACT = {
     "Input 2 contribution": "Contribución de la entrada 2",
     "Residual noise": "Ruido residual",
     "Coherent output [dB re 1/Hz]": "Salida coherente [dB re 1/Hz]",
-    r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by x1)":
-        r"Entrada 2 ordinaria $\gamma^2_{2y}$ (inflada por x1)",
-    r"Input 2 partial $\gamma^2_{2y\cdot 1}$ (x1 removed)":
-        r"Entrada 2 parcial $\gamma^2_{2y\cdot 1}$ (x1 eliminada)",
+    r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by $x_1$)":
+        r"Entrada 2 ordinaria $\gamma^2_{2y}$ (inflada por $x_1$)",
+    r"Input 2 partial $\gamma^2_{2y\cdot 1}$ ($x_1$ removed)":
+        r"Entrada 2 parcial $\gamma^2_{2y\cdot 1}$ ($x_1$ eliminada)",
     r"Multiple $\gamma^2_{y:x}$": r"Múltiple $\gamma^2_{y:x}$",
     "Coherence": "Coherencia",
-    "conditioning removes the shared x1 component:\n"
-    "the low-band ordinary coherence of x2 collapses":
-        "el condicionamiento elimina la componente x1 compartida:\n"
-        "la coherencia ordinaria de x2 en la banda baja se desploma",
+    "conditioning removes the shared $x_1$ component:\n"
+    "the low-band ordinary coherence of $x_2$ collapses":
+        "el condicionamiento elimina la componente $x_1$ compartida:\n"
+        "la coherencia ordinaria de $x_2$ en la banda baja se desploma",
     # Data qualification: trend and stationarity tests, Rice crossing statistics
     "Nonparametric Trend Test by Reverse Arrangements (B&P 4.5.2)":
         "Test de tendencia no paramétrico por inversiones de orden (B&P 4.5.2)",
