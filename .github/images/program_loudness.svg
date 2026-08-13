@@ -2775,11 +2775,11 @@ Q 694.415713 366.051852 698.665713 366.051852
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 318.101725)">I     =  -23.0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 318.101725)">I     =  −23.0 LUFS</text>
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(708.900245 328.303385)">LRA   =   17.7 LU</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 338.505045)">max M =  -17.7 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 348.706705)">max S =  -19.0 LUFS</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 358.909029)">TPmax =   -8.6 dBTP</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 338.505045)">max M =  −17.7 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 348.706705)">max S =  −19.0 LUFS</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(698.665713 358.909029)">TPmax =   −8.6 dBTP</text>
    </g>
    <g id="text_21">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="428.284297" y="16.318125" transform="rotate(-0 428.284297 16.318125)">Programme Loudness Metering (EBU R 128)</text>
@@ -2787,10 +2787,10 @@ z
    <g id="legend_1">
     <g id="patch_9">
      <path d="M 55.605469 367.615781 
-L 198.348281 367.615781 
-Q 200.148281 367.615781 200.148281 365.815781 
-L 200.148281 312.712969 
-Q 200.148281 310.912969 198.348281 310.912969 
+L 202.642969 367.615781 
+Q 204.442969 367.615781 204.442969 365.815781 
+L 204.442969 312.712969 
+Q 204.442969 310.912969 202.642969 310.912969 
 L 55.605469 310.912969 
 Q 53.805469 310.912969 53.805469 312.712969 
 L 53.805469 365.815781 
@@ -2834,7 +2834,7 @@ L 75.405469 358.703672
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="361.853672" transform="rotate(-0 82.605469 361.853672)">Integrated I = -23.0 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="361.853672" transform="rotate(-0 82.605469 361.853672)">Integrated I = −23.0 LUFS</text>
     </g>
    </g>
   </g>

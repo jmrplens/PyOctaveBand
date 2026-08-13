@@ -553,7 +553,8 @@ _ES_EXACT = {
     "Attenuation [dB]": "Atenuación [dB]",
     "Expansion-chamber transmission loss (Bies Eq. 8.111)":
         "Pérdida de transmisión de cámara de expansión (Bies Ec. 8.111)",
-    "Area ratio m = Sexp/Sduct": "Relación de áreas m = Sexp/Sduct",
+    "Area ratio $m = S_{\\mathrm{exp}}/S_{\\mathrm{duct}}$":
+        "Relación de áreas $m = S_{\\mathrm{exp}}/S_{\\mathrm{duct}}$",
     "Noise-Power-Distance Curves (ECAC Doc 29)":
         "Curvas nivel-potencia-distancia (ECAC Doc 29)",
     "Aircraft Departure SEL Contour (ECAC Doc 29)":
@@ -1238,7 +1239,7 @@ _ES_EXACT = {
         "Tabla C.1: 26 / 14 / 7 / 3,7 m/s$^2$",
     "extrapolation beyond Table C.1": "extrapolación fuera de la Tabla C.1",
     # Precision sound power (ISO 3745 / ISO 9614-3)
-    "Sound power level LW [dB]": "Nivel de potencia acústica LW [dB]",
+    "Sound power level $L_W$ [dB]": "Nivel de potencia acústica $L_W$ [dB]",
     "Non-applicable band": "Banda no aplicable",
     # precision_positions_arrays: the two ISO 3745 arrays
     "ISO 3745 precision microphone arrays":
@@ -1250,52 +1251,60 @@ _ES_EXACT = {
     "positions 1-20: always": "posiciones 1-20: siempre",
     "positions 21-40: on escalation": "posiciones 21-40: en la ampliación",
     # k1_k2_corrections: the two ISO 3744 corrections and their caps
-    "K1 is a cliff, not a slope": "K1 es un acantilado, no una pendiente",
-    "K2 saturates, and inherits every error in A":
-        "K2 se satura, y hereda cada error de A",
-    "Source-to-background margin ΔLp [dB]":
-        "Margen entre fuente y fondo ΔLp [dB]",
-    "Background correction K1 [dB]":
-        "Corrección por ruido de fondo K1 [dB]",
-    "Environmental correction K2 [dB]": "Corrección ambiental K2 [dB]",
+    "$K_1$ is a cliff, not a slope": "$K_1$ es un acantilado, no una pendiente",
+    "$K_2$ saturates, and inherits every error in $A$":
+        "$K_2$ se satura, y hereda cada error de $A$",
+    "Source-to-background margin $\\Delta L_p$ [dB]":
+        "Margen entre fuente y fondo $\\Delta L_p$ [dB]",
+    "Background correction $K_1$ [dB]":
+        "Corrección por ruido de fondo $K_1$ [dB]",
+    "Environmental correction $K_2$ [dB]": "Corrección ambiental $K_2$ [dB]",
     "ISO 3744 criterion\n6 dB": "Criterio de ISO 3744\n6 dB",
     "capped:\nupper bound": "acotada:\ncota superior",
-    "A known to ±20 %": "A conocida a ±20 %",
+    "$A$ known to ±20 %": "$A$ conocida a ±20 %",
     # reverberation_correction_terms: ISO 3741 Eq. 20, term by term
     "The five terms of ISO 3741 Eq. 20":
         "Los cinco términos de la Ec. 20 de ISO 3741",
-    "Contribution to LW − L̄p [dB]": "Aportación a LW − L̄p [dB]",
+    "Contribution to $L_W - \\bar{L}_p$ [dB]":
+        "Aportación a $L_W - \\bar{L}_p$ [dB]",
     "Waterhouse": "Waterhouse",
     "the Waterhouse term rules the low bands\n"
     "(1.68 dB at 100 Hz, 0.02 dB at 10 kHz)":
         "el término de Waterhouse manda en las bandas graves\n"
         "(1,68 dB a 100 Hz, 0,02 dB a 10 kHz)",
-    "4.34 A/S is 0.32 dB in this hard room, and 0.79 dB with the same room "
-    "damped to T₆₀ = 0.8 s":
-        "4,34 A/S es 0,32 dB en esta cámara reflectante, y 0,79 dB con la "
-        "misma cámara amortiguada hasta T₆₀ = 0,8 s",
+    # The mathtext skips the save-time comma pass: commas baked in, and the
+    # 4.34 inside the math carries the brace-guarded {,} form.
+    "$4.34\\,A/S$ is 0.32 dB in this hard room, and 0.79 dB with the same "
+    "room damped to $T_{60}$ = 0.8 s":
+        "$4{,}34\\,A/S$ es 0,32 dB en esta cámara reflectante, y 0,79 dB con "
+        "la misma cámara amortiguada hasta $T_{60}$ = 0,8 s",
     # partial_power_map: the ISO 9614-2 box unfolded
     "Partial power level per segment [dB re 1 pW], the box unfolded":
         "Nivel de potencia parcial por segmento [dB re 1 pW], "
         "la caja desplegada",
-    "LWi [dB]": "LWi [dB]",
     "Face total [dB]": "Total por cara [dB]",
-    # spacer_bandwidth: what each p-p spacer costs at both ends
-    "High end: the finite-difference bias, and f_max = 0.1 c/Δr":
-        "Extremo alto: el sesgo de diferencias finitas, y f_max = 0,1 c/Δr",
+    # spacer_bandwidth: what each p-p spacer costs at both ends (the decimal
+    # comma inside the mathtext is baked in with the brace-guarded {,} form)
+    "High end: the finite-difference bias, and "
+    "$f_{\\mathrm{max}} = 0.1\\,c/\\Delta r$":
+        "Extremo alto: el sesgo de diferencias finitas, y "
+        "$f_{\\mathrm{max}} = 0{,}1\\,c/\\Delta r$",
     "Low end: doubling the spacer is worth 3 dB of margin":
         "Extremo bajo: doblar el espaciador vale 3 dB de margen",
     "Finite-difference bias [dB]": "Sesgo de diferencias finitas [dB]",
-    "δpI0 margin,\nre 25 mm [dB]": "Margen de δpI0,\nre 25 mm [dB]",
-    "−0.3 dB: the bound f_max is quoted against":
-        "−0,3 dB: el sesgo contra el que se cita la cota f_max",
+    "$\\delta_{pI0}$ margin,\nre 25 mm [dB]":
+        "Margen de $\\delta_{pI0}$,\nre 25 mm [dB]",
+    "−0.3 dB: the bound $f_{\\mathrm{max}}$ is quoted against":
+        "−0,3 dB: el sesgo contra el que se cita la cota $f_{\\mathrm{max}}$",
     "25 mm: the separation Table 2 is written for":
         "25 mm: la separación para la que está escrita la Tabla 2",
     # sound_power_grades_declaration: grades and the ISO 4871 declaration
     "One measurement, three grades: 92.4 dB(A) against a 93 dB limit":
         "Una medición, tres grados: 92,4 dB(A) frente a un límite de 93 dB",
-    "ISO 4871 Annex B: LWAd = LWA + K_WA, verified when L1 ≤ LWAd":
-        "ISO 4871 Anexo B: LWAd = LWA + K_WA, verificado si L1 ≤ LWAd",
+    "ISO 4871 Annex B: $L_{W\\!Ad} = L_{W\\!A} + K_{W\\!A}$, "
+    "verified when $L_1 \\leq L_{W\\!Ad}$":
+        "ISO 4871 Anexo B: $L_{W\\!Ad} = L_{W\\!A} + K_{W\\!A}$, "
+        "verificado si $L_1 \\leq L_{W\\!Ad}$",
     "Grade 1\nISO 3741 / 3745": "Grado 1\nISO 3741 / 3745",
     "Grade 2\nISO 3744 / 9614-2": "Grado 2\nISO 3744 / 9614-2",
     "Grade 3\nISO 3746": "Grado 3\nISO 3746",
@@ -1304,14 +1313,17 @@ _ES_EXACT = {
         "Nivel de potencia acústica ponderado A [dB]",
     "Operating mode 1": "Modo de funcionamiento 1",
     "Operating mode 2": "Modo de funcionamiento 2",
-    "verification level L1": "nivel de verificación L1",
-    # vibration_sound_power info box (ISO/TS 7849); monospace alignment kept
-    "LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)\n"
-    "S = 1.6 m2,  S0 = 1 m2\n"
-    "Part 1: e = 1 -> upper limit LW,max":
-        "LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)\n"
-        "S = 1,6 m2,  S0 = 1 m2\n"
-        "Parte 1: e = 1 -> límite superior LW,max",
+    "verification level $L_1$": "nivel de verificación $L_1$",
+    # vibration_sound_power info box (ISO/TS 7849); the decimal comma is
+    # baked in because the mathtext skips the save-time comma pass
+    "$L_W = L_v + 10\\,\\log_{10}(S/S_0) + 10\\,\\log_{10}(\\varepsilon)"
+    " + 10\\,\\log_{10}(411/400)$\n"
+    "$S$ = 1.6 m²,  $S_0$ = 1 m²\n"
+    "Part 1: $\\varepsilon = 1$ → upper limit $L_{W,\\mathrm{max}}$":
+        "$L_W = L_v + 10\\,\\log_{10}(S/S_0) + 10\\,\\log_{10}(\\varepsilon)"
+        " + 10\\,\\log_{10}(411/400)$\n"
+        "$S$ = 1,6 m²,  $S_0$ = 1 m²\n"
+        "Parte 1: $\\varepsilon = 1$ → límite superior $L_{W,\\mathrm{max}}$",
     "Stable tone (good coupling)": "Tono estable (buen acoplamiento)",
     "3% AM tone (loose coupling)": "Tono con AM del 3 % (acoplamiento flojo)",
     "IEC 60942:2017 class 1 limit (deviation from mean)":
@@ -1616,10 +1628,10 @@ _ES_EXACT = {
     "Position (Type A)": "Posición (Tipo A)",
     "Sound Intensity with a p-p Probe (IEC 61043)":
         "Intensidad acústica con sonda p-p (IEC 61043)",
-    "Plane wave: Lp \u2248 LI": "Onda plana: Lp \u2248 LI",
+    "Plane wave: $L_p \\approx L_I$": "Onda plana: $L_p \\approx L_I$",
     "Standing wave: reactive field": "Onda estacionaria: campo reactivo",
-    "Pressure level Lp": "Nivel de presi\u00f3n Lp",
-    "Intensity level LI": "Nivel de intensidad LI",
+    "Pressure level $L_p$": "Nivel de presi\u00f3n $L_p$",
+    "Intensity level $L_I$": "Nivel de intensidad $L_I$",
     "Schroeder Integration and Reverberation Time (ISO 3382)":
         "Integraci\u00f3n de Schroeder y tiempo de reverberaci\u00f3n (ISO 3382)",
     "Raw squared IR level": "Nivel de la RI al cuadrado",
@@ -1928,22 +1940,20 @@ _ES_EXACT = {
     "Harmonic Distortion of a Single-Tone Test (IEC 60268-3)":
         "Distorsión armónica de un ensayo con tono único (IEC 60268-3)",
     "Magnitude spectrum": "Espectro de magnitud",
-    "Harmonics n·f₁": "Armónicos n·f₁",
+    "Harmonics $n f_1$": "Armónicos $n f_1$",
     "Level re fundamental [dB]": "Nivel respecto al fundamental [dB]",
     "Frequency Response and Coherence (Bendat & Piersol)":
         "Respuesta en frecuencia y coherencia (Bendat y Piersol)",
-    "True |H|": "|H| verdadero",
-    "Estimated |H| (H1)": "|H| estimado (H1)",
+    "True $|H|$": "$|H|$ verdadero",
     # frequency_response: H1 against H2 with the noise moved between channels
-    "Choosing Between H1 and H2 (Bendat & Piersol)":
-        "Elegir entre H1 y H2 (Bendat y Piersol)",
-    "Noise on the output — H1 is unbiased":
-        "Ruido en la salida — H1 es el insesgado",
-    "Noise on the input — H2 is unbiased":
-        "Ruido en la entrada — H2 es el insesgado",
-    # The estimator formulas read the same in both languages.
-    "H1 = Gxy / Gxx": "H1 = Gxy / Gxx",
-    "H2 = Gyy / Gyx": "H2 = Gyy / Gyx",
+    # (the estimator formulas and the SNR ratio are now pure mathtext and
+    # read the same in both languages, so they carry no entry).
+    "Choosing Between $H_1$ and $H_2$ (Bendat & Piersol)":
+        "Elegir entre $H_1$ y $H_2$ (Bendat y Piersol)",
+    "Noise on the output — $H_1$ is unbiased":
+        "Ruido en la salida — $H_1$ es el insesgado",
+    "Noise on the input — $H_2$ is unbiased":
+        "Ruido en la entrada — $H_2$ es el insesgado",
     # The measured coherence trace (la coherencia, feminine).
     "measured": "medida",
     # itu_r_468_weighting figure (ITU-R BS.468-4 network and CCIR-RMS form)
@@ -1956,20 +1966,18 @@ _ES_EXACT = {
     "+12.2 dB at 6.3 kHz": "+12,2 dB a 6,3 kHz",
     "0 dB at 1 kHz": "0 dB a 1 kHz",
     "−5.63 dB at 1 kHz": "−5,63 dB a 1 kHz",
-    "for a 100 Hz fundamental the network cuts d2 by 13.8 dB\n"
-    "and d3 by 10.3 dB, and lifts the 10th order and above":
-        "para un fundamental de 100 Hz la red recorta d2 en 13,8 dB\n"
-        "y d3 en 10,3 dB, y realza del 10º orden en adelante",
+    "for a 100 Hz fundamental the network cuts $d_2$ by 13.8 dB\n"
+    "and $d_3$ by 10.3 dB, and lifts the 10th order and above":
+        "para un fundamental de 100 Hz la red recorta $d_2$ en 13,8 dB\n"
+        "y $d_3$ en 10,3 dB, y realza del 10º orden en adelante",
     # intermodulation_tests panel notes (the titles carry computed values
     # and are in the pattern list)
-    "denominator: a(f1) + a(f2)": "denominador: a(f1) + a(f2)",
+    "denominator: $a(f_1) + a(f_2)$": "denominador: $a(f_1) + a(f_2)$",
     "only the two in-band products count":
         "solo cuentan los dos productos en banda",
     "denominator: the 15 kHz sine alone":
         "denominador: solo la sinusoide de 15 kHz",
-    # The TDFD sideband markers name the Greek letter, same in Spanish.
-    "f0-delta": "f0-delta",
-    "f0+delta": "f0+delta",
+    # The TDFD sideband markers are pure mathtext now and carry no entry.
     # microphone_patterns polar family (IEC 60268-4 13.2.2)
     "The First-Order Family and Its Directivity Index (IEC 60268-4 13.2.2)":
         "La familia de primer orden y su índice de directividad "
@@ -1981,7 +1989,7 @@ _ES_EXACT = {
     "A-weighted": "Con ponderación A",
     "ITU-R BS.468-4 weighted": "Con ponderación ITU-R BS.468-4",
     "Band-summed level [dB]": "Nivel de la suma de bandas [dB]",
-    "this capsule\n(1/f, falling)": "esta cápsula\n(1/f, decreciente)",
+    "this capsule\n($1/f$, falling)": "esta cápsula\n($1/f$, decreciente)",
     "a hissier capsule\n(rising to 20 kHz)":
         "una cápsula más siseante\n(creciente hasta 20 kHz)",
     "the quasi-peak detector of ITU-R BS.468-4 adds the rest of the "
@@ -1994,42 +2002,40 @@ _ES_EXACT = {
         "(Farina / Novak)",
     "Excitation frequency [Hz]": "Frecuencia de excitación [Hz]",
     "Distortion re fundamental [%]": "Distorsión respecto al fundamental [%]",
-    "Total THD(f)": "THD(f) total",
-    "2nd harmonic d₂(f)": "2º armónico d₂(f)",
-    "3rd harmonic d₃(f)": "3er armónico d₃(f)",
-    "Chebyshev asymptote (a₂/2)/H₁": "Asíntota de Chebyshev (a₂/2)/H₁",
-    "Chebyshev asymptote (a₃/4)/H₁": "Asíntota de Chebyshev (a₃/4)/H₁",
+    "Total $\\mathrm{THD}(f)$": "$\\mathrm{THD}(f)$ total",
+    "2nd harmonic $d_2(f)$": "2º armónico $d_2(f)$",
+    "3rd harmonic $d_3(f)$": "3er armónico $d_3(f)$",
+    "Chebyshev asymptote $(a_2/2)/H_1$": "Asíntota de Chebyshev $(a_2/2)/H_1$",
+    "Chebyshev asymptote $(a_3/4)/H_1$": "Asíntota de Chebyshev $(a_3/4)/H_1$",
     "one sweep separates every distortion order;\n"
-    "each rolls off where its product n·f crosses the 3 kHz corner":
+    "each rolls off where its product $n f$ crosses the 3 kHz corner":
         "un solo barrido separa cada orden de distorsión;\n"
-        "cada uno cae donde su producto n·f cruza el corte de 3 kHz",
+        "cada uno cae donde su producto $n f$ cruza el corte de 3 kHz",
     # swept_sine_harmonic_responses: each order as a full response
     "The Separated Harmonic Frequency Responses (Farina / Novak)":
         "Las respuestas en frecuencia separadas por armónico "
         "(Farina / Novak)",
     "Frequency of the harmonic itself [Hz]":
         "Frecuencia del propio armónico [Hz]",
-    "|H1(f)| over [1f1, 1f2]": "|H1(f)| en [1f1, 1f2]",
-    "|H2(f)| over [2f1, 2f2]": "|H2(f)| en [2f1, 2f2]",
-    "|H3(f)| over [3f1, 3f2]": "|H3(f)| en [3f1, 3f2]",
-    "dotted: the Chebyshev levels 1 + 3a3/4, a2/2 and a3/4;\n"
-    "each order rolls off at the 3 kHz post-filter, not at n f2":
-        "punteado: los niveles de Chebyshev 1 + 3a3/4, a2/2 y a3/4;\n"
-        "cada orden cae en el posfiltro de 3 kHz, no en n f2",
+    "$|H_1(f)|$ over $[1f_1, 1f_2]$": "$|H_1(f)|$ en $[1f_1, 1f_2]$",
+    "$|H_2(f)|$ over $[2f_1, 2f_2]$": "$|H_2(f)|$ en $[2f_1, 2f_2]$",
+    "$|H_3(f)|$ over $[3f_1, 3f_2]$": "$|H_3(f)|$ en $[3f_1, 3f_2]$",
+    "dotted: the Chebyshev levels $1 + 3a_3/4$, $a_2/2$ and $a_3/4$;\n"
+    "each order rolls off at the 3 kHz post-filter, not at $n f_2$":
+        "punteado: los niveles de Chebyshev $1 + 3a_3/4$, $a_2/2$ y "
+        "$a_3/4$;\ncada orden cae en el posfiltro de 3 kHz, no en $n f_2$",
     # swept_sine_methods: synchronized against Farina on one recording
     "Same Recording, Two Deconvolutions (Novak et al. 2015, Fig. 6)":
         "La misma grabación, dos deconvoluciones (Novak et al. 2015, Fig. 6)",
-    "Chebyshev level a2/2": "Nivel de Chebyshev a2/2",
-    "f2 = 6 kHz: the Farina band stops here":
-        "f2 = 6 kHz: la banda de Farina se detiene aquí",
+    "Chebyshev level $a_2/2$": "Nivel de Chebyshev $a_2/2$",
+    "$f_2$ = 6 kHz: the Farina band stops here":
+        "$f_2$ = 6 kHz: la banda de Farina se detiene aquí",
     # Only "kHz" carries language here; the label reads the same in Spanish.
-    "2 f2 = 12 kHz": "2 f2 = 12 kHz",
-    # "arg" is the same operator in Spanish notation; method="..." is API.
-    'arg H2 — method="farina"': 'arg H2 — method="farina"',
-    'arg H2 — method="synchronized"': 'arg H2 — method="synchronized"',
+    "$2 f_2$ = 12 kHz": "$2 f_2$ = 12 kHz",
+    # The method="..." legends carry no words now and need no entry.
     "Unwrapped phase [rad]": "Fase desenrollada [rad]",
-    "true phase of H2: -pi/2 at every frequency":
-        "fase verdadera de H2: -pi/2 en todas las frecuencias",
+    "true phase of $H_2$: $-\\pi/2$ at every frequency":
+        "fase verdadera de $H_2$: $-\\pi/2$ en todas las frecuencias",
     # Calibrated spectral analysis (Bendat & Piersol PSD/CSD core)
     "Calibrated Spectral Density of Pink Noise (Bendat & Piersol)":
         "Densidad espectral calibrada de ruido rosa (Bendat y Piersol)",
@@ -3536,8 +3542,8 @@ _ES_EXACT = {
     # silencer_selection: reactive against dissipative on one axis
     "Choosing the family: where each one is worth having":
         "Elegir la familia: dónde compensa cada una",
-    "Reactive: 0.3 m expansion chamber, m = 4":
-        "Reactivo: cámara de expansión de 0,3 m, m = 4",
+    "Reactive: 0.3 m expansion chamber, $m = 4$":
+        "Reactivo: cámara de expansión de 0,3 m, $m = 4$",
     "Reactive: Helmholtz branch tuned to 100 Hz":
         "Reactivo: rama de Helmholtz sintonizada a 100 Hz",
     "Dissipative: five-airway splitter unit, 5 ft":
@@ -3547,16 +3553,16 @@ _ES_EXACT = {
         "Cámara de tubos extendidos: ramas de cuarto de onda "
         "enterradas dentro",
     "Plain chamber, 0.4 m": "Cámara simple, 0,4 m",
-    "Inlet extension L/4 = 0.10 m": "Extensión de entrada L/4 = 0,10 m",
-    "Inlet L/4 and outlet L/2 = 0.20 m":
-        "Entrada L/4 y salida L/2 = 0,20 m",
-    "c/2L = 429 Hz: the plain chamber is transparent (0.0 dB),\n"
-    "the L/4 inlet gives 5.1 dB and the L/4 + L/2 pair 74 dB":
-        "c/2L = 429 Hz: la cámara simple es transparente (0,0 dB),\n"
-        "la entrada L/4 da 5,1 dB y el par L/4 + L/2, 74 dB",
+    "Inlet extension $L/4$ = 0.10 m": "Extensión de entrada $L/4$ = 0,10 m",
+    "Inlet $L/4$ and outlet $L/2$ = 0.20 m":
+        "Entrada $L/4$ y salida $L/2$ = 0,20 m",
+    "$c/2L$ = 429 Hz: the plain chamber is transparent (0.0 dB),\n"
+    "the $L/4$ inlet gives 5.1 dB and the $L/4$ + $L/2$ pair 74 dB":
+        "$c/2L$ = 429 Hz: la cámara simple es transparente (0,0 dB),\n"
+        "la entrada $L/4$ da 5,1 dB y el par $L/4$ + $L/2$, 74 dB",
     # duct_attenuation_elements: the four element panels
     "(a) 36 × 24 in run, 5 ft": "(a) Tramo de 36 × 24 in, 5 ft",
-    "(b) One bend, W = 24 in": "(b) Un codo, W = 24 in",
+    "(b) One bend, $W$ = 24 in": "(b) Un codo, $W$ = 24 in",
     "(c) Open end, 300 mm flush": "(c) Extremo abierto, 300 mm enrasado",
     "(d) Splitter silencer": "(d) Silenciador de bafles",
     "Bare": "Desnudo",
@@ -3588,14 +3594,14 @@ _ES_EXACT = {
     "Airway velocity": "Velocidad en el paso de aire",
     "24 × 24 in device": "Dispositivo de 24 × 24 in",
     "Regenerated $L_W$ [dB re 1 pW]": "$L_W$ regenerado [dB re 1 pW]",
-    "55 lg(V/V₀): 16.6 dB per\ndoubling, every band":
-        "55 lg(V/V₀): 16,6 dB por\nduplicación, en cada banda",
-    "peak band f_P = 48.8 U_G moves up one octave per\ndoubling of the "
+    "$55\\,\\mathrm{lg}(V/V_0)$: 16.6 dB per\ndoubling, every band":
+        "$55\\,\\mathrm{lg}(V/V_0)$: 16,6 dB por\nduplicación, en cada banda",
+    "peak band $f_P = 48.8\\,U_G$ moves up one octave per\ndoubling of the "
     "face velocity; ASHRAE Table 9 caps\nthe neck of an RC 30 supply "
     "outlet at 2.2 m/s":
-        "la banda de pico f_P = 48,8 U_G sube una octava por\nduplicación "
-        "de la velocidad en la cara; la Tabla 9 de\nASHRAE limita el cuello "
-        "de una salida de impulsión RC 30 a 2,2 m/s",
+        "la banda de pico $f_P = 48{,}8\\,U_G$ sube una octava por\n"
+        "duplicación de la velocidad en la cara; la Tabla 9 de\nASHRAE "
+        "limita el cuello de una salida de impulsión RC 30 a 2,2 m/s",
     # fan_sound_power: the efficiency staircase and the blade tone
     "The fan row: 5000 cfm at 2 in w.g., forward curved (Long Eq. 13.1)":
         "La fila del ventilador: 5000 cfm a 2 in c.a., álabes curvados "
@@ -3605,21 +3611,21 @@ _ES_EXACT = {
     "the same fan with its blade tone at 2 kHz":
         "el mismo ventilador con su tono de álabes en 2 kHz",
     "static efficiency [% of peak]": "rendimiento estático [% del máximo]",
-    "the C_BFI increment is 2 dB and lands whole in the\noctave "
-    "containing the blade tone: 500 Hz at 1200 rev/min\n× 24 blades, "
-    "2 kHz if the fan is selected faster":
-        "el incremento C_BFI es de 2 dB y cae entero en la\noctava del tono "
-        "de álabes: 500 Hz a 1200 rev/min\n× 24 álabes, 2 kHz si el "
-        "ventilador se elige más rápido",
+    "the $C_{\\mathrm{BFI}}$ increment is 2 dB and lands whole in "
+    "the\noctave containing the blade tone: 500 Hz at 1200 rev/min\n× 24 "
+    "blades, 2 kHz if the fan is selected faster":
+        "el incremento $C_{\\mathrm{BFI}}$ es de 2 dB y cae entero en la\n"
+        "octava del tono de álabes: 500 Hz a 1200 rev/min\n× 24 álabes, "
+        "2 kHz si el ventilador se elige más rápido",
     # hvac_elbow_flow_noise: the bend chosen and the noise it regenerates
     "Elbow insertion loss (ASHRAE Table 8.11)":
         "Pérdida por inserción del codo (ASHRAE Tabla 8.11)",
     "Flow-generated sound power (VDI 2081, Bies Eq. 8.252)":
         "Potencia acústica del flujo (VDI 2081, Bies Ec. 8.252)",
     "Insertion loss [dB per bend]": "Pérdida por inserción [dB por codo]",
-    "Mitred bend, U = 10 m/s": "Codo a inglete, U = 10 m/s",
-    "W / lambda = 1\n(W = 0.30 m, 1143 Hz)":
-        "W / lambda = 1\n(W = 0,30 m, 1143 Hz)",
+    "Mitred bend, $U$ = 10 m/s": "Codo a inglete, $U$ = 10 m/s",
+    "$W/\\lambda = 1$\n($W$ = 0.30 m, 1143 Hz)":
+        "$W/\\lambda = 1$\n($W$ = 0,30 m, 1143 Hz)",
     "one bend at 10 m/s beats\na straight run at 20 m/s\nbelow 500 Hz":
         "un codo a 10 m/s supera a\nun tramo recto a 20 m/s\n"
         "por debajo de 500 Hz",
@@ -3627,12 +3633,13 @@ _ES_EXACT = {
     "What the enclosure panels have to be: Norton problem 4.16":
         "Lo que tienen que ser los paneles del encapsulado: "
         "problema 4.16 de Norton",
-    "Target IL = $L_{p1}$ − NC 45": "IL objetivo = $L_{p1}$ − NC 45",
+    "Target $\\mathrm{IL}$ = $L_{p1}$ − NC 45":
+        "$\\mathrm{IL}$ objetivo = $L_{p1}$ − NC 45",
     "Interior correction $10\\,\\lg(S_E/R_i)$":
         "Corrección interior $10\\,\\lg(S_E/R_i)$",
-    "Required panel R (Norton)": "R necesaria del panel (Norton)",
-    "Required panel R (Bies default)":
-        "R necesaria del panel (Bies, por omisión)",
+    "Required panel $R$ (Norton)": "$R$ necesaria del panel (Norton)",
+    "Required panel $R$ (Bies default)":
+        "$R$ necesaria del panel (Bies, por omisión)",
     "Norton's printed answer": "La respuesta impresa de Norton",
     "the peak: the lining works and\nthe compressor is still loud":
         "el máximo: el revestimiento funciona y\nel compresor sigue "
@@ -3673,19 +3680,23 @@ _ES_EXACT = {
         "Anexo 3 de BS.1770: la ponderación es una propiedad de la "
         "posición del altavoz",
     "1.0 everywhere else": "1,0 en todo lo demás",
-    "60° ≤ |azimuth| ≤ 120°,  |elevation| < 30°":
-        "60° ≤ |acimut| ≤ 120°,  |elevación| < 30°",
+    "$60° \\leq |\\mathrm{azimuth}| \\leq 120°$,  $|\\mathrm{elevation}| < "
+    "30°$":
+        "$60° \\leq |\\mathrm{acimut}| \\leq 120°$,  $|\\mathrm{elevación}| "
+        "< 30°$",
     "Azimuth [°]": "Acimut [°]",
     "Elevation [°]": "Elevación [°]",
     # true_peak_intersample: the intersample peak and the closed-form bound
-    "A 12 kHz tone at π/4: every sample misses the peak":
-        "Un tono de 12 kHz en π/4: ninguna muestra cae en el pico",
+    "A 12 kHz tone at $\\pi/4$: every sample misses the peak":
+        "Un tono de 12 kHz en $\\pi/4$: ninguna muestra cae en el pico",
     "band-limited reconstruction": "reconstrucción de banda limitada",
     "samples at 48 kHz": "muestras a 48 kHz",
     "4× oversampled grid": "rejilla sobremuestreada 4×",
     "Amplitude [FS]": "Amplitud [FS]",
-    "Worst-case under-read, 20 lg cos(π f_norm / n)":
-        "Infravaloración de peor caso, 20 lg cos(π f_norm / n)",
+    "Worst-case under-read, "
+    "$20\\,\\mathrm{lg}\\,\\cos(\\pi f_{\\mathrm{norm}}/n)$":
+        "Infravaloración de peor caso, "
+        "$20\\,\\mathrm{lg}\\,\\cos(\\pi f_{\\mathrm{norm}}/n)$",
     "Under-read [dB]": "Infravaloración [dB]",
     "Tone frequency / sampling rate":
         "Frecuencia del tono / frecuencia de muestreo",
@@ -4315,7 +4326,8 @@ _ES_EXACT = {
         "de Snell de cada onda transmitida",
     # Radiation-efficiency clip (devices/emission/vibration-sound-power).
     # radiation_efficiency_sigma sat on the FL1/FL8 boundary; see above.
-    "ISO/TS 7849-1 assumes ε = 1 here": "ISO/TS 7849-1 supone ε = 1 aquí",
+    "ISO/TS 7849-1 assumes $\\varepsilon = 1$ here":
+        "ISO/TS 7849-1 supone $\\varepsilon = 1$ aquí",
     "the gap Part 1 pays for: 25 dB at 63 Hz,\n"
     "14 dB at 2 kHz, gone only above coincidence":
         "lo que la Parte 1 paga: 25 dB en 63 Hz,\n"
@@ -4664,8 +4676,8 @@ _ES_PATTERNS = [
      "Banda estrecha de 1 kHz - N = \\1 sonios"),
     (r"^Flat broadband 60 dB - N = (.+) sone$",
      "Banda ancha plana a 60 dB - N = \\1 sonios"),
-    (r"^Pressure-intensity index\n\u03b4pI = (.+) dB$",
-     "\u00cdndice presi\u00f3n-intensidad\\n\u03b4pI = \\1 dB"),
+    (r"^Pressure-intensity index\n\$\\delta_\{pI\}\$ = (\u2212?\d+)\.(\d+) dB$",
+     ("\u00cdndice presi\u00f3n-intensidad\n" r"$\\delta_{pI}$ = \1,\2 dB")),
     (r"^Reference curve shifted by (.+) dB$",
      r"Curva de referencia desplazada \1 dB"),
     (r"^Sum of unfavourable deviations = (.+) dB  \(limit 32\.0 dB\)$",
@@ -4788,25 +4800,36 @@ _ES_PATTERNS = [
     # Scattering / diffusion / precision power dynamic titles (numeric d / LWA)
     (r"^Directional diffusion  d = (.+)  \(ISO 17497-2\)$",
      r"Difusión direccional  d = \1  (ISO 17497-2)"),
-    (r"^Precision sound power \(ISO 3745\)  LWA = (.+) dB\(A\)$",
-     r"Potencia acústica de precisión (ISO 3745)  LWA = \1 dB(A)"),
-    (r"^Precision intensity scanning \(ISO 9614-3\)  LWA = (.+) dB\(A\)$",
-     r"Barrido de intensidad de precisión (ISO 9614-3)  LWA = \1 dB(A)"),
-    (r"^Enveloping-surface sound power \(ISO 3744\)  LWA = (.+) dB\(A\)$",
-     r"Potencia acústica por superficie envolvente (ISO 3744)  LWA = \1 dB(A)"),
-    (r"^Reverberation-room sound power \(ISO 3741\)  LWA = (.+) dB\(A\)$",
-     r"Potencia acústica en cámara reverberante (ISO 3741)  LWA = \1 dB(A)"),
-    (r"^Intensity-scanning sound power \(ISO 9614-2\)  LWA = (.+) dB\(A\)$",
-     r"Potencia acústica por barrido de intensidad (ISO 9614-2)  LWA = \1 dB(A)"),
+    ((r"^Precision sound power \(ISO 3745\)  "
+     r"\$L_\{W\\!A\}\$ = (\d+)\.(\d+) dB\(A\)$"),
+     (r"Potencia acústica de precisión (ISO 3745)  "
+     r"$L_{W\\!A}$ = \1,\2 dB(A)")),
+    ((r"^Precision intensity scanning \(ISO 9614-3\)  "
+     r"\$L_\{W\\!A\}\$ = (\d+)\.(\d+) dB\(A\)$"),
+     (r"Barrido de intensidad de precisión (ISO 9614-3)  "
+     r"$L_{W\\!A}$ = \1,\2 dB(A)")),
+    ((r"^Enveloping-surface sound power \(ISO 3744\)  "
+     r"\$L_\{W\\!A\}\$ = (\d+)\.(\d+) dB\(A\)$"),
+     (r"Potencia acústica por superficie envolvente (ISO 3744)  "
+     r"$L_{W\\!A}$ = \1,\2 dB(A)")),
+    ((r"^Reverberation-room sound power \(ISO 3741\)  "
+     r"\$L_\{W\\!A\}\$ = (\d+)\.(\d+) dB\(A\)$"),
+     (r"Potencia acústica en cámara reverberante (ISO 3741)  "
+     r"$L_{W\\!A}$ = \1,\2 dB(A)")),
+    ((r"^Intensity-scanning sound power \(ISO 9614-2\)  "
+     r"\$L_\{W\\!A\}\$ = (\d+)\.(\d+) dB\(A\)$"),
+     (r"Potencia acústica por barrido de intensidad (ISO 9614-2)  "
+     r"$L_{W\\!A}$ = \1,\2 dB(A)")),
     # Electroacoustics figures: titles and readouts carrying computed values
     # (intermodulation_tests, feedback_stability, microphone_patterns,
     # microphone_noise_weightings).
-    (r"^\(a\) Difference frequency, 13 / 14 kHz — d\(d,2\) = (.+) %$",
-     r"(a) Diferencia de frecuencias, 13 / 14 kHz — d(d,2) = \1 %"),
+    ((r"^\(a\) Difference frequency, 13 / 14 kHz — "
+     r"\$d\(d,2\)\$ = (\d+)\.(\d+) %$"),
+     r"(a) Diferencia de frecuencias, 13 / 14 kHz — $d(d,2)$ = \1,\2 %"),
     ((r"^\(b\) Total difference frequency, 8 / 11\.95 kHz — "
-      r"d\(TDFD\) = (.+) %$"),
+      r"\$d\(\\mathrm\{TDFD\}\)\$ = (\d+)\.(\d+) %$"),
      ("(b) Diferencia total de frecuencias, 8 / 11,95 kHz — "
-      r"d(TDFD) = \1 %")),
+      r"$d(\\mathrm{TDFD})$ = \1,\2 %")),
     ((r"^\(c\) Dynamic intermodulation, 15 kHz \+ 3\.15 kHz square — "
       r"DIM = (.+) %$"),
      (r"(c) Intermodulación dinámica, 15 kHz + cuadrada de 3,15 kHz — "
@@ -4815,18 +4838,18 @@ _ES_PATTERNS = [
      r"Un micrófono abierto — margen \1 dB"),
     (r"^Four open microphones — headroom (.+) dB$",
      r"Cuatro micrófonos abiertos — margen \1 dB"),
-    (r"^Omnidirectional \(b = (.+)\): DI = (.+) dB$",
-     r"Omnidireccional (b = \1): DI = \2 dB"),
-    (r"^Subcardioid \(b = (.+)\): DI = (.+) dB$",
-     r"Subcardioide (b = \1): DI = \2 dB"),
-    (r"^Cardioid \(b = (.+)\): DI = (.+) dB$",
-     r"Cardioide (b = \1): DI = \2 dB"),
-    (r"^Supercardioid \(b = (.+)\): DI = (.+) dB$",
-     r"Supercardioide (b = \1): DI = \2 dB"),
-    (r"^Hypercardioid \(b = (.+)\): DI = (.+) dB$",
-     r"Hipercardioide (b = \1): DI = \2 dB"),
-    (r"^Figure-of-eight \(b = (.+)\): DI = (.+) dB$",
-     r"Figura en ocho (b = \1): DI = \2 dB"),
+    (r"^Omnidirectional \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Omnidireccional ($b$ = \1,\2): DI = \3,\4 dB"),
+    (r"^Subcardioid \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Subcardioide ($b$ = \1,\2): DI = \3,\4 dB"),
+    (r"^Cardioid \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Cardioide ($b$ = \1,\2): DI = \3,\4 dB"),
+    (r"^Supercardioid \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Supercardioide ($b$ = \1,\2): DI = \3,\4 dB"),
+    (r"^Hypercardioid \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Hipercardioide ($b$ = \1,\2): DI = \3,\4 dB"),
+    (r"^Figure-of-eight \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
+     r"Figura en ocho ($b$ = \1,\2): DI = \3,\4 dB"),
     (r"^network alone: (.+) dB$", r"la red sola: \1 dB"),
     # modulation_distortion: the library title reads the same in Spanish;
     # only the decimal comma differs, and the save-time pass applies it.
@@ -4842,17 +4865,21 @@ _ES_PATTERNS = [
       "máx S = \\4 LUFS\nTPmáx = \\5 dBTP")),
     (r"^sample peak (.+) dBFS$", r"pico muestral \1 dBFS"),
     (r"^true peak (.+) dBTP$", r"pico verdadero \1 dBTP"),
-    (r"^BS\.1770 asks for n ≥ 4 at 48 kHz:\n(.+) dB left at f_norm = 1/4$",
-     "BS.1770 pide n ≥ 4 a 48 kHz:\nquedan \\1 dB en f_norm = 1/4"),
+    ((r"^BS\.1770 asks for \$n \\geq 4\$ at 48 kHz:\n(−?\d+)\.(\d+) dB left "
+     r"at \$f_\{\\mathrm\{norm\}\} = 1/4\$$"),
+     (r"BS.1770 pide $n \\geq 4$ a 48 kHz:" "\n"
+     r"quedan \1,\2 dB en $f_{\\mathrm{norm}} = 1/4$")),
     # Emission figures: computed annotations (k1_k2_corrections,
     # spacer_bandwidth, sound_power_grades_declaration).
-    (r"^LWAd = (\d+) dB\nL1 = (\d+) dB\nnot verified$",
-     "LWAd = \\1 dB\nL1 = \\2 dB\nno verificado"),
-    (r"^LWAd = (\d+) dB\nL1 = (\d+) dB\nverified$",
-     "LWAd = \\1 dB\nL1 = \\2 dB\nverificado"),
-    ((r"^ISO (3744|3746) limit: K2 = (.+) dB\n"
+    (r"^\$L_\{W\\!Ad\}\$ = (\d+) dB\n\$L_1\$ = (\d+) dB\nnot verified$",
+     (r"$L_{W\\!Ad}$ = \1 dB" "\n" r"$L_1$ = \2 dB" "\nno verificado")),
+    (r"^\$L_\{W\\!Ad\}\$ = (\d+) dB\n\$L_1\$ = (\d+) dB\nverified$",
+     (r"$L_{W\\!Ad}$ = \1 dB" "\n" r"$L_1$ = \2 dB" "\nverificado")),
+    (r"^\$U\$ = (\d+)\.(\d+) dB$", r"$U$ = \1,\2 dB"),
+    (r"^\$L_W\$ = (\d+)\.(\d+) dB$", r"$L_W$ = \1,\2 dB"),
+    ((r"^ISO (3744|3746) limit: \$K_2\$ = (.+) dB\n"
       r"(\d+) % of the measured energy is room$"),
-     ("Límite de ISO \\1: K2 = \\2 dB\n"
+     (r"Límite de ISO \1: $K_2$ = \2 dB" "\n"
       "el \\3 % de la energía medida es de la sala")),
     # A bare "value kHz" marker reads the same in Spanish (the decimal
     # comma is applied by the save-time pass).
@@ -4861,21 +4888,23 @@ _ES_PATTERNS = [
     # (duct_sheet_verification, duct_regenerated_noise, fan_sound_power,
     # hvac_elbow_flow_noise, silencer_selection, silencer_extended_tube,
     # room_to_room_partitions).
-    (r"^Fan, Eq\. 13\.1  \(worst Δ (\d+) dB\)$",
-     r"Ventilador, Ec. 13.1  (peor Δ \1 dB)"),
-    (r"^Flexible duct, 12 in × 6 ft  \(worst Δ (\d+) dB\)$",
-     r"Conducto flexible, 12 in × 6 ft  (peor Δ \1 dB)"),
-    (r"^Lined duct, (\d+) × (\d+) in, (\d+) ft  \(worst Δ (\d+) dB\)$",
-     r"Conducto revestido, \1 × \2 in, \3 ft  (peor Δ \4 dB)"),
-    (r"^Supply diffuser, 312 cfm  \(worst Δ (\d+) dB\)$",
-     r"Difusor de impulsión, 312 cfm  (peor Δ \1 dB)"),
-    (r"^NC 30 curve  \(worst Δ (\d+) dB\)$",
-     r"Curva NC 30  (peor Δ \1 dB)"),
+    (r"^Fan, Eq\. 13\.1  \(worst \$\\Delta\$ (\d+) dB\)$",
+     r"Ventilador, Ec. 13.1  (peor $\\Delta$ \1 dB)"),
+    (r"^Flexible duct, 12 in × 6 ft  \(worst \$\\Delta\$ (\d+) dB\)$",
+     r"Conducto flexible, 12 in × 6 ft  (peor $\\Delta$ \1 dB)"),
+    ((r"^Lined duct, (\d+) × (\d+) in, (\d+) ft  "
+     r"\(worst \$\\Delta\$ (\d+) dB\)$"),
+     r"Conducto revestido, \1 × \2 in, \3 ft  (peor $\\Delta$ \4 dB)"),
+    (r"^Supply diffuser, 312 cfm  \(worst \$\\Delta\$ (\d+) dB\)$",
+     r"Difusor de impulsión, 312 cfm  (peor $\\Delta$ \1 dB)"),
+    (r"^NC 30 curve  \(worst \$\\Delta\$ (\d+) dB\)$",
+     r"Curva NC 30  (peor $\\Delta$ \1 dB)"),
     # The diffuser flow legend reads the same in Spanish (comma at save).
     (r"^(\d+) cfm \((.+) m/s\)$", r"\1 cfm (\2 m/s)"),
     (r"^(\d+) % of peak static efficiency \(\+(\d+) dB\)$",
      r"\1 % del rendimiento estático máximo (+\2 dB)"),
-    (r"^Straight duct, U = (\d+) m/s$", r"Conducto recto, U = \1 m/s"),
+    (r"^Straight duct, \$U\$ = (\d+) m/s$", r"Conducto recto, $U$ = \1 m/s"),
+    (r"^\$m\$ = (\d+)  →  (\d+)\.(\d+) dB$", r"$m$ = \1  →  \2,\3 dB"),
     (r"^Dissipative: 1\.5 m of (\d+) mm lined 36 × 24 in duct$",
      (r"Disipativo: 1,5 m de conducto de 36 × 24 in con \1 mm de "
       r"revestimiento")),

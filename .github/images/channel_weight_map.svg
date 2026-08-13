@@ -1283,7 +1283,47 @@ L 768.143125 28.318125
     <text style="font-size: 11px; font-family: sans-serif; text-anchor: middle" x="408.724297" y="79.55776" transform="rotate(-0 408.724297 79.55776)">1.0 everywhere else</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="408.724297" y="284.516302" transform="rotate(-0 408.724297 284.516302)">60° ≤ |azimuth| ≤ 120°,  |elevation| &lt; 30°</text>
+    <!-- $60° \leq |\mathrm{azimuth}| \leq 120°$,  $|\mathrm{elevation}| &lt; 30°$ -->
+    <g transform="translate(305.624297 284.516302)">
+     <text>
+      <tspan x="0" y="-0.359375" style="font-size: 10px; font-family: sans-serif">6</tspan>
+      <tspan x="6.362305" y="-0.359375" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="12.724609" y="-0.359375" style="font-size: 10px; font-family: sans-serif">°</tspan>
+      <tspan x="19.672852" y="-0.359375" style="font-size: 10px; font-family: sans-serif">≤</tspan>
+      <tspan x="30" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+      <tspan x="33.369141" y="-0.359375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="39.49707" y="-0.359375" style="font-size: 10px; font-family: sans-serif">z</tspan>
+      <tspan x="44.746094" y="-0.359375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+      <tspan x="47.524414" y="-0.359375" style="font-size: 10px; font-family: sans-serif">m</tspan>
+      <tspan x="57.265625" y="-0.359375" style="font-size: 10px; font-family: sans-serif">u</tspan>
+      <tspan x="63.603516" y="-0.359375" style="font-size: 10px; font-family: sans-serif">t</tspan>
+      <tspan x="67.524414" y="-0.359375" style="font-size: 10px; font-family: sans-serif">h</tspan>
+      <tspan x="73.862305" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+      <tspan x="79.179688" y="-0.359375" style="font-size: 10px; font-family: sans-serif">≤</tspan>
+      <tspan x="89.506836" y="-0.359375" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="95.869141" y="-0.359375" style="font-size: 10px; font-family: sans-serif">2</tspan>
+      <tspan x="102.231445" y="-0.359375" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="108.59375" y="-0.359375" style="font-size: 10px; font-family: sans-serif">°</tspan>
+      <tspan x="113.59375" y="-0.359375" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="116.772461" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="119.951172" y="-0.359375" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="123.129883" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+      <tspan x="126.499023" y="-0.359375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+      <tspan x="132.651367" y="-0.359375" style="font-size: 10px; font-family: sans-serif">l</tspan>
+      <tspan x="135.429688" y="-0.359375" style="font-size: 10px; font-family: sans-serif">e</tspan>
+      <tspan x="141.582031" y="-0.359375" style="font-size: 10px; font-family: sans-serif">v</tspan>
+      <tspan x="147.5" y="-0.359375" style="font-size: 10px; font-family: sans-serif">a</tspan>
+      <tspan x="153.62793" y="-0.359375" style="font-size: 10px; font-family: sans-serif">t</tspan>
+      <tspan x="157.548828" y="-0.359375" style="font-size: 10px; font-family: sans-serif">i</tspan>
+      <tspan x="160.327148" y="-0.359375" style="font-size: 10px; font-family: sans-serif">o</tspan>
+      <tspan x="166.445312" y="-0.359375" style="font-size: 10px; font-family: sans-serif">n</tspan>
+      <tspan x="172.783203" y="-0.359375" style="font-size: 10px; font-family: sans-serif">|</tspan>
+      <tspan x="178.100586" y="-0.359375" style="font-size: 10px; font-family: sans-serif">&lt;</tspan>
+      <tspan x="188.427734" y="-0.359375" style="font-size: 10px; font-family: sans-serif">3</tspan>
+      <tspan x="194.790039" y="-0.359375" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="201.152344" y="-0.359375" style="font-size: 10px; font-family: sans-serif">°</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_19">
     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #d62728" x="357.821159" y="209.016953" transform="rotate(-0 357.821159 209.016953)">L  (1.00)</text>

@@ -3913,64 +3913,64 @@ L 741.503125 22.318125
    </g>
    <g id="legend_1">
     <g id="patch_8">
-     <path d="M 588.827969 232.318711 
+     <path d="M 584.533281 232.318711 
 L 735.203125 232.318711 
 Q 737.003125 232.318711 737.003125 230.518711 
 L 737.003125 163.915195 
 Q 737.003125 162.115195 735.203125 162.115195 
-L 588.827969 162.115195 
-Q 587.027969 162.115195 587.027969 163.915195 
-L 587.027969 230.518711 
-Q 587.027969 232.318711 588.827969 232.318711 
+L 584.533281 162.115195 
+Q 582.733281 162.115195 582.733281 163.915195 
+L 582.733281 230.518711 
+Q 582.733281 232.318711 584.533281 232.318711 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_9">
-     <path d="M 590.627969 172.553789 
-L 608.627969 172.553789 
-L 608.627969 166.253789 
-L 590.627969 166.253789 
+     <path d="M 586.333281 172.553789 
+L 604.333281 172.553789 
+L 604.333281 166.253789 
+L 586.333281 166.253789 
 z
 " style="fill: #ffe7d2"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="615.827969" y="172.553789" transform="rotate(-0 615.827969 172.553789)">LRA 1.6 LU</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="611.533281" y="172.553789" transform="rotate(-0 611.533281 172.553789)">LRA 1.6 LU</text>
     </g>
     <g id="line2d_35">
-     <path d="M 590.627969 182.904492 
-L 599.627969 182.904492 
-L 608.627969 182.904492 
+     <path d="M 586.333281 182.904492 
+L 595.333281 182.904492 
+L 604.333281 182.904492 
 " style="fill: none; stroke: #9e9e9e; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="615.827969" y="186.054492" transform="rotate(-0 615.827969 186.054492)">Momentary (400 ms)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="611.533281" y="186.054492" transform="rotate(-0 611.533281 186.054492)">Momentary (400 ms)</text>
     </g>
     <g id="line2d_36">
-     <path d="M 590.627969 196.405195 
-L 599.627969 196.405195 
-L 608.627969 196.405195 
+     <path d="M 586.333281 196.405195 
+L 595.333281 196.405195 
+L 604.333281 196.405195 
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="615.827969" y="199.555195" transform="rotate(-0 615.827969 199.555195)">Short-term (3 s)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="611.533281" y="199.555195" transform="rotate(-0 611.533281 199.555195)">Short-term (3 s)</text>
     </g>
     <g id="line2d_37">
-     <path d="M 590.627969 209.905898 
-L 599.627969 209.905898 
-L 608.627969 209.905898 
+     <path d="M 586.333281 209.905898 
+L 595.333281 209.905898 
+L 604.333281 209.905898 
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.6"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="615.827969" y="213.055898" transform="rotate(-0 615.827969 213.055898)">Integrated -23.0 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="611.533281" y="213.055898" transform="rotate(-0 611.533281 213.055898)">Integrated −23.0 LUFS</text>
     </g>
     <g id="line2d_38">
-     <path d="M 590.627969 223.406602 
-L 599.627969 223.406602 
-L 608.627969 223.406602 
+     <path d="M 586.333281 223.406602 
+L 595.333281 223.406602 
+L 604.333281 223.406602 
 " style="fill: none; stroke-dasharray: 10.24,2.56,1.6,2.56; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.6"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="615.827969" y="226.556602" transform="rotate(-0 615.827969 226.556602)">Ungated mean -27.7 LUFS</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="611.533281" y="226.556602" transform="rotate(-0 611.533281 226.556602)">Ungated mean −27.7 LUFS</text>
     </g>
    </g>
   </g>

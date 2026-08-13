@@ -530,49 +530,135 @@ L 438.194609 54.722812
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_18">
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.789223 215.736133)">Índice presión-intensidad</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.789223 227.738867)">δpI = 0,0 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(60.789223 215.136914)">Índice presión-intensidad</text>
+    <!-- $\delta_{pI}$ = 0,0 dB -->
+    <g transform="translate(60.789223 227.141211)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">δ</tspan>
+      <tspan x="6.118164" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">p</tspan>
+      <tspan x="10.561523" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">I</tspan>
+      <tspan x="12.899414" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="16.078125" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="24.457031" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="27.635742" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="33.998047" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="37.176758" y="-0.40625" style="font-size: 10px; font-family: sans-serif">0</tspan>
+      <tspan x="43.539062" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="46.717773" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="53.06543" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="239.560195" y="42.722812" transform="rotate(-0 239.560195 42.722812)">Onda plana: Lp ≈ LI</text>
+    <!-- Onda plana: $L_p \approx L_I$ -->
+    <g transform="translate(178.240195 42.722812)">
+     <text>
+      <tspan x="0" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">O</tspan>
+      <tspan x="10.201172" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">n</tspan>
+      <tspan x="18.744141" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">d</tspan>
+      <tspan x="27.333984" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">a</tspan>
+      <tspan x="35.431641" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif"> </tspan>
+      <tspan x="39.609375" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">p</tspan>
+      <tspan x="48.199219" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">l</tspan>
+      <tspan x="52.3125" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">a</tspan>
+      <tspan x="60.410156" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">n</tspan>
+      <tspan x="68.953125" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">a</tspan>
+      <tspan x="77.050781" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif">:</tspan>
+      <tspan x="81.849609" y="-0.875" style="font-weight: 700; font-size: 12px; font-family: sans-serif"> </tspan>
+      <tspan x="86.027344" y="-0.875" style="font-style: oblique; font-size: 12px; font-family: sans-serif">L</tspan>
+      <tspan x="113.103516" y="-0.875" style="font-style: oblique; font-size: 12px; font-family: sans-serif">L</tspan>
+      <tspan x="92.712891" y="0.924994" style="font-style: oblique; font-size: 8.4px; font-family: sans-serif">p</tspan>
+      <tspan x="119.789062" y="0.924994" style="font-style: oblique; font-size: 8.4px; font-family: sans-serif">I</tspan>
+      <tspan x="100.710938" y="-0.875" style="font-size: 12px; font-family: sans-serif">≈</tspan>
+     </text>
+    </g>
    </g>
    <g id="legend_1">
     <g id="patch_7">
-     <path d="M 305.888984 89.284219 
-L 431.894609 89.284219 
-Q 433.694609 89.284219 433.694609 87.484219 
+     <path d="M 306.434609 89.824922 
+L 431.894609 89.824922 
+Q 433.694609 89.824922 433.694609 88.024922 
 L 433.694609 61.022812 
 Q 433.694609 59.222812 431.894609 59.222812 
-L 305.888984 59.222812 
-Q 304.088984 59.222812 304.088984 61.022812 
-L 304.088984 87.484219 
-Q 304.088984 89.284219 305.888984 89.284219 
+L 306.434609 59.222812 
+Q 304.634609 59.222812 304.634609 61.022812 
+L 304.634609 88.024922 
+Q 304.634609 89.824922 306.434609 89.824922 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_53">
-     <path d="M 307.688984 66.871406 
-L 316.688984 66.871406 
-L 325.688984 66.871406 
+     <path d="M 308.234609 66.872812 
+L 317.234609 66.872812 
+L 326.234609 66.872812 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#ma07b1be976" x="316.688984" y="66.871406" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
+      <use xlink:href="#ma07b1be976" x="317.234609" y="66.872812" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
      </g>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="332.888984" y="70.021406" transform="rotate(-0 332.888984 70.021406)">Nivel de presión Lp</text>
+     <!-- Nivel de presión $L_p$ -->
+     <g transform="translate(333.434609 70.022812)">
+      <text>
+       <tspan x="0" y="-0.796875" style="font-size: 9px; font-family: sans-serif">N</tspan>
+       <tspan x="6.732422" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="9.23291" y="-0.796875" style="font-size: 9px; font-family: sans-serif">v</tspan>
+       <tspan x="14.559082" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="20.096191" y="-0.796875" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="22.59668" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="25.45752" y="-0.796875" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="31.17041" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="36.70752" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="39.568359" y="-0.796875" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="45.28125" y="-0.796875" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="48.981445" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="54.518555" y="-0.796875" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="59.20752" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="61.708008" y="-0.796875" style="font-size: 9px; font-family: sans-serif">ó</tspan>
+       <tspan x="67.214355" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="72.918457" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="75.779297" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">L</tspan>
+       <tspan x="80.793457" y="0.553121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">p</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_54">
-     <path d="M 307.688984 80.372109 
-L 316.688984 80.372109 
-L 325.688984 80.372109 
+     <path d="M 308.234609 80.912812 
+L 317.234609 80.912812 
+L 326.234609 80.912812 
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
      <g>
-      <use xlink:href="#mc448654096" x="316.688984" y="80.372109" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
+      <use xlink:href="#mc448654096" x="317.234609" y="80.912812" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="332.888984" y="83.522109" transform="rotate(-0 332.888984 83.522109)">Nivel de intensidad LI</text>
+     <!-- Nivel de intensidad $L_I$ -->
+     <g transform="translate(333.434609 84.062812)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">N</tspan>
+       <tspan x="6.732422" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="9.23291" y="-0.15625" style="font-size: 9px; font-family: sans-serif">v</tspan>
+       <tspan x="14.559082" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="20.096191" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="22.59668" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="25.45752" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="31.17041" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="36.70752" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="39.568359" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="42.068848" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="47.772949" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="51.301758" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="56.838867" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="62.542969" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="67.231934" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="69.732422" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="75.445312" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="80.960449" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="86.67334" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="89.53418" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">L</tspan>
+       <tspan x="94.54834" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">I</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
@@ -1013,49 +1099,115 @@ L 849.763437 54.722812
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_29">
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(472.358051 215.736133)">Índice presión-intensidad</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(472.358051 227.738867)">δpI = 38,1 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(472.358051 215.136914)">Índice presión-intensidad</text>
+    <!-- $\delta_{pI}$ = 38,1 dB -->
+    <g transform="translate(472.358051 227.141211)">
+     <text>
+      <tspan x="0" y="-0.40625" style="font-style: oblique; font-size: 10px; font-family: sans-serif">δ</tspan>
+      <tspan x="6.118164" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">p</tspan>
+      <tspan x="10.561523" y="1.093745" style="font-style: oblique; font-size: 7px; font-family: sans-serif">I</tspan>
+      <tspan x="12.899414" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="16.078125" y="-0.40625" style="font-size: 10px; font-family: sans-serif">=</tspan>
+      <tspan x="24.457031" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="27.635742" y="-0.40625" style="font-size: 10px; font-family: sans-serif">3</tspan>
+      <tspan x="33.998047" y="-0.40625" style="font-size: 10px; font-family: sans-serif">8</tspan>
+      <tspan x="40.360352" y="-0.40625" style="font-size: 10px; font-family: sans-serif">,</tspan>
+      <tspan x="43.539062" y="-0.40625" style="font-size: 10px; font-family: sans-serif">1</tspan>
+      <tspan x="49.901367" y="-0.40625" style="font-size: 10px; font-family: sans-serif"> </tspan>
+      <tspan x="53.080078" y="-0.40625" style="font-size: 10px; font-family: sans-serif">d</tspan>
+      <tspan x="59.427734" y="-0.40625" style="font-size: 10px; font-family: sans-serif">B</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_30">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="651.129023" y="42.722812" transform="rotate(-0 651.129023 42.722812)">Onda estacionaria: campo reactivo</text>
    </g>
    <g id="legend_2">
     <g id="patch_13">
-     <path d="M 717.457812 89.284219 
-L 843.463437 89.284219 
-Q 845.263437 89.284219 845.263437 87.484219 
+     <path d="M 718.003437 89.824922 
+L 843.463437 89.824922 
+Q 845.263437 89.824922 845.263437 88.024922 
 L 845.263437 61.022812 
 Q 845.263437 59.222812 843.463437 59.222812 
-L 717.457812 59.222812 
-Q 715.657812 59.222812 715.657812 61.022812 
-L 715.657812 87.484219 
-Q 715.657812 89.284219 717.457812 89.284219 
+L 718.003437 59.222812 
+Q 716.203437 59.222812 716.203437 61.022812 
+L 716.203437 88.024922 
+Q 716.203437 89.824922 718.003437 89.824922 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_107">
-     <path d="M 719.257812 66.871406 
-L 728.257812 66.871406 
-L 737.257812 66.871406 
+     <path d="M 719.803437 66.872812 
+L 728.803437 66.872812 
+L 737.803437 66.872812 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#ma07b1be976" x="728.257812" y="66.871406" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
+      <use xlink:href="#ma07b1be976" x="728.803437" y="66.872812" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
      </g>
     </g>
     <g id="text_31">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="744.457812" y="70.021406" transform="rotate(-0 744.457812 70.021406)">Nivel de presión Lp</text>
+     <!-- Nivel de presión $L_p$ -->
+     <g transform="translate(745.003437 70.022812)">
+      <text>
+       <tspan x="0" y="-0.796875" style="font-size: 9px; font-family: sans-serif">N</tspan>
+       <tspan x="6.732422" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="9.23291" y="-0.796875" style="font-size: 9px; font-family: sans-serif">v</tspan>
+       <tspan x="14.559082" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="20.096191" y="-0.796875" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="22.59668" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="25.45752" y="-0.796875" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="31.17041" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="36.70752" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="39.568359" y="-0.796875" style="font-size: 9px; font-family: sans-serif">p</tspan>
+       <tspan x="45.28125" y="-0.796875" style="font-size: 9px; font-family: sans-serif">r</tspan>
+       <tspan x="48.981445" y="-0.796875" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="54.518555" y="-0.796875" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="59.20752" y="-0.796875" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="61.708008" y="-0.796875" style="font-size: 9px; font-family: sans-serif">ó</tspan>
+       <tspan x="67.214355" y="-0.796875" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="72.918457" y="-0.796875" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="75.779297" y="-0.796875" style="font-style: oblique; font-size: 9px; font-family: sans-serif">L</tspan>
+       <tspan x="80.793457" y="0.553121" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">p</tspan>
+      </text>
+     </g>
     </g>
     <g id="line2d_108">
-     <path d="M 719.257812 80.372109 
-L 728.257812 80.372109 
-L 737.257812 80.372109 
+     <path d="M 719.803437 80.912812 
+L 728.803437 80.912812 
+L 737.803437 80.912812 
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
      <g>
-      <use xlink:href="#mc448654096" x="728.257812" y="80.372109" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
+      <use xlink:href="#mc448654096" x="728.803437" y="80.912812" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_32">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="744.457812" y="83.522109" transform="rotate(-0 744.457812 83.522109)">Nivel de intensidad LI</text>
+     <!-- Nivel de intensidad $L_I$ -->
+     <g transform="translate(745.003437 84.062812)">
+      <text>
+       <tspan x="0" y="-0.15625" style="font-size: 9px; font-family: sans-serif">N</tspan>
+       <tspan x="6.732422" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="9.23291" y="-0.15625" style="font-size: 9px; font-family: sans-serif">v</tspan>
+       <tspan x="14.559082" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="20.096191" y="-0.15625" style="font-size: 9px; font-family: sans-serif">l</tspan>
+       <tspan x="22.59668" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="25.45752" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="31.17041" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="36.70752" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="39.568359" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="42.068848" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="47.772949" y="-0.15625" style="font-size: 9px; font-family: sans-serif">t</tspan>
+       <tspan x="51.301758" y="-0.15625" style="font-size: 9px; font-family: sans-serif">e</tspan>
+       <tspan x="56.838867" y="-0.15625" style="font-size: 9px; font-family: sans-serif">n</tspan>
+       <tspan x="62.542969" y="-0.15625" style="font-size: 9px; font-family: sans-serif">s</tspan>
+       <tspan x="67.231934" y="-0.15625" style="font-size: 9px; font-family: sans-serif">i</tspan>
+       <tspan x="69.732422" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="75.445312" y="-0.15625" style="font-size: 9px; font-family: sans-serif">a</tspan>
+       <tspan x="80.960449" y="-0.15625" style="font-size: 9px; font-family: sans-serif">d</tspan>
+       <tspan x="86.67334" y="-0.15625" style="font-size: 9px; font-family: sans-serif"> </tspan>
+       <tspan x="89.53418" y="-0.15625" style="font-style: oblique; font-size: 9px; font-family: sans-serif">L</tspan>
+       <tspan x="94.54834" y="1.193746" style="font-style: oblique; font-size: 6.3px; font-family: sans-serif">I</tspan>
+      </text>
+     </g>
     </g>
    </g>
   </g>
