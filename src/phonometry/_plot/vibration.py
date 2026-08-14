@@ -68,8 +68,8 @@ _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
     "Weighting factor [dB]": "Factor de ponderación [dB]",
     "Unweighted $a_i$": "Sin ponderar $a_i$",
-    "r.m.s. acceleration [m/s$^2$]": "Aceleración eficaz [m/s$^2$]",
-    "Vibration exposure A(8) [m/s$^2$]": "Exposición a vibración A(8) [m/s$^2$]",
+    "r.m.s. acceleration [m/s²]": "Aceleración eficaz [m/s²]",
+    "Vibration exposure $A(8)$ [m/s²]": "Exposición a vibración $A(8)$ [m/s²]",
     "driving-point mobility": "movilidad en punto de excitación",
     "transfer mobility": "movilidad de transferencia",
     _MOBILITY_LABEL: "Movilidad $|Y|$ [m/(N·s)]",
@@ -90,8 +90,8 @@ _STRINGS: dict[str, str] = {
     "Plate radiation efficiency (Leppington / Maidanik)": "Eficiencia de radiación de placa (Leppington / Maidanik)",
     "Frequency weighting {name} (ISO 8041-1)": "Ponderación en frecuencia {name} (ISO 8041-1)",
     "Weighted $W_i a_i$ ({name})": "Ponderada $W_i a_i$ ({name})",
-    "{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s$^2$)": "{designation} espectro de aceleración ponderada  ($a_w$ = {aw} m/s$^2$)",
-    "Directive 2002/44/EC daily {kind} exposure  (A(8) = {a8} m/s$^2$, {zone})": "Directiva 2002/44/CE exposición diaria {kind}  (A(8) = {a8} m/s$^2$, {zone})",
+    r"{designation} weighted acceleration spectrum  ($a_\mathrm{w}$ = {aw} m/s²)": r"{designation} espectro de aceleración ponderada  ($a_\mathrm{w}$ = {aw} m/s²)",
+    "Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})": "Directiva 2002/44/CE exposición diaria {kind}  ($A(8)$ = {a8} m/s², {zone})",
     "below action": "por debajo de la acción",
     "action": "acción",
     "limit": "límite",
@@ -209,14 +209,17 @@ def plot_weighted_spectrum(
         label=_t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name),
         **kwargs,
     )
-    ax.set_ylabel(_t("r.m.s. acceleration [m/s$^2$]", language))
+    ax.set_ylabel(_t("r.m.s. acceleration [m/s²]", language))
     # Wh is the hand-arm weighting of ISO 5349-1; the others (Wk, Wd, Wm...)
     # are the whole-body weightings of ISO 2631.
     designation = "ISO 5349-1" if str(result.weighting_name) == "Wh" else "ISO 2631"
-    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s$^2$)", language).format(
-        designation=designation,
-        aw=format_number(float(result.overall), language, decimals=3),
-    ))
+    # ``str.replace`` rather than ``str.format``: the template carries the
+    # mathtext braces of ``\mathrm{w}``, which ``format`` would read as a field.
+    ax.set_title(
+        _t(r"{designation} weighted acceleration spectrum  ($a_\mathrm{w}$ = {aw} m/s²)", language)
+        .replace("{designation}", designation)
+        .replace("{aw}", format_number(float(result.overall), language, decimals=3))
+    )
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band axis (a FuncFormatter) alone.
@@ -266,11 +269,11 @@ def plot_daily_exposure(
         )
     ax.bar(
         positions[-1], values[-1], width=width, color=_A8_COLOR,
-        edgecolor=edgecolor, linewidth=0.6, zorder=3, label="A(8)", **kwargs,
+        edgecolor=edgecolor, linewidth=0.6, zorder=3, label="$A(8)$", **kwargs,
     )
     # The legend carries the bar identity, so the crowded category ticks go.
     ax.set_xticks([])
-    ax.set_ylabel(_t("Vibration exposure A(8) [m/s$^2$]", language))
+    ax.set_ylabel(_t("Vibration exposure $A(8)$ [m/s²]", language))
 
     assessment = result.assessment
     eav = float(assessment.action_value)
@@ -283,7 +286,7 @@ def plot_daily_exposure(
     ax.set_ylim(0.0, top)
     kind = str(assessment.kind).upper()
     zone = _t(str(assessment.zone), language)
-    ax.set_title(_t("Directive 2002/44/EC daily {kind} exposure  (A(8) = {a8} m/s$^2$, {zone})", language).format(
+    ax.set_title(_t("Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})", language).format(
         kind=kind, a8=format_number(float(result.a8), language, decimals=2),
         zone=zone,
     ))

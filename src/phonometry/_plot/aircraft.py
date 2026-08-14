@@ -72,7 +72,8 @@ _STRINGS: dict[str, str] = {
     "Segment index": "Índice de segmento",
     "Segment {metric} [dB]": "{metric} por segmento [dB]",
     "Single-event segment contributions (ECAC Doc 29)": "Contribuciones por segmento de un evento único (ECAC Doc 29)",
-    "Polar angle θ [°]  (0° forward → 180° rearward)": "Ángulo polar θ [°]  (0° adelante → 180° atrás)",
+    "Polar angle $\\theta$ [°]  (0° forward → 180° rearward)":
+        "Ángulo polar $\\theta$ [°]  (0° adelante → 180° atrás)",
     "Source level at {distance} m [dB]": "Nivel de fuente a {distance} m [dB]",
     "Rotorcraft noise hemisphere directivity (ECAC Doc 32)": "Directividad del hemisferio de ruido de rotorcraft (ECAC Doc 32)",
     "Aircraft noise contour (ECAC Doc 29)": "Curvas de ruido de aeronaves (ECAC Doc 29)",
@@ -127,7 +128,7 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     :param kwargs: Forwarded to the PNLT ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import decimal_comma, format_number, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     t = np.asarray(result.times, dtype=np.float64)
@@ -147,7 +148,7 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     ax.set_ylabel(_t("Level [PNdB]", language))
     ax.set_title(
         f"ICAO EPNL = {format_number(result.epnl, language)} EPNdB "
-        f"(D = {decimal_comma(f'{result.duration_correction:+.1f}', language)} dB)"
+        f"($D$ = {decimal_comma(fmt_minus(result.duration_correction, '+.1f'), language)} dB)"
     )
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -196,14 +197,14 @@ def plot_npd_level(result: NpdLevelResult, ax: Axes | None = None, *, language: 
     :param kwargs: Forwarded to the interpolated-curve ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     d = np.asarray(result.distance, dtype=np.float64)
     lvl = np.asarray(result.level, dtype=np.float64)
     td = np.asarray(result.table_distances, dtype=np.float64)
     tl = np.asarray(result.table_levels, dtype=np.float64)
-    label = f"NPD (P = {decimal_comma(f'{result.power:g}', language)})"
+    label = f"NPD ($P$ = {decimal_comma(fmt_minus(result.power, 'g'), language)})"
     ax.plot(d, lvl, **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     ax.plot(td, tl, "o", color=_C_REFERENCE, ms=4, label=_t("Tabulated", language))
     ax.set_xscale("log")
@@ -236,7 +237,7 @@ def plot_flyover(result: FlyoverResult, ax: Axes | None = None, *, language: str
     # dropped so Matplotlib does not choke on them.
     seg = np.where(np.isfinite(seg), seg, np.nan)
     idx = np.arange(seg.size)
-    metric = "SEL" if result.metric == "exposure" else "LAmax"
+    metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{Amax}$"
     ax.bar(idx, seg, **{"color": _C_PRIMARY, "alpha": 0.85, **kwargs})
     if np.isfinite(result.level):
         ax.axhline(result.level, color=_C_REFERENCE, ls="--", lw=1.2,
@@ -275,8 +276,9 @@ def plot_rotorcraft_hemisphere(
     idx = int(np.argmin(np.abs(freqs - band))) if band is not None else int(
         np.nanargmax(np.nansum(10.0 ** (grid / 10.0), axis=0)))
     ax.plot(theta, grid[:, idx], **{"color": _C_PRIMARY, "lw": 1.8,
-            "label": f"{format_number(freqs[idx], language, decimals=0)} Hz (φ = 0°)", **kwargs})
-    ax.set_xlabel(_t("Polar angle θ [°]  (0° forward → 180° rearward)", language))
+            "label": f"{format_number(freqs[idx], language, decimals=0)} Hz ($\\varphi$ = 0°)",
+            **kwargs})
+    ax.set_xlabel(_t("Polar angle $\\theta$ [°]  (0° forward → 180° rearward)", language))
     ax.set_ylabel(_t("Source level at {distance} m [dB]", language,
                      distance=format_number(result.distance, language,
                                             decimals=1, trim=True)))
@@ -309,9 +311,10 @@ def plot_noise_contour(result: NoiseContourResult, ax: Axes | None = None, *,
     masked = np.ma.masked_invalid(lvl)
     cf = ax.contourf(x, y, masked, **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs})
     ax.contour(x, y, masked, levels=levels, colors="k", linewidths=0.4, alpha=0.5)
-    ax.figure.colorbar(cf, ax=ax, label=f"{'SEL' if result.metric == 'exposure' else 'LAmax'} [dB]")
-    ax.set_xlabel("x [km]")
-    ax.set_ylabel("y [km]")
+    metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{Amax}$"
+    ax.figure.colorbar(cf, ax=ax, label=f"{metric} [dB]")
+    ax.set_xlabel("$x$ [km]")
+    ax.set_ylabel("$y$ [km]")
     ax.set_title(_t("Aircraft noise contour (ECAC Doc 29)", language))
     ax.set_aspect("equal", adjustable="box")
     localize_axes(ax, language)
@@ -427,8 +430,8 @@ def plot_rotorcraft_noise_contour(
     ax.contour(x, y, masked, levels=levels, colors="k", linewidths=0.4, alpha=0.5)
     metric = "SEL" if result.metric == "exposure" else "$L_{ASmax}$"
     ax.figure.colorbar(cf, ax=ax, label=f"{metric} [dB(A)]")
-    ax.set_xlabel("x [km]")
-    ax.set_ylabel("y [km]")
+    ax.set_xlabel("$x$ [km]")
+    ax.set_ylabel("$y$ [km]")
     ax.set_title(_t("Rotorcraft noise contour (ECAC Doc 32)", language))
     ax.set_aspect("equal", adjustable="box")
     localize_axes(ax, language)
@@ -457,7 +460,7 @@ def plot_mean_ground_plane(
     ax.fill_between(d, z, z.min() - 0.05 * np.ptp(z) - 0.5, color=_C_PRIMARY,
                     alpha=0.08)
     ax.plot(d, result.height(d), color=_C_SECONDARY, lw=1.6, ls="--",
-            label=f"{_t('Mean ground plane', language)} (a = {format_number(result.slope, language, decimals=3)})")
+            label=f"{_t('Mean ground plane', language)} ($a$ = {format_number(result.slope, language, decimals=3)})")
     ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Mean ground plane (NORAH2 guidance Eq. 36-40)", language))
@@ -495,14 +498,14 @@ def plot_terrain_screening(
         pts = np.vstack([[src[0], src[1]], result.diffraction_points,
                          [rcv[0], rcv[1]]])
         ax.plot(pts[:, 0], pts[:, 1], color=_C_PRIMARY, lw=1.8,
-                label=f"{_t('Diffracted path', language)} (δ = {format_number(result.path_difference, language, decimals=2)} m)")
+                label=f"{_t('Diffracted path', language)} ($\\delta$ = {format_number(result.path_difference, language, decimals=2)} m)")
         ax.plot(result.diffraction_points[:, 0], result.diffraction_points[:, 1],
                 "v", color=_C_SECONDARY, ms=6, label=_t("Diffraction edges", language))
     ax.plot(*src, "o", color=_C_PRIMARY, ms=7)
-    ax.annotate("S", src, textcoords="offset points", xytext=(0, 8),
+    ax.annotate("$S$", src, textcoords="offset points", xytext=(0, 8),
                 ha="center", fontsize=10)
     ax.plot(*rcv, "s", color=_C_SECONDARY, ms=6)
-    ax.annotate("R", rcv, textcoords="offset points", xytext=(0, 8),
+    ax.annotate("$R$", rcv, textcoords="offset points", xytext=(0, 8),
                 ha="center", fontsize=10)
     ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
@@ -524,13 +527,14 @@ def plot_anp_npd(
     :param kwargs: Forwarded to the interpolated-curve ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
     from ..aircraft.airport_noise import npd_curve
 
     ax = ax if ax is not None else _new_axes()
     for i, power in enumerate(result.powers):
         curve = npd_curve(result.powers, result.distances, result.levels, float(power))
-        ax.plot(curve.distance, curve.level, **{"lw": 1.5, "label": f"P = {power:g}",
+        reading = decimal_comma(fmt_minus(float(power), "g"), language)
+        ax.plot(curve.distance, curve.level, **{"lw": 1.5, "label": f"$P$ = {reading}",
                 **kwargs})
         ax.plot(result.distances, result.levels[i], "o", ms=3, color=_C_MUTED)
     ax.set_xscale("log")

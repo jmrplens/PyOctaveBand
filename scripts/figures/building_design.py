@@ -107,8 +107,8 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     rpw = result.r_prime_w
     lines = [
         f"$R_w$ (Dd) = {rw_dd:.1f} dB",
-        f"$R′_w$ = {rpw:.1f} dB",
-        f"$R′_w - R_w$ = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
+        rf"$R^{{\prime}}_w$ = {rpw:.1f} dB",
+        rf"$R^{{\prime}}_w - R_w$ = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
         f"Dd {direct_share:.1f} %   ΣFf,Fd,Df {flank_share:.1f} %",
     ]
     ax.text(0.985, 0.62, "\n".join(lines), transform=ax.transAxes,
@@ -315,7 +315,7 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "35 mm screed $m′$ = 73.5 kg/m² on $s′$ = 8 MN/m³",
+        r"35 mm screed $m^{\prime}$ = 73.5 kg/m² on $s^{\prime}$ = 8 MN/m³",
         f"$\\Delta L_w$ = {delta_lw:.1f} dB  (ISO 12354-2 Formula C.4)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -679,7 +679,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     imp = predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
                                       k_correction=k)
 
-    labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L′_{n,w}$"]
+    labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", r"$L^{\prime}_{n,w}$"]
     values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
     # COLOR_MUTED rather than the gridline grey for the starting term: a bar
     # is a read value, so it has to hold up against the page on both themes.
@@ -705,9 +705,10 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.set_axisbelow(True)
 
     info = [
-        r"$L′_{n,w} = L_{n,w,eq} - \Delta L_w + K$",
-        f"$L_{{n,w,eq}} = 164 - 35\\,\\log_{{10}}(m′/m′_0)$ = {ln_eq:.1f} dB",
-        f"$L′_{{n,w}}$ = {imp.l_prime_n_w:.1f} dB → 45 dB",
+        r"$L^{\prime}_{n,w} = L_{n,w,eq} - \Delta L_w + K$",
+        (f"$L_{{n,w,eq}} = 164 - 35\\,\\log_{{10}}"
+         f"(m^{{\\prime}}/m^{{\\prime}}_0)$ = {ln_eq:.1f} dB"),
+        rf"$L^{{\prime}}_{{n,w}}$ = {imp.l_prime_n_w:.1f} dB → 45 dB",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
@@ -785,16 +786,16 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
 
     twin = ax.twinx()
     twin.plot(x, res.r_prime, "-o", color=COLOR_FG, linewidth=2.0,
-              markersize=4, zorder=5, label="$R′$ (apparent)")
-    twin.set_ylabel("Apparent sound reduction index $R′$ [dB]")
+              markersize=4, zorder=5, label=r"$R^{\prime}$ (apparent)")
+    twin.set_ylabel(r"Apparent sound reduction index $R^{\prime}$ [dB]")
     handles, labels = ax.get_legend_handles_labels()
     extra, extra_labels = twin.get_legend_handles_labels()
     ax.legend(handles + extra, labels + extra_labels, loc="upper left",
               fontsize=9, ncol=3)
 
     info = [
-        r"$R′ = -10\,\log_{10}(\Sigma\,10^{-R_{ij}/10})$",
-        (f"$R′_w$ ($C$; $C_{{tr}}$) = {res.rating.rating} "
+        r"$R^{\prime} = -10\,\log_{10}(\Sigma\,10^{-R_{ij}/10})$",
+        (rf"$R^{{\prime}}_w$ ($C$; $C_{{tr}}$) = {res.rating.rating} "
          f"({_fmt_minus(res.rating.c)}; {_fmt_minus(res.rating.ctr)}) dB"),
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -849,7 +850,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     info = [
         (f"$R_w$($C$;$C_{{tr}}$) = {w.rating}"
          f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
-        "6 mm float glass, $m′′$ = 15 kg/m², $\\eta$ = 0.024",
+        r"6 mm float glass, $m^{\prime\prime}$ = 15 kg/m², $\eta$ = 0.024",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -907,7 +908,8 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
-        f"6 mm float glass, $m′′$ = {mass:.1f} kg/m², $\\eta$ = {eta:g}",
+        (f"6 mm float glass, $m^{{\\prime\\prime}}$ = {mass:.1f} kg/m², "
+         f"$\\eta$ = {eta:g}"),
         (f"plateau height 27 dB, $B/A = 10$ → $A$ = {quick.plateau_start:.0f} Hz, "
          f"$B$ = {quick.plateau_end:.0f} Hz"),
         "identical below $A$; the plateau replaces the whole coincidence region",
@@ -996,9 +998,10 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
         flat.transmission_loss[worst] - corrugated.transmission_loss[worst]
     )
     info = [
-        (f"1 mm steel sheet, $m′′$ = {mass_flat:.1f} kg/m², flat "
+        (rf"1 mm steel sheet, $m^{{\prime\prime}}$ = {mass_flat:.1f} kg/m², flat "
          f"$f_c$ = {flat_fc / 1000.0:.1f} kHz"),
-        (f"corrugated $H$ = 10 mm, $L$ = 100 mm, $m′′$ = {mass_corr:.1f} kg/m², "
+        (f"corrugated $H$ = 10 mm, $L$ = 100 mm, "
+         rf"$m^{{\prime\prime}}$ = {mass_corr:.1f} kg/m², "
          f"$f_{{c1}}$ = {fc1:.0f} Hz, $f_{{c2}}$ = {fc2 / 1000.0:.1f} kHz"),
         (f"worst penalty {penalty:.0f} dB at {nominal[worst]:g} Hz, "
          "for a stiffer and only 9 % heavier panel"),
@@ -1215,8 +1218,8 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
 
     twin = ax.twinx()
     twin.plot(x, res.l_prime_n, "-o", color=COLOR_FG, linewidth=2.0,
-              markersize=4, zorder=5, label="$L′_n$ (apparent)")
-    twin.set_ylabel("Apparent normalized impact level $L′_n$ [dB]")
+              markersize=4, zorder=5, label=r"$L^{\prime}_n$ (apparent)")
+    twin.set_ylabel(r"Apparent normalized impact level $L^{\prime}_n$ [dB]")
     idx_f0 = float(np.interp(np.log10(f_0), np.log10(bands), x))
     twin.axvline(idx_f0, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
                  zorder=4, label=f"floating floor $f_0$ = {f_0:.1f} Hz")
@@ -1227,7 +1230,7 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
 
     info = [
         "five paths, not thirteen: only the floor is excited",
-        (f"$L′_{{n,w}}$ ($C_I$) = {res.rating.rating} "
+        (rf"$L^{{\prime}}_{{n,w}}$ ($C_I$) = {res.rating.rating} "
          f"({_fmt_minus(res.rating.ci)}) dB"),
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,

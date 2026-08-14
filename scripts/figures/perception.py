@@ -135,7 +135,7 @@ def generate_loudness_pattern(output_dir: str) -> None:
     ax.set_title("Specific Loudness Pattern (ISO 532-1 Zwicker)",
                  pad=12)
     ax.set_xlabel("Critical-band rate $z$ [Bark]")
-    ax.set_ylabel("Specific loudness $N′$ [sone/Bark]")
+    ax.set_ylabel(r"Specific loudness $N^{\prime}$ [sone/Bark]")
     ax.set_xlim(0, 24)
     # Headroom above the tallest pattern so the legend stays clear of it.
     ax.set_ylim(0, float(flat.specific.max()) * 1.28)
@@ -390,7 +390,7 @@ def _sottek_specific_panels(
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax.set_xlabel(f"Critical-band rate $z$ [{_hms('Bark_HMS')}]")
-    ax.set_ylabel(f"Specific {title.lower()} ${symbol}′(z)$ "
+    ax.set_ylabel(rf"Specific {title.lower()} ${symbol}^{{\prime}}(z)$ "
                   f"[{_hms(unit)}/{_hms('Bark_HMS')}]")
     ax.set_xlim(0, 24)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
@@ -481,7 +481,7 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
         ax.annotate(rf"$\langle z\rangle$ = {centroid:.1f} Bark", xy=(centroid, 0.06),
                     xytext=(centroid + 0.7, 0.06), fontsize=9, color=color)
     ax.set_xlabel("Critical-band rate $z$ [Bark]")
-    ax.set_ylabel("Specific loudness $N′$ [sone/Bark]")
+    ax.set_ylabel(r"Specific loudness $N^{\prime}$ [sone/Bark]")
     ax.set_xlim(0, 24)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
     ax.set_title("Equally loud, seven times as sharp",
@@ -952,7 +952,8 @@ def generate_sottek_specific_loudness(output_dir: str) -> None:
     ax.set_title("Sottek Specific Loudness (ECMA-418-2)",
                  pad=12)
     ax.set_xlabel("Critical-band rate $z$ [Bark]")
-    ax.set_ylabel(f"Specific loudness $N′$ [{_hms('sone_HMS')}/Bark]")
+    ax.set_ylabel(
+        rf"Specific loudness $N^{{\prime}}$ [{_hms('sone_HMS')}/Bark]")
     ax.set_xlim(0, float(bark[-1]))
     ax.set_ylim(0, float(spec.max()) * 1.25)
     ax.set_xticks([0, 4, 8, 12, 16, 20, 24])
@@ -2182,9 +2183,9 @@ def generate_sii_masking_chain(output_dir: str) -> None:
                     color=theme_fill(COLOR_TERTIARY, ax), zorder=0,
                     label="the 30 dB window: $D_i - 15$ to $D_i + 15$")
     ax.plot(pos, e, "o-", color=COLOR_PRIMARY, linewidth=2.0,
-            label="speech $E_i′$")
+            label=r"speech $E_i^{\prime}$")
     ax.plot(pos, noise, "s--", color=COLOR_FG, linewidth=1.6,
-            label="external noise $N_i′$")
+            label=r"external noise $N_i^{\prime}$")
     ax.plot(pos, res.masking, "^-", color=COLOR_SECONDARY, linewidth=1.8,
             label="equivalent masking $Z_i$")
     ax.plot(pos, d, ":", color=COLOR_TERTIARY, linewidth=2.2,

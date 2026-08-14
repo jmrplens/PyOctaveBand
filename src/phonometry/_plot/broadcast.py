@@ -46,7 +46,7 @@ _STRINGS: dict[str, str] = {
     "Stage 1: spherical-head shelf": "Etapa 1: realce de cabeza esférica",
     "Stage 2: RLB high-pass": "Etapa 2: paso alto RLB",
     "K-weighting frequency response (ITU-R BS.1770)":
-        "Respuesta en frecuencia de la ponderación K (UIT-R BS.1770)",
+        "Respuesta en frecuencia de la ponderación K (ITU-R BS.1770)",
 }
 
 

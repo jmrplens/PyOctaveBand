@@ -30,18 +30,19 @@ _VELOCITY_LABEL = "Particle velocity [m/s]"
 _STRINGS: dict[str, str] = {
     "Time [ms]": "Tiempo [ms]",
     "Pressure [Pa]": "Presión [Pa]",
-    "FDTD pressure field at t = {t_txt} ms": "Campo de presión FDTD en t = {t_txt} ms",
+    "FDTD pressure field at $t$ = {t_txt} ms":
+        "Campo de presión FDTD en $t$ = {t_txt} ms",
     "FDTD probe pressure": "Presión en las sondas FDTD",
     "probe": "sonda",
     "Particle velocity [m/s]": "Velocidad de partícula [m/s]",
     "Signal [Pa, m/s]": "Señal [Pa, m/s]",
     "Elastic FDTD probe signals": "Señales en las sondas del FDTD elástico",
-    "Elastic FDTD pressure field at t = {t_txt} ms":
-        "Campo de presión del FDTD elástico en t = {t_txt} ms",
-    "Elastic FDTD vx field at t = {t_txt} ms":
-        "Campo de vx del FDTD elástico en t = {t_txt} ms",
-    "Elastic FDTD vy field at t = {t_txt} ms":
-        "Campo de vy del FDTD elástico en t = {t_txt} ms",
+    "Elastic FDTD pressure field at $t$ = {t_txt} ms":
+        "Campo de presión del FDTD elástico en $t$ = {t_txt} ms",
+    "Elastic FDTD $v_x$ field at $t$ = {t_txt} ms":
+        "Campo de $v_x$ del FDTD elástico en $t$ = {t_txt} ms",
+    "Elastic FDTD $v_y$ field at $t$ = {t_txt} ms":
+        "Campo de $v_y$ del FDTD elástico en $t$ = {t_txt} ms",
 }
 
 #: Colorbar label of each elastic snapshot field.
@@ -51,11 +52,23 @@ _ELASTIC_FIELD_LABELS = {
     "vy": _VELOCITY_LABEL,
 }
 
-#: Snapshot title of each elastic snapshot field.
+#: Snapshot title of each elastic snapshot field. The velocity component is
+#: set as mathematics (``$v_x$``, never ``$v_{x}$``): ``_t`` runs ``format``
+#: over the whole template, so a brace group other than ``{t_txt}`` would
+#: raise :class:`KeyError` at draw time.
 _ELASTIC_FIELD_TITLES = {
-    "p": "Elastic FDTD pressure field at t = {t_txt} ms",
-    "vx": "Elastic FDTD vx field at t = {t_txt} ms",
-    "vy": "Elastic FDTD vy field at t = {t_txt} ms",
+    "p": "Elastic FDTD pressure field at $t$ = {t_txt} ms",
+    "vx": "Elastic FDTD $v_x$ field at $t$ = {t_txt} ms",
+    "vy": "Elastic FDTD $v_y$ field at $t$ = {t_txt} ms",
+}
+
+#: Legend symbol of each recorded probe field, for the elastic probe legend
+#: that prefixes the probe label with the field. A symbol identifier is never
+#: translated, so this table is language-independent.
+_FIELD_SYMBOLS = {
+    "p": "$p$",
+    "vx": "$v_x$",
+    "vy": "$v_y$",
 }
 
 
@@ -141,8 +154,8 @@ def _render_snapshot(
         ax.plot(x, y, marker="o", markersize=5, color=_C_MUTED,
                 markeredgecolor="black", linestyle="none")
     ax.figure.colorbar(img, ax=ax, label=colorbar_label)
-    ax.set_xlabel("x [m]")
-    ax.set_ylabel("y [m]")
+    ax.set_xlabel("$x$ [m]")
+    ax.set_ylabel("$y$ [m]")
     ax.set_title(title)
     localize_axes(ax, language)
     return ax
@@ -218,7 +231,7 @@ def plot_fdtd_snapshot(
                           for s in result.sources],
         probe_positions=result.probe_positions,
         colorbar_label=_t(_PRESSURE_LABEL, language),
-        title=_t("FDTD pressure field at t = {t_txt} ms", language,
+        title=_t("FDTD pressure field at $t$ = {t_txt} ms", language,
                  t_txt=t_txt),
         language=language, **kwargs,
     )
@@ -262,7 +275,8 @@ def plot_elastic_probes(
     for k in range(result.signals.shape[0]):
         for j, field in enumerate(result.probe_fields):
             traces.append(result.signals[k, j])
-            labels.append(f"{field}, {base[k]}" if many else base[k])
+            symbol = _FIELD_SYMBOLS.get(field, field)
+            labels.append(f"{symbol}, {base[k]}" if many else base[k])
     if set(result.probe_fields) <= {"vx", "vy"}:
         ylabel = _VELOCITY_LABEL
     elif result.probe_fields == ("p",):

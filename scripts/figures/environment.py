@@ -268,7 +268,7 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
         pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel(r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(45.0, 90.0)
@@ -864,7 +864,7 @@ def generate_cnossos_rail_emission(output_dir: str) -> None:
         pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel(r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(30.0, 95.0)

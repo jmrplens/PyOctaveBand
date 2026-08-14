@@ -1067,20 +1067,17 @@ def format_number(
     parent imports), reach it through a sibling module instead. The import is
     lazy for the same reason.
 
-    One behaviour is deliberately not shared: a fiche keeps the ASCII hyphen on
-    a negative reading, where a plot label takes the typographic minus. A plot
-    label is read; a fiche's numbers are transcribed. They are quoted into
-    another report, pasted into a spreadsheet, typed into a calculator -- and
-    U+2212 is not what a numeric field, a parser or a search box accepts, so an
-    accredited document that ships it hands its reader a value that looks right
-    and does not paste. The figures have no such reader and every reason to
-    match the tick labels beside them, which is why the shared helper defaults
-    the other way.
+    The typographic minus comes with it. A fiche and the figure printed inside
+    it are one document, and a reading signed with an ASCII hyphen in the table
+    while the plot above it carries U+2212 puts two lengths of minus on one
+    page. Transcription was the argument for keeping the hyphen here, and it is
+    a real cost -- U+2212 is not what every numeric field or search box accepts
+    -- but it is a cost the reader pays once, against a mark that is wrong on
+    every printing.
     """
     from .._i18n import format_number as _format_number
 
-    return _format_number(value, language, decimals=decimals, trim=trim,
-                          minus=False)
+    return _format_number(value, language, decimals=decimals, trim=trim)
 
 
 def decimal_comma(value: str, language: str = "en") -> str:

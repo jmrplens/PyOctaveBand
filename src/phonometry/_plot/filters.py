@@ -173,7 +173,7 @@ def plot_filter_class(
         )
 
     ax.axvline(1.0, color=_C_MUTED, ls=":", lw=1.0)
-    _normalized_frequency_axis(ax, lo_x, hi_x)
+    _normalized_frequency_axis(ax, lo_x, hi_x, language)
     ax.set_xlim(lo_x, hi_x)
     ax.set_ylim(y_bot, y_top)
     ax.set_xlabel(_t(r"Normalised frequency $f\,/\,f_m$", language))
@@ -188,18 +188,29 @@ def plot_filter_class(
     return ax
 
 
-#: Fiche/plot prose for each IEC 61043 Table 2 column group.
-def _normalized_frequency_axis(ax: Axes, lo: float, hi: float) -> None:
-    """Label a logarithmic ``f / f_m`` axis with plain decimal ratios."""
+def _normalized_frequency_axis(
+    ax: Axes, lo: float, hi: float, language: str = "en"
+) -> None:
+    """Label a logarithmic ``f / f_m`` axis with plain decimal ratios.
+
+    The labels are fixed strings on a logarithmic axis, so
+    :func:`~phonometry._i18n.localize_axes` cannot reach them (it only
+    reformats the default numeric formatter of a linear axis). Half of these
+    ratios carry a decimal, so the separator is localised here or nowhere.
+    """
     import matplotlib.ticker as mticker
+
+    from .._i18n import decimal_comma
 
     ax.set_xscale("log")
     ticks = [t for t in (0.25, 0.5, 0.7, 1.0, 1.4, 2.0, 4.0) if lo <= t <= hi]
     ax.xaxis.set_major_locator(mticker.FixedLocator(ticks))
     ax.xaxis.set_major_formatter(
-        mticker.FixedFormatter([f"{t:g}" for t in ticks])
+        mticker.FixedFormatter([decimal_comma(f"{t:g}", language) for t in ticks])
     )
     ax.xaxis.set_minor_formatter(mticker.NullFormatter())
+
+
 def plot_parametric_eq(
     result: EQResponseResult, ax: Axes | None = None, *,
     language: str = "en", show_sections: bool = True, **kwargs: Any
@@ -227,8 +238,15 @@ def plot_parametric_eq(
     def _magnitude(axm: Axes) -> None:
         if show_sections and result.section_magnitude_db.shape[0] > 1:
             for idx, section in enumerate(result.sections):
+                # The key doubles as the lookup value (``_t`` is called with
+                # the raw ``EQFilterType`` token), so the underscore of
+                # ``bandpass_skirt`` can only be dropped at the label, never by
+                # renaming the key: outside maths it draws as a literal
+                # underscore in a legend whose every other entry reads as
+                # prose. A no-op for the other eight types and for every
+                # Spanish value, none of which carries one.
                 label = decimal_comma(
-                    f"{_t(section.filter_type, language)} "
+                    f"{_t(section.filter_type, language).replace('_', ' ')} "
                     f"{section.f0:g} Hz",
                     language,
                 )
@@ -252,7 +270,7 @@ def plot_parametric_eq(
     if ax is not None:
         _magnitude(ax)
         ax.set_xlabel(_t(_FREQ_LABEL, language))
-        format_frequency_axis(ax, fmin, fmax)
+        format_frequency_axis(ax, fmin, fmax, language=language)
         localize_axes(ax, language)
         return ax
 
@@ -266,6 +284,6 @@ def plot_parametric_eq(
     axes[1].set_xlabel(_t(_FREQ_LABEL, language))
     axes[1].grid(True, which="both", alpha=0.3)
     for axf in axes:
-        format_frequency_axis(axf, fmin, fmax)
+        format_frequency_axis(axf, fmin, fmax, language=language)
         localize_axes(axf, language)
     return axes

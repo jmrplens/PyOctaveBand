@@ -43,8 +43,8 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     s_mn = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Two typical floating-floor masses per unit area (light vs heavy screed).
-    for m, color, label in ((40.0, COLOR_SECONDARY, "$m′$ = 40 kg/m²"),
-                             (120.0, COLOR_PRIMARY, "$m′$ = 120 kg/m²")):
+    for m, color, label in ((40.0, COLOR_SECONDARY, r"$m^{\prime}$ = 40 kg/m²"),
+                             (120.0, COLOR_PRIMARY, r"$m^{\prime}$ = 120 kg/m²")):
         f0 = np.asarray(natural_frequency(s_mn * 1e6, m), dtype=float)
         ax.plot(s_mn, f0, color=color, linewidth=2.2, label=label)
 
@@ -57,7 +57,7 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     ax.plot([s_mn[0], s0], [f00, f00], color=COLOR_GRID, ls=":", lw=1.0, zorder=1)
 
     ax.set_xscale("log")
-    ax.set_xlabel("Dynamic stiffness per unit area $s′$ [MN/m³]")
+    ax.set_xlabel(r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]")
     ax.set_ylabel(r"Natural frequency $f_0$ [Hz]")
     ax.set_title("EN 29052-1 Floating-Floor Resonance", pad=12)
     ax.set_ylim(bottom=0.0)
@@ -66,10 +66,10 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=10)
 
     info = [
-        r"$f_0 = (1/2\pi)\sqrt{s′/m′}$  (Formula 2)",
-        r"$s′ = s′_t + s′_a$  (clause 8.2)",
-        r"$s′_t = 4\pi^2 m′_t f_r^2$  (Formula 4)",
-        r"$s′_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
+        r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Formula 2)",
+        r"$s^{\prime} = s^{\prime}_t + s^{\prime}_a$  (clause 8.2)",
+        r"$s^{\prime}_t = 4\pi^2 m^{\prime}_t f_r^2$  (Formula 4)",
+        r"$s^{\prime}_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -130,9 +130,9 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
                   label="ideal mass-spring isolation")
     for f0, color, marker, label in (
         (f0_hard, COLOR_PRIMARY, "o",
-         f"$s′$ = 10.5 MN/m³, $f_0$ = {f0_hard:.0f} Hz"),
+         rf"$s^{{\prime}}$ = 10.5 MN/m³, $f_0$ = {f0_hard:.0f} Hz"),
         (f0_soft, COLOR_TERTIARY, "s",
-         f"$s′$ = 5.0 MN/m³, $f_0$ = {f0_soft:.0f} Hz"),
+         rf"$s^{{\prime}}$ = 5.0 MN/m³, $f_0$ = {f0_soft:.0f} Hz"),
     ):
         law = floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
         ax_r.semilogx(bands, np.asarray(law.improvement), color=color,
@@ -177,12 +177,12 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     ax.loglog(d_mm, s_frame, color=COLOR_PRIMARY, linewidth=1.9,
-              linestyle="--", zorder=3, label="$s′_t$, frame (Formula 4)")
+              linestyle="--", zorder=3, label=r"$s^{\prime}_t$, frame (Formula 4)")
     ax.loglog(d_mm, s_gas, color=COLOR_TERTIARY, linewidth=1.9,
               linestyle="-.", zorder=3,
-              label=r"$s′_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
+              label=r"$s^{\prime}_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
     ax.loglog(d_mm, s_total, color=COLOR_SECONDARY, linewidth=2.4, zorder=4,
-              label="installed $s′ = s′_t + s′_a$ (clause 8.2)")
+              label=r"installed $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (clause 8.2)")
     ax.scatter([20.0], [10.49], color=COLOR_FG, s=70, zorder=6)
     ax.annotate("the worked determination:\n$d$ = 20 mm, 4.94 + 5.56 = 10.49",
                 (21.0, 10.49), fontsize=9, color=COLOR_FG, ha="left",
@@ -215,9 +215,9 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
     ax_f.set_yticks([15, 20, 30, 40, 60, 90])
 
     ax.text(0.015, 0.05,
-            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s′ = s′_t$" "\n"
-            r"$10 \leq r < 100$  →  $s′ = s′_t + s′_a$" "\n"
-            r"$r < 10$  →  $s′ = s′_t$ only if $s′_a$ is negligible",
+            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$" "\n"
+            r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$" "\n"
+            r"$r < 10$  →  $s^{\prime} = s^{\prime}_t$ only if $s^{\prime}_a$ is negligible",
             transform=ax.transAxes, va="bottom", ha="left", fontsize=9,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -2161,7 +2161,7 @@ def generate_effective_kappa(output_dir: str) -> None:
                label=f"Annex A.3 example (2 Hz, {kappa_a3:.3f})")
 
     ax.set_xlabel("Piston frequency $f$ [Hz]  (ISO 9053-2 Clause 6.2: 1 Hz to 4 Hz)")
-    ax.set_ylabel(r"Effective ratio of specific heats $\kappa′$")
+    ax.set_ylabel(r"Effective ratio of specific heats $\kappa^{\prime}$")
     ax.set_title("ISO 9053-2 Annex A Heat-Conduction Correction",
                  pad=12)
     ax.set_xlim(1.0, 4.0)
@@ -2341,7 +2341,7 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
         1.0 + r_eff**2 + 2.0 * r_eff * np.cos(2 * k * x + np.radians(54.1))
     )
     ax.plot(x, lossy, color=COLOR_SECONDARY, linewidth=1.8, linestyle=":",
-            label=f"the same, with tube loss ($k_0\u2032\u2032$ = {atten:.3f} Np/m)")
+            label=rf"the same, with tube loss ($k_0^{{\prime\prime}}$ = {atten:.3f} Np/m)")
 
     # How far the far minima have filled in, in decibels.
     minima = [float(lossy[np.argmin(np.abs(x - xm))])

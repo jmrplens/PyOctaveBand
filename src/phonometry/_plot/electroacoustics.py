@@ -89,7 +89,8 @@ _STRINGS: dict[str, str] = {
     _MAGNITUDE_LABEL: "Magnitud [dB]",
     "Phase [deg]": "Fase [grados]",
     r"Coherence $\gamma^2$": r"Coherencia $\gamma^2$",
-    "Harmonic order n  (f = n·f₁)": "Orden del armónico n  (f = n·f₁)",
+    r"Harmonic order $n$  ($f = n \cdot f_1$)":
+        r"Orden del armónico $n$  ($f = n \cdot f_1$)",
     "Level re fundamental [dB]": "Nivel respecto al fundamental [dB]",
     "Harmonics": "Armónicos",
     "Frequency response": "Respuesta en frecuencia",
@@ -109,7 +110,7 @@ _STRINGS: dict[str, str] = {
     _TOLERANCE_LABEL: "Tolerancia ±{tol} dB",
     "−10 dB reference": "Referencia −10 dB",
     _EFFECTIVE_RANGE: "Rango efectivo",
-    "Impedance |Z| [{ohm}]": "Impedancia |Z| [{ohm}]",
+    "Impedance $|Z|$ [{ohm}]": "Impedancia $|Z|$ [{ohm}]",
     "Impedance": "Impedancia",
     "Rated impedance": "Impedancia nominal",
     "80 % of rated": "80 % de la nominal",
@@ -123,13 +124,14 @@ _STRINGS: dict[str, str] = {
     "Inherent noise spectrum": "Espectro de ruido inherente",
     "{thd} % limit": "Límite del {thd} %",
     "Max. SPL": "SPL máx.",
-    "Carrier f₂": "Portadora f₂",
-    "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
+    "Carrier $f_2$": "Portadora $f_2$",
+    r"Sidebands $f_2 \pm n \cdot f_1$": r"Bandas laterales $f_2 \pm n \cdot f_1$",
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
     # --- Sound-reinforcement gain before feedback (Long Ch. 18) ---
     "Open-loop gain $Z_S$": "Ganancia en lazo abierto $Z_S$",
     "Feedback-loop gain $G_S$": "Ganancia del lazo de realimentación $G_S$",
-    r"Open microphones $\Delta L_{nom}$": r"Micrófonos abiertos $\Delta L_{nom}$",
+    r"Open microphones $\Delta L_{\mathrm{nom}}$":
+        r"Micrófonos abiertos $\Delta L_{\mathrm{nom}}$",
     "Total loop gain": "Ganancia total del lazo",
     "Gain [dB]": "Ganancia [dB]",
     "Oscillation (0 dB)": "Oscilación (0 dB)",
@@ -192,7 +194,7 @@ def plot_harmonic_distortion(
                 ha="center",
                 fontsize="x-small",
             )
-    ax.set_xlabel(_t("Harmonic order n  (f = n·f₁)", language))
+    ax.set_xlabel(_t(r"Harmonic order $n$  ($f = n \cdot f_1$)", language))
     ax.set_ylabel(_t("Level re fundamental [dB]", language))
     ax.set_xticks(orders)
     ax.set_ylim(bottom=-160.0, top=10.0)
@@ -203,7 +205,7 @@ def plot_harmonic_distortion(
     ax.set_title(
         f"IEC 60268-3 THD = {thd_f}% (F), "
         f"{thd_r}% (R); SINAD = {sinad} dB "
-        f"(f₁ = {freq}Hz)"
+        f"($f_1$ = {freq}Hz)"
     )
     ax.grid(True, alpha=0.3)
     ax.set_axisbelow(True)
@@ -252,15 +254,15 @@ def plot_modulation_distortion(
 
     ax.vlines([result.f_high], floor, [0.0], color=_C_SECONDARY, lw=1.8)
     ax.plot([result.f_high], [0.0], "s", color=_C_SECONDARY,
-            label=_t("Carrier f₂", language))
+            label=_t("Carrier $f_2$", language))
     ax.vlines(sb_freqs, floor, np.maximum(sb_db, floor), color=_C_PRIMARY, lw=1.5)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Sidebands f₂ ± n·f₁", language))
+    kwargs.setdefault("label", _t(r"Sidebands $f_2 \pm n \cdot f_1$", language))
     ax.plot(sb_freqs, np.maximum(sb_db, floor), "o", **kwargs)
     for order, idx in ((3, 0), (2, 1), (2, 2), (3, 3)):
         if sb_db[idx] > floor:
             ax.annotate(
-                f"n = {order}",
+                f"$n$ = {order}",
                 (sb_freqs[idx], max(sb_db[idx], floor)),
                 textcoords=_OFFSET_POINTS,
                 xytext=(0, 5),
@@ -276,8 +278,8 @@ def plot_modulation_distortion(
     f_low = decimal_comma(_format_freq(float(result.f_low or 0.0)), language)
     f_high = decimal_comma(_format_freq(float(result.f_high)), language)
     ax.set_title(
-        f"IEC 60268-3 d₂ = {d2}%, d₃ = {d3}%; SMPTE = {smpte}% "
-        f"(f₁ = {f_low}Hz, f₂ = {f_high}Hz)"
+        f"IEC 60268-3 $d_2$ = {d2}%, $d_3$ = {d3}%; SMPTE = {smpte}% "
+        f"($f_1$ = {f_low}Hz, $f_2$ = {f_high}Hz)"
     )
     ax.grid(True, alpha=0.3)
     ax.set_axisbelow(True)
@@ -314,7 +316,7 @@ def plot_frequency_response(
     color = kwargs.pop("color", _C_PRIMARY)
 
     def _magnitude(axm: Axes) -> None:
-        kwargs.setdefault("label", f"|H| ({result.estimator})")
+        kwargs.setdefault("label", f"$|H|$ ({result.estimator})")
         axm.semilogx(freqs[pos], mag[pos], color=color, **kwargs)
         axm.set_ylabel(_t(_MAGNITUDE_LABEL, language))
         axm.grid(True, which="both", alpha=0.3)
@@ -376,7 +378,7 @@ def plot_swept_sine_distortion(
 
     def _thd_panel(axt: Axes) -> None:
         kwargs.setdefault("color", _C_PRIMARY)
-        kwargs.setdefault("label", "THD(f)")
+        kwargs.setdefault("label", r"$\mathrm{THD}(f)$")
         axt.loglog(
             result.thd_frequencies,
             100.0 * np.maximum(result.thd, tiny),
@@ -465,6 +467,25 @@ def plot_piston_impedance(
     return ax
 
 
+def _sign_theta_labels(ax: Any) -> None:
+    """Sign the polar angle ticks with the typographic minus U+2212.
+
+    Matplotlib's polar ``ThetaFormatter`` builds its degree labels with a plain
+    format spec, so it ignores the ``axes.unicode_minus`` setting and draws a
+    negative angle with an ASCII hyphen: a shorter, lower glyph than the minus
+    the radial labels beside it carry, inside one figure. Only the glyph
+    changes -- the tick positions stay the ones matplotlib's locator chose.
+    """
+    from matplotlib.ticker import FuncFormatter
+
+    from .._i18n import fmt_minus
+
+    def _degrees(value: float, _pos: Any = None) -> str:
+        return f"{fmt_minus(round(float(np.degrees(value))), 'd')}°"
+
+    ax.xaxis.set_major_formatter(FuncFormatter(_degrees))
+
+
 def plot_piston_directivity(
     result: PistonDirectivity, ax: Any | None = None, *,
     language: str = "en", **kwargs: Any
@@ -501,6 +522,7 @@ def plot_piston_directivity(
     ax.set_theta_direction(-1)
     ax.set_thetamin(-90.0)
     ax.set_thetamax(90.0)
+    _sign_theta_labels(ax)
     for i, ka_value in enumerate(ka):
         label = f"$ka$ = {decimal_comma(f'{ka_value:.3g}', language)}"
         line_kwargs: dict[str, Any] = {
@@ -513,7 +535,7 @@ def plot_piston_directivity(
         ax.plot(theta, levels[i], **line_kwargs)
     ax.set_ylim(-_POLAR_SPAN_PISTON_DB, 0.0)
     ax.set_yticks([-40.0, -30.0, -20.0, -10.0, 0.0])
-    ax.set_yticklabels(["-40", "-30", "-20", "-10", "0 dB"], fontsize="x-small")
+    ax.set_yticklabels(["−40", "−30", "−20", "−10", "0 dB"], fontsize="x-small")
     ax.tick_params(axis="x", labelsize="x-small")
     ax.grid(True, ls=":", lw=0.4, alpha=0.7)
     ax.set_title(_t("Baffled circular piston directivity", language))
@@ -600,7 +622,7 @@ def _draw_impedance(
     ax.axhline(0.8 * result.rated_impedance, color=_C_REFERENCE, lw=0.8, ls=":",
                label=_t("80 % of rated", language))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.set_ylabel(_t("Impedance |Z| [{ohm}]", language, ohm=_OHM_TEXT))
+    ax.set_ylabel(_t("Impedance $|Z|$ [{ohm}]", language, ohm=_OHM_TEXT))
     ax.set_ylim(bottom=0.0)
     _grid(ax)
     ax.set_title(_t("Impedance", language))
@@ -640,7 +662,7 @@ def _draw_datasheet_polar(
     # Reference circle at 0 dB (relative level, IEC 60263 3.3); radial ticks
     # every 5 dB (multiple of 5 for a 25 dB radius, IEC 60263 3.2).
     ax.set_yticks([-20.0, -15.0, -10.0, -5.0, 0.0])
-    ax.set_yticklabels(["-20", "", "-10", "", "0 dB"], fontsize="x-small")
+    ax.set_yticklabels(["−20", "", "−10", "", "0 dB"], fontsize="x-small")
     ax.tick_params(axis="x", labelsize="x-small")
     ax.grid(True, ls=":", lw=0.4, alpha=0.7)
     title = _t("Directional response", language)
@@ -867,7 +889,7 @@ def plot_feedback_stability(
     labels = [
         _t("Open-loop gain $Z_S$", language),
         _t("Feedback-loop gain $G_S$", language),
-        _t(r"Open microphones $\Delta L_{nom}$", language),
+        _t(r"Open microphones $\Delta L_{\mathrm{nom}}$", language),
         _t("Total loop gain", language),
     ]
     values = np.array(

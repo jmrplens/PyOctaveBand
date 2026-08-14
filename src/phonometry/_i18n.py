@@ -41,7 +41,6 @@ def format_number(
     *,
     decimals: int = 1,
     trim: bool = False,
-    minus: bool = True,
 ) -> str:
     """Format ``value`` with a locale-aware decimal separator.
 
@@ -50,17 +49,13 @@ def format_number(
     :param decimals: Digits after the decimal separator.
     :param trim: Drop a trailing ``.0`` / ``,0`` (and the separator) for a
         whole number, e.g. ``90.0 -> "90"``.
-    :param minus: Sign a negative value with the typographic minus U+2212
-        rather than the ASCII hyphen ``format`` writes. On by default, because
-        this feeds the ``.plot()`` labels, which sit beside axis tick labels
-        that carry U+2212 in both languages; two lengths of minus in one figure,
-        with the short one always on the number the reader came for, is the
-        defect it exists to prevent. Pass ``False`` where the number goes into a
-        document whose readers transcribe it -- see
-        :func:`phonometry._report._i18n.format_number`, which does.
-    :return: The formatted string. A value that rounds to zero at the requested
-        precision never keeps a sign at all: a tiny negative number (or a signed
-        ``-0.0``) formats as ``"0.0"``, not the contradictory ``"-0.0"``.
+    :return: The formatted string. A negative value is signed with the
+        typographic minus U+2212, the sign the axis tick labels beside it carry
+        and the one a fiche's tables print; ``format`` writes an ASCII hyphen,
+        which is a shorter, lower glyph and reads as a different mark next to
+        them. A value that rounds to zero at the requested precision never keeps
+        a sign at all: a tiny negative number (or a signed ``-0.0``) formats as
+        ``"0.0"``, not the contradictory ``"-0.0"``.
     """
     text = f"{float(value):.{decimals}f}"
     # A formatted value whose digits are all zeros is a signed zero; strip the
@@ -71,7 +66,7 @@ def format_number(
         text = text.rstrip("0").rstrip(".")
     if language == "es":
         text = text.replace(".", ",")
-    return _MINUS_RE.sub("\\1−", text, count=1) if minus else text
+    return _MINUS_RE.sub("\\1−", text, count=1)
 
 
 #: The leading sign of a formatted number, and only that. The optional run in

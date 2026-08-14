@@ -1422,8 +1422,8 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     info = [
-        r"plate:  $Y = 1/(8\sqrt{B′ m′′})$, real and flat",
-        r"beam:   $Y = (1-\mathrm{j})/(4 m′ c_B)$, $\propto f^{-1/2}$",
+        r"plate:  $Y = 1/(8\sqrt{B^{\prime} m^{\prime}^{\prime}})$, real and flat",
+        r"beam:   $Y = (1-\mathrm{j})/(4 m^{\prime} c_B)$, $\propto f^{-1/2}$",
         r"rod:    $Y = 1/(\rho c_L S)$, real and flat",
         f"plate $|Y|$ = {_sci_math(float(plate.magnitude[0]))} m/(N·s)",
     ]

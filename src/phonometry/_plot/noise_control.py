@@ -49,16 +49,16 @@ _STRINGS: dict[str, str] = {
     "Reactive silencer": "Silenciador reactivo",
     "Sound power level [dB re 1 pW]": "Nivel de potencia acústica [dB re 1 pW]",
     "Attenuation [dB]": "Atenuación [dB]",
-    "Panel R": "R del panel",
-    "Interior correction C": "Corrección interior C",
-    "Insertion loss (R - C)": "Pérdida por inserción (R - C)",
+    "Panel $R$": "$R$ del panel",
+    "Interior correction $C$": "Corrección interior $C$",
+    "Insertion loss ($R - C$)": "Pérdida por inserción ($R - C$)",
     _LEVEL_LABEL: "Nivel [dB]",
     "Machine enclosure insertion loss": "Pérdida por inserción de encapsulado de máquina",
     "Sound power level [dB]": "Nivel de potencia acústica [dB]",
     "Received level": "Nivel recibido",
     "Source": "Fuente",
     "Duct-borne noise path": "Trayecto de ruido por conductos",
-    "Mode order (p, q)": "Orden del modo (p, q)",
+    "Mode order ($p$, $q$)": "Orden del modo ($p$, $q$)",
     "Cut-on frequency [Hz]": "Frecuencia de corte [Hz]",
     "No flow": "Sin flujo",
     "Plane waves only": "Solo ondas planas",
@@ -201,7 +201,7 @@ def plot_duct_path(
     :param kwargs: Forwarded to the received-level ``Axes.plot``.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequencies, dtype=np.float64)
@@ -215,9 +215,10 @@ def plot_duct_path(
         ax.semilogx(f, values, ls=style, color=colour, lw=1.1, alpha=0.85,
                     label=label if len(series) <= 10 else None)
     curve = result.criterion_curve
-    if curve is not None:
+    if curve is not None and result.target is not None:
+        target = decimal_comma(fmt_minus(result.target, "g"), language)
         ax.semilogx(f, curve, ls="--", color=_C_REFERENCE, lw=1.5,
-                    label=f"{result.criterion} {result.target:g}")
+                    label=f"{result.criterion} {target}")
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Received level", language))
     kwargs.setdefault("lw", 2.4)
@@ -255,16 +256,17 @@ def plot_room_to_room(
     :param kwargs: Forwarded to the received-level ``Axes.plot``.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequencies, dtype=np.float64)
     ax.semilogx(f, np.asarray(result.source_level), color=_C_SECONDARY, lw=1.6,
                 ls="--", marker="s", ms=4, label=_t("Source room", language))
     curve = result.criterion_curve
-    if curve is not None:
+    if curve is not None and result.target is not None:
+        target = decimal_comma(fmt_minus(result.target, "g"), language)
         ax.semilogx(f, curve, ls=":", color=_C_REFERENCE, lw=1.5,
-                    label=f"{result.criterion} {result.target:g}")
+                    label=f"{result.criterion} {target}")
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Receiving room", language))
     kwargs.setdefault("lw", 2.4)
@@ -317,7 +319,7 @@ def plot_duct_modes(
     :param kwargs: Forwarded to the with-flow ``Axes.plot``.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     x = np.arange(len(result.modes), dtype=np.float64)
@@ -326,14 +328,16 @@ def plot_duct_modes(
     ax.plot(x, np.asarray(result.cut_on_no_flow), ls="--", color=_C_MUTED,
             marker="s", ms=4, lw=1.3, label=_t("No flow", language))
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", f"M = {result.mach:.3f}")
+    kwargs.setdefault(
+        "label", f"$M$ = {format_number(result.mach, language, decimals=3)}"
+    )
     kwargs.setdefault("lw", 1.8)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 5)
     ax.plot(x, np.asarray(result.cut_on), **kwargs)
     ax.set_xticks(x)
     ax.set_xticklabels([f"({p}, {q})" for p, q in result.modes])
-    ax.set_xlabel(_t("Mode order (p, q)", language))
+    ax.set_xlabel(_t("Mode order ($p$, $q$)", language))
     ax.set_ylabel(_t("Cut-on frequency [Hz]", language))
     ax.set_title(f"{_t('Duct higher-order-mode cut-on', language)}: {result.label}")
     ax.grid(True, which="both", alpha=0.3)
@@ -366,11 +370,12 @@ def plot_enclosure(
         x = np.arange(n, dtype=np.float64)
         continuous = False
     ax.plot(x, np.asarray(result.panel_transmission_loss), color=_C_REFERENCE,
-            lw=1.3, ls="--", marker="s", ms=3, label=_t("Panel R", language))
+            lw=1.3, ls="--", marker="s", ms=3, label=_t("Panel $R$", language))
     ax.plot(x, np.asarray(result.correction), color=_C_TERTIARY, lw=1.3,
-            ls=":", marker="^", ms=3, label=_t("Interior correction C", language))
+            ls=":", marker="^", ms=3,
+            label=_t("Interior correction $C$", language))
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Insertion loss (R - C)", language))
+    kwargs.setdefault("label", _t("Insertion loss ($R - C$)", language))
     kwargs.setdefault("lw", 1.9)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 3)

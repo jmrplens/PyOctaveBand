@@ -102,7 +102,7 @@ _STRINGS: dict[str, str] = {
     "ISO 18233 exponential sine sweep": "Barrido sinusoidal exponencial ISO 18233",
     "Spectrogram (exponential frequency rise)":
         "Espectrograma (subida exponencial de frecuencia)",
-    r"$1/r$ spreading envelope": r"envolvente de propagación $1/r$",
+    r"$1/r$ spreading envelope": r"Envolvente de propagación $1/r$",
     "Reflections": "Reflexiones",
     "Reflection order": "Orden de reflexión",
     "Direct sound": "Sonido directo",
@@ -127,15 +127,15 @@ _STRINGS: dict[str, str] = {
     "Mode kind": "Tipo de modo",
     "Modal density [modes/Hz]": "Densidad modal [modos/Hz]",
     "Modal density d$N$/d$f$": "Densidad modal d$N$/d$f$",
-    "Room modes — {lx} x {ly} x {lz} m": "Modos de la sala — {lx} x {ly} x {lz} m",
+    "Room modes — {lx} × {ly} × {lz} m": "Modos de la sala — {lx} × {ly} × {lz} m",
     "Schroeder $f_s$ = {value} Hz": "$f_s$ de Schroeder = {value} Hz",
     # --- Restaurant crowd self-noise (Long Ch. 17) ---
     "Simultaneous talkers $N$": "Hablantes simultáneos $N$",
     "Self-generated noise level [dB]": "Nivel de ruido autogenerado [dB]",
     _ABSORPTION_AREA_LABEL: _ABSORPTION_AREA_LABEL,
     "Speech at {value} m": "Habla a {value} m",
-    "Communication limit ($L_{SN}$ = -6 dB)":
-        "Límite de comunicación ($L_{SN}$ = -6 dB)",
+    r"Communication limit ($L_\mathrm{SN}$ = −6 dB)":
+        r"Límite de comunicación ($L_\mathrm{SN}$ = −6 dB)",
     "Crowd self-noise — $L_W$ = {lw} dB per talker":
         "Ruido autogenerado del público — $L_W$ = {lw} dB por hablante",
 }
@@ -576,7 +576,7 @@ def plot_open_plan(
     )
     ax.plot(r, level, **kwargs)
     ax.plot([4.0], [result.lp_as_4m], "o", color=_C_PRIMARY, ms=7,
-            label=rf"$L_{{p,A,S,4m}}$ = "
+            label=rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = "
                   f"{format_number(result.lp_as_4m, language, decimals=1)} dB")
     if np.isfinite(result.rd):
         ax.axvline(result.rd, color=_C_SECONDARY, ls="--",
@@ -712,7 +712,7 @@ def plot_image_source_reflectogram(
     :param kwargs: Forwarded to the stem ``markerline`` styling.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import decimal_comma, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     times = np.asarray(result.times, dtype=np.float64)
@@ -752,6 +752,10 @@ def plot_image_source_reflectogram(
             label=_t("Direct sound", language), **kwargs)
 
     lx, ly, lz = result.dimensions
+    # A bare ``:g`` never reaches the locale pass (``localize_axes`` reformats
+    # tick labels only), so a 6.2 × 4.1 × 2.8 m room would publish English
+    # decimal points inside the Spanish title. English is unchanged.
+    dims = "×".join(decimal_comma(f"{d:g}", language) for d in (lx, ly, lz))
     finite = level[np.isfinite(level)]
     ax.set_ylim(bottom=max(-80.0, float(finite.min()) - 3.0) if finite.size else -80.0,
                 top=5.0)
@@ -761,11 +765,11 @@ def plot_image_source_reflectogram(
     if language == "es":
         ax.set_title(
             f"Reflectograma de fuentes imagen — sala de "
-            f"{lx:g}×{ly:g}×{lz:g} m, orden ≤ {result.max_order}"
+            f"{dims} m, orden ≤ {result.max_order}"
         )
     else:
         ax.set_title(
-            f"Image-source reflectogram — {lx:g}×{ly:g}×{lz:g} m room, "
+            f"Image-source reflectogram — {dims} m room, "
             f"order ≤ {result.max_order}"
         )
     ax.grid(True, alpha=0.3)
@@ -791,7 +795,7 @@ def plot_steady_field(
     """
     import matplotlib.ticker as mticker
 
-    from .._i18n import format_number, localize_axes
+    from .._i18n import decimal_comma, format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.distances, dtype=np.float64)
@@ -812,17 +816,21 @@ def plot_steady_field(
     ax.xaxis.set_minor_formatter(mticker.NullFormatter())
     ax.set_xlabel(_t("Distance from source [m]", language))
     ax.set_ylabel(_t("Sound pressure level [dB]", language))
+    # ``:g`` bypasses the locale pass, so a 92.5 dB source power or a Q of 2.5
+    # would keep an English decimal point in the Spanish title beside the room
+    # constant, which is localised. English is unchanged.
+    lw = decimal_comma(f"{result.sound_power_level:g}", language)
+    q = decimal_comma(f"{result.directivity:g}", language)
     if language == "es":
         ax.set_title(
-            f"Campo estacionario de la sala — "
-            f"$L_W$ = {result.sound_power_level:g} dB, "
+            f"Campo estacionario de la sala — $L_W$ = {lw} dB, "
             f"$R$ = {format_number(result.room_constant, language, decimals=0)} m², "
-            f"$Q$ = {result.directivity:g}"
+            f"$Q$ = {q}"
         )
     else:
         ax.set_title(
-            f"Steady-state room field — $L_W$ = {result.sound_power_level:g} dB, "
-            f"$R$ = {result.room_constant:.0f} m², $Q$ = {result.directivity:g}"
+            f"Steady-state room field — $L_W$ = {lw} dB, "
+            f"$R$ = {result.room_constant:.0f} m², $Q$ = {q}"
         )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -974,7 +982,7 @@ def plot_room_modes(
     ladder.set_ylabel(_t("Mode kind", language))
     lx, ly, lz = result.dimensions
     ladder.set_title(
-        _t("Room modes — {lx} x {ly} x {lz} m", language).format(
+        _t("Room modes — {lx} × {ly} × {lz} m", language).format(
             lx=format_number(lx, language, decimals=1, trim=True),
             ly=format_number(ly, language, decimals=1, trim=True),
             lz=format_number(lz, language, decimals=1, trim=True),
@@ -1046,8 +1054,10 @@ def plot_crowd_noise(
             value=format_number(result.distance, language, decimals=1,
                                 trim=True)),
     )
-    ax.axhline(result.communication_level, color=_C_REFERENCE, ls=":", lw=1.4,
-               label=_t("Communication limit ($L_{SN}$ = -6 dB)", language))
+    ax.axhline(
+        result.communication_level, color=_C_REFERENCE, ls=":", lw=1.4,
+        label=_t(r"Communication limit ($L_\mathrm{SN}$ = −6 dB)", language),
+    )
     import matplotlib.ticker as mticker
 
     ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))

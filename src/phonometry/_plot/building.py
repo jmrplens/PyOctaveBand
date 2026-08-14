@@ -114,7 +114,7 @@ _SHARE_LABEL = "Share of transmitted energy [%]"
 
 #: Shared y-axis label of the impact-improvement figures (the ISO 16251-1
 #: measurement and the two resilient-layer predictions).
-_IMPROVEMENT_LABEL = "Improvement of impact sound insulation delta-L [dB]"
+_IMPROVEMENT_LABEL = r"Improvement of impact sound insulation $\Delta L$ [dB]"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: building-domain ``.plot()`` renderers, keyed by their verbatim English
@@ -133,7 +133,7 @@ _STRINGS: dict[str, str] = {
     "aperture $R$": "$R$ de abertura",
     "Aperture sound transmission (Gomperts / Wilson-Soroka)": "Transmisión sonora por abertura (Gomperts / Wilson-Soroka)",
     _REDUCTION_INDEX_LABEL: "Índice de reducción acústica [dB]",
-    "Sigma unfav.": "Σ desfav.",
+    r"$\Sigma$ unfav.": r"$\Sigma$ desfav.",
     "impact rating": "índice de impacto",
     _IMPACT_LEVEL_LABEL: "Nivel de presión acústica de impactos [dB]",
     _LEVEL_DIFFERENCE_LABEL: "Diferencia de nivel / índice de reducción [dB]",
@@ -157,11 +157,11 @@ _STRINGS: dict[str, str] = {
     "impact prediction": "predicción de impacto",
     "Airborne sound insulation (ISO 16283-1)": "Aislamiento a ruido aéreo (ISO 16283-1)",
     "Impact sound insulation (ISO 16283-2)": "Aislamiento a ruido de impacto (ISO 16283-2)",
-    "Standard uncertainty u [dB]": "Incertidumbre típica u [dB]",
+    "Standard uncertainty $u$ [dB]": "Incertidumbre típica $u$ [dB]",
     "band uncertainty": "incertidumbre por banda",
     "situation": "situación",
-    "sigma_R95 upper limit": "límite superior sigma_R95",
-    "limit of measurement (> delta-L)": "límite de medición (> delta-L)",
+    r"$\sigma_\mathrm{R95}$ upper limit": r"límite superior $\sigma_\mathrm{R95}$",
+    r"limit of measurement (> $\Delta L$)": r"límite de medición (> $\Delta L$)",
     "enlarged range (Annex B)": "rango ampliado (Anexo B)",
     "enlarged range (A.2.1)": "rango ampliado (A.2.1)",
     "Measured": "Medido",
@@ -196,14 +196,15 @@ _STRINGS: dict[str, str] = {
     "Heavy impact source conformance": "Conformidad de la fuente de impacto pesada",
     "rubber ball": "pelota de caucho",
     "bang machine": "máquina de neumático",
-    "$L_{i,Fmax}$ (measured)": "$L_{i,Fmax}$ (medido)",
-    "$L'_{i,Fmax,V,T}$ (standardized)": "$L'_{i,Fmax,V,T}$ (estandarizado)",
+    r"$L_\mathrm{i,Fmax}$ (measured)": r"$L_\mathrm{i,Fmax}$ (medido)",
+    r"$L′_{\mathrm{i,Fmax},V,T}$ (standardized)":
+        r"$L′_{\mathrm{i,Fmax},V,T}$ (estandarizado)",
     "standardization correction": "corrección de estandarización",
     _MAX_IMPACT_LABEL: "Nivel máximo de presión acústica de impactos [dB]",
     "ISO 16283-2 rubber-ball standardization":
         "Estandarización de la pelota de caucho ISO 16283-2",
     "A-weighted contribution": "contribución ponderada A",
-    "$X_{i,Fmax}$ (unweighted)": "$X_{i,Fmax}$ (sin ponderar)",
+    r"$X_\mathrm{i,Fmax}$ (unweighted)": r"$X_\mathrm{i,Fmax}$ (sin ponderar)",
     "ISO 717-2 Annex D heavy-impact rating":
         "Índice de impacto pesado ISO 717-2 Anexo D",
     "one-third octave": "tercio de octava",
@@ -212,7 +213,7 @@ _STRINGS: dict[str, str] = {
     "Normalized ceiling attenuation $D_{n,c}$ [dB]":
         "Diferencia de niveles normalizada del techo $D_{n,c}$ [dB]",
     "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
-    "$R_{cl}$ (ceiling/plenum path)": "$R_{cl}$ (trayecto techo/plenum)",
+    r"$R_\mathrm{cl}$ (ceiling/plenum path)": r"$R_\mathrm{cl}$ (trayecto techo/plenum)",
     "plenum penalty": "penalización del plenum",
     "Suspended-ceiling plenum path": "Trayecto por plenum de techo suspendido",
     "rigid connection ($Y_c$ = 0)": "unión rígida ($Y_c$ = 0)",
@@ -220,7 +221,7 @@ _STRINGS: dict[str, str] = {
     "isolation gained by the tie": "aislamiento aportado por la llave",
     "Coupling loss factor $\\eta_{ij}$": "Factor de pérdidas por acoplamiento $\\eta_{ij}$",
     "Wall-tie structure-borne coupling": "Acoplamiento estructural por llaves de muro",
-    "ties/m$^2$": "llaves/m$^2$",
+    "ties/m²": "llaves/m²",
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Band index": "Índice de banda",
     "force spectrum $|F_n|$": "espectro de fuerza $|F_n|$",
@@ -235,10 +236,6 @@ _STRINGS: dict[str, str] = {
     "Sound reduction index improvement [dB]": "Mejora del índice de reducción acústica [dB]",
     "Additional-layer rating (ISO 12354-1 Annex D)": "Magnitud global de capa adicional (ISO 12354-1 Anexo D)",
 }
-
-#: Shared y-axis label of the impact-improvement figures (the ISO 16251-1
-#: measurement and the two resilient-layer predictions).
-_IMPROVEMENT_LABEL = "Improvement of impact sound insulation delta-L [dB]"
 
 #: Localised names of the two standard heavy and soft impact sources.
 _HEAVY_IMPACT_SOURCE_LABELS = {
@@ -373,9 +370,11 @@ def plot_weighted_rating(
         impact=False,
         title=(
             # Sign only when negative, the style of ISO 717-1's own examples.
-            f"ISO 717-1 Rw (C={result.c:d}; Ctr={result.ctr:d}) = "
-            f"{result.rating} dB  ({_t('Sigma unfav.', language)} = "
-            f"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
+            rf"ISO 717-1 $R_\mathrm{{w}}$ "
+            rf"($C$={format_number(result.c, language, decimals=0)}; "
+            rf"$C_\mathrm{{tr}}$={format_number(result.ctr, language, decimals=0)}) = "
+            rf"{result.rating} dB  ({_t(r'$\Sigma$ unfav.', language)} = "
+            rf"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
         ),
         ylabel=_t(_REDUCTION_INDEX_LABEL, language),
         ax=ax,
@@ -419,9 +418,10 @@ def plot_impact_rating(
         # "impact rating" label rather than hard-coding one specific symbol.
         title=(
             # Sign only when negative, the style of ISO 717-2's own examples.
-            f"ISO 717-2 {_t('impact rating', language)} (CI={result.ci:d}) = "
-            f"{result.rating} dB  ({_t('Sigma unfav.', language)} = "
-            f"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
+            rf"ISO 717-2 {_t('impact rating', language)} "
+            rf"($C_\mathrm{{I}}$={format_number(result.ci, language, decimals=0)}) = "
+            rf"{result.rating} dB  ({_t(r'$\Sigma$ unfav.', language)} = "
+            rf"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
         ),
         ylabel=_t(_IMPACT_LEVEL_LABEL, language),
         ax=ax,
@@ -533,18 +533,20 @@ def plot_extended_weighted_rating(
 
     decimals = 0 if float(result.rating).is_integer() else 1
     title = (
-        f"ISO 717-1 Rw (C={format_number(result.c, language, decimals=decimals)}; "
-        f"Ctr={format_number(result.ctr, language, decimals=decimals)}) = "
-        f"{format_number(result.rating, language, decimals=decimals)} dB"
+        rf"ISO 717-1 $R_\mathrm{{w}}$ "
+        rf"($C$={format_number(result.c, language, decimals=decimals)}; "
+        rf"$C_\mathrm{{tr}}$="
+        rf"{format_number(result.ctr, language, decimals=decimals)}) = "
+        rf"{format_number(result.rating, language, decimals=decimals)} dB"
     )
     extended = _extended_terms_line(
         [
-            ("C50-3150", result.c_50_3150),
-            ("C50-5000", result.c_50_5000),
-            ("C100-5000", result.c_100_5000),
-            ("Ctr,50-3150", result.ctr_50_3150),
-            ("Ctr,50-5000", result.ctr_50_5000),
-            ("Ctr,100-5000", result.ctr_100_5000),
+            ("$C_{50-3150}$", result.c_50_3150),
+            ("$C_{50-5000}$", result.c_50_5000),
+            ("$C_{100-5000}$", result.c_100_5000),
+            (r"$C_{\mathrm{tr},50-3150}$", result.ctr_50_3150),
+            (r"$C_{\mathrm{tr},50-5000}$", result.ctr_50_5000),
+            (r"$C_{\mathrm{tr},100-5000}$", result.ctr_100_5000),
         ],
         language, decimals,
     )
@@ -575,14 +577,16 @@ def plot_extended_impact_rating(
 
     decimals = 0 if float(result.rating).is_integer() else 1
     title = (
-        f"ISO 717-2 {_t('impact rating', language)} "
-        f"(CI={format_number(result.ci, language, decimals=decimals)}) = "
-        f"{format_number(result.rating, language, decimals=decimals)} dB"
+        rf"ISO 717-2 {_t('impact rating', language)} "
+        rf"($C_\mathrm{{I}}$="
+        rf"{format_number(result.ci, language, decimals=decimals)}) = "
+        rf"{format_number(result.rating, language, decimals=decimals)} dB"
     )
     if result.ci_50_2500 is not None:
         title = (
-            f"{title}\nCI,50-2500 = "
-            f"{format_number(result.ci_50_2500, language, decimals=decimals)}"
+            f"{title}\n"
+            rf"$C_{{\mathrm{{I}},50-2500}}$ = "
+            rf"{format_number(result.ci_50_2500, language, decimals=decimals)}"
         )
     return _plot_extended_rating(
         result, impact=True, title=title,
@@ -625,7 +629,7 @@ def plot_facade_insulation(
     if result.d_2m_n is not None:
         curves.append(("$D_{2m,n}$", np.asarray(result.d_2m_n, dtype=np.float64)))
     if result.r_prime is not None:
-        curves.append(("$R'$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append(("$R′$", np.asarray(result.r_prime, dtype=np.float64)))
     # Forward user kwargs to the primary D2m,nT curve only, so styling kwargs
     # (label=, color=) neither collide with the per-curve labels nor make the
     # companion curves indistinguishable.
@@ -671,7 +675,7 @@ def plot_facade_prediction(
     for name, rp in result.element_r.items():
         ax.plot(x, np.asarray(rp, dtype=np.float64), "--", lw=0.9, alpha=0.6, label=name)
 
-    opts: dict[str, Any] = {"label": "$R'$", "color": "black", "lw": 2.0}
+    opts: dict[str, Any] = {"label": "$R′$", "color": "black", "lw": 2.0}
     opts.update(kwargs)
     ax.plot(x, r_prime, "o-", **opts)
     ax.plot(
@@ -883,9 +887,10 @@ def plot_airborne_prediction(
     ax.set_xlabel(_t("Transmission path", language))
     ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_title(
-        f"EN 12354-1 {_t('flanking prediction', language)} — R'w = "
-        f"{format_number(result.r_prime_w, language, decimals=1)} dB "
-        f"(RDd,w = {format_number(result.r_direct_w, language, decimals=1)} dB)"
+        rf"EN 12354-1 {_t('flanking prediction', language)} — $R′_\mathrm{{w}}$ = "
+        rf"{format_number(result.r_prime_w, language, decimals=1)} dB "
+        rf"($R_\mathrm{{Dd,w}}$ = "
+        rf"{format_number(result.r_direct_w, language, decimals=1)} dB)"
     )
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
@@ -912,7 +917,10 @@ def plot_impact_prediction(
     from .._i18n import format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
-    labels = ("$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L'_{n,w}$")
+    labels = (
+        r"$L_\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$",
+        r"$L′_\mathrm{n,w}$",
+    )
     values = (
         result.ln_w_eq,
         -result.delta_l_w,
@@ -927,8 +935,9 @@ def plot_impact_prediction(
     ax.set_xticklabels(labels)
     ax.set_ylabel(_t("Level / correction [dB]", language))
     ax.set_title(
-        f"EN 12354-2 {_t('impact prediction', language)} — L'n,w = "
-        f"{format_number(result.l_prime_n_w, language, decimals=1)} dB"
+        rf"EN 12354-2 {_t('impact prediction', language)} — "
+        rf"$L′_\mathrm{{n,w}}$ = "
+        rf"{format_number(result.l_prime_n_w, language, decimals=1)} dB"
     )
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
@@ -1019,11 +1028,11 @@ def plot_detailed_airborne_prediction(
     title = f"EN 12354-1 {_t('detailed prediction', language)}"
     if result.rating is not None:
         title += (
-            f" — R'w = {format_number(result.rating.rating, language, decimals=0)}"
-            " dB"
+            rf" — $R′_\mathrm{{w}}$ = "
+            rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.r_prime, total_label="$R'$",
+        result, result.r_prime, total_label="$R′$",
         ylabel=_REDUCTION_INDEX_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
@@ -1047,11 +1056,11 @@ def plot_detailed_impact_prediction(
     title = f"EN 12354-2 {_t('detailed prediction', language)}"
     if result.rating is not None:
         title += (
-            f" — L'n,w = "
-            f"{format_number(result.rating.rating, language, decimals=0)} dB"
+            rf" — $L′_\mathrm{{n,w}}$ = "
+            rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.l_prime_n, total_label="$L'_n$",
+        result, result.l_prime_n, total_label=r"$L′_\mathrm{n}$",
         ylabel=_IMPACT_LEVEL_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
@@ -1077,9 +1086,9 @@ def plot_in_situ_element(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 4)
-    ax.plot(freqs, result.sound_reduction_index, label="$R_{situ}$", **kwargs)
+    ax.plot(freqs, result.sound_reduction_index, label=r"$R_\mathrm{situ}$", **kwargs)
     ax.plot(freqs, result.impact_level, color=_C_SECONDARY, marker="s", ms=4,
-            label="$L_{n,situ}$")
+            label=r"$L_\mathrm{n,situ}$")
     ax.set_xscale("log")
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Reduction index / impact level [dB]", language))
@@ -1117,7 +1126,7 @@ def plot_airborne_insulation(
         ("$D$", np.asarray(result.d, dtype=np.float64)),
     ]
     if result.r_prime is not None:
-        curves.append(("$R'$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append(("$R′$", np.asarray(result.r_prime, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
         ylabel=_t(_LEVEL_DIFFERENCE_LABEL, language),
@@ -1146,9 +1155,9 @@ def plot_impact_insulation(
     """
     from .._i18n import localize_axes
 
-    curves = [("$L'_{nT}$", np.asarray(result.l_n_t, dtype=np.float64))]
+    curves = [(r"$L′_\mathrm{nT}$", np.asarray(result.l_n_t, dtype=np.float64))]
     if result.l_n is not None:
-        curves.append(("$L'_n$", np.asarray(result.l_n, dtype=np.float64)))
+        curves.append((r"$L′_\mathrm{n}$", np.asarray(result.l_n, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
         ylabel=_t(_IMPACT_LEVEL_LABEL, language),
@@ -1181,9 +1190,12 @@ def plot_band_uncertainty(
     kwargs.setdefault("marker", "o")
     ax.plot(freqs, u, **kwargs)
     _freq_axis(ax, freqs, language=language)
-    ax.set_ylabel(_t("Standard uncertainty u [dB]", language))
+    ax.set_ylabel(_t("Standard uncertainty $u$ [dB]", language))
     ax.set_ylim(bottom=0.0)
-    quantity = _t("sigma_R95 upper limit", language) if result.upper_limit else "u"
+    quantity = (
+        _t(r"$\sigma_\mathrm{R95}$ upper limit", language)
+        if result.upper_limit else "$u$"
+    )
     ax.set_title(
         f"ISO 12999-1 {_t('band uncertainty', language)} ({quantity}) — "
         f"{result.measurand}, {_t('situation', language)} {result.situation}"
@@ -1218,14 +1230,17 @@ def plot_floor_covering_improvement(
         ax.plot(
             freqs[result.limited], dl[result.limited], ls="", marker="v",
             color=_C_SECONDARY, ms=9, mfc="none", mew=1.6, zorder=5,
-            label=_t("limit of measurement (> delta-L)", language),
+            label=_t(r"limit of measurement (> $\Delta L$)", language),
         )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t(_IMPROVEMENT_LABEL, language))
     ax.set_ylim(bottom=0.0)
     title = _t("ISO 16251-1 Floor-Covering Impact Sound Improvement", language)
     if result.delta_lw is not None:
-        title += f"  (delta-Lw = {decimal_comma(str(result.delta_lw), language)} dB)"
+        title += (
+            r"  ($\Delta L_\mathrm{w}$ = "
+            f"{decimal_comma(str(result.delta_lw), language)} dB)"
+        )
     ax.set_title(title)
     ax.grid(True, which="both", alpha=0.3)
     if ax.get_legend_handles_labels()[0]:
@@ -1459,13 +1474,13 @@ def plot_standardized_maximum_impact(
         result.frequencies,
         result.measured,
         result.standardized,
-        reference_label="$L_{i,Fmax}$ (measured)",
-        curve_label="$L\'_{i,Fmax,V,T}$ (standardized)",
+        reference_label=r"$L_\mathrm{i,Fmax}$ (measured)",
+        curve_label=r"$L′_{\mathrm{i,Fmax},V,T}$ (standardized)",
         fill_label="standardization correction",
         ylabel=_MAX_IMPACT_LABEL,
         title=(
             f"{_t('ISO 16283-2 rubber-ball standardization', language)} "
-            f"(V = {format_number(result.volume, language, decimals=1)} m$^3$)"
+            f"($V$ = {format_number(result.volume, language, decimals=1)} m³)"
         ),
         language=language,
         **kwargs,
@@ -1495,9 +1510,9 @@ def plot_a_weighted_maximum_impact(
     ax.bar(positions, result.corrected, width=0.7, zorder=2,
            label=_t("A-weighted contribution", language), **kwargs)
     ax.plot(positions, result.levels, "s--", color=_C_REFERENCE, lw=1.2, zorder=3,
-            label=_t("$X_{i,Fmax}$ (unweighted)", language))
+            label=_t(r"$X_\mathrm{i,Fmax}$ (unweighted)", language))
     ax.axhline(result.rating, color=_C_SECONDARY, ls="-", lw=1.6, zorder=4,
-               label=f"$X_{{iA,Fmax}}$ = {result.rating} dB")
+               label=rf"$X_\mathrm{{iA,Fmax}}$ = {result.rating} dB")
     ax.set_ylabel(_t(_MAX_IMPACT_LABEL, language))
     ax.set_title(
         f"{_t('ISO 717-2 Annex D heavy-impact rating', language)} "
@@ -1532,7 +1547,7 @@ def plot_ceiling_attenuation(
         impact=False,
         title=(
             f"ASTM E413 CAC = {result.rating} dB  "
-            f"({_t('Sigma unfav.', language)} = "
+            rf"({_t(r'$\Sigma$ unfav.', language)} = "
             f"{format_number(result.deficiency_sum, language, decimals=1)} dB)"
         ),
         measured_label="Normalized ceiling attenuation",
@@ -1566,12 +1581,12 @@ def plot_plenum_flanking(
         result.reduction_index_source + result.reduction_index_receiving,
         result.reduction_index,
         reference_label="$R_S + R_R$ (two ceilings)",
-        curve_label="$R_{cl}$ (ceiling/plenum path)",
+        curve_label=r"$R_\mathrm{cl}$ (ceiling/plenum path)",
         fill_label="plenum penalty",
         ylabel=_R_INDEX_LABEL,
         title=(
             f"{_t('Suspended-ceiling plenum path', language)} "
-            f"(h = {format_number(result.plenum_height, language, decimals=2)} m, "
+            f"($h$ = {format_number(result.plenum_height, language, decimals=2)} m, "
             f"$L_R$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
             f"$\\varepsilon$ = {result.epsilon:.0f})"
         ),
@@ -1620,7 +1635,7 @@ def plot_wall_tie_coupling(
     ax.set_title(
         f"{_t('Wall-tie structure-borne coupling', language)} "
         f"({format_number(result.ties_per_area, language, decimals=1)} "
-        f"{_t('ties/m$^2$', language)}{stiffness})"
+        f"{_t('ties/m²', language)}{stiffness})"
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -1689,12 +1704,12 @@ def plot_tapping_force(
             label=kwargs.pop("label", _t("force spectrum $|F_n|$", language)),
             **kwargs)
     ax.axhline(result.upper_limit, color=_C_REFERENCE, ls="--", lw=1.2,
-               label="$|F_n|_{upper}$")
+               label=r"$|F_n|_\mathrm{upper}$")
     ax.axhline(result.lower_limit, color=_C_MUTED, ls="--", lw=1.2,
-               label="$|F_n|_{lower}$")
+               label=r"$|F_n|_\mathrm{lower}$")
     ax.axvline(
         result.cut_off_frequency, color=_C_SECONDARY, ls=":", lw=1.2,
-        label=f"$f_{{co}}$ = {_format_freq(result.cut_off_frequency)} Hz",
+        label=rf"$f_\mathrm{{co}}$ = {_format_freq(result.cut_off_frequency)} Hz",
     )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Magnitude of the peak force $|F_n|$ [N]", language))
@@ -1735,7 +1750,7 @@ def plot_covering_improvement(
             (result.two_line, "two-line estimate (0 dB, 12 dB/oct)",
              _C_SECONDARY, "--"),
         ],
-        result.cut_off_frequency, "$f_{co}$", language, kwargs,
+        result.cut_off_frequency, r"$f_\mathrm{co}$", language, kwargs,
     )
     ax.set_title(_t("Soft floor covering improvement (Hopkins 4.4.3.1)", language))
     localize_axes(ax, language)
