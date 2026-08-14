@@ -21,3 +21,11 @@ overrides:
   nanoid@^3: ^3.3.17
   undici: ^6.28.0
   brace-expansion@^1: ^1.1.18
+  # pa11y and pa11y-ci both still require puppeteer ^24, which pins
+  # @puppeteer/browsers to 2.13.2. That release extracts downloaded browser
+  # archives with extract-zip, whose symlink handling lets a crafted archive
+  # write outside the target directory. @puppeteer/browsers 3.x replaced
+  # extract-zip with OS tar/unzip and puppeteer-core 24.43.1 works fine
+  # against it (verified by running the pa11y audit); the pin only matters at
+  # install time, so this can go once pa11y ships on puppeteer 25.
+  "@puppeteer/browsers@<3": ^3.1.0
