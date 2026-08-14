@@ -1330,6 +1330,14 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
     here, with the files it describes, so a re-render cannot forget it; a
     single-variant render does not stamp, because it leaves the other three
     variants of that clip as they were.
+
+    The stamping is in a ``finally`` because a batch does not fail as a
+    whole: a clip that raises halfway through leaves the ones before it
+    complete on disk, and dropping their stamps with the error would have
+    the freshness check call finished clips stale until somebody re-rendered
+    them for nothing. The pool path already stamps what succeeded before it
+    reports the failures (:func:`_generate_animations_parallel`); this is the
+    same bargain for the sequential one, and the render error still leaves.
     """
     import shutil
 
@@ -1348,14 +1356,16 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
     else:
         clips = list(_ANIMATIONS)
     stamped: list[str] = []
-    for clip in clips:
-        if variants:
-            print(f"--- Generating {clip} (4 variants) ---")
-            _render_anim_variants(clip, output_dir)
-            stamped.append(clip)
-        else:
-            _ANIMATIONS[clip](output_dir)
-    _stamp_clips(stamped, output_dir)
+    try:
+        for clip in clips:
+            if variants:
+                print(f"--- Generating {clip} (4 variants) ---")
+                _render_anim_variants(clip, output_dir)
+                stamped.append(clip)
+            else:
+                _ANIMATIONS[clip](output_dir)
+    finally:
+        _stamp_clips(stamped, output_dir)
 
 
 # ====================================================================# Command line / parallel figure generation

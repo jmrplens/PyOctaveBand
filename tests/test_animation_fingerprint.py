@@ -130,8 +130,27 @@ def test_every_registered_clip_is_fingerprinted(tree: pathlib.Path) -> None:
     assert sorted(fp.fingerprints(tree)) == ["anim_one", "anim_two"]
 
 
-def test_the_same_sources_give_the_same_fingerprint(tree: pathlib.Path) -> None:
-    assert fp.fingerprints(tree) == fp.fingerprints(tree)
+def test_the_same_sources_give_the_same_fingerprint(
+        tree: pathlib.Path, tmp_path_factory: pytest.TempPathFactory) -> None:
+    """The same sources hash the same, read again and read from elsewhere.
+
+    The stamp is written from a working copy and recomputed in CI out of a
+    checkout at another absolute path, so a fingerprint carrying anything of
+    where the files sit -- a path in the hash, an order the filesystem
+    happened to hand back -- would mark all forty-two clips stale on every
+    run and be switched off by the end of the week.
+    """
+    import shutil
+
+    elsewhere = tmp_path_factory.mktemp("elsewhere") / "checkout"
+    shutil.copytree(tree, elsewhere)
+
+    first = fp.fingerprints(tree)
+    again = fp.fingerprints(tree)
+    copied = fp.fingerprints(elsewhere)
+
+    assert again == first
+    assert copied == first
 
 
 @pytest.mark.parametrize(
@@ -206,3 +225,56 @@ def test_a_new_clip_is_reported_rather_than_ignored(tree: pathlib.Path) -> None:
     after = fp.fingerprints(tree)
     assert set(after) - set(before) == {"anim_three"}
     assert {c: after[c] for c in before} == before
+
+
+# -- the renderer's half of the bargain -------------------------------------
+#
+# The stamp is only worth anything if it is written whenever the files it
+# describes are, which is a claim about the renderer rather than about the
+# hash: a batch of clips is minutes of work each, and it is the runs that do
+# not finish that decide whether the manifest can be trusted.
+
+
+def _fake_batch(monkeypatch: pytest.MonkeyPatch,
+                fails: str | None) -> list[list[str]]:
+    """Run a three-clip batch with the rendering replaced, return the stamps."""
+    import shutil
+
+    from figures import registry
+
+    stamped: list[list[str]] = []
+
+    def render(clip: str, output_dir: str) -> None:
+        if clip == fails:
+            raise RuntimeError("the encoder died")
+
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/ffmpeg")
+    monkeypatch.setattr(registry, "_ANIMATIONS",
+                        dict.fromkeys(("anim_one", "anim_two", "anim_three")))
+    monkeypatch.setattr(registry, "_render_anim_variants", render)
+    monkeypatch.setattr(registry, "_stamp_clips",
+                        lambda clips, output_dir: stamped.append(list(clips)))
+    if fails is None:
+        registry.generate_animations("images", variants=True)
+    else:
+        with pytest.raises(RuntimeError, match="the encoder died"):
+            registry.generate_animations("images", variants=True)
+    return stamped
+
+
+def test_a_finished_batch_stamps_every_clip_it_rendered(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    assert _fake_batch(monkeypatch, fails=None) == [
+        ["anim_one", "anim_two", "anim_three"]]
+
+
+def test_a_clip_that_dies_does_not_cost_the_stamps_of_the_ones_before_it(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """The clips already on disk keep their fingerprints when a later one dies.
+
+    Their four variants are written and complete; leaving with the error and
+    no stamp would have the freshness check report them as unrendered, and
+    the way to make it green again would be to render, at several minutes
+    each, clips that are already correct.
+    """
+    assert _fake_batch(monkeypatch, fails="anim_two") == [["anim_one"]]
