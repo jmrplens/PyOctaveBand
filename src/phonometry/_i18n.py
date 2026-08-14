@@ -16,6 +16,7 @@ lazily and is a no-op for English, so English plots are byte-for-byte unchanged.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Literal
 
 #: Supported rendering languages. English is the default everywhere.
@@ -48,10 +49,13 @@ def format_number(
     :param decimals: Digits after the decimal separator.
     :param trim: Drop a trailing ``.0`` / ``,0`` (and the separator) for a
         whole number, e.g. ``90.0 -> "90"``.
-    :return: The formatted string. A value that rounds to zero at the
-        requested precision never keeps a minus sign: a tiny negative number
-        (or a signed ``-0.0``) formats as ``"0.0"``, not the contradictory
-        ``"-0.0"``.
+    :return: The formatted string. A negative value is signed with the
+        typographic minus U+2212, the sign the axis tick labels beside it
+        carry; ``format`` writes an ASCII hyphen, which is a shorter, lower
+        glyph and reads as a different mark next to them. A value that rounds
+        to zero at the requested precision never keeps a sign at all: a tiny
+        negative number (or a signed ``-0.0``) formats as ``"0.0"``, not the
+        contradictory ``"-0.0"``.
     """
     text = f"{float(value):.{decimals}f}"
     # A formatted value whose digits are all zeros is a signed zero; strip the
@@ -62,7 +66,36 @@ def format_number(
         text = text.rstrip("0").rstrip(".")
     if language == "es":
         text = text.replace(".", ",")
-    return text
+    return _MINUS_RE.sub("\\1−", text, count=1)
+
+
+#: The leading sign of a formatted number, and only that. The optional run in
+#: front of it is the width padding of a spec like ``"8.2f"``, which puts the
+#: sign after the spaces rather than at the start of the string; anchoring on
+#: the string's first character alone would silently skip every padded reading,
+#: which is how a readout column keeps its numbers aligned.
+_MINUS_RE = re.compile(r"^([ \t]*)-")
+
+
+def fmt_minus(value: float, spec: str = "") -> str:
+    """Format ``value`` with ``spec``, signing it with the typographic minus.
+
+    For the readings that are built with an explicit format spec rather than
+    through :func:`format_number` -- a ``"+.1f"`` correction that must show its
+    sign, a ``":g"`` that must not show trailing zeros.
+
+    Only the leading sign is rewritten. The hyphen inside the number's own text
+    (the exponent of ``1e-05``) is left alone, which is why this takes the value
+    and its spec rather than the finished string: once a label is assembled
+    there is no telling a minus from the hyphen of a standard designation such
+    as "IEC 61672-1", of a compound name, or of a range.
+
+    Localise afterwards, not before: :func:`decimal_comma` only touches the
+    decimal point, so the order of the two is free, but the sign has to be
+    settled before the string reaches a translation table keyed by the text as
+    it is drawn.
+    """
+    return _MINUS_RE.sub("\\1−", format(value, spec), count=1)
 
 
 def decimal_comma(value: str, language: str = "en") -> str:
