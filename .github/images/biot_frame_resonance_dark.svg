@@ -1501,7 +1501,7 @@ z
    </g>
    <g id="text_18">
     <!-- Glass wool, 100 mm glued to a rigid wall: porosity 0.94, -->
-    <g style="fill: #ffffff" transform="translate(52.881096 366.440381) scale(0.085 -0.085)">
+    <g style="fill: #ffffff" transform="translate(241.675828 180.541133) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-2a" d="M 3809 666 
 L 3809 1919 
@@ -1680,7 +1680,7 @@ z
      <use xlink:href="#DejaVuSans-f" transform="translate(2760.921875 0)"/>
     </g>
     <!-- flow resistivity 40 kPa s/m², frame density 130 kg/m³, -->
-    <g style="fill: #ffffff" transform="translate(52.881096 376.642705) scale(0.085 -0.085)">
+    <g style="fill: #ffffff" transform="translate(241.675828 190.743457) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-13b0" d="M 1831 4863 
 L 3431 4863 
@@ -1848,7 +1848,7 @@ z
      <use xlink:href="#DejaVuSans-f" transform="translate(2648.90625 0)"/>
     </g>
     <!-- shear modulus 2.2 MPa -->
-    <g style="fill: #ffffff" transform="translate(52.881096 386.845029) scale(0.085 -0.085)">
+    <g style="fill: #ffffff" transform="translate(241.675828 200.945781) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-4b" d="M 3513 2113 
 L 3513 0 

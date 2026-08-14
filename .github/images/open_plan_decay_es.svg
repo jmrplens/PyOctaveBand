@@ -2088,17 +2088,17 @@ L 598.925781 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_13">
-    <path d="M 303.03308 153.912962 
-Q 332.566427 160.207179 361.115646 166.291655 
+    <path d="M 415.563513 133.367307 
+Q 390.647151 149.596983 366.57393 165.277465 
 " style="fill: none; stroke: #d62728; stroke-width: 0.9; stroke-linecap: round"/>
-    <path d="M 357.969914 163.780804 
-L 361.115646 166.291655 
-L 357.219526 167.30173 
+    <path d="M 370.57287 164.820867 
+L 366.57393 165.277465 
+L 368.608015 161.804355 
 " style="fill: none; stroke: #d62728; stroke-width: 0.9; stroke-linecap: round"/>
    </g>
    <g id="text_31">
     <!-- $r_D$ = 6,7 m -->
-    <g style="fill: #d62728" transform="translate(251.015738 150.286125) scale(0.09 -0.09)">
+    <g style="fill: #d62728" transform="translate(403.193732 128.110125) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSans-Oblique-55" transform="translate(0 0.78125)"/>
      <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(41.113281 -14.218701) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(97.749023 0.78125)"/>

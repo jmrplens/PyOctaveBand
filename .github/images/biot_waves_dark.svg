@@ -1433,7 +1433,7 @@ L 70.059344 33.230425
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_12">
-     <!-- Airborne, Re$(\delta)$ -->
+     <!-- Airborne, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 36.145925) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-24" d="M 2188 4044 
@@ -1560,7 +1560,7 @@ L 70.059344 45.727377
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #aec7e8; stroke-width: 1.5"/>
     </g>
     <g id="text_13">
-     <!-- Airborne, $-$Im$(\delta)$ -->
+     <!-- Airborne, $-\mathrm{Im}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 48.642877) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-c9c" d="M 678 2272 
@@ -1603,7 +1603,7 @@ L 70.059344 58.22433
 " style="fill: none; stroke: #d62728; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_14">
-     <!-- Frame-borne, Re$(\delta)$ -->
+     <!-- Frame-borne, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 61.13983) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-29" d="M 628 4666 
@@ -1654,7 +1654,7 @@ L 70.059344 70.721282
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.5"/>
     </g>
     <g id="text_15">
-     <!-- Frame-borne, $-$Im$(\delta)$ -->
+     <!-- Frame-borne, $-\mathrm{Im}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 73.636782) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(50.519531 0.015625)"/>
@@ -1684,7 +1684,7 @@ L 70.059344 83.218234
 " style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
     </g>
     <g id="text_16">
-     <!-- Shear, Re$(\delta)$ -->
+     <!-- Shear, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 86.133734) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-36" d="M 3425 4513 

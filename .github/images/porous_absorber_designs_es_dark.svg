@@ -1735,12 +1735,12 @@ L 705.983125 401.277577
 " clip-path="url(#p2636f85e0e)" style="fill: none; stroke: #9467bd; stroke-width: 2.2; stroke-linecap: square"/>
    </g>
    <g id="line2d_59">
-    <path d="M 405.60949 401.313437 
+    <path d="M 405.60949 369.649636 
 L 405.60949 28.798125 
 " clip-path="url(#p2636f85e0e)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.8; stroke-width: 1.1"/>
    </g>
    <g id="line2d_60">
-    <path d="M 238.815243 401.313437 
+    <path d="M 238.815243 369.649636 
 L 238.815243 28.798125 
 " clip-path="url(#p2636f85e0e)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #9467bd; stroke-opacity: 0.8; stroke-width: 1.1"/>
    </g>
@@ -1766,7 +1766,7 @@ L 705.983125 28.798125
    </g>
    <g id="text_16">
     <!-- Forma cerrada de Helmholtz -->
-    <g style="fill: #2ca02c" transform="translate(417.701748 249.54794) rotate(-90) scale(0.085 -0.085)">
+    <g style="fill: #2ca02c" transform="translate(417.701748 298.029563) rotate(-90) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-50" d="M 3328 2828 
 Q 3544 3216 3844 3400 
@@ -1855,7 +1855,7 @@ z
    </g>
    <g id="text_17">
     <!-- Forma cerrada de membrana -->
-    <g style="fill: #9467bd" transform="translate(250.907501 249.54794) rotate(-90) scale(0.085 -0.085)">
+    <g style="fill: #9467bd" transform="translate(257.652311 242.871253) rotate(-90) scale(0.085 -0.085)">
      <use xlink:href="#DejaVuSans-29"/>
      <use xlink:href="#DejaVuSans-52" transform="translate(53.953125 0)"/>
      <use xlink:href="#DejaVuSans-55" transform="translate(115.140625 0)"/>
@@ -1885,7 +1885,7 @@ z
    </g>
    <g id="text_18">
     <!-- Incidencia normal, respaldo rígido, 50 mm de profundidad total -->
-    <g style="fill: #ffffff" transform="translate(426.471507 388.095986) scale(0.085 -0.085)">
+    <g style="fill: #ffffff" transform="translate(347.094188 385.860894) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-2c" d="M 628 4666 
 L 1259 4666 

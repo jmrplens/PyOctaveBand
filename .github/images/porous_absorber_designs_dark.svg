@@ -1755,12 +1755,12 @@ L 705.583125 400.797577
 " clip-path="url(#p0508f5f956)" style="fill: none; stroke: #9467bd; stroke-width: 2.2; stroke-linecap: square"/>
    </g>
    <g id="line2d_59">
-    <path d="M 405.20949 400.833437 
+    <path d="M 405.20949 369.169636 
 L 405.20949 28.318125 
 " clip-path="url(#p0508f5f956)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #2ca02c; stroke-opacity: 0.8; stroke-width: 1.1"/>
    </g>
    <g id="line2d_60">
-    <path d="M 238.415243 400.833437 
+    <path d="M 238.415243 369.169636 
 L 238.415243 28.318125 
 " clip-path="url(#p0508f5f956)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #9467bd; stroke-opacity: 0.8; stroke-width: 1.1"/>
    </g>
@@ -1786,7 +1786,7 @@ L 705.583125 28.318125
    </g>
    <g id="text_16">
     <!-- Helmholtz closed form -->
-    <g style="fill: #2ca02c" transform="translate(417.301748 249.06794) rotate(-90) scale(0.085 -0.085)">
+    <g style="fill: #2ca02c" transform="translate(417.301748 272.151829) rotate(-90) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-4f" d="M 603 4863 
 L 1178 4863 
@@ -1870,7 +1870,7 @@ z
    </g>
    <g id="text_17">
     <!-- Membrane closed form -->
-    <g style="fill: #9467bd" transform="translate(250.507501 249.06794) rotate(-90) scale(0.085 -0.085)">
+    <g style="fill: #9467bd" transform="translate(257.252311 216.069144) rotate(-90) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-30" d="M 628 4666 
 L 1569 4666 
@@ -1913,7 +1913,7 @@ z
    </g>
    <g id="text_18">
     <!-- Normal incidence, rigid backing, 50 mm total depth -->
-    <g style="fill: #ffffff" transform="translate(475.985101 387.615986) scale(0.085 -0.085)">
+    <g style="fill: #ffffff" transform="translate(396.607782 385.380894) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-31" d="M 628 4666 
 L 1478 4666 

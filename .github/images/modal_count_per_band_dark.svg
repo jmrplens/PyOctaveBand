@@ -1990,7 +1990,7 @@ z
    </g>
    <g id="text_24">
     <!-- Schroeder frequency 185 Hz -->
-    <g style="fill: #ffffff" transform="translate(271.996947 173.390133) rotate(-90) scale(0.1 -0.1)">
+    <g style="fill: #ffffff" transform="translate(271.996947 215.642803) rotate(-90) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-36" d="M 3425 4513 
 L 3425 3897 
@@ -2332,29 +2332,29 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_14">
-     <path d="M 52.100781 60.521406 
-L 222.337187 60.521406 
-Q 224.137187 60.521406 224.137187 58.721406 
-L 224.137187 32.62 
-Q 224.137187 30.82 222.337187 30.82 
-L 52.100781 30.82 
-Q 50.300781 30.82 50.300781 32.62 
-L 50.300781 58.721406 
-Q 50.300781 60.521406 52.100781 60.521406 
+     <path d="M 51.400781 56.72125 
+L 202.722031 56.72125 
+Q 204.322031 56.72125 204.322031 55.12125 
+L 204.322031 31.92 
+Q 204.322031 30.32 202.722031 30.32 
+L 51.400781 30.32 
+Q 49.800781 30.32 49.800781 31.92 
+L 49.800781 55.12125 
+Q 49.800781 56.72125 51.400781 56.72125 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_15">
-     <path d="M 53.900781 41.258594 
-L 71.900781 41.258594 
-L 71.900781 34.958594 
-L 53.900781 34.958594 
+     <path d="M 53.000781 39.59875 
+L 69.000781 39.59875 
+L 69.000781 33.99875 
+L 53.000781 33.99875 
 z
 " style="fill: #d62728"/>
     </g>
     <g id="text_26">
      <!-- Below the Schroeder frequency -->
-     <g style="fill: #ffffff" transform="translate(79.100781 41.258594) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(75.400781 39.59875) scale(0.08 -0.08)">
       <defs>
        <path id="DejaVuSans-25" d="M 1259 2228 
 L 1259 519 
@@ -2437,16 +2437,16 @@ z
      </g>
     </g>
     <g id="patch_16">
-     <path d="M 53.900781 54.759297 
-L 71.900781 54.759297 
-L 71.900781 48.459297 
-L 53.900781 48.459297 
+     <path d="M 53.000781 51.599375 
+L 69.000781 51.599375 
+L 69.000781 45.999375 
+L 53.000781 45.999375 
 z
 " style="fill: #1f77b4"/>
     </g>
     <g id="text_27">
      <!-- Above it -->
-     <g style="fill: #ffffff" transform="translate(79.100781 54.759297) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(75.400781 51.599375) scale(0.08 -0.08)">
       <defs>
        <path id="DejaVuSans-24" d="M 2188 4044 
 L 1331 1722 

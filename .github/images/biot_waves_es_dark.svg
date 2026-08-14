@@ -1512,7 +1512,7 @@ L 70.059344 33.710425
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_12">
-     <!-- Onda del aire, Re$(\delta)$ -->
+     <!-- Onda del aire, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 36.625925) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-35" d="M 2841 2188 
@@ -1628,7 +1628,7 @@ L 70.059344 46.207377
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #aec7e8; stroke-width: 1.5"/>
     </g>
     <g id="text_13">
-     <!-- Onda del aire, $-$Im$(\delta)$ -->
+     <!-- Onda del aire, $-\mathrm{Im}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 49.122877) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-c9c" d="M 678 2272 
@@ -1676,7 +1676,7 @@ L 70.059344 58.70433
 " style="fill: none; stroke: #d62728; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_14">
-     <!-- Onda del esqueleto, Re$(\delta)$ -->
+     <!-- Onda del esqueleto, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 61.61983) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-54" d="M 947 1747 
@@ -1740,7 +1740,7 @@ L 70.059344 71.201282
 " style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.5"/>
     </g>
     <g id="text_15">
-     <!-- Onda del esqueleto, $-$Im$(\delta)$ -->
+     <!-- Onda del esqueleto, $-\mathrm{Im}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 74.116782) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-32" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(78.710938 0.015625)"/>
@@ -1777,7 +1777,7 @@ L 70.059344 83.698234
 " style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.5"/>
     </g>
     <g id="text_16">
-     <!-- Onda de cizalla, Re$(\delta)$ -->
+     <!-- Onda de cizalla, $\mathrm{Re}(\delta)$ -->
      <g style="fill: #ffffff" transform="translate(76.723344 86.613734) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-32" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(78.710938 0.015625)"/>

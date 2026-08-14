@@ -1942,7 +1942,7 @@ z
    </g>
    <g id="text_24">
     <!-- Frecuencia de Schroeder 185 Hz -->
-    <g transform="translate(271.996947 183.53029) rotate(-90) scale(0.1 -0.1)">
+    <g transform="translate(271.996947 235.443116) rotate(-90) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-36" d="M 3425 4513 
 L 3425 3897 
@@ -2357,29 +2357,29 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_14">
-     <path d="M 52.100781 61.001406 
-L 266.310625 61.001406 
-Q 268.110625 61.001406 268.110625 59.201406 
-L 268.110625 33.1 
-Q 268.110625 31.3 266.310625 31.3 
-L 52.100781 31.3 
-Q 50.300781 31.3 50.300781 33.1 
-L 50.300781 59.201406 
-Q 50.300781 61.001406 52.100781 61.001406 
+     <path d="M 51.400781 57.20125 
+L 241.809531 57.20125 
+Q 243.409531 57.20125 243.409531 55.60125 
+L 243.409531 32.4 
+Q 243.409531 30.8 241.809531 30.8 
+L 51.400781 30.8 
+Q 49.800781 30.8 49.800781 32.4 
+L 49.800781 55.60125 
+Q 49.800781 57.20125 51.400781 57.20125 
 z
 " style="fill: #ffffff; opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="patch_15">
-     <path d="M 53.900781 41.738594 
-L 71.900781 41.738594 
-L 71.900781 35.438594 
-L 53.900781 35.438594 
+     <path d="M 53.000781 40.07875 
+L 69.000781 40.07875 
+L 69.000781 34.47875 
+L 53.000781 34.47875 
 z
 " style="fill: #d62728"/>
     </g>
     <g id="text_26">
      <!-- Por debajo de la frecuencia de Schroeder -->
-     <g transform="translate(79.100781 41.738594) scale(0.09 -0.09)">
+     <g transform="translate(75.400781 40.07875) scale(0.08 -0.08)">
       <defs>
        <path id="DejaVuSans-33" d="M 1259 4147 
 L 1259 2394 
@@ -2486,16 +2486,16 @@ z
      </g>
     </g>
     <g id="patch_16">
-     <path d="M 53.900781 55.239297 
-L 71.900781 55.239297 
-L 71.900781 48.939297 
-L 53.900781 48.939297 
+     <path d="M 53.000781 52.079375 
+L 69.000781 52.079375 
+L 69.000781 46.479375 
+L 53.000781 46.479375 
 z
 " style="fill: #1f77b4"/>
     </g>
     <g id="text_27">
      <!-- Por encima -->
-     <g transform="translate(79.100781 55.239297) scale(0.09 -0.09)">
+     <g transform="translate(75.400781 52.079375) scale(0.08 -0.08)">
       <use xlink:href="#DejaVuSans-33"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(56.734375 0)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(117.921875 0)"/>

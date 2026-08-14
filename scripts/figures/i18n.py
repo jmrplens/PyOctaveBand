@@ -1394,8 +1394,14 @@ _ES_EXACT = {
     "Critical-band rate $z$ [Bark]": "Raz\u00f3n de banda cr\u00edtica $z$ [Bark]",
     "Specific loudness N' [sone/Bark]":
         "Sonoridad espec\u00edfica N' [sonios/Bark]",
-    "Specific loudness $N\u2032$ [sone/Bark]":
-        "Sonoridad espec\u00edfica $N\u2032$ [sonios/Bark]",
+    # The library renderer composes the prime now, so the key follows the
+    # drawn text; loudness_pattern and sharpness_pair_and_targets reach this
+    # entry through a `res.plot(ax=...)` with no language.
+    # Raw string with the accent typed as a character: raw because `\prime`
+    # must stay a backslash, and a raw string cannot spell the accent as a
+    # `\u`-escape -- it would ship the seven characters literally.
+    r"Specific loudness $N^{\prime}$ [sone/Bark]":
+        "Sonoridad espec\u00edfica $N^{\\prime}$ [sonios/Bark]",
     "Shaded area = total loudness $N$":
         "\u00c1rea sombreada = sonoridad total $N$",
     "STI vs Reverberation Time (IEC 60268-16)":
@@ -2761,7 +2767,10 @@ _ES_EXACT = {
     "Standard uncertainty $\\pm u$": "Incertidumbre típica $\\pm u$",
     "Expanded uncertainty $\\pm U$ (95 %)":
         "Incertidumbre expandida $\\pm U$ (95 %)",
-    r"$R^{\prime}_w \\pm U$ (single number)": r"$R^{\prime}_w \\pm U$ (valor único)",
+    # One backslash, not two: the key must equal the DRAWN text, and the
+    # renderer draws `\pm`, so a raw `\\pm` here is a different string and the
+    # lookup misses (which is exactly how the language gate caught this line).
+    r"$R^{\prime}_w \pm U$ (single number)": r"$R^{\prime}_w \pm U$ (valor único)",
     # Outdoor propagation & occupational exposure (PR-C).
     r"ISO 9613-1 Atmospheric Absorption $\alpha(f)$":
         r"Absorción atmosférica $\alpha(f)$ (ISO 9613-1)",

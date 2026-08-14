@@ -1169,17 +1169,17 @@ L 388.808835 28.798125
 " clip-path="url(#p28f392d734)" style="fill: none; stroke-dasharray: 1.6,2.64; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.6"/>
    </g>
    <g id="patch_7">
-    <path d="M 352.029295 42.186332 
-Q 367.212186 42.887 381.278232 43.536128 
+    <path d="M 150.084505 184.963129 
+Q 266.380972 114.837747 381.719996 45.289691 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 377.765038 41.572083 
-L 381.278232 43.536128 
-L 377.59908 45.168256 
+    <path d="M 377.707616 45.607193 
+L 381.719996 45.289691 
+L 379.56657 48.690096 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="text_8">
     <!-- pico de coincidencia: $\sigma$ = 2,60 -->
-    <g transform="translate(211.408016 41.188215) scale(0.09 -0.09)">
+    <g transform="translate(69.282297 194.834727) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-53" d="M 1159 525 
 L 1159 -1331 
