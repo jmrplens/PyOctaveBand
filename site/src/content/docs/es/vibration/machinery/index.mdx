@@ -3,6 +3,9 @@ title: "Maquinaria"
 description: "Leer una máquina desde su vibración: las familias cinemáticas de rodamiento, engranaje, motor y paso de pala calculadas a partir de la geometría, y la vía de filtrado en banda y envolvente que saca un defecto del ruido de fondo."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Una máquina rotativa tiene una **firma cinemática**. Toda periodicidad de su
 vibración pertenece a algo que gira, engrana o pasa, y la geometría fija la
 frecuencia antes de hacer ninguna medición: un rodamiento de quince elementos
@@ -64,18 +67,25 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Estas son **previsiones, no detecciones**. Aquí nada decide si una línea está
-presente, solo dónde estaría si lo estuviera: la superposición es un conjunto de
-expectativas contra las que leer un espectro medido, y la lectura es tuya. Un
-rodamiento cargado desliza un poco, así que espera el pico medido a un uno o dos
-por ciento de la previsión y no exactamente encima.
+presente, solo dónde estaría si lo estuviera: la superposición es un conjunto
+de expectativas contra las que leer un espectro medido, y la lectura es tuya.
+Un rodamiento cargado desliza un poco, así que espera el pico medido a un uno
+o dos por ciento de la previsión y no exactamente encima.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Tampoco hay ningún veredicto de severidad. Los criterios de amplitud que
 convierten una línea presente en una valoración — las tendencias del factor de
-cresta y de la curtosis, y las bandas de severidad en velocidad de las
-ISO 10816 / ISO 20816 — quedan fuera de este módulo, y el equilibrado de rotores
-(ISO 21940) y el seguimiento de órdenes faltan en la biblioteca por completo. Un
-convenio publicado difiere entre fuentes y se señala en la guía en vez de
+cresta y de la curtosis, y las bandas de severidad en velocidad de las ISO
+10816 / ISO 20816 — quedan fuera de este módulo, y el equilibrado de rotores
+(ISO 21940) y el seguimiento de órdenes faltan en la biblioteca por completo.
+Un convenio publicado difiere entre fuentes y se señala en la guía en vez de
 esconderse: la frecuencia de paso de polos es práctica habitual del
 mantenimiento predictivo y no de Norton, que da la propia frecuencia de
 deslizamiento como espaciado de las bandas laterales de una barra rota.
+</ScopeClaim>
+</Scope>
+

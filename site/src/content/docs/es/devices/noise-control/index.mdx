@@ -3,6 +3,9 @@ title: "Control de ruido"
 description: "Control de ruido industrial en el camino: el cálculo completo del ventilador a la sala y la cadena entre recintos frente a un criterio de diseño, más los modelos de elemento a los que llaman: silenciadores reactivos de cuatro polos, atenuación y ruido de flujo en conductos HVAC, y pérdida por inserción de cerramientos de máquina."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Un problema de control de ruido es un **presupuesto**, no una elección de
 componente. Entre una máquina y quien la oye hay un camino, y cada elemento de
 ese camino quita un número conocido de decibelios por banda; la pregunta de
@@ -86,22 +89,27 @@ límite laboral que corresponda, en [Exposición al ruido en el trabajo
 
 ## Qué no cubre esta sección
 
-Aquí no hay ninguna medición: todo número se predice a partir de la geometría y
-de unos datos declarados, y las normas de medición nombradas arriba se citan
+<Scope>
+<ScopeClaim status="not-covered">
+Aquí no hay ninguna medición: todo número se predice a partir de la geometría
+y de unos datos declarados, y las normas de medición nombradas arriba se citan
 como origen de las cifras de un proveedor, no se implementan. Dentro de las
 predicciones, tres límites son estructurales. **Solo se calculan los elementos
-de silenciador reactivos**: los silenciadores disipativos de conducto revestido
-se comentan para la selección, pero no se modelan a partir de las propiedades
-del revestimiento en ningún punto de la biblioteca, y las cifras de codo
-revestido y de plenum de la página de HVAC son tablas de instalación
+de silenciador reactivos**: los silenciadores disipativos de conducto
+revestido se comentan para la selección, pero no se modelan a partir de las
+propiedades del revestimiento en ningún punto de la biblioteca, y las cifras
+de codo revestido y de plenum de la página de HVAC son tablas de instalación
 interpoladas y no un modelo de revestimiento. **El flujo medio queda fuera de
 las matrices de elemento**: no aparecen la convección, los gradientes de
-temperatura ni la impedancia dependiente del flujo de los perforados, así que un
-silenciador que transporta un flujo apreciable se predice como si no lo hiciera.
-Y `enclosure_insertion_loss` **nunca predice la pérdida por transmisión del
-panel**: aportas tú una R medida o venida de otro modelo, y el módulo la combina
-con la corrección interior; predecir la propia R es [Diseño del
-aislamiento](/phonometry/es/buildings/design/). Por encima de la frecuencia de
-corte de los modos de orden superior deja de valer la hipótesis de onda plana en
-la que se apoya todo modelo de conducto, cosa que la página de ruido por
-conductos enuncia y que ningún método de aquí sortea.
+temperatura ni la impedancia dependiente del flujo de los perforados, así que
+un silenciador que transporta un flujo apreciable se predice como si no lo
+hiciera. Y `enclosure_insertion_loss` **nunca predice la pérdida por
+transmisión del panel**: aportas tú una R medida o venida de otro modelo, y el
+módulo la combina con la corrección interior; predecir la propia R es [Diseño
+del aislamiento](/phonometry/es/buildings/design/). Por encima de la
+frecuencia de corte de los modos de orden superior deja de valer la hipótesis
+de onda plana en la que se apoya todo modelo de conducto, cosa que la página
+de ruido por conductos enuncia y que ningún método de aquí sortea.
+</ScopeClaim>
+</Scope>
+

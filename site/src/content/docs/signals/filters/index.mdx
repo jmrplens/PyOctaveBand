@@ -3,6 +3,9 @@ title: "Octave filtering"
 description: "Fractional octave band analysis in phonometry: the ANSI S1.11 / IEC 61260-1 filter banks and their architectures, the IEC 61260-1 class verification, stateful block processing for streaming signals, and vectorized multichannel analysis."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Acoustic analysis rarely wants a raw FFT: standards, ratings and human hearing
 all work in **fractional octave bands**, frequency intervals whose width grows
 proportionally with frequency. phonometry implements them as banks of
@@ -64,18 +67,23 @@ parameters) consumes the band signals or band levels these pages produce.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 `verify_filter_class` checks a designed digital response against Table 1 of
-IEC 61260-1. The standard's conformance tests for the physical filter — overload
-recovery, linearity, the environmental influence quantities — apply to an
-instrument and are not implemented, so a class verdict here is a statement about
-the design and not about a device. Near Nyquist the bilinear transform warps
-the frequency axis and the bank carries no correction for it, unlike the
-`high_accuracy` option of the weighting filters: the stopband beyond the
-processing Nyquist is reported as `range_limited` rather than verified, so keep
-the top band edge comfortably below Nyquist or raise `fs`. Two operations do
-not stream: zero-phase forward-backward filtering needs the whole signal, and
-rank statistics such as L90 have to be computed once on the pooled
-envelope. And the per-channel path never mixes channels — delay between two
-microphones, or how much of one channel a second explains, is
-[Correlation and delay](/phonometry/signals/spectra/correlation-delay/) and
-[Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/).
+IEC 61260-1. The standard's conformance tests for the physical filter —
+overload recovery, linearity, the environmental influence quantities — apply
+to an instrument and are not implemented, so a class verdict here is a
+statement about the design and not about a device. Near Nyquist the bilinear
+transform warps the frequency axis and the bank carries no correction for it,
+unlike the `high_accuracy` option of the weighting filters: the stopband
+beyond the processing Nyquist is reported as `range_limited` rather than
+verified, so keep the top band edge comfortably below Nyquist or raise `fs`.
+Two operations do not stream: zero-phase forward-backward filtering needs the
+whole signal, and rank statistics such as L90 have to be computed once on the
+pooled envelope. And the per-channel path never mixes channels — delay between
+two microphones, or how much of one channel a second explains, is [Correlation
+and delay](/phonometry/signals/spectra/correlation-delay/) and [Multiple and
+partial coherence](/phonometry/signals/spectra/miso-coherence/).
+</ScopeClaim>
+</Scope>
+

@@ -26,8 +26,10 @@ references:
     note: "The alternating method of section 3, with the Annex A effective ratio of specific heats, validated against the standard's own Annex A.3 worked example."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Push air slowly through a porous absorber and it pushes back. That viscous
 drag, exerted by the pore walls on the air threading through them, is the
@@ -556,23 +558,29 @@ the model, is $\sigma$.
 
 ## What this guide covers
 
-**Covered.** Both parts of ISO 9053: the static method of Clause 7.5
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Both parts of ISO 9053: the static method of Clause 7.5
 (`static_airflow_resistance`, the through-origin regression and the 0.5 mm/s
-evaluation velocity) and the alternating method of ISO 9053-2 Formula (2)
-with the Annex A effective ratio of specific heats (`effective_kappa`,
+evaluation velocity) and the alternating method of ISO 9053-2 Formula (2) with
+the Annex A effective ratio of specific heats (`effective_kappa`,
 `thermal_boundary_layer_thickness`, `alternating_airflow_resistance`),
 including the 1-4 Hz and Formula (3)/(4) validity warnings, and the
 accredited-style ISO 9053-1 fiche. The definitional conversions that connect
 them to what a rig reads are `linear_airflow_velocity` (Clause 3.4),
 `specific_airflow_resistance` (Clause 3.2, in both call forms) and
 `piston_volume_flow_rate` (ISO 9053-2 Clause 6.2).
+</ScopeClaim>
 
-**Not covered.** The equivalent-fluid models that consume the resistivity
-(Delany-Bazley, Miki, Johnson-Champoux-Allard) live in
-[Porous and Multilayer Absorbers](/phonometry/materials/absorbers/porous-absorbers/), and
-the $\sigma d$ design window of section 4 is engineering guidance, not part
-of either standard. ISO 9053-1 defines no pass/fail verdict or single-number
+<ScopeClaim status="not-covered" label="Not covered">
+The equivalent-fluid models that consume the resistivity (Delany-Bazley, Miki,
+Johnson-Champoux-Allard) live in [Porous and Multilayer
+Absorbers](/phonometry/materials/absorbers/porous-absorbers/), and the
+$\sigma d$ design window of section 4 is engineering guidance, not part of
+either standard. ISO 9053-1 defines no pass/fail verdict or single-number
 rating, so the fiche carries neither.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

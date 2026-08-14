@@ -39,8 +39,10 @@ references:
     note: "La práctica SAE de absorción atmosférica predecesora, origen del método aproximado limitado a 50 dB con el que se contrasta el método SAE."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 El **nivel efectivo de ruido percibido (EPNL)** es la métrica de certificación
@@ -540,24 +542,28 @@ evento único, es el método de ECAC Doc 29 de
 
 ## Qué cubre esta guía
 
-**Cubierto.** El Anexo 16 de la OACI, Vol. I, Apéndice 2: la ruidosidad
-percibida y el PNL de la Tabla A2-3 (`perceived_noisiness`,
-`perceived_noise_level`), la corrección tonal por el método de pendientes
-(`tone_correction`, que reproduce el ejemplo del turbofán de la Tabla 3-7 del
-ETM Vol. I) y la cadena EPNL completa (`effective_perceived_noise_level`, que
-reproduce el ejemplo de la Tabla 4-4 del ETM Vol. I). Las tolerancias del
-sistema de medida de la IEC 61265:1995 mediante `verify_aircraft_noise_system`.
-La absorción atmosférica en banda de la SAE ARP 5534 mediante
-`sae_band_attenuation`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El Anexo 16 de la OACI, Vol. I, Apéndice 2: la ruidosidad percibida y el PNL
+de la Tabla A2-3 (`perceived_noisiness`, `perceived_noise_level`), la
+corrección tonal por el método de pendientes (`tone_correction`, que reproduce
+el ejemplo del turbofán de la Tabla 3-7 del ETM Vol. I) y la cadena EPNL
+completa (`effective_perceived_noise_level`, que reproduce el ejemplo de la
+Tabla 4-4 del ETM Vol. I). Las tolerancias del sistema de medida de la IEC
+61265:1995 mediante `verify_aircraft_noise_system`. La absorción atmosférica
+en banda de la SAE ARP 5534 mediante `sae_band_attenuation`.
+</ScopeClaim>
 
-**No cubierto.** El ajuste del §8 del Apéndice 2 de un EPNL medido a condiciones
-de referencia no está implementado, ni en su forma simplificada ni en la
-integrada: el EPNL que se devuelve es el valor tal cual se ha medido, así que
-primero se ajusta y luego se informa frente a un límite.
-`verify_aircraft_noise_system` comprueba las tolerancias de
-la IEC 61265:1995, no la edición sucesora de 2018. La cadena de ruido de
-aeropuerto de ECAC Doc 29 se ha trasladado a
-[Ruido de aeropuertos](/phonometry/es/aircraft/airport-noise/).
+<ScopeClaim status="not-covered" label="No cubierto">
+El ajuste del §8 del Apéndice 2 de un EPNL medido a condiciones de referencia
+no está implementado, ni en su forma simplificada ni en la integrada: el EPNL
+que se devuelve es el valor tal cual se ha medido, así que primero se ajusta y
+luego se informa frente a un límite. `verify_aircraft_noise_system` comprueba
+las tolerancias de la IEC 61265:1995, no la edición sucesora de 2018. La
+cadena de ruido de aeropuerto de ECAC Doc 29 se ha trasladado a [Ruido de
+aeropuertos](/phonometry/es/aircraft/airport-noise/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

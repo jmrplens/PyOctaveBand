@@ -76,24 +76,25 @@ judged against.
 
 The determination methods start after the facility and the probe have been
 qualified. ISO 3745's free-field qualification of an anechoic or hemi-anechoic
-room, ISO 3741's reverberation-room qualification (eigenfrequency counting or a
-reference-source comparison) and the IEC 61043 residual-intensity test of a
+room, ISO 3741's reverberation-room qualification (eigenfrequency counting or
+a reference-source comparison) and the IEC 61043 residual-intensity test of a
 probe-and-analyser chain are all **assumed, not performed**: the library warns
 on the coarse advisory criteria the standards state explicitly — the Table 1
 minimum volume, the position count, an inter-position spread above 1.5 dB, the
 ISO 3744 K₂ validity — and grades a residual-intensity index you measured
 yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
-air-absorption coefficient you supply; it is not computed from ISO 9613-1 here.
+air-absorption coefficient you supply; it is not computed from ISO 9613-1
+here.
 
 One route is absent by design: **ISO 9614-1's discrete fixed-point power
 summation is not implemented at all**, and only its Annex A field indicators
 are, reused by the two scanning parts. On the vibration route, the measurement
-clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather than
-code, and only the single-machine radiation factor of Formula 8 is implemented,
-so a batch or family determination needs an already-averaged value. Finally,
-nothing here reduces a machine's emission: quieting a source is [Noise
-control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared emission value is
-the input to that work, not its result.
+clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
+than code, and only the single-machine radiation factor of Formula 8 is
+implemented, so a batch or family determination needs an already-averaged
+value. Finally, nothing here reduces a machine's emission: quieting a source
+is [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
+emission value is the input to that work, not its result.
 
 ---
 

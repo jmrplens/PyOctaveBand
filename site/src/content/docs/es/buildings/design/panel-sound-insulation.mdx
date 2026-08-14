@@ -62,6 +62,8 @@ references:
     note: "Tabla 1: los mismos tipos de llave medidos con una cámara de 85 mm (mariposa 1,1 MN/m, doble triángulo 4,3 MN/m), que corroboran el orden de la Tabla A4 pero no sus valores, porque la rigidez dinámica se define para una anchura de cámara dada."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
@@ -997,60 +999,64 @@ panel; la rendija sin viscosidad de Gomperts válida para $w < 0{,}3\lambda$;
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las propias fórmulas fuente: la ley de masas del apartado
-7.2 de Bies y el método de coincidencia de Sharp (Ec. 7.40/7.42/7.44) para
-un panel simple, la resonancia masa-muelle-masa de la pared doble y su
-ganancia de cámara que satura (Ec. 7.62-7.64), los coeficientes de
-transmisión de rendija de Gomperts y de orificio circular de Wilson y
-Soroka de Hopkins con la suma compuesta ponderada por área (Ec. 4.92), la
-eficiencia de radiación de placa de Leppington/Maidanik
-(Ec. 2.227-2.230), y las impedancias y movilidades puntuales de placas y
-vigas infinitas de la Tabla 5.1 de Cremer con la relación de potencia
-inyectada, mediante `single_panel_transmission_loss`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las propias fórmulas fuente: la ley de masas del apartado 7.2 de Bies y el
+método de coincidencia de Sharp (Ec. 7.40/7.42/7.44) para un panel simple, la
+resonancia masa-muelle-masa de la pared doble y su ganancia de cámara que
+satura (Ec. 7.62-7.64), los coeficientes de transmisión de rendija de Gomperts
+y de orificio circular de Wilson y Soroka de Hopkins con la suma compuesta
+ponderada por área (Ec. 4.92), la eficiencia de radiación de placa de
+Leppington/Maidanik (Ec. 2.227-2.230), y las impedancias y movilidades
+puntuales de placas y vigas infinitas de la Tabla 5.1 de Cremer con la
+relación de potencia inyectada, mediante `single_panel_transmission_loss`,
 `double_wall_transmission_loss`, `slit_transmission_coefficient`,
 `composite_transmission_loss`, `radiation_efficiency`,
 `infinite_plate_impedance`, `infinite_beam_mobility` e `injected_power`. A
 ellas se suma el capítulo ortótropo de Vigran: el rango de coincidencia de un
 panel nervado o grecado y su pérdida por transmisión aplanada, por la integral
-en campo difuso o por la forma cerrada de Heckl (Ec. 6.107-6.113), las rigideces
-equivalentes de Timoshenko de una greca sinusoidal (Ec. 3.115) y la
+en campo difuso o por la forma cerrada de Heckl (Ec. 6.107-6.113), las
+rigideces equivalentes de Timoshenko de una greca sinusoidal (Ec. 3.115) y la
 frecuencia propia de placa ortótropa (Ec. 3.113), mediante
 `orthotropic_transmission_loss`, `orthotropic_critical_frequencies`,
 `corrugated_plate_stiffness`, `corrugated_plate_mass_factor` y
-`orthotropic_plate_resonance`. Los muros de fábrica con cámara añaden el puente
-de las llaves de las Secciones 3.11.3.2 y 4.3.5.4.1 de Hopkins: las rigideces
-dinámicas de la Tabla A4, el conjunto de llaves actuando en paralelo con el
-aire de la cámara (Ec. 4.89, accesible con el argumento
+`orthotropic_plate_resonance`. Los muros de fábrica con cámara añaden el
+puente de las llaves de las Secciones 3.11.3.2 y 4.3.5.4.1 de Hopkins: las
+rigideces dinámicas de la Tabla A4, el conjunto de llaves actuando en paralelo
+con el aire de la cámara (Ec. 4.89, accesible con el argumento
 `tie_stiffness_per_area` de `mass_spring_mass_resonance` y
 `double_wall_transmission_loss`) y el factor de pérdidas por acoplamiento de
 unión puntual con conector de muelle lineal (Ecs. 4.87 y 4.88), mediante
 `wall_tie_stiffness`, `wall_tie_stiffness_per_area` y
 `wall_tie_coupling_loss_factor`.
+</ScopeClaim>
 
-**No cubierto.** Cada predicción se mantiene dentro del rango de validez
-que declara su fuente, que la guía señala pero no extiende: el método de
-Sharp (y por tanto `single_panel_transmission_loss`) no es válido por
-debajo de aproximadamente $1{,}5\times$ la primera resonancia del panel,
-donde manda el propio comportamiento modal de baja frecuencia del panel,
-no la ley de masas; el modelo de rendija de Gomperts solo es válido para
-una rendija estrecha, $w < 0{,}3\lambda$, así que una abertura ancha queda
-fuera de él; y solo está implementado el «método n.º 1» de Leppington
-para la eficiencia de radiación, no sus otras formulaciones publicadas.
-Los modelos ortótropos son modelos de panel infinito en las mismas
-condiciones: por debajo de unos $0{,}7f_{c1}$ la rama de Heckl infravalora $R$
-en paneles pequeños, y el valle entre 2 kHz y 4 kHz que muestra la chapa grecada
-real proviene de resonancias de los tramos de panel entre nervios, que ninguna
-de las dos vías predice. Solo la greca sinusoidal tiene aquí rigideces
-equivalentes; la chapa trapezoidal necesita las suyas, de la bibliografía que
-cita Vigran.
-El modelo de llaves está en la misma situación por su lado de salida: las
-entradas son datos impresos, pero no hay tabulado ningún índice de reducción
-acústica publicado de un muro de fábrica con cámara puenteado, así que la
-penalización por bandas que causan las llaves no tiene oráculo numérico y solo
-está anclado el desplazamiento de la resonancia (Hopkins Fig. 4.35, de 26 Hz a
-50 Hz). El factor de pérdidas por acoplamiento no se introduce aquí en un
-análisis estadístico de energía completo; combinarlo con el camino aéreo
-exigiría toda la cadena sala-placa-cámara-placa-sala.
+<ScopeClaim status="not-covered" label="No cubierto">
+Cada predicción se mantiene dentro del rango de validez que declara su fuente,
+que la guía señala pero no extiende: el método de Sharp (y por tanto
+`single_panel_transmission_loss`) no es válido por debajo de aproximadamente
+$1{,}5\times$ la primera resonancia del panel, donde manda el propio
+comportamiento modal de baja frecuencia del panel, no la ley de masas; el
+modelo de rendija de Gomperts solo es válido para una rendija estrecha,
+$w < 0{,}3\lambda$, así que una abertura ancha queda fuera de él; y solo está
+implementado el «método n.º 1» de Leppington para la eficiencia de radiación,
+no sus otras formulaciones publicadas. Los modelos ortótropos son modelos de
+panel infinito en las mismas condiciones: por debajo de unos $0{,}7f_{c1}$ la
+rama de Heckl infravalora $R$ en paneles pequeños, y el valle entre 2 kHz y 4
+kHz que muestra la chapa grecada real proviene de resonancias de los tramos de
+panel entre nervios, que ninguna de las dos vías predice. Solo la greca
+sinusoidal tiene aquí rigideces equivalentes; la chapa trapezoidal necesita
+las suyas, de la bibliografía que cita Vigran. El modelo de llaves está en la
+misma situación por su lado de salida: las entradas son datos impresos, pero
+no hay tabulado ningún índice de reducción acústica publicado de un muro de
+fábrica con cámara puenteado, así que la penalización por bandas que causan
+las llaves no tiene oráculo numérico y solo está anclado el desplazamiento de
+la resonancia (Hopkins Fig. 4.35, de 26 Hz a 50 Hz). El factor de pérdidas por
+acoplamiento no se introduce aquí en un análisis estadístico de energía
+completo; combinarlo con el camino aéreo exigiría toda la cadena
+sala-placa-cámara-placa-sala.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

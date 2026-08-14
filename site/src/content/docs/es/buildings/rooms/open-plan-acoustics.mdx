@@ -19,8 +19,10 @@ references:
     note: "El modelo de ruido autogenerado por los ocupantes del capítulo 17, ecuaciones (17.50) a (17.54)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una oficina diáfana no es un problema de reverberación; es un problema de
 privacidad, y una sala que queda bien en los parámetros de sala cerrada puede
@@ -675,40 +677,45 @@ y `absorption_per_table` son invocables directamente.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las magnitudes de oficina diáfana del apartado 4 y los
-apartados 6.2/6.3 de la ISO 3382-3:2012 ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$,
-$r_P$) de `room.open_plan_metrics`, con el dibujo a escala de la línea de
-medición (`room.plot_open_plan_geometry` y `.plot_geometry()`) y la ficha
-ISO 3382-3 de una página con `.report()`. Las condiciones de medición de los
-apartados 5.1 y 5.2 y los intervalos de calidad del Anexo A se citan aquí para
-planificar y para leer los resultados. El modelo de ruido autogenerado por
-los ocupantes del capítulo 17 de *Architectural Acoustics* 2.ª ed. de Long
-(ecs. (17.50) a (17.54)) mediante `room.crowd_noise` y sus piezas, con la
-ventana de diseño de las ecs. (17.53)-(17.54) y su condición de cierre.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las magnitudes de oficina diáfana del apartado 4 y los apartados 6.2/6.3 de la
+ISO 3382-3:2012 ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de
+`room.open_plan_metrics`, con el dibujo a escala de la línea de medición
+(`room.plot_open_plan_geometry` y `.plot_geometry()`) y la ficha ISO 3382-3 de
+una página con `.report()`. Las condiciones de medición de los apartados 5.1 y
+5.2 y los intervalos de calidad del Anexo A se citan aquí para planificar y
+para leer los resultados. El modelo de ruido autogenerado por los ocupantes
+del capítulo 17 de *Architectural Acoustics* 2.ª ed. de Long (ecs. (17.50) a
+(17.54)) mediante `room.crowd_noise` y sus piezas, con la ventana de diseño de
+las ecs. (17.53)-(17.54) y su condición de cierre.
+</ScopeClaim>
 
-**No cubierto.** El STI por posición de la ISO 3382-3 se toma como entrada
-de `open_plan_metrics` en lugar de calcularse dentro de la función: mídelo
-con las herramientas STIPA de la
-[guía del Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
-La cuarta magnitud de número único exigida, el ruido de fondo medio ponderado A
-$L_{p,A,B}$, tampoco se calcula aquí: es la media energética ponderada A de los
-niveles de fondo por banda de octava de cada posición, y le corresponde ir en el
-informe junto a las tres que sí produce esta página.
-Tampoco **se comprueba** ninguna de las condiciones de medición de los
-apartados 5.1 y 5.2: la función consume distancias, niveles y valores de STI
-vengan de donde vengan, así que la directividad de la fuente, el estado amueblado
-y desocupado y la captura del ruido de fondo son responsabilidad del operador y
-no de la biblioteca. La edición implementada está fijada en la
-ISO 3382-3:2012; la revisión sucesora ISO 3382-3:2022 retira la distancia de
-privacidad $r_P$, añade la distancia de confort $r_C$ y traslada el STI por
-posición al método indirecto de la IEC 60268-16, y no es la comprobada aquí.
-El modelo de ruido autogenerado es un
-cálculo de *diseño* y deliberadamente no modela el reflejo de Lombard: se
-cancela en $L_{SN}$ mientras todo el mundo alce la voz por igual, de modo que
-el modelo explica por qué el nivel se dispara en una sala dura, no dónde se
-detiene. Supone además un campo reverberante difuso y una única cifra de
-absorción por mesa, así que no dice nada de las mamparas, la absorción local
-ni de dónde está cada mesa dentro de la sala.
+<ScopeClaim status="not-covered" label="No cubierto">
+El STI por posición de la ISO 3382-3 se toma como entrada de
+`open_plan_metrics` en lugar de calcularse dentro de la función: mídelo con
+las herramientas STIPA de la [guía del Índice de transmisión del
+habla](/phonometry/es/perception/speech/speech-transmission/). La cuarta
+magnitud de número único exigida, el ruido de fondo medio ponderado A
+$L_{p,A,B}$, tampoco se calcula aquí: es la media energética ponderada A de
+los niveles de fondo por banda de octava de cada posición, y le corresponde ir
+en el informe junto a las tres que sí produce esta página. Tampoco **se
+comprueba** ninguna de las condiciones de medición de los apartados 5.1 y 5.2:
+la función consume distancias, niveles y valores de STI vengan de donde
+vengan, así que la directividad de la fuente, el estado amueblado y desocupado
+y la captura del ruido de fondo son responsabilidad del operador y no de la
+biblioteca. La edición implementada está fijada en la ISO 3382-3:2012; la
+revisión sucesora ISO 3382-3:2022 retira la distancia de privacidad $r_P$,
+añade la distancia de confort $r_C$ y traslada el STI por posición al método
+indirecto de la IEC 60268-16, y no es la comprobada aquí. El modelo de ruido
+autogenerado es un cálculo de *diseño* y deliberadamente no modela el reflejo
+de Lombard: se cancela en $L_{SN}$ mientras todo el mundo alce la voz por
+igual, de modo que el modelo explica por qué el nivel se dispara en una sala
+dura, no dónde se detiene. Supone además un campo reverberante difuso y una
+única cifra de absorción por mesa, así que no dice nada de las mamparas, la
+absorción local ni de dónde está cada mesa dentro de la sala.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

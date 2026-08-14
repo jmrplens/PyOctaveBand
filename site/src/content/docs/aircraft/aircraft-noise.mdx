@@ -39,8 +39,10 @@ references:
     note: "The predecessor SAE atmospheric-absorption practice, source of the 50 dB-limited Approximate Method the SAE Method is contrasted with."
 ---
 
-import ThemeImage from '../../../components/ThemeImage.astro';
 import ReportPreview from '../../../components/ReportPreview.astro';
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
 The **Effective Perceived Noise Level (EPNL)** is the noise-certification metric
@@ -510,20 +512,26 @@ the ECAC Doc 29 method of
 
 ## What this guide covers
 
-**Covered.** ICAO Annex 16, Vol. I, Appendix 2: perceived noisiness and PNL
-from Table A2-3 (`perceived_noisiness`, `perceived_noise_level`), the slope-
-method tone correction (`tone_correction`, matching the ETM Vol. I Table 3-7
-turbofan example) and the full EPNL chain (`effective_perceived_noise_level`,
-matching the ETM Vol. I Table 4-4 example). IEC 61265:1995 measurement-system
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ICAO Annex 16, Vol. I, Appendix 2: perceived noisiness and PNL from Table A2-3
+(`perceived_noisiness`, `perceived_noise_level`), the slope- method tone
+correction (`tone_correction`, matching the ETM Vol. I Table 3-7 turbofan
+example) and the full EPNL chain (`effective_perceived_noise_level`, matching
+the ETM Vol. I Table 4-4 example). IEC 61265:1995 measurement-system
 tolerances via `verify_aircraft_noise_system`. SAE ARP 5534 band atmospheric
 absorption via `sae_band_attenuation`.
+</ScopeClaim>
 
-**Not covered.** The Appendix 2 §8 adjustment of a measured EPNL to reference
-conditions is not implemented, in either the simplified or the integrated form:
-the returned EPNL is the as-measured value, so adjust first and then report
-against a limit. `verify_aircraft_noise_system` checks the IEC 61265:1995
-tolerances, not the superseding 2018 edition. The ECAC Doc 29 airport-noise
-chain has moved to [Airport noise](/phonometry/aircraft/airport-noise/).
+<ScopeClaim status="not-covered" label="Not covered">
+The Appendix 2 §8 adjustment of a measured EPNL to reference conditions is not
+implemented, in either the simplified or the integrated form: the returned
+EPNL is the as-measured value, so adjust first and then report against a
+limit. `verify_aircraft_noise_system` checks the IEC 61265:1995 tolerances,
+not the superseding 2018 edition. The ECAC Doc 29 airport-noise chain has
+moved to [Airport noise](/phonometry/aircraft/airport-noise/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

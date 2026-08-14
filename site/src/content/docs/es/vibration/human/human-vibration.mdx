@@ -75,8 +75,10 @@ references:
     note: "Los valores de acción y límite de exposición contra los que se evalúa la exposición diaria A(8)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La vibración transmitida a una persona se evalúa con la misma cadena de medida
 sea cual sea su origen: la aceleración se **pondera en frecuencia** para reflejar
@@ -970,35 +972,39 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 8041-1:2017 en lo que define las ponderaciones
-frecuenciales: la cascada de etapas analógicas de la Tabla 3 (fórmulas
-(1)-(5)) que `frequency_weighting` y `apply_weighting` realizan para las
-nueve ponderaciones, reproduciendo las tablas de objetivo de diseño del
-Anexo B. La ISO 2631-1:1997 para la vibración de cuerpo entero, que cubre
-el valor eficaz ponderado $a_w$ y el valor total de vibración $a_v$
-(`weighted_acceleration`, `vibration_total_value`), las medidas de dosis
-MTVV, VDV, MSDV y factor de cresta, los cocientes de comparación del apartado
-6.3.3, la escala de confort del Anexo C y la lectura de mareo del Anexo D
-(`running_rms`, `motion_sickness_dose_value`), y la magnitud
-energético-equivalente del
-Anexo B (`energy_equivalent_acceleration`). La ISO 2631-2:2003 (`Wm`), la
-ISO 2631-4:2001 (`Wb`) y la ISO 5349-1/-2:2001 para la vibración transmitida
-a la mano, cuyo total vectorial, exposición diaria $A(8)$
-(`daily_vibration_exposure`, `wbv_exposure_basis`) y relación de dosis de
-dedo blanco por vibración del Anexo C (`hav_vwf_lifetime_years`) también se
-implementan. Los valores de acción y límite de la Directiva 2002/44/CE
-cierran la evaluación, redactada por `DailyVibrationExposure.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 8041-1:2017 en lo que define las ponderaciones frecuenciales: la
+cascada de etapas analógicas de la Tabla 3 (fórmulas (1)-(5)) que
+`frequency_weighting` y `apply_weighting` realizan para las nueve
+ponderaciones, reproduciendo las tablas de objetivo de diseño del Anexo B. La
+ISO 2631-1:1997 para la vibración de cuerpo entero, que cubre el valor eficaz
+ponderado $a_w$ y el valor total de vibración $a_v$ (`weighted_acceleration`,
+`vibration_total_value`), las medidas de dosis MTVV, VDV, MSDV y factor de
+cresta, los cocientes de comparación del apartado 6.3.3, la escala de confort
+del Anexo C y la lectura de mareo del Anexo D (`running_rms`,
+`motion_sickness_dose_value`), y la magnitud energético-equivalente del Anexo
+B (`energy_equivalent_acceleration`). La ISO 2631-2:2003 (`Wm`), la ISO
+2631-4:2001 (`Wb`) y la ISO 5349-1/-2:2001 para la vibración transmitida a la
+mano, cuyo total vectorial, exposición diaria $A(8)$
+(`daily_vibration_exposure`, `wbv_exposure_basis`) y relación de dosis de dedo
+blanco por vibración del Anexo C (`hav_vwf_lifetime_years`) también se
+implementan. Los valores de acción y límite de la Directiva 2002/44/CE cierran
+la evaluación, redactada por `DailyVibrationExposure.report()`.
+</ScopeClaim>
 
-**No cubierto.** El objeto propio de la ISO 8041-1, el diseño y los ensayos
-de tipo de los vibrómetros de uso general, no está implementado: de ella
-solo se toman las definiciones de las ponderaciones frecuenciales. La
-ISO 2631-5:2018, el modelo de respuesta espinal y riesgo de lesión por
-choques múltiples para la vibración de cuerpo entero, es una norma
-independiente con su propio módulo: consulta
-[Vibración con choques
-múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/)
-para registros con choques repetidos, a los que las medidas eficaz y VDV de
-esta página no sustituyen.
+<ScopeClaim status="not-covered" label="No cubierto">
+El objeto propio de la ISO 8041-1, el diseño y los ensayos de tipo de los
+vibrómetros de uso general, no está implementado: de ella solo se toman las
+definiciones de las ponderaciones frecuenciales. La ISO 2631-5:2018, el modelo
+de respuesta espinal y riesgo de lesión por choques múltiples para la
+vibración de cuerpo entero, es una norma independiente con su propio módulo:
+consulta [Vibración con choques
+múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/) para
+registros con choques repetidos, a los que las medidas eficaz y VDV de esta
+página no sustituyen.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

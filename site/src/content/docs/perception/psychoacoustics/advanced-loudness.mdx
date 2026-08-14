@@ -33,6 +33,8 @@ references:
     note: "The Sottek Hearing Model loudness (sone_HMS)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The Zwicker method of ISO 532-1 is the reference route to loudness in sones
@@ -521,23 +523,29 @@ Returns an `EcmaLoudness`: `loudness` ($N$, sone_HMS), `specific_loudness`
 
 ## What this guide covers
 
-**Covered.** The Glasberg and Moore (1990) ERB<sub>N</sub> bandwidth and Cam
-scale of Moore 6e pp. 76-77, via `erb_bandwidth()`, `cam_from_frequency()`
-and `frequency_from_cam()`. ISO 532-2:2017 (Moore-Glasberg): the roex
-excitation pattern of clause 7 and the binaural inhibition of clause 8, via
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The Glasberg and Moore (1990) ERB<sub>N</sub> bandwidth and Cam scale of Moore
+6e pp. 76-77, via `erb_bandwidth()`, `cam_from_frequency()` and
+`frequency_from_cam()`. ISO 532-2:2017 (Moore-Glasberg): the roex excitation
+pattern of clause 7 and the binaural inhibition of clause 8, via
 `loudness_moore_glasberg()` and its `_from_spectrum`/`_from_third_octave`
 variants. ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher): the short-term
 loudness of clause 7.8, the long-term loudness of clause 7.9 and its peak
-$N_\text{max}$, via `loudness_moore_glasberg_time()`. ECMA-418-2:2025 (Sottek Hearing
-Model): the loudness assembly of Clause 8, via `loudness_ecma()`.
+$N_\text{max}$, via `loudness_moore_glasberg_time()`. ECMA-418-2:2025 (Sottek
+Hearing Model): the loudness assembly of Clause 8, via `loudness_ecma()`.
+</ScopeClaim>
 
-**Not covered.** ECMA-418-2's binaural combination (Formula 118, Clause
-8.1.5) is not implemented: `loudness_ecma()` is monaural, so analyse each ear
-channel separately. ISO 532-3 Clause 5 prescribes resampling the input to
-32 kHz before the running FFT analysis. This implementation processes at the
-native sampling rate instead, a documented deviation that stays inside the
-standard's expanded uncertainty. Resample to 32 kHz first if strict
-clause-by-clause conformance matters.
+<ScopeClaim status="not-covered" label="Not covered">
+ECMA-418-2's binaural combination (Formula 118, Clause 8.1.5) is not
+implemented: `loudness_ecma()` is monaural, so analyse each ear channel
+separately. ISO 532-3 Clause 5 prescribes resampling the input to 32 kHz
+before the running FFT analysis. This implementation processes at the native
+sampling rate instead, a documented deviation that stays inside the standard's
+expanded uncertainty. Resample to 32 kHz first if strict clause-by-clause
+conformance matters.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

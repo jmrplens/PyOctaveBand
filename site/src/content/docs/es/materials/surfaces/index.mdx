@@ -3,6 +3,9 @@ title: "Superficies medidas in situ"
 description: "Superficies que no tienen probeta: por qué un pavimento se caracteriza donde está, la técnica de sustracción de ISO 13472-1 frente al tubo puntual de ISO 13472-2, a qué está acotado cada uno, y las ediciones que implementa la biblioteca."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Un coeficiente de cámara reverberante o de tubo de impedancia describe una
 *probeta*. Algunas superficies no tienen probeta. Un pavimento no se puede recortar
 y llevar a un laboratorio sin destruir justo aquello que gobierna su absorción
@@ -62,17 +65,22 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **El estado de las ediciones importa aquí más que en ningún otro sitio de esta
 área.** La implementación sigue ISO 13472-1:2002 e ISO 13472-2:2010; ambas se
 han revisado desde entonces — en 2022 y en 2025, respectivamente — y esas
 revisiones **no** están implementadas, así que un informe que cite la edición
 vigente no puede citar estas funciones sin matizarlo. Tampoco se duplica el
 tratamiento de señal propio del método puntual: aquí viven solo sus funciones
-de geometría, validez y corrección, y la reducción por función de transferencia
-de dos micrófonos es la rutina ISO 10534-2 de
-[Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/). Nada
-de esta subsección mide el ruido que una superficie *genera* — el término de
-fuente de rodadura es terreno de CNOSSOS, en [Fuentes
+de geometría, validez y corrección, y la reducción por función de
+transferencia de dos micrófonos es la rutina ISO 10534-2 de [Tubo de
+impedancia](/phonometry/es/materials/absorbers/impedance-tube/). Nada de esta
+subsección mide el ruido que una superficie *genera* — el término de fuente de
+rodadura es terreno de CNOSSOS, en [Fuentes
 ambientales](/phonometry/es/environment/sources/) — y no se ofrece ningún
 método in situ para otra superficie que no sea una carretera: una pared o un
 techo medidos donde están quedan fuera de las dos partes de ISO 13472.
+</ScopeClaim>
+</Scope>
+

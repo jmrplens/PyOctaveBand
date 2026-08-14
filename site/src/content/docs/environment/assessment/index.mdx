@@ -3,6 +3,9 @@ title: "Assessment and regulation"
 description: "Rating environmental noise once it has arrived: the ISO 1996-1 indicators and rating level, the ISO 1996-2 determination chain with its residual correction and uncertainty budget, the impulsive-sound adjustment, and a national application of the whole chain."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Propagation says what arrives at the receiver. Assessment says what it counts
 as, which is a separate question with its own standards. It is a chain with
 three links: an **indicator** averages the sound over a defined period;
@@ -76,6 +79,8 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 The library starts where the sound level meter stops. ISO 1996-2 fixes the
 receiver positions and the façade corrections that turn a raw measurement into
 the level these functions expect, and those position and correction procedures
@@ -91,3 +96,6 @@ appear only as the assessor's-judgement baseline the measurement replaces.
 Finally, no limit table other than the Spanish one is built in: a limit is
 national, and the library gives you the rating level to compare against
 whichever one applies.
+</ScopeClaim>
+</Scope>
+

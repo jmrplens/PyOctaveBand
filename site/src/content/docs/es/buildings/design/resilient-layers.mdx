@@ -38,6 +38,8 @@ references:
     note: "La medida de la rigidez dinámica por unidad de superficie s' de la que parte toda fórmula de esta página."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una capa elástica es la forma más barata de comprar aislamiento a ruido de
@@ -536,33 +538,38 @@ afirma, que es todo lo que se puede hacer honestamente sin ejemplo resuelto.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El impulso de fuerza de la máquina de impactos del apartado
-3.6.3 de Hopkins (ecs. 3.85, 3.90 a 3.92, 3.95 a 3.106) mediante
-`tapping_force_spectrum`, `force_pulse`, `plate_contact_stiffness`,
-`covering_contact_stiffness`, `tapping_cut_off_frequency`,
-`hammer_limiting_frequency` y `short_pulse_mean_square_force`; la mejora por
-revestimiento blando del apartado 4.4.3.1 de Hopkins (ec. 4.114 y la
-estimación de dos rectas) mediante `covering_improvement`; el anexo C de
-ISO 12354-2:2017 (fórmulas C.1 a C.6) con el apartado 4.4.4 de Hopkins y el
-8.4 de Vigran mediante `floating_floor_resonance_frequency`,
-`floating_floor_improvement_spectrum`, `weighted_floating_floor_improvement`,
-`combined_dynamic_stiffness`, `double_floating_floor_resonances` y
-`resilient_mount_improvement`; y el anexo D de ISO 12354-1:2017 (fórmulas D.1
-a D.8 y tabla D.1) mediante `lining_resonance_frequency`,
-`weighted_lining_improvement`, `lining_improvement` y
-`lining_improvement_in_situ`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El impulso de fuerza de la máquina de impactos del apartado 3.6.3 de Hopkins
+(ecs. 3.85, 3.90 a 3.92, 3.95 a 3.106) mediante `tapping_force_spectrum`,
+`force_pulse`, `plate_contact_stiffness`, `covering_contact_stiffness`,
+`tapping_cut_off_frequency`, `hammer_limiting_frequency` y
+`short_pulse_mean_square_force`; la mejora por revestimiento blando del
+apartado 4.4.3.1 de Hopkins (ec. 4.114 y la estimación de dos rectas) mediante
+`covering_improvement`; el anexo C de ISO 12354-2:2017 (fórmulas C.1 a C.6)
+con el apartado 4.4.4 de Hopkins y el 8.4 de Vigran mediante
+`floating_floor_resonance_frequency`, `floating_floor_improvement_spectrum`,
+`weighted_floating_floor_improvement`, `combined_dynamic_stiffness`,
+`double_floating_floor_resonances` y `resilient_mount_improvement`; y el anexo
+D de ISO 12354-1:2017 (fórmulas D.1 a D.8 y tabla D.1) mediante
+`lining_resonance_frequency`, `weighted_lining_improvement`,
+`lining_improvement` y `lining_improvement_in_situ`.
+</ScopeClaim>
 
-**No cubierto.** El modelo de fuerza supone una impedancia de punto de
-excitación independiente de la frecuencia, así que un forjado ligero con
-viguetas o rastreles, cuya impedancia cambia según dónde caiga el martillo,
-queda fuera; Hopkins remite allí a métodos numéricos. Los revestimientos
-blandos se tratan como resortes lineales y no se modela su falta de linealidad
-medida bajo la máquina de impactos. No hay predicción por bandas del
-$\Delta R(f)$ de una capa adicional: el anexo D es un método de magnitud
-global, y donde ISO 12354 necesita ese espectro o bien lo mide (anexo G de
-ISO 10140-1) o bien, para un suelo flotante, toma $\Delta R(f) = \Delta L(f)$,
-lo que su propio anexo L califica de aproximación burda. Las fuentes de
-impacto pesadas (la pelota de caucho) no las cubre ninguno de estos modelos.
+<ScopeClaim status="not-covered" label="No cubierto">
+El modelo de fuerza supone una impedancia de punto de excitación independiente
+de la frecuencia, así que un forjado ligero con viguetas o rastreles, cuya
+impedancia cambia según dónde caiga el martillo, queda fuera; Hopkins remite
+allí a métodos numéricos. Los revestimientos blandos se tratan como resortes
+lineales y no se modela su falta de linealidad medida bajo la máquina de
+impactos. No hay predicción por bandas del $\Delta R(f)$ de una capa
+adicional: el anexo D es un método de magnitud global, y donde ISO 12354
+necesita ese espectro o bien lo mide (anexo G de ISO 10140-1) o bien, para un
+suelo flotante, toma $\Delta R(f) = \Delta L(f)$, lo que su propio anexo L
+califica de aproximación burda. Las fuentes de impacto pesadas (la pelota de
+caucho) no las cubre ninguno de estos modelos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

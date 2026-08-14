@@ -33,6 +33,8 @@ references:
     note: "Sections 3.1.5 and 3.4 (microphone field effects and sound level meter calibration: the electrical and acoustic calibration practice this page's workflow follows). ISBN 978-1-4987-2405-0."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Every level this library reports is only as trustworthy as the one number
@@ -645,19 +647,25 @@ anything else.
 
 ## What this guide covers
 
-**Covered.** IEC 60942:2017 as far as it constrains the *sensitivity factor*:
-the principal calibrator level that `target_spl` assumes, the Table 2 and
-Table A.1 class tolerances quoted in the uncertainty discussion above, and the
-short-term level-fluctuation check of clause 5.3.3 against the class 1 limits of
-Table 2, which `sensitivity(ref, fs=fs)` runs on the reference recording.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+IEC 60942:2017 as far as it constrains the *sensitivity factor*: the principal
+calibrator level that `target_spl` assumes, the Table 2 and Table A.1 class
+tolerances quoted in the uncertainty discussion above, and the short-term
+level-fluctuation check of clause 5.3.3 against the class 1 limits of Table 2,
+which `sensitivity(ref, fs=fs)` runs on the reference recording.
+</ScopeClaim>
 
-**Not covered.** The conformance tests of the calibrator itself (generated
-level, frequency, distortion, and the environmental corrections for static
-pressure and temperature) are not implemented, so pass an already corrected
-`target_spl` when the calibrator's manual asks for one. The IEC 61672-3
-periodic tests are cited as laboratory practice, not run: nothing here verifies
-a sound level meter or assigns it a class. The dBFS half of the page sits
-outside any standard and makes no physical claim.
+<ScopeClaim status="not-covered" label="Not covered">
+The conformance tests of the calibrator itself (generated level, frequency,
+distortion, and the environmental corrections for static pressure and
+temperature) are not implemented, so pass an already corrected `target_spl`
+when the calibrator's manual asks for one. The IEC 61672-3 periodic tests are
+cited as laboratory practice, not run: nothing here verifies a sound level
+meter or assigns it a class. The dBFS half of the page sits outside any
+standard and makes no physical claim.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

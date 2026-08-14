@@ -25,8 +25,10 @@ references:
     note: "La norma madre frente a la que se confirman la corrección de ancho de banda de Hanning de −1,76 dB, el procedimiento iterativo del nivel de enmascaramiento y la lógica de detección/combinación (su programa de referencia del Anexo J)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Un tono estacionario inmerso en ruido de banda ancha resalta cuando emerge de
 forma audible por encima del ruido que de otro modo lo enmascararía, la
@@ -570,34 +572,37 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El método de ingeniería de ISO/PAS 20065:2016 completo: los
-requisitos de analizador del apartado 4.2 y la fusión de espectros básicos del
-apartado 4.3 sobre los que se apoya la entrada, con las condiciones de
-aceptación del apartado 5.1 y la lista de contenidos del informe del
-apartado 7; el
-ancho de banda crítico $\Delta f_c$ y las frecuencias de esquina (Fórmulas 2 a 5),
-el nivel medio de banda estrecha $L_S$ y el nivel del tono $L_T$ (Fórmulas 6 y
-8, Anexo D), el nivel de banda crítica del enmascaramiento $L_G$, el índice de
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El método de ingeniería de ISO/PAS 20065:2016 completo: los requisitos de
+analizador del apartado 4.2 y la fusión de espectros básicos del apartado 4.3
+sobre los que se apoya la entrada, con las condiciones de aceptación del
+apartado 5.1 y la lista de contenidos del informe del apartado 7; el ancho de
+banda crítico $\Delta f_c$ y las frecuencias de esquina (Fórmulas 2 a 5), el
+nivel medio de banda estrecha $L_S$ y el nivel del tono $L_T$ (Fórmulas 6 y 8,
+Anexo D), el nivel de banda crítica del enmascaramiento $L_G$, el índice de
 enmascaramiento $a_v$ y la audibilidad $\Delta L$ (Fórmulas 12 a 14), la
 detección de picos y el criterio de distinción (apartados 5.3.8 y 5.3.4), la
-combinación
-multitono FG (Fórmula 17) y la excepción de dos tonos por debajo de 1000 Hz
-(Fórmulas 18/19), la audibilidad decisiva y media energética (Fórmula 20) y la
-incertidumbre expandida $U$ de los apartados 5.4/6, todo a través de
-`psychoacoustics.analyze_spectrum` y `assess_tones`. El Anexo J de la
-ISO 1996-2:2017 está cubierto en lo que convierte la audibilidad media en el
-ajuste tonal $K_t$ (Tabla J.1).
+combinación multitono FG (Fórmula 17) y la excepción de dos tonos por debajo
+de 1000 Hz (Fórmulas 18/19), la audibilidad decisiva y media energética
+(Fórmula 20) y la incertidumbre expandida $U$ de los apartados 5.4/6, todo a
+través de `psychoacoustics.analyze_spectrum` y `assess_tones`. El Anexo J de
+la ISO 1996-2:2017 está cubierto en lo que convierte la audibilidad media en
+el ajuste tonal $K_t$ (Tabla J.1).
+</ScopeClaim>
 
-**No cubierto.** El criterio de distinción de pendiente de flanco sigue
-la lectura de DIN 45681:2005-03 (su programa de referencia ejecutable), no
-las fórmulas asimétricas impresas en el texto de ISO/PAS 20065, que la
-contradicen, recogido en el
-[registro de erratas](/phonometry/es/reference/errata/). Construir el propio
-espectro FFT de banda estrecha a partir de una grabación en el dominio temporal
-no forma parte de este módulo: todas las funciones aquí parten de un espectro
-ya calculado (niveles y frecuencias), y el §0 dice cómo tiene que ser ese
-espectro, incluida la ponderación A del apartado 5.3.2, que aplica quien llama
-porque el módulo es agnóstico a la ponderación.
+<ScopeClaim status="not-covered" label="No cubierto">
+El criterio de distinción de pendiente de flanco sigue la lectura de DIN
+45681:2005-03 (su programa de referencia ejecutable), no las fórmulas
+asimétricas impresas en el texto de ISO/PAS 20065, que la contradicen,
+recogido en el [registro de erratas](/phonometry/es/reference/errata/).
+Construir el propio espectro FFT de banda estrecha a partir de una grabación
+en el dominio temporal no forma parte de este módulo: todas las funciones aquí
+parten de un espectro ya calculado (niveles y frecuencias), y el §0 dice cómo
+tiene que ser ese espectro, incluida la ponderación A del apartado 5.3.2, que
+aplica quien llama porque el módulo es agnóstico a la ponderación.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

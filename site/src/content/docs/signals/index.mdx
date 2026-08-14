@@ -3,6 +3,9 @@ title: "Signal analysis"
 description: "The measurement core of phonometry: fractional octave filter banks, frequency and time weighting, integrated and statistical levels, calibrated spectral and correlation analysis, physical calibration and measurement uncertainty, and how those pieces chain into a sound level meter in code."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+
 Everything in phonometry starts here. This section covers the chain that turns
 a raw digital signal into standards-compliant acoustic numbers: split it into
 **fractional octave bands** (ANSI S1.11 / IEC 61260-1), shape it with the
@@ -168,25 +171,41 @@ What the numbers mean and how much to trust them.
 
 ## What this section does not cover
 
-Four things a reader reasonably expects here are absent, and each guide says so
-in its own "Not covered" block. **No instrument is verified.**
-`verify_filter_class` and `verify_weighting_class` check a designed digital
-response against the tolerance tables of IEC 61260-1 and IEC 61672-1; the
-IEC 61672-2 pattern-evaluation tests a physical meter needs for type approval,
-the IEC 61672-3 periodic tests it receives in service, and the IEC 60942
-conformance tests of the calibrator itself, are not run, so a class verdict
-here describes the algorithm and not a built device;
-[Compliance and verification](/phonometry/signals/metrology/compliance-verification/)
-draws that boundary part by part. **No file is
-opened.** Nothing in the library decodes WAV, FLAC or any other container:
-every function takes an array you have already read, which is why `fs` is
-always an argument. **No array processing.** Correlation and time delay model
-one common path between exactly two sensors and report the single largest peak;
-there is no multi-sensor TDOA solver, no beamformer and no source localisation.
+Four things a reader reasonably expects here are absent, and each guide says
+so in its own "Not covered" block.
+
+<Scope>
+<ScopeClaim status="not-covered">
+**No instrument is verified.** `verify_filter_class` and
+`verify_weighting_class` check a designed digital response against the
+tolerance tables of IEC 61260-1 and IEC 61672-1; the IEC 61672-2
+pattern-evaluation tests a physical meter needs for type approval, the IEC
+61672-3 periodic tests it receives in service, and the IEC 60942 conformance
+tests of the calibrator itself, are not run, so a class verdict here describes
+the algorithm and not a built device; [Compliance and
+verification](/phonometry/signals/metrology/compliance-verification/) draws
+that boundary part by part.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**No file is opened.** Nothing in the library decodes WAV, FLAC or any other
+container: every function takes an array you have already read, which is why
+`fs` is always an argument.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**No array processing.** Correlation and time delay model one common path
+between exactly two sensors and report the single largest peak; there is no
+multi-sensor TDOA solver, no beamformer and no source localisation.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
 **No perceptual features.** The cepstrum here is the plain linear-frequency
 one, with no mel warping or MFCC variant, and loudness as a sensation belongs
 to [Psychoacoustics](/phonometry/perception/psychoacoustics/), not to the
 energy metrics of this section.
+</ScopeClaim>
+</Scope>
 
 ## Before and after these pages
 

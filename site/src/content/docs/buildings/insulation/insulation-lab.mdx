@@ -39,8 +39,10 @@ references:
     note: "The measurement procedures and the background-noise correction shared by the airborne R and impact Ln."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 To rate a building element on its own (a wall type, a floating floor, a
 window) you take it to a qualified laboratory, where suppressed flanking
@@ -532,29 +534,35 @@ junction data the EN 12354 prediction consumes is measured per
 
 ## What this guide covers
 
-**Covered.** ISO 10140-2:2010 (the laboratory sound reduction index $R$
-with the Clause 4.3 background-noise correction) and ISO 10140-3:2010 (the
-laboratory normalized impact level $L_n$), via
-`building.lab_airborne_insulation`, `building.lab_impact_insulation` and
-`building.background_correction`; the single-number ratings reuse the
-verified ISO 717-1/ISO 717-2 engines, and both results write the one-page
-ISO 10140 fiche through `.report()`, with the ISO 10140-4:2010
-absorption-area annex in the verbose form.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 10140-2:2010 (the laboratory sound reduction index $R$ with the Clause 4.3
+background-noise correction) and ISO 10140-3:2010 (the laboratory normalized
+impact level $L_n$), via `building.lab_airborne_insulation`,
+`building.lab_impact_insulation` and `building.background_correction`; the
+single-number ratings reuse the verified ISO 717-1/ISO 717-2 engines, and both
+results write the one-page ISO 10140 fiche through `.report()`, with the ISO
+10140-4:2010 absorption-area annex in the verbose form.
+</ScopeClaim>
 
-**Not covered.** The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and
-ISO 10140-5:2010 facility and mounting requirements are documented above and
-implemented nowhere: nothing checks the position counts, the separations, the
-averaging times, the band range, the test-opening geometry or the loss-factor
+<ScopeClaim status="not-covered" label="Not covered">
+The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and ISO 10140-5:2010
+facility and mounting requirements are documented above and implemented
+nowhere: nothing checks the position counts, the separations, the averaging
+times, the band range, the test-opening geometry or the loss-factor
 requirement, and the mounting condition survives only as a free-text label in
 report metadata (`"Type A mounting, mortar-bedded perimeter
-(ISO 10140-1)"`) — which is what ISO 10140-1 asks for, since it requires any
-mounting to be *described* rather than selected from a list. Nothing estimates
-the suite's $R'_\text{max}$ either, so a result approaching the facility's
-ceiling will be produced without complaint; that qualification has to come from
-the laboratory's own Annex A tests. The neighbouring laboratory measurements
-are covered by their own guides: sound insulation by intensity (ISO 15186),
-the floor-covering improvement (ISO 16251-1) and flanking transmission
-(ISO 10848).
+(ISO 10140-1)"`) —
+which is what ISO 10140-1 asks for, since it requires any mounting to be
+*described* rather than selected from a list. Nothing estimates the suite's
+$R'_\text{max}$ either, so a result approaching the facility's ceiling will be
+produced without complaint; that qualification has to come from the
+laboratory's own Annex A tests. The neighbouring laboratory measurements are
+covered by their own guides: sound insulation by intensity (ISO 15186), the
+floor-covering improvement (ISO 16251-1) and flanking transmission (ISO
+10848).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

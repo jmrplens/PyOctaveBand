@@ -3,6 +3,9 @@ title: "Electroacústica"
 description: "Dispositivos que deben producir sonido, y los programas que transportan: el conjunto de distorsión de IEC 60268-3 y las respuestas en frecuencia H1/H2, los ensayos de tipo de altavoces IEC 60268-5 y de micrófonos IEC 60268-4, la separación armónica con barridos y THD(f) (Farina / Novak), y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Esta sección se vuelve hacia los dispositivos que *deben* producir sonido:
 amplificadores, altavoces y micrófonos, y el programa de radiodifusión que
 acaban transportando.
@@ -89,6 +92,8 @@ partida son las páginas de
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Las páginas de ensayo de tipo **reducen y presentan** lo que midió un
 laboratorio; no lo adquieren. La respuesta de campo libre, los cortes polares,
 el espectro de ruido y el barrido de distorsión frente a nivel entran como
@@ -96,13 +101,16 @@ datos, y aquí no hay ningún procedimiento que te diga cómo llevar la cámara
 anecoica o la medición por sustitución que los produjo. Dos de las ediciones
 implementadas están fijadas en vez de vigentes: las métricas de distorsión
 siguen AES17-2015 y no la revisión de 2020, y el informe de micrófono sigue
-IEC 60268-4:2014 y no el de 2018. La extracción de parámetros de Thiele-Small a
-partir de una curva de impedancia no está implementada, y los valores eléctricos
-y mecánicos de potencia admisible del apartado 17 de IEC 60268-5 los declara
-el fabricante, no se calculan. El criterio de realimentación es una contabilidad
-de niveles, no un modelo acústico: consume dos niveles de campo directo que
-aportas tú, no los calcula a partir de un patrón de cobertura, y no predice ni
-la frecuencia de acoplo ni el efecto de un ecualizador o de un desplazador de
-frecuencia. Y la IEC 60268-16, el índice de transmisión del habla, no forma
-parte de esta sección en absoluto: está en
+IEC 60268-4:2014 y no el de 2018. La extracción de parámetros de Thiele-Small
+a partir de una curva de impedancia no está implementada, y los valores
+eléctricos y mecánicos de potencia admisible del apartado 17 de IEC 60268-5
+los declara el fabricante, no se calculan. El criterio de realimentación es
+una contabilidad de niveles, no un modelo acústico: consume dos niveles de
+campo directo que aportas tú, no los calcula a partir de un patrón de
+cobertura, y no predice ni la frecuencia de acoplo ni el efecto de un
+ecualizador o de un desplazador de frecuencia. Y la IEC 60268-16, el índice de
+transmisión del habla, no forma parte de esta sección en absoluto: está en
 [Habla](/phonometry/es/perception/speech/).
+</ScopeClaim>
+</Scope>
+

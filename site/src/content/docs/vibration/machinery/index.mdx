@@ -3,6 +3,9 @@ title: "Machinery"
 description: "Reading a machine from its vibration: the kinematic bearing, gear, motor and blade-passing families computed from the geometry, and the band-pass and envelope route that brings a defect out of the noise floor."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A rotating machine has a **kinematic signature**. Every periodicity in its
 vibration belongs to something that turns, meshes or passes, and the geometry
 fixes the frequency before any measurement is made: a bearing with fifteen
@@ -57,17 +60,24 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 These are **predictions, not detections**. Nothing here decides whether a line
 is present, only where it would be if it were: the overlay is a set of
 expectations to read a measured spectrum against, and the reading is yours. A
-loaded bearing slips a little, so expect the measured peak within a per cent or
-two of the prediction rather than exactly on it.
+loaded bearing slips a little, so expect the measured peak within a per cent
+or two of the prediction rather than exactly on it.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Nor is there a severity verdict. The amplitude criteria that turn a present
 line into an assessment — crest-factor and kurtosis trending, and the velocity
 severity bands of ISO 10816 / ISO 20816 — are outside this module, and rotor
 balancing (ISO 21940) and order tracking are absent from the library
 altogether. One published convention differs between sources and is flagged on
 the guide rather than hidden: the pole-pass frequency is standard
-condition-monitoring practice rather than Norton's, who gives the slip frequency
-itself as the broken-bar sideband spacing.
+condition-monitoring practice rather than Norton's, who gives the slip
+frequency itself as the broken-bar sideband spacing.
+</ScopeClaim>
+</Scope>
+

@@ -87,14 +87,14 @@ pile-driving noise has no closed form here or anywhere in the library.
 
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
-all three solvers assume a **range-independent** water column with no absorbing
-or elastic bottom and no real bathymetry — which rules out range-dependent
-problems entirely. The ray solver returns paths and travel times but not
-amplitudes (no ray-tube intensity, no caustic correction), and the parabolic
-equation is the standard small-angle Tappert form rather than a wide-angle Padé
-variant. For the elastic seabed physics these fluid solvers leave out, the
-[elastic wave solver](../simulation/elastic-waves.md) is the nearest
-thing the library has.
+all three solvers assume a **range-independent** water column with no
+absorbing or elastic bottom and no real bathymetry — which rules out
+range-dependent problems entirely. The ray solver returns paths and travel
+times but not amplitudes (no ray-tube intensity, no caustic correction), and
+the parabolic equation is the standard small-angle Tappert form rather than a
+wide-angle Padé variant. For the elastic seabed physics these fluid solvers
+leave out, the [elastic wave solver](../simulation/elastic-waves.md) is
+the nearest thing the library has.
 
 **The exposure page rates hearing, not behaviour.** Only the auditory-effect
 criteria are implemented; behavioural-disturbance thresholds, the ones a
@@ -102,11 +102,13 @@ harassment take estimate turns on, are out of scope. Nothing chooses a hearing
 group or an accumulation period for you, and nothing models the animal moving
 relative to the source, so the cumulative exposure reported is the
 stationary-receiver worst case. There is no audiogram for low-frequency
-cetaceans, because the source publication does not print one of its parameters.
+cetaceans, because the source publication does not print one of its
+parameters.
 
-Two smaller boundaries: the ambient-noise spectrum leaves out the low-frequency
-turbulence band and has no built-in distant-shipping model — supply a shipping
-spectrum yourself — and the active sonar equation is monostatic only.
+Two smaller boundaries: the ambient-noise spectrum leaves out the
+low-frequency turbulence band and has no built-in distant-shipping model —
+supply a shipping spectrum yourself — and the active sonar equation is
+monostatic only.
 
 ## Before and after these pages
 

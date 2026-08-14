@@ -3,6 +3,9 @@ title: "Señales y espectros"
 description: "Análisis de señal en frecuencia y en tiempo en phonometry: estimaciones espectrales de Welch calibradas con su calidad estadística, análisis cepstral con detección de ecos y liftering, el espectro de la envolvente, y correlación, estimación de retardo y la envolvente de Hilbert."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Los niveles de banda responden a *cuánto*; esta sección responde a *qué hay
 en la señal*. Donde el resto del núcleo trabaja en bandas de fracción
 de octava, estas páginas trabajan con los estimadores de grano fino del
@@ -184,17 +187,31 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 Estos son los estimadores del libro de Bendat y Piersol, no un método de
 certificación: ninguna página de aquí lleva números de apartado ni límites de
 aceptación, y ningún resultado es un veredicto de cumplimiento. Faltan de
-verdad tres capacidades que un lector busca. **Las llegadas múltiples no se
-separan.** `time_delay` y `echo_detection` informan solo del mayor pico, así
-que un registro con un camino directo más varias reflexiones necesita
-localización manual de picos o llamadas repetidas sobre bandas más estrechas.
-**No hay geometría multisensor.** La estimación de retardo es por pares; no hay
-ninguna resolución de TDOA incorporada, ni beamformer, ni localización de fuentes, y
-un sistema de varias salidas necesita una llamada a `miso_coherence` por
-salida. **No hay rasgos perceptuales.** El cepstrum es el de frecuencia lineal,
-sin escala mel ni variante MFCC. Dos estimadores que comparten el núcleo de
-Welch de esta sección se documentan allí donde se usan: la función de
-transferencia y la coherencia ordinaria en
-[Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/), y
-la sonda de intensidad de dos micrófonos en [Intensidad
+verdad tres capacidades que un lector busca.
+
+<Scope>
+<ScopeClaim status="not-covered">
+**Las llegadas múltiples no se separan.** `time_delay` y `echo_detection`
+informan solo del mayor pico, así que un registro con un camino directo más
+varias reflexiones necesita localización manual de picos o llamadas repetidas
+sobre bandas más estrechas.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**No hay geometría multisensor.** La estimación de retardo es por pares; no
+hay ninguna resolución de TDOA incorporada, ni beamformer, ni localización de
+fuentes, y un sistema de varias salidas necesita una llamada a
+`miso_coherence` por salida.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**No hay rasgos perceptuales.** El cepstrum es el de frecuencia lineal, sin
+escala mel ni variante MFCC. Dos estimadores que comparten el núcleo de Welch
+de esta sección se documentan allí donde se usan: la función de transferencia
+y la coherencia ordinaria en
+[Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
+y la sonda de intensidad de dos micrófonos en [Intensidad
 acústica](/phonometry/es/devices/emission/intensity/).
+</ScopeClaim>
+</Scope>
+

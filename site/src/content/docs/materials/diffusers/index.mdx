@@ -3,6 +3,9 @@ title: "Diffusers and surfaces"
 description: "Grading and designing surfaces by what they reflect: the ISO 17497-1 scattering and ISO 17497-2 diffusion coefficients with Schroeder diffuser design, deep-subwavelength metadiffusers, and the ISO 13472 in-situ absorption of road surfaces."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Where the [Absorbers](/phonometry/materials/absorbers/) subsection asks
 how much energy a material removes from the field, this one asks what a
 *surface* does with the sound it returns: how much it throws off the specular
@@ -57,6 +60,8 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 Both prediction models here are **design estimates, not measurements**. The
 Fraunhofer far field the diffuser and metadiffuser pages share loses accuracy
 at low frequency, at grazing angles and over strongly absorbing surfaces, and
@@ -71,3 +76,6 @@ phases by evaluation. On the measurement side the library reduces the data but
 does not run the rig: the ISO 17497-1 turntable and the ISO 17497-2 goniometer
 supply the reverberation times and the polar response, and what is implemented
 is the arithmetic that turns them into a coefficient.
+</ScopeClaim>
+</Scope>
+

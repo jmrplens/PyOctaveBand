@@ -90,6 +90,8 @@ references:
     note: "Capítulo 6: la teoría de Biot de un material poroso de esqueleto elástico, sus coeficientes elásticos, sus dos ondas de compresión y su onda de cizalla, y la impedancia de superficie y la resonancia de cuarto de onda del esqueleto de una capa con fondo rígido (ecs. 6.107-6.111). Capítulo 11: el método de matrices de transferencia, la matriz de capa poroelástica de seis variables (tabla 11.1), las matrices de acoplamiento (apdo. 11.4) y el ensamblado global (apdo. 11.5). Apartado 11.3.4: los límites de esqueleto rígido y blando de la teoría de Biot, la frecuencia de desacoplo y la densidad efectiva blanda (ecs. 11.53-11.55, según Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 A partir de la **resistividad al flujo** de un material poroso (la magnitud
@@ -1302,42 +1304,46 @@ durante este trabajo están registradas en el
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los métodos de libro y de revista de Mechel, Bies, Cox y
-D'Antonio, Miki (1990), Maa (1998) y Johnson, Koplik y Dashen (1987),
-implementados en sala limpia como se describe arriba, junto con la teoría de
-Biot de los capítulos 6 y 11 de Allard y Atalla. Esto cubre los
-modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
-`johnson_champoux_allard`, `limp_frame`), la capa poroelástica
-(`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), el
-modelo multicapa por matrices de
-transferencia (`layered_absorber` con `AirLayer`, `PorousLayer`,
-`PoroelasticLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer` y
-`MembraneLayer`) y los
-coeficientes de incidencia aleatoria por la integral de Paris
-(`diffuse_field_absorption`, `statistical_absorption`). Las impedancias de
-transferencia de lámina que consumen las clases de capa también están expuestas
-por separado, que es como se diseña una lámina resonante en vez de solo
-evaluarla: `perforated_plate_impedance`, `microperforated_plate_impedance`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los métodos de libro y de revista de Mechel, Bies, Cox y D'Antonio, Miki
+(1990), Maa (1998) y Johnson, Koplik y Dashen (1987), implementados en sala
+limpia como se describe arriba, junto con la teoría de Biot de los capítulos 6
+y 11 de Allard y Atalla. Esto cubre los modelos de fluido equivalente porosos
+(`delany_bazley`, `miki`, `johnson_champoux_allard`, `limp_frame`), la capa
+poroelástica (`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), el
+modelo multicapa por matrices de transferencia (`layered_absorber` con
+`AirLayer`, `PorousLayer`, `PoroelasticLayer`, `PerforatedPlateLayer`,
+`MicroperforatedPlateLayer` y `MembraneLayer`) y los coeficientes de
+incidencia aleatoria por la integral de Paris (`diffuse_field_absorption`,
+`statistical_absorption`). Las impedancias de transferencia de lámina que
+consumen las clases de capa también están expuestas por separado, que es como
+se diseña una lámina resonante en vez de solo evaluarla:
+`perforated_plate_impedance`, `microperforated_plate_impedance`,
 `membrane_impedance` y `perforation_end_correction`.
+</ScopeClaim>
 
-**No cubierto.** Aquí no se mide nada: los cinco parámetros de JCA, el módulo
-de cizalla y el coeficiente de Poisson del esqueleto y la geometría de la lámina
-son todos entradas, y la sección 1.1 dice de dónde salen sin implementar
-ninguno de esos métodos de caracterización (solo se muestra el ajuste inverso
-contra una impedancia medida, y eso es `scipy.optimize`, no esta biblioteca).
-Las reglas de construcción del final de la sección 3 son práctica de ingeniería
-sin norma detrás, y la diferencia de tamaño finito entre un $\alpha_{dif}$
-predicho y un $\alpha_s$ medido se enuncia pero no se modela: nada de aquí
-reproduce el efecto de borde. El libro de Cox y D'Antonio trata tanto difusores
-como absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
+<ScopeClaim status="not-covered" label="No cubierto">
+Aquí no se mide nada: los cinco parámetros de JCA, el módulo de cizalla y el
+coeficiente de Poisson del esqueleto y la geometría de la lámina son todos
+entradas, y la sección 1.1 dice de dónde salen sin implementar ninguno de esos
+métodos de caracterización (solo se muestra el ajuste inverso contra una
+impedancia medida, y eso es `scipy.optimize`, no esta biblioteca). Las reglas
+de construcción del final de la sección 3 son práctica de ingeniería sin norma
+detrás, y la diferencia de tamaño finito entre un $\alpha_{dif}$ predicho y un
+$\alpha_s$ medido se enuncia pero no se modela: nada de aquí reproduce el
+efecto de borde. El libro de Cox y D'Antonio trata tanto difusores como
+absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
 predicción del difusor de gradiente de fase de Schroeder vive en un módulo
-aparte (`materials.diffusers.design`), documentada en
-[Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/) y, para los
+aparte (`materials.diffusers.design`), documentada en [Difusores y sus
+coeficientes](/phonometry/es/materials/diffusers/diffusers/) y, para los
 paneles en sublongitud de onda profunda cargados con resonadores, en
-[Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/). El absorbente de
-ranura con resonador de Helmholtz de acoplamiento crítico
+[Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/). El
+absorbente de ranura con resonador de Helmholtz de acoplamiento crítico
 (`slit_helmholtz_absorber`, `critical_coupling_design`) es el tema de
 [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

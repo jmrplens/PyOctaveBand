@@ -48,6 +48,8 @@ references:
     note: "Las clases de suelo por resistividad de flujo 'A'-'H' que acepta ground_effect_adjustment."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 El ruido de los helicópteros es muy directivo, así que el método de **ECAC
@@ -1034,36 +1036,41 @@ filiación CNOSSOS-EU.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El método del hemisferio de ECAC Doc 32 y la guía a nivel de
-ecuación NORAH2 de EASA (§A.3-A.5): el hemisferio de ruido y su consulta
-bilineal (`RotorcraftHemisphere`, `hemisphere_source_level`), los tres
-ajustes de propagación (`spherical_spreading_adjustment`,
-`atmospheric_adjustment`, `ground_effect_adjustment`, el modelo de
-Chien-Soroka con la impedancia de Delany-Bazley y las clases de resistividad
-de flujo CNOSSOS), la interpolación entre condiciones de vuelo
-(`flight_condition_weights`, `interpolated_source_level`), la derivación de
-fuente de estacionario, ralentí y rodaje de la Tabla 3
-(`hover_ring_hemisphere`, `hover_derived_hemisphere`), la cinemática de
-la trayectoria (`flight_path_kinematics`), el SEL, LASmax y EPNL de evento
-único (`rotorcraft_event_level`), los contornos en malla de tierra
-(`rotorcraft_noise_contour`) y la cadena de plano medio del suelo y
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El método del hemisferio de ECAC Doc 32 y la guía a nivel de ecuación NORAH2
+de EASA (§A.3-A.5): el hemisferio de ruido y su consulta bilineal
+(`RotorcraftHemisphere`, `hemisphere_source_level`), los tres ajustes de
+propagación (`spherical_spreading_adjustment`, `atmospheric_adjustment`,
+`ground_effect_adjustment`, el modelo de Chien-Soroka con la impedancia de
+Delany-Bazley y las clases de resistividad de flujo CNOSSOS), la interpolación
+entre condiciones de vuelo (`flight_condition_weights`,
+`interpolated_source_level`), la derivación de fuente de estacionario, ralentí
+y rodaje de la Tabla 3 (`hover_ring_hemisphere`, `hover_derived_hemisphere`),
+la cinemática de la trayectoria (`flight_path_kinematics`), el SEL, LASmax y
+EPNL de evento único (`rotorcraft_event_level`), los contornos en malla de
+tierra (`rotorcraft_noise_contour`) y la cadena de plano medio del suelo y
 apantallamiento por terreno (`mean_ground_plane`, `mean_flow_resistivity`,
-`diffraction_attenuation`, `terrain_screening_adjustment`). Validado contra
-la Tabla 4 de la guía NORAH2, límites geométricos y rasantes en forma cerrada,
-y de extremo a extremo contra los casos de verificación ARP del prototipo
+`diffraction_attenuation`, `terrain_screening_adjustment`). Validado contra la
+Tabla 4 de la guía NORAH2, límites geométricos y rasantes en forma cerrada, y
+de extremo a extremo contra los casos de verificación ARP del prototipo
 NORAH2, incluida su operación de estacionario sin efecto suelo.
+</ScopeClaim>
 
-**No cubierto.** El recurso del §A.3.5 para un tipo sin ningún dato de
-estacionario (dos micrófonos laterales de vuelo nivelado corregidos al
-círculo de estacionario de 150 m por el método integrado del Anexo 16 de la
-OACI) es una cadena de corrección de medida que este módulo, que consume
-hemisferios ya reducidos, no modela.
-**Con phonometry no se distribuye ninguna base de datos de hemisferios, y no hay
-lector de ficheros NORAH**: el método está implementado, los datos no, así que
-los arrays salen de una campaña de medida o de la base de datos de referencia
-NORAH2 y los monta quien lee. La refracción por gradientes atmosféricos queda
-fuera de la propia Doc 32, igual que la interpolación entre condiciones de vuelo,
-que sigue en su lugar la guía NORAH2.
+<ScopeClaim status="not-covered" label="No cubierto">
+El recurso del §A.3.5 para un tipo sin ningún dato de estacionario (dos
+micrófonos laterales de vuelo nivelado corregidos al círculo de estacionario
+de 150 m por el método integrado del Anexo 16 de la OACI) es una cadena de
+corrección de medida que este módulo, que consume hemisferios ya reducidos, no
+modela. **Con phonometry no se distribuye ninguna base de datos de
+hemisferios, y no hay lector de ficheros NORAH**: el método está implementado,
+los datos no, así que los arrays salen de una campaña de medida o de la base
+de datos de referencia NORAH2 y los monta quien lee. La refracción por
+gradientes atmosféricos queda fuera de la propia Doc 32, igual que la
+interpolación entre condiciones de vuelo, que sigue en su lugar la guía
+NORAH2.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

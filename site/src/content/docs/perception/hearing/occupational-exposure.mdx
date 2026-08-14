@@ -27,8 +27,10 @@ references:
     note: "The freely available criteria document (the linked PDF is the free download) behind the 85 dB(A) recommended exposure limit and the hearing-conservation rationale for measuring the daily dose."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A working day is rarely measured in one take: the daily exposure level a
 regulation acts on has to be assembled from *samples* of a real shift, and
@@ -476,28 +478,34 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The three measurement strategies of ISO 9612:2009 Clauses 9-11 —
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The three measurement strategies of ISO 9612:2009 Clauses 9-11 —
 `task_based_exposure`, `job_based_exposure` and `full_day_exposure` — with the
-Clause 9.3 sampling rules and the Clause 12.3 / 12.4 microphone geometry stated
-here as the procedure that produces their inputs; the Annex C uncertainty
-budget (Formulae C.6, C.9 and C.12 with Tables C.4 and C.5, and $u_3$ from
-Clause C.6); the one-sided coverage factor $k = 1.65$ of Clause 14; the
-Clause 9.3 / 10.4 / Table 1 advisories, reachable before the survey through
-`minimum_cumulative_duration_hours` and `table_c4_contribution`; and the
-Clause 15 measurement report through `ExposureResult.report()`, with the
+Clause 9.3 sampling rules and the Clause 12.3 / 12.4 microphone geometry
+stated here as the procedure that produces their inputs; the Annex C
+uncertainty budget (Formulae C.6, C.9 and C.12 with Tables C.4 and C.5, and
+$u_3$ from Clause C.6); the one-sided coverage factor $k = 1.65$ of Clause 14;
+the Clause 9.3 / 10.4 / Table 1 advisories, reachable before the survey
+through `minimum_cumulative_duration_hours` and `table_c4_contribution`; and
+the Clause 15 measurement report through `ExposureResult.report()`, with the
 Directive 2003/10/EC assessment on top of it. The three worked examples of
 Annexes D, E and F are reproduced.
+</ScopeClaim>
 
-**Not covered.** The work analysis of Clause 7 and the microphone placement of
-Clause 12.3 / 12.4 are procedures, not calculations: they stay with the
-surveyor, and this guide documents them so the numbers fed to a `Task` mean
-something. Table B.1 is reproduced as guidance and the caller picks the
-strategy; nothing here applies it. Hearing-protector attenuation (the ISO 4869
-series) is not applied, so the $L_{EX,8h}$ computed here — and the limit-value
-comparison the fiche prints on it — is the **unprotected** exposure, which is
-also what the ISO 1999 hearing-loss model wants. And Annex C offers no
-uncertainty model for $L_{p,Cpeak}$ (Table C.5, Note 1), which is why the peak
-is reported without one rather than with a zero one.
+<ScopeClaim status="not-covered" label="Not covered">
+The work analysis of Clause 7 and the microphone placement of Clause 12.3 /
+12.4 are procedures, not calculations: they stay with the surveyor, and this
+guide documents them so the numbers fed to a `Task` mean something. Table B.1
+is reproduced as guidance and the caller picks the strategy; nothing here
+applies it. Hearing-protector attenuation (the ISO 4869 series) is not
+applied, so the $L_{EX,8h}$ computed here — and the limit-value comparison the
+fiche prints on it — is the **unprotected** exposure, which is also what the
+ISO 1999 hearing-loss model wants. And Annex C offers no uncertainty model for
+$L_{p,Cpeak}$ (Table C.5, Note 1), which is why the peak is reported without
+one rather than with a zero one.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

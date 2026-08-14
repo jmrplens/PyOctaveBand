@@ -39,8 +39,10 @@ references:
     note: "El índice de curva de referencia que convierte cada magnitud de fachada de esta página en su número único (Anexo F de ISO 16283-3, EN ISO 717-1 para la predicción)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La fachada es el único elemento del edificio que da la cara al ruido del que
 todo el mundo se queja: la carretera, el ferrocarril, la senda de vuelo.
@@ -720,14 +722,15 @@ entrada de aire, no el muro.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 16283-3:2016 (las magnitudes de fachada en campo
-$D_{2m}$, $D_{2m,nT}$, $D_{2m,n}$, $R'_{45°}$ y $R'_{tr,s}$ de los métodos de
-elemento con altavoz y con tráfico rodado, con el promediado de posiciones del
-apartado 9.5.1 y el informe de ensayo del apartado 14) mediante
-`building.facade_insulation`; la EN 12354-3:2000 (la suma de factores de
-transmisión de la Fórmula 10, los índices $R_{45}$ y $R_{tr,s}$, la
-$D_{2m,nT}$ de la Fórmula 13 y el término de forma de fachada del Anexo C)
-mediante `building.facade_sound_reduction` y
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 16283-3:2016 (las magnitudes de fachada en campo $D_{2m}$, $D_{2m,nT}$,
+$D_{2m,n}$, $R'_{45°}$ y $R'_{tr,s}$ de los métodos de elemento con altavoz y
+con tráfico rodado, con el promediado de posiciones del apartado 9.5.1 y el
+informe de ensayo del apartado 14) mediante `building.facade_insulation`; la
+EN 12354-3:2000 (la suma de factores de transmisión de la Fórmula 10, los
+índices $R_{45}$ y $R_{tr,s}$, la $D_{2m,nT}$ de la Fórmula 13 y el término de
+forma de fachada del Anexo C) mediante `building.facade_sound_reduction` y
 `building.facade_shape_level_difference`; y la EN 12354-4:2000 (la potencia
 acústica radiada de la Fórmula 2 con el término de difusividad del Anexo B y
 la atenuación del Anexo E de un lado radiante finito) mediante
@@ -735,24 +738,28 @@ la atenuación del Anexo E de un lado radiante finito) mediante
 `building.outdoor_level`. Los índices globales reutilizan el motor verificado
 de ISO 717-1, y tanto la medición como la predicción escriben su ficha de una
 página con `.report()`.
+</ScopeClaim>
 
-**No cubierto.** Los niveles por banda que se pasan a `facade_insulation` se
-suponen ya corregidos por ruido de fondo, y los requisitos de procedimiento de
-la propia ISO 16283-3, los que expone
-[Elegir y realizar el método](#elegir-y-realizar-el-metodo),
-están documentados pero no se comprueban: nada verifica la incidencia de
-45° ± 5°, las distancias oblicuas de 5 m y 7 m, la escalada de 3 a 10
-posiciones de micrófono y su caso especial del retranqueo, los 50 pasos de
-vehículo ni la simultaneidad de una medición con tráfico, ni que el método
-elegido corresponda a la pregunta planteada. El procedimiento de esquina en
-baja frecuencia del apartado 7 (la contraparte de fachada del
-[procedimiento de ISO 16283-1](/phonometry/es/buildings/insulation/insulation-field/#recintos-pequenos-apartado-8),
+<ScopeClaim status="not-covered" label="No cubierto">
+Los niveles por banda que se pasan a `facade_insulation` se suponen ya
+corregidos por ruido de fondo, y los requisitos de procedimiento de la propia
+ISO 16283-3, los que expone [Elegir y realizar el
+método](#elegir-y-realizar-el-metodo), están documentados pero no se
+comprueban: nada verifica la incidencia de 45° ± 5°, las distancias oblicuas
+de 5 m y 7 m, la escalada de 3 a 10 posiciones de micrófono y su caso especial
+del retranqueo, los 50 pasos de vehículo ni la simultaneidad de una medición
+con tráfico, ni que el método elegido corresponda a la pregunta planteada. El
+procedimiento de esquina en baja frecuencia del apartado 7 (la contraparte de
+fachada del [procedimiento de ISO
+16283-1](/phonometry/es/buildings/insulation/insulation-field/#recintos-pequenos-apartado-8),
 activado por el mismo umbral de 25 m³ del recinto receptor) tampoco está
 implementado, y tampoco lo están los métodos de ferrocarril y aeronaves del
-Anexo E. Los ejemplos resueltos de
-EN 12354-3 y EN 12354-4 de las ediciones de 2000 llevan pequeñas
-inconsistencias internas de redondeo en las bandas de octava altas, señaladas
-donde aparecen: la implementación sigue las fórmulas y no las filas impresas.
+Anexo E. Los ejemplos resueltos de EN 12354-3 y EN 12354-4 de las ediciones de
+2000 llevan pequeñas inconsistencias internas de redondeo en las bandas de
+octava altas, señaladas donde aparecen: la implementación sigue las fórmulas y
+no las filas impresas.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

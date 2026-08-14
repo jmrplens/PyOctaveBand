@@ -12,6 +12,8 @@ references:
     note: "La sección 8.4 reúne las frecuencias discretas de fallo de la maquinaria rotativa implementadas en esta página: las once frecuencias del rodamiento de contacto rodante según Shahan y Kamperman (Ecs. 8.4-8.14), la frecuencia de engrane (Ec. 8.3), la frecuencia de paso de pala y los patrones lobulados de interacción de un ventilador axial entubado (Ecs. 8.15-8.17), la frecuencia de pulsación hidráulica de las bombas (Ec. 8.18) y las frecuencias de alimentación y de armónicos de ranura del motor de inducción (Ecs. 8.19-8.20). ISBN 978-0-521-49913-2."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 El mantenimiento predictivo empieza por la aritmética, no por el tratamiento de
@@ -584,26 +586,33 @@ envolvente.
 
 ## Qué cubre y qué no
 
-**Cubierto.** Las familias cinemáticas de la sección 8.4 de Norton: rodamientos
-de contacto rodante (Ecs. 8.4 a 8.14), engrane y bandas laterales (Ec. 8.3),
-líneas de alimentación, deslizamiento, paso de polos y ranura de rotor de los
-motores de inducción (Ecs. 8.19 y 8.20), y frecuencias de paso de pala con los
-patrones lobulados de interacción de un ventilador axial entubado (Ecs. 8.15 a
-8.18), mediante `bearing_fault_frequencies`, `gear_mesh_frequencies`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las familias cinemáticas de la sección 8.4 de Norton: rodamientos de contacto
+rodante (Ecs. 8.4 a 8.14), engrane y bandas laterales (Ec. 8.3), líneas de
+alimentación, deslizamiento, paso de polos y ranura de rotor de los motores de
+inducción (Ecs. 8.19 y 8.20), y frecuencias de paso de pala con los patrones
+lobulados de interacción de un ventilador axial entubado (Ecs. 8.15 a 8.18),
+mediante `bearing_fault_frequencies`, `gear_mesh_frequencies`,
 `induction_motor_frequencies`, `blade_pass_frequencies`, `combine_fault_lines`
 y `shaft_rate`.
+</ScopeClaim>
 
-**No cubierto.** Estas son *previsiones*, no detecciones: aquí nada decide si
-una línea está presente, solo dónde estaría. Los criterios de amplitud que
-convierten una línea presente en una valoración de severidad (tendencias de
-factor de cresta y de curtosis, bandas de severidad en velocidad de las
-ISO 10816 / ISO 20816) quedan fuera de este módulo; la propia orientación de
-Norton es cualitativa (factores de cresta de 2,5 a 3,5 en un rodamiento sano,
-hasta unos 11 con defectos impulsivos; curtosis en torno a 3 en un rodamiento
-sano y por encima de 4 en uno dañado). La frecuencia de paso de polos
-$\text{FP} = p \times f_\text{slip}$ es práctica habitual del mantenimiento predictivo, no de
-Norton: él da la propia frecuencia de deslizamiento como espaciado de las bandas
-laterales de una barra rota y no la multiplica por el número de polos.
+<ScopeClaim status="not-covered" label="No cubierto">
+Estas son *previsiones*, no detecciones: aquí nada decide si una línea está
+presente, solo dónde estaría. Los criterios de amplitud que convierten una
+línea presente en una valoración de severidad (tendencias de factor de cresta
+y de curtosis, bandas de severidad en velocidad de las ISO 10816 / ISO 20816)
+quedan fuera de este módulo; la propia orientación de Norton es cualitativa
+(factores de cresta de 2,5 a 3,5 en un rodamiento sano, hasta unos 11 con
+defectos impulsivos; curtosis en torno a 3 en un rodamiento sano y por encima
+de 4 en uno dañado). La frecuencia de paso de polos
+$\text{FP} = p \times f_\text{slip}$ es práctica habitual del mantenimiento
+predictivo, no de Norton: él da la propia frecuencia de deslizamiento como
+espaciado de las bandas laterales de una barra rota y no la multiplica por el
+número de polos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

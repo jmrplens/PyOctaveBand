@@ -105,10 +105,10 @@ residual-intensity test of a probe are all assumed to have been done: the
 library warns on the coarse advisory criteria a standard states explicitly and
 grades a residual index you supply, but it does not certify a room or an
 instrument. The same boundary runs through the electroacoustics pages, which
-**reduce and report curves the laboratory supplies** rather than telling you how
-to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
-instrumentation, installation and measurement positions are laboratory practice
-this library assumes.
+**reduce and report curves the laboratory supplies** rather than telling you
+how to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
+instrumentation, installation and measurement positions are laboratory
+practice this library assumes.
 
 Three specific absences are worth knowing before you plan a job. ISO 9614-1's
 discrete fixed-point power summation is **not implemented at all** — only its
@@ -124,8 +124,8 @@ Editions are pinned rather than current in two places: the distortion metrics
 follow AES17-2015 and not the 2020 revision, and the microphone
 rated-characteristics report follows IEC 60268-4:2014 and not the 2018 one.
 Object-based audio (BS.1770-5 Annex 4) is out of scope, and the library
-implements no spatial renderer, so an object-based programme has to be rendered
-to a loudspeaker layout before it can be measured.
+implements no spatial renderer, so an object-based programme has to be
+rendered to a loudspeaker layout before it can be measured.
 
 ## Before and after these pages
 

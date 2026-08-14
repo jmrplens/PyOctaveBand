@@ -48,6 +48,8 @@ references:
     note: "The fluid-solid benchmark of the same staggered scheme: the harmonic shear modulus and arithmetic density averages (Eqs. 9-10) that satisfy the interface conditions implicitly, the soft-bed configuration of the Scholte case of section 6 and the >= 15 points-per-wavelength rule for the O(2,2) scheme with an interface wave."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
@@ -701,32 +703,36 @@ takes the same run apart against the plateau method and the mass law.
 
 ## What this guide covers
 
-**Covered.** The elastic P-SV companion of the acoustic FDTD solver: the
-Virieux (1986) velocity-stress scheme with the Moczo et al. (2007)
-effective parameters and stress-imaging free surface, exposed through
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The elastic P-SV companion of the acoustic FDTD solver: the Virieux (1986)
+velocity-stress scheme with the Moczo et al. (2007) effective parameters and
+stress-imaging free surface, exposed through
 `elastic_fdtd_simulation`/`ElasticFDTD2D` with `ExplosionSource` and
 `ForceSource`, validated against the body-wave speeds, the exact Rayleigh
-root, the Kirchhoff flexural dispersion and the bit-exact acoustic limit.
-The fluid-solid coupling of sections 4-7, with the `Material` constants,
-`ElasticFDTD2D.from_regions` and `scholte_speed`: oblique reflection with
-mode conversion against Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) at
-sub-critical and between-critical angles, the Scholte-wave speed against
-the exact characteristic equation (Eq. 4.4.20) and by time of flight in
-the van Vossen (2002) soft-bed benchmark, the immersed-plate transmission
-with its first thickness resonance against the three-media closed form
-(Eqs. 2.4.14-2.4.19), the immersed-panel mass law and the air-steel
-extreme-contrast stress test.
+root, the Kirchhoff flexural dispersion and the bit-exact acoustic limit. The
+fluid-solid coupling of sections 4-7, with the `Material` constants,
+`ElasticFDTD2D.from_regions` and `scholte_speed`: oblique reflection with mode
+conversion against Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) at sub-critical
+and between-critical angles, the Scholte-wave speed against the exact
+characteristic equation (Eq. 4.4.20) and by time of flight in the van Vossen
+(2002) soft-bed benchmark, the immersed-plate transmission with its first
+thickness resonance against the three-media closed form (Eqs. 2.4.14-2.4.19),
+the immersed-panel mass law and the air-steel extreme-contrast stress test.
+</ScopeClaim>
 
-**Not covered.** Everything the 2D acoustic solver cannot do, this one
-cannot either: the domain is a cross-section (cylindrical $1/\sqrt{r}$
-spreading, not $1/r$), so absolute levels and decay rates are not those of
-a 3D problem. The solid is isotropic and purely elastic: no anisotropy and
-no viscoelastic damping beyond the bulk decay rate, so material loss
-factors are not modelled. There is no elastic perfectly matched layer: the
-sponge absorbs grazing Rayleigh waves less effectively than body waves.
-Guided-wave dispersion beyond the thin-plate Kirchhoff regime (full Lamb
-modes) is observable in the fields but has no dedicated closed-form
-oracle here.
+<ScopeClaim status="not-covered" label="Not covered">
+Everything the 2D acoustic solver cannot do, this one cannot either: the
+domain is a cross-section (cylindrical $1/\sqrt{r}$ spreading, not $1/r$), so
+absolute levels and decay rates are not those of a 3D problem. The solid is
+isotropic and purely elastic: no anisotropy and no viscoelastic damping beyond
+the bulk decay rate, so material loss factors are not modelled. There is no
+elastic perfectly matched layer: the sponge absorbs grazing Rayleigh waves
+less effectively than body waves. Guided-wave dispersion beyond the thin-plate
+Kirchhoff regime (full Lamb modes) is observable in the fields but has no
+dedicated closed-form oracle here.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

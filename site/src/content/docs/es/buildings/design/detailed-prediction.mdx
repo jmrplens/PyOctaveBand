@@ -31,8 +31,10 @@ references:
     note: "El apartado 4.2 define el modelo detallado por bandas a ruido de impactos; el Anexo B el nivel de impactos calculado del forjado desnudo, el Anexo C la mejora del suelo flotante y el Anexo G los ejemplos resueltos, que comparten el edificio del Anexo L de ISO 12354-1."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 El modelo simplificado de
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)
@@ -632,40 +634,48 @@ de arriba.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La cadena por bandas del apartado 4.2 para elementos de **Tipo A**:
-el índice de reducción acústica y el nivel de impactos de elemento homogéneo del
-Anexo B y la conversión in situ del Anexo C mediante `HomogeneousElement`,
-`in_situ_element` y `perimeter_absorption_coefficient`; el traslado de datos de
-laboratorio *medidos* mediante `laboratory_total_loss_factor`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La cadena por bandas del apartado 4.2 para elementos de **Tipo A**: el índice
+de reducción acústica y el nivel de impactos de elemento homogéneo del Anexo B
+y la conversión in situ del Anexo C mediante `HomogeneousElement`,
+`in_situ_element` y `perimeter_absorption_coefficient`; el traslado de datos
+de laboratorio *medidos* mediante `laboratory_total_loss_factor`,
 `structural_reverberation_time`, `in_situ_reduction_index` e
-`in_situ_impact_level` (fórmula 9 y fórmula 5 de la parte 2); la caída de unión
-in situ de la fórmula (10); las trayectorias aéreas directa y por flancos de las
-fórmulas (14)/(15) mediante `direct_reduction_index` y `airborne_flanking_path` y
-sus gemelas de impactos `direct_impact_level` e `impact_flanking_path`; las vías
-de **Tipo B** de las fórmulas (16)/(17) y la corrección resonante del Anexo
-B.1/B.2 mediante `resonant_sound_reduction_index`; el ensamblaje y la valoración
-ISO 717 mediante `detailed_airborne_prediction` y `detailed_impact_prediction`;
-la identidad de reciprocidad B.3/B.4 de la parte 2 mediante
-`reciprocity_impact_level`; y las dos fichas mediante `.report()`. El apartado 5
-declara que el modelo a ruido aéreo no tiene error sistemático y que su
-desviación típica es de 1,5 dB a 2,5 dB para edificios de elementos homogéneos,
-suponiendo una buena ejecución — la cifra menor cuando se tiene en cuenta cada
-aspecto, la mayor en situaciones complejas o cuando se desprecia el tiempo de
-reverberación estructural.
+`in_situ_impact_level` (fórmula 9 y fórmula 5 de la parte 2); la caída de
+unión in situ de la fórmula (10); las trayectorias aéreas directa y por
+flancos de las fórmulas (14)/(15) mediante `direct_reduction_index` y
+`airborne_flanking_path` y sus gemelas de impactos `direct_impact_level` e
+`impact_flanking_path`; las vías de **Tipo B** de las fórmulas (16)/(17) y la
+corrección resonante del Anexo B.1/B.2 mediante
+`resonant_sound_reduction_index`; el ensamblaje y la valoración ISO 717
+mediante `detailed_airborne_prediction` y `detailed_impact_prediction`; la
+identidad de reciprocidad B.3/B.4 de la parte 2 mediante
+`reciprocity_impact_level`; y las dos fichas mediante `.report()`. El apartado
+5 declara que el modelo a ruido aéreo no tiene error sistemático y que su
+desviación típica es de 1,5 dB a 2,5 dB para edificios de elementos
+homogéneos, suponiendo una buena ejecución — la cifra menor cuando se tiene en
+cuenta cada aspecto, la mayor en situaciones complejas o cuando se desprecia
+el tiempo de reverberación estructural.
+</ScopeClaim>
 
-**No cubierto.** Aquí solo se calculan elementos homogéneos del Anexo B; el
-espectro de un elemento ligero, doble o compuesto es un dato de entrada, que sale
-de
-[Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
-o de un informe de ensayo. El propio catálogo de uniones del Anexo E vive en
-[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/),
-igual que las tablas por defecto de los anexos D y F de las demás partes. La rama
-de Tipo B se muestra a partir de sus entradas normativas en lugar de resolverse
-de principio a fin. La transmisión aérea a través de cámaras y de techos
-suspendidos no se lleva en absoluto, y la nota 1 del apartado 3.3.4 advierte de
-que ahí «puede contribuir o incluso dominar». Y la valoración ISO 717 necesita el
-espectro entero: de 100 Hz a 3150 Hz en tercios de octava, o de 125 Hz a 2000 Hz
-en octavas.
+<ScopeClaim status="not-covered" label="No cubierto">
+Aquí solo se calculan elementos homogéneos del Anexo B; el espectro de un
+elemento ligero, doble o compuesto es un dato de entrada, que sale de
+[Predicción del aislamiento de
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/) o de un
+informe de ensayo. El propio catálogo de uniones del Anexo E vive en
+[Predicción del aislamiento acústico (EN
+12354)](/phonometry/es/buildings/design/insulation-prediction/), igual que las
+tablas por defecto de los anexos D y F de las demás partes. La rama de Tipo B
+se muestra a partir de sus entradas normativas en lugar de resolverse de
+principio a fin. La transmisión aérea a través de cámaras y de techos
+suspendidos no se lleva en absoluto, y la nota 1 del apartado 3.3.4 advierte
+de que ahí «puede contribuir o incluso dominar». Y la valoración ISO 717
+necesita el espectro entero: de 100 Hz a 3150 Hz en tercios de octava, o de
+125 Hz a 2000 Hz en octavas.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

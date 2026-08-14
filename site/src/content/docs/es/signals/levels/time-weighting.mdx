@@ -26,8 +26,10 @@ references:
     note: "Las secciones 3.2 y 3.6 (sonómetros y medición de sonido variable en el tiempo: qué significan las lecturas F/S/I en la práctica instrumental). ISBN 978-1-4987-2405-0."
 ---
 
-import Video from '../../../../../components/Video.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Un nivel sonoro mostrado en pantalla es siempre un nivel con *ponderación
 temporal*: antes de llegar a la lectura, la presión cuadrática ponderada en
@@ -423,26 +425,30 @@ verificación con ráfagas tonales de IEC 61672-1.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El detector exponencial de ponderación temporal de la
-IEC 61672-1:2013 (apartado 3.8) con las constantes de tiempo Fast y Slow
-(apartado 5.8.1), implementado como el filtro recursivo de `time_weighting`
-y la clase `TimeWeighting` para streaming, verificado en CI contra las
-referencias de ráfaga tonal de clase 1 de la Tabla 4. La balística
-asimétrica heredada Impulse (35 ms de ataque, 1,5 s de caída), trasladada
-a las normas internacionales desde las características FAST/SLOW/IMPULSE
-de ANSI S1.4-1983.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El detector exponencial de ponderación temporal de la IEC 61672-1:2013
+(apartado 3.8) con las constantes de tiempo Fast y Slow (apartado 5.8.1),
+implementado como el filtro recursivo de `time_weighting` y la clase
+`TimeWeighting` para streaming, verificado en CI contra las referencias de
+ráfaga tonal de clase 1 de la Tabla 4. La balística asimétrica heredada
+Impulse (35 ms de ataque, 1,5 s de caída), trasladada a las normas
+internacionales desde las características FAST/SLOW/IMPULSE de ANSI S1.4-1983.
+</ScopeClaim>
 
-**No cubierto.** La cadena de instrumento más amplia de la IEC 61672-1
-(ponderación frecuencial, rangos de nivel, verificaciones periódicas) no
-está en esta página; es el asunto de
-[Construye un sonómetro](/phonometry/es/signals/sound-level-meter/). La
-ANSI S1.4-1983 se cita solo por el origen histórico de las constantes F y
-S, no se implementa como especificación de instrumento propia. La
-valoración moderna de impulsividad ($L_{Aeq}$ más un ajuste, o el análisis
-de inicio) está en la página de
-[Prominencia de sonidos
-impulsivos](/phonometry/es/environment/assessment/impulsive-sound/),
-no construida sobre la ponderación Impulse de aquí.
+<ScopeClaim status="not-covered" label="No cubierto">
+La cadena de instrumento más amplia de la IEC 61672-1 (ponderación
+frecuencial, rangos de nivel, verificaciones periódicas) no está en esta
+página; es el asunto de [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/). La ANSI S1.4-1983 se
+cita solo por el origen histórico de las constantes F y S, no se implementa
+como especificación de instrumento propia. La valoración moderna de
+impulsividad ($L_{Aeq}$ más un ajuste, o el análisis de inicio) está en la
+página de [Prominencia de sonidos
+impulsivos](/phonometry/es/environment/assessment/impulsive-sound/), no
+construida sobre la ponderación Impulse de aquí.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

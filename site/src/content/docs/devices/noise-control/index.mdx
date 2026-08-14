@@ -3,6 +3,9 @@ title: "Noise control"
 description: "Industrial noise control on the path: the end-to-end fan-to-room duct calculation and the room-to-room chain against a design criterion, plus the element models they call — reactive four-pole silencers, HVAC duct attenuation and flow noise, and machine-enclosure insertion loss."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A noise-control problem is a **budget**, not a component choice. Between a
 machine and the person who hears it there is a path, and each element on that
 path removes a known number of decibels per band; the design question is which
@@ -77,19 +80,25 @@ occupational limit applies, in [Occupational exposure
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 Nothing here is a measurement: every number is predicted from geometry and
 declared data, and the measurement standards named above are cited as the
 source of a supplier's figures, not implemented. Within the predictions, three
 limits are structural. **Only reactive silencer elements are computed** —
 dissipative duct-lining silencers are discussed for selection but are not
-modelled from liner properties anywhere in the library, and the lined-elbow and
-plenum figures on the HVAC page are interpolated installation tables rather than
-a liner model. **Mean flow is outside the element matrices**: convection,
-temperature gradients and the flow-dependent impedance of perforates do not
-appear, so a silencer carrying significant flow is predicted as though it were
-not. And `enclosure_insertion_loss` **never predicts the panel's transmission
-loss**: you supply R measured or from another model, and the module combines it
-with the interior correction — predicting R itself is [Insulation
-design](/phonometry/buildings/design/). Above the higher-order-mode cut-on
-frequency the plane-wave assumption every duct model rests on stops holding,
-which the duct-path page states and which no method here works around.
+modelled from liner properties anywhere in the library, and the lined-elbow
+and plenum figures on the HVAC page are interpolated installation tables
+rather than a liner model. **Mean flow is outside the element matrices**:
+convection, temperature gradients and the flow-dependent impedance of
+perforates do not appear, so a silencer carrying significant flow is predicted
+as though it were not. And `enclosure_insertion_loss` **never predicts the
+panel's transmission loss**: you supply R measured or from another model, and
+the module combines it with the interior correction — predicting R itself is
+[Insulation design](/phonometry/buildings/design/). Above the
+higher-order-mode cut-on frequency the plane-wave assumption every duct model
+rests on stops holding, which the duct-path page states and which no method
+here works around.
+</ScopeClaim>
+</Scope>
+

@@ -48,6 +48,8 @@ references:
     note: "El benchmark fluido-sólido del mismo esquema escalonado: las medias armónica del módulo de cizalla y aritmética de la densidad (Ecs. 9-10) que satisfacen implícitamente las condiciones de interfase, la configuración de fondo blando del caso de Scholte de la sección 6 y la regla de >= 15 puntos por longitud de onda para el esquema O(2,2) con una onda de interfase."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -753,34 +755,38 @@ desmonta esa misma ejecución frente al método de la meseta y a la ley de masas
 
 ## Qué cubre esta guía
 
-**Cubierto.** El compañero elástico P-SV del método FDTD acústico: el
-esquema velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y
-la superficie libre por imagen de esfuerzos de Moczo et al. (2007),
-expuesto a través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con
-`ExplosionSource` y `ForceSource`, validado contra las velocidades de las
-ondas de cuerpo, la raíz exacta de Rayleigh, la dispersión de flexión de
-Kirchhoff y el límite acústico bit a bit. El acoplamiento fluido-sólido de
-las secciones 4-7, con las constantes `Material`,
-`ElasticFDTD2D.from_regions` y `scholte_speed`: la reflexión oblicua con
-conversión de modo contra Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) en
-ángulos subcríticos y entre críticos, la velocidad de la onda de Scholte
-contra la ecuación característica exacta (Ec. 4.4.20) y por tiempo de vuelo
-en el benchmark de fondo blando de van Vossen (2002), la transmisión de la
-placa sumergida con su primera resonancia de espesor contra la forma
-cerrada de tres medios (Ecs. 2.4.14-2.4.19), la ley de masas del panel
-sumergido y la prueba de robustez con el contraste extremo aire-acero.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El compañero elástico P-SV del método FDTD acústico: el esquema
+velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y la
+superficie libre por imagen de esfuerzos de Moczo et al. (2007), expuesto a
+través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con `ExplosionSource` y
+`ForceSource`, validado contra las velocidades de las ondas de cuerpo, la raíz
+exacta de Rayleigh, la dispersión de flexión de Kirchhoff y el límite acústico
+bit a bit. El acoplamiento fluido-sólido de las secciones 4-7, con las
+constantes `Material`, `ElasticFDTD2D.from_regions` y `scholte_speed`: la
+reflexión oblicua con conversión de modo contra Brekhovskikh y Godin (Ecs.
+4.2.22-4.2.26) en ángulos subcríticos y entre críticos, la velocidad de la
+onda de Scholte contra la ecuación característica exacta (Ec. 4.4.20) y por
+tiempo de vuelo en el benchmark de fondo blando de van Vossen (2002), la
+transmisión de la placa sumergida con su primera resonancia de espesor contra
+la forma cerrada de tres medios (Ecs. 2.4.14-2.4.19), la ley de masas del
+panel sumergido y la prueba de robustez con el contraste extremo aire-acero.
+</ScopeClaim>
 
-**No cubierto.** Todo lo que el esquema acústico 2D no puede hacer,
-este tampoco: el dominio es una sección transversal (propagación cilíndrica
-$1/\sqrt{r}$, no $1/r$), así que los niveles absolutos y las tasas de
-decaimiento no son los de un problema 3D. El sólido es isótropo y puramente
-elástico: sin anisotropía ni amortiguamiento viscoelástico más allá de la
-tasa de decaimiento volumétrica, así que los factores de pérdidas del
-material no se modelan. No hay una capa elástica perfectamente adaptada: la
-esponja absorbe las ondas de Rayleigh rasantes peor que las ondas de
-cuerpo. La dispersión de ondas guiadas más allá del régimen de placa
-delgada de Kirchhoff (modos de Lamb completos) es observable en los campos
-pero no tiene aquí oráculo dedicado en forma cerrada.
+<ScopeClaim status="not-covered" label="No cubierto">
+Todo lo que el esquema acústico 2D no puede hacer, este tampoco: el dominio es
+una sección transversal (propagación cilíndrica $1/\sqrt{r}$, no $1/r$), así
+que los niveles absolutos y las tasas de decaimiento no son los de un problema
+3D. El sólido es isótropo y puramente elástico: sin anisotropía ni
+amortiguamiento viscoelástico más allá de la tasa de decaimiento volumétrica,
+así que los factores de pérdidas del material no se modelan. No hay una capa
+elástica perfectamente adaptada: la esponja absorbe las ondas de Rayleigh
+rasantes peor que las ondas de cuerpo. La dispersión de ondas guiadas más allá
+del régimen de placa delgada de Kirchhoff (modos de Lamb completos) es
+observable en los campos pero no tiene aquí oráculo dedicado en forma cerrada.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

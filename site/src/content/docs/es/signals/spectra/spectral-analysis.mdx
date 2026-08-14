@@ -49,6 +49,8 @@ references:
     note: "Capítulo 7 (estimación multitaper: autoespectros propios, ponderación adaptativa, grados de libertad equivalentes) y capítulo 8 (cálculo de las secuencias de Slepian); los autovalores de la tabla 382 anclan el oráculo de las ventanas en la batería de tests. ISBN 978-0-521-43541-3."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Un espectro sin su incertidumbre es media medición. Esta página cubre los
@@ -854,27 +856,31 @@ salida.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los estimadores de Welch de Bendat y Piersol (*Random
-Data*, 4.ª ed., 2010, secciones 5.2, 8.5, 9.1-9.2 y 11.5):
-`power_spectral_density` y `cross_spectral_density` con el número efectivo
-de promedios, los intervalos de confianza chi-cuadrado y el error de sesgo
-por resolución; el espectro de salida coherente y la relación
-señal-ruido espectral; las figuras de mérito de las ventanas de Harris
-(1978) de `window_metrics`; y el estimador multitaper de Thomson (1982) de
-`multitaper_psd`, siguiendo los capítulos 7 y 8 de Percival y Walden.
-`fractional_octave_smoothing` y `noise_signal` completan la caja de
-herramientas.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los estimadores de Welch de Bendat y Piersol (*Random Data*, 4.ª ed., 2010,
+secciones 5.2, 8.5, 9.1-9.2 y 11.5): `power_spectral_density` y
+`cross_spectral_density` con el número efectivo de promedios, los intervalos
+de confianza chi-cuadrado y el error de sesgo por resolución; el espectro de
+salida coherente y la relación señal-ruido espectral; las figuras de mérito de
+las ventanas de Harris (1978) de `window_metrics`; y el estimador multitaper
+de Thomson (1982) de `multitaper_psd`, siguiendo los capítulos 7 y 8 de
+Percival y Walden. `fractional_octave_smoothing` y `noise_signal` completan la
+caja de herramientas.
+</ScopeClaim>
 
-**No cubierto.** Los estimadores de respuesta en frecuencia
-`transfer_function` y `coherence`, y la sonda de intensidad acústica,
-comparten el núcleo de Welch de esta página pero se documentan en las
-páginas de [electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) y
-[intensidad acústica](/phonometry/es/devices/emission/intensity/), no aquí. Lo mismo
-ocurre con la coherencia múltiple y parcial, en la página de
-[coherencia MISO](/phonometry/es/signals/spectra/miso-coherence/). Esta página
-implementa los estimadores del libro de Bendat y Piersol, no una norma de
-certificación, así que no lleva números de apartado ni límites de
-cumplimiento que comprobar.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los estimadores de respuesta en frecuencia `transfer_function` y `coherence`,
+y la sonda de intensidad acústica, comparten el núcleo de Welch de esta página
+pero se documentan en las páginas de
+[electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) y
+[intensidad acústica](/phonometry/es/devices/emission/intensity/), no aquí. Lo
+mismo ocurre con la coherencia múltiple y parcial, en la página de [coherencia
+MISO](/phonometry/es/signals/spectra/miso-coherence/). Esta página implementa
+los estimadores del libro de Bendat y Piersol, no una norma de certificación,
+así que no lleva números de apartado ni límites de cumplimiento que comprobar.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

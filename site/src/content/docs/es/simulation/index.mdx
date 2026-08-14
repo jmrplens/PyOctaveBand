@@ -3,6 +3,9 @@ title: "Simulación de ondas"
 description: "Calcular el propio campo sonoro: un método FDTD 2D determinista sobre una malla escalonada presión-velocidad, con fuentes, sondas, obstáculos rasterizados y contornos por lado, más su compañero elástico P-SV con ondas de Rayleigh, acoplamiento fluido-sólido y ondas de interfase de Scholte."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 La mayor parte de esta biblioteca predice un número; esta sección calcula el
 **propio campo de ondas**. Un esquema de diferencias finitas en el
 dominio del tiempo (FDTD) integra las ecuaciones acústicas lineales sobre una
@@ -134,26 +137,32 @@ dice en su propia apertura.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Dos dimensiones, y no hay forma de esquivarlo.** Todo lo que una sección 2D
-no puede decir de una sala 3D, no lo dice ninguno de los dos esquemas, y
-la divergencia cilíndrica de más arriba es solo la consecuencia más visible. El
+no puede decir de una sala 3D, no lo dice ninguno de los dos esquemas, y la
+divergencia cilíndrica de más arriba es solo la consecuencia más visible. El
 contorno abierto es una capa absorbente de rampa cuadrática — el precursor
-sencillo de una capa perfectamente adaptada, no una PML —, así que la incidencia
-rasante se absorbe menos limpiamente que la normal, y el esquema elástico
-no tiene ninguna PML elástica, lo que más se nota en las ondas de Rayleigh
-rasantes. El medio no se mueve: **el viento y la advección por flujo no se
-modelan**, así que un estudio de refracción aquí sale de un perfil de velocidad
-del sonido dependiente de la altura y no de un campo de flujo. El único contorno
-de impedancia es uno real independiente de la frecuencia, así que un absorbente
-poroso hay que mallarlo en vez de declararlo. Del lado elástico el sólido es
-isótropo y puramente elástico: sin anisotropía y sin amortiguamiento
-viscoelástico más allá de la tasa de decaimiento volumétrica, así que no se puede
-introducir un factor de pérdidas del material.
+sencillo de una capa perfectamente adaptada, no una PML —, así que la
+incidencia rasante se absorbe menos limpiamente que la normal, y el esquema
+elástico no tiene ninguna PML elástica, lo que más se nota en las ondas de
+Rayleigh rasantes. El medio no se mueve: **el viento y la advección por flujo
+no se modelan**, así que un estudio de refracción aquí sale de un perfil de
+velocidad del sonido dependiente de la altura y no de un campo de flujo. El
+único contorno de impedancia es uno real independiente de la frecuencia, así
+que un absorbente poroso hay que mallarlo en vez de declararlo. Del lado
+elástico el sólido es isótropo y puramente elástico: sin anisotropía y sin
+amortiguamiento viscoelástico más allá de la tasa de decaimiento volumétrica,
+así que no se puede introducir un factor de pérdidas del material.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Y aquí no hay ningún paquete de acústica de salas. No hay importador de
 geometría, ni biblioteca de materiales, ni trazador de rayos, ni auralización,
-ni cálculo 3D: los obstáculos se rasterizan sobre la malla a partir de
-formas que defines tú, y la salida es un campo que analizas tú.
+ni cálculo 3D: los obstáculos se rasterizan sobre la malla a partir de formas
+que defines tú, y la salida es un campo que analizas tú.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

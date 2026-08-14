@@ -3,6 +3,9 @@ title: "Radiodifusión"
 description: "La sonoridad de programa como la mide la radiodifusión: la cadena con puertas y ponderada en K de UIT-R BS.1770 en LUFS, el objetivo y el techo de pico verdadero de EBU R 128, los medidores en modo EBU de Tech 3341 y el rango de sonoridad de Tech 3342."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 La radiodifusión resolvió el problema de la sonoridad con una medición, no con
 un compresor: un número por programa, con puerta para que el silencio no lo
 diluya, y un rango que dice cuánto se mueve el programa.
@@ -64,12 +67,17 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
-El **Anexo 4 de BS.1770-5, el audio basado en objetos, queda fuera de alcance**,
-y la biblioteca no implementa ningún renderizador espacial, así que un programa
-basado en objetos hay que renderizarlo a una disposición de altavoces antes de
-que nada de esto se aplique. **EBU Tech 3343** se cita como práctica de
-producción alrededor de estos números, no como algoritmo: aquí no se ejecuta. Y
-la propia normalización de sonoridad — el cambio de ganancia, y cualquier
-limitación que venga detrás — es un paso de producción que esta biblioteca no
-realiza: mide el programa y te dice el desplazamiento, y aplicarlo es tarea de
-tu codificador.
+<Scope>
+<ScopeClaim status="not-covered">
+El **Anexo 4 de BS.1770-5, el audio basado en objetos, queda fuera de
+alcance**, y la biblioteca no implementa ningún renderizador espacial, así que
+un programa basado en objetos hay que renderizarlo a una disposición de
+altavoces antes de que nada de esto se aplique. **EBU Tech 3343** se cita como
+práctica de producción alrededor de estos números, no como algoritmo: aquí no
+se ejecuta. Y la propia normalización de sonoridad — el cambio de ganancia, y
+cualquier limitación que venga detrás — es un paso de producción que esta
+biblioteca no realiza: mide el programa y te dice el desplazamiento, y
+aplicarlo es tarea de tu codificador.
+</ScopeClaim>
+</Scope>
+

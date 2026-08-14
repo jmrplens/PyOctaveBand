@@ -33,9 +33,11 @@ references:
     note: "El criterio de ganancia antes de la realimentación del apartado 4: las ganancias en lazo abierto y de realimentación, el margen de estabilidad y la corrección por número de micrófonos abiertos (capítulo 18, ecuaciones (18.13) a (18.24))."
 ---
 
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 La hoja de características de un altavoz es un paquete de convenciones, e IEC 60268-5
 es la norma que las fija: a qué se refiere la «sensibilidad», sobre qué
@@ -822,52 +824,53 @@ directamente, y `plot_sound_reinforcement_geometry` dibuja el lazo de arriba.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las convenciones de sensibilidad de IEC 60268-5:2003+A1:2007
-(la sensibilidad característica referida a 1 W en la impedancia nominal a
-1 m, apartados 20.3/20.4, y la referencia por distancia inversa del
-apartado 7.1) y las condiciones en las que quedan definidas: los tres
-montajes del apartado 10, el plano, el punto y el eje de referencia del
-apartado 15, el preacondicionamiento de 1 h del apartado 12, la excitación
-con ruido rosa limitado en banda de 20.1.2 con su sustituto por tercios de
-octava, los requisitos de instrumentación de los apartados 8 y 9, el campo
-libre simulado de 5.5/7.3, y la geometría polar, la regla de excitación y las
-dos vías del índice de directividad del apartado 23. El modelo de radiación
-del pistón en pantalla
-(`radiating_piston`, `piston_directivity_pattern`, Beranek y Mellow
-§4.19/§13.7): la resistencia y reactancia de radiación normalizadas, la
-masa de radiación, la directividad de campo lejano y el dibujo de la
-geometría a escala. Las características nominales mediante
-`loudspeaker_characteristics` y su `.report()`: el nivel de sensibilidad y
-el rango de frecuencias efectivo calculados (21.2), la respuesta en eje con
-su banda de tolerancia y los paneles de impedancia, THD y polar dibujados
-según las convenciones de escala de IEC 60263. El criterio de ganancia
-antes de la realimentación del capítulo 18 de *Architectural Acoustics*
-2.ª ed. de Long (ecs. (18.13) a (18.24)) mediante `feedback_stability`,
-`feedback_loop_gain`, `open_microphone_correction` y
-`plot_sound_reinforcement_geometry`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las convenciones de sensibilidad de IEC 60268-5:2003+A1:2007 (la sensibilidad
+característica referida a 1 W en la impedancia nominal a 1 m, apartados
+20.3/20.4, y la referencia por distancia inversa del apartado 7.1) y las
+condiciones en las que quedan definidas: los tres montajes del apartado 10, el
+plano, el punto y el eje de referencia del apartado 15, el
+preacondicionamiento de 1 h del apartado 12, la excitación con ruido rosa
+limitado en banda de 20.1.2 con su sustituto por tercios de octava, los
+requisitos de instrumentación de los apartados 8 y 9, el campo libre simulado
+de 5.5/7.3, y la geometría polar, la regla de excitación y las dos vías del
+índice de directividad del apartado 23. El modelo de radiación del pistón en
+pantalla (`radiating_piston`, `piston_directivity_pattern`, Beranek y Mellow
+§4.19/§13.7): la resistencia y reactancia de radiación normalizadas, la masa
+de radiación, la directividad de campo lejano y el dibujo de la geometría a
+escala. Las características nominales mediante `loudspeaker_characteristics` y
+su `.report()`: el nivel de sensibilidad y el rango de frecuencias efectivo
+calculados (21.2), la respuesta en eje con su banda de tolerancia y los
+paneles de impedancia, THD y polar dibujados según las convenciones de escala
+de IEC 60263. El criterio de ganancia antes de la realimentación del capítulo
+18 de *Architectural Acoustics* 2.ª ed. de Long (ecs. (18.13) a (18.24))
+mediante `feedback_stability`, `feedback_loop_gain`,
+`open_microphone_correction` y `plot_sound_reinforcement_geometry`.
+</ScopeClaim>
 
-**No cubierto.** Las funciones no comprueban ninguna de las condiciones de
-arriba: reducen y presentan las curvas que se les entregan, así que el
-montaje, la excitación, el enventanado y la condición de campo quedan a cargo
-de quien opera, que además tiene que declararlos junto al resultado. Los
-valores eléctricos y mecánicos que la norma define
-en torno a la potencia admisible (potencia de ruido nominal, tensiones
-máximas de entrada de corta y larga duración, apartado 17) los declara el
-fabricante, no se calculan aquí. La extracción de parámetros de
-Thiele-Small de la curva de impedancia no está implementada: el panel de
-impedancia presenta el módulo medido frente a las líneas de impedancia
-nominal. La propia curva de distorsión procede de una medición, por
-ejemplo de la cadena de
-[distorsión con barrido
+<ScopeClaim status="not-covered" label="No cubierto">
+Las funciones no comprueban ninguna de las condiciones de arriba: reducen y
+presentan las curvas que se les entregan, así que el montaje, la excitación,
+el enventanado y la condición de campo quedan a cargo de quien opera, que
+además tiene que declararlos junto al resultado. Los valores eléctricos y
+mecánicos que la norma define en torno a la potencia admisible (potencia de
+ruido nominal, tensiones máximas de entrada de corta y larga duración,
+apartado 17) los declara el fabricante, no se calculan aquí. La extracción de
+parámetros de Thiele-Small de la curva de impedancia no está implementada: el
+panel de impedancia presenta el módulo medido frente a las líneas de
+impedancia nominal. La propia curva de distorsión procede de una medición, por
+ejemplo de la cadena de [distorsión con barrido
 sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
-El criterio de realimentación es una contabilidad de niveles, no un
-modelo acústico: consume los dos niveles de campo directo que produce
-el altavoz y no los calcula a partir de un patrón de cobertura, ni
-predice la frecuencia de acoplo ni el efecto de un ecualizador o de un
-desplazador de frecuencia. Long excluye el campo reverberante a
-propósito, porque un campo uniforme no puede depender de dónde esté el
-micrófono ni de hacia dónde apunte; la relación directo-reverberante
-entra en el diseño por separado.
+El criterio de realimentación es una contabilidad de niveles, no un modelo
+acústico: consume los dos niveles de campo directo que produce el altavoz y no
+los calcula a partir de un patrón de cobertura, ni predice la frecuencia de
+acoplo ni el efecto de un ecualizador o de un desplazador de frecuencia. Long
+excluye el campo reverberante a propósito, porque un campo uniforme no puede
+depender de dónde esté el micrófono ni de hacia dónde apunte; la relación
+directo-reverberante entra en el diseño por separado.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

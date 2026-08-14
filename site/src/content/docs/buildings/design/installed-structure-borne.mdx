@@ -26,8 +26,10 @@ references:
     note: "The coupling term (clause 4.4.3, Formulae 19a-19e), the installed structure-borne power level (Formula 18b), the structure-to-airborne adjustment term (clause 4.4.4, Formulae 20a/20b), and the normalised sound pressure level per path and its energetic combination (Formulae 18a, 17). Conformance is anchored on the coupling-term force-source limit and the standard's own Annex I worked examples: the whirlpool bath of I.2 (Table I.6a: mobility correction and path 11) and the flushing cistern of I.3 (Tables I.8/I.9: source conversion, all four transmission paths, the Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of the printed one-decimal intermediates. D_sa and R_ij,ref are inputs (from measurement / EN 12354-1 / Annexes D and F). The linked catalogue record is the BSI Knowledge page for BS EN 12354-5:2009; since revised as EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 **EN 12354-5:2009** predicts the sound pressure level in a receiving room caused
 by building service equipment (pumps, fans, lifts, water installations) that
@@ -512,21 +514,26 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** EN 12354-5:2009: the coupling term $D_C$ (clause 4.4.3,
-Formulae 19b-e, with its force-source and velocity-source limits) via
-`coupling_term`, the installed power level
-$L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$
-(Formula 18b) via `installed_structure_borne_power_level`, and the per-path
-normalised sound pressure level and its energetic total (Formulae 18a, 17)
-via `installed_source_prediction`. Validated against the standard's own
-Annex I worked examples, the whirlpool bath (I.2) and the flushing cistern
-(I.3), within the ±0.15 dB rounding of the printed intermediates.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+EN 12354-5:2009: the coupling term $D_C$ (clause 4.4.3, Formulae 19b-e, with
+its force-source and velocity-source limits) via `coupling_term`, the
+installed power level $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Formula 18b)
+via `installed_structure_borne_power_level`, and the per-path normalised sound
+pressure level and its energetic total (Formulae 18a, 17) via
+`installed_source_prediction`. Validated against the standard's own Annex I
+worked examples, the whirlpool bath (I.2) and the flushing cistern (I.3),
+within the ±0.15 dB rounding of the printed intermediates.
+</ScopeClaim>
 
-**Not covered.** The Annex D and F default-value tables for the structure-
-to-airborne adjustment term $D_{sa}$ and the flanking reduction index
-$R_{ij,\mathrm{ref}}$ are not implemented; both are inputs you supply from measurement,
-EN 12354-1 or the standard's own annexes. Only the 2009 edition is
-implemented, not the 2023 revision.
+<ScopeClaim status="not-covered" label="Not covered">
+The Annex D and F default-value tables for the structure- to-airborne
+adjustment term $D_{sa}$ and the flanking reduction index
+$R_{ij,\mathrm{ref}}$ are not implemented; both are inputs you supply from
+measurement, EN 12354-1 or the standard's own annexes. Only the 2009 edition
+is implemented, not the 2023 revision.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

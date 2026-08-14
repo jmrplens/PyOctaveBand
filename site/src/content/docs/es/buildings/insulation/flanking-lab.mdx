@@ -67,8 +67,10 @@ references:
     note: "La Sección 9.2.3 presenta el modelo unidimensional de plenum de Mechel, Ecs. (9.13) a (9.20). ISBN 978-0-415-42853-8."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 EN 12354 predice un edificio a partir de sus uniones, e ISO 10848 es la trayectoria
 por la que una unión consigue su número. Dos elementos unidos rígidamente a lo
@@ -629,55 +631,58 @@ repositorio. Pulsa una vista previa para abrir el PDF:
 
 ## Qué cubre esta guía
 
-**Cubierto.** El índice de reducción vibratoria $K_{ij}$ de
-ISO 10848-1:2006 (Fórmula (13)) desde la diferencia de niveles de velocidad
-promediada direccionalmente (Fórmula (11)) y las longitudes de absorción
-equivalentes (Fórmula (12)), con la forma simplificada para elementos
-ligeros (Fórmula (14)), el factor de pérdidas total y la media de número
-único del Anexo A, mediante
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El índice de reducción vibratoria $K_{ij}$ de ISO 10848-1:2006 (Fórmula (13))
+desde la diferencia de niveles de velocidad promediada direccionalmente
+(Fórmula (11)) y las longitudes de absorción equivalentes (Fórmula (12)), con
+la forma simplificada para elementos ligeros (Fórmula (14)), el factor de
+pérdidas total y la media de número único del Anexo A, mediante
 `building.direction_averaged_level_difference` y
 `building.vibration_reduction_index`; los descriptores globales $D_{n,f}$
 (Fórmula (4)) y $L_{n,f}$ (Fórmula (5)) con sus números únicos de ISO 717,
 mediante `building.normalized_flanking_level_difference` y
 `building.normalized_flanking_impact_level`; la comprobación de acoplamiento
-fuerte (Fórmula (15)) y las comprobaciones de validez de ISO 10848-4:2010
-por densidad modal, recuento de modos por banda y solape modal que ponen
-entre corchetes las bandas poco fiables
-(`building.strong_coupling_satisfied`, `building.modal_density`,
-`building.band_mode_count`, `building.modal_overlap_factor`); y las tres
-fichas de una página con `.report()`.
+fuerte (Fórmula (15)) y las comprobaciones de validez de ISO 10848-4:2010 por
+densidad modal, recuento de modos por banda y solape modal que ponen entre
+corchetes las bandas poco fiables (`building.strong_coupling_satisfied`,
+`building.modal_density`, `building.band_mode_count`,
+`building.modal_overlap_factor`); y las tres fichas de una página con
+`.report()`.
+</ScopeClaim>
 
-**No cubierto.** Las partes 2, 3 y 4 de ISO 10848 difieren en los tipos de
-unión y de elemento de ensayo a los que se aplican; phonometry implementa solo las
-fórmulas genéricas de $K_{ij}$/$D_{n,f}$/$L_{n,f}$ de la parte 1, más la
-comprobación de solape modal de la parte 4, no los montajes de ensayo
-específicos de instalación que describen las otras partes. La adquisición de
-[La medición](#la-medicion-iso-10848-1-2017)
-está documentada aquí y no se comprueba en ninguna parte: nada verifica que
-los demás elementos se apantallaran, que el apantallamiento alcanzara
-$\Delta R_\text{min}$, que se respetaran los recuentos y las separaciones de
-posiciones, que el acelerómetro cumpliera la desigualdad de carga másica, ni
-que $T_s$ se midiera sobre los elementos ya montados en lugar de suponerse.
-Como ISO 10848
-no contiene ejemplo numérico resuelto, la conformidad se ancla en
-identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ en
-$f_\text{ref}$, $\eta$).
+<ScopeClaim status="not-covered" label="No cubierto">
+Las partes 2, 3 y 4 de ISO 10848 difieren en los tipos de unión y de elemento
+de ensayo a los que se aplican; phonometry implementa solo las fórmulas
+genéricas de $K_{ij}$/$D_{n,f}$/$L_{n,f}$ de la parte 1, más la comprobación
+de solape modal de la parte 4, no los montajes de ensayo específicos de
+instalación que describen las otras partes. La adquisición de [La
+medición](#la-medicion-iso-10848-1-2017) está documentada aquí y no se
+comprueba en ninguna parte: nada verifica que los demás elementos se
+apantallaran, que el apantallamiento alcanzara $\Delta R_\text{min}$, que se
+respetaran los recuentos y las separaciones de posiciones, que el acelerómetro
+cumpliera la desigualdad de carga másica, ni que $T_s$ se midiera sobre los
+elementos ya montados en lugar de suponerse. Como ISO 10848 no contiene
+ejemplo numérico resuelto, la conformidad se ancla en identidades de forma
+cerrada ($K_{ij}$ simplificado, $a_j$ en $f_\text{ref}$, $\eta$).
+</ScopeClaim>
 
-La rama de techos suspendidos cubre la atenuación normalizada del
-techo $D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de
-atenuación de techo de ASTM E413-22 que invoca ASTM E1414 y el modelo
-unidimensional de plenum de la Sección 9.2.3 de Vigran, con
-`building.normalized_ceiling_attenuation`,
+<ScopeClaim status="covered" label="Cubierto">
+La rama de techos suspendidos cubre la atenuación normalizada del techo
+$D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de atenuación de techo
+de ASTM E413-22 que invoca ASTM E1414 y el modelo unidimensional de plenum de
+la Sección 9.2.3 de Vigran, con `building.normalized_ceiling_attenuation`,
 `building.ceiling_attenuation_class`,
 `building.plenum_flanking_reduction_index` y
-`building.partition_referenced_reduction_index`. El modelo de plenum
-no tiene salida numérica publicada propia, así que se ancla en sus
-formas cerradas y en las propiedades estructurales que una lectura errónea
-rompe: la monotonía con el amortiguamiento del plenum, la cota
-$\tau_{cl} \le 1$ y la convergencia de la Ec. (9.18) a la Ec. (9.20);
-la cadena de medición y la clase se anclan en informes de laboratorio
-acreditados ASTM E1414. La constante de propagación $k'$ de un
-conducto revestido es aquí un dato de entrada, no una predicción.
+`building.partition_referenced_reduction_index`. El modelo de plenum no tiene
+salida numérica publicada propia, así que se ancla en sus formas cerradas y en
+las propiedades estructurales que una lectura errónea rompe: la monotonía con
+el amortiguamiento del plenum, la cota $\tau_{cl} \le 1$ y la convergencia de
+la Ec. (9.18) a la Ec. (9.20); la cadena de medición y la clase se anclan en
+informes de laboratorio acreditados ASTM E1414. La constante de propagación
+$k'$ de un conducto revestido es aquí un dato de entrada, no una predicción.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

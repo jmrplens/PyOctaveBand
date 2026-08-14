@@ -38,8 +38,10 @@ references:
     note: "La estimación informativa de suelos flotantes del Anexo C que reproduce esta página (Fórmulas C.1 a C.4, la resonancia 160 raíz(s'/m')) y el suelo resuelto de su Anexo G."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Un revestimiento de suelo blando no bloquea el ruido aéreo; amortigua las
 pisadas. Lo que mejora es el nivel de impactos del forjado que tiene debajo,
@@ -381,31 +383,36 @@ $\Delta L_w$ que se tenga.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El nivel de aceleración de ISO 16251-1:2014 (Fórmula (1)), la
-corrección de ruido de fondo de tres ramas (Fórmula (2)), la mejora
-promediada por posiciones $\Delta L$ (Fórmulas (3)/(4)) y su síntesis en
-octavas (Fórmula (5)), mediante `building.acceleration_level`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El nivel de aceleración de ISO 16251-1:2014 (Fórmula (1)), la corrección de
+ruido de fondo de tres ramas (Fórmula (2)), la mejora promediada por
+posiciones $\Delta L$ (Fórmulas (3)/(4)) y su síntesis en octavas (Fórmula
+(5)), mediante `building.acceleration_level`,
 `building.background_corrected_level` y `building.impact_improvement`; la
-declaración de resultados del apartado 8 e), $\Delta L_w$ frente al suelo
-de referencia de la Tabla 4 de ISO 717-2 con el término de adaptación
+declaración de resultados del apartado 8 e), $\Delta L_w$ frente al suelo de
+referencia de la Tabla 4 de ISO 717-2 con el término de adaptación
 $C_{I,\Delta}$ (Fórmula (A.4)), mediante
 `building.weighted_impact_improvement` y
 `building.impact_improvement_adaptation_term`; y la ficha acreditada de una
 página con `.report()`.
+</ScopeClaim>
 
-**No cubierto.** La propia instalación de la maqueta (las dimensiones de la
-placa, los apoyos resilientes, las posiciones de la máquina de impactos del
-apartado 5) no se comprueba: las funciones consumen niveles de
-aceleración medidos vengan de donde vengan. Las fórmulas de suelo flotante
-del Anexo C de ISO 12354-2:2017 se citan en esta página como ayudas de proyecto y
-se evalúan en línea con numpy; las funciones dedicadas que las envuelven,
-junto con el modelo de fuerza de la máquina de impactos que hay tras la mejora
-de un revestimiento blando y la magnitud global de un trasdosado según el
-anexo D de ISO 12354-1, son el objeto de
-[Predicción del comportamiento de capas
-elásticas](/phonometry/es/buildings/design/resilient-layers/). El
-método a tamaño completo ISO 140-8, ya sustituido, aparece aquí solo como
-eje de comparación del ejemplo resuelto de Foret et al. (2011).
+<ScopeClaim status="not-covered" label="No cubierto">
+La propia instalación de la maqueta (las dimensiones de la placa, los apoyos
+resilientes, las posiciones de la máquina de impactos del apartado 5) no se
+comprueba: las funciones consumen niveles de aceleración medidos vengan de
+donde vengan. Las fórmulas de suelo flotante del Anexo C de ISO 12354-2:2017
+se citan en esta página como ayudas de proyecto y se evalúan en línea con
+numpy; las funciones dedicadas que las envuelven, junto con el modelo de
+fuerza de la máquina de impactos que hay tras la mejora de un revestimiento
+blando y la magnitud global de un trasdosado según el anexo D de ISO 12354-1,
+son el objeto de [Predicción del comportamiento de capas
+elásticas](/phonometry/es/buildings/design/resilient-layers/). El método a
+tamaño completo ISO 140-8, ya sustituido, aparece aquí solo como eje de
+comparación del ejemplo resuelto de Foret et al. (2011).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

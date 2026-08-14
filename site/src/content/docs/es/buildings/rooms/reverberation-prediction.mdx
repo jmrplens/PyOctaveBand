@@ -95,9 +95,11 @@ references:
     note: "El coeficiente de absorción atmosférica que sustenta el término de aire 4mV; ver la guía de propagación en exteriores."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 El **tiempo de reverberación** $T$, el tiempo que tarda el nivel de energía
 sonora en caer 60 dB tras detenerse la fuente, se predice aquí a partir del
@@ -722,28 +724,33 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las fórmulas clásicas del tiempo de reverberación de la
-acústica estadística de Sabine (1922), Eyring (1930), Millington-Sette
-(1932), Fitzroy (1959) y Arau-Puchades (1988), cada una con su propia
-comprobación de dominio de validez y el término de absorción del aire
-derivado de la ISO 9613-1, mediante `room.sabine_reverberation_time`,
-`room.eyring_reverberation_time`, `room.millington_sette_reverberation_time`,
-`room.fitzroy_reverberation_time`, `room.arau_puchades_reverberation_time`
-y la función combinada `room.reverberation_time_models`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las fórmulas clásicas del tiempo de reverberación de la acústica estadística
+de Sabine (1922), Eyring (1930), Millington-Sette (1932), Fitzroy (1959) y
+Arau-Puchades (1988), cada una con su propia comprobación de dominio de
+validez y el término de absorción del aire derivado de la ISO 9613-1, mediante
+`room.sabine_reverberation_time`, `room.eyring_reverberation_time`,
+`room.millington_sette_reverberation_time`, `room.fitzroy_reverberation_time`,
+`room.arau_puchades_reverberation_time` y la función combinada
+`room.reverberation_time_models`.
+</ScopeClaim>
 
-**No cubierto.** El propio modelo del apartado 4 de la EN 12354-6 (un
-cálculo de Sabine con un término de objetos añadido y el término de aire de
-la ISO 9613-1) es un cálculo distinto, definido por esa norma, que vive en
-la
-[guía de absorción acústica en
-recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/),
-no aquí. Ninguna de las cinco fórmulas modela volúmenes acoplados, salas
+<ScopeClaim status="not-covered" label="No cubierto">
+El propio modelo del apartado 4 de la EN 12354-6 (un cálculo de Sabine con un
+término de objetos añadido y el término de aire de la ISO 9613-1) es un
+cálculo distinto, definido por esa norma, que vive en la [guía de absorción
+acústica en
+recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/), no aquí.
+Ninguna de las cinco fórmulas modela volúmenes acoplados, salas
 desproporcionadas o geometrías focalizantes: sus decaimientos de doble
 pendiente o dependientes de la posición quedan fuera de toda hipótesis de
 campo difuso (apartado 4). Para un decaimiento medido que muestre esos
-síntomas, usa el diagnóstico de curvatura T20/T30 de la
-[guía de Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) en lugar
-de una predicción estadística.
+síntomas, usa el diagnóstico de curvatura T20/T30 de la [guía de Acústica de
+salas](/phonometry/es/buildings/rooms/room-acoustics/) en lugar de una
+predicción estadística.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

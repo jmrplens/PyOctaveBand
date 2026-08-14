@@ -26,8 +26,10 @@ references:
     note: "El término de acoplamiento (apartado 4.4.3, Fórmulas 19a-19e), el nivel de potencia estructural instalada (Fórmula 18b), el término de ajuste estructura-a-aéreo (apartado 4.4.4, Fórmulas 20a/20b) y el nivel de presión acústica normalizado por trayectoria y su combinación energética (Fórmulas 18a, 17). La conformidad se ancla en el límite de fuente de fuerza del término de acoplamiento y en los ejemplos resueltos del propio Anexo I de la norma: la bañera de hidromasaje de I.2 (Tabla I.6a: corrección de movilidad y trayectoria 11) y la cisterna de I.3 (Tablas I.8/I.9: conversión de la fuente, las cuatro trayectorias de transmisión, el total de la Fórmula 17 y su cierre a 29 dB(A)), dentro del redondeo de ±0,15 dB de los intermedios impresos con un decimal. D_sa y R_ij,ref son entradas (de medición / EN 12354-1 / Anexos D y F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-5:2009; revisada después como EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La **EN 12354-5:2009** predice el nivel de presión acústica en un recinto receptor
 causado por equipamientos del edificio (bombas, ventiladores, ascensores,
@@ -538,21 +540,27 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La EN 12354-5:2009: el término de acoplamiento $D_C$
-(apartado 4.4.3, Fórmulas 19b-e, con sus límites de fuente de fuerza y de
-fuente de velocidad) mediante `coupling_term`, el nivel de potencia
-instalada $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La EN 12354-5:2009: el término de acoplamiento $D_C$ (apartado 4.4.3, Fórmulas
+19b-e, con sus límites de fuente de fuerza y de fuente de velocidad) mediante
+`coupling_term`, el nivel de potencia instalada
+$L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
 `installed_structure_borne_power_level`, y el nivel de presión acústica
 normalizado por trayectoria y su total energético (Fórmulas 18a, 17) mediante
-`installed_source_prediction`. Validado contra los propios ejemplos
-resueltos del Anexo I de la norma, la bañera de hidromasaje (I.2) y la
-cisterna (I.3), dentro del redondeo de ±0,15 dB de los intermedios impresos.
+`installed_source_prediction`. Validado contra los propios ejemplos resueltos
+del Anexo I de la norma, la bañera de hidromasaje (I.2) y la cisterna (I.3),
+dentro del redondeo de ±0,15 dB de los intermedios impresos.
+</ScopeClaim>
 
-**No cubierto.** Las tablas de valores por defecto de los Anexos D y F para
-el término de ajuste estructura-a-aéreo $D_{sa}$ y el índice de reducción por
-flancos $R_{ij,\mathrm{ref}}$ no están implementadas; ambos son entradas que se aportan
-a partir de mediciones, de la EN 12354-1 o de los propios anexos de la
+<ScopeClaim status="not-covered" label="No cubierto">
+Las tablas de valores por defecto de los Anexos D y F para el término de
+ajuste estructura-a-aéreo $D_{sa}$ y el índice de reducción por flancos
+$R_{ij,\mathrm{ref}}$ no están implementadas; ambos son entradas que se
+aportan a partir de mediciones, de la EN 12354-1 o de los propios anexos de la
 norma. Solo está implementada la edición de 2009, no la revisión de 2023.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -29,8 +29,10 @@ references:
     note: "Un documento de criterios de libre acceso (el PDF enlazado es la descarga gratuita) que repasa la misma evidencia de exposición-respuesta y las cuestiones de *fence* y conservación auditiva tratadas en esta página."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 **ISO 1999:2013** estima la pérdida auditiva que sufre una población por el
 ruido laboral. Da el **desplazamiento permanente del umbral inducido por ruido**
@@ -498,24 +500,28 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 1999:2013 tal como la implementan `nipts` y `htlan`: el
-NIPTS mediano del apartado 6.3.1 (Fórmula 2, extrapolada por debajo de 10
-años con la Fórmula 3, Tabla 1) y su fractil poblacional del apartado 6.3.2
-(Fórmulas 4-7, Tablas 2-3), junto con la combinación HTLAN del apartado 6.1
-(Fórmula 1) que ejecuta `combine_age_and_noise`, todo ello validado frente a
-los ejemplos resueltos del Anexo D. La componente de edad es la base de datos
-A, evaluada a partir de ISO 7029:2017, la edición que el apartado 6.2.2 cita
-sin fecha.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 1999:2013 tal como la implementan `nipts` y `htlan`: el NIPTS mediano
+del apartado 6.3.1 (Fórmula 2, extrapolada por debajo de 10 años con la
+Fórmula 3, Tabla 1) y su fractil poblacional del apartado 6.3.2 (Fórmulas 4-7,
+Tablas 2-3), junto con la combinación HTLAN del apartado 6.1 (Fórmula 1) que
+ejecuta `combine_age_and_noise`, todo ello validado frente a los ejemplos
+resueltos del Anexo D. La componente de edad es la base de datos A, evaluada a
+partir de ISO 7029:2017, la edición que el apartado 6.2.2 cita sin fecha.
+</ScopeClaim>
 
-**No cubierto.** Los apartados 6.2.3 y 6.2.4 permiten sustituir la base de
-datos A por una base de datos B: un umbral por edad medido en una población de
-control del país correspondiente. Solo está implementada la base de datos A,
-así que `htlan` toma siempre su componente de edad de ISO 7029:2017.
-`combine_age_and_noise` acepta un array de HTLA externo para ese caso, pero
-calcular la base de datos B no es cosa de phonometry. La ISO 1999 no define
-una «discapacidad auditiva» ni un umbral indemnizable: esa línea la fija la
-reglamentación nacional, y aquí no se aplica ninguna, así que hay que
-aportarla y comprobarla uno mismo.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los apartados 6.2.3 y 6.2.4 permiten sustituir la base de datos A por una base
+de datos B: un umbral por edad medido en una población de control del país
+correspondiente. Solo está implementada la base de datos A, así que `htlan`
+toma siempre su componente de edad de ISO 7029:2017. `combine_age_and_noise`
+acepta un array de HTLA externo para ese caso, pero calcular la base de datos
+B no es cosa de phonometry. La ISO 1999 no define una «discapacidad auditiva»
+ni un umbral indemnizable: esa línea la fija la reglamentación nacional, y
+aquí no se aplica ninguna, así que hay que aportarla y comprobarla uno mismo.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

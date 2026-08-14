@@ -53,8 +53,10 @@ references:
     note: "Las incertidumbres típicas por situación de medición (apartado 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Esta guía continúa desde la [guía de Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/):
 la misma respuesta al impulso, medida a ambos lados de un cerramiento, da su
@@ -721,9 +723,11 @@ receptor, es
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia
-de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12
-a 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2020
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia de
+niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12 a
+3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2020
 (aislamiento a ruido de impactos de campo, las mismas normalizaciones con el
 signo invertido) mediante `building.energy_average_level`,
 `building.airborne_insulation` y `building.impact_insulation`, cada una con su
@@ -732,40 +736,38 @@ estándar tabuladas de la ISO 12999-1:2020 (las situaciones de medición A/B/C
 del apartado 5.2 y los factores de cobertura de la Tabla 8, uni- y
 bilaterales) mediante `building.band_uncertainty`,
 `building.single_number_uncertainty` y `building.uncertain_value`. Los índices
-globales citados aquí reutilizan los motores verificados de
-ISO 717-1/ISO 717-2.
+globales citados aquí reutilizan los motores verificados de ISO 717-1/ISO
+717-2.
+</ScopeClaim>
 
-**No cubierto.** Todas las funciones de campo de aquí toman niveles que el
-usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1). La
-*medición* del nivel de fondo — fuente apagada, mismas posiciones, mismo
-promediado — es cosa del operador, y aquí nada verifica que se haya cumplido el
-mínimo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
-[Corrección por ruido de fondo](#correccion-por-ruido-de-fondo)
-más arriba. (`building.background_correction` es la variante de *laboratorio*
-de ISO 10140-4 y no coincide con los umbrales de campo.) Los
-propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (los
-recuentos, las distancias y el promediado de
-[La medición](#la-medicion-iso-16283-1)
-y las mediciones en esquina de
-[Recintos pequeños](#recintos-pequenos-apartado-8)) están
-documentados aquí y no se comprueban en ninguna parte: el promediado en energía
-ocurre una vez que se proporcionan las posiciones, pero nada verifica cuántas
-se tomaron, dónde, ni que se haya llegado a comprobar el umbral de los 25 m³.
-La combinación de las Fórmulas (12) y (13) del procedimiento de baja frecuencia
-son las dos líneas de NumPy impresas más arriba, no una función de la
-biblioteca. Los demás miembros de la
-familia están cubiertos por sus propias guías: la parte de fachada ISO 16283-3
-([Aislamiento acústico de
-fachadas](/phonometry/es/buildings/insulation/facade-insulation/)),
-el método de control ISO 10052
-([Método de control del
-aislamiento](/phonometry/es/buildings/insulation/insulation-survey/)),
-los motores de valoración ISO 717-1/-2
-([Índices globales de
-aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/)) y
-la vía de intensidad acústica ISO 15186-1/-2
-([Aislamiento acústico por
+<ScopeClaim status="not-covered" label="No cubierto">
+Todas las funciones de campo de aquí toman niveles que el usuario ya ha
+corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1). La *medición*
+del nivel de fondo — fuente apagada, mismas posiciones, mismo promediado — es
+cosa del operador, y aquí nada verifica que se haya cumplido el mínimo de 6
+dB; la corrección en sí son tres líneas de NumPy, escritas en [Corrección por
+ruido de fondo](#correccion-por-ruido-de-fondo) más arriba.
+(`building.background_correction` es la variante de *laboratorio* de ISO
+10140-4 y no coincide con los umbrales de campo.) Los propios requisitos de
+posición y procedimiento de la ISO 16283-1/-2 (los recuentos, las distancias y
+el promediado de [La medición](#la-medicion-iso-16283-1) y las mediciones en
+esquina de [Recintos pequeños](#recintos-pequenos-apartado-8)) están
+documentados aquí y no se comprueban en ninguna parte: el promediado en
+energía ocurre una vez que se proporcionan las posiciones, pero nada verifica
+cuántas se tomaron, dónde, ni que se haya llegado a comprobar el umbral de los
+25 m³. La combinación de las Fórmulas (12) y (13) del procedimiento de baja
+frecuencia son las dos líneas de NumPy impresas más arriba, no una función de
+la biblioteca. Los demás miembros de la familia están cubiertos por sus
+propias guías: la parte de fachada ISO 16283-3 ([Aislamiento acústico de
+fachadas](/phonometry/es/buildings/insulation/facade-insulation/)), el método
+de control ISO 10052 ([Método de control del
+aislamiento](/phonometry/es/buildings/insulation/insulation-survey/)), los
+motores de valoración ISO 717-1/-2 ([Índices globales de
+aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/)) y la
+vía de intensidad acústica ISO 15186-1/-2 ([Aislamiento acústico por
 intensidad](/phonometry/es/buildings/insulation/insulation-intensity/)).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

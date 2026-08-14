@@ -3,6 +3,9 @@ title: "Resilient layers"
 description: "The mechanical property a floating floor is designed around: the dynamic stiffness per unit area of a resilient layer, the EN 29052-1 load-plate resonance that measures it, the enclosed-gas term, and the natural frequency it sets under a screed."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A floating floor is a mass-spring system: the screed is the mass, the resilient
 layer is the spring, and the impact improvement the pair buys begins above the
 resonance they set. That resonance is fixed by the mass per unit area m' of the
@@ -55,13 +58,18 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 The measurement starts one step after the signal. Clause 7's extraction of the
 resonant frequency from the raw excitation-response record — by sinusoidal,
-white-noise or pulse excitation — and its extrapolation to zero force amplitude
-are **not implemented**: pass a resonant frequency that has already been
-extrapolated. The lateral airflow resistivity is an input, not a measurement.
-Clause 6's specimen-selection requirement of at least three 200 mm × 200 mm
-specimens is not enforced, so nothing here objects if you characterise a
-material from one. And the layer's other properties — creep under long-term
-load, compressive strength, thermal performance — are outside the standard and
-outside the library.
+white-noise or pulse excitation — and its extrapolation to zero force
+amplitude are **not implemented**: pass a resonant frequency that has already
+been extrapolated. The lateral airflow resistivity is an input, not a
+measurement. Clause 6's specimen-selection requirement of at least three 200
+mm × 200 mm specimens is not enforced, so nothing here objects if you
+characterise a material from one. And the layer's other properties — creep
+under long-term load, compressive strength, thermal performance — are outside
+the standard and outside the library.
+</ScopeClaim>
+</Scope>
+

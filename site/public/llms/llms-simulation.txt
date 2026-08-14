@@ -118,23 +118,23 @@ so in its own opening.
 ## What this section does not cover
 
 **Two dimensions, and no way around it.** Everything a 2D cross-section cannot
-say about a 3D room, neither solver says, and the cylindrical spreading above is
-only the most visible consequence. The open boundary is a quadratic-ramp
-absorbing layer — the simple precursor of a perfectly matched layer, not a PML —
-so grazing incidence is absorbed less cleanly than normal incidence, and the
+say about a 3D room, neither solver says, and the cylindrical spreading above
+is only the most visible consequence. The open boundary is a quadratic-ramp
+absorbing layer — the simple precursor of a perfectly matched layer, not a PML
+— so grazing incidence is absorbed less cleanly than normal incidence, and the
 elastic solver has no elastic PML at all, which shows most on grazing Rayleigh
 waves. The medium is non-moving: **wind and flow advection are not modelled**,
-so a refraction study here comes from a height-dependent sound-speed profile and
-not from a flow field. The only impedance boundary is a frequency-independent
-real one, so a porous absorber has to be meshed rather than declared. On the
-elastic side the solid is isotropic and purely elastic: no anisotropy, and no
-viscoelastic damping beyond the bulk decay rate, so a material loss factor
-cannot be entered.
+so a refraction study here comes from a height-dependent sound-speed profile
+and not from a flow field. The only impedance boundary is a
+frequency-independent real one, so a porous absorber has to be meshed rather
+than declared. On the elastic side the solid is isotropic and purely elastic:
+no anisotropy, and no viscoelastic damping beyond the bulk decay rate, so a
+material loss factor cannot be entered.
 
-And nothing here is a room-acoustics package. There is no geometry importer, no
-material library, no ray tracer, no auralisation and no 3D solver: obstacles are
-rasterised onto the grid from shapes you define, and the output is a field you
-analyse yourself.
+And nothing here is a room-acoustics package. There is no geometry importer,
+no material library, no ray tracer, no auralisation and no 3D solver:
+obstacles are rasterised onto the grid from shapes you define, and the output
+is a field you analyse yourself.
 
 ## Before and after these pages
 

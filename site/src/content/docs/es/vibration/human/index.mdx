@@ -3,6 +3,9 @@ title: "Vibración en humanos"
 description: "La vibración transmitida a las personas: las ponderaciones de ISO 8041-1 y las métricas de cuerpo entero de ISO 2631-1, la exposición mano-brazo según ISO 5349 con los valores de acción y límite de la Directiva 2002/44/CE, y el modelo de respuesta espinal de ISO 2631-5 para choques repetidos."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 La vibración transmitida a una persona se evalúa con una cadena de medida
 deliberadamente paralela a la de un sonómetro: la aceleración se **pondera en
 frecuencia** para reflejar cómo responde el cuerpo a cada frecuencia, se
@@ -56,26 +59,38 @@ señal](/phonometry/es/signals/).
 
 ## Qué no cubre esta sección
 
-**Aquí no se somete a ensayo de tipo ningún vibrómetro.** El objeto propio de la
-ISO 8041-1 — el diseño y el ensayo de tipo de los vibrómetros de uso general
-para vibración en humanos — no está implementado; de ella solo se toman las
-definiciones de las ponderaciones frecuenciales, así que aquí nada asigna una
-clase a un instrumento.
+<Scope>
+<ScopeClaim status="not-covered">
+**Aquí no se somete a ensayo de tipo ningún vibrómetro.** El objeto propio de
+la ISO 8041-1 — el diseño y el ensayo de tipo de los vibrómetros de uso
+general para vibración en humanos — no está implementado; de ella solo se
+toman las definiciones de las ponderaciones frecuenciales, así que aquí nada
+asigna una clase a un instrumento.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **La vibración en edificios se queda en la ponderación.** De la ISO 2631-2 la
-biblioteca implementa la curva `Wm` independiente de la dirección y nada más, y
-eso está más cerca de la norma de lo que parece: la edición de 2003 suprimió a
-propósito los valores orientativos de su predecesora, así que no hay magnitudes
-admisibles de vibración en edificios con las que comparar. Quien busque un
-límite no lo encontrará aquí, y tampoco lo encontrará en la norma.
+biblioteca implementa la curva `Wm` independiente de la dirección y nada más,
+y eso está más cerca de la norma de lo que parece: la edición de 2003 suprimió
+a propósito los valores orientativos de su predecesora, así que no hay
+magnitudes admisibles de vibración en edificios con las que comparar. Quien
+busque un límite no lo encontrará aquí, y tampoco lo encontrará en la norma.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **De la ISO 2631-5, solo el modelo del apartado 5.** El modelo de elementos
 finitos del Anexo A para exposiciones sentadas menos severas lo distribuye ISO
-por separado y no está implementado, que es lo que convierte la delimitación de
-1 g de más arriba en una decisión de encaminamiento y no en una preferencia.
+por separado y no está implementado, que es lo que convierte la delimitación
+de 1 g de más arriba en una decisión de encaminamiento y no en una
+preferencia.
+</ScopeClaim>
 
-Y no se emite ningún veredicto de exposición. Los valores de acción y límite de
-la Directiva 2002/44/CE se enuncian para poder contrastar un A(8) con ellos,
-pero la biblioteca no aplica ninguna transposición nacional de la directiva, y
-una conclusión de evaluación de riesgos no es un número que produzca esta
-sección.
+<ScopeClaim status="not-covered">
+Y no se emite ningún veredicto de exposición. Los valores de acción y límite
+de la Directiva 2002/44/CE se enuncian para poder contrastar un A(8) con
+ellos, pero la biblioteca no aplica ninguna transposición nacional de la
+directiva, y una conclusión de evaluación de riesgos no es un número que
+produzca esta sección.
+</ScopeClaim>
+</Scope>
+

@@ -34,8 +34,10 @@ references:
     note: "La forma in situ de esa misma medición, con los requisitos de corrección ambiental y de ruido de fondo de la Tabla C.1."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Tres medidas pasivas dominan el control de ruido aplicado: un **silenciador** en
 el conducto, la atenuación y el ruido regenerado de la propia **instalación
@@ -573,27 +575,33 @@ comparar dos cosas distintas.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los métodos HVAC de Bies §8.11-8.17 / ASHRAE:
-`hvac.end_reflection_loss` y `hvac.elbow_insertion_loss` (tablas
-interpoladas), `hvac.plenum_attenuation` (forma cerrada de Wells) y
-`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). La pérdida por
-inserción de cerramientos de máquina de Bies §7.4 (Ecs. (7.103), (7.111)),
-`enclosure_insertion_loss`, que combina una pérdida de transmisión de panel
-aportada con la corrección por la constante de sala interior, y el compuesto de
-paneles, puertas y aberturas que la alimenta (`composite_transmission_loss`).
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los métodos HVAC de Bies §8.11-8.17 / ASHRAE: `hvac.end_reflection_loss` y
+`hvac.elbow_insertion_loss` (tablas interpoladas), `hvac.plenum_attenuation`
+(forma cerrada de Wells) y `hvac.flow_noise_straight_duct`/`flow_noise_bend`
+(VDI 2081). La pérdida por inserción de cerramientos de máquina de Bies §7.4
+(Ecs. (7.103), (7.111)), `enclosure_insertion_loss`, que combina una pérdida
+de transmisión de panel aportada con la corrección por la constante de sala
+interior, y el compuesto de paneles, puertas y aberturas que la alimenta
+(`composite_transmission_loss`).
+</ScopeClaim>
 
-**No cubierto.** Los elementos de silenciador reactivo (cámaras de
-expansión, ramas laterales, tubos extendidos) se han trasladado a
-[Silenciadores](/phonometry/es/devices/noise-control/silencers/), y los silenciadores
-disipativos con revestimiento interior no se modelan a partir de las
-propiedades del revestimiento en ninguna parte: los valores de codo revestido
-y de plenum de esta página son tablas de instalación interpoladas.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los elementos de silenciador reactivo (cámaras de expansión, ramas laterales,
+tubos extendidos) se han trasladado a
+[Silenciadores](/phonometry/es/devices/noise-control/silencers/), y los
+silenciadores disipativos con revestimiento interior no se modelan a partir de
+las propiedades del revestimiento en ninguna parte: los valores de codo
+revestido y de plenum de esta página son tablas de instalación interpoladas.
 `enclosure_insertion_loss` nunca predice la pérdida de transmisión de panel
 $R$; se aporta medida o de otro modelo, y el módulo solo la combina con la
 corrección interior. Nada de lo que hay aquí es una medición: el procedimiento
-de ISO 11546 del apartado 2.2 se describe para poder leer un valor declarado, no
-para implementarlo, y la transmisión estructural de una máquina a su cerramiento
-o a su solera queda fuera de todos los modelos de la página.
+de ISO 11546 del apartado 2.2 se describe para poder leer un valor declarado,
+no para implementarlo, y la transmisión estructural de una máquina a su
+cerramiento o a su solera queda fuera de todos los modelos de la página.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

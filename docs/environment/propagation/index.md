@@ -89,14 +89,14 @@ elevation profile, no building geometry and no GIS layer, both refraction
 models assume flat ground at height zero and a profile that varies with height
 alone rather than along the path, and how a source line is broken into point
 sources is declared out of scope by CNOSSOS itself. The **CNOSSOS-EU
-propagation method of section 2.5 is not implemented**: it is a different model
-from ISO 9613-2, so a calculation that pairs CNOSSOS source powers with the
-path here is not a CNOSSOS calculation. The coherent barrier-on-ground model
-weights its four diffracted paths with a single reflection coefficient computed
-over the overall geometry, so it is coherent and reciprocal but is not a
-boundary-element solution, and no model here computes turbulent scattering:
-ISO 9613-2 absorbs it into the fixed caps on its screening term, and the
-wave-acoustic and refraction pages assume a non-turbulent atmosphere
-outright. Nothing on these pages produces a rating: no Lden,
-no limit value and no verdict — those are
-[Assessment and regulation](../assessment/index.md).
+propagation method of section 2.5 is not implemented**: it is a different
+model from ISO 9613-2, so a calculation that pairs CNOSSOS source powers with
+the path here is not a CNOSSOS calculation. The coherent barrier-on-ground
+model weights its four diffracted paths with a single reflection coefficient
+computed over the overall geometry, so it is coherent and reciprocal but is
+not a boundary-element solution, and no model here computes turbulent
+scattering: ISO 9613-2 absorbs it into the fixed caps on its screening term,
+and the wave-acoustic and refraction pages assume a non-turbulent atmosphere
+outright. Nothing on these pages produces a rating: no Lden, no limit value
+and no verdict — those are [Assessment and
+regulation](../assessment/index.md).

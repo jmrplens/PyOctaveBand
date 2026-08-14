@@ -3,6 +3,9 @@ title: "Room acoustics"
 description: "The sound field inside a single room: impulse-response measurement (ISO 18233), the ISO 3382 parameters, open-plan speech privacy, image sources, the steady-state field and the rectangular-room modes, the ANSI S12.2 room-noise ratings, and reverberation-time prediction by the classical formulae and the EN 12354-6 normative model."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Almost everything about the sound field inside a room follows from two
 quantities: its **impulse response**, which can be measured, and its **sound
 absorption**, which can be designed. The pages of this section cover the
@@ -102,26 +105,35 @@ speech intelligibility a room affords is quantified by the
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Nothing here is a wave solver.** The image-source model is specular only: it
 carries no diffraction, no scattering off a diffuser and no finite-impedance
 boundary, and it stops when the reflection order runs out rather than when the
 sound does. Below the Schroeder frequency, where the statistical models give
 out, what this section offers is the mode *positions* of a rigid rectangular
-box — not the field of a real room at low frequency. For that, the
-[wave simulation](/phonometry/simulation/) section runs an FDTD solver on the
-actual geometry.
+box — not the field of a real room at low frequency. For that, the [wave
+simulation](/phonometry/simulation/) section runs an FDTD solver on the actual
+geometry.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **No auralisation, no ray tracer, no room model.** There is no geometry
 importer, no material database and no renderer: the pages take dimensions,
 coefficients and impulse responses as inputs, and give back parameters. The
-absorption coefficients themselves come from
-[Materials and surfaces](/phonometry/materials/absorbers/), and the model errs
-optimistically when the room is not diffuse — outside the EN 12354-6 clause 4.6
-limits (no dimension more than five times another, opposite surfaces within a
-factor of three in absorption, object fraction below 0.2) the measured
-reverberation time can reach twice the predicted one.
+absorption coefficients themselves come from [Materials and
+surfaces](/phonometry/materials/absorbers/), and the model errs optimistically
+when the room is not diffuse — outside the EN 12354-6 clause 4.6 limits (no
+dimension more than five times another, opposite surfaces within a factor of
+three in absorption, object fraction below 0.2) the measured reverberation
+time can reach twice the predicted one.
+</ScopeClaim>
 
-Two coverage boundaries follow the standards. Only the normative clause 4 model
-of EN 12354-6 is implemented, not its informative Annex D method for irregular
-spaces. And nothing in this section measures insulation *between* rooms: that is
-[Sound insulation](/phonometry/buildings/insulation/).
+<ScopeClaim status="not-covered">
+Two coverage boundaries follow the standards. Only the normative clause 4
+model of EN 12354-6 is implemented, not its informative Annex D method for
+irregular spaces. And nothing in this section measures insulation *between*
+rooms: that is [Sound insulation](/phonometry/buildings/insulation/).
+</ScopeClaim>
+</Scope>
+

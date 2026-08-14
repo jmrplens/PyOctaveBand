@@ -40,6 +40,8 @@ references:
     note: "Section 13.1.4: the Hilbert-transform relation between log-magnitude and phase behind the minimum-phase reconstruction. ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A single exponential sine sweep characterises the linear response and
@@ -507,31 +509,36 @@ grids.
 
 ## What this guide covers
 
-**Covered.** Farina's exponential-sweep deconvolution (AES preprint 5093,
-2000) and the phase-coherent synchronized swept-sine of Novak, Lotton &
-Simon (2015): the harmonic separation, the closed-form inverse-filter
-spectrum and the fractional-sample de-skewing, implemented by
-`swept_sine_distortion` and `synchronized_sweep_signal`. The acquisition
-conditions the result depends on: the drive level and its `amplitude`
-reference, the `fade` that must reach both calls, the clipping and tail
-requirements, the time-variance and impulsive-noise failure modes, and the
-sizing rules that relate $T$, $N$ and $f_2$. The phase
-utilities `minimum_phase`, `group_delay`, `excess_phase` and
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Farina's exponential-sweep deconvolution (AES preprint 5093, 2000) and the
+phase-coherent synchronized swept-sine of Novak, Lotton & Simon (2015): the
+harmonic separation, the closed-form inverse-filter spectrum and the
+fractional-sample de-skewing, implemented by `swept_sine_distortion` and
+`synchronized_sweep_signal`. The acquisition conditions the result depends on:
+the drive level and its `amplitude` reference, the `fade` that must reach both
+calls, the clipping and tail requirements, the time-variance and
+impulsive-noise failure modes, and the sizing rules that relate $T$, $N$ and
+$f_2$. The phase utilities `minimum_phase`, `group_delay`, `excess_phase` and
 `phase_decomposition` implement the Hilbert-transform relation of Bendat &
 Piersol Section 13.1.4 through the real cepstrum.
+</ScopeClaim>
 
-**Not covered.** Intermodulation and dynamic intermodulation distortion
-(IEC 60268-3, clauses 14.12.7-10) are measured from steady tones on the
-[electroacoustics](/phonometry/devices/electroacoustics/electroacoustics/) page, not from a
-sweep; this page separates harmonic orders only. Müller & Massarani's
-sweep monograph is cited for background practice (fades, inverse-filter
-technique), not for a specific implemented formula. With
-`method="farina"`, the harmonic phases of $H_2 \dots H_N$ are returned but should
-be ignored: the plain exponential sweep breaks the time-shift/harmonic
+<ScopeClaim status="not-covered" label="Not covered">
+Intermodulation and dynamic intermodulation distortion (IEC 60268-3, clauses
+14.12.7-10) are measured from steady tones on the
+[electroacoustics](/phonometry/devices/electroacoustics/electroacoustics/)
+page, not from a sweep; this page separates harmonic orders only. Müller &
+Massarani's sweep monograph is cited for background practice (fades,
+inverse-filter technique), not for a specific implemented formula. With
+`method="farina"`, the harmonic phases of $H_2 \dots H_N$ are returned but
+should be ignored: the plain exponential sweep breaks the time-shift/harmonic
 equivalence the synchronized method relies on. Nothing here checks the
 acquisition conditions of section 1.1 either: the functions take the arrays
 they are given, so the drive level, the absence of clipping and the length of
 the tail are the operator's to keep and to report.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

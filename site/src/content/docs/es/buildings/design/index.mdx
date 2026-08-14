@@ -3,6 +3,9 @@ title: "Diseño del aislamiento"
 description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN/ISO 12354 entre recintos en sus formas simplificada y por bandas, el aislamiento teórico de un panel a partir de sus propiedades físicas, las capas elásticas de las que depende el diseño de un suelo o de un trasdosado, y el ruido estructural de los equipamientos desde la placa de recepción de EN 15657 hasta el nivel en el recinto receptor de EN 12354-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Las páginas de la sección de
 [Aislamiento acústico](/phonometry/es/buildings/insulation/)
 responden a la pregunta *¿qué consigue este edificio?* Las de aquí responden a
@@ -161,32 +164,41 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Una predicción vale lo que valen los datos de elemento que le des, y la
 biblioteca toma esos datos como dados.** Las magnitudes globales de los
 elementos, los índices de unión, la mejora del revestimiento y los términos de
-ajuste de estructural a aéreo de los anexos D y F de EN 12354-5 son entradas que
-aportas tú desde una medición o desde los propios anexos de las normas; ninguno
-se deriva aquí. La página de predicción simplificada se detiene por diseño en
-los números únicos ponderados, y la página detallada es donde viven los modelos
-por bandas.
+ajuste de estructural a aéreo de los anexos D y F de EN 12354-5 son entradas
+que aportas tú desde una medición o desde los propios anexos de las normas;
+ninguno se deriva aquí. La página de predicción simplificada se detiene por
+diseño en los números únicos ponderados, y la página detallada es donde viven
+los modelos por bandas.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Todo modelo de panel lleva un rango de validez del que no pasa, y las guías lo
-señalan uno a uno: el método de panel simple de Sharp no es válido por debajo de
-aproximadamente 1,5 veces la primera resonancia del panel, el modelo de rendija
-de Gomperts solo se sostiene mientras la rendija sea estrecha frente a la
-longitud de onda, de la eficiencia de radiación solo está implementado el método
-n.º 1 de Leppington, y las trayectorias ortótropas son modelos de panel infinito que se
-pierden el valle entre 2 kHz y 4 kHz que muestra la chapa grecada real. Del lado
-de las capas elásticas, el modelo de fuerza de la máquina de impactos supone una
-impedancia de punto de excitación independiente de la frecuencia, así que un
-forjado ligero con viguetas o rastreles queda fuera; los revestimientos blandos
-se tratan como resortes lineales; no hay predicción por bandas de la mejora de
-un trasdosado, porque el anexo D es un método de magnitud global; y las fuentes
-de impacto pesadas, como la pelota de caucho, no las cubre ninguno de estos
-modelos — su valoración está en
-[Fuentes de impacto pesadas y
+señalan uno a uno: el método de panel simple de Sharp no es válido por debajo
+de aproximadamente 1,5 veces la primera resonancia del panel, el modelo de
+rendija de Gomperts solo se sostiene mientras la rendija sea estrecha frente a
+la longitud de onda, de la eficiencia de radiación solo está implementado el
+método n.º 1 de Leppington, y las trayectorias ortótropas son modelos de panel
+infinito que se pierden el valle entre 2 kHz y 4 kHz que muestra la chapa
+grecada real. Del lado de las capas elásticas, el modelo de fuerza de la
+máquina de impactos supone una impedancia de punto de excitación independiente
+de la frecuencia, así que un forjado ligero con viguetas o rastreles queda
+fuera; los revestimientos blandos se tratan como resortes lineales; no hay
+predicción por bandas de la mejora de un trasdosado, porque el anexo D es un
+método de magnitud global; y las fuentes de impacto pesadas, como la pelota de
+caucho, no las cubre ninguno de estos modelos — su valoración está en [Fuentes
+de impacto pesadas y
 blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+</ScopeClaim>
 
-Dos fronteras de edición: solo está implementada la edición de 2009 de
-EN 12354-5, no la revisión de 2023, y las páginas simplificada y detallada
-siguen ediciones distintas de la familia 12354, como dice la nota de más arriba.
+<ScopeClaim status="not-covered">
+Dos fronteras de edición: solo está implementada la edición de 2009 de EN
+12354-5, no la revisión de 2023, y las páginas simplificada y detallada siguen
+ediciones distintas de la familia 12354, como dice la nota de más arriba.
+</ScopeClaim>
+</Scope>
+

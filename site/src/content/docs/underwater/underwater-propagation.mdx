@@ -159,6 +159,8 @@ references:
     note: "The Weston shallow-water propagation regimes (section 9.1.1.2, Equations 9.42 to 9.61 and Table 9.1), the Medwin sound-speed formula (Equation 1.2) and the seven numeric sonar worked examples of chapters 3 and 11 that pin the sonar-equation section."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
@@ -987,14 +989,16 @@ closed forms, have their own guide:
 
 ## What this guide covers
 
-**Covered.** ISO 18405:2017 terminology (propagation loss, source level,
-levels re 1 µPa) underlies every quantity on this page. `transmission_loss`
-and `seawater_absorption` implement geometrical spreading plus the
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 18405:2017 terminology (propagation loss, source level, levels re 1 µPa)
+underlies every quantity on this page. `transmission_loss` and
+`seawater_absorption` implement geometrical spreading plus the
 Francois-Garrison (1982, default), Ainslie-McColm (1998) or Thorp (1967)
-absorption models. `sea_water_sound_speed` and `sound_speed_profile`
-implement the UNESCO/Chen-Millero (Wong & Zhu 1995 ITS-90 form, default), Del
-Grosso (1974), Mackenzie (1981) and Medwin (1975) sound-speed equations, with
-the Leroy & Parthiot (1998) depth-to-pressure conversion.
+absorption models. `sea_water_sound_speed` and `sound_speed_profile` implement
+the UNESCO/Chen-Millero (Wong & Zhu 1995 ITS-90 form, default), Del Grosso
+(1974), Mackenzie (1981) and Medwin (1975) sound-speed equations, with the
+Leroy & Parthiot (1998) depth-to-pressure conversion.
 `weston_propagation_loss` and `weston_regime_boundaries` implement the four
 Weston energy-flux regimes and their transition ranges (Ainslie section
 9.1.1.2, Table 9.1). `passive_sonar_equation` and `active_sonar_equation`
@@ -1002,19 +1006,23 @@ implement the passive and monostatic active sonar equations (Urick, via Etter
 2003), and `detection_range` / `detection_range_from_curve` invert a
 transmission loss at the figure of merit. `seabed_reflection` and
 `bottom_reflection_loss` implement the fluid-fluid Rayleigh reflection
-coefficient and critical angle (Medwin & Clay). `ocean_ambient_noise` sums
-the Wenz wind "rule of fives" and Mellen thermal-noise components.
+coefficient and critical angle (Medwin & Clay). `ocean_ambient_noise` sums the
+Wenz wind "rule of fives" and Mellen thermal-noise components.
 `ship_source_spectrum` implements the JOMOPANS-ECHO (default), RANDI 3.1 and
 Wales & Heitmeyer (2002) source-level models.
+</ScopeClaim>
 
-**Not covered.** The seabed model is lossless fluid-fluid Rayleigh reflection
-only, so sediment attenuation is out of scope. `active_sonar_equation` is
-monostatic only: there is no bistatic geometry. `ocean_ambient_noise` leaves
-out the low-frequency turbulence band and any built-in distant-shipping
-model; supply a shipping spectrum yourself, for instance from
-`ship_source_spectrum` above. The numerical field solvers (`normal_modes`,
-`ray_trace`, `parabolic_equation`) are covered in
-[Underwater propagation solvers](/phonometry/underwater/underwater-solvers/).
+<ScopeClaim status="not-covered" label="Not covered">
+The seabed model is lossless fluid-fluid Rayleigh reflection only, so sediment
+attenuation is out of scope. `active_sonar_equation` is monostatic only: there
+is no bistatic geometry. `ocean_ambient_noise` leaves out the low-frequency
+turbulence band and any built-in distant-shipping model; supply a shipping
+spectrum yourself, for instance from `ship_source_spectrum` above. The
+numerical field solvers (`normal_modes`, `ray_trace`, `parabolic_equation`)
+are covered in [Underwater propagation
+solvers](/phonometry/underwater/underwater-solvers/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

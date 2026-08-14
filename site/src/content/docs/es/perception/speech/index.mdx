@@ -3,6 +3,9 @@ title: "Habla"
 description: "Las tres medidas objetivas de la inteligibilidad del habla y las preguntas que responden: el STI de IEC 60268-16, que valora un canal de transmisión, el SII de ANSI S3.5, que valora una condición de escucha, y STOI/ESTOI, que valoran un procesado a partir de un par limpio y degradado."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Las tres páginas de esta sección reducen la inteligibilidad del habla a un
 número en [0, 1], y el arte está en saber qué número responde a tu pregunta.
 El **índice de transmisión del habla** (STI) valora un *canal de
@@ -85,23 +88,30 @@ medida.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Aquí no se examina a ningún oyente ni se predice una puntuación.** El STOI
 devuelve el índice basado en correlación y no el porcentaje de palabras
 entendidas, porque la correspondencia logística se ajusta para cada corpus de
 pruebas de escucha; el SII devuelve una fracción de audibilidad y no una
 puntuación; y ninguna página de aquí reproduce una prueba subjetiva de
 inteligibilidad. **Tampoco se adquiere ninguna señal**: la página del STI
-implementa la señal directa STIPA y el cálculo indirecto desde una respuesta al
-impulso, pero la medición directa completa con las 14 frecuencias de modulación
-del apartado 6.3 no está implementada, así que una cadena con distorsión severa
-necesita equipo de medida y no esta biblioteca.
+implementa la señal directa STIPA y el cálculo indirecto desde una respuesta
+al impulso, pero la medición directa completa con las 14 frecuencias de
+modulación del apartado 6.3 no está implementada, así que una cadena con
+distorsión severa necesita equipo de medida y no esta biblioteca.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Dentro del SII hay dos límites de cobertura que conviene comprobar antes de
-usarlo: los espectros de habla de esfuerzo vocal elevado, fuerte y de grito solo
-se incluyen para el procedimiento por tercios de octava, y las funciones de
-importancia de banda tabuladas son el compromiso de habla promedio de cada
+usarlo: los espectros de habla de esfuerzo vocal elevado, fuerte y de grito
+solo se incluyen para el procedimiento por tercios de octava, y las funciones
+de importancia de banda tabuladas son el compromiso de habla promedio de cada
 tabla, con las alternativas por material del Anexo B en tus manos a través del
 argumento `band_importance=`. No se ofrece remuestreo entre los cuatro
 procedimientos por bandas: cada uno se alimenta con espectros en sus propias
-bandas. Y la opción de habla femenina no falta en el STI: la Edición 5 de
-IEC 60268-16 la eliminó, así que no queda nada por implementar.
+bandas. Y la opción de habla femenina no falta en el STI: la Edición 5 de IEC
+60268-16 la eliminó, así que no queda nada por implementar.
+</ScopeClaim>
+</Scope>
+

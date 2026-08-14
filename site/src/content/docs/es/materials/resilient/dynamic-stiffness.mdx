@@ -18,8 +18,10 @@ references:
     note: "La EN 29052-1:1992 es la adopción europea idéntica de la ISO 9052-1:1989 y es la designación que usa esta página en todo momento; la URL de ISO es la citable. El método implementado aquí: la rigidez dinámica por unidad de superficie (Fórmula 1), las relaciones de resonancia (Fórmulas 2-4), el término del gas encerrado (Fórmula 7, NOTA del apartado 8.2 s'a = 111/d MN/m³) y los regímenes por resistividad al flujo (Fórmulas 5-6). La conformidad se ancla en la NOTA numérica de la propia norma más valores en forma cerrada calculados a mano de las relaciones de resonancia."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 Un **suelo flotante** es una losa pesada que descansa sobre una capa elástica;
@@ -482,30 +484,35 @@ número único ponderado, es
 
 ## Qué cubre esta guía
 
-**Cubierto.** La EN 29052-1:1992 (idéntica a la ISO 9052-1:1989) para
-materiales bajo suelos flotantes: la rigidez dinámica por unidad de superficie de
-la Fórmula 1, las relaciones de resonancia de las Fórmulas 2-4
-(`apparent_dynamic_stiffness`, `natural_frequency`), el término del gas
-encerrado de la Fórmula 7 (`enclosed_gas_stiffness`) y los regímenes por
-resistividad al flujo del apartado 8.2, Fórmulas 5-6
-(`installed_dynamic_stiffness`), encadenados de principio a fin por
-`floating_floor_resonance`. `DynamicStiffnessResult.report` genera la ficha
-de informe de ensayo del apartado 9.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La EN 29052-1:1992 (idéntica a la ISO 9052-1:1989) para materiales bajo suelos
+flotantes: la rigidez dinámica por unidad de superficie de la Fórmula 1, las
+relaciones de resonancia de las Fórmulas 2-4 (`apparent_dynamic_stiffness`,
+`natural_frequency`), el término del gas encerrado de la Fórmula 7
+(`enclosed_gas_stiffness`) y los regímenes por resistividad al flujo del
+apartado 8.2, Fórmulas 5-6 (`installed_dynamic_stiffness`), encadenados de
+principio a fin por `floating_floor_resonance`.
+`DynamicStiffnessResult.report` genera la ficha de informe de ensayo del
+apartado 9.
+</ScopeClaim>
 
-**No cubierto.** El procedimiento de medición del apartado 7, que extrae
-la frecuencia de resonancia $f_r$ de la señal bruta de excitación-respuesta
-por métodos sinusoidal, de ruido blanco o de impulso, no está implementado:
-pasa una $f_r$ ya extrapolada, obtenida como describe la sección 1.1 (la
-extrapolación en sí es un ajuste por recta, que la sección 1.1 muestra).
-La resistividad al flujo lateral $r$ del apartado 8.2 también se toma como
-entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
-están implementados aparte, en `materials.absorbers.airflow_resistance`, y
-dan $\sigma$ en Pa·s/m² mientras que el argumento `airflow_resistivity` de
-esta página va en kPa·s/m². El requisito
-de selección de probetas del apartado 6 (al menos tres probetas de
+<ScopeClaim status="not-covered" label="No cubierto">
+El procedimiento de medición del apartado 7, que extrae la frecuencia de
+resonancia $f_r$ de la señal bruta de excitación-respuesta por métodos
+sinusoidal, de ruido blanco o de impulso, no está implementado: pasa una $f_r$
+ya extrapolada, obtenida como describe la sección 1.1 (la extrapolación en sí
+es un ajuste por recta, que la sección 1.1 muestra). La resistividad al flujo
+lateral $r$ del apartado 8.2 también se toma como entrada en lugar de medirse;
+los métodos estático y alterno de la ISO 9053 están implementados aparte, en
+`materials.absorbers.airflow_resistance`, y dan $\sigma$ en Pa·s/m² mientras
+que el argumento `airflow_resistivity` de esta página va en kPa·s/m². El
+requisito de selección de probetas del apartado 6 (al menos tres probetas de
 200 mm × 200 mm) no se aplica, y tampoco el contenido de informe de la
 apartado 9: la ficha de abajo lleva la disposición de excitación y el tipo de
 señal solo si se aportan en los metadatos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

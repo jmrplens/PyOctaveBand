@@ -3,6 +3,9 @@ title: "Levels and weighting"
 description: "From weighted signal to reported number: the IEC 61672-1 frequency weightings and the special-purpose curves, Fast/Slow/Impulse ballistics, the integrated, statistical and dose levels, and the ISO 1996 environmental indicators built on them."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A sound level meter does three things to a calibrated signal, in order: it
 **weights it in frequency** to mimic the ear's sensitivity, it **smooths it in
 time** with a standardised ballistic, and it **integrates it into a level**.
@@ -75,6 +78,8 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 These pages implement the signal processing of a sound level meter, not the
 meter. The rest of IEC 61672-1 — level ranges, overload indication, the
 self-generated noise floor, the directional response and the IEC 61672-3
@@ -85,9 +90,12 @@ verdict from the library does and does not mean. Two curves come without a
 verdict of any kind: ISO 7196 defines a single ±1 dB tolerance for G with no
 class structure, and the withdrawn IEC 537 left no tolerance table behind for
 D, so both curves filter a signal but neither reaches
-`verify_weighting_class`, and they are pinned against their published tables in
-the conformance report instead. The noise dose is the 1993
-first edition of IEC 61252 only, not the 2025 revision. And a dose is a
-quantity, not a verdict: the exposure strategies, the sampling plan and the
-limits that decide whether a worker is over-exposed are [Occupational exposure
-(ISO 9612)](/phonometry/perception/hearing/occupational-exposure/).
+`verify_weighting_class`, and they are pinned against their published tables
+in the conformance report instead. The noise dose is the 1993 first edition of
+IEC 61252 only, not the 2025 revision. And a dose is a quantity, not a
+verdict: the exposure strategies, the sampling plan and the limits that decide
+whether a worker is over-exposed are [Occupational exposure (ISO
+9612)](/phonometry/perception/hearing/occupational-exposure/).
+</ScopeClaim>
+</Scope>
+

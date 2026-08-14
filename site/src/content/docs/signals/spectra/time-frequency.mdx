@@ -22,6 +22,8 @@ references:
     note: "The taper catalogue behind the segment window: main-lobe width versus sidelobe leakage, the trade-off that sets what a spectrogram column can resolve at a given segment length."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A stationary spectrum hides everything that happens *in time*: a passing
@@ -321,23 +323,30 @@ component's frequency in time, the
 
 ## What this guide covers
 
-**Covered.** Bendat & Piersol's calibrated spectrogram (Section 12.6.4.2):
-tapered, overlapped STFT segments kept as separate time columns instead of
-averaged, implemented by `spectrogram` with the exact Welch-module scaling
-and the Eq. 8.158 random error of an unaveraged cell. The zoom FFT of
-Section 11.5.4 (Eqs. 11.122-11.130): band-limited, arbitrarily fine-grid
-spectra computed as the chirp-Z equivalent of the book's
-demodulate-decimate-DFT chain, implemented by `zoom_fft`. Both share the
-Harris (1978) window catalogue behind the segment taper.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Bendat & Piersol's calibrated spectrogram (Section 12.6.4.2): tapered,
+overlapped STFT segments kept as separate time columns instead of averaged,
+implemented by `spectrogram` with the exact Welch-module scaling and the Eq.
+8.158 random error of an unaveraged cell. The zoom FFT of Section 11.5.4 (Eqs.
+11.122-11.130): band-limited, arbitrarily fine-grid spectra computed as the
+chirp-Z equivalent of the book's demodulate-decimate-DFT chain, implemented by
+`zoom_fft`. Both share the Harris (1978) window catalogue behind the segment
+taper.
+</ScopeClaim>
 
-**Not covered.** This is the constant-bandwidth, STFT-based family only.
-The constant-percentage-bandwidth, sound-level-meter counterpart is
-`OctaveFilterBank.spectrogram` on the [Levels](/phonometry/signals/levels/levels/)
-page. Tracking a single component's instantaneous frequency over time is
-the Hilbert envelope of `envelope`, on the
-[Correlation and delay](/phonometry/signals/spectra/correlation-delay/) page, not
-this one. As with the spectral-analysis page, this implements Bendat &
-Piersol's estimators, not a certification standard.
+<ScopeClaim status="not-covered" label="Not covered">
+This is the constant-bandwidth, STFT-based family only. The
+constant-percentage-bandwidth, sound-level-meter counterpart is
+`OctaveFilterBank.spectrogram` on the
+[Levels](/phonometry/signals/levels/levels/) page. Tracking a single
+component's instantaneous frequency over time is the Hilbert envelope of
+`envelope`, on the [Correlation and
+delay](/phonometry/signals/spectra/correlation-delay/) page, not this one. As
+with the spectral-analysis page, this implements Bendat & Piersol's
+estimators, not a certification standard.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

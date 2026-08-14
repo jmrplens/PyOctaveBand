@@ -3,6 +3,9 @@ title: "Referencia"
 description: "Teoría, evidencia y vocabulario: las deducciones que hay detrás de los módulos, el informe de conformidad que fija cada métrica a su apartado, el registro de defectos encontrados en las fuentes publicadas, la bibliografía y el glosario."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Las guías muestran cómo medir algo. Esta sección responde a las preguntas que
 vienen después: **por qué la fórmula es esta**, **si la implementación es
 realmente correcta**, **si la fuente impresa es correcta**, **qué es este
@@ -120,22 +123,33 @@ enuncia sus magnitudes antes de su código.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **No es evidencia sobre tu medición, solo sobre la biblioteca.** El informe de
 conformidad dice que la implementación reproduce el valor esperado de cada
 norma; no dice nada de tu micrófono, de tu sala ni de tu operador, y una
 medición acreditada necesita una cadena de calibración trazable y un
 instrumento con aprobación de modelo que ningún software puede aportar.
+</ScopeClaim>
 
-**No sustituye a las normas.** Aquí no se reproduce ningún texto normativo: las
-páginas de teoría citan números de apartado, de tabla y de ecuación para que
-puedas leer el documento en sí, que es lo que te va a pedir quien revise.
+<ScopeClaim status="not-covered">
+**No sustituye a las normas.** Aquí no se reproduce ningún texto normativo:
+las páginas de teoría citan números de apartado, de tabla y de ecuación para
+que puedas leer el documento en sí, que es lo que te va a pedir quien revise.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **No es la API.** Las firmas, los tipos de los argumentos y los valores de
 retorno se generan a partir de los docstrings hacia la [referencia de la
 API](/phonometry/es/reference/api/), que es otra sección de la barra lateral.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Y no es exhaustiva.** Las páginas de teoría cubren las áreas cuya matemática
 comparten varias guías, y dicen sin rodeos qué áreas se quedan con su teoría
 dentro; el registro de erratas lista solo los defectos que este proyecto ha
 confirmado contra una página impresa; y la bibliografía lista las fuentes que
 implementa la biblioteca, no la literatura del campo.
+</ScopeClaim>
+</Scope>
+

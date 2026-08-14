@@ -26,6 +26,8 @@ references:
     note: "Section 10.4.2 (the procedure for analyzing multiple data records: individual per-record analysis first, joint cross-record analysis as a separate, deliberate step) and Chapter 7 (the multiple-input/output models that joint step leads to). ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Most real measurement sessions produce more than one channel: the two ears
@@ -304,22 +306,27 @@ Additional performance notes:
 
 ## What this guide covers
 
-**Covered.** IEC 61260-1:2014 and IEC 61672-1:2013 as far as they
-constrain each row of a `(channels, samples)` array: the band filters,
-weightings and detector ballistics applied per channel are the unchanged
-single-channel designs, and multichannel support adds no normative content
-of its own. The convention itself follows Bendat & Piersol's procedure for
-multiple data records (Section 10.4.2): analyze each record individually
-first, and treat anything joint as a separate, explicit step.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+IEC 61260-1:2014 and IEC 61672-1:2013 as far as they constrain each row of a
+`(channels, samples)` array: the band filters, weightings and detector
+ballistics applied per channel are the unchanged single-channel designs, and
+multichannel support adds no normative content of its own. The convention
+itself follows Bendat & Piersol's procedure for multiple data records (Section
+10.4.2): analyze each record individually first, and treat anything joint as a
+separate, explicit step.
+</ScopeClaim>
 
-**Not covered.** Cross-channel questions, such as the delay between two
-channels or how much of one channel a second one explains, are
-deliberately left out: `octave_filter`, `weighting_filter` and
-`time_weighting` never mix or combine rows. See
+<ScopeClaim status="not-covered" label="Not covered">
+Cross-channel questions, such as the delay between two channels or how much of
+one channel a second one explains, are deliberately left out: `octave_filter`,
+`weighting_filter` and `time_weighting` never mix or combine rows. See
 [Correlation and delay](/phonometry/signals/spectra/correlation-delay/) and
-[Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/) for
-the cross-channel tools built on Bendat & Piersol's cross-correlation and
+[Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/)
+for the cross-channel tools built on Bendat & Piersol's cross-correlation and
 multiple-input models.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

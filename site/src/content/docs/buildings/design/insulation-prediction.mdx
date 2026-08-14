@@ -25,9 +25,11 @@ references:
     note: "The simplified impact flanking-transmission prediction (worked example E.3). The linked catalogue record is the BSI Knowledge page for BS EN 12354-2:2000."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A laboratory rating describes an element in isolation; a building also
 transmits sound along every flanking path. This page covers the EN 12354
@@ -584,13 +586,14 @@ ISO 16283-3 measurement they are compared against, in
 
 ## What this guide covers
 
-**Covered.** The simplified single-number models of EN 12354-1:2000
-(Clause 4.4) and EN 12354-2:2000 (Clause 4.3). Airborne: the Formula (26)
-energetic sum of the direct and flanking paths through
-`building.flanking_path`, `building.flanking_element` and
-`building.predicted_airborne_insulation`, with the Annex E vibration
-reduction indices $K_{ij}$ (rigid cross and T junctions, flexible
-interlayers, lightweight façades and double-leaf walls, corners and
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The simplified single-number models of EN 12354-1:2000 (Clause 4.4) and EN
+12354-2:2000 (Clause 4.3). Airborne: the Formula (26) energetic sum of the
+direct and flanking paths through `building.flanking_path`,
+`building.flanking_element` and `building.predicted_airborne_insulation`, with
+the Annex E vibration reduction indices $K_{ij}$ (rigid cross and T junctions,
+flexible interlayers, lightweight façades and double-leaf walls, corners and
 thickness changes) and the Clause 4.4.2 floor $K_{ij,\min}$ via
 `building.junction_vibration_reduction` and
 `building.junction_min_vibration_reduction`. Impact: the Formula (21)
@@ -599,24 +602,29 @@ subtraction $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ through
 `building.predicted_impact_insulation` and
 `building.standardized_impact_level`. Both results write a prediction fiche
 with `.report()`.
+</ScopeClaim>
 
-**Not covered.** The *detailed* per-band models of both parts are the subject of
-[Detailed Per-Band Prediction (ISO 12354)](/phonometry/buildings/design/detailed-prediction/):
-the same standard run band by band, with the laboratory element and junction data
-converted to their in-situ values before the paths are formed. Use the simplified
-model here when only the weighted element ratings are known and the question is
-whether the room passes; use the detailed one when the element spectra exist and
-the question is which path sets which band. The element
-inputs themselves ($R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area)
-are taken as given, from laboratory data or from the mass-law estimates of
-[Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/).
-The rest of the family is covered by its own guides: EN 12354-3 and
-EN 12354-4 across the building envelope in
-[Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/),
-EN 12354-5's service equipment in
-[Installed structure-borne sound](/phonometry/buildings/design/installed-structure-borne/)
-and EN 12354-6's absorption model in
-[Sound absorption in enclosed spaces](/phonometry/buildings/rooms/enclosed-space-absorption/).
+<ScopeClaim status="not-covered" label="Not covered">
+The *detailed* per-band models of both parts are the subject of [Detailed
+Per-Band Prediction (ISO
+12354)](/phonometry/buildings/design/detailed-prediction/): the same standard
+run band by band, with the laboratory element and junction data converted to
+their in-situ values before the paths are formed. Use the simplified model
+here when only the weighted element ratings are known and the question is
+whether the room passes; use the detailed one when the element spectra exist
+and the question is which path sets which band. The element inputs themselves
+($R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area) are taken as given,
+from laboratory data or from the mass-law estimates of [Predicting Panel Sound
+Insulation](/phonometry/buildings/design/panel-sound-insulation/). The rest of
+the family is covered by its own guides: EN 12354-3 and EN 12354-4 across the
+building envelope in [Façade Sound
+Insulation](/phonometry/buildings/insulation/facade-insulation/), EN 12354-5's
+service equipment in [Installed structure-borne
+sound](/phonometry/buildings/design/installed-structure-borne/) and EN
+12354-6's absorption model in [Sound absorption in enclosed
+spaces](/phonometry/buildings/rooms/enclosed-space-absorption/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

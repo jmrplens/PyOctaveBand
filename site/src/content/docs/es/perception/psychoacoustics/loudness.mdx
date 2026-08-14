@@ -36,9 +36,11 @@ references:
     note: "Sonoridad estacionaria y variable en el tiempo en sonios a partir del programa de referencia normativo del Anexo A.4, con la sonoridad percentil N5/N10, validada frente al conjunto del Anexo B."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Las métricas de nivel dicen cuánta *presión acústica* hay; la sonoridad dice
 cuán fuerte la *percibe* realmente quien escucha. Esta página cubre el
@@ -434,7 +436,9 @@ la tabla de elección de modelo que dice cuándo preferir cada uno, están en
 
 ## Qué cubre esta guía
 
-**Cubierto.** ISO 532-1:2017 (método de Zwicker): los requisitos de entrada e
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+ISO 532-1:2017 (método de Zwicker): los requisitos de entrada e
 instrumentación del apartado 4, el método estacionario del apartado 5 y el
 método variable en el tiempo del apartado 6 con las reglas de percentiles del
 apartado 6.4, portado del programa de referencia normativo del Anexo A.4 y
@@ -444,14 +448,18 @@ contenidos del informe del apartado 7 y las indicaciones del Anexo D para
 grabaciones con cabeza y torso. ISO 226:2023: la Fórmula (1), la Fórmula (2) y
 los parámetros de curva de la Tabla 1, mediante `equal_loudness_contour()`,
 `loudness_level()`, `hearing_threshold()` y `equal_loudness_contours()`.
+</ScopeClaim>
 
-**No cubierto.** La sonoridad de Moore-Glasberg de ISO 532-2, el método
-variable en el tiempo de ISO 532-3 y la sonoridad del modelo de Sottek de
-ECMA-418-2 se han mudado a
-[Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/). Las curvas
-de ISO 226:2023 describen solo tonos puros, y la norma no define
+<ScopeClaim status="not-covered" label="No cubierto">
+La sonoridad de Moore-Glasberg de ISO 532-2, el método variable en el tiempo
+de ISO 532-3 y la sonoridad del modelo de Sottek de ECMA-418-2 se han mudado a
+[Sonoridad
+avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/). Las
+curvas de ISO 226:2023 describen solo tonos puros, y la norma no define
 interpolación entre las 29 frecuencias tabuladas, así que `loudness_level()`
 espera una de las frecuencias de la Tabla 1.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -38,6 +38,8 @@ references:
     note: "Republishes the IEC 537 D-weighting table (Table SLD-I) used to pin the D response in CI."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Beyond A, C and Z, the weighting family keeps four special-purpose curves,
@@ -354,23 +356,28 @@ conformance report instead).
 
 ## What this guide covers
 
-**Covered.** ISO 7196:1995 for the
-G curve (Table 1 pole/zero values, verified against every Table 2 nominal
-response). ANSI S1.4-1983 for the historical B curve (Appendix C definition,
-Table IV design goals, Table V tolerance limits). IEC 61012:1990 for AU (the
-U low-pass of Table 2 cascaded with A, verified against Table 1). IEC
-537:1976 for the withdrawn aircraft-noise D curve, implemented from its
-published transfer function and cross-checked against two independent
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 7196:1995 for the G curve (Table 1 pole/zero values, verified against
+every Table 2 nominal response). ANSI S1.4-1983 for the historical B curve
+(Appendix C definition, Table IV design goals, Table V tolerance limits). IEC
+61012:1990 for AU (the U low-pass of Table 2 cascaded with A, verified against
+Table 1). IEC 537:1976 for the withdrawn aircraft-noise D curve, implemented
+from its published transfer function and cross-checked against two independent
 implementations.
+</ScopeClaim>
 
-**Not covered.** `verify_weighting_class` does not produce a class verdict
-for G or D: ISO 7196 defines a single ±1 dB tolerance with no class
-structure, and the withdrawn IEC 537 left no tolerance table behind. Both
-curves are pinned numerically against their published tables in the CI
-conformance report instead, not through this public verifier. B and D are
-provided for historical data and older national codes only; neither is
-current practice (IEC 61672-1 replaced B, and aircraft-noise certification
-now reports EPNL or plain A-weighted levels instead of D).
+<ScopeClaim status="not-covered" label="Not covered">
+`verify_weighting_class` does not produce a class verdict for G or D: ISO 7196
+defines a single ±1 dB tolerance with no class structure, and the withdrawn
+IEC 537 left no tolerance table behind. Both curves are pinned numerically
+against their published tables in the CI conformance report instead, not
+through this public verifier. B and D are provided for historical data and
+older national codes only; neither is current practice (IEC 61672-1 replaced
+B, and aircraft-noise certification now reports EPNL or plain A-weighted
+levels instead of D).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

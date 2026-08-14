@@ -18,9 +18,11 @@ references:
     note: "The direct (Eq. 20) and comparison (Eq. 21) methods of this guide, with the Waterhouse and meteorological corrections and the Table 1 qualification criteria."
 ---
 
+import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
-import ReportPreview from '../../../../components/ReportPreview.astro';
 
 A reverberation room turns its main defect as a listening space into a
 measuring instrument: because the field is diffuse, a handful of microphone
@@ -451,26 +453,30 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The ISO 3741 reverberation-room determination
-(`sound_power_reverberation`): the direct method (Eq. 20) through the Sabine
-absorption area, the Waterhouse boundary correction and the $C_1$/$C_2$
-meteorological corrections, and the comparison method against a reference
-sound source (`sound_power_comparison`, Eq. 21), both with per-band
-background correction and the Annex F A-weighted total, rendered as the
-accredited-style sound-power fiche through `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 3741 reverberation-room determination (`sound_power_reverberation`):
+the direct method (Eq. 20) through the Sabine absorption area, the Waterhouse
+boundary correction and the $C_1$/$C_2$ meteorological corrections, and the
+comparison method against a reference sound source (`sound_power_comparison`,
+Eq. 21), both with per-band background correction and the Annex F A-weighted
+total, rendered as the accredited-style sound-power fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** The sound energy level $L_J$ of clause 9.2, the single-event
-counterpart of $L_W$ defined in the same clauses, is not implemented, so an
-impulsive or single-event source falls outside this guide. Neither is the
-Annex F octave-band summation, so octave results have to be summed from the
+<ScopeClaim status="not-covered" label="Not covered">
+The sound energy level $L_J$ of clause 9.2, the single-event counterpart of
+$L_W$ defined in the same clauses, is not implemented, so an impulsive or
+single-event source falls outside this guide. Neither is the Annex F
+octave-band summation, so octave results have to be summed from the
 one-third-octave band powers by hand. The reverberation-room qualification
-itself (Annex C/D,
-eigenfrequency counting or a reference-source comparison) is assumed, not
-performed; the library only warns on the coarse advisory criteria ISO 3741
-states explicitly (the Table 1 minimum volume, the $V/S$ reverberation floor,
-fewer than 6 positions, an inter-position spread above 1.5 dB). Choosing
-among the six routes, and the ISO 4871 declaration a result feeds, live in
-[Sound Power](/phonometry/devices/emission/sound-power/).
+itself (Annex C/D, eigenfrequency counting or a reference-source comparison)
+is assumed, not performed; the library only warns on the coarse advisory
+criteria ISO 3741 states explicitly (the Table 1 minimum volume, the $V/S$
+reverberation floor, fewer than 6 positions, an inter-position spread above
+1.5 dB). Choosing among the six routes, and the ISO 4871 declaration a result
+feeds, live in [Sound Power](/phonometry/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

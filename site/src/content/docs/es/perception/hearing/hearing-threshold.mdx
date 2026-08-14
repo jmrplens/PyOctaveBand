@@ -18,6 +18,8 @@ references:
     note: "El cero audiométrico de la sección 2 (Tabla 1), implementado aquí a través de su adopción europea EN ISO 389-7:2006."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Dos normas describen dónde se sitúa el umbral de audición. **ISO 7029:2017** da
@@ -346,29 +348,35 @@ componente de edad, es el tema de la guía de
 
 ## Qué cubre esta guía
 
-**Cubierto.** El modelo de edad de ISO 7029:2017: la desviación mediana en
-ley de potencias desde los 18 años (apartado 4.2, Tabla 1), las dispersiones
-asimétricas semi-gaussianas $s_u$ y $s_l$ (apartado 4.3, Tablas 2–5), y el
-cálculo del fractil poblacional del apartado 4.4, todo implementado por
-`age_threshold(age, sex, fractile)`. El umbral de referencia de la audición
-en campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005 en las once
-frecuencias audiométricas, devuelto por `reference_threshold(field)`, junto con
-las condiciones de escucha del apartado 1 que lo definen.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El modelo de edad de ISO 7029:2017: la desviación mediana en ley de potencias
+desde los 18 años (apartado 4.2, Tabla 1), las dispersiones asimétricas
+semi-gaussianas $s_u$ y $s_l$ (apartado 4.3, Tablas 2–5), y el cálculo del
+fractil poblacional del apartado 4.4, todo implementado por
+`age_threshold(age, sex, fractile)`. El umbral de referencia de la audición en
+campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005 en las once
+frecuencias audiométricas, devuelto por `reference_threshold(field)`, junto
+con las condiciones de escucha del apartado 1 que lo definen.
+</ScopeClaim>
 
-**No cubierto.** La Fórmula (1) del apartado 6.1 de ISO 1999:2013 combina
-este umbral por edad con un desplazamiento inducido por ruido en un
-audiograma real. Esa combinación *sí* está implementada, en `htlan`, pero se
-documenta en la guía de
-[pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/)
-y no aquí; esta página se detiene en la componente de edad. De ISO 389-7:2005
-este módulo devuelve solo las once filas audiométricas de la Tabla 1. Las otras
-27, los tercios de octava de 20 Hz a 100 Hz, los tercios de octava intermedios
+<ScopeClaim status="not-covered" label="No cubierto">
+La Fórmula (1) del apartado 6.1 de ISO 1999:2013 combina este umbral por edad
+con un desplazamiento inducido por ruido en un audiograma real. Esa
+combinación *sí* está implementada, en `htlan`, pero se documenta en la guía
+de [pérdida auditiva inducida por
+ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) y no
+aquí; esta página se detiene en la componente de edad. De ISO 389-7:2005 este
+módulo devuelve solo las once filas audiométricas de la Tabla 1. Las otras 27,
+los tercios de octava de 20 Hz a 100 Hz, los tercios de octava intermedios
 entre los puntos audiométricos y las altas frecuencias extendidas de 9 kHz a
 18 kHz, no se llevan, y tampoco la Modificación 1:2016, así que el trabajo en
 baja frecuencia y en altas frecuencias extendidas tiene que acudir a la tabla
 misma. Los ceros de referencia con auriculares de ISO 389-1/-2/-8, el
-procedimiento audiométrico en campo sonoro de ISO 8253-2 y cómo se establecieron
-los valores de ISO 389-7 no están implementados.
+procedimiento audiométrico en campo sonoro de ISO 8253-2 y cómo se
+establecieron los valores de ISO 389-7 no están implementados.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

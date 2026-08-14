@@ -19,6 +19,8 @@ references:
     note: "Capítulo 11 (refracción por gradientes de viento y temperatura, modelos de rayos y zonas de sombra). ISBN 978-1-4987-4007-4."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
@@ -524,25 +526,30 @@ plt.show()
 
 ## Qué cubre esta guía
 
-**Cubierto.** El modelo de rayos (integración de la ley de Snell por
-Runge-Kutta, `atmospheric_ray_paths`) con la geometría en forma cerrada del
-perfil lineal (`ray_curvature_radius`, `shadow_zone_distance`, Salomons
-Sec. 4.4), y la ecuación parabólica de la función de Green
-(`atmospheric_parabolic_equation`, Salomons apéndices G y H): el arranque
-gaussiano, la reflexión de impedancia finita en el suelo, la pantalla de fase
-de refracción y la capa absorbente superior. Validado por el límite
-homogéneo frente al efecto suelo esférico exacto (a unas décimas de dB, y al
-refuerzo de +6 dB sobre suelo rígido), la geometría de rayo exacta a
-precisión de máquina, la reciprocidad y el desplome del nivel en la zona de
-sombra.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El modelo de rayos (integración de la ley de Snell por Runge-Kutta,
+`atmospheric_ray_paths`) con la geometría en forma cerrada del perfil lineal
+(`ray_curvature_radius`, `shadow_zone_distance`, Salomons Sec. 4.4), y la
+ecuación parabólica de la función de Green (`atmospheric_parabolic_equation`,
+Salomons apéndices G y H): el arranque gaussiano, la reflexión de impedancia
+finita en el suelo, la pantalla de fase de refracción y la capa absorbente
+superior. Validado por el límite homogéneo frente al efecto suelo esférico
+exacto (a unas décimas de dB, y al refuerzo de +6 dB sobre suelo rígido), la
+geometría de rayo exacta a precisión de máquina, la reciprocidad y el desplome
+del nivel en la zona de sombra.
+</ScopeClaim>
 
-**No cubierto.** Ambos modelos toman un único perfil de velocidad efectiva
-del sonido que varía solo con la altura, no con la distancia: una atmósfera
-horizontalmente no homogénea (un gradiente que cambia a lo largo de la
-trayectoria) queda fuera de esta formulación independiente de la distancia,
-descrita en el módulo como la contrapartida de los «métodos oceánicos
-independientes de la distancia» de los que es el reflejo. Ambos suponen además un suelo
-plano en $z = 0$; ninguno admite un perfil de elevación del terreno.
+<ScopeClaim status="not-covered" label="No cubierto">
+Ambos modelos toman un único perfil de velocidad efectiva del sonido que varía
+solo con la altura, no con la distancia: una atmósfera horizontalmente no
+homogénea (un gradiente que cambia a lo largo de la trayectoria) queda fuera
+de esta formulación independiente de la distancia, descrita en el módulo como
+la contrapartida de los «métodos oceánicos independientes de la distancia» de
+los que es el reflejo. Ambos suponen además un suelo plano en $z = 0$; ninguno
+admite un perfil de elevación del terreno.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

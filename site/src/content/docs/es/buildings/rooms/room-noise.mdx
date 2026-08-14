@@ -39,8 +39,10 @@ references:
     note: "Las curvas NC normativas y el método de tangencia (Tabla 1), más, del Anexo D informativo, las curvas RC Mark II (Tabla D.1), la valoración por media de frecuencias medias (apartado D.4) y la etiqueta espectral neutro/retumbo/siseo (apartado D.3), que implementa este módulo."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 El ruido de fondo estacionario de una sala ocupada (de la ventilación, los
 difusores o el tráfico lejano) se valora frente a una familia de **curvas de
@@ -548,28 +550,35 @@ en el repositorio; pulsa una vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La Tabla 1 y los apartados 5.2.2/5.2.3 de la ANSI/ASA S12.2-2019
-— la designación NC-(SIL) y el método de tangencia con su banda determinante —
-mediante `room.noise_criterion`; y la familia informativa RC Mark II del Anexo D,
-Tabla D.1 (`room.rc_curve`), con la valoración por media de frecuencias medias del
-apartado D.4 y la etiqueta neutro/retumbo/siseo del apartado D.3, mediante
-`room.room_criterion`. Las dos trabajan sobre las diez bandas de octava de 16 Hz a
-8 kHz, y cada resultado genera su propia ficha de una página con `.report()`. Las
-condiciones de medición del apartado 5.2.5, el procedimiento de exceso en baja
-frecuencia del apartado 5.2.4 y las tablas de criterios de los Anexos C y D se
-citan aquí para planificar y para leer los resultados.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La Tabla 1 y los apartados 5.2.2/5.2.3 de la ANSI/ASA S12.2-2019 — la
+designación NC-(SIL) y el método de tangencia con su banda determinante —
+mediante `room.noise_criterion`; y la familia informativa RC Mark II del Anexo
+D, Tabla D.1 (`room.rc_curve`), con la valoración por media de frecuencias
+medias del apartado D.4 y la etiqueta neutro/retumbo/siseo del apartado D.3,
+mediante `room.room_criterion`. Las dos trabajan sobre las diez bandas de
+octava de 16 Hz a 8 kHz, y cada resultado genera su propia ficha de una página
+con `.report()`. Las condiciones de medición del apartado 5.2.5, el
+procedimiento de exceso en baja frecuencia del apartado 5.2.4 y las tablas de
+criterios de los Anexos C y D se citan aquí para planificar y para leer los
+resultados.
+</ScopeClaim>
 
-**No cubierto.** El ensayo de cribado del apartado 5.3.2 se describe en el
-apartado 1 pero no está implementado: quien mide debe realizarlo, porque un
-espectro que no lo supere queda fuera del dominio de las dos funciones. Los
-criterios de ruido balanceados (NCB), el criterio de ruido de sala para ruido de
-baja frecuencia fluctuante (RNC, que necesita una serie temporal en lugar de un
-único espectro), la etiqueta de vibración y traqueteo ($RV$, que necesita el
-ensayo de la Tabla 6) y el índice numérico de evaluación de calidad (QAI, que la
-norma remite a referencias externas) no forman parte de este módulo. Tampoco la
-familia de curvas NR (ver el apartado 3). Las tablas de criterios se reproducen
-solo como referencias: consulta la norma, o el documento nacional o del cliente que
-rija el encargo, antes de citar un límite.
+<ScopeClaim status="not-covered" label="No cubierto">
+El ensayo de cribado del apartado 5.3.2 se describe en el apartado 1 pero no
+está implementado: quien mide debe realizarlo, porque un espectro que no lo
+supere queda fuera del dominio de las dos funciones. Los criterios de ruido
+balanceados (NCB), el criterio de ruido de sala para ruido de baja frecuencia
+fluctuante (RNC, que necesita una serie temporal en lugar de un único
+espectro), la etiqueta de vibración y traqueteo ($RV$, que necesita el ensayo
+de la Tabla 6) y el índice numérico de evaluación de calidad (QAI, que la
+norma remite a referencias externas) no forman parte de este módulo. Tampoco
+la familia de curvas NR (ver el apartado 3). Las tablas de criterios se
+reproducen solo como referencias: consulta la norma, o el documento nacional o
+del cliente que rija el encargo, antes de citar un límite.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

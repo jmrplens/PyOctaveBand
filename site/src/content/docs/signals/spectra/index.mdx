@@ -3,6 +3,9 @@ title: "Signals and spectra"
 description: "Frequency- and time-domain signal analysis in phonometry: calibrated Welch spectral estimates with their statistical quality, cepstral analysis with echo detection and liftering, the envelope spectrum, and correlation, time-delay estimation and the Hilbert envelope."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Band levels answer *how much*; this section answers *what is in the signal*.
 Where the rest of the core works in fractional octave bands, these pages work
 with the fine-grained estimators of classical signal analysis: spectral
@@ -162,17 +165,30 @@ Pages elsewhere on the site that this section leans on:
 
 These are Bendat & Piersol's textbook estimators, not a certification method:
 no page here carries clause numbers or acceptance limits, and no result is a
-compliance verdict. Three capabilities a reader looks for are genuinely absent.
+compliance verdict. Three capabilities a reader looks for are genuinely
+absent.
+
+<Scope>
+<ScopeClaim status="not-covered">
 **Multiple arrivals are not separated.** `time_delay` and `echo_detection`
 report the single largest peak, so a record with a direct path plus several
 reflections needs manual peak-picking or repeated calls on narrowed bands.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
 **There is no multi-sensor geometry.** Delay estimation is pairwise; there is
 no built-in TDOA solver, no beamformer and no source localisation, and a
 multiple-output system needs one `miso_coherence` call per output.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
 **There are no perceptual features.** The cepstrum is the plain
 linear-frequency one, with no mel warping and no MFCC variant. Two estimators
 that share this section's Welch core are documented where they are used
 instead: the transfer function and ordinary coherence on
-[Electroacoustics](/phonometry/devices/electroacoustics/electroacoustics/), and
-the two-microphone intensity probe on [Sound
+[Electroacoustics](/phonometry/devices/electroacoustics/electroacoustics/),
+and the two-microphone intensity probe on [Sound
 intensity](/phonometry/devices/emission/intensity/).
+</ScopeClaim>
+</Scope>
+

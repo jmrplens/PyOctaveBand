@@ -26,8 +26,10 @@ references:
     note: "Sections 3.2 and 3.6 (sound level meters and the measurement of time-varying sound: what the F/S/I readouts mean in instrument practice). ISBN 978-1-4987-2405-0."
 ---
 
-import Video from '../../../../components/Video.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A displayed sound level is always a *time-weighted* level: before anything
 reaches the readout, the squared, frequency-weighted pressure passes
@@ -404,24 +406,28 @@ $L_{eq}$/$L_N$ metrics built on these envelopes, and
 
 ## What this guide covers
 
-**Covered.** IEC 61672-1:2013's exponential time-weighting detector
-(clause 3.8) with the Fast and Slow time constants (clause 5.8.1),
-implemented as the recursive filter of `time_weighting` and the streaming
-`TimeWeighting` class, verified in CI against the class 1 tone-burst
-references of Table 4. The legacy asymmetric Impulse ballistics (35 ms
-attack, 1.5 s decay), carried into the international standards from the
-FAST/SLOW/IMPULSE characteristics of ANSI S1.4-1983.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+IEC 61672-1:2013's exponential time-weighting detector (clause 3.8) with the
+Fast and Slow time constants (clause 5.8.1), implemented as the recursive
+filter of `time_weighting` and the streaming `TimeWeighting` class, verified
+in CI against the class 1 tone-burst references of Table 4. The legacy
+asymmetric Impulse ballistics (35 ms attack, 1.5 s decay), carried into the
+international standards from the FAST/SLOW/IMPULSE characteristics of ANSI
+S1.4-1983.
+</ScopeClaim>
 
-**Not covered.** IEC 61672-1's wider instrument chain (frequency
-weighting, level ranges, periodic tests) is not on this page; it is the
-subject of
-[Build a sound level meter](/phonometry/signals/sound-level-meter/). ANSI
-S1.4-1983 is cited only for the historical origin of the F and S
-constants, not implemented as its own instrument specification. Modern
-impulsiveness rating ($L_{Aeq}$ plus an adjustment, or onset analysis) is
-on the
-[Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/) page,
-not built on the Impulse weighting here.
+<ScopeClaim status="not-covered" label="Not covered">
+IEC 61672-1's wider instrument chain (frequency weighting, level ranges,
+periodic tests) is not on this page; it is the subject of [Build a sound level
+meter](/phonometry/signals/sound-level-meter/). ANSI S1.4-1983 is cited only
+for the historical origin of the F and S constants, not implemented as its own
+instrument specification. Modern impulsiveness rating ($L_{Aeq}$ plus an
+adjustment, or onset analysis) is on the [Impulsive-sound
+prominence](/phonometry/environment/assessment/impulsive-sound/) page, not
+built on the Impulse weighting here.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

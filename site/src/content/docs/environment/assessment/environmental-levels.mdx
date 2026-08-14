@@ -31,6 +31,8 @@ references:
     note: "The survey-practice companion of ISO 1996-1: which descriptor family fits which assessment question, and the measurement procedures around them (BS 7445-2:1991 covers the land-use data acquisition)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A community does not hear a single $L_{Aeq}$: it hears a day whose evenings and
@@ -362,16 +364,22 @@ the cheapest way to shrink $u$ is therefore to measure more often, which is what
 
 ## What this guide covers
 
-**Covered.** ISO 1996-1:2016's $L_{den}$, $L_{dn}$ and composite rating level (clause
-6.5, `environment.lden`/`ldn`/`composite_rating_level`); and ISO
-1996-2:2007's Annex C tonal adjustment together with ISO 1996-2:2017's
-residual-noise correction (Clause 10.4), measurement uncertainty budget
-(Clause 4, Annex F), Annex J mean-audibility mapping and Annex K survey method.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 1996-1:2016's $L_{den}$, $L_{dn}$ and composite rating level (clause 6.5,
+`environment.lden`/`ldn`/`composite_rating_level`); and ISO 1996-2:2007's
+Annex C tonal adjustment together with ISO 1996-2:2017's residual-noise
+correction (Clause 10.4), measurement uncertainty budget (Clause 4, Annex F),
+Annex J mean-audibility mapping and Annex K survey method.
+</ScopeClaim>
 
-**Not covered.** ISO 1996-2 fixes the receiver positions and the façade
-corrections that turn a raw measurement into the level this page's
-functions expect: those position and correction procedures are not
-implemented, only the arithmetic that follows once you have applied them.
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 1996-2 fixes the receiver positions and the façade corrections that turn a
+raw measurement into the level this page's functions expect: those position
+and correction procedures are not implemented, only the arithmetic that
+follows once you have applied them.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

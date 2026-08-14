@@ -26,8 +26,10 @@ references:
     note: "The engineering method with a measured band-wise radiation factor (Formula 4/8) and its sound power level (Formula 15). Conformance includes the exact round-trip between the radiation factor and L_W = 10 lg(P/P₀)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 The airborne sound power a machine radiates through the structure-borne
@@ -489,37 +491,41 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** ISO/TS 7849-1:2009 and ISO/TS 7849-2:2009 as far as they define
-the calculation of sound power from vibration: the radiated power
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO/TS 7849-1:2009 and ISO/TS 7849-2:2009 as far as they define the
+calculation of sound power from vibration: the radiated power
 $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the velocity
-level and its calibration
-conversion (Formulae 3, 8) run by `velocity_level` and
-`velocity_level_from_acceleration`, the surface mean (Formulae 10/11) run by
-`mean_velocity_level`, the extraneous-vibration correction of Table 2 run by
-`extraneous_velocity_correction`, and the sound power level with the fixed
+level and its calibration conversion (Formulae 3, 8) run by `velocity_level`
+and `velocity_level_from_acceleration`, the surface mean (Formulae 10/11) run
+by `mean_velocity_level`, the extraneous-vibration correction of Table 2 run
+by `extraneous_velocity_correction`, and the sound power level with the fixed
 impedance term (Formula 12, Part 1) or a measured per-band radiation factor
 (Formula 15, Part 2) run by `radiated_sound_power_level` and
 `sound_power_from_vibration`. `radiation_factor` implements Part 2's
 single-machine Formula 8, converting an independently measured sound power
 into $\varepsilon$.
+</ScopeClaim>
 
-**Not covered.** The measurement clauses of both parts (instrumentation,
-source installation, environmental conditions: clauses 5 to 7) are not
-*implemented* as code, and neither are their measurement-uncertainty clauses and
-informative annexes: they are laboratory practice, and this guide states the
-rules of it that decide whether the inputs are valid at all — the Table 1
-position counts, the Table 2 extraneous-vibration ladder and the transducer
-mounting limits above. Part 2's clause 8 also asks for the radiation
-factor of a machine batch or family, averaging $\varepsilon_j$ over several
-machines and its standard deviation (Formulae 9, 10); only the single-machine
-Formula 8 is implemented, so pass an already-averaged $\varepsilon$ for a
-family determination. The
+<ScopeClaim status="not-covered" label="Not covered">
+The measurement clauses of both parts (instrumentation, source installation,
+environmental conditions: clauses 5 to 7) are not *implemented* as code, and
+neither are their measurement-uncertainty clauses and informative annexes:
+they are laboratory practice, and this guide states the rules of it that
+decide whether the inputs are valid at all — the Table 1 position counts, the
+Table 2 extraneous-vibration ladder and the transducer mounting limits above.
+Part 2's clause 8 also asks for the radiation factor of a machine batch or
+family, averaging $\varepsilon_j$ over several machines and its standard
+deviation (Formulae 9, 10); only the single-machine Formula 8 is implemented,
+so pass an already-averaged $\varepsilon$ for a family determination. The
 sound power that feeds `radiation_factor` must come from an ISO 9614 intensity
-*determination*, which is
-[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/)
+*determination*, which is [Sound Power by Intensity
+Scanning](/phonometry/devices/emission/sound-power-intensity/)
 (`sound_power_intensity`, or `sound_power_intensity_precision` for grade 1) —
-the [sound intensity guide](/phonometry/devices/emission/intensity/) covers the
-probe and the field indicators behind it but computes no power.
+the [sound intensity guide](/phonometry/devices/emission/intensity/) covers
+the probe and the field indicators behind it but computes no power.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

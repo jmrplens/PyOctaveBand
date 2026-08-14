@@ -25,8 +25,10 @@ references:
     note: "The field counterpart of the intensity method, giving the apparent index R'_I."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A reverberation room reads transmitted sound power *indirectly*: the
 receiving room integrates every watt that arrives, whichever path carried
@@ -486,30 +488,35 @@ low-frequency range.
 
 ## What this guide covers
 
-**Covered.** ISO 15186-1:2000's intensity sound reduction index $R_I$
-(Clause 3.8), its $K_c$-modified $R_{I,M}$ (Annex B) and the
-element-normalized $D_{I,n,e}$ (Clause 3.9), with the subarea combination of
-Formulas (11)-(12) and the surface pressure-intensity indicator, via
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 15186-1:2000's intensity sound reduction index $R_I$ (Clause 3.8), its
+$K_c$-modified $R_{I,M}$ (Annex B) and the element-normalized $D_{I,n,e}$
+(Clause 3.9), with the subarea combination of Formulas (11)-(12) and the
+surface pressure-intensity indicator, via
 `building.intensity_sound_reduction`, `building.adaptation_term_kc`,
 `building.intensity_element_normalized_difference`,
 `building.surface_pressure_intensity_indicator` and
-`building.combine_subareas`; the single-number ratings reuse the verified
-ISO 717-1 engine, and both results write the one-page test fiche through
+`building.combine_subareas`; the single-number ratings reuse the verified ISO
+717-1 engine, and both results write the one-page test fiche through
 `.report()`.
+</ScopeClaim>
 
-**Not covered.** The sound-intensity measurement itself (the scanning probe,
-the two-microphone acquisition and phase-mismatch calibration behind
-$L_{p1}$ and $L_{In}$) is not implemented: both levels are taken as
-already-measured inputs, and the ISO 15186-1 report fiche states explicitly
-that it has no field for the measurement-surface geometry or the
-scanning-versus-discrete-point acquisition method. Nothing here enforces the
-Clause 6.4 acquisition documented above either — the 0.1–0.3 m stand-off, the
-0.1–0.3 m/s scan speed, the 90°-rotated second scan and its 1.0 dB validity
-test, the 10 dB background margin — so a single scan will produce a number
-just as readily as a qualified pair. ISO 15186-2's own field procedure
-(loudspeaker positions, the façade cases) and the low-frequency Part 3 variant
-are not implemented either: the formulas here apply unchanged to field data,
-but nothing checks how that data was acquired.
+<ScopeClaim status="not-covered" label="Not covered">
+The sound-intensity measurement itself (the scanning probe, the two-microphone
+acquisition and phase-mismatch calibration behind $L_{p1}$ and $L_{In}$) is
+not implemented: both levels are taken as already-measured inputs, and the ISO
+15186-1 report fiche states explicitly that it has no field for the
+measurement-surface geometry or the scanning-versus-discrete-point acquisition
+method. Nothing here enforces the Clause 6.4 acquisition documented above
+either — the 0.1–0.3 m stand-off, the 0.1–0.3 m/s scan speed, the 90°-rotated
+second scan and its 1.0 dB validity test, the 10 dB background margin — so a
+single scan will produce a number just as readily as a qualified pair. ISO
+15186-2's own field procedure (loudspeaker positions, the façade cases) and
+the low-frequency Part 3 variant are not implemented either: the formulas here
+apply unchanged to field data, but nothing checks how that data was acquired.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

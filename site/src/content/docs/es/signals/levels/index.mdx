@@ -3,6 +3,9 @@ title: "Niveles y ponderación"
 description: "De la señal ponderada al número declarado: las ponderaciones frecuenciales de IEC 61672-1 y las curvas especiales, las balísticas Fast/Slow/Impulse, los niveles integrados, estadísticos y de dosis, y los indicadores ambientales de ISO 1996 construidos sobre ellos."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Un sonómetro hace tres cosas a una señal calibrada, en orden: la **pondera en
 frecuencia** para imitar la sensibilidad del oído, la **suaviza en el tiempo**
 con una balística normalizada y la **integra en un nivel**. Las páginas
@@ -84,6 +87,8 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Estas páginas implementan el procesado de señal de un sonómetro, no el
 sonómetro. El resto de IEC 61672-1 (los rangos de nivel, la indicación de
 sobrecarga, el ruido autogenerado, la respuesta direccional y los ensayos
@@ -94,10 +99,13 @@ exactamente qué significa y qué no significa un veredicto de clase de la
 biblioteca. Dos curvas llegan sin veredicto de ningún tipo: ISO 7196 define
 una única tolerancia de ±1 dB sin estructura de clases, y la retirada IEC 537
 no dejó tabla de tolerancias para la D, así que ambas curvas filtran una señal
-pero ninguna llega a `verify_weighting_class`, y en su lugar se anclan a
-sus tablas publicadas en el informe de conformidad. La dosis de ruido es solo
-la primera edición (1993) de IEC 61252, no la revisión de 2025. Y una dosis es
+pero ninguna llega a `verify_weighting_class`, y en su lugar se anclan a sus
+tablas publicadas en el informe de conformidad. La dosis de ruido es solo la
+primera edición (1993) de IEC 61252, no la revisión de 2025. Y una dosis es
 una magnitud, no un veredicto: las estrategias de exposición, el plan de
 muestreo y los límites que deciden si un trabajador está sobreexpuesto son
-[Exposición al ruido en el trabajo
-(ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/).
+[Exposición al ruido en el trabajo (ISO
+9612)](/phonometry/es/perception/hearing/occupational-exposure/).
+</ScopeClaim>
+</Scope>
+

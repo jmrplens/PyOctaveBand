@@ -159,6 +159,8 @@ references:
     note: "Los regímenes de propagación en aguas someras de Weston (sección 9.1.1.2, Ecuaciones 9.42 a 9.61 y Tabla 9.1), la fórmula de velocidad del sonido de Medwin (Ecuación 1.2) y los siete ejemplos numéricos de sonar resueltos de los capítulos 3 y 11 que fijan la sección de la ecuación del sonar."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -1022,8 +1024,10 @@ submarina](/phonometry/es/underwater/underwater-solvers/).
 
 ## Qué cubre esta guía
 
-**Cubierto.** La terminología de la ISO 18405:2017 (pérdida por propagación,
-nivel de fuente, niveles re 1 µPa) sustenta cada magnitud de esta página.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La terminología de la ISO 18405:2017 (pérdida por propagación, nivel de
+fuente, niveles re 1 µPa) sustenta cada magnitud de esta página.
 `transmission_loss` y `seawater_absorption` implementan la divergencia
 geométrica más los modelos de absorción de Francois-Garrison (1982, por
 defecto), Ainslie-McColm (1998) y Thorp (1967). `sea_water_sound_speed` y
@@ -1031,10 +1035,10 @@ defecto), Ainslie-McColm (1998) y Thorp (1967). `sea_water_sound_speed` y
 UNESCO/Chen-Millero (forma ITS-90 de Wong y Zhu de 1995, por defecto), Del
 Grosso (1974), Mackenzie (1981) y Medwin (1975), con la conversión de
 profundidad a presión de Leroy y Parthiot (1998). `weston_propagation_loss` y
-`weston_regime_boundaries` implementan los cuatro regímenes de flujo de energía
-de Weston y sus distancias de transición (Ainslie sección 9.1.1.2, Tabla 9.1).
-`passive_sonar_equation` y `active_sonar_equation` implementan las ecuaciones
-del sonar pasivo y activo monoestático (Urick, vía Etter 2003), y
+`weston_regime_boundaries` implementan los cuatro regímenes de flujo de
+energía de Weston y sus distancias de transición (Ainslie sección 9.1.1.2,
+Tabla 9.1). `passive_sonar_equation` y `active_sonar_equation` implementan las
+ecuaciones del sonar pasivo y activo monoestático (Urick, vía Etter 2003), y
 `detection_range` / `detection_range_from_curve` invierten una pérdida por
 transmisión en la figura de mérito. `seabed_reflection` y
 `bottom_reflection_loss` implementan el coeficiente de reflexión de Rayleigh
@@ -1042,17 +1046,20 @@ fluido-fluido y el ángulo crítico (Medwin & Clay). `ocean_ambient_noise` suma
 el ruido de viento de Wenz por la «regla de los cincos» y el ruido térmico de
 Mellen. `ship_source_spectrum` implementa los modelos de nivel de fuente
 JOMOPANS-ECHO (por defecto), RANDI 3.1 y Wales & Heitmeyer (2002).
+</ScopeClaim>
 
-**No cubierto.** El modelo de fondo es solo reflexión de Rayleigh
-fluido-fluido sin pérdidas, así que la atenuación del sedimento queda fuera
-de alcance. `active_sonar_equation` es solo monoestática: no hay geometría
-biestática. `ocean_ambient_noise` deja fuera la banda de turbulencia de baja
-frecuencia y cualquier modelo integrado de tráfico marítimo lejano; hay que
-aportar un espectro de tráfico propio, por ejemplo con
-`ship_source_spectrum` de arriba. Los métodos numéricos del campo
-(`normal_modes`, `ray_trace`, `parabolic_equation`) se cubren en
-[Métodos numéricos de propagación
+<ScopeClaim status="not-covered" label="No cubierto">
+El modelo de fondo es solo reflexión de Rayleigh fluido-fluido sin pérdidas,
+así que la atenuación del sedimento queda fuera de alcance.
+`active_sonar_equation` es solo monoestática: no hay geometría biestática.
+`ocean_ambient_noise` deja fuera la banda de turbulencia de baja frecuencia y
+cualquier modelo integrado de tráfico marítimo lejano; hay que aportar un
+espectro de tráfico propio, por ejemplo con `ship_source_spectrum` de arriba.
+Los métodos numéricos del campo (`normal_modes`, `ray_trace`,
+`parabolic_equation`) se cubren en [Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

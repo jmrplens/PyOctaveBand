@@ -89,20 +89,20 @@ which needs an external rotational-speed signal, and the small adjustment
 footnote 47 permits.
 
 **A verdict is never complete.** The `prominent` flag the tone-prominence
-functions return is the numeric criterion alone; ECMA-418-1 also requires aural
-confirmation and a lower-threshold-of-hearing screen, both of which stay with
-the caller. The tone-audibility module is weighting-agnostic and does **not**
-apply the A-weighting clause 5.3.2 requires, so A-weight the spectrum before
-passing it, and it takes an already-computed narrow-band spectrum rather than
-building one from a recording.
+functions return is the numeric criterion alone; ECMA-418-1 also requires
+aural confirmation and a lower-threshold-of-hearing screen, both of which stay
+with the caller. The tone-audibility module is weighting-agnostic and does
+**not** apply the A-weighting clause 5.3.2 requires, so A-weight the spectrum
+before passing it, and it takes an already-computed narrow-band spectrum
+rather than building one from a recording.
 
-Two documented deviations are worth knowing. ISO 532-3 prescribes resampling to
-32 kHz before the running FFT; this implementation works at the native rate, a
-deviation that stays inside the standard's expanded uncertainty but that you
-should undo by resampling first if strict clause-by-clause conformance matters.
-And the Osses 2016 fluctuation-strength signal model is validated for
-amplitude-modulated stimuli only, with a documented floor — a steady 1 kHz tone
-reads about 0.09 vacil rather than 0.
+Two documented deviations are worth knowing. ISO 532-3 prescribes resampling
+to 32 kHz before the running FFT; this implementation works at the native
+rate, a deviation that stays inside the standard's expanded uncertainty but
+that you should undo by resampling first if strict clause-by-clause
+conformance matters. And the Osses 2016 fluctuation-strength signal model is
+validated for amplitude-modulated stimuli only, with a documented floor — a
+steady 1 kHz tone reads about 0.09 vacil rather than 0.
 
 Finally, none of these metrics is a community response: annoyance here is a
 laboratory sensation computed from a signal, while the annoyance a

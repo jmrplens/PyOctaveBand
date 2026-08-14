@@ -3,6 +3,9 @@ title: "Hearing and exposure"
 description: "The statistics of hearing and the noise that damages it: the ISO 7029 age-related threshold distribution and ISO 389-7 reference zero, the ISO 1999 noise-induced permanent threshold shift, and the ISO 9612 occupational-exposure survey."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 This section connects three quantities that regulation treats as one story:
 where a population's **hearing threshold** sits, how occupational **noise
 exposure** is measured, and how that exposure **shifts the threshold**
@@ -67,20 +70,29 @@ In the order the chain runs.
 
 ## What this section does not cover
 
-**Nothing here is a verdict about a person.** ISO 1999 does not define a hearing
-handicap or a compensable fence — that line is set by national regulation, and
-the library applies none of it, so you supply and check the criterion yourself.
-The same is true of the exposure action values: the LEX,8h and its one-sided
-95 % upper limit come out of ISO 9612, and the numbers they are compared against
-are in your jurisdiction's directive, not here.
+<Scope>
+<ScopeClaim status="not-covered">
+**Nothing here is a verdict about a person.** ISO 1999 does not define a
+hearing handicap or a compensable fence — that line is set by national
+regulation, and the library applies none of it, so you supply and check the
+criterion yourself. The same is true of the exposure action values: the LEX,8h
+and its one-sided 95 % upper limit come out of ISO 9612, and the numbers they
+are compared against are in your jurisdiction's directive, not here.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Two implementation boundaries follow the standards. Only **database A** is
-implemented for ISO 1999: `htlan` always draws its age component from
-ISO 7029:2017, and substituting a nationally measured control population
-(clauses 6.2.3 and 6.2.4) means computing that database elsewhere and passing it
-in. Of ISO 389-7, only the Table 1 reference values are implemented, not the
+implemented for ISO 1999: `htlan` always draws its age component from ISO
+7029:2017, and substituting a nationally measured control population (clauses
+6.2.3 and 6.2.4) means computing that database elsewhere and passing it in. Of
+ISO 389-7, only the Table 1 reference values are implemented, not the
 procedures by which they were established.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 And no audiometry happens here. Nothing generates a test tone, drives an
 audiometer or corrects for an earphone coupler: the pages consume and produce
 threshold levels as data.
+</ScopeClaim>
+</Scope>
+

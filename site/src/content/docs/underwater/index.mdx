@@ -3,6 +3,9 @@ title: "Underwater acoustics"
 description: "Sound in the sea: the ISO 18405 reference levels, ship radiated noise (ISO 17208) and pile-driving exposure (ISO 18406), propagation from closed-form transmission loss and the sonar equation to ambient noise and full numerical solvers, and the marine-mammal hearing criteria that turn a level into an assessment."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+
 Underwater acoustics runs on the same physics as airborne acoustics but on a
 different scale and a different reference: levels are expressed re **1 µPa**
 (not 20 µPa), exposure re 1 µPa²·s, and the medium itself, with its
@@ -78,6 +81,8 @@ lives inline with the guides rather than in the theory reference.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **The measurement discipline is not implemented, only its arithmetic.** ISO
 17208-1's four-run, three-hydrophone averaging, its closest-point-of-approach
 and water-depth geometry checks, its ±30° data-window scoring and its
@@ -85,29 +90,39 @@ background-noise correction are the operator's; the library supplies the
 closed-form radiated-noise and monopole source levels that follow. ISO 18406
 itself excludes vibro- and sheet-piling from its scope, so continuous
 pile-driving noise has no closed form here or anywhere in the library.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
-all three solvers assume a **range-independent** water column with no absorbing
-or elastic bottom and no real bathymetry — which rules out range-dependent
-problems entirely. The ray solver returns paths and travel times but not
-amplitudes (no ray-tube intensity, no caustic correction), and the parabolic
-equation is the standard small-angle Tappert form rather than a wide-angle Padé
-variant. For the elastic seabed physics these fluid solvers leave out, the
-[elastic wave solver](/phonometry/simulation/elastic-waves/) is the nearest
-thing the library has.
+all three solvers assume a **range-independent** water column with no
+absorbing or elastic bottom and no real bathymetry — which rules out
+range-dependent problems entirely. The ray solver returns paths and travel
+times but not amplitudes (no ray-tube intensity, no caustic correction), and
+the parabolic equation is the standard small-angle Tappert form rather than a
+wide-angle Padé variant. For the elastic seabed physics these fluid solvers
+leave out, the [elastic wave solver](/phonometry/simulation/elastic-waves/) is
+the nearest thing the library has.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **The exposure page rates hearing, not behaviour.** Only the auditory-effect
 criteria are implemented; behavioural-disturbance thresholds, the ones a
 harassment take estimate turns on, are out of scope. Nothing chooses a hearing
 group or an accumulation period for you, and nothing models the animal moving
 relative to the source, so the cumulative exposure reported is the
 stationary-receiver worst case. There is no audiogram for low-frequency
-cetaceans, because the source publication does not print one of its parameters.
+cetaceans, because the source publication does not print one of its
+parameters.
+</ScopeClaim>
 
-Two smaller boundaries: the ambient-noise spectrum leaves out the low-frequency
-turbulence band and has no built-in distant-shipping model — supply a shipping
-spectrum yourself — and the active sonar equation is monostatic only.
+<ScopeClaim status="not-covered">
+Two smaller boundaries: the ambient-noise spectrum leaves out the
+low-frequency turbulence band and has no built-in distant-shipping model —
+supply a shipping spectrum yourself — and the active sonar equation is
+monostatic only.
+</ScopeClaim>
+</Scope>
 
 ## Before and after these pages
 

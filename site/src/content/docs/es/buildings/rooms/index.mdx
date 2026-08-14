@@ -3,6 +3,9 @@ title: "Acústica de salas"
 description: "El campo sonoro dentro de una sala: la medición de la respuesta al impulso (ISO 18233), los parámetros de ISO 3382, la privacidad del habla en oficinas diáfanas, las fuentes imagen, el campo estacionario y los modos de la sala rectangular, las valoraciones de ruido de sala de ANSI S12.2 y la predicción del tiempo de reverberación por las fórmulas clásicas y el modelo normativo EN 12354-6."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Casi todo lo que importa del campo sonoro dentro de una sala se sigue de dos
 magnitudes: su **respuesta al impulso**, que puede medirse, y su **absorción
 acústica**, que puede diseñarse. Las páginas de esta sección cubren la cadena
@@ -111,29 +114,38 @@ habla](/phonometry/es/perception/speech/speech-transmission/).
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Aquí no hay ninguna simulación de ondas.** El modelo de fuentes imagen es
 solo especular: no lleva difracción, ni dispersión en un difusor, ni contornos
 de impedancia finita, y se detiene cuando se agota el orden de reflexión, no
 cuando se agota el sonido. Por debajo de la frecuencia de Schroeder, donde los
 modelos estadísticos dejan de servir, lo que ofrece esta sección son las
 *posiciones* de los modos de una caja rectangular rígida, no el campo de una
-sala real a baja frecuencia. Para eso, la sección de
-[simulación de ondas](/phonometry/es/simulation/) ejecuta un esquema FDTD
-sobre la geometría real.
+sala real a baja frecuencia. Para eso, la sección de [simulación de
+ondas](/phonometry/es/simulation/) ejecuta un esquema FDTD sobre la geometría
+real.
+</ScopeClaim>
 
-**Ni auralización, ni trazador de rayos, ni modelo de sala.** No hay importador
-de geometría, ni base de datos de materiales, ni renderizador: las páginas toman
-dimensiones, coeficientes y respuestas al impulso como entradas, y devuelven
-parámetros. Los propios coeficientes de absorción salen de
+<ScopeClaim status="not-covered">
+**Ni auralización, ni trazador de rayos, ni modelo de sala.** No hay
+importador de geometría, ni base de datos de materiales, ni renderizador: las
+páginas toman dimensiones, coeficientes y respuestas al impulso como entradas,
+y devuelven parámetros. Los propios coeficientes de absorción salen de
 [Materiales y superficies](/phonometry/es/materials/absorbers/), y el modelo
 yerra por el lado optimista cuando la sala no es difusa — fuera de los límites
 del apartado 4.6 de EN 12354-6 (ninguna dimensión más de cinco veces otra,
 superficies opuestas dentro de un factor de tres en absorción, fracción de
 objetos por debajo de 0,2) el tiempo de reverberación medido puede llegar al
 doble del previsto.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Dos fronteras de cobertura siguen a las normas. De EN 12354-6 solo está
 implementado el modelo normativo del apartado 4, no su método informativo del
 Anexo D para recintos irregulares. Y nada de esta sección mide el aislamiento
-*entre* salas: eso es
-[Aislamiento acústico](/phonometry/es/buildings/insulation/).
+*entre* salas: eso es [Aislamiento
+acústico](/phonometry/es/buildings/insulation/).
+</ScopeClaim>
+</Scope>
+

@@ -26,8 +26,10 @@ references:
     note: "El método alterno de la sección 3, con la relación efectiva de calores específicos del Anexo A, validado frente al ejemplo resuelto del propio Anexo A.3 de la norma."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Empuja aire despacio a través de un absorbente poroso y el material devuelve
 el empuje. Ese arrastre viscoso, ejercido por las paredes de los poros sobre
@@ -585,10 +587,12 @@ de tocar el modelo, es $\sigma$.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las dos partes de ISO 9053: el método estático del
-apartado 7.5 (`static_airflow_resistance`, la regresión por el origen y la
-velocidad de evaluación de 0,5 mm/s) y el método alterno de la Fórmula (2) de
-ISO 9053-2 con la relación efectiva de calores específicos del Anexo A
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las dos partes de ISO 9053: el método estático del apartado 7.5
+(`static_airflow_resistance`, la regresión por el origen y la velocidad de
+evaluación de 0,5 mm/s) y el método alterno de la Fórmula (2) de ISO 9053-2
+con la relación efectiva de calores específicos del Anexo A
 (`effective_kappa`, `thermal_boundary_layer_thickness`,
 `alternating_airflow_resistance`), incluidos los avisos de validez de 1-4 Hz y
 de las Fórmulas (3)/(4), y la ficha de estilo acreditado de ISO 9053-1. Las
@@ -596,13 +600,17 @@ conversiones de definición que los conectan con lo que lee un banco son
 `linear_airflow_velocity` (apartado 3.4), `specific_airflow_resistance`
 (apartado 3.2, en sus dos formas de llamada) y `piston_volume_flow_rate`
 (apartado 6.2 de ISO 9053-2).
+</ScopeClaim>
 
-**No cubierto.** Los modelos de fluido equivalente que consumen la
-resistividad (Delany-Bazley, Miki, Johnson-Champoux-Allard) viven en
-[Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y
-la ventana de diseño $\sigma d$ de la sección 4 es una guía de ingeniería, no
-parte de ninguna de las dos normas. ISO 9053-1 no define veredicto ni
-valoración de número único, así que la ficha no lleva ninguno de los dos.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los modelos de fluido equivalente que consumen la resistividad (Delany-Bazley,
+Miki, Johnson-Champoux-Allard) viven en [Absorbentes porosos y
+multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y la ventana
+de diseño $\sigma d$ de la sección 4 es una guía de ingeniería, no parte de
+ninguna de las dos normas. ISO 9053-1 no define veredicto ni valoración de
+número único, así que la ficha no lleva ninguno de los dos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -12,6 +12,8 @@ references:
     note: "Capítulo 7 (relaciones de entradas y salidas múltiples: coherencia ordinaria Ec. 7.109, coherencia múltiple Ec. 7.35, coherencia parcial Ec. 7.87, la recursión de eliminación de Gauss de los espectros condicionados Ec. 7.94, la descomposición de la salida coherente Ecs. 7.86/7.116/7.121) y sección 9.3 (errores estadísticos de las estimaciones múltiples y condicionadas, Ecs. 9.98-9.101). ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Cuando varias fuentes parcialmente correlacionadas excitan una misma respuesta, la
@@ -322,23 +324,28 @@ calculados con la misma longitud de segmento son congruentes bin a bin.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las funciones de coherencia ordinaria, múltiple y parcial del
-capítulo 7 de Bendat y Piersol (ecuaciones 7.109, 7.35, 7.87), la
-recursión de condicionamiento por eliminación de Gauss (ecuación 7.94),
-los espectros de salida coherente parciales y su descomposición exacta de
-la salida (ecuaciones 7.86/7.116/7.121), y los errores aleatorios de la
-sección 9.3 para las estimaciones múltiples y condicionadas (ecuaciones
-9.98-9.101), todo expuesto por `miso_coherence` y `MISOCoherenceResult`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las funciones de coherencia ordinaria, múltiple y parcial del capítulo 7 de
+Bendat y Piersol (ecuaciones 7.109, 7.35, 7.87), la recursión de
+condicionamiento por eliminación de Gauss (ecuación 7.94), los espectros de
+salida coherente parciales y su descomposición exacta de la salida (ecuaciones
+7.86/7.116/7.121), y los errores aleatorios de la sección 9.3 para las
+estimaciones múltiples y condicionadas (ecuaciones 9.98-9.101), todo expuesto
+por `miso_coherence` y `MISOCoherenceResult`.
+</ScopeClaim>
 
-**No cubierto.** Las estimaciones de respuesta en frecuencia de entradas
-múltiples del capítulo (los factores de ganancia $L_{iy}$), el modelo lineal
-que predice la salida a partir de las entradas condicionadas, se calculan
-internamente para construir los espectros de salida coherente pero no se
-devuelven: `MISOCoherenceResult` solo expone el lado de la coherencia y la
-descomposición espectral, no una función de transferencia multientrada
-ajustada. El método también es de salida única (MISO); un sistema con
-varias salidas correlacionadas necesita una llamada a `miso_coherence` por cada
-salida.
+<ScopeClaim status="not-covered" label="No cubierto">
+Las estimaciones de respuesta en frecuencia de entradas múltiples del capítulo
+(los factores de ganancia $L_{iy}$), el modelo lineal que predice la salida a
+partir de las entradas condicionadas, se calculan internamente para construir
+los espectros de salida coherente pero no se devuelven: `MISOCoherenceResult`
+solo expone el lado de la coherencia y la descomposición espectral, no una
+función de transferencia multientrada ajustada. El método también es de salida
+única (MISO); un sistema con varias salidas correlacionadas necesita una
+llamada a `miso_coherence` por cada salida.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

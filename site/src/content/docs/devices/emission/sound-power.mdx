@@ -25,9 +25,11 @@ references:
     note: "The declaration section: the dual/single-number forms, L_WAd = L_WA + K_WA (clause 3.15) and the clause 6.2 verification."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Sound *pressure* depends on where you stand and on the room you stand in;
 sound **power** does not. The sound power level $L_W$ is the total acoustic
@@ -406,35 +408,39 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The ISO 3740 decision guidance condensed into the method table
-and the decision path, the operating and mounting conditions that precede it,
-what the accuracy grades claim about
-reproducibility, and the ISO 4871 noise-emission declaration
-(`NoiseEmissionDeclaration`, `OperatingModeDeclaration`, `declare()`): the
-dual- and single-number forms, $L_{WAd} = L_{WA} + K_{WA}$ and the clause 6.2
-verification with both rounding rules (`verified`, `verified_dual`), rendered as
-the declaration fiche through `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 3740 decision guidance condensed into the method table and the
+decision path, the operating and mounting conditions that precede it, what the
+accuracy grades claim about reproducibility, and the ISO 4871 noise-emission
+declaration (`NoiseEmissionDeclaration`, `OperatingModeDeclaration`,
+`declare()`): the dual- and single-number forms, $L_{WAd} = L_{WA} + K_{WA}$
+and the clause 6.2 verification with both rounding rules (`verified`,
+`verified_dual`), rendered as the declaration fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** The six determinations themselves live in their method
-guides: the enveloping surface and the anechoic array in
-[Sound Power by Pressure Methods](/phonometry/devices/emission/sound-power-pressure/),
-the diffuse-field method in
-[Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/),
-both scanning methods in
-[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/)
-and the surface-velocity route in
-[Sound power from surface vibration](/phonometry/devices/emission/vibration-sound-power/).
-ISO 9614-1's own discrete-point power summation is not implemented at all;
-only its field indicators are, in
-[Sound Intensity](/phonometry/devices/emission/intensity/).
+<ScopeClaim status="not-covered" label="Not covered">
+The six determinations themselves live in their method guides: the enveloping
+surface and the anechoic array in [Sound Power by Pressure
+Methods](/phonometry/devices/emission/sound-power-pressure/), the
+diffuse-field method in [Sound Power in the Reverberation
+Room](/phonometry/devices/emission/sound-power-reverberation/), both scanning
+methods in [Sound Power by Intensity
+Scanning](/phonometry/devices/emission/sound-power-intensity/) and the
+surface-velocity route in [Sound power from surface
+vibration](/phonometry/devices/emission/vibration-sound-power/). ISO 9614-1's
+own discrete-point power summation is not implemented at all; only its field
+indicators are, in [Sound Intensity](/phonometry/devices/emission/intensity/).
 ISO 3743-1, ISO 3743-2 and ISO 3747, the remaining members of the ISO 3740
 family, are not implemented either, and neither is the sound *energy* level
-$L_J$ for single events. The emission sound pressure level $L_{pA}$ that stands
-beside $L_{WA}$ in a declaration is consumed, not determined: ISO 11201,
-ISO 11202 and ISO 11204 are outside the library. ISO 4871's batch criteria of
-clause 6.3 are not evaluated — only the clause 6.2 single-machine verification —
-and its batch statistics beyond the single-machine
+$L_J$ for single events. The emission sound pressure level $L_{pA}$ that
+stands beside $L_{WA}$ in a declaration is consumed, not determined: ISO
+11201, ISO 11202 and ISO 11204 are outside the library. ISO 4871's batch
+criteria of clause 6.3 are not evaluated — only the clause 6.2 single-machine
+verification — and its batch statistics beyond the single-machine
 $K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

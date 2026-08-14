@@ -3,6 +3,9 @@ title: "Surfaces measured in place"
 description: "Surfaces that have no sample: why a pavement is characterised where it lies, the ISO 13472-1 subtraction technique against the ISO 13472-2 spot tube, what each is scoped to, and the editions the library implements."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A reverberation-room or impedance-tube coefficient describes a *sample*. Some
 surfaces have no sample. A pavement cannot be cut out and carried to a
 laboratory without destroying the very thing that governs its absorption — the
@@ -57,16 +60,21 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Edition status matters here more than anywhere else in this area.** The
 implementation follows ISO 13472-1:2002 and ISO 13472-2:2010; both have since
 been revised — 2022 and 2025 respectively — and those revisions are **not**
 implemented, so a report that cites the current edition cannot cite these
-functions without qualification. The spot method's own signal processing is not
-duplicated either: only its geometry, validity and correction helpers live here,
-and the two-microphone transfer-function reduction is the ISO 10534-2 routine of
-[Impedance Tube](/phonometry/materials/absorbers/impedance-tube/). Nothing in
-this subsection measures the noise a surface *generates* — the tyre-road source
-term is CNOSSOS territory, in [Environmental
+functions without qualification. The spot method's own signal processing is
+not duplicated either: only its geometry, validity and correction helpers live
+here, and the two-microphone transfer-function reduction is the ISO 10534-2
+routine of [Impedance Tube](/phonometry/materials/absorbers/impedance-tube/).
+Nothing in this subsection measures the noise a surface *generates* — the
+tyre-road source term is CNOSSOS territory, in [Environmental
 sources](/phonometry/environment/sources/) — and no in-situ method is provided
 for any surface other than a road: a wall or a ceiling measured in place is
 outside both parts of ISO 13472.
+</ScopeClaim>
+</Scope>
+

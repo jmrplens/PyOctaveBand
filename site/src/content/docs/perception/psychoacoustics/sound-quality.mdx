@@ -26,6 +26,8 @@ references:
     note: "The Sottek Hearing Model tonality (tu_HMS, clause 6), roughness (asper, clause 7) and fluctuation strength (vacil_HMS, clause 9, the HSA-based envelope analysis)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Two sounds of equal loudness can still differ in how *sharp*, how *tonal*,
@@ -591,24 +593,30 @@ STI/STIPA, and [Theory](/phonometry/reference/theory/perception/) for the underl
 
 ## What this guide covers
 
-**Covered.** DIN 45692:2009 through `sharpness_din()`: the clause 6 weighting
-over the ISO 532-1 specific-loudness pattern, plus the informative Annex B
-von Bismarck and Aures variants, with the Table A.2 targets checked in CI.
-ECMA-418-2:2025 on the shared clause 5 auditory front-end: the clause 6.2
-tonality output stages (`tonality_ecma()`), the clause 7 roughness chain
-(`roughness_ecma()`) and the clause 9 HSA fluctuation strength
-(`fluctuation_strength_ecma()`). Each uses the standard's tabulated
-calibration constant, not a reverse fit to the reference sound.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+DIN 45692:2009 through `sharpness_din()`: the clause 6 weighting over the ISO
+532-1 specific-loudness pattern, plus the informative Annex B von Bismarck and
+Aures variants, with the Table A.2 targets checked in CI. ECMA-418-2:2025 on
+the shared clause 5 auditory front-end: the clause 6.2 tonality output stages
+(`tonality_ecma()`), the clause 7 roughness chain (`roughness_ecma()`) and the
+clause 9 HSA fluctuation strength (`fluctuation_strength_ecma()`). Each uses
+the standard's tabulated calibration constant, not a reverse fit to the
+reference sound.
+</ScopeClaim>
 
-**Not covered.** The three ECMA-418-2 entry points are monaural: the binaural
-quadratic-mean combinations of Formula 112 (clause 7.1.11) and Formula 170
-(clause 9.1.15) are not implemented, so analyse each channel separately. The
-optional entropy weighting of clause 7.1.6 needs an external rotational-speed
-signal and is left out, as is the ±0.25 % adjustment of $c_F$ that footnote 47
-permits. The ECMA-418-2 loudness that shares this front-end lives in
-[Advanced Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/), and the Fastl and Zwicker
-fluctuation-strength models in
-[Psychoacoustic Annoyance](/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/).
+<ScopeClaim status="not-covered" label="Not covered">
+The three ECMA-418-2 entry points are monaural: the binaural quadratic-mean
+combinations of Formula 112 (clause 7.1.11) and Formula 170 (clause 9.1.15)
+are not implemented, so analyse each channel separately. The optional entropy
+weighting of clause 7.1.6 needs an external rotational-speed signal and is
+left out, as is the ±0.25 % adjustment of $c_F$ that footnote 47 permits. The
+ECMA-418-2 loudness that shares this front-end lives in [Advanced
+Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/), and the
+Fastl and Zwicker fluctuation-strength models in [Psychoacoustic
+Annoyance](/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -48,6 +48,8 @@ references:
     note: "The flow-resistivity ground classes 'A'-'H' accepted by ground_effect_adjustment."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 Helicopter noise is strongly directive, so the **ECAC Doc 32** method describes
@@ -1002,34 +1004,39 @@ itself rests on the closed-form anchors and its CNOSSOS-EU lineage.
 
 ## What this guide covers
 
-**Covered.** The ECAC Doc 32 hemisphere method and the EASA NORAH2 equation-
-level guidance (§A.3-A.5): the noise hemisphere and its bilinear lookup
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ECAC Doc 32 hemisphere method and the EASA NORAH2 equation- level guidance
+(§A.3-A.5): the noise hemisphere and its bilinear lookup
 (`RotorcraftHemisphere`, `hemisphere_source_level`), the three propagation
 adjustments (`spherical_spreading_adjustment`, `atmospheric_adjustment`,
 `ground_effect_adjustment`, the Chien-Soroka model with Delany-Bazley
 impedance and the CNOSSOS flow-resistivity classes), the flight-condition
 interpolation (`flight_condition_weights`, `interpolated_source_level`), the
-hover, idle and taxi source derivation of Table 3
-(`hover_ring_hemisphere`, `hover_derived_hemisphere`), the
-flight-path kinematics (`flight_path_kinematics`), the single-event SEL,
-LASmax and EPNL (`rotorcraft_event_level`), ground-grid contours
-(`rotorcraft_noise_contour`) and the terrain mean-ground-plane and
-diffraction-screening chain (`mean_ground_plane`, `mean_flow_resistivity`,
-`diffraction_attenuation`, `terrain_screening_adjustment`). Validated against
-the NORAH2 guidance Table 4, closed-form geometric and grazing limits, and
-end to end against the NORAH2 prototype's ARP verification cases, including
-its out-of-ground-hover operation.
+hover, idle and taxi source derivation of Table 3 (`hover_ring_hemisphere`,
+`hover_derived_hemisphere`), the flight-path kinematics
+(`flight_path_kinematics`), the single-event SEL, LASmax and EPNL
+(`rotorcraft_event_level`), ground-grid contours (`rotorcraft_noise_contour`)
+and the terrain mean-ground-plane and diffraction-screening chain
+(`mean_ground_plane`, `mean_flow_resistivity`, `diffraction_attenuation`,
+`terrain_screening_adjustment`). Validated against the NORAH2 guidance Table
+4, closed-form geometric and grazing limits, and end to end against the NORAH2
+prototype's ARP verification cases, including its out-of-ground-hover
+operation.
+</ScopeClaim>
 
-**Not covered.** The §A.3.5 fallback for a type with no hover data at all —
-two side-line level-flight microphones corrected to the 150 m hover circle by
-the ICAO Annex 16 integrated method — is a measurement-correction chain this
-module, which consumes already-reduced hemispheres, does not model. **No
-hemisphere database
+<ScopeClaim status="not-covered" label="Not covered">
+The §A.3.5 fallback for a type with no hover data at all — two side-line
+level-flight microphones corrected to the 150 m hover circle by the ICAO Annex
+16 integrated method — is a measurement-correction chain this module, which
+consumes already-reduced hemispheres, does not model. **No hemisphere database
 ships with phonometry, and there is no NORAH file reader**: the method is
-implemented, the data is not, so the arrays come from a measurement campaign or
-from the NORAH2 reference database and are assembled by the reader. Refraction
-by atmospheric gradients is outside Doc 32 itself, as is the flight-condition
-interpolation, which follows the NORAH2 guidance instead.
+implemented, the data is not, so the arrays come from a measurement campaign
+or from the NORAH2 reference database and are assembled by the reader.
+Refraction by atmospheric gradients is outside Doc 32 itself, as is the
+flight-condition interpolation, which follows the NORAH2 guidance instead.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

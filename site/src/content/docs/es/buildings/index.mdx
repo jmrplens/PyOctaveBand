@@ -3,6 +3,9 @@ title: "Salas y edificación"
 description: "El sonido dentro de las salas y a través de los edificios: medición y predicción acústica de salas (ISO 3382, EN 12354-6), y aislamiento acústico medido en campo y en laboratorio y predicho con EN 12354."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Esta sección cubre el sonido en el entorno construido, y se divide por una
 línea natural: lo que ocurre **dentro** de una sala y lo que pasa **entre**
 salas. Dentro de una sala, la magnitud que gobierna es la absorción: fija el
@@ -119,6 +122,8 @@ datos de elemento y a partir de la física del propio elemento.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **La biblioteca empieza después del micrófono y se detiene antes de la
 geometría.** Del lado de la medición, cada función toma niveles de banda ya
 promediados sobre las posiciones y ya corregidos por el ruido de fondo: el
@@ -127,21 +132,27 @@ señal frente al ruido de fondo y las cualificaciones de la instalación de
 ensayo de ISO 16283, ISO 10140 e ISO 3382 son cosa del operador, y aquí nada
 comprueba que se hayan cumplido. Del lado de la predicción, los índices
 globales de los elementos, los índices de unión y las mejoras de los
-revestimientos son entradas que aportas tú desde una medición o desde el propio
-anexo de una norma; ninguna se deriva de un plano.
+revestimientos son entradas que aportas tú desde una medición o desde el
+propio anexo de una norma; ninguna se deriva de un plano.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Aquí no hay ninguna simulación de ondas ni ningún modelo de sala.** No hay
 importador de geometría, ni base de datos de materiales, ni trazador de rayos,
 ni auralización: las páginas de sala toman dimensiones, coeficientes de
 absorción y respuestas al impulso y devuelven parámetros, y el modelo de
 fuentes imagen es solo especular. Un campo real a baja frecuencia en una forma
 real es la [simulación de ondas](/phonometry/es/simulation/).
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Y una predicción no es un veredicto.** Los índices globales y los índices
-nacionales se calculan aquí, pero los valores límite frente a los que se juzgan
-son nacionales — el código español está implementado como ejemplo resuelto de
-uno de esos marcos, no como la regla en todas partes — y la exigencia sale
-siempre de tu reglamentación.
+nacionales se calculan aquí, pero los valores límite frente a los que se
+juzgan son nacionales — el código español está implementado como ejemplo
+resuelto de uno de esos marcos, no como la regla en todas partes — y la
+exigencia sale siempre de tu reglamentación.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

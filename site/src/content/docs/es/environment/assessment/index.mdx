@@ -3,6 +3,9 @@ title: "Evaluación y normativa"
 description: "Evaluar el ruido ambiental una vez ha llegado: los indicadores y el nivel de evaluación de ISO 1996-1, la cadena de determinación de ISO 1996-2 con su corrección de ruido residual y su balance de incertidumbre, el ajuste por sonidos impulsivos, y una aplicación nacional de toda la cadena."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 La propagación dice qué llega al receptor. La evaluación dice cómo se
 contabiliza, que es otra pregunta con sus propias normas. Es una cadena de tres
 eslabones: un **indicador** promedia el sonido sobre un periodo definido; unos
@@ -78,19 +81,24 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 La biblioteca empieza donde termina el sonómetro. La ISO 1996-2 fija las
-posiciones del receptor y las correcciones de fachada que convierten una medida
-en bruto en el nivel que esperan estas funciones, y esos procedimientos de
-posición y corrección **no están implementados** — solo la aritmética que sigue
-una vez aplicados. Lo mismo vale en el plano nacional: los procedimientos de
-medición del anexo IV del RD 1367/2007 (posiciones de micrófono, duración de
-las series, número de mediciones) tampoco están implementados, y la
-zonificación acústica, los mapas de ruido y los planes de acción de la
-Ley 37/2003 son instrumentos de planificación más que cálculos. Faltan a
-propósito dos alternativas publicadas: solo está implementado el KI graduado de
-la Fórmula 2 de NT ACOU 112, no el valor fijo de 5 dB de reserva de su Nota 4,
-y los ajustes por categoría de la Tabla A.1 de ISO 1996-1 aparecen únicamente
-como la referencia de juicio del técnico evaluador a la que sustituye la
-medición. Por último, no hay ninguna tabla de límites incorporada aparte de la
-española: un límite es nacional, y la biblioteca te da el nivel de evaluación
-para compararlo con el que corresponda.
+posiciones del receptor y las correcciones de fachada que convierten una
+medida en bruto en el nivel que esperan estas funciones, y esos procedimientos
+de posición y corrección **no están implementados** — solo la aritmética que
+sigue una vez aplicados. Lo mismo vale en el plano nacional: los
+procedimientos de medición del anexo IV del RD 1367/2007 (posiciones de
+micrófono, duración de las series, número de mediciones) tampoco están
+implementados, y la zonificación acústica, los mapas de ruido y los planes de
+acción de la Ley 37/2003 son instrumentos de planificación más que cálculos.
+Faltan a propósito dos alternativas publicadas: solo está implementado el KI
+graduado de la Fórmula 2 de NT ACOU 112, no el valor fijo de 5 dB de reserva
+de su Nota 4, y los ajustes por categoría de la Tabla A.1 de ISO 1996-1
+aparecen únicamente como la referencia de juicio del técnico evaluador a la
+que sustituye la medición. Por último, no hay ninguna tabla de límites
+incorporada aparte de la española: un límite es nacional, y la biblioteca te
+da el nivel de evaluación para compararlo con el que corresponda.
+</ScopeClaim>
+</Scope>
+

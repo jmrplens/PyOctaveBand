@@ -33,8 +33,10 @@ references:
     note: "The statistical reverberation theory the standard's formulae specialise."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 **EN 12354-6:2003** predicts the **total equivalent sound absorption area** of a
 room and its **reverberation time** from the absorption of its surfaces and
@@ -557,24 +559,30 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** EN 12354-6:2003 Clause 4: the total equivalent sound absorption
-area of Formulae 1 to 4 with its surface, object, object-array and air terms
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+EN 12354-6:2003 Clause 4: the total equivalent sound absorption area of
+Formulae 1 to 4 with its surface, object, object-array and air terms
 (`room.equivalent_absorption_area`, `room.hard_object_absorption`,
-`room.object_fraction`, `room.air_absorption_area`), the Formula 5 reverberation
-time (`room.reverberation_time`), the per-octave-band chain
+`room.object_fraction`, `room.air_absorption_area`), the Formula 5
+reverberation time (`room.reverberation_time`), the per-octave-band chain
 (`room.enclosed_space_reverberation`) and the one-page fiche through
-`.report()`, validated against the three worked cases of Annex E. The input-data
-rules of clause 4.2, the interpretations of clause 4.5 and the limits of
-clause 4.6 are stated in §3, and the design inversion of Formula 5 in §2b.
+`.report()`, validated against the three worked cases of Annex E. The
+input-data rules of clause 4.2, the interpretations of clause 4.5 and the
+limits of clause 4.6 are stated in §3, and the design inversion of Formula 5
+in §2b.
+</ScopeClaim>
 
-**Not covered.** The informative Annex D method for irregular spaces and
-irregular absorption distribution, which is where the standard itself sends the
-cases that fail clause 4.6 (including its own Annex E case 3). The standard's
-scope exclusions — very large or irregularly shaped spaces such as concert
-halls, theatres and factories — are outside the model rather than outside this
-implementation. Nothing here emits a verdict: EN 12354-6 gives a diffuse-field
-estimate, and a target passed through `requirement` is drawn as a reference line
-only.
+<ScopeClaim status="not-covered" label="Not covered">
+The informative Annex D method for irregular spaces and irregular absorption
+distribution, which is where the standard itself sends the cases that fail
+clause 4.6 (including its own Annex E case 3). The standard's scope exclusions
+— very large or irregularly shaped spaces such as concert halls, theatres and
+factories — are outside the model rather than outside this implementation.
+Nothing here emits a verdict: EN 12354-6 gives a diffuse-field estimate, and a
+target passed through `requirement` is drawn as a reference line only.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

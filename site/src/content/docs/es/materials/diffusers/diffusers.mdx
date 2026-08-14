@@ -53,9 +53,11 @@ references:
     note: "Solo el coeficiente de atenuación de tono puro alfa que consumen las relaciones de atenuación del aire del apartado 8 de ISO 17497-1 (Ecs. (2)/(3)); el modelo completo de absorción atmosférica está en la guía de propagación en exteriores."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Un difusor se juzga por adónde envía el sonido que refleja, y dos
 coeficientes normalizados valoran ese trabajo desde dos ángulos distintos.
@@ -1206,11 +1208,14 @@ sonido») no es ninguno de los dos.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El coeficiente de dispersión de incidencia aleatoria de la
-ISO 17497-1:2004+A1:2014 (las relaciones de absorción a partir del tiempo
-de reverberación del apartado 6 y la Fórmula (5)) con los límites de placa
-base de la Tabla 1, mediante `materials.random_incidence_absorption`,
-`materials.specular_absorption_coefficient`, `materials.scattering_coefficient`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El coeficiente de dispersión de incidencia aleatoria de la ISO
+17497-1:2004+A1:2014 (las relaciones de absorción a partir del tiempo de
+reverberación del apartado 6 y la Fórmula (5)) con los límites de placa base
+de la Tabla 1, mediante `materials.random_incidence_absorption`,
+`materials.specular_absorption_coefficient`,
+`materials.scattering_coefficient`,
 `materials.scattering_coefficient_spectrum` y
 `materials.check_base_plate_scattering`; el coeficiente de difusión
 direccional y de incidencia aleatoria de la ISO 17497-2:2012 (Fórmulas (5) a
@@ -1220,18 +1225,22 @@ direccional y de incidencia aleatoria de la ISO 17497-2:2012 (Fórmulas (5) a
 modelo de predicción de difusor de Fraunhofer de Cox y D'Antonio
 (`materials.predict_diffuser_polar_response`,
 `materials.predicted_diffusion_spectrum`).
+</ScopeClaim>
 
-**No cubierto.** El modelo de predicción de difusor de Fraunhofer es una
-estimación de diseño, no forma parte de la ISO 17497-2 en sí, y sus propios
-límites declarados (pierde precisión a baja frecuencia, en ángulos rasantes y
-para superficies muy absorbentes, e ignora la difracción de borde) hacen que
-no sustituya a una medición real del coeficiente de difusión. Las
-disposiciones de raíz primitiva y moduladas se tratan como guía de diseño en
-la sección 3, pero solo la secuencia de profundidades de residuo cuadrático
-tiene función dedicada; otros perfiles entran por los argumentos explícitos
-`depths` o `reflection`. Los paneles en sublongitud de onda profunda cargados
-con resonadores son el tema de la
-[guía de metadifusores](/phonometry/es/materials/diffusers/metadiffusers/).
+<ScopeClaim status="not-covered" label="No cubierto">
+El modelo de predicción de difusor de Fraunhofer es una estimación de diseño,
+no forma parte de la ISO 17497-2 en sí, y sus propios límites declarados
+(pierde precisión a baja frecuencia, en ángulos rasantes y para superficies
+muy absorbentes, e ignora la difracción de borde) hacen que no sustituya a una
+medición real del coeficiente de difusión. Las disposiciones de raíz primitiva
+y moduladas se tratan como guía de diseño en la sección 3, pero solo la
+secuencia de profundidades de residuo cuadrático tiene función dedicada; otros
+perfiles entran por los argumentos explícitos `depths` o `reflection`. Los
+paneles en sublongitud de onda profunda cargados con resonadores son el tema
+de la [guía de
+metadifusores](/phonometry/es/materials/diffusers/metadiffusers/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

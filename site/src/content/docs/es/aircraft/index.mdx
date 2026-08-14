@@ -3,6 +3,9 @@ title: "Ruido de aeronaves"
 description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la OACI, la maquinaria de contornos de aeropuerto de ECAC Doc 29, el método del hemisferio para helicópteros de ECAC Doc 32 y la base de datos ANP de EASA que los alimenta."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 El ruido de aeronaves se calcula con métodos negociados internacionalmente de
 dos clases. La **certificación** fija un único número por tipo de aeronave
 hasta el último decimal, en los puntos de referencia que una norma coloca
@@ -91,21 +94,27 @@ suelo.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Solo eventos únicos.** La cadena de Doc 29 construye contornos de evento
 único; no ensambla los índices acumulados de múltiples eventos — una suma tipo
 Lden sobre un programa completo de vuelos — que un estudio de contornos de
 ruido necesita por encima de ellos. Ese último paso es donde de verdad se toma
 una decisión de usos del suelo, y no está aquí.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Ninguna aeronave se modela desde primeros principios.** Las tablas NPD y los
-hemisferios de ruido son *datos de entrada*: la biblioteca interpola las tablas
-publicadas para un tipo y no las sintetiza a partir de datos de motor, y la
-base de datos ANP se lee y nunca se escribe (la versión 2.3 se distribuye tal
-cual). De las entradas de ANP, solo las que tienen perfiles de punto fijo traen
-una trayectoria lista para usar, porque convertir una salida por pasos de
-procedimiento en una trayectoria de vuelo exige el modelo de prestaciones de
-mecánica del vuelo del Doc 9911 de la OACI, que no está implementado.
+hemisferios de ruido son *datos de entrada*: la biblioteca interpola las
+tablas publicadas para un tipo y no las sintetiza a partir de datos de motor,
+y la base de datos ANP se lee y nunca se escribe (la versión 2.3 se distribuye
+tal cual). De las entradas de ANP, solo las que tienen perfiles de punto fijo
+traen una trayectoria lista para usar, porque convertir una salida por pasos
+de procedimiento en una trayectoria de vuelo exige el modelo de prestaciones
+de mecánica del vuelo del Doc 9911 de la OACI, que no está implementado.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Tres huecos concretos.** El estacionario, el ralentí y el rodaje de
 helicóptero funcionan sobre las fuentes derivadas de la Tabla 3, pero el
 último recurso de la guía para un tipo sin ningún dato de estacionario (dos
@@ -114,12 +123,17 @@ de 150 m por el método integrado del Anexo 16) no está modelado. El
 verificador de sistemas de medida comprueba la IEC 61265:1995 y no la edición
 de 2018 que la sustituye. Y el estampido sónico no se toca en ningún punto de
 la biblioteca.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Por último, la fuente de aeronaves de CNOSSOS-EU de los apartados 2.6 y 2.7
-**no** está implementada: el ruido de aeronaves aquí es la familia de la OACI y
-la ECAC, que es un conjunto de modelos distinto del de las fuentes de carretera
-y ferrocarril de [Fuentes ambientales](/phonometry/es/environment/sources/), y
-los dos no deben mezclarse dentro de un mismo mapa estratégico sin advertirlo.
+**no** está implementada: el ruido de aeronaves aquí es la familia de la OACI
+y la ECAC, que es un conjunto de modelos distinto del de las fuentes de
+carretera y ferrocarril de [Fuentes
+ambientales](/phonometry/es/environment/sources/), y los dos no deben
+mezclarse dentro de un mismo mapa estratégico sin advertirlo.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

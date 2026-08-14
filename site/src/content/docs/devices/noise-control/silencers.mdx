@@ -35,9 +35,11 @@ references:
     note: "The substitution measurement of section 3: the source, modal filter, transition and substitution duct of Clause 5.2, the three receiving-side arrangements of 5.2.4, the two series of 6.2.1 with the Table 6 spread limits, and the limiting insertion loss of Clause 7.4 and Annex C."
 ---
 
+import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
-import ReportPreview from '../../../../components/ReportPreview.astro';
 
 A silencer earns its keep in a duct: between an engine and its tailpipe,
 between a fan and the room it serves. Two working principles divide the
@@ -821,27 +823,33 @@ algebra does not.
 
 ## What this guide covers
 
-**Covered.** Reactive silencers by the four-pole transfer-matrix method
-(Bies §8.8-8.9, Munjal Eq. (3.27)): the closed-form `expansion_chamber`
-(Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator`
-(Eqs. (8.46), (8.44)), `extended_tube_chamber`, and the `duct_matrix`/
-`shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building
-blocks for arbitrary element chains, each with its to-scale
-`.plot_geometry()` drawing, cross-checked against the independent FDTD
-solver; the `plane_wave_limit` that bounds all of them; and, as prose rather
-than as code, the ISO 7235 substitution measurement that produces the
-insertion loss a supplier publishes.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Reactive silencers by the four-pole transfer-matrix method (Bies §8.8-8.9,
+Munjal Eq. (3.27)): the closed-form `expansion_chamber` (Eq. (8.111)),
+`helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46), (8.44)),
+`extended_tube_chamber`, and the `duct_matrix`/
+`shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building blocks
+for arbitrary element chains, each with its to-scale `.plot_geometry()`
+drawing, cross-checked against the independent FDTD solver; the
+`plane_wave_limit` that bounds all of them; and, as prose rather than as code,
+the ISO 7235 substitution measurement that produces the insertion loss a
+supplier publishes.
+</ScopeClaim>
 
-**Not covered.** Only reactive elements are computed: dissipative
-(absorptive, duct-lining) silencers are discussed for selection but not
-modelled from the liner properties, and the lined-elbow and plenum data of
-the [HVAC methods](/phonometry/devices/noise-control/noise-control/) are interpolated
+<ScopeClaim status="not-covered" label="Not covered">
+Only reactive elements are computed: dissipative (absorptive, duct-lining)
+silencers are discussed for selection but not modelled from the liner
+properties, and the lined-elbow and plenum data of the [HVAC
+methods](/phonometry/devices/noise-control/noise-control/) are interpolated
 installation tables, not a liner model. Mean-flow effects (convection,
-temperature gradients, flow-dependent impedance of perforates) are outside
-the no-flow element matrices used here. Nothing on this page is a
-measurement: no part of ISO 7235 is implemented, the shell breakout and the
-end corrections at the area jumps are not modelled, and the branch models are
-lossless unless a `resistance` is supplied.
+temperature gradients, flow-dependent impedance of perforates) are outside the
+no-flow element matrices used here. Nothing on this page is a measurement: no
+part of ISO 7235 is implemented, the shell breakout and the end corrections at
+the area jumps are not modelled, and the branch models are lossless unless a
+`resistance` is supplied.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

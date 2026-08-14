@@ -32,6 +32,8 @@ references:
     note: "ESTOI: the row- and column mean- and variance-normalisation of the short-time spectrogram (Eqs. 4-7) and the spectral-correlation intermediate index (Eq. 8)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 **STOI** and **ESTOI** are correlation-based objective intelligibility
@@ -431,21 +433,27 @@ other: a processor can raise STOI while the room keeps the STI poor.
 
 ## What this guide covers
 
-**Covered.** Taal et al. 2011 (STOI) and Jensen & Taal 2016 (ESTOI), the two
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Taal et al. 2011 (STOI) and Jensen & Taal 2016 (ESTOI), the two
 correlation-based measures `stoi()` implements: the shared front end of 10 kHz
 resampling, 256-sample Hann frames, 15 one-third-octave bands, 384 ms segments
 and 40 dB silent-frame removal (Taal et al. 2011, Eqs. 1-4); the per-band
 envelope correlation and averaged index (Eqs. 5-6); and, with `extended=True`,
 the row- and column-normalisation of the spectrogram and the
 spectral-correlation index (Jensen & Taal 2016, Eqs. 4-8).
+</ScopeClaim>
 
-**Not covered.** Taal et al. 2011 also fits a logistic function mapping the
-index $d$ to a predicted percentage of words understood, calibrated on
-specific listening-test corpora. `stoi()` returns only $d$, as
-`STOIResult.value`, not that percentage: the API has no percent-correct
-output or fitted coefficients. The 2010 ICASSP paper is cited only as the
-short conference version of the same algorithm, adding nothing implemented
-beyond the 2011/2016 equations above.
+<ScopeClaim status="not-covered" label="Not covered">
+Taal et al. 2011 also fits a logistic function mapping the index $d$ to a
+predicted percentage of words understood, calibrated on specific
+listening-test corpora. `stoi()` returns only $d$, as `STOIResult.value`, not
+that percentage: the API has no percent-correct output or fitted coefficients.
+The 2010 ICASSP paper is cited only as the short conference version of the
+same algorithm, adding nothing implemented beyond the 2011/2016 equations
+above.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

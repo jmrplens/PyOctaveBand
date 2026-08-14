@@ -3,6 +3,9 @@ title: "Reference"
 description: "Theory, evidence and vocabulary: the derivations behind the modules, the conformance report that pins each metric to its clause, the registry of defects found in the published sources, the bibliography and the glossary."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+
 The guides show how to measure something. This section answers the questions
 that come after: **why is the formula this one**, **is the implementation
 actually right**, **is the printed source itself right**, **what is this
@@ -112,23 +115,35 @@ code.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **It is not evidence about your measurement, only about the library.** The
 conformance report says that the implementation reproduces each standard's own
 expected value; it says nothing about your microphone, your room or your
-operator, and an accredited measurement needs a traceable calibration chain and
-a type-approved instrument that no software can supply.
+operator, and an accredited measurement needs a traceable calibration chain
+and a type-approved instrument that no software can supply.
+</ScopeClaim>
 
-**It is not a substitute for the standards.** Nothing here reproduces normative
-text: the theory pages cite clause, table and equation numbers so that you can
-read the document itself, which is what a reviewer will ask you to do.
+<ScopeClaim status="not-covered">
+**It is not a substitute for the standards.** Nothing here reproduces
+normative text: the theory pages cite clause, table and equation numbers so
+that you can read the document itself, which is what a reviewer will ask you
+to do.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **It is not the API.** Signatures, argument types and return values are
 generated from the docstrings into the [API
 reference](/phonometry/reference/api/), which is a different section of the
 sidebar.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **And it is not exhaustive.** The theory pages cover the areas whose
-mathematics several guides share, and say plainly which areas keep their theory
-inline instead; the errata registry lists only the defects this project has
-confirmed against a printed page; and the bibliography lists the sources the
-library implements rather than the literature of the field.
+mathematics several guides share, and say plainly which areas keep their
+theory inline instead; the errata registry lists only the defects this project
+has confirmed against a printed page; and the bibliography lists the sources
+the library implements rather than the literature of the field.
+</ScopeClaim>
+</Scope>
+

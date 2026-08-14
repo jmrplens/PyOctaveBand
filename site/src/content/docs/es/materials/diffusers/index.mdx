@@ -3,6 +3,9 @@ title: "Difusores y superficies"
 description: "Valorar y diseñar superficies por lo que reflejan: los coeficientes de dispersión ISO 17497-1 y de difusión ISO 17497-2 con el diseño de difusores de Schroeder, los metadifusores en sublongitud de onda profunda, y la absorción in situ de pavimentos de carretera de ISO 13472."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Donde la subsección de
 [Absorbentes](/phonometry/es/materials/absorbers/) pregunta cuánta
 energía retira un material del campo, esta pregunta qué hace una *superficie*
@@ -61,19 +64,24 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Los dos modelos de predicción de aquí son **estimaciones de diseño, no
 mediciones**. El campo lejano de Fraunhofer que comparten las páginas de
 difusores y metadifusores pierde exactitud en baja frecuencia, a incidencias
-rasantes y sobre superficies muy absorbentes, e ignora la difracción de bordes,
-así que valora una secuencia de profundidades antes de construirla pero no
-sustituye a una medición ISO 17497-2; el modelo de metadifusor es además de
-reacción local, sin acoplamiento entre pozos. Solo la secuencia de
+rasantes y sobre superficies muy absorbentes, e ignora la difracción de
+bordes, así que valora una secuencia de profundidades antes de construirla
+pero no sustituye a una medición ISO 17497-2; el modelo de metadifusor es
+además de reacción local, sin acoplamiento entre pozos. Solo la secuencia de
 profundidades de residuo cuadrático tiene una función dedicada — las
 disposiciones de raíz primitiva y moduladas se comentan como guía de diseño y
-entran por los argumentos explícitos de profundidad o de reflexión. El problema
-inverso, resolver las geometrías de los resonadores para un perfil de fase
-objetivo, no está automatizado: el flujo de trabajo ajusta las fases por
+entran por los argumentos explícitos de profundidad o de reflexión. El
+problema inverso, resolver las geometrías de los resonadores para un perfil de
+fase objetivo, no está automatizado: el flujo de trabajo ajusta las fases por
 evaluación. Del lado de la medida, la biblioteca reduce los datos pero no
-maneja el banco: la plataforma giratoria de ISO 17497-1 y el goniómetro de
-ISO 17497-2 aportan los tiempos de reverberación y la respuesta polar, y lo que
+maneja el banco: la plataforma giratoria de ISO 17497-1 y el goniómetro de ISO
+17497-2 aportan los tiempos de reverberación y la respuesta polar, y lo que
 está implementado es la aritmética que los convierte en un coeficiente.
+</ScopeClaim>
+</Scope>
+

@@ -12,6 +12,8 @@ references:
     note: "Section 8.4 collects the discrete fault frequencies of rotating machinery implemented on this page: the eleven rolling-contact bearing frequencies after Shahan and Kamperman (Eqs. 8.4-8.14), the gear-meshing frequency (Eq. 8.3), the blade-passing frequency and the lobed interaction patterns of a ducted axial fan (Eqs. 8.15-8.17), the pump hydraulic pulsation frequency (Eq. 8.18) and the induction-motor supply and rotor-slot harmonic frequencies (Eqs. 8.19-8.20). ISBN 978-0-521-49913-2."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Condition monitoring begins with arithmetic, not with signal processing. Every
@@ -540,24 +542,30 @@ above the useful part of this envelope spectrum.
 
 ## Covered and not covered
 
-**Covered.** The kinematic families of Norton Section 8.4: rolling-contact
-bearings (Eqs. 8.4 to 8.14), gear mesh and sidebands (Eq. 8.3), induction-motor
-supply, slip, pole-pass and rotor-slot lines (Eqs. 8.19 and 8.20), and
-blade-passing frequencies with the lobed interaction patterns of a ducted axial
-fan (Eqs. 8.15 to 8.18), through `bearing_fault_frequencies`,
-`gear_mesh_frequencies`, `induction_motor_frequencies`,
-`blade_pass_frequencies`, `combine_fault_lines` and `shaft_rate`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The kinematic families of Norton Section 8.4: rolling-contact bearings (Eqs.
+8.4 to 8.14), gear mesh and sidebands (Eq. 8.3), induction-motor supply, slip,
+pole-pass and rotor-slot lines (Eqs. 8.19 and 8.20), and blade-passing
+frequencies with the lobed interaction patterns of a ducted axial fan (Eqs.
+8.15 to 8.18), through `bearing_fault_frequencies`, `gear_mesh_frequencies`,
+`induction_motor_frequencies`, `blade_pass_frequencies`, `combine_fault_lines`
+and `shaft_rate`.
+</ScopeClaim>
 
-**Not covered.** These are *predictions*, not detections: nothing here decides
-whether a line is present, only where it would be. The amplitude criteria that
-turn a present line into a severity assessment (crest factor and kurtosis
-trends, ISO 10816 / ISO 20816 velocity severity bands) are outside this module;
-Norton's own guidance is qualitative (crest factors of 2.5 to 3.5 for a healthy
-bearing, up to about 11 with impulsive defects; kurtosis near 3 healthy and
-above 4 damaged). The pole-pass frequency $\text{FP} = p \times f_\text{slip}$ is standard
-condition-monitoring practice rather than Norton's: he gives the slip frequency
-itself as the broken-bar sideband spacing and does not multiply it by the pole
-count.
+<ScopeClaim status="not-covered" label="Not covered">
+These are *predictions*, not detections: nothing here decides whether a line
+is present, only where it would be. The amplitude criteria that turn a present
+line into a severity assessment (crest factor and kurtosis trends, ISO 10816 /
+ISO 20816 velocity severity bands) are outside this module; Norton's own
+guidance is qualitative (crest factors of 2.5 to 3.5 for a healthy bearing, up
+to about 11 with impulsive defects; kurtosis near 3 healthy and above 4
+damaged). The pole-pass frequency $\text{FP} = p \times f_\text{slip}$ is
+standard condition-monitoring practice rather than Norton's: he gives the slip
+frequency itself as the broken-bar sideband spacing and does not multiply it
+by the pole count.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

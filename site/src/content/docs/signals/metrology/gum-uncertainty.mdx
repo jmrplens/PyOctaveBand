@@ -29,6 +29,8 @@ references:
     note: "The domain-specific reproducibility budget for building-acoustics single-number ratings, a separate companion to the general GUM machinery."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Every measurement result is incomplete without a statement of its uncertainty.
@@ -438,8 +440,10 @@ those standardized cases:
 
 ## What this guide covers
 
-**Covered.** From the GUM: the clause 5 law of propagation with sensitivity
-coefficients evaluated numerically, the clause 4.2 Type A evaluation as the
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+From the GUM: the clause 5 law of propagation with sensitivity coefficients
+evaluated numerically, the clause 4.2 Type A evaluation as the
 `uncertainty`/`dof` pair of a `Quantity`, the clause 4.3 Type B evaluations
 (`rectangular`, `triangular`, `u_shaped`), correlated inputs through a
 correlation matrix, the Annex G.4 Welch–Satterthwaite effective degrees of
@@ -447,16 +451,20 @@ freedom and the Annex G coverage factor — validated against the Annex H.1
 end-gauge and Annex H.2 resistance budgets. From Supplement 1: Monte Carlo
 propagation of distributions with the clause 7.7 probabilistically symmetric
 coverage interval, checked against the clause 9.2 worked examples.
+</ScopeClaim>
 
-**Not covered.** The adaptive trial-count procedure of Supplement 1 clause 7.9
-(the number of trials is fixed, with a minimum of 2), the shortest coverage
-interval of clause 5.3.4, and the multivariate-Gaussian sampling of clause 6.4.8
-— so a correlated budget stays with `combine_uncertainty`. Supplement 2
-(multiple output quantities) is not implemented at all. The clause 8 validation
-of the GUM framework against the Monte Carlo result is a comparison you make by
-reading the two results, not an automated verdict. Domain budgets prescribed by
-acoustics standards (ISO 1996-2, ISO 12999-1 and -2, ISO 9612) are implemented
-on their own pages, listed above, and are not derived here.
+<ScopeClaim status="not-covered" label="Not covered">
+The adaptive trial-count procedure of Supplement 1 clause 7.9 (the number of
+trials is fixed, with a minimum of 2), the shortest coverage interval of
+clause 5.3.4, and the multivariate-Gaussian sampling of clause 6.4.8 — so a
+correlated budget stays with `combine_uncertainty`. Supplement 2 (multiple
+output quantities) is not implemented at all. The clause 8 validation of the
+GUM framework against the Monte Carlo result is a comparison you make by
+reading the two results, not an automated verdict. Domain budgets prescribed
+by acoustics standards (ISO 1996-2, ISO 12999-1 and -2, ISO 9612) are
+implemented on their own pages, listed above, and are not derived here.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

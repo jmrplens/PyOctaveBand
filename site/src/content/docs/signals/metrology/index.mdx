@@ -3,6 +3,9 @@ title: "Calibration and uncertainty"
 description: "The disciplines that make a computed level a defensible measurement: physical SPL calibration against digital dBFS analysis, the GUM and Monte Carlo propagation of measurement uncertainty, the stationarity and peak statistics that qualify a record before any of it is averaged, and the class verifiers with the conformance report behind every number."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A level printed by software is not yet a measurement. Three things separate
 the one from the other: knowing that the record deserves to be **averaged at
 all**, knowing what the digital samples mean **physically**, and knowing how
@@ -78,20 +81,26 @@ budgets that are specialisations of the GUM machinery described here.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 Nothing here checks an instrument or a calibrator. The IEC 60942 conformance
 tests of the calibrator itself — generated level, frequency, distortion, and
 the corrections for static pressure and temperature — are not implemented, so
 pass an already corrected `target_spl` when the manual asks for one, and the
 IEC 61672-3 periodic tests are cited as laboratory practice rather than run;
-[Compliance and verification](/phonometry/signals/metrology/compliance-verification/)
-draws that boundary precisely, part by part.
-The dBFS half of the calibration page sits outside any standard and makes no
-physical claim: it is a reference frame, not a measurement. Data qualification
-implements the quantitative core of Bendat & Piersol's section 10.3 only —
-classifying a record's type, validating it against physical limits and editing
-out glitches remain manual steps, as the book describes them. And an
-uncertainty budget is a model of *your* measurement: the library propagates
-whatever you declare, and never invents the terms. Where a standard publishes
-its own budget the guides say so, as ISO 9612 does for [occupational
-exposure](/phonometry/perception/hearing/occupational-exposure/) and ISO 12999-1
-for [sound insulation](/phonometry/buildings/insulation/).
+[Compliance and
+verification](/phonometry/signals/metrology/compliance-verification/) draws
+that boundary precisely, part by part. The dBFS half of the calibration page
+sits outside any standard and makes no physical claim: it is a reference
+frame, not a measurement. Data qualification implements the quantitative core
+of Bendat & Piersol's section 10.3 only — classifying a record's type,
+validating it against physical limits and editing out glitches remain manual
+steps, as the book describes them. And an uncertainty budget is a model of
+*your* measurement: the library propagates whatever you declare, and never
+invents the terms. Where a standard publishes its own budget the guides say
+so, as ISO 9612 does for [occupational
+exposure](/phonometry/perception/hearing/occupational-exposure/) and ISO
+12999-1 for [sound insulation](/phonometry/buildings/insulation/).
+</ScopeClaim>
+</Scope>
+

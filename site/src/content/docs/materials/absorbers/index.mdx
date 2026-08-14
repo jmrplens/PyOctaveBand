@@ -3,6 +3,9 @@ title: "Absorbers"
 description: "Characterising and predicting sound absorbers: the reverberation-room measurement and ISO 11654 rating, ISO 9053 airflow resistance, the ISO 10534 / ASTM E2611 impedance tube, the porous and multilayer prediction models, and the critically coupled metamaterial absorbers."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 An absorber can be characterised at three scales, and this subsection walks
 them from the finished product inwards: the mounted product in a reverberation
 room, the raw material in a flow rig, and the small sample in an impedance
@@ -64,17 +67,22 @@ meshed cell.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 None of these pages qualifies a laboratory. ISO 354's room requirements of
 Annex A — the number of loudspeaker and microphone positions, the diffusing
-elements — are not checked; the functions convert an
-already-measured decay pair and only warn when the room volume or sample area
-falls outside the clause 6 limits. Two editions are cited but not implemented:
-the code follows the 1998/2001 transfer-function method of ISO 10534-2, not the
-2023 edition, and ASTM E2611-19, not E2611-24. The probe-traverse refinements of
-ISO 10534-1 (extrapolating the minima to the sample face, probe-body
-corrections) are described but not automated. The prediction models are
-forward-only: they turn a resistivity into an impedance, and no inverse solver
-recovers the material parameters from a measured curve. And no measurement
-standard governs the metamaterial designs at all — a built panel is verified in
-the impedance tube or the reverberation room like any other absorber, which is
-why that page states a prediction and not a rating.
+elements — are not checked; the functions convert an already-measured decay
+pair and only warn when the room volume or sample area falls outside the
+clause 6 limits. Two editions are cited but not implemented: the code follows
+the 1998/2001 transfer-function method of ISO 10534-2, not the 2023 edition,
+and ASTM E2611-19, not E2611-24. The probe-traverse refinements of ISO 10534-1
+(extrapolating the minima to the sample face, probe-body corrections) are
+described but not automated. The prediction models are forward-only: they turn
+a resistivity into an impedance, and no inverse solver recovers the material
+parameters from a measured curve. And no measurement standard governs the
+metamaterial designs at all — a built panel is verified in the impedance tube
+or the reverberation room like any other absorber, which is why that page
+states a prediction and not a rating.
+</ScopeClaim>
+</Scope>
+

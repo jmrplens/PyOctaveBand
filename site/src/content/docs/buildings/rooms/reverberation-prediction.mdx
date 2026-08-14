@@ -95,9 +95,11 @@ references:
     note: "The atmospheric-absorption coefficient behind the air term 4mV; see the outdoor propagation guide."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 The **reverberation time** $T$, the time for the sound-energy level to fall by
 60 dB after the source stops, is predicted here from a room's **volume**,
@@ -692,24 +694,30 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The classical statistical-acoustics reverberation-time formulae
-of Sabine (1922), Eyring (1930), Millington-Sette (1932), Fitzroy (1959) and
-Arau-Puchades (1988), each with its own domain-of-validity check and the
-ISO 9613-1-derived air-absorption term, via `room.sabine_reverberation_time`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The classical statistical-acoustics reverberation-time formulae of Sabine
+(1922), Eyring (1930), Millington-Sette (1932), Fitzroy (1959) and
+Arau-Puchades (1988), each with its own domain-of-validity check and the ISO
+9613-1-derived air-absorption term, via `room.sabine_reverberation_time`,
 `room.eyring_reverberation_time`, `room.millington_sette_reverberation_time`,
-`room.fitzroy_reverberation_time`, `room.arau_puchades_reverberation_time`
-and the combined `room.reverberation_time_models`.
+`room.fitzroy_reverberation_time`, `room.arau_puchades_reverberation_time` and
+the combined `room.reverberation_time_models`.
+</ScopeClaim>
 
-**Not covered.** EN 12354-6's own Clause 4 model (a Sabine calculation with
-an added object term and the ISO 9613-1 air term) is a distinct,
-standard-defined calculation that lives in the
-[Sound absorption in enclosed spaces guide](/phonometry/buildings/rooms/enclosed-space-absorption/),
-not here. None of the five formulae here models coupled volumes,
-disproportionate rooms or focusing geometries: their double-slope or
-position-dependent decays fall outside every diffuse-field assumption (§4).
-For a measured decay that shows those symptoms, use the T20/T30 curvature
-diagnostic of the [Room Acoustics guide](/phonometry/buildings/rooms/room-acoustics/)
-rather than a statistical prediction.
+<ScopeClaim status="not-covered" label="Not covered">
+EN 12354-6's own Clause 4 model (a Sabine calculation with an added object
+term and the ISO 9613-1 air term) is a distinct, standard-defined calculation
+that lives in the [Sound absorption in enclosed spaces
+guide](/phonometry/buildings/rooms/enclosed-space-absorption/), not here. None
+of the five formulae here models coupled volumes, disproportionate rooms or
+focusing geometries: their double-slope or position-dependent decays fall
+outside every diffuse-field assumption (§4). For a measured decay that shows
+those symptoms, use the T20/T30 curvature diagnostic of the [Room Acoustics
+guide](/phonometry/buildings/rooms/room-acoustics/) rather than a statistical
+prediction.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

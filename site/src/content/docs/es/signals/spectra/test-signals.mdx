@@ -19,6 +19,8 @@ references:
     note: "Sección 10.2 (preparación de datos: muestreo, aliasing y el requisito de filtrado antialias que el remuestreador declara explícitamente). ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una medición es tan fiable como su estímulo y su contabilidad de la
@@ -315,22 +317,26 @@ al impulso y emborronarlas.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga
-tonal que «debería comenzar en el paso por cero del tono y constar de un
-número entero de periodos completos» (A2.1) y el tren repetitivo de ráfagas tonales
-de A2.2, implementados por `tone_burst` y comprobados a mano contra las
-duraciones de la tabla AII. El requisito antialias de la sección 10.2 de
-Bendat y Piersol, convertido en una especificación explícita y verificable
-por el rechazo en la banda atenuada y la anchura de transición de
-`resample_signal`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El anexo A, apartado A2, de la IEC 60268-1:1985: la ráfaga tonal que «debería
+comenzar en el paso por cero del tono y constar de un número entero de
+periodos completos» (A2.1) y el tren repetitivo de ráfagas tonales de A2.2,
+implementados por `tone_burst` y comprobados a mano contra las duraciones de
+la tabla AII. El requisito antialias de la sección 10.2 de Bendat y Piersol,
+convertido en una especificación explícita y verificable por el rechazo en la
+banda atenuada y la anchura de transición de `resample_signal`.
+</ScopeClaim>
 
-**No cubierto.** La IEC 60268-1:1985 es una norma general para equipos de
-sistemas de sonido. Aquí solo se implementan los apartados de ráfagas
-tonales del anexo A; el resto de sus partes (amplificadores, altavoces,
-conectores, etc.) quedan sin tocar. `fractional_delay` y los generadores
-de ruido de colores de `noise_signal` son herramientas de DSP de
-propósito general sin norma que las gobierne; sus afirmaciones de
-exactitud son formas cerradas, no normativas.
+<ScopeClaim status="not-covered" label="No cubierto">
+La IEC 60268-1:1985 es una norma general para equipos de sistemas de sonido.
+Aquí solo se implementan los apartados de ráfagas tonales del anexo A; el
+resto de sus partes (amplificadores, altavoces, conectores, etc.) quedan sin
+tocar. `fractional_delay` y los generadores de ruido de colores de
+`noise_signal` son herramientas de DSP de propósito general sin norma que las
+gobierne; sus afirmaciones de exactitud son formas cerradas, no normativas.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

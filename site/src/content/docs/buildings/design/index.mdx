@@ -3,6 +3,9 @@ title: "Insulation design"
 description: "Sound insulation before it is built: the EN/ISO 12354 flanking prediction between rooms in its simplified and per-band forms, the theoretical insulation of a panel from its physical properties, the resilient layers a floor or lining design turns on, and the structure-borne sound of building service equipment from the EN 15657 reception plate to the EN 12354-5 receiving-room level."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 The pages of the [Sound insulation](/phonometry/buildings/insulation/)
 section answer the question *what does this building achieve?* The pages here
 answer the one that comes first: *what will it achieve, and what should I
@@ -149,28 +152,38 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
-**A prediction is only as good as the element data you feed it, and the library
-takes that data as given.** The element ratings, the junction indices, the
-covering improvement and the structure-to-airborne adjustment terms of
-EN 12354-5 Annexes D and F are inputs you supply from measurement or from the
-standards' own annexes; none of them is derived here. The simplified prediction
-page stops at the weighted single numbers by design, and the detailed page is
-where the per-band models live.
+<Scope>
+<ScopeClaim status="not-covered">
+**A prediction is only as good as the element data you feed it, and the
+library takes that data as given.** The element ratings, the junction indices,
+the covering improvement and the structure-to-airborne adjustment terms of EN
+12354-5 Annexes D and F are inputs you supply from measurement or from the
+standards' own annexes; none of them is derived here. The simplified
+prediction page stops at the weighted single numbers by design, and the
+detailed page is where the per-band models live.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Every panel model carries a validity range it does not extend past, and the
 guides flag each: Sharp's single-panel method is not valid below about 1.5
 times the panel's first resonance, Gomperts' slit model holds only while the
 slit is narrow against the wavelength, only Leppington's method no. 1 is
 implemented for radiation efficiency, and the orthotropic routes are
-infinite-panel models that miss the dip real ribbed cladding shows between 2 and
-4 kHz. On the resilient-layer side, the tapping-machine force model assumes a
-frequency-independent driving-point impedance, so a joisted or battened
-lightweight floor is outside it; soft coverings are treated as linear springs;
-there is no per-band prediction of a lining's improvement, because Annex D is a
-single-number method; and heavy impact sources such as the rubber ball are not
-covered by any of these models at all — their rating is
-[Heavy and Soft Impact Sources](/phonometry/buildings/insulation/heavy-impact-sources/).
+infinite-panel models that miss the dip real ribbed cladding shows between 2
+and 4 kHz. On the resilient-layer side, the tapping-machine force model
+assumes a frequency-independent driving-point impedance, so a joisted or
+battened lightweight floor is outside it; soft coverings are treated as linear
+springs; there is no per-band prediction of a lining's improvement, because
+Annex D is a single-number method; and heavy impact sources such as the rubber
+ball are not covered by any of these models at all — their rating is [Heavy
+and Soft Impact
+Sources](/phonometry/buildings/insulation/heavy-impact-sources/).
+</ScopeClaim>
 
-Two edition boundaries: only the 2009 edition of EN 12354-5 is implemented, not
-the 2023 revision, and the simplified and detailed pages follow different
+<ScopeClaim status="not-covered">
+Two edition boundaries: only the 2009 edition of EN 12354-5 is implemented,
+not the 2023 revision, and the simplified and detailed pages follow different
 editions of the 12354 family, as the note above says.
+</ScopeClaim>
+</Scope>
+

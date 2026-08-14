@@ -3,6 +3,9 @@ title: "Materiales y superficies"
 description: "Caracterizar materiales y superficies acústicas: absorción en cámara reverberante y su valoración (ISO 354, ISO 11654), resistencia al flujo de aire (ISO 9053), el tubo de impedancia (ISO 10534, ASTM E2611), predicción de absorbentes porosos, multicapa y de metamaterial, difusores con sus coeficientes de dispersión y difusión (ISO 17497), metadifusores, absorción in situ de pavimentos (ISO 13472) y la rigidez dinámica de las capas elásticas (EN 29052-1)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Toda predicción de sala y más de un modelo de aislamiento acaban consumiendo
 un coeficiente que describe lo que un material o una superficie hace con el
 sonido. Esta sección cubre de dónde salen esos coeficientes: los instrumentos
@@ -149,23 +152,27 @@ La propiedad mecánica en torno a la que se diseña un suelo flotante.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Todo lo de aquí caracteriza un **material o una superficie**, nunca una
 construcción. La pérdida por transmisión de una pared, la mejora a ruido de
 impactos de un suelo y las trayectorias por flancos de una unión son
-[Aislamiento acústico](/phonometry/es/buildings/insulation/) y
-[Diseño del aislamiento](/phonometry/es/buildings/design/); esta sección
-suministra los coeficientes que ellos consumen. Dentro de las propias
-mediciones hay dos fronteras que conviene conocer antes de empezar. Los
-métodos in situ de carretera implementan ISO 13472-1:2002 e ISO 13472-2:2010;
-**sus revisiones de 2022 y 2025 no están implementadas**. Y la medición de
-capas elásticas espera una frecuencia de resonancia ya extrapolada a
-amplitud de fuerza nula por el apartado 7 de EN 29052-1, un procedimiento que
-no está implementado, y una resistividad al flujo de aire suministrada como
-entrada en lugar de medida allí mismo. Nada de esta sección predice un
-material a partir de su química o de su fabricación: los modelos van hacia
-delante desde parámetros macroscópicos medidos — resistividad al flujo,
-porosidad, tortuosidad — hasta una impedancia, y no hay ninguna inversión
-que recupere esos parámetros de una curva de impedancia medida.
+[Aislamiento acústico](/phonometry/es/buildings/insulation/) y [Diseño del
+aislamiento](/phonometry/es/buildings/design/); esta sección suministra los
+coeficientes que ellos consumen. Dentro de las propias mediciones hay dos
+fronteras que conviene conocer antes de empezar. Los métodos in situ de
+carretera implementan ISO 13472-1:2002 e ISO 13472-2:2010; **sus revisiones de
+2022 y 2025 no están implementadas**. Y la medición de capas elásticas espera
+una frecuencia de resonancia ya extrapolada a amplitud de fuerza nula por el
+apartado 7 de EN 29052-1, un procedimiento que no está implementado, y una
+resistividad al flujo de aire suministrada como entrada en lugar de medida
+allí mismo. Nada de esta sección predice un material a partir de su química o
+de su fabricación: los modelos van hacia delante desde parámetros
+macroscópicos medidos — resistividad al flujo, porosidad, tortuosidad — hasta
+una impedancia, y no hay ninguna inversión que recupere esos parámetros de una
+curva de impedancia medida.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

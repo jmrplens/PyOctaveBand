@@ -3,6 +3,9 @@ title: "Human vibration"
 description: "Vibration transmitted to people: the ISO 8041-1 weightings and ISO 2631-1 whole-body metrics, hand-arm exposure per ISO 5349 with the Directive 2002/44/EC action and limit values, and the ISO 2631-5 spinal-response model for repeated shocks."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Vibration transmitted to a person is evaluated with a measurement chain
 deliberately parallel to a sound level meter's: the acceleration is
 **frequency-weighted** to reflect how the body responds at each frequency,
@@ -50,24 +53,35 @@ analysis](/phonometry/signals/) section.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **No meter is type-tested.** ISO 8041-1's own subject — the design and
 type-testing of general-purpose human-vibration meters — is not implemented;
 only its frequency-weighting definitions are taken from it, so nothing here
 assigns a class to an instrument.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Building vibration stops at the weighting.** Of ISO 2631-2 the library
 implements the direction-independent `Wm` curve and nothing else, and that is
-closer to the standard than it looks: the 2003 edition deliberately deleted its
-predecessor's guidance values, so there are no acceptable magnitudes for
+closer to the standard than it looks: the 2003 edition deliberately deleted
+its predecessor's guidance values, so there are no acceptable magnitudes for
 building vibration to compare against. A reader looking for a limit will not
 find one here, and will not find one in the standard either.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Of ISO 2631-5, the clause 5 model only.** The Annex A finite-element model
 for less severe seated exposures is distributed separately by ISO and is not
 implemented, which is what makes the 1 g delineation above a routing decision
 rather than a preference.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 And no exposure verdict is issued. The action and limit values of Directive
 2002/44/EC are stated so that an A(8) can be read against them, but the
 library applies no national implementation of the directive, and a
 risk-assessment conclusion is not a number this section produces.
+</ScopeClaim>
+</Scope>
+

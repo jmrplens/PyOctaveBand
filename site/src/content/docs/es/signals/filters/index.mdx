@@ -3,6 +3,9 @@ title: "Filtrado en octavas"
 description: "El análisis en bandas de fracción de octava en phonometry: los bancos de filtros ANSI S1.11 / IEC 61260-1 y sus arquitecturas, la verificación de clase de IEC 61260-1, el procesado por bloques con estado para señales en streaming, y el análisis multicanal vectorizado."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 El análisis acústico rara vez quiere una FFT en bruto: las normas, los
 índices y el propio oído trabajan en **bandas de fracción de octava**,
 intervalos de frecuencia cuya anchura crece proporcionalmente con la
@@ -71,6 +74,8 @@ páginas producen.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 `verify_filter_class` comprueba una respuesta digital diseñada frente a la
 Tabla 1 de IEC 61260-1. Los ensayos de conformidad de la norma sobre el filtro
 físico (recuperación de sobrecarga, linealidad, las magnitudes de influencia
@@ -86,5 +91,9 @@ fase cero hacia delante y hacia atrás necesita la señal entera, y los
 estadísticos de rango como L90 hay que calcularlos una sola vez sobre la
 envolvente conjunta. Y la ruta por canal nunca mezcla canales: el retardo
 entre dos micrófonos, o cuánto de un canal explica un segundo, son
-[Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/) y
-[Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/).
+[Correlación, retardo y
+envolvente](/phonometry/es/signals/spectra/correlation-delay/) y [Coherencia
+múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/).
+</ScopeClaim>
+</Scope>
+

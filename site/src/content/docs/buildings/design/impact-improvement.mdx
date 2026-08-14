@@ -38,8 +38,10 @@ references:
     note: "The informative Annex C floating-floor estimate reproduced on this page (Formulae C.1 to C.4, the 160 sqrt(s'/m') resonance) and the worked floor of its Annex G."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A soft floor covering does not block airborne sound; it cushions footsteps.
 What it improves is the impact level of the floor underneath, and measuring
@@ -359,28 +361,34 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
 
 ## What this guide covers
 
-**Covered.** ISO 16251-1:2014's acceleration level (Formula (1)), the
-three-branch background correction (Formula (2)), the position-averaged
-improvement $\Delta L$ (Formulae (3)/(4)) and its octave synthesis
-(Formula (5)), via `building.acceleration_level`,
-`building.background_corrected_level` and `building.impact_improvement`;
-the Clause 8 e) statement of results, $\Delta L_w$ against the ISO 717-2
-Table 4 reference floor with the $C_{I,\Delta}$ adaptation term
-(Formula (A.4)), via `building.weighted_impact_improvement` and
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 16251-1:2014's acceleration level (Formula (1)), the three-branch
+background correction (Formula (2)), the position-averaged improvement
+$\Delta L$ (Formulae (3)/(4)) and its octave synthesis (Formula (5)), via
+`building.acceleration_level`, `building.background_corrected_level` and
+`building.impact_improvement`; the Clause 8 e) statement of results,
+$\Delta L_w$ against the ISO 717-2 Table 4 reference floor with the
+$C_{I,\Delta}$ adaptation term (Formula (A.4)), via
+`building.weighted_impact_improvement` and
 `building.impact_improvement_adaptation_term`; and the one-page accredited
 fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** The mock-up facility itself (the plate dimensions, the
-resilient supports, the tapping-machine positions of Clause 5) is not
-checked: the functions consume measured acceleration levels wherever they
-came from. The ISO 12354-2:2017 Annex C floating-floor formulas are quoted on
-this page as design aids and evaluated inline with numpy; the dedicated
-helpers that wrap them, together with the tapping-machine force model behind
-a soft covering's improvement and the ISO 12354-1 Annex D rating of a wall
-lining, are the subject of
-[Predicting Resilient-Layer Performance](/phonometry/buildings/design/resilient-layers/).
-The superseded full-size ISO 140-8 method exists here only as the comparison
-axis of the Foret et al. (2011) worked example.
+<ScopeClaim status="not-covered" label="Not covered">
+The mock-up facility itself (the plate dimensions, the resilient supports, the
+tapping-machine positions of Clause 5) is not checked: the functions consume
+measured acceleration levels wherever they came from. The ISO 12354-2:2017
+Annex C floating-floor formulas are quoted on this page as design aids and
+evaluated inline with numpy; the dedicated helpers that wrap them, together
+with the tapping-machine force model behind a soft covering's improvement and
+the ISO 12354-1 Annex D rating of a wall lining, are the subject of
+[Predicting Resilient-Layer
+Performance](/phonometry/buildings/design/resilient-layers/). The superseded
+full-size ISO 140-8 method exists here only as the comparison axis of the
+Foret et al. (2011) worked example.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

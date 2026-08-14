@@ -3,6 +3,9 @@ title: "Audición y percepción"
 description: "Cómo perciben el sonido los oyentes y qué hace el ruido a la audición: sensaciones psicoacústicas (sonoridad, agudeza, aspereza, tonalidad, molestia), inteligibilidad del habla (STI y SII), y la estadística de umbrales, daño auditivo y exposición laboral."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Un nivel de presión acústica dice cuánto sonido hay; esta sección trata de lo
 que un **oyente** hace con él. Sus tres subsecciones responden a tres
 preguntas distintas. La **psicoacústica** cuantifica sensaciones: cuán fuerte
@@ -123,6 +126,8 @@ El umbral de audición, lo que el ruido le hace y cómo se mide la exposición.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Aquí no se examina a ningún oyente ni se emite un veredicto sobre una
 persona.** Todos los modelos de estas páginas predicen lo que percibiría una
 población, o un oyente normalizado, a partir de una señal calibrada: ninguno
@@ -132,12 +137,16 @@ indemnizable, esa línea es regulación nacional y aquí no se aplica ninguna.
 Todo veredicto de prominencia y de audibilidad es igualmente el criterio
 numérico y nada más: ECMA-418-1 exige además la confirmación auditiva de un
 tono prominente, y eso queda de tu lado.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Todo es monoaural.** Las combinaciones binaurales de ECMA-418-2 no están
 implementadas, así que una grabación de dos canales se analiza oído a oído, y
-aquí nada modela la localización, la liberación espacial del enmascaramiento ni
-la suma binaural de sonoridad.
+aquí nada modela la localización, la liberación espacial del enmascaramiento
+ni la suma binaural de sonoridad.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Ninguna prueba de escucha queda sustituida.** El STOI devuelve el índice
 basado en correlación y no un porcentaje de palabras entendidas, porque esa
 correspondencia se ajusta para cada corpus de pruebas de escucha; el SII
@@ -145,12 +154,16 @@ devuelve una fracción de audibilidad y no una puntuación; y ninguna página
 predice la molestia en una comunidad, que es una magnitud de encuesta social y
 no psicoacústica: los indicadores comunitarios están en [Medio ambiente y
 transporte](/phonometry/es/environment/).
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Por último, estos modelos parten de una señal o un espectro **calibrados** en
-pascales, porque todos ellos dependen del nivel. Alimentarlos con muestras
-en bruto de una tarjeta de sonido produce una cifra con una referencia
+pascales, porque todos ellos dependen del nivel. Alimentarlos con muestras en
+bruto de una tarjeta de sonido produce una cifra con una referencia
 arbitraria, que es un fallo distinto de una respuesta equivocada: parece
 plausible.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

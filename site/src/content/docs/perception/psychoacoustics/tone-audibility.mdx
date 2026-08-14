@@ -25,8 +25,10 @@ references:
     note: "The parent standard the −1.76 dB Hanning bandwidth correction, the iterative masking-level procedure and the detection/combination logic are confirmed against (its Annex J reference program)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A steady tone embedded in broadband noise stands out when it rises audibly above
 the noise that would otherwise mask it, the objective precondition for the tonal
@@ -546,30 +548,35 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The ISO/PAS 20065:2016 engineering method in full: the clause 4.2
-analyser requirements and the clause 4.3 merging of basic spectra that the
-input rests on, with the clause 5.1 acceptance conditions and the clause 7
-reporting list; the critical
-bandwidth $\Delta f_c$ and corner frequencies (Formulae 2 to 5), the mean
-narrow-band level $L_S$ and tone level $L_T$ (Formulae 6 and 8, Annex D),
-the critical-band masking level $L_G$, the masking index $a_v$ and the
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO/PAS 20065:2016 engineering method in full: the clause 4.2 analyser
+requirements and the clause 4.3 merging of basic spectra that the input rests
+on, with the clause 5.1 acceptance conditions and the clause 7 reporting list;
+the critical bandwidth $\Delta f_c$ and corner frequencies (Formulae 2 to 5),
+the mean narrow-band level $L_S$ and tone level $L_T$ (Formulae 6 and 8, Annex
+D), the critical-band masking level $L_G$, the masking index $a_v$ and the
 audibility $\Delta L$ (Formulae 12 to 14), peak detection and the distinctness
-test (clauses 5.3.8 and 5.3.4), the multi-tone FG combination (Formula 17)
-and the two-tones-below-1000-Hz exception (Formulae 18/19), the decisive and
-energy-mean audibility (Formula 20) and the clause 5.4/6 extended
-uncertainty $U$, all through `psychoacoustics.analyze_spectrum` and
-`assess_tones`. ISO 1996-2:2017 Annex J is covered as far as it maps the
-mean audibility to the tonal adjustment $K_t$ (Table J.1).
+test (clauses 5.3.8 and 5.3.4), the multi-tone FG combination (Formula 17) and
+the two-tones-below-1000-Hz exception (Formulae 18/19), the decisive and
+energy-mean audibility (Formula 20) and the clause 5.4/6 extended uncertainty
+$U$, all through `psychoacoustics.analyze_spectrum` and `assess_tones`. ISO
+1996-2:2017 Annex J is covered as far as it maps the mean audibility to the
+tonal adjustment $K_t$ (Table J.1).
+</ScopeClaim>
 
-**Not covered.** The distinctness edge-steepness test follows the DIN
-45681:2005-03 reading (its executable reference program), not the
-asymmetric formulas printed in the ISO/PAS 20065 text, which contradict it,
-recorded in the [errata registry](/phonometry/reference/errata/). Building the
-narrow-band FFT spectrum itself from a raw time-domain recording is not part of
-this module: every function here takes an already-computed spectrum (levels and
+<ScopeClaim status="not-covered" label="Not covered">
+The distinctness edge-steepness test follows the DIN 45681:2005-03 reading
+(its executable reference program), not the asymmetric formulas printed in the
+ISO/PAS 20065 text, which contradict it, recorded in the [errata
+registry](/phonometry/reference/errata/). Building the narrow-band FFT
+spectrum itself from a raw time-domain recording is not part of this module:
+every function here takes an already-computed spectrum (levels and
 frequencies), and §0 states what that spectrum has to be — including the
 clause 5.3.2 A-weighting, which the caller applies because the module is
 weighting agnostic.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

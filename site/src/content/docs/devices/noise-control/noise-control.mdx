@@ -34,8 +34,10 @@ references:
     note: "The in-situ form of the same measurement, with the environmental-correction and background-noise requirements of Table C.1."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Three passive measures dominate applied noise control: a **silencer** in the
 duct, the attenuation and regenerated noise of the **HVAC run** itself, and a
@@ -553,26 +555,31 @@ with a value computed here compares two different things.
 
 ## What this guide covers
 
-**Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods:
-`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
-tables), `hvac.plenum_attenuation` (Wells closed form) and
-`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). The machine-
-enclosure insertion loss of Bies §7.4 (Eqs. (7.103), (7.111)),
-`enclosure_insertion_loss`, combining a supplied panel transmission loss
-with the interior room-constant correction, and the composite of panels,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The Bies §8.11-8.17 / ASHRAE HVAC methods: `hvac.end_reflection_loss` and
+`hvac.elbow_insertion_loss` (interpolated tables), `hvac.plenum_attenuation`
+(Wells closed form) and `hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI
+2081). The machine- enclosure insertion loss of Bies §7.4 (Eqs. (7.103),
+(7.111)), `enclosure_insertion_loss`, combining a supplied panel transmission
+loss with the interior room-constant correction, and the composite of panels,
 doors and openings that feeds it (`composite_transmission_loss`).
+</ScopeClaim>
 
-**Not covered.** The reactive silencer elements (expansion chambers, side
-branches, extended tubes) have moved to
-[Silencers](/phonometry/devices/noise-control/silencers/), and dissipative duct-lining
-silencers are not modelled from liner properties anywhere: the lined-elbow
-and plenum values here are interpolated installation tables.
+<ScopeClaim status="not-covered" label="Not covered">
+The reactive silencer elements (expansion chambers, side branches, extended
+tubes) have moved to
+[Silencers](/phonometry/devices/noise-control/silencers/), and dissipative
+duct-lining silencers are not modelled from liner properties anywhere: the
+lined-elbow and plenum values here are interpolated installation tables.
 `enclosure_insertion_loss` never predicts the panel transmission loss $R$
 itself; you supply it measured or from another model, and the module only
-combines it with the interior correction. Nothing here is a measurement:
-the ISO 11546 procedure of section 2.2 is described so that a declared
-figure can be read, not implemented, and structure-borne transmission from a
-machine into its enclosure or its slab is outside every model on the page.
+combines it with the interior correction. Nothing here is a measurement: the
+ISO 11546 procedure of section 2.2 is described so that a declared figure can
+be read, not implemented, and structure-borne transmission from a machine into
+its enclosure or its slab is outside every model on the page.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

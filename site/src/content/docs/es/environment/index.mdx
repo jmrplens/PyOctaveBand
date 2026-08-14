@@ -3,6 +3,9 @@ title: "Medio ambiente y transporte"
 description: "El sonido en exteriores y las fuentes que lo dominan: el modelo de propagación ISO 9613, el nivel de evaluación de ISO 1996 y su aplicación española, el ajuste por sonidos impulsivos NT ACOU 112, y los modelos de fuente CNOSSOS-EU de carretera y ferrocarril y de aerogeneradores de IEC 61400-11."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 El ruido ambiental es un problema fuente-camino-receptor estirado a lo largo
 de cientos de metros de aire libre. Esta sección cubre los tres. Las páginas
 de **propagación** se ocupan del camino: ISO 9613 predice, banda a banda,
@@ -100,6 +103,8 @@ internacionalmente, y tienen un área propia:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Del Anexo II de CNOSSOS-EU solo está implementado el lado de la fuente, y solo
 dos de sus cuatro fuentes. La **fuente industrial** del apartado 2.4 y el
 Apéndice H, y la **fuente de aeronaves** de los apartados 2.6 y 2.7, no están
@@ -112,18 +117,23 @@ dispositivos](/phonometry/es/devices/emission/). Tampoco está implementado el
 ISO 9613-2, un modelo distinto, así que una cadena construida con fuentes
 CNOSSOS y la propagación de esta biblioteca no es un cálculo CNOSSOS y no debe
 declararse como tal.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Nada de aquí es un motor de mapas. No hay modelo de terreno, ni geometría de
-ciudad, ni capa GIS: las funciones de propagación toman una fuente, un receptor
-y el suelo entre ambos, los dos modelos de refracción suponen un suelo plano en
-z = 0, y cómo se descompone una línea fuente en fuentes puntuales lo declara
-fuera de alcance el propio CNOSSOS. Del lado de la evaluación, la biblioteca
-empieza donde termina el sonómetro — las posiciones del receptor y las
-correcciones de fachada de ISO 1996-2, y los procedimientos de medición del
-anexo IV del RD 1367/2007 (posiciones de micrófono, duración de las series,
-número de mediciones), no están implementados, solo la aritmética que sigue una
-vez aplicados. La zonificación acústica, los mapas de ruido y los planes de
-acción de la Ley 37/2003 son instrumentos de planificación, no cálculos.
+ciudad, ni capa GIS: las funciones de propagación toman una fuente, un
+receptor y el suelo entre ambos, los dos modelos de refracción suponen un
+suelo plano en z = 0, y cómo se descompone una línea fuente en fuentes
+puntuales lo declara fuera de alcance el propio CNOSSOS. Del lado de la
+evaluación, la biblioteca empieza donde termina el sonómetro — las posiciones
+del receptor y las correcciones de fachada de ISO 1996-2, y los procedimientos
+de medición del anexo IV del RD 1367/2007 (posiciones de micrófono, duración
+de las series, número de mediciones), no están implementados, solo la
+aritmética que sigue una vez aplicados. La zonificación acústica, los mapas de
+ruido y los planes de acción de la Ley 37/2003 son instrumentos de
+planificación, no cálculos.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

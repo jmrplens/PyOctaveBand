@@ -3,6 +3,9 @@ title: "Análisis de señal"
 description: "El núcleo de medición de phonometry: bancos de filtros de fracción de octava, ponderación frecuencial y temporal, niveles integrados y estadísticos, análisis espectral y de correlación calibrado, calibración física e incertidumbre de medida, y cómo esas piezas se encadenan en un sonómetro en código."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Todo en phonometry empieza aquí. Esta sección cubre la cadena que convierte
 una señal digital en bruto en números acústicos conformes con las normas:
 dividirla en **bandas de fracción de octava** (ANSI S1.11 / IEC 61260-1),
@@ -182,26 +185,42 @@ Qué significan los números y cuánto fiarse de ellos.
 ## Qué no cubre esta sección
 
 Faltan cuatro cosas que un lector espera razonablemente encontrar aquí, y cada
-guía lo dice en su propio bloque «No cubierto». **Aquí no se verifica ningún
-instrumento.** `verify_filter_class` y `verify_weighting_class` comprueban una
-respuesta digital diseñada frente a las tablas de tolerancias de IEC 61260-1 y
-de IEC 61672-1; los ensayos de tipo de IEC 61672-2 que un sonómetro físico
-necesita para su aprobación de tipo, los ensayos periódicos de IEC 61672-3
-que recibe en servicio, y los ensayos de conformidad del propio calibrador de
-IEC 60942, no se ejecutan, así que un veredicto de clase de aquí describe el
-algoritmo y no un aparato construido;
-[Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/)
-traza esa frontera parte por parte.
+guía lo dice en su propio bloque «No cubierto».
+
+<Scope>
+<ScopeClaim status="not-covered">
+**Aquí no se verifica ningún instrumento.** `verify_filter_class` y
+`verify_weighting_class` comprueban una respuesta digital diseñada frente a
+las tablas de tolerancias de IEC 61260-1 y de IEC 61672-1; los ensayos de tipo
+de IEC 61672-2 que un sonómetro físico necesita para su aprobación de tipo,
+los ensayos periódicos de IEC 61672-3 que recibe en servicio, y los ensayos de
+conformidad del propio calibrador de IEC 60942, no se ejecutan, así que un
+veredicto de clase de aquí describe el algoritmo y no un aparato construido;
+[Conformidad y
+verificación](/phonometry/es/signals/metrology/compliance-verification/) traza
+esa frontera parte por parte.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
 **Aquí no se abre ningún archivo.** Nada en la biblioteca decodifica WAV, FLAC
 ni ningún otro contenedor: toda función toma un array que ya has leído, que es
-la razón de que `fs` sea siempre un argumento. **Aquí no hay procesado de
-arrays.** La correlación y el retardo modelan un único camino común entre
-exactamente dos sensores e informan solo del mayor pico; no hay ninguna resolución
-de TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
-rasgos perceptuales.** El cepstrum de aquí es el de frecuencia lineal, sin
-escala mel ni variante MFCC, y la sonoridad como sensación pertenece a
-[Psicoacústica](/phonometry/es/perception/psychoacoustics/), no a las métricas
-energéticas de esta sección.
+la razón de que `fs` sea siempre un argumento.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**Aquí no hay procesado de arrays.** La correlación y el retardo modelan un
+único camino común entre exactamente dos sensores e informan solo del mayor
+pico; no hay ninguna resolución de TDOA multisensor, ni beamformer, ni
+localización de fuentes.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**Aquí no hay rasgos perceptuales.** El cepstrum de aquí es el de frecuencia
+lineal, sin escala mel ni variante MFCC, y la sonoridad como sensación
+pertenece a [Psicoacústica](/phonometry/es/perception/psychoacoustics/), no a
+las métricas energéticas de esta sección.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

@@ -25,9 +25,11 @@ references:
     note: "La sección de declaración: las formas de número doble y único, L_WAd = L_WA + K_WA (apartado 3.15) y la verificación del apartado 6.2."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 La *presión* sonora depende de dónde te sitúes y de la sala en la que estés;
 la **potencia** acústica no. El nivel de potencia acústica $L_W$ es la energía
@@ -426,36 +428,42 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La guía de decisión de ISO 3740 condensada en la tabla de
-métodos y la ruta de decisión, las condiciones de funcionamiento y de montaje
-que la preceden, qué afirma cada grado de precisión sobre la
-reproducibilidad, y la declaración de emisión sonora de ISO 4871
-(`NoiseEmissionDeclaration`, `OperatingModeDeclaration`, `declare()`): las
-formas de número doble y de número único, $L_{WAd} = L_{WA} + K_{WA}$ y la
-verificación del apartado 6.2 con sus dos reglas de redondeo (`verified`,
-`verified_dual`), presentadas como ficha de declaración mediante `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La guía de decisión de ISO 3740 condensada en la tabla de métodos y la ruta de
+decisión, las condiciones de funcionamiento y de montaje que la preceden, qué
+afirma cada grado de precisión sobre la reproducibilidad, y la declaración de
+emisión sonora de ISO 4871 (`NoiseEmissionDeclaration`,
+`OperatingModeDeclaration`, `declare()`): las formas de número doble y de
+número único, $L_{WAd} = L_{WA} + K_{WA}$ y la verificación del apartado 6.2
+con sus dos reglas de redondeo (`verified`, `verified_dual`), presentadas como
+ficha de declaración mediante `.report()`.
+</ScopeClaim>
 
-**No cubierto.** Las seis determinaciones viven en sus guías de método: la
-superficie envolvente y la malla anecoica en
-[Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/),
-el método de campo difuso en
-[Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/),
-los dos métodos de barrido en
-[Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
-y la vía de velocidad superficial en
-[Potencia acústica a partir de la vibración](/phonometry/es/devices/emission/vibration-sound-power/).
-La suma de potencia por puntos discretos de la propia ISO 9614-1 no está
-implementada en absoluto; solo lo están sus indicadores de campo, en
-[Intensidad acústica](/phonometry/es/devices/emission/intensity/).
-La ISO 3743-1, la ISO 3743-2 y la ISO 3747, los miembros restantes de la
-familia ISO 3740, tampoco están implementadas, ni lo está el nivel de *energía*
-acústica $L_J$ para sucesos aislados. El nivel de presión acústica de emisión
-$L_{pA}$ que acompaña a $L_{WA}$ en una declaración se consume, no se determina:
-la ISO 11201, la ISO 11202 y la ISO 11204 quedan fuera de la biblioteca. Los
+<ScopeClaim status="not-covered" label="No cubierto">
+Las seis determinaciones viven en sus guías de método: la superficie
+envolvente y la malla anecoica en [Potencia acústica por métodos de
+presión](/phonometry/es/devices/emission/sound-power-pressure/), el método de
+campo difuso en [Potencia acústica en cámara
+reverberante](/phonometry/es/devices/emission/sound-power-reverberation/), los
+dos métodos de barrido en [Potencia acústica por barrido de
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/) y la vía
+de velocidad superficial en [Potencia acústica a partir de la
+vibración](/phonometry/es/devices/emission/vibration-sound-power/). La suma de
+potencia por puntos discretos de la propia ISO 9614-1 no está implementada en
+absoluto; solo lo están sus indicadores de campo, en [Intensidad
+acústica](/phonometry/es/devices/emission/intensity/). La ISO 3743-1, la ISO
+3743-2 y la ISO 3747, los miembros restantes de la familia ISO 3740, tampoco
+están implementadas, ni lo está el nivel de *energía* acústica $L_J$ para
+sucesos aislados. El nivel de presión acústica de emisión $L_{pA}$ que
+acompaña a $L_{WA}$ en una declaración se consume, no se determina: la ISO
+11201, la ISO 11202 y la ISO 11204 quedan fuera de la biblioteca. Los
 criterios de lote del apartado 6.3 de ISO 4871 no se evalúan — solo la
 verificación de máquina única del apartado 6.2 — y su estadística de lote más
-allá del caso de máquina única
-$K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
+allá del caso de máquina única $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se
+enuncia, no se deriva.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

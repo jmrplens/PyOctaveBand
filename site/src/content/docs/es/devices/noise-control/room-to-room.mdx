@@ -34,6 +34,8 @@ references:
     note: "La frecuencia de Schroeder (Ec. 3.44), que acota por abajo la hipótesis de campo difuso."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
@@ -599,26 +601,31 @@ de fuentes imagen y de rayos de
 
 ## Qué cubre esta guía
 
-**Cubierto.** El balance de potencia del apartado 4.9 de Norton y Karczub
-(Ec. 4.101) como `room_to_room_transmission`, con `SourceRoom`,
-`equivalent_absorption_area`, `mean_absorption` y `room_constant`; el nivel del
-recinto emisor a partir de un nivel de potencia acústica mediante los modelos de
-fuente de la Tabla 4.5 del apartado 4.6 (potencia constante, volumen constante,
-presión constante) y la directividad de la posición de la máquina;
-`DesignCriterion` con su objetivo, su provisión por flancos y su valoración
-según ANSI/ASA S12.2-2019, en la familia NC por omisión y en la familia RC
-Mark II con `DesignCriterion(family="RC")`; `.required_transmission_loss`,
-`.exceedance`, `.meets_target` y `.table()`; y la ecuación del cerramiento del
-apartado 4.10 (Ec. 4.115) mediante `enclosure_required_transmission_loss`, en
-los dos modelos de interior, el de Norton y el de Bies, que lista
-`ENCLOSURE_MODELS`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El balance de potencia del apartado 4.9 de Norton y Karczub (Ec. 4.101) como
+`room_to_room_transmission`, con `SourceRoom`, `equivalent_absorption_area`,
+`mean_absorption` y `room_constant`; el nivel del recinto emisor a partir de
+un nivel de potencia acústica mediante los modelos de fuente de la Tabla 4.5
+del apartado 4.6 (potencia constante, volumen constante, presión constante) y
+la directividad de la posición de la máquina; `DesignCriterion` con su
+objetivo, su provisión por flancos y su valoración según ANSI/ASA S12.2-2019,
+en la familia NC por omisión y en la familia RC Mark II con
+`DesignCriterion(family="RC")`; `.required_transmission_loss`, `.exceedance`,
+`.meets_target` y `.table()`; y la ecuación del cerramiento del apartado 4.10
+(Ec. 4.115) mediante `enclosure_required_transmission_loss`, en los dos
+modelos de interior, el de Norton y el de Bies, que lista `ENCLOSURE_MODELS`.
+</ScopeClaim>
 
-**No cubierto.** La pérdida por transmisión de la propia partición, que se mide
-o se predice en otra parte; los flancos como trayectoria modelada en lugar de
-como provisión a tanto alzado; las fugas y aberturas de un cerramiento, que
-necesitan el compuesto de la guía de control de ruido industrial; y todo lo que
-quede por debajo de la frecuencia de Schroeder de cada recinto, o más cerca de
-una superficie que media longitud de onda.
+<ScopeClaim status="not-covered" label="No cubierto">
+La pérdida por transmisión de la propia partición, que se mide o se predice en
+otra parte; los flancos como trayectoria modelada en lugar de como provisión a
+tanto alzado; las fugas y aberturas de un cerramiento, que necesitan el
+compuesto de la guía de control de ruido industrial; y todo lo que quede por
+debajo de la frecuencia de Schroeder de cada recinto, o más cerca de una
+superficie que media longitud de onda.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

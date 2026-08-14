@@ -3,6 +3,9 @@ title: "Psicoacústica"
 description: "Las métricas perceptivas del sonido: modelos de sonoridad (ISO 532, ECMA-418-2), agudeza, tonalidad, aspereza e intensidad de fluctuación, los dos métodos de evaluación tonal (prominencia ECMA-418-1 y audibilidad ISO/PAS 20065), y la molestia psicoacústica de Fastl y Zwicker."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 La psicoacústica sustituye la pregunta «¿cuántos decibelios?» por «¿qué
 percibe el oyente?». Su magnitud base es la **sonoridad**: una magnitud
 perceptiva en sonios, calculada por modelos auditivos que tienen en cuenta el
@@ -91,34 +94,46 @@ misma sensación, bajo otro nombre de unidad.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Aquí todo es monoaural.** Las combinaciones binaurales que ECMA-418-2 define
 para la sonoridad, la aspereza y la intensidad de fluctuación no están
 implementadas, así que una grabación estéreo o binaural se analiza canal a
-canal, y ningún modelo de aquí tiene en cuenta la localización ni la liberación
-espacial del enmascaramiento. Quedan fuera además dos refinamientos opcionales:
-la ponderación de entropía del apartado 7.1.6, que necesita una señal externa
-de velocidad de giro, y el pequeño ajuste que permite la nota al pie 47.
+canal, y ningún modelo de aquí tiene en cuenta la localización ni la
+liberación espacial del enmascaramiento. Quedan fuera además dos refinamientos
+opcionales: la ponderación de entropía del apartado 7.1.6, que necesita una
+señal externa de velocidad de giro, y el pequeño ajuste que permite la nota al
+pie 47.
+</ScopeClaim>
 
-**Un veredicto nunca está completo.** El indicador `prominent` que devuelven las
-funciones de prominencia tonal es solo el criterio numérico; ECMA-418-1 exige
-además la confirmación auditiva y el filtro del umbral inferior de audición, y
-ambos quedan a cargo de quien llama. El módulo de audibilidad de tonos es
-agnóstico a la ponderación y **no** aplica la ponderación A que exige el
-apartado 5.3.2, así que pondera A el espectro antes de pasárselo; y toma un
+<ScopeClaim status="not-covered">
+**Un veredicto nunca está completo.** El indicador `prominent` que devuelven
+las funciones de prominencia tonal es solo el criterio numérico; ECMA-418-1
+exige además la confirmación auditiva y el filtro del umbral inferior de
+audición, y ambos quedan a cargo de quien llama. El módulo de audibilidad de
+tonos es agnóstico a la ponderación y **no** aplica la ponderación A que exige
+el apartado 5.3.2, así que pondera A el espectro antes de pasárselo; y toma un
 espectro de banda estrecha ya calculado en lugar de construirlo desde una
 grabación.
+</ScopeClaim>
 
-Conviene conocer dos desviaciones documentadas. ISO 532-3 prescribe remuestrear
-a 32 kHz antes del análisis FFT deslizante; esta implementación trabaja a la
-frecuencia de muestreo nativa, una desviación que se mantiene dentro de la
-incertidumbre expandida de la norma pero que deberías deshacer remuestreando
-primero si te importa la conformidad estricta apartado a apartado. Y el modelo
-de señal de intensidad de fluctuación de Osses 2016 está validado solo para
-estímulos modulados en amplitud, con un suelo documentado: un tono estacionario
-de 1 kHz marca unos 0,09 vacil en lugar de 0.
+<ScopeClaim status="not-covered">
+Conviene conocer dos desviaciones documentadas. ISO 532-3 prescribe
+remuestrear a 32 kHz antes del análisis FFT deslizante; esta implementación
+trabaja a la frecuencia de muestreo nativa, una desviación que se mantiene
+dentro de la incertidumbre expandida de la norma pero que deberías deshacer
+remuestreando primero si te importa la conformidad estricta apartado a
+apartado. Y el modelo de señal de intensidad de fluctuación de Osses 2016 está
+validado solo para estímulos modulados en amplitud, con un suelo documentado:
+un tono estacionario de 1 kHz marca unos 0,09 vacil en lugar de 0.
+</ScopeClaim>
 
-Por último, ninguna de estas métricas es una respuesta comunitaria: la molestia
-de aquí es una sensación de laboratorio calculada a partir de una señal,
-mientras que la molestia que declara un vecindario es una magnitud de encuesta
-social, que se trata con los indicadores de [Medio ambiente y
+<ScopeClaim status="not-covered">
+Por último, ninguna de estas métricas es una respuesta comunitaria: la
+molestia de aquí es una sensación de laboratorio calculada a partir de una
+señal, mientras que la molestia que declara un vecindario es una magnitud de
+encuesta social, que se trata con los indicadores de [Medio ambiente y
 transporte](/phonometry/es/environment/).
+</ScopeClaim>
+</Scope>
+

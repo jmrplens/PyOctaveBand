@@ -3,6 +3,9 @@ title: "Potencia acústica e intensidad"
 description: "La emisión acústica total de una fuente: determinación de la potencia acústica por las rutas de presión, cámara reverberante, barrido de intensidad y vibración superficial (series ISO 3740 e ISO 9614, ISO/TS 7849), la declaración de emisión de ruido de ISO 4871, y la intensidad acústica con dos micrófonos según IEC 61043 con los indicadores de campo de ISO 9614-1."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 La magnitud central de esta sección es la **potencia acústica**: la energía
 acústica total por segundo que radia una fuente. Expresada en decibelios como
 el nivel de potencia acústica, es la cifra que va en una hoja de características,
@@ -73,26 +76,33 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
 
 ## Qué no cubre esta sección
 
-Los métodos de determinación empiezan después de haber cualificado el recinto y
-la sonda. La cualificación de campo libre de una sala anecoica o semianecoica de
-ISO 3745, la cualificación de la cámara reverberante de ISO 3741 (recuento de
-frecuencias propias o comparación con una fuente de referencia) y el ensayo de
-intensidad residual de IEC 61043 de una cadena de sonda y analizador se **dan
-por supuestos, no se ejecutan**: la biblioteca avisa de los criterios
-orientativos gruesos que las normas declaran explícitamente — el volumen mínimo
-de la Tabla 1, el número de posiciones, una dispersión entre posiciones superior
-a 1,5 dB, la validez de K₂ en ISO 3744 — y cualifica un índice de intensidad
-residual que has medido tú. La corrección meteorológica C₃ de ISO 3745
-necesita igualmente un coeficiente de absorción del aire que aportas tú; aquí no
-se calcula a partir de ISO 9613-1.
+<Scope>
+<ScopeClaim status="not-covered">
+Los métodos de determinación empiezan después de haber cualificado el recinto
+y la sonda. La cualificación de campo libre de una sala anecoica o
+semianecoica de ISO 3745, la cualificación de la cámara reverberante de ISO
+3741 (recuento de frecuencias propias o comparación con una fuente de
+referencia) y el ensayo de intensidad residual de IEC 61043 de una cadena de
+sonda y analizador se **dan por supuestos, no se ejecutan**: la biblioteca
+avisa de los criterios orientativos gruesos que las normas declaran
+explícitamente — el volumen mínimo de la Tabla 1, el número de posiciones, una
+dispersión entre posiciones superior a 1,5 dB, la validez de K₂ en ISO 3744 —
+y cualifica un índice de intensidad residual que has medido tú. La corrección
+meteorológica C₃ de ISO 3745 necesita igualmente un coeficiente de absorción
+del aire que aportas tú; aquí no se calcula a partir de ISO 9613-1.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Una vía falta a propósito: **la suma de potencia en puntos fijos discretos de
 ISO 9614-1 no está implementada en absoluto**, y sí lo están solo sus
-indicadores de campo del Anexo A, reutilizados por las dos partes de barrido. En
-la vía de vibración, los apartados de medición 5 a 7 de ambas partes de ISO/TS
-7849 son práctica de laboratorio y no código, y solo está implementado el factor
-de radiación de una sola máquina de la Fórmula 8, así que una determinación de
-lote o de familia necesita un valor ya promediado. Por último, aquí no se reduce
-la emisión de ninguna máquina: silenciar una fuente es [Control de
-ruido](/phonometry/es/devices/noise-control/), y un valor de emisión declarado
-es la entrada de ese trabajo, no su resultado.
+indicadores de campo del Anexo A, reutilizados por las dos partes de barrido.
+En la vía de vibración, los apartados de medición 5 a 7 de ambas partes de
+ISO/TS 7849 son práctica de laboratorio y no código, y solo está implementado
+el factor de radiación de una sola máquina de la Fórmula 8, así que una
+determinación de lote o de familia necesita un valor ya promediado. Por
+último, aquí no se reduce la emisión de ninguna máquina: silenciar una fuente
+es [Control de ruido](/phonometry/es/devices/noise-control/), y un valor de
+emisión declarado es la entrada de ese trabajo, no su resultado.
+</ScopeClaim>
+</Scope>
+

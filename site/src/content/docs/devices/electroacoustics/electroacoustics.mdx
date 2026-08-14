@@ -33,6 +33,8 @@ references:
     note: "ISBN 978-0-470-24877-5. The H1 and H2 frequency-response estimators and the ordinary coherence γ² of section 5."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Two staples of audio-equipment characterisation, from a captured signal: how much
@@ -618,32 +620,37 @@ plt.show()
 
 ## What this guide covers
 
-**Covered.** The IEC 60268-3 rated and standard measuring conditions
-(clauses 3.1.2/3.1.3, the 1 h pre-conditioning of clause 9) and the acceptance
-checks of 14.12.3.2 and 14.12.4.1 as the conditions every ratio below is
-defined at. The IEC 60268-3 distortion set (clauses 14.12.2-14.12.11):
-$\mathrm{THD}_F$ and $\mathrm{THD}_R$ (`thd`), nth-order harmonic distortion
-(`harmonic_distortion`),
-THD+N and SINAD through the AES17-2015 measurement bandwidth
-(`harmonic_analysis`, AES17 clauses 5.2.5/5.2.8/6.3.1), modulation and
-difference-frequency intermodulation, dynamic intermodulation (DIM) and the
-ITU-R BS.468-4 weighted THD, plus the AES17-2015 dynamic range and idle
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The IEC 60268-3 rated and standard measuring conditions (clauses 3.1.2/3.1.3,
+the 1 h pre-conditioning of clause 9) and the acceptance checks of 14.12.3.2
+and 14.12.4.1 as the conditions every ratio below is defined at. The IEC
+60268-3 distortion set (clauses 14.12.2-14.12.11): $\mathrm{THD}_F$ and
+$\mathrm{THD}_R$ (`thd`), nth-order harmonic distortion
+(`harmonic_distortion`), THD+N and SINAD through the AES17-2015 measurement
+bandwidth (`harmonic_analysis`, AES17 clauses 5.2.5/5.2.8/6.3.1), modulation
+and difference-frequency intermodulation, dynamic intermodulation (DIM) and
+the ITU-R BS.468-4 weighted THD, plus the AES17-2015 dynamic range and idle
 channel noise. The Bendat & Piersol $H_1$/$H_2$ frequency-response estimators
 and ordinary coherence.
+</ScopeClaim>
 
-**Not covered.** None of the conditions of section 0 is checked by the
-functions: they take a captured array and compute the ratio the clause defines,
-so the bench, the operating point and the three acceptance checks are the
-reader's to keep. Other parts of the IEC 60268 series sit outside this page:
-Part 16 (objective speech intelligibility) is implemented as the speech
-transmission index in
-[Speech Transmission](/phonometry/perception/speech/speech-transmission/),
-and the Part 4 microphone and Part 5 loudspeaker
-rated-characteristics reports have moved to
-[Microphone Characterisation](/phonometry/devices/electroacoustics/microphones/) and
-[Loudspeaker Characterisation](/phonometry/devices/electroacoustics/loudspeakers/). The
+<ScopeClaim status="not-covered" label="Not covered">
+None of the conditions of section 0 is checked by the functions: they take a
+captured array and compute the ratio the clause defines, so the bench, the
+operating point and the three acceptance checks are the reader's to keep.
+Other parts of the IEC 60268 series sit outside this page: Part 16 (objective
+speech intelligibility) is implemented as the speech transmission index in
+[Speech Transmission](/phonometry/perception/speech/speech-transmission/), and
+the Part 4 microphone and Part 5 loudspeaker rated-characteristics reports
+have moved to [Microphone
+Characterisation](/phonometry/devices/electroacoustics/microphones/) and
+[Loudspeaker
+Characterisation](/phonometry/devices/electroacoustics/loudspeakers/). The
 implemented editions are frozen at AES17-2015; the superseding AES17-2020
 revision is not the one checked.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

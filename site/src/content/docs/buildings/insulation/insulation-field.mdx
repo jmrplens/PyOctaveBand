@@ -53,8 +53,10 @@ references:
     note: "The standard uncertainties per measurement situation (Clause 5.2) and the Table 8 coverage factors; its precision framework builds on ISO 5725 (context, not implemented directly)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 This guide continues from the [Room Acoustics guide](/phonometry/buildings/rooms/room-acoustics/):
 the same impulse response, measured either side of a partition, yields its
@@ -694,45 +696,49 @@ power off the radiating face instead of the receiving-room level, is
 
 ## What this guide covers
 
-**Covered.** ISO 16283-1:2014 (airborne field insulation: the level
-difference, standardized $D_{nT}$ and apparent $R'$ of Clause 3.12-3.15 and
-the Clause 7.8 position averaging) and ISO 16283-2:2020 (impact field
-insulation, the same normalisations with the sign flip) through
-`building.energy_average_level`, `building.airborne_insulation` and
-`building.impact_insulation`, each writing the Clause 14 test report with
-`.report()`; and ISO 12999-1:2020's tabulated standard uncertainties (the
-Clause 5.2 measurement situations A/B/C and the Table 8 coverage factors, one-
-and two-sided) via `building.band_uncertainty`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 16283-1:2014 (airborne field insulation: the level difference,
+standardized $D_{nT}$ and apparent $R'$ of Clause 3.12-3.15 and the Clause 7.8
+position averaging) and ISO 16283-2:2020 (impact field insulation, the same
+normalisations with the sign flip) through `building.energy_average_level`,
+`building.airborne_insulation` and `building.impact_insulation`, each writing
+the Clause 14 test report with `.report()`; and ISO 12999-1:2020's tabulated
+standard uncertainties (the Clause 5.2 measurement situations A/B/C and the
+Table 8 coverage factors, one- and two-sided) via `building.band_uncertainty`,
 `building.single_number_uncertainty` and `building.uncertain_value`. The
 single-number ratings quoted here reuse the verified ISO 717-1/ISO 717-2
 engines.
+</ScopeClaim>
 
-**Not covered.** Every field function here takes levels that the caller has
-already corrected for background noise (Clause 9.2 of ISO 16283-1). The
-*measurement* of the background level — source off, same positions, same
-averaging — is the operator's job, and nothing here verifies that the 6 dB
-floor was met; the correction itself is three lines of NumPy, written out
-under [Correcting for background noise](#correcting-for-background-noise-clause-92)
-above. (`building.background_correction` is the ISO 10140-4 *laboratory*
-variant and does not match the field thresholds.)
-ISO 16283-1/-2's own position and procedure requirements — the counts,
-distances and averaging of
-[Taking the measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9)
-and the corner measurements of
-[Small rooms](#small-rooms-the-low-frequency-procedure-clause-8) — are
-documented here and checked nowhere: energy-averaging happens once positions
-are supplied, but nothing verifies how many were taken, where, or that the
-25 m³ trigger was even tested for. The Formula (12) and (13) combination of the
+<ScopeClaim status="not-covered" label="Not covered">
+Every field function here takes levels that the caller has already corrected
+for background noise (Clause 9.2 of ISO 16283-1). The *measurement* of the
+background level — source off, same positions, same averaging — is the
+operator's job, and nothing here verifies that the 6 dB floor was met; the
+correction itself is three lines of NumPy, written out under [Correcting for
+background noise](#correcting-for-background-noise-clause-92) above.
+(`building.background_correction` is the ISO 10140-4 *laboratory* variant and
+does not match the field thresholds.) ISO 16283-1/-2's own position and
+procedure requirements — the counts, distances and averaging of [Taking the
+measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9) and the
+corner measurements of [Small
+rooms](#small-rooms-the-low-frequency-procedure-clause-8) — are documented
+here and checked nowhere: energy-averaging happens once positions are
+supplied, but nothing verifies how many were taken, where, or that the 25 m³
+trigger was even tested for. The Formula (12) and (13) combination of the
 low-frequency procedure is the two lines of NumPy printed above, not a library
 function. The other members of the family are covered by their own guides: the
-façade part ISO 16283-3
-([Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/)), the survey
-method ISO 10052
-([Sound Insulation Survey Method](/phonometry/buildings/insulation/insulation-survey/)), the
-rating engines ISO 717-1/-2
-([Insulation Ratings](/phonometry/buildings/insulation/insulation-ratings/)) and the
-sound-intensity route ISO 15186-1/-2
-([Sound Insulation by Intensity](/phonometry/buildings/insulation/insulation-intensity/)).
+façade part ISO 16283-3 ([Façade Sound
+Insulation](/phonometry/buildings/insulation/facade-insulation/)), the survey
+method ISO 10052 ([Sound Insulation Survey
+Method](/phonometry/buildings/insulation/insulation-survey/)), the rating
+engines ISO 717-1/-2 ([Insulation
+Ratings](/phonometry/buildings/insulation/insulation-ratings/)) and the
+sound-intensity route ISO 15186-1/-2 ([Sound Insulation by
+Intensity](/phonometry/buildings/insulation/insulation-intensity/)).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

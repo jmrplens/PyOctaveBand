@@ -56,8 +56,10 @@ references:
     note: "Topics in Applied Physics, Vol. 143. The book-length treatment of resonant metamaterial absorbers and diffusers; the modern companion to Cox & D'Antonio for this whole family."
 ---
 
-import Video from '../../../../components/Video.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A Schroeder diffuser earns its diffusion with depth: the
 [design equations](/phonometry/materials/diffusers/diffusers/) turn a phase sequence into
@@ -536,23 +538,29 @@ honest grade.
 
 ## What this guide covers
 
-**Covered.** The Jiménez et al. (2017) metadiffuser model: the per-well slit
-and Helmholtz-resonator transfer-matrix chain with visco-thermal effective
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The Jiménez et al. (2017) metadiffuser model: the per-well slit and
+Helmholtz-resonator transfer-matrix chain with visco-thermal effective
 parameters, end corrections and the slit-radiation term
 (`metadiffuser_reflection`, with `MetadiffuserWell` and `HelmholtzResonator`
 as the geometry containers and `None` wells as flat rigid strips), and its
 reduction through the Fraunhofer far field to the ISO 17497-2 directional
 diffusion coefficient (`metadiffuser_polar_response`) and the band-by-band
 normalised spectrum (`metadiffuser_diffusion_spectrum`).
+</ScopeClaim>
 
-**Not covered.** The model is locally reacting (wells do not couple
-internally) and shares the stated limits of the Fraunhofer far field: it
-loses accuracy at low frequency, at grazing angles and where edge diffraction
-matters, so it grades designs rather than replacing an ISO 17497-2
-measurement. The inverse problem (solving resonator geometries for a target
-phase profile) is not automated; the workflow of section 3 matches phases by
-evaluation. The critical-coupling design solver for a single slit lives in
-[Metamaterial Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/).
+<ScopeClaim status="not-covered" label="Not covered">
+The model is locally reacting (wells do not couple internally) and shares the
+stated limits of the Fraunhofer far field: it loses accuracy at low frequency,
+at grazing angles and where edge diffraction matters, so it grades designs
+rather than replacing an ISO 17497-2 measurement. The inverse problem (solving
+resonator geometries for a target phase profile) is not automated; the
+workflow of section 3 matches phases by evaluation. The critical-coupling
+design solver for a single slit lives in [Metamaterial
+Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

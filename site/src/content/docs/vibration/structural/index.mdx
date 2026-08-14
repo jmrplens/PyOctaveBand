@@ -3,6 +3,9 @@ title: "Structure-borne sources"
 description: "The chain from a vibrating machine to the noise heard rooms away: the ISO 7626 FRF family, ISO 10846 isolator transfer stiffness, ISO/TS 7849 radiated power from surface vibration, the EN 15657 reception plate and the EN 12354-5 installed prediction."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 A machine fixed to a building radiates sound twice: directly from its own
 vibrating surface, and indirectly by injecting **structure-borne power** into
 the structure, which carries it away and re-radiates it in distant rooms. Six
@@ -74,24 +77,33 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 The junction coefficients are a **closed-form idealisation** for a rigid,
 simply supported junction between homogeneous plates, not a measurement: the
-empirical vibration reduction index obtained from a direction-averaged velocity
-level difference is ISO 10848, in [Laboratory flanking
+empirical vibration reduction index obtained from a direction-averaged
+velocity level difference is ISO 10848, in [Laboratory flanking
 transmission](/phonometry/buildings/insulation/flanking-lab/). The
 straight-section coefficient is undefined for the T and L geometries, which
 have no collinear third plate, so only the corner path applies there.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 The FRF page implements ISO 7626-1 and the ISO 7626-2 acceptance criteria for
 an attached exciter; **impact-hammer excitation (ISO 7626-5) is named for
 context only**, with nothing that synthesises or processes an impact spectrum,
 and the conversions return element-wise *free* reciprocals — correct for a
 driving-point or single-path use, not for a full FRF matrix, whose blocked
 matrix quantities are not built.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 On the isolator page, parts 4 and 5 of ISO 10846 are not implemented, and two
 of the standard's own validity checks are described rather than computed: the
 rigid blocking-mass inequality, and the clause 7.6 linearity criterion (two
 input spectra 10 dB apart agreeing within 1.5 dB). Finally, nothing here
 designs an isolator or a floating base: the pages characterise elements and
 predict transmission, and the sizing decision stays yours.
+</ScopeClaim>
+</Scope>
+

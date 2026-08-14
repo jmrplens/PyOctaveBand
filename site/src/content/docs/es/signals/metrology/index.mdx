@@ -3,6 +3,9 @@ title: "Calibración e incertidumbre"
 description: "Las disciplinas que convierten un nivel calculado en una medición defendible: calibración SPL física frente a análisis digital en dBFS, la propagación de la incertidumbre de medida por GUM y Monte Carlo, las estadísticas de estacionariedad y de picos que cualifican un registro antes de promediar nada de él, y los verificadores de clase con el informe de conformidad detrás de cada número."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Un nivel impreso por un programa no es todavía una medición. Tres cosas
 separan lo uno de lo otro: saber que el registro merece **promediarse
 siquiera**, saber qué significan **físicamente** las muestras digitales, y
@@ -87,21 +90,27 @@ la maquinaria GUM descrita aquí.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Aquí nada comprueba un instrumento ni un calibrador. Los ensayos de
 conformidad de IEC 60942 sobre el propio calibrador (nivel generado,
 frecuencia, distorsión y las correcciones por presión estática y temperatura)
 no están implementados, así que pasa un `target_spl` ya corregido cuando el
 manual lo pida, y los ensayos periódicos de IEC 61672-3 se citan como práctica
-de laboratorio, no se ejecutan;
-[Conformidad y verificación](/phonometry/es/signals/metrology/compliance-verification/)
-traza esa frontera con precisión, parte por parte. La parte de dBFS de la página de calibración
-queda fuera de cualquier norma y no hace ninguna afirmación física: es un
-marco de referencia, no una medición. La cualificación de datos implementa solo
-el núcleo cuantitativo del apartado 10.3 de Bendat y Piersol: clasificar el
-tipo de un registro, validarlo frente a límites físicos y editar transitorios
-espurios siguen siendo pasos manuales, tal como los describe el libro. Y un
-balance de incertidumbre es un modelo de *tu* medición: la biblioteca
-propaga lo que declares y nunca inventa los términos. Donde una norma publica
-su propio presupuesto, las guías lo dicen, como hace ISO 9612 para la
-[exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) e
-ISO 12999-1 para el [aislamiento acústico](/phonometry/es/buildings/insulation/).
+de laboratorio, no se ejecutan; [Conformidad y
+verificación](/phonometry/es/signals/metrology/compliance-verification/) traza
+esa frontera con precisión, parte por parte. La parte de dBFS de la página de
+calibración queda fuera de cualquier norma y no hace ninguna afirmación
+física: es un marco de referencia, no una medición. La cualificación de datos
+implementa solo el núcleo cuantitativo del apartado 10.3 de Bendat y Piersol:
+clasificar el tipo de un registro, validarlo frente a límites físicos y editar
+transitorios espurios siguen siendo pasos manuales, tal como los describe el
+libro. Y un balance de incertidumbre es un modelo de *tu* medición: la
+biblioteca propaga lo que declares y nunca inventa los términos. Donde una
+norma publica su propio presupuesto, las guías lo dicen, como hace ISO 9612
+para la [exposición
+laboral](/phonometry/es/perception/hearing/occupational-exposure/) e ISO
+12999-1 para el [aislamiento acústico](/phonometry/es/buildings/insulation/).
+</ScopeClaim>
+</Scope>
+

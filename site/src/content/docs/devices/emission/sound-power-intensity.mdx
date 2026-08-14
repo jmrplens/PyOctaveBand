@@ -26,9 +26,11 @@ references:
     note: "The grade-1 scanning method of section 2, its field indicators and the clause 9.2 not-applicable flagging."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 The pressure routes to the sound power level fail exactly where machines
 live: on a factory floor where the neighbouring lines cannot be switched
@@ -602,27 +604,33 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The ISO 9614-2 scanning determination
-(`sound_power_intensity`): the partial powers, the $F_{pI}$ surface
-pressure-intensity and $F_{+/-}$ negative-partial-power field indicators, the
-dynamic capability $L_d$, the repeatability criterion, the per-band achieved
-grade and the clause 9.2 not-applicable flagging for net-inflow bands, with the
-clause 10.6 b) screening of the A-weighted total (`a_weighting_omitted_bands`).
-The ISO 9614-3 precision determination (`sound_power_intensity_precision`) with
-its own not-applicable flagging, its Annex B field indicators
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 9614-2 scanning determination (`sound_power_intensity`): the partial
+powers, the $F_{pI}$ surface pressure-intensity and $F_{+/-}$
+negative-partial-power field indicators, the dynamic capability $L_d$, the
+repeatability criterion, the per-band achieved grade and the clause 9.2
+not-applicable flagging for net-inflow bands, with the clause 10.6 b)
+screening of the A-weighted total (`a_weighting_omitted_bands`). The ISO
+9614-3 precision determination (`sound_power_intensity_precision`) with its
+own not-applicable flagging, its Annex B field indicators
 (`precision_field_indicators`) and the five Annex C acceptance criteria
 (`precision_qualification`). Both results render the accredited-style
 sound-power fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** ISO 9614-1, the discrete fixed-point intensity method, is
-not one of the routes here: only its field indicators are reused, and the
-discrete-point power determination is not implemented at all; the
-[sound intensity guide](/phonometry/devices/emission/intensity/) covers the
-probe and the Annex A field indicators that both parts share. The probe's
-finite-difference bias and the pressure-residual intensity index are
-measured properties of the instrument, covered in the same guide. Choosing
-among the six routes, and the ISO 4871 declaration a result feeds, live in
-[Sound Power](/phonometry/devices/emission/sound-power/).
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 9614-1, the discrete fixed-point intensity method, is not one of the
+routes here: only its field indicators are reused, and the discrete-point
+power determination is not implemented at all; the [sound intensity
+guide](/phonometry/devices/emission/intensity/) covers the probe and the Annex
+A field indicators that both parts share. The probe's finite-difference bias
+and the pressure-residual intensity index are measured properties of the
+instrument, covered in the same guide. Choosing among the six routes, and the
+ISO 4871 declaration a result feeds, live in [Sound
+Power](/phonometry/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

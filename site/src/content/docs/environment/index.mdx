@@ -3,6 +3,9 @@ title: "Environment and transport"
 description: "Sound outdoors and the sources that dominate it: the ISO 9613 propagation model, the ISO 1996 rating level and its Spanish application, the NT ACOU 112 impulsive-sound adjustment, and the CNOSSOS-EU road and railway and IEC 61400-11 wind-turbine source models."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+
 Environmental noise is a source-path-receiver problem stretched over hundreds
 of metres of open air. This section covers all three of them. The **propagation**
 pages handle the path: ISO 9613 predicts, band by band, how much level survives
@@ -92,17 +95,21 @@ and they have a topic of their own:
 
 ## What this section does not cover
 
-Only the source side of CNOSSOS-EU Annex II is implemented, and only two of its
-four sources. The **industrial source** of section 2.4 and Appendix H, and the
-**aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft noise
-is covered by the ICAO and ECAC methods in [Aircraft
+<Scope>
+<ScopeClaim status="not-covered">
+Only the source side of CNOSSOS-EU Annex II is implemented, and only two of
+its four sources. The **industrial source** of section 2.4 and Appendix H, and
+the **aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft
+noise is covered by the ICAO and ECAC methods in [Aircraft
 noise](/phonometry/aircraft/), which is a different family of models, and a
 non-vehicle machine is characterised as a sound power in [Sources and
 devices](/phonometry/devices/emission/). The **CNOSSOS propagation method** of
-section 2.5 is not implemented either: the path here is ISO 9613-2, a different
-model, so a chain built from CNOSSOS sources and this library's propagation is
-not a CNOSSOS calculation and should not be reported as one.
+section 2.5 is not implemented either: the path here is ISO 9613-2, a
+different model, so a chain built from CNOSSOS sources and this library's
+propagation is not a CNOSSOS calculation and should not be reported as one.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Nothing here is a mapping engine. There is no terrain model, no city geometry
 and no GIS layer: the propagation functions take one source, one receiver and
 the ground between them, both refraction models assume flat ground at z = 0,
@@ -111,8 +118,11 @@ CNOSSOS itself. On the assessment side, the library starts where the sound
 level meter stops — the ISO 1996-2 receiver positions and façade corrections,
 and the RD 1367/2007 Annex IV measurement procedures (microphone positions,
 series duration, number of measurements), are not implemented, only the
-arithmetic that follows once you have applied them. Acoustic zoning, noise maps
-and action plans under Ley 37/2003 are planning instruments, not calculations.
+arithmetic that follows once you have applied them. Acoustic zoning, noise
+maps and action plans under Ley 37/2003 are planning instruments, not
+calculations.
+</ScopeClaim>
+</Scope>
 
 ## Before and after these pages
 

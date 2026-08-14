@@ -3,6 +3,9 @@ title: "Hearing and perception"
 description: "How listeners perceive sound and what noise does to hearing: psychoacoustic sensations (loudness, sharpness, roughness, tonality, annoyance), speech intelligibility (STI and SII), and the statistics of hearing thresholds, hearing damage and occupational exposure."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
+
 A sound pressure level says how much sound there is; this section is about
 what a **listener** makes of it. Its three subsections answer three different
 questions. **Psychoacoustics** quantifies sensations: how loud a sound is
@@ -116,31 +119,41 @@ The hearing threshold, what noise does to it, and how exposure is measured.
 
 ## What this section does not cover
 
+<Scope>
+<ScopeClaim status="not-covered">
 **No listener is tested here, and no verdict about a person is issued.** Every
 model on these pages predicts what a population, or a standard listener, would
 perceive from a calibrated signal: none of them runs an audiometric session,
 none diagnoses a hearing loss, and ISO 1999 explicitly declines to define a
-hearing handicap or a compensable fence — that line is national regulation, and
-nothing here applies one. Every prominence and audibility verdict is likewise
-the numeric criterion only: ECMA-418-1 also requires aural confirmation of a
-prominent tone, and that stays with you.
+hearing handicap or a compensable fence — that line is national regulation,
+and nothing here applies one. Every prominence and audibility verdict is
+likewise the numeric criterion only: ECMA-418-1 also requires aural
+confirmation of a prominent tone, and that stays with you.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 **Everything is monaural.** The binaural combinations of ECMA-418-2 are not
 implemented, so a two-channel recording is analysed one ear at a time, and
 nothing here models localisation, spatial release from masking or binaural
 loudness summation.
+</ScopeClaim>
 
-**No listening test is replaced.** STOI returns the correlation-based index and
-not a percentage of words understood, because that mapping is fitted per
+<ScopeClaim status="not-covered">
+**No listening test is replaced.** STOI returns the correlation-based index
+and not a percentage of words understood, because that mapping is fitted per
 listening-test corpus; the SII returns an audibility fraction and not a score;
 and no page predicts annoyance in a community, which is a social-survey
 quantity rather than a psychoacoustic one — the community indicators are
 [Environment and transport](/phonometry/environment/).
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Finally, these models start from a **calibrated** signal or spectrum in
 pascals, because every one of them is level-dependent. Feeding them raw
 soundcard samples produces a number with an arbitrary reference, which is a
 different failure from a wrong answer: it looks plausible.
+</ScopeClaim>
+</Scope>
 
 ## Before and after these pages
 

@@ -53,8 +53,10 @@ references:
     note: "The class limits on the pressure-residual intensity index behind verify_intensity_class, the third verifier family this page inventories."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import { totalChecks, domains, standards } from '../../../../data/conformance-stats.mjs';
 
 Three kinds of evidence back a number computed with this library, and they
@@ -339,23 +341,28 @@ The same honesty applies to this library, in both directions:
 
 ## What this guide covers
 
-**Covered.** What a performance class asserts in IEC 61672-1:2013 and
-IEC 61260-1:2014 and how the claim chains through a measurement; the public
-verifiers (`verify_weighting_class`, `verify_filter_class`,
-`verify_intensity_class`, with `weighting_class_limits` and `class_limits`
-publishing the masks, and `filter_class_compliance` /
-`intensity_class_compliance` adding `.plot()` and the accredited fiche); how
-to read and cite the published conformance report; and the verified scope of
-the pattern-evaluation and periodic-test parts.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+What a performance class asserts in IEC 61672-1:2013 and IEC 61260-1:2014 and
+how the claim chains through a measurement; the public verifiers
+(`verify_weighting_class`, `verify_filter_class`, `verify_intensity_class`,
+with `weighting_class_limits` and `class_limits` publishing the masks, and
+`filter_class_compliance` / `intensity_class_compliance` adding `.plot()` and
+the accredited fiche); how to read and cite the published conformance report;
+and the verified scope of the pattern-evaluation and periodic-test parts.
+</ScopeClaim>
 
-**Not covered.** The verification mathematics of each stage, which belongs
-to the stage's own guide ([Frequency Weighting](/phonometry/signals/levels/weighting/),
-[Special Weightings](/phonometry/signals/levels/special-weightings/),
-[Filter Class Verification](/phonometry/signals/filters/filter-compliance/),
-[Sound Intensity](/phonometry/devices/emission/intensity/)); and every test of
-Parts 2 and 3 themselves, which this page delimits but the library does not
-perform: no environmental, immunity, acoustical or linearity test is run,
-and no physical instrument is assigned a class.
+<ScopeClaim status="not-covered" label="Not covered">
+The verification mathematics of each stage, which belongs to the stage's own
+guide ([Frequency Weighting](/phonometry/signals/levels/weighting/), [Special
+Weightings](/phonometry/signals/levels/special-weightings/), [Filter Class
+Verification](/phonometry/signals/filters/filter-compliance/), [Sound
+Intensity](/phonometry/devices/emission/intensity/)); and every test of Parts
+2 and 3 themselves, which this page delimits but the library does not perform:
+no environmental, immunity, acoustical or linearity test is run, and no
+physical instrument is assigned a class.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

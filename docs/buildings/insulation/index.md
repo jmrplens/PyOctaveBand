@@ -97,16 +97,16 @@ related EN 12354-5, lives in
 
 **The library starts after the microphone.** Every function here takes band
 levels that were already energy-averaged over positions and already corrected
-for background noise, and nothing verifies how the measurement was made: not the
-number and placement of source and microphone positions, not the low-frequency
-procedures of ISO 16283-1/-2, not the 6 dB signal-to-background floor, and not
-the test-facility and mounting requirements of ISO 10140-1. Those are the
-operator's responsibility and the report's, and they are what makes the numbers
-here mean something. Two consequences worth naming: the field and laboratory
-background corrections are *different* rules, so a laboratory helper must not be
-applied to field data; and the intensity route takes both the pressure and the
-intensity level as inputs, with the scanning probe and its phase-mismatch
-calibration outside the library.
+for background noise, and nothing verifies how the measurement was made: not
+the number and placement of source and microphone positions, not the
+low-frequency procedures of ISO 16283-1/-2, not the 6 dB signal-to-background
+floor, and not the test-facility and mounting requirements of ISO 10140-1.
+Those are the operator's responsibility and the report's, and they are what
+makes the numbers here mean something. Two consequences worth naming: the
+field and laboratory background corrections are *different* rules, so a
+laboratory helper must not be applied to field data; and the intensity route
+takes both the pressure and the intensity level as inputs, with the scanning
+probe and its phase-mismatch calibration outside the library.
 
 **Coverage inside the standards is partial in two places.** Of ISO 10848 only
 the Part 1 formulae are implemented generically, plus the Part 4 modal-overlap
@@ -114,12 +114,12 @@ validity check, not the facility-specific setups of Parts 2, 3 and 4. Of the
 Spanish code, only the verification indices are implemented: the simplified
 option's solution tables of clause 3, the execution conditions of clause 5 and
 the maintenance conditions of clause 6 are out of scope, and the general
-option's calculation route is
-[Predicting Sound Insulation](../design/insulation-prediction.md).
+option's calculation route is [Predicting Sound
+Insulation](../design/insulation-prediction.md).
 
-**And there is no heavy-impact prediction at all.** A floor construction can be
-carried to a tapping-machine level by the models in [Insulation
+**And there is no heavy-impact prediction at all.** A floor construction can
+be carried to a tapping-machine level by the models in [Insulation
 design](../design/index.md); nothing does the same for the rubber
 ball, because the complexity of the input force and the use of a time-weighted
-maximum leave no simple counterpart. The heavy-impact page rates a measurement,
-and only a measurement.
+maximum leave no simple counterpart. The heavy-impact page rates a
+measurement, and only a measurement.

@@ -3,6 +3,9 @@ title: "Audición y exposición"
 description: "La estadística de la audición y el ruido que la daña: la distribución del umbral con la edad de ISO 7029 y el cero de referencia de ISO 389-7, el desplazamiento permanente del umbral inducido por ruido de ISO 1999, y el muestreo de exposición laboral de ISO 9612."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Esta sección conecta tres magnitudes que la regulación trata como una sola
 historia: dónde se sitúa el **umbral de audición** de una población, cómo se
 mide la **exposición laboral al ruido**, y cómo esa exposición **desplaza el
@@ -70,21 +73,30 @@ En el orden en que discurre la cadena.
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 **Nada de lo que hay aquí es un veredicto sobre una persona.** ISO 1999 no
 define un hándicap auditivo ni un umbral indemnizable: esa línea la fija la
 regulación nacional, y la biblioteca no aplica ninguna, así que el criterio lo
 aportas y lo compruebas tú. Lo mismo vale para los valores de acción de la
-exposición: el LEX,8h y su límite superior unilateral al 95 % salen de
-ISO 9612, y las cifras con las que se comparan están en la directiva de tu
+exposición: el LEX,8h y su límite superior unilateral al 95 % salen de ISO
+9612, y las cifras con las que se comparan están en la directiva de tu
 jurisdicción, no aquí.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Dos límites de implementación siguen a las normas. De ISO 1999 solo está
-implementada la **base de datos A**: `htlan` toma siempre su componente de edad
-de ISO 7029:2017, y sustituirla por una población de control medida
+implementada la **base de datos A**: `htlan` toma siempre su componente de
+edad de ISO 7029:2017, y sustituirla por una población de control medida
 nacionalmente (apartados 6.2.3 y 6.2.4) obliga a calcular esa base de datos
 fuera y pasarla. De ISO 389-7 solo están implementados los valores de
 referencia de la Tabla 1, no los procedimientos con los que se establecieron.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Y aquí no se hace audiometría. Nada genera un tono de prueba, gobierna un
 audiómetro ni corrige por el acoplador de un auricular: las páginas consumen y
 producen niveles de umbral como datos.
+</ScopeClaim>
+</Scope>
+

@@ -19,8 +19,10 @@ references:
     note: "The crowd self-noise model of Chapter 17, Equations (17.50) to (17.54)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 An open-plan office is not a reverberation problem; it is a privacy
 problem, and a room that flatters the closed-room parameters can still fail
@@ -658,39 +660,43 @@ and `absorption_per_table` are callable directly.
 
 ## What this guide covers
 
-**Covered.** ISO 3382-3:2012 Clause 4 and Clause 6.2/6.3 open-plan
-quantities ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) from
-`room.open_plan_metrics`, with the to-scale measurement-line drawing
-(`room.plot_open_plan_geometry` and `.plot_geometry()`) and the one-page
-ISO 3382-3 fiche through `.report()`. The clause 5.1 and 5.2 measurement
-conditions and the Annex A quality ranges are quoted here for planning and
-reading. Long's *Architectural Acoustics* 2e Chapter 17 crowd self-noise model
-(Eqs. (17.50) to (17.54)) through `room.crowd_noise` and its parts, with the
-Eq. (17.53)-(17.54) design window and its closure condition.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 3382-3:2012 Clause 4 and Clause 6.2/6.3 open-plan quantities ($D_{2,S}$,
+$L_{p,A,S,4m}$, $r_D$, $r_P$) from `room.open_plan_metrics`, with the to-scale
+measurement-line drawing (`room.plot_open_plan_geometry` and
+`.plot_geometry()`) and the one-page ISO 3382-3 fiche through `.report()`. The
+clause 5.1 and 5.2 measurement conditions and the Annex A quality ranges are
+quoted here for planning and reading. Long's *Architectural Acoustics* 2e
+Chapter 17 crowd self-noise model (Eqs. (17.50) to (17.54)) through
+`room.crowd_noise` and its parts, with the Eq. (17.53)-(17.54) design window
+and its closure condition.
+</ScopeClaim>
 
-**Not covered.** ISO 3382-3's per-position STI is taken as an input to
-`open_plan_metrics` rather than computed inside it: measure it with the
-STIPA tools of the
-[Speech Transmission Index guide](/phonometry/perception/speech/speech-transmission/).
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 3382-3's per-position STI is taken as an input to `open_plan_metrics`
+rather than computed inside it: measure it with the STIPA tools of the [Speech
+Transmission Index guide](/phonometry/perception/speech/speech-transmission/).
 The fourth required single number, the average A-weighted background noise
 $L_{p,A,B}$, is likewise not computed here — it is the energetic A-weighted
 average of the per-position octave-band background levels, and it belongs in
-the report alongside the three this page produces.
-Nothing **checks** the measurement conditions of clauses 5.1 and 5.2 either:
-the function consumes distances, levels and STI values wherever they came
-from, so the source directivity, the furnished-and-unoccupied state and the
-background capture are the operator's responsibility, not the library's. The
-implemented edition is frozen at ISO 3382-3:2012; the superseding
-ISO 3382-3:2022 revision removes the privacy distance $r_P$, adds the
-comfort distance $r_C$ and moves the per-position STI to the indirect
-IEC 60268-16 method, and is not the one checked here. The
-crowd self-noise model is a *design* calculation and
+the report alongside the three this page produces. Nothing **checks** the
+measurement conditions of clauses 5.1 and 5.2 either: the function consumes
+distances, levels and STI values wherever they came from, so the source
+directivity, the furnished-and-unoccupied state and the background capture are
+the operator's responsibility, not the library's. The implemented edition is
+frozen at ISO 3382-3:2012; the superseding ISO 3382-3:2022 revision removes
+the privacy distance $r_P$, adds the comfort distance $r_C$ and moves the
+per-position STI to the indirect IEC 60268-16 method, and is not the one
+checked here. The crowd self-noise model is a *design* calculation and
 deliberately does not model the Lombard reflex: it cancels out of $L_{SN}$ as
 long as everyone raises their voice equally, so the model explains why the
 level spirals upward in a hard room rather than predicting where it stops. It
 also assumes a diffuse reverberant field and a single absorption figure per
 table, so it says nothing about screens, local absorption or where in the room
 a given table sits.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

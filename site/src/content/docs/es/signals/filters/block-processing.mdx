@@ -26,6 +26,8 @@ references:
     note: "Las ponderaciones frecuenciales y temporales en streaming son los mismos diseños que rige esta norma; el estado transportado mantiene válidas en streaming las afirmaciones de clase y tolerancia de las páginas de ponderación frecuencial y temporal."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Algunas mediciones nunca caben en memoria: una grabación ambiental de una hora,
@@ -384,30 +386,35 @@ a menos que pases `True` explícitamente.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La IEC 61260-1:2014 y la IEC 61672-1:2013 exactamente en la
-medida en que ya las implementan [Bancos de
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La IEC 61260-1:2014 y la IEC 61672-1:2013 exactamente en la medida en que ya
+las implementan [Bancos de
 filtros](/phonometry/es/signals/filters/filter-banks/), [Ponderación
 frecuencial](/phonometry/es/signals/levels/weighting/) y [Ponderación
 temporal](/phonometry/es/signals/levels/time-weighting/): `stateful=True` en
-`OctaveFilterBank`, `WeightingFilter` y `TimeWeighting` conserva el estado
-de sección en forma directa II transpuesta ($z_1$, $z_2$), o el último valor
-de la envolvente en `TimeWeighting`, entre fronteras de bloque, de modo que
-la salida en streaming concatenada es exactamente igual, bit a bit, a una
-sola pasada sobre la señal completa. Esta página no añade contenido
-normativo propio; solo demuestra y documenta esa equivalencia.
+`OctaveFilterBank`, `WeightingFilter` y `TimeWeighting` conserva el estado de
+sección en forma directa II transpuesta ($z_1$, $z_2$), o el último valor de
+la envolvente en `TimeWeighting`, entre fronteras de bloque, de modo que la
+salida en streaming concatenada es exactamente igual, bit a bit, a una sola
+pasada sobre la señal completa. Esta página no añade contenido normativo
+propio; solo demuestra y documenta esa equivalencia.
+</ScopeClaim>
 
-**No cubierto.** El filtrado bidireccional `zero_phase` necesita la señal
-completa, así que no se admite en modo con estado; usa la vía offline
-de [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. El
-diseño `high_accuracy` de ponderación se resuelve al filtro bilineal
-clásico en modo con estado (pasar `True` explícitamente lanza
-`ValueError`), porque su etapa de remuestreo polifásico no es compatible
-con bloques; consulta [Ponderación
+<ScopeClaim status="not-covered" label="No cubierto">
+El filtrado bidireccional `zero_phase` necesita la señal completa, así que no
+se admite en modo con estado; usa la vía offline de [Bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. El diseño
+`high_accuracy` de ponderación se resuelve al filtro bilineal clásico en modo
+con estado (pasar `True` explícitamente lanza `ValueError`), porque su etapa
+de remuestreo polifásico no es compatible con bloques; consulta [Ponderación
 frecuencial](/phonometry/es/signals/levels/weighting/) para el diseño de alta
 precisión offline. Los estadísticos de rango como $L_{90}$ tampoco admiten
 streaming: procesa la envolvente en streaming y calcula los percentiles una
 vez sobre el resultado conjunto, como describe [Niveles integrados y
 estadísticos](/phonometry/es/signals/levels/levels/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

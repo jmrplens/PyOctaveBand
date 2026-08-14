@@ -82,8 +82,8 @@ Pages elsewhere on the site that this section leans on:
 
 The junction coefficients are a **closed-form idealisation** for a rigid,
 simply supported junction between homogeneous plates, not a measurement: the
-empirical vibration reduction index obtained from a direction-averaged velocity
-level difference is ISO 10848, in [Laboratory flanking
+empirical vibration reduction index obtained from a direction-averaged
+velocity level difference is ISO 10848, in [Laboratory flanking
 transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/). The
 straight-section coefficient is undefined for the T and L geometries, which
 have no collinear third plate, so only the corner path applies there.

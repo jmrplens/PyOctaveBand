@@ -33,8 +33,10 @@ references:
     note: "La teoría estadística de la reverberación que las fórmulas de la norma especializan."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 **EN 12354-6:2003** predice el **área de absorción acústica equivalente total** de
 una sala y su **tiempo de reverberación** a partir de la absorción de sus
@@ -578,25 +580,32 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El apartado 4 de la EN 12354-6:2003: el área de absorción acústica
-equivalente total de las Fórmulas 1 a 4 con sus términos de superficies, objetos,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El apartado 4 de la EN 12354-6:2003: el área de absorción acústica equivalente
+total de las Fórmulas 1 a 4 con sus términos de superficies, objetos,
 conjuntos de objetos y aire (`room.equivalent_absorption_area`,
 `room.hard_object_absorption`, `room.object_fraction`,
 `room.air_absorption_area`), el tiempo de reverberación de la Fórmula 5
 (`room.reverberation_time`), la cadena por bandas de octava
-(`room.enclosed_space_reverberation`) y la ficha de una página con `.report()`,
-validados frente a los tres casos resueltos del Anexo E. Las reglas de datos de
-entrada del apartado 4.2, las interpretaciones del apartado 4.5 y los límites del
-apartado 4.6 están en el §3, y la inversión de diseño de la Fórmula 5 en el §2b.
+(`room.enclosed_space_reverberation`) y la ficha de una página con
+`.report()`, validados frente a los tres casos resueltos del Anexo E. Las
+reglas de datos de entrada del apartado 4.2, las interpretaciones del apartado
+4.5 y los límites del apartado 4.6 están en el §3, y la inversión de diseño de
+la Fórmula 5 en el §2b.
+</ScopeClaim>
 
-**No cubierto.** El método informativo del Anexo D para recintos irregulares y
-distribución irregular de la absorción, que es adonde la propia norma manda los
-casos que incumplen el apartado 4.6 (incluido su propio caso 3 del Anexo E). Las
-exclusiones de alcance de la norma — espacios muy grandes o de forma irregular,
-como auditorios, teatros y naves industriales — quedan fuera del modelo más que
-fuera de esta implementación. Aquí nada emite un veredicto: la EN 12354-6 da una
-estimación de campo difuso, y un objetivo pasado por `requirement` se dibuja solo
-como línea de referencia.
+<ScopeClaim status="not-covered" label="No cubierto">
+El método informativo del Anexo D para recintos irregulares y distribución
+irregular de la absorción, que es adonde la propia norma manda los casos que
+incumplen el apartado 4.6 (incluido su propio caso 3 del Anexo E). Las
+exclusiones de alcance de la norma — espacios muy grandes o de forma
+irregular, como auditorios, teatros y naves industriales — quedan fuera del
+modelo más que fuera de esta implementación. Aquí nada emite un veredicto: la
+EN 12354-6 da una estimación de campo difuso, y un objetivo pasado por
+`requirement` se dibuja solo como línea de referencia.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

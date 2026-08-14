@@ -32,6 +32,8 @@ references:
     note: "ESTOI: la normalización en media y varianza de las filas y las columnas del espectrograma de corto plazo (Ecs. 4-7) y el índice intermedio de correlación espectral (Ec. 8)."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 **STOI** y **ESTOI** son medidas de inteligibilidad objetiva basadas en
@@ -445,22 +447,28 @@ sí: un procesador puede subir el STOI mientras la sala mantiene un STI pobre.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Taal et al. 2011 (STOI) y Jensen y Taal 2016 (ESTOI), las dos
-medidas basadas en correlación que implementa `stoi()`: el procesado inicial
-común de remuestreo a 10 kHz, tramas Hann de 256 muestras, 15 bandas de tercio
-de octava, segmentos de 384 ms y la eliminación de tramas silenciosas a 40 dB
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Taal et al. 2011 (STOI) y Jensen y Taal 2016 (ESTOI), las dos medidas basadas
+en correlación que implementa `stoi()`: el procesado inicial común de
+remuestreo a 10 kHz, tramas Hann de 256 muestras, 15 bandas de tercio de
+octava, segmentos de 384 ms y la eliminación de tramas silenciosas a 40 dB
 (Taal et al. 2011, Ecs. 1-4); la correlación de envolventes por banda y el
 índice promediado (Ecs. 5-6); y, con `extended=True`, la normalización por
 filas y columnas del espectrograma y el índice de correlación espectral
 (Jensen y Taal 2016, Ecs. 4-8).
+</ScopeClaim>
 
-**No cubierto.** Taal et al. 2011 también ajusta una función logística que
-convierte el índice $d$ en un porcentaje de palabras entendidas previsto,
-calibrada sobre corpus concretos de pruebas de escucha. `stoi()` devuelve
-solo $d$, como `STOIResult.value`, no ese porcentaje: la API no tiene salida
-de porcentaje ni coeficientes ajustados. El artículo de ICASSP de 2010 se
-cita solo como la versión corta de congreso del mismo algoritmo, sin añadir
-nada implementado más allá de las ecuaciones de 2011/2016 anteriores.
+<ScopeClaim status="not-covered" label="No cubierto">
+Taal et al. 2011 también ajusta una función logística que convierte el índice
+$d$ en un porcentaje de palabras entendidas previsto, calibrada sobre corpus
+concretos de pruebas de escucha. `stoi()` devuelve solo $d$, como
+`STOIResult.value`, no ese porcentaje: la API no tiene salida de porcentaje ni
+coeficientes ajustados. El artículo de ICASSP de 2010 se cita solo como la
+versión corta de congreso del mismo algoritmo, sin añadir nada implementado
+más allá de las ecuaciones de 2011/2016 anteriores.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

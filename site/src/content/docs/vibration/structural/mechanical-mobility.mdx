@@ -26,8 +26,10 @@ references:
     note: "The measurement side: the 8.1.3 H1 processing of random excitation, the 7.5.2 rigid-mass operational calibration (±5 %) and the Annex A random-error criterion (< 5 % at resonances). Conformance is anchored on the rigid-mass calibration values (|A| = 0.100 1/kg for 10 kg; |Y| = 1.59155e-4 m/(N·s) at 100 Hz) and the Annex A example (γ² = 0.8, n = 75 → ε = 4.08 %)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Mechanical **mobility** is the complex ratio of a velocity response to the
 force that produces it, $Y = v/F$. It is one member of a family of
@@ -679,36 +681,41 @@ res.report(
 
 ## What this guide covers
 
-**Covered.** ISO 7626-1:2011's FRF family (Table 1): receptance, mobility
-and accelerance, with their force-per-motion reciprocals, moved between
-through `convert_frf`. Also covered are the driving-point/transfer
-distinction and the closed-form SDOF resonator used as their reference
-(`sdof_receptance`, `sdof_mobility`, `sdof_accelerance`,
-`resonance_frequency`, `sdof_mobility_result`), and the infinite-structure
-point mobilities that stand in for a real plate, beam or strut
-(`infinite_plate_point_mobility`, `infinite_beam_point_mobility`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 7626-1:2011's FRF family (Table 1): receptance, mobility and accelerance,
+with their force-per-motion reciprocals, moved between through `convert_frf`.
+Also covered are the driving-point/transfer distinction and the closed-form
+SDOF resonator used as their reference (`sdof_receptance`, `sdof_mobility`,
+`sdof_accelerance`, `resonance_frequency`, `sdof_mobility_result`), and the
+infinite-structure point mobilities that stand in for a real plate, beam or
+strut (`infinite_plate_point_mobility`, `infinite_beam_point_mobility`,
 `infinite_beam_moment_mobility`, `longitudinal_rod_mobility` and their
 impedance reciprocals, with `plate_bending_stiffness` and
-`beam_bending_wave_speed`). On the measurement side,
-ISO 7626-2:2015's H1 processing of random excitation is covered too
-(`transfer_function`, `coherence`, shared with the electroacoustics guide),
-along with two acceptance criteria: the 7.5.2 rigid-mass operational
-calibration (`rigid_mass_calibration_check`) and the Annex A random-error
-criterion (`random_error_percent`).
+`beam_bending_wave_speed`). On the measurement side, ISO 7626-2:2015's H1
+processing of random excitation is covered too (`transfer_function`,
+`coherence`, shared with the electroacoustics guide), along with two
+acceptance criteria: the 7.5.2 rigid-mass operational calibration
+(`rigid_mass_calibration_check`) and the Annex A random-error criterion
+(`random_error_percent`).
+</ScopeClaim>
 
-**Not covered.** ISO 7626-5 covers impact-hammer excitation as an
-alternative to the attached exciter. It is named here for context only: no
-function synthesizes or processes an impact-excitation spectrum. The
-*blocked* matrix quantities of Table 1, needed for multi-coordinate
-systems, are not built either. `convert_frf` returns only the element-wise
-*free* reciprocals of ISO 7626-1, 3.1.4, correct for driving-point or
-single-path use but not for a full FRF matrix. Of the acceptance procedure,
-only the two criteria above are computed: the clause 5.3 suspension rules, the
-clause 6.4.4 exciter-attachment criterion, the clause 7.3 mass-cancellation
-trigger and the A.2 to A.4 linearity, reciprocity and driving-point tests are
-described here and left to the operator, in the same way ISO 10846's
-Inequality 3 is described but not computed on the
-[transfer-stiffness page](/phonometry/vibration/structural/transfer-stiffness/).
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 7626-5 covers impact-hammer excitation as an alternative to the attached
+exciter. It is named here for context only: no function synthesizes or
+processes an impact-excitation spectrum. The *blocked* matrix quantities of
+Table 1, needed for multi-coordinate systems, are not built either.
+`convert_frf` returns only the element-wise *free* reciprocals of ISO 7626-1,
+3.1.4, correct for driving-point or single-path use but not for a full FRF
+matrix. Of the acceptance procedure, only the two criteria above are computed:
+the clause 5.3 suspension rules, the clause 6.4.4 exciter-attachment
+criterion, the clause 7.3 mass-cancellation trigger and the A.2 to A.4
+linearity, reciprocity and driving-point tests are described here and left to
+the operator, in the same way ISO 10846's Inequality 3 is described but not
+computed on the [transfer-stiffness
+page](/phonometry/vibration/structural/transfer-stiffness/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -29,6 +29,8 @@ references:
     note: "El balance de reproducibilidad específico de la acústica de la edificación para magnitudes de número único, complemento aparte de la maquinaria general de la GUM."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Todo resultado de medida está incompleto sin una declaración de su
@@ -456,28 +458,34 @@ siempre que tu modelo de medición no sea uno de esos casos normalizados:
 
 ## Qué cubre esta guía
 
-**Cubierto.** De la GUM: la ley de propagación del apartado 5 con los
-coeficientes de sensibilidad evaluados numéricamente, la evaluación de Tipo A del
-apartado 4.2 como el par `uncertainty`/`dof` de una `Quantity`, las evaluaciones
-de Tipo B del apartado 4.3 (`rectangular`, `triangular`, `u_shaped`), las
-entradas correlacionadas mediante una matriz de correlación, los grados de
-libertad efectivos de Welch–Satterthwaite del Anexo G.4 y el factor de cobertura
-del Anexo G, validado todo ello contra los balances del bloque patrón del anexo
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+De la GUM: la ley de propagación del apartado 5 con los coeficientes de
+sensibilidad evaluados numéricamente, la evaluación de Tipo A del apartado 4.2
+como el par `uncertainty`/`dof` de una `Quantity`, las evaluaciones de Tipo B
+del apartado 4.3 (`rectangular`, `triangular`, `u_shaped`), las entradas
+correlacionadas mediante una matriz de correlación, los grados de libertad
+efectivos de Welch–Satterthwaite del Anexo G.4 y el factor de cobertura del
+Anexo G, validado todo ello contra los balances del bloque patrón del anexo
 H.1 y de la resistencia del anexo H.2. Del Suplemento 1: la propagación de
 distribuciones por Monte Carlo con el intervalo de cobertura simétrico en
 probabilidad del apartado 7.7, comprobada contra los ejemplos resueltos del
 apartado 9.2.
+</ScopeClaim>
 
-**No cubierto.** El procedimiento adaptativo de número de ensayos del apartado
-7.9 del Suplemento 1 (el número de ensayos es fijo, con un mínimo de 2), el
-intervalo de cobertura más corto del apartado 5.3.4 y el muestreo gaussiano
-multivariante del apartado 6.4.8, de modo que un balance correlacionado se queda
-con `combine_uncertainty`. El Suplemento 2 (varias magnitudes de salida) no está
-implementado en absoluto. La validación del marco de la GUM contra el resultado
-de Monte Carlo del apartado 8 es una comparación que se hace leyendo los dos
-resultados, no un veredicto automático. Los balances de dominio que prescriben
-las normas de acústica (ISO 1996-2, ISO 12999-1 y -2, ISO 9612) se implementan en
-sus propias páginas, listadas arriba, y no se derivan aquí.
+<ScopeClaim status="not-covered" label="No cubierto">
+El procedimiento adaptativo de número de ensayos del apartado 7.9 del
+Suplemento 1 (el número de ensayos es fijo, con un mínimo de 2), el intervalo
+de cobertura más corto del apartado 5.3.4 y el muestreo gaussiano
+multivariante del apartado 6.4.8, de modo que un balance correlacionado se
+queda con `combine_uncertainty`. El Suplemento 2 (varias magnitudes de salida)
+no está implementado en absoluto. La validación del marco de la GUM contra el
+resultado de Monte Carlo del apartado 8 es una comparación que se hace leyendo
+los dos resultados, no un veredicto automático. Los balances de dominio que
+prescriben las normas de acústica (ISO 1996-2, ISO 12999-1 y -2, ISO 9612) se
+implementan en sus propias páginas, listadas arriba, y no se derivan aquí.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -25,8 +25,10 @@ references:
     note: "La contraparte en campo del método por intensidad, que da el índice aparente R'_I."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una cámara reverberante lee la potencia acústica transmitida de forma
 *indirecta*: el recinto receptor integra cada vatio que llega, lo traiga la vía
@@ -508,33 +510,36 @@ rango útil en baja frecuencia.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El índice de reducción acústica por intensidad $R_I$ de
-ISO 15186-1:2000 (apartado 3.8), su $R_{I,M}$ modificado con $K_c$ (Anexo B)
-y la $D_{I,n,e}$ normalizada de elemento (apartado 3.9), con la combinación
-de subáreas de las Fórmulas (11)-(12) y el indicador presión-intensidad de
-la superficie, mediante `building.intensity_sound_reduction`,
-`building.adaptation_term_kc`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El índice de reducción acústica por intensidad $R_I$ de ISO 15186-1:2000
+(apartado 3.8), su $R_{I,M}$ modificado con $K_c$ (Anexo B) y la $D_{I,n,e}$
+normalizada de elemento (apartado 3.9), con la combinación de subáreas de las
+Fórmulas (11)-(12) y el indicador presión-intensidad de la superficie,
+mediante `building.intensity_sound_reduction`, `building.adaptation_term_kc`,
 `building.intensity_element_normalized_difference`,
-`building.surface_pressure_intensity_indicator` y
-`building.combine_subareas`; los índices globales reutilizan el motor
-verificado de ISO 717-1, y ambos resultados escriben la ficha de ensayo de
-una página con `.report()`.
+`building.surface_pressure_intensity_indicator` y `building.combine_subareas`;
+los índices globales reutilizan el motor verificado de ISO 717-1, y ambos
+resultados escriben la ficha de ensayo de una página con `.report()`.
+</ScopeClaim>
 
-**No cubierto.** La propia medición de intensidad acústica (la sonda de
-barrido, la adquisición con dos micrófonos y la calibración del desajuste de
-fase tras $L_{p1}$ y $L_{In}$) no está implementada: ambos niveles se toman
-como entradas ya medidas, y la ficha de ISO 15186-1 declara explícitamente
-que no tiene campo para la geometría de la superficie de medición ni para el
-método de adquisición por barrido o por puntos discretos. Aquí tampoco se
-impone la adquisición del apartado 6.4 documentada más arriba: la separación de
-0,1 a 0,3 m, la velocidad de barrido de 0,1 a 0,3 m/s, el segundo barrido
-girado 90° y su prueba de validez de 1,0 dB, el margen de 10 dB sobre el ruido
-de fondo. Un solo barrido produce un número igual de fácilmente que una pareja
-cualificada. Tampoco están
-implementados el procedimiento de campo propio de ISO 15186-2 (posiciones
-de altavoz, los casos de fachada) ni la variante de baja frecuencia de la
-parte 3: las fórmulas de esta página se aplican sin cambios a datos de
-campo, pero nada comprueba cómo se adquirieron.
+<ScopeClaim status="not-covered" label="No cubierto">
+La propia medición de intensidad acústica (la sonda de barrido, la adquisición
+con dos micrófonos y la calibración del desajuste de fase tras $L_{p1}$ y
+$L_{In}$) no está implementada: ambos niveles se toman como entradas ya
+medidas, y la ficha de ISO 15186-1 declara explícitamente que no tiene campo
+para la geometría de la superficie de medición ni para el método de
+adquisición por barrido o por puntos discretos. Aquí tampoco se impone la
+adquisición del apartado 6.4 documentada más arriba: la separación de 0,1 a
+0,3 m, la velocidad de barrido de 0,1 a 0,3 m/s, el segundo barrido girado 90°
+y su prueba de validez de 1,0 dB, el margen de 10 dB sobre el ruido de fondo.
+Un solo barrido produce un número igual de fácilmente que una pareja
+cualificada. Tampoco están implementados el procedimiento de campo propio de
+ISO 15186-2 (posiciones de altavoz, los casos de fachada) ni la variante de
+baja frecuencia de la parte 3: las fórmulas de esta página se aplican sin
+cambios a datos de campo, pero nada comprueba cómo se adquirieron.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

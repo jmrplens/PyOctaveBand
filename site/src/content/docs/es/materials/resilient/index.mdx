@@ -3,6 +3,9 @@ title: "Capas elásticas"
 description: "La propiedad mecánica en torno a la que se diseña un suelo flotante: la rigidez dinámica por unidad de superficie de una capa elástica, la resonancia de placa de carga de EN 29052-1 que la mide, el término del gas encerrado y la frecuencia natural que fija bajo una solera."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Un suelo flotante es un sistema masa-resorte: la solera es la masa, la capa
 elástica es el resorte, y la mejora a ruido de impactos que compra el
 conjunto empieza por encima de la resonancia que fijan entre los dos. Esa
@@ -61,14 +64,19 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
-La medición empieza un paso después de la señal. La extracción de la frecuencia
-de resonancia de la señal bruta de excitación-respuesta del apartado 7 — por
-excitación sinusoidal, de ruido blanco o de impulso — y su extrapolación a
-amplitud de fuerza nula **no están implementadas**: pasa una frecuencia de
-resonancia ya extrapolada. La resistividad lateral al flujo de aire es una
-entrada, no una medición. El requisito de selección de probetas del apartado
-6, al menos tres probetas de 200 mm × 200 mm, no se aplica, así que nada aquí
-protesta si caracterizas un material a partir de una sola. Y las demás
-propiedades de la capa — fluencia bajo carga de larga duración, resistencia a
-compresión, comportamiento térmico — quedan fuera de la norma y fuera de la
-biblioteca.
+<Scope>
+<ScopeClaim status="not-covered">
+La medición empieza un paso después de la señal. La extracción de la
+frecuencia de resonancia de la señal bruta de excitación-respuesta del
+apartado 7 — por excitación sinusoidal, de ruido blanco o de impulso — y su
+extrapolación a amplitud de fuerza nula **no están implementadas**: pasa una
+frecuencia de resonancia ya extrapolada. La resistividad lateral al flujo de
+aire es una entrada, no una medición. El requisito de selección de probetas
+del apartado 6, al menos tres probetas de 200 mm × 200 mm, no se aplica, así
+que nada aquí protesta si caracterizas un material a partir de una sola. Y las
+demás propiedades de la capa — fluencia bajo carga de larga duración,
+resistencia a compresión, comportamiento térmico — quedan fuera de la norma y
+fuera de la biblioteca.
+</ScopeClaim>
+</Scope>
+

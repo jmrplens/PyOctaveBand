@@ -25,6 +25,8 @@ references:
     note: "The acoustic calibrator assumed by the sensitivity stage: the 94 dB principal level and the short-term stability check applied to the reference recording."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
@@ -383,25 +385,31 @@ check (b) catches.
 
 ## What this guide covers
 
-**Covered.** This page composes stages already implemented elsewhere into
-the pipeline IEC 61672-1:2013 describes: the A frequency weighting and Fast
-exponential time weighting, $L_{Aeq}$, percentile levels, sound exposure level
-and the C-weighted peak, the IEC 61260-1:2014 octave-band filters of
-`octave_filter`, and the Table 3 (weighting) and Table 1 (filter) class
-acceptance limits checked by `verify_weighting_class` and
-`verify_filter_class`. Each stage's own guide states its coverage in detail.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+This page composes stages already implemented elsewhere into the pipeline IEC
+61672-1:2013 describes: the A frequency weighting and Fast exponential time
+weighting, $L_{Aeq}$, percentile levels, sound exposure level and the
+C-weighted peak, the IEC 61260-1:2014 octave-band filters of `octave_filter`,
+and the Table 3 (weighting) and Table 1 (filter) class acceptance limits
+checked by `verify_weighting_class` and `verify_filter_class`. Each stage's
+own guide states its coverage in detail.
+</ScopeClaim>
 
-**Not covered.** `verify_weighting_class` and `verify_filter_class` check
-the frequency-response design of the digital filters against the standards'
+<ScopeClaim status="not-covered" label="Not covered">
+`verify_weighting_class` and `verify_filter_class` check the
+frequency-response design of the digital filters against the standards'
 tables; they do not perform the IEC 61672-2:2013 pattern-evaluation tests a
 physical instrument needs for type approval, such as self-generated noise,
-linearity range, overload indication or directional response, nor the
-IEC 61672-3:2013 periodic tests a working instrument receives. A class
-verdict from this page describes the algorithm, not a built device, and the
-three checks of step 7 screen the *recording*, not the instrument. The
-IEC 60942:2017 calibrator conformance tests are likewise not run here; see
-the [calibration guide](/phonometry/signals/metrology/calibration/) for exactly what
-`sensitivity()` does and does not check.
+linearity range, overload indication or directional response, nor the IEC
+61672-3:2013 periodic tests a working instrument receives. A class verdict
+from this page describes the algorithm, not a built device, and the three
+checks of step 7 screen the *recording*, not the instrument. The IEC
+60942:2017 calibrator conformance tests are likewise not run here; see the
+[calibration guide](/phonometry/signals/metrology/calibration/) for exactly
+what `sensitivity()` does and does not check.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -3,6 +3,9 @@ title: "Sonido en exteriores"
 description: "El sonido en su camino por el aire libre: el modelo de propagación ISO 9613 con su desglose de atenuación término a término, el efecto suelo esférico por acústica ondulatoria y la difracción de barreras avanzada que hay debajo, y la atmósfera refractante que ambos suponen inexistente: rayos curvos, zonas de sombra y la ecuación parabólica."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
 Esta sección es el **camino**: lo que le pasa a un sonido entre una fuente de
 potencia conocida y un receptor a cientos de metros. Sus tres páginas van del
 método de ingeniería a la física que aproxima, y de ahí a lo único que ambos
@@ -91,20 +94,26 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 
 ## Qué no cubre esta sección
 
+<Scope>
+<ScopeClaim status="not-covered">
 Son modelos punto a punto, no un motor de mapas. Cada llamada toma una fuente,
 un receptor y el suelo entre ambos; no hay perfil de elevación del terreno, ni
 geometría de edificios, ni capa GIS, los dos modelos de refracción suponen un
 suelo plano a altura cero y un perfil que varía solo con la altura y no a lo
-largo del camino, y cómo se descompone una línea fuente en fuentes puntuales lo
-declara fuera de alcance el propio CNOSSOS. El **método de propagación de
-CNOSSOS-EU del apartado 2.5 no está implementado**: es un modelo distinto de la
-ISO 9613-2, así que un cálculo que empareje potencias de fuente CNOSSOS con el
-camino de aquí no es un cálculo CNOSSOS. El modelo coherente de barrera sobre
-suelo pondera sus cuatro caminos difractados con un único coeficiente de
-reflexión calculado sobre la geometría global, así que es coherente y recíproco
-pero no es una solución por elementos de contorno, y ningún modelo de aquí
-calcula la dispersión por turbulencia: la ISO 9613-2 la absorbe en los topes
-fijos de su término de apantallamiento, y las páginas de acústica ondulatoria y
-de refracción suponen sin más una atmósfera no turbulenta. Nada de estas páginas
-produce una evaluación: ni Lden, ni valor límite, ni veredicto — eso es
-[Evaluación y normativa](/phonometry/es/environment/assessment/).
+largo del camino, y cómo se descompone una línea fuente en fuentes puntuales
+lo declara fuera de alcance el propio CNOSSOS. El **método de propagación de
+CNOSSOS-EU del apartado 2.5 no está implementado**: es un modelo distinto de
+la ISO 9613-2, así que un cálculo que empareje potencias de fuente CNOSSOS con
+el camino de aquí no es un cálculo CNOSSOS. El modelo coherente de barrera
+sobre suelo pondera sus cuatro caminos difractados con un único coeficiente de
+reflexión calculado sobre la geometría global, así que es coherente y
+recíproco pero no es una solución por elementos de contorno, y ningún modelo
+de aquí calcula la dispersión por turbulencia: la ISO 9613-2 la absorbe en los
+topes fijos de su término de apantallamiento, y las páginas de acústica
+ondulatoria y de refracción suponen sin más una atmósfera no turbulenta. Nada
+de estas páginas produce una evaluación: ni Lden, ni valor límite, ni
+veredicto — eso es [Evaluación y
+normativa](/phonometry/es/environment/assessment/).
+</ScopeClaim>
+</Scope>
+

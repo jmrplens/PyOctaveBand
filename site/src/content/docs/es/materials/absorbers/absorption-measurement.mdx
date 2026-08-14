@@ -33,8 +33,10 @@ references:
     note: "La incertidumbre de medida de la absorción acústica de la sección 4, validada frente a los ejemplos resueltos de la propia norma (Tablas 4/5)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 De todos los números que produce un laboratorio de materiales, el coeficiente
@@ -933,44 +935,49 @@ Sabine o de EN 12354-6 subestima sistemáticamente la absorción instalada.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La inversión de Sabine de ISO 354:2003 (Ecs. (5)-(9)) en
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La inversión de Sabine de ISO 354:2003 (Ecs. (5)-(9)) en
 `measure_sound_absorption`, y la conversión (apartados 4/8.1) de una pareja
 $T_1$/$T_2$ ya medida en `absorption_area` y `absorption_coefficient` (con
-`attenuation_from_alpha` para el término del aire). La valoración ponderada
-de absorción de ISO 11654:1997: el coeficiente práctico del apartado 4.1,
-el desplazamiento de la curva de referencia del apartado 4.2, los
-indicadores de forma del apartado 4.3 y la clase de absorción de la
-Tabla B.1, construidos por `weighted_absorption` y
-`weighted_absorption_from_third_octave`. Las fórmulas de incertidumbre de
-medida de ISO 12999-2:2020 (apartados 5-8), una función por magnitud:
-`sound_absorption_coefficient_uncertainty` (fórmula (1)),
-`equivalent_area_uncertainty` (fórmula (2)),
+`attenuation_from_alpha` para el término del aire). La valoración ponderada de
+absorción de ISO 11654:1997: el coeficiente práctico del apartado 4.1, el
+desplazamiento de la curva de referencia del apartado 4.2, los indicadores de
+forma del apartado 4.3 y la clase de absorción de la Tabla B.1, construidos
+por `weighted_absorption` y `weighted_absorption_from_third_octave`. Las
+fórmulas de incertidumbre de medida de ISO 12999-2:2020 (apartados 5-8), una
+función por magnitud: `sound_absorption_coefficient_uncertainty` (fórmula
+(1)), `equivalent_area_uncertainty` (fórmula (2)),
 `practical_coefficient_uncertainty` (apartado 6),
 `weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`
 (apartado 7), cada una admitiendo `condition="reproducibility"` o
-`"repeatability"` para la fórmula (3), con el factor de cobertura de la Tabla 3
-en `absorption_coverage_factor`.
+`"repeatability"` para la fórmula (3), con el factor de cobertura de la Tabla
+3 en `absorption_coverage_factor`.
+</ScopeClaim>
 
-**No cubierto.** Nada de *esta* página consume una impedancia superficial
-medida: la conversión de un resultado de tubo al coeficiente estadístico
-$\alpha_{st}$ vive con los modelos de predicción (`statistical_absorption` para
-una superficie de reacción local, `diffuse_field_absorption` para una de
-reacción volumétrica), y ninguno de los dos sustituye a una medición según
-ISO 354, porque ninguno reproduce el efecto de borde. Los requisitos de sala y
-de probeta del apartado 6 y del Anexo A se *describen* en las secciones 1.2 y
-1.3, pero no se *comprueban*: nada de aquí verifica la regla de forma, el techo
-de la Tabla 1 sobre $A_1$, la cualificación de difusividad ni el número de
-posiciones de micrófono y de fuente, y `absorption_area` /
-`absorption_coefficient` solo convierten una pareja $T_1$/$T_2$ ya medida y
-emiten un aviso cuando el volumen de la sala o el área de la probeta salen de
-los límites del apartado 6. Tampoco entra en el alcance la propia medida del
-decaimiento: los métodos de ruido interrumpido y de respuesta al impulso
-integrada del apartado 7 pertenecen a la
-[acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/). La fórmula
-de incertidumbre de ISO 12999-2 para la valoración de número único de EN 1793-1
-$DL_{\alpha,\text{NRD}}$ está implementada, pero el propio método de medida
-in situ de EN 1793-1 (dispositivos reductores de ruido de tráfico rodado) no
-lo está.
+<ScopeClaim status="not-covered" label="No cubierto">
+Nada de *esta* página consume una impedancia superficial medida: la conversión
+de un resultado de tubo al coeficiente estadístico $\alpha_{st}$ vive con los
+modelos de predicción (`statistical_absorption` para una superficie de
+reacción local, `diffuse_field_absorption` para una de reacción volumétrica),
+y ninguno de los dos sustituye a una medición según ISO 354, porque ninguno
+reproduce el efecto de borde. Los requisitos de sala y de probeta del apartado
+6 y del Anexo A se *describen* en las secciones 1.2 y 1.3, pero no se
+*comprueban*: nada de aquí verifica la regla de forma, el techo de la Tabla 1
+sobre $A_1$, la cualificación de difusividad ni el número de posiciones de
+micrófono y de fuente, y `absorption_area` / `absorption_coefficient` solo
+convierten una pareja $T_1$/$T_2$ ya medida y emiten un aviso cuando el
+volumen de la sala o el área de la probeta salen de los límites del apartado 6.
+Tampoco entra en el alcance la propia medida del decaimiento: los métodos de
+ruido interrumpido y de respuesta al impulso integrada del apartado 7
+pertenecen a la [acústica de
+salas](/phonometry/es/buildings/rooms/room-acoustics/). La fórmula de
+incertidumbre de ISO 12999-2 para la valoración de número único de EN 1793-1
+$DL_{\alpha,\text{NRD}}$ está implementada, pero el propio método de medida in
+situ de EN 1793-1 (dispositivos reductores de ruido de tráfico rodado) no lo
+está.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

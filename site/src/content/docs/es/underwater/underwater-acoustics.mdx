@@ -46,6 +46,8 @@ references:
     note: "La exposición sonora por golpe (Fórmulas 3–4), de pico y acumulada (Fórmulas 8–9) de la sección 3, y el nivel de presión acústica cuadrático medio (Fórmula 7) de la sección 1."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 El sonido submarino se refiere a **1 µPa** (no los 20 µPa de la acústica en
@@ -450,34 +452,40 @@ criterios de inicio publicados) es
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 18405:2017 para los niveles de referencia re 1 µPa y
-1 µPa²·s: `sound_pressure_level`, `sound_exposure_level` y
-`peak_sound_pressure_level`. Las ISO 17208-1:2016 e ISO 17208-2:2019 para el
-nivel de ruido radiado del buque y el nivel de fuente monopolar equivalente:
-`radiated_noise_level` y `monopole_source_level`, con la corrección de
-superficie de espejo de Lloyd (ISO 17208-2 Fórmula 3) y la profundidad de
-fuente de 0,7·calado (ISO 17208-2 Fórmula 1), la geometría de tres hidrófonos
-(`hydrophone_depths`) y la incertidumbre tabulada del nivel de fuente
-(`source_level_uncertainty`). La ISO 18406:2017 para las métricas de hincado
-de pilotes de la sección 3: la exposición sonora por golpe (ISO 18406
-Fórmulas 3-4), el SPL cuadrático medio (ISO 18406 Fórmula 7) y la exposición
-sonora acumulada (ISO 18406 Fórmulas 8-9), que calculan `single_strike_sel`,
-`cumulative_sel`, `cumulative_sel_identical` y `pile_strike_metrics`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 18405:2017 para los niveles de referencia re 1 µPa y 1 µPa²·s:
+`sound_pressure_level`, `sound_exposure_level` y `peak_sound_pressure_level`.
+Las ISO 17208-1:2016 e ISO 17208-2:2019 para el nivel de ruido radiado del
+buque y el nivel de fuente monopolar equivalente: `radiated_noise_level` y
+`monopole_source_level`, con la corrección de superficie de espejo de Lloyd
+(ISO 17208-2 Fórmula 3) y la profundidad de fuente de 0,7·calado (ISO 17208-2
+Fórmula 1), la geometría de tres hidrófonos (`hydrophone_depths`) y la
+incertidumbre tabulada del nivel de fuente (`source_level_uncertainty`). La
+ISO 18406:2017 para las métricas de hincado de pilotes de la sección 3: la
+exposición sonora por golpe (ISO 18406 Fórmulas 3-4), el SPL cuadrático medio
+(ISO 18406 Fórmula 7) y la exposición sonora acumulada (ISO 18406 Fórmulas
+8-9), que calculan `single_strike_sel`, `cumulative_sel`,
+`cumulative_sel_identical` y `pile_strike_metrics`.
+</ScopeClaim>
 
-**No cubierto.** La disciplina de medida de la ISO 17208-1 en sí no está
-implementada: el promediado en potencia y aritmético de cuatro pasadas y tres
-hidrófonos (ISO 17208-1 Fórmulas 8-9), las comprobaciones de geometría de CPA y
-profundidad de agua, la puntuación de la ventana de datos de ±30° y la
-corrección de ruido de fondo al estilo ISO 3744 descrita en la sección 2
-anterior quedan a cargo del lector; la biblioteca solo aporta las fórmulas
-cerradas `radiated_noise_level` y `monopole_source_level`. Lo mismo vale para
-la campaña de la ISO 18406 de la sección 3: los requisitos de despliegue,
-instrumento, calibración e informe se describen aquí y no se hacen cumplir en
-ningún sitio del código, y nada comprueba que un golpe entregado a
-`pile_strike_metrics` venga de un registro que los cumpla. La propia ISO 18406
-excluye de su alcance el vibrohincado y las tablestacas, y el hincado en menos
-de 4 m o más de 100 m de agua (apartado 1), así que el ruido del hincado
-continuo no tiene forma cerrada aquí ni en ningún otro lugar de phonometry.
+<ScopeClaim status="not-covered" label="No cubierto">
+La disciplina de medida de la ISO 17208-1 en sí no está implementada: el
+promediado en potencia y aritmético de cuatro pasadas y tres hidrófonos (ISO
+17208-1 Fórmulas 8-9), las comprobaciones de geometría de CPA y profundidad de
+agua, la puntuación de la ventana de datos de ±30° y la corrección de ruido de
+fondo al estilo ISO 3744 descrita en la sección 2 anterior quedan a cargo del
+lector; la biblioteca solo aporta las fórmulas cerradas `radiated_noise_level`
+y `monopole_source_level`. Lo mismo vale para la campaña de la ISO 18406 de la
+sección 3: los requisitos de despliegue, instrumento, calibración e informe se
+describen aquí y no se hacen cumplir en ningún sitio del código, y nada
+comprueba que un golpe entregado a `pile_strike_metrics` venga de un registro
+que los cumpla. La propia ISO 18406 excluye de su alcance el vibrohincado y
+las tablestacas, y el hincado en menos de 4 m o más de 100 m de agua (apartado
+1), así que el ruido del hincado continuo no tiene forma cerrada aquí ni en
+ningún otro lugar de phonometry.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

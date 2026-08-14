@@ -3,6 +3,9 @@ title: "Fuentes y dispositivos"
 description: "Caracterizar lo que emite el sonido: determinación de la potencia acústica por métodos de presión, cámara reverberante, intensidad y vibración superficial (series ISO 3740 e ISO 9614, ISO/TS 7849), intensidad acústica con dos micrófonos (IEC 61043), las métricas de distorsión, altavoces y micrófonos de IEC 60268, la separación armónica con barridos y THD(f) (Farina / Novak), los silenciadores reactivos y el control de ruido industrial, y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
 Toda predicción del resto de esta documentación parte de un descriptor de
 fuente, y esta sección es donde esos descriptores se miden. Su hilo conductor
 es la **emisión**: números que pertenecen al dispositivo y no a la sala ni a
@@ -99,28 +102,35 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
 
 ## Qué no cubre esta sección
 
-**Aquí no se cualifica ningún recinto.** La cualificación de campo libre de una
-sala anecoica de ISO 3745, la cualificación de la cámara reverberante de ISO 3741
-y el ensayo de intensidad residual de una sonda de IEC 61043 se dan todos por
-hechos: la biblioteca avisa de los criterios orientativos gruesos que una norma
-declara explícitamente y cualifica un índice residual que aportas tú, pero no
-certifica ni una sala ni un instrumento. El mismo límite recorre las páginas de
-electroacústica, que **reducen y presentan curvas que aporta el laboratorio** en
-vez de decirte cómo adquirirlas, y la ISO/TS 7849, cuyos apartados 5 a 7 sobre
-instrumentación, instalación y posiciones de medición son práctica de
-laboratorio que esta biblioteca supone.
+<Scope>
+<ScopeClaim status="not-covered">
+**Aquí no se cualifica ningún recinto.** La cualificación de campo libre de
+una sala anecoica de ISO 3745, la cualificación de la cámara reverberante de
+ISO 3741 y el ensayo de intensidad residual de una sonda de IEC 61043 se dan
+todos por hechos: la biblioteca avisa de los criterios orientativos gruesos
+que una norma declara explícitamente y cualifica un índice residual que
+aportas tú, pero no certifica ni una sala ni un instrumento. El mismo límite
+recorre las páginas de electroacústica, que **reducen y presentan curvas que
+aporta el laboratorio** en vez de decirte cómo adquirirlas, y la ISO/TS 7849,
+cuyos apartados 5 a 7 sobre instrumentación, instalación y posiciones de
+medición son práctica de laboratorio que esta biblioteca supone.
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Conviene conocer tres ausencias concretas antes de planificar un trabajo. La
-suma de potencia en puntos fijos discretos de ISO 9614-1 **no está implementada
-en absoluto**: sí lo están solo sus indicadores de campo, reutilizados por las
-vías de barrido. Los silenciadores disipativos de conducto revestido **no se
-modelan a partir de las propiedades del revestimiento** en ningún sitio: los
-elementos reactivos se calculan exactamente, y las cifras de codo revestido y de
-plenum son tablas de instalación interpoladas. Y aquí ninguna página predice la
-pérdida por transmisión de un panel: `enclosure_insertion_loss` combina un valor
-que aportas tú con la corrección interior, y la predicción en sí es [Diseño del
+suma de potencia en puntos fijos discretos de ISO 9614-1 **no está
+implementada en absoluto**: sí lo están solo sus indicadores de campo,
+reutilizados por las vías de barrido. Los silenciadores disipativos de
+conducto revestido **no se modelan a partir de las propiedades del
+revestimiento** en ningún sitio: los elementos reactivos se calculan
+exactamente, y las cifras de codo revestido y de plenum son tablas de
+instalación interpoladas. Y aquí ninguna página predice la pérdida por
+transmisión de un panel: `enclosure_insertion_loss` combina un valor que
+aportas tú con la corrección interior, y la predicción en sí es [Diseño del
 aislamiento](/phonometry/es/buildings/design/).
+</ScopeClaim>
 
+<ScopeClaim status="not-covered">
 Las ediciones están fijadas en vez de vigentes en dos sitios: las métricas de
 distorsión siguen AES17-2015 y no la revisión de 2020, y el informe de
 características nominales de micrófono sigue IEC 60268-4:2014 y no el de 2018.
@@ -128,6 +138,8 @@ El audio basado en objetos (Anexo 4 de BS.1770-5) queda fuera de alcance, y la
 biblioteca no implementa ningún renderizador espacial, así que un programa
 basado en objetos hay que renderizarlo a una disposición de altavoces antes de
 poder medirlo.
+</ScopeClaim>
+</Scope>
 
 ## Antes y después de estas páginas
 

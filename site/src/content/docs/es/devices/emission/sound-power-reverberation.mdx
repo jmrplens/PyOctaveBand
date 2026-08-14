@@ -18,9 +18,11 @@ references:
     note: "Los métodos directo (Ec. 20) y de comparación (Ec. 21) de esta guía, con las correcciones de Waterhouse y meteorológicas y los criterios de cualificación de la Tabla 1."
 ---
 
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Una cámara reverberante convierte su principal defecto como espacio de escucha
 en un instrumento de medida: como el campo es difuso, un puñado de
@@ -472,28 +474,33 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La determinación en cámara reverberante de ISO 3741
-(`sound_power_reverberation`): el método directo (Ec. 20) mediante el área
-de absorción de Sabine, la corrección de contorno de Waterhouse y las
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La determinación en cámara reverberante de ISO 3741
+(`sound_power_reverberation`): el método directo (Ec. 20) mediante el área de
+absorción de Sabine, la corrección de contorno de Waterhouse y las
 correcciones meteorológicas $C_1$/$C_2$, y el método de comparación con una
 fuente sonora de referencia (`sound_power_comparison`, Ec. 21), ambos con
-corrección de fondo por banda y el total ponderado A del Anexo F,
-presentados como ficha de potencia acústica de estilo acreditado mediante
-`.report()`.
+corrección de fondo por banda y el total ponderado A del Anexo F, presentados
+como ficha de potencia acústica de estilo acreditado mediante `.report()`.
+</ScopeClaim>
 
-**No cubierto.** El nivel de energía acústica $L_J$ del apartado 9.2, la
-contrapartida para sucesos aislados de $L_W$ definida en los mismos apartados, no
-está implementado, así que una fuente impulsiva o de suceso aislado cae fuera de
-esta guía. Tampoco lo está la suma en bandas de octava del Anexo F, de modo que
-los resultados por octava hay que sumarlos a mano a partir de las potencias de
-banda de tercio de octava. La propia cualificación de la cámara reverberante
-(Anexo C/D, recuento de frecuencias propias o comparación con una fuente de
-referencia) se da por supuesta, no se ejecuta; la biblioteca solo avisa de
-los criterios orientativos que ISO 3741 declara explícitamente (el volumen
-mínimo de la Tabla 1, el suelo de reverberación $V/S$, menos de 6 posiciones,
-una dispersión entre posiciones superior a 1,5 dB). La elección entre las
-seis vías, y la declaración ISO 4871 que un resultado alimenta, viven en
-[Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+<ScopeClaim status="not-covered" label="No cubierto">
+El nivel de energía acústica $L_J$ del apartado 9.2, la contrapartida para
+sucesos aislados de $L_W$ definida en los mismos apartados, no está
+implementado, así que una fuente impulsiva o de suceso aislado cae fuera de
+esta guía. Tampoco lo está la suma en bandas de octava del Anexo F, de modo
+que los resultados por octava hay que sumarlos a mano a partir de las
+potencias de banda de tercio de octava. La propia cualificación de la cámara
+reverberante (Anexo C/D, recuento de frecuencias propias o comparación con una
+fuente de referencia) se da por supuesta, no se ejecuta; la biblioteca solo
+avisa de los criterios orientativos que ISO 3741 declara explícitamente (el
+volumen mínimo de la Tabla 1, el suelo de reverberación $V/S$, menos de 6
+posiciones, una dispersión entre posiciones superior a 1,5 dB). La elección
+entre las seis vías, y la declaración ISO 4871 que un resultado alimenta,
+viven en [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

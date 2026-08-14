@@ -41,6 +41,8 @@ references:
     note: "La construcción original de los pares complementarios del §1."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La [guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)
@@ -592,23 +594,28 @@ cualquier [respuesta al impulso](/phonometry/es/buildings/rooms/room-acoustics/)
 
 ## Qué cubre esta guía
 
-**Cubierto.** El par complementario de Golay (Golay 1961; Havelock, Kuwano
-y Vorländer eds., 2008, parte I, cap. 6 de Xiang): la recursión de
-adjunción, la identidad exacta de autocorrelaciones complementarias y la
-recuperación por suma de correlaciones, implementadas por `golay_pair` y
-`golay_impulse_response`. La síntesis de barridos por retardo de grupo de
-Müller y Massarani (2001, secs. 4.2-4.3), implementada por
-`shaped_sweep_signal`. La regularización de Tikhonov dependiente de la
-frecuencia de Kirkeby y Nelson (1999, Ec. 17 y sec. 2.4), implementada por
-`regularized_inverse_filter`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El par complementario de Golay (Golay 1961; Havelock, Kuwano y Vorländer eds.,
+2008, parte I, cap. 6 de Xiang): la recursión de adjunción, la identidad
+exacta de autocorrelaciones complementarias y la recuperación por suma de
+correlaciones, implementadas por `golay_pair` y `golay_impulse_response`. La
+síntesis de barridos por retardo de grupo de Müller y Massarani (2001, secs.
+4.2-4.3), implementada por `shaped_sweep_signal`. La regularización de
+Tikhonov dependiente de la frecuencia de Kirkeby y Nelson (1999, Ec. 17 y sec.
+2.4), implementada por `regularized_inverse_filter`.
+</ScopeClaim>
 
-**No cubierto.** Son métodos de ingeniería de medición tomados de la
-literatura de funciones de transferencia, no de una norma de
-certificación, así que no hay ningún apartado de cumplimiento contra el
-que comprobar. La inversión original de Kirkeby y Nelson apunta a la
-reproducción sonora multialtavoz, con una regularización matricial para la
-cancelación de diafonía entre varios canales. `regularized_inverse_filter`
-implementa solo el caso escalar de un único canal de su Ec. 17.
+<ScopeClaim status="not-covered" label="No cubierto">
+Son métodos de ingeniería de medición tomados de la literatura de funciones de
+transferencia, no de una norma de certificación, así que no hay ningún
+apartado de cumplimiento contra el que comprobar. La inversión original de
+Kirkeby y Nelson apunta a la reproducción sonora multialtavoz, con una
+regularización matricial para la cancelación de diafonía entre varios canales.
+`regularized_inverse_filter` implementa solo el caso escalar de un único canal
+de su Ec. 17.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -38,6 +38,8 @@ references:
     note: "Reedita la tabla de la ponderación D de IEC 537 (Tabla SLD-I) usada para anclar la respuesta D en CI."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Más allá de A, C y Z, la familia de ponderaciones conserva cuatro curvas de
@@ -371,24 +373,29 @@ informe de conformidad de CI).
 
 ## Qué cubre esta guía
 
-**Cubierto.** ISO 7196:1995 para la curva G (valores de
-polo/cero de la Tabla 1, verificados frente a todos los valores nominales de
-la Tabla 2). ANSI S1.4-1983 para la curva histórica B (definición del
-Apéndice C, objetivos de diseño de la Tabla IV, límites de tolerancia de la
-Tabla V). IEC 61012:1990 para AU (el paso bajo U de la Tabla 2 en cascada
-con A, verificado frente a la Tabla 1). IEC 537:1976 para la curva D de
-ruido de aeronaves, retirada, implementada desde su función de transferencia
-publicada y contrastada con dos implementaciones independientes.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+ISO 7196:1995 para la curva G (valores de polo/cero de la Tabla 1, verificados
+frente a todos los valores nominales de la Tabla 2). ANSI S1.4-1983 para la
+curva histórica B (definición del Apéndice C, objetivos de diseño de la Tabla
+IV, límites de tolerancia de la Tabla V). IEC 61012:1990 para AU (el paso bajo
+U de la Tabla 2 en cascada con A, verificado frente a la Tabla 1). IEC
+537:1976 para la curva D de ruido de aeronaves, retirada, implementada desde
+su función de transferencia publicada y contrastada con dos implementaciones
+independientes.
+</ScopeClaim>
 
-**No cubierto.** `verify_weighting_class` no produce un veredicto de clase
-para G ni para D: ISO 7196 define una única tolerancia de ±1 dB sin
-estructura de clases, y la retirada IEC 537 no dejó tabla de tolerancias.
-Ambas curvas se anclan numéricamente a sus tablas publicadas en el
-informe de conformidad de CI en su lugar, no a través de este verificador
-público. B y D se ofrecen solo para datos históricos y códigos nacionales
-antiguos; ninguna es práctica actual (IEC 61672-1 sustituyó a B, y la
-certificación de ruido de aeronaves informa hoy el EPNL o niveles con
-ponderación A simples en lugar de D).
+<ScopeClaim status="not-covered" label="No cubierto">
+`verify_weighting_class` no produce un veredicto de clase para G ni para D:
+ISO 7196 define una única tolerancia de ±1 dB sin estructura de clases, y la
+retirada IEC 537 no dejó tabla de tolerancias. Ambas curvas se anclan
+numéricamente a sus tablas publicadas en el informe de conformidad de CI en su
+lugar, no a través de este verificador público. B y D se ofrecen solo para
+datos históricos y códigos nacionales antiguos; ninguna es práctica actual
+(IEC 61672-1 sustituyó a B, y la certificación de ruido de aeronaves informa
+hoy el EPNL o niveles con ponderación A simples en lugar de D).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

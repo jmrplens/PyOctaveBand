@@ -63,8 +63,8 @@ assigns a class to an instrument.
 
 **Building vibration stops at the weighting.** Of ISO 2631-2 the library
 implements the direction-independent `Wm` curve and nothing else, and that is
-closer to the standard than it looks: the 2003 edition deliberately deleted its
-predecessor's guidance values, so there are no acceptable magnitudes for
+closer to the standard than it looks: the 2003 edition deliberately deleted
+its predecessor's guidance values, so there are no acceptable magnitudes for
 building vibration to compare against. A reader looking for a limit will not
 find one here, and will not find one in the standard either.
 

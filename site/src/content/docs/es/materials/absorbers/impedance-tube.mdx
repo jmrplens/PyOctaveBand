@@ -33,9 +33,11 @@ references:
     note: "El método de matriz de transferencia con cuatro micrófonos de la sección 4 que sustenta las funciones auxiliares de pérdida por transmisión. La edición implementada aquí; revisada después como ASTM E2611-24 (https://store.astm.org/e2611-24.html)."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 El tubo de impedancia es el laboratorio de materiales reducido a un banco: un
 conducto rígido de unos pocos centímetros por el que un altavoz lanza una
@@ -984,44 +986,49 @@ atenuada que resuelven los cuatro micrófonos ASTM.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El trío del tubo de impedancia. El método de la razón de onda
-estacionaria de ISO 10534-1 (`standing_wave_ratio_from_level`,
-`standing_wave_reflection_magnitude`, `standing_wave_absorption`, y la mitad de
-posición de la lectura en `standing_wave_reflection` y
-`standing_wave_normalized_impedance`). El método
-de la función de transferencia de ISO 10534-2 con su comprobación de rango de
-frecuencias del apartado 4 (`two_microphone_impedance`,
-`plane_wave_frequency_range`, `reflection_factor`,
-`absorption_from_reflection`, `normalized_surface_impedance`,
-`normalized_surface_admittance`, las propiedades del aire del apartado 7.2
-`speed_of_sound_iso` y `air_density_iso`, la pareja de desajuste del
-apartado 7.5 `mic_calibration_factor` y `apply_mic_calibration`, y
-`tube_attenuation_constant`). El método de matriz de
-transferencia con cuatro micrófonos de ASTM E2611 (`transfer_matrix_two_load`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El trío del tubo de impedancia. El método de la razón de onda estacionaria de
+ISO 10534-1 (`standing_wave_ratio_from_level`,
+`standing_wave_reflection_magnitude`, `standing_wave_absorption`, y la mitad
+de posición de la lectura en `standing_wave_reflection` y
+`standing_wave_normalized_impedance`). El método de la función de
+transferencia de ISO 10534-2 con su comprobación de rango de frecuencias del
+apartado 4 (`two_microphone_impedance`, `plane_wave_frequency_range`,
+`reflection_factor`, `absorption_from_reflection`,
+`normalized_surface_impedance`, `normalized_surface_admittance`, las
+propiedades del aire del apartado 7.2 `speed_of_sound_iso` y
+`air_density_iso`, la pareja de desajuste del apartado 7.5
+`mic_calibration_factor` y `apply_mic_calibration`, y
+`tube_attenuation_constant`). El método de matriz de transferencia con cuatro
+micrófonos de ASTM E2611 (`transfer_matrix_two_load`,
 `transfer_matrix_one_load`, `TransferMatrix`,
 `plane_wave_frequency_range_astm`, `hydraulic_diameter`), con los dibujos a
 escala de ambos tubos. Los tubos FDTD virtuales de la sección 5, cuyos
-espectros recuperados se contrastan con la respuesta analítica en cada
-commit.
+espectros recuperados se contrastan con la respuesta analítica en cada commit.
+</ScopeClaim>
 
-**No cubierto.** Dos ediciones citadas solo como revisiones posteriores no
-están implementadas: ISO 10534-2:2023 (el código sigue el método de la
-función de transferencia de 1998/2001) y ASTM E2611-24 (el código sigue
-E2611-19). ISO 10534-1:1996 está implementada como su adopción europea
-BS EN ISO 10534-1:2001, no leída directamente del texto ISO de 1996; sus
-refinamientos de sonda (extrapolar los niveles de los mínimos hasta la cara
-de la muestra, correcciones por el cuerpo de la sonda) se describen en la
-sección 2 pero no están automatizados. Tampoco lo están los apartados de equipo
-y procedimiento de las secciones 1.1 y 3.2: las distancias de campo cercano del
-apartado 4.3, las tolerancias de posición del apartado 4.5, el suelo de relación
-señal-ruido del apartado 7.3 y el calentamiento del apartado 5 se enuncian para
-el operador, y nada de la biblioteca comprueba que se haya cumplido ninguno de
-ellos. `tube_attenuation_constant` implementa solo la estimación de la
-Ec. (A.18), que la propia norma llama límite inferior; la determinación medida
-de las Ecs. (A.13)/(A.14) con el tubo vacío no está implementada.
-El $\alpha_s$ de incidencia aleatoria
-de la cámara reverberante es otra magnitud con su propia guía:
-[Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
+<ScopeClaim status="not-covered" label="No cubierto">
+Dos ediciones citadas solo como revisiones posteriores no están implementadas:
+ISO 10534-2:2023 (el código sigue el método de la función de transferencia de
+1998/2001) y ASTM E2611-24 (el código sigue E2611-19). ISO 10534-1:1996 está
+implementada como su adopción europea BS EN ISO 10534-1:2001, no leída
+directamente del texto ISO de 1996; sus refinamientos de sonda (extrapolar los
+niveles de los mínimos hasta la cara de la muestra, correcciones por el cuerpo
+de la sonda) se describen en la sección 2 pero no están automatizados. Tampoco
+lo están los apartados de equipo y procedimiento de las secciones 1.1 y 3.2:
+las distancias de campo cercano del apartado 4.3, las tolerancias de posición
+del apartado 4.5, el suelo de relación señal-ruido del apartado 7.3 y el
+calentamiento del apartado 5 se enuncian para el operador, y nada de la
+biblioteca comprueba que se haya cumplido ninguno de ellos.
+`tube_attenuation_constant` implementa solo la estimación de la Ec. (A.18),
+que la propia norma llama límite inferior; la determinación medida de las Ecs.
+(A.13)/(A.14) con el tubo vacío no está implementada. El $\alpha_s$ de
+incidencia aleatoria de la cámara reverberante es otra magnitud con su propia
+guía: [Medida y clasificación de la absorción
+sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

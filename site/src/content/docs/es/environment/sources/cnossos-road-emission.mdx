@@ -41,6 +41,8 @@ references:
     note: "El modelo de propagación que aquí lleva la emisión hasta un receptor. CNOSSOS-EU tiene su propio método de propagación en el apartado 2.5 del Anexo II, que no es la ISO 9613-2."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Todo mapa estratégico de ruido trazado en la Unión Europea desde 2021 parte de
@@ -610,22 +612,28 @@ decimales que imprime el juego de prueba.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El apartado 2.2 del Anexo II de la Directiva 2002/49/CE en el
-texto consolidado: la potencia de línea del flujo de tráfico (2.2.1), la
-potencia del vehículo (2.2.2, 2.2.3), el ruido de rodadura con sus correcciones
-por neumáticos con clavos y temperatura (2.2.4 a 2.2.10), el ruido de propulsión
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El apartado 2.2 del Anexo II de la Directiva 2002/49/CE en el texto
+consolidado: la potencia de línea del flujo de tráfico (2.2.1), la potencia
+del vehículo (2.2.2, 2.2.3), el ruido de rodadura con sus correcciones por
+neumáticos con clavos y temperatura (2.2.4 a 2.2.10), el ruido de propulsión
 con la corrección por pendiente (2.2.11 a 2.2.16), la corrección por cruce
 (2.2.17, 2.2.18) y el efecto del pavimento (2.2.19, 2.2.20), junto con toda la
 base de datos del Apéndice F, a través de `road_source_power`,
 `road_vehicle_sound_power`, `road_rolling_noise`, `road_propulsion_noise` y
 `road_surface_coefficients`.
+</ScopeClaim>
 
-**No cubierto.** La fuente ferroviaria (2.3 y Apéndice G), la fuente industrial
-(2.4 y Apéndice H), la fuente aeronáutica (2.6 y 2.7) y el método de propagación
-CNOSSOS-EU del apartado 2.5, que es un modelo distinto del de la ISO 9613-2
-implementado en esta biblioteca. La categoría de vehículo abierta 5 no tiene
-coeficientes en el Apéndice F y por eso no se modeliza. Cómo se trocea una línea
-fuente en fuentes puntuales lo declara fuera de alcance el propio método.
+<ScopeClaim status="not-covered" label="No cubierto">
+La fuente ferroviaria (2.3 y Apéndice G), la fuente industrial (2.4 y Apéndice
+H), la fuente aeronáutica (2.6 y 2.7) y el método de propagación CNOSSOS-EU
+del apartado 2.5, que es un modelo distinto del de la ISO 9613-2 implementado
+en esta biblioteca. La categoría de vehículo abierta 5 no tiene coeficientes
+en el Apéndice F y por eso no se modeliza. Cómo se trocea una línea fuente en
+fuentes puntuales lo declara fuera de alcance el propio método.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

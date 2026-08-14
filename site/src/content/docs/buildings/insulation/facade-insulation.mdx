@@ -39,8 +39,10 @@ references:
     note: "The reference-curve rating that turns every façade quantity on this page into its single number (Annex F of ISO 16283-3, EN ISO 717-1 for the prediction)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A façade is the one element of a building that faces the noise everybody
 complains about: the road, the railway, the flight path. It is also the
@@ -698,35 +700,41 @@ decides the result.
 
 ## What this guide covers
 
-**Covered.** ISO 16283-3:2016 (the field façade quantities $D_{2m}$,
-$D_{2m,nT}$, $D_{2m,n}$, $R'_{45°}$ and $R'_{tr,s}$ of the loudspeaker and
-road-traffic element methods, with the position averaging of Clause 9.5.1 and
-the Clause 14 test report) via `building.facade_insulation`; EN 12354-3:2000
-(the transmission-factor summation of Formula 10, the $R_{45}$ and $R_{tr,s}$
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 16283-3:2016 (the field façade quantities $D_{2m}$, $D_{2m,nT}$,
+$D_{2m,n}$, $R'_{45°}$ and $R'_{tr,s}$ of the loudspeaker and road-traffic
+element methods, with the position averaging of Clause 9.5.1 and the Clause 14
+test report) via `building.facade_insulation`; EN 12354-3:2000 (the
+transmission-factor summation of Formula 10, the $R_{45}$ and $R_{tr,s}$
 indices, the $D_{2m,nT}$ of Formula 13 and the Annex C façade-shape term) via
-`building.facade_sound_reduction` and `building.facade_shape_level_difference`;
-and EN 12354-4:2000 (the radiated sound power of Formula 2 with the Annex B
-diffusivity term, and the Annex E attenuation of a finite radiating side) via
-`building.radiated_sound_power`, `building.outdoor_attenuation` and
-`building.outdoor_level`. The single-number ratings reuse the verified
-ISO 717-1 engine, and both the measurement and the prediction write their
-one-page fiche through `.report()`.
+`building.facade_sound_reduction` and
+`building.facade_shape_level_difference`; and EN 12354-4:2000 (the radiated
+sound power of Formula 2 with the Annex B diffusivity term, and the Annex E
+attenuation of a finite radiating side) via `building.radiated_sound_power`,
+`building.outdoor_attenuation` and `building.outdoor_level`. The single-number
+ratings reuse the verified ISO 717-1 engine, and both the measurement and the
+prediction write their one-page fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** The band levels handed to `facade_insulation` are assumed
-already corrected for background noise, and ISO 16283-3's own procedural
-requirements — the ones set out under
-[Choosing and running the method](#choosing-and-running-the-method-clauses-9-and-10)
-— are documented but not checked: nothing verifies the 45° ± 5° incidence, the
-5 m / 7 m slant distances, the 3→10 microphone escalation and its recess
-special case, the 50 pass-bys and the simultaneity of a traffic measurement, or
-that the method chosen matches the question asked. The low-frequency corner
-procedure of Clause 7 (the façade counterpart of the
-[ISO 16283-1 procedure](/phonometry/buildings/insulation/insulation-field/#small-rooms-the-low-frequency-procedure-clause-8),
+<ScopeClaim status="not-covered" label="Not covered">
+The band levels handed to `facade_insulation` are assumed already corrected
+for background noise, and ISO 16283-3's own procedural requirements — the ones
+set out under [Choosing and running the
+method](#choosing-and-running-the-method-clauses-9-and-10) — are documented
+but not checked: nothing verifies the 45° ± 5° incidence, the 5 m / 7 m slant
+distances, the 3→10 microphone escalation and its recess special case, the 50
+pass-bys and the simultaneity of a traffic measurement, or that the method
+chosen matches the question asked. The low-frequency corner procedure of
+Clause 7 (the façade counterpart of the [ISO 16283-1
+procedure](/phonometry/buildings/insulation/insulation-field/#small-rooms-the-low-frequency-procedure-clause-8),
 triggered by the same 25 m³ receiving-room threshold) is not implemented
-either, and neither are the railway and aircraft methods of Annex E. The EN 12354-3 and EN 12354-4 worked examples
-of the 2000 editions carry small internal rounding inconsistencies at the
-higher octave bands, noted where they appear: the implementation follows the
-formulas rather than the printed rows.
+either, and neither are the railway and aircraft methods of Annex E. The EN
+12354-3 and EN 12354-4 worked examples of the 2000 editions carry small
+internal rounding inconsistencies at the higher octave bands, noted where they
+appear: the implementation follows the formulas rather than the printed rows.
+</ScopeClaim>
+</Scope>
 
 ## See also
 
