@@ -18,6 +18,7 @@ anim_epnl_flyover e555f89b4b467daa
 anim_fdtd_absorption_placement 20a3e82deab423f6
 anim_fdtd_barrier 4d1a13d120636f7b
 anim_fdtd_critical_angle 40d434ea40480406
+anim_fdtd_diffusion 35f12288d0a93335
 anim_fdtd_dispersion 6de574766da9812d
 anim_fdtd_duct_cut_on 51eddf89a7eb4983
 anim_fdtd_expansion_chamber 996482c4a5016a89
