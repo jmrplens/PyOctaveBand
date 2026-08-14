@@ -209,7 +209,7 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     def update(k: int) -> tuple[Any, ...]:
         kf = min(k, n_active - 1)
         im.set_data(frames[kf])
-        t_txt.set_text(T(f"t = {ts[kf] * 1e3:5.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {ts[kf] * 1e3:5.2f} ms"))
         return (im, t_txt)
 
     # GIF budget: the full-frame wave motion compresses poorly, so the

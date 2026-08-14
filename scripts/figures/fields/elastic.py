@@ -195,8 +195,8 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     titles = [T("Straight plate: the packet just runs on"),
               T("L-junction: reflected, transmitted and mode-converted")]
     verdicts = [T("nothing comes back"),
-                T(f"junction_transmission('L'): τ(0°) = {tau0:.2f}, "
-                  f"K12 = {kij:.1f} dB")]
+                T(f"junction_transmission('L'): $\\tau(0°)$ = {tau0:.2f}, "
+                  f"$K_{{12}}$ = {kij:.1f} dB")]
     ims: list[Any] = []
     v_txts: list[Any] = []
     ln_arts: list[Any] = []
@@ -284,7 +284,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
         ln_arts[2].set_xdata(x_mid + gain * vl_junc[kf][r0:r_end])
         for row, v_txt in enumerate(v_txts):
             v_txt.set_text(verdicts[row] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *ln_arts, *v_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_elastic_plate_junction",
@@ -478,10 +478,10 @@ def animate_elastic_coincidence(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Coincidence: the same steel plate, below and above "
-                   "f_c (elastic 2D FDTD)"), fontweight="bold")
+                   "$f_c$ (elastic 2D FDTD)"), fontweight="bold")
     axes = fig.subplots(1, 2, sharey=True)
-    titles = [T(f"f = f_c/2 = {fc / 2:.0f} Hz, 45° incidence"),
-              T(f"f = 2 f_c = {2 * fc:.0f} Hz, 45° incidence")]
+    titles = [T(f"$f = f_c/2$ = {fc / 2:.0f} Hz, 45° incidence"),
+              T(f"$f = 2f_c$ = {2 * fc:.0f} Hz, 45° incidence")]
     # Each panel is judged against the oblique mass law (Bies Eq. 7.41):
     # TL(theta) = 10 log10[1 + (pi f m'' cos(theta) / rho0 c0)^2]. Below f_c
     # the measured level lands on it; above f_c the trace-matched plate
@@ -492,10 +492,10 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     ml = [10.0 * float(np.log10(1.0 + (np.pi * f * m2 * np.cos(theta)
                                        / (_EL_RHO0 * _EL_C0)) ** 2))
           for f in (0.5 * fc, 2.0 * fc)]
-    verdicts = [T(f"below f_c: the mass law holds: "
+    verdicts = [T(f"below $f_c$: the mass law holds: "
                   f"{_fmt_minus(trans_db[0], '.0f')} dB "
                   f"(it predicts {_fmt_minus(-ml[0], '.0f')})"),
-                T(f"above f_c: trace matches λ_B: "
+                T(f"above $f_c$: trace matches $\\lambda_B$: "
                   f"{_fmt_minus(trans_db[1], '.0f')} dB, "
                   f"the mass law said {_fmt_minus(-ml[1], '.0f')}")]
     ims: list[Any] = []
@@ -539,7 +539,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         ims.append(im)
         v_txts.append(v_txt)
     fc_txt = fig.text(0.5, 0.035,
-                      T(f"coincidence_frequency: f_c = {fc:.0f} Hz "
+                      T(f"coincidence_frequency: $f_c$ = {fc:.0f} Hz "
                         f"(10 mm steel)"), ha="center", va="bottom",
                       fontsize=9, color=COLOR_FG)
     t_txt = fig.text(0.985, 0.035, "", ha="right", va="bottom",
@@ -552,7 +552,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         ims[1].set_data(p_hi[kf])
         for col, v_txt in enumerate(v_txts):
             v_txt.set_text(verdicts[col] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *v_txts, fc_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_elastic_coincidence",

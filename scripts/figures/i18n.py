@@ -218,8 +218,8 @@ _ES_EXACT = {
     "Tube diameter $d$ [mm]": "Diámetro del tubo $d$ [mm]",
     "Plane-wave ceiling [Hz]": "Techo de onda plana [Hz]",
     # Resonance-sweep clip (anim_dynamic_stiffness_sweep)
-    "Reading fr on the EN 29052-1 rig":
-        "Lectura de fr en el banco EN 29052-1",
+    r"Reading $f_r$ on the EN 29052-1 rig":
+        r"Lectura de $f_r$ en el banco EN 29052-1",
     "rigid base": "base rígida",
     "load plate, 8 kg": "placa de carga, 8 kg",
     "specimen": "probeta",
@@ -227,12 +227,12 @@ _ES_EXACT = {
     "Response magnitude": "Módulo de la respuesta",
     "Phase [deg]": "Fase [grados]",
     "−90 deg: resonance": "−90 grados: resonancia",
-    "below fr: the plate follows the force":
-        "por debajo de fr: la placa sigue a la fuerza",
-    "at fr: a quarter cycle behind, amplitude peaks":
-        "en fr: un cuarto de ciclo por detrás, la amplitud es máxima",
-    "above fr: the plate moves against the force":
-        "por encima de fr: la placa se mueve contra la fuerza",
+    r"below $f_r$: the plate follows the force":
+        r"por debajo de $f_r$: la placa sigue a la fuerza",
+    r"at $f_r$: a quarter cycle behind, amplitude peaks":
+        r"en $f_r$: un cuarto de ciclo por detrás, la amplitud es máxima",
+    r"above $f_r$: the plate moves against the force":
+        r"por encima de $f_r$: la placa se mueve contra la fuerza",
     "phase": "fase",
     # Building acoustics: sound insulation (B8 figures)
     "Same weighted rating, different spectrum":
@@ -463,7 +463,10 @@ _ES_EXACT = {
     "loudspeaker": "altavoz",
     "anechoic termination": "terminación anecoica",
     "rigid plug": "tapón rígido",
-    "|p| envelope": "envolvente |p|",
+    "$|p|$ envelope": "envolvente $|p|$",
+    # anim_fdtd_expansion_chamber: the geometry readout. Its own entry
+    # because the mathtext symbols take it out of the decimal-comma pass.
+    "$L$ = 0.30 m · $m$ = 4": "$L$ = 0,30 m · $m$ = 4",
     "The 2 cm metadiffuser scatters like the 27 cm QRD (2 kHz)":
         "El metadifusor de 2 cm dispersa como el QRD de 27 cm (2 kHz)",
     "Metadiffuser, panel 2 cm": "Metadifusor, panel de 2 cm",
@@ -486,8 +489,8 @@ _ES_EXACT = {
     "(2D FDTD)":
         "El tubo de impedancia virtual: las ondas estacionarias leen la "
         "absorción (FDTD 2D)",
-    "Rigid end: deep minima, |r| ~ 1":
-        "Extremo rígido: mínimos profundos, |r| ~ 1",
+    r"Rigid end: deep minima, $|r| \sim 1$":
+        r"Extremo rígido: mínimos profundos, $|r| \sim 1$",
     "10 cm lossy sample: shallow minima":
         "Muestra disipativa de 10 cm: mínimos poco profundos",
     "The virtual transmission tube: what gets through (2D FDTD)":
@@ -1044,7 +1047,7 @@ _ES_EXACT = {
     r"indirect method $-(2\pi f)^2 m_2 T$":
         r"método indirecto $-(2\pi f)^2 m_2 T$",
     r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]":
-        r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{real}}$ [dB]",
+        r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]",
     r"transmissibility $|T|$": r"transmisibilidad $|T|$",
     r"loss factor $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$":
         r"factor de pérdidas $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$",
@@ -1369,9 +1372,9 @@ _ES_EXACT = {
         "Nivel de exposici\u00f3n sonora: el evento normalizado a 1 s",
     "Level [dBFS]": "Nivel [dBFS]",
     "Hourly $L_{Aeq}$": "$L_{Aeq}$ horario",
-    r"$L_{\mathrm{day}}$ (+0 dB)": r"$L_{\mathrm{día}}$ (+0 dB)",
-    r"$L_{\mathrm{evening}}$ + 5 dB": r"$L_{\mathrm{tarde}}$ + 5 dB",
-    r"$L_{\mathrm{night}}$ + 10 dB": r"$L_{\mathrm{noche}}$ + 10 dB",
+    r"$L_{\mathrm{day}}$ (+0 dB)": r"$L_{\mathrm{day}}$ (+0 dB)",
+    r"$L_{\mathrm{evening}}$ + 5 dB": r"$L_{\mathrm{evening}}$ + 5 dB",
+    r"$L_{\mathrm{night}}$ + 10 dB": r"$L_{\mathrm{night}}$ + 10 dB",
     r"Day-Evening-Night Level $L_{\mathrm{den}}$ (ISO 1996-1)":
         r"Nivel día-tarde-noche $L_{\mathrm{den}}$ (ISO 1996-1)",
     "Hour of day": "Hora del d\u00eda",
@@ -1589,20 +1592,20 @@ _ES_EXACT = {
         "Envolvente de intensidad, media recibida = 1",
     "mean, the same in every frame":
         "la media, la misma en todos los fotogramas",
-    "m": "m",
+    "$m$": "$m$",
     "the red point is the 4 Hz probe on the left":
         "el punto rojo es la sonda de 4 Hz de la izquierda",
     "Band MTI": "MTI de banda",
     "Octave band [Hz]": "Banda de octava [Hz]",
-    "transmitted, m = 1": "transmitida, m = 1",
+    "transmitted, $m$ = 1": "transmitida, $m$ = 1",
     "received": "recibida",
     "Reverberation shrinks the envelope about a fixed mean":
         "La reverberación encoge la envolvente en torno a una media fija",
     "  no noise": "  sin ruido",
     "Now hold the room and let noise take part of the level":
         "Ahora se fija la sala y el ruido se lleva parte del nivel",
-    "Noise raises a floor under the same mean: m falls again":
-        "El ruido levanta un suelo bajo la misma media: m vuelve a caer",
+    "Noise raises a floor under the same mean: $m$ falls again":
+        "El ruido levanta un suelo bajo la misma media: $m$ vuelve a caer",
     "noise-free ($T_{60}$ = 0.9 s)": "sin ruido ($T_{60}$ = 0,9 s)",
     r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$":
         r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: constante en $F$",
@@ -1734,14 +1737,14 @@ _ES_EXACT = {
     "measured spectrum": "espectro medido",
     "reference curve, as shifted": "curva de referencia, ya desplazada",
     # ("unfavourable deviations" is already in this table, further down.)
-    "Normalized impact level L'nT [dB]":
-        "Nivel de impactos normalizado L'nT [dB]",
+    "Normalized impact level $L\u2032_{nT}$ [dB]":
+        "Nivel de impactos normalizado $L\u2032_{nT}$ [dB]",
     "over the cap: shift again": "pasa del límite: desplazar otra vez",
     "largest sum still under the cap": "la mayor suma bajo el límite",
     "legal, but the sum is smaller:": "válido, pero la suma es menor:",
     "this is one step too far": "esto es un paso de más",
-    "Rw": "Rw",
-    "L'nT,w": "L'nT,w",
+    "$R_w$": "$R_w$",
+    "$L\u2032_{nT,w}$": "$L\u2032_{nT,w}$",
     # --- anim_block_vs_exponential: the alignment the block detector needs ---
     "One burst, two detectors, and the block grid underneath":
         "Una ráfaga, dos detectores y la rejilla de bloques debajo",
@@ -1774,8 +1777,8 @@ _ES_EXACT = {
     "loop at unity": "lazo en la unidad",
     "Long's 10 dB margin: each copy is a third of the last":
         "Margen de 10 dB de Long: cada copia es un tercio de la anterior",
-    "Four open microphones add 10 lg 4 = 6 dB to the loop":
-        "Cuatro micrófonos abiertos suman 10 lg 4 = 6 dB al lazo",
+    r"Four open microphones add $10\,\mathrm{lg}\,4$ = 6 dB to the loop":
+        r"Cuatro micrófonos abiertos suman $10\,\mathrm{lg}\,4$ = 6 dB al lazo",
     "Four more decibels of system gain: the loop reaches unity":
         "Cuatro decibelios más de ganancia: el lazo llega a la unidad",
     "the sum does not converge: this is the howl":
@@ -2310,8 +2313,8 @@ _ES_EXACT = {
         "familias de suelo y techo llegan entre ellas",
     "Level re direct [dB]": "Nivel rel. directo [dB]",
     "Arrivals so far": "Llegadas hasta ahora",
-    "1/r spreading": "divergencia 1/r",
-    "(4 pi / 3)(c t)^3 / V": "(4 pi / 3)(c t)^3 / V",
+    "$1/r$ spreading": "divergencia $1/r$",
+    r"$(4\pi/3)(ct)^3/V$": r"$(4\pi/3)(ct)^3/V$",
     "counted": "contadas",
     "each reflection is a mirror image of the source;\n"
     r"amplitude = product of wall reflection factors / ($4\pi r$)":
@@ -2519,13 +2522,14 @@ _ES_EXACT = {
     # anim_epnl_flyover: EPNL assembled in the order the standard builds it.
     "EPNL, record by record (ICAO Annex 16 Appendix 2)":
         "EPNL, registro a registro (OACI Anexo 16 Apéndice 2)",
-    "PNLTM - 10 dB": "PNLTM - 10 dB",
+    r"$\mathrm{PNLTM} - 10$ dB": r"$\mathrm{PNLTM} - 10$ dB",
     "microphone": "micrófono",
-    "fitted background SPL''": "SPL'' de fondo ajustado",
+    r"fitted background $\mathrm{SPL}''$": r"$\mathrm{SPL}''$ de fondo ajustado",
     "PNL": "PNL",
-    "PNLT = PNL + C": "PNLT = PNL + C",
+    r"$\mathrm{PNLT} = \mathrm{PNL} + C$":
+        r"$\mathrm{PNLT} = \mathrm{PNL} + C$",
     "Peak PNLTM": "Máximo PNLTM",
-    "Duration correction D": "Corrección de duración D",
+    "Duration correction $D$": "Corrección de duración $D$",
     "EPNL": "EPNL",
     "Each record: fit the background, measure the tone excess":
         "Cada registro: se ajusta el fondo y se mide el exceso tonal",
@@ -3243,45 +3247,47 @@ _ES_EXACT = {
     "Mean-square response (normalized)":
         "Respuesta cuadrática media (normalizada)",
     "RC exponential detector": "Detector exponencial RC",
-    "input x(t)": "entrada x(t)",
+    "input $x(t)$": "entrada $x(t)$",
     "square-law rectifier": "rectificador cuadrático",
     "stored charge (Fast shown)": "carga almacenada (se muestra Fast)",
     "charging": "cargando",
     "draining": "descargando",
-    "τ = RC sets attack and decay": "τ = RC fija el ataque y la caída",
+    r"$\tau = RC$ sets attack and decay":
+        r"$\tau = RC$ fija el ataque y la caída",
     "onset (> 10 dB/s)": "inicio (> 10 dB/s)",
     "Impulse onset detection (NT ACOU 112)":
         "Detección del inicio de impulso (NT ACOU 112)",
-    "A-weighted level L_AF [dB]": "Nivel ponderado A L_AF [dB]",
-    "L_AF (A-weighted, Fast)": "L_AF (ponderado A, Fast)",
-    "detector: onset when dL/dt > 10 dB/s":
-        "detector: inicio cuando dL/dt > 10 dB/s",
+    "A-weighted level $L_{AF}$ [dB]": "Nivel ponderado A $L_{AF}$ [dB]",
+    "$L_{AF}$ (A-weighted, Fast)": "$L_{AF}$ (ponderado A, Fast)",
+    "detector: onset when $dL/dt > 10$ dB/s":
+        "detector: inicio cuando $dL/dt > 10$ dB/s",
     "onset rate": "tasa de inicio",
     "level difference": "diferencia de nivel",
     "prominence": "prominencia",
     "adjustment": "ajuste",
     "add KI to the rating level": "sumar KI al nivel de evaluación",
-    "pressure p": "presión p",
-    "velocity u": "velocidad u",
-    "intensity p·u": "intensidad p·u",
+    "pressure $p$": "presión $p$",
+    "velocity $u$": "velocidad $u$",
+    r"intensity $p\cdot u$": r"intensidad $p\cdot u$",
     "amplitude (normalized)": "amplitud (normalizada)",
-    "Two-microphone p-p probe: instantaneous intensity p·u":
-        "Sonda p-p de dos micrófonos: intensidad instantánea p·u",
+    r"Two-microphone p-p probe: instantaneous intensity $p\cdot u$":
+        r"Sonda p-p de dos micrófonos: intensidad instantánea $p\cdot u$",
     "Progressive wave — active": "Onda progresiva — activa",
     "Standing wave — reactive": "Onda estacionaria — reactiva",
     "p and u in phase": "p y u en fase",
     "p and u 90° apart": "p y u desfasados 90°",
-    "spacer Δr": "separador Δr",
+    r"spacer $\Delta r$": r"separador $\Delta r$",
     "T20 fit": "ajuste T20",
     "T30 fit": "ajuste T30",
     "Schroeder backward integration (ISO 3382)":
         "Integración inversa de Schroeder (ISO 3382)",
     "← integrate from the tail": "← integrar desde la cola",
-    "squared impulse response p²": "respuesta al impulso al cuadrado p²",
+    "squared impulse response $p^2$":
+        "respuesta al impulso al cuadrado $p^2$",
     "tail energy": "energía de la cola",
     "Room modes in a rigid 5 m × 3.5 m room (2D FDTD)":
         "Modos propios en una sala rígida de 5 m × 3,5 m (FDTD 2D)",
-    "instantaneous p(x, y)": "p(x, y) instantánea",
+    "instantaneous $p(x, y)$": "$p(x, y)$ instantánea",
     "RMS pressure (mode map)": "presión RMS (mapa modal)",
     "nodal lines (2,1)": "líneas nodales (2,1)",
     "source": "fuente",
@@ -3295,8 +3301,8 @@ _ES_EXACT = {
     "rigid wall": "pared rígida",
     "incident": "incidente",
     "reflected": "reflejada",
-    "sum p(x, t)": "suma p(x, t)",
-    "envelope |p(x)|": "envolvente |p(x)|",
+    "sum $p(x, t)$": "suma $p(x, t)$",
+    "envelope $|p(x)|$": "envolvente $|p(x)|$",
     "deep nodes": "nodos profundos",
     "shallow nodes": "nodos poco profundos",
     "Flanking transmission paths (EN 12354-1)":
@@ -3307,23 +3313,23 @@ _ES_EXACT = {
     "floor to floor": "de suelo a suelo",
     "floor to wall": "de suelo a muro",
     "wall to floor": "de muro a suelo",
-    "junction: Kij attenuates each transfer":
-        "unión: Kij atenúa cada transferencia",
-    "R'w sums all paths — always below the wall alone":
-        "R'w suma todos los caminos — siempre menor que el muro solo",
+    r"junction: $K_{ij}$ attenuates each transfer":
+        r"unión: $K_{ij}$ atenúa cada transferencia",
+    "$R\u2032_w$ sums all paths — always below the wall alone":
+        "$R\u2032_w$ suma todos los caminos — siempre menor que el muro solo",
     "Intensity scanning over a box surface (ISO 9614-2)":
         "Barrido de intensidad sobre una superficie en caja (ISO 9614-2)",
     "p-p probe": "sonda p-p",
-    "normal intensity I·n on the surface":
-        "intensidad normal I·n en la superficie",
+    r"normal intensity $I\cdot n$ on the surface":
+        r"intensidad normal $I\cdot n$ en la superficie",
     "partial powers": "potencias parciales",
     "top": "superior",
     "front": "frontal",
     "back": "trasera",
     "left": "izquierda",
     "right": "derecha",
-    "any enclosing surface gives the same P":
-        "cualquier superficie envolvente da la misma P",
+    "any enclosing surface gives the same $P$":
+        "cualquier superficie envolvente da la misma $P$",
     "Sweep measurement and deconvolution (ISO 18233)":
         "Medición con barrido y deconvolución (ISO 18233)",
     "mic": "micro",
@@ -3338,8 +3344,8 @@ _ES_EXACT = {
     " response":
         "la misma información en otro dominio: barrido ⊛ filtro inverso ="
         " respuesta al impulso",
-    "Specific loudness N'(z) and its integral (ISO 532-1)":
-        "Sonoridad específica N'(z) y su integral (ISO 532-1)",
+    "Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)":
+        "Sonoridad específica $N\u2032(z)$ y su integral (ISO 532-1)",
     "1 kHz ≈ 8.5 Bark": "1 kHz ≈ 8,5 Bark",
     "upward spread of masking":
         "extensión del enmascaramiento hacia agudos",
@@ -3348,14 +3354,14 @@ _ES_EXACT = {
         "Una fuente, dos salas, una única potencia acústica",
     "Anechoic room (ISO 3745)": "Cámara anecoica (ISO 3745)",
     "Reverberation room (ISO 3741)": "Cámara reverberante (ISO 3741)",
-    "microphone sphere, r": "esfera de micrófonos, r",
+    "microphone sphere, $r$": "esfera de micrófonos, $r$",
     "direct sound only — no reflections":
         "solo sonido directo — sin reflexiones",
     "rotating microphone": "micrófono giratorio",
     "reflections build a diffuse field":
         "las reflexiones crean un campo difuso",
-    "the room changes Lp, not the source power":
-        "la sala cambia Lp, no la potencia de la fuente",
+    "the room changes $L_p$, not the source power":
+        "la sala cambia $L_p$, no la potencia de la fuente",
     "Comb filtering from a single reflection":
         "Filtrado en peine por una sola reflexión",
     "reflecting floor": "suelo reflectante",
@@ -3381,37 +3387,38 @@ _ES_EXACT = {
     "each panel on its own dB scale": "cada panel en su propia escala dB",
     "Ground effect: direct + reflected interference (2D FDTD)":
         "Efecto de suelo: interferencia directa + reflejada (FDTD 2D)",
-    "source (h = 1.5 m)": "fuente (h = 1,5 m)",
+    "source ($h$ = 1.5 m)": "fuente ($h$ = 1,5 m)",
     "image source (ghost)": "fuente imagen (fantasma)",
     "receiver in a dip": "receptor en un mínimo",
     "instantaneous pressure": "presión instantánea",
     "RMS level: interference lobes": "nivel RMS: lóbulos de interferencia",
     "Level on the 8 m arc": "Nivel en el arco de 8 m",
-    "elevation angle θ [°]": "ángulo de elevación θ [°]",
+    r"elevation angle $\theta$ [°]": r"ángulo de elevación $\theta$ [°]",
     "level [dB re max]": "nivel [dB re máx]",
     "image-source model": "modelo de fuente imagen",
     "predicted nulls": "mínimos previstos",
     "dips land exactly on the predicted nulls":
         "los mínimos caen exactamente en los nulos previstos",
     "FDTD": "FDTD",
-    "SOFAR channel: sound trapped by the c(z) minimum (2D FDTD)":
-        "Canal SOFAR: sonido atrapado por el mínimo de c(z) (FDTD 2D)",
+    "SOFAR channel: sound trapped by the $c(z)$ minimum (2D FDTD)":
+        "Canal SOFAR: sonido atrapado por el mínimo de $c(z)$ (FDTD 2D)",
     "Source on the channel axis (depth 400 m)":
         "Fuente en el eje del canal (400 m de profundidad)",
     "Source near the surface (depth 150 m)":
         "Fuente cerca de la superficie (150 m de profundidad)",
-    "channel axis (c minimum)": "eje del canal (mínimo de c)",
+    "channel axis ($c$ minimum)": "eje del canal (mínimo de $c$)",
     "trapped: wavefronts bend back to the axis":
         "atrapado: los frentes de onda se curvan de vuelta al eje",
     "leaks: energy escapes the channel":
         "fuga: la energía escapa del canal",
-    "c(z) [m/s]": "c(z) [m/s]",
+    "$c(z)$ [m/s]": "$c(z)$ [m/s]",
     "Flat panel vs Schroeder diffuser (2D FDTD)":
         "Panel plano frente a difusor de Schroeder (FDTD 2D)",
     "Flat rigid panel": "Panel rígido plano",
-    "Schroeder diffuser (QRD, N = 7)": "Difusor de Schroeder (QRD, N = 7)",
+    "Schroeder diffuser (QRD, $N$ = 7)":
+        "Difusor de Schroeder (QRD, $N$ = 7)",
     "incident plane wavefront": "frente de onda plano incidente",
-    "sound field p": "campo sonoro p",
+    "sound field $p$": "campo sonoro $p$",
     "scattered field (total − incident)":
         "campo dispersado (total − incidente)",
     "specular beam": "haz especular",
@@ -3431,7 +3438,7 @@ _ES_EXACT = {
     "block, counted": "bloque, contado",
     "block, gated out": "bloque, excluido por la puerta",
     "short-term (3 s)": "corto plazo (3 s)",
-    "Integrated I (gated)": "Integrada I (con puerta)",
+    "Integrated $I$ (gated)": "Integrada $I$ (con puerta)",
     "Ungated energy mean": "Media energética",
     "What the gate is worth": "Lo que aporta la puerta",
     "Blocks gated out": "Bloques excluidos",
@@ -3945,10 +3952,10 @@ _ES_EXACT = {
     "no critical angle: every angle leaks":
         "sin ángulo crítico: se fuga en todos los ángulos",
     ("Solid: the flux measured into the bed; dashed: "
-     "(1 \u2212 |R|\u00b2) sin\u00b2\u03c8. Each curve on its own maximum; "
+     r"$(1 - |R|^2)\sin^2\psi$. Each curve on its own maximum; "
      "the field compensated for spreading."):
         ("Continuo: el flujo medido hacia el fondo; discontinuo: "
-         "(1 \u2212 |R|\u00b2) sin\u00b2\u03c8. Cada curva con su máximo; "
+         r"$(1 - |R|^2)\sin^2\psi$. Cada curva con su máximo; "
          "campo compensado del ensanchamiento."),
     # anim_fdtd_expansion_chamber
     # Kept short: the canvas clips a suptitle much beyond ~80 characters.
@@ -3963,15 +3970,15 @@ _ES_EXACT = {
     # anim_fdtd_side_branch
     "The quarter-wave side branch, on and off tune (2D FDTD)":
         "La rama lateral de cuarto de onda, en sintonía y fuera (FDTD 2D)",
-    "closed stub, built ℓ = 300 mm":
-        "tubo cerrado, construido con ℓ = 300 mm",
+    r"closed stub, built $\ell$ = 300 mm":
+        r"tubo cerrado, construido con $\ell$ = 300 mm",
     "on tune": "en sintonía",
     "off tune": "fuera de sintonía",
     "closed-end\npressure [Pa]": "presión en el\nextremo cerrado [Pa]",
     "Rigid walls, anechoic ends, incident amplitude 1; the charge "
-    "bandwidth f/Q is percent-wide, the lossless notch hertz-wide.":
+    "bandwidth $f/Q$ is percent-wide, the lossless notch hertz-wide.":
         "Paredes rígidas, extremos anecoicos, amplitud incidente 1; el "
-        "ancho de carga f/Q es porcentual; la muesca sin pérdidas, de "
+        "ancho de carga $f/Q$ es porcentual; la muesca sin pérdidas, de "
         "hercios.",
     # anim_fdtd_absorption_placement
     "Where the absorption sits: same total, two decays (2D FDTD)":
@@ -4010,9 +4017,9 @@ _ES_EXACT = {
     "bent up: a shadow opens, the receiver goes quiet":
         "curvada hacia arriba: se abre una sombra, el receptor se queda en "
         "silencio",
-    "source (h = 2 m)": "fuente (h = 2 m)",
+    "source ($h$ = 2 m)": "fuente ($h$ = 2 m)",
     "receiver 350 m": "receptor a 350 m",
-    "c_eff(z) [m/s]": "c_ef(z) [m/s]",
+    r"$c_{\mathrm{eff}}(z)$ [m/s]": r"$c_{\mathrm{eff}}(z)$ [m/s]",
     # anim_elastic_plate_junction
     "Bending waves at an L-junction (elastic 2D FDTD)":
         "Ondas de flexión en una unión en L (FDTD elástico 2D)",
@@ -4024,9 +4031,9 @@ _ES_EXACT = {
     "free end": "extremo libre",
     "4 kHz tone burst at ▼": "salva de tono de 4 kHz en ▼",
     # anim_elastic_coincidence
-    "Coincidence: the same steel plate, below and above f_c "
+    "Coincidence: the same steel plate, below and above $f_c$ "
     "(elastic 2D FDTD)":
-        "Coincidencia: la misma placa de acero, bajo y sobre f_c "
+        "Coincidencia: la misma placa de acero, bajo y sobre $f_c$ "
         "(FDTD elástico 2D)",
     "10 mm steel plate": "placa de acero de 10 mm",
     # coupling_term_regimes (EN 12354-5, buildings/design)
@@ -4047,9 +4054,9 @@ _ES_EXACT = {
         "derecha: fuente de fuerza (un receptor rígido acepta menos)",
     # tapping_force_spectrum (buildings/design/resilient-layers)
     r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (rebound)":
-        r"$|F_n|_{\mathrm{sup}} = 2\,m\,v_h/T_i$  (con rebote)",
+        r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (con rebote)",
     r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (no rebound)":
-        r"$|F_n|_{\mathrm{inf}} = m\,v_h/T_i$  (sin rebote)",
+        r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (sin rebote)",
     r"Line force $|F_n|$ [N]": r"Fuerza por línea $|F_n|$ [N]",
     "Tapping-Machine Force: the Floor Decides the Excitation":
         "Fuerza de la máquina de impactos: el forjado decide la excitación",
@@ -4391,8 +4398,8 @@ _ES_EXACT = {
     "Duct cut-on: is one pressure enough? (2D FDTD)":
         "Corte del conducto: ¿basta una sola presión? (FDTD 2D)",
     "Distance along the duct [m]": "Distancia a lo largo del conducto [m]",
-    "p across the section": "p en la sección",
-    "p / plane mode": "p / modo plano",
+    "$p$ across the section": "$p$ en la sección",
+    "$p$ / plane mode": "$p$ / modo plano",
     # Lamb's problem clip (simulation/elastic-waves).
     "Lamb's problem: P, S and the surface wave (elastic 2D FDTD)":
         "Problema de Lamb: P, S y la onda de superficie (FDTD elástico 2D)",
@@ -4407,8 +4414,8 @@ _ES_EXACT = {
         "sonda comparten una",
     "depth [m]": "profundidad [m]",
     "distance from the impact [m]": "distancia al impacto [m]",
-    "surface v_y at 0.15 and 0.30 m":
-        "v_y en la superficie a 0,15 y 0,30 m",
+    "surface $v_y$ at 0.15 and 0.30 m":
+        "$v_y$ en la superficie a 0,15 y 0,30 m",
     # Mode-conversion clip (simulation/elastic-waves).
     "Mode conversion: water on steel, three incidences (elastic 2D FDTD)":
         "Conversión de modo: agua sobre acero, tres incidencias "
@@ -4428,8 +4435,8 @@ _ES_EXACT = {
     "14 dB at 2 kHz, gone only above coincidence":
         "lo que la Parte 1 paga: 25 dB en 63 Hz,\n"
         "14 dB en 2 kHz; solo desaparece sobre la coincidencia",
-    "Radiation efficiency: a driven plate below and above f_c":
-        "Eficiencia de radiación: una placa excitada bajo y sobre f_c",
+    "Radiation efficiency: a driven plate below and above $f_c$":
+        "Eficiencia de radiación: una placa excitada bajo y sobre $f_c$",
     "colour: air pressure / the pressure a piston of the same surface "
     "velocity would make":
         "color: presión del aire / la que haría un pistón con la misma "
@@ -4448,24 +4455,26 @@ _ES_PATTERNS = [
       "solo alcanza el inicio LF, y el grupo de las marsopas se queda \\1 dB\n"
       "por debajo de su propio criterio de TTS incluso tras 10 000 golpes")),
     # anim_fdtd_critical_angle: labels and readouts with computed values.
-    (r"^critical ray, ψ = (.+)°$", r"rayo crítico, ψ = \1°"),
-    (r"^sand: c₂ = (.+) m/s, ρ₂ = (.+) kg/m³$",
-     r"arena: c₂ = \1 m/s, ρ₂ = \2 kg/m³"),
-    (r"^mud: c₂ = (.+) m/s, ρ₂ = (.+) kg/m³$",
-     r"fango: c₂ = \1 m/s, ρ₂ = \2 kg/m³"),
-    (r"^ψ = (\d+\.\d+)°$", r"ψ = \1°"),
-    (r"^\|R\| = (.+): nothing enters$", r"|R| = \1: no entra nada"),
+    (r"^critical ray, \$\\psi\$ = (\d+)\.(\d+)°$",
+     r"rayo crítico, $\\psi$ = \1,\2°"),
+    (r"^sand: \$c_2\$ = (.+) m/s, \$\\rho_2\$ = (.+) kg/m³$",
+     r"arena: $c_2$ = \1 m/s, $\\rho_2$ = \2 kg/m³"),
+    (r"^mud: \$c_2\$ = (.+) m/s, \$\\rho_2\$ = (.+) kg/m³$",
+     r"fango: $c_2$ = \1 m/s, $\\rho_2$ = \2 kg/m³"),
+    (r"^\$\\psi\$ = (\d+)\.(\d+)°$", r"$\\psi$ = \1,\2°"),
+    (r"^\$\|R\|\$ = (\d+)\.(\d+): nothing enters$",
+     r"$|R|$ = \1,\2: no entra nada"),
     (r"^\$\|R\|\$ = (\d+)\.(\d+)$", r"$|R|$ = \1,\2"),
     ((r"^beyond (.+) m the net is (.+) % of what entered inside "
       r"\(theory (.+) %\)$"),
      ("más allá de \\1 m el neto es el \\2 % de lo que entró dentro "
       "(teoría \\3 %)")),
-    (r"^ · the front meets the bed at ψ = (.+)°$",
-     r" · el frente llega al fondo con ψ = \1°"),
+    (r"^ · the front meets the bed at \$\\psi\$ = (\d+)°$",
+     r" · el frente llega al fondo con $\\psi$ = \1°"),
     # anim_fdtd_dispersion: labels and readouts carrying computed values.
     (r"^finish line, (.+) m$", r"línea de meta, \1 m"),
-    (r"^(\d+) cells per wavelength · Δx = (.+) mm$",
-     r"\1 celdas por longitud de onda · Δx = \2 mm"),
+    (r"^(\d+) cells per wavelength · \$\\Delta x\$ = (\d+)\.(\d+) mm$",
+     r"\1 celdas por longitud de onda · $\\Delta x$ = \2,\3 mm"),
     (r"^(.+) m behind \(theory (.+) m\)$",
      r"\1 m por detrás (teoría \2 m)"),
     (r"^crossed at (.+) ms, \+(.+) ms$",
@@ -4473,11 +4482,11 @@ _ES_PATTERNS = [
     (r"^(.+) % slow \(theory (.+) %\)$",
      r"\1 % más lenta (teoría \2 %)"),
     ((r"^Air at (.+) m/s, a (.+) Hz burst, per-axis Courant number "
-      r"S = (.+); grey is the exact continuous wave, dots are the "
-      r"grid cells$"),
+      r"\$S\$ = (\d+)\.(\d+); grey is the exact continuous wave, dots "
+      r"are the grid cells$"),
      ("Aire a \\1 m/s, ráfaga de \\2 Hz, número de Courant por eje "
-      "S = \\3; en gris la onda continua exacta, los puntos son las "
-      "celdas de la malla")),
+      "$S$ = \\3,\\4; en gris la onda continua exacta, los puntos son "
+      "las celdas de la malla")),
     # anim_fdtd_side_branch: titles and readouts carrying computed values.
     (r"^On the tuning frequency: (\d+\.\d) Hz$",
      r"En la frecuencia de sintonía: \1 Hz"),
@@ -4486,23 +4495,25 @@ _ES_PATTERNS = [
      r"×\1 la onda incidente, en ≈\2 periodos"),
     (r"^×(\d+\.\d) at once: it never charges$",
      r"×\1 al instante: nunca se carga"),
-    ((r"^the stub rings at (\d+\.\d) Hz, not (\d+\.\d):\n"
-      r"ℓ_eff = c/4f = (\d+) mm, so trim it to tune$"),
-     ("el tubo resuena a \\1 Hz, no a \\2:\nℓ_ef = c/4f = \\3 mm: se "
-      "recorta para afinarlo")),
+    ((r"^the stub rings at (\d+)\.(\d) Hz, not (\d+)\.(\d):\n"
+      r"\$\\ell_\{\\mathrm\{eff\}\} = c/4f\$ = (\d+) mm, "
+      r"so trim it to tune$"),
+     ("el tubo resuena a \\1,\\2 Hz, no a \\3,\\4:\n"
+      "$\\\\ell_{\\\\mathrm{eff}} = c/4f$ = \\5 mm: se recorta para afinarlo")),
     # anim_fdtd_absorption_placement: readouts carrying measured values.
-    (r"^measured T = (\d+) ms: inside the band$",
-     r"T medida = \1 ms: dentro de la banda"),
-    (r"^early (\d+) ms, tail (\d+) ms: no single T$",
-     r"inicial \1 ms, cola \2 ms: sin una única T"),
-    (r"^Sabine, T = (\d+) ms$", r"Sabine, T = \1 ms"),
-    (r"^Eyring, T = (\d+) ms$", r"Eyring, T = \1 ms"),
-    ((r"^Locally reacting resistive edges; both rooms hold (\d+\.\d) m of "
-      r"statistical absorption \(α_st = (\d+\.\d\d) on 21 m vs (\d+\.\d\d) "
-      r"on 16 m\); 250 Hz burst\.$"),
-     (r"Bordes resistivos de reacción local; ambas salas tienen \1 m de "
-      r"absorción estadística (α_st = \2 en 21 m frente a \3 en 16 m); "
-      r"ráfaga de 250 Hz.")),
+    (r"^measured \$T\$ = (\d+) ms: inside the band$",
+     r"$T$ medida = \1 ms: dentro de la banda"),
+    (r"^early (\d+) ms, tail (\d+) ms: no single \$T\$$",
+     r"inicial \1 ms, cola \2 ms: sin una única $T$"),
+    (r"^Sabine, \$T\$ = (\d+) ms$", r"Sabine, $T$ = \1 ms"),
+    (r"^Eyring, \$T\$ = (\d+) ms$", r"Eyring, $T$ = \1 ms"),
+    ((r"^Locally reacting resistive edges; both rooms hold (\d+)\.(\d) m of "
+      r"statistical absorption \(\$\\alpha_\{\\mathrm\{st\}\}\$ = "
+      r"(\d+)\.(\d\d) on 21 m vs (\d+)\.(\d\d) on 16 m\); "
+      r"250 Hz burst\.$"),
+     ("Bordes resistivos de reacción local; ambas salas tienen \\1,\\2 m de "
+      "absorción estadística ($\\\\alpha_{\\\\mathrm{st}}$ = \\3,\\4 en 21 m "
+      "frente a \\5,\\6 en 16 m); ráfaga de 250 Hz.")),
     # Aircraft: labels and annotations carrying computed values.
     (r"^closest segment: (.+) dB$", r"segmento más próximo: \1 dB"),
     ((r"^receiver 3 000 m along track, 500 m to the side, 1\.2 m up\.\n"
@@ -4567,7 +4578,7 @@ _ES_PATTERNS = [
      (r"tablero de partículas de \1 mm (supercrítico, "
       r"$f_{\\mathrm{co}}$ = \2 Hz)")),
     (r"^\$f_\{\\mathrm\{limit\}\}\$ = (\d+) Hz$",
-     r"$f_{\\mathrm{límite}}$ = \1 Hz"),
+     r"$f_{\\mathrm{limit}}$ = \1 Hz"),
     (r"^(.+) dB in mean square\n\((.+) N to (.+) N\)$",
      r"\1 dB en valor cuadrático medio\n(de \2 N a \3 N)"),
     # detailed_impact_paths annotations (mathtext skips the decimal-comma
@@ -4676,8 +4687,11 @@ _ES_PATTERNS = [
     # window_functions_tradeoff legend entries (name + baked-in metrics).
     (r"^([a-z]+): ENBW (.+) bins, sidelobe (.+) dB$",
      r"\1: ENBW \2 bins, lóbulo lateral \3 dB"),
-    (r"^alpha = (.+) at (.+) Hz$",
-     r"alfa = \1 a \2 Hz"),
+    (r"^\$\\alpha\$ = (\d+)\.(\d+) at (\d+) Hz$",
+     r"$\\alpha$ = \1,\2 a \3 Hz"),
+    # anim_fdtd_impedance_tube: the reflection and absorption readout.
+    (r"^\$\|R\|\$ = (\d+)\.(\d+)   \$\\alpha\$ = (\d+)\.(\d+)$",
+     r"$|R|$ = \1,\2   $\\alpha$ = \3,\4"),
     (r"^TL = (.+) dB at (.+) Hz$",
      r"TL = \1 dB a \2 Hz"),
     (r"^Integrated I = (.+) LUFS$", "Integrada I = \\1 LUFS"),
@@ -4747,16 +4761,23 @@ _ES_PATTERNS = [
      r"Camino difractado (δ = \1,\2 m)"),
     (r"^(\d+) yr$", r"\1 años"),
     # anim_elastic_coincidence titles and verdicts (library values baked in).
-    (r"^f = f_c/2 = (\d+) Hz, 45° incidence$",
-     r"f = f_c/2 = \1 Hz, incidencia a 45°"),
-    (r"^f = 2 f_c = (\d+) Hz, 45° incidence$",
-     r"f = 2 f_c = \1 Hz, incidencia a 45°"),
-    (r"^below f_c: the mass law holds: (.+) dB \(it predicts (.+)\)$",
-     r"bajo f_c: manda la ley de masas: \1 dB (predice \2)"),
-    (r"^above f_c: trace matches λ_B: (.+) dB, the mass law said (.+)$",
-     r"sobre f_c: la traza iguala λ_B: \1 dB, la ley de masas decía \2"),
-    (r"^coincidence_frequency: f_c = (\d+) Hz \(10 mm steel\)$",
-     r"coincidence_frequency: f_c = \1 Hz (acero de 10 mm)"),
+    (r"^\$f = f_c/2\$ = (\d+) Hz, 45° incidence$",
+     r"$f = f_c/2$ = \1 Hz, incidencia a 45°"),
+    (r"^\$f = 2f_c\$ = (\d+) Hz, 45° incidence$",
+     r"$f = 2f_c$ = \1 Hz, incidencia a 45°"),
+    (r"^below \$f_c\$: the mass law holds: (.+) dB \(it predicts (.+)\)$",
+     r"bajo $f_c$: manda la ley de masas: \1 dB (predice \2)"),
+    ((r"^above \$f_c\$: trace matches \$\\lambda_B\$: (.+) dB, "
+      r"the mass law said (.+)$"),
+     r"sobre $f_c$: la traza iguala $\\lambda_B$: \1 dB, la ley de masas decía \2"),
+    (r"^coincidence_frequency: \$f_c\$ = (\d+) Hz \(10 mm steel\)$",
+     r"coincidence_frequency: $f_c$ = \1 Hz (acero de 10 mm)"),
+    # anim_elastic_plate_junction: the junction readout. Its own entry
+    # because the mathtext symbols take it out of the decimal-comma pass.
+    ((r"^junction_transmission\('L'\): \$\\tau\(0°\)\$ = (\d+)\.(\d+), "
+      r"\$K_\{12\}\$ = (\d+)\.(\d+) dB$"),
+     (r"junction_transmission('L'): $\\tau(0°)$ = \1,\2, "
+      r"$K_{12}$ = \3,\4 dB")),
     # Weak-field display-gain notes (_gain_note); the factor is measured off
     # the field, so the number and its dB equivalent ride through.
     (r"^air below the plate drawn ×(\d+) \(\+(\d+) dB\)$",
@@ -4802,14 +4823,14 @@ _ES_PATTERNS = [
     (r"^(\d+) dB at 500 Hz$", r"\1 dB a 500 Hz"),
     (r"^step (\d+) of (\d+)$", r"paso \1 de \2"),
     (r"^sum = (.+) dB$", r"suma = \1 dB"),
-    (r"^C = ([-+−]\d+) dB, Ctr = ([-+−]\d+) dB$",
-     r"C = \1 dB, Ctr = \2 dB"),
-    (r"^CI = ([-+−]\d+) dB$", r"CI = \1 dB"),
+    (r"^\$C\$ = ([-+−]\d+) dB, \$C_\{tr\}\$ = ([-+−]\d+) dB$",
+     r"$C$ = \1 dB, $C_{tr}$ = \2 dB"),
+    (r"^\$C_I\$ = ([-+−]\d+) dB$", r"$C_I$ = \1 dB"),
     # --- anim_dynamic_stiffness_sweep: the drive readout, every frame. The
     # padding inside the captures is what keeps the monospace columns still
     # while the numbers change width.
-    (r"^f = ( *[\d.]+) Hz    phase = ( *[-−]?[\d.]+)°$",
-     r"f = \1 Hz    fase = \2°"),
+    (r"^\$f\$ = ( *\d+)\.(\d+) Hz    phase = ( *[-−]?\d+)\.(\d+)°$",
+     r"$f$ = \1,\2 Hz    fase = \3,\4°"),
     # --- anim_block_vs_exponential: readouts rewritten on every frame ---
     (r"^4 kHz burst, (\d+) ms$", r"ráfaga de 4 kHz, \1 ms"),
     (r"^class 1 is (.+) dB about (.+) dB$",
@@ -4823,10 +4844,10 @@ _ES_PATTERNS = [
     (r"^spread so far, block Leq:   (.+) dB$",
      r"dispersión, Leq bloques: \1 dB"),
     # --- anim_feedback_howl: readouts rewritten on every frame ---
-    (r"^Zs = (.+) dB, (\d+) open microphone\(s\)$",
-     r"Zs = \1 dB, \2 micrófono(s) abierto(s)"),
-    (r"^loop gain Zs \+ Gs = (.+) dB$",
-     r"ganancia de lazo Zs + Gs = \1 dB"),
+    (r"^\$Z_S\$ = (.+) dB, (\d+) open microphone\(s\)$",
+     r"$Z_S$ = \1 dB, \2 micrófono(s) abierto(s)"),
+    (r"^loop gain \$Z_S \+ G_S\$ = ([-+−]\d+)\.(\d+) dB$",
+     r"ganancia de lazo $Z_S + G_S$ = \1,\2 dB"),
     (r"^each round trip is x (.+)$", r"cada vuelta es x \1"),
     (r"^sum converges to (.+) dB$", r"la suma converge a \1 dB"),
     (r"^Aures \(Annex B, \$N\$ = (\d+) sone\)$",
@@ -5154,16 +5175,25 @@ _ES_PATTERNS = [
     (r"^10-90 % band \((\d+) yr\)$", r"banda 10-90 % (\1 años)"),
     # Tier-1 animation dynamic labels
     (r"^remaining energy: (.+) %$", r"energía restante: \1 %"),
+    (r"^\$\\langle p\\cdot u\\rangle\$ = ([+−-])(\d+)\.(\d+)$",
+     r"$\\langle p\\cdot u\\rangle$ = \1\2,\3"),
+    (r"^\$\\Delta\$ = (\d+)\.(\d+) m   \$\\tau\$ = (\d+)\.(\d+) ms$",
+     r"$\\Delta$ = \1,\2 m   $\\tau$ = \3,\4 ms"),
+    (r"^\$P\$ = (\d+)\.(\d+)$", r"$P$ = \1,\2"),
+    (r"^\$N\$ = (\d+)\.(\d+) sone$", r"$N$ = \1,\2 sonios"),
     (r"^On the \(2,1\) mode: (.+) Hz$", r"En el modo (2,1): \1 Hz"),
     (r"^Off mode: (.+) Hz$", r"Fuera de modo: \1 Hz"),
     (r"^(.+) sone$", r"\1 sonios"),
-    (r"^mean Lp = (.+) dB$", r"Lp medio = \1 dB"),
+    (r"^mean \$L_p\$ = (\d+)\.(\d+) dB$", r"$L_p$ medio = \1,\2 dB"),
     (r"^first notch (.+) Hz$", r"primer nulo \1 Hz"),
     # FDTD animation dynamic labels (third batch)
-    (r"^Low frequency: (.+)$", r"Baja frecuencia: \1"),
-    (r"^High frequency: (.+)$", r"Alta frecuencia: \1"),
+    (r"^Low frequency: (\d+) Hz \(\$\\lambda\$ ≈ (\d+)\.(\d+) m\)$",
+     r"Baja frecuencia: \1 Hz ($\\lambda$ ≈ \2,\3 m)"),
+    (r"^High frequency: (\d+) Hz \(\$\\lambda\$ ≈ (\d+)\.(\d+) m\)$",
+     r"Alta frecuencia: \1 Hz ($\\lambda$ ≈ \2,\3 m)"),
     (r"^insertion loss (.+) dB$", r"pérdida por inserción \1 dB"),
-    (r"^diffusion coefficient d = (.+)$", r"coeficiente de difusión d = \1"),
+    (r"^diffusion coefficient \$d\$ = (\d+)\.(\d+)$",
+     r"coeficiente de difusión $d$ = \1,\2"),
     (r"^design frequency (.+) Hz$", r"frecuencia de diseño \1 Hz"),
     # 2D FDTD wave simulation (public API concept figure)
     (r"^FDTD pressure field at t = (.+) ms$",
@@ -5220,10 +5250,16 @@ _ES_PATTERNS = [
     (r"^short-term gate (.+) LUFS$", r"puerta de corto plazo \1 LUFS"),
     (r"^(\d+) of (\d+)$", r"\1 de \2"),
     # anim_epnl_flyover: the per-record tone readout and the window caption.
-    (r"^F = (.+) dB at (\d+) Hz$", r"F = \1 dB a \2 Hz"),
+    (r"^\$F\$ = (\d+)\.(\d+) dB at (\d+) Hz$", r"$F$ = \1,\2 dB a \3 Hz"),
+    (r"^\$C\$ = (\d+)\.(\d+) dB$", r"$C$ = \1,\2 dB"),
+    (r"^\$m\$\((\d+) Hz\) = (\d+)\.(\d+)$", r"$m$(\1 Hz) = \2,\3"),
     (r"^Sum the energy inside the window, records (\d+) to (\d+)$",
      r"Se suma la energía dentro de la ventana, registros \1 a \2"),
     # anim_image_source_buildup: the running counter and its analytic law.
+    (r"^\$t\$ = ( *\d+)\.(\d+) ms$", r"$t$ = \1,\2 ms"),
+    (r"^\$t\$ = ( *\d+)\.(\d+) s$", r"$t$ = \1,\2 s"),
+    (r"^\$t\$ = ( *\d+)\.(\d+) µs$", r"$t$ = \1,\2 µs"),
+    (r"^\$ct\$ = ( *\d+)\.(\d+) m$", r"$ct$ = \1,\2 m"),
     (r"^counted (\d+)$", r"contadas \1"),
     (r"^law (\d+)$", r"ley \1"),
     # Core-metrology figures: dynamic verdict / error strings
@@ -5234,14 +5270,19 @@ _ES_PATTERNS = [
     (r"^estimated delay removed: (.+) samples$",
      r"retardo estimado eliminado: \1 muestras"),
     # FDTD second-batch clips: baked-number pills and titles
-    (r"^slit h = (.+) mm$", r"rendija h = \1 mm"),
-    (r"^Pass band: (\d+) Hz, kL = π$", r"Banda de paso: \1 Hz, kL = π"),
-    (r"^Stop band peak: (\d+) Hz, kL = π/2$",
-     r"Pico de rechazo: \1 Hz, kL = π/2"),
-    (r"^Slit w = (\d+) mm \(λ/20\)$", r"Rendija w = \1 mm (λ/20)"),
-    (r"^Opening w = (.+) m \(= λ\)$", r"Hueco w = \1 m (= λ)"),
-    (r"^slit τ = (.+) \(Gomperts\)$", r"rendija τ = \1 (Gomperts)"),
-    (r"^f = (\d+) Hz \(λ = (.+) m\)$", r"f = \1 Hz (λ = \2 m)"),
+    (r"^slit \$h\$ = (\d+)\.(\d+) mm$", r"rendija $h$ = \1,\2 mm"),
+    (r"^Pass band: (\d+) Hz, \$kL = \\pi\$$",
+     r"Banda de paso: \1 Hz, $kL = \\pi$"),
+    (r"^Stop band peak: (\d+) Hz, \$kL = \\pi/2\$$",
+     r"Pico de rechazo: \1 Hz, $kL = \\pi/2$"),
+    (r"^Slit \$w\$ = (\d+) mm \(\$\\lambda/20\$\)$",
+     r"Rendija $w$ = \1 mm ($\\lambda/20$)"),
+    (r"^Opening \$w\$ = (\d+)\.(\d+) m \(= \$\\lambda\$\)$",
+     r"Hueco $w$ = \1,\2 m (= $\\lambda$)"),
+    (r"^slit \$\\tau\$ = (\d+)\.(\d+) \(Gomperts\)$",
+     r"rendija $\\tau$ = \1,\2 (Gomperts)"),
+    (r"^\$f\$ = (\d+) Hz \(\$\\lambda\$ = (\d+)\.(\d+) m\)$",
+     r"$f$ = \1 Hz ($\\lambda$ = \2,\3 m)"),
     (r"^shadow beyond ≈ (\d+) m \(ray model\)$",
      r"sombra más allá de ≈ \1 m (modelo de rayos)"),
     # cnossos_road_speed_law rolling/propulsion crossover annotation.
@@ -5419,7 +5460,7 @@ _ES_PATTERNS = [
      r"una sola presión, con un margen del \1 %"),
     (r"^(.+) % of the section's energy is not the plane mode$",
      r"el \1 % de la energía de la sección no está en el modo plano"),
-    (r"^section at x = (.+) m$", r"sección en x = \1 m"),
+    (r"^section at \$x\$ = (.+) m$", r"sección en $x$ = \1 m"),
     ((r"^rectangular_duct_cut_on: first cut-on (.+) Hz "
       r"\((.+) × (.+) m duct\)$"),
      r"rectangular_duct_cut_on: primer corte a \1 Hz (conducto de \2 × \3 m)"),
@@ -5436,32 +5477,38 @@ _ES_PATTERNS = [
     # Mode-conversion clip: the display gain and the measured reflection.
     (r"^steel drawn ×(\d+) \(\+(\d+) dB\)$",
      r"acero dibujado ×\1 (+\2 dB)"),
-    (r"^P and SV both propagate\n\|V\| = (.+)$",
-     "P y SV se propagan las dos\n|V| = \\1"),
-    (r"^P evanescent, SV alone crosses\n\|V\| = (.+)$",
-     "P evanescente, solo SV atraviesa\n|V| = \\1"),
-    (r"^both evanescent\n\|V\| = (.+), with a phase$",
-     "las dos evanescentes\n|V| = \\1, con una fase"),
+    (r"^P and SV both propagate\n\$\|V\|\$ = (\d+)\.(\d+)$",
+     "P y SV se propagan las dos\n$|V|$ = \\1,\\2"),
+    (r"^P evanescent, SV alone crosses\n\$\|V\|\$ = (\d+)\.(\d+)$",
+     "P evanescente, solo SV atraviesa\n$|V|$ = \\1,\\2"),
+    (r"^both evanescent\n\$\|V\|\$ = (\d+)\.(\d+), with a phase$",
+     "las dos evanescentes\n$|V|$ = \\1,\\2, con una fase"),
     # Radiation-efficiency clip: panel titles, verdicts and footer.
-    ((r"^f = f_c/2 = (.+) Hz, below coincidence: the plate wave is slower "
-      r"than sound$"),
-     ("f = f_c/2 = \\1 Hz, bajo coincidencia: la onda de la placa es más "
+    ((r"^\$f = f_c/2\$ = (.+) Hz, below coincidence: the plate wave is "
+      r"slower than sound$"),
+     ("$f = f_c/2$ = \\1 Hz, bajo coincidencia: la onda de la placa es más "
       "lenta que el sonido")),
-    ((r"^f = 2 f_c = (.+) Hz, above coincidence: the plate wave is faster "
-      r"than sound$"),
-     ("f = 2 f_c = \\1 Hz, sobre coincidencia: la onda de la placa es más "
+    ((r"^\$f = 2f_c\$ = (.+) Hz, above coincidence: the plate wave is "
+      r"faster than sound$"),
+     ("$f = 2f_c$ = \\1 Hz, sobre coincidencia: la onda de la placa es más "
       "rápida que el sonido")),
-    ((r"^λ_B = (.+) m is shorter than λ = (.+) m in air\n"
-      r"no angle solves sin θ = λ/λ_B: the skin dies in (.+) m$"),
-     ("λ_B = \\1 m es menor que λ = \\2 m en el aire\n"
-      "ningún ángulo cumple sen θ = λ/λ_B: la piel se apaga en \\3 m")),
-    ((r"^λ_B = (.+) m is longer than λ = (.+) m in air\n"
-      r"the trace match sends a beam out at (.+)°$"),
-     ("λ_B = \\1 m es mayor que λ = \\2 m en el aire\n"
-      "la coincidencia de traza lanza un haz a \\3°")),
-    ((r"^elastic 2D FDTD, 10 mm steel plate, f_c = (.+) Hz · overlaid "
+    ((r"^\$\\lambda_B\$ = (\d+)\.(\d+) m is shorter than \$\\lambda\$ = "
+      r"(\d+)\.(\d+) m in air\n"
+      r"no angle solves \$\\sin\\theta = \\lambda/\\lambda_B\$: "
+      r"the skin dies in (\d+)\.(\d+) m$"),
+     ("$\\\\lambda_B$ = \\1,\\2 m es menor que $\\\\lambda$ = \\3,\\4 m "
+      "en el aire\n"
+      "ningún ángulo cumple $\\\\mathrm{sen}\\\\,\\\\theta = "
+      "\\\\lambda/\\\\lambda_B$: la piel se apaga en \\5,\\6 m")),
+    ((r"^\$\\lambda_B\$ = (\d+)\.(\d+) m is longer than \$\\lambda\$ = "
+      r"(\d+)\.(\d+) m in air\n"
+      r"the trace match sends a beam out at (\d+)°$"),
+     ("$\\\\lambda_B$ = \\1,\\2 m es mayor que $\\\\lambda$ = \\3,\\4 m "
+      "en el aire\n"
+      "la coincidencia de traza lanza un haz a \\5°")),
+    ((r"^elastic 2D FDTD, 10 mm steel plate, \$f_c\$ = (.+) Hz · overlaid "
       r"line: its deflection, exaggerated$"),
-     ("FDTD elástico 2D, placa de acero de 10 mm, f_c = \\1 Hz · línea "
+     ("FDTD elástico 2D, placa de acero de 10 mm, $f_c$ = \\1 Hz · línea "
       "superpuesta: su deformación, exagerada")),
     # Underwater figures: readouts carrying computed values (the detection
     # ranges, the modal wavenumbers, the orca branches, the exposure

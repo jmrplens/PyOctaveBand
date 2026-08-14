@@ -284,7 +284,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
                                facecolor="none", edgecolor=COLOR_FG,
                                ls="--", lw=0.8, zorder=5))
         ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
-        ax.text(0.005, env_base + 0.004, "|p| envelope", fontsize=7.5,
+        ax.text(0.005, env_base + 0.004, "$|p|$ envelope", fontsize=7.5,
                 ha="left", va="bottom", color=COLOR_FG, alpha=0.8)
         # The settled standing-wave envelope, static: the clip captures
         # the steady state, where it no longer changes.
@@ -327,7 +327,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
         ax_z.set_xticks([])
         ax_z.set_yticks([])
         ax_z.annotate(
-            T(f"slit h = {h * 1e3:.2f} mm"),
+            T(f"slit $h$ = {h * 1e3:.2f} mm"),
             xy=(x_zoom0 + 0.006, y_slit0 + 0.5 * h),
             xytext=(x_zoom0 + 0.0035, bore - 0.0095),
             fontsize=7, color=COLOR_FG, ha="left", va="top",
@@ -371,9 +371,9 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
             ims[i].set_data(t_all[k])
             ims_zoom[i].set_data(z_all[k])
             a_txts[i].set_text(
-                T(f"alpha = {alpha:.2f} at {_SLIT_ABS_F0:.0f} Hz")
+                T(r"$\alpha$ = " f"{alpha:.2f} at {_SLIT_ABS_F0:.0f} Hz")
                 if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1e3:5.1f} ms"))
         return (*ims, *ims_zoom, *a_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_slit_absorber",

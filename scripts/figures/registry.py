@@ -1290,6 +1290,28 @@ def _render_anim_variants(clip: str, output_dir: str) -> None:
                            f"(exit codes {failed})")
 
 
+def _stamp_clips(clips: list[str], output_dir: str) -> None:
+    """Record the fingerprint of every clip whose four variants were written.
+
+    Both render paths end here -- the sequential one and the process pool of
+    a full ``make animations`` -- because a stamp that only the one-clip path
+    writes would leave the whole batch unstamped and the freshness check
+    complaining about clips that were just re-rendered.
+
+    Only a run that wrote into the committed image directory stamps: the
+    renderer takes any output directory, and a render into a scratch one is
+    for looking at, not a statement about what is committed.
+    """
+    import pathlib
+
+    import animation_fingerprint
+
+    committed = pathlib.Path(__file__).resolve().parents[2] / ".github" / "images"
+    if not clips or pathlib.Path(output_dir).resolve() != committed:
+        return
+    animation_fingerprint.stamp(clips)
+
+
 def generate_animations(output_dir: str, names: list[str] | None = None,
                         *, variants: bool = False) -> None:
     """Render the Tier-1 animations, by default in the active language/theme.
@@ -1300,6 +1322,22 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
     rendered in all four language x theme variants off one field
     computation (:func:`_render_anim_variants`) instead of once in whatever
     language and theme the caller has set.
+
+    A four-variant render also stamps the clip's fingerprint into
+    ``scripts/animation_fingerprints.txt``, which is how
+    ``scripts/check_animation_freshness.py`` can later tell that the code
+    drawing a committed clip has moved on without it. The stamp is written
+    here, with the files it describes, so a re-render cannot forget it; a
+    single-variant render does not stamp, because it leaves the other three
+    variants of that clip as they were.
+
+    The stamping is in a ``finally`` because a batch does not fail as a
+    whole: a clip that raises halfway through leaves the ones before it
+    complete on disk, and dropping their stamps with the error would have
+    the freshness check call finished clips stale until somebody re-rendered
+    them for nothing. The pool path already stamps what succeeded before it
+    reports the failures (:func:`_generate_animations_parallel`); this is the
+    same bargain for the sequential one, and the render error still leaves.
     """
     import shutil
 
@@ -1317,12 +1355,17 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
         clips = list(names)
     else:
         clips = list(_ANIMATIONS)
-    for clip in clips:
-        if variants:
-            print(f"--- Generating {clip} (4 variants) ---")
-            _render_anim_variants(clip, output_dir)
-        else:
-            _ANIMATIONS[clip](output_dir)
+    stamped: list[str] = []
+    try:
+        for clip in clips:
+            if variants:
+                print(f"--- Generating {clip} (4 variants) ---")
+                _render_anim_variants(clip, output_dir)
+                stamped.append(clip)
+            else:
+                _ANIMATIONS[clip](output_dir)
+    finally:
+        _stamp_clips(stamped, output_dir)
 
 
 # ====================================================================# Command line / parallel figure generation
@@ -1609,6 +1652,10 @@ def _generate_animations_parallel(
             if exc.__cause__ is not None:
                 detail += f"\n{exc.__cause__}"
             failures.append(f"{clip}: {detail}")
+    _stamp_clips([
+        clip for future, clip in futures.items()
+        if not future.cancelled() and future.exception() is None
+    ], img_dir)
     if failures:
         skipped = (
             f"\n  ({cancelled} queued clips cancelled, not attempted)"

@@ -270,7 +270,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
         tax.set_ylim(-1.15, 1.15)
         tax.set_yticks([])
         tax.tick_params(labelsize=7)
-        tax.set_title(T("surface v_y at 0.15 and 0.30 m"), fontsize=7.5)
+        tax.set_title(T("surface $v_y$ at 0.15 and 0.30 m"), fontsize=7.5)
         if row == 1:
             tax.set_xlabel(T("t [µs]"), fontsize=7.5)
         (ln0,) = tax.plot([], [], color=COLOR_PRIMARY, lw=1.0)
@@ -321,7 +321,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
             for i, line in enumerate(lines[row]):
                 line.set_data(t_us[:kf + 1], trace[:kf + 1, i])
             v_txts[row].set_text(verdicts[row] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {t * 1e6:5.1f} µs"))
+        t_txt.set_text(T(f"$t$ = {t * 1e6:5.1f} µs"))
         return (*ims, *marks, *r_labs, *v_txts, speeds, scale_txt, t_txt)
 
     # The poster is grabbed mid-flight rather than at the end of the hold:

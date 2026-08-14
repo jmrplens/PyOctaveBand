@@ -277,7 +277,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
                                facecolor="#9a9a9a", hatch="////",
                                edgecolor=COLOR_FG, linewidth=0.8, zorder=3))
         ax.text(stub_x1 + 0.03, duct_y1 + 0.24,
-                T("closed stub, built ℓ = 300 mm"), fontsize=7.5,
+                T("closed stub, built $\\ell$ = 300 mm"), fontsize=7.5,
                 ha="left", va="center", color=COLOR_FG, zorder=4)
         if panel == 1:
             # Labelled once, on the panel without the trim verdict: the
@@ -329,7 +329,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
     fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))
     fig.text(0.5, 0.005,
              T("Rigid walls, anechoic ends, incident amplitude 1; the "
-               "charge bandwidth f/Q is percent-wide, the lossless notch "
+               "charge bandwidth $f/Q$ is percent-wide, the lossless notch "
                "hertz-wide."),
              ha="center", va="bottom", fontsize=7.2, color=COLOR_FG,
              alpha=0.85)
@@ -339,7 +339,8 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
                   f"{per90_on:.0f} periods"),
                 T(f"×{ratio_off:.1f} at once: it never charges"))
     trim = T(f"the stub rings at {f_sim:.1f} Hz, not {f0:.1f}:\n"
-             f"ℓ_eff = c/4f = {l_eff:.0f} mm, so trim it to tune")
+             f"$\\ell_{{\\mathrm{{eff}}}} = c/4f$ = {l_eff:.0f} mm, "
+             f"so trim it to tune")
 
     def update(k: int) -> tuple[Any, ...]:
         j = min(k, times.size - 1)
@@ -351,7 +352,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
         for pill, verdict in zip(pills, verdicts, strict=True):
             pill.set_text(verdict if k >= reveal else "")
         trims[0].set_text(trim if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[j] * 1e3:4.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[j] * 1e3:4.1f} ms"))
         return (*ims, line_on, line_off, *pills, trims[0], t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_side_branch",

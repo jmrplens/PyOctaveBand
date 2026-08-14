@@ -291,7 +291,8 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
                        cmap=CMAP_FIELD, vmin=-_MC_VLIM, vmax=_MC_VLIM,
                        aspect="equal", interpolation="bilinear")
         ax.axhline(0.0, color=FIELD_INK, lw=1.0, zorder=4)
-        ax.set_title(T(f"θ = {theta:.0f}°"), fontsize=10, fontweight="bold")
+        ax.set_title(T(f"$\\theta$ = {theta:.0f}°"), fontsize=10,
+                     fontweight="bold")
         ax.tick_params(labelsize=7)
         ax.set_xlabel("x [mm]", fontsize=8)
         # Incident beam arrow, drawn from the top of the frame down onto
@@ -341,11 +342,11 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     # Two lines, not one: the Spanish of these runs 10 % longer than the
     # English and a single line fills a third of the canvas edge to edge.
     verdicts = [
-        T(f"P and SV both propagate\n|V| = "
+        T(f"P and SV both propagate\n$|V|$ = "
           f"{abs(_mc_reflection(_MC_ANGLES[0])):.3f}"),
-        T(f"P evanescent, SV alone crosses\n|V| = "
+        T(f"P evanescent, SV alone crosses\n$|V|$ = "
           f"{abs(_mc_reflection(_MC_ANGLES[1])):.3f}"),
-        T(f"both evanescent\n|V| = "
+        T(f"both evanescent\n$|V|$ = "
           f"{abs(_mc_reflection(_MC_ANGLES[2])):.3f}, with a phase"),
     ]
     crit = fig.text(0.5, 0.030,
@@ -361,7 +362,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
         for i, stack in enumerate(shown):
             ims[i].set_data(stack[kf])
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[kf] * 1e6:5.1f} µs"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e6:5.1f} µs"))
         return (*ims, *v_txts, crit, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_elastic_mode_conversion",

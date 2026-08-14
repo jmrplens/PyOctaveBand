@@ -307,11 +307,12 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
             for a in (ax, ax_f):
                 a.axvline(r_c, color=COLOR_MUTED, lw=1.0, ls=":", zorder=3)
             ax.text(r_c - 4.0, 3.0,
-                    T(f"critical ray, ψ = {criticals[i]:.2f}°"),
+                    T(rf"critical ray, $\psi$ = {criticals[i]:.2f}°"),
                     fontsize=7.5, ha="right", va="top", color=COLOR_FG,
                     zorder=6)
         ax.text(6.0, _SB_WATER + 4.0,
-                T(f"{name}: c₂ = {c2:.0f} m/s, ρ₂ = {rho2:.0f} kg/m³"),
+                T(rf"{name}: $c_2$ = {c2:.0f} m/s, "
+                  rf"$\rho_2$ = {rho2:.0f} kg/m³"),
                 fontsize=8.5, ha="left", va="top", color=COLOR_FG,
                 fontweight="bold", zorder=6)
         ax.set_xlim(0.0, length)
@@ -361,7 +362,7 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
                                  zorder=6 - len(f_lines))[0])
     ax_f.legend(fontsize=7.5, loc="lower left", ncol=2, framealpha=0.85)
     for label_x, label_psi in ((118.6, 24.6), (210.0, 11.9), (340.0, 6.8)):
-        ax_f.text(label_x + 5.0, 1.7, T(f"ψ = {label_psi:.1f}°"),
+        ax_f.text(label_x + 5.0, 1.7, T(rf"$\psi$ = {label_psi:.1f}°"),
                   fontsize=7.0, ha="left", va="top", color=COLOR_MUTED)
 
 
@@ -370,9 +371,9 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
     # Kept short: at 300 dpi the canvas clips a footer much beyond ~150
     # characters, and the Spanish runs about 15 % longer again.
     fig.text(0.5, 0.008,
-             T("Solid: the flux measured into the bed; dashed: "
-               "(1 − |R|²) sin²ψ. Each curve on its own maximum; the "
-               "field compensated for spreading."),
+             T(r"Solid: the flux measured into the bed; dashed: "
+               r"$(1 - |R|^2)\sin^2\psi$. Each curve on its own maximum; "
+               r"the field compensated for spreading."),
              ha="center", va="bottom", fontsize=7.2, color=COLOR_FG,
              alpha=0.85)
     fig.get_layout_engine().set(rect=(0.0, 0.035, 1.0, 0.95))
@@ -391,9 +392,9 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
             if np.isnan(psi):
                 pills[i].set_text("")
             else:
-                head = (T(f"|R| = {refl[i][j]:.3f}: nothing enters")
+                head = (T(f"$|R|$ = {refl[i][j]:.3f}: nothing enters")
                         if criticals[i] is not None and psi <= criticals[i]
-                        else T(f"|R| = {refl[i][j]:.3f}"))
+                        else T(f"$|R|$ = {refl[i][j]:.3f}"))
                 tail = ""
                 if contact[j] > r_crit + 60.0:
                     tail = "\n" + T(
@@ -405,8 +406,8 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
             artists += [ims[i], pills[i], f_lines[i]]
         psi = angles[j]
         sweep = ("" if np.isnan(psi)
-                 else T(f" · the front meets the bed at ψ = {psi:.0f}°"))
-        t_txt.set_text(T(f"t = {times[j] * 1e3:5.1f} ms") + sweep)
+                 else T(rf" · the front meets the bed at $\psi$ = {psi:.0f}°"))
+        t_txt.set_text(T(f"$t$ = {times[j] * 1e3:5.1f} ms") + sweep)
         return tuple(artists)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_critical_angle",

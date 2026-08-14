@@ -126,9 +126,9 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
                            extent=(0.0, 5.0, 0.0, 3.5), cmap="magma",
                            vmin=0.0, vmax=vmax_r, interpolation="bilinear")
         ax_r.tick_params(labelsize=7)
-        ax_r.set_xlabel("x [m]", fontsize=8)
+        ax_r.set_xlabel("$x$ [m]", fontsize=8)
         if col == 0:
-            ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
+            ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS pressure (mode map)"), fontsize=9)
             for xn in (1.25, 3.75):
                 ax_r.axvline(xn, color="white", ls="--", lw=1.0, alpha=0.75)
@@ -148,7 +148,7 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
         for col in range(2):
             ims[2 * col].set_data(p_all[col][k])
             ims[2 * col + 1].set_data(r_all[col][k])
-        t_txt.set_text(T(f"t = {times[k] * 1000.0:3.0f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:3.0f} ms"))
         return (*ims, t_txt)
 
     # Own frame budget and rate (see the _ROOM_FRAMES timeline note):

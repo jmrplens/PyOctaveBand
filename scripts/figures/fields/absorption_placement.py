@@ -291,7 +291,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
             ax.set_yticks([])
         ax_p.set_title(title, fontsize=9.5, fontweight="bold")
         if col == 0:
-            ax_p.set_ylabel(T("p(x, y)"), fontsize=8.5)
+            ax_p.set_ylabel(T("$p(x, y)$"), fontsize=8.5)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=8.5)
             ax_p.text(0.12, _AP_LY - 0.16, "8 × 2.5 m", fontsize=6.8,
                       ha="left", va="top", color="white", zorder=6,
@@ -326,7 +326,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
                   ls="--", zorder=3)
         frac = 0.52 if name == "Sabine" else 0.30
         ax_d.annotate(
-            T(f"{name}, T = {t_line * 1e3:.0f} ms"),
+            T(f"{name}, $T$ = {t_line * 1e3:.0f} ms"),
             (t_pk + t_line * 1e3 * frac, -60.0 * frac),
             xytext=(6.0 if name == "Sabine" else -6.0, 0.0),
             textcoords="offset points", fontsize=7.6, color=COLOR_MUTED,
@@ -355,7 +355,8 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     fig.text(0.5, 0.005,
              T(f"Locally reacting resistive edges; both rooms hold "
                f"{a_b * 2.0 * _AP_LX:.1f} m of statistical absorption "
-               f"(α_st = {a_a:.2f} on 21 m vs {a_b:.2f} on 16 m); "
+               r"($\alpha_{\mathrm{st}}$ = "
+               f"{a_a:.2f} on 21 m vs {a_b:.2f} on 16 m); "
                f"250 Hz burst."),
              ha="center", va="bottom", fontsize=7.2, color=COLOR_FG,
              alpha=0.85)
@@ -376,9 +377,9 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
                         color=COLOR_FG)
 
     reveal = int(0.7 * times.size)
-    verdict_a = T(f"measured T = {t_meas * 1e3:.0f} ms: inside the band")
+    verdict_a = T(f"measured $T$ = {t_meas * 1e3:.0f} ms: inside the band")
     verdict_b = T(f"early {t_early * 1e3:.0f} ms, tail {t_late * 1e3:.0f}"
-                  f" ms: no single T")
+                  f" ms: no single $T$")
     gap_note = f"{gap:.0f} dB"
     graze = T("what survives runs parallel to the absorber")
 
@@ -398,7 +399,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         # The gap arrow only exists once both its endpoints do.
         arrow.set_visible(j >= k_gap)
         gap_txt.set_text(gap_note if j >= k_gap else "")
-        t_txt.set_text(T(f"t = {times[j] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[j] * 1e3:5.1f} ms"))
         return (*ims, line_a, line_b, pill_a, pill_b, graze_txt, arrow,
                 gap_txt, t_txt)
 

@@ -293,22 +293,24 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     # Short on purpose: the Spanish of the longer title overran the canvas
     # at both ends. The solver and the plate moved to the footer.
     fig.suptitle(T("Radiation efficiency: a driven plate below and above "
-                   "f_c"), fontweight="bold")
+                   "$f_c$"), fontweight="bold")
     axes = fig.subplots(2, 1, sharex=True)
     titles = [
-        T(f"f = f_c/2 = {freqs[0]:.0f} Hz, below coincidence: the plate wave "
-          f"is slower than sound"),
-        T(f"f = 2 f_c = {freqs[1]:.0f} Hz, above coincidence: the plate wave "
-          f"is faster than sound"),
+        T(f"$f = f_c/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
+          f"wave is slower than sound"),
+        T(f"$f = 2f_c$ = {freqs[1]:.0f} Hz, above coincidence: the plate "
+          f"wave is faster than sound"),
     ]
     # One measurement per panel, each the one its regime admits: a decay
     # where the field is evanescent, an angle where it propagates.
     verdicts = [
-        T(f"λ_B = {lam_b[0]:.2f} m is shorter than λ = {lam_0[0]:.2f} m in "
-          f"air\nno angle solves sin θ = λ/λ_B: the skin dies in "
+        T(f"$\\lambda_B$ = {lam_b[0]:.2f} m is shorter than $\\lambda$ = "
+          f"{lam_0[0]:.2f} m in air\nno angle solves "
+          f"$\\sin\\theta = \\lambda/\\lambda_B$: the skin dies in "
           f"{skin_exact:.3f} m"),
-        T(f"λ_B = {lam_b[1]:.2f} m is longer than λ = {lam_0[1]:.2f} m in "
-          f"air\nthe trace match sends a beam out at {theta:.0f}°"),
+        T(f"$\\lambda_B$ = {lam_b[1]:.2f} m is longer than $\\lambda$ = "
+          f"{lam_0[1]:.2f} m in air\nthe trace match sends a beam out at "
+          f"{theta:.0f}°"),
     ]
     ims: list[Any] = []
     defl: list[Any] = []
@@ -370,8 +372,8 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
                     ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)
     foot2 = fig.text(0.5, 0.006,
                      T(f"elastic 2D FDTD, 10 mm steel plate, "
-                       f"f_c = {fc:.0f} Hz · overlaid line: its deflection, "
-                       f"exaggerated"),
+                       f"$f_c$ = {fc:.0f} Hz · overlaid line: its "
+                       f"deflection, exaggerated"),
                      ha="center", va="bottom", fontsize=7, color=COLOR_FG,
                      alpha=0.85)
     t_txt = fig.text(0.988, 0.030, "", ha="right", va="bottom",
@@ -385,7 +387,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
             ims[i].set_data(stack[kf])
             defl[i].set_ydata(-0.5 * _EL_H + swing * prof[kf])
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
-        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.2f} ms"))
+        t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *defl, *v_txts, foot, foot2, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_elastic_radiation_efficiency",
