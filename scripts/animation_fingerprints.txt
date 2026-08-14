@@ -33,6 +33,7 @@ anim_flanking_paths 7cd7079f29b91602
 anim_image_source_buildup cc0098b6de500073
 anim_instantaneous_intensity 776ec865e0830cab
 anim_intensity_scan_power 836278515c2c9dc9
+anim_iso717_shift fde70d28bf2d97fc
 anim_loudness_gating 100483f947ff07f4
 anim_modulation_transfer b83da9124a6fead6
 anim_onset_detection 28346608ed02edd7
