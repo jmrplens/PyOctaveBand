@@ -11,6 +11,7 @@
 # Written by the renderer. To refresh one clip, re-render it:
 #     python scripts/generate_graphs.py --animations --anim <clip>
 anim_comb_filtering da3202e0889b8f9c
+anim_dynamic_stiffness_sweep 7a6510f3233da78b
 anim_elastic_halfspace_waves d4c6b03e1874b384
 anim_elastic_mode_conversion e7b5219d6f8ede59
 anim_elastic_radiation_efficiency bb4f06bb985ae306
@@ -21,6 +22,7 @@ anim_fdtd_critical_angle 40d434ea40480406
 anim_fdtd_diffusion 35f12288d0a93335
 anim_fdtd_dispersion 6de574766da9812d
 anim_fdtd_duct_cut_on 51eddf89a7eb4983
+anim_fdtd_ducting 7b1eef0573fe1daa
 anim_fdtd_expansion_chamber 996482c4a5016a89
 anim_fdtd_ground_effect eb2c1c46681fce6e
 anim_fdtd_impedance_tube c6a2533a574cd3d6
