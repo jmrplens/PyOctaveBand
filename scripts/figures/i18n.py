@@ -5790,15 +5790,23 @@ def _translate_figure(fig: Any) -> None:
                 wrapped._phonometry_comma = True  # type: ignore[attr-defined]
                 axis.set_major_formatter(wrapped)
             elif type(fmt) is _SF and axis.get_scale() == "linear":
-                # ``f"{v:g}"`` writes an ASCII hyphen, while the formatter it
-                # replaces runs every label through ``fix_minus`` and ships the
-                # typographic U+2212 the English figure shows. Keep that pass,
-                # or the same axis is drawn with a different minus sign in each
-                # language.
-                wrapped = _FF(
-                    lambda v, pos, _f=fmt: _f.fix_minus(_comma(f"{v:g}"))
-                )
-                axis.set_major_formatter(wrapped)
+                # Reformat THROUGH a ScalarFormatter, never with a bare
+                # ``f"{v:g}"``. The formatter chooses one decimal precision for
+                # the whole axis from the tick spacing, so English draws
+                # ``0.0 0.2 ... 1.0``; ``%g`` decides per value and drew the
+                # Spanish twin as ``0  0,2 ... 1``, dropping exactly the
+                # decimals that keep a tick column aligned (and its ASCII
+                # hyphen needed a fix_minus of its own). A subclass INSTALLED
+                # on the axis -- matplotlib then keeps its tick locations in
+                # sync, exactly as ``phonometry._i18n.localize_axes`` does; a
+                # formatter wrapped detached renders blank labels -- formats
+                # with the English precision, swaps the comma, and inherits
+                # the typographic U+2212 from the base class.
+                class _CommaSF(_SF):
+                    def __call__(self, x: float, pos: int | None = None) -> str:
+                        return super().__call__(x, pos).replace(".", ",")
+
+                axis.set_major_formatter(_CommaSF())
     for artist in fig.findobj(_mtext.Text):
         s = artist.get_text()
         if not s:
