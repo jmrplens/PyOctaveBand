@@ -35,4 +35,5 @@ anim_onset_detection 28346608ed02edd7
 anim_schroeder 46dfa1050eed8b9d
 anim_specific_loudness 0c2a8a69ab3f3620
 anim_standing_wave_tube 114a1c9e3004ad34
+anim_sweep_deconvolution 6f99e149c0c9b13f
 anim_time_weighting 42a8c62341643954
