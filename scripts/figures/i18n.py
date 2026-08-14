@@ -1391,8 +1391,8 @@ _ES_EXACT = {
     "Critical-band rate $z$ [Bark]": "Raz\u00f3n de banda cr\u00edtica $z$ [Bark]",
     "Specific loudness N' [sone/Bark]":
         "Sonoridad espec\u00edfica N' [sonios/Bark]",
-    r"Specific loudness $N\u2032$ [sone/Bark]":
-        r"Sonoridad espec\u00edfica $N\u2032$ [sonios/Bark]",
+    "Specific loudness $N\u2032$ [sone/Bark]":
+        "Sonoridad espec\u00edfica $N\u2032$ [sonios/Bark]",
     "Shaded area = total loudness $N$":
         "\u00c1rea sombreada = sonoridad total $N$",
     "STI vs Reverberation Time (IEC 60268-16)":
@@ -1737,14 +1737,14 @@ _ES_EXACT = {
     "measured spectrum": "espectro medido",
     "reference curve, as shifted": "curva de referencia, ya desplazada",
     # ("unfavourable deviations" is already in this table, further down.)
-    r"Normalized impact level $L\u2032_{nT}$ [dB]":
-        r"Nivel de impactos normalizado $L\u2032_{nT}$ [dB]",
+    "Normalized impact level $L\u2032_{nT}$ [dB]":
+        "Nivel de impactos normalizado $L\u2032_{nT}$ [dB]",
     "over the cap: shift again": "pasa del límite: desplazar otra vez",
     "largest sum still under the cap": "la mayor suma bajo el límite",
     "legal, but the sum is smaller:": "válido, pero la suma es menor:",
     "this is one step too far": "esto es un paso de más",
     "$R_w$": "$R_w$",
-    r"$L\u2032_{nT,w}$": r"$L\u2032_{nT,w}$",
+    "$L\u2032_{nT,w}$": "$L\u2032_{nT,w}$",
     # --- anim_block_vs_exponential: the alignment the block detector needs ---
     "One burst, two detectors, and the block grid underneath":
         "Una ráfaga, dos detectores y la rejilla de bloques debajo",
@@ -3074,8 +3074,8 @@ _ES_EXACT = {
         r"la muestra resuelta  $|r| = 0{,}5$  ($\Delta L$ = 9,54 dB)",
     r"near-anechoic  $|r| = 0.1$  ($\Delta L$ = 1.74 dB)":
         r"casi anecoica  $|r| = 0{,}1$  ($\Delta L$ = 1,74 dB)",
-    r"the same, with tube loss ($k_0^{\prime}^{\prime}$ = 0.013 Np/m)":
-        r"la misma, con la atenuación del tubo ($k_0^{\prime}^{\prime}$ = 0,013 Np/m)",
+    r"the same, with tube loss ($k_0^{\prime\prime}$ = 0.013 Np/m)":
+        r"la misma, con la atenuación del tubo ($k_0^{\prime\prime}$ = 0,013 Np/m)",
     "minima at 12, 46 and 81 cm: −5.99, −5.92, −5.85 dB\n"
     "(read the nearest one, and extrapolate to x = 0)":
         "mínimos en 12, 46 y 81 cm: −5,99, −5,92, −5,85 dB\n"
@@ -3315,8 +3315,8 @@ _ES_EXACT = {
     "wall to floor": "de muro a suelo",
     r"junction: $K_{ij}$ attenuates each transfer":
         r"unión: $K_{ij}$ atenúa cada transferencia",
-    r"$R\u2032_w$ sums all paths — always below the wall alone":
-        r"$R\u2032_w$ suma todos los caminos — siempre menor que el muro solo",
+    "$R\u2032_w$ sums all paths — always below the wall alone":
+        "$R\u2032_w$ suma todos los caminos — siempre menor que el muro solo",
     "Intensity scanning over a box surface (ISO 9614-2)":
         "Barrido de intensidad sobre una superficie en caja (ISO 9614-2)",
     "p-p probe": "sonda p-p",
@@ -3344,8 +3344,8 @@ _ES_EXACT = {
     " response":
         "la misma información en otro dominio: barrido ⊛ filtro inverso ="
         " respuesta al impulso",
-    r"Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)":
-        r"Sonoridad específica $N\u2032(z)$ y su integral (ISO 532-1)",
+    "Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)":
+        "Sonoridad específica $N\u2032(z)$ y su integral (ISO 532-1)",
     "1 kHz ≈ 8.5 Bark": "1 kHz ≈ 8,5 Bark",
     "upward spread of masking":
         "extensión del enmascaramiento hacia agudos",
@@ -3615,9 +3615,9 @@ _ES_EXACT = {
         "Sala de máquinas a sala de control: lo que aporta el muro, y NC 45",
     "Duct higher-order-mode cut-on: 254 mm steam line at 200 m/s":
         "Corte de modos superiores del conducto: línea de vapor de 254 mm a 200 m/s",
-    "Panel R": "R del panel",
-    "Interior correction C": "Corrección interior C",
-    "Insertion loss (R - C)": "Pérdida por inserción (R - C)",
+    "Panel $R$": "$R$ del panel",
+    "Interior correction $C$": "Corrección interior $C$",
+    "Insertion loss ($R - C$)": "Pérdida por inserción ($R - C$)",
     "Machine enclosure insertion loss":
         "Pérdida por inserción de encapsulado de máquina",
     # silencer_insertion_loss: one TL, as many ILs as installations
@@ -3765,7 +3765,7 @@ _ES_EXACT = {
         "Absorción del recinto receptor $S_2\\alpha_2$",
     "Area [m²]": "Área [m²]",
     "Measured phase": "Fase medida",
-    "Minimum phase (from |H|)": "Fase mínima (de |H|)",
+    "Minimum phase (from $|H|$)": "Fase mínima (de $|H|$)",
     "Excess phase (all-pass)": "Fase de exceso (pasa-todo)",
     "Phase [rad]": "Fase [rad]",
     "Minimum-phase / all-pass decomposition":
