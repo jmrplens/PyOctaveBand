@@ -26,6 +26,7 @@ anim_fdtd_ducting 7b1eef0573fe1daa
 anim_fdtd_expansion_chamber 996482c4a5016a89
 anim_fdtd_ground_effect eb2c1c46681fce6e
 anim_fdtd_impedance_tube c6a2533a574cd3d6
+anim_fdtd_refraction a4ed7f4ea2a894aa
 anim_fdtd_room_modes c4c970b6a5bac45d
 anim_fdtd_side_branch 71258bf06820cb15
 anim_fdtd_slit_absorber 28506539bd0ec725
