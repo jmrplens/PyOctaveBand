@@ -534,6 +534,7 @@ export default defineConfig({
         './src/styles/typography.css',
         './src/styles/brand.css',
         './src/styles/see-also.css',
+        './src/styles/scope.css',
         './src/styles/katex.css',
         './src/styles/containment.css',
         './src/styles/theme-images.css',

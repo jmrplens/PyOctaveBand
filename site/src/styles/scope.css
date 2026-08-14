@@ -1,0 +1,172 @@
+/* ------------------------------------------------------------------ *
+ * Scope declarations, as a specification sheet.
+ *
+ * Every guide ends its argument with a section that says what the library
+ * covers and what it deliberately does not (`## What this guide covers`,
+ * `## What this section does not cover`, and their Spanish twins). Those
+ * sentences are the most consequential prose on the page — they are what a
+ * reader quotes when a reviewer asks whether a number may be used — and
+ * until now they were set in body type, indistinguishable from the
+ * paragraphs arguing the physics above them. A reader scrolling past met a
+ * wall of identical prose and had to read it to find out it was a boundary.
+ *
+ * Rendered by src/components/Scope.astro and ScopeClaim.astro. The markup
+ * is a list, one entry per claim; this sheet sets it as the specification
+ * table at the back of an instrument manual, which is what it is: a
+ * two-column entry with a screen-printed legend in the gutter, the
+ * declaration in the body column, and a rule down the left that says which
+ * side of the boundary the entry is on.
+ *
+ * THE STATE IS NOT CARRIED BY COLOUR. The rule is SOLID for what is covered
+ * and DASHED for what is not — the drafting convention, where a solid line
+ * bounds the part and a dashed one shows what is not there. Colour is a
+ * second channel on top (the palette accent against neutral grey), and the
+ * legend states the word outright, so the distinction survives greyscale,
+ * a colour-vision deficiency and a screen reader. Both rule colours clear
+ * 3:1 against the panel ground in both themes (WCAG 1.4.11), which is why
+ * the absent state takes --sl-color-gray-3 and not the --ph-border-strong
+ * a hairline would normally use: that token is a divider, at 1.6:1, and a
+ * divider is exactly what this rule must not read as.
+ *
+ * The legend is set like the rest of the instrument chrome — small,
+ * monospaced, letter-spaced, gray-3 — the same treatment as the "See also"
+ * panel label in see-also.css, so the two panels read as one family.
+ *
+ * The section HEADING stays in the markdown, above the component and
+ * outside it, for the reason see-also.css records: a heading that moves
+ * into a component drops out of the table of contents and loses its
+ * anchor. Framing prose that introduces the claims stays in the markdown
+ * too. Everything INSIDE the component is a claim, and nothing else is;
+ * that is the contract scripts/list_coverage_claims.py enumerates.
+ *
+ * All selectors are unlayered, so they win over Starlight's layered styles
+ * without specificity games, and every colour is a palette token from
+ * src/styles/theme.css.
+ * ------------------------------------------------------------------ */
+
+.sl-markdown-content .scope-list {
+  /* Width of the legend gutter. Fixed rather than content-sized so that the
+     body column starts at the same place on every entry: "COVERED" and
+     "NOT COVERED" are different lengths, and a ragged left edge down a
+     two-entry table is the first thing the eye finds. Sized for the longest
+     legend the corpus uses in either language ("NOT COVERED", "NO CUBIERTO"),
+     with room for the tracking; a longer one wraps to a second line rather
+     than pushing the body column. */
+  --scope-legend-width: 7.5rem;
+
+  margin-block: 1.5rem;
+  padding: 0;
+  list-style: none;
+  background: var(--ph-surface);
+  border: 1px solid var(--ph-border);
+  border-radius: var(--ph-radius);
+}
+
+/* One entry: legend gutter, then the declaration. The left rule is the
+   entry's own border, so it meets the panel edge cleanly at the first and
+   last entry instead of floating inside it. */
+.sl-markdown-content .scope-claim {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1rem;
+  padding: 0.85rem 1rem 0.9rem;
+  border-inline-start: 3px solid var(--sl-color-gray-3);
+}
+
+.sl-markdown-content .scope-claim:has(> .scope-legend) {
+  grid-template-columns: var(--scope-legend-width) 1fr;
+}
+
+/* Entries are separated by the same hairline that draws the panel, so the
+   list reads as the rows of one table rather than as stacked cards. */
+.sl-markdown-content .scope-claim + .scope-claim {
+  border-top: 1px solid var(--ph-border);
+}
+
+/* The two states. Solid and dashed carry the meaning; the hues only
+   reinforce it. */
+.sl-markdown-content .scope-claim[data-coverage='covered'] {
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--ph-mark);
+}
+
+/* The absent state is drawn rather than bordered. `border-style: dashed` at
+   3 px gives dashes about as long as they are wide, which reads as a dotted
+   row of ticks; a hidden line in a drawing is a long dash and a short gap.
+   The border stays, transparent, to reserve exactly the same 3 px so the two
+   states align to the pixel, and the rule is painted under it -- which is
+   what `background-origin`/`background-clip: border-box` are for, since the
+   default padding box starts 3 px to the right of where the rule belongs. */
+.sl-markdown-content .scope-claim[data-coverage='not-covered'] {
+  border-inline-start-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--sl-color-gray-3) 0 9px,
+    transparent 9px 15px
+  );
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 3px 100%;
+  background-origin: border-box;
+  background-clip: border-box;
+}
+
+/* Screen-printed panel legend. `margin-top` is optical, not structural: the
+   legend is smaller than the body text it labels, and sitting both on the
+   same grid line leaves it riding above the first line of the declaration. */
+.sl-markdown-content .scope-legend {
+  margin: 0.15rem 0 0;
+  font-family: var(--ph-mono);
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+
+/* The declaration itself: ordinary body prose, because it argues. Two margins
+   have to be taken back and only one of them is obvious. Starlight's
+   `:not(...) + :not(...)` rule gives every element that follows a sibling a
+   top margin, and here the declaration follows the legend — as a GRID ITEM,
+   so the margin does not separate them vertically, it drops the prose a whole
+   line below the legend that labels it. The inner one is the ordinary
+   first-paragraph reset. */
+.sl-markdown-content .scope-body {
+  margin-top: 0;
+  /* And the matching bottom margin, which is the one that shows: it opened a
+     20 px hole between the last line of a declaration and the rule under it,
+     on every entry of every panel. */
+  margin-bottom: 0;
+}
+
+.sl-markdown-content .scope-body > :first-child {
+  margin-top: 0;
+}
+
+.sl-markdown-content .scope-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* A declaration may end in a list, and the panel is itself a list, so the
+   browser numbers that list as a nested one and draws hollow bullets. It is
+   not nested in the reader's terms — it is the first list on the page at that
+   point — so it keeps the top-level marker it had before the migration. */
+.sl-markdown-content .scope-body > ul {
+  list-style: disc;
+}
+
+/* Narrow viewports: the gutter costs more than it gives once the body column
+   drops below about forty characters, so the legend moves above its
+   declaration and the rule keeps carrying the state. Also where a Spanish
+   legend that wrapped in the gutter stops wrapping. */
+@media (max-width: 50rem) {
+  .sl-markdown-content .scope-claim:has(> .scope-legend) {
+    grid-template-columns: 1fr;
+    gap: 0.35rem 0;
+  }
+
+  .sl-markdown-content .scope-legend {
+    margin-top: 0;
+  }
+}
