@@ -46,6 +46,8 @@ references:
     note: "The rectangular-room modes of §3: the eigenfrequencies of Equation (8.43), the Table 8.1 example room and the Morse/Pierce mode count and modal density of Equations (8.45) and (8.46)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -908,38 +910,41 @@ texts' own numeric anchors (see the
 
 ## What this guide covers
 
-**Covered.** Kuttruff's *Room Acoustics* (the image-source construction of
-§4.1, the Eyring reverberation formula used for the near-cubic check and
-the Schroeder frequency of §3.6), Vorländer's *Auralization* (the
-mirror-source model of Chapter 11, its reflection-factor and delay
-expressions) and Allen & Berkley's reflection-order decomposition, all
-implemented by `room.image_source_rir`; and the Bies, Hansen & Howard
-steady-state room field of §6.4 (room constant, directivity $Q$, critical
-distance) implemented by `room.steady_state_field`,
-`room.room_constant`, `room.critical_distance`, `room.steady_state_spl`
-and `room.schroeder_frequency`; and Long's *Architectural Acoustics*
-Chapter 8 (the rectangular-room eigenfrequencies of Eq. (8.43) with their
-axial/tangential/oblique classification, and the Morse/Pierce mode count
-and modal density of Eqs. (8.45) and (8.46)) implemented by
-`room.room_modes`, `room.room_mode_frequency`, `room.room_mode_count` and
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Kuttruff's *Room Acoustics* (the image-source construction of §4.1, the Eyring
+reverberation formula used for the near-cubic check and the Schroeder
+frequency of §3.6), Vorländer's *Auralization* (the mirror-source model of
+Chapter 11, its reflection-factor and delay expressions) and Allen & Berkley's
+reflection-order decomposition, all implemented by `room.image_source_rir`;
+and the Bies, Hansen & Howard steady-state room field of §6.4 (room constant,
+directivity $Q$, critical distance) implemented by `room.steady_state_field`,
+`room.room_constant`, `room.critical_distance`, `room.steady_state_spl` and
+`room.schroeder_frequency`; and Long's *Architectural Acoustics* Chapter 8
+(the rectangular-room eigenfrequencies of Eq. (8.43) with their
+axial/tangential/oblique classification, and the Morse/Pierce mode count and
+modal density of Eqs. (8.45) and (8.46)) implemented by `room.room_modes`,
+`room.room_mode_frequency`, `room.room_mode_count` and
 `room.room_modal_density`.
+</ScopeClaim>
 
-**Not covered.** The image-source model captures specular reflections
-only: no diffraction and no diffuse scattering, so an elongated room's
-true decay runs slower than the diffuse-field Eyring estimate it is
-checked against (the anisotropy the Fitzroy and Arau-Puchades models of
-the
-[reverberation-prediction guide](/phonometry/buildings/rooms/reverberation-prediction/)
-were built to correct). Kuttruff's alternative reverberation distance
-(using the Sabine absorption area in place of the room constant) is cited
-for comparison but not implemented: `steady_state_field` and
-`critical_distance` always use the Bies room-constant formulation. The
-mode calculator assumes rigid walls and a rectangular plan: it gives the
-eigen*frequencies*, not the pressure amplitude at a listening position,
-and it says nothing about damping, mode shape or a non-shoebox geometry.
-For those, mesh the room and run the
-[2D FDTD solver](/phonometry/simulation/fdtd-simulation/). Bolt's preferred
-dimension ratios are discussed but not tabulated.
+<ScopeClaim status="not-covered" label="Not covered">
+The image-source model captures specular reflections only: no diffraction and
+no diffuse scattering, so an elongated room's true decay runs slower than the
+diffuse-field Eyring estimate it is checked against (the anisotropy the
+Fitzroy and Arau-Puchades models of the [reverberation-prediction
+guide](/phonometry/buildings/rooms/reverberation-prediction/) were built to
+correct). Kuttruff's alternative reverberation distance (using the Sabine
+absorption area in place of the room constant) is cited for comparison but not
+implemented: `steady_state_field` and `critical_distance` always use the Bies
+room-constant formulation. The mode calculator assumes rigid walls and a
+rectangular plan: it gives the eigen*frequencies*, not the pressure amplitude
+at a listening position, and it says nothing about damping, mode shape or a
+non-shoebox geometry. For those, mesh the room and run the [2D FDTD
+solver](/phonometry/simulation/fdtd-simulation/). Bolt's preferred dimension
+ratios are discussed but not tabulated.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

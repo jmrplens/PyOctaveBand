@@ -18,8 +18,10 @@ references:
     note: "EN 29052-1:1992 is the identical European adoption of ISO 9052-1:1989 and is the designation this page uses throughout; the ISO URL is the citable one. The method implemented here: the dynamic stiffness per unit area (Formula 1), the resonance relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE s'a = 111/d MN/m³) and the airflow-resistivity regimes (Formulae 5-6). Conformance is anchored on the standard's own numeric NOTE plus hand-computed closed-form values of the resonance relations."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 A **floating floor** is a heavy floating slab resting on a resilient layer; the
@@ -463,28 +465,34 @@ weighted single number, is
 
 ## What this guide covers
 
-**Covered.** EN 29052-1:1992 (identical to ISO 9052-1:1989) for materials
-under floating floors: the dynamic stiffness per unit area of Formula 1, the
-resonance relations of Formulae 2-4 (`apparent_dynamic_stiffness`,
-`natural_frequency`), the enclosed-gas term of Formula 7
-(`enclosed_gas_stiffness`), and the clause 8.2 airflow-resistivity regimes of
-Formulae 5-6 (`installed_dynamic_stiffness`), chained end to end by
-`floating_floor_resonance`. `DynamicStiffnessResult.report` renders the
-clause 9 test-report fiche.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+EN 29052-1:1992 (identical to ISO 9052-1:1989) for materials under floating
+floors: the dynamic stiffness per unit area of Formula 1, the resonance
+relations of Formulae 2-4 (`apparent_dynamic_stiffness`, `natural_frequency`),
+the enclosed-gas term of Formula 7 (`enclosed_gas_stiffness`), and the clause
+8.2 airflow-resistivity regimes of Formulae 5-6
+(`installed_dynamic_stiffness`), chained end to end by
+`floating_floor_resonance`. `DynamicStiffnessResult.report` renders the clause
+9 test-report fiche.
+</ScopeClaim>
 
-**Not covered.** Clause 7's measurement procedure, extracting the resonant
-frequency $f_r$ from the raw excitation-response signal by sinusoidal,
-white-noise or pulse methods, is not implemented: pass an already-extrapolated
-$f_r$, obtained as section 1.1 describes (the extrapolation itself is a
-straight-line fit, which section 1.1 shows). The lateral airflow
-resistivity $r$ of clause 8.2 is likewise taken as an input rather than
-measured; ISO 9053's static and alternating methods are implemented
-separately, in `materials.absorbers.airflow_resistance`, and they report
-$\sigma$ in Pa·s/m² while this page's `airflow_resistivity` argument is in
-kPa·s/m². Clause 6's specimen-selection requirement (at least three
-200 mm × 200 mm specimens) is not enforced, and neither is the Clause 9 report
-content: the fiche below carries the excitation arrangement and the signal
-type only if they are supplied in the metadata.
+<ScopeClaim status="not-covered" label="Not covered">
+Clause 7's measurement procedure, extracting the resonant frequency $f_r$ from
+the raw excitation-response signal by sinusoidal, white-noise or pulse
+methods, is not implemented: pass an already-extrapolated $f_r$, obtained as
+section 1.1 describes (the extrapolation itself is a straight-line fit, which
+section 1.1 shows). The lateral airflow resistivity $r$ of clause 8.2 is
+likewise taken as an input rather than measured; ISO 9053's static and
+alternating methods are implemented separately, in
+`materials.absorbers.airflow_resistance`, and they report $\sigma$ in Pa·s/m²
+while this page's `airflow_resistivity` argument is in kPa·s/m². Clause 6's
+specimen-selection requirement (at least three 200 mm × 200 mm specimens) is
+not enforced, and neither is the Clause 9 report content: the fiche below
+carries the excitation arrangement and the signal type only if they are
+supplied in the metadata.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

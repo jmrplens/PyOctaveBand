@@ -18,6 +18,8 @@ references:
     note: "The audiometric zero of section 2 (Table 1), implemented here through its European adoption EN ISO 389-7:2006."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Two standards describe where the hearing threshold sits. **ISO 7029:2017**
@@ -332,28 +334,33 @@ component, is the subject of the
 
 ## What this guide covers
 
-**Covered.** ISO 7029:2017's age model: the median power-law deviation from
-age 18 (clause 4.2, Table 1), the asymmetric half-Gaussian spreads $s_u$ and
-$s_l$ (clause 4.3, Tables 2–5), and the population-fractile calculation of
-clause 4.4, all implemented by `age_threshold(age, sex, fractile)`. ISO
-389-7:2005 Table 1's free-field and diffuse-field reference threshold of
-hearing at the eleven audiometric frequencies, returned by
-`reference_threshold(field)`, together with the clause 1 listening conditions
-that define it.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 7029:2017's age model: the median power-law deviation from age 18 (clause
+4.2, Table 1), the asymmetric half-Gaussian spreads $s_u$ and $s_l$ (clause
+4.3, Tables 2–5), and the population-fractile calculation of clause 4.4, all
+implemented by `age_threshold(age, sex, fractile)`. ISO 389-7:2005 Table 1's
+free-field and diffuse-field reference threshold of hearing at the eleven
+audiometric frequencies, returned by `reference_threshold(field)`, together
+with the clause 1 listening conditions that define it.
+</ScopeClaim>
 
-**Not covered.** ISO 1999:2013 clause 6.1 Formula (1) combines this age
-threshold with a noise-induced shift into a real audiogram. That combination
-*is* implemented, by `htlan`, but it is documented in the
-[noise-induced hearing loss](/phonometry/perception/hearing/noise-induced-hearing-loss/)
-guide rather than here; this page stops at the age component. Of ISO 389-7:2005,
-this module returns only the eleven audiometric rows of Table 1. The other 27 —
-the third octaves from 20 Hz to 100 Hz, the intermediate third octaves between
-the audiometric points, and the extended high frequencies from 9 kHz to
-18 kHz — are not carried, and neither is Amendment 1:2016, so low-frequency and
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 1999:2013 clause 6.1 Formula (1) combines this age threshold with a
+noise-induced shift into a real audiogram. That combination *is* implemented,
+by `htlan`, but it is documented in the [noise-induced hearing
+loss](/phonometry/perception/hearing/noise-induced-hearing-loss/) guide rather
+than here; this page stops at the age component. Of ISO 389-7:2005, this
+module returns only the eleven audiometric rows of Table 1. The other 27 — the
+third octaves from 20 Hz to 100 Hz, the intermediate third octaves between the
+audiometric points, and the extended high frequencies from 9 kHz to 18 kHz —
+are not carried, and neither is Amendment 1:2016, so low-frequency and
 extended-high-frequency work has to read the table itself. The earphone
-reference zeros of
-ISO 389-1/-2/-8, the sound-field audiometric procedure of ISO 8253-2, and how
-the ISO 389-7 values were established, are not implemented.
+reference zeros of ISO 389-1/-2/-8, the sound-field audiometric procedure of
+ISO 8253-2, and how the ISO 389-7 values were established, are not
+implemented.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

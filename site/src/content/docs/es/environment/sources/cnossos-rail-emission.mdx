@@ -41,6 +41,8 @@ references:
     note: "El modelo de propagación que aquí lleva la emisión hasta un receptor. CNOSSOS-EU tiene su propio método de propagación en el apartado 2.5 del Anexo II, que no es la ISO 9613-2."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una carretera es una única línea fuente a 5 cm del pavimento. Una vía férrea son
@@ -643,23 +645,29 @@ que el propio método declara fuera de alcance.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El apartado 2.3 del Anexo II de la Directiva 2002/49/CE en el texto
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El apartado 2.3 del Anexo II de la Directiva 2002/49/CE en el texto
 consolidado: los descriptores de vehículo y de vía de las Tablas [2.3.a] y
 [2.3.b], la potencia de línea por flujo de tráfico (2.3.1, 2.3.2, 2.3.4), la
-potencia acústica direccional (2.3.5), el ruido de rodadura (2.3.6 a 2.3.10), el
-ruido de impacto (2.3.11, 2.3.12), el chirrido en curva, el ruido de tracción, el
-ruido aerodinámico (2.3.13, 2.3.14), la directividad de la fuente (2.3.15 a
-2.3.17) y el ruido de puente (2.3.18), junto con toda la base de datos del
-Apéndice G, a través de `railway_source_power` y las funciones de componente que
-la rodean.
+potencia acústica direccional (2.3.5), el ruido de rodadura (2.3.6 a 2.3.10),
+el ruido de impacto (2.3.11, 2.3.12), el chirrido en curva, el ruido de
+tracción, el ruido aerodinámico (2.3.13, 2.3.14), la directividad de la fuente
+(2.3.15 a 2.3.17) y el ruido de puente (2.3.18), junto con toda la base de
+datos del Apéndice G, a través de `railway_source_power` y las funciones de
+componente que la rodean.
+</ScopeClaim>
 
-**No cubierto.** La fuente viaria (2.2 y Apéndice F), la fuente industrial (2.4 y
-Apéndice H), la fuente de aeronaves (2.6 y 2.7) y el método de propagación
-CNOSSOS-EU del apartado 2.5, que es un modelo distinto del de la ISO 9613-2
-implementado en esta biblioteca. Las clases de rugosidad de carril `N` (mal
-mantenida) y `B` (en mal estado) no tienen espectro en el Apéndice G y ha de
-aportarlas el Estado miembro. Las demás fuentes ferroviarias del 2.3.3, como
-depósitos, estaciones y megafonía, se tratan por el método industrial.
+<ScopeClaim status="not-covered" label="No cubierto">
+La fuente viaria (2.2 y Apéndice F), la fuente industrial (2.4 y Apéndice H),
+la fuente de aeronaves (2.6 y 2.7) y el método de propagación CNOSSOS-EU del
+apartado 2.5, que es un modelo distinto del de la ISO 9613-2 implementado en
+esta biblioteca. Las clases de rugosidad de carril `N` (mal mantenida) y `B`
+(en mal estado) no tienen espectro en el Apéndice G y ha de aportarlas el
+Estado miembro. Las demás fuentes ferroviarias del 2.3.3, como depósitos,
+estaciones y megafonía, se tratan por el método industrial.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

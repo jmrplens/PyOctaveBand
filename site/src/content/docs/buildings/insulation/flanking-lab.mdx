@@ -67,8 +67,10 @@ references:
     note: "Section 9.2.3 presents Mechel's one-dimensional plenum model, Eqs. (9.13) to (9.20). ISBN 978-0-415-42853-8."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 EN 12354 predicts a building from its junctions, and ISO 10848 is how a
 junction gets its number. Two elements rigidly joined along a common edge are
@@ -599,51 +601,56 @@ repository. Click a preview to open the PDF:
 
 ## What this guide covers
 
-**Covered.** ISO 10848-1:2006's vibration reduction index $K_{ij}$
-(Formula (13)) from the direction-averaged velocity level difference
-(Formula (11)) and the equivalent absorption lengths (Formula (12)), with
-the simplified lightweight form (Formula (14)), the total loss factor and
-the Annex A single-number mean, via
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 10848-1:2006's vibration reduction index $K_{ij}$ (Formula (13)) from the
+direction-averaged velocity level difference (Formula (11)) and the equivalent
+absorption lengths (Formula (12)), with the simplified lightweight form
+(Formula (14)), the total loss factor and the Annex A single-number mean, via
 `building.direction_averaged_level_difference` and
 `building.vibration_reduction_index`; the overall descriptors $D_{n,f}$
-(Formula (4)) and $L_{n,f}$ (Formula (5)) with their ISO 717 single
-numbers, via `building.normalized_flanking_level_difference` and
+(Formula (4)) and $L_{n,f}$ (Formula (5)) with their ISO 717 single numbers,
+via `building.normalized_flanking_level_difference` and
 `building.normalized_flanking_impact_level`; the strong-coupling check
 (Formula (15)) and the ISO 10848-4:2010 modal-density, band-mode-count and
 modal-overlap validity checks that bracket unreliable bands
 (`building.strong_coupling_satisfied`, `building.modal_density`,
-`building.band_mode_count`, `building.modal_overlap_factor`); and the
-three one-page fiches through `.report()`.
+`building.band_mode_count`, `building.modal_overlap_factor`); and the three
+one-page fiches through `.report()`.
+</ScopeClaim>
 
-**Not covered.** ISO 10848 Parts 2, 3 and 4 differ in which junction and
-specimen types they apply to; phonometry implements only the Part 1
-$K_{ij}$/$D_{n,f}$/$L_{n,f}$ formulae generically, plus the Part 4
-modal-overlap validity check, not the facility-specific test setups the
-other parts describe. The acquisition of
-[Making the measurement](#making-the-measurement-iso-10848-12017-clauses-7-and-9)
-is documented here and enforced nowhere: nothing checks that the other
-elements were shielded, that the shield met $\Delta R_\text{min}$, that the
-position counts and separations were kept, that the accelerometer satisfied
-the mass-loading inequality, or that $T_s$ was measured on the elements in
-their installed state rather than assumed. Because ISO 10848 contains no
-worked numeric example, conformance is anchored on closed-form identities
-(simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 10848 Parts 2, 3 and 4 differ in which junction and specimen types they
+apply to; phonometry implements only the Part 1 $K_{ij}$/$D_{n,f}$/$L_{n,f}$
+formulae generically, plus the Part 4 modal-overlap validity check, not the
+facility-specific test setups the other parts describe. The acquisition of
+[Making the
+measurement](#making-the-measurement-iso-10848-12017-clauses-7-and-9) is
+documented here and enforced nowhere: nothing checks that the other elements
+were shielded, that the shield met $\Delta R_\text{min}$, that the position
+counts and separations were kept, that the accelerometer satisfied the
+mass-loading inequality, or that $T_s$ was measured on the elements in their
+installed state rather than assumed. Because ISO 10848 contains no worked
+numeric example, conformance is anchored on closed-form identities (simplified
+$K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+</ScopeClaim>
 
-The suspended-ceiling branch covers the normalized ceiling
-attenuation $D_{n,c}$ of ISO 140-9:1985 clause 3.3, the ASTM E413-22
-ceiling attenuation class that ASTM E1414 invokes, and the
-one-dimensional plenum model of Vigran Section 9.2.3, via
-`building.normalized_ceiling_attenuation`,
+<ScopeClaim status="covered" label="Covered">
+The suspended-ceiling branch covers the normalized ceiling attenuation
+$D_{n,c}$ of ISO 140-9:1985 clause 3.3, the ASTM E413-22 ceiling attenuation
+class that ASTM E1414 invokes, and the one-dimensional plenum model of Vigran
+Section 9.2.3, via `building.normalized_ceiling_attenuation`,
 `building.ceiling_attenuation_class`,
 `building.plenum_flanking_reduction_index` and
-`building.partition_referenced_reduction_index`. The plenum model has
-no published numeric output of its own, so it is anchored on its
-closed forms and on the structural properties a wrong reading breaks:
-monotonicity in the plenum damping, the bound $\tau_{cl} \le 1$, and the
-convergence of Eq. (9.18) to Eq. (9.20); the
-measurement chain and the class are anchored on accredited
-ASTM E1414 laboratory reports. The plenum propagation constant
-$k'$ of a lined duct is an input here, not a prediction.
+`building.partition_referenced_reduction_index`. The plenum model has no
+published numeric output of its own, so it is anchored on its closed forms and
+on the structural properties a wrong reading breaks: monotonicity in the
+plenum damping, the bound $\tau_{cl} \le 1$, and the convergence of Eq. (9.18)
+to Eq. (9.20); the measurement chain and the class are anchored on accredited
+ASTM E1414 laboratory reports. The plenum propagation constant $k'$ of a lined
+duct is an input here, not a prediction.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

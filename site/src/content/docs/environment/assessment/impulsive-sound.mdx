@@ -25,9 +25,11 @@ references:
     note: "The ISO successor built on the NT ACOU 112 onset-rate prominence."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Noise with prominent impulses (hammering, riveting, pile driving) is more
 annoying than a steady sound of the same equivalent level. **NT ACOU 112:2002**
@@ -390,23 +392,29 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** NT ACOU 112:2002: the onset definition (clauses 4.5 to 4.7),
-the predicted prominence $P$ (clause 7, Formula 1), the graduated adjustment
-$K_I$ (clause 8, Formula 2) and the rating level over a reference time
-(clause 8, Note 1), through `impulse_prominence`, `predicted_prominence`,
-`impulse_adjustment` and `rating_level`. ISO/PAS 1996-3:2022 is covered for
-the objective measurement chain built on the same prominence formula: $L_{pAF}$
-sampling, onset detection and merging, and the least-squares onset rate and
-level difference, through `impulsive_sound_adjustment` and `detect_onsets`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+NT ACOU 112:2002: the onset definition (clauses 4.5 to 4.7), the predicted
+prominence $P$ (clause 7, Formula 1), the graduated adjustment $K_I$ (clause
+8, Formula 2) and the rating level over a reference time (clause 8, Note 1),
+through `impulse_prominence`, `predicted_prominence`, `impulse_adjustment` and
+`rating_level`. ISO/PAS 1996-3:2022 is covered for the objective measurement
+chain built on the same prominence formula: $L_{pAF}$ sampling, onset
+detection and merging, and the least-squares onset rate and level difference,
+through `impulsive_sound_adjustment` and `detect_onsets`.
+</ScopeClaim>
 
-**Not covered.** NT ACOU 112's Note 4 (clause 7) records an older Nordic
-guideline: a flat 5 dB adjustment based on subjective judgement, recommended
-when $K_I > 3$ for noise characteristic of working operations, offered as a
-fallback where the graduated method cannot be applied. Only the graduated
-$K_I$ of Formula 2 is implemented; the flat 5 dB alternative is not. ISO
-1996-1's Table A.1 category adjustments (5 dB regular, 12 dB highly
-impulsive) are covered only as the assessor's-judgement baseline that this
-measurement replaces, not as a function of their own.
+<ScopeClaim status="not-covered" label="Not covered">
+NT ACOU 112's Note 4 (clause 7) records an older Nordic guideline: a flat 5 dB
+adjustment based on subjective judgement, recommended when $K_I > 3$ for noise
+characteristic of working operations, offered as a fallback where the
+graduated method cannot be applied. Only the graduated $K_I$ of Formula 2 is
+implemented; the flat 5 dB alternative is not. ISO 1996-1's Table A.1 category
+adjustments (5 dB regular, 12 dB highly impulsive) are covered only as the
+assessor's-judgement baseline that this measurement replaces, not as a
+function of their own.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

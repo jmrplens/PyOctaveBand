@@ -33,6 +33,8 @@ references:
     note: "El capítulo 6 da el balance de potencia SEA de dos subsistemas (Ecs. 6.10, 6.11), la relación de consistencia (Ec. 6.8), la inversión in situ de los factores de pérdidas por acoplamiento a partir de energías medidas (Ec. 6.15), las densidades modales de barras, vigas, placas planas y envolventes cilíndricas de pared delgada (Ecs. 6.23-6.29) y los factores de acoplamiento en forma cerrada de uniones en ángulo recto y de conexiones puntuales (Ecs. 6.52-6.56) implementados en esta página. ISBN 978-0-521-49913-2."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
@@ -604,17 +606,17 @@ se sostiene siquiera.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los coeficientes de transmisión de unión rígida,
-independientes de la frecuencia, de Cremer, Heckl y Ungar (1973),
-tabulados por Craik (1981/1996) y recogidos en Hopkins (2007, apartado
-5.2.1.3), para las uniones X, T, L y en línea de placas delgadas,
-homogéneas e isótropas: los parámetros de onda $\chi$/$\psi$, los
-coeficientes de esquina y de tramo recto
-$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso,
-el factor de pérdidas por acoplamiento SEA y el índice de reducción
-vibratoria $K_{ij}$ del enfoque ondulatorio, mediante
-`junction_wave_parameters`, `corner_transmission_coefficient`,
-`straight_transmission_coefficient`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los coeficientes de transmisión de unión rígida, independientes de la
+frecuencia, de Cremer, Heckl y Ungar (1973), tabulados por Craik (1981/1996) y
+recogidos en Hopkins (2007, apartado 5.2.1.3), para las uniones X, T, L y en
+línea de placas delgadas, homogéneas e isótropas: los parámetros de onda
+$\chi$/$\psi$, los coeficientes de esquina y de tramo recto
+$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso, el
+factor de pérdidas por acoplamiento SEA y el índice de reducción vibratoria
+$K_{ij}$ del enfoque ondulatorio, mediante `junction_wave_parameters`,
+`corner_transmission_coefficient`, `straight_transmission_coefficient`,
 `angular_average_transmission_coefficient`, `inline_transmission_coefficient`,
 `coupling_loss_factor`, `wave_vibration_reduction_index` y
 `junction_transmission`.
@@ -628,21 +630,24 @@ barras, vigas, placas planas y envolventes cilíndricas de pared delgada con la
 `cylindrical_shell_modal_density`), y las dos formas cerradas que quedan entre
 ambas vías (`right_angle_transmission_coefficient`,
 `point_connection_coupling_loss_factor`).
+</ScopeClaim>
 
-**No cubierto.** Este $K_{ij}$ predicho es una idealización en forma
-cerrada para una unión rígida y simplemente apoyada, no una medición: el
-$K_{ij}$ medido y empírico a partir de una diferencia de niveles de
-velocidad promediada en dirección (ISO 10848) es el
-`vibration_reduction_index` separado de la
-[guía de Transmisión por flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/).
-El coeficiente de tramo recto $\tau_{13}$ no está definido para las
-geometrías de unión T (2) y L, que no tienen una tercera placa colineal,
-así que ahí solo se aplica el camino de esquina. Los coeficientes tabulados
-suponen además una unión *simétrica* (placas opuestas idénticas), y aquí no hay
-forma cerrada para una que no lo sea. Del lado experimental, la inversión de la
-sección 6 está escrita solo para **dos** subsistemas, y
-`PowerInjectionResult.modal_density_ratio` es una comprobación de coherencia que
-hace el lector, no una que automatice la biblioteca.
+<ScopeClaim status="not-covered" label="No cubierto">
+Este $K_{ij}$ predicho es una idealización en forma cerrada para una unión
+rígida y simplemente apoyada, no una medición: el $K_{ij}$ medido y empírico a
+partir de una diferencia de niveles de velocidad promediada en dirección (ISO 10848)
+es el `vibration_reduction_index` separado de la [guía de Transmisión por
+flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/). El
+coeficiente de tramo recto $\tau_{13}$ no está definido para las geometrías de
+unión T (2) y L, que no tienen una tercera placa colineal, así que ahí solo se
+aplica el camino de esquina. Los coeficientes tabulados suponen además una
+unión *simétrica* (placas opuestas idénticas), y aquí no hay forma cerrada
+para una que no lo sea. Del lado experimental, la inversión de la sección 6
+está escrita solo para **dos** subsistemas, y
+`PowerInjectionResult.modal_density_ratio` es una comprobación de coherencia
+que hace el lector, no una que automatice la biblioteca.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

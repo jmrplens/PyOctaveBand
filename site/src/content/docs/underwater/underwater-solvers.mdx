@@ -29,6 +29,8 @@ references:
     note: "The standardized definitions (propagation loss, source level, sound pressure level re 1 µPa) behind the quantities of this page."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 The closed-form transmission loss of
@@ -648,25 +650,31 @@ equation is why they all live in one module.
 
 ## What this guide covers
 
-**Covered.** `normal_modes`, `ray_trace` and `parabolic_equation` implement
-the Jensen et al. (2011) numerical solvers for a range-independent
-stratified ocean: the finite-difference Sturm-Liouville modal sum
-(Ch. 5, Eqs. 5.3-5.17), the Runge-Kutta ray-trajectory integration
-(Ch. 3, Eqs. 3.23-3.24) and the split-step Fourier standard PE (Ch. 6),
-with ISO 18405:2017 terminology throughout. Each is validated against an
-exact closed form: the ideal pressure-release waveguide's modes, the
-circular-arc rays of a linear gradient, and free-field spherical spreading,
-plus the mutual agreement of the modal and PE transmission loss.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+`normal_modes`, `ray_trace` and `parabolic_equation` implement the Jensen et
+al. (2011) numerical solvers for a range-independent stratified ocean: the
+finite-difference Sturm-Liouville modal sum (Ch. 5, Eqs. 5.3-5.17), the
+Runge-Kutta ray-trajectory integration (Ch. 3, Eqs. 3.23-3.24) and the
+split-step Fourier standard PE (Ch. 6), with ISO 18405:2017 terminology
+throughout. Each is validated against an exact closed form: the ideal
+pressure-release waveguide's modes, the circular-arc rays of a linear
+gradient, and free-field spherical spreading, plus the mutual agreement of the
+modal and PE transmission loss.
+</ScopeClaim>
 
-**Not covered.** All three solvers assume a range-independent water column
-with a pressure-release (or, for the modes, optionally rigid) boundary:
-there is no absorbing or elastic bottom, no sediment attenuation and no
-real bathymetry, so range-dependent problems are out of scope. The ray
-solver returns paths and travel times, not amplitudes: ray-tube intensity
-with caustic corrections is not computed. The PE is the standard
-small-angle (Tappert) form, not a wide-angle Padé variant. For the elastic
-seabed physics these fluid solvers leave out, see
-[Elastic waves and fluid-solid coupling](/phonometry/simulation/elastic-waves/).
+<ScopeClaim status="not-covered" label="Not covered">
+All three solvers assume a range-independent water column with a
+pressure-release (or, for the modes, optionally rigid) boundary: there is no
+absorbing or elastic bottom, no sediment attenuation and no real bathymetry,
+so range-dependent problems are out of scope. The ray solver returns paths and
+travel times, not amplitudes: ray-tube intensity with caustic corrections is
+not computed. The PE is the standard small-angle (Tappert) form, not a
+wide-angle Padé variant. For the elastic seabed physics these fluid solvers
+leave out, see [Elastic waves and fluid-solid
+coupling](/phonometry/simulation/elastic-waves/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

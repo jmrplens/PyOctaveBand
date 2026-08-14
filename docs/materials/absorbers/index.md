@@ -65,15 +65,15 @@ meshed cell.
 
 None of these pages qualifies a laboratory. ISO 354's room requirements of
 Annex A — the number of loudspeaker and microphone positions, the diffusing
-elements — are not checked; the functions convert an
-already-measured decay pair and only warn when the room volume or sample area
-falls outside the clause 6 limits. Two editions are cited but not implemented:
-the code follows the 1998/2001 transfer-function method of ISO 10534-2, not the
-2023 edition, and ASTM E2611-19, not E2611-24. The probe-traverse refinements of
-ISO 10534-1 (extrapolating the minima to the sample face, probe-body
-corrections) are described but not automated. The prediction models are
-forward-only: they turn a resistivity into an impedance, and no inverse solver
-recovers the material parameters from a measured curve. And no measurement
-standard governs the metamaterial designs at all — a built panel is verified in
-the impedance tube or the reverberation room like any other absorber, which is
-why that page states a prediction and not a rating.
+elements — are not checked; the functions convert an already-measured decay
+pair and only warn when the room volume or sample area falls outside the
+clause 6 limits. Two editions are cited but not implemented: the code follows
+the 1998/2001 transfer-function method of ISO 10534-2, not the 2023 edition,
+and ASTM E2611-19, not E2611-24. The probe-traverse refinements of ISO 10534-1
+(extrapolating the minima to the sample face, probe-body corrections) are
+described but not automated. The prediction models are forward-only: they turn
+a resistivity into an impedance, and no inverse solver recovers the material
+parameters from a measured curve. And no measurement standard governs the
+metamaterial designs at all — a built panel is verified in the impedance tube
+or the reverberation room like any other absorber, which is why that page
+states a prediction and not a rating.

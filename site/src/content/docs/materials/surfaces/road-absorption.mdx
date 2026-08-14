@@ -27,6 +27,8 @@ references:
     note: "The two-microphone transfer-function reduction the spot method reuses, implemented in the Impedance Tube guide."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 How much sound a road surface absorbs decides how loud its traffic is, and a
@@ -626,10 +628,11 @@ few positions.
 
 ## What this guide covers
 
-**Covered.** ISO 13472-1:2002's subtraction technique: the Clause 4.1
-geometrical spreading (`materials.geometric_spreading_factor`), the
-Clause 6.4 Adrienne time window (`materials.adrienne_window`), the
-narrow-band and one-third-octave reduction
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 13472-1:2002's subtraction technique: the Clause 4.1 geometrical spreading
+(`materials.geometric_spreading_factor`), the Clause 6.4 Adrienne time window
+(`materials.adrienne_window`), the narrow-band and one-third-octave reduction
 (`materials.insitu_absorption_coefficient`,
 `materials.one_third_octave_absorption`,
 `materials.insitu_absorption_spectrum`) and the Annex A sampled-area radius
@@ -637,24 +640,27 @@ narrow-band and one-third-octave reduction
 correction (`materials.absorption_reference_corrected`) and the Annex F
 oblique-incidence case (`materials.geometric_spreading_factor_angle`,
 `materials.msa_major_axis`, and the `incidence_angle` argument of
-`materials.insitu_absorption_spectrum`); and
-ISO 13472-2:2010's spot-method plane-wave frequency limit,
-microphone-spacing geometry and Annex A internal-loss correction
-(`materials.spot_tube_upper_frequency`,
+`materials.insitu_absorption_spectrum`); and ISO 13472-2:2010's spot-method
+plane-wave frequency limit, microphone-spacing geometry and Annex A
+internal-loss correction (`materials.spot_tube_upper_frequency`,
 `materials.spot_microphone_spacing_bounds`,
 `materials.spot_internal_loss_correction`).
+</ScopeClaim>
 
-**Not covered.** Both in-situ road standards have since been revised
-(ISO 13472-1:2022, ISO 13472-2:2025); only the earlier 2002 and 2010
-editions are implemented here, as the reference notes above flag.
-ISO 13472-2's own transfer-function processing is not implemented in this
-module either: only the geometry, validity and correction helpers are
-provided, and the actual two-microphone DSP is the ISO 10534-2 routine of the
-[Impedance Tube guide](/phonometry/materials/absorbers/impedance-tube/).
-Neither the acquisition itself nor the field gates are enforced anywhere in
-code: the averaging, the free-field reference, the signal-to-noise checks, the
-seal verification and the weather limits of sections 1.1 to 1.4 and 2.1 are
-the operator's, and the library only sees the two arrays that come out of them.
+<ScopeClaim status="not-covered" label="Not covered">
+Both in-situ road standards have since been revised (ISO 13472-1:2022, ISO
+13472-2:2025); only the earlier 2002 and 2010 editions are implemented here,
+as the reference notes above flag. ISO 13472-2's own transfer-function
+processing is not implemented in this module either: only the geometry,
+validity and correction helpers are provided, and the actual two-microphone
+DSP is the ISO 10534-2 routine of the [Impedance Tube
+guide](/phonometry/materials/absorbers/impedance-tube/). Neither the
+acquisition itself nor the field gates are enforced anywhere in code: the
+averaging, the free-field reference, the signal-to-noise checks, the seal
+verification and the weather limits of sections 1.1 to 1.4 and 2.1 are the
+operator's, and the library only sees the two arrays that come out of them.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

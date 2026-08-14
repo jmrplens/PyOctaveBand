@@ -26,8 +26,10 @@ references:
     note: "The free-velocity source characterization that complements the reception-plate quantities: equation (9), reference velocity v₀ = 5·10⁻⁸ m/s."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Building service equipment (pumps, fans, boilers, sanitary appliances)
 injects **structure-borne sound power** into the building structure it is fixed
@@ -484,32 +486,37 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** EN 15657:2018's reception-plate method: the spatial mean
-velocity level (`spatial_mean_velocity_level`, Formula 12), the plate loss
-factor (`plate_loss_factor`, Formula 13) and the plate-injected power level
-(`reception_plate_power`, `structure_borne_power_level`, Formula 14). Also
-the plate-independent source-quantity chain: the equivalent blocked force
-level (`equivalent_blocked_force_level`, Formula 15), the characteristic
-reception-plate power level (`characteristic_reception_plate_power`,
-Formula 17), the equivalent free velocity level
-(`equivalent_free_velocity_level`, Formula 18) and the source mobility
-(`source_mobility_from_levels`, Formula 19). Also covered is ISO 9611:1996's
-position-averaged free velocity level, equation (9)
-(`mean_free_velocity_level`).
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+EN 15657:2018's reception-plate method: the spatial mean velocity level
+(`spatial_mean_velocity_level`, Formula 12), the plate loss factor
+(`plate_loss_factor`, Formula 13) and the plate-injected power level
+(`reception_plate_power`, `structure_borne_power_level`, Formula 14). Also the
+plate-independent source-quantity chain: the equivalent blocked force level
+(`equivalent_blocked_force_level`, Formula 15), the characteristic
+reception-plate power level (`characteristic_reception_plate_power`, Formula
+17), the equivalent free velocity level (`equivalent_free_velocity_level`,
+Formula 18) and the source mobility (`source_mobility_from_levels`, Formula
+19). Also covered is ISO 9611:1996's position-averaged free velocity level,
+equation (9) (`mean_free_velocity_level`).
+</ScopeClaim>
 
-**Not covered.** Formula 16, the equivalent point mobility of a plate as
-the arithmetic mean of $\operatorname{Re}(Y)$ over its contact points, is not implemented:
-the functions above take an already-known `plate_mobility` as input rather
-than deriving it from per-point measurements. The Annex C power-substitution
-method is likewise not implemented — the library takes an already-averaged
-$L_v$, so a substitution determination must be reduced to a plate power level by
-hand (Formulae C.1/C.2) before `structure_borne_power_level` is used. Nor does
-anything here check the facility: the plate's dimensions, density, aspect ratio
-and loss factor, the position count and clearances, the background correction and
-the operating conditions are the operator's responsibility, and a value computed
-from a non-conforming plate is returned without complaint. Of ISO 9611:1996, only
-the equation (9) position average is implemented; the rest of the standard is
-cited as the source-side counterpart, not implemented.
+<ScopeClaim status="not-covered" label="Not covered">
+Formula 16, the equivalent point mobility of a plate as the arithmetic mean of
+$\operatorname{Re}(Y)$ over its contact points, is not implemented: the
+functions above take an already-known `plate_mobility` as input rather than
+deriving it from per-point measurements. The Annex C power-substitution method
+is likewise not implemented — the library takes an already-averaged $L_v$, so
+a substitution determination must be reduced to a plate power level by hand
+(Formulae C.1/C.2) before `structure_borne_power_level` is used. Nor does
+anything here check the facility: the plate's dimensions, density, aspect
+ratio and loss factor, the position count and clearances, the background
+correction and the operating conditions are the operator's responsibility, and
+a value computed from a non-conforming plate is returned without complaint. Of
+ISO 9611:1996, only the equation (9) position average is implemented; the rest
+of the standard is cited as the source-side counterpart, not implemented.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

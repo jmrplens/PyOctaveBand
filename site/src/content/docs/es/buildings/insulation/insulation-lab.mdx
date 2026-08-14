@@ -39,8 +39,10 @@ references:
     note: "Los procedimientos de medición y la corrección de ruido de fondo comunes al R aéreo y al Ln de impactos."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Para valorar un elemento constructivo por sí mismo (un tipo de pared, un
 suelo flotante, una ventana) se lleva a un laboratorio cualificado, donde
@@ -544,32 +546,38 @@ datos de unión que consume la predicción EN 12354 se miden según
 
 ## Qué cubre esta guía
 
-**Cubierto.** ISO 10140-2:2010 (el índice de reducción acústica de
-laboratorio $R$ con la corrección de ruido de fondo del apartado 4.3) e
-ISO 10140-3:2010 (el nivel de impactos normalizado de laboratorio $L_n$),
-mediante `building.lab_airborne_insulation`,
-`building.lab_impact_insulation` y `building.background_correction`; los
-índices globales reutilizan los motores verificados de ISO 717-1/ISO 717-2,
-y ambos resultados escriben la ficha ISO 10140 de una página con
-`.report()`, con el anexo de área de absorción de ISO 10140-4:2010 en la
-forma detallada.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+ISO 10140-2:2010 (el índice de reducción acústica de laboratorio $R$ con la
+corrección de ruido de fondo del apartado 4.3) e ISO 10140-3:2010 (el nivel de
+impactos normalizado de laboratorio $L_n$), mediante
+`building.lab_airborne_insulation`, `building.lab_impact_insulation` y
+`building.background_correction`; los índices globales reutilizan los motores
+verificados de ISO 717-1/ISO 717-2, y ambos resultados escriben la ficha ISO
+10140 de una página con `.report()`, con el anexo de área de absorción de ISO
+10140-4:2010 en la forma detallada.
+</ScopeClaim>
 
-**No cubierto.** El procedimiento de ISO 10140-4:2010 y los requisitos de
-instalación y de montaje de ISO 10140-1:2010 e ISO 10140-5:2010 están
-documentados más arriba y no están implementados en ninguna parte: nada
-comprueba los recuentos de posiciones, las separaciones, los tiempos de
-promediado, el rango de bandas, la geometría de la abertura de ensayo ni el
-requisito de factor de pérdidas, y la condición de montaje sobrevive solo como
-etiqueta de texto libre en los metadatos del informe (`"Montaje tipo A,
-perímetro recibido con mortero (ISO 10140-1)"`), que es lo que pide
-ISO 10140-1, ya que exige que cualquier montaje se *describa* en lugar de
-elegirse de una lista. Tampoco se estima el $R'_\text{max}$ de la cámara, así
-que un resultado que se acerque al techo de la instalación se producirá sin
-queja alguna; esa cualificación tiene que venir de los propios ensayos del
-Anexo A del laboratorio. Las mediciones de laboratorio vecinas
-están cubiertas por sus propias guías: el
-aislamiento por intensidad (ISO 15186), la mejora de revestimientos de
-suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
+<ScopeClaim status="not-covered" label="No cubierto">
+El procedimiento de ISO 10140-4:2010 y los requisitos de instalación y de
+montaje de ISO 10140-1:2010 e ISO 10140-5:2010 están documentados más arriba y
+no están implementados en ninguna parte: nada comprueba los recuentos de
+posiciones, las separaciones, los tiempos de promediado, el rango de bandas,
+la geometría de la abertura de ensayo ni el requisito de factor de pérdidas, y
+la condición de montaje sobrevive solo como etiqueta de texto libre en los
+metadatos del informe
+(`"Montaje tipo A,
+perímetro recibido con mortero (ISO 10140-1)"`), que es lo
+que pide ISO 10140-1, ya que exige que cualquier montaje se *describa* en
+lugar de elegirse de una lista. Tampoco se estima el $R'_\text{max}$ de la
+cámara, así que un resultado que se acerque al techo de la instalación se
+producirá sin queja alguna; esa cualificación tiene que venir de los propios
+ensayos del Anexo A del laboratorio. Las mediciones de laboratorio vecinas
+están cubiertas por sus propias guías: el aislamiento por intensidad (ISO
+15186), la mejora de revestimientos de suelo (ISO 16251-1) y la transmisión
+por flancos (ISO 10848).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

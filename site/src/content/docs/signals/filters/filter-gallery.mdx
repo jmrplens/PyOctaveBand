@@ -25,6 +25,8 @@ references:
     note: "A free online-book companion treatment of digital-filter design and analysis, covering the classical architectures compared in this gallery."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Choosing a filter architecture is a trade-off: selectivity, passband ripple
@@ -485,20 +487,26 @@ on-axis response with the swept-sine method of
 
 ## What this guide covers
 
-**Covered.** The five architectures every IEC-band bank can be built on
-(Butterworth, Chebyshev I/II, Elliptic, Bessel): their magnitude responses
-compared at the −3 dB crossover and in the full 1/1 and 1/3 octave gallery,
-the band-edge convention (exact for Butterworth, Chebyshev II and Bessel; the
-ripple edge for the two equiripple families), and a usage example per
-architecture, plus the Linkwitz-Riley crossover, whose two branches recombine
-flat — by sum or by difference, depending on the parity of `order/2`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The five architectures every IEC-band bank can be built on (Butterworth,
+Chebyshev I/II, Elliptic, Bessel): their magnitude responses compared at the
+−3 dB crossover and in the full 1/1 and 1/3 octave gallery, the band-edge
+convention (exact for Butterworth, Chebyshev II and Bessel; the ripple edge
+for the two equiripple families), and a usage example per architecture, plus
+the Linkwitz-Riley crossover, whose two branches recombine flat — by sum or by
+difference, depending on the parity of `order/2`.
+</ScopeClaim>
 
-**Not covered.** The band mathematics, the pole-zero, stability and
-multirate design and the `octave_filter()` / `OctaveFilterBank` parameter
-reference stay in [Filter Banks](/phonometry/signals/filters/filter-banks/). The
-IEC 61260-1 Table 1 class acceptance masks, which decide the class each of
-these architectures actually reaches, are
-[Filter Class Verification](/phonometry/signals/filters/filter-compliance/).
+<ScopeClaim status="not-covered" label="Not covered">
+The band mathematics, the pole-zero, stability and multirate design and the
+`octave_filter()` / `OctaveFilterBank` parameter reference stay in [Filter
+Banks](/phonometry/signals/filters/filter-banks/). The IEC 61260-1 Table 1
+class acceptance masks, which decide the class each of these architectures
+actually reaches, are [Filter Class
+Verification](/phonometry/signals/filters/filter-compliance/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

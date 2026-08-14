@@ -32,9 +32,11 @@ references:
     note: "El grado de inspección de la sección 1, que comparte las fórmulas de superficie envolvente con criterios menos exigentes."
 ---
 
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 De las vías normalizadas hasta el nivel de potencia acústica $L_W$, los
 métodos de presión son los que no necesitan nada más exótico que un
@@ -850,31 +852,36 @@ result.report(
 
 ## Qué cubre esta guía
 
-**Cubierto.** La determinación por superficie envolvente de ISO 3744/3746
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La determinación por superficie envolvente de ISO 3744/3746
 (`sound_power_pressure`): las áreas de superficie de semiesfera y caja, las
-correcciones $K_1$ de fondo y $K_2$ de entorno con sus límites de validez,
-las posiciones de micrófono del Anexo B (`measurement_positions`,
+correcciones $K_1$ de fondo y $K_2$ de entorno con sus límites de validez, las
+posiciones de micrófono del Anexo B (`measurement_positions`,
 `plot_microphone_positions`) y el total ponderado A del Anexo E. La
 determinación de precisión de ISO 3745 (`sound_power_anechoic`): las mallas
 fijas de los Anexos D/E (`precision_positions`), la corrección de fondo por
 posición (`precision_background_correction`, Ec. 11), las correcciones
-meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida del
-apartado 10.5 (`precision_uncertainty`). Ambos resultados presentan la
-ficha de potencia acústica de estilo acreditado mediante `.report()`.
+meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida del apartado
+10.5 (`precision_uncertainty`). Ambos resultados presentan la ficha de
+potencia acústica de estilo acreditado mediante `.report()`.
+</ScopeClaim>
 
-**No cubierto.** Ninguno de los dos métodos ejecuta el ensayo de
-cualificación del recinto: la cualificación de campo libre de la cámara
-anecoica o semianecoica de ISO 3745 se da por supuesta, no se realiza, y la
-validez de $K_2$ en ISO 3744 solo emite avisos. Tampoco se aplica la corrección
-del **Anexo G** de ISO 3744 a las condiciones meteorológicas de referencia,
-exigida por encima de 500 m de altitud o por debajo de 10 °C (apartado 8.2.5):
-`sound_power_pressure` no admite argumento de temperatura ni de presión. La
-corrección meteorológica
+<ScopeClaim status="not-covered" label="No cubierto">
+Ninguno de los dos métodos ejecuta el ensayo de cualificación del recinto: la
+cualificación de campo libre de la cámara anecoica o semianecoica de ISO 3745
+se da por supuesta, no se realiza, y la validez de $K_2$ en ISO 3744 solo
+emite avisos. Tampoco se aplica la corrección del **Anexo G** de ISO 3744 a
+las condiciones meteorológicas de referencia, exigida por encima de 500 m de
+altitud o por debajo de 10 °C (apartado 8.2.5): `sound_power_pressure` no
+admite argumento de temperatura ni de presión. La corrección meteorológica
 $C_3$ de ISO 3745 necesita un coeficiente de absorción del aire que aporta
 quien llama (`air_absorption_coefficient=`); este módulo no lo calcula a
-partir de ISO 9613-1. La elección entre las seis vías, y la declaración
-ISO 4871 que un resultado alimenta, viven en
-[Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+partir de ISO 9613-1. La elección entre las seis vías, y la declaración ISO
+4871 que un resultado alimenta, viven en [Potencia
+acústica](/phonometry/es/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

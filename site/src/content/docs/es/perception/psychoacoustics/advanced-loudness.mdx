@@ -33,6 +33,8 @@ references:
     note: "La sonoridad del modelo de Sottek (sone_HMS)."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 El método de Zwicker de ISO 532-1 es la vía de referencia hacia la sonoridad
@@ -537,26 +539,30 @@ Devuelve un `EcmaLoudness`: `loudness` ($N$, sone_HMS), `specific_loudness`
 
 ## Qué cubre esta guía
 
-**Cubierto.** El ancho de banda ERB<sub>N</sub> y la escala Cam de Glasberg
-y Moore (1990) de Moore 6.ª ed. pp. 76-77, mediante `erb_bandwidth()`,
-`cam_from_frequency()` y `frequency_from_cam()`. ISO 532-2:2017
-(Moore-Glasberg): el
-patrón de excitación roex del apartado 7 y la inhibición binaural del
-apartado 8, mediante `loudness_moore_glasberg()` y sus variantes
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El ancho de banda ERB<sub>N</sub> y la escala Cam de Glasberg y Moore (1990)
+de Moore 6.ª ed. pp. 76-77, mediante `erb_bandwidth()`, `cam_from_frequency()`
+y `frequency_from_cam()`. ISO 532-2:2017 (Moore-Glasberg): el patrón de
+excitación roex del apartado 7 y la inhibición binaural del apartado 8,
+mediante `loudness_moore_glasberg()` y sus variantes
 `_from_spectrum`/`_from_third_octave`. ISO 532-3:2023
 (Moore-Glasberg-Schlittenlacher): la sonoridad de corto plazo del apartado
 7.8, la de largo plazo del apartado 7.9 y su pico $N_\text{max}$, mediante
 `loudness_moore_glasberg_time()`. ECMA-418-2:2025 (modelo de Sottek): el
 ensamblaje de sonoridad del apartado 8, mediante `loudness_ecma()`.
+</ScopeClaim>
 
-**No cubierto.** La combinación binaural de ECMA-418-2 (Fórmula 118, apartado
-8.1.5) no está implementada: `loudness_ecma()` es monaural, así que analiza
-cada canal por separado. El apartado 5 de ISO 532-3 exige remuestrear la
-entrada a 32 kHz antes del análisis FFT deslizante. Esta implementación
-procesa en cambio a la frecuencia de muestreo nativa, una desviación
-documentada que se mantiene dentro de la incertidumbre expandida de la norma.
-Remuestrea a 32 kHz primero si te importa la conformidad estricta apartado a
-apartado.
+<ScopeClaim status="not-covered" label="No cubierto">
+La combinación binaural de ECMA-418-2 (Fórmula 118, apartado 8.1.5) no está
+implementada: `loudness_ecma()` es monaural, así que analiza cada canal por
+separado. El apartado 5 de ISO 532-3 exige remuestrear la entrada a 32 kHz
+antes del análisis FFT deslizante. Esta implementación procesa en cambio a la
+frecuencia de muestreo nativa, una desviación documentada que se mantiene
+dentro de la incertidumbre expandida de la norma. Remuestrea a 32 kHz primero
+si te importa la conformidad estricta apartado a apartado.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

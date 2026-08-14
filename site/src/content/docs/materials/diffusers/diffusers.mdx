@@ -53,9 +53,11 @@ references:
     note: "Only the pure-tone attenuation coefficient alpha consumed by the ISO 17497-1 Clause 8 air-attenuation relations (Eqs. (2)/(3)); the full atmospheric-absorption model lives in the Outdoor Sound Propagation guide."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A diffuser is judged by where it sends the sound it reflects, and two
 standardised coefficients grade that job from two different angles. The
@@ -1156,11 +1158,13 @@ no longer small against the wavelength; a frequency-blind single number
 
 ## What this guide covers
 
-**Covered.** ISO 17497-1:2004+A1:2014's random-incidence scattering
-coefficient (the Clause 6 absorption-from-reverberation-time relations and
-Eq. (5)) with the Table 1 base-plate ceilings, via
-`materials.random_incidence_absorption`,
-`materials.specular_absorption_coefficient`, `materials.scattering_coefficient`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 17497-1:2004+A1:2014's random-incidence scattering coefficient (the Clause
+6 absorption-from-reverberation-time relations and Eq. (5)) with the Table 1
+base-plate ceilings, via `materials.random_incidence_absorption`,
+`materials.specular_absorption_coefficient`,
+`materials.scattering_coefficient`,
 `materials.scattering_coefficient_spectrum` and
 `materials.check_base_plate_scattering`; ISO 17497-2:2012's directional and
 random-incidence diffusion coefficient (Formulas (5) to (8)) via
@@ -1169,17 +1173,20 @@ and the Schroeder design toolkit (`materials.quadratic_residue_sequence`,
 `materials.qrd_well_depths`) with the Cox & D'Antonio Fraunhofer
 diffuser-prediction model (`materials.predict_diffuser_polar_response`,
 `materials.predicted_diffusion_spectrum`).
+</ScopeClaim>
 
-**Not covered.** The Fraunhofer diffuser-prediction model is a design
-estimate, not part of ISO 17497-2 itself, and its own stated limits (it loses
-accuracy at low frequency, at grazing angles and for strongly absorbing
-surfaces, and it ignores edge diffraction) mean it is no substitute for a
-measured diffusion coefficient. Primitive-root and modulated arrangements are
-discussed as design guidance in section 3, but only the quadratic-residue
-depth sequence has a dedicated helper; other profiles enter through the
-explicit `depths` or `reflection` arguments. Resonator-loaded
-deep-subwavelength panels are the subject of the
+<ScopeClaim status="not-covered" label="Not covered">
+The Fraunhofer diffuser-prediction model is a design estimate, not part of ISO
+17497-2 itself, and its own stated limits (it loses accuracy at low frequency,
+at grazing angles and for strongly absorbing surfaces, and it ignores edge
+diffraction) mean it is no substitute for a measured diffusion coefficient.
+Primitive-root and modulated arrangements are discussed as design guidance in
+section 3, but only the quadratic-residue depth sequence has a dedicated
+helper; other profiles enter through the explicit `depths` or `reflection`
+arguments. Resonator-loaded deep-subwavelength panels are the subject of the
 [Metadiffusers guide](/phonometry/materials/diffusers/metadiffusers/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

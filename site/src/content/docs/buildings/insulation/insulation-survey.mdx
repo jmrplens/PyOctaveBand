@@ -18,8 +18,10 @@ references:
     note: "The field survey method: the reverberation-index correction, the standardized/normalized airborne, impact and façade quantities, and service-equipment noise. The formulas and reverberation-index table are identical in the harmonized EN ISO 10052:2004+A1:2010."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Not every question deserves a full engineering measurement. When a dispute
 needs a number this afternoon, ISO 10052 trades accuracy for speed: octave
@@ -408,32 +410,37 @@ plt.show()
 
 ## What this guide covers
 
-**Covered.** The ISO 10052:2021 survey method: the reverberation index
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 10052:2021 survey method: the reverberation index
 $k = 10\log_{10}(T/T_0)$ measured with `building.reverberation_index` or
 estimated from the Table 3 room classes with
 `building.estimate_reverberation_index`; the survey airborne, impact and
 façade quantities ($D_{nT}$, $D_n$, $R'$ with the $V/7.5$ rule, $L'_{nT}$,
 $L'_n$, $D_{2m,nT}$) via `building.survey_airborne_insulation`,
-`building.survey_impact_insulation` and
-`building.survey_facade_insulation`; service-equipment noise $L_{XY}$ from
-exactly three positions via `building.survey_service_equipment_level`; the
-automatic ISO 717 ratings on 5-octave or 16-third spectra; and the survey
-fiches through `.report()`.
+`building.survey_impact_insulation` and `building.survey_facade_insulation`;
+service-equipment noise $L_{XY}$ from exactly three positions via
+`building.survey_service_equipment_level`; the automatic ISO 717 ratings on
+5-octave or 16-third spectra; and the survey fiches through `.report()`.
+</ScopeClaim>
 
-**Not covered.** The survey procedure of
-[Running the survey](#running-the-survey-clauses-5-and-6) is documented here
-but not *checked*: the functions consume band levels wherever they came from,
-so nothing verifies the sweep, the source corner, the tapping-machine
-positions or the one-corner-plus-two-central service-equipment recipe. Nothing
-verifies that the 6 dB signal-to-background floor of Clause 6.2.1 was met
-either, and no correction is applied when it was not — that is the method's
-own rule, not an omission. The ± 2 dB agreement with the engineering method is
-the standard's own estimate (Clause 6.6 NOTE), not something this library
-models or propagates: no survey result carries an uncertainty. When the stakes
-rise, step up to
-[Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/),
-whose ISO 12999-1 machinery does produce one. Annex A's report form and
-Annex B's operating cycles for service equipment are also outside the library.
+<ScopeClaim status="not-covered" label="Not covered">
+The survey procedure of [Running the
+survey](#running-the-survey-clauses-5-and-6) is documented here but not
+*checked*: the functions consume band levels wherever they came from, so
+nothing verifies the sweep, the source corner, the tapping-machine positions
+or the one-corner-plus-two-central service-equipment recipe. Nothing verifies
+that the 6 dB signal-to-background floor of Clause 6.2.1 was met either, and
+no correction is applied when it was not — that is the method's own rule, not
+an omission. The ± 2 dB agreement with the engineering method is the
+standard's own estimate (Clause 6.6 NOTE), not something this library models
+or propagates: no survey result carries an uncertainty. When the stakes rise,
+step up to [Field Insulation Measurement (ISO
+16283)](/phonometry/buildings/insulation/insulation-field/), whose ISO 12999-1
+machinery does produce one. Annex A's report form and Annex B's operating
+cycles for service equipment are also outside the library.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

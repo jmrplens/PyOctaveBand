@@ -84,9 +84,9 @@ verdict from the library does and does not mean. Two curves come without a
 verdict of any kind: ISO 7196 defines a single ±1 dB tolerance for G with no
 class structure, and the withdrawn IEC 537 left no tolerance table behind for
 D, so both curves filter a signal but neither reaches
-`verify_weighting_class`, and they are pinned against their published tables in
-the conformance report instead. The noise dose is the 1993
-first edition of IEC 61252 only, not the 2025 revision. And a dose is a
-quantity, not a verdict: the exposure strategies, the sampling plan and the
-limits that decide whether a worker is over-exposed are [Occupational exposure
-(ISO 9612)](../../perception/hearing/occupational-exposure.md).
+`verify_weighting_class`, and they are pinned against their published tables
+in the conformance report instead. The noise dose is the 1993 first edition of
+IEC 61252 only, not the 2025 revision. And a dose is a quantity, not a
+verdict: the exposure strategies, the sampling plan and the limits that decide
+whether a worker is over-exposed are [Occupational exposure (ISO
+9612)](../../perception/hearing/occupational-exposure.md).

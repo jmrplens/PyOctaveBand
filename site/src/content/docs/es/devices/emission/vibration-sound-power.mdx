@@ -26,8 +26,10 @@ references:
     note: "El método de ingeniería con un factor de radiación medido por bandas (Fórmula 4/8) y su nivel de potencia acústica (Fórmula 15). La conformidad incluye la ida y vuelta exacta entre el factor de radiación y L_W = 10 lg(P/P₀)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 La potencia acústica aérea que una máquina radia a través de la vibración
@@ -510,41 +512,46 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO/TS 7849-1:2009 y la ISO/TS 7849-2:2009 en lo que
-definen el cálculo de la potencia acústica a partir de la vibración: la
-potencia radiada $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$
-(Fórmula 6), el nivel de velocidad y su
-conversión de calibración (Fórmulas 3, 8) que ejecutan `velocity_level` y
-`velocity_level_from_acceleration`, la media sobre la superficie (Fórmulas
-10/11) que ejecuta `mean_velocity_level`, la corrección por vibración
-extraña de la Tabla 2 que ejecuta `extraneous_velocity_correction`, y el
-nivel de potencia acústica con el término fijo de impedancia (Fórmula 12,
-Parte 1) o con un factor de radiación medido por banda (Fórmula 15, Parte 2)
-que ejecutan `radiated_sound_power_level` y `sound_power_from_vibration`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO/TS 7849-1:2009 y la ISO/TS 7849-2:2009 en lo que definen el cálculo de
+la potencia acústica a partir de la vibración: la potencia radiada
+$P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Fórmula 6), el nivel de
+velocidad y su conversión de calibración (Fórmulas 3, 8) que ejecutan
+`velocity_level` y `velocity_level_from_acceleration`, la media sobre la
+superficie (Fórmulas 10/11) que ejecuta `mean_velocity_level`, la corrección
+por vibración extraña de la Tabla 2 que ejecuta
+`extraneous_velocity_correction`, y el nivel de potencia acústica con el
+término fijo de impedancia (Fórmula 12, Parte 1) o con un factor de radiación
+medido por banda (Fórmula 15, Parte 2) que ejecutan
+`radiated_sound_power_level` y `sound_power_from_vibration`.
 `radiation_factor` implementa la Fórmula 8 de la Parte 2 para una sola
-máquina, que convierte una potencia acústica medida de forma independiente
-en $\varepsilon$.
+máquina, que convierte una potencia acústica medida de forma independiente en
+$\varepsilon$.
+</ScopeClaim>
 
-**No cubierto.** Los apartados de procedimiento de medición de ambas partes
-(instrumentación, instalación de la fuente, las condiciones ambientales:
-apartados 5 a 7) no están *implementados* como código, y tampoco lo están sus
-apartados de incertidumbre de medida ni sus anexos informativos: son práctica de
+<ScopeClaim status="not-covered" label="No cubierto">
+Los apartados de procedimiento de medición de ambas partes (instrumentación,
+instalación de la fuente, las condiciones ambientales: apartados 5 a 7) no
+están *implementados* como código, y tampoco lo están sus apartados de
+incertidumbre de medida ni sus anexos informativos: son práctica de
 laboratorio, y esta guía enuncia las reglas de esa práctica que deciden si las
 entradas son válidas siquiera — el número de posiciones de la Tabla 1, la
 escalera de vibración extraña de la Tabla 2 y los límites de montaje del
-transductor de más arriba. El apartado
-8 de la Parte 2 pide además el factor de radiación de un lote o familia de
-máquinas, promediando $\varepsilon_j$ sobre varias máquinas y su desviación
-típica (Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola
-máquina, así que pasa un $\varepsilon$ ya promediado para una determinación de
-familia. La
-potencia acústica que alimenta a `radiation_factor` debe proceder de una
-*determinación* de intensidad según la ISO 9614, que es
-[Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
-(`sound_power_intensity`, o `sound_power_intensity_precision` para el grado 1) —
-la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/)
+transductor de más arriba. El apartado 8 de la Parte 2 pide además el factor
+de radiación de un lote o familia de máquinas, promediando $\varepsilon_j$
+sobre varias máquinas y su desviación típica (Fórmulas 9, 10); solo está
+implementada la Fórmula 8 de una sola máquina, así que pasa un $\varepsilon$
+ya promediado para una determinación de familia. La potencia acústica que
+alimenta a `radiation_factor` debe proceder de una *determinación* de
+intensidad según la ISO 9614, que es [Potencia acústica por barrido de
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
+(`sound_power_intensity`, o `sound_power_intensity_precision` para el grado 1)
+— la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/)
 cubre la sonda y los indicadores de campo que hay detrás, pero no calcula
 ninguna potencia.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

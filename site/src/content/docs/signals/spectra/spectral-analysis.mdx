@@ -49,6 +49,8 @@ references:
     note: "Chapter 7 (multitaper estimation: eigenspectra, adaptive weighting, equivalent degrees of freedom) and Chapter 8 (computing the Slepian sequences); the Table 382 eigenvalues anchor the taper oracle in the test suite. ISBN 978-0-521-43541-3."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A spectrum without its uncertainty is half a measurement. This page covers the
@@ -809,25 +811,30 @@ output.
 
 ## What this guide covers
 
-**Covered.** Bendat & Piersol's Welch estimators (*Random Data*, 4th ed.,
-2010, Sections 5.2, 8.5, 9.1-9.2 and 11.5): `power_spectral_density` and
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Bendat & Piersol's Welch estimators (*Random Data*, 4th ed., 2010, Sections
+5.2, 8.5, 9.1-9.2 and 11.5): `power_spectral_density` and
 `cross_spectral_density` with the effective number of averages, chi-square
 confidence intervals and the resolution-bias error; the coherent output
 spectrum and spectral SNR; the Harris (1978) window figures of merit of
 `window_metrics`; and the Thomson (1982) multitaper estimator of
 `multitaper_psd`, following Percival & Walden's Chapters 7-8.
 `fractional_octave_smoothing` and `noise_signal` complete the toolbox.
+</ScopeClaim>
 
-**Not covered.** The frequency-response estimators `transfer_function` and
-`coherence`, and the sound-intensity probe, share this page's Welch core
-but are documented on the
+<ScopeClaim status="not-covered" label="Not covered">
+The frequency-response estimators `transfer_function` and `coherence`, and the
+sound-intensity probe, share this page's Welch core but are documented on the
 [electroacoustics](/phonometry/devices/electroacoustics/electroacoustics/) and
-[sound intensity](/phonometry/devices/emission/intensity/) pages, not here. So is
-multiple and partial coherence, on the
-[MISO coherence](/phonometry/signals/spectra/miso-coherence/) page. This page
+[sound intensity](/phonometry/devices/emission/intensity/) pages, not here. So
+is multiple and partial coherence, on the [MISO
+coherence](/phonometry/signals/spectra/miso-coherence/) page. This page
 implements Bendat & Piersol's textbook estimators, not a certification
 standard, so it carries no clause numbers or compliance limits to check
 against.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -28,6 +28,8 @@ references:
     note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB a 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Las curvas de ponderación frecuencial simulan la sensibilidad del oído humano.
@@ -503,17 +505,21 @@ plt.show()
 
 ## Qué cubre esta guía
 
-**Cubierto.** IEC 61672-1:2013 para las curvas A, C y Z: la definición
-analítica del Anexo E a partir de cuatro frecuencias de esquina, el diseño
-`high_accuracy` que mantiene las tolerancias de clase 1 hasta 16 kHz, y los
-límites de aceptación de clase 1/clase 2 de la Tabla 3 que comprueba
-`verify_weighting_class`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+IEC 61672-1:2013 para las curvas A, C y Z: la definición analítica del Anexo E
+a partir de cuatro frecuencias de esquina, el diseño `high_accuracy` que
+mantiene las tolerancias de clase 1 hasta 16 kHz, y los límites de aceptación
+de clase 1/clase 2 de la Tabla 3 que comprueba `verify_weighting_class`.
+</ScopeClaim>
 
-**No cubierto.** Las curvas especiales, la G de infrasonido de ISO 7196,
-las históricas B (ANSI S1.4-1983) y D (IEC 537) y la AU de IEC 61012, junto
-con la verificación de B y AU frente a sus tablas de tolerancias, tienen su
-propia guía:
-[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
+<ScopeClaim status="not-covered" label="No cubierto">
+Las curvas especiales, la G de infrasonido de ISO 7196, las históricas B (ANSI
+S1.4-1983) y D (IEC 537) y la AU de IEC 61012, junto con la verificación de B
+y AU frente a sus tablas de tolerancias, tienen su propia guía: [Ponderaciones
+especiales](/phonometry/es/signals/levels/special-weightings/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

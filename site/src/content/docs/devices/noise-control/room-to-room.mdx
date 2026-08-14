@@ -34,6 +34,8 @@ references:
     note: "The Schroeder frequency (Eq. 3.44) that bounds the diffuse-field assumption from below."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -581,23 +583,29 @@ are the tool.
 
 ## What this guide covers
 
-**Covered.** The Norton & Karczub §4.9 power balance (Eq. 4.101) as
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The Norton & Karczub §4.9 power balance (Eq. 4.101) as
 `room_to_room_transmission`, with `SourceRoom`, `equivalent_absorption_area`,
-`mean_absorption` and `room_constant`; the source-room level from a sound power
-level through the §4.6 Table 4.5 source models (constant power, constant volume,
-constant pressure) and the directivity of the machine's position;
+`mean_absorption` and `room_constant`; the source-room level from a sound
+power level through the §4.6 Table 4.5 source models (constant power, constant
+volume, constant pressure) and the directivity of the machine's position;
 `DesignCriterion` with its target, its flanking allowance and its ANSI/ASA
-S12.2-2019 rating, in the NC family by default and in the RC Mark II family with
-`DesignCriterion(family="RC")`; `.required_transmission_loss`, `.exceedance`,
-`.meets_target` and `.table()`; and the §4.10 enclosure equation (Eq. 4.115)
-through `enclosure_required_transmission_loss`, in both the Norton and the Bies
-interior models listed by `ENCLOSURE_MODELS`.
+S12.2-2019 rating, in the NC family by default and in the RC Mark II family
+with `DesignCriterion(family="RC")`; `.required_transmission_loss`,
+`.exceedance`, `.meets_target` and `.table()`; and the §4.10 enclosure
+equation (Eq. 4.115) through `enclosure_required_transmission_loss`, in both
+the Norton and the Bies interior models listed by `ENCLOSURE_MODELS`.
+</ScopeClaim>
 
-**Not covered.** The transmission loss of the partition itself, which is
-measured or predicted elsewhere; flanking as a modelled path rather than a flat
-allowance; the leaks and openings of an enclosure, which need the composite of
-the industrial noise-control guide; and anything below each room's Schroeder
-frequency, or closer to a surface than about half a wavelength.
+<ScopeClaim status="not-covered" label="Not covered">
+The transmission loss of the partition itself, which is measured or predicted
+elsewhere; flanking as a modelled path rather than a flat allowance; the leaks
+and openings of an enclosure, which need the composite of the industrial
+noise-control guide; and anything below each room's Schroeder frequency, or
+closer to a surface than about half a wavelength.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

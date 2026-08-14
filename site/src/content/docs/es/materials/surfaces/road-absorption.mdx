@@ -27,6 +27,8 @@ references:
     note: "La reducción por función de transferencia de dos micrófonos que el método puntual reutiliza, implementada en la guía del tubo de impedancia."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Cuánto sonido absorbe un pavimento decide lo ruidoso que es su tráfico, y de una
@@ -649,38 +651,42 @@ medición por sustracción en unas pocas posiciones.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La técnica de sustracción de la ISO 13472-1:2002: la
-divergencia geométrica del apartado 4.1
-(`materials.geometric_spreading_factor`), la ventana temporal Adrienne del
-apartado 6.4 (`materials.adrienne_window`), la reducción de banda estrecha y
-a tercios de octava (`materials.insitu_absorption_coefficient`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La técnica de sustracción de la ISO 13472-1:2002: la divergencia geométrica
+del apartado 4.1 (`materials.geometric_spreading_factor`), la ventana temporal
+Adrienne del apartado 6.4 (`materials.adrienne_window`), la reducción de banda
+estrecha y a tercios de octava (`materials.insitu_absorption_coefficient`,
 `materials.one_third_octave_absorption`,
 `materials.insitu_absorption_spectrum`) y el radio de área muestreada del
-Anexo A (`materials.max_sampled_area_radius`), con la corrección de
-superficie de referencia del Anexo B
-(`materials.absorption_reference_corrected`) y el caso de incidencia oblicua
-del Anexo F (`materials.geometric_spreading_factor_angle`,
-`materials.msa_major_axis` y el argumento `incidence_angle` de
-`materials.insitu_absorption_spectrum`); y el límite de frecuencia de
-onda plana, la geometría de separación de micrófonos y la corrección de
-pérdidas internas del Anexo A del método puntual de la ISO 13472-2:2010
-(`materials.spot_tube_upper_frequency`,
+Anexo A (`materials.max_sampled_area_radius`), con la corrección de superficie
+de referencia del Anexo B (`materials.absorption_reference_corrected`) y el
+caso de incidencia oblicua del Anexo F
+(`materials.geometric_spreading_factor_angle`, `materials.msa_major_axis` y el
+argumento `incidence_angle` de `materials.insitu_absorption_spectrum`); y el
+límite de frecuencia de onda plana, la geometría de separación de micrófonos y
+la corrección de pérdidas internas del Anexo A del método puntual de la ISO
+13472-2:2010 (`materials.spot_tube_upper_frequency`,
 `materials.spot_microphone_spacing_bounds`,
 `materials.spot_internal_loss_correction`).
+</ScopeClaim>
 
-**No cubierto.** Ambas normas de absorción in situ de pavimentos se han
-revisado desde entonces (ISO 13472-1:2022, ISO 13472-2:2025); aquí solo están
-implementadas las ediciones anteriores de 2002 y 2010, como indican las notas
-de referencia de arriba. El procesado de función de transferencia propio de
-la ISO 13472-2 tampoco está implementado en este módulo: solo se proporcionan
-la geometría, las funciones de validación y las correcciones, y el DSP de dos
-micrófonos real es la rutina ISO 10534-2 de la
-[guía del Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/).
-Tampoco se hacen cumplir en ningún sitio del código ni la adquisición en sí ni
-los filtros de campo: el promediado, la referencia de campo libre, las
+<ScopeClaim status="not-covered" label="No cubierto">
+Ambas normas de absorción in situ de pavimentos se han revisado desde entonces
+(ISO 13472-1:2022, ISO 13472-2:2025); aquí solo están implementadas las
+ediciones anteriores de 2002 y 2010, como indican las notas de referencia de
+arriba. El procesado de función de transferencia propio de la ISO 13472-2
+tampoco está implementado en este módulo: solo se proporcionan la geometría,
+las funciones de validación y las correcciones, y el DSP de dos micrófonos
+real es la rutina ISO 10534-2 de la [guía del Tubo de
+impedancia](/phonometry/es/materials/absorbers/impedance-tube/). Tampoco se
+hacen cumplir en ningún sitio del código ni la adquisición en sí ni los
+filtros de campo: el promediado, la referencia de campo libre, las
 comprobaciones de señal-ruido, la verificación del sellado y los límites
 meteorológicos de las secciones 1.1 a 1.4 y 2.1 son de quien opera, y la
 biblioteca solo ve los dos arrays que salen de ellos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

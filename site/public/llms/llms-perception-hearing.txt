@@ -73,18 +73,18 @@ In the order the chain runs.
 
 ## What this section does not cover
 
-**Nothing here is a verdict about a person.** ISO 1999 does not define a hearing
-handicap or a compensable fence — that line is set by national regulation, and
-the library applies none of it, so you supply and check the criterion yourself.
-The same is true of the exposure action values: the LEX,8h and its one-sided
-95 % upper limit come out of ISO 9612, and the numbers they are compared against
-are in your jurisdiction's directive, not here.
+**Nothing here is a verdict about a person.** ISO 1999 does not define a
+hearing handicap or a compensable fence — that line is set by national
+regulation, and the library applies none of it, so you supply and check the
+criterion yourself. The same is true of the exposure action values: the LEX,8h
+and its one-sided 95 % upper limit come out of ISO 9612, and the numbers they
+are compared against are in your jurisdiction's directive, not here.
 
 Two implementation boundaries follow the standards. Only **database A** is
-implemented for ISO 1999: `htlan` always draws its age component from
-ISO 7029:2017, and substituting a nationally measured control population
-(clauses 6.2.3 and 6.2.4) means computing that database elsewhere and passing it
-in. Of ISO 389-7, only the Table 1 reference values are implemented, not the
+implemented for ISO 1999: `htlan` always draws its age component from ISO
+7029:2017, and substituting a nationally measured control population (clauses
+6.2.3 and 6.2.4) means computing that database elsewhere and passing it in. Of
+ISO 389-7, only the Table 1 reference values are implemented, not the
 procedures by which they were established.
 
 And no audiometry happens here. Nothing generates a test tone, drives an

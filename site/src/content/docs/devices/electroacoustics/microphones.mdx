@@ -32,8 +32,10 @@ references:
     note: "The weighting network and quasi-peak detection behind the dB(468) inherent-noise figure of section 3."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Every acoustic measurement in this documentation starts at a microphone, and
 IEC 60268-4 is the standard that fixes how the device itself is described:
@@ -576,31 +578,36 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The three sensitivity types and the rated conditions, geometry,
-substitution calibration and ±2 dB accuracy bound behind them (clauses 4.2.2,
-5.5.2, 5.6.2, 5.7, 11.2), the clause 17.2 inherent-noise procedure with its
-one-third residual check, and the clause 15.2/19.2-19.4 limits. The
-IEC 60268-4:2014 rated microphone characteristics via
-`microphone_characteristics` and its `.report()`: the sensitivity level re
-1 V/Pa (11.1/11.3), the effective frequency range against a stated
-tolerance (12.2), the directivity index through the 11.2.2 a) diffuse-field
-integral (13.2.2), the equivalent noise level and signal-to-noise ratio
-(17.2), the overload sound pressure level read off a distortion curve
-(15.2) and the rated impedances and powering (9/10), with the response,
-polar, noise and distortion panels drawn to the IEC 60263 scale
-conventions.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The three sensitivity types and the rated conditions, geometry, substitution
+calibration and ±2 dB accuracy bound behind them (clauses 4.2.2, 5.5.2, 5.6.2,
+5.7, 11.2), the clause 17.2 inherent-noise procedure with its one-third
+residual check, and the clause 15.2/19.2-19.4 limits. The IEC 60268-4:2014
+rated microphone characteristics via `microphone_characteristics` and its
+`.report()`: the sensitivity level re 1 V/Pa (11.1/11.3), the effective
+frequency range against a stated tolerance (12.2), the directivity index
+through the 11.2.2 a) diffuse-field integral (13.2.2), the equivalent noise
+level and signal-to-noise ratio (17.2), the overload sound pressure level read
+off a distortion curve (15.2) and the rated impedances and powering (9/10),
+with the response, polar, noise and distortion panels drawn to the IEC 60263
+scale conventions.
+</ScopeClaim>
 
-**Not covered.** The laboratory's own instrumentation: the anechoic room and
-its qualification, the reference microphone and its calibration certificate,
-the high-level source that produces a 140 dB field, and the turntable. The
-*conditions* those instruments have to satisfy are in sections 1.1, 3 and 3.1,
-because they are what the reported numbers mean; the acquisition itself is not
-implemented here, and neither is the ITU-R 468 quasi-peak detector, so an
-inherent-noise level computed from `itu_r_468_weighting` and an r.m.s. sum is
-not a dBqps figure. The implemented edition is frozen at IEC 60268-4:2014;
-the superseding 2018 revision is not the one checked. Acoustic calibration
-of a working chain, sensitivity into pascals and dBFS, lives in
-[Calibration and dBFS](/phonometry/signals/metrology/calibration/).
+<ScopeClaim status="not-covered" label="Not covered">
+The laboratory's own instrumentation: the anechoic room and its qualification,
+the reference microphone and its calibration certificate, the high-level
+source that produces a 140 dB field, and the turntable. The *conditions* those
+instruments have to satisfy are in sections 1.1, 3 and 3.1, because they are
+what the reported numbers mean; the acquisition itself is not implemented
+here, and neither is the ITU-R 468 quasi-peak detector, so an inherent-noise
+level computed from `itu_r_468_weighting` and an r.m.s. sum is not a dBqps
+figure. The implemented edition is frozen at IEC 60268-4:2014; the superseding
+2018 revision is not the one checked. Acoustic calibration of a working chain,
+sensitivity into pascals and dBFS, lives in [Calibration and
+dBFS](/phonometry/signals/metrology/calibration/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

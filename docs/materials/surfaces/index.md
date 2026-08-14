@@ -60,12 +60,12 @@ Pages elsewhere on the site that this section leans on:
 implementation follows ISO 13472-1:2002 and ISO 13472-2:2010; both have since
 been revised — 2022 and 2025 respectively — and those revisions are **not**
 implemented, so a report that cites the current edition cannot cite these
-functions without qualification. The spot method's own signal processing is not
-duplicated either: only its geometry, validity and correction helpers live here,
-and the two-microphone transfer-function reduction is the ISO 10534-2 routine of
-[Impedance Tube](../absorbers/impedance-tube.md). Nothing in
-this subsection measures the noise a surface *generates* — the tyre-road source
-term is CNOSSOS territory, in [Environmental
+functions without qualification. The spot method's own signal processing is
+not duplicated either: only its geometry, validity and correction helpers live
+here, and the two-microphone transfer-function reduction is the ISO 10534-2
+routine of [Impedance Tube](../absorbers/impedance-tube.md).
+Nothing in this subsection measures the noise a surface *generates* — the
+tyre-road source term is CNOSSOS territory, in [Environmental
 sources](../../environment/sources/index.md) — and no in-situ method is provided
 for any surface other than a road: a wall or a ceiling measured in place is
 outside both parts of ISO 13472.

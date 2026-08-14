@@ -41,6 +41,8 @@ references:
     note: "The propagation model used here to carry the emission to a receiver. CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which is not ISO 9613-2."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A road is one source line 5 cm above the pavement. A railway track is **two**,
@@ -622,22 +624,28 @@ scope.
 
 ## What this guide covers
 
-**Covered.** Section 2.3 of Annex II to Directive 2002/49/EC in the consolidated
-text: the vehicle and track descriptors of Tables [2.3.a] and [2.3.b], the
-traffic-flow line power (2.3.1, 2.3.2, 2.3.4), the directional sound power
-(2.3.5), rolling noise (2.3.6 to 2.3.10), impact noise (2.3.11, 2.3.12), curve
-squeal, traction noise, aerodynamic noise (2.3.13, 2.3.14), the source
-directivity (2.3.15 to 2.3.17) and bridge noise (2.3.18), together with the
-whole Appendix G database, through `railway_source_power` and the component
-functions around it.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Section 2.3 of Annex II to Directive 2002/49/EC in the consolidated text: the
+vehicle and track descriptors of Tables [2.3.a] and [2.3.b], the traffic-flow
+line power (2.3.1, 2.3.2, 2.3.4), the directional sound power (2.3.5), rolling
+noise (2.3.6 to 2.3.10), impact noise (2.3.11, 2.3.12), curve squeal, traction
+noise, aerodynamic noise (2.3.13, 2.3.14), the source directivity (2.3.15 to
+2.3.17) and bridge noise (2.3.18), together with the whole Appendix G
+database, through `railway_source_power` and the component functions around
+it.
+</ScopeClaim>
 
-**Not covered.** The road source (2.2 and Appendix F), the industrial source
-(2.4 and Appendix H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU
-propagation method of section 2.5, which is a different model from the
-ISO 9613-2 one implemented in this library. Rail roughness classes `N` (not
-well maintained) and `B` (bad condition) carry no spectrum in Appendix G and
-have to be supplied by the Member State. The other railway sources of 2.3.3,
-such as depots, stations and loudspeakers, are treated by the industrial method.
+<ScopeClaim status="not-covered" label="Not covered">
+The road source (2.2 and Appendix F), the industrial source (2.4 and Appendix
+H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU propagation method of
+section 2.5, which is a different model from the ISO 9613-2 one implemented in
+this library. Rail roughness classes `N` (not well maintained) and `B` (bad
+condition) carry no spectrum in Appendix G and have to be supplied by the
+Member State. The other railway sources of 2.3.3, such as depots, stations and
+loudspeakers, are treated by the industrial method.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

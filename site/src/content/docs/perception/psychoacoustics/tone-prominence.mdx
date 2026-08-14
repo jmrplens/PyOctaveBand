@@ -18,6 +18,8 @@ references:
     note: "The parent emission standard, freely downloadable (the linked PDF is the free download): the operator/bystander measurement positions of section 2, with Annex D delegating the tone assessments to ECMA-418-1."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Tonal components in machinery noise are far more annoying than their level
@@ -351,23 +353,29 @@ other only as supporting evidence.
 
 ## What this guide covers
 
-**Covered.** ECMA-418-1:2024 (3rd edition): the tone-to-noise ratio (clause
-11, Formulae 9 to 12) and prominence ratio (clause 12, Formulae 23 to 26)
-methods on Hann-windowed, RMS-averaged spectra, the clause 10 critical-band
-model, the frequency-dependent prominence criteria, and the clause 11.6
-combination of secondary tones sharing a band, all through
-`tone_to_noise_ratio()` and `prominence_ratio()`. The clause 6 microphone
-positions and clause 7 instrumentation requirements are documented in §2 as
-the conditions the two ratios are defined under.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ECMA-418-1:2024 (3rd edition): the tone-to-noise ratio (clause 11, Formulae 9
+to 12) and prominence ratio (clause 12, Formulae 23 to 26) methods on
+Hann-windowed, RMS-averaged spectra, the clause 10 critical-band model, the
+frequency-dependent prominence criteria, and the clause 11.6 combination of
+secondary tones sharing a band, all through `tone_to_noise_ratio()` and
+`prominence_ratio()`. The clause 6 microphone positions and clause 7
+instrumentation requirements are documented in §2 as the conditions the two
+ratios are defined under.
+</ScopeClaim>
 
-**Not covered.** The `prominent` verdict these functions return is the
-numeric criterion only. The standard also requires a prominent tone to be
-confirmed by aural examination (clauses 11.8/12.8) and to pass the clause
-8/9 lower-threshold-of-hearing screen, which needs calibrated absolute
-levels: both checks are left to the caller. ECMA-74:2025 is covered only as
-the standard that delegates its tone assessments to ECMA-418-1; its own
-Annex D measurement procedure and operator/bystander positions (shown above
-for context) are not implemented here.
+<ScopeClaim status="not-covered" label="Not covered">
+The `prominent` verdict these functions return is the numeric criterion only.
+The standard also requires a prominent tone to be confirmed by aural
+examination (clauses 11.8/12.8) and to pass the clause 8/9
+lower-threshold-of-hearing screen, which needs calibrated absolute levels:
+both checks are left to the caller. ECMA-74:2025 is covered only as the
+standard that delegates its tone assessments to ECMA-418-1; its own Annex D
+measurement procedure and operator/bystander positions (shown above for
+context) are not implemented here.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

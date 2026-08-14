@@ -61,6 +61,8 @@ references:
     note: "Topics in Applied Physics, Vol. 143. The book-length treatment of critical coupling, slow sound and resonant metamaterial absorbers."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -611,34 +613,39 @@ incidence above.
 
 ## What this guide covers
 
-**Covered.** The slit + Helmholtz-resonator metamaterial absorber of Jiménez
-et al. (2016/2017): the transfer-matrix chain with the Stinson (1991)
-visco-thermal effective parameters, the resonator impedance with its
-radiation end corrections and the slit-radiation term
-(`slit_helmholtz_absorber`, with `HelmholtzResonator` as the geometry
-container and the retrieved `effective_wavenumber` and `effective_impedance`
-exposed on the result), and the critical-coupling design solver
-(`critical_coupling_design`) that tunes cavity length and slit height until
-the reflection zero sits on the real-frequency axis. The two visco-thermal
-building blocks the chain is assembled from are exposed as well
-(`slit_effective_properties`, `rectangular_duct_properties` and
-`helmholtz_resonator_impedance`, all taking an `AirProperties` state), and
-`slit_helmholtz_absorber` accepts a *list* of resonators, which is the graded
-chain of section 4.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The slit + Helmholtz-resonator metamaterial absorber of Jiménez et al.
+(2016/2017): the transfer-matrix chain with the Stinson (1991) visco-thermal
+effective parameters, the resonator impedance with its radiation end
+corrections and the slit-radiation term (`slit_helmholtz_absorber`, with
+`HelmholtzResonator` as the geometry container and the retrieved
+`effective_wavenumber` and `effective_impedance` exposed on the result), and
+the critical-coupling design solver (`critical_coupling_design`) that tunes
+cavity length and slit height until the reflection zero sits on the
+real-frequency axis. The two visco-thermal building blocks the chain is
+assembled from are exposed as well (`slit_effective_properties`,
+`rectangular_duct_properties` and `helmholtz_resonator_impedance`, all taking
+an `AirProperties` state), and `slit_helmholtz_absorber` accepts a *list* of
+resonators, which is the graded chain of section 4.
+</ScopeClaim>
 
-**Not covered.** No measurement standard governs these prediction models;
-section 5 sets out the route a built panel would be verified along, in the
-[impedance tube](/phonometry/materials/absorbers/impedance-tube/) (ISO 10534-2) or the
-[reverberation room](/phonometry/materials/absorbers/absorption-measurement/) (ISO 354),
-but nothing here performs any of it: the tolerance and angle figures quoted
-are model evaluations, and the roughness of a printed slit, the frame, the
-mounting and the finite panel size are all outside the model.
-The membrane and decorated-membrane absorbers of section 4 are discussed as
+<ScopeClaim status="not-covered" label="Not covered">
+No measurement standard governs these prediction models; section 5 sets out
+the route a built panel would be verified along, in the [impedance
+tube](/phonometry/materials/absorbers/impedance-tube/) (ISO 10534-2) or the
+[reverberation room](/phonometry/materials/absorbers/absorption-measurement/)
+(ISO 354), but nothing here performs any of it: the tolerance and angle
+figures quoted are model evaluations, and the roughness of a printed slit, the
+frame, the mounting and the finite panel size are all outside the model. The
+membrane and decorated-membrane absorbers of section 4 are discussed as
 context only; the classical perforated, microperforated and membrane layers
-are implemented in
-[Porous and Multilayer Absorbers](/phonometry/materials/absorbers/porous-absorbers/), and
-the resonator-loaded slit used as a phase element rather than an absorber is
-the subject of [Metadiffusers](/phonometry/materials/diffusers/metadiffusers/).
+are implemented in [Porous and Multilayer
+Absorbers](/phonometry/materials/absorbers/porous-absorbers/), and the
+resonator-loaded slit used as a phase element rather than an absorber is the
+subject of [Metadiffusers](/phonometry/materials/diffusers/metadiffusers/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

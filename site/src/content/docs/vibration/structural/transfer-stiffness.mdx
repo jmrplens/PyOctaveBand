@@ -33,8 +33,10 @@ references:
     note: "The indirect method k₂₁ = −(2πf)²(m₂+m_f)T (Formula 1) with its validity conditions (clause 6: Inequalities 2 and 3; clause 7.6 linearity). Conformance is anchored on the indirect inertia relation, the |T| = 0.1 ↔ ΔL₁,₂ = 20 dB validity limit and its 1 dB (12 %) accuracy bound, and the 7.6 linearity criterion."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The vibro-acoustic transfer property of a resilient element (a vibration
 isolator, mount, bellows or hose) is its **dynamic transfer stiffness**
@@ -483,30 +485,35 @@ res.report(
 
 ## What this guide covers
 
-**Covered.** ISO 10846-1:2008's $k_{2,1} = F_{2,b}/u_1$ definition, the level (ISO
-10846-2 and -3, 3.17) and loss factor (ISO 10846-1, 3.8)
-(`transfer_stiffness_level`, `loss_factor`), the ISO 10846-2:2008 direct
-method (`transfer_stiffness_direct`), and the ISO 10846-3:2002 indirect
-method of Formula 1 (`transfer_stiffness_indirect`, including its
-`flange_mass=` term). The blocking-force
-approximation of Equations 6-7 (`blocking_force_ratio`) and the Annex A /
-Table A.2 FRF relations (`convert_frf`) are implemented too.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 10846-1:2008's $k_{2,1} = F_{2,b}/u_1$ definition, the level (ISO 10846-2
+and -3, 3.17) and loss factor (ISO 10846-1, 3.8) (`transfer_stiffness_level`,
+`loss_factor`), the ISO 10846-2:2008 direct method
+(`transfer_stiffness_direct`), and the ISO 10846-3:2002 indirect method of
+Formula 1 (`transfer_stiffness_indirect`, including its `flange_mass=` term).
+The blocking-force approximation of Equations 6-7 (`blocking_force_ratio`) and
+the Annex A / Table A.2 FRF relations (`convert_frf`) are implemented too.
 `TransferStiffnessResult` bundles a swept determination, and `.report()`
 renders the characterisation fiche.
+</ScopeClaim>
 
-**Not covered.** Parts 4 and 5 of the ISO 10846 series, covering elements
-other than resilient supports and the driving-point low-frequency method,
-are not implemented. `transfer_stiffness_indirect` only checks Inequality 2
-(the $|T| \le 0.1$ transmissibility limit): Inequality 3, the rigid
-blocking-mass check of Formula 4, is described but not computed
-automatically. The clause 7.6 linearity criterion (two input spectra 10 dB
-apart within 1.5 dB) is likewise not checked in code, and neither are the
-conditioning and instrumentation requirements of section 3: the preload, creep
-and temperature conditioning, the two 15 dB pre-runs, the 0,5 dB transducer
-flatness and inter-channel matching and the five-lines-per-band resolution are
-described here and left to the operator. Hydraulic mounts are outside the
-single-spectrum description altogether: their stiffness is amplitude-dependent
-by design, so one $L_k(f)$ does not characterise them.
+<ScopeClaim status="not-covered" label="Not covered">
+Parts 4 and 5 of the ISO 10846 series, covering elements other than resilient
+supports and the driving-point low-frequency method, are not implemented.
+`transfer_stiffness_indirect` only checks Inequality 2 (the $|T| \le 0.1$
+transmissibility limit): Inequality 3, the rigid blocking-mass check of
+Formula 4, is described but not computed automatically. The clause 7.6
+linearity criterion (two input spectra 10 dB apart within 1.5 dB) is likewise
+not checked in code, and neither are the conditioning and instrumentation
+requirements of section 3: the preload, creep and temperature conditioning,
+the two 15 dB pre-runs, the 0,5 dB transducer flatness and inter-channel
+matching and the five-lines-per-band resolution are described here and left to
+the operator. Hydraulic mounts are outside the single-spectrum description
+altogether: their stiffness is amplitude-dependent by design, so one $L_k(f)$
+does not characterise them.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

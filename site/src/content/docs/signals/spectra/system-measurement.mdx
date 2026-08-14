@@ -41,6 +41,8 @@ references:
     note: "The original construction of the complementary pairs of §1."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The [room-acoustics guide](/phonometry/buildings/rooms/room-acoustics/) recovers
@@ -569,22 +571,27 @@ and the equalized responses feed the same downstream chain as every
 
 ## What this guide covers
 
-**Covered.** The complementary Golay pair (Golay 1961; Havelock, Kuwano &
-Vorländer eds., 2008, Part I Ch. 6 by Xiang): the append recursion, the
-exact complementary-autocorrelation identity and the summed-correlation
-recovery, implemented by `golay_pair` and `golay_impulse_response`. The
-group-delay sweep synthesis of Müller & Massarani (2001, Secs. 4.2-4.3),
-implemented by `shaped_sweep_signal`. The frequency-dependent Tikhonov
-regularization of Kirkeby & Nelson (1999, Eq. 17 and Sec. 2.4),
-implemented by `regularized_inverse_filter`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The complementary Golay pair (Golay 1961; Havelock, Kuwano & Vorländer eds.,
+2008, Part I Ch. 6 by Xiang): the append recursion, the exact
+complementary-autocorrelation identity and the summed-correlation recovery,
+implemented by `golay_pair` and `golay_impulse_response`. The group-delay
+sweep synthesis of Müller & Massarani (2001, Secs. 4.2-4.3), implemented by
+`shaped_sweep_signal`. The frequency-dependent Tikhonov regularization of
+Kirkeby & Nelson (1999, Eq. 17 and Sec. 2.4), implemented by
+`regularized_inverse_filter`.
+</ScopeClaim>
 
-**Not covered.** These are measurement-engineering methods from the
-transfer-function literature, not a certification standard, so there is no
-compliance clause to check against. Kirkeby & Nelson's original inversion
-targets multi-loudspeaker sound reproduction, with a matrix regularization
-for crosstalk cancellation between several channels.
-`regularized_inverse_filter` implements only the single-channel, scalar
-case of their Eq. 17.
+<ScopeClaim status="not-covered" label="Not covered">
+These are measurement-engineering methods from the transfer-function
+literature, not a certification standard, so there is no compliance clause to
+check against. Kirkeby & Nelson's original inversion targets multi-loudspeaker
+sound reproduction, with a matrix regularization for crosstalk cancellation
+between several channels. `regularized_inverse_filter` implements only the
+single-channel, scalar case of their Eq. 17.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

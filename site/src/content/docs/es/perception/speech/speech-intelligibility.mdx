@@ -22,8 +22,10 @@ references:
     note: "Los experimentos por bandas de articulación de los que desciende la función de importancia de banda de la sección 1."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 El **índice de inteligibilidad del habla** predice cuánto de una señal de habla
 es audible, y por tanto inteligible, para un oyente en una condición dada de
@@ -778,34 +780,40 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los cuatro procedimientos por bandas de ANSI S3.5-1997 (R2017):
-el método por bandas críticas (21 bandas, Tabla 1), el de bandas críticas de
-contribución equitativa (17 bandas, Tabla 2), el de bandas de tercio de octava
-(18 bandas, Tabla 3, el valor por omisión) y el de bandas de octava (6 bandas,
-Tabla 4). Para cada uno: los niveles espectrales equivalentes de habla, ruido y
-umbral de audición, la función de importancia de banda y el nivel espectral de
-voz estándar, el autoenmascaramiento del habla, la propagación ascendente del
-enmascaramiento,
-el factor de distorsión de nivel y la función de audibilidad de banda del
-apartado 5, y el índice del apartado 6. `speech_intelligibility_index` (con
-`method=` y `band_importance=`), `sii_procedure`, `standard_speech_spectrum` y
-`standard_speech_spectra` implementan esto, y `SIIResult.report(path)` genera la
-ficha de ANSI S3.5-1997 para el procedimiento que se haya usado.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los cuatro procedimientos por bandas de ANSI S3.5-1997 (R2017): el método por
+bandas críticas (21 bandas, Tabla 1), el de bandas críticas de contribución
+equitativa (17 bandas, Tabla 2), el de bandas de tercio de octava (18 bandas,
+Tabla 3, el valor por omisión) y el de bandas de octava (6 bandas, Tabla 4).
+Para cada uno: los niveles espectrales equivalentes de habla, ruido y umbral
+de audición, la función de importancia de banda y el nivel espectral de voz
+estándar, el autoenmascaramiento del habla, la propagación ascendente del
+enmascaramiento, el factor de distorsión de nivel y la función de audibilidad
+de banda del apartado 5, y el índice del apartado 6.
+`speech_intelligibility_index` (con `method=` y `band_importance=`),
+`sii_procedure`, `standard_speech_spectrum` y `standard_speech_spectra`
+implementan esto, y `SIIResult.report(path)` genera la ficha de ANSI S3.5-1997
+para el procedimiento que se haya usado.
+</ScopeClaim>
 
-**No cubierto.** Los espectros de voz estándar de esfuerzo vocal elevado, fuerte
-y de grito solo se incluyen para el procedimiento por tercios de octava; las
-Tablas 1, 2 y 4 se implementan con su columna de esfuerzo normal, que es la que
-necesita el factor de distorsión de nivel del apartado 5.7. Las funciones de
+<ScopeClaim status="not-covered" label="No cubierto">
+Los espectros de voz estándar de esfuerzo vocal elevado, fuerte y de grito
+solo se incluyen para el procedimiento por tercios de octava; las Tablas 1, 2
+y 4 se implementan con su columna de esfuerzo normal, que es la que necesita
+el factor de distorsión de nivel del apartado 5.7. Las funciones de
 importancia de banda tabuladas son el compromiso de habla promedio de cada
-tabla; las funciones de importancia alternativas del Anexo B para materiales de
-ensayo concretos (sílabas sin sentido, listas de palabras monosílabas, pasajes
-cortos) no se distribuyen como constantes, pero cualquier función de importancia
-puede aplicarse con `band_importance=`. No se ofrece remuestreo entre los cuatro
-conjuntos de bandas: cada procedimiento se alimenta con espectros en sus propias
-bandas. El índice de transmisión del habla, una métrica distinta para un canal de
-transmisión en vez de la audibilidad de quien escucha, se cubre aparte en la
-[guía del índice de transmisión del
+tabla; las funciones de importancia alternativas del Anexo B para materiales
+de ensayo concretos (sílabas sin sentido, listas de palabras monosílabas,
+pasajes cortos) no se distribuyen como constantes, pero cualquier función de
+importancia puede aplicarse con `band_importance=`. No se ofrece remuestreo
+entre los cuatro conjuntos de bandas: cada procedimiento se alimenta con
+espectros en sus propias bandas. El índice de transmisión del habla, una
+métrica distinta para un canal de transmisión en vez de la audibilidad de
+quien escucha, se cubre aparte en la [guía del índice de transmisión del
 habla](/phonometry/es/perception/speech/speech-transmission/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

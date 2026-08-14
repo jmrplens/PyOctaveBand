@@ -31,8 +31,10 @@ references:
     note: "Clause 4.2 defines the detailed per-band impact model; Annex B the calculated impact level of a bare floor, Annex C the floating-floor improvement and Annex G the worked examples sharing ISO 12354-1 Annex L's building."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The simplified model of
 [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/) returns one
@@ -600,36 +602,43 @@ built from.
 
 ## What this guide covers
 
-**Covered.** The Clause 4.2 per-band chain for **Type A** elements: the Annex B
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The Clause 4.2 per-band chain for **Type A** elements: the Annex B
 homogeneous-element sound reduction index and impact level and the Annex C
 in-situ conversion through `HomogeneousElement`, `in_situ_element` and
 `perimeter_absorption_coefficient`; the transfer of *measured* laboratory data
 through `laboratory_total_loss_factor`, `structural_reverberation_time`,
 `in_situ_reduction_index` and `in_situ_impact_level` (Formula 9 and Part 2
-Formula 5); the Formula (10) in-situ junction drop; the Formula (14)/(15) direct
-and flanking airborne paths through `direct_reduction_index` and
+Formula 5); the Formula (10) in-situ junction drop; the Formula (14)/(15)
+direct and flanking airborne paths through `direct_reduction_index` and
 `airborne_flanking_path` and their impact twins `direct_impact_level` and
 `impact_flanking_path`; the Formula (16)/(17) **Type B** routes and the Annex
 B.1/B.2 resonant correction through `resonant_sound_reduction_index`; the
 assembly and ISO 717 rating through `detailed_airborne_prediction` and
 `detailed_impact_prediction`; the Part 2 B.3/B.4 reciprocity identity through
-`reciprocity_impact_level`; and the two fiches through `.report()`. The airborne
-model is stated by Clause 5 to carry no bias error and a standard deviation of
-1,5 dB to 2,5 dB for buildings of homogeneous elements, assuming good workmanship
-— the lower figure when every aspect is taken into account, the higher for
-complex situations or when the structural reverberation time is neglected.
+`reciprocity_impact_level`; and the two fiches through `.report()`. The
+airborne model is stated by Clause 5 to carry no bias error and a standard
+deviation of 1,5 dB to 2,5 dB for buildings of homogeneous elements, assuming
+good workmanship — the lower figure when every aspect is taken into account,
+the higher for complex situations or when the structural reverberation time is
+neglected.
+</ScopeClaim>
 
-**Not covered.** Only homogeneous Annex B elements are calculated here; the
-spectrum of a lightweight, double or composite element is an input, from
-[Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/)
-or from a test report. The Annex E junction catalogue itself lives on
-[Predicting Sound Insulation](/phonometry/buildings/design/insulation-prediction/),
-as do the Annex D and F default tables of the other parts. The Type B branch is
+<ScopeClaim status="not-covered" label="Not covered">
+Only homogeneous Annex B elements are calculated here; the spectrum of a
+lightweight, double or composite element is an input, from [Predicting Panel
+Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/) or
+from a test report. The Annex E junction catalogue itself lives on [Predicting
+Sound Insulation](/phonometry/buildings/design/insulation-prediction/), as do
+the Annex D and F default tables of the other parts. The Type B branch is
 shown from its standard inputs rather than worked end to end. Airborne
-transmission through cavities and suspended ceilings is not carried at all, and
-clause 3.3.4 Note 1 warns it "can contribute to or even dominate" there. And the
-ISO 717 rating needs the whole spectrum: 100 Hz to 3150 Hz in one-third octaves,
-or 125 Hz to 2000 Hz in octaves.
+transmission through cavities and suspended ceilings is not carried at all,
+and clause 3.3.4 Note 1 warns it "can contribute to or even dominate" there.
+And the ISO 717 rating needs the whole spectrum: 100 Hz to 3150 Hz in
+one-third octaves, or 125 Hz to 2000 Hz in octaves.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The scope sections of every guide are set apart from the prose and made
+  auditable. Each "what this covers" and "what this does not cover" section now
+  renders as a specification panel: one claim per row, a screen-printed legend
+  in a fixed gutter (COVERED / NOT COVERED, and the Spanish pair on the Spanish
+  pages), and a rule down the left edge that is solid for what the library
+  covers and dashed for what it deliberately does not, the drafting convention
+  for a boundary. Colour is a second channel only, and both states clear 3:1
+  against the panel ground in both themes. The prose inside each row is the
+  prose the sections always had, word for word, links and code included; the
+  lead-in labels became the legend and nothing else moved. Behind the design
+  sits a contract: every claim row carries `data-coverage`, and
+  `scripts/list_coverage_claims.py` (`make claims`) enumerates the whole census
+  from the authored MDX and from the built HTML with the same parser, 582
+  claims over 280 pages at present, the two runs agreeing exactly, so what the
+  documentation promises and declines can be checked against the code claim by
+  claim. The overview mirror learned to render the components' children into
+  the GitHub `docs/` mirrors and the llms artifacts, which also repaired its
+  glob, silently matching nothing since the overviews became `.mdx`.
 - Every figure on the documentation site opens at the full viewport
   (`starlight-image-zoom`). The reading column is 720 px at its widest and the
   source drawings are 1200 px and more, so a 33-band third-octave filter bank

@@ -12,12 +12,15 @@ that would have carried it was dead code.
 
 The guides themselves are written twice on purpose: the mirror edition reads
 differently (no frontmatter, no components, image-free). The overviews carry
-no figures and no components, so their mirror needs no second authorship, and
-a page whose job is to stay in step with its folder is exactly the kind that
-drifts when kept by hand. So these are generated: the frontmatter title
-becomes the H1, site-absolute guide links become mirror-relative ones where the
-target has a mirror page and absolute site URLs where it does not, and the file
-opens with the same index backlink every mirror page carries.
+no figures, and the one component they do use wraps prose rather than
+generating any, so their mirror needs no second authorship: dropping the
+``<Scope>`` and ``<ScopeClaim>`` tags leaves exactly the paragraphs they
+present. And a page whose job is to stay in step with its folder is exactly
+the kind that drifts when kept by hand. So these are generated: the
+frontmatter title becomes the H1, the component wrappers and their imports
+come off, site-absolute guide links become mirror-relative ones where the
+target has a mirror page and absolute site URLs where it does not, and the
+file opens with the same index backlink every mirror page carries.
 
 Run with ``--check`` to compare against the committed files and fail on drift,
 which is what CI does; run bare to rewrite them.
@@ -67,7 +70,12 @@ def _frontmatter(text: str, page: Path) -> tuple[dict[str, str], str]:
 
 def _overviews() -> list[Path]:
     """Every topic and section overview on the English site, in path order."""
-    pages = sorted(SITE.glob("*/index.md")) + sorted(SITE.glob("*/*/index.md"))
+    # ``index.md*``, not ``index.md``: the overviews became .mdx when their
+    # scope sections moved onto the <Scope> components, and a glob that only
+    # matched .md did not fail, it matched nothing — the run reported "0 pages
+    # up to date", CI's staleness diff saw no change, and every mirror would
+    # have frozen at its pre-component prose in silence.
+    pages = sorted(SITE.glob("*/index.md*")) + sorted(SITE.glob("*/*/index.md*"))
     # The mirror is the English edition only, like every other mirror page;
     # ``reference`` holds hand-written mirror content already (theory/,
     # bibliography.md) and the generated API tree, so its indexes are site
@@ -132,6 +140,27 @@ def _rewrite_links(body: str, route: str) -> str:
     return re.sub(r"\(/phonometry/([^)#]+?)/?(#[^)]*)?\)", swap, body)
 
 
+#: The component wrappers an overview may use, and the import lines that bring
+#: them in. The mirror is plain markdown for GitHub, which renders neither, so
+#: both are removed and the children are kept: a <ScopeClaim> holds nothing but
+#: the prose of one claim, so dropping the tag leaves the paragraph it wraps.
+#: The claim's `label` is not recovered here — the overviews are the pages that
+#: carry no label, because every claim under "What this section does not cover"
+#: is on the same side of the boundary and the heading already says which.
+#: ``[ \t]*`` and not ``\s*``: ``\s`` matches a newline, so a greedy trailing
+#: ``\s*$`` swallows the blank line after the tag as well as the tag's own,
+#: which welds two claims into one paragraph and glues the panel's last line
+#: to the heading below it. Both were visible in the first generated mirror.
+_IMPORT = re.compile(r"^import\s+\w+\s+from\s+'[^']*';[ \t]*$\n?", re.MULTILINE)
+_COMPONENT = re.compile(r"^</?(?:Scope|ScopeClaim)(?:\s[^>]*)?>[ \t]*$\n?", re.MULTILINE)
+_BLANK_RUN = re.compile(r"\n{3,}")
+
+
+def _strip_components(body: str) -> str:
+    """The prose of an overview, without the MDX that presents it."""
+    return _BLANK_RUN.sub("\n\n", _COMPONENT.sub("", _IMPORT.sub("", body))).strip()
+
+
 def render(page: Path) -> tuple[Path, str]:
     route = page.parent.relative_to(SITE).as_posix()
     fields, body = _frontmatter(page.read_text(encoding="utf-8"), page)
@@ -140,7 +169,7 @@ def render(page: Path) -> tuple[Path, str]:
         raise SystemExit(f"{page}: overview without a title")
     up = "../" * len(Path(route).parts)
     head = f"← [Documentation index]({up}README.md)\n\n# {title}\n\n"
-    body = _rewrite_links(body.strip(), route) + "\n"
+    body = _rewrite_links(_strip_components(body), route) + "\n"
     return _mirror_path(route), head + body
 
 

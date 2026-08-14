@@ -40,8 +40,10 @@ references:
     note: "The periodic tests a working analyser receives: midband relative attenuation of every filter, effective bandwidth, linear operating range and its lower limit, under stated environmental conditions."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A filter bank becomes a measuring instrument only once its bands have been
 proved against a specification. IEC 61260-1:2014 writes that specification
@@ -427,25 +429,30 @@ result.report("iec61260_1995.pdf",
 
 ## What this guide covers
 
-**Covered.** The IEC 61260-1:2014 Table 1 class 1 / class 2 acceptance
-limits (with the fractional-octave breakpoint mapping and the log-frequency
-interpolation of the standard), checked band by band by
-`verify_filter_class` and published as a mask by `class_limits`; the
-withdrawn IEC 61260:1995 / ANSI S1.11-2004 class 0 mask, reachable with
-`edition="1995"`; and the accredited one-page fiche of
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The IEC 61260-1:2014 Table 1 class 1 / class 2 acceptance limits (with the
+fractional-octave breakpoint mapping and the log-frequency interpolation of
+the standard), checked band by band by `verify_filter_class` and published as
+a mask by `class_limits`; the withdrawn IEC 61260:1995 / ANSI S1.11-2004 class
+0 mask, reachable with `edition="1995"`; and the accredited one-page fiche of
 `filter_class_compliance().report()`, with its optional `required_class`
 PASS/FAIL verdict, in English and Spanish.
+</ScopeClaim>
 
-**Not covered.** IEC 61260-1's conformance tests for the physical filter
-itself (overload recovery, filter linearity, environmental influences) apply
-to hardware analog and digital filters and are not implemented:
-`verify_filter_class` checks the designed digital response against Table 1,
-not an instrument. Those tests belong to IEC 61260-2:2016 (pattern evaluation)
-and IEC 61260-3:2016 (periodic tests), which section 3b summarizes and this
-page does not run. Near Nyquist, the bilinear transform warps the frequency
-axis and the bank has no correction for it, so the stopband mask beyond the
-processing Nyquist is reported as `range_limited` rather than verified: keep
-the top band edge comfortably below Nyquist or raise `fs`.
+<ScopeClaim status="not-covered" label="Not covered">
+IEC 61260-1's conformance tests for the physical filter itself (overload
+recovery, filter linearity, environmental influences) apply to hardware analog
+and digital filters and are not implemented: `verify_filter_class` checks the
+designed digital response against Table 1, not an instrument. Those tests
+belong to IEC 61260-2:2016 (pattern evaluation) and IEC 61260-3:2016 (periodic
+tests), which section 3b summarizes and this page does not run. Near Nyquist,
+the bilinear transform warps the frequency axis and the bank has no correction
+for it, so the stopband mask beyond the processing Nyquist is reported as
+`range_limited` rather than verified: keep the top band edge comfortably below
+Nyquist or raise `fs`.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

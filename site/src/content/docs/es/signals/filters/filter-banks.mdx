@@ -47,6 +47,8 @@ references:
     note: "Libro en línea gratuito y complementario sobre diseño y análisis de filtros digitales, de la geometría de polos y ceros a la estabilidad."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 phonometry ofrece varios tipos de filtro, cada uno con su propia función de
@@ -622,25 +624,31 @@ plt.show()
 
 ## Qué cubre esta guía
 
-**Cubierto.** La matemática de bordes de banda de la IEC 61260-1:2014
-(apartados 5.2-5.5) y la serie de frecuencias preferentes de la ISO 266:1997
-tras `nominal_frequencies`. La biblioteca diseña cada banda como una cascada
-SOS en cinco arquitecturas (Butterworth, Chebyshev I/II, elíptico, Bessel),
-más el `ParametricEQ` del RBJ Audio EQ Cookbook, con la descomposición por
-bandas y el filtrado de fase cero.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La matemática de bordes de banda de la IEC 61260-1:2014 (apartados 5.2-5.5) y
+la serie de frecuencias preferentes de la ISO 266:1997 tras
+`nominal_frequencies`. La biblioteca diseña cada banda como una cascada SOS en
+cinco arquitecturas (Butterworth, Chebyshev I/II, elíptico, Bessel), más el
+`ParametricEQ` del RBJ Audio EQ Cookbook, con la descomposición por bandas y
+el filtrado de fase cero.
+</ScopeClaim>
 
-**No cubierto.** Las respuestas comparadas de las cinco arquitecturas, la
-galería completa de octava y tercio de octava y los ejemplos de uso por
-arquitectura, incluido el crossover Linkwitz-Riley, son la
-[Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/).
-Las máscaras de aceptación de clase de la Tabla 1 y su
-verificación se han trasladado a
-[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
-Cerca de Nyquist, la transformada bilineal deforma el eje de frecuencia y el
-banco no tiene corrección para ello (a diferencia de la opción
-`high_accuracy` de `WeightingFilter`): mantén el borde superior de banda con
-margen cómodo respecto a Nyquist, o sube `fs`, y confirma el margen con
+<ScopeClaim status="not-covered" label="No cubierto">
+Las respuestas comparadas de las cinco arquitecturas, la galería completa de
+octava y tercio de octava y los ejemplos de uso por arquitectura, incluido el
+crossover Linkwitz-Riley, son la [Galería de arquitecturas de
+filtro](/phonometry/es/signals/filters/filter-gallery/). Las máscaras de
+aceptación de clase de la Tabla 1 y su verificación se han trasladado a
+[Verificación de clase de
+filtros](/phonometry/es/signals/filters/filter-compliance/). Cerca de Nyquist,
+la transformada bilineal deforma el eje de frecuencia y el banco no tiene
+corrección para ello (a diferencia de la opción `high_accuracy` de
+`WeightingFilter`): mantén el borde superior de banda con margen cómodo
+respecto a Nyquist, o sube `fs`, y confirma el margen con
 `verify_filter_class`.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

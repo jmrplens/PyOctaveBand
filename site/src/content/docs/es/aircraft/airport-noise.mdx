@@ -25,8 +25,10 @@ references:
     note: "El modelo de atenuación lateral sobre suelo blando que la Doc 29 adopta (sección 4.5.4) en la sección de contornos de evento único."
 ---
 
-import Video from '../../../../components/Video.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 La certificación mide un avión en un punto de referencia y en un vuelo; un
 estudio de aeropuerto plantea otra pregunta: cuánto ruido llega *allí*, a esa
@@ -507,31 +509,37 @@ reproducen de extremo a extremo en la batería de tests.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La cadena de evento único de ruido de aeropuerto de ECAC
-Doc 29: la interpolación NPD de `npd_level`/`npd_curve` (Ecs. 4-3, 4-4), las
-correcciones por segmento `impedance_adjustment`, `lateral_attenuation`
-(suelo blando de SAE AIR 5662), `engine_installation_correction`,
-`duration_correction`, `noise_fraction` y `start_of_roll_directivity`, su
-ensamblado en `SEL`/$L_{Amax}$ por `event_level` y el contorno en malla de
-tierra `noise_contour`, incluidos el recorrido de aterrizaje, el ángulo de
-alabeo por segmento y la geometría lateral de extremo más próximo. Validada
-por debajo de 0,01 dB contra el workbook de referencia de la Parte 1 del
-Vol. 3 de la Doc 29 5.ª ed.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La cadena de evento único de ruido de aeropuerto de ECAC Doc 29: la
+interpolación NPD de `npd_level`/`npd_curve` (Ecs. 4-3, 4-4), las correcciones
+por segmento `impedance_adjustment`, `lateral_attenuation` (suelo blando de
+SAE AIR 5662), `engine_installation_correction`, `duration_correction`,
+`noise_fraction` y `start_of_roll_directivity`, su ensamblado en
+`SEL`/$L_{Amax}$ por `event_level` y el contorno en malla de tierra
+`noise_contour`, incluidos el recorrido de aterrizaje, el ángulo de alabeo por
+segmento y la geometría lateral de extremo más próximo. Validada por debajo de
+0,01 dB contra el workbook de referencia de la Parte 1 del Vol. 3 de la Doc 29
+5.ª ed.
+</ScopeClaim>
 
-**No cubierto.** La cadena construye solo contornos de evento único: no
-ensambla los índices acumulados multievento (una suma tipo $L_{den}$ sobre un
-programa de vuelos completo) que un estudio de contornos Doc 29 completo
-necesita por encima de estos niveles de evento único. Las propias tablas NPD
-son un dato de entrada, no una predicción: la biblioteca interpola las tablas
-que se le aportan para un tipo de avión, no las sintetiza a partir de datos
-de motor. La base de datos ANP de EASA/EUROCONTROL de tablas medidas para tipos
-reales sí viene con phonometry y la lee [La base de datos ANP de
+<ScopeClaim status="not-covered" label="No cubierto">
+La cadena construye solo contornos de evento único: no ensambla los índices
+acumulados multievento (una suma tipo $L_{den}$ sobre un programa de vuelos
+completo) que un estudio de contornos Doc 29 completo necesita por encima de
+estos niveles de evento único. Las propias tablas NPD son un dato de entrada,
+no una predicción: la biblioteca interpola las tablas que se le aportan para
+un tipo de avión, no las sintetiza a partir de datos de motor. La base de
+datos ANP de EASA/EUROCONTROL de tablas medidas para tipos reales sí viene con
+phonometry y la lee [La base de datos ANP de
 flota](/phonometry/es/aircraft/anp-fleet/), que la enchufa directamente a las
 funciones de esta página. Convertir datos NPD a un emplazamiento fuera de la
 envolvente del §2.5 (el recálculo del Apéndice D) no está implementado, y
 tampoco lo está el suelo acústicamente duro que SAE AIR 5662 excluye: la
 atenuación lateral, y con ella toda la cadena de evento único, supone suelo
 blando con hierba.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

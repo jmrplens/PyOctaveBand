@@ -25,8 +25,10 @@ references:
     note: "El disco de acelerómetros sobre la almohadilla de asiento que exige el apartado 5.1.2: su diámetro, su altura y su dureza, y el disco metálico que sostiene los transductores (5.2.3)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La vibración que contiene **choques mecánicos** repetidos (vehículos todoterreno,
 embarcaciones rápidas, maquinaria de movimiento de tierras) carga la columna
@@ -510,8 +512,10 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El apartado 5 y el Anexo C de la ISO 2631-5:2018. Los requisitos
-de adquisición y acondicionamiento de los apartados 5.1.2 a 5.1.4 como
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El apartado 5 y el Anexo C de la ISO 2631-5:2018. Los requisitos de
+adquisición y acondicionamiento de los apartados 5.1.2 a 5.1.4 como
 orientación; la función de transferencia asiento-columna del apartado 5.2
 (`seat_to_spine_transfer`, `spinal_response`, `response_peaks`); la dosis de
 aceleración del apartado 5.3 y la dosis diaria de la Fórmula 4
@@ -522,19 +526,24 @@ Weibull del Anexo C con sus coeficientes de la Tabla C.1 y sus umbrales de la
 Tabla C.2 (`compression_dose`, `static_stress`, `ultimate_strength`,
 `injury_risk`, `injury_probability`, `multiple_shock_assessment`,
 `MultipleShockResult.report`).
+</ScopeClaim>
 
-**No cubierto.** El modelo de elementos finitos de los Anexos A / E para las
-exposiciones *menos severas* del apartado 4 (ocupantes que permanecen sentados
-en todo momento, que es la mayor parte del trabajo agrícola y de movimiento de
-tierras) lo distribuye ISO como software aparte y no está implementado aquí; un
-registro de ese régimen no tiene recorrido por esta página. Tampoco lo está el
-modelo espinal horizontal de la edición retirada de 2004, así que la exposición
-horizontal de cuerpo entero va a las métricas eficaz, eficaz móvil/MTVV y VDV de
-[Vibración en humanos](/phonometry/es/vibration/human/human-vibration/). La
-cadena de acondicionamiento de la sección 2 es cosa de quien llama:
-`spinal_response` da por supuesto un registro al que ya se le ha comprobado el
-signo, se ha partido en las fronteras de pérdida de contacto, se le ha corregido
-el offset, se le ha aplicado la ventana y se le ha limitado la banda.
+<ScopeClaim status="not-covered" label="No cubierto">
+El modelo de elementos finitos de los Anexos A / E para las exposiciones
+*menos severas* del apartado 4 (ocupantes que permanecen sentados en todo
+momento, que es la mayor parte del trabajo agrícola y de movimiento de
+tierras) lo distribuye ISO como software aparte y no está implementado aquí;
+un registro de ese régimen no tiene recorrido por esta página. Tampoco lo está
+el modelo espinal horizontal de la edición retirada de 2004, así que la
+exposición horizontal de cuerpo entero va a las métricas eficaz, eficaz
+móvil/MTVV y VDV de [Vibración en
+humanos](/phonometry/es/vibration/human/human-vibration/). La cadena de
+acondicionamiento de la sección 2 es cosa de quien llama: `spinal_response` da
+por supuesto un registro al que ya se le ha comprobado el signo, se ha partido
+en las fronteras de pérdida de contacto, se le ha corregido el offset, se le
+ha aplicado la ventana y se le ha limitado la banda.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

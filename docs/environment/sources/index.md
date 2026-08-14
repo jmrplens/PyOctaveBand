@@ -75,17 +75,17 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
-Two of the four CNOSSOS sources are missing, by omission rather than oversight:
-the **industrial source** of section 2.4 and Appendix H is not implemented, and
-neither is the **aircraft source** of sections 2.6 and 2.7 — aircraft noise is
-covered by the ICAO and ECAC methods in [Aircraft
+Two of the four CNOSSOS sources are missing, by omission rather than
+oversight: the **industrial source** of section 2.4 and Appendix H is not
+implemented, and neither is the **aircraft source** of sections 2.6 and 2.7 —
+aircraft noise is covered by the ICAO and ECAC methods in [Aircraft
 noise](../../aircraft/index.md), which is a different family of models entirely.
 Neither is the **CNOSSOS propagation method** of section 2.5: it differs from
 the ISO 9613-2 model this library implements, so pairing these source powers
 with [Outdoor Sound
-Propagation](../propagation/outdoor-propagation.md) does not
-give a CNOSSOS result. Inside the two methods that are here, three gaps come
-from the source documents themselves: the open vehicle category 5 has no
+Propagation](../propagation/outdoor-propagation.md) does
+not give a CNOSSOS result. Inside the two methods that are here, three gaps
+come from the source documents themselves: the open vehicle category 5 has no
 coefficients in Appendix F and is not modelled, rail roughness classes N and B
 carry no spectrum in Appendix G and must be supplied by the Member State, and
 how a source line is split into point sources is declared out of scope by the

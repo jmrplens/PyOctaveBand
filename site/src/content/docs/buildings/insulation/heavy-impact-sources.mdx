@@ -46,6 +46,8 @@ references:
     note: "Table 1 records the August 2022 revision: the heavyweight source became the rubber ball, the index L'iA,Fmax through KS F ISO 10140-5 and KS F ISO 717-2, the mandatory standard 49 dB (from 50 dB) and the four grades at 4 dB intervals. The only published regulatory scale for the quantity this page computes."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The ISO tapping machine is a *light* impact source. Its five 500 g hammers fall
@@ -430,12 +432,14 @@ where the A-weighting has already discarded the energy.
 
 ## What this guide covers
 
-**Covered.** The impact force exposure level of ISO 16283-2:2020
-Formula (A.1) from a sampled force record, via
-`building.impact_force_exposure_level`; the printed octave-band specifications
-of ISO 16283-2:2020 Table A.1 / ISO 10140-5:2010 Table F.1 (rubber ball) and
-JIS A 1418-2:2019 Tables A.1 and A.2 (both characteristics) with their
-tolerances, via `building.heavy_impact_source_specification`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The impact force exposure level of ISO 16283-2:2020 Formula (A.1) from a
+sampled force record, via `building.impact_force_exposure_level`; the printed
+octave-band specifications of ISO 16283-2:2020 Table A.1 / ISO 10140-5:2010
+Table F.1 (rubber ball) and JIS A 1418-2:2019 Tables A.1 and A.2 (both
+characteristics) with their tolerances, via
+`building.heavy_impact_source_specification`,
 `building.heavy_impact_source_limits` and
 `building.check_heavy_impact_source`; the standardized maximum impact sound
 pressure level of Formulae (4), (5) and (6) and the octave synthesis of
@@ -444,21 +448,24 @@ Formula (20), via `building.standardized_maximum_impact_level`,
 `building.heavy_impact_octave_levels`; and the normative A-weighted rating of
 ISO 717-2:2020 Annex D with the Table D.3 corrections, via
 `building.a_weighted_maximum_impact_level`.
+</ScopeClaim>
 
-**Not covered.** The field procedure documented above is not automated: the
-functions consume levels that were already energy-averaged over the microphone
-positions of one ball position and then over the ball positions, and nothing
-checks the drop height, the four-or-more source positions, the microphone
-separations or the two-stage averaging. Nor is the horizontal-arrangement
-guidance of ISO 16283-2:2020 Annex E, which is informative. There is no prediction model
-that takes a floor construction to a heavy-impact level; Hopkins states
-plainly that the complexity of the input force and the use of a
-time-weighted maximum leave no simple counterpart to the tapping-machine
-prediction. No accredited worked example exists anywhere that carries a real
-floor from measured $L_{i,F\max}$ through to $L'_{iA,F\max,V,T}$, so the
-standardization chain is anchored on its own $T = T_0$ identity and on a
-published 25-band reproduction of Formula (4).
-
+<ScopeClaim status="not-covered" label="Not covered">
+The field procedure documented above is not automated: the functions consume
+levels that were already energy-averaged over the microphone positions of one
+ball position and then over the ball positions, and nothing checks the drop
+height, the four-or-more source positions, the microphone separations or the
+two-stage averaging. Nor is the horizontal-arrangement guidance of ISO
+16283-2:2020 Annex E, which is informative. There is no prediction model that
+takes a floor construction to a heavy-impact level; Hopkins states plainly
+that the complexity of the input force and the use of a time-weighted maximum
+leave no simple counterpart to the tapping-machine prediction. No accredited
+worked example exists anywhere that carries a real floor from measured
+$L_{i,F\max}$ through to $L'_{iA,F\max,V,T}$, so the standardization chain is
+anchored on its own $T = T_0$ identity and on a published 25-band reproduction
+of Formula (4).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

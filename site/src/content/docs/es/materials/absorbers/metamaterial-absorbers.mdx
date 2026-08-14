@@ -61,6 +61,8 @@ references:
     note: "Topics in Applied Physics, vol. 143. El tratamiento en formato libro del acoplamiento crítico, el sonido lento y los absorbentes de metamaterial resonantes."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
@@ -636,37 +638,42 @@ apartado de incidencia fuera de la normal.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El absorbente de metamaterial de ranura con resonadores de
-Helmholtz de Jiménez et al. (2016/2017): la cadena de matrices de
-transferencia con los parámetros efectivos viscotérmicos de Stinson (1991),
-la impedancia del resonador con sus correcciones de radiación y el término de
-radiación de la ranura (`slit_helmholtz_absorber`, con `HelmholtzResonator`
-como contenedor de geometría y el `effective_wavenumber` y
-`effective_impedance` recuperados expuestos en el resultado), y el
-cálculo de diseño por acoplamiento crítico (`critical_coupling_design`)
-que ajusta longitud de cavidad y altura de ranura hasta que el cero de
-reflexión queda sobre el eje de frecuencia real. También están expuestos los
-dos bloques constructivos viscotérmicos con los que se ensambla la cadena
-(`slit_effective_properties`, `rectangular_duct_properties` y
-`helmholtz_resonator_impedance`, todos con un estado `AirProperties`), y
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El absorbente de metamaterial de ranura con resonadores de Helmholtz de
+Jiménez et al. (2016/2017): la cadena de matrices de transferencia con los
+parámetros efectivos viscotérmicos de Stinson (1991), la impedancia del
+resonador con sus correcciones de radiación y el término de radiación de la
+ranura (`slit_helmholtz_absorber`, con `HelmholtzResonator` como contenedor de
+geometría y el `effective_wavenumber` y `effective_impedance` recuperados
+expuestos en el resultado), y el cálculo de diseño por acoplamiento crítico
+(`critical_coupling_design`) que ajusta longitud de cavidad y altura de ranura
+hasta que el cero de reflexión queda sobre el eje de frecuencia real. También
+están expuestos los dos bloques constructivos viscotérmicos con los que se
+ensambla la cadena (`slit_effective_properties`, `rectangular_duct_properties`
+y `helmholtz_resonator_impedance`, todos con un estado `AirProperties`), y
 `slit_helmholtz_absorber` acepta una *lista* de resonadores, que es la cadena
 graduada de la sección 4.
+</ScopeClaim>
 
-**No cubierto.** Ninguna norma de medida rige estos modelos de predicción;
-la sección 5 expone la vía por la que se verificaría un panel construido, en el
-[tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) (ISO 10534-2) o
-en la [cámara reverberante](/phonometry/es/materials/absorbers/absorption-measurement/)
-(ISO 354), pero nada de aquí ejecuta nada de eso: las cifras de tolerancia y de
+<ScopeClaim status="not-covered" label="No cubierto">
+Ninguna norma de medida rige estos modelos de predicción; la sección 5 expone
+la vía por la que se verificaría un panel construido, en el [tubo de
+impedancia](/phonometry/es/materials/absorbers/impedance-tube/) (ISO 10534-2)
+o en la [cámara
+reverberante](/phonometry/es/materials/absorbers/absorption-measurement/) (ISO
+354), pero nada de aquí ejecuta nada de eso: las cifras de tolerancia y de
 ángulo citadas son evaluaciones del modelo, y la rugosidad de una ranura
 impresa, el marco, el montaje y el tamaño finito del panel quedan todos fuera
 del modelo. Los absorbentes de membrana y membrana decorada de la sección 4 se
-tratan solo como contexto; las capas clásicas perforadas, microperforadas y
-de membrana están implementadas en
-[Absorbentes porosos y
-multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y
-la ranura cargada con resonadores usada como elemento de fase en vez de como
-absorbente es el tema de
+tratan solo como contexto; las capas clásicas perforadas, microperforadas y de
+membrana están implementadas en [Absorbentes porosos y
+multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y la ranura
+cargada con resonadores usada como elemento de fase en vez de como absorbente
+es el tema de
 [Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

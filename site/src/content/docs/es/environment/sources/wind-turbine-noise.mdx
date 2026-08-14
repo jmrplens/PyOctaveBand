@@ -25,8 +25,10 @@ references:
     note: "El criterio de audibilidad tonal que reutiliza el método IEC procede del anexo C de su edición de 2007 (la edición de 2017 lleva los métodos tonales en los anexos J y K), y su mapeo de la Tabla J.1, tonal_adjustment_from_mean_audibility, es el que consume la audibilidad media del intervalo."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La IEC 61400-11 mide la emisión acústica de un aerogenerador. Esta página cubre
 sus dos magnitudes en forma cerrada: el **nivel de potencia acústica aparente**
@@ -389,31 +391,37 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las magnitudes en forma cerrada de la IEC 61400-11:2012+A1:2018:
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las magnitudes en forma cerrada de la IEC 61400-11:2012+A1:2018:
 `slant_distance` (Fórmulas 1 y 2), `apparent_sound_power_level` (Fórmula 26) y
 la cadena de audibilidad tonal de los apartados 9.5.2 a 9.5.8 mediante
 `wind_turbine_tonality`, con su ficha `.report()`. Los requisitos de
 instrumentación y de posición de los apartados 6 y 7 están documentados arriba
-como las condiciones que esas fórmulas suponen, y las tolerancias de la posición
-de medida están dibujadas.
+como las condiciones que esas fórmulas suponen, y las tolerancias de la
+posición de medida están dibujadas.
+</ScopeClaim>
 
-**No cubierto.** La propia campaña de medida: el promediado de 10 s, la
-clasificación en intervalos de velocidad de viento de 0,5 m/s con sus 10 + 10
-periodos, la corrección por fondo, la interpolación a los centros de intervalo,
-la conversión de la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de
-incertidumbre del apartado 9.3 operan todos sobre campañas completas y son cosa
-del usuario. Tampoco está implementada la vía de declaración de la
-IEC TS 61400-14, que convierte un lote de máquinas medidas en el número único
-que recibe la administración competente. Y dos cosas que un lector interesado en
+<ScopeClaim status="not-covered" label="No cubierto">
+La propia campaña de medida: el promediado de 10 s, la clasificación en
+intervalos de velocidad de viento de 0,5 m/s con sus 10 + 10 periodos, la
+corrección por fondo, la interpolación a los centros de intervalo, la
+conversión de la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de
+incertidumbre del apartado 9.3 operan todos sobre campañas completas y son
+cosa del usuario. Tampoco está implementada la vía de declaración de la IEC TS
+61400-14, que convierte un lote de máquinas medidas en el número único que
+recibe la administración competente. Y dos cosas que un lector interesado en
 aerogeneradores viene a buscar a menudo quedan fuera de la IEC 61400-11 por
-completo: la **modulación de amplitud** (el «silbido», que queda englobado en el
-$L_{WA}$ y que esta norma no valora en ningún sitio) y el **infrasonido**. Las
-dos figuran en el 7.2.1 como
-medidas *opcionales* sin método de valoración asociado, así que su evaluación
-recae en las guías nacionales; la vía psicoacústica hacia ellas empieza en
-[Intensidad de fluctuación y aspereza](/phonometry/es/perception/psychoacoustics/sound-quality/)
-y en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/)
+completo: la **modulación de amplitud** (el «silbido», que queda englobado en
+el $L_{WA}$ y que esta norma no valora en ningún sitio) y el **infrasonido**.
+Las dos figuran en el 7.2.1 como medidas *opcionales* sin método de valoración
+asociado, así que su evaluación recae en las guías nacionales; la vía
+psicoacústica hacia ellas empieza en [Intensidad de fluctuación y
+aspereza](/phonometry/es/perception/psychoacoustics/sound-quality/) y en
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/)
 para el nivel de infrasonido con ponderación G.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

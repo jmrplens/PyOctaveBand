@@ -26,6 +26,8 @@ references:
     note: "Sección 13.1.4 (la relación de Hilbert entre log-magnitud y fase tras el plegado de fase mínima) y sección 13.3 con la figura 13.11 (detección de envolvente seguida de eliminación de la continua, la estructura del espectro de la envolvente). ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Los [estimadores
@@ -600,20 +602,26 @@ métricas del dominio la cuantifican normativamente.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las tres variantes del cepstrum y el liftering del *Handbook of
-Signal Processing in Acoustics* de Havelock, Kuwano y Vorländer (`cepstrum`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las tres variantes del cepstrum y el liftering del *Handbook of Signal
+Processing in Acoustics* de Havelock, Kuwano y Vorländer (`cepstrum`,
 `lifter`, capítulos 27 y 87), el retardo de un único eco y el coeficiente de
 reflexión leídos en el cepstrum de potencia (`echo_detection`), el cepstrum
-complejo invertible y su ida y vuelta homomórfica (`CepstrumResult.invert`),
-y el espectro de la envolvente del capítulo 13 de Bendat y Piersol
+complejo invertible y su ida y vuelta homomórfica (`CepstrumResult.invert`), y
+el espectro de la envolvente del capítulo 13 de Bendat y Piersol
 (`envelope_spectrum`) con sus líneas de forma cerrada para un tono AM.
+</ScopeClaim>
 
-**No cubierto.** `echo_detection` solo elige el mayor pico cepstral de la
-banda de búsqueda, así que una respuesta con varios ecos solapados necesita
-localización manual de picos o llamadas repetidas sobre bandas más
-estrechas: no es un separador multi-eco. El módulo tampoco tiene un cepstrum
-en escala mel ni de tipo MFCC para rasgos de audio perceptual: `lifter` y
-`cepstrum` trabajan solo sobre el espectro logarítmico en frecuencia lineal.
+<ScopeClaim status="not-covered" label="No cubierto">
+`echo_detection` solo elige el mayor pico cepstral de la banda de búsqueda,
+así que una respuesta con varios ecos solapados necesita localización manual
+de picos o llamadas repetidas sobre bandas más estrechas: no es un separador
+multi-eco. El módulo tampoco tiene un cepstrum en escala mel ni de tipo MFCC
+para rasgos de audio perceptual: `lifter` y `cepstrum` trabajan solo sobre el
+espectro logarítmico en frecuencia lineal.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

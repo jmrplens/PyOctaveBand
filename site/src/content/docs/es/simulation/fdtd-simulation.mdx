@@ -36,6 +36,8 @@ references:
     note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 4 reproducen, con este esquema, el contraste TMM frente a onda completa que documenta el artículo."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -1040,50 +1042,52 @@ propia guía,
 
 ## Qué cubre esta guía
 
-**Cubierto.** El esquema FDTD presión-velocidad escalonado de Attenborough y
-Van Renterghem, capítulo 4: las ecuaciones de gobierno (Ecs. 4.3-4.4), la
-actualización leapfrog (Ecs. 4.11-4.12), la condición de estabilidad de
-Courant (Ecs. 4.13-4.14), el contorno rígido (Ec. 4.32) y el contorno de
-impedancia real independiente de la frecuencia (Ecs. 4.33-4.35), expuestos a
-través de `fdtd_simulation`/`FDTD2D` con las fuentes `GaussianPulse`,
-`CWSource` y `SignalSource`, sondas de presión y una `obstacle_mask`
-rasterizada, con `damping` como única pérdida volumétrica. La sección 3
-deduce las cuatro reglas de dimensionado que la regla de resolución no
-cubre (el ancho de banda de la fuente, la duración de la ejecución, el
-grosor de la esponja en celdas, y el transitorio y la ventana DFT de una
-medición en régimen estacionario), y la sección 2 enumera las seis
-comprobaciones que dicen si una ejecución sirve.
-Validado contra oráculos en forma cerrada: los modos normales de
-sala rígida (Kuttruff cap. 3), los tiempos de llegada en campo libre y el
-decaimiento cilíndrico en 2D, el eco de imagen de pared rígida, el
-coeficiente de reflexión de impedancia y la relación de dispersión de la
-sección 6, con el orden de convergencia medido coincidiendo con el diseño de
-segundo orden del esquema. La cadena de campo cercano a lejano de la
-sección 4: captura de
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El esquema FDTD presión-velocidad escalonado de Attenborough y Van Renterghem,
+capítulo 4: las ecuaciones de gobierno (Ecs. 4.3-4.4), la actualización
+leapfrog (Ecs. 4.11-4.12), la condición de estabilidad de Courant (Ecs.
+4.13-4.14), el contorno rígido (Ec. 4.32) y el contorno de impedancia real
+independiente de la frecuencia (Ecs. 4.33-4.35), expuestos a través de
+`fdtd_simulation`/`FDTD2D` con las fuentes `GaussianPulse`, `CWSource` y
+`SignalSource`, sondas de presión y una `obstacle_mask` rasterizada, con
+`damping` como única pérdida volumétrica. La sección 3 deduce las cuatro
+reglas de dimensionado que la regla de resolución no cubre (el ancho de banda
+de la fuente, la duración de la ejecución, el grosor de la esponja en celdas,
+y el transitorio y la ventana DFT de una medición en régimen estacionario), y
+la sección 2 enumera las seis comprobaciones que dicen si una ejecución sirve.
+Validado contra oráculos en forma cerrada: los modos normales de sala rígida
+(Kuttruff cap. 3), los tiempos de llegada en campo libre y el decaimiento
+cilíndrico en 2D, el eco de imagen de pared rígida, el coeficiente de
+reflexión de impedancia y la relación de dispersión de la sección 6, con el
+orden de convergencia medido coincidiendo con el diseño de segundo orden del
+esquema. La cadena de campo cercano a lejano de la sección 4: captura de
 fasores sobre contorno cerrado (`add_contour_probe`) y la integral de
-Kirchhoff-Helmholtz 2D (`far_field_from_contour`, Williams cap. 8),
-validada contra los campos exactos de las fuentes lineales monopolo y
-dipolo, la propiedad de extinción, y los paneles QRD y metadifusor
-mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
-la biblioteca.
+Kirchhoff-Helmholtz 2D (`far_field_from_contour`, Williams cap. 8), validada
+contra los campos exactos de las fuentes lineales monopolo y dipolo, la
+propiedad de extinción, y los paneles QRD y metadifusor mallados frente a los
+propios modelos de campo lejano Fraunhofer y TMM de la biblioteca.
+</ScopeClaim>
 
-**No cubierto.** La geometría interior es rígida por construcción: solo los
-cuatro lados del dominio aceptan una impedancia o una esponja, así que una
-superficie interior solo puede ablandarse respaldándola con una región
-`damping` con pérdidas, y esa región es un fluido equivalente independiente
-de la frecuencia y no un modelo poroso. El esquema es solo
-bidimensional: modela una fuente
-lineal en sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la
-propagación esférica $1/r$ de una fuente puntual 3D, así que los niveles
-absolutos y las tasas de decaimiento no son los de una sala 3D. El contorno
-abierto es la capa absorbente de rampa cuadrática descrita como «el precursor
-sencillo» de una verdadera capa perfectamente adaptada, no una PML en sí. Las
-ecuaciones de gobierno suponen un medio en reposo, así que no se modela la
-advección por viento o flujo, y el único contorno de impedancia es el real
-independiente de la frecuencia de las Ecs. 4.33-4.35. Los medios elásticos no
-se cubren aquí: el esquema compañero P-SV, sus superficies libres y su
-física fluido-sólido tienen su propia guía, [Ondas elásticas y acoplamiento
+<ScopeClaim status="not-covered" label="No cubierto">
+La geometría interior es rígida por construcción: solo los cuatro lados del
+dominio aceptan una impedancia o una esponja, así que una superficie interior
+solo puede ablandarse respaldándola con una región `damping` con pérdidas, y
+esa región es un fluido equivalente independiente de la frecuencia y no un
+modelo poroso. El esquema es solo bidimensional: modela una fuente lineal en
+sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la propagación
+esférica $1/r$ de una fuente puntual 3D, así que los niveles absolutos y las
+tasas de decaimiento no son los de una sala 3D. El contorno abierto es la capa
+absorbente de rampa cuadrática descrita como «el precursor sencillo» de una
+verdadera capa perfectamente adaptada, no una PML en sí. Las ecuaciones de
+gobierno suponen un medio en reposo, así que no se modela la advección por
+viento o flujo, y el único contorno de impedancia es el real independiente de
+la frecuencia de las Ecs. 4.33-4.35. Los medios elásticos no se cubren aquí:
+el esquema compañero P-SV, sus superficies libres y su física fluido-sólido
+tienen su propia guía, [Ondas elásticas y acoplamiento
 fluido-sólido](/phonometry/es/simulation/elastic-waves/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

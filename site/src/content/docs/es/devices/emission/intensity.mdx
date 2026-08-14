@@ -26,9 +26,11 @@ references:
     note: "El índice presión-intensidad, los indicadores de campo F1 a F4 del Anexo A (F1 según las ecuaciones (A.1)-(A.2), evaluado en el ensayo inicial del apartado 8.2 y de nuevo según B.1.4), el límite de variabilidad temporal de la tabla B.3, el criterio de capacidad dinámica (Anexo B) y la regla de los 0,5 m de distancia de la superficie."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 La *presión* acústica dice cuánto suena un punto; la **intensidad acústica** dice
 hacia dónde *va* la energía. Es el flujo de potencia acústica (W/m²), una
@@ -711,39 +713,43 @@ los dos canales.
 
 ## Qué cubre esta guía
 
-**Cubierto.** IEC 61043:1993 (EN 61043:1994) para el estimador de
-intensidad por espectro cruzado de dos micrófonos de `sound_intensity`, la
-corrección de sesgo por diferencias finitas y su límite de ancho de banda
-útil (apartado 7.3, tabla 3), el índice residual de presión-intensidad
-$\delta_{pI0}$ como el suelo de error de fase del instrumento, y la clasificación del
-instrumento construida sobre él: los mínimos por banda de la tabla 2 para
-sondas, procesadores e instrumentos con la regla de separación de la nota 1,
-los rangos de frecuencia del apartado 6.1 y la regla de combinación de
-componentes del apartado 8 (`intensity_class_compliance`,
-`residual_index_limits`, `instrument_class_from_components`), además de la
-conversión entre $\delta_{pI0}$ y desfase en ambos sentidos. ISO 9614-1:1993
-para los indicadores de campo del Anexo A $F_1$ a $F_4$
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+IEC 61043:1993 (EN 61043:1994) para el estimador de intensidad por espectro
+cruzado de dos micrófonos de `sound_intensity`, la corrección de sesgo por
+diferencias finitas y su límite de ancho de banda útil (apartado 7.3, tabla
+3), el índice residual de presión-intensidad $\delta_{pI0}$ como el suelo de
+error de fase del instrumento, y la clasificación del instrumento construida
+sobre él: los mínimos por banda de la tabla 2 para sondas, procesadores e
+instrumentos con la regla de separación de la nota 1, los rangos de frecuencia
+del apartado 6.1 y la regla de combinación de componentes del apartado 8
+(`intensity_class_compliance`, `residual_index_limits`,
+`instrument_class_from_components`), además de la conversión entre
+$\delta_{pI0}$ y desfase en ambos sentidos. ISO 9614-1:1993 para los
+indicadores de campo del Anexo A $F_1$ a $F_4$
 (`temporal_variability_indicator`, `field_indicators`) con el límite de la
-tabla B.3 sobre $F_1$, y el criterio de
-capacidad dinámica del Anexo B (`dynamic_capability_index`).
+tabla B.3 sobre $F_1$, y el criterio de capacidad dinámica del Anexo B
+(`dynamic_capability_index`).
+</ScopeClaim>
 
-**No cubierto.** La propia determinación de potencia acústica de ISO 9614-1,
-apartados 8 y 9, que suma las potencias parciales $I_i \cdot S_i$ de los
-puntos de medida discretos hasta $L_W$, no está implementada como función aquí:
-`sound_intensity` y `field_indicators` informan de la intensidad y la
-calidad de campo, no de una potencia sumada. Las vías de barrido que sí
-calculan $L_W$ a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
-la guía de
+<ScopeClaim status="not-covered" label="No cubierto">
+La propia determinación de potencia acústica de ISO 9614-1, apartados 8 y 9,
+que suma las potencias parciales $I_i \cdot S_i$ de los puntos de medida
+discretos hasta $L_W$, no está implementada como función aquí:
+`sound_intensity` y `field_indicators` informan de la intensidad y la calidad
+de campo, no de una potencia sumada. Las vías de barrido que sí calculan $L_W$
+a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en la guía de
 [potencia acústica por barrido de
-intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
-El propio *ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la
-biblioteca: $\delta_{pI0}$ es un valor que quien mide obtiene en su propia
-cadena
+intensidad](/phonometry/es/devices/emission/sound-power-intensity/). El propio
+*ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la biblioteca:
+$\delta_{pI0}$ es un valor que quien mide obtiene en su propia cadena
 sonda-analizador, con el espaciador que va a montar, y aporta — el
 procedimiento está en *Medir el índice residual*, más arriba, y lo que
 phonometry hace con el número es clasificarlo frente a la tabla 2. La
-comprobación previa al uso del apartado 14 y el ensayo de inversión de la sonda
-de ISO 9614-2 son igualmente procedimientos, no funciones.
+comprobación previa al uso del apartado 14 y el ensayo de inversión de la
+sonda de ISO 9614-2 son igualmente procedimientos, no funciones.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

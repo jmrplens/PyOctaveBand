@@ -19,6 +19,8 @@ references:
     note: "Chapter 11 (refraction by wind and temperature gradients, ray models and shadow zones). ISBN 978-1-4987-4007-4."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -501,7 +503,9 @@ plt.show()
 
 ## What this guide covers
 
-**Covered.** The ray model (Runge-Kutta integration of Snell's law,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ray model (Runge-Kutta integration of Snell's law,
 `atmospheric_ray_paths`) with the closed-form linear-profile geometry
 (`ray_curvature_radius`, `shadow_zone_distance`, Salomons Sec. 4.4), and the
 Green's Function parabolic equation (`atmospheric_parabolic_equation`,
@@ -510,13 +514,17 @@ ground reflection, the refraction phase screen and the absorbing top layer.
 Validated by the homogeneous limit against the exact spherical ground effect
 (a few tenths of a dB, and the +6 dB rigid-ground enhancement), exact ray
 geometry to machine precision, reciprocity and the shadow-zone collapse.
+</ScopeClaim>
 
-**Not covered.** Both models take a single effective-sound-speed profile
-that varies with height alone, not with range: a horizontally inhomogeneous
-atmosphere (a gradient that changes along the path) sits outside their
-range-independent formulation, described in the module as the counterpart of
-the "range-independent ocean solvers" it mirrors. Both also assume flat
-ground at $z = 0$; neither takes a terrain elevation profile.
+<ScopeClaim status="not-covered" label="Not covered">
+Both models take a single effective-sound-speed profile that varies with
+height alone, not with range: a horizontally inhomogeneous atmosphere (a
+gradient that changes along the path) sits outside their range-independent
+formulation, described in the module as the counterpart of the
+"range-independent ocean solvers" it mirrors. Both also assume flat ground at
+$z = 0$; neither takes a terrain elevation profile.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

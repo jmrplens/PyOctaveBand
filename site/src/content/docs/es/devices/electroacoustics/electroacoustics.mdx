@@ -33,6 +33,8 @@ references:
     note: "ISBN 978-0-470-24877-5. Los estimadores de respuesta en frecuencia H1 y H2 y la coherencia ordinaria γ² de la sección 5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Dos pilares de la caracterización de equipos de audio, a partir de una señal
@@ -649,34 +651,40 @@ plt.show()
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las condiciones nominales y las condiciones normalizadas de
-medición de la IEC 60268-3 (apartados 3.1.2/3.1.3 y el preacondicionamiento de
-1 h del apartado 9) y las comprobaciones de aceptación de 14.12.3.2 y 14.12.4.1,
-como las condiciones en las que queda definida cada una de las razones de abajo.
-El conjunto de distorsión de IEC 60268-3 (apartados
-14.12.2-14.12.11): $\mathrm{THD}_F$ y $\mathrm{THD}_R$ (`thd`), la distorsión armónica de orden n
-(`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de
-medición de AES17-2015 (`harmonic_analysis`, apartados 5.2.5/5.2.8/6.3.1 de
-AES17), la intermodulación por modulación y por diferencia de frecuencias, la
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las condiciones nominales y las condiciones normalizadas de medición de la IEC
+60268-3 (apartados 3.1.2/3.1.3 y el preacondicionamiento de 1 h del apartado 9)
+y las comprobaciones de aceptación de 14.12.3.2 y 14.12.4.1, como las
+condiciones en las que queda definida cada una de las razones de abajo. El
+conjunto de distorsión de IEC 60268-3 (apartados 14.12.2-14.12.11):
+$\mathrm{THD}_F$ y $\mathrm{THD}_R$ (`thd`), la distorsión armónica de orden n
+(`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de medición
+de AES17-2015 (`harmonic_analysis`, apartados 5.2.5/5.2.8/6.3.1 de AES17), la
+intermodulación por modulación y por diferencia de frecuencias, la
 intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
-rango dinámico y el ruido de canal en reposo de AES17-2015. Los
-estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y Piersol y la
-coherencia ordinaria.
+rango dinámico y el ruido de canal en reposo de AES17-2015. Los estimadores de
+respuesta en frecuencia $H_1$/$H_2$ de Bendat y Piersol y la coherencia
+ordinaria.
+</ScopeClaim>
 
-**No cubierto.** Ninguna de las condiciones de la sección 0 la comprueban las
-funciones: toman un array capturado y calculan la razón que define el apartado,
-así que el banco, el punto de funcionamiento y las tres comprobaciones de
-aceptación quedan a cargo de quien lee. Otras partes de la serie IEC 60268
-quedan fuera de esta página: la Parte 16 (inteligibilidad objetiva del habla)
-está implementada como el índice de transmisión del habla en
-[Transmisión del habla](/phonometry/es/perception/speech/speech-transmission/),
-y los informes de
-características nominales de micrófono (Parte 4) y de altavoz (Parte 5) se
-han trasladado a
-[Caracterización de micrófonos](/phonometry/es/devices/electroacoustics/microphones/) y
-[Caracterización de altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/). Las
+<ScopeClaim status="not-covered" label="No cubierto">
+Ninguna de las condiciones de la sección 0 la comprueban las funciones: toman
+un array capturado y calculan la razón que define el apartado, así que el
+banco, el punto de funcionamiento y las tres comprobaciones de aceptación
+quedan a cargo de quien lee. Otras partes de la serie IEC 60268 quedan fuera
+de esta página: la Parte 16 (inteligibilidad objetiva del habla) está
+implementada como el índice de transmisión del habla en [Transmisión del
+habla](/phonometry/es/perception/speech/speech-transmission/), y los informes
+de características nominales de micrófono (Parte 4) y de altavoz (Parte 5) se
+han trasladado a [Caracterización de
+micrófonos](/phonometry/es/devices/electroacoustics/microphones/) y
+[Caracterización de
+altavoces](/phonometry/es/devices/electroacoustics/loudspeakers/). Las
 ediciones implementadas están fijadas en AES17-2015; la revisión sucesora
 AES17-2020 no es la comprobada.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

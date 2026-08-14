@@ -14,6 +14,8 @@ references:
     note: "The comb-filter model of synchronous averaging (Eq. 8, magnitude Eq. 9), the revised finite-record model that yields an exactly periodic result, and the observation that a non-harmonic interfering order is best rejected by choosing the number of averages so that a comb node lands on it, not by the habitual power of two."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A rotating machine repeats its signature once per revolution. Buried in
@@ -364,24 +366,29 @@ error corrupts the averaging and the identification together.
 
 ## What this guide covers
 
-**Covered.** McFadden's revised model for time domain averaging
-(*Mechanical Systems and Signal Processing*, 1987): the comb-filter
-description of the average (Eq. 8, magnitude Eq. 9) implemented by
-`comb_filter_response`, the square-root noise-reduction law reported as
-`noise_reduction_db` and `amplitude_snr_gain`, and the choice of $N$ that
-places a comb node on an interfering order, following the paper's own
-32.05-order example. `time_synchronous_average` also implements the
-band-limited fractional-delay alignment used when $f_s T$ is not an
-integer.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+McFadden's revised model for time domain averaging (*Mechanical Systems and
+Signal Processing*, 1987): the comb-filter description of the average (Eq. 8,
+magnitude Eq. 9) implemented by `comb_filter_response`, the square-root
+noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
+and the choice of $N$ that places a comb node on an interfering order,
+following the paper's own 32.05-order example. `time_synchronous_average` also
+implements the band-limited fractional-delay alignment used when $f_s T$ is
+not an integer.
+</ScopeClaim>
 
-**Not covered.** TSA needs a known period; finding that period, or
-detecting periodic families without one, is the job of the
+<ScopeClaim status="not-covered" label="Not covered">
+TSA needs a known period; finding that period, or detecting periodic families
+without one, is the job of the
 [cepstrum](/phonometry/signals/spectra/cepstrum-echoes/), not of this page.
-Locating amplitude-modulation periodicities, such as bearing faults, is
-the
-[envelope spectrum](/phonometry/signals/spectra/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines),
-also outside this page. McFadden's paper is not a certification standard,
-so there is no compliance clause to check the implementation against.
+Locating amplitude-modulation periodicities, such as bearing faults, is the
+[envelope
+spectrum](/phonometry/signals/spectra/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines),
+also outside this page. McFadden's paper is not a certification standard, so
+there is no compliance clause to check the implementation against.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

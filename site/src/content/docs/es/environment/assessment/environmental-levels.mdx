@@ -31,6 +31,8 @@ references:
     note: "El complemento de práctica de medición de ISO 1996-1: qué familia de descriptores encaja con cada pregunta de evaluación, y los procedimientos de medición a su alrededor (BS 7445-2:1991 cubre la adquisición de datos para usos del suelo)."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una comunidad no oye un único $L_{Aeq}$: oye un día cuyas tardes y noches pesan
@@ -371,19 +373,23 @@ más a menudo, que es para lo que está
 
 ## Qué cubre esta guía
 
-**Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de evaluación compuesto de la ISO
-1996-1:2016 (apartado 6.5,
-`environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal del
-anexo C de la ISO 1996-2:2007 junto con la corrección de ruido residual
-(apartado 10.4), el balance de incertidumbre de medida (apartado 4, anexo F),
-el mapeo de audibilidad media del anexo J y el método de cribado del anexo K
-de la ISO 1996-2:2017.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El $L_{den}$, el $L_{dn}$ y el nivel de evaluación compuesto de la ISO
+1996-1:2016 (apartado 6.5, `environment.lden`/`ldn`/`composite_rating_level`);
+y el ajuste tonal del anexo C de la ISO 1996-2:2007 junto con la corrección de
+ruido residual (apartado 10.4), el balance de incertidumbre de medida
+(apartado 4, anexo F), el mapeo de audibilidad media del anexo J y el método
+de cribado del anexo K de la ISO 1996-2:2017.
+</ScopeClaim>
 
-**No cubierto.** La ISO 1996-2 fija las posiciones del receptor y las
-correcciones de fachada que convierten una medida en bruto en el nivel que
-esperan las funciones de esta página: esos procedimientos de posición y
-corrección no están implementados, solo la aritmética que sigue una vez
-aplicados.
+<ScopeClaim status="not-covered" label="No cubierto">
+La ISO 1996-2 fija las posiciones del receptor y las correcciones de fachada
+que convierten una medida en bruto en el nivel que esperan las funciones de
+esta página: esos procedimientos de posición y corrección no están
+implementados, solo la aritmética que sigue una vez aplicados.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

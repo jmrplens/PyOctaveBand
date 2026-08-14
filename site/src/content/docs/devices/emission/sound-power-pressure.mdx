@@ -32,9 +32,11 @@ references:
     note: "The survey grade of section 1, sharing the enveloping-surface formulae with coarser criteria."
 ---
 
+import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
-import ReportPreview from '../../../../components/ReportPreview.astro';
 
 Of the standardised routes to the sound power level $L_W$, the pressure
 methods are the ones that need nothing more exotic than a sound level meter:
@@ -817,31 +819,34 @@ result.report(
 
 ## What this guide covers
 
-**Covered.** The ISO 3744/3746 enveloping-surface determination
-(`sound_power_pressure`): the hemisphere and box surface areas, the $K_1$
-background and $K_2$ environmental corrections with their validity limits,
-the Annex B microphone positions (`measurement_positions`,
-`plot_microphone_positions`) and the Annex E A-weighted total. The
-ISO 3745 precision determination (`sound_power_anechoic`): the Annex D/E
-fixed arrays (`precision_positions`), the per-position background correction
-(`precision_background_correction`, Eq. 11), the meteorological corrections
-$C_1$/$C_2$/$C_3$ and the Clause 10.5 expanded uncertainty
-(`precision_uncertainty`). Both results render the accredited-style
-sound-power fiche through `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 3744/3746 enveloping-surface determination (`sound_power_pressure`):
+the hemisphere and box surface areas, the $K_1$ background and $K_2$
+environmental corrections with their validity limits, the Annex B microphone
+positions (`measurement_positions`, `plot_microphone_positions`) and the Annex
+E A-weighted total. The ISO 3745 precision determination
+(`sound_power_anechoic`): the Annex D/E fixed arrays (`precision_positions`),
+the per-position background correction (`precision_background_correction`, Eq.
+11), the meteorological corrections $C_1$/$C_2$/$C_3$ and the Clause 10.5
+expanded uncertainty (`precision_uncertainty`). Both results render the
+accredited-style sound-power fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** Neither method implements the underlying facility
-qualification test: ISO 3745's free-field qualification of the anechoic or
-hemi-anechoic environment is assumed, not performed, and ISO 3744's
-$K_2$ validity only warns. ISO 3744's **Annex G** correction to reference
-meteorological conditions, required above 500 m of altitude or below 10 °C
-(clause 8.2.5), is not applied either: `sound_power_pressure` takes no
-temperature or pressure argument. The $C_3$ meteorological correction of
-ISO 3745 needs
-an air-absorption coefficient the caller supplies
-(`air_absorption_coefficient=`); this module does not compute it from
-ISO 9613-1 itself. Choosing among the six routes, and the ISO 4871
-declaration a result feeds, live in
-[Sound Power](/phonometry/devices/emission/sound-power/).
+<ScopeClaim status="not-covered" label="Not covered">
+Neither method implements the underlying facility qualification test: ISO
+3745's free-field qualification of the anechoic or hemi-anechoic environment
+is assumed, not performed, and ISO 3744's $K_2$ validity only warns. ISO
+3744's **Annex G** correction to reference meteorological conditions, required
+above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied either:
+`sound_power_pressure` takes no temperature or pressure argument. The $C_3$
+meteorological correction of ISO 3745 needs an air-absorption coefficient the
+caller supplies (`air_absorption_coefficient=`); this module does not compute
+it from ISO 9613-1 itself. Choosing among the six routes, and the ISO 4871
+declaration a result feeds, live in [Sound
+Power](/phonometry/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

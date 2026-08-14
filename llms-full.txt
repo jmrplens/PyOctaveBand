@@ -1484,30 +1484,31 @@ land-use study is finally judged on.
 ## What this section does not cover
 
 **Single events only.** The Doc 29 chain builds single-event contours; it does
-not assemble the cumulative multi-event indices — an Lden-style sum over a full
-flight schedule — that a complete noise-contour study needs on top of them. That
-last step is where a land-use decision is actually made, and it is not here.
+not assemble the cumulative multi-event indices — an Lden-style sum over a
+full flight schedule — that a complete noise-contour study needs on top of
+them. That last step is where a land-use decision is actually made, and it is
+not here.
 
 **No aircraft is modelled from first principles.** NPD tables and noise
 hemispheres are *inputs*: the library interpolates the tables published for a
-type and does not synthesise them from engine data, and the ANP database is read
-and never written (version 2.3 ships as-is). Of the ANP entries, only those with
-fixed-point profiles have a ready-to-use trajectory, because turning a
-procedural-step departure into a flight path needs the ICAO Doc 9911
+type and does not synthesise them from engine data, and the ANP database is
+read and never written (version 2.3 ships as-is). Of the ANP entries, only
+those with fixed-point profiles have a ready-to-use trajectory, because
+turning a procedural-step departure into a flight path needs the ICAO Doc 9911
 flight-mechanics performance model, which is not implemented.
 
 **Three specific gaps.** Rotorcraft hover, idle and taxi run on the Table 3
 derived sources, but the guidance's last resort for a type with no hover data
 at all (two side-line level-flight microphones corrected to the 150 m hover
 circle by the Annex 16 integrated method) is not modelled. The
-measurement-system verifier checks IEC 61265:1995 and not the superseding
-2018 edition. And sonic boom is not touched anywhere in the library.
+measurement-system verifier checks IEC 61265:1995 and not the superseding 2018
+edition. And sonic boom is not touched anywhere in the library.
 
 Finally, the CNOSSOS-EU aircraft source of sections 2.6 and 2.7 is **not**
 implemented: aircraft noise here is the ICAO and ECAC family, which is a
 different set of models from the road and rail sources of [Environmental
-sources](https://jmrplens.github.io/phonometry/environment/sources/), and the two must not be mixed inside
-one strategic map without saying so.
+sources](https://jmrplens.github.io/phonometry/environment/sources/), and the two must not be mixed
+inside one strategic map without saying so.
 
 ## Before and after these pages
 
@@ -3037,30 +3038,31 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
-**A prediction is only as good as the element data you feed it, and the library
-takes that data as given.** The element ratings, the junction indices, the
-covering improvement and the structure-to-airborne adjustment terms of
-EN 12354-5 Annexes D and F are inputs you supply from measurement or from the
-standards' own annexes; none of them is derived here. The simplified prediction
-page stops at the weighted single numbers by design, and the detailed page is
-where the per-band models live.
+**A prediction is only as good as the element data you feed it, and the
+library takes that data as given.** The element ratings, the junction indices,
+the covering improvement and the structure-to-airborne adjustment terms of EN
+12354-5 Annexes D and F are inputs you supply from measurement or from the
+standards' own annexes; none of them is derived here. The simplified
+prediction page stops at the weighted single numbers by design, and the
+detailed page is where the per-band models live.
 
 Every panel model carries a validity range it does not extend past, and the
 guides flag each: Sharp's single-panel method is not valid below about 1.5
 times the panel's first resonance, Gomperts' slit model holds only while the
 slit is narrow against the wavelength, only Leppington's method no. 1 is
 implemented for radiation efficiency, and the orthotropic routes are
-infinite-panel models that miss the dip real ribbed cladding shows between 2 and
-4 kHz. On the resilient-layer side, the tapping-machine force model assumes a
-frequency-independent driving-point impedance, so a joisted or battened
-lightweight floor is outside it; soft coverings are treated as linear springs;
-there is no per-band prediction of a lining's improvement, because Annex D is a
-single-number method; and heavy impact sources such as the rubber ball are not
-covered by any of these models at all — their rating is
-[Heavy and Soft Impact Sources](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/).
+infinite-panel models that miss the dip real ribbed cladding shows between 2
+and 4 kHz. On the resilient-layer side, the tapping-machine force model
+assumes a frequency-independent driving-point impedance, so a joisted or
+battened lightweight floor is outside it; soft coverings are treated as linear
+springs; there is no per-band prediction of a lining's improvement, because
+Annex D is a single-number method; and heavy impact sources such as the rubber
+ball are not covered by any of these models at all — their rating is [Heavy
+and Soft Impact
+Sources](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/).
 
-Two edition boundaries: only the 2009 edition of EN 12354-5 is implemented, not
-the 2023 revision, and the simplified and detailed pages follow different
+Two edition boundaries: only the 2009 edition of EN 12354-5 is implemented,
+not the 2023 revision, and the simplified and detailed pages follow different
 editions of the 12354 family, as the note above says.
 
 ---
@@ -5395,12 +5397,12 @@ and from the physics of the element itself.
 **The library starts after the microphone and stops before the geometry.** On
 the measurement side, every function takes band levels already averaged over
 positions and already corrected for background noise: the position counts, the
-low-frequency procedures, the signal-to-background floors and the test-facility
-qualifications of ISO 16283, ISO 10140 and ISO 3382 are the operator's job, and
-nothing here checks that they were done. On the prediction side, the element
-ratings, the junction indices and the covering improvements are inputs you
-supply from measurement or from a standard's own annex; none is derived from a
-drawing.
+low-frequency procedures, the signal-to-background floors and the
+test-facility qualifications of ISO 16283, ISO 10140 and ISO 3382 are the
+operator's job, and nothing here checks that they were done. On the prediction
+side, the element ratings, the junction indices and the covering improvements
+are inputs you supply from measurement or from a standard's own annex; none is
+derived from a drawing.
 
 **Nothing here is a wave solver or a room model.** There is no geometry
 importer, no material database, no ray tracer and no auralisation: the room
@@ -6841,16 +6843,16 @@ related EN 12354-5, lives in
 
 **The library starts after the microphone.** Every function here takes band
 levels that were already energy-averaged over positions and already corrected
-for background noise, and nothing verifies how the measurement was made: not the
-number and placement of source and microphone positions, not the low-frequency
-procedures of ISO 16283-1/-2, not the 6 dB signal-to-background floor, and not
-the test-facility and mounting requirements of ISO 10140-1. Those are the
-operator's responsibility and the report's, and they are what makes the numbers
-here mean something. Two consequences worth naming: the field and laboratory
-background corrections are *different* rules, so a laboratory helper must not be
-applied to field data; and the intensity route takes both the pressure and the
-intensity level as inputs, with the scanning probe and its phase-mismatch
-calibration outside the library.
+for background noise, and nothing verifies how the measurement was made: not
+the number and placement of source and microphone positions, not the
+low-frequency procedures of ISO 16283-1/-2, not the 6 dB signal-to-background
+floor, and not the test-facility and mounting requirements of ISO 10140-1.
+Those are the operator's responsibility and the report's, and they are what
+makes the numbers here mean something. Two consequences worth naming: the
+field and laboratory background corrections are *different* rules, so a
+laboratory helper must not be applied to field data; and the intensity route
+takes both the pressure and the intensity level as inputs, with the scanning
+probe and its phase-mismatch calibration outside the library.
 
 **Coverage inside the standards is partial in two places.** Of ISO 10848 only
 the Part 1 formulae are implemented generically, plus the Part 4 modal-overlap
@@ -6858,15 +6860,15 @@ validity check, not the facility-specific setups of Parts 2, 3 and 4. Of the
 Spanish code, only the verification indices are implemented: the simplified
 option's solution tables of clause 3, the execution conditions of clause 5 and
 the maintenance conditions of clause 6 are out of scope, and the general
-option's calculation route is
-[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
+option's calculation route is [Predicting Sound
+Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
-**And there is no heavy-impact prediction at all.** A floor construction can be
-carried to a tapping-machine level by the models in [Insulation
+**And there is no heavy-impact prediction at all.** A floor construction can
+be carried to a tapping-machine level by the models in [Insulation
 design](https://jmrplens.github.io/phonometry/buildings/design/); nothing does the same for the rubber
 ball, because the complexity of the input force and the use of a time-weighted
-maximum leave no simple counterpart. The heavy-impact page rates a measurement,
-and only a measurement.
+maximum leave no simple counterpart. The heavy-impact page rates a
+measurement, and only a measurement.
 
 ---
 
@@ -9441,24 +9443,24 @@ carries no diffraction, no scattering off a diffuser and no finite-impedance
 boundary, and it stops when the reflection order runs out rather than when the
 sound does. Below the Schroeder frequency, where the statistical models give
 out, what this section offers is the mode *positions* of a rigid rectangular
-box — not the field of a real room at low frequency. For that, the
-[wave simulation](https://jmrplens.github.io/phonometry/simulation/) section runs an FDTD solver on the
-actual geometry.
+box — not the field of a real room at low frequency. For that, the [wave
+simulation](https://jmrplens.github.io/phonometry/simulation/) section runs an FDTD solver on the actual
+geometry.
 
 **No auralisation, no ray tracer, no room model.** There is no geometry
 importer, no material database and no renderer: the pages take dimensions,
 coefficients and impulse responses as inputs, and give back parameters. The
-absorption coefficients themselves come from
-[Materials and surfaces](https://jmrplens.github.io/phonometry/materials/absorbers/), and the model errs
-optimistically when the room is not diffuse — outside the EN 12354-6 clause 4.6
-limits (no dimension more than five times another, opposite surfaces within a
-factor of three in absorption, object fraction below 0.2) the measured
-reverberation time can reach twice the predicted one.
+absorption coefficients themselves come from [Materials and
+surfaces](https://jmrplens.github.io/phonometry/materials/absorbers/), and the model errs optimistically
+when the room is not diffuse — outside the EN 12354-6 clause 4.6 limits (no
+dimension more than five times another, opposite surfaces within a factor of
+three in absorption, object fraction below 0.2) the measured reverberation
+time can reach twice the predicted one.
 
-Two coverage boundaries follow the standards. Only the normative clause 4 model
-of EN 12354-6 is implemented, not its informative Annex D method for irregular
-spaces. And nothing in this section measures insulation *between* rooms: that is
-[Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/).
+Two coverage boundaries follow the standards. Only the normative clause 4
+model of EN 12354-6 is implemented, not its informative Annex D method for
+irregular spaces. And nothing in this section measures insulation *between*
+rooms: that is [Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/).
 
 ---
 
@@ -11917,13 +11919,13 @@ Pages elsewhere on the site that this section leans on:
 ## What this section does not cover
 
 BS.1770-5 **Annex 4, object-based audio, is out of scope**, and the library
-implements no spatial renderer, so an object-based programme has to be rendered
-to a loudspeaker layout before any of this applies. **EBU Tech 3343** is cited
-as production practice around these numbers, not as an algorithm: nothing here
-runs it. And loudness normalisation itself — the gain change, and any limiting
-that follows it — is a production step this library does not perform: it
-measures the programme and tells you the offset, and applying it is your
-encoder's job.
+implements no spatial renderer, so an object-based programme has to be
+rendered to a loudspeaker layout before any of this applies. **EBU Tech 3343**
+is cited as production practice around these numbers, not as an algorithm:
+nothing here runs it. And loudness normalisation itself — the gain change, and
+any limiting that follows it — is a production step this library does not
+perform: it measures the programme and tells you the offset, and applying it
+is your encoder's job.
 
 ---
 
@@ -12852,20 +12854,20 @@ are the place to start.
 ## What this section does not cover
 
 The type-test pages **reduce and report** what a laboratory measured; they do
-not acquire it. The free-field response, the polar cuts, the noise spectrum and
-the distortion-against-level sweep come in as data, and no procedure here tells
-you how to run the anechoic room or the substitution measurement that produced
-them. Two implemented editions are pinned rather than current: the distortion
-metrics follow AES17-2015 and not the 2020 revision, and the microphone report
-follows IEC 60268-4:2014 and not the 2018 one. Thiele-Small parameter
-extraction from an impedance curve is not implemented, and the electrical and
-mechanical power-handling ratings of IEC 60268-5 clause 17 are stated by the
-manufacturer rather than computed. The feedback criterion is level bookkeeping,
-not an acoustic model: it consumes two direct-field levels you supply, does not
-compute them from a coverage pattern, and predicts neither the ring frequency
-nor the effect of an equaliser or frequency shifter. And IEC 60268-16, the
-speech transmission index, is not part of this section at all — it is in
-[Speech](https://jmrplens.github.io/phonometry/perception/speech/).
+not acquire it. The free-field response, the polar cuts, the noise spectrum
+and the distortion-against-level sweep come in as data, and no procedure here
+tells you how to run the anechoic room or the substitution measurement that
+produced them. Two implemented editions are pinned rather than current: the
+distortion metrics follow AES17-2015 and not the 2020 revision, and the
+microphone report follows IEC 60268-4:2014 and not the 2018 one. Thiele-Small
+parameter extraction from an impedance curve is not implemented, and the
+electrical and mechanical power-handling ratings of IEC 60268-5 clause 17 are
+stated by the manufacturer rather than computed. The feedback criterion is
+level bookkeeping, not an acoustic model: it consumes two direct-field levels
+you supply, does not compute them from a coverage pattern, and predicts
+neither the ring frequency nor the effect of an equaliser or frequency
+shifter. And IEC 60268-16, the speech transmission index, is not part of this
+section at all — it is in [Speech](https://jmrplens.github.io/phonometry/perception/speech/).
 
 ---
 
@@ -14137,24 +14139,25 @@ judged against.
 
 The determination methods start after the facility and the probe have been
 qualified. ISO 3745's free-field qualification of an anechoic or hemi-anechoic
-room, ISO 3741's reverberation-room qualification (eigenfrequency counting or a
-reference-source comparison) and the IEC 61043 residual-intensity test of a
+room, ISO 3741's reverberation-room qualification (eigenfrequency counting or
+a reference-source comparison) and the IEC 61043 residual-intensity test of a
 probe-and-analyser chain are all **assumed, not performed**: the library warns
 on the coarse advisory criteria the standards state explicitly — the Table 1
 minimum volume, the position count, an inter-position spread above 1.5 dB, the
 ISO 3744 K₂ validity — and grades a residual-intensity index you measured
 yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
-air-absorption coefficient you supply; it is not computed from ISO 9613-1 here.
+air-absorption coefficient you supply; it is not computed from ISO 9613-1
+here.
 
 One route is absent by design: **ISO 9614-1's discrete fixed-point power
 summation is not implemented at all**, and only its Annex A field indicators
 are, reused by the two scanning parts. On the vibration route, the measurement
-clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather than
-code, and only the single-machine radiation factor of Formula 8 is implemented,
-so a batch or family determination needs an already-averaged value. Finally,
-nothing here reduces a machine's emission: quieting a source is [Noise
-control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared emission value is
-the input to that work, not its result.
+clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
+than code, and only the single-machine radiation factor of Formula 8 is
+implemented, so a batch or family determination needs an already-averaged
+value. Finally, nothing here reduces a machine's emission: quieting a source
+is [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
+emission value is the input to that work, not its result.
 
 ---
 
@@ -16708,10 +16711,10 @@ residual-intensity test of a probe are all assumed to have been done: the
 library warns on the coarse advisory criteria a standard states explicitly and
 grades a residual index you supply, but it does not certify a room or an
 instrument. The same boundary runs through the electroacoustics pages, which
-**reduce and report curves the laboratory supplies** rather than telling you how
-to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
-instrumentation, installation and measurement positions are laboratory practice
-this library assumes.
+**reduce and report curves the laboratory supplies** rather than telling you
+how to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
+instrumentation, installation and measurement positions are laboratory
+practice this library assumes.
 
 Three specific absences are worth knowing before you plan a job. ISO 9614-1's
 discrete fixed-point power summation is **not implemented at all** — only its
@@ -16727,8 +16730,8 @@ Editions are pinned rather than current in two places: the distortion metrics
 follow AES17-2015 and not the 2020 revision, and the microphone
 rated-characteristics report follows IEC 60268-4:2014 and not the 2018 one.
 Object-based audio (BS.1770-5 Annex 4) is out of scope, and the library
-implements no spatial renderer, so an object-based programme has to be rendered
-to a loudspeaker layout before it can be measured.
+implements no spatial renderer, so an object-based programme has to be
+rendered to a loudspeaker layout before it can be measured.
 
 ## Before and after these pages
 
@@ -17627,17 +17630,18 @@ declared data, and the measurement standards named above are cited as the
 source of a supplier's figures, not implemented. Within the predictions, three
 limits are structural. **Only reactive silencer elements are computed** —
 dissipative duct-lining silencers are discussed for selection but are not
-modelled from liner properties anywhere in the library, and the lined-elbow and
-plenum figures on the HVAC page are interpolated installation tables rather than
-a liner model. **Mean flow is outside the element matrices**: convection,
-temperature gradients and the flow-dependent impedance of perforates do not
-appear, so a silencer carrying significant flow is predicted as though it were
-not. And `enclosure_insertion_loss` **never predicts the panel's transmission
-loss**: you supply R measured or from another model, and the module combines it
-with the interior correction — predicting R itself is [Insulation
-design](https://jmrplens.github.io/phonometry/buildings/design/). Above the higher-order-mode cut-on
-frequency the plane-wave assumption every duct model rests on stops holding,
-which the duct-path page states and which no method here works around.
+modelled from liner properties anywhere in the library, and the lined-elbow
+and plenum figures on the HVAC page are interpolated installation tables
+rather than a liner model. **Mean flow is outside the element matrices**:
+convection, temperature gradients and the flow-dependent impedance of
+perforates do not appear, so a silencer carrying significant flow is predicted
+as though it were not. And `enclosure_insertion_loss` **never predicts the
+panel's transmission loss**: you supply R measured or from another model, and
+the module combines it with the interior correction — predicting R itself is
+[Insulation design](https://jmrplens.github.io/phonometry/buildings/design/). Above the
+higher-order-mode cut-on frequency the plane-wave assumption every duct model
+rests on stops holding, which the duct-path page states and which no method
+here works around.
 
 ---
 
@@ -19999,16 +20003,16 @@ and they have a topic of their own:
 
 ## What this section does not cover
 
-Only the source side of CNOSSOS-EU Annex II is implemented, and only two of its
-four sources. The **industrial source** of section 2.4 and Appendix H, and the
-**aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft noise
-is covered by the ICAO and ECAC methods in [Aircraft
+Only the source side of CNOSSOS-EU Annex II is implemented, and only two of
+its four sources. The **industrial source** of section 2.4 and Appendix H, and
+the **aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft
+noise is covered by the ICAO and ECAC methods in [Aircraft
 noise](https://jmrplens.github.io/phonometry/aircraft/), which is a different family of models, and a
 non-vehicle machine is characterised as a sound power in [Sources and
 devices](https://jmrplens.github.io/phonometry/devices/emission/). The **CNOSSOS propagation method** of
-section 2.5 is not implemented either: the path here is ISO 9613-2, a different
-model, so a chain built from CNOSSOS sources and this library's propagation is
-not a CNOSSOS calculation and should not be reported as one.
+section 2.5 is not implemented either: the path here is ISO 9613-2, a
+different model, so a chain built from CNOSSOS sources and this library's
+propagation is not a CNOSSOS calculation and should not be reported as one.
 
 Nothing here is a mapping engine. There is no terrain model, no city geometry
 and no GIS layer: the propagation functions take one source, one receiver and
@@ -20018,8 +20022,9 @@ CNOSSOS itself. On the assessment side, the library starts where the sound
 level meter stops — the ISO 1996-2 receiver positions and façade corrections,
 and the RD 1367/2007 Annex IV measurement procedures (microphone positions,
 series duration, number of measurements), are not implemented, only the
-arithmetic that follows once you have applied them. Acoustic zoning, noise maps
-and action plans under Ley 37/2003 are planning instruments, not calculations.
+arithmetic that follows once you have applied them. Acoustic zoning, noise
+maps and action plans under Ley 37/2003 are planning instruments, not
+calculations.
 
 ## Before and after these pages
 
@@ -20851,17 +20856,17 @@ elevation profile, no building geometry and no GIS layer, both refraction
 models assume flat ground at height zero and a profile that varies with height
 alone rather than along the path, and how a source line is broken into point
 sources is declared out of scope by CNOSSOS itself. The **CNOSSOS-EU
-propagation method of section 2.5 is not implemented**: it is a different model
-from ISO 9613-2, so a calculation that pairs CNOSSOS source powers with the
-path here is not a CNOSSOS calculation. The coherent barrier-on-ground model
-weights its four diffracted paths with a single reflection coefficient computed
-over the overall geometry, so it is coherent and reciprocal but is not a
-boundary-element solution, and no model here computes turbulent scattering:
-ISO 9613-2 absorbs it into the fixed caps on its screening term, and the
-wave-acoustic and refraction pages assume a non-turbulent atmosphere
-outright. Nothing on these pages produces a rating: no Lden,
-no limit value and no verdict — those are
-[Assessment and regulation](https://jmrplens.github.io/phonometry/environment/assessment/).
+propagation method of section 2.5 is not implemented**: it is a different
+model from ISO 9613-2, so a calculation that pairs CNOSSOS source powers with
+the path here is not a CNOSSOS calculation. The coherent barrier-on-ground
+model weights its four diffracted paths with a single reflection coefficient
+computed over the overall geometry, so it is coherent and reciprocal but is
+not a boundary-element solution, and no model here computes turbulent
+scattering: ISO 9613-2 absorbs it into the fixed caps on its screening term,
+and the wave-acoustic and refraction pages assume a non-turbulent atmosphere
+outright. Nothing on these pages produces a rating: no Lden, no limit value
+and no verdict — those are [Assessment and
+regulation](https://jmrplens.github.io/phonometry/environment/assessment/).
 
 ---
 
@@ -22462,17 +22467,17 @@ Pages elsewhere on the site that this section leans on:
 
 ## What this section does not cover
 
-Two of the four CNOSSOS sources are missing, by omission rather than oversight:
-the **industrial source** of section 2.4 and Appendix H is not implemented, and
-neither is the **aircraft source** of sections 2.6 and 2.7 — aircraft noise is
-covered by the ICAO and ECAC methods in [Aircraft
+Two of the four CNOSSOS sources are missing, by omission rather than
+oversight: the **industrial source** of section 2.4 and Appendix H is not
+implemented, and neither is the **aircraft source** of sections 2.6 and 2.7 —
+aircraft noise is covered by the ICAO and ECAC methods in [Aircraft
 noise](https://jmrplens.github.io/phonometry/aircraft/), which is a different family of models entirely.
 Neither is the **CNOSSOS propagation method** of section 2.5: it differs from
 the ISO 9613-2 model this library implements, so pairing these source powers
 with [Outdoor Sound
-Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) does not
-give a CNOSSOS result. Inside the two methods that are here, three gaps come
-from the source documents themselves: the open vehicle category 5 has no
+Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) does
+not give a CNOSSOS result. Inside the two methods that are here, three gaps
+come from the source documents themselves: the open vehicle category 5 has no
 coefficients in Appendix F and is not modelled, rail roughness classes N and B
 carry no spectrum in Appendix G and must be supplied by the Member State, and
 how a source line is split into point sources is declared out of scope by the
@@ -24318,18 +24323,18 @@ meshed cell.
 
 None of these pages qualifies a laboratory. ISO 354's room requirements of
 Annex A — the number of loudspeaker and microphone positions, the diffusing
-elements — are not checked; the functions convert an
-already-measured decay pair and only warn when the room volume or sample area
-falls outside the clause 6 limits. Two editions are cited but not implemented:
-the code follows the 1998/2001 transfer-function method of ISO 10534-2, not the
-2023 edition, and ASTM E2611-19, not E2611-24. The probe-traverse refinements of
-ISO 10534-1 (extrapolating the minima to the sample face, probe-body
-corrections) are described but not automated. The prediction models are
-forward-only: they turn a resistivity into an impedance, and no inverse solver
-recovers the material parameters from a measured curve. And no measurement
-standard governs the metamaterial designs at all — a built panel is verified in
-the impedance tube or the reverberation room like any other absorber, which is
-why that page states a prediction and not a rating.
+elements — are not checked; the functions convert an already-measured decay
+pair and only warn when the room volume or sample area falls outside the
+clause 6 limits. Two editions are cited but not implemented: the code follows
+the 1998/2001 transfer-function method of ISO 10534-2, not the 2023 edition,
+and ASTM E2611-19, not E2611-24. The probe-traverse refinements of ISO 10534-1
+(extrapolating the minima to the sample face, probe-body corrections) are
+described but not automated. The prediction models are forward-only: they turn
+a resistivity into an impedance, and no inverse solver recovers the material
+parameters from a measured curve. And no measurement standard governs the
+metamaterial designs at all — a built panel is verified in the impedance tube
+or the reverberation room like any other absorber, which is why that page
+states a prediction and not a rating.
 
 ---
 
@@ -26758,20 +26763,20 @@ The mechanical property a floating floor is designed around.
 
 Everything here characterises a **material or a surface**, never a
 construction. The transmission loss of a wall, the impact improvement of a
-floor and the flanking paths of a junction are
-[Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) and
-[Insulation design](https://jmrplens.github.io/phonometry/buildings/design/); this section supplies the
-coefficients they consume. Two boundaries inside the measurements themselves
-are worth knowing before you start. The in-situ road methods implement
-ISO 13472-1:2002 and ISO 13472-2:2010; **their 2022 and 2025 revisions are not
-implemented**. And the resilient-layer measurement expects a resonant frequency
-that has already been extrapolated to zero force amplitude by clause 7 of
-EN 29052-1, a procedure that is not implemented, and an airflow resistivity
-supplied as an input rather than measured in place. Nothing in this section
-predicts a material from its chemistry or its manufacture: the models run
-forwards from measured macroscopic parameters — flow resistivity, porosity,
-tortuosity — to an impedance, and there is no inverse solver that recovers
-those parameters from a measured impedance curve.
+floor and the flanking paths of a junction are [Sound
+insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) and [Insulation
+design](https://jmrplens.github.io/phonometry/buildings/design/); this section supplies the coefficients
+they consume. Two boundaries inside the measurements themselves are worth
+knowing before you start. The in-situ road methods implement ISO 13472-1:2002
+and ISO 13472-2:2010; **their 2022 and 2025 revisions are not implemented**.
+And the resilient-layer measurement expects a resonant frequency that has
+already been extrapolated to zero force amplitude by clause 7 of EN 29052-1, a
+procedure that is not implemented, and an airflow resistivity supplied as an
+input rather than measured in place. Nothing in this section predicts a
+material from its chemistry or its manufacture: the models run forwards from
+measured macroscopic parameters — flow resistivity, porosity, tortuosity — to
+an impedance, and there is no inverse solver that recovers those parameters
+from a measured impedance curve.
 
 ## Before and after these pages
 
@@ -27113,14 +27118,14 @@ Pages elsewhere on the site that this section leans on:
 
 The measurement starts one step after the signal. Clause 7's extraction of the
 resonant frequency from the raw excitation-response record — by sinusoidal,
-white-noise or pulse excitation — and its extrapolation to zero force amplitude
-are **not implemented**: pass a resonant frequency that has already been
-extrapolated. The lateral airflow resistivity is an input, not a measurement.
-Clause 6's specimen-selection requirement of at least three 200 mm × 200 mm
-specimens is not enforced, so nothing here objects if you characterise a
-material from one. And the layer's other properties — creep under long-term
-load, compressive strength, thermal performance — are outside the standard and
-outside the library.
+white-noise or pulse excitation — and its extrapolation to zero force
+amplitude are **not implemented**: pass a resonant frequency that has already
+been extrapolated. The lateral airflow resistivity is an input, not a
+measurement. Clause 6's specimen-selection requirement of at least three 200
+mm × 200 mm specimens is not enforced, so nothing here objects if you
+characterise a material from one. And the layer's other properties — creep
+under long-term load, compressive strength, thermal performance — are outside
+the standard and outside the library.
 
 ---
 
@@ -27188,12 +27193,12 @@ Pages elsewhere on the site that this section leans on:
 implementation follows ISO 13472-1:2002 and ISO 13472-2:2010; both have since
 been revised — 2022 and 2025 respectively — and those revisions are **not**
 implemented, so a report that cites the current edition cannot cite these
-functions without qualification. The spot method's own signal processing is not
-duplicated either: only its geometry, validity and correction helpers live here,
-and the two-microphone transfer-function reduction is the ISO 10534-2 routine of
-[Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/). Nothing in
-this subsection measures the noise a surface *generates* — the tyre-road source
-term is CNOSSOS territory, in [Environmental
+functions without qualification. The spot method's own signal processing is
+not duplicated either: only its geometry, validity and correction helpers live
+here, and the two-microphone transfer-function reduction is the ISO 10534-2
+routine of [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/).
+Nothing in this subsection measures the noise a surface *generates* — the
+tyre-road source term is CNOSSOS territory, in [Environmental
 sources](https://jmrplens.github.io/phonometry/environment/sources/) — and no in-situ method is provided
 for any surface other than a road: a wall or a ceiling measured in place is
 outside both parts of ISO 13472.
@@ -27838,18 +27843,18 @@ In the order the chain runs.
 
 ## What this section does not cover
 
-**Nothing here is a verdict about a person.** ISO 1999 does not define a hearing
-handicap or a compensable fence — that line is set by national regulation, and
-the library applies none of it, so you supply and check the criterion yourself.
-The same is true of the exposure action values: the LEX,8h and its one-sided
-95 % upper limit come out of ISO 9612, and the numbers they are compared against
-are in your jurisdiction's directive, not here.
+**Nothing here is a verdict about a person.** ISO 1999 does not define a
+hearing handicap or a compensable fence — that line is set by national
+regulation, and the library applies none of it, so you supply and check the
+criterion yourself. The same is true of the exposure action values: the LEX,8h
+and its one-sided 95 % upper limit come out of ISO 9612, and the numbers they
+are compared against are in your jurisdiction's directive, not here.
 
 Two implementation boundaries follow the standards. Only **database A** is
-implemented for ISO 1999: `htlan` always draws its age component from
-ISO 7029:2017, and substituting a nationally measured control population
-(clauses 6.2.3 and 6.2.4) means computing that database elsewhere and passing it
-in. Of ISO 389-7, only the Table 1 reference values are implemented, not the
+implemented for ISO 1999: `htlan` always draws its age component from ISO
+7029:2017, and substituting a nationally measured control population (clauses
+6.2.3 and 6.2.4) means computing that database elsewhere and passing it in. Of
+ISO 389-7, only the Table 1 reference values are implemented, not the
 procedures by which they were established.
 
 And no audiometry happens here. Nothing generates a test tone, drives an
@@ -28571,18 +28576,18 @@ The hearing threshold, what noise does to it, and how exposure is measured.
 model on these pages predicts what a population, or a standard listener, would
 perceive from a calibrated signal: none of them runs an audiometric session,
 none diagnoses a hearing loss, and ISO 1999 explicitly declines to define a
-hearing handicap or a compensable fence — that line is national regulation, and
-nothing here applies one. Every prominence and audibility verdict is likewise
-the numeric criterion only: ECMA-418-1 also requires aural confirmation of a
-prominent tone, and that stays with you.
+hearing handicap or a compensable fence — that line is national regulation,
+and nothing here applies one. Every prominence and audibility verdict is
+likewise the numeric criterion only: ECMA-418-1 also requires aural
+confirmation of a prominent tone, and that stays with you.
 
 **Everything is monaural.** The binaural combinations of ECMA-418-2 are not
 implemented, so a two-channel recording is analysed one ear at a time, and
 nothing here models localisation, spatial release from masking or binaural
 loudness summation.
 
-**No listening test is replaced.** STOI returns the correlation-based index and
-not a percentage of words understood, because that mapping is fitted per
+**No listening test is replaced.** STOI returns the correlation-based index
+and not a percentage of words understood, because that mapping is fitted per
 listening-test corpus; the SII returns an audibility fraction and not a score;
 and no page predicts annoyance in a community, which is a social-survey
 quantity rather than a psychoacoustic one — the community indicators are
@@ -29113,20 +29118,20 @@ which needs an external rotational-speed signal, and the small adjustment
 footnote 47 permits.
 
 **A verdict is never complete.** The `prominent` flag the tone-prominence
-functions return is the numeric criterion alone; ECMA-418-1 also requires aural
-confirmation and a lower-threshold-of-hearing screen, both of which stay with
-the caller. The tone-audibility module is weighting-agnostic and does **not**
-apply the A-weighting clause 5.3.2 requires, so A-weight the spectrum before
-passing it, and it takes an already-computed narrow-band spectrum rather than
-building one from a recording.
+functions return is the numeric criterion alone; ECMA-418-1 also requires
+aural confirmation and a lower-threshold-of-hearing screen, both of which stay
+with the caller. The tone-audibility module is weighting-agnostic and does
+**not** apply the A-weighting clause 5.3.2 requires, so A-weight the spectrum
+before passing it, and it takes an already-computed narrow-band spectrum
+rather than building one from a recording.
 
-Two documented deviations are worth knowing. ISO 532-3 prescribes resampling to
-32 kHz before the running FFT; this implementation works at the native rate, a
-deviation that stays inside the standard's expanded uncertainty but that you
-should undo by resampling first if strict clause-by-clause conformance matters.
-And the Osses 2016 fluctuation-strength signal model is validated for
-amplitude-modulated stimuli only, with a documented floor — a steady 1 kHz tone
-reads about 0.09 vacil rather than 0.
+Two documented deviations are worth knowing. ISO 532-3 prescribes resampling
+to 32 kHz before the running FFT; this implementation works at the native
+rate, a deviation that stays inside the standard's expanded uncertainty but
+that you should undo by resampling first if strict clause-by-clause
+conformance matters. And the Osses 2016 fluctuation-strength signal model is
+validated for amplitude-modulated stimuli only, with a documented floor — a
+steady 1 kHz tone reads about 0.09 vacil rather than 0.
 
 Finally, none of these metrics is a community response: annoyance here is a
 laboratory sensation computed from a signal, while the annoyance a
@@ -30884,20 +30889,20 @@ standard.
 correlation index and not the percentage of words understood, because the
 logistic mapping is fitted per listening-test corpus; the SII returns an
 audibility fraction rather than a score; and no page here reproduces a
-subjective intelligibility test. **No signal is acquired either**: the STI page
-implements the STIPA direct signal and the indirect computation from an impulse
-response, but the full 14-modulation-frequency direct measurement of clause 6.3
-is not implemented, so a chain with severe distortion needs measuring equipment
-rather than this library.
+subjective intelligibility test. **No signal is acquired either**: the STI
+page implements the STIPA direct signal and the indirect computation from an
+impulse response, but the full 14-modulation-frequency direct measurement of
+clause 6.3 is not implemented, so a chain with severe distortion needs
+measuring equipment rather than this library.
 
 Two coverage limits inside the SII are worth checking before use: the raised,
 loud and shouted speech spectra are carried for the one-third-octave procedure
 only, and the tabulated band-importance functions are each table's
-average-speech compromise, with Annex B's material-specific alternatives left to
-you through the `band_importance=` argument. There is no resampling between the
-four band procedures — each is fed spectra on its own bands. And the female
-speech option is not missing from the STI: Edition 5 of IEC 60268-16 removed it,
-so there is nothing left to implement.
+average-speech compromise, with Annex B's material-specific alternatives left
+to you through the `band_importance=` argument. There is no resampling between
+the four band procedures — each is fed spectra on its own bands. And the
+female speech option is not missing from the STI: Edition 5 of IEC 60268-16
+removed it, so there is nothing left to implement.
 
 ---
 
@@ -38831,20 +38836,20 @@ parameters) consumes the band signals or band levels these pages produce.
 ## What this section does not cover
 
 `verify_filter_class` checks a designed digital response against Table 1 of
-IEC 61260-1. The standard's conformance tests for the physical filter — overload
-recovery, linearity, the environmental influence quantities — apply to an
-instrument and are not implemented, so a class verdict here is a statement about
-the design and not about a device. Near Nyquist the bilinear transform warps
-the frequency axis and the bank carries no correction for it, unlike the
-`high_accuracy` option of the weighting filters: the stopband beyond the
-processing Nyquist is reported as `range_limited` rather than verified, so keep
-the top band edge comfortably below Nyquist or raise `fs`. Two operations do
-not stream: zero-phase forward-backward filtering needs the whole signal, and
-rank statistics such as L90 have to be computed once on the pooled
-envelope. And the per-channel path never mixes channels — delay between two
-microphones, or how much of one channel a second explains, is
-[Correlation and delay](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/) and
-[Multiple and partial coherence](https://jmrplens.github.io/phonometry/signals/spectra/miso-coherence/).
+IEC 61260-1. The standard's conformance tests for the physical filter —
+overload recovery, linearity, the environmental influence quantities — apply
+to an instrument and are not implemented, so a class verdict here is a
+statement about the design and not about a device. Near Nyquist the bilinear
+transform warps the frequency axis and the bank carries no correction for it,
+unlike the `high_accuracy` option of the weighting filters: the stopband
+beyond the processing Nyquist is reported as `range_limited` rather than
+verified, so keep the top band edge comfortably below Nyquist or raise `fs`.
+Two operations do not stream: zero-phase forward-backward filtering needs the
+whole signal, and rank statistics such as L90 have to be computed once on the
+pooled envelope. And the per-channel path never mixes channels — delay between
+two microphones, or how much of one channel a second explains, is [Correlation
+and delay](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/) and [Multiple and
+partial coherence](https://jmrplens.github.io/phonometry/signals/spectra/miso-coherence/).
 
 ---
 
@@ -39240,21 +39245,27 @@ What the numbers mean and how much to trust them.
 
 ## What this section does not cover
 
-Four things a reader reasonably expects here are absent, and each guide says so
-in its own "Not covered" block. **No instrument is verified.**
-`verify_filter_class` and `verify_weighting_class` check a designed digital
-response against the tolerance tables of IEC 61260-1 and IEC 61672-1; the
-IEC 61672-2 pattern-evaluation tests a physical meter needs for type approval,
-the IEC 61672-3 periodic tests it receives in service, and the IEC 60942
-conformance tests of the calibrator itself, are not run, so a class verdict
-here describes the algorithm and not a built device;
-[Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
-draws that boundary part by part. **No file is
-opened.** Nothing in the library decodes WAV, FLAC or any other container:
-every function takes an array you have already read, which is why `fs` is
-always an argument. **No array processing.** Correlation and time delay model
-one common path between exactly two sensors and report the single largest peak;
-there is no multi-sensor TDOA solver, no beamformer and no source localisation.
+Four things a reader reasonably expects here are absent, and each guide says
+so in its own "Not covered" block.
+
+**No instrument is verified.** `verify_filter_class` and
+`verify_weighting_class` check a designed digital response against the
+tolerance tables of IEC 61260-1 and IEC 61672-1; the IEC 61672-2
+pattern-evaluation tests a physical meter needs for type approval, the IEC
+61672-3 periodic tests it receives in service, and the IEC 60942 conformance
+tests of the calibrator itself, are not run, so a class verdict here describes
+the algorithm and not a built device; [Compliance and
+verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/) draws
+that boundary part by part.
+
+**No file is opened.** Nothing in the library decodes WAV, FLAC or any other
+container: every function takes an array you have already read, which is why
+`fs` is always an argument.
+
+**No array processing.** Correlation and time delay model one common path
+between exactly two sensors and report the single largest peak; there is no
+multi-sensor TDOA solver, no beamformer and no source localisation.
+
 **No perceptual features.** The cepstrum here is the plain linear-frequency
 one, with no mel warping or MFCC variant, and loudness as a sensation belongs
 to [Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/), not to the
@@ -39364,12 +39375,12 @@ verdict from the library does and does not mean. Two curves come without a
 verdict of any kind: ISO 7196 defines a single ±1 dB tolerance for G with no
 class structure, and the withdrawn IEC 537 left no tolerance table behind for
 D, so both curves filter a signal but neither reaches
-`verify_weighting_class`, and they are pinned against their published tables in
-the conformance report instead. The noise dose is the 1993
-first edition of IEC 61252 only, not the 2025 revision. And a dose is a
-quantity, not a verdict: the exposure strategies, the sampling plan and the
-limits that decide whether a worker is over-exposed are [Occupational exposure
-(ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/).
+`verify_weighting_class`, and they are pinned against their published tables
+in the conformance report instead. The noise dose is the 1993 first edition of
+IEC 61252 only, not the 2025 revision. And a dose is a quantity, not a
+verdict: the exposure strategies, the sampling plan and the limits that decide
+whether a worker is over-exposed are [Occupational exposure (ISO
+9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/).
 
 ---
 
@@ -42204,18 +42215,19 @@ tests of the calibrator itself — generated level, frequency, distortion, and
 the corrections for static pressure and temperature — are not implemented, so
 pass an already corrected `target_spl` when the manual asks for one, and the
 IEC 61672-3 periodic tests are cited as laboratory practice rather than run;
-[Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
-draws that boundary precisely, part by part.
-The dBFS half of the calibration page sits outside any standard and makes no
-physical claim: it is a reference frame, not a measurement. Data qualification
-implements the quantitative core of Bendat & Piersol's section 10.3 only —
-classifying a record's type, validating it against physical limits and editing
-out glitches remain manual steps, as the book describes them. And an
-uncertainty budget is a model of *your* measurement: the library propagates
-whatever you declare, and never invents the terms. Where a standard publishes
-its own budget the guides say so, as ISO 9612 does for [occupational
-exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) and ISO 12999-1
-for [sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/).
+[Compliance and
+verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/) draws
+that boundary precisely, part by part. The dBFS half of the calibration page
+sits outside any standard and makes no physical claim: it is a reference
+frame, not a measurement. Data qualification implements the quantitative core
+of Bendat & Piersol's section 10.3 only — classifying a record's type,
+validating it against physical limits and editing out glitches remain manual
+steps, as the book describes them. And an uncertainty budget is a model of
+*your* measurement: the library propagates whatever you declare, and never
+invents the terms. Where a standard publishes its own budget the guides say
+so, as ISO 9612 does for [occupational
+exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) and ISO
+12999-1 for [sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/).
 
 ---
 
@@ -43502,19 +43514,23 @@ Pages elsewhere on the site that this section leans on:
 
 These are Bendat & Piersol's textbook estimators, not a certification method:
 no page here carries clause numbers or acceptance limits, and no result is a
-compliance verdict. Three capabilities a reader looks for are genuinely absent.
+compliance verdict. Three capabilities a reader looks for are genuinely
+absent.
+
 **Multiple arrivals are not separated.** `time_delay` and `echo_detection`
 report the single largest peak, so a record with a direct path plus several
 reflections needs manual peak-picking or repeated calls on narrowed bands.
+
 **There is no multi-sensor geometry.** Delay estimation is pairwise; there is
 no built-in TDOA solver, no beamformer and no source localisation, and a
 multiple-output system needs one `miso_coherence` call per output.
+
 **There are no perceptual features.** The cepstrum is the plain
 linear-frequency one, with no mel warping and no MFCC variant. Two estimators
 that share this section's Welch core are documented where they are used
 instead: the transfer function and ordinary coherence on
-[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/), and
-the two-microphone intensity probe on [Sound
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/),
+and the two-microphone intensity probe on [Sound
 intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/).
 
 ---
@@ -46881,23 +46897,23 @@ so in its own opening.
 ## What this section does not cover
 
 **Two dimensions, and no way around it.** Everything a 2D cross-section cannot
-say about a 3D room, neither solver says, and the cylindrical spreading above is
-only the most visible consequence. The open boundary is a quadratic-ramp
-absorbing layer — the simple precursor of a perfectly matched layer, not a PML —
-so grazing incidence is absorbed less cleanly than normal incidence, and the
+say about a 3D room, neither solver says, and the cylindrical spreading above
+is only the most visible consequence. The open boundary is a quadratic-ramp
+absorbing layer — the simple precursor of a perfectly matched layer, not a PML
+— so grazing incidence is absorbed less cleanly than normal incidence, and the
 elastic solver has no elastic PML at all, which shows most on grazing Rayleigh
 waves. The medium is non-moving: **wind and flow advection are not modelled**,
-so a refraction study here comes from a height-dependent sound-speed profile and
-not from a flow field. The only impedance boundary is a frequency-independent
-real one, so a porous absorber has to be meshed rather than declared. On the
-elastic side the solid is isotropic and purely elastic: no anisotropy, and no
-viscoelastic damping beyond the bulk decay rate, so a material loss factor
-cannot be entered.
+so a refraction study here comes from a height-dependent sound-speed profile
+and not from a flow field. The only impedance boundary is a
+frequency-independent real one, so a porous absorber has to be meshed rather
+than declared. On the elastic side the solid is isotropic and purely elastic:
+no anisotropy, and no viscoelastic damping beyond the bulk decay rate, so a
+material loss factor cannot be entered.
 
-And nothing here is a room-acoustics package. There is no geometry importer, no
-material library, no ray tracer, no auralisation and no 3D solver: obstacles are
-rasterised onto the grid from shapes you define, and the output is a field you
-analyse yourself.
+And nothing here is a room-acoustics package. There is no geometry importer,
+no material library, no ray tracer, no auralisation and no 3D solver:
+obstacles are rasterised onto the grid from shapes you define, and the output
+is a field you analyse yourself.
 
 ## Before and after these pages
 
@@ -47678,14 +47694,14 @@ pile-driving noise has no closed form here or anywhere in the library.
 
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
-all three solvers assume a **range-independent** water column with no absorbing
-or elastic bottom and no real bathymetry — which rules out range-dependent
-problems entirely. The ray solver returns paths and travel times but not
-amplitudes (no ray-tube intensity, no caustic correction), and the parabolic
-equation is the standard small-angle Tappert form rather than a wide-angle Padé
-variant. For the elastic seabed physics these fluid solvers leave out, the
-[elastic wave solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is the nearest
-thing the library has.
+all three solvers assume a **range-independent** water column with no
+absorbing or elastic bottom and no real bathymetry — which rules out
+range-dependent problems entirely. The ray solver returns paths and travel
+times but not amplitudes (no ray-tube intensity, no caustic correction), and
+the parabolic equation is the standard small-angle Tappert form rather than a
+wide-angle Padé variant. For the elastic seabed physics these fluid solvers
+leave out, the [elastic wave solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is
+the nearest thing the library has.
 
 **The exposure page rates hearing, not behaviour.** Only the auditory-effect
 criteria are implemented; behavioural-disturbance thresholds, the ones a
@@ -47693,11 +47709,13 @@ harassment take estimate turns on, are out of scope. Nothing chooses a hearing
 group or an accumulation period for you, and nothing models the animal moving
 relative to the source, so the cumulative exposure reported is the
 stationary-receiver worst case. There is no audiogram for low-frequency
-cetaceans, because the source publication does not print one of its parameters.
+cetaceans, because the source publication does not print one of its
+parameters.
 
-Two smaller boundaries: the ambient-noise spectrum leaves out the low-frequency
-turbulence band and has no built-in distant-shipping model — supply a shipping
-spectrum yourself — and the active sonar equation is monostatic only.
+Two smaller boundaries: the ambient-noise spectrum leaves out the
+low-frequency turbulence band and has no built-in distant-shipping model —
+supply a shipping spectrum yourself — and the active sonar equation is
+monostatic only.
 
 ## Before and after these pages
 
@@ -49826,8 +49844,8 @@ assigns a class to an instrument.
 
 **Building vibration stops at the weighting.** Of ISO 2631-2 the library
 implements the direction-independent `Wm` curve and nothing else, and that is
-closer to the standard than it looks: the 2003 edition deliberately deleted its
-predecessor's guidance values, so there are no acceptable magnitudes for
+closer to the standard than it looks: the 2003 edition deliberately deleted
+its predecessor's guidance values, so there are no acceptable magnitudes for
 building vibration to compare against. A reader looking for a limit will not
 find one here, and will not find one in the standard either.
 
@@ -50201,26 +50219,27 @@ something this library can give.
 **No severity verdict is issued for a machine.** The machinery pages predict
 *where* a line would be, never whether it is present or whether the machine is
 in trouble: the amplitude criteria that turn a present line into an assessment
-— crest-factor and kurtosis trending, and the velocity severity bands of
-ISO 10816 / ISO 20816 — are outside the library, as are rotor balancing
-(ISO 21940) and order tracking.
+— crest-factor and kurtosis trending, and the velocity severity bands of ISO
+10816 / ISO 20816 — are outside the library, as are rotor balancing (ISO 21940)
+and order tracking.
 
 **Nor is one issued for a building.** The 2003 edition of ISO 2631-2 deleted
 its predecessor's guidance values on purpose, so there are no acceptable
-magnitudes for building vibration to compare against; what the library gives is
-the weighted magnitude, and the judgement stays with the assessor and the
+magnitudes for building vibration to compare against; what the library gives
+is the weighted magnitude, and the judgement stays with the assessor and the
 national code.
 
 Two structural predictions are idealisations rather than measurements. The
-junction transmission coefficients are a closed-form result for a rigid, simply
-supported junction — the *measured* vibration reduction index of ISO 10848 is
-[Laboratory flanking transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/)
-— and the FRF page returns element-wise free reciprocals, correct for a
-driving-point or single-path use but not a full FRF matrix, with no
-impact-hammer processing (ISO 7626-5) and no blocked matrix quantities. On the
-isolator page, parts 4 and 5 of ISO 10846 are not implemented, and two of the
-standard's validity checks (the blocking-mass inequality and the clause 7.6
-linearity criterion) are described but not computed for you.
+junction transmission coefficients are a closed-form result for a rigid,
+simply supported junction — the *measured* vibration reduction index of ISO
+10848 is [Laboratory flanking
+transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/) — and the FRF
+page returns element-wise free reciprocals, correct for a driving-point or
+single-path use but not a full FRF matrix, with no impact-hammer processing
+(ISO 7626-5) and no blocked matrix quantities. On the isolator page, parts 4
+and 5 of ISO 10846 are not implemented, and two of the standard's validity
+checks (the blocking-mass inequality and the clause 7.6 linearity criterion)
+are described but not computed for you.
 
 ## Before and after these pages
 
@@ -50302,8 +50321,8 @@ Pages elsewhere on the site that this section leans on:
 These are **predictions, not detections**. Nothing here decides whether a line
 is present, only where it would be if it were: the overlay is a set of
 expectations to read a measured spectrum against, and the reading is yours. A
-loaded bearing slips a little, so expect the measured peak within a per cent or
-two of the prediction rather than exactly on it.
+loaded bearing slips a little, so expect the measured peak within a per cent
+or two of the prediction rather than exactly on it.
 
 Nor is there a severity verdict. The amplitude criteria that turn a present
 line into an assessment — crest-factor and kurtosis trending, and the velocity
@@ -50311,8 +50330,8 @@ severity bands of ISO 10816 / ISO 20816 — are outside this module, and rotor
 balancing (ISO 21940) and order tracking are absent from the library
 altogether. One published convention differs between sources and is flagged on
 the guide rather than hidden: the pole-pass frequency is standard
-condition-monitoring practice rather than Norton's, who gives the slip frequency
-itself as the broken-bar sideband spacing.
+condition-monitoring practice rather than Norton's, who gives the slip
+frequency itself as the broken-bar sideband spacing.
 
 ---
 
@@ -50677,8 +50696,8 @@ Pages elsewhere on the site that this section leans on:
 
 The junction coefficients are a **closed-form idealisation** for a rigid,
 simply supported junction between homogeneous plates, not a measurement: the
-empirical vibration reduction index obtained from a direction-averaged velocity
-level difference is ISO 10848, in [Laboratory flanking
+empirical vibration reduction index obtained from a direction-averaged
+velocity level difference is ISO 10848, in [Laboratory flanking
 transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/). The
 straight-section coefficient is undefined for the T and L geometries, which
 have no collinear third plate, so only the corner path applies there.

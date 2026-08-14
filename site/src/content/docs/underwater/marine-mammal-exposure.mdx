@@ -54,6 +54,8 @@ references:
     note: "The symbols and references the guidance documents adopt for their criteria (Lp,0-pk and LE,p re 1 µPa and 1 µPa²·s)."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 A marine mammal does not hear every frequency equally, so an underwater noise
@@ -593,31 +595,37 @@ regulatory guidance, not a whole campaign.
 
 ## What this guide covers
 
-**Covered.** `group_audiogram` and `audiogram_parameters` implement the
-Southall et al. (2019) group audiogram (Equation 1) with the Table 2 absolute
-and Table 3 normalised fits; `orca_audiogram` implements the three-branch
-killer-whale audiogram of Ainslie (2010) Equation (11.159). `auditory_weighting`
-implements the band-pass weighting and exposure functions for the three
-selectable guidance versions (NMFS 2024 v3.0, the default; NMFS 2018 v2.0;
-Southall et al. 2019), with the parameter tables addressable through
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+`group_audiogram` and `audiogram_parameters` implement the Southall et al.
+(2019) group audiogram (Equation 1) with the Table 2 absolute and Table 3
+normalised fits; `orca_audiogram` implements the three-branch killer-whale
+audiogram of Ainslie (2010) Equation (11.159). `auditory_weighting` implements
+the band-pass weighting and exposure functions for the three selectable
+guidance versions (NMFS 2024 v3.0, the default; NMFS 2018 v2.0; Southall et
+al. 2019), with the parameter tables addressable through
 `weighting_parameters`. `exposure_criteria` returns the published TTS and
 injury (PTS / AUD INJ) onset criteria, impulsive and non-impulsive, including
 the unweighted peak-SPL half of the dual metric. `weighted_exposure` runs the
 assessment: weighting a band spectrum, accumulating it over events and
 reporting the margin against every applicable criterion. `strike_sel_spectrum`
 supplies that band spectrum from a recorded pile strike.
+</ScopeClaim>
 
-**Not covered.** There is no audiogram for LF cetaceans, because Southall
-et al. never print its $F_1$ parameter. Behavioural-disturbance criteria (the
-step-function and dose-response thresholds used for harassment take estimates)
-are out of scope: only the auditory-effect criteria are implemented. The
-library does not choose a hearing group or an accumulation period for you, and
-it does not model the animal's movement relative to the source, so the
-cumulative SEL it reports is the stationary-receiver worst case. It also does
-not check that the supplied spectrum spans the group's passband: a record that
-stops short of $f_2$ is weighted as given and under-reports the exposure.
-Propagation from source to receiver belongs to
-[Underwater sound propagation](/phonometry/underwater/underwater-propagation/).
+<ScopeClaim status="not-covered" label="Not covered">
+There is no audiogram for LF cetaceans, because Southall et al. never print
+its $F_1$ parameter. Behavioural-disturbance criteria (the step-function and
+dose-response thresholds used for harassment take estimates) are out of scope:
+only the auditory-effect criteria are implemented. The library does not choose
+a hearing group or an accumulation period for you, and it does not model the
+animal's movement relative to the source, so the cumulative SEL it reports is
+the stationary-receiver worst case. It also does not check that the supplied
+spectrum spans the group's passband: a record that stops short of $f_2$ is
+weighted as given and under-reports the exposure. Propagation from source to
+receiver belongs to [Underwater sound
+propagation](/phonometry/underwater/underwater-propagation/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -25,8 +25,10 @@ references:
     note: "The tonal-audibility criterion the IEC method reuses comes from the Annex C of its 2007 edition (the 2017 edition carries the tonal methods in Annexes J and K), and its Table J.1 mapping, tonal_adjustment_from_mean_audibility, is the one that consumes the bin-mean audibility."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 IEC 61400-11 measures the acoustic emission of a wind turbine. This page covers
 its two closed-form quantities: the **apparent sound power level** referred to
@@ -370,28 +372,36 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The closed-form quantities of IEC 61400-11:2012+A1:2018:
-`slant_distance` (Formulae 1 and 2), `apparent_sound_power_level` (Formula 26)
-and the tonal-audibility chain of subclauses 9.5.2 to 9.5.8 through
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The closed-form quantities of IEC 61400-11:2012+A1:2018: `slant_distance`
+(Formulae 1 and 2), `apparent_sound_power_level` (Formula 26) and the
+tonal-audibility chain of subclauses 9.5.2 to 9.5.8 through
 `wind_turbine_tonality`, with its `.report()` fiche. The instrumentation and
-position requirements of clauses 6 and 7 are documented above as the conditions
-those formulae assume, and the measurement-position tolerances are drawn.
+position requirements of clauses 6 and 7 are documented above as the
+conditions those formulae assume, and the measurement-position tolerances are
+drawn.
+</ScopeClaim>
 
-**Not covered.** The measurement campaign itself: the 10 s averaging, the
-0,5 m/s wind-speed binning with its 10 + 10 periods, the background correction,
-the interpolation to bin centres, the Formula (29) mapping to $z_{0ref} =
-0{,}05$ m and the uncertainty budget of clause 9.3 all operate on whole
-campaigns and are the user's. The declaration route of IEC TS 61400-14, which
-turns a batch of measured machines into the single number a planning authority
-receives, is not implemented either. And two things a wind-turbine reader often
-arrives looking for are outside IEC 61400-11 altogether: **amplitude
-modulation** (the "swish", which is folded into $L_{WA}$ and rated nowhere in
-this standard) and **infrasound**. Both are listed in 7.2.1 as *optional*
-measurements with no rating method attached, so their assessment falls to
-national guidance; the psychoacoustic route to them starts at
-[Fluctuation strength and roughness](/phonometry/perception/psychoacoustics/sound-quality/)
-and at [Special weightings](/phonometry/signals/levels/special-weightings/) for
-the G-weighted infrasound level.
+<ScopeClaim status="not-covered" label="Not covered">
+The measurement campaign itself: the 10 s averaging, the 0,5 m/s wind-speed
+binning with its 10 + 10 periods, the background correction, the interpolation
+to bin centres, the Formula (29) mapping to $z_{0ref} =
+0{,}05$ m and the
+uncertainty budget of clause 9.3 all operate on whole campaigns and are the
+user's. The declaration route of IEC TS 61400-14, which turns a batch of
+measured machines into the single number a planning authority receives, is not
+implemented either. And two things a wind-turbine reader often arrives looking
+for are outside IEC 61400-11 altogether: **amplitude modulation** (the
+"swish", which is folded into $L_{WA}$ and rated nowhere in this standard) and
+**infrasound**. Both are listed in 7.2.1 as *optional* measurements with no
+rating method attached, so their assessment falls to national guidance; the
+psychoacoustic route to them starts at [Fluctuation strength and
+roughness](/phonometry/perception/psychoacoustics/sound-quality/) and at
+[Special weightings](/phonometry/signals/levels/special-weightings/) for the
+G-weighted infrasound level.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

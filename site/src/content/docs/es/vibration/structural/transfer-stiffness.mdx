@@ -33,8 +33,10 @@ references:
     note: "El método indirecto k₂₁ = −(2πf)²(m₂+m_f)T (Fórmula 1) con sus condiciones de validez (apartado 6: Desigualdades 2 y 3; linealidad del 7.6). La conformidad se ancla en la relación de inercia del método indirecto, el límite de validez |T| = 0,1 ↔ ΔL₁,₂ = 20 dB con su cota de exactitud de 1 dB (12 %) y el criterio de linealidad del 7.6."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La propiedad de transferencia vibroacústica de un elemento resiliente (un
 aislador de vibraciones, soporte, fuelle o manguera) es su **rigidez dinámica
@@ -507,32 +509,37 @@ res.report(
 
 ## Qué cubre esta guía
 
-**Cubierto.** La definición $k_{2,1} = F_{2,b}/u_1$ de la ISO 10846-1:2008, el nivel
-(ISO 10846-2 y -3, 3.17) y el factor de pérdidas (ISO 10846-1, 3.8)
-(`transfer_stiffness_level`, `loss_factor`), el método directo de la
-ISO 10846-2:2008 (`transfer_stiffness_direct`) y el método indirecto de la
-ISO 10846-3:2002 de la Fórmula 1 (`transfer_stiffness_indirect`, incluido su
-término `flange_mass=`). También
-están implementadas la aproximación de la fuerza de bloqueo de las
-Ecuaciones 6-7 (`blocking_force_ratio`) y las relaciones FRF del Anexo A /
-Tabla A.2 (`convert_frf`). `TransferStiffnessResult` agrupa una
-determinación en barrido, y `.report()` genera la ficha de caracterización.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La definición $k_{2,1} = F_{2,b}/u_1$ de la ISO 10846-1:2008, el nivel (ISO
+10846-2 y -3, 3.17) y el factor de pérdidas (ISO 10846-1, 3.8)
+(`transfer_stiffness_level`, `loss_factor`), el método directo de la ISO
+10846-2:2008 (`transfer_stiffness_direct`) y el método indirecto de la ISO
+10846-3:2002 de la Fórmula 1 (`transfer_stiffness_indirect`, incluido su
+término `flange_mass=`). También están implementadas la aproximación de la
+fuerza de bloqueo de las Ecuaciones 6-7 (`blocking_force_ratio`) y las
+relaciones FRF del Anexo A / Tabla A.2 (`convert_frf`).
+`TransferStiffnessResult` agrupa una determinación en barrido, y `.report()`
+genera la ficha de caracterización.
+</ScopeClaim>
 
-**No cubierto.** Las Partes 4 y 5 de la serie ISO 10846, que cubren
-elementos distintos de los soportes resilientes y el método de punto de
-excitación en baja frecuencia, no están implementadas.
-`transfer_stiffness_indirect` solo comprueba la Desigualdad 2 (el límite de
-transmisibilidad $|T| \le 0{,}1$): la Desigualdad 3, la comprobación de masa de
-bloqueo rígida de la Fórmula 4, se describe pero no se calcula
-automáticamente. El criterio de linealidad del apartado 7.6 (dos espectros
-de entrada separados 10 dB dentro de 1,5 dB) tampoco se comprueba en el
-código, ni tampoco los requisitos de acondicionamiento e instrumentación de la
-sección 3: el acondicionamiento de precarga, fluencia y temperatura, los dos
-ensayos previos de 15 dB, la planitud de 0,5 dB de los transductores y el
+<ScopeClaim status="not-covered" label="No cubierto">
+Las Partes 4 y 5 de la serie ISO 10846, que cubren elementos distintos de los
+soportes resilientes y el método de punto de excitación en baja frecuencia, no
+están implementadas. `transfer_stiffness_indirect` solo comprueba la
+Desigualdad 2 (el límite de transmisibilidad $|T| \le 0{,}1$): la Desigualdad
+3, la comprobación de masa de bloqueo rígida de la Fórmula 4, se describe pero
+no se calcula automáticamente. El criterio de linealidad del apartado 7.6 (dos
+espectros de entrada separados 10 dB dentro de 1,5 dB) tampoco se comprueba en
+el código, ni tampoco los requisitos de acondicionamiento e instrumentación de
+la sección 3: el acondicionamiento de precarga, fluencia y temperatura, los
+dos ensayos previos de 15 dB, la planitud de 0,5 dB de los transductores y el
 emparejamiento entre canales, y la resolución de cinco líneas por banda se
-describen aquí y se dejan al operador. Los soportes hidráulicos quedan del todo
-fuera de la descripción con un solo espectro: su rigidez depende de la amplitud
-por diseño, así que un único $L_k(f)$ no los caracteriza.
+describen aquí y se dejan al operador. Los soportes hidráulicos quedan del
+todo fuera de la descripción con un solo espectro: su rigidez depende de la
+amplitud por diseño, así que un único $L_k(f)$ no los caracteriza.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

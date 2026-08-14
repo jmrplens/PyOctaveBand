@@ -38,6 +38,8 @@ references:
     note: "The measurement of the dynamic stiffness per unit area s' that every formula on this page starts from."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A resilient layer is the cheapest way to buy impact sound insulation and the
@@ -524,8 +526,10 @@ example.
 
 ## What this guide covers
 
-**Covered.** Hopkins 3.6.3's tapping-machine force pulse (Eqs. 3.85, 3.90 to
-3.92, 3.95 to 3.106) through `tapping_force_spectrum`, `force_pulse`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Hopkins 3.6.3's tapping-machine force pulse (Eqs. 3.85, 3.90 to 3.92, 3.95 to
+3.106) through `tapping_force_spectrum`, `force_pulse`,
 `plate_contact_stiffness`, `covering_contact_stiffness`,
 `tapping_cut_off_frequency`, `hammer_limiting_frequency` and
 `short_pulse_mean_square_force`; the soft-covering improvement of Hopkins
@@ -538,17 +542,21 @@ ISO 12354-2:2017 Annex C (Formulae C.1 to C.6) with Hopkins 4.4.4 and Vigran
 D.8 and Table D.1) through `lining_resonance_frequency`,
 `weighted_lining_improvement`, `lining_improvement` and
 `lining_improvement_in_situ`.
+</ScopeClaim>
 
-**Not covered.** The force model assumes a frequency-independent
-driving-point impedance, so a joisted or battened lightweight floor, whose
-impedance changes with where the hammer lands, is outside it; Hopkins points
-to numerical methods there. Soft coverings are treated as linear springs, and
-their measured non-linearity under the tapping machine is not modelled. There
-is no per-band prediction of a lining's $\Delta R(f)$: Annex D is a
-single-number method, and where ISO 12354 needs a lining spectrum it either
-measures it (ISO 10140-1 Annex G) or, for a floating floor, takes
-$\Delta R(f) = \Delta L(f)$, which its own Annex L calls rough. Heavy impact
-sources (the rubber ball) are not covered by any of these models.
+<ScopeClaim status="not-covered" label="Not covered">
+The force model assumes a frequency-independent driving-point impedance, so a
+joisted or battened lightweight floor, whose impedance changes with where the
+hammer lands, is outside it; Hopkins points to numerical methods there. Soft
+coverings are treated as linear springs, and their measured non-linearity
+under the tapping machine is not modelled. There is no per-band prediction of
+a lining's $\Delta R(f)$: Annex D is a single-number method, and where ISO
+12354 needs a lining spectrum it either measures it (ISO 10140-1 Annex G) or,
+for a floating floor, takes $\Delta R(f) = \Delta L(f)$, which its own Annex L
+calls rough. Heavy impact sources (the rubber ball) are not covered by any of
+these models.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

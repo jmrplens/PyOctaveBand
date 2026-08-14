@@ -54,6 +54,8 @@ references:
     note: "Los símbolos y referencias que los documentos de guía adoptan para sus criterios (Lp,0-pk y LE,p re 1 µPa y 1 µPa²·s)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Un mamífero marino no oye todas las frecuencias por igual, así que una
@@ -610,32 +612,39 @@ por convención 24 horas en la guía regulatoria, y no una campaña entera.
 
 ## Qué cubre esta guía
 
-**Cubierto.** `group_audiogram` y `audiogram_parameters` implementan el
-audiograma de grupo de Southall et al. (2019) (Ecuación 1) con los ajustes
-absoluto de la Tabla 2 y normalizado de la Tabla 3; `orca_audiogram` implementa
-el audiograma de orca de tres tramos de Ainslie (2010) Ecuación (11.159).
-`auditory_weighting` implementa las funciones de ponderación y de exposición
-paso banda para las tres versiones de guía seleccionables (NMFS 2024 v3.0, por
-defecto; NMFS 2018 v2.0; Southall et al. 2019), con las tablas de parámetros
-accesibles mediante `weighting_parameters`. `exposure_criteria` devuelve los
-criterios publicados de inicio de TTS y de lesión (PTS / AUD INJ), impulsivos y
-no impulsivos, incluida la mitad de nivel de pico sin ponderar de la métrica
-dual. `weighted_exposure` ejecuta la evaluación: pondera un espectro por bandas,
-lo acumula sobre eventos e informa del margen frente a cada criterio aplicable.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+`group_audiogram` y `audiogram_parameters` implementan el audiograma de grupo
+de Southall et al. (2019) (Ecuación 1) con los ajustes absoluto de la Tabla 2
+y normalizado de la Tabla 3; `orca_audiogram` implementa el audiograma de orca
+de tres tramos de Ainslie (2010) Ecuación (11.159). `auditory_weighting`
+implementa las funciones de ponderación y de exposición paso banda para las
+tres versiones de guía seleccionables (NMFS 2024 v3.0, por defecto; NMFS 2018
+v2.0; Southall et al. 2019), con las tablas de parámetros accesibles mediante
+`weighting_parameters`. `exposure_criteria` devuelve los criterios publicados
+de inicio de TTS y de lesión (PTS / AUD INJ), impulsivos y no impulsivos,
+incluida la mitad de nivel de pico sin ponderar de la métrica dual.
+`weighted_exposure` ejecuta la evaluación: pondera un espectro por bandas, lo
+acumula sobre eventos e informa del margen frente a cada criterio aplicable.
 `strike_sel_spectrum` aporta ese espectro por bandas a partir de un golpe de
 pilote registrado.
+</ScopeClaim>
 
-**No cubierto.** No hay audiograma para los cetáceos LF, porque Southall et al.
-nunca imprimen su parámetro $F_1$. Los criterios de perturbación conductual (los
-umbrales de escalón y de dosis-respuesta usados en las estimaciones de
-hostigamiento) quedan fuera de alcance: solo se implementan los criterios de
-efecto auditivo. La biblioteca no elige por el usuario ni el grupo auditivo ni
-el periodo de acumulación, y no modela el movimiento del animal respecto a la
-fuente, de modo que el SEL acumulado que informa es el caso peor de receptor
-estático. Tampoco comprueba que el espectro aportado abarque la banda de paso
-del grupo: un registro que se queda corto respecto de $f_2$ se pondera tal cual
-y subestima la exposición. La propagación de la fuente al receptor pertenece a
-[Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/).
+<ScopeClaim status="not-covered" label="No cubierto">
+No hay audiograma para los cetáceos LF, porque Southall et al. nunca imprimen
+su parámetro $F_1$. Los criterios de perturbación conductual (los umbrales de
+escalón y de dosis-respuesta usados en las estimaciones de hostigamiento)
+quedan fuera de alcance: solo se implementan los criterios de efecto auditivo.
+La biblioteca no elige por el usuario ni el grupo auditivo ni el periodo de
+acumulación, y no modela el movimiento del animal respecto a la fuente, de
+modo que el SEL acumulado que informa es el caso peor de receptor estático.
+Tampoco comprueba que el espectro aportado abarque la banda de paso del grupo:
+un registro que se queda corto respecto de $f_2$ se pondera tal cual y
+subestima la exposición. La propagación de la fuente al receptor pertenece a
+[Propagación submarina del
+sonido](/phonometry/es/underwater/underwater-propagation/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -25,6 +25,8 @@ references:
     note: "Libro en línea gratuito y complementario sobre diseño y análisis de filtros digitales, que trata las arquitecturas clásicas comparadas en esta galería."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Elegir una arquitectura de filtro es un compromiso: la selectividad, el
@@ -492,22 +494,28 @@ en eje con el método de barrido sinusoidal de
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las cinco arquitecturas sobre las que puede construirse
-cualquier banco de bandas IEC (Butterworth, Chebyshev I/II, elíptico,
-Bessel): sus respuestas en magnitud comparadas en el cruce a −3 dB y en la
-galería completa de octava y tercio de octava, el convenio de bordes de banda
-(exacto para Butterworth, Chebyshev II y Bessel; el borde de rizado para las dos
-familias de rizado constante), y un ejemplo de uso por arquitectura, más el
-crossover Linkwitz-Riley, cuyas dos ramas se recombinan planas por suma o por
-diferencia según la paridad de `order/2`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las cinco arquitecturas sobre las que puede construirse cualquier banco de
+bandas IEC (Butterworth, Chebyshev I/II, elíptico, Bessel): sus respuestas en
+magnitud comparadas en el cruce a −3 dB y en la galería completa de octava y
+tercio de octava, el convenio de bordes de banda (exacto para Butterworth,
+Chebyshev II y Bessel; el borde de rizado para las dos familias de rizado
+constante), y un ejemplo de uso por arquitectura, más el crossover
+Linkwitz-Riley, cuyas dos ramas se recombinan planas por suma o por diferencia
+según la paridad de `order/2`.
+</ScopeClaim>
 
-**No cubierto.** Las matemáticas de banda, el diseño de polos y ceros,
-estabilidad y multitasa y la referencia de parámetros de `octave_filter()`
-/ `OctaveFilterBank` permanecen en
-[Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). Las máscaras de
+<ScopeClaim status="not-covered" label="No cubierto">
+Las matemáticas de banda, el diseño de polos y ceros, estabilidad y multitasa
+y la referencia de parámetros de `octave_filter()` / `OctaveFilterBank`
+permanecen en [Bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/). Las máscaras de
 aceptación de clase de la Tabla 1 de IEC 61260-1, que deciden la clase que
-alcanza realmente cada una de estas arquitecturas, son
-[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/).
+alcanza realmente cada una de estas arquitecturas, son [Verificación de clase
+de filtros](/phonometry/es/signals/filters/filter-compliance/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

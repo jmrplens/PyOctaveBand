@@ -25,6 +25,8 @@ references:
     note: "Ejemplo 7.2 and Ejercicio 7.1 (pp. 394-395) are the numeric oracles of the global index on this page, and Ejemplos 7.4 and 7.5 (pp. 408-410) the window-size correction and the composite-façade calculation. ISBN 978-84-283-3814-1."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The *Documento Básico HR* "Protección frente al ruido" of the Spanish building
@@ -348,19 +350,26 @@ plt.show()
 
 ## What this guide covers
 
-**Covered.** The DB-HR Annex A global index (Formulae A.5 to A.7) over the
-eighteen bands from 100 Hz to 5 kHz with the four normalised spectra of Tables
-A.2 to A.5, the rounding of clause 3.1.3.1 point 4, the requirements of clause
-2 (Table 2.1 for façades, 2.1.1 airborne and party walls, 2.1.2 impact and 2.2
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The DB-HR Annex A global index (Formulae A.5 to A.7) over the eighteen bands
+from 100 Hz to 5 kHz with the four normalised spectra of Tables A.2 to A.5,
+the rounding of clause 3.1.3.1 point 4, the requirements of clause 2 (Table
+2.1 for façades, 2.1.1 airborne and party walls, 2.1.2 impact and 2.2
 reverberation and absorption) and the window-size correction of the *Catálogo
 de Elementos Constructivos*.
+</ScopeClaim>
 
-**Not covered.** The design options of clause 3 (the simplified option with its
-solution tables, and the general option, which is the EN 12354 prediction) are
-not implemented here: the calculation route of the general option lives in
-[Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/).
-The execution conditions of clause 5 and the maintenance conditions of clause 6
-are out of scope as well.
+<ScopeClaim status="not-covered" label="Not covered">
+The design options of clause 3 (the simplified option with its solution
+tables, and the general option, which is the EN 12354 prediction) are not
+implemented here: the calculation route of the general option lives in
+[Predicting Sound Insulation (EN
+12354)](/phonometry/buildings/design/insulation-prediction/). The execution
+conditions of clause 5 and the maintenance conditions of clause 6 are out of
+scope as well.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -22,6 +22,8 @@ references:
     note: "El marco GCC, las ponderaciones de la Tabla I con sus condiciones y el procesador de máxima verosimilitud (Hannan-Thomson)."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Donde los [estimadores espectrales calibrados](/phonometry/es/signals/spectra/spectral-analysis/)
@@ -515,27 +517,31 @@ submuestral comparte su núcleo de banda limitada con las
 
 ## Qué cubre esta guía
 
-**Cubierto.** El capítulo 5, la sección 8.4 y el capítulo 13 de Bendat y
-Piersol: `correlation` con las normalizaciones sesgada, insesgada y
-coeficiente y sus fórmulas de error aleatorio (ecuaciones 8.109/8.112);
-`time_delay` con los métodos directo, de pendiente de fase y la correlación
-cruzada generalizada de Knapp y Carter (1976), incluidas las ponderaciones
-Roth, SCOT, PHAT y de máxima verosimilitud de su Tabla I; la incertidumbre
-de localización del pico de la ecuación 8.129; `impulse_response_delay` y
-`align_impulse_responses`; y la `envelope` de Hilbert con fase y frecuencia
-instantáneas (capítulo 13).
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El capítulo 5, la sección 8.4 y el capítulo 13 de Bendat y Piersol:
+`correlation` con las normalizaciones sesgada, insesgada y coeficiente y sus
+fórmulas de error aleatorio (ecuaciones 8.109/8.112); `time_delay` con los
+métodos directo, de pendiente de fase y la correlación cruzada generalizada de
+Knapp y Carter (1976), incluidas las ponderaciones Roth, SCOT, PHAT y de
+máxima verosimilitud de su Tabla I; la incertidumbre de localización del pico
+de la ecuación 8.129; `impulse_response_delay` y `align_impulse_responses`; y
+la `envelope` de Hilbert con fase y frecuencia instantáneas (capítulo 13).
+</ScopeClaim>
 
-**No cubierto.** `correlation` y `time_delay` modelan un único retardo de
-camino común entre exactamente dos sensores (el modelo
-$y(t) = \alpha\,x(t-\tau_0) + n(t)$ de la ecuación 5.21). Un registro con varias
-llegadas (multitrayecto, un camino directo más reflexiones) no se separa
-automáticamente: `time_delay` y el correlador directo solo informan
-del mayor pico, la misma limitación que `echo_detection` señala en el cepstrum
-dentro de [Cepstrum, ecos y espectro de la
-envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/). Estimar retardos entre
-más de dos sensores, como haría un array o un beamformer, implica llamar
-tú mismo a estas funciones por pares: no hay ninguna resolución de TDOA
-multisensor incorporada.
+<ScopeClaim status="not-covered" label="No cubierto">
+`correlation` y `time_delay` modelan un único retardo de camino común entre
+exactamente dos sensores (el modelo $y(t) = \alpha\,x(t-\tau_0) + n(t)$ de la
+ecuación 5.21). Un registro con varias llegadas (multitrayecto, un camino
+directo más reflexiones) no se separa automáticamente: `time_delay` y el
+correlador directo solo informan del mayor pico, la misma limitación que
+`echo_detection` señala en el cepstrum dentro de [Cepstrum, ecos y espectro de
+la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/). Estimar
+retardos entre más de dos sensores, como haría un array o un beamformer,
+implica llamar tú mismo a estas funciones por pares: no hay ninguna resolución
+de TDOA multisensor incorporada.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

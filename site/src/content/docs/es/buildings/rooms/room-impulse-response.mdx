@@ -25,8 +25,10 @@ references:
     note: "Los grados de exactitud, los recuentos de posiciones y la distancia mínima a la fuente tras la discusión sobre promediado de posiciones."
 ---
 
-import Video from '../../../../../components/Video.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Toda magnitud de acústica de salas de este sitio parte de la misma medición:
 la **respuesta al impulso** (RI) entre una fuente y un receptor. Hazla bien
@@ -726,31 +728,37 @@ el análisis de THD de la
 
 ## Qué cubre esta guía
 
-**Cubierto.** La adquisición determinista de la respuesta al impulso de sala
-de ISO 18233:2006: el barrido sinusoidal exponencial del Anexo B
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La adquisición determinista de la respuesta al impulso de sala de ISO
+18233:2006: el barrido sinusoidal exponencial del Anexo B
 (`room.sweep_signal`, `room.inverse_filter`) con deconvolución espectral
 lineal (regularizada con Tikhonov) y la variante de filtro inverso de Farina
-(`room.impulse_response`, métodos `"spectral"` y `"farina"`), y las
-secuencias de longitud máxima del Anexo A (`room.mls_signal`, órdenes 2-20,
-`room.mls_impulse_response` por correlación cruzada circular). Los
-resultados son objetos `ImpulseResponseResult` que encajan sin cambios en
-`room.room_parameters`. Las reglas de dimensionado de la ISO 18233 (longitud de
-barrido y silencio del apartado B.3.1, ec. (10) del apartado 6.2.2.2 para el
-periodo de la MLS), los requisitos de equipo del apartado 4.2 de la ISO 3382-1 y
-las reglas de colocación de ISO 3382-1/-2 (separación, distancia a superficies, la
-distancia mínima a la fuente, la alternativa del brazo giratorio y los grados de
-exactitud) se citan para la planificación, junto con la lista de comprobación del
-informe del apartado 9.2.
+(`room.impulse_response`, métodos `"spectral"` y `"farina"`), y las secuencias
+de longitud máxima del Anexo A (`room.mls_signal`, órdenes 2-20,
+`room.mls_impulse_response` por correlación cruzada circular). Los resultados
+son objetos `ImpulseResponseResult` que encajan sin cambios en
+`room.room_parameters`. Las reglas de dimensionado de la ISO 18233 (longitud
+de barrido y silencio del apartado B.3.1, ec. (10) del apartado 6.2.2.2 para
+el periodo de la MLS), los requisitos de equipo del apartado 4.2 de la ISO
+3382-1 y las reglas de colocación de ISO 3382-1/-2 (separación, distancia a
+superficies, la distancia mínima a la fuente, la alternativa del brazo
+giratorio y los grados de exactitud) se citan para la planificación, junto con
+la lista de comprobación del informe del apartado 9.2.
+</ScopeClaim>
 
-**No cubierto.** La reproducción y la grabación en sí (la E/S de la tarjeta
-de sonido, la calibración de nivel de la cadena) quedan fuera de la
-biblioteca. Los diagnósticos de varianza temporal y de distorsión de
-ISO 18233 no están implementados: la guía explica cómo el barrido separa la
-distorsión, pero ninguna función auxiliar la cuantifica (esa lectura vive en la
-[guía de distorsión por barrido
+<ScopeClaim status="not-covered" label="No cubierto">
+La reproducción y la grabación en sí (la E/S de la tarjeta de sonido, la
+calibración de nivel de la cadena) quedan fuera de la biblioteca. Los
+diagnósticos de varianza temporal y de distorsión de ISO 18233 no están
+implementados: la guía explica cómo el barrido separa la distorsión, pero
+ninguna función auxiliar la cuantifica (esa lectura vive en la [guía de
+distorsión por barrido
 sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
 Las reglas de posiciones son prosa de orientación: nada comprueba cuántas
 posiciones se midieron ni dónde.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

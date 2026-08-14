@@ -46,6 +46,8 @@ references:
     note: "La Tabla 1 recoge la revisión de agosto de 2022: la fuente pesada pasó a ser la pelota de caucho, el índice L'iA,Fmax a través de KS F ISO 10140-5 y KS F ISO 717-2, el requisito obligatorio de 49 dB (antes 50 dB) y los cuatro grados a intervalos de 4 dB. La única escala reglamentaria publicada para la magnitud que calcula esta página."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La máquina de impactos normalizada de ISO es una fuente de impacto *ligera*.
@@ -448,37 +450,42 @@ blando, que actúa donde la ponderación A ya ha descartado la energía.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El nivel de exposición a la fuerza de impacto de la
-Fórmula (A.1) de ISO 16283-2:2020 desde un registro muestreado de fuerza, con
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El nivel de exposición a la fuerza de impacto de la Fórmula (A.1) de ISO
+16283-2:2020 desde un registro muestreado de fuerza, con
 `building.impact_force_exposure_level`; las especificaciones impresas por
-bandas de octava de la Tabla A.1 de ISO 16283-2:2020 / Tabla F.1 de
-ISO 10140-5:2010 (pelota de caucho) y de las Tablas A.1 y A.2 de
-JIS A 1418-2:2019 (ambas características) con sus tolerancias, con
+bandas de octava de la Tabla A.1 de ISO 16283-2:2020 / Tabla F.1 de ISO
+10140-5:2010 (pelota de caucho) y de las Tablas A.1 y A.2 de JIS A 1418-2:2019
+(ambas características) con sus tolerancias, con
 `building.heavy_impact_source_specification`,
-`building.heavy_impact_source_limits` y
-`building.check_heavy_impact_source`; el nivel máximo estandarizado de
-presión acústica de impactos de las Fórmulas (4), (5) y (6) y la síntesis en
-octavas de la Fórmula (20), con `building.standardized_maximum_impact_level`,
+`building.heavy_impact_source_limits` y `building.check_heavy_impact_source`;
+el nivel máximo estandarizado de presión acústica de impactos de las Fórmulas
+(4), (5) y (6) y la síntesis en octavas de la Fórmula (20), con
+`building.standardized_maximum_impact_level`,
 `building.fast_reverberation_correction` y
 `building.heavy_impact_octave_levels`; y la valoración normativa ponderada A
 del Anexo D de ISO 717-2:2020 con las correcciones de la Tabla D.3, con
 `building.a_weighted_maximum_impact_level`.
+</ScopeClaim>
 
-**No cubierto.** El procedimiento in situ documentado más arriba no está
-automatizado: las funciones consumen niveles ya promediados en energía sobre
-las posiciones de micrófono de una posición de pelota y después sobre las
-posiciones de pelota, y nada comprueba la altura de caída, las cuatro o más
-posiciones de fuente, las separaciones de micrófono ni el promediado en dos
-etapas. Tampoco lo está la guía de disposición horizontal del Anexo E de
-ISO 16283-2:2020, que es informativo. No
-hay ningún modelo de predicción que lleve de una solución constructiva a un
-nivel de impacto pesado; Hopkins afirma sin rodeos que la complejidad de la
-fuerza de entrada y el uso de un máximo con ponderación temporal no dejan
-ningún equivalente sencillo a la predicción de la máquina de impactos. No
-existe en ninguna parte un ejemplo resuelto acreditado que lleve un forjado
-real desde el $L_{i,F\max}$ medido hasta $L'_{iA,F\max,V,T}$, de modo que la
-cadena de estandarización se ancla en su propia identidad con $T = T_0$ y en
-una reproducción publicada de 25 bandas de la Fórmula (4).
+<ScopeClaim status="not-covered" label="No cubierto">
+El procedimiento in situ documentado más arriba no está automatizado: las
+funciones consumen niveles ya promediados en energía sobre las posiciones de
+micrófono de una posición de pelota y después sobre las posiciones de pelota,
+y nada comprueba la altura de caída, las cuatro o más posiciones de fuente,
+las separaciones de micrófono ni el promediado en dos etapas. Tampoco lo está
+la guía de disposición horizontal del Anexo E de ISO 16283-2:2020, que es
+informativo. No hay ningún modelo de predicción que lleve de una solución
+constructiva a un nivel de impacto pesado; Hopkins afirma sin rodeos que la
+complejidad de la fuerza de entrada y el uso de un máximo con ponderación
+temporal no dejan ningún equivalente sencillo a la predicción de la máquina de
+impactos. No existe en ninguna parte un ejemplo resuelto acreditado que lleve
+un forjado real desde el $L_{i,F\max}$ medido hasta $L'_{iA,F\max,V,T}$, de
+modo que la cadena de estandarización se ancla en su propia identidad con
+$T = T_0$ y en una reproducción publicada de 25 bandas de la Fórmula (4).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

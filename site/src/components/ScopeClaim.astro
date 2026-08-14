@@ -1,0 +1,68 @@
+---
+/**
+ * One scope declaration inside a <Scope> panel: a single thing the library
+ * either covers or deliberately does not, with the prose that argues it.
+ *
+ * The prose is the point. These sections do not list labels, they reason —
+ * an absence here says why it is absent and usually links to the guide that
+ * draws the boundary — so the declaration is passed as markdown children,
+ * links, inline maths, code spans and all, and may run to several
+ * paragraphs or end in a list. Nothing about it is reformatted.
+ *
+ * Two props, and they do different jobs:
+ *
+ *  - `status` is the MACHINE contract. It is emitted verbatim as
+ *    `data-coverage` on the entry and is the only thing an audit reads, so
+ *    it is language-independent by construction and is validated here
+ *    rather than trusted.
+ *  - `label` is the HUMAN legend printed in the panel gutter, and the page
+ *    supplies it already translated. The Spanish pages are separate files
+ *    with their own prose, so there is nothing to translate at build time
+ *    and no lookup table to keep in step: an English page passes
+ *    "Not covered", its Spanish twin passes "No cubierto", and the shared
+ *    `status` is what joins them for the audit.
+ *
+ * `label` is optional, and the rule for omitting it is not stylistic. A
+ * legend earns its place when the state VARIES inside the panel: a guide's
+ * "What this guide covers" section declares one of each, and the reader has
+ * to be able to tell the rows apart at a glance. A section overview's
+ * "What this section does not cover" is a run of absences under a heading
+ * that has already said so, and stamping NOT COVERED on every row of it
+ * repeats a constant instead of distinguishing a variable. Those entries
+ * omit the label and are carried by the rule alone, which is dashed in
+ * either case. The `status` attribute is emitted whether or not there is a
+ * legend, so the census does not change.
+ *
+ * Styled by src/styles/scope.css.
+ */
+interface Props {
+	/** Which side of the boundary this claim is on. Emitted as `data-coverage`. */
+	status: 'covered' | 'not-covered';
+	/**
+	 * Gutter legend, in the page's own language and supplied by the page.
+	 * Omitted when every entry in the panel shares one state (see above).
+	 */
+	label?: string;
+}
+
+const STATUSES = ['covered', 'not-covered'] as const;
+
+const { status, label } = Astro.props;
+
+// Validated rather than trusted: the attribute this writes is what a future
+// audit counts, so a typo here would silently drop a claim out of the census
+// instead of rendering wrong. Same reflex as ThemeImage's empty-alt guard.
+if (!STATUSES.includes(status)) {
+	throw new Error(
+		`ScopeClaim needs status="covered" or status="not-covered", got ${JSON.stringify(status)}` +
+			(label ? ` (label: ${label})` : ''),
+	);
+}
+---
+
+<li class="scope-claim" data-coverage={status}>
+	{label && <p class="scope-legend">{label}</p>}
+	<div class="scope-body">
+		<slot />
+	</div>
+</li>

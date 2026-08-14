@@ -18,6 +18,8 @@ references:
     note: "The NPD and profile conventions the database follows, and the single-event chain the aircraft records feed. The linked PDF is the free download; the volumes are catalogued on the ECAC documents page (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 [Airport Noise (ECAC Doc 29)](/phonometry/aircraft/airport-noise/) computes an
@@ -361,21 +363,27 @@ work unchanged.
 
 ## What this guide covers
 
-**Covered.** Opening the shipped EASA ANP database (or another ANP CSV export)
-with `load_anp_database`; what one aircraft record holds, including the power
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Opening the shipped EASA ANP database (or another ANP CSV export) with
+`load_anp_database`; what one aircraft record holds, including the power
 parameter its NPD table is indexed by and the engine mounting the Doc 29 chain
-reads; reading and interpolating the NPD surface with `npd_curves` and `level`;
-the default fixed-point trajectories and their stage-length bins; and running
-the Doc 29 single-event level and ground-grid contour from an aircraft
+reads; reading and interpolating the NPD surface with `npd_curves` and
+`level`; the default fixed-point trajectories and their stage-length bins; and
+running the Doc 29 single-event level and ground-grid contour from an aircraft
 identifier through `event_level` and `noise_contour`.
+</ScopeClaim>
 
-**Not covered.** The procedural-step profiles, which are how most ANP entries
-describe a departure: turning those into a flight path needs the ICAO Doc 9911
+<ScopeClaim status="not-covered" label="Not covered">
+The procedural-step profiles, which are how most ANP entries describe a
+departure: turning those into a flight path needs the ICAO Doc 9911
 flight-mechanics performance model, which this bridge does not implement, so
-only the 13 aircraft with a fixed-point *departure* profile — and the 20 with a
-fixed-point *arrival* profile — have a ready-to-use trajectory.
-The database is also read, never written: phonometry ships version 2.3 and does
-not update it.
+only the 13 aircraft with a fixed-point *departure* profile — and the 20 with
+a fixed-point *arrival* profile — have a ready-to-use trajectory. The database
+is also read, never written: phonometry ships version 2.3 and does not update
+it.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

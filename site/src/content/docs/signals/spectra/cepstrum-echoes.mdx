@@ -26,6 +26,8 @@ references:
     note: "Section 13.1.4 (the Hilbert relation between log magnitude and phase behind the minimum-phase folding) and Section 13.3 with Figure 13.11 (envelope detection followed by DC removal, the structure of the envelope spectrum). ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The [spectral estimators](/phonometry/signals/spectra/spectral-analysis/) describe *what
@@ -570,20 +572,26 @@ is modulated, the domain metrics quantify it normatively.
 
 ## What this guide covers
 
-**Covered.** The three cepstrum variants and liftering of Havelock, Kuwano
-and Vorländer's *Handbook of Signal Processing in Acoustics* (`cepstrum`,
-`lifter`, Chapters 27 and 87), the single-echo delay and reflection
-coefficient read off the power cepstrum (`echo_detection`), the invertible
-complex cepstrum and its homomorphic round trip (`CepstrumResult.invert`),
-and the Bendat & Piersol Chapter 13 envelope spectrum (`envelope_spectrum`)
-with its closed-form AM tone lines.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The three cepstrum variants and liftering of Havelock, Kuwano and Vorländer's
+*Handbook of Signal Processing in Acoustics* (`cepstrum`, `lifter`, Chapters
+27 and 87), the single-echo delay and reflection coefficient read off the
+power cepstrum (`echo_detection`), the invertible complex cepstrum and its
+homomorphic round trip (`CepstrumResult.invert`), and the Bendat & Piersol
+Chapter 13 envelope spectrum (`envelope_spectrum`) with its closed-form AM
+tone lines.
+</ScopeClaim>
 
-**Not covered.** `echo_detection` picks only the single largest cepstral
-peak in the searched band, so a response with several overlapping echoes
-needs manual peak-picking or repeated calls on narrowed bands; it is not a
-multi-echo separator. The module also has no mel-warped or MFCC-style
-cepstrum for perceptual audio features: `lifter` and `cepstrum` work on the
-plain linear-frequency log spectrum only.
+<ScopeClaim status="not-covered" label="Not covered">
+`echo_detection` picks only the single largest cepstral peak in the searched
+band, so a response with several overlapping echoes needs manual peak-picking
+or repeated calls on narrowed bands; it is not a multi-echo separator. The
+module also has no mel-warped or MFCC-style cepstrum for perceptual audio
+features: `lifter` and `cepstrum` work on the plain linear-frequency log
+spectrum only.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

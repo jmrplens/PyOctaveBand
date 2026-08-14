@@ -40,6 +40,8 @@ references:
     note: "Sección 13.1.4: la relación de transformada de Hilbert entre log-magnitud y fase detrás de la reconstrucción de fase mínima. ISBN 978-0-470-24877-5."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Un solo barrido sinusoidal exponencial caracteriza a la vez la respuesta
@@ -522,34 +524,38 @@ gruesas.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La deconvolución de barrido exponencial de Farina (preprint
-AES 5093, 2000) y el barrido sincronizado coherente en fase de Novak,
-Lotton y Simon (2015): la separación armónica, el espectro en forma
-cerrada del filtro inverso y la corrección de sesgo sub-muestra,
-implementadas por `swept_sine_distortion` y `synchronized_sweep_signal`.
-Las condiciones de adquisición de las que depende el resultado: el nivel de
-excitación y su referencia `amplitude`, el `fade` que tiene que llegar a las
-dos llamadas, los requisitos de recorte y de cola, los modos de fallo por
-variación en el tiempo y por ruido impulsivo, y las reglas de dimensionado que
-relacionan $T$, $N$ y $f_2$.
-Las utilidades de fase `minimum_phase`, `group_delay`, `excess_phase` y
-`phase_decomposition` implementan la relación de transformada de Hilbert
-de la sección 13.1.4 de Bendat y Piersol mediante el cepstrum real.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La deconvolución de barrido exponencial de Farina (preprint AES 5093, 2000) y
+el barrido sincronizado coherente en fase de Novak, Lotton y Simon (2015): la
+separación armónica, el espectro en forma cerrada del filtro inverso y la
+corrección de sesgo sub-muestra, implementadas por `swept_sine_distortion` y
+`synchronized_sweep_signal`. Las condiciones de adquisición de las que depende
+el resultado: el nivel de excitación y su referencia `amplitude`, el `fade`
+que tiene que llegar a las dos llamadas, los requisitos de recorte y de cola,
+los modos de fallo por variación en el tiempo y por ruido impulsivo, y las
+reglas de dimensionado que relacionan $T$, $N$ y $f_2$. Las utilidades de fase
+`minimum_phase`, `group_delay`, `excess_phase` y `phase_decomposition`
+implementan la relación de transformada de Hilbert de la sección 13.1.4 de
+Bendat y Piersol mediante el cepstrum real.
+</ScopeClaim>
 
-**No cubierto.** La distorsión de intermodulación y la intermodulación
-dinámica (IEC 60268-3, apartados 14.12.7-10) se miden a partir de tonos
-estacionarios en la página de
-[electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/), no con un
-barrido; esta página separa solo los órdenes armónicos. La monografía de
-medición con barridos de Müller y Massarani se cita como contexto de
-práctica (fundidos, técnica del filtro inverso), no como una fórmula
-concreta implementada. Con `method="farina"`, las fases armónicas de
-$H_2 \dots H_N$ se devuelven pero deben ignorarse: el barrido exponencial simple
-rompe la equivalencia desplazamiento-armónico de la que depende el método
-sincronizado. Aquí tampoco se comprueba ninguna de las condiciones de
+<ScopeClaim status="not-covered" label="No cubierto">
+La distorsión de intermodulación y la intermodulación dinámica (IEC 60268-3,
+apartados 14.12.7-10) se miden a partir de tonos estacionarios en la página de
+[electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
+no con un barrido; esta página separa solo los órdenes armónicos. La
+monografía de medición con barridos de Müller y Massarani se cita como
+contexto de práctica (fundidos, técnica del filtro inverso), no como una
+fórmula concreta implementada. Con `method="farina"`, las fases armónicas de
+$H_2 \dots H_N$ se devuelven pero deben ignorarse: el barrido exponencial
+simple rompe la equivalencia desplazamiento-armónico de la que depende el
+método sincronizado. Aquí tampoco se comprueba ninguna de las condiciones de
 adquisición de la sección 1.1: las funciones toman los arrays que se les dan,
-así que el nivel de excitación, la ausencia de recorte y la longitud de la cola
-quedan a cargo de quien opera, que además tiene que informar de ellos.
+así que el nivel de excitación, la ausencia de recorte y la longitud de la
+cola quedan a cargo de quien opera, que además tiene que informar de ellos.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

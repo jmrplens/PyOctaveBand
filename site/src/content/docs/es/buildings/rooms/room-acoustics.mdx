@@ -46,9 +46,11 @@ references:
     note: "Los grados de exactitud y el criterio de rango dinámico tras el análisis del decaimiento; sus reglas de posiciones se aplican en la guía de medición de la respuesta al impulso."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 La acústica de salas parte de una única medición: la **respuesta al impulso**
 (RI) entre una fuente y un receptor. Fíltrala en bandas e intégrala, y da el
@@ -656,25 +658,30 @@ trabajo de la ISO 3382-3
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración inversa y
-las fórmulas de parámetros del anexo A) y la ISO 3382-2:2008 (apartado 6 y
-el criterio de rango dinámico del apartado 5.3.3), calculados por
-`room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
-y las marcas de validez y curvatura por banda, con el filtrado de fase cero
-opcional de la NOTA del apartado 7.3 de ISO 3382-2, y la ficha ISO 3382 de
-una página con `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La ISO 3382-1:2009 (apartado 5.3.3 de integración inversa y las fórmulas de
+parámetros del anexo A) y la ISO 3382-2:2008 (apartado 6 y el criterio de
+rango dinámico del apartado 5.3.3), calculados por
+`room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts y
+las marcas de validez y curvatura por banda, con el filtrado de fase cero
+opcional de la NOTA del apartado 7.3 de ISO 3382-2, y la ficha ISO 3382 de una
+página con `.report()`.
+</ScopeClaim>
 
-**No cubierto.** El anexo A de la ISO 3382-1 también define la fuerza
-acústica $G$ y los parámetros binaurales LF/LFC e IACC; phonometry
-implementa solo la familia de reverberancia y claridad citada arriba (EDT,
-T20, T30, C50, C80, D50, Ts). La adquisición de la respuesta al impulso
-(ISO 18233) y las magnitudes de oficina diáfana (ISO 3382-3) tienen guías
-propias,
-[Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/)
-y [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/).
-La absorción en cámara reverberante de ISO 354 que consume el par
-$T_1$/$T_2$ medido vive en
-[Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
+<ScopeClaim status="not-covered" label="No cubierto">
+El anexo A de la ISO 3382-1 también define la fuerza acústica $G$ y los
+parámetros binaurales LF/LFC e IACC; phonometry implementa solo la familia de
+reverberancia y claridad citada arriba (EDT, T20, T30, C50, C80, D50, Ts). La
+adquisición de la respuesta al impulso (ISO 18233) y las magnitudes de oficina
+diáfana (ISO 3382-3) tienen guías propias, [Medición de la respuesta al
+impulso](/phonometry/es/buildings/rooms/room-impulse-response/) y [Acústica de
+oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/). La
+absorción en cámara reverberante de ISO 354 que consume el par $T_1$/$T_2$
+medido vive en [Medida y clasificación de la absorción
+sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

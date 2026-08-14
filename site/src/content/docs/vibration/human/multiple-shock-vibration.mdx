@@ -25,8 +25,10 @@ references:
     note: "The accelerometer disc on the seat pad that clause 5.1.2 requires: its diameter, height and hardness, and the metal disc that carries the transducers (5.2.3)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Vibration that contains repeated **mechanical shocks** (off-road vehicles,
 high-speed marine craft, earth-moving machinery) loads the lumbar spine far
@@ -487,28 +489,34 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** ISO 2631-5:2018 clause 5 and Annex C. The acquisition and
-conditioning requirements of clauses 5.1.2 to 5.1.4 as guidance; the clause 5.2
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 2631-5:2018 clause 5 and Annex C. The acquisition and conditioning
+requirements of clauses 5.1.2 to 5.1.4 as guidance; the clause 5.2
 seat-to-spine transfer function (`seat_to_spine_transfer`, `spinal_response`,
-`response_peaks`); the clause 5.3 acceleration dose and the Formula 4 daily dose
-(`dose_from_peaks`, `acceleration_dose`, `daily_dose`, and the
+`response_peaks`); the clause 5.3 acceleration dose and the Formula 4 daily
+dose (`dose_from_peaks`, `acceleration_dose`, `daily_dose`, and the
 `measurement_time` / `exposure_time` pair of `multiple_shock_assessment`); and
 the Annex C compressive stress, cumulative stress variable and Weibull
 probability with their Table C.1 coefficients and Table C.2 thresholds
 (`compression_dose`, `static_stress`, `ultimate_strength`, `injury_risk`,
-`injury_probability`, `multiple_shock_assessment`, `MultipleShockResult.report`).
+`injury_probability`, `multiple_shock_assessment`,
+`MultipleShockResult.report`).
+</ScopeClaim>
 
-**Not covered.** The Annex A / Annex E finite-element model for the *less
-severe* exposures of clause 4 — occupants who stay seated throughout, which is
-most agricultural and earth-moving work — is distributed by ISO as separate
-software and is not implemented here; a record from that regime has no route
-through this page. Neither is the horizontal spinal model of the withdrawn 2004
-edition, so horizontal whole-body exposure goes to the r.m.s.,
-running-r.m.s./MTVV and VDV metrics of
-[Human Vibration](/phonometry/vibration/human/human-vibration/). The conditioning
-chain of section 2 is the caller's: `spinal_response` assumes a record that has
-already been sign-checked, split at the loss-of-contact boundaries,
-offset-corrected, tapered and band-limited.
+<ScopeClaim status="not-covered" label="Not covered">
+The Annex A / Annex E finite-element model for the *less severe* exposures of
+clause 4 — occupants who stay seated throughout, which is most agricultural
+and earth-moving work — is distributed by ISO as separate software and is not
+implemented here; a record from that regime has no route through this page.
+Neither is the horizontal spinal model of the withdrawn 2004 edition, so
+horizontal whole-body exposure goes to the r.m.s., running-r.m.s./MTVV and VDV
+metrics of [Human Vibration](/phonometry/vibration/human/human-vibration/).
+The conditioning chain of section 2 is the caller's: `spinal_response` assumes
+a record that has already been sign-checked, split at the loss-of-contact
+boundaries, offset-corrected, tapered and band-limited.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

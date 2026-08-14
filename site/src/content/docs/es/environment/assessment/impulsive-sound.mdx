@@ -25,9 +25,11 @@ references:
     note: "El sucesor ISO construido sobre la prominencia por tasa de crecimiento de la NT ACOU 112."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 El ruido con impulsos prominentes (martilleo, remachado, hinca de pilotes) es
 más molesto que un sonido estacionario del mismo nivel equivalente. **NT ACOU
@@ -400,26 +402,30 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** NT ACOU 112:2002: la definición de arranque (apartados 4.5 a
-4.7), la prominencia prevista $P$ (apartado 7, Fórmula 1), el ajuste
-graduado $K_I$ (apartado 8, Fórmula 2) y el nivel de evaluación sobre un
-tiempo de referencia (apartado 8, Nota 1), a través de `impulse_prominence`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+NT ACOU 112:2002: la definición de arranque (apartados 4.5 a 4.7), la
+prominencia prevista $P$ (apartado 7, Fórmula 1), el ajuste graduado $K_I$
+(apartado 8, Fórmula 2) y el nivel de evaluación sobre un tiempo de referencia
+(apartado 8, Nota 1), a través de `impulse_prominence`,
 `predicted_prominence`, `impulse_adjustment` y `rating_level`. La ISO/PAS
-1996-3:2022 está cubierta en la cadena de medida objetiva construida sobre
-la misma fórmula de prominencia: el muestreo de $L_{pAF}$, la detección y
-fusión de arranques, y la tasa de crecimiento y diferencia de nivel por
-mínimos cuadrados, a través de `impulsive_sound_adjustment` y
-`detect_onsets`.
+1996-3:2022 está cubierta en la cadena de medida objetiva construida sobre la
+misma fórmula de prominencia: el muestreo de $L_{pAF}$, la detección y fusión
+de arranques, y la tasa de crecimiento y diferencia de nivel por mínimos
+cuadrados, a través de `impulsive_sound_adjustment` y `detect_onsets`.
+</ScopeClaim>
 
-**No cubierto.** La Nota 4 (apartado 7) de la NT ACOU 112 recoge una
-directriz nórdica anterior: un ajuste plano de 5 dB basado en el juicio
-subjetivo, recomendado cuando $K_I > 3$ para ruido característico de
-operaciones de trabajo, ofrecido como alternativa cuando el método graduado
-no se puede aplicar. Solo está implementado el $K_I$ graduado de la
-Fórmula 2; la alternativa plana de 5 dB no lo está. Los ajustes por
-categoría de la Tabla A.1 de la ISO 1996-1 (5 dB regular, 12 dB altamente
-impulsiva) están cubiertos solo como la base de juicio del evaluador que
-sustituye esta medición, no como una función propia.
+<ScopeClaim status="not-covered" label="No cubierto">
+La Nota 4 (apartado 7) de la NT ACOU 112 recoge una directriz nórdica
+anterior: un ajuste plano de 5 dB basado en el juicio subjetivo, recomendado
+cuando $K_I > 3$ para ruido característico de operaciones de trabajo, ofrecido
+como alternativa cuando el método graduado no se puede aplicar. Solo está
+implementado el $K_I$ graduado de la Fórmula 2; la alternativa plana de 5 dB
+no lo está. Los ajustes por categoría de la Tabla A.1 de la ISO 1996-1 (5 dB
+regular, 12 dB altamente impulsiva) están cubiertos solo como la base de
+juicio del evaluador que sustituye esta medición, no como una función propia.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

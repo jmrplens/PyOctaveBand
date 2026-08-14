@@ -46,6 +46,8 @@ references:
     note: "The single-strike (Formulae 3–4), peak and cumulative (Formulae 8–9) sound exposure of section 3, and the mean-square sound pressure level (Formula 7) of section 1."
 ---
 
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 Underwater sound is referenced to **1 µPa** (not the 20 µPa of airborne
@@ -423,32 +425,39 @@ the published onset criteria — is
 
 ## What this guide covers
 
-**Covered.** ISO 18405:2017 for the reference levels re 1 µPa and 1 µPa²·s:
-`sound_pressure_level`, `sound_exposure_level` and `peak_sound_pressure_level`.
-ISO 17208-1:2016 and ISO 17208-2:2019 for the ship radiated noise level and the
-equivalent monopole source level: `radiated_noise_level` and
-`monopole_source_level`, with the Lloyd's-mirror surface correction
-(ISO 17208-2 Formula 3) and the 0.7·draught source depth (ISO 17208-2
-Formula 1), the three-hydrophone geometry (`hydrophone_depths`) and the
-tabulated source-level uncertainty (`source_level_uncertainty`). ISO 18406:2017
-for the pile-driving metrics of section 3: the single-strike SEL (ISO 18406
-Formulae 3-4), the mean-square SPL (ISO 18406 Formula 7) and the cumulative SEL
-(ISO 18406 Formulae 8-9), which `single_strike_sel`, `cumulative_sel`,
-`cumulative_sel_identical` and `pile_strike_metrics` compute.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 18405:2017 for the reference levels re 1 µPa and 1 µPa²·s:
+`sound_pressure_level`, `sound_exposure_level` and
+`peak_sound_pressure_level`. ISO 17208-1:2016 and ISO 17208-2:2019 for the
+ship radiated noise level and the equivalent monopole source level:
+`radiated_noise_level` and `monopole_source_level`, with the Lloyd's-mirror
+surface correction (ISO 17208-2 Formula 3) and the 0.7·draught source depth
+(ISO 17208-2 Formula 1), the three-hydrophone geometry (`hydrophone_depths`)
+and the tabulated source-level uncertainty (`source_level_uncertainty`). ISO
+18406:2017 for the pile-driving metrics of section 3: the single-strike SEL
+(ISO 18406 Formulae 3-4), the mean-square SPL (ISO 18406 Formula 7) and the
+cumulative SEL (ISO 18406 Formulae 8-9), which `single_strike_sel`,
+`cumulative_sel`, `cumulative_sel_identical` and `pile_strike_metrics`
+compute.
+</ScopeClaim>
 
-**Not covered.** ISO 17208-1's measurement discipline itself is not
-implemented: the four-run, three-hydrophone power and arithmetic averaging
-(ISO 17208-1 Formulae 8-9), the CPA and water-depth geometry checks, the ±30°
-data-window scoring and the ISO 3744-style background-noise correction described
-in section 2 above are left to the reader; the library only supplies the
-closed-form `radiated_noise_level` and `monopole_source_level` formulae. The
-same holds for the ISO 18406 survey of section 3: the deployment, instrument,
-calibration and reporting requirements are described here and enforced nowhere
-in code, and nothing checks that a strike handed to `pile_strike_metrics` came
-from a record that meets them. ISO 18406 itself excludes vibro- and sheet-piling
-from its scope, and piling in less than 4 m or more than 100 m of water
-(Clause 1), so continuous pile-driving noise has no closed form here or
-elsewhere in phonometry.
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 17208-1's measurement discipline itself is not implemented: the four-run,
+three-hydrophone power and arithmetic averaging (ISO 17208-1 Formulae 8-9),
+the CPA and water-depth geometry checks, the ±30° data-window scoring and the
+ISO 3744-style background-noise correction described in section 2 above are
+left to the reader; the library only supplies the closed-form
+`radiated_noise_level` and `monopole_source_level` formulae. The same holds
+for the ISO 18406 survey of section 3: the deployment, instrument, calibration
+and reporting requirements are described here and enforced nowhere in code,
+and nothing checks that a strike handed to `pile_strike_metrics` came from a
+record that meets them. ISO 18406 itself excludes vibro- and sheet-piling from
+its scope, and piling in less than 4 m or more than 100 m of water (Clause 1),
+so continuous pile-driving noise has no closed form here or elsewhere in
+phonometry.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

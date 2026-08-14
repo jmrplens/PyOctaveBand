@@ -18,6 +18,8 @@ references:
     note: "La norma de emisión matriz, de descarga gratuita (el PDF enlazado es la descarga gratuita): las posiciones de medida de operador y observador de la sección 2, con el Anexo D delegando la evaluación de tonos en ECMA-418-1."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Los componentes tonales del ruido de maquinaria molestan mucho más de lo que
@@ -367,26 +369,30 @@ que exija la evaluación y cita cualquier otra solo como evidencia de apoyo.
 
 ## Qué cubre esta guía
 
-**Cubierto.** ECMA-418-1:2024 (3.ª edición): los métodos de relación
-tono-ruido (apartado 11, Fórmulas 9 a 12) y relación de prominencia
-(apartado 12, Fórmulas 23 a 26) sobre espectros promediados RMS con ventana
-Hann, el modelo de banda crítica del apartado 10, los criterios de
-prominencia dependientes de la frecuencia y la combinación de tonos
-secundarios que comparten banda del apartado 11.6, todo a través de
-`tone_to_noise_ratio()` y `prominence_ratio()`. Las posiciones de micrófono del
-apartado 6 y los requisitos de instrumentación del apartado 7 están
-documentados en el §2 como las condiciones bajo las que quedan definidas las
-dos relaciones.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+ECMA-418-1:2024 (3.ª edición): los métodos de relación tono-ruido (apartado
+11, Fórmulas 9 a 12) y relación de prominencia (apartado 12, Fórmulas 23 a 26)
+sobre espectros promediados RMS con ventana Hann, el modelo de banda crítica
+del apartado 10, los criterios de prominencia dependientes de la frecuencia y
+la combinación de tonos secundarios que comparten banda del apartado 11.6,
+todo a través de `tone_to_noise_ratio()` y `prominence_ratio()`. Las
+posiciones de micrófono del apartado 6 y los requisitos de instrumentación del
+apartado 7 están documentados en el §2 como las condiciones bajo las que
+quedan definidas las dos relaciones.
+</ScopeClaim>
 
-**No cubierto.** El veredicto `prominent` que devuelven estas funciones es
-solo el criterio numérico. La norma exige además que un tono prominente se
-confirme por examen auditivo (apartados 11.8/12.8) y que supere el filtro
-del umbral inferior de audición de los apartados 8/9, que necesita niveles
-absolutos calibrados: ambas comprobaciones quedan a cargo de quien llama.
-ECMA-74:2025 está cubierta solo como la norma que delega su evaluación
-tonal en ECMA-418-1; su propio procedimiento de medida del Anexo D y las
-posiciones de operador/observador (mostradas arriba solo como contexto) no
-están implementados aquí.
+<ScopeClaim status="not-covered" label="No cubierto">
+El veredicto `prominent` que devuelven estas funciones es solo el criterio
+numérico. La norma exige además que un tono prominente se confirme por examen
+auditivo (apartados 11.8/12.8) y que supere el filtro del umbral inferior de
+audición de los apartados 8/9, que necesita niveles absolutos calibrados:
+ambas comprobaciones quedan a cargo de quien llama. ECMA-74:2025 está cubierta
+solo como la norma que delega su evaluación tonal en ECMA-418-1; su propio
+procedimiento de medida del Anexo D y las posiciones de operador/observador
+(mostradas arriba solo como contexto) no están implementados aquí.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

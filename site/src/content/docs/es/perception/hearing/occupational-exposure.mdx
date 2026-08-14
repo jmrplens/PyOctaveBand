@@ -27,8 +27,10 @@ references:
     note: "El documento de criterios de libre acceso (el PDF enlazado es la descarga gratuita) que sustenta el límite de exposición recomendado de 85 dB(A) y la justificación de conservación auditiva para medir la dosis diaria."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una jornada laboral rara vez se mide de una sola toma: el nivel de exposición
 diario sobre el que actúa la normativa hay que componerlo a partir de
@@ -511,30 +513,36 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Las tres estrategias de medición de los apartados 9-11 de la
-ISO 9612:2009, `task_based_exposure`, `job_based_exposure` y
-`full_day_exposure`, con las reglas de muestreo del apartado 9.3 y la geometría
-del micrófono de los apartados 12.3 / 12.4 enunciadas aquí como el procedimiento
-que produce sus entradas; el balance de incertidumbre del anexo C (Ecuaciones
-C.6, C.9 y C.12 con las Tablas C.4 y C.5, y $u_3$ del apartado C.6); el factor
-de cobertura unilateral $k = 1{,}65$ del apartado 14; los avisos de los
-apartados 9.3 / 10.4 y de la Tabla 1, alcanzables antes de la campaña mediante
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las tres estrategias de medición de los apartados 9-11 de la ISO 9612:2009,
+`task_based_exposure`, `job_based_exposure` y `full_day_exposure`, con las
+reglas de muestreo del apartado 9.3 y la geometría del micrófono de los
+apartados 12.3 / 12.4 enunciadas aquí como el procedimiento que produce sus
+entradas; el balance de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12
+con las Tablas C.4 y C.5, y $u_3$ del apartado C.6); el factor de cobertura
+unilateral $k = 1{,}65$ del apartado 14; los avisos de los apartados 9.3 /
+10.4 y de la Tabla 1, alcanzables antes de la campaña mediante
 `minimum_cumulative_duration_hours` y `table_c4_contribution`; y el informe de
 medición del apartado 15 a través de `ExposureResult.report()`, con la
 evaluación de la Directiva 2003/10/CE encima. Se reproducen los tres ejemplos
 resueltos de los anexos D, E y F.
+</ScopeClaim>
 
-**No cubierto.** El análisis del trabajo del apartado 7 y la colocación del
-micrófono de los apartados 12.3 / 12.4 son procedimientos, no cálculos: quedan
-en manos de quien mide, y esta guía los documenta para que los números que se le
-dan a una `Task` signifiquen algo. La Tabla B.1 se reproduce como orientación y
-es quien llama el que elige la estrategia; aquí no se aplica ninguna. La
-atenuación de los protectores auditivos (la serie ISO 4869) no se aplica, así
-que el $L_{EX,8h}$ que se calcula aquí, y la comparación con el valor límite que
-la ficha imprime sobre él, son la exposición **sin protección**, que es además
-la que quiere el modelo de pérdida auditiva de la ISO 1999. Y el anexo C no
-ofrece modelo de incertidumbre para $L_{p,Cpeak}$ (Tabla C.5, Nota 1), y por eso
-el pico se declara sin ella en lugar de con una incertidumbre nula.
+<ScopeClaim status="not-covered" label="No cubierto">
+El análisis del trabajo del apartado 7 y la colocación del micrófono de los
+apartados 12.3 / 12.4 son procedimientos, no cálculos: quedan en manos de
+quien mide, y esta guía los documenta para que los números que se le dan a una
+`Task` signifiquen algo. La Tabla B.1 se reproduce como orientación y es quien
+llama el que elige la estrategia; aquí no se aplica ninguna. La atenuación de
+los protectores auditivos (la serie ISO 4869) no se aplica, así que el
+$L_{EX,8h}$ que se calcula aquí, y la comparación con el valor límite que la
+ficha imprime sobre él, son la exposición **sin protección**, que es además la
+que quiere el modelo de pérdida auditiva de la ISO 1999. Y el anexo C no
+ofrece modelo de incertidumbre para $L_{p,Cpeak}$ (Tabla C.5, Nota 1), y por
+eso el pico se declara sin ella en lugar de con una incertidumbre nula.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

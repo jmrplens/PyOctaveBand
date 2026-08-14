@@ -32,6 +32,8 @@ references:
     note: "Las derivaciones originales de las tasas esperadas de cruces por nivel y de máximos y de la distribución de picos del ruido gaussiano que presenta la Sección 5.5 de Bendat y Piersol (su Ref. 6; las Partes I-II están en el volumen 23, 1944)."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Todo promedio de esta documentación - una [PSD](/phonometry/es/signals/spectra/spectral-analysis/), un
@@ -680,23 +682,29 @@ tranquila.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La sección 4.5.2 con la Tabla A.6 de Bendat y Piersol (el
-test de tendencia por inversiones de orden, `trend_test`, su valor p exacto
-y por aproximación normal, y el Ejemplo 4.4), el test de rachas de Wald y
-Wolfowitz (1940) (`trend_test(method="runs")`), el procedimiento de
-estacionariedad por medias cuadráticas de segmento de la sección 10.3.1.1
-con el Ejemplo 10.3 (`stationarity_test`), y las estadísticas de cruces por
-nivel y de picos de Rice (1945) de la sección 5.5 (`level_crossing_rate`,
-`peak_statistics`, el factor de irregularidad y sus límites Rayleigh y
-gaussiano para la altura de pico).
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La sección 4.5.2 con la Tabla A.6 de Bendat y Piersol (el test de tendencia
+por inversiones de orden, `trend_test`, su valor p exacto y por aproximación
+normal, y el Ejemplo 4.4), el test de rachas de Wald y Wolfowitz (1940)
+(`trend_test(method="runs")`), el procedimiento de estacionariedad por medias
+cuadráticas de segmento de la sección 10.3.1.1 con el Ejemplo 10.3
+(`stationarity_test`), y las estadísticas de cruces por nivel y de picos de
+Rice (1945) de la sección 5.5 (`level_crossing_rate`, `peak_statistics`, el
+factor de irregularidad y sus límites Rayleigh y gaussiano para la altura de
+pico).
+</ScopeClaim>
 
-**No cubierto.** La sección 10.3 del libro se titula «cualificación de
-datos» en un sentido más amplio y también cubre la clasificación, la
-validación y la edición de registros; `phonometry.metrology` implementa
-solo su núcleo cuantitativo, el test de estacionariedad por medias
-cuadráticas. Clasificar el tipo de un registro, validarlo frente a límites
-físicos o editar transitorios espurios siguen siendo pasos manuales tal
-como los describe el libro, fuera de este módulo.
+<ScopeClaim status="not-covered" label="No cubierto">
+La sección 10.3 del libro se titula «cualificación de datos» en un sentido más
+amplio y también cubre la clasificación, la validación y la edición de
+registros; `phonometry.metrology` implementa solo su núcleo cuantitativo, el
+test de estacionariedad por medias cuadráticas. Clasificar el tipo de un
+registro, validarlo frente a límites físicos o editar transitorios espurios
+siguen siendo pasos manuales tal como los describe el libro, fuera de este
+módulo.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

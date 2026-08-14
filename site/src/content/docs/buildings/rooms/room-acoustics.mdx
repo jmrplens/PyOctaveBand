@@ -46,9 +46,11 @@ references:
     note: "The accuracy grades and the dynamic-range criterion behind the decay analysis; its position rules are applied in the room-impulse-response guide."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Room acoustics starts from one measurement: the **impulse response** (IR)
 between a source and a receiver. Filter it into bands and integrate it, and
@@ -634,25 +636,29 @@ workstations
 
 ## What this guide covers
 
-**Covered.** ISO 3382-1:2009 (clause 5.3.3 backward integration and the
-Annex A parameter formulae) and ISO 3382-2:2008 (Clause 6 and the 5.3.3
-dynamic-range criterion), computed by
-`room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50,
-Ts and the per-band validity and curvature flags, with the optional
-zero-phase band filtering of the ISO 3382-2 §7.3 NOTE, and the one-page
-ISO 3382 fiche through `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 3382-1:2009 (clause 5.3.3 backward integration and the Annex A parameter
+formulae) and ISO 3382-2:2008 (Clause 6 and the 5.3.3 dynamic-range
+criterion), computed by `room.room_parameters`/`room.decay_curve`: EDT, T20,
+T30, C50, C80, D50, Ts and the per-band validity and curvature flags, with the
+optional zero-phase band filtering of the ISO 3382-2 §7.3 NOTE, and the
+one-page ISO 3382 fiche through `.report()`.
+</ScopeClaim>
 
-**Not covered.** ISO 3382-1 Annex A also defines the sound-strength $G$ and
-the binaural parameters LF/LFC and IACC; phonometry implements only the
-reverberance and clarity family named above (EDT, T20, T30, C50, C80, D50,
-Ts). The acquisition of the impulse response (ISO 18233) and the open-plan
-quantities (ISO 3382-3) have guides of their own,
-[Measuring the Room Impulse Response](/phonometry/buildings/rooms/room-impulse-response/)
-and
-[Open-Plan Office Acoustics](/phonometry/buildings/rooms/open-plan-acoustics/). The
-ISO 354 reverberation-room absorption that consumes the measured
-$T_1$/$T_2$ pair lives in
-[Sound Absorption Measurement and Rating](/phonometry/materials/absorbers/absorption-measurement/).
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 3382-1 Annex A also defines the sound-strength $G$ and the binaural
+parameters LF/LFC and IACC; phonometry implements only the reverberance and
+clarity family named above (EDT, T20, T30, C50, C80, D50, Ts). The acquisition
+of the impulse response (ISO 18233) and the open-plan quantities (ISO 3382-3)
+have guides of their own, [Measuring the Room Impulse
+Response](/phonometry/buildings/rooms/room-impulse-response/) and [Open-Plan
+Office Acoustics](/phonometry/buildings/rooms/open-plan-acoustics/). The ISO
+354 reverberation-room absorption that consumes the measured $T_1$/$T_2$ pair
+lives in [Sound Absorption Measurement and
+Rating](/phonometry/materials/absorbers/absorption-measurement/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

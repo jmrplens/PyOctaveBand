@@ -39,8 +39,10 @@ references:
     note: "The normative NC curves and tangency method (Table 1), plus, from the informative Annex D, the RC Mark II curves (Table D.1), the mid-frequency-average rating (clause D.4) and the neutral/rumble/hiss spectral tag (clause D.3), that this module implements."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Steady background noise in an occupied room (from ventilation, diffusers or
 distant traffic) is rated against a family of **octave-band criterion curves**.
@@ -533,27 +535,32 @@ repository; click a preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** ANSI/ASA S12.2-2019 Table 1 and clauses 5.2.2/5.2.3 — the
-NC-(SIL) designation and the tangency method with its governing band — through
-`room.noise_criterion`; and the informative Annex D RC Mark II family of
-Table D.1 (`room.rc_curve`) with the clause D.4 mid-frequency-average rating
-and the clause D.3 neutral/rumble/hiss tag, through `room.room_criterion`.
-Both work over the ten octave bands from 16 Hz to 8 kHz, and each result
-renders its own one-page fiche through `.report()`. The clause 5.2.5
-measurement conditions, the clause 5.2.4 low-frequency-excess procedure and
-the Annex C / Annex D criterion tables are quoted here for planning and
-reading.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ANSI/ASA S12.2-2019 Table 1 and clauses 5.2.2/5.2.3 — the NC-(SIL) designation
+and the tangency method with its governing band — through
+`room.noise_criterion`; and the informative Annex D RC Mark II family of Table
+D.1 (`room.rc_curve`) with the clause D.4 mid-frequency-average rating and the
+clause D.3 neutral/rumble/hiss tag, through `room.room_criterion`. Both work
+over the ten octave bands from 16 Hz to 8 kHz, and each result renders its own
+one-page fiche through `.report()`. The clause 5.2.5 measurement conditions,
+the clause 5.2.4 low-frequency-excess procedure and the Annex C / Annex D
+criterion tables are quoted here for planning and reading.
+</ScopeClaim>
 
-**Not covered.** The clause 5.3.2 screening test is described in section 1 but
-not implemented: the reader must perform it, because a spectrum that fails it
-is outside the domain of both functions. The balanced noise criteria (NCB),
-the room noise criterion for fluctuating low-frequency noise (RNC, which needs
-a time series rather than a single spectrum), the vibration/rattle tag ($RV$,
-which needs the Table 6 test) and the numeric quality-assessment index (QAI,
-which the standard defers to external references) are not part of this module.
-Neither is the NR curve family (see section 3). The criterion tables are
-reproduced only as anchors: check the standard, or the national or client
-document that governs the job, before quoting a limit.
+<ScopeClaim status="not-covered" label="Not covered">
+The clause 5.3.2 screening test is described in section 1 but not implemented:
+the reader must perform it, because a spectrum that fails it is outside the
+domain of both functions. The balanced noise criteria (NCB), the room noise
+criterion for fluctuating low-frequency noise (RNC, which needs a time series
+rather than a single spectrum), the vibration/rattle tag ($RV$, which needs
+the Table 6 test) and the numeric quality-assessment index (QAI, which the
+standard defers to external references) are not part of this module. Neither
+is the NR curve family (see section 3). The criterion tables are reproduced
+only as anchors: check the standard, or the national or client document that
+governs the job, before quoting a limit.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

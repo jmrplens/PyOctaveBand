@@ -25,9 +25,11 @@ references:
     note: "La predicción simplificada de transmisión por flancos de impactos (ejemplo resuelto E.3). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-2:2000."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Un índice de laboratorio describe un elemento aislado; un edificio también
 transmite sonido por todas las trayectorias por flancos. Esta página cubre la
@@ -612,47 +614,47 @@ ISO 16283-3 con la que se contrastan, en
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los modelos simplificados de índice global de la
-EN 12354-1:2000 (apartado 4.4) y la EN 12354-2:2000 (apartado 4.3). Aéreo: la
-suma energética de la Fórmula (26) de la trayectoria directa y las
-trayectorias por flancos mediante `building.flanking_path`,
-`building.flanking_element` y
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los modelos simplificados de índice global de la EN 12354-1:2000 (apartado
+4.4) y la EN 12354-2:2000 (apartado 4.3). Aéreo: la suma energética de la
+Fórmula (26) de la trayectoria directa y las trayectorias por flancos mediante
+`building.flanking_path`, `building.flanking_element` y
 `building.predicted_airborne_insulation`, con los índices de reducción
 vibratoria $K_{ij}$ del Anexo E (uniones rígidas en cruz y en T, capas
 intermedias flexibles, fachadas ligeras y muros de doble hoja, esquinas y
-cambios de espesor) y el límite inferior $K_{ij,\min}$ del apartado 4.4.2 mediante
-`building.junction_vibration_reduction` y
-`building.junction_min_vibration_reduction`. Impactos: la resta de la
-Fórmula (21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
+cambios de espesor) y el límite inferior $K_{ij,\min}$ del apartado 4.4.2
+mediante `building.junction_vibration_reduction` y
+`building.junction_min_vibration_reduction`. Impactos: la resta de la Fórmula
+(21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
 `building.equivalent_impact_level`, `building.impact_flanking_correction`,
-`building.predicted_impact_insulation` y
-`building.standardized_impact_level`. Ambos resultados escriben una ficha de
-predicción con `.report()`.
+`building.predicted_impact_insulation` y `building.standardized_impact_level`.
+Ambos resultados escriben una ficha de predicción con `.report()`.
+</ScopeClaim>
 
-**No cubierto.** Los modelos *detallados* por banda de ambas partes son el asunto
-de
-[Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
-la misma norma ejecutada banda a banda, con los datos de laboratorio de elemento
-y de unión convertidos a sus valores in situ antes de formar las trayectorias.
-Usa el modelo simplificado de aquí cuando solo conozcas las magnitudes globales
+<ScopeClaim status="not-covered" label="No cubierto">
+Los modelos *detallados* por banda de ambas partes son el asunto de
+[Predicción detallada por bandas (ISO
+12354)](/phonometry/es/buildings/design/detailed-prediction/): la misma norma
+ejecutada banda a banda, con los datos de laboratorio de elemento y de unión
+convertidos a sus valores in situ antes de formar las trayectorias. Usa el
+modelo simplificado de aquí cuando solo conozcas las magnitudes globales
 ponderadas de los elementos y la pregunta sea si el recinto cumple; usa el
 detallado cuando existan los espectros de elemento y la pregunta sea qué
-trayectoria fija qué banda. Los
-propios datos de los elementos ($R_w$, $\Delta R_w$, $\Delta L_w$, masa por
-unidad de superficie) se toman como dados, de datos de laboratorio o de las
-estimaciones de ley de masas de
+trayectoria fija qué banda. Los propios datos de los elementos ($R_w$,
+$\Delta R_w$, $\Delta L_w$, masa por unidad de superficie) se toman como
+dados, de datos de laboratorio o de las estimaciones de ley de masas de
 [Predicción del aislamiento de
-paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
-El resto de la familia está cubierto por sus propias guías: la EN 12354-3 y
-la EN 12354-4 a través del cerramiento del edificio en
-[Aislamiento acústico de
-fachadas](/phonometry/es/buildings/insulation/facade-insulation/),
-los equipamientos de la EN 12354-5 en
-[Ruido estructural
-instalado](/phonometry/es/buildings/design/installed-structure-borne/)
-y el modelo de absorción de la EN 12354-6 en
-[Absorción acústica en
+paneles](/phonometry/es/buildings/design/panel-sound-insulation/). El resto de
+la familia está cubierto por sus propias guías: la EN 12354-3 y la EN 12354-4
+a través del cerramiento del edificio en [Aislamiento acústico de
+fachadas](/phonometry/es/buildings/insulation/facade-insulation/), los
+equipamientos de la EN 12354-5 en [Ruido estructural
+instalado](/phonometry/es/buildings/design/installed-structure-borne/) y el
+modelo de absorción de la EN 12354-6 en [Absorción acústica en
 recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

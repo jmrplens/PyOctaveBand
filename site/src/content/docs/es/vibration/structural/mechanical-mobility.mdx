@@ -26,8 +26,10 @@ references:
     note: "El lado de medición: el procesado H1 de excitación aleatoria del 8.1.3, la calibración operacional con masa rígida del 7.5.2 (±5 %) y el criterio de error aleatorio del Anexo A (< 5 % en las resonancias). La conformidad se ancla en los valores de la calibración con masa rígida (|A| = 0,100 1/kg para 10 kg; |Y| = 1,59155e-4 m/(N·s) a 100 Hz) y el ejemplo del Anexo A (γ² = 0,8, n = 75 → ε = 4,08 %)."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La **movilidad** mecánica es el cociente complejo entre una respuesta en
 velocidad y la fuerza que la produce, $Y = v/F$. Es un miembro de una familia de
@@ -717,38 +719,43 @@ res.report(
 
 ## Qué cubre esta guía
 
-**Cubierto.** La familia de FRF de la ISO 7626-1:2011 (Tabla 1): receptancia,
-movilidad y acelerancia, con sus recíprocas fuerza-por-movimiento, que se
-convierten entre sí con `convert_frf`. También se cubren la distinción entre
-punto de excitación y transferencia, y el resonador SDOF en forma cerrada
-usado como referencia (`sdof_receptance`, `sdof_mobility`,
-`sdof_accelerance`, `resonance_frequency`, `sdof_mobility_result`), y las
-movilidades puntuales de estructura infinita que hacen de sustituto de una
-placa, una viga o un puntal reales (`infinite_plate_point_mobility`,
-`infinite_beam_point_mobility`, `infinite_beam_moment_mobility`,
-`longitudinal_rod_mobility` y sus recíprocas de impedancia, con
-`plate_bending_stiffness` y `beam_bending_wave_speed`). En el
-lado de medición también se cubre el procesado H1 de excitación aleatoria de
-la ISO 7626-2:2015 (`transfer_function`, `coherence`, compartidos con la
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La familia de FRF de la ISO 7626-1:2011 (Tabla 1): receptancia, movilidad y
+acelerancia, con sus recíprocas fuerza-por-movimiento, que se convierten entre
+sí con `convert_frf`. También se cubren la distinción entre punto de
+excitación y transferencia, y el resonador SDOF en forma cerrada usado como
+referencia (`sdof_receptance`, `sdof_mobility`, `sdof_accelerance`,
+`resonance_frequency`, `sdof_mobility_result`), y las movilidades puntuales de
+estructura infinita que hacen de sustituto de una placa, una viga o un puntal
+reales (`infinite_plate_point_mobility`, `infinite_beam_point_mobility`,
+`infinite_beam_moment_mobility`, `longitudinal_rod_mobility` y sus recíprocas
+de impedancia, con `plate_bending_stiffness` y `beam_bending_wave_speed`). En
+el lado de medición también se cubre el procesado H1 de excitación aleatoria
+de la ISO 7626-2:2015 (`transfer_function`, `coherence`, compartidos con la
 guía de electroacústica), junto con dos criterios de aceptación: la
 calibración operacional con masa rígida del 7.5.2
-(`rigid_mass_calibration_check`) y el criterio de error aleatorio del
-Anexo A (`random_error_percent`).
+(`rigid_mass_calibration_check`) y el criterio de error aleatorio del Anexo A
+(`random_error_percent`).
+</ScopeClaim>
 
-**No cubierto.** La ISO 7626-5 cubre la excitación por martillo de impacto
-como alternativa al excitador acoplado. Se nombra aquí solo como contexto:
-ninguna función sintetiza ni procesa un espectro de excitación por impacto.
-Las magnitudes matriciales *bloqueadas* de la Tabla 1, necesarias para
-sistemas de varias coordenadas, tampoco están implementadas. `convert_frf`
-devuelve solo las recíprocas *libres* elemento a elemento de la ISO 7626-1,
-3.1.4, correctas para el punto de excitación o para una sola vía, pero no
-para una matriz de FRF completa. Del procedimiento de aceptación solo se
-calculan los dos criterios anteriores: las reglas de suspensión del apartado
-5.3, el criterio de acoplo del excitador del 6.4.4, el umbral de cancelación de
-masa del 7.3 y los ensayos de linealidad, reciprocidad y punto de excitación de
-A.2 a A.4 se describen aquí y se dejan al operador, igual que la Desigualdad 3
-de la ISO 10846 se describe pero no se calcula en la
-[página de rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/).
+<ScopeClaim status="not-covered" label="No cubierto">
+La ISO 7626-5 cubre la excitación por martillo de impacto como alternativa al
+excitador acoplado. Se nombra aquí solo como contexto: ninguna función
+sintetiza ni procesa un espectro de excitación por impacto. Las magnitudes
+matriciales *bloqueadas* de la Tabla 1, necesarias para sistemas de varias
+coordenadas, tampoco están implementadas. `convert_frf` devuelve solo las
+recíprocas *libres* elemento a elemento de la ISO 7626-1, 3.1.4, correctas
+para el punto de excitación o para una sola vía, pero no para una matriz de
+FRF completa. Del procedimiento de aceptación solo se calculan los dos
+criterios anteriores: las reglas de suspensión del apartado 5.3, el criterio
+de acoplo del excitador del 6.4.4, el umbral de cancelación de masa del 7.3 y
+los ensayos de linealidad, reciprocidad y punto de excitación de A.2 a A.4 se
+describen aquí y se dejan al operador, igual que la Desigualdad 3 de la ISO
+10846 se describe pero no se calcula en la [página de rigidez de
+transferencia](/phonometry/es/vibration/structural/transfer-stiffness/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

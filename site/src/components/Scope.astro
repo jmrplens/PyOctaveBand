@@ -1,0 +1,46 @@
+---
+/**
+ * The panel that holds a page's scope declarations: the list every
+ * `## What this guide covers` / `## What this section does not cover`
+ * section (and their Spanish twins) is built from. Its children are
+ * <ScopeClaim> elements and nothing else.
+ *
+ * The section HEADING stays in the markdown above this element, and so does
+ * any framing sentence that introduces the claims. Two reasons, and the
+ * second is the important one:
+ *
+ *  - a heading emitted by a component is invisible to Starlight's table of
+ *    contents, which is built from the markdown AST, so moving it in here
+ *    would drop the section from "On this page" and lose its anchor (the
+ *    same trap src/styles/see-also.css records);
+ *  - it makes the contract exact. EVERYTHING INSIDE THIS ELEMENT IS A
+ *    CLAIM, AND NOTHING ELSE IS. That is what makes the corpus countable.
+ *
+ * MACHINE-READABILITY IS A CONTRACT, not a side effect. The rendered markup
+ * is a <ul data-scope="coverage"> whose every child is an
+ * <li data-coverage="covered"> or <li data-coverage="not-covered">, in
+ * document order, one per claim. A future audit enumerates every promise
+ * the corpus makes by walking those attributes and checking each against
+ * the library; the "not-covered" half doubles as a backlog of work nobody
+ * has claimed yet. scripts/list_coverage_claims.py is the proof the
+ * contract parses: it reads the same two attributes off the authored MDX
+ * and prints the census. Neither the attribute names nor their values may
+ * change without changing that script.
+ *
+ * Styled by src/styles/scope.css, where the visual design and the
+ * WCAG reasoning behind it are recorded.
+ */
+interface Props {
+	/**
+	 * Optional id for the panel, for a page that needs to link at the
+	 * declarations rather than at the heading above them.
+	 */
+	id?: string;
+}
+
+const { id } = Astro.props;
+---
+
+<ul class="scope-list" data-scope="coverage" id={id}>
+	<slot />
+</ul>

@@ -40,8 +40,10 @@ references:
     note: "La estructura de filas del sector para la hoja de cálculo de ruido por conductos (Tabla 8) que siguen DuctPathResult.table() y .report()."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 El ruido de la climatización no se predice, se *contabiliza*. Se parte de la
@@ -1135,12 +1137,14 @@ calculada sencillamente no sobreviven al corte.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El modelo de fuente del ventilador (`fan_sound_power`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El modelo de fuente del ventilador (`fan_sound_power`,
 `fan_efficiency_correction`, `blade_passing_frequency`,
 `fan_casing_attenuation`; Ec. 13.1 de Long con las Tablas 13.5-13.8); las
-atenuaciones del trazado (conductos rectangulares y circulares, revestidos y sin
-revestir, `flexible_duct_insertion_loss`, `elbow_insertion_loss`, `split_loss`,
-`end_reflection_loss` en los dos métodos publicados,
+atenuaciones del trazado (conductos rectangulares y circulares, revestidos y
+sin revestir, `flexible_duct_insertion_loss`, `elbow_insertion_loss`,
+`split_loss`, `end_reflection_loss` en los dos métodos publicados,
 `splitter_silencer_insertion_loss`, `plenum_attenuation`); el ruido regenerado
 (`silencer_self_noise`, `flow_noise_straight_duct`, `flow_noise_bend`,
 `diffuser_sound_power` y las reglas de cribado del capítulo 49 de ASHRAE
@@ -1148,15 +1152,17 @@ revestir, `flexible_duct_insertion_loss`, `elbow_insertion_loss`, `split_loss`,
 `room_effect` y la maquinaria de criterio; la cascada en sí (`duct_path`,
 `combine_duct_paths`, `.table()`, `.report()`); y el análisis de corte de
 `duct_modes`.
+</ScopeClaim>
 
-**No cubierto.** No se predice ningún dato de ventilador ni de unidad terminal
-allí donde lo publica el fabricante, y esta hoja espera la cifra publicada. No
-hay modelo de revestimiento disipativo: la estimación del silenciador de bafles
-es una regresión de conducto revestido y el plenum es la forma cerrada de Wells.
-Por encima del primer corte los modelos de elemento se sostienen solo sobre su
+<ScopeClaim status="not-covered" label="No cubierto">
+No se predice ningún dato de ventilador ni de unidad terminal allí donde lo
+publica el fabricante, y esta hoja espera la cifra publicada. No hay modelo de
+revestimiento disipativo: la estimación del silenciador de bafles es una
+regresión de conducto revestido y el plenum es la forma cerrada de Wells. Por
+encima del primer corte los modelos de elemento se sostienen solo sobre su
 ajuste empírico. Y **cuatro trayectos de ruido de una instalación real quedan
-por completo fuera de este cálculo**, que es la razón de que una hoja que cumple
-y un local que no suelan ser uno de ellos:
+por completo fuera de este cálculo**, que es la razón de que una hoja que
+cumple y un local que no suelan ser uno de ellos:
 
 - **La radiación por las paredes del conducto**, tratada en el apartado 4.1: un
   tronco grande que transporta baja frecuencia radiando por sus propias paredes
@@ -1171,6 +1177,8 @@ y un local que no suelan ser uno de ellos:
   [Rigidez de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/).
 - **La propia resolución por bandas de octava**, que promedia un tono de paso de
   álabes dentro de su banda y por tanto subestima cómo se juzgará un tono puro.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

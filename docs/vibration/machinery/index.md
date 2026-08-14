@@ -59,8 +59,8 @@ Pages elsewhere on the site that this section leans on:
 These are **predictions, not detections**. Nothing here decides whether a line
 is present, only where it would be if it were: the overlay is a set of
 expectations to read a measured spectrum against, and the reading is yours. A
-loaded bearing slips a little, so expect the measured peak within a per cent or
-two of the prediction rather than exactly on it.
+loaded bearing slips a little, so expect the measured peak within a per cent
+or two of the prediction rather than exactly on it.
 
 Nor is there a severity verdict. The amplitude criteria that turn a present
 line into an assessment — crest-factor and kurtosis trending, and the velocity
@@ -68,5 +68,5 @@ severity bands of ISO 10816 / ISO 20816 — are outside this module, and rotor
 balancing (ISO 21940) and order tracking are absent from the library
 altogether. One published convention differs between sources and is flagged on
 the guide rather than hidden: the pole-pass frequency is standard
-condition-monitoring practice rather than Norton's, who gives the slip frequency
-itself as the broken-bar sideband spacing.
+condition-monitoring practice rather than Norton's, who gives the slip
+frequency itself as the broken-bar sideband spacing.

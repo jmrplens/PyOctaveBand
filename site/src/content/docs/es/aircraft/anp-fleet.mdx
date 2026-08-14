@@ -18,6 +18,8 @@ references:
     note: "Las convenciones NPD y de perfil que sigue la base, y la cadena de evento único que alimentan los registros de aeronave. El PDF enlazado es la descarga gratuita; los volúmenes están catalogados en la página de documentos de ECAC (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/aircraft/airport-noise/)
@@ -371,22 +373,28 @@ desglose por segmentos funcionan igual.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Abrir la base ANP de EASA distribuida con el paquete (u otra
-exportación CSV de ANP) con `load_anp_database`; qué contiene el registro de una
-aeronave, incluidos el parámetro de potencia con el que se indexa su tabla NPD y
-el montaje de motores que lee la cadena de Doc 29; leer e interpolar la
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Abrir la base ANP de EASA distribuida con el paquete (u otra exportación CSV
+de ANP) con `load_anp_database`; qué contiene el registro de una aeronave,
+incluidos el parámetro de potencia con el que se indexa su tabla NPD y el
+montaje de motores que lee la cadena de Doc 29; leer e interpolar la
 superficie NPD con `npd_curves` y `level`; las trayectorias de punto fijo por
-defecto y sus tramos de etapa; y ejecutar el nivel de evento único y el contorno
-en malla de Doc 29 desde un identificador de aeronave con `event_level` y
-`noise_contour`.
+defecto y sus tramos de etapa; y ejecutar el nivel de evento único y el
+contorno en malla de Doc 29 desde un identificador de aeronave con
+`event_level` y `noise_contour`.
+</ScopeClaim>
 
-**No cubierto.** Los perfiles de pasos de procedimiento, que es como describen
-su despegue la mayoría de las entradas ANP: convertirlos en una trayectoria
-exige el modelo de mecánica del vuelo de Doc 9911 de la OACI, que este puente no
-implementa, así que solo las 13 aeronaves con perfil de *despegue* de punto fijo,
-y las 20 con perfil de *llegada* de punto fijo, tienen
-trayectoria lista para usar. La base además solo se lee, nunca se escribe:
-phonometry distribuye la versión 2.3 y no la actualiza.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los perfiles de pasos de procedimiento, que es como describen su despegue la
+mayoría de las entradas ANP: convertirlos en una trayectoria exige el modelo
+de mecánica del vuelo de Doc 9911 de la OACI, que este puente no implementa,
+así que solo las 13 aeronaves con perfil de *despegue* de punto fijo, y las 20
+con perfil de *llegada* de punto fijo, tienen trayectoria lista para usar. La
+base además solo se lee, nunca se escribe: phonometry distribuye la versión
+2.3 y no la actualiza.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

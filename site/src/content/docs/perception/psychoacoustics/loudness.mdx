@@ -36,9 +36,11 @@ references:
     note: "Stationary and time-varying loudness in sones from the normative Annex A.4 reference program, with the N5/N10 percentile loudness, validated against the Annex B set."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Level metrics tell you how much *sound pressure* there is; loudness tells you
 how loud a listener actually *perceives* it. This page covers the reference
@@ -411,23 +413,28 @@ model-choice table that says when to prefer each, are
 
 ## What this guide covers
 
-**Covered.** ISO 532-1:2017 (Zwicker method): the clause 4 input and
-instrumentation requirements, the stationary method of clause 5 and the
-time-varying method of clause 6 with the clause 6.4 percentile rules, ported
-from the normative Annex A.4 reference program and validated against Annex B,
-with the `n5`/`n10` percentiles, via `loudness_zwicker()` and
-`loudness_zwicker_from_spectrum()`; the clause 7 reporting list and the
-Annex D guidance for head-and-torso recordings. ISO 226:2023: Formula (1),
-Formula (2) and the Table 1 contour parameters, via
-`equal_loudness_contour()`, `loudness_level()`, `hearing_threshold()` and
-`equal_loudness_contours()`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 532-1:2017 (Zwicker method): the clause 4 input and instrumentation
+requirements, the stationary method of clause 5 and the time-varying method of
+clause 6 with the clause 6.4 percentile rules, ported from the normative Annex
+A.4 reference program and validated against Annex B, with the `n5`/`n10`
+percentiles, via `loudness_zwicker()` and `loudness_zwicker_from_spectrum()`;
+the clause 7 reporting list and the Annex D guidance for head-and-torso
+recordings. ISO 226:2023: Formula (1), Formula (2) and the Table 1 contour
+parameters, via `equal_loudness_contour()`, `loudness_level()`,
+`hearing_threshold()` and `equal_loudness_contours()`.
+</ScopeClaim>
 
-**Not covered.** The Moore-Glasberg loudness of ISO 532-2, the time-varying
-ISO 532-3 method and the Sottek Hearing Model loudness of ECMA-418-2 have
-moved to [Advanced Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/). The
-ISO 226:2023 contours describe pure tones only, and the standard defines no
+<ScopeClaim status="not-covered" label="Not covered">
+The Moore-Glasberg loudness of ISO 532-2, the time-varying ISO 532-3 method
+and the Sottek Hearing Model loudness of ECMA-418-2 have moved to [Advanced
+Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/). The ISO
+226:2023 contours describe pure tones only, and the standard defines no
 interpolation between the 29 tabulated frequencies, so `loudness_level()`
 expects one of the Table 1 frequencies.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -25,8 +25,10 @@ references:
     note: "Ejemplos 3.1 to 3.3 (pp. 171-176) are the worked case reproduced here, with the noise-phase breakdown, the annual integration and the Article 25 verdict. ISBN 978-84-283-3814-1."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Acoustic assessment in Spain does not stop at an $L_{Aeq}$. Real Decreto
 1367/2007, which develops Ley 37/2003 del Ruido, defines an index of its own,
@@ -432,18 +434,24 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$
-corrections of RD 1367/2007 (Annex I A.2 c and Annex IV A.3.3), the evaluation
-periods and the noise-phase and annual integration (Annex I A.1 and Annex IV
-A.3.4.2 b) with the regulation's own rounding, the acoustic quality objective
-(Annex II) and immission limit value (Annex III) tables, and the Article 25
-compliance check of activities and port infrastructure.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$ corrections of
+RD 1367/2007 (Annex I A.2 c and Annex IV A.3.3), the evaluation periods and
+the noise-phase and annual integration (Annex I A.1 and Annex IV A.3.4.2 b)
+with the regulation's own rounding, the acoustic quality objective (Annex II)
+and immission limit value (Annex III) tables, and the Article 25 compliance
+check of activities and port infrastructure.
+</ScopeClaim>
 
-**Not covered.** The acoustic zoning into acoustic areas, the noise maps and
-the action plans of Ley 37/2003 are planning instruments rather than
-calculations, and are out of scope. The measurement procedures themselves
-(microphone positions, series duration, number of measurements of Annex IV) are
-not implemented either: this page starts where the sound level meter ends.
+<ScopeClaim status="not-covered" label="Not covered">
+The acoustic zoning into acoustic areas, the noise maps and the action plans
+of Ley 37/2003 are planning instruments rather than calculations, and are out
+of scope. The measurement procedures themselves (microphone positions, series
+duration, number of measurements of Annex IV) are not implemented either: this
+page starts where the sound level meter ends.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

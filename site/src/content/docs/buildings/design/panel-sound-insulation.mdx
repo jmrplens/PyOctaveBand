@@ -62,6 +62,8 @@ references:
     note: "Table 1: the same tie types measured at an 85 mm cavity (butterfly 1,1 MN/m, double-triangle 4,3 MN/m), which corroborate the ordering of Table A4 but not its values, since the dynamic stiffness is defined at a given cavity width."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -973,54 +975,59 @@ Gomperts' inviscid slit valid for $w < 0.3\lambda$; Leppington "method no. 1").
 
 ## What this guide covers
 
-**Covered.** The source formulae themselves: Bies' §7.2 mass law and
-Sharp's coincidence method (Eqs 7.40/7.42/7.44) for a single panel, the
-double-wall mass-spring-mass resonance and its saturating cavity boost
-(Eqs 7.62-7.64), Hopkins' Gomperts slit and Wilson & Soroka circular-hole
-transmission coefficients with the area-weighted composite sum (Eq. 4.92),
-the Leppington/Maidanik plate radiation efficiency (Eqs 2.227-2.230), and
-the Cremer Table 5.1 point impedances and mobilities of infinite plates
-and beams with the injected-power relation, via
-`single_panel_transmission_loss`, `double_wall_transmission_loss`,
-`slit_transmission_coefficient`, `composite_transmission_loss`,
-`radiation_efficiency`, `infinite_plate_impedance`,
-`infinite_beam_mobility` and `injected_power`. Vigran's orthotropic
-chapter joins them: the coincidence range of a ribbed or corrugated panel and
-its flattened transmission loss by either the diffuse-field integral or Heckl's
-closed form (Eqs 6.107-6.113), the Timoshenko equivalent stiffnesses of a
-sinusoidal corrugation (Eq. 3.115) and the orthotropic plate eigenfrequency
-(Eq. 3.113), via `orthotropic_transmission_loss`,
-`orthotropic_critical_frequencies`, `corrugated_plate_stiffness`,
-`corrugated_plate_mass_factor` and `orthotropic_plate_resonance`. Masonry
-cavity walls add the wall-tie bridge of Hopkins' Sections 3.11.3.2 and
-4.3.5.4.1: the Table A4 dynamic stiffnesses, the tie array acting in parallel
-with the cavity air (Eq. 4.89, reached through the `tie_stiffness_per_area`
-keyword of `mass_spring_mass_resonance` and `double_wall_transmission_loss`)
-and the point-connection coupling loss factor with a linear-spring connector
-(Eqs 4.87 and 4.88), via `wall_tie_stiffness`,
-`wall_tie_stiffness_per_area` and `wall_tie_coupling_loss_factor`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The source formulae themselves: Bies' §7.2 mass law and Sharp's coincidence
+method (Eqs 7.40/7.42/7.44) for a single panel, the double-wall
+mass-spring-mass resonance and its saturating cavity boost (Eqs 7.62-7.64),
+Hopkins' Gomperts slit and Wilson & Soroka circular-hole transmission
+coefficients with the area-weighted composite sum (Eq. 4.92), the
+Leppington/Maidanik plate radiation efficiency (Eqs 2.227-2.230), and the
+Cremer Table 5.1 point impedances and mobilities of infinite plates and beams
+with the injected-power relation, via `single_panel_transmission_loss`,
+`double_wall_transmission_loss`, `slit_transmission_coefficient`,
+`composite_transmission_loss`, `radiation_efficiency`,
+`infinite_plate_impedance`, `infinite_beam_mobility` and `injected_power`.
+Vigran's orthotropic chapter joins them: the coincidence range of a ribbed or
+corrugated panel and its flattened transmission loss by either the
+diffuse-field integral or Heckl's closed form (Eqs 6.107-6.113), the
+Timoshenko equivalent stiffnesses of a sinusoidal corrugation (Eq. 3.115) and
+the orthotropic plate eigenfrequency (Eq. 3.113), via
+`orthotropic_transmission_loss`, `orthotropic_critical_frequencies`,
+`corrugated_plate_stiffness`, `corrugated_plate_mass_factor` and
+`orthotropic_plate_resonance`. Masonry cavity walls add the wall-tie bridge of
+Hopkins' Sections 3.11.3.2 and 4.3.5.4.1: the Table A4 dynamic stiffnesses,
+the tie array acting in parallel with the cavity air (Eq. 4.89, reached
+through the `tie_stiffness_per_area` keyword of `mass_spring_mass_resonance`
+and `double_wall_transmission_loss`) and the point-connection coupling loss
+factor with a linear-spring connector (Eqs 4.87 and 4.88), via
+`wall_tie_stiffness`, `wall_tie_stiffness_per_area` and
+`wall_tie_coupling_loss_factor`.
+</ScopeClaim>
 
-**Not covered.** Each prediction stays inside the validity range its
-source states, which the guide flags but does not extend past: Sharp's
-method (and so `single_panel_transmission_loss`) is not valid below about
-$1.5\times$ the panel's first resonance, where the panel's own low-frequency
-modal behaviour, not the mass law, governs; Gomperts' slit model holds
-only for a narrow slit, $w < 0.3\lambda$, so a wide aperture falls outside
-it; and only Leppington's "method no. 1" for radiation efficiency is
-implemented, not his other published formulations.
-The orthotropic models are infinite-panel models on the same footing: below
-about $0.7f_{c1}$ Heckl's branch underestimates $R$ on small panels, and the
-2 kHz to 4 kHz dip that real corrugated cladding shows comes from resonances of
-the panel sections between the ribs, which neither route predicts. Only the
-sinusoidal ("wavy") corrugation has equivalent stiffnesses here; trapezoidal
-cladding needs its own, from the literature Vigran cites.
-The wall-tie model is on the same footing on its output side: the inputs are
-printed data, but no published sound reduction index of a bridged masonry
-cavity wall is tabulated, so the per-band penalty the ties cause has no numeric
-oracle and only the resonance shift is anchored (Hopkins Fig. 4.35, 26 Hz to
-50 Hz). The coupling loss factor is not fed into a full statistical energy
-analysis here; combining it with the airborne path would need the whole
-room-plate-cavity-plate-room chain.
+<ScopeClaim status="not-covered" label="Not covered">
+Each prediction stays inside the validity range its source states, which the
+guide flags but does not extend past: Sharp's method (and so
+`single_panel_transmission_loss`) is not valid below about $1.5\times$ the
+panel's first resonance, where the panel's own low-frequency modal behaviour,
+not the mass law, governs; Gomperts' slit model holds only for a narrow slit,
+$w < 0.3\lambda$, so a wide aperture falls outside it; and only Leppington's
+"method no. 1" for radiation efficiency is implemented, not his other
+published formulations. The orthotropic models are infinite-panel models on
+the same footing: below about $0.7f_{c1}$ Heckl's branch underestimates $R$ on
+small panels, and the 2 kHz to 4 kHz dip that real corrugated cladding shows
+comes from resonances of the panel sections between the ribs, which neither
+route predicts. Only the sinusoidal ("wavy") corrugation has equivalent
+stiffnesses here; trapezoidal cladding needs its own, from the literature
+Vigran cites. The wall-tie model is on the same footing on its output side:
+the inputs are printed data, but no published sound reduction index of a
+bridged masonry cavity wall is tabulated, so the per-band penalty the ties
+cause has no numeric oracle and only the resonance shift is anchored (Hopkins
+Fig. 4.35, 26 Hz to 50 Hz). The coupling loss factor is not fed into a full
+statistical energy analysis here; combining it with the airborne path would
+need the whole room-plate-cavity-plate-room chain.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

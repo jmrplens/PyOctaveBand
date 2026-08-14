@@ -41,6 +41,8 @@ references:
     note: "The propagation model used here to carry the emission to a receiver. CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which is not ISO 9613-2."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Every strategic noise map drawn in the European Union since 2021 starts from the
@@ -589,21 +591,27 @@ level to 0,005 dB, inside the two decimals the test set prints.
 
 ## What this guide covers
 
-**Covered.** Section 2.2 of Annex II to Directive 2002/49/EC in the consolidated
-text: the traffic-flow line power (2.2.1), the vehicle power (2.2.2, 2.2.3),
-rolling noise with its studded-tyre and temperature corrections (2.2.4 to
-2.2.10), propulsion noise with the road-gradient correction (2.2.11 to 2.2.16),
-the junction correction (2.2.17, 2.2.18) and the road-surface effect (2.2.19,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Section 2.2 of Annex II to Directive 2002/49/EC in the consolidated text: the
+traffic-flow line power (2.2.1), the vehicle power (2.2.2, 2.2.3), rolling
+noise with its studded-tyre and temperature corrections (2.2.4 to 2.2.10),
+propulsion noise with the road-gradient correction (2.2.11 to 2.2.16), the
+junction correction (2.2.17, 2.2.18) and the road-surface effect (2.2.19,
 2.2.20), together with the whole Appendix F database, through
 `road_source_power`, `road_vehicle_sound_power`, `road_rolling_noise`,
 `road_propulsion_noise` and `road_surface_coefficients`.
+</ScopeClaim>
 
-**Not covered.** The railway source (2.3 and Appendix G), the industrial source
-(2.4 and Appendix H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU
-propagation method of section 2.5, which is a different model from the
-ISO 9613-2 one implemented in this library. The open vehicle category 5 has no
-coefficients in Appendix F and is therefore not modelled. How a source line is
-split into point sources is declared out of scope by the method itself.
+<ScopeClaim status="not-covered" label="Not covered">
+The railway source (2.3 and Appendix G), the industrial source (2.4 and
+Appendix H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU propagation
+method of section 2.5, which is a different model from the ISO 9613-2 one
+implemented in this library. The open vehicle category 5 has no coefficients
+in Appendix F and is therefore not modelled. How a source line is split into
+point sources is declared out of scope by the method itself.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

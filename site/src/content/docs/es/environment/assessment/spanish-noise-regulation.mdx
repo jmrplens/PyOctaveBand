@@ -25,8 +25,10 @@ references:
     note: "Los ejemplos 3.1 a 3.3 (pp. 171-176) son el caso resuelto que reproduce esta página, con el desglose de fases de ruido, la integración anual y el veredicto del artículo 25. ISBN 978-84-283-3814-1."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 La evaluación acústica en España no termina en un $L_{Aeq}$. El Real Decreto
 1367/2007, que desarrolla la Ley 37/2003 del Ruido, define un índice propio, el
@@ -438,20 +440,26 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El nivel corregido $L_{Keq,T}$ y las correcciones $K_t$, $K_f$ y
-$K_i$ del RD 1367/2007 (anexo I A.2 c y anexo IV A.3.3), los periodos
-temporales de evaluación y la integración por fases de ruido y anual (anexo I
-A.1 y anexo IV A.3.4.2 b) con el redondeo del reglamento, las tablas de
-objetivos de calidad acústica (anexo II) y de valores límite de inmisión
-(anexo III), y la comprobación de cumplimiento de actividades e
-infraestructuras portuarias del artículo 25.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El nivel corregido $L_{Keq,T}$ y las correcciones $K_t$, $K_f$ y $K_i$ del RD
+1367/2007 (anexo I A.2 c y anexo IV A.3.3), los periodos temporales de
+evaluación y la integración por fases de ruido y anual (anexo I A.1 y anexo IV
+A.3.4.2 b) con el redondeo del reglamento, las tablas de objetivos de calidad
+acústica (anexo II) y de valores límite de inmisión (anexo III), y la
+comprobación de cumplimiento de actividades e infraestructuras portuarias del
+artículo 25.
+</ScopeClaim>
 
-**No cubierto.** La zonificación acústica en áreas acústicas, los mapas de
-ruido y los planes de acción del capítulo correspondiente de la Ley 37/2003 son
-instrumentos de planificación, no cálculo, y quedan fuera. Tampoco se
-implementan los procedimientos de medición en sí (posiciones de micrófono,
-duración de las series, número de mediciones del anexo IV): esta página empieza
-donde termina el sonómetro.
+<ScopeClaim status="not-covered" label="No cubierto">
+La zonificación acústica en áreas acústicas, los mapas de ruido y los planes
+de acción del capítulo correspondiente de la Ley 37/2003 son instrumentos de
+planificación, no cálculo, y quedan fuera. Tampoco se implementan los
+procedimientos de medición en sí (posiciones de micrófono, duración de las
+series, número de mediciones del anexo IV): esta página empieza donde termina
+el sonómetro.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

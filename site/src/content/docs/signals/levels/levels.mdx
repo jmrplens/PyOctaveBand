@@ -34,6 +34,8 @@ references:
     note: "Section 2.5 (the noise measures: Leq, L10/L90 and their intended uses) and Section 2.15 (environmental noise surveys). ISBN 978-1-4987-2405-0."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A noise measurement rarely ends with a waveform: it ends with a handful of
@@ -800,20 +802,24 @@ objectively from segment mean squares.
 
 ## What this guide covers
 
-**Covered.** IEC 61672-1:2013's Fast/Slow/Impulse envelope ballistics
-behind the percentile levels, the C-weighted peak of clause 5.13
-(`lc_peak`, verified against Table 5) and the sound exposure level (`sel`,
-verified against the Table 4 $L_{AE}$ column); IEC 61252:1993's sound
-exposure and $L_{EX,8h}$ (`sound_exposure`, `lex_8h`); and the
-fractional-octave-band
-spectrogram of `OctaveFilterBank.spectrogram`.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+IEC 61672-1:2013's Fast/Slow/Impulse envelope ballistics behind the percentile
+levels, the C-weighted peak of clause 5.13 (`lc_peak`, verified against Table 5)
+and the sound exposure level (`sel`, verified against the Table 4 $L_{AE}$
+column); IEC 61252:1993's sound exposure and $L_{EX,8h}$ (`sound_exposure`,
+`lex_8h`); and the fractional-octave-band spectrogram of
+`OctaveFilterBank.spectrogram`.
+</ScopeClaim>
 
-**Not covered.** The ISO 1996-1 whole-day indicators ($L_{den}$, $L_{dn}$,
-rating
-levels) and the ISO 1996-2 determination procedures have moved to
-[Environmental Levels](/phonometry/environment/assessment/environmental-levels/). IEC
-61252 was revised in 2025; only the formulae of the implemented first
-edition (1993) are here, not the newer one.
+<ScopeClaim status="not-covered" label="Not covered">
+The ISO 1996-1 whole-day indicators ($L_{den}$, $L_{dn}$, rating levels) and
+the ISO 1996-2 determination procedures have moved to [Environmental
+Levels](/phonometry/environment/assessment/environmental-levels/). IEC 61252
+was revised in 2025; only the formulae of the implemented first edition (1993)
+are here, not the newer one.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

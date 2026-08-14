@@ -33,6 +33,8 @@ references:
     note: "Las secciones 3.1.5 y 3.4 (efectos de campo del micrófono y calibración del sonómetro: la práctica de calibración eléctrica y acústica que sigue el flujo de esta página). ISBN 978-1-4987-2405-0."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Cada nivel que devuelve esta biblioteca es tan fiable como el número que
@@ -684,20 +686,26 @@ de nada.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La IEC 60942:2017 en lo que condiciona el *factor de
-sensibilidad*: el nivel principal del calibrador que supone `target_spl`, las
-tolerancias de clase de la Tabla 2 y la Tabla A.1 citadas arriba en la discusión
-de incertidumbre y la comprobación de fluctuación de nivel a corto plazo del
-apartado 5.3.3 frente a los límites de clase 1 de la Tabla 2, que
-`sensitivity(ref, fs=fs)` ejecuta sobre la grabación de referencia.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La IEC 60942:2017 en lo que condiciona el *factor de sensibilidad*: el nivel
+principal del calibrador que supone `target_spl`, las tolerancias de clase de
+la Tabla 2 y la Tabla A.1 citadas arriba en la discusión de incertidumbre y la
+comprobación de fluctuación de nivel a corto plazo del apartado 5.3.3 frente a
+los límites de clase 1 de la Tabla 2, que `sensitivity(ref, fs=fs)` ejecuta
+sobre la grabación de referencia.
+</ScopeClaim>
 
-**No cubierto.** Los ensayos de conformidad del propio calibrador (nivel
-generado, frecuencia, distorsión y las correcciones ambientales por presión
-estática y temperatura) no están implementados, así que pasa un `target_spl` ya
-corregido cuando el manual del calibrador lo pida. Los ensayos periódicos de la
-IEC 61672-3 se citan como práctica de laboratorio, no se ejecutan: aquí nada
-verifica un sonómetro ni le asigna una clase. La parte de dBFS de esta página
-queda fuera de cualquier norma y no hace ninguna afirmación física.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los ensayos de conformidad del propio calibrador (nivel generado, frecuencia,
+distorsión y las correcciones ambientales por presión estática y temperatura)
+no están implementados, así que pasa un `target_spl` ya corregido cuando el
+manual del calibrador lo pida. Los ensayos periódicos de la IEC 61672-3 se
+citan como práctica de laboratorio, no se ejecutan: aquí nada verifica un
+sonómetro ni le asigna una clase. La parte de dBFS de esta página queda fuera
+de cualquier norma y no hace ninguna afirmación física.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

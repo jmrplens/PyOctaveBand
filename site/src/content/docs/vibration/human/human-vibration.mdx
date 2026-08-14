@@ -75,8 +75,10 @@ references:
     note: "The exposure action and limit values the daily exposure A(8) is assessed against."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Vibration transmitted to a person is evaluated with the same measurement chain
 whatever its origin: the acceleration is **frequency-weighted** to reflect how
@@ -939,16 +941,17 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** ISO 8041-1:2017 as far as it defines the frequency weightings:
-the Table 3 cascade of analog stages (Formulae (1)-(5)) that
-`frequency_weighting` and `apply_weighting` realise for all nine weightings,
-reproducing the Annex B design-goal tables. ISO 2631-1:1997 for whole-body
-vibration, covering the weighted r.m.s. $a_w$ and vibration total value $a_v$
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 8041-1:2017 as far as it defines the frequency weightings: the Table 3
+cascade of analog stages (Formulae (1)-(5)) that `frequency_weighting` and
+`apply_weighting` realise for all nine weightings, reproducing the Annex B
+design-goal tables. ISO 2631-1:1997 for whole-body vibration, covering the
+weighted r.m.s. $a_w$ and vibration total value $a_v$
 (`weighted_acceleration`, `vibration_total_value`), the MTVV, VDV, MSDV and
 crest-factor dose measures, the clause 6.3.3 comparison ratios, the Annex C
-comfort scale and the Annex D motion-sickness reading
-(`running_rms`, `motion_sickness_dose_value`), and the Annex B
-energy-equivalent magnitude
+comfort scale and the Annex D motion-sickness reading (`running_rms`,
+`motion_sickness_dose_value`), and the Annex B energy-equivalent magnitude
 (`energy_equivalent_acceleration`). ISO 2631-2:2003 (`Wm`), ISO 2631-4:2001
 (`Wb`) and ISO 5349-1/-2:2001 for hand-transmitted vibration, whose vector
 total, daily exposure $A(8)$ (`daily_vibration_exposure`,
@@ -956,15 +959,19 @@ total, daily exposure $A(8)$ (`daily_vibration_exposure`,
 (`hav_vwf_lifetime_years`) are implemented too. The Directive 2002/44/EC
 action and limit values close the assessment, written up by
 `DailyVibrationExposure.report()`.
+</ScopeClaim>
 
-**Not covered.** ISO 8041-1's own subject, the design and type-testing of
-general purpose vibration meters, is not implemented: only the
-frequency-weighting definitions are taken from it. ISO 2631-5:2018, the
-multiple-shock spinal-response and injury-risk model for whole-body
-vibration, is a separate standard with its own module: see
-[Multiple Shock Vibration](/phonometry/vibration/human/multiple-shock-vibration/) for
-records containing repeated shocks, which the r.m.s. and VDV measures on
-this page do not substitute for.
+<ScopeClaim status="not-covered" label="Not covered">
+ISO 8041-1's own subject, the design and type-testing of general purpose
+vibration meters, is not implemented: only the frequency-weighting definitions
+are taken from it. ISO 2631-5:2018, the multiple-shock spinal-response and
+injury-risk model for whole-body vibration, is a separate standard with its
+own module: see [Multiple Shock
+Vibration](/phonometry/vibration/human/multiple-shock-vibration/) for records
+containing repeated shocks, which the r.m.s. and VDV measures on this page do
+not substitute for.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

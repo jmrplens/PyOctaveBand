@@ -25,8 +25,10 @@ references:
     note: "The impact reference-curve rating and the spectrum adaptation term CI, with the enlarged-range CI,50-2500 term."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 Every sound-insulation quantity in this documentation ends its journey the
@@ -568,33 +570,39 @@ numeric fields are validated on construction by physical range.
 
 ## What this guide covers
 
-**Covered.** ISO 717-1:2020's reference-curve airborne rating (the 1 dB
-shifting rule with the 32.0 dB / 10.0 dB unfavourable-deviation caps, read
-at 500 Hz) with the Annex A spectrum adaptation terms $C$ and $C_{tr}$, via
-`building.weighted_rating`; ISO 717-2:2020's impact rating with the
-opposite deviation sign, the octave −5 dB reduction and the $C_I$ term, via
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 717-1:2020's reference-curve airborne rating (the 1 dB shifting rule with
+the 32.0 dB / 10.0 dB unfavourable-deviation caps, read at 500 Hz) with the
+Annex A spectrum adaptation terms $C$ and $C_{tr}$, via
+`building.weighted_rating`; ISO 717-2:2020's impact rating with the opposite
+deviation sign, the octave −5 dB reduction and the $C_I$ term, via
 `building.weighted_impact_rating`; the Annex B / A.2.1 enlarged-range terms
 and the 0.1 dB-step one-decimal variants via
 `building.weighted_rating_extended` and
 `building.weighted_impact_rating_extended`; and the ISO 717 fiche through
 `.report()` with the shared `ReportMetadata` container. Conformance is
 anchored on the standards' own Annex C worked examples.
+</ScopeClaim>
 
-**Not covered.** Nothing on this page measures: every function takes an
-already-measured (or predicted) band spectrum from the
+<ScopeClaim status="not-covered" label="Not covered">
+Nothing on this page measures: every function takes an already-measured (or
+predicted) band spectrum from the
 [field](/phonometry/buildings/insulation/insulation-field/),
 [laboratory](/phonometry/buildings/insulation/insulation-lab/),
 [intensity](/phonometry/buildings/insulation/insulation-intensity/),
 [survey](/phonometry/buildings/insulation/insulation-survey/) or
-[flanking](/phonometry/buildings/insulation/flanking-lab/) guides. The façade single
-number of ISO 16283-3 Annex F and the flanking $D_{n,f,w}$ reuse these
+[flanking](/phonometry/buildings/insulation/flanking-lab/) guides. The façade
+single number of ISO 16283-3 Annex F and the flanking $D_{n,f,w}$ reuse these
 engines from their own guides rather than duplicating them. One member of the
 ISO 717 family is deliberately absent: the A-weighted maximum impact level of
 **ISO 717-2:2020 Annex D**, which rates the rubber ball and the bang machine.
 It shifts no curve at all — it is an energy sum of A-weighted band levels — so
 it is not produced by either engine on this page and lives with the sources it
-rates, in
-[Heavy and Soft Impact Sources](/phonometry/buildings/insulation/heavy-impact-sources/).
+rates, in [Heavy and Soft Impact
+Sources](/phonometry/buildings/insulation/heavy-impact-sources/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

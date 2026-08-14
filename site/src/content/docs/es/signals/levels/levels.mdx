@@ -34,6 +34,8 @@ references:
     note: "La sección 2.5 (las medidas de ruido: Leq, L10/L90 y sus usos previstos) y la sección 2.15 (campañas de ruido ambiental). ISBN 978-1-4987-2405-0."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una medición de ruido rara vez termina en una forma de onda: termina en un
@@ -819,21 +821,26 @@ responden objetivamente a partir de medias cuadráticas por segmento.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La balística de envolvente Fast/Slow/Impulse de la IEC
-61672-1:2013 que hay tras los niveles percentiles, el pico ponderado C del
-apartado 5.13 (`lc_peak`, verificado frente a la Tabla 5) y el nivel de
-exposición sonora (`sel`, verificado frente a la columna $L_{AE}$ de la Tabla
-4); la exposición sonora y el LEX,8h de la IEC 61252:1993
-(`sound_exposure`, `lex_8h`); y el espectrograma en bandas de fracción
-de octava de `OctaveFilterBank.spectrogram`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La balística de envolvente Fast/Slow/Impulse de la IEC 61672-1:2013 que hay
+tras los niveles percentiles, el pico ponderado C del apartado 5.13
+(`lc_peak`, verificado frente a la Tabla 5) y el nivel de exposición sonora
+(`sel`, verificado frente a la columna $L_{AE}$ de la Tabla 4); la exposición
+sonora y el LEX,8h de la IEC 61252:1993 (`sound_exposure`, `lex_8h`); y el
+espectrograma en bandas de fracción de octava de
+`OctaveFilterBank.spectrogram`.
+</ScopeClaim>
 
-**No cubierto.** Los indicadores de jornada completa de la ISO 1996-1
-($L_{den}$, $L_{dn}$, niveles de evaluación) y los procedimientos de
-determinación de
-la ISO 1996-2 se han trasladado a
-[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/). La IEC
-61252 se revisó en 2025; aquí solo están las fórmulas de la primera edición
-implementada (1993), no las de la más reciente.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los indicadores de jornada completa de la ISO 1996-1 ($L_{den}$, $L_{dn}$,
+niveles de evaluación) y los procedimientos de determinación de la ISO 1996-2
+se han trasladado a [Niveles
+ambientales](/phonometry/es/environment/assessment/environmental-levels/). La
+IEC 61252 se revisó en 2025; aquí solo están las fórmulas de la primera
+edición implementada (1993), no las de la más reciente.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

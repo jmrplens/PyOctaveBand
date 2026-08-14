@@ -1,0 +1,91 @@
+---
+title: "Maquinaria"
+description: "Leer una máquina desde su vibración: las familias cinemáticas de rodamiento, engranaje, motor y paso de pala calculadas a partir de la geometría, y la vía de filtrado en banda y envolvente que saca un defecto del ruido de fondo."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+
+Una máquina rotativa tiene una **firma cinemática**. Toda periodicidad de su
+vibración pertenece a algo que gira, engrana o pasa, y la geometría fija la
+frecuencia antes de hacer ninguna medición: un rodamiento de quince elementos
+girando a una velocidad de eje dada tiene una frecuencia de paso de elementos
+por la pista exterior que se puede escribir, no buscar. Tres familias cubren la
+mayoría de las máquinas. En un **rodamiento de contacto rodante**, las
+frecuencias de paso de elementos por las pistas exterior e interior, la
+velocidad de la jaula y la velocidad de rotación del elemento rodante, todas
+escalando con la velocidad del eje y fijadas por el diámetro del elemento
+rodante, el diámetro primitivo y el ángulo de contacto; su suma es
+exactamente el número de
+elementos por la frecuencia de giro del eje, lo que detecta al instante una
+geometría mal tecleada. En un **par de engranajes**, la frecuencia de engrane y
+las familias de bandas laterales que distinguen un diente astillado de una
+rueda excéntrica. En **motores y rotores con palas**, las líneas de
+alimentación, deslizamiento, paso de polos y ranura del rotor de un motor de
+inducción y los tonos de paso de pala de ventiladores, soplantes y bombas, con
+los patrones lobulados de interacción de un ventilador axial entubado.
+
+La respuesta estándar para encontrar una de esas líneas bajo el ruido de banda
+ancha de una máquina en marcha es el **análisis de envolvente**, y son tres
+pasos en tres sitios. Se filtra en banda el registro alrededor de la resonancia
+de alta frecuencia del soporte que los impactos hacen sonar, se toma el espectro
+de envolvente para que la frecuencia de repetición de los impactos se convierta
+en una línea discreta — ese paso es [Cepstrum, ecos y espectro de la
+envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/), a una sección de
+distancia — y se superponen las familias cinemáticas, coloreadas por origen,
+para que un armónico del eje no pueda leerse nunca como prueba de rodamiento.
+Cuando hay que separar dos ejes antes de poder leer sus bandas laterales, el
+[Promediado síncrono en el
+tiempo](/phonometry/es/signals/spectra/synchronous-averaging/) lo hace primero.
+
+[Frecuencias de fallo en máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/)
+calcula las familias y las dibuja sobre un espectro de envolvente medido.
+
+## Páginas de esta sección
+
+- [Frecuencias de fallo en máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
+  las frecuencias del rodamiento de contacto rodante, la frecuencia de engrane
+  y sus bandas laterales, los armónicos de alimentación, deslizamiento, paso de
+  polos y ranura del rotor del motor de inducción, y los tonos de paso de pala
+  de ventiladores, soplantes y bombas, todo a partir de la geometría y de la
+  velocidad del eje (Norton y Karczub, sección 8.4).
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
+- [Cepstrum, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
+  el espectro de envolvente del que depende el flujo de trabajo de esta
+  sección, y el cepstrum que lee el rizado periódico del propio espectro.
+- [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):
+  extraer la contribución de un eje antes de leer sus bandas laterales.
+- [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):
+  el vocabulario de respuesta en frecuencia que hay detrás de la resonancia del
+  soporte que hace sonar el método de la envolvente.
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
+  adónde va la vibración de la máquina una vez que ha salido de la máquina.
+
+## Qué no cubre esta sección
+
+<Scope>
+<ScopeClaim status="not-covered">
+Estas son **previsiones, no detecciones**. Aquí nada decide si una línea está
+presente, solo dónde estaría si lo estuviera: la superposición es un conjunto
+de expectativas contra las que leer un espectro medido, y la lectura es tuya.
+Un rodamiento cargado desliza un poco, así que espera el pico medido a un uno
+o dos por ciento de la previsión y no exactamente encima.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+Tampoco hay ningún veredicto de severidad. Los criterios de amplitud que
+convierten una línea presente en una valoración — las tendencias del factor de
+cresta y de la curtosis, y las bandas de severidad en velocidad de las ISO
+10816 / ISO 20816 — quedan fuera de este módulo, y el equilibrado de rotores
+(ISO 21940) y el seguimiento de órdenes faltan en la biblioteca por completo.
+Un convenio publicado difiere entre fuentes y se señala en la guía en vez de
+esconderse: la frecuencia de paso de polos es práctica habitual del
+mantenimiento predictivo y no de Norton, que da la propia frecuencia de
+deslizamiento como espaciado de las bandas laterales de una barra rota.
+</ScopeClaim>
+</Scope>
+

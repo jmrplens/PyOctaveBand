@@ -91,16 +91,16 @@ and they have a topic of their own:
 
 ## What this section does not cover
 
-Only the source side of CNOSSOS-EU Annex II is implemented, and only two of its
-four sources. The **industrial source** of section 2.4 and Appendix H, and the
-**aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft noise
-is covered by the ICAO and ECAC methods in [Aircraft
+Only the source side of CNOSSOS-EU Annex II is implemented, and only two of
+its four sources. The **industrial source** of section 2.4 and Appendix H, and
+the **aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft
+noise is covered by the ICAO and ECAC methods in [Aircraft
 noise](../aircraft/index.md), which is a different family of models, and a
 non-vehicle machine is characterised as a sound power in [Sources and
 devices](../devices/emission/index.md). The **CNOSSOS propagation method** of
-section 2.5 is not implemented either: the path here is ISO 9613-2, a different
-model, so a chain built from CNOSSOS sources and this library's propagation is
-not a CNOSSOS calculation and should not be reported as one.
+section 2.5 is not implemented either: the path here is ISO 9613-2, a
+different model, so a chain built from CNOSSOS sources and this library's
+propagation is not a CNOSSOS calculation and should not be reported as one.
 
 Nothing here is a mapping engine. There is no terrain model, no city geometry
 and no GIS layer: the propagation functions take one source, one receiver and
@@ -110,8 +110,9 @@ CNOSSOS itself. On the assessment side, the library starts where the sound
 level meter stops — the ISO 1996-2 receiver positions and façade corrections,
 and the RD 1367/2007 Annex IV measurement procedures (microphone positions,
 series duration, number of measurements), are not implemented, only the
-arithmetic that follows once you have applied them. Acoustic zoning, noise maps
-and action plans under Ley 37/2003 are planning instruments, not calculations.
+arithmetic that follows once you have applied them. Acoustic zoning, noise
+maps and action plans under Ley 37/2003 are planning instruments, not
+calculations.
 
 ## Before and after these pages
 

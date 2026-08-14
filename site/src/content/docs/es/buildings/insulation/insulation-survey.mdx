@@ -18,8 +18,10 @@ references:
     note: "El método de control en campo: la corrección por índice de reverberación, las magnitudes aérea, de impacto y de fachada estandarizadas/normalizadas, y el ruido de equipamientos. Las fórmulas y la tabla del índice de reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 No toda pregunta merece una medición de ingeniería completa. Cuando una
 disputa necesita un número esta misma tarde, ISO 10052 cambia exactitud por
@@ -425,35 +427,40 @@ plt.show()
 
 ## Qué cubre esta guía
 
-**Cubierto.** El método de control de ISO 10052:2021: el índice de
-reverberación $k = 10\log_{10}(T/T_0)$ medido con
-`building.reverberation_index` o estimado desde las clases de recinto de la
-Tabla 3 con `building.estimate_reverberation_index`; las magnitudes de
-control aéreas, de impacto y de fachada ($D_{nT}$, $D_n$, $R'$ con la regla
-$V/7,5$, $L'_{nT}$, $L'_n$, $D_{2m,nT}$) mediante
-`building.survey_airborne_insulation`, `building.survey_impact_insulation`
-y `building.survey_facade_insulation`; el ruido de equipamiento $L_{XY}$
-desde exactamente tres posiciones mediante
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El método de control de ISO 10052:2021: el índice de reverberación
+$k = 10\log_{10}(T/T_0)$ medido con `building.reverberation_index` o estimado
+desde las clases de recinto de la Tabla 3 con
+`building.estimate_reverberation_index`; las magnitudes de control aéreas, de
+impacto y de fachada ($D_{nT}$, $D_n$, $R'$ con la regla $V/7,5$, $L'_{nT}$,
+$L'_n$, $D_{2m,nT}$) mediante `building.survey_airborne_insulation`,
+`building.survey_impact_insulation` y `building.survey_facade_insulation`; el
+ruido de equipamiento $L_{XY}$ desde exactamente tres posiciones mediante
 `building.survey_service_equipment_level`; los índices ISO 717 automáticos
 sobre espectros de 5 octavas o 16 tercios; y las fichas del método con
 `.report()`.
+</ScopeClaim>
 
-**No cubierto.** El procedimiento de control de
-[Realizar el control](#realizar-el-control-apartados-5-y-6) está documentado
-aquí, pero no se *comprueba*: las funciones consumen niveles por banda vengan
-de donde vengan, así que nada verifica el barrido, la esquina de la fuente, las
+<ScopeClaim status="not-covered" label="No cubierto">
+El procedimiento de control de [Realizar el
+control](#realizar-el-control-apartados-5-y-6) está documentado aquí, pero no
+se *comprueba*: las funciones consumen niveles por banda vengan de donde
+vengan, así que nada verifica el barrido, la esquina de la fuente, las
 posiciones de la máquina de impactos ni la receta de una esquina más dos
-centrales de los equipamientos. Tampoco verifica que se cumpliese el
-umbral de 6 dB de señal a fondo del apartado 6.2.1, y no se aplica corrección
-alguna cuando no se cumplió: esa es la regla del propio método, no una omisión.
-La concordancia de ± 2 dB con el método de ingeniería es la estimación de la
+centrales de los equipamientos. Tampoco verifica que se cumpliese el umbral de
+6 dB de señal a fondo del apartado 6.2.1, y no se aplica corrección alguna
+cuando no se cumplió: esa es la regla del propio método, no una omisión. La
+concordancia de ± 2 dB con el método de ingeniería es la estimación de la
 propia norma (NOTA del apartado 6.6), no algo que esta biblioteca modele ni
-propague: ningún resultado de control lleva incertidumbre. Cuando
-sube lo que hay en juego, pasa a
-[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
-cuya maquinaria de ISO 12999-1 sí produce una. El modelo de informe del Anexo A
-y los ciclos de funcionamiento de equipamientos del Anexo B también
-quedan fuera de la biblioteca.
+propague: ningún resultado de control lleva incertidumbre. Cuando sube lo que
+hay en juego, pasa a [Medición del aislamiento en campo (ISO
+16283)](/phonometry/es/buildings/insulation/insulation-field/), cuya
+maquinaria de ISO 12999-1 sí produce una. El modelo de informe del Anexo A y
+los ciclos de funcionamiento de equipamientos del Anexo B también quedan fuera
+de la biblioteca.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

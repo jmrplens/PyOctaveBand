@@ -35,9 +35,11 @@ references:
     note: "La medición por sustitución del apartado 3: la fuente, el filtro modal, la transición y el conducto de sustitución del apartado 5.2, las tres disposiciones del lado receptor del 5.2.4, las dos series del 6.2.1 con los límites de dispersión de la Tabla 6, y la pérdida por inserción límite del apartado 7.4 y el Anexo C."
 ---
 
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
-import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Un silenciador se gana el sueldo dentro de un conducto: entre un motor y su
 escape, entre un ventilador y la sala a la que sirve. Dos principios de
@@ -868,29 +870,35 @@ no.
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los silenciadores reactivos por el método de matriz de
-transferencia de cuatro polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma
-cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
-`quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
-los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
-`insertion_loss` para encadenar elementos arbitrarios, cada uno con su
-dibujo a escala `.plot_geometry()`, contrastados con la simulación FDTD
-independiente; el `plane_wave_limit` que acota a todos ellos; y, como prosa y
-no como código, la medición por sustitución de ISO 7235 que produce la pérdida
-por inserción que publica un suministrador.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los silenciadores reactivos por el método de matriz de transferencia de cuatro
+polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma cerrada `expansion_chamber`
+(Ec. (8.111)), `helmholtz_resonator` y `quarter_wave_resonator` (Ecs. (8.46),
+(8.44)), `extended_tube_chamber`, y los bloques
+`duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/ `insertion_loss`
+para encadenar elementos arbitrarios, cada uno con su dibujo a escala
+`.plot_geometry()`, contrastados con la simulación FDTD independiente; el
+`plane_wave_limit` que acota a todos ellos; y, como prosa y no como código, la
+medición por sustitución de ISO 7235 que produce la pérdida por inserción que
+publica un suministrador.
+</ScopeClaim>
 
-**No cubierto.** Solo se calculan elementos reactivos: los silenciadores
-disipativos (absorbentes, con revestimiento interior) se discuten para la
-selección pero no se modelan a partir de las propiedades del revestimiento, y
-los datos de codo revestido y plenum de los
-[métodos HVAC](/phonometry/es/devices/noise-control/noise-control/) son tablas de
-instalación interpoladas, no un modelo de revestimiento. Los efectos del
-flujo medio (convección, gradientes de temperatura, impedancia de los
-perforados dependiente del flujo) quedan fuera de las matrices de elemento
-sin flujo que se usan aquí. Nada de lo que hay en esta página es una medición:
-no se implementa ninguna parte de la ISO 7235, no se modelan ni la radiación por
-la envolvente ni las correcciones de extremo de los saltos de área, y los
-modelos de rama no tienen pérdidas salvo que se dé una `resistance`.
+<ScopeClaim status="not-covered" label="No cubierto">
+Solo se calculan elementos reactivos: los silenciadores disipativos
+(absorbentes, con revestimiento interior) se discuten para la selección pero
+no se modelan a partir de las propiedades del revestimiento, y los datos de
+codo revestido y plenum de los [métodos
+HVAC](/phonometry/es/devices/noise-control/noise-control/) son tablas de
+instalación interpoladas, no un modelo de revestimiento. Los efectos del flujo
+medio (convección, gradientes de temperatura, impedancia de los perforados
+dependiente del flujo) quedan fuera de las matrices de elemento sin flujo que
+se usan aquí. Nada de lo que hay en esta página es una medición: no se
+implementa ninguna parte de la ISO 7235, no se modelan ni la radiación por la
+envolvente ni las correcciones de extremo de los saltos de área, y los modelos
+de rama no tienen pérdidas salvo que se dé una `resistance`.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

@@ -53,8 +53,10 @@ references:
     note: "Los límites de clase sobre el índice de intensidad residual de presión detrás de verify_intensity_class, la tercera familia de verificadores que inventaría esta página."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import { totalChecks, domains, standards } from '../../../../../data/conformance-stats.mjs';
 
 Tres clases de evidencia respaldan un número calculado con esta biblioteca, y
@@ -368,25 +370,30 @@ La misma honestidad se aplica a esta biblioteca, en las dos direcciones:
 
 ## Qué cubre esta guía
 
-**Cubierto.** Qué afirma una clase de prestaciones en IEC 61672-1:2013 e
-IEC 61260-1:2014 y cómo la afirmación se encadena a través de una medición;
-los verificadores públicos (`verify_weighting_class`, `verify_filter_class`,
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Qué afirma una clase de prestaciones en IEC 61672-1:2013 e IEC 61260-1:2014 y
+cómo la afirmación se encadena a través de una medición; los verificadores
+públicos (`verify_weighting_class`, `verify_filter_class`,
 `verify_intensity_class`, con `weighting_class_limits` y `class_limits`
 publicando las máscaras, y `filter_class_compliance` /
-`intensity_class_compliance` añadiendo `.plot()` y la ficha acreditada);
-cómo leer y citar el informe de conformidad publicado; y el alcance
-verificado de las partes de ensayo de tipo y de ensayos periódicos.
+`intensity_class_compliance` añadiendo `.plot()` y la ficha acreditada); cómo
+leer y citar el informe de conformidad publicado; y el alcance verificado de
+las partes de ensayo de tipo y de ensayos periódicos.
+</ScopeClaim>
 
-**No cubierto.** Las matemáticas de verificación de cada etapa, que
-pertenecen a la guía de esa etapa
-([Ponderación frecuencial](/phonometry/es/signals/levels/weighting/),
+<ScopeClaim status="not-covered" label="No cubierto">
+Las matemáticas de verificación de cada etapa, que pertenecen a la guía de esa
+etapa ([Ponderación frecuencial](/phonometry/es/signals/levels/weighting/),
 [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/),
-[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/),
-[Intensidad acústica](/phonometry/es/devices/emission/intensity/)); y todos los
-ensayos de las propias Partes 2 y 3, que esta página delimita pero la
-biblioteca no realiza: no se ejecuta ningún ensayo ambiental, de inmunidad,
-acústico ni de linealidad, y a ningún instrumento físico se le asigna una
-clase.
+[Verificación de clase de
+filtros](/phonometry/es/signals/filters/filter-compliance/), [Intensidad
+acústica](/phonometry/es/devices/emission/intensity/)); y todos los ensayos de
+las propias Partes 2 y 3, que esta página delimita pero la biblioteca no
+realiza: no se ejecuta ningún ensayo ambiental, de inmunidad, acústico ni de
+linealidad, y a ningún instrumento físico se le asigna una clase.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

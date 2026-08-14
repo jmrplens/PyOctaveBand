@@ -33,9 +33,11 @@ references:
     note: "The four-microphone transfer-matrix method of section 4 behind the transmission-loss helpers. The edition implemented here; since revised as ASTM E2611-24 (https://store.astm.org/e2611-24.html)."
 ---
 
-import Video from '../../../../components/Video.astro';
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 The impedance tube is the materials laboratory shrunk to a bench: a rigid duct
 a few centimetres across in which a loudspeaker drives a single plane wave
@@ -951,15 +953,17 @@ resolve.
 
 ## What this guide covers
 
-**Covered.** The impedance-tube trio. The ISO 10534-1 standing-wave-ratio
-method (`standing_wave_ratio_from_level`, `standing_wave_reflection_magnitude`,
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The impedance-tube trio. The ISO 10534-1 standing-wave-ratio method
+(`standing_wave_ratio_from_level`, `standing_wave_reflection_magnitude`,
 `standing_wave_absorption`, and the position half of the reading in
-`standing_wave_reflection` and `standing_wave_normalized_impedance`). The
-ISO 10534-2 transfer-function method with its
-Clause 4 frequency-range check (`two_microphone_impedance`,
-`plane_wave_frequency_range`, `reflection_factor`, `absorption_from_reflection`,
-`normalized_surface_impedance`, `normalized_surface_admittance`, the Clause 7.2
-air properties `speed_of_sound_iso` and `air_density_iso`, the Clause 7.5
+`standing_wave_reflection` and `standing_wave_normalized_impedance`). The ISO
+10534-2 transfer-function method with its Clause 4 frequency-range check
+(`two_microphone_impedance`, `plane_wave_frequency_range`,
+`reflection_factor`, `absorption_from_reflection`,
+`normalized_surface_impedance`, `normalized_surface_admittance`, the Clause
+7.2 air properties `speed_of_sound_iso` and `air_density_iso`, the Clause 7.5
 mismatch pair `mic_calibration_factor` and `apply_mic_calibration`, and
 `tube_attenuation_constant`). The ASTM E2611 four-microphone transfer-matrix
 method (`transfer_matrix_two_load`, `transfer_matrix_one_load`,
@@ -967,24 +971,27 @@ method (`transfer_matrix_two_load`, `transfer_matrix_one_load`,
 with the to-scale geometry drawings of both tubes. The virtual FDTD tubes of
 section 5, whose recovered spectra are cross-checked against the analytic
 answer on every commit.
+</ScopeClaim>
 
-**Not covered.** Two editions cited only as later revisions are not
-implemented: ISO 10534-2:2023 (the code follows the 1998/2001
-transfer-function method) and ASTM E2611-24 (the code follows E2611-19).
-ISO 10534-1:1996 is implemented as its European adoption
-BS EN ISO 10534-1:2001, not read directly from the 1996 ISO text; its
-probe-traverse refinements (extrapolating the minimum levels to the sample
-face, probe-body corrections) are described in section 2 but not automated.
-Neither are the equipment and procedure clauses of sections 1.1 and 3.2: the
-near-field distances of Clause 4.3, the position tolerances of Clause 4.5, the
-signal-to-noise floor of Clause 7.3 and the warm-up of Clause 5 are stated for
-the operator, and nothing in the library checks that any of them was met.
-`tube_attenuation_constant` implements only the Eq. (A.18) estimate, which the
-standard itself calls a lower limit; the measured determination of
-Eqs. (A.13)/(A.14) from the empty tube is not implemented.
-The random-incidence $\alpha_s$ of the reverberation room is a different
-quantity with its own guide:
-[Sound Absorption Measurement and Rating](/phonometry/materials/absorbers/absorption-measurement/).
+<ScopeClaim status="not-covered" label="Not covered">
+Two editions cited only as later revisions are not implemented: ISO
+10534-2:2023 (the code follows the 1998/2001 transfer-function method) and
+ASTM E2611-24 (the code follows E2611-19). ISO 10534-1:1996 is implemented as
+its European adoption BS EN ISO 10534-1:2001, not read directly from the 1996
+ISO text; its probe-traverse refinements (extrapolating the minimum levels to
+the sample face, probe-body corrections) are described in section 2 but not
+automated. Neither are the equipment and procedure clauses of sections 1.1 and
+3.2: the near-field distances of Clause 4.3, the position tolerances of Clause
+4.5, the signal-to-noise floor of Clause 7.3 and the warm-up of Clause 5 are
+stated for the operator, and nothing in the library checks that any of them
+was met. `tube_attenuation_constant` implements only the Eq. (A.18) estimate,
+which the standard itself calls a lower limit; the measured determination of
+Eqs. (A.13)/(A.14) from the empty tube is not implemented. The
+random-incidence $\alpha_s$ of the reverberation room is a different quantity
+with its own guide: [Sound Absorption Measurement and
+Rating](/phonometry/materials/absorbers/absorption-measurement/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

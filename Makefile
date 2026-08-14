@@ -164,6 +164,15 @@ snippets-static:
 hazards:
 	$(PYTHON) scripts/check_markdown_hazards.py
 
+# Every "we cover X" / "we do not cover Y" the guides declare, one line each,
+# read off the <Scope>/<ScopeClaim> markup. Not a gate: it is the list an audit
+# holds against the library, and its not-covered half is a backlog with the
+# reasoning already attached. Add `--html site/dist` after a build to read the
+# rendered pages instead, which also checks the components emitted what the
+# pages asked for.
+claims:
+	$(PYTHON) scripts/list_coverage_claims.py
+
 # Regenerate the committed Starlight API reference (site/src/content/docs/
 # reference/api + site/src/generated/api-sidebar.mjs) from the source
 # docstrings. CI fails if this drifts (see the api-docs job in python-app.yml).
@@ -254,4 +263,4 @@ check: lint security test
 .PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
-	snippets snippets-static
+	snippets snippets-static claims

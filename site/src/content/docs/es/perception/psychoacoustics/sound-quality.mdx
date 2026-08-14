@@ -26,6 +26,8 @@ references:
     note: "La tonalidad (tu_HMS, apartado 6), la aspereza (asper, apartado 7) y la intensidad de fluctuación (vacil_HMS, apartado 9, el análisis de envolvente basado en HSA) del modelo de Sottek."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Dos sonidos igual de sonoros pueden diferir aún en cuán *afilados*, cuán
@@ -615,26 +617,32 @@ matemática subyacente.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La DIN 45692:2009 mediante `sharpness_din()`: la ponderación del
-apartado 6 sobre el patrón de sonoridad específica de ISO 532-1, más las
-variantes informativas de von Bismarck y Aures del Anexo B, con los valores
-objetivo de la Tabla A.2 comprobados en CI. La ECMA-418-2:2025 sobre el
-front-end auditivo común del apartado 5: las etapas de salida de tonalidad del
-apartado 6.2 (`tonality_ecma()`), la cadena de aspereza del apartado 7
-(`roughness_ecma()`) y la intensidad de fluctuación por HSA del apartado 9
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La DIN 45692:2009 mediante `sharpness_din()`: la ponderación del apartado 6
+sobre el patrón de sonoridad específica de ISO 532-1, más las variantes
+informativas de von Bismarck y Aures del Anexo B, con los valores objetivo de
+la Tabla A.2 comprobados en CI. La ECMA-418-2:2025 sobre el front-end auditivo
+común del apartado 5: las etapas de salida de tonalidad del apartado 6.2
+(`tonality_ecma()`), la cadena de aspereza del apartado 7 (`roughness_ecma()`)
+y la intensidad de fluctuación por HSA del apartado 9
 (`fluctuation_strength_ecma()`). Cada una usa la constante de calibración
 tabulada de la norma, no un ajuste inverso al sonido de referencia.
+</ScopeClaim>
 
-**No cubierto.** Los tres puntos de entrada de ECMA-418-2 son monoaurales: las
-combinaciones binaurales de media cuadrática de la Fórmula 112 (apartado
-7.1.11) y la Fórmula 170 (apartado 9.1.15) no están implementadas, así que
-analiza cada canal por separado. La ponderación de entropía opcional del
-apartado 7.1.6 necesita una señal externa de velocidad de giro y queda fuera,
-igual que el ajuste de ±0,25 % de $c_F$ que permite la nota al pie 47. La
-sonoridad de ECMA-418-2 que comparte este front-end está en
-[Sonoridad avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/), y los modelos de intensidad de
-fluctuación de Fastl y Zwicker, en
-[Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
+<ScopeClaim status="not-covered" label="No cubierto">
+Los tres puntos de entrada de ECMA-418-2 son monoaurales: las combinaciones
+binaurales de media cuadrática de la Fórmula 112 (apartado 7.1.11) y la
+Fórmula 170 (apartado 9.1.15) no están implementadas, así que analiza cada
+canal por separado. La ponderación de entropía opcional del apartado 7.1.6
+necesita una señal externa de velocidad de giro y queda fuera, igual que el
+ajuste de ±0,25 % de $c_F$ que permite la nota al pie 47. La sonoridad de
+ECMA-418-2 que comparte este front-end está en [Sonoridad
+avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/), y los
+modelos de intensidad de fluctuación de Fastl y Zwicker, en [Molestia
+psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

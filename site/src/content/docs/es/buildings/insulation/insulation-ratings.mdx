@@ -25,8 +25,10 @@ references:
     note: "La valoración de impactos por curva de referencia y el término de adaptación espectral CI, con el término de rango ampliado CI,50-2500."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
 
 Toda magnitud de aislamiento acústico de esta documentación termina su viaje
@@ -587,34 +589,40 @@ rango físico.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El índice aéreo por curva de referencia de ISO 717-1:2020 (la
-regla de desplazamiento de 1 dB con los topes de desviaciones desfavorables
-de 32,0 dB / 10,0 dB, leído a 500 Hz) con los términos de adaptación
-espectral $C$ y $C_{tr}$ del Anexo A, mediante `building.weighted_rating`;
-el índice de impactos de ISO 717-2:2020 con el signo de desviación opuesto,
-la reducción de −5 dB en octavas y el término $C_I$, mediante
-`building.weighted_impact_rating`; los términos de rango ampliado del
-Anexo B / A.2.1 y las variantes con un decimal en pasos de 0,1 dB mediante
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El índice aéreo por curva de referencia de ISO 717-1:2020 (la regla de
+desplazamiento de 1 dB con los topes de desviaciones desfavorables de 32,0 dB
+/ 10,0 dB, leído a 500 Hz) con los términos de adaptación espectral $C$ y
+$C_{tr}$ del Anexo A, mediante `building.weighted_rating`; el índice de
+impactos de ISO 717-2:2020 con el signo de desviación opuesto, la reducción de
+−5 dB en octavas y el término $C_I$, mediante
+`building.weighted_impact_rating`; los términos de rango ampliado del Anexo B
+/ A.2.1 y las variantes con un decimal en pasos de 0,1 dB mediante
 `building.weighted_rating_extended` y
-`building.weighted_impact_rating_extended`; y la ficha ISO 717 con
-`.report()` y el contenedor compartido `ReportMetadata`. La conformidad se
-ancla en los propios ejemplos resueltos del Anexo C de las normas.
+`building.weighted_impact_rating_extended`; y la ficha ISO 717 con `.report()`
+y el contenedor compartido `ReportMetadata`. La conformidad se ancla en los
+propios ejemplos resueltos del Anexo C de las normas.
+</ScopeClaim>
 
-**No cubierto.** Nada en esta página mide: cada función toma un espectro
-por bandas ya medido (o predicho) de las guías de
+<ScopeClaim status="not-covered" label="No cubierto">
+Nada en esta página mide: cada función toma un espectro por bandas ya medido
+(o predicho) de las guías de
 [campo](/phonometry/es/buildings/insulation/insulation-field/),
 [laboratorio](/phonometry/es/buildings/insulation/insulation-lab/),
 [intensidad](/phonometry/es/buildings/insulation/insulation-intensity/),
 [método de control](/phonometry/es/buildings/insulation/insulation-survey/) o
-[flancos](/phonometry/es/buildings/insulation/flanking-lab/). El número único de fachada
-del Anexo F de ISO 16283-3 y el $D_{n,f,w}$ de flancos reutilizan estos
-motores desde sus propias guías en lugar de duplicarlos. Un miembro de la
-familia ISO 717 falta a propósito: el nivel máximo de impactos ponderado A del
-**Anexo D de ISO 717-2:2020**, que valora la pelota de caucho y la máquina de
-neumático. No desplaza curva alguna, es una suma energética de niveles de banda
-ponderados A, así que no lo produce ninguno de los dos motores de esta página y
-vive con las fuentes que valora, en
-[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+[flancos](/phonometry/es/buildings/insulation/flanking-lab/). El número único
+de fachada del Anexo F de ISO 16283-3 y el $D_{n,f,w}$ de flancos reutilizan
+estos motores desde sus propias guías en lugar de duplicarlos. Un miembro de
+la familia ISO 717 falta a propósito: el nivel máximo de impactos ponderado A
+del **Anexo D de ISO 717-2:2020**, que valora la pelota de caucho y la máquina
+de neumático. No desplaza curva alguna, es una suma energética de niveles de
+banda ponderados A, así que no lo produce ninguno de los dos motores de esta
+página y vive con las fuentes que valora, en [Fuentes de impacto pesadas y
+blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

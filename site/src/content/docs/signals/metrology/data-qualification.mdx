@@ -32,6 +32,8 @@ references:
     note: "The original derivations of the expected level-crossing and maxima rates and the peak distribution of Gaussian noise that Bendat & Piersol Section 5.5 presents (their Ref. 6; Parts I-II are in volume 23, 1944)."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Every average in this documentation - a [PSD](/phonometry/signals/spectra/spectral-analysis/), a
@@ -657,21 +659,26 @@ conscience.
 
 ## What this guide covers
 
-**Covered.** Bendat & Piersol Section 4.5.2 with Table A.6 (the reverse
-arrangement trend test, `trend_test`, its exact and normal-approximation
-p-value and Example 4.4), the Wald & Wolfowitz (1940) runs test
-(`trend_test(method="runs")`), the Section 10.3.1.1 segment mean-square
-stationarity procedure with Example 10.3 (`stationarity_test`), and the
-Rice (1945) level-crossing and peak statistics of Section 5.5
-(`level_crossing_rate`, `peak_statistics`, the irregularity factor and its
-Rayleigh/Gaussian peak-height limits).
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+Bendat & Piersol Section 4.5.2 with Table A.6 (the reverse arrangement trend
+test, `trend_test`, its exact and normal-approximation p-value and Example
+4.4), the Wald & Wolfowitz (1940) runs test (`trend_test(method="runs")`), the
+Section 10.3.1.1 segment mean-square stationarity procedure with Example 10.3
+(`stationarity_test`), and the Rice (1945) level-crossing and peak statistics
+of Section 5.5 (`level_crossing_rate`, `peak_statistics`, the irregularity
+factor and its Rayleigh/Gaussian peak-height limits).
+</ScopeClaim>
 
-**Not covered.** Section 10.3 of the book is titled "data qualification"
-more broadly and also covers classification, validation and editing
-procedures; `phonometry.metrology` implements only its quantitative core,
-the segment mean-square stationarity test. Classifying a record's type,
-validating it against physical limits, or editing out glitches stay manual
-steps the way the book describes them, outside this module.
+<ScopeClaim status="not-covered" label="Not covered">
+Section 10.3 of the book is titled "data qualification" more broadly and also
+covers classification, validation and editing procedures;
+`phonometry.metrology` implements only its quantitative core, the segment
+mean-square stationarity test. Classifying a record's type, validating it
+against physical limits, or editing out glitches stay manual steps the way the
+book describes them, outside this module.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

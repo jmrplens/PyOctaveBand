@@ -106,21 +106,21 @@ carries no diffraction, no scattering off a diffuser and no finite-impedance
 boundary, and it stops when the reflection order runs out rather than when the
 sound does. Below the Schroeder frequency, where the statistical models give
 out, what this section offers is the mode *positions* of a rigid rectangular
-box — not the field of a real room at low frequency. For that, the
-[wave simulation](../../simulation/index.md) section runs an FDTD solver on the
-actual geometry.
+box — not the field of a real room at low frequency. For that, the [wave
+simulation](../../simulation/index.md) section runs an FDTD solver on the actual
+geometry.
 
 **No auralisation, no ray tracer, no room model.** There is no geometry
 importer, no material database and no renderer: the pages take dimensions,
 coefficients and impulse responses as inputs, and give back parameters. The
-absorption coefficients themselves come from
-[Materials and surfaces](../../materials/absorbers/index.md), and the model errs
-optimistically when the room is not diffuse — outside the EN 12354-6 clause 4.6
-limits (no dimension more than five times another, opposite surfaces within a
-factor of three in absorption, object fraction below 0.2) the measured
-reverberation time can reach twice the predicted one.
+absorption coefficients themselves come from [Materials and
+surfaces](../../materials/absorbers/index.md), and the model errs optimistically
+when the room is not diffuse — outside the EN 12354-6 clause 4.6 limits (no
+dimension more than five times another, opposite surfaces within a factor of
+three in absorption, object fraction below 0.2) the measured reverberation
+time can reach twice the predicted one.
 
-Two coverage boundaries follow the standards. Only the normative clause 4 model
-of EN 12354-6 is implemented, not its informative Annex D method for irregular
-spaces. And nothing in this section measures insulation *between* rooms: that is
-[Sound insulation](../insulation/index.md).
+Two coverage boundaries follow the standards. Only the normative clause 4
+model of EN 12354-6 is implemented, not its informative Annex D method for
+irregular spaces. And nothing in this section measures insulation *between*
+rooms: that is [Sound insulation](../insulation/index.md).

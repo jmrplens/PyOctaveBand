@@ -29,6 +29,8 @@ references:
     note: "Las definiciones normalizadas (pérdida por propagación, nivel de fuente, nivel de presión acústica re 1 µPa) tras las magnitudes de esta página."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 La pérdida por transmisión en forma cerrada de la
@@ -674,28 +676,33 @@ del sonar es la razón de que todos vivan en un mismo módulo.
 
 ## Qué cubre esta guía
 
-**Cubierto.** `normal_modes`, `ray_trace` y `parabolic_equation` implementan
-los métodos numéricos de Jensen et al. (2011) para un océano estratificado
-independiente de la distancia: la suma modal de Sturm-Liouville por
-diferencias finitas (cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de
-las trayectorias de rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar
-split-step de Fourier (cap. 6), con la terminología de la ISO 18405:2017 en
-toda la página. Cada uno está validado contra una forma cerrada exacta: los
-modos de la guía de ondas ideal de presión nula, los rayos en arco de
-círculo de un gradiente lineal y la divergencia esférica en campo libre,
-más la coincidencia mutua de la pérdida por transmisión modal y de la PE.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+`normal_modes`, `ray_trace` y `parabolic_equation` implementan los métodos
+numéricos de Jensen et al. (2011) para un océano estratificado independiente
+de la distancia: la suma modal de Sturm-Liouville por diferencias finitas
+(cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de las trayectorias de
+rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar split-step de Fourier (cap.
+6), con la terminología de la ISO 18405:2017 en toda la página. Cada uno está
+validado contra una forma cerrada exacta: los modos de la guía de ondas ideal
+de presión nula, los rayos en arco de círculo de un gradiente lineal y la
+divergencia esférica en campo libre, más la coincidencia mutua de la pérdida
+por transmisión modal y de la PE.
+</ScopeClaim>
 
-**No cubierto.** Los tres métodos suponen una columna de agua independiente
-de la distancia con un contorno de presión nula (o, para los modos,
-opcionalmente rígido): no hay fondo absorbente ni elástico, ni atenuación
-del sedimento, ni batimetría real, así que los problemas dependientes de la
-distancia quedan fuera de alcance. El trazado de rayos devuelve caminos y
-tiempos de propagación, no amplitudes: la intensidad de tubo de rayos con
-correcciones de cáusticas no se calcula. La PE es la forma estándar de
-ángulos pequeños (Tappert), no una variante de gran angular de Padé. Para la
-física del lecho elástico que estos métodos fluidos dejan fuera, véase
-[Ondas elásticas y acoplamiento
+<ScopeClaim status="not-covered" label="No cubierto">
+Los tres métodos suponen una columna de agua independiente de la distancia con
+un contorno de presión nula (o, para los modos, opcionalmente rígido): no hay
+fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
+así que los problemas dependientes de la distancia quedan fuera de alcance. El
+trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes: la
+intensidad de tubo de rayos con correcciones de cáusticas no se calcula. La PE
+es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
+angular de Padé. Para la física del lecho elástico que estos métodos fluidos
+dejan fuera, véase [Ondas elásticas y acoplamiento
 fluido-sólido](/phonometry/es/simulation/elastic-waves/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

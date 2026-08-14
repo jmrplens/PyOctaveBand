@@ -29,6 +29,8 @@ references:
     note: "La referencia abierta en MATLAB (software de código abierto) usada como oráculo numérico de las comprobaciones de intensidad de fluctuación de esta página."
 ---
 
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Lo *molesto* que resulta un sonido depende de algo más que de su sonoridad.
@@ -416,27 +418,33 @@ Para **ruido de banda ancha AM** el modelo de señal sobreestima el nivel absolu
 
 ## Qué cubre esta guía
 
-**Cubierto.** Fastl y Zwicker, en *Psychoacoustics: Facts and Models*, dan el
-modelo exacto de $PA$, Ecs. 16.2-16.4 (origen Widmann 1992), que ejecuta
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Fastl y Zwicker, en *Psychoacoustics: Facts and Models*, dan el modelo exacto
+de $PA$, Ecs. 16.2-16.4 (origen Widmann 1992), que ejecuta
 `psychoacoustic_annoyance`. También dan la forma cerrada para ruido de banda
 ancha AM, Ec. 10.2, que ejecuta `fluctuation_strength_am_noise`. El modelo de
-señal de Osses et al. (2016) para la intensidad de fluctuación se ejecuta
-como `fluctuation_strength`, contrastado con los valores de su Tabla 1 y con
-la referencia SQAT. `psychoacoustic_annoyance_from_signal` deriva las cuatro
+señal de Osses et al. (2016) para la intensidad de fluctuación se ejecuta como
+`fluctuation_strength`, contrastado con los valores de su Tabla 1 y con la
+referencia SQAT. `psychoacoustic_annoyance_from_signal` deriva las cuatro
 magnitudes a partir de una señal ($N_5$ Zwicker de la ISO 532-1, $S$ de la DIN
 45692, $R$ de ECMA-418-2) y las combina con el modelo exacto.
+</ScopeClaim>
 
-**No cubierto.** El modelo de Osses 2016 no persigue explícitamente su
-exactitud para tonos FM. Aquí solo se validan estímulos AM. El front-end
-también se aparta del planteamiento exacto del artículo (tramas de 2 s,
-solape del 90 %, umbral absoluto de audición). Como resultado, un tono
-estacionario de 1 kHz marca unos 0,09 vacil en vez de 0, y el ruido de banda
-ancha estacionario marca unos 0,15-0,19 vacil. Para el ruido de banda ancha AM,
-cita `fluctuation_strength_am_noise` (§3.1) en vez de `fluctuation_strength`,
-que sobreestima ese estímulo. La intensidad de fluctuación normativa del
-modelo de Sottek del apartado 9 de ECMA-418-2 no está implementada en esta
-página: está en
-[Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
+<ScopeClaim status="not-covered" label="No cubierto">
+El modelo de Osses 2016 no persigue explícitamente su exactitud para tonos FM.
+Aquí solo se validan estímulos AM. El front-end también se aparta del
+planteamiento exacto del artículo (tramas de 2 s, solape del 90 %, umbral
+absoluto de audición). Como resultado, un tono estacionario de 1 kHz marca
+unos 0,09 vacil en vez de 0, y el ruido de banda ancha estacionario marca unos
+0,15-0,19 vacil. Para el ruido de banda ancha AM, cita
+`fluctuation_strength_am_noise` (§3.1) en vez de `fluctuation_strength`, que
+sobreestima ese estímulo. La intensidad de fluctuación normativa del modelo de
+Sottek del apartado 9 de ECMA-418-2 no está implementada en esta página: está
+en [Métricas de calidad
+sonora](/phonometry/es/perception/psychoacoustics/sound-quality/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

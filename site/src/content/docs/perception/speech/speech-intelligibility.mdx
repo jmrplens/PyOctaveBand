@@ -22,8 +22,10 @@ references:
     note: "The articulation-band experiments that the band-importance function of section 1 descends from."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The **Speech Intelligibility Index** predicts how much of a speech signal is
 audible, and therefore intelligible, to a listener in a given noise and hearing
@@ -743,32 +745,37 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** All four band procedures of ANSI S3.5-1997 (R2017): the
-critical-band method (21 bands, Table 1), the equally-contributing
-critical-band method (17 bands, Table 2), the one-third-octave-band method (18
-bands, Table 3, the default) and the octave-band method (6 bands, Table 4).
-For each: the equivalent speech, noise and hearing-threshold spectrum levels,
-the band-importance function and standard speech spectrum level, the
-self-speech masking, upward spread of masking, level-distortion factor and
-band-audibility function of clause 5, and the index of clause 6.
-`speech_intelligibility_index` (with `method=` and `band_importance=`),
-`sii_procedure`, `standard_speech_spectrum` and `standard_speech_spectra`
-implement these, and `SIIResult.report(path)` renders the ANSI S3.5-1997 fiche
-for whichever procedure was used.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+All four band procedures of ANSI S3.5-1997 (R2017): the critical-band method
+(21 bands, Table 1), the equally-contributing critical-band method (17 bands,
+Table 2), the one-third-octave-band method (18 bands, Table 3, the default)
+and the octave-band method (6 bands, Table 4). For each: the equivalent
+speech, noise and hearing-threshold spectrum levels, the band-importance
+function and standard speech spectrum level, the self-speech masking, upward
+spread of masking, level-distortion factor and band-audibility function of
+clause 5, and the index of clause 6. `speech_intelligibility_index` (with
+`method=` and `band_importance=`), `sii_procedure`, `standard_speech_spectrum`
+and `standard_speech_spectra` implement these, and `SIIResult.report(path)`
+renders the ANSI S3.5-1997 fiche for whichever procedure was used.
+</ScopeClaim>
 
-**Not covered.** The standard speech spectra for raised, loud and shout vocal
-effort are carried for the one-third-octave procedure only; Tables 1, 2 and 4
-are implemented with their normal-effort column, which is the column the
+<ScopeClaim status="not-covered" label="Not covered">
+The standard speech spectra for raised, loud and shout vocal effort are
+carried for the one-third-octave procedure only; Tables 1, 2 and 4 are
+implemented with their normal-effort column, which is the column the
 level-distortion factor of clause 5.7 needs. The tabulated band-importance
 functions are the average-speech compromise of each table; Annex B's
 alternative importance functions for specific test materials (nonsense
 syllables, monosyllabic word lists, short passages) are not shipped as
-constants, but any importance function can be applied with
-`band_importance=`. No resampling between the four band sets is provided: each
-procedure is fed spectra on its own bands. The Speech Transmission Index, a
-different metric for a transmission channel rather than listener audibility,
-is covered separately in the
-[Speech Transmission Index guide](/phonometry/perception/speech/speech-transmission/).
+constants, but any importance function can be applied with `band_importance=`.
+No resampling between the four band sets is provided: each procedure is fed
+spectra on its own bands. The Speech Transmission Index, a different metric
+for a transmission channel rather than listener audibility, is covered
+separately in the [Speech Transmission Index
+guide](/phonometry/perception/speech/speech-transmission/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 

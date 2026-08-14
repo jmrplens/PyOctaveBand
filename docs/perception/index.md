@@ -119,18 +119,18 @@ The hearing threshold, what noise does to it, and how exposure is measured.
 model on these pages predicts what a population, or a standard listener, would
 perceive from a calibrated signal: none of them runs an audiometric session,
 none diagnoses a hearing loss, and ISO 1999 explicitly declines to define a
-hearing handicap or a compensable fence — that line is national regulation, and
-nothing here applies one. Every prominence and audibility verdict is likewise
-the numeric criterion only: ECMA-418-1 also requires aural confirmation of a
-prominent tone, and that stays with you.
+hearing handicap or a compensable fence — that line is national regulation,
+and nothing here applies one. Every prominence and audibility verdict is
+likewise the numeric criterion only: ECMA-418-1 also requires aural
+confirmation of a prominent tone, and that stays with you.
 
 **Everything is monaural.** The binaural combinations of ECMA-418-2 are not
 implemented, so a two-channel recording is analysed one ear at a time, and
 nothing here models localisation, spatial release from masking or binaural
 loudness summation.
 
-**No listening test is replaced.** STOI returns the correlation-based index and
-not a percentage of words understood, because that mapping is fitted per
+**No listening test is replaced.** STOI returns the correlation-based index
+and not a percentage of words understood, because that mapping is fitted per
 listening-test corpus; the SII returns an audibility fraction and not a score;
 and no page predicts annoyance in a community, which is a social-survey
 quantity rather than a psychoacoustic one — the community indicators are

@@ -47,6 +47,8 @@ references:
     note: "A free online-book companion treatment of digital-filter design and analysis, from pole-zero geometry to filter stability."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 phonometry supports several filter types, each with its own transfer function
@@ -595,24 +597,28 @@ plt.show()
 
 ## What this guide covers
 
-**Covered.** IEC 61260-1:2014's band-edge mathematics (clauses 5.2-5.5)
-and the ISO 266:1997 preferred-frequency series behind `nominal_frequencies`.
-The library designs each band as an SOS cascade across five architectures
-(Butterworth, Chebyshev I/II, Elliptic, Bessel), plus the RBJ Audio EQ
-Cookbook's `ParametricEQ`, with band decomposition and zero-phase
-filtering.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+IEC 61260-1:2014's band-edge mathematics (clauses 5.2-5.5) and the ISO
+266:1997 preferred-frequency series behind `nominal_frequencies`. The library
+designs each band as an SOS cascade across five architectures (Butterworth,
+Chebyshev I/II, Elliptic, Bessel), plus the RBJ Audio EQ Cookbook's
+`ParametricEQ`, with band decomposition and zero-phase filtering.
+</ScopeClaim>
 
-**Not covered.** The compared responses of the five architectures, the
-full 1/1 and 1/3 octave gallery and the per-architecture usage examples,
-including the Linkwitz-Riley crossover, are
-[Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/). The
-Table 1 class acceptance masks and their verification
-have moved to
-[Filter Class Verification](/phonometry/signals/filters/filter-compliance/). Near
-Nyquist, the bilinear transform warps the frequency axis and the bank has no
-correction for it (unlike `WeightingFilter`'s `high_accuracy` option): keep
-the top band edge comfortably below Nyquist or raise `fs`, and confirm the
-margin with `verify_filter_class`.
+<ScopeClaim status="not-covered" label="Not covered">
+The compared responses of the five architectures, the full 1/1 and 1/3 octave
+gallery and the per-architecture usage examples, including the Linkwitz-Riley
+crossover, are [Filter Architecture
+Gallery](/phonometry/signals/filters/filter-gallery/). The Table 1 class
+acceptance masks and their verification have moved to [Filter Class
+Verification](/phonometry/signals/filters/filter-compliance/). Near Nyquist,
+the bilinear transform warps the frequency axis and the bank has no correction
+for it (unlike `WeightingFilter`'s `high_accuracy` option): keep the top band
+edge comfortably below Nyquist or raise `fs`, and confirm the margin with
+`verify_filter_class`.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

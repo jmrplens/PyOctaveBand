@@ -25,8 +25,10 @@ references:
     note: "The soft-ground lateral-attenuation model that Doc 29 adopts (section 4.5.4) in the single-event contour section."
 ---
 
-import Video from '../../../components/Video.astro';
+import Scope from '../../../components/Scope.astro';
+import ScopeClaim from '../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 Certification measures one aeroplane at one reference point on one flight;
 an airport study asks a different question: how loud is it *there*, on that
@@ -489,29 +491,35 @@ reference workbook are reproduced end-to-end in the test suite.
 
 ## What this guide covers
 
-**Covered.** The ECAC Doc 29 single-event airport-noise chain: the NPD
-interpolation of `npd_level`/`npd_curve` (Eqs. 4-3, 4-4), the per-segment
-corrections `impedance_adjustment`, `lateral_attenuation` (SAE AIR 5662
-soft ground), `engine_installation_correction`, `duration_correction`,
-`noise_fraction` and `start_of_roll_directivity`, their assembly into
-`SEL`/$L_{Amax}$ by `event_level` and the ground-grid `noise_contour`,
-including the landing rollout, per-segment bank angle and the nearest-end
-lateral geometry. Validated to under 0.01 dB against the Doc 29 5th ed.
-Vol. 3 Part 1 reference workbook.
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ECAC Doc 29 single-event airport-noise chain: the NPD interpolation of
+`npd_level`/`npd_curve` (Eqs. 4-3, 4-4), the per-segment corrections
+`impedance_adjustment`, `lateral_attenuation` (SAE AIR 5662 soft ground),
+`engine_installation_correction`, `duration_correction`, `noise_fraction` and
+`start_of_roll_directivity`, their assembly into `SEL`/$L_{Amax}$ by
+`event_level` and the ground-grid `noise_contour`, including the landing
+rollout, per-segment bank angle and the nearest-end lateral geometry.
+Validated to under 0.01 dB against the Doc 29 5th ed. Vol. 3 Part 1 reference
+workbook.
+</ScopeClaim>
 
-**Not covered.** The chain builds single-event contours only: it does not
-assemble the cumulative multi-event indices (an $L_{den}$-style sum over a full
-flight schedule) that a complete Doc 29 noise-contour study needs on top of
-these single-event levels. NPD tables themselves are an input, not a
-prediction: the library interpolates the tables supplied for an aircraft
-type, it does not synthesise them from engine data. The EASA/EUROCONTROL ANP
-database of measured tables for real types does ship with phonometry and is
-read by [The ANP fleet database](/phonometry/aircraft/anp-fleet/), which wires
-it straight into the functions of this page. Converting NPD data to a site
-outside the §2.5 envelope (the Appendix D recalculation) is not implemented,
-and neither is the acoustically hard ground that SAE AIR 5662 excludes: the
-lateral attenuation, and with it the whole single-event chain, assumes soft
-grassy ground.
+<ScopeClaim status="not-covered" label="Not covered">
+The chain builds single-event contours only: it does not assemble the
+cumulative multi-event indices (an $L_{den}$-style sum over a full flight
+schedule) that a complete Doc 29 noise-contour study needs on top of these
+single-event levels. NPD tables themselves are an input, not a prediction: the
+library interpolates the tables supplied for an aircraft type, it does not
+synthesise them from engine data. The EASA/EUROCONTROL ANP database of
+measured tables for real types does ship with phonometry and is read by [The
+ANP fleet database](/phonometry/aircraft/anp-fleet/), which wires it straight
+into the functions of this page. Converting NPD data to a site outside the
+§2.5 envelope (the Appendix D recalculation) is not implemented, and neither
+is the acoustically hard ground that SAE AIR 5662 excludes: the lateral
+attenuation, and with it the whole single-event chain, assumes soft grassy
+ground.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

@@ -40,8 +40,10 @@ references:
     note: "Los ensayos periódicos que recibe un analizador en servicio: atenuación relativa en el centro de banda de todos los filtros, ancho de banda efectivo, rango lineal de funcionamiento y su límite inferior, bajo condiciones ambientales declaradas."
 ---
 
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Un banco de filtros solo se convierte en instrumento de medida cuando sus
 bandas se han demostrado frente a una especificación. IEC 61260-1:2014
@@ -447,27 +449,32 @@ result.report("iec61260_1995.pdf",
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los límites de aceptación de clase 1 y clase 2 de la Tabla 1
-de IEC 61260-1:2014 (con el mapeo de los puntos de quiebre a cada fracción de
-octava y la interpolación logarítmica de la norma), comprobados banda a banda
-por `verify_filter_class` y publicados como máscara por `class_limits`; la
-máscara de clase 0 de la edición retirada IEC 61260:1995 / ANSI S1.11-2004,
-accesible con `edition="1995"`; y la ficha acreditada de una página de
-`filter_class_compliance().report()`, con su veredicto opcional CUMPLE/NO CUMPLE
-frente a `required_class`, en inglés y en español.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Los límites de aceptación de clase 1 y clase 2 de la Tabla 1 de IEC
+61260-1:2014 (con el mapeo de los puntos de quiebre a cada fracción de octava
+y la interpolación logarítmica de la norma), comprobados banda a banda por
+`verify_filter_class` y publicados como máscara por `class_limits`; la máscara
+de clase 0 de la edición retirada IEC 61260:1995 / ANSI S1.11-2004, accesible
+con `edition="1995"`; y la ficha acreditada de una página de
+`filter_class_compliance().report()`, con su veredicto opcional CUMPLE/NO
+CUMPLE frente a `required_class`, en inglés y en español.
+</ScopeClaim>
 
-**No cubierto.** Los ensayos de conformidad de IEC 61260-1 sobre el filtro
-físico (recuperación de sobrecarga, linealidad del filtro, influencias
-ambientales) se aplican a filtros analógicos y digitales de hardware y no
-están implementados: `verify_filter_class` comprueba la respuesta digital
-diseñada frente a la Tabla 1, no un instrumento. Esos ensayos pertenecen a la
-IEC 61260-2:2016 (ensayo de tipo) y a la IEC 61260-3:2016 (ensayos
-periódicos), que el apartado 3b resume y que esta página no ejecuta. Cerca de
-Nyquist la
-transformada bilineal deforma el eje de frecuencia y el banco no lo corrige,
-así que la máscara de banda atenuada más allá del Nyquist de procesado se informa
-como `range_limited` en lugar de verificarse: mantén el borde de banda
-superior holgadamente por debajo de Nyquist o sube `fs`.
+<ScopeClaim status="not-covered" label="No cubierto">
+Los ensayos de conformidad de IEC 61260-1 sobre el filtro físico (recuperación
+de sobrecarga, linealidad del filtro, influencias ambientales) se aplican a
+filtros analógicos y digitales de hardware y no están implementados:
+`verify_filter_class` comprueba la respuesta digital diseñada frente a la
+Tabla 1, no un instrumento. Esos ensayos pertenecen a la IEC 61260-2:2016
+(ensayo de tipo) y a la IEC 61260-3:2016 (ensayos periódicos), que el apartado
+3b resume y que esta página no ejecuta. Cerca de Nyquist la transformada
+bilineal deforma el eje de frecuencia y el banco no lo corrige, así que la
+máscara de banda atenuada más allá del Nyquist de procesado se informa como
+`range_limited` en lugar de verificarse: mantén el borde de banda superior
+holgadamente por debajo de Nyquist o sube `fs`.
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

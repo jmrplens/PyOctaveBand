@@ -33,8 +33,10 @@ references:
     note: "The sound-absorption measurement uncertainty of section 4, validated against the standard's own worked examples (Tables 4/5)."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 Of all the numbers a materials laboratory produces, the sound-absorption
@@ -896,27 +898,29 @@ EN 12354-6 budget systematically underpredicts the installed absorption.
 
 ## What this guide covers
 
-**Covered.** The ISO 354:2003 Sabine inversion (Eqs. (5)-(9)) in
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The ISO 354:2003 Sabine inversion (Eqs. (5)-(9)) in
 `measure_sound_absorption`, and the Clause 4/8.1 conversion of an
 already-measured $T_1$/$T_2$ pair in `absorption_area` and
-`absorption_coefficient` (with `attenuation_from_alpha` for the air term).
-ISO 11654:1997's weighted absorption rating: the practical coefficient of
-Clause 4.1, the reference-curve shift of Clause 4.2, the shape indicators of
-Clause 4.3, and the Table B.1 absorption class, built by
-`weighted_absorption` and `weighted_absorption_from_third_octave`.
-ISO 12999-2:2020's measurement-uncertainty formulae (Clauses 5-8), one function
-per quantity: `sound_absorption_coefficient_uncertainty` (Formula (1)),
+`absorption_coefficient` (with `attenuation_from_alpha` for the air term). ISO
+11654:1997's weighted absorption rating: the practical coefficient of Clause
+4.1, the reference-curve shift of Clause 4.2, the shape indicators of Clause
+4.3, and the Table B.1 absorption class, built by `weighted_absorption` and
+`weighted_absorption_from_third_octave`. ISO 12999-2:2020's
+measurement-uncertainty formulae (Clauses 5-8), one function per quantity:
+`sound_absorption_coefficient_uncertainty` (Formula (1)),
 `equivalent_area_uncertainty` (Formula (2)),
 `practical_coefficient_uncertainty` (Clause 6),
 `weighted_coefficient_uncertainty` and `single_number_rating_uncertainty`
-(Clause 7), each taking `condition="reproducibility"` or `"repeatability"`
-for Formula (3), with the Table 3 coverage factor in
-`absorption_coverage_factor`.
+(Clause 7), each taking `condition="reproducibility"` or `"repeatability"` for
+Formula (3), with the Table 3 coverage factor in `absorption_coverage_factor`.
+</ScopeClaim>
 
-**Not covered.** Nothing on *this* page consumes a measured surface impedance:
-the conversion from a tube result to the statistical coefficient
-$\alpha_{st}$ lives with the prediction models
-(`statistical_absorption` for a locally reacting surface,
+<ScopeClaim status="not-covered" label="Not covered">
+Nothing on *this* page consumes a measured surface impedance: the conversion
+from a tube result to the statistical coefficient $\alpha_{st}$ lives with the
+prediction models (`statistical_absorption` for a locally reacting surface,
 `diffuse_field_absorption` for a bulk-reacting one), and neither is a
 substitute for an ISO 354 measurement, because neither reproduces the edge
 effect. The room and specimen requirements of Clause 6 and Annex A are
@@ -927,10 +931,12 @@ the microphone and source counts, and `absorption_area` /
 raise an advisory warning when the room volume or sample area falls outside
 the Clause 6 limits. Neither is the decay measurement itself in scope — the
 interrupted-noise and integrated-impulse-response methods of Clause 7 belong
-to [room acoustics](/phonometry/buildings/rooms/room-acoustics/). ISO 12999-2's
-uncertainty formula for the EN 1793-1 single-number rating
+to [room acoustics](/phonometry/buildings/rooms/room-acoustics/). ISO
+12999-2's uncertainty formula for the EN 1793-1 single-number rating
 $DL_{\alpha,\text{NRD}}$ is implemented, but EN 1793-1's own in-situ
 measurement method (road-traffic noise-reducing devices) is not.
+</ScopeClaim>
+</Scope>
 
 ## See also
 

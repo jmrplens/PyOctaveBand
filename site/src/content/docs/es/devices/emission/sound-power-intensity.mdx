@@ -26,9 +26,11 @@ references:
     note: "El método de barrido de grado 1 de la sección 2, sus indicadores de campo y el marcado de no aplicable del apartado 9.2."
 ---
 
-import Video from '../../../../../components/Video.astro';
-import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Las vías de presión hasta el nivel de potencia acústica fallan exactamente
 donde viven las máquinas: en una nave donde las líneas vecinas no se pueden
@@ -632,30 +634,36 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La determinación por barrido de ISO 9614-2
-(`sound_power_intensity`): las potencias parciales, los indicadores de
-campo $F_{pI}$ (presión-intensidad superficial) y $F_{+/-}$ (potencia parcial
-negativa), la capacidad dinámica $L_d$, el criterio de repetibilidad, el
-grado alcanzado por banda y el marcado de no aplicable del apartado 9.2
-para bandas con flujo neto entrante, con el cribado del apartado 10.6 b) del
-total ponderado A (`a_weighting_omitted_bands`). La determinación de precisión de
-ISO 9614-3 (`sound_power_intensity_precision`) con su propio marcado de no
-aplicable, sus indicadores de campo del Anexo B (`precision_field_indicators`) y
-los cinco criterios de aceptación del Anexo C (`precision_qualification`). Ambos
-resultados presentan la ficha de potencia acústica de
-estilo acreditado mediante `.report()`.
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La determinación por barrido de ISO 9614-2 (`sound_power_intensity`): las
+potencias parciales, los indicadores de campo $F_{pI}$ (presión-intensidad
+superficial) y $F_{+/-}$ (potencia parcial negativa), la capacidad dinámica
+$L_d$, el criterio de repetibilidad, el grado alcanzado por banda y el marcado
+de no aplicable del apartado 9.2 para bandas con flujo neto entrante, con el
+cribado del apartado 10.6 b) del total ponderado A
+(`a_weighting_omitted_bands`). La determinación de precisión de ISO 9614-3
+(`sound_power_intensity_precision`) con su propio marcado de no aplicable, sus
+indicadores de campo del Anexo B (`precision_field_indicators`) y los cinco
+criterios de aceptación del Anexo C (`precision_qualification`). Ambos
+resultados presentan la ficha de potencia acústica de estilo acreditado
+mediante `.report()`.
+</ScopeClaim>
 
-**No cubierto.** ISO 9614-1, el método de intensidad de puntos fijos
-discretos, no es una de las vías de aquí: solo se reutilizan sus
-indicadores de campo, y la determinación de potencia por puntos discretos
-no está implementada en absoluto; la
-[guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) cubre la
-sonda y los indicadores de campo del Anexo A que ambas partes comparten. El sesgo
-por diferencias finitas de la sonda y el índice de intensidad residual de
-presión son propiedades medidas del instrumento, cubiertas en la misma
-guía. La elección entre las seis vías, y la declaración ISO 4871 que un
-resultado alimenta, viven en
-[Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+<ScopeClaim status="not-covered" label="No cubierto">
+ISO 9614-1, el método de intensidad de puntos fijos discretos, no es una de
+las vías de aquí: solo se reutilizan sus indicadores de campo, y la
+determinación de potencia por puntos discretos no está implementada en
+absoluto; la [guía de intensidad
+acústica](/phonometry/es/devices/emission/intensity/) cubre la sonda y los
+indicadores de campo del Anexo A que ambas partes comparten. El sesgo por
+diferencias finitas de la sonda y el índice de intensidad residual de presión
+son propiedades medidas del instrumento, cubiertas en la misma guía. La
+elección entre las seis vías, y la declaración ISO 4871 que un resultado
+alimenta, viven en [Potencia
+acústica](/phonometry/es/devices/emission/sound-power/).
+</ScopeClaim>
+</Scope>
 
 ## Véase también
 

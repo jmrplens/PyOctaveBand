@@ -90,6 +90,8 @@ references:
     note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.111). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Given a porous material's **flow resistivity** (the quantity the
@@ -1242,41 +1244,47 @@ found in the sources during this work are recorded in the
 
 ## What this guide covers
 
-**Covered.** The textbook and journal methods of Mechel, Bies, Cox &
-D'Antonio, Miki (1990), Maa (1998) and Johnson, Koplik & Dashen (1987),
-implemented clean-room as described above, together with the Biot theory of
-Allard & Atalla chapters 6 and 11. That covers the
-equivalent-fluid porous models (`delany_bazley`, `miki`,
-`johnson_champoux_allard`, `limp_frame`), the poroelastic layer
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The textbook and journal methods of Mechel, Bies, Cox & D'Antonio, Miki
+(1990), Maa (1998) and Johnson, Koplik & Dashen (1987), implemented clean-room
+as described above, together with the Biot theory of Allard & Atalla chapters
+6 and 11. That covers the equivalent-fluid porous models (`delany_bazley`,
+`miki`, `johnson_champoux_allard`, `limp_frame`), the poroelastic layer
 (`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), the
-transfer-matrix multilayer solver
-(`layered_absorber` with `AirLayer`, `PorousLayer`, `PoroelasticLayer`,
-`PerforatedPlateLayer`, `MicroperforatedPlateLayer` and `MembraneLayer`) and
-the Paris-integral random-incidence coefficients (`diffuse_field_absorption`,
+transfer-matrix multilayer solver (`layered_absorber` with `AirLayer`,
+`PorousLayer`, `PoroelasticLayer`, `PerforatedPlateLayer`,
+`MicroperforatedPlateLayer` and `MembraneLayer`) and the Paris-integral
+random-incidence coefficients (`diffuse_field_absorption`,
 `statistical_absorption`). The sheet transfer impedances the layer classes
 consume are also exposed on their own, which is how a resonant sheet is
 designed rather than merely evaluated: `perforated_plate_impedance`,
 `microperforated_plate_impedance`, `membrane_impedance` and
 `perforation_end_correction`.
+</ScopeClaim>
 
-**Not covered.** Nothing here measures anything: the five JCA parameters, the
-frame's shear modulus and Poisson coefficient and the sheet geometry are all
-inputs, and section 1.1 says where they come from without implementing any of
-those characterisation methods (only the inverse fit against a measured
-impedance is shown, and that is `scipy.optimize`, not this library). The
-buildability rules at the end of section 3 are engineering practice with no
-standard behind them, and the finite-size difference between a predicted
-$\alpha_{dif}$ and a measured $\alpha_s$ is stated but not modelled — nothing
-here reproduces the edge effect. Cox & D'Antonio's book covers diffusers as
-well as absorbers, but this guide only implements the absorber half of it. Schroeder
-phase-grating diffuser prediction lives in a separate module
-(`materials.diffusers.design`), documented in
-[Diffusers and Their Coefficients](/phonometry/materials/diffusers/diffusers/) and, for
-the resonator-loaded deep-subwavelength panels, in
-[Metadiffusers](/phonometry/materials/diffusers/metadiffusers/). The critically coupled
-slit and Helmholtz-resonator absorber (`slit_helmholtz_absorber`,
-`critical_coupling_design`) is the subject of
-[Metamaterial Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/).
+<ScopeClaim status="not-covered" label="Not covered">
+Nothing here measures anything: the five JCA parameters, the frame's shear
+modulus and Poisson coefficient and the sheet geometry are all inputs, and
+section 1.1 says where they come from without implementing any of those
+characterisation methods (only the inverse fit against a measured impedance is
+shown, and that is `scipy.optimize`, not this library). The buildability rules
+at the end of section 3 are engineering practice with no standard behind them,
+and the finite-size difference between a predicted $\alpha_{dif}$ and a
+measured $\alpha_s$ is stated but not modelled — nothing here reproduces the
+edge effect. Cox & D'Antonio's book covers diffusers as well as absorbers, but
+this guide only implements the absorber half of it. Schroeder phase-grating
+diffuser prediction lives in a separate module (`materials.diffusers.design`),
+documented in [Diffusers and Their
+Coefficients](/phonometry/materials/diffusers/diffusers/) and, for the
+resonator-loaded deep-subwavelength panels, in
+[Metadiffusers](/phonometry/materials/diffusers/metadiffusers/). The
+critically coupled slit and Helmholtz-resonator absorber
+(`slit_helmholtz_absorber`, `critical_coupling_design`) is the subject of
+[Metamaterial
+Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/).
+</ScopeClaim>
+</Scope>
 
 ## See also
 
