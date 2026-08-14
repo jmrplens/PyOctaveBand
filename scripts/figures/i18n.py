@@ -1047,7 +1047,7 @@ _ES_EXACT = {
     r"indirect method $-(2\pi f)^2 m_2 T$":
         r"método indirecto $-(2\pi f)^2 m_2 T$",
     r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]":
-        r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{real}}$ [dB]",
+        r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]",
     r"transmissibility $|T|$": r"transmisibilidad $|T|$",
     r"loss factor $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$":
         r"factor de pérdidas $\eta = \mathrm{Im}(k_{2,1})/\mathrm{Re}(k_{2,1})$",
@@ -1372,9 +1372,9 @@ _ES_EXACT = {
         "Nivel de exposici\u00f3n sonora: el evento normalizado a 1 s",
     "Level [dBFS]": "Nivel [dBFS]",
     "Hourly $L_{Aeq}$": "$L_{Aeq}$ horario",
-    r"$L_{\mathrm{day}}$ (+0 dB)": r"$L_{\mathrm{día}}$ (+0 dB)",
-    r"$L_{\mathrm{evening}}$ + 5 dB": r"$L_{\mathrm{tarde}}$ + 5 dB",
-    r"$L_{\mathrm{night}}$ + 10 dB": r"$L_{\mathrm{noche}}$ + 10 dB",
+    r"$L_{\mathrm{day}}$ (+0 dB)": r"$L_{\mathrm{day}}$ (+0 dB)",
+    r"$L_{\mathrm{evening}}$ + 5 dB": r"$L_{\mathrm{evening}}$ + 5 dB",
+    r"$L_{\mathrm{night}}$ + 10 dB": r"$L_{\mathrm{night}}$ + 10 dB",
     r"Day-Evening-Night Level $L_{\mathrm{den}}$ (ISO 1996-1)":
         r"Nivel día-tarde-noche $L_{\mathrm{den}}$ (ISO 1996-1)",
     "Hour of day": "Hora del d\u00eda",
@@ -4019,7 +4019,7 @@ _ES_EXACT = {
         "silencio",
     "source ($h$ = 2 m)": "fuente ($h$ = 2 m)",
     "receiver 350 m": "receptor a 350 m",
-    r"$c_{\mathrm{eff}}(z)$ [m/s]": r"$c_{\mathrm{ef}}(z)$ [m/s]",
+    r"$c_{\mathrm{eff}}(z)$ [m/s]": r"$c_{\mathrm{eff}}(z)$ [m/s]",
     # anim_elastic_plate_junction
     "Bending waves at an L-junction (elastic 2D FDTD)":
         "Ondas de flexión en una unión en L (FDTD elástico 2D)",
@@ -4054,9 +4054,9 @@ _ES_EXACT = {
         "derecha: fuente de fuerza (un receptor rígido acepta menos)",
     # tapping_force_spectrum (buildings/design/resilient-layers)
     r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (rebound)":
-        r"$|F_n|_{\mathrm{sup}} = 2\,m\,v_h/T_i$  (con rebote)",
+        r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (con rebote)",
     r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (no rebound)":
-        r"$|F_n|_{\mathrm{inf}} = m\,v_h/T_i$  (sin rebote)",
+        r"$|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (sin rebote)",
     r"Line force $|F_n|$ [N]": r"Fuerza por línea $|F_n|$ [N]",
     "Tapping-Machine Force: the Floor Decides the Excitation":
         "Fuerza de la máquina de impactos: el forjado decide la excitación",
@@ -4499,7 +4499,7 @@ _ES_PATTERNS = [
       r"\$\\ell_\{\\mathrm\{eff\}\} = c/4f\$ = (\d+) mm, "
       r"so trim it to tune$"),
      ("el tubo resuena a \\1,\\2 Hz, no a \\3,\\4:\n"
-      "$\\\\ell_{\\\\mathrm{ef}} = c/4f$ = \\5 mm: se recorta para afinarlo")),
+      "$\\\\ell_{\\\\mathrm{eff}} = c/4f$ = \\5 mm: se recorta para afinarlo")),
     # anim_fdtd_absorption_placement: readouts carrying measured values.
     (r"^measured \$T\$ = (\d+) ms: inside the band$",
      r"$T$ medida = \1 ms: dentro de la banda"),
@@ -4578,7 +4578,7 @@ _ES_PATTERNS = [
      (r"tablero de partículas de \1 mm (supercrítico, "
       r"$f_{\\mathrm{co}}$ = \2 Hz)")),
     (r"^\$f_\{\\mathrm\{limit\}\}\$ = (\d+) Hz$",
-     r"$f_{\\mathrm{límite}}$ = \1 Hz"),
+     r"$f_{\\mathrm{limit}}$ = \1 Hz"),
     (r"^(.+) dB in mean square\n\((.+) N to (.+) N\)$",
      r"\1 dB en valor cuadrático medio\n(de \2 N a \3 N)"),
     # detailed_impact_paths annotations (mathtext skips the decimal-comma
