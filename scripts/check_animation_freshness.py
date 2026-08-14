@@ -23,6 +23,13 @@ rendered, so re-render it and commit the result::
     set -a; . .env; set +a          # the AV1 encoder settings
     python scripts/generate_graphs.py --animations --anim <clip>
 
+A render writes more than the four WebM variants, and the extra files are the
+ones a half-finished render loses quietly: the poster still each embed shows
+before the video loads, and the two English GIFs the GitHub pages fall back
+to. They come off the same render as the WebM, so the fingerprint already
+speaks for how old they are; what is checked here is that they are there at
+all (:func:`outputs`).
+
 The check is cheap (it parses the figure package, it does not import or run
 it) and needs no rendering stack, so it rides in any job.
 """
@@ -41,6 +48,23 @@ import animation_fingerprint as fp
 #: Where the clips are committed, used only to say which ones exist on disk.
 IMAGES = _SCRIPTS.parent / ".github" / "images"
 
+#: The language x theme variants every clip is rendered in.
+VARIANTS = ("", "_dark", "_es", "_es_dark")
+
+
+def outputs(clip: str) -> list[str]:
+    """Every file a four-variant render of *clip* leaves in :data:`IMAGES`.
+
+    The WebM of each variant, the poster still next to it (the site defers
+    the video behind it, so a missing poster is a blank box until the reader
+    presses play) and the two English GIFs the GitHub documentation embeds.
+    ``figures/media.py`` writes all three for every clip: the poster always,
+    the GIF for English only, in both themes.
+    """
+    return ([f"{clip}{suffix}.webm" for suffix in VARIANTS]
+            + [f"{clip}{suffix}_poster.jpg" for suffix in VARIANTS]
+            + [f"{clip}{suffix}.gif" for suffix in ("", "_dark")])
+
 
 def main() -> int:
     current = fp.fingerprints(_SCRIPTS.parent)
@@ -52,34 +76,36 @@ def main() -> int:
             f"{clip}: stamped in {fp.MANIFEST.name} but no longer a registered "
             "clip; delete the line if the clip is gone")
     for clip in sorted(current):
-        missing = [
-            name for name in (f"{clip}.webm", f"{clip}_dark.webm",
-                              f"{clip}_es.webm", f"{clip}_es_dark.webm")
-            if not (IMAGES / name).exists()
-        ]
-        if missing:
+        expected = outputs(clip)
+        missing = [name for name in expected if not (IMAGES / name).exists()]
+        if len(missing) == len(expected):
             problems.append(
-                f"{clip}: {len(missing)} of its four variants are not "
-                f"committed ({', '.join(missing)})")
+                f"{clip}: registered but not committed at all (none of its "
+                f"{len(expected)} files are there); render it")
+        elif missing:
+            problems.append(
+                f"{clip}: committed half-rendered, {len(missing)} of its "
+                f"{len(expected)} files are missing "
+                f"({', '.join(missing)})")
         if clip not in stamped:
             problems.append(
-                f"{clip}: no fingerprint recorded"
-                + ("; re-render the clip to stamp it" if not missing
-                   else " and no clip committed either"))
+                f"{clip}: no fingerprint recorded; re-render the clip to "
+                "stamp it")
         elif stamped[clip] != current[clip]:
             problems.append(
                 f"{clip}: drawn by code that has changed since "
                 f"(recorded {stamped[clip]}, current {current[clip]})")
 
     if problems:
-        print("::error::a committed clip is older than the code that draws it "
-              "- re-render it with "
+        print("::error::a committed clip is incomplete or older than the code "
+              "that draws it - re-render it with "
               "'python scripts/generate_graphs.py --animations --anim <clip>'")
         for problem in problems:
             print(f"  - {problem}")
         return 1
 
-    print(f"All {len(current)} committed clips match the code that draws them.")
+    print(f"All {len(current)} committed clips are complete and match the "
+          "code that draws them.")
     return 0
 
 
