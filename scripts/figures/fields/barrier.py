@@ -142,7 +142,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Barrier diffraction into the shadow zone (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2)
     titles = [
         T(rf"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
@@ -163,7 +163,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         im_r = ax_r.imshow(db_all[col][0], origin="lower",
                            extent=(0.0, 12.0, 0.0, 7.0), cmap="magma",
                            vmin=-40.0, vmax=0.0, interpolation="bilinear")
-        ax_p.set_title(titles[col], fontsize=10, fontweight="bold")
+        ax_p.set_title(titles[col], fontsize=10)
         for ax in (ax_p, ax_r):
             ax.grid(False)
             ax.set_ylim(-0.5, 7.0)

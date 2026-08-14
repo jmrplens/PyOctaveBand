@@ -251,4 +251,4 @@ def _finish_geometry_axes(ax: Axes, title: str) -> None:
     ax.autoscale()
     ax.margins(0.12)
     ax.set_axis_off()
-    ax.set_title(title, fontweight="bold")
+    ax.set_title(title)

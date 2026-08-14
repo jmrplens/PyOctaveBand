@@ -208,7 +208,7 @@ def plot_microphone_positions(
     ax.set_xlabel(_t(_AXIS_X, language))
     ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_zlabel(_t(_AXIS_Z, language))
-    ax.set_title(_t("Microphone positions", language), fontweight="bold")
+    ax.set_title(_t("Microphone positions", language))
     ax.set_box_aspect((1.0, 1.0, 0.55 if not full_sphere else 1.0))
     return ax
 

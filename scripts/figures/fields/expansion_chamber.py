@@ -141,7 +141,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Expansion-chamber silencer: pass band vs stop band "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     axes = fig.subplots(2, 1, sharex=True)
     titles = [T(f"Pass band: {f_pass:.0f} Hz, $kL = \\pi$"),
               T(f"Stop band peak: {f_peak:.0f} Hz, $kL = \\pi/2$")]
@@ -172,7 +172,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
         # (1.85 of 2.1 full scale), so neither text strikes the curve.
         ax.set_ylim(-0.030, env_base + env_h + 0.062)
         ax.set_yticks([])
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.tick_params(labelsize=7)
         tl_txts.append(
             ax.text(length + 0.055, env_base + env_h + 0.050, "",

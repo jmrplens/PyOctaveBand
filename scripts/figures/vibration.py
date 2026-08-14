@@ -83,7 +83,7 @@ def generate_junction_transmission(output_dir: str) -> None:
     ax.set_ylabel(r"Transmission coefficient $\tau$")
     ax.set_title(
         "Bending-wave transmission at a rigid X-junction (Hopkins 5.2.1.3)",
-        fontweight="bold", pad=12,
+        pad=12,
     )
     ax.set_xlim(0.0, 90.0)
     ax.set_ylim(bottom=0.0)
@@ -138,7 +138,7 @@ def generate_mechanical_mobility(output_dir: str) -> None:
 
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Normalized FRF magnitude")
-    ax.set_title("ISO 7626-1 Mechanical Mobility FRFs", fontweight="bold", pad=12)
+    ax.set_title("ISO 7626-1 Mechanical Mobility FRFs", pad=12)
     ax.set_xlim(freq[0], freq[-1])
     format_frequency_axis(ax, float(freq[0]), float(freq[-1]))
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -206,7 +206,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         panel.set_axisbelow(True)
 
     ax.set_ylabel(r"$L_k$ [dB re 1 N/m]")
-    ax.set_title("ISO 10846 Dynamic Transfer Stiffness", fontweight="bold",
+    ax.set_title("ISO 10846 Dynamic Transfer Stiffness",
                  pad=12)
     ax.set_xlim(freq[0], freq[-1])
     ax.legend(loc="upper left", fontsize=9)
@@ -294,7 +294,7 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
                     label="out of tolerance")
     ax_top.set_ylabel("Accelerance $|A|$ [1/kg]")
     ax_top.set_title("ISO 7626-2 Rigid-Mass Calibration Check",
-                     fontweight="bold", pad=12)
+                     pad=12)
     ax_top.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_top.legend(loc="upper left", fontsize=9)
 
@@ -365,7 +365,7 @@ def generate_vibration_weighting(output_dir: str) -> None:
                 linewidth=1.9, zorder=3)
     ax.axhline(0.0, color=COLOR_FG, linewidth=0.8, alpha=0.4, zorder=1)
     ax.set_title("Whole-body vertical weighting Wk (ISO 8041-1)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Weighting factor [dB]")
     ax.set_xlim(0.4, 100.0)
@@ -411,7 +411,7 @@ def generate_weighted_acceleration(output_dir: str) -> None:
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
         f"Weighted seat acceleration (ISO 2631-1)  $a_w$ = {result.overall:.3f} "
-        "m/s²", fontweight="bold", pad=12)
+        "m/s²", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("r.m.s. acceleration [m/s²]")
     ax.legend(loc="upper right", fontsize=9)
@@ -457,7 +457,7 @@ def generate_daily_vibration_exposure(output_dir: str) -> None:
     ax.set_ylim(0.0, elv * 1.2)
     ax.set_title(
         f"Hand-arm daily exposure (ISO 5349 / 2002-44-EC)  $A(8)$ = "
-        f"{result.a8:.2f} m/s²", fontweight="bold", pad=12)
+        f"{result.a8:.2f} m/s²", pad=12)
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -491,7 +491,7 @@ def generate_multiple_shock(output_dir: str) -> None:
     ax_h.set_xscale("log")
     ax_h.set_xlabel("Frequency [Hz]")
     ax_h.set_ylabel("Transmissibility  seat $\\rightarrow$ spine")
-    ax_h.set_title("Seat-to-spine transfer function", fontweight="bold", pad=10)
+    ax_h.set_title("Seat-to-spine transfer function", pad=10)
     ax_h.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_h.set_axisbelow(True)
     format_frequency_axis(ax_h, float(freq[0]), float(freq[-1]))
@@ -517,7 +517,7 @@ def generate_multiple_shock(output_dir: str) -> None:
                  label=f"Example  $R$ = {r_male:.2f}")
     ax_r.set_xlabel("Stress variable $R$")
     ax_r.set_ylabel("Probability of lumbar injury [%]")
-    ax_r.set_title("Injury probability (Annex C)", fontweight="bold", pad=10)
+    ax_r.set_title("Injury probability (Annex C)", pad=10)
     ax_r.set_xlim(left=0.0)
     ax_r.set_ylim(0.0, 100.0)
     ax_r.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
@@ -594,7 +594,7 @@ def generate_vibration_weighting_family(output_dir: str) -> None:
                             "color": COLOR_PRIMARY})
 
     ax.set_title("The nine human-vibration weightings (ISO 8041-1 Table 3)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Weighting factor [dB]")
     ax.set_xlim(0.05, 1500.0)
@@ -662,7 +662,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title(
         "(a)  A seated off-road record: 4.5 Hz ride plus five impacts",
-        fontsize=10, fontweight="bold", loc="left", pad=6)
+        fontsize=10, loc="left", pad=6)
     ax_t.legend(loc="upper right", fontsize=9)
 
     ax_r.plot(time, running, color=COLOR_PRIMARY, linewidth=1.4,
@@ -681,7 +681,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
                               "color": COLOR_SECONDARY})
     ax_r.set_ylabel("r.m.s. [m/s²]")
     ax_r.set_title("(b)  The 1 s running r.m.s., whose maximum is the MTVV",
-                   fontsize=10, fontweight="bold", loc="left", pad=6)
+                   fontsize=10, loc="left", pad=6)
     ax_r.legend(loc="upper left", fontsize=9)
 
     ax_v.plot(time, running_vdv, color=COLOR_PRIMARY, linewidth=1.6,
@@ -701,7 +701,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_v.set_ylabel("dose [m/s$^{1.75}$]")
     ax_v.set_xlabel("Time [s]")
     ax_v.set_title("(c)  The fourth-power accumulation, whose end point is "
-                   "the VDV", fontsize=10, fontweight="bold", loc="left",
+                   "the VDV", fontsize=10, loc="left",
                    pad=6)
     ax_v.legend(loc="upper left", fontsize=9)
 
@@ -751,7 +751,7 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
                 " years", fontsize=9, color=colour, va="bottom")
 
     ax.set_title("Group-mean years to a 10 % prevalence of vibration white "
-                 "finger (ISO 5349-1 Annex C)", fontweight="bold", pad=12)
+                 "finger (ISO 5349-1 Annex C)", pad=12)
     ax.set_xlabel("Daily exposure $A(8)$ [m/s²]")
     ax.set_ylabel("Exposure duration $D_y$ [years]")
     ax.set_xlim(1.0, 40.0)
@@ -825,7 +825,7 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
                               "color": COLOR_SECONDARY})
     ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title("(a)  The seat-to-spine filter turns an impact into a "
-                   "ringing response", fontsize=10, fontweight="bold",
+                   "ringing response", fontsize=10,
                    loc="left", pad=6)
     ax_t.legend(loc="upper left", fontsize=9)
 
@@ -848,7 +848,7 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
     ax_p.set_xlabel("Time [s]")
     ax_p.set_title(
         f"(b)  Each peak's share of $\\sum A_{{z,i}}^6$ — dose $D_z$ = "
-        f"{dose:.1f} m/s²", fontsize=10, fontweight="bold", loc="left",
+        f"{dose:.1f} m/s²", fontsize=10, loc="left",
         pad=6)
     ax_p.legend(loc="upper left", fontsize=9)
 
@@ -901,7 +901,7 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     ax.set_xlabel("Thickness ratio $h_2/h_1$")
     ax.set_ylabel("Vibration reduction index $K_{ij}$ [dB]")
     ax.set_title("Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -973,7 +973,7 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Envelope amplitude")
     ax.set_title("Bearing Fault Lines on a Measured Envelope Spectrum",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=8, ncol=2)
@@ -1049,7 +1049,7 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     ax.axhline(1.0e-2, color=COLOR_FG, linestyle="--", linewidth=1.2,
                alpha=0.7, label=r"internal loss factor $\eta_1$")
     ax.set_ylabel("Coupling loss factor")
-    ax.set_title("Predicted: Weld Against Bolts", fontweight="bold", pad=10)
+    ax.set_title("Predicted: Weld Against Bolts", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -1066,7 +1066,7 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     ax.set_ylim(1.0e-4, 1.0e-2)
     ax.set_ylabel("Loss factor")
     ax.set_title("Measured: Power Injection, 500 Hz Octave",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", which="both")
     ax.set_axisbelow(True)
     for label, value in zip(labels, values, strict=True):
@@ -1085,7 +1085,7 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
             bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
                   "edgecolor": COLOR_GRID})
     fig.suptitle("Coupling Loss Factors: Prediction and Power Injection",
-                 fontweight="bold", fontsize=13)
+                 fontsize=13)
     plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.95))
     save_figure(output_dir, "experimental_sea_clf.svg")
     plt.close()
@@ -1119,7 +1119,7 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     ax.set_ylim(2e-4, 0.6)
     ax.set_ylabel("Mobility $|Y|$ [m/(N·s)]")
     ax.set_title("Reading a Driving-Point Mobility (ISO 7626-1)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower center", fontsize=9, ncol=2)
@@ -1190,7 +1190,7 @@ def _relabel_spectrum(ax: Axes, title: str) -> None:
     curve = ax.get_lines()[0]
     curve.set_label("vibration spectrum")
     ax.set_ylabel("Spectrum amplitude")
-    ax.set_title(title, fontweight="bold", pad=10, fontsize=11)
+    ax.set_title(title, pad=10, fontsize=11)
     ax.legend(loc="upper right", fontsize=8.5)
 
 
@@ -1280,7 +1280,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
 
     fig.suptitle("Fault Families Are Recognised by Their Pattern",
-                 fontweight="bold", fontsize=13)
+                 fontsize=13)
     plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.96))
     save_figure(output_dir, "machine_fault_families.svg")
     plt.close()
@@ -1323,13 +1323,13 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     axes[0].plot(t[window] * 1e3, x[window], color=COLOR_MUTED, linewidth=0.9)
     axes[0].set_ylabel("raw record")
     axes[0].set_title("1. As recorded: noise and unbalance, no visible impacts",
-                      fontweight="bold", fontsize=11, pad=8)
+                      fontsize=11, pad=8)
 
     axes[1].plot(t[window] * 1e3, narrow[window], color=COLOR_PRIMARY,
                  linewidth=0.9)
     axes[1].set_ylabel("2-4 kHz band")
     axes[1].set_title("2. Band-passed on the 3 kHz housing resonance: "
-                      "the impact train", fontweight="bold", fontsize=11,
+                      "the impact train", fontsize=11,
                       pad=8)
     top = float(np.max(np.abs(narrow[window])))
     axes[1].set_ylim(-1.35 * top, 1.35 * top)
@@ -1349,7 +1349,7 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     axes[2].set_ylabel("envelope")
     axes[2].set_xlabel("Time [ms]")
     axes[2].set_title("3. Hilbert envelope: one pulse per impact",
-                      fontweight="bold", fontsize=11, pad=8)
+                      fontsize=11, pad=8)
 
     keep = res.frequencies <= 4.6 * bpfo
     axes[3].plot(res.frequencies[keep], res.amplitude[keep],
@@ -1368,14 +1368,14 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     axes[3].set_xlabel(LABEL_FREQ_HZ)
     axes[3].set_ylabel("envelope spectrum")
     axes[3].set_title("4. Its spectrum: the period has become a line at BPFO",
-                      fontweight="bold", fontsize=11, pad=8)
+                      fontsize=11, pad=8)
     axes[3].legend(loc="upper right", fontsize=8.5)
 
     for ax in axes:
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
     fig.suptitle("What Each Step of the Envelope Route Does to the Signal",
-                 fontweight="bold", fontsize=13)
+                 fontsize=13)
     plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.965))
     save_figure(output_dir, "envelope_chain_steps.svg")
     plt.close()
@@ -1417,7 +1417,7 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     ax.set_ylim(5.0e-7, 0.6)
     ax.set_ylabel("Mobility $|Y|$ [m/(N·s)]")
     ax.set_title("Point Mobilities of Infinite Structures (Cremer Table 5.1)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
@@ -1479,7 +1479,7 @@ def generate_mobility_random_error(output_dir: str) -> None:
     ax.set_xlabel("Number of averaged spectra $n$")
     ax.set_ylabel(r"Normalized random error $\varepsilon$ [%]")
     ax.set_title("How Many Averages the 5 % Criterion Costs (ISO 7626-2, "
-                 "Annex A)", fontweight="bold", pad=12)
+                 "Annex A)", pad=12)
     ax.set_xlim(2.0, 1000.0)
     ax.set_ylim(1.0, 60.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)

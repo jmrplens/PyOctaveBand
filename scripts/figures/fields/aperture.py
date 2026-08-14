@@ -139,7 +139,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Sound through a wall aperture (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2)
     titles = [T(rf"Slit $w$ = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm "
                 rf"($\lambda/20$)"),
@@ -159,7 +159,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         im_r = ax_r.imshow(db_all[col][0], origin="lower",
                            extent=(0.0, 6.0, 0.0, 5.0), cmap="magma",
                            vmin=-40.0, vmax=0.0, interpolation="bilinear")
-        ax_p.set_title(titles[col], fontsize=10, fontweight="bold")
+        ax_p.set_title(titles[col], fontsize=10)
         for ax in (ax_p, ax_r):
             ax.grid(False)
             for y0, y1 in ((0.0, 2.5 - gap / 2.0), (2.5 + gap / 2.0, 5.0)):

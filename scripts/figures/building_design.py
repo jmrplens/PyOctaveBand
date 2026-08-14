@@ -87,7 +87,7 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     ax.set_xlabel("Transmission path")
     ax.set_ylim(0, max(fracs) + 9.0)
     ax.set_title("EN 12354-1 Flanking Transmission (Annex H.3 example)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
 
@@ -151,7 +151,7 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
     ax.set_ylabel("Improvement of impact sound insulation [dB]")
     ax.set_ylim(bottom=0.0)
     ax.set_title("ISO 16251-1 Floor-Covering Impact Sound Improvement",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -211,7 +211,7 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ax_clf.set_xlabel(LABEL_FREQ_HZ)
     ax_clf.set_ylabel(r"Coupling loss factor $\eta_{ij}$")
     ax_clf.set_title("Wall-tie structure-borne coupling\n(point-connection model, "
-                     "2.5 ties/m²)", fontweight="bold", pad=10)
+                     "2.5 ties/m²)", pad=10)
     ax_clf.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_clf.set_axisbelow(True)
     ax_clf.legend(loc="lower left", fontsize=9)
@@ -250,7 +250,7 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ax_tl.set_xlabel(LABEL_FREQ_HZ)
     ax_tl.set_ylabel("Sound reduction index $R$ [dB]")
     ax_tl.set_title("Ties stiffen the cavity\n(140 kg/m² leaves, 75 mm cavity, "
-                    "2.5 ties/m²)", fontweight="bold", pad=10)
+                    "2.5 ties/m²)", pad=10)
     ax_tl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_tl.set_axisbelow(True)
     ax_tl.legend(loc="upper left", fontsize=9)
@@ -309,7 +309,7 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
     ax.set_ylabel("Improvement of impact sound insulation [dB]")
     ax.set_ylim(-5.0, 100.0)
     ax.set_title("Floating-Floor Impact Improvement Above the Mass-Spring "
-                 "Resonance", fontweight="bold", pad=12)
+                 "Resonance", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -385,7 +385,7 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
     ax.set_ylabel("Improvement of impact sound insulation [dB]")
     ax.set_ylim(-5.0, 80.0)
     ax.set_title("Soft Floor Covering Improvement From the Hammer Contact "
-                 "Stiffness", fontweight="bold", pad=12)
+                 "Stiffness", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -434,7 +434,7 @@ def generate_structure_borne_power(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Structure-borne power level $L_{Ws}$ [dB re 1 pW]")
     ax.set_title("EN 15657 Reception-Plate Structure-Borne Sound Power",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="major", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
@@ -498,7 +498,7 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Level [dB]")
     ax.set_title("EN 12354-5 Installed Structure-Borne Sound",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="major", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
@@ -590,7 +590,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                 marker="o", markersize=3, label="single panel $R$ (Sharp)")
     ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_c$")
     ax.set_title("Single panel: mass law and coincidence",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
@@ -608,7 +608,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                 marker="o", markersize=3, label="double wall $R$")
     ax.axvline(f0, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_0$")
     ax.set_title("Double wall: mass-spring-mass resonance",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
@@ -623,7 +623,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axhline(1.0, color=COLOR_FG, ls=":", lw=0.9, alpha=0.5, label="$\\sigma = 1$")
     ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_c$")
     ax.set_title("Radiation efficiency of a bending plate",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.set_ylabel(r"Radiation efficiency $\sigma$")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
@@ -647,7 +647,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axhline(10.0 * np.log10(1.0 / open_area), color=COLOR_FG, ls=":", lw=0.9,
                alpha=0.5, label="open-area limit")
     ax.set_title("Composite wall with a small aperture",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
@@ -656,7 +656,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
 
     fig.suptitle(
         "Theoretical panel sound insulation (Bies / Hopkins / Cremer)",
-        fontweight="bold", fontsize=14,
+        fontsize=14,
     )
     plt.tight_layout()
     save_figure(output_dir, "panel_insulation_concept.png")
@@ -700,7 +700,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
 
     ax.set_ylabel("Level / correction [dB]")
     ax.set_title("EN 12354-2 Impact Sound Prediction (Annex E.3)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", zorder=0)
     ax.set_axisbelow(True)
 
@@ -780,7 +780,7 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
     ax.set_ylim(0.0, 100.0)
     ax.set_ylabel("Share of transmitted energy [%]")
     ax.set_title("ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_axisbelow(True)
 
     twin = ax.twinx()
@@ -841,7 +841,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
 
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Predicted Single-Panel Insulation Rated per ISO 717-1",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -900,7 +900,7 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
 
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Plateau Estimate Against the Physical Panel Model",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -985,7 +985,7 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
 
     ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Corrugating a Sheet Flattens Its Sound Reduction Index",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -1068,7 +1068,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
     ax.set_xlabel(r"Mobility ratio $|Y_s|/|Y_i|$")
     ax.set_ylabel("Coupling term $D_C$ [dB]")
     ax.set_title("EN 12354-5 Coupling Term and Its Two Limits",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -1146,7 +1146,7 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Line force $|F_n|$ [N]")
     ax.set_title("Tapping-Machine Force: the Floor Decides the Excitation",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
@@ -1210,7 +1210,7 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
     ax.set_ylim(0.0, 100.0)
     ax.set_ylabel("Share of transmitted energy [%]")
     ax.set_title("ISO 12354-2 Detailed Model: the Direct Path Governs (Annex G)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_axisbelow(True)
 
     twin = ax.twinx()
@@ -1277,7 +1277,7 @@ def generate_radiation_efficiency_panels(output_dir: str) -> None:
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel(r"Radiation efficiency $\sigma$")
     ax_l.set_title("Edge Radiation, Coincidence and the Slow Return to Unity",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_l.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5,
               zorder=0)
     ax_l.set_axisbelow(True)
@@ -1352,7 +1352,7 @@ def generate_structure_borne_conversion(output_dir: str) -> None:
     _band_index_axis(ax, bands)
     ax.set_ylabel("Structure-borne power level [dB re 1 pW]")
     ax.set_title("One Source, Four Levels: the EN 15657 Conversion Chain",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=8.5)

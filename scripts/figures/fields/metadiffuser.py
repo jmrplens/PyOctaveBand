@@ -343,7 +343,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Schroeder diffuser vs metadiffuser (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 3)
     titles = [T("Flat rigid panel"), T("QRD, wells down to 27 cm"),
               T("Metadiffuser, 2 cm panel")]
@@ -364,7 +364,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         im_s = ax_s.imshow(trail_db[col][0], origin="lower",
                            extent=(0.0, 1.6, 0.0, 1.2), cmap="magma",
                            vmin=-30.0, vmax=0.0, interpolation="bilinear")
-        ax_t.set_title(titles[col], fontsize=10, fontweight="bold")
+        ax_t.set_title(titles[col], fontsize=10)
         for ax in (ax_t, ax_s):
             ax.grid(False)
             if col == 1:

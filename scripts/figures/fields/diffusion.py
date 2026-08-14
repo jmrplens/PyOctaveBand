@@ -186,7 +186,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Flat panel vs Schroeder diffuser (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2)
     titles = [T("Flat rigid panel"), T("Schroeder diffuser (QRD, $N$ = 7)")]
     beams = [T("specular beam"), T("scattered fan")]
@@ -213,7 +213,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         im_s = ax_s.imshow(trail_db[col][0], origin="lower",
                            extent=(0.0, 6.0, 0.0, 4.4), cmap="magma",
                            vmin=-30.0, vmax=0.0, interpolation="bilinear")
-        ax_t.set_title(titles[col], fontsize=10, fontweight="bold")
+        ax_t.set_title(titles[col], fontsize=10)
         for ax in (ax_t, ax_s):
             ax.grid(False)
             ax.add_patch(Polygon(polys[col], closed=True,

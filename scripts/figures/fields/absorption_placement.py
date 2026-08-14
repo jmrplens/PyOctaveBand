@@ -239,7 +239,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Where the absorption sits: same total, two decays "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(3, 2, height_ratios=(1.0, 1.0, 1.15), hspace=0.12)
     titles = [T("Absorption spread over all four edges"),
               T("The same total, floor and ceiling only")]
@@ -289,7 +289,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
             ax.set_ylim(-strip - 0.06, _AP_LY + strip + 0.06)
             ax.set_xticks([])
             ax.set_yticks([])
-        ax_p.set_title(title, fontsize=9.5, fontweight="bold")
+        ax_p.set_title(title, fontsize=9.5)
         if col == 0:
             ax_p.set_ylabel(T("$p(x, y)$"), fontsize=8.5)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=8.5)

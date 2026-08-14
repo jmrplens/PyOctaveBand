@@ -195,7 +195,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # Short on purpose: the Spanish of a longer title overran the canvas at
     # both ends. What the boundary has to do with it is in the panel titles.
     fig.suptitle(T("Lamb's problem: P, S and the surface wave "
-                   "(elastic 2D FDTD)"), fontweight="bold")
+                   "(elastic 2D FDTD)"))
     # The field panels are 2:1 and, in a two-row canvas, height-limited: a
     # wider cell than their natural width only pads them with white. The
     # probe traces are time series and use every pixel of width they get,
@@ -219,7 +219,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
                        extent=(-half, half, half, 0.0), cmap=CMAP_FIELD,
                        vmin=-vmaxes[row], vmax=vmaxes[row], aspect="equal",
                        interpolation="bilinear")
-        ax.set_title(title, fontsize=9.5, fontweight="bold")
+        ax.set_title(title, fontsize=9.5)
         ax.plot([0.0], [0.0], marker="v", ms=6, color=COLOR_SECONDARY,
                 markeredgecolor=FIELD_STROKE, markeredgewidth=0.6,
                 clip_on=False, zorder=6)

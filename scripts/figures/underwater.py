@@ -47,7 +47,7 @@ def generate_ship_source_level(output_dir: str) -> None:
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Level [dB re 1 µPa·m]")
     ax.set_title("Ship Equivalent Monopole Source Level (ISO 17208-2)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
 
@@ -105,7 +105,7 @@ def generate_pile_driving(output_dir: str) -> None:
     ax_w.set_xlabel("Time [ms]")
     ax_w.set_ylabel("Pressure [Pa]")
     ax_w.set_title("Percussive Pile-Driving Strike (ISO 18406)",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_w.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_w.set_axisbelow(True)
     ax_w.legend(loc="upper right", fontsize=9)
@@ -144,7 +144,7 @@ def generate_underwater_transmission_loss(output_dir: str) -> None:
     ax.set_xlabel("Range [m]")
     ax.set_ylabel("Transmission loss [dB]")
     ax.set_title("Underwater Transmission Loss (Francois–Garrison)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.invert_yaxis()
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -203,7 +203,7 @@ def generate_weston_regimes(output_dir: str) -> None:
     ax.set_xlabel("Range [m]")
     ax.set_ylabel("Propagation loss [dB re 1 m²]")
     ax.set_title("Weston Shallow-Water Propagation Regimes (Ainslie §9.1.1.2)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_ylim(130.0, 18.0)
     ax.set_xlim(float(ranges[0]), float(ranges[-1]))
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
@@ -245,7 +245,7 @@ def generate_marine_mammal_weighting(output_dir: str) -> None:
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Weighting amplitude $W(f)$ [dB]")
     ax.set_title("Marine-Mammal Auditory Weighting (NMFS 2024, v3.0)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_ylim(-75.0, 5.0)
     ax.set_xlim(10.0, 250e3)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
@@ -275,7 +275,7 @@ def generate_underwater_sound_speed(output_dir: str) -> None:
     ax.set_xlabel("Sound speed [m/s]")
     ax.set_ylabel("Depth [m]")
     ax.set_title("Sea-Water Sound-Speed Profile (UNESCO)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.invert_yaxis()
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -302,7 +302,7 @@ def generate_sonar_equation(output_dir: str) -> None:
                label="Figure of merit")
     ax.set_xlabel("Transmission loss [dB]")
     ax.set_ylabel("Signal excess [dB]")
-    ax.set_title("Passive Sonar Equation", fontweight="bold", pad=12)
+    ax.set_title("Passive Sonar Equation", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -331,7 +331,7 @@ def generate_seabed_reflection(output_dir: str) -> None:
                    label=f"Critical angle ({res.critical_angle:.1f}°)")
     ax.set_xlabel("Grazing angle [°]")
     ax.set_ylabel("Bottom loss [dB]")
-    ax.set_title("Seabed Reflection Loss (Rayleigh)", fontweight="bold", pad=12)
+    ax.set_title("Seabed Reflection Loss (Rayleigh)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -359,7 +359,7 @@ def generate_seabed_reflection_coefficient(output_dir: str) -> None:
                    label=f"Critical angle ({res.critical_angle:.1f}°)")
     ax.set_xlabel("Grazing angle [°]")
     ax.set_ylabel("Reflection coefficient magnitude $|R|$")
-    ax.set_title("Seabed Reflection Coefficient (Rayleigh)", fontweight="bold", pad=12)
+    ax.set_title("Seabed Reflection Coefficient (Rayleigh)", pad=12)
     ax.set_ylim(0.0, 1.05)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -387,7 +387,7 @@ def generate_ocean_ambient_noise(output_dir: str) -> None:
     ax.set_xscale("log")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Spectrum level [dB re 1 µPa²/Hz]")
-    ax.set_title("Ocean Ambient Noise (Wenz)", fontweight="bold", pad=12)
+    ax.set_title("Ocean Ambient Noise (Wenz)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -429,7 +429,7 @@ def generate_ship_traffic_noise(output_dir: str) -> None:
     ax.set_xscale("log")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Source spectral density [dB re 1 µPa²/Hz at 1 m]")
-    ax.set_title("Ship Traffic Source Level (JOMOPANS-ECHO)", fontweight="bold", pad=12)
+    ax.set_title("Ship Traffic Source Level (JOMOPANS-ECHO)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     _sf = np.asarray(s.frequency, dtype=float)
@@ -463,7 +463,7 @@ def generate_numerical_propagation(output_dir: str) -> None:
     axes[0].invert_yaxis()
     axes[0].set_xlabel("Range [km]")
     axes[0].set_ylabel("Depth [m]")
-    axes[0].set_title("Ray trace (Munk profile)", fontweight="bold")
+    axes[0].set_title("Ray trace (Munk profile)")
     axes[0].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[0].legend(loc="upper right", fontsize=9)
 
@@ -481,7 +481,7 @@ def generate_numerical_propagation(output_dir: str) -> None:
     fig.colorbar(img, ax=axes[1], label="Transmission loss [dB]")
     axes[1].set_xlabel("Range [km]")
     axes[1].set_ylabel("Depth [m]")
-    axes[1].set_title("Parabolic equation (50 Hz)", fontweight="bold")
+    axes[1].set_title("Parabolic equation (50 Hz)")
 
     # (c) Transmission loss vs range: modes and PE agree for a shallow gradient.
     r = np.linspace(100.0, 20_000.0, 400)
@@ -497,7 +497,7 @@ def generate_numerical_propagation(output_dir: str) -> None:
     axes[2].invert_yaxis()
     axes[2].set_xlabel("Range [km]")
     axes[2].set_ylabel("Transmission loss [dB]")
-    axes[2].set_title("Modes vs PE (50 Hz, $z$ = 120 m)", fontweight="bold")
+    axes[2].set_title("Modes vs PE (50 Hz, $z$ = 120 m)")
     axes[2].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[2].legend(loc="upper right", fontsize=9)
 
@@ -527,7 +527,7 @@ def generate_seawater_absorption(output_dir: str) -> None:
     ax_a.set_xlabel("Frequency [Hz]")
     ax_a.set_ylabel(r"Absorption coefficient $\alpha$ [dB/km]")
     ax_a.set_title("Volume Absorption (10 °C, 35 ppt, 100 m)",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_a.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_a.set_axisbelow(True)
     ax_a.legend(loc="upper left", fontsize=9)
@@ -551,7 +551,7 @@ def generate_seawater_absorption(output_dir: str) -> None:
     ax_r.axhline(0.0, color=COLOR_PRIMARY, linewidth=1.4)
     ax_r.set_xlabel("Frequency [Hz]")
     ax_r.set_ylabel("Departure from Francois-Garrison [%]")
-    ax_r.set_title("Where Each Simplification Is Honest", fontweight="bold",
+    ax_r.set_title("Where Each Simplification Is Honest",
                    pad=12)
     ax_r.set_ylim(-70.0, 90.0)
     ax_r.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -582,7 +582,7 @@ def generate_sound_speed_models(output_dir: str) -> None:
     ax_c.invert_yaxis()
     ax_c.set_xlabel("Sound speed $c$ [m/s]")
     ax_c.set_ylabel("Depth [m]")
-    ax_c.set_title("Four Equations, One Profile", fontweight="bold", pad=12)
+    ax_c.set_title("Four Equations, One Profile", pad=12)
     ax_c.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_c.set_axisbelow(True)
     ax_c.legend(loc="lower left", fontsize=9)
@@ -600,7 +600,7 @@ def generate_sound_speed_models(output_dir: str) -> None:
     ax_d.set_ylabel("Depth [m]")
     spread = float(np.max([np.max(np.abs(profiles[m] - ref)) for m in models[1:]]))
     ax_d.set_title(f"Spread on This Profile: up to {spread:.1f} m/s",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_d.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_d.set_axisbelow(True)
     ax_d.legend(loc="lower left", fontsize=9)
@@ -631,7 +631,7 @@ def generate_detection_range(output_dir: str) -> None:
     res = detection_range(82.7, 50e3)
     res.plot(ax=ax_c)
     ax_c.set_title("Closed Form: One Crossing (FOM = 82.7 dB, 50 kHz)",
-                   fontweight="bold", pad=12)
+                   pad=12)
 
     # A shallow waveguide: the modal loss oscillates, so a figure of merit can
     # be crossed several times and "the" detection range needs a convention.
@@ -667,7 +667,7 @@ def generate_detection_range(output_dir: str) -> None:
     ax_m.set_xlabel("Range [km]")
     ax_m.set_ylabel("Transmission loss [dB]")
     ax_m.set_title(f"Real Waveguide: {len(crossings)} Crossings",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_m.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_m.set_axisbelow(True)
     ax_m.legend(loc="lower right", fontsize=9)
@@ -709,7 +709,7 @@ def generate_normal_modes(output_dir: str) -> None:
     ax.invert_yaxis()
     ax.set_xlabel(r"Mode function $\Psi_m(z)$")
     ax.set_ylabel("Depth [m]")
-    ax.set_title("Mode $m$ Has $m - 1$ Interior Nulls", fontweight="bold", pad=12)
+    ax.set_title("Mode $m$ Has $m - 1$ Interior Nulls", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=8)
@@ -726,14 +726,14 @@ def generate_normal_modes(output_dir: str) -> None:
             linewidth=1.6, linestyle="--", label=r"$M = kD/\pi = 2fD/c$")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Number of propagating modes $M$")
-    ax.set_title("One Mode Cuts On at a Time", fontweight="bold", pad=12)
+    ax.set_title("One Mode Cuts On at a Time", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
     ax = axes[2]
     res.plot(ax=ax)
-    ax.set_title("Modal Transmission Loss ($z$ = 100 m)", fontweight="bold",
+    ax.set_title("Modal Transmission Loss ($z$ = 100 m)",
                  pad=12)
     plt.tight_layout()
     save_figure(output_dir, "normal_modes.svg")
@@ -790,7 +790,7 @@ def generate_sonar_budget(output_dir: str) -> None:
     ax.invert_yaxis()
     ax.set_xlabel("Range [km]")
     ax.set_ylabel("Transmission loss [dB]")
-    ax.set_title("A Passive Sonar Budget, End to End", fontweight="bold", pad=12)
+    ax.set_title("A Passive Sonar Budget, End to End", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
@@ -829,7 +829,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
     ax_c.invert_yaxis()
     ax_c.set_xlabel("$c(z)$ [m/s]")
     ax_c.set_ylabel("Depth [m]")
-    ax_c.set_title("Linear Gradient", fontweight="bold", pad=12)
+    ax_c.set_title("Linear Gradient", pad=12)
     ax_c.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_c.set_axisbelow(True)
 
@@ -872,7 +872,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
     ax_r.set_xlabel("Range [km]")
     ax_r.set_ylabel("Depth [m]")
     ax_r.set_title(r"Every Ray Turns Where $c(z_t) = c(z_s)/\cos\theta_0$",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     ax_r.legend(loc="lower center", fontsize=8.5, ncols=3)
@@ -928,7 +928,7 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
     ax_tl.set_xlabel("Range [km]")
     ax_tl.set_ylabel("Transmission loss [dB]")
     ax_tl.set_title("50 Hz in 100 m of Water, Receiver at 60 m",
-                    fontweight="bold", pad=12)
+                    pad=12)
     ax_tl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_tl.set_axisbelow(True)
     ax_tl.legend(loc="lower right", fontsize=9)
@@ -953,7 +953,7 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
     ax_ang.set_xlabel("Mode index $m$")
     ax_ang.set_ylabel(r"Modal grazing angle $\arccos(k_{rm}/k)$ [°]")
     ax_ang.set_title(f"{int(np.sum(~inside))} of {grazing.size} Modes Are "
-                     "Outside It", fontweight="bold", pad=12)
+                     "Outside It", pad=12)
     ax_ang.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_ang.set_axisbelow(True)
     ax_ang.legend(loc="upper left", fontsize=9)
@@ -984,7 +984,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
     ax_g.set_xlabel("Frequency [Hz]")
     ax_g.set_ylabel("Threshold [dB re 1 µPa; in-air groups re 20 µPa]")
     ax_g.set_title("Southall et al. (2019) Group Audiograms",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_g.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_g.set_axisbelow(True)
     ax_g.legend(loc="upper right", fontsize=8.5, ncols=2)
@@ -1024,7 +1024,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
     ax_o.set_xlabel("Frequency [Hz]")
     ax_o.set_ylabel("Threshold [dB re 1 µPa]")
     ax_o.set_title("Killer Whale (Ainslie 2010, Eq. 11.159)",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_o.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_o.set_axisbelow(True)
     ax_o.legend(loc="upper center", fontsize=8.5)
@@ -1057,7 +1057,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
 
     fig, axes = plt.subplots(1, 3, figsize=(16.5, 5.4))
     spectrum.plot(ax=axes[0])
-    axes[0].set_title("Step 1: Single-Strike SEL by Band", fontweight="bold",
+    axes[0].set_title("Step 1: Single-Strike SEL by Band",
                       pad=12)
 
     for ax, group in zip(axes[1:], ("LF", "VHF"), strict=True):
@@ -1067,7 +1067,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
         res.plot(ax=ax)
         ax.set_title(f"{group}: cumulative {res.cumulative_sel:.1f} dB, "
                      f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",
-                     fontweight="bold", pad=12)
+                     pad=12)
     plt.tight_layout()
     save_figure(output_dir, "marine_mammal_assessment.svg")
     plt.close(fig)
@@ -1111,7 +1111,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
                       "edgecolor": COLOR_GRID})
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Exposure function $E(f) = K + C - W(f)$ [dB re 1 µPa²·s]")
-    ax.set_title("What a Band Level Is Compared Against", fontweight="bold",
+    ax.set_title("What a Band Level Is Compared Against",
                  pad=12)
     ax.set_ylim(135.0, 265.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1128,7 +1128,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
                     label=f"{guidance}  ($b$ = {res.parameters.b:g})")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Weighting $W(f)$ [dB]")
-    ax.set_title("What $b$ = 5 Changed for LF Cetaceans", fontweight="bold",
+    ax.set_title("What $b$ = 5 Changed for LF Cetaceans",
                  pad=12)
     ax.set_ylim(-60.0, 5.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1155,7 +1155,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     ax.set_ylim(120.0, 245.0)
     ax.set_xlabel("Hearing group")
     ax.set_ylabel("Onset criterion [dB re 1 µPa²·s / dB re 1 µPa]")
-    ax.set_title("Impulsive Onset Criteria (NMFS 2024)", fontweight="bold",
+    ax.set_title("Impulsive Onset Criteria (NMFS 2024)",
                  pad=12)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -1215,7 +1215,7 @@ def generate_piling_campaign_accumulation(output_dir: str) -> None:
     ax.set_xlabel("Number of strikes $N$")
     ax.set_ylabel("Weighted cumulative SEL [dB re 1 µPa²·s]")
     ax.set_title("Accumulation Against the Criteria (dotted TTS, dashed AUD INJ)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9, ncols=5)

@@ -103,7 +103,7 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Room modes in a rigid 5 m × 3.5 m room (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2)
     titles = [T(f"On the (2,1) mode: {f_mode:.1f} Hz"),
               T(f"Off mode: {f_off:.1f} Hz")]
@@ -114,7 +114,7 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
         im_p = ax_p.imshow(p_all[col][0], origin="lower",
                            extent=(0.0, 5.0, 0.0, 3.5), cmap=CMAP_FIELD,
                            vmin=-vmax_p, vmax=vmax_p, interpolation="bilinear")
-        ax_p.set_title(titles[col], fontsize=10, fontweight="bold")
+        ax_p.set_title(titles[col], fontsize=10)
         ax_p.plot([0.25], [0.25], marker="o", ms=5, color=COLOR_TERTIARY,
                   markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
         ax_p.text(0.45, 0.22, T("source"), ha="left", va="center",

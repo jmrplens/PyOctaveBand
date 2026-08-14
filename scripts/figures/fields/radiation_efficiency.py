@@ -293,7 +293,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     # Short on purpose: the Spanish of the longer title overran the canvas
     # at both ends. The solver and the plate moved to the footer.
     fig.suptitle(T("Radiation efficiency: a driven plate below and above "
-                   "$f_c$"), fontweight="bold")
+                   "$f_c$"))
     axes = fig.subplots(2, 1, sharex=True)
     titles = [
         T(f"$f = f_c/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
@@ -322,7 +322,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
         im = ax.imshow(data[0], origin="lower", extent=(x0, x1, h0, h1),
                        cmap=CMAP_FIELD, vmin=-_RE_VLIM, vmax=_RE_VLIM,
                        aspect="equal", interpolation="bilinear")
-        ax.set_title(title, fontsize=9, fontweight="bold")
+        ax.set_title(title, fontsize=9)
         ax.add_patch(Rectangle((x0, -_EL_H), x1 - x0, _EL_H,
                                facecolor=COLOR_GRID, edgecolor=COLOR_FG,
                                lw=0.7, zorder=3))

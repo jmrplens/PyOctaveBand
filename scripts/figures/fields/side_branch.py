@@ -238,7 +238,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The quarter-wave side branch, on and off tune (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(3, 1, height_ratios=(1.0, 1.0, 0.74), hspace=0.1)
     axes = [fig.add_subplot(gs[i, 0]) for i in range(2)]
     ax_t = fig.add_subplot(gs[2, 0])
@@ -296,7 +296,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
         trims.append(ax.text(
             stub_x1 + 0.03, duct_y1 + 0.185, "", ha="left", va="top",
             fontsize=7.8, color=COLOR_FG, linespacing=1.5, zorder=4))
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.set_xlim(-0.115, length + 0.065)
         ax.set_ylim(-0.012, height + 0.012)
         ax.set_yticks([])

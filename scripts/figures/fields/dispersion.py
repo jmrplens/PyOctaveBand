@@ -188,7 +188,7 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Numerical dispersion: one pulse, three grids (2D FDTD)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(3, 2, width_ratios=(3.55, 1.0), hspace=0.12,
                           wspace=0.05)
     axes = [fig.add_subplot(gs[i, 0]) for i in range(3)]
@@ -265,7 +265,7 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
     ax_law.set_yticks([], minor=True)
     ax_law.tick_params(labelsize=7)
     ax_law.legend(fontsize=6.5, loc="lower left", framealpha=0.85)
-    ax_law.set_title(T("The closed form"), fontsize=8.5, fontweight="bold")
+    ax_law.set_title(T("The closed form"), fontsize=8.5)
 
     t_txt = fig.text(0.012, 0.935, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)

@@ -289,7 +289,7 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
 
 def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = None, ylim: tuple[float, float] | None = None) -> None:
     """Apply consistent styling to plots."""
-    ax.set_title(title, fontweight="bold", pad=12)
+    ax.set_title(title, pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(LABEL_LEVEL_DB)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")

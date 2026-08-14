@@ -106,7 +106,7 @@ def generate_schroeder_decay(output_dir: str) -> None:
                   "edgecolor": COLOR_FG, "alpha": 0.85})
 
     ax.set_title("Schroeder Integration and Reverberation Time (ISO 3382)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Level re steady state [dB]")
     ax.set_xlim(0, duration)
@@ -133,7 +133,7 @@ def generate_excitation_signals(output_dir: str) -> None:
 
     # Exponential sine sweep: time-domain waveform.
     ax_sw.plot(t, sweep, color=COLOR_PRIMARY, linewidth=0.5)
-    ax_sw.set_title("Exponential sine sweep — waveform", fontweight="bold")
+    ax_sw.set_title("Exponential sine sweep — waveform")
     ax_sw.set_xlabel("Time [s]")
     ax_sw.set_ylabel("Amplitude")
     ax_sw.set_xlim(0.0, secs)
@@ -142,7 +142,7 @@ def generate_excitation_signals(output_dir: str) -> None:
 
     # Sweep spectrogram: the exponential frequency rise.
     ax_sp.specgram(sweep, NFFT=1024, Fs=fs, noverlap=512, cmap="magma")
-    ax_sp.set_title("Sweep spectrogram (exponential rise)", fontweight="bold")
+    ax_sp.set_title("Sweep spectrogram (exponential rise)")
     ax_sp.set_xlabel("Time [s]")
     ax_sp.set_ylabel("Frequency [Hz]")
     ax_sp.set_ylim(0.0, fs / 2)
@@ -151,7 +151,7 @@ def generate_excitation_signals(output_dir: str) -> None:
     show = 100
     ax_ml.step(np.arange(show), mls[:show], where="mid", color=COLOR_PRIMARY,
                linewidth=1.2)
-    ax_ml.set_title(f"MLS — first {show} of {mls.size} samples", fontweight="bold")
+    ax_ml.set_title(f"MLS — first {show} of {mls.size} samples")
     ax_ml.set_xlabel("Sample")
     ax_ml.set_ylabel("Amplitude")
     ax_ml.set_ylim(-1.4, 1.4)
@@ -162,7 +162,7 @@ def generate_excitation_signals(output_dir: str) -> None:
     freqs = np.fft.rfftfreq(mls.size, d=1.0 / fs)
     ax_ms.semilogx(freqs[1:], 20.0 * np.log10(spec[1:] / np.median(spec[1:])),
                    color=COLOR_SECONDARY, linewidth=0.7)
-    ax_ms.set_title("MLS magnitude spectrum (flat)", fontweight="bold")
+    ax_ms.set_title("MLS magnitude spectrum (flat)")
     ax_ms.set_xlabel("Frequency [Hz]")
     ax_ms.set_ylabel("Magnitude [dB]")
     ax_ms.set_xlim(20.0, fs / 2)
@@ -170,7 +170,7 @@ def generate_excitation_signals(output_dir: str) -> None:
     ax_ms.set_ylim(-12.0, 12.0)
     ax_ms.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
 
-    fig.suptitle("ISO 18233 excitation signals", fontweight="bold")
+    fig.suptitle("ISO 18233 excitation signals")
     plt.tight_layout()
     save_figure(output_dir, "excitation_signals.png")
     plt.close()
@@ -212,7 +212,7 @@ def generate_impulse_response(output_dir: str) -> None:
     _fig, (ax_w, ax_d) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
     ax_w.plot(time, h / peak, color=COLOR_PRIMARY, linewidth=0.7)
     ax_w.set_title("Recovered room impulse response (ISO 18233)",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_w.set_ylabel("Amplitude (norm.)")
     ax_w.set_ylim(-1.1, 1.1)
     ax_w.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -309,7 +309,7 @@ def generate_deconvolution_snr_gain(output_dir: str) -> None:
     ax.annotate("noise floor read here", xy=(1.3, -12.0), fontsize=9,
                 color=COLOR_FG, ha="center")
     ax.set_title("Effective signal-to-noise ratio of the recovered impulse "
-                 "response", fontweight="bold", pad=10)
+                 "response", pad=10)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Level re peak [dB]")
     ax.set_xlim(0.0, seconds)
@@ -370,7 +370,7 @@ def generate_sweep_distortion_separation(output_dir: str) -> None:
     ax.annotate("causal part: what impulse_response() returns", xy=(0.35, -6.0),
                 fontsize=10, color=COLOR_FG, ha="left")
     ax.set_title("Harmonic distortion lands before $t$ = 0 (ISO 18233 B.5)",
-                 fontweight="bold", pad=18)
+                 pad=18)
     ax.set_xlabel("Arrival time relative to the linear impulse response [s]")
     ax.set_ylabel("Level re peak [dB]")
     ax.set_xlim(-0.78, 0.42)
@@ -442,7 +442,7 @@ def generate_source_distance_bias(output_dir: str) -> None:
                   xytext=(r_c + 0.4, 0.08), fontsize=9, color=COLOR_FG,
                   va="center", ha="left")
     ax_t.set_title(r"A microphone inside $d_{\mathrm{min}}$ returns wrong "
-                   "numbers, not noisy ones", fontweight="bold", pad=10)
+                   "numbers, not noisy ones", pad=10)
     plt.tight_layout()
     save_figure(output_dir, "source_distance_bias.svg")
     plt.close()
@@ -486,7 +486,7 @@ def generate_modal_count_per_band(output_dir: str) -> None:
     ax.set_ylabel("Modes inside the octave band")
     ax.set_ylim(5.0, counts.max() * 6.0)
     ax.set_title("What the analysis band averages over (7 × 5 × 3 m room, "
-                 "$V$ = 105 m³)", fontweight="bold", pad=10)
+                 "$V$ = 105 m³)", pad=10)
     ax.grid(which="both", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -566,7 +566,7 @@ def generate_excitation_robustness(output_dir: str) -> None:
                 linewidth=1.0 if style == "-" else 1.5,
                 label=f"{kind}, {name}")
     ax.set_title("Time variance costs the MLS its dynamic range, not the sweep",
-                 fontweight="bold", pad=10)
+                 pad=10)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Level re peak [dB]")
     ax.set_xlim(0.0, n / fs)
@@ -638,7 +638,7 @@ def generate_open_plan_quality(output_dir: str) -> None:
     ax_l.set_ylabel("A-weighted speech level [dB]")
     ax_l.set_ylim(30.0, 62.0)
     ax_l.set_title("The same two quantities at the two ends of Annex A",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_s.axhline(0.50, color=COLOR_FG, linestyle="-", linewidth=1.1)
     ax_s.annotate("STI = 0.50", xy=(16.5, 0.52), fontsize=9, color=COLOR_FG)
     ax_s.axhline(0.20, color=COLOR_FG, linestyle="--", linewidth=1.0)
@@ -709,7 +709,7 @@ def generate_absorption_per_table(output_dir: str) -> None:
     ax_a.set_ylabel(r"Absorption per occupied table $A_{\mathrm{tab}}$ [m²]")
     ax_a.set_ylim(0.0, 60.0)
     ax_a.set_xlim(0.6, 3.2)
-    ax_a.set_title("The design window, for one layout", fontweight="bold",
+    ax_a.set_title("The design window, for one layout",
                    pad=10)
     ax_a.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_a.set_axisbelow(True)
@@ -737,7 +737,7 @@ def generate_absorption_per_table(output_dir: str) -> None:
     ax_w.set_ylabel(r"Width of the feasible $A_{\mathrm{tab}}$ window [m²]")
     ax_w.set_xlim(1.0, 2.2)
     ax_w.set_title(f"Packed tables close it ($r_s$ = {r_s:g} m)",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_w.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_w.set_axisbelow(True)
 
@@ -781,7 +781,7 @@ def generate_open_plan_decay(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     ax.set_title("Open-Plan Spatial Decay of Speech (ISO 3382-3)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel("Distance from the talker $r$ [m]")
     ax.set_ylabel("A-weighted SPL [dB]", color=COLOR_PRIMARY)
     ax.set_xlim(1.7, 18.0)
@@ -900,7 +900,7 @@ def generate_image_source_reflectogram(output_dir: str) -> None:
     ax.set_xlabel("Arrival time [ms]")
     ax.set_ylabel("Reflection level re direct [dB]")
     ax.set_title("Image-Source Room Impulse Response: a 7 × 5 × 3 m room "
-                 "(order ≤ 10)", fontweight="bold", pad=12)
+                 "(order ≤ 10)", pad=12)
     ax.set_xlim(0.0, 120.0)
     ax.set_ylim(-60.0, 5.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -953,7 +953,7 @@ def generate_reverberation_models(output_dir: str) -> None:
     ax.set_xticklabels([f"{int(b)}" for b in bands])
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Reverberation time $T$ [s]")
-    ax.set_title("Reverberation-time prediction models", fontweight="bold", pad=12)
+    ax.set_title("Reverberation-time prediction models", pad=12)
     ax.set_ylim(bottom=0.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -1050,7 +1050,7 @@ def generate_enclosed_space_absorption(output_dir: str) -> None:
         ax.set_xticklabels(labels)
         ax.set_xlabel("Octave-band centre frequency [Hz]")
         ax.set_ylabel(ylab)
-        ax.set_title(title, fontweight="bold", pad=10)
+        ax.set_title(title, pad=10)
         ax.set_ylim(bottom=0.0)
         ax.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
         ax.set_axisbelow(True)
@@ -1092,7 +1092,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     ax_nc.set_xlabel("Octave-band center frequency [Hz]")
     ax_nc.set_ylabel("Octave-band sound pressure level [dB]")
     ax_nc.set_title(f"Noise Criteria — tangency method   NC-{nc.rating:g}",
-                    fontweight="bold", pad=10)
+                    pad=10)
     ax_nc.grid(which="both", axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_nc.set_axisbelow(True)
     ax_nc.legend(loc="upper right")
@@ -1128,7 +1128,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     ax_rc.set_xlabel("Octave-band center frequency [Hz]")
     ax_rc.set_ylabel("Octave-band sound pressure level [dB]")
     ax_rc.set_title(f"Room Criteria Mark II   {rc.label}",
-                    fontweight="bold", pad=10)
+                    pad=10)
     ax_rc.grid(which="both", axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_rc.set_axisbelow(True)
     ax_rc.legend(loc="upper right")
@@ -1171,7 +1171,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
         ax_nc.plot([nc.governing_frequency], [gov], "D", color=color, ms=10,
                    mec=COLOR_FG, mew=0.8, zorder=4)
     ax_nc.set_title(f"One rating: NC-{nc_left.rating:g} for both rooms",
-                    fontweight="bold", pad=10)
+                    pad=10)
 
     # --- Right: the deviation from each room's own RC reference curve. ---
     # The tag rule read directly: +5 dB at and below 500 Hz, +3 dB at and
@@ -1188,7 +1188,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
                    color=color, zorder=3, label=f"{label} — {rc.label}")
     ax_rc.set_ylim(-17.0, 17.0)
     ax_rc.set_title("Two ratings: the RC Mark II tag reads the character",
-                    fontweight="bold", pad=10)
+                    pad=10)
 
     for axis in (ax_nc, ax_rc):
         axis.set_xscale("log")
@@ -1299,7 +1299,7 @@ def generate_reverberation_model_absorption(output_dir: str) -> None:
     top.set_ylabel(r"Reverberation time $T$ [s]")
     top.set_ylim(0.02, 4.0)
     top.set_title("Model behaviour against the mean absorption",
-                  fontweight="bold", pad=12)
+                  pad=12)
     top.legend(loc="upper right", fontsize=9)
     top.annotate(
         "Sabine stays finite:\n0.12 s at " + r"$\alpha = 1$",
@@ -1369,7 +1369,7 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
                     label=name.replace("C_", " °C, ") + " % RH")
     left.set_ylabel(r"Air term $A_{\mathrm{air}} = 4mV(1-\psi)$ [m²]")
     left.set_title(r"Six climate profiles, $V$ = 2000 m³",
-                   fontweight="bold", pad=10)
+                   pad=10)
     left.legend(loc="upper left", fontsize=8)
 
     styles = ((60.0, 94.0, COLOR_PRIMARY, "60 m³ office"),
@@ -1385,7 +1385,7 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
     right.set_ylabel(r"Reverberation time $T$ [s]")
     right.set_ylim(bottom=0.0)
     right.set_title("The same absorption in two volumes",
-                    fontweight="bold", pad=10)
+                    pad=10)
     right.legend(loc="lower left", fontsize=8)
     right.annotate("−42 % at 8 kHz", xy=(8000.0, 1.24), xytext=(0.42, 0.30),
                    textcoords="axes fraction", fontsize=9, color=COLOR_FG,
@@ -1462,7 +1462,7 @@ def generate_enclosed_space_objects(output_dir: str) -> None:
                           for f in freq])
     left.set_xlabel("Octave-band centre frequency [Hz]")
     left.set_ylabel("Equivalent absorption area $A$ [m²]")
-    left.set_title("Where the absorption comes from", fontweight="bold", pad=10)
+    left.set_title("Where the absorption comes from", pad=10)
     left.legend(loc="upper left", fontsize=9)
 
     right.semilogx(freq, bare.reverberation_time, color=COLOR_SECONDARY,
@@ -1476,7 +1476,7 @@ def generate_enclosed_space_objects(output_dir: str) -> None:
     right.set_xlabel(LABEL_FREQ_HZ)
     right.set_ylabel(r"Reverberation time $T$ [s]")
     right.set_ylim(bottom=0.0)
-    right.set_title("The volume the objects displace", fontweight="bold", pad=10)
+    right.set_title("The volume the objects displace", pad=10)
     right.legend(loc="lower left", fontsize=9)
     format_frequency_axis(right, float(freq[0]), float(freq[-1]), minor=None)
     right.annotate(
@@ -1560,7 +1560,7 @@ def generate_image_source_order_convergence(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     ax.set_xlabel("Reflection-order cut-off  max_order")
     ax.set_ylabel(r"Fitted $T_{30}$ [s]")
-    ax.set_title("The image lattice is a time horizon", fontweight="bold",
+    ax.set_title("The image lattice is a time horizon",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -1640,7 +1640,7 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
     ax.set_xlabel(r"Room elongation  $L_x : L_y = L_z$")
     ax.set_ylabel(r"Reverberation time [s]")
     ax.set_title("Where the specular decay leaves the diffuse-field estimate",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_ylim(bottom=0.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -1690,7 +1690,7 @@ def generate_image_source_bands(output_dir: str) -> None:
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Level re steady state [dB]")
     ax.set_title("Per-band decay: solid without air, dashed with air",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -1771,7 +1771,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
                for kind, colour in family.items()]
     axes[0].legend(handles=handles, loc="upper left", fontsize=8, ncol=3)
     axes[0].set_title("Three rooms of 105 m³, modes up to 200 Hz",
-                      fontweight="bold", pad=10)
+                      pad=10)
     plt.tight_layout()
     save_figure(output_dir, "room_proportion_modes.svg")
     plt.close()
@@ -1799,7 +1799,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
                       zorder=5)
         left.axvline(field.critical_distance, color=colour, linestyle=":",
                      linewidth=1.2, zorder=3)
-    left.set_title(r"$Q$ moves $r_c$, not the plateau", fontweight="bold",
+    left.set_title(r"$Q$ moves $r_c$, not the plateau",
                    pad=10)
     left.legend(loc="upper right", fontsize=9)
 
@@ -1813,7 +1813,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
             label=rf"$\bar\alpha$ = {absorption:g}  ($R$ = "
                   f"{field.room_constant:.0f} m²)", zorder=5)
     right.set_title(r"Absorption moves the plateau, not the direct field",
-                    fontweight="bold", pad=10)
+                    pad=10)
     right.legend(loc="upper right", fontsize=9)
     right.annotate(r"10.1 dB = $10\,\mathrm{lg}(R_2/R_1)$", xy=(8.0, 73.2),
                    xytext=(0.06, 0.22),
@@ -1879,7 +1879,7 @@ def generate_decay_signatures(output_dir: str) -> None:
         ax.set_xlim(0.0, 3.0)
         ax.set_ylim(-60.0, 3.0)
         ax.set_xlabel("Time [s]")
-        ax.set_title(name, fontweight="bold", pad=10)
+        ax.set_title(name, pad=10)
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
         ax.set_axisbelow(True)
         summary = (f"EDT {float(res.edt[0]):.2f} s\n"
@@ -1945,7 +1945,7 @@ def generate_decay_range_bias(output_dir: str) -> None:
     ax.set_xlabel("Usable decay range  dynamic_range (INR) [dB]")
     ax.set_ylabel(r"Error of the fitted decay time [%]")
     ax.set_title("The bias an undersized decay range leaves behind",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="center right", fontsize=9)

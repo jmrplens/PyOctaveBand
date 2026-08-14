@@ -190,7 +190,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Bending waves at an L-junction (elastic 2D FDTD)"),
-                 fontweight="bold")
+                 )
     axes = fig.subplots(2, 1, sharex=True)
     titles = [T("Straight plate: the packet just runs on"),
               T("L-junction: reflected, transmitted and mode-converted")]
@@ -207,7 +207,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
                        cmap="magma", vmin=0.0, vmax=vmax,
                        aspect="equal", interpolation="bilinear")
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         # The 10 mm plates, drawn as thin open rectangles so the field
         # inside stays visible.
         px1 = _EJ_JUNC_X + 4 * _EL_DX if with_junction else x1
@@ -478,7 +478,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Coincidence: the same steel plate, below and above "
-                   "$f_c$ (elastic 2D FDTD)"), fontweight="bold")
+                   "$f_c$ (elastic 2D FDTD)"))
     axes = fig.subplots(1, 2, sharey=True)
     titles = [T(f"$f = f_c/2$ = {fc / 2:.0f} Hz, 45° incidence"),
               T(f"$f = 2f_c$ = {2 * fc:.0f} Hz, 45° incidence")]
@@ -506,7 +506,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
                        cmap=CMAP_FIELD, vmin=-_EC_VLIM, vmax=_EC_VLIM,
                        aspect="equal", interpolation="bilinear")
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.add_patch(Rectangle((x0, _EC_PLATE_Y), x1 - x0, _EL_H,
                                facecolor=COLOR_GRID, edgecolor=COLOR_FG,
                                lw=0.8, zorder=3))

@@ -265,7 +265,7 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The critical grazing angle: a fast seabed and a slow one "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     # The two field panels are drawn to true scale (an angle on screen is
     # the angle), so their height follows their width: the ratios below are
     # the scene's own aspect, and the flux axis takes what is left.

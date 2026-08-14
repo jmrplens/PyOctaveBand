@@ -380,7 +380,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Time-weighting ballistics (IEC 61672-1)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.15])
     ax_s = fig.add_subplot(gs[:, 0])
@@ -575,7 +575,7 @@ def animate_onset_detection(output_dir: str) -> None:
     ax.text(0.02, 0.05, T("detector: onset when $dL/dt > 10$ dB/s"),
             transform=ax.transAxes, ha="left", va="bottom", color=COLOR_FG,
             fontsize=9, zorder=8, path_effects=_halo(3.0))
-    ax.set_title(T("Impulse onset detection (NT ACOU 112)"), fontweight="bold")
+    ax.set_title(T("Impulse onset detection (NT ACOU 112)"))
     ax.set_xlabel(T("Time [s]"))
     ax.set_ylabel(T("A-weighted level $L_{AF}$ [dB]"), fontsize=9)
     ax.legend(loc="upper right", fontsize=8)
@@ -673,7 +673,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
     ]
     fig = _anim_figure()
     fig.suptitle(T(r"Two-microphone p-p probe: instantaneous intensity $p\cdot u$"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[1.15, 1.0])
     dial_c, dial_r = (1.55, 3.05), 1.25
     i_axis_y, i_scale = 1.05, 2.35
@@ -681,7 +681,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
     for col, (title, phi, caption) in enumerate(cases):
         ax_s = fig.add_subplot(gs[0, col])
         _schematic_axes(ax_s, (0.0, 10.0), (0.0, 4.9), equal=True)
-        ax_s.set_title(title, fontsize=10.5, fontweight="bold")
+        ax_s.set_title(title, fontsize=10.5)
         ax_s.add_patch(Circle(dial_c, dial_r, facecolor="none",
                               edgecolor=COLOR_GRID, lw=1.2))
         p_ph = _make_arrow(ax_s, COLOR_PRIMARY, scale=11.0)
@@ -859,7 +859,7 @@ def animate_schroeder(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Schroeder backward integration (ISO 3382)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.3])
     ax_e = fig.add_subplot(gs[0])
     _grid_axes(ax_e)
@@ -958,7 +958,7 @@ def animate_flanking_paths(output_dir: str) -> None:
     T = _translate_str
     fig = _anim_figure()
     fig.suptitle(T("Flanking transmission paths (EN 12354-1)"),
-                 fontweight="bold")
+                 )
     ax = fig.add_subplot()
     _schematic_axes(ax, (0.0, 14.2), (0.0, 7.6), equal=True)
 
@@ -1108,7 +1108,7 @@ def animate_intensity_scan_power(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Intensity scanning over a box surface (ISO 9614-2)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(1, 2, width_ratios=[1.75, 1.0])
     ax = fig.add_subplot(gs[0])
     _schematic_axes(ax, (0.0, 9.4), (0.0, 6.4), equal=True)
@@ -1331,7 +1331,7 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Sweep measurement and deconvolution (ISO 18233)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[0.85, 1.15])
     ax_r = fig.add_subplot(gs[0, :])
     # The band below zero is the caption's: at the drawn scale an 8 pt line is
@@ -1480,7 +1480,7 @@ def animate_specific_loudness(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(1, 2, width_ratios=[2.1, 1.0])
     ax = fig.add_subplot(gs[0])
     _grid_axes(ax)
@@ -1579,7 +1579,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("One source, two rooms, one sound power"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[2.35, 1.0])
     ax_a = fig.add_subplot(gs[0, 0])
     _schematic_axes(ax_a, (0.0, 8.0), (0.0, 6.6), equal=True)
@@ -1590,7 +1590,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     # --- anechoic room: wedges on every wall, mic ring, free field -------
     ax_a.set_title(T("Anechoic room (ISO 3745)"), fontsize=10,
-                   fontweight="bold")
+                   )
     ax_a.add_patch(Rectangle((0.6, 0.4), 6.8, 5.6, facecolor="none",
                              edgecolor=COLOR_FG, lw=1.4))
     wedge = 0.42
@@ -1631,7 +1631,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     # --- reverberation room: bare walls, diffuse build-up, one mic path --
     ax_r.set_title(T("Reverberation room (ISO 3741)"), fontsize=10,
-                   fontweight="bold")
+                   )
     # animated fill (the diffuse level building up) + a fixed outline
     room = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
                      edgecolor="none", alpha=0.0)
@@ -1764,7 +1764,7 @@ def animate_comb_filtering(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Comb filtering from a single reflection"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.25, 1.0])
     ax = fig.add_subplot(gs[:, 0])
     _schematic_axes(ax, (0.0, 5.6), (-2.3, 2.6), equal=True)
@@ -1919,7 +1919,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     phase = np.degrees(np.angle(response(freqs)))
 
     fig = _anim_figure()
-    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"), fontweight="bold")
+    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.0])
 
@@ -2161,7 +2161,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The modulation transfer function on the envelope "
-                   "(IEC 60268-16)"), fontweight="bold")
+                   "(IEC 60268-16)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.55, 1.0],
                           height_ratios=[1.0, 1.0])
 
@@ -2225,7 +2225,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
                     alpha=0.85)
     ax_b.set_xticks(xs)
     ax_b.set_xticklabels(list(_MTF_BAND_LABELS))
-    sti_txt = ax_b.set_title("", fontsize=10.5, fontweight="bold",
+    sti_txt = ax_b.set_title("", fontsize=10.5,
                              family="monospace", color=COLOR_FG)
 
     # Act timing over the 10 s sweep (the last 2 s of the clip are the hold).
@@ -2378,7 +2378,7 @@ def animate_loudness_gating(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The two passes of the EBU R 128 gate (BS.1770-5)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[3.05, 1.0],
                           height_ratios=[2.5, 1.0])
 
@@ -2637,7 +2637,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("EPNL, record by record (ICAO Annex 16 Appendix 2)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.45, 1.0])
 
@@ -2897,7 +2897,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The reflectogram is a lattice being swept "
-                   "(image-source method)"), fontweight="bold")
+                   "(image-source method)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.12, 1.0],
                           height_ratios=[1.5, 1.0])
 
@@ -3090,7 +3090,7 @@ def animate_iso717_shift(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Fitting the ISO 717 reference curve, one step at a time"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.45, 1.0],
                           height_ratios=[1.0, 1.0])
 
@@ -3369,7 +3369,7 @@ def animate_block_vs_exponential(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("One burst, two detectors, and the block grid underneath"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.28, 1.0],
                           height_ratios=[1.0, 1.15])
 
@@ -3575,7 +3575,7 @@ def animate_feedback_howl(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Gain before feedback is a convergence condition"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.1, 1.0],
                           height_ratios=[1.0, 1.0])
 

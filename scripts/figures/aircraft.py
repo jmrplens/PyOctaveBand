@@ -64,7 +64,7 @@ def generate_epnl(output_dir: str) -> None:
     ax.set_ylabel("Level [PNdB]")
     ax.set_title(
         "ICAO Aircraft Flyover — Effective Perceived Noise Level (Annex 16)",
-        fontweight="bold", pad=12)
+        pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -99,7 +99,7 @@ def generate_aircraft_atmospheric_absorption(output_dir: str) -> None:
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Attenuation [dB]")
     ax.set_title("Aircraft Atmospheric Absorption (SAE ARP 5534)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -133,7 +133,7 @@ def generate_airport_noise(output_dir: str) -> None:
     ax.set_xscale("log")
     ax.set_xlabel("Slant distance [m]")
     ax.set_ylabel("Event level [dB]")
-    ax.set_title("Noise-Power-Distance Curves (ECAC Doc 29)", fontweight="bold", pad=12)
+    ax.set_title("Noise-Power-Distance Curves (ECAC Doc 29)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -168,7 +168,7 @@ def generate_airport_contour(output_dir: str) -> None:
                         x=np.linspace(-2500.0, 20000.0, 56), y=np.linspace(-6000.0, 6000.0, 44))
     ax = res.plot()
     plt.gcf().set_size_inches(10, 5.5)
-    ax.set_title("Aircraft Departure SEL Contour (ECAC Doc 29)", fontweight="bold", pad=12)
+    ax.set_title("Aircraft Departure SEL Contour (ECAC Doc 29)", pad=12)
     plt.tight_layout()
     save_figure(output_dir, "airport_contour.png")
     plt.close()
@@ -227,7 +227,7 @@ def generate_airport_sor(output_dir: str) -> None:
     ax.set_xlim(-21.0, 21.0)
     ax.set_ylim(-20.2, 1.5)
     ax.set_title(r"Start-of-Roll Directivity $\Delta_{SOR}$ (ECAC Doc 29 §4.5.7)",
-                 fontweight="bold", pad=6)
+                 pad=6)
     ax.text(0.0, 1.0,
             r"radial axis: $\Delta_{SOR}$ [dB] relative to abeam"
             r"  ·  $d_{SOR}$ = 300 m",
@@ -259,7 +259,7 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
     ax.set_xlabel("One-third-octave-band centre frequency [Hz]")
     ax.set_ylabel(r"Ground-effect adjustment $\Delta L_g$ [dB]")
     ax.set_title("Rotorcraft Ground Effect (ECAC Doc 32, Chien-Soroka)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6, which="both")
     ax.set_axisbelow(True)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -317,7 +317,7 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
     ax.set_xlabel("Recorded time [s]")
     ax.set_ylabel("A-weighted sound pressure level [dB(A)]")
     ax.set_title("Rotorcraft Flyover Time History (ECAC Doc 32)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -349,7 +349,7 @@ def generate_rotorcraft_terrain_screening(output_dir: str) -> None:
                                   gridspec_kw={"height_ratios": [1.1, 1.0]})
     res.plot(ax=ax)   # the user-facing section geometry
     ax.set_title("Rotorcraft Terrain Screening (ECAC Doc 32 / NORAH2)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
 
@@ -417,7 +417,7 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     ax.set_xlabel(r"Path difference $\delta$ [m]")
     ax.set_ylabel(r"Diffraction attenuation $\Delta L_d$ [dB]")
     ax.set_title("Rotorcraft Diffraction Attenuation vs Path Difference "
-                 "(ECAC Doc 32 / NORAH2)", fontweight="bold", pad=12)
+                 "(ECAC Doc 32 / NORAH2)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -443,7 +443,7 @@ def generate_anp_npd(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     curves.plot(ax=ax)
     ax.set_title(f"ANP NPD Curves - {aircraft.description} (SEL, departure)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.text(0.02, 0.06,
@@ -467,7 +467,7 @@ def generate_anp_profile(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     profile.plot(ax=ax)
     ax.set_title(f"ANP Default Departure Profile - {aircraft.description}",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.text(0.98, 0.06,
@@ -530,7 +530,7 @@ def generate_airport_segment_breakdown(output_dir: str) -> None:
             patch.set_facecolor(COLOR_SECONDARY)
     ax.set_ylim(0.0, float(seg.max()) + 12.0)
     ax.set_title("Doc 29 Segment Contributions at One Receiver",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.annotate(f"closest segment: {seg[top]:.1f} dB",
                 xy=(top, seg[top]), xytext=(top + 5.0, seg[top] + 7.0),
                 color=COLOR_FG, fontsize=9,
@@ -575,7 +575,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     ax_i.set(xlabel=r"Depression angle $\varphi$ [°]",
              ylabel=r"$\Delta I(\varphi)$ [dB]", xlim=(0.0, 180.0))
     ax_i.set_title("(a) Engine installation (Eq. 4-15/4-16)", fontsize=11,
-                   fontweight="bold")
+                   )
     ax_i.legend(loc="lower center", fontsize=8)
 
     # (b) lateral attenuation: elevation angle, for three lateral offsets.
@@ -589,7 +589,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     ax_l.set(xlabel=r"Elevation angle $\beta$ [°]",
              ylabel=r"$\Lambda(\beta, \ell)$ subtracted [dB]", xlim=(0.0, 90.0))
     ax_l.set_title("(b) Lateral attenuation (Eq. 4-18/4-19)", fontsize=11,
-                   fontweight="bold")
+                   )
     ax_l.legend(loc="upper right", fontsize=8)
 
     # (c) noise fraction: the share of the infinite path a finite segment gives.
@@ -607,7 +607,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
               color=COLOR_FG)
     ax_f.set(xlabel=r"$q/\lambda$", ylabel=r"$\Delta F$ [dB]", ylim=(-15.0, 1.0))
     ax_f.set_title(rf"(c) Noise fraction, $d_\lambda$ = {d_lambda:.0f} m (Eq. 4-20)",
-                   fontsize=11, fontweight="bold")
+                   fontsize=11)
     ax_f.legend(loc="lower right", fontsize=8)
 
     # (d) duration correction, with the impedance adjustment for scale.
@@ -623,7 +623,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     ax_v.set(xlabel=r"Segment speed $V_{\mathrm{seg}}$ [m/s]",
              ylabel=r"$\Delta V$ [dB]")
     ax_v.set_title("(d) Duration correction (Eq. 4-14)", fontsize=11,
-                   fontweight="bold")
+                   )
     ax_v.text(0.98, 0.96,
               "impedance adjustment (Eq. 4-6/4-7), for scale:\n"
               f"15 °C, 101.3 kPa: {_fmt_minus(impedance_adjustment(), '+.2f')} dB\n"
@@ -668,7 +668,7 @@ def generate_anp_contour(output_dir: str) -> None:
     ax.set_xlim(x.min() / 1000.0, x.max() / 1000.0)
     ax.set_ylim(y.min() / 1000.0, y.max() / 1000.0)
     ax.set_title(f"ANP Departure SEL Contour - {record.description}",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.legend(loc="lower left", fontsize=8)
     ax.text(0.98, 0.94,
             f"stage length {profile.stage_length}, "
@@ -750,7 +750,7 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
     ax.axvspan(40.0, 140.0, color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
     ax.text(90.0, ax.get_ylim()[0] + 2.0, "measured polar band", ha="center",
             fontsize=9, color=COLOR_FG)
-    ax.set_title(r"Fore-aft section ($\varphi$ = 0°)", fontweight="bold", pad=10)
+    ax.set_title(r"Fore-aft section ($\varphi$ = 0°)", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
 
@@ -774,7 +774,6 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
     ax2.set_xlabel(r"Polar angle $\theta$ [°]")
     ax2.set_ylabel(r"Azimuth $\varphi$ [°]")
     ax2.set_title(f"{freqs[idx]:.0f} Hz band, the most directive one",
-                  fontweight="bold",
                   pad=10)
     ax2.text(0.02, 0.04,
              f"{spread:.1f} dB between the loudest and quietest measured cell;\n"
@@ -820,7 +819,7 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     ax.set_xticks(np.arange(-180.0, 181.0, 60.0))
     ax.set_xlabel("Ring bearing [°]  (0° nose, +90° starboard)")
     ax.set_ylabel("Band level at 70 m [dB]")
-    ax.set_title("In-ground-hover ring, 315 Hz band", fontweight="bold", pad=10)
+    ax.set_title("In-ground-hover ring, 315 Hz band", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
 
@@ -848,7 +847,7 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     ax2.set_xlabel(r"Polar angle $\theta$ [°]  (0° forward → 180° rearward)")
     ax2.set_ylabel("Source level at 70 m [dB]")
     ax2.set_title(r"Derived hover and idle sources (Table 3, $\varphi$ = 0°)",
-                  fontweight="bold", pad=10)
+                  pad=10)
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax2.set_axisbelow(True)
     ax2.legend(loc="upper right", fontsize=9)
@@ -892,7 +891,7 @@ def generate_rotorcraft_contour(output_dir: str) -> None:
                 label="the event receiver")
         ax.set_xlim(x.min() / 1000.0, x.max() / 1000.0)
         ax.set_ylim(y.min() / 1000.0, y.max() / 1000.0)
-        ax.set_title(title, fontweight="bold", pad=10)
+        ax.set_title(title, pad=10)
         ax.legend(loc="upper right", fontsize=8)
     axes[1].axhline(-0.3, color=COLOR_FG, lw=1.0, ls=":")
     axes[1].axhline(0.3, color=COLOR_FG, lw=1.0, ls=":")
@@ -953,7 +952,7 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
                     fontsize=9, color=color,
                     ha="left" if side > 0 else "right")
     ax.set_title("Mean Ground Plane and Equivalent Heights (ECAC Doc 32 / NORAH2)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
     ax.set_axisbelow(True)
@@ -1038,7 +1037,7 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
         axis.plot([qo[0], pts[w_out[0][0], 0]], [qo[1], pts[w_out[0][0], 1]],
                   color=COLOR_SECONDARY, lw=1.2, ls=":", zorder=2)
         axis.set(xlabel=xlabel, ylabel=ylabel)
-        axis.set_title(title, fontweight="bold", pad=10)
+        axis.set_title(title, pad=10)
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
         axis.set_axisbelow(True)
         axis.legend(loc="upper left", fontsize=8)
@@ -1091,7 +1090,7 @@ def generate_rotorcraft_kinematics(output_dir: str) -> None:
             (ax2, t_fine, smooth, "Smoothing spline resampled to 0.5 s")):
         kin = flight_path_kinematics(times, pos)
         kin.plot(ax=axis)
-        axis.set_title(title, fontweight="bold", pad=10)
+        axis.set_title(title, pad=10)
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
         axis.set_axisbelow(True)
         peak = float(np.nanmax(np.abs(kin.bank_angle)))

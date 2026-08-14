@@ -187,7 +187,7 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
     # claim space from the constrained layout on its own.
     fig.get_layout_engine().set(rect=(0.0, 0.075, 1.0, 0.925))
     fig.suptitle(T("Duct cut-on: is one pressure enough? (2D FDTD)"),
-                 fontweight="bold")
+                 )
     grid = fig.add_gridspec(2, 2, width_ratios=(6.4, 1.15))
     titles = [T(f"{_DUCT_FREQS[0]:.0f} Hz: below the {f_co:.1f} Hz cut-on"),
               T(f"{_DUCT_FREQS[1]:.0f} Hz: above it")]
@@ -208,7 +208,7 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
                        extent=(0.0, _DUCT_VIEW, 0.0, _DUCT_A),
                        cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                        aspect=_DUCT_ASPECT, interpolation="bilinear")
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.axvline(_DUCT_STATION, color=COLOR_FG, lw=1.0, ls=":", zorder=4)
         ax.plot([_DUCT_SRC_X], [_DUCT_SRC_YF * _DUCT_A], marker="o", ms=4,
                 color=COLOR_TERTIARY, markeredgecolor="white",

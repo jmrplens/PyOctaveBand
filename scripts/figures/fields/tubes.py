@@ -191,7 +191,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
     env_base, env_h, env_max = 0.265, 0.34, 2.2
     fig = _anim_figure()
     fig.suptitle(T("The virtual impedance tube: standing waves read the "
-                   "absorption (2D FDTD)"), fontweight="bold")
+                   "absorption (2D FDTD)"))
     axes = fig.subplots(2, 1, sharex=True)
     titles = [T(r"Rigid end: deep minima, $|r| \sim 1$"),
               T("10 cm lossy sample: shallow minima")]
@@ -225,7 +225,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
         ax.set_xlim(-0.125, length + 0.075)
         ax.set_ylim(-0.150, env_base + env_h + 0.045)
         ax.set_yticks([])
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.tick_params(labelsize=7)
         ims.append(im)
         lines.append(line)
@@ -367,7 +367,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
     length, bore = 1.6, 0.1
     fig = _anim_figure()
     fig.suptitle(T("The virtual transmission tube: what gets through "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     axes = fig.subplots(2, 1, sharex=True)
     titles = [T("Empty tube: the packet crosses unchanged"),
               T("10 cm lossy layer: reflected + attenuated transmission")]
@@ -389,7 +389,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
         ax.set_xlim(-0.125, length + 0.10)
         ax.set_ylim(-0.150, 0.255)
         ax.set_yticks([])
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.tick_params(labelsize=7)
         ims.append(im)
     axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
@@ -440,7 +440,7 @@ def animate_standing_wave_tube(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Standing wave in the impedance tube (ISO 10534-2)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 1)
     panels: list[dict[str, Any]] = []
     for row, (title, refl) in enumerate(cases):
