@@ -1284,18 +1284,30 @@ def generate_lab_versus_field_insulation(output_dir: str) -> None:
             zorder=4, label=(rf"field $R^{{\prime}}$, flanking dominant"
                              rf" ($R^{{\prime}}_w$ = {w_poor.rating} dB)"))
 
+    # The three curves climb about 3 dB per band, so a reading laid beside its
+    # own arrow is run over by the next curve within a word or two (and the
+    # Spanish text is longer still). Each reading therefore sits in the clear
+    # ground outside the band -- the gap between R and R' above the laboratory
+    # curve, the flanking gap below the field one -- with a leader back to the
+    # tip of the arrow it measures, so no leader crosses a curve either.
     mid = len(x) // 2
     ax.annotate("", xy=(mid, float(lab[mid])), xytext=(mid, float(good[mid])),
                 arrowprops={"arrowstyle": "<->", "lw": 1.4, "color": COLOR_FG})
-    ax.text(mid + 0.25, (float(lab[mid]) + float(good[mid])) / 2.0,
-            f"{w_lab.rating - w_good.rating} dB: normal", fontsize=9,
-            color=COLOR_FG)
+    ax.annotate(f"{w_lab.rating - w_good.rating} dB: normal",
+                xy=(mid, float(lab[mid])),
+                xytext=(mid - 1.0, float(lab[mid]) + 4.8),
+                fontsize=9, color=COLOR_FG, va="center",
+                arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG,
+                            "shrinkB": 5.0})
     ax.annotate("", xy=(mid + 3, float(lab[mid + 3])),
                 xytext=(mid + 3, float(poor[mid + 3])),
                 arrowprops={"arrowstyle": "<->", "lw": 1.4, "color": COLOR_FG})
-    ax.text(mid + 3.25, (float(lab[mid + 3]) + float(poor[mid + 3])) / 2.0,
-            f"{w_lab.rating - w_poor.rating} dB: find the path", fontsize=9,
-            color=COLOR_FG)
+    ax.annotate(f"{w_lab.rating - w_poor.rating} dB: find the path",
+                xy=(mid + 3, float(poor[mid + 3])),
+                xytext=(mid + 3.6, float(poor[mid + 3]) - 6.0),
+                fontsize=9, color=COLOR_FG, va="center",
+                arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG,
+                            "shrinkB": 5.0})
 
     ax.set_ylabel("Sound reduction index [dB]")
     ax.set_title("The same wall, in the laboratory and in two buildings\n"

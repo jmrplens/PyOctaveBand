@@ -565,24 +565,34 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
                   linestyle="--", linewidth=1.2, alpha=0.8)
         ax_l.plot(res.levels / np.std(record), res.rates, marker, color=color,
                   markersize=size, linestyle="none", label=label)
+    # The guides stop above the caption row: full height they ran straight
+    # through both sentences, and the dots merged with the glyphs (they share
+    # the red of the clipped record). Above the row they still cross every
+    # decade the rates occupy, which is all they are there to mark.
     for edge in (-2.5, 2.5):
-        ax_l.axvline(edge, color=COLOR_SECONDARY, linestyle=":", linewidth=1.1,
-                     alpha=0.8)
+        ax_l.axvline(edge, ymin=0.18, color=COLOR_SECONDARY, linestyle=":",
+                     linewidth=1.1, alpha=0.8)
     # Two rows, not one: side by side at the same height the Spanish pair
     # overlapped mid-panel (the committed asset shows them run together).
-    ax_l.text(-3.9, 0.34, "spikes lift both tails above the curve", fontsize=9,
+    ax_l.text(-3.6, 0.62, "spikes lift both tails above the curve", fontsize=9,
               color=COLOR_TERTIARY, ha="left")
-    ax_l.text(4.0, 0.16, r"clipping: no crossings past $2.5\,\sigma$",
+    ax_l.text(4.0, 0.2, r"clipping: no crossings past $2.5\,\sigma$",
               fontsize=9, color=COLOR_SECONDARY, ha="right")
     ax_l.set_yscale("log")
-    ax_l.set_ylim(1e-1, 1e4)
+    # A decade of headroom above the highest rate: the three-entry legend is
+    # wider in Spanish than in English, and at the old top it sat on the Rice
+    # curve and hid the marker groups underneath it.
+    ax_l.set_ylim(1e-1, 1e5)
     ax_l.set_xlabel(r"Crossing level $a/\sigma$")
     ax_l.set_ylabel("Crossings per second [1/s]")
     ax_l.set_title("Measured rates against each record's own Rice curve",
                    pad=10)
     ax_l.grid(color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_l.set_axisbelow(True)
-    ax_l.legend(loc="upper left", fontsize=9)
+    # Opaque: the guide at $-2.5\,\sigma$ passes behind the legend on its way
+    # to the top, and through a translucent frame it printed a dotted trace
+    # across the entries.
+    ax_l.legend(loc="upper left", fontsize=9, framealpha=1.0)
 
     # Right: what an out-of-band noise floor does to the irregularity factor.
     fs2 = 51200.0

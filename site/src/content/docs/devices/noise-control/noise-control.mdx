@@ -397,9 +397,9 @@ plt.show()
 
 # By hand, from the per-band fields the result carries:
 fig, ax = plt.subplots()
-ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel R")
-ax.plot(bands, enc.correction, "^:", label="Interior correction C")
-ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss (R - C)")
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel $R$")
+ax.plot(bands, enc.correction, "^:", label="Interior correction $C$")
+ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss ($R - C$)")
 ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Level [dB]")
 ax.set_xscale("log")
 ax.legend()

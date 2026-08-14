@@ -111,9 +111,10 @@ def plot_uncertainty_budget(
 
     ax = ax if ax is not None else _new_axes()
     contributions = np.asarray(result.contributions, dtype=np.float64)
-    names = list(result.names) or [
-        f"$x_{{{i + 1}}}$" for i in range(contributions.size)
-    ]
+    # The fallback must read exactly like the names combine_uncertainty
+    # fills in (``x1``, ``x2``, ...), so a hand-built result and a library
+    # one label the same bars the same way.
+    names = list(result.names) or [f"x{i + 1}" for i in range(contributions.size)]
     positions = np.arange(contributions.size)
     kwargs.setdefault("color", _C_PRIMARY)
     ax.barh(positions, contributions, **kwargs)

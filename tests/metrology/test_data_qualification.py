@@ -402,14 +402,14 @@ def test_trend_test_plot_renders_and_returns_axes() -> None:
     assert "Trend test" in ax.get_title()
     assert ax.get_xlabel() == "Sample index"
     legend = ax.get_legend().get_texts()[0].get_text()
-    assert "Reverse arrangements A = 86" in legend
+    assert "Reverse arrangements $A$ = 86" in legend
     assert "no trend" in legend
     plt.close("all")
     rng = np.random.default_rng(3)
     runs = ph.trend_test(rng.standard_normal(40), method="runs")
     ax = runs.plot()
     legend_texts = [t.get_text() for t in ax.get_legend().get_texts()]
-    assert any("Runs r =" in t for t in legend_texts)
+    assert any("Runs $r$ =" in t for t in legend_texts)
     assert any("Sequence median" in t for t in legend_texts)
     plt.close("all")
     with pytest.raises(ValueError):
@@ -448,7 +448,7 @@ def test_plots_render_and_return_axes() -> None:
     runs = ph.stationarity_test(x, FS, method="runs")
     ax = runs.plot()
     legend_texts = [t.get_text() for t in ax.get_legend().get_texts()]
-    assert any("Runs r =" in t for t in legend_texts)
+    assert any("Runs $r$ =" in t for t in legend_texts)
     assert any("Sequence median" in t for t in legend_texts)
     plt.close("all")
     noise = rng.standard_normal(n)

@@ -458,7 +458,7 @@ ax.bar(pos + 0.2, result.weighted, 0.4, color="#1f77b4",
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel(r"Aceleración eficaz [m/s$^2$]")
+ax.set_ylabel("Aceleración eficaz [m/s²]")
 ax.set_title(f"Aceleración ponderada ($a_w$ = {result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
@@ -764,7 +764,7 @@ result.plot(language="es")
 plt.show()
 
 # A mano, replicando lo que dibuja DailyVibrationExposure.plot():
-labels = [*result.labels, "A(8)"]
+labels = [*result.labels, "$A(8)$"]
 values = [*result.partials.tolist(), result.a8]
 a = result.assessment
 fig, ax = plt.subplots()
@@ -774,7 +774,7 @@ ax.axhline(a.action_value, color="#2ca02c", ls="--", label=f"VAE = {a.action_val
 ax.axhline(a.limit_value, color="#d62728", ls="--", label=f"VLE = {a.limit_value:g}")
 ax.set_xticks(range(len(values)))
 ax.set_xticklabels(labels, rotation=30, ha="right")
-ax.set_ylabel(r"Exposición diaria A(8) [m/s$^2$]")
+ax.set_ylabel("Exposición diaria $A(8)$ [m/s²]")
 ax.legend()
 plt.show()
 ```

@@ -25,6 +25,7 @@ def _sci_math(value: float, digits: int = 2) -> str:
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
@@ -1179,19 +1180,30 @@ class _LineSpectrum:
             -0.5 * ((self.frequencies - centre) / width) ** 2)
 
 
+#: One size for the four reading blocks of ``machine_fault_families``. Half a
+#: point below the usual note size: every block stands in the room between two
+#: of its panel's dashed lines, and the Spanish readings are the wide ones.
+_NOTE_PT = 8.5
+
+
 def _relabel_spectrum(ax: Axes, title: str) -> None:
     """Say what the drawn curve is: these panels are ordinary spectra.
 
     ``FaultFrequencyResult.plot`` labels its curve "envelope spectrum",
     which is true of the bearing route and false of the gear, motor and fan
     families drawn here, so the label, the y axis and the title are set to
-    what the panel actually shows.
+    what the panel actually shows. The panel's own legend goes with them: the
+    four panels draw the same curve and the same colour per family, so one key
+    at the foot of the figure says all of it, and none of the four upper-right
+    corners -- where the line names are -- has a box standing in it.
     """
     curve = ax.get_lines()[0]
     curve.set_label("vibration spectrum")
     ax.set_ylabel("Spectrum amplitude")
     ax.set_title(title, pad=10, fontsize=11)
-    ax.legend(loc="upper right", fontsize=8.5)
+    legend = ax.get_legend()
+    if legend is not None:
+        legend.remove()
 
 
 def generate_machine_fault_families(output_dir: str) -> None:
@@ -1203,7 +1215,10 @@ def generate_machine_fault_families(output_dir: str) -> None:
         induction_motor_frequencies,
     )
 
-    fig, axes = plt.subplots(2, 2, figsize=(12.6, 8.4))
+    # Wide panels: the three gear clusters sit 100 Hz wide on a 2400 Hz axis
+    # and the fan's four lines cut its axis into narrow columns, so the room
+    # between them is what every annotation block has to fit in.
+    fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.8))
 
     # --- (a) and (b): the same gear pair with two different faults ----------
     gear = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
@@ -1227,13 +1242,17 @@ def generate_machine_fault_families(output_dir: str) -> None:
                 spec.add(k * gmf + order * shaft, height * ratio)
         gear.within(1.0, 2400.0).plot(spectrum=spec, ax=ax)
         _relabel_spectrum(ax, title)
-        ax.set_ylim(0.0, 1.25)
+        # The block goes below the shaft end of the axis, the only stretch
+        # wide enough for it: the three mesh clusters carry their dashed
+        # lines the full height of the panel, and the block used to be read
+        # through the 2xGMF group's five of them.
         ax.annotate(
-            "sidebands at $\\pm f_s$ = 25 Hz:\n"
+            "sidebands at\n$\\pm f_s$ = 25 Hz:\n"
             + ("low and flat" if "Localised" in title
                else "tall groups, and the\nhigher harmonics lift"),
-            xy=(gmf + 2.0 * shaft, 0.34 if "Localised" in title else 0.62),
-            xytext=(910.0, 0.80), fontsize=9, color=COLOR_FG,
+            xy=(gmf - 2.0 * shaft, 0.16 if "Localised" in title else 0.42),
+            xytext=(0.025, 0.76), textcoords="axes fraction",
+            va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
             arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
 
     # --- (c): the motor family, three decades of amplitude ------------------
@@ -1250,11 +1269,13 @@ def generate_machine_fault_families(output_dir: str) -> None:
     _relabel_spectrum(ax, "Induction motor: 1x, 2x, 2fe and the rotor-slot "
                       "family")
     ax.set_yscale("log")
-    ax.set_ylim(1.0e-5, 3.0)
+    # Five decades and a little: the 1x line is the tallest thing in the panel
+    # and the top of the axis is where its name is written.
+    ax.set_ylim(1.0e-5, 5.0)
     ax.annotate("rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
                 "the spacing is the diagnosis",
                 xy=(motor["fsh"], 1.6e-3), xytext=(1700.0, 0.02),
-                fontsize=9, color=COLOR_FG,
+                fontsize=_NOTE_PT, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
 
     # --- (d): the ducted fan, blade rate against its lobe patterns ----------
@@ -1269,19 +1290,32 @@ def generate_machine_fault_families(output_dir: str) -> None:
     fan.plot(spectrum=spec, ax=ax)
     _relabel_spectrum(ax, "Ducted fan: the blade rate and its rotating lobe "
                       "patterns")
-    ax.set_ylim(0.0, 1.3)
+    # Each block is centred in the column between two of the fan's lines: the
+    # first between the shaft and the two-lobe pattern, the second between that
+    # and the blade rate, which the longer Spanish reading used to run over.
     ax.annotate("$m_L$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
-                xy=(fan["lobe n=1 m=10"], 0.12), xytext=(64.0, 0.72),
-                fontsize=9, color=COLOR_FG,
+                xy=(fan["lobe n=1 m=10"], 0.12), xytext=(66.0, 0.62),
+                va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
     ax.annotate("$m_L$ = 2 turns at 175 Hz,\n3x the shaft speed: strong",
-                xy=(fan["lobe n=1 m=2"], 0.68), xytext=(196.0, 0.96),
-                fontsize=9, color=COLOR_FG,
+                xy=(fan["lobe n=1 m=2"], 0.70), xytext=(189.0, 0.96),
+                va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
+
+    # One key for the four panels, at the foot of the figure: they draw the
+    # same curve and give each family the same colour, so a box per panel
+    # would only repeat itself in the corner where the line names are.
+    keyed: dict[str, Artist] = {}
+    for panel in axes.flat:
+        handles, names = panel.get_legend_handles_labels()
+        for name, handle in zip(names, handles, strict=True):
+            keyed.setdefault(name, handle)
+    fig.legend(list(keyed.values()), list(keyed), loc="lower center",
+               ncol=len(keyed), fontsize=9.5, frameon=False)
 
     fig.suptitle("Fault Families Are Recognised by Their Pattern",
                  fontsize=13)
-    plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.96))
+    plt.tight_layout(rect=(0.0, 0.035, 1.0, 0.96))
     save_figure(output_dir, "machine_fault_families.svg")
     plt.close()
 

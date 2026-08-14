@@ -256,12 +256,19 @@ def _draw_branch_silencer(
                            facecolor="none", edgecolor=_C_EDGE,
                            linewidth=1.2))
     off = 0.25 * d_d
-    if kind == _KIND_HELMHOLTZ and cavity_volume is not None:
+    # A Helmholtz neck is a slot a couple of centimetres long and a few
+    # millimetres wide: both of its dimensions are shorter than the text that
+    # labels them. Their labels therefore go on the far side of the dimension
+    # line, past the end of the extension lines, and the neck length is
+    # lettered upright so that it fits between the duct wall and the cavity.
+    neck = kind == _KIND_HELMHOLTZ
+    if neck and cavity_volume is not None:
         _draw_hr_cavity(
             ax, y0, branch_len, cavity_side, cavity_volume, language
         )
         _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
-             _mm(branch_len, language), offset=-2.0 * off, tight=True)
+             _mm(branch_len, language), offset=-2.0 * off, tight=True,
+             label_side=-1.0, label_upright=True)
     else:
         # Closed end of the quarter-wave tube.
         ax.plot([-0.5 * d_b, 0.5 * d_b],
@@ -270,7 +277,7 @@ def _draw_branch_silencer(
         _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
              _mm(branch_len, language), offset=-2.0 * off)
     _dim(ax, (-0.5 * d_b, y0), (0.5 * d_b, y0), _mm(d_b, language),
-         offset=-1.5 * off, tight=True)
+         offset=-1.5 * off, tight=True, label_side=-1.0 if neck else 1.0)
     _dim(ax, (-0.5 * run, -0.5 * d_d), (-0.5 * run, 0.5 * d_d),
          _mm(d_d, language), offset=2.0 * off, tight=True)
 

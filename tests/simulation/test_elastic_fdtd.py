@@ -612,7 +612,7 @@ def test_plot_probes(small_result: ElasticFDTDResult) -> None:
                                small_result.times * 1e3)
     np.testing.assert_allclose(lines[0].get_ydata(),
                                small_result.signals[0, 0])
-    assert lines[0].get_label().startswith("p, probe")
+    assert lines[0].get_label().startswith("$p$, probe")
     assert ax.get_xlabel() == "Time [ms]"
     plt.close(ax.figure)
 
@@ -623,7 +623,7 @@ def test_plot_snapshot(small_result: ElasticFDTDResult) -> None:
     images = ax.get_images()
     np.testing.assert_allclose(np.asarray(images[0].get_array()),
                                small_result.snapshots[-1])
-    assert "vy" in ax.get_title()
+    assert "$v_y$" in ax.get_title()
     plt.close(ax.figure)
 
 
@@ -634,7 +634,7 @@ def test_plot_localizes_labels(small_result: ElasticFDTDResult) -> None:
     plt.close(ax.figure)
 
     ax = small_result.plot(kind="snapshot", language="es")
-    assert ax.get_title().startswith("Campo de vy del FDTD elástico")
+    assert ax.get_title().startswith("Campo de $v_y$ del FDTD elástico")
     plt.close(ax.figure)
 
 

@@ -104,11 +104,12 @@ def test_report_renders_the_published_sheet(tmp_path) -> None:
         assert label in text
     # The fan row of Table 14.9 and the worksheet-signed silencer attenuation.
     assert "90 86 82 79 77 75 71 61" in text
-    assert "-7 -12 -16 -28 -35 -35 -28 -17" in text
+    # Signed with the typographic minus, as every reading a fiche prints is.
+    assert "−7 −12 −16 −28 −35 −35 −28 −17" in text
     # The silencer's regenerated noise keeps its own row.
     assert "49 43 44 42 42 45 35 24" in text
     # The received spectrum and the ANSI/ASA S12.2-2019 NC 30 curve.
-    assert "52 42 30 18 9 -2 -3 -1" in text
+    assert "52 42 30 18 9 −2 −3 −1" in text
     assert "57 48 41 35 32 29 28 27" in text
     assert "NC 30" in text
     # The boxed designation is quoted at the sheet's one-decimal rounding, not

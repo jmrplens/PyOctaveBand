@@ -242,7 +242,7 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
         20.0 * np.log10(np.array([0.01, 0.02, 0.02, 0.01]) / 0.25),
         atol=1e-6,
     )
-    assert "d₂" in ax.get_title()
+    assert "$d_2$" in ax.get_title()
     assert "SMPTE" in ax.get_title()
     plt.close("all")
     # Spanish labels and the unknown-language rejection.

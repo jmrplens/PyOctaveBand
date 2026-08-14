@@ -1632,10 +1632,15 @@ def generate_pole_migration(output_dir: str) -> None:
         ax.set_ylim(-1.25, 1.25)
         ax.set_aspect("equal")
         ax.grid(color=COLOR_GRID, linestyle="-")
-        ax.legend(loc="lower left", fontsize=8)
+        # One row along the bottom: the corners of a unit-circle plot are the
+        # only space free of the circle, and they are too small for a stacked
+        # legend -- at "lower left" the box swallowed the outermost pole of
+        # the lower conjugate group and a stretch of the circle itself.
+        ax.legend(loc="lower center", ncol=2, fontsize=8)
 
-    # The zoom that makes the collapsed pair visible.
-    inset = ax_a.inset_axes((0.52, 0.60, 0.44, 0.36))
+    # The zoom that makes the collapsed pair visible.  Its top stays clear of
+    # the parent's top spine so the inset title has a line of its own.
+    inset = ax_a.inset_axes((0.52, 0.60, 0.44, 0.34))
     inset.plot(np.real(p_full), np.imag(p_full), "x", color=COLOR_SECONDARY,
                markersize=8, markeredgewidth=1.8)
     theta = np.linspace(-0.01, 0.01, 200)
@@ -1643,8 +1648,14 @@ def generate_pole_migration(output_dir: str) -> None:
     inset.set_xlim(0.9985, 1.0004)
     inset.set_ylim(-0.0045, 0.0045)
     inset.tick_params(labelsize=7)
-    inset.set_title("zoom at $z = 1$", fontsize=8)
-    ax_a.indicate_inset_zoom(inset, edgecolor=COLOR_FG)
+    inset.set_title("zoom at $z = 1$", fontsize=8, pad=3)
+    indicator = ax_a.indicate_inset_zoom(inset, edgecolor=COLOR_FG)
+    # Of the two leaders matplotlib picks, the one from the lower-left corner
+    # runs along the inset's own tick labels on its way to z = 1; the
+    # lower-right one reaches the same point over empty ground.
+    leaders = indicator.connectors
+    if leaders is not None:
+        leaders[0].set_visible(False)
 
     radius_dec = [1.0 - float(np.max(np.abs(sos2zpk(np.asarray(s))[1])))
                   for s in bank.sos]
@@ -1661,6 +1672,9 @@ def generate_pole_migration(output_dir: str) -> None:
     ax_c.grid(which="both", color=COLOR_GRID, linestyle="-")
     ax_c.legend(loc="lower right", fontsize=8)
     format_frequency_axis(ax_c, 11.0, 23000.0, minor=None)
+    # Eleven octave labels over a third of this figure's width: at the body
+    # size "125 250 500" closes up into a single number.
+    ax_c.tick_params(axis="x", labelsize=8)
 
     fig.suptitle(f"The {f_m:.0f} Hz one-third-octave band, before and after "
                  f"decimation by {factor}")

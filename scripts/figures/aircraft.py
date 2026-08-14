@@ -303,11 +303,15 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
         ground=RotorcraftGround(flow_resistivity="D"))
 
     _fig, ax = plt.subplots(figsize=(10, 6))
+    # The subscripts are descriptive (A weighting, A-weighted Slow maximum), so
+    # they are upright -- and they have to match the library renderer of the
+    # same quantity, `phonometry._plot.aircraft`, which this figure sits beside
+    # in the documentation.
     ax.plot(event.times, event.a_levels, color=COLOR_PRIMARY, lw=2.0,
-            label="Received level $L_A(t)$")
+            label=r"Received level $L_\mathrm{A}(t)$")
     k = int(np.argmax(event.a_levels))
     ax.plot(event.times[k], event.la_max, "o", color=COLOR_SECONDARY, ms=7,
-            label=f"$L_{{ASmax}}$ = {event.la_max:.1f} dB(A)")
+            label=rf"$L_\mathrm{{ASmax}}$ = {event.la_max:.1f} dB(A)")
     window = event.a_levels >= event.la_max - 10.0
     idx = np.nonzero(window)[0]
     ax.axvspan(event.times[idx[0]], event.times[idx[-1]], zorder=0,
@@ -1093,6 +1097,16 @@ def generate_rotorcraft_kinematics(output_dir: str) -> None:
         axis.set_title(title, pad=10)
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)
         axis.set_axisbelow(True)
+        # Both scales get a band clear of the traces at each end: at the
+        # natural limits the dotted bank angle - drawn on the twin axis, hence
+        # after the legend - climbed through the legend interior and touched
+        # its entry text, and the note at the foot lay over the speed minima.
+        # The Spanish legend is half the panel wide, so the note cannot share
+        # the top band with it and stays where it is.
+        for scale in axis.get_shared_x_axes().get_siblings(axis):
+            low, high = scale.get_ylim()
+            span = high - low
+            scale.set_ylim(low - 0.16 * span, high + 0.34 * span)
         peak = float(np.nanmax(np.abs(kin.bank_angle)))
         axis.text(0.02, 0.04,
                   rf"peak $|\Phi|$ = {peak:.0f}°"

@@ -81,8 +81,8 @@ _STRINGS: dict[str, str] = {
     "Absorption coefficient": "Coeficiente de absorción",
     "In-situ road-surface absorption (ISO 13472-1)":
         "Absorción in situ de pavimentos (ISO 13472-1)",
-    "Dynamic stiffness per unit area $s′$ [MN/m³]":
-        "Rigidez dinámica por unidad de área $s′$ [MN/m³]",
+    r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]":
+        r"Rigidez dinámica por unidad de área $s^{\prime}$ [MN/m³]",
     "Natural frequency $f_0$ [Hz]": "Frecuencia natural $f_0$ [Hz]",
     "EN 29052-1 floating-floor resonance": "Resonancia de suelo flotante EN 29052-1",
     r"Absorption $\alpha$": r"Absorción $\alpha$",
@@ -99,10 +99,10 @@ _STRINGS: dict[str, str] = {
     "ISO 12999-2 absorption uncertainty": "Incertidumbre de absorción ISO 12999-2",
     "reproducibility": "reproducibilidad",
     "repeatability": "repetibilidad",
-    "Sound absorption coefficient alpha_s": "Coeficiente de absorción acústica alpha_s",
-    "Equivalent absorption area A_T [m2]": "Área de absorción equivalente A_T [m2]",
-    "Practical absorption coefficient alpha_p":
-        "Coeficiente de absorción práctico alpha_p",
+    r"Equivalent absorption area $A_\mathrm{T}$ [m²]":
+        r"Área de absorción equivalente $A_\mathrm{T}$ [m²]",
+    r"Practical absorption coefficient $\alpha_\mathrm{p}$":
+        r"Coeficiente de absorción práctico $\alpha_\mathrm{p}$",
     "Value": "Valor",
     "Porous medium": "Medio poroso",
     "Normalised characteristic value": "Valor característico normalizado",
@@ -464,8 +464,8 @@ def plot_dynamic_stiffness(
     grid = np.logspace(np.log10(max(s_mn * 0.2, 1e-2)), np.log10(s_mn * 5.0), 240)
     f0 = np.sqrt(grid * 1e6 / m) / (2.0 * np.pi)
     ax.plot(grid, f0, color=_C_PRIMARY,
-            label=rf"$f_0 = \frac{{1}}{{2\pi}}\sqrt{{s′/m′}}$,  "
-                 rf"$m′$ = {decimal_comma(f'{m:g}', language)} kg/m²")
+            label=rf"$f_0 = \frac{{1}}{{2\pi}}\sqrt{{s^{{\prime}}/m^{{\prime}}}}$,  "
+                 rf"$m^{{\prime}}$ = {decimal_comma(f'{m:g}', language)} kg/m²")
     ax.axhline(result.natural_frequency, color=_C_MUTED, ls=":", lw=0.8)
     ax.plot([s_mn, s_mn], [0.0, result.natural_frequency], color=_C_MUTED, ls=":", lw=0.8)
 
@@ -473,12 +473,12 @@ def plot_dynamic_stiffness(
     kwargs.setdefault("zorder", 5)
     kwargs.setdefault("s", 80)
     ax.scatter([s_mn], [result.natural_frequency],
-               label=(f"$s′$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
+               label=(rf"$s^{{\prime}}$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
                       f"$f_0$ = "
                       f"{format_number(result.natural_frequency, language, decimals=1)} Hz"),
                **kwargs)
     ax.set_xscale("log")
-    ax.set_xlabel(_t("Dynamic stiffness per unit area $s′$ [MN/m³]", language))
+    ax.set_xlabel(_t(r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]", language))
     ax.set_ylabel(_t("Natural frequency $f_0$ [Hz]", language))
     ax.set_title(_t("EN 29052-1 floating-floor resonance", language))
     ax.set_ylim(bottom=0.0)

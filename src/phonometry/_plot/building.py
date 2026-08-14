@@ -166,7 +166,7 @@ _STRINGS: dict[str, str] = {
     "enlarged range (A.2.1)": "rango ampliado (A.2.1)",
     "Measured": "Medido",
     "Shifted reference (core bands)": "Referencia desplazada (bandas 100-3150 Hz)",
-    _IMPROVEMENT_LABEL: "Mejora del aislamiento a ruido de impacto delta-L [dB]",
+    _IMPROVEMENT_LABEL: r"Mejora del aislamiento a ruido de impacto $\Delta L$ [dB]",
     "ISO 16251-1 Floor-Covering Impact Sound Improvement": "Mejora del aislamiento a ruido de impacto de revestimiento de suelo ISO 16251-1",
     "band insulation": "aislamiento por banda",
     "transmitted level $L_{x,i} - X_i$": "nivel transmitido $L_{x,i} - X_i$",
@@ -197,8 +197,8 @@ _STRINGS: dict[str, str] = {
     "rubber ball": "pelota de caucho",
     "bang machine": "máquina de neumático",
     r"$L_\mathrm{i,Fmax}$ (measured)": r"$L_\mathrm{i,Fmax}$ (medido)",
-    r"$L′_{\mathrm{i,Fmax},V,T}$ (standardized)":
-        r"$L′_{\mathrm{i,Fmax},V,T}$ (estandarizado)",
+    r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (standardized)":
+        r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (estandarizado)",
     "standardization correction": "corrección de estandarización",
     _MAX_IMPACT_LABEL: "Nivel máximo de presión acústica de impactos [dB]",
     "ISO 16283-2 rubber-ball standardization":
@@ -541,12 +541,15 @@ def plot_extended_weighted_rating(
     )
     extended = _extended_terms_line(
         [
-            ("$C_{50-3150}$", result.c_50_3150),
-            ("$C_{50-5000}$", result.c_50_5000),
-            ("$C_{100-5000}$", result.c_100_5000),
-            (r"$C_{\mathrm{tr},50-3150}$", result.ctr_50_3150),
-            (r"$C_{\mathrm{tr},50-5000}$", result.ctr_50_5000),
-            (r"$C_{\mathrm{tr},100-5000}$", result.ctr_100_5000),
+            # U+2010 HYPHEN, not an ASCII one: inside mathematics a hyphen is
+            # the binary minus, and mathtext would space the range like a
+            # subtraction ("50 − 3150").
+            ("$C_{50‐3150}$", result.c_50_3150),
+            ("$C_{50‐5000}$", result.c_50_5000),
+            ("$C_{100‐5000}$", result.c_100_5000),
+            (r"$C_{\mathrm{tr},50‐3150}$", result.ctr_50_3150),
+            (r"$C_{\mathrm{tr},50‐5000}$", result.ctr_50_5000),
+            (r"$C_{\mathrm{tr},100‐5000}$", result.ctr_100_5000),
         ],
         language, decimals,
     )
@@ -585,7 +588,8 @@ def plot_extended_impact_rating(
     if result.ci_50_2500 is not None:
         title = (
             f"{title}\n"
-            rf"$C_{{\mathrm{{I}},50-2500}}$ = "
+            # U+2010 HYPHEN: a range, not the binary minus (see Annex B above).
+            rf"$C_{{\mathrm{{I}},50‐2500}}$ = "
             rf"{format_number(result.ci_50_2500, language, decimals=decimals)}"
         )
     return _plot_extended_rating(
@@ -629,7 +633,7 @@ def plot_facade_insulation(
     if result.d_2m_n is not None:
         curves.append(("$D_{2m,n}$", np.asarray(result.d_2m_n, dtype=np.float64)))
     if result.r_prime is not None:
-        curves.append(("$R′$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append((r"$R^{\prime}$", np.asarray(result.r_prime, dtype=np.float64)))
     # Forward user kwargs to the primary D2m,nT curve only, so styling kwargs
     # (label=, color=) neither collide with the per-curve labels nor make the
     # companion curves indistinguishable.
@@ -675,7 +679,7 @@ def plot_facade_prediction(
     for name, rp in result.element_r.items():
         ax.plot(x, np.asarray(rp, dtype=np.float64), "--", lw=0.9, alpha=0.6, label=name)
 
-    opts: dict[str, Any] = {"label": "$R′$", "color": "black", "lw": 2.0}
+    opts: dict[str, Any] = {"label": r"$R^{\prime}$", "color": "black", "lw": 2.0}
     opts.update(kwargs)
     ax.plot(x, r_prime, "o-", **opts)
     ax.plot(
@@ -887,7 +891,8 @@ def plot_airborne_prediction(
     ax.set_xlabel(_t("Transmission path", language))
     ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_title(
-        rf"EN 12354-1 {_t('flanking prediction', language)} — $R′_\mathrm{{w}}$ = "
+        rf"EN 12354-1 {_t('flanking prediction', language)} — "
+        rf"$R^{{\prime}}_\mathrm{{w}}$ = "
         rf"{format_number(result.r_prime_w, language, decimals=1)} dB "
         rf"($R_\mathrm{{Dd,w}}$ = "
         rf"{format_number(result.r_direct_w, language, decimals=1)} dB)"
@@ -919,7 +924,7 @@ def plot_impact_prediction(
     ax = ax if ax is not None else _new_axes()
     labels = (
         r"$L_\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$",
-        r"$L′_\mathrm{n,w}$",
+        r"$L^{\prime}_\mathrm{n,w}$",
     )
     values = (
         result.ln_w_eq,
@@ -936,7 +941,7 @@ def plot_impact_prediction(
     ax.set_ylabel(_t("Level / correction [dB]", language))
     ax.set_title(
         rf"EN 12354-2 {_t('impact prediction', language)} — "
-        rf"$L′_\mathrm{{n,w}}$ = "
+        rf"$L^{{\prime}}_\mathrm{{n,w}}$ = "
         rf"{format_number(result.l_prime_n_w, language, decimals=1)} dB"
     )
     ax.grid(True, axis="y", alpha=0.3)
@@ -1028,11 +1033,11 @@ def plot_detailed_airborne_prediction(
     title = f"EN 12354-1 {_t('detailed prediction', language)}"
     if result.rating is not None:
         title += (
-            rf" — $R′_\mathrm{{w}}$ = "
+            rf" — $R^{{\prime}}_\mathrm{{w}}$ = "
             rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.r_prime, total_label="$R′$",
+        result, result.r_prime, total_label=r"$R^{\prime}$",
         ylabel=_REDUCTION_INDEX_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
@@ -1056,11 +1061,11 @@ def plot_detailed_impact_prediction(
     title = f"EN 12354-2 {_t('detailed prediction', language)}"
     if result.rating is not None:
         title += (
-            rf" — $L′_\mathrm{{n,w}}$ = "
+            rf" — $L^{{\prime}}_\mathrm{{n,w}}$ = "
             rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.l_prime_n, total_label=r"$L′_\mathrm{n}$",
+        result, result.l_prime_n, total_label=r"$L^{\prime}_\mathrm{n}$",
         ylabel=_IMPACT_LEVEL_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
@@ -1126,12 +1131,13 @@ def plot_airborne_insulation(
         ("$D$", np.asarray(result.d, dtype=np.float64)),
     ]
     if result.r_prime is not None:
-        curves.append(("$R′$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append((r"$R^{\prime}$", np.asarray(result.r_prime, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
         ylabel=_t(_LEVEL_DIFFERENCE_LABEL, language),
         title=_t("Airborne sound insulation (ISO 16283-1)", language),
         ax=ax,
+        language=language,
         **kwargs,
     )
     localize_axes(ax, language)
@@ -1155,14 +1161,19 @@ def plot_impact_insulation(
     """
     from .._i18n import localize_axes
 
-    curves = [(r"$L′_\mathrm{nT}$", np.asarray(result.l_n_t, dtype=np.float64))]
+    curves = [
+        (r"$L^{\prime}_\mathrm{nT}$", np.asarray(result.l_n_t, dtype=np.float64))
+    ]
     if result.l_n is not None:
-        curves.append((r"$L′_\mathrm{n}$", np.asarray(result.l_n, dtype=np.float64)))
+        curves.append(
+            (r"$L^{\prime}_\mathrm{n}$", np.asarray(result.l_n, dtype=np.float64))
+        )
     ax = _plot_insulation_bands(
         curves,
         ylabel=_t(_IMPACT_LEVEL_LABEL, language),
         title=_t("Impact sound insulation (ISO 16283-2)", language),
         ax=ax,
+        language=language,
         **kwargs,
     )
     localize_axes(ax, language)
@@ -1475,7 +1486,7 @@ def plot_standardized_maximum_impact(
         result.measured,
         result.standardized,
         reference_label=r"$L_\mathrm{i,Fmax}$ (measured)",
-        curve_label=r"$L′_{\mathrm{i,Fmax},V,T}$ (standardized)",
+        curve_label=r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (standardized)",
         fill_label="standardization correction",
         ylabel=_MAX_IMPACT_LABEL,
         title=(
@@ -1782,7 +1793,9 @@ def plot_floating_floor_improvement(
     title = _t("Floating floor improvement (ISO 12354-2 Annex C)", language)
     if result.delta_lw is not None:
         value = decimal_comma(f"{result.delta_lw:.1f}", language)
-        title += f"  (delta-Lw = {value} dB)"
+        # ``decimal_comma`` has already localised the value: the dollars below
+        # would otherwise stop the save-time comma pass over the whole string.
+        title += rf"  ($\Delta L_\mathrm{{w}}$ = {value} dB)"
     ax.set_title(title)
     localize_axes(ax, language)
     return ax

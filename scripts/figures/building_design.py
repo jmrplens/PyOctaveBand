@@ -575,6 +575,12 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
          1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float
     )
     fig, axes = plt.subplots(2, 2, figsize=(12, 9))
+    # Three of the four panels carry the same y label, and on one line it is
+    # longer than a panel of a two-by-two grid is tall: in Spanish its head
+    # ran into the title and its tail into the label of the panel below. Set
+    # over two lines it clears both, in either language.
+    r_label = ("Sound reduction index $R$\n"
+               "(transmission loss $TL$) [dB]")
 
     # (a) Single panel: field-incidence mass law and the coincidence dip.
     bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
@@ -591,7 +597,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_c$")
     ax.set_title("Single panel: mass law and coincidence",
                  pad=10)
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel(r_label)
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -609,7 +615,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axvline(f0, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_0$")
     ax.set_title("Double wall: mass-spring-mass resonance",
                  pad=10)
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel(r_label)
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -648,7 +654,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                alpha=0.5, label="open-area limit")
     ax.set_title("Composite wall with a small aperture",
                  pad=10)
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel(r_label)
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -1273,9 +1279,14 @@ def generate_radiation_efficiency_panels(output_dir: str) -> None:
     ax_l.axvline(f_c, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
                  zorder=3, label=f"critical frequency $f_c$ = {f_c:.0f} Hz")
     peak = float(big.radiation_efficiency.max())
+    # The label goes in the open wedge under the legend and left of the rise,
+    # with the leader carrying the eye to the peak: anywhere along the top the
+    # upper-left legend would cover its opening words, and the Spanish line is
+    # the wider of the two.
     ax_l.annotate(f"coincidence peak: $\\sigma$ = {peak:.2f}",
-                  xy=(2000.0, peak), xytext=(260.0, peak * 1.05), fontsize=9,
-                  color=COLOR_FG,
+                  xy=(2000.0, peak), xytext=(0.04, 0.50),
+                  textcoords="axes fraction", ha="left", va="center",
+                  fontsize=9, color=COLOR_FG,
                   arrowprops={"arrowstyle": "->", "lw": 1.0})
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel(r"Radiation efficiency $\sigma$")

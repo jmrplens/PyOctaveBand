@@ -50,7 +50,7 @@ _STRINGS: dict[str, str] = {
     "Band audibility": "Audibilidad de banda",
     "Band audibility $A_i$": "Audibilidad de banda $A_i$",
     r"Importance-weighted $I_i\,A_i$ (scaled)":
-        r"$I_i\,A_i$ ponderada por importancia (escalada)",
+        r"Ponderada por importancia $I_i\,A_i$ (escalada)",
     "IEC 60268-16 STI = {sti}  (rating {rating})":
         "IEC 60268-16 STI = {sti}  (calificación {rating})",
     _NAME_VALUE_LABEL: _NAME_VALUE_LABEL,

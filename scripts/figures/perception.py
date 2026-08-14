@@ -1114,8 +1114,11 @@ def generate_hms_modulation_bandpass(output_dir: str) -> None:
     ax.set_xticks([0.5, 1, 2, 4, 8, 16, 32, 70, 140, 250])
     ax.set_xticklabels(["0.5", "1", "2", "4", "8", "16", "32", "70", "140", "250"])
     ax.legend(loc="upper left", fontsize=9)
-    ax.text(0.985, 0.03, "1 kHz carrier, 100 % AM, overall 60 dB SPL",
-            transform=ax.transAxes, va="bottom", ha="right", fontsize=8.5,
+    # Bottom-left: the only stretch of the frame both band-passes leave
+    # clear. Right-aligned, the longer Spanish caption ran into the
+    # fluctuation-strength curve as it descends to zero near 32 Hz.
+    ax.text(0.015, 0.03, "1 kHz carrier, 100 % AM, overall 60 dB SPL",
+            transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
     save_figure(output_dir, "hms_modulation_bandpass.svg")
@@ -1305,8 +1308,11 @@ def generate_annoyance_weightings(output_dir: str) -> None:
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax2.set_axisbelow(True)
     ax2.legend(loc="upper left", fontsize=9)
-    ax2.text(0.03, 0.03, "$N_5$ = 30 sone, $S$ = 2.0 acum throughout",
+    # Bottom right, not bottom left: at the left the opaque box lay on the
+    # first fifth of both curves and hid where they start.
+    ax2.text(0.975, 0.035, "$N_5$ = 30 sone, $S$ = 2.0 acum throughout",
              transform=ax2.transAxes, fontsize=9, color=COLOR_FG,
+             ha="right",
              bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                    "edgecolor": COLOR_GRID})
 
@@ -1840,7 +1846,14 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
     ax_spread.fill_between(ages, s_l, s_u, where=s_u >= s_l,
                            color=theme_fill(COLOR_PRIMARY, ax_spread),
                            zorder=0, label="$s_u - s_l$: the asymmetry")
-    ax_spread.set_ylim(0.0, max(s_u.max(), s_l.max()) + 7.0)
+    # The three-line clause note is far wider than the ten-year band it
+    # describes, so the top of the panel keeps a clear strip for it: the note
+    # is anchored to the right edge in axes coordinates (Spanish grows to the
+    # left from there, still well inside the frame) and the 70 yr marker stops
+    # below the strip instead of running down through the words. The floor
+    # sits below zero so that headroom does not push the start of the curves,
+    # at 18 yr, down onto the legend.
+    ax_spread.set_ylim(-1.5, max(s_u.max(), s_l.max()) + 10.0)
     peak = int(np.argmax(s_u))
     ax_spread.annotate(
         f"$s_u$ peaks at {ages[peak]:.0f} yr ({s_u[peak]:.1f} dB)",
@@ -1848,16 +1861,17 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
         fontsize=11, arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     cross = ages[np.argmax(s_u < s_l)]
-    ax_spread.axvline(70.0, color=COLOR_SECONDARY, linewidth=1.4,
+    ax_spread.axvline(70.0, ymax=0.84, color=COLOR_SECONDARY, linewidth=1.4,
                       linestyle=":")
     ax_spread.axvspan(70.0, ages[-1], color=theme_fill(COLOR_SECONDARY,
                                                        ax_spread), zorder=0)
-    ax_spread.text(77.5, 21.5,
+    ax_spread.text(0.985, 0.98,
                    "above 70 yr:\ninformative only\n(clause 4.1, $f \\geq 3$ kHz)",
-                   fontsize=10, ha="center", va="top", color=COLOR_SECONDARY)
+                   transform=ax_spread.transAxes,
+                   fontsize=10, ha="right", va="top", color=COLOR_SECONDARY)
     ax_spread.annotate(
         f"they cross at {cross:.0f} yr", xy=(cross, s_l[int(cross - 18)]),
-        xytext=(63.0, 3.5), fontsize=11,
+        xytext=(81.5, 3.5), ha="right", fontsize=11,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax_spread.set_xlabel("Age [years]")

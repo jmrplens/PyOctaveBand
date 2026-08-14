@@ -97,6 +97,8 @@ def _dim(
     offset: float = 0.0,
     fontsize: float = 8.0,
     tight: bool = False,
+    label_side: float = 1.0,
+    label_upright: bool = False,
 ) -> None:
     """A drafting dimension: double-headed arrow between two points + label.
 
@@ -104,6 +106,14 @@ def _dim(
     (positive = to the left of the direction of travel), with dashed
     extension lines back to the measured points. ``tight`` switches to bar
     ends for spans too short for two arrowheads.
+
+    The label rides beside the dimension line, by default on the side the
+    normal points to. A feature narrower than its own label leaves no room
+    there, because that is the strip the extension lines cross: ``label_side
+    = -1.0`` moves the label to the far side of the dimension line, past the
+    end of those lines, and ``label_upright`` sets it horizontally rather
+    than along the dimension, anchored by its near edge so that a label
+    longer than a short span no longer overruns it.
     """
     if not label:
         return
@@ -132,10 +142,18 @@ def _dim(
     angle = float(np.degrees(np.arctan2(direction[1], direction[0])))
     if angle > 90.0 or angle <= -90.0:
         angle += 180.0
+    shift = normal * (9.0 * label_side)
+    ha, va, rotation = "center", "center", angle
+    if label_upright:
+        rotation = 0.0
+        if abs(shift[0]) > 1e-12:
+            ha = "left" if shift[0] > 0.0 else "right"
+        if abs(shift[1]) > 1e-12:
+            va = "bottom" if shift[1] > 0.0 else "top"
     ax.annotate(
-        label, xy=(mid[0], mid[1]), xytext=tuple(normal * 9.0),
-        textcoords="offset points", fontsize=fontsize, ha="center",
-        va="center", rotation=angle, rotation_mode="anchor", zorder=6,
+        label, xy=(mid[0], mid[1]), xytext=tuple(shift),
+        textcoords="offset points", fontsize=fontsize, ha=ha,
+        va=va, rotation=rotation, rotation_mode="anchor", zorder=6,
     )
 
 

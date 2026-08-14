@@ -166,7 +166,7 @@ _ES_EXACT = {
     "Phase error against the QRD target [deg]":
         "Error de fase frente al objetivo QRD [grados]",
     "Slit index $n$": "Índice de ranura $n$",
-    "within 10 deg of the target": "dentro de 10 grados del objetivo",
+    "within 10 deg\nof the target": "dentro de 10 grados\ndel objetivo",
     "slit 1": "ranura 1",
     "slit 2": "ranura 2",
     "slit 3": "ranura 3",
@@ -373,12 +373,15 @@ _ES_EXACT = {
     "gear": "engranaje",
     "motor": "motor",
     "blade": "álabe",
-    "sidebands at $\\pm f_s$ = 25 Hz:\nlow and flat":
-        "bandas laterales a $\\pm f_s$ = 25 Hz:\nbajas y planas",
-    "sidebands at $\\pm f_s$ = 25 Hz:\ntall groups, and the\n"
+    # Both sideband blocks are set narrow, one clause per line: they stand in
+    # the stretch of axis below the first mesh cluster, and the Spanish
+    # reading is the wider of the two, so it sets the line breaks.
+    "sidebands at\n$\\pm f_s$ = 25 Hz:\nlow and flat":
+        "bandas laterales\na $\\pm f_s$ = 25 Hz:\nbajas y planas",
+    "sidebands at\n$\\pm f_s$ = 25 Hz:\ntall groups, and the\n"
     "higher harmonics lift":
-        "bandas laterales a $\\pm f_s$ = 25 Hz:\ngrupos altos, y los "
-        "armónicos\nsuperiores se levantan",
+        "bandas laterales\na $\\pm f_s$ = 25 Hz:\ngrupos altos, y los\n"
+        "armónicos superiores\nse levantan",
     "rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
     "the spacing is the diagnosis":
         "armónico de ranura de rotor\ncon bandas laterales a $\\pm f_s$:\n"
@@ -620,15 +623,15 @@ _ES_EXACT = {
         r"4,8 dB donde $C_h$ = 1, 3,0 dB en 63 Hz",
     "A-weighted sound pressure level [dB(A)]":
         "Nivel de presión acústica ponderado A [dB(A)]",
-    "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
+    r"Received level $L_\mathrm{A}(t)$": r"Nivel recibido $L_\mathrm{A}(t)$",
     "One-third-octave-band centre frequency [Hz]":
         "Frecuencia central de banda de 1/3 de octava [Hz]",
     r"Ground-effect adjustment $\Delta L_g$ [dB]":
         r"Ajuste por efecto de suelo $\Delta L_g$ [dB]",
     "Hard (asphalt/concrete, class G)": "Duro (asfalto/hormigón, clase G)",
     "Soft (grass/pasture, class D)": "Blando (hierba/pasto, clase D)",
-    "x [km]": "x [km]",
-    "y [km]": "y [km]",
+    "$x$ [km]": "$x$ [km]",
+    "$y$ [km]": "$y$ [km]",
     "Slant distance [m]": "Distancia oblicua [m]",
     "Event level [dB]": "Nivel de evento [dB]",
     "markers: tabulated NPD nodes\nlines: log-linear interpolation":
@@ -3528,11 +3531,16 @@ _ES_EXACT = {
     "Predicted Single-Panel Insulation Rated per ISO 717-1":
         "Aislamiento previsto de panel simple evaluado según ISO 717-1",
     "predicted $R$ (Sharp)": "$R$ previsto (Sharp)",
-    # Shared ylabel of single_panel_rating, plateau_transmission_loss,
-    # orthotropic_transmission_loss and panel_insulation_concept; "pérdida
-    # por transmisión" as the panel-sound-insulation page words it.
+    # Shared ylabel of single_panel_rating, plateau_transmission_loss and
+    # orthotropic_transmission_loss; "pérdida por transmisión" as the
+    # panel-sound-insulation page words it.
     r"Sound reduction index $R$ (transmission loss $TL$) [dB]":
         r"Índice de reducción acústica $R$ (pérdida por transmisión $TL$) [dB]",
+    # The same label over two lines, as the four-panel grid of
+    # panel_insulation_concept sets it: one line is taller than its panels.
+    "Sound reduction index $R$\n(transmission loss $TL$) [dB]":
+        "Índice de reducción acústica $R$\n"
+        "(pérdida por transmisión $TL$) [dB]",
     "Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)":
         "$K_{ij}$ de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)",
     "X corner": "X esquina",
@@ -3583,8 +3591,8 @@ _ES_EXACT = {
         "Límite rasante de Kurze-Anderson (5 dB)",
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
     # --- WP emission & electroacoustics figures (result .plot() labels) ---
-    "Carrier f₂": "Portadora f₂",
-    "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
+    "Carrier $f_2$": "Portadora $f_2$",
+    r"Sidebands $f_2 \pm n \cdot f_1$": r"Bandas laterales $f_2 \pm n \cdot f_1$",
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
     "$R_1$ (resistance)": "$R_1$ (resistencia)",
     "$X_1$ (reactance)": "$X_1$ (reactancia)",
@@ -3592,12 +3600,12 @@ _ES_EXACT = {
         r"Impedancia de radiación normalizada $Z_r / \rho c S$",
     "Baffled circular piston radiation impedance":
         "Impedancia de radiación de un pistón circular con pantalla",
-    "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
-    "F3 (negative partial power)": "F3 (potencia parcial negativa)",
-    "Dynamic capability Ld": "Capacidad dinámica Ld",
-    "F4 (non-uniformity)": "F4 (no uniformidad)",
+    "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
+    "$F_3$ (negative partial power)": "$F_3$ (potencia parcial negativa)",
+    r"Dynamic capability $L_\mathrm{d}$": r"Capacidad dinámica $L_\mathrm{d}$",
+    "$F_4$ (non-uniformity)": "$F_4$ (no uniformidad)",
     "Indicator [dB]": "Indicador [dB]",
-    "Field non-uniformity F4": "No uniformidad del campo F4",
+    "Field non-uniformity $F_4$": "No uniformidad del campo $F_4$",
     "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
     "Helmholtz resonator": "Resonador de Helmholtz",
     "Quarter-wave tube": "Tubo de cuarto de onda",
@@ -4753,12 +4761,20 @@ _ES_PATTERNS = [
      r"level flyover, 60 kt, 150 m, 120 m sideline, grass$"),
      ("SEL \\1,\\2 dB(A)  ·  EPNL \\3,\\4 EPNdB\n"
      "sobrevuelo nivelado, 60 kt, 150 m, 120 m lateral, hierba")),
-    (r"^\$L_\{ASmax\}\$ = (\d+)\.(\d+) dB\(A\)$",
-     r"$L_{ASmax}$ = \1,\2 dB(A)"),
-    (r"^Diffracted path \(δ = (\d+)\.(\d+) m\)$",
-     r"Camino difractado (δ = \1,\2 m)"),
-    (r"^Diffracted path \(δ = (\d+),(\d+) m\)$",
-     r"Camino difractado (δ = \1,\2 m)"),
+    # The subscript is upright now, so the pattern matches the drawn form:
+    # ``\mathrm`` is a literal backslash in the string, hence ``\\mathrm`` in
+    # this raw regex, and its braces are literal too. The replacement still
+    # spells the comma itself -- the string carries a dollar, so the save-time
+    # decimal pass skips it whole.
+    (r"^\$L_\\mathrm\{ASmax\}\$ = (\d+)\.(\d+) dB\(A\)$",
+     r"$L_\\mathrm{ASmax}$ = \1,\2 dB(A)"),
+    # rotorcraft_terrain_screening: the library legend sets its path difference
+    # as mathematics, so ``_translate_figure`` skips its decimal-comma pass over
+    # the whole string and the comma has to be spelt in the replacement.
+    (r"^Diffracted path \(\$\\delta\$ = (\d+)\.(\d+) m\)$",
+     r"Camino difractado ($\\delta$ = \1,\2 m)"),
+    (r"^Diffracted path \(\$\\delta\$ = (\d+),(\d+) m\)$",
+     r"Camino difractado ($\\delta$ = \1,\2 m)"),
     (r"^(\d+) yr$", r"\1 años"),
     # anim_elastic_coincidence titles and verdicts (library values baked in).
     (r"^\$f = f_c/2\$ = (\d+) Hz, 45° incidence$",
@@ -5011,11 +5027,18 @@ _ES_PATTERNS = [
     (r"^Figure-of-eight \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
      r"Figura en ocho ($b$ = \1,\2): DI = \3,\4 dB"),
     (r"^network alone: (.+) dB$", r"la red sola: \1 dB"),
-    # modulation_distortion: the library title reads the same in Spanish;
-    # only the decimal comma differs, and the save-time pass applies it.
-    ((r"^IEC 60268-3 d₂ = (.+)%, d₃ = (.+)%; SMPTE = (.+)% "
-      r"\(f₁ = (.+)Hz, f₂ = (.+)Hz\)$"),
-     r"IEC 60268-3 d₂ = \1%, d₃ = \2%; SMPTE = \3% (f₁ = \4Hz, f₂ = \5Hz)"),
+    # modulation_distortion: the library title reads the same in Spanish, and
+    # only the decimal comma differs -- but the title carries its symbols as
+    # mathtext, so ``_translate_figure`` skips its decimal-comma pass over the
+    # whole string (a bare comma inside $...$ sets wrong). The commas are spelt
+    # here instead, which is why each reading is captured as two digit groups:
+    # a value that arrived without a decimal point would not match, and the
+    # audit would say so, rather than the figure quietly shipping an English
+    # point. The frequencies are ``60`` and ``7k`` for the same reason.
+    ((r"^IEC 60268-3 \$d_2\$ = (\d+)\.(\d+)%, \$d_3\$ = (\d+)\.(\d+)%; "
+      r"SMPTE = (\d+)\.(\d+)% \(\$f_1\$ = (\d+k?)Hz, \$f_2\$ = (\d+k?)Hz\)$"),
+     (r"IEC 60268-3 $d_2$ = \1,\2%, $d_3$ = \3,\4%; SMPTE = \5,\6% "
+      r"($f_1$ = \7Hz, $f_2$ = \8Hz)")),
     # Broadcast figures: the metered readouts (program_loudness box,
     # true_peak_intersample annotations). Alignment of the monospace box is
     # preserved by the captures.
@@ -5195,9 +5218,11 @@ _ES_PATTERNS = [
     (r"^diffusion coefficient \$d\$ = (\d+)\.(\d+)$",
      r"coeficiente de difusión $d$ = \1,\2"),
     (r"^design frequency (.+) Hz$", r"frecuencia de diseño \1 Hz"),
-    # 2D FDTD wave simulation (public API concept figure)
-    (r"^FDTD pressure field at t = (.+) ms$",
-     r"Campo de presión FDTD en t = \1 ms"),
+    # 2D FDTD wave simulation (public API concept figure). The title carries
+    # mathtext, so the save-time decimal-comma pass skips the whole string and
+    # the comma has to be baked into the replacement here.
+    (r"^FDTD pressure field at \$t\$ = (\d+)\.(\d+) ms$",
+     r"Campo de presión FDTD en $t$ = \1,\2 ms"),
     (r"^probe \((.+)\) m$", r"sonda (\1) m"),
     # Building & structure-borne result figures (dynamic values baked in).
     (r"^Airborne: \$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB$",

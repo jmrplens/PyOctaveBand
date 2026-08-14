@@ -645,9 +645,21 @@ def format_frequency_axis(
         hi = fmax
     lo, hi = min(lo, hi), max(lo, hi)
     majors = [f for f in _OCTAVE_NOMINAL if lo <= f <= hi]
+    # An octave label every octave is right for the audio band, and too many
+    # for an axis that spans the ultrasonic: ten to a million is seventeen
+    # labels on one panel, and at the high end -- where "31.5k" and "125k" are
+    # the widest strings on the axis -- they run together into "16k31.5k63k".
+    # Past four decades, label every third octave instead and let the rest
+    # stand as unlabelled ticks; three octaves is close enough to a decade that
+    # the axis still reads as one.
+    stride = 3 if hi > lo * 10 ** 4 else 1
+    labelled = majors[::stride]
     ax.xaxis.set_major_locator(mticker.FixedLocator(majors))
     ax.xaxis.set_major_formatter(
-        mticker.FixedFormatter([_format_freq(f, language) for f in majors])
+        mticker.FixedFormatter([
+            _format_freq(f, language) if f in labelled else ""
+            for f in majors
+        ])
     )
     if minor == "thirds":
         minors = [

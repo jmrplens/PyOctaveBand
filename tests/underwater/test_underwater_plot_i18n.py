@@ -103,7 +103,7 @@ def test_marine_mammal_plot_labels() -> None:
 
     ax_w = auditory_weighting(freqs, "LF").plot(language="es")
     assert ax_w.get_title() == "Función de ponderación auditiva"
-    assert ax_w.get_ylabel() == "Ponderación W(f) [dB]"
+    assert ax_w.get_ylabel() == "Ponderación $W(f)$ [dB]"
 
     bands = np.array([125.0, 250.0, 500.0, 1000.0])
     res = weighted_exposure(bands, np.full(bands.size, 180.0), "LF", peak_spl=210.0)

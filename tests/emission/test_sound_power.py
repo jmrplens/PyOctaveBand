@@ -475,6 +475,6 @@ def test_plot_language_spanish_and_validation() -> None:
     assert "potencia acústica" in ax.get_ylabel()
     assert "espectro de potencia acústica" in ax.get_title()
     ax_en = res.plot()
-    assert ax_en.get_ylabel() == "Sound power level LW [dB]"
+    assert ax_en.get_ylabel() == "Sound power level $L_W$ [dB]"
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

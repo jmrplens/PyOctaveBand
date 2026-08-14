@@ -156,7 +156,7 @@ def plot_sound_power(
     if np.isfinite(lwa):
         ax.set_title(
             f"{designation} {_t('sound power spectrum', language)}  "
-            rf"($L_{{W\mathrm{{A}}}}$ = "
+            "($L_{WA}$ = "
             f"{format_number(lwa, language, decimals=1)} dB(A))"
         )
     else:
@@ -384,7 +384,7 @@ def plot_intensity_class(
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import format_number, localize_axes
+    from .._i18n import decimal_comma, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
@@ -445,9 +445,12 @@ def plot_intensity_class(
     ax.set_title(
         _t("IEC 61043 Table 2 — {device}, {spacing} mm separation", language,
            device=_t(_DEVICE_LABELS[result.device], language),
-           spacing=format_number(
-               result.spacing * 1000.0, language, decimals=1, trim=True
-           ))
+           # ``:g`` prints the separation exactly as the chain was verified
+           # with (a 6.35 mm quarter-inch spacer stays 6.35, which a fixed
+           # one-decimal format would round away); only its decimal separator
+           # needs localising, and ``spacing`` is validated positive, so the
+           # sign never enters.
+           spacing=decimal_comma(f"{result.spacing * 1000.0:g}", language))
     )
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)

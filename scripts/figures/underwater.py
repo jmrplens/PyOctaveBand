@@ -12,7 +12,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
-from .i18n import _fmt_minus
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -531,12 +531,21 @@ def generate_seawater_absorption(output_dir: str) -> None:
     ax_a.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_a.set_axisbelow(True)
     ax_a.legend(loc="upper left", fontsize=9)
-    # The three relaxation regions of the Francois-Garrison expression.
+    # The three relaxation regions of the Francois-Garrison expression. The
+    # curve climbs six decades across the panel, so a label offset by a fixed
+    # factor of its own ordinate leaves the axes near the top: at 500 kHz the
+    # absorption is already within a factor of seven of the ceiling, and "pure
+    # water" was drawn astride the top spine, which struck through its
+    # descenders. Each label is offset by the same factor and then held one
+    # tenth of a decade inside the axis, so the three keep a common look and
+    # none of them lands on the frame.
+    top = float(np.max(alpha["francois-garrison"])) * 10.0
     for f_mark, label in ((300.0, "boric acid"), (30e3, r"$\mathrm{MgSO_4}$"),
                           (500e3, "pure water")):
         a_mark = float(np.interp(f_mark, freqs, alpha["francois-garrison"]))
         ax_a.annotate(label, xy=(f_mark, a_mark),
-                      xytext=(f_mark * 0.32, a_mark * 7.0), fontsize=9,
+                      xytext=(f_mark * 0.32, min(a_mark * 7.0, top / 1.26)),
+                      fontsize=9,
                       color=COLOR_FG,
                       arrowprops={"arrowstyle": "->", "color": COLOR_MUTED,
                                   "linewidth": 1.0})
@@ -1056,7 +1065,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
     peak = float(peak_sound_pressure_level(strike))
 
     fig, axes = plt.subplots(1, 3, figsize=(16.5, 5.4))
-    spectrum.plot(ax=axes[0])
+    spectrum.plot(ax=axes[0], language=_LANG)
     axes[0].set_title("Step 1: Single-Strike SEL by Band",
                       pad=12)
 
@@ -1064,7 +1073,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
         res = weighted_exposure(spectrum.frequencies, spectrum.band_sel, group,
                                 guidance="nmfs-2024", impulsive=True,
                                 n_events=3000, peak_spl=peak)
-        res.plot(ax=ax)
+        res.plot(ax=ax, language=_LANG)
         ax.set_title(f"{group}: cumulative {res.cumulative_sel:.1f} dB, "
                      f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",
                      pad=12)

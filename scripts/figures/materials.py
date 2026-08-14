@@ -492,12 +492,24 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
         open_area=0.05,
     )
     f_mem = membrane_resonance_frequency(surface_density=2.0, cavity_depth=0.048)
-    for f0, color, label in (
-        (f_helm, COLOR_TERTIARY, "Helmholtz closed form"),
-        (f_mem, "#9467bd", "Membrane closed form"),
+    # Each guide label hangs from its own ceiling instead of standing on a
+    # common floor: the Spanish label is a third longer than the English one,
+    # so a shared baseline pushes the longer one up into whatever crosses its
+    # dotted line. The ceiling and the offset from the line are the free
+    # stretch each label has -- the Helmholtz one stops under the crossing of
+    # the porous and perforated curves, the membrane one stands clear of the
+    # steep flank of its own resonance and under the legend.
+    for f0, color, label, offset, top in (
+        (f_helm, COLOR_TERTIARY, "Helmholtz closed form", 1.04, 0.65),
+        (f_mem, "#9467bd", "Membrane closed form", 1.09, 0.82),
     ):
-        ax.axvline(f0, color=color, linestyle=":", linewidth=1.1, alpha=0.8)
-        ax.text(f0 * 1.04, 0.44, label, rotation=90, va="bottom",
+        # The guides stop above the note row: the only stretch of the bottom
+        # margin wide enough for the note is the one the Helmholtz guide ran
+        # through. Above that row each guide still crosses every curve it is
+        # there to mark.
+        ax.axvline(f0, ymin=0.085, color=color, linestyle=":", linewidth=1.1,
+                   alpha=0.8)
+        ax.text(f0 * offset, top, label, rotation=90, va="top",
                 ha="left", fontsize=8.5, color=color)
 
     ax.set_xlabel("Frequency [Hz]")
@@ -511,7 +523,11 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
     ax.set_xticks([63, 125, 250, 500, 1000, 2000, 4000])
     ax.set_xticklabels(["63", "125", "250", "500", "1k", "2k", "4k"])
     ax.legend(loc="upper left", fontsize=9)
-    ax.text(0.985, 0.03, "Normal incidence, rigid backing, 50 mm total depth",
+    # The note stops short of the right frame: further right the bottom margin
+    # belongs to the microperforated dip and its spike, and to the tail of the
+    # perforated curve. Anchored here it clears the perforated tail above and
+    # the membrane tail below at both label lengths.
+    ax.text(0.865, 0.036, "Normal incidence, rigid backing, 50 mm total depth",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -666,11 +682,14 @@ def generate_biot_frame_resonance(output_dir: str) -> None:
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
-    ax.text(0.015, 0.03,
+    # The empty band between the real and imaginary parts, to the right of the
+    # resonance marker: the bottom-left corner is crossed by both imaginary
+    # curves and by the marker itself, in either language.
+    ax.text(0.30, 0.57,
             "Glass wool, 100 mm glued to a rigid wall: porosity 0.94,\n"
             "flow resistivity 40 kPa s/m², frame density 130 kg/m³,\n"
             "shear modulus 2.2 MPa",
-            transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
+            transform=ax.transAxes, va="center", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
     save_figure(output_dir, "biot_frame_resonance.svg")
@@ -1006,9 +1025,15 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
     ax_l.set_xticks(index)
     ax_l.set_xlabel("Slit index $n$")
     ax_l.set_ylabel("Reflection phase [deg]")
+    # Wider than the data so the |R| annotations centred on the first and the
+    # last slit, which are about 0.31 of a slit wide either side of the marker,
+    # stay inside the spines rather than being cut by them.
+    ax_l.set_xlim(0.55, 5.45)
     ax_l.set_ylim(-115.0, 115.0)
     ax_l.set_title("At the 2 kHz design frequency", pad=12)
-    ax_l.legend(loc="lower right", fontsize=9)
+    # Above the phases rather than under them: at the lower right the box met
+    # the |R| annotation of slit 3, whose comma in Spanish reached its border.
+    ax_l.legend(loc="upper right", fontsize=9)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
 
@@ -1024,15 +1049,24 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
                   linewidth=1.5, zorder=3, label=f"slit {slit + 1}")
     ax_r.axvline(2000.0, color=COLOR_FG, linestyle=":", linewidth=1.3,
                  zorder=1)
-    ax_r.annotate("within 10 deg of the target", (1615.0, 12.0), fontsize=8.5,
-                  color=COLOR_FG, ha="left", va="bottom")
+    # Set on two lines inside the band it names: the only stretch of the panel
+    # no curve reaches is the left end of the band itself, before the three
+    # slits that converge on zero drop into it around 1900 Hz. One line was
+    # 330 Hz wide in English and 400 Hz in Spanish, wider than any clear
+    # corridor here, so it was crossed by the curves and by the 2 kHz guide.
+    ax_r.annotate("within 10 deg\nof the target", (1665.0, -1.25), fontsize=8.0,
+                  color=COLOR_FG, ha="left", va="center")
     ax_r.set_xlim(freqs[0], freqs[-1])
     ax_r.set_ylim(-100.0, 100.0)
     ax_r.set_xlabel(LABEL_FREQ_HZ)
     ax_r.set_ylabel("Phase error against the QRD target [deg]")
     ax_r.set_title("Across the band: exact only where it was tuned",
                    pad=12)
-    ax_r.legend(loc="lower left", fontsize=9, ncol=3)
+    # Below the axes rather than in them: five curves with poles in the band
+    # leave no clear rectangle inside, and at the lower left the box sat on
+    # the slit-3 curve, which crossed its own sample in the key.
+    ax_r.legend(loc="upper center", bbox_to_anchor=(0.5, -0.11), fontsize=9,
+                ncol=5, columnspacing=1.4, handlelength=1.6)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     fig.align_ylabels((ax_l, ax_r))

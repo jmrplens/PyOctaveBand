@@ -476,9 +476,15 @@ def generate_modal_count_per_band(output_dir: str) -> None:
         ax.annotate(f"{count:,.0f}", xy=(centre, count * 1.25), fontsize=9,
                     color=COLOR_FG, ha="center")
     ax.axvline(f_schroeder, color=COLOR_FG, linestyle="--", linewidth=1.4)
+    # Hung by its top from a fixed height, low enough to clear the legend: the
+    # string reads up the line, so anchoring it anywhere else sends the longer
+    # Spanish wording ("Frecuencia de Schroeder 185 Hz") up through the legend
+    # box and out over the top spine. Growing downward, it still ends well
+    # above the 250 Hz bar the line crosses.
     ax.annotate(f"Schroeder frequency {f_schroeder:.0f} Hz",
-                xy=(f_schroeder * 1.06, counts.max() * 0.28), fontsize=10,
-                color=COLOR_FG, ha="left", rotation=90, va="center")
+                xy=(f_schroeder * 1.06, 0.87),
+                xycoords=("data", "axes fraction"), fontsize=10,
+                color=COLOR_FG, ha="left", rotation=90, va="top")
     ax.set_xscale("log")
     ax.set_yscale("log")
     format_frequency_axis(ax, 45.0, 5600.0)
@@ -489,7 +495,9 @@ def generate_modal_count_per_band(output_dir: str) -> None:
                  "$V$ = 105 m³)", pad=10)
     ax.grid(which="both", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper left", fontsize=9)
+    # One point down from the usual 9: at 9 the Spanish entry is wide enough
+    # for the legend box to reach past the Schroeder line and wash it out.
+    ax.legend(loc="upper left", fontsize=8)
     plt.tight_layout()
     save_figure(output_dir, "modal_count_per_band.svg")
     plt.close()
@@ -800,11 +808,15 @@ def generate_open_plan_decay(output_dir: str) -> None:
                          linewidth=1.7, label="STI vs distance")
     ax2.plot(r, sti, "s", color=COLOR_TERTIARY, markersize=5,
              markerfacecolor="white", markeredgewidth=1.3)
-    for dist, level, name in [(m.rd, 0.50, "$r_D$"), (m.rp, 0.20, "$r_P$")]:
+    # r_D is called out to the right of its marker: the space to its left holds
+    # the 4 m diamond and the leader of the L_p,A,S,4m callout. r_P sits near the
+    # right frame, so its own callout goes to the left.
+    for dist, level, name, xfac, yoff in [(m.rd, 0.50, "$r_D$", 1.18, 0.07),
+                                          (m.rp, 0.20, "$r_P$", 0.62, 0.03)]:
         ax2.axhline(level, color=COLOR_FG, linestyle=":", alpha=0.25, linewidth=1)
         ax2.plot(dist, level, "v", color=COLOR_SECONDARY, markersize=9, zorder=6)
         ax2.annotate(f"{name} = {dist:.1f} m", xy=(dist, level),
-                     xytext=(dist * 0.62, level + 0.03), fontsize=9,
+                     xytext=(dist * xfac, level + yoff), fontsize=9,
                      color=COLOR_SECONDARY,
                      arrowprops={"arrowstyle": "->", "lw": 0.9,
                                  "color": COLOR_SECONDARY})

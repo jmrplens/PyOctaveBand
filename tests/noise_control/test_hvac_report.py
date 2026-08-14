@@ -125,8 +125,10 @@ def test_verbose_adds_a_weighting_columns(tmp_path) -> None:
     res.report(str(out), verbose=True)
     _assert_one_page(str(out))
     text = _extract_text(str(out))
-    # The 63 Hz and 2 kHz A-weighting corrections to one decimal.
-    assert "-26.2" in text
+    # The 63 Hz and 2 kHz A-weighting corrections to one decimal. The sign is
+    # the typographic minus the fiches print, not the ASCII hyphen `format`
+    # writes -- the same sign the plot inside the fiche carries.
+    assert "−26.2" in text
     assert "1.2" in text
 
 
@@ -202,7 +204,7 @@ def test_spanish_report_translates_the_element_label(tmp_path) -> None:
 
 @pytest.mark.parametrize(
     ("value", "printed"),
-    [(0.25, "0.3"), (0.35, "0.4"), (-0.25, "-0.3")],
+    [(0.25, "0.3"), (0.35, "0.4"), (-0.25, "−0.3")],
 )
 def test_verdict_prints_the_value_its_verdict_used(value: float, printed: str) -> None:
     """A half-way value prints the display rounding the verdict was decided on.

@@ -381,14 +381,14 @@ def plot_rotorcraft_event(
     ax = ax if ax is not None else _new_axes()
     t = np.asarray(result.times, dtype=np.float64)
     la = np.asarray(result.a_levels, dtype=np.float64)
-    label = f"$L_A(t)$  (SEL {format_number(result.sel, language)} dB(A)"
+    label = rf"$L_\mathrm{{A}}(t)$  (SEL {format_number(result.sel, language)} dB(A)"
     if np.isfinite(result.epnl):
         label += f", EPNL {format_number(result.epnl, language)} EPNdB"
     label += ")"
     ax.plot(t, la, **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     k = int(np.argmax(la))
     ax.plot(t[k], la[k], "o", color=_C_SECONDARY, ms=5,
-            label=f"$L_{{ASmax}}$ = {format_number(result.la_max, language)} dB(A)")
+            label=rf"$L_\mathrm{{ASmax}}$ = {format_number(result.la_max, language)} dB(A)")
     window = la >= result.la_max - 10.0
     if np.any(window):
         idx = np.nonzero(window)[0]
@@ -428,7 +428,7 @@ def plot_rotorcraft_noise_contour(
     cf = ax.contourf(x, y, masked,
                      **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs})
     ax.contour(x, y, masked, levels=levels, colors="k", linewidths=0.4, alpha=0.5)
-    metric = "SEL" if result.metric == "exposure" else "$L_{ASmax}$"
+    metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{ASmax}$"
     ax.figure.colorbar(cf, ax=ax, label=f"{metric} [dB(A)]")
     ax.set_xlabel("$x$ [km]")
     ax.set_ylabel("$y$ [km]")

@@ -416,7 +416,7 @@ def plot_cnossos_rail_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel(r"$L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
@@ -850,7 +850,7 @@ def plot_cnossos_road_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel(r"$L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)

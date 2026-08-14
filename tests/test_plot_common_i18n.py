@@ -15,6 +15,9 @@ documentation figures via ``scripts/check_figures.py``.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 import pytest
 
@@ -23,6 +26,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from result_factories import _airborne_insulation, _impact_insulation
 
 from phonometry._plot.common import (
     _annotate_impact_500,
@@ -174,6 +178,35 @@ def test_facade_x_axis_band_index_path_english_unchanged() -> None:
     assert ax.get_xlabel() == "Band"
     tick_labels = [t.get_text() for t in ax.get_xticklabels()]
     assert tick_labels == ["Band 1", "Band 2"]
+    plt.close("all")
+
+
+@pytest.mark.parametrize("factory", [_airborne_insulation, _impact_insulation])
+def test_insulation_bands_band_word_reaches_spanish_from_the_callers(
+    factory: Callable[[], Any],
+) -> None:
+    """The ISO 16283 plotters must hand their language down to the helper.
+
+    The band word is drawn by ``_plot_insulation_bands`` itself, so it only
+    reaches Spanish if ``plot_airborne_insulation`` / ``plot_impact_insulation``
+    forward their ``language``; a helper that localises but is never told the
+    language ships an English axis on an otherwise Spanish figure.
+    """
+    ax = factory().plot(language="es")
+    assert ax.get_xlabel() == "Banda"
+    tick_labels = [t.get_text() for t in ax.get_xticklabels()]
+    assert tick_labels == ["Banda 1", "Banda 2", "Banda 3"]
+    plt.close("all")
+
+
+@pytest.mark.parametrize("factory", [_airborne_insulation, _impact_insulation])
+def test_insulation_bands_english_default_unchanged(
+    factory: Callable[[], Any],
+) -> None:
+    ax = factory().plot()
+    assert ax.get_xlabel() == "Band"
+    tick_labels = [t.get_text() for t in ax.get_xticklabels()]
+    assert tick_labels == ["Band 1", "Band 2", "Band 3"]
     plt.close("all")
 
 

@@ -1353,14 +1353,41 @@ def generate_precision_positions_arrays(output_dir: str) -> None:
     sphere = emission.precision_positions("sphere", radius=1.0, count=20)
 
     from matplotlib.lines import Line2D
+    from matplotlib.transforms import offset_copy
 
     fig, (axl, axr) = plt.subplots(
-        1, 2, figsize=(12, 5.4), subplot_kw={"projection": "3d"})
+        1, 2, figsize=(13, 7.0), subplot_kw={"projection": "3d"})
     # Two colours through the scatter kwargs, so the escalation the standard
     # makes at position 20 reads straight off the array.
     plot_microphone_positions(
         hemi, ax=axl, radius=1.0, language=_LANG,
         color=[COLOR_SECONDARY] * 20 + [COLOR_PRIMARY] * 20, s=36)
+    # Forty numbered positions on one dome is the densest array the corpus
+    # draws, and at the library's default view whole numbers disappeared under
+    # their neighbours: 14 under 36, 34 under 22, 10 under 25, 26 under 30.
+    # Three layout moves open the array up, none of them touching a position.
+    # The dome is drawn taller and seen from lower down, because Table E.1
+    # spirals its positions up in z and it is z that has to carry them apart.
+    axl.set_box_aspect((1.0, 1.0, 0.78))
+    axl.view_init(elev=14, azim=-24)
+    # And the numbers the helper wrote on the points lean apart: a position of
+    # the first set leans left of its dot, one of the escalation set leans
+    # right. The array is two interleaved spirals, so nearly every stack was
+    # one number of each set, and leaning the sets in opposite directions
+    # stands those two side by side; which way a number leans reads off its
+    # own colour. Their chips also carry no more padding than the digits need,
+    # which buys the dense rings room without setting the digits smaller.
+    badges = [t for t in axl.texts if t.get_text().isdigit()]
+    for order, badge in enumerate(badges):
+        badge.set_transform(offset_copy(
+            badge.get_transform(), fig=fig, x=-3.8 if order < 20 else 3.8,
+            units="points"))
+        badge.get_bbox_patch().set_boxstyle("round,pad=0.12")
+    # The plane's own label is anchored on the rim of the disc, which on this
+    # array is exactly where position 21 sits; take it out to the edge of the
+    # plane it names, clear of that chip.
+    plane = next(t for t in axl.texts if not t.get_text().isdigit())
+    plane.set_position_3d((1.35, 0.0, 0.0))
     axl.set_title("Hemisphere, 40 positions (Table E.1)")
     axl.legend(handles=[
         Line2D([], [], marker="o", linestyle="none", color=COLOR_SECONDARY,
@@ -1370,10 +1397,24 @@ def generate_precision_positions_arrays(output_dir: str) -> None:
     ], loc="upper left", fontsize=8)
 
     plot_microphone_positions(sphere, ax=axr, radius=1.0, language=_LANG)
+    # Nine labels to an axis ran the tick chain of the sphere's x axis into
+    # itself ("−1.00" into "−0.75" into "−0.50"); the half-metre step reads
+    # the same radius with room between the labels, and matches the ticks the
+    # hemisphere panel carries.
+    for setter in (axr.set_xticks, axr.set_yticks, axr.set_zticks):
+        setter([-1.0, -0.5, 0.0, 0.5, 1.0])
+    # Table D.1 puts positions 2 and 19 on opposite faces of the sphere, and
+    # the default view laid one number over the other; four degrees of
+    # elevation and ten of azimuth part them by half a panel.
+    axr.view_init(elev=34, azim=-70)
     axr.set_title("Sphere, 20 positions (Table D.1)")
 
     fig.suptitle("ISO 3745 precision microphone arrays")
-    plt.tight_layout()
+    # The lower eye widens the hemisphere's 3-D box on the page, and its z
+    # label then reached over the sphere panel, which paints its own white
+    # ground over anything of its neighbour's that arrives there. The wider
+    # gutter keeps the label on its own panel.
+    plt.tight_layout(w_pad=5.0)
     save_figure(output_dir, "precision_positions_arrays.svg")
     plt.close()
 
@@ -2285,11 +2326,13 @@ def generate_hvac_elbow_flow_noise(output_dir: str) -> None:
                 color=COLOR_FG, lw=1.8, ms=4,
                 label="Mitred bend, $U$ = 10 m/s")
     ax.annotate("one bend at 10 m/s beats\na straight run at 20 m/s\nbelow 500 Hz",
-                xy=(125.0, 57.8), xytext=(320.0, 30.0),
+                xy=(125.0, 57.8), xytext=(56.0, 73.5), va="top",
                 fontsize="small", color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
+                arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0,
+                            "shrinkB": 5.0})
     ax.set_xlim(50.0, 10000.0)
-    ax.set_ylim(-16.0, 66.0)
+    ax.set_ylim(-16.0, 76.0)
+    ax.set_yticks(np.arange(-10.0, 71.0, 10.0))
     format_frequency_axis(ax, 50.0, 10000.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Regenerated $L_W$ [dB re 1 pW]")
@@ -2841,23 +2884,31 @@ def generate_intermodulation_tests(output_dir: str) -> None:
     tdfd = electroacoustics.total_difference_frequency_distortion(y_tdfd, fs)
     dim = electroacoustics.dynamic_intermodulation_distortion(y_dim, fs)
 
+    # Each mark is (frequency, label, label offset in points, horizontal
+    # alignment): the offsets keep every label off its own stem, off its
+    # neighbours' markers and off the panel frame.
     panels = (
         (y_dfd, (0.0, 16000.0),
          (f"(a) Difference frequency, 13 / 14 kHz — "
           f"$d(d,2)$ = {dfd2 * 100:.2f} %"),
-         ((1000.0, "$f_2 - f_1$"), (12000.0, "$2f_1 - f_2$"),
-          (15000.0, "$2f_2 - f_1$")),
+         ((1000.0, "$f_2 - f_1$", (0.0, 10.0), "center"),
+          (12000.0, "$2f_1 - f_2$", (0.0, 22.0), "center"),
+          (15000.0, "$2f_2 - f_1$", (0.0, 10.0), "center")),
          "denominator: $a(f_1) + a(f_2)$"),
         (y_tdfd, (0.0, 16000.0),
          (f"(b) Total difference frequency, 8 / 11.95 kHz — "
           f"$d(\\mathrm{{TDFD}})$ = {tdfd * 100:.2f} %"),
-         ((3950.0, "$f_0 - \\delta$"), (4050.0, "$f_0 + \\delta$")),
+         # The two sidebands are 100 Hz apart and 17 dB apart, so the lower
+         # one is labelled sideways with a leader instead of overhead.
+         ((3950.0, "$f_0 - \\delta$", (0.0, 10.0), "center"),
+          (4050.0, "$f_0 + \\delta$", (30.0, 0.0), "left")),
          "only the two in-band products count"),
         (y_dim, (0.0, 16000.0),
          (f"(c) Dynamic intermodulation, 15 kHz + 3.15 kHz square — "
           f"DIM = {dim * 100:.2f} %"),
-         tuple((abs(k * 3150.0 - 15000.0), f"$k$ = {k}")
-               for k in (1, 2, 3, 4, 5)
+         tuple((abs(k * 3150.0 - 15000.0), f"$k$ = {k}",
+                (0.0, 10.0 if j % 2 == 0 else 22.0), "center")
+               for j, k in enumerate((1, 2, 3, 4, 5))
                if 0.0 < abs(k * 3150.0 - 15000.0) < 15000.0),
          "denominator: the 15 kHz sine alone"),
     )
@@ -2866,22 +2917,29 @@ def generate_intermodulation_tests(output_dir: str) -> None:
     for ax, (sig, xlim, title, marks, note) in zip(axes, panels, strict=True):
         f, mag_db = spectrum(sig)
         ax.plot(f, mag_db, color=COLOR_PRIMARY, linewidth=0.9, alpha=0.85)
-        for j, (fm, lab) in enumerate(marks):
+        for fm, lab, offset, halign in marks:
             k = int(np.argmin(np.abs(f - fm)))
             ax.plot([f[k]], [mag_db[k]], "o", color=COLOR_SECONDARY,
                     markersize=6, zorder=6)
-            ax.annotate(lab, xy=(f[k], mag_db[k]),
-                        xytext=(0, 10 if j % 2 == 0 else 22),
-                        textcoords="offset points", ha="center", fontsize=8,
-                        color=COLOR_SECONDARY)
+            leader = ({"arrowstyle": "-", "color": COLOR_SECONDARY,
+                       "linewidth": 0.8, "shrinkA": 1.0, "shrinkB": 4.0}
+                      if offset[0] != 0.0 else None)
+            ax.annotate(lab, xy=(f[k], mag_db[k]), xytext=offset,
+                        textcoords="offset points", ha=halign,
+                        va="center" if offset[0] != 0.0 else "baseline",
+                        fontsize=8, color=COLOR_SECONDARY,
+                        arrowprops=leader)
         ax.set_xlim(*xlim)
-        ax.set_ylim(-110.0, 8.0)
+        # The top 20 dB carry no data (every spectrum is normalised to 0 dB),
+        # which leaves the corner note a clear band of its own instead of
+        # sitting down among the stems at the noise floor.
+        ax.set_ylim(-110.0, 20.0)
         ax.set_ylabel("Level [dB]")
         ax.set_title(title, fontsize=10, pad=6)
         ax.grid(which="major", color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
-        ax.text(0.985, 0.06, note, transform=ax.transAxes, va="bottom",
-                ha="right", fontsize=8.5, color=COLOR_FG)
+        ax.text(0.985, 10.0, note, transform=ax.get_yaxis_transform(),
+                va="center", ha="right", fontsize=8.5, color=COLOR_FG)
     axes[-1].set_xlabel("Frequency [Hz]")
     plt.tight_layout()
     save_figure(output_dir, "intermodulation_tests.svg")
