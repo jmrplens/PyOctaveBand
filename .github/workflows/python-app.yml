@@ -274,6 +274,11 @@ jobs:
       # traceback in the middle of a four-hundred-figure run. Reads the
       # sources, so it costs seconds and covers labels no figure exercises.
       run: python scripts/check_mathtext.py
+    - name: Fail if a Spanish label would keep an English decimal point
+      # The one defect the language gate structurally cannot see: it compares
+      # untranslated WORDS, and a number is not a word. Static, so it needs no
+      # generation run.
+      run: python scripts/check_decimal_comma.py
     - name: Regenerate figures and diagrams
       run: make graphs
     - name: Fail if any committed figure is stale

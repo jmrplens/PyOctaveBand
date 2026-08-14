@@ -94,6 +94,16 @@ figure-contrast:
 mathtext:
 	$(PYTHON) scripts/check_mathtext.py
 
+# The blind spot of the Spanish pass, and the reason it needs a check of its
+# own. That pass ends with the decimal comma, guarded by `"$" not in s` because
+# a bare comma inside `$...$` sets with maths spacing -- but the guard tests the
+# WHOLE string, so a label carrying mathematics anywhere keeps an English point
+# everywhere. No other gate can see it: the language gate compares untranslated
+# WORDS, and a number is not a word. This reads the translation tables and fails
+# on a Spanish value that still has a point the pass will never reach.
+decimal-comma:
+	$(PYTHON) scripts/check_decimal_comma.py
+
 # The Spanish variant of a figure is the English one with its strings looked
 # up in a table at save time, so a string nobody added to the table ships in
 # English inside `X_es.svg` and every other gate stays green: the page is
@@ -114,6 +124,7 @@ figures:
 	# cannot parse aborts the generation below, and finding that out from the
 	# traceback of a four-hundred-figure run is the slow way round.
 	$(MAKE) mathtext
+	$(MAKE) decimal-comma
 	$(MAKE) graphs
 	$(MAKE) figure-contrast
 	$(MAKE) figure-language
