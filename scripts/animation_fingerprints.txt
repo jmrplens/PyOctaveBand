@@ -35,6 +35,7 @@ anim_fdtd_refraction a4ed7f4ea2a894aa
 anim_fdtd_room_modes c4c970b6a5bac45d
 anim_fdtd_side_branch 71258bf06820cb15
 anim_fdtd_slit_absorber 28506539bd0ec725
+anim_fdtd_transmission_tube 6caad94c79483323
 anim_feedback_howl 54b793d3d2f683bb
 anim_flanking_paths 7cd7079f29b91602
 anim_image_source_buildup cc0098b6de500073
