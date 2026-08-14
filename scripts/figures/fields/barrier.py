@@ -19,6 +19,7 @@ from ._core import (
     _fdtd_cw_capture,
     _fit_text_x,
     _rms_to_db,
+    _settle,
     _text_width_x,
 )
 
@@ -141,8 +142,8 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     rx, ry = _BARRIER_RECEIVER
 
     fig = _anim_figure()
-    fig.suptitle(T("Barrier diffraction into the shadow zone (2D FDTD)"),
-                 )
+    sup = fig.suptitle(T("Barrier diffraction into the shadow zone (2D FDTD)"),
+                       )
     gs = fig.add_gridspec(2, 2)
     titles = [
         T(rf"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
@@ -200,7 +201,11 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         if col == 0:
             ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB re panel max]"), fontsize=8)
-            ax_p.text(0.25, -0.27, T("rigid ground"), ha="left",
+            # 0.45 m, not flush with the corner: anchored at 0.25 m the
+            # rounded box behind the label started about a pixel off the
+            # left spine and read as touching it. The extra 0.2 m is
+            # daylight between the box and the spine, not data.
+            ax_p.text(0.45, -0.27, T("rigid ground"), ha="left",
                       va="center", color=COLOR_FG, fontsize=6.5,
                       bbox={"boxstyle": "round,pad=0.2",
                             "facecolor": fig.get_facecolor(),
@@ -228,7 +233,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     # fits. Stepped rather than scaled by the ratio: the rasteriser rounds
     # the glyph size to whole pixels, so a 2 % reduction can come back the
     # same width it went in.
-    def fit_insertion_loss() -> None:
+    def fit_annotations() -> None:
         while (max(_text_width_x(fig, il.axes, il) for il in il_txts)
                > shadow[1] - shadow[0] and il_txts[0].get_fontsize() > 6.0):
             for il in il_txts:
@@ -236,6 +241,21 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         for il in il_txts:
             _fit_text_x(fig, il.axes, il, *shadow)
             il.set_text("")
+        # The title is centred on the canvas and the clock owns the
+        # top-left corner, so the room between them is what the title
+        # leaves over: the Spanish title runs long enough that its first
+        # letter once landed 37 px from the clock and the two read as one
+        # run-on line at web size. The clock string is fixed-width (a
+        # monospace 4.1f number in an unchanging frame), so draw it,
+        # measure both, and step the title down -- same whole-pixel
+        # stepping as the pills above -- until 0.6 in of daylight
+        # separates them.
+        t_txt.set_text(T(f"$t$ = {times[-1] * 1000.0:4.1f} ms"))
+        _settle(fig)
+        while (sup.get_window_extent().x0 - t_txt.get_window_extent().x1
+               < 0.6 * fig.dpi and sup.get_fontsize() > 9.0):
+            sup.set_fontsize(sup.get_fontsize() - 0.25)
+        t_txt.set_text("")
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):
@@ -252,4 +272,4 @@ def animate_fdtd_barrier(output_dir: str) -> None:
 
     _render_clip(fig, update, output_dir, "anim_fdtd_barrier",
                  frames=int(p_all.shape[1]), fps=_BARRIER_FPS, gif_fps=5,
-                 measure=fit_insertion_loss)
+                 measure=fit_annotations)

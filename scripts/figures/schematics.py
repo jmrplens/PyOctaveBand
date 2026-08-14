@@ -230,7 +230,7 @@ def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
 
 def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
                 color: str, lo: str = "", hi: str = "",
-                end_dy: float = -0.12) -> dict[str, Any]:
+                end_dy: float = -0.12, end_dx: float = 1.12) -> dict[str, Any]:
     """A semicircular meter dial; move the needle with :func:`_set_gauge`.
 
     ``lo``/``hi`` are optional scale-endpoint labels (left and right end of
@@ -240,7 +240,12 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     which is what a label wide for its dial needs; a dial whose endpoint
     labels are two or three characters wide is better served by a shallower
     drop, close enough under the arc ends to read as belonging to that arc
-    rather than floating in the gap to the next dial.
+    rather than floating in the gap to the next dial. ``end_dx`` is the
+    horizontal hang, in radii from the dial centre: the default puts the
+    labels just outside the arc ends, and a dial in a row packed so tight
+    that an outside label would fall into the gap to its neighbour tucks
+    them inside the arc instead (``end_dx`` < 1, with a drop deep enough
+    to clear the needle lying flat along the baseline).
     """
     from matplotlib.patches import Arc
 
@@ -256,10 +261,10 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     # Spanish "20 sonios" against the English "20 sone") otherwise reaches
     # back under the needle tip with a couple of pixels to spare.
     if lo:
-        ax.text(cx - 1.12 * r, cy + end_dy * r, lo, ha="center", va="top",
+        ax.text(cx - end_dx * r, cy + end_dy * r, lo, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     if hi:
-        ax.text(cx + 1.12 * r, cy + end_dy * r, hi, ha="center", va="top",
+        ax.text(cx + end_dx * r, cy + end_dy * r, hi, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     (needle,) = ax.plot([cx, cx - 0.78 * r], [cy, cy], color=color, lw=2.4,
                         solid_capstyle="round")
@@ -456,17 +461,18 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
               va="center", color=COLOR_FG, fontsize=8.5, alpha=0.85)
 
     # --- meter gauges + response traces -----------------------------------
-    # One shared 0..1.2 scale, spelled out on the first dial only (the
-    # endpoint labels of adjacent dials would otherwise collide). "0" and
-    # "1.2" are two or three characters wide and never reach back under the
-    # needle, so they hang just clear of the arc ends instead of at the
-    # shared default, which drops them into the gap between F and S where
-    # they read as labelling neither. Not flush against the ends either: at
-    # this radius the arc's own end tick is horizontal, and a label whose
-    # top edge meets it is drawn with a line through its digits.
+    # One shared 0..1.2 scale, spelled out on the F and S dials. The dials
+    # sit so close that a label hung outside an arc end lands in the gap to
+    # the neighbouring dial (that is where the lone "1.2" of the
+    # first-dial-only design sat, nearer the S arc than the F one, reading
+    # as labelling neither), so the endpoint labels tuck inside each
+    # labelled arc instead, under the horizontal end ticks; the drop is
+    # deep enough that the needle lying flat along the baseline at zero
+    # clears the digits under its tip.
     gauges = [_make_gauge(ax_g, 0.6, 0.0, 0.5, "F", COLOR_PRIMARY,
-                          lo="0", hi="1.2", end_dy=-0.04),
-              _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY),
+                          lo="0", hi="1.2", end_dx=0.80, end_dy=-0.14),
+              _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY,
+                          lo="0", hi="1.2", end_dx=0.80, end_dy=-0.14),
               _make_gauge(ax_g, 2.8, 0.0, 0.5, "I", col_imp)]
     ax_t.set_xlim(0.5, 4.0)
     ax_t.set_ylim(0, 1.25)
@@ -713,7 +719,11 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                   color=COLOR_FG, fontsize=10, alpha=0.8)
         ax_s.text(8.85, i_axis_y, "+", ha="left", va="center",
                   color=COLOR_FG, fontsize=10, alpha=0.8)
-        ax_s.text(3.4, 1.55, T(r"$I(t) = p\cdot u$"), ha="left", va="bottom",
+        # Anchored 0.4 to the right of the number-line's left end: the
+        # Spanish phase caption under the dial is wider than the English
+        # one and its right edge otherwise runs to within a few pixels of
+        # this label (they share a vertical band).
+        ax_s.text(3.8, 1.55, T(r"$I(t) = p\cdot u$"), ha="left", va="bottom",
                   color=COLOR_SECONDARY, fontsize=9)
         i_arrow = _make_arrow(ax_s, COLOR_SECONDARY, scale=16.0)
         (mean_marker,) = ax_s.plot([], [], marker="^", ms=7, color=COLOR_FG)

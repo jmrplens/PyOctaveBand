@@ -280,6 +280,13 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
         T(f"surface train: {c_meas:.0f} m/s measured, {c_r:.0f} m/s exact"),
         T("only P and S: a clamped wall carries no surface wave"),
     ]
+    # The Spanish of the rigid-run verdict is wider than the
+    # height-limited field panel (it ran ~150 px past the right spine),
+    # and a pill wider than its panel cannot be slid inside it. Both
+    # pills break onto two lines at their one ": " instead -- after the
+    # translation, so the i18n keys stay the one-line strings -- and in
+    # every language, so the four variants keep one composition.
+    verdicts = [v.replace(": ", ":\n", 1) for v in verdicts]
     # The symbols are mathtext, which is the house convention and also the
     # fix for a real defect: `_translate_str` rewrites decimal points as
     # commas for Spanish unless the string carries maths, and it had been

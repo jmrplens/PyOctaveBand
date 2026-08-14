@@ -336,7 +336,13 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
                        label=T("all four edges"), zorder=5)[0]
     line_b = ax_d.plot([], [], color=COLOR_SECONDARY, lw=1.8,
                        label=T("floor + ceiling"), zorder=4)[0]
-    ax_d.legend(fontsize=7.2, loc="upper right", framealpha=0.85)
+    # One row, hugging the top-right: the two-row box used to reach down to
+    # ~-20 dB, where the concentrated room's verdict pill (whose Spanish
+    # text runs wider) slid underneath it and covered the second entry's
+    # swatch. A single row bottoms out near -11 dB, clear of the pill's top
+    # (~-16 dB) in both languages, and the curves stay below -30 dB in the
+    # strip it occupies.
+    ax_d.legend(fontsize=7.2, loc="upper right", framealpha=0.85, ncols=2)
     pill_a = ax_d.text(0.055 * t_end, _AP_FLOOR + 4.0, "",
                        ha="left", va="bottom", fontsize=8.5,
                        color="white", zorder=6,

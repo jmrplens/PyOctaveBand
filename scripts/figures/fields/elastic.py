@@ -189,6 +189,12 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     x_mid = _EJ_JUNC_X + 2.0 * dx
 
     fig = _anim_figure()
+    # Two stacked 2.3:1 equal-aspect panels are height-limited on the
+    # fixed 16:9 canvas, so every point of vertical padding costs 2.3 of
+    # panel width: the layout pads and the title pads run tight to give
+    # back part of the side bands the aspect ratio forces.
+    fig.get_layout_engine().set(h_pad=0.022, w_pad=0.015,
+                                hspace=0.0, wspace=0.0)
     fig.suptitle(T("Bending waves at an L-junction (elastic 2D FDTD)"),
                  )
     axes = fig.subplots(2, 1, sharex=True)
@@ -207,7 +213,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
                        cmap="magma", vmin=0.0, vmax=vmax,
                        aspect="equal", interpolation="bilinear")
-        ax.set_title(title, fontsize=10)
+        ax.set_title(title, fontsize=10, pad=3.0)
         # The 10 mm plates, drawn as thin open rectangles so the field
         # inside stays visible.
         px1 = _EJ_JUNC_X + 4 * _EL_DX if with_junction else x1
@@ -262,8 +268,11 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
                               "edgecolor": "none"})
         ims.append(im)
         v_txts.append(v_txt)
-    axes[1].set_xlabel("x [m]", fontsize=8)
-    t_txt = fig.text(0.985, 0.965, "", ha="right", va="top",
+    axes[1].set_xlabel("x [m]", fontsize=8, labelpad=2.0)
+    # Clock in the top-left corner, where anim_fdtd_aperture_slit and the
+    # plurality of the field clips carry it; this clip was the one of its
+    # batch with it top-right.
+    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
     # aspect="equal" makes the axes box narrower than its gridspec cell, so
     # a pill anchored a fixed distance inside the data limits still hung its
@@ -477,6 +486,21 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         stack[:, i_below:, :] *= gain
 
     fig = _anim_figure()
+    # Side by side, the two 1.48:1 equal-aspect panels are width-limited
+    # on the fixed 16:9 canvas, and the leftover height pooled as ~240 px
+    # of white between the suptitle and the panel titles. The bottom
+    # strip is reserved for the two figure-level captions (fig.text takes
+    # no room of its own from the layout), the pads run tight, and the
+    # display window is cropped on the right below so the panels use the
+    # height instead.
+    fig.get_layout_engine().set(rect=(0.0, 0.065, 1.0, 0.935),
+                                h_pad=0.015, w_pad=0.015,
+                                hspace=0.0, wspace=0.0)
+    # Display-only crop: the run, the capture and the under-plate
+    # transmitted-level average all keep the full stored span; the panels
+    # just stop showing the last stripes of the periodic pattern, which
+    # buys the equal-aspect boxes their height.
+    x_hi = 1.905
     fig.suptitle(T("Coincidence: the same steel plate, below and above "
                    "$f_c$ (elastic 2D FDTD)"))
     axes = fig.subplots(1, 2, sharey=True)
@@ -506,7 +530,8 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
                        cmap=CMAP_FIELD, vmin=-_EC_VLIM, vmax=_EC_VLIM,
                        aspect="equal", interpolation="bilinear")
-        ax.set_title(title, fontsize=10)
+        ax.set_xlim(x0, x_hi)
+        ax.set_title(title, fontsize=10, pad=3.0)
         ax.add_patch(Rectangle((x0, _EC_PLATE_Y), x1 - x0, _EL_H,
                                facecolor=COLOR_GRID, edgecolor=COLOR_FG,
                                lw=0.8, zorder=3))
@@ -515,7 +540,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
             # at the near end it grew, in Spanish, into the incidence
             # arrow, whose head then landed on the "0" of "10 mm" and left
             # the plate reading 1 mm thick.
-            ax.text(x1 - 0.02, _EC_PLATE_Y - 0.012,
+            ax.text(x_hi - 0.02, _EC_PLATE_Y - 0.012,
                     T("10 mm steel plate"), ha="right", va="bottom",
                     color=FIELD_INK, fontsize=7.5, path_effects=outline,
                     zorder=4)
@@ -529,9 +554,9 @@ def animate_elastic_coincidence(output_dir: str) -> None:
                     xytext=(x0 + 0.13, y0 + 0.09),
                     arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                 "lw": 1.4}, zorder=4)
-        ax.set_xlabel("x [m]", fontsize=8)
+        ax.set_xlabel("x [m]", fontsize=8, labelpad=2.0)
         ax.tick_params(labelsize=7)
-        v_txt = ax.text(x1 - 0.02, y1 - 0.02, "", ha="right", va="bottom",
+        v_txt = ax.text(x_hi - 0.02, y1 - 0.02, "", ha="right", va="bottom",
                         color="white", fontsize=8, zorder=5,
                         bbox={"boxstyle": _ANIM_PILL_BOX,
                               "facecolor": "black", "alpha": 0.55,

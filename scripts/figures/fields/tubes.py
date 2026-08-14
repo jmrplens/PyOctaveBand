@@ -230,10 +230,16 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
         ims.append(im)
         lines.append(line)
     axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
+    # The pill backs onto the panel, not onto the field, so translucent
+    # black -- the backing the field pills use -- composites here with the
+    # page: on the light page it read as the grey box it was meant to be,
+    # on the dark page it matched the background and left bare white text.
+    # Solid mid-grey (what the translucent box rendered to over white) is
+    # that same box on both themes.
     a_txt = axes[1].text(0.03, env_base + env_h - 0.015, "", ha="left",
                          va="top", fontsize=9, color="white", zorder=7,
                          bbox={"boxstyle": _ANIM_PILL_BOX,
-                               "facecolor": "black", "alpha": 0.55,
+                               "facecolor": "#737373",
                                "edgecolor": "none"})
     t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
@@ -393,10 +399,13 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
         ax.tick_params(labelsize=7)
         ims.append(im)
     axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
+    # Solid mid-grey backing for the same reason as the absorption pill of
+    # the impedance tube above: this pill sits on the page, where the
+    # translucent black of the field pills vanished on the dark theme.
     tl_txt = axes[1].text(0.02, 0.205, "", ha="left", va="top",
                           fontsize=9, color="white", zorder=7,
                           bbox={"boxstyle": _ANIM_PILL_BOX,
-                                "facecolor": "black", "alpha": 0.55,
+                                "facecolor": "#737373",
                                 "edgecolor": "none"})
     t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
