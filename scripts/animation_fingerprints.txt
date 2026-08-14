@@ -12,6 +12,7 @@
 #     python scripts/generate_graphs.py --animations --anim <clip>
 anim_comb_filtering da3202e0889b8f9c
 anim_dynamic_stiffness_sweep 7a6510f3233da78b
+anim_elastic_coincidence 24204ab4efa895b4
 anim_elastic_halfspace_waves d4c6b03e1874b384
 anim_elastic_mode_conversion e7b5219d6f8ede59
 anim_elastic_radiation_efficiency bb4f06bb985ae306
