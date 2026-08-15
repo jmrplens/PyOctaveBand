@@ -15,7 +15,8 @@ transmission loss of [`phonometry.underwater.propagation.closed_form`](/phonomet
   Sturm-Liouville eigenvalue problem by finite differences and assembles the
   transmission loss from the propagating modes.
 * [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) -- ray tracing. Integrates the ray-trajectory equations
-  through a sound-speed profile (Runge-Kutta), returning the ray paths.
+  through a sound-speed profile (Runge-Kutta), returning the ray paths and the
+  travel time accumulated along each of them.
 * [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the transmission-loss field.
 
@@ -24,7 +25,9 @@ All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 (Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24) and the
 split-step Fourier PE (Ch. 6). They are validated against analytic oracles: the
 ideal (pressure-release) waveguide's exact modes, the circular-arc ray paths of
-a linear sound-speed gradient, and mutual agreement of the PE and normal-mode
+a linear sound-speed gradient together with the closed-form travel time along
+them (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press
+1998, Eq. (3.3.20)), and mutual agreement of the PE and normal-mode
 transmission loss for a range-independent waveguide.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
@@ -238,6 +241,16 @@ Integrates the ray-trajectory equations (Jensen Eqs. 3.23-3.24) with a
 fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
 surface (`z = 0`) and the bottom (`z = water_depth`).
 
+The travel time is a third state of that same Runge-Kutta step rather than a
+quadrature run over the finished path: with the range-invariant Snell
+parameter $\xi = \cos\theta_0 / c(z_s)$ it obeys
+$dt/dr = 1/(\xi c^2)$, so it is integrated with the very stages that
+place the ray and cannot drift from the geometry actually returned. This is
+the same ray core, and the same travel-time equation, as the atmospheric
+[`atmospheric_ray_paths`](/phonometry/reference/api/environment/refraction/#atmospheric_ray_paths)
+(which reflects at the ground instead of at the sea surface). Reflections
+cost no time, so the accumulated time stays continuous across them.
+
 **Parameters**
 
 | Name | Description |
@@ -264,6 +277,7 @@ RayTraceResult(
     launch_angles: NDArray[np.float64],
     ranges: NDArray[np.float64],
     depths: NDArray[np.float64],
+    travel_times: NDArray[np.float64],
     source_depth: float,
     water_depth: float,
 )
@@ -278,6 +292,7 @@ Ray-tracing solution through a sound-speed profile.
 | `launch_angles` | Launch angles from the horizontal, in degrees. |
 | `ranges` | Per-ray horizontal ranges, in metres, shape `(n_rays, n_steps)`. |
 | `depths` | Per-ray depths, in metres, shape `(n_rays, n_steps)`. |
+| `travel_times` | Per-ray cumulative travel times, in seconds, shape `(n_rays, n_steps)` (zero at the source, increasing along the ray). |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
 

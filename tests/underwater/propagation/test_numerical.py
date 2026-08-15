@@ -3,11 +3,14 @@
 
 Oracles are analytic and independent of the implementation: the ideal
 (pressure-release) waveguide's exact normal modes, the circular-arc ray paths of
-a linear sound-speed gradient, and free-field spherical spreading for the
-parabolic equation.
+a linear sound-speed gradient and the published closed form for the travel time
+along them (Medwin & Clay 1998, Eq. (3.3.20)), and free-field spherical
+spreading for the parabolic equation.
 """
 
 from __future__ import annotations
+
+import math
 
 import matplotlib
 
@@ -111,6 +114,214 @@ def test_ray_trace_constant_speed_is_straight() -> None:
                     max_range=1000.0, n_steps=2000)
     # A horizontal ray in isovelocity water stays at the source depth.
     assert np.allclose(res.depths[0], 50.0, atol=1e-6)
+
+
+# --- Ray travel times -------------------------------------------------------
+#
+# Oracle: the closed-form travel time through a layer of constant sound-speed
+# gradient, Medwin & Clay, *Fundamentals of Acoustical Oceanography* (Academic
+# Press, 1998), Sec. 3.3.4, Eq. (3.3.20) printed on p. 88,
+#
+#     t(n+1) - t(n) = |1/b| ln{ w(n+1)[1 + (1 - a^2 b^2 w(n)^2)^(1/2)]
+#                             / ( w(n) [1 + (1 - a^2 b^2 w(n+1)^2)^(1/2)] ) },
+#
+# in which b = dc/dz is the gradient, w = c/b (their Eqs. (3.3.16)-(3.3.17)) and
+# a = sin(theta_v)/c is the Snell invariant with theta_v measured from the
+# vertical. Since a*b*w = a*c = sin(theta_v) = cos(theta), with theta the angle
+# from the HORIZONTAL that this library launches its rays at, the printed
+# equation reads, in the library's own variables,
+#
+#     t = (1/g) ln[ (c2/c1) (1 + sin theta_1) / (1 + sin theta_2) ],
+#
+# and the companion Eq. (3.3.21) gives the range as
+# r = (sin theta_1 - sin theta_2)/(a g), i.e. sin theta_2 = sin theta_1 - xi g r
+# with xi = cos(theta_1)/c1. The numbers below were evaluated from those two
+# printed equations at 40 decimal digits (mpmath) and rounded to 1e-11 s; no
+# part of them comes from running the solver.
+_MEDWIN_C0, _MEDWIN_G = 1500.0, 0.05  # c(z) = 1500 + 0.05 z, launch 10 deg down
+#: (range in m, travel time in s) for a 10 deg ray launched at the surface.
+_MEDWIN_TRAVEL_TIME = [
+    (2_000.0, 1.34017403528),   # still descending
+    (5_000.0, 3.31823980910),   # just short of the 5289.8 m turning range
+    (8_000.0, 5.29257808047),   # climbing again, past the turn
+    (10_000.0, 6.62594192637),  # back up at 96.4 m depth
+]
+
+
+def test_ray_travel_time_matches_iso_gradient_closed_form() -> None:
+    """Travel time against Medwin & Clay (1998) Eq. (3.3.20), p. 88.
+
+    The closed form for a layer of constant gradient, evaluated independently of
+    this library (see the derivation above the table), pinned at four ranges
+    that straddle the ray's turning point.
+    """
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + _MEDWIN_G * 2000.0]))
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=[10.0],
+                    max_range=10_000.0, n_steps=20_001)
+    assert res.travel_times.shape == res.depths.shape
+    assert res.travel_times[0, 0] == 0.0
+    for rng, t_ref in _MEDWIN_TRAVEL_TIME:
+        i = int(np.argmin(np.abs(res.ranges[0] - rng)))
+        assert res.ranges[0, i] == pytest.approx(rng)
+        assert res.travel_times[0, i] == pytest.approx(t_ref, abs=1e-9), rng
+
+
+def test_ray_travel_time_deeper_turning_ray_takes_longer() -> None:
+    """A ray that turns deeper spends longer getting to its turning point.
+
+    Steeper launch means a deeper turn (Snell: c(z_t) = c(z_s)/cos theta_0), and
+    Medwin & Clay Eq. (3.3.20) taken from the source to that turn collapses to
+    t_turn = (1/g) ln[(1 + sin theta_0)/cos theta_0], which is strictly
+    increasing in theta_0 and, notably, free of the sound speed itself.
+    """
+    g = _MEDWIN_G
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + g * 2000.0]))
+    angles = [4.0, 8.0, 12.0, 16.0]
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=angles,
+                    max_range=12_000.0, n_steps=24_001)
+    turn_times, turn_depths = [], []
+    for k, angle in enumerate(angles):
+        th = np.radians(angle)
+        xi = np.cos(th) / _MEDWIN_C0
+        r_turn = np.sin(th) / (xi * g)  # Eq. (3.3.21) with sin theta_2 = 0
+        t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / g
+        got = float(np.interp(r_turn, res.ranges[k], res.travel_times[k]))
+        assert got == pytest.approx(t_turn, abs=1e-6), angle
+        turn_times.append(got)
+        turn_depths.append((1.0 / xi - _MEDWIN_C0) / g)
+    assert np.all(np.diff(turn_depths) > 0.0)  # steeper turns deeper
+    assert np.all(np.diff(turn_times) > 0.0)   # and takes longer to get there
+
+
+def test_ray_travel_time_constant_profile_is_range_over_speed() -> None:
+    # With no gradient the ray is straight, its arc is range/cos(theta0) long and
+    # it is covered at c, so t = r/(c cos theta0); horizontally, exactly r/c.
+    res = ray_trace(*_ISO, source_depth=50.0, launch_angles_deg=[0.0, 20.0],
+                    max_range=1500.0, n_steps=2000)
+    r, c = res.ranges[0], 1500.0
+    assert np.allclose(res.travel_times[0], r / c, rtol=0.0, atol=1e-12)
+    assert np.allclose(res.travel_times[1], r / (c * np.cos(np.radians(20.0))),
+                       rtol=0.0, atol=1e-12)
+
+
+# A ray steep enough to reach the bottom before it turns (it would only turn at
+# 4098 m, five times the column), launched deep enough to work both boundaries.
+_BOUNCE_C0, _BOUNCE_G = 1500.0, 0.06  # c(z) = 1500 + 0.06 z
+_BOUNCE_DEPTH, _BOUNCE_SOURCE_Z = 800.0, 200.0
+_BOUNCE_LAUNCH_DEG, _BOUNCE_RANGE = 30.0, 9000.0
+_BOUNCE_MAX_LEGS = 200
+
+
+def _arc_walk(rmax: float) -> tuple[float, float]:
+    """Exact travel time and depth at ``rmax`` for the bouncing ray below.
+
+    In a constant gradient a ray is an arc of a circle of radius R = 1/(xi g)
+    centred at the depth where c extrapolates to zero, z_c = -c1/g, since
+    Snell's cos(phi) = xi c(z) and c(z) = g (z - z_c) together give
+    z = z_c + R cos(phi). Range and time along the arc follow from
+    dr = -R cos(phi) dphi and dt = ds/c = dphi/(g cos(phi)):
+
+        r = R [sin(phi_a) - sin(phi_b)],
+        t = |ln((1 + sin phi_a)/cos phi_a) - ln((1 + sin phi_b)/cos phi_b)| / g,
+
+    the second being Medwin & Clay Eq. (3.3.20) written with the angle alone. A
+    specular reflection is exactly ``phi -> -phi`` at the boundary depth, so the
+    whole bouncing path is these two formulae restarted at each boundary. None
+    of it comes from the solver.
+    """
+    phi = math.radians(_BOUNCE_LAUNCH_DEG)
+    z_c = -_BOUNCE_C0 / _BOUNCE_G
+    xi = math.cos(phi) / (_BOUNCE_C0 + _BOUNCE_G * _BOUNCE_SOURCE_Z)
+    radius = 1.0 / (xi * _BOUNCE_G)
+
+    def arc(p: float) -> float:
+        return math.log((1.0 + math.sin(p)) / math.cos(p))
+
+    r = t = 0.0
+    for _ in range(_BOUNCE_MAX_LEGS):
+        target = _BOUNCE_DEPTH if phi > 0.0 else 0.0
+        phi_b = math.copysign(math.acos((target - z_c) / radius), phi)
+        leg = radius * (math.sin(phi) - math.sin(phi_b))
+        if r + leg >= rmax:  # the partial leg the range ends inside
+            p = math.asin(math.sin(phi) - (rmax - r) / radius)
+            return t + abs(arc(phi) - arc(p)) / _BOUNCE_G, z_c + radius * math.cos(p)
+        r += leg
+        t += abs(arc(phi) - arc(phi_b)) / _BOUNCE_G
+        phi = -phi_b  # the reflection itself
+    raise AssertionError("the arc walk did not reach the range")
+
+
+def test_bouncing_ray_matches_the_exact_arc_through_every_reflection() -> None:
+    """A multi-bounce path against the closed form, at a sampled range.
+
+    The comparison is at the last sample, where the marching grid lands exactly,
+    because interpolating between samples is second order and would swamp what
+    is being measured.
+    """
+    prof = (np.array([0.0, _BOUNCE_DEPTH]),
+            np.array([_BOUNCE_C0, _BOUNCE_C0 + _BOUNCE_G * _BOUNCE_DEPTH]))
+    res = ray_trace(*prof, source_depth=_BOUNCE_SOURCE_Z,
+                    launch_angles_deg=[_BOUNCE_LAUNCH_DEG],
+                    max_range=_BOUNCE_RANGE, n_steps=4001)
+    t_exact, z_exact = _arc_walk(_BOUNCE_RANGE)
+    assert res.ranges[0, -1] == pytest.approx(_BOUNCE_RANGE)
+    # The ray really does work both boundaries over this range.
+    assert res.depths[0].max() > _BOUNCE_DEPTH - 1.0
+    assert res.depths[0].min() < 1.0
+    assert float(res.travel_times[0, -1]) == pytest.approx(t_exact, abs=1e-12)
+    assert float(res.depths[0, -1]) == pytest.approx(z_exact, abs=1e-8)
+
+
+def test_reflection_costs_no_accuracy_in_a_gradient() -> None:
+    """A bounce must not degrade the path, which is what splitting the step buys.
+
+    A ray launched upward from the surface and the same ray launched downward
+    are one trajectory: the first reflects immediately and continues as the
+    second, so the two must agree to the accuracy of the integration itself.
+    They only do if the range step is split at the crossing. Folding the
+    overshoot back after a whole step instead integrates through water that is
+    not there and applies a mid-step reflection at the step's end, which leaves
+    a first-order error per bounce: metres of depth at these step counts, and
+    visible in any figure that draws a reflected ray.
+
+    Isovelocity water cannot see this (no gradient, nothing to get wrong outside
+    the column), which is why a gradient is essential here.
+    """
+    prof = (np.array([0.0, 2000.0]), np.array([1500.0, 1600.0]))
+    for n_steps in (201, 2001, 20_001):
+        kw = {"source_depth": 0.0, "max_range": 10_000.0, "n_steps": n_steps}
+        up = ray_trace(*prof, launch_angles_deg=[-10.0], **kw)
+        down = ray_trace(*prof, launch_angles_deg=[10.0], **kw)
+        # Nanometres over a 2 km column: roundoff, not discretisation. Before
+        # the step was split this gap was 3.6 m at the middle step count.
+        assert np.abs(up.depths[0] - down.depths[0]).max() < 1e-9, n_steps
+        assert np.abs(up.travel_times[0] - down.travel_times[0]).max() < 1e-12
+
+
+def test_ray_travel_time_survives_reflections() -> None:
+    # Reflections cost no time and do not change the speed, so a ray bouncing
+    # between surface and bottom in isovelocity water still covers r/(c cos th0);
+    # this is the folding path, which a post-hoc integral over the drawn (folded)
+    # geometry would get wrong.
+    res = ray_trace(*_ISO, source_depth=100.0, launch_angles_deg=[60.0],
+                    max_range=5000.0, n_steps=3000)
+    assert res.travel_times[0, -1] == pytest.approx(
+        5000.0 / (1500.0 * np.cos(np.radians(60.0))), rel=1e-9)
+
+
+def test_ray_travel_time_increases_monotonically_along_every_ray() -> None:
+    # Time only ever runs forward, whichever way the ray is going: a Munk-like
+    # profile with rays that turn, reflect and cross each other.
+    z = np.linspace(0.0, 5000.0, 60)
+    eta = 2.0 * (z - 1300.0) / 1300.0
+    c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
+    res = ray_trace(z, c, source_depth=1000.0,
+                    launch_angles_deg=np.linspace(-14.0, 14.0, 15),
+                    max_range=60_000.0, n_steps=4000)
+    assert np.all(res.travel_times[:, 0] == 0.0)
+    assert np.all(np.diff(res.travel_times, axis=1) > 0.0)
 
 
 # --- Parabolic equation -----------------------------------------------------

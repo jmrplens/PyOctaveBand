@@ -55,6 +55,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 from numpy.typing import ArrayLike
 
+from ..._internal.rays import march_rays
 from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
@@ -345,8 +346,10 @@ def atmospheric_ray_paths(
     :math:`dz/dr = \zeta/\xi` and
     :math:`d\zeta/dr = -(dc/dz)/(c^3 \xi)`, the same ray core as the ocean
     :func:`~phonometry.underwater.propagation.numerical.ray_trace` (with a ground
-    reflection in place of the sea surface). The travel time accumulates
-    :math:`dt/dr = 1/(\xi c^2)`.
+    reflection in place of the sea surface). The travel time is a third state of
+    the same Runge-Kutta step, :math:`dt/dr = 1/(\xi c^2)`, so it is integrated
+    with the very stages that place the ray rather than run over the finished
+    path; a ground reflection is instantaneous and leaves it continuous.
 
     :param profile: The effective sound-speed profile (see
         :func:`linear_sound_speed_profile` /
@@ -386,47 +389,38 @@ def atmospheric_ray_paths(
     def _speed_at(zq: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.asarray(np.interp(zq, z_prof, c_prof), dtype=np.float64)
 
-    def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
-        xi_arr: NDArray[np.float64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        cc = _speed_at(z_arr)
-        return zeta_arr / xi_arr, -_grad_at(z_arr) / (cc**3 * xi_arr)
-
     ns = int(n_steps)
-    dr = rmax / (ns - 1)
     ranges = np.linspace(0.0, rmax, ns)
     c0 = float(np.interp(zs, z_prof, c_prof))
     th = np.radians(angles)
     xi = np.cos(th) / c0
-    z = np.full(angles.size, zs)
-    zeta = np.sin(th) / c0
-    ray_z = np.zeros((angles.size, ns))
-    ray_t = np.zeros((angles.size, ns))
-    ray_z[:, 0] = zs
-    turns = np.zeros(angles.size, dtype=np.int_)
-    bounces = np.zeros(angles.size, dtype=np.int_)
-    prev_dz = np.sign(zeta)
-    for s in range(1, ns):
-        k1z, k1zeta = deriv(z, zeta, xi)
-        k2z, k2zeta = deriv(z + 0.5 * dr * k1z, zeta + 0.5 * dr * k1zeta, xi)
-        k3z, k3zeta = deriv(z + 0.5 * dr * k2z, zeta + 0.5 * dr * k2zeta, xi)
-        k4z, k4zeta = deriv(z + dr * k3z, zeta + dr * k3zeta, xi)
-        z = z + dr / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z)
-        zeta = zeta + dr / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta)
-        # Specular ground reflection: fold z < 0 back up and flip zeta.
-        below = z < 0.0
-        z = np.where(below, -z, z)
-        zeta = np.where(below, -zeta, zeta)
-        bounces += below.astype(np.int_)
-        # Travel time increment (dt/dr = 1/(xi c^2)) at the true (folded) height.
-        cc = _speed_at(z)
-        ray_t[:, s] = ray_t[:, s - 1] + dr / (xi * cc**2)
-        # Turning points: sign change of the vertical velocity (away from a bounce).
-        cur = np.sign(zeta)
-        turns += ((cur != prev_dz) & (~below) & (prev_dz != 0)).astype(np.int_)
-        prev_dz = cur
-        ray_z[:, s] = z
+
+    # State is (z, zeta, t): dz/dr = zeta/xi, dzeta/dr = -(dc/dz)/(c^3 xi) and
+    # dt/dr = 1/(xi c^2). The time shares the sound speed the other two
+    # derivatives already need, so carrying it through the same four stages
+    # costs one multiply per stage and gives it the RK4 order of the geometry.
+    def deriv(
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        cc = _speed_at(z_arr)
+        return (zeta_arr / xi, -_grad_at(z_arr) / (cc**3 * xi),
+                1.0 / (xi * cc**2))
+
+    # The ground is the only boundary: the atmosphere is open above, so a ray
+    # that climbs out of the profile simply keeps climbing. The march splits
+    # every step at the ground rather than folding the overshoot back after a
+    # whole one, which is what keeps a reflected ray at the order the rest of
+    # the path is integrated with; it is the same core the ocean solver runs on.
+    march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
+                       zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
+                       n_steps=ns, lower=0.0)
+    ray_z, ray_t = march.positions, march.times
+    bounces = march.reflections.sum(axis=1)
+    # Turning points: a sign change of the vertical slowness between samples
+    # that a ground reflection did not cause.
+    sign = np.sign(march.verticals)
+    turns = ((sign[:, 1:] != sign[:, :-1]) & (march.reflections[:, 1:] == 0)
+             & (sign[:, :-1] != 0)).sum(axis=1)
     ray_r = np.broadcast_to(ranges, ray_z.shape).copy()
 
     return AtmosphericRayResult(
