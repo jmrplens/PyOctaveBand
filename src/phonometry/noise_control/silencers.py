@@ -723,8 +723,17 @@ def extended_tube_chamber(
     both extensions ``0`` the result reduces exactly to
     :func:`expansion_chamber`.
 
+    The junction where each extended pipe ends is where its three ducts meet,
+    so the straight chamber element cascaded between the two side branches is
+    the length left over,
+    :math:`L_c = L - L_a - L_b` (Bies Figure 8.19(a) and Example 8.2, where
+    :math:`L = L_a + L_b + L_c`), and not the full chamber length. When the two
+    extensions meet (:math:`L_a + L_b = L`) the straight element vanishes and
+    the two annular branches shunt the same plane, which is the well-defined
+    limit of the cascade; extensions that would overlap are rejected.
+
     :param frequencies: Frequencies ``f``, Hz (1-D array).
-    :param length: Chamber length ``L``, m.
+    :param length: Overall chamber length ``L``, m, extensions included.
     :param chamber_area: Chamber cross-sectional area ``S_exp``, m2.
     :param pipe_area: Inlet/outlet pipe area ``S_duct``, m2.
     :param inlet_extension: Inlet pipe extension into the chamber ``L_a``, m.
@@ -740,6 +749,7 @@ def extended_tube_chamber(
     rho = require_positive(density, "density")
     s_exp = require_positive(chamber_area, "chamber_area")
     s_duct = require_positive(pipe_area, "pipe_area")
+    length = require_non_negative(length, "length")
     la = require_non_negative(inlet_extension, "inlet_extension")
     lb = require_non_negative(outlet_extension, "outlet_extension")
     if s_exp <= s_duct:
@@ -747,8 +757,13 @@ def extended_tube_chamber(
     if la + lb > length:
         raise ValueError(
             "the inlet and outlet extensions cannot together exceed the "
-            "chamber length (they would overlap inside the chamber)."
+            "chamber length (they would overlap inside the chamber, leaving "
+            "a straight chamber section of negative length)."
         )
+    # The straight section between the two junction planes. Clamped because
+    # subtracting two exactly-meeting extensions can land a rounding step
+    # below zero, and a duct of negative length is not a thing.
+    straight = max(length - la - lb, 0.0)
     annulus = s_exp - s_duct
 
     elements = []
@@ -758,7 +773,9 @@ def extended_tube_chamber(
             quarter_wave_impedance(f, la, annulus, speed_of_sound=c, density=rho)
         ))
         resonances.append(c / (4.0 * la))
-    elements.append(duct_matrix(f, length, s_exp, speed_of_sound=c, density=rho))
+    elements.append(
+        duct_matrix(f, straight, s_exp, speed_of_sound=c, density=rho)
+    )
     if lb > 0.0:
         elements.append(shunt_matrix(
             quarter_wave_impedance(f, lb, annulus, speed_of_sound=c, density=rho)

@@ -1056,6 +1056,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `extended_tube_chamber` cascades its straight chamber element over the length
+  the extensions leave, `L - L_a - L_b`, not the full chamber length. The
+  junction where each extended pipe ends is where its three ducts meet, so the
+  duct between the two annular side branches is the leftover section; Bies
+  Example 8.2 states the same arithmetic, `L = L_a + L_b + L_c`, and the
+  cross-section drawing in this package already computed it that way. Against
+  Bies Figure 8.20 the previous cascade opened deep spurious dips where the
+  published curves are smooth (for an area ratio of 16, 5.2 dB at
+  `kL/pi = 0.6` and 5.6 dB at 1.15, where the figure holds a dome near 28 dB);
+  the corrected curves reproduce the figure, and an independent 2D FDTD
+  simulation of the same chamber now agrees with the model to 0.97 dB where
+  the old length missed by up to 11.1 dB. Transmission and insertion loss move
+  for every call that passes a non-zero extension. Extensions that exactly meet
+  are accepted as the limit they are, the two annular branches shunting one
+  plane; extensions that would overlap are still rejected, now with a message
+  that says the straight section would come out negative.
+
 - The coverage claims tell the truth again, all 582 of them audited claim by
   claim against the code. The errors ran almost entirely in one direction: the
   documentation undersold the library. Five claims denied functionality that
