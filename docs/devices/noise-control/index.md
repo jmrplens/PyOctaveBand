@@ -82,8 +82,8 @@ source of a supplier's figures, not implemented. Within the predictions, three
 limits are structural. **Only reactive silencer elements are computed** —
 dissipative duct-lining silencers are discussed for selection but are not
 modelled from liner properties anywhere in the library, and on the HVAC page
-the lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum is
-Wells' closed form driven by a declared mean absorption — neither is a liner
+the lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
+attenuation is Wells' closed form driven by a declared mean absorption — neither is a liner
 model. **Mean flow is outside the element matrices**:
 convection, temperature gradients and the flow-dependent impedance of
 perforates do not appear, so a silencer carrying significant flow is predicted

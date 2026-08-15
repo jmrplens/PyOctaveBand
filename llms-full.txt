@@ -16734,8 +16734,8 @@ discrete fixed-point power summation is **not implemented at all** — only its
 field indicators are, reused by the scanning routes. Dissipative duct-lining
 silencers are **not modelled from liner properties** anywhere: the reactive
 elements are computed exactly within the no-flow plane-wave model, and the
-lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum Wells'
-closed form driven by a declared mean absorption — neither is a liner model.
+lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
+attenuation Wells' closed form driven by a declared mean absorption — neither is a liner model.
 And no page here predicts a panel's transmission loss:
 `enclosure_insertion_loss` combines a value you supply with the interior
 correction, and the prediction itself is [Insulation
@@ -17646,8 +17646,8 @@ source of a supplier's figures, not implemented. Within the predictions, three
 limits are structural. **Only reactive silencer elements are computed** —
 dissipative duct-lining silencers are discussed for selection but are not
 modelled from liner properties anywhere in the library, and on the HVAC page
-the lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum is
-Wells' closed form driven by a declared mean absorption — neither is a liner
+the lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
+attenuation is Wells' closed form driven by a declared mean absorption — neither is a liner
 model. **Mean flow is outside the element matrices**:
 convection, temperature gradients and the flow-dependent impedance of
 perforates do not appear, so a silencer carrying significant flow is predicted
