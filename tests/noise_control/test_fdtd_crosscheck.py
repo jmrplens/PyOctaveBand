@@ -16,13 +16,14 @@ frequencies. The measured ``20 log10`` ratio of the transmitted amplitudes
 (trough over peak) must reproduce the closed-form peak ``TL``. The run is
 deterministic and small (a 16x200 grid, ~3000 steps, well under a second).
 
-The Helmholtz side branch is driven with a broadband pulse instead, because
-the quantity to compare is a *resonance frequency* and a tone sweep would need
-one run per frequency. One pulse run of the bare duct and one of the duct with
-the resonator give the whole transmission spectrum
-``|p_resonator(f)| / |p_bare(f)|``, that is the insertion loss, which for equal
+The Helmholtz side branch and the extended-tube chamber are driven with a
+broadband pulse instead, because what has to be compared is a whole curve (a
+resonance frequency in one case, a transmission-loss band in the other) and a
+tone sweep would need one run per frequency. One pulse run of the bare duct and
+one of the duct with the device give the whole transmission spectrum
+``|p_device(f)| / |p_bare(f)|``, that is the insertion loss, which for equal
 inlet and outlet areas and anechoic ends is the transmission loss. The point
-sources are additive (soft), so the wave the resonator reflects back passes
+sources are additive (soft), so the wave the device reflects back passes
 through the source cell untouched and is swallowed by the upstream sponge: the
 source really does present the anechoic internal impedance that identity needs.
 """
@@ -39,6 +40,35 @@ from phonometry.noise_control import silencers as sl
 from phonometry.simulation.fdtd import CWSource, GaussianPulse, fdtd_simulation
 
 _C = 343.0
+#: FFT zero-padding factor for the pulse runs; the underlying spectrum is
+#: band-limited by the record, so interpolating it costs nothing but arithmetic.
+_PAD = 16
+
+
+def _pulse_spectrum(
+    obstacle: NDArray[np.bool_],
+    *,
+    source: tuple[int, int],
+    probe: tuple[int, int],
+    steps: int,
+    dx: float,
+    pulse_width: float,
+    sponge: int,
+) -> tuple[NDArray[np.float64], NDArray[np.complex128]]:
+    """Probe spectrum of one broadband pulse run: ``(frequencies, P(f))``."""
+    dt = 0.6 * dx / (_C * math.sqrt(2.0))
+    res = fdtd_simulation(
+        _C, dx, steps * dt,
+        sources=[GaussianPulse(ix=source[0], iy=source[1], width=pulse_width)],
+        shape=obstacle.shape, probes=[probe],
+        boundaries={"left": "absorbing", "right": "absorbing",
+                    "top": "rigid", "bottom": "rigid"},
+        absorbing_layer_cells=sponge, obstacle_mask=obstacle,
+    )
+    p = res.pressures[0]
+    n = p.size * _PAD
+    return np.fft.rfftfreq(n, dt), np.fft.rfft(p, n)
+
 
 # --- Simple expansion chamber, driven with a steady tone --------------------
 
@@ -149,7 +179,6 @@ _HSTEPS = 5000
 _HSPONGE = 20
 _HSRC = (45, _HNY - 4)                  # on the duct axis, upstream
 _HPROBE = (_HNX - 60, _HNY - 4)         # on the duct axis, downstream
-_HPAD = 16                              # FFT zero-padding factor
 
 _HS_DUCT = _HDUCT * _HDX
 _HS_NECK = _HNECK_W * _HDX
@@ -199,21 +228,12 @@ def _h_transmission(cavity_width: int | None) -> tuple[
     NDArray[np.float64], NDArray[np.complex128]
 ]:
     """Probe spectrum of one pulse run: ``(frequencies, P(f))``."""
-    dt = 0.6 * _HDX / (_C * math.sqrt(2.0))
-    # A Gaussian wide enough to cover DC up to about twice the resonance.
-    width = 1.0 / (4.0 * _h_nominal_resonance(_HCAV_NARROW))
-    res = fdtd_simulation(
-        _C, _HDX, _HSTEPS * dt,
-        sources=[GaussianPulse(ix=_HSRC[0], iy=_HSRC[1], width=width)],
-        shape=(_HNY, _HNX), probes=[_HPROBE],
-        boundaries={"left": "absorbing", "right": "absorbing",
-                    "top": "rigid", "bottom": "rigid"},
-        absorbing_layer_cells=_HSPONGE,
-        obstacle_mask=_helmholtz_mask(cavity_width),
+    return _pulse_spectrum(
+        _helmholtz_mask(cavity_width), source=_HSRC, probe=_HPROBE,
+        steps=_HSTEPS, dx=_HDX, sponge=_HSPONGE,
+        # A Gaussian wide enough to cover DC up to about twice the resonance.
+        pulse_width=1.0 / (4.0 * _h_nominal_resonance(_HCAV_NARROW)),
     )
-    p = res.pressures[0]
-    n = p.size * _HPAD
-    return np.fft.rfftfreq(n, dt), np.fft.rfft(p, n)
 
 
 @pytest.fixture(scope="module")
@@ -356,3 +376,151 @@ def test_fdtd_helmholtz_transmission_loss_curve(
     # And the branch really does short the duct: a deep notch, not a dent.
     assert measured.max() > 10.0
     assert -20.0 * math.log10(ratio.min()) > 25.0
+
+
+# --- Extended-tube chamber, driven with a broadband pulse -------------------
+#
+# The chamber runs the full grid height over columns [_EX1, _EX2); the inlet
+# and outlet pipes are the middle _EDUCT rows, and their walls (the single rows
+# just outside the duct) carry on into the chamber for _ELA and _ELB cells to
+# make the two extensions. The mapping onto the four-pole model is exact for
+# the lengths, which is what these tests are about:
+#
+#   * chamber length  L   = (_EX2 - _EX1) * _EDX
+#   * extensions      L_a = _ELA * _EDX, L_b = _ELB * _EDX, measured from the
+#     chamber end plates to the plane where each pipe ends
+#   * straight section between the two junction planes, L - L_a - L_b
+#
+# It is not exact for the annulus. A real pipe wall has thickness and the model
+# has none, so the model's annulus S_exp - S_duct is 34 cells where the grid
+# leaves 32 open; that difference is priced into the tolerance below rather
+# than hidden, because widening the chamber until it vanished would cost more
+# grid than the point is worth.
+
+_EDX = 0.01
+_ENY = 40            # chamber height, cells; the duct is _EDUCT of them
+_ENX = 260
+_EDUCT = 6
+_EDUCT0 = 17         # first duct row, so the pipe walls are rows 16 and 23
+_EX1, _EX2 = 100, 180                   # chamber columns -> L = 0.8 m
+_EL = (_EX2 - _EX1) * _EDX
+_ELA = (_EX2 - _EX1) // 2               # inlet extension L/2
+_ELB = (_EX2 - _EX1) // 4               # outlet extension L/4
+_ESTEPS = 5000
+_ESPONGE = 20
+_ESRC = (45, _EDUCT0 + 3)
+_EPROBE = (_ENX - 50, _EDUCT0 + 3)
+
+_ES_EXP = _ENY * _EDX
+_ES_DUCT = _EDUCT * _EDX
+#: Where the comparison is taken, as kL/pi. The stops well short of the inlet
+#: stub's quarter-wave resonance at kL/pi = 1 (and the outlet stub's at 2): the
+#: extensions carry end corrections of their own, which shift those peaks down
+#: and lift the shoulder underneath them, and no end correction is applied
+#: here.
+_E_KL_PI = np.array([0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55])
+
+
+def _extended_tube_mask(*, extended: bool) -> NDArray[np.bool_]:
+    """Rigid-cell map; ``extended=False`` gives the bare reference duct."""
+    mask = np.ones((_ENY, _ENX), dtype=bool)
+    mask[_EDUCT0:_EDUCT0 + _EDUCT, :] = False       # the straight main duct
+    if not extended:
+        return mask
+    mask[:, _EX1:_EX2] = False                      # the chamber, full height
+    for row in (_EDUCT0 - 1, _EDUCT0 + _EDUCT):     # the two pipe walls
+        mask[row, _EX1:_EX1 + _ELA] = True          # carried on as the inlet
+        mask[row, _EX2 - _ELB:_EX2] = True          # and the outlet extension
+    return mask
+
+
+@pytest.fixture(scope="module")
+def extended_tube_loss() -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """``(frequencies, transmission loss)`` from two FDTD runs (~1 s)."""
+    frequencies, bare = _pulse_spectrum(
+        _extended_tube_mask(extended=False), source=_ESRC, probe=_EPROBE,
+        steps=_ESTEPS, dx=_EDX, sponge=_ESPONGE,
+        pulse_width=_EL / _C,   # covers DC through several kL/pi
+    )
+    _, loaded = _pulse_spectrum(
+        _extended_tube_mask(extended=True), source=_ESRC, probe=_EPROBE,
+        steps=_ESTEPS, dx=_EDX, sponge=_ESPONGE, pulse_width=_EL / _C,
+    )
+    return frequencies, 20.0 * np.log10(np.abs(bare) / np.abs(loaded))
+
+
+def _e_measured(
+    spectrum: tuple[NDArray[np.float64], NDArray[np.float64]],
+) -> NDArray[np.float64]:
+    """Transmission loss at the comparison frequencies."""
+    frequencies, loss = spectrum
+    wanted = _E_KL_PI * _C / (2.0 * _EL)
+    return np.array([
+        loss[int(np.argmin(np.abs(frequencies - f)))] for f in wanted
+    ])
+
+
+def _e_cascade_by_hand(straight: float) -> NDArray[np.float64]:
+    """The same three elements, with the straight duct length spelled out."""
+    frequencies = _E_KL_PI * _C / (2.0 * _EL)
+    annulus = _ES_EXP - _ES_DUCT
+    return sl.transmission_loss(
+        sl.cascade(
+            sl.shunt_matrix(sl.quarter_wave_impedance(
+                frequencies, _ELA * _EDX, annulus, speed_of_sound=_C)),
+            sl.duct_matrix(frequencies, straight, _ES_EXP, speed_of_sound=_C),
+            sl.shunt_matrix(sl.quarter_wave_impedance(
+                frequencies, _ELB * _EDX, annulus, speed_of_sound=_C)),
+        ),
+        inlet_area=_ES_DUCT, outlet_area=_ES_DUCT, speed_of_sound=_C,
+    )
+
+
+@pytest.mark.xdist_group("fdtd-extended-tube")
+def test_fdtd_matches_extended_tube_chamber(
+    extended_tube_loss: tuple[NDArray[np.float64], NDArray[np.float64]],
+) -> None:
+    # Error budget for the 1.5 dB bound, largest term first.
+    #
+    # The pipe walls are one cell thick, so the grid leaves 32 cells of annulus
+    # where the model, whose pipe wall is infinitely thin, assumes 34. Feeding
+    # the model the annulus the grid actually has moves its answer by 0.28 to
+    # 0.33 dB across this band, uniformly and in one direction.
+    #
+    # The extensions have end corrections of their own (Bies Eq. (8.169),
+    # Munjal Eq. (8.8)) which lower their quarter-wave tuning by a few per cent
+    # and lift the shoulder below it. None is applied, so the residual grows
+    # toward kL/pi = 1 and the band stops at 0.55.
+    #
+    # Grid dispersion is not a term at this scale: the shortest wavelength in
+    # the band spans 291 cells, so (k dx)^2 / 24 = 1.9e-5, two thousandths of a
+    # per cent of frequency and nothing measurable in dB. Nor is the grid
+    # itself: growing it from 260 to 420 columns and the record from 5000 to
+    # 9000 steps moves the residuals by at most 0.25 dB.
+    #
+    # Measured: -0.30 to +0.97 dB.
+    measured = _e_measured(extended_tube_loss)
+    analytic = sl.extended_tube_chamber(
+        _E_KL_PI * _C / (2.0 * _EL), _EL, _ES_EXP, _ES_DUCT,
+        inlet_extension=_ELA * _EDX, outlet_extension=_ELB * _EDX,
+        speed_of_sound=_C,
+    ).transmission_loss
+    assert measured == pytest.approx(analytic, abs=1.5)
+
+
+@pytest.mark.xdist_group("fdtd-extended-tube")
+def test_fdtd_rejects_a_chamber_element_of_the_full_length(
+    extended_tube_loss: tuple[NDArray[np.float64], NDArray[np.float64]],
+) -> None:
+    # The straight element between the two junction planes is what the
+    # extensions leave over. Cascading the full chamber length instead is not a
+    # refinement the simulation cannot resolve, it is a different device: over
+    # this band it reads 3.7 dB high at the bottom and 11.1 dB low at the top,
+    # against 0.97 dB worst case for the length the library uses.
+    measured = _e_measured(extended_tube_loss)
+    right = _e_cascade_by_hand(_EL - (_ELA + _ELB) * _EDX)
+    wrong = _e_cascade_by_hand(_EL)
+
+    assert measured == pytest.approx(right, abs=1.5)
+    assert np.max(np.abs(measured - wrong)) > 5.0
+    assert np.max(np.abs(measured - right)) < np.max(np.abs(measured - wrong))
