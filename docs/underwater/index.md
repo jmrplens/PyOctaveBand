@@ -64,7 +64,7 @@ lives inline with the guides rather than in the theory reference.
   ISO 18405 reference levels, ISO 17208 ship radiated noise and monopole
   source level, and ISO 18406 pile-driving sound exposure.
 - [Underwater sound propagation](underwater-propagation.md):
-  transmission loss, sound speed, the sonar equation, seabed reflection and
+  propagation loss, sound speed, the sonar equation, seabed reflection and
   ocean ambient noise, in closed form.
 - [Underwater propagation solvers](underwater-solvers.md):
   the normal-mode, ray-tracing and parabolic-equation solvers of the

@@ -71,7 +71,7 @@ lives inline with the guides rather than in the theory reference.
   ISO 18405 reference levels, ISO 17208 ship radiated noise and monopole
   source level, and ISO 18406 pile-driving sound exposure.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  transmission loss, sound speed, the sonar equation, seabed reflection and
+  propagation loss, sound speed, the sonar equation, seabed reflection and
   ocean ambient noise, in closed form.
 - [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
   the normal-mode, ray-tracing and parabolic-equation solvers of the
@@ -391,7 +391,7 @@ piling campaign's weighted exposure falls below a criterion.
   the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
   feed this page.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  the transmission loss and figure-of-merit machinery that turns a criterion
+  the propagation loss and figure-of-merit machinery that turns a criterion
   into a range.
 - API reference: [`underwater.bioacoustics.weighting`](https://jmrplens.github.io/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](https://jmrplens.github.io/phonometry/reference/api/underwater/audiograms/).
 
@@ -645,7 +645,7 @@ phonometry.
   weighting, accumulation over the strikes and the margin against the published
   onset criteria.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  the transmission loss that carries these source levels to a receiver, and the
+  the propagation loss that carries these source levels to a receiver, and the
   sonar equation they feed.
 - API reference: [`underwater.acoustics`](https://jmrplens.github.io/phonometry/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.sources.ship_radiated_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/ship-radiated-noise/).
 - General underwater propagation modelling (ray, normal mode, parabolic equation) is covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
@@ -688,21 +688,21 @@ mode, parabolic equation) is out of scope here: see
 <!-- source: docs/underwater/underwater-propagation.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/
 
-# Underwater sound propagation: transmission loss, sound speed, sonar, seabed and ambient noise
+# Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise
 
-Closed-form underwater propagation: the **transmission loss** (geometrical
+Closed-form underwater propagation: the **propagation loss** (geometrical
 spreading plus volume absorption), the **speed of sound** in sea water, the
 **sonar equation**, **seabed reflection loss** and the **ocean ambient-noise**
 spectrum (wind, thermal and shipping-traffic contributions). These complement
 the underwater reference levels (ISO 18405/17208/18406) in
 [Underwater Acoustics](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/).
 
-## 1. Transmission loss
+## 1. Propagation loss
 
-The transmission loss is
+The propagation loss is
 
 $$
-TL = \text{spreading} + \alpha R .
+PL = \text{spreading} + \alpha R .
 $$
 
 Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
@@ -712,8 +712,8 @@ spherical up to a transition range $R_0$ and cylindrical beyond it
 simplification) or **Thorp** (1967, frequency-only).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss.svg" alt="Underwater propagation loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
 </picture>
 
 <details>
@@ -726,11 +726,11 @@ from phonometry import underwater
 
 # 10 kHz at 10 °C, 35 ppt, 100 m depth; practical spreading with R0 = 1000 m.
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical",
+pl = underwater.propagation_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
-print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot()   # total TL with the spreading and absorption contributions
+print(f"alpha = {pl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
+pl.plot()   # total PL with the spreading and absorption contributions
 plt.show()
 ```
 
@@ -747,13 +747,13 @@ alpha = underwater.seawater_absorption(10e3, temperature=10.0, salinity=35.0,
 print(f"α = {alpha:.3f} dB/km")
 
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical", transition_range=1000.0,
+pl = underwater.propagation_loss(ranges, 10e3, law="practical", transition_range=1000.0,
                           temperature=10.0, salinity=35.0, depth=100.0)
-print(tl.absorption_coefficient, tl.tl[-1])
-tl.plot()   # TL vs range with the spreading/absorption split (needs matplotlib)
+print(pl.absorption_coefficient, pl.pl[-1])
+pl.plot()   # PL vs range with the spreading/absorption split (needs matplotlib)
 ```
 
-`transmission_loss` returns a `TransmissionLossResult` with `tl`, `spreading`,
+`propagation_loss` returns a `PropagationLossResult` with `pl`, `spreading`,
 `absorption` (arrays), the `frequency` and the `absorption_coefficient`
 (dB/km). Francois–Garrison and Ainslie–McColm agree to within ~10 % across
 100 Hz–1 MHz, so either is a good cross-check of the other.
@@ -838,8 +838,8 @@ flux = underwater.weston_propagation_loss(ranges, 100.0, 100.0, critical_angle=9
                                           reflection_loss_gradient_value=0.0)
 modes = underwater.normal_modes(100.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=41.0, receiver_depth=57.0, ranges_m=ranges)
-mean = lambda tl: -10.0 * np.log10(np.mean(10.0 ** (-tl / 10.0)))
-print(mean(flux.propagation_loss), mean(modes.transmission_loss))
+mean = lambda pl: -10.0 * np.log10(np.mean(10.0 ** (-pl / 10.0)))
+print(mean(flux.propagation_loss), mean(modes.propagation_loss))
 ```
 
 > Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
@@ -921,21 +921,21 @@ kilometres.
 
 The sonar equation combines the performance terms into the **signal excess**
 $SE$ (detection when $SE \ge 0$) and the **figure of merit** (the maximum
-allowable transmission loss at $SE = 0$):
+allowable propagation loss at $SE = 0$):
 
 $$
-SE = SL - TL - (NL - DI) - DT \ \ \text{(passive)},
+SE = SL - PL - (NL - DI) - DT \ \ \text{(passive)},
 $$
 
 $$
-SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
+SE = SL - 2\,PL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
 $$
 
 or reverberation-limited with $RL$ in place of $NL - DI$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with transmission loss, crossing zero (the detection limit) at the figure of merit" width="82%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with propagation loss, crossing zero (the detection limit) at the figure of merit" width="82%">
 </picture>
 
 <details>
@@ -946,12 +946,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                        noise_level=60.0, directivity_index=15.0,
                                        detection_threshold=8.0)
 print(f"figure of merit = {se.figure_of_merit:.1f} dB")  # figure of merit = 87.0 dB
-se.plot()   # signal excess vs transmission loss, zero crossing at the FOM
+se.plot()   # signal excess vs propagation loss, zero crossing at the FOM
 plt.show()
 ```
 
@@ -961,12 +961,12 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                noise_level=60.0, directivity_index=15.0,
                                detection_threshold=8.0)
-print(se.figure_of_merit)   # max allowable one-way TL at SE = 0
-se.plot()   # signal excess vs transmission loss (needs matplotlib)
+print(se.figure_of_merit)   # max allowable one-way PL at SE = 0
+se.plot()   # signal excess vs propagation loss (needs matplotlib)
 
 # Active, monostatic (two-way loss, target strength):
 underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=60.0,
@@ -975,8 +975,8 @@ underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=
 
 ### 3.1 Detection range
 
-Since the figure of merit *is* the maximum allowable transmission loss,
-inverting a loss law at $TL = FOM$ gives the **detection range**, the range at
+Since the figure of merit *is* the maximum allowable propagation loss,
+inverting a loss law at $PL = FOM$ gives the **detection range**, the range at
 which the detection probability is 50 %. `detection_range` inverts the
 closed-form loss of §1, which grows monotonically with range and therefore has
 a single crossing; `detection_range_from_curve` reads the crossing off any
@@ -989,15 +989,15 @@ from phonometry import underwater
 # Ainslie's active CW example: FOM = 82.7 dB re m2 at 50 kHz -> r50 ~ 1.3 km.
 res = underwater.detection_range(82.7, 50e3)
 print(res.detection_range)          # metres
-res.plot()                          # TL vs FOM with the crossing marked
+res.plot()                          # PL vs FOM with the crossing marked
 
 # Off a numerical prediction instead:
 import numpy as np
 modes = underwater.normal_modes(200.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=40.0, receiver_depth=60.0,
                                 ranges_m=np.linspace(100.0, 20_000.0, 800))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss,
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss))
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss,
                                             crossing="last"))
 ```
 
@@ -1369,7 +1369,7 @@ Source: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/
 
 # Underwater propagation solvers: normal modes, rays and the parabolic equation
 
-The closed-form transmission loss of
+The closed-form propagation loss of
 [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) knows nothing of
 the sound-speed profile, the seabed or the surface. When refraction and
 boundaries decide the answer, the field has to be **computed**: this guide
@@ -1387,7 +1387,7 @@ computed numerically. Three solvers are provided (Jensen et al.,
 
 - **`normal_modes`** solves the depth-separated Sturm-Liouville eigenvalue
   problem by finite differences and sums the propagating modes into the
-  transmission loss. Validated against the ideal (pressure-release) waveguide's
+  propagation loss. Validated against the ideal (pressure-release) waveguide's
   exact modes.
 - **`ray_trace`** integrates the ray-trajectory equations (Runge-Kutta,
   vectorised over all rays at once) through a sound-speed profile, reflecting at
@@ -1396,11 +1396,11 @@ computed numerically. Three solvers are provided (Jensen et al.,
   gradient and the closed-form travel time along them.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
-  with the normal-mode transmission loss in trend.
+  with the normal-mode propagation loss in trend.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and transmission loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -1420,7 +1420,7 @@ c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
 field = underwater.parabolic_equation(50.0, z, c, source_depth=1000.0,
                                       max_range=50_000.0, range_step=50.0,
                                       n_depth_points=512)
-field.plot()   # TL(z, r) field showing the convergence zones
+field.plot()   # PL(z, r) field showing the convergence zones
 plt.show()
 ```
 
@@ -1445,13 +1445,13 @@ modes = underwater.normal_modes(50.0, [0.0, 200.0], [1500.0, 1500.0],
 print(modes.wavenumbers.size, "propagating modes")
 field = underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1500.0],
                               source_depth=50.0, max_range=20e3)
-field.plot()  # TL field over range x depth (needs matplotlib)
+field.plot()  # PL field over range x depth (needs matplotlib)
 ```
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
-`transmission_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
+`propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
 `travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`transmission_loss` field). All assume a range-independent water column with a pressure-release
+`propagation_loss` field). All assume a range-independent water column with a pressure-release
 surface, and the bottom is pressure-release too (or, for the modes, optionally
 rigid): there is no absorbing or elastic bottom, no sediment attenuation and
 no real bathymetry, so range-dependent problems are out of scope. For the
@@ -1486,7 +1486,7 @@ $$
 
 each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
-transmission loss follows as $TL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
+propagation loss follows as $PL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
 differences (a symmetric tridiagonal eigenproblem) on a grid refined enough
 to keep the near-cutoff eigenvalues honest, and warns when a retained mode
@@ -1609,13 +1609,13 @@ import numpy as np
 from phonometry import underwater
 
 # Free field: in a 5000 m isovelocity column, before any boundary is felt,
-# the PE must reproduce spherical spreading, TL = 20 lg R.
+# the PE must reproduce spherical spreading, PL = 20 lg R.
 field = underwater.parabolic_equation(50.0, [0.0, 5000.0], [1500.0, 1500.0],
                                       source_depth=2500.0, max_range=2000.0,
                                       range_step=10.0)
 iz = np.argmin(np.abs(field.depths - 2500.0))
 ir = np.argmin(np.abs(field.ranges - 1000.0))
-print(round(float(field.transmission_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
+print(round(float(field.propagation_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
 ```
 
 and it does so to about $10^{-4}$ dB at the default range step.
@@ -1659,14 +1659,14 @@ and the bottom (or in the SOFAR channel) that can only expand in range. The
 physically of the order of the water (or channel) depth: spherical while the
 wavefront has not yet filled the duct, cylindrical once it has. In the 10 kHz
 example of the
-[transmission-loss section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) the choice is not
+[propagation-loss section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) the choice is not
 cosmetic: against the same figure of merit of 87 dB, spherical-only spreading
 predicts detection out to about 8.7 km while the practical law with
 $R_0 = 1000$ m stretches it to about 15.8 km. When the spreading law is the
 biggest uncertainty in the budget, that is the cue to stop using a closed
 form and compute the field.
 
-**Closed form or solver.** The closed-form transmission loss knows nothing of
+**Closed form or solver.** The closed-form propagation loss knows nothing of
 the sound-speed profile, the seabed or the surface; it is honest for short,
 direct, boundary-free paths and for first-cut sonar budgets. When refraction
 and boundaries decide the answer, pick the solver by frequency and geometry
@@ -1676,7 +1676,7 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 |---|---|---|
 | `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones; cost independent of frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field PL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
@@ -1689,11 +1689,11 @@ convergence test.
 gain and an 8 dB detection threshold give the figure of merit
 $FOM = 140 - (60 - 15) - 8 = 87$ dB computed by `passive_sonar_equation` in
 the [sonar-equation section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) of the propagation
-guide. The transmission-loss curve of that guide's first section (10 °C,
+guide. The propagation-loss curve of that guide's first section (10 °C,
 35 ppt, 100 m, $\alpha = 0.95$ dB/km) crosses 87 dB at about 15.8 km with the
 practical law: that crossing *is* the predicted detection range, and every
 term of the budget moves it. Trim the directivity index to 7.5 dB and the
-figure of merit falls to 79.5 dB, so the range drops to wherever the TL
+figure of merit falls to 79.5 dB, so the range drops to wherever the PL
 curve crosses that value; double the frequency to 20 kHz and $\alpha$ more
 than triples to 3.3 dB/km, pulling the crossing sharply inward. This
 coupling between the absorption model, the spreading law and the sonar
@@ -1708,15 +1708,15 @@ frequency and deep water (ray-path geometry, travel times and convergence
 zones at a cost independent of frequency), normal modes for low frequency in
 shallow water (few propagating modes, $m < kD/\pi$, the reference solution for
 its regime) and the parabolic equation for low-frequency, long one-way paths
-(the full TL($z$, $r$) field with refraction). When two solvers agree on a
+(the full PL($z$, $r$) field with refraction). When two solvers agree on a
 case, that agreement is the practical convergence test.
 
-### When is a closed-form transmission loss no longer enough?
+### When is a closed-form propagation loss no longer enough?
 
 When refraction or boundaries decide the answer: a sound-speed minimum that
 traps energy (the SOFAR channel), surface and bottom reflections in shallow
 water, or a detection range that swings with the choice of spreading law.
-The closed form $TL = \text{spreading} + \alpha R$ is honest for short,
+The closed form $PL = \text{spreading} + \alpha R$ is honest for short,
 direct, boundary-free paths and first-cut sonar budgets; beyond that,
 compute the field.
 
@@ -1726,7 +1726,7 @@ compute the field.
   forms these solvers replace when refraction and boundaries matter, and
   the sound-speed profiles they consume.
 - [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/):
-  the ISO 18405 reference levels every transmission loss here is expressed
+  the ISO 18405 reference levels every propagation loss here is expressed
   in.
 - [Atmospheric refraction: rays and the GFPE](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/):
   the airborne siblings of these solvers, with the same ray bending and a
@@ -1765,6 +1765,6 @@ implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 closed forms: the ideal pressure-release waveguide's exact modes, the
 circular-arc ray paths of a linear sound-speed gradient, free-field
 spherical spreading for the PE, and the mutual agreement of the modal and
-PE transmission loss.
+PE propagation loss.
 
 ---

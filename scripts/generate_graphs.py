@@ -387,8 +387,8 @@ from figures.underwater import (
     generate_ship_source_level,
     generate_ship_traffic_noise,
     generate_sonar_equation,
+    generate_underwater_propagation_loss,
     generate_underwater_sound_speed,
-    generate_underwater_transmission_loss,
     generate_weston_regimes,
 )
 from figures.vibration import (
@@ -741,8 +741,8 @@ __all__ = [
     "generate_trend_test",
     "generate_tsa_noise_reduction",
     "generate_uncertainty",
+    "generate_underwater_propagation_loss",
     "generate_underwater_sound_speed",
-    "generate_underwater_transmission_loss",
     "generate_vibration_sound_power",
     "generate_vibration_weighting",
     "generate_weighted_acceleration",

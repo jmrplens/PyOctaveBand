@@ -4,16 +4,16 @@ Numerical models of underwater sound propagation (range-independent ocean).
 
 Three complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
-transmission loss of :mod:`phonometry.underwater.propagation.closed_form`:
+propagation loss of :mod:`phonometry.underwater.propagation.closed_form`:
 
 * :func:`normal_modes` -- the normal-mode expansion. Solves the depth-separated
   Sturm-Liouville eigenvalue problem by finite differences and assembles the
-  transmission loss from the propagating modes.
+  propagation loss from the propagating modes.
 * :func:`ray_trace` -- ray tracing. Integrates the ray-trajectory equations
   through a sound-speed profile (Runge-Kutta), returning the ray paths and the
   travel time accumulated along each of them.
 * :func:`parabolic_equation` -- the standard (Tappert) parabolic equation, solved
-  with the split-step Fourier algorithm, returning the transmission-loss field.
+  with the split-step Fourier algorithm, returning the propagation-loss field.
 
 All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 *Computational Ocean Acoustics* (2nd ed., Springer 2011): the modal derivation
@@ -23,7 +23,7 @@ ideal (pressure-release) waveguide's exact modes, the circular-arc ray paths of
 a linear sound-speed gradient together with the closed-form travel time along
 them (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press
 1998, Eq. (3.3.20)), and mutual agreement of the PE and normal-mode
-transmission loss for a range-independent waveguide.
+propagation loss for a range-independent waveguide.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
 frequencies in Hz. The water column has a pressure-release surface at z = 0.
@@ -82,10 +82,10 @@ class NormalModeResult:
     :ivar mode_depths: Depth grid of the mode functions, in metres.
     :ivar mode_functions: Orthonormalised mode shapes ``Ψm(z)``, shape
         ``(n_modes, n_depths)``.
-    :ivar ranges: Ranges at which the transmission loss is evaluated, in metres.
-    :ivar transmission_loss: Coherent transmission loss at ``receiver_depth``
+    :ivar ranges: Ranges at which the propagation loss is evaluated, in metres.
+    :ivar propagation_loss: Coherent propagation loss at ``receiver_depth``
         per range, in dB.
-    :ivar receiver_depth: Receiver depth of the transmission-loss slice, in m.
+    :ivar receiver_depth: Receiver depth of the propagation-loss slice, in m.
     :ivar source_depth: Source depth, in metres.
     """
 
@@ -94,12 +94,12 @@ class NormalModeResult:
     mode_depths: NDArray[np.float64]
     mode_functions: NDArray[np.float64]
     ranges: NDArray[np.float64]
-    transmission_loss: NDArray[np.float64]
+    propagation_loss: NDArray[np.float64]
     receiver_depth: float
     source_depth: float
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the transmission loss versus range (loss increasing downward)."""
+        """Plot the propagation loss versus range (loss increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_normal_modes
 
@@ -145,10 +145,10 @@ def normal_modes(
     bottom: str = "pressure-release",
     n_depth_points: int | None = None,
 ) -> NormalModeResult:
-    r"""Normal-mode transmission loss for a range-independent waveguide.
+    r"""Normal-mode propagation loss for a range-independent waveguide.
 
     Solves the depth-separated Sturm-Liouville problem (Jensen Eq. 5.3) on a
-    uniform finite-difference grid, then assembles the coherent transmission
+    uniform finite-difference grid, then assembles the coherent propagation
     loss from the propagating modes (Eq. 5.17).
 
     The finite-difference eigenvalues carry an :math:`O(dz^2)` error that
@@ -165,7 +165,7 @@ def normal_modes(
         at the surface ``z = 0`` and strictly increasing to the bottom.
     :param sound_speeds: Sound speed at each depth, in m/s.
     :param source_depth: Source depth ``zs``, in metres.
-    :param receiver_depth: Receiver depth for the transmission-loss slice, in m.
+    :param receiver_depth: Receiver depth for the propagation-loss slice, in m.
     :param ranges_m: Ranges at which to evaluate the loss, in metres; defaults to
         100 m to 10 km.
     :param density: Water density (constant), in kg/m3.
@@ -265,13 +265,13 @@ def normal_modes(
     psi_s = _modes_at(zs)
     psi_r = _modes_at(zr)
 
-    # Coherent TL (Eq. 5.14/5.17): p = i/(ρ√(8πr)) e^{-iπ/4} Σ Ψm(zs)Ψm(zr) e^{i kr r}/√kr
+    # Coherent PL (Eq. 5.14/5.17): p = i/(ρ√(8πr)) e^{-iπ/4} Σ Ψm(zs)Ψm(zr) e^{i kr r}/√kr
     r = ranges
     modal = (psi_s * psi_r / np.sqrt(kr))[:, None] * np.exp(1j * kr[:, None] * r[None, :])
     field = (1j / (rho * np.sqrt(8.0 * np.pi * r))) * np.exp(-1j * np.pi / 4.0) * modal.sum(axis=0)
     p0 = 1.0 / (4.0 * np.pi)  # free-field pressure magnitude at r = 1 m
     with np.errstate(divide="ignore"):
-        tl = -20.0 * np.log10(np.abs(field) / p0)
+        pl = -20.0 * np.log10(np.abs(field) / p0)
 
     return NormalModeResult(
         frequency=f,
@@ -279,7 +279,7 @@ def normal_modes(
         mode_depths=z,
         mode_functions=psi,
         ranges=r,
-        transmission_loss=np.asarray(tl, dtype=np.float64),
+        propagation_loss=np.asarray(pl, dtype=np.float64),
         receiver_depth=zr,
         source_depth=zs,
     )
@@ -422,12 +422,12 @@ def ray_trace(
 
 @dataclass(frozen=True)
 class ParabolicEquationResult:
-    """Parabolic-equation transmission-loss field.
+    """Parabolic-equation propagation-loss field.
 
     :ivar frequency: Source frequency, in Hz.
     :ivar ranges: Range grid, in metres.
     :ivar depths: Depth grid, in metres.
-    :ivar transmission_loss: Transmission-loss field ``TL(z, r)``, in dB, shape
+    :ivar propagation_loss: Propagation-loss field ``PL(z, r)``, in dB, shape
         ``(n_depths, n_ranges)``.
     :ivar source_depth: Source depth, in metres.
     """
@@ -435,11 +435,11 @@ class ParabolicEquationResult:
     frequency: float
     ranges: NDArray[np.float64]
     depths: NDArray[np.float64]
-    transmission_loss: NDArray[np.float64]
+    propagation_loss: NDArray[np.float64]
     source_depth: float
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the transmission-loss field (depth increasing downward)."""
+        """Plot the propagation-loss field (depth increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_parabolic_equation
 
@@ -456,14 +456,14 @@ def parabolic_equation(
     range_step: float = 10.0,
     n_depth_points: int = 1024,
 ) -> ParabolicEquationResult:
-    r"""Transmission-loss field from the standard (Tappert) parabolic
+    r"""Propagation-loss field from the standard (Tappert) parabolic
     equation.
 
     Marches the split-step Fourier solution (Jensen Ch. 6) in range with a
     discrete sine transform in depth, enforcing a pressure-release surface at
     ``z = 0`` and bottom at ``z = water_depth``. The envelope is related to
     pressure by :math:`p = \psi \, e^{i(k_0 r - \pi/4)} / \sqrt{r}` and
-    :math:`\mathrm{TL} = -20 \log_{10}(\lvert \psi \rvert / \sqrt{r})`
+    :math:`\mathrm{PL} = -20 \log_{10}(\lvert \psi \rvert / \sqrt{r})`
     (Eqs. 6.70-6.71), using a Gaussian starter.
 
     The standard PE is **paraxial**: it is accurate for propagation within
@@ -519,19 +519,19 @@ def parabolic_equation(
     # not divide it evenly (the last sample may sit just beyond max_range).
     n_r = int(np.ceil(rmax / dr)) + 1
     ranges = np.asarray(np.arange(n_r) * dr, dtype=np.float64)
-    tl = np.zeros((n, n_r), dtype=np.float64)
+    pl = np.zeros((n, n_r), dtype=np.float64)
     half_phase = np.exp(0.5j * k0 * (nsq - 1.0) * dr)  # phase screen exp(i k0/2 (n²−1) Δr)
     free_phase = np.exp(-0.5j * kz**2 / k0 * dr)  # free propagation exp(−i kz²/(2k0) Δr)
 
-    # TL = −20·log10(|ψ|/√r) (Eq. 6.71); the √k0 Gaussian starter reproduces
-    # free-field spherical spreading (TL = 20·log10 r) exactly.
+    # PL = −20·log10(|ψ|/√r) (Eq. 6.71); the √k0 Gaussian starter reproduces
+    # free-field spherical spreading (PL = 20·log10 r) exactly.
     for j in range(n_r):
         r = ranges[j]
         if r <= 0.0:
-            tl[:, j] = np.inf
+            pl[:, j] = np.inf
         else:
             with np.errstate(divide="ignore"):
-                tl[:, j] = -20.0 * np.log10(np.abs(psi) / np.sqrt(r))
+                pl[:, j] = -20.0 * np.log10(np.abs(psi) / np.sqrt(r))
         # March one step: phase screen, then free propagation via sine transform.
         psi = half_phase * psi
         spectrum = dst(psi, type=1)
@@ -542,6 +542,6 @@ def parabolic_equation(
         frequency=f,
         ranges=ranges,
         depths=z,
-        transmission_loss=np.asarray(tl, dtype=np.float64),
+        propagation_loss=np.asarray(pl, dtype=np.float64),
         source_depth=zs,
     )

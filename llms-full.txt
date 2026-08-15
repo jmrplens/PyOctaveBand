@@ -244,7 +244,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/underwater/)
 - [Underwater acoustics: radiated noise and pile driving (ISO 18405 / 17208 / 18406)](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/)
-- [Underwater sound propagation: transmission loss, sound speed, sonar, seabed and ambient noise](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
+- [Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
 - [Underwater propagation solvers: normal modes, rays and the parabolic equation](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
 - [Marine-mammal noise exposure: audiograms, auditory weighting and injury criteria](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/)
 
@@ -32227,7 +32227,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
-| `phonometry.underwater` | Three families: `sources` (ISO 17208 ship radiated noise, traffic, pile driving, wind and thermal ambient noise), `propagation` (closed-form and Weston transmission loss, normal modes, rays and the parabolic equation, seabed reflection, sound speed) and `bioacoustics` (marine-mammal audiograms and regulatory auditory weighting), over the ISO 18405 quantities and the sonar equation at the root |
+| `phonometry.underwater` | Three families: `sources` (ISO 17208 ship radiated noise, traffic, pile driving, wind and thermal ambient noise), `propagation` (closed-form and Weston propagation loss, normal modes, rays and the parabolic equation, seabed reflection, sound speed) and `bioacoustics` (marine-mammal audiograms and regulatory auditory weighting), over the ISO 18405 quantities and the sonar equation at the root |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
 | `phonometry.noise_control` | Reactive silencers (four-pole method), HVAC duct attenuation, machine-enclosure insertion loss |
 | `phonometry.broadcast` | Programme loudness and true peak (ITU-R BS.1770-5, EBU R 128 with Tech 3341/3342) |
@@ -32394,6 +32394,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `uncertainty_from_repeated_measurements` | `function` | **Energy mean & uncertainty from repeats: primary Formulae (17)+(19) route, Formula (20) approximation alongside.**<br>• `levels` [dB] (≥ 2); warns when they spread > 3 dB | `res = uncertainty_from_repeated_measurements(levels)`<br><br>• `RepeatedMeasurementResult` |
 | `TonalAssessmentResult` | `dataclass` | **Tonal assessment (ISO 1996-2).**<br>• `audibility` ΔLta, `adjustment` Kt [dB]<br>• `centre_frequency`, `critical_bandwidth`; `.plot()` | `res.audibility, res.adjustment` |
 | `ResidualCorrectionResult` | `dataclass` | **Residual-corrected level (ISO 1996-2).**<br>• `corrected_level` [dB], `reportable_upper_bound` = measured L' [dB], `margin` [dB], `reliable` (> 3 dB; when False report the upper bound, not the correction) | `res.corrected_level, res.reliable` |
+| `EnvironmentalMeasurementWarning` | `warning class` | **Unreliable environmental-noise determination (ISO 1996-2:2017).**<br>• Residual within 3 dB of the measured level: no correction is allowed and only `reportable_upper_bound` may be reported (10.4)<br>• Repeated levels spreading more than 3 dB: `approximate_uncertainty` (Formula (20)) is unreliable there (10.5 Note 2)<br>• Subclass of `PhonometryWarning` | `warnings.simplefilter('error', EnvironmentalMeasurementWarning)` |
 | `RepeatedMeasurementResult` | `dataclass` | **Repeat-measurement mean & uncertainty (ISO 1996-2).**<br>• `mean_level`, `standard_uncertainty` (Formulae (17)+(19)), `approximate_uncertainty` (Formula (20)) [dB], `n` | `res.mean_level, res.standard_uncertainty` |
 | `linkwitz_riley` | `function` | **Audio crossover.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `freq`: Crossover frequency [Hz]<br>• `order`: Any even number (Default: 4) | `lo, hi = linkwitz_riley(x, fs, freq=1000, order=4)`<br><br>• `lo`: Low-pass filtered signal<br>• `hi`: High-pass filtered signal |
 | `parametric_eq` | `function` | **Parametric EQ, one shot (RBJ Audio EQ Cookbook).**<br>• `x`: Signal array (1D or 2D `[channels, samples]`)<br>• `fs`: Sample rate [Hz]<br>• `sections`: an `EQSection` or a sequence of them | `y = parametric_eq(x, fs, EQSection("peaking", 1000, gain_db=6.0))` |
@@ -32648,6 +32649,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `SoundPowerResult` | `dataclass` | **Surface-pressure sound power.**<br>• `sound_power_level` [dB]<br>• `surface_pressure_level`, `mean_pressure_level` [dB]<br>• `background_correction`, `environmental_correction` [dB]<br>• `directivity_index` [dB] `(NM, NB)`<br>• `surface_area` [m²]<br>• `sound_power_level_a` [dB]<br>• `uncertainty` [dB]<br>• `grade`<br>• `declare(...)` → `NoiseEmissionDeclaration` | `res.sound_power_level, res.sound_power_level_a` |
 | `RoomEnvironment` | `dataclass` | **Room data behind K2 (ISO 3744 Annex A), for `sound_power_pressure`.**<br>• `absorption_area` A [m²]<br>• `reverberation_time` T [s] + `volume` V [m³] (Eq. A.3)<br>• `mean_absorption_coefficient` α + `room_surface` Sv [m²] (Eq. A.7)<br>All Default: None; the empty environment is a free field (K2 = 0) | `RoomEnvironment(reverberation_time=0.6, volume=300)` |
 | `OperatingModeDeclaration` | `dataclass` | **ISO 4871 dual-number values for one operating mode.**<br>• `mode`: column label<br>• `sound_power_level` L_WA [dB re 1 pW]<br>• `sound_power_uncertainty` K_WA [dB]<br>• `emission_pressure_level` L_pA, `emission_pressure_uncertainty` K_pA [dB] (optional)<br>• `verification_level` L_1 [dB] (optional)<br>• `declared_sound_power_level`: L_WAd = L_WA + K_WA (3.15)<br>• `verified`: L_1 ≤ L_WAd (6.2, combined form)<br>• `verified_dual`: L_1 ≤ round(L_WA) + round(K_WA) (6.2, dual-number form) | `OperatingModeDeclaration('Mode 1', 88.0, 2.0)` |
+| `DeclarationForm` | `constant` | **The `form` literal of `NoiseEmissionDeclaration` (ISO 4871 clause 6).**<br>• `'dual-number'`: L_WA and K_WA declared as a pair (Default)<br>• `'single-number'`: the declared L_WAd alone | `NoiseEmissionDeclaration(modes, form='single-number')` |
 | `NoiseEmissionDeclaration` | `dataclass` | **ISO 4871:1996 noise emission declaration (machinery).**<br>• `modes`: `OperatingModeDeclaration` per mode<br>• `machine`, `operating_conditions` (clause 5)<br>• `noise_test_code`, `basic_standards` (clause 5 b)<br>• `form`: 'dual-number' (Default) / 'single-number'<br>• `.report(path, ...)`: ISO 4871 fiche → PDF | `NoiseEmissionDeclaration((m1, m2), machine='...').report('iso4871.pdf')` |
 | `sound_power_reverberation` | `function` | **Reverberation-room LW, direct (ISO 3741).**<br>• `levels`: mean room SPL [dB] (1D or (NM, NB))<br>• `t60` [s]<br>• `volume` V [m³]<br>• `surface_area` S [m²]<br>• `frequencies` [Hz] (required)<br>• `background_levels`: for K1<br>• `temperature` [°C] (Default: 23)<br>• `static_pressure` [kPa] (Default: 101.325) | `rev = sound_power_reverberation(lp, t60, 200, 220, f)`<br><br>• `ReverberationSoundPowerResult` |
 | `sound_power_comparison` | `function` | **Reverberation-room LW, comparison (ISO 3741).**<br>• `levels`, `levels_ref`: room SPL [dB]<br>• `lw_ref`: reference-source LW [dB]<br>• `frequencies` [Hz]<br>• `background_levels`, `background_levels_ref`<br>• `temperature`, `static_pressure` | `cmp = sound_power_comparison(lp, lp_ref, lw_ref)`<br><br>• `ReverberationSoundPowerResult` (method='comparison') |
@@ -32835,6 +32837,10 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `plot_silencer_geometry` | `function` | **To-scale silencer cross-section.**<br>• `kind`: the `ReactiveSilencerResult.kind` strings<br>• Chamber: `length`, `chamber_area`, `pipe_area` (+ `inlet_extension`/`outlet_extension`)<br>• Branch: `duct_area` + Helmholtz (`neck_area`, `neck_length`, `cavity_volume`) or quarter-wave (`length`, `branch_area`)<br>• `language` | `plot_silencer_geometry('expansion chamber', length=0.3, chamber_area=0.03, pipe_area=0.005)`<br><br>• Equivalent circular diameters 2·√(S/π); also `ReactiveSilencerResult.plot_geometry()` |
 | `helmholtz_resonator` / `quarter_wave_resonator` | `function` | **Side-branch resonator silencers (Bies Eqs. 8.46/8.44).**<br>• Helmholtz: `duct_area`, `neck_area`, `neck_length`, `cavity_volume`<br>• Quarter-wave: `duct_area`, `length`, `branch_area` | `quarter_wave_resonator(f, 0.01, 1.5, 2e-3)` |
 | `extended_tube_chamber` | `function` | **Extended-inlet/outlet expansion chamber (Bies §8.9.7); reduces to `expansion_chamber` at zero extension.**<br>• `length`, `chamber_area`, `pipe_area`, `inlet_extension`, `outlet_extension` | `extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)` |
+| `transmission_loss` | `function` | **Transmission loss of a four-pole element (Munjal Eq. (3.27), no flow).**<br>• `transfer_matrix` T, shape `(n_freq, 2, 2)`<br>• `inlet_area` S_in / `outlet_area` S_out [m²]<br>• `speed_of_sound` / `density`<br>• The anechoic termination is part of the definition, so this describes the element alone | `transmission_loss(t, inlet_area=0.01, outlet_area=0.01)` |
+| `insertion_loss` | `function` | **Insertion loss of a four-pole element for stated end impedances.**<br>• `transfer_matrix` T<br>• `source_impedance` Z_s, `radiation_impedance` Z_r [Pa·s/m³]<br>• Unlike the transmission loss it depends on the source and the termination, which is what makes it the number a client hears | `insertion_loss(t, source_impedance=zs, radiation_impedance=zr)` |
+| `duct_matrix` / `shunt_matrix` / `cascade` | `function` | **The four-pole primitives the silencers are assembled from (Bies Eqs. 8.143/8.144).**<br>• `duct_matrix(frequencies, length, area, ...)`: a straight duct<br>• `shunt_matrix(branch_impedance)`: a side branch of impedance Z_b<br>• `cascade(*matrices)`: multiplies elements inlet to outlet | `t = cascade(duct_matrix(f, 0.1, s), shunt_matrix(z))` |
+| `helmholtz_impedance` / `quarter_wave_impedance` | `function` | **Side-branch impedances to feed `shunt_matrix` (Bies Eqs. 8.152/8.146).**<br>• Helmholtz: `neck_area`, `neck_length`, `cavity_volume`, `resistance`<br>• Quarter-wave: `length`, `area`<br>• `speed_of_sound` / `density` | `shunt_matrix(helmholtz_impedance(f, 1e-3, 0.05, 2e-3))` |
 | `ReactiveSilencerResult` | `dataclass` | **Reactive-silencer result.**<br>• `frequencies`, `transmission_loss`, `insertion_loss` (or None), `transfer_matrix`, `kind`, `resonances`<br>• `.plot()`: TL/IL vs frequency | `res.transmission_loss` |
 | `end_reflection_loss` / `elbow_insertion_loss` | `function` | **HVAC duct end reflection & bend insertion loss (Bies Tables 8.14/8.11, ASHRAE).**<br>• end: `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• elbow: `frequencies`, `width`, `bend_type`, `vanes`, `lined` | `end_reflection_loss(bands, 0.3)`<br><br>• `HvacSpectrumResult` |
 | `plenum_attenuation` | `function` | **Plenum-chamber TL by Wells' method (Bies Eq. 8.275).**<br>• `exit_area`, `line_of_sight`, `wall_area`, `mean_absorption`, `angle` | `plenum_attenuation(0.1, 1.0, 20.0, 0.2)  # dB` |
@@ -32898,11 +32904,11 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `SoundSpeedProfile` | `dataclass` | **Sound-speed profile.**<br>• `depth` [m] / `sound_speed` [m/s] / `gradient` [(m/s)/m]<br>• `model`<br>• `.plot()`: speed vs depth (depth down) | `prof.sound_speed, prof.gradient` |
 | `spreading_loss` | `function` | **Geometrical spreading loss, dB.**<br>• `range_m` [m] (scalar/array)<br>• `law`: `"spherical"` / `"cylindrical"` / `"practical"`<br>• `transition_range` [m] (for `"practical"`) | `spreading_loss(1000.0)` |
 | `seawater_absorption` | `function` | **Volume absorption α, dB/km.**<br>• `frequency_hz` [Hz] (scalar/array)<br>• `temperature` [°C] / `salinity` [ppt] / `depth` [m] / `ph`<br>• `model`: `"francois-garrison"` (default) / `"ainslie-mccolm"` / `"thorp"` | `seawater_absorption(10e3)` |
-| `transmission_loss` | `function` | **Transmission loss TL = spreading + α·R.**<br>• `range_m` [m] / `frequency_hz` [Hz]<br>• `law` / `temperature` / `salinity` / `depth` / `ph` / `model` / `transition_range` | `transmission_loss(r, 10e3)`<br><br>• `TransmissionLossResult` |
-| `TransmissionLossResult` | `dataclass` | **Transmission-loss result.**<br>• `range_m` [m] / `tl` / `spreading` / `absorption` [dB]<br>• `frequency` [Hz] / `absorption_coefficient` [dB/km]<br>• `law` / `model`<br>• `.plot()`: TL vs range | `res.tl, res.absorption_coefficient` |
-| `passive_sonar_equation` | `function` | **Passive sonar equation.**<br>• `source_level` / `transmission_loss` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` (Default: 0)<br>SE = SL − TL − (NL − DI) − DT | `passive_sonar_equation(140, 80, 60)`<br><br>• `SonarEquationResult` |
-| `active_sonar_equation` | `function` | **Active (monostatic) sonar equation.**<br>• `source_level` / `transmission_loss` / `target_strength` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` / `reverberation_level`<br>noise-limited SE = SL − 2·TL + TS − (NL − DI) − DT; with `reverberation_level` → SE = SL − 2·TL + TS − RL − DT | `active_sonar_equation(220, 70, 15, 60)`<br><br>• `SonarEquationResult` |
-| `SonarEquationResult` | `dataclass` | **Sonar-equation result.**<br>• `mode` / `signal_excess` / `snr` [dB] / `figure_of_merit` [dB]<br>• `transmission_loss` / `source_level` / `noise_level` / `directivity_index` / `detection_threshold` [dB]<br>• `target_strength` [dB or None] / `reverberation_limited`<br>• `.plot()`: signal excess vs TL | `res.signal_excess, res.figure_of_merit` |
+| `propagation_loss` | `function` | **Propagation loss PL = spreading + α·R.**<br>• `range_m` [m] / `frequency_hz` [Hz]<br>• `law` / `temperature` / `salinity` / `depth` / `ph` / `model` / `transition_range` | `propagation_loss(r, 10e3)`<br><br>• `PropagationLossResult` |
+| `PropagationLossResult` | `dataclass` | **Propagation-loss result.**<br>• `range_m` [m] / `pl` / `spreading` / `absorption` [dB]<br>• `frequency` [Hz] / `absorption_coefficient` [dB/km]<br>• `law` / `model`<br>• `.plot()`: PL vs range | `res.pl, res.absorption_coefficient` |
+| `passive_sonar_equation` | `function` | **Passive sonar equation.**<br>• `source_level` / `propagation_loss` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` (Default: 0)<br>SE = SL − PL − (NL − DI) − DT | `passive_sonar_equation(140, 80, 60)`<br><br>• `SonarEquationResult` |
+| `active_sonar_equation` | `function` | **Active (monostatic) sonar equation.**<br>• `source_level` / `propagation_loss` / `target_strength` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` / `reverberation_level`<br>noise-limited SE = SL − 2·PL + TS − (NL − DI) − DT; with `reverberation_level` → SE = SL − 2·PL + TS − RL − DT | `active_sonar_equation(220, 70, 15, 60)`<br><br>• `SonarEquationResult` |
+| `SonarEquationResult` | `dataclass` | **Sonar-equation result.**<br>• `mode` / `signal_excess` / `snr` [dB] / `figure_of_merit` [dB]<br>• `propagation_loss` / `source_level` / `noise_level` / `directivity_index` / `detection_threshold` [dB]<br>• `target_strength` [dB or None] / `reverberation_limited`<br>• `.plot()`: signal excess vs PL | `res.signal_excess, res.figure_of_merit` |
 | `critical_angle` | `function` | **Critical grazing angle φc = arccos(c1/c2), degrees.**<br>• `c1` / `c2` [m/s] (needs `c2 > c1`) | `critical_angle(1500, 1650)` |
 | `reflection_coefficient` | `function` | **Complex seabed Rayleigh reflection coefficient.**<br>• `grazing_angle` [°] (scalar/array)<br>• `rho1` / `c1` / `rho2` / `c2` | `reflection_coefficient(30, rho1=1000, c1=1500, rho2=1900, c2=1650)` |
 | `bottom_reflection_loss` | `function` | **Seabed reflection loss BL = −20·lg\|R\|, dB.**<br>• `grazing_angle` [°]<br>• `rho1` (Default: 1000) / `c1` (Default: 1500) / `rho2` / `c2` | `bottom_reflection_loss(phi, rho2=1900, c2=1650)`<br><br>• `BottomLossResult` |
@@ -32919,9 +32925,9 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `normal_modes` | `function` | **Normal-mode transmission loss (range-independent).**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` / `receiver_depth` [m] / `ranges_m` / `density` / `bottom`: `"pressure-release"`\|`"rigid"` / `n_depth_points` | `normal_modes(50, [0,200], [1500,1500], source_depth=50, receiver_depth=100)`<br><br>• `NormalModeResult` |
 | `ray_trace` | `function` | **Ray tracing and travel times through a sound-speed profile (vectorised).**<br>• `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `launch_angles_deg` / `max_range` [m] / `n_steps` | `ray_trace(z, c, source_depth=1000, launch_angles_deg=[-10,0,10])`<br><br>• `RayTraceResult` |
 | `parabolic_equation` | `function` | **Split-step Fourier parabolic-equation TL field.**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `max_range` [m] / `range_step` [m] / `n_depth_points` | `parabolic_equation(50, [0,200], [1500,1500], source_depth=50)`<br><br>• `ParabolicEquationResult` |
-| `NormalModeResult` | `dataclass` | **Normal-mode result.**<br>• `frequency` / `wavenumbers` [rad/m] / `mode_depths` [m] / `mode_functions`<br>• `ranges` [m] / `transmission_loss` [dB] / `receiver_depth` / `source_depth`<br>• `.plot()`: TL vs range | `res.wavenumbers, res.transmission_loss` |
+| `NormalModeResult` | `dataclass` | **Normal-mode result.**<br>• `frequency` / `wavenumbers` [rad/m] / `mode_depths` [m] / `mode_functions`<br>• `ranges` [m] / `propagation_loss` [dB] / `receiver_depth` / `source_depth`<br>• `.plot()`: PL vs range | `res.wavenumbers, res.propagation_loss` |
 | `RayTraceResult` | `dataclass` | **Ray-tracing result.**<br>• `launch_angles` [°] `(n_rays,)`<br>• `ranges` [m] / `depths` [m] / `travel_times` [s] (all `(n_rays, n_steps)`)<br>• `source_depth` / `water_depth` [m]<br>• `.plot()`: ray paths | `res.ranges, res.depths, res.travel_times` |
-| `ParabolicEquationResult` | `dataclass` | **Parabolic-equation result.**<br>• `frequency` / `ranges` [m] / `depths` [m]<br>• `transmission_loss` [dB] `(n_depths, n_ranges)` / `source_depth`<br>• `.plot()`: TL field | `res.transmission_loss` |
+| `ParabolicEquationResult` | `dataclass` | **Parabolic-equation result.**<br>• `frequency` / `ranges` [m] / `depths` [m]<br>• `propagation_loss` [dB] `(n_depths, n_ranges)` / `source_depth`<br>• `.plot()`: PL field | `res.propagation_loss` |
 | `PileStrikeResult` | `dataclass` | **Pile-strike result.**<br>• `single_strike_sel` [dB re 1 µPa²·s]<br>• `peak_spl` / `spl` [dB re 1 µPa]<br>• `pulse_duration` [s]<br>• `pressure` [Pa] / `fs` [Hz]<br>• `.plot()`: waveform + cumulative energy | `res.single_strike_sel, res.peak_spl` |
 | `strike_sel_spectrum` | `function` | **Band-resolved single-strike SEL (ISO 18406).**<br>• `pressure`: one strike (1D) [Pa] / `fs` [Hz]<br>• `fraction`: 1 or 3 (Default: 3) / `limits` [Hz] (Default: (10, 20000))<br>Parseval band split of ∫p²dt | `strike_sel_spectrum(p, fs)`<br><br>• `StrikeSelSpectrum` |
 | `StrikeSelSpectrum` | `dataclass` | **Band-resolved strike SEL.**<br>• `frequencies` [Hz] / `band_sel` [dB re 1 µPa²·s]<br>• `total_sel` / `broadband_sel` [dB] / `fraction` / `fs` [Hz]<br>• `.plot()`: band SEL vs frequency | `spec.frequencies, spec.band_sel` |
@@ -32938,8 +32944,8 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `WESTON_SEABEDS` | `dict` | **Ainslie Table 9.1 seabeds: `"sand"` (Mz 1.5) and `"mud"` (Mz 8).** | `WESTON_SEABEDS["mud"]` |
 | `WESTON_REGIMES` | `tuple` | **Regime labels in range order.**<br>`"spherical"`, `"cylindrical"`, `"mode-stripping"`, `"single-mode"` | `WESTON_REGIMES[2]` |
 | `detection_range` | `function` | **Range where the closed-form TL equals the figure of merit, m.**<br>• `figure_of_merit` [dB] / `frequency_hz` [Hz]<br>• `law` / `transition_range` / `temperature` / `salinity` / `depth` / `ph` / `model`<br>• `max_range` (Default: 500000) [m] / `n_points` (Default: 400) | `detection_range(82.7, 50e3)`<br><br>• `DetectionRangeResult` |
-| `DetectionRangeResult` | `dataclass` | **Detection-range result.**<br>• `detection_range` [m] / `figure_of_merit` [dB] / `frequency` [Hz]<br>• `range_m` [m] / `transmission_loss` [dB] / `absorption_coefficient` [dB/km]<br>• `law` / `model`<br>• `.plot()`: TL vs FOM with the crossing | `res.detection_range` |
-| `detection_range_from_curve` | `function` | **Detection range read off any computed TL curve, m.**<br>• `figure_of_merit` [dB] / `range_m` [m] / `transmission_loss` [dB]<br>• `crossing`: `"first"` (default) / `"last"` | `detection_range_from_curve(60, nm.ranges, nm.transmission_loss)` |
+| `DetectionRangeResult` | `dataclass` | **Detection-range result.**<br>• `detection_range` [m] / `figure_of_merit` [dB] / `frequency` [Hz]<br>• `range_m` [m] / `propagation_loss` [dB] / `absorption_coefficient` [dB/km]<br>• `law` / `model`<br>• `.plot()`: PL vs FOM with the crossing | `res.detection_range` |
+| `detection_range_from_curve` | `function` | **Detection range read off any computed PL curve, m.**<br>• `figure_of_merit` [dB] / `range_m` [m] / `propagation_loss` [dB]<br>• `crossing`: `"first"` (default) / `"last"` | `detection_range_from_curve(60, nm.ranges, nm.propagation_loss)` |
 | `auditory_weighting` | `function` | **Marine-mammal auditory weighting W(f), dB.**<br>• `frequency_hz` [Hz] / `group`: hearing-group code<br>• `guidance`: `"nmfs-2024"` (default) / `"nmfs-2018"` / `"southall-2019"` | `auditory_weighting(1000, "LF")`<br><br>• `AuditoryWeightingResult` |
 | `AuditoryWeightingResult` | `dataclass` | **Auditory weighting result.**<br>• `frequencies` [Hz] / `weighting` W(f) [dB] / `exposure_function` E(f) [dB]<br>• `parameters` / `guidance` / `group` / `weighted_tts_onset` Tw = K + C [dB]<br>• `.plot()`: W(f) vs frequency | `res.weighting, res.weighted_tts_onset` |
 | `weighting_parameters` | `function` | **Weighting/exposure parameters of one hearing group.**<br>• `group` / `guidance` | `weighting_parameters("OW", guidance="nmfs-2024")`<br><br>• `WeightingParameters` |
@@ -33099,6 +33105,8 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `TransferStiffnessResult` | `dataclass` | **Dynamic transfer stiffness over frequency (ISO 10846).**<br>• `frequencies` [Hz], `transfer_stiffness` k₂,₁ [N/m]<br>• `blocking_mass` m₂ [kg] or None<br>• `.magnitude` / `.level` (dB re 1 N/m) / `.loss_factor`<br>• `.to(target)`: "impedance"/"apparent_mass"<br>• `.plot()`: Lₖ(f) | `res.level, res.loss_factor` |
 | `infinite_plate_impedance` / `infinite_plate_mobility` / `infinite_plate_point_mobility` | `function` | **Thin-plate point mobility Z = C√(B'm'') (Cremer Table 5.1).**<br>• `bending_stiffness` B' [N·m], `mass_per_area` m'' [kg/m²]<br>• `location`: 'centre' (C=8) / 'edge' (C=3.5); real, frequency-independent | `infinite_plate_impedance(1e4, 10)`<br><br>• float or `MobilityResult` |
 | `infinite_beam_mobility` / `infinite_beam_impedance` / `infinite_beam_moment_mobility` / `infinite_beam_point_mobility` | `function` | **Slender-beam point mobility Y = (1−j)/(4m'cB) (Cremer Table 5.1).**<br>• `frequency` [Hz], `bending_stiffness` B [N·m²], `mass_per_length` m' [kg/m]<br>• `location`: 'centre'/'end'; 45°, ∝ ω^−½ | `infinite_beam_mobility(100, 200, 5)`<br><br>• complex or `MobilityResult` |
+| `beam_bending_wave_speed` / `plate_bending_wave_speed` | `function` | **Free bending wave speed, cB = (B ω²/m')^¼ for a beam and (B' ω²/m'')^¼ for a plate.**<br>• `frequency` [Hz]<br>• beam: `bending_stiffness` B = EI [N·m²], `mass_per_length` m' [kg/m]<br>• plate: `bending_stiffness` B' [N·m], `mass_per_area` m'' [kg/m²]<br>• ∝ √f, so it crosses the speed of sound at fc | `plate_bending_wave_speed(500.0, 4.2e3, 20.0)` |
+| `longitudinal_rod_mobility` | `function` | **Point mobility of an infinite rod, Y = 1/(ρ cL S) (Cremer Table 5.1).**<br>• `density` ρ [kg/m³], `longitudinal_wave_speed` cL [m/s], `cross_section_area` S [m²]<br>• Real and frequency-independent, unlike the bending mobilities | `longitudinal_rod_mobility(7800.0, 5100.0, 1e-4)` |
 | `longitudinal_rod_impedance` / `injected_power` / `plate_bending_stiffness` | `function` | **Rod point impedance ρcₗS; injected power W = ½\|F\|²Re{Y} (Cremer 5.23); plate B' = Eh³/12(1−ν²).** | `injected_power(10.0, y)` |
 | `radiation_efficiency` / `coincidence_frequency` | `function` | **Plate radiation efficiency σ(f) (Hopkins 2.9, Leppington/Maidanik).**<br>• `frequency` [Hz], `length_x`/`length_y` [m], `critical_frequency` fc [Hz]<br>• `boundary`: 'simply_supported'/'clamped', `baffle`: 'infinite'/'perpendicular'<br>• σ → 1 above fc; fc = (c₀²/2π)√(m''/B') | `radiation_efficiency(f, 1.5, 1.25, 2100)`<br><br>• `RadiationEfficiencyResult` |
 | `plot_plate_geometry` | `function` | **Baffled rectangular plate to scale.**<br>• `length_x`, `length_y` [m]<br>• `boundary` (title label)<br>• `language` | `plot_plate_geometry(1.2, 0.8)`<br><br>• Also `RadiationEfficiencyResult.plot_geometry()` |
@@ -34848,7 +34856,7 @@ the one case the grouping by domain cannot serve.
 | Symbol | Meanings that are not the same quantity |
 | :--- | :--- |
 | $C$ | The **decay curvature** $100\,(T_{30}/T_{20} - 1)$ in per cent, and the ISO 717-1 **spectrum adaptation term** in decibels. Both are defined on one page, [Rooms and buildings](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/), a couple of sections apart. |
-| TL | A partition's **transmission loss**, a duct element's **transmission loss** (a different measurement, with an anechoic termination in the definition) and the underwater **propagation loss** of the sonar equation. Three domains, three unrelated calculations. |
+| TL | A partition's **transmission loss** and a duct element's **transmission loss**: a different measurement, with an anechoic termination in the definition. The underwater quantity the sonar equation carries is not one of them, and is written PL: ISO 18405:2017 deprecates the two names as synonyms (3.4.1.3 Note 6, 3.4.1.4 Note 7). |
 | NR | The **noise rating** curve family of a room criterion, and the **noise reduction** $L_{p1} - L_{p2}$ between two rooms in noise control. |
 | $\alpha$ | The **absorption coefficient** of a surface, the **atmospheric attenuation coefficient** per unit length (dB/m here, dB/km in ISO 9613-2), the **volume absorption coefficient** of sea water (dB/km), and the **tortuosity** $\alpha_\infty$ of a porous model, which is not an absorption at all. |
 | $A$ | An **equivalent absorption area** in m², an **accelerance** in 1/kg, and the **total attenuation** of ISO 9613-2 in dB. |
@@ -35123,7 +35131,7 @@ check that pins each quantity to its standard's own expected value.
 | SEL (underwater) | Underwater sound exposure level, the time integral of squared pressure referred to 1 µPa²·s. | dB re 1 µPa²·s | ISO 18405:2017 | [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/) |
 | $L_{RN}$ | Radiated noise level of a ship: the level of the product of the far-field r.m.s. pressure and the source distance. | dB re 1 µPa·m | ISO 17208-1:2016 | [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/) |
 | $L_s$ | Equivalent monopole source level: the radiated noise level after the Lloyd's-mirror surface correction, so that one number describes the source itself. | dB re 1 µPa·m | ISO 17208-2:2019, Formula 3 | [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/) |
-| TL (underwater) | Transmission loss as the sonar equation uses it: the drop between the source level and the level at the receiver, a geometrical spreading law plus the volume absorption $\alpha R$. Strictly, ISO 18405 calls that quantity propagation loss, $N_{PL} = L_S - L_p(x)$, keeps the name transmission loss for the reduction in level between two stated points, and deprecates using one as a synonym of the other. | dB | ISO 18405:2017, 3.4.1.3 and 3.4.1.4 | [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) |
+| PL, $N_{PL}$ (underwater) | Propagation loss, the quantity the sonar equation uses: the difference between the source level and the mean-square sound pressure level at the receiver, $N_{PL}(x) = L_S - L_p(x)$, in practice a geometrical spreading law plus the volume absorption $\alpha R$. Clause 3.4.1.3 keeps the name transmission loss for the reduction in level between two stated points, and both entries deprecate using one name as a synonym of the other, which is why so much of the literature calls this one a transmission loss. | dB | ISO 18405:2017, 3.4.1.4 | [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) |
 | SL, $L_S$ | Source level: the level of the source factor, equal to the level 1 m from a hypothetical point source radiating into an infinite lossless medium, so it is back-projected from a measurement made much further away and never measured at 1 m. The reference value carries a squared metre, which is why the widespread "dB re 1 µPa at 1 m" is the same number written loosely. | dB re 1 µPa²m² | ISO 18405:2017, 3.3.2.1 | [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) |
 | NL, $L_N$ | Sonar noise level: the background the signal has to be detected against, in the band of interest, from wind, thermal agitation, distant shipping and the platform's own self-noise. It has to be quoted over the same bandwidth as the source level, since an ambient spectrum level and a broadband level differ by $10\log_{10}B$. | dB re 1 µPa | ISO 18405:2017, 3.6.2.5 | [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) |
 | DI (receiving array) | Directivity index of a receiving array: the array gain in the special case the sonar equation assumes, a plane-wave signal in isotropic background noise. It is the signal-to-noise ratio the beam buys over a single omnidirectional hydrophone, and it enters the equation as a credit against the noise level. | dB | ISO 18405:2017, 3.6.2.4 (Note 4) | [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) |
@@ -47764,7 +47772,7 @@ lives inline with the guides rather than in the theory reference.
   ISO 18405 reference levels, ISO 17208 ship radiated noise and monopole
   source level, and ISO 18406 pile-driving sound exposure.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  transmission loss, sound speed, the sonar equation, seabed reflection and
+  propagation loss, sound speed, the sonar equation, seabed reflection and
   ocean ambient noise, in closed form.
 - [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
   the normal-mode, ray-tracing and parabolic-equation solvers of the
@@ -48084,7 +48092,7 @@ piling campaign's weighted exposure falls below a criterion.
   the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
   feed this page.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  the transmission loss and figure-of-merit machinery that turns a criterion
+  the propagation loss and figure-of-merit machinery that turns a criterion
   into a range.
 - API reference: [`underwater.bioacoustics.weighting`](https://jmrplens.github.io/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](https://jmrplens.github.io/phonometry/reference/api/underwater/audiograms/).
 
@@ -48338,7 +48346,7 @@ phonometry.
   weighting, accumulation over the strikes and the margin against the published
   onset criteria.
 - [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
-  the transmission loss that carries these source levels to a receiver, and the
+  the propagation loss that carries these source levels to a receiver, and the
   sonar equation they feed.
 - API reference: [`underwater.acoustics`](https://jmrplens.github.io/phonometry/reference/api/underwater/acoustics/), [`underwater.sources.pile_driving_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.sources.ship_radiated_noise`](https://jmrplens.github.io/phonometry/reference/api/underwater/ship-radiated-noise/).
 - General underwater propagation modelling (ray, normal mode, parabolic equation) is covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
@@ -48381,21 +48389,21 @@ mode, parabolic equation) is out of scope here: see
 <!-- source: docs/underwater/underwater-propagation.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/
 
-# Underwater sound propagation: transmission loss, sound speed, sonar, seabed and ambient noise
+# Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise
 
-Closed-form underwater propagation: the **transmission loss** (geometrical
+Closed-form underwater propagation: the **propagation loss** (geometrical
 spreading plus volume absorption), the **speed of sound** in sea water, the
 **sonar equation**, **seabed reflection loss** and the **ocean ambient-noise**
 spectrum (wind, thermal and shipping-traffic contributions). These complement
 the underwater reference levels (ISO 18405/17208/18406) in
 [Underwater Acoustics](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/).
 
-## 1. Transmission loss
+## 1. Propagation loss
 
-The transmission loss is
+The propagation loss is
 
 $$
-TL = \text{spreading} + \alpha R .
+PL = \text{spreading} + \alpha R .
 $$
 
 Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
@@ -48405,8 +48413,8 @@ spherical up to a transition range $R_0$ and cylindrical beyond it
 simplification) or **Thorp** (1967, frequency-only).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss.svg" alt="Underwater propagation loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
 </picture>
 
 <details>
@@ -48419,11 +48427,11 @@ from phonometry import underwater
 
 # 10 kHz at 10 °C, 35 ppt, 100 m depth; practical spreading with R0 = 1000 m.
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical",
+pl = underwater.propagation_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
-print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot()   # total TL with the spreading and absorption contributions
+print(f"alpha = {pl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
+pl.plot()   # total PL with the spreading and absorption contributions
 plt.show()
 ```
 
@@ -48440,13 +48448,13 @@ alpha = underwater.seawater_absorption(10e3, temperature=10.0, salinity=35.0,
 print(f"α = {alpha:.3f} dB/km")
 
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical", transition_range=1000.0,
+pl = underwater.propagation_loss(ranges, 10e3, law="practical", transition_range=1000.0,
                           temperature=10.0, salinity=35.0, depth=100.0)
-print(tl.absorption_coefficient, tl.tl[-1])
-tl.plot()   # TL vs range with the spreading/absorption split (needs matplotlib)
+print(pl.absorption_coefficient, pl.pl[-1])
+pl.plot()   # PL vs range with the spreading/absorption split (needs matplotlib)
 ```
 
-`transmission_loss` returns a `TransmissionLossResult` with `tl`, `spreading`,
+`propagation_loss` returns a `PropagationLossResult` with `pl`, `spreading`,
 `absorption` (arrays), the `frequency` and the `absorption_coefficient`
 (dB/km). Francois–Garrison and Ainslie–McColm agree to within ~10 % across
 100 Hz–1 MHz, so either is a good cross-check of the other.
@@ -48531,8 +48539,8 @@ flux = underwater.weston_propagation_loss(ranges, 100.0, 100.0, critical_angle=9
                                           reflection_loss_gradient_value=0.0)
 modes = underwater.normal_modes(100.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=41.0, receiver_depth=57.0, ranges_m=ranges)
-mean = lambda tl: -10.0 * np.log10(np.mean(10.0 ** (-tl / 10.0)))
-print(mean(flux.propagation_loss), mean(modes.transmission_loss))
+mean = lambda pl: -10.0 * np.log10(np.mean(10.0 ** (-pl / 10.0)))
+print(mean(flux.propagation_loss), mean(modes.propagation_loss))
 ```
 
 > Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
@@ -48614,21 +48622,21 @@ kilometres.
 
 The sonar equation combines the performance terms into the **signal excess**
 $SE$ (detection when $SE \ge 0$) and the **figure of merit** (the maximum
-allowable transmission loss at $SE = 0$):
+allowable propagation loss at $SE = 0$):
 
 $$
-SE = SL - TL - (NL - DI) - DT \ \ \text{(passive)},
+SE = SL - PL - (NL - DI) - DT \ \ \text{(passive)},
 $$
 
 $$
-SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
+SE = SL - 2\,PL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
 $$
 
 or reverberation-limited with $RL$ in place of $NL - DI$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with transmission loss, crossing zero (the detection limit) at the figure of merit" width="82%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with propagation loss, crossing zero (the detection limit) at the figure of merit" width="82%">
 </picture>
 
 <details>
@@ -48639,12 +48647,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                        noise_level=60.0, directivity_index=15.0,
                                        detection_threshold=8.0)
 print(f"figure of merit = {se.figure_of_merit:.1f} dB")  # figure of merit = 87.0 dB
-se.plot()   # signal excess vs transmission loss, zero crossing at the FOM
+se.plot()   # signal excess vs propagation loss, zero crossing at the FOM
 plt.show()
 ```
 
@@ -48654,12 +48662,12 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                noise_level=60.0, directivity_index=15.0,
                                detection_threshold=8.0)
-print(se.figure_of_merit)   # max allowable one-way TL at SE = 0
-se.plot()   # signal excess vs transmission loss (needs matplotlib)
+print(se.figure_of_merit)   # max allowable one-way PL at SE = 0
+se.plot()   # signal excess vs propagation loss (needs matplotlib)
 
 # Active, monostatic (two-way loss, target strength):
 underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=60.0,
@@ -48668,8 +48676,8 @@ underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=
 
 ### 3.1 Detection range
 
-Since the figure of merit *is* the maximum allowable transmission loss,
-inverting a loss law at $TL = FOM$ gives the **detection range**, the range at
+Since the figure of merit *is* the maximum allowable propagation loss,
+inverting a loss law at $PL = FOM$ gives the **detection range**, the range at
 which the detection probability is 50 %. `detection_range` inverts the
 closed-form loss of §1, which grows monotonically with range and therefore has
 a single crossing; `detection_range_from_curve` reads the crossing off any
@@ -48682,15 +48690,15 @@ from phonometry import underwater
 # Ainslie's active CW example: FOM = 82.7 dB re m2 at 50 kHz -> r50 ~ 1.3 km.
 res = underwater.detection_range(82.7, 50e3)
 print(res.detection_range)          # metres
-res.plot()                          # TL vs FOM with the crossing marked
+res.plot()                          # PL vs FOM with the crossing marked
 
 # Off a numerical prediction instead:
 import numpy as np
 modes = underwater.normal_modes(200.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=40.0, receiver_depth=60.0,
                                 ranges_m=np.linspace(100.0, 20_000.0, 800))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss,
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss))
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss,
                                             crossing="last"))
 ```
 
@@ -49062,7 +49070,7 @@ Source: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/
 
 # Underwater propagation solvers: normal modes, rays and the parabolic equation
 
-The closed-form transmission loss of
+The closed-form propagation loss of
 [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) knows nothing of
 the sound-speed profile, the seabed or the surface. When refraction and
 boundaries decide the answer, the field has to be **computed**: this guide
@@ -49080,7 +49088,7 @@ computed numerically. Three solvers are provided (Jensen et al.,
 
 - **`normal_modes`** solves the depth-separated Sturm-Liouville eigenvalue
   problem by finite differences and sums the propagating modes into the
-  transmission loss. Validated against the ideal (pressure-release) waveguide's
+  propagation loss. Validated against the ideal (pressure-release) waveguide's
   exact modes.
 - **`ray_trace`** integrates the ray-trajectory equations (Runge-Kutta,
   vectorised over all rays at once) through a sound-speed profile, reflecting at
@@ -49089,11 +49097,11 @@ computed numerically. Three solvers are provided (Jensen et al.,
   gradient and the closed-form travel time along them.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
-  with the normal-mode transmission loss in trend.
+  with the normal-mode propagation loss in trend.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and transmission loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -49113,7 +49121,7 @@ c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
 field = underwater.parabolic_equation(50.0, z, c, source_depth=1000.0,
                                       max_range=50_000.0, range_step=50.0,
                                       n_depth_points=512)
-field.plot()   # TL(z, r) field showing the convergence zones
+field.plot()   # PL(z, r) field showing the convergence zones
 plt.show()
 ```
 
@@ -49138,13 +49146,13 @@ modes = underwater.normal_modes(50.0, [0.0, 200.0], [1500.0, 1500.0],
 print(modes.wavenumbers.size, "propagating modes")
 field = underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1500.0],
                               source_depth=50.0, max_range=20e3)
-field.plot()  # TL field over range x depth (needs matplotlib)
+field.plot()  # PL field over range x depth (needs matplotlib)
 ```
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
-`transmission_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
+`propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
 `travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`transmission_loss` field). All assume a range-independent water column with a pressure-release
+`propagation_loss` field). All assume a range-independent water column with a pressure-release
 surface, and the bottom is pressure-release too (or, for the modes, optionally
 rigid): there is no absorbing or elastic bottom, no sediment attenuation and
 no real bathymetry, so range-dependent problems are out of scope. For the
@@ -49179,7 +49187,7 @@ $$
 
 each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
-transmission loss follows as $TL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
+propagation loss follows as $PL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
 differences (a symmetric tridiagonal eigenproblem) on a grid refined enough
 to keep the near-cutoff eigenvalues honest, and warns when a retained mode
@@ -49302,13 +49310,13 @@ import numpy as np
 from phonometry import underwater
 
 # Free field: in a 5000 m isovelocity column, before any boundary is felt,
-# the PE must reproduce spherical spreading, TL = 20 lg R.
+# the PE must reproduce spherical spreading, PL = 20 lg R.
 field = underwater.parabolic_equation(50.0, [0.0, 5000.0], [1500.0, 1500.0],
                                       source_depth=2500.0, max_range=2000.0,
                                       range_step=10.0)
 iz = np.argmin(np.abs(field.depths - 2500.0))
 ir = np.argmin(np.abs(field.ranges - 1000.0))
-print(round(float(field.transmission_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
+print(round(float(field.propagation_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
 ```
 
 and it does so to about $10^{-4}$ dB at the default range step.
@@ -49352,14 +49360,14 @@ and the bottom (or in the SOFAR channel) that can only expand in range. The
 physically of the order of the water (or channel) depth: spherical while the
 wavefront has not yet filled the duct, cylindrical once it has. In the 10 kHz
 example of the
-[transmission-loss section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) the choice is not
+[propagation-loss section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) the choice is not
 cosmetic: against the same figure of merit of 87 dB, spherical-only spreading
 predicts detection out to about 8.7 km while the practical law with
 $R_0 = 1000$ m stretches it to about 15.8 km. When the spreading law is the
 biggest uncertainty in the budget, that is the cue to stop using a closed
 form and compute the field.
 
-**Closed form or solver.** The closed-form transmission loss knows nothing of
+**Closed form or solver.** The closed-form propagation loss knows nothing of
 the sound-speed profile, the seabed or the surface; it is honest for short,
 direct, boundary-free paths and for first-cut sonar budgets. When refraction
 and boundaries decide the answer, pick the solver by frequency and geometry
@@ -49369,7 +49377,7 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 |---|---|---|
 | `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones; cost independent of frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field PL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
@@ -49382,11 +49390,11 @@ convergence test.
 gain and an 8 dB detection threshold give the figure of merit
 $FOM = 140 - (60 - 15) - 8 = 87$ dB computed by `passive_sonar_equation` in
 the [sonar-equation section](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) of the propagation
-guide. The transmission-loss curve of that guide's first section (10 °C,
+guide. The propagation-loss curve of that guide's first section (10 °C,
 35 ppt, 100 m, $\alpha = 0.95$ dB/km) crosses 87 dB at about 15.8 km with the
 practical law: that crossing *is* the predicted detection range, and every
 term of the budget moves it. Trim the directivity index to 7.5 dB and the
-figure of merit falls to 79.5 dB, so the range drops to wherever the TL
+figure of merit falls to 79.5 dB, so the range drops to wherever the PL
 curve crosses that value; double the frequency to 20 kHz and $\alpha$ more
 than triples to 3.3 dB/km, pulling the crossing sharply inward. This
 coupling between the absorption model, the spreading law and the sonar
@@ -49401,15 +49409,15 @@ frequency and deep water (ray-path geometry, travel times and convergence
 zones at a cost independent of frequency), normal modes for low frequency in
 shallow water (few propagating modes, $m < kD/\pi$, the reference solution for
 its regime) and the parabolic equation for low-frequency, long one-way paths
-(the full TL($z$, $r$) field with refraction). When two solvers agree on a
+(the full PL($z$, $r$) field with refraction). When two solvers agree on a
 case, that agreement is the practical convergence test.
 
-### When is a closed-form transmission loss no longer enough?
+### When is a closed-form propagation loss no longer enough?
 
 When refraction or boundaries decide the answer: a sound-speed minimum that
 traps energy (the SOFAR channel), surface and bottom reflections in shallow
 water, or a detection range that swings with the choice of spreading law.
-The closed form $TL = \text{spreading} + \alpha R$ is honest for short,
+The closed form $PL = \text{spreading} + \alpha R$ is honest for short,
 direct, boundary-free paths and first-cut sonar budgets; beyond that,
 compute the field.
 
@@ -49419,7 +49427,7 @@ compute the field.
   forms these solvers replace when refraction and boundaries matter, and
   the sound-speed profiles they consume.
 - [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/):
-  the ISO 18405 reference levels every transmission loss here is expressed
+  the ISO 18405 reference levels every propagation loss here is expressed
   in.
 - [Atmospheric refraction: rays and the GFPE](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/):
   the airborne siblings of these solvers, with the same ray bending and a
@@ -49458,7 +49466,7 @@ implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 closed forms: the ideal pressure-release waveguide's exact modes, the
 circular-arc ray paths of a linear sound-speed gradient, free-field
 spherical spreading for the PE, and the mutual agreement of the modal and
-PE transmission loss.
+PE propagation loss.
 
 ---
 

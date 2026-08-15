@@ -196,7 +196,7 @@ print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 ```
 
 That value is the hearing threshold $HT$ in Ainslie's orca-versus-salmon
-example. An echolocating orca is an active sonar: it pays the transmission loss
+example. An echolocating orca is an active sonar: it pays the propagation loss
 twice, so with a source level $SL = 198.2$ dB re 1 µPa²m², a salmon target
 strength $TS = -29.0$ dB re m² and its own hearing threshold in place of a
 detection threshold, the hearing-limited figure of merit is
@@ -404,7 +404,7 @@ above satisfies row by row.
 
 ## A worked pile-driving assessment
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure.svg" alt="The exposure-assessment configuration: a pile driven by an impact hammer, a calibrated hydrophone at the ISO 18406 range of 750 metres where the band sound exposure level is measured, the receiving animal further out at range R with the transmission loss between them, the three processing steps from per-band exposure through the auditory weighting to the accumulation over strikes, and a plan view of the two isopleths of the dual metric with the larger one governing" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure.svg" alt="The exposure-assessment configuration: a pile driven by an impact hammer, a calibrated hydrophone at the ISO 18406 range of 750 metres where the band sound exposure level is measured, the receiving animal further out at range R with the propagation loss between them, the three processing steps from per-band exposure through the auditory weighting to the accumulation over strikes, and a plan view of the two isopleths of the dual metric with the larger one governing" width="92%" />
 
 Percussive pile driving is the canonical impulsive case. The chain runs from
 the recorded strike to the verdict:
@@ -553,16 +553,16 @@ exceeds its own, with the larger of the two governing.
 
 The bridge from this page to that radius runs through the propagation guide.
 Take the band SEL at the range it was measured at — 750 m, per ISO 18406 —
-propagate it to a trial range with `transmission_loss` at each band centre,
+propagate it to a trial range with `propagation_loss` at each band centre,
 re-run `weighted_exposure` on the propagated spectrum for the strike count of
 the campaign, and read off the range where `sel_margin` crosses zero. Then
 repeat for the flat peak, where only the single-trip loss applies.
 
 ```python
 def band_loss(r):
-    """Per-band transmission loss at range r, in 30 m of water."""
-    return np.array([float(underwater.transmission_loss(
-        r, float(f), law="practical", transition_range=30.0).tl[0])
+    """Per-band propagation loss at range r, in 30 m of water."""
+    return np.array([float(underwater.propagation_loss(
+        r, float(f), law="practical", transition_range=30.0).pl[0])
         for f in spectrum.frequencies])
 
 reference = band_loss(750.0)          # the range the strike was measured at
@@ -633,6 +633,6 @@ propagation](/phonometry/underwater/underwater-propagation/).
   the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
   feed this page.
 - [Underwater sound propagation](/phonometry/underwater/underwater-propagation/):
-  the transmission loss and figure-of-merit machinery that turns a criterion
+  the propagation loss and figure-of-merit machinery that turns a criterion
   into a range.
 - API reference: [`underwater.bioacoustics.weighting`](/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](/phonometry/reference/api/underwater/audiograms/).

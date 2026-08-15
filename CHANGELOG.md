@@ -1155,6 +1155,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The underwater domain calls its propagation quantity by the name the standard
+  gives it. ISO 18405:2017 defines *propagation loss* in 3.4.1.4 as the
+  difference between the source level in a specified direction and the
+  mean-square sound pressure level at a specified position, `N_PL(x) = L_S -
+  L_p(x)`, which is exactly what this library computes; *transmission loss* is
+  a different quantity, the reduction in a specified level between two
+  specified points (3.4.1.3), and Note 6 to that entry says using it as a
+  synonym of propagation loss "is deprecated". Note 7 under 3.4.1.4 deprecates
+  the reverse substitution too. The domain named its function and its results
+  after the deprecated synonym while citing ISO 18405 on the same pages as the
+  source of its definitions.
+
+  So `underwater.transmission_loss` is now `underwater.propagation_loss`,
+  `TransmissionLossResult` is `PropagationLossResult` and its `.tl` field is
+  `.pl`, and the `.transmission_loss` attribute of every underwater result
+  (sonar equation, detection range, normal modes, parabolic equation) is
+  `.propagation_loss`, as are the arguments of `passive_sonar_equation`,
+  `active_sonar_equation` and `detection_range_from_curve`. The symbol follows
+  in the prose, the figures and the diagrams: `PL`, or `N_PL` where the ISO
+  level symbol is meant, never `TL`. `underwater_transmission_loss.svg` is
+  `underwater_propagation_loss.svg`. Weston's regimes already returned a
+  `propagation_loss` and are untouched.
+
+  There are no aliases and no deprecation warnings. An alias would preserve the
+  spelling this change exists to remove, and a reader who kept it would keep
+  reading a name the standard deprecates.
+
+  Noise control and building acoustics keep `transmission_loss`: for a
+  silencer, a partition or an aperture that is the correct term for the
+  reduction between two points, which is 3.4.1.3 rather than 3.4.1.4. The
+  collision this resolves was real and silent: `phonometry.transmission_loss`
+  used to resolve to the ocean function and shadow
+  `phonometry.noise_control.transmission_loss`, so a reader following the
+  silencer guide got a four-pole call answered by a spreading law. The
+  top-level name is now the noise-control one.
+- Fourteen names a domain exported publicly were missing from
+  `phonometry.__all__`, and the API reference renders `phonometry.__all__`, so
+  none of them had a page. Thirteen are now exported at the top level and
+  documented: the six four-pole primitives the silencer guide teaches by name
+  (`insertion_loss`, `cascade`, `duct_matrix`, `shunt_matrix`,
+  `helmholtz_impedance`, `quarter_wave_impedance`, alongside the
+  `transmission_loss` the previous entry rebound), the bending-wave speeds,
+  beam impedance and rod mobility of `vibration.structural.point_mobility`
+  (`beam_bending_wave_speed`, `plate_bending_wave_speed`,
+  `infinite_beam_impedance`, `longitudinal_rod_mobility`),
+  `plot_metadiffuser_panel_geometry`, `EnvironmentalMeasurementWarning` and
+  `DeclarationForm`. Exporting them rather than teaching the generator to
+  render domain-level `__all__` keeps the invariant the reference states on its
+  own top-level page, that every public name can be imported straight from
+  `phonometry`; the alternative would have documented the invariant as broken
+  and left the curated quick table, whose gate reads the same list, blind to
+  all thirteen.
+
+  The fourteenth, `environment`'s `expanded_uncertainty`, deliberately stays
+  where it is. Three domains define an expanded uncertainty over their own
+  coverage factors, the top level already qualifies each of them
+  (`environmental_expanded_uncertainty`, `insulation_expanded_uncertainty`),
+  and claiming the unqualified name for one of the three would recreate exactly
+  the shadowing the previous entry removes. Its docstring now says so, and the
+  reference documents the function under the qualified name.
+
 - Every entry of `docs/ERRATA.md` was checked again against the page it
   quotes, and the registry now cites the document rather than a file. A
   citation is the edition, the PDF page index and the printed folio, which any

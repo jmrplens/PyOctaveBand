@@ -42,6 +42,10 @@ declaration is most often built from a measured sound power via
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## DeclarationForm
+
+*Constant* (`typing._LiteralGenericAlias`).
+
 ## NoiseEmissionDeclaration
 
 ```python

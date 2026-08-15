@@ -198,8 +198,8 @@ print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 ```
 
 Ese valor es el umbral de audición $HT$ del ejemplo de orca frente a salmón de
-Ainslie. Una orca que ecolocaliza es un sonar activo: paga la pérdida por
-transmisión dos veces, así que con un nivel de fuente
+Ainslie. Una orca que ecolocaliza es un sonar activo: paga la pérdida de
+propagación dos veces, así que con un nivel de fuente
 $SL = 198{,}2$ dB re 1 µPa²m², una fuerza de blanco del salmón
 $TS = -29{,}0$ dB re m² y su propio umbral de audición en lugar de un umbral de
 detección, la figura de mérito limitada por audición es
@@ -412,7 +412,7 @@ que la tabla de arriba cumple fila a fila.
 
 ## Una evaluación resuelta de hincado de pilotes
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure_es.svg" alt="La configuración de la evaluación de exposición: un pilote hincado por un martillo de impacto, un hidrófono calibrado a la distancia de 750 metros de la ISO 18406 donde se mide el nivel de exposición sonora por bandas, el animal receptor más lejos a la distancia R con la pérdida por transmisión entre ambos, los tres pasos de proceso desde la exposición por bandas hasta la ponderación auditiva y la acumulación sobre los golpes, y una vista en planta con las dos isopletas de la métrica dual y la mayor gobernando" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_marine_mammal_exposure_es.svg" alt="La configuración de la evaluación de exposición: un pilote hincado por un martillo de impacto, un hidrófono calibrado a la distancia de 750 metros de la ISO 18406 donde se mide el nivel de exposición sonora por bandas, el animal receptor más lejos a la distancia R con la pérdida de propagación entre ambos, los tres pasos de proceso desde la exposición por bandas hasta la ponderación auditiva y la acumulación sobre los golpes, y una vista en planta con las dos isopletas de la métrica dual y la mayor gobernando" width="92%" />
 
 El hincado percusivo de pilotes es el caso impulsivo canónico. La cadena va del
 golpe registrado al veredicto:
@@ -569,7 +569,7 @@ la mayor de las dos.
 
 El puente de esta página a ese radio pasa por la guía de propagación. Toma el
 SEL por bandas a la distancia a la que se midió (750 m, según la ISO 18406),
-propágalo a una distancia de prueba con `transmission_loss` en cada frecuencia
+propágalo a una distancia de prueba con `propagation_loss` en cada frecuencia
 central de banda, vuelve a ejecutar `weighted_exposure` sobre el espectro
 propagado con el número de golpes de la campaña y lee la distancia en la que
 `sel_margin` cruza el cero. Después repítelo para el pico plano, donde solo se
@@ -577,9 +577,9 @@ aplica la pérdida de ida.
 
 ```python
 def band_loss(r):
-    """Pérdida por transmisión por bandas a la distancia r, en 30 m de agua."""
-    return np.array([float(underwater.transmission_loss(
-        r, float(f), law="practical", transition_range=30.0).tl[0])
+    """Pérdida de propagación por bandas a la distancia r, en 30 m de agua."""
+    return np.array([float(underwater.propagation_loss(
+        r, float(f), law="practical", transition_range=30.0).pl[0])
         for f in spectrum.frequencies])
 
 reference = band_loss(750.0)          # la distancia a la que se midió el golpe
@@ -652,6 +652,6 @@ sonido](/phonometry/es/underwater/underwater-propagation/).
   los niveles de referencia de la ISO 18405 y la exposición por hincado de la
   ISO 18406 que alimentan esta página.
 - [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/):
-  la pérdida por transmisión y la maquinaria de figura de mérito que convierte un
+  la pérdida de propagación y la maquinaria de figura de mérito que convierte un
   criterio en una distancia.
 - Referencia de la API: [`underwater.bioacoustics.weighting`](/phonometry/es/reference/api/underwater/weighting/) y [`underwater.bioacoustics.audiograms`](/phonometry/es/reference/api/underwater/audiograms/).

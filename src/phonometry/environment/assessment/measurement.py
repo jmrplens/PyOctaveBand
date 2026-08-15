@@ -463,6 +463,14 @@ def expanded_uncertainty(
 
     Coverage factor :math:`k = 2` for 95 % or :math:`k = 1.3` for 80 %.
 
+    .. note::
+
+       Three domains define an expanded uncertainty over their own coverage
+       factors, so the package top level qualifies each of them: this one is
+       ``phonometry.environmental_expanded_uncertainty``, the building one is
+       :func:`~phonometry.insulation_expanded_uncertainty`. Inside
+       ``phonometry.environment`` the plain name is unambiguous and stays.
+
     :param standard_uncertainty: Combined standard uncertainty ``u``, in dB.
     :param confidence: Coverage probability (0.95 or 0.80).
     :return: The expanded uncertainty ``U``, in dB.

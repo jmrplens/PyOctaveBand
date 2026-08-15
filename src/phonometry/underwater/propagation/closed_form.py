@@ -1,9 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 r"""
-Underwater sound propagation: transmission loss (closed-form).
+Underwater sound propagation: propagation loss (closed-form).
 
-Transmission loss ``TL`` (dB) is the sum of geometrical spreading and volume
-absorption:
+Propagation loss ``PL``, :math:`N_\mathrm{PL}` (dB) is the difference between
+the source level in a given direction and the mean-square sound pressure level
+at the receiver, :math:`N_\mathrm{PL}(x) = L_S - L_p(x)` (ISO 18405:2017,
+3.4.1.4). Here it is the sum of geometrical spreading and volume absorption:
 
 * :func:`spreading_loss` -- geometrical spreading, :math:`20 \log_{10} R`
   (spherical), :math:`10 \log_{10} R` (cylindrical) or spherical-then-cylindrical
@@ -13,9 +15,13 @@ absorption:
   dB/km, from three coexisting formulations selectable through ``model``:
   Francois & Garrison (1982, the default and reference), Ainslie & McColm (1998,
   a legible simplification of it) and Thorp (1967, a frequency-only form).
-* :func:`transmission_loss` -- the total
-  :math:`\mathrm{TL} = \text{spreading} + \alpha R` versus range,
-  returned as a :class:`TransmissionLossResult` with a ``.plot()``.
+* :func:`propagation_loss` -- the total
+  :math:`\mathrm{PL} = \text{spreading} + \alpha R` versus range,
+  returned as a :class:`PropagationLossResult` with a ``.plot()``.
+
+Not *transmission loss*, which ISO 18405:2017, 3.4.1.3 reserves for the
+reduction in a specified level between two specified points and whose Note 6 to
+entry deprecates as a synonym of this quantity.
 
 Sources (clean-room, implemented from the published equations): Francois &
 Garrison, JASA 72 (1982) via Medwin & Clay; Ainslie & McColm, JASA 103 (1998);
@@ -181,11 +187,11 @@ def seawater_absorption(
 
 
 @dataclass(frozen=True)
-class TransmissionLossResult:
-    r"""Transmission loss versus range (closed-form).
+class PropagationLossResult:
+    r"""Propagation loss versus range (closed-form).
 
     :ivar range_m: Ranges from the source, in metres.
-    :ivar tl: Total transmission loss per range, in dB.
+    :ivar pl: Total propagation loss per range, in dB.
     :ivar spreading: Geometrical-spreading contribution per range, in dB.
     :ivar absorption: Volume-absorption contribution per range, in dB.
     :ivar frequency: The acoustic frequency, in Hz.
@@ -196,7 +202,7 @@ class TransmissionLossResult:
     """
 
     range_m: NDArray[np.float64]
-    tl: NDArray[np.float64]
+    pl: NDArray[np.float64]
     spreading: NDArray[np.float64]
     absorption: NDArray[np.float64]
     frequency: float
@@ -205,14 +211,14 @@ class TransmissionLossResult:
     model: str
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the transmission loss versus range with its two contributions."""
+        """Plot the propagation loss versus range with its two contributions."""
         from ..._i18n import check_language
-        from ..._plot.underwater import plot_transmission_loss
+        from ..._plot.underwater import plot_propagation_loss
 
-        return plot_transmission_loss(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_propagation_loss(self, ax=ax, language=check_language(language), **kwargs)
 
 
-def transmission_loss(
+def propagation_loss(
     range_m: NDArray[np.float64] | list[float] | float,
     frequency_hz: float,
     *,
@@ -223,9 +229,9 @@ def transmission_loss(
     ph: float = 8.0,
     model: str = "francois-garrison",
     transition_range: float | None = None,
-) -> TransmissionLossResult:
-    r"""Total transmission loss
-    :math:`\mathrm{TL} = \text{spreading} + \alpha R` versus range.
+) -> PropagationLossResult:
+    r"""Total propagation loss
+    :math:`\mathrm{PL} = \text{spreading} + \alpha R` versus range.
 
     :param range_m: Range(s) from the source, in metres (scalar or array).
     :param frequency_hz: Acoustic frequency, in Hz.
@@ -236,7 +242,7 @@ def transmission_loss(
     :param ph: Acidity (default 8).
     :param model: Absorption model (see :func:`seawater_absorption`).
     :param transition_range: Transition range for the ``"practical"`` law, in m.
-    :return: A :class:`TransmissionLossResult`.
+    :return: A :class:`PropagationLossResult`.
     :raises ValueError: If the inputs are invalid.
     """
     f = _positive(frequency_hz, "frequency_hz")
@@ -248,9 +254,9 @@ def transmission_loss(
         )[0]
     )
     absorption = alpha * (r / _M_PER_KM)
-    return TransmissionLossResult(
+    return PropagationLossResult(
         range_m=r,
-        tl=spreading + absorption,
+        pl=spreading + absorption,
         spreading=spreading,
         absorption=absorption,
         frequency=f,

@@ -33,7 +33,7 @@ import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-La pérdida por transmisión en forma cerrada de la
+La pérdida de propagación en forma cerrada de la
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
 no sabe nada del perfil de velocidad del sonido, del fondo ni de la
 superficie. Cuando la refracción y los contornos deciden la respuesta, el
@@ -50,7 +50,7 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
 
 - **`normal_modes`** resuelve el problema de autovalores de Sturm-Liouville
   separado en profundidad por diferencias finitas y suma los modos
-  propagantes en la pérdida por transmisión. Validado contra los modos
+  propagantes en la pérdida de propagación. Validado contra los modos
   exactos de la guía de ondas ideal (de presión nula).
 - **`ray_trace`** integra las ecuaciones de trayectoria de rayos
   (Runge-Kutta, vectorizadas sobre todos los rayos a la vez) a través de un
@@ -61,10 +61,10 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   ellos.
 - **`parabolic_equation`** hace avanzar en distancia la PE estándar (Tappert)
   con el algoritmo split-step de Fourier. Validado contra la divergencia esférica en campo
-  libre; coincide en tendencia con la pérdida por transmisión de los modos
+  libre; coincide en tendencia con la pérdida de propagación de los modos
   normales.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_es.webp" alt="Un perfil de velocidad del sonido de Munk, trayectorias de rayos formando zonas de convergencia, y la pérdida por transmisión de modos normales frente a la ecuación parabólica coincidiendo en tendencia" width="100%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_es.webp" alt="Un perfil de velocidad del sonido de Munk, trayectorias de rayos formando zonas de convergencia, y la pérdida de propagación de modos normales frente a la ecuación parabólica coincidiendo en tendencia" width="100%" loading="eager" />
 
 *Tres paneles, tres preguntas distintas sobre la misma agua. A la izquierda,
 rayos en un perfil de Munk cuyo mínimo es de 1500,0 m/s a 1271 m frente a los
@@ -113,10 +113,10 @@ pe = underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1530.0],
                                    source_depth=30.0, max_range=20e3,
                                    range_step=20.0, n_depth_points=512)
 zi = int(np.argmin(np.abs(pe.depths - 120.0)))
-axes[2].plot(nm.ranges / 1000.0, nm.transmission_loss, label="Modos normales")
-axes[2].plot(pe.ranges / 1000.0, pe.transmission_loss[zi], label="PE")
+axes[2].plot(nm.ranges / 1000.0, nm.propagation_loss, label="Modos normales")
+axes[2].plot(pe.ranges / 1000.0, pe.propagation_loss[zi], label="PE")
 axes[2].invert_yaxis()
-axes[2].set(xlabel="Distancia [km]", ylabel="Pérdida por transmisión [dB]")
+axes[2].set(xlabel="Distancia [km]", ylabel="Pérdida de propagación [dB]")
 axes[2].legend()
 plt.show()
 ```
@@ -142,13 +142,13 @@ modes = underwater.normal_modes(50.0, [0.0, 200.0], [1500.0, 1500.0],
 print(modes.wavenumbers.size, "modos propagantes")
 field = underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1500.0],
                               source_depth=50.0, max_range=20e3)
-field.plot()  # campo TL sobre distancia x profundidad
+field.plot()  # campo PL sobre distancia x profundidad
 ```
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
-`mode_functions`, `transmission_loss`); `ray_trace` un `RayTraceResult`
+`mode_functions`, `propagation_loss`); `ray_trace` un `RayTraceResult`
 (`ranges`, `depths` y `travel_times` por rayo); `parabolic_equation` un
-`ParabolicEquationResult` (el campo `transmission_loss`). Los tres difieren en
+`ParabolicEquationResult` (el campo `propagation_loss`). Los tres difieren en
 lo que aproximan, no en lo que modelan, así que elegir entre ellos es una
 cuestión de régimen: la tabla de la sección 5 es la respuesta corta.
 
@@ -181,7 +181,7 @@ $$
 
 cada modo ponderado por su excitación en la profundidad de la fuente
 $\Psi_m(z_s)$ y su amplitud en la del receptor $\Psi_m(z)$, y la pérdida
-por transmisión coherente sale como $TL = -20 \log_{10}\,\lvert
+de propagación coherente sale como $PL = -20 \log_{10}\,\lvert
 p(r,z)/p_0(1\,\mathrm{m})\rvert$ (Ec. 5.15). `normal_modes` discretiza la
 ecuación en profundidad por diferencias finitas (un problema de autovalores
 tridiagonal simétrico) sobre una malla lo bastante fina para mantener
@@ -210,7 +210,7 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  kr1 calculado
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exacto
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/normal_modes_es.svg" alt="A la izquierda, las cuatro primeras funciones modales de una guía de ondas isovelocidad de 200 metros a 50 hercios dibujadas frente a la profundidad, cada una rotulada con su número de onda horizontal calculado y exacto, con la profundidad de fuente de 50 metros marcada; en el centro, el número de modos propagantes frente a la frecuencia de 10 a 200 hercios como una escalera que sigue la recta kD partido por pi; a la derecha, la pérdida por transmisión modal frente a la distancia a la profundidad de receptor de 100 metros" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/normal_modes_es.svg" alt="A la izquierda, las cuatro primeras funciones modales de una guía de ondas isovelocidad de 200 metros a 50 hercios dibujadas frente a la profundidad, cada una rotulada con su número de onda horizontal calculado y exacto, con la profundidad de fuente de 50 metros marcada; en el centro, el número de modos propagantes frente a la frecuencia de 10 a 200 hercios como una escalera que sigue la recta kD partido por pi; a la derecha, la pérdida de propagación modal frente a la distancia a la profundidad de receptor de 100 metros" width="92%" />
 
 *El modo $m$ tiene $m-1$ ceros interiores, y la profundidad de la fuente decide
 qué modos existen siquiera en el campo: el cuarto modo tiene un cero justo a
@@ -259,7 +259,7 @@ Esa guía de ondas ideal cumple dos papeles, y no conviene confundirlos. Es el
 oráculo exacto contra el que se comprueba el cálculo, que es para lo que se
 usa aquí, y es además un fondo físicamente *extremo*: un lecho de presión nula
 refleja con módulo unidad e inversión de fase, así que no transmite nada al
-sedimento y no absorbe nada. Una pérdida por transmisión modal o PE calculada
+sedimento y no absorbe nada. Una pérdida de propagación modal o PE calculada
 sobre él subestima, por tanto, la pérdida de cualquier fondo marino real, y la
 diferencia se ensancha con el alcance porque se acumula rebote a rebote. La
 opción rígida es el extremo contrario, ofrecida por la misma razón de validación
@@ -416,20 +416,20 @@ from phonometry import underwater
 
 # Campo libre: en una columna isovelocidad de 5000 m, antes de sentir
 # ningún contorno, la PE debe reproducir la divergencia esférica,
-# TL = 20 lg R.
+# PL = 20 lg R.
 field = underwater.parabolic_equation(50.0, [0.0, 5000.0], [1500.0, 1500.0],
                                       source_depth=2500.0, max_range=2000.0,
                                       range_step=10.0)
 iz = np.argmin(np.abs(field.depths - 2500.0))
 ir = np.argmin(np.abs(field.ranges - 1000.0))
-print(round(float(field.transmission_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
+print(round(float(field.propagation_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
 ```
 
 y lo hace hasta unos $10^{-4}$ dB con el paso de distancia por defecto. Esa es
 la comprobación que la PE no puede fallar: campo libre, sin contornos, sin
 energía empinada. El límite paraxial solo se ve donde faltan esas tres cosas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pe_paraxial_error_es.svg" alt="A la izquierda, la pérdida por transmisión frente a la distancia en un receptor a 60 metros en una guía de ondas de 100 metros a 50 hercios, calculada con modos normales y con la ecuación parabólica, ambas dibujadas tenues en su estructura fina y marcadas en sus promedios en distancia, con la ecuación parabólica dando 1,6 decibelios más de pérdida a cualquier distancia; a la derecha, los ángulos rasantes modales de los seis modos propagantes como barras frente a la banda paraxial de más menos 20 grados, con cuatro de ellos fuera" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pe_paraxial_error_es.svg" alt="A la izquierda, la pérdida de propagación frente a la distancia en un receptor a 60 metros en una guía de ondas de 100 metros a 50 hercios, calculada con modos normales y con la ecuación parabólica, ambas dibujadas tenues en su estructura fina y marcadas en sus promedios en distancia, con la ecuación parabólica dando 1,6 decibelios más de pérdida a cualquier distancia; a la derecha, los ángulos rasantes modales de los seis modos propagantes como barras frente a la banda paraxial de más menos 20 grados, con cuatro de ellos fuera" width="92%" />
 
 *En una guía de ondas de 100 m a 50 Hz, cuatro de los seis modos propagantes
 salen de la fuente a 27°, 37°, 49° y 64°: fuera de la banda para la que está
@@ -456,27 +456,27 @@ pe_field = underwater.parabolic_equation(50.0, [0.0, 100.0], [1500.0, 1500.0],
                                          source_depth=30.0, max_range=6000.0,
                                          range_step=5.0, n_depth_points=1024)
 iz2 = int(np.argmin(np.abs(pe_field.depths - 60.0)))
-pe_tl = np.interp(r, pe_field.ranges, pe_field.transmission_loss[iz2])
+pe_pl = np.interp(r, pe_field.ranges, pe_field.propagation_loss[iz2])
 
-def range_average(tl, width=61):        # incoherente, en el dominio de la energía
-    return -10.0 * np.log10(np.convolve(10.0 ** (-tl / 10.0),
+def range_average(pl, width=61):        # incoherente, en el dominio de la energía
+    return -10.0 * np.log10(np.convolve(10.0 ** (-pl / 10.0),
                                         np.ones(width) / width, mode="same"))
 
 inner = (r > 300.0) & (r < 5700.0)
-sm_nm = range_average(np.asarray(modes.transmission_loss))
-sm_pe = range_average(pe_tl)
+sm_nm = range_average(np.asarray(modes.propagation_loss))
+sm_pe = range_average(pe_pl)
 print(round(float(np.mean(sm_pe[inner] - sm_nm[inner])), 2))   # 1.64 dB
 
-fig, (ax_tl, ax_ang) = plt.subplots(1, 2, figsize=(13.5, 5.6),
+fig, (ax_pl, ax_ang) = plt.subplots(1, 2, figsize=(13.5, 5.6),
                                     gridspec_kw={"width_ratios": [2, 1]})
-ax_tl.plot(r / 1000.0, modes.transmission_loss, alpha=0.35)
-ax_tl.plot(r / 1000.0, pe_tl, alpha=0.35)
-ax_tl.plot(r[inner] / 1000.0, sm_nm[inner], label="Modos normales, promediado")
-ax_tl.plot(r[inner] / 1000.0, sm_pe[inner], label="PE, promediada")
-ax_tl.set_ylim(30.0, 92.0)
-ax_tl.invert_yaxis()
-ax_tl.set(xlabel="Distancia [km]", ylabel="Pérdida por transmisión [dB]")
-ax_tl.legend()
+ax_pl.plot(r / 1000.0, modes.propagation_loss, alpha=0.35)
+ax_pl.plot(r / 1000.0, pe_pl, alpha=0.35)
+ax_pl.plot(r[inner] / 1000.0, sm_nm[inner], label="Modos normales, promediado")
+ax_pl.plot(r[inner] / 1000.0, sm_pe[inner], label="PE, promediada")
+ax_pl.set_ylim(30.0, 92.0)
+ax_pl.invert_yaxis()
+ax_pl.set(xlabel="Distancia [km]", ylabel="Pérdida de propagación [dB]")
+ax_pl.legend()
 
 k0 = 2.0 * np.pi * 50.0 / 1500.0
 grazing = np.degrees(np.arccos(np.clip(modes.wavenumbers / k0, -1.0, 1.0)))
@@ -578,14 +578,14 @@ expandirse en distancia. La ley `"practical"` empalma ambos en una distancia
 de transición $R_0$, físicamente del orden de la profundidad del agua (o del
 canal): esférico mientras el frente no ha llenado el conducto, cilíndrico
 cuando ya lo ha hecho. En el ejemplo de 10 kHz de la
-[sección de pérdida por transmisión](/phonometry/es/underwater/underwater-propagation/#perdida-por-transmision)
+[sección de pérdida de propagación](/phonometry/es/underwater/underwater-propagation/#perdida-de-propagacion)
 la elección no es cosmética: frente a la misma figura de mérito de 87 dB, la
 divergencia solo esférica predice detección hasta unos 8,7 km, mientras
 que la ley práctica con $R_0 = 1000$ m la estira hasta unos 15,8 km. Cuando
 la ley de divergencia es la mayor incertidumbre del presupuesto, esa es
 la señal de dejar la forma cerrada y calcular el campo.
 
-**¿Forma cerrada o cálculo numérico?** La pérdida por transmisión en forma cerrada no
+**¿Forma cerrada o cálculo numérico?** La pérdida de propagación en forma cerrada no
 sabe nada del perfil de velocidad del sonido, del fondo ni de la superficie;
 es honesta para caminos cortos, directos y sin contornos, y para presupuestos
 de sonar de primera pasada. Cuando la refracción y los contornos deciden la
@@ -596,7 +596,7 @@ cap. 1):
 |---|---|---|
 | `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | PL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
@@ -613,8 +613,8 @@ Encadenando las piezas de punta a punta: una fuente de 140 dB re 1 µPa²/Hz a
 $FOM = 140 - (60 - 15) - 8 = 87$ dB, que calcula `passive_sonar_equation` en la
 [sección de la ecuación del sonar](/phonometry/es/underwater/underwater-propagation/#ecuacion-del-sonar)
 de la guía de propagación. Cada término mueve después el cruce de la curva de
-pérdida por transmisión de la
-[sección de pérdida por transmisión](/phonometry/es/underwater/underwater-propagation/#perdida-por-transmision)
+pérdida de propagación de la
+[sección de pérdida de propagación](/phonometry/es/underwater/underwater-propagation/#perdida-de-propagacion)
 de esa guía (10 °C, 35 ppt, 100 m), y ese cruce *es* la distancia de detección
 predicha.
 
@@ -623,7 +623,7 @@ import numpy as np
 
 env = {"temperature": 10.0, "salinity": 35.0, "depth": 100.0}
 se = underwater.passive_sonar_equation(
-    source_level=140.0, transmission_loss=np.linspace(40.0, 120.0, 400),
+    source_level=140.0, propagation_loss=np.linspace(40.0, 120.0, 400),
     noise_level=60.0, directivity_index=15.0, detection_threshold=8.0)
 print(se.figure_of_merit)                                    # 87.0 dB
 
@@ -634,7 +634,7 @@ for law, r0 in (("spherical", None), ("practical", 1000.0)):
 
 # Dos maneras de perderla: la mitad de ganancia de array, o el doble de frecuencia.
 trim = underwater.passive_sonar_equation(
-    source_level=140.0, transmission_loss=np.linspace(40.0, 120.0, 400),
+    source_level=140.0, propagation_loss=np.linspace(40.0, 120.0, 400),
     noise_level=60.0, directivity_index=7.5, detection_threshold=8.0)
 print(trim.figure_of_merit)                                  # 79.5 dB
 print(round(float(underwater.detection_range(
@@ -645,7 +645,7 @@ print(round(float(underwater.detection_range(
     transition_range=1000.0, **env).detection_range) / 1000.0, 1))       # 5.9 km
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_budget_es.svg" alt="Pérdida por transmisión frente a la distancia para tres casos: 10 kilohercios con divergencia solo esférica, 10 kilohercios con la ley práctica y una distancia de transición de un kilómetro, y 20 kilohercios con la misma ley práctica, cruzados por dos rectas horizontales de figura de mérito a 87 y 79,5 decibelios, con cada uno de los seis cruces proyectado sobre el eje de distancias y rotulado, y un recuadro con el nivel de fuente, el nivel de ruido, el índice de directividad y el umbral de detección" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_budget_es.svg" alt="Pérdida de propagación frente a la distancia para tres casos: 10 kilohercios con divergencia solo esférica, 10 kilohercios con la ley práctica y una distancia de transición de un kilómetro, y 20 kilohercios con la misma ley práctica, cruzados por dos rectas horizontales de figura de mérito a 87 y 79,5 decibelios, con cada uno de los seis cruces proyectado sobre el eje de distancias y rotulado, y un recuadro con el nivel de fuente, el nivel de ruido, el índice de directividad y el umbral de detección" width="92%" />
 
 *La misma fuente y el mismo mar, seis respuestas entre 4,1 y 15,8 km. La ley de
 divergencia es la palanca mayor: elegir la esférica sola en lugar de la práctica
@@ -667,8 +667,8 @@ cases = (("10 kHz, solo esférica", 10e3, "spherical", None),
          ("20 kHz, práctica R0 = 1 km", 20e3, "practical", 1000.0))
 for label, freq, law, r0 in cases:
     ax.plot(ranges / 1000.0,
-            underwater.transmission_loss(ranges, freq, law=law,
-                                         transition_range=r0, **env).tl,
+            underwater.propagation_loss(ranges, freq, law=law,
+                                         transition_range=r0, **env).pl,
             label=label)
 for fom in (se.figure_of_merit, trim.figure_of_merit):
     ax.axhline(fom, linewidth=1.4, label=f"FOM = {fom:.1f} dB")
@@ -679,7 +679,7 @@ for fom in (se.figure_of_merit, trim.figure_of_merit):
         ax.plot([r50 / 1000.0], [fom], "o")
 ax.set_ylim(40.0, 126.0)
 ax.invert_yaxis()
-ax.set(xlabel="Distancia [km]", ylabel="Pérdida por transmisión [dB]")
+ax.set(xlabel="Distancia [km]", ylabel="Pérdida de propagación [dB]")
 ax.legend()
 plt.show()
 ```
@@ -711,7 +711,7 @@ forma cerrada exacta: los modos de la guía de ondas ideal de presión nula, los
 rayos en arco de círculo de un gradiente lineal junto con el tiempo de
 propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)) y
 la divergencia esférica en campo libre, más la coincidencia mutua de la
-pérdida por transmisión modal y de la PE.
+pérdida de propagación modal y de la PE.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
@@ -737,7 +737,7 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
   consumen.
 - [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/):
   los niveles de referencia de ISO 18405 en los que se expresa toda pérdida
-  por transmisión de esta página.
+  de propagación de esta página.
 - [Refracción atmosférica: rayos y la GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
   los hermanos aéreos de estos métodos, con la misma curvatura de rayos y
   una PE de función de Green que avanza sobre impedancia de suelo en lugar de
@@ -757,16 +757,16 @@ de propagación y zonas de convergencia a un coste independiente de la
 frecuencia), modos normales para baja frecuencia en aguas someras (pocos modos
 propagantes, $M \approx kD/\pi$,
 la solución de referencia en su régimen) y la ecuación parabólica para caminos
-largos de un solo sentido a baja frecuencia (el campo completo TL($z$,$r$)
+largos de un solo sentido a baja frecuencia (el campo completo PL($z$,$r$)
 con refracción). Cuando dos métodos coinciden en un caso, esa coincidencia
 es la prueba práctica de convergencia.
 
-### ¿Cuándo deja de bastar la pérdida por transmisión en forma cerrada?
+### ¿Cuándo deja de bastar la pérdida de propagación en forma cerrada?
 
 Cuando la refracción o los contornos deciden la respuesta: un mínimo de
 velocidad del sonido que atrapa energía (el canal SOFAR), reflexiones en la
 superficie y el fondo en aguas someras, o una distancia de detección que
 oscila con la elección de la ley de divergencia. La forma cerrada
-$TL = \text{divergencia} + \alpha R$ es honesta para caminos cortos,
+$PL = \text{divergencia} + \alpha R$ es honesta para caminos cortos,
 directos y sin contornos, y para presupuestos de sonar de primera pasada;
 más allá, calcula el campo.

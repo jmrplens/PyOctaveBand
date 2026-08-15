@@ -253,7 +253,7 @@ piling campaign's weighted exposure falls below a criterion.
   the ISO 18405 reference levels and the ISO 18406 pile-driving exposure that
   feed this page.
 - [Underwater sound propagation](underwater-propagation.md):
-  the transmission loss and figure-of-merit machinery that turns a criterion
+  the propagation loss and figure-of-merit machinery that turns a criterion
   into a range.
 - API reference: [`underwater.bioacoustics.weighting`](https://jmrplens.github.io/phonometry/reference/api/underwater/weighting/) and [`underwater.bioacoustics.audiograms`](https://jmrplens.github.io/phonometry/reference/api/underwater/audiograms/).
 

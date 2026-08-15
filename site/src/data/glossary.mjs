@@ -3116,21 +3116,18 @@ export const glossary = [
       },
       {
         id: "tl-3",
-        symbol: "TL",
+        symbol: "PL, $N_{PL}$",
         qualifier: {
           en: "underwater",
           es: "submarino",
         },
         unit: "dB",
         standard: "ISO 18405:2017",
-        clause: {
-          en: "3.4.1.3 and 3.4.1.4",
-          es: "3.4.1.3 y 3.4.1.4",
-        },
+        clause: "3.4.1.4",
         guide: "underwater/underwater-propagation",
         definition: {
-          en: "Transmission loss as the sonar equation uses it: the drop between the source level and the level at the receiver, a geometrical spreading law plus the volume absorption $\\alpha R$. Strictly, ISO 18405 calls that quantity propagation loss, $N_{PL} = L_S - L_p(x)$, keeps the name transmission loss for the reduction in level between two stated points, and deprecates using one as a synonym of the other.",
-          es: "Pérdidas por transmisión tal como las usa la ecuación del sonar: la caída entre el nivel de fuente y el nivel en el receptor, una ley de divergencia geométrica más la absorción de volumen $\\alpha R$. En rigor, la ISO 18405 llama a esa magnitud pérdidas por propagación, $N_{PL} = L_S - L_p(x)$, reserva el nombre de pérdidas por transmisión para la reducción de nivel entre dos puntos indicados y desaconseja usar una como sinónimo de la otra.",
+          en: "Propagation loss, the quantity the sonar equation uses: the difference between the source level and the mean-square sound pressure level at the receiver, $N_{PL}(x) = L_S - L_p(x)$, in practice a geometrical spreading law plus the volume absorption $\\alpha R$. Clause 3.4.1.3 keeps the name transmission loss for the reduction in level between two stated points, and both entries deprecate using one name as a synonym of the other, which is why so much of the literature calls this one a transmission loss.",
+          es: "Pérdida de propagación, la magnitud que usa la ecuación del sonar: la diferencia entre el nivel de fuente y el nivel de presión acústica cuadrático medio en el receptor, $N_{PL}(x) = L_S - L_p(x)$, en la práctica una ley de divergencia geométrica más la absorción de volumen $\\alpha R$. El apartado 3.4.1.3 reserva el nombre de pérdida por transmisión para la reducción de nivel entre dos puntos indicados, y ambas entradas desaconsejan usar un nombre como sinónimo del otro, que es la razón de que buena parte de la literatura llame a esta pérdida por transmisión.",
         },
       },
       {

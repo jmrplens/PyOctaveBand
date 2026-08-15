@@ -227,7 +227,7 @@ export const en: HomeContent = {
 			{
 				name: 'Underwater acoustics',
 				href: '/phonometry/underwater/',
-				summary: 'Levels re 1 µPa, ship radiated noise, pile driving, ambient noise, transmission loss.',
+				summary: 'Levels re 1 µPa, ship radiated noise, pile driving, ambient noise, propagation loss.',
 				standards: ['ISO 18405', 'ISO 17208-1/-2', 'ISO 18406', 'JOMOPANS-ECHO'],
 			},
 			{

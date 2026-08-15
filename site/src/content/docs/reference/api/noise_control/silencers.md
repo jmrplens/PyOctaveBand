@@ -92,6 +92,53 @@ they describe the plane-wave mode alone and a measurement will show the rest.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## cascade
+
+```python
+cascade(*matrices: _Complex) -> _Complex
+```
+
+Cascade element four-pole matrices from inlet to outlet.
+
+The compound matrix is the ordered product `T1 @ T2 @ ... @ Tn` (the
+state at the inlet equals the compound matrix times the state at the
+outlet), broadcast over the frequency axis.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `matrices` | One or more `(n_freq, 2, 2)` arrays sharing `n_freq`. |
+
+**Returns:** The compound `(n_freq, 2, 2)` array.
+
+## duct_matrix
+
+```python
+duct_matrix(
+    frequencies: ArrayLike,
+    length: float,
+    area: float,
+    *,
+    speed_of_sound: float = 343.0,
+    density: float = 1.206,
+) -> _Complex
+```
+
+Four-pole matrix of a straight duct (Bies Eq. (8.143), no flow).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Frequencies `f`, Hz (1-D array). |
+| `length` | Duct length `L`, m. |
+| `area` | Cross-sectional area `S`, m2. |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `density` | Air density `rho`, kg/m3. |
+
+**Returns:** A `(n_freq, 2, 2)` complex transfer-matrix array.
+
 ## expansion_chamber
 
 ```python
@@ -181,6 +228,44 @@ limit of the cascade; extensions that would overlap are rejected.
 
 **Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult).
 
+## helmholtz_impedance
+
+```python
+helmholtz_impedance(
+    frequencies: ArrayLike,
+    neck_area: float,
+    neck_length: float,
+    cavity_volume: float,
+    *,
+    resistance: float = 0.0,
+    speed_of_sound: float = 343.0,
+    density: float = 1.206,
+) -> _Complex
+```
+
+Acoustic impedance of a Helmholtz side branch (Bies Eq. (8.152)).
+
+$Z = R + j(\rho \omega l_e / S_{\mathrm{neck}} - \rho c^2 / (\omega V))$ with acoustic
+mass $\rho l_e / S_{\mathrm{neck}}$ and compliance
+$V / (\rho c^2)$; the resonance
+$f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$
+(Bies Eq. (8.46)) is where the
+reactance vanishes and the branch shorts the duct.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Frequencies `f`, Hz (1-D array). |
+| `neck_area` | Neck cross-sectional area `S_neck`, m2. |
+| `neck_length` | Effective neck length `l_e` (with end corrections), m. |
+| `cavity_volume` | Cavity volume `V`, m3. |
+| `resistance` | Acoustic resistance `R`, Pa s/m3 (default 0, lossless). |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `density` | Air density `rho`, kg/m3. |
+
+**Returns:** The complex branch impedance per frequency, Pa s/m3.
+
 ## helmholtz_resonator
 
 ```python
@@ -217,6 +302,37 @@ Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
 | `radiation_impedance` | Optional radiation impedance `Z_r`, Pa s/m3. |
 
 **Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds $f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$.
+
+## insertion_loss
+
+```python
+insertion_loss(
+    transfer_matrix: _Complex,
+    *,
+    source_impedance: ArrayLike,
+    radiation_impedance: ArrayLike,
+) -> NDArray[np.float64]
+```
+
+Insertion loss of a four-pole element for given end impedances.
+
+The attenuation from inserting the element in place of a direct (zero
+length) connection between a source of internal impedance `Z_s` and a
+radiation (termination) impedance `Z_r`:
+
+$$
+\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}} {Z_s + Z_r} \right\rvert.
+$$
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `transfer_matrix` | A `(n_freq, 2, 2)` compound matrix. |
+| `source_impedance` | Source internal acoustic impedance `Z_s`, Pa s/m3 (scalar or per-frequency, real or complex). |
+| `radiation_impedance` | Termination/radiation acoustic impedance `Z_r`, Pa s/m3 (scalar or per-frequency). |
+
+**Returns:** The insertion loss per frequency, dB.
 
 ## plot_silencer_geometry
 
@@ -266,6 +382,38 @@ with its volume annotated.
 | `language` | Label language, `"en"` (default) or `"es"`. |
 
 **Returns:** The axes.
+
+## quarter_wave_impedance
+
+```python
+quarter_wave_impedance(
+    frequencies: ArrayLike,
+    length: float,
+    area: float,
+    *,
+    speed_of_sound: float = 343.0,
+    density: float = 1.206,
+) -> _Complex
+```
+
+Acoustic impedance of a closed quarter-wave side branch (Bies Eq. (8.146)).
+
+$Z = -j (\rho c / S) \cot(k l_e)$; the reactance vanishes at
+$l_e = \lambda / 4$ ($f = c / 4 l_e$), where the closed tube
+presents a
+pressure node and shorts the duct.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Frequencies `f`, Hz (1-D array). |
+| `length` | Effective tube length `l_e` (with end correction), m. |
+| `area` | Tube cross-sectional area `S`, m2. |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `density` | Air density `rho`, kg/m3. |
+
+**Returns:** The complex branch impedance per frequency, Pa s/m3.
 
 ## quarter_wave_resonator
 
@@ -413,3 +561,56 @@ transmission-loss relation.
 | :--- | :--- |
 | ValueError | If `engine` is not `"reportlab"` or `language` is unknown. |
 | ImportError | If reportlab (or, for the figure, matplotlib) is not installed (`pip install phonometry[report]`). |
+
+## shunt_matrix
+
+```python
+shunt_matrix(branch_impedance: ArrayLike) -> _Complex
+```
+
+Four-pole matrix of a side branch of impedance `Z_b` (Bies Eq. (8.144)).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `branch_impedance` | Acoustic impedance `Z_b` of the branch, Pa s/m3 (1-D complex array over frequency). |
+
+**Returns:** A `(n_freq, 2, 2)` complex transfer-matrix array.
+
+## transmission_loss
+
+```python
+transmission_loss(
+    transfer_matrix: _Complex,
+    *,
+    inlet_area: float,
+    outlet_area: float,
+    speed_of_sound: float = 343.0,
+    density: float = 1.206,
+) -> NDArray[np.float64]
+```
+
+Transmission loss of a four-pole element (Munjal Eq. (3.27), no flow).
+
+$$
+\mathrm{TL} = 10 \log_{10}\!\left[(Z_n/Z_1) \frac{1}{4} \lvert T_{11} + T_{12}/Z_n + Z_1 T_{21} + (Z_1/Z_n) T_{22} \rvert^2\right]
+$$
+
+with $Z_1 = \rho c / S_{\mathrm{in}}$ and
+$Z_n = \rho c / S_{\mathrm{out}}$ (Munjal, *Acoustics
+of Ducts and Mufflers* 2nd ed., Eq. (3.27)). Do not "restore" the Bies
+Eq. (8.141) weighting: as printed there the equation fails the
+sudden-expansion limit for unequal port areas (see `docs/ERRATA.md`).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `transfer_matrix` | A `(n_freq, 2, 2)` compound matrix. |
+| `inlet_area` | Inlet pipe area `S_in`, m2. |
+| `outlet_area` | Outlet pipe area `S_out`, m2. |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `density` | Air density `rho`, kg/m3. |
+
+**Returns:** The transmission loss per frequency, dB.

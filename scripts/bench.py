@@ -161,8 +161,8 @@ def run_parabolic_equation() -> np.ndarray:
                                 max_range=p["max_range"],
                                 range_step=p["range_step"],
                                 n_depth_points=p["n_depth_points"])
-    tl = np.asarray(res.transmission_loss)
-    return tl[::16, 1::10].ravel()  # skip the r = 0 column (TL is inf there)
+    pl = np.asarray(res.propagation_loss)
+    return pl[::16, 1::10].ravel()  # skip the r = 0 column (PL is inf there)
 
 
 def run_ecma_loudness() -> np.ndarray:

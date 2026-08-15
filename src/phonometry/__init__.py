@@ -19,6 +19,7 @@ from ._plot.geometry import (
     plot_impedance_tube_geometry,
     plot_insitu_geometry,
     plot_junction_geometry,
+    plot_metadiffuser_panel_geometry,
     plot_microphone_positions,
     plot_open_plan_geometry,
     plot_piston_geometry,
@@ -471,6 +472,7 @@ from .electroacoustics.swept_sine import (
     synchronized_sweep_signal,
 )
 from .emission.declaration import (
+    DeclarationForm,
     NoiseEmissionDeclaration,
     OperatingModeDeclaration,
 )
@@ -552,6 +554,7 @@ from .environment.assessment.impulsive_sound import (
     sound_pressure_level_history,
 )
 from .environment.assessment.measurement import (
+    EnvironmentalMeasurementWarning,
     RepeatedMeasurementResult,
     ResidualCorrectionResult,
     TonalAssessmentResult,
@@ -1077,10 +1080,17 @@ from .noise_control.room_to_room import (
 )
 from .noise_control.silencers import (
     ReactiveSilencerResult,
+    cascade,
+    duct_matrix,
     expansion_chamber,
     extended_tube_chamber,
+    helmholtz_impedance,
     helmholtz_resonator,
+    insertion_loss,
+    quarter_wave_impedance,
     quarter_wave_resonator,
+    shunt_matrix,
+    transmission_loss,
 )
 from .psychoacoustics.erb_scale import (
     CAM_C,
@@ -1397,10 +1407,10 @@ from .underwater.bioacoustics.weighting import (
     weighting_parameters,
 )
 from .underwater.propagation.closed_form import (
-    TransmissionLossResult,
+    PropagationLossResult,
+    propagation_loss,
     seawater_absorption,
     spreading_loss,
-    transmission_loss,
 )
 from .underwater.propagation.numerical import (
     NormalModeResult,
@@ -1571,6 +1581,8 @@ from .vibration.structural.mechanical_mobility import (
     sdof_receptance,
 )
 from .vibration.structural.point_mobility import (
+    beam_bending_wave_speed,
+    infinite_beam_impedance,
     infinite_beam_mobility,
     infinite_beam_moment_mobility,
     infinite_beam_point_mobility,
@@ -1579,7 +1591,9 @@ from .vibration.structural.point_mobility import (
     infinite_plate_point_mobility,
     injected_power,
     longitudinal_rod_impedance,
+    longitudinal_rod_mobility,
     plate_bending_stiffness,
+    plate_bending_wave_speed,
 )
 from .vibration.structural.radiation_efficiency import (
     RadiationEfficiencyResult,
@@ -1765,6 +1779,7 @@ __all__ = [
     "DbHrGlobalIndexResult",
     "DbHrRequirement",
     "DecayCurve",
+    "DeclarationForm",
     "DesignCriterion",
     "DetailedAirborneResult",
     "DetailedImpactResult",
@@ -1797,6 +1812,7 @@ __all__ = [
     "EnclosureResult",
     "EnvelopeResult",
     "EnvelopeSpectrumResult",
+    "EnvironmentalMeasurementWarning",
     "EqualLoudnessContours",
     "ExplosionSource",
     "ExposureAssessment",
@@ -1929,6 +1945,7 @@ __all__ = [
     "PrecisionSoundPowerResult",
     "ProgramLoudnessResult",
     "PropagationGeometry",
+    "PropagationLossResult",
     "PsychoacousticAnnoyanceResult",
     "Quantity",
     "RCResult",
@@ -2031,7 +2048,6 @@ __all__ = [
     "TractionVehicle",
     "TransferMatrix",
     "TransferStiffnessResult",
-    "TransmissionLossResult",
     "TrendTestResult",
     "UncertainValue",
     "UncertaintyResult",
@@ -2125,6 +2141,7 @@ __all__ = [
     "barrier_insertion_loss",
     "base_plate_scattering",
     "base_transmissibility",
+    "beam_bending_wave_speed",
     "beam_modal_density",
     "bearing_fault_frequencies",
     "bending_radiation_factor",
@@ -2137,6 +2154,7 @@ __all__ = [
     "bridge_transfer",
     "calculated_sound_reduction_index",
     "cam_from_frequency",
+    "cascade",
     "ceiling_attenuation_class",
     "cepstrum",
     "channel_weight",
@@ -2234,6 +2252,7 @@ __all__ = [
     "dose_from_peaks",
     "double_floating_floor_resonances",
     "double_wall_transmission_loss",
+    "duct_matrix",
     "duct_path",
     "duration_correction",
     "dynamic_capability_index",
@@ -2353,6 +2372,7 @@ __all__ = [
     "heavy_impact_octave_levels",
     "heavy_impact_source_limits",
     "heavy_impact_source_specification",
+    "helmholtz_impedance",
     "helmholtz_resonance_frequency",
     "helmholtz_resonator",
     "helmholtz_resonator_impedance",
@@ -2391,6 +2411,7 @@ __all__ = [
     "indirect_transfer_stiffness_result",
     "indoor_quality_objectives",
     "induction_motor_frequencies",
+    "infinite_beam_impedance",
     "infinite_beam_mobility",
     "infinite_beam_moment_mobility",
     "infinite_beam_point_mobility",
@@ -2402,6 +2423,7 @@ __all__ = [
     "injury_probability",
     "injury_risk",
     "inline_transmission_coefficient",
+    "insertion_loss",
     "insitu_absorption_coefficient",
     "insitu_absorption_from_reflection",
     "insitu_absorption_spectrum",
@@ -2459,6 +2481,7 @@ __all__ = [
     "log_linear_sound_speed_profile",
     "long_term_corrected_level",
     "longitudinal_rod_impedance",
+    "longitudinal_rod_mobility",
     "loss_factor",
     "loss_parameter",
     "loudness_ecma",
@@ -2573,6 +2596,7 @@ __all__ = [
     "plane_wave_frequency_range_astm",
     "plane_wave_limit",
     "plate_bending_stiffness",
+    "plate_bending_wave_speed",
     "plate_contact_stiffness",
     "plate_loss_factor",
     "plateau_transmission_loss",
@@ -2590,6 +2614,7 @@ __all__ = [
     "plot_impedance_tube_geometry",
     "plot_insitu_geometry",
     "plot_junction_geometry",
+    "plot_metadiffuser_panel_geometry",
     "plot_microphone_positions",
     "plot_open_plan_geometry",
     "plot_piston_geometry",
@@ -2623,10 +2648,12 @@ __all__ = [
     "prediction_input_uncertainty",
     "program_loudness",
     "prominence_ratio",
+    "propagation_loss",
     "psychoacoustic_annoyance",
     "psychoacoustic_annoyance_from_signal",
     "qrd_well_depths",
     "quadratic_residue_sequence",
+    "quarter_wave_impedance",
     "quarter_wave_resonator",
     "ra",
     "ra_tr",
@@ -2723,6 +2750,7 @@ __all__ = [
     "sharpness_din_from_specific",
     "ship_source_spectrum",
     "short_pulse_mean_square_force",
+    "shunt_matrix",
     "sii_procedure",
     "silencer_self_noise",
     "sinad",

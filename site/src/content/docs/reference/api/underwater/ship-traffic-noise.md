@@ -24,7 +24,7 @@ All three return an equivalent-monopole source spectral-density level (dB re
 1 µPa²/Hz at 1 m, source depth 6 m) and the decidecade-band source level
 (dB re 1 µPa m). The predicted spectrum can be used as the `shipping` input of
 [`phonometry.underwater.sources.ambient_noise.ocean_ambient_noise`](/phonometry/reference/api/underwater/ambient-noise/#ocean_ambient_noise) or placed at range
-with [`phonometry.underwater.propagation.transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss).
+with [`phonometry.underwater.propagation.propagation_loss`](/phonometry/reference/api/underwater/closed-form/#propagation_loss).
 
 Source (clean-room, implemented from the equations, validated against the
 authors' own Excel reference implementation, File S1): MacGillivray, A.;
