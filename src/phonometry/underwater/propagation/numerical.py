@@ -410,9 +410,10 @@ def ray_trace(
         k4z, k4zeta, k4t = deriv(z + dr * k3z, zeta + dr * k3zeta, xi)
         z = z + dr / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z)
         zeta = zeta + dr / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta)
-        # A reflection is instantaneous and specular, so the accumulated time
-        # crosses it unchanged; it is written before the fold for exactly that
-        # reason, from the same four stages as the geometry above.
+        # From the same four stages as the geometry above. A reflection is
+        # specular and instantaneous, so no time is added at a bounce: the fold
+        # below rewrites z and ζ alone, and the accumulated time crosses it
+        # unchanged wherever this line sits.
         ray_t[:, s] = ray_t[:, s - 1] + dr / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t)
         # Fold any overshoot (arbitrarily many surface/bottom crossings) back
         # into [0, D] with a triangle wave, flipping ζ once per crossing.
