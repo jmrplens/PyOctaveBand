@@ -610,9 +610,11 @@ plt.show()
 Cada uno devuelve un `ReactiveSilencerResult` con `transmission_loss`,
 `insertion_loss` (cuando se dan las impedancias), la matriz compuesta
 `transfer_matrix`, el `plane_wave_limit` de su sección más ancha y `.plot()`.
-Las configuraciones avanzadas encadenan elementos directamente con
-`duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` e
-`insertion_loss`.
+Las configuraciones que los cuatro constructores no cubren se encadenan
+elemento a elemento, ya sea con `duct_matrix`, `shunt_matrix`, `cascade`,
+`transmission_loss` e `insertion_loss` directamente, ya sea con
+`SilencerChain`, que hace esas mismas llamadas y conserva la geometría que
+recibieron.
 
 Ese `plane_wave_limit` es el techo de validez de todo lo que hay en esta página.
 Por encima del primer corte de orden superior de la sección más ancha se
@@ -684,6 +686,78 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	description="Ficha de silenciador reactivo de una página: una cabecera de metadatos con el cliente, el silenciador de cámara de expansión con relación de áreas m = 8 como fuente de ruido, el estudio de diseño del sistema de conductos y la fecha de ensayo, la tabla de pérdida de transmisión por bandas de octava con 7,5, 11,4, 9,9, 12,1, 3,2, 7,0 y 11,1 dB de 63 Hz a 4 kHz junto a esa misma curva frente a la frecuencia, la pérdida de transmisión media TL = 8,9 dB enmarcada con el valor de pico de 12,1 dB y el dispositivo identificado como cámara de expansión, un veredicto CUMPLE frente al mínimo exigido de 6,0 dB, y la nota de que el resultado es una predicción de onda plana a partir de la geometría declarada y no una medida."
 	caption="Ficha de silenciador reactivo (ReactiveSilencerResult.report), la pérdida de transmisión media sobre las bandas de análisis con su valor de pico."
 />
+
+### Configuraciones propias
+
+Nada de lo anterior cubre un silenciador de dos cámaras, ni una cámara con un
+ramal soldado a su tubo de entrada. Eso se encadena elemento a elemento, y
+`SilencerChain` lo hace con las mismas llamadas a `duct_matrix`, `shunt_matrix`
+y `cascade` conservando lo que se le dio a cada elemento, de modo que la
+configuración se puede dibujar además de calcular y el dibujo no puede
+separarse del modelo.
+
+Lo que ese dibujo puede mostrar se sigue de lo que declaran los elementos, y
+los dos tipos declaran cantidades muy distintas. A `duct_matrix` se le da una
+longitud y un área, así que un conducto se dibuja a escala, acotado, y con él
+sus saltos de sección. A `shunt_matrix` se le da una impedancia, que no fija
+ninguna longitud, ningún área ni ningún volumen: el resonador de Helmholtz y el
+ramal de cuarto de onda del apartado anterior presentan a la cadena *el mismo
+tipo de objeto*, y una placa perforada o un extremo abierto presentarían otro.
+Por eso un ramal se marca en la estación donde se conecta, rotulado con su
+nombre y con lo único que su impedancia dice de sí misma, la frecuencia a la
+que es mínima, donde el ramal muerde con más fuerza, y no se acota nada de
+él. Los extremos del tramo se dejan abiertos por la misma razón: una cadena es
+una lista de elementos, no una afirmación sobre los tubos entre los que se
+monta. Si esos tubos se meten en la cadena como elementos de conducto, también
+se dibujan.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_es.svg" alt="Sección a escala de una cadena de silenciador construida a mano: tramos de 100 mm y 200 mm de conducto de 200 mm que desembocan en una envolvente de 400 mm y 600 mm de longitud y vuelven a 300 mm de conducto de 200 mm, con la longitud de cada tramo, ambos diámetros y la longitud total de 1200 mm acotados, y dos ramales laterales marcados con líneas de referencia en las estaciones donde se conectan, uno rotulado como ramal de cuarto de onda con impedancia mínima en 125 Hz y el otro como resonador de Helmholtz en 242 Hz" width="88%" />
+
+*Toda medida de la página es un número que se le dio a la cadena: las cuatro
+longitudes de conducto, los dos diámetros y su suma. Los dos ramales no llevan
+ninguna cota, porque una impedancia no es una forma.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import SilencerChain
+from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
+
+freqs = np.linspace(20.0, 500.0, 481)
+s_duct = np.pi * 0.100**2               # conducto nominal de 200 mm
+s_shell = np.pi * 0.200**2              # envolvente nominal de 400 mm
+
+# Los elementos en orden, de entrada a salida; cada llamada guarda lo que
+# se le dio.
+chain = (
+    SilencerChain(freqs)
+    .duct(0.10, s_duct)
+    .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
+           label="Ramal de cuarto de onda")
+    .duct(0.20, s_duct)
+    .duct(0.60, s_shell)
+    .shunt(helmholtz_impedance(freqs, np.pi * 0.025**2, 0.05, 2e-3),
+           label="Resonador de Helmholtz")
+    .duct(0.30, s_duct)
+)
+
+# Una línea: la cadena dibujada tal y como se declaró.
+chain.plot_geometry(language="es")
+plt.show()
+
+# Los mismos elementos, evaluados: `.result()` da la matriz compuesta, la
+# pérdida de transmisión, el límite de onda plana de la sección más ancha,
+# .plot() y .report(); `.transfer_matrix` es lo que habría dado `cascade`.
+res = chain.result(inlet_area=s_duct, outlet_area=s_duct)
+res.plot(language="es")
+plt.show()
+```
+
+</details>
+
 
 ## 2. ¿Reactivo o disipativo?
 
@@ -877,8 +951,9 @@ polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma cerrada `expansion_chamber`
 (Ec. (8.111)), `helmholtz_resonator` y `quarter_wave_resonator` (Ecs. (8.46),
 (8.44)), `extended_tube_chamber`, y los bloques
 `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/ `insertion_loss`
-para encadenar elementos arbitrarios; el dibujo a escala `.plot_geometry()`
-del resultado de cada uno de los cuatro constructores, y la cámara de
+para encadenar elementos arbitrarios, que `SilencerChain` reúne en una cadena
+que conserva su geometría; el dibujo a escala `.plot_geometry()` del resultado
+de cada uno de los cuatro constructores y de una cadena, y la cámara de
 expansión contrastada con la simulación FDTD independiente; el
 `plane_wave_limit` que acota a todos ellos; y, como prosa y no como código, la
 medición por sustitución de ISO 7235 que produce la pérdida por inserción que

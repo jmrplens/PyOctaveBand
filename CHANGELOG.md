@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Silencer layouts built by hand can now be drawn. `SilencerChain` cascades
+  the same `duct_matrix`, `shunt_matrix` and `cascade` calls the four-pole
+  method has always taken, keeping what each element was handed, so a layout
+  none of the named devices covers has a `.plot_geometry()` as well as a
+  transfer matrix, and one call feeds both. The drawing shows exactly what
+  the elements declare and not a millimetre more: the ducts to scale with
+  their lengths, bores, area steps and overall run dimensioned, and each side
+  branch marked at the station where it joins, because a shunt is handed an
+  impedance and an impedance fixes no length, no area and no volume. A branch
+  is lettered with its name and with the frequency at which its impedance is
+  least, which is the one thing it does say about itself, and the drawing
+  states underneath that it is marked rather than drawn. `.result()` closes
+  the loop with the transmission loss, the plane-wave limit of the widest
+  section of the chain, and the usual `.plot()` and `.report()`.
 - Every piece of vector artwork draws its own text. The figures' SVGs used to
   ship live text positioned glyph by glyph from DejaVu metrics while asking the
   viewer for a generic sans, so any label carrying mathematics arrived

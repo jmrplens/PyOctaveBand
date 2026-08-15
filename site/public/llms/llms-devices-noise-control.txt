@@ -1636,6 +1636,57 @@ first higher-order cut-on the computed peaks and troughs do not survive, and the
 result raises a `PlaneWaveWarning` when the analysis grid runs past it (890.8 Hz
 for the 0.04 m² chamber above).
 
+**Layouts of your own.** A two-chamber muffler, or a chamber with a stub on its
+inlet pipe, is cascaded element by element. `SilencerChain` makes the same
+`duct_matrix`/`shunt_matrix`/`cascade` calls and keeps what each element was
+handed, so the layout can be drawn as well as computed. What the drawing may
+show follows from what the elements declare: a duct is handed a length and an
+area and is drawn to scale and dimensioned, while a shunt is handed an
+impedance, which fixes no length, no area and no volume, so it is marked at the
+station where it joins and lettered with the frequency at which it is least,
+and nothing about it is dimensioned.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="To-scale cross-section of a hand-built silencer chain: 100 mm and 200 mm runs of 200 mm duct opening into a 400 mm shell 600 mm long and returning to 300 mm of 200 mm duct, with each run length, both bores and the 1200 mm overall length dimensioned, and two side branches marked by leaders at the stations where they join, one lettered as a quarter-wave stub with least impedance at 125 Hz and the other as a Helmholtz resonator at 242 Hz" width="88%"></picture>
+
+*Every measurement on the page is a number the chain was given: the four duct
+lengths, the two bores, and their sum. The two branches carry no dimension at
+all, because an impedance is not a shape.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import SilencerChain
+from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
+
+freqs = np.linspace(20.0, 500.0, 481)
+s_duct = np.pi * 0.100**2               # nominal 200 mm duct
+s_shell = np.pi * 0.200**2              # nominal 400 mm shell
+
+chain = (
+    SilencerChain(freqs)
+    .duct(0.10, s_duct)
+    .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
+           label="Quarter-wave stub")
+    .duct(0.20, s_duct)
+    .duct(0.60, s_shell)
+    .shunt(helmholtz_impedance(freqs, np.pi * 0.025**2, 0.05, 2e-3),
+           label="Helmholtz resonator")
+    .duct(0.30, s_duct)
+)
+
+# One line: the chain drawn exactly as it was declared.
+chain.plot_geometry()
+plt.show()
+
+# The same elements evaluated, ports included.
+res = chain.result(inlet_area=s_duct, outlet_area=s_duct)
+```
+
+</details>
+
 **Test-report fiche.** `ReactiveSilencerResult.report(path)` renders a one-page
 fiche in the layout of a silencer performance sheet: a metadata header, the
 octave-band transmission-loss table beside the same curve plotted against
@@ -1751,8 +1802,9 @@ and the plane-wave algebra does not.
 (Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46),
 (8.44)), `extended_tube_chamber`, and the `duct_matrix` / `shunt_matrix` /
 `cascade` / `transmission_loss` / `insertion_loss` blocks for arbitrary chains,
-each with its to-scale `.plot_geometry()` and cross-checked against the
-independent FDTD solver; the `plane_wave_limit` that bounds all of them; and,
+gathered by `SilencerChain` into a chain that keeps its geometry, each with its
+to-scale `.plot_geometry()` and cross-checked against the independent FDTD
+solver; the `plane_wave_limit` that bounds all of them; and,
 as prose rather than code, the ISO 7235 substitution measurement that produces
 the insertion loss a supplier publishes.
 
