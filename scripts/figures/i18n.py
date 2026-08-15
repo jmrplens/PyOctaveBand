@@ -3356,8 +3356,8 @@ _ES_EXACT = {
     " response":
         "la misma información en otro dominio: barrido ⊛ filtro inverso ="
         " respuesta al impulso",
-    "Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)":
-        "Sonoridad específica $N\u2032(z)$ y su integral (ISO 532-1)",
+    r"Specific loudness $N^{\prime}(z)$ and its integral (ISO 532-1)":
+        "Sonoridad específica $N^{\\prime}(z)$ y su integral (ISO 532-1)",
     "1 kHz ≈ 8.5 Bark": "1 kHz ≈ 8,5 Bark",
     "upward spread of masking":
         "extensión del enmascaramiento hacia agudos",

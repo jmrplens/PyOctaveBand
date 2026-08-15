@@ -1489,7 +1489,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     z = np.arange(1, 241) * 0.1
 
     fig = _anim_figure()
-    fig.suptitle(T("Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)"),
+    fig.suptitle(T(r"Specific loudness $N^{\prime}(z)$ and its integral (ISO 532-1)"),
                  )
     gs = fig.add_gridspec(1, 2, width_ratios=[2.1, 1.0])
     ax = fig.add_subplot(gs[0])
@@ -1498,7 +1498,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     # headroom above the 85 dB pattern (max N' ~ 5.4 sone/Bark)
     ax.set_ylim(0.0, 6.0)
     ax.set_xlabel(T("Critical-band rate $z$ [Bark]"))
-    ax.set_ylabel(T("Specific loudness $N\u2032$ [sone/Bark]"), fontsize=9)
+    ax.set_ylabel(T(r"Specific loudness $N^{\prime}$ [sone/Bark]"), fontsize=9)
     (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=2.2)
     fill = {"art": None}
     ax.axvline(8.5, color=COLOR_FG, lw=0.9, ls=":", alpha=0.6)
