@@ -88,6 +88,15 @@ dropping to ``0`` at :math:`kL = n \pi` (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
 
+**Layouts of your own.** Anything the four named devices do not cover is built
+by cascading elements directly. :class:`SilencerChain` does that through the
+same :func:`duct_matrix`, :func:`shunt_matrix` and :func:`cascade` calls while
+keeping the arguments each element was given, which is what lets a hand-built
+chain be drawn (:meth:`SilencerChain.plot_geometry`) and not only computed. The
+drawing shows the ducts to scale and marks the branch points, because that is
+the whole of what the elements declare: a duct element is handed a length and
+an area, a shunt element only an impedance.
+
 **Validity.** All of this is one-dimensional: it holds while the duct and the
 chamber carry plane waves only, that is below the first higher-order-mode
 cut-on frequency of the widest cross section
@@ -111,6 +120,8 @@ from .duct_modes import plane_wave_limit as _plane_wave_limit
 from .duct_modes import warn_above_plane_wave_limit
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
@@ -190,6 +201,29 @@ def shunt_matrix(branch_impedance: ArrayLike) -> _Complex:
         t[:, 1, 0] = 1.0 / zb
     t[:, 1, 1] = 1.0
     return t
+
+
+def _shorting_frequency(
+    f: NDArray[np.float64], branch_impedance: _Complex
+) -> float | None:
+    """Grid frequency of least ``|Z_b|``, when it falls inside the grid.
+
+    The one thing a bare shunt impedance says about itself: where on the
+    analysis grid the branch comes closest to shorting the duct, which is
+    where it takes the most out of the line. A least value sitting on either
+    end of the grid is a property of the grid rather than of the branch, and
+    is not reported.
+    """
+    if f.size < 3:
+        return None
+    magnitude = np.abs(branch_impedance)
+    magnitude = np.where(np.isfinite(magnitude), magnitude, np.inf)
+    if not bool(np.any(np.isfinite(magnitude))):
+        return None
+    index = int(np.argmin(magnitude))
+    if index in (0, f.size - 1):
+        return None
+    return float(f[index])
 
 
 def cascade(*matrices: _Complex) -> _Complex:
@@ -396,7 +430,7 @@ class ReactiveSilencerResult:
         (keys matching its keyword names, e.g. ``length``/``chamber_area``/
         ``pipe_area`` for a chamber), retained so :meth:`plot_geometry` can
         draw the device; appended after the original fields and ``None`` for
-        hand-built results.
+        hand-built results that were not assembled by a :class:`SilencerChain`.
     :ivar plane_wave_limit: The first higher-order-mode cut-on frequency of the
         widest cross section of the device, Hz (Norton & Karczub Eq. 7.6,
         :func:`phonometry.noise_control.duct_modes.plane_wave_limit`). The
@@ -406,6 +440,11 @@ class ReactiveSilencerResult:
         :class:`~phonometry.noise_control.duct_modes.PlaneWaveWarning` is
         raised when the analysis reaches past it. ``None`` for hand-built
         results that do not retain their geometry.
+    :ivar chain: The :class:`SilencerChain` that assembled this result, for a
+        result built by :meth:`SilencerChain.result`, and ``None`` otherwise.
+        A chain is a list of four-pole elements rather than a named device, so
+        it carries its geometry element by element instead of in ``geometry``;
+        :meth:`plot_geometry` draws whichever of the two is present.
     """
 
     frequencies: np.ndarray
@@ -416,6 +455,7 @@ class ReactiveSilencerResult:
     resonances: np.ndarray | None = None
     geometry: dict[str, float] | None = None
     plane_wave_limit: float | None = None
+    chain: SilencerChain | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the transmission (and insertion) loss against frequency.
@@ -434,10 +474,17 @@ class ReactiveSilencerResult:
     ) -> Axes:
         """Draw the silencer cross-section to scale (dimensioned side cut).
 
+        A named device is drawn from its ``geometry``; a result assembled by a
+        :class:`SilencerChain` is drawn from that ``chain``, duct by duct.
+
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
 
-        :raises ValueError: If the result does not retain its ``geometry``.
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :return: The axes.
+        :raises ValueError: If the result retains neither its ``geometry`` nor
+            the ``chain`` that built it.
         """
         from .._i18n import check_language
         from .._plot.geometry import plot_silencer_result_geometry
@@ -515,6 +562,8 @@ def _result(
     kind: str,
     resonances: NDArray[np.float64] | None = None,
     geometry: dict[str, float] | None = None,
+    areas: Sequence[float] | None = None,
+    chain: SilencerChain | None = None,
 ) -> ReactiveSilencerResult:
     """Assemble a :class:`ReactiveSilencerResult` from a compound matrix.
 
@@ -522,18 +571,20 @@ def _result(
     whole four-pole formulation expires: the first higher-order-mode cut-on of
     the widest cross section the device presents (the chamber of an expansion
     silencer, the duct of a side-branch resonator), and warns when the analysis
-    grid reaches past it.
+    grid reaches past it. A named device declares those cross sections in its
+    ``geometry``; a :class:`SilencerChain` has one per element and passes them
+    in ``areas``.
     """
     limit: float | None = None
-    if geometry is not None:
+    if areas is None and geometry is not None:
         areas = [
             value
             for key, value in geometry.items()
             if key.endswith("_area") and value > 0.0
         ]
-        if areas:
-            limit = _plane_wave_limit(area=max(areas), speed_of_sound=c)
-            warn_above_plane_wave_limit(f, limit, kind, stacklevel=4)
+    if areas:
+        limit = _plane_wave_limit(area=max(areas), speed_of_sound=c)
+        warn_above_plane_wave_limit(f, limit, kind, stacklevel=4)
     tl = transmission_loss(
         t, inlet_area=inlet_area, outlet_area=outlet_area,
         speed_of_sound=c, density=rho,
@@ -553,6 +604,7 @@ def _result(
         resonances=resonances,
         geometry=geometry,
         plane_wave_limit=limit,
+        chain=chain,
     )
 
 
@@ -806,3 +858,256 @@ def extended_tube_chamber(
             "outlet_extension": float(outlet_extension),
         },
     )
+
+
+#: The ``kind`` of a result assembled element by element rather than from one
+#: of the named devices; shared with the geometry renderer.
+_KIND_CHAIN = "element chain"
+
+
+@dataclass(frozen=True)
+class SilencerChainElement:
+    """One recorded element of a :class:`SilencerChain`.
+
+    The element carries its four-pole matrix and, with it, whatever geometry
+    the call that produced the matrix was given. That is the whole asymmetry
+    of a hand-built chain: :func:`duct_matrix` is handed a length and an area,
+    so a duct element knows its shape, while :func:`shunt_matrix` is handed an
+    impedance and nothing else, so a shunt element has no shape to know.
+
+    :ivar matrix: The element's ``(n_freq, 2, 2)`` four-pole matrix.
+    :ivar length: Duct length ``L``, m, or ``None`` for a shunt element.
+    :ivar area: Duct cross-sectional area ``S``, m2, or ``None`` for a shunt
+        element.
+    :ivar label: The name the element was given, or ``None``.
+    :ivar shorting_frequency: For a shunt element, the analysis frequency at
+        which ``|Z_b|`` is least (where the branch comes closest to shorting
+        the duct), or ``None`` when that least value sits on an end of the
+        analysis grid, and for every duct element.
+    """
+
+    matrix: np.ndarray
+    length: float | None = None
+    area: float | None = None
+    label: str | None = None
+    shorting_frequency: float | None = None
+
+    @property
+    def is_duct(self) -> bool:
+        """Whether this is a duct element (an element with a declared area).
+
+        :return: ``True`` for a duct element, ``False`` for a shunt element.
+        """
+        return self.area is not None
+
+
+class SilencerChain:
+    """A chain of four-pole elements that remembers the geometry it was given.
+
+    :func:`duct_matrix`, :func:`shunt_matrix` and :func:`cascade` build any
+    silencer layout the named devices do not cover, but they return bare
+    matrices: the compound matrix of a hand-built chain is a stack of complex
+    numbers, and nothing in it recalls that the first element was a 300 mm run
+    of 200 mm duct. This class calls the same three functions and keeps the
+    arguments, so the chain can be drawn (:meth:`plot_geometry`) as well as
+    evaluated (:meth:`result`), and the drawing cannot drift from the model
+    because one call produces both.
+
+    Elements are added in order from inlet to outlet, and each adder returns
+    the chain so the calls read as the device does::
+
+        chain = (
+            SilencerChain(frequencies)
+            .duct(0.30, 0.0314)
+            .shunt(quarter_wave_impedance(frequencies, 0.686, 0.0079))
+            .duct(0.60, 0.1257)
+            .duct(0.30, 0.0314)
+        )
+
+    What the drawing may show follows from what the elements know. A duct is
+    drawn to scale from its declared length and area; a shunt declares an
+    impedance, which fixes no length, no area and no volume, so it is marked
+    at the station where it joins the run and nothing about its shape is
+    invented (see :meth:`plot_geometry`).
+
+    :param frequencies: Frequencies ``f``, Hz (1-D array), shared by every
+        element of the chain.
+    :param speed_of_sound: Speed of sound ``c``, m/s.
+    :param density: Air density ``rho``, kg/m3.
+    """
+
+    def __init__(
+        self,
+        frequencies: ArrayLike,
+        *,
+        speed_of_sound: float = _C_AIR,
+        density: float = _RHO_AIR,
+    ) -> None:
+        self._frequencies = _frequencies(frequencies)
+        self._c = require_positive(speed_of_sound, "speed_of_sound")
+        self._rho = require_positive(density, "density")
+        self._elements: list[SilencerChainElement] = []
+
+    @property
+    def frequencies(self) -> NDArray[np.float64]:
+        """The analysis frequencies shared by every element, Hz.
+
+        :return: The frequency grid the chain was built on.
+        """
+        return self._frequencies
+
+    @property
+    def elements(self) -> tuple[SilencerChainElement, ...]:
+        """The recorded elements, in order from inlet to outlet.
+
+        :return: The elements added so far.
+        """
+        return tuple(self._elements)
+
+    @property
+    def transfer_matrix(self) -> _Complex:
+        """The compound four-pole matrix of the chain.
+
+        :return: The ordered product :func:`cascade` makes of the element
+            matrices, ``(n_freq, 2, 2)``.
+        :raises ValueError: If the chain is empty.
+        """
+        return cascade(*(element.matrix for element in self._elements))
+
+    def duct(
+        self, length: float, area: float
+    ) -> SilencerChain:
+        """Append a straight duct of length ``L`` and area ``S``.
+
+        :param length: Duct length ``L``, m. A zero-length duct is the
+            identity matrix, so it is neither computed against nor drawn.
+        :param area: Cross-sectional area ``S``, m2.
+        :return: The chain, so the calls can be written one after another.
+        """
+        length = require_non_negative(length, "length")
+        area = require_positive(area, "area")
+        self._elements.append(
+            SilencerChainElement(
+                matrix=duct_matrix(
+                    self._frequencies, length, area,
+                    speed_of_sound=self._c, density=self._rho,
+                ),
+                length=length,
+                area=area,
+            )
+        )
+        return self
+
+    def shunt(
+        self, branch_impedance: ArrayLike, *, label: str | None = None
+    ) -> SilencerChain:
+        """Append a side branch of acoustic impedance ``Z_b``.
+
+        The branch is the only element that can be given a ``label``, because
+        it is the only one the drawing cannot identify by its dimensions.
+
+        :param branch_impedance: Acoustic impedance ``Z_b`` of the branch,
+            Pa s/m3: one value per analysis frequency, or a scalar held
+            constant over the grid.
+        :param label: What the branch is, e.g.
+            ``"Helmholtz resonator, 125 Hz"``. Rendered verbatim in the
+            drawing, in whatever language it is written in.
+        :return: The chain, so the calls can be written one after another.
+        :raises ValueError: If ``branch_impedance`` is neither a scalar nor one
+            value per analysis frequency.
+        """
+        zb = np.asarray(branch_impedance, dtype=np.complex128)
+        if zb.ndim == 0:
+            zb = np.full(self._frequencies.size, zb, dtype=np.complex128)
+        if zb.shape != self._frequencies.shape:
+            raise ValueError(
+                "'branch_impedance' must be a scalar or hold one value per "
+                f"analysis frequency ({self._frequencies.size} values); got "
+                f"shape {zb.shape}."
+            )
+        self._elements.append(
+            SilencerChainElement(
+                matrix=shunt_matrix(zb),
+                label=label,
+                shorting_frequency=_shorting_frequency(
+                    self._frequencies, zb
+                ),
+            )
+        )
+        return self
+
+    def result(
+        self,
+        *,
+        inlet_area: float,
+        outlet_area: float,
+        source_impedance: ArrayLike | None = None,
+        radiation_impedance: ArrayLike | None = None,
+    ) -> ReactiveSilencerResult:
+        """Evaluate the chain into a :class:`ReactiveSilencerResult`.
+
+        The port areas are the pipes the chain is connected between, which
+        ``transmission_loss`` needs and the chain itself does not contain: put
+        them in the chain as duct elements if the drawing is to show them.
+
+        :param inlet_area: Inlet pipe area ``S_in``, m2.
+        :param outlet_area: Outlet pipe area ``S_out``, m2.
+        :param source_impedance: Optional source impedance ``Z_s`` for the
+            insertion loss, Pa s/m3.
+        :param radiation_impedance: Optional radiation impedance ``Z_r`` for
+            the insertion loss, Pa s/m3.
+        :return: The result, carrying a snapshot of this chain so that it can
+            be drawn as well as plotted and reported.
+        :raises ValueError: If the chain is empty.
+        """
+        areas = [inlet_area, outlet_area]
+        areas += [
+            element.area
+            for element in self._elements
+            if element.area is not None
+        ]
+        computed = _result(
+            self._frequencies, self.transfer_matrix,
+            inlet_area=inlet_area, outlet_area=outlet_area,
+            c=self._c, rho=self._rho,
+            source_impedance=source_impedance,
+            radiation_impedance=radiation_impedance,
+            kind=_KIND_CHAIN, areas=areas, chain=self._snapshot(),
+        )
+        return computed
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en"
+    ) -> Axes:
+        """Draw the chain: its ducts to scale, its branch points marked.
+
+        Every duct is drawn at its declared length and equivalent circular
+        diameter ``d = 2 sqrt(S / pi)``, so the runs, the area steps between
+        them and the overall length are read off the page. A shunt element
+        holds an impedance and no geometry at all, so it is not drawn as a
+        stub of any length: it is marked with a leader at the station where it
+        joins the run, carrying its label and, when the analysis grid resolves
+        one, the frequency at which it comes closest to shorting the duct.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :return: The axes.
+        :raises ValueError: If the chain holds no duct of positive length, and
+            so has no geometry and no scale to draw at.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_silencer_chain_geometry
+
+        check_language(language)
+        return plot_silencer_chain_geometry(self, ax=ax, language=language)
+
+    def _snapshot(self) -> SilencerChain:
+        """A copy of the chain as it stands, immune to later additions."""
+        clone = SilencerChain(
+            self._frequencies, speed_of_sound=self._c, density=self._rho
+        )
+        clone._elements.extend(self._elements)
+        return clone

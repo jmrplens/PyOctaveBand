@@ -590,9 +590,11 @@ plt.show()
 
 Each returns a `ReactiveSilencerResult` with `transmission_loss`,
 `insertion_loss` (when impedances are given), the compound `transfer_matrix`,
-the `plane_wave_limit` of its widest cross section and `.plot()`. Advanced
-layouts chain elements directly with `duct_matrix`, `shunt_matrix`, `cascade`,
-`transmission_loss` and `insertion_loss`.
+the `plane_wave_limit` of its widest cross section and `.plot()`. Layouts the four
+constructors do not cover are chained element by element, either with the
+bare `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` and
+`insertion_loss`, or through `SilencerChain`, which makes the same calls and
+keeps the geometry they were given.
 
 That `plane_wave_limit` is the validity ceiling of everything on this page.
 Above the first higher-order cut-on of the widest section several modes
@@ -659,6 +661,78 @@ repository; click the preview to open the PDF.
 	description="One-page reactive-silencer fiche: a metadata header with the client, the expansion-chamber muffler of area ratio m = 8 as the noise source, the duct-system design study and the test date, the octave-band transmission-loss table running 7.5, 11.4, 9.9, 12.1, 3.2, 7.0 and 11.1 dB from 63 Hz to 4 kHz beside the same curve plotted against frequency, the boxed mean transmission loss TL = 8.9 dB with the peak transmission loss of 12.1 dB and the device named as an expansion chamber, a PASS verdict against the required minimum of 6.0 dB, and the note that the result is a plane-wave prediction from the declared geometry and not a measurement."
 	caption="Reactive-silencer fiche (ReactiveSilencerResult.report), the mean transmission loss over the analysis bands with its peak value."
 />
+
+
+### Layouts of your own
+
+Nothing above covers a two-chamber muffler, or a chamber with a stub welded
+onto its inlet pipe. Those are cascaded element by element, and `SilencerChain`
+does it through the same `duct_matrix`, `shunt_matrix` and `cascade` calls
+while keeping what each element was handed, so the layout can be drawn as well
+as computed and the drawing cannot drift from the model.
+
+What such a drawing may show follows from what the elements declare, and the
+two kinds of element declare very different amounts. `duct_matrix` is handed a
+length and an area, so a duct is drawn to scale, dimensioned, and its steps
+with it. `shunt_matrix` is handed an impedance, which fixes no length, no area
+and no volume: the Helmholtz resonator and the quarter-wave stub of the
+previous section present *the same kind of object* to the chain, and a
+perforate or an open end would present another. So a branch is marked at the
+station where it joins the run, lettered with its name and with the one thing
+its impedance does say about itself, the frequency at which it is least, where
+the branch bites hardest, and nothing about it is dimensioned. The ends of the
+run are left open for the same reason: a chain is a list of elements, not a
+statement about the pipes it sits between. Put those pipes in the chain as duct
+elements and they are drawn too. A chain that holds no duct of positive length
+has no geometry and no scale to draw at, so it raises rather than drawing one.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="To-scale cross-section of a hand-built silencer chain: 100 mm and 200 mm runs of 200 mm duct opening into a 400 mm shell 600 mm long and returning to 300 mm of 200 mm duct, with each run length, both bores and the 1200 mm overall length dimensioned, and two side branches marked by leaders at the stations where they join, one lettered as a quarter-wave stub with least impedance at 125 Hz and the other as a Helmholtz resonator at 242 Hz" width="88%" />
+
+*Every measurement on the page comes from what the chain was given: the four
+duct lengths and their sum are the numbers themselves, and the two bores are
+the areas it was handed, restated as the equivalent circular diameter
+$d = 2\sqrt{S/\pi}$. The two branches carry no dimension at
+all, because an impedance is not a shape.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import SilencerChain
+from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
+
+freqs = np.linspace(20.0, 500.0, 481)
+s_duct = np.pi * 0.100**2               # nominal 200 mm duct
+s_shell = np.pi * 0.200**2              # nominal 400 mm shell
+
+# The elements in order, inlet to outlet; each call keeps what it was given.
+chain = (
+    SilencerChain(freqs)
+    .duct(0.10, s_duct)
+    .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
+           label="Quarter-wave stub")
+    .duct(0.20, s_duct)
+    .duct(0.60, s_shell)
+    .shunt(helmholtz_impedance(freqs, np.pi * 0.025**2, 0.05, 2e-3),
+           label="Helmholtz resonator")
+    .duct(0.30, s_duct)
+)
+
+# One line: the chain drawn exactly as it was declared.
+chain.plot_geometry()
+plt.show()
+
+# The same elements evaluated: `.result()` gives the compound matrix, the
+# transmission loss, the plane-wave limit of the widest section, .plot() and
+# .report(), and `.transfer_matrix` alone is what `cascade` would have built.
+res = chain.result(inlet_area=s_duct, outlet_area=s_duct)
+res.plot()
+plt.show()
+```
+
+</details>
 
 
 ## 2. Reactive or dissipative?
@@ -836,9 +910,10 @@ Munjal Eq. (3.27)): the closed-form `expansion_chamber` (Eq. (8.111)),
 `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46), (8.44)),
 `extended_tube_chamber`, and the `duct_matrix`/
 `shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building blocks
-for arbitrary element chains; the to-scale `.plot_geometry()` drawing on each
-of the four constructors' results, and the expansion chamber cross-checked
-against the independent FDTD solver; the
+for arbitrary element chains, gathered by `SilencerChain` into a chain that
+keeps its geometry; the to-scale `.plot_geometry()` drawing on each of the
+four constructors' results and on a chain, and the expansion chamber
+cross-checked against the independent FDTD solver; the
 `plane_wave_limit` that bounds all of them; and, as prose rather than as code,
 the ISO 7235 substitution measurement that produces the insertion loss a
 supplier publishes.

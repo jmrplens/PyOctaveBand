@@ -156,8 +156,28 @@ def headline_level(result: Any, level_a: float | None = None) -> float:
     standard prescribes a different summation than the one the result computed
     (the ISO 9614-3 A-weighted determination omits the bands its Annex C
     criteria reject, which the result object cannot know).
+
+    The fallback to the energy-summed total belongs to the unscreened case
+    alone, where an undefined ``LWA`` means no band frequencies were supplied
+    and the total is over the same bands the result already holds. A supplied
+    ``level_a`` that is not finite means something else entirely: every band
+    was screened out, so there is no determination to head the sheet with, and
+    falling back would print a total summed over exactly the bands the standard
+    says to drop. That is refused rather than rendered.
+
+    :raises ValueError: If a screened ``level_a`` is supplied and is not
+        finite, which is a determination with no qualifying band left.
     """
-    lwa = float(result.sound_power_level_a if level_a is None else level_a)
+    if level_a is not None:
+        if not math.isfinite(float(level_a)):
+            raise ValueError(
+                "the screened A-weighted level is not defined: no band "
+                "survived the qualification, so there is no determination to "
+                "report. Re-run the measurement rather than reporting the "
+                "total over the bands the criteria rejected."
+            )
+        return float(level_a)
+    lwa = float(result.sound_power_level_a)
     return lwa if math.isfinite(lwa) else total_power_level(result)
 
 

@@ -653,7 +653,8 @@ precise = emission.sound_power_intensity_precision(
     temperature=28.0, barometric_pressure=94_000.0,
 )
 annex_b = emission.precision_field_indicators(segment_intensity, segment_levels)
-scan_level = 10 * np.log10(scanned.mean(axis=0) / 1e-12)
+scan_intensity = np.average(scanned, axis=0, weights=faces)  # unequal faces
+scan_level = 10 * np.log10(scan_intensity / 1e-12)
 annex_c = emission.precision_qualification(
     annex_b, scan_intensity_level_1=scan_level,
     scan_intensity_level_2=scan_level + 0.1,

@@ -239,10 +239,11 @@ def _precision_intensity_example() -> tuple[object, ReportMetadata, str, dict[st
     two scans differ by 0,2 dB, inside the s/2 of Table 1 everywhere (criterion
     1); the temporal variability over ten averaging windows is FT = 0,04, well
     under the 0,6 of C.1.2; and halving the scan-line density (segments merged
-    in pairs) leaves FS within the 0,83 to 1,2 band of criterion 5.
+    in pairs) leaves the ratio FS(1)/FS(2) within the 0,83 to 1,2 band of
+    criterion 5, which constrains that ratio and not FS itself.
 
     At 28 degC and 94,0 kPa the meteorological normalization of Eq. 10 is
-    -0,59 dB, so every normalized level LW0 sits 0,6 dB above its LW. The
+    -0,60 dB, so every normalized level LW0 sits 0,6 dB above its LW. The
     determination gives LWA = 96,7 dB(A) re 1 pW against a declared limit of
     98 dB(A), so the verdict passes.
     """

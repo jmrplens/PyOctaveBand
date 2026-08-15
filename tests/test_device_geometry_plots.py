@@ -61,6 +61,101 @@ def test_silencer_hand_built_refuses() -> None:
         bare.plot_geometry()
 
 
+#: A 1 Hz grid, fine enough to resolve a branch tuning exactly and low
+#: enough to stay under the 400 mm chamber's cut-on.
+CHAIN_FREQ = np.linspace(20.0, 500.0, 481)
+
+
+def _chain(branch_length: float = 0.686) -> pm.SilencerChain:
+    """A duct-shunt-duct-chamber-duct chain with one quarter-wave branch."""
+    from phonometry.noise_control.silencers import quarter_wave_impedance
+
+    return (
+        pm.SilencerChain(CHAIN_FREQ)
+        .duct(0.15, 0.0314)
+        .shunt(
+            quarter_wave_impedance(CHAIN_FREQ, branch_length, 0.00785),
+            label="Quarter-wave stub",
+        )
+        .duct(0.15, 0.0314)
+        .duct(0.60, 0.1257)
+        .duct(0.30, 0.0314)
+    )
+
+
+def _lengths_lettered(ax) -> set[str]:
+    """Every measurement the drawing letters, as it letters it."""
+    return {
+        text.get_text() for text in ax.texts if text.get_text().endswith(" mm")
+    }
+
+
+def test_silencer_chain_draws_its_ducts_and_marks_its_branch() -> None:
+    ax = _chain().plot_geometry()
+    assert ax.get_aspect() == 1.0
+    assert "element chain" in ax.get_title()
+    labels = [text.get_text() for text in ax.texts]
+    assert "Quarter-wave stub\nmin |Z| at 125 Hz" in labels
+    # Every dimension on the page is a declared duct length, a declared bore
+    # or their sum: nothing the branch would have to supply.
+    assert _lengths_lettered(ax) == {
+        "150 mm", "600 mm", "300 mm", "L = 1200 mm", "199.9 mm", "400.1 mm",
+    }
+
+
+def test_silencer_chain_draws_nothing_from_the_branch_impedance() -> None:
+    # The honesty property: change the branch, and only its own callout
+    # changes. Not one line, patch or dimension of the drawn duct moves,
+    # because the impedance declares no geometry to move them.
+    first = _chain().plot_geometry()
+    second = _chain(branch_length=0.343).plot_geometry()
+    assert _lengths_lettered(first) == _lengths_lettered(second)
+    bounds = [patch.get_bbox().bounds for patch in first.patches]
+    assert bounds == [patch.get_bbox().bounds for patch in second.patches]
+    assert "min |Z| at 125 Hz" in first.texts[0].get_text()
+    assert "min |Z| at 250 Hz" in second.texts[0].get_text()
+
+
+def test_silencer_chain_result_and_language() -> None:
+    chain = _chain()
+    result = chain.result(inlet_area=0.0314, outlet_area=0.0314)
+    assert "element chain" in result.plot_geometry().get_title()
+    ax = chain.plot_geometry(language="es")
+    assert "cadena de elementos" in ax.get_title()
+    labels = [text.get_text() for text in ax.texts]
+    # The user's own words for the branch stay as written; ours translate.
+    assert "Quarter-wave stub\n|Z| mínima en 125 Hz" in labels
+    assert any("Ramal lateral" in text for text in labels) is False
+    assert any("Conductos dibujados a escala" in text for text in labels)
+    assert "L = 1200 mm" in _lengths_lettered(ax)
+    with pytest.raises(ValueError, match="Unknown language"):
+        chain.plot_geometry(language="fr")
+
+
+def test_silencer_chain_numbers_unlabelled_branches() -> None:
+    ax = (
+        pm.SilencerChain(FREQ)
+        .shunt(1.0e4)
+        .duct(0.4, 0.02)
+        .shunt(1.0e4)
+        .plot_geometry()
+    )
+    labels = [text.get_text() for text in ax.texts]
+    assert "Side branch 1" in labels
+    assert "Side branch 2" in labels
+
+
+def test_silencer_chain_without_a_duct_refuses_to_draw() -> None:
+    chain = pm.SilencerChain(FREQ).shunt(1.0e4)
+    with pytest.raises(ValueError, match="no duct of positive length"):
+        chain.plot_geometry()
+    # A zero-length duct is the identity matrix: nothing acoustically, and
+    # nothing to draw either.
+    flat = pm.SilencerChain(FREQ).duct(0.0, 0.02)
+    with pytest.raises(ValueError, match="no duct of positive length"):
+        flat.plot_geometry()
+
+
 def test_silencer_free_function_validation() -> None:
     with pytest.raises(ValueError, match="Unknown silencer kind"):
         pm.plot_silencer_geometry("muffler")

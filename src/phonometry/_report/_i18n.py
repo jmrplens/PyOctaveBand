@@ -899,6 +899,7 @@ _STRINGS: dict[str, str] = {
     "Helmholtz resonator": "resonador de Helmholtz",
     "quarter-wave resonator": "resonador de cuarto de onda",
     "extended-tube chamber": "cámara con tubos extendidos",
+    "element chain": "cadena de elementos",
     "End reflection": "Reflexión en el extremo",
     "Elbow": "Codo",
     "Straight-duct flow noise": "Ruido de flujo en conducto recto",

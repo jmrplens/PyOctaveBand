@@ -67,6 +67,18 @@ _PRESSURE_PA = 95_000.0
 _RESIDUAL_INDEX = 15.0
 
 
+@pytest.fixture(autouse=True)
+def _render_stack() -> None:
+    """Skip every test here unless the whole rendering stack is installed.
+
+    The three are soft dependencies and a fiche needs all of them, so the trio
+    was repeated in each test; autouse states it once for the module.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+
+
 def _assert_one_page(path: str) -> None:
     from pypdf import PdfReader
 
@@ -170,9 +182,6 @@ def test_hand_oracle_matches_library() -> None:
 
 def test_report_renders_oracle_values(tmp_path) -> None:
     """The fiche prints the hand-derived LWA, band LW, LW0 and Table 1 U."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     out = tmp_path / "iso9614_3.pdf"
     returned = res.report(str(out))
@@ -210,9 +219,6 @@ def test_report_renders_oracle_values(tmp_path) -> None:
 
 def test_uncertainty_column_follows_table_1(tmp_path) -> None:
     """Every band prints U = 2*sigma_R0 from its ISO 9614-3 Table 1 row."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     # Six consecutive one-third-octave bands crossing all three Table 1 tiers:
     # 160 Hz -> 2*2,0 = 4,0 dB; 200 to 315 Hz -> 2*1,5 = 3,0 dB; 400 and
     # 500 Hz -> 2*1,0 = 2,0 dB.
@@ -236,9 +242,6 @@ def test_uncertainty_column_follows_table_1(tmp_path) -> None:
 
 def test_octave_bands_have_no_tabulated_uncertainty(tmp_path) -> None:
     """Table 1 tabulates one-third-octave bands; an octave set prints an em dash."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     freqs = np.array([250, 500, 1000, 2000], dtype=float)
     intensity = _INTENSITY[:4]
     res = _determination(intensity, freqs)
@@ -259,9 +262,6 @@ def test_octave_bands_have_no_tabulated_uncertainty(tmp_path) -> None:
 
 def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
     """verbose=True tabulates the four Annex B indicators and the qualification."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
     out = tmp_path / "verbose.pdf"
@@ -294,9 +294,6 @@ def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
 
 def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
     """The verbose cell reads no for the band Annex C rejects, yes for the rest."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
     out = tmp_path / "verbose_reject.pdf"
@@ -309,7 +306,8 @@ def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
         "200", f"{lw[0]:.1f}", f"{lw0[0]:.1f}", "3.0", "—", "8.0", "8.0",
         "0.00", "no",
     ) in text
-    # The 250 Hz row, one tier down in Table 1, qualifies.
+    # The 250 Hz row qualifies on its 2 dB indicator against Ld, not on a
+    # different Table 1 row: both bands assert the same U above.
     assert _row(
         "250", f"{lw[1]:.1f}", f"{lw0[1]:.1f}", "3.0", "—", "2.0", "2.0",
         "0.00", "yes",
@@ -321,9 +319,6 @@ def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
 
 def test_failing_band_is_omitted_and_named(tmp_path) -> None:
     """A band failing criterion 2 leaves LWA and is named with its criterion."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     # A 200 Hz pressure-intensity indicator of 8 dB exceeds the probe's
     # Ld = 5 dB; the other bands sit at 2 dB and qualify.
@@ -357,9 +352,6 @@ def test_failing_band_is_omitted_and_named(tmp_path) -> None:
 
 def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
     """A net-negative band prints an em dash and is named under clause 9.2."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     scan = np.tile(_INTENSITY, (_N_SEG, 1)).copy()
     # Drive the 250 Hz band net-negative (more energy flowing in than out).
     scan[:, 1] = -_INTENSITY[1]
@@ -383,9 +375,6 @@ def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
 
 def test_without_criteria_the_fiche_says_so(tmp_path) -> None:
     """No Annex C qualification: the result's own LWA, and the strip says why."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     out = tmp_path / "unqualified.pdf"
     res.report(str(out))
@@ -401,9 +390,6 @@ def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
     with non-positive net power leaves the A-weighted determination whether or
     not the criteria were ever evaluated, so it is named either way.
     """
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     scan = np.tile(_INTENSITY, (_N_SEG, 1)).copy()
     scan[:, 1] = -_INTENSITY[1]
     with pytest.warns(SoundPowerWarning, match="non-positive in one or more bands"):
@@ -423,9 +409,6 @@ def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
 
 def test_qualified_set_states_that_nothing_is_omitted(tmp_path) -> None:
     """Every band qualifying is stated too, not left to silence."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
     out = tmp_path / "all_qualified.pdf"
@@ -439,9 +422,6 @@ def test_qualified_set_states_that_nothing_is_omitted(tmp_path) -> None:
 
 def test_wide_band_set_is_paired_onto_one_page(tmp_path) -> None:
     """Sixteen one-third-octave bands print in two column groups, on one page."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     freqs = np.array(list(_CK_THIRD), dtype=float)
     intensity = np.full(freqs.size, 2.0e-5)
     res = _determination(intensity, freqs)
@@ -462,9 +442,6 @@ def test_wide_band_set_is_paired_onto_one_page(tmp_path) -> None:
 @pytest.mark.parametrize(("limit", "verdict"), [(120.0, "PASS"), (60.0, "FAIL")])
 def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     out = tmp_path / f"verdict_{limit}.pdf"
     res.report(str(out), metadata=ReportMetadata(requirement=limit))
@@ -475,9 +452,6 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
 
 def test_verdict_follows_the_boxed_level(tmp_path) -> None:
     """The verdict compares the qualified-band LWA the fiche boxes, not the raw one."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
     keep = np.array([False, True, True, True, True])
@@ -503,9 +477,6 @@ def test_verdict_follows_the_boxed_level(tmp_path) -> None:
 
 def test_metadata_header_renders(tmp_path) -> None:
     """Supplied metadata renders the source, environment and identity fields."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     metadata = ReportMetadata(
         client="Example works",
@@ -543,9 +514,6 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
     as an error. The Spanish wording of each block is asserted, and the English
     original of each is asserted absent.
     """
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
     out = tmp_path / "es.pdf"
@@ -599,9 +567,6 @@ def test_incomplete_qualification_is_stated_as_such(tmp_path) -> None:
     residual index gets. The sheet has to say that rather than deny having
     received a qualification it did receive.
     """
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     scan = np.tile(_INTENSITY, (_N_SEG, 1))
     indicators = precision_field_indicators(
@@ -624,9 +589,6 @@ def test_criterion_5_is_not_reported_as_a_failure(tmp_path) -> None:
     a requirement of its own, so a band that misses the scan-density ratio
     while satisfying criterion 4 has failed nothing on that account.
     """
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     indicators, _base = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
     level = 10.0 * np.log10(
@@ -655,9 +617,6 @@ def test_criterion_5_is_not_reported_as_a_failure(tmp_path) -> None:
 
 def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
     """Without band frequencies there is no A-weighting, and the box says so."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     scan = np.tile(_INTENSITY, (_N_SEG, 1))
     res = sound_power_intensity_precision(
         scan,
@@ -677,9 +636,6 @@ def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
 
 def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
     """An odd wide band set pairs cleanly, the last right-hand row left empty."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     freqs = np.array(list(_CK_THIRD)[:9], dtype=float)
     intensity = np.full(freqs.size, 2.0e-5)
     res = _determination(intensity, freqs)
@@ -700,9 +656,6 @@ def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
 
 def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path) -> None:
     """A residual index measured band by band is stated as its range."""
-    pytest.importorskip("reportlab")
-    pytest.importorskip("svglib")
-    pytest.importorskip("matplotlib")
     res = _determination()
     residual = np.array([12.0, 13.0, 14.0, 15.0, 16.0])
     out = tmp_path / "per_band_residual.pdf"
