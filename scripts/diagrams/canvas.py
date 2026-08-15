@@ -58,17 +58,35 @@ DARK = Theme(
 #: (ref, rms, tot, TOT, eff, mod, norm, spec, inst, cal, tab, cum, ss,
 #: shadow, co, tr, diff, ff, ax, SN, CS, MS), the hand-arm/whole-body
 #: vibration axes of ISO 5349 and ISO 2631 (hv, hwx, hwy, hwz, wx, wy, wz),
-#: and the Spanish twins the i18n table sets beside them (sup for upper,
-#: ef for eff). Every other letter run inside a script is an index and is
-#: set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a subscript
-#: that abbreviates a word, never for letter-indices.
+#: the parts of a room and of a building element the building plates name
+#: (obj and air of EN 12354-6 Formulae 2 to 4, the wall/win mnemonics of
+#: its take-off inset, perp for the ⊥ of EN 12354-1 Annex E Formula E.3),
+#: the mid-frequency average of ANSI/ASA S12.2 Annex D (MF), the force
+#: exposure level of JIS A 1418-2 Annex C (FE), and the Spanish twin the
+#: i18n table sets beside them (sup for upper). Every other letter run
+#: inside a script is an index and is set in italic ($K_{ij}$, $η_{ij}$);
+#: extend this set only for a subscript that abbreviates a word, never
+#: for letter-indices.
 _ROMAN_SCRIPTS = frozenset((
     "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
-    "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "ef", "mod",
+    "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "mod",
     "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
     "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
-    "wx", "wy", "wz",
+    "wx", "wy", "wz", "obj", "air", "wall", "win", "perp", "MF",
 ))
+
+#: Subscripts that are part quantity symbol and part word, letter by letter:
+#: ``"v"`` for the italic of a quantity, ``"u"`` for the upright of an
+#: abbreviation. :data:`_ROMAN_SCRIPTS` cannot express these, because it sets a
+#: whole run one way. The one member so far is the force exposure level of
+#: JIS A 1418-2, ``L_FE = 10 lg[(1/T_ref) int F(t)^2/F_0^2 dt]``: its F is the
+#: force the formula integrates, so it is italic like every other quantity in
+#: the corpus, while its E abbreviates "exposure" and is upright. Set roman
+#: whole, as it was, the plate drew the same F upright that the figures and the
+#: library both draw italic.
+_MIXED_SCRIPTS: dict[str, str] = {
+    "FE": "vu",
+}
 
 #: Script metrics of the ``$...$`` composer, as fractions of the font size:
 #: how far a subscript drops, how far a superscript rises, and the glyph
@@ -202,6 +220,16 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                 # it is an operator or a descriptor, never an index.
                 kind = "up"
             elif script:
+                mixed = _MIXED_SCRIPTS.get(run[i:j])
+                if mixed is not None:
+                    # A subscript that is part quantity and part word: emit one
+                    # token per letter so each takes its own type style. The
+                    # loop's own bookkeeping continues from j, so the run is
+                    # consumed exactly once either way.
+                    for letter, letter_kind in zip(run[i:j], mixed, strict=True):
+                        out.append(("up" if letter_kind == "u" else "var", letter))
+                    i = j
+                    continue
                 kind = "up" if run[i:j] in _ROMAN_SCRIPTS else "var"
             else:
                 letters = sum(1 for c in run[i:j] if c not in _COMBINING)

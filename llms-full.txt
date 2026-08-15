@@ -5123,7 +5123,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="low-mobility plate")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="high-mobility plate")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frequency [Hz]",
-       ylabel="Structure-borne power level $L_{Ws}$ [dB re 1 pW]")
+       ylabel=r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -5148,7 +5148,7 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
-L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{W\mathrm{s}} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
@@ -5195,7 +5195,7 @@ for the EN 12354-5 model through the conversion chain below.
 
 ## 3. From plate power to source quantities (Formulae 15–19)
 
-The plate-injected $L_{Ws}$ is **not** a source descriptor: the same source
+The plate-injected $L_{W\mathrm{s}}$ is **not** a source descriptor: the same source
 injects a different power into a different receiver. EN 15657 derives the
 plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
@@ -5262,8 +5262,8 @@ standard-basis line naming the EN 15657:2018 reception-plate method (Formula
 14), an optional metadata header (client, source equipment, test environment,
 instrumentation, climate, date), a per-band table (nominal
 octave/one-third-octave frequency, the spatial mean plate velocity level $L_v$
-and the injected structure-borne sound power level $L_{Ws}$), the $L_{Ws}(f)$
-spectrum with a nominal band axis, and a boxed band-summed total $L_{Ws}$ (dB re
+and the injected structure-borne sound power level $L_{W\mathrm{s}}$), the $L_{W\mathrm{s}}(f)$
+spectrum with a nominal band axis, and a boxed band-summed total $L_{W\mathrm{s}}$ (dB re
 1 pW) with the plate mass per area $m$ and area $S$.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the source
@@ -5271,7 +5271,7 @@ equipment), `test_room` (the test environment), `instrumentation`,
 `temperature`, `relative_humidity`, `pressure`, `test_date` and the footer
 identity `laboratory`, `operator`, `report_id` and `notes`; the plate mass and
 area come from the result itself. Supplying `requirement` adds a PASS/FAIL
-verdict against a declared upper limit on the total $L_{Ws}$ (lower is better).
+verdict against a declared upper limit on the total $L_{W\mathrm{s}}$ (lower is better).
 `verbose=True` adds the plate loss factor $\eta$ column, and `language="es"`
 renders the Spanish fiche. The basis strip states Formula 14 and the conversion
 to the plate-independent source quantities (Formulae 15/17) required before
@@ -5334,7 +5334,7 @@ EN 15657:2018, *Acoustic properties of building elements and
 buildings — Laboratory measurement of structure-borne sound from building
 service equipment for all installation conditions*: the reception-plate method
 (clause 7), the spatial mean velocity level (Formula 12), the plate loss factor
-$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{Ws}$
+$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{W\mathrm{s}}$
 (Formula 14) and the source-quantity chain: equivalent blocked force
 (Formula 15), characteristic reception-plate power level (Formula 17,
 $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$), equivalent free
@@ -35218,7 +35218,7 @@ check that pins each quantity to its standard's own expected value.
 | $R$ | Cumulative stress variable of the multiple-shock model: the daily compressive stresses accumulated over the years of exposure, which the lumbar injury probability is read from. | dimensionless | ISO 2631-5:2018, Annex C (Formulae C.1 and C.3 to C.5) | [Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/) |
 | $L_v$ | Velocity level: twenty times the base-10 logarithm of the surface velocity over the reference velocity. | dB re 50 nm/s | ISO/TS 7849-1:2009, Formula 3 | [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/) |
 | $\varepsilon$ | Radiation factor, or radiation efficiency, of a vibrating machine surface: the airborne power radiated per unit mean-square velocity and area. | dimensionless | ISO/TS 7849-1:2009 and ISO/TS 7849-2:2009 | [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/) |
-| $L_{Ws}$ | Structure-borne sound power level injected by equipment into a reception plate. | dB re 1 pW | EN 15657:2018, Formula 14 | [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/) |
+| $L_{Wmathrm{s}}$ | Structure-borne sound power level injected by equipment into a reception plate. | dB re 1 pW | EN 15657:2018, Formula 14 | [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/) |
 | $\eta_{ij}$ | Coupling loss factor: the fraction of energy per radian that a statistical energy analysis subsystem loses into a neighbouring one across a junction. | dimensionless | Hopkins (2007), Equation 2.154; no governing standard | [Plate junctions: wave approach and experimental SEA](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) |
 | $\tau_{ij}$ (junction) | Junction transmission coefficient: the fraction of the bending-wave power arriving at a junction from plate $i$ that continues into plate $j$, angle by angle and then averaged over a diffuse field. Both the coupling loss factor $\eta_{ij}$ and the vibration reduction index $K_{ij}$ are derived from it, so it is the wave-approach quantity the junction family bottoms out in. | dimensionless | Hopkins (2007), Equations 5.12 and 5.13; no governing standard | [Plate junctions: wave approach and experimental SEA](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) |
 
@@ -42274,7 +42274,7 @@ plt.show()
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.4))
 ax1.barh(result.names, result.contributions)
 ax1.axvline(result.combined_uncertainty, ls="--",
-            label=f"$u_c$ = {result.combined_uncertainty:.3f} dB")
+            label=rf"$u_\mathrm{{c}}$ = {result.combined_uncertainty:.3f} dB")
 ax1.invert_yaxis(); ax1.legend()
 
 rng = np.random.default_rng(1)

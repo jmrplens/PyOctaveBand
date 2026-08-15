@@ -50,7 +50,7 @@ equipos instalados de EN 12354-5.
 *Una fuente, dos placas conformes, dos respuestas separadas 12,0 dB en todas las
 bandas (67,5 dB frente a 79,5 dB sumados en bandas). La placa ligera vibra
 35,1 dB más fuerte, pero también disipa a través de un $\eta m S$ unas 204 veces
-menor, y $L_{Ws}$ es la potencia que absorbe **esa placa**, no una propiedad de
+menor, y $L_{W\mathrm{s}}$ es la potencia que absorbe **esa placa**, no una propiedad de
 la máquina. Leída por su cuenta, ninguna de las dos curvas describe la fuente;
 la sección 4 es la que convierte cualquiera de ellas en las magnitudes
 independientes de la placa que consume EN 12354-5.*
@@ -90,7 +90,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="placa de baja movilidad")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="placa de alta movilidad")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frecuencia [Hz]",
-       ylabel="Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]")
+       ylabel=r"Nivel de potencia estructural $L_{W\mathrm{s}}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -116,7 +116,7 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, de modo que
 el nivel de potencia inyectada en bandas de tercio de octava es (Fórmula 14)
 
 $$
-L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{W\mathrm{s}} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
@@ -254,7 +254,7 @@ espectro de fuente que en realidad es el del edificio.
 
 **El factor de pérdidas.** $T_s$ es una caída estructural medida sobre la propia
 placa, que alimenta $\eta = 2{,}2/(f\,T_s)$. La Fórmula (14) es lineal en
-$10\lg\eta$, así que un error en $T_s$ mueve $L_{Ws}$ decibelio a decibelio: es
+$10\lg\eta$, así que un error en $T_s$ mueve $L_{W\mathrm{s}}$ decibelio a decibelio: es
 el dato más sensible de la página. La regla de carga sigue a la placa: en la
 placa de **baja movilidad** no debería haber diferencia apreciable entre medir
 $T_s$ y las movilidades puntuales con el equipo montado o sin él; la placa de
@@ -290,7 +290,7 @@ requisitos de arriba. El propio sonido aéreo de la fuente puede mover la placa 
 que es por lo que la placa de alta movilidad está perforada en torno al 50 %. Un
 factor de pérdidas medido sobre la placa desnuda se puede arrastrar al
 caso de alta movilidad, donde la norma exige que la fuente esté colocada, y el
-error se va directo a $L_{Ws}$. Y una máquina que no ha alcanzado el régimen
+error se va directo a $L_{W\mathrm{s}}$. Y una máquina que no ha alcanzado el régimen
 estacionario, o que se mide promediando un ciclo sin decirlo, produce un número
 que ningún otro laboratorio puede reproducir.
 
@@ -324,7 +324,7 @@ placa, y solo la sustitución mide sorteándolo.
 
 ## 4. De la potencia de placa a las magnitudes de fuente (Fórmulas 15–19)
 
-La $L_{Ws}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
+La $L_{W\mathrm{s}}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
 fuente inyecta una potencia distinta en un receptor distinto. La EN 15657
 deriva las magnitudes independientes de la placa: el **nivel de fuerza
 bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$, no la
@@ -418,10 +418,12 @@ characteristic = building.installed_power_from_reception_plate(l_wsn, 1.0e-3)
 
 fig, ax = plt.subplots()
 ax.semilogx(bands, l_ws, "-o", label="medido sobre la placa de ensayo")
-ax.semilogx(bands, l_wsn, "-s", label="$L_{Wsn}$, el valor declarado")
-ax.semilogx(bands, installed, "-^", label="$L_{Ws,inst}$ sobre la pared")
-ax.semilogx(bands, characteristic, "-D", label="$L_{Ws,c}$, la entrada de EN 12354-5")
-ax.semilogx(bands, characteristic - 16.2, "x", label="$L_{Ws,c} - D_C$")
+ax.semilogx(bands, l_wsn, "-s", label=r"$L_{W\mathrm{sn}}$, el valor declarado")
+ax.semilogx(bands, installed, "-^", label=r"$L_{W\mathrm{s,inst}}$ sobre la pared")
+ax.semilogx(bands, characteristic, "-D",
+            label=r"$L_{W\mathrm{s,c}}$, la entrada de EN 12354-5")
+ax.semilogx(bands, characteristic - 16.2, "x",
+            label=r"$L_{W\mathrm{s,c}} - D_\mathrm{C}$")
 ax.set(xlabel="Frecuencia [Hz]",
        ylabel="Nivel de potencia estructural [dB re 1 pW]")
 ax.legend()
@@ -459,8 +461,8 @@ EN 15657:2018 (Fórmula 14), una cabecera de metadatos opcional (cliente, equipo
 fuente, entorno de ensayo, instrumentación, clima, fecha), una tabla por bandas
 (frecuencia nominal de octava/tercio de octava, el nivel de velocidad medio
 espacial de la placa $L_v$ y el nivel de potencia acústica estructural inyectado
-$L_{Ws}$), el espectro $L_{Ws}(f)$ con un eje de bandas nominal, y el total
-sumado en bandas $L_{Ws}$ (dB re 1 pW) recuadrado, con la masa por unidad de
+$L_{W\mathrm{s}}$), el espectro $L_{W\mathrm{s}}(f)$ con un eje de bandas nominal, y el total
+sumado en bandas $L_{W\mathrm{s}}$ (dB re 1 pW) recuadrado, con la masa por unidad de
 superficie de la placa $m$ y el área $S$.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
@@ -470,7 +472,7 @@ aquí son el **equipo fuente** (`specimen`), el **entorno de ensayo**
 (`test_date`) y la identidad del pie (`laboratory`, `operator`, `report_id`,
 `notes`); la masa y el área de la placa provienen del propio resultado. Aportar
 `requirement` añade un veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado
-sobre el total $L_{Ws}$ (una emisión de potencia es una magnitud donde menos es
+sobre el total $L_{W\mathrm{s}}$ (una emisión de potencia es una magnitud donde menos es
 mejor, así que la fuente cumple en el límite o por debajo). `verbose=True` añade
 la columna del factor de pérdidas de la placa $\eta$ a la tabla.
 `language="es"` genera la ficha en español con comas decimales. La franja de

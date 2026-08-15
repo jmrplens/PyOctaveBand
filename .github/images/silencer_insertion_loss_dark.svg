@@ -2174,7 +2174,7 @@ L 73.462469 49.726076
 " style="fill: none; stroke-dasharray: 6.29,2.72; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.7"/>
     </g>
     <g id="text_21">
-     <!-- Insertion loss, stiff source ($Z_s = 20\,\rho c/S$) -->
+     <!-- Insertion loss, stiff source ($Z_\mathrm{s} = 20\,\rho c/S$) -->
      <g style="fill: #ffffff" transform="translate(80.126469 52.641576) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-2c" d="M 628 4666 
@@ -2195,37 +2195,6 @@ L -50 481
 L 3566 4134 
 L 738 4134 
 L 838 4666 
-z
-" transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-20" d="M 678 2906 
@@ -2361,7 +2330,7 @@ z
       <use xlink:href="#DejaVuSans-3" transform="translate(1281.251953 0.015625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(1313.039062 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(1352.052734 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1420.558594 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(1420.558594 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(1479.245117 0.015625)"/>
       <use xlink:href="#DejaVuSans-15" transform="translate(1582.516602 0.015625)"/>
       <use xlink:href="#DejaVuSans-13" transform="translate(1646.139648 0.015625)"/>
@@ -2379,7 +2348,7 @@ L 73.462469 62.223028
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.7; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <!-- Insertion loss, matched source ($Z_s = \rho c/S$) -->
+     <!-- Insertion loss, matched source ($Z_\mathrm{s} = \rho c/S$) -->
      <g style="fill: #ffffff" transform="translate(80.126469 65.138528) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-2c" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(29.492188 0.015625)"/>
@@ -2414,7 +2383,7 @@ L 73.462469 62.223028
       <use xlink:href="#DejaVuSans-3" transform="translate(1533.009766 0.015625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(1564.796875 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(1603.810547 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1672.316406 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(1672.316406 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(1731.00293 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-355" transform="translate(1834.274414 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(1897.750977 0.015625)"/>

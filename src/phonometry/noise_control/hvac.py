@@ -185,7 +185,7 @@ _ELBOW_TABLE: dict[str, NDArray[np.float64]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Long Table 13.5 -- level correction K_F of the ASHRAE fan sound-power model
+# Long Table 13.5 -- level correction K_\mathrm{F} of the ASHRAE fan sound-power model
 # (Eq. 13.1), dB, over the octave bands 63 Hz to 8 kHz, with the blade
 # frequency increment of Table 13.7 (its octave band, Hz, and increment, dB).
 # ---------------------------------------------------------------------------
@@ -593,17 +593,17 @@ def plenum_attenuation(
 
        \mathrm{TL} = -10 \log_{10}\!\left[S_{\mathrm{out}}
        \left(\frac{\cos(\theta)}{\pi r^2}
-       + \frac{1 - \alpha}{S_w \alpha}\right)\right],
+       + \frac{1 - \alpha}{S_\mathrm{w} \alpha}\right)\right],
 
     where the reverberant term uses the plenum room constant
-    :math:`R = S_w \alpha / (1 - \alpha)`
+    :math:`R = S_\mathrm{w} \alpha / (1 - \alpha)`
     (:func:`phonometry.room.room_constant`). The
     method holds above the inlet cut-on and when the plenum is large compared
     with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
 
     :param exit_area: Outlet-opening area ``S_out``, m2.
     :param line_of_sight: Straight-line inlet-to-outlet distance ``r``, m.
-    :param wall_area: Total internal wall area ``S_w``, m2.
+    :param wall_area: Total internal wall area ``S_\mathrm{w}``, m2.
     :param mean_absorption: Mean Sabine wall absorption ``alpha`` in ``(0, 1)``
         (scalar or per-band).
     :param angle: Angle ``theta`` between the inlet axis and the line to the
@@ -633,7 +633,7 @@ def flow_noise_straight_duct(
 
     .. math::
 
-       L_{WB} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2
+       L_{W\mathrm{B}} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2
        - 26 \log_{10}(1.14 + 0.02 f / U)
 
     in dB re 1e-12 W (VDI 2081-1), for airflow speed ``U`` in a duct of area
@@ -673,17 +673,17 @@ def flow_noise_bend(
 
     .. math::
 
-       L_{WB} = L_{Ws} - 10 \log_{10}(1 + 0.165 N_s^2)
+       L_{W\mathrm{B}} = L_{W\mathrm{s}} - 10 \log_{10}(1 + 0.165 N_\mathrm{s}^2)
        + 30 \log_{10}(U) - 103
 
-       L_{Ws} = 30 \log_{10}(U) + 10 \log_{10}(S)
+       L_{W\mathrm{s}} = 30 \log_{10}(U) + 10 \log_{10}(S)
        + 10 \log_{10}(\rho) + 117
 
-    with the stream power level :math:`L_{Ws}` (Bies Eq. (8.252)) and the
-    Strouhal number :math:`N_s = f H / U` (``H`` the duct
+    with the stream power level :math:`L_{W\mathrm{s}}` (Bies Eq. (8.252)) and the
+    Strouhal number :math:`N_\mathrm{s} = f H / U` (``H`` the duct
     height in the plane of the bend). The radiated sound power grows as the
-    sixth power of the stream speed at low ``N_s`` (the inner-corner drag
-    dipole) and the eighth power at high ``N_s`` (the outer-corner shear
+    sixth power of the stream speed at low ``N_\mathrm{s}`` (the inner-corner drag
+    dipole) and the eighth power at high ``N_\mathrm{s}`` (the outer-corner shear
     quadrupole); equivalently, the *efficiency* referenced to the stream power
     grows as :math:`U^3` and :math:`U^5` respectively.
 
@@ -768,16 +768,16 @@ def fan_sound_power(
 
     .. math::
 
-       L_W = K_F + 10 \log_{10}(Q_F / Q_{REF}) + 10 \log_{10}(P_F / P_{REF})
+       L_W = K_\mathrm{F} + 10 \log_{10}(Q_\mathrm{F} / Q_\mathrm{REF}) + 10 \log_{10}(P_\mathrm{F} / P_\mathrm{REF})
        + C_{EFF} + C_{BFI}
 
-    with the spectral constant ``K_F`` of Long Table 13.5 (one row per fan
+    with the spectral constant ``K_\mathrm{F}`` of Long Table 13.5 (one row per fan
     type), the off-peak efficiency correction ``C_EFF`` of Table 13.6
     (:func:`fan_efficiency_correction`) and the blade frequency increment
     ``C_BFI`` of Table 13.7, added to the single octave band that contains the
     blade passing frequency. In SI the reference volume flow is
-    :math:`Q_{REF} = 0.472` L/s and the reference pressure
-    :math:`P_{REF} = 249` Pa, so the two logarithmic terms take the same
+    :math:`Q_\mathrm{REF} = 0.472` L/s and the reference pressure
+    :math:`P_\mathrm{REF} = 249` Pa, so the two logarithmic terms take the same
     values as the foot-pound form in cfm and inches of water gauge.
 
     The law assumes ideal inlet and outlet flow conditions and gives the power
@@ -790,8 +790,8 @@ def fan_sound_power(
     prints a forward-curved row that this equation does not reproduce; see the
     module warning.
 
-    :param volume_flow: Volume flow through the fan ``Q_F``, m3/s.
-    :param static_pressure: Fan static pressure ``P_F``, Pa (gauge).
+    :param volume_flow: Volume flow through the fan ``Q_\mathrm{F}``, m3/s.
+    :param static_pressure: Fan static pressure ``P_\mathrm{F}``, Pa (gauge).
     :param fan_type: One of ``"airfoil_large"`` / ``"airfoil_small"``
         (backward-curved or backward-inclined centrifugal wheels above and
         below 36 in diameter), ``"forward_curved"``, ``"radial_low"`` /
@@ -1333,27 +1333,27 @@ def diffuser_sound_power(
 
     .. math::
 
-       L_W = 10 \log_{10} S_G + 30 \log_{10} \xi + 60 \log_{10} U_G - 31.3
+       L_W = 10 \log_{10} S_\mathrm{G} + 30 \log_{10} \xi + 60 \log_{10} U_\mathrm{G} - 31.3
 
-    with ``S_G`` the face area of the device (ft2),
-    :math:`U_G = Q / (60 S_G)` the approach velocity (ft/s) and
-    :math:`\xi = 334.9\, dP / (\rho_0 U_G^2)` the normalised pressure-drop
+    with ``S_\mathrm{G}`` the face area of the device (ft2),
+    :math:`U_\mathrm{G} = Q / (60 S_\mathrm{G})` the approach velocity (ft/s) and
+    :math:`\xi = 334.9\, dP / (\rho_0 U_\mathrm{G}^2)` the normalised pressure-drop
     coefficient of Eq. 13.28 (``dP`` in inches of water gauge,
     :math:`\rho_0 = 0.075` lb/ft3); this function takes and returns SI and
     converts internally.
 
     The octave-band spectrum follows from Eq. 13.29,
-    :math:`L_{W,oct} = L_W + C_D`, with the shape functions of Eqs. 13.30
+    :math:`L_{W,\mathrm{oct}} = L_W + C_\mathrm{D}`, with the shape functions of Eqs. 13.30
     and 13.31:
 
     .. math::
 
-       C_D = -5.82 - 0.15 A - 1.13 A^2 \qquad \text{(round)}
+       C_\mathrm{D} = -5.82 - 0.15 A - 1.13 A^2 \qquad \text{(round)}
 
-       C_D = -11.82 - 0.15 A - 1.13 A^2
+       C_\mathrm{D} = -11.82 - 0.15 A - 1.13 A^2
        \qquad \text{(rectangular, including slot)}
 
-    normalised to the peak frequency :math:`f_P = 48.8 U_G` of Eq. 13.32,
+    normalised to the peak frequency :math:`f_P = 48.8 U_\mathrm{G}` of Eq. 13.32,
     where :math:`A = N_B(f_P) - N_B(f)` is the distance in octaves from the
     peak band (Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
 
@@ -1369,7 +1369,7 @@ def diffuser_sound_power(
 
     :param frequencies: Octave-band centres, Hz; ``None`` uses
         :data:`OCTAVE_BANDS`.
-    :param face_area: Cross-sectional face area ``S_G`` of one device, m2.
+    :param face_area: Cross-sectional face area ``S_\mathrm{G}`` of one device, m2.
     :param volume_flow: Volume flow ``Q`` through one device, m3/s.
     :param pressure_drop: Static pressure drop ``dP`` across the device, Pa.
     :param shape: ``"rectangular"`` (Eq. 13.31, includes slot diffusers) or
@@ -1387,8 +1387,8 @@ def diffuser_sound_power(
     profile = require_choice(shape, "shape", ("rectangular", "round"))
     if count <= 0:
         raise ValueError("'count' must be a positive integer.")
-    # Eq. 13.28: Long prints "ft/min" under U_G but defines it in the same
-    # breath as Q / (60 S_G), which is ft/s, the unit Eq. 13.27 declares and
+    # Eq. 13.28: Long prints "ft/min" under U_\mathrm{G} but defines it in the same
+    # breath as Q / (60 S_\mathrm{G}), which is ft/s, the unit Eq. 13.27 declares and
     # the only one for which the 334.9 constant is the velocity-pressure
     # relation (see docs/ERRATA.md).
     velocity = flow_cfm / (60.0 * area_ft2)
