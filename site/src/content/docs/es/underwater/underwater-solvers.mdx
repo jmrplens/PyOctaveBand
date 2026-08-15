@@ -312,7 +312,7 @@ rays = underwater.ray_trace(z, c, source_depth=100.0,
                             n_steps=20000)
 z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  profundidad de giro analítica
-print(round(float(rays.depths.max()), 1))   # 583.7  trazada
+print(round(float(rays.depths.max()), 1))   # 583.3  trazada
 
 # El arco fija también el tiempo hasta ese giro, y depende solo del ángulo
 # de lanzamiento: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
@@ -328,8 +328,9 @@ print(round(float(traced), 3))                                 # 6.171  trazado
 
 *Cuanto más empinado es el lanzamiento, más hondo gira el rayo: en la misma agua
 el rayo de 2° gira a 154 m y el de 10° a 1454 m. El rayo de 6° lleva la
-validación de la propia página, los 583,3 m de profundidad de giro analítica
-frente a los 583,7 m trazados, y la superposición discontinua es el arco de
+validación de la propia página, los 583,3 m de profundidad de giro analítica,
+que el trazado reproduce hasta la décima de metro que imprime, y la
+superposición discontinua es el arco de
 círculo exacto de radio $R = c_0/(g\cos\theta_0)$ contra el que se comprueba el
 cálculo. Un resultado dibuja su propio abanico con `rays.plot()`.*
 

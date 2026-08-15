@@ -10,6 +10,8 @@ spreading for the parabolic equation.
 
 from __future__ import annotations
 
+import math
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -202,6 +204,100 @@ def test_ray_travel_time_constant_profile_is_range_over_speed() -> None:
     assert np.allclose(res.travel_times[0], r / c, rtol=0.0, atol=1e-12)
     assert np.allclose(res.travel_times[1], r / (c * np.cos(np.radians(20.0))),
                        rtol=0.0, atol=1e-12)
+
+
+# A ray steep enough to reach the bottom before it turns (it would only turn at
+# 4098 m, five times the column), launched deep enough to work both boundaries.
+_BOUNCE_C0, _BOUNCE_G = 1500.0, 0.06  # c(z) = 1500 + 0.06 z
+_BOUNCE_DEPTH, _BOUNCE_SOURCE_Z = 800.0, 200.0
+_BOUNCE_LAUNCH_DEG, _BOUNCE_RANGE = 30.0, 9000.0
+_BOUNCE_MAX_LEGS = 200
+
+
+def _arc_walk(rmax: float) -> tuple[float, float]:
+    """Exact travel time and depth at ``rmax`` for the bouncing ray below.
+
+    In a constant gradient a ray is an arc of a circle of radius R = 1/(xi g)
+    centred at the depth where c extrapolates to zero, z_c = -c1/g, since
+    Snell's cos(phi) = xi c(z) and c(z) = g (z - z_c) together give
+    z = z_c + R cos(phi). Range and time along the arc follow from
+    dr = -R cos(phi) dphi and dt = ds/c = dphi/(g cos(phi)):
+
+        r = R [sin(phi_a) - sin(phi_b)],
+        t = |ln((1 + sin phi_a)/cos phi_a) - ln((1 + sin phi_b)/cos phi_b)| / g,
+
+    the second being Medwin & Clay Eq. (3.3.20) written with the angle alone. A
+    specular reflection is exactly ``phi -> -phi`` at the boundary depth, so the
+    whole bouncing path is these two formulae restarted at each boundary. None
+    of it comes from the solver.
+    """
+    phi = math.radians(_BOUNCE_LAUNCH_DEG)
+    z_c = -_BOUNCE_C0 / _BOUNCE_G
+    xi = math.cos(phi) / (_BOUNCE_C0 + _BOUNCE_G * _BOUNCE_SOURCE_Z)
+    radius = 1.0 / (xi * _BOUNCE_G)
+
+    def arc(p: float) -> float:
+        return math.log((1.0 + math.sin(p)) / math.cos(p))
+
+    r = t = 0.0
+    for _ in range(_BOUNCE_MAX_LEGS):
+        target = _BOUNCE_DEPTH if phi > 0.0 else 0.0
+        phi_b = math.copysign(math.acos((target - z_c) / radius), phi)
+        leg = radius * (math.sin(phi) - math.sin(phi_b))
+        if r + leg >= rmax:  # the partial leg the range ends inside
+            p = math.asin(math.sin(phi) - (rmax - r) / radius)
+            return t + abs(arc(phi) - arc(p)) / _BOUNCE_G, z_c + radius * math.cos(p)
+        r += leg
+        t += abs(arc(phi) - arc(phi_b)) / _BOUNCE_G
+        phi = -phi_b  # the reflection itself
+    raise AssertionError("the arc walk did not reach the range")
+
+
+def test_bouncing_ray_matches_the_exact_arc_through_every_reflection() -> None:
+    """A multi-bounce path against the closed form, at a sampled range.
+
+    The comparison is at the last sample, where the marching grid lands exactly,
+    because interpolating between samples is second order and would swamp what
+    is being measured.
+    """
+    prof = (np.array([0.0, _BOUNCE_DEPTH]),
+            np.array([_BOUNCE_C0, _BOUNCE_C0 + _BOUNCE_G * _BOUNCE_DEPTH]))
+    res = ray_trace(*prof, source_depth=_BOUNCE_SOURCE_Z,
+                    launch_angles_deg=[_BOUNCE_LAUNCH_DEG],
+                    max_range=_BOUNCE_RANGE, n_steps=4001)
+    t_exact, z_exact = _arc_walk(_BOUNCE_RANGE)
+    assert res.ranges[0, -1] == pytest.approx(_BOUNCE_RANGE)
+    # The ray really does work both boundaries over this range.
+    assert res.depths[0].max() > _BOUNCE_DEPTH - 1.0
+    assert res.depths[0].min() < 1.0
+    assert float(res.travel_times[0, -1]) == pytest.approx(t_exact, abs=1e-12)
+    assert float(res.depths[0, -1]) == pytest.approx(z_exact, abs=1e-8)
+
+
+def test_reflection_costs_no_accuracy_in_a_gradient() -> None:
+    """A bounce must not degrade the path, which is what splitting the step buys.
+
+    A ray launched upward from the surface and the same ray launched downward
+    are one trajectory: the first reflects immediately and continues as the
+    second, so the two must agree to the accuracy of the integration itself.
+    They only do if the range step is split at the crossing. Folding the
+    overshoot back after a whole step instead integrates through water that is
+    not there and applies a mid-step reflection at the step's end, which leaves
+    a first-order error per bounce: metres of depth at these step counts, and
+    visible in any figure that draws a reflected ray.
+
+    Isovelocity water cannot see this (no gradient, nothing to get wrong outside
+    the column), which is why a gradient is essential here.
+    """
+    prof = (np.array([0.0, 2000.0]), np.array([1500.0, 1600.0]))
+    for n_steps in (201, 2001, 20_001):
+        kw = {"source_depth": 0.0, "max_range": 10_000.0, "n_steps": n_steps}
+        up = ray_trace(*prof, launch_angles_deg=[-10.0], **kw)
+        down = ray_trace(*prof, launch_angles_deg=[10.0], **kw)
+        # Nanometres over a 2 km column: roundoff, not discretisation. Before
+        # the step was split this gap was 3.6 m at the middle step count.
+        assert np.abs(up.depths[0] - down.depths[0]).max() < 1e-9, n_steps
+        assert np.abs(up.travel_times[0] - down.travel_times[0]).max() < 1e-12
 
 
 def test_ray_travel_time_survives_reflections() -> None:

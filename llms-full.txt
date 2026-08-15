@@ -49175,7 +49175,7 @@ rays = underwater.ray_trace(z, c, source_depth=100.0,
                             n_steps=20000)
 z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  analytic turning depth
-print(round(float(rays.depths.max()), 1))   # 583.7  traced
+print(round(float(rays.depths.max()), 1))   # 583.3  traced
 
 # The arc also fixes the time to that turn, and it depends on the launch
 # angle alone: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].

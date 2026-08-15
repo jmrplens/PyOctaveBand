@@ -300,7 +300,7 @@ rays = underwater.ray_trace(z, c, source_depth=100.0,
                             n_steps=20000)
 z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  analytic turning depth
-print(round(float(rays.depths.max()), 1))   # 583.7  traced
+print(round(float(rays.depths.max()), 1))   # 583.3  traced
 
 # The arc also fixes the time to that turn, and it depends on the launch
 # angle alone: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
@@ -316,9 +316,9 @@ print(round(float(traced), 3))                                 # 6.171  traced
 
 *Steeper launch means deeper turn: in the same water the 2° ray turns at 154 m
 and the 10° ray at 1454 m. The 6° ray carries the page's own validation, the
-583.3 m analytic turning depth against 583.7 m traced, and the dashed overlay is
-the exact circular arc of radius $R = c_0/(g\cos\theta_0)$ the solver is checked
-against. A result draws its own fan with `rays.plot()`.*
+583.3 m analytic turning depth, which the trace reproduces to the tenth of a
+metre it prints, and the dashed overlay is the exact circular arc of radius
+$R = c_0/(g\cos\theta_0)$ the solver is checked against. A result draws its own fan with `rays.plot()`.*
 
 <details>
 <summary>Show the code for this figure</summary>

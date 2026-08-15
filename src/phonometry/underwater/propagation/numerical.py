@@ -44,6 +44,22 @@ if TYPE_CHECKING:
 
 _BOTTOM_TYPES = ("pressure-release", "rigid")
 
+#: Bisections used to locate a surface or bottom crossing inside a ray step.
+#: The bracket is the unit interval, so 40 halvings pin the crossing far below
+#: the accuracy of the step it subdivides, at the cost of arithmetic only.
+_BOUNDARY_BISECTIONS = 40
+#: Newton polishes of the interpolated crossing, against real Runge-Kutta steps.
+#: Two is convergence to the step's own residual from a start already close.
+_BOUNDARY_NEWTON_STEPS = 2
+#: Below this |dz/dr| a ray meets the boundary tangentially and Newton has no
+#: slope to divide by; the interpolated crossing stands.
+_GRAZING_SLOPE = 1e-12
+#: Cap on reflections resolved within one range step. A step spans dr*tan(theta)
+#: in depth, so reaching this many crossings needs a ray within a hair of
+#: vertical in a column thinner than one step; the cap only stops a pathological
+#: input from spinning.
+_MAX_CROSSINGS_PER_STEP = 16
+
 
 def _clean_profile(
     depths: NDArray[np.float64] | list[float],
@@ -402,25 +418,105 @@ def ray_trace(
     ray_z = np.zeros((angles.size, ns))
     ray_t = np.zeros((angles.size, ns))
     ray_z[:, 0] = zs
-    two_d = 2.0 * water_depth
+
+    def rk4(
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
+        h: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        """One Runge-Kutta step of per-ray range size ``h``; time as increment."""
+        k1z, k1zeta, k1t = deriv(z_arr, zeta_arr, xi)
+        k2z, k2zeta, k2t = deriv(z_arr + 0.5 * h * k1z,
+                                 zeta_arr + 0.5 * h * k1zeta, xi)
+        k3z, k3zeta, k3t = deriv(z_arr + 0.5 * h * k2z,
+                                 zeta_arr + 0.5 * h * k2zeta, xi)
+        k4z, k4zeta, k4t = deriv(z_arr + h * k3z, zeta_arr + h * k3zeta, xi)
+        return (z_arr + h / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z),
+                zeta_arr + h / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta),
+                h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t))
+
+    def boundary_fraction(
+        z0: NDArray[np.float64], zeta0: NDArray[np.float64],
+        z1: NDArray[np.float64], zeta1: NDArray[np.float64],
+        h: NDArray[np.float64], target: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        """How far into the step the depth first reaches ``target``, in [0, 1].
+
+        The cubic Hermite through the two endpoint depths and their two slopes
+        (dz/dr = ζ/ξ) is the step's own interpolant, so bisecting it locates the
+        crossing without a single further evaluation of the profile. Bisection
+        rather than a closed-form cubic root because it is branch-free across
+        rays and cannot pick the wrong one of three.
+        """
+        m0 = h * zeta0 / xi
+        m1 = h * zeta1 / xi
+
+        def depth_at(s: NDArray[np.float64]) -> NDArray[np.float64]:
+            s2 = s * s
+            s3 = s2 * s
+            return ((2.0 * s3 - 3.0 * s2 + 1.0) * z0 + (s3 - 2.0 * s2 + s) * m0
+                    + (3.0 * s2 - 2.0 * s3) * z1 + (s3 - s2) * m1 - target)
+
+        lo = np.zeros_like(z0)
+        hi = np.ones_like(z0)
+        start_sign = np.sign(depth_at(lo))
+        for _ in range(_BOUNDARY_BISECTIONS):
+            mid = 0.5 * (lo + hi)
+            keeps_sign = np.sign(depth_at(mid)) == start_sign
+            lo = np.where(keeps_sign, mid, lo)
+            hi = np.where(keeps_sign, hi, mid)
+        return 0.5 * (lo + hi)
+
     for s in range(1, ns):
-        k1z, k1zeta, k1t = deriv(z, zeta, xi)
-        k2z, k2zeta, k2t = deriv(z + 0.5 * dr * k1z, zeta + 0.5 * dr * k1zeta, xi)
-        k3z, k3zeta, k3t = deriv(z + 0.5 * dr * k2z, zeta + 0.5 * dr * k2zeta, xi)
-        k4z, k4zeta, k4t = deriv(z + dr * k3z, zeta + dr * k3zeta, xi)
-        z = z + dr / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z)
-        zeta = zeta + dr / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta)
-        # From the same four stages as the geometry above. A reflection is
-        # specular and instantaneous, so no time is added at a bounce: the fold
-        # below rewrites z and ζ alone, and the accumulated time crosses it
-        # unchanged wherever this line sits.
-        ray_t[:, s] = ray_t[:, s - 1] + dr / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t)
-        # Fold any overshoot (arbitrarily many surface/bottom crossings) back
-        # into [0, D] with a triangle wave, flipping ζ once per crossing.
-        zmod = np.mod(z, two_d)
-        upper = zmod > water_depth
-        z = np.where(upper, two_d - zmod, zmod)
-        zeta = np.where(upper, -zeta, zeta)
+        # Split the range step at every surface or bottom crossing instead of
+        # folding the overshoot back afterwards. Folding integrates the step
+        # through water that is not there (the profile saturates outside the
+        # column) and applies a mid-step reflection at the step's end, which
+        # costs one order of accuracy per bounce in a gradient. Here each
+        # crossing ends a sub-step exactly on the boundary, ζ flips there, and
+        # the remainder of the step continues from it, so a reflected ray keeps
+        # the order the rest of the path is integrated with.
+        h = np.full(angles.size, dr)
+        t_step = np.zeros(angles.size)
+        for _ in range(_MAX_CROSSINGS_PER_STEP):
+            moving = h > 0.0
+            if not moving.any():
+                break
+            z_end, zeta_end, dt = rk4(z, zeta, h)
+            crossed = ((z_end < 0.0) | (z_end > water_depth)) & moving
+            if not crossed.any():
+                z = np.where(moving, z_end, z)
+                zeta = np.where(moving, zeta_end, zeta)
+                t_step += np.where(moving, dt, 0.0)
+                break
+            target = np.where(z_end < 0.0, 0.0, water_depth)
+            frac = np.clip(
+                boundary_fraction(z, zeta, z_end, zeta_end, h, target), 0.0, 1.0
+            )
+            # The interpolant places the crossing to its own order, which is one
+            # short of the step's. Polishing it with Newton on real steps costs
+            # two evaluations per bounce, rare enough to be free, and buys back
+            # the order: the residual is then RK4's own. A ray tangent to the
+            # boundary has no slope to divide by, so it keeps the interpolated
+            # value, which is exactly the case where the interpolant is best.
+            for _ in range(_BOUNDARY_NEWTON_STEPS):
+                z_try, zeta_try, _ = rk4(z, zeta, frac * h)
+                slope = h * zeta_try / xi
+                usable = np.abs(slope) > _GRAZING_SLOPE
+                # Both branches of np.where are evaluated, so the divisor has to
+                # be finite even where the result is discarded.
+                step = np.where(usable,
+                                (z_try - target) / np.where(usable, slope, 1.0),
+                                0.0)
+                frac = np.clip(frac - step, 0.0, 1.0)
+            h_sub = np.where(crossed, frac, 1.0) * h
+            z_sub, zeta_sub, dt_sub = rk4(z, zeta, h_sub)
+            # A reflection is specular and instantaneous: ζ changes sign and no
+            # time is added, so only the sub-step before it is charged.
+            z = np.where(moving, np.where(crossed, target, z_sub), z)
+            zeta = np.where(moving, np.where(crossed, -zeta_sub, zeta_sub), zeta)
+            t_step += np.where(moving, dt_sub, 0.0)
+            h = np.where(moving, h - h_sub, 0.0)
+        ray_t[:, s] = ray_t[:, s - 1] + t_step
         ray_z[:, s] = z
     ray_r = np.broadcast_to(ranges, ray_z.shape).copy()
 
