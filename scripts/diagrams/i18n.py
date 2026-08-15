@@ -1651,6 +1651,10 @@ _ES: dict[str, str] = {
         "(apartado 4.1)",
     "mean of the three one-third octaves, rounded to 0.05":
         "media de los tres tercios de octava, redondeado a 0,05",
+    "read off the shifted curve, always a multiple of 0.05":
+        "leído sobre la curva desplazada, siempre múltiplo de 0,05",
+    "appended to $α_w$ in parentheses, e.g. 0.60(M)":
+        "añadido a $α_w$ entre paréntesis, p. ej. 0,60(M)",
     "Shift the reference curve in 0.05 steps to best fit  (Clause 4.2)":
         "Desplazar la curva de referencia en pasos de 0,05 hasta el mejor "
         "ajuste  (apartado 4.2)",
@@ -2583,6 +2587,7 @@ _ES: dict[str, str] = {
         "Medición de FRF a dos canales: el estimador H1 y la coherencia",
     "Signal generator": "Generador de señal",
     "broadband noise or a sweep": "ruido de banda ancha o barrido",
+    "its gain is in H1": "su ganancia va en H1",
     "Power amplifier": "Amplificador",
     "Loudspeaker under test": "Altavoz en ensayo",
     "measurement microphone": "micrófono de medición",
