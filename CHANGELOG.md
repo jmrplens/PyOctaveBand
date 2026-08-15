@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Silencer layouts built by hand can now be drawn. `SilencerChain` cascades
-  the same `duct_matrix`, `shunt_matrix` and `cascade` calls the four-pole
-  method has always taken, keeping what each element was handed, so a layout
-  none of the named devices covers has a `.plot_geometry()` as well as a
-  transfer matrix, and one call feeds both. The drawing shows exactly what
+- Silencer layouts built by hand can now be drawn. A layout none of the four
+  named devices covers gets a `.plot_geometry()` alongside its transfer matrix,
+  through `SilencerChain`. It cascades the same `duct_matrix`, `shunt_matrix`
+  and `cascade` calls the four-pole method has always taken, and keeps what
+  each element was handed, so one call feeds both the matrix and the drawing
+  and the two cannot drift apart. The drawing shows exactly what
   the elements declare and not a millimetre more: the ducts to scale with
   their lengths, bores, area steps and overall run dimensioned, and each side
   branch marked at the station where it joins, because a shunt is handed an
