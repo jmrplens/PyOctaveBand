@@ -109,7 +109,7 @@ they describe the plane-wave mode alone and a measurement will show the rest.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -557,6 +557,7 @@ def _result(
     resonances: NDArray[np.float64] | None = None,
     geometry: dict[str, float] | None = None,
     areas: Sequence[float] | None = None,
+    chain: SilencerChain | None = None,
 ) -> ReactiveSilencerResult:
     """Assemble a :class:`ReactiveSilencerResult` from a compound matrix.
 
@@ -597,6 +598,7 @@ def _result(
         resonances=resonances,
         geometry=geometry,
         plane_wave_limit=limit,
+        chain=chain,
     )
 
 
@@ -1043,10 +1045,9 @@ class SilencerChain:
             c=self._c, rho=self._rho,
             source_impedance=source_impedance,
             radiation_impedance=radiation_impedance,
-            kind=_KIND_CHAIN, areas=areas,
+            kind=_KIND_CHAIN, areas=areas, chain=self._snapshot(),
         )
-        attached: ReactiveSilencerResult = replace(computed, chain=self._snapshot())
-        return attached
+        return computed
 
     def plot_geometry(
         self, ax: Axes | None = None, *, language: str = "en"
