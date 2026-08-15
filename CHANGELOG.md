@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The underwater ray solver returns travel times. `ray_trace` now carries
+  `travel_times` on its `RayTraceResult`, one cumulative arrival per ray
+  sample, integrated as a third state of the Runge-Kutta step that already
+  places the ray (`dt/dr = 1/(xi c^2)`, off the sound speed the trajectory
+  derivatives interpolate anyway) rather than quadratured over the finished
+  path, which is both a fidelity argument and an accuracy one: the stage sum
+  reproduces the published closed form to 1e-14 s where the quadrature misses
+  it by 3e-5 s at the default step. A reflection is instantaneous, so the time
+  crosses surface and bottom bounces unchanged, and a ray bouncing the length
+  of an isovelocity waveguide reports range/(c cos theta0) to nine digits. The
+  oracle is Medwin and Clay, *Fundamentals of Acoustical Oceanography*
+  (Academic Press, 1998), Eq. (3.3.20) on p. 88, read in the library's
+  horizontal-angle convention as t = (1/g) ln[(c2/c1)(1 + sin th1)/(1 + sin
+  th2)]; it anchors a new conformance row and the tests, which also pin the
+  properties the physics owes, including that a ray turning deeper takes
+  longer to reach its turn. The airborne twin `atmospheric_ray_paths`, which
+  has returned a travel time since it was written, moves to the same
+  four-stage integration; nothing rendered depends on either. The documentation
+  that promised paths and travel times, and had been corrected the other way
+  when the coverage audit found nothing computing them, is true as first
+  written.
 - Every piece of vector artwork draws its own text. The figures' SVGs used to
   ship live text positioned glyph by glyph from DejaVu metrics while asking the
   viewer for a generic sans, so any label carrying mathematics arrived
