@@ -257,7 +257,7 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
             label="Soft (grass/pasture, class D)")
     ax.set_xscale("log")
     ax.set_xlabel("One-third-octave-band centre frequency [Hz]")
-    ax.set_ylabel(r"Ground-effect adjustment $\Delta L_g$ [dB]")
+    ax.set_ylabel(r"Ground-effect adjustment $\Delta L_\mathrm{g}$ [dB]")
     ax.set_title("Rotorcraft Ground Effect (ECAC Doc 32, Chien-Soroka)",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.6, which="both")
@@ -265,7 +265,7 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.98, 0.05,
-            f"$h_s$ = {hs:.0f} m, $h_r$ = {hr:.1f} m, $d_p$ = {dp:.0f} m",
+            f"$h_\\mathrm{{s}}$ = {hs:.0f} m, $h_\\mathrm{{r}}$ = {hr:.1f} m, $d_\\mathrm{{p}}$ = {dp:.0f} m",
             transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -419,7 +419,7 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
         fontsize=9, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
     ax.set_xlabel(r"Path difference $\delta$ [m]")
-    ax.set_ylabel(r"Diffraction attenuation $\Delta L_d$ [dB]")
+    ax.set_ylabel(r"Diffraction attenuation $\Delta L_\mathrm{d}$ [dB]")
     ax.set_title("Rotorcraft Diffraction Attenuation vs Path Difference "
                  "(ECAC Doc 32 / NORAH2)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -943,9 +943,9 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     ax.plot([rcv[0]], [rcv[1]], "o", color=COLOR_PRIMARY, ms=7, label="receiver")
     m, c = float(plane.slope), float(plane.intercept)
     for (px, py), color, label in ((src, COLOR_SECONDARY,
-                                    f"$h_s$ = {hs_eq:.0f} m"),
+                                    f"$h_\\mathrm{{s}}$ = {hs_eq:.0f} m"),
                                    (rcv, COLOR_PRIMARY,
-                                    f"$h_r$ = {hr_eq:.1f} m")):
+                                    f"$h_\\mathrm{{r}}$ = {hr_eq:.1f} m")):
         # Foot of the perpendicular onto the fitted plane.
         fx = (px + m * (py - c)) / (1.0 + m**2)
         ax.plot([px, fx], [py, m * fx + c], color=color, lw=1.6, ls="-")
@@ -973,7 +973,7 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
              label=f"equivalent heights ({hs_eq:.0f} m, {hr_eq:.1f} m)")
     ax2.set_xscale("log")
     ax2.set_xlabel("One-third-octave-band centre frequency [Hz]")
-    ax2.set_ylabel(r"Ground-effect adjustment $\Delta L_g$ [dB]")
+    ax2.set_ylabel(r"Ground-effect adjustment $\Delta L_\mathrm{g}$ [dB]")
     ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.6, which="both")
     ax2.set_axisbelow(True)
     format_frequency_axis(ax2, float(freqs.min()), float(freqs.max()))
@@ -1021,7 +1021,7 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
              (inside[0] / dv, scale * inside[1] / dg),
              (outside[0] / dv, scale * outside[1] / dg),
              "Normalised plane — the library default",
-             r"$V/\Delta V$", r"$F_{fc}\,\gamma/\Delta\gamma$")):
+             r"$V/\Delta V$", r"$F_\mathrm{fc}\,\gamma/\Delta\gamma$")):
         axis.triplot(pts[:, 0], pts[:, 1], tri, color=COLOR_MUTED, lw=0.9,
                      zorder=1)
         # The simplex that encloses the query, and the three weights it blends.

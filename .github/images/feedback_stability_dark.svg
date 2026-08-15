@@ -54,7 +54,7 @@ L 0 3.5
       </g>
      </g>
      <g id="text_1">
-      <!-- Open-loop gain $Z_S$ -->
+      <!-- Open-loop gain $Z_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(93.737837 320.118984) scale(0.08 -0.08)">
        <defs>
         <path id="DejaVuSans-32" d="M 2522 4238 
@@ -277,35 +277,35 @@ L 738 4134
 L 838 4666 
 z
 " transform="scale(0.015625)"/>
-        <path id="DejaVuSans-Oblique-36" d="M 3859 4513 
-L 3738 3897 
-Q 3422 4066 3111 4152 
-Q 2800 4238 2509 4238 
-Q 1944 4238 1609 3991 
-Q 1275 3744 1275 3334 
-Q 1275 3109 1398 2989 
-Q 1522 2869 2034 2731 
-L 2413 2638 
-Q 3053 2472 3303 2217 
-Q 3553 1963 3553 1503 
-Q 3553 797 2998 353 
-Q 2444 -91 1538 -91 
-Q 1166 -91 791 -17 
-Q 416 56 38 206 
-L 166 856 
-Q 513 641 861 531 
-Q 1209 422 1556 422 
-Q 2147 422 2503 684 
-Q 2859 947 2859 1369 
-Q 2859 1650 2717 1795 
-Q 2575 1941 2106 2059 
-L 1728 2156 
-Q 1081 2325 845 2545 
-Q 609 2766 609 3163 
-Q 609 3859 1145 4304 
-Q 1681 4750 2541 4750 
-Q 2875 4750 3203 4690 
-Q 3531 4631 3859 4513 
+        <path id="DejaVuSans-36" d="M 3425 4513 
+L 3425 3897 
+Q 3066 4069 2747 4153 
+Q 2428 4238 2131 4238 
+Q 1616 4238 1336 4038 
+Q 1056 3838 1056 3469 
+Q 1056 3159 1242 3001 
+Q 1428 2844 1947 2747 
+L 2328 2669 
+Q 3034 2534 3370 2195 
+Q 3706 1856 3706 1288 
+Q 3706 609 3251 259 
+Q 2797 -91 1919 -91 
+Q 1588 -91 1214 -16 
+Q 841 59 441 206 
+L 441 856 
+Q 825 641 1194 531 
+Q 1563 422 1919 422 
+Q 2459 422 2753 634 
+Q 3047 847 3047 1241 
+Q 3047 1584 2836 1778 
+Q 2625 1972 2144 2069 
+L 1759 2144 
+Q 1053 2284 737 2584 
+Q 422 2884 422 3419 
+Q 422 4038 858 4394 
+Q 1294 4750 2059 4750 
+Q 2388 4750 2728 4690 
+Q 3069 4631 3425 4513 
 z
 " transform="scale(0.015625)"/>
        </defs>
@@ -325,7 +325,7 @@ z
        <use xlink:href="#DejaVuSans-51" transform="translate(701.123047 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(764.501953 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(796.289062 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(864.794922 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(864.794922 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -341,7 +341,7 @@ L 295.00881 23.558281
       </g>
      </g>
      <g id="text_2">
-      <!-- Feedback-loop gain $G_S$ -->
+      <!-- Feedback-loop gain $G_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(249.76881 320.118984) scale(0.08 -0.08)">
        <defs>
         <path id="DejaVuSans-29" d="M 628 4666 
@@ -494,7 +494,7 @@ z
        <use xlink:href="#DejaVuSans-51" transform="translate(910.722656 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(974.101562 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-2a" transform="translate(1005.888672 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1083.378906 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1083.378906 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -1425,37 +1425,6 @@ L 570.862992 46.96493
      <!-- Stability limit (10 dB margin) -->
      <g style="fill: #ffffff" transform="translate(577.526992 49.88043) scale(0.0833 -0.0833)">
       <defs>
-       <path id="DejaVuSans-36" d="M 3425 4513 
-L 3425 3897 
-Q 3066 4069 2747 4153 
-Q 2428 4238 2131 4238 
-Q 1616 4238 1336 4038 
-Q 1056 3838 1056 3469 
-Q 1056 3159 1242 3001 
-Q 1428 2844 1947 2747 
-L 2328 2669 
-Q 3034 2534 3370 2195 
-Q 3706 1856 3706 1288 
-Q 3706 609 3251 259 
-Q 2797 -91 1919 -91 
-Q 1588 -91 1214 -16 
-Q 841 59 441 206 
-L 441 856 
-Q 825 641 1194 531 
-Q 1563 422 1919 422 
-Q 2459 422 2753 634 
-Q 3047 847 3047 1241 
-Q 3047 1584 2836 1778 
-Q 2625 1972 2144 2069 
-L 1759 2144 
-Q 1053 2284 737 2584 
-Q 422 2884 422 3419 
-Q 422 4038 858 4394 
-Q 1294 4750 2059 4750 
-Q 2388 4750 2728 4690 
-Q 3069 4631 3425 4513 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-5c" d="M 2059 -325 
 Q 1816 -950 1584 -1140 
 Q 1353 -1331 966 -1331 
@@ -1530,7 +1499,7 @@ L 130.217837 349.358281
       </g>
      </g>
      <g id="text_22">
-      <!-- Open-loop gain $Z_S$ -->
+      <!-- Open-loop gain $Z_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(93.737837 645.918984) scale(0.08 -0.08)">
        <use xlink:href="#DejaVuSans-32" transform="translate(0 0.015625)"/>
        <use xlink:href="#DejaVuSans-53" transform="translate(78.710938 0.015625)"/>
@@ -1548,7 +1517,7 @@ L 130.217837 349.358281
        <use xlink:href="#DejaVuSans-51" transform="translate(701.123047 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(764.501953 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(796.289062 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(864.794922 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(864.794922 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -1564,7 +1533,7 @@ L 295.00881 349.358281
       </g>
      </g>
      <g id="text_23">
-      <!-- Feedback-loop gain $G_S$ -->
+      <!-- Feedback-loop gain $G_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(249.76881 645.918984) scale(0.08 -0.08)">
        <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
        <use xlink:href="#DejaVuSans-48" transform="translate(52.519531 0.015625)"/>
@@ -1586,7 +1555,7 @@ L 295.00881 349.358281
        <use xlink:href="#DejaVuSans-51" transform="translate(910.722656 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(974.101562 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-2a" transform="translate(1005.888672 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1083.378906 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1083.378906 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>

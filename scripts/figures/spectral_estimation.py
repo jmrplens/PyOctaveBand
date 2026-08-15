@@ -79,7 +79,7 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.985, 0.965,
             f"$n_d$ = {res.n_averages:.0f} averages, "
-            f"$\\varepsilon_r$ = {100.0 * res.random_error:.1f} %",
+            f"$\\varepsilon_\\mathrm{{r}}$ = {100.0 * res.random_error:.1f} %",
             transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -225,7 +225,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
             peak_ref = float(np.max(level))
         ax_l.plot(res.frequencies[band], level, color=color, linewidth=1.5,
                   label=f"nperseg = {nperseg}, "
-                        f"$B_e$ = {res.resolution_bandwidth:.1f} Hz")
+                        f"$B_\\mathrm{{e}}$ = {res.resolution_bandwidth:.1f} Hz")
     ax_l.set_xlim(880.0, 1120.0)
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("PSD [dB re 1/Hz]")
@@ -247,7 +247,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
         measured.append(float(np.max(10.0 * np.log10(res.psd[band]))))
     measured_db = np.asarray(measured)
     ax_r.semilogx(grid, bias_db, "o-", color=COLOR_SECONDARY, base=2,
-                  label="resolution bias, $-10\\lg(1+\\varepsilon_b)$ [dB]")
+                  label="resolution bias, $-10\\lg(1+\\varepsilon_\\mathrm{b})$ [dB]")
     ax_r.semilogx(grid, random_db, "s-", color=COLOR_PRIMARY, base=2,
                   label="random error, $10\\lg(1+1/\\sqrt{n_d})$ [dB]")
     ax_r.semilogx(grid, measured_db.max() - measured_db, "^--", color=COLOR_TERTIARY,

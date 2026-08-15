@@ -422,7 +422,7 @@ def generate_uncertainty(output_dir: str) -> None:
     pos = np.arange(len(names))
     ax_b.barh(pos, contrib, color=COLOR_PRIMARY, zorder=2)
     ax_b.axvline(result.combined_uncertainty, color=COLOR_SECONDARY, ls="--",
-                 label=f"$u_c$ = {result.combined_uncertainty:.3f} dB")
+                 label=f"$u_\\mathrm{{c}}$ = {result.combined_uncertainty:.3f} dB")
     ax_b.set_yticks(pos)
     ax_b.set_yticklabels(names)
     ax_b.invert_yaxis()

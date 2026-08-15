@@ -60,7 +60,7 @@ _HEIGHT_LABEL = "Height [m]"
 _RANGE_LABEL = "Range [m]"
 _TOTAL_A_LABEL = "$A$ — total"
 _FREE_FIELD_LABEL = "Level re free field [dB]"
-_LT_LABEL = "$L_t$ [dB]"
+_LT_LABEL = "$L_\\mathrm{t}$ [dB]"
 
 _STRINGS: dict[str, str] = {
     "Narrowband spectrum": "Espectro de banda estrecha",
@@ -74,15 +74,15 @@ _STRINGS: dict[str, str] = {
     "Impulses": "Impulsos",
     "Governing": "Determinante",
     "Predicted prominence $P$": "Prominencia prevista $P$",
-    "Adjustment $K_I$ [dB]": "Ajuste $K_I$ [dB]",
+    "Adjustment $K_\\mathrm{I}$ [dB]": "Ajuste $K_\\mathrm{I}$ [dB]",
     # The decimal lives inside the mathematics, out of reach of the automatic
     # comma pass, so the Spanish value carries it already converted; the braces
     # keep mathtext from spacing the comma as the punctuation mark it is.
-    r"$K_I = 1.8\,(P-5)$": r"$K_I = 1{,}8\,(P-5)$",
-    "NT ACOU 112 — impulse adjustment to $L_{Aeq}$": "NT ACOU 112 — ajuste por impulsos a $L_{Aeq}$",
-    "knees $\\Delta L_{ta}=4,\\,10$ dB": "codos $\\Delta L_{ta}=4,\\,10$ dB",
-    "Tonal audibility $\\Delta L_{ta}$ [dB]": "Audibilidad tonal $\\Delta L_{ta}$ [dB]",
-    "Tonal adjustment $K_t$ [dB]": "Ajuste tonal $K_t$ [dB]",
+    r"$K_\mathrm{I} = 1.8\,(P-5)$": r"$K_\mathrm{I} = 1{,}8\,(P-5)$",
+    "NT ACOU 112 — impulse adjustment to $L_\\mathrm{Aeq}$": "NT ACOU 112 — ajuste por impulsos a $L_\\mathrm{Aeq}$",
+    "knees $\\Delta L_\\mathrm{ta}=4,\\,10$ dB": "codos $\\Delta L_\\mathrm{ta}=4,\\,10$ dB",
+    "Tonal audibility $\\Delta L_\\mathrm{ta}$ [dB]": "Audibilidad tonal $\\Delta L_\\mathrm{ta}$ [dB]",
+    "Tonal adjustment $K_\\mathrm{t}$ [dB]": "Ajuste tonal $K_\\mathrm{t}$ [dB]",
     "ISO 1996-2 tonal adjustment": "Ajuste tonal ISO 1996-2",
     r"$A_{\mathrm{div}}$ — divergence": r"$A_{\mathrm{div}}$ — divergencia",
     r"$A_{\mathrm{atm}}$ — atmospheric": r"$A_{\mathrm{atm}}$ — atmosférica",
@@ -119,11 +119,11 @@ _STRINGS: dict[str, str] = {
         r"Coeficiente de atenuación $\alpha$ [dB/km]",
     "ISO 9613-1 atmospheric attenuation": "Atenuación atmosférica ISO 9613-1",
     "Band level": "Nivel de banda",
-    "$L_t$ vs neighbour mean": "$L_t$ frente a la media de contiguas",
+    "$L_\\mathrm{t}$ vs neighbour mean": "$L_\\mathrm{t}$ frente a la media de contiguas",
     "Band level [dB]": "Nivel de banda [dB]",
     _LT_LABEL: _LT_LABEL,
-    "RD 1367/2007 tonal correction $K_t$ = {kt} dB":
-        "Corrección tonal $K_t$ = {kt} dB (RD 1367/2007)",
+    "RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB":
+        "Corrección tonal $K_\\mathrm{{t}}$ = {kt} dB (RD 1367/2007)",
     "max $L_{Keq,Ti}$": "máx. $L_{Keq,Ti}$",
     "$L_{Keq,x}$ (daily)": "$L_{Keq,x}$ (diario)",
     "$L_{K,x}$ (annual)": "$L_{K,x}$ (anual)",
@@ -225,7 +225,7 @@ def plot_wind_turbine_tonality(
             label=f"{_t('Tone', language)} ({format_number(result.tone_level, language)} dB)")
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Level [dB]", language))
-    ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} $\\Delta L_a$ = {format_number(result.tonal_audibility, language)} dB")
+    ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} $\\Delta L_\\mathrm{{a}}$ = {format_number(result.tonal_audibility, language)} dB")
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
@@ -255,7 +255,7 @@ def plot_impulse_prominence(
     p_max = max(per_max, result.prominence, 15.0) + 1.0
     grid = np.linspace(0.0, p_max, 200)
     ax.plot(grid, impulse_adjustment(grid), color=_C_PRIMARY,
-            label=_t(r"$K_I = 1.8\,(P-5)$", language))
+            label=_t(r"$K_\mathrm{I} = 1.8\,(P-5)$", language))
     ax.axvline(ADJUSTMENT_THRESHOLD, color=_C_MUTED, ls=":",
                label=f"{_t('threshold', language)} $P = {decimal_comma(f'{ADJUSTMENT_THRESHOLD:g}', language)}$")
 
@@ -265,10 +265,10 @@ def plot_impulse_prominence(
     ax.scatter([result.prominence], [result.adjustment], color=_C_REFERENCE,
                zorder=4, s=90, marker="*",
                label=f"{_t('Governing', language)}  $P$ = {format_number(result.prominence, language, decimals=2)},  "
-                     f"$K_I$ = {format_number(result.adjustment, language)} dB")
+                     f"$K_\\mathrm{{I}}$ = {format_number(result.adjustment, language)} dB")
     ax.set_xlabel(_t("Predicted prominence $P$", language))
-    ax.set_ylabel(_t("Adjustment $K_I$ [dB]", language))
-    ax.set_title(_t("NT ACOU 112 — impulse adjustment to $L_{Aeq}$", language))
+    ax.set_ylabel(_t("Adjustment $K_\\mathrm{I}$ [dB]", language))
+    ax.set_title(_t("NT ACOU 112 — impulse adjustment to $L_\\mathrm{Aeq}$", language))
     ax.set_ylim(bottom=0.0)
     ax.legend(loc=_LEGEND_UPPER_LEFT, fontsize="small")
     ax.grid(True, alpha=0.3)
@@ -295,8 +295,8 @@ def plot_tonal_adjustment(
     top = max(result.audibility, 12.0) + 1.0
     grid = np.linspace(0.0, top, 200)
     curve = np.array([tonal_adjustment(d) for d in grid], dtype=np.float64)
-    ax.plot(grid, curve, color=_C_PRIMARY, label=r"$K_t(\Delta L_{ta})$")
-    ax.axvline(4.0, color=_C_MUTED, ls=":", label=_t("knees $\\Delta L_{ta}=4,\\,10$ dB", language))
+    ax.plot(grid, curve, color=_C_PRIMARY, label=r"$K_\mathrm{t}(\Delta L_\mathrm{ta})$")
+    ax.axvline(4.0, color=_C_MUTED, ls=":", label=_t("knees $\\Delta L_\\mathrm{ta}=4,\\,10$ dB", language))
     ax.axvline(10.0, color=_C_MUTED, ls=":")
 
     kwargs.setdefault("color", _C_REFERENCE)
@@ -304,10 +304,10 @@ def plot_tonal_adjustment(
     kwargs.setdefault("s", 90)
     kwargs.setdefault("marker", "*")
     ax.scatter([result.audibility], [result.adjustment],
-               label=rf"$\Delta L_{{ta}}$ = {format_number(result.audibility, language)} dB,  "
-                     rf"$K_t$ = {format_number(result.adjustment, language)} dB", **kwargs)
-    ax.set_xlabel(_t("Tonal audibility $\\Delta L_{ta}$ [dB]", language))
-    ax.set_ylabel(_t("Tonal adjustment $K_t$ [dB]", language))
+               label=rf"$\Delta L_\mathrm{{ta}}$ = {format_number(result.audibility, language)} dB,  "
+                     rf"$K_\mathrm{{t}}$ = {format_number(result.adjustment, language)} dB", **kwargs)
+    ax.set_xlabel(_t("Tonal audibility $\\Delta L_\\mathrm{ta}$ [dB]", language))
+    ax.set_ylabel(_t("Tonal adjustment $K_\\mathrm{t}$ [dB]", language))
     ax.set_title(_t("ISO 1996-2 tonal adjustment", language))
     ax.set_ylim(bottom=0.0)
     ax.legend(loc=_LEGEND_UPPER_LEFT, fontsize="small")
@@ -416,7 +416,7 @@ def plot_cnossos_rail_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,\mathrm{eq,line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
@@ -655,7 +655,7 @@ def plot_tonal_correction_rd1367(
 
     twin = ax.twinx()
     twin.plot(positions, lt, "o-", color=_C_SECONDARY, ms=4.0,
-              label=_t("$L_t$ vs neighbour mean", language))
+              label=_t("$L_\\mathrm{t}$ vs neighbour mean", language))
     if result.governing_frequency is not None:
         index = int(np.argmin(np.abs(freqs - result.governing_frequency)))
         twin.plot([positions[index]], [lt[index]], "*", color=_C_REFERENCE,
@@ -664,7 +664,7 @@ def plot_tonal_correction_rd1367(
     twin.axhline(0.0, color=_C_MUTED, lw=0.8)
 
     ax.set_title(
-        _t("RD 1367/2007 tonal correction $K_t$ = {kt} dB", language).format(
+        _t("RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB", language).format(
             kt=format_number(result.correction, language, decimals=0)
         )
     )
@@ -850,7 +850,7 @@ def plot_cnossos_road_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,\mathrm{eq,line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)

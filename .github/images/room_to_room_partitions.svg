@@ -2576,7 +2576,7 @@ L 67.099969 334.24562
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_33">
-     <!-- Partition area $S_w$ = 24 m² -->
+     <!-- Partition area $S_\mathrm{w}$ = 24 m² -->
      <g transform="translate(73.763969 337.16112) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-33" d="M 1259 4147 
@@ -2598,22 +2598,6 @@ L 1259 1875
 L 1259 0 
 L 628 0 
 L 628 4666 
-z
-" transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-5a" d="M 544 3500 
-L 1113 3500 
-L 1259 684 
-L 2566 3500 
-L 3231 3500 
-L 3425 684 
-L 4666 3500 
-L 5241 3500 
-L 3641 0 
-L 2969 0 
-L 2797 2900 
-L 1459 0 
-L 781 0 
-L 544 3500 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-20" d="M 678 2906 
@@ -2646,7 +2630,7 @@ z
       <use xlink:href="#DejaVuSans-44" transform="translate(610.943359 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(672.222656 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(704.009766 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-5a" transform="translate(767.486328 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-5a" transform="translate(767.486328 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(827.47168 0.015625)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(859.258789 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(943.047852 0.015625)"/>

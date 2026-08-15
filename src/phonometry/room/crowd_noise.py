@@ -55,7 +55,7 @@ a distance ``rt`` apart, turns into a pair of design bounds
    His prose also puts the direct field at an adjacent table 3 m away at
    "about 54 dB", where :func:`speech_direct_level` with the same
    :math:`Q = 2`
-   and :math:`L_w = 70` dB gives 52.5 dB. That one is left as printed rather
+   and :math:`L_W = 70` dB gives 52.5 dB. That one is left as printed rather
    than
    reconciled, because the intended reading cannot be established from the
    book; it is recorded under the non-errata notes of ``docs/ERRATA.md``.

@@ -75,8 +75,8 @@ _STRINGS: dict[str, str] = {
     "Power spectrum [dB]": "Espectro de potencia [dB]",
     r"{pct} % confidence ($\chi^2$, $n_d$ = {nd})":
         r"{pct} % de confianza ($\chi^2$, $n_d$ = {nd})",
-    r"Welch spectral density — $\varepsilon_r$ = {er} %":
-        r"Densidad espectral de Welch — $\varepsilon_r$ = {er} %",
+    r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %":
+        r"Densidad espectral de Welch — $\varepsilon_\mathrm{{r}}$ = {er} %",
     "Cross-spectral density (Bendat & Piersol)":
         "Densidad espectral cruzada (Bendat y Piersol)",
     r"$\pm$ s.d.$[\hat{\theta}_{xy}]$ (Eq. 9.52)":
@@ -296,7 +296,7 @@ def plot_spectral_density(
         band_alpha=0.25,
         band_label=_t(r"{pct} % confidence ($\chi^2$, $n_d$ = {nd})", language, pct=pct, nd=nd),
         line_label="$\\hat{G}_{xx}(f)$",
-        title=_t(r"Welch spectral density — $\varepsilon_r$ = {er} %", language, er=er),
+        title=_t(r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %", language, er=er),
     )
 
 
@@ -670,7 +670,7 @@ def plot_zoom_fft(
     be = format_number(result.resolution_bandwidth, language, decimals=2)
     df = format_number(result.bin_spacing, language, decimals=3)
     kwargs.setdefault(
-        "label", f"$B_e$ = {be} Hz, $\\Delta f$ = {df} Hz"
+        "label", f"$B_\\mathrm{{e}}$ = {be} Hz, $\\Delta f$ = {df} Hz"
     )
     ax.plot(freqs, _db10(np.asarray(result.power, dtype=np.float64)),
             color=color, **kwargs)

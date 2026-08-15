@@ -2511,7 +2511,7 @@ L 78.202344 371.851328
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.6"/>
     </g>
     <g id="text_15">
-     <!-- $|F_n|_{\mathrm{upper}} = 2\,m\,v_h/T_i$  (con rebote) -->
+     <!-- $|F_n|_{\mathrm{upper}} = 2\,m\,v_\text{h}/T_i$  (con rebote) -->
      <g transform="translate(85.402344 375.001328) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-50" d="M 5747 2113 
@@ -2560,29 +2560,6 @@ L 1100 0
 L 459 3500 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-4b" d="M 3566 2113 
-L 3156 0 
-L 2578 0 
-L 2988 2091 
-Q 3016 2238 3031 2350 
-Q 3047 2463 3047 2528 
-Q 3047 2791 2881 2937 
-Q 2716 3084 2419 3084 
-Q 1956 3084 1617 2771 
-Q 1278 2459 1178 1941 
-L 800 0 
-L 225 0 
-L 1172 4863 
-L 1747 4863 
-L 1375 2950 
-Q 1594 3244 1934 3414 
-Q 2275 3584 2650 3584 
-Q 3113 3584 3367 3334 
-Q 3622 3084 3622 2631 
-Q 3622 2519 3608 2391 
-Q 3594 2263 3566 2113 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-12" d="M 1625 4666 
 L 2156 4666 
 L 531 -594 
@@ -2628,7 +2605,7 @@ z
       <use xlink:href="#DejaVuSans-15" transform="translate(503.525391 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(583.384114 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-59" transform="translate(697.031899 0.578125)"/>
-      <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(756.211587 -14.421826) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-4b" transform="translate(756.211587 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(803.311196 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(837.002603 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(898.086587 -14.421826) scale(0.7)"/>
@@ -2655,7 +2632,7 @@ L 78.202344 385.981328
 " style="fill: none; stroke-dasharray: 10.24,2.56,1.6,2.56; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.6"/>
     </g>
     <g id="text_16">
-     <!-- $|F_n|_{\mathrm{lower}} = m\,v_h/T_i$  (sin rebote) -->
+     <!-- $|F_n|_{\mathrm{lower}} = m\,v_\text{h}/T_i$  (sin rebote) -->
      <g transform="translate(85.402344 389.131328) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-5a" d="M 269 3500 
@@ -2687,7 +2664,7 @@ z
       <use xlink:href="#DejaVuSans-20" transform="translate(386.547852 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(489.819336 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-59" transform="translate(603.467122 0.578125)"/>
-      <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(662.646809 -14.421826) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-4b" transform="translate(662.646809 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(709.746418 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(743.437825 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(804.521809 -14.421826) scale(0.7)"/>

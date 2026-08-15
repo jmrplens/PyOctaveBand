@@ -156,7 +156,7 @@ def plot_sound_power(
     if np.isfinite(lwa):
         ax.set_title(
             f"{designation} {_t('sound power spectrum', language)}  "
-            "($L_{WA}$ = "
+            "($L_{{W\\mathrm{{A}}}}$ = "
             f"{format_number(lwa, language, decimals=1)} dB(A))"
         )
     else:

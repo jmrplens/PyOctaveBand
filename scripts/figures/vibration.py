@@ -411,7 +411,7 @@ def generate_weighted_acceleration(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
-        f"Weighted seat acceleration (ISO 2631-1)  $a_w$ = {result.overall:.3f} "
+        f"Weighted seat acceleration (ISO 2631-1)  $a_\\mathrm{{w}}$ = {result.overall:.3f} "
         "m/s²", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("r.m.s. acceleration [m/s²]")
@@ -659,7 +659,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_t.plot(time, raw, color=COLOR_MUTED, linewidth=0.7,
               label="$a_z(t)$, unweighted", zorder=2)
     ax_t.plot(time, weighted, color=COLOR_PRIMARY, linewidth=1.0,
-              label="$a_w(t)$, Wk-weighted", zorder=3)
+              label="$a_\\mathrm{w}(t)$, Wk-weighted", zorder=3)
     ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title(
         "(a)  A seated off-road record: 4.5 Hz ride plus five impacts",
@@ -669,12 +669,12 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_r.plot(time, running, color=COLOR_PRIMARY, linewidth=1.4,
               label="running r.m.s., 1 s (Eq. (3))", zorder=3)
     ax_r.axhline(a_w, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
-                 label=f"$a_w$ = {a_w:.2f} m/s² (Eq. (1))", zorder=2)
+                 label=f"$a_\\mathrm{{w}}$ = {a_w:.2f} m/s² (Eq. (1))", zorder=2)
     peak_index = int(np.argmax(running))
     ax_r.plot([time[peak_index]], [mtvv], marker="o", markersize=7,
               color=COLOR_SECONDARY, zorder=4,
               label=f"MTVV = {mtvv:.2f} m/s² (Eq. (4))")
-    ax_r.annotate(rf"$\mathrm{{MTVV}}/a_w$ = {mtvv / a_w:.2f}   (> 1.5)",
+    ax_r.annotate(rf"$\mathrm{{MTVV}}/a_\mathrm{{w}}$ = {mtvv / a_w:.2f}   (> 1.5)",
                   xy=(time[peak_index], mtvv),
                   xytext=(time[peak_index] - 6.5, mtvv * 0.78), fontsize=9,
                   color=COLOR_SECONDARY,
@@ -686,15 +686,15 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     ax_r.legend(loc="upper left", fontsize=9)
 
     ax_v.plot(time, running_vdv, color=COLOR_PRIMARY, linewidth=1.6,
-              label=r"$\left(\int_0^t a_w^4\,dt\right)^{1/4}$", zorder=3)
+              label=r"$\left(\int_0^t a_\mathrm{w}^4\,dt\right)^{1/4}$", zorder=3)
     ax_v.plot(time, basic_vdv, color=COLOR_MUTED, linestyle="--",
-              linewidth=1.6, label=r"$a_w\,t^{1/4}$ (the basic method)",
+              linewidth=1.6, label=r"$a_\mathrm{w}\,t^{1/4}$ (the basic method)",
               zorder=2)
     ax_v.plot([duration], [vdv], marker="o", markersize=7,
               color=COLOR_SECONDARY, zorder=4,
               label=f"VDV = {vdv:.2f} m/s$^{{1.75}}$ (Eq. (5))")
     ax_v.annotate(
-        rf"$\mathrm{{VDV}}/(a_w T^{{1/4}})$ = {vdv / (a_w * duration ** 0.25):.2f}"
+        rf"$\mathrm{{VDV}}/(a_\mathrm{{w}} T^{{1/4}})$ = {vdv / (a_w * duration ** 0.25):.2f}"
         "   (> 1.75)",
         xy=(duration, vdv), xytext=(7.0, vdv * 0.55), fontsize=9,
         color=COLOR_SECONDARY,
@@ -739,7 +739,7 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
     ax.text(1.15, 0.42, "extrapolation beyond Table C.1", fontsize=9,
             color=COLOR_FG, alpha=0.75, va="center")
     ax.loglog(a8, years, color=COLOR_PRIMARY, linewidth=2.0, zorder=3,
-              label=r"$D_y = 31.8\,A(8)^{-1.06}$ (Eq. (C.1))")
+              label=r"$D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1))")
     ax.loglog(table_a8, table_years, linestyle="none", marker="o",
               markersize=8, color=COLOR_SECONDARY, zorder=4,
               label="Table C.1: 26 / 14 / 7 / 3.7 m/s²")
@@ -754,7 +754,7 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
     ax.set_title("Group-mean years to a 10 % prevalence of vibration white "
                  "finger (ISO 5349-1 Annex C)", pad=12)
     ax.set_xlabel("Daily exposure $A(8)$ [m/s²]")
-    ax.set_ylabel("Exposure duration $D_y$ [years]")
+    ax.set_ylabel("Exposure duration $D_\\mathrm{y}$ [years]")
     ax.set_xlim(1.0, 40.0)
     ax.set_ylim(0.3, 60.0)
     ax.set_xticks([1, 2, 2.5, 5, 10, 20, 40])
@@ -1247,7 +1247,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
         # lines the full height of the panel, and the block used to be read
         # through the 2xGMF group's five of them.
         ax.annotate(
-            "sidebands at\n$\\pm f_s$ = 25 Hz:\n"
+            "sidebands at\n$\\pm f_\\mathrm{s}$ = 25 Hz:\n"
             + ("low and flat" if "Localised" in title
                else "tall groups, and the\nhigher harmonics lift"),
             xy=(gmf - 2.0 * shaft, 0.16 if "Localised" in title else 0.42),
@@ -1272,7 +1272,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
     # Five decades and a little: the 1x line is the tallest thing in the panel
     # and the top of the axis is where its name is written.
     ax.set_ylim(1.0e-5, 5.0)
-    ax.annotate("rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
+    ax.annotate("rotor-slot harmonic\nwith $\\pm f_\\mathrm{s}$ sidebands:\n"
                 "the spacing is the diagnosis",
                 xy=(motor["fsh"], 1.6e-3), xytext=(1700.0, 0.02),
                 fontsize=_NOTE_PT, color=COLOR_FG,
@@ -1293,11 +1293,11 @@ def generate_machine_fault_families(output_dir: str) -> None:
     # Each block is centred in the column between two of the fan's lines: the
     # first between the shaft and the two-lobe pattern, the second between that
     # and the blade rate, which the longer Spanish reading used to run over.
-    ax.annotate("$m_L$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
+    ax.annotate("$m_\\mathrm{L}$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
                 xy=(fan["lobe n=1 m=10"], 0.12), xytext=(66.0, 0.62),
                 va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
-    ax.annotate("$m_L$ = 2 turns at 175 Hz,\n3x the shaft speed: strong",
+    ax.annotate("$m_\\mathrm{L}$ = 2 turns at 175 Hz,\n3x the shaft speed: strong",
                 xy=(fan["lobe n=1 m=2"], 0.70), xytext=(189.0, 0.96),
                 va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
@@ -1457,8 +1457,8 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
     info = [
         r"plate:  $Y = 1/(8\sqrt{B^{\prime} m^{\prime\prime}})$, real and flat",
-        r"beam:   $Y = (1-\mathrm{j})/(4 m^{\prime} c_B)$, $\propto f^{-1/2}$",
-        r"rod:    $Y = 1/(\rho c_L S)$, real and flat",
+        r"beam:   $Y = (1-\mathrm{j})/(4 m^{\prime} c_\mathrm{B})$, $\propto f^{-1/2}$",
+        r"rod:    $Y = 1/(\rho c_\mathrm{L} S)$, real and flat",
         f"plate $|Y|$ = {_sci_math(float(plate.magnitude[0]))} m/(N·s)",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,

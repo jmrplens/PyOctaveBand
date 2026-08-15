@@ -53,7 +53,7 @@ def generate_lden_profile(output_dir: str) -> None:
     ax.axvspan(23, 24, color=theme_fill(COLOR_PRIMARY, ax))
     ax.axvspan(0, 7, color=theme_fill(COLOR_PRIMARY, ax))
     ax.step(np.r_[hours, 24], np.r_[laeq_h, laeq_h[-1]], where="post",
-            color=COLOR_FG, linewidth=1.6, label="Hourly $L_{Aeq}$")
+            color=COLOR_FG, linewidth=1.6, label="Hourly $L_\\mathrm{Aeq}$")
     ax.hlines(ld, 7, 19, color=COLOR_TERTIARY, linestyle="--", linewidth=2,
               label=r"$L_{\mathrm{day}}$ (+0 dB)")
     ax.hlines(le + 5, 19, 23, color="#e8a838", linestyle="--", linewidth=2,
@@ -109,7 +109,7 @@ def generate_wind_turbine_tonality(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.02, 0.95,
-            f"Tonal audibility $\\Delta L_a$ = "
+            f"Tonal audibility $\\Delta L_\\mathrm{{a}}$ = "
             f"{_fmt_minus(res.tonal_audibility, '.1f')} dB\n"
             f"{'audible' if res.is_audible else 'not audible'}",
             transform=ax.transAxes, va="top", fontsize=10,
@@ -268,7 +268,7 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
         pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel(r"Line power $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L^{\prime}_{W,\mathrm{eq,line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(45.0, 90.0)
@@ -504,17 +504,17 @@ def generate_impulse_prominence(output_dir: str) -> None:
     result = impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
     grid = np.linspace(0.0, 16.0, 200)
     ax_k.plot(grid, impulse_adjustment(grid), color=COLOR_PRIMARY,
-              label=r"$K_I = 1.8\,(P-5)$")
+              label=r"$K_\mathrm{I} = 1.8\,(P-5)$")
     ax_k.axvline(ADJUSTMENT_THRESHOLD, color="#7f7f7f", linestyle=":",
                  label=f"threshold $P = {ADJUSTMENT_THRESHOLD:g}$")
     ax_k.scatter(result.per_impulse, impulse_adjustment(result.per_impulse),
                  color="#aec7e8", zorder=3, label="Impulses")
     ax_k.scatter([result.prominence], [result.adjustment], color=COLOR_SECONDARY,
                  marker="*", s=140, zorder=4,
-                 label=f"Governing  $K_I$ = {result.adjustment:.1f} dB")
+                 label=f"Governing  $K_\\mathrm{{I}}$ = {result.adjustment:.1f} dB")
     ax_k.set_xlabel("Predicted prominence $P$")
-    ax_k.set_ylabel("Adjustment $K_I$ [dB]")
-    ax_k.set_title("Adjustment to $L_{Aeq}$", pad=10)
+    ax_k.set_ylabel("Adjustment $K_\\mathrm{I}$ [dB]")
+    ax_k.set_title("Adjustment to $L_\\mathrm{Aeq}$", pad=10)
     ax_k.set_ylim(bottom=0.0)
     ax_k.grid(color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_k.set_axisbelow(True)
@@ -542,7 +542,7 @@ def generate_tonal_audibility(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(grid, curve, "-", color=COLOR_PRIMARY, linewidth=2.4, zorder=5,
-            label=r"$K_t(\Delta L_{ta})$ (Formulae C.4-C.6)")
+            label=r"$K_\mathrm{t}(\Delta L_\mathrm{ta})$ (Formulae C.4-C.6)")
     for x in (4.0, 10.0):
         ax.axvline(x, color=COLOR_GRID, linestyle=":", alpha=0.8, zorder=1)
     ax.scatter([a.audibility for a in assessed], [a.adjustment for a in assessed],
@@ -551,8 +551,8 @@ def generate_tonal_audibility(output_dir: str) -> None:
     ax.scatter([mid.audibility], [mid.adjustment], color=COLOR_TERTIARY,
                marker="*", s=150, zorder=7, label="mid-range tone")
 
-    ax.set_xlabel(r"Tonal audibility $\Delta L_{ta}$ [dB]")
-    ax.set_ylabel("Tonal adjustment $K_t$ [dB]")
+    ax.set_xlabel(r"Tonal audibility $\Delta L_\mathrm{ta}$ [dB]")
+    ax.set_ylabel("Tonal adjustment $K_\\mathrm{t}$ [dB]")
     ax.set_ylim(-0.3, 6.6)
     ax.set_title("ISO 1996-2 Tonal Adjustment", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -560,9 +560,9 @@ def generate_tonal_audibility(output_dir: str) -> None:
     ax.legend(loc="lower right", fontsize=9)
 
     info = [
-        r"$K_t = 0$  ($\Delta L_{ta} < 4$)",
-        r"$K_t = \Delta L_{ta} - 4$  ($4 \leq \Delta L_{ta} \leq 10$)",
-        r"$K_t = 6$  ($\Delta L_{ta} > 10$)",
+        r"$K_\mathrm{t} = 0$  ($\Delta L_\mathrm{ta} < 4$)",
+        r"$K_\mathrm{t} = \Delta L_\mathrm{ta} - 4$  ($4 \leq \Delta L_\mathrm{ta} \leq 10$)",
+        r"$K_\mathrm{t} = 6$  ($\Delta L_\mathrm{ta} > 10$)",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG,
@@ -864,7 +864,7 @@ def generate_cnossos_rail_emission(output_dir: str) -> None:
         pad=12,
     )
     ax.set_xlabel("Octave-band centre frequency [Hz]")
-    ax.set_ylabel(r"Line power $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"Line power $L^{\prime}_{W,\mathrm{eq,line}}$ [dB re 1 pW/m]")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{b:g}" for b in bands])
     ax.set_ylim(30.0, 95.0)
@@ -956,7 +956,7 @@ def generate_outdoor_level_cascade(output_dir: str) -> None:
                width=0.62, label=label, zorder=2)
         level = level - np.asarray(term)
     ax.plot(x, level, "D-", color=COLOR_FG, linewidth=2.0, markersize=6,
-            label=r"$L_{fT}(\mathrm{DW})$ at the receiver", zorder=5)
+            label=r"$L_{fT}(\mathrm{{DW}})$ at the receiver", zorder=5)
     ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     ax.set_title("Where 95 dB of Source Power Goes (ISO 9613-2, 200 m)",
                  pad=12)
@@ -1063,7 +1063,7 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
 
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.4))
     left.semilogx(heights, rp_mag, color=COLOR_PRIMARY, linewidth=2.0,
-                  label="$|R_p|$ — plane wave", zorder=4)
+                  label="$|R_\\mathrm{p}|$ — plane wave", zorder=4)
     left.semilogx(heights, q_mag, color=COLOR_SECONDARY, linewidth=2.0,
                   label="$|Q|$ — spherical wave", zorder=4)
     left.invert_xaxis()
@@ -1078,7 +1078,7 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
     right.semilogx(heights, dl_q, color=COLOR_SECONDARY, linewidth=2.0,
                    label="with $Q$ (spherical wave)", zorder=4)
     right.semilogx(heights, dl_p, color=COLOR_PRIMARY, linewidth=2.0,
-                   linestyle="--", label="with $R_p$ alone (plane wave)",
+                   linestyle="--", label="with $R_\\mathrm{p}$ alone (plane wave)",
                    zorder=4)
     right.invert_xaxis()
     right.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
@@ -1184,7 +1184,7 @@ def generate_shadow_zone_map(output_dir: str) -> None:
         ax.loglog(gradients,
                   [shadow_zone_distance(-float(g), hs, hr, ground_speed=340.0)
                    for g in gradients], color=color, linewidth=2.0,
-                  label=f"$h_s/h_r$ = {hs:g} / {hr:g} m", zorder=4)
+                  label=f"$h_\\mathrm{{s}}/h_\\mathrm{{r}}$ = {hs:g} / {hr:g} m", zorder=4)
     ax.axvline(0.1, color=COLOR_MUTED, linestyle="--", linewidth=1.3, zorder=2)
     ax.plot([0.1], [shadow_zone_distance(-0.1, 2.0, 2.0, ground_speed=340.0)],
             "o", color=COLOR_FG, markersize=8, zorder=5)
@@ -1210,7 +1210,7 @@ def generate_shadow_zone_map(output_dir: str) -> None:
     secondary = ax.secondary_xaxis(
         "top", functions=(lambda g: 340.0 / np.maximum(g, 1e-9),
                           lambda r: 340.0 / np.maximum(r, 1e-9)))
-    secondary.set_xlabel("Radius of curvature $R_c = c_0/|g|$ [m]")
+    secondary.set_xlabel("Radius of curvature $R_\\mathrm{c} = c_0/|g|$ [m]")
     plt.tight_layout()
     save_figure(output_dir, "shadow_zone_map.svg")
     plt.close()
@@ -1249,7 +1249,7 @@ def generate_refraction_homogeneous_check(output_dir: str) -> None:
     top.set_ylim(-35.0, 10.0)
     top.set_ylabel("Level re free field [dB]")
     top.set_title("The Homogeneous Limit: 500 Hz, Rigid Ground, "
-                  "$h_s = h_r$ = 2 m", pad=12)
+                  "$h_\\mathrm{s} = h_\\mathrm{r}$ = 2 m", pad=12)
     top.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     top.set_axisbelow(True)
     top.legend(loc="lower right", fontsize=9)
@@ -1313,7 +1313,7 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
             - a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0,
                                           float(v))])
             for v in speeds], color=color, linewidth=2.0,
-            label=rf"$Q_{{\mathrm{{stud}}}}$ = {share:g}, $T_s$ = 4 months",
+            label=rf"$Q_{{\mathrm{{stud}}}}$ = {share:g}, $T_\mathrm{{s}}$ = 4 months",
             zorder=4)
     for edge in (50.0, 90.0):
         s_ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
@@ -1584,7 +1584,7 @@ def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
               solid_capstyle="butt", label="9.5.3: fixed 20-120 Hz band", zorder=5)
     left.set_title("Two critical bandwidths on one page",
                    pad=10)
-    left.set_xlabel("Tone frequency $f_c$ [Hz]")
+    left.set_xlabel("Tone frequency $f_\\mathrm{c}$ [Hz]")
     left.set_ylabel("Critical bandwidth [Hz]")
     left.set_xlim(20.0, 10000.0)
     format_frequency_axis(left, 20.0, 10000.0)
@@ -1593,17 +1593,17 @@ def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
     left.legend(loc="upper left", fontsize=8.5)
 
     right.semilogx(fc, -la, color=COLOR_PRIMARY, linewidth=2.0,
-                   label=r"Tonality needed to be audible ($\Delta L_a > 0$)",
+                   label=r"Tonality needed to be audible ($\Delta L_\mathrm{a} > 0$)",
                    zorder=4)
     right.semilogx(fc, -la - 3.0, "--", color=COLOR_SECONDARY, linewidth=1.8,
                    label=r"Tonality needed to be reportable "
-                         r"($\Delta L_a \geq -3$ dB)",
+                         r"($\Delta L_\mathrm{a} \geq -3$ dB)",
                    zorder=4)
     right.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
     right.set_title("The audibility criterion, read as required tonality",
                     pad=10)
     right.set_xlabel("Tone frequency [Hz]")
-    right.set_ylabel(r"Required tonality $\Delta L_{tn}$ [dB]")
+    right.set_ylabel(r"Required tonality $\Delta L_\mathrm{tn}$ [dB]")
     right.set_xlim(20.0, 10000.0)
     format_frequency_axis(right, 20.0, 10000.0)
     right.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5,
@@ -1643,17 +1643,17 @@ def generate_rd1367_kf_ki(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(11, 6.2))
     ax.step(diffs, kf, where="post", color=COLOR_PRIMARY, linewidth=2.4,
-            label="$K_f$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$", zorder=4)
+            label="$K_\\mathrm{f}$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$", zorder=4)
     ax.step(diffs, ki, where="post", color=COLOR_SECONDARY, linewidth=2.0,
-            linestyle="--", label="$K_i$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$",
+            linestyle="--", label="$K_\\mathrm{i}$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$",
             zorder=4)
     for edge in (10.0, 15.0):
         ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
                    zorder=2)
     ax.plot([13.0], [3.0], "o", color=COLOR_PRIMARY, markersize=9, zorder=5,
-            label="worked example: $L_f$ = 13 dB → $K_f$ = 3 dB")
+            label="worked example: $L_f$ = 13 dB → $K_\\mathrm{f}$ = 3 dB")
     ax.plot([5.0], [0.0], "s", color=COLOR_SECONDARY, markersize=9, zorder=5,
-            label="worked example: $L_i$ = 5 dB → $K_i$ = 0 dB")
+            label="worked example: $L_i$ = 5 dB → $K_\\mathrm{i}$ = 0 dB")
     ax.set_title("RD 1367/2007: the Low-Frequency and Impulsive Corrections",
                  pad=12)
     ax.set_xlabel("Level difference [dB]")
@@ -1681,8 +1681,8 @@ def generate_rd1367_vs_iso_tonal(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(1, 2, figsize=(13, 5.8), sharey=True)
     for ax, spectrum, title in (
-        (axes[0], deep, "$L_t$ = 10.5 dB: both methods agree"),
-        (axes[1], shallow, "$L_t$ = 7.5 dB: the verdicts split"),
+        (axes[0], deep, "$L_\\mathrm{t}$ = 10.5 dB: both methods agree"),
+        (axes[1], shallow, "$L_\\mathrm{t}$ = 7.5 dB: the verdicts split"),
     ):
         rd = environment.tonal_correction(spectrum, freqs)
         flags = np.asarray(environment.tonal_seeking_survey(spectrum, freqs))
@@ -1704,9 +1704,9 @@ def generate_rd1367_vs_iso_tonal(output_dir: str) -> None:
         ax.set_axisbelow(True)
         ax.text(
             0.03, 0.97,
-            f"RD 1367 tonal_correction: $K_t$ = {rd.correction:.0f} dB\n"
+            f"RD 1367 tonal_correction: $K_\\mathrm{{t}}$ = {rd.correction:.0f} dB\n"
             f"ISO 1996-2 survey flag at 250 Hz: {bool(flags[4])}\n"
-            f"$L_t$ at 250 Hz = {_fmt_minus(rd.differences[4], '.1f')} dB",
+            f"$L_\\mathrm{{t}}$ at 250 Hz = {_fmt_minus(rd.differences[4], '.1f')} dB",
             transform=ax.transAxes, va="top", fontsize=10, color=COLOR_FG,
             bbox={"boxstyle": "round", "facecolor": COLOR_PANEL, "alpha": 0.9},
         )

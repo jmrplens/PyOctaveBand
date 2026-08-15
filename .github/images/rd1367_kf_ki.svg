@@ -1406,7 +1406,7 @@ L 60.663281 40.108125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <!-- $K_f$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$ -->
+     <!-- $K_\mathrm{f}$, from $L_{Ceq,Ti} - L_{Aeq,Ti}$ -->
      <g transform="translate(67.863281 43.258125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-2e" d="M 1081 4666 
@@ -1421,36 +1421,6 @@ L 1247 2272
 L 806 0 
 L 172 0 
 L 1081 4666 
-z
-" transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-49" d="M 3059 4863 
-L 2969 4384 
-L 2419 4384 
-Q 2106 4384 1964 4261 
-Q 1822 4138 1753 3809 
-L 1691 3500 
-L 2638 3500 
-L 2553 3053 
-L 1606 3053 
-L 1013 0 
-L 434 0 
-L 1031 3053 
-L 481 3053 
-L 563 3500 
-L 1113 3500 
-L 1159 3744 
-Q 1278 4363 1576 4613 
-Q 1875 4863 2516 4863 
-L 3059 4863 
-z
-" transform="scale(0.015625)"/>
-       <path id="DejaVuSans-f" d="M 750 794 
-L 1409 794 
-L 1409 256 
-L 897 -744 
-L 494 -744 
-L 750 256 
-L 750 794 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-49" d="M 2375 4863 
@@ -1472,6 +1442,15 @@ L 697 3744
 Q 697 4328 969 4595 
 Q 1241 4863 1831 4863 
 L 2375 4863 
+z
+" transform="scale(0.015625)"/>
+       <path id="DejaVuSans-f" d="M 750 794 
+L 1409 794 
+L 1409 256 
+L 897 -744 
+L 494 -744 
+L 750 256 
+L 750 794 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -1619,7 +1598,7 @@ z
 " transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(0 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(65.576172 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-49" transform="translate(65.576172 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(92.954102 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(124.741211 0.015625)"/>
       <use xlink:href="#DejaVuSans-49" transform="translate(156.52832 0.015625)"/>
@@ -1653,7 +1632,7 @@ L 60.663281 54.148125
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 2"/>
     </g>
     <g id="text_22">
-     <!-- $K_i$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$ -->
+     <!-- $K_\mathrm{i}$, from $L_{AIeq,Ti} - L_{Aeq,Ti}$ -->
      <g transform="translate(67.863281 57.298125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-2c" d="M 1081 4666 
@@ -1665,7 +1644,7 @@ z
 " transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(0 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(65.576172 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-4c" transform="translate(65.576172 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(87.758789 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(119.545898 0.015625)"/>
       <use xlink:href="#DejaVuSans-49" transform="translate(151.333008 0.015625)"/>
@@ -1697,7 +1676,7 @@ z
      </g>
     </g>
     <g id="text_23">
-     <!-- worked example: $L_f$ = 13 dB → $K_f$ = 3 dB -->
+     <!-- worked example: $L_f$ = 13 dB → $K_\mathrm{f}$ = 3 dB -->
      <g transform="translate(67.863281 71.338125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-4e" d="M 581 4863 
@@ -1727,6 +1706,27 @@ L 978 3500
 L 1906 2253 
 L 2834 3500 
 L 3513 3500 
+z
+" transform="scale(0.015625)"/>
+       <path id="DejaVuSans-Oblique-49" d="M 3059 4863 
+L 2969 4384 
+L 2419 4384 
+Q 2106 4384 1964 4261 
+Q 1822 4138 1753 3809 
+L 1691 3500 
+L 2638 3500 
+L 2553 3053 
+L 1606 3053 
+L 1013 0 
+L 434 0 
+L 1031 3053 
+L 481 3053 
+L 563 3500 
+L 1113 3500 
+L 1159 3744 
+Q 1278 4363 1576 4613 
+Q 1875 4863 2516 4863 
+L 3059 4863 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-20" d="M 678 2906 
@@ -1786,7 +1786,7 @@ z
       <use xlink:href="#DejaVuSans-c1c" transform="translate(1443.790039 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1527.579102 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(1559.366211 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1624.942383 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-49" transform="translate(1624.942383 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1652.320312 0.015625)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(1684.107422 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1767.896484 0.015625)"/>
@@ -1802,7 +1802,7 @@ z
      </g>
     </g>
     <g id="text_24">
-     <!-- worked example: $L_i$ = 5 dB → $K_i$ = 0 dB -->
+     <!-- worked example: $L_i$ = 5 dB → $K_\mathrm{i}$ = 0 dB -->
      <g transform="translate(67.863281 84.840234) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-5a" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(81.787109 0.015625)"/>
@@ -1833,7 +1833,7 @@ z
       <use xlink:href="#DejaVuSans-c1c" transform="translate(1374.97168 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1458.760742 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(1490.547852 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(1556.124023 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-4c" transform="translate(1556.124023 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1578.306641 0.015625)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(1610.09375 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1693.882812 0.015625)"/>

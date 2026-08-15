@@ -1251,7 +1251,7 @@ Q 547.146973 394.467852 551.396973 394.467852
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <!-- $\mathrm{PA} = N_5(1 + \sqrt{w_S^2 + w_{FR}^2})$ -->
+    <!-- $\mathrm{{PA}} = N_5(1 + \sqrt{w_S^2 + w_{FR}^2})$ -->
     <g style="fill: #ffffff" transform="translate(596.191973 362.756709) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-b" d="M 1984 4856 

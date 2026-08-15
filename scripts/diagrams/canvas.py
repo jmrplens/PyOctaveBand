@@ -62,12 +62,35 @@ DARK = Theme(
 #: ef for eff). Every other letter run inside a script is an index and is
 #: set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a subscript
 #: that abbreviates a word, never for letter-indices.
+#: A letter run is romanised here for the whole corpus, so a run is only
+#: added once every diagram that carries it wants it upright. These were
+#: settled against the prose, run by run: the descriptive subscripts of the
+#: quantities the guides define -- the critical, sampling, resonance, lower
+#: and upper frequencies (c, s, r, l, u), the Sabine and weighted absorption
+#: and the weighted ratings (s, w), the source and receiver geometry (s, r,
+#: m, h), the impact and coupling terms (C, D, E, K, L, P, R, T, G, F), the
+#: character penalties of RD 1367/2007 (f, t), the ground and gate times
+#: (g), the enclosure and object volumes (air, obj), the situation of
+#: ISO 12999-1 (situ) and the airborne descriptors (AF, Cpeak, MF, sa).
+#:
+#: Seven runs the prose sets upright somewhere are deliberately absent,
+#: because this set cannot tell one base from another and the same run has
+#: to stay italic elsewhere: ``i`` and ``n`` (indices in $S_i$, $L_i$,
+#: $H_n$), ``d`` ($n_d$, the disjoint averages), ``p`` ($L_p$), ``v``
+#: ($L_v$), ``S`` ($w_S$), ``a`` ($L_{a1}$, $L_{a2}$), ``r`` ($K_r$) and
+#: ``I`` ($L_{I0}$, the residual intensity level). Romanising those would
+#: romanise a quantity symbol or an index, which is the error this whole
+#: policy exists to avoid; the affected labels stay italic and are listed
+#: in the pass that settled them.
 _ROMAN_SCRIPTS = frozenset((
     "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
     "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "ef", "mod",
     "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
     "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
     "wx", "wy", "wz",
+    "AF", "Cpeak", "MF", "air", "obj", "sa", "situ",
+    "C", "D", "E", "F", "G", "K", "L", "P", "R", "T",
+    "c", "e", "f", "g", "h", "l", "m", "s", "t", "u", "w",
 ))
 
 #: Script metrics of the ``$...$`` composer, as fractions of the font size:

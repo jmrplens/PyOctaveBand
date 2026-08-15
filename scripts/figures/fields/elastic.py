@@ -502,10 +502,10 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     # buys the equal-aspect boxes their height.
     x_hi = 1.905
     fig.suptitle(T("Coincidence: the same steel plate, below and above "
-                   "$f_c$ (elastic 2D FDTD)"))
+                   "$f_\\mathrm{c}$ (elastic 2D FDTD)"))
     axes = fig.subplots(1, 2, sharey=True)
-    titles = [T(f"$f = f_c/2$ = {fc / 2:.0f} Hz, 45° incidence"),
-              T(f"$f = 2f_c$ = {2 * fc:.0f} Hz, 45° incidence")]
+    titles = [T(f"$f = f_\\mathrm{{c}}/2$ = {fc / 2:.0f} Hz, 45° incidence"),
+              T(f"$f = 2f_\\mathrm{{c}}$ = {2 * fc:.0f} Hz, 45° incidence")]
     # Each panel is judged against the oblique mass law (Bies Eq. 7.41):
     # TL(theta) = 10 log10[1 + (pi f m'' cos(theta) / rho0 c0)^2]. Below f_c
     # the measured level lands on it; above f_c the trace-matched plate
@@ -516,10 +516,10 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     ml = [10.0 * float(np.log10(1.0 + (np.pi * f * m2 * np.cos(theta)
                                        / (_EL_RHO0 * _EL_C0)) ** 2))
           for f in (0.5 * fc, 2.0 * fc)]
-    verdicts = [T(f"below $f_c$: the mass law holds: "
+    verdicts = [T(f"below $f_\\mathrm{{c}}$: the mass law holds: "
                   f"{_fmt_minus(trans_db[0], '.0f')} dB "
                   f"(it predicts {_fmt_minus(-ml[0], '.0f')})"),
-                T(f"above $f_c$: trace matches $\\lambda_B$: "
+                T(f"above $f_\\mathrm{{c}}$: trace matches $\\lambda_\\mathrm{{B}}$: "
                   f"{_fmt_minus(trans_db[1], '.0f')} dB, "
                   f"the mass law said {_fmt_minus(-ml[1], '.0f')}")]
     ims: list[Any] = []
@@ -564,7 +564,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         ims.append(im)
         v_txts.append(v_txt)
     fc_txt = fig.text(0.5, 0.035,
-                      T(f"coincidence_frequency: $f_c$ = {fc:.0f} Hz "
+                      T(f"coincidence_frequency: $f_\\mathrm{{c}}$ = {fc:.0f} Hz "
                         f"(10 mm steel)"), ha="center", va="bottom",
                       fontsize=9, color=COLOR_FG)
     t_txt = fig.text(0.985, 0.035, "", ha="right", va="bottom",

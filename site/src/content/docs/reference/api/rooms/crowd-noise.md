@@ -59,7 +59,7 @@ mutually consistent.
 His prose also puts the direct field at an adjacent table 3 m away at
 "about 54 dB", where [`speech_direct_level`](/phonometry/reference/api/rooms/crowd-noise/#speech_direct_level) with the same
 $Q = 2$
-and $L_w = 70$ dB gives 52.5 dB. That one is left as printed rather
+and $L_W = 70$ dB gives 52.5 dB. That one is left as printed rather
 than
 reconciled, because the intended reading cannot be established from the
 book; it is recorded under the non-errata notes of `docs/ERRATA.md`.

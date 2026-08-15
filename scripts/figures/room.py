@@ -610,15 +610,15 @@ def generate_open_plan_quality(output_dir: str) -> None:
     # Annex A: the two ends of the informative scale, shaded on each axis.
     ax_l.axhspan(50.0, 62.0, color=theme_fill(COLOR_SECONDARY, ax_l), zorder=0)
     ax_l.axhspan(30.0, 48.0, color=theme_fill(COLOR_PRIMARY, ax_l), zorder=0)
-    ax_l.annotate(r"$L_{p,A,S,4\,\mathrm{m}} > 50$ dB: poor", xy=(2.1, 59.0),
+    ax_l.annotate(r"$L_{p,\mathrm{A,S},4\,\mathrm{m}} > 50$ dB: poor", xy=(2.1, 59.0),
                   fontsize=9, color=COLOR_FG)
-    ax_l.annotate(r"$L_{p,A,S,4\,\mathrm{m}} \leq 48$ dB: good target",
+    ax_l.annotate(r"$L_{p,\mathrm{A,S},4\,\mathrm{m}} \leq 48$ dB: good target",
                   xy=(2.1, 32.0), fontsize=9, color=COLOR_FG)
     ax_s.axvspan(1.8, 5.0, color=theme_fill(COLOR_PRIMARY, ax_s), zorder=0)
     ax_s.axvspan(10.0, 20.0, color=theme_fill(COLOR_SECONDARY, ax_s), zorder=0)
-    ax_s.annotate(r"$r_D \leq 5$ m: good", xy=(2.1, 0.10), fontsize=9,
+    ax_s.annotate(r"$r_\mathrm{D} \leq 5$ m: good", xy=(2.1, 0.10), fontsize=9,
                   color=COLOR_FG)
-    ax_s.annotate(r"$r_D > 10$ m: poor", xy=(10.4, 0.10), fontsize=9,
+    ax_s.annotate(r"$r_\mathrm{D} > 10$ m: poor", xy=(10.4, 0.10), fontsize=9,
                   color=COLOR_FG)
 
     for label, d2s, lp_4m, sti_0, sti_slope, color in cases:
@@ -631,15 +631,15 @@ def generate_open_plan_quality(output_dir: str) -> None:
                   + slope * np.log10(span), "--", color=color, linewidth=1.6)
         ax_l.plot(positions, levels, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
-                  label=rf"{label}: $D_{{2,S}}$ = {res.d2s:.0f} dB, "
-                        rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {res.lp_as_4m:.0f} dB")
+                  label=rf"{label}: $D_{{2,\mathrm{{S}}}}$ = {res.d2s:.0f} dB, "
+                        rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {res.lp_as_4m:.0f} dB")
         ax_l.plot(4.0, res.lp_as_4m, "D", color=color, markersize=9, zorder=6)
         ax_s.plot(span, sti_0 - sti_slope * span, "--", color=color,
                   linewidth=1.6)
         ax_s.plot(positions, sti, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
-                  label=f"{label}: $r_D$ = {res.rd:.1f} m, "
-                        f"$r_P$ = {res.rp:.0f} m")
+                  label=f"{label}: $r_\\mathrm{{D}}$ = {res.rd:.1f} m, "
+                        f"$r_\\mathrm{{P}}$ = {res.rp:.0f} m")
         ax_s.plot(res.rd, 0.50, "D", color=color, markersize=9, zorder=6)
 
     ax_l.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
@@ -775,15 +775,15 @@ def generate_open_plan_decay(output_dir: str) -> None:
     rr = np.logspace(np.log10(2.0), np.log10(16.0), 100)
     line_spl, = ax.plot(rr, a_lp + b_log * np.log10(rr), color=COLOR_PRIMARY,
                         linestyle="--", linewidth=1.8,
-                        label=f"Spatial decay $D_{{2,S}}$ = {m.d2s:.1f} dB")
+                        label=f"Spatial decay $D_{{2,\\mathrm{{S}}}}$ = {m.d2s:.1f} dB")
     pts_spl, = ax.plot(r, lp, "o", color=COLOR_PRIMARY, markersize=7,
                        markerfacecolor="white", markeredgewidth=1.6,
                        label=r"Measured $L_{p,A,S}$")
     ax.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
     mark_4m, = ax.plot(4.0, m.lp_as_4m, "D", color=COLOR_SECONDARY, markersize=9,
                        zorder=6,
-                       label=rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB")
-    ax.annotate(rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB",
+                       label=rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB")
+    ax.annotate(rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB",
                 xy=(4.0, m.lp_as_4m),
                 xytext=(4.7, m.lp_as_4m + 4.5), fontsize=10,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
@@ -811,8 +811,8 @@ def generate_open_plan_decay(output_dir: str) -> None:
     # r_D is called out to the right of its marker: the space to its left holds
     # the 4 m diamond and the leader of the L_p,A,S,4m callout. r_P sits near the
     # right frame, so its own callout goes to the left.
-    for dist, level, name, xfac, yoff in [(m.rd, 0.50, "$r_D$", 1.18, 0.07),
-                                          (m.rp, 0.20, "$r_P$", 0.62, 0.03)]:
+    for dist, level, name, xfac, yoff in [(m.rd, 0.50, "$r_\\mathrm{D}$", 1.18, 0.07),
+                                          (m.rp, 0.20, "$r_\\mathrm{P}$", 0.62, 0.03)]:
         ax2.axhline(level, color=COLOR_FG, linestyle=":", alpha=0.25, linewidth=1)
         ax2.plot(dist, level, "v", color=COLOR_SECONDARY, markersize=9, zorder=6)
         ax2.annotate(f"{name} = {dist:.1f} m", xy=(dist, level),
@@ -1587,7 +1587,7 @@ def generate_image_source_order_convergence(output_dir: str) -> None:
 
     info = [
         r"room 7 × 5 × 3 m, $\alpha$ = 0.12",
-        "$V$ = 105 m³, $S$ = 142 m², $f_s$ = 48 kHz",
+        "$V$ = 105 m³, $S$ = 142 m², $f_\\mathrm{s}$ = 48 kHz",
         "shaded: ±10 % around Eyring",
     ]
     ax.text(0.985, 0.04, "\n".join(info), transform=ax.transAxes,
@@ -1807,11 +1807,11 @@ def generate_steady_state_directivity(output_dir: str) -> None:
                                    mean_absorption=0.15, distances=grid,
                                    directivity=q)
         left.semilogx(field.distances, field.total, color=colour, linewidth=2.0,
-                      label=f"$Q$ = {q:g}  ($r_c$ = {field.critical_distance:.2f} m)",
+                      label=f"$Q$ = {q:g}  ($r_\\mathrm{{c}}$ = {field.critical_distance:.2f} m)",
                       zorder=5)
         left.axvline(field.critical_distance, color=colour, linestyle=":",
                      linewidth=1.2, zorder=3)
-    left.set_title(r"$Q$ moves $r_c$, not the plateau",
+    left.set_title(r"$Q$ moves $r_\mathrm{c}$, not the plateau",
                    pad=10)
     left.legend(loc="upper right", fontsize=9)
 
@@ -1964,7 +1964,7 @@ def generate_decay_range_bias(output_dir: str) -> None:
 
     info = [
         "synthetic single-slope decay, $T$ = 1.0 s",
-        "white noise floor swept, $f_s$ = 48 kHz",
+        "white noise floor swept, $f_\\mathrm{s}$ = 48 kHz",
         "green band: the 5 % JND",
         "red band: flagged invalid for T20",
         "below ~34 dB the fit returns NaN",

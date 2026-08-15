@@ -101,7 +101,7 @@ _STRINGS: dict[str, str] = {
     "Harmonic frequency responses ({method} sweep)": "Respuestas en frecuencia de los armónicos (barrido {method})",
     "$R_1$ (resistance)": "$R_1$ (resistencia)",
     "$X_1$ (reactance)": "$X_1$ (reactancia)",
-    r"Normalized radiation impedance $Z_r / \rho c S$": r"Impedancia de radiación normalizada $Z_r / \rho c S$",
+    r"Normalized radiation impedance $Z_\mathrm{r} / \rho c S$": r"Impedancia de radiación normalizada $Z_\mathrm{r} / \rho c S$",
     "Baffled circular piston radiation impedance": "Impedancia de radiación de un pistón circular con pantalla",
     "Baffled circular piston directivity": "Directividad de un pistón circular con pantalla",
     # --- IEC 60268-4/-5 datasheet panels (shared by .report() and .plot()) ---
@@ -128,8 +128,8 @@ _STRINGS: dict[str, str] = {
     r"Sidebands $f_2 \pm n \cdot f_1$": r"Bandas laterales $f_2 \pm n \cdot f_1$",
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
     # --- Sound-reinforcement gain before feedback (Long Ch. 18) ---
-    "Open-loop gain $Z_S$": "Ganancia en lazo abierto $Z_S$",
-    "Feedback-loop gain $G_S$": "Ganancia del lazo de realimentación $G_S$",
+    "Open-loop gain $Z_\\mathrm{S}$": "Ganancia en lazo abierto $Z_\\mathrm{S}$",
+    "Feedback-loop gain $G_\\mathrm{S}$": "Ganancia del lazo de realimentación $G_\\mathrm{S}$",
     r"Open microphones $\Delta L_{\mathrm{nom}}$":
         r"Micrófonos abiertos $\Delta L_{\mathrm{nom}}$",
     "Total loop gain": "Ganancia total del lazo",
@@ -459,7 +459,7 @@ def plot_piston_impedance(
     ax.axhline(1.0, color=_C_TERTIARY, ls=":", lw=1.0,
                label=r"$R_1 \to 1$ ($ka \gg 1$)")
     ax.set_xlabel(r"$ka$")
-    ax.set_ylabel(_t(r"Normalized radiation impedance $Z_r / \rho c S$", language))
+    ax.set_ylabel(_t(r"Normalized radiation impedance $Z_\mathrm{r} / \rho c S$", language))
     ax.set_title(_t("Baffled circular piston radiation impedance", language))
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -887,8 +887,8 @@ def plot_feedback_stability(
 
     ax = ax if ax is not None else _new_axes()
     labels = [
-        _t("Open-loop gain $Z_S$", language),
-        _t("Feedback-loop gain $G_S$", language),
+        _t("Open-loop gain $Z_\\mathrm{S}$", language),
+        _t("Feedback-loop gain $G_\\mathrm{S}$", language),
         _t(r"Open microphones $\Delta L_{\mathrm{nom}}$", language),
         _t("Total loop gain", language),
     ]

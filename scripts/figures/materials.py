@@ -67,9 +67,9 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
 
     info = [
         r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Formula 2)",
-        r"$s^{\prime} = s^{\prime}_t + s^{\prime}_a$  (clause 8.2)",
-        r"$s^{\prime}_t = 4\pi^2 m^{\prime}_t f_r^2$  (Formula 4)",
-        r"$s^{\prime}_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
+        r"$s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$  (clause 8.2)",
+        r"$s^{\prime}_\mathrm{t} = 4\pi^2 m^{\prime}_\mathrm{t} f_\mathrm{r}^2$  (Formula 4)",
+        r"$s^{\prime}_\mathrm{a} = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -98,7 +98,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     rig = np.linspace(8.0, 70.0, 600)
     ax_l.plot(rig, 20.0 * np.log10(sdof(rig, 25.0, 0.14)),
               color=COLOR_PRIMARY, linewidth=2.0, zorder=3,
-              label="small excitation: $f_r$ = 25.0 Hz")
+              label="small excitation: $f_\\mathrm{r}$ = 25.0 Hz")
     ax_l.plot(rig, 20.0 * np.log10(sdof(rig, 22.0, 0.22)),
               color=COLOR_SECONDARY, linewidth=1.8, linestyle="--", zorder=3,
               label="over-driven: peak lower and at 22 Hz")
@@ -111,7 +111,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     ax_l.set_xlim(rig[0], rig[-1])
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("Load-plate response [dB re static]")
-    ax_l.set_title("On the rig: reading $f_r$", pad=12)
+    ax_l.set_title("On the rig: reading $f_\\mathrm{r}$", pad=12)
     ax_l.legend(loc="upper right", fontsize=9)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
@@ -177,12 +177,12 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     ax.loglog(d_mm, s_frame, color=COLOR_PRIMARY, linewidth=1.9,
-              linestyle="--", zorder=3, label=r"$s^{\prime}_t$, frame (Formula 4)")
+              linestyle="--", zorder=3, label=r"$s^{\prime}_\mathrm{t}$, frame (Formula 4)")
     ax.loglog(d_mm, s_gas, color=COLOR_TERTIARY, linewidth=1.9,
               linestyle="-.", zorder=3,
-              label=r"$s^{\prime}_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
+              label=r"$s^{\prime}_\mathrm{a}$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
     ax.loglog(d_mm, s_total, color=COLOR_SECONDARY, linewidth=2.4, zorder=4,
-              label=r"installed $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (clause 8.2)")
+              label=r"installed $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$ (clause 8.2)")
     ax.scatter([20.0], [10.49], color=COLOR_FG, s=70, zorder=6)
     ax.annotate("the worked determination:\n$d$ = 20 mm, 4.94 + 5.56 = 10.49",
                 (21.0, 10.49), fontsize=9, color=COLOR_FG, ha="left",
@@ -215,9 +215,9 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
     ax_f.set_yticks([15, 20, 30, 40, 60, 90])
 
     ax.text(0.015, 0.05,
-            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$" "\n"
-            r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$" "\n"
-            r"$r < 10$  →  $s^{\prime} = s^{\prime}_t$ only if $s^{\prime}_a$ is negligible",
+            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_\mathrm{t}$" "\n"
+            r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$" "\n"
+            r"$r < 10$  →  $s^{\prime} = s^{\prime}_\mathrm{t}$ only if $s^{\prime}_\mathrm{a}$ is negligible",
             transform=ax.transAxes, va="bottom", ha="left", fontsize=9,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -249,7 +249,7 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
     ax.fill_between(x, alpha_s - u, alpha_s + u, color=COLOR_TERTIARY, alpha=0.22,
                     zorder=0, label=r"$\pm U$ ($k$ = 2), reproducibility")
     ax.plot(x, alpha_s, "-", color=COLOR_PRIMARY, linewidth=2.4, marker="o",
-            markersize=6, zorder=5, label=r"$\alpha_s$ (ISO 354)")
+            markersize=6, zorder=5, label=r"$\alpha_\mathrm{s}$ (ISO 354)")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(b)}" for b in freqs], rotation=45, fontsize=8)
@@ -263,7 +263,7 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        r"$\sigma_R = m\,\alpha_s + n$  (Table 1)",
+        r"$\sigma_\mathrm{R} = m\,\alpha_\mathrm{s} + n$  (Table 1)",
         r"$U = k\,u$,  $k$ = 2  (95 %)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -296,12 +296,12 @@ def generate_absorption_rating(output_dir: str) -> None:
                 label="Shifted reference curve (ISO 11654)")
     ax.semilogx(freqs, measured, marker="o", color=COLOR_PRIMARY, linewidth=1.8,
                 markersize=6, markerfacecolor="white", markeredgewidth=1.4,
-                zorder=4, label=r"Practical absorption $\alpha_p$")
+                zorder=4, label=r"Practical absorption $\alpha_\mathrm{p}$")
 
     # alpha_w is the shifted reference read at 500 Hz.
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.4)
     ax.plot(500, result.alpha_w, "D", color=COLOR_SECONDARY, markersize=9, zorder=6)
-    ax.annotate(f"$\\alpha_w$ = {result.rating_label}", xy=(500, result.alpha_w),
+    ax.annotate(f"$\\alpha_\\mathrm{{w}}$ = {result.rating_label}", xy=(500, result.alpha_w),
                 xytext=(600, result.alpha_w - 0.16), fontsize=12, fontweight="bold",
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
@@ -366,11 +366,11 @@ def generate_airflow_resistance(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     for dy, text in (
-        (0.97, (f"Specific airflow resistance $R_s$ = "
+        (0.97, (f"Specific airflow resistance $R_\\mathrm{{s}}$ = "
                f"{result.specific_resistance:.0f} Pa·s/m")),
         (0.90, f"Airflow resistivity $\\sigma$ = {result.resistivity:.0f} Pa·s/m²"),
         (0.83, (f"Linear term $a$ = {result.linear_coefficient:.0f} Pa·s/m"
-               f"  (= $R_s$ at $u \\to 0$)")),
+               f"  (= $R_\\mathrm{{s}}$ at $u \\to 0$)")),
     ):
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
@@ -583,7 +583,7 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
                alpha=0.45)
     ax.axvline(f_d, color=COLOR_FG, linestyle=":", linewidth=1.2, alpha=0.7)
     ax.annotate(
-        f"apparent total density $\\rho_t/\\rho_0$ = {total / rho0:.1f}",
+        f"apparent total density $\\rho_\\mathrm{{t}}/\\rho_0$ = {total / rho0:.1f}",
         xy=(1960.0, total / rho0), xytext=(1960.0, total / rho0 - 1.4),
         ha="right", va="top", fontsize=9, color=COLOR_FG,
     )
@@ -594,7 +594,7 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
     ax.set_xlim(0.0, 2000.0)
     ax.set_ylim(-30.0, 30.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel(r"Normalised effective density $\rho_e/\rho_0$")
+    ax.set_ylabel(r"Normalised effective density $\rho_\mathrm{e}/\rho_0$")
     ax.set_title("A Limp Frame Carries Its Own Inertia",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -677,7 +677,7 @@ def generate_biot_frame_resonance(output_dir: str) -> None:
     ax.set_xlim(200.0, 1500.0)
     ax.set_ylim(-3.0, 3.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
-    ax.set_ylabel(r"Normalised surface impedance $Z_s/\rho_0 c_0$")
+    ax.set_ylabel(r"Normalised surface impedance $Z_\mathrm{s}/\rho_0 c_0$")
     ax.set_title("Only an Elastic Frame Resonates", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -1271,13 +1271,13 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     )
     ax_a.fill_between(freqs, alpha_s, alpha_spec, color=COLOR_TERTIARY,
                       alpha=theme_fill_alpha(COLOR_TERTIARY, ax_a), zorder=1,
-                      label=r"$\alpha_{\mathrm{spec}} - \alpha_s$  (numerator of Eq. (5))")
+                      label=r"$\alpha_{\mathrm{spec}} - \alpha_\mathrm{s}$  (numerator of Eq. (5))")
     ax_a.semilogx(freqs, alpha_spec, color=COLOR_SECONDARY, linewidth=1.9,
                   marker="s", markersize=5, zorder=3,
                   label=r"$\alpha_{\mathrm{spec}}$, rotating turntable (T3, T4)")
     ax_a.semilogx(freqs, alpha_s, color=COLOR_PRIMARY, linewidth=1.9,
                   marker="o", markersize=5, zorder=3,
-                  label=r"$\alpha_s$, static turntable (T1, T2)")
+                  label=r"$\alpha_\mathrm{s}$, static turntable (T1, T2)")
     ax_a.set_ylabel("Absorption coefficient")
     ax_a.set_ylim(0.0, 1.0)
     ax_a.set_title("Random-incidence scattering coefficient (ISO 17497-1)",
@@ -1300,7 +1300,7 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax.set_axisbelow(True)
     ax.text(0.985, 0.06,
-            r"$s = (\alpha_{\mathrm{spec}} - \alpha_s)/(1 - \alpha_s)$   Eq. (5)",
+            r"$s = (\alpha_{\mathrm{spec}} - \alpha_\mathrm{s})/(1 - \alpha_\mathrm{s})$   Eq. (5)",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=11,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -1726,7 +1726,7 @@ def generate_insitu_absorption(output_dir: str) -> None:
     ax.set_ylabel(r"Absorption coefficient $\alpha$")
     ax.set_ylim(0.0, 1.0)
     ax.text(0.04, 0.94,
-            r"$K_r = 2/3$" "\n" r"$\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$",
+            r"$K_r = 2/3$" "\n" r"$\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$",
             transform=ax.transAxes, va="top", ha="left", fontsize=10,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -1809,13 +1809,13 @@ def generate_adrienne_window(output_dir: str) -> None:
     mid.plot(ms, h_road, color=COLOR_MUTED, linewidth=1.2, zorder=2,
              label="measured over the road: the two arrivals overlap")
     mid.plot(ms, h_reflected, color=COLOR_SECONDARY, linewidth=1.5, zorder=4,
-             label="$h_r$ = road - free field, the surface alone")
+             label="$h_\\mathrm{r}$ = road - free field, the surface alone")
     mid.plot(ms, gate, color=COLOR_TERTIARY, linewidth=1.6, zorder=3,
              label=f"Adrienne window: 0.5 + 5 + 5 ms = {duration * 1e3:.1f} ms")
     mid.annotate("", xy=(t_direct * 1e3, -0.60),
                  xytext=(t_reflected * 1e3, -0.60),
                  arrowprops={"arrowstyle": "<->", "color": COLOR_FG})
-    mid.annotate(f"$2 d_m/c$ = {(t_reflected - t_direct) * 1e3:.2f} ms",
+    mid.annotate(f"$2 d_\\mathrm{{m}}/c$ = {(t_reflected - t_direct) * 1e3:.2f} ms",
                  (0.5 * (t_direct + t_reflected) * 1e3, -0.66), fontsize=9,
                  color=COLOR_FG, ha="center", va="top")
     mid.annotate("parasitic arrival, just outside\nthe gate: lengthen the window\n"
@@ -1842,9 +1842,9 @@ def generate_adrienne_window(output_dir: str) -> None:
     mag_i, mag_r = mag_i - peak, mag_r - peak
     keep = (f_i >= 100.0) & (f_i <= 5000.0)
     bot.semilogx(f_i[keep], mag_i[keep], color=COLOR_PRIMARY, linewidth=1.6,
-                 zorder=3, label="$|H_i|$, the windowed free-field reference")
+                 zorder=3, label="$|H_\\mathrm{i}|$, the windowed free-field reference")
     bot.semilogx(f_i[keep], mag_r[keep], color=COLOR_SECONDARY, linewidth=1.6,
-                 zorder=3, label="$|H_r|$, the windowed surface reflection")
+                 zorder=3, label="$|H_\\mathrm{r}|$, the windowed surface reflection")
     bot.axvspan(100.0, 250.0, color=theme_fill(COLOR_MUTED, bot), zorder=0)
     bot.axvline(1.0 / duration, color=COLOR_FG, linestyle=":", linewidth=1.3,
                 zorder=2)
@@ -1914,7 +1914,7 @@ def generate_insitu_method_windows(output_dir: str) -> None:
     ceiling = np.array([float(materials.spot_tube_upper_frequency(d, c0))
                         for d in diameters])
     ax_d.plot(diameters * 1e3, ceiling, color=COLOR_SECONDARY, linewidth=2.2,
-              zorder=4, label=r"$f_u = 0.58\,c_0/d$ (Clause 5.4)")
+              zorder=4, label=r"$f_\mathrm{u} = 0.58\,c_0/d$ (Clause 5.4)")
     ax_d.axhline(1800.0, color=COLOR_FG, linestyle="--", linewidth=1.3,
                  zorder=3)
     ax_d.axhspan(ceiling.min(), 1800.0, color=theme_fill(COLOR_MUTED, ax_d),
@@ -2150,7 +2150,7 @@ def generate_sound_absorption_inversion(output_dir: str) -> None:
     # Right-hand axis: the same filled difference read as alpha_s = (A2-A1)/S.
     ax_alpha = ax_a.twinx()
     ax_alpha.set_ylim(ax_a.get_ylim()[0] / area, ax_a.get_ylim()[1] / area)
-    ax_alpha.set_ylabel(r"Band height as $\alpha_s = (A_2 - A_1)/S$",
+    ax_alpha.set_ylabel(r"Band height as $\alpha_\mathrm{s} = (A_2 - A_1)/S$",
                         color=COLOR_TERTIARY)
     ax_alpha.tick_params(axis="y", colors=COLOR_TERTIARY)
 
@@ -2270,7 +2270,7 @@ def generate_flow_resistivity_window(output_dir: str) -> None:
         ).absorption[0]) for s in sigmas
     ])
     ax_w.semilogx(ratio, alpha_dif, color=COLOR_TERTIARY, linewidth=2.0,
-                  linestyle="--", label=r"$\alpha_{dif}$ at 1 kHz")
+                  linestyle="--", label=r"$\alpha_\mathrm{dif}$ at 1 kHz")
     ax_w.axvspan(1.0, 4.0, color=theme_fill(COLOR_PRIMARY, ax_w), linewidth=0,
                  zorder=0)
     ax_w.text(2.0, 0.06, r"$\rho_0 c_0 \leq \sigma d \leq 4\rho_0 c_0$",
@@ -2449,7 +2449,7 @@ def generate_porous_model_comparison(output_dir: str) -> None:
               fontsize=10, color=COLOR_FG)
     format_frequency_axis(ax_z, 20.0, 20000.0)
     ax_z.set_xlabel(LABEL_FREQ_HZ)
-    ax_z.set_ylabel(r"$Z_c/(\rho_0 c_0)$")
+    ax_z.set_ylabel(r"$Z_\mathrm{c}/(\rho_0 c_0)$")
     ax_z.set_title(r"Characteristic impedance, $\sigma$ = 20 kPa·s/m²",
                    pad=10)
     ax_z.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2472,7 +2472,7 @@ def generate_porous_model_comparison(output_dir: str) -> None:
                   arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG})
     format_frequency_axis(ax_s, 20.0, 20000.0)
     ax_s.set_xlabel(LABEL_FREQ_HZ)
-    ax_s.set_ylabel(r"$\mathrm{Re}(Z_s)/(\rho_0 c_0)$,  50 mm hard-backed layer")
+    ax_s.set_ylabel(r"$\mathrm{Re}(Z_\mathrm{s})/(\rho_0 c_0)$,  50 mm hard-backed layer")
     ax_s.set_title("Where the extrapolation fails", pad=10)
     ax_s.set_ylim(-8.0, 8.0)
     ax_s.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2584,9 +2584,9 @@ def generate_oblique_absorption(output_dir: str) -> None:
     statistical = np.asarray(
         materials.statistical_absorption(normal.normalized_impedance))
     ax_f.semilogx(freq, diffuse, color=COLOR_PRIMARY, linewidth=2.2,
-                  label=r"$\alpha_{dif}$  bulk (Paris integral)")
+                  label=r"$\alpha_\mathrm{dif}$  bulk (Paris integral)")
     ax_f.semilogx(freq, statistical, color=COLOR_SECONDARY, linewidth=2.0,
-                  linestyle="--", label=r"$\alpha_{st}$  locally reacting (closed form)")
+                  linestyle="--", label=r"$\alpha_\mathrm{st}$  locally reacting (closed form)")
     ax_f.semilogx(freq, normal.absorption, color=COLOR_MUTED, linewidth=1.6,
                   linestyle=":", label=r"$\alpha(0°)$  what the tube reads")
     ax_f.axhline(0.951, color=COLOR_FG, linestyle=":", linewidth=1.2)

@@ -205,8 +205,8 @@ as zero on the edge, is a shear-free rigid wall; `free_sides` turns
 selected sides into traction-free surfaces via stress imaging and sponge
 layers into absorbing ones. Material maps are given as the measurable
 wave speeds and converted internally to the Lame parameters
-$\mu = \rho c_\mathrm{s}^2$ and
-$\lambda = \rho (c_\mathrm{p}^2 - 2 c_\mathrm{s}^2)$;
+$\mu = \rho c_\mathrm{S}^2$ and
+$\lambda = \rho (c_\mathrm{P}^2 - 2 c_\mathrm{S}^2)$;
 density is
 arithmetically averaged onto the faces and `mu` harmonically averaged
 onto the corners (zero whenever any neighbour is a fluid), the Moczo
@@ -218,7 +218,7 @@ interfaces converge to the physical traction continuity.
 | Name | Description |
 | :--- | :--- |
 | `c_p` | P-wave speed map [m/s], shape `(ny, nx)`. A scalar with an explicit `shape` is also accepted. |
-| `c_s` | S-wave speed map [m/s]; scalar or `(ny, nx)` array. `c_s = 0` marks a fluid cell (the acoustic limit); every cell must satisfy $c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2$ (non-negative `lambda`). |
+| `c_s` | S-wave speed map [m/s]; scalar or `(ny, nx)` array. `c_s = 0` marks a fluid cell (the acoustic limit); every cell must satisfy $c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2$ (non-negative `lambda`). |
 | `dx` | Grid spacing [m] (square cells). |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
 | `cfl` | Courant number $C_\mathrm{N} = c_{\mathrm{p},\max}\, \Delta t \sqrt{2} / \Delta x$; the scheme is stable for $C_\mathrm{N} < 1$ (Virieux Eqs. 6-7, a bound on `c_P` alone, independent of `c_S` and of the Poisson ratio) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
@@ -549,13 +549,13 @@ Material(c_p: float, c_s: float, rho: float)
 An isotropic elastic medium as measurable wave speeds and density.
 
 The three numbers the solver's material maps are built from: the
-compressional speed $c_\mathrm{p} = \sqrt{(\lambda + 2\mu) / \rho}$,
+compressional speed $c_\mathrm{P} = \sqrt{(\lambda + 2\mu) / \rho}$,
 the shear
-speed $c_\mathrm{s} = \sqrt{\mu / \rho}$ and the density `rho`.
+speed $c_\mathrm{S} = \sqrt{\mu / \rho}$ and the density `rho`.
 `c_s = 0`
 marks a fluid (the acoustic `mu = 0` limit of the elastic scheme,
 Virieux 1986), so the same dataclass names both fluids and solids.
-Every material must satisfy $c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2$
+Every material must satisfy $c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2$
 (non-negative first
 Lame parameter), the constructor bound of [`ElasticFDTD2D`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticfdtd2d).
 

@@ -292,8 +292,8 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # commas for Spanish unless the string carries maths, and it had been
     # turning the equation number "3.149" into "3,149".
     speeds = fig.text(0.5, 0.030,
-                      T(f"aluminium: $c_P$ = {_HS_CP:.0f}, $c_S$ = "
-                        f"{_HS_CS:.0f}, $c_R$ = {c_r:.0f} m/s "
+                      T(f"aluminium: $c_\\mathrm{{P}}$ = {_HS_CP:.0f}, $c_\\mathrm{{S}}$ = "
+                        f"{_HS_CS:.0f}, $c_\\mathrm{{R}}$ = {c_r:.0f} m/s "
                         f"(C&H Eq. 3.149)"),
                       ha="center", va="bottom", fontsize=8, color=COLOR_FG)
     scale_txt = fig.text(0.5, 0.006,

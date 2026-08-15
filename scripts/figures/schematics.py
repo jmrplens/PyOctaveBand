@@ -562,7 +562,7 @@ def animate_onset_detection(output_dir: str) -> None:
     ax.set_xlim(0.55, 3.0)
     ax.set_ylim(42, 100)
     ax.plot(t, laf, color=COLOR_PRIMARY, lw=1.8,
-            label=T("$L_{AF}$ (A-weighted, Fast)"))
+            label=T("$L_\\mathrm{AF}$ (A-weighted, Fast)"))
     (hot,) = ax.plot([], [], color=COLOR_SECONDARY, lw=4.0,
                      solid_capstyle="round", label=T("onset (> 10 dB/s)"))
     rx, ry = 0.13, 6.5
@@ -583,7 +583,7 @@ def animate_onset_detection(output_dir: str) -> None:
             fontsize=9, zorder=8, path_effects=_halo(3.0))
     ax.set_title(T("Impulse onset detection (NT ACOU 112)"))
     ax.set_xlabel(T("Time [s]"))
-    ax.set_ylabel(T("A-weighted level $L_{AF}$ [dB]"), fontsize=9)
+    ax.set_ylabel(T("A-weighted level $L_\\mathrm{AF}$ [dB]"), fontsize=9)
     ax.legend(loc="upper right", fontsize=8)
 
     ax_b = fig.add_subplot(gs[1])
@@ -1929,7 +1929,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     phase = np.degrees(np.angle(response(freqs)))
 
     fig = _anim_figure()
-    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"))
+    fig.suptitle(T(r"Reading $f_\mathrm{r}$ on the EN 29052-1 rig"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.0])
 
@@ -1983,7 +1983,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     ax_m.set_xlim(f_lo - f_pad, f_hi + f_pad)
     ax_m.set_ylim(0.0, float(mag.max()) * 1.18)
     ax_m.set_ylabel(T("Response magnitude"), fontsize=9)
-    ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T(r"$f_r$ = 25 Hz"), ha="left",
+    ax_m.text(f_r + 0.8, float(mag.max()) * 1.05, T(r"$f_\mathrm{r}$ = 25 Hz"), ha="left",
               va="top", color=COLOR_FG, fontsize=9)
     (dot_m,) = ax_m.plot([], [], "o", color=COLOR_SECONDARY, ms=8, zorder=5)
 
@@ -2038,11 +2038,11 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
         dot_p.set_data([f], [np.degrees(np.angle(h))])
         deg = np.degrees(np.angle(h))
         if f < f_r - 3.0:
-            state = T(r"below $f_r$: the plate follows the force")
+            state = T(r"below $f_\mathrm{r}$: the plate follows the force")
         elif f <= f_r + 3.0:
-            state = T(r"at $f_r$: a quarter cycle behind, amplitude peaks")
+            state = T(r"at $f_\mathrm{r}$: a quarter cycle behind, amplitude peaks")
         else:
-            state = T(r"above $f_r$: the plate moves against the force")
+            state = T(r"above $f_\mathrm{r}$: the plate moves against the force")
         state_txt.set_text(state)
         # Translated whole, values included: assembled from an f-string and a
         # lone T("phase"), the readout kept the English decimal point through
@@ -3250,15 +3250,15 @@ def animate_iso717_shift(output_dir: str) -> None:
         if not st["ok"]:
             lines.append(T("over the cap: shift again"))
         elif idx == track["accepted"]:
-            name = T("$L\u2032_{nT,w}$") if impact else T("$R_w$")
+            name = T("$L\u2032_{nT,w}$") if impact else T("$R_\\mathrm{w}$")
             lines.append(T("largest sum still under the cap"))
             lines.append(f"{name} = {track['rating']:d} dB")
             if impact:
                 lines.append(
-                    T(f"$C_I$ = {_fmt_minus(int(res.ci), '+d')} dB"))
+                    T(f"$C_\\mathrm{{I}}$ = {_fmt_minus(int(res.ci), '+d')} dB"))
             else:
                 lines.append(T(f"$C$ = {_fmt_minus(int(res.c), '+d')} dB, "
-                               f"$C_{{tr}}$ = {_fmt_minus(int(res.ctr), '+d')} dB"))
+                               f"$C_\\mathrm{{tr}}$ = {_fmt_minus(int(res.ctr), '+d')} dB"))
         else:
             lines.append(T("legal, but the sum is smaller:"))
             lines.append(T("this is one step too far"))
@@ -3741,9 +3741,9 @@ def animate_feedback_howl(output_dir: str) -> None:
                if a == 1 else
                T("Four more decibels of system gain: the loop reaches unity"))
         act_txt.set_text(act)
-        lines = [T(f"$Z_S$ = {_fmt_minus(case['zs'], '.0f')} dB, "
+        lines = [T(f"$Z_\\mathrm{{S}}$ = {_fmt_minus(case['zs'], '.0f')} dB, "
                    f"{mics:d} open microphone(s)"),
-                 T(f"loop gain $Z_S + G_S$ = "
+                 T(f"loop gain $Z_\\mathrm{{S}} + G_\\mathrm{{S}}$ = "
                    f"{_fmt_minus(case['loop'], '+.1f')} dB"),
                  T(f"each round trip is x {case['g']:.3f}")]
         if np.isfinite(case["limit"]):

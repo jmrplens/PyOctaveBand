@@ -120,7 +120,7 @@ def plot_uncertainty_budget(
     ax.barh(positions, contributions, **kwargs)
     uc = decimal_comma(f"{result.combined_uncertainty:.3g}", language)
     ax.axvline(result.combined_uncertainty, color=_C_REFERENCE, ls="--",
-               label=f"$u_c$ = {uc}")
+               label=f"$u_\\mathrm{{c}}$ = {uc}")
     ax.set_yticks(positions)
     ax.set_yticklabels(names)
     ax.invert_yaxis()

@@ -913,7 +913,7 @@ Q 51.222534 73.235039 54.222534 73.235039
 z
 " style="fill: #555555; opacity: 0.6; stroke: #ffffff; stroke-linejoin: miter"/>
     </g>
-    <!-- Tonal audibility $\Delta L_a$ = 8.6 dB -->
+    <!-- Tonal audibility $\Delta L_\mathrm{a}$ = 8.6 dB -->
     <g style="fill: #ffffff" transform="translate(54.222534 54.828984) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-37" d="M -19 4666 
@@ -1062,43 +1062,6 @@ L 172 0
 L 1075 4666 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-44" d="M 3438 1997 
-L 3047 0 
-L 2472 0 
-L 2578 531 
-Q 2325 219 2001 64 
-Q 1678 -91 1281 -91 
-Q 834 -91 548 182 
-Q 263 456 263 884 
-Q 263 1497 752 1853 
-Q 1241 2209 2100 2209 
-L 2900 2209 
-L 2931 2363 
-Q 2938 2388 2941 2417 
-Q 2944 2447 2944 2509 
-Q 2944 2788 2717 2942 
-Q 2491 3097 2081 3097 
-Q 1800 3097 1504 3025 
-Q 1209 2953 897 2809 
-L 997 3341 
-Q 1322 3463 1633 3523 
-Q 1944 3584 2234 3584 
-Q 2853 3584 3176 3315 
-Q 3500 3047 3500 2534 
-Q 3500 2431 3484 2292 
-Q 3469 2153 3438 1997 
-z
-M 2816 1759 
-L 2241 1759 
-Q 1534 1759 1195 1570 
-Q 856 1381 856 984 
-Q 856 709 1029 553 
-Q 1203 397 1509 397 
-Q 1978 397 2328 733 
-Q 2678 1069 2791 1631 
-L 2816 1759 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-20" d="M 678 2906 
 L 4684 2906 
 L 4684 2381 
@@ -1178,7 +1141,7 @@ z
      <use xlink:href="#DejaVuSans-3" transform="translate(750.626953 0.015625)"/>
      <use xlink:href="#DejaVuSans-329" transform="translate(782.414062 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(850.822266 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-44" transform="translate(906.535156 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-44" transform="translate(906.535156 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(952.165039 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(983.952148 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1067.741211 0.015625)"/>

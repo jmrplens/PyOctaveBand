@@ -1127,9 +1127,9 @@ def generate_silencer_insertion_loss(output_dir: str) -> None:
             label="Transmission loss (anechoic ports)")
     ax.plot(freqs, np.asarray(stiff.insertion_loss), color=COLOR_SECONDARY,
             lw=1.7, ls="--",
-            label="Insertion loss, stiff source ($Z_s = 20\\,\\rho c/S$)")
+            label="Insertion loss, stiff source ($Z_\\mathrm{s} = 20\\,\\rho c/S$)")
     ax.plot(freqs, np.asarray(matched.insertion_loss), color=COLOR_PRIMARY,
-            lw=1.7, label="Insertion loss, matched source ($Z_s = \\rho c/S$)")
+            lw=1.7, label="Insertion loss, matched source ($Z_\\mathrm{s} = \\rho c/S$)")
     ax.set_xlim(20.0, 880.0)
     ax.set_ylim(-30.0, 24.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
@@ -2250,7 +2250,7 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
                     ms=4, label=f"{flow:.0f} cfm ({velocity:.1f} m/s)")
         ax.axvline(peak, color=color, lw=1.0, ls=":")
     limit = air_terminal_velocity_limit(30, opening="supply")
-    ax.annotate(f"peak band $f_P = 48.8\\,U_G$ moves up one octave per\n"
+    ax.annotate(f"peak band $f_\\mathrm{{P}} = 48.8\\,U_\\mathrm{{G}}$ moves up one octave per\n"
                 f"doubling of the face velocity; ASHRAE Table 9 caps\nthe "
                 f"neck of an RC 30 supply outlet at {limit:.1f} m/s",
                 xy=(250.0, 33.0), xytext=(340.0, 12.0), fontsize="small",
@@ -2510,11 +2510,11 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(np.arange(bands.size) - 0.16, lp1 - nc45, width=0.32,
            color=theme_fill(COLOR_TERTIARY, ax), edgecolor=COLOR_TERTIARY,
-           label="Target $\\mathrm{IL}$ = $L_{p1}$ − NC 45")
+           label="Target $\\mathrm{{IL}}$ = $L_{p1}$ − NC 45")
     ax.bar(np.arange(bands.size) + 0.16,
            np.asarray(norton.correction, dtype=float), width=0.32,
            color=theme_fill(COLOR_SECONDARY, ax), edgecolor=COLOR_SECONDARY,
-           label="Interior correction $10\\,\\lg(S_E/R_i)$")
+           label="Interior correction $10\\,\\lg(S_\\mathrm{E}/R_\\mathrm{i})$")
     ax.plot(np.arange(bands.size),
             np.asarray(norton.panel_transmission_loss, dtype=float), "o-",
             color=COLOR_PRIMARY, lw=2.0, ms=6,
@@ -2595,7 +2595,7 @@ def generate_room_to_room_partitions(output_dir: str) -> None:
     ax.semilogx(bands, receiving, "o-", color=COLOR_PRIMARY, lw=1.8, ms=6,
                 label="Receiving-room absorption $S_2\\alpha_2$")
     ax.axhline(wall_area, color=COLOR_SECONDARY, lw=1.8, ls="--",
-               label=f"Partition area $S_w$ = {wall_area:.0f} m²")
+               label=f"Partition area $S_\\mathrm{{w}}$ = {wall_area:.0f} m²")
     ax.fill_between(bands, wall_area, receiving, where=receiving > wall_area,
                     color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
     ax.annotate("crossing: below it the wall delivers less than its TL,\n"

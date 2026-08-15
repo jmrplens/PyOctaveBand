@@ -128,7 +128,7 @@ _STRINGS: dict[str, str] = {
     "Modal density [modes/Hz]": "Densidad modal [modos/Hz]",
     "Modal density d$N$/d$f$": "Densidad modal d$N$/d$f$",
     "Room modes — {lx} × {ly} × {lz} m": "Modos de la sala — {lx} × {ly} × {lz} m",
-    "Schroeder $f_s$ = {value} Hz": "$f_s$ de Schroeder = {value} Hz",
+    "Schroeder $f_\\mathrm{{s}}$ = {value} Hz": "$f_\\mathrm{{s}}$ de Schroeder = {value} Hz",
     # --- Restaurant crowd self-noise (Long Ch. 17) ---
     "Simultaneous talkers $N$": "Hablantes simultáneos $N$",
     "Self-generated noise level [dB]": "Nivel de ruido autogenerado [dB]",
@@ -571,20 +571,20 @@ def plot_open_plan(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault(
         "label",
-        rf"$D_{{2,S}}$ = {format_number(result.d2s, language, decimals=1)}"
+        rf"$D_{{2,\mathrm{{S}}}}$ = {format_number(result.d2s, language, decimals=1)}"
         f"{_t(' dB per doubling', language)}",
     )
     ax.plot(r, level, **kwargs)
     ax.plot([4.0], [result.lp_as_4m], "o", color=_C_PRIMARY, ms=7,
-            label=rf"$L_{{p,A,S,4\,\mathrm{{m}}}}$ = "
+            label=rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = "
                   f"{format_number(result.lp_as_4m, language, decimals=1)} dB")
     if np.isfinite(result.rd):
         ax.axvline(result.rd, color=_C_SECONDARY, ls="--",
-                   label=rf"$r_D$ = {format_number(result.rd, language, decimals=1)}"
+                   label=rf"$r_\mathrm{{D}}$ = {format_number(result.rd, language, decimals=1)}"
                          f"{_t(' m (STI 0.50)', language)}")
     if np.isfinite(result.rp):
         ax.axvline(result.rp, color=_C_REFERENCE, ls=":",
-                   label=rf"$r_P$ = {format_number(result.rp, language, decimals=1)}"
+                   label=rf"$r_\mathrm{{P}}$ = {format_number(result.rp, language, decimals=1)}"
                          f"{_t(' m (STI 0.20)', language)}")
 
     ax.set_xscale("log", base=2)
@@ -808,7 +808,7 @@ def plot_steady_field(
     ax.plot(r, np.asarray(result.total, dtype=np.float64),
             label=_t("Total", language), **kwargs)
     ax.axvline(result.critical_distance, color=_C_REFERENCE, ls="-.", lw=1.2,
-               label=rf"$r_c$ = "
+               label=rf"$r_\mathrm{{c}}$ = "
                      f"{format_number(result.critical_distance, language, decimals=2)} m")
 
     ax.set_xscale("log")
@@ -992,7 +992,7 @@ def plot_room_modes(
 
     fs = result.schroeder_frequency
     if fs is not None and np.isfinite(fs):
-        label = _t("Schroeder $f_s$ = {value} Hz", language).format(
+        label = _t("Schroeder $f_\\mathrm{{s}}$ = {value} Hz", language).format(
             value=format_number(fs, language, decimals=0)
         )
         for panel in axes:

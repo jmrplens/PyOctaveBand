@@ -1548,7 +1548,7 @@ z
      <use xlink:href="#DejaVuSans-3" transform="translate(2505.957031 0.015625)"/>
      <use xlink:href="#DejaVuSans-56" transform="translate(2537.744141 0.015625)"/>
     </g>
-    <!-- suelo de ruido blanco barrido, $f_s$ = 48 kHz -->
+    <!-- suelo de ruido blanco barrido, $f_\mathrm{s}$ = 48 kHz -->
     <g transform="translate(304.364844 62.126777) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-45" d="M 3116 1747 
@@ -1596,37 +1596,6 @@ L 1159 3744
 Q 1278 4363 1576 4613 
 Q 1875 4863 2516 4863 
 L 3059 4863 
-z
-" transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-4e" d="M 581 4863 
@@ -1704,7 +1673,7 @@ z
      <use xlink:href="#DejaVuSans-f" transform="translate(1464.552734 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1496.339844 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1528.126953 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1563.332031 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(1563.332031 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1602.536133 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1634.323242 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1718.112305 0.015625)"/>

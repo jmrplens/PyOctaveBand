@@ -149,11 +149,11 @@ _STRINGS: dict[str, str] = {
     "Radiated sound power (EN 12354-4)": "Potencia acústica radiada (EN 12354-4)",
     "Vibration reduction index $K_{ij}$ [dB]": "Índice de reducción de vibraciones $K_{ij}$ [dB]",
     "Vibration reduction index (ISO 10848)": "Índice de reducción de vibraciones (ISO 10848)",
-    "Structure-borne power level $L_{Ws}$ [dB re 1 pW]": "Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]",
+    "Structure-borne power level $L_{W\\mathrm{s}}$ [dB re 1 pW]": "Nivel de potencia estructural $L_{W\\mathrm{s}}$ [dB re 1 pW]",
     "EN 15657 characteristic structure-borne sound power": "Potencia acústica estructural característica EN 15657",
     "paths": "trayectos",
-    "total $L_{n,s}$": "total $L_{n,s}$",
-    "Normalised SPL $L_{n,s}$ [dB]": "NPS normalizado $L_{n,s}$ [dB]",
+    "total $L_\\mathrm{n,s}$": "total $L_\\mathrm{n,s}$",
+    "Normalised SPL $L_\\mathrm{n,s}$ [dB]": "NPS normalizado $L_\\mathrm{n,s}$ [dB]",
     "EN 12354-5 installed structure-borne sound": "Ruido estructural instalado EN 12354-5",
     "Transmission path": "Trayecto de transmisión",
     "Share of transmitted energy [%]": "Fracción de energía transmitida [%]",
@@ -215,13 +215,13 @@ _STRINGS: dict[str, str] = {
     "one-third octave": "tercio de octava",
     "octave": "octava",
     "Normalized ceiling attenuation": "Diferencia de niveles normalizada del techo",
-    "Normalized ceiling attenuation $D_{n,c}$ [dB]":
-        "Diferencia de niveles normalizada del techo $D_{n,c}$ [dB]",
-    "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
+    "Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]":
+        "Diferencia de niveles normalizada del techo $D_\\mathrm{n,c}$ [dB]",
+    "$R_\\mathrm{S} + R_\\mathrm{R}$ (two ceilings)": "$R_\\mathrm{S} + R_\\mathrm{R}$ (dos techos)",
     r"$R_\mathrm{cl}$ (ceiling/plenum path)": r"$R_\mathrm{cl}$ (trayecto techo/plenum)",
     "plenum penalty": "penalización del plenum",
     "Suspended-ceiling plenum path": "Trayecto por plenum de techo suspendido",
-    "rigid connection ($Y_c$ = 0)": "unión rígida ($Y_c$ = 0)",
+    "rigid connection ($Y_\\mathrm{c}$ = 0)": "unión rígida ($Y_\\mathrm{c}$ = 0)",
     "resilient tie array": "conjunto de llaves elásticas",
     "isolation gained by the tie": "aislamiento aportado por la llave",
     "Coupling loss factor $\\eta_{ij}$": "Factor de pérdidas por acoplamiento $\\eta_{ij}$",
@@ -280,7 +280,7 @@ def plot_sound_reduction(
     kwargs.setdefault("markersize", 3)
     ax.semilogx(freq, r, label=_t("predicted $R$", language), **kwargs)
     if result.critical_frequency is not None:
-        symbol = "$f_{c1}$" if result.critical_frequency_upper is not None else "$f_c$"
+        symbol = "$f_{c1}$" if result.critical_frequency_upper is not None else "$f_\\mathrm{c}$"
         ax.axvline(
             result.critical_frequency, color=_C_REFERENCE, ls="--", lw=1.0,
             label=f"{symbol} = "
@@ -742,7 +742,7 @@ def plot_radiated_power(
             color="black",
             ls="--",
             lw=1.2,
-            label=f"$L_{{WA}}$ = {format_number(result.l_w_dba, language, decimals=1)} dB(A)",
+            label=f"$L_{{W\\mathrm{{A}}}}$ = {format_number(result.l_w_dba, language, decimals=1)} dB(A)",
         )
     ax.set_ylabel(_t("Radiated sound power level [dB]", language))
     ax.set_title(_t("Radiated sound power (EN 12354-4)", language))
@@ -815,7 +815,7 @@ def plot_structure_borne_power(
 
     ax = _plot_band_level_bars(
         ax, result.power_level, result.frequencies, result.total_level,
-        ylabel=_t(r"Structure-borne power level $L_{Ws}$ [dB re 1 pW]", language),
+        ylabel=_t(r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]", language),
         title=_t("EN 15657 characteristic structure-borne sound power", language),
         language=language,
         **kwargs,
@@ -854,8 +854,8 @@ def plot_installed_structure_borne(
                 label=_t("paths", language) if k == 0 else None)
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 2.2)
-    ax.plot(x, total, label=_t(r"total $L_{n,s}$", language), **kwargs)
-    ax.set_ylabel(_t(r"Normalised SPL $L_{n,s}$ [dB]", language))
+    ax.plot(x, total, label=_t(r"total $L_\mathrm{n,s}$", language), **kwargs)
+    ax.set_ylabel(_t(r"Normalised SPL $L_\mathrm{n,s}$ [dB]", language))
     ax.set_title(_t("EN 12354-5 installed structure-borne sound", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -1132,7 +1132,7 @@ def plot_airborne_insulation(
     from .._i18n import localize_axes
 
     curves = [
-        ("$D_{nT}$", np.asarray(result.dnt, dtype=np.float64)),
+        ("$D_\\mathrm{nT}$", np.asarray(result.dnt, dtype=np.float64)),
         ("$D$", np.asarray(result.d, dtype=np.float64)),
     ]
     if result.r_prime is not None:
@@ -1567,7 +1567,7 @@ def plot_ceiling_attenuation(
             f"{format_number(result.deficiency_sum, language, decimals=1)} dB)"
         ),
         measured_label="Normalized ceiling attenuation",
-        ylabel=_t("Normalized ceiling attenuation $D_{n,c}$ [dB]", language),
+        ylabel=_t("Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]", language),
         ax=ax,
         language=language,
         **kwargs,
@@ -1596,14 +1596,14 @@ def plot_plenum_flanking(
         result.frequencies,
         result.reduction_index_source + result.reduction_index_receiving,
         result.reduction_index,
-        reference_label="$R_S + R_R$ (two ceilings)",
+        reference_label="$R_\\mathrm{S} + R_\\mathrm{R}$ (two ceilings)",
         curve_label=r"$R_\mathrm{cl}$ (ceiling/plenum path)",
         fill_label="plenum penalty",
         ylabel=_R_INDEX_LABEL,
         title=(
             f"{_t('Suspended-ceiling plenum path', language)} "
             f"($h$ = {format_number(result.plenum_height, language, decimals=2)} m, "
-            f"$L_R$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
+            f"$L_\\mathrm{{R}}$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
             f"$\\varepsilon$ = {result.epsilon:.0f})"
         ),
         language=language,
@@ -1631,7 +1631,7 @@ def plot_wall_tie_coupling(
     ax = ax if ax is not None else _new_axes()
     freq = np.asarray(result.frequencies, dtype=np.float64)
     ax.loglog(freq, result.rigid_coupling_loss_factor, "--", color=_C_REFERENCE,
-              lw=1.2, label=_t("rigid connection ($Y_c$ = 0)", language))
+              lw=1.2, label=_t("rigid connection ($Y_\\mathrm{c}$ = 0)", language))
     kwargs.setdefault("color", _C_PRIMARY)
     ax.loglog(freq, result.coupling_loss_factor,
               label=_t("resilient tie array", language), **kwargs)
@@ -1841,9 +1841,9 @@ def plot_lining_improvement(
     ]
     curves = np.asarray(ratings, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(sweep, curves[:, 0], label=kwargs.pop("label", r"$\Delta R_w$"), **kwargs)
-    ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_A$")
-    ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_{A,tr}$")
+    ax.plot(sweep, curves[:, 0], label=kwargs.pop("label", r"$\Delta R_\mathrm{w}$"), **kwargs)
+    ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_\mathrm{A}$")
+    ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_\mathrm{A,tr}$")
     ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,
             color=_C_REFERENCE, ls="",
             label=f"$f_o$ = {_format_freq(result.resonance_frequency)} Hz")

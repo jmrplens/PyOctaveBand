@@ -1067,7 +1067,7 @@ L -2 0
      </g>
     </g>
     <g id="text_16">
-     <!-- Duración de la exposición $D_y$ [años] -->
+     <!-- Duración de la exposición $D_\mathrm{y}$ [años] -->
      <g style="fill: #ffffff" transform="translate(15.2 311.571328) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-27" d="M 1259 4147 
@@ -1164,21 +1164,21 @@ Q 3206 4147 2406 4147
 L 1613 4147 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-5c" d="M 1588 -325 
-Q 1188 -997 936 -1164 
-Q 684 -1331 294 -1331 
-L -159 -1331 
-L -63 -850 
-L 269 -850 
-Q 509 -850 678 -719 
-Q 847 -588 1056 -206 
-L 1234 128 
-L 459 3500 
-L 1069 3500 
-L 1650 819 
-L 3256 3500 
-L 3859 3500 
-L 1588 -325 
+       <path id="DejaVuSans-5c" d="M 2059 -325 
+Q 1816 -950 1584 -1140 
+Q 1353 -1331 966 -1331 
+L 506 -1331 
+L 506 -850 
+L 844 -850 
+Q 1081 -850 1212 -737 
+Q 1344 -625 1503 -206 
+L 1606 56 
+L 191 3500 
+L 800 3500 
+L 1894 763 
+L 2988 3500 
+L 3597 3500 
+L 2059 -325 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-b3" d="M 3513 2113 
@@ -1250,7 +1250,7 @@ z
       <use xlink:href="#DejaVuSans-51" transform="translate(1226.710938 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1290.089844 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(1321.876953 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-5c" transform="translate(1398.878906 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-5c" transform="translate(1398.878906 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1443.039062 0.015625)"/>
       <use xlink:href="#DejaVuSans-3e" transform="translate(1474.826172 0.015625)"/>
       <use xlink:href="#DejaVuSans-44" transform="translate(1513.839844 0.015625)"/>
@@ -1959,7 +1959,7 @@ L 545.05 41.9325
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <!-- $D_y = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)) -->
+     <!-- $D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)) -->
      <g style="fill: #ffffff" transform="translate(552.25 45.0825) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-20" d="M 678 2906 
@@ -2040,7 +2040,7 @@ z
 " transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(0 0.746875)"/>
-      <use xlink:href="#DejaVuSans-Oblique-5c" transform="translate(77.001953 -14.253076) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-5c" transform="translate(77.001953 -14.253076) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(140.644531 0.746875)"/>
       <use xlink:href="#DejaVuSans-16" transform="translate(243.916016 0.746875)"/>
       <use xlink:href="#DejaVuSans-14" transform="translate(307.539062 0.746875)"/>

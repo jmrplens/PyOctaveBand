@@ -569,7 +569,7 @@ def test_plot_levels_view_draws_tone_levels_over_frequency() -> None:
     assert ax.get_xscale() == "log"          # continuous frequency axis
     assert "level" in ax.get_ylabel().lower()
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
-    assert any("L_\\mathrm{pt}" in label for label in labels)
+    assert any("L_{p\\mathrm{t}}" in label for label in labels)
     plt.close("all")
 
 

@@ -293,22 +293,22 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     # Short on purpose: the Spanish of the longer title overran the canvas
     # at both ends. The solver and the plate moved to the footer.
     fig.suptitle(T("Radiation efficiency: a driven plate below and above "
-                   "$f_c$"))
+                   "$f_\\mathrm{c}$"))
     axes = fig.subplots(2, 1, sharex=True)
     titles = [
-        T(f"$f = f_c/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
+        T(f"$f = f_\\mathrm{{c}}/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
           f"wave is slower than sound"),
-        T(f"$f = 2f_c$ = {freqs[1]:.0f} Hz, above coincidence: the plate "
+        T(f"$f = 2f_\\mathrm{{c}}$ = {freqs[1]:.0f} Hz, above coincidence: the plate "
           f"wave is faster than sound"),
     ]
     # One measurement per panel, each the one its regime admits: a decay
     # where the field is evanescent, an angle where it propagates.
     verdicts = [
-        T(f"$\\lambda_B$ = {lam_b[0]:.2f} m is shorter than $\\lambda$ = "
+        T(f"$\\lambda_\\mathrm{{B}}$ = {lam_b[0]:.2f} m is shorter than $\\lambda$ = "
           f"{lam_0[0]:.2f} m in air\nno angle solves "
-          f"$\\sin\\theta = \\lambda/\\lambda_B$: the skin dies in "
+          f"$\\sin\\theta = \\lambda/\\lambda_\\mathrm{{B}}$: the skin dies in "
           f"{skin_exact:.3f} m"),
-        T(f"$\\lambda_B$ = {lam_b[1]:.2f} m is longer than $\\lambda$ = "
+        T(f"$\\lambda_\\mathrm{{B}}$ = {lam_b[1]:.2f} m is longer than $\\lambda$ = "
           f"{lam_0[1]:.2f} m in air\nthe trace match sends a beam out at "
           f"{theta:.0f}°"),
     ]
@@ -372,7 +372,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
                     ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)
     foot2 = fig.text(0.5, 0.006,
                      T(f"elastic 2D FDTD, 10 mm steel plate, "
-                       f"$f_c$ = {fc:.0f} Hz · overlaid line: its "
+                       f"$f_\\mathrm{{c}}$ = {fc:.0f} Hz · overlaid line: its "
                        f"deflection, exaggerated"),
                      ha="center", va="bottom", fontsize=7, color=COLOR_FG,
                      alpha=0.85)

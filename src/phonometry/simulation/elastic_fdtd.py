@@ -184,13 +184,13 @@ class Material:
     r"""An isotropic elastic medium as measurable wave speeds and density.
 
     The three numbers the solver's material maps are built from: the
-    compressional speed :math:`c_\mathrm{p} = \sqrt{(\lambda + 2\mu) / \rho}`,
+    compressional speed :math:`c_\mathrm{P} = \sqrt{(\lambda + 2\mu) / \rho}`,
     the shear
-    speed :math:`c_\mathrm{s} = \sqrt{\mu / \rho}` and the density ``rho``.
+    speed :math:`c_\mathrm{S} = \sqrt{\mu / \rho}` and the density ``rho``.
     ``c_s = 0``
     marks a fluid (the acoustic ``mu = 0`` limit of the elastic scheme,
     Virieux 1986), so the same dataclass names both fluids and solids.
-    Every material must satisfy :math:`c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2`
+    Every material must satisfy :math:`c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2`
     (non-negative first
     Lame parameter), the constructor bound of :class:`ElasticFDTD2D`.
 
@@ -371,8 +371,8 @@ class ElasticFDTD2D:
     selected sides into traction-free surfaces via stress imaging and sponge
     layers into absorbing ones. Material maps are given as the measurable
     wave speeds and converted internally to the Lame parameters
-    :math:`\mu = \rho c_\mathrm{s}^2` and
-    :math:`\lambda = \rho (c_\mathrm{p}^2 - 2 c_\mathrm{s}^2)`;
+    :math:`\mu = \rho c_\mathrm{S}^2` and
+    :math:`\lambda = \rho (c_\mathrm{P}^2 - 2 c_\mathrm{S}^2)`;
     density is
     arithmetically averaged onto the faces and ``mu`` harmonically averaged
     onto the corners (zero whenever any neighbour is a fluid), the Moczo
@@ -383,7 +383,7 @@ class ElasticFDTD2D:
         explicit ``shape`` is also accepted.
     :param c_s: S-wave speed map [m/s]; scalar or ``(ny, nx)`` array.
         ``c_s = 0`` marks a fluid cell (the acoustic limit); every cell must
-        satisfy :math:`c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2` (non-negative
+        satisfy :math:`c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2` (non-negative
         ``lambda``).
     :param dx: Grid spacing [m] (square cells).
     :param rho: Density map [kg/m3]; scalar or ``(ny, nx)`` array.
