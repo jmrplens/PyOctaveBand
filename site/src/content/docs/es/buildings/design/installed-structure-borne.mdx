@@ -213,6 +213,62 @@ plt.show()
 
 </details>
 
+### Tabla D.1: $Y_s$ a partir de las piezas de la propia máquina
+
+Nada mide la movilidad de fuente de una caldera. El apartado D.1.3 la construye
+a partir de las piezas que llevan la vibración hasta las patas, y la Tabla D.1
+da las seis formas cerradas que usa. `typical_element_mobility` es esa tabla:
+
+| Fila | Magnitudes que la describen | $\lvert Y\rvert$ en m/N.s |
+| --- | --- | --- |
+| `"mass"` | $M$ [kg] | $[2\pi f M]^{-1}$ |
+| `"bar_end"` | $\rho$ [kg/m3], $c_L$ [m/s], $S$ [m²] | $[\rho c_L S]^{-1}$ |
+| `"beam"` | $\rho$, $c_L$, $t$ [m], $w$ [m] | $[7{,}6\,\rho t w\sqrt{c_L t f}]^{-1}$ |
+| `"plate"` | $\rho$, $c_L$, $t$ [m] | $[2{,}3\,c_L\rho t^2]^{-1}$ |
+| `"pipe"` | $\rho$, $c_L$, $t$ [m], $r$ [m] | $[63\,\rho t r\sqrt{c_L r f}]^{-1}$ |
+| `"mass_spring"` | $M$ [kg], $s$ [N/m], $\eta$ [-] | $\left[\left(\frac{2\pi f\eta}{s(1+\eta^2)}\right)^2 + \left(\frac{2\pi f}{s(1+\eta^2)} - \frac{1}{2\pi f M}\right)^2\right]^{1/2}$ |
+
+La frecuencia no está en la columna de magnitudes que describen el elemento,
+porque es la frecuencia de banda de la predicción y no una propiedad del
+elemento — pero sí aparece en cuatro de las seis expresiones, así que esas
+cuatro filas admiten `frequency` y las otras dos la rechazan. Elige la fila por
+lo que realmente transporta la vibración: una máquina pequeña y compacta es su
+masa total, una máquina sobre patas no rígidas es la fila masa-muelle, y la
+tubería que sale de una bomba es la fila de tubo. Fíjate en que `"plate"` es de
+nuevo la Fórmula (F.4), escrita en $\rho$, $c_L$ y $t$ en lugar de en masa y
+rigidez a flexión: el mismo número que `vibration.infinite_plate_mobility`.
+
+```python
+from phonometry import building
+
+# Una bomba de 120 kg sobre cuatro apoyos de caucho, 1,0e6 N/m cada uno,
+# factor de pérdidas 0,1.
+y_feet = building.typical_element_mobility(
+    "mass_spring", frequency=125.0, mass=120.0, stiffness=4.0e6, loss_factor=0.1
+)
+print(f"{float(y_feet):.3g}")                       # 0.000185 m/(N.s)
+
+# Muy por encima de la resonancia del montaje, de 29 Hz, mandan los apoyos: la
+# carcasa por sí sola es un orden de magnitud más rígida, así que son los
+# apoyos los que fijan Y_s.
+y_casing = building.typical_element_mobility("mass", frequency=125.0, mass=120.0)
+print(f"{float(y_casing):.3g}")                     # 1.06e-05 m/(N.s)
+
+dc = building.coupling_term(y_feet, 3e-5 + 1e-5j)   # sobre un forjado de hormigón
+print(round(float(dc), 1))                          # 9.2 dB
+```
+
+La fila masa-muelle es la única con un punto de retorno. Es la suma en serie de
+una movilidad de muelle y una de masa, de modo que su segundo paréntesis
+contiene las dos reactancias, que se cancelan en
+$f_0 = (2\pi)^{-1}\sqrt{s(1+\eta^2)/M}$ y dejan $\lvert Y_s\rvert$ en su
+*mínimo* limitado por el amortiguamiento — que es la frecuencia a la que el
+montaje inyecta **más** potencia, porque una movilidad de fuente pequeña es un
+$D_C$ pequeño. Esa es la resonancia del montaje, y $\eta$ es lo único que fija
+cuánto empeora. Una fila llamada con una magnitud que no la describe, o con una
+`frequency` que su expresión no contiene, lanza un error en lugar de aplicar
+un valor por defecto en silencio.
+
 ### Dónde se fija la máquina es parte de $Y_i$
 
 La movilidad del receptor no es una constante de material del elemento; es una
@@ -278,6 +334,52 @@ el [banco de ISO 10846](/phonometry/es/vibration/structural/transfer-stiffness/)
 La posición de fijación y la hoja de características del soporte van las dos en el `notes`
 del informe, porque son las dos cosas que hacen reproducible una predicción
 repetida.
+
+### Tabla F.1: la máquina de impactos como fuente de sustitución
+
+Cuando el propio equipo no se puede caracterizar, el apartado D.1.2.3 permite
+medir la transmisión del edificio con una fuente de nivel de fuerza conocido y
+sustituir después el equipo en ella (Fórmula D.6). La máquina de impactos ISO
+es la opción práctica sobre estructuras receptoras de baja movilidad, y la
+Tabla F.1 es su nivel de fuerza en bandas de octava:
+
+| Banda de octava [Hz] | 31,5 | 63 | 125 | 250 | 500 | 1000 | 2000 | 4000 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| $L_F$ [dB] | 139 | 142 | 145 | 148 | 151 | 154 | 156 | 156 |
+
+Con la tabla viajan dos condiciones. La forma cerrada que la norma imprime a su
+lado, $L_F = 10\log_{10}(2{,}5f/10^{-12})$ en bandas de octava y
+$10\log_{10}(0{,}8f/10^{-12})$ en tercios de octava, solo vale «hasta unos
+1000 Hz»: da 157 dB y 160 dB a 2 kHz y 4 kHz, donde la tabla se aplana en
+156 dB, así que lee la tabla donde la tabla existe y la forma cerrada solo para
+los tercios de octava que no tabula. Y los niveles están referidos a
+$10^{-6}$ N pese al «re 1 pN» que imprime el pie; véase el
+[registro de erratas](/phonometry/es/reference/errata/).
+
+El apartado D.1.3 trata entonces la máquina como fuente de fuerza con la
+movilidad tipo masa de sus martillos de 0,5 kg, lo que convierte la tabla en las
+dos entradas que toma esta página: $L_{Ws,c} = L_F - 5 - 10\log_{10}f$
+(Fórmula D.9a) y
+$D_{C,i} = -10\log_{10}(\omega M Y_i) + 10\log_{10}[1 + (\omega M Y_i)^2]$
+(Fórmula D.9b, que es la Fórmula 19b con $Y_s = 1/\mathrm{j}\omega M$).
+
+```python
+import numpy as np
+from phonometry import building
+
+bands = np.array(building.TABLE_F1_OCTAVE_BANDS)
+lf = building.tapping_machine_force_level()            # Tabla F.1
+lw_c = building.tapping_machine_characteristic_power_level(bands, lf)
+print(np.round(lw_c, 1))   # [119. 119. 119. 119. 119. 119. 118. 115.]
+
+# Sobre el forjado de hormigón de 220 mm del apartado anterior (Y_i = 1,07e-6).
+dc = building.tapping_machine_coupling_term(bands, 1.07e-6)
+print(np.round(lw_c - dc, 1))   # [79.3 82.3 85.3 88.3 91.3 94.3 96.3 96.3]
+```
+
+En tercios de octava la potencia característica sale plana en 114 dB re 1 pW,
+que es el «$\approx 115$ dB» de la propia Fórmula (D.9a) y la curva gruesa
+horizontal de la Figura D.3 de la norma.
 
 ## 2. Transmisión al recinto receptor
 
@@ -396,9 +498,10 @@ todo el espectro, y sin que se levante ningún error.
 :::
 
 Todas las entradas de la Fórmula (F.3) están ya disponibles:
-[`in_situ_element`](/phonometry/es/buildings/design/detailed-prediction/)
+[`in_situ_element`](/phonometry/es/buildings/design/detailed-prediction/#parámetros-de-in_situ_element)
 devuelve el tiempo de reverberación estructural in situ, el factor de radiación
-y la $R$ del elemento.
+y la $R$ del elemento, y `structure_to_airborne_adjustment` es la propia
+Fórmula (F.3).
 
 ```python
 import numpy as np
@@ -407,7 +510,9 @@ from phonometry import building
 # Fórmula (F.3) para la pared de 92 kg/m2 del edificio resuelto del Anexo I.
 f = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
 sigma = np.minimum(1.0, np.sqrt(f / 200.0))        # factor de radiación, fc = 200 Hz
-dsa_f3 = 10 * np.log10(400.0 * 200.0 * sigma / (92.0 * f**2))
+dsa_f3 = building.structure_to_airborne_adjustment(
+    f, critical_frequency=200.0, mass_per_area=92.0, radiation_factor=sigma
+)
 print(np.round(dsa_f3, 1))    # [-9.1 -13.6 -18.6 -24.6 -30.6 -36.6]  todos negativos
 
 bands = np.array([250.0, 500.0, 1000.0])
@@ -550,15 +655,24 @@ $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
 normalizado por trayectoria y su total energético (Fórmulas 18a, 17) mediante
 `installed_source_prediction`. Validado contra los propios ejemplos resueltos
 del Anexo I de la norma, la bañera de hidromasaje (I.2) y la cisterna (I.3),
-dentro del redondeo de ±0,15 dB de los intermedios impresos.
+dentro del redondeo de ±0,15 dB de los intermedios impresos. Las tablas
+informativas de los anexos están también aquí: la Tabla D.1 (movilidad de
+elementos constructivos típicos) mediante `typical_element_mobility`, la
+Tabla F.1 (nivel de fuerza de la máquina de impactos ISO) mediante
+`tapping_machine_force_level` junto con las Fórmulas (D.9a) y (D.9b), el
+término de ajuste de la Fórmula (F.3) mediante
+`structure_to_airborne_adjustment` y el $\Delta K$ multiunión del apartado F.1
+mediante `multi_junction_adjustment`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-Las tablas de valores por defecto de los Anexos D y F para el término de
-ajuste estructura-a-aéreo $D_{sa}$ y el índice de reducción por flancos
-$R_{ij,\mathrm{ref}}$ no están implementadas; ambos son entradas que se
-aportan a partir de mediciones, de la EN 12354-1 o de los propios anexos de la
-norma. Solo está implementada la edición de 2009, no la revisión de 2023.
+El índice de reducción por flancos $R_{ij,\mathrm{ref}}$ es una entrada que se
+aporta a partir de mediciones o de la EN 12354-1; el Anexo F.1 solo da la
+corrección multiunión sobre él, no el índice en sí. No están implementadas la
+Fórmula (F.1) para el $K_{ij}$ equivalente a través de varias uniones, la vía
+SEA de la Fórmula (F.2) ni las correcciones de movilidad para excitación cerca
+de un borde o de una esquina (Fórmulas F.6a y F.6b). Solo está implementada la
+edición de 2009, no la revisión de 2023.
 </ScopeClaim>
 </Scope>
 

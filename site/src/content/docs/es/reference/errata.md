@@ -367,6 +367,83 @@ which is the check that enforces the rule; see
   affected anchor.
 - **Status:** unreported.
 
+## EN 12354-5:2009, Table F.1 and clause F.4.2 (reference force printed as 1 pN)
+
+- **Location:** Annex F, clause F.4.2: the symbol list of Formula (F.9), the
+  sentence introducing the closed form, and the caption of Table F.1 (printed
+  p. 59).
+- **The print:** "$L_F$ is the force level in the source room, in dB re 1 pN";
+  "$L_F = 10\lg 2{,}5f/10^{-12}$ dB re 1 pN or $L_F = 10\lg 0{,}8f/10^{-12}$ dB
+  re 1 pN for one-third octave bands"; and "Table F.1 – Force level $L_F$ re
+  1 pN for the ISO tapping machine in octave bands", whose eight cells read
+  139, 142, 145, 148, 151, 154, 156 and 156 dB.
+- **The problem:** the reference force of those levels is $10^{-6}$ N, not
+  1 pN. Three independent readings agree, and none of them is compatible with
+  the printed reference. **(a) The annex's own algebra.** A power level re
+  1 pW built from a force level and a mobility is
+  $L_W = L_F + 10\lg(F_0^2 Y / W_0)$. Formula (D.5a) prints
+  $L_{Ws,c} = L_{F,eq} + 10\lg Y_s$ and Formula (D.9a) prints
+  $L_{Ws,c} = L_F - 5 - 10\lg f$, which is the same expression evaluated at
+  the mass-like source mobility $Y_s = (2\pi f M)^{-1}$ of a 0,5 kg tapping
+  hammer. Neither carries a term for $F_0^2/W_0$, so both balance only when
+  $F_0^2 / W_0 = 1\ \text{s}^{-1}$, that is $F_0 = 10^{-6}$ N; read re 1 pN
+  each would fall 120 dB short of the level it defines. The velocity
+  counterpart, Formula (D.10a), does print its reference term
+  $10\lg(v_\text{ref}^2/W_\text{ref})$ and states the result cancels the
+  $10\lg Z_s$ exactly, which it does at the $10^{-9}$ m/s the standard itself
+  gives as the velocity-level reference in clause F.4.2. The annex is
+  therefore explicit and correct about the velocity reference and silent about
+  the force one. **(b) The machine that produces the table.** The ISO tapping
+  machine drops 0,5 kg hammers from 40 mm at ten impacts per second, so each
+  impact transfers a momentum of 0,443 N·s and the force is a 10 Hz impulse
+  train every harmonic of which carries 6,26 N r.m.s. Summing the harmonics
+  that fall inside each octave band gives 139,4 / 142,4 / 145,4 / 148,4 /
+  151,4 / 154,4 dB re $10^{-6}$ N from 31,5 Hz to 1 kHz, reproducing the first
+  six cells of Table F.1 to within 0,5 dB; the 2 kHz and 4 kHz cells sit below
+  that line, which is the roll-off the standard itself flags with "up till
+  about 1000 Hz". Re 1 pN the same cells would describe forces of tens of
+  micronewtons, which no impact machine produces. **(c) The companion
+  standard.** EN 15657:2018 Formula (15), which is where the structure-borne
+  source data of Annex D comes from in the first place, writes the same
+  force-to-power conversion "in dB re $F_0 = 10^{-6}$ N", and $10^{-6}$ N is
+  the preferred reference force of ISO 1683.
+- **Evidence:** verified on PDF pages 61 and 62 (printed pp. 59 and 60) of
+  BS EN 12354-5:2009, carrying clause F.4.2 with the symbol list of
+  Formula (F.9), the closed form, the whole of Table F.1 and the symbol list
+  of Formula (F.11) with its $10^{-9}$ m/s velocity reference; and on PDF
+  pages 45, 48 and 50 (printed pp. 43, 46 and 48) of the same edition,
+  carrying Formulae (D.5a), (D.9a) and (D.10a).
+- **Library behaviour:** ships the printed cells unchanged and documents them
+  re $10^{-6}$ N. `tapping_machine_force_level` returns the eight values of
+  Table F.1, `tapping_machine_force_level_estimate` the closed form and
+  `tapping_machine_characteristic_power_level` Formula (D.9a) as printed;
+  `test_table_f1_is_referred_to_1e_6_newton_not_1_piconewton` pins the reading
+  against the mechanics of the machine.
+- **Status:** unreported.
+
+## EN 12354-5:2009, Figure D.3 Key (three curves under one symbol)
+
+- **Location:** Annex D, the Key of Figure D.3 (printed p. 47).
+- **The print:** three key rows, each labelled with the same symbol:
+  $L_{Ws,c,A} = 124\ \text{dB}$, $L_{Ws,c,A} = 119\ \text{dB}$ and
+  $L_{Ws,c,A} = 102\ \text{dB}$.
+- **The problem:** the figure's own caption reads "Structure-borne sound power
+  for the ISO-tapping machine: characteristic source power, installed power on
+  a wooden floor and installed power on a concrete floor; the A-weighted power
+  level is also indicated". Only the first curve is a characteristic power; the
+  other two are installed powers and their A-weighted totals are
+  $L_{Ws,\text{inst},A}$. The plotted curves settle the assignment: the first
+  is flat at about 114,5 dB re 1 pW, which is the frequency-independent
+  Formula (D.9a) result for the tapping machine, while the other two rise with
+  frequency and lie below it, the concrete floor lowest, as
+  $L_{Ws,c} - D_{C,i}$ requires.
+- **Evidence:** verified on PDF page 49 (printed p. 47) of BS EN 12354-5:2009,
+  the page carrying Figure D.3 with its Key and its caption.
+- **Library behaviour:** none required; no value is read from Figure D.3.
+  `test_formula_d9a_is_flat_at_about_115_db_per_third_octave` pins the flat
+  characteristic curve that the first key row belongs to.
+- **Status:** unreported.
+
 ## ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (perimeter sums)
 
 - **Location:** the input-data block below Table L.3 (printed p. 81) and the
