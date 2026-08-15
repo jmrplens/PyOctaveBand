@@ -15131,6 +15131,97 @@ repository. Click the preview to open the PDF:
 ISO 9614-2 engineering-grade scan with the field indicators and the boxed
 $L_{WA}$.*
 
+### The precision sheet (ISO 9614-3)
+
+`PrecisionIntensityResult` writes its own fiche, and it is not the part 2
+sheet with a different title: part 3 asks a report to state different things
+(clause 10). The per-band table carries the normalized level $L_{W0}$ the
+standard reports (Eq. 10) beside $L_W$, and the expanded uncertainty $U$ of
+clause 4.3, twice the Table 1 standard deviation of reproducibility of the
+band; the caption names the frequency range the determination covers, because
+clause 4.3 asks for it whenever that range is narrower than 50 Hz to 6.3 kHz.
+A one-third-octave set is printed in two column groups side by side, the way
+an accredited sheet fits that many bands on a page. `verbose=True` tabulates
+the four Annex B indicators $F_T$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_S$ per band,
+the tabulation clause 10 f) 1) asks for, over the measurement surface as
+Annex B defines them, and the qualification cell the criteria decide.
+
+Hand it an Annex C qualification and the sheet does what clause 10 f) 2)
+makes mandatory: the bands whose criteria are not satisfied are dropped from
+the A-weighted determination and named on the sheet, next to the bands the
+method is not applicable to at all (clause 9.2). That is why the boxed
+$L_{WA}$ can differ from `result.sound_power_level_a`, which is computed
+before any criterion is evaluated and therefore sums every applicable band.
+Beside it the box states the normalized $L_{WA0}$, since clause 10 f) 2)
+reports the normalized quantity while the headline number is the level a
+declared limit is written against.
+Without `criteria` the fiche boxes the result's own value and says that no
+qualification was supplied. `residual_index` puts the probe's
+pressure-residual intensity index on the sheet (clause 10 d) 5)) with the
+dynamic capability $L_d$ it yields; the clause 10 items that are free
+description rather than numbers, the scan geometry and speed, the scanning
+time and the probe-reversal checks, go in the metadata `notes`.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+# A box measurement surface: five partial surfaces, each scanned in four
+# segments, over the one-third-octave bands 200 Hz to 800 Hz. Part 3 works in
+# one-third octaves, which is the band set Table 1 tabulates its uncertainty
+# and its criterion-1 tolerance for.
+third_octave = np.array([200, 250, 315, 400, 500, 630, 800], float)
+faces = np.array([1.65, 1.575, 1.575, 1.155, 1.155])
+scanned = 1.2e-5 * np.array([1.3, 1.1, 0.8, 0.9, 0.9])[:, None] * np.ones(7)
+segment_intensity = np.repeat(scanned, 4, axis=0)
+# The pressure-intensity margin per band: 8 dB at 200 Hz, where the hall is
+# reverberant, 2 dB above it.
+margin = np.array([8.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0])
+segment_levels = 10 * np.log10(segment_intensity / 1e-12) + margin
+
+precise = emission.sound_power_intensity_precision(
+    scanned, faces, frequencies=third_octave,
+    temperature=28.0, barometric_pressure=94_000.0,
+)
+annex_b = emission.precision_field_indicators(segment_intensity, segment_levels)
+scan_intensity = np.average(scanned, axis=0, weights=faces)  # unequal faces
+scan_level = 10 * np.log10(scan_intensity / 1e-12)
+annex_c = emission.precision_qualification(
+    annex_b, scan_intensity_level_1=scan_level,
+    scan_intensity_level_2=scan_level + 0.1,
+    pressure_residual_index=15.0,          # Ld = 15 - 10 = 5 dB
+    frequencies=third_octave,
+)
+print(annex_c.qualified.tolist())   # [False, True, True, True, True, True, True]
+
+precise.report(
+    "sound_power_intensity_precision.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Machine hall with steady background noise",
+        instrumentation="Class 1 p-p intensity probe (IEC 61043), 12 mm spacer",
+        temperature=28.0, relative_humidity=40.0, pressure=94.0,
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-9614-3",
+        requirement=98.0,
+        notes="Box surface at 0,25 m; five partial surfaces scanned twice.",
+    ),
+    indicators=annex_b, criteria=annex_c, residual_index=15.0,
+)   # 200 Hz fails criterion 2 and is named as omitted from LWA
+```
+
+The example fiche in the repository is a fuller determination of the same
+machine: sixteen one-third-octave bands from 100 Hz to 3150 Hz over a
+five-face box surface, with the 100 Hz band failing criterion 2 and named as
+omitted. Click the preview to open the PDF:
+
+[![ISO 9614-3 precision sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment, the intensity probe and the 28 degrees Celsius and 94 kPa test atmosphere, the one-third-octave table from 100 Hz to 3150 Hz in two column groups giving the band sound-power level LW, the normalized level LW0 and the expanded uncertainty U, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 96.7 dB(A) re 1 pW with the total LW = 97.9 dB, the normalized total LW0 = 98.5 dB, the normalized A-weighted level LWA0 = 97.3 dB(A), the measurement surface S = 7.11 m2 and the expanded uncertainty U = 2.0 dB, and a PASS verdict against the declared 98 dB(A) limit, closed by a basis strip stating the partial-power model, the meteorological normalization, the Annex B field indicators and the five Annex C criteria, and naming the 100 Hz band as omitted from LWA for criterion 2](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.pdf)
+
+*Precision sound power by intensity fiche
+(`PrecisionIntensityResult.report`), an ISO 9614-3 grade-1 scan with the
+normalized levels, the per-band uncertainty and the Annex C omission stated.*
+
 
 ## See also
 
@@ -18816,6 +18907,61 @@ first higher-order cut-on the computed peaks and troughs do not survive, and the
 result raises a `PlaneWaveWarning` when the analysis grid runs past it (890.8 Hz
 for the 0.04 m² chamber above).
 
+**Layouts of your own.** A two-chamber muffler, or a chamber with a stub on its
+inlet pipe, is cascaded element by element. `SilencerChain` makes the same
+`duct_matrix`/`shunt_matrix`/`cascade` calls and keeps what each element was
+handed, so the layout can be drawn as well as computed. What the drawing may
+show follows from what the elements declare: a duct is handed a length and an
+area and is drawn to scale and dimensioned, while a shunt is handed an
+impedance, which fixes no length, no area and no volume, so it is marked at the
+station where it joins and lettered with the frequency at which it is least,
+and nothing about it is dimensioned. A chain that holds no duct of positive
+length has no geometry and no scale to draw at, so it raises rather than
+drawing one.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="To-scale cross-section of a hand-built silencer chain: 100 mm and 200 mm runs of 200 mm duct opening into a 400 mm shell 600 mm long and returning to 300 mm of 200 mm duct, with each run length, both bores and the 1200 mm overall length dimensioned, and two side branches marked by leaders at the stations where they join, one lettered as a quarter-wave stub with least impedance at 125 Hz and the other as a Helmholtz resonator at 242 Hz" width="88%"></picture>
+
+*Every measurement on the page comes from what the chain was given: the four
+duct lengths and their sum are the numbers themselves, and the two bores are
+the areas it was handed, restated as the equivalent circular diameter
+$d = 2\sqrt{S/\pi}$. The two branches carry no dimension at
+all, because an impedance is not a shape.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import SilencerChain
+from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
+
+freqs = np.linspace(20.0, 500.0, 481)
+s_duct = np.pi * 0.100**2               # nominal 200 mm duct
+s_shell = np.pi * 0.200**2              # nominal 400 mm shell
+
+chain = (
+    SilencerChain(freqs)
+    .duct(0.10, s_duct)
+    .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
+           label="Quarter-wave stub")
+    .duct(0.20, s_duct)
+    .duct(0.60, s_shell)
+    .shunt(helmholtz_impedance(freqs, np.pi * 0.025**2, 0.05, 2e-3),
+           label="Helmholtz resonator")
+    .duct(0.30, s_duct)
+)
+
+# One line: the chain drawn exactly as it was declared.
+chain.plot_geometry()
+plt.show()
+
+# The same elements evaluated, ports included.
+res = chain.result(inlet_area=s_duct, outlet_area=s_duct)
+```
+
+</details>
+
 **Test-report fiche.** `ReactiveSilencerResult.report(path)` renders a one-page
 fiche in the layout of a silencer performance sheet: a metadata header, the
 octave-band transmission-loss table beside the same curve plotted against
@@ -18931,8 +19077,9 @@ and the plane-wave algebra does not.
 (Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46),
 (8.44)), `extended_tube_chamber`, and the `duct_matrix` / `shunt_matrix` /
 `cascade` / `transmission_loss` / `insertion_loss` blocks for arbitrary chains,
-each with its to-scale `.plot_geometry()` and cross-checked against the
-independent FDTD solver; the `plane_wave_limit` that bounds all of them; and,
+gathered by `SilencerChain` into a chain that keeps its geometry, each with its
+to-scale `.plot_geometry()` and cross-checked against the independent FDTD
+solver; the `plane_wave_limit` that bounds all of them; and,
 as prose rather than code, the ISO 7235 substitution measurement that produces
 the insertion loss a supplier publishes.
 
@@ -32836,6 +32983,8 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `helmholtz_resonator` / `quarter_wave_resonator` | `function` | **Side-branch resonator silencers (Bies Eqs. 8.46/8.44).**<br>• Helmholtz: `duct_area`, `neck_area`, `neck_length`, `cavity_volume`<br>• Quarter-wave: `duct_area`, `length`, `branch_area` | `quarter_wave_resonator(f, 0.01, 1.5, 2e-3)` |
 | `extended_tube_chamber` | `function` | **Extended-inlet/outlet expansion chamber (Bies §8.9.7); reduces to `expansion_chamber` at zero extension.**<br>• `length`, `chamber_area`, `pipe_area`, `inlet_extension`, `outlet_extension` | `extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)` |
 | `ReactiveSilencerResult` | `dataclass` | **Reactive-silencer result.**<br>• `frequencies`, `transmission_loss`, `insertion_loss` (or None), `transfer_matrix`, `kind`, `resonances`<br>• `.plot()`: TL/IL vs frequency | `res.transmission_loss` |
+| `SilencerChain` | `class` | **Hand-built four-pole chain that keeps the geometry it was given.**<br>• `SilencerChain(frequencies, speed_of_sound=…, density=…)`<br>• `.duct(length, area)` and `.shunt(branch_impedance, label=…)` in order, each returning the chain<br>• `.transfer_matrix`, `.result(inlet_area=…, outlet_area=…)`, `.plot_geometry()` | `SilencerChain(f).duct(0.3, 0.031).shunt(zb).duct(0.6, 0.126)`<br><br>• Ducts drawn to scale, shunts marked as branch points |
+| `SilencerChainElement` | `dataclass` | **One recorded element of a `SilencerChain`.**<br>• `matrix`, plus whatever geometry the call was handed: `length` and `area` for a duct, neither for a shunt<br>• `label`, `shorting_frequency` (where the branch impedance is least), `.is_duct` | `chain.elements[0].area` |
 | `end_reflection_loss` / `elbow_insertion_loss` | `function` | **HVAC duct end reflection & bend insertion loss (Bies Tables 8.14/8.11, ASHRAE).**<br>• end: `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• elbow: `frequencies`, `width`, `bend_type`, `vanes`, `lined` | `end_reflection_loss(bands, 0.3)`<br><br>• `HvacSpectrumResult` |
 | `plenum_attenuation` | `function` | **Plenum-chamber TL by Wells' method (Bies Eq. 8.275).**<br>• `exit_area`, `line_of_sight`, `wall_area`, `mean_absorption`, `angle` | `plenum_attenuation(0.1, 1.0, 20.0, 0.2)  # dB` |
 | `plot_plenum_geometry` | `function` | **Plenum section honouring r and θ exactly.**<br>• `exit_area` S_out [m²], `line_of_sight` r [m], `wall_area` S_w [m²]<br>• `angle` θ [rad] (Default: 0)<br>• `language` | `plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)`<br><br>• Box fixed by r/θ, S_out mouth to scale, S_w annotated |

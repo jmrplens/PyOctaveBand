@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -108,37 +109,81 @@ def band_labels(frequencies: np.ndarray | None, n: int) -> tuple[list[str], int]
     return labels, fraction
 
 
-def range_str(values: np.ndarray, language: str = "en") -> str:
-    """Format a per-band quantity as a single value or an ``a to b`` range."""
+def range_str(values: np.ndarray, language: str = "en", decimals: int = 1) -> str:
+    """Format a per-band quantity as a single value or an ``a to b`` range.
+
+    ``decimals`` is the precision the quantity is read at: one decimal for a
+    level in decibels, two for a dimensionless field indicator judged against a
+    threshold of 0,6 or 2 (ISO 9614-3:2002 Annex C). A spread below half the
+    last printed digit is one value rather than a range.
+    """
     arr = np.asarray(values, dtype=np.float64)
     arr = arr[np.isfinite(arr)]
     if arr.size == 0:
         return "—"
     lo, hi = float(np.min(arr)), float(np.max(arr))
-    if abs(hi - lo) < 0.05:
-        return f"{format_number(lo, language, decimals=1)}"
+    if abs(hi - lo) < 0.5 * 10.0**-decimals:
+        return f"{format_number(lo, language, decimals=decimals)}"
     return t("{lo} to {hi}", language).format(
-        lo=format_number(lo, language, decimals=1),
-        hi=format_number(hi, language, decimals=1),
+        lo=format_number(lo, language, decimals=decimals),
+        hi=format_number(hi, language, decimals=decimals),
     )
 
 
-def total_power_level(result: Any) -> float:
-    """Energy sum of the band sound-power levels, ``10 lg(sum 10^(LW/10))`` dB."""
-    lw = np.asarray(result.sound_power_level, dtype=np.float64)
-    finite = lw[np.isfinite(lw)]
+def energy_sum(levels: Any) -> float:
+    """Energy sum of a per-band level array, ``10 lg(sum 10^(L/10))`` dB.
+
+    Non-finite bands are skipped: a band the method could not determine
+    contributes no energy rather than poisoning the total with ``NaN``. An
+    array with no finite band has no total, which is ``NaN``.
+    """
+    arr = np.asarray(levels, dtype=np.float64)
+    finite = arr[np.isfinite(arr)]
     if finite.size == 0:
         return float("nan")
     return float(10.0 * np.log10(np.sum(10.0 ** (finite / 10.0))))
 
 
-def headline_level(result: Any) -> float:
-    """The single number the verdict compares: ``LWA`` if defined, else total ``LW``."""
+def total_power_level(result: Any) -> float:
+    """Energy sum of the band sound-power levels, ``10 lg(sum 10^(LW/10))`` dB."""
+    return energy_sum(result.sound_power_level)
+
+
+def headline_level(result: Any, level_a: float | None = None) -> float:
+    """The single number the verdict compares: ``LWA`` if defined, else total ``LW``.
+
+    ``level_a`` overrides the result's own A-weighted total, for a fiche whose
+    standard prescribes a different summation than the one the result computed
+    (the ISO 9614-3 A-weighted determination omits the bands its Annex C
+    criteria reject, which the result object cannot know).
+
+    The fallback to the energy-summed total belongs to the unscreened case
+    alone, where an undefined ``LWA`` means no band frequencies were supplied
+    and the total is over the same bands the result already holds. A supplied
+    ``level_a`` that is not finite means something else entirely: every band
+    was screened out, so there is no determination to head the sheet with, and
+    falling back would print a total summed over exactly the bands the standard
+    says to drop. That is refused rather than rendered.
+
+    :raises ValueError: If a screened ``level_a`` is supplied and is not
+        finite, which is a determination with no qualifying band left.
+    """
+    if level_a is not None:
+        if not math.isfinite(float(level_a)):
+            raise ValueError(
+                "the screened A-weighted level is not defined: no band "
+                "survived the qualification, so there is no determination to "
+                "report. Re-run the measurement rather than reporting the "
+                "total over the bands the criteria rejected."
+            )
+        return float(level_a)
     lwa = float(result.sound_power_level_a)
     return lwa if math.isfinite(lwa) else total_power_level(result)
 
 
-def power_statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def power_statement(
+    result: Any, language: str = "en", *, level_a: float | None = None
+) -> tuple[str, list[str]]:
     """The boxed sound-power result and its base extended terms.
 
     Boxes the A-weighted sound power level ``LWA`` when it is defined (band
@@ -147,8 +192,13 @@ def power_statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     box); each renderer appends its own further terms (the expanded uncertainty
     and surface area for the pressure method, the surface area and measurement
     grade for the intensity method).
+
+    ``level_a`` overrides the result's own ``sound_power_level_a`` with the
+    A-weighted level the fiche states, for a standard that prescribes its own
+    band screening (ISO 9614-3:2002 clause 10 f) 2) omits the bands its Annex C
+    criteria reject, a screening the result object cannot perform on its own).
     """
-    lwa = float(result.sound_power_level_a)
+    lwa = float(result.sound_power_level_a if level_a is None else level_a)
     total = total_power_level(result)
     extended: list[str] = []
     if math.isfinite(lwa):
@@ -171,7 +221,11 @@ def power_statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
 
 
 def power_verdict(
-    result: Any, requirement: float, language: str = "en"
+    result: Any,
+    requirement: float,
+    language: str = "en",
+    *,
+    level_a: float | None = None,
 ) -> tuple[str, bool]:
     """Verdict text and PASS flag against a declared sound-power limit.
 
@@ -179,10 +233,14 @@ def power_verdict(
     passes when its A-weighted level (or total ``LW`` when no band frequencies
     were supplied) is at or below the declared limit. The comparison uses the
     displayed (one-decimal) value so the printed number cannot contradict the
-    verdict at the boundary.
+    verdict at the boundary. ``level_a`` overrides the result's own A-weighted
+    total with the one the fiche boxes, so the verdict is taken on the number
+    the reader sees (see :func:`power_statement`).
     """
-    value = headline_level(result)
-    weighted = math.isfinite(float(result.sound_power_level_a))
+    value = headline_level(result, level_a)
+    weighted = math.isfinite(
+        float(result.sound_power_level_a if level_a is None else level_a)
+    )
     passed = math.isfinite(value) and display_round(value) <= requirement
     if weighted:
         text = t(
@@ -298,21 +356,38 @@ def power_value_table(
     return table
 
 
+@dataclass(frozen=True)
+class FicheCopy:
+    """The already-translated wording a renderer supplies for its own sheet.
+
+    The shared flow builds the same sheet for every sound-power method, so what
+    each renderer contributes is the words: the title, the standard-basis line,
+    the caption above the band table, the boxed single-number statement, the
+    extended terms printed beside it, and the measurement-basis strips. They
+    travel together because they are one thing, the sheet's copy, and because a
+    renderer that forgets one of them should fail to construct rather than
+    render a sheet with a hole in it.
+    """
+
+    title: str
+    basis: str
+    caption: str
+    statement: str
+    extended: list[str]
+    basis_strips: Sequence[str]
+
+
 def render_sound_power_fiche(
     result: Any,
     path: str,
     *,
-    title: str,
-    basis: str,
-    caption: str,
+    copy: FicheCopy,
     value_table: Any,
-    statement: str,
-    extended: list[str],
-    basis_strips: Sequence[str],
     metadata: ReportMetadata | None,
     language: str,
     verdict: tuple[str, bool] | None = None,
     disclaimer: str | None = None,
+    figsize: tuple[float, float] = (9.2, 3.4),
 ) -> str:
     """Assemble the shared sound-power fiche flow and build the PDF at ``path``.
 
@@ -325,13 +400,8 @@ def render_sound_power_fiche(
     :param result: The sound-power result; its ``plot`` draws the band-axis
         ``LW(f)`` spectrum (native to the library) and, with the metadata
         ``requirement``, its A-weighted total drives the verdict.
-    :param title: The already-translated fiche title.
-    :param basis: The already-translated standard-basis line.
-    :param caption: The already-translated band-set caption above the table.
+    :param copy: The already-translated wording this sheet is built from.
     :param value_table: The pre-built per-band reportlab table flowable.
-    :param statement: The boxed single-number statement (markup).
-    :param extended: The extended terms shown alongside the boxed statement.
-    :param basis_strips: The measurement-basis-strip paragraphs (markup).
     :param metadata: Optional :class:`ReportMetadata` for the header, the
         requirement verdict and the footer identity.
     :param language: ``"en"`` (default) or ``"es"``.
@@ -343,6 +413,11 @@ def render_sound_power_fiche(
     :param disclaimer: Footer scope sentence override (an English key
         translated for display); a prediction fiche passes its
         modelled-configuration wording (see :func:`._layout.footer_flow`).
+    :param figsize: Size of the embedded spectrum in inches, rendered to the
+        full 174 mm text width. The default suits the six or seven bands the
+        pressure fiches print; a fiche whose band set fills the page with rows
+        (the one-third-octave ISO 9614-3 sheet) asks for a shallower panel so
+        that the whole determination still fits on one page.
     :return: The written ``path`` as a :class:`str`.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
@@ -360,8 +435,8 @@ def render_sound_power_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        Paragraph(copy.title, title_style),
+        Paragraph(copy.basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -371,7 +446,7 @@ def render_sound_power_fiche(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(caption, caption_style))
+    flow.append(Paragraph(copy.caption, caption_style))
     flow.append(value_table)
     flow.append(Spacer(1, 8))
 
@@ -379,13 +454,13 @@ def render_sound_power_fiche(
     # plot(ax=...); the band axis carries nominal labels (not base-ten log).
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 3.4),
+            result.plot, 174 * mm, y_top=None, figsize=figsize,
             language=language,
         )
     )
     flow.append(Spacer(1, 8))
 
-    flow.append(result_box(statement, styles, accent, extended))
+    flow.append(result_box(copy.statement, styles, accent, copy.extended))
     # A caller may supply its own verdict (its quantity symbol and sign rule);
     # otherwise the airborne sound-power fiches fall back to the L_WA/L_W
     # requirement comparison. The two paths are mutually exclusive.
@@ -397,8 +472,8 @@ def render_sound_power_fiche(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_style_strip = measurement_basis_style()
-    for strip in basis_strips:
+    for strip in copy.basis_strips:
         flow.append(Paragraph(strip, basis_style_strip))
     flow.extend(footer_flow(metadata, language, disclaimer=disclaimer))
 
-    return build_document(path, flow, title)
+    return build_document(path, flow, copy.title)

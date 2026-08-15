@@ -8,6 +8,12 @@ chamber, extended-tube chamber, Helmholtz resonator and quarter-wave stub),
 validating that the geometry it is handed can actually be built; the plenum
 renderer draws the inlet, the outlet and the line of sight between them.
 
+A third renderer draws what a hand-built
+:class:`~phonometry.noise_control.silencers.SilencerChain` declares, which is
+less than a named device does and is drawn as such: the ducts to scale, and
+the shunts as marked branch points, because a shunt element is handed an
+impedance and no shape at all.
+
 Domain classes are referenced only under ``TYPE_CHECKING`` so this rendering
 leaf never imports domain code at module level.
 """
@@ -34,32 +40,57 @@ from ._draft import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
-    from ...noise_control.silencers import ReactiveSilencerResult
+    from ...noise_control.silencers import (
+        ReactiveSilencerResult,
+        SilencerChain,
+        SilencerChainElement,
+    )
 
 #: The ``ReactiveSilencerResult.kind`` strings, shared with the dispatcher.
 _KIND_EXPANSION = "expansion chamber"
 _KIND_EXTENDED = "extended-tube chamber"
 _KIND_HELMHOLTZ = "Helmholtz resonator"
 _KIND_QUARTER = "quarter-wave resonator"
+_KIND_CHAIN = "element chain"
 
 #: Shared validation message for length arguments.
 _LENGTH_POSITIVE = "'length' must be positive."
 
+#: The note that keeps a chain drawing honest, rendered under it whenever it
+#: carries a branch point (see :func:`plot_silencer_chain_geometry`).
+_CHAIN_NOTE = (
+    "Ducts drawn to scale from their declared length and area. A side branch\n"
+    "declares only an impedance, so it is marked where it joins, not drawn."
+)
+
+
+#: Title every reactive-silencer drawing carries, whichever renderer draws it.
+_CROSS_SECTION = "Reactive silencer cross-section"
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
 _STRINGS: dict[str, str] = {
-    "Reactive silencer cross-section": "Sección del silenciador reactivo",
+    _CROSS_SECTION: "Sección del silenciador reactivo",
     _KIND_EXPANSION: "cámara de expansión",
     _KIND_HELMHOLTZ: "resonador de Helmholtz",
     _KIND_QUARTER: "resonador de cuarto de onda",
     _KIND_EXTENDED: "cámara con tubos extendidos",
+    _KIND_CHAIN: "cadena de elementos",
     "Plenum chamber section": "Sección de la cámara plenum",
     "Inlet": "Entrada",
     "Outlet": "Salida",
+    "Side branch": "Ramal lateral",
+    "min |Z| at {frequency} Hz": "|Z| mínima en {frequency} Hz",
+    _CHAIN_NOTE: (
+        "Conductos dibujados a escala a partir de su longitud y área "
+        "declaradas.\nUn ramal lateral solo declara una impedancia: se marca "
+        "dónde se conecta, no se dibuja."
+    ),
 }
 
 
@@ -87,6 +118,14 @@ def _duct_diameter(area: float) -> float:
     return float(2.0 * np.sqrt(area / np.pi))
 
 
+def _duct_walls(
+    ax: Axes, x0: float, x1: float, d: float, wall: float
+) -> None:
+    """The two wall plates of a duct run, lying just outside its bore."""
+    for y in (-0.5 * d - wall, 0.5 * d):
+        _material_rect(ax, x0, y, x1 - x0, wall, "plate", linewidth=0.5)
+
+
 def _draw_duct(ax: Axes, x0: float, x1: float, d: float, **kwargs: Any) -> Any:
     """A straight duct run: bore centred on y = 0, walls just outside."""
     from matplotlib.patches import Rectangle
@@ -97,8 +136,7 @@ def _draw_duct(ax: Axes, x0: float, x1: float, d: float, **kwargs: Any) -> Any:
     kwargs.setdefault("linewidth", 1.2)
     bore = Rectangle((x0, -0.5 * d), x1 - x0, d, **kwargs)
     ax.add_patch(bore)
-    for y in (-0.5 * d - wall, 0.5 * d):
-        _material_rect(ax, x0, y, x1 - x0, wall, "plate", linewidth=0.5)
+    _duct_walls(ax, x0, x1, d, wall)
     return bore
 
 
@@ -418,7 +456,7 @@ def plot_silencer_geometry(
         )
     _finish_geometry_axes(
         ax,
-        _t("Reactive silencer cross-section", language)
+        _t(_CROSS_SECTION, language)
         + f" ({_t(kind, language)})",
     )
     return ax
@@ -430,7 +468,16 @@ def plot_silencer_result_geometry(
     *,
     language: str = "en",
 ) -> Axes:
-    """Silencer drawing for a result that retained its ``geometry``."""
+    """Silencer drawing for a result that retained a geometry of either kind.
+
+    A named device retains the arguments of its constructor in ``geometry``; a
+    result assembled element by element retains the ``chain`` that built it,
+    which carries the geometry of each element separately.
+    """
+    if result.chain is not None:
+        return plot_silencer_chain_geometry(
+            result.chain, ax=ax, language=language
+        )
     if result.geometry is None:
         raise ValueError(
             "This result does not retain its geometry; call "
@@ -439,6 +486,261 @@ def plot_silencer_result_geometry(
     return plot_silencer_geometry(
         result.kind, ax=ax, language=language, **dict(result.geometry),
     )
+
+
+# ---------------------------------------------------------------------------
+# Hand-built element chains.
+# ---------------------------------------------------------------------------
+#: A drawn duct run: where it starts, where it ends, what its area is.
+_Segment = tuple[float, float, float]
+#: A drawn branch point: its station, its label and its shorting frequency.
+_Branch = tuple[float, str | None, float | None]
+
+
+def _chain_layout(
+    elements: Sequence[SilencerChainElement],
+) -> tuple[list[_Segment], list[_Branch], float]:
+    """Resolve the chain into drawn duct runs, branch points and a length.
+
+    Stations accumulate along the run in the order the elements were added.
+    A duct of zero length is dropped from both lists: its four-pole matrix is
+    the identity, so it is nothing acoustically and has no extent to draw.
+    """
+    segments: list[_Segment] = []
+    branches: list[_Branch] = []
+    x = 0.0
+    for element in elements:
+        if element.area is None:
+            branches.append(
+                (x, element.label, element.shorting_frequency)
+            )
+            continue
+        length = element.length or 0.0
+        if length > 0.0:
+            segments.append((x, x + length, element.area))
+            x += length
+    return segments, branches, x
+
+
+def _equal_area_runs(segments: Sequence[_Segment]) -> list[_Segment]:
+    """Merge consecutive duct runs of equal area into one drawn run."""
+    runs: list[_Segment] = []
+    for x0, x1, area in segments:
+        if runs and runs[-1][2] == area:
+            runs[-1] = (runs[-1][0], x1, area)
+        else:
+            runs.append((x0, x1, area))
+    return runs
+
+
+def _diameter_at(segments: Sequence[_Segment], x: float) -> float:
+    """The drawn diameter of the run a branch joins at station ``x``.
+
+    A branch landing on the joint between two runs is drawn on the wider of
+    the two, which is the shell its mouth would open through.
+    """
+    touching = [
+        _duct_diameter(area) for x0, x1, area in segments if x0 <= x <= x1
+    ]
+    return max(touching) if touching else _duct_diameter(segments[0][2])
+
+
+def _draw_chain_ducts(
+    ax: Axes, segments: Sequence[_Segment], wall: float
+) -> None:
+    """The bores, the wall plates and the annular faces of the area steps.
+
+    The two ends of the whole run are left open: a chain declares its elements
+    and not what it is connected between, so nothing is drawn to cap it.
+    """
+    diameters = [_duct_diameter(area) for _, _, area in segments]
+    for (x0, x1, _area), d in zip(segments, diameters, strict=True):
+        _duct_walls(ax, x0, x1, d, wall)
+        for y in (-0.5 * d, 0.5 * d):
+            ax.plot([x0, x1], [y, y], color=_C_EDGE, linewidth=1.2)
+    for index in range(1, len(segments)):
+        d_before, d_after = diameters[index - 1], diameters[index]
+        if d_before == d_after:
+            continue
+        x = segments[index][0]
+        near, far = sorted((d_before, d_after))
+        for sign in (-1.0, 1.0):
+            ax.plot(
+                [x, x], [sign * 0.5 * near, sign * (0.5 * far + wall)],
+                color=_C_EDGE, linewidth=1.4,
+            )
+
+
+def _branch_label(
+    branch: _Branch, index: int, total: int, language: str
+) -> str:
+    """The callout text of a branch point: what it is, and where it bites."""
+    from ..._i18n import format_number
+
+    _station, label, frequency = branch
+    text = label if label else _t("Side branch", language)
+    if not label and total > 1:
+        text = f"{text} {index + 1}"
+    if frequency is not None:
+        text += "\n" + _t("min |Z| at {frequency} Hz", language).format(
+            frequency=format_number(
+                frequency, language, decimals=1, trim=True
+            )
+        )
+    return text
+
+
+def _draw_branch_points(
+    ax: Axes,
+    segments: Sequence[_Segment],
+    branches: Sequence[_Branch],
+    wall: float,
+    d_max: float,
+    language: str,
+) -> None:
+    """Mark each shunt where it joins the run, with a leader to its callout.
+
+    A leader and a node dot are annotation, not features: they carry no
+    dimension line and no measurement, which is the whole of what may honestly
+    be drawn for an element that declares an impedance and no shape.
+    """
+    run = 0.30 * d_max
+    for index, branch in enumerate(branches):
+        x = branch[0]
+        y0 = 0.5 * _diameter_at(segments, x) + wall
+        rise = (0.55 if index % 2 == 0 else 1.00) * d_max
+        ax.plot(
+            [x, x + run, x + run + 0.10 * d_max],
+            [y0, y0 + rise, y0 + rise],
+            color=_C_SECONDARY, linewidth=0.9, zorder=4,
+        )
+        ax.plot(
+            [x], [y0], marker="o", markersize=5.0,
+            markerfacecolor=_C_SECONDARY, markeredgecolor=_C_EDGE,
+            markeredgewidth=0.6, zorder=6,
+        )
+        ax.text(
+            x + run + 0.14 * d_max, y0 + rise,
+            _branch_label(branch, index, len(branches), language),
+            fontsize=8, ha="left", va="center",
+        )
+
+
+def _dimension_chain(
+    ax: Axes,
+    segments: Sequence[_Segment],
+    total: float,
+    d_max: float,
+    wall: float,
+    language: str,
+) -> None:
+    """Dimension every run's length, each distinct bore, and the whole.
+
+    The lengths are lettered on one row below the widest section, each with
+    witness lines back to its own run, and the overall length on a second row
+    under them. A bore is dimensioned on the first run that has it, so a chain
+    returning to a diameter it already showed does not letter the same number
+    twice.
+    """
+    off = 0.18 * d_max
+    y_lengths = -0.5 * d_max - 2.0 * off
+    for x0, x1, area in segments:
+        y_wall = -0.5 * _duct_diameter(area) - wall
+        _dim(
+            ax, (x0, y_wall), (x1, y_wall), _mm(x1 - x0, language),
+            offset=y_lengths - y_wall, tight=(x1 - x0) < 0.25 * total,
+        )
+    # A single segment is its own overall run, so the second line would repeat
+    # the first; the overall run is dimensioned only when there is more than one.
+    if len(segments) > 1:
+        _dim(
+            ax, (0.0, y_lengths), (total, y_lengths),
+            "L = " + _mm(total, language), offset=-1.6 * off,
+        )
+    drawn: set[float] = set()
+    for x0, x1, area in _equal_area_runs(segments):
+        if area in drawn:
+            continue
+        drawn.add(area)
+        d = _duct_diameter(area)
+        x_mid = 0.5 * (x0 + x1)
+        _dim(
+            ax, (x_mid, -0.5 * d), (x_mid, 0.5 * d), _mm(d, language),
+            offset=0.0,
+        )
+
+
+def _note_under(ax: Axes, width: float, note: str) -> None:
+    """Letter a two-line note under everything drawn so far.
+
+    Text does not enlarge the data limits, and the drawing is autoscaled from
+    them, so the band the note will occupy is claimed first. Both the drop and
+    the band are fractions of what has been drawn, which keeps the note in
+    proportion at any scale the chain happens to have.
+    """
+    bounds = ax.dataLim
+    span = float(bounds.height)
+    y_note = float(bounds.y0) - 0.06 * span
+    ax.update_datalim(((0.0, y_note - 0.16 * span), (width, y_note)))
+    ax.text(
+        0.5 * width, y_note, note, fontsize=8, ha="center", va="top",
+    )
+
+
+def plot_silencer_chain_geometry(
+    chain: SilencerChain,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+) -> Axes:
+    """Draw a hand-built element chain: ducts to scale, branch points marked.
+
+    The companion of :func:`plot_silencer_geometry` for a layout that is not
+    one of the named devices. A
+    :class:`~phonometry.noise_control.silencers.SilencerChain` records what
+    each of its elements was given, and this draws exactly that and no more:
+    every duct at its declared length and equivalent circular diameter
+    (``d = 2 sqrt(S / pi)``), the annular face of every area step between
+    them, and each length, bore and the overall run dimensioned.
+
+    A shunt element is handed an acoustic impedance, which fixes no length, no
+    area and no volume. It is therefore not drawn as a stub of any size: it is
+    marked with a node and a leader at the station where it joins the run,
+    lettered with its label and with the frequency at which its impedance is
+    least, and the drawing says so underneath. The two ends of the run are
+    left open for the same reason, a chain being a list of elements and not a
+    statement about the pipes it sits between.
+
+    :param chain: The chain to draw.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :return: The axes.
+    :raises ValueError: If the chain holds no duct of positive length, and so
+        declares no geometry and no scale to draw it at.
+    """
+    _check_language(language)
+    segments, branches, total = _chain_layout(chain.elements)
+    if not segments:
+        raise ValueError(
+            "This chain has no duct of positive length, so it declares no "
+            "geometry to draw: a shunt element holds an impedance and no "
+            "shape. Add the duct runs its branches sit on."
+        )
+    if ax is None:
+        ax = _new_axes()
+    d_max = max(_duct_diameter(area) for _, _, area in segments)
+    wall = max(0.04 * d_max, 0.003)
+    _draw_chain_ducts(ax, segments, wall)
+    _draw_branch_points(ax, segments, branches, wall, d_max, language)
+    _dimension_chain(ax, segments, total, d_max, wall, language)
+    if branches:
+        _note_under(ax, total, _t(_CHAIN_NOTE, language))
+    _finish_geometry_axes(
+        ax,
+        _t(_CROSS_SECTION, language)
+        + f" ({_t(_KIND_CHAIN, language)})",
+    )
+    return ax
 
 
 # ---------------------------------------------------------------------------

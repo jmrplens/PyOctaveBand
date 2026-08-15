@@ -61,6 +61,8 @@ from .room_to_room import (
 )
 from .silencers import (
     ReactiveSilencerResult,
+    SilencerChain,
+    SilencerChainElement,
     cascade,
     duct_matrix,
     expansion_chamber,
@@ -86,6 +88,8 @@ __all__ = [
     "PlaneWaveWarning",
     "ReactiveSilencerResult",
     "RoomToRoomResult",
+    "SilencerChain",
+    "SilencerChainElement",
     "SourceRoom",
     "air_terminal_damper_correction",
     "air_terminal_velocity_limit",

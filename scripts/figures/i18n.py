@@ -3727,6 +3727,7 @@ _ES_EXACT = {
     "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
     "Helmholtz resonator": "Resonador de Helmholtz",
     "Quarter-wave tube": "Tubo de cuarto de onda",
+    "Quarter-wave stub": "Ramal de cuarto de onda",
     "Side-branch resonators: transmission loss (Bies Eqs. 8.44, 8.46)":
         "Resonadores en derivación: pérdida de transmisión (Bies Ecs. 8.44, 8.46)",
     "Duct end reflection loss (ASHRAE Table 8.14)":
