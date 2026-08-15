@@ -1126,7 +1126,7 @@ L 640.070675 28.318125
      </g>
     </g>
     <g id="text_5">
-     <!-- Frequency of the more audible tone $f_T$ [Hz] -->
+     <!-- Frequency of the more audible tone $f_\mathrm{T}$ [Hz] -->
      <g style="fill: #ffffff" transform="translate(266.688672 415.034219) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-29" d="M 628 4666 
@@ -1528,15 +1528,15 @@ Q 1875 4863 2516 4863
 L 3059 4863 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-37" d="M 378 4666 
-L 4325 4666 
-L 4225 4134 
-L 2559 4134 
-L 1759 0 
-L 1125 0 
-L 1925 4134 
-L 275 4134 
-L 378 4666 
+       <path id="DejaVuSans-37" d="M -19 4666 
+L 3928 4666 
+L 3928 4134 
+L 2272 4134 
+L 2272 0 
+L 1638 0 
+L 1638 4134 
+L -19 4134 
+L -19 4666 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-3e" d="M 550 4863 
@@ -1626,7 +1626,7 @@ z
       <use xlink:href="#DejaVuSans-48" transform="translate(1728.208984 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1789.732422 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1821.519531 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(1856.724609 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-37" transform="translate(1856.724609 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1902.217773 0.015625)"/>
       <use xlink:href="#DejaVuSans-3e" transform="translate(1934.004883 0.015625)"/>
       <use xlink:href="#DejaVuSans-2b" transform="translate(1973.018555 0.015625)"/>
@@ -1850,7 +1850,7 @@ L 699.9875 28.318125
      </g>
     </g>
     <g id="text_12">
-     <!-- Frequency separation $|f_{T1} - f_{T2}|$ [Hz] -->
+     <!-- Frequency separation $|f_{\mathrm{T}1} - f_{\mathrm{T}2}|$ [Hz] -->
      <g style="fill: #ffffff" transform="translate(14.9 296.975781) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-56" d="M 2834 3397 
@@ -1948,11 +1948,11 @@ z
       <use xlink:href="#DejaVuSans-3" transform="translate(1081.185547 0.578125)"/>
       <use xlink:href="#DejaVuSans-5f" transform="translate(1112.972656 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1146.664062 0.578125)"/>
-      <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(1181.869141 -14.421826) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-37" transform="translate(1181.869141 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-14" transform="translate(1224.62793 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-c9c" transform="translate(1291.380859 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1394.652344 0.578125)"/>
-      <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(1429.857422 -14.421826) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-37" transform="translate(1429.857422 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-15" transform="translate(1472.616211 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-5f" transform="translate(1519.886719 0.578125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1553.578125 0.578125)"/>
@@ -2259,7 +2259,7 @@ z
      <use xlink:href="#DejaVuSans-5d" transform="translate(1629.5 0)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(1681.984375 0)"/>
     </g>
-    <!-- 18.9 Hz apart — below $f_D$, so combined -->
+    <!-- 18.9 Hz apart — below $f_\mathrm{D}$, so combined -->
     <g style="fill: #2ca02c" transform="translate(67.941809 228.8627) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-1c" d="M 703 97 
@@ -2315,25 +2315,23 @@ L 1184 0
 L 269 3500 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-27" d="M 1081 4666 
-L 2438 4666 
-Q 3519 4666 4070 4208 
-Q 4622 3750 4622 2847 
-Q 4622 2250 4412 1698 
-Q 4203 1147 3834 769 
-Q 3463 381 2891 190 
-Q 2319 0 1538 0 
-L 172 0 
-L 1081 4666 
+      <path id="DejaVuSans-27" d="M 1259 4147 
+L 1259 519 
+L 2022 519 
+Q 2988 519 3436 956 
+Q 3884 1394 3884 2338 
+Q 3884 3275 3436 3711 
+Q 2988 4147 2022 4147 
+L 1259 4147 
 z
-M 1613 4147 
-L 909 519 
-L 1734 519 
-Q 2794 519 3375 1128 
-Q 3956 1738 3956 2847 
-Q 3956 3519 3581 3833 
-Q 3206 4147 2406 4147 
-L 1613 4147 
+M 628 4666 
+L 1925 4666 
+Q 3281 4666 3915 4102 
+Q 4550 3538 4550 2338 
+Q 4550 1131 3912 565 
+Q 3275 0 1925 0 
+L 628 0 
+L 628 4666 
 z
 " transform="scale(0.015625)"/>
      </defs>
@@ -2360,7 +2358,7 @@ z
      <use xlink:href="#DejaVuSans-5a" transform="translate(1057.8125 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1139.599609 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1171.386719 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(1206.591797 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-27" transform="translate(1206.591797 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(1263.227539 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1295.014648 0.015625)"/>
      <use xlink:href="#DejaVuSans-56" transform="translate(1326.801758 0.015625)"/>
@@ -2505,17 +2503,6 @@ z
     <!-- Two Tones in One Critical Band: Separate or Combined (ISO/PAS 20065 Formula 19) -->
     <g style="fill: #ffffff" transform="translate(123.588047 16.318125) scale(0.12 -0.12)">
      <defs>
-      <path id="DejaVuSans-37" d="M -19 4666 
-L 3928 4666 
-L 3928 4134 
-L 2272 4134 
-L 2272 0 
-L 1638 0 
-L 1638 4134 
-L -19 4134 
-L -19 4666 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-32" d="M 2522 4238 
 Q 1834 4238 1429 3725 
 Q 1025 3213 1025 2328 
@@ -2816,7 +2803,7 @@ L 73.489844 40.108125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <!-- Threshold $f_D$ (Formula 19) -->
+     <!-- Threshold $f_\mathrm{D}$ (Formula 19) -->
      <g style="fill: #ffffff" transform="translate(80.689844 43.258125) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-37" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-4b" transform="translate(61.083984 0.015625)"/>
@@ -2829,7 +2816,7 @@ L 73.489844 40.108125
       <use xlink:href="#DejaVuSans-47" transform="translate(429.542969 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(493.019531 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(524.806641 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(560.011719 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-27" transform="translate(560.011719 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(616.647461 0.015625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(648.43457 0.015625)"/>
       <use xlink:href="#DejaVuSans-29" transform="translate(687.448242 0.015625)"/>

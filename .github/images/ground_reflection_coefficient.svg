@@ -1645,7 +1645,7 @@ L 70.203906 38.198125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_14">
-     <!-- $|R_p|$ — plane wave -->
+     <!-- $|R_{\mathrm{p}}|$ — plane wave -->
      <g transform="translate(77.403906 41.348125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-5f" d="M 1344 4891 
@@ -1683,38 +1683,6 @@ Q 3841 3044 3547 2687
 Q 3253 2331 2772 2241 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-53" d="M 3175 2156 
-Q 3175 2616 2975 2859 
-Q 2775 3103 2400 3103 
-Q 2144 3103 1911 2972 
-Q 1678 2841 1497 2591 
-Q 1319 2344 1212 1994 
-Q 1106 1644 1106 1300 
-Q 1106 863 1306 627 
-Q 1506 391 1875 391 
-Q 2147 391 2380 519 
-Q 2613 647 2778 891 
-Q 2956 1147 3065 1494 
-Q 3175 1841 3175 2156 
-z
-M 1394 2969 
-Q 1625 3272 1939 3428 
-Q 2253 3584 2638 3584 
-Q 3175 3584 3472 3232 
-Q 3769 2881 3769 2247 
-Q 3769 1728 3584 1258 
-Q 3400 788 3053 416 
-Q 2822 169 2531 39 
-Q 2241 -91 1919 -91 
-Q 1547 -91 1294 64 
-Q 1041 219 916 525 
-L 556 -1331 
-L -19 -1331 
-L 922 3500 
-L 1497 3500 
-L 1394 2969 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSansDisplay-4" d="M 313 1978 
 L 6088 1978 
 L 6088 1528 
@@ -1748,7 +1716,7 @@ z
       </defs>
       <use xlink:href="#DejaVuSans-5f" transform="translate(0 0.578125)"/>
       <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(33.691406 0.578125)"/>
-      <use xlink:href="#DejaVuSans-Oblique-53" transform="translate(103.173828 -14.421826) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-53" transform="translate(103.173828 -14.421826) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-5f" transform="translate(150.341797 0.578125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(184.033203 0.578125)"/>
       <use xlink:href="#DejaVuSansDisplay-4" transform="translate(215.820312 0.578125)"/>
@@ -2906,7 +2874,7 @@ L 517.443906 327.363438
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 2"/>
     </g>
     <g id="text_28">
-     <!-- with $R_p$ alone (plane wave) -->
+     <!-- with $R_{\mathrm{p}}$ alone (plane wave) -->
      <g transform="translate(524.643906 330.513438) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-5a" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-4c" transform="translate(81.787109 0.015625)"/>
@@ -2914,7 +2882,7 @@ L 517.443906 327.363438
       <use xlink:href="#DejaVuSans-4b" transform="translate(148.779297 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(212.158203 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(243.945312 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-53" transform="translate(313.427734 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-53" transform="translate(313.427734 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(360.595703 0.015625)"/>
       <use xlink:href="#DejaVuSans-44" transform="translate(392.382812 0.015625)"/>
       <use xlink:href="#DejaVuSans-4f" transform="translate(453.662109 0.015625)"/>

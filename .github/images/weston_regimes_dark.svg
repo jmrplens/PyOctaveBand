@@ -1461,7 +1461,7 @@ L 705.885937 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_14">
-    <!-- $H/(2\psi_c)$ -->
+    <!-- $H/(2\psi_\mathrm{c})$ -->
     <g style="fill: #d62728" transform="translate(147.822693 41.039386) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-Oblique-2b" d="M 1081 4666 
@@ -1522,29 +1522,25 @@ L 1347 -1331
 L 1591 -78 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-46" d="M 3431 3366 
-L 3316 2797 
-Q 3109 2947 2876 3022 
-Q 2644 3097 2394 3097 
-Q 2119 3097 1870 3000 
-Q 1622 2903 1453 2725 
-Q 1184 2453 1037 2087 
-Q 891 1722 891 1331 
-Q 891 859 1127 628 
-Q 1363 397 1844 397 
-Q 2081 397 2348 469 
-Q 2616 541 2906 684 
-L 2797 116 
-Q 2547 13 2283 -39 
-Q 2019 -91 1741 -91 
-Q 1044 -91 669 257 
-Q 294 606 294 1253 
-Q 294 1797 489 2255 
-Q 684 2713 1069 3078 
-Q 1331 3328 1684 3456 
-Q 2038 3584 2456 3584 
-Q 2700 3584 2940 3529 
-Q 3181 3475 3431 3366 
+      <path id="DejaVuSans-46" d="M 3122 3366 
+L 3122 2828 
+Q 2878 2963 2633 3030 
+Q 2388 3097 2138 3097 
+Q 1578 3097 1268 2742 
+Q 959 2388 959 1747 
+Q 959 1106 1268 751 
+Q 1578 397 2138 397 
+Q 2388 397 2633 464 
+Q 2878 531 3122 666 
+L 3122 134 
+Q 2881 22 2623 -34 
+Q 2366 -91 2075 -91 
+Q 1284 -91 818 406 
+Q 353 903 353 1747 
+Q 353 2603 823 3093 
+Q 1294 3584 2113 3584 
+Q 2378 3584 2631 3529 
+Q 2884 3475 3122 3366 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-c" d="M 513 4856 
@@ -1566,7 +1562,7 @@ z
      <use xlink:href="#DejaVuSans-b" transform="translate(108.886719 0.125)"/>
      <use xlink:href="#DejaVuSans-15" transform="translate(147.900391 0.125)"/>
      <use xlink:href="#DejaVuSans-Oblique-35c" transform="translate(211.523438 0.125)"/>
-     <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(277.490234 -14.874951) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-46" transform="translate(277.490234 -14.874951) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(318.710938 0.125)"/>
     </g>
    </g>
@@ -1820,7 +1816,7 @@ z
      <use xlink:href="#DejaVuSans-51" transform="translate(1695.214844 0.015625)"/>
      <use xlink:href="#DejaVuSans-47" transform="translate(1758.59375 0.015625)"/>
     </g>
-    <!-- $\psi_c$ = 33.6°, $\eta$ = 0.28 Np/rad, 10 modes -->
+    <!-- $\psi_\mathrm{c}$ = 33.6°, $\eta$ = 0.28 Np/rad, 10 modes -->
     <g style="fill: #ffffff" transform="translate(497.413984 363.300352) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-11" d="M 684 794 
@@ -1887,7 +1883,7 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-35c" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(65.966797 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-46" transform="translate(65.966797 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(107.1875 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(138.974609 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(222.763672 0.015625)"/>
@@ -2165,29 +2161,6 @@ L 73.388281 317.095703
     <g id="text_19">
      <!-- Spherical, $20\,\log_{10} r$ -->
      <g style="fill: #ffffff" transform="translate(80.588281 320.245703) scale(0.09 -0.09)">
-      <defs>
-       <path id="DejaVuSans-46" d="M 3122 3366 
-L 3122 2828 
-Q 2878 2963 2633 3030 
-Q 2388 3097 2138 3097 
-Q 1578 3097 1268 2742 
-Q 959 2388 959 1747 
-Q 959 1106 1268 751 
-Q 1578 397 2138 397 
-Q 2388 397 2633 464 
-Q 2878 531 3122 666 
-L 3122 134 
-Q 2881 22 2623 -34 
-Q 2366 -91 2075 -91 
-Q 1284 -91 818 406 
-Q 353 903 353 1747 
-Q 353 2603 823 3093 
-Q 1294 3584 2113 3584 
-Q 2378 3584 2631 3529 
-Q 2884 3475 3122 3366 
-z
-" transform="scale(0.015625)"/>
-      </defs>
       <use xlink:href="#DejaVuSans-36" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-53" transform="translate(63.476562 0.015625)"/>
       <use xlink:href="#DejaVuSans-4b" transform="translate(126.953125 0.015625)"/>

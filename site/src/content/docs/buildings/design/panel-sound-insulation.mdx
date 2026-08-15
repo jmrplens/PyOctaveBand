@@ -278,7 +278,7 @@ ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
                 alpha=0.3, label="unfavourable deviations")
 ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
 ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+ax.set_ylabel(r"Sound reduction index $R$ (transmission loss $\mathrm{TL}$) [dB]")
 ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
 ax.legend()
 plt.show()
@@ -559,7 +559,7 @@ ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
             label="corrugated, integral")
 ax.semilogx(bands, heckl.transmission_loss, "--", label="Heckl approximation")
 ax.set(xlabel="Frequency [Hz]",
-       ylabel="Sound reduction index $R$ (transmission loss $TL$) [dB]")
+       ylabel=r"Sound reduction index $R$ (transmission loss $\mathrm{TL}$) [dB]")
 ax.legend()
 plt.show()
 ```
