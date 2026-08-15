@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Sound power by intensity determination fiche (reportlab, ISO 9614-2).
+"""Sound power by intensity determination fiches (reportlab, ISO 9614-2 / -3).
 
 Renders a
 :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`
@@ -27,35 +27,67 @@ a one-page PDF laid out like a sound-power test sheet:
   indicators and the Annex B qualification criteria, and a footer
   identity/disclaimer block.
 
+The precision sibling,
+:class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`
+(ISO 9614-3:2002, the same scan qualified to accuracy grade 1), prints the same
+sheet with the content **that** standard asks a report to state (clause 10):
+
+* the *normalized* sound power level ``LW0`` beside ``LW`` in the per-band
+  table, since clause 10 f) 2) asks for the level referred to the reference
+  atmosphere of 23 degrees Celsius and 101 325 Pa (Eq. 10), and the per-band
+  expanded uncertainty ``U``, twice the standard deviation of reproducibility
+  of Table 1 (clause 4.3, clause 10 f) 4));
+* the four Annex B field indicators ``FT``, ``Fp|In|``, ``FpIn`` and ``FS``,
+  tabulated per band with ``verbose=True`` for the measurement surface as
+  Annex B defines them (clause 10 f) 1) asks for the tabulation) and
+  summarised in the basis strip, with the pressure-residual intensity index of
+  the probe (clause 10 d) 5)) and the dynamic capability it yields;
+* the five Annex C acceptance criteria and the per-band qualification cell
+  they decide, and the statement clause 10 f) 2) makes mandatory: the bands
+  whose criteria are not satisfied are omitted from the A-weighted
+  determination and named in the basis strip, alongside the bands with net
+  power ``P <= 0`` the method is not applicable to (clause 9.2).
+
 The quantity-independent skeleton lives in :mod:`._layout`; the sound-power
 body (the per-band table, the ``LW(f)`` spectrum, the boxed ``LWA`` and the
 flow assembly) is shared with the ISO 3744 pressure fiche in
 :mod:`._sound_power_fiche`; this module only holds the intensity-method
-specifics (the basis line, the ``FpI``/``F+/-``/grade columns and the
-field-indicator strip). reportlab, matplotlib and svglib are soft dependencies
-imported lazily; each is guarded with an actionable :class:`ImportError`.
+specifics (the basis lines, the indicator columns and the field-indicator
+strips). reportlab, matplotlib and svglib are soft dependencies imported
+lazily; each is guarded with an actionable :class:`ImportError`.
 """
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ._i18n import t
+from ._i18n import format_number, t
 from ._sound_power_fiche import (
+    FicheCopy,
     band_labels,
     d1,
+    energy_sum,
     fraction_caption,
     power_statement,
     power_value_table,
+    power_verdict,
     range_str,
     render_sound_power_fiche,
 )
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..emission.sound_power_intensity import SoundPowerIntensityResult
+    from collections.abc import Sequence
+
+    from ..emission.sound_power_intensity import (
+        PrecisionCriteria,
+        PrecisionFieldIndicators,
+        PrecisionIntensityResult,
+        SoundPowerIntensityResult,
+    )
 
 #: Bias-error factor K of ISO 9614-2:1996 Table 1, in dB, by measurement grade.
 _K = {"engineering": 10.0, "survey": 7.0}
@@ -66,6 +98,37 @@ _GRADE_PHRASE = {
 }
 #: Per-band achieved-grade cell (the accuracy grade number, or an em dash).
 _GRADE_CELL = {"engineering": "2", "survey": "3", "none": "—"}
+
+#: The em dash printed wherever a quantity was not supplied or is not finite.
+_ABSENT = "—"
+#: Bias-error factor K of ISO 9614-3:2002 (definition 3.11), in dB. Part 3
+#: recognises the single precision grade, so K is fixed rather than tabulated.
+_K_PRECISION = 10.0
+#: The grade phrase of the precision method (ISO 9614-3:2002 has one grade).
+_PRECISION_GRADE_PHRASE = "precision grade (accuracy grade 1)"
+#: Coverage factor of the expanded uncertainty: ISO 9614-3:2002 clause 4.3
+#: states it as twice the Table 1 standard deviation of reproducibility, for a
+#: coverage probability of 95 % as defined in the GUM.
+_COVERAGE_FACTOR = 2.0
+#: The Table 1 standard deviation of reproducibility of the A-weighted sound
+#: power level, in dB (footnote b: a relatively flat 50 Hz to 6,3 kHz spectrum).
+_SIGMA_A_WEIGHTED = 1.0
+#: The two column headings every band table on these sheets opens with: the
+#: band centre, which is translated, and the sound power level, which is a
+#: quantity symbol and therefore is not.
+_COL_FREQ = "f [Hz]"
+_COL_LW = "L<sub>W</sub> [dB]"
+#: Band count above which the precision table pairs its rows into two column
+#: groups. The one-third-octave range this method works in does not fit the
+#: page as one column of rows beside a header grid, a spectrum, a boxed result
+#: and the Annex B/C strips, and an accredited sheet prints a wide band set in
+#: two groups rather than on a second page.
+_SPLIT_ABOVE = 8
+#: Size of the embedded spectrum on the precision sheet, in inches. Shallower
+#: than the pressure fiches': this sheet carries a one-third-octave band set,
+#: and the rows it costs have to come from somewhere for the determination to
+#: stay on one page.
+_PRECISION_FIGSIZE = (9.2, 2.5)
 
 
 def _basis(result: Any, language: str = "en") -> str:
@@ -94,7 +157,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     labels, fraction = band_labels(getattr(result, "frequencies", None), n)
 
     if not verbose:
-        header = [t("f [Hz]", language), "L<sub>W</sub> [dB]"]
+        header = [t(_COL_FREQ, language), _COL_LW]
         widths = [87.0, 87.0]
         rows_data = [[labels[i], d1(lw[i], language)] for i in range(n)]
         return power_value_table(header, rows_data, widths, fraction)
@@ -103,8 +166,8 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     fpm = _band_array(result.negative_partial_power_index, n)
     grade = result.achieved_grade
     header = [
-        t("f [Hz]", language),
-        "L<sub>W</sub> [dB]",
+        t(_COL_FREQ, language),
+        _COL_LW,
         "F<sub>pI</sub> [dB]",
         "F<sub>+/&#8722;</sub> [dB]",
         t("Grade", language),
@@ -133,8 +196,8 @@ def _band_array(values: np.ndarray | None, n: int) -> np.ndarray:
 def _grade_cell(grade: np.ndarray | None, i: int) -> str:
     """The per-band achieved-grade cell (grade number, or an em dash)."""
     if grade is None:
-        return "—"
-    return _GRADE_CELL.get(str(grade[i]), "—")
+        return _ABSENT
+    return _GRADE_CELL.get(str(grade[i]), _ABSENT)
 
 
 def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
@@ -145,8 +208,6 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     extended terms: the measurement surface area ``S`` and the determination
     grade (the intensity result carries no expanded uncertainty).
     """
-    from ._i18n import format_number
-
     statement, extended = power_statement(result, language)
     surface = float(result.surface_area)
     grade_phrase = _GRADE_PHRASE.get(getattr(result, "grade", "engineering"),
@@ -211,11 +272,13 @@ def _criteria_strip(result: Any, language: str = "en") -> str:
     return text
 
 
-def _indicator_range(values: np.ndarray | None, language: str = "en") -> str:
+def _indicator_range(
+    values: np.ndarray | None, language: str = "en", decimals: int = 1
+) -> str:
     """A field-indicator range, or an em dash when the indicator is absent."""
     if values is None:
-        return "—"
-    return range_str(np.asarray(values, dtype=np.float64), language)
+        return _ABSENT
+    return range_str(np.asarray(values, dtype=np.float64), language, decimals)
 
 
 def render_intensity_power_report(
@@ -245,18 +308,569 @@ def render_intensity_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Sound power determination", language),
-        basis=_basis(result, language),
-        caption=fraction_caption(result, language),
-        value_table=_value_table(result, verbose, language),
-        statement=statement,
-        extended=extended,
-        basis_strips=[
+        result, path,
+        copy=FicheCopy(
+            title=t("Sound power determination", language),
+            basis=_basis(result, language),
+            caption=fraction_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[
             _indicator_strip(result, language),
             _criteria_strip(result, language),
         ],
+        ),
+        value_table=_value_table(result, verbose, language),
         metadata=metadata,
         language=language,
+    )
+
+
+# ===========================================================================
+# ISO 9614-3:2002 - the precision fiche. The same scan and the same sheet, but
+# the content clause 10 asks a report of *this* part to state: the normalized
+# level, the per-band uncertainty, the four Annex B indicators and the five
+# Annex C criteria, with the mandatory statement naming the bands their
+# rejection keeps out of the A-weighted determination.
+# ===========================================================================
+
+
+def _precision_basis(language: str = "en") -> str:
+    """The standard-basis line of the precision scanning method."""
+    return t(
+        "Determination of the sound power level from the normal sound intensity "
+        "scanned over a surface enclosing the source, qualified by the Annex C "
+        "procedure (ISO 9614-3:2002, {grade}).",
+        language,
+    ).format(grade=t(_PRECISION_GRADE_PHRASE, language))
+
+
+def _band_uncertainty(result: Any) -> np.ndarray:
+    """Per-band expanded uncertainty ``U = 2 sigma_R0`` (Table 1), in dB.
+
+    ISO 9614-3:2002 clause 4.3 states the expanded uncertainty for a coverage
+    probability of 95 % as twice the standard deviation of reproducibility of
+    Table 1, which is tabulated for the one-third-octave bands from 50 Hz to
+    6,3 kHz. A band outside that set, or a determination whose bands are not
+    one-third octaves, has no tabulated value and reports ``NaN`` (an em dash
+    on the sheet) rather than an uncertainty the standard does not give.
+    """
+    lw = np.asarray(result.sound_power_level, dtype=np.float64)
+    n = lw.size
+    uncertainty = np.full(n, np.nan, dtype=np.float64)
+    frequencies = getattr(result, "frequencies", None)
+    if frequencies is None:
+        return uncertainty
+    labels, fraction = band_labels(frequencies, n)
+    if fraction != 3:
+        return uncertainty
+    from ..emission.sound_power_intensity import _sigma_r0_9614_3
+
+    for i, label in enumerate(labels):
+        try:
+            sigma = _sigma_r0_9614_3(round(float(label)))
+        except ValueError:  # a band outside the Table 1 range
+            continue
+        uncertainty[i] = _COVERAGE_FACTOR * sigma
+    return uncertainty
+
+
+def _paired(
+    header: list[str], rows_data: list[list[str]]
+) -> tuple[list[str], list[list[str]], list[float]]:
+    """Fold a tall band table into two column groups printed side by side.
+
+    The lower half of the band set heads the left group and the upper half the
+    right one, separated by a narrow blank column; an odd band count leaves
+    the last right-hand row empty. Returns the paired ``(header, rows,
+    widths)`` for :func:`._sound_power_fiche.power_value_table`.
+    """
+    half = (len(rows_data) + 1) // 2
+    blank = [""] * len(header)
+    paired_rows = [
+        [*rows_data[i], "", *(rows_data[i + half] if i + half < len(rows_data) else blank)]
+        for i in range(half)
+    ]
+    widths = [20.0, 22.0, 22.0, 18.0, 10.0, 20.0, 22.0, 22.0, 18.0]
+    return [*header, "", *header], paired_rows, widths
+
+
+def d2(value: float, language: str = "en") -> str:
+    """Two decimal places, locale-aware separator; em dash when not finite.
+
+    The temporal-variability and field-non-uniformity indicators are ratios,
+    not levels: ``FT`` is judged against 0,6 and ``FS`` against 2, and a scan
+    whose ``FT`` is 0,04 reads as 0,0 at the one decimal a decibel gets.
+    """
+    if not math.isfinite(float(value)):
+        return _ABSENT
+    return format_number(float(value), language, decimals=2)
+
+
+def _qualified_cell(
+    criteria: PrecisionCriteria | None, i: int, language: str = "en"
+) -> str:
+    """The per-band qualification cell: yes, no, or an em dash when unevaluated.
+
+    ISO 9614-3:2002 recognises one accuracy grade for the determination, not a
+    per-band grade ladder as ISO 9614-2 does, so the column states whether
+    Annex C qualified the band rather than dressing a boolean as a grade.
+    """
+    if criteria is None or criteria.qualified is None:
+        return _ABSENT
+    return t("yes", language) if bool(criteria.qualified[i]) else t("no", language)
+
+
+def _precision_value_table(
+    result: Any,
+    indicators: PrecisionFieldIndicators | None,
+    criteria: PrecisionCriteria | None,
+    verbose: bool,
+    language: str = "en",
+) -> Any:
+    """Build the per-band table of the precision fiche.
+
+    The default columns are the ones clause 10 f) asks for: the band level
+    ``LW``, the normalized level ``LW0`` the standard reports (Eq. 10, clause
+    10 f) 2)) and the expanded uncertainty ``U`` (clause 10 f) 4)). A band set
+    wider than :data:`_SPLIT_ABOVE` is printed in two column groups side by
+    side, as accredited sheets print the one-third-octave range this method
+    works in, which is what keeps the whole determination on one page.
+    ``verbose`` adds the tabulation of the four Annex B field indicators
+    clause 10 f) 1) asks for, over the measurement surface as Annex B defines
+    them, and the qualification cell the Annex C criteria decide; those nine
+    columns leave no room to pair, so a wide verbose set prints as one tall
+    table and can run onto a second page. Called only after the renderer has
+    imported reportlab.
+    """
+    lw = np.asarray(result.sound_power_level, dtype=np.float64)
+    lw0 = np.asarray(result.sound_power_level_normalized, dtype=np.float64)
+    n = lw.size
+    labels, fraction = band_labels(getattr(result, "frequencies", None), n)
+    uncertainty = _band_uncertainty(result)
+
+    if not verbose:
+        header = [
+            t(_COL_FREQ, language),
+            _COL_LW,
+            "L<sub>W0</sub> [dB]",
+            "U [dB]",
+        ]
+        rows_data = [
+            [
+                labels[i],
+                d1(lw[i], language),
+                d1(lw0[i], language),
+                d1(uncertainty[i], language),
+            ]
+            for i in range(n)
+        ]
+        if n > _SPLIT_ABOVE:
+            wide_header, wide_rows, wide_widths = _paired(header, rows_data)
+            return power_value_table(wide_header, wide_rows, wide_widths, 0)
+        return power_value_table(header, rows_data, [43.5] * 4, fraction)
+
+    ft = _band_array(None if indicators is None else indicators.ft, n)
+    unsigned = _band_array(None if indicators is None else indicators.f_pi_unsigned, n)
+    signed = _band_array(None if indicators is None else indicators.f_pi_signed, n)
+    fs = _band_array(None if indicators is None else indicators.fs, n)
+    header = [
+        t(_COL_FREQ, language),
+        _COL_LW,
+        "L<sub>W0</sub> [dB]",
+        "U [dB]",
+        "F<sub>T</sub>",
+        "F<sub>p|In|</sub> [dB]",
+        "F<sub>pIn</sub> [dB]",
+        "F<sub>S</sub>",
+        t("Qualified", language),
+    ]
+    widths = [19.0, 21.0, 21.0, 17.0, 16.0, 22.0, 21.0, 16.0, 21.0]
+    rows_data = [
+        [
+            labels[i],
+            d1(lw[i], language),
+            d1(lw0[i], language),
+            d1(uncertainty[i], language),
+            d2(ft[i], language),
+            d1(unsigned[i], language),
+            d1(signed[i], language),
+            d2(fs[i], language),
+            _qualified_cell(criteria, i, language),
+        ]
+        for i in range(n)
+    ]
+    return power_value_table(header, rows_data, widths, fraction)
+
+
+def _precision_caption(result: Any, language: str = "en") -> str:
+    """The band-set caption, extended with the frequency range determined.
+
+    ISO 9614-3:2002 clause 4.3 covers the one-third-octave bands from 50 Hz to
+    6,3 kHz and requires a determination made over a more restricted range to
+    state that range. Naming the first and last band in the caption states it
+    where the reader meets the table, and costs the sheet no line of its own.
+    """
+    caption = fraction_caption(result, language)
+    frequencies = getattr(result, "frequencies", None)
+    n = np.asarray(result.sound_power_level, dtype=np.float64).size
+    if frequencies is None or n < 2:
+        return caption
+    labels, _fraction = band_labels(frequencies, n)
+    return t("{caption}, {lo} Hz to {hi} Hz", language).format(
+        caption=caption, lo=labels[0], hi=labels[-1]
+    )
+
+
+def _precision_omitted(result: Any, criteria: PrecisionCriteria | None) -> np.ndarray:
+    """The bands the A-weighted determination leaves out, per band.
+
+    Two rules put a band here, and the sheet has to distinguish them: the
+    method is not applicable to a band whose net power is non-positive (clause
+    9.2), and clause 10 f) 2) omits the contribution of a band whose Annex C
+    criteria are not satisfied. Without the criteria only the first rule can
+    be applied, and the strip says so.
+    """
+    omitted = np.asarray(result.not_applicable_band, dtype=bool).copy()
+    if criteria is not None and criteria.qualified is not None:
+        omitted |= ~np.asarray(criteria.qualified, dtype=bool)
+    return omitted
+
+
+def _precision_level_a(result: Any, omitted: np.ndarray) -> float:
+    """The A-weighted level the fiche boxes: the qualified bands only.
+
+    The result object sums every applicable band, because it is computed
+    before the Annex C criteria are evaluated. Clause 10 f) 2) requires the
+    bands the criteria reject to be dropped from the A-weighted determination,
+    so the fiche recombines the levels over the bands that survive both rules.
+    Recomputing is skipped when the criteria reject nothing, which keeps the
+    printed number identical to ``result.sound_power_level_a``.
+    """
+    not_applicable = np.asarray(result.not_applicable_band, dtype=bool)
+    if np.array_equal(omitted, not_applicable):
+        return float(result.sound_power_level_a)
+    from ..emission.sound_power_intensity import _precision_a_weighted_total
+
+    lw = np.asarray(result.sound_power_level, dtype=np.float64)
+    return _precision_a_weighted_total(
+        lw, omitted, getattr(result, "frequencies", None), lw.size
+    )
+
+
+def _precision_statement(
+    result: Any, level_a: float, language: str = "en"
+) -> tuple[str, list[str]]:
+    """The boxed precision result and its extended terms.
+
+    Boxes the A-weighted level of the qualified bands and states beside it the
+    quantities ISO 9614-3:2002 asks the report to carry: the band-summed total
+    ``LW`` with its normalized counterpart ``LW0`` (Eq. 10) on the same line,
+    the normalized A-weighted level ``LWA0``, since clause 10 f) 2) reports the
+    normalized quantity and the box heads the un-normalized one, the
+    measurement surface area and the expanded uncertainty of clause 4.3. The
+    single grade the method recognises is on the basis line above the table and
+    is not repeated here.
+    """
+    statement, _base = power_statement(result, language, level_a=level_a)
+    extended: list[str] = []
+    total = energy_sum(result.sound_power_level)
+    total_normalized = energy_sum(result.sound_power_level_normalized)
+    if math.isfinite(total):
+        extended.append(
+            t(
+                "Total L<sub>W</sub> = {value} dB, normalized L<sub>W0</sub> = "
+                "{normalized} dB re {ref}",
+                language,
+            ).format(
+                value=d1(total, language),
+                normalized=d1(total_normalized, language),
+                ref="1 pW",
+            )
+        )
+    offset = _normalization_offset(result)
+    if math.isfinite(level_a) and math.isfinite(offset):
+        extended.append(
+            t(
+                "Normalized L<sub>WA0</sub> = {value} dB(A) re {ref}", language
+            ).format(value=d1(level_a - offset, language), ref="1 pW")
+        )
+    extended.append(
+        t("Measurement surface S = {value} m<super>2</super>", language).format(
+            value=format_number(float(result.surface_area), language, decimals=2)
+        )
+    )
+    if math.isfinite(level_a):
+        extended.append(
+            t("Expanded uncertainty U = {value} dB", language).format(
+                value=d1(_COVERAGE_FACTOR * _SIGMA_A_WEIGHTED, language)
+            )
+        )
+    return statement, extended
+
+
+def _normalization_offset(result: Any) -> float:
+    """The applied meteorological normalization ``LW - LW0``, in dB (Eq. 10).
+
+    The term depends only on the test atmosphere, so it is the same in every
+    band; the first determinable band carries it for the whole sheet.
+    """
+    lw = np.asarray(result.sound_power_level, dtype=np.float64)
+    lw0 = np.asarray(result.sound_power_level_normalized, dtype=np.float64)
+    offset = lw - lw0
+    finite = offset[np.isfinite(offset)]
+    return float(finite[0]) if finite.size else float("nan")
+
+
+def _dynamic_capability(
+    residual_index: float | Sequence[float] | np.ndarray | None,
+) -> np.ndarray | None:
+    """``Ld = delta_pI0 - K`` with the fixed precision ``K``, or ``None``."""
+    if residual_index is None:
+        return None
+    return np.atleast_1d(np.asarray(residual_index, dtype=np.float64)) - _K_PRECISION
+
+
+def _precision_model_strip(
+    result: Any,
+    indicators: PrecisionFieldIndicators | None,
+    residual_index: float | Sequence[float] | np.ndarray | None,
+    language: str = "en",
+) -> str:
+    """The partial-power / normalization / field-indicator line of the strip."""
+    offset = _normalization_offset(result)
+    residual = (
+        None
+        if residual_index is None
+        else np.atleast_1d(np.asarray(residual_index, dtype=np.float64))
+    )
+    return t(
+        "L<sub>W</sub> = 10 lg(P/P<sub>0</sub>), P the sum of the "
+        "partial-surface powers P<sub>i</sub> = I<sub>n,i</sub> S<sub>i</sub>, "
+        "P<sub>0</sub> = 1 pW (ISO 9614-3:2002 Eq. 5/8/9); L<sub>W0</sub> = "
+        "L<sub>W</sub> &#8722; 15 lg[(B/101 325)(296,15/(273,15 + &#952;))] "
+        "refers it to 23 &#176;C, 101 325 Pa (Eq. 10), applied normalization "
+        "{offset} dB. Annex B indicators F<sub>T</sub> = {ft}, "
+        "F<sub>p|In|</sub> = {unsigned} dB, F<sub>pIn</sub> = {signed} dB, "
+        "F<sub>S</sub> = {fs}; pressure-residual intensity index "
+        "&#948;<sub>pI0</sub> = {residual} dB (IEC 61043), dynamic capability "
+        "L<sub>d</sub> = {ld} dB.",
+        language,
+    ).format(
+        offset=(
+            _ABSENT
+            if not math.isfinite(offset)
+            else format_number(offset, language, decimals=2)
+        ),
+        ft=_indicator_range(
+            None if indicators is None else indicators.ft, language, 2
+        ),
+        unsigned=_indicator_range(
+            None if indicators is None else indicators.f_pi_unsigned, language
+        ),
+        signed=_indicator_range(
+            None if indicators is None else indicators.f_pi_signed, language
+        ),
+        fs=_indicator_range(
+            None if indicators is None else indicators.fs, language, 2
+        ),
+        residual=_indicator_range(residual, language),
+        ld=_indicator_range(_dynamic_capability(residual_index), language),
+    )
+
+
+def _failed_criteria(criteria: PrecisionCriteria | None, i: int) -> list[int]:
+    """The numbers of the Annex C criteria that keep a band out.
+
+    Clause 10 f) 2) rejects a band on "criteria 1 to 4 or criteria 1 to 3 and
+    5", so criterion 5 is not a requirement of its own: it is the second route
+    past the field non-uniformity of criterion 4 (C.1.6.2). A band that misses
+    the scan-density ratio while satisfying criterion 4 has failed nothing, and
+    naming criterion 5 there would name a test the band never had to pass; a
+    band that fails both is reported against criterion 4, the one the standard
+    states as the requirement.
+    """
+    if criteria is None:
+        return []
+    numbered = (
+        criteria.criterion_1,
+        criteria.criterion_2,
+        criteria.criterion_3,
+    )
+    failed = [
+        number
+        for number, values in enumerate(numbered, start=1)
+        if values is not None and not bool(values[i])
+    ]
+    non_uniformity = bool(criteria.criterion_4[i]) or (
+        criteria.criterion_5 is not None and bool(criteria.criterion_5[i])
+    )
+    if not non_uniformity:
+        failed.append(4)
+    return failed
+
+
+def _omission_reason(
+    result: Any, criteria: PrecisionCriteria | None, i: int, language: str = "en"
+) -> str:
+    """Why a band is out of the A-weighted determination: clause 9.2, or which criteria."""
+    if bool(np.asarray(result.not_applicable_band, dtype=bool)[i]):
+        return t("clause 9.2", language)
+    failed = _failed_criteria(criteria, i)
+    if not failed:
+        # A caller may hand the fiche a qualification mask of its own, from an
+        # Annex C procedure carried out by hand; the sheet then knows the band
+        # was rejected without knowing which criterion did it.
+        return t("not qualified", language)
+    numbers = ", ".join(str(number) for number in failed)
+    if len(failed) == 1:
+        return t("criterion {numbers}", language).format(numbers=numbers)
+    return t("criteria {numbers}", language).format(numbers=numbers)
+
+
+def _omitted_band_list(
+    result: Any,
+    criteria: PrecisionCriteria | None,
+    omitted: np.ndarray,
+    language: str = "en",
+) -> str:
+    """The omitted bands, each with the rule that omitted it."""
+    labels, _fraction = band_labels(getattr(result, "frequencies", None), omitted.size)
+    unit = " Hz" if getattr(result, "frequencies", None) is not None else ""
+    return ", ".join(
+        f"{labels[i]}{unit} ({_omission_reason(result, criteria, i, language)})"
+        for i in range(omitted.size)
+        if bool(omitted[i])
+    )
+
+
+def _precision_criteria_strip(
+    result: Any,
+    criteria: PrecisionCriteria | None,
+    omitted: np.ndarray,
+    language: str = "en",
+) -> str:
+    """The Annex C qualification / uncertainty line, with the mandatory statement."""
+    text = t(
+        "Annex C qualifies a band when the two scans repeat within "
+        "|L<sub>In</sub>(1) &#8722; L<sub>In</sub>(2)| &#8804; s/2, s from "
+        "Table 1 (criterion 1), L<sub>d</sub> &#8805; F<sub>pIn</sub> with "
+        "K = 10 dB (2), F<sub>pIn</sub> &#8722; F<sub>p|In|</sub> &#8804; 3 dB "
+        "(3) and F<sub>S</sub> &#8804; 2 (4), or a doubled scan-line density "
+        "gives 0,83 &#8804; F<sub>S</sub>(1)/F<sub>S</sub>(2) &#8804; 1,2 (5), "
+        "which qualifies the band even where F<sub>S</sub>(2) &#8805; 2. The "
+        "A-weighted L<sub>WA</sub> sums the qualified bands only: a band whose "
+        "criteria are not satisfied is omitted (clause 10 f) 2)), even where "
+        "4.3 would allow a negligible contribution to be kept, as is a band "
+        "with net power P &#8804; 0, to which the method is not applicable "
+        "(clause 9.2). U is twice the Table 1 standard deviation of "
+        "reproducibility (clause 4.3, coverage probability 95 %); its "
+        "A-weighted value holds for the relatively flat 50 Hz to 6,3 kHz "
+        "spectrum of the Table 1 footnote.",
+        language,
+    )
+    parts = [text]
+    qualified = None if criteria is None else criteria.qualified
+    if criteria is None:
+        parts.append(
+            t(
+                "The Annex C qualification was not supplied with this "
+                "determination, so no band is omitted on its criteria.",
+                language,
+            )
+        )
+    elif qualified is None:
+        # precision_qualification leaves ``qualified`` unset when criterion 1
+        # or 2 could not be evaluated, which is a different statement from
+        # having been handed no criteria at all.
+        parts.append(
+            t(
+                "Criteria 1 and 2 were not both evaluated, so the "
+                "qualification is incomplete and no band is omitted on it.",
+                language,
+            )
+        )
+    # The list of omitted bands is the mandatory statement itself, and a band
+    # can be omitted under clause 9.2 with no qualification in sight, so it is
+    # printed whenever there is one to print.
+    if bool(np.any(omitted)):
+        parts.append(
+            t("Bands omitted from L<sub>WA</sub>: {bands}.", language).format(
+                bands=_omitted_band_list(result, criteria, omitted, language)
+            )
+        )
+    elif qualified is not None:
+        parts.append(
+            t(
+                "Every band satisfies the Annex C criteria; none is omitted "
+                "from L<sub>WA</sub>.",
+                language,
+            )
+        )
+    return " ".join(parts)
+
+
+def render_precision_intensity_report(
+    result: PrecisionIntensityResult,
+    path: str,
+    *,
+    metadata: ReportMetadata | None = None,
+    verbose: bool = False,
+    language: str = "en",
+    indicators: PrecisionFieldIndicators | None = None,
+    criteria: PrecisionCriteria | None = None,
+    residual_index: float | Sequence[float] | np.ndarray | None = None,
+) -> str:
+    """Render an ISO 9614-3 precision sound-power fiche to a PDF at ``path``.
+
+    :param result: A
+        :class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`
+        carrying the per-band ``sound_power_level``, its normalized
+        counterpart and the A-weighted total.
+    :param path: Destination path of the PDF file.
+    :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a bare
+        fiche (body + result + disclaimer, no header). A supplied
+        ``requirement`` is read as the declared A-weighted sound-power limit.
+    :param verbose: When ``True`` the per-band table adds the Annex B field
+        indicators and the per-band grade cell.
+    :param language: Fiche language: ``"en"`` (default) or ``"es"``.
+    :param indicators: Optional :class:`PrecisionFieldIndicators` (clause
+        10 f) 1)); tabulated with ``verbose`` and summarised in the strip.
+    :param criteria: Optional :class:`PrecisionCriteria`; its ``qualified``
+        mask drives the per-band grade cell and the clause 10 f) 2) omission.
+    :param residual_index: Optional pressure-residual intensity index
+        ``delta_pI0`` of the probe and analyser (clause 10 d) 5)), scalar or
+        per band; it yields the dynamic capability ``Ld`` of criterion 2.
+    :return: The written ``path`` as a :class:`str`.
+    :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
+        installed.
+    """
+    omitted = _precision_omitted(result, criteria)
+    level_a = _precision_level_a(result, omitted)
+    statement, extended = _precision_statement(result, level_a, language)
+    verdict = (
+        None
+        if metadata is None or metadata.requirement is None
+        else power_verdict(result, metadata.requirement, language, level_a=level_a)
+    )
+    return render_sound_power_fiche(
+        result, path,
+        copy=FicheCopy(
+            title=t("Sound power determination", language),
+            basis=_precision_basis(language),
+            caption=_precision_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[
+            _precision_model_strip(result, indicators, residual_index, language),
+            _precision_criteria_strip(result, criteria, omitted, language),
+        ],
+        ),
+        value_table=_precision_value_table(
+            result, indicators, criteria, verbose, language
+        ),
+        metadata=metadata,
+        language=language,
+        verdict=verdict,
+        figsize=_PRECISION_FIGSIZE,
     )

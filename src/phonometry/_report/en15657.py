@@ -46,6 +46,7 @@ import numpy as np
 from ._i18n import format_number, t
 from ._sound_power_fiche import (
     POWER_REFERENCE,
+    FicheCopy,
     band_labels,
     d1,
     level_limit_verdict,
@@ -216,15 +217,16 @@ def render_structure_borne_power_report(
             language,
         )
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Structure-borne sound power determination", language),
-        basis=_basis(language),
-        caption=_caption(result, language),
+        result, path,
+        copy=FicheCopy(
+            title=t("Structure-borne sound power determination", language),
+            basis=_basis(language),
+            caption=_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[_relation_strip(language), _conversion_strip(language)],
+        ),
         value_table=_value_table(result, verbose, language),
-        statement=statement,
-        extended=extended,
-        basis_strips=[_relation_strip(language), _conversion_strip(language)],
         metadata=metadata,
         language=language,
         verdict=verdict,

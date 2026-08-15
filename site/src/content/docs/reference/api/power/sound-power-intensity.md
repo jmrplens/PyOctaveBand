@@ -279,6 +279,78 @@ Plot the `LW` spectrum; non-applicable bands are hatched/greyed.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
+### PrecisionIntensityResult.report()
+
+```python
+PrecisionIntensityResult.report(
+    path: str,
+    *,
+    metadata: ReportMetadata | None = None,
+    engine: str = 'reportlab',
+    verbose: bool = False,
+    language: str = 'en',
+    indicators: PrecisionFieldIndicators | None = None,
+    criteria: PrecisionCriteria | None = None,
+    residual_index: float | Sequence[float] | np.ndarray | None = None,
+) -> str
+```
+
+Render an ISO 9614-3 precision sound-power determination fiche.
+
+Writes the one-page sound-power test sheet with what ISO 9614-3:2002
+clause 10 asks a report of this method to state: the standard-basis
+line naming the precision scanning method and its single accuracy
+grade, an optional metadata header (client, noise source, test
+environment, instrumentation, air temperature, relative humidity,
+barometric pressure and date, clause 10 a) to d)), a per-band table of
+the band sound-power level `LW`, the normalized level `LW0` the
+standard reports (Eq. 10, clause 10 f) 2)) and the expanded uncertainty
+`U` of clause 4.3 (clause 10 f) 4)), the sound-power spectrum
+`LW(f)` with the non-applicable bands hatched, the boxed A-weighted
+sound power level `LWA` (dB re 1 pW) with the totals, the measurement
+surface area and the grade, an optional verdict row against a declared
+limit, and a measurement-basis strip carrying the partial-power model,
+the meteorological normalization, the Annex B field indicators and the
+Annex C criteria.
+
+Supplying `criteria` makes the fiche state what clause 10 f) 2)
+requires it to state: the bands whose criteria are not satisfied are
+dropped from the A-weighted determination and named on the sheet
+alongside the bands the method is not applicable to (clause 9.2). The
+boxed `LWA` is then the level of the qualified bands, which differs
+from the result's own `sound_power_level_a` whenever a band is
+rejected; without `criteria` the fiche boxes the result's value and
+says that no qualification was supplied.
+
+The items of clause 10 that are free description rather than computed
+quantities (the scan geometry and speed, the drawing of the scanning
+paths, the scanning time per partial surface, the calibration and
+field-check history, the windscreen, and the probe-reversal checks of
+clause 6.2.3) belong in the metadata `notes` and `calibration`
+fields; the fiche prints them verbatim in its footer.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `path` | Destination path of the PDF file. |
+| `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata) supplying the header (`client`, `specimen` the noise source, `test_room` the test environment, `instrumentation`, `temperature`, `relative_humidity`, `pressure`, `test_date`), the footer identity (`laboratory`, `operator`, `report_id`, `notes`) and, via `requirement`, a declared A-weighted sound-power limit the fiche checks the result against (lower is better). |
+| `engine` | Rendering back end; only `"reportlab"` is supported. |
+| `verbose` | When `True` the per-band table adds the four Annex B field indicators and the per-band grade cell. |
+| `language` | Fiche language: `"en"` (default) or `"es"`. |
+| `indicators` | Optional [`PrecisionFieldIndicators`](/phonometry/reference/api/power/sound-power-intensity/#precisionfieldindicators) from [`precision_field_indicators`](/phonometry/reference/api/power/sound-power-intensity/#precision_field_indicators), tabulated per band with `verbose` and summarised in the basis strip (clause 10 f) 1)). |
+| `criteria` | Optional [`PrecisionCriteria`](/phonometry/reference/api/power/sound-power-intensity/#precisioncriteria) from [`precision_qualification`](/phonometry/reference/api/power/sound-power-intensity/#precision_qualification), which decides the per-band grade cell and the clause 10 f) 2) omission described above. |
+| `residual_index` | Optional pressure-residual intensity index `delta_pI0` of the probe and analyser (clause 10 d) 5)), a scalar or a per-band array; the strip states it and the dynamic capability `Ld = delta_pI0 - K` that criterion 2 tests. |
+
+**Returns:** The written `path` as a `str`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `engine` is not `"reportlab"`, `language` is unknown, or a supplied `indicators`, `criteria` or `residual_index` does not span the result's bands. |
+| ImportError | If reportlab (or, for the figure, matplotlib) is not installed (`pip install phonometry[report]`). |
+
 ## sound_power_intensity
 
 ```python

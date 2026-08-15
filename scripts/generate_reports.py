@@ -36,6 +36,7 @@ import argparse
 import os
 import sys
 from collections.abc import Callable, Sequence
+from typing import Any
 
 # The fiche builders live in the ``reports`` package beside this file. Running
 # this script puts ``scripts/`` on the import path for free, but loading the
@@ -84,6 +85,7 @@ from reports.emission import (
     _epnl_example,
     _intensity_sound_power_example,
     _iso4871_declaration_example,
+    _precision_intensity_example,
     _precision_sound_power_example,
     _reverberation_sound_power_example,
     _sound_power_example,
@@ -150,6 +152,17 @@ _DEFAULT_DIR = os.path.normpath(
 _PREVIEW_WIDTH_PX = 1000
 
 
+#: What a fiche factory returns: the result, the example metadata, the file it
+#: writes and, optionally, the extra ``report()`` keywords that fiche needs.
+#: Nearly every fiche prints from the result alone; the ISO 9614-3 sheet is
+#: handed the Annex B field indicators and the Annex C criteria its standard
+#: asks the report to state, which are measured beside the determination
+#: rather than carried by it.
+_Fiche = (
+    tuple[object, ReportMetadata, str]
+    | tuple[object, ReportMetadata, str, dict[str, Any]]
+)
+
 #: Every example fiche the repository keeps rendered, from the file it writes
 #: to the factory that builds it. New report kinds add an entry here so
 #: ``make reports`` regenerates the full set. Keyed by filename so that the set
@@ -157,7 +170,7 @@ _PREVIEW_WIDTH_PX = 1000
 #: asking "is every registered fiche committed?" needs, and calling the factory
 #: for it would run a full computation and build a plot for an answer already
 #: written here.
-_FICHES: dict[str, Callable[[], tuple[object, ReportMetadata, str]]] = {
+_FICHES: dict[str, Callable[[], _Fiche]] = {
     "iso717_airborne_example.pdf": _airborne_example,
     "iso717_impact_example.pdf": _impact_example,
     "iso16283_airborne_example.pdf": _field_airborne_example,
@@ -200,6 +213,7 @@ _FICHES: dict[str, Callable[[], tuple[object, ReportMetadata, str]]] = {
     "iso10846_transfer_stiffness_example.pdf": _transfer_stiffness_example,
     "iso3744_sound_power_example.pdf": _sound_power_example,
     "iso9614_sound_power_intensity_example.pdf": _intensity_sound_power_example,
+    "iso9614_3_precision_intensity_example.pdf": _precision_intensity_example,
     "iso3741_reverberation_power_example.pdf": _reverberation_sound_power_example,
     "iso7849_vibration_power_example.pdf": _vibration_sound_power_example,
     "en15657_structure_borne_power_example.pdf": _structure_borne_power_example,
@@ -231,9 +245,7 @@ _FICHES: dict[str, Callable[[], tuple[object, ReportMetadata, str]]] = {
 }
 
 #: The registered factories alone, in generation order.
-_EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = list(
-    _FICHES.values()
-)
+_EXAMPLES: list[Callable[[], _Fiche]] = list(_FICHES.values())
 
 
 def preview_path_for(pdf_path: str) -> str:
@@ -270,21 +282,25 @@ def _write_preview(pdf_path: str) -> str:
 
 def generate_reports(
     output_dir: str,
-    examples: Sequence[Callable[[], tuple[object, ReportMetadata, str]]] | None = None,
+    examples: Sequence[Callable[[], _Fiche]] | None = None,
 ) -> list[str]:
     """Write every example fiche (PDF + WebP preview) into ``output_dir``.
 
     ``examples`` restricts the run to a subset of the registered factories
     (the test suite renders one fiche per test); the default renders the
-    full registry. Returns the PDF paths written; each has a paired
-    ``.webp`` preview next to it (see :func:`preview_path_for`).
+    full registry. A factory may return a fourth element, the extra keywords
+    its ``report()`` takes beyond the metadata. Returns the PDF paths written;
+    each has a paired ``.webp`` preview next to it (see
+    :func:`preview_path_for`).
     """
     os.makedirs(output_dir, exist_ok=True)
     written: list[str] = []
     for factory in _EXAMPLES if examples is None else examples:
-        result, metadata, name = factory()
+        fiche = factory()
+        result, metadata, name = fiche[0], fiche[1], fiche[2]
+        kwargs: dict[str, Any] = fiche[3] if len(fiche) == 4 else {}
         path = os.path.join(output_dir, name)
-        result.report(path, metadata=metadata)  # type: ignore[attr-defined]
+        result.report(path, metadata=metadata, **kwargs)  # type: ignore[attr-defined]
         _write_preview(path)
         written.append(path)
     return written

@@ -93,6 +93,8 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
@@ -689,6 +691,60 @@ class PrecisionCriteria:
     qualified: np.ndarray | None
 
 
+def _check_report_bands(
+    indicators: PrecisionFieldIndicators | None,
+    criteria: PrecisionCriteria | None,
+    residual_index: float | Sequence[float] | np.ndarray | None,
+    n_bands: int,
+) -> None:
+    """Reject fiche inputs that do not span the determination's bands.
+
+    The indicators, the criteria and the residual index are measured beside
+    the determination rather than derived from it, so nothing has yet forced
+    them onto the same band set. A mismatch would print one band's indicator
+    against another band's level, which is the one error an accredited sheet
+    must not make, so it is refused here rather than rendered.
+    """
+    arrays: list[tuple[str, np.ndarray]] = []
+    if indicators is not None:
+        arrays += [
+            (f"indicators.{name}", np.asarray(values))
+            for name, values in (
+                ("ft", indicators.ft),
+                ("f_pi_unsigned", indicators.f_pi_unsigned),
+                ("f_pi_signed", indicators.f_pi_signed),
+                ("fs", indicators.fs),
+            )
+            if values is not None
+        ]
+    if criteria is not None:
+        arrays += [
+            (f"criteria.{name}", np.asarray(values))
+            for name, values in (
+                ("criterion_1", criteria.criterion_1),
+                ("criterion_2", criteria.criterion_2),
+                ("criterion_3", criteria.criterion_3),
+                ("criterion_4", criteria.criterion_4),
+                ("criterion_5", criteria.criterion_5),
+                ("qualified", criteria.qualified),
+            )
+            if values is not None
+        ]
+    if residual_index is not None:
+        index = np.atleast_1d(np.asarray(residual_index, dtype=np.float64))
+        if index.size not in (1, n_bands):
+            raise ValueError(
+                f"'residual_index' must be a scalar or span the {n_bands} "
+                f"bands of the determination; got {index.size} values."
+            )
+    for name, values in arrays:
+        if values.shape != (n_bands,):
+            raise ValueError(
+                f"'{name}' must span the {n_bands} bands of the determination; "
+                f"got shape {values.shape}."
+            )
+
+
 @dataclass(frozen=True)
 class PrecisionIntensityResult:
     r"""Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
@@ -722,6 +778,104 @@ class PrecisionIntensityResult:
 
         check_language(language)
         return plot_sound_power(self, ax=ax, language=language, **kwargs)
+
+    def report(
+        self,
+        path: str,
+        *,
+        metadata: ReportMetadata | None = None,
+        engine: str = "reportlab",
+        verbose: bool = False,
+        language: str = "en",
+        indicators: PrecisionFieldIndicators | None = None,
+        criteria: PrecisionCriteria | None = None,
+        residual_index: float | Sequence[float] | np.ndarray | None = None,
+    ) -> str:
+        """Render an ISO 9614-3 precision sound-power determination fiche.
+
+        Writes the one-page sound-power test sheet with what ISO 9614-3:2002
+        clause 10 asks a report of this method to state: the standard-basis
+        line naming the precision scanning method and its single accuracy
+        grade, an optional metadata header (client, noise source, test
+        environment, instrumentation, air temperature, relative humidity,
+        barometric pressure and date, clause 10 a) to d)), a per-band table of
+        the band sound-power level ``LW``, the normalized level ``LW0`` the
+        standard reports (Eq. 10, clause 10 f) 2)) and the expanded uncertainty
+        ``U`` of clause 4.3 (clause 10 f) 4)), the sound-power spectrum
+        ``LW(f)`` with the non-applicable bands hatched, the boxed A-weighted
+        sound power level ``LWA`` (dB re 1 pW) with the totals, the measurement
+        surface area and the grade, an optional verdict row against a declared
+        limit, and a measurement-basis strip carrying the partial-power model,
+        the meteorological normalization, the Annex B field indicators and the
+        Annex C criteria.
+
+        Supplying ``criteria`` makes the fiche state what clause 10 f) 2)
+        requires it to state: the bands whose criteria are not satisfied are
+        dropped from the A-weighted determination and named on the sheet
+        alongside the bands the method is not applicable to (clause 9.2). The
+        boxed ``LWA`` is then the level of the qualified bands, which differs
+        from the result's own ``sound_power_level_a`` whenever a band is
+        rejected; without ``criteria`` the fiche boxes the result's value and
+        says that no qualification was supplied.
+
+        The items of clause 10 that are free description rather than computed
+        quantities (the scan geometry and speed, the drawing of the scanning
+        paths, the scanning time per partial surface, the calibration and
+        field-check history, the windscreen, and the probe-reversal checks of
+        clause 6.2.3) belong in the metadata ``notes`` and ``calibration``
+        fields; the fiche prints them verbatim in its footer.
+
+        :param path: Destination path of the PDF file.
+        :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying
+            the header (``client``, ``specimen`` the noise source, ``test_room``
+            the test environment, ``instrumentation``, ``temperature``,
+            ``relative_humidity``, ``pressure``, ``test_date``), the footer
+            identity (``laboratory``, ``operator``, ``report_id``, ``notes``)
+            and, via ``requirement``, a declared A-weighted sound-power limit
+            the fiche checks the result against (lower is better).
+        :param engine: Rendering back end; only ``"reportlab"`` is supported.
+        :param verbose: When ``True`` the per-band table adds the four Annex B
+            field indicators and the per-band grade cell.
+        :param language: Fiche language: ``"en"`` (default) or ``"es"``.
+        :param indicators: Optional :class:`PrecisionFieldIndicators` from
+            :func:`precision_field_indicators`, tabulated per band with
+            ``verbose`` and summarised in the basis strip (clause 10 f) 1)).
+        :param criteria: Optional :class:`PrecisionCriteria` from
+            :func:`precision_qualification`, which decides the per-band grade
+            cell and the clause 10 f) 2) omission described above.
+        :param residual_index: Optional pressure-residual intensity index
+            ``delta_pI0`` of the probe and analyser (clause 10 d) 5)), a scalar
+            or a per-band array; the strip states it and the dynamic capability
+            ``Ld = delta_pI0 - K`` that criterion 2 tests.
+        :return: The written ``path`` as a :class:`str`.
+        :raises ValueError: If ``engine`` is not ``"reportlab"``, ``language``
+            is unknown, or a supplied ``indicators``, ``criteria`` or
+            ``residual_index`` does not span the result's bands.
+        :raises ImportError: If reportlab (or, for the figure, matplotlib) is
+            not installed (``pip install phonometry[report]``).
+        """
+        from .._i18n import check_language
+
+        check_language(language)
+        if engine != "reportlab":
+            raise ValueError(
+                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            )
+        n_bands = int(np.asarray(self.sound_power_level).size)
+        _check_report_bands(indicators, criteria, residual_index, n_bands)
+
+        from .._report.iso9614 import render_precision_intensity_report
+
+        return render_precision_intensity_report(
+            self,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
+            indicators=indicators,
+            criteria=criteria,
+            residual_index=residual_index,
+        )
 
 
 def precision_field_indicators(
