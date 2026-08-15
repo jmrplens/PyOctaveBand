@@ -364,10 +364,10 @@ matters for selection:
   pressure drop the silencer becomes the noise source.
 
 phonometry models the reactive family in closed form on this page. The
-dissipative side enters through the installation data of the
-[HVAC methods](noise-control.md): the lined-elbow insertion loss and the
-lined plenum attenuation of Wells' method, both from interpolated ASHRAE
-data rather than a liner model. The porous physics that a first-principles
+dissipative side enters at installation level, through the
+[HVAC methods](noise-control.md): the lined-elbow insertion loss read from
+tabulated ASHRAE data and the lined plenum attenuation from Wells' closed
+form, neither of them a liner model. The porous physics that a first-principles
 liner calculation needs, the equivalent-fluid models fed by the airflow
 resistivity, is the same material theory as
 [Porous and Multilayer Absorbers](../../materials/absorbers/porous-absorbers.md).
@@ -405,9 +405,10 @@ the insertion loss a supplier publishes.
 
 **Not covered.** Reactive elements only. Dissipative (absorptive, duct-lining)
 silencers are discussed for selection but never modelled from liner properties,
-and the lined-elbow and plenum data of the
-[HVAC methods](noise-control.md) are interpolated installation tables, not a
-liner model. Mean-flow effects — convection, temperature gradients, the
+and in the [HVAC methods](noise-control.md) the lined-elbow figure is a table
+lookup (Bies Table 8.11) and the plenum is Wells' closed form driven by a
+declared mean absorption — neither is a liner model.
+Mean-flow effects — convection, temperature gradients, the
 flow-dependent impedance of perforates — are outside the no-flow element
 matrices used here. Nothing on this page is a measurement: no part of ISO 7235
 is implemented, shell breakout and the end corrections at the area jumps are

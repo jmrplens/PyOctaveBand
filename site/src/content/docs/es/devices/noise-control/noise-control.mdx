@@ -265,8 +265,9 @@ plt.show()
 
 </details>
 
-Los métodos de reflexión de extremo y de codos interpolan las tablas ASHRAE
-(pasan exactamente por los nodos tabulados); los métodos de plenum (Wells) y de
+El método de reflexión de extremo interpola su tabla ASHRAE (pasa exactamente
+por los nodos tabulados) y el de codos lee la Tabla 8.11 según la banda en la
+que cae su $W/\lambda$; los métodos de plenum (Wells) y de
 ruido de flujo (VDI 2081) son formas cerradas. `end_reflection_loss`,
 `elbow_insertion_loss`, `flow_noise_straight_duct` y `flow_noise_bend` devuelven
 un `HvacSpectrumResult` (atenuación o nivel de potencia acústica regenerada) con

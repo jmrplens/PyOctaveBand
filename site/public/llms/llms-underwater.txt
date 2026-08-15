@@ -1510,7 +1510,7 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  computed kr1
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exact
 ```
 
-## 3. Ray tracing: travel times and convergence zones
+## 3. Ray tracing: turning points and convergence zones
 
 In the high-frequency limit the Helmholtz equation collapses to the eikonal
 equation, and its characteristics are **rays**: trajectories integrated from
@@ -1551,7 +1551,7 @@ print(round(z_turn, 1))                     # 583.3  analytic turning depth
 print(round(float(rays.depths.max()), 1))   # 583.7  traced
 ```
 
-Rays buy geometry: eigenray paths, travel times and convergence-zone ranges
+Rays buy geometry: paths, turning depths and convergence-zone ranges
 at a cost independent of frequency. What they do not carry here is a full
 amplitude: the geometric ray-tube intensity diverges at caustics, so the
 result object returns the paths and leaves the level to the modal or PE
@@ -1657,12 +1657,12 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 
 | Solver | Natural regime | What it buys you |
 |---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
+| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, convergence zones; cost independent of frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
 | `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
-frequencies for travel-time work, and the PE remains the workhorse well above
+frequencies for path-geometry work, and the PE remains the workhorse well above
 its formal small-angle regime. When two of the three agree on a case, as the
 modes and the PE do in the section 1 figure, that agreement is the practical
 convergence test.
@@ -1687,7 +1687,7 @@ equation is why they all live in one module.
 ### Which underwater propagation solver should I use?
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
-frequency and deep water (eigenray geometry and travel times at a cost
+frequency and deep water (ray-path geometry and convergence zones at a cost
 independent of frequency), normal modes for low frequency in shallow water
 (few propagating modes, $m < kD/\pi$, the reference solution for its
 regime) and the parabolic equation for low-frequency, long one-way paths

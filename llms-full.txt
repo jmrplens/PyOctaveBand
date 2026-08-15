@@ -6847,9 +6847,12 @@ related EN 12354-5, lives in
 
 ## What this section does not cover
 
-**The library starts after the microphone.** Every function here accepts
-per-position spectra and energy-averages them for you, but nothing verifies
-how the measurement was made: not the number and placement of the source and
+**The library starts after the microphone.** The field, laboratory, survey and
+intensity routines that form an insulation index accept per-position spectra
+and energy-average them for you; the heavy-impact standardization, the
+flanking indices, the ISO 717 ratings and the background-noise helpers take
+their per-band input already formed. Either way, nothing verifies how the
+measurement was made: not the number and placement of the source and
 microphone positions behind those spectra, not the low-frequency procedures
 of ISO 16283-1/-2, and not the test-facility and mounting requirements of
 ISO 10140-1. Those are the operator's responsibility and the report's, and
@@ -16730,11 +16733,12 @@ Three specific absences are worth knowing before you plan a job. ISO 9614-1's
 discrete fixed-point power summation is **not implemented at all** — only its
 field indicators are, reused by the scanning routes. Dissipative duct-lining
 silencers are **not modelled from liner properties** anywhere: the reactive
-elements are computed exactly, and the lined-elbow figure is a table lookup
-(Bies Table 8.11) and the plenum Wells' closed form driven by a declared mean
-absorption — neither is a liner model. And no page here predicts a panel's
-transmission loss: `enclosure_insertion_loss` combines a value you supply with
-the interior correction, and the prediction itself is [Insulation
+elements are computed exactly within the no-flow plane-wave model, and the
+lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum Wells'
+closed form driven by a declared mean absorption — neither is a liner model.
+And no page here predicts a panel's transmission loss:
+`enclosure_insertion_loss` combines a value you supply with the interior
+correction, and the prediction itself is [Insulation
 design](https://jmrplens.github.io/phonometry/buildings/design/).
 
 Editions are pinned rather than current in two places: the distortion metrics
@@ -17953,8 +17957,9 @@ over interior volume) — the two numbers a prediction never captures.
 ## What this guide covers
 
 **Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods —
-`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
-tables), `hvac.plenum_attenuation` (Wells' closed form) and
+`hvac.end_reflection_loss` (interpolated table) and
+`hvac.elbow_insertion_loss` (Table 8.11 lookup),
+`hvac.plenum_attenuation` (Wells' closed form) and
 `hvac.flow_noise_straight_duct` / `flow_noise_bend` (VDI 2081) — and the
 machine-enclosure insertion loss of Bies §7.4, Eqs. (7.103) and (7.111),
 through `enclosure_insertion_loss`, which combines a supplied panel
@@ -17963,9 +17968,11 @@ transmission loss with the interior room-constant correction, together with the
 
 **Not covered.** The reactive elements — expansion chambers, side branches,
 extended tubes — live in [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/). Dissipative duct-lining
-silencers are modelled from liner properties nowhere in the library; the lined
-elbow and the plenum here are interpolated installation tables. Nothing on this
-page is a measurement: the ISO 11546 procedure of section 2 is described so a
+silencers are modelled from liner properties nowhere in the library: the
+lined-elbow figure here is a table lookup (Bies Table 8.11) and the plenum is
+Wells' closed form driven by a declared mean absorption — neither is a liner
+model. Nothing on this page is a measurement: the ISO 11546 procedure of
+section 2 is described so a
 declared figure can be read, not implemented. Structure-borne transmission from
 a machine into its enclosure or its slab is outside every model here.
 
@@ -18827,10 +18834,10 @@ matters for selection:
   pressure drop the silencer becomes the noise source.
 
 phonometry models the reactive family in closed form on this page. The
-dissipative side enters through the installation data of the
-[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the lined-elbow insertion loss and the
-lined plenum attenuation of Wells' method, both from interpolated ASHRAE
-data rather than a liner model. The porous physics that a first-principles
+dissipative side enters at installation level, through the
+[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the lined-elbow insertion loss read from
+tabulated ASHRAE data and the lined plenum attenuation from Wells' closed
+form, neither of them a liner model. The porous physics that a first-principles
 liner calculation needs, the equivalent-fluid models fed by the airflow
 resistivity, is the same material theory as
 [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/).
@@ -18868,9 +18875,10 @@ the insertion loss a supplier publishes.
 
 **Not covered.** Reactive elements only. Dissipative (absorptive, duct-lining)
 silencers are discussed for selection but never modelled from liner properties,
-and the lined-elbow and plenum data of the
-[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) are interpolated installation tables, not a
-liner model. Mean-flow effects — convection, temperature gradients, the
+and in the [HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) the lined-elbow figure is a table
+lookup (Bies Table 8.11) and the plenum is Wells' closed form driven by a
+declared mean absorption — neither is a liner model.
+Mean-flow effects — convection, temperature gradients, the
 flow-dependent impedance of perforates — are outside the no-flow element
 matrices used here. Nothing on this page is a measurement: no part of ISO 7235
 is implemented, shell breakout and the end corrections at the area jumps are
@@ -49126,7 +49134,7 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  computed kr1
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exact
 ```
 
-## 3. Ray tracing: travel times and convergence zones
+## 3. Ray tracing: turning points and convergence zones
 
 In the high-frequency limit the Helmholtz equation collapses to the eikonal
 equation, and its characteristics are **rays**: trajectories integrated from
@@ -49167,7 +49175,7 @@ print(round(z_turn, 1))                     # 583.3  analytic turning depth
 print(round(float(rays.depths.max()), 1))   # 583.7  traced
 ```
 
-Rays buy geometry: eigenray paths, travel times and convergence-zone ranges
+Rays buy geometry: paths, turning depths and convergence-zone ranges
 at a cost independent of frequency. What they do not carry here is a full
 amplitude: the geometric ray-tube intensity diverges at caustics, so the
 result object returns the paths and leaves the level to the modal or PE
@@ -49273,12 +49281,12 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 
 | Solver | Natural regime | What it buys you |
 |---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
+| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, convergence zones; cost independent of frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
 | `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
-frequencies for travel-time work, and the PE remains the workhorse well above
+frequencies for path-geometry work, and the PE remains the workhorse well above
 its formal small-angle regime. When two of the three agree on a case, as the
 modes and the PE do in the section 1 figure, that agreement is the practical
 convergence test.
@@ -49303,7 +49311,7 @@ equation is why they all live in one module.
 ### Which underwater propagation solver should I use?
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
-frequency and deep water (eigenray geometry and travel times at a cost
+frequency and deep water (ray-path geometry and convergence zones at a cost
 independent of frequency), normal modes for low frequency in shallow water
 (few propagating modes, $m < kD/\pi$, the reference solution for its
 regime) and the parabolic equation for low-frequency, long one-way paths

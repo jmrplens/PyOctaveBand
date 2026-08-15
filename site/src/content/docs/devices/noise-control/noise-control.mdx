@@ -254,8 +254,9 @@ plt.show()
 
 </details>
 
-The end-reflection and elbow methods interpolate the ASHRAE tables (they pass
-exactly through the tabulated nodes); the plenum (Wells) and flow-noise (VDI
+The end-reflection method interpolates its ASHRAE table (it passes exactly
+through the tabulated nodes) and the elbow method reads Table 8.11 by the band
+its $W/\lambda$ falls in; the plenum (Wells) and flow-noise (VDI
 2081) methods are closed forms. `end_reflection_loss`, `elbow_insertion_loss`,
 `flow_noise_straight_duct` and `flow_noise_bend` return an `HvacSpectrumResult`
 (attenuation or regenerated sound power level) with `.plot()`; `plenum_attenuation`
