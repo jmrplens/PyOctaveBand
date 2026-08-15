@@ -57,8 +57,8 @@ _FREQS = np.array([200, 250, 315, 400, 500], dtype=float)
 # Uniform per-band signed normal intensity (W/m^2), shared by every segment.
 _INTENSITY = np.array([1.0e-5, 2.0e-5, 3.0e-5, 2.5e-5, 1.5e-5])
 _N_SEG = 4
-_SEG_AREA = 0.5
-_SURFACE = _N_SEG * _SEG_AREA  # 2.0 m^2
+_SEG_AREA = 0.6
+_SURFACE = _N_SEG * _SEG_AREA  # 2.4 m^2
 # Test atmosphere: warm and at altitude, so the Eq. 10 normalization is
 # visible at the one decimal the fiche prints.
 _TEMPERATURE = 30.0
@@ -82,6 +82,17 @@ def _extract_text(path: str) -> str:
 
     raw = "\n".join(page.extract_text() for page in PdfReader(path).pages)
     return " ".join(raw.split())
+
+
+def _row(label: str, *cells: str) -> str:
+    """A table row as the text extraction lays it out, cell by cell.
+
+    Asserting a whole row rather than a lone number is what makes these tests
+    discriminating: a bare "2.0" is also the boxed expanded uncertainty, and a
+    band level printed to one decimal collides with the A-weighted total often
+    enough to have hidden a wrong value once.
+    """
+    return " ".join((label, *cells))
 
 
 def _determination(intensity: np.ndarray = _INTENSITY, freqs: np.ndarray = _FREQS):
@@ -169,23 +180,32 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
 
-    # A-weighted total to one decimal, boxed with its reference power.
-    assert f"{_oracle_lwa():.1f}" in text
-    assert "re 1 pW" in text
-    # Two band levels and their normalized counterparts (315 Hz and 400 Hz).
+    # The A-weighted total heads the boxed statement.
+    assert (
+        f"Sound power level LWA = {_oracle_lwa():.1f} dB(A) re 1 pW" in text
+    )
+    # Every band row: nominal label, LW, its normalized counterpart and the
+    # Table 1 expanded uncertainty of that band.
     lw = _oracle_lw()
     lw0 = lw - _oracle_normalization()
-    for index in (2, 3):
-        assert f"{lw[index]:.1f}" in text
-        assert f"{lw0[index]:.1f}" in text
+    for index, freq in enumerate(_FREQS):
+        assert _row(
+            f"{freq:g}",
+            f"{lw[index]:.1f}",
+            f"{lw0[index]:.1f}",
+            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+        ) in text
     # The Eq. 10 normalization is stated in the basis strip, to two decimals.
-    assert f"{_oracle_normalization():.2f}".replace("-", "−") in text
-    # Nominal band labels, the band-set caption and the range it covers.
+    assert (
+        "applied normalization "
+        f"{_oracle_normalization():.2f}".replace("-", "−") + " dB" in text
+    )
+    # The band-set caption names the range the determination covers.
     assert "One-third-octave-band sound power levels, 200 Hz to 500 Hz" in text
-    # Method, grade and the measurement surface S = 2.00 m2.
+    # Method, grade and the measurement surface S = 2.40 m2.
     assert "ISO 9614-3:2002" in text
     assert "precision grade (accuracy grade 1)" in text
-    assert "2.00" in text
+    assert f"Measurement surface S = {_SURFACE:.2f} m2" in text
 
 
 def test_uncertainty_column_follows_table_1(tmp_path) -> None:
@@ -197,12 +217,20 @@ def test_uncertainty_column_follows_table_1(tmp_path) -> None:
     # 160 Hz -> 2*2,0 = 4,0 dB; 200 to 315 Hz -> 2*1,5 = 3,0 dB; 400 and
     # 500 Hz -> 2*1,0 = 2,0 dB.
     freqs = np.array([160, 200, 250, 315, 400, 500], dtype=float)
-    res = _determination(np.full(freqs.size, 2.0e-5), freqs)
+    intensity = np.full(freqs.size, 2.0e-5)
+    res = _determination(intensity, freqs)
     out = tmp_path / "uncertainty.pdf"
     res.report(str(out))
     text = _extract_text(str(out))
-    for freq in freqs:
-        assert f"{2.0 * _SIGMA_R0[int(freq)]:.1f}" in text
+    lw = _oracle_lw(intensity)
+    lw0 = lw - _oracle_normalization()
+    for index, freq in enumerate(freqs):
+        assert _row(
+            f"{freq:g}",
+            f"{lw[index]:.1f}",
+            f"{lw0[index]:.1f}",
+            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+        ) in text
     assert "Table 1 standard deviation of reproducibility" in text
 
 
@@ -212,19 +240,25 @@ def test_octave_bands_have_no_tabulated_uncertainty(tmp_path) -> None:
     pytest.importorskip("svglib")
     pytest.importorskip("matplotlib")
     freqs = np.array([250, 500, 1000, 2000], dtype=float)
-    res = _determination(_INTENSITY[:4], freqs)
+    intensity = _INTENSITY[:4]
+    res = _determination(intensity, freqs)
     out = tmp_path / "octave.pdf"
     res.report(str(out))
     text = _extract_text(str(out))
     assert "Octave-band sound power levels, 250 Hz to 2000 Hz" in text
-    assert "—" in text
+    lw = _oracle_lw(intensity)
+    lw0 = lw - _oracle_normalization()
+    # Every row ends in an em dash where the uncertainty would be, and no row
+    # carries a tabulated value: Table 1 does not cover an octave band.
+    for index, freq in enumerate(freqs):
+        assert _row(f"{freq:g}", f"{lw[index]:.1f}", f"{lw0[index]:.1f}", "—") in text
 
 
 # --- Annex B tabulation (verbose) ---------------------------------------------
 
 
 def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
-    """verbose=True adds the four Annex B indicators and the grade cell."""
+    """verbose=True tabulates the four Annex B indicators and the qualification."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
     pytest.importorskip("matplotlib")
@@ -235,13 +269,51 @@ def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     flat = "".join(text.split())
-    for header in ("FT", "Fp|In|", "FpIn", "FS"):
+    for header in ("FT", "Fp|In|", "FpIn", "FS", "Qualified"):
         assert header in flat
-    assert "Grade" in text
-    # Every band clears Ld = 5 dB with a 2 dB indicator, so each grade cell
-    # reports the single accuracy grade of the method.
+    # Every band clears Ld = 5 dB with a 2 dB indicator, so every band
+    # qualifies; the uniform field makes FS vanish, and FT is an em dash
+    # because no per-window intensity was supplied.
     assert criteria.qualified is not None
     assert criteria.qualified.tolist() == [True] * _FREQS.size
+    lw = _oracle_lw()
+    lw0 = lw - _oracle_normalization()
+    for index, freq in enumerate(_FREQS):
+        assert _row(
+            f"{freq:g}",
+            f"{lw[index]:.1f}",
+            f"{lw0[index]:.1f}",
+            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+            "—",          # FT: no time-window intensity was supplied
+            "2.0",        # Fp|In|: the margin the pressure levels were built with
+            "2.0",        # FpIn: equal to it, every segment radiating outward
+            "0.00",       # FS: a uniform field has no non-uniformity
+            "yes",
+        ) in text
+
+
+def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
+    """The verbose cell reads no for the band Annex C rejects, yes for the rest."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    res = _determination()
+    indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
+    out = tmp_path / "verbose_reject.pdf"
+    res.report(str(out), verbose=True, indicators=indicators, criteria=criteria)
+    text = _extract_text(str(out))
+    lw = _oracle_lw()
+    lw0 = lw - _oracle_normalization()
+    # The 200 Hz row carries its 8 dB indicators and closes with the rejection.
+    assert _row(
+        "200", f"{lw[0]:.1f}", f"{lw0[0]:.1f}", "3.0", "—", "8.0", "8.0",
+        "0.00", "no",
+    ) in text
+    # The 250 Hz row, one tier down in Table 1, qualifies.
+    assert _row(
+        "250", f"{lw[1]:.1f}", f"{lw0[1]:.1f}", "3.0", "—", "2.0", "2.0",
+        "0.00", "yes",
+    ) in text
 
 
 # --- clause 10 f) 2) omission -------------------------------------------------
@@ -269,12 +341,18 @@ def test_failing_band_is_omitted_and_named(tmp_path) -> None:
     )
     _assert_one_page(str(out))
     text = _extract_text(str(out))
-    # The boxed LWA is the total over the qualified bands, not the result's own.
+    # The boxed LWA is the total over the qualified bands, and the result's own
+    # unscreened total is nowhere on the sheet.
     keep = np.array([False, True, True, True, True])
-    assert f"{_oracle_lwa(keep):.1f}" in text
+    qualified = _oracle_lwa(keep)
+    assert f"{qualified:.1f}" != f"{_oracle_lwa():.1f}"
+    assert f"Sound power level LWA = {qualified:.1f} dB(A) re 1 pW" in text
+    assert f"Sound power level LWA = {_oracle_lwa():.1f}" not in text
     assert "Bands omitted from LWA: 200 Hz (criterion 2)" in text
-    # The strip states the dynamic capability the criterion was judged against.
-    assert "5.0" in text
+    # The strip states the dynamic capability the criterion was judged against,
+    # which is not the residual index printed beside it.
+    assert "dynamic capability Ld = 5.0 dB" in text
+    assert f"δpI0 = {_RESIDUAL_INDEX:.1f} dB" in text
 
 
 def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
@@ -313,7 +391,7 @@ def test_without_criteria_the_fiche_says_so(tmp_path) -> None:
     res.report(str(out))
     text = _extract_text(str(out))
     assert "The Annex C qualification was not supplied" in text
-    assert f"{_oracle_lwa():.1f}" in text
+    assert f"Sound power level LWA = {_oracle_lwa():.1f} dB(A) re 1 pW" in text
 
 
 def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
@@ -416,7 +494,7 @@ def test_verdict_follows_the_boxed_level(tmp_path) -> None:
         criteria=criteria,
     )
     text = _extract_text(str(out))
-    assert f"{qualified:.1f}" in text
+    assert f"LWA = {qualified:.1f} dB(A), declared limit" in text
     assert "PASS" in text
 
 
@@ -489,6 +567,7 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
         "Superficie de medición",
         "Incertidumbre expandida",
         "El Anexo C cualifica una banda",
+        "punto f) 2) del capítulo 10",
         "Bandas omitidas de LWA: 200 Hz (criterio 2)",
     ):
         assert spanish in text, spanish
@@ -497,9 +576,11 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
         "precision grade (accuracy grade 1)",
         "One-third-octave-band sound power levels",
         "Expanded uncertainty",
+        "Normalized L",
         "Annex C qualifies a band",
         "Bands omitted from",
         "criterion 2",
+        "clause 10 f) 2)",
     ):
         assert english not in text, english
     # Comma decimal separator on the A-weighted total of the qualified bands.
@@ -508,6 +589,127 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
 
 
 # --- rendering contract -------------------------------------------------------
+
+
+def test_incomplete_qualification_is_stated_as_such(tmp_path) -> None:
+    """Criteria that could not be closed are not the same as criteria withheld.
+
+    ``precision_qualification`` leaves ``qualified`` unset when criterion 1 or
+    2 could not be evaluated, which is what a caller with indicators but no
+    residual index gets. The sheet has to say that rather than deny having
+    received a qualification it did receive.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    res = _determination()
+    scan = np.tile(_INTENSITY, (_N_SEG, 1))
+    indicators = precision_field_indicators(
+        scan, 10.0 * np.log10(np.abs(scan) / 1.0e-12) + 2.0
+    )
+    criteria = precision_qualification(indicators, frequencies=_FREQS)
+    assert criteria.qualified is None
+    out = tmp_path / "incomplete.pdf"
+    res.report(str(out), indicators=indicators, criteria=criteria)
+    text = _extract_text(str(out))
+    assert "Criteria 1 and 2 were not both evaluated" in text
+    assert "The Annex C qualification was not supplied" not in text
+
+
+def test_criterion_5_is_not_reported_as_a_failure(tmp_path) -> None:
+    """A band satisfying criterion 4 is never named against criterion 5.
+
+    Clause 10 f) 2) rejects a band on criteria 1 to 4, or on criteria 1 to 3
+    and 5: criterion 5 is the second route past the field non-uniformity, not
+    a requirement of its own, so a band that misses the scan-density ratio
+    while satisfying criterion 4 has failed nothing on that account.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    res = _determination()
+    indicators, _base = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
+    level = 10.0 * np.log10(
+        np.abs(np.mean(np.tile(_INTENSITY, (_N_SEG, 1)), axis=0)) / 1.0e-12
+    )
+    # A doubled scan density that halves the non-uniformity fails criterion 5
+    # everywhere, while criterion 4 (a uniform field) passes everywhere.
+    criteria = precision_qualification(
+        indicators,
+        scan_intensity_level_1=level,
+        scan_intensity_level_2=level + 0.1,
+        pressure_residual_index=_RESIDUAL_INDEX,
+        field_nonuniformity_1=np.full(_FREQS.size, 1.0),
+        field_nonuniformity_2=np.full(_FREQS.size, 2.0),
+        frequencies=_FREQS,
+    )
+    assert criteria.criterion_5 is not None
+    assert not criteria.criterion_5.any()
+    assert criteria.criterion_4.all()
+    out = tmp_path / "criterion5.pdf"
+    res.report(str(out), indicators=indicators, criteria=criteria)
+    text = _extract_text(str(out))
+    assert "Bands omitted from LWA: 200 Hz (criterion 2)" in text
+    assert "criteria 2, 5" not in text
+
+
+def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
+    """Without band frequencies there is no A-weighting, and the box says so."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    scan = np.tile(_INTENSITY, (_N_SEG, 1))
+    res = sound_power_intensity_precision(
+        scan,
+        np.full(_N_SEG, _SEG_AREA),
+        temperature=_TEMPERATURE,
+        barometric_pressure=_PRESSURE_PA,
+    )
+    out = tmp_path / "unbanded.pdf"
+    res.report(str(out))
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    total = 10.0 * np.log10(np.sum(10.0 ** (_oracle_lw() / 10.0)))
+    assert f"Sound power level LW = {total:.1f} dB re 1 pW" in text
+    assert "Band 1" in text
+    assert "dB(A)" not in text
+
+
+def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
+    """An odd wide band set pairs cleanly, the last right-hand row left empty."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    freqs = np.array(list(_CK_THIRD)[:9], dtype=float)
+    intensity = np.full(freqs.size, 2.0e-5)
+    res = _determination(intensity, freqs)
+    out = tmp_path / "odd.pdf"
+    res.report(str(out))
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    lw = _oracle_lw(intensity)
+    lw0 = lw - _oracle_normalization()
+    for index, freq in enumerate(freqs):
+        assert _row(
+            f"{freq:g}",
+            f"{lw[index]:.1f}",
+            f"{lw0[index]:.1f}",
+            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+        ) in text
+
+
+def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path) -> None:
+    """A residual index measured band by band is stated as its range."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    res = _determination()
+    residual = np.array([12.0, 13.0, 14.0, 15.0, 16.0])
+    out = tmp_path / "per_band_residual.pdf"
+    res.report(str(out), residual_index=residual)
+    text = _extract_text(str(out))
+    assert "δpI0 = 12.0 to 16.0 dB" in text
+    assert "dynamic capability Ld = 2.0 to 6.0 dB" in text
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:

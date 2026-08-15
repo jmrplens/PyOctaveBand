@@ -339,15 +339,19 @@ band; the caption names the frequency range the determination covers, because
 clause 4.3 asks for it whenever that range is narrower than 50 Hz to 6.3 kHz.
 A one-third-octave set is printed in two column groups side by side, the way
 an accredited sheet fits that many bands on a page. `verbose=True` tabulates
-the four Annex B indicators $F_T$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_S$ per band
-(clause 10 f) 1)) and the grade cell the criteria decide.
+the four Annex B indicators $F_T$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_S$ per band,
+the tabulation clause 10 f) 1) asks for, over the measurement surface as
+Annex B defines them, and the qualification cell the criteria decide.
 
-Hand it the Annex C qualification and the sheet does what clause 10 f) 2)
+Hand it an Annex C qualification and the sheet does what clause 10 f) 2)
 makes mandatory: the bands whose criteria are not satisfied are dropped from
 the A-weighted determination and named on the sheet, next to the bands the
 method is not applicable to at all (clause 9.2). That is why the boxed
 $L_{WA}$ can differ from `result.sound_power_level_a`, which is computed
 before any criterion is evaluated and therefore sums every applicable band.
+Beside it the box states the normalized $L_{WA0}$, since clause 10 f) 2)
+reports the normalized quantity while the headline number is the level a
+declared limit is written against.
 Without `criteria` the fiche boxes the result's own value and says that no
 qualification was supplied. `residual_index` puts the probe's
 pressure-residual intensity index on the sheet (clause 10 d) 5)) with the
@@ -359,27 +363,34 @@ time and the probe-reversal checks, go in the metadata `notes`.
 import numpy as np
 from phonometry import ReportMetadata, emission
 
-# The determination of section 2, its Annex B indicators and its Annex C
-# criteria: four partial surfaces over five one-third-octave bands, with the
-# 250 Hz band net-negative (clause 9.2) and a probe of delta_pI0 = 15 dB.
-freqs = np.array([250, 500, 1000, 2000, 4000], float)
-areas = np.array([0.5, 1.0, 0.75, 0.5])
-base_intensity = np.array([2.0e-6, 8.0e-6, 2.0e-5, 1.0e-5, 3.0e-6])
-partial_intensity = base_intensity[None, :] * np.array([1.0, 1.1, 0.9, 1.05])[:, None]
-partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]
-result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
+# A box measurement surface: five partial surfaces, each scanned in four
+# segments, over the one-third-octave bands 200 Hz to 800 Hz. Part 3 works in
+# one-third octaves, which is the band set Table 1 tabulates its uncertainty
+# and its criterion-1 tolerance for.
+third_octave = np.array([200, 250, 315, 400, 500, 630, 800], float)
+faces = np.array([1.65, 1.575, 1.575, 1.155, 1.155])
+scanned = 1.2e-5 * np.array([1.3, 1.1, 0.8, 0.9, 0.9])[:, None] * np.ones(7)
+segment_intensity = np.repeat(scanned, 4, axis=0)
+# The pressure-intensity margin per band: 8 dB at 200 Hz, where the hall is
+# reverberant, 2 dB above it.
+margin = np.array([8.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0])
+segment_levels = 10 * np.log10(segment_intensity / 1e-12) + margin
 
-ind = emission.precision_field_indicators(partial_intensity, np.full((4, 5), 74.0))
-scan1 = 10.0 * np.log10(np.abs(partial_intensity.mean(axis=0)) / 1e-12)
-crit = emission.precision_qualification(
-    ind, scan_intensity_level_1=scan1,
-    scan_intensity_level_2=scan1 + np.array([0.9, 0.2, 0.1, 0.3, 0.4]),
-    pressure_residual_index=15.0,
-    field_nonuniformity_1=ind.fs, field_nonuniformity_2=0.95 * ind.fs,
-    frequencies=freqs,
+precise = emission.sound_power_intensity_precision(
+    scanned, faces, frequencies=third_octave,
+    temperature=28.0, barometric_pressure=94_000.0,
 )
+annex_b = emission.precision_field_indicators(segment_intensity, segment_levels)
+scan_level = 10 * np.log10(scanned.mean(axis=0) / 1e-12)
+annex_c = emission.precision_qualification(
+    annex_b, scan_intensity_level_1=scan_level,
+    scan_intensity_level_2=scan_level + 0.1,
+    pressure_residual_index=15.0,          # Ld = 15 - 10 = 5 dB
+    frequencies=third_octave,
+)
+print(annex_c.qualified.tolist())   # [False, True, True, True, True, True, True]
 
-result.report(
+precise.report(
     "sound_power_intensity_precision.pdf",
     metadata=ReportMetadata(
         client="Example manufacturing plant",
@@ -390,10 +401,10 @@ result.report(
         laboratory="Phonometry reference example",
         report_id="EXAMPLE-9614-3",
         requirement=98.0,
-        notes="Box surface at 0,25 m; four partial surfaces scanned twice.",
+        notes="Box surface at 0,25 m; five partial surfaces scanned twice.",
     ),
-    indicators=ind, criteria=crit, residual_index=15.0,
-)   # 250 Hz omitted (clause 9.2), 4 kHz omitted (criterion 2)
+    indicators=annex_b, criteria=annex_c, residual_index=15.0,
+)   # 200 Hz fails criterion 2 and is named as omitted from LWA
 ```
 
 The example fiche in the repository is a fuller determination of the same
@@ -401,7 +412,7 @@ machine: sixteen one-third-octave bands from 100 Hz to 3150 Hz over a
 five-face box surface, with the 100 Hz band failing criterion 2 and named as
 omitted. Click the preview to open the PDF:
 
-[![ISO 9614-3 precision sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment, the intensity probe and the 28 degrees Celsius and 94 kPa test atmosphere, the one-third-octave table from 100 Hz to 3150 Hz in two column groups giving the band sound-power level LW, the normalized level LW0 and the expanded uncertainty U, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 96.7 dB(A) re 1 pW with the total LW = 97.9 dB, the normalized total LW0 = 98.5 dB, the measurement surface S = 7.11 m2, the expanded uncertainty U = 2.0 dB and the precision grade, and a PASS verdict against the declared 98 dB(A) limit, closed by a basis strip stating the partial-power model, the meteorological normalization, the Annex B field indicators and the five Annex C criteria, and naming the 100 Hz band as omitted from LWA for criterion 2](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.pdf)
+[![ISO 9614-3 precision sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment, the intensity probe and the 28 degrees Celsius and 94 kPa test atmosphere, the one-third-octave table from 100 Hz to 3150 Hz in two column groups giving the band sound-power level LW, the normalized level LW0 and the expanded uncertainty U, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 96.7 dB(A) re 1 pW with the total LW = 97.9 dB, the normalized total LW0 = 98.5 dB, the normalized A-weighted level LWA0 = 97.3 dB(A), the measurement surface S = 7.11 m2 and the expanded uncertainty U = 2.0 dB, and a PASS verdict against the declared 98 dB(A) limit, closed by a basis strip stating the partial-power model, the meteorological normalization, the Annex B field indicators and the five Annex C criteria, and naming the 100 Hz band as omitted from LWA for criterion 2](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_3_precision_intensity_example.pdf)
 
 *Precision sound power by intensity fiche
 (`PrecisionIntensityResult.report`), an ISO 9614-3 grade-1 scan with the

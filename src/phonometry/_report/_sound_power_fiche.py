@@ -108,18 +108,24 @@ def band_labels(frequencies: np.ndarray | None, n: int) -> tuple[list[str], int]
     return labels, fraction
 
 
-def range_str(values: np.ndarray, language: str = "en") -> str:
-    """Format a per-band quantity as a single value or an ``a to b`` range."""
+def range_str(values: np.ndarray, language: str = "en", decimals: int = 1) -> str:
+    """Format a per-band quantity as a single value or an ``a to b`` range.
+
+    ``decimals`` is the precision the quantity is read at: one decimal for a
+    level in decibels, two for a dimensionless field indicator judged against a
+    threshold of 0,6 or 2 (ISO 9614-3:2002 Annex C). A spread below half the
+    last printed digit is one value rather than a range.
+    """
     arr = np.asarray(values, dtype=np.float64)
     arr = arr[np.isfinite(arr)]
     if arr.size == 0:
         return "—"
     lo, hi = float(np.min(arr)), float(np.max(arr))
-    if abs(hi - lo) < 0.05:
-        return f"{format_number(lo, language, decimals=1)}"
+    if abs(hi - lo) < 0.5 * 10.0**-decimals:
+        return f"{format_number(lo, language, decimals=decimals)}"
     return t("{lo} to {hi}", language).format(
-        lo=format_number(lo, language, decimals=1),
-        hi=format_number(hi, language, decimals=1),
+        lo=format_number(lo, language, decimals=decimals),
+        hi=format_number(hi, language, decimals=decimals),
     )
 
 

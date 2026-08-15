@@ -19,15 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   determination covers, the four Annex B field indicators `FT`, `Fp|In|`,
   `FpIn` and `FS` tabulated with `verbose=True` and summarised in the basis
   strip beside the probe's pressure-residual intensity index and the dynamic
-  capability it yields, and the five Annex C criteria with the per-band grade
-  cell they decide. Handed that qualification, the sheet makes the statement
-  clause 10 f) 2) requires: the bands whose criteria are not satisfied leave
-  the A-weighted determination and are named with the criterion that rejected
-  them, beside the bands the method is not applicable to at all (clause 9.2).
-  The screening is the fiche's own, because the result object computes its
-  A-weighted total before any criterion has been evaluated, so the boxed `LWA`
-  is the qualified-band level and the requirement verdict is taken on the
-  number the reader sees. A one-third-octave band set prints in two column
+  capability it yields, and the five Annex C criteria with the per-band
+  qualification cell they decide. Handed that qualification, the sheet makes
+  the statement clause 10 f) 2) requires: the bands whose criteria are not
+  satisfied leave the A-weighted determination and are named with the criterion
+  that rejected them, beside the bands the method is not applicable to at all
+  (clause 9.2). The screening is the fiche's own, because the result object
+  computes its A-weighted total before any criterion has been evaluated, so the
+  boxed `LWA` is the qualified-band level, the requirement verdict is taken on
+  the number the reader sees, and the normalized `LWA0` the standard reports
+  stands beside it. A one-third-octave band set prints in two column
   groups side by side, the way an accredited sheet fits that many bands on a
   page: the committed example is a sixteen-band determination from 100 Hz to
   3150 Hz over a five-face box measurement surface, whose 100 Hz band fails the

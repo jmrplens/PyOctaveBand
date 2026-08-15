@@ -643,16 +643,20 @@ determinación, porque el apartado 4.3 lo exige cuando ese rango es más estrech
 que de 50 Hz a 6,3 kHz. Un conjunto de tercios de octava se imprime en dos
 grupos de columnas contiguos, como una hoja acreditada encaja tantas bandas en
 una página. `verbose=True` tabula por banda los cuatro indicadores del Anexo B
-$F_T$, $F_{p|I_n|}$, $F_{pI_n}$ y $F_S$ (apartado 10 f) 1)) y la celda de grado
-que deciden los criterios.
+$F_T$, $F_{p|I_n|}$, $F_{pI_n}$ y $F_S$, la tabulación que pide el punto f) 1)
+del capítulo 10, sobre la superficie de medición tal como los define el Anexo B,
+y la celda de cualificación que deciden los criterios.
 
-Si le pasas la cualificación calculada arriba, la hoja hace lo que el apartado
+Si le pasas una cualificación del Anexo C, la hoja hace lo que el apartado
 10 f) 2) declara obligatorio: las bandas cuyos criterios del Anexo C no se
 cumplen quedan fuera de la determinación ponderada A y se nombran en la hoja,
 junto a las bandas a las que el método no es aplicable en absoluto (apartado
 9.2). Por eso el $L_{WA}$ del recuadro puede diferir de
 `result.sound_power_level_a`, que se calcula antes de evaluar ningún criterio y
-por tanto suma todas las bandas aplicables. Sin `criteria`, la ficha recuadra el
+por tanto suma todas las bandas aplicables. A su lado el recuadro indica el
+$L_{WA0}$ normalizado, porque el punto f) 2) del capítulo 10 declara la magnitud
+normalizada mientras que el número principal es el nivel frente al que se
+escribe un límite declarado. Sin `criteria`, la ficha recuadra el
 valor del propio resultado e indica que no se aportó cualificación.
 `residual_index` pone en la hoja el índice presión-intensidad residual de la
 sonda (apartado 10 d) 5)) con la capacidad dinámica $L_d$ que se deduce de él;
@@ -661,11 +665,38 @@ geometría y la velocidad del barrido, el tiempo de barrido y las comprobaciones
 con la sonda invertida, van en el campo `notes` de los metadatos.
 
 ```python
-from phonometry import ReportMetadata
+import numpy as np
+from phonometry import ReportMetadata, emission
 
-# result, ind y crit son la determinación de precisión, sus indicadores del
-# Anexo B y sus criterios del Anexo C de los dos bloques anteriores.
-result.report(
+# Una superficie de medida en caja: cinco superficies parciales, cada una
+# barrida en cuatro segmentos, sobre las bandas de tercio de octava de 200 Hz
+# a 800 Hz. La parte 3 trabaja en tercios de octava, que es el conjunto de
+# bandas para el que la Tabla 1 tabula su incertidumbre y la tolerancia del
+# criterio 1.
+third_octave = np.array([200, 250, 315, 400, 500, 630, 800], float)
+faces = np.array([1.65, 1.575, 1.575, 1.155, 1.155])
+scanned = 1.2e-5 * np.array([1.3, 1.1, 0.8, 0.9, 0.9])[:, None] * np.ones(7)
+segment_intensity = np.repeat(scanned, 4, axis=0)
+# El margen presión-intensidad por banda: 8 dB a 200 Hz, donde la nave es
+# reverberante, y 2 dB por encima.
+margin = np.array([8.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0])
+segment_levels = 10 * np.log10(segment_intensity / 1e-12) + margin
+
+precise = emission.sound_power_intensity_precision(
+    scanned, faces, frequencies=third_octave,
+    temperature=28.0, barometric_pressure=94_000.0,
+)
+annex_b = emission.precision_field_indicators(segment_intensity, segment_levels)
+scan_level = 10 * np.log10(scanned.mean(axis=0) / 1e-12)
+annex_c = emission.precision_qualification(
+    annex_b, scan_intensity_level_1=scan_level,
+    scan_intensity_level_2=scan_level + 0.1,
+    pressure_residual_index=15.0,          # Ld = 15 - 10 = 5 dB
+    frequencies=third_octave,
+)
+print(annex_c.qualified.tolist())   # [False, True, True, True, True, True, True]
+
+precise.report(
     "sound_power_intensity_precision.pdf",
     metadata=ReportMetadata(
         client="Planta de fabricación de ejemplo",
@@ -676,11 +707,11 @@ result.report(
         laboratory="Laboratorio de referencia Phonometry",
         report_id="EXAMPLE-9614-3",
         requirement=98.0,
-        notes="Superficie en caja a 0,25 m; cuatro superficies parciales barridas dos veces.",
+        notes="Superficie en caja a 0,25 m; cinco superficies parciales barridas dos veces.",
     ),
-    indicators=ind, criteria=crit, residual_index=15.0,
+    indicators=annex_b, criteria=annex_c, residual_index=15.0,
     language="es",
-)   # 250 Hz omitida (apartado 9.2), 4 kHz omitida (criterio 2)
+)   # la banda de 200 Hz incumple el criterio 2 y se nombra como omitida del LWA
 ```
 
 La ficha de ejemplo del repositorio es una determinación más completa de la
@@ -691,7 +722,7 @@ criterio 2 y nombrada como omitida.
 <ReportPreview
 	name="iso9614_3_precision_intensity_example"
 	title="Informe de ejemplo de potencia acústica por intensidad de precisión ISO 9614-3 (PDF)"
-	description="Ficha de una página de determinación de potencia acústica por intensidad de precisión ISO 9614-3: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo en nave, la sonda de intensidad y la atmósfera de ensayo de 28 grados Celsius y 94 kPa, la tabla en tercios de octava de 100 Hz a 3150 Hz en dos grupos de columnas con el nivel de potencia acústica de banda LW, el nivel normalizado LW0 y la incertidumbre expandida U, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 96,7 dB(A) re 1 pW con el LW total = 97,9 dB, el LW0 total normalizado = 98,5 dB, la superficie de medición S = 7,11 m2, la incertidumbre expandida U = 2,0 dB y el grado de precisión, y un veredicto CUMPLE frente al límite declarado de 98 dB(A), cerrada por una franja de base que indica el modelo de potencia parcial, la normalización meteorológica, los indicadores de campo del Anexo B y los cinco criterios del Anexo C, y que nombra la banda de 100 Hz como omitida del LWA por el criterio 2."
+	description="Ficha de una página de determinación de potencia acústica por intensidad de precisión ISO 9614-3: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo en nave, la sonda de intensidad y la atmósfera de ensayo de 28 grados Celsius y 94 kPa, la tabla en tercios de octava de 100 Hz a 3150 Hz en dos grupos de columnas con el nivel de potencia acústica de banda LW, el nivel normalizado LW0 y la incertidumbre expandida U, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 96,7 dB(A) re 1 pW con el LW total = 97,9 dB, el LW0 total normalizado = 98,5 dB, el nivel ponderado A normalizado LWA0 = 97,3 dB(A), la superficie de medición S = 7,11 m2 y la incertidumbre expandida U = 2,0 dB, y un veredicto CUMPLE frente al límite declarado de 98 dB(A), cerrada por una franja de base que indica el modelo de potencia parcial, la normalización meteorológica, los indicadores de campo del Anexo B y los cinco criterios del Anexo C, y que nombra la banda de 100 Hz como omitida del LWA por el criterio 2."
 	caption="Ficha de potencia acústica por intensidad de precisión (PrecisionIntensityResult.report), un barrido ISO 9614-3 de grado 1 con los niveles normalizados, la incertidumbre por banda y la omisión del Anexo C declarada."
 />
 
