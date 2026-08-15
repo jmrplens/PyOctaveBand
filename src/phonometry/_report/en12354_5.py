@@ -48,6 +48,7 @@ import numpy as np
 from ._i18n import t
 from ._sound_power_fiche import (
     POWER_REFERENCE,
+    FicheCopy,
     band_labels,
     d1,
     level_limit_verdict,
@@ -222,20 +223,19 @@ def render_installed_structure_borne_report(
             language,
         )
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Predicted installed structure-borne sound", language),
-        basis=_basis(language),
-        caption=_caption(result, language),
+        result, path,
+        copy=FicheCopy(
+            title=t("Predicted installed structure-borne sound", language),
+            basis=_basis(language),
+            caption=_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[_relation_strip(language), _prediction_strip(language)],
+        ),
         value_table=_value_table(result, verbose, language),
-        statement=statement,
-        extended=extended,
-        basis_strips=[_relation_strip(language), _prediction_strip(language)],
         metadata=metadata,
         language=language,
         verdict=verdict,
-        disclaimer=(
-            "Predicted result: the values relate only to the modelled "
-            "configuration, not to a tested specimen."
-        ),
+        disclaimer="Predicted result: the values relate only to the modelled "
+            "configuration, not to a tested specimen.",
     )

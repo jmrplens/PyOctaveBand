@@ -9,6 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The ISO 9614-3 precision determination renders its own accredited-style
+  fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
+  sheet carrying what part 3 asks a report to state (clause 10), which is not
+  what part 2 asks: the normalized level `LW0` of Eq. 10 beside `LW` in the
+  per-band table, the expanded uncertainty of clause 4.3 band by band (twice
+  the Table 1 standard deviation of reproducibility, an em dash where the table
+  has no row for the band), a caption naming the frequency range the
+  determination covers, the four Annex B field indicators `FT`, `Fp|In|`,
+  `FpIn` and `FS` tabulated with `verbose=True` and summarised in the basis
+  strip beside the probe's pressure-residual intensity index and the dynamic
+  capability it yields, and the five Annex C criteria with the per-band
+  qualification cell they decide. Handed that qualification, the sheet makes
+  the statement clause 10 f) 2) requires: the bands whose criteria are not
+  satisfied leave the A-weighted determination and are named with the criterion
+  that rejected them, beside the bands the method is not applicable to at all
+  (clause 9.2). The screening is the fiche's own, because the result object
+  computes its A-weighted total before any criterion has been evaluated, so the
+  boxed `LWA` is the qualified-band level, the requirement verdict is taken on
+  the number the reader sees, and the normalized `LWA0` the standard reports
+  stands beside it. A one-third-octave band set prints in two column
+  groups side by side, the way an accredited sheet fits that many bands on a
+  page: the committed example is a sixteen-band determination from 100 Hz to
+  3150 Hz over a five-face box measurement surface, whose 100 Hz band fails the
+  dynamic-capability criterion and is named as omitted. With this the guide's
+  coverage claim that both scanning results render the accredited-style fiche,
+  narrowed to the truth by the coverage audit, holds again.
+- Silencer layouts built by hand can now be drawn. A layout none of the four
+  named devices covers gets a `.plot_geometry()` alongside its transfer matrix,
+  through `SilencerChain`. It cascades the same `duct_matrix`, `shunt_matrix`
+  and `cascade` calls the four-pole method has always taken, and keeps what
+  each element was handed, so one call feeds both the matrix and the drawing
+  and the two cannot drift apart. The drawing shows exactly what
+  the elements declare and not a millimetre more: the ducts to scale with
+  their lengths, bores, area steps and overall run dimensioned, and each side
+  branch marked at the station where it joins, because a shunt is handed an
+  impedance and an impedance fixes no length, no area and no volume. A branch
+  is lettered with its name and with the frequency at which its impedance is
+  least, which is the one thing it does say about itself, and the drawing
+  states underneath that it is marked rather than drawn. `.result()` closes
+  the loop with the transmission loss, the plane-wave limit of the widest
+  section of the chain, and the usual `.plot()` and `.report()`.
 - The underwater ray solver returns travel times. `ray_trace` now carries
   `travel_times` on its `RayTraceResult`, one cumulative arrival per ray
   sample, integrated as a third state of the Runge-Kutta step that already

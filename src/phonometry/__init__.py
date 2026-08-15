@@ -1080,6 +1080,8 @@ from .noise_control.room_to_room import (
 )
 from .noise_control.silencers import (
     ReactiveSilencerResult,
+    SilencerChain,
+    SilencerChainElement,
     cascade,
     duct_matrix,
     expansion_chamber,
@@ -2002,6 +2004,8 @@ __all__ = [
     "ShipSourceLevelResult",
     "ShipTrafficSpectrum",
     "SignalSource",
+    "SilencerChain",
+    "SilencerChainElement",
     "SlitResonatorAbsorberResult",
     "SlowSoundAbsorberWarning",
     "SonarEquationResult",

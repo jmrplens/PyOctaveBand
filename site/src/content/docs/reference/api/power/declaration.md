@@ -38,7 +38,7 @@ This module models a declaration as [`NoiseEmissionDeclaration`](/phonometry/ref
 [`OperatingModeDeclaration`](/phonometry/reference/api/power/declaration/#operatingmodedeclaration) values (one per operating mode, clause 4), and
 renders it as an ISO 4871 declaration fiche through `.report`. A
 declaration is most often built from a measured sound power via
-[`declare`](/phonometry/reference/api/power/sound-power/).
+[`declare`](/phonometry/reference/api/power/sound-power/#soundpowerresultdeclare).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

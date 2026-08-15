@@ -65,6 +65,7 @@ from .materials import (
 )
 from .noise_control import (
     plot_plenum_geometry,
+    plot_silencer_chain_geometry,
     plot_silencer_geometry,
     plot_silencer_result_geometry,
 )
@@ -119,6 +120,7 @@ __all__ = [
     "plot_pp_probe_geometry",
     "plot_qrd_geometry",
     "plot_radiation_result_geometry",
+    "plot_silencer_chain_geometry",
     "plot_silencer_geometry",
     "plot_silencer_result_geometry",
     "plot_slit_absorber_geometry",

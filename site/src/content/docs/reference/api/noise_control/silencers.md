@@ -81,6 +81,15 @@ dropping to `0` at $kL = n \pi$ (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
 
+**Layouts of your own.** Anything the four named devices do not cover is built
+by cascading elements directly. [`SilencerChain`](/phonometry/reference/api/noise_control/silencers/#silencerchain) does that through the
+same [`duct_matrix`](/phonometry/reference/api/noise_control/silencers/#duct_matrix), [`shunt_matrix`](/phonometry/reference/api/noise_control/silencers/#shunt_matrix) and [`cascade`](/phonometry/reference/api/noise_control/silencers/#cascade) calls while
+keeping the arguments each element was given, which is what lets a hand-built
+chain be drawn ([`SilencerChain.plot_geometry`](/phonometry/reference/api/noise_control/silencers/#silencerchainplot_geometry)) and not only computed. The
+drawing shows the ducts to scale and marks the branch points, because that is
+the whole of what the elements declare: a duct element is handed a length and
+an area, a shunt element only an impedance.
+
 **Validity.** All of this is one-dimensional: it holds while the duct and the
 chamber carry plane waves only, that is below the first higher-order-mode
 cut-on frequency of the widest cross section
@@ -460,6 +469,7 @@ ReactiveSilencerResult(
     resonances: np.ndarray | None = None,
     geometry: dict[str, float] | None = None,
     plane_wave_limit: float | None = None,
+    chain: SilencerChain | None = None,
 )
 ```
 
@@ -475,8 +485,9 @@ Transmission and insertion loss of a reactive silencer over frequency.
 | `transfer_matrix` | The compound `(n_freq, 2, 2)` four-pole matrix. |
 | `kind` | A short label of the device (e.g. `"expansion chamber"`). |
 | `resonances` | Notable resonance frequencies, Hz (e.g. the resonator tuning frequency), or `None`. |
-| `geometry` | The defining geometry the constructor was called with (keys matching its keyword names, e.g. `length`/`chamber_area`/ `pipe_area` for a chamber), retained so `plot_geometry` can draw the device; appended after the original fields and `None` for hand-built results. |
+| `geometry` | The defining geometry the constructor was called with (keys matching its keyword names, e.g. `length`/`chamber_area`/ `pipe_area` for a chamber), retained so `plot_geometry` can draw the device; appended after the original fields and `None` for hand-built results that were not assembled by a [`SilencerChain`](/phonometry/reference/api/noise_control/silencers/#silencerchain). |
 | `plane_wave_limit` | The first higher-order-mode cut-on frequency of the widest cross section of the device, Hz (Norton & Karczub Eq. 7.6, [`phonometry.noise_control.duct_modes.plane_wave_limit`](/phonometry/reference/api/noise_control/duct-modes/#plane_wave_limit)). The four-pole algebra of this module is one-dimensional and is valid below it; above it several modes propagate at once and the result describes the plane-wave mode only, which is why a [`PlaneWaveWarning`](/phonometry/reference/api/noise_control/duct-modes/#planewavewarning) is raised when the analysis reaches past it. `None` for hand-built results that do not retain their geometry. |
+| `chain` | The [`SilencerChain`](/phonometry/reference/api/noise_control/silencers/#silencerchain) that assembled this result, for a result built by [`SilencerChain.result`](/phonometry/reference/api/noise_control/silencers/#silencerchainresult), and `None` otherwise. A chain is a list of four-pole elements rather than a named device, so it carries its geometry element by element instead of in `geometry`; `plot_geometry` draws whichever of the two is present. |
 
 ### ReactiveSilencerResult.plot()
 
@@ -506,14 +517,26 @@ ReactiveSilencerResult.plot_geometry(
 
 Draw the silencer cross-section to scale (dimensioned side cut).
 
+A named device is drawn from its `geometry`; a result assembled by a
+[`SilencerChain`](/phonometry/reference/api/noise_control/silencers/#silencerchain) is drawn from that `chain`, duct by duct.
+
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+
+**Returns:** The axes.
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the result does not retain its `geometry`. |
+| ValueError | If the result retains neither its `geometry` nor the `chain` that built it. |
 
 ### ReactiveSilencerResult.report()
 
@@ -577,6 +600,243 @@ Four-pole matrix of a side branch of impedance `Z_b` (Bies Eq. (8.144)).
 | `branch_impedance` | Acoustic impedance `Z_b` of the branch, Pa s/m3 (1-D complex array over frequency). |
 
 **Returns:** A `(n_freq, 2, 2)` complex transfer-matrix array.
+
+## SilencerChain
+
+```python
+SilencerChain(
+    frequencies: ArrayLike,
+    *,
+    speed_of_sound: float = 343.0,
+    density: float = 1.206,
+)
+```
+
+A chain of four-pole elements that remembers the geometry it was given.
+
+[`duct_matrix`](/phonometry/reference/api/noise_control/silencers/#duct_matrix), [`shunt_matrix`](/phonometry/reference/api/noise_control/silencers/#shunt_matrix) and [`cascade`](/phonometry/reference/api/noise_control/silencers/#cascade) build any
+silencer layout the named devices do not cover, but they return bare
+matrices: the compound matrix of a hand-built chain is a stack of complex
+numbers, and nothing in it recalls that the first element was a 300 mm run
+of 200 mm duct. This class calls the same three functions and keeps the
+arguments, so the chain can be drawn (`plot_geometry`) as well as
+evaluated (`result`), and the drawing cannot drift from the model
+because one call produces both.
+
+Elements are added in order from inlet to outlet, and each adder returns
+the chain so the calls read as the device does:
+
+```text
+chain = (
+    SilencerChain(frequencies)
+    .duct(0.30, 0.0314)
+    .shunt(quarter_wave_impedance(frequencies, 0.686, 0.0079))
+    .duct(0.60, 0.1257)
+    .duct(0.30, 0.0314)
+)
+```
+
+What the drawing may show follows from what the elements know. A duct is
+drawn to scale from its declared length and area; a shunt declares an
+impedance, which fixes no length, no area and no volume, so it is marked
+at the station where it joins the run and nothing about its shape is
+invented (see `plot_geometry`).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Frequencies `f`, Hz (1-D array), shared by every element of the chain. |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `density` | Air density `rho`, kg/m3. |
+
+### SilencerChain.duct()
+
+```python
+SilencerChain.duct(length: float, area: float) -> SilencerChain
+```
+
+Append a straight duct of length `L` and area `S`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `length` | Duct length `L`, m. A zero-length duct is the identity matrix, so it is neither computed against nor drawn. |
+| `area` | Cross-sectional area `S`, m2. |
+
+**Returns:** The chain, so the calls can be written one after another.
+
+### SilencerChain.elements
+
+*property*
+
+The recorded elements, in order from inlet to outlet.
+
+**Returns:** The elements added so far.
+
+### SilencerChain.frequencies
+
+*property*
+
+The analysis frequencies shared by every element, Hz.
+
+**Returns:** The frequency grid the chain was built on.
+
+### SilencerChain.plot_geometry()
+
+```python
+SilencerChain.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+) -> Axes
+```
+
+Draw the chain: its ducts to scale, its branch points marked.
+
+Every duct is drawn at its declared length and equivalent circular
+diameter `d = 2 sqrt(S / pi)`, so the runs, the area steps between
+them and the overall length are read off the page. A shunt element
+holds an impedance and no geometry at all, so it is not drawn as a
+stub of any length: it is marked with a leader at the station where it
+joins the run, carrying its label and, when the analysis grid resolves
+one, the frequency at which it comes closest to shorting the duct.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+
+**Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the chain holds no duct of positive length, and so has no geometry and no scale to draw at. |
+
+### SilencerChain.result()
+
+```python
+SilencerChain.result(
+    *,
+    inlet_area: float,
+    outlet_area: float,
+    source_impedance: ArrayLike | None = None,
+    radiation_impedance: ArrayLike | None = None,
+) -> ReactiveSilencerResult
+```
+
+Evaluate the chain into a [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult).
+
+The port areas are the pipes the chain is connected between, which
+`transmission_loss` needs and the chain itself does not contain: put
+them in the chain as duct elements if the drawing is to show them.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `inlet_area` | Inlet pipe area `S_in`, m2. |
+| `outlet_area` | Outlet pipe area `S_out`, m2. |
+| `source_impedance` | Optional source impedance `Z_s` for the insertion loss, Pa s/m3. |
+| `radiation_impedance` | Optional radiation impedance `Z_r` for the insertion loss, Pa s/m3. |
+
+**Returns:** The result, carrying a snapshot of this chain so that it can be drawn as well as plotted and reported.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the chain is empty. |
+
+### SilencerChain.shunt()
+
+```python
+SilencerChain.shunt(
+    branch_impedance: ArrayLike,
+    *,
+    label: str | None = None,
+) -> SilencerChain
+```
+
+Append a side branch of acoustic impedance `Z_b`.
+
+The branch is the only element that can be given a `label`, because
+it is the only one the drawing cannot identify by its dimensions.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `branch_impedance` | Acoustic impedance `Z_b` of the branch, Pa s/m3: one value per analysis frequency, or a scalar held constant over the grid. |
+| `label` | What the branch is, e.g. `"Helmholtz resonator, 125 Hz"`. Rendered verbatim in the drawing, in whatever language it is written in. |
+
+**Returns:** The chain, so the calls can be written one after another.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `branch_impedance` is neither a scalar nor one value per analysis frequency. |
+
+### SilencerChain.transfer_matrix
+
+*property*
+
+The compound four-pole matrix of the chain.
+
+**Returns:** The ordered product [`cascade`](/phonometry/reference/api/noise_control/silencers/#cascade) makes of the element matrices, `(n_freq, 2, 2)`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the chain is empty. |
+
+## SilencerChainElement
+
+```python
+SilencerChainElement(
+    matrix: np.ndarray,
+    length: float | None = None,
+    area: float | None = None,
+    label: str | None = None,
+    shorting_frequency: float | None = None,
+)
+```
+
+One recorded element of a [`SilencerChain`](/phonometry/reference/api/noise_control/silencers/#silencerchain).
+
+The element carries its four-pole matrix and, with it, whatever geometry
+the call that produced the matrix was given. That is the whole asymmetry
+of a hand-built chain: [`duct_matrix`](/phonometry/reference/api/noise_control/silencers/#duct_matrix) is handed a length and an area,
+so a duct element knows its shape, while [`shunt_matrix`](/phonometry/reference/api/noise_control/silencers/#shunt_matrix) is handed an
+impedance and nothing else, so a shunt element has no shape to know.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `matrix` | The element's `(n_freq, 2, 2)` four-pole matrix. |
+| `length` | Duct length `L`, m, or `None` for a shunt element. |
+| `area` | Duct cross-sectional area `S`, m2, or `None` for a shunt element. |
+| `label` | The name the element was given, or `None`. |
+| `shorting_frequency` | For a shunt element, the analysis frequency at which `\|Z_b\|` is least (where the branch comes closest to shorting the duct), or `None` when that least value sits on an end of the analysis grid, and for every duct element. |
+
+### SilencerChainElement.is_duct
+
+*property*
+
+Whether this is a duct element (an element with a declared area).
+
+**Returns:** `True` for a duct element, `False` for a shunt element.
 
 ## transmission_loss
 

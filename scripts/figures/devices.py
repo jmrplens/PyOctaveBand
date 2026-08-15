@@ -18,7 +18,7 @@ from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
-from .i18n import _LANG, _fmt_minus
+from .i18n import _LANG, _fmt_minus, lookup
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -686,6 +686,58 @@ def generate_quarter_wave_geometry(output_dir: str) -> None:
     )
     plt.tight_layout()
     save_figure(output_dir, "quarter_wave_geometry.svg")
+    plt.close()
+
+
+def _es(text: str) -> str:
+    """Localise a caller-supplied label the save-time pass cannot reach.
+
+    A branch label is passed *into* the library, which renders it verbatim
+    inside a two-line callout; the Spanish pass looks up whole rendered
+    strings and would never match the compound. Translating the label here
+    keeps it in the same table as every other Spanish string of the corpus.
+    """
+    return lookup(text) if _LANG == "es" else text
+
+
+def generate_silencer_chain_geometry(output_dir: str) -> None:
+    """To-scale drawing of a silencer assembled element by element.
+
+    A run of nominal 200 mm circular duct opening into a 400 mm shell of
+    600 mm, with a quarter-wave stub on the inlet run and a Helmholtz
+    resonator at the outlet junction. One concept: what a hand-built chain
+    can honestly draw, which is its ducts to scale and its branches marked.
+    """
+    print("Generating silencer_chain_geometry...")
+    from phonometry import SilencerChain
+    from phonometry.noise_control.silencers import (
+        helmholtz_impedance,
+        quarter_wave_impedance,
+    )
+
+    freqs = np.linspace(20.0, 500.0, 481)
+    s_duct = np.pi * 0.100**2                # nominal 200 mm duct
+    s_shell = np.pi * 0.200**2               # nominal 400 mm shell
+    s_stub = np.pi * 0.050**2                # nominal 100 mm branch
+    chain = (
+        SilencerChain(freqs)
+        .duct(0.10, s_duct)
+        .shunt(
+            quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), s_stub),
+            label=_es("Quarter-wave stub"),
+        )
+        .duct(0.20, s_duct)
+        .duct(0.60, s_shell)
+        .shunt(
+            helmholtz_impedance(freqs, np.pi * 0.025**2, 0.05, 2e-3),
+            label=_es("Helmholtz resonator"),
+        )
+        .duct(0.30, s_duct)
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    chain.plot_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "silencer_chain_geometry.svg")
     plt.close()
 
 
