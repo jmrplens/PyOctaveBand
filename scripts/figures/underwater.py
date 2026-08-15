@@ -41,7 +41,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.0))
     ax.semilogx(freqs, res.source_level, "o-", color=COLOR_PRIMARY, linewidth=2.0,
-                markersize=4, label="Source level $L_s$")
+                markersize=4, label=r"Source level $L_\mathrm{s}$")
     ax.semilogx(freqs, res.radiated_noise_level, "s--", color=COLOR_SECONDARY,
                 linewidth=1.6, markersize=3, alpha=0.8, label="Radiated noise level")
     ax.set_xlabel("Frequency [Hz]")
@@ -64,9 +64,9 @@ def generate_ship_source_level(output_dir: str) -> None:
     ax.legend(lines + tlines, labels + tlabels, loc="lower left", fontsize=9)
 
     info = [
-        r"$L_s = L_{RN} + \Delta L$",
+        r"$L_\mathrm{s} = L_\mathrm{RN} + \Delta L$",
         r"$\Delta L = -10\,\log_{10}[(2u^4 + 14u^2)/(14 + 2u^2 + u^4)]$",
-        r"$u = k\,d_s$,  $d_s = 0.7\,D$ = 4.2 m",
+        r"$u = k\,d_\mathrm{s}$,  $d_\mathrm{s} = 0.7\,D$ = 4.2 m",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
@@ -189,7 +189,7 @@ def generate_weston_regimes(output_dir: str) -> None:
     ax.plot(res.range_m, res.propagation_loss, color=COLOR_PRIMARY, linewidth=2.6,
             label="Composite propagation loss")
     for boundary, name in (
-        (bounds.spherical_to_cylindrical, r"$H/(2\psi_c)$"),
+        (bounds.spherical_to_cylindrical, r"$H/(2\psi_\mathrm{c})$"),
         (bounds.cylindrical_to_mode_stripping, r"$r_{\mathrm{CS}}$"),
         (bounds.mode_stripping_to_single_mode, r"$r_{\mathrm{MS}}$"),
     ):
@@ -211,7 +211,7 @@ def generate_weston_regimes(output_dir: str) -> None:
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.98, 0.05,
             "$f$ = 250 Hz, $H$ = 50 m, medium sand\n"
-            f"$\\psi_c$ = {np.degrees(bounds.critical_angle):.1f}°, "
+            f"$\\psi_\\mathrm{{c}}$ = {np.degrees(bounds.critical_angle):.1f}°, "
             f"$\\eta$ = {bounds.reflection_loss_gradient:.2f} Np/rad, "
             f"{bounds.mode_count:.0f} modes",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=10,
@@ -867,7 +867,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
                       linewidth=1.2, alpha=0.85,
                       label=r"exact circular arc, $R = c_0/(g\,\cos\theta_0)$")
             ax_r.annotate(
-                f"analytic $z_t$ = {z_turn:.1f} m\n"
+                f"analytic $z_\\mathrm{{t}}$ = {z_turn:.1f} m\n"
                 f"traced      = {deepest:.1f} m",
                 xy=(r_turn, z_turn), xytext=(26, -62),
                 textcoords="offset points", fontsize=8.5, color=COLOR_FG,
@@ -880,8 +880,9 @@ def generate_ray_turning_point(output_dir: str) -> None:
     ax_r.set_ylim(1760.0, -70.0)
     ax_r.set_xlabel("Range [km]")
     ax_r.set_ylabel("Depth [m]")
-    ax_r.set_title(r"Every Ray Turns Where $c(z_t) = c(z_s)/\cos\theta_0$",
-                   pad=12)
+    ax_r.set_title(
+        r"Every Ray Turns Where $c(z_\mathrm{t}) = c(z_\mathrm{s})/\cos\theta_0$",
+        pad=12)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     ax_r.legend(loc="lower center", fontsize=8.5, ncols=3)
@@ -1111,7 +1112,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     lf = auditory_weighting(freqs, "LF", guidance="nmfs-2024")
     p = lf.parameters
     ax.annotate("each minimum is that group's weighted TTS onset "
-                "$T_w = K + C$\nLF: below $f_1$ the filter falls at "
+                "$T_\\mathrm{w} = K + C$\nLF: below $f_1$ the filter falls at "
                 f"$20a$ = {20 * p.a:.0f} dB/decade, above $f_2$ at "
                 f"$20b$ = {20 * p.b:.0f} dB/decade",
                 xy=(0.03, 0.06), xycoords="axes fraction", fontsize=8.5,

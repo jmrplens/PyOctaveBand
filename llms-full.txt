@@ -5058,7 +5058,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="low-mobility plate")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="high-mobility plate")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frequency [Hz]",
-       ylabel="Structure-borne power level $L_{Ws}$ [dB re 1 pW]")
+       ylabel=r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -42024,7 +42024,7 @@ plt.show()
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.4))
 ax1.barh(result.names, result.contributions)
 ax1.axvline(result.combined_uncertainty, ls="--",
-            label=f"$u_c$ = {result.combined_uncertainty:.3f} dB")
+            label=rf"$u_\mathrm{{c}}$ = {result.combined_uncertainty:.3f} dB")
 ax1.invert_yaxis(); ax1.legend()
 
 rng = np.random.default_rng(1)

@@ -1534,7 +1534,7 @@ L 706.285937 28.798125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_14">
-    <!-- $H/(2\psi_c)$ -->
+    <!-- $H/(2\psi_\mathrm{c})$ -->
     <g style="fill: #d62728" transform="translate(148.222693 41.519386) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-Oblique-2b" d="M 1081 4666 
@@ -1595,31 +1595,6 @@ L 1347 -1331
 L 1591 -78 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-46" d="M 3431 3366 
-L 3316 2797 
-Q 3109 2947 2876 3022 
-Q 2644 3097 2394 3097 
-Q 2119 3097 1870 3000 
-Q 1622 2903 1453 2725 
-Q 1184 2453 1037 2087 
-Q 891 1722 891 1331 
-Q 891 859 1127 628 
-Q 1363 397 1844 397 
-Q 2081 397 2348 469 
-Q 2616 541 2906 684 
-L 2797 116 
-Q 2547 13 2283 -39 
-Q 2019 -91 1741 -91 
-Q 1044 -91 669 257 
-Q 294 606 294 1253 
-Q 294 1797 489 2255 
-Q 684 2713 1069 3078 
-Q 1331 3328 1684 3456 
-Q 2038 3584 2456 3584 
-Q 2700 3584 2940 3529 
-Q 3181 3475 3431 3366 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-c" d="M 513 4856 
 L 1013 4856 
 Q 1481 4119 1714 3412 
@@ -1639,7 +1614,7 @@ z
      <use xlink:href="#DejaVuSans-b" transform="translate(108.886719 0.125)"/>
      <use xlink:href="#DejaVuSans-15" transform="translate(147.900391 0.125)"/>
      <use xlink:href="#DejaVuSans-Oblique-35c" transform="translate(211.523438 0.125)"/>
-     <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(277.490234 -14.874951) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-46" transform="translate(277.490234 -14.874951) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(318.710938 0.125)"/>
     </g>
    </g>
@@ -1871,7 +1846,7 @@ z
      <use xlink:href="#DejaVuSans-4c" transform="translate(1679.835938 0.015625)"/>
      <use xlink:href="#DejaVuSans-44" transform="translate(1707.619141 0.015625)"/>
     </g>
-    <!-- $\psi_c$ = 33,6°, $\eta$ = 0,28 Np/rad, 10 modos -->
+    <!-- $\psi_\mathrm{c}$ = 33,6°, $\eta$ = 0,28 Np/rad, 10 modos -->
     <g transform="translate(497.913984 363.780352) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-72" d="M 1600 4347 
@@ -1931,7 +1906,7 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-35c" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(65.966797 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-46" transform="translate(65.966797 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(107.1875 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(138.974609 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(222.763672 0.015625)"/>

@@ -725,7 +725,7 @@ def _d_room_measurement_section(s: SVG, th: Theme) -> None:
     for i, line in enumerate((
         "Level (4.2.1):",
         "≥ 45 dB over the background",
-        "per band for T30, ≥ 35 dB for T20",
+        "per band for $T_{30}$, ≥ 35 dB for $T_{20}$",
         "Receiving chain (4.2.2.2):",
         "class 1 to IEC 61672-1,",
         "IEC 61260 filters, omnidirectional",
@@ -1972,7 +1972,8 @@ def _d_decay_range(s: SVG, th: Theme) -> None:
         s.line(wx, fy, wx + 196, fy, th.accent, 1.8, dash="7,4")
         s.text(wx + 202, fy + 5, f"{-flag:.0f} dB", 14, th.accent,
                anchor="start")
-    windows = (("EDT", 0.0, -10.0), ("T20", -5.0, -25.0), ("T30", -5.0, -35.0))
+    windows = (("EDT", 0.0, -10.0), ("$T_{20}$", -5.0, -25.0),
+               ("$T_{30}$", -5.0, -35.0))
     for i, (name, hi, lo) in enumerate(windows):
         bx = wx + 16 + 64 * i
         s.rect(bx, y_of(hi), 38, (hi - lo) * per_db, th.panel, th.primary,
@@ -1989,13 +1990,14 @@ def _d_decay_range(s: SVG, th: Theme) -> None:
     s.rect(48, 416, 804, 88, "none", th.muted, rx=10, dash="6,5")
     s.text(450, 442,
            "hatched: the 15 dB margin ISO 3382-1 asks for beyond each window "
-           "— EDT needs 25 dB, T20 35 dB, T30 45 dB", 14, th.fg)
+           "— EDT needs 25 dB, $T_{20}$ 35 dB, $T_{30}$ 45 dB", 14, th.fg)
     s.text(450, 466,
            "the library flags at 46 dB and 54 dB instead, where the fit's "
            "positive bias crosses 5 %", 14, th.accent)
     s.text(450, 490,
-           "short of range? T20 instead of T30 -> a longer sweep or more "
-           "averages -> EDT; never a fit into the noise", 14, th.secondary)
+           "short of range? $T_{20}$ instead of $T_{30}$ -> a longer sweep "
+           "or more averages -> EDT; never a fit into the noise", 14,
+           th.secondary)
 
 
 # ---------------------------------------------------------------------------
@@ -2201,10 +2203,11 @@ def _d_facade_setup(s: SVG, th: Theme) -> None:
         (600, ("Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ "
               "(traffic): one component, comparable with a laboratory $R$.")),
         # The 2 m of the quantity's subscript is a value with its unit,
-        # which the composer has no roman run for yet; the line stays plain
-        # until that case is adjudicated (as does the L1,2m label above).
+        # which the composer has no roman run for yet; that one symbol
+        # stays plain until the case is adjudicated (as does the L1,2m
+        # label above), while the R beside it is set like its twin.
         (626, ("Global method → D2m,nT: the whole facade as built, "
-              "not comparable with a laboratory R.")),
+              "not comparable with a laboratory $R$.")),
         (652, ("Road traffic replaces the loudspeaker at all angles: "
               "simultaneous inside and outside, ≥ 50 pass-bys.")),
         (678, ("Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "

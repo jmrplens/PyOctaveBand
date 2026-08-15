@@ -77,8 +77,8 @@ _STRINGS: dict[str, str] = {
     "Source level at {distance} m [dB]": "Nivel de fuente a {distance} m [dB]",
     "Rotorcraft noise hemisphere directivity (ECAC Doc 32)": "Directividad del hemisferio de ruido de rotorcraft (ECAC Doc 32)",
     "Aircraft noise contour (ECAC Doc 29)": "Curvas de ruido de aeronaves (ECAC Doc 29)",
-    "Airspeed $V_A$": "Velocidad del aire $V_A$",
-    "Ground speed $V_g$": "Velocidad respecto al suelo $V_g$",
+    "Airspeed $V_\\mathrm{A}$": "Velocidad del aire $V_\\mathrm{A}$",
+    "Ground speed $V_\\mathrm{g}$": "Velocidad respecto al suelo $V_\\mathrm{g}$",
     "Speed [m/s]": "Velocidad [m/s]",
     "Path angle $\\gamma$": "Ángulo de trayectoria $\\gamma$",
     "Bank angle $\\Phi$": "Ángulo de alabeo $\\Phi$",
@@ -341,9 +341,10 @@ def plot_flight_path_kinematics(
     ax = ax if ax is not None else _new_axes()
     t = np.asarray(result.times, dtype=np.float64)
     ax.plot(t, result.airspeed, **{"color": _C_PRIMARY, "lw": 1.8,
-            "label": _t("Airspeed $V_A$", language), **kwargs})
+            "label": _t("Airspeed $V_\\mathrm{A}$", language), **kwargs})
     ax.plot(t, result.ground_speed, **{"color": _C_SECONDARY, "lw": 1.4,
-            "ls": "--", "label": _t("Ground speed $V_g$", language), **kwargs})
+            "ls": "--", "label": _t("Ground speed $V_\\mathrm{g}$", language),
+            **kwargs})
     ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Speed [m/s]", language))
     ax2 = ax.twinx()

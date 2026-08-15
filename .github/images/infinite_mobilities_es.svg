@@ -2150,7 +2150,7 @@ L 781.965408 111.75
 z
 "/>
     </g>
-    <!-- viga:  $Y = (1-\mathrm{j})/(4 m^{\prime} c_B)$, $\propto f^{-1/2}$ -->
+    <!-- viga:  $Y = (1-\mathrm{j})/(4 m^{\prime} c_\mathrm{B})$, $\propto f^{-1/2}$ -->
     <g transform="translate(531.783035 63.397527) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-4a" d="M 2906 1791 
@@ -2231,6 +2231,38 @@ Q 2700 3584 2940 3529
 Q 3181 3475 3431 3366 
 z
 " transform="scale(0.015625)"/>
+      <path id="DejaVuSans-25" d="M 1259 2228 
+L 1259 519 
+L 2272 519 
+Q 2781 519 3026 730 
+Q 3272 941 3272 1375 
+Q 3272 1813 3026 2020 
+Q 2781 2228 2272 2228 
+L 1259 2228 
+z
+M 1259 4147 
+L 1259 2741 
+L 2194 2741 
+Q 2656 2741 2882 2914 
+Q 3109 3088 3109 3444 
+Q 3109 3797 2882 3972 
+Q 2656 4147 2194 4147 
+L 1259 4147 
+z
+M 628 4666 
+L 2241 4666 
+Q 2963 4666 3353 4366 
+Q 3744 4066 3744 3513 
+Q 3744 3084 3544 2831 
+Q 3344 2578 2956 2516 
+Q 3422 2416 3680 2098 
+Q 3938 1781 3938 1306 
+Q 3938 681 3513 340 
+Q 3088 0 2303 0 
+L 628 0 
+L 628 4666 
+z
+" transform="scale(0.015625)"/>
       <path id="DejaVuSans-ca7" d="M 1647 1134 
 Q 2163 1134 2472 1884 
 Q 2075 2703 1647 2703 
@@ -2306,7 +2338,7 @@ z
      <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(921.337891 0.746875)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(1023.399896 42.046875) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(1045.377435 0.746875)"/>
-     <use xlink:href="#DejaVuSans-Oblique-25" transform="translate(1100.357904 -14.253076) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-25" transform="translate(1100.357904 -14.253076) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1151.11474 0.746875)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(1190.128411 0.746875)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1221.915521 0.746875)"/>
@@ -2317,7 +2349,7 @@ z
      <use xlink:href="#DejaVuSans-12" transform="translate(1509.944284 42.046875) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-15" transform="translate(1533.528268 42.046875) scale(0.7)"/>
     </g>
-    <!-- barra: $Y = 1/(\rho c_L S)$, real y plana -->
+    <!-- barra: $Y = 1/(\rho c_\mathrm{L} S)$, real y plana -->
     <g transform="translate(533.083035 75.401824) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-45" d="M 3116 1747 
@@ -2371,13 +2403,13 @@ Q 2450 391 2781 750
 Q 3113 1113 3238 1747 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
-L 1709 4666 
-L 909 525 
-L 3181 525 
-L 3078 0 
-L 172 0 
-L 1075 4666 
+      <path id="DejaVuSans-2f" d="M 628 4666 
+L 1259 4666 
+L 1259 531 
+L 3531 531 
+L 3531 0 
+L 628 0 
+L 628 4666 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-Oblique-36" d="M 3859 4513 
@@ -2426,7 +2458,7 @@ z
      <use xlink:href="#DejaVuSans-b" transform="translate(612.892578 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-355" transform="translate(651.90625 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(715.382812 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(770.363281 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-2f" transform="translate(770.363281 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(812.09668 0.015625)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(875.573242 0.015625)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(914.586914 0.015625)"/>

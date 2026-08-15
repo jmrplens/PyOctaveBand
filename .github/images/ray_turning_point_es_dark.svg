@@ -2032,34 +2032,9 @@ Q 507.342208 224.442977 510.742208 224.442977
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <!-- $z_t$ analítica = 583,3 m -->
+    <!-- $z_\mathrm{t}$ analítica = 583,3 m -->
     <g style="fill: #ffffff" transform="translate(510.742208 207.947831) scale(0.085 -0.085)">
      <defs>
-      <path id="DejaVuSans-Oblique-57" d="M 2706 3500 
-L 2619 3053 
-L 1472 3053 
-L 1100 1153 
-Q 1081 1047 1072 975 
-Q 1063 903 1063 863 
-Q 1063 663 1183 572 
-Q 1303 481 1569 481 
-L 2150 481 
-L 2053 0 
-L 1503 0 
-Q 991 0 739 200 
-Q 488 400 488 806 
-Q 488 878 497 964 
-Q 506 1050 525 1153 
-L 897 3053 
-L 409 3053 
-L 500 3500 
-L 978 3500 
-L 1172 4494 
-L 1747 4494 
-L 1556 3500 
-L 2706 3500 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-af" d="M 1325 5119 
 L 1947 5119 
 L 929 3944 
@@ -2139,7 +2114,7 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-5d" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(52.490234 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-57" transform="translate(52.490234 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(82.670898 0.015625)"/>
      <use xlink:href="#DejaVuSans-44" transform="translate(114.458008 0.015625)"/>
      <use xlink:href="#DejaVuSans-51" transform="translate(175.737305 0.015625)"/>
@@ -2221,7 +2196,7 @@ z
     </g>
    </g>
    <g id="text_36">
-    <!-- Cada rayo gira donde $c(z_t) = c(z_s)/\cos\theta_0$ -->
+    <!-- Cada rayo gira donde $c(z_\mathrm{t}) = c(z_\mathrm{s})/\cos\theta_0$ -->
     <g style="fill: #ffffff" transform="translate(488.28843 16.44) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-26" d="M 4122 4306 
@@ -2296,37 +2271,6 @@ L 3481 3500
 L 3481 434 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-Oblique-34c" d="M 2913 2219 
 L 925 2219 
 Q 791 1284 928 888 
@@ -2377,13 +2321,13 @@ z
      <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(1112.451172 0.234375)"/>
      <use xlink:href="#DejaVuSans-b" transform="translate(1167.431641 0.234375)"/>
      <use xlink:href="#DejaVuSans-Oblique-5d" transform="translate(1206.445312 0.234375)"/>
-     <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(1258.935547 -14.765576) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-57" transform="translate(1258.935547 -14.765576) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1289.116211 0.234375)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1347.612305 0.234375)"/>
      <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(1450.883789 0.234375)"/>
      <use xlink:href="#DejaVuSans-b" transform="translate(1505.864258 0.234375)"/>
      <use xlink:href="#DejaVuSans-Oblique-5d" transform="translate(1544.87793 0.234375)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1597.368164 -14.765576) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(1597.368164 -14.765576) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1636.572266 0.234375)"/>
      <use xlink:href="#DejaVuSans-12" transform="translate(1675.585938 0.234375)"/>
      <use xlink:href="#DejaVuSans-46" transform="translate(1709.277344 0.234375)"/>

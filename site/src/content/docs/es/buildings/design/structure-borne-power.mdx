@@ -90,7 +90,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="placa de baja movilidad")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="placa de alta movilidad")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frecuencia [Hz]",
-       ylabel="Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]")
+       ylabel=r"Nivel de potencia estructural $L_{W\mathrm{s}}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -418,10 +418,12 @@ characteristic = building.installed_power_from_reception_plate(l_wsn, 1.0e-3)
 
 fig, ax = plt.subplots()
 ax.semilogx(bands, l_ws, "-o", label="medido sobre la placa de ensayo")
-ax.semilogx(bands, l_wsn, "-s", label="$L_{Wsn}$, el valor declarado")
-ax.semilogx(bands, installed, "-^", label="$L_{Ws,inst}$ sobre la pared")
-ax.semilogx(bands, characteristic, "-D", label="$L_{Ws,c}$, la entrada de EN 12354-5")
-ax.semilogx(bands, characteristic - 16.2, "x", label="$L_{Ws,c} - D_C$")
+ax.semilogx(bands, l_wsn, "-s", label=r"$L_{W\mathrm{sn}}$, el valor declarado")
+ax.semilogx(bands, installed, "-^", label=r"$L_{W\mathrm{s,inst}}$ sobre la pared")
+ax.semilogx(bands, characteristic, "-D",
+            label=r"$L_{W\mathrm{s,c}}$, la entrada de EN 12354-5")
+ax.semilogx(bands, characteristic - 16.2, "x",
+            label=r"$L_{W\mathrm{s,c}} - D_\mathrm{C}$")
 ax.set(xlabel="Frecuencia [Hz]",
        ylabel="Nivel de potencia estructural [dB re 1 pW]")
 ax.legend()

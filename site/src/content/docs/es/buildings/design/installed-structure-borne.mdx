@@ -205,8 +205,8 @@ for yk in (1e-4, 1e-3):               # apoyo elástico, Fórmula 19e
     ax.semilogx(ratio, [float(building.coupling_term(a, yi, transfer_mobility=yk))
                         for a in ys], label=f"con $Y_k$ = {yk:g} m/(N·s)")
 ax.plot(7.07, 9.86, "o")              # la bomba del fragmento de código
-ax.set(xlabel="Relación de movilidades $|Y_s| / |Y_i|$",
-       ylabel="Término de acoplamiento $D_C$ [dB]")
+ax.set(xlabel=r"Relación de movilidades $|Y_\mathrm{s}| / |Y_i|$",
+       ylabel=r"Término de acoplamiento $D_\mathrm{C}$ [dB]")
 ax.legend()
 plt.show()
 ```

@@ -41,10 +41,14 @@ _STRINGS: dict[str, str] = {
     "Class {cls} pass corridor": "Corredor de aceptación clase {cls}",
     r"Measured $\Delta A$": r"$\Delta A$ medida",
     "Out of tolerance": "Fuera de tolerancia",
-    r"Normalised frequency $f\,/\,f_m$": r"Frecuencia normalizada $f\,/\,f_m$",
+    r"Normalised frequency $f\,/\,f_{\mathrm{m}}$":
+        r"Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$",
     "Relative attenuation [dB]": "Atenuación relativa [dB]",
-    "IEC 61260-1 class {cls} mask — $f_m$ = {fm} Hz":
-        "Máscara clase {cls} IEC 61260-1 — $f_m$ = {fm} Hz",
+    # The mid-band subscript is upright (m abbreviates "mid-band", as
+    # IEC 61260-1:2014 5.4.1 prints it); its braces are doubled because this
+    # title is the one string here that goes through ``str.format``.
+    r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz":
+        r"Máscara clase {cls} IEC 61260-1 — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
     "lowpass": "paso bajo",
     "highpass": "paso alto",
     "magnitude": "magnitud",
@@ -176,11 +180,11 @@ def plot_filter_class(
     _normalized_frequency_axis(ax, lo_x, hi_x, language)
     ax.set_xlim(lo_x, hi_x)
     ax.set_ylim(y_bot, y_top)
-    ax.set_xlabel(_t(r"Normalised frequency $f\,/\,f_m$", language))
+    ax.set_xlabel(_t(r"Normalised frequency $f\,/\,f_{\mathrm{m}}$", language))
     ax.set_ylabel(_t("Relative attenuation [dB]", language))
     ax.set_title(
-        _t("IEC 61260-1 class {cls} mask — $f_m$ = {fm} Hz", language, cls=cls,
-           fm=format_number(fm, language, decimals=0))
+        _t(r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
+           language, cls=cls, fm=format_number(fm, language, decimals=0))
     )
     ax.legend(loc="upper center", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)

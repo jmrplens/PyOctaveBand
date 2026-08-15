@@ -1152,7 +1152,7 @@ z
     </g>
    </g>
    <g id="text_17">
-    <!-- Specific airflow resistance $R_s$ = 16200 Pa·s/m -->
+    <!-- Specific airflow resistance $R_\mathrm{s}$ = 16200 Pa·s/m -->
     <g style="fill: #ffffff" transform="translate(64.029844 46.348925) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-36" d="M 3425 4513 
@@ -1214,37 +1214,6 @@ Q 3841 3044 3547 2687
 Q 3253 2331 2772 2241 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-20" d="M 678 2906 
 L 4684 2906 
 L 4684 2381 
@@ -1295,7 +1264,7 @@ z
      <use xlink:href="#DejaVuSans-48" transform="translate(1240.382812 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1301.90625 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(1333.693359 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1403.175781 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(1403.175781 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1442.379883 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1474.166992 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1557.956055 0.015625)"/>
@@ -1450,7 +1419,7 @@ z
     </g>
    </g>
    <g id="text_19">
-    <!-- Linear term $a$ = 16000 Pa·s/m  (= $R_s$ at $u \to 0$) -->
+    <!-- Linear term $a$ = 16000 Pa·s/m  (= $R_\mathrm{s}$ at $u \to 0$) -->
     <g style="fill: #ffffff" transform="translate(64.029844 96.799325) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-Oblique-44" d="M 3438 1997 
@@ -1564,7 +1533,7 @@ z
      <use xlink:href="#DejaVuSans-20" transform="translate(1605.328125 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1689.117188 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(1720.904297 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1790.386719 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(1790.386719 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1829.59082 0.015625)"/>
      <use xlink:href="#DejaVuSans-44" transform="translate(1861.37793 0.015625)"/>
      <use xlink:href="#DejaVuSans-57" transform="translate(1922.657227 0.015625)"/>

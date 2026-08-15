@@ -2030,7 +2030,7 @@ Q 53.978683 261.604909 57.378683 261.604909
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <!-- each minimum is that group's weighted TTS onset $T_w = K + C$ -->
+    <!-- each minimum is that group's weighted TTS onset $T_\mathrm{w} = K + C$ -->
     <g transform="translate(57.378683 245.108435) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-4b" d="M 3513 2113 
@@ -2192,22 +2192,6 @@ L 275 4134
 L 378 4666 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-5a" d="M 544 3500 
-L 1113 3500 
-L 1259 684 
-L 2566 3500 
-L 3231 3500 
-L 3425 684 
-L 4666 3500 
-L 5241 3500 
-L 3641 0 
-L 2969 0 
-L 2797 2900 
-L 1459 0 
-L 781 0 
-L 544 3500 
-z
-" transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-48" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-44" transform="translate(61.523438 0.015625)"/>
@@ -2258,7 +2242,7 @@ z
      <use xlink:href="#DejaVuSans-57" transform="translate(2475.394531 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(2514.603516 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(2546.390625 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-5a" transform="translate(2607.474609 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-5a" transform="translate(2607.474609 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(2686.942383 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(2790.213867 0.015625)"/>
      <use xlink:href="#DejaVuSans-e" transform="translate(2875.272461 0.015625)"/>

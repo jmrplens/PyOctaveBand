@@ -1513,7 +1513,7 @@ Q 46.294911 400.945898 50.794911 400.945898
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <!-- apartado 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$ -->
+    <!-- apartado 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_\mathrm{t}$ -->
     <g transform="translate(50.794911 368.451504) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-1b" d="M 2034 2216 
@@ -1715,31 +1715,6 @@ Q 394 275 320 306
 Q 247 338 225 347 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-57" d="M 2706 3500 
-L 2619 3053 
-L 1472 3053 
-L 1100 1153 
-Q 1081 1047 1072 975 
-Q 1063 903 1063 863 
-Q 1063 663 1183 572 
-Q 1303 481 1569 481 
-L 2150 481 
-L 2053 0 
-L 1503 0 
-Q 991 0 739 200 
-Q 488 400 488 806 
-Q 488 878 497 964 
-Q 506 1050 525 1153 
-L 897 3053 
-L 409 3053 
-L 500 3500 
-L 978 3500 
-L 1172 4494 
-L 1747 4494 
-L 1556 3500 
-L 2706 3500 
-z
-" transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-44" transform="translate(0 0.115625)"/>
      <use xlink:href="#DejaVuSans-53" transform="translate(61.279297 0.115625)"/>
@@ -1780,9 +1755,9 @@ z
      <use xlink:href="#DejaVuSans-20" transform="translate(1866.621576 0.115625)"/>
      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1969.89306 0.115625)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(2026.642565 43.865625) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(2021.992669 -30.2875) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-57" transform="translate(2021.992669 -30.2875) scale(0.7)"/>
     </g>
-    <!-- $10 \leq r &lt; 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ -->
+    <!-- $10 \leq r &lt; 100$  →  $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$ -->
     <g transform="translate(50.794911 380.513262) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-cee" d="M 4684 3175 
@@ -1811,43 +1786,6 @@ L 4684 3719
 L 4684 3150 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-44" d="M 3438 1997 
-L 3047 0 
-L 2472 0 
-L 2578 531 
-Q 2325 219 2001 64 
-Q 1678 -91 1281 -91 
-Q 834 -91 548 182 
-Q 263 456 263 884 
-Q 263 1497 752 1853 
-Q 1241 2209 2100 2209 
-L 2900 2209 
-L 2931 2363 
-Q 2938 2388 2941 2417 
-Q 2944 2447 2944 2509 
-Q 2944 2788 2717 2942 
-Q 2491 3097 2081 3097 
-Q 1800 3097 1504 3025 
-Q 1209 2953 897 2809 
-L 997 3341 
-Q 1322 3463 1633 3523 
-Q 1944 3584 2234 3584 
-Q 2853 3584 3176 3315 
-Q 3500 3047 3500 2534 
-Q 3500 2431 3484 2292 
-Q 3469 2153 3438 1997 
-z
-M 2816 1759 
-L 2241 1759 
-Q 1534 1759 1195 1570 
-Q 856 1381 856 984 
-Q 856 709 1029 553 
-Q 1203 397 1509 397 
-Q 1978 397 2328 733 
-Q 2678 1069 2791 1631 
-L 2816 1759 
-z
-" transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-14" transform="translate(0 0.115625)"/>
      <use xlink:href="#DejaVuSans-13" transform="translate(63.623047 0.115625)"/>
@@ -1867,13 +1805,13 @@ z
      <use xlink:href="#DejaVuSans-20" transform="translate(913.883294 0.115625)"/>
      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1017.154779 0.115625)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(1073.904284 43.865625) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(1069.254388 -30.2875) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-57" transform="translate(1069.254388 -30.2875) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-e" transform="translate(1118.917474 0.115625)"/>
      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1222.188958 0.115625)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(1278.938464 41.415625) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-44" transform="translate(1274.288568 -30.784375) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-44" transform="translate(1274.288568 -30.784375) scale(0.7)"/>
     </g>
-    <!-- $r &lt; 10$  →  $s^{\prime} = s^{\prime}_t$ solo si $s^{\prime}_a$ es despreciable -->
+    <!-- $r &lt; 10$  →  $s^{\prime} = s^{\prime}_\mathrm{t}$ solo si $s^{\prime}_\mathrm{a}$ es despreciable -->
     <g transform="translate(50.794911 392.66502) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSans-Oblique-55" transform="translate(0 0.115625)"/>
      <use xlink:href="#DejaVuSans-1f" transform="translate(60.595703 0.115625)"/>
@@ -1889,7 +1827,7 @@ z
      <use xlink:href="#DejaVuSans-20" transform="translate(600.260247 0.115625)"/>
      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(703.531732 0.115625)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(760.281237 43.865625) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(755.631341 -30.2875) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-57" transform="translate(755.631341 -30.2875) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(785.812005 0.115625)"/>
      <use xlink:href="#DejaVuSans-56" transform="translate(817.599115 0.115625)"/>
      <use xlink:href="#DejaVuSans-52" transform="translate(869.698724 0.115625)"/>
@@ -1901,7 +1839,7 @@ z
      <use xlink:href="#DejaVuSans-3" transform="translate(1131.51513 0.115625)"/>
      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1163.30224 0.115625)"/>
      <use xlink:href="#Cmsy10-49" transform="translate(1220.051745 41.415625) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-44" transform="translate(1215.401849 -30.784375) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-44" transform="translate(1215.401849 -30.784375) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(1261.031732 0.115625)"/>
      <use xlink:href="#DejaVuSans-48" transform="translate(1292.818841 0.115625)"/>
      <use xlink:href="#DejaVuSans-56" transform="translate(1354.342279 0.115625)"/>
@@ -2054,7 +1992,7 @@ L 486.391094 41.218125
 " style="fill: none; stroke-dasharray: 7.03,3.04; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.9"/>
     </g>
     <g id="text_17">
-     <!-- $s^{\prime}_t$, esqueleto (Fórmula 4) -->
+     <!-- $s^{\prime}_\mathrm{t}$, esqueleto (Fórmula 4) -->
      <g transform="translate(493.591094 44.368125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-54" d="M 947 1747 
@@ -2125,7 +2063,7 @@ z
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(0 0.115625)"/>
       <use xlink:href="#Cmsy10-49" transform="translate(56.749505 43.865625) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(52.099609 -30.2875) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-57" transform="translate(52.099609 -30.2875) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(82.280273 0.115625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(114.067383 0.115625)"/>
       <use xlink:href="#DejaVuSans-48" transform="translate(145.854492 0.115625)"/>
@@ -2158,7 +2096,7 @@ L 486.391094 55.798125
 " style="fill: none; stroke-dasharray: 12.16,3.04,1.9,3.04; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.9"/>
     </g>
     <g id="text_18">
-     <!-- $s^{\prime}_a$, aire encerrado (Fórmula 7, $\varepsilon = 0{,}9$) -->
+     <!-- $s^{\prime}_\mathrm{a}$, aire encerrado (Fórmula 7, $\varepsilon = 0{,}9$) -->
      <g transform="translate(493.591094 58.948125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-1a" d="M 525 4666 
@@ -2206,7 +2144,7 @@ z
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(0 0.565625)"/>
       <use xlink:href="#Cmsy10-49" transform="translate(56.749505 41.865625) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-44" transform="translate(52.099609 -30.334375) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-44" transform="translate(52.099609 -30.334375) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(97.729492 0.565625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(129.516602 0.565625)"/>
       <use xlink:href="#DejaVuSans-44" transform="translate(161.303711 0.565625)"/>
@@ -2251,7 +2189,7 @@ L 486.391094 70.648125
 " style="fill: none; stroke: #d62728; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <!-- instalada $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (apartado 8.2) -->
+     <!-- instalada $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$ (apartado 8.2) -->
      <g transform="translate(493.591094 73.798125) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-4c" transform="translate(0 0.115625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(27.783203 0.115625)"/>
@@ -2268,11 +2206,11 @@ L 486.391094 70.648125
       <use xlink:href="#DejaVuSans-20" transform="translate(587.564935 0.115625)"/>
       <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(690.836419 0.115625)"/>
       <use xlink:href="#Cmsy10-49" transform="translate(747.585924 43.865625) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-57" transform="translate(742.936029 -30.2875) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-57" transform="translate(742.936029 -30.2875) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-e" transform="translate(792.599115 0.115625)"/>
       <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(895.870599 0.115625)"/>
       <use xlink:href="#Cmsy10-49" transform="translate(952.620104 41.415625) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-44" transform="translate(947.970208 -30.784375) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-44" transform="translate(947.970208 -30.784375) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(993.600091 0.115625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(1025.387201 0.115625)"/>
       <use xlink:href="#DejaVuSans-44" transform="translate(1064.400872 0.115625)"/>

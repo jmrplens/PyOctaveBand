@@ -46538,7 +46538,7 @@ L 199.599668 48.402813
      </g>
     </g>
     <g id="text_4">
-     <!-- Frecuencia normalizada $f\,/\,f_m$ -->
+     <!-- Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(161.144609 287.199063) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-29" d="M 628 4666 
@@ -46830,42 +46830,6 @@ L 0 -594
 L 1625 4666 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-50" d="M 5747 2113 
-L 5338 0 
-L 4763 0 
-L 5166 2094 
-Q 5191 2228 5203 2325 
-Q 5216 2422 5216 2491 
-Q 5216 2772 5059 2928 
-Q 4903 3084 4622 3084 
-Q 4203 3084 3875 2770 
-Q 3547 2456 3450 1953 
-L 3066 0 
-L 2491 0 
-L 2900 2094 
-Q 2925 2209 2937 2307 
-Q 2950 2406 2950 2484 
-Q 2950 2769 2794 2926 
-Q 2638 3084 2363 3084 
-Q 1938 3084 1609 2770 
-Q 1281 2456 1184 1953 
-L 800 0 
-L 225 0 
-L 909 3500 
-L 1484 3500 
-L 1375 2956 
-Q 1609 3263 1923 3423 
-Q 2238 3584 2597 3584 
-Q 2978 3584 3223 3384 
-Q 3469 3184 3519 2828 
-Q 3781 3197 4126 3390 
-Q 4472 3584 4856 3584 
-Q 5306 3584 5551 3325 
-Q 5797 3066 5797 2591 
-Q 5797 2488 5784 2364 
-Q 5772 2241 5747 2113 
-z
-" transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(50.519531 0.015625)"/>
@@ -46893,7 +46857,7 @@ z
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1218.492188 0.015625)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(1269.932942 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1319.860024 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
      </g>
     </g>
    </g>
@@ -94140,7 +94104,7 @@ L 626.199668 48.402813
      </g>
     </g>
     <g id="text_19">
-     <!-- Frecuencia normalizada $f\,/\,f_m$ -->
+     <!-- Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(587.744609 287.199063) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(50.519531 0.015625)"/>
@@ -94168,7 +94132,7 @@ L 626.199668 48.402813
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1218.492188 0.015625)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(1269.932942 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1319.860024 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
      </g>
     </g>
    </g>
@@ -141798,7 +141762,7 @@ L 199.599668 319.601406
      </g>
     </g>
     <g id="text_35">
-     <!-- Frecuencia normalizada $f\,/\,f_m$ -->
+     <!-- Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(161.144609 558.397656) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(50.519531 0.015625)"/>
@@ -141826,7 +141790,7 @@ L 199.599668 319.601406
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1218.492188 0.015625)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(1269.932942 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1319.860024 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
      </g>
     </g>
    </g>
@@ -189310,7 +189274,7 @@ L 626.199668 319.601406
      </g>
     </g>
     <g id="text_51">
-     <!-- Frecuencia normalizada $f\,/\,f_m$ -->
+     <!-- Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(587.744609 558.397656) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-29" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-55" transform="translate(50.519531 0.015625)"/>
@@ -189338,7 +189302,7 @@ L 626.199668 319.601406
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1218.492188 0.015625)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(1269.932942 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(1319.860024 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-50" transform="translate(1355.065103 -14.984326) scale(0.7)"/>
      </g>
     </g>
    </g>
