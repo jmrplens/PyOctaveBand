@@ -1,20 +1,20 @@
 ← [Documentation index](../README.md)
 
-# Underwater sound propagation: transmission loss, sound speed, sonar, seabed and ambient noise
+# Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise
 
-Closed-form underwater propagation: the **transmission loss** (geometrical
+Closed-form underwater propagation: the **propagation loss** (geometrical
 spreading plus volume absorption), the **speed of sound** in sea water, the
 **sonar equation**, **seabed reflection loss** and the **ocean ambient-noise**
 spectrum (wind, thermal and shipping-traffic contributions). These complement
 the underwater reference levels (ISO 18405/17208/18406) in
 [Underwater Acoustics](underwater-acoustics.md).
 
-## 1. Transmission loss
+## 1. Propagation loss
 
-The transmission loss is
+The propagation loss is
 
 $$
-TL = \text{spreading} + \alpha R .
+PL = \text{spreading} + \alpha R .
 $$
 
 Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
@@ -24,8 +24,8 @@ spherical up to a transition range $R_0$ and cylindrical beyond it
 simplification) or **Thorp** (1967, frequency-only).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss.svg" alt="Underwater propagation loss versus range at 10 kHz: the total loss with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%">
 </picture>
 
 <details>
@@ -38,11 +38,11 @@ from phonometry import underwater
 
 # 10 kHz at 10 °C, 35 ppt, 100 m depth; practical spreading with R0 = 1000 m.
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical",
+pl = underwater.propagation_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
-print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot()   # total TL with the spreading and absorption contributions
+print(f"alpha = {pl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
+pl.plot()   # total PL with the spreading and absorption contributions
 plt.show()
 ```
 
@@ -59,13 +59,13 @@ alpha = underwater.seawater_absorption(10e3, temperature=10.0, salinity=35.0,
 print(f"α = {alpha:.3f} dB/km")
 
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical", transition_range=1000.0,
+pl = underwater.propagation_loss(ranges, 10e3, law="practical", transition_range=1000.0,
                           temperature=10.0, salinity=35.0, depth=100.0)
-print(tl.absorption_coefficient, tl.tl[-1])
-tl.plot()   # TL vs range with the spreading/absorption split (needs matplotlib)
+print(pl.absorption_coefficient, pl.pl[-1])
+pl.plot()   # PL vs range with the spreading/absorption split (needs matplotlib)
 ```
 
-`transmission_loss` returns a `TransmissionLossResult` with `tl`, `spreading`,
+`propagation_loss` returns a `PropagationLossResult` with `pl`, `spreading`,
 `absorption` (arrays), the `frequency` and the `absorption_coefficient`
 (dB/km). Francois–Garrison and Ainslie–McColm agree to within ~10 % across
 100 Hz–1 MHz, so either is a good cross-check of the other.
@@ -150,8 +150,8 @@ flux = underwater.weston_propagation_loss(ranges, 100.0, 100.0, critical_angle=9
                                           reflection_loss_gradient_value=0.0)
 modes = underwater.normal_modes(100.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=41.0, receiver_depth=57.0, ranges_m=ranges)
-mean = lambda tl: -10.0 * np.log10(np.mean(10.0 ** (-tl / 10.0)))
-print(mean(flux.propagation_loss), mean(modes.transmission_loss))
+mean = lambda pl: -10.0 * np.log10(np.mean(10.0 ** (-pl / 10.0)))
+print(mean(flux.propagation_loss), mean(modes.propagation_loss))
 ```
 
 > Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
@@ -233,21 +233,21 @@ kilometres.
 
 The sonar equation combines the performance terms into the **signal excess**
 $SE$ (detection when $SE \ge 0$) and the **figure of merit** (the maximum
-allowable transmission loss at $SE = 0$):
+allowable propagation loss at $SE = 0$):
 
 $$
-SE = SL - TL - (NL - DI) - DT \ \ \text{(passive)},
+SE = SL - PL - (NL - DI) - DT \ \ \text{(passive)},
 $$
 
 $$
-SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
+SE = SL - 2\,PL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
 $$
 
 or reverberation-limited with $RL$ in place of $NL - DI$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with transmission loss, crossing zero (the detection limit) at the figure of merit" width="82%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with propagation loss, crossing zero (the detection limit) at the figure of merit" width="82%">
 </picture>
 
 <details>
@@ -258,12 +258,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                        noise_level=60.0, directivity_index=15.0,
                                        detection_threshold=8.0)
 print(f"figure of merit = {se.figure_of_merit:.1f} dB")  # figure of merit = 87.0 dB
-se.plot()   # signal excess vs transmission loss, zero crossing at the FOM
+se.plot()   # signal excess vs propagation loss, zero crossing at the FOM
 plt.show()
 ```
 
@@ -273,12 +273,12 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                noise_level=60.0, directivity_index=15.0,
                                detection_threshold=8.0)
-print(se.figure_of_merit)   # max allowable one-way TL at SE = 0
-se.plot()   # signal excess vs transmission loss (needs matplotlib)
+print(se.figure_of_merit)   # max allowable one-way PL at SE = 0
+se.plot()   # signal excess vs propagation loss (needs matplotlib)
 
 # Active, monostatic (two-way loss, target strength):
 underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=60.0,
@@ -287,8 +287,8 @@ underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=
 
 ### 3.1 Detection range
 
-Since the figure of merit *is* the maximum allowable transmission loss,
-inverting a loss law at $TL = FOM$ gives the **detection range**, the range at
+Since the figure of merit *is* the maximum allowable propagation loss,
+inverting a loss law at $PL = FOM$ gives the **detection range**, the range at
 which the detection probability is 50 %. `detection_range` inverts the
 closed-form loss of §1, which grows monotonically with range and therefore has
 a single crossing; `detection_range_from_curve` reads the crossing off any
@@ -301,15 +301,15 @@ from phonometry import underwater
 # Ainslie's active CW example: FOM = 82.7 dB re m2 at 50 kHz -> r50 ~ 1.3 km.
 res = underwater.detection_range(82.7, 50e3)
 print(res.detection_range)          # metres
-res.plot()                          # TL vs FOM with the crossing marked
+res.plot()                          # PL vs FOM with the crossing marked
 
 # Off a numerical prediction instead:
 import numpy as np
 modes = underwater.normal_modes(200.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=40.0, receiver_depth=60.0,
                                 ranges_m=np.linspace(100.0, 20_000.0, 800))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss))
-print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.transmission_loss,
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss))
+print(underwater.detection_range_from_curve(60.0, modes.ranges, modes.propagation_loss,
                                             crossing="last"))
 ```
 

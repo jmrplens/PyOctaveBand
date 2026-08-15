@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         AuditoryWeightingResult,
         WeightedExposureResult,
     )
-    from ..underwater.propagation.closed_form import TransmissionLossResult
+    from ..underwater.propagation.closed_form import PropagationLossResult
     from ..underwater.propagation.numerical import (
         NormalModeResult,
         ParabolicEquationResult,
@@ -59,7 +59,7 @@ _FREQUENCY_LABEL = "Frequency [Hz]"
 _TIME_LABEL = "Time [s]"
 _DEPTH_LABEL = "Depth [m]"
 _GRAZING_ANGLE_LABEL = "Grazing angle [°]"
-_TRANSMISSION_LOSS_LABEL = "Transmission loss [dB]"
+_PROPAGATION_LOSS_LABEL = "Propagation loss [dB]"
 _LEGEND_LOWER_RIGHT: Final = "lower right"
 
 #: Spanish translations of the fixed strings rendered by the underwater
@@ -85,12 +85,12 @@ _STRINGS: dict[str, str] = {
     "Sound speed [m/s]": "Velocidad del sonido [m/s]",
     "Depth [m]": "Profundidad [m]",
     "Sea-water sound-speed profile": "Perfil de velocidad del sonido en agua de mar",
-    "Total TL": "TL total",
+    "Total PL": "PL total",
     "Spreading": "Divergencia",
     "Absorption": "Absorción",
     "Range [m]": "Distancia [m]",
-    "Transmission loss [dB]": "Pérdida por transmisión [dB]",
-    "Underwater transmission loss": "Pérdida por transmisión submarina",
+    "Propagation loss [dB]": "Pérdida de propagación [dB]",
+    "Underwater propagation loss": "Pérdida de propagación submarina",
     "Signal excess": "Exceso de señal",
     r"Detection limit ($\mathrm{SE}$ = 0)": r"Límite de detección ($\mathrm{SE}$ = 0)",
     "Figure of merit": "Cifra de mérito",
@@ -113,10 +113,10 @@ _STRINGS: dict[str, str] = {
     "Ship traffic source level": "Nivel de fuente del tráfico marítimo",
     "modes": "modos",
     "Range [km]": "Distancia [km]",
-    "Normal-mode transmission loss": "Pérdida por transmisión por modos normales",
+    "Normal-mode propagation loss": "Pérdida de propagación por modos normales",
     "Source": "Fuente",
     "Ray trace": "Trazado de rayos",
-    "Parabolic-equation transmission loss": "Pérdida por transmisión por ecuación parabólica",
+    "Parabolic-equation propagation loss": "Pérdida de propagación por ecuación parabólica",
     "Weston regimes": "Regímenes de Weston",
     "Composite": "Compuesto",
     r"Spherical ($20\,\log_{10} r$)": r"Esférica ($20\,\log_{10} r$)",
@@ -136,7 +136,7 @@ _STRINGS: dict[str, str] = {
     "Weighted exposure vs criteria": "Exposición ponderada frente a criterios",
     "Single-strike SEL per band": "SEL por banda de un golpe",
     "Detection range": "Alcance de detección",
-    "Transmission loss vs figure of merit": "Pérdida por transmisión frente a cifra de mérito",
+    "Propagation loss vs figure of merit": "Pérdida de propagación frente a cifra de mérito",
 }
 
 
@@ -291,33 +291,33 @@ def plot_sound_speed_profile(
     localize_axes(ax, language)
     return ax
 
-def plot_transmission_loss(
-    result: TransmissionLossResult, ax: Axes | None = None, *, language: str = "en",
+def plot_propagation_loss(
+    result: PropagationLossResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
 ) -> Axes:
-    """Transmission loss versus range, with spreading and absorption split out.
+    """Propagation loss versus range, with spreading and absorption split out.
 
-    Loss increases downward (the usual TL convention).
+    Loss increases downward (the usual PL convention).
 
-    :param result: A :class:`~phonometry.underwater.propagation.TransmissionLossResult`.
+    :param result: A :class:`~phonometry.underwater.propagation.PropagationLossResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the total-TL ``plot`` call.
+    :param kwargs: Forwarded to the total-PL ``plot`` call.
     :return: The axes.
     """
     from .._i18n import decimal_comma, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.range_m, dtype=np.float64)
-    label = f"{_t('Total TL', language)} ({decimal_comma(f'{result.frequency / 1000.0:.3g}', language)} kHz)"
-    ax.plot(r, np.asarray(result.tl), **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
+    label = f"{_t('Total PL', language)} ({decimal_comma(f'{result.frequency / 1000.0:.3g}', language)} kHz)"
+    ax.plot(r, np.asarray(result.pl), **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     ax.plot(r, np.asarray(result.spreading), color=_C_MUTED, lw=1.0, ls="--",
             label=f"{_t('Spreading', language)} ({result.law})")
     ax.plot(r, np.asarray(result.absorption), color=_C_SECONDARY, lw=1.0, ls=":",
             label=f"{_t('Absorption', language)} ({decimal_comma(f'{result.absorption_coefficient:.3g}', language)} dB/km)")
     ax.set_xlabel(_t(_RANGE_LABEL, language))
-    ax.set_ylabel(_t(_TRANSMISSION_LOSS_LABEL, language))
-    ax.set_title(f"{_t('Underwater transmission loss', language)} ({result.model})")
+    ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
+    ax.set_title(f"{_t('Underwater propagation loss', language)} ({result.model})")
     if not ax.yaxis_inverted():
         ax.invert_yaxis()
     ax.grid(True, alpha=0.3)
@@ -329,7 +329,7 @@ def plot_sonar_equation(
     result: SonarEquationResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
 ) -> Axes:
-    """Signal excess versus transmission loss, with the detection limit (SE = 0).
+    """Signal excess versus propagation loss, with the detection limit (SE = 0).
 
     :param result: A :class:`~phonometry.underwater.sonar_equation.SonarEquationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
@@ -340,16 +340,16 @@ def plot_sonar_equation(
     from .._i18n import format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
-    tl = np.asarray(result.transmission_loss, dtype=np.float64)
+    pl = np.asarray(result.propagation_loss, dtype=np.float64)
     se = np.asarray(result.signal_excess, dtype=np.float64)
-    order = np.argsort(tl)
+    order = np.argsort(pl)
     label = f"{_t('Signal excess', language)} ({result.mode})"
-    ax.plot(tl[order], se[order], **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
+    ax.plot(pl[order], se[order], **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     ax.axhline(0.0, color=_C_REFERENCE, ls="--", lw=1.0,
                label=_t(r"Detection limit ($\mathrm{SE}$ = 0)", language))
     ax.axvline(result.figure_of_merit, color=_C_MUTED, ls=":", lw=1.0,
                label=f"{_t('Figure of merit', language)} = {format_number(result.figure_of_merit, language)} dB")
-    ax.set_xlabel(_t(_TRANSMISSION_LOSS_LABEL, language))
+    ax.set_xlabel(_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_ylabel(_t("Signal excess [dB]", language))
     ax.set_title(_t("Sonar equation", language))
     ax.grid(True, alpha=0.3)
@@ -489,24 +489,24 @@ def plot_normal_modes(
     result: NormalModeResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
 ) -> Axes:
-    """Normal-mode transmission loss versus range (loss increasing downward).
+    """Normal-mode propagation loss versus range (loss increasing downward).
 
     :param result: A :class:`~phonometry.underwater.propagation.numerical.NormalModeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the transmission-loss ``plot`` call.
+    :param kwargs: Forwarded to the propagation-loss ``plot`` call.
     :return: The axes.
     """
     from .._i18n import format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.ranges, dtype=np.float64)
-    tl = np.asarray(result.transmission_loss, dtype=np.float64)
+    pl = np.asarray(result.propagation_loss, dtype=np.float64)
     label = f"{result.wavenumbers.size} {_t('modes', language)} ({format_number(result.frequency, language, decimals=0)} Hz)"
-    ax.plot(r / 1000.0, tl, **{"color": _C_PRIMARY, "lw": 1.2, "label": label, **kwargs})
+    ax.plot(r / 1000.0, pl, **{"color": _C_PRIMARY, "lw": 1.2, "label": label, **kwargs})
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
-    ax.set_ylabel(_t(_TRANSMISSION_LOSS_LABEL, language))
-    ax.set_title(_t("Normal-mode transmission loss", language))
+    ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
+    ax.set_title(_t("Normal-mode propagation loss", language))
     if not ax.yaxis_inverted():
         ax.invert_yaxis()
     ax.grid(True, alpha=0.3)
@@ -546,7 +546,7 @@ def plot_parabolic_equation(
     result: ParabolicEquationResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
 ) -> Axes:
-    """Parabolic-equation transmission-loss field (range x depth).
+    """Parabolic-equation propagation-loss field (range x depth).
 
     :param result: A
         :class:`~phonometry.underwater.propagation.numerical.ParabolicEquationResult`.
@@ -560,16 +560,16 @@ def plot_parabolic_equation(
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.ranges, dtype=np.float64) / 1000.0
     z = np.asarray(result.depths, dtype=np.float64)
-    tl = np.asarray(result.transmission_loss, dtype=np.float64)
-    finite = tl[np.isfinite(tl)]
+    pl = np.asarray(result.propagation_loss, dtype=np.float64)
+    finite = pl[np.isfinite(pl)]
     vmax = float(np.percentile(finite, 95)) if finite.size else 100.0
     # The zero-range column is infinite (1/√r); clip non-finite samples to vmax
     # so imshow does not render them as a spurious stripe.
-    tl = np.where(np.isfinite(tl), tl, vmax)
+    pl = np.where(np.isfinite(pl), pl, vmax)
     # imshow renders the field as a single raster image (no per-cell vector
     # quads), which avoids moiré and keeps the figure light.
     img = ax.imshow(
-        tl,
+        pl,
         **{
             "cmap": "viridis_r",
             "vmin": vmax - 50.0,
@@ -581,10 +581,10 @@ def plot_parabolic_equation(
             **kwargs,
         },
     )
-    ax.figure.colorbar(img, ax=ax, label=_t(_TRANSMISSION_LOSS_LABEL, language))
+    ax.figure.colorbar(img, ax=ax, label=_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_DEPTH_LABEL, language))
-    ax.set_title(_t("Parabolic-equation transmission loss", language))
+    ax.set_title(_t("Parabolic-equation propagation loss", language))
     localize_axes(ax, language)
     return ax
 
@@ -795,21 +795,21 @@ def plot_detection_range(
     result: DetectionRangeResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
 ) -> Axes:
-    """Transmission loss against the figure of merit, with the detection range.
+    """Propagation loss against the figure of merit, with the detection range.
 
     :param result: A
         :class:`~phonometry.underwater.sonar_equation.DetectionRangeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the transmission-loss ``plot`` call.
+    :param kwargs: Forwarded to the propagation-loss ``plot`` call.
     :return: The axes.
     """
     from .._i18n import format_number, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.range_m, dtype=np.float64)
-    ax.plot(r, np.asarray(result.transmission_loss, dtype=np.float64),
-            **{"color": _C_PRIMARY, "lw": 1.4, "label": _t("Total TL", language), **kwargs})
+    ax.plot(r, np.asarray(result.propagation_loss, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.4, "label": _t("Total PL", language), **kwargs})
     ax.axhline(result.figure_of_merit, color=_C_SECONDARY, ls="--", lw=1.2,
                label=(f"{_t('Figure of merit', language)} "
                       f"{format_number(result.figure_of_merit, language)} dB"))
@@ -818,8 +818,8 @@ def plot_detection_range(
                    label=(f"{_t('Detection range', language)} "
                           f"{format_number(result.detection_range, language, decimals=0)} m"))
     ax.set_xlabel(_t(_RANGE_LABEL, language))
-    ax.set_ylabel(_t(_TRANSMISSION_LOSS_LABEL, language))
-    ax.set_title(_t("Transmission loss vs figure of merit", language))
+    ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
+    ax.set_title(_t("Propagation loss vs figure of merit", language))
     if not ax.yaxis_inverted():
         ax.invert_yaxis()
     ax.grid(True, alpha=0.3)

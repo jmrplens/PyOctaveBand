@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """underwater.propagation subdomain of phonometry: how the sound gets there.
 
-The closed-form transmission loss (spreading plus seawater absorption) and
+The closed-form propagation loss (spreading plus seawater absorption) and
 Weston's regimes, the numerical solvers (normal modes, rays, parabolic
 equation), the seabed reflection they bounce off and the sound speed profile
 they travel through.
@@ -10,10 +10,10 @@ they travel through.
 from __future__ import annotations
 
 from .closed_form import (
-    TransmissionLossResult,
+    PropagationLossResult,
+    propagation_loss,
     seawater_absorption,
     spreading_loss,
-    transmission_loss,
 )
 from .numerical import (
     NormalModeResult,
@@ -58,10 +58,10 @@ __all__ = [
     "BottomLossResult",
     "NormalModeResult",
     "ParabolicEquationResult",
+    "PropagationLossResult",
     "RayTraceResult",
     "SeabedReflection",
     "SoundSpeedProfile",
-    "TransmissionLossResult",
     "WestonPropagationResult",
     "WestonRegimeBoundaries",
     "WestonSeabed",
@@ -73,6 +73,7 @@ __all__ = [
     "loss_parameter",
     "normal_modes",
     "parabolic_equation",
+    "propagation_loss",
     "ray_trace",
     "reflection_coefficient",
     "reflection_loss_gradient",
@@ -81,7 +82,6 @@ __all__ = [
     "seawater_absorption",
     "sound_speed_profile",
     "spreading_loss",
-    "transmission_loss",
     "waveguide_cutoff_frequency",
     "weston_propagation_loss",
     "weston_regime_boundaries",

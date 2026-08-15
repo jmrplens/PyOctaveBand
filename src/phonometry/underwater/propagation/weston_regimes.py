@@ -22,8 +22,8 @@ Performance Modelling* (Springer 2010), §9.1.1.2 (printed pp. 452-458):
 Equations (9.42) to (9.61) and the seabed properties of Table 9.1
 (:data:`WESTON_SEABEDS`). The quantity computed is Ainslie's **propagation
 factor** ``F`` (units m⁻²), reported as the propagation loss
-:math:`\mathrm{PL} = -10 \log_{10} F` dB re 1 m², which equals the usual
-transmission loss for a point source in free water.
+:math:`\mathrm{PL} = -10 \log_{10} F` dB re 1 m², which reduces to spherical
+spreading for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
 range-averaged field, not its modal interference. That is exactly what makes

@@ -21,7 +21,7 @@ from phonometry.underwater.sonar_equation import (
 
 
 def test_passive_signal_excess_and_fom() -> None:
-    # SE = SL - TL - (NL - DI) - DT ; hand values.
+    # SE = SL - PL - (NL - DI) - DT ; hand values.
     res = passive_sonar_equation(140.0, 80.0, 60.0, directivity_index=10.0,
                                  detection_threshold=5.0)
     assert isinstance(res, SonarEquationResult)
@@ -35,14 +35,14 @@ def test_passive_signal_excess_and_fom() -> None:
 
 
 def test_passive_detection_at_fom() -> None:
-    # At TL = FOM the signal excess is exactly zero (detection limit).
+    # At PL = FOM the signal excess is exactly zero (detection limit).
     res = passive_sonar_equation(140.0, [85.0], 60.0, directivity_index=10.0,
                                  detection_threshold=5.0)
     assert res.signal_excess[0] == pytest.approx(0.0, abs=1e-9)
 
 
 def test_active_noise_limited() -> None:
-    # SE = SL - 2 TL + TS - (NL - DI) - DT
+    # SE = SL - 2 PL + TS - (NL - DI) - DT
     res = active_sonar_equation(220.0, 70.0, 15.0, 60.0, directivity_index=20.0,
                                 detection_threshold=10.0)
     assert res.mode == "active"
@@ -62,16 +62,16 @@ def test_active_reverberation_limited_ignores_di() -> None:
     assert res.figure_of_merit == pytest.approx((220.0 + 15.0 - 55.0 - 10.0) / 2.0)
 
 
-def test_signal_excess_decreases_with_transmission_loss() -> None:
-    tl = np.linspace(50.0, 120.0, 8)
-    res = passive_sonar_equation(150.0, tl, 55.0)
+def test_signal_excess_decreases_with_propagation_loss() -> None:
+    pl = np.linspace(50.0, 120.0, 8)
+    res = passive_sonar_equation(150.0, pl, 55.0)
     assert np.all(np.diff(res.signal_excess) < 0.0)
-    # Passive SE decreases 1 dB per dB of one-way TL.
-    np.testing.assert_allclose(np.diff(res.signal_excess), -np.diff(tl))
+    # Passive SE decreases 1 dB per dB of one-way PL.
+    np.testing.assert_allclose(np.diff(res.signal_excess), -np.diff(pl))
 
 
 def test_active_two_way_loss() -> None:
-    # Active SE loses 2 dB per dB of one-way TL.
+    # Active SE loses 2 dB per dB of one-way PL.
     res = active_sonar_equation(200.0, [60.0, 61.0], 10.0, 50.0)
     assert res.signal_excess[1] - res.signal_excess[0] == pytest.approx(-2.0)
 

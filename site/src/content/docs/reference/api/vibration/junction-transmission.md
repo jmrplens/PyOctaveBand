@@ -241,7 +241,7 @@ source-plate bending-wave group velocity `cg_i`, the junction length
 | Name | Description |
 | :--- | :--- |
 | `transmission_coefficient` | Angular-average `tau_ij` (scalar/array). |
-| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate $c_g = 2 c_B$ with the bending phase speed `cB` (see [`phonometry.vibration.structural.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/)). |
+| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate $c_g = 2 c_B$ with the bending phase speed `cB` (see [`phonometry.vibration.structural.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_wave_speed)). |
 | `junction_length` | Junction length `L_ij`, in m (> 0). |
 | `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
 | `plate_area` | Source-plate area `S_i`, in m^2 (> 0). |

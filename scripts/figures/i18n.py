@@ -2636,12 +2636,12 @@ _ES_EXACT = {
         "Audibilidad tonal de aerogenerador (IEC 61400-11)",
     "Narrowband spectrum": "Espectro de banda estrecha",
     "Critical band": "Banda crítica",
-    # Underwater propagation (plan-22 P1): transmission loss, sound speed, sonar.
-    "Underwater Transmission Loss (Francois–Garrison)":
-        "Pérdida por transmisión submarina (Francois–Garrison)",
+    # Underwater propagation (plan-22 P1): propagation loss, sound speed, sonar.
+    "Underwater Propagation Loss (Francois–Garrison)":
+        "Pérdida de propagación submarina (Francois–Garrison)",
     "Range [m]": "Distancia [m]",
-    "Transmission loss [dB]": "Pérdida por transmisión [dB]",
-    "Total transmission loss": "Pérdida por transmisión total",
+    "Propagation loss [dB]": "Pérdida de propagación [dB]",
+    "Total propagation loss": "Pérdida de propagación total",
     "Geometrical spreading": "Ensanchamiento geométrico",
     "Volume absorption": "Absorción de volumen",
     "Sea-Water Sound-Speed Profile (UNESCO)":
@@ -2711,9 +2711,9 @@ _ES_EXACT = {
     "Closed Form: One Crossing (FOM = 82.7 dB, 50 kHz)":
         "Forma cerrada: un cruce (FOM = 82,7 dB, 50 kHz)",
     "Crossings": "Cruces",
-    "Normal-mode TL (30 Hz, 100 m waveguide, 3 modes)":
-        "TL de modos normales (30 Hz, guía de 100 m, 3 modos)",
-    "Total TL": "TL total",
+    "Normal-mode PL (30 Hz, 100 m waveguide, 3 modes)":
+        "PL de modos normales (30 Hz, guía de 100 m, 3 modos)",
+    "Total PL": "PL total",
     r"Mode function $\Psi_m(z)$": r"Función modal $\Psi_m(z)$",
     "Mode $m$ Has $m - 1$ Interior Nulls":
         "El modo $m$ tiene $m - 1$ ceros interiores",
@@ -2724,8 +2724,8 @@ _ES_EXACT = {
         "el modo 4 tiene un cero a la profundidad\nde la fuente, que por eso "
         "no lo excita",
     "source depth 50 m": "profundidad de la fuente: 50 m",
-    "Modal Transmission Loss ($z$ = 100 m)":
-        "Pérdida por transmisión modal ($z$ = 100 m)",
+    "Modal Propagation Loss ($z$ = 100 m)":
+        "Pérdida de propagación modal ($z$ = 100 m)",
     "10 kHz, spherical only": "10 kHz, solo esférica",
     "10 kHz, practical $R_0$ = 1 km": "10 kHz, ley práctica, $R_0$ = 1 km",
     "20 kHz, practical $R_0$ = 1 km": "20 kHz, ley práctica, $R_0$ = 1 km",
@@ -3730,6 +3730,9 @@ _ES_EXACT = {
     "Quarter-wave stub": "Ramal de cuarto de onda",
     "Side-branch resonators: transmission loss (Bies Eqs. 8.44, 8.46)":
         "Resonadores en derivación: pérdida de transmisión (Bies Ecs. 8.44, 8.46)",
+    # The silencers' own y-label. Not the underwater one, which is a
+    # propagation loss and has its own entry (ISO 18405:2017, 3.4.1.3/3.4.1.4).
+    "Transmission loss [dB]": "Pérdida por transmisión [dB]",
     "Duct end reflection loss (ASHRAE Table 8.14)":
         "Pérdida por reflexión del extremo del conducto (ASHRAE Tabla 8.14)",
     "End reflection loss [dB]": "Pérdida por reflexión del extremo [dB]",

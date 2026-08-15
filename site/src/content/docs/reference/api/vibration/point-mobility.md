@@ -65,6 +65,71 @@ bending wavenumber.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## beam_bending_wave_speed
+
+```python
+beam_bending_wave_speed(
+    frequency: ArrayLike,
+    bending_stiffness: float,
+    mass_per_length: float,
+) -> NDArray[np.float64]
+```
+
+Free bending wave speed of a beam
+$c_B = (B \omega^2 / m')^{1/4}$.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
+| `bending_stiffness` | Beam bending stiffness $B = E I$, in N.m^2. |
+| `mass_per_length` | Mass per unit length `m'`, in kg/m. |
+
+**Returns:** The bending phase speed `cB`, in m/s.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive stiffness, mass or frequency. |
+
+## infinite_beam_impedance
+
+```python
+infinite_beam_impedance(
+    frequency: ArrayLike,
+    bending_stiffness: float,
+    mass_per_length: float,
+    *,
+    location: str = 'centre',
+) -> NDArray[np.complex128]
+```
+
+Point impedance of an infinite beam in bending (Cremer Table 5.1).
+
+$Z = 2 m' c_B (1 + j)$ for a force at the centre of the beam and
+$Z = (m' c_B / 2)(1 + j)$ for a force at a free end, with the
+bending wave speed $c_B = (B \omega^2 / m')^{1/4}$
+([`beam_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/#beam_bending_wave_speed)).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
+| `bending_stiffness` | Beam bending stiffness $B = E I$, in N.m^2. |
+| `mass_per_length` | Mass per unit length `m'`, in kg/m. |
+| `location` | `"centre"` or `"end"`. |
+
+**Returns:** The complex point impedance `Z`, in N.s/m.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive input or unknown location. |
+
 ## infinite_beam_mobility
 
 ```python
@@ -81,7 +146,7 @@ Point mobility of an infinite beam in bending (Cremer Table 5.1).
 
 $Y = (1 - j) / (4 m' c_B)$ for a force at the centre and
 $Y = (1 - j) / (m' c_B)$ for a force at a free end, the reciprocal
-of `infinite_beam_impedance`. The mobility falls as
+of [`infinite_beam_impedance`](/phonometry/reference/api/vibration/point-mobility/#infinite_beam_impedance). The mobility falls as
 $\omega^{-1/2}$.
 
 **Parameters**
@@ -306,6 +371,35 @@ $Z = \rho c_L S$, real and frequency independent.
 | :--- | :--- |
 | ValueError | for a non-positive input. |
 
+## longitudinal_rod_mobility
+
+```python
+longitudinal_rod_mobility(
+    density: float,
+    longitudinal_wave_speed: float,
+    cross_section_area: float,
+) -> float
+```
+
+Point mobility of an infinite rod $Y = 1 / (\rho c_L S)$
+(Table 5.1).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `density` | Material density `rho`, in kg/m^3. |
+| `longitudinal_wave_speed` | Longitudinal wave speed `cL`, in m/s. |
+| `cross_section_area` | Cross-section area `S`, in m^2. |
+
+**Returns:** The point mobility `Y`, in m/(N.s).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive input. |
+
 ## plate_bending_stiffness
 
 ```python
@@ -337,3 +431,32 @@ in N.m used throughout this module and by the coincidence frequency of
 | Exception | When |
 | :--- | :--- |
 | ValueError | for a non-positive modulus/thickness or $\lvert\nu\rvert \ge 1$. |
+
+## plate_bending_wave_speed
+
+```python
+plate_bending_wave_speed(
+    frequency: ArrayLike,
+    bending_stiffness: float,
+    mass_per_area: float,
+) -> NDArray[np.float64]
+```
+
+Free bending wave speed of a plate
+$c_B = (B' \omega^2 / m'')^{1/4}$.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
+| `bending_stiffness` | Plate bending stiffness per unit width `B'`, in N.m. |
+| `mass_per_area` | Mass per unit area `m''`, in kg/m^2. |
+
+**Returns:** The bending phase speed `cB`, in m/s.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive stiffness, mass or frequency. |

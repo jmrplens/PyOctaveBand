@@ -94,7 +94,7 @@ keeps working:
 from phonometry import building, underwater
 
 r = building.airborne_insulation(...)
-tl = underwater.transmission_loss(...)
+pl = underwater.propagation_loss(...)
 ```
 
 | Namespace | Coverage |
@@ -111,7 +111,7 @@ tl = underwater.transmission_loss(...)
 | `emission` | Sound power by enveloping surface (ISO 3744/3746), reverberation room (ISO 3741), precision anechoic rooms (ISO 3745) and intensity scanning with field indicators and grades (ISO 9614-2/3); two-microphone p-p intensity (IEC 61043, ISO 9614-1); sound power from surface vibration (ISO/TS 7849); noise-emission declarations (ISO 4871) |
 | `environment` | Sources: CNOSSOS-EU road and rail emission, wind-turbine apparent sound power and tonal audibility (IEC 61400-11). Propagation: atmospheric absorption (ISO 9613-1) and the ISO 9613-2 general method with per-term octave breakdown, spherical ground effect and wave-theoretic barriers, refraction ray tracing and the GFPE. Assessment: rating levels, Lden/Ldn and adjustments (ISO 1996-1/2), impulsive-sound prominence (NT ACOU 112) and the Spanish RD 1367/2007 |
 | `aircraft` | EPNL certification chain (ICAO Annex 16) with IEC 61265 verification and SAE ARP 5534 absorption; airport noise contours (ECAC Doc 29) with the EASA ANP fleet database; rotorcraft hemisphere method (ECAC Doc 32) |
-| `underwater` | Levels re 1 µPa (ISO 18405); ship radiated noise (ISO 17208-1/2); pile driving (ISO 18406); ship-traffic source levels (JOMOPANS-ECHO) and Wenz ambient noise; sonar equation and detection range; sound speed and seabed reflection; transmission loss from spreading laws and Weston's shallow-water regimes to normal-mode, ray and parabolic-equation solvers; marine-mammal audiograms and regulatory auditory weighting (NMFS 2024/2018, Southall et al. 2019) |
+| `underwater` | Levels re 1 µPa (ISO 18405); ship radiated noise (ISO 17208-1/2); pile driving (ISO 18406); ship-traffic source levels (JOMOPANS-ECHO) and Wenz ambient noise; sonar equation and detection range; sound speed and seabed reflection; propagation loss from spreading laws and Weston's shallow-water regimes to normal-mode, ray and parabolic-equation solvers; marine-mammal audiograms and regulatory auditory weighting (NMFS 2024/2018, Southall et al. 2019) |
 | `vibration` | Human vibration: weightings (ISO 8041-1), whole-body metrics and buildings (ISO 2631-1/2), multiple shocks (ISO 2631-5), hand-arm and A(8) (ISO 5349); mobility and the FRF family (ISO 7626); isolator transfer stiffness (ISO 10846); plate-junction transmission and Kij; radiation efficiency and point mobilities |
 | `electroacoustics` | Distortion per IEC 60268-3: THD, THD+N and SINAD (AES17), SMPTE/CCIF intermodulation and DIM; swept-sine harmonic separation and THD(f) (Farina, Novak synchronized sweep); frequency response and coherence; rigid-piston radiation; loudspeaker and microphone rated characteristics (IEC 60268-5/-4) |
 | `noise_control` | Reactive silencers by the four-pole transmission-matrix method; HVAC duct elements and flow noise; machine enclosures |

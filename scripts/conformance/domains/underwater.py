@@ -111,9 +111,9 @@ def _chk_uw_cumulative_sel() -> Outcome:
 
 
 # ===========================================================================
-# Underwater sound propagation (transmission loss, closed-form)
+# Underwater sound propagation (propagation loss, closed-form)
 # ===========================================================================
-_UW_PROP = "Underwater sound propagation (transmission loss)"
+_UW_PROP = "Underwater sound propagation (propagation loss)"
 
 
 @register(
@@ -357,7 +357,7 @@ def _chk_uww_eta_mud() -> Outcome:
 @register(
     _UW_WESTON,
     "Weston cylindrical spreading vs normal modes",
-    "Range-averaged TL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB",
+    "Range-averaged PL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB",
 )
 def _chk_uww_flux_vs_modes() -> Outcome:
     # Independent cross-check: the range average of the coherent modal field is
@@ -370,15 +370,15 @@ def _chk_uww_flux_vs_modes() -> Outcome:
     energies = [
         _np.mean(10.0 ** (-ph.normal_modes(
             100.0, [0.0, 100.0], [1500.0, 1500.0], source_depth=41.0,
-            receiver_depth=float(zr), ranges_m=ranges).transmission_loss / 10.0))
+            receiver_depth=float(zr), ranges_m=ranges).propagation_loss / 10.0))
         for zr in _np.linspace(10.0, 90.0, 9)
     ]
-    numeric_tl = -10.0 * math.log10(float(_np.mean(energies)))
+    numeric_pl = -10.0 * math.log10(float(_np.mean(energies)))
     flux = ph.weston_propagation_loss(ranges, 100.0, 100.0, critical_angle=90.0,
                                       reflection_loss_gradient_value=0.0)
     expected = -10.0 * math.log10(
         float(_np.mean(10.0 ** (-flux.propagation_loss / 10.0))))
-    return numeric(expected, numeric_tl, 1.0, unit="dB", places=3)
+    return numeric(expected, numeric_pl, 1.0, unit="dB", places=3)
 
 
 _UW_FAUNA = "Marine-mammal auditory weighting (NMFS / Southall)"
@@ -456,16 +456,16 @@ def _chk_uwn_modes() -> Outcome:
 @register(
     _UW_NUM,
     "Normal modes vs image-source oracle",
-    "Absolute TL at 1 km in the ideal waveguide (converged image sum), dB",
+    "Absolute PL at 1 km in the ideal waveguide (converged image sum), dB",
 )
 def _chk_uwn_modes_absolute() -> Outcome:
     # Independent absolute anchor (does not share the Eq. 5.14 prefactor with
     # the implementation): converged image-source sum for D = 100 m, f = 20 Hz,
-    # zs = 36 m, zr = 46 m gives TL(1 km) = 48.238 dB.
+    # zs = 36 m, zr = 46 m gives PL(1 km) = 48.238 dB.
     res = ph.normal_modes(20.0, [0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
                           receiver_depth=46.0, ranges_m=[1000.0],
                           n_depth_points=3000)
-    return numeric(48.238, float(res.transmission_loss[0]), 0.02, unit="dB", places=3)
+    return numeric(48.238, float(res.propagation_loss[0]), 0.02, unit="dB", places=3)
 
 
 @register(
@@ -505,7 +505,7 @@ def _chk_uwn_ray_time() -> Outcome:
 @register(
     _UW_NUM,
     "Parabolic equation vs free field",
-    "PE transmission loss at 2 km, homogeneous medium (spherical spreading), dB",
+    "PE propagation loss at 2 km, homogeneous medium (spherical spreading), dB",
 )
 def _chk_uwn_pe() -> Outcome:
     res = ph.parabolic_equation(50.0, [0.0, 20_000.0], [1500.0, 1500.0],
@@ -513,5 +513,5 @@ def _chk_uwn_pe() -> Outcome:
                                 range_step=2.0, n_depth_points=8192)
     zi = int(min(range(res.depths.size), key=lambda i: abs(res.depths[i] - 10_000.0)))
     ri = int(min(range(res.ranges.size), key=lambda i: abs(res.ranges[i] - 2000.0)))
-    return numeric(20.0 * math.log10(2000.0), float(res.transmission_loss[zi][ri]),
+    return numeric(20.0 * math.log10(2000.0), float(res.propagation_loss[zi][ri]),
                    0.1, unit="dB", places=3)

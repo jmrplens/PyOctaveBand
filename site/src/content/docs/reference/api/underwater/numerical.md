@@ -9,16 +9,16 @@ Numerical models of underwater sound propagation (range-independent ocean).
 
 Three complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
-transmission loss of [`phonometry.underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/):
+propagation loss of [`phonometry.underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/):
 
 * [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) -- the normal-mode expansion. Solves the depth-separated
   Sturm-Liouville eigenvalue problem by finite differences and assembles the
-  transmission loss from the propagating modes.
+  propagation loss from the propagating modes.
 * [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) -- ray tracing. Integrates the ray-trajectory equations
   through a sound-speed profile (Runge-Kutta), returning the ray paths and the
   travel time accumulated along each of them.
 * [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) -- the standard (Tappert) parabolic equation, solved
-  with the split-step Fourier algorithm, returning the transmission-loss field.
+  with the split-step Fourier algorithm, returning the propagation-loss field.
 
 All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 *Computational Ocean Acoustics* (2nd ed., Springer 2011): the modal derivation
@@ -28,7 +28,7 @@ ideal (pressure-release) waveguide's exact modes, the circular-arc ray paths of
 a linear sound-speed gradient together with the closed-form travel time along
 them (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press
 1998, Eq. (3.3.20)), and mutual agreement of the PE and normal-mode
-transmission loss for a range-independent waveguide.
+propagation loss for a range-independent waveguide.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
 frequencies in Hz. The water column has a pressure-release surface at z = 0.
@@ -52,10 +52,10 @@ normal_modes(
 ) -> NormalModeResult
 ```
 
-Normal-mode transmission loss for a range-independent waveguide.
+Normal-mode propagation loss for a range-independent waveguide.
 
 Solves the depth-separated Sturm-Liouville problem (Jensen Eq. 5.3) on a
-uniform finite-difference grid, then assembles the coherent transmission
+uniform finite-difference grid, then assembles the coherent propagation
 loss from the propagating modes (Eq. 5.17).
 
 The finite-difference eigenvalues carry an $O(dz^2)$ error that
@@ -75,7 +75,7 @@ to resolve it).
 | `depths` | Depth samples of the sound-speed profile, in metres, starting at the surface `z = 0` and strictly increasing to the bottom. |
 | `sound_speeds` | Sound speed at each depth, in m/s. |
 | `source_depth` | Source depth `zs`, in metres. |
-| `receiver_depth` | Receiver depth for the transmission-loss slice, in m. |
+| `receiver_depth` | Receiver depth for the propagation-loss slice, in m. |
 | `ranges_m` | Ranges at which to evaluate the loss, in metres; defaults to 100 m to 10 km. |
 | `density` | Water density (constant), in kg/m3. |
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. |
@@ -98,7 +98,7 @@ NormalModeResult(
     mode_depths: NDArray[np.float64],
     mode_functions: NDArray[np.float64],
     ranges: NDArray[np.float64],
-    transmission_loss: NDArray[np.float64],
+    propagation_loss: NDArray[np.float64],
     receiver_depth: float,
     source_depth: float,
 )
@@ -114,9 +114,9 @@ Normal-mode solution of a range-independent waveguide.
 | `wavenumbers` | Horizontal wavenumbers `krm` of the propagating modes, in rad/m (descending order). |
 | `mode_depths` | Depth grid of the mode functions, in metres. |
 | `mode_functions` | Orthonormalised mode shapes `Ψm(z)`, shape `(n_modes, n_depths)`. |
-| `ranges` | Ranges at which the transmission loss is evaluated, in metres. |
-| `transmission_loss` | Coherent transmission loss at `receiver_depth` per range, in dB. |
-| `receiver_depth` | Receiver depth of the transmission-loss slice, in m. |
+| `ranges` | Ranges at which the propagation loss is evaluated, in metres. |
+| `propagation_loss` | Coherent propagation loss at `receiver_depth` per range, in dB. |
+| `receiver_depth` | Receiver depth of the propagation-loss slice, in m. |
 | `source_depth` | Source depth, in metres. |
 
 ### NormalModeResult.plot()
@@ -130,7 +130,7 @@ NormalModeResult.plot(
 ) -> Axes
 ```
 
-Plot the transmission loss versus range (loss increasing downward).
+Plot the propagation loss versus range (loss increasing downward).
 
 ## parabolic_equation
 
@@ -147,14 +147,14 @@ parabolic_equation(
 ) -> ParabolicEquationResult
 ```
 
-Transmission-loss field from the standard (Tappert) parabolic
+Propagation-loss field from the standard (Tappert) parabolic
 equation.
 
 Marches the split-step Fourier solution (Jensen Ch. 6) in range with a
 discrete sine transform in depth, enforcing a pressure-release surface at
 `z = 0` and bottom at `z = water_depth`. The envelope is related to
 pressure by $p = \psi \, e^{i(k_0 r - \pi/4)} / \sqrt{r}$ and
-$\mathrm{TL} = -20 \log_{10}(\lvert \psi \rvert / \sqrt{r})$
+$\mathrm{PL} = -20 \log_{10}(\lvert \psi \rvert / \sqrt{r})$
 (Eqs. 6.70-6.71), using a Gaussian starter.
 
 The standard PE is **paraxial**: it is accurate for propagation within
@@ -191,12 +191,12 @@ ParabolicEquationResult(
     frequency: float,
     ranges: NDArray[np.float64],
     depths: NDArray[np.float64],
-    transmission_loss: NDArray[np.float64],
+    propagation_loss: NDArray[np.float64],
     source_depth: float,
 )
 ```
 
-Parabolic-equation transmission-loss field.
+Parabolic-equation propagation-loss field.
 
 **Attributes**
 
@@ -205,7 +205,7 @@ Parabolic-equation transmission-loss field.
 | `frequency` | Source frequency, in Hz. |
 | `ranges` | Range grid, in metres. |
 | `depths` | Depth grid, in metres. |
-| `transmission_loss` | Transmission-loss field `TL(z, r)`, in dB, shape `(n_depths, n_ranges)`. |
+| `propagation_loss` | Propagation-loss field `PL(z, r)`, in dB, shape `(n_depths, n_ranges)`. |
 | `source_depth` | Source depth, in metres. |
 
 ### ParabolicEquationResult.plot()
@@ -219,7 +219,7 @@ ParabolicEquationResult.plot(
 ) -> Axes
 ```
 
-Plot the transmission-loss field (depth increasing downward).
+Plot the propagation-loss field (depth increasing downward).
 
 ## ray_trace
 

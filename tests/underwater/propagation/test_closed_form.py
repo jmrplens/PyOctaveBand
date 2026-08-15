@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for underwater transmission loss (spreading + volume absorption).
+"""Tests for underwater propagation loss (spreading + volume absorption).
 
 Oracles: the printed Francois & Garrison (1982, Part II) Table IV absorption
 values, the closed-form spreading laws (hand recomputation), the Thorp,
@@ -17,10 +17,10 @@ import numpy as np
 import pytest
 
 from phonometry.underwater.propagation import (
-    TransmissionLossResult,
+    PropagationLossResult,
+    propagation_loss,
     seawater_absorption,
     spreading_loss,
-    transmission_loss,
 )
 
 
@@ -144,27 +144,27 @@ def test_unknown_absorption_model_rejected() -> None:
         seawater_absorption(1000.0, model="fisher-simmons")
 
 
-def test_transmission_loss_is_spreading_plus_absorption() -> None:
-    res = transmission_loss(
+def test_propagation_loss_is_spreading_plus_absorption() -> None:
+    res = propagation_loss(
         [100.0, 1000.0, 10000.0], 10_000.0, law="spherical",
         temperature=10.0, salinity=35.0, depth=0.0, model="francois-garrison",
     )
-    assert isinstance(res, TransmissionLossResult)
+    assert isinstance(res, PropagationLossResult)
     alpha = seawater_absorption(10_000.0, temperature=10.0, salinity=35.0, depth=0.0,
                                 model="francois-garrison")[0]
     expected = 20.0 * np.log10(res.range_m) + alpha * (res.range_m / 1000.0)
-    np.testing.assert_allclose(res.tl, expected, rtol=1e-9)
-    np.testing.assert_allclose(res.spreading + res.absorption, res.tl)
+    np.testing.assert_allclose(res.pl, expected, rtol=1e-9)
+    np.testing.assert_allclose(res.spreading + res.absorption, res.pl)
     assert res.absorption_coefficient == pytest.approx(alpha)
 
 
-def test_transmission_loss_rejects_nonpositive_range() -> None:
+def test_propagation_loss_rejects_nonpositive_range() -> None:
     with pytest.raises(ValueError, match="range_m"):
-        transmission_loss([0.0, 100.0], 1000.0)
+        propagation_loss([0.0, 100.0], 1000.0)
 
 
-def test_transmission_loss_plot_smoke() -> None:
-    res = transmission_loss(np.linspace(10.0, 10000.0, 50), 12_000.0)
+def test_propagation_loss_plot_smoke() -> None:
+    res = propagation_loss(np.linspace(10.0, 10000.0, 50), 12_000.0)
     assert res.plot() is not None
 
 

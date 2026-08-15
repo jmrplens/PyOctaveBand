@@ -271,7 +271,7 @@ def test_normal_modes_range_average_matches_weston_cylindrical(frequency: float)
         np.mean(10.0 ** (-normal_modes(
             frequency, depths, speeds, source_depth=41.0, receiver_depth=float(zr),
             ranges_m=ranges, bottom="pressure-release",
-        ).transmission_loss / 10.0))
+        ).propagation_loss / 10.0))
         for zr in np.linspace(10.0, 90.0, 9)
     ]
     numeric = -10.0 * np.log10(float(np.mean(energies)))
@@ -298,7 +298,7 @@ def test_parabolic_equation_range_average_matches_weston_cylindrical() -> None:
     keep_r = pe.ranges >= 20_000.0
     keep_z = (pe.depths >= 10.0) & (pe.depths <= 90.0)
     numeric = -10.0 * np.log10(
-        float(np.mean(10.0 ** (-pe.transmission_loss[np.ix_(keep_z, keep_r)] / 10.0)))
+        float(np.mean(10.0 ** (-pe.propagation_loss[np.ix_(keep_z, keep_r)] / 10.0)))
     )
     flux = weston_propagation_loss(pe.ranges[keep_r], f, h, **_IDEAL)
     expected = -10.0 * np.log10(float(np.mean(10.0 ** (-flux.propagation_loss / 10.0))))

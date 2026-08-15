@@ -179,7 +179,7 @@ def test_example_11_4_6_detection_ranges_versus_wind_speed(
     The wind-noise source factor scales as ``v̂^2.24`` (Equation 11.165), so
     ``NL`` rises by ``22.4·lg(v/2)`` dB above the 75.0 dB re µPa² of Table 11.7
     and the noise-limited figure of merit falls by half of that. Inverting the
-    50 kHz transmission loss at that figure of merit reproduces the three
+    50 kHz propagation loss at that figure of merit reproduces the three
     published ranges to within a few per cent, the closed form standing in for
     Ainslie's broadband propagation model.
     """
@@ -204,9 +204,9 @@ def test_detection_range_inverts_spherical_spreading_exactly() -> None:
 
 def test_detection_range_matches_the_loss_it_inverts() -> None:
     res = detection_range(78.0, 300.0)
-    from phonometry.underwater.propagation import transmission_loss
+    from phonometry.underwater.propagation import propagation_loss
 
-    at_root = transmission_loss(res.detection_range, 300.0).tl[0]
+    at_root = propagation_loss(res.detection_range, 300.0).pl[0]
     assert at_root == pytest.approx(78.0, abs=1e-6)
 
 
@@ -256,16 +256,16 @@ def test_both_solvers_return_zero_when_the_target_is_undetectable_everywhere() -
     """
     res = detection_range(-100.0, 1000.0)
     assert res.detection_range == 0.0
-    assert float(res.transmission_loss.min()) > res.figure_of_merit
+    assert float(res.propagation_loss.min()) > res.figure_of_merit
     assert detection_range_from_curve(
-        res.figure_of_merit, res.range_m, res.transmission_loss
+        res.figure_of_merit, res.range_m, res.propagation_loss
     ) == 0.0
     # And directly, on a plain rising curve entirely above the figure of merit.
     assert detection_range_from_curve(20.0, [1.0, 2.0, 3.0], [50.0, 58.0, 70.0]) == 0.0
 
 
 def test_detection_range_from_curve_bridges_a_numerical_model() -> None:
-    """The solver reads a detection range off a normal-mode transmission loss."""
+    """The solver reads a detection range off a normal-mode propagation loss."""
     from phonometry.underwater.propagation.numerical import normal_modes
 
     depths = np.array([0.0, 100.0])
@@ -273,7 +273,7 @@ def test_detection_range_from_curve_bridges_a_numerical_model() -> None:
     ranges = np.linspace(100.0, 20_000.0, 800)
     nm = normal_modes(200.0, depths, speeds, source_depth=40.0, receiver_depth=60.0,
                       ranges_m=ranges)
-    got = detection_range_from_curve(60.0, nm.ranges, nm.transmission_loss)
+    got = detection_range_from_curve(60.0, nm.ranges, nm.propagation_loss)
     assert 100.0 < got < 20_000.0
 
 
@@ -292,7 +292,7 @@ def test_detection_range_validates_its_arguments(
 
 
 def test_detection_range_from_curve_validates_its_arguments() -> None:
-    with pytest.raises(ValueError, match="transmission_loss"):
+    with pytest.raises(ValueError, match="propagation_loss"):
         detection_range_from_curve(60.0, [1.0, 2.0], [10.0])
     with pytest.raises(ValueError, match="range_m"):
         detection_range_from_curve(60.0, [2.0, 1.0], [10.0, 20.0])

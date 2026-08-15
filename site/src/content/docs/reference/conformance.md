@@ -749,7 +749,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Underwater sound propagation (transmission loss)</b>: 100% (16/16)</summary>
+<summary>&#9989; <b>Underwater sound propagation (propagation loss)</b>: 100% (16/16)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -779,7 +779,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 |:---|:---|:---|:---|:---|:---:|
 | Ainslie (2010) Table 9.1, medium sand | Reflection loss gradient η from Equation (9.51), Np/rad | 0.28 Np/rad (+/-0.005 Np/rad) | 0.278 Np/rad | -0.002 Np/rad | &#9989; |
 | Ainslie (2010) Table 9.1, mud | Reflection loss gradient η from Equation (9.53) at 1 Hz, Np/rad | 0.021 Np/rad (+/-0.0005 Np/rad) | 0.02073 Np/rad | 0 Np/rad | &#9989; |
-| Weston cylindrical spreading vs normal modes | Range-averaged TL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB | 58.949 dB (+/-1 dB) | 58.399 dB | -0.55 dB | &#9989; |
+| Weston cylindrical spreading vs normal modes | Range-averaged PL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB | 58.949 dB (+/-1 dB) | 58.399 dB | -0.55 dB | &#9989; |
 
 </details>
 
@@ -801,10 +801,10 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | Normal modes vs ideal waveguide | Fundamental horizontal wavenumber kr1 at 20 Hz, 100 m (analytic), rad/m | 0.077662 rad/m (+/-0.0001 rad/m) | 0.077662 rad/m | 0 rad/m | &#9989; |
-| Normal modes vs image-source oracle | Absolute TL at 1 km in the ideal waveguide (converged image sum), dB | 48.238 dB (+/-0.02 dB) | 48.239 dB | 0.001 dB | &#9989; |
+| Normal modes vs image-source oracle | Absolute PL at 1 km in the ideal waveguide (converged image sum), dB | 48.238 dB (+/-0.02 dB) | 48.239 dB | 0.001 dB | &#9989; |
 | Ray tracing vs linear gradient | Turning depth of a 10° ray, c = 1500 + 0.05z (circular arc), m | 462.8 m (+/-1 m) | 462.8 m | 0 m | &#9989; |
 | Ray travel time vs iso-gradient closed form | Travel time of a 10° ray at 10 km, c = 1500 + 0.05z (Medwin & Clay Eq. 3.3.20), s | 6.625942 s (+/-0.000001 s) | 6.625942 s | 0 s | &#9989; |
-| Parabolic equation vs free field | PE transmission loss at 2 km, homogeneous medium (spherical spreading), dB | 66.021 dB (+/-0.1 dB) | 66.021 dB | 0 dB | &#9989; |
+| Parabolic equation vs free field | PE propagation loss at 2 km, homogeneous medium (spherical spreading), dB | 66.021 dB (+/-0.1 dB) | 66.021 dB | 0 dB | &#9989; |
 
 </details>
 

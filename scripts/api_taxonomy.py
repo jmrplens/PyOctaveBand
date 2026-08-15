@@ -381,6 +381,9 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # standards share it; documented with the free-field method that raises it
     # most often.
     "SoundPowerWarning": "phonometry.emission.sound_power",
+    # A typing.Literal alias, so it reports "typing" as its module; documented
+    # with the declaration whose `form` argument it types.
+    "DeclarationForm": "phonometry.emission.declaration",
     # Defined in phonometry._plot.room; documented helper for the ISO 18233
     # excitation signals that live in room.impulse_response.
     "plot_excitation": "phonometry.room.impulse_response",

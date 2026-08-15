@@ -2429,13 +2429,13 @@ _ES: dict[str, str] = {
     "Active, monostatic: out and back": "Activo monoestático: ida y vuelta",
     "ambient noise field NL": "campo de ruido ambiente NL",
     "source level": "nivel de fuente",
-    "one-way transmission loss": "pérdida de transmisión de ida",
+    "one-way propagation loss": "pérdida de propagación de ida",
     "array gain": "ganancia de array",
     "detector": "detector",
     "transmit and": "emite y",
     "receive here": "recibe aquí",
-    "TL out": "TL ida",
-    "TL back": "TL vuelta",
+    "PL out": "PL ida",
+    "PL back": "PL vuelta",
     "target strength": "índice de blanco",
     "RL: surface, volume and bottom scattering":
         "RL: dispersión superficie/volumen/fondo",
@@ -2444,9 +2444,9 @@ _ES: dict[str, str] = {
     "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²":
         "Niveles de campo re 1 µPa; un nivel de fuente lleva el metro "
         "cuadrado de su distancia, re 1 µPa²m²",
-    "Every term refers to the same bandwidth; the figure of merit is the TL that drives SE to zero, quoted re m²":
+    "Every term refers to the same bandwidth; the figure of merit is the PL that drives SE to zero, quoted re m²":
         "Todos los términos al mismo ancho de banda; la figura de mérito es "
-        "la TL que anula SE, re m²",
+        "la PL que anula SE, re m²",
     # The waveguide the three numerical solvers share
     "The range-independent waveguide the three solvers share":
         "La guía de ondas que comparten los tres solucionadores",

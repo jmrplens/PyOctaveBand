@@ -361,8 +361,8 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
 
     # One-way path.
     s.arrow(184, 196, 596, 196, th.primary, 2.2)
-    s.text(390, 182, "TL", 18, th.primary, bold=True)
-    s.text(390, 224, "one-way transmission loss", 14, th.fg)
+    s.text(390, 182, "PL", 18, th.primary, bold=True)
+    s.text(390, 224, "one-way propagation loss", 14, th.fg)
 
     # Receiving array with its beam.
     for k in range(5):
@@ -378,7 +378,7 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
     s.text(764, 192, "detector", 15, th.fg)
     s.text(764, 212, "DT", 18, th.fg, bold=True, mono=True)
     s.arrow(668, 196, 698, 196, th.fg, 1.6)
-    s.text(388, 282, "$SE = SL − TL − (NL − DI) − DT$", 16, th.fg)
+    s.text(388, 282, "$SE = SL − PL − (NL − DI) − DT$", 16, th.fg)
 
     # --- Active monostatic --------------------------------------------------
     s.text(60, 350, "Active, monostatic: out and back", 19, th.fg, bold=True,
@@ -396,9 +396,9 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
 
     # Outbound and return legs.
     s.arrow(136, 464, 520, 464, th.primary, 2.0)
-    s.text(330, 456, "TL out", 16, th.primary, bold=True)
+    s.text(330, 456, "PL out", 16, th.primary, bold=True)
     s.arrow(520, 490, 136, 490, th.primary, 2.0)
-    s.text(330, 508, "TL back", 16, th.primary, bold=True)
+    s.text(330, 508, "PL back", 16, th.primary, bold=True)
 
     # Target with its backscattered lobe.
     s.ellipse(566, 477, 40, 15, th.panel, th.fg, 1.8)
@@ -413,7 +413,7 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
                        (192.0, 560.0, 500.0)):
         s.circle(sx, sy, 3, th.accent)
         s.arrow(sx, sy, 150, ey, th.accent, 1.2)
-    s.text(316, 536, "$SE = SL − 2 TL + TS − (NL − DI) − DT$", 16, th.fg)
+    s.text(316, 536, "$SE = SL − 2 PL + TS − (NL − DI) − DT$", 16, th.fg)
     s.text(660, 524, "RL: surface, volume and bottom scattering", 14,
            th.accent, anchor="middle")
     s.text(660, 548, "replaces $NL − DI$ when reverberation-limited", 14,
@@ -422,7 +422,7 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
     # --- Reference conventions ---------------------------------------------
     s.text(70, 620, "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²",
            17, th.fg, anchor="start")
-    s.text(70, 648, "Every term refers to the same bandwidth; the figure of merit is the TL that drives SE to zero, quoted re m²",
+    s.text(70, 648, "Every term refers to the same bandwidth; the figure of merit is the PL that drives SE to zero, quoted re m²",
            17, th.fg, anchor="start")
 
 
@@ -552,7 +552,7 @@ def _d_marine_mammal_exposure(s: SVG, th: Theme) -> None:
     s.circle(ax_ - 26, 258, 2.4, th.fg)
     s.text(ax_ + 30, 214, "the criterion applies here", 14, th.accent)
     s.arrow(hx_ + 16, 274, ax_ - 46, 262, th.primary, 1.8)
-    s.text(ax_ - 74, 296, "$TL(f, R)$", 15, th.primary, bold=True, anchor="middle")
+    s.text(ax_ - 74, 296, "$PL(f, R)$", 15, th.primary, bold=True, anchor="middle")
     s.dim(hx_, 128, ax_, 128, "range $R$", offset=0, size=15)
 
     # --- The three steps between the two ------------------------------------

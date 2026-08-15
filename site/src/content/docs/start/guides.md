@@ -69,7 +69,7 @@ head:
             "@type": "ListItem",
             "position": 8,
             "name": "Underwater acoustics",
-            "description": "Levels re 1 microPa, ship radiated noise, pile driving, ambient noise, transmission loss.",
+            "description": "Levels re 1 microPa, ship radiated noise, pile driving, ambient noise, propagation loss.",
             "url": "https://jmrplens.github.io/phonometry/underwater/"
           },
           {
@@ -557,7 +557,7 @@ SAE ARP 866B/5534 and ECAC Doc 29/32.
 ## [Underwater acoustics](/phonometry/underwater/)
 
 Levels referenced to 1 micropascal, ship radiated noise, pile driving, ambient
-noise and transmission loss. The reference quantities differ from the airborne
+noise and propagation loss. The reference quantities differ from the airborne
 ones, so this is the one area where a level cannot be read across without
 conversion. Implements ISO 18405, ISO 17208-1/-2, ISO 18406 and
 JOMOPANS-ECHO.
