@@ -118,6 +118,12 @@ if TYPE_CHECKING:
 #: Reference air properties at 20 degC, 101.325 kPa.
 _C_AIR = 343.0
 _RHO_AIR = 1.206
+#: Relative slack allowed when two extended tubes meet inside a chamber. Their
+#: sum has to clear the chamber length by more than this fraction of it to count
+#: as an overlap, which separates a geometry the user did not intend from the
+#: last bits of a sum like 0.1 + 0.2. Nine orders of magnitude below the length
+#: is far above the arithmetic and far below any dimension anyone draws.
+_MEETING_SLACK = 1e-9
 
 _Complex = NDArray[np.complex128]
 
@@ -754,16 +760,21 @@ def extended_tube_chamber(
     lb = require_non_negative(outlet_extension, "outlet_extension")
     if s_exp <= s_duct:
         raise ValueError("'chamber_area' must exceed 'pipe_area'.")
-    if la + lb > length:
+    # The straight section between the two junction planes. Extensions that
+    # meet exactly are the accepted limit, but binary arithmetic does not
+    # respect that: 0.1 + 0.2 exceeds 0.3 by an ulp, so a chamber described in
+    # round decimal metres would be refused for a geometry it does in fact
+    # have. What is rejected is therefore a materially negative section, and
+    # anything within rounding of zero is clamped to it, since a duct of
+    # negative length is not a thing either.
+    straight = length - la - lb
+    if straight < -_MEETING_SLACK * max(length, la + lb):
         raise ValueError(
             "the inlet and outlet extensions cannot together exceed the "
             "chamber length (they would overlap inside the chamber, leaving "
             "a straight chamber section of negative length)."
         )
-    # The straight section between the two junction planes. Clamped because
-    # subtracting two exactly-meeting extensions can land a rounding step
-    # below zero, and a duct of negative length is not a thing.
-    straight = max(length - la - lb, 0.0)
+    straight = max(straight, 0.0)
     annulus = s_exp - s_duct
 
     elements = []

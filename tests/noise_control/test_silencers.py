@@ -251,6 +251,24 @@ def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
         )
 
 
+def test_extensions_that_meet_only_in_decimal_are_still_accepted() -> None:
+    # 0.1 + 0.2 exceeds 0.3 in binary, so a chamber described in round decimal
+    # metres meets the case above without satisfying it in arithmetic. The
+    # rejection is of a materially negative straight section, not of an ulp.
+    f = np.array([200.0, 400.0])
+    assert 0.1 + 0.2 > 0.3  # the premise, so this test cannot quietly go stale
+    meeting = sl.extended_tube_chamber(
+        f, 0.3, 0.04, 0.01, inlet_extension=0.1, outlet_extension=0.2
+    )
+    assert np.all(np.isfinite(meeting.transmission_loss))
+    # An overlap far below any drawn dimension, and far above the arithmetic,
+    # is still an overlap.
+    with pytest.raises(ValueError, match="negative length"):
+        sl.extended_tube_chamber(
+            f, 0.3, 0.04, 0.01, inlet_extension=0.1, outlet_extension=0.2 + 1e-6
+        )
+
+
 def test_insertion_loss_present_when_impedances_given() -> None:
     f = np.linspace(50.0, 500.0, 20)
     res = sl.expansion_chamber(
