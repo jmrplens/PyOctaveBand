@@ -159,7 +159,9 @@ qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
                             speed_of_sound=343.24)
 print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
 
-# An inlet extension of L/4 fills the first expansion-chamber trough.
+# Each extension is a quarter-wave stub, so its own length picks the trough
+# it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
+# second trough, and L/2 = 0.2 m would take the first one at c/2L.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
 ```
