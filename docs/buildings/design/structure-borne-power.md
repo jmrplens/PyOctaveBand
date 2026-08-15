@@ -70,7 +70,7 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
-L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{W\mathrm{s}} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
@@ -117,7 +117,7 @@ for the EN 12354-5 model through the conversion chain below.
 
 ## 3. From plate power to source quantities (Formulae 15–19)
 
-The plate-injected $L_{Ws}$ is **not** a source descriptor: the same source
+The plate-injected $L_{W\mathrm{s}}$ is **not** a source descriptor: the same source
 injects a different power into a different receiver. EN 15657 derives the
 plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
@@ -184,8 +184,8 @@ standard-basis line naming the EN 15657:2018 reception-plate method (Formula
 14), an optional metadata header (client, source equipment, test environment,
 instrumentation, climate, date), a per-band table (nominal
 octave/one-third-octave frequency, the spatial mean plate velocity level $L_v$
-and the injected structure-borne sound power level $L_{Ws}$), the $L_{Ws}(f)$
-spectrum with a nominal band axis, and a boxed band-summed total $L_{Ws}$ (dB re
+and the injected structure-borne sound power level $L_{W\mathrm{s}}$), the $L_{W\mathrm{s}}(f)$
+spectrum with a nominal band axis, and a boxed band-summed total $L_{W\mathrm{s}}$ (dB re
 1 pW) with the plate mass per area $m$ and area $S$.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the source
@@ -193,7 +193,7 @@ equipment), `test_room` (the test environment), `instrumentation`,
 `temperature`, `relative_humidity`, `pressure`, `test_date` and the footer
 identity `laboratory`, `operator`, `report_id` and `notes`; the plate mass and
 area come from the result itself. Supplying `requirement` adds a PASS/FAIL
-verdict against a declared upper limit on the total $L_{Ws}$ (lower is better).
+verdict against a declared upper limit on the total $L_{W\mathrm{s}}$ (lower is better).
 `verbose=True` adds the plate loss factor $\eta$ column, and `language="es"`
 renders the Spanish fiche. The basis strip states Formula 14 and the conversion
 to the plate-independent source quantities (Formulae 15/17) required before
@@ -256,7 +256,7 @@ EN 15657:2018, *Acoustic properties of building elements and
 buildings — Laboratory measurement of structure-borne sound from building
 service equipment for all installation conditions*: the reception-plate method
 (clause 7), the spatial mean velocity level (Formula 12), the plate loss factor
-$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{Ws}$
+$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{W\mathrm{s}}$
 (Formula 14) and the source-quantity chain: equivalent blocked force
 (Formula 15), characteristic reception-plate power level (Formula 17,
 $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$), equivalent free

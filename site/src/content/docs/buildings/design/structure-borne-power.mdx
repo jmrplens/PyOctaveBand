@@ -49,7 +49,7 @@ installed-equipment prediction consumes.
 *One source, two conforming plates, two answers 12.0 dB apart in every band
 (67.5 dB against 79.5 dB summed over the bands). The light plate vibrates
 35.1 dB harder, but it also dissipates through an $\eta m S$ some 204 times
-smaller, and $L_{Ws}$ is the power **that plate** absorbs, not a property of the
+smaller, and $L_{W\mathrm{s}}$ is the power **that plate** absorbs, not a property of the
 machine. Read on its own, neither curve describes the source; section 4 is what
 turns either of them into the plate-independent quantities EN 12354-5 consumes.*
 
@@ -113,7 +113,7 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
-L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{W\mathrm{s}} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
@@ -240,7 +240,7 @@ and a source spectrum that is really the building's.
 
 **The loss factor.** $T_s$ is a structural decay measured on the plate itself,
 feeding $\eta = 2{,}2/(f\,T_s)$. Formula (14) is linear in $10\lg\eta$, so an
-error in $T_s$ moves $L_{Ws}$ decibel for decibel — it is the single most
+error in $T_s$ moves $L_{W\mathrm{s}}$ decibel for decibel — it is the single most
 sensitive input on the page. The loading rule follows the plate: on the
 **low-mobility** plate there should be no significant difference whether $T_s$
 and the point mobilities are measured with or without the equipment attached; the
@@ -273,7 +273,7 @@ Three failure modes are silent, and each is why one of the requirements above
 exists. The source's own airborne sound can drive the plate — which is why the
 high-mobility plate is about half perforated. A loss factor measured on the bare
 plate can be carried into the high-mobility case, where the standard requires
-the source to be attached, and the error goes straight into $L_{Ws}$. And a
+the source to be attached, and the error goes straight into $L_{W\mathrm{s}}$. And a
 machine that has not reached steady state, or that is measured over a cycle
 average without saying so, produces a number that no other laboratory can
 reproduce.
@@ -306,7 +306,7 @@ plate power balance wrong, and only the substitution measures round it.
 
 ## 4. From plate power to source quantities (Formulae 15–19)
 
-The plate-injected $L_{Ws}$ is **not** a source descriptor: the same source
+The plate-injected $L_{W\mathrm{s}}$ is **not** a source descriptor: the same source
 injects a different power into a different receiver. EN 15657 derives the
 plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$, not the 1 N reference of the
@@ -436,8 +436,8 @@ reception-plate method (Formula 14), an optional metadata header (client,
 source equipment, test environment, instrumentation, climate, date), a per-band
 table (nominal octave/one-third-octave frequency, the spatial mean plate
 velocity level $L_v$ and the injected structure-borne sound power level
-$L_{Ws}$), the $L_{Ws}(f)$ spectrum with a nominal band axis, and a boxed
-band-summed total $L_{Ws}$ (dB re 1 pW) with the plate mass per area $m$ and
+$L_{W\mathrm{s}}$), the $L_{W\mathrm{s}}(f)$ spectrum with a nominal band axis, and a boxed
+band-summed total $L_{W\mathrm{s}}$ (dB re 1 pW) with the plate mass per area $m$ and
 area $S$.
 
 The metadata is supplied through a `ReportMetadata`, whose applicable fields
@@ -447,7 +447,7 @@ here are the **source equipment** (`specimen`), the **test environment**
 (`test_date`) and the footer identity (`laboratory`, `operator`, `report_id`,
 `notes`); the plate mass and area come from the result itself. Supplying
 `requirement` adds a PASS/FAIL verdict against a declared upper limit on the
-total $L_{Ws}$ (a power emission is a quantity where less is better, so the
+total $L_{W\mathrm{s}}$ (a power emission is a quantity where less is better, so the
 source passes at or below the limit). `verbose=True` adds the plate loss factor
 $\eta$ column to the table. `language="es"` renders the Spanish fiche with comma
 decimals. The basis strip states Formula 14 and reminds that the plate-injected

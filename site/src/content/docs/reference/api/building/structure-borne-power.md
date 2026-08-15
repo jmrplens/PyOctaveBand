@@ -20,7 +20,7 @@ $P = \omega\, \eta\, (m S)\, \langle v^2 \rangle$, so the power
 (Formula 14):
 
 $$
-L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60 \qquad \text{dB re 1 pW}
+L_{W\mathrm{s}} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60 \qquad \text{dB re 1 pW}
 $$
 
 with the references $f_0 = 1$ Hz, $m_0 = 1$ kg (printed as 1 kg;
@@ -331,7 +331,7 @@ The power a resonant reception plate dissipates, expressed as a level re
 1 pW:
 
 $$
-L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v + 10 \log_{10}\frac{v_0^2}{P_0}
+L_{W\mathrm{s}} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v + 10 \log_{10}\frac{v_0^2}{P_0}
 $$
 
 With the EN 15657 reference $v_0 = 10^{-9}$ m/s the last term is
@@ -464,5 +464,5 @@ EN 12354-5.
 
 *property*
 
-Band-summed power level $10 \log_{10}(\sum 10^{0.1 L_{Ws}})$,
+Band-summed power level $10 \log_{10}(\sum 10^{0.1 L_{W\mathrm{s}}})$,
 in dB.

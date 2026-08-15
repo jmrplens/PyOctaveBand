@@ -200,29 +200,29 @@ manufacturer's ASHRAE Standard 70 data is not to hand. The overall sound
 power level is Eq. 13.27:
 
 $$
-L_W = 10 \log_{10} S_G + 30 \log_{10} \xi + 60 \log_{10} U_G - 31.3
+L_W = 10 \log_{10} S_\mathrm{G} + 30 \log_{10} \xi + 60 \log_{10} U_\mathrm{G} - 31.3
 $$
 
-with `S_G` the face area of the device (ft2),
-$U_G = Q / (60 S_G)$ the approach velocity (ft/s) and
-$\xi = 334.9\, dP / (\rho_0 U_G^2)$ the normalised pressure-drop
+with `S_\mathrm{G}` the face area of the device (ft2),
+$U_\mathrm{G} = Q / (60 S_\mathrm{G})$ the approach velocity (ft/s) and
+$\xi = 334.9\, dP / (\rho_0 U_\mathrm{G}^2)$ the normalised pressure-drop
 coefficient of Eq. 13.28 (`dP` in inches of water gauge,
 $\rho_0 = 0.075$ lb/ft3); this function takes and returns SI and
 converts internally.
 
 The octave-band spectrum follows from Eq. 13.29,
-$L_{W,oct} = L_W + C_D$, with the shape functions of Eqs. 13.30
+$L_{W,\mathrm{oct}} = L_W + C_\mathrm{D}$, with the shape functions of Eqs. 13.30
 and 13.31:
 
 $$
-C_D = -5.82 - 0.15 A - 1.13 A^2 \qquad \text{(round)}
+C_\mathrm{D} = -5.82 - 0.15 A - 1.13 A^2 \qquad \text{(round)}
 $$
 
 $$
-C_D = -11.82 - 0.15 A - 1.13 A^2 \qquad \text{(rectangular, including slot)}
+C_\mathrm{D} = -11.82 - 0.15 A - 1.13 A^2 \qquad \text{(rectangular, including slot)}
 $$
 
-normalised to the peak frequency $f_P = 48.8 U_G$ of Eq. 13.32,
+normalised to the peak frequency $f_P = 48.8 U_\mathrm{G}$ of Eq. 13.32,
 where $A = N_B(f_P) - N_B(f)$ is the distance in octaves from the
 peak band (Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
 
@@ -241,7 +241,7 @@ which is what `count` applies.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
-| `face_area` | Cross-sectional face area `S_G` of one device, m2. |
+| `face_area` | Cross-sectional face area `S_\mathrm{G}` of one device, m2. |
 | `volume_flow` | Volume flow `Q` through one device, m3/s. |
 | `pressure_drop` | Static pressure drop `dP` across the device, Pa. |
 | `shape` | `"rectangular"` (Eq. 13.31, includes slot diffusers) or `"round"` (Eq. 13.30). |
@@ -461,16 +461,16 @@ The ASHRAE (1987) scaling law, originally due to Beranek and published by
 Graham (1975):
 
 $$
-L_W = K_F + 10 \log_{10}(Q_F / Q_{REF}) + 10 \log_{10}(P_F / P_{REF}) + C_{EFF} + C_{BFI}
+L_W = K_\mathrm{F} + 10 \log_{10}(Q_\mathrm{F} / Q_\mathrm{REF}) + 10 \log_{10}(P_\mathrm{F} / P_\mathrm{REF}) + C_{EFF} + C_{BFI}
 $$
 
-with the spectral constant `K_F` of Long Table 13.5 (one row per fan
+with the spectral constant `K_\mathrm{F}` of Long Table 13.5 (one row per fan
 type), the off-peak efficiency correction `C_EFF` of Table 13.6
 ([`fan_efficiency_correction`](/phonometry/reference/api/noise_control/hvac/#fan_efficiency_correction)) and the blade frequency increment
 `C_BFI` of Table 13.7, added to the single octave band that contains the
 blade passing frequency. In SI the reference volume flow is
-$Q_{REF} = 0.472$ L/s and the reference pressure
-$P_{REF} = 249$ Pa, so the two logarithmic terms take the same
+$Q_\mathrm{REF} = 0.472$ L/s and the reference pressure
+$P_\mathrm{REF} = 249$ Pa, so the two logarithmic terms take the same
 values as the foot-pound form in cfm and inches of water gauge.
 
 The law assumes ideal inlet and outlet flow conditions and gives the power
@@ -487,8 +487,8 @@ module warning.
 
 | Name | Description |
 | :--- | :--- |
-| `volume_flow` | Volume flow through the fan `Q_F`, m3/s. |
-| `static_pressure` | Fan static pressure `P_F`, Pa (gauge). |
+| `volume_flow` | Volume flow through the fan `Q_\mathrm{F}`, m3/s. |
+| `static_pressure` | Fan static pressure `P_\mathrm{F}`, Pa (gauge). |
 | `fan_type` | One of `"airfoil_large"` / `"airfoil_small"` (backward-curved or backward-inclined centrifugal wheels above and below 36 in diameter), `"forward_curved"`, `"radial_low"` / `"radial_medium"` / `"radial_high"` (radial blades by total pressure), `"vaneaxial_hub_low"` / `"vaneaxial_hub_medium"` / `"vaneaxial_hub_high"` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8), `"tubeaxial_large"` / `"tubeaxial_small"` (above and below 40 in wheel diameter) or `"propeller"`. |
 | `relative_efficiency` | Static efficiency as a percentage of the peak (default 80, Long's recommendation when the peak is unknown). |
 | `blade_frequency` | Blade passing frequency `f_bp`, Hz (from [`blade_passing_frequency`](/phonometry/reference/api/noise_control/hvac/#blade_passing_frequency)). `None` (default) places the increment in the octave band Table 13.7 tabulates for the fan type. |
@@ -544,18 +544,18 @@ flow_noise_bend(
 Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
 
 $$
-L_{WB} = L_{Ws} - 10 \log_{10}(1 + 0.165 N_s^2) + 30 \log_{10}(U) - 103
+L_{W\mathrm{B}} = L_{W\mathrm{s}} - 10 \log_{10}(1 + 0.165 N_\mathrm{s}^2) + 30 \log_{10}(U) - 103
 $$
 
 $$
-L_{Ws} = 30 \log_{10}(U) + 10 \log_{10}(S) + 10 \log_{10}(\rho) + 117
+L_{W\mathrm{s}} = 30 \log_{10}(U) + 10 \log_{10}(S) + 10 \log_{10}(\rho) + 117
 $$
 
-with the stream power level $L_{Ws}$ (Bies Eq. (8.252)) and the
-Strouhal number $N_s = f H / U$ (`H` the duct
+with the stream power level $L_{W\mathrm{s}}$ (Bies Eq. (8.252)) and the
+Strouhal number $N_\mathrm{s} = f H / U$ (`H` the duct
 height in the plane of the bend). The radiated sound power grows as the
-sixth power of the stream speed at low `N_s` (the inner-corner drag
-dipole) and the eighth power at high `N_s` (the outer-corner shear
+sixth power of the stream speed at low `N_\mathrm{s}` (the inner-corner drag
+dipole) and the eighth power at high `N_\mathrm{s}` (the outer-corner shear
 quadrupole); equivalently, the *efficiency* referenced to the stream power
 grows as $U^3$ and $U^5$ respectively.
 
@@ -584,7 +584,7 @@ flow_noise_straight_duct(
 Flow-generated octave-band sound power of a straight duct (Bies Eq. (8.251)).
 
 $$
-L_{WB} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2 - 26 \log_{10}(1.14 + 0.02 f / U)
+L_{W\mathrm{B}} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2 - 26 \log_{10}(1.14 + 0.02 f / U)
 $$
 
 in dB re 1e-12 W (VDI 2081-1), for airflow speed `U` in a duct of area
@@ -772,11 +772,11 @@ plenum_attenuation(
 Plenum-chamber transmission loss by Wells' method (Bies Eq. (8.275)).
 
 $$
-\mathrm{TL} = -10 \log_{10}\!\left[S_{\mathrm{out}} \left(\frac{\cos(\theta)}{\pi r^2} + \frac{1 - \alpha}{S_w \alpha}\right)\right],
+\mathrm{TL} = -10 \log_{10}\!\left[S_{\mathrm{out}} \left(\frac{\cos(\theta)}{\pi r^2} + \frac{1 - \alpha}{S_\mathrm{w} \alpha}\right)\right],
 $$
 
 where the reverberant term uses the plenum room constant
-$R = S_w \alpha / (1 - \alpha)$
+$R = S_\mathrm{w} \alpha / (1 - \alpha)$
 ([`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant)). The
 method holds above the inlet cut-on and when the plenum is large compared
 with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
@@ -787,7 +787,7 @@ with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
 | :--- | :--- |
 | `exit_area` | Outlet-opening area `S_out`, m2. |
 | `line_of_sight` | Straight-line inlet-to-outlet distance `r`, m. |
-| `wall_area` | Total internal wall area `S_w`, m2. |
+| `wall_area` | Total internal wall area `S_\mathrm{w}`, m2. |
 | `mean_absorption` | Mean Sabine wall absorption `alpha` in `(0, 1)` (scalar or per-band). |
 | `angle` | Angle `theta` between the inlet axis and the line to the outlet, rad (default 0). |
 
