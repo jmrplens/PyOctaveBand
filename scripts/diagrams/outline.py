@@ -177,10 +177,18 @@ def segment(text: str, face_key: FaceKey) -> list[FaceRun]:
                 break
         else:
             ch = next(
-                ch for ch in cluster
-                if not any(ord(ch) in _coverage(p) for p in chain)
+                (ch for ch in cluster
+                 if not any(ord(ch) in _coverage(p) for p in chain)),
+                None,
             )
-            raise ValueError(f"no face in the chain draws {ch!r} of {text!r}")
+            if ch is not None:
+                raise ValueError(
+                    f"no face in the chain draws {ch!r} of {text!r}"
+                )
+            raise ValueError(
+                f"no single face in the chain covers the cluster "
+                f"{cluster!r} of {text!r}"
+            )
         if runs and runs[-1].path == path:
             runs[-1] = FaceRun(runs[-1].text + cluster, path)
         else:
