@@ -32857,7 +32857,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `ray_trace` | `function` | **Ray tracing and travel times through a sound-speed profile (vectorised).**<br>• `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `launch_angles_deg` / `max_range` [m] / `n_steps` | `ray_trace(z, c, source_depth=1000, launch_angles_deg=[-10,0,10])`<br><br>• `RayTraceResult` |
 | `parabolic_equation` | `function` | **Split-step Fourier parabolic-equation TL field.**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `max_range` [m] / `range_step` [m] / `n_depth_points` | `parabolic_equation(50, [0,200], [1500,1500], source_depth=50)`<br><br>• `ParabolicEquationResult` |
 | `NormalModeResult` | `dataclass` | **Normal-mode result.**<br>• `frequency` / `wavenumbers` [rad/m] / `mode_depths` [m] / `mode_functions`<br>• `ranges` [m] / `transmission_loss` [dB] / `receiver_depth` / `source_depth`<br>• `.plot()`: TL vs range | `res.wavenumbers, res.transmission_loss` |
-| `RayTraceResult` | `dataclass` | **Ray-tracing result.**<br>• `launch_angles` [°] / `ranges` [m] / `depths` [m] / `travel_times` [s] (all `(n_rays, n_steps)`)<br>• `source_depth` / `water_depth` [m]<br>• `.plot()`: ray paths | `res.ranges, res.depths, res.travel_times` |
+| `RayTraceResult` | `dataclass` | **Ray-tracing result.**<br>• `launch_angles` [°] `(n_rays,)`<br>• `ranges` [m] / `depths` [m] / `travel_times` [s] (all `(n_rays, n_steps)`)<br>• `source_depth` / `water_depth` [m]<br>• `.plot()`: ray paths | `res.ranges, res.depths, res.travel_times` |
 | `ParabolicEquationResult` | `dataclass` | **Parabolic-equation result.**<br>• `frequency` / `ranges` [m] / `depths` [m]<br>• `transmission_loss` [dB] `(n_depths, n_ranges)` / `source_depth`<br>• `.plot()`: TL field | `res.transmission_loss` |
 | `PileStrikeResult` | `dataclass` | **Pile-strike result.**<br>• `single_strike_sel` [dB re 1 µPa²·s]<br>• `peak_spl` / `spl` [dB re 1 µPa]<br>• `pulse_duration` [s]<br>• `pressure` [Pa] / `fs` [Hz]<br>• `.plot()`: waveform + cumulative energy | `res.single_strike_sel, res.peak_spl` |
 | `strike_sel_spectrum` | `function` | **Band-resolved single-strike SEL (ISO 18406).**<br>• `pressure`: one strike (1D) [Pa] / `fs` [Hz]<br>• `fraction`: 1 or 3 (Default: 3) / `limits` [Hz] (Default: (10, 20000))<br>Parseval band split of ∫p²dt | `strike_sel_spectrum(p, fs)`<br><br>• `StrikeSelSpectrum` |
@@ -49177,8 +49177,9 @@ z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  analytic turning depth
 print(round(float(rays.depths.max()), 1))   # 583.3  traced
 
-# The arc also fixes the time to that turn, and it depends on the launch
-# angle alone: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
+# The arc also fixes the time to that turn: the sound speed cancels and only
+# the launch angle and the gradient are left,
+# t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
 th = np.radians(6.0)
 r_turn = np.sin(th) / (np.cos(th) / 1491.7 * 0.017)   # 9222.6 m
 t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / 0.017
@@ -49190,12 +49191,12 @@ print(round(float(traced), 3))                                 # 6.171  traced
 Rays buy geometry and timing: paths, turning depths, convergence-zone ranges
 and the travel time along every one of them, at a cost independent of
 frequency. Because the time rides the same four Runge-Kutta stages as the
-trajectory, off the sound speed those stages already interpolate, it describes
-the path actually returned rather than a second reading of it, and it matches
-the closed form for a constant gradient (Medwin & Clay 1998, Eq. (3.3.20)) to
-about $10^{-14}$ s. What rays do not carry here is a full amplitude: the
-geometric ray-tube intensity diverges at caustics, so the result object leaves
-the level to the modal or PE field.
+trajectory, and takes its sound speed from the interpolation those stages
+already do, it describes the path actually returned rather than a second
+reading of it, and it matches the closed form for a constant gradient
+(Medwin & Clay 1998, Eq. (3.3.20)) to about $10^{-14}$ s. What rays do not
+carry here is a full amplitude: the geometric ray-tube intensity diverges at
+caustics, so the result object leaves the level to the modal or PE field.
 
 ## 4. The parabolic equation: a one-way field, marched in range
 

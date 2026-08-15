@@ -314,8 +314,9 @@ z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  profundidad de giro analítica
 print(round(float(rays.depths.max()), 1))   # 583.3  trazada
 
-# El arco fija también el tiempo hasta ese giro, y depende solo del ángulo
-# de lanzamiento: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
+# El arco fija también el tiempo hasta ese giro: la velocidad del sonido se
+# cancela y solo quedan el ángulo de lanzamiento y el gradiente,
+# t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
 th = np.radians(6.0)
 r_turn = np.sin(th) / (np.cos(th) / 1491.7 * 0.017)   # 9222,6 m
 t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / 0.017
@@ -330,9 +331,9 @@ print(round(float(traced), 3))                                 # 6.171  trazado
 el rayo de 2° gira a 154 m y el de 10° a 1454 m. El rayo de 6° lleva la
 validación de la propia página, los 583,3 m de profundidad de giro analítica,
 que el trazado reproduce hasta la décima de metro que imprime, y la
-superposición discontinua es el arco de
-círculo exacto de radio $R = c_0/(g\cos\theta_0)$ contra el que se comprueba el
-cálculo. Un resultado dibuja su propio abanico con `rays.plot()`.*
+superposición discontinua es el arco de círculo exacto de radio
+$R = c_0/(g\cos\theta_0)$ contra el que se comprueba el cálculo. Un resultado
+dibuja su propio abanico con `rays.plot()`.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -370,13 +371,13 @@ plt.show()
 Los rayos compran geometría y tiempos: caminos, profundidades de giro,
 distancias de las zonas de convergencia y el tiempo de propagación a lo largo
 de cada uno, a un coste independiente de la frecuencia. Como el tiempo viaja
-en las mismas cuatro etapas Runge-Kutta que la trayectoria, sobre la velocidad
-del sonido que esas etapas ya interpolan, describe el camino que de verdad se
-devuelve y no una segunda lectura de él, y coincide con la forma cerrada de un
-gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos $10^{-14}$ s.
-Lo que aquí no llevan es una amplitud completa: la intensidad geométrica del
-tubo de rayos diverge en las cáusticas, así que el objeto de resultado deja el
-nivel al campo modal o de la PE.
+en las mismas cuatro etapas Runge-Kutta que la trayectoria, y toma su velocidad
+del sonido de la interpolación que esas etapas ya hacen, describe el camino que
+de verdad se devuelve y no una segunda lectura de él, y coincide con la forma
+cerrada de un gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos
+$10^{-14}$ s. Lo que aquí no llevan es una amplitud completa: la intensidad
+geométrica del tubo de rayos diverge en las cáusticas, así que el objeto de
+resultado deja el nivel al campo modal o de la PE.
 
 ## 4. La ecuación parabólica: un campo de un solo sentido que avanza en distancia
 

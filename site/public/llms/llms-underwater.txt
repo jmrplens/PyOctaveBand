@@ -1553,8 +1553,9 @@ z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  analytic turning depth
 print(round(float(rays.depths.max()), 1))   # 583.3  traced
 
-# The arc also fixes the time to that turn, and it depends on the launch
-# angle alone: t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
+# The arc also fixes the time to that turn: the sound speed cancels and only
+# the launch angle and the gradient are left,
+# t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
 th = np.radians(6.0)
 r_turn = np.sin(th) / (np.cos(th) / 1491.7 * 0.017)   # 9222.6 m
 t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / 0.017
@@ -1566,12 +1567,12 @@ print(round(float(traced), 3))                                 # 6.171  traced
 Rays buy geometry and timing: paths, turning depths, convergence-zone ranges
 and the travel time along every one of them, at a cost independent of
 frequency. Because the time rides the same four Runge-Kutta stages as the
-trajectory, off the sound speed those stages already interpolate, it describes
-the path actually returned rather than a second reading of it, and it matches
-the closed form for a constant gradient (Medwin & Clay 1998, Eq. (3.3.20)) to
-about $10^{-14}$ s. What rays do not carry here is a full amplitude: the
-geometric ray-tube intensity diverges at caustics, so the result object leaves
-the level to the modal or PE field.
+trajectory, and takes its sound speed from the interpolation those stages
+already do, it describes the path actually returned rather than a second
+reading of it, and it matches the closed form for a constant gradient
+(Medwin & Clay 1998, Eq. (3.3.20)) to about $10^{-14}$ s. What rays do not
+carry here is a full amplitude: the geometric ray-tube intensity diverges at
+caustics, so the result object leaves the level to the modal or PE field.
 
 ## 4. The parabolic equation: a one-way field, marched in range
 
