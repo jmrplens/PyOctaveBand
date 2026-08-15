@@ -10,7 +10,8 @@ transmission loss of :mod:`phonometry.underwater.propagation.closed_form`:
   Sturm-Liouville eigenvalue problem by finite differences and assembles the
   transmission loss from the propagating modes.
 * :func:`ray_trace` -- ray tracing. Integrates the ray-trajectory equations
-  through a sound-speed profile (Runge-Kutta), returning the ray paths.
+  through a sound-speed profile (Runge-Kutta), returning the ray paths and the
+  travel time accumulated along each of them.
 * :func:`parabolic_equation` -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the transmission-loss field.
 
@@ -19,7 +20,9 @@ All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 (Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24) and the
 split-step Fourier PE (Ch. 6). They are validated against analytic oracles: the
 ideal (pressure-release) waveguide's exact modes, the circular-arc ray paths of
-a linear sound-speed gradient, and mutual agreement of the PE and normal-mode
+a linear sound-speed gradient together with the closed-form travel time along
+them (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press
+1998, Eq. (3.3.20)), and mutual agreement of the PE and normal-mode
 transmission loss for a range-independent waveguide.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
@@ -33,6 +36,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.rays import march_rays
 from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
@@ -294,6 +298,8 @@ class RayTraceResult:
     :ivar ranges: Per-ray horizontal ranges, in metres, shape
         ``(n_rays, n_steps)``.
     :ivar depths: Per-ray depths, in metres, shape ``(n_rays, n_steps)``.
+    :ivar travel_times: Per-ray cumulative travel times, in seconds, shape
+        ``(n_rays, n_steps)`` (zero at the source, increasing along the ray).
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
     """
@@ -301,6 +307,7 @@ class RayTraceResult:
     launch_angles: NDArray[np.float64]
     ranges: NDArray[np.float64]
     depths: NDArray[np.float64]
+    travel_times: NDArray[np.float64]
     source_depth: float
     water_depth: float
 
@@ -321,11 +328,21 @@ def ray_trace(
     max_range: float = 10_000.0,
     n_steps: int = 2000,
 ) -> RayTraceResult:
-    """Trace acoustic rays through a range-independent sound-speed profile.
+    r"""Trace acoustic rays through a range-independent sound-speed profile.
 
     Integrates the ray-trajectory equations (Jensen Eqs. 3.23-3.24) with a
     fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
     surface (``z = 0``) and the bottom (``z = water_depth``).
+
+    The travel time is a third state of that same Runge-Kutta step rather than a
+    quadrature run over the finished path: with the range-invariant Snell
+    parameter :math:`\xi = \cos\theta_0 / c(z_s)` it obeys
+    :math:`dt/dr = 1/(\xi c^2)`, so it is integrated with the very stages that
+    place the ray and cannot drift from the geometry actually returned. This is
+    the same ray core, and the same travel-time equation, as the atmospheric
+    :func:`~phonometry.environment.propagation.refraction.atmospheric_ray_paths`
+    (which reflects at the ground instead of at the sea surface). Reflections
+    cost no time, so the accumulated time stays continuous across them.
 
     :param depths: Depth samples of the profile, in metres, from ``z = 0``.
     :param sound_speeds: Sound speed at each depth, in m/s.
@@ -358,49 +375,41 @@ def ray_trace(
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
 
     # March in range r (not arc length): every valid ray then spans [0, rmax] in
-    # n_steps regardless of its launch angle. State is (z, ζ); ξ = cosθ0/c(zs) is
-    # invariant for c(z). From dz/ds, dζ/ds and dr/ds = c·ξ:
-    #   dz/dr = ζ/ξ,   dζ/dr = −(dc/dz)/(c³·ξ).
-    def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], xi_arr: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        # Vectorised over all rays at once (data-parallel).
-        cc = np.interp(z_arr, z_prof, c_prof)
-        seg = np.clip(np.searchsorted(z_prof, z_arr, side="right") - 1,
-                      0, seg_grad.size - 1)
-        return zeta_arr / xi_arr, -seg_grad[seg] / (cc**3 * xi_arr)
-
+    # n_steps regardless of its launch angle. State is (z, ζ, t); ξ = cosθ0/c(zs)
+    # is invariant for c(z). From dz/ds, dζ/ds, dt/ds = 1/c and dr/ds = c·ξ:
+    #   dz/dr = ζ/ξ,   dζ/dr = −(dc/dz)/(c³·ξ),   dt/dr = 1/(ξ·c²).
+    # The time shares the sound speed the other two derivatives already need, so
+    # carrying it costs one multiply per stage and inherits the RK4 order: at the
+    # default step it reproduces the linear-gradient closed form to ~1e-14 s,
+    # where accumulating dr/(ξc²) over the finished path would be first-order.
     ns = int(n_steps)
-    dr = rmax / (ns - 1)
     ranges = np.linspace(0.0, rmax, ns)
     c0 = float(np.interp(zs, z_prof, c_prof))
     th = np.radians(angles)
     xi = np.cos(th) / c0  # Snell invariant per ray (> 0 since |θ0| < 90°)
-    z = np.full(angles.size, zs)
-    zeta = np.sin(th) / c0
-    ray_z = np.zeros((angles.size, ns))
-    ray_z[:, 0] = zs
-    two_d = 2.0 * water_depth
-    for s in range(1, ns):
-        k1z, k1zeta = deriv(z, zeta, xi)
-        k2z, k2zeta = deriv(z + 0.5 * dr * k1z, zeta + 0.5 * dr * k1zeta, xi)
-        k3z, k3zeta = deriv(z + 0.5 * dr * k2z, zeta + 0.5 * dr * k2zeta, xi)
-        k4z, k4zeta = deriv(z + dr * k3z, zeta + dr * k3zeta, xi)
-        z = z + dr / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z)
-        zeta = zeta + dr / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta)
-        # Fold any overshoot (arbitrarily many surface/bottom crossings) back
-        # into [0, D] with a triangle wave, flipping ζ once per crossing.
-        zmod = np.mod(z, two_d)
-        upper = zmod > water_depth
-        z = np.where(upper, two_d - zmod, zmod)
-        zeta = np.where(upper, -zeta, zeta)
-        ray_z[:, s] = z
-    ray_r = np.broadcast_to(ranges, ray_z.shape).copy()
+
+    def deriv(
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        # Vectorised over all rays at once (data-parallel).
+        cc = np.interp(z_arr, z_prof, c_prof)
+        seg = np.clip(np.searchsorted(z_prof, z_arr, side="right") - 1,
+                      0, seg_grad.size - 1)
+        return (zeta_arr / xi, -seg_grad[seg] / (cc**3 * xi), 1.0 / (xi * cc**2))
+
+    # The marcher splits every range step at the surface or bottom it crosses,
+    # so a reflected ray keeps the order the rest of the path is integrated
+    # with; see :mod:`phonometry._internal.rays`.
+    march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
+                       zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
+                       n_steps=ns, lower=0.0, upper=water_depth)
+    ray_r = np.broadcast_to(ranges, march.positions.shape).copy()
 
     return RayTraceResult(
         launch_angles=angles,
         ranges=ray_r,
-        depths=ray_z,
+        depths=march.positions,
+        travel_times=march.times,
         source_depth=zs,
         water_depth=water_depth,
     )

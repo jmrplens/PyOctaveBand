@@ -66,6 +66,7 @@ import numpy as np
 
 from ._i18n import format_number, t
 from ._sound_power_fiche import (
+    FicheCopy,
     band_labels,
     d1,
     energy_sum,
@@ -112,17 +113,16 @@ _COVERAGE_FACTOR = 2.0
 #: The Table 1 standard deviation of reproducibility of the A-weighted sound
 #: power level, in dB (footnote b: a relatively flat 50 Hz to 6,3 kHz spectrum).
 _SIGMA_A_WEIGHTED = 1.0
+#: The two column headings every band table on these sheets opens with: the
+#: band centre, which is translated, and the sound power level, which is a
+#: quantity symbol and therefore is not.
+_COL_FREQ = "f [Hz]"
+_COL_LW = "L<sub>W</sub> [dB]"
 #: Band count above which the precision table pairs its rows into two column
 #: groups. The one-third-octave range this method works in does not fit the
 #: page as one column of rows beside a header grid, a spectrum, a boxed result
 #: and the Annex B/C strips, and an accredited sheet prints a wide band set in
 #: two groups rather than on a second page.
-#: The two column headings every band table on these sheets opens with:
-#: the band centre, which is translated, and the sound power level,
-#: which is a quantity symbol and therefore is not.
-_COL_FREQ = "f [Hz]"
-_COL_LW = "L<sub>W</sub> [dB]"
-
 _SPLIT_ABOVE = 8
 #: Size of the embedded spectrum on the precision sheet, in inches. Shallower
 #: than the pressure fiches': this sheet carries a one-third-octave band set,
@@ -308,18 +308,19 @@ def render_intensity_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Sound power determination", language),
-        basis=_basis(result, language),
-        caption=fraction_caption(result, language),
-        value_table=_value_table(result, verbose, language),
-        statement=statement,
-        extended=extended,
-        basis_strips=[
+        result, path,
+        copy=FicheCopy(
+            title=t("Sound power determination", language),
+            basis=_basis(result, language),
+            caption=fraction_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[
             _indicator_strip(result, language),
             _criteria_strip(result, language),
         ],
+        ),
+        value_table=_value_table(result, verbose, language),
         metadata=metadata,
         language=language,
     )
@@ -853,20 +854,21 @@ def render_precision_intensity_report(
         else power_verdict(result, metadata.requirement, language, level_a=level_a)
     )
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Sound power determination", language),
-        basis=_precision_basis(language),
-        caption=_precision_caption(result, language),
-        value_table=_precision_value_table(
-            result, indicators, criteria, verbose, language
-        ),
-        statement=statement,
-        extended=extended,
-        basis_strips=[
+        result, path,
+        copy=FicheCopy(
+            title=t("Sound power determination", language),
+            basis=_precision_basis(language),
+            caption=_precision_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[
             _precision_model_strip(result, indicators, residual_index, language),
             _precision_criteria_strip(result, criteria, omitted, language),
         ],
+        ),
+        value_table=_precision_value_table(
+            result, indicators, criteria, verbose, language
+        ),
         metadata=metadata,
         language=language,
         verdict=verdict,

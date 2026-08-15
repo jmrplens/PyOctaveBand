@@ -49,6 +49,7 @@ import numpy as np
 
 from ._i18n import format_number, t
 from ._sound_power_fiche import (
+    FicheCopy,
     band_labels,
     d1,
     fraction_caption,
@@ -283,18 +284,19 @@ def render_sound_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result,
-        path,
-        title=t("Sound power determination", language),
-        basis=_basis(result, language),
-        caption=fraction_caption(result, language),
-        value_table=_value_table(result, verbose, language),
-        statement=statement,
-        extended=extended,
-        basis_strips=[
+        result, path,
+        copy=FicheCopy(
+            title=t("Sound power determination", language),
+            basis=_basis(result, language),
+            caption=fraction_caption(result, language),
+            statement=statement,
+            extended=extended,
+            basis_strips=[
             _corrections_strip(result, language),
             _a_weighting_strip(result, language),
         ],
+        ),
+        value_table=_value_table(result, verbose, language),
         metadata=metadata,
         language=language,
     )

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -335,17 +336,33 @@ def power_value_table(
     return table
 
 
+@dataclass(frozen=True)
+class FicheCopy:
+    """The already-translated wording a renderer supplies for its own sheet.
+
+    The shared flow builds the same sheet for every sound-power method, so what
+    each renderer contributes is the words: the title, the standard-basis line,
+    the caption above the band table, the boxed single-number statement, the
+    extended terms printed beside it, and the measurement-basis strips. They
+    travel together because they are one thing, the sheet's copy, and because a
+    renderer that forgets one of them should fail to construct rather than
+    render a sheet with a hole in it.
+    """
+
+    title: str
+    basis: str
+    caption: str
+    statement: str
+    extended: list[str]
+    basis_strips: Sequence[str]
+
+
 def render_sound_power_fiche(
     result: Any,
     path: str,
     *,
-    title: str,
-    basis: str,
-    caption: str,
+    copy: FicheCopy,
     value_table: Any,
-    statement: str,
-    extended: list[str],
-    basis_strips: Sequence[str],
     metadata: ReportMetadata | None,
     language: str,
     verdict: tuple[str, bool] | None = None,
@@ -363,13 +380,8 @@ def render_sound_power_fiche(
     :param result: The sound-power result; its ``plot`` draws the band-axis
         ``LW(f)`` spectrum (native to the library) and, with the metadata
         ``requirement``, its A-weighted total drives the verdict.
-    :param title: The already-translated fiche title.
-    :param basis: The already-translated standard-basis line.
-    :param caption: The already-translated band-set caption above the table.
+    :param copy: The already-translated wording this sheet is built from.
     :param value_table: The pre-built per-band reportlab table flowable.
-    :param statement: The boxed single-number statement (markup).
-    :param extended: The extended terms shown alongside the boxed statement.
-    :param basis_strips: The measurement-basis-strip paragraphs (markup).
     :param metadata: Optional :class:`ReportMetadata` for the header, the
         requirement verdict and the footer identity.
     :param language: ``"en"`` (default) or ``"es"``.
@@ -403,8 +415,8 @@ def render_sound_power_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        Paragraph(copy.title, title_style),
+        Paragraph(copy.basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -414,7 +426,7 @@ def render_sound_power_fiche(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(caption, caption_style))
+    flow.append(Paragraph(copy.caption, caption_style))
     flow.append(value_table)
     flow.append(Spacer(1, 8))
 
@@ -428,7 +440,7 @@ def render_sound_power_fiche(
     )
     flow.append(Spacer(1, 8))
 
-    flow.append(result_box(statement, styles, accent, extended))
+    flow.append(result_box(copy.statement, styles, accent, copy.extended))
     # A caller may supply its own verdict (its quantity symbol and sign rule);
     # otherwise the airborne sound-power fiches fall back to the L_WA/L_W
     # requirement comparison. The two paths are mutually exclusive.
@@ -440,8 +452,8 @@ def render_sound_power_fiche(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_style_strip = measurement_basis_style()
-    for strip in basis_strips:
+    for strip in copy.basis_strips:
         flow.append(Paragraph(strip, basis_style_strip))
     flow.extend(footer_flow(metadata, language, disclaimer=disclaimer))
 
-    return build_document(path, flow, title)
+    return build_document(path, flow, copy.title)

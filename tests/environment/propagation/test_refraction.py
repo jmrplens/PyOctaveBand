@@ -177,6 +177,29 @@ def test_ray_travel_time_free_field() -> None:
     assert res.travel_times[0, -1] == pytest.approx(343.0 / C0, rel=1e-6)
 
 
+def test_ground_reflection_costs_no_accuracy() -> None:
+    """A bounce must not degrade the path, which is what splitting the step buys.
+
+    A ray launched downward from the ground and the same ray launched upward are
+    one trajectory: the first reflects immediately and continues as the second.
+    They agree only if the range step is split at the crossing. Folding the
+    overshoot back after a whole step instead integrates through ground rather
+    than air, where the profile saturates, and applies a mid-step reflection at
+    the step's end; that was worth 2.9 m of height here at the middle step
+    count, closing only as 1/n_steps.
+
+    The agreement is exact rather than merely close because once the step is
+    split the two rays are, step for step, the same arithmetic.
+    """
+    prof = linear_sound_speed_profile(gradient=0.2, max_height=500.0)
+    for n_steps in (201, 2001, 20_001):
+        kw = {"source_height": 0.0, "max_range": 3000.0, "n_steps": n_steps}
+        up = atmospheric_ray_paths(prof, launch_angles_deg=[10.0], **kw)
+        down = atmospheric_ray_paths(prof, launch_angles_deg=[-10.0], **kw)
+        assert np.array_equal(up.heights[0], down.heights[0]), n_steps
+        assert np.array_equal(up.travel_times[0], down.travel_times[0]), n_steps
+
+
 def test_ray_validation() -> None:
     prof = linear_sound_speed_profile(0.1)
     with pytest.raises(ValueError):

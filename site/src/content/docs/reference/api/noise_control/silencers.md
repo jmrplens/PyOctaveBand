@@ -155,12 +155,21 @@ fill the $kL = n \pi$ troughs of the plain expansion chamber. With
 both extensions `0` the result reduces exactly to
 [`expansion_chamber`](/phonometry/reference/api/noise_control/silencers/#expansion_chamber).
 
+The junction where each extended pipe ends is where its three ducts meet,
+so the straight chamber element cascaded between the two side branches is
+the length left over,
+$L_c = L - L_a - L_b$ (Bies Figure 8.19(a) and Example 8.2, where
+$L = L_a + L_b + L_c$), and not the full chamber length. When the two
+extensions meet ($L_a + L_b = L$) the straight element vanishes and
+the two annular branches shunt the same plane, which is the well-defined
+limit of the cascade; extensions that would overlap are rejected.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies `f`, Hz (1-D array). |
-| `length` | Chamber length `L`, m. |
+| `length` | Overall chamber length `L`, m, extensions included. |
 | `chamber_area` | Chamber cross-sectional area `S_exp`, m2. |
 | `pipe_area` | Inlet/outlet pipe area `S_duct`, m2. |
 | `inlet_extension` | Inlet pipe extension into the chamber `L_a`, m. |

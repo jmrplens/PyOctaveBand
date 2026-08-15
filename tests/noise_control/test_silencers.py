@@ -170,16 +170,103 @@ def test_extended_tube_reduces_to_expansion_chamber() -> None:
     assert np.allclose(ext.transmission_loss, plain.transmission_loss, atol=1e-9)
 
 
-def test_extended_tube_fills_trough() -> None:
-    # An inlet extension tuned to L/4 raises the TL at the first chamber trough.
+def test_extended_tube_fills_the_trough_its_length_tunes() -> None:
+    # An extension is a quarter-wave stub of length L_ext, so it shorts the
+    # duct at c / 4 L_ext and fills exactly the chamber trough that lands
+    # there: L/2 covers the first (c/2L), L/4 the second (c/L). The extension
+    # tuned to the *other* trough leaves this one essentially untouched.
     c, length = 343.0, 0.4
-    f = np.array([c / (2.0 * length)])  # first plain-chamber trough (TL = 0)
+    first, second = c / (2.0 * length), c / length
+    f = np.array([first, second])
     plain = sl.expansion_chamber(f, length, 0.04, 0.01)
-    tuned = sl.extended_tube_chamber(
+    half = sl.extended_tube_chamber(
+        f, length, 0.04, 0.01, inlet_extension=length / 2.0
+    )
+    quarter = sl.extended_tube_chamber(
         f, length, 0.04, 0.01, inlet_extension=length / 4.0
     )
-    assert plain.transmission_loss[0] == pytest.approx(0.0, abs=1e-9)
-    assert tuned.transmission_loss[0] > 3.0
+    assert plain.transmission_loss == pytest.approx([0.0, 0.0], abs=1e-9)
+    assert half.transmission_loss[0] > 100.0     # tuned to the first trough
+    assert half.transmission_loss[1] < 0.1       # transparent at the second
+    assert quarter.transmission_loss[1] > 100.0  # tuned to the second trough
+    assert quarter.transmission_loss[0] < 1.0    # nearly nothing at the first
+
+
+def test_extended_tube_straight_section_excludes_the_extensions() -> None:
+    # The junction where each extended pipe ends is where its ducts meet, so
+    # the straight chamber element is L - L_a - L_b (Bies Figure 8.19(a) and
+    # Example 8.2, L = L_a + L_b + L_c), not the full chamber length. Building
+    # the same cascade by hand from the documented building blocks reproduces
+    # the result; using the full length does not.
+    c, length, la, lb = 343.0, 0.5, 0.25, 0.1
+    f = np.linspace(50.0, 900.0, 400)
+    s_exp, s_duct = 0.04, 0.01
+    result = sl.extended_tube_chamber(
+        f, length, s_exp, s_duct, inlet_extension=la, outlet_extension=lb,
+        speed_of_sound=c,
+    )
+
+    def by_hand(straight: float) -> np.ndarray:
+        annulus = s_exp - s_duct
+        return sl.transmission_loss(
+            sl.cascade(
+                sl.shunt_matrix(sl.quarter_wave_impedance(
+                    f, la, annulus, speed_of_sound=c)),
+                sl.duct_matrix(f, straight, s_exp, speed_of_sound=c),
+                sl.shunt_matrix(sl.quarter_wave_impedance(
+                    f, lb, annulus, speed_of_sound=c)),
+            ),
+            inlet_area=s_duct, outlet_area=s_duct, speed_of_sound=c,
+        )
+
+    assert result.transmission_loss == pytest.approx(
+        by_hand(length - la - lb), abs=1e-9
+    )
+    assert not np.allclose(
+        result.transmission_loss, by_hand(length), atol=1.0
+    )
+
+
+def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
+    # Extensions that meet leave no straight section: the cascade degenerates
+    # to the two annular branches shunting the same plane, which is finite and
+    # well defined. Extensions that would overlap are rejected instead of
+    # cascading a duct of negative length.
+    f = np.array([200.0, 400.0])
+    meeting = sl.extended_tube_chamber(
+        f, 0.5, 0.04, 0.01, inlet_extension=0.3, outlet_extension=0.2
+    )
+    assert np.all(np.isfinite(meeting.transmission_loss))
+    by_hand = sl.transmission_loss(
+        sl.cascade(
+            sl.shunt_matrix(sl.quarter_wave_impedance(f, 0.3, 0.03)),
+            sl.shunt_matrix(sl.quarter_wave_impedance(f, 0.2, 0.03)),
+        ),
+        inlet_area=0.01, outlet_area=0.01,
+    )
+    assert meeting.transmission_loss == pytest.approx(by_hand, abs=1e-9)
+    with pytest.raises(ValueError, match="negative length"):
+        sl.extended_tube_chamber(
+            f, 0.5, 0.04, 0.01, inlet_extension=0.3, outlet_extension=0.3
+        )
+
+
+def test_extensions_that_meet_only_in_decimal_are_still_accepted() -> None:
+    # 0.1 + 0.2 exceeds 0.3 in binary, so a chamber described in round decimal
+    # metres meets the case above without satisfying it in arithmetic. The
+    # rejection is of a materially negative straight section, not of an ulp.
+    f = np.array([200.0, 400.0])
+    assert 0.1 + 0.2 > 0.3  # the premise, so this test cannot quietly go stale
+    meeting = sl.extended_tube_chamber(
+        f, 0.3, 0.04, 0.01, inlet_extension=0.1, outlet_extension=0.2
+    )
+    assert np.all(np.isfinite(meeting.transmission_loss))
+    # An overlap far below any drawn dimension, and far above the arithmetic,
+    # is still an overlap.
+    with pytest.raises(ValueError, match="negative length"):
+        sl.extended_tube_chamber(
+            f, 0.3, 0.04, 0.01, inlet_extension=0.1, outlet_extension=0.2 + 1e-6
+        )
 
 
 def test_insertion_loss_present_when_impedances_given() -> None:
