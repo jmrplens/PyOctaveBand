@@ -152,7 +152,7 @@ _ES: dict[str, str] = {
     "activity already in operation": "actividad ya en funcionamiento",
     # Facade sound insulation setup (buildings/insulation/facade-insulation).
     "Facade sound insulation setup (ISO 16283-3)":
-        "Montaje de aislamiento acustico de fachada (ISO 16283-3)",
+        "Montaje de aislamiento acústico de fachada (ISO 16283-3)",
     "Receiving room": "Recinto receptor",
     "$S$ = 11.5 m²": "$S$ = 11,5 m²",
     "Loudspeaker": "Altavoz",
@@ -165,7 +165,7 @@ _ES: dict[str, str] = {
     "≤ 10 mm parallel / ≤ 3 mm normal": "≤ 10 mm paralelo / ≤ 3 mm normal",
     "3 to 10 positions, never gridded":
         "de 3 a 10 posiciones, nunca en rejilla",
-    "L₁,2m  global method": "L₁,2m  metodo global",
+    "L₁,2m  global method": "L₁,2m  método global",
     "(2.0 ± 0.2) m": "(2,0 ± 0,2) m",
     "1.5 m": "1,5 m",
     "above the": "por encima del",
@@ -176,12 +176,12 @@ _ES: dict[str, str] = {
         "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
     "not comparable with a laboratory R.":
-        "Metodo global → D2m,nT: la fachada tal como esta construida; "
+        "Método global → D2m,nT: la fachada tal como está construida; "
         "no comparable con laboratorio.",
     "Road traffic replaces the loudspeaker at all angles: "
     "simultaneous inside and outside, ≥ 50 pass-bys.":
-        "El trafico rodado incide desde todos los angulos: medicion "
-        "simultanea dentro y fuera, ≥ 50 pasos.",
+        "El tráfico rodado incide desde todos los ángulos: medición "
+        "simultánea dentro y fuera, ≥ 50 pasos.",
     "Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "
     "by the functions.":
         "Apartados 9.4, 9.5.1, 9.6.1 y 10.2. Nada de esto lo comprueban "
@@ -190,7 +190,7 @@ _ES: dict[str, str] = {
     "Standard heavy and soft impact sources (ISO 16283-2, JIS A 1418-2)":
         "Fuentes de impacto normalizadas (ISO 16283-2, JIS A 1418-2)",
     "Floor under test (source room)": "Forjado ensayado (recinto emisor)",
-    "(a) tapping machine": "(a) maquina de impactos",
+    "(a) tapping machine": "(a) máquina de impactos",
     "ISO 10140-5 Annex E": "ISO 10140-5 Anexo E",
     "5 hammers, 500 g each": "5 martillos de 500 g cada uno",
     "(100 ± 20) ms apart": "separados (100 ± 20) ms",
@@ -204,29 +204,29 @@ _ES: dict[str, str] = {
     "$e$ = 0.8 ± 0.1": "$e$ = 0,8 ± 0,1",
     "(100 ± 1) cm": "(100 ± 1) cm",
     "from the ball's BOTTOM": "desde la BASE de la pelota",
-    "(c) bang machine": "(c) maquina de golpes",
+    "(c) bang machine": "(c) máquina de golpes",
     "JIS A 1418-2 only": "solo en JIS A 1418-2",
     "(2.4 ± 0.2)·10⁵ Pa": "(2,4 ± 0,2)·10⁵ Pa",
     "$m_{eff}$ = (7.3 ± 0.2) kg": "$m_{ef}$ = (7,3 ± 0,2) kg",
     "85 cm": "85 cm",
     "source": "fuente",
-    "rigid floor +": "suelo rigido +",
+    "rigid floor +": "suelo rígido +",
     "force plate": "plataforma de fuerza",
     "octave filter": "filtro de octava",
     "analyser → $L_{FE}$": "analizador → $L_{FE}$",
     "JIS A 1418-2 Annex C: the filter goes BEFORE the analyser,":
         "JIS A 1418-2 Anexo C: el filtro va ANTES del analizador,",
     "so $L_{FE}$ is evaluated once per band":
-        "de modo que $L_{FE}$ se evalua una vez por banda",
+        "de modo que $L_{FE}$ se evalúa una vez por banda",
     "The dimensions above are the standards' informative construction "
     "examples;":
         "Las dimensiones anteriores son ejemplos constructivos informativos "
         "de las normas;",
     "the specification is the force spectrum, not the shape.":
-        "la especificacion es el espectro de fuerza, no la forma.",
+        "la especificación es el espectro de fuerza, no la forma.",
     # ISO 10052 survey sweep (buildings/insulation/insulation-survey).
     "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)":
-        "El barrido del metodo de control ISO 10052 (apartados 6.2 y 6.3)",
+        "El barrido del método de control ISO 10052 (apartados 6.2 y 6.3)",
     "Plan of the room": "Planta del recinto",
     "separating element": "elemento separador",
     "≥ 0.5 m": "≥ 0,5 m",
