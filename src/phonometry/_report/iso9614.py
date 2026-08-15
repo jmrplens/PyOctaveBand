@@ -117,6 +117,12 @@ _SIGMA_A_WEIGHTED = 1.0
 #: page as one column of rows beside a header grid, a spectrum, a boxed result
 #: and the Annex B/C strips, and an accredited sheet prints a wide band set in
 #: two groups rather than on a second page.
+#: The two column headings every band table on these sheets opens with:
+#: the band centre, which is translated, and the sound power level,
+#: which is a quantity symbol and therefore is not.
+_COL_FREQ = "f [Hz]"
+_COL_LW = "L<sub>W</sub> [dB]"
+
 _SPLIT_ABOVE = 8
 #: Size of the embedded spectrum on the precision sheet, in inches. Shallower
 #: than the pressure fiches': this sheet carries a one-third-octave band set,
@@ -151,7 +157,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     labels, fraction = band_labels(getattr(result, "frequencies", None), n)
 
     if not verbose:
-        header = [t("f [Hz]", language), "L<sub>W</sub> [dB]"]
+        header = [t(_COL_FREQ, language), _COL_LW]
         widths = [87.0, 87.0]
         rows_data = [[labels[i], d1(lw[i], language)] for i in range(n)]
         return power_value_table(header, rows_data, widths, fraction)
@@ -160,8 +166,8 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     fpm = _band_array(result.negative_partial_power_index, n)
     grade = result.achieved_grade
     header = [
-        t("f [Hz]", language),
-        "L<sub>W</sub> [dB]",
+        t(_COL_FREQ, language),
+        _COL_LW,
         "F<sub>pI</sub> [dB]",
         "F<sub>+/&#8722;</sub> [dB]",
         t("Grade", language),
@@ -444,8 +450,8 @@ def _precision_value_table(
 
     if not verbose:
         header = [
-            t("f [Hz]", language),
-            "L<sub>W</sub> [dB]",
+            t(_COL_FREQ, language),
+            _COL_LW,
             "L<sub>W0</sub> [dB]",
             "U [dB]",
         ]
@@ -459,7 +465,8 @@ def _precision_value_table(
             for i in range(n)
         ]
         if n > _SPLIT_ABOVE:
-            return power_value_table(*_paired(header, rows_data), 0)
+            wide_header, wide_rows, wide_widths = _paired(header, rows_data)
+            return power_value_table(wide_header, wide_rows, wide_widths, 0)
         return power_value_table(header, rows_data, [43.5] * 4, fraction)
 
     ft = _band_array(None if indicators is None else indicators.ft, n)
@@ -467,8 +474,8 @@ def _precision_value_table(
     signed = _band_array(None if indicators is None else indicators.f_pi_signed, n)
     fs = _band_array(None if indicators is None else indicators.fs, n)
     header = [
-        t("f [Hz]", language),
-        "L<sub>W</sub> [dB]",
+        t(_COL_FREQ, language),
+        _COL_LW,
         "L<sub>W0</sub> [dB]",
         "U [dB]",
         "F<sub>T</sub>",
