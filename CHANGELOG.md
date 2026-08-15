@@ -23,6 +23,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   states underneath that it is marked rather than drawn. `.result()` closes
   the loop with the transmission loss, the plane-wave limit of the widest
   section of the chain, and the usual `.plot()` and `.report()`.
+- The informative tables of EN 12354-5:2009 are in the library instead of in
+  the reader's notebook. `typical_element_mobility` is Table D.1, the six
+  closed forms clause D.1.3 builds a source mobility out of (mass, bar end,
+  beam, plate, pipe, mass-spring), with `TABLE_D1_QUANTITIES` carrying the
+  table's own "describing quantities" column: a row rejects a quantity that
+  does not describe it, and the four rows whose expression contains the
+  frequency demand it while the other two refuse it.
+  `tapping_machine_force_level` is Table F.1, the octave-band force level of
+  the ISO tapping machine used as the substitution source of clause D.1.2.3,
+  with `tapping_machine_force_level_estimate` for the closed form printed
+  beside it (which the standard itself limits to about 1000 Hz, and which is
+  the only route to the one-third-octave values it does not tabulate) and
+  `tapping_machine_characteristic_power_level` /
+  `tapping_machine_coupling_term` for Formulae (D.9a) and (D.9b). Annex F
+  supplies the two terms Formula (18a) takes and they are here too:
+  `structure_to_airborne_adjustment` is Formula (F.3) for the adjustment term
+  `D_sa`, which the documentation previously spelled out as a raw expression
+  for the reader to copy, and `multi_junction_adjustment` is the 4 dB and 6 dB
+  of clause F.1 with the −5 dB floor on the resulting `Kij`.
+- Two defects registered in the errata registry, both from EN 12354-5:2009.
+  Table F.1 and clause F.4.2 print the force level "re 1 pN"; the reference is
+  10⁻⁶ N, which is what Formulae (D.5a), (D.9a) and (F.10) balance at, what the
+  tapping machine's own hammers produce, and what EN 15657:2018 Formula (15)
+  and ISO 1683 use. And the Key of Figure D.3 labels all three curves
+  `L_Ws,c,A` where its own caption names one characteristic power and two
+  installed ones.
 - Every piece of vector artwork draws its own text. The figures' SVGs used to
   ship live text positioned glyph by glyph from DejaVu metrics while asking the
   viewer for a generic sans, so any label carrying mathematics arrived
@@ -1069,6 +1095,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   so nothing is fetched and nothing reflows once the page has painted.
 
 ### Fixed
+
+- `extended_tube_chamber` cascades its straight chamber element over the length
+  the extensions leave, `L - L_a - L_b`, not the full chamber length. The
+  junction where each extended pipe ends is where its three ducts meet, so the
+  duct between the two annular side branches is the leftover section; Bies
+  Example 8.2 states the same arithmetic, `L = L_a + L_b + L_c`, and the
+  cross-section drawing in this package already computed it that way. Against
+  Bies Figure 8.20 the previous cascade opened deep spurious dips where the
+  published curves are smooth (for an area ratio of 16, 5.2 dB at
+  `kL/pi = 0.6` and 5.6 dB at 1.15, where the figure holds a dome near 28 dB);
+  the corrected curves reproduce the figure, and an independent 2D FDTD
+  simulation of the same chamber now agrees with the model to 0.97 dB where
+  the old length missed by up to 11.1 dB. Transmission and insertion loss move
+  for every call that passes a non-zero extension. Extensions that exactly meet
+  are accepted as the limit they are, the two annular branches shunting one
+  plane; extensions that would overlap are still rejected, now with a message
+  that says the straight section would come out negative.
 
 - The coverage claims tell the truth again, all 582 of them audited claim by
   claim against the code. The errors ran almost entirely in one direction: the

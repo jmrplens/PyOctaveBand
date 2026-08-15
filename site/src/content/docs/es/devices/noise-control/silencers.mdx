@@ -368,30 +368,35 @@ qw_hot = quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
                                 branch_area=2e-3, speed_of_sound=557.0)
 print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, no 285.8
 
-# Una extensión de entrada de L/4 rellena la primera caída de la cámara.
+# Cada extensión es un tubo de cuarto de onda, así que su propia longitud
+# elige la caída que rellena: L/4 = 0,1 m cortocircuita el conducto en
+# c/4(L/4) = c/L, la segunda caída de la cámara, y L/2 = 0,2 m tomaría la
+# primera, en c/2L.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
 print(round(float(et.transmission_loss[np.argmin(abs(f - 428.75))]), 1))
-# 5.1 dB donde la cámara simple marca 0.0
+# 0.6 dB en c/2L: el tubo L/4 está sintonizado una octava por encima
 ```
 
 Una extensión es un tubo de cuarto de onda alojado dentro de la cámara, así que
-trabaja justo donde la cámara no tiene nada. La cámara simple de 0,4 m es
-transparente en $c/2L = 429$ Hz; una extensión de entrada de 0,1 m ($L/4$)
-devuelve ahí 5,1 dB, y añadir una extensión de salida de 0,2 m ($L/2$) convierte
-la caída en un pico de 74 dB. El precio se ve en la misma figura: cada extensión
-es a su vez un resonador, así que abre una caída **nueva** propia, en 355 Hz con
-la extensión de entrada sola y en 261 Hz con las dos.
+su propia longitud decide qué caída rellena: un tubo de longitud
+$L_\text{ext}$ cortocircuita el conducto en $c/4L_\text{ext}$. La cámara simple
+de 0,4 m es transparente en $c/2L = 429$ Hz y otra vez en $c/L = 858$ Hz. La
+extensión de entrada de 0,1 m ($L/4$) está sintonizada en 858 Hz, así que
+cortocircuita la segunda caída y deja la primera casi intacta, en 0,6 dB; la
+extensión de salida de 0,2 m ($L/2$) es la sintonizada en 429 Hz, y el par
+cubre las dos. El precio se ve en la misma figura: por sí sola, la extensión de
+entrada no elimina la caída que no le toca, la desplaza, a 444 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube_es.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como joroba discontinua que llega a 6,5 dB y cae a cero en 429 Hz, esa misma cámara con una extensión de entrada de 0,10 m que aporta 5,1 dB en 429 Hz pero abre un cero nuevo en 355 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se dispara por encima de 45 dB en 429 Hz y abre su propio cero en 261 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube_es.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como pareja de jorobas discontinuas que llegan a 6,5 dB y caen a cero en 429 y en 858 Hz, esa misma cámara con una extensión de entrada de 0,10 m que se sale por arriba del gráfico en 858 Hz pero solo marca 0,6 dB en 429 Hz y conserva ahí una caída, desplazada a 444 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se sale por arriba en 429 y en 858 Hz y no deja ninguna caída en la banda" width="88%" />
 
 *Lo que aporta una extensión interior, y lo que cuesta. Las caídas a 0 dB de la
-cámara simple en cada media longitud de onda son su defecto fatal; una extensión
-de cuarto de onda rellena la primera, y una segunda extensión de la mitad de
-longitud la convierte en un cortocircuito. Cada extensión pasa entonces a
-resonar en su propia longitud, que es la razón de que las caídas se muevan en
-lugar de desaparecer y de que una cámara de tubo extendido se diseñe contra el
-espectro de la fuente y no en general.*
+cámara simple en cada media longitud de onda son su defecto fatal, y cada
+extensión cortocircuita exactamente la que sintoniza su propia longitud: $L/2$
+se lleva la primera y $L/4$ la segunda. Una sola extensión, por tanto, desplaza
+la caída que no le toca en lugar de eliminarla, que es la razón de que las
+extensiones se dimensionen por parejas y de que una cámara de tubo extendido se
+diseñe contra el espectro de la fuente y no en general.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -709,13 +714,17 @@ que es mínima, donde el ramal muerde con más fuerza, y no se acota nada de
 él. Los extremos del tramo se dejan abiertos por la misma razón: una cadena es
 una lista de elementos, no una afirmación sobre los tubos entre los que se
 monta. Si esos tubos se meten en la cadena como elementos de conducto, también
-se dibujan.
+se dibujan. Una cadena sin ningún conducto de longitud positiva no tiene
+geometría ni escala a la que dibujarse, así que lanza un error en vez de
+dibujar una.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_es.svg" alt="Sección a escala de una cadena de silenciador construida a mano: tramos de 100 mm y 200 mm de conducto de 200 mm que desembocan en una envolvente de 400 mm y 600 mm de longitud y vuelven a 300 mm de conducto de 200 mm, con la longitud de cada tramo, ambos diámetros y la longitud total de 1200 mm acotados, y dos ramales laterales marcados con líneas de referencia en las estaciones donde se conectan, uno rotulado como ramal de cuarto de onda con impedancia mínima en 125 Hz y el otro como resonador de Helmholtz en 242 Hz" width="88%" />
 
-*Toda medida de la página es un número que se le dio a la cadena: las cuatro
-longitudes de conducto, los dos diámetros y su suma. Los dos ramales no llevan
-ninguna cota, porque una impedancia no es una forma.*
+*Toda medida de la página sale de lo que se le dio a la cadena: las cuatro
+longitudes de conducto y su suma son los números mismos, y los dos diámetros
+son las áreas que recibió, expresadas como el diámetro circular equivalente
+$d = 2\sqrt{S/\pi}$. Los dos ramales no llevan ninguna cota, porque una
+impedancia no es una forma.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

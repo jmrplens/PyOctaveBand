@@ -1237,20 +1237,28 @@ def generate_silencer_extended_tube(output_dir: str) -> None:
             label="Inlet extension $L/4$ = 0.10 m")
     ax.plot(freqs, both.transmission_loss, color=COLOR_SECONDARY, lw=1.7,
             ls="-.", label="Inlet $L/4$ and outlet $L/2$ = 0.20 m")
-    trough = 343.0 / (2.0 * kwargs["length"])
-    ax.axvline(trough, color=COLOR_GRID, lw=1.2, ls=":")
-    ax.annotate(f"$c/2L$ = {trough:.0f} Hz: the plain chamber is transparent "
-                "(0.0 dB),\nthe $L/4$ inlet gives 5.1 dB and the $L/4$ + "
-                "$L/2$ pair 74 dB", xy=(trough, 5.1),
-                xytext=(trough * 1.06, 26.0),
+    # Each extension is a quarter-wave stub, so its length picks which trough
+    # it fills: c/4(L/2) = c/2L is the first, c/4(L/4) = c/L the second.
+    first = 343.0 / (2.0 * kwargs["length"])
+    second = 343.0 / kwargs["length"]
+    for fx in (first, second):
+        ax.axvline(fx, color=COLOR_GRID, lw=1.2, ls=":")
+    ax.annotate(f"$c/2L$ = {first:.0f} Hz: plain chamber 0.0 dB and the "
+                "$L/4$ inlet\nstill only 0.6 dB, because $L/4$ is not tuned "
+                "here.\nThe $L/2$ outlet is, and shorts the duct",
+                xy=(first, 27.0), xytext=(60.0, 35.0),
                 fontsize="small", color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
-    for fx, label in ((355.0, "0.1 dB"), (261.0, "0.4 dB")):
-        ax.annotate(f"new trough,\n{label}", xy=(fx, 0.4),
-                    xytext=(fx - 78.0, 16.0), fontsize="small",
-                    color=COLOR_SECONDARY,
-                    arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY,
-                                "lw": 1.0})
+    ax.annotate(f"$c/L$ = {second:.0f} Hz:\nthe $L/4$ inlet\nis tuned here",
+                xy=(second, 27.0), xytext=(second - 175.0, 22.0),
+                fontsize="small", color=COLOR_PRIMARY,
+                arrowprops={"arrowstyle": "->", "color": COLOR_PRIMARY,
+                            "lw": 1.0})
+    ax.annotate("the inlet alone only moves\nthe surviving trough, to 444 Hz",
+                xy=(444.0, 0.3), xytext=(150.0, 11.5), fontsize="small",
+                color=COLOR_PRIMARY,
+                arrowprops={"arrowstyle": "->", "color": COLOR_PRIMARY,
+                            "lw": 1.0})
     ax.set_xlim(20.0, 880.0)
     ax.set_ylim(0.0, 46.0)
     ax.set_xlabel(LABEL_FREQ_HZ)

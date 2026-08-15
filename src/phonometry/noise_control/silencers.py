@@ -129,6 +129,12 @@ if TYPE_CHECKING:
 #: Reference air properties at 20 degC, 101.325 kPa.
 _C_AIR = 343.0
 _RHO_AIR = 1.206
+#: Relative slack allowed when two extended tubes meet inside a chamber. Their
+#: sum has to clear the chamber length by more than this fraction of it to count
+#: as an overlap, which separates a geometry the user did not intend from the
+#: last bits of a sum like 0.1 + 0.2. Nine orders of magnitude below the length
+#: is far above the arithmetic and far below any dimension anyone draws.
+_MEETING_SLACK = 1e-9
 
 _Complex = NDArray[np.complex128]
 
@@ -775,8 +781,17 @@ def extended_tube_chamber(
     both extensions ``0`` the result reduces exactly to
     :func:`expansion_chamber`.
 
+    The junction where each extended pipe ends is where its three ducts meet,
+    so the straight chamber element cascaded between the two side branches is
+    the length left over,
+    :math:`L_c = L - L_a - L_b` (Bies Figure 8.19(a) and Example 8.2, where
+    :math:`L = L_a + L_b + L_c`), and not the full chamber length. When the two
+    extensions meet (:math:`L_a + L_b = L`) the straight element vanishes and
+    the two annular branches shunt the same plane, which is the well-defined
+    limit of the cascade; extensions that would overlap are rejected.
+
     :param frequencies: Frequencies ``f``, Hz (1-D array).
-    :param length: Chamber length ``L``, m.
+    :param length: Overall chamber length ``L``, m, extensions included.
     :param chamber_area: Chamber cross-sectional area ``S_exp``, m2.
     :param pipe_area: Inlet/outlet pipe area ``S_duct``, m2.
     :param inlet_extension: Inlet pipe extension into the chamber ``L_a``, m.
@@ -792,15 +807,26 @@ def extended_tube_chamber(
     rho = require_positive(density, "density")
     s_exp = require_positive(chamber_area, "chamber_area")
     s_duct = require_positive(pipe_area, "pipe_area")
+    length = require_non_negative(length, "length")
     la = require_non_negative(inlet_extension, "inlet_extension")
     lb = require_non_negative(outlet_extension, "outlet_extension")
     if s_exp <= s_duct:
         raise ValueError("'chamber_area' must exceed 'pipe_area'.")
-    if la + lb > length:
+    # The straight section between the two junction planes. Extensions that
+    # meet exactly are the accepted limit, but binary arithmetic does not
+    # respect that: 0.1 + 0.2 exceeds 0.3 by an ulp, so a chamber described in
+    # round decimal metres would be refused for a geometry it does in fact
+    # have. What is rejected is therefore a materially negative section, and
+    # anything within rounding of zero is clamped to it, since a duct of
+    # negative length is not a thing either.
+    straight = length - la - lb
+    if straight < -_MEETING_SLACK * max(length, la + lb):
         raise ValueError(
             "the inlet and outlet extensions cannot together exceed the "
-            "chamber length (they would overlap inside the chamber)."
+            "chamber length (they would overlap inside the chamber, leaving "
+            "a straight chamber section of negative length)."
         )
+    straight = max(straight, 0.0)
     annulus = s_exp - s_duct
 
     elements = []
@@ -810,7 +836,9 @@ def extended_tube_chamber(
             quarter_wave_impedance(f, la, annulus, speed_of_sound=c, density=rho)
         ))
         resonances.append(c / (4.0 * la))
-    elements.append(duct_matrix(f, length, s_exp, speed_of_sound=c, density=rho))
+    elements.append(
+        duct_matrix(f, straight, s_exp, speed_of_sound=c, density=rho)
+    )
     if lb > 0.0:
         elements.append(shunt_matrix(
             quarter_wave_impedance(f, lb, annulus, speed_of_sound=c, density=rho)
@@ -1018,10 +1046,9 @@ class SilencerChain:
     ) -> ReactiveSilencerResult:
         """Evaluate the chain into a :class:`ReactiveSilencerResult`.
 
-        The port areas are the pipes the chain is connected between, which the
-        transmission loss needs (:func:`transmission_loss`) and the chain
-        itself does not contain: put them in the chain as duct elements if the
-        drawing is to show them.
+        The port areas are the pipes the chain is connected between, which
+        ``transmission_loss`` needs and the chain itself does not contain: put
+        them in the chain as duct elements if the drawing is to show them.
 
         :param inlet_area: Inlet pipe area ``S_in``, m2.
         :param outlet_area: Outlet pipe area ``S_out``, m2.

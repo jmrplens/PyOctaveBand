@@ -52,9 +52,9 @@ plt.show()
 ## 1. Coupling and installed power
 
 Only part of the characteristic power is injected into the supporting element;
-the loss is the **coupling term** $D_C$ (always positive), set for a point
-excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
-(Formula 19b):
+the loss is the **coupling term** $D_C$, positive whenever the two mobilities
+are well mismatched, set for a point excitation by the source mobility $Y_s$
+and the receiver mobility $Y_i$ (Formula 19b):
 
 $$
 D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
@@ -83,8 +83,29 @@ from phonometry import building
 
 # A near-force source (Y_s >> Y_i) on a concrete floor:
 dc = building.coupling_term(2e-4 + 1e-4j, 3e-5 + 1e-5j)
-print(round(float(dc), 2))                                          # ~8.5 dB
+print(round(float(dc), 2))                                          # 9.86 dB
 print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # installed L_Ws
+```
+
+Nothing measures the source mobility of a boiler, so clause D.1.3 builds it out
+of the machine's own parts and Table D.1 gives the six closed forms it uses.
+`typical_element_mobility` is that table: the rows are `"mass"`
+$[2\pi f M]^{-1}$, `"bar_end"` $[\rho c_L S]^{-1}$, `"beam"`
+$[7{,}6\,\rho t w\sqrt{c_L t f}]^{-1}$, `"plate"` $[2{,}3\,c_L\rho t^2]^{-1}$,
+`"pipe"` $[63\,\rho t r\sqrt{c_L r f}]^{-1}$ and `"mass_spring"`
+$\left[\left(\frac{2\pi f\eta}{s(1+\eta^2)}\right)^2 + \left(\frac{2\pi f}{s(1+\eta^2)} - \frac{1}{2\pi f M}\right)^2\right]^{1/2}$,
+each in m/N.s. `TABLE_D1_QUANTITIES` is the table's "describing quantities"
+column, and only those may be passed; the four rows whose expression contains
+$f$ take `frequency` and the other two refuse it.
+
+```python
+from phonometry import building
+
+# A 120 kg pump on four rubber mounts, 1,0e6 N/m each, loss factor 0,1.
+y_feet = building.typical_element_mobility(
+    "mass_spring", frequency=125.0, mass=120.0, stiffness=4.0e6, loss_factor=0.1
+)
+print(f"{float(y_feet):.3g}")                       # 0.000185 m/(N.s)
 ```
 
 ## 2. Transmission to the receiving room
@@ -110,7 +131,14 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):
+with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17).
+
+$D_{sa}$ is normally **negative** — the standard's own Annex I columns run from
+about $-14$ dB at 63 Hz to $-45$ dB at 2 kHz — and Formula (18a) subtracts it,
+so a negative value *raises* the predicted level. Annex F.2 gives the working
+form $D_{sa,i} = 10\log_{10}(400 f_{c,i}\sigma_i / m_i f^2)$, which is
+`structure_to_airborne_adjustment`; passing a positive number in its place
+leaves the prediction 20 to 40 dB low with no error raised.
 
 ```python
 import numpy as np
@@ -121,9 +149,9 @@ res = building.installed_source_prediction(
     characteristic_power_level=np.array([80.0, 82.0, 78.0]),
     coupling_term=np.array([9.0, 10.0, 11.0]),
     paths=[
-        {"adjustment_term": 5.0,
+        {"adjustment_term": np.array([-19.0, -25.0, -31.0]),
          "flanking_reduction_index": np.array([50.0, 52.0, 55.0]), "element_area": 12.0},
-        {"adjustment_term": 6.0,
+        {"adjustment_term": np.array([-22.0, -28.0, -34.0]),
          "flanking_reduction_index": np.array([52.0, 54.0, 57.0]), "element_area": 8.0},
     ],
     frequencies=bands,
@@ -137,6 +165,35 @@ res.plot()   # the per-path and total L_n,s cascade, as in the figure above (nee
 The `InstalledSourceResult` carries the per-path levels, the total per band, the
 installed power level and `.overall_level`, and its `.plot()` draws the whole
 cascade.
+
+Where the receiving room is more than one junction away, clause F.1 subtracts an
+adjustment $\Delta K$ from the summed junction $K_{ij}$ to cover the transmission
+by wave types other than bending waves: `multi_junction_adjustment` returns the
+4 dB it gives for two junctions and the 6 dB for three or more, with the
+resulting $K_{ij}$ floored at `MINIMUM_MULTI_JUNCTION_KIJ` ($-5$ dB).
+
+When the equipment itself cannot be characterised, clause D.1.2.3 substitutes a
+source of known force level and Table F.1 gives that level for the ISO tapping
+machine, in octave bands from 31,5 Hz to 4 kHz: 139, 142, 145, 148, 151, 154,
+156 and 156 dB. `tapping_machine_force_level` returns them,
+`tapping_machine_force_level_estimate` the closed form printed beside the table
+(valid only up to about 1000 Hz, and the only route to one-third-octave values),
+and `tapping_machine_characteristic_power_level` /
+`tapping_machine_coupling_term` turn them into the $L_{Ws,c}$ and $D_C$ of
+Formulae (D.9a) and (D.9b). The table's levels are re $10^{-6}$ N despite the
+"re 1 pN" its caption prints; see [the errata register](../../ERRATA.md).
+
+```python
+import numpy as np
+from phonometry import building
+
+bands = np.array(building.TABLE_F1_OCTAVE_BANDS)
+lw_c = building.tapping_machine_characteristic_power_level(
+    bands, building.tapping_machine_force_level()
+)
+dc = building.tapping_machine_coupling_term(bands, 1.07e-6)   # 220 mm concrete
+print(np.round(lw_c - dc, 1))   # [79.3 82.3 85.3 88.3 91.3 94.3 96.3 96.3]
+```
 
 ## 3. The prediction report (`.report()`)
 
@@ -239,6 +296,10 @@ standard's own Annex I worked examples: the whirlpool bath of I.2
 (Table I.6a: mobility correction and path 11) and the flushing cistern of I.3
 (Tables I.8/I.9: source conversion, all four transmission paths, the
 Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of
-the printed one-decimal intermediates. $D_{sa}$ and $R_{ij,\mathrm{ref}}$ are inputs (from
-measurement / EN 12354-1 / Annexes D and F). Only the 2009 edition is
-implemented, not the EN 12354-5:2023 revision.
+the printed one-decimal intermediates. The informative tables of the annexes
+are implemented as named lookups: Table D.1 (mobility of typical construction
+elements), Table F.1 (force level of the ISO tapping machine) with Formulae
+(D.9a) and (D.9b), the adjustment term of Formula (F.3) and the multi-junction
+$\Delta K$ of clause F.1. $R_{ij,\mathrm{ref}}$ remains an input (from
+measurement or EN 12354-1). Only the 2009 edition is implemented, not the
+EN 12354-5:2023 revision.

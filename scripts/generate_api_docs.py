@@ -765,10 +765,21 @@ def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
             )
             pages.append(page)
             xref[module_name] = page.url
+            # Both the bare name and the qualified one. A bare name is all most
+            # references write, but it is ambiguous the moment two modules
+            # export it (`transmission_loss` is both a silencer's and an
+            # ocean's), and whichever module is walked last would otherwise
+            # take every link to it. A reference that says which module it
+            # means is then resolved by saying so, rather than falling through
+            # to the bare name and landing wherever it lands.
             for member in page.members:
-                xref[member.name] = f"{page.url}#{member.anchor}"
+                anchored = f"{page.url}#{member.anchor}"
+                xref[member.name] = anchored
+                xref[f"{module_name}.{member.name}"] = anchored
                 for method in member.methods:
-                    xref[method.name] = f"{page.url}#{method.anchor}"
+                    anchored = f"{page.url}#{method.anchor}"
+                    xref[method.name] = anchored
+                    xref[f"{module_name}.{method.name}"] = anchored
 
     slugs = {(page.section.key, page.slug) for page in pages}
     if len(slugs) != len(pages):

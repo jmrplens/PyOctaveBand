@@ -354,29 +354,34 @@ qw_hot = quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
                                 branch_area=2e-3, speed_of_sound=557.0)
 print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, not 285.8
 
-# An inlet extension of L/4 fills the first expansion-chamber trough.
+# Each extension is a quarter-wave stub, so its own length picks the trough
+# it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
+# second trough, and L/2 = 0.2 m would take the first one at c/2L.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
 print(round(float(et.transmission_loss[np.argmin(abs(f - 428.75))]), 1))
-# 5.1 dB where the plain chamber reads 0.0
+# 0.6 dB at c/2L: the L/4 stub is tuned an octave above it
 ```
 
-An extension is a quarter-wave stub buried inside the chamber, so it does its
-work where the chamber has none. The plain 0.4 m chamber is transparent at
-$c/2L = 429$ Hz; a 0.1 m inlet extension ($L/4$) puts 5.1 dB back there, and
-adding a 0.2 m outlet extension ($L/2$) turns the trough into a 74 dB spike.
-The trade is visible in the same figure: each extension is itself a resonator,
-so it opens a **new** trough of its own — at 355 Hz for the inlet extension
-alone and at 261 Hz for the pair.
+An extension is a quarter-wave stub buried inside the chamber, so its own
+length decides which trough it fills: a stub of length $L_\text{ext}$ shorts
+the duct at $c/4L_\text{ext}$. The plain 0.4 m chamber is transparent at
+$c/2L = 429$ Hz and again at $c/L = 858$ Hz. The 0.1 m inlet extension ($L/4$)
+is tuned to 858 Hz, so it shorts the second trough and leaves the first almost
+untouched at 0.6 dB; the 0.2 m outlet extension ($L/2$) is the one tuned to
+429 Hz, and the pair covers both. The trade is visible in the same figure: on
+its own the inlet extension does not remove the trough it misses, it moves it,
+to 444 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube.svg" alt="Transmission loss from 20 to 880 Hz of a 0.4 m expansion chamber in three configurations: the plain chamber as a dashed hump reaching 6.5 dB and falling to zero at 429 Hz, the same chamber with a 0.10 m inlet extension which is worth 5.1 dB at 429 Hz but opens a new zero at 355 Hz, and the chamber with both a 0.10 m inlet and a 0.20 m outlet extension which spikes past 45 dB at 429 Hz and opens its own zero at 261 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube.svg" alt="Transmission loss from 20 to 880 Hz of a 0.4 m expansion chamber in three configurations: the plain chamber as a dashed pair of humps reaching 6.5 dB and falling to zero at 429 and at 858 Hz, the same chamber with a 0.10 m inlet extension which runs off the top of the plot at 858 Hz but reads only 0.6 dB at 429 Hz and keeps a trough there, moved to 444 Hz, and the chamber with both a 0.10 m inlet and a 0.20 m outlet extension which runs off the top at 429 and at 858 Hz and has no trough left in the band" width="88%" />
 
 *What an internal extension buys, and what it costs. The plain chamber's 0 dB
-troughs at every half wavelength are its fatal defect; a quarter-wave extension
-fills the first one, and a second extension of half the length turns it into a
-short. Each extension then rings at its own length, which is why the troughs
-move rather than disappear and why an extended-tube chamber is designed against
-the source spectrum rather than in general.*
+troughs at every half wavelength are its fatal defect, and each extension
+shorts exactly the one its own length tunes: $L/2$ takes the first, $L/4$ the
+second. A single extension therefore moves the trough it misses rather than
+removing it, which is why the extensions are sized in pairs and why an
+extended-tube chamber is designed against the source spectrum rather than in
+general.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -678,12 +683,15 @@ its impedance does say about itself, the frequency at which it is least, where
 the branch bites hardest, and nothing about it is dimensioned. The ends of the
 run are left open for the same reason: a chain is a list of elements, not a
 statement about the pipes it sits between. Put those pipes in the chain as duct
-elements and they are drawn too.
+elements and they are drawn too. A chain that holds no duct of positive length
+has no geometry and no scale to draw at, so it raises rather than drawing one.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="To-scale cross-section of a hand-built silencer chain: 100 mm and 200 mm runs of 200 mm duct opening into a 400 mm shell 600 mm long and returning to 300 mm of 200 mm duct, with each run length, both bores and the 1200 mm overall length dimensioned, and two side branches marked by leaders at the stations where they join, one lettered as a quarter-wave stub with least impedance at 125 Hz and the other as a Helmholtz resonator at 242 Hz" width="88%" />
 
-*Every measurement on the page is a number the chain was given: the four duct
-lengths, the two bores, and their sum. The two branches carry no dimension at
+*Every measurement on the page comes from what the chain was given: the four
+duct lengths and their sum are the numbers themselves, and the two bores are
+the areas it was handed, restated as the equivalent circular diameter
+$d = 2\sqrt{S/\pi}$. The two branches carry no dimension at
 all, because an impedance is not a shape.*
 
 <details>

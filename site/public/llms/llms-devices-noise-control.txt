@@ -1512,7 +1512,9 @@ qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
                             speed_of_sound=343.24)
 print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
 
-# An inlet extension of L/4 fills the first expansion-chamber trough.
+# Each extension is a quarter-wave stub, so its own length picks the trough
+# it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
+# second trough, and L/2 = 0.2 m would take the first one at c/2L.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
 ```
@@ -1644,12 +1646,16 @@ show follows from what the elements declare: a duct is handed a length and an
 area and is drawn to scale and dimensioned, while a shunt is handed an
 impedance, which fixes no length, no area and no volume, so it is marked at the
 station where it joins and lettered with the frequency at which it is least,
-and nothing about it is dimensioned.
+and nothing about it is dimensioned. A chain that holds no duct of positive
+length has no geometry and no scale to draw at, so it raises rather than
+drawing one.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="To-scale cross-section of a hand-built silencer chain: 100 mm and 200 mm runs of 200 mm duct opening into a 400 mm shell 600 mm long and returning to 300 mm of 200 mm duct, with each run length, both bores and the 1200 mm overall length dimensioned, and two side branches marked by leaders at the stations where they join, one lettered as a quarter-wave stub with least impedance at 125 Hz and the other as a Helmholtz resonator at 242 Hz" width="88%"></picture>
 
-*Every measurement on the page is a number the chain was given: the four duct
-lengths, the two bores, and their sum. The two branches carry no dimension at
+*Every measurement on the page comes from what the chain was given: the four
+duct lengths and their sum are the numbers themselves, and the two bores are
+the areas it was handed, restated as the equivalent circular diameter
+$d = 2\sqrt{S/\pi}$. The two branches carry no dimension at
 all, because an impedance is not a shape.*
 
 <details>

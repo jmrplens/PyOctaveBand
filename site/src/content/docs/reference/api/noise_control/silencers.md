@@ -164,12 +164,21 @@ fill the $kL = n \pi$ troughs of the plain expansion chamber. With
 both extensions `0` the result reduces exactly to
 [`expansion_chamber`](/phonometry/reference/api/noise_control/silencers/#expansion_chamber).
 
+The junction where each extended pipe ends is where its three ducts meet,
+so the straight chamber element cascaded between the two side branches is
+the length left over,
+$L_c = L - L_a - L_b$ (Bies Figure 8.19(a) and Example 8.2, where
+$L = L_a + L_b + L_c$), and not the full chamber length. When the two
+extensions meet ($L_a + L_b = L$) the straight element vanishes and
+the two annular branches shunt the same plane, which is the well-defined
+limit of the cascade; extensions that would overlap are rejected.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies `f`, Hz (1-D array). |
-| `length` | Chamber length `L`, m. |
+| `length` | Overall chamber length `L`, m, extensions included. |
 | `chamber_area` | Chamber cross-sectional area `S_exp`, m2. |
 | `pipe_area` | Inlet/outlet pipe area `S_duct`, m2. |
 | `inlet_extension` | Inlet pipe extension into the chamber `L_a`, m. |
@@ -562,10 +571,9 @@ SilencerChain.result(
 
 Evaluate the chain into a [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult).
 
-The port areas are the pipes the chain is connected between, which the
-transmission loss needs ([`transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss)) and the chain
-itself does not contain: put them in the chain as duct elements if the
-drawing is to show them.
+The port areas are the pipes the chain is connected between, which
+`transmission_loss` needs and the chain itself does not contain: put
+them in the chain as duct elements if the drawing is to show them.
 
 **Parameters**
 

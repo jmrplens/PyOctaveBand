@@ -3674,10 +3674,16 @@ _ES_EXACT = {
     "Inlet extension $L/4$ = 0.10 m": "Extensión de entrada $L/4$ = 0,10 m",
     "Inlet $L/4$ and outlet $L/2$ = 0.20 m":
         "Entrada $L/4$ y salida $L/2$ = 0,20 m",
-    "$c/2L$ = 429 Hz: the plain chamber is transparent (0.0 dB),\n"
-    "the $L/4$ inlet gives 5.1 dB and the $L/4$ + $L/2$ pair 74 dB":
-        "$c/2L$ = 429 Hz: la cámara simple es transparente (0,0 dB),\n"
-        "la entrada $L/4$ da 5,1 dB y el par $L/4$ + $L/2$, 74 dB",
+    "$c/2L$ = 429 Hz: plain chamber 0.0 dB and the $L/4$ inlet\n"
+    "still only 0.6 dB, because $L/4$ is not tuned here.\n"
+    "The $L/2$ outlet is, and shorts the duct":
+        "$c/2L$ = 429 Hz: cámara simple 0,0 dB y la entrada $L/4$\n"
+        "solo 0,6 dB, porque $L/4$ no está sintonizada aquí.\n"
+        "La salida $L/2$ sí, y cortocircuita el conducto",
+    "$c/L$ = 858 Hz:\nthe $L/4$ inlet\nis tuned here":
+        "$c/L$ = 858 Hz:\nla entrada $L/4$\nsí lo está",
+    "the inlet alone only moves\nthe surviving trough, to 444 Hz":
+        "la entrada sola solo desplaza\nla caída que queda, a 444 Hz",
     # duct_attenuation_elements: the four element panels
     "(a) 36 × 24 in run, 5 ft": "(a) Tramo de 36 × 24 in, 5 ft",
     "(b) One bend, $W$ = 24 in": "(b) Un codo, $W$ = 24 in",
