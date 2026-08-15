@@ -24,6 +24,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   states underneath that it is marked rather than drawn. `.result()` closes
   the loop with the transmission loss, the plane-wave limit of the widest
   section of the chain, and the usual `.plot()` and `.report()`.
+- The underwater ray solver returns travel times. `ray_trace` now carries
+  `travel_times` on its `RayTraceResult`, one cumulative arrival per ray
+  sample, integrated as a third state of the Runge-Kutta step that already
+  places the ray (`dt/dr = 1/(xi c^2)`, off the sound speed the trajectory
+  derivatives interpolate anyway) rather than quadratured over the finished
+  path, which is both a fidelity argument and an accuracy one: the stage sum
+  reproduces the published closed form to 1e-14 s where the quadrature misses
+  it by 3e-5 s at the default step. A reflection is instantaneous, so the time
+  crosses surface and bottom bounces unchanged, and a ray bouncing the length
+  of an isovelocity waveguide reports range/(c cos theta0) to nine digits. The
+  oracle is Medwin and Clay, *Fundamentals of Acoustical Oceanography*
+  (Academic Press, 1998), Eq. (3.3.20) on p. 88, read in the library's
+  horizontal-angle convention as t = (1/g) ln[(c2/c1)(1 + sin th1)/(1 + sin
+  th2)]; it anchors a new conformance row and the tests, which also pin the
+  properties the physics owes, including that a ray turning deeper takes
+  longer to reach its turn. The airborne twin `atmospheric_ray_paths`, which
+  has returned a travel time since it was written, moves to the same
+  four-stage integration; nothing rendered depends on either. The documentation
+  that promised paths and travel times, and had been corrected the other way
+  when the coverage audit found nothing computing them, is true as first
+  written.
+- Both ray solvers reflect at a boundary instead of folding it. A crossing used
+  to be handled by taking a whole Runge-Kutta step and folding whatever came out
+  of the medium back into it, which integrates the step through water or ground
+  that is not there and applies a mid-step reflection at the step's end: a
+  first-order error at every bounce inside a fourth-order integration, carried
+  by the geometry and not only by the timing, and invisible to the tests because
+  the only reflection they exercised was in isovelocity water where there is
+  nothing to get wrong. Each crossing now ends a sub-step exactly on the
+  boundary, located by the step's own cubic Hermite and polished against real
+  steps, so a reflected ray keeps the order the rest of the path is integrated
+  with. Two rays that must be identical, launched up and down from the same
+  point on a boundary, went from 3.6 m apart to 1e-12 m in the ocean and to
+  exactly equal in the atmosphere, and a path working both the surface and the
+  bottom now reproduces the exact circular arc of a constant gradient to 7e-15 s
+  over four bounces. The solver guide was printing 583.7 m for a turning depth
+  whose analytic value it printed as 583.3 m and offering the gap as its own
+  validation; the gap was this defect, and the two figures that draw rays
+  against a boundary move with the fix.
 - The informative tables of EN 12354-5:2009 are in the library instead of in
   the reader's notebook. `typical_element_mobility` is Table D.1, the six
   closed forms clause D.1.3 builds a source mobility out of (mass, bar end,

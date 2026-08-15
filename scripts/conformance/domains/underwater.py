@@ -484,6 +484,26 @@ def _chk_uwn_rays() -> Outcome:
 
 @register(
     _UW_NUM,
+    "Ray travel time vs iso-gradient closed form",
+    "Travel time of a 10° ray at 10 km, c = 1500 + 0.05z (Medwin & Clay Eq. 3.3.20), s",
+)
+def _chk_uwn_ray_time() -> Outcome:
+    # Oracle: Medwin & Clay, Fundamentals of Acoustical Oceanography (1998),
+    # Eq. (3.3.20) p. 88, which in this library's horizontal-angle convention
+    # reads t = (1/g) ln[(c2/c1)(1 + sin th1)/(1 + sin th2)], with the ray angle
+    # at range r from their companion Eq. (3.3.21), sin th2 = sin th1 - xi g r.
+    c0, g, th = 1500.0, 0.05, math.radians(10.0)
+    xi = math.cos(th) / c0
+    sin_th2 = math.sin(th) - xi * g * 10_000.0
+    c2 = math.sqrt(1.0 - sin_th2**2) / xi
+    t = math.log((c2 / c0) * (1.0 + math.sin(th)) / (1.0 + sin_th2)) / g
+    res = ph.ray_trace([0.0, 2000.0], [c0, c0 + g * 2000.0], source_depth=0.0,
+                       launch_angles_deg=[10.0], max_range=10_000.0, n_steps=20_001)
+    return numeric(t, float(res.travel_times[0, -1]), 1e-6, unit="s", places=6)
+
+
+@register(
+    _UW_NUM,
     "Parabolic equation vs free field",
     "PE transmission loss at 2 km, homogeneous medium (spherical spreading), dB",
 )

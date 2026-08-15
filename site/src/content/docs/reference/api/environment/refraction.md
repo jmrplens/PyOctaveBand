@@ -152,8 +152,10 @@ $\xi = \cos(\gamma_0)/c(z_s)$ the equations are
 $dz/dr = \zeta/\xi$ and
 $d\zeta/dr = -(dc/dz)/(c^3 \xi)$, the same ray core as the ocean
 [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) (with a ground
-reflection in place of the sea surface). The travel time accumulates
-$dt/dr = 1/(\xi c^2)$.
+reflection in place of the sea surface). The travel time is a third state of
+the same Runge-Kutta step, $dt/dr = 1/(\xi c^2)$, so it is integrated
+with the very stages that place the ray rather than run over the finished
+path; a ground reflection is instantaneous and leaves it continuous.
 
 **Parameters**
 

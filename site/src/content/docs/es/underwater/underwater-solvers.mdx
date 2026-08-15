@@ -54,8 +54,11 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   exactos de la guía de ondas ideal (de presión nula).
 - **`ray_trace`** integra las ecuaciones de trayectoria de rayos
   (Runge-Kutta, vectorizadas sobre todos los rayos a la vez) a través de un
-  perfil de velocidad del sonido, reflejando en la superficie y el fondo.
-  Validado contra los arcos de círculo de un gradiente lineal.
+  perfil de velocidad del sonido, reflejando en la superficie y el fondo, y
+  arrastra el tiempo de propagación de cada rayo como un estado más de la
+  misma integración. Validado contra los arcos de círculo de un gradiente
+  lineal y contra la forma cerrada del tiempo de propagación a lo largo de
+  ellos.
 - **`parabolic_equation`** hace avanzar en distancia la PE estándar (Tappert)
   con el algoritmo split-step de Fourier. Validado contra la divergencia esférica en campo
   libre; coincide en tendencia con la pérdida por transmisión de los modos
@@ -144,7 +147,7 @@ field.plot()  # campo TL sobre distancia x profundidad
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `transmission_loss`); `ray_trace` un `RayTraceResult`
-(`ranges`, `depths` por rayo); `parabolic_equation` un
+(`ranges`, `depths` y `travel_times` por rayo); `parabolic_equation` un
 `ParabolicEquationResult` (el campo `transmission_loss`). Los tres difieren en
 lo que aproximan, no en lo que modelan, así que elegir entre ellos es una
 cuestión de régimen: la tabla de la sección 5 es la respuesta corta.
@@ -267,7 +270,7 @@ cuyo ángulo crítico y gradiente de pérdida por reflexión codifican exactamen
 lo que estas condiciones de contorno omiten, y lee la respuesta modal como una
 cota superior del nivel recibido.
 
-## 3. Trazado de rayos: puntos de giro y zonas de convergencia
+## 3. Trazado de rayos: puntos de giro y tiempos de propagación
 
 En el límite de alta frecuencia la ecuación de Helmholtz colapsa en la
 ecuación eikonal, y sus características son los **rayos**: trayectorias
@@ -291,7 +294,9 @@ trazado de rayos; en un perfil de aguas profundas la familia de rayos se reenfoc
 periódicamente en las **zonas de convergencia** de la figura de la
 sección 1. `ray_trace` integra todos los ángulos de lanzamiento a la vez
 con un esquema Runge-Kutta de cuarto orden y paso fijo, reflejando en la
-superficie y en el fondo:
+superficie y en el fondo, y arrastra con ellos el tiempo de propagación como
+un tercer estado del mismo paso ($dt/dr = 1/(\xi c^2)$, con
+$\xi = \cos\theta_0/c(z_s)$ el invariante de Snell):
 
 ```python
 import numpy as np
@@ -307,17 +312,28 @@ rays = underwater.ray_trace(z, c, source_depth=100.0,
                             n_steps=20000)
 z_turn = (1491.7 / np.cos(np.radians(6.0)) - 1490.0) / 0.017
 print(round(z_turn, 1))                     # 583.3  profundidad de giro analítica
-print(round(float(rays.depths.max()), 1))   # 583.7  trazada
+print(round(float(rays.depths.max()), 1))   # 583.3  trazada
+
+# El arco fija también el tiempo hasta ese giro: la velocidad del sonido se
+# cancela y solo quedan el ángulo de lanzamiento y el gradiente,
+# t = (1/g) ln[(1 + sin theta_0) / cos theta_0].
+th = np.radians(6.0)
+r_turn = np.sin(th) / (np.cos(th) / 1491.7 * 0.017)   # 9222,6 m
+t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / 0.017
+print(round(t_turn, 3))                                        # 6.171  analítico
+traced = np.interp(r_turn, rays.ranges[0], rays.travel_times[0])
+print(round(float(traced), 3))                                 # 6.171  trazado
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ray_turning_point_es.svg" alt="A la izquierda, un gradiente lineal de velocidad del sonido que sube desde 1490 metros por segundo en superficie; a la derecha, cinco rayos lanzados a 2, 4, 6, 8 y 10 grados hacia abajo desde una fuente a 100 metros, cada uno girando a su propia profundidad de giro analítica marcada con un aspa, con el arco de círculo exacto del gradiente lineal superpuesto en trazo discontinuo sobre el rayo de 6 grados y sus profundidades de giro analítica y trazada anotadas" width="92%" />
 
 *Cuanto más empinado es el lanzamiento, más hondo gira el rayo: en la misma agua
 el rayo de 2° gira a 154 m y el de 10° a 1454 m. El rayo de 6° lleva la
-validación de la propia página, los 583,3 m de profundidad de giro analítica
-frente a los 583,7 m trazados, y la superposición discontinua es el arco de
-círculo exacto de radio $R = c_0/(g\cos\theta_0)$ contra el que se comprueba el
-cálculo. Un resultado dibuja su propio abanico con `rays.plot()`.*
+validación de la propia página, los 583,3 m de profundidad de giro analítica,
+que el trazado reproduce hasta la décima de metro que imprime, y la
+superposición discontinua es el arco de círculo exacto de radio
+$R = c_0/(g\cos\theta_0)$ contra el que se comprueba el cálculo. Un resultado
+dibuja su propio abanico con `rays.plot()`.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -352,10 +368,16 @@ plt.show()
 
 </details>
 
-Los rayos compran geometría: caminos, profundidades de giro y distancias de
-las zonas de convergencia a un coste independiente de la frecuencia. Lo que aquí no llevan es una amplitud completa: la intensidad
+Los rayos compran geometría y tiempos: caminos, profundidades de giro,
+distancias de las zonas de convergencia y el tiempo de propagación a lo largo
+de cada uno, a un coste independiente de la frecuencia. Como el tiempo viaja
+en las mismas cuatro etapas Runge-Kutta que la trayectoria, y toma su velocidad
+del sonido de la interpolación que esas etapas ya hacen, describe el camino que
+de verdad se devuelve y no una segunda lectura de él, y coincide con la forma
+cerrada de un gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos
+$10^{-14}$ s. Lo que aquí no llevan es una amplitud completa: la intensidad
 geométrica del tubo de rayos diverge en las cáusticas, así que el objeto de
-resultado devuelve los caminos y deja el nivel al campo modal o de la PE.
+resultado deja el nivel al campo modal o de la PE.
 
 ## 4. La ecuación parabólica: un campo de un solo sentido que avanza en distancia
 
@@ -572,12 +594,12 @@ cap. 1):
 
 | Método | Régimen natural | Qué aporta |
 |---|---|---|
-| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, zonas de convergencia; coste independiente de la frecuencia |
+| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
 | `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
-frecuencias sorprendentemente bajas para trabajo de geometría de caminos, y
+frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
 la PE sigue siendo el caballo de batalla bastante por encima de su régimen
 formal de ángulos pequeños. Cuando dos de los tres coinciden en un caso, como
 hacen los modos y la PE en la figura de la sección 1, esa coincidencia es la
@@ -682,11 +704,14 @@ numéricos de Jensen et al. (2011) para un océano estratificado independiente
 de la distancia: la suma modal de Sturm-Liouville por diferencias finitas
 (cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de las trayectorias de
 rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar split-step de Fourier (cap.
-6), con la terminología de la ISO 18405:2017 en toda la página. Cada uno está
-validado contra una forma cerrada exacta: los modos de la guía de ondas ideal
-de presión nula, los rayos en arco de círculo de un gradiente lineal y la
-divergencia esférica en campo libre, más la coincidencia mutua de la pérdida
-por transmisión modal y de la PE.
+6), con la terminología de la ISO 18405:2017 en toda la página. `ray_trace`
+devuelve además el tiempo de propagación de cada rayo, integrado como un
+tercer estado del mismo paso Runge-Kutta. Cada uno está validado contra una
+forma cerrada exacta: los modos de la guía de ondas ideal de presión nula, los
+rayos en arco de círculo de un gradiente lineal junto con el tiempo de
+propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)) y
+la divergencia esférica en campo libre, más la coincidencia mutua de la
+pérdida por transmisión modal y de la PE.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
@@ -694,8 +719,9 @@ Los tres métodos suponen una columna de agua independiente de la distancia con
 un contorno de presión nula (o, para los modos, opcionalmente rígido): no hay
 fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
 así que los problemas dependientes de la distancia quedan fuera de alcance. El
-trazado de rayos devuelve caminos, no tiempos de propagación ni amplitudes: la
-intensidad de tubo de rayos con correcciones de cáusticas no se calcula. La PE
+trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes: la
+intensidad de tubo de rayos con correcciones de cáusticas no se calcula, y
+nada busca los eigenrayos que unen una fuente y un receptor dados. La PE
 es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
 angular de Padé. Para la física del lecho elástico que estos métodos fluidos
 dejan fuera, véase [Ondas elásticas y acoplamiento
@@ -726,9 +752,10 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 ### ¿Qué método de propagación submarina debo usar?
 
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
-alta frecuencia y océano profundo (geometría de los caminos de rayos y zonas
-de convergencia a un coste independiente de la frecuencia), modos normales para
-baja frecuencia en aguas someras (pocos modos propagantes, $M \approx kD/\pi$,
+alta frecuencia y océano profundo (geometría de los caminos de rayos, tiempos
+de propagación y zonas de convergencia a un coste independiente de la
+frecuencia), modos normales para baja frecuencia en aguas someras (pocos modos
+propagantes, $M \approx kD/\pi$,
 la solución de referencia en su régimen) y la ecuación parabólica para caminos
 largos de un solo sentido a baja frecuencia (el campo completo TL($z$,$r$)
 con refracción). Cuando dos métodos coinciden en un caso, esa coincidencia
